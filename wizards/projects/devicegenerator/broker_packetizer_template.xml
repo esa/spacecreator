@@ -1,43 +1,57 @@
 <?xml version="1.0"?>
 <InterfaceView%{IVAsnFile}>
 
-<Function name="Packetizer" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="6700 44700 26700 56100"/>
-<Provided_Interface name="Init" kind="Protected" layer="default" required_system_element="NO">
-    <Property name="Taste::coordinates" value="26700 47200"/>
+<Function name="Broker" is_type="NO" instance_of="" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="6600 28800 26600 41100"/>
+<Provided_Interface name="Init" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="validBusses" type="SystemBusSeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26600 31800"/>
 </Provided_Interface>
 
-<Provided_Interface name="Packetize" kind="Protected" layer="default" required_system_element="NO" wcet="0">
-    <Property name="Taste::coordinates" value="26700 50300"/>
+<Provided_Interface name="Deliver" kind="Sporadic" layer="default" required_system_element="NO" miat="0" wcet="0" stack_size="1024" queue_size="1" priority="1">
+    <Input_Parameter name="deliverReqSeq" type="DeliverRequestSeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26600 35000"/>
 </Provided_Interface>
 
-<Provided_Interface name="Depacketize" kind="Protected" layer="default" required_system_element="NO" wcet="0">
-    <Property name="Taste::coordinates" value="26700 53600"/>
-</Provided_Interface>
+<Required_Interface name="Receive" kind="Sporadic" layer="default" required_system_element="NO">
+    <Input_Parameter name="receiveReqSeq" type="ReceiveRequestSeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26600 38500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
 
     <Implementations>
         <Implementation name="default" language="C"/>
     </Implementations>
 </Function>
 
-<Function name="Broker" is_type="NO" instance_of="" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="6600 28800 26600 41100"/>
-<Provided_Interface name="Init" kind="Protected" layer="default" required_system_element="NO">
-    <Input_Parameter name="validBusses" type="SystemBusSeq" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="26600 31800"/>
+<Function name="Packetizer" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="6700 44700 26700 56100"/>
+<Provided_Interface name="Init" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Property name="Taste::coordinates" value="26700 47300"/>
 </Provided_Interface>
 
-<Provided_Interface name="Deliver" kind="Sporadic" layer="default" required_system_element="NO" miat="0" wcet="0" stack_size="1024" priority="1" queue_size="1">
-    <Input_Parameter name="deliverSeq" type="DeliverRequestSeq" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="26600 35100"/>
+<Provided_Interface name="Packetize" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="packetType" type="PacketType" encoding="NATIVE"/>
+    <Input_Parameter name="source" type="PacketSource" encoding="NATIVE"/>
+    <Input_Parameter name="destination" type="PacketDestination" encoding="NATIVE"/>
+    <Input_Parameter name="packetPointer" type="PacketPointer" encoding="NATIVE"/>
+    <Input_Parameter name="dataOffset" type="PacketDataOffset" encoding="NATIVE"/>
+    <Input_Parameter name="dataSize" type="DataLength" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26700 50600"/>
 </Provided_Interface>
 
-<Required_Interface name="Receive" kind="Sporadic" layer="default" required_system_element="NO">
-    <Input_Parameter name="receiveSeq" type="ReceiveRequestSeq" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="26600 38100"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="false"/>
-</Required_Interface>
+<Provided_Interface name="Depacketize" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="packetType" type="PacketType" encoding="NATIVE"/>
+    <Input_Parameter name="packetPointer" type="PacketPointer" encoding="NATIVE"/>
+    <Input_Parameter name="packetSize" type="DataLength" encoding="NATIVE"/>
+    <Input_Parameter name="source" type="PacketSourcePtr" encoding="NATIVE"/>
+    <Input_Parameter name="destination" type="PacketDestinationPtr" encoding="NATIVE"/>
+    <Input_Parameter name="dataOffset" type="PacketDataOffsetPtr" encoding="NATIVE"/>
+    <Input_Parameter name="dataSize" type="DataLengthPtr" encoding="NATIVE"/>
+    <Input_Parameter name="errorCode" type="RequestErrorCodePtr" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26700 53800"/>
+</Provided_Interface>
 
     <Implementations>
         <Implementation name="default" language="C"/>

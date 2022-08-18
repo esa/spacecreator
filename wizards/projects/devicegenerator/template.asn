@@ -1,4 +1,4 @@
-COMMDEVTEST1-DATAVIEW DEFINITIONS ::= BEGIN
+%{Model}-DATAVIEW DEFINITIONS ::= BEGIN
 
     SystemBus ::= INTEGER (0 .. 255)
 
@@ -8,7 +8,27 @@ COMMDEVTEST1-DATAVIEW DEFINITIONS ::= BEGIN
 
     OutputDataPtr ::= INTEGER (0 .. 255)
 
-    DataLength ::= INTEGER (-2147483648 .. 2147483647)
+    DataLength ::= INTEGER (-2147483648 .. 2147483647) --(Broker/Packetizer)const size_t dataSize/Length
+
+    DataLengthPtr ::= INTEGER (-2147483648 .. 2147483647) --(Depacketizer)size_t* const dataSize
+
+    PacketType ::= INTEGER (0 .. 255) --(Broker/Packetizer)const Packetizer_PacketType packetType
+
+    PacketSource ::= INTEGER (0 .. 65535) --(Packetizer)const uint16_t source
+
+    PacketDestination ::= INTEGER (0 .. 65535) --(Packetizer)const uint16_t destination
+
+    PacketSourcePtr ::= INTEGER (0 .. 65535) --(Depacketizer)uint16_t* const source
+
+    PacketDestinationPtr ::= INTEGER (0 .. 65535) --(Depacketizer)uint16_t* const destination
+
+    PacketPointer ::= INTEGER (0 .. 255) --(Packetizer)uint8_t* const packetPointer
+
+    PacketDataOffset ::= INTEGER (-2147483648 .. 2147483647) --(Packetizer)const size_t dataOffset
+
+    PacketDataOffsetPtr ::= INTEGER (-2147483648 .. 2147483647) --(Packetizer)size_t* const dataOffset
+
+    RequestErrorCodePtr ::= INTEGER (-2147483648 .. 2147483647) --(Depacketizer)int32_t* const errorCode
 
     SystemBusSeq ::= SEQUENCE (SIZE (255)) OF SystemBus --(Broker)enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER]
 
