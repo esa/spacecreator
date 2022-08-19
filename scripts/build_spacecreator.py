@@ -26,8 +26,9 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
                  '-DQTC_SOURCE=' + qtc_install
                  ]
     print_cmd(ninja_cmd)
-    return_code = subprocess.call(ninja_cmd)
-    if return_code:
+    completed_process = subprocess.run(ninja_cmd)
+    if not completed_process.returncode == 0:
+        print("CMake failed")
         exit(1)
 
     # Build SpaceCreator using ninja
@@ -35,15 +36,16 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
                  '--build', build_dir,
                  '--target', 'all']
     print_cmd(build_cmd)
-    return_code = subprocess.call(build_cmd)
-    if return_code:
-        exit(4)
+    completed_process = subprocess.run(build_cmd)
+    if not completed_process.returncode == 0:
+        print("Building Spacecreator failed")
+        exit(2)
 
 
 if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='build_spacecreator',
-                                     epilog='Example: python3 ./postbuild.py '
+                                     epilog='Example: python3 ./scripts/build_spacecreator.py '
                                             '--project_dir=/home/<user>/projects/spacecreator/ '
                                             '--build_dir=./build '
                                             '--build_type=Release'
