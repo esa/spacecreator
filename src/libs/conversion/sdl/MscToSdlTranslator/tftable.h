@@ -25,7 +25,9 @@
 namespace conversion::sdl::translator {
 
 /**
- * @brief   Represents a TF table that cointains transitions between states for given sequence
+ * @brief   Represents a TF table that contains transitions between states for given sequence
+ *
+ * Algorithm for sequence search is based on a finite automata based pattern search.
  */
 class TFTable final
 {
@@ -80,7 +82,7 @@ public:
 
 private:
     auto compute(const std::vector<uint32_t> &sequence) -> void;
-    auto getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t sig) const
+    auto getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t signal) const
             -> uint32_t;
 
 private:

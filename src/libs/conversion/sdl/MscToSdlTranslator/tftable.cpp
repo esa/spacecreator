@@ -57,14 +57,14 @@ void TFTable::compute(const std::vector<uint32_t> &sequence)
     }
 }
 
-uint32_t TFTable::getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t sig) const
+uint32_t TFTable::getNextState(const std::vector<uint32_t> &sequence, const uint32_t state, const uint32_t signal) const
 {
-    if (state < sequence.size() && sequence.at(state) == sig) {
+    if (state < sequence.size() && sequence.at(state) == signal) {
         return state + 1;
     }
 
     for (uint32_t nextState = state; nextState > 0; --nextState) {
-        if (sequence.at(nextState - 1) == sig) {
+        if (sequence.at(nextState - 1) == signal) {
             uint32_t i;
 
             for (i = 0; i < nextState - 1; ++i) {

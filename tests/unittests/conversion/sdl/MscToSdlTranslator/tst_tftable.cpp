@@ -31,6 +31,8 @@ void tst_TFTable::testTFTableSimple()
 
     TFTable table(sequence, 2);
 
+    QCOMPARE(table.stateCount(), sequence.size());
+
     {
         const auto &transitions = table.transitionsForState(0);
         QCOMPARE(transitions.at(0), 1);
@@ -61,6 +63,8 @@ void tst_TFTable::testTFTableComplex()
     std::vector<uint32_t> sequence { 0, 1, 0, 1, 0, 2, 0 };
 
     TFTable table(sequence, 4);
+
+    QCOMPARE(table.stateCount(), sequence.size());
 
     {
         const auto &transitions = table.transitionsForState(0);
