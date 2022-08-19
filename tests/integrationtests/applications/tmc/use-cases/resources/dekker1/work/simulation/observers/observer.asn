@@ -5,7 +5,7 @@ IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
 
-Lock-States ::= ENUMERATED {idle, wait-nocontention, writing, wait-turn}
+Lock-States ::= ENUMERATED {writing, idle, wait-nocontention, wait-turn}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,
@@ -98,38 +98,6 @@ T-Null-Record ::= SEQUENCE {}
 
 END
 
-
-TESTGUI-SUBTYPE DEFINITIONS ::=
-BEGIN
-
-IMPORTS 
-
-T-WriteRequest FROM DEKKER1-DATAVIEW
-
-
-
-
-T-WriteRequest FROM DEKKER1-DATAVIEW
-
- ;
-
-
-
-
-
-
-
-Testgui-writerequesta-p1 ::= T-WriteRequest
-
-
-
-
-Testgui-writerequestb-p1 ::= T-WriteRequest
-
-
-
-
-END
 
 
 Simulation-DataView DEFINITIONS ::=

@@ -55,17 +55,17 @@ writeRequest.start_address + writeCount;
     endstate;
     /* CIF state (512, 275), (72, 36) */
     state IDLE;
-        /* CIF input (440, 331), (192, 37) */
+        /* CIF input (438, 331), (192, 37) */
         input WriteRequest(writeRequest);
-            /* CIF PROCEDURECALL (401, 388), (270, 35) */
+            /* CIF PROCEDURECALL (399, 388), (270, 35) */
             call writeln('proc ', myProcID, ' write request');
-            /* CIF task (480, 443), (113, 35) */
+            /* CIF task (478, 443), (113, 35) */
             task writeCount := 0;
-            /* CIF task (403, 498), (268, 35) */
+            /* CIF task (401, 498), (268, 35) */
             task writeSize := length(writeRequest.values);
-            /* CIF output (468, 548), (138, 36) */
+            /* CIF output (466, 548), (138, 36) */
             output WantToEnter(true);
-            /* CIF decision (462, 604), (149, 50) */
+            /* CIF decision (460, 604), (149, 50) */
             decision remoteWantsToEnter;
                 /* CIF ANSWER (405, 674), (70, 24) */
                 (true):
@@ -84,7 +84,7 @@ writeRequest.start_address + writeCount;
             /* CIF NEXTSTATE (989, 174), (70, 36) */
             NEXTSTATE -;
     endstate;
-    /* CIF state (211, 808), (162, 36) */
+    /* CIF state (209, 808), (162, 36) */
     state WAIT_NOCONTENTION;
         /* CIF provided (196, 864), (207, 36) */
         provided remoteWantsToEnter = false;
