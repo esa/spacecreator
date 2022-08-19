@@ -1,0 +1,23 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Ponger;
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (601, 18), (70, 38) */
+    state Ready;
+        /* CIF input (601, 76), (70, 35) */
+        input HelpMe;
+            /* CIF output (601, 131), (70, 35) */
+            output Pong;
+            /* CIF NEXTSTATE (601, 186), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+    /* CIF state (450, 10), (70, 35) */
+    state Wait;
+        /* CIF input (450, 65), (70, 35) */
+        input Ping;
+            /* CIF NEXTSTATE (450, 120), (70, 35) */
+            NEXTSTATE Ready;
+    endstate;
+endprocess Ponger;

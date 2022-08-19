@@ -19,7 +19,6 @@
 
 #include "cmdfunctionarchetypesapply.h"
 
-#include "archetypes/archetypemodel.h"
 #include "commandids.h"
 #include "ivarchetypereference.h"
 #include "ivfunctiontype.h"
@@ -34,8 +33,6 @@ CmdFunctionArchetypesApply::CmdFunctionArchetypesApply(
     , m_newReferences(references)
     , m_oldReferences(function->archetypeReferences())
 {
-    Q_ASSERT(m_function);
-    Q_ASSERT(m_archetypeModel);
 }
 
 void CmdFunctionArchetypesApply::redo()

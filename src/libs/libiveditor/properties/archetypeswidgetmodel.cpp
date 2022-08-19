@@ -21,10 +21,8 @@
 
 #include "archetypes/archetypemodel.h"
 #include "ivarchetypereference.h"
-#include "ivcore/abstractsystemchecks.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
-#include "ivpropertytemplateconfig.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -35,11 +33,10 @@
 
 namespace ive {
 
-ArchetypesWidgetModel::ArchetypesWidgetModel(ivm::ArchetypeModel *archetypeModel, ivm::AbstractSystemChecks *checks,
-        cmd::CommandsStack::Macro *macro, QObject *parent)
+ArchetypesWidgetModel::ArchetypesWidgetModel(
+        ivm::ArchetypeModel *archetypeModel, cmd::CommandsStack::Macro *macro, QObject *parent)
     : QAbstractItemModel(parent)
     , m_areArchetypesModified(false)
-    , m_checks(checks)
     , m_cmdMacro(macro)
     , m_archetypeModel(archetypeModel)
 {
@@ -197,10 +194,6 @@ bool ArchetypesWidgetModel::insertRows(int row, int count, const QModelIndex &pa
                 tr("It's not possible to add new archetype implementation, no archetype libraries loaded"));
         return false;
     }
-
-    if (m_archetypeModel->getLibrariesNames().isEmpty()) {
-        return false;
-    }
     firstLibraryName = m_archetypeModel->getLibrariesNames().first();
 
     if (m_archetypeModel->getFunctionsNamesByLibraryName(firstLibraryName).isEmpty()) {
@@ -237,7 +230,7 @@ bool ArchetypesWidgetModel::removeRows(int row, int count, const QModelIndex &pa
     }
     const auto result = QMessageBox::question(qApp->activeWindow(), tr("Remove archetype implementations"),
             tr("Are you sure you want to remove selected archetype implementations?"));
-    if (QMessageBox::StandardButton::Yes != result) {
+    if (result != QMessageBox::StandardButton::Yes) {
         return false;
     }
     beginRemoveRows(parent, row, row + count - 1);

@@ -49,6 +49,7 @@ enum Id
     InsertFunctionImplementation,
     RemoveFunctionImplementation,
 
+    ApplyArchetypeLibraries,
     ApplyFunctionArchetypes,
 
     ChangeRequiredIfaceProperty,

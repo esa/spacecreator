@@ -46,7 +46,7 @@ VEObject::VEObject(const shared::Id &id, QObject *parent)
         setModel(model);
 }
 
-VEObject::~VEObject() { }
+VEObject::~VEObject() {}
 
 shared::Id VEObject::id() const
 {
@@ -263,4 +263,5 @@ QString toString(VEObject *object)
 {
     return object->titleUI();
 }
+
 }

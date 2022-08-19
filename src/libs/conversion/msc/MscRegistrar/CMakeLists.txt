@@ -14,6 +14,7 @@ target_link_libraries(MscRegistrar
     PUBLIC      Conversion::Common
                 MSC::Importer
                 MSC::Exporter
+                Conversion::MscToSdlTranslator
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(MscRegistrar)

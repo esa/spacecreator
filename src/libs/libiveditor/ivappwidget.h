@@ -50,6 +50,9 @@ public:
 
     void centerView();
 
+public Q_SLOTS:
+    void showArchetypeManager();
+
 private Q_SLOTS:
     void showContextMenuForIVModel(const QPoint &pos);
     void showAvailableLayers(const QPoint &pos);

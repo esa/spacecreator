@@ -20,11 +20,11 @@
 #pragma once
 
 #include "commandsstack.h"
-#include "shared/parameter.h"
 #include "ivinterface.h"
+#include "shared/parameter.h"
 
-#include <QWidget>
 #include <QVector>
+#include <QWidget>
 
 namespace ivm {
 class AbstractSystemChecks;
@@ -50,7 +50,7 @@ class ArchetypesWidget : public QWidget
 
 public:
     explicit ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function,
-            ivm::AbstractSystemChecks *checks, cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
+            cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
     ~ArchetypesWidget();
 
     void addArchetype();

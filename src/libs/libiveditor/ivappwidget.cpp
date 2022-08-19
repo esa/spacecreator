@@ -17,6 +17,7 @@
 
 #include "ivappwidget.h"
 
+#include "archetypesmanagerdialog.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
@@ -43,6 +44,7 @@
 #include <QBuffer>
 #include <QClipboard>
 #include <QDebug>
+#include <QDialog>
 #include <QFileInfo>
 #include <QIcon>
 #include <QMenu>
@@ -622,6 +624,17 @@ QVector<QAction *> IVAppWidget::initViewActions()
     m_viewActions.append(actionSaveSceneRender);
 
     return m_viewActions;
+}
+
+void IVAppWidget::showArchetypeManager()
+{
+    if (m_document == nullptr || m_document->objectsModel() == nullptr || m_document->archetypesModel() == nullptr) {
+        return;
+    }
+
+    ive::ArchetypesManagerDialog dialog(m_document, m_document->objectsModel(), m_document->commandsStack(), this);
+    dialog.init();
+    dialog.exec();
 }
 
 } // namespace ive

@@ -1,0 +1,44 @@
+<InterfaceView asn1file="sequenceparam.asn">
+<Function name="Controller" is_type="NO" language="C" default_implementation="default" required_system_element="NO" FPGA_Configurations="" fixed_system_element="NO" startup_priority="1">
+    <Property name="Taste::coordinates" value="23200 30700 43200 38700"/>
+<Provided_Interface name="Trigger" kind="Cyclic" layer="default" required_system_element="NO" dispatch_offset="0" priority="1" period="1000" stack_size="1024" wcet="0">
+    <Property name="Taste::coordinates" value="32300 30700"/>
+</Provided_Interface>
+
+<Required_Interface name="Iface" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="input" type="MySeq" encoding="NATIVE"/>
+    <Output_Parameter name="output" type="MySeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="43200 35700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function name="QGenC" is_type="NO" language="QGenC" default_implementation="default" required_system_element="NO" FPGA_Configurations="" fixed_system_element="NO" startup_priority="1">
+    <Property name="Taste::coordinates" value="59900 30800 79900 38800"/>
+<Provided_Interface name="Iface" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="input" type="MySeq" encoding="NATIVE"/>
+    <Output_Parameter name="output" type="MySeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="59900 33000"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="Iface"/>
+    <Target func_name="QGenC" pi_name="Iface"/>
+    <Property name="Taste::coordinates" value="43800 35700 51700 35700 51700 33000 59600 33000"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3" required_system_element="NO">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>

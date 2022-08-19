@@ -1,8 +1,0 @@
-SEQUENCEOFPARAM-DATAVIEW DEFINITIONS ::=
-BEGIN
-
-   MyInteger ::= INTEGER (0 .. 10000)
-   MySeqOf ::= SEQUENCE (SIZE (3)) OF MyInteger
-
-END
-

@@ -24,9 +24,10 @@
 
 namespace sdl {
 
-VariableDeclaration::VariableDeclaration(QString name, QString type)
+VariableDeclaration::VariableDeclaration(QString name, QString type, bool isMonitor)
     : Node(std::move(name))
     , m_type(std::move(type))
+    , m_isMonitor(isMonitor)
 {
 }
 
@@ -38,6 +39,16 @@ const QString &VariableDeclaration::type() const
 void VariableDeclaration::setType(QString type)
 {
     m_type = std::move(type);
+}
+
+bool VariableDeclaration::isMonitor() const
+{
+    return m_isMonitor;
+}
+
+void VariableDeclaration::setMonitor(bool isMonitor)
+{
+    m_isMonitor = isMonitor;
 }
 
 void VariableDeclaration::accept(Visitor &visitor) const

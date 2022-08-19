@@ -183,6 +183,143 @@ SdlVisitor::SdlVisitor(IndentingStreamWriter &writer, Layouter &layouter)
 {
 }
 
+void SdlVisitor::visit(const System &system)
+{
+    if (system.name().isEmpty()) {
+        throw ExportException("System shall have a name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("system %1;").arg(system.name()));
+
+    m_writer.pushIndent(INDENT);
+
+    if (!system.freeformTexts().empty()) {
+        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
+        m_layouter.moveDown(Layouter::ElementType::Text);
+
+        for (const auto &text : system.freeformTexts()) {
+            m_writer.beginLine(text);
+            m_writer.endLine(";");
+        }
+
+        m_writer.writeLine("/* CIF ENDTEXT */");
+    }
+
+    if (!system.getSignals().empty()) {
+        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
+        m_layouter.moveDown(Layouter::ElementType::Text);
+        exportCollection(system.getSignals());
+        m_writer.writeLine("/* CIF ENDTEXT */");
+    }
+
+    for (const auto &channel : system.channels()) {
+        channel.accept(*this);
+    }
+
+    system.block().accept(*this);
+
+    m_writer.popIndent();
+
+    m_writer.writeLine("endsystem;");
+}
+
+void SdlVisitor::visit(const Channel &channel)
+{
+    if (channel.name().isEmpty()) {
+        throw ExportException("Channel shall have a name but it doesn't");
+    }
+    if (channel.routes().empty()) {
+        throw ExportException("Channel shall have at least one route");
+    }
+
+    m_writer.writeLine(QString("channel %1").arg(channel.name()));
+
+    m_writer.pushIndent(INDENT);
+
+    for (const auto &route : channel.routes()) {
+        route.accept(*this);
+    }
+
+    m_writer.popIndent();
+    m_writer.writeLine("endchannel;");
+}
+
+void SdlVisitor::visit(const Block &block)
+{
+    if (block.name().isEmpty()) {
+        throw ExportException("Block shall have a name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("block %1;").arg(block.name()));
+
+    m_writer.pushIndent(INDENT);
+
+    for (const auto &signalRoute : block.signalRoutes()) {
+        signalRoute.accept(*this);
+    }
+
+    for (const auto &connection : block.connections()) {
+        connection.accept(*this);
+    }
+
+    block.process().accept(*this);
+
+    m_writer.popIndent();
+    m_writer.writeLine("endblock;");
+}
+
+void SdlVisitor::visit(const SignalRoute &signalRoute)
+{
+    if (signalRoute.name().isEmpty()) {
+        throw ExportException("Signal route shall have a name but it doesn't");
+    }
+    if (signalRoute.routes().empty()) {
+        throw ExportException("Signal route shall have at least one route");
+    }
+
+    m_writer.writeLine(QString("signalroute %1").arg(signalRoute.name()));
+
+    m_writer.pushIndent(INDENT);
+
+    for (const auto &route : signalRoute.routes()) {
+        route.accept(*this);
+    }
+
+    m_writer.popIndent();
+}
+
+void SdlVisitor::visit(const Connection &connection)
+{
+    const auto &channelName = connection.channelName();
+    const auto &signalRouteName = connection.signalRouteName();
+
+    if (channelName.isEmpty()) {
+        throw ExportException("Connection shall have a channel name but it doesn't");
+    }
+    if (signalRouteName.isEmpty()) {
+        throw ExportException("Connection shall have a signal route name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("connect %1 and %2;").arg(channelName).arg(signalRouteName));
+}
+
+void SdlVisitor::visit(const Route &route)
+{
+    if (route.from().isEmpty()) {
+        throw ExportException("Route shall have a from name but it doesn't");
+    }
+    if (route.to().isEmpty()) {
+        throw ExportException("Route shall have a to name but it doesn't");
+    }
+    if (route.with().isEmpty()) {
+        throw ExportException("Route shall have at least one with name but it doesn't");
+    }
+
+    m_writer.beginLine(QString("from %1").arg(route.from()));
+    m_writer.write(QString(" to %1").arg(route.to()));
+    m_writer.endLine(QString(" with %1;").arg(route.with().join(", ")));
+}
+
 void SdlVisitor::visit(const Process &process)
 {
     if (process.name().isEmpty()) {
@@ -195,18 +332,30 @@ void SdlVisitor::visit(const Process &process)
     m_writer.writeLine("process " + process.name() + ";");
     m_writer.pushIndent(INDENT);
 
-    if (!process.variables().empty() || !process.timerNames().empty()) {
+    const auto hasVariables = !process.variables().empty();
+    const auto hasTimers = !process.timerNames().empty();
+    const auto hasErrorStates = !process.errorStates().empty();
+    const auto hasProcedures = !process.procedures().empty();
+
+    if (hasVariables || hasTimers || hasErrorStates) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
+
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
             m_writer.writeLine("Timer " + timer + ";");
         }
+
         exportCollection(process.variables());
+
+        if (hasErrorStates) {
+            m_writer.writeLine(QString("errorstates %1;").arg(process.errorStates().join(", ")));
+        }
+
         m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
-    if (!process.procedures().empty()) {
+    if (hasProcedures) {
         exportCollection(process.procedures());
     }
 
@@ -253,6 +402,55 @@ void SdlVisitor::visit(const State &state)
     m_layouter.popPosition();
     m_layouter.moveRightToHighWatermark();
     m_layouter.moveRight(Layouter::ElementType::State);
+}
+
+void SdlVisitor::visit(const Signal &signal)
+{
+    if (signal.name().isEmpty()) {
+        throw ExportException("Signal shall have a name but it doesn't");
+    }
+
+    m_writer.writeLine(QString("signal %1;").arg(signal.name()));
+}
+
+void SdlVisitor::visit(const Rename &rename)
+{
+    if (rename.name().isEmpty()) {
+        throw ExportException("Signal rename shall have a name but it doesn't");
+    }
+
+    m_writer.beginLine(QString("signal %1 renames").arg(rename.name()));
+
+    if (rename.referencedName().isEmpty()) {
+        return;
+    }
+
+    switch (rename.direction()) {
+    case Rename::Direction::Input:
+        m_writer.write(" input ");
+        break;
+    case Rename::Direction::Output:
+        m_writer.write(" output ");
+        break;
+    }
+
+    m_writer.write(rename.referencedName());
+
+    if (rename.referencedFunctionName().isEmpty()) {
+        return;
+    }
+
+    switch (rename.direction()) {
+    case Rename::Direction::Input:
+        m_writer.write(" to ");
+        break;
+    case Rename::Direction::Output:
+        m_writer.write(" from ");
+        break;
+    }
+
+    m_writer.write(rename.referencedFunctionName());
+    m_writer.endLine(";");
 }
 
 void SdlVisitor::visit(const Input &input)
@@ -349,7 +547,15 @@ void SdlVisitor::visit(const VariableDeclaration &declaration)
     }
 
     m_writer.writeComment(declaration.comment());
-    m_writer.writeLine("dcl " + declaration.name() + " " + declaration.type() + ";");
+
+    if (declaration.isMonitor()) {
+        m_writer.beginLine("monitor ");
+    } else {
+        m_writer.beginLine("dcl ");
+    }
+
+    m_writer.write(QString("%1 %2").arg(declaration.name()).arg(declaration.type()));
+    m_writer.endLine(";");
 }
 
 void SdlVisitor::visit(const Label &label)

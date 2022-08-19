@@ -23,8 +23,10 @@
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
 
+#include <QMenu>
 #include <QUndoGroup>
 #include <QUndoStack>
+#include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/editormanager/editormanager.h>
@@ -58,6 +60,18 @@ IVEditorData::IVEditorData(SpaceCreatorProjectManager *projectManager, QObject *
     Core::ActionManager::registerAction(redoAction, Core::Constants::REDO, contexts);
 
     contexts.add(Core::Constants::C_EDITORMANAGER);
+
+    auto interfaceViewMenu = Core::ActionManager::createMenu(Constants::IV_MENU_ID);
+    auto action = new QAction(tr("Manage Archetypes"), this);
+    auto command = Core::ActionManager::registerAction(action, Constants::IV_MANAGE_ARCHETYPES_ID, contexts);
+    interfaceViewMenu->addAction(command);
+
+    auto toolsMenu = Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
+    QMenu *menu = interfaceViewMenu->menu();
+    menu->setTitle(tr("Interface view"));
+    menu->setEnabled(true);
+    toolsMenu->addMenu(interfaceViewMenu);
+
     m_context = new MscContext(contexts, nullptr, this);
     Core::ICore::addContextObject(m_context);
 }

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "process.h"
+#include "system.h"
 
 #include <QStringList>
 #include <conversion/common/model.h>
@@ -67,6 +68,19 @@ public:
     virtual auto modelType() const -> conversion::ModelType override;
 
     /**
+     * @brief   Getter for systems stored in a model
+     *
+     * @return  Model systems
+     */
+    auto systems() const -> const std::vector<System> &;
+    /**
+     * @brief   Add a system to the model
+     *
+     * @param   system      System
+     */
+    auto addSystem(System system) -> void;
+
+    /**
      * @brief   Getter for processes stored in a model
      *
      * @returns Model processes
@@ -93,6 +107,8 @@ public:
     auto setName(QString name) -> void;
 
 private:
+    /** @brief  Model systems */
+    std::vector<System> m_systems;
     /** @brief  Model processes */
     std::vector<Process> m_processes;
     /** @brief  Model name */
