@@ -51,12 +51,12 @@ std::unique_ptr<conversion::Model> SimulinkXmlImporter::importModel(const Option
         throw ImportException("Simulink file to import wasn't specified");
     }
 
-    const QFileInfo inputFileInfo(*inputFilepath);
+    const QFileInfo inputFileInfo(*inputFilePath);
     if (!inputFileInfo.exists()) {
-        throw FileNotFoundException(*inputFilepath, "while importing");
+        throw FileNotFoundException(*inputFilePath, "while importing");
     }
 
-    auto model = parse(*inputFilepath);
+    auto model = parse(*inputFilePath);
 
     return model;
 }
@@ -74,6 +74,10 @@ std::unique_ptr<conversion::Model> SimulinkXmlImporter::parse(const common::Stri
 
     if (xmlReader.name() == QLatin1String("ModelInterface")) {
         auto simulinkModel = std::make_unique<model::SimulinkModel>();
+
+        QFileInfo inputSimulinkFileInfo(inputSimulinkFile);
+        simulinkModel->setName(inputSimulinkFileInfo.baseName());
+
         readSimulinkModel(xmlReader, simulinkModel);
         return simulinkModel;
     } else {
