@@ -1,0 +1,28 @@
+<InterfaceView>
+    <Function name="Function_Type_1" is_type="YES" FPGA_Configurations="" type_language="SDL">
+        <Property name="Taste::coordinates" value="55500 35600 75500 43600"/>
+    <Provided_Interface name="InterfaceTest" kind="Unprotected" layer="default" wcet="0">
+        <Input_Parameter name="Paramaeter11" type="T-Int32" encoding="NATIVE"/>
+        <Output_Parameter name="Paramaeter12" type="T-UInt32" encoding="NATIVE"/>
+        <Input_Parameter name="Paramaeter13" type="T-Int8" encoding="NATIVE"/>
+        <Property name="Taste::coordinates" value="55500 35600"/>
+    </Provided_Interface>
+    
+    <Required_Interface name="Interface2" kind="Protected" layer="FirstLibLayer1">
+        <Input_Parameter name="Paramaeter21" type="T-Boolean" encoding="NATIVE"/>
+        <Output_Parameter name="Paramaeter22" type="T-Int8" encoding="NATIVE"/>
+        <Input_Parameter name="Paramaeter23" type="T-Boolean" encoding="NATIVE"/>
+        <Property name="Taste::coordinates" value="55500 37300"/>
+        <Property name="Taste::InheritPI" value="true"/>
+        <Property name="Taste::Autonamed" value="false"/>
+    </Required_Interface>
+    
+    
+    <ArchetypeReference archetype_library="Lib1" archetype_function="ArchFunc1"/>
+    </Function>
+    
+    <Layer name="default"/>
+    
+    <Layer name="FirstLibLayer1"/>
+    
+</InterfaceView>

@@ -17,9 +17,10 @@
 
 #include "ivexporter.h"
 
-#include "archetypes/archetypemodel.h"
 #include "archetypes/archetypeintegrityhelper.h"
+#include "archetypes/archetypemodel.h"
 #include "common.h"
+#include "errorhub.h"
 #include "interfacedocument.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
@@ -65,14 +66,14 @@ QString IVExporter::defaultTemplatePath() const
 bool IVExporter::exportObjects(const QList<shared::VEObject *> &objects, QBuffer *outBuffer,
         ivm::ArchetypeModel *archetypesModel, const QString &templatePath)
 {
-    ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(objects, archetypesModel);
+    checkArchetypeIntegrity(objects, archetypesModel);
     const QHash<QString, QVariant> ivObjects = collectObjects(objects);
     return exportData(ivObjects, templatePath, outBuffer);
 }
 
 bool IVExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPath, const QString &templatePath)
 {
-    ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(doc->objects().values(), doc->archetypesModel());
+    checkArchetypeIntegrity(doc->objects().values(), doc->archetypesModel());
     const QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
     return exportData(ivObjects, outPath.isEmpty() ? doc->path() : outPath, templatePath, InteractionPolicy::Silently);
 }
@@ -80,7 +81,7 @@ bool IVExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPat
 bool IVExporter::exportDocInteractively(
         InterfaceDocument *doc, const QString &outPath, const QString &templatePath, QWidget *root)
 {
-    ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(doc->objects().values(), doc->archetypesModel());
+    checkArchetypeIntegrity(doc->objects().values(), doc->archetypesModel());
     const QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
     return exportData(
             ivObjects, outPath.isEmpty() ? doc->path() : outPath, templatePath, InteractionPolicy::Interactive, root);
@@ -140,5 +141,17 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
     }
 
     return grouppedObjects;
+}
+
+void IVExporter::checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel)
+{
+    if (archetypesModel == nullptr) {
+        return;
+    }
+
+    QStringList warningList = ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(ivObjects, archetypesModel);
+    for (QString warning : warningList) {
+        shared::ErrorHub::addError(shared::ErrorItem::Warning, warning);
+    }
 }
 }

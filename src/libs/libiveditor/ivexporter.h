@@ -62,6 +62,7 @@ private:
     QString groupName(const shared::VEObject *object) const override;
 
     QHash<QString, QVariant> collectInterfaceObjects(InterfaceDocument *doc);
+    void checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
 };
 
 }

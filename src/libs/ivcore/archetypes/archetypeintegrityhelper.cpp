@@ -22,7 +22,6 @@
 #include "archetypelibrary.h"
 #include "archetypemodel.h"
 #include "archetypeobject.h"
-#include "errorhub.h"
 #include "functionarchetype.h"
 #include "interfacearchetype.h"
 #include "ivarchetypereference.h"
@@ -35,19 +34,23 @@
 
 namespace ivm {
 
-void ArchetypeIntegrityHelper::checkArchetypeIntegrity(
+QStringList ArchetypeIntegrityHelper::checkArchetypeIntegrity(
         QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel)
 {
+    QStringList warnings;
     for (auto object : ivObjects) {
         if (auto functionType = object->as<ivm::IVFunctionType *>()) {
-            checkFunctionArchetypeIntegrity(functionType, archetypesModel);
+            warnings << checkFunctionArchetypeIntegrity(functionType, archetypesModel);
         }
     }
+    return warnings;
 }
 
-void ArchetypeIntegrityHelper::checkFunctionArchetypeIntegrity(
+QStringList ArchetypeIntegrityHelper::checkFunctionArchetypeIntegrity(
         ivm::IVFunctionType *function, ivm::ArchetypeModel *archetypesModel)
 {
+    QStringList warnings;
+
     for (auto reference : function->archetypeReferences()) {
 
         ivm::ArchetypeObject *archetypeObject = archetypesModel->getObjectByName(
@@ -71,11 +74,12 @@ void ArchetypeIntegrityHelper::checkFunctionArchetypeIntegrity(
             }
             if (!contains) {
                 const QString msg("The archetype interface %1::%2 is not implemented in function %3");
-                shared::ErrorHub::addError(shared::ErrorItem::Warning,
-                        msg.arg(functionArchetype->title(), interfaceArchetype->title(), function->title()));
+                warnings << msg.arg(functionArchetype->title(), interfaceArchetype->title(), function->title());
             }
         }
     }
+
+    return warnings;
 }
 
 bool ArchetypeIntegrityHelper::checkInterfaceArchetypeIntegrity(

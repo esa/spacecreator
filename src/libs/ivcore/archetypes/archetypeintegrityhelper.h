@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QObject>
+#include <QStringList>
 
 namespace shared {
 class VEObject;
@@ -40,10 +41,12 @@ class ArchetypeIntegrityHelper : public QObject
 public:
     ArchetypeIntegrityHelper() = delete;
 
-    static void checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
+    static QStringList checkArchetypeIntegrity(
+            QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
 
 private:
-    static void checkFunctionArchetypeIntegrity(ivm::IVFunctionType *function, ivm::ArchetypeModel *archetypesModel);
+    static QStringList checkFunctionArchetypeIntegrity(
+            ivm::IVFunctionType *function, ivm::ArchetypeModel *archetypesModel);
     static bool checkInterfaceArchetypeIntegrity(
             ivm::IVInterface *interface, ivm::InterfaceArchetype *interfaceArchetype);
     static bool checkParameterArchetypeIntegrity(
