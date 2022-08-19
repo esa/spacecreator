@@ -58,14 +58,9 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
     qDebug() << "Client command: " << cmdClient;
     qDebug() << "Binary under test dir: " << binaryUnderTestDir;
 
-    int result;
-    result = std::system(cmdServer.toStdString().c_str());
-    result = std::system(cmdClient.toStdString().c_str());
-    result = std::system(("killall " + server).toStdString().c_str());
-    if (result != 0)
-    {
-        qDebug() << "std::system failed";
-    }
+    std::system(cmdServer.toStdString().c_str());
+    std::system(cmdClient.toStdString().c_str());
+    std::system(("killall " + server).toStdString().c_str());
 
     QString outStr;
     QFile file(outputFilePath);
