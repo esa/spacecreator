@@ -19,22 +19,17 @@
 
 #pragma once
 
-#include "observertype.h"
-#include "tftable.h"
+#include "specialized/sequencetranslator.h"
 
-#include <conversion/common/options.h>
-#include <memory>
 #include <msccore/mscchart.h>
 #include <sdl/SdlModel/rename.h>
-#include <sdl/SdlModel/sdlmodel.h>
-#include <vector>
 
 namespace conversion::sdl::translator {
 
 /**
  * @brief   Translator for MSC "Never" charts
  */
-class NeverSequenceTranslator final
+class NeverSequenceTranslator final : public SequenceTranslator
 {
 public:
     /**
@@ -77,33 +72,18 @@ private:
         std::set<QString> messages;
         std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
         std::vector<uint32_t> sequence;
+        ::sdl::State *startState;
+        ::sdl::State *errorState;
         std::size_t signalCounter;
     };
 
 private:
-    using StateList = std::vector<std::unique_ptr<::sdl::State>>;
-    using TransitionList = std::vector<std::unique_ptr<::sdl::Transition>>;
-
     auto collectData(const msc::MscChart *mscChart) const -> NeverSequenceTranslator::Context;
 
     auto handleEvent(Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
     auto handleMessageEvent(Context &context, const msc::MscMessage *mscMessage) const -> void;
 
-    auto createSdlSystem(Context &context) -> void;
-    auto createSdlProcess(const Context &context) -> ::sdl::Process;
-    auto createStateMachine(const Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
-
-    auto createStates(const uint32_t stateCount) const -> StateList;
-    auto createTransitions(const TFTable &table, StateList &states) const -> TransitionList;
-
-private:
-    inline static const QString m_stateNameTemplate = "s%1";
-    inline static const QString m_signalRenameNameTemplate = "sig%1";
-    inline static const QString m_defaultChannelName = "c";
-    inline static const QString m_defaultRouteName = "r";
-
-    ::sdl::SdlModel *m_sdlModel;
-    const Options &m_options;
+    auto createStateMachine(Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
 };
 
 } // namespace conversion::sdl::translator

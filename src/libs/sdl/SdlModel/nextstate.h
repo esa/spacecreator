@@ -41,7 +41,7 @@ public:
      * @param   name    name of the action
      * @param   state   a pointer to the next state
      */
-    NextState(QString name, State *state = nullptr);
+    NextState(QString name, const State *state = nullptr);
     /**
      * @brief   Deleted copy constructor
      */
@@ -66,7 +66,7 @@ public:
      *
      * @return  next state
      */
-    auto state() const -> State *;
+    auto state() const -> const State *;
     /**
      * @brief   Setter for the next state
      *
@@ -81,7 +81,7 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 private:
-    State *m_state;
+    const State *m_state;
 };
 
 } // namespace sdl

@@ -4,12 +4,14 @@ set(SOURCES     tftable.cpp
                 translator.cpp
                 specialized/charttranslator.cpp
                 specialized/documenttranslator.cpp
-                specialized/neversequencetranslator.cpp)
+                specialized/neversequencetranslator.cpp
+                specialized/sequencetranslator.cpp)
 set(INCLUDES    tftable.h
                 translator.h
                 specialized/charttranslator.h
                 specialized/documenttranslator.h
-                specialized/neversequencetranslator.h)
+                specialized/neversequencetranslator.h
+                specialized/sequencetranslator.h)
 
 add_library(MscToSdlTranslator STATIC)
 target_sources(MscToSdlTranslator
