@@ -11,6 +11,8 @@ DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
 RESOURCE_DIR=resources/dekker1
 SUBTYPES_DIR=${RESOURCE_DIR}/work/modelchecking/subtypes
+OBSERVERS_DIR=${RESOURCE_DIR}/work/modelchecking/properties/observers
+STOPCONDITIONS_DIR=${RESOURCE_DIR}/work/modelchecking/properties/stopconditions
 
 echo "Running TMC test: ${0##*/}'"
 
@@ -20,8 +22,12 @@ mkdir $TEST_OUTPUT_DIR
 
 # Translate
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
+    -ivl 1 \
     -sub ${SUBTYPES_DIR}/subtypes.asn \
+    -scl ${STOPCONDITIONS_DIR}/sc.scl \
     -o $TEST_OUTPUT_DIR
+
+#    -os ${STOPCONDITIONS_DIR}/observer.pr \
 
 # Compile the actual Spin model checker. This tests
 # whether all the features are supported, and that 
