@@ -1,0 +1,44 @@
+<InterfaceView>
+<Function name="ModelHost" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="46200 10600 66200 18600"/>
+<Provided_Interface name="Calculate" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="paramint" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="paramfloat" type="MyFloat" encoding="NATIVE"/>
+    <Input_Parameter name="parambool" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="paramout" type="MyFloat" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="46200 14200"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function name="TestDriver" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="7500 18400 27500 26400"/>
+<Provided_Interface name="StartTest" kind="Cyclic" layer="default" period="999" priority="1" wcet="0" dispatch_offset="0" stack_size="5000">
+    <Property name="Taste::coordinates" value="12300 18400"/>
+</Provided_Interface>
+
+<Required_Interface name="Calculate" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="paramint" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="paramfloat" type="MyFloat" encoding="NATIVE"/>
+    <Input_Parameter name="parambool" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="paramout" type="MyFloat" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="27500 21800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="TestDriver" ri_name="Calculate"/>
+    <Target func_name="ModelHost" pi_name="Calculate"/>
+    <Property name="Taste::coordinates" value="28100 21800 37000 21800 45900 14200"/>
+</Connection>
+
+</InterfaceView>

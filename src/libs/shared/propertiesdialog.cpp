@@ -115,4 +115,14 @@ PropertyTemplateConfig *PropertiesDialog::propertiesConfig() const
     return d->dynPropConfig;
 }
 
+Ui::PropertiesDialog *PropertiesDialog::propertiesDialogUi() const
+{
+    return d->ui.get();
+}
+
+int PropertiesDialog::getTabCount() const
+{
+    return d->ui->tabWidget->count();
+}
+
 } // namespace ive

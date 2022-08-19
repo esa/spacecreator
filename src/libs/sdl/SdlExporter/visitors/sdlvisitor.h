@@ -214,6 +214,43 @@ public:
      */
     SdlVisitor &operator=(SdlVisitor &&) = delete; // instances of this class cannot be moved
 
+public:
+    /**
+     * @brief   System visitor
+     *
+     * @param   system     System to be serialized
+     */
+    virtual auto visit(const System &system) -> void override;
+    /**
+     * @brief   Channel visitor
+     *
+     * @param   channel   Channel to be visited
+     */
+    virtual auto visit(const Channel &channel) -> void override;
+    /**
+     * @brief   Block visitor
+     *
+     * @param   block   Block to be serialized
+     */
+    virtual auto visit(const Block &block) -> void override;
+    /**
+     * @brief   SignalRoute visitor
+     *
+     * @param   signalRoute     Signal route to be serialized
+     */
+    virtual auto visit(const SignalRoute &signalRoute) -> void override;
+    /**
+     * @brief   Connection visitor
+     *
+     * @param   connection      Connection to be serialized
+     */
+    virtual auto visit(const Connection &connection) -> void override;
+    /**
+     * @brief   Route visitor
+     *
+     * @param   route   Route to be visited
+     */
+    virtual auto visit(const Route &route) -> void override;
     /**
      * @brief   Process visitor
      *
@@ -226,6 +263,18 @@ public:
      * @param   state   state to be serialized
      */
     virtual auto visit(const State &state) -> void override;
+    /**
+     * @brief   Signal visitor
+     *
+     * @param   signal   Signal to be visited
+     */
+    virtual auto visit(const Signal &input) -> void override;
+    /**
+     * @brief   Rename visitor
+     *
+     * @param   rename      Rename to be serialized
+     */
+    virtual auto visit(const Rename &rename) -> void override;
     /**
      * @brief   Input visitor
      *

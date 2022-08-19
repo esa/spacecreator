@@ -19,9 +19,10 @@
 
 #pragma once
 
+#include "ivobject.h"
+
 #include <QObject>
 #include <QString>
-#include "ivobject.h"
 
 namespace ivm {
 
@@ -30,8 +31,8 @@ class IVArchetypeLibraryReference : public IVObject
     Q_OBJECT
 
 public:
-    explicit IVArchetypeLibraryReference(QObject *parent = nullptr, const QString &archetypeLibraryName = QString(),
-            const QString &archetypeLibraryPath = QString());
+    explicit IVArchetypeLibraryReference(const QString &archetypeLibraryName = QString(),
+            const QString &archetypeLibraryPath = QString(), QObject *parent = nullptr);
     ~IVArchetypeLibraryReference() = default;
 
     QString getLibraryName() const;

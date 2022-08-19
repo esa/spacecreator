@@ -64,6 +64,8 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "archetype_library", Token::archetype_library },
     { "archetype_function", Token::archetype_function },
     { "path", Token::path },
+    { "fixed_system_element", Token::fixed_system_element },
+    { "required_system_element", Token::required_system_element },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },

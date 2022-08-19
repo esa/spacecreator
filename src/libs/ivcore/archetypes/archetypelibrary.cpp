@@ -33,6 +33,15 @@ QVector<FunctionArchetype *> ArchetypeLibrary::getFunctions() const
     return m_functions;
 }
 
+bool ArchetypeLibrary::aboutToBeRemoved()
+{
+    for (auto function : m_functions) {
+        function->setParentObject(nullptr);
+    }
+    m_functions.clear();
+    return true;
+}
+
 void ArchetypeLibrary::addFunction(FunctionArchetype *functionArchetype)
 {
     if (!functionArchetype) {
@@ -49,5 +58,16 @@ void ArchetypeLibrary::removeFunction(FunctionArchetype *functionArchetype)
     }
     functionArchetype->setParentObject(nullptr);
     m_functions.removeAll(functionArchetype);
+}
+
+QStringList ArchetypeLibrary::getFunctionsNames()
+{
+    QStringList functionsNames;
+
+    for (auto function : getFunctions()) {
+        functionsNames.append(function->title());
+    }
+
+    return functionsNames;
 }
 }

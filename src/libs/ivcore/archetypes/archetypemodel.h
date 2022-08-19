@@ -24,6 +24,7 @@
 
 #include <QAbstractItemModel>
 #include <QVector>
+#include <QStringList>
 #include <conversion/common/model.h>
 #include <memory>
 
@@ -45,6 +46,9 @@ public:
     ArchetypeObject *getObject(const shared::Id &id) const override;
     ArchetypeObject *getObjectByName(const QString &name, ArchetypeObject::Type type = ArchetypeObject::Type::Unknown,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
+
+    QStringList getLibrariesNames();
+    QStringList getFunctionsNamesByLibraryName(const QString &libraryName);
 
     void clear() override;
 

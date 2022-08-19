@@ -32,6 +32,10 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdentitiesinstantiate.h
     commands/cmdentitiesremove.cpp
     commands/cmdentitiesremove.h
+    commands/cmdfunctionarchetypesapply.cpp
+    commands/cmdfunctionarchetypesapply.h
+    commands/cmdarchetypelibraryapply.cpp
+    commands/cmdarchetypelibraryapply.h
     commands/cmdfunctionattrchange.cpp
     commands/cmdfunctionattrchange.h
     commands/cmdfunctionimplementationdefaultchange.cpp
@@ -96,6 +100,11 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/extprocmonitor.h
     createconnectiongroupdialog.cpp
     createconnectiongroupdialog.h
+    archetypesmanagerdialog.cpp
+    archetypesmanagerdialog.h
+    archetypesmanagerdialog.ui
+    archetypesmanagermodel.cpp
+    archetypesmanagermodel.h
     endtoend/endtoendconnections.cpp
     endtoend/endtoendconnections.h
     endtoend/endtoendview.cpp
@@ -162,6 +171,15 @@ target_sources(${LIB_NAME} PRIVATE
     properties/contextparametersmodel.h
     properties/delegates/asn1valuedelegate.cpp
     properties/delegates/asn1valuedelegate.h
+    properties/delegates/comboboxdelegate.cpp
+    properties/delegates/comboboxdelegate.h
+    properties/delegates/filedialogdelegate.h
+    properties/delegates/filedialogdelegate.cpp
+    properties/archetypeswidgetmodel.cpp
+    properties/archetypeswidgetmodel.h
+    properties/archetypeswidget.cpp
+    properties/archetypeswidget.h
+    properties/archetypeswidget.ui
     properties/ifaceparametersmodel.cpp
     properties/ifaceparametersmodel.h
     properties/implementationsmodel.cpp

@@ -32,6 +32,8 @@ public:
     explicit FunctionArchetype(const QString &title, QObject *parent = nullptr);
     ~FunctionArchetype() override;
 
+    bool aboutToBeRemoved() override;
+
     QVector<InterfaceArchetype *> getInterfaces() const;
     void addInterface(InterfaceArchetype *interfaceArchetype);
     void removeInterface(InterfaceArchetype *interfaceArchetype);

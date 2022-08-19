@@ -1,6 +1,8 @@
 project(SdlModelBuilder VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES     sdlanswerbuilder.cpp
+                sdlblockbuilder.cpp
+                sdlchannelbuilder.cpp
                 sdldecisionbuilder.cpp
                 sdlmodelbuilder.cpp
                 sdlinputbuilder.cpp
@@ -8,11 +10,15 @@ set(SOURCES     sdlanswerbuilder.cpp
                 sdlprocedurebuilder.cpp
                 sdlprocedurecallbuilder.cpp
                 sdlprocessbuilder.cpp
+                sdlsignalroutebuilder.cpp
                 sdlstatebuilder.cpp
                 sdlstatemachinebuilder.cpp
+                sdlsystembuilder.cpp
                 sdltaskbuilder.cpp
                 sdltransitionbuilder.cpp)
 set(INCLUDES    sdlanswerbuilder.h
+                sdlblockbuilder.h
+                sdlchannelbuilder.h
                 sdldecisionbuilder.h
                 sdlmodelbuilder.h
                 sdlinputbuilder.h
@@ -20,8 +26,10 @@ set(INCLUDES    sdlanswerbuilder.h
                 sdlprocedurebuilder.h
                 sdlprocedurecallbuilder.h
                 sdlprocessbuilder.h
+                sdlsignalroutebuilder.h
                 sdlstatebuilder.h
                 sdlstatemachinebuilder.h
+                sdlsystembuilder.h
                 sdltaskbuilder.h
                 sdltransitionbuilder.h)
 

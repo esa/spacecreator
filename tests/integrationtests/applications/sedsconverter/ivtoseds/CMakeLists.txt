@@ -18,6 +18,7 @@ configure_file(resources/config.xml resources/config.xml COPYONLY)
 configure_file(resources/seds.xsd resources/seds.xsd COPYONLY)
 configure_file(resources/seds-core-semantics.xsd resources/seds-core-semantics.xsd COPYONLY)
 configure_file(resources/seds-extension-semantics.xsd resources/seds-extension-semantics.xsd COPYONLY)
+configure_file(resources/xml.xsd resources/xml.xsd COPYONLY)
 
 configure_file(test_cyclic_interface.sh test_cyclic_interface.sh COPYONLY)
 configure_file(resources/test_cyclic_interface.output resources/test_cyclic_interface.output COPYONLY)

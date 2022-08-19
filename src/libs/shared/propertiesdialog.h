@@ -22,6 +22,10 @@
 #include <QDialog>
 #include <memory>
 
+namespace Ui {
+class PropertiesDialog;
+}
+
 namespace shared {
 class VEObject;
 class PropertyTemplateConfig;
@@ -49,6 +53,8 @@ protected:
     cmd::CommandsStackBase::Macro *commandMacro() const;
     cmd::CommandsStackBase *commandStack() const;
     PropertyTemplateConfig *propertiesConfig() const;
+    Ui::PropertiesDialog *propertiesDialogUi() const;
+    int getTabCount() const;
 
 private:
     struct PropertiesDialogPrivate;

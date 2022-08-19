@@ -177,8 +177,13 @@ auto TestGenerator::prepareTasteProjectSkeleton() -> bool
         qDebug() << "No files found in project directory: " + projectDirectory;
         return false;
     }
+
+    const QStringList suffixesToCopy { "asn", "acn", "modelcheck" };
+    const QStringList namesToCopy { "Makefile" };
     for (const auto &file : qFileInfoList) {
-        if (file.suffix() == "asn" || file.suffix() == "acn" || file.fileName() == "Makefile") {
+        auto suffixIt = std::find(std::begin(suffixesToCopy), std::end(suffixesToCopy), file.suffix());
+        auto namesIt = std::find(std::begin(namesToCopy), std::end(namesToCopy), file.fileName());
+        if (suffixIt != std::end(suffixesToCopy) || namesIt != std::end(namesToCopy)) {
             if (!QFile::copy(file.absoluteFilePath(), generatedPath + QDir::separator() + file.fileName())) {
                 qDebug() << "Error copying file: " << file.fileName();
                 return false;
@@ -252,17 +257,27 @@ auto TestGenerator::exportDvModel(DVModel *dvModel, const QString &outputFilenam
 auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)
         -> QVector<QVariant>
 {
-    const QByteArray rawTestData = GdbConnector::getRawTestResults(binaryPath, launchConfig.clientArgsParsed,
-            launchConfig.serverArgsParsed, launchConfig.clientName, launchConfig.serverName);
+    QByteArray rawTestData;
+    try {
+        rawTestData = GdbConnector::getRawTestResults(binaryPath, launchConfig.clientArgsParsed,
+                launchConfig.serverArgsParsed, launchConfig.clientName, launchConfig.serverName);
+    } catch (std::invalid_argument &e) {
+        qCritical() << "Error while getting raw test results (invalid argument): " << e.what();
+    } catch (std::runtime_error &e) {
+        qCritical() << "Error while getting raw test results (runtime error): " << e.what();
+    }
 
+    constexpr int LOGGED_DATA_SIZE = 100;
     qDebug() << "Raw test data size: " << rawTestData.size();
-    qDebug() << "Raw test data: " << rawTestData;
+    qDebug() << "Raw test data (first 100 bytes): " << rawTestData.left(LOGGED_DATA_SIZE);
 
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, &interface, &asn1Model, launchConfig.endianess, launchConfig.typeLayoutInfos);
 
-    for (const auto &readValue : readTestData) {
-        qDebug() << readValue;
+    for (int i = 0; i < readTestData.size(); i++) {
+        if (i < LOGGED_DATA_SIZE) {
+            qDebug() << readTestData[i];
+        }
     }
 
     return readTestData;

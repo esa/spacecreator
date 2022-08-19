@@ -17,7 +17,9 @@
 
 #include "ivfunctiontype.h"
 
+#include "archetypes/archetypemodel.h"
 #include "errorhub.h"
+#include "ivarchetypereference.h"
 #include "ivcomment.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
@@ -25,7 +27,6 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
-#include "ivarchetypereference.h"
 
 #include <QDebug>
 
@@ -257,6 +258,11 @@ QVector<IVArchetypeReference *> IVFunctionType::archetypeReferences() const
     return d->m_archetypeReferences;
 }
 
+void IVFunctionType::setArchetypeReferences(QVector<IVArchetypeReference *> references)
+{
+    d->m_archetypeReferences = QVector<IVArchetypeReference *>(references);
+}
+
 bool IVFunctionType::hasNestedChildren() const
 {
     return functionTypes().size() || functions().size() || comments().size();
@@ -346,5 +352,7 @@ void IVFunctionType::forgetInstance(IVFunction *function)
     if (function)
         d->m_instances.removeAll(function);
 }
+
+
 
 }

@@ -22,6 +22,7 @@
 #include "archetypecommonprops.h"
 #include "archetypeobject.h"
 #include "functionarchetype.h"
+#include <QStringList>
 
 namespace ivm {
 
@@ -32,9 +33,13 @@ public:
     explicit ArchetypeLibrary(const QString &title, QObject *parent = nullptr);
     ~ArchetypeLibrary() override;
 
+    bool aboutToBeRemoved() override;
+
     QVector<FunctionArchetype *> getFunctions() const;
     void addFunction(FunctionArchetype *functionArchetype);
     void removeFunction(FunctionArchetype *functionArchetype);
+
+    QStringList getFunctionsNames();
 
 private:
     QVector<FunctionArchetype *> m_functions;
