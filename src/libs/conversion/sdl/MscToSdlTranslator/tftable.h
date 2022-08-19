@@ -74,6 +74,9 @@ public:
     /**
      * @brief   Getter for list of transitions for given state
      *
+     * Value `val` at index `idx` means that there is a transition from state with ID `state`
+     * to state with ID `val` on signal with ID `idx`.
+     *
      * @param   state       State to get
      *
      * @return  List of transitions
