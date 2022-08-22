@@ -5,7 +5,7 @@ import os.path
 import subprocess
 import urllib.request
 import py7zr
-import zipfile
+
 from utils import join_dir, print_cmd, ensure_dir
 from git.repo import Repo
 
@@ -108,7 +108,9 @@ def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
 
     cmake_build_dir = join_dir(env_dir, 'build')
     cmake_source_dir = join_dir(env_dir, 'grantlee')
+    cmake_install_dir = join_dir(env_dir, 'grantlee')
     qmake_dir = join_dir(env_qt_dir, 'bin/qmake')
+
     print('Building grantlee')
     # Make ninja.build
     ninja_cmd = ['cmake',
@@ -116,6 +118,7 @@ def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
                  '-DCMAKE_PREFIX_PATH:STRING=' + env_qt_dir,
                  '-DQT_QMAKE_EXECUTABLE:STRING=' + qmake_dir,
                  '-DCMAKE_BUILD_TYPE=Release',
+                 '-DCMAKE_INSTALL_PREFIX=' + cmake_install_dir,
                  '-B', cmake_build_dir,
                  '-S', cmake_source_dir]
     if build_with_qt6:
@@ -146,10 +149,11 @@ def install_grantlee(env_dir: str) -> None:
                    cmake_build_dir,
                    '--target',
                    'install']
-
-    message = "\nTo finish the installation of grantlee, you'll have to run last command:\n" +\
-              'sudo -E ' + ' '.join(install_cmd)
-    print(message)
+    print_cmd(install_cmd)
+    completed_process = subprocess.run(install_cmd)
+    if not completed_process.returncode == 0:
+        print("Could not install grantlee in {}".format(cmake_build_dir))
+        exit(5)
 
 
 if __name__ == '__main__':
