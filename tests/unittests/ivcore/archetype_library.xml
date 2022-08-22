@@ -1,14 +1,14 @@
 <ArchetypeLibrary>
 	<FunctionArchetype name="ArchFunc1">
 		<InterfaceArchetype name="Interface1" interfaceType="PROVIDED" kind="UNPROTECTED" layer="default">
-			<ParameterArchetype name="Paramaeter11" type="T-Int32" direction="IN"/>
-			<ParameterArchetype name="Paramaeter12" type="T-UInt32" direction="OUT"/>
-			<ParameterArchetype name="Paramaeter13" type="T-Int8" direction="IN"/>
+			<ParameterArchetype name="Parameter11" type="T-Int32" direction="IN"/>
+			<ParameterArchetype name="Parameter12" type="T-UInt32" direction="OUT"/>
+			<ParameterArchetype name="Parameter13" type="T-Int8" direction="IN"/>
 		</InterfaceArchetype>
 		<InterfaceArchetype name="Interface2" interfaceType="REQUIRED" kind="PROTECTED" layer="FirstLibLayer1">
-			<ParameterArchetype name="Paramaeter21" type="T-Boolean" direction="IN"/>
-			<ParameterArchetype name="Paramaeter22" type="T-Int8" direction="OUT"/>
-			<ParameterArchetype name="Paramaeter23" type="T-Boolean" direction="IN"/>
+			<ParameterArchetype name="Parameter21" type="T-Boolean" direction="IN"/>
+			<ParameterArchetype name="Parameter22" type="T-Int8" direction="OUT"/>
+			<ParameterArchetype name="Parameter23" type="T-Boolean" direction="IN"/>
 		</InterfaceArchetype>
 	</FunctionArchetype>
 
