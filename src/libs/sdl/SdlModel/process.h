@@ -137,6 +137,18 @@ public:
     auto addTimer(QString timerName) -> void;
 
     /**
+     * @brief   Getter for success states names
+     *
+     * @return  Success states names
+     */
+    auto successStates() const -> const QStringList &;
+    /**
+     * @brief   Adds an success state name
+     *
+     * @param   stateName   Success state name
+     */
+    auto addSuccessState(QString stateName) -> void;
+    /**
      * @brief   Getter for error states names
      *
      * @return  Error states names
@@ -161,6 +173,7 @@ private:
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
     std::vector<std::unique_ptr<Procedure>> m_procedures;
     std::vector<QString> m_timerNames;
+    QStringList m_successStates;
     QStringList m_errorStates;
 };
 } // namespace sdl
