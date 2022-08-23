@@ -288,5 +288,14 @@ QPointF CreatorTool::cursorInScene(const QPoint &globalPos) const
     return sceneCoordinates;
 }
 
+QPointF CreatorTool::cursorInScene(const QMouseEvent *e) const
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    return cursorInScene(e->globalPos());
+#else
+    return cursorInScene(e->globalPosition().toPoint());
+#endif
+}
+
 } // namespace ui
 } // namespace shared
