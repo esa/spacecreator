@@ -9,7 +9,7 @@ CC=gcc
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
-RESOURCE_DIR=resources/MscWhenThenSequenceFailure
+RESOURCE_DIR=resources/MscWhenThenNotSequence
 PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 
 echo "Running TMC test: ${0##*/}'"
@@ -28,6 +28,6 @@ cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
     && $CC -o system.out pan.c \
     && ./system.out -m1000000 -a -n -E > system.output \
-    && grep -q "errors: 1" system.output \
+    && grep -q "errors: 0" system.output \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR
