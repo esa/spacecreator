@@ -1056,8 +1056,7 @@ void IvToPromelaTranslator::createPromelaObjectsForObservers(Context &context) c
         if (interface != nullptr) {
             queueSize = getInterfaceQueueSize(interface);
             std::tie(parameterName, parameterType) = getInterfaceParameter(interface);
-        }
-        if (interface == nullptr) {
+        } else {
             const QString timer = findTimerSignal(context.ivModel(), toFunction, attachment.interface());
             if (timer.isEmpty()) {
                 const auto message = QString("Cannot find interface '%1::%2' while attaching observer '%3'")
