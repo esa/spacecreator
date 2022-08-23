@@ -79,7 +79,7 @@ private:
         std::vector<uint32_t> whenSequence;
         std::vector<uint32_t> thenSequence;
         std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
-        ::sdl::State *successState;
+        ::sdl::State *endState;
         std::size_t signalCounter;
         Mode mode;
     };
@@ -93,6 +93,8 @@ private:
 
     auto createStateMachine(Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
     auto createThenTransitions(Context &context, StateList &states, const uint32_t startStateId) const
+            -> TransitionList;
+    auto createThenNotTransitions(Context &context, StateList &states, const uint32_t startStateId) const
             -> TransitionList;
 };
 

@@ -77,6 +77,7 @@ protected:
     inline static const QString m_stateNameTemplate = "s%1";
     inline static const QString m_signalRenameNameTemplate = "sig%1";
     inline static const QString m_errorStateName = "sErr";
+    inline static const QString m_okStateName = "sOk";
     inline static const QString m_anySignalName = "*";
     inline static const QString m_defaultChannelName = "c";
     inline static const QString m_defaultRouteName = "r";

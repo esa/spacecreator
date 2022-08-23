@@ -57,8 +57,12 @@ void WhenSequenceTranslator::createObserver(const MscChart *mscChart)
     auto stateMachine = createStateMachine(context);
 
     auto process = createSdlProcess(context.chartName, std::move(stateMachine));
-    process.addErrorState(m_errorStateName);
-    process.addSuccessState(context.successState->name());
+    if (context.mode == Mode::Then) {
+        process.addErrorState(m_errorStateName);
+        process.addSuccessState(context.endState->name());
+    } else if (context.mode == Mode::ThenNot) {
+        process.addErrorState(context.endState->name());
+    }
 
     auto system = createSdlSystem(context.chartName, std::move(process));
     for (auto &[id, signalRename] : context.signals) {
@@ -177,7 +181,7 @@ std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSeq
     auto stateMachine = std::make_unique<StateMachine>();
 
     auto states = createStates(context.whenSequence.size() + context.thenSequence.size());
-    context.successState = states.back().get();
+    context.endState = states.back().get();
 
     TFTable table(context.whenSequence, context.signals.size());
     auto whenTransitions = createTransitions(table, states, 0);
@@ -191,7 +195,10 @@ std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSeq
             stateMachine->addTransition(std::move(transition));
         }
     } else if (context.mode == Mode::ThenNot) {
-        throw TranslationException("ThenNot sequences not yet implemented");
+        auto thenNotTransitions = createThenNotTransitions(context, states, context.whenSequence.size());
+        for (auto &transition : thenNotTransitions) {
+            stateMachine->addTransition(std::move(transition));
+        }
     }
 
     for (auto &state : states) {
@@ -241,6 +248,50 @@ WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenTransit
 
     states.push_back(std::move(errorState));
     transitions.push_back(std::move(errorTransition));
+
+    return transitions;
+}
+
+WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenNotTransitions(
+        WhenSequenceTranslator::Context &context, StateList &states, const uint32_t startStateId) const
+{
+    auto okState = std::make_unique<State>();
+    okState->setName(m_okStateName);
+
+    auto okTransition = std::make_unique<Transition>();
+    okTransition->addAction(std::make_unique<NextState>(okState->name(), okState.get()));
+
+    std::vector<std::unique_ptr<Transition>> transitions;
+
+    uint32_t stateId = startStateId;
+
+    for (const auto &signalId : context.thenSequence) {
+        const auto signalName = m_signalRenameNameTemplate.arg(signalId);
+        auto sourceState = states.at(stateId).get();
+        const auto targetState = states.at(stateId + 1).get();
+
+        auto transition = std::make_unique<Transition>();
+        transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
+
+        auto input = std::make_unique<Input>();
+        input->setName(signalName);
+        input->setTransition(transition.get());
+
+        sourceState->addInput(std::move(input));
+
+        auto okInput = std::make_unique<Input>();
+        okInput->setName(m_anySignalName);
+        okInput->setTransition(okTransition.get());
+
+        sourceState->addInput(std::move(okInput));
+
+        transitions.push_back(std::move(transition));
+
+        ++stateId;
+    }
+
+    states.push_back(std::move(okState));
+    transitions.push_back(std::move(okTransition));
 
     return transitions;
 }
