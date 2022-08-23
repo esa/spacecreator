@@ -731,11 +731,9 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
     const QVector<shared::ContextParameter> parameters = ivFunction->contextParams();
 
     for (const shared::ContextParameter &parameter : parameters) {
-        if (parameter.paramType() != shared::BasicParameter::Type::Timer) {
-            continue;
+        if (parameter.paramType() == shared::BasicParameter::Type::Timer) {
+            generateProctype(context, functionName, parameter.name().toLower(), QString(), 1, 1, false);
         }
-
-        generateProctype(context, functionName, parameter.name().toLower(), QString(), 1, 1, false);
     }
 
     createCheckQueueInline(context.model(), functionName, channelNames);
@@ -981,8 +979,11 @@ void IvToPromelaTranslator::createTimerInlinesForFunction(
 
     resetTimerSequence.appendElement(Assignment(element, Expression(BooleanConstant(false))));
 
+    QList<QString> params;
+    params.append("interval");
+
     context.model()->addInlineDef(
-            std::make_unique<InlineDef>(setTimerName, QList<QString>() << "interval", std::move(setTimerSequence)));
+            std::make_unique<InlineDef>(setTimerName, std::move(params), std::move(setTimerSequence)));
     context.model()->addInlineDef(
             std::make_unique<InlineDef>(resetTimerName, QList<QString>(), std::move(resetTimerSequence)));
 }
@@ -1409,6 +1410,7 @@ IvToPromelaTranslator::ObserverAttachments IvToPromelaTranslator::getObserverAtt
                     && interface.compare(attachment.interface(), Qt::CaseInsensitive) == 0) {
                 result.push_back(attachment);
             }
+            // special case for the timers, when the interface name contains both function name and timer name
             if (function.compare(toFunction, Qt::CaseInsensitive) == 0
                     && attachment.interface().compare(
                                QString("%1_%2").arg(function).arg(interface), Qt::CaseInsensitive)
