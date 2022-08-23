@@ -22,7 +22,6 @@
 #include "specialized/sequencetranslator.h"
 
 #include <msccore/mscchart.h>
-#include <sdl/SdlModel/rename.h>
 
 namespace conversion::sdl::translator {
 
@@ -70,7 +69,7 @@ private:
     struct Context {
         QString chartName;
         std::vector<uint32_t> sequence;
-        std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
+        std::unordered_map<uint32_t, SignalInfo> signals;
         ::sdl::State *errorState;
         std::size_t signalCounter;
     };

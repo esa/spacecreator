@@ -65,8 +65,8 @@ void WhenSequenceTranslator::createObserver(const MscChart *mscChart)
     }
 
     auto system = createSdlSystem(context.chartName, std::move(process));
-    for (auto &[id, signalRename] : context.signals) {
-        system.addSignal(std::move(signalRename));
+    for (auto &[id, signalInfo] : context.signals) {
+        system.addSignal(std::move(signalInfo.rename));
     }
     system.createRoutes(m_defaultChannelName, m_defaultRouteName);
 
@@ -117,8 +117,10 @@ void WhenSequenceTranslator::handleEvent(
 void WhenSequenceTranslator::handleMessageEvent(
         WhenSequenceTranslator::Context &context, const MscMessage *mscMessage) const
 {
-    const auto signalRenamed = std::find_if(context.signals.begin(), context.signals.end(),
-            [&](auto &&sig) { return sig.second->referencedName() == mscMessage->name(); });
+    const auto signalRenamed = std::find_if(context.signals.begin(), context.signals.end(), [&](auto &&sig) {
+        return sig.second.rename->referencedName() == mscMessage->name()
+                && sig.second.parameterList == mscMessage->parameters();
+    });
 
     uint32_t sequenceValue = 0;
 
@@ -129,7 +131,11 @@ void WhenSequenceTranslator::handleMessageEvent(
         signalRename->setReferencedName(Escaper::escapeSdlName(mscMessage->name()));
         signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
 
-        context.signals.insert({ context.signalCounter, std::move(signalRename) });
+        SignalInfo signalInfo;
+        signalInfo.rename = std::move(signalRename);
+        signalInfo.parameterList = mscMessage->parameters();
+
+        context.signals.insert({ context.signalCounter, std::move(signalInfo) });
 
         sequenceValue = context.signalCounter++;
     } else {

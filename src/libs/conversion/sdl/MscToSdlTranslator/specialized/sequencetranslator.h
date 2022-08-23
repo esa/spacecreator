@@ -21,8 +21,11 @@
 
 #include "tftable.h"
 
+#include <QVariantMap>
 #include <conversion/common/options.h>
 #include <memory>
+#include <msccore/mscparameterlist.h>
+#include <sdl/SdlModel/rename.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <vector>
 
@@ -60,6 +63,11 @@ public:
 protected:
     using StateList = std::vector<std::unique_ptr<::sdl::State>>;
     using TransitionList = std::vector<std::unique_ptr<::sdl::Transition>>;
+
+    struct SignalInfo {
+        std::unique_ptr<::sdl::Rename> rename;
+        msc::MscParameterList parameterList;
+    };
 
     auto createSdlProcess(const QString &chartName, std::unique_ptr<::sdl::StateMachine> stateMachine)
             -> ::sdl::Process;
