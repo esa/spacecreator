@@ -199,7 +199,7 @@ bool MessageCreatorTool::onMouseRelease(QMouseEvent *e)
 {
     switch (m_currMode) {
     case InteractionMode::None: {
-        if (e->button() == Qt::LeftButton && m_mouseDown == cursorInScene(e->globalPosition().toPoint())) {
+        if (e->button() == Qt::LeftButton && m_mouseDown == cursorInScene(e)) {
             m_currMode = InteractionMode::Click;
             onMouseRelease(e);
         }
@@ -226,7 +226,7 @@ bool MessageCreatorTool::onMouseMove(QMouseEvent *e)
             m_currMode = InteractionMode::Drag;
             processMousePressDrag(e);
         } else {
-            const QPointF &scenePos = cursorInScene(e->globalPosition().toPoint());
+            const QPointF &scenePos = cursorInScene(e);
             movePreviewItemTo(scenePos);
         }
         break;
@@ -247,7 +247,7 @@ bool MessageCreatorTool::onMouseMove(QMouseEvent *e)
 void MessageCreatorTool::processMousePressDrag(QMouseEvent *e)
 {
     if (m_messageItem && m_currStep == Step::ChooseSource) {
-        m_messageItem->setTail(cursorInScene(e->globalPosition().toPoint()), ObjectAnchor::Snap::SnapTo);
+        m_messageItem->setTail(cursorInScene(e), ObjectAnchor::Snap::SnapTo);
         m_currStep = Step::ChooseTarget;
     }
 }
@@ -260,7 +260,7 @@ void MessageCreatorTool::processMouseReleaseDrag(QMouseEvent *e)
         createPreviewItem();
 
         if (m_messageItem) {
-            const QPointF &scenePos = this->cursorInScene(e->globalPosition().toPoint());
+            const QPointF &scenePos = this->cursorInScene(e);
             movePreviewItemTo(scenePos);
         }
     }
@@ -269,7 +269,7 @@ void MessageCreatorTool::processMouseReleaseDrag(QMouseEvent *e)
 void MessageCreatorTool::processMouseMoveDrag(QMouseEvent *e)
 {
     if (m_messageItem) {
-        const QPointF &scenePos = this->cursorInScene(e->globalPosition().toPoint());
+        const QPointF &scenePos = this->cursorInScene(e);
         switch (m_currStep) {
         case Step::ChooseSource: {
             movePreviewItemTo(scenePos);
@@ -290,7 +290,7 @@ void MessageCreatorTool::processMousePressClick(QMouseEvent *e)
 
 void MessageCreatorTool::processMouseReleaseClick(QMouseEvent *e)
 {
-    const QPointF &scenePos = this->cursorInScene(e->globalPosition().toPoint());
+    const QPointF &scenePos = this->cursorInScene(e);
     switch (m_currStep) {
     case Step::ChooseSource: {
         m_messageItem->setTail(scenePos, ObjectAnchor::Snap::SnapTo);
@@ -318,7 +318,7 @@ void MessageCreatorTool::processMouseReleaseClick(QMouseEvent *e)
 void MessageCreatorTool::processMouseMoveClick(QMouseEvent *e)
 {
     if (m_messageItem) {
-        const QPointF &scenePos = cursorInScene(e->globalPosition().toPoint());
+        const QPointF &scenePos = cursorInScene(e);
         switch (m_currStep) {
         case Step::ChooseSource: {
             movePreviewItemTo(scenePos);
