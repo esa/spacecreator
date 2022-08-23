@@ -346,6 +346,8 @@ private:
             const QString &interfaceName) const -> const ivm::IVInterface *;
     auto findRequiredInterface(const ivm::IVModel *model, const QString &functionName,
             const QString &interfaceName) const -> const ivm::IVInterface *;
+    auto findTimerSignal(const ivm::IVModel *model, const QString &functionName, const QString &signalName) const
+            -> QString;
 
     auto observerChannelName(const ObserverAttachment &attachment, const QString &toFunction) const -> QString;
     auto getAttachmentToFunction(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;

@@ -122,6 +122,11 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(const QString &spe
             }
         }
     }
+
+    if (m_interfaceName.isEmpty()) {
+        const auto message = QString("Observed interface name is empty in observer %1 ").arg(m_observerName);
+        throw TranslationException(message);
+    }
 }
 
 std::optional<QString> IvToPromelaTranslator::ObserverAttachment::toFunction() const
@@ -723,6 +728,14 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(
         }
     }
 
+    const QVector<shared::ContextParameter> parameters = ivFunction->contextParams();
+
+    for (const shared::ContextParameter &parameter : parameters) {
+        if (parameter.paramType() == shared::BasicParameter::Type::Timer) {
+            generateProctype(context, functionName, parameter.name().toLower(), QString(), 1, 1, false);
+        }
+    }
+
     createCheckQueueInline(context.model(), functionName, channelNames);
 
     for (const auto requiredInterface : ivFunction->ris()) {
@@ -935,12 +948,11 @@ void IvToPromelaTranslator::createPromelaObjectsForTimers(Context &context) cons
             for (const shared::ContextParameter &parameter : parameters) {
                 if (parameter.paramType() == shared::BasicParameter::Type::Timer) {
                     const QString timerName = parameter.name().toLower();
-                    const QString signalName =
-                            QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
+                    const QString channelName = constructChannelName(functionName, timerName);
                     const int timerId = timerCount;
                     ++timerCount;
                     createTimerInlinesForFunction(context, functionName, timerName, timerId);
-                    timerSignals.emplace(timerId, signalName);
+                    timerSignals.emplace(timerId, channelName);
                 }
             }
         }
@@ -967,8 +979,11 @@ void IvToPromelaTranslator::createTimerInlinesForFunction(
 
     resetTimerSequence.appendElement(Assignment(element, Expression(BooleanConstant(false))));
 
+    QList<QString> params;
+    params.append("interval");
+
     context.model()->addInlineDef(
-            std::make_unique<InlineDef>(setTimerName, QList<QString>(), std::move(setTimerSequence)));
+            std::make_unique<InlineDef>(setTimerName, std::move(params), std::move(setTimerSequence)));
     context.model()->addInlineDef(
             std::make_unique<InlineDef>(resetTimerName, QList<QString>(), std::move(resetTimerSequence)));
 }
@@ -998,8 +1013,10 @@ void IvToPromelaTranslator::createGlobalTimerObjects(
 
             std::unique_ptr<Sequence> timerCall = std::make_unique<Sequence>(Sequence::Type::NORMAL);
             timerCall->appendElement(Expression(fpt));
-            QList<InlineCall::Argument> arguments;
-            timerCall->appendElement(InlineCall(iter->second, arguments));
+            const QString channelName = iter->second;
+            QList<Expression> sendParams;
+            sendParams.append(Expression(Constant(0)));
+            timerCall->appendElement(ChannelSend(VariableRef(channelName), std::move(sendParams)));
             timerCall->appendElement(Assignment(fpt, Expression(BooleanConstant(false))));
             cond.appendAlternative(std::move(timerCall));
 
@@ -1033,16 +1050,24 @@ void IvToPromelaTranslator::createPromelaObjectsForObservers(Context &context) c
         const QString channelName = observerChannelName(attachment, toFunction);
 
         const IVInterface *interface = findProvidedInterface(context.ivModel(), toFunction, attachment.interface());
+        size_t queueSize;
+        QString parameterName;
+        QString parameterType;
+        if (interface != nullptr) {
+            queueSize = getInterfaceQueueSize(interface);
+            std::tie(parameterName, parameterType) = getInterfaceParameter(interface);
+        } else {
+            const QString timer = findTimerSignal(context.ivModel(), toFunction, attachment.interface());
+            if (timer.isEmpty()) {
+                const auto message = QString("Cannot find interface '%1::%2' while attaching observer '%3'")
+                                             .arg(toFunction)
+                                             .arg(attachment.interface())
+                                             .arg(attachment.observer());
+                throw TranslationException(message);
+            }
 
-        if (interface == nullptr) {
-            const auto message = QString("Cannot find interface '%1::%2' while attaching observer '%3'")
-                                         .arg(toFunction)
-                                         .arg(attachment.interface())
-                                         .arg(attachment.observer());
-            throw TranslationException(message);
+            queueSize = 1;
         }
-        const size_t queueSize = getInterfaceQueueSize(interface);
-        const auto [parameterName, parameterType] = getInterfaceParameter(interface);
 
         QList<ChannelInit::Type> channelType;
         channelType.append(parameterType.isEmpty()
@@ -1062,6 +1087,8 @@ void IvToPromelaTranslator::createPromelaObjectsForObservers(Context &context) c
             const QString name = QString("%1_%2_%3").arg(attachment.observer()).arg(toFunction).arg(parameterName);
             arguments.append(name);
             params.append(Expression(VariableRef(name)));
+        } else {
+            params.append(Expression(Constant(1)));
         }
         Sequence sequence(Sequence::Type::NORMAL);
 
@@ -1266,6 +1293,32 @@ const ::ivm::IVInterface *IvToPromelaTranslator::findRequiredInterface(
     return *iter;
 }
 
+QString IvToPromelaTranslator::findTimerSignal(
+        const ::ivm::IVModel *model, const QString &functionName, const QString &signalName) const
+{
+    const IVFunction *function = model->getFunction(functionName, Qt::CaseInsensitive);
+    if (function == nullptr) {
+        return nullptr;
+    }
+
+    QString timerName = signalName;
+
+    if (timerName.startsWith(QString("%1_").arg(functionName), Qt::CaseInsensitive)) {
+        timerName.remove(QString("%1_").arg(functionName), Qt::CaseInsensitive);
+    }
+
+    const QVector<shared::ContextParameter> params = function->contextParams();
+
+    for (const shared::ContextParameter &param : params) {
+        if (param.paramType() == shared::ContextParameter::Type::Timer
+                && param.name().compare(timerName, Qt::CaseInsensitive) == 0) {
+            return param.name();
+        }
+    }
+
+    return QString();
+}
+
 QString IvToPromelaTranslator::observerChannelName(
         const ObserverAttachment &attachment, const QString &toFunction) const
 {
@@ -1354,6 +1407,13 @@ IvToPromelaTranslator::ObserverAttachments IvToPromelaTranslator::getObserverAtt
             const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
             if (function.compare(toFunction, Qt::CaseInsensitive) == 0
                     && interface.compare(attachment.interface(), Qt::CaseInsensitive) == 0) {
+                result.push_back(attachment);
+            }
+            // special case for the timers, when the interface name contains both function name and timer name
+            if (function.compare(toFunction, Qt::CaseInsensitive) == 0
+                    && attachment.interface().compare(
+                               QString("%1_%2").arg(function).arg(interface), Qt::CaseInsensitive)
+                            == 0) {
                 result.push_back(attachment);
             }
         }
