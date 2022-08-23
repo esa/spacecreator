@@ -34,7 +34,9 @@ set(GCC_WARNINGS ${CLANG_WARNINGS}
                  -Wduplicated-cond
                  -Wduplicated-branches
                  -Wlogical-op
-                 -Wuseless-cast)
+                 -Wuseless-cast
+                 -Wno-unused-result
+             )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(PROJECT_WARNINGS ${CLANG_WARNINGS})
