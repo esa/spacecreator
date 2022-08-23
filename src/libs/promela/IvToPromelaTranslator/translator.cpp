@@ -508,6 +508,9 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
 
         loopSequence->appendElement(generateProcessMessageBlock(
                 functionName, currentChannelName, piName, parameterType, signalParameterName, mainLoopLabel, false));
+        // Observers can be also attached to environment
+        attachInputObservers(
+                context, functionName, interfaceName, signalParameterName, parameterType, loopSequence.get());
     }
 
     // process all observers
@@ -519,9 +522,6 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         loopSequence->appendElement(generateProcessMessageBlock(attachment.observer(), currentChannelName,
                 observerInputSignalName(attachment), parameterType, signalParameterName, mainLoopLabel, true));
     }
-
-    // Observers can be also attached to environment
-    attachInputObservers(context, functionName, interfaceName, signalParameterName, parameterType, loopSequence.get());
 
     // release function mutex
     if (!environment) {
