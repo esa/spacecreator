@@ -17,8 +17,6 @@
 
 #include "basetool.h"
 
-#include "baseitems/common/mscutils.h"
-
 #include <QDebug>
 #include <QGraphicsView>
 #include <QMouseEvent>
@@ -142,7 +140,7 @@ bool BaseTool::onMouseRelease(QMouseEvent *e)
 bool BaseTool::onMouseMove(QMouseEvent *e)
 {
     if (m_view)
-        movePreviewItem(cursorInScene(e->globalPos()));
+        movePreviewItem(cursorInScene(e));
     return true;
 }
 
@@ -189,6 +187,15 @@ QPointF BaseTool::cursorInScene(const QPoint &globalPos) const
         sceneCoordinates = m_view->mapToScene(viewCoordinates);
     }
     return sceneCoordinates;
+}
+
+QPointF BaseTool::cursorInScene(const QMouseEvent *e) const
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    return cursorInScene(e->globalPos());
+#else
+    return cursorInScene(e->globalPosition().toPoint());
+#endif
 }
 
 } // ns msc
