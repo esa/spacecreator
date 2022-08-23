@@ -52,7 +52,7 @@ const QString TestDriverGenerator::testDriverStartTestFunctionDeclaration =
 
 auto TestDriverGenerator::getTestDriverRiName(const ivm::IVInterface &interface) -> QString
 {
-    return QString("testdriver_RI_%1").arg(removePiPrefix(interface.title()));
+    return QString("testdriver_RI_%1").arg(interface.title());
 }
 
 auto TestDriverGenerator::generateTestDriver(
@@ -226,17 +226,6 @@ auto TestDriverGenerator::getAssignmentsForRecords(const ivm::IVInterface &inter
     }
 
     return result;
-}
-
-auto TestDriverGenerator::removePiPrefix(const QString &str) -> QString
-{
-    constexpr int prefixLength = 3;
-
-    if (str.left(prefixLength).compare("PI_") != 0) {
-        return str;
-    }
-
-    return str.right(str.size() - prefixLength);
 }
 
 } // namespace testgenerator

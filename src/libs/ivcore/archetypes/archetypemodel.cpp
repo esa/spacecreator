@@ -18,6 +18,7 @@
  */
 
 #include "archetypemodel.h"
+#include "archetypelibrary.h"
 
 #include "common.h"
 #include "errorhub.h"
@@ -73,6 +74,37 @@ ArchetypeObject *ArchetypeModel::getObjectByName(
         }
     }
     return nullptr;
+}
+
+QStringList ArchetypeModel::getLibrariesNames()
+{
+    QStringList librariesNames;
+
+    for (auto object : objects()) {
+        if (auto library = object->as<ArchetypeLibrary *>()) {
+            librariesNames.append(library->title());
+        }
+    }
+
+    return librariesNames;
+}
+
+QStringList ArchetypeModel::getFunctionsNamesByLibraryName(const QString &libraryName)
+{
+    QStringList librariesNames;
+
+    if(libraryName.isEmpty()) {
+        return librariesNames;
+    }
+
+    for (auto object : objects()) {
+        auto library = object->as<ArchetypeLibrary *>();
+        if (library != nullptr && library->title() == libraryName) {
+            librariesNames.append(library->getFunctionsNames());
+        }
+    }
+
+    return librariesNames;
 }
 
 void ArchetypeModel::clear()

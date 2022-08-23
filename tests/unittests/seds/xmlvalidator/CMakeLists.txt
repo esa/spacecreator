@@ -22,5 +22,6 @@ configure_file(resources/seds-extension-semantics.xsd seds-extension-semantics.x
 configure_file(resources/seds.xsd seds.xsd COPYONLY)
 configure_file(resources/SomeInvalidData.xml SomeInvalidData.xml COPYONLY)
 configure_file(resources/Valid.xml Valid.xml COPYONLY)
+configure_file(resources/xml.xsd xml.xsd COPYONLY)
 
 add_format_target(${TEST_NAME})

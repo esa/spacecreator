@@ -46,6 +46,7 @@ class IVObject;
 class IVConnectionLayerType;
 class IVPropertyTemplateConfig;
 class ArchetypeObject;
+class ArchetypeModel;
 }
 
 namespace ive {
@@ -111,6 +112,7 @@ public:
     IVItemModel *itemsModel() const;
     ivm::IVModel *layersModel() const;
     QHash<shared::Id, shared::VEObject *> layersObjects() const;
+    ivm::ArchetypeModel *archetypesModel() const;
 
     IVVisualizationModelBase *visualisationModel() const;
     QItemSelectionModel *objectsSelectionModel() const;
@@ -133,6 +135,7 @@ public:
     ivm::IVPropertyTemplateConfig *dynPropConfig() const;
 
     auto updateLayersModel() const -> void;
+    void loadArchetypes();
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -158,7 +161,6 @@ private:
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
     bool loadComponentModel(ivm::IVModel *model, const QString &path);
-    void loadArchetypes();
     void generateArchetypeLibrary(
             QVector<ivm::ArchetypeObject *> &archetypeObjects, const QString &archetypeLibraryName);
 

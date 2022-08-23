@@ -19,8 +19,8 @@
 
 #include "entityattribute.h"
 #include "errorhub.h"
-#include "ivarchetypereference.h"
 #include "ivarchetypelibraryreference.h"
+#include "ivarchetypereference.h"
 #include "ivcomment.h"
 #include "ivcommonprops.h"
 #include "ivconnection.h"
@@ -291,7 +291,7 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::ArchetypeLibraryReference: {
-        obj = new IVArchetypeLibraryReference(d->m_currentObject.get(),
+        obj = new IVArchetypeLibraryReference(
                 attrValue(attrs, Props::Token::archetype_library), attrValue(attrs, Props::Token::path));
         break;
     }

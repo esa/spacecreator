@@ -50,6 +50,8 @@ public:
             const OperationKind &operationKind = OperationKind::CYCLIC, const QString &layer = QString());
     ~InterfaceArchetype() override;
 
+    bool aboutToBeRemoved() override;
+
     InterfaceType getInterfaceType() const;
     void setInterfaceType(const InterfaceType &interfaceType);
 

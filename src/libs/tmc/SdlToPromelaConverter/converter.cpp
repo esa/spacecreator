@@ -187,7 +187,7 @@ bool SdlToPromelaConverter::waitForSdl2PromelaProcess(QProcess &process)
     }
 
     if (process.exitCode() != EXIT_SUCCESS) {
-        qCritical() << "External process finished wit code: " << process.exitCode();
+        qCritical() << "External process finished with code: " << process.exitCode();
         return false;
     }
 

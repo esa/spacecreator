@@ -25,6 +25,7 @@
 #include "errorhub.h"
 
 #include <QDebug>
+#include <ivcore/ivfunction.h>
 
 namespace dvm {
 
@@ -142,6 +143,49 @@ QStringList DVMessage::pathOfFunction(const QString &functionName, DVNode *node)
     }
 
     return { functionName };
+}
+
+QString DVMessage::resolvedTargetFunction() const
+{
+    const auto model = getModel();
+    if (model == nullptr) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("DVMessage has no parent model"));
+        return "";
+    }
+    if (model->ivQueries() == nullptr) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("ivQueries are not initialized in DVModel"));
+        return "";
+    }
+
+    return model->ivQueries()->resolvedTargetFunction(fromFunction(), fromInterface(), toFunction(), toInterface());
+}
+
+QString DVMessage::resolvedTargetInterface() const
+{
+    const auto model = getModel();
+    if (model == nullptr) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("DVMessage has no parent model"));
+        return "";
+    }
+    if (model->ivQueries() == nullptr) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("ivQueries are not initialized in DVModel"));
+        return "";
+    }
+    return model->ivQueries()->resolvedTargetInterface(fromFunction(), fromInterface(), toFunction(), toInterface());
+}
+
+DVModel *DVMessage::getModel() const
+{
+    QObject *parentObject = parent();
+    DVModel *model = NULL;
+    while (parentObject != NULL) {
+        model = qobject_cast<DVModel *>(parentObject);
+        if (model != NULL) {
+            return model;
+        }
+        parentObject = parentObject->parent();
+    }
+    return NULL;
 }
 
 } // namespace dvm

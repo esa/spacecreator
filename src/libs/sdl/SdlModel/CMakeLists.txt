@@ -5,6 +5,9 @@ add_library(SdlModel STATIC)
 
 set(SOURCES     action.cpp
                 answer.cpp
+                block.cpp
+                channel.cpp
+                connection.cpp
                 expression.cpp
                 decision.cpp
                 input.cpp
@@ -17,11 +20,15 @@ set(SOURCES     action.cpp
                 procedurecall.cpp
                 procedureparameter.cpp
                 process.cpp
+                rename.cpp
                 return.cpp
+                route.cpp
                 sdlmodel.cpp
                 signal.cpp
+                signalroute.cpp
                 state.cpp
                 statemachine.cpp
+                system.cpp
                 task.cpp
                 transition.cpp
                 variabledeclaration.cpp
@@ -29,6 +36,9 @@ set(SOURCES     action.cpp
                 variablereference.cpp)
 set(INCLUDES    action.h
                 answer.h
+                block.h
+                channel.h
+                connection.h
                 expression.h
                 decision.h
                 input.h
@@ -41,11 +51,15 @@ set(INCLUDES    action.h
                 procedurecall.h
                 procedureparameter.h
                 process.h
+                rename.h
                 return.h
+                route.h
                 sdlmodel.h
                 signal.h
+                signalroute.h
                 state.h
                 statemachine.h
+                system.h
                 task.h
                 transition.h
                 variabledeclaration.h

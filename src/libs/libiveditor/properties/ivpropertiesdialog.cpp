@@ -17,6 +17,9 @@
 
 #include "ivpropertiesdialog.h"
 
+#include "../../shared/ui_propertiesdialog.h"
+#include "archetypes/archetypemodel.h"
+#include "archetypeswidget.h"
 #include "asn1systemchecks.h"
 #include "commands/cmdentityattributeschange.h"
 #include "commandsstack.h"
@@ -50,14 +53,26 @@
 namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
-        ivm::IVObject *obj, ivm::IVModel *layersModel, ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks,
-        cmd::CommandsStack *commandsStack, QWidget *parent)
+        ivm::IVObject *obj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
+        ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
+        QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
     , m_projectPath(projectPath)
     , m_layersModel(layersModel)
+    , m_archetypesModel(archetypesModel)
+    , m_isFixedSystemElement(obj ? obj->isFixedSystemElement() : false)
+    , m_isRequiredSystemElement(false)
 {
+    switch (obj->type()) {
+    case ivm::IVObject::Type::RequiredInterface:
+    case ivm::IVObject::Type::ProvidedInterface: {
+        ivm::IVInterface *iface = qobject_cast<ivm::IVInterface *>(obj);
+        m_isRequiredSystemElement = iface->isRequiredSystemElement();
+        break;
+    }
+    }
 }
 
 IVPropertiesDialog::~IVPropertiesDialog() {}
@@ -101,6 +116,7 @@ void IVPropertiesDialog::init()
     case ivm::IVObject::Type::FunctionType:
         initContextParams();
         initAttributesView();
+        initArchetypeView();
         break;
     case ivm::IVObject::Type::RequiredInterface:
     case ivm::IVObject::Type::ProvidedInterface: {
@@ -133,6 +149,10 @@ void IVPropertiesDialog::initConnectionGroup()
     auto model = new IVConnectionGroupModel(qobject_cast<ivm::IVConnectionGroup *>(dataObject()), commandMacro(), this);
     auto connectionsView = new QListView;
     connectionsView->setModel(model);
+
+    if (m_isFixedSystemElement) {
+        connectionsView->setDisabled(true);
+    }
     insertTab(connectionsView, tr("Connections"));
 }
 
@@ -163,6 +183,9 @@ void IVPropertiesDialog::initAttributesView()
     viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
 
+    if (m_isFixedSystemElement && !m_isRequiredSystemElement) {
+        viewAttrs->setDisabled(true);
+    }
     insertTab(viewAttrs, tr("Attributes"));
 
     QTimer::singleShot(0, viewAttrs, [this, viewAttrs, modelAttrs]() {
@@ -192,12 +215,17 @@ void IVPropertiesDialog::initContextParams()
             ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_asn1Checks, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
+
+    if (m_isFixedSystemElement) {
+        viewAttrs->setDisabled(true);
+    }
     insertTab(viewAttrs, tr("Context Parameters"));
 }
 
 void IVPropertiesDialog::initIfaceParams()
 {
-    IfaceParametersModel *modelIfaceParams = new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
+    IfaceParametersModel *modelIfaceParams =
+            new IfaceParametersModel(commandMacro(), m_asn1Checks->allTypeNames(), this);
     modelIfaceParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
@@ -209,6 +237,10 @@ void IVPropertiesDialog::initIfaceParams()
             IfaceParametersModel::Column::Direction, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
+
+    if (m_isFixedSystemElement && !m_isRequiredSystemElement) {
+        viewAttrs->setDisabled(true);
+    }
     insertTab(viewAttrs, tr("Parameters"));
 }
 
@@ -217,6 +249,10 @@ void IVPropertiesDialog::initCommentView()
     if (auto comment = qobject_cast<ivm::IVComment *>(dataObject())) {
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
+
+        if (m_isFixedSystemElement) {
+            commentEdit->setDisabled(true);
+        }
         insertTab(commentEdit, tr("Comment content"));
         connect(this, &QDialog::accepted, this, [comment, commentEdit, this]() {
             const QString text = commentEdit->toPlainText();
@@ -242,7 +278,24 @@ void IVPropertiesDialog::initLanguageView()
         return;
     }
     auto languagesWidget = new ive::ImplementationsWidget(m_projectPath, fn, m_ivChecks, commandMacro(), this);
+
+    if (m_isFixedSystemElement) {
+        languagesWidget->setDisabled(true);
+    }
     insertTab(languagesWidget, tr("Implementations"));
+}
+
+void IVPropertiesDialog::initArchetypeView()
+{
+    auto function = qobject_cast<ivm::IVFunctionType *>(dataObject());
+    if (function == nullptr) {
+        return;
+    }
+    auto archetypesWidget = new ive::ArchetypesWidget(m_archetypesModel, function, commandMacro(), this);
+
+    connect(propertiesDialogUi()->buttonBox, &QDialogButtonBox::accepted, archetypesWidget,
+            &ive::ArchetypesWidget::applyArchetypes);
+    insertTab(archetypesWidget, tr("Archetypes"), getTabCount());
 }
 
 } // namespace ive

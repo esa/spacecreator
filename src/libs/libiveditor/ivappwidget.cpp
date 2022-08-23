@@ -17,6 +17,7 @@
 
 #include "ivappwidget.h"
 
+#include "archetypesmanagerdialog.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
@@ -32,10 +33,10 @@
 #include "ivcreatortool.h"
 #include "iveditorcore.h"
 #include "ivexporter.h"
+#include "ivnamevalidator.h"
 #include "ivvisualizationmodelbase.h"
 #include "properties/ivpropertiesdialog.h"
 #include "ui_ivappwidget.h"
-#include "ivnamevalidator.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -43,6 +44,7 @@
 #include <QBuffer>
 #include <QClipboard>
 #include <QDebug>
+#include <QDialog>
 #include <QFileInfo>
 #include <QIcon>
 #include <QMenu>
@@ -275,8 +277,8 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
     }
 
     ive::IVPropertiesDialog dialog(QFileInfo(m_document->path()).absolutePath(), m_document->dynPropConfig(), obj,
-            m_document->layersModel(), m_document->ivCheck(), m_document->asn1Check(), m_document->commandsStack(),
-            graphicsView());
+            m_document->layersModel(), m_document->archetypesModel(), m_document->ivCheck(), m_document->asn1Check(),
+            m_document->commandsStack(), graphicsView());
     dialog.init();
     dialog.exec();
 }
@@ -622,6 +624,17 @@ QVector<QAction *> IVAppWidget::initViewActions()
     m_viewActions.append(actionSaveSceneRender);
 
     return m_viewActions;
+}
+
+void IVAppWidget::showArchetypeManager()
+{
+    if (m_document == nullptr || m_document->objectsModel() == nullptr || m_document->archetypesModel() == nullptr) {
+        return;
+    }
+
+    ive::ArchetypesManagerDialog dialog(m_document, m_document->objectsModel(), m_document->commandsStack(), this);
+    dialog.init();
+    dialog.exec();
 }
 
 } // namespace ive

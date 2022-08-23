@@ -112,9 +112,23 @@ public:
     virtual QVariantList generateProperties(bool isProperty) const = 0;
 
     // Perform updates/actions directly before the data is saved
-    virtual void updateForExport() { }
+    virtual void updateForExport() {}
 
     void setAttributeExportable(const QString &attrName, bool isExportable);
+
+    template<typename T>
+    static bool hasDuplicates(QVector<T *> &objects)
+    {
+        for (int i = 0; i < objects.size() - 1; ++i) {
+            for (int j = i + 1; j < objects.size(); ++j) {
+                if (*objects[i] == *objects[j]) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
 Q_SIGNALS:
     void attributeChanged(const QString &name);

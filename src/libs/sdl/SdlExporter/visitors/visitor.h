@@ -20,6 +20,8 @@
 #pragma once
 
 #include <sdl/SdlModel/answer.h>
+#include <sdl/SdlModel/block.h>
+#include <sdl/SdlModel/channel.h>
 #include <sdl/SdlModel/decision.h>
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/join.h>
@@ -29,10 +31,12 @@
 #include <sdl/SdlModel/procedure.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/process.h>
+#include <sdl/SdlModel/rename.h>
 #include <sdl/SdlModel/return.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
 #include <sdl/SdlModel/state.h>
+#include <sdl/SdlModel/system.h>
 #include <sdl/SdlModel/task.h>
 #include <sdl/SdlModel/transition.h>
 #include <sdl/SdlModel/variabledeclaration.h>
@@ -73,7 +77,41 @@ public:
 
 public:
     /**
+     * @brief   System visitor
+     *
+     * @param   system      system to be visited
      */
+    virtual auto visit(const System &system) -> void = 0;
+    /**
+     * @brief   Channel visitor
+     *
+     * @param   channel   Channel to be visited
+     */
+    virtual auto visit(const Channel &channel) -> void = 0;
+    /**
+     * @brief   Block visitor
+     *
+     * @param   block   Block to be visited
+     */
+    virtual auto visit(const Block &block) -> void = 0;
+    /**
+     * @brief   SignalRoute visitor
+     *
+     * @param   signalRoute     Signal route to be serialized
+     */
+    virtual auto visit(const SignalRoute &signalRoute) -> void = 0;
+    /**
+     * @brief   Connection visitor
+     *
+     * @param   connection      Connection to be serialized
+     */
+    virtual auto visit(const Connection &connection) -> void = 0;
+    /**
+     * @brief   Route visitor
+     *
+     * @param   route   Route to be visited
+     */
+    virtual auto visit(const Route &route) -> void = 0;
     /**
      * @brief   Process visitor
      *
@@ -86,6 +124,18 @@ public:
      * @param   state   state to be visited
      */
     virtual auto visit(const State &state) -> void = 0;
+    /**
+     * @brief   Signal visitor
+     *
+     * @param   signal   Signal to be visited
+     */
+    virtual auto visit(const Signal &input) -> void = 0;
+    /**
+     * @brief   Rename visitor
+     *
+     * @param   rename  Rename to be visited
+     */
+    virtual auto visit(const Rename &rename) -> void = 0;
     /**
      * @brief   Input visitor
      *

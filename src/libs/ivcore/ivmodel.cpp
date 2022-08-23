@@ -371,6 +371,18 @@ QVector<IVArchetypeLibraryReference *> IVModel::getArchetypeLibraryReferences()
     return result;
 }
 
+void IVModel::setArchetypeLibraryReferences(QVector<IVArchetypeLibraryReference *> references)
+{
+    QVector<IVArchetypeLibraryReference *> oldReferences = getArchetypeLibraryReferences();
+    for (auto reference : oldReferences) {
+        removeObject(reference);
+    }
+
+    for (auto reference : references) {
+        addObjectImpl(reference);
+    }
+}
+
 QVector<IVConnection *> IVModel::getConnectionsForFunction(const shared::Id &id) const
 {
     QVector<IVConnection *> result;

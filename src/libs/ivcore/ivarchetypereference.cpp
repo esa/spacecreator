@@ -51,6 +51,7 @@ void IVArchetypeReference::setFunctionName(const QString &functionName)
 
 bool IVArchetypeReference::operator==(const IVArchetypeReference &other) const
 {
-    return m_archetypeLibraryName == other.getLibraryName() && m_archetypeFunctionName == other.getFunctionName();
+    return m_archetypeLibraryName == other.getLibraryName()
+            && m_archetypeFunctionName == other.getFunctionName();
 }
 }
