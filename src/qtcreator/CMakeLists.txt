@@ -4,5 +4,6 @@ endif()
 
 add_subdirectory(spacecreatorplugin)
 add_subdirectory(sedsplugin)
+add_subdirectory(compastaplugin)
 add_subdirectory(functiontesterplugin)
 add_subdirectory(devicegeneratorplugin)

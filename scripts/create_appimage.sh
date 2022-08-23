@@ -70,6 +70,8 @@ cp ${PROJECT_ROOT}/wizards/files/* ${APP_DIR}/share/qtcreator/templates/wizards/
 cp ${PROJECT_ROOT}/wizards/projects/* ${APP_DIR}/share/qtcreator/templates/wizards/projects -r
 cp ${PROJECT_ROOT}/src/qtcreator/asn1plugin/generic-highlighter/syntax/* ${APP_DIR}/share/qtcreator/generic-highlighter
 cp ${PROJECT_ROOT}/src/qtcreator/asn1plugin/snippets ${APP_DIR}/share/qtcreator -r
+cp ${PROJECT_ROOT}/src/qtcreator/compastaplugin/generic-highlighter/syntax/* ${APP_DIR}/share/qtcreator/generic-highlighter
+cp ${PROJECT_ROOT}/src/qtcreator/compastaplugin/snippets ${APP_DIR}/share/qtcreator -r
 cp ${BUILD_DIR}/grantlee/build/templates/lib/libGrantlee_Templates.* ${APP_DIR}/lib/Qt/lib
 cp ${BUILD_DIR}/grantlee/build/grantlee ${APP_DIR}/lib/Qt/plugins -r
 cp ${ENV_QT_BASE_DIR}/lib/libQt5WebSockets* ${APP_DIR}/lib/Qt/lib -r

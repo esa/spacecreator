@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="Slim" section="Sources" version="1.0" extensions="*.slim" kateversion="2.4">
+    <highlighting>
+        <list name="keywords">
+            <item>system</item>
+            <item>device</item>
+            <item>features</item>
+            <item>properties</item>
+            <item>in</item>
+            <item>out</item>
+            <item>data</item>
+            <item>port</item>
+            <item>end</item>
+        </list>
+        <contexts>
+            <context attribute="Normal Text" lineEndContext="#pop" name="Normal Text">
+                <keyword attribute="Keyword" context="#stay" String="keywords" />
+                <DetectChar attribute="String" context="string" char="&quot;" />
+                <Detect2Chars attribute="Comment" context="Singleline comment" char="-" char1="-"/>
+            </context>
+            <context attribute="String" lineEndContext="#stay" name="string" >
+                <DetectChar attribute="String" context="#pop" char="&quot;" />
+            </context>
+            <context name="Singleline comment" attribute="Comment" lineEndContext="#pop">
+                <DetectSpaces />
+                <IncludeRules context="##Comments" />
+            </context>
+
+        </contexts>
+        <itemDatas>
+            <itemData name="Normal Text" defStyleNum="dsNormal" />
+            <itemData name="Keyword" defStyleNum="dsKeyword" />
+            <itemData name="String" defStyleNum="dsString" />
+            <itemData name="Comment" defStyleNum="dsComment" />
+        </itemDatas>
+    </highlighting> 
+    <general>
+        <comments>
+            <comment name="singleLine" start="--" position="afterwhitespace" />
+            <comment name="multiLine" start="/*" end="*/" region="Comment" />
+        </comments>
+        <keywords casesensitive="1" />
+    </general>
+</language>
