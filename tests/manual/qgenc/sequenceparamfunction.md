@@ -4,8 +4,10 @@
 
 * Open project `tests/manual/qgenc/projects/not-working/sequenceparam/sequenceparam.pro`
 * Open the `interfaceview.xml` file
-* Try to build the project
+* Build and run the project
 
-Results:
+Expected results:
 
-* Project build fails. There are compilation errors in a wrongly generated function.
+* Project should succesfully build and run.
+* It should display the program output in a loop.
+* No "assertion failed" info should appear.
