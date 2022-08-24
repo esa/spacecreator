@@ -3,9 +3,10 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   Testgui-writerequesta-p1, Testgui-writerequestb-p1 FROM TESTGUI-SUBTYPE;
 
-Lock-States ::= ENUMERATED {writing, idle, wait-nocontention, wait-turn}
+Lock-States ::= ENUMERATED {writing, wait-nocontention, idle, wait-turn}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,

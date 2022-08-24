@@ -1,8 +1,10 @@
 Receiver-Datamodel DEFINITIONS ::=
 BEGIN
+--  This file was generated automatically by OpenGEODE
 IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   MyOctetString, MyBetterOctetString FROM USERDEFINED-TYPES-DATAVIEW;
+   MyOctetString, MyBetterOctetString FROM USERDEFINED-TYPES-DATAVIEW
+   Pinger-octetinterface-octetArg FROM PINGER-SUBTYPE;
 
 Receiver-States ::= ENUMERATED {wait}
 
@@ -43,6 +45,28 @@ BEGIN
 END
 
 
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyBetterOctetString FROM USERDEFINED-TYPES-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-octetinterface-octetArg ::= MyBetterOctetString
+
+
+
+
+END
+
 
 Simulation-DataView DEFINITIONS ::=
 BEGIN
@@ -54,6 +78,8 @@ BEGIN
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
       Receiver-Context FROM Receiver-Datamodel
    ;
@@ -135,11 +161,34 @@ BEGIN
 
    --  Global system state (excluding observers, which are defined later)
    receiver-queue-size INTEGER ::= 2
+
    System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
       --  Message queues
       receiver-queue Events-Ty (SIZE (0 .. receiver-queue-size)),
 
       receiver  Receiver-Context
+   }
+
+END
+
+Simulation-Timers-DataView DEFINITIONS ::=
+BEGIN
+
+   TimerData ::= SEQUENCE {
+      timer-enabled BOOLEAN,
+      interval INTEGER (0 .. 50000)
+   }
+
+   AggregateTimerData ::= SEQUENCE {
+      
+      
+      
+      receiver SEQUENCE {
+      },
+      
+      dummy-entry SEQUENCE {}
    }
 
 END

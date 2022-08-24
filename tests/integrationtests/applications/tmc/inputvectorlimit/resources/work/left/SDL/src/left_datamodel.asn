@@ -1,0 +1,18 @@
+Left-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   Gui-leftinterface-leftArg, Gui-rightinterface-rightArg FROM GUI-SUBTYPE;
+
+Left-States ::= ENUMERATED {wait}
+
+Left-Context ::= SEQUENCE {
+   state Left-States,
+   init-done BOOLEAN,
+   leftarg MyInteger,
+   leftval MyInteger
+}
+
+END
