@@ -189,13 +189,15 @@ std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSeq
         stateMachine->addTransition(std::move(transition));
     }
 
+    const auto requirementStartStateId = context.whenSequence.size();
+
     if (context.mode == Mode::Then) {
-        auto thenTransitions = createThenTransitions(context, states, context.whenSequence.size());
+        auto thenTransitions = createThenTransitions(context, states, requirementStartStateId);
         for (auto &transition : thenTransitions) {
             stateMachine->addTransition(std::move(transition));
         }
     } else if (context.mode == Mode::ThenNot) {
-        auto thenNotTransitions = createThenNotTransitions(context, states, context.whenSequence.size());
+        auto thenNotTransitions = createThenNotTransitions(context, states, requirementStartStateId);
         for (auto &transition : thenNotTransitions) {
             stateMachine->addTransition(std::move(transition));
         }
