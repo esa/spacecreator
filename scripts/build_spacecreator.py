@@ -13,13 +13,16 @@ from utils import join_dir, print_cmd, ensure_dir
 def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_dir: str, env_qt_dir: str) -> None:
     env_qmake_bin = join_dir(env_qt_dir, 'bin', 'qmake')
     qtc_install = join_dir(env_dir, 'spacecreator.AppDir')
+    grantlee_dir = join_dir(env_dir, 'grantlee', 'lib', 'cmake', 'Grantlee5')
+    env_qt_cmake_dir = join_dir(env_qt_dir, 'lib', 'cmake')
+    cmake_prefix_path = '"' + env_qt_cmake_dir + ';' + grantlee_dir + '"'  # The encompassing "'s are to escape the ;
     ninja_cmd = ['cmake',
                  '-GNinja',
                  '-S', project_dir,
                  '-B', build_dir,
                  '-DCMAKE_BUILD_TYPE=' + build_type,
                  '-DBUILD_PATCH_NUMBER=0',
-                 '-DCMAKE_PREFIX_PATH:STRING=' + env_qt_dir,
+                 '-DCMAKE_PREFIX_PATH=' + cmake_prefix_path,
                  '-DQT_QMAKE_EXECUTABLE:STRING=' + env_qmake_bin,
                  '-DENABLE_FORMAT_CHECK=OFF',
                  '-DQTC_INSTALL=' + qtc_install,
