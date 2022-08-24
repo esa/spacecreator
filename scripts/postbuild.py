@@ -24,10 +24,10 @@ In QtCreator the run settings could be a custom Deploy Configuration with the co
 
 def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: str) -> None:
     if not os.path.exists(plugin_build_dir):
-        print("Could not find plugin dir: {}", format(plugin_build_dir))
+        print("Could not find plugin build dir: {}".format(plugin_build_dir))
         exit(1)
     if not os.path.exists(qtcreator_app_plugin_dir):
-        print("Could not find QtCreators plugin dir: {}", format(plugin_build_dir))
+        print("Could not find QtCreators plugin dir: {}".format(qtcreator_app_plugin_dir))
         exit(2)
 
     print("Copying plugins from {} to {}".format(plugin_build_dir, qtcreator_app_plugin_dir))
@@ -37,10 +37,10 @@ def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: 
 
 def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     if not os.path.exists(wizards_dir):
-        print("Could not find wizards dir: {}", format(wizards_dir))
+        print("Could not find wizards dir: {}". format(wizards_dir))
         exit(1)
     if not os.path.exists(wizards_install_dir):
-        print("Could not find wizards install dir: {}", format(wizards_install_dir))
+        print("Could not find wizards install dir: {}".format(wizards_install_dir))
         exit(2)
 
     # File wizards
