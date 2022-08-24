@@ -1,0 +1,21 @@
+INTERFACE DEFINITIONS ::= BEGIN
+BoolInt16Enum [size 32, encoding twos-complement, encode-values]
+BoolInt32Enum [size 32, encoding twos-complement, encode-values]
+BoolInt8Enum [size 32, encoding twos-complement, encode-values]
+BoolSimulinkIntEnumType [size 32, encoding twos-complement, encode-values]
+BoolUInt16Enum [size 32, encoding pos-int, encode-values]
+BoolUInt8Enum [size 32, encoding pos-int, encode-values]
+I1-Type []
+I2-Type []
+I3-Type []
+I4-Type []
+I5-Type []
+I6-Type []
+O1-Type []
+O2-Type []
+O3-Type []
+O4-Type []
+O5-Type []
+O6-Type []
+END
+
