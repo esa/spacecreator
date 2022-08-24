@@ -41,7 +41,7 @@
     <Property name="Taste::coordinates" value="26700 50600"/>
 </Required_Interface>
 
-<Provided_Interface name="Depacketize" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+<Required_Interface name="Depacketize" kind="Protected" layer="default" required_system_element="NO" wcet="0">
     <Input_Parameter name="packetType" type="PacketType" encoding="NATIVE"/>
     <Input_Parameter name="packetPointer" type="PacketPointer" encoding="NATIVE"/>
     <Input_Parameter name="packetSize" type="DataLength" encoding="NATIVE"/>
@@ -51,7 +51,7 @@
     <Output_Parameter name="dataSize" type="DataLengthPtr" encoding="NATIVE"/>
     <Output_Parameter name="errorCode" type="RequestErrorCodePtr" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="26700 53800"/>
-</Provided_Interface>
+</Required_Interface>
 
     <Implementations>
         <Implementation name="default" language="C"/>
