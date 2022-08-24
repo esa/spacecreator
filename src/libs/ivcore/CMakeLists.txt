@@ -56,6 +56,8 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/archetypemodel.cpp
     archetypes/archetypeobject.h
     archetypes/archetypeobject.cpp
+    archetypes/layerarchetype.h
+    archetypes/layerarchetype.cpp
     archetypes/parameterarchetype.h
     archetypes/parameterarchetype.cpp
     archetypes/interfacearchetype.h
@@ -68,6 +70,8 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/archetypecommonprops.cpp
     archetypes/archetypexmlreader.h
     archetypes/archetypexmlreader.cpp
+    archetypes/archetypeintegrityhelper.h
+    archetypes/archetypeintegrityhelper.cpp
     )
 
 target_include_directories(${LIB_NAME}

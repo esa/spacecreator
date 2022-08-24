@@ -19,45 +19,18 @@
 
 #pragma once
 
-#include <QHash>
-#include <QObject>
-#include <QString>
+#include "archetypecommonprops.h"
+#include "archetypeobject.h"
 
 namespace ivm {
-namespace meta {
 
-struct ArchetypeProps {
-    Q_GADGET
+class LayerArchetype : public ArchetypeObject
+{
+    Q_OBJECT
 public:
-    enum class Token
-    {
-        Unknown = 0,
 
-        // tags:
-        ParameterArchetype,
-        InterfaceArchetype,
-        FunctionArchetype,
-        ArchetypeLibrary,
-        CommunicationLayerTypes,
-        CommunicationLayerType,
-
-        // attrs:
-        name,
-        value,
-        type,
-        interfaceType,
-        kind,
-        direction,
-        layer
-    };
-    Q_ENUM(Token)
-
-    static const QHash<QString, ArchetypeProps::Token> TokensByName;
-
-    static ArchetypeProps::Token token(const QString &fromString);
-
-    static QString token(ArchetypeProps::Token tag);
+    explicit LayerArchetype(const QString &title, QObject *parent = nullptr);
+    ~LayerArchetype() override;
 };
 
-} // namespace meta
-} // namespace ivm
+}

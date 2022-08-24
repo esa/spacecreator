@@ -342,7 +342,7 @@ private:
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
 
-    auto findProvidedInterface(const ivm::IVModel *model, const QString &functionName,
+    auto findProvidedInterface(const ivm::IVModel *model, const QString &fromFunction,
             const QString &interfaceName) const -> const ivm::IVInterface *;
     auto findRequiredInterface(const ivm::IVModel *model, const QString &functionName,
             const QString &interfaceName) const -> const ivm::IVInterface *;

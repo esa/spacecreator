@@ -25,6 +25,7 @@
 
 #include <QVector>
 #include <QWidget>
+#include <memory>
 
 namespace ivm {
 class AbstractSystemChecks;
@@ -49,8 +50,8 @@ class ArchetypesWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function,
-            cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
+    explicit ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVModel *layersModel,
+            ivm::IVFunctionType *function, cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
     ~ArchetypesWidget();
 
     void addArchetype();
@@ -64,9 +65,10 @@ private:
     void rowsInserted(const QModelIndex &parent, int first, int last);
 
 private:
-    Ui::ArchetypesWidget *m_ui;
-    ArchetypesWidgetModel *m_model = nullptr;
-    ivm::ArchetypeModel *m_archetypeModel = nullptr;
+    std::unique_ptr<Ui::ArchetypesWidget> m_ui;
+    QPointer<ivm::IVModel> m_layersModel;
+    QPointer<ArchetypesWidgetModel> m_model;
+    QPointer<ivm::ArchetypeModel> m_archetypeModel;
     shared::cmd::CommandsStackBase::Macro *m_cmdMacro = nullptr;
 };
 
