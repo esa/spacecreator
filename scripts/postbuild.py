@@ -32,7 +32,7 @@ def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: 
 
     print("Copying plugins from {} to {}".format(plugin_build_dir, qtcreator_app_plugin_dir))
     libspacecreatorplugin = join_dir(plugin_build_dir, "libSpaceCreatorPlugin.so")
-    shutil.copy2(libspacecreatorplugin, qtcreator_app_plugin_dir, )
+    shutil.copy2(libspacecreatorplugin, qtcreator_app_plugin_dir)
 
 
 def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
