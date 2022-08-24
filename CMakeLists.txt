@@ -34,11 +34,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Set up Qt stuff:
-set(CMAKE_PREFIX_PATH "")
-list(APPEND CMAKE_PREFIX_PATH "/home/fisker/opt/qtcreatorenv_6test/grantlee/lib/cmake/Grantlee5")
-list(APPEND CMAKE_PREFIX_PATH "/home/fisker/opt/qtcreatorenv_6test/Qt/6.3.1/gcc_64/lib/cmake")
-message("#### CMAKE_PREFIX_PATH: " "${CMAKE_PREFIX_PATH}")
-
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Concurrent Core Gui Network Svg Test Widgets Xml REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Concurrent Core Gui Network Svg Test WebSockets Widgets Xml REQUIRED)
