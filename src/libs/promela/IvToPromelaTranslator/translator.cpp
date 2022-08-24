@@ -1047,9 +1047,10 @@ void IvToPromelaTranslator::createPromelaObjectsForObservers(Context &context) c
 
     for (const auto &attachment : attachments) {
         const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
+        const QString fromFunction = getAttachmentFromFunction(context.ivModel(), attachment);
         const QString channelName = observerChannelName(attachment, toFunction);
 
-        const IVInterface *interface = findProvidedInterface(context.ivModel(), toFunction, attachment.interface());
+        const IVInterface *interface = findProvidedInterface(context.ivModel(), fromFunction, attachment.interface());
         size_t queueSize;
         QString parameterName;
         QString parameterType;
@@ -1260,20 +1261,15 @@ QString IvToPromelaTranslator::buildParameterSubtypeName(
 }
 
 const ::ivm::IVInterface *IvToPromelaTranslator::findProvidedInterface(
-        const ::ivm::IVModel *model, const QString &functionName, const QString &interfaceName) const
+        const ::ivm::IVModel *model, const QString &fromFunction, const QString &interfaceName) const
 {
-    const IVFunction *function = model->getFunction(functionName, Qt::CaseInsensitive);
-    if (function == nullptr) {
+    const IVInterface *ri = findRequiredInterface(model, fromFunction, interfaceName);
+    const IVConnection *connection = model->getConnectionForIface(ri->id());
+    if (connection != nullptr) {
+        return connection->targetInterface();
+    } else {
         return nullptr;
     }
-    const QVector<IVInterface *> pis = function->pis();
-    auto iter = std::find_if(pis.begin(), pis.end(), [&interfaceName, this](const IVInterface *i) {
-        return interfaceName.compare(getInterfaceName(i), Qt::CaseInsensitive) == 0;
-    });
-    if (iter == pis.end()) {
-        return nullptr;
-    }
-    return *iter;
 }
 
 const ::ivm::IVInterface *IvToPromelaTranslator::findRequiredInterface(
