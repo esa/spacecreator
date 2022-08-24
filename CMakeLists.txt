@@ -33,6 +33,13 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Generated files should be in the include path
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# Set up Qt stuff:
+set(CMAKE_PREFIX_PATH "")
+list(APPEND CMAKE_PREFIX_PATH "/home/fisker/opt/qtcreatorenv_6test/grantlee/lib/cmake/Grantlee5")
+list(APPEND CMAKE_PREFIX_PATH "/home/fisker/opt/qtcreatorenv_6test/Qt/6.3.1/gcc_64/lib/cmake")
+message("#### CMAKE_PREFIX_PATH: " "${CMAKE_PREFIX_PATH}")
+
+
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Concurrent Core Gui Network Svg Test Widgets Xml REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Concurrent Core Gui Network Svg Test WebSockets Widgets Xml REQUIRED)
 
@@ -40,7 +47,6 @@ if(${QT_VERSION_MAJOR} STREQUAL "6")
     find_package(Qt6 COMPONENTS Core5Compat SvgWidgets REQUIRED)
 endif()
 
-# Set up Qt stuff:
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -66,10 +72,11 @@ if (WIN32)
     get_target_property(QtCore_location ${QT_CORE} LOCATION)
     get_filename_component(QT_DIR ${QtCore_location} DIRECTORY)
     get_filename_component(QT_DIR ${QT_DIR} DIRECTORY)
-    set(Grantlee5_DIR "${QT_DIR}/lib/cmake/Grantlee5")
+    # set(Grantlee5_DIR "${QT_DIR}/lib/cmake/Grantlee5")
     # message("Grantlee cmake dir: ${Grantlee5_DIR}")
 endif()
-find_package(Grantlee5 REQUIRED)
+
+find_package(Grantlee5 CONFIG REQUIRED)
 
 include(QtCreatorCheck)
 if (${QTC_FOUND})
@@ -130,8 +137,8 @@ if(UNIX)
 add_subdirectory(asn1scc)
 
 # install grantlee
-install(FILES /usr/lib/libGrantlee_Templates.so /usr/lib/libGrantlee_Templates.so.5 /usr/lib/libGrantlee_Templates.so.5.2.0 DESTINATION /usr/lib)
-install(DIRECTORY /usr/lib/grantlee DESTINATION /usr/lib)
+#install(FILES /usr/lib/libGrantlee_Templates.so /usr/lib/libGrantlee_Templates.so.5 /usr/lib/libGrantlee_Templates.so.5.2.0 DESTINATION /usr/lib)
+#install(DIRECTORY /usr/lib/grantlee DESTINATION /usr/lib)
 
 set (CPACK_PACKAGE_NAME "${SC_NAME}")
 set (CPACK_PACKAGE_VENDOR "European Space Agency")
