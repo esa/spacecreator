@@ -36,6 +36,8 @@ private Q_SLOTS:
     void test_mscNeverSequenceBacktrackingFailure();
     void test_mscWhenThenSequence();
     void test_mscWhenThenSequenceFailure();
+    void test_mscWhenThenNotSequence();
+    void test_mscWhenThenNotSequenceFailure();
 };
 
 void tst_Tmc_Observers::test_inputMonitoring()
@@ -83,6 +85,18 @@ void tst_Tmc_Observers::test_mscWhenThenSequence()
 void tst_Tmc_Observers::test_mscWhenThenSequenceFailure()
 {
     const int result = system("./test_msc_when_then_sequence_failure.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_mscWhenThenNotSequence()
+{
+    const int result = system("./test_msc_when_then_not_sequence.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_mscWhenThenNotSequenceFailure()
+{
+    const int result = system("./test_msc_when_then_not_sequence_failure.sh");
     QCOMPARE(result, 0);
 }
 
