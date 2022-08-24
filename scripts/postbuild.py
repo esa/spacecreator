@@ -58,6 +58,9 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
 
 
 if __name__ == '__main__':
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    default_project_dir = join_dir(script_dir, '..')
+
     # Parse arguments
     parser = argparse.ArgumentParser(prog='postbuild',
                                      epilog='python3 ./scripts/postbuild.py '
@@ -65,17 +68,29 @@ if __name__ == '__main__':
                                             '--build_dir=/home/<user>/projects/spacecreator/build '
                                             '--env_dir=/home/<user>/opt/qtcreatorenv ')
 
-    parser.add_argument('--project_dir', dest='project_dir', type=str, required=True,
+    parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
                         help='Path to the folder where spacecreator project is')
-    parser.add_argument('--build_dir', dest='build_dir', type=str, required=True,
+    parser.add_argument('--build_dir', dest='build_dir', type=str, required=False,
                         help='Path to the folder where spacecreator was build')
     parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
                         help='Path to the folder that contains the build environment')
     args = parser.parse_args()
 
-    build_dir = args.build_dir
+    if args.project_dir:
+        project_dir = args.project_dir
+        print("Project dir is {}".format(project_dir))
+    else:
+        project_dir = default_project_dir
+        print("Defaulting to project dir {}".format(project_dir))
+
+    if args.build_dir:
+        build_dir = args.build_dir
+        print("build dir is {}".format(build_dir))
+    else:
+        build_dir = join_dir(project_dir, 'build')
+        print("Defaulting to build dir {}".format(build_dir))
+
     env_dir = args.env_dir
-    project_dir = args.project_dir
     plugin_build_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     plugin_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'qtcreator', 'plugins')
     copy_plugins_to_plugin_dir(plugin_build_dir, plugin_install_dir)
