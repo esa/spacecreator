@@ -39,5 +39,5 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
     && $CC -DVECTORSZ=65536 -o system.out pan.c \
-    && cd .. \
-    && rm -r $TEST_OUTPUT_DIR
+    && cd ..
+#    && rm -r $TEST_OUTPUT_DIR
