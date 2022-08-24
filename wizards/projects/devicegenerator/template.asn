@@ -1,16 +1,18 @@
 %{Model}-DATAVIEW DEFINITIONS ::= BEGIN
 
+    PlatformSpecificPointer ::= INTEGER (0 .. 4294967295)
+
     SystemBus ::= INTEGER (0 .. 255)
 
     RemoteInterface ::= INTEGER (0 .. 255)
 
-    InputDataPtr ::= INTEGER (0 .. 255)
+    InputDataPtr ::= PlatformSpecificPointer
 
-    OutputDataPtr ::= INTEGER (0 .. 255)
+    OutputDataPtr ::= PlatformSpecificPointer
 
     DataLength ::= INTEGER (-2147483648 .. 2147483647) --(Broker/Packetizer)const size_t dataSize/Length
 
-    DataLengthPtr ::= INTEGER (-2147483648 .. 2147483647) --(Depacketizer)size_t* const dataSize
+    DataLengthPtr ::= PlatformSpecificPointer --(Depacketizer)size_t* const dataSize
 
     PacketType ::= INTEGER (0 .. 255) --(Broker/Packetizer)const Packetizer_PacketType packetType
 
@@ -18,27 +20,27 @@
 
     PacketDestination ::= INTEGER (0 .. 65535) --(Packetizer)const uint16_t destination
 
-    PacketSourcePtr ::= INTEGER (0 .. 65535) --(Depacketizer)uint16_t* const source
+    PacketSourcePtr ::= PlatformSpecificPointer --(Depacketizer)uint16_t* const source
 
-    PacketDestinationPtr ::= INTEGER (0 .. 65535) --(Depacketizer)uint16_t* const destination
+    PacketDestinationPtr ::= PlatformSpecificPointer --(Depacketizer)uint16_t* const destination
 
-    PacketPointer ::= INTEGER (0 .. 255) --(Packetizer)uint8_t* const packetPointer
+    PacketPointer ::= PlatformSpecificPointer --(Packetizer)uint8_t* const packetPointer
 
     PacketDataOffset ::= INTEGER (-2147483648 .. 2147483647) --(Packetizer)const size_t dataOffset
 
-    PacketDataOffsetPtr ::= INTEGER (-2147483648 .. 2147483647) --(Packetizer)size_t* const dataOffset
+    PacketDataOffsetPtr ::= PlatformSpecificPointer --(Packetizer)size_t* const dataOffset
 
-    RequestErrorCodePtr ::= INTEGER (-2147483648 .. 2147483647) --(Depacketizer)int32_t* const errorCode
+    RequestErrorCodePtr ::= PlatformSpecificPointer --(Depacketizer)int32_t* const errorCode
 
-    SystemBusSeq ::= SEQUENCE (SIZE (255)) OF SystemBus --(Broker)enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER]
+    SystemBusArray ::= SEQUENCE (SIZE (255)) OF SystemBus --(Broker)enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER]
 
-    DeliverRequestSeq ::= SEQUENCE{
+    DeliveredRequestData ::= SEQUENCE{
         interface RemoteInterface, --(Broker)const enum RemoteInterface
         data InputDataPtr, --(Broker)const uint8_t* const
         length DataLength --(Broker)const size_t
     }
 
-    ReceiveRequestSeq ::= SEQUENCE{
+    ReceivedRequestData ::= SEQUENCE{
         bus-id SystemBus, --(Broker)enum SystemBus
         data OutputDataPtr, --(Broker)uint8_t* const
         length DataLength --(Broker)const size_t
