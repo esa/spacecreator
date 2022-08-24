@@ -12,7 +12,7 @@ TEST_OUTPUT_DIR=output
 RESOURCE_DIR=resources/dekker1
 SUBTYPES_DIR=${RESOURCE_DIR}/work/modelchecking/subtypes
 OBSERVERS_DIR=${RESOURCE_DIR}/work/modelchecking/properties/observers
-STOPCONDITIONS_DIR=${RESOURCE_DIR}/work/modelchecking/properties/stopconditions
+PROPERTIES_DIR=${RESOURCE_DIR}/work/modelchecking/properties
 
 echo "Running TMC test: ${0##*/}'"
 
@@ -24,10 +24,10 @@ mkdir $TEST_OUTPUT_DIR
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -ivl 1 \
     -sub ${SUBTYPES_DIR}/subtypes.asn \
-    -scl ${STOPCONDITIONS_DIR}/sc.scl \
+    -scl ${PROPERTIES_DIR}/sc.scl \
+    -os ${PROPERTIES_DIR}/InputObserver/InputObserver.pr \
+    -os ${PROPERTIES_DIR}/OutputObserver/OutputObserver.pr \
     -o $TEST_OUTPUT_DIR
-
-#    -os ${STOPCONDITIONS_DIR}/observer.pr \
 
 # Compile the actual Spin model checker. This tests
 # whether all the features are supported, and that 
@@ -39,5 +39,5 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
     && $CC -DVECTORSZ=65536 -o system.out pan.c \
-    && cd ..
-#    && rm -r $TEST_OUTPUT_DIR
+    && cd .. \
+    && rm -r $TEST_OUTPUT_DIR

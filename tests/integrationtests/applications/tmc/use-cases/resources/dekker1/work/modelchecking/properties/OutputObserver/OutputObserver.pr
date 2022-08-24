@@ -1,0 +1,53 @@
+system OutputObserver;
+    /* CIF TEXT (144, 214), (507, 136) */
+    use datamodel comment 'observer.asn';
+    
+    signal notification(T_Boolean) renames output WantToEnter from LockB;
+    /* CIF ENDTEXT */
+    channel c
+        from env to OutputObserver with notification;
+        from OutputObserver to env with notification;
+    endchannel;
+    block OutputObserver;
+        signalroute r
+            from env to OutputObserver with notification;
+            from OutputObserver to env with notification;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process OutputObserver;
+            /* CIF TEXT (0, 57), (256, 112) */
+            monitor st System_State;
+            
+            monitor event Observable_Event;
+            
+            errorstates WantsToEnter;
+            /* CIF ENDTEXT */
+            /* CIF START (352, 68), (70, 35) */
+            START;
+                /* CIF NEXTSTATE (352, 123), (70, 35) */
+                NEXTSTATE Wait;
+            /* CIF state (346, 222), (70, 38) */
+            state Wait
+;
+                /* CIF input (327, 280), (106, 35) */
+                input notification(x);
+                    /* CIF output (317, 335), (126, 35) */
+                    output notification(x);
+                    /* CIF decision (346, 385), (70, 50) */
+                    decision x;
+                        /* CIF ANSWER (301, 455), (70, 23) */
+                        (true):
+                            /* CIF NEXTSTATE (282, 498), (106, 35) */
+                            NEXTSTATE WantsToEnter;
+                        /* CIF ANSWER (391, 455), (70, 23) */
+                        (false):
+                            /* CIF NEXTSTATE (391, 498), (70, 35) */
+                            NEXTSTATE Wait;
+                    enddecision;
+            endstate;
+            /* CIF state (656, 77), (106, 35) */
+            state WantsToEnter;
+            endstate;
+        endprocess OutputObserver;
+    endblock;
+endsystem;
