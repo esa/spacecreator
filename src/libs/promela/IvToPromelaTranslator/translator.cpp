@@ -928,6 +928,8 @@ void IvToPromelaTranslator::createSystemState(Context &context) const
         }
     }
 
+    systemState.addField(Declaration(DataType(UtypeRef("AggregateTimerData")), "timers"));
+
     context.model()->addUtype(systemState);
 
     context.model()->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
@@ -935,8 +937,7 @@ void IvToPromelaTranslator::createSystemState(Context &context) const
 
 void IvToPromelaTranslator::createPromelaObjectsForTimers(Context &context) const
 {
-    std::map<int, QString> timerSignals;
-    int timerCount = 0;
+    std::map<QString, VariableRef> timerSignals;
 
     QVector<IVFunction *> ivFunctionList = context.ivModel()->allObjectsByType<IVFunction>();
 
@@ -949,22 +950,24 @@ void IvToPromelaTranslator::createPromelaObjectsForTimers(Context &context) cons
                 if (parameter.paramType() == shared::BasicParameter::Type::Timer) {
                     const QString timerName = parameter.name().toLower();
                     const QString channelName = constructChannelName(functionName, timerName);
-                    const int timerId = timerCount;
-                    ++timerCount;
-                    createTimerInlinesForFunction(context, functionName, timerName, timerId);
-                    timerSignals.emplace(timerId, channelName);
+                    VariableRef timerData("global_state");
+                    timerData.appendElement("timers");
+                    timerData.appendElement(functionName.toLower());
+                    timerData.appendElement(timerName.toLower());
+                    createTimerInlinesForFunction(context, functionName, timerName, timerData);
+                    timerSignals.emplace(channelName, timerData);
                 }
             }
         }
     }
 
-    if (timerCount > 0) {
-        createGlobalTimerObjects(context, timerCount, timerSignals);
+    if (!timerSignals.empty()) {
+        createGlobalTimerObjects(context, timerSignals);
     }
 }
 
 void IvToPromelaTranslator::createTimerInlinesForFunction(
-        Context &context, const QString &functionName, const QString &timerName, int timerId) const
+        Context &context, const QString &functionName, const QString &timerName, const VariableRef &timerData) const
 {
     const QList<InlineCall::Argument> arguments;
 
@@ -972,15 +975,25 @@ void IvToPromelaTranslator::createTimerInlinesForFunction(
     const QString resetTimerName = QString("%1_0_%2_reset").arg(Escaper::escapePromelaIV(functionName)).arg(timerName);
 
     Sequence setTimerSequence(Sequence::Type::NORMAL);
-    VariableRef element(m_timerManagerDataName, std::make_unique<Expression>((Constant(timerId))));
-    setTimerSequence.appendElement(Assignment(element, Expression(BooleanConstant(true))));
+
+    QString setTimerParameterName = QString("%1_%2_interval")
+                                            .arg(Escaper::escapePromelaName(functionName))
+                                            .arg(Escaper::escapePromelaName(timerName));
+
+    VariableRef timerIntervalVar(timerData);
+    timerIntervalVar.appendElement("interval");
+    setTimerSequence.appendElement(Assignment(timerIntervalVar, Expression(VariableRef(setTimerParameterName))));
+
+    VariableRef timerEnabledVar(timerData);
+    timerEnabledVar.appendElement("timer_enabled");
+    setTimerSequence.appendElement(Assignment(timerEnabledVar, Expression(BooleanConstant(true))));
 
     Sequence resetTimerSequence(Sequence::Type::NORMAL);
 
-    resetTimerSequence.appendElement(Assignment(element, Expression(BooleanConstant(false))));
+    resetTimerSequence.appendElement(Assignment(timerEnabledVar, Expression(BooleanConstant(false))));
 
     QList<QString> params;
-    params.append("interval");
+    params.append(setTimerParameterName);
 
     context.model()->addInlineDef(
             std::make_unique<InlineDef>(setTimerName, std::move(params), std::move(setTimerSequence)));
@@ -989,12 +1002,8 @@ void IvToPromelaTranslator::createTimerInlinesForFunction(
 }
 
 void IvToPromelaTranslator::createGlobalTimerObjects(
-        Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
+        Context &context, const std::map<QString, VariableRef> &timerSignals) const
 {
-    Declaration timerManagerDataDeclaration(
-            DataType(ArrayType(static_cast<size_t>(timerCount), BasicType::BOOLEAN)), m_timerManagerDataName);
-    context.model()->addDeclaration(std::move(timerManagerDataDeclaration));
-
     Sequence timerProctypeBody(Sequence::Type::NORMAL);
     timerProctypeBody.appendElement(createWaitForInitStatement());
 
@@ -1009,15 +1018,16 @@ void IvToPromelaTranslator::createGlobalTimerObjects(
         for (auto iter = timerSignals.begin(); iter != timerSignals.end(); ++iter) {
             Conditional cond;
 
-            VariableRef fpt(m_timerManagerDataName, std::make_unique<Expression>(Constant(iter->first)));
+            VariableRef timerEnabledVar(iter->second);
+            timerEnabledVar.appendElement("timer_enabled");
 
             std::unique_ptr<Sequence> timerCall = std::make_unique<Sequence>(Sequence::Type::NORMAL);
-            timerCall->appendElement(Expression(fpt));
-            const QString channelName = iter->second;
+            timerCall->appendElement(Expression(timerEnabledVar));
+            const QString channelName = iter->first;
             QList<Expression> sendParams;
             sendParams.append(Expression(Constant(0)));
             timerCall->appendElement(ChannelSend(VariableRef(channelName), std::move(sendParams)));
-            timerCall->appendElement(Assignment(fpt, Expression(BooleanConstant(false))));
+            timerCall->appendElement(Assignment(timerEnabledVar, Expression(BooleanConstant(false))));
             cond.appendAlternative(std::move(timerCall));
 
             std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
