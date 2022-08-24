@@ -28,7 +28,7 @@ DocumentTranslator::DocumentTranslator(SdlModel *sdlModel, const Options &option
 {
 }
 
-void DocumentTranslator::translateDocument(const msc::MscDocument *mscDocument) const
+void DocumentTranslator::translateDocument(const msc::MscDocument *mscDocument)
 {
     for (const auto mscChart : mscDocument->charts()) {
         m_chartTranslator.translateChart(mscChart);

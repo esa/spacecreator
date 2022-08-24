@@ -23,13 +23,13 @@
 
 namespace sdl {
 
-NextState::NextState(QString name, State *state)
+NextState::NextState(QString name, const State *state)
     : Action(std::move(name))
     , m_state(state)
 {
 }
 
-State *NextState::state() const
+const State *NextState::state() const
 {
     return m_state;
 }
