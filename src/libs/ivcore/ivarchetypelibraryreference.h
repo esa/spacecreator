@@ -26,6 +26,10 @@
 
 namespace ivm {
 
+/**
+* @brief IVArchetypeLibraryReference reference for archetype library
+* It is used to load specific archetype library
+*/
 class IVArchetypeLibraryReference : public IVObject
 {
     Q_OBJECT
