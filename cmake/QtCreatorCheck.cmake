@@ -17,36 +17,48 @@ if(UNIX AND NOT APPLE)
     set(LINUX TRUE)
 endif()
 
+
+# Find QTC_LIB_DIR from QTC_INSTALL
 if(LINUX)
     find_path(QTC_LIB_DIR libExtensionSystem.so
-        "$ENV{QTC_INSTALL}/lib/qtcreator")
+        "${QTC_INSTALL}/lib/qtcreator/")
 elseif(APPLE)
     find_path(QTC_LIB_DIR libExtensionSystem.dylib
-        "$ENV{QTC_INSTALL}/Qt\ Creator.app/Contents/Frameworks")
+        "${QTC_INSTALL}/Qt\ Creator.app/Contents/Frameworks")
 elseif(WIN32)
     find_path(QTC_LIB_DIR ExtensionSystem.dll
-        "$ENV{QTC_INSTALL}")
+        "${QTC_INSTALL}")
 endif()
+
+if (${QTC_LIB_DIR} STREQUAL "QTC_LIB_DIR-NOTFOUND")
+    message("Could not find libExtensionSystem.so|dylib|dll in " ${QTC_INSTALL}/lib/qtcreator)
+endif()
+
+message("QtCreatorCheck: Looked for QTC_LIB_DIR. Found " ${QTC_LIB_DIR})
 
 if(LINUX)
     find_path(QTC_PLUGINS_DIR libCore.so
         "${QTC_LIB_DIR}/plugins"
-        "$ENV{QTC_INSTALL}/lib/qtcreator/plugins")
+        "${QTC_INSTALL}/lib/qtcreator/plugins")
 elseif(APPLE)
     find_path(QTC_PLUGINS_DIR libCore.dylib
-        "$ENV{QTC_INSTALL}/Qt\ Creator.app/Contents/PlugIns")
+        "${QTC_INSTALL}/Qt\ Creator.app/Contents/PlugIns")
 elseif(WIN32)
     find_path(QTC_PLUGINS_DIR core.dll
-        "$ENV{QTC_INSTALL}/plugins")
+        "${QTC_INSTALL}/plugins")
 endif()
 
+message("QtCreatorCheck: Looked for QTC_PLUGINS_DIR. Found " ${QTC_PLUGINS_DIR})
+
 find_path(QTC_SOURCE_DIR src/libs/extensionsystem/iplugin.h
-    "$ENV{QTC_INSTALL}/include/qtcreator"
-    "$ENV{QTC_SOURCE}"
-    "$ENV{QTC_SOURCE}/include/qtcreator"
+    "${QTC_INSTALL}/include/qtcreator"
+    "${QTC_SOURCE}"
+    "${QTC_SOURCE}/include/qtcreator"
     "${QTC_SOURCE_DIR}/dev"
-    /opt/qt-creator-dev/qt-creator
 )
+
+message("QtCreatorCheck: Looked for QTC_SOURCE_DIR. Found " ${QTC_SOURCE_DIR})
+
 
 if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
     set(QTC_FOUND TRUE)
@@ -97,8 +109,9 @@ if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
 endif()
 
 if (NOT EXISTS ${QTC_SOURCE_DIR})
-    message("No QtCreator sources found - set the environment variable QTC_SOURCE to point to the sources directory")
+    message("No QtCreator sources found - set the environment variable QTC_SOURCE to point to the sources directory. QTC_SOURCE was " ${QTC_SOURCE})
 endif()
+
 if (NOT EXISTS ${QTC_LIB_DIR})
-    message("No QtCreator binaries found - set the environment variable QTC_INSTALL  to point to the binary directory")
+    message("No QtCreator binaries found - set the environment variable QTC_INSTALL  to point to the binary directory. QTC_INSTALL was " ${QTC_INSTALL})
 endif()
