@@ -10,9 +10,7 @@
 
     OutputDataPtr ::= PlatformSpecificPointer
 
-    DataLength ::= INTEGER (-2147483648 .. 2147483647) --(Broker/Packetizer)const size_t dataSize/Length
-
-    DataLengthPtr ::= PlatformSpecificPointer --(Depacketizer)size_t* const dataSize
+    DataLength ::= INTEGER (0 .. 4294967295) --(Broker/Packetizer)const size_t dataSize/Length
 
     PacketType ::= INTEGER (0 .. 255) --(Broker/Packetizer)const Packetizer_PacketType packetType
 
@@ -20,15 +18,9 @@
 
     PacketDestination ::= INTEGER (0 .. 65535) --(Packetizer)const uint16_t destination
 
-    PacketSourcePtr ::= PlatformSpecificPointer --(Depacketizer)uint16_t* const source
-
-    PacketDestinationPtr ::= PlatformSpecificPointer --(Depacketizer)uint16_t* const destination
-
     PacketPointer ::= PlatformSpecificPointer --(Packetizer)uint8_t* const packetPointer
 
-    PacketDataOffset ::= INTEGER (-2147483648 .. 2147483647) --(Packetizer)const size_t dataOffset
-
-    PacketDataOffsetPtr ::= PlatformSpecificPointer --(Packetizer)size_t* const dataOffset
+    PacketDataOffset ::= INTEGER (0 .. 4294967295) --(Packetizer)const size_t dataOffset
 
     RequestErrorCodePtr ::= PlatformSpecificPointer --(Depacketizer)int32_t* const errorCode
 
