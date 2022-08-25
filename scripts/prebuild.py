@@ -49,7 +49,7 @@ def download_qt(env_qt_path: str, env_qt_version: str) -> None:
     Downloads the specified version of Qt to the specified environment folder.
     Extra modules installed: qtwebsockets, qt5compat
     """
-    build_with_qt6 = env_qt_version.split('.')[0] == 6
+    build_with_qt6 = env_qt_version.split('.')[0] == '6'
     print("Downloading Qt {} to {}".format(env_qt_version, env_qt_path))
     download_qt_command = ['aqt', 'install-qt', '--outputdir', env_qt_path,
                            '--base', 'https://download.qt.io/',
