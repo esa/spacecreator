@@ -29,6 +29,11 @@ def ensure_dir(dir_str: str) -> None:
     os.makedirs(dir_str, exist_ok=True)
 
 
+def exit_if_not_exists(path: str):
+    if not os.path.exists(path):
+        print("Path {} does not exist. Exiting".format(path))
+        exit(1)
+
 def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str) -> None:
     """
     Copy all files and dirs in src_dir to dst_dir
