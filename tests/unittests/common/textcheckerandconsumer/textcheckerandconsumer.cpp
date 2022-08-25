@@ -27,9 +27,10 @@
 
 namespace tests::common {
 
-void TextCheckerAndConsumer::checkSequenceAndConsume(const QStringList &expectedOutput, QTextStream &actualConsumableOutput)
+void TextCheckerAndConsumer::checkSequenceAndConsume(
+        const QStringList &expectedOutput, QTextStream &actualConsumableOutput)
 {
-    for (unsigned int i = 0; i < expectedOutput.size(); i++) {
+    for (int i = 0; i < expectedOutput.size(); i++) {
         const auto &expectedLine = expectedOutput.at(i);
         if (doesStreamContainRequested(actualConsumableOutput, expectedLine)) {
             continue;
@@ -52,14 +53,13 @@ const QStringList TextCheckerAndConsumer::readLinesFromFile(const QString &filen
     const QByteArray expectedData = expectedOutFile.readAll();
     const QString expectedText = QString::fromStdString(expectedData.toStdString());
     QStringList expectedStringList = expectedText.split("\n");
-    //const QVector<QString> expectedStringVector = expectedStringList.toVector();
-    //std::vector<QString> expectedOutput = expectedStringVector.toStdVector();
+    // const QVector<QString> expectedStringVector = expectedStringList.toVector();
+    // std::vector<QString> expectedOutput = expectedStringVector.toStdVector();
 
     for (auto &out : expectedStringList) {
         out = out.trimmed();
     }
     return expectedStringList;
-
 }
 
 bool TextCheckerAndConsumer::doesStreamContainRequested(QTextStream &streamToVerify, const QString &requestedString)

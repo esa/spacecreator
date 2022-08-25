@@ -47,12 +47,22 @@
 #include <QGraphicsView>
 #include <QMenu>
 #include <QMouseEvent>
+#include <QPoint>
 #include <QPointer>
 
 static const qreal kContextMenuItemTolerance = 10.;
 static const qreal kPreviewItemPenWidth = 2.;
 
 namespace dve {
+
+QPoint mouseEventToPoint(const QMouseEvent *mouseEvent)
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    return mouseEvent->globalPos();
+#else
+    return mouseEvent->globalPosition().toPoint();
+#endif
+}
 
 DVCreatorTool::DVCreatorTool(QGraphicsView *view, DVItemModel *model, DVEditorCore *dvCore, QObject *parent)
     : shared::ui::CreatorTool(view, model, parent)
@@ -197,7 +207,7 @@ bool DVCreatorTool::onMouseRelease(QMouseEvent *e)
         return false;
 
     if ((e->button() & Qt::RightButton) && m_previewItem) {
-        return showContextMenu(e->globalPosition().toPoint());
+        return showContextMenu(mouseEventToPoint(e));
     } else if (m_toolType != ToolType::Pointer) {
         const bool hasPreview = m_previewItem || m_previewConnectionItem;
         if (hasPreview) {

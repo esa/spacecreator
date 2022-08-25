@@ -42,6 +42,12 @@ using conversion::simulink::SimulinkOptions;
 using simulink::model::Dimensions;
 using simulink::model::VectorDimensions;
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+auto SkipEmptyParts = QString::SkipEmptyParts;
+#else
+auto SkipEmptyParts = Qt::SkipEmptyParts;
+#endif
+
 namespace simulink::importer {
 
 std::unique_ptr<conversion::Model> SimulinkXmlImporter::importModel(const Options &options) const
@@ -493,7 +499,7 @@ model::Dimensions SimulinkXmlImporter::parseDimensions(const StringRef &dimensio
                                          .remove(0, 1) // removing '['
                                          .replace(QChar(';'), QChar(' '), Qt::CaseSensitive); // replacing ';' to ' '
 
-        const auto splitBySpacesStrList = preparedStr.split(' ', Qt::SkipEmptyParts, Qt::CaseSensitive);
+        const auto splitBySpacesStrList = preparedStr.split(' ', SkipEmptyParts, Qt::CaseSensitive);
         const auto splitBySpacesStrListSize = splitBySpacesStrList.size();
 
         if (splitBySpacesStrListSize == 0) {

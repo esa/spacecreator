@@ -127,7 +127,13 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
 {
     QHash<QString, QVariant> grouppedObjects = collectObjects(doc->objects().values());
     QHash<QString, QVariant> grouppedLayers = collectObjects(doc->layersObjects().values());
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    grouppedObjects.unite(grouppedLayers);
+#else
     grouppedObjects.insert(grouppedLayers);
+#endif
+
     // Add meta-data
     for (const QString &asnFileName : doc->asn1FilesNames()) {
         grouppedObjects["Asn1FileName"] = QVariant::fromValue(asnFileName);
