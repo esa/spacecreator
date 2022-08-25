@@ -3,17 +3,7 @@ BEGIN
 
 IMPORTS T-UInt8, T-Boolean FROM TASTE-BasicTypes;
 
---T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
-
---T-UInt32 ::= INTEGER (0 .. 4294967295)
-
---T-Int8 ::= INTEGER (-128 .. 127)
-
---T-UInt8 ::= INTEGER (0 .. 255)
-
 T-UInt16 ::= INTEGER (0 .. 65535)
-
--- T-Boolean ::= BOOLEAN
 
 T-WriteAccess ::= SEQUENCE {
     write-address T-UInt16,

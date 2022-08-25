@@ -29,11 +29,32 @@ class tst_Tmc_UseCases : public QObject
 
 private Q_SLOTS:
     void test_dekker();
+    void test_dekkerRunningWithStopCondition();
+    void test_dekkerRunningWithInputObserver();
+    void test_dekkerRunningWithOutputObserver();
 };
 
 void tst_Tmc_UseCases::test_dekker()
 {
     const int result = system("./test_dekker.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_UseCases::test_dekkerRunningWithStopCondition()
+{
+    const int result = system("./test_dekkerRunningWithStopCondition.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_UseCases::test_dekkerRunningWithInputObserver()
+{
+    const int result = system("./test_dekkerRunningWithInputObserver.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_UseCases::test_dekkerRunningWithOutputObserver()
+{
+    const int result = system("./test_dekkerRunningWithOutputObserver.sh");
     QCOMPARE(result, 0);
 }
 

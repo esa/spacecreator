@@ -18,30 +18,30 @@ system InputObserver;
             
             monitor event Observable_Event;
             
-            errorstates NonZeroWrite;
+            errorstates ZeroWrite;
             /* CIF ENDTEXT */
             /* CIF START (350, 65), (70, 35) */
             START;
                 /* CIF NEXTSTATE (350, 120), (70, 35) */
                 NEXTSTATE Wait;
+            /* CIF state (712, 66), (107, 35) */
+            state ZeroWrite;
+            endstate;
             /* CIF state (514, 63), (70, 35) */
             state Wait;
                 /* CIF input (493, 118), (111, 35) */
                 input writesignal(x);
                     /* CIF decision (480, 173), (136, 50) */
-                    decision x.write_address > 0;
+                    decision x.write_address = 0;
                         /* CIF ANSWER (469, 243), (70, 23) */
                         (true):
                             /* CIF NEXTSTATE (450, 286), (107, 35) */
-                            NEXTSTATE NonZeroWrite;
+                            NEXTSTATE ZeroWrite;
                         /* CIF ANSWER (559, 243), (70, 23) */
                         (false):
                             /* CIF NEXTSTATE (559, 286), (70, 35) */
                             NEXTSTATE Wait;
                     enddecision;
-            endstate;
-            /* CIF state (712, 66), (107, 35) */
-            state NonZeroWrite;
             endstate;
         endprocess InputObserver;
     endblock;

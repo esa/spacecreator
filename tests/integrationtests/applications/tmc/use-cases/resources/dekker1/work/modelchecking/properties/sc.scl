@@ -1,1 +1,1 @@
-eventually get_state(locka) = writing;
+never get_state(locka) = idle;
