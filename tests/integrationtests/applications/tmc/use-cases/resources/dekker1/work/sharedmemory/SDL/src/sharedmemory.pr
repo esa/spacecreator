@@ -24,17 +24,17 @@ writeAccess.write_value);
 writeAccess.write_value;
             /* CIF NEXTSTATE (849, 516), (70, 35) */
             NEXTSTATE IDLE;
-        /* CIF input (510, 298), (172, 35) */
+        /* CIF input (509, 298), (172, 35) */
         input MemWriteA(writeAccess);
-            /* CIF PROCEDURECALL (505, 353), (182, 72) */
+            /* CIF PROCEDURECALL (504, 353), (182, 72) */
             call writeln('WriteA addr ', 
 writeAccess.write_address,
 ' val ',
 writeAccess.write_value);
-            /* CIF task (462, 456), (269, 40) */
+            /* CIF task (461, 456), (269, 40) */
             task memBuffer(writeAccess.write_address) :=
 writeAccess.write_value;
-            /* CIF NEXTSTATE (562, 516), (70, 35) */
+            /* CIF NEXTSTATE (561, 516), (70, 35) */
             NEXTSTATE IDLE;
     endstate;
 endprocess Sharedmemory;

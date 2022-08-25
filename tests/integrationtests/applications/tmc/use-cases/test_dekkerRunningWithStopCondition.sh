@@ -36,6 +36,6 @@ cd $TEST_OUTPUT_DIR \
     && $CC -DVECTORSZ=65536 -o system.out pan.c \
     && ./system.out > system.log \
     && grep -q "errors: 1" system.log \
-    && grep -q "assertion violated  !((global_state.locka.state==1))" system.log \
+    && grep -q "assertion violated  !((global_state.locka.state==2))" system.log \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR
