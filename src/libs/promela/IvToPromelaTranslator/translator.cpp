@@ -1400,13 +1400,18 @@ IvToPromelaTranslator::ObserverAttachments IvToPromelaTranslator::getObserverAtt
 
     if (kind == ObserverAttachment::Kind::Kind_Output) {
         for (const ObserverAttachment &attachment : allAttachments) {
+            const QString fromFunction = getAttachmentFromFunction(context.ivModel(), attachment);
             const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
-            if (function.compare(toFunction, Qt::CaseInsensitive) == 0
-                    && interface.compare(attachment.interface(), Qt::CaseInsensitive) == 0) {
+            const IVInterface *i = findProvidedInterface(context.ivModel(), fromFunction, attachment.interface());
+            const IVConnection *connection = context.ivModel()->getConnectionForIface(i->id());
+
+            // check possible connection
+            if (function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
+                    && interface.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0) {
                 result.push_back(attachment);
             }
             // special case for the timers, when the interface name contains both function name and timer name
-            if (function.compare(toFunction, Qt::CaseInsensitive) == 0
+            else if (function.compare(toFunction, Qt::CaseInsensitive) == 0
                     && attachment.interface().compare(
                                QString("%1_%2").arg(function).arg(interface), Qt::CaseInsensitive)
                             == 0) {

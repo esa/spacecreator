@@ -1,0 +1,43 @@
+system observer;
+    /* CIF TEXT (144, 214), (319, 140) */
+    use datamodel comment 'observer.asn';
+    
+    signal notify renames output left from controller;
+    /* CIF ENDTEXT */
+    channel c
+        from env to observer with notify;
+        from observer to env with notify;
+    endchannel;
+    block observer;
+        signalroute r
+            from env to observer with notify;
+            from observer to env with notify;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process observer;
+            /* CIF TEXT (0, 57), (222, 140) */
+            monitor st System_State;
+            
+            monitor event Observable_Event;
+            
+            errorstates error;
+            /* CIF ENDTEXT */
+            /* CIF START (397, 65), (70, 35) */
+            START;
+                /* CIF NEXTSTATE (397, 120), (70, 35) */
+                NEXTSTATE Idle;
+            /* CIF state (606, 89), (70, 35) */
+            state Idle;
+                /* CIF input (606, 144), (70, 35) */
+                input notify;
+                    /* CIF output (606, 199), (70, 35) */
+                    output notify;
+                    /* CIF NEXTSTATE (606, 249), (70, 35) */
+                    NEXTSTATE error;
+            endstate;
+            /* CIF state (912, 64), (70, 35) */
+            state error;
+            endstate;
+        endprocess observer;
+    endblock;
+endsystem;

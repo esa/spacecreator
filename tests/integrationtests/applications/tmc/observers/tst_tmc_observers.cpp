@@ -34,6 +34,11 @@ private Q_SLOTS:
     void test_mscNeverSequenceFailure();
     void test_mscNeverSequenceBacktracking();
     void test_mscNeverSequenceBacktrackingFailure();
+    void test_mscWhenThenSequence();
+    void test_mscWhenThenSequenceFailure();
+    void test_mscWhenThenNotSequence();
+    void test_mscWhenThenNotSequenceFailure();
+    void test_differentInterfaceNames();
 };
 
 void tst_Tmc_Observers::test_inputMonitoring()
@@ -69,6 +74,36 @@ void tst_Tmc_Observers::test_mscNeverSequenceBacktracking()
 void tst_Tmc_Observers::test_mscNeverSequenceBacktrackingFailure()
 {
     const int result = system("./test_msc_never_sequence_backtracking_failure.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_mscWhenThenSequence()
+{
+    const int result = system("./test_msc_when_then_sequence.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_mscWhenThenSequenceFailure()
+{
+    const int result = system("./test_msc_when_then_sequence_failure.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_mscWhenThenNotSequence()
+{
+    const int result = system("./test_msc_when_then_not_sequence.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_mscWhenThenNotSequenceFailure()
+{
+    const int result = system("./test_msc_when_then_not_sequence_failure.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_differentInterfaceNames()
+{
+    const int result = system("./test_different_interface_names.sh");
     QCOMPARE(result, 0);
 }
 

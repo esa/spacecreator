@@ -135,16 +135,6 @@ bool ArchetypeObject::isRootObject() const
     return model() ? model()->rootObject() == this : false;
 }
 
-void ArchetypeObject::setVisible(bool isVisible)
-{
-    setEntityAttribute(meta::Props::token(meta::Props::Token::is_visible), isVisible);
-}
-
-bool ArchetypeObject::isVisible() const
-{
-    return entityAttributeValue(meta::Props::token(meta::Props::Token::is_visible), true);
-}
-
 QVariantList ArchetypeObject::attributes() const
 {
     return generateProperties(false);

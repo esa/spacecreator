@@ -41,6 +41,9 @@ class ArchetypeIntegrityHelper : public QObject
 public:
     ArchetypeIntegrityHelper() = delete;
 
+    /**
+    * @brief checkArchetypeIntegrity checks if all referenced archetypes are implemented correctly
+    */
     static QStringList checkArchetypeIntegrity(
             QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
 
