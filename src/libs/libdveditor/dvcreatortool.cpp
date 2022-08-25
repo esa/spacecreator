@@ -175,7 +175,6 @@ bool DVCreatorTool::onMousePress(QMouseEvent *e)
     }
 
     const QPointF scenePos = cursorInScene(e);
-
     if ((m_toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
         return prepareReCreateConnectionPreview(e);

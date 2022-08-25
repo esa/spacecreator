@@ -33,7 +33,25 @@
 
 namespace plugincommon {
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+auto IvTools::getFunctions(ivm::IVModel *const model) -> std::vector<ivm::IVFunction *>
+{
+    if (model == nullptr) {
+        return std::vector<ivm::IVFunction *>();
+    }
 
+    std::vector<ivm::IVFunction *> functions;
+
+    for (auto &ivObject : model->visibleObjects()) {
+        auto *const function = dynamic_cast<ivm::IVFunction *>(ivObject);
+        if (function != nullptr) {
+            functions.push_back(function);
+        }
+    }
+
+    return functions;
+}
+#else
 auto IvTools::getFunctions(ivm::IVModel *model) -> QList<ivm::IVFunction *>
 {
     if (model == nullptr) {
@@ -51,6 +69,7 @@ auto IvTools::getFunctions(ivm::IVModel *model) -> QList<ivm::IVFunction *>
 
     return functions;
 }
+#endif
 
 auto IvTools::getIfaceFromModel(const QString &ifaceName, ivm::IVModel *const model) -> ivm::IVInterface *
 {

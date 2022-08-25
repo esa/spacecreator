@@ -181,9 +181,15 @@ static ivm::IVInterface::CreationInfo createInterfaceUnderTestCreationInfo(
 
 static void compareModels(ivm::IVModel *const loaded, ivm::IVModel *const generated)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    const QVector<ivm::IVFunction *> loadedFunctions =
+            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(loaded));
+    const QVector<ivm::IVFunction *> generatedFunctions =
+            QVector<ivm::IVFunction *>::fromStdVector(IvTools::getFunctions(generated));
+#else
     const QList<ivm::IVFunction *> loadedFunctions = plugincommon::IvTools::getFunctions(loaded);
     const QList<ivm::IVFunction *> generatedFunctions = plugincommon::IvTools::getFunctions(generated);
-
+#endif
     const int loadedFunctionsSize = loadedFunctions.size();
     const int generatedFunctionsSize = generatedFunctions.size();
     QCOMPARE(generatedFunctionsSize, loadedFunctionsSize);

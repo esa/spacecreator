@@ -19,10 +19,10 @@
 
 #pragma once
 
+#include <QList>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <vector>
-#include <QList>
 
 namespace plugincommon {
 
@@ -40,8 +40,12 @@ public:
      *
      * @return functions stored in the given model
      */
-    static auto getFunctions(ivm::IVModel *model) -> QList<ivm::IVFunction *>;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    static auto getFunctions(ivm::IVModel *model) -> std::vector<ivm::IVFunction *>;
 
+#else
+    static auto getFunctions(ivm::IVModel *model) -> QList<ivm::IVFunction *>;
+#endif
 
     /**
      * @brief Get the requested interface from IVModel
@@ -52,7 +56,6 @@ public:
      * @return IV interface
      */
     static auto getIfaceFromModel(const QString &ifaceName, ivm::IVModel *model) -> ivm::IVInterface *;
-
 };
 
 } // namespace plugincommon

@@ -603,6 +603,13 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
 
 auto SedsPlugin::addFilesToCurrentProject(QStringList filenames, const QString &path) -> void
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    for (auto &filename : filenames) {
+        filename = QString("%1%2%3").arg(path).arg(QDir::separator()).arg(filename);
+    };
+    ProjectExplorer::Project *const project = ProjectExplorer::ProjectTree::currentProject();
+    project->rootProjectNode()->addFiles(filenames);
+#else
     QList<Utils::FilePath> filePathList;
     for (auto &filename : filenames) {
         filename = QString("%1%2%3").arg(path).arg(QDir::separator()).arg(filename);
@@ -611,6 +618,7 @@ auto SedsPlugin::addFilesToCurrentProject(QStringList filenames, const QString &
     };
     ProjectExplorer::Project *const project = ProjectExplorer::ProjectTree::currentProject();
     project->rootProjectNode()->addFiles(filePathList);
+#endif
 }
 
 auto SedsPlugin::getAsnModelFilenames(const std::vector<std::unique_ptr<conversion::Model>> &models) -> QStringList
