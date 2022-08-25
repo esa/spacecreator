@@ -46,8 +46,8 @@ namespace simulink::importer {
 
 std::unique_ptr<conversion::Model> SimulinkXmlImporter::importModel(const Options &options) const
 {
-    const auto inputFilepath = options.value(SimulinkOptions::inputFilepath);
-    if (!inputFilepath) {
+    const auto inputFilePath = options.value(SimulinkOptions::inputFilepath);
+    if (!inputFilePath) {
         throw ImportException("Simulink file to import wasn't specified");
     }
 
