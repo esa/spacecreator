@@ -24,6 +24,7 @@ configure_file(test_msc_when_then_sequence.sh test_msc_when_then_sequence.sh COP
 configure_file(test_msc_when_then_sequence_failure.sh test_msc_when_then_sequence_failure.sh COPYONLY)
 configure_file(test_msc_when_then_not_sequence.sh test_msc_when_then_not_sequence.sh COPYONLY)
 configure_file(test_msc_when_then_not_sequence_failure.sh test_msc_when_then_not_sequence_failure.sh COPYONLY)
+configure_file(test_different_interface_names.sh test_different_interface_names.sh COPYONLY)
 add_custom_target(${TEST_NAME}_copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources
     DEPENDS ${TEST_NAME})
