@@ -73,6 +73,9 @@ IVEditorCore::IVEditorCore(QObject *parent)
         connect(model, &ivm::IVModel::objectRemoved, this, &ive::IVEditorCore::updateIVItems);
         connect(model, &ivm::IVModel::rootObjectChanged, this, &ive::IVEditorCore::updateIVItems);
     }
+    if (ivm::IVModel *layerModel = document()->layersModel()) {
+        connect(layerModel, &ivm::IVModel::objectsAdded, this, &ive::IVEditorCore::updateIVItems);
+    }
 }
 
 IVEditorCore::~IVEditorCore() {}
@@ -156,8 +159,8 @@ QAction *IVEditorCore::actionToggleE2EView()
 QAction *IVEditorCore::actionLaunchModelCheckingWindow()
 {
     if (m_actionLaunchModelCheckingWindow == nullptr) {
-        m_actionLaunchModelCheckingWindow =
-                new QAction(QIcon(QIcon(":/toolbar/icns/model_checking_window.png")), tr("Launch Model Checking Window"), this);
+        m_actionLaunchModelCheckingWindow = new QAction(
+                QIcon(QIcon(":/toolbar/icns/model_checking_window.png")), tr("Launch Model Checking Window"), this);
         m_actionLaunchModelCheckingWindow->setCheckable(true);
     }
     return m_actionLaunchModelCheckingWindow;

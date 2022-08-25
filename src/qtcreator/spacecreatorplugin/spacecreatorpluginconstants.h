@@ -55,6 +55,8 @@ const char IV_EXPORT_SELECTED_ID[] = "IVEditor.ExportSelected";
 const char IV_EXPORT_IV_TYPE_ID[] = "IVEditor.ExportComponentType";
 const char MSC_HELP_ID[] = "MscEditor.Help";
 const char IV_HELP_ID[] = "IVEditor.Help";
+const char IV_MENU_ID[] = "InterfaceView.Tools.Menu";
+const char IV_MANAGE_ARCHETYPES_ID[] = "InterfaceView.ManageArchetypes";
 
 // Settings
 const char SETTINGS_CATEGORY_DISPLAY[] = QT_TRANSLATE_NOOP("SpaceCreator", "SpaceCreator");

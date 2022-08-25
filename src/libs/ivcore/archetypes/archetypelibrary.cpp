@@ -33,6 +33,25 @@ QVector<FunctionArchetype *> ArchetypeLibrary::getFunctions() const
     return m_functions;
 }
 
+FunctionArchetype *ArchetypeLibrary::getFunctionByName(QString name) const
+{
+    for (auto function : m_functions) {
+        if (function->title() == name) {
+            return function;
+        }
+    }
+    return nullptr;
+}
+
+bool ArchetypeLibrary::aboutToBeRemoved()
+{
+    for (auto function : m_functions) {
+        function->setParentObject(nullptr);
+    }
+    m_functions.clear();
+    return true;
+}
+
 void ArchetypeLibrary::addFunction(FunctionArchetype *functionArchetype)
 {
     if (!functionArchetype) {

@@ -1,0 +1,9 @@
+#pragma once
+
+#include <QtGlobal>
+
+#if defined(DEVICEGENERATOR_LIBRARY)
+#  define DEVICEGENERATORSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define DEVICEGENERATORSHARED_EXPORT Q_DECL_IMPORT
+#endif

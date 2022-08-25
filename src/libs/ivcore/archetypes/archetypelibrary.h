@@ -33,7 +33,10 @@ public:
     explicit ArchetypeLibrary(const QString &title, QObject *parent = nullptr);
     ~ArchetypeLibrary() override;
 
+    bool aboutToBeRemoved() override;
+
     QVector<FunctionArchetype *> getFunctions() const;
+    FunctionArchetype *getFunctionByName(QString name) const;
     void addFunction(FunctionArchetype *functionArchetype);
     void removeFunction(FunctionArchetype *functionArchetype);
 

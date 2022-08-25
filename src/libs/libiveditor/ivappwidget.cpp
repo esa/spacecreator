@@ -17,6 +17,7 @@
 
 #include "ivappwidget.h"
 
+#include "archetypesmanagerdialog.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
@@ -43,6 +44,7 @@
 #include <QBuffer>
 #include <QClipboard>
 #include <QDebug>
+#include <QDialog>
 #include <QFileInfo>
 #include <QIcon>
 #include <QMenu>
@@ -231,7 +233,7 @@ void IVAppWidget::copyItems()
             objects.append(object);
         }
     }
-    if (!m_document->exporter()->exportObjects(objects, &buffer)) {
+    if (!m_document->exporter()->exportObjects(objects, &buffer, m_document->archetypesModel())) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
     }
@@ -315,7 +317,7 @@ void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoi
         return;
     }
 
-    if (!m_document->exporter()->exportObjects({ obj }, &buffer)) {
+    if (!m_document->exporter()->exportObjects({ obj }, &buffer, m_document->archetypesModel())) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
     }
@@ -622,6 +624,17 @@ QVector<QAction *> IVAppWidget::initViewActions()
     m_viewActions.append(actionSaveSceneRender);
 
     return m_viewActions;
+}
+
+void IVAppWidget::showArchetypeManager()
+{
+    if (m_document == nullptr || m_document->objectsModel() == nullptr || m_document->archetypesModel() == nullptr) {
+        return;
+    }
+
+    ive::ArchetypesManagerDialog dialog(m_document, m_document->objectsModel(), m_document->commandsStack(), this);
+    dialog.init();
+    dialog.exec();
 }
 
 } // namespace ive

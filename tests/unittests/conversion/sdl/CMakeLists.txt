@@ -1,1 +1,2 @@
+add_subdirectory(MscToSdlTranslator)
 add_subdirectory(sedstosdltranslator)

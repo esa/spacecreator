@@ -4,5 +4,9 @@
         <file>ifaceparams.xml</file>
         <file>connection_group.xml</file>
         <file>multicast.xml</file>
+        <file>archetype_library.xml</file>
+        <file>iv_archetypes.xml</file>
+        <file>iv_archetypes_with_wrong_interface.xml</file>
+        <file>iv_archetypes_with_wrong_parameter.xml</file>
     </qresource>
 </RCC>

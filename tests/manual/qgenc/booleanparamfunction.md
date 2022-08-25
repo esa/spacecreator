@@ -1,4 +1,4 @@
-# Building function with boolean type param
+# Testing function with boolean type param
 
 **1. Steps:**
 

@@ -65,7 +65,7 @@ public:
      *
      * @param   mscChart    Chart to translate
      */
-    auto translateChart(const msc::MscChart *mscChart) const -> void;
+    auto translateChart(const msc::MscChart *mscChart) -> void;
 
 private:
     inline static const QString m_observerNameNever = "never";

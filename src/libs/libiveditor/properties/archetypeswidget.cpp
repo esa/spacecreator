@@ -29,9 +29,12 @@
 #include "commands/cmdinterfaceitemcreate.h"
 #include "delegates/comboboxdelegate.h"
 #include "ivarchetypereference.h"
+#include "ivconnectionlayertype.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivmodel.h"
+#include "ivobject.h"
+#include "shared/veobject.h"
 #include "ui_archetypeswidget.h"
 
 #include <QApplication>
@@ -41,11 +44,12 @@
 
 namespace ive {
 
-ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVFunctionType *function,
-        ivm::AbstractSystemChecks *checks, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
+ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVModel *layersModel,
+        ivm::IVFunctionType *function, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
     : QWidget(parent)
-    , m_ui(new Ui::ArchetypesWidget)
+    , m_ui(std::make_unique<Ui::ArchetypesWidget>())
     , m_archetypeModel(archetypeModel)
+    , m_layersModel(layersModel)
     , m_cmdMacro(macro)
 {
     Q_ASSERT(function && function->model());
@@ -56,7 +60,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
     m_ui->tableView->setItemDelegateForColumn(
             ArchetypesWidgetModel::Column::FunctionName, new ive::ComboBoxDelegate(QStringList(), m_ui->tableView));
 
-    m_model = new ArchetypesWidgetModel(archetypeModel, checks, macro, this);
+    m_model = new ArchetypesWidgetModel(archetypeModel, macro, this);
     m_model->setFunction(function);
     m_ui->tableView->setModel(m_model);
     m_ui->tableView->horizontalHeader()->resizeSection(0, 220);
@@ -69,10 +73,7 @@ ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVF
     rowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
 }
 
-ArchetypesWidget::~ArchetypesWidget()
-{
-    delete m_ui;
-}
+ArchetypesWidget::~ArchetypesWidget() {}
 
 void ArchetypesWidget::addArchetype()
 {
@@ -107,13 +108,13 @@ void ArchetypesWidget::applyArchetypes()
     auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());
     m_cmdMacro->push(command);
 
-    for (auto reference : m_model->getArchetypeReferences()) {
+    for (int i = 0; i < m_model->getArchetypeReferences().size(); i++) {
 
         ivm::ArchetypeObject *archetypeObject = m_archetypeModel->getObjectByName(
-                reference->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
+                m_model->getArchetypeReferences()[i]->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
         ivm::FunctionArchetype *functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>();
 
-        if (functionArchetype == nullptr) {
+        if (functionArchetype == nullptr || !m_model->isReferenceNew(i)) {
             continue;
         }
 
@@ -130,6 +131,8 @@ void ArchetypesWidget::applyArchetypes()
 
             auto command = new cmd::CmdInterfaceItemCreate(creationInfo);
             m_cmdMacro->push(command);
+
+            m_model->setReferenceNotNew(i);
         }
     }
 }
@@ -146,15 +149,10 @@ bool ArchetypesWidget::checkReferences()
         }
     }
 
-    for (int i = 0; i < references.size(); ++i) {
-        for (int j = i + 1; j < references.size(); ++j) {
-            if (references[i]->getLibraryName() == references[j]->getLibraryName()
-                    && references[i]->getFunctionName() == references[j]->getFunctionName()) {
-                QMessageBox::warning(qApp->activeWindow(), tr("Archetype error"),
-                        tr("Archetype list has duplicate implementations"));
-                return false;
-            }
-        }
+    if (shared::VEObject::hasDuplicates(references)) {
+        QMessageBox::warning(
+                qApp->activeWindow(), tr("Archetype error"), tr("Archetype list has duplicate implementations"));
+        return false;
     }
 
     return true;
@@ -188,8 +186,15 @@ ivm::IVInterface::CreationInfo ArchetypesWidget::generateCreationInfo(ivm::Inter
         break;
     }
 
-    ivm::IVConnectionLayerType *layer = new ivm::IVConnectionLayerType();
-    layer->rename(interfaceArchetype->getLayer());
+    ivm::IVObject *object =
+            m_layersModel->getObjectByName(interfaceArchetype->getLayer(), ivm::IVObject::Type::ConnectionLayer);
+    ivm::IVConnectionLayerType *layer = object->as<ivm::IVConnectionLayerType *>();
+
+    if (layer == nullptr) {
+        layer = new ivm::IVConnectionLayerType();
+        layer->rename(interfaceArchetype->getLayer());
+        m_layersModel->addObject(layer);
+    }
 
     creationInfo.parameters = generateInterfaceParameters(interfaceArchetype->getParameters());
     creationInfo.layer = layer;

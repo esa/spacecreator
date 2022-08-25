@@ -1,4 +1,4 @@
-# Building function with sequenceof type param
+# Testing function with sequenceof type param
 
 **1. Steps:**
 

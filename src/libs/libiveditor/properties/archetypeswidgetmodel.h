@@ -25,7 +25,6 @@
 #include <QPointer>
 
 namespace ivm {
-class AbstractSystemChecks;
 class IVFunctionType;
 class ArchetypeModel;
 class IVArchetypeReference;
@@ -45,14 +44,16 @@ public:
     };
     Q_ENUM(Column)
 
-    explicit ArchetypesWidgetModel(ivm::ArchetypeModel *archetypeModel, ivm::AbstractSystemChecks *checks,
-            cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
+    explicit ArchetypesWidgetModel(
+            ivm::ArchetypeModel *archetypeModel, cmd::CommandsStack::Macro *macro, QObject *parent = nullptr);
 
     ivm::IVFunctionType *getFunction();
     void setFunction(ivm::IVFunctionType *fn);
 
     QVector<ivm::IVArchetypeReference *> getArchetypeReferences();
-    bool areArchetypesModified();
+    bool areArchetypesModified() const;
+    bool isReferenceNew(int i) const;
+    void setReferenceNotNew(int i);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -73,10 +74,10 @@ public:
 private:
     bool m_areArchetypesModified;
     QPointer<ivm::IVFunctionType> m_function;
-    QPointer<ivm::AbstractSystemChecks> m_checks;
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     QPointer<ivm::ArchetypeModel> m_archetypeModel;
     QVector<ivm::IVArchetypeReference *> m_archetypeReferences;
+    QVector<bool> m_isReferenceNew;
 };
 
 } // namespace ive

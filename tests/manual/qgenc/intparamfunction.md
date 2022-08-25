@@ -1,4 +1,4 @@
-# Building function with integer type param
+# Testing function with integer type param
 
 **1. Steps:**
 

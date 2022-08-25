@@ -1,0 +1,19 @@
+NESTED-SEQUENCEPARAM-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+    MyInteger ::= INTEGER (0 .. 10000)
+    MyReal ::= REAL (0.0 .. 1000.0)
+    MyBool ::= BOOLEAN
+
+    MySeqSimple   ::= SEQUENCE {
+       intSeqElement  MyInteger,
+       realSeqElement MyReal,
+       boolSeqElement MyBool
+    }
+
+    MySeqComplex   ::= SEQUENCE {
+        simpleSeq1 MySeqSimple,
+        simpleSeq2 MySeqSimple
+    }
+
+END

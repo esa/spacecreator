@@ -28,7 +28,6 @@
 namespace ivm {
 class IVFunctionType;
 class IVArchetypeReference;
-class ArchetypeModel;
 }
 
 namespace ive {
@@ -48,7 +47,6 @@ private:
     QPointer<ivm::IVFunctionType> m_function;
     QVector<ivm::IVArchetypeReference *> m_newReferences;
     QVector<ivm::IVArchetypeReference *> m_oldReferences;
-    QPointer<ivm::ArchetypeModel> m_archetypeModel;
 };
 
 } // namespace cmd

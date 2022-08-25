@@ -10,3 +10,5 @@ addQtTest(tst_ivxmlreader ivcore "allitems.xml;connection_group.xml;ifaceparams.
 addQtTest(tst_ivutils ivcore)
 addQtTest(tst_ivconnectionlayertype ivcore)
 addQtTest(tst_archetypexmlreader ivcore)
+addQtTest(tst_archetypemodel ivcore)
+addQtTest(tst_archetypeintegrityhelper ivcore)
