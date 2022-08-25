@@ -20,13 +20,11 @@
 #pragma once
 
 #include <simulink/SimulinkCommon/basetypesmappings.h>
-#include <simulink/SimulinkModel/common/namedentity.h>
-#include <simulink/SimulinkModel/common/portdimension.h>
-#include <simulink/SimulinkModel/common/signaltype.h>
+#include <simulink/SimulinkModel/common/port.h>
 
 namespace simulink::model {
 
-class Inport final : public NamedEntity
+class Inport final : public Port
 {
 public:
     Inport() = default;
@@ -34,18 +32,6 @@ public:
     Inport &operator=(Inport &&) = default;
 
 public:
-    auto outDataTypeStr() const -> const common::String &;
-    auto setOutDataTypeStr(common::String outDataTypeStr) -> void;
-
-    auto busObject() const -> const common::String &;
-    auto setBusObject(common::String busObject) -> void;
-
-    auto busOutputAsStruct() const -> const common::String &;
-    auto setBusOutputAsStruct(common::String busOutputAsStruct) -> void;
-
-    auto iconDisplay() const -> const common::String &;
-    auto setIconDisplay(common::String iconDisplay) -> void;
-
     auto interpolate() const -> const common::String &;
     auto setInterpolate(common::String interpolate) -> void;
 
@@ -55,58 +41,14 @@ public:
     auto latchInputForFeedbackSignals() const -> const common::String &;
     auto setLatchInputForFeedbackSignals(common::String latchInputForFeedbackSignals) -> void;
 
-    auto lockScale() const -> const common::String &;
-    auto setLockScale(common::String lockScale) -> void;
-
-    auto outMax() const -> const common::String &;
-    auto setOutMax(common::String outMax) -> void;
-
-    auto outMin() const -> const common::String &;
-    auto setOutMin(common::String outMin) -> void;
-
     auto outputSignalNames() const -> const common::String &;
     auto setOutputSignalNames(common::String outputSignalNames) -> void;
 
-    auto port() const -> const common::String &;
-    auto setPort(common::String port) -> void;
-
-    auto portDimensions() const -> const PortDimension &;
-    auto setPortDimensions(PortDimension portDimensions) -> void;
-
-    auto sampleTime() const -> const common::String &;
-    auto setSampleTime(common::String sampleTime) -> void;
-
-    auto signalType() const -> SignalType;
-    auto setSignalType(SignalType signalType) -> void;
-
-    auto unit() const -> const common::String &;
-    auto setUnit(common::String unit) -> void;
-
-    auto unitNoProp() const -> const common::String &;
-    auto setUnitNoProp(common::String unitNoProp) -> void;
-
-    auto useBusObject() const -> const common::String &;
-    auto setUseBusObject(common::String useBusObject) -> void;
-
 private:
-    common::String m_busObject;
-    common::String m_busOutputAsStruct;
-    common::String m_iconDisplay;
     common::String m_interpolate;
     common::String m_latchByDelayingOutsideSignal;
     common::String m_latchInputForFeedbackSignals;
-    common::String m_lockScale;
-    common::String m_outDataTypeStr;
-    common::String m_outMax;
-    common::String m_outMin;
     common::String m_outputSignalNames;
-    common::String m_port;
-    PortDimension m_portDimensions;
-    common::String m_sampleTime;
-    SignalType m_signalType;
-    common::String m_unit;
-    common::String m_unitNoProp;
-    common::String m_useBusObject;
 };
 
 } // namespace simulink::model

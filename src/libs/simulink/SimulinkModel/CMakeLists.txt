@@ -2,6 +2,7 @@ project(SimulinkModel VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
     common/namedentity.cpp
+    common/port.cpp
     common/signaltype.cpp
     common/datascope.cpp
     common/complexity.cpp
@@ -20,6 +21,7 @@ set(SOURCES
     )
 set(INCLUDES
     common/namedentity.h
+    common/port.h
     common/signaltype.h
     common/datascope.h
     common/complexity.h
