@@ -81,4 +81,11 @@ tar xzf ${PROJECT_ROOT}/install/libzxb-util.tar.gz
 
 # Generate AppImage
 echo "Generating the app image"
-${APPIMAGE_TOOL} ${APP_DIR} ${PACKAGE_DIR}/spacecreator-x86_64-${SC_VERSION}.AppImage
+tmp_dir=$(mktemp -d)
+pushd $tmp_dir
+${APPIMAGE_TOOL} --appimage-extract
+export PATH=$PATH:$PWD/squashfs-root/usr/bin/
+export APPIMAGE_TOOL_EXTRACTED=appimagetool
+popd
+${APPIMAGE_TOOL_EXTRACTED} ${APP_DIR} ${PACKAGE_DIR}/spacecreator-x86_64-${SC_VERSION}.AppImage
+rm -rf $tmp_dir
