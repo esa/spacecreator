@@ -31,9 +31,9 @@ using sdl::SdlModel;
 
 namespace conversion::sdl::translator {
 
-ChartTranslator::ChartTranslator(SdlModel *sdlModel, const Options &options)
-    : m_neverSequenceTranslator(sdlModel, options)
-    , m_whenSequenceTranslator(sdlModel, options)
+ChartTranslator::ChartTranslator(SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options)
+    : m_neverSequenceTranslator(sdlModel, observerAsn1File, options)
+    , m_whenSequenceTranslator(sdlModel, observerAsn1File, options)
 {
 }
 

@@ -24,6 +24,7 @@ target_include_directories(MscToSdlTranslator
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(MscToSdlTranslator
     PUBLIC      Conversion::Common
+                asn1library
                 msccore
                 SdlModel
     PRIVATE     CommonProjectWarnings)

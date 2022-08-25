@@ -40,8 +40,9 @@ using sdl::Transition;
 
 namespace conversion::sdl::translator {
 
-WhenSequenceTranslator::WhenSequenceTranslator(SdlModel *sdlModel, const Options &options)
-    : SequenceTranslator(sdlModel, options)
+WhenSequenceTranslator::WhenSequenceTranslator(
+        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options)
+    : SequenceTranslator(sdlModel, observerAsn1File, options)
 {
 }
 
@@ -66,7 +67,7 @@ void WhenSequenceTranslator::createObserver(const MscChart *mscChart)
 
     auto system = createSdlSystem(context.chartName, std::move(process));
     for (auto &[id, signalInfo] : context.signals) {
-        system.addSignal(std::move(signalInfo.rename));
+        system.addSignal(std::move(signalInfo.signal));
     }
     system.createRoutes(m_defaultChannelName, m_defaultRouteName);
 
@@ -118,7 +119,7 @@ void WhenSequenceTranslator::handleMessageEvent(
         WhenSequenceTranslator::Context &context, const MscMessage *mscMessage) const
 {
     const auto signalRenamed = std::find_if(context.signals.begin(), context.signals.end(), [&](auto &&sig) {
-        return sig.second.rename->referencedName() == mscMessage->name()
+        return sig.second.signal->referencedName() == mscMessage->name()
                 && sig.second.parameterList == mscMessage->parameters();
     });
 
@@ -132,7 +133,7 @@ void WhenSequenceTranslator::handleMessageEvent(
         signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
 
         SignalInfo signalInfo;
-        signalInfo.rename = std::move(signalRename);
+        signalInfo.signal = std::move(signalRename);
         signalInfo.parameterList = mscMessage->parameters();
 
         context.signals.insert({ context.signalCounter, std::move(signalInfo) });

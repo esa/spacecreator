@@ -21,7 +21,7 @@
 
 #include "tftable.h"
 
-#include <QVariantMap>
+#include <asn1library/asn1/file.h>
 #include <conversion/common/options.h>
 #include <memory>
 #include <msccore/mscparameterlist.h>
@@ -37,10 +37,11 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sdlModel    Parent SDL model
-     * @param   options     Conversion options
+     * @param   sdlModel            Parent SDL model
+     * @param   observerAsn1File    ASN.1 with observer dataview
+     * @param   options             Conversion options
      */
-    SequenceTranslator(::sdl::SdlModel *sdlModel, const Options &options);
+    SequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options);
 
     /**
      * @brief   Deleted copy constuctor
@@ -65,7 +66,7 @@ protected:
     using TransitionList = std::vector<std::unique_ptr<::sdl::Transition>>;
 
     struct SignalInfo {
-        std::unique_ptr<::sdl::Rename> rename;
+        std::unique_ptr<::sdl::Rename> signal;
         msc::MscParameterList parameterList;
     };
 
@@ -91,6 +92,7 @@ protected:
     inline static const QString m_defaultRouteName = "r";
 
     ::sdl::SdlModel *m_sdlModel;
+    const Asn1Acn::File *m_observerAsn1File;
     const Options &m_options;
 };
 

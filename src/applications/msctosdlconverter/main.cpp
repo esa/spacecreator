@@ -18,6 +18,8 @@
  */
 
 #include <QCoreApplication>
+#include <conversion/asn1/Asn1Importer/importer.h>
+#include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/msc/MscImporter/importer.h>
 #include <conversion/msc/MscOptions/options.h>
 #include <conversion/sdl/MscToSdlTranslator/translator.h>
@@ -40,12 +42,16 @@ int main(int argc, char **argv)
 
     conversion::Options options;
     options.add(conversion::msc::MscOptions::inputFilepath, QString(argv[1]));
+    options.add(conversion::asn1::Asn1Options::inputFilepath, "observer.asn");
 
-    conversion::msc::importer::MscImporter importer;
-    auto mscModel = importer.importModel(options);
+    conversion::msc::importer::MscImporter mscImporter;
+    auto mscModel = mscImporter.importModel(options);
+
+    conversion::asn1::importer::Asn1Importer asn1Importer;
+    auto asn1Model = asn1Importer.importModel(options);
 
     conversion::sdl::translator::MscToSdlTranslator translator;
-    auto outputModels = translator.translateModels({ mscModel.get() }, options);
+    auto outputModels = translator.translateModels({ mscModel.get(), asn1Model.get() }, options);
     auto sdlModel = dynamic_cast<sdl::SdlModel *>(outputModels[0].get());
 
     sdl::exporter::SdlExporter exporter;

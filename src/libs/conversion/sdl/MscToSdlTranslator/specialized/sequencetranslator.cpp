@@ -39,8 +39,10 @@ using sdl::VariableDeclaration;
 
 namespace conversion::sdl::translator {
 
-SequenceTranslator::SequenceTranslator(SdlModel *sdlModel, const Options &options)
+SequenceTranslator::SequenceTranslator(
+        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options)
     : m_sdlModel(sdlModel)
+    , m_observerAsn1File(observerAsn1File)
     , m_options(options)
 {
 }

@@ -21,6 +21,7 @@
 
 #include "specialized/charttranslator.h"
 
+#include <asn1library/asn1/file.h>
 #include <msccore/mscdocument.h>
 #include <sdl/SdlModel/sdlmodel.h>
 
@@ -35,10 +36,11 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sdlModel    Parent SDL model
-     * @param   options     Conversion options
+     * @param   sdlModel            Parent SDL model
+     * @param   observerAsn1File    ASN.1 with observer dataview
+     * @param   options             Conversion options
      */
-    DocumentTranslator(::sdl::SdlModel *sdlModel, const Options &options);
+    DocumentTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options);
 
     /**
      * @brief   Deleted copy constuctor

@@ -33,8 +33,9 @@ using sdl::StateMachine;
 
 namespace conversion::sdl::translator {
 
-NeverSequenceTranslator::NeverSequenceTranslator(SdlModel *sdlModel, const Options &options)
-    : SequenceTranslator(sdlModel, options)
+NeverSequenceTranslator::NeverSequenceTranslator(
+        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options)
+    : SequenceTranslator(sdlModel, observerAsn1File, options)
 {
 }
 
@@ -48,7 +49,7 @@ void NeverSequenceTranslator::createObserver(const MscChart *mscChart)
 
     auto system = createSdlSystem(context.chartName, std::move(process));
     for (auto &[id, signalInfo] : context.signals) {
-        system.addSignal(std::move(signalInfo.rename));
+        system.addSignal(std::move(signalInfo.signal));
     }
     system.createRoutes(m_defaultChannelName, m_defaultRouteName);
 
@@ -95,7 +96,7 @@ void NeverSequenceTranslator::handleMessageEvent(
         NeverSequenceTranslator::Context &context, const MscMessage *mscMessage) const
 {
     const auto signalRenamed = std::find_if(context.signals.begin(), context.signals.end(), [&](auto &&sig) {
-        return sig.second.rename->referencedName() == mscMessage->name()
+        return sig.second.signal->referencedName() == mscMessage->name()
                 && sig.second.parameterList == mscMessage->parameters();
     });
 
@@ -107,7 +108,7 @@ void NeverSequenceTranslator::handleMessageEvent(
         signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
 
         SignalInfo signalInfo;
-        signalInfo.rename = std::move(signalRename);
+        signalInfo.signal = std::move(signalRename);
         signalInfo.parameterList = mscMessage->parameters();
 
         context.signals.insert({ context.signalCounter, std::move(signalInfo) });

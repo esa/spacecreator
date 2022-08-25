@@ -493,12 +493,13 @@ bool TmcConverter::convertMscObservers()
         Options options;
 
         options.add(MscOptions::inputFilepath, mscFilePath);
+        options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
         options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
         options.add(SdlOptions::filepathPrefix, outputPath);
 
         qDebug() << "Converting MSC file" << mscFilePath << "to an SDL observer";
 
-        if (!convertModel({ ModelType::Msc }, ModelType::Sdl, {}, std::move(options))) {
+        if (!convertModel({ ModelType::Msc, ModelType::Asn1 }, ModelType::Sdl, {}, std::move(options))) {
             qCritical() << "Unable to translate MSC file" << mscFilePath << "to SDL observer";
             return false;
         }

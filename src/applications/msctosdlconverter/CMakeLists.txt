@@ -9,6 +9,7 @@ target_include_directories(MscToSdlConverter
 target_link_libraries(MscToSdlConverter
     PRIVATE     CommonProjectWarnings
                 msccore
+                ASN1::Importer
                 MSC::Importer
                 SDL::Exporter
                 Conversion::MscToSdlTranslator)

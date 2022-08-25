@@ -34,10 +34,11 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sdlModel    Parent SDL model
-     * @param   options     Conversion options
+     * @param   sdlModel            Parent SDL model
+     * @param   observerAsn1File    ASN.1 with observer dataview
+     * @param   options             Conversion options
      */
-    NeverSequenceTranslator(::sdl::SdlModel *sdlModel, const Options &options);
+    NeverSequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options);
 
     /**
      * @brief   Deleted copy constuctor
