@@ -7,7 +7,21 @@ import urllib.request
 
 import py7zr
 import zipfile
-from utils import join_dir, print_cmd, ensure_dir
+from utils import join_dir, print_cmd, exit_if_not_exists
+
+"""
+Builds the SpaceCreator Project.
+Prerequisites: A spacecreator build environment produced by the prebuild.py script.
+
+Build SpaceCreator with Qt6:
+python3 ./scripts/build_spacecreator.py 
+    --project_dir ~/projects/spacecreator
+    --build_dir ./build
+    --env_dir ~/opt/spacecreatorenv6
+    --env_qt_dir ~/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/ 
+    
+    
+"""
 
 
 def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_dir: str, env_qt_dir: str) -> None:
@@ -15,7 +29,16 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
     qtc_install = join_dir(env_dir, 'spacecreator.AppDir')
     grantlee_dir = join_dir(env_dir, 'grantlee', 'lib', 'cmake', 'Grantlee5')
     env_qt_cmake_dir = join_dir(env_qt_dir, 'lib', 'cmake')
-    cmake_prefix_path = '"' + env_qt_cmake_dir + ';' + grantlee_dir + '"'  # The encompassing "'s are to escape the ;
+
+    exit_if_not_exists(project_dir)
+    exit_if_not_exists(env_dir)
+    exit_if_not_exists(env_qt_dir)
+    exit_if_not_exists(env_qmake_bin)
+    exit_if_not_exists(qtc_install)
+    exit_if_not_exists(grantlee_dir)
+    exit_if_not_exists(env_qt_cmake_dir)
+
+    cmake_prefix_path = env_qt_cmake_dir + ';' + grantlee_dir
     ninja_cmd = ['cmake',
                  '-GNinja',
                  '-S', project_dir,
