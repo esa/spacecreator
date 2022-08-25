@@ -18,6 +18,12 @@ GrantLee - A template library that arguments Qt.
 Qt Creator with header files for plugin development.
 
 Requires aqt to be installed. (pip3 install aqtinstall).
+
+Installing Qt 5.12.12 with QtCreator 4.8.2:
+python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv5 --qt_version=5.12.12 --qtcreator_version=4.8.2
+
+Installing Qt 6.3.1 with QtCreator 8.0.1:
+python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6.3.1 --qtcreator_version=8.0.1
 '''
 
 
@@ -38,11 +44,12 @@ def build_path_object(env_path: str, qt_version: str):
     return _paths
 
 
-def download_qt(env_qt_path: str, env_qt_version: str, build_with_qt6: bool) -> None:
+def download_qt(env_qt_path: str, env_qt_version: str) -> None:
     """
     Downloads the specified version of Qt to the specified environment folder.
     Extra modules installed: qtwebsockets, qt5compat
     """
+    build_with_qt6 = env_qt_version.split('.')[0] == 6
     print("Downloading Qt {} to {}".format(env_qt_version, env_qt_path))
     download_qt_command = ['aqt', 'install-qt', '--outputdir', env_qt_path,
                            '--base', 'https://download.qt.io/',
@@ -57,32 +64,39 @@ def download_qt(env_qt_path: str, env_qt_version: str, build_with_qt6: bool) -> 
         exit(1)
 
 
-def download_qtcreator(env_path: str, env_qt_version: str, env_app_dir) -> None:
+def download_qtcreator(env_path: str, env_qtc_version: str, env_app_dir, is_qt6: bool) -> None:
     """
     Downloads QtCreator in the specified version and the corresponding source files for plugin development
     and place them in the specified folder.
     :param env_path path to folder
-    :param env_qt_version version number in format X.Y.Z
+    :param env_qtc_version version number in format X.Y.Z
     :param env_app_dir the dir
+    :param is_qt6 is this QtCreator part of Qt6
     """
     # Download the 7z'ed QtCreator in the specified version
-    version_list = env_qt_version.split('.')
+    version_list = env_qtc_version.split('.')
     version_short = '.'.join(version_list[:2])  # version_short is now in the format X.Y
-    base_url = 'https://download.qt.io/official_releases/qtcreator/'
-    bin_url = base_url + version_short + '/' + env_qt_version + '/installer_source/linux_x64/qtcreator.7z'
+
+    if is_qt6:
+        base_url = 'https://download.qt.io/official_releases/qtcreator/' + \
+                   version_short + '/' + env_qtc_version + '/installer_source/linux_x64/'
+    else:
+        base_url = 'https://download.qt.io/archive/qtcreator/' + \
+                   version_short + '/' + env_qtc_version + '/installer_source/linux_gcc_64_rhel72/'
+    bin_url = base_url + 'qtcreator.7z'
     qtcreator7z = join_dir(env_path, 'qtcreator.7z')
     print("Downloading {} to {}".format(bin_url, qtcreator7z))
     try:
         urllib.request.urlretrieve(bin_url, qtcreator7z)  # download qtcreator.7z to the root of the env folder
     except:
-        print("Could not download QtCreator 7z file{}".format(bin_url))
+        print("Could not download QtCreator 7z file {}".format(bin_url))
         exit(2)
 
     with py7zr.SevenZipFile(qtcreator7z, mode='r') as z:
         z.extractall(env_app_dir)  # uncompress qtcreator into AppDir because qtcreator IS the app
 
     # Download the header files for building plugins for QtCreator and extract them to where qtcreator is
-    dev_url = base_url + version_short + '/' + env_qt_version + '/installer_source/linux_x64/qtcreator_dev.7z'
+    dev_url = base_url + 'qtcreator_dev.7z'
     qtcreatordev7z = join_dir(env_path, 'qtcreator_dev.7z')
     print("Downloading {} to {}".format(dev_url, qtcreatordev7z))
     try:
@@ -178,8 +192,8 @@ if __name__ == '__main__':
     qtcreator_version = args.qtcreator_version
     paths = build_path_object(env_dir, qt_version)
 
-    build_with_qt6 = qt_version.split('.')[0] == '6'
-    print('qt_version was {}. Building with qt6 is {}'.format(qt_version, build_with_qt6))
+    is_qt6 = qt_version.split('.')[0] == '6'
+    print('qt_version was {}. Building with qt6 is {}'.format(qt_version, is_qt6))
 
     # Ensure dirs
     ensure_dir(paths.env_dir)
@@ -187,10 +201,10 @@ if __name__ == '__main__':
     ensure_dir(paths.env_app_dir)
 
     # Setup Qt and QtCreator with plugin development files
-    download_qt(paths.env_qt_install_dir, qt_version, build_with_qt6)
-    download_qtcreator(env_dir, qtcreator_version, paths.env_app_dir)
+    download_qt(paths.env_qt_install_dir, qt_version)
+    download_qtcreator(env_dir, qtcreator_version, paths.env_app_dir, is_qt6)
 
     # Grant Lee Template Library
     download_grantlee(env_dir)
-    build_grantlee(env_dir, paths.env_qt_dir, build_with_qt6)
+    build_grantlee(env_dir, paths.env_qt_dir, is_qt6)
     install_grantlee(env_dir)
