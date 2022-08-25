@@ -16,9 +16,13 @@ spacecreator.AppDir/share/qtcreator/templates/wizards/files
 and 
 spacecreator.AppDir/share/qtcreator/templates/wizards/project
 folders.
+
 This script handles all this and can be called on the commandline or from the QtCreator/Other IDE used to develop in.
 In QtCreator the run settings could be a custom Deploy Configuration with the command python3 an the arguments:
- %{ActiveProject:Path}/scripts/postbuild.py --project_dir=%{ActiveProject:Path} --build_dir=%{buildDir} --env_dir=/home/<user>/opt/qtcreatorenv/
+ %{ActiveProject:Path}/scripts/postbuild.py --project_dir=%{ActiveProject:Path} --build_dir=%{buildDir} --env_dir=/home/<user>/opt/spacecreatorenv6/
+ 
+On the command line:
+python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir=~/projects/spacecreator/build --env_dir=~/opt/spacecreatorenv6
 """
 
 
