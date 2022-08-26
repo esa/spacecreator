@@ -7,10 +7,15 @@ SPACECREATOR?=spacecreator.AppImage
 #
 # export <PARTITIONNAME>_USER_CFLAGS=...
 # export <PARTITIONNAME>_USER_LDFLAGS=...
-# export <PARTITIONNAME>_EXTERNAL_SOURCE_PATH=
+# export <PARTITIONNAME>_EXTERNAL_SOURCE_PATH=...
+#
+# NOTE: this can also be done in the Deployment View directly
 
 # If you need to reset this Makefile to its original state, run:
-# $ space-creator reset
+# $ taste reset
+
+# Disable the progress bar from taste-update-data-view when building systems
+export NO_PROGRESS_BAR=1
 
 # Get the list of ASN.1 files from Space Creator project file:
 DISTFILES=$(shell qmake inputvectorlimit.pro -o /tmp/null 2>&1)
@@ -51,6 +56,16 @@ simu:
 	$(MAKE) interfaceview work/glue_simu
 	$(MAKE) -C work
 	$(MAKE) -C work/simulation -f Makefile.Simulation simu
+
+
+# Simulation and model checking: shortcut to create observer.asn
+observer_dataview:
+	$(MAKE) DataView.aadl
+	$(MAKE) InterfaceView.aadl
+	$(MAKE) interfaceview
+	$(KAZOO) --glue -t SIMU
+	$(MAKE) -C work dataview/dataview-uniq.asn
+	$(MAKE) -C work/build -f Makefile.taste observer.asn
 
 skeletons:
 	$(MAKE) work/skeletons_built

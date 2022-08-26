@@ -64,7 +64,7 @@ public:
      *
      * @param   mscDocument     Document to translate
      */
-    auto translateDocument(const msc::MscDocument *mscDocument) const -> void;
+    auto translateDocument(const msc::MscDocument *mscDocument) -> void;
 
 private:
     ChartTranslator m_chartTranslator;

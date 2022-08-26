@@ -51,7 +51,9 @@ public:
     void setFunction(ivm::IVFunctionType *fn);
 
     QVector<ivm::IVArchetypeReference *> getArchetypeReferences();
-    bool areArchetypesModified();
+    bool areArchetypesModified() const;
+    bool isReferenceNew(int i) const;
+    void setReferenceNotNew(int i);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -75,6 +77,7 @@ private:
     cmd::CommandsStack::Macro *m_cmdMacro { nullptr };
     QPointer<ivm::ArchetypeModel> m_archetypeModel;
     QVector<ivm::IVArchetypeReference *> m_archetypeReferences;
+    QVector<bool> m_isReferenceNew;
 };
 
 } // namespace ive

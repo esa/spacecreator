@@ -45,7 +45,7 @@ ArchetypesManagerDialog::ArchetypesManagerDialog(ive::InterfaceDocument *documen
     , m_objectsModel(objectsModel)
     , m_document(document)
     , m_commandsStack(commandsStack)
-    , m_ui(new Ui::ArchetypesManagerDialog)
+    , m_ui(std::make_unique<Ui::ArchetypesManagerDialog>())
 {
     m_ui->setupUi(this);
 

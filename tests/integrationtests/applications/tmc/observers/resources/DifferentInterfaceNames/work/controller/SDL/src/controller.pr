@@ -1,0 +1,12 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Controller;
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF output (320, 65), (70, 35) */
+        output left;
+        /* CIF NEXTSTATE (320, 115), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (589, 89), (70, 35) */
+    state Wait;
+    endstate;
+endprocess Controller;

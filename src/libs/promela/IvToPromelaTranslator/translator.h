@@ -272,7 +272,6 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
-    inline static const QString m_timerManagerDataName = "timer_manager_data";
     inline static const QString m_timerManagerProctypeName = "timer_manager_proc";
     inline static const QString m_dummyParamName = "dummy";
     inline static const QString m_systemInitedVariableName = "inited";
@@ -282,13 +281,14 @@ private:
     auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName) const -> void;
     auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) const -> QString;
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
-            const QString &interfaceName, const QString &parameterName, const QString &parameterType,
-            promela::model::Sequence *sequence) const -> void;
+            const QString &interfaceName, const QString &parameterName, const QString &parameterType) const
+            -> std::list<std::unique_ptr<promela::model::ProctypeElement>>;
     auto generateInitProctype(Context &context) const -> void;
     auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, size_t queueSize, size_t priority, bool environment) const -> void;
     auto generateProcessMessageBlock(const QString &functionName, const QString &channelName, const QString &inlineName,
-            const QString &parameterType, const QString &parameterName, const QString &exitLabel, bool lock) const
+            const QString &parameterType, const QString &parameterName, const QString &exitLabel, bool lock,
+            std::list<std::unique_ptr<promela::model::ProctypeElement>> additionalElements) const
             -> std::unique_ptr<model::ProctypeElement>;
     auto generateEnvironmentProctype(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterType, const QString &sendInline) const -> void;
@@ -309,10 +309,10 @@ private:
             -> std::unique_ptr<::promela::model::Expression>;
     auto createSystemState(Context &context) const -> void;
     auto createPromelaObjectsForTimers(Context &context) const -> void;
-    auto createTimerInlinesForFunction(
-            Context &context, const QString &functionName, const QString &timerName, int timerId) const -> void;
-    auto createGlobalTimerObjects(Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
-            -> void;
+    auto createTimerInlinesForFunction(Context &context, const QString &functionName, const QString &timerName,
+            const promela::model::VariableRef &timerData) const -> void;
+    auto createGlobalTimerObjects(
+            Context &context, const std::map<QString, promela::model::VariableRef> &timerSignals) const -> void;
     auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
     auto createPromelaObjectsForObservers(Context &context) const -> void;
 
@@ -341,10 +341,12 @@ private:
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
 
-    auto findProvidedInterface(const ivm::IVModel *model, const QString &functionName,
+    auto findProvidedInterface(const ivm::IVModel *model, const QString &fromFunction,
             const QString &interfaceName) const -> const ivm::IVInterface *;
     auto findRequiredInterface(const ivm::IVModel *model, const QString &functionName,
             const QString &interfaceName) const -> const ivm::IVInterface *;
+    auto findTimerSignal(const ivm::IVModel *model, const QString &functionName, const QString &signalName) const
+            -> QString;
 
     auto observerChannelName(const ObserverAttachment &attachment, const QString &toFunction) const -> QString;
     auto getAttachmentToFunction(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;

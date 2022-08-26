@@ -1,0 +1,41 @@
+mscdocument MscObserver /* MSC AND */;
+    language ASN.1;
+    data MscWhenThenSequence.asn;
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+mscdocument MscObserver /* MSC LEAF */;
+    language ASN.1;
+    data MscWhenThenSequence.asn;
+msc MscObserver;
+/* CIF INSTANCE (37, 61) (148, 87) (800, 2127) */
+instance Pinger;
+/* CIF CONDITION (37, 196) (836, 66) */
+condition When shared all;
+/* CIF MESSAGE (111, 331) (794, 331) */
+out Ping to Ponger;
+/* CIF CONDITION (37, 400) (836, 66) */
+condition Then shared all;
+/* CIF MESSAGE (794, 534) (111, 534) */
+in Pong from Ponger;
+/* CIF MESSAGE (111, 624) (794, 624) */
+out Ack to Ponger;
+/* CIF MESSAGE (794, 714) (111, 714) */
+in Nice from Ponger;
+endinstance;
+/* CIF INSTANCE (714, 61) (159, 87) (800, 2127) */
+instance Ponger;
+/* CIF CONDITION (37, 196) (836, 66) */
+condition When shared all;
+/* CIF MESSAGE (111, 331) (794, 331) */
+in Ping from Pinger;
+/* CIF CONDITION (37, 400) (836, 66) */
+condition Then shared all;
+/* CIF MESSAGE (794, 534) (111, 534) */
+out Pong to Pinger;
+/* CIF MESSAGE (111, 624) (794, 624) */
+in Ack from Pinger;
+/* CIF MESSAGE (794, 714) (111, 714) */
+out Nice to Pinger;
+endinstance;
+endmsc;
+endmscdocument;
+endmscdocument;

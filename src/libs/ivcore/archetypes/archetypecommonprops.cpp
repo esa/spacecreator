@@ -28,6 +28,8 @@ const QHash<QString, ArchetypeProps::Token> ArchetypeProps::TokensByName = {
     { "InterfaceArchetype", Token::InterfaceArchetype },
     { "FunctionArchetype", Token::FunctionArchetype },
     { "ArchetypeLibrary", Token::ArchetypeLibrary },
+    { "CommunicationLayerTypes", Token::CommunicationLayerTypes },
+    { "CommunicationLayerType", Token::CommunicationLayerType },
 
     // attrs:
     { "name", Token::name },

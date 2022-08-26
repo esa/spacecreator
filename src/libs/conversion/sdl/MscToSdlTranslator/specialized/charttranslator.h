@@ -21,6 +21,7 @@
 
 #include "observertype.h"
 #include "specialized/neversequencetranslator.h"
+#include "specialized/whensequencetranslator.h"
 
 #include <msccore/mscchart.h>
 #include <sdl/SdlModel/sdlmodel.h>
@@ -65,7 +66,7 @@ public:
      *
      * @param   mscChart    Chart to translate
      */
-    auto translateChart(const msc::MscChart *mscChart) const -> void;
+    auto translateChart(const msc::MscChart *mscChart) -> void;
 
 private:
     inline static const QString m_observerNameNever = "never";
@@ -75,6 +76,7 @@ private:
 
 private:
     NeverSequenceTranslator m_neverSequenceTranslator;
+    WhenSequenceTranslator m_whenSequenceTranslator;
 };
 
 } // namespace conversion::sdl::translator

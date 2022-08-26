@@ -62,6 +62,24 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
+CLOCK-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+ ;
+
+
+
+
+
+
+
+
+
+
+END
+
 
 Simulation-DataView DEFINITIONS ::=
 BEGIN
@@ -75,6 +93,8 @@ BEGIN
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
       Pinger-Context FROM Pinger-Datamodel
       Ponger-Context FROM Ponger-Datamodel
@@ -176,13 +196,39 @@ BEGIN
    --  Global system state (excluding observers, which are defined later)
    pinger-queue-size INTEGER ::= 2
    ponger-queue-size INTEGER ::= 2
+
    System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
       --  Message queues
       pinger-queue Events-Ty (SIZE (0 .. pinger-queue-size)),
       ponger-queue Events-Ty (SIZE (0 .. ponger-queue-size)),
 
       pinger  Pinger-Context,
       ponger  Ponger-Context
+   }
+
+END
+
+Simulation-Timers-DataView DEFINITIONS ::=
+BEGIN
+
+   TimerData ::= SEQUENCE {
+      timer-enabled BOOLEAN,
+      interval INTEGER (0 .. 50000)
+   }
+
+   AggregateTimerData ::= SEQUENCE {
+      
+      
+      
+      pinger SEQUENCE {
+      },
+      
+      ponger SEQUENCE {
+      },
+      
+      dummy-entry SEQUENCE {}
    }
 
 END

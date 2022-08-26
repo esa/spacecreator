@@ -1,6 +1,8 @@
 # SDL
 #TASTE::Is_Component_Type true
+SEDS_CONVERTER?=spacecreator.AppImage --sedsconverter
 OPENGEODE?=opengeode
+VISUAL?=kate
 
 all: compile-linux
 

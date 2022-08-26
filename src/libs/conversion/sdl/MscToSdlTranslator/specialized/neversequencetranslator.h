@@ -19,21 +19,17 @@
 
 #pragma once
 
-#include "observertype.h"
+#include "specialized/sequencetranslator.h"
 
-#include <conversion/common/options.h>
-#include <memory>
 #include <msccore/mscchart.h>
 #include <sdl/SdlModel/rename.h>
-#include <sdl/SdlModel/sdlmodel.h>
-#include <vector>
 
 namespace conversion::sdl::translator {
 
 /**
  * @brief   Translator for MSC "Never" charts
  */
-class NeverSequenceTranslator final
+class NeverSequenceTranslator final : public SequenceTranslator
 {
 public:
     /**
@@ -68,33 +64,24 @@ public:
      *
      * @param   mscChart    Chart to translatr
      */
-    auto createObserver(const msc::MscChart *mscChart) const -> void;
+    auto createObserver(const msc::MscChart *mscChart) -> void;
 
 private:
     struct Context {
-        ::sdl::Process process;
-        ::sdl::StateMachine *stateMachine;
-        ::sdl::State *startState;
-        ::sdl::State *lastState;
-        std::vector<std::unique_ptr<::sdl::Rename>> signalRenames;
-        std::size_t stateCounter;
+        QString chartName;
+        std::vector<uint32_t> sequence;
+        std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
+        ::sdl::State *errorState;
+        std::size_t signalCounter;
     };
 
 private:
-    auto handleEvent(NeverSequenceTranslator::Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
-    auto handleMessageEvent(NeverSequenceTranslator::Context &context, const msc::MscMessage *mscMessage) const -> void;
+    auto collectData(const msc::MscChart *mscChart) const -> NeverSequenceTranslator::Context;
 
-    auto createSdlSkeleton(const msc::MscChart *mscChart) const -> Context;
-    auto createSdlSystem(NeverSequenceTranslator::Context &context) const -> ::sdl::System;
+    auto handleEvent(Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
+    auto handleMessageEvent(Context &context, const msc::MscMessage *mscMessage) const -> void;
 
-private:
-    inline static const QString m_stateNameTemplate = "s%1";
-    inline static const QString m_signalRenameNameTemplate = "sig%1";
-    inline static const QString m_defaultChannelName = "c";
-    inline static const QString m_defaultRouteName = "r";
-
-    ::sdl::SdlModel *m_sdlModel;
-    const Options &m_options;
+    auto createStateMachine(Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
 };
 
 } // namespace conversion::sdl::translator

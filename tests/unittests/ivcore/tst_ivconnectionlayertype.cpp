@@ -32,9 +32,6 @@ class tst_IVConnectionLayerType : public QObject
 {
     Q_OBJECT
 
-private:
-    ivm::IVPropertyTemplateConfig *cfg { nullptr };
-
 private Q_SLOTS:
     void initTestCase();
     void tst_layerRenaming();
