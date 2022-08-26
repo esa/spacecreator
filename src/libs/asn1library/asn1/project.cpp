@@ -42,7 +42,7 @@ Project::Project(const Project &other)
         add(std::make_unique<File>(*file));
 }
 
-Project::~Project() {}
+Project::~Project() { }
 
 void Project::accept(Visitor &visitor) const
 {

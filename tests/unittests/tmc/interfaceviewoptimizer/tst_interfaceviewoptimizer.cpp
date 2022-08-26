@@ -58,7 +58,7 @@ void tst_InterfaceViewOptimizer::initTestCase()
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
 }
 
-void tst_InterfaceViewOptimizer::cleanupTestCase() {}
+void tst_InterfaceViewOptimizer::cleanupTestCase() { }
 
 void tst_InterfaceViewOptimizer::testEnvironmentSelection()
 {

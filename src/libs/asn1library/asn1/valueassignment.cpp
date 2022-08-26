@@ -45,7 +45,7 @@ ValueAssignment::ValueAssignment(const ValueAssignment &other)
         m_value = other.m_value->clone();
 }
 
-ValueAssignment::~ValueAssignment() {}
+ValueAssignment::~ValueAssignment() { }
 
 void ValueAssignment::accept(Visitor &visitor) const
 {

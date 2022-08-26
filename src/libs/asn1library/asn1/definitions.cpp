@@ -47,7 +47,7 @@ Definitions::Definitions(const Definitions &other)
         addImportedValue(importedValue);
 }
 
-Definitions::~Definitions() {}
+Definitions::~Definitions() { }
 
 void Definitions::accept(Visitor &visitor) const
 {

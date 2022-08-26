@@ -44,7 +44,7 @@ Root::Root(const Root &other)
         add(std::make_unique<Project>(*p));
 }
 
-Root::~Root() {}
+Root::~Root() { }
 
 void Root::accept(Visitor &visitor) const
 {

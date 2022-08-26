@@ -26,4 +26,4 @@
 
 using namespace Asn1Acn;
 
-MutatingVisitor::~MutatingVisitor() {}
+MutatingVisitor::~MutatingVisitor() { }

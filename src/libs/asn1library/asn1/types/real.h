@@ -63,9 +63,15 @@ public:
 
     static RealEncoding mapEncoding(StringRef ref);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    static RealEncoding mapEncoding(const QString &in) { return mapEncoding(StringRef(in)); }
+    static RealEncoding mapEncoding(const QString &in)
+    {
+        return mapEncoding(StringRef(in));
+    }
 #else
-    static RealEncoding mapEncoding(const QString &in) { return mapEncoding(&in); }
+    static RealEncoding mapEncoding(const QString &in)
+    {
+        return mapEncoding(&in);
+    }
 #endif
     static QString encodingToString(RealEncoding encoding);
 

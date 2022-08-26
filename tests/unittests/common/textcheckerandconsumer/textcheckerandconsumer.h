@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <QTextStream>
 #include <QStringList>
+#include <QTextStream>
 
 namespace tests::common {
 

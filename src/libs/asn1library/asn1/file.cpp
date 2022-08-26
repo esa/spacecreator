@@ -49,7 +49,7 @@ File::File(const File &other)
         setPolluted();
 }
 
-File::~File() {}
+File::~File() { }
 
 void File::accept(Visitor &visitor) const
 {

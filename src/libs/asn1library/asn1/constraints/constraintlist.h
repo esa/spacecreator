@@ -27,7 +27,6 @@
 #include "constraint.h"
 #include "constraintvisitor.h"
 #include "rangeconstraint.h"
-#include "values.h"
 
 #include <memory>
 #include <optional>
@@ -40,7 +39,7 @@ template<typename ValueType>
 class ConstraintList : public Constraint<ValueType>
 {
 public:
-    ConstraintList() {}
+    ConstraintList() { }
     ConstraintList(const ConstraintList &other);
 
     const std::vector<std::unique_ptr<Constraint<ValueType>>> &constraints() const { return m_constraints; }

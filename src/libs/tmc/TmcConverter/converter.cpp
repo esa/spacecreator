@@ -706,13 +706,14 @@ QFileInfo TmcConverter::workDirectory() const
 
 QFileInfo TmcConverter::simuDataViewLocation() const
 {
-    return QFileInfo(workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator() + "observers"
-            + QDir::separator() + "observer.asn");
+    return QFileInfo(workDirectory().absoluteFilePath() + QDir::separator() + "simulation" + QDir::separator()
+            + "observers" + QDir::separator() + "observer.asn");
 }
 
 QFileInfo TmcConverter::sdlImplementationBaseDirectory(const QString &functionName) const
 {
-    return QFileInfo(workDirectory().absoluteFilePath() + QDir::separator() + functionName.toLower() + QDir::separator() + "SDL");
+    return QFileInfo(workDirectory().absoluteFilePath() + QDir::separator() + functionName.toLower() + QDir::separator()
+            + "SDL");
 }
 
 QFileInfo TmcConverter::sdlImplementationLocation(const QString &functionName) const
@@ -741,8 +742,8 @@ QFileInfo TmcConverter::sdlFunctionDatamodelLocation(const QString &functionName
 
 QFileInfo TmcConverter::sdlFunctionContextLocation(const QString &functionName) const
 {
-    QFileInfo contextLocation = QFileInfo(sdlImplementationBaseDirectory(functionName).absoluteFilePath() + QDir::separator()
-            + "Context-" + functionName.toLower() + ".asn");
+    QFileInfo contextLocation = QFileInfo(sdlImplementationBaseDirectory(functionName).absoluteFilePath()
+            + QDir::separator() + "Context-" + functionName.toLower() + ".asn");
     if (contextLocation.exists()) {
         return contextLocation;
     } else {

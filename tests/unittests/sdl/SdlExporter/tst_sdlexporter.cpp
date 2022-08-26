@@ -18,8 +18,8 @@
  */
 
 #include <QObject>
-#include <QtTest>
 #include <QStringList>
+#include <QtTest>
 #include <common/sdlmodelbuilder/sdlanswerbuilder.h>
 #include <common/sdlmodelbuilder/sdlblockbuilder.h>
 #include <common/sdlmodelbuilder/sdlchannelbuilder.h>
