@@ -21,8 +21,8 @@
 
 #include "descriptiontranslator.h"
 
-#include <QTextStream>
 #include <QIODevice>
+#include <QTextStream>
 #include <asn1library/asn1/constraints/rangeconstraint.h>
 #include <asn1library/asn1/constraints/sizeconstraint.h>
 #include <asn1library/asn1/typeassignment.h>
