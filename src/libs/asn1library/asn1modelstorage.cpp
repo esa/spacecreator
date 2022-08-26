@@ -49,7 +49,7 @@ Asn1ModelStorage::Asn1ModelStorage(QObject *parent)
 /*!
    \brief Asn1ModelStorage::~Asn1ModelStorage
  */
-Asn1ModelStorage::~Asn1ModelStorage() {}
+Asn1ModelStorage::~Asn1ModelStorage() { }
 
 /*!
    Returns the asn types for the given file (full path).
