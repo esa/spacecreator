@@ -3,7 +3,8 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   Testgui-writerequesta-p1, Testgui-writerequestb-p1 FROM TESTGUI-SUBTYPE;
 
 Lock-States ::= ENUMERATED {wait-nocontention, writing, idle, wait-turn}
 
@@ -30,7 +31,8 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   Testgui-writerequesta-p1, Testgui-writerequestb-p1 FROM TESTGUI-SUBTYPE;
 
 Sharedmemory-States ::= ENUMERATED {idle}
 
@@ -68,7 +70,6 @@ T-ProcID ::= T-UInt8 (0 .. 1)
 
 END
 
-
 TASTE-BasicTypes DEFINITIONS ::=
 BEGIN
 
@@ -88,6 +89,38 @@ T-Null-Record ::= SEQUENCE {}
 
 END
 
+
+TESTGUI-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+T-WriteRequest FROM DEKKER1-DATAVIEW
+
+
+
+
+T-WriteRequest FROM DEKKER1-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Testgui-writerequesta-p1 ::= T-WriteRequest
+
+
+
+
+Testgui-writerequestb-p1 ::= T-WriteRequest
+
+
+
+
+END
 
 
 Simulation-DataView DEFINITIONS ::=
@@ -123,6 +156,8 @@ BEGIN
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
       Lock-Context         FROM Lock-Datamodel
       Lock-Context         FROM Lock-Datamodel
@@ -246,7 +281,10 @@ BEGIN
    locka-queue-size INTEGER ::= 2
    lockb-queue-size INTEGER ::= 2
    sharedmemory-queue-size INTEGER ::= 2
+
    System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
       --  Message queues
       locka-queue        Events-Ty (SIZE (0 .. locka-queue-size)),
       lockb-queue        Events-Ty (SIZE (0 .. lockb-queue-size)),
@@ -255,6 +293,32 @@ BEGIN
       locka         Lock-Context,
       lockb         Lock-Context,
       sharedmemory  Sharedmemory-Context
+   }
+
+END
+
+Simulation-Timers-DataView DEFINITIONS ::=
+BEGIN
+
+   TimerData ::= SEQUENCE {
+      timer-enabled BOOLEAN,
+      interval INTEGER (0 .. 50000)
+   }
+
+   AggregateTimerData ::= SEQUENCE {
+      
+      
+      
+      locka SEQUENCE {
+      },
+      
+      lockb SEQUENCE {
+      },
+      
+      sharedmemory SEQUENCE {
+      },
+      
+      dummy-entry SEQUENCE {}
    }
 
 END

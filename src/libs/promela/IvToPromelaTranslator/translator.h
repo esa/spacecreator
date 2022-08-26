@@ -272,7 +272,6 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
-    inline static const QString m_timerManagerDataName = "timer_manager_data";
     inline static const QString m_timerManagerProctypeName = "timer_manager_proc";
     inline static const QString m_dummyParamName = "dummy";
     inline static const QString m_systemInitedVariableName = "inited";
@@ -310,10 +309,10 @@ private:
             -> std::unique_ptr<::promela::model::Expression>;
     auto createSystemState(Context &context) const -> void;
     auto createPromelaObjectsForTimers(Context &context) const -> void;
-    auto createTimerInlinesForFunction(
-            Context &context, const QString &functionName, const QString &timerName, int timerId) const -> void;
-    auto createGlobalTimerObjects(Context &context, int timerCount, const std::map<int, QString> &timerSignals) const
-            -> void;
+    auto createTimerInlinesForFunction(Context &context, const QString &functionName, const QString &timerName,
+            const promela::model::VariableRef &timerData) const -> void;
+    auto createGlobalTimerObjects(
+            Context &context, const std::map<QString, promela::model::VariableRef> &timerSignals) const -> void;
     auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
     auto createPromelaObjectsForObservers(Context &context) const -> void;
 

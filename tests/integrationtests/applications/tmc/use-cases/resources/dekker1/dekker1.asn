@@ -22,4 +22,3 @@ T-WriteRequest ::= SEQUENCE {
 T-ProcID ::= T-UInt8 (0 .. 1)
 
 END
-

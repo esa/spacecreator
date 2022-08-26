@@ -2,18 +2,19 @@ Receiver-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyString, MyBetterString FROM IA5STRING-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   Pinger-stringinterface-stringArg FROM PINGER-SUBTYPE;
+   MyChoice, MyBetterChoice FROM USERDEFINED-TYPES-DATAVIEW
+   Pinger-choiceinterface-choiceArg FROM PINGER-SUBTYPE;
 
 Receiver-States ::= ENUMERATED {wait}
 
 Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
-   stringarg MyBetterString,
-   stringval MyBetterString,
-   stringhandled T-Boolean
+   choicearg MyBetterChoice,
+   choicevalue MyBetterChoice,
+   choicehandled T-Boolean
 }
 
+Receiver-Mychoice-Selection  ::= ENUMERATED {option1-present(1), option2-present(2)}
 END
