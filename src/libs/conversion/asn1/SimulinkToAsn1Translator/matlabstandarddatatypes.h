@@ -53,16 +53,45 @@ public:
     static inline auto getStandardDataTypesPrefix() -> QString { return "MatLab-"; }
 
     /**
-     * @brief These group of methods create ASN.1 types related to MatLab's Standard Types
+     * @brief  Return bit size value for translated asn1 enumerated type
+     */
+    static inline auto getAsn1EnumBitSize() -> int { return 32; }
+
+    /**
+     * @brief Create ASN.1 Boolean type related to MatLab Boolean Standard Type
      */
     static auto getStandardAsn1BooleanDataType() -> std::unique_ptr<Asn1Acn::Types::Boolean>;
+    /**
+     * @brief Create ASN.1 REAL type with proper constraints related to MatLab Double Standard Type
+     */
     static auto getStandardAsn1DoubleDataType() -> std::unique_ptr<Asn1Acn::Types::Real>;
+    /**
+     * @brief Create ASN.1 REAL type with proper constraints related to MatLab Single Standard Type
+     */
     static auto getStandardAsn1SingleDataType() -> std::unique_ptr<Asn1Acn::Types::Real>;
+    /**
+     * @brief Create ASN.1 INTEGER type with proper constraints related to MatLab Int8 Standard Type
+     */
     static auto getStandardAsn1Int8DataType() -> std::unique_ptr<Asn1Acn::Types::Integer>;
+    /**
+     * @brief Create ASN.1 INTEGER type with proper constraints related to MatLab UInt8 Standard Type
+     */
     static auto getStandardAsn1UInt8DataType() -> std::unique_ptr<Asn1Acn::Types::Integer>;
+    /**
+     * @brief Create ASN.1 INTEGER type with proper constraints related to MatLab Int16 Standard Type
+     */
     static auto getStandardAsn1Int16DataType() -> std::unique_ptr<Asn1Acn::Types::Integer>;
+    /**
+     * @brief Create ASN.1 INTEGER type with proper constraints related to MatLab UInt16 Standard Type
+     */
     static auto getStandardAsn1UInt16DataType() -> std::unique_ptr<Asn1Acn::Types::Integer>;
+    /**
+     * @brief Create ASN.1 INTEGER type with proper constraints related to MatLab Int32 Standard Type
+     */
     static auto getStandardAsn1Int32DataType() -> std::unique_ptr<Asn1Acn::Types::Integer>;
+    /**
+     * @brief Create ASN.1 INTEGER type with proper constraints related to MatLab UInt32 Standard Type
+     */
     static auto getStandardAsn1UInt32DataType() -> std::unique_ptr<Asn1Acn::Types::Integer>;
 
 public:

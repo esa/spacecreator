@@ -53,7 +53,6 @@ std::unique_ptr<Boolean> MatLabStandardDataTypes::getStandardAsn1BooleanDataType
     const auto asn1TypeName = getStandardDataTypesPrefix() + "Boolean";
     auto asn1Type = std::make_unique<Boolean>(asn1TypeName);
 
-    asn1Type->setAcnSize(1);
     asn1Type->setTrueValue("1");
     asn1Type->setFalseValue("0");
 

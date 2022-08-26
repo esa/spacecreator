@@ -80,11 +80,24 @@ private Q_SLOTS:
     void testResolvingUndeclaredType();
     void testMissingModel();
     void testTooManyModels();
-    void testMatLabStandardTypes();
-    void testBaseDataTypes();
+    void testMatLabStandardTypesAmount();
+    void testMatLabBooleanStandardType();
+    void testMatLabDoubleStandardType();
+    void testMatLabSingleStandardType();
+    void testMatLabInt8StandardType();
+    void testMatLabUInt8StandardType();
+    void testMatLabInt16StandardType();
+    void testMatLabUInt16StandardType();
+    void testMatLabInt32StandardType();
+    void testMatLabUInt32StandardType();
+    void testAliasDataType();
+    void testEnumDataType();
+    void testBusDataType();
     void testBusDataTypeDimensionality();
 
 private:
+    auto translateEmptySimulinkModel() -> std::vector<std::unique_ptr<conversion::Model>>;
+
     auto getTypeAssignment(const Asn1Model *asn1Model, Asn1ModelFileChooser asn1ModelFileChooser,
             std::size_t index) const -> const TypeAssignment *;
     auto getRangeConstraint(const SequenceOf *sequenceOf) const -> const Range<IntegerValue::Type> &;
@@ -94,9 +107,8 @@ void tst_SimulinkToAsn1Translator::testResolvingDataTypes()
 {
     // clang-format off
     const auto simulinkModel = SimulinkModelBuilder("SimulinkModel")
-									.withAliasDataType("Alias", "double", DataScope::Auto, "", "")
                                     .withAliasDataType("Alias2", "Alias", DataScope::Auto, "", "")
-                                    .withEnumDataType("Enum", DataScope::Auto, "", "", { "true", "false" })
+                                    .withAliasDataType("Alias", "double", DataScope::Auto, "", "")
                                     .withBusDataType
                                     (
                                         SimulinkBusDataTypeBuilder("Bus", DataScope::Auto, "", "")
@@ -104,7 +116,8 @@ void tst_SimulinkToAsn1Translator::testResolvingDataTypes()
                                                     .withBusMember("member2", "Alias2", "", Dimensions(1))
                                                 .build()
                                     )
-									.build();
+                                    .withEnumDataType("Enum", DataScope::Auto, "", "", { "true", "false" })
+                                    .build();
     // clang-format on
 
     DataTypesDependencyResolver resolver(simulinkModel->dataTypes());
@@ -151,12 +164,12 @@ void tst_SimulinkToAsn1Translator::testMissingModel()
 void tst_SimulinkToAsn1Translator::testTooManyModels()
 {
     // clang-format off
-	const auto simulinkModel1 = SimulinkModelBuilder("SimulinkModel1")
-									.withInport("Inport", "Inport", "double", "1")
-									.build();
+    const auto simulinkModel1 = SimulinkModelBuilder("SimulinkModel1")
+                                    .withInport("Inport", "Inport", "double", "1")
+                                    .build();
     const auto simulinkModel2 = SimulinkModelBuilder("SimulinkModel2")
-									.withInport("Inport", "Inport", "double", "1")
-									.build();
+                                    .withInport("Inport", "Inport", "double", "1")
+                                    .build();
     // clang-format on
 
     Options options;
@@ -167,14 +180,9 @@ void tst_SimulinkToAsn1Translator::testTooManyModels()
             "Too many models passed for SIMULINK to ASN.1 translation");
 }
 
-void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
+void tst_SimulinkToAsn1Translator::testMatLabStandardTypesAmount()
 {
-    const auto simulinkModel = SimulinkModelBuilder("SimulinkModel").build();
-
-    Options options;
-    SimulinkToAsn1Translator translator;
-
-    const auto resultModels = translator.translateModels({ simulinkModel.get() }, options);
+    const auto resultModels = translateEmptySimulinkModel();
     QCOMPARE(resultModels.size(), 1);
 
     const auto &resultModel = resultModels[0];
@@ -191,47 +199,31 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     const auto &definitions = definitionsList.at(0);
     const auto typeAssignmentsSize = definitions->types().size();
     QCOMPARE(typeAssignmentsSize, 9);
+}
 
-    // MatLab Standard Data Types
+void tst_SimulinkToAsn1Translator::testMatLabBooleanStandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
 
     const auto *booleanDataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 0)->type();
-    QVERIFY(booleanDataType);
-
-    const auto *doubleDataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 1)->type();
-    QVERIFY(doubleDataType);
-
-    const auto *singleDataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 2)->type();
-    QVERIFY(singleDataType);
-
-    const auto *int8DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 3)->type();
-    QVERIFY(int8DataType);
-
-    const auto *uint8DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 4)->type();
-    QVERIFY(uint8DataType);
-
-    const auto *int16DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 5)->type();
-    QVERIFY(int16DataType);
-
-    const auto *uint16DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 6)->type();
-    QVERIFY(uint16DataType);
-
-    const auto *int32DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 7)->type();
-    QVERIFY(int32DataType);
-
-    const auto *uint32DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 8)->type();
-    QVERIFY(uint32DataType);
-
-    // MatLab-Boolean
 
     const auto *booleanType = dynamic_cast<const Boolean *>(booleanDataType);
     QVERIFY(booleanType);
     QCOMPARE(booleanType->identifier(), "MatLab-Boolean");
     QCOMPARE(booleanType->typeName(), "BOOLEAN");
-    QCOMPARE(booleanType->acnSize(), 1);
     QCOMPARE(booleanType->trueValue(), "1");
     QCOMPARE(booleanType->falseValue(), "0");
+}
 
-    // MatLab-Double
+void tst_SimulinkToAsn1Translator::testMatLabDoubleStandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+
+    const auto *doubleDataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 1)->type();
 
     const auto *doubleType = dynamic_cast<const Real *>(doubleDataType);
     QVERIFY(doubleType);
@@ -252,8 +244,15 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     const auto &doubleRange = doubleRangeConstraint->range();
     QCOMPARE(doubleRange.begin(), std::numeric_limits<double>::lowest());
     QCOMPARE(doubleRange.end(), std::numeric_limits<double>::max());
+}
 
-    // MatLab-Single
+void tst_SimulinkToAsn1Translator::testMatLabSingleStandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+
+    const auto *singleDataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 2)->type();
 
     const auto *singleType = dynamic_cast<const Real *>(singleDataType);
     QVERIFY(singleType);
@@ -274,8 +273,15 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     const auto &singleRange = singleRangeConstraint->range();
     QCOMPARE(singleRange.begin(), static_cast<double>(std::numeric_limits<float>::lowest()));
     QCOMPARE(singleRange.end(), static_cast<double>(std::numeric_limits<float>::max()));
+}
 
-    // MatLab-Int8
+void tst_SimulinkToAsn1Translator::testMatLabInt8StandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+
+    const auto *int8DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 3)->type();
 
     const auto *int8Type = dynamic_cast<const Integer *>(int8DataType);
     QVERIFY(int8Type);
@@ -299,8 +305,15 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     const auto &int8Range = int8RangeConstraint->range();
     QCOMPARE(int8Range.begin(), -128);
     QCOMPARE(int8Range.end(), 127);
+}
 
-    // MatLab-Uint8
+void tst_SimulinkToAsn1Translator::testMatLabUInt8StandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+
+    const auto *uint8DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 4)->type();
 
     const auto *uint8Type = dynamic_cast<const Integer *>(uint8DataType);
     QVERIFY(uint8Type);
@@ -324,8 +337,15 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     const auto &uint8Range = uint8RangeConstraint->range();
     QCOMPARE(uint8Range.begin(), 0);
     QCOMPARE(uint8Range.end(), 255);
+}
 
-    // MatLab-Int16
+void tst_SimulinkToAsn1Translator::testMatLabInt16StandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+
+    const auto *int16DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 5)->type();
 
     const auto *int16Type = dynamic_cast<const Integer *>(int16DataType);
     QVERIFY(int16Type);
@@ -349,8 +369,15 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     const auto &int16Range = int16RangeConstraint->range();
     QCOMPARE(int16Range.begin(), -32768);
     QCOMPARE(int16Range.end(), 32767);
+}
 
-    // MatLab-Uint16
+void tst_SimulinkToAsn1Translator::testMatLabUInt16StandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+
+    const auto *uint16DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 6)->type();
 
     const auto *uint16Type = dynamic_cast<const Integer *>(uint16DataType);
     QVERIFY(uint16Type);
@@ -374,8 +401,15 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     const auto &uint16Range = uint16RangeConstraint->range();
     QCOMPARE(uint16Range.begin(), 0);
     QCOMPARE(uint16Range.end(), 65535);
+}
 
-    // MatLab-Int32
+void tst_SimulinkToAsn1Translator::testMatLabInt32StandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+
+    const auto *int32DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 7)->type();
 
     const auto *int32Type = dynamic_cast<const Integer *>(int32DataType);
     QVERIFY(int32Type);
@@ -399,8 +433,15 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     const auto &int32Range = int32RangeConstraint->range();
     QCOMPARE(int32Range.begin(), -2147483648);
     QCOMPARE(int32Range.end(), 2147483647);
+}
 
-    // MatLab-Uint32
+void tst_SimulinkToAsn1Translator::testMatLabUInt32StandardType()
+{
+    const auto resultModels = translateEmptySimulinkModel();
+    const auto &resultModel = resultModels[0];
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+
+    const auto *uint32DataType = getTypeAssignment(asn1Model, MATLAB_STANDARD_TYPES, 8)->type();
 
     const auto *uint32Type = dynamic_cast<const Integer *>(uint32DataType);
     QVERIFY(uint32Type);
@@ -426,21 +467,13 @@ void tst_SimulinkToAsn1Translator::testMatLabStandardTypes()
     QCOMPARE(uint32Range.end(), 4294967295);
 }
 
-void tst_SimulinkToAsn1Translator::testBaseDataTypes()
+void tst_SimulinkToAsn1Translator::testAliasDataType()
 {
     // clang-format off
     const auto simulinkModel = SimulinkModelBuilder("SimulinkModel")
                                     .withAliasDataType("Alias1", "double", DataScope::Auto, "Alias1Description", "")
                                     .withAliasDataType("Alias2", "Alias1", DataScope::Auto, "Alias2Description", "")
                                     .withAliasDataType("Alias3", "Alias2", DataScope::Auto, "Alias3Description", "")
-                                    .withEnumDataType("Enum", DataScope::Auto, "EnumDescription", "", {"false", "true"})
-                                    .withBusDataType(
-                                        SimulinkBusDataTypeBuilder("Bus", DataScope::Auto, "BusDescription", "")
-                                            .withBusMember("member1", "Alias1", "", Dimensions(1))
-                                            .withBusMember("member2", "Enum", "", Dimensions(1))
-                                            .withBusMember("member3", "int8", "", Dimensions(1))
-                                            .build()
-                                    )
                                     .build();
     // clang-format on
 
@@ -463,7 +496,7 @@ void tst_SimulinkToAsn1Translator::testBaseDataTypes()
 
     const auto &definitions = definitionsList.at(0);
     const auto typeAssignmentsSize = definitions->types().size();
-    QCOMPARE(typeAssignmentsSize, 5);
+    QCOMPARE(typeAssignmentsSize, 3);
 
     // Alias1
 
@@ -497,13 +530,39 @@ void tst_SimulinkToAsn1Translator::testBaseDataTypes()
     const auto *alias3DataType = dynamic_cast<const UserdefinedType *>(alias3TypeAssignment->type());
     QVERIFY(alias3DataType);
     QCOMPARE(alias3DataType->typeName(), "Alias2");
+}
 
-    // Enum
+void tst_SimulinkToAsn1Translator::testEnumDataType()
+{
+    // clang-format off
+    const auto simulinkModel = SimulinkModelBuilder("SimulinkModel")
+                                    .withEnumDataType("Enum", DataScope::Auto, "EnumDescription", "", {"false", "true"})
+                                    .build();
+    // clang-format on
 
-    const auto *enumTypeAssignment = getTypeAssignment(asn1Model, SIMULINK_MODEL, 3);
+    Options options;
+    SimulinkToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ simulinkModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto &asn1Files = asn1Model->data();
+    const auto &definitionsList = asn1Files.at(SIMULINK_MODEL)->definitionsList();
+    const auto definitionsSize = definitionsList.size();
+    QCOMPARE(definitionsSize, 1);
+
+    const auto &definitions = definitionsList.at(0);
+    const auto typeAssignmentsSize = definitions->types().size();
+    QCOMPARE(typeAssignmentsSize, 1);
+
+    const auto *enumTypeAssignment = getTypeAssignment(asn1Model, SIMULINK_MODEL, 0);
     QVERIFY(enumTypeAssignment);
-    QCOMPARE(alias3TypeAssignment->name(), "Alias3");
-    QCOMPARE(alias3TypeAssignment->comment(), "Alias3Description");
 
     const auto *enumType = dynamic_cast<const Enumerated *>(enumTypeAssignment->type());
     QVERIFY(enumType);
@@ -522,10 +581,46 @@ void tst_SimulinkToAsn1Translator::testBaseDataTypes()
     QCOMPARE(trueEnumItem.name(), "true");
     QCOMPARE(trueEnumItem.value(), 1);
     QCOMPARE(trueEnumItem.index(), 1);
+}
 
-    // Bus
+void tst_SimulinkToAsn1Translator::testBusDataType()
+{
+    // clang-format off
+    const auto simulinkModel = SimulinkModelBuilder("SimulinkModel")
+                                    .withAliasDataType("Alias", "double", DataScope::Auto, "Alias1Description", "")
+                                    .withEnumDataType("Enum", DataScope::Auto, "EnumDescription", "", {"false", "true"})
+                                    .withBusDataType(
+                                        SimulinkBusDataTypeBuilder("Bus", DataScope::Auto, "BusDescription", "")
+                                            .withBusMember("member1", "Alias", "", Dimensions(1))
+                                            .withBusMember("member2", "Enum", "", Dimensions(1))
+                                            .withBusMember("member3", "int8", "", Dimensions(1))
+                                            .build()
+                                    )
+                                    .build();
+    // clang-format on
 
-    const auto *busDataType = getTypeAssignment(asn1Model, SIMULINK_MODEL, 4);
+    Options options;
+    SimulinkToAsn1Translator translator;
+
+    const auto resultModels = translator.translateModels({ simulinkModel.get() }, options);
+    QCOMPARE(resultModels.size(), 1);
+
+    const auto &resultModel = resultModels[0];
+    QCOMPARE(resultModel->modelType(), ModelType::Asn1);
+
+    const auto *asn1Model = dynamic_cast<Asn1Model *>(resultModel.get());
+    QVERIFY(asn1Model);
+
+    const auto &asn1Files = asn1Model->data();
+    const auto &definitionsList = asn1Files.at(SIMULINK_MODEL)->definitionsList();
+    const auto definitionsSize = definitionsList.size();
+    QCOMPARE(definitionsSize, 1);
+
+    const auto &definitions = definitionsList.at(0);
+    const auto typeAssignmentsSize = definitions->types().size();
+    QCOMPARE(typeAssignmentsSize, 3);
+
+    const auto *busDataType = getTypeAssignment(asn1Model, SIMULINK_MODEL, 2);
     QVERIFY(busDataType);
     QCOMPARE(busDataType->name(), "Bus");
     QCOMPARE(busDataType->comment(), "BusDescription");
@@ -543,7 +638,7 @@ void tst_SimulinkToAsn1Translator::testBaseDataTypes()
 
     const auto *busMember1Type = dynamic_cast<const UserdefinedType *>(busMember1->type());
     QVERIFY(busMember1Type);
-    QCOMPARE(busMember1Type->typeName(), "Alias1");
+    QCOMPARE(busMember1Type->typeName(), "Alias");
 
     // Bus Member2
 
@@ -688,6 +783,18 @@ void tst_SimulinkToAsn1Translator::testBusDataTypeDimensionality()
     QVERIFY(busMember3SequenceOfSequenceOfReferencedItemsType);
     QCOMPARE(busMember3SequenceOfSequenceOfReferencedItemsType->identifier(), "");
     QCOMPARE(busMember3SequenceOfSequenceOfReferencedItemsType->typeName(), "MatLab-Int8");
+}
+
+std::vector<std::unique_ptr<conversion::Model>> tst_SimulinkToAsn1Translator::translateEmptySimulinkModel()
+{
+    const auto emptySimulinkModel = SimulinkModelBuilder("SimulinkModel").build();
+
+    Options options;
+    SimulinkToAsn1Translator translator;
+
+    auto resultModels = translator.translateModels({ emptySimulinkModel.get() }, options);
+
+    return std::move(resultModels);
 }
 
 const TypeAssignment *tst_SimulinkToAsn1Translator::getTypeAssignment(

@@ -25,7 +25,7 @@
 namespace conversion::asn1::translator {
 
 /**
- * @brief  // TasteStandardDataTypes class provides various methods for handling TASTE's Standard Types
+ * @brief  TasteStandardDataTypes class provides various methods for handling TASTE's Standard Types
  */
 class TasteStandardDataTypes final
 {

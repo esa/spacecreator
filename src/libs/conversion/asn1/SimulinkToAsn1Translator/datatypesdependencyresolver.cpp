@@ -53,15 +53,15 @@ const DataTypesDependencyResolver::ResultList &DataTypesDependencyResolver::reso
 
 void DataTypesDependencyResolver::visit(const DataType &dataType)
 {
-    if (isPermanentlyMarked(dataType)) {
+    if (isDataTypeMarkedAs(dataType, MarkType::Permanent)) {
         return;
     }
 
-    if (isTemporarilyMarked(dataType)) {
+    if (isDataTypeMarkedAs(dataType, MarkType::Temporary)) {
         throw NotDagException(dataTypeNameStr(dataType));
     }
 
-    markTemporary(dataType);
+    markDataTypeAs(dataType, MarkType::Temporary);
 
     if (const auto *aliasDataType = std::get_if<AliasDataType>(&dataType)) {
         visitAlias(*aliasDataType);
@@ -69,7 +69,7 @@ void DataTypesDependencyResolver::visit(const DataType &dataType)
         visitBus(*busDataType);
     }
 
-    markPermanent(dataType);
+    markDataTypeAs(dataType, MarkType::Permanent);
 
     m_result.push_back(&dataType);
 }
@@ -79,8 +79,9 @@ void DataTypesDependencyResolver::visitAlias(const AliasDataType &aliasDataType)
     const auto &baseType = aliasDataType.baseType();
 
     if (MatLabStandardDataTypes::isNumericType(baseType) || MatLabStandardDataTypes::isBooleanType(baseType)
-            || TasteStandardDataTypes::isTasteType(baseType))
+            || TasteStandardDataTypes::isTasteType(baseType)) {
         return;
+    }
 
     const auto &itemDataType = findDataType(baseType);
     visit(itemDataType);
@@ -93,8 +94,9 @@ void DataTypesDependencyResolver::visitBus(const BusDataType &busDataType)
 
         if (MatLabStandardDataTypes::isNumericType(busMemberDataType)
                 || MatLabStandardDataTypes::isBooleanType(busMemberDataType)
-                || TasteStandardDataTypes::isTasteType(busMemberDataType))
+                || TasteStandardDataTypes::isTasteType(busMemberDataType)) {
             continue;
+        }
 
         const auto &itemDataType = findDataType(busMemberDataType);
         visit(itemDataType);
@@ -115,32 +117,18 @@ const simulink::model::DataType &DataTypesDependencyResolver::findDataType(const
     throw UndeclaredDataTypeException(dataTypeName);
 }
 
-void DataTypesDependencyResolver::markTemporary(const DataType &dataType)
+void DataTypesDependencyResolver::markDataTypeAs(const DataType &dataType, MarkType markType)
 {
-    m_marks.insert({ &dataType, MarkType::Temporary });
+    m_marks[&dataType] = markType;
 }
 
-void DataTypesDependencyResolver::markPermanent(const DataType &dataType)
-{
-    m_marks[&dataType] = MarkType::Permanent;
-}
-
-bool DataTypesDependencyResolver::isTemporarilyMarked(const DataType &dataType)
+bool DataTypesDependencyResolver::isDataTypeMarkedAs(const DataType &dataType, MarkType markType) const
 {
     if (m_marks.count(&dataType) == 0) {
         return false;
     }
 
-    return m_marks.at(&dataType) == MarkType::Temporary;
-}
-
-bool DataTypesDependencyResolver::isPermanentlyMarked(const DataType &dataType)
-{
-    if (m_marks.count(&dataType) == 0) {
-        return false;
-    }
-
-    return m_marks.at(&dataType) == MarkType::Permanent;
+    return m_marks.at(&dataType) == markType;
 }
 
 } // namespace conversion::asn1::translator

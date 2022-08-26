@@ -64,24 +64,25 @@ public:
     /**
      * @brief   Translate SIMULINK scalar dimension
      *
-     * @param   dataTypeAsn1Type       ASN.1 type corresponding to basetype for translated simulink datatype
+     * @param   sequenceOfAsn1TypeName name for the constructed SequenceOf object
+     * @param   itemAsn1Type           ASN.1 type corresponding to basetype for translated simulink datatype
      * @param   scalarDimensions       scalar dimension to translate
      *
      * @return  Constructed SequenceOf object
      */
-    auto translate(const QString &asn1TypeName, const Asn1Acn::Types::Type *dataTypeAsn1Type, int64_t scalarDimensions)
-            -> std::unique_ptr<Asn1Acn::Types::SequenceOf>;
+    auto translate(const QString &sequenceOfAsn1TypeName, const Asn1Acn::Types::Type *itemAsn1Type,
+            int64_t scalarDimensions) -> std::unique_ptr<Asn1Acn::Types::SequenceOf>;
 
     /**
      * @brief   Translate SIMULINK vector dimension
      *
-     * @param   dataTypeAsn1Type       ASN.1 type corresponding to basetype for translated simulink datatype
+     * @param   itemAsn1Type           ASN.1 type corresponding to basetype for translated simulink datatype
      * @param   vectorDimensions       vector dimension to translate
      *
      * @return  Constructed SequenceOf object
      */
-    auto translate(const Asn1Acn::Types::Type *dataTypeAsn1Type,
-            const simulink::model::VectorDimensions::Vector &vectorDimensions)
+    auto translate(
+            const Asn1Acn::Types::Type *itemAsn1Type, const simulink::model::VectorDimensions::Vector &vectorDimensions)
             -> std::unique_ptr<Asn1Acn::Types::SequenceOf>;
 
 private:

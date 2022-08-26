@@ -44,7 +44,7 @@ Context::Context(const SimulinkModel &simulinkModel, std::unique_ptr<Definitions
 {
 }
 
-void Context::addSimulinkModelAsn1Type(std::unique_ptr<Type> asn1Type, QString description /* = QString() */)
+void Context::addSimulinkModelAsn1Type(std::unique_ptr<Type> asn1Type, QString description)
 {
     const auto &asn1TypeName = asn1Type->identifier();
     auto asn1TypeAssignment =

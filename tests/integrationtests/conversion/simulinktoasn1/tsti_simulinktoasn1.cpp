@@ -38,7 +38,7 @@ class tsti_SimulinkToAsn1 : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void testComparingWithExpected();
+    void testComparingAsn1TranslationResultWithExpectedResult();
 
 private:
     static const std::array<const QString, 24> m_directoriesOfTests;
@@ -105,41 +105,53 @@ QString getFileContents(const QString &filename)
     return file.readAll();
 }
 
-void tsti_SimulinkToAsn1::testComparingWithExpected()
+std::unique_ptr<conversion::Model> loadModel(const QString &interfaceFilePath)
+{
+    Options importerOptions;
+    importerOptions.add(SimulinkOptions::inputFilepath, interfaceFilePath);
+
+    SimulinkXmlImporter importer;
+    auto importedModel = importer.importModel(importerOptions);
+
+    return std::move(importedModel);
+}
+
+std::vector<std::unique_ptr<conversion::Model>> translateModel(SimulinkModel *simulinkModel)
+{
+    Options translatorOptions;
+    SimulinkToAsn1Translator translator;
+
+    auto translatedModels = translator.translateModels({ simulinkModel }, translatorOptions);
+
+    return std::move(translatedModels);
+}
+
+void exportModel(const Asn1Model *asn1Model)
+{
+    Options exporterOptions;
+    Asn1Exporter asn1Exporter;
+
+    asn1Exporter.exportModel(asn1Model, exporterOptions);
+}
+
+void tsti_SimulinkToAsn1::testComparingAsn1TranslationResultWithExpectedResult()
 {
     for (const QString &m_directoryOfTest : m_directoriesOfTests) {
         try {
             QString interfaceFilePath = m_directoryOfTest + m_interfaceXmlFilePath;
 
-            // Importing .xml file to SimulinkModel
-
-            Options importerOptions;
-            importerOptions.add(SimulinkOptions::inputFilepath, interfaceFilePath);
-
-            SimulinkXmlImporter importer;
-            const auto importedModel = importer.importModel(importerOptions);
+            const auto importedModel = loadModel(interfaceFilePath);
             auto *simulinkModel = dynamic_cast<SimulinkModel *>(importedModel.get());
+            QVERIFY(simulinkModel);
 
-            // Translating SimulinkModel to Asn1Model
-
-            Options translatorOptions;
-            SimulinkToAsn1Translator translator;
-
-            const auto translatedModels = translator.translateModels({ simulinkModel }, translatorOptions);
+            const auto translatedModels = translateModel(simulinkModel);
             QCOMPARE(translatedModels.size(), 1);
 
             const auto &translatedModel = translatedModels[0];
             const auto *asn1Model = dynamic_cast<Asn1Model *>(translatedModel.get());
             QVERIFY(asn1Model);
 
-            // Saving Asn1Model to .asn and .acn files
-
-            Options exporterOptions;
-            Asn1Exporter asn1Exporter;
-
-            asn1Exporter.exportModel(asn1Model, exporterOptions);
-
-            // Comparing results with expected
+            exportModel(asn1Model);
 
             const QString expectedInterfaceAsnFilePath = m_directoryOfTest + m_expectedInterfaceFileSubPath + ".asn";
             const QString expectedInterfaceAcnFilePath = m_directoryOfTest + m_expectedInterfaceFileSubPath + ".acn";

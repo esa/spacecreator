@@ -41,11 +41,11 @@ DimensionTranslator::DimensionTranslator(Context &context)
 }
 
 std::unique_ptr<SequenceOf> DimensionTranslator::translate(
-        const QString &asn1TypeName, const Type *dataTypeAsn1Type, int64_t scalarDimensions)
+        const QString &sequenceOfAsn1TypeName, const Type *itemAsn1Type, int64_t scalarDimensions)
 {
-    auto asn1SequenceOfType = std::make_unique<SequenceOf>(asn1TypeName);
+    auto asn1SequenceOfType = std::make_unique<SequenceOf>(sequenceOfAsn1TypeName);
     auto asn1UserdefinedType =
-            std::make_unique<UserdefinedType>(dataTypeAsn1Type->identifier(), m_context.simulinkModelDefinitionsName());
+            std::make_unique<UserdefinedType>(itemAsn1Type->identifier(), m_context.simulinkModelDefinitionsName());
 
     asn1SequenceOfType->setItemsType(std::move(asn1UserdefinedType));
 
@@ -55,9 +55,9 @@ std::unique_ptr<SequenceOf> DimensionTranslator::translate(
 }
 
 std::unique_ptr<SequenceOf> DimensionTranslator::translate(
-        const Type *dataTypeAsn1Type, const VectorDimensions::Vector &vectorDimensions)
+        const Type *itemAsn1Type, const VectorDimensions::Vector &vectorDimensions)
 {
-    auto asn1SequenceOfType = std::make_unique<SequenceOf>(dataTypeAsn1Type->identifier());
+    auto asn1SequenceOfType = std::make_unique<SequenceOf>(itemAsn1Type->identifier());
 
     addSizeConstraint(asn1SequenceOfType.get(), vectorDimensions[0]);
 

@@ -19,6 +19,8 @@
 
 #include "datatypetranslatorvisitor.h"
 
+#include "matlabstandarddatatypes.h"
+
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/asn1/SimulinkToAsn1Translator/tastestandarddatatypes.h>
@@ -50,9 +52,9 @@ void DataTypeTranslatorVisitor::operator()(const EnumDataType &simulinkEnumType)
     auto enumAsn1EnumeratedType = std::make_unique<Enumerated>(enumAsn1TypeName);
 
     enumAsn1EnumeratedType->setEndianness(Endianness::unspecified);
-    enumAsn1EnumeratedType->setSize(32);
-    enumAsn1EnumeratedType->setAcnMinSizeInBits(32);
-    enumAsn1EnumeratedType->setAcnMaxSizeInBits(32);
+    enumAsn1EnumeratedType->setSize(MatLabStandardDataTypes::getAsn1EnumBitSize());
+    enumAsn1EnumeratedType->setAcnMinSizeInBits(MatLabStandardDataTypes::getAsn1EnumBitSize());
+    enumAsn1EnumeratedType->setAcnMaxSizeInBits(MatLabStandardDataTypes::getAsn1EnumBitSize());
     enumAsn1EnumeratedType->setEncodeValues(true);
 
     const auto &simulinkEnumValues = simulinkEnumType.enumValues();

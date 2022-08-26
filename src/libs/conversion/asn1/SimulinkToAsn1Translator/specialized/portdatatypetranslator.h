@@ -27,8 +27,8 @@
 namespace conversion::asn1::translator {
 
 /**
- * @brief   When [in/out]port has "Port Dimensions" parameter different from -1 or greater than 1 or it is a vector [n
- * m], then new ASN1 data type has to be created.
+ * @brief   When port (inport or outport) has "Port Dimensions" parameter different from -1 or greater than 1 or it is a vector
+ * [n m], then new ASN1 data type has to be created.
  */
 class PortDataTypeTranslator final
 {
@@ -63,9 +63,9 @@ public:
 
 public:
     /**
-     * @brief   Translation [in/out]port data type to ASN1
+     * @brief   Translation port data type to ASN1, if necessary
      *
-     * @param   port    [in/out]port to translation
+     * @param   port    port (inport or outport) to translation
      */
     auto translate(const simulink::model::Port &port) -> void;
 

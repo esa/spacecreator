@@ -34,7 +34,7 @@ namespace conversion::asn1::translator {
 class DataTypesDependencyResolver final
 {
 private:
-    /// @brief  Type of the mark for the soring
+    /// @brief  Type of the mark for the sorting
     enum class MarkType
     {
         Temporary,
@@ -66,11 +66,8 @@ private:
 
     auto findDataType(const QString &dataTypeName) -> const simulink::model::DataType &;
 
-    auto markTemporary(const simulink::model::DataType &dataType) -> void;
-    auto markPermanent(const simulink::model::DataType &dataType) -> void;
-
-    auto isTemporarilyMarked(const simulink::model::DataType &dataType) -> bool;
-    auto isPermanentlyMarked(const simulink::model::DataType &dataType) -> bool;
+    auto markDataTypeAs(const simulink::model::DataType &dataType, MarkType markType) -> void;
+    auto isDataTypeMarkedAs(const simulink::model::DataType &dataType, MarkType markType) const -> bool;
 
 private:
     const SimulinkDataTypes &m_simulinkDataTypes;
