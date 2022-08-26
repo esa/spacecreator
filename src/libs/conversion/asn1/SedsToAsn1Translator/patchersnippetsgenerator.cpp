@@ -19,12 +19,12 @@
 
 #include "patchersnippetsgenerator.h"
 
+#include <QIODevice>
 #include <QTextStream>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <seds/SedsModel/package/package.h>
-#include <QIODevice>
 
 using conversion::translator::TranslationException;
 
