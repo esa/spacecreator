@@ -33,6 +33,7 @@ namespace conversion::sdl::translator {
 
 ChartTranslator::ChartTranslator(SdlModel *sdlModel, const Options &options)
     : m_neverSequenceTranslator(sdlModel, options)
+    , m_whenSequenceTranslator(sdlModel, options)
 {
 }
 
@@ -45,11 +46,9 @@ void ChartTranslator::translateChart(const MscChart *mscChart)
     case ObserverType::Never:
         m_neverSequenceTranslator.createObserver(mscChart);
         break;
-    case ObserverType::When: {
-        auto errorMessage = QString("Cannot translate chart '%1' - \"when\" observers are not yet implemented")
-                                    .arg(mscChart->name());
-        throw TranslationException(std::move(errorMessage));
-    } break;
+    case ObserverType::When:
+        m_whenSequenceTranslator.createObserver(mscChart);
+        break;
     case ObserverType::None: {
         auto errorMessage = QString(
                 "Cannot translate chart '%1' - first chart item is not a \"never\" nor \"when\" shared condition")

@@ -25,6 +25,10 @@
 
 namespace ivm {
 
+/**
+* @brief IVArchetypeReference reference for archetype function in function type
+* It is used to specify which archetype functions are implemented in specific function type
+*/
 class IVArchetypeReference : public IVObject
 {
     Q_OBJECT

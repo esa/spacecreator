@@ -1,5 +1,7 @@
 # SDL
+SEDS_CONVERTER?=spacecreator.AppImage --sedsconverter
 OPENGEODE?=opengeode
+VISUAL?=kate
 
 all: compile-linux
 
