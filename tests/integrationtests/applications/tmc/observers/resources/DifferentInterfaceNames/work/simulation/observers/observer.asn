@@ -67,6 +67,8 @@ BEGIN
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
       Actuator-Context   FROM Actuator-Datamodel
       Controller-Context FROM Controller-Datamodel
@@ -157,13 +159,39 @@ BEGIN
    --  Global system state (excluding observers, which are defined later)
    actuator-queue-size INTEGER ::= 2
    controller-queue-size INTEGER ::= 2
+
    System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
       --  Message queues
       actuator-queue   Events-Ty (SIZE (0 .. actuator-queue-size)),
       controller-queue Events-Ty (SIZE (0 .. controller-queue-size)),
 
       actuator    Actuator-Context,
       controller  Controller-Context
+   }
+
+END
+
+Simulation-Timers-DataView DEFINITIONS ::=
+BEGIN
+
+   TimerData ::= SEQUENCE {
+      timer-enabled BOOLEAN,
+      interval INTEGER (0 .. 50000)
+   }
+
+   AggregateTimerData ::= SEQUENCE {
+      
+      
+      
+      actuator SEQUENCE {
+      },
+      
+      controller SEQUENCE {
+      },
+      
+      dummy-entry SEQUENCE {}
    }
 
 END
