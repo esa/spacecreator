@@ -21,6 +21,7 @@
 
 #include <asn1library/asn1/file.h>
 #include <conversion/common/translation/translator.h>
+#include <ivcore/ivmodel.h>
 #include <msccore/mscmodel.h>
 #include <sdl/SdlModel/sdlmodel.h>
 
@@ -72,7 +73,7 @@ private:
      *
      * @return  Result SDL model
      */
-    auto translateMscModel(const ::msc::MscModel *mscModel, const Asn1Acn::File *observerAsn1File,
+    auto translateMscModel(const ::msc::MscModel *mscModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel,
             const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 };
 

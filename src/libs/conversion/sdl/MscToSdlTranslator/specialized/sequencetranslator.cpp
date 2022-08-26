@@ -26,6 +26,7 @@
 
 using conversion::msc::MscOptions;
 using conversion::translator::TranslationException;
+using ivm::IVModel;
 using sdl::Block;
 using sdl::Input;
 using sdl::NextState;
@@ -40,9 +41,10 @@ using sdl::VariableDeclaration;
 namespace conversion::sdl::translator {
 
 SequenceTranslator::SequenceTranslator(
-        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options)
+        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options)
     : m_sdlModel(sdlModel)
     , m_observerAsn1File(observerAsn1File)
+    , m_ivModel(ivModel)
     , m_options(options)
 {
 }

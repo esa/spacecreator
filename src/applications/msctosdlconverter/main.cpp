@@ -20,14 +20,19 @@
 #include <QCoreApplication>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/Asn1Options/options.h>
+#include <conversion/iv/IvOptions/options.h>
+#include <conversion/iv/IvXmlImporter/importer.h>
 #include <conversion/msc/MscImporter/importer.h>
 #include <conversion/msc/MscOptions/options.h>
 #include <conversion/sdl/MscToSdlTranslator/translator.h>
 #include <cstdlib>
 #include <iostream>
+#include <ivcore/ivlibrary.h>
+#include <ivcore/ivpropertytemplateconfig.h>
 #include <msccore/msclibrary.h>
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlOptions/options.h>
+#include <shared/common.h>
 
 int main(int argc, char **argv)
 {
@@ -38,11 +43,17 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+    ivm::initIVLibrary();
     msc::initMscLibrary();
+
+    auto dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
+    dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
     conversion::Options options;
     options.add(conversion::msc::MscOptions::inputFilepath, QString(argv[1]));
     options.add(conversion::asn1::Asn1Options::inputFilepath, "observer.asn");
+    options.add(conversion::iv::IvOptions::inputFilepath, "interfaceview.xml");
+    options.add(conversion::iv::IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
 
     conversion::msc::importer::MscImporter mscImporter;
     auto mscModel = mscImporter.importModel(options);
@@ -50,8 +61,11 @@ int main(int argc, char **argv)
     conversion::asn1::importer::Asn1Importer asn1Importer;
     auto asn1Model = asn1Importer.importModel(options);
 
+    conversion::iv::importer::IvXmlImporter ivImporter;
+    auto ivModel = ivImporter.importModel(options);
+
     conversion::sdl::translator::MscToSdlTranslator translator;
-    auto outputModels = translator.translateModels({ mscModel.get(), asn1Model.get() }, options);
+    auto outputModels = translator.translateModels({ mscModel.get(), asn1Model.get(), ivModel.get() }, options);
     auto sdlModel = dynamic_cast<sdl::SdlModel *>(outputModels[0].get());
 
     sdl::exporter::SdlExporter exporter;

@@ -28,6 +28,7 @@
 
 using Asn1Acn::Asn1Model;
 using conversion::translator::TranslationException;
+using ivm::IVModel;
 using msc::MscModel;
 using sdl::SdlModel;
 
@@ -40,6 +41,7 @@ std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateModels(
 
     const auto *mscModel = getModel<MscModel>(sourceModels);
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
+    const auto *ivModel = getModel<IVModel>(sourceModels);
 
     if (asn1Model->data().empty()) {
         throw TranslationException("Missing observer.asn file in the MSC to SDL translation");
@@ -49,7 +51,7 @@ std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateModels(
 
     const auto *observerAsn1File = asn1Model->data().front().get();
 
-    return translateMscModel(mscModel, observerAsn1File, options);
+    return translateMscModel(mscModel, observerAsn1File, ivModel, options);
 }
 
 ModelType MscToSdlTranslator::getSourceModelType() const
@@ -64,16 +66,16 @@ ModelType MscToSdlTranslator::getTargetModelType() const
 
 std::set<ModelType> MscToSdlTranslator::getDependencies() const
 {
-    static std::set<ModelType> dependencies { ModelType::Msc, ModelType::Asn1 };
+    static std::set<ModelType> dependencies { ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView };
     return dependencies;
 }
 
 std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(
-        const MscModel *mscModel, const Asn1Acn::File *observerAsn1File, const Options &options) const
+        const MscModel *mscModel, const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options) const
 {
     auto sdlModel = std::make_unique<SdlModel>();
 
-    DocumentTranslator documentTranslator(sdlModel.get(), observerAsn1File, options);
+    DocumentTranslator documentTranslator(sdlModel.get(), observerAsn1File, ivModel, options);
     for (const auto mscDocument : mscModel->allDocuments()) {
         documentTranslator.translateDocument(mscDocument);
     }

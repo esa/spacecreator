@@ -23,6 +23,7 @@
 
 #include <asn1library/asn1/file.h>
 #include <conversion/common/options.h>
+#include <ivcore/ivmodel.h>
 #include <memory>
 #include <msccore/mscparameterlist.h>
 #include <sdl/SdlModel/rename.h>
@@ -39,9 +40,10 @@ public:
      *
      * @param   sdlModel            Parent SDL model
      * @param   observerAsn1File    ASN.1 with observer dataview
+     * @param   ivModel             IV model
      * @param   options             Conversion options
      */
-    SequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options);
+    SequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel, const Options &options);
 
     /**
      * @brief   Deleted copy constuctor
@@ -93,6 +95,7 @@ protected:
 
     ::sdl::SdlModel *m_sdlModel;
     const Asn1Acn::File *m_observerAsn1File;
+    const ivm::IVModel *m_ivModel;
     const Options &m_options;
 };
 

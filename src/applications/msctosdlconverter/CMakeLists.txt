@@ -10,8 +10,10 @@ target_link_libraries(MscToSdlConverter
     PRIVATE     CommonProjectWarnings
                 msccore
                 ASN1::Importer
+                IV::XmlImporter
                 MSC::Importer
                 SDL::Exporter
+                shared
                 Conversion::MscToSdlTranslator)
 set_target_properties(MscToSdlConverter PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

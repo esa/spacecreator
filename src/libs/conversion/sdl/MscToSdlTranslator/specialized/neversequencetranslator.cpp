@@ -23,6 +23,7 @@
 #include <conversion/common/translation/exceptions.h>
 
 using conversion::translator::TranslationException;
+using ivm::IVModel;
 using msc::MscChart;
 using msc::MscEntity;
 using msc::MscInstanceEvent;
@@ -34,8 +35,8 @@ using sdl::StateMachine;
 namespace conversion::sdl::translator {
 
 NeverSequenceTranslator::NeverSequenceTranslator(
-        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options)
-    : SequenceTranslator(sdlModel, observerAsn1File, options)
+        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options)
+    : SequenceTranslator(sdlModel, observerAsn1File, ivModel, options)
 {
 }
 
@@ -126,6 +127,8 @@ std::unique_ptr<StateMachine> NeverSequenceTranslator::createStateMachine(
 
     auto states = createStates(context.sequence.size());
     context.errorState = states.back().get();
+
+    parseMessageParameters(context.signals);
 
     TFTable table(context.sequence, context.signals.size());
     auto transitions = createTransitions(table, states, 0);

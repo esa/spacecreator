@@ -25,6 +25,7 @@
 #include <sdl/SdlModel/nextstate.h>
 
 using conversion::translator::TranslationException;
+using ivm::IVModel;
 using msc::MscChart;
 using msc::MscCondition;
 using msc::MscEntity;
@@ -41,8 +42,8 @@ using sdl::Transition;
 namespace conversion::sdl::translator {
 
 WhenSequenceTranslator::WhenSequenceTranslator(
-        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const Options &options)
-    : SequenceTranslator(sdlModel, observerAsn1File, options)
+        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options)
+    : SequenceTranslator(sdlModel, observerAsn1File, ivModel, options)
 {
 }
 

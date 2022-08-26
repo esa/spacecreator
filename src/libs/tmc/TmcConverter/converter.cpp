@@ -325,7 +325,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         }
     }
 
-    if (!convertMscObservers()) {
+    if (!convertMscObservers(outputOptimizedIvFileName)) {
         return false;
     }
 
@@ -477,7 +477,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
     return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
-bool TmcConverter::convertMscObservers()
+bool TmcConverter::convertMscObservers(const QString &ivFilePath)
 {
     for (const QString &mscFilePath : m_mscObserverFiles) {
         QFileInfo mscFile(mscFilePath);
@@ -494,6 +494,8 @@ bool TmcConverter::convertMscObservers()
 
         options.add(MscOptions::inputFilepath, mscFilePath);
         options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
+        options.add(IvOptions::inputFilepath, ivFilePath)
+        options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
         options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
         options.add(SdlOptions::filepathPrefix, outputPath);
 

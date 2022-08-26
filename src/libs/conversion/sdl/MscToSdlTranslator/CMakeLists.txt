@@ -25,6 +25,7 @@ target_include_directories(MscToSdlTranslator
 target_link_libraries(MscToSdlTranslator
     PUBLIC      Conversion::Common
                 asn1library
+                ivcore
                 msccore
                 SdlModel
     PRIVATE     CommonProjectWarnings)
