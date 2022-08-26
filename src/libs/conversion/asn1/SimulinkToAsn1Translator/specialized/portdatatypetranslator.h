@@ -27,8 +27,8 @@
 namespace conversion::asn1::translator {
 
 /**
- * @brief   When port (inport or outport) has "Port Dimensions" parameter different from -1 or greater than 1 or it is a vector
- * [n m], then new ASN1 data type has to be created.
+ * @brief   When port (inport or outport) has "Port Dimensions" parameter different from -1 or greater than 1 or it is a
+ * vector [n m], then new ASN1 data type has to be created.
  */
 class PortDataTypeTranslator final
 {
