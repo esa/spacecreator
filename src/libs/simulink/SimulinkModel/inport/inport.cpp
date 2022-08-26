@@ -21,46 +21,6 @@
 
 namespace simulink::model {
 
-const common::String &Inport::outDataTypeStr() const
-{
-    return m_outDataTypeStr;
-}
-
-void Inport::setOutDataTypeStr(common::String outDataTypeStr)
-{
-    m_outDataTypeStr = std::move(outDataTypeStr);
-}
-
-const common::String &Inport::busObject() const
-{
-    return m_busObject;
-}
-
-void Inport::setBusObject(common::String busObject)
-{
-    m_busObject = std::move(busObject);
-}
-
-const common::String &Inport::busOutputAsStruct() const
-{
-    return m_busOutputAsStruct;
-}
-
-void Inport::setBusOutputAsStruct(common::String busOutputAsStruct)
-{
-    m_busOutputAsStruct = std::move(busOutputAsStruct);
-}
-
-const common::String &Inport::iconDisplay() const
-{
-    return m_iconDisplay;
-}
-
-void Inport::setIconDisplay(common::String iconDisplay)
-{
-    m_iconDisplay = std::move(iconDisplay);
-}
-
 const common::String &Inport::interpolate() const
 {
     return m_interpolate;
@@ -91,36 +51,6 @@ void Inport::setLatchInputForFeedbackSignals(common::String latchInputForFeedbac
     m_latchInputForFeedbackSignals = std::move(latchInputForFeedbackSignals);
 }
 
-const common::String &Inport::lockScale() const
-{
-    return m_lockScale;
-}
-
-void Inport::setLockScale(common::String lockScale)
-{
-    m_lockScale = std::move(lockScale);
-}
-
-const common::String &Inport::outMax() const
-{
-    return m_outMax;
-}
-
-void Inport::setOutMax(common::String outMax)
-{
-    m_outMax = std::move(outMax);
-}
-
-const common::String &Inport::outMin() const
-{
-    return m_outMin;
-}
-
-void Inport::setOutMin(common::String outMin)
-{
-    m_outMin = std::move(outMin);
-}
-
 const common::String &Inport::outputSignalNames() const
 {
     return m_outputSignalNames;
@@ -129,76 +59,6 @@ const common::String &Inport::outputSignalNames() const
 void Inport::setOutputSignalNames(common::String outputSignalNames)
 {
     m_outputSignalNames = std::move(outputSignalNames);
-}
-
-const common::String &Inport::port() const
-{
-    return m_port;
-}
-
-void Inport::setPort(common::String port)
-{
-    m_port = std::move(port);
-}
-
-const PortDimension &Inport::portDimensions() const
-{
-    return m_portDimensions;
-}
-
-void Inport::setPortDimensions(PortDimension portDimensions)
-{
-    m_portDimensions = std::move(portDimensions);
-}
-
-const common::String &Inport::sampleTime() const
-{
-    return m_sampleTime;
-}
-
-void Inport::setSampleTime(common::String sampleTime)
-{
-    m_sampleTime = std::move(sampleTime);
-}
-
-SignalType Inport::signalType() const
-{
-    return m_signalType;
-}
-
-void Inport::setSignalType(SignalType signalType)
-{
-    m_signalType = signalType;
-}
-
-const common::String &Inport::unit() const
-{
-    return m_unit;
-}
-
-void Inport::setUnit(common::String unit)
-{
-    m_unit = std::move(unit);
-}
-
-const common::String &Inport::unitNoProp() const
-{
-    return m_unitNoProp;
-}
-
-void Inport::setUnitNoProp(common::String unitNoProp)
-{
-    m_unitNoProp = std::move(unitNoProp);
-}
-
-const common::String &Inport::useBusObject() const
-{
-    return m_useBusObject;
-}
-
-void Inport::setUseBusObject(common::String useBusObject)
-{
-    m_useBusObject = std::move(useBusObject);
 }
 
 } // namespace simulink::model

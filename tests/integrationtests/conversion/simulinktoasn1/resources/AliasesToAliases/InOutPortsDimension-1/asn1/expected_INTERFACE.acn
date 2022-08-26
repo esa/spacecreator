@@ -1,0 +1,21 @@
+INTERFACE DEFINITIONS ::= BEGIN
+AliasBoolean []
+AliasDouble []
+AliasInt16 []
+AliasInt32 []
+AliasInt8 []
+AliasSingle []
+AliasToAliasBoolean []
+AliasToAliasDouble []
+AliasToAliasInt16 []
+AliasToAliasInt32 []
+AliasToAliasInt8 []
+AliasToAliasSingle []
+AliasUInt16 []
+AliasToAliasUInt16 []
+AliasUInt32 []
+AliasToAliasUInt32 []
+AliasUInt8 []
+AliasToAliasUInt8 []
+END
+

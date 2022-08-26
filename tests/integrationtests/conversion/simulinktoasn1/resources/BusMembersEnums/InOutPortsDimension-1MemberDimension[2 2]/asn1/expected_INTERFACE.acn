@@ -1,0 +1,18 @@
+INTERFACE DEFINITIONS ::= BEGIN
+BoolSimulinkIntEnumType [size 32, encoding twos-complement, encode-values]
+BoolUInt8Enum [size 32, encoding pos-int, encode-values]
+BoolUInt16Enum [size 32, encoding pos-int, encode-values]
+BoolInt8Enum [size 32, encoding twos-complement, encode-values]
+BoolInt16Enum [size 32, encoding twos-complement, encode-values]
+BoolInt32Enum [size 32, encoding twos-complement, encode-values]
+BusDef []
+{
+    boolSimulinkIntEnumTypeMember [],
+    boolUInt8EnumMember [],
+    boolUInt16EnumMember [],
+    boolInt8EnumMember [],
+    boolInt16EnumMember [],
+    boolInt32EnumMember []
+}
+END
+

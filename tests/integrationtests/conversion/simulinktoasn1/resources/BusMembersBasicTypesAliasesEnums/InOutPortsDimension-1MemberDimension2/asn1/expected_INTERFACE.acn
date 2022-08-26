@@ -1,0 +1,57 @@
+INTERFACE DEFINITIONS ::= BEGIN
+AliasBoolean []
+AliasDouble []
+AliasInt16 []
+AliasInt32 []
+AliasInt8 []
+AliasSingle []
+AliasUInt16 []
+AliasUInt32 []
+AliasUInt8 []
+BusAliasesToStandardTypesDef []
+{
+    aliasBooleanMember [],
+    aliasDoubleMember [],
+    aliasSingleMember [],
+    aliasInt8Member [],
+    aliasInt16Member [],
+    aliasInt32Member [],
+    aliasUInt8Member [],
+    aliasUInt16Member [],
+    aliasUInt32Member []
+}
+BusStandardTypesDef []
+{
+    doubleMember [],
+    singleMember [],
+    int8Member [],
+    uint8Member [],
+    int16Member [],
+    uint16Member [],
+    int32Member [],
+    uint32Member [],
+    booleanMember []
+}
+BoolSimulinkIntEnumType [size 32, encoding twos-complement, encode-values]
+BoolUInt8Enum [size 32, encoding pos-int, encode-values]
+BoolUInt16Enum [size 32, encoding pos-int, encode-values]
+BoolInt8Enum [size 32, encoding twos-complement, encode-values]
+BoolInt16Enum [size 32, encoding twos-complement, encode-values]
+BoolInt32Enum [size 32, encoding twos-complement, encode-values]
+BusEnumsDef []
+{
+    boolSimulinkIntEnumTypeMember [],
+    boolUInt8EnumMember [],
+    boolUInt16EnumMember [],
+    boolInt8EnumMember [],
+    boolInt16EnumMember [],
+    boolInt32EnumMember []
+}
+BusDef []
+{
+    busStandardTypesDefMember [],
+    busAliasesToStandardTypesDefMember [],
+    busEnumsDefMember []
+}
+END
+

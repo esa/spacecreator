@@ -1,0 +1,12 @@
+MATLAB-STANDARD-DATATYPES DEFINITIONS ::= BEGIN
+MatLab-Boolean [true-value '1'B, false-value '0'B]
+MatLab-Double [encoding IEEE754-1985-64]
+MatLab-Single [encoding IEEE754-1985-32]
+MatLab-Int8 [size 8, encoding twos-complement]
+MatLab-Uint8 [size 8, encoding pos-int]
+MatLab-Int16 [size 16, encoding twos-complement]
+MatLab-Uint16 [size 16, encoding pos-int]
+MatLab-Int32 [size 32, encoding twos-complement]
+MatLab-Uint32 [size 32, encoding pos-int]
+END
+

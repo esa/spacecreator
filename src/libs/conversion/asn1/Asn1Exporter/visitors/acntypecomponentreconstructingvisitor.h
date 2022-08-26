@@ -70,6 +70,7 @@ private:
     void tryAppendPattern(const Types::Null &type, QStringList &params) const;
     void tryAppendSavePosition(const Types::Null &type, QStringList &params) const;
     void tryAppendTerminationPattern(const Types::AsciiStringAcnParameters &type, QStringList &params) const;
+    void tryAppendEncodeValues(const Types::Enumerated &type, QStringList &params) const;
 
     void tryAppendPresentWhen(QStringList &params) const;
     void tryAppendSize(const Types::Boolean &type, QStringList &params) const;
