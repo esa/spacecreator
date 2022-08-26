@@ -21,9 +21,9 @@
 
 #include "datareconstructor/datareconstructor.h"
 
-#include <optional>
 #include <QDataStream>
 #include <QTextStream>
+#include <optional>
 
 namespace testgenerator {
 
