@@ -24,7 +24,7 @@
 
 namespace csv {
 
-Row::Row() {}
+Row::Row() { }
 
 Row::Row(const QStringList &fields)
 {
@@ -43,5 +43,4 @@ void Row::addField(const Field &field)
 {
     m_fields.push_back(field);
 }
-
 }
