@@ -550,7 +550,7 @@ void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
     }
 
     // build and run the exhaustive simulator
-    QString callSimCmd = "xterm -hold -e make native_modelchecker && work/simulation/modelcheck";
+    QString callSimCmd = "xterm -hold -e make native_modelchecker";
     if (QProcess::execute(callSimCmd) != 0) {
         QMessageBox::warning(this, tr("Exhaustive Simulator"),
                              "Error executing: " + callSimCmd);
