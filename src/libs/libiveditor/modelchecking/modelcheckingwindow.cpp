@@ -532,7 +532,7 @@ void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
     }
 
     // build and run the interactive simulator
-    QString callSimCmd = "xterm -e '/usr/bin/make simu; read -p 'Press Enter to close''";
+    QString callSimCmd = "xterm -e make simu";
     if (QProcess::execute(callSimCmd) != 0) {
         QMessageBox::warning(this, tr("Interactive Simulator"),
                              "Error executing: " + callSimCmd);
@@ -550,7 +550,7 @@ void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
     }
 
     // build and run the exhaustive simulator
-    QString callSimCmd = "xterm -e '/usr/bin/make native_modelchecker; read -p 'Press Enter to close''";
+    QString callSimCmd = "xterm -hold -e make native_modelchecker";
     if (QProcess::execute(callSimCmd) != 0) {
         QMessageBox::warning(this, tr("Exhaustive Simulator"),
                              "Error executing: " + callSimCmd);
