@@ -31,6 +31,7 @@ private Q_SLOTS:
     void test_interfaceViewOptimizer();
     void test_interfaceViewOptimizer_standalone();
     void test_interfaceViewOptimizer_keep();
+    void test_interfaceViewOptimizer_ergo();
 };
 
 void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer()
@@ -48,6 +49,12 @@ void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_standalone()
 void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_keep()
 {
     const int result = system("./test_interface_view_optimizer_keep.sh");
+    QCOMPARE(result, 0);
+}
+
+void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_ergo()
+{
+    const int result = system("./test_interface_view_optimizer_ergo.sh");
     QCOMPARE(result, 0);
 }
 
