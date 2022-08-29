@@ -80,3 +80,5 @@ ColumnLimit: 120
 SortIncludes: true
 IncludeBlocks: Regroup
 AlignAfterOpenBracket: DontAlign
+
+SpaceInEmptyBlock: false

@@ -24,7 +24,7 @@
 
 namespace csv {
 
-Row::Row() { }
+Row::Row() {}
 
 Row::Row(const QStringList &fields)
 {
