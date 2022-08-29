@@ -81,4 +81,3 @@ SortIncludes: true
 IncludeBlocks: Regroup
 AlignAfterOpenBracket: DontAlign
 
-SpaceInEmptyBlock: false
