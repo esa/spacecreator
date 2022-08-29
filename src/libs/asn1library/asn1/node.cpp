@@ -26,4 +26,4 @@
 
 using namespace Asn1Acn;
 
-Node::~Node() { }
+Node::~Node() {}
