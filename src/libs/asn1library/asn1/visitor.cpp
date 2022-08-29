@@ -26,4 +26,4 @@
 
 using namespace Asn1Acn;
 
-Visitor::~Visitor() { }
+Visitor::~Visitor() {}

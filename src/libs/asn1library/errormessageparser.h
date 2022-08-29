@@ -37,7 +37,7 @@ namespace Asn1Acn {
 class ErrorMessageParser
 {
 public:
-    explicit ErrorMessageParser( );
+    explicit ErrorMessageParser();
     Asn1Acn::ErrorMessage parse(const QString &message) const;
 };
 

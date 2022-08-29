@@ -44,7 +44,7 @@ TypeAssignment::TypeAssignment(const TypeAssignment &other)
 {
 }
 
-TypeAssignment::~TypeAssignment() { }
+TypeAssignment::~TypeAssignment() {}
 
 const QString &TypeAssignment::cName() const
 {

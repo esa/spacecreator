@@ -26,4 +26,4 @@
 
 using namespace Asn1Acn::Types;
 
-TypeMutatingVisitor::~TypeMutatingVisitor() { }
+TypeMutatingVisitor::~TypeMutatingVisitor() {}

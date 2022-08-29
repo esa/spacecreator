@@ -36,7 +36,7 @@ class Project;
 class Visitor
 {
 protected:
-    Visitor() { }
+    Visitor() {}
 
 public:
     virtual ~Visitor();

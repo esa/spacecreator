@@ -39,7 +39,7 @@ template<typename ValueType>
 class ConstraintList : public Constraint<ValueType>
 {
 public:
-    ConstraintList() { }
+    ConstraintList() {}
     ConstraintList(const ConstraintList &other);
 
     const std::vector<std::unique_ptr<Constraint<ValueType>>> &constraints() const { return m_constraints; }

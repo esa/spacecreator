@@ -36,7 +36,7 @@ class Project;
 class MutatingVisitor
 {
 protected:
-    MutatingVisitor() { }
+    MutatingVisitor() {}
 
 public:
     virtual ~MutatingVisitor();
