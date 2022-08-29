@@ -29,7 +29,7 @@
 
 using namespace Asn1Acn;
 
-ErrorMessageParser::ErrorMessageParser() { }
+ErrorMessageParser::ErrorMessageParser() {}
 
 Asn1Acn::ErrorMessage ErrorMessageParser::parse(const QString &message) const
 {
