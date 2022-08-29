@@ -118,7 +118,7 @@ void Asn1ModelStorage::invalidateStorage()
             [&fileInfos](const QString &fileName) { fileInfos.append(QFileInfo(fileName)); });
     m_store = parser.parseAsn1Files(fileInfos, &errorMessages);
     if (m_store.empty()) {
-        qWarning() << "Can't read file(s)" << fileNames.join(", ") << ":" << errorMessages.join(", ");
+        qWarning() << "Can't read file(s) " << fileNames.join(", ") << ":" << errorMessages.join(", ");
         Q_EMIT error(fileNames, errorMessages);
         return;
     }
