@@ -80,7 +80,7 @@ public:
     {
     }
 
-    ~TypeAttributesAssigningVisitor() override { }
+    ~TypeAttributesAssigningVisitor() override {}
 
     void visit(Types::Boolean &type) override
     {
@@ -178,7 +178,7 @@ public:
     {
     }
 
-    ~ChildItemAddingVisitor() override { }
+    ~ChildItemAddingVisitor() override {}
 
     void visit(Types::Boolean &type) override { Q_UNUSED(type); }
     void visit(Types::Null &type) override { Q_UNUSED(type); }
@@ -296,7 +296,7 @@ public:
     {
     }
 
-    ~AcnDefinedItemsAddingVisitor() override { }
+    ~AcnDefinedItemsAddingVisitor() override {}
 
     void visit(Types::Boolean &type) override { Q_UNUSED(type); }
     void visit(Types::Null &type) override { Q_UNUSED(type); }
