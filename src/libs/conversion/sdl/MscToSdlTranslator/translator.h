@@ -73,8 +73,8 @@ private:
      *
      * @return  Result SDL model
      */
-    auto translateMscModel(const ::msc::MscModel *mscModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel,
-            const Options &options) const -> std::vector<std::unique_ptr<Model>>;
+    auto translateMscModel(const ::msc::MscModel *mscModel, const Asn1Acn::File *observerAsn1File,
+            const ivm::IVModel *ivModel, const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 };
 
 } // namespace conversion::sdl::translator

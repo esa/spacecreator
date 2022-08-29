@@ -42,7 +42,8 @@ public:
      * @param   ivModel             IV model
      * @param   options             Conversion options
      */
-    DocumentTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel, const Options &options);
+    DocumentTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel,
+            const Options &options);
 
     /**
      * @brief   Deleted copy constuctor

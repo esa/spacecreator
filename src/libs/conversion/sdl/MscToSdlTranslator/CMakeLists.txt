@@ -1,13 +1,16 @@
 project(MscToSdlTranslator VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES     tftable.cpp
+set(SOURCES     mscparametervalueparser.cpp
+                tftable.cpp
                 translator.cpp
                 specialized/charttranslator.cpp
                 specialized/documenttranslator.cpp
                 specialized/neversequencetranslator.cpp
                 specialized/sequencetranslator.cpp
                 specialized/whensequencetranslator.cpp)
-set(INCLUDES    tftable.h
+set(INCLUDES    mscparametervalueparser.h
+                signalinfo.h
+                tftable.h
                 translator.h
                 specialized/charttranslator.h
                 specialized/documenttranslator.h

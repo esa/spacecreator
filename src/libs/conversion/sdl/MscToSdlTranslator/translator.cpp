@@ -70,8 +70,8 @@ std::set<ModelType> MscToSdlTranslator::getDependencies() const
     return dependencies;
 }
 
-std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(
-        const MscModel *mscModel, const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options) const
+std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(const MscModel *mscModel,
+        const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options) const
 {
     auto sdlModel = std::make_unique<SdlModel>();
 

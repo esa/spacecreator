@@ -19,14 +19,13 @@
 
 #pragma once
 
+#include "signalinfo.h"
 #include "tftable.h"
 
 #include <asn1library/asn1/file.h>
 #include <conversion/common/options.h>
 #include <ivcore/ivmodel.h>
 #include <memory>
-#include <msccore/mscparameterlist.h>
-#include <sdl/SdlModel/rename.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <vector>
 
@@ -43,7 +42,8 @@ public:
      * @param   ivModel             IV model
      * @param   options             Conversion options
      */
-    SequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel, const Options &options);
+    SequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel,
+            const Options &options);
 
     /**
      * @brief   Deleted copy constuctor
@@ -66,11 +66,6 @@ public:
 protected:
     using StateList = std::vector<std::unique_ptr<::sdl::State>>;
     using TransitionList = std::vector<std::unique_ptr<::sdl::Transition>>;
-
-    struct SignalInfo {
-        std::unique_ptr<::sdl::Rename> signal;
-        msc::MscParameterList parameterList;
-    };
 
     auto createSdlProcess(const QString &chartName, std::unique_ptr<::sdl::StateMachine> stateMachine)
             -> ::sdl::Process;

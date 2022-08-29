@@ -19,6 +19,8 @@
 
 #include "specialized/neversequencetranslator.h"
 
+#include "mscparametervalueparser.h"
+
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 
@@ -128,7 +130,8 @@ std::unique_ptr<StateMachine> NeverSequenceTranslator::createStateMachine(
     auto states = createStates(context.sequence.size());
     context.errorState = states.back().get();
 
-    parseMessageParameters(context.signals);
+    MscParameterValueParser messageParser(context.chartName, m_observerAsn1File, m_ivModel);
+    messageParser.parseSignals(context.signals);
 
     TFTable table(context.sequence, context.signals.size());
     auto transitions = createTransitions(table, states, 0);
