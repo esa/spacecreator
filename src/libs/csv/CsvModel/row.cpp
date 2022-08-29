@@ -28,10 +28,7 @@ Row::Row() { }
 
 Row::Row(const QStringList &fields)
 {
-    std::for_each(fields.begin(), fields.end(),
-            [&](const QString &field) { //
-                m_fields.push_back(field);
-            });
+    std::for_each(fields.begin(), fields.end(), [&](const QString &field) { m_fields.push_back(field); });
 }
 
 std::vector<Field> Row::fields() const
