@@ -42,12 +42,13 @@ using conversion::simulink::SimulinkOptions;
 using simulink::model::Dimensions;
 using simulink::model::VectorDimensions;
 
+namespace {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 auto SkipEmptyParts = QString::SkipEmptyParts;
 #else
 auto SkipEmptyParts = Qt::SkipEmptyParts;
 #endif
-
+}
 namespace simulink::importer {
 
 std::unique_ptr<conversion::Model> SimulinkXmlImporter::importModel(const Options &options) const
