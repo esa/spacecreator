@@ -7,7 +7,7 @@ from fnmatch import fnmatch
 
 
 def clang_format(root_dir: str) -> None:
-    clang_format_cmd = ['clang-format']
+    clang_format_cmd = ['clang-format' '-i']
     for path, subdirs, files in os.walk(root_dir):
         for name in files:
             if fnmatch(name, "*.h") or fnmatch(name, "*.cpp"):
