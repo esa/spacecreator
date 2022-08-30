@@ -94,9 +94,9 @@ static auto translateAsnToPromela(const QString &inputAsnFilename, const QString
         const QString &actualOutputFilename) -> void;
 static auto compareTextFiles(const QString &actualOutputFilename, const QString &expectedOutputFilename) -> void;
 
-void tst_Asn1ToPromelaTranslator_Env::initTestCase() { }
+void tst_Asn1ToPromelaTranslator_Env::initTestCase() {}
 
-void tst_Asn1ToPromelaTranslator_Env::cleanupTestCase() { }
+void tst_Asn1ToPromelaTranslator_Env::cleanupTestCase() {}
 
 void tst_Asn1ToPromelaTranslator_Env::testBoolean() const
 {

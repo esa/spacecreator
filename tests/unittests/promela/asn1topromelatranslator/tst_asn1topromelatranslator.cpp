@@ -88,9 +88,9 @@ using promela::translator::PromelaTypeSorter;
 
 namespace tmc::test {
 
-void tst_Asn1ToPromelaTranslator::initTestCase() { }
+void tst_Asn1ToPromelaTranslator::initTestCase() {}
 
-void tst_Asn1ToPromelaTranslator::cleanupTestCase() { }
+void tst_Asn1ToPromelaTranslator::cleanupTestCase() {}
 
 void tst_Asn1ToPromelaTranslator::testBasicTypes()
 {

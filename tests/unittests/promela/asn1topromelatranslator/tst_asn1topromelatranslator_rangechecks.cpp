@@ -51,9 +51,9 @@ using promela::translator::Asn1NodeVisitor;
 
 namespace tmc::test {
 
-void tst_Asn1ToPromelaTranslator_RangeChecks::initTestCase() { }
+void tst_Asn1ToPromelaTranslator_RangeChecks::initTestCase() {}
 
-void tst_Asn1ToPromelaTranslator_RangeChecks::cleanupTestCase() { }
+void tst_Asn1ToPromelaTranslator_RangeChecks::cleanupTestCase() {}
 
 void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
 {

@@ -291,23 +291,11 @@ void tst_Asn1ValueParser::testChoiceValue()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Choice>();
-    auto choice1 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
-            "choiceInt",
-            "choiceInt",
-            "choiceInt",
-            "choiceInt",
-            "",
-            Asn1Acn::SourceLocation(),
-            std::make_unique<Asn1Acn::Types::Integer>("choiceInt"));
+    auto choice1 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>("choiceInt", "choiceInt", "choiceInt",
+            "choiceInt", "", Asn1Acn::SourceLocation(), std::make_unique<Asn1Acn::Types::Integer>("choiceInt"));
     type->addComponent(std::move(choice1));
-    auto choice2 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
-            "choiceReal",
-            "choiceReal",
-            "choiceReal",
-            "choiceReal",
-            "",
-            Asn1Acn::SourceLocation(),
-            std::make_unique<Asn1Acn::Types::Real>("choiceReal"));
+    auto choice2 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>("choiceReal", "choiceReal", "choiceReal",
+            "choiceReal", "", Asn1Acn::SourceLocation(), std::make_unique<Asn1Acn::Types::Real>("choiceReal"));
     type->addComponent(std::move(choice2));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyChoice", "MyChoice", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "choiceReal : 31.07");
@@ -327,23 +315,11 @@ void tst_Asn1ValueParser::testChoiceValueError()
 
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Choice>();
-    auto choice1 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
-            "choiceInt",
-            "choiceInt",
-            "choiceInt",
-            "choiceInt",
-            "",
-            Asn1Acn::SourceLocation(),
-            std::make_unique<Asn1Acn::Types::Integer>("choiceInt"));
+    auto choice1 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>("choiceInt", "choiceInt", "choiceInt",
+            "choiceInt", "", Asn1Acn::SourceLocation(), std::make_unique<Asn1Acn::Types::Integer>("choiceInt"));
     type->addComponent(std::move(choice1));
-    auto choice2 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
-            "choiceReal",
-            "choiceReal",
-            "choiceReal",
-            "choiceReal",
-            "",
-            Asn1Acn::SourceLocation(),
-            std::make_unique<Asn1Acn::Types::Real>("choiceReal"));
+    auto choice2 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>("choiceReal", "choiceReal", "choiceReal",
+            "choiceReal", "", Asn1Acn::SourceLocation(), std::make_unique<Asn1Acn::Types::Real>("choiceReal"));
     type->addComponent(std::move(choice2));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyChoice", "MyChoice", location, std::move(type));
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "choice : TRUE");
@@ -358,20 +334,13 @@ void tst_Asn1ValueParser::testSequenceValueWithString()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Sequence>();
-    auto sequence1 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            "strVal",
-            "strVal",
-            false,
-            std::nullopt,
-            "",
-            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(),
+    auto sequence1 = std::make_unique<Asn1Acn::AsnSequenceComponent>("strVal", "strVal", false, std::nullopt, "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::IA5String>("strVal"));
     type->addComponent(std::move(sequence1));
 
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));
-    auto valueMap = valueParser->parseAsn1Value(
-            assignment.get(), "{ strVal potatoes }");
+    auto valueMap = valueParser->parseAsn1Value(assignment.get(), "{ strVal potatoes }");
 
     QCOMPARE(valueMap.size(), 2);
     QCOMPARE(valueMap["name"].toString(), QString("MySequence"));
@@ -389,64 +358,27 @@ void tst_Asn1ValueParser::testSequenceValue()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Sequence>();
-    auto sequence1 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            "intVal",
-            "intVal",
-            false,
-            std::nullopt,
-            "",
-            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(),
+    auto sequence1 = std::make_unique<Asn1Acn::AsnSequenceComponent>("intVal", "intVal", false, std::nullopt, "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Integer>("intVal"));
     type->addComponent(std::move(sequence1));
-    auto sequence2 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            "realVal",
-            "realVal",
-            false,
-            std::nullopt,
-            "",
-            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(),
+    auto sequence2 = std::make_unique<Asn1Acn::AsnSequenceComponent>("realVal", "realVal", false, std::nullopt, "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Real>("realVal"));
     type->addComponent(std::move(sequence2));
-    auto sequence3 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            "boolVal",
-            "boolVal",
-            false,
-            std::nullopt,
-            "",
-            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(),
+    auto sequence3 = std::make_unique<Asn1Acn::AsnSequenceComponent>("boolVal", "boolVal", false, std::nullopt, "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
     type->addComponent(std::move(sequence3));
     auto choice = std::make_unique<Asn1Acn::Types::Choice>("choiceVal");
-    auto choice1 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
-            "choice1",
-            "choice1",
-            "choice1",
-            "choice1",
-            "",
-            Asn1Acn::SourceLocation(),
-            std::make_unique<Asn1Acn::Types::Boolean>("choice1"));
+    auto choice1 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>("choice1", "choice1", "choice1", "choice1", "",
+            Asn1Acn::SourceLocation(), std::make_unique<Asn1Acn::Types::Boolean>("choice1"));
     choice->addComponent(std::move(choice1));
-    auto choice2 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(
-            "choice2",
-            "choice2",
-            "choice2",
-            "choice2",
-            "",
-            Asn1Acn::SourceLocation(),
-            std::make_unique<Asn1Acn::Types::Integer>("choice2"));
+    auto choice2 = std::make_unique<Asn1Acn::Types::ChoiceAlternative>("choice2", "choice2", "choice2", "choice2", "",
+            Asn1Acn::SourceLocation(), std::make_unique<Asn1Acn::Types::Integer>("choice2"));
     choice->addComponent(std::move(choice2));
-    auto sequence4 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            "choiceVal",
-            "choiceVal",
-            false,
-            std::nullopt,
-            "",
-            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(),
-            std::move(choice));
+    auto sequence4 = std::make_unique<Asn1Acn::AsnSequenceComponent>("choiceVal", "choiceVal", false, std::nullopt, "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(), std::move(choice));
     type->addComponent(std::move(sequence4));
 
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));
@@ -489,34 +421,16 @@ void tst_Asn1ValueParser::testSequenceValueError()
 
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::Sequence>();
-    auto sequence1 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            "intVal",
-            "intVal",
-            false,
-            std::nullopt,
-            "",
-            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(),
+    auto sequence1 = std::make_unique<Asn1Acn::AsnSequenceComponent>("intVal", "intVal", false, std::nullopt, "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Integer>("intVal"));
     type->addComponent(std::move(sequence1));
-    auto sequence2 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            "realVal",
-            "realVal",
-            false,
-            std::nullopt,
-            "",
-            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(),
+    auto sequence2 = std::make_unique<Asn1Acn::AsnSequenceComponent>("realVal", "realVal", false, std::nullopt, "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Real>("realVal"));
     type->addComponent(std::move(sequence2));
-    auto sequence3 = std::make_unique<Asn1Acn::AsnSequenceComponent>(
-            "boolVal",
-            "boolVal",
-            false,
-            std::nullopt,
-            "",
-            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified,
-            Asn1Acn::SourceLocation(),
+    auto sequence3 = std::make_unique<Asn1Acn::AsnSequenceComponent>("boolVal", "boolVal", false, std::nullopt, "",
+            Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
             std::make_unique<Asn1Acn::Types::Boolean>("boolVal"));
     type->addComponent(std::move(sequence3));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MySequence", "MySequence", location, std::move(type));

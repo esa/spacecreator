@@ -99,7 +99,7 @@ void tst_IvToPromelaTranslator::initTestCase()
     m_dynPropConfig->init(QLatin1String("default_attributes.xml"));
 }
 
-void tst_IvToPromelaTranslator::cleanupTestCase() { }
+void tst_IvToPromelaTranslator::cleanupTestCase() {}
 
 void tst_IvToPromelaTranslator::testSimple()
 {

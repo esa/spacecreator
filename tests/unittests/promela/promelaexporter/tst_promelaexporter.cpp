@@ -97,9 +97,9 @@ private:
     void showInfo(const QString &returned, const QString &expected);
 };
 
-void tst_PromelaExporter::initTestCase() { }
+void tst_PromelaExporter::initTestCase() {}
 
-void tst_PromelaExporter::cleanupTestCase() { }
+void tst_PromelaExporter::cleanupTestCase() {}
 
 void tst_PromelaExporter::testMtype()
 {
