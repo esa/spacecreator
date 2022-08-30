@@ -127,24 +127,25 @@ static inline auto exportContainerConstraints(
     if (!dataType.constraints().empty()) {
         auto constraintListElement = sedsDocument.createElement(QStringLiteral("ConstraintSet"));
         for (const auto &constraint : dataType.constraints()) {
-            std::visit(overloaded {
-                               [](const model::ContainerRangeConstraint &castConstraint) {
-                                   Q_UNUSED(castConstraint);
-                                   throw UnsupportedElementException("Container ContainerRangeConstraint");
-                               },
-                               [](const model::ContainerTypeConstraint &castConstraint) {
-                                   Q_UNUSED(castConstraint);
-                                   throw UnsupportedElementException("Container ContainerTypeConstraint");
-                               },
-                               [&sedsDocument, &constraintListElement](
-                                       const model::ContainerValueConstraint &castConstraint) {
-                                   auto entryElement = sedsDocument.createElement(QStringLiteral("ValueConstraint"));
-                                   entryElement.setAttribute(
-                                           QStringLiteral("entry"), castConstraint.entry().value().value());
-                                   entryElement.setAttribute(QStringLiteral("value"), castConstraint.value().value());
-                                   constraintListElement.appendChild(entryElement);
-                               },
-                       },
+            std::visit(
+                    overloaded {
+                            [](const model::ContainerRangeConstraint &castConstraint) {
+                                Q_UNUSED(castConstraint);
+                                throw UnsupportedElementException("Container ContainerRangeConstraint");
+                            },
+                            [](const model::ContainerTypeConstraint &castConstraint) {
+                                Q_UNUSED(castConstraint);
+                                throw UnsupportedElementException("Container ContainerTypeConstraint");
+                            },
+                            [&sedsDocument, &constraintListElement](
+                                    const model::ContainerValueConstraint &castConstraint) {
+                                auto entryElement = sedsDocument.createElement(QStringLiteral("ValueConstraint"));
+                                entryElement.setAttribute(
+                                        QStringLiteral("entry"), castConstraint.entry().value().value());
+                                entryElement.setAttribute(QStringLiteral("value"), castConstraint.value().value());
+                                constraintListElement.appendChild(entryElement);
+                            },
+                    },
                     constraint);
         }
         typeElement.appendChild(constraintListElement);
