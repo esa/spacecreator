@@ -63,15 +63,9 @@ public:
 
     static IntegerEncoding mapEncoding(StringRef in);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    static IntegerEncoding mapEncoding(const QString &in)
-    {
-        return mapEncoding(StringRef(in));
-    }
+    static IntegerEncoding mapEncoding(const QString &in) { return mapEncoding(StringRef(in)); }
 #else
-    static IntegerEncoding mapEncoding(const QString &in)
-    {
-        return mapEncoding(&in);
-    }
+    static IntegerEncoding mapEncoding(const QString &in) { return mapEncoding(&in); }
 #endif
     static QString encodingToString(IntegerEncoding encoding);
 

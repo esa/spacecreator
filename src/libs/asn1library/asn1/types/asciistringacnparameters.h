@@ -50,15 +50,9 @@ public:
 
     static AsciiStringEncoding mapEncoding(StringRef in);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    static AsciiStringEncoding mapEncoding(const QString &in)
-    {
-        return mapEncoding(StringRef(in));
-    }
+    static AsciiStringEncoding mapEncoding(const QString &in) { return mapEncoding(StringRef(in)); }
 #else
-    static AsciiStringEncoding mapEncoding(const QString &in)
-    {
-        return mapEncoding(&in);
-    }
+    static AsciiStringEncoding mapEncoding(const QString &in) { return mapEncoding(&in); }
 #endif
     static QString encodingToString(AsciiStringEncoding encoding);
 

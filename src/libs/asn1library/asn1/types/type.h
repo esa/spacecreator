@@ -105,28 +105,16 @@ public:
 
     static AlignToNext mapAlignToNext(StringRef in);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    static AlignToNext mapAlignToNext(const QString &in)
-    {
-        return mapAlignToNext(StringRef(in));
-    }
+    static AlignToNext mapAlignToNext(const QString &in) { return mapAlignToNext(StringRef(in)); }
 #else
-    static AlignToNext mapAlignToNext(const QString &in)
-    {
-        return mapAlignToNext(&in);
-    }
+    static AlignToNext mapAlignToNext(const QString &in) { return mapAlignToNext(&in); }
 #endif
 
     static Endianness mapEndianess(StringRef in);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    static Endianness mapEndianess(const QString &in)
-    {
-        return mapEndianess(StringRef(in));
-    }
+    static Endianness mapEndianess(const QString &in) { return mapEndianess(StringRef(in)); }
 #else
-    static Endianness mapEndianess(const QString &in)
-    {
-        return mapEndianess(&in);
-    }
+    static Endianness mapEndianess(const QString &in) { return mapEndianess(&in); }
 #endif
 
     static QString alignToNextToString(AlignToNext param);

@@ -81,3 +81,6 @@ SortIncludes: true
 IncludeBlocks: Regroup
 AlignAfterOpenBracket: DontAlign
 
+# Spaces In Empty places is set to false to mimic clang-format version7 which runs on ESA CI
+#SpaceInEmptyBlock: false
+#SpaceInEmptyParentheses: false
