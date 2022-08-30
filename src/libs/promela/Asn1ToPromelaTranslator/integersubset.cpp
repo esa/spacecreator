@@ -98,7 +98,7 @@ const IntegerSubset::RangeList &IntegerSubset::getRanges() const noexcept
     return m_allowedValues;
 }
 
-IntegerSubset::IntegerSubset() { }
+IntegerSubset::IntegerSubset() {}
 
 void IntegerSubset::mergeOverlappingNeighbours()
 {
