@@ -43,20 +43,20 @@ public:
     /**
      * @brief   Deleted copy constructor
      */
-    GenericTypeCreator(const GenericTypeCreator&) = delete;
+    GenericTypeCreator(const GenericTypeCreator &) = delete;
     /**
      * @brief   Deleted move constructor
      */
-    GenericTypeCreator(GenericTypeCreator&&) = delete;
+    GenericTypeCreator(GenericTypeCreator &&) = delete;
 
     /**
      * @brief   Deleted copy assignment operator
      */
-    auto operator=(const GenericTypeCreator&) -> GenericTypeCreator& = delete;
+    auto operator=(const GenericTypeCreator &) -> GenericTypeCreator & = delete;
     /**
      * @brief   Deleted move assignment operator
      */
-    auto operator=(GenericTypeCreator&&) -> GenericTypeCreator& = delete ;
+    auto operator=(GenericTypeCreator &&) -> GenericTypeCreator & = delete;
 
 public:
     /**
@@ -68,13 +68,11 @@ public:
     auto createTypeForGeneric(const TypeMapping *mapping, const QString &genericName) -> QString;
 
 private:
-    auto createConcreteTypeAlias(
-        const QString &genericName, const TypeMapping::Concrete &concreteMapping) -> QString;
+    auto createConcreteTypeAlias(const QString &genericName, const TypeMapping::Concrete &concreteMapping) -> QString;
 
-    auto createConcreteChoice(
-        const QString &genericName, const TypeMapping *mapping) -> QString;
-    auto createConcreteChoiceAlternative(
-        const TypeMapping::Concrete &concreteMapping, Asn1Acn::Types::Choice *choice, const std::size_t count) -> void;
+    auto createConcreteChoice(const QString &genericName, const TypeMapping *mapping) -> QString;
+    auto createConcreteChoiceAlternative(const TypeMapping::Concrete &concreteMapping, Asn1Acn::Types::Choice *choice,
+            const std::size_t count) -> void;
 
     auto handleFixedValue(Asn1Acn::Types::Type *type, const QString &fixedValue) -> void;
 

@@ -618,14 +618,14 @@ auto StatementTranslatorVisitor::translateBooleanExpression(
 auto StatementTranslatorVisitor::translateComparison(const seds::model::Comparison &comparison) -> QString
 {
     const auto left = translateVariableReference(comparison.firstOperand().variableRef().value().value());
-    const auto &right =
-            std::visit(overloaded {
-                               [](const seds::model::VariableRefOperand &reference) {
-                                   return translateVariableReference(reference.variableRef().value().value());
-                               },
-                               [](const seds::model::ValueOperand &value) { return value.value().value(); },
-                       },
-                    comparison.secondOperand());
+    const auto &right = std::visit(
+            overloaded {
+                    [](const seds::model::VariableRefOperand &reference) {
+                        return translateVariableReference(reference.variableRef().value().value());
+                    },
+                    [](const seds::model::ValueOperand &value) { return value.value().value(); },
+            },
+            comparison.secondOperand());
     const auto op = comparisonOperatorToString(comparison.comparisonOperator());
     return QString("%1 %2 %3").arg(left, op, right);
 }
