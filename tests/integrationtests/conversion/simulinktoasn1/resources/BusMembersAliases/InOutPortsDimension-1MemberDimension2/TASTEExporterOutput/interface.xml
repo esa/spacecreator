@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModelInterface>
+   <DataTypes>
+      <AliasDataType BaseType="boolean" DataScope="Auto" Description="" HeaderFile=""
+                     Name="AliasBoolean"/>
+      <AliasDataType BaseType="double" DataScope="Auto" Description="" HeaderFile=""
+                     Name="AliasDouble"/>
+      <AliasDataType BaseType="int16" DataScope="Auto" Description="" HeaderFile=""
+                     Name="AliasInt16"/>
+      <AliasDataType BaseType="int32" DataScope="Auto" Description="" HeaderFile=""
+                     Name="AliasInt32"/>
+      <AliasDataType BaseType="int8" DataScope="Auto" Description="" HeaderFile="" Name="AliasInt8"/>
+      <AliasDataType BaseType="single" DataScope="Auto" Description="" HeaderFile=""
+                     Name="AliasSingle"/>
+      <AliasDataType BaseType="uint16" DataScope="Auto" Description="" HeaderFile=""
+                     Name="AliasUInt16"/>
+      <AliasDataType BaseType="uint32" DataScope="Auto" Description="" HeaderFile=""
+                     Name="AliasUInt32"/>
+      <AliasDataType BaseType="uint8" DataScope="Auto" Description="" HeaderFile=""
+                     Name="AliasUInt8"/>
+      <BusDataType Alignment="-1" DataScope="Auto" Description="" HeaderFile="" Name="BusDef">
+         <BusMembers>
+            <BusMember Complexity="real" DataType="AliasBoolean" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasBooleanMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="AliasDouble" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasDoubleMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="AliasSingle" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasSingleMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="AliasInt8" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasInt8Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="AliasInt16" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasInt16Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="AliasInt32" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasInt32Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="AliasUInt8" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasUInt8Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="AliasUInt16" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasUInt16Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="AliasUInt32" Description="" Dimensions="2"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="AliasUInt32Member"
+                       SampleTime="-1"
+                       Unit=""/>
+         </BusMembers>
+      </BusDataType>
+   </DataTypes>
+   <Inports>
+      <Inport BusObject="BusDef" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i1"
+              OutDataTypeStr="BusDef"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="1"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="on"/>
+   </Inports>
+   <Outports>
+      <Outport BusObject="BusDef" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o1"
+               OutDataTypeStr="BusDef"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="1"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="on"
+               VarSizeSig="Inherit"/>
+   </Outports>
+</ModelInterface>

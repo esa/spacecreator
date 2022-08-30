@@ -1,0 +1,35 @@
+INTERFACE DEFINITIONS ::= BEGIN
+IMPORTS
+MatLab-Boolean FROM MATLAB-STANDARD-DATATYPES
+MatLab-Double FROM MATLAB-STANDARD-DATATYPES
+MatLab-Int16 FROM MATLAB-STANDARD-DATATYPES
+MatLab-Int32 FROM MATLAB-STANDARD-DATATYPES
+MatLab-Int8 FROM MATLAB-STANDARD-DATATYPES
+MatLab-Single FROM MATLAB-STANDARD-DATATYPES
+MatLab-Uint16 FROM MATLAB-STANDARD-DATATYPES
+MatLab-Uint32 FROM MATLAB-STANDARD-DATATYPES
+MatLab-Uint8 FROM MATLAB-STANDARD-DATATYPES
+;
+AliasBoolean ::= MatLab-Boolean
+AliasDouble ::= MatLab-Double
+AliasInt16 ::= MatLab-Int16
+AliasInt32 ::= MatLab-Int32
+AliasInt8 ::= MatLab-Int8
+AliasSingle ::= MatLab-Single
+AliasUInt16 ::= MatLab-Uint16
+AliasUInt32 ::= MatLab-Uint32
+AliasUInt8 ::= MatLab-Uint8
+BusDef ::= SEQUENCE 
+{ 
+    aliasBooleanMember SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasBoolean, 
+    aliasDoubleMember SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasDouble, 
+    aliasSingleMember SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasSingle, 
+    aliasInt8Member SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasInt8, 
+    aliasInt16Member SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasInt16, 
+    aliasInt32Member SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasInt32, 
+    aliasUInt8Member SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasUInt8, 
+    aliasUInt16Member SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasUInt16, 
+    aliasUInt32Member SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF AliasUInt32
+} 
+END
+

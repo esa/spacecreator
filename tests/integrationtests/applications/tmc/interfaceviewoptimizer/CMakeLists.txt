@@ -18,6 +18,7 @@ add_format_target(${TEST_NAME})
 configure_file(test_interface_view_optimizer.sh test_interface_view_optimizer.sh COPYONLY)
 configure_file(test_interface_view_optimizer_standalone.sh test_interface_view_optimizer_standalone.sh COPYONLY)
 configure_file(test_interface_view_optimizer_keep.sh test_interface_view_optimizer_keep.sh COPYONLY)
+configure_file(test_interface_view_optimizer_ergo.sh test_interface_view_optimizer_ergo.sh COPYONLY)
 add_custom_target(${TEST_NAME}_copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources
     DEPENDS ${TEST_NAME})

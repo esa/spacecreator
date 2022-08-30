@@ -1,0 +1,24 @@
+INTERFACE DEFINITIONS ::= BEGIN
+AliasBoolean []
+AliasDouble []
+AliasInt16 []
+AliasInt32 []
+AliasInt8 []
+AliasSingle []
+AliasUInt16 []
+AliasUInt32 []
+AliasUInt8 []
+BusDef []
+{
+    aliasBooleanMember [],
+    aliasDoubleMember [],
+    aliasSingleMember [],
+    aliasInt8Member [],
+    aliasInt16Member [],
+    aliasInt32Member [],
+    aliasUInt8Member [],
+    aliasUInt16Member [],
+    aliasUInt32Member []
+}
+END
+

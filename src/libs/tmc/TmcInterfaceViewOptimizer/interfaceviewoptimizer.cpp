@@ -89,7 +89,9 @@ void InterfaceViewOptimizer::keepFunctions(IVModel *ivModel, const std::vector<Q
 InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
 {
     ParentFunctionsInfo parentFunctionsInfo;
+
     std::vector<IVFunctionType *> functionsToRemove;
+    std::vector<IVConnection *> connectionsToRemove;
 
     for (auto function : ivModel->allObjectsByType<IVFunctionType>()) {
 
@@ -102,8 +104,12 @@ InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel
 
             functionsToRemove.push_back(function);
         } else {
-            flattenConnections(function, ivModel);
+            flattenConnections(function, connectionsToRemove, ivModel);
         }
+    }
+
+    for (auto connection : connectionsToRemove) {
+        ivModel->removeObject(connection);
     }
 
     for (auto function : functionsToRemove) {
@@ -118,7 +124,8 @@ InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel
     return parentFunctionsInfo;
 }
 
-void InterfaceViewOptimizer::flattenConnections(IVFunctionType *function, IVModel *ivModel)
+void InterfaceViewOptimizer::flattenConnections(
+        IVFunctionType *function, std::vector<IVConnection *> &connectionsToRemove, IVModel *ivModel)
 {
     const auto &connections = ivModel->getConnectionsForFunction(function->id());
 
@@ -130,7 +137,8 @@ void InterfaceViewOptimizer::flattenConnections(IVFunctionType *function, IVMode
         const auto sourceInterface = connection->sourceInterface();
         auto lastConnection = findLastConnection(connection, ivModel);
         const auto targetInterface = lastConnection->targetInterface();
-        ivModel->removeObject(lastConnection);
+
+        connectionsToRemove.push_back(lastConnection);
 
         auto newConnection = new IVConnection(sourceInterface, targetInterface);
         ivModel->addObject(newConnection);

@@ -1,0 +1,1011 @@
+<InterfaceView asn1file="ERGO.acn">
+<Function name="GuidanceLibrary" is_type="NO" language="CPP" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="153800 2000 173800 12000"/>
+<Provided_Interface name="travel" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="currentPos" type="T-Double" encoding="NATIVE"/>
+    <Input_Parameter name="targetPos" type="T-Double" encoding="NATIVE"/>
+    <Input_Parameter name="speed" type="T-Double" encoding="NATIVE"/>
+    <Input_Parameter name="accuracy" type="T-Double" encoding="NATIVE"/>
+    <Output_Parameter name="newPos" type="T-Double" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="153800 7600"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="CPP"/>
+    </Implementations>
+</Function>
+
+<Function name="RarmControl" is_type="NO" instance_of="" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="97900 35100 121200 46300"/>
+<Provided_Interface name="DO_STEP" kind="Cyclic" layer="default" wcet="0" priority="1" stack_size="50" period="500" dispatch_offset="0">
+    <Property name="Taste::coordinates" value="109400 35100"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="ROBOTICARM_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="roboticarmstatus" type="Roboticarmstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="97900 37200"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="HALT_RARM" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="haltStatus" type="HaltStatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="121200 41900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="ROBOTICARM_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="roboticarmstatus" type="Roboticarmstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="97900 41900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="RARM_STATUS_FDIR" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="rarmStatus" type="RoboticarmPred" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="121200 37200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="ConvertTelecommand" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="-14300 25100 5700 78400"/>
+<Provided_Interface name="TRAVERSE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="pose" type="SimplifiedPose2D" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 37700"/>
+</Provided_Interface>
+
+<Provided_Interface name="CHANGE_AUTONOMY_E1" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="-14300 29400"/>
+</Provided_Interface>
+
+<Provided_Interface name="CHANGE_AUTONOMY_E4" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="-14300 33500"/>
+</Provided_Interface>
+
+<Provided_Interface name="TAKE_SAMPLE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="sampleat" type="SimplifiedTLSample" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 41500"/>
+</Provided_Interface>
+
+<Provided_Interface name="LEAVE_SAMPLE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="sampleat" type="SimplifiedTLSample" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 45300"/>
+</Provided_Interface>
+
+<Provided_Interface name="TAKE_PICTURE_AT" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="pose" type="SimplifiedPose2D" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 49100"/>
+</Provided_Interface>
+
+<Provided_Interface name="PICK_SAMPLE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="sampleat" type="SimplifiedPDSample" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 62400"/>
+</Provided_Interface>
+
+<Provided_Interface name="DROP_SAMPLE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="sampleat" type="SimplifiedPDSample" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 65600"/>
+</Provided_Interface>
+
+<Provided_Interface name="TAKE_PICTURE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="-14300 69300"/>
+</Provided_Interface>
+
+<Provided_Interface name="SCAN" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="frequency" type="T-UIntFrequency" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 72600"/>
+</Provided_Interface>
+
+<Provided_Interface name="RECHARGE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="-14300 76100"/>
+</Provided_Interface>
+
+<Provided_Interface name="GO_TO" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="topose" type="SimplifiedPose2D" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 53000"/>
+</Provided_Interface>
+
+<Provided_Interface name="MOVE_RARM" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="toposition" type="SimplifiedPosition" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-14300 57400"/>
+</Provided_Interface>
+
+<Required_Interface name="TELECOMMAND" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="tc" type="Telecommand" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="5700 50700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="BatterySystem" is_type="NO" instance_of="" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="99000 75300 122000 106800"/>
+<Provided_Interface name="BATTERYCMD_REQUEST_1" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="executionRequest" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="99000 77400"/>
+    <Property name="Taste::RootCoordinates" value="-62500 -25800"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="BATTERYCMD_REQUEST_2" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="executionRequest" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="99000 94400"/>
+    <Property name="Taste::RootCoordinates" value="-62500 -9200"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="BATTERYCMD_STATUS_1" kind="Sporadic" layer="default">
+    <Input_Parameter name="executionStatus" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="99000 83100"/>
+    <Property name="Taste::RootCoordinates" value="-62500 -21300"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="BATTERYCMD_STATUS_2" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="executionStatus" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="99000 98500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="BATTERY_STATUS_2" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="batteryStatus" type="Batterystatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="99000 103200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="POWER_LEVEL_FDIR" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="power" type="BatteryLevel" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="122000 80800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="BATTERY_STATUS_1" kind="Sporadic" layer="default">
+    <Input_Parameter name="batteryStatus" type="Batterystatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="99000 87300"/>
+    <Property name="Taste::RootCoordinates" value="-62500 -17600"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Function name="Battery1" is_type="NO" instance_of="BatteryType" language="SDL" default_implementation="default" FPGA_Configurations="" type_language="SDL">
+<Provided_Interface name="DO_STEP" kind="Cyclic" layer="default" wcet="0" priority="1" stack_size="50" period="500" dispatch_offset="0">
+    <Property name="Taste::coordinates" value="115600 91700"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="BATTERYCMD_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="executionRequest" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="109500 96900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="BATTERYCMD_STATUS" kind="Sporadic" layer="default">
+    <Input_Parameter name="executionStatus" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="109500 101100"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="BATTERY_STATUS" kind="Sporadic" layer="default">
+    <Input_Parameter name="batteryStatus" type="Batterystatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="109500 104800"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="POWER_LEVEL_FDIR" kind="Sporadic" layer="default">
+    <Input_Parameter name="power" type="BatteryLevel" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="129500 100600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Battery2" is_type="NO" instance_of="BatteryType" language="SDL" default_implementation="default" FPGA_Configurations="" type_language="SDL">
+<Provided_Interface name="DO_STEP" kind="Cyclic" layer="default" wcet="0" priority="1" stack_size="50" period="500" dispatch_offset="0">
+    <Property name="Taste::coordinates" value="115600 91700"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="BATTERYCMD_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="executionRequest" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="109500 96900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="BATTERYCMD_STATUS" kind="Sporadic" layer="default">
+    <Input_Parameter name="executionStatus" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="109500 101100"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="BATTERY_STATUS" kind="Sporadic" layer="default">
+    <Input_Parameter name="batteryStatus" type="Batterystatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="109500 104800"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="POWER_LEVEL_FDIR" kind="Sporadic" layer="default">
+    <Input_Parameter name="power" type="BatteryLevel" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="129500 100600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="BatterySystem" pi_name="BATTERYCMD_REQUEST_1"/>
+    <Target func_name="Battery1" pi_name="BATTERYCMD_REQUEST"/>
+    <Property name="Taste::InnerCoordinates" value="-61900 -25800 -52700 -25800 -43400 -25900"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Battery1" ri_name="BATTERYCMD_STATUS"/>
+    <Target func_name="BatterySystem" ri_name="BATTERYCMD_STATUS_1"/>
+    <Property name="Taste::InnerCoordinates" value="-43700 -21400 -52900 -21400 -62200 -21300"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Battery1" ri_name="BATTERY_STATUS"/>
+    <Target func_name="BatterySystem" ri_name="BATTERY_STATUS_1"/>
+    <Property name="Taste::InnerCoordinates" value="-43700 -17800 -52900 -17800 -62200 -17600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Battery2" ri_name="BATTERYCMD_STATUS"/>
+    <Target func_name="BatterySystem" ri_name="BATTERYCMD_STATUS_2"/>
+    <Property name="Taste::InnerCoordinates" value="-43500 -5100 -52800 -5100 -60600 -4100 -62200 -4100"/>
+</Connection>
+
+<Connection >
+    <Source func_name="BatterySystem" pi_name="BATTERYCMD_REQUEST_2"/>
+    <Target func_name="Battery2" pi_name="BATTERYCMD_REQUEST"/>
+    <Property name="Taste::InnerCoordinates" value="-61900 -9200 -43200 -9200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Battery2" ri_name="BATTERY_STATUS"/>
+    <Target func_name="BatterySystem" ri_name="BATTERY_STATUS_2"/>
+    <Property name="Taste::InnerCoordinates" value="-43500 -1200 -52800 -1200 -52800 700 -62200 700"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Battery1" ri_name="POWER_LEVEL_FDIR"/>
+    <Target func_name="BatterySystem" ri_name="POWER_LEVEL_FDIR"/>
+    <Property name="Taste::InnerCoordinates" value="-22500 -23100 -15200 -23100 -15200 -26900 -7900 -26900"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Battery2" ri_name="POWER_LEVEL_FDIR"/>
+    <Target func_name="BatterySystem" ri_name="POWER_LEVEL_FDIR"/>
+    <Property name="Taste::InnerCoordinates" value="-22300 -8700 -15100 -8700 -15100 -26900 -7900 -26900"/>
+</Connection>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Camera" is_type="NO" instance_of="" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="98500 51300 121300 69200"/>
+    <ContextParameter name="tCam" type="Timer" value=""/>
+    <ContextParameter name="tSciCam" type="Timer" value=""/>
+    <ContextParameter name="t" type="Timer" value=""/>
+<Provided_Interface name="CAMERA_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="camerastatus" type="Camerastatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="98500 53100"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="SCIENTIFICCAMERA_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="scientificcamerastatus" type="Scientificcamerastatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="98500 62000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="HALT_CAMERA" kind="Sporadic" layer="default" wcet="0" priority="1" miat="100" stack_size="50" queue_size="5">
+    <Property name="Taste::coordinates" value="121300 64700"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="CAMERA_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="camerastatus" type="Camerastatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="98500 57100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="SCIENTIFICCAMERA_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="scientificcamerastatus" type="Scientificcamerastatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="98500 66400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="CAM_FDIR" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="cameraStatus" type="CameraPred" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="121300 55400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="SCIENTIFICCAM_FDIR" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="scientifcCamStatus" type="ScientificcameraPred" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="121300 60000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="BatteryType" is_type="YES" FPGA_Configurations="" type_language="SDL">
+    <Property name="Taste::coordinates" value="154300 88000 174300 105200"/>
+<Provided_Interface name="DO_STEP" kind="Cyclic" layer="default" wcet="0" priority="1" stack_size="50" period="500" dispatch_offset="0">
+    <Property name="Taste::coordinates" value="160000 88000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="BATTERYCMD_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="executionRequest" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="154300 93200"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="BATTERYCMD_STATUS" kind="Sporadic" layer="default">
+    <Input_Parameter name="executionStatus" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="154300 97400"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="BATTERY_STATUS" kind="Sporadic" layer="default">
+    <Input_Parameter name="batteryStatus" type="Batterystatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="154300 102500"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="POWER_LEVEL_FDIR" kind="Sporadic" layer="default">
+    <Input_Parameter name="power" type="BatteryLevel" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="174300 96900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+</Function>
+
+<Function name="Agent" is_type="NO" instance_of="" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="33500 14000 53500 108200"/>
+<Provided_Interface name="GUIDANCECMD_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="guidancecmdstatus" type="Guidancecmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 25400"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="ROVERPOSITION_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="roverpositionstatus" type="Roverpositionstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 29400"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="ROBOTICARM_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="roboticarmstatus" type="Roboticarmstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 42000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="CAMERA_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="camerastatus" type="Camerastatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 57000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="SCIENTIFICCAMERA_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="scientificcamerastatus" type="Scientificcamerastatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 66400"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="DO_STEP" kind="Cyclic" layer="default" wcet="0" priority="1" stack_size="50" period="1000" dispatch_offset="0">
+    <Property name="Taste::coordinates" value="42600 14000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="TELECOMMAND" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="tc" type="Telecommand" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="33500 50900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="BATTERYCMD_STATUS_2" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="executionStatus" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 98600"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="BATTERY_STATUS_2" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="batteryStatus" type="Batterystatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 103200"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="BATTERY_STATUS_1" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="batteryStatus" type="Batterystatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 87400"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="BATTERYCMD_STATUS_1" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="executionStatus" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 83100"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="GUIDANCECMD_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="guidancecmdstatus" type="Guidancecmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 20400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="ROBOTICARM_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="roboticarmstatus" type="Roboticarmstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 37300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="CAMERA_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="camerastatus" type="Camerastatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 53000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="SCIENTIFICCAMERA_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="scientificcamerastatus" type="Scientificcamerastatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 61900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="TELEMETRY" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="tm" type="Telemetry" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="33500 82800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="BATTERYCMD_REQUEST_2" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="executionRequest" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 94200"/>
+    <Property name="Taste::RootCoordinates" value="-62500 -9200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="BATTERYCMD_REQUEST_1" kind="Sporadic" layer="default" miat="0" queue_size="1">
+    <Input_Parameter name="executionRequest" type="Batterycmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 77300"/>
+    <Property name="Taste::RootCoordinates" value="-62500 -27400"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="FDIR" is_type="NO" instance_of="" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="153500 15600 174400 83500"/>
+    <ContextParameter name="tWdog" type="Timer" value=""/>
+<Provided_Interface name="GUI_WDOG" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="guiDriveStatus" type="GuidancecmdPred" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="153500 21000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="RARM_STATUS_FDIR" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="rarmStatus" type="RoboticarmPred" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="153500 37100"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="CAM_FDIR" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="cameraStatus" type="CameraPred" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="153500 55300"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="SCIENTIFICCAM_FDIR" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="scientifcCamStatus" type="ScientificcameraPred" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="153500 59900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="POWER_LEVEL_FDIR" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="power" type="BatteryLevel" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="153500 80800"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="HALT_GUI" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="haltStatus" type="HaltStatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="153500 26000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="HALT_RARM" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="haltStatus" type="HaltStatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="153500 42000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="HALT_CAMERA" kind="Sporadic" layer="default" wcet="0" priority="1" miat="100" stack_size="50" queue_size="5">
+    <Property name="Taste::coordinates" value="153500 64700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="GuidanceControl" is_type="NO" instance_of="" language="SDL" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="97900 1900 120600 31500"/>
+<Provided_Interface name="GUIDANCECMD_REQUEST" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="guidancecmdstatus" type="Guidancecmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="97900 20200"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="DO_STEP" kind="Cyclic" layer="default" wcet="0" priority="1" stack_size="50" period="500" dispatch_offset="0">
+    <Property name="Taste::coordinates" value="109500 1900"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="HALT_GUI" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="haltStatus" type="HaltStatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="120600 26000"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="GUIDANCECMD_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="guidancecmdstatus" type="Guidancecmdstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="97900 25300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="ROVERPOSITION_STATUS" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="roverpositionstatus" type="Roverpositionstatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="97900 29500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="GUI_WDOG" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="5">
+    <Input_Parameter name="guiDriveStatus" type="GuidancecmdPred" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="120600 20900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+<Required_Interface name="travel" kind="Protected" layer="default" wcet="0">
+    <Input_Parameter name="currentPos" type="T-Double" encoding="NATIVE"/>
+    <Input_Parameter name="targetPos" type="T-Double" encoding="NATIVE"/>
+    <Input_Parameter name="speed" type="T-Double" encoding="NATIVE"/>
+    <Input_Parameter name="accuracy" type="T-Double" encoding="NATIVE"/>
+    <Output_Parameter name="newPos" type="T-Double" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="120600 7400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="GroundControl" is_type="NO" instance_of="" language="GUI" default_implementation="default" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="-69900 22300 -49900 89200"/>
+<Provided_Interface name="TELEMETRY" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="tm" type="Telemetry" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 82700"/>
+    <Property name="Taste::InnerCoordinates" value="0 0"/>
+</Provided_Interface>
+
+<Required_Interface name="TRAVERSE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="pose" type="SimplifiedPose2D" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 37700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="CHANGE_AUTONOMY_E1" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="-49900 29500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="CHANGE_AUTONOMY_E4" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="-49900 33500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="TAKE_SAMPLE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="sampleat" type="SimplifiedTLSample" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 41400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="LEAVE_SAMPLE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="sampleat" type="SimplifiedTLSample" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 45200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="TAKE_PICTURE_AT" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="pose" type="SimplifiedPose2D" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 48900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="PICK_SAMPLE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="sampleat" type="SimplifiedPDSample" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 62300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="DROP_SAMPLE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="sampleat" type="SimplifiedPDSample" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 65800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="TAKE_PICTURE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="-49900 69200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="SCAN" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="frequency" type="T-UIntFrequency" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 72500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="RECHARGE" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="-49900 75900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="GO_TO" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="topose" type="SimplifiedPose2D" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 52800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="MOVE_RARM" kind="Sporadic" layer="default" wcet="0" priority="1" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="toposition" type="SimplifiedPosition" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-49900 57300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection >
+    <Source func_name="ConvertTelecommand" ri_name="TELECOMMAND"/>
+    <Target func_name="Agent" pi_name="TELECOMMAND"/>
+    <Property name="Taste::coordinates" value="6300 50700 33200 50900"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="CHANGE_AUTONOMY_E1"/>
+    <Target func_name="ConvertTelecommand" pi_name="CHANGE_AUTONOMY_E1"/>
+    <Property name="Taste::coordinates" value="-49300 29500 -14600 29400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="BatterySystem" ri_name="BATTERY_STATUS_1"/>
+    <Target func_name="Agent" pi_name="BATTERY_STATUS_1"/>
+    <Property name="Taste::coordinates" value="98400 87300 76100 87300 53800 87400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Agent" ri_name="SCIENTIFICCAMERA_REQUEST"/>
+    <Target func_name="Camera" pi_name="SCIENTIFICCAMERA_REQUEST"/>
+    <Property name="Taste::coordinates" value="54100 61900 76100 61900 98200 62000"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Agent" ri_name="BATTERYCMD_REQUEST_2"/>
+    <Target func_name="BatterySystem" pi_name="BATTERYCMD_REQUEST_2"/>
+    <Property name="Taste::coordinates" value="54100 94200 76400 94200 98700 94400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="LEAVE_SAMPLE"/>
+    <Target func_name="ConvertTelecommand" pi_name="LEAVE_SAMPLE"/>
+    <Property name="Taste::coordinates" value="-49300 45200 -14600 45300"/>
+</Connection>
+
+<Connection >
+    <Source func_name="RarmControl" ri_name="ROBOTICARM_STATUS"/>
+    <Target func_name="Agent" pi_name="ROBOTICARM_STATUS"/>
+    <Property name="Taste::coordinates" value="97300 41900 75600 41900 53800 42000"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Agent" ri_name="TELEMETRY"/>
+    <Target func_name="GroundControl" pi_name="TELEMETRY"/>
+    <Property name="Taste::coordinates" value="32900 82800 -49600 82700"/>
+</Connection>
+
+<Connection >
+    <Source func_name="BatterySystem" ri_name="POWER_LEVEL_FDIR"/>
+    <Target func_name="FDIR" pi_name="POWER_LEVEL_FDIR"/>
+    <Property name="Taste::coordinates" value="122600 80800 153200 80800"/>
+</Connection>
+
+<Connection >
+    <Source func_name="RarmControl" ri_name="RARM_STATUS_FDIR"/>
+    <Target func_name="FDIR" pi_name="RARM_STATUS_FDIR"/>
+    <Property name="Taste::coordinates" value="121800 37200 137500 37200 153200 37100"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GuidanceControl" ri_name="GUI_WDOG"/>
+    <Target func_name="FDIR" pi_name="GUI_WDOG"/>
+    <Property name="Taste::coordinates" value="121200 20900 137200 20900 153200 21000"/>
+</Connection>
+
+<Connection >
+    <Source func_name="BatterySystem" ri_name="BATTERYCMD_STATUS_2"/>
+    <Target func_name="Agent" pi_name="BATTERYCMD_STATUS_2"/>
+    <Property name="Taste::coordinates" value="98400 98500 76100 98500 53800 98600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="TRAVERSE"/>
+    <Target func_name="ConvertTelecommand" pi_name="TRAVERSE"/>
+    <Property name="Taste::coordinates" value="-49300 37700 -14600 37700"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="RECHARGE"/>
+    <Target func_name="ConvertTelecommand" pi_name="RECHARGE"/>
+    <Property name="Taste::coordinates" value="-49300 75900 -32000 75900 -14600 76100"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Camera" ri_name="SCIENTIFICCAM_FDIR"/>
+    <Target func_name="FDIR" pi_name="SCIENTIFICCAM_FDIR"/>
+    <Property name="Taste::coordinates" value="121900 60000 137500 60000 153200 59900"/>
+</Connection>
+
+<Connection >
+    <Source func_name="FDIR" ri_name="HALT_CAMERA"/>
+    <Target func_name="Camera" pi_name="HALT_CAMERA"/>
+    <Property name="Taste::coordinates" value="152900 64700 121600 64700"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="DROP_SAMPLE"/>
+    <Target func_name="ConvertTelecommand" pi_name="DROP_SAMPLE"/>
+    <Property name="Taste::coordinates" value="-49300 65800 -32000 65800 -14600 65600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Agent" ri_name="BATTERYCMD_REQUEST_1"/>
+    <Target func_name="BatterySystem" pi_name="BATTERYCMD_REQUEST_1"/>
+    <Property name="Taste::coordinates" value="54100 77300 76400 77300 98700 77400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GuidanceControl" ri_name="GUIDANCECMD_STATUS"/>
+    <Target func_name="Agent" pi_name="GUIDANCECMD_STATUS"/>
+    <Property name="Taste::coordinates" value="97300 25300 75600 25300 53800 25400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="FDIR" ri_name="HALT_RARM"/>
+    <Target func_name="RarmControl" pi_name="HALT_RARM"/>
+    <Property name="Taste::coordinates" value="152900 42000 137200 42000 121500 41900"/>
+</Connection>
+
+<Connection >
+    <Source func_name="FDIR" ri_name="HALT_GUI"/>
+    <Target func_name="GuidanceControl" pi_name="HALT_GUI"/>
+    <Property name="Taste::coordinates" value="152900 26000 120900 26000"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="MOVE_RARM"/>
+    <Target func_name="ConvertTelecommand" pi_name="MOVE_RARM"/>
+    <Property name="Taste::coordinates" value="-49300 57300 -32000 57300 -14600 57400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="TAKE_PICTURE_AT"/>
+    <Target func_name="ConvertTelecommand" pi_name="TAKE_PICTURE_AT"/>
+    <Property name="Taste::coordinates" value="-49300 48900 -14600 49100"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Agent" ri_name="ROBOTICARM_REQUEST"/>
+    <Target func_name="RarmControl" pi_name="ROBOTICARM_REQUEST"/>
+    <Property name="Taste::coordinates" value="54100 37300 75800 37300 97600 37200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="GO_TO"/>
+    <Target func_name="ConvertTelecommand" pi_name="GO_TO"/>
+    <Property name="Taste::coordinates" value="-49300 52800 -14600 53000"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GuidanceControl" ri_name="travel"/>
+    <Target func_name="GuidanceLibrary" pi_name="travel"/>
+    <Property name="Taste::coordinates" value="121200 7400 137300 7400 153500 7600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="SCAN"/>
+    <Target func_name="ConvertTelecommand" pi_name="SCAN"/>
+    <Property name="Taste::coordinates" value="-49300 72500 -32000 72500 -14600 72600"/>
+</Connection>
+
+<Connection >
+    <Source func_name="BatterySystem" ri_name="BATTERY_STATUS_2"/>
+    <Target func_name="Agent" pi_name="BATTERY_STATUS_2"/>
+    <Property name="Taste::coordinates" value="98400 103200 53800 103200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="BatterySystem" ri_name="BATTERYCMD_STATUS_1"/>
+    <Target func_name="Agent" pi_name="BATTERYCMD_STATUS_1"/>
+    <Property name="Taste::coordinates" value="98400 83100 53800 83100"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Agent" ri_name="GUIDANCECMD_REQUEST"/>
+    <Target func_name="GuidanceControl" pi_name="GUIDANCECMD_REQUEST"/>
+    <Property name="Taste::coordinates" value="54100 20400 75800 20400 97600 20200"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="TAKE_SAMPLE"/>
+    <Target func_name="ConvertTelecommand" pi_name="TAKE_SAMPLE"/>
+    <Property name="Taste::coordinates" value="-49300 41400 -14600 41500"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Agent" ri_name="CAMERA_REQUEST"/>
+    <Target func_name="Camera" pi_name="CAMERA_REQUEST"/>
+    <Property name="Taste::coordinates" value="54100 53000 76100 53000 98200 53100"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Camera" ri_name="CAM_FDIR"/>
+    <Target func_name="FDIR" pi_name="CAM_FDIR"/>
+    <Property name="Taste::coordinates" value="121900 55400 137500 55400 153200 55300"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GuidanceControl" ri_name="ROVERPOSITION_STATUS"/>
+    <Target func_name="Agent" pi_name="ROVERPOSITION_STATUS"/>
+    <Property name="Taste::coordinates" value="97300 29500 75600 29500 53800 29400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Camera" ri_name="SCIENTIFICCAMERA_STATUS"/>
+    <Target func_name="Agent" pi_name="SCIENTIFICCAMERA_STATUS"/>
+    <Property name="Taste::coordinates" value="97900 66400 53800 66400"/>
+</Connection>
+
+<Connection >
+    <Source func_name="Camera" ri_name="CAMERA_STATUS"/>
+    <Target func_name="Agent" pi_name="CAMERA_STATUS"/>
+    <Property name="Taste::coordinates" value="97900 57100 75900 57100 53800 57000"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="TAKE_PICTURE"/>
+    <Target func_name="ConvertTelecommand" pi_name="TAKE_PICTURE"/>
+    <Property name="Taste::coordinates" value="-49300 69200 -32000 69200 -14600 69300"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="CHANGE_AUTONOMY_E4"/>
+    <Target func_name="ConvertTelecommand" pi_name="CHANGE_AUTONOMY_E4"/>
+    <Property name="Taste::coordinates" value="-49300 33500 -14600 33500"/>
+</Connection>
+
+<Connection >
+    <Source func_name="GroundControl" ri_name="PICK_SAMPLE"/>
+    <Target func_name="ConvertTelecommand" pi_name="PICK_SAMPLE"/>
+    <Property name="Taste::coordinates" value="-49300 62300 -32000 62300 -14600 62400"/>
+</Connection>
+
+</InterfaceView>

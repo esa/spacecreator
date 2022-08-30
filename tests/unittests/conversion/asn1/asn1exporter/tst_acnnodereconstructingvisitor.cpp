@@ -177,8 +177,8 @@ void tst_AcnNodeReconstructingVisitor::testEnumerated()
     type->setEndianness(Types::Type::mapEndianess(QStringLiteral("big")));
     type->setEncodeValues(true);
 
-    auto expectedResult =
-            QStringLiteral("MyEnumerated [align-to-next word, size 10, encoding pos-int, endianness big]\n");
+    auto expectedResult = QStringLiteral(
+            "MyEnumerated [align-to-next word, size 10, encoding pos-int, endianness big, encode-values]\n");
 
     performTest(QStringLiteral("MyEnumerated"), expectedResult, std::move(type));
 }

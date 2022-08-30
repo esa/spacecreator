@@ -81,7 +81,8 @@ public:
 
 private:
     static auto flattenModel(ivm::IVModel *ivModel) -> ParentFunctionsInfo;
-    static auto flattenConnections(ivm::IVFunctionType *function, ivm::IVModel *ivModel) -> void;
+    static auto flattenConnections(ivm::IVFunctionType *function, std::vector<ivm::IVConnection *> &connectionsToRemove,
+            ivm::IVModel *ivModel) -> void;
     static auto shouldFlattenConnection(ivm::IVConnection *connection, ivm::IVFunctionType *function) -> bool;
     static auto findLastConnection(ivm::IVConnection *connection, ivm::IVModel *ivModel) -> ivm::IVConnection *;
 
