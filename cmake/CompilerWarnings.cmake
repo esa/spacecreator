@@ -36,6 +36,7 @@ set(GCC_WARNINGS ${CLANG_WARNINGS}
                  -Wlogical-op
                  -Wuseless-cast
                  -Wno-unused-result
+                 -Wno-pessimizing-move
              )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
