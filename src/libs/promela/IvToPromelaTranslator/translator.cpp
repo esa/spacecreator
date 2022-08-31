@@ -79,10 +79,13 @@ IvToPromelaTranslator::ObserverAttachment::Kind IvToPromelaTranslator::ObserverA
 {
     const auto kindIn = QString("ObservedSignalKind.INPUT");
     const auto kindOut = QString("ObservedSignalKind.OUTPUT");
+    const auto kindContinuousSignal = QString("ObservedSignalKind.CONTINUOUS_SIGNAL");
     if (kind == kindIn) {
         return ObserverAttachment::Kind::Kind_Input;
     } else if (kind == kindOut) {
         return ObserverAttachment::Kind::Kind_Output;
+    } else if (kind == kindContinuousSignal) {
+        return ObserverAttachment::Kind::Kind_Continuous_Signal;
     } else {
         const auto message = QString("Observer kind %1 is unknown").arg(kind);
         throw TranslationException(message);
@@ -123,7 +126,7 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(const QString &spe
         }
     }
 
-    if (m_interfaceName.isEmpty()) {
+    if (m_interfaceName.isEmpty() && m_kind != Kind::Kind_Continuous_Signal) {
         const auto message = QString("Observed interface name is empty in observer %1 ").arg(m_observerName);
         throw TranslationException(message);
     }
@@ -185,6 +188,9 @@ void IvToPromelaTranslator::Context::addObserverAttachment(const IvToPromelaTran
     if (attachment.toFunction().has_value()) {
         m_toObserverAttachments[*attachment.toFunction()][attachment.interface()].push_back(attachment);
     }
+    if (attachment.kind() == ObserverAttachment::Kind::Kind_Continuous_Signal) {
+        m_observersWithContinuousSignals.push_back(attachment.observer());
+    }
 }
 
 auto IvToPromelaTranslator::Context::getObserverAttachments(const QString &function, const QString &interface,
@@ -227,7 +233,7 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const ObserverAttach
                         [kind](const ObserverAttachment &attachment) { return attachment.kind() == kind; });
             }
         }
-    } else {
+    } else if (kind == ObserverAttachment::Kind::Kind_Input) {
         for (auto functionIter = m_toObserverAttachments.begin(); functionIter != m_toObserverAttachments.end();
                 ++functionIter) {
             for (auto interfaceIter = functionIter->second.begin(); interfaceIter != functionIter->second.end();
@@ -278,6 +284,11 @@ void IvToPromelaTranslator::Context::setBaseProctypePriority(uint32_t priority)
 uint32_t IvToPromelaTranslator::Context::getBaseProctypePriority() const
 {
     return m_baseProctypePriority;
+}
+
+const std::vector<QString> &IvToPromelaTranslator::Context::getObserversWithContinuousSignals() const
+{
+    return m_observersWithContinuousSignals;
 }
 
 void IvToPromelaTranslator::addChannelAndLock(
@@ -515,8 +526,15 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
                 : QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
         // Observers can be also attached to environment
-        auto observerStatements =
+        std::list<std::unique_ptr<promela::model::ProctypeElement>> observerStatements =
                 attachInputObservers(context, functionName, interfaceName, signalParameterName, parameterType);
+
+        for (const QString &observer : context.getObserversWithContinuousSignals()) {
+            const QString inlineName = QString("%1_0_check_continuous_signals").arg(Escaper::escapePromelaIV(observer));
+            observerStatements.push_back(createLockAcquireStatement(observer));
+            observerStatements.push_back(std::make_unique<ProctypeElement>(InlineCall(inlineName, {})));
+            observerStatements.push_back(createLockReleaseStatement(observer));
+        }
 
         loopSequence->appendElement(generateProcessMessageBlock(functionName, currentChannelName, piName, parameterType,
                 signalParameterName, mainLoopLabel, false, std::move(observerStatements)));
@@ -538,12 +556,6 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
     }
 
     if (!environment) {
-        for (const QString &observer : context.observerNames()) {
-            const QString inlineName = QString("%1_0_check_continuous_signals").arg(observer);
-            loopSequence->appendElement(createLockAcquireStatement(observer));
-            loopSequence->appendElement(InlineCall(inlineName, {}));
-            loopSequence->appendElement(createLockReleaseStatement(observer));
-        }
     }
 
     DoLoop loop;
@@ -1437,7 +1449,7 @@ IvToPromelaTranslator::ObserverAttachments IvToPromelaTranslator::getObserverAtt
                 result.push_back(attachment);
             }
         }
-    } else {
+    } else if (kind == ObserverAttachment::Kind::Kind_Input) {
         for (const ObserverAttachment &attachment : allAttachments) {
             const QString fromFunction = getAttachmentFromFunction(context.ivModel(), attachment);
             if (function.compare(fromFunction, Qt::CaseInsensitive) == 0

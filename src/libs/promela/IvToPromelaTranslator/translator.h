@@ -46,6 +46,7 @@ private:
         {
             Kind_Input, //< Input signal interception, after processing by the recipient
             Kind_Output, //< Ouput signal interception, before processing by the recipient
+            Kind_Continuous_Signal, //< Continuous signal in observer
         };
 
         /**
@@ -222,11 +223,18 @@ private:
         auto setBaseProctypePriority(uint32_t priority) -> void;
 
         /**
-         * @brief Getter base priority for proctypes
+         * @brief Getter for base priority for proctypes
          *
          * @return base priority for proctypes
          */
         auto getBaseProctypePriority() const -> uint32_t;
+
+        /**
+         * @brief Getter for vector of observers with continuous signals
+         *
+         * @return vector of observers with continuous signals
+         */
+        auto getObserversWithContinuousSignals() const -> const std::vector<QString> &;
 
     private:
         model::PromelaModel *m_promelaModel;
@@ -238,6 +246,7 @@ private:
         uint32_t m_baseProctypePriority;
         std::map<QString, std::map<QString, ObserverAttachments>> m_fromObserverAttachments;
         std::map<QString, std::map<QString, ObserverAttachments>> m_toObserverAttachments;
+        std::vector<QString> m_observersWithContinuousSignals;
     };
 
 public:
