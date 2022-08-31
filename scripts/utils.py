@@ -8,7 +8,7 @@ def join_dir(*subdir):
     return os.path.abspath(os.path.join(*subdir))
 
 
-def print_cmd(cmd: list[str]) -> None:
+def print_cmd(cmd) -> None:
     """
     Prints a list of strings using spaces as seperator.
     """
