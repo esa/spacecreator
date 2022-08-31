@@ -537,6 +537,15 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         loopSequence->appendElement(createLockReleaseStatement(functionName));
     }
 
+    if (!environment) {
+        for (const QString &observer : context.observerNames()) {
+            const QString inlineName = QString("%1_0_check_continuous_signals").arg(observer);
+            loopSequence->appendElement(createLockAcquireStatement(observer));
+            loopSequence->appendElement(InlineCall(inlineName, {}));
+            loopSequence->appendElement(createLockReleaseStatement(observer));
+        }
+    }
+
     DoLoop loop;
 
     loop.appendSequence(std::move(loopSequence));
