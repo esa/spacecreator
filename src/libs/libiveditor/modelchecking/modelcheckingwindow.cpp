@@ -36,10 +36,8 @@
 
 
 namespace {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#define Endl std::endl;
-#else
-#define Endl Qt::endl;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using Qt::endl;
 #endif
 }
 
@@ -608,10 +606,10 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QFile callIfFile("callif.sh");
     if(callIfFile.open(QIODevice::ReadWrite)){
         QTextStream stream(&callIfFile);
-        stream << "#!/bin/bash" << Endl;
-        stream << "make clean" << Endl;
-        stream << "make model-check" << Endl;
-        stream << "echo $? > statusfile" << Endl;
+        stream << "#!/bin/bash" << endl;
+        stream << "make clean" << endl;
+        stream << "make model-check" << endl;
+        stream << "echo $? > statusfile" << endl;
     } else {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error opening callif.sh!");
