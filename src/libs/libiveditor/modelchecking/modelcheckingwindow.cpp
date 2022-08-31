@@ -34,6 +34,15 @@
 #include <QFileDialog>
 #include <QDebug>
 
+
+namespace {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define Endl std::endl;
+#else
+#define Endl Qt::endl;
+#endif
+}
+
 namespace ive {
 
 struct ModelCheckingWindow::ModelCheckingWindowPrivate {
@@ -599,10 +608,10 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QFile callIfFile("callif.sh");
     if(callIfFile.open(QIODevice::ReadWrite)){
         QTextStream stream(&callIfFile);
-        stream << "#!/bin/bash" << endl;
-        stream << "make clean" << endl;
-        stream << "make model-check" << endl;
-        stream << "echo $? > statusfile" << endl;
+        stream << "#!/bin/bash" << Endl;
+        stream << "make clean" << Endl;
+        stream << "make model-check" << Endl;
+        stream << "echo $? > statusfile" << Endl;
     } else {
         QMessageBox::warning(this, tr("Call IF"),
                              "Error opening callif.sh!");
@@ -943,7 +952,12 @@ void ModelCheckingWindow::addSubtypes()
 
         // ADD NEW TREE NODE
         QStringList fileColumn;
-        QFileInfo fileInfo = filePath;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+QFileInfo fileInfo = filePath;
+#else
+QFileInfo fileInfo = QFileInfo(filePath);
+#endif
+
         fileColumn.append(fileInfo.fileName());
         fileColumn.append(fileInfo.filePath());
         QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
