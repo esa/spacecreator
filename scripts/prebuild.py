@@ -112,7 +112,7 @@ def download_grantlee(env_dir: str) -> None:
     """
     Clone grantlees template library
     """
-    gitlab_url = "https://git.vikingsoftware.com/kasper/grantlee.git"
+    gitlab_url = "https://gitrepos.estec.esa.int/taste/grantlee.git"
     target_dir = join_dir(env_dir, 'grantlee')
     print('Cloning grantlee from {}'.format(gitlab_url))
     repository = Repo.clone_from(gitlab_url, target_dir)
