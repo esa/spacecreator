@@ -20,8 +20,8 @@
 #include "mscparametervalueparser.h"
 
 #include <conversion/common/translation/exceptions.h>
-#include <iostream>
 #include <ivcore/ivfunction.h>
+#include <shared/qstringhash.h>
 
 using Asn1Acn::Types::Type;
 using conversion::translator::TranslationException;
@@ -39,8 +39,11 @@ MscParameterValueParser::MscParameterValueParser(
 {
 }
 
-void MscParameterValueParser::parseSignals(const std::unordered_map<uint32_t, SignalInfo> &signals) const
+MscParameterValueParser::SignalsParametersRequirementsMap MscParameterValueParser::parseSignals(
+        const std::unordered_map<uint32_t, SignalInfo> &signals) const
 {
+    SignalsParametersRequirementsMap signalsParametersRequirements;
+
     for (const auto &[signalId, signalInfo] : signals) {
         const auto &parameterList = signalInfo.parameterList;
 
@@ -53,11 +56,16 @@ void MscParameterValueParser::parseSignals(const std::unordered_map<uint32_t, Si
 
         const auto ivInterface = findIvInterface(ivFunctionName, ivInterfaceName);
 
-        parseSignal(signalInfo, ivInterface);
+        auto signalParametersRequirements = parseSignal(signalInfo, ivInterface);
+
+        signalsParametersRequirements.insert({ signalId, std::move(signalParametersRequirements) });
     }
+
+    return signalsParametersRequirements;
 }
 
-void MscParameterValueParser::parseSignal(const SignalInfo &signalInfo, const IVInterface *ivInterface) const
+MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::parseSignal(
+        const SignalInfo &signalInfo, const IVInterface *ivInterface) const
 {
     const auto &ivParameters = ivInterface->params();
     const auto &mscParameters = signalInfo.parameterList;
@@ -72,12 +80,23 @@ void MscParameterValueParser::parseSignal(const SignalInfo &signalInfo, const IV
 
     const auto &ivInterfaceName = ivInterface->title();
 
+    SignalParametersRequirements signalParametersRequirements;
+
     for (int i = 0; i < ivParameters.size(); ++i) {
         const auto &ivParameter = ivParameters.at(i);
         const auto &mscParameter = mscParameters.at(i);
 
-        const auto asn1Value = parseParameter(ivParameter, mscParameter, ivInterfaceName);
+        const auto asn1ValueMap = parseParameter(ivParameter, mscParameter, ivInterfaceName);
+
+        ParameterRequirementsMap parameterRequirements;
+
+        const auto signalVariableName = QString("%1_%2").arg(signalInfo.signal->name()).arg(ivParameter.name());
+        parseValueMap(asn1ValueMap, signalVariableName, false, parameterRequirements);
+
+        signalParametersRequirements.push_back(std::move(parameterRequirements));
     }
+
+    return signalParametersRequirements;
 }
 
 QVariantMap MscParameterValueParser::parseParameter(
@@ -118,6 +137,72 @@ QVariantMap MscParameterValueParser::parseParameter(
     }
 
     return asn1Value;
+}
+
+void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const QString &parentName, const bool isChoice,
+        ParameterRequirementsMap &result) const
+{
+    if (!valueMap.contains("name")) {
+        throw TranslationException("Missing 'name' key in value map from ASN.1 value parser");
+    }
+
+    const auto &nameValue = valueMap["name"].toString();
+    const auto name = nameValue.isEmpty() ? parentName : QString("%1.%2").arg(parentName).arg(nameValue);
+
+    for (auto iter = valueMap.constBegin(); iter != valueMap.constEnd(); ++iter) {
+        const auto &key = iter.key();
+        const auto &value = iter.value();
+
+        if (key == "name") {
+            continue;
+        }
+
+        if (key == "seqofvalue") {
+            parseValueSequence(value.toList(), parentName, result);
+        } else if (key == "children") {
+            parseValueChildren(value.toList(), name, result);
+        } else if (key == "choice") {
+            parseValueMap(value.toMap(), name, true, result);
+        } else if (key == "value") {
+            if (value.isValid()) {
+                result.insert({ name, value.toString() });
+            } else if (isChoice) {
+                result.insert({ name, std::nullopt });
+            }
+        } else {
+            auto errorMessage = QString("Unknown ASN.1 value map key '%1'").arg(key);
+            throw TranslationException(std::move(errorMessage));
+        }
+    }
+}
+
+void MscParameterValueParser::parseValueSequence(
+        const QVariantList &seqOfValue, const QString &parentName, ParameterRequirementsMap &result) const
+{
+    for (int i = 0; i < seqOfValue.size(); ++i) {
+        const auto &elem = seqOfValue.at(i);
+
+        if (elem.userType() != QMetaType::QVariantMap) {
+            throw TranslationException("ASN.1 value sequence element is not a map");
+        }
+
+        const auto name = QString("%1(%2)").arg(parentName).arg(i);
+        parseValueMap(elem.toMap(), name, false, result);
+    }
+}
+
+void MscParameterValueParser::parseValueChildren(
+        const QVariantList &children, const QString &name, ParameterRequirementsMap &result) const
+{
+    for (int i = 0; i < children.size(); ++i) {
+        const auto &child = children.at(i);
+
+        if (child.userType() != QMetaType::QVariantMap) {
+            throw TranslationException("ASN.1 value children element is not a map");
+        }
+
+        parseValueMap(child.toMap(), name, false, result);
+    }
 }
 
 IVInterface *MscParameterValueParser::findIvInterface(

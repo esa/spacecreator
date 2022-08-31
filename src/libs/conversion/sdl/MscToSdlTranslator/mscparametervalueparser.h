@@ -28,6 +28,7 @@
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <shared/parameter.h>
+#include <shared/qstringhash.h>
 #include <unordered_map>
 
 namespace conversion::sdl::translator {
@@ -65,17 +66,30 @@ public:
     MscParameterValueParser &operator=(MscParameterValueParser &&) = delete;
 
 public:
+    using ParameterRequirementsMap = std::unordered_map<QString, std::optional<QString>>;
+    using SignalParametersRequirements = std::vector<ParameterRequirementsMap>;
+    using SignalsParametersRequirementsMap = std::unordered_map<uint32_t, SignalParametersRequirements>;
+
     /**
      * @brief   Parse given signals
      *
      * @param   signals     Signals to parse
      */
-    auto parseSignals(const std::unordered_map<uint32_t, SignalInfo> &signals) const -> void;
+    auto parseSignals(const std::unordered_map<uint32_t, SignalInfo> &signals) const
+            -> SignalsParametersRequirementsMap;
 
 private:
-    auto parseSignal(const SignalInfo &signalInfo, const ivm::IVInterface *ivInterface) const -> void;
+    auto parseSignal(const SignalInfo &signalInfo, const ivm::IVInterface *ivInterface) const
+            -> SignalParametersRequirements;
     auto parseParameter(const shared::InterfaceParameter &ivParameter, const msc::MscParameter &mscParameter,
             const QString &ivInterfaceName) const -> QVariantMap;
+
+    auto parseValueMap(const QVariantMap &valueMap, const QString &parentName, const bool isChoice,
+            ParameterRequirementsMap &result) const -> void;
+    auto parseValueSequence(
+            const QVariantList &seqOfValue, const QString &parentName, ParameterRequirementsMap &result) const -> void;
+    auto parseValueChildren(const QVariantList &children, const QString &name, ParameterRequirementsMap &result) const
+            -> void;
 
     auto findIvInterface(const QString &ivFunctionName, const QString &ivInterfaceName) const -> ivm::IVInterface *;
     auto getIvParameterType(const shared::InterfaceParameter &ivParameter) const -> const Asn1Acn::Types::Type *;
