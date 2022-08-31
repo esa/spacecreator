@@ -555,9 +555,6 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         loopSequence->appendElement(createLockReleaseStatement(functionName));
     }
 
-    if (!environment) {
-    }
-
     DoLoop loop;
 
     loop.appendSequence(std::move(loopSequence));
