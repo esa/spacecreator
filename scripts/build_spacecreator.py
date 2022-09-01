@@ -3,10 +3,6 @@
 import argparse
 import os.path
 import subprocess
-import urllib.request
-
-import py7zr
-import zipfile
 from utils import join_dir, print_cmd, exit_if_not_exists
 
 """
@@ -19,8 +15,6 @@ python3 ./scripts/build_spacecreator.py
     --build_dir ./build
     --env_dir ~/opt/spacecreatorenv6
     --env_qt_dir ~/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/ 
-    
-    
 """
 
 
@@ -110,7 +104,7 @@ if __name__ == '__main__':
 
     if args.build_type:
         build_type = args.build_type
-        print("Build type {}".fomat(build_type))
+        print("Build type {}".format(build_type))
     else:
         build_type = 'Release'
         print("Defaulting to build type {}".format(build_type))
