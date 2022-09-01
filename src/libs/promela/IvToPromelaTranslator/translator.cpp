@@ -525,10 +525,15 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
                 ? QString()
                 : QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
+        std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements;
+        preProcessingElements.push_back(
+                std::make_unique<ProctypeElement>(Assignment(VariableRef(channelUsedName), Expression(Constant(1)))));
+
         // Observers can be also attached to environment
         std::list<std::unique_ptr<promela::model::ProctypeElement>> observerStatements =
                 attachInputObservers(context, functionName, interfaceName, signalParameterName, parameterType);
 
+        // Add processing of continuous signals in observers
         for (const QString &observer : context.getObserversWithContinuousSignals()) {
             const QString inlineName = QString("%1_0_check_continuous_signals").arg(Escaper::escapePromelaIV(observer));
             observerStatements.push_back(createLockAcquireStatement(observer));
@@ -537,7 +542,8 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         }
 
         loopSequence->appendElement(generateProcessMessageBlock(functionName, currentChannelName, piName, parameterType,
-                signalParameterName, mainLoopLabel, false, std::move(observerStatements)));
+                signalParameterName, mainLoopLabel, false, std::move(preProcessingElements),
+                std::move(observerStatements)));
     }
 
     // process all observers
@@ -547,7 +553,7 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
         channelNames.pop_front();
 
         loopSequence->appendElement(generateProcessMessageBlock(attachment.observer(), currentChannelName,
-                observerInputSignalName(attachment), parameterType, signalParameterName, mainLoopLabel, true, {}));
+                observerInputSignalName(attachment), parameterType, signalParameterName, mainLoopLabel, true, {}, {}));
     }
 
     // release function mutex
@@ -574,7 +580,8 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
 std::unique_ptr<ProctypeElement> IvToPromelaTranslator::generateProcessMessageBlock(const QString &functionName,
         const QString &channelName, const QString &inlineName, const QString &parameterType,
         const QString &parameterName, const QString &exitLabel, bool lock,
-        std::list<std::unique_ptr<promela::model::ProctypeElement>> additionalElements) const
+        std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements,
+        std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements) const
 {
     QList<InlineCall::Argument> checkQueueArguments;
     checkQueueArguments.append(VariableRef(channelName));
@@ -584,6 +591,11 @@ std::unique_ptr<ProctypeElement> IvToPromelaTranslator::generateProcessMessageBl
 
     // channel receive
     processMessageSeq->appendElement(createReceiveStatement(channelName, parameterType, parameterName));
+
+    while (!preProcessingElements.empty()) {
+        processMessageSeq->appendElement(std::move(preProcessingElements.front()));
+        preProcessingElements.pop_front();
+    }
 
     // acquire lock (observer or sdl process)
     if (lock) {
@@ -600,9 +612,9 @@ std::unique_ptr<ProctypeElement> IvToPromelaTranslator::generateProcessMessageBl
         processMessageSeq->appendElement(createLockReleaseStatement(functionName));
     }
 
-    while (!additionalElements.empty()) {
-        processMessageSeq->appendElement(std::move(additionalElements.front()));
-        additionalElements.pop_front();
+    while (!postProcessingElements.empty()) {
+        processMessageSeq->appendElement(std::move(postProcessingElements.front()));
+        postProcessingElements.pop_front();
     }
 
     processMessageSeq->appendElement(GoTo(exitLabel));

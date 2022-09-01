@@ -32,6 +32,7 @@
 #include <promela/PromelaOptions/options.h>
 
 using conversion::promela::PromelaOptions;
+using promela::model::Assignment;
 using promela::model::BasicType;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -40,6 +41,8 @@ using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
+using promela::model::GoTo;
+using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::Label;
 using promela::model::Proctype;
@@ -78,6 +81,9 @@ private:
         }
         return nullptr;
     }
+
+    void verifyProctypeSimple(const Proctype *proctype, const QString &functionName, const QString &interfaceName,
+            size_t expectedParameters);
 
 private:
     std::unique_ptr<ivm::IVModel> importIvModel(const QString &filepath);
@@ -217,22 +223,19 @@ void tst_IvToPromelaTranslator::testSimple()
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Actuator_test");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Actuator", "test", 0);
     }
 
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_success");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Controller", "success", 0);
     }
 
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_fail");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Controller", "fail", 0);
     }
 
     QCOMPARE(promelaModel->getInlineDefs().size(), 5);
@@ -431,22 +434,19 @@ void tst_IvToPromelaTranslator::testParameters()
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Actuator_work");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Actuator", "work", 1);
     }
 
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_result");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Controller", "result", 1);
     }
 
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_error");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Controller", "error", 0);
     }
 
     QCOMPARE(promelaModel->getInlineDefs().size(), 5);
@@ -741,36 +741,31 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_test");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Controller", "test", 1);
     }
 
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_up_result");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Controller", "up_result", 1);
     }
 
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_down_result");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Controller", "down_result", 1);
     }
 
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Up_check");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Up", "check", 1);
     }
 
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Down_check");
         QVERIFY(proctype != nullptr);
-        QVERIFY(proctype->isActive());
-        QCOMPARE(proctype->getInstancesCount(), 1);
+        verifyProctypeSimple(proctype, "Down", "check", 1);
     }
 
     QCOMPARE(promelaModel->getInlineDefs().size(), 8);
@@ -995,6 +990,7 @@ const InlineDef *tst_IvToPromelaTranslator::findInline(
     }
     return iter->get();
 }
+
 const Proctype *tst_IvToPromelaTranslator::findProctype(
         const std::list<std::unique_ptr<Proctype>> &list, const QString &name)
 {
@@ -1005,6 +1001,71 @@ const Proctype *tst_IvToPromelaTranslator::findProctype(
         return nullptr;
     }
     return iter->get();
+}
+
+void tst_IvToPromelaTranslator::verifyProctypeSimple(
+        const Proctype *proctype, const QString &functionName, const QString &interfaceName, size_t expectedParameters)
+{
+    const QString expectedLoopLabel = QString("%1_%2_loop").arg(functionName).arg(interfaceName);
+    const QString expectedChannelName = QString("%1_%2_channel").arg(functionName).arg(interfaceName);
+    const QString expectedChannelUsedName = QString("%1_used").arg(expectedChannelName);
+    const QString expectedProcessInlineName = QString("%1_0_PI_0_%2").arg(functionName).arg(interfaceName);
+
+    QVERIFY(proctype->isActive());
+    QCOMPARE(proctype->getInstancesCount(), 1);
+
+    const Sequence &main = proctype->getSequence();
+
+    const DoLoop *mainLoop = findProctypeElement<DoLoop>(main, 1);
+    QVERIFY(mainLoop);
+
+    QVERIFY(mainLoop->getSequences().size() > 0);
+
+    const Sequence &mainSequence = *mainLoop->getSequences().front();
+
+    const Expression *queueCheckExpression = findProctypeElement<Expression>(mainSequence, 0);
+    QVERIFY(queueCheckExpression);
+
+    const ChannelRecv *functionLockStatement = findProctypeElement<ChannelRecv>(mainSequence, 1);
+    QVERIFY(functionLockStatement);
+
+    const Label *loopLabel = findProctypeElement<Label>(mainSequence, 2);
+    QVERIFY(loopLabel);
+    QCOMPARE(loopLabel->getName(), expectedLoopLabel);
+
+    const Conditional *sdlProcessingBlock = findProctypeElement<Conditional>(mainSequence, 3);
+    QVERIFY(sdlProcessingBlock);
+
+    QCOMPARE(sdlProcessingBlock->getAlternatives().size(), 2);
+    const Sequence &processingSequence = *sdlProcessingBlock->getAlternatives().front();
+
+    const InlineCall *processingCheckExpression = findProctypeElement<InlineCall>(processingSequence, 0);
+    QVERIFY(processingCheckExpression);
+    QCOMPARE(processingCheckExpression->getName(), "nempty");
+    const ChannelRecv *processingChannelRecv = findProctypeElement<ChannelRecv>(processingSequence, 1);
+    QVERIFY(processingChannelRecv);
+    QCOMPARE(processingChannelRecv->getChannelRef().getElements().size(), 1);
+    QCOMPARE(processingChannelRecv->getChannelRef().getElements().front().m_name, expectedChannelName);
+    QVERIFY(processingChannelRecv->getChannelRef().getElements().front().m_index.get() == nullptr);
+
+    const Assignment *channelUsedAssignment = findProctypeElement<Assignment>(processingSequence, 2);
+    QVERIFY(channelUsedAssignment);
+
+    QCOMPARE(channelUsedAssignment->getVariableRef().getElements().size(), 1);
+    QCOMPARE(channelUsedAssignment->getVariableRef().getElements().front().m_name, expectedChannelUsedName);
+    QVERIFY(channelUsedAssignment->getVariableRef().getElements().front().m_index.get() == nullptr);
+
+    const InlineCall *sdlProcessingCall = findProctypeElement<InlineCall>(processingSequence, 3);
+    QVERIFY(sdlProcessingCall);
+    QCOMPARE(sdlProcessingCall->getName(), expectedProcessInlineName);
+    QCOMPARE(sdlProcessingCall->getArguments().size(), expectedParameters);
+
+    const GoTo *gotoLoop = findProctypeElement<GoTo>(processingSequence, 4);
+    QVERIFY(gotoLoop);
+    QCOMPARE(gotoLoop->getLabel(), expectedLoopLabel);
+
+    const ChannelSend *functionUnlockStatement = findProctypeElement<ChannelSend>(mainSequence, 4);
+    QVERIFY(functionUnlockStatement);
 }
 }
 QTEST_MAIN(tmc::test::tst_IvToPromelaTranslator)
