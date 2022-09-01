@@ -10,7 +10,7 @@ from utils import join_dir, print_cmd, ensure_dir
 from git.repo import Repo
 
 '''
-This script prepares a build environment in a given folder for SpaceCreator. SpaceCreator is plugin for QtCreator
+This script prepares a build environment in a given folder for SpaceCreator. SpaceCreator is a plugin for QtCreator
 and the following is needed to compile it:
 
 Qt
@@ -156,8 +156,11 @@ def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
 
 
 def install_grantlee(env_dir: str) -> None:
+    """
+    Install grantlee in the spacecreator build environment
+    :param env_dir: path to the build environment (i.e ~/opt/spacecreatorenv6)
+    """
     cmake_build_dir = join_dir(env_dir, 'build')
-    # Install GrantLee lib in /usr/local/ not ideal but it's what we have for now
     install_cmd = ['cmake',
                    '--build',
                    cmake_build_dir,
