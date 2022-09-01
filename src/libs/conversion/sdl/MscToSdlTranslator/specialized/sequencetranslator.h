@@ -82,7 +82,7 @@ protected:
     auto createTransitionOnInput(const QString &signalName, ::sdl::State *sourceState,
             const ::sdl::State *targetState) const -> std::unique_ptr<::sdl::Transition>;
 
-    auto getArgumentsTypes(const ::sdl::Rename *signal) const -> std::vector<QString>;
+    auto getArgumentsTypes(const QString &ivFunctionName, const QString &ivInterfaceName) const -> QStringList;
     auto findIvInterface(const QString &ivFunctionName, const QString &ivInterfaceName) const -> ivm::IVInterface *;
 
 protected:

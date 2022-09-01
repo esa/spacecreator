@@ -79,7 +79,7 @@ public:
 private:
     auto parseSignal(const SignalInfo &signalInfo) const -> SignalParametersRequirements;
     auto parseParameter(const QString &ivParameterTypeName, const msc::MscParameter &mscParameter,
-            const QString &ivInterfaceName, std::size_t parameterIndex) const -> QVariantMap;
+            const QString &ivInterfaceName, const int parameterIndex) const -> QVariantMap;
 
     auto parseValueMap(const QVariantMap &valueMap, const QString &parentName, const bool isChoice,
             ParameterRequirementsMap &result) const -> void;

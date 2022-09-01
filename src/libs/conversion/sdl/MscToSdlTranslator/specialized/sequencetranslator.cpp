@@ -57,18 +57,21 @@ SequenceTranslator::SequenceTranslator(
 
 SignalInfo SequenceTranslator::renameSignal(const QString &name, const MscMessage *mscMessage) const
 {
+    const auto &referencedFunctionName = Escaper::escapeSdlName(mscMessage->targetInstance()->name());
+    const auto &referencedName = Escaper::escapeSdlName(mscMessage->name());
+
+    auto parametersTypes = getArgumentsTypes(referencedFunctionName, referencedName);
+
     auto signalRename = std::make_unique<Rename>();
     signalRename->setName(name);
     signalRename->setDirection(Rename::Direction::Input);
-    signalRename->setReferencedName(Escaper::escapeSdlName(mscMessage->name()));
-    signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
-
-    auto parametersTypes = getArgumentsTypes(signalRename.get());
+    signalRename->setReferencedName(referencedName);
+    signalRename->setReferencedFunctionName(referencedFunctionName);
+    signalRename->setParametersTypes(std::move(parametersTypes));
 
     SignalInfo signalInfo;
     signalInfo.signal = std::move(signalRename);
     signalInfo.parameterList = mscMessage->parameters();
-    signalInfo.parametersTypes = std::move(parametersTypes);
 
     return signalInfo;
 }
@@ -174,19 +177,16 @@ std::unique_ptr<Transition> SequenceTranslator::createTransitionOnInput(
     return transition;
 }
 
-std::vector<QString> SequenceTranslator::getArgumentsTypes(const ::sdl::Rename *signal) const
+QStringList SequenceTranslator::getArgumentsTypes(const QString &ivFunctionName, const QString &ivInterfaceName) const
 {
-    std::vector<QString> types;
-
-    const auto &ivFunctionName = signal->referencedFunctionName();
-    const auto &ivInterfaceName = signal->referencedName();
+    QStringList types;
 
     const auto ivInterface = findIvInterface(ivFunctionName, ivInterfaceName);
 
     const auto &ivInterfaceParameters = ivInterface->params();
 
     for (const auto &param : ivInterfaceParameters) {
-        types.push_back(param.paramTypeName());
+        types << param.paramTypeName();
     }
 
     return types;

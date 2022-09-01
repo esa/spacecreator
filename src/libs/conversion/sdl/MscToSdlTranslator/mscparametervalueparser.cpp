@@ -60,12 +60,12 @@ MscParameterValueParser::SignalsParametersRequirementsMap MscParameterValueParse
 MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::parseSignal(
         const SignalInfo &signalInfo) const
 {
-    const auto &parametersTypes = signalInfo.parametersTypes;
     const auto &mscParameters = signalInfo.parameterList;
+    const auto &parametersTypes = signalInfo.signal->parametersTypes();
 
     const auto &signal = signalInfo.signal;
 
-    if (mscParameters.size() != static_cast<int>(parametersTypes.size())) {
+    if (mscParameters.size() != parametersTypes.size()) {
         auto errorMessage =
                 QString("Wrong number of parameters in message %1 (chart %2)").arg(signal->name()).arg(m_chartName);
         throw TranslationException(std::move(errorMessage));
@@ -75,15 +75,15 @@ MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::p
 
     SignalParametersRequirements signalParametersRequirements;
 
-    for (std::size_t i = 0; i < parametersTypes.size(); ++i) {
-        const auto &ivParameterTypeName = parametersTypes.at(i);
-        const auto &mscParameter = mscParameters.at(i);
+    for (int parameterIndex = 0; parameterIndex < parametersTypes.size(); ++parameterIndex) {
+        const auto &ivParameterTypeName = parametersTypes.at(parameterIndex);
+        const auto &mscParameter = mscParameters.at(parameterIndex);
 
-        const auto asn1ValueMap = parseParameter(ivParameterTypeName, mscParameter, ivInterfaceName, i);
+        const auto asn1ValueMap = parseParameter(ivParameterTypeName, mscParameter, ivInterfaceName, parameterIndex);
 
         ParameterRequirementsMap parameterRequirements;
 
-        const auto signalVariableName = QString("%1_param%2").arg(signalInfo.signal->name()).arg(i);
+        const auto signalVariableName = QString("%1_param%2").arg(signalInfo.signal->name()).arg(parameterIndex);
         parseValueMap(asn1ValueMap, signalVariableName, false, parameterRequirements);
 
         signalParametersRequirements.push_back(std::move(parameterRequirements));
@@ -93,7 +93,7 @@ MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::p
 }
 
 QVariantMap MscParameterValueParser::parseParameter(const QString &ivParameterTypeName,
-        const MscParameter &mscParameter, const QString &ivInterfaceName, std::size_t parameterIndex) const
+        const MscParameter &mscParameter, const QString &ivInterfaceName, const int parameterIndex) const
 {
     if (mscParameter.type() == MscParameter::Type::Unknown) {
         auto errorMessage = QString("MSC parameter #%1 is of unknown type").arg(parameterIndex);
