@@ -33,8 +33,10 @@ default:
     - git clone https://github.com/n7space/sdl2promela.git
     - pushd sdl2promela ; make install ; popd
     # install qtcreator sources
-    - ./scripts/download_qtcreator.sh
-    - ./scripts/build_grantlee.sh
+    #- ./scripts/download_qtcreator.sh
+    #- ./scripts/build_grantlee.sh
+    # SpaceCreator
+    - python3 ${PROJECT_ROOT}/scripts/prebuild.py --output_dir ${DOWNLOAD_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
 
 
 space-creator-dev:
