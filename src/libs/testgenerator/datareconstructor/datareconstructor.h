@@ -26,7 +26,9 @@
 #include <QPair>
 #include <QString>
 #include <QVariant>
+#ifndef Q_OS_MACOS
 #include <endian.h>
+#endif
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <qglobal.h>

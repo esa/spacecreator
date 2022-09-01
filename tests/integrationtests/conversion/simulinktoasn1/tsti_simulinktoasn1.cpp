@@ -23,6 +23,7 @@
 #include <conversion/asn1/SimulinkToAsn1Translator/translator.h>
 #include <simulink/SimulinkOptions/options.h>
 #include <simulink/SimulinkXmlImporter/importer.h>
+#include <array>
 
 using Asn1Acn::Asn1Model;
 using conversion::asn1::exporter::Asn1Exporter;

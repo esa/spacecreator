@@ -234,8 +234,12 @@ target_link_libraries(${LIB_NAME}
     ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
-    "stdc++fs"
     )
+
+if (NOT APPLE)
+    target_link_libraries(${LIB_NAME} "stdc++fs")
+endif()
+
 
 target_include_directories(${LIB_NAME} PUBLIC .)
 
