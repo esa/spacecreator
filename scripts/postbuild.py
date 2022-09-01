@@ -19,10 +19,10 @@ folders.
 
 This script handles all this and can be called on the commandline or from the QtCreator/Other IDE used to develop in.
 In QtCreator the run settings could be a custom Deploy Configuration with the command python3 an the arguments:
- %{ActiveProject:Path}/scripts/postbuild.py --project_dir=%{ActiveProject:Path} --build_dir=%{buildDir} --env_dir=/home/<user>/opt/spacecreatorenv6/
+ %{ActiveProject:Path}/scripts/postbuild.py --project_dir %{ActiveProject:Path} --build_dir %{buildDir} --env_dir /home/<user>/opt/spacecreatorenv6/
  
 On the command line:
-python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir=~/projects/spacecreator/build --env_dir=~/opt/spacecreatorenv6
+python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir ~/projects/spacecreator/build --env_dir ~/opt/spacecreatorenv6
 """
 
 
@@ -56,9 +56,8 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     # Projects wizards
     projects_dir = join_dir(wizards_dir, 'projects')
     projects_install_dir = join_dir(wizards_install_dir, 'projects')
-    utils.copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
-
     print("Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
+    utils.copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
 
 
 if __name__ == '__main__':
@@ -68,9 +67,9 @@ if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='postbuild',
                                      epilog='python3 ./scripts/postbuild.py '
-                                            '--project_dir=/home/<user>/projects/spacecreator/ '
-                                            '--build_dir=/home/<user>/projects/spacecreator/build '
-                                            '--env_dir=/home/<user>/opt/qtcreatorenv ')
+                                            '--project_dir /home/<user>/projects/spacecreator/ '
+                                            '--build_dir /home/<user>/projects/spacecreator/build '
+                                            '--env_dir /home/<user>/opt/spacecreatorenv6 ')
 
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
                         help='Path to the folder where spacecreator project is')
