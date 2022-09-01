@@ -44,7 +44,7 @@ def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str) -> None:
     def ensure_dst_dir(path: str) -> None:
         if not os.path.exists(path):
             os.makedirs(path)
-            
+
     for item_name in os.listdir(src_dir):
         item = join_dir(src_dir, item_name)
         if os.path.isfile(item):
