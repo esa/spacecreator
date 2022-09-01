@@ -193,7 +193,10 @@ void SdlVisitor::visit(const System &system)
 
     m_writer.pushIndent(INDENT);
 
-    if (!system.freeformTexts().empty()) {
+    const auto hasFreeformTexts = !system.freeformTexts().empty();
+    const auto hasSignals = !system.getSignals().empty();
+
+    if (hasFreeformTexts || hasSignals) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
 
@@ -202,13 +205,8 @@ void SdlVisitor::visit(const System &system)
             m_writer.endLine(";");
         }
 
-        m_writer.writeLine("/* CIF ENDTEXT */");
-    }
-
-    if (!system.getSignals().empty()) {
-        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
-        m_layouter.moveDown(Layouter::ElementType::Text);
         exportCollection(system.getSignals());
+
         m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
