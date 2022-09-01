@@ -26,7 +26,6 @@
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1valueparser.h>
 #include <ivcore/ivinterface.h>
-#include <ivcore/ivmodel.h>
 #include <shared/parameter.h>
 #include <shared/qstringhash.h>
 #include <unordered_map>
@@ -42,11 +41,10 @@ public:
     /**
      * @brief   Constructor
      *
+     * @param   chartName           Name of the MSC chart
      * @param   observerAsn1File    ASN.1 with observer dataview
-     * @param   ivModel             IV model
      */
-    MscParameterValueParser(
-            const QString &chartName, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel);
+    MscParameterValueParser(const QString &chartName, const Asn1Acn::File *observerAsn1File);
     /**
      * @brief   Deleted copy constructor
      */
@@ -79,10 +77,9 @@ public:
             -> SignalsParametersRequirementsMap;
 
 private:
-    auto parseSignal(const SignalInfo &signalInfo, const ivm::IVInterface *ivInterface) const
-            -> SignalParametersRequirements;
-    auto parseParameter(const shared::InterfaceParameter &ivParameter, const msc::MscParameter &mscParameter,
-            const QString &ivInterfaceName) const -> QVariantMap;
+    auto parseSignal(const SignalInfo &signalInfo) const -> SignalParametersRequirements;
+    auto parseParameter(const QString &ivParameterTypeName, const msc::MscParameter &mscParameter,
+            const QString &ivInterfaceName, std::size_t parameterIndex) const -> QVariantMap;
 
     auto parseValueMap(const QVariantMap &valueMap, const QString &parentName, const bool isChoice,
             ParameterRequirementsMap &result) const -> void;
@@ -91,13 +88,9 @@ private:
     auto parseValueChildren(const QVariantList &children, const QString &name, ParameterRequirementsMap &result) const
             -> void;
 
-    auto findIvInterface(const QString &ivFunctionName, const QString &ivInterfaceName) const -> ivm::IVInterface *;
-    auto getIvParameterType(const shared::InterfaceParameter &ivParameter) const -> const Asn1Acn::Types::Type *;
-
 private:
     QString m_chartName;
     const Asn1Acn::File *m_observerAsn1File;
-    const ivm::IVModel *m_ivModel;
 
     Asn1Acn::Asn1ValueParser m_asn1ValueParser;
 };

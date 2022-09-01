@@ -19,18 +19,24 @@
 
 #include "specialized/sequencetranslator.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/msc/MscOptions/options.h>
+#include <ivcore/ivfunction.h>
+#include <msccore/mscinstance.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/variabledeclaration.h>
 
 using conversion::msc::MscOptions;
 using conversion::translator::TranslationException;
+using ivm::IVInterface;
 using ivm::IVModel;
+using msc::MscMessage;
 using sdl::Block;
 using sdl::Input;
 using sdl::NextState;
 using sdl::Process;
+using sdl::Rename;
 using sdl::SdlModel;
 using sdl::State;
 using sdl::StateMachine;
@@ -47,6 +53,24 @@ SequenceTranslator::SequenceTranslator(
     , m_ivModel(ivModel)
     , m_options(options)
 {
+}
+
+SignalInfo SequenceTranslator::renameSignal(const QString &name, const MscMessage *mscMessage) const
+{
+    auto signalRename = std::make_unique<Rename>();
+    signalRename->setName(name);
+    signalRename->setDirection(Rename::Direction::Input);
+    signalRename->setReferencedName(Escaper::escapeSdlName(mscMessage->name()));
+    signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
+
+    auto parametersTypes = getArgumentsTypes(signalRename.get());
+
+    SignalInfo signalInfo;
+    signalInfo.signal = std::move(signalRename);
+    signalInfo.parameterList = mscMessage->parameters();
+    signalInfo.parametersTypes = std::move(parametersTypes);
+
+    return signalInfo;
 }
 
 Process SequenceTranslator::createSdlProcess(const QString &chartName, std::unique_ptr<StateMachine> stateMachine)
@@ -148,6 +172,47 @@ std::unique_ptr<Transition> SequenceTranslator::createTransitionOnInput(
     sourceState->addInput(std::move(input));
 
     return transition;
+}
+
+std::vector<QString> SequenceTranslator::getArgumentsTypes(const ::sdl::Rename *signal) const
+{
+    std::vector<QString> types;
+
+    const auto &ivFunctionName = signal->referencedFunctionName();
+    const auto &ivInterfaceName = signal->referencedName();
+
+    const auto ivInterface = findIvInterface(ivFunctionName, ivInterfaceName);
+
+    const auto &ivInterfaceParameters = ivInterface->params();
+
+    for (const auto &param : ivInterfaceParameters) {
+        types.push_back(param.paramTypeName());
+    }
+
+    return types;
+}
+
+IVInterface *SequenceTranslator::findIvInterface(const QString &ivFunctionName, const QString &ivInterfaceName) const
+{
+    const auto ivFunction = m_ivModel->getFunction(ivFunctionName, Qt::CaseInsensitive);
+
+    if (ivFunction == nullptr) {
+        auto errorMessage = QString("Unable to find function named %1 in given InterfaceView").arg(ivFunctionName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto ivInterfaces = ivFunction->interfaces();
+    const auto ivInterfaceFound = std::find_if(ivInterfaces.begin(), ivInterfaces.end(),
+            [&](const auto interface) { return interface->title() == ivInterfaceName; });
+
+    if (ivInterfaceFound == ivInterfaces.end()) {
+        auto errorMessage = QString("Unable to find interface named %1 in function %2 in given InterfaceView")
+                                    .arg(ivInterfaceName)
+                                    .arg(ivFunctionName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    return *ivInterfaceFound;
 }
 
 } // namespace conversion::sdl::translator

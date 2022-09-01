@@ -28,6 +28,7 @@ namespace conversion::sdl::translator {
 struct SignalInfo {
     std::unique_ptr<::sdl::Rename> signal;
     msc::MscParameterList parameterList;
+    std::vector<QString> parametersTypes;
 };
 
 } // namespace conversion::sdl::translator

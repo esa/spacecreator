@@ -31,11 +31,9 @@ using shared::InterfaceParameter;
 
 namespace conversion::sdl::translator {
 
-MscParameterValueParser::MscParameterValueParser(
-        const QString &chartName, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel)
+MscParameterValueParser::MscParameterValueParser(const QString &chartName, const Asn1Acn::File *observerAsn1File)
     : m_chartName(chartName)
     , m_observerAsn1File(observerAsn1File)
-    , m_ivModel(ivModel)
 {
 }
 
@@ -51,12 +49,7 @@ MscParameterValueParser::SignalsParametersRequirementsMap MscParameterValueParse
             continue;
         }
 
-        const auto &ivFunctionName = signalInfo.signal->referencedFunctionName();
-        const auto &ivInterfaceName = signalInfo.signal->referencedName();
-
-        const auto ivInterface = findIvInterface(ivFunctionName, ivInterfaceName);
-
-        auto signalParametersRequirements = parseSignal(signalInfo, ivInterface);
+        auto signalParametersRequirements = parseSignal(signalInfo);
 
         signalsParametersRequirements.insert({ signalId, std::move(signalParametersRequirements) });
     }
@@ -65,32 +58,32 @@ MscParameterValueParser::SignalsParametersRequirementsMap MscParameterValueParse
 }
 
 MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::parseSignal(
-        const SignalInfo &signalInfo, const IVInterface *ivInterface) const
+        const SignalInfo &signalInfo) const
 {
-    const auto &ivParameters = ivInterface->params();
+    const auto &parametersTypes = signalInfo.parametersTypes;
     const auto &mscParameters = signalInfo.parameterList;
 
     const auto &signal = signalInfo.signal;
 
-    if (mscParameters.size() != ivParameters.size()) {
+    if (mscParameters.size() != static_cast<int>(parametersTypes.size())) {
         auto errorMessage =
                 QString("Wrong number of parameters in message %1 (chart %2)").arg(signal->name()).arg(m_chartName);
         throw TranslationException(std::move(errorMessage));
     }
 
-    const auto &ivInterfaceName = ivInterface->title();
+    const auto &ivInterfaceName = signalInfo.signal->referencedName();
 
     SignalParametersRequirements signalParametersRequirements;
 
-    for (int i = 0; i < ivParameters.size(); ++i) {
-        const auto &ivParameter = ivParameters.at(i);
+    for (std::size_t i = 0; i < parametersTypes.size(); ++i) {
+        const auto &ivParameterTypeName = parametersTypes.at(i);
         const auto &mscParameter = mscParameters.at(i);
 
-        const auto asn1ValueMap = parseParameter(ivParameter, mscParameter, ivInterfaceName);
+        const auto asn1ValueMap = parseParameter(ivParameterTypeName, mscParameter, ivInterfaceName, i);
 
         ParameterRequirementsMap parameterRequirements;
 
-        const auto signalVariableName = QString("%1_%2").arg(signalInfo.signal->name()).arg(ivParameter.name());
+        const auto signalVariableName = QString("%1_param%2").arg(signalInfo.signal->name()).arg(i);
         parseValueMap(asn1ValueMap, signalVariableName, false, parameterRequirements);
 
         signalParametersRequirements.push_back(std::move(parameterRequirements));
@@ -99,26 +92,23 @@ MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::p
     return signalParametersRequirements;
 }
 
-QVariantMap MscParameterValueParser::parseParameter(
-        const InterfaceParameter &ivParameter, const MscParameter &mscParameter, const QString &ivInterfaceName) const
+QVariantMap MscParameterValueParser::parseParameter(const QString &ivParameterTypeName,
+        const MscParameter &mscParameter, const QString &ivInterfaceName, std::size_t parameterIndex) const
 {
-    const auto &ivParameterName = ivParameter.name();
-    const auto &ivParameterTypeName = ivParameter.paramTypeName();
-
     if (mscParameter.type() == MscParameter::Type::Unknown) {
-        auto errorMessage = QString("MSC parameter for IV parameter %1 is of unknown type").arg(ivParameterName);
+        auto errorMessage = QString("MSC parameter #%1 is of unknown type").arg(parameterIndex);
         throw TranslationException(std::move(errorMessage));
     } else if (mscParameter.type() == MscParameter::Type::Expression) {
-        auto errorMessage =
-                QString("MSC parameter for IV parameter %1 is an expression which is unsupported").arg(ivParameterName);
+        auto errorMessage = QString("MSC parameter #%1 is an expression which is unsupported").arg(parameterIndex);
         throw TranslationException(std::move(errorMessage));
     }
 
-    const auto ivParameterType = getIvParameterType(ivParameter);
+    const auto ivParameterType = m_observerAsn1File->typeFromName(ivParameterTypeName);
+
     if (ivParameterType == nullptr) {
-        auto errorMessage = QString("Unable to find ASN.1 type %1 for IV parameter %2 of interface %3")
+        auto errorMessage = QString("Unable to find ASN.1 type %1 for IV parameter #%2 of interface %3")
                                     .arg(ivParameterTypeName)
-                                    .arg(ivParameterName)
+                                    .arg(parameterIndex)
                                     .arg(ivInterfaceName);
         throw TranslationException(std::move(errorMessage));
     }
@@ -129,9 +119,9 @@ QVariantMap MscParameterValueParser::parseParameter(
     auto asn1Value = m_asn1ValueParser.parseAsn1Value(ivParameterType, mscParameterValue, &ok);
 
     if (!ok) {
-        auto errorMessage = QString("Failed to parse ASN.1 value '%1' for IV parameter %2 of type %3")
+        auto errorMessage = QString("Failed to parse ASN.1 value '%1' for IV parameter #%2 of type %3")
                                     .arg(mscParameterValue)
-                                    .arg(ivParameterName)
+                                    .arg(parameterIndex)
                                     .arg(ivParameterTypeName);
         throw TranslationException(std::move(errorMessage));
     }
@@ -203,36 +193,6 @@ void MscParameterValueParser::parseValueChildren(
 
         parseValueMap(child.toMap(), name, false, result);
     }
-}
-
-IVInterface *MscParameterValueParser::findIvInterface(
-        const QString &ivFunctionName, const QString &ivInterfaceName) const
-{
-    const auto ivFunction = m_ivModel->getFunction(ivFunctionName, Qt::CaseInsensitive);
-
-    if (ivFunction == nullptr) {
-        auto errorMessage = QString("Unable to find function named %1 in given InterfaceView").arg(ivFunctionName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    const auto ivInterfaces = ivFunction->interfaces();
-    const auto ivInterfaceFound = std::find_if(ivInterfaces.begin(), ivInterfaces.end(),
-            [&](const auto interface) { return interface->title() == ivInterfaceName; });
-
-    if (ivInterfaceFound == ivInterfaces.end()) {
-        auto errorMessage = QString("Unable to find interface named %1 in function %2 in given InterfaceView")
-                                    .arg(ivInterfaceName)
-                                    .arg(ivFunctionName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    return *ivInterfaceFound;
-}
-
-const Type *MscParameterValueParser::getIvParameterType(const InterfaceParameter &ivParameter) const
-{
-    const auto &ivParameterTypeName = ivParameter.paramTypeName();
-    return m_observerAsn1File->typeFromName(ivParameterTypeName);
 }
 
 } // namespace conversion::sdl::translator

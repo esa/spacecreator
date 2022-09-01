@@ -127,18 +127,10 @@ void WhenSequenceTranslator::handleMessageEvent(
     uint32_t sequenceValue = 0;
 
     if (signalRenamed == context.signals.end()) {
-        auto signalRename = std::make_unique<Rename>();
-        signalRename->setName(m_signalRenameNameTemplate.arg(context.signalCounter));
-        signalRename->setDirection(Rename::Direction::Input);
-        signalRename->setReferencedName(Escaper::escapeSdlName(mscMessage->name()));
-        signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
-
-        SignalInfo signalInfo;
-        signalInfo.signal = std::move(signalRename);
-        signalInfo.parameterList = mscMessage->parameters();
+        const auto name = m_signalRenameNameTemplate.arg(context.signalCounter);
+        auto signalInfo = renameSignal(name, mscMessage);
 
         context.signals.insert({ context.signalCounter, std::move(signalInfo) });
-
         sequenceValue = context.signalCounter++;
     } else {
         sequenceValue = signalRenamed->first;

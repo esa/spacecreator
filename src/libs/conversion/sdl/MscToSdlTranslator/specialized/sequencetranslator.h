@@ -19,13 +19,16 @@
 
 #pragma once
 
+#include "mscparametervalueparser.h"
 #include "signalinfo.h"
 #include "tftable.h"
 
 #include <asn1library/asn1/file.h>
 #include <conversion/common/options.h>
+#include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <memory>
+#include <msccore/mscmessage.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <vector>
 
@@ -67,6 +70,8 @@ protected:
     using StateList = std::vector<std::unique_ptr<::sdl::State>>;
     using TransitionList = std::vector<std::unique_ptr<::sdl::Transition>>;
 
+    auto renameSignal(const QString &name, const msc::MscMessage *mscMessage) const -> SignalInfo;
+
     auto createSdlProcess(const QString &chartName, std::unique_ptr<::sdl::StateMachine> stateMachine)
             -> ::sdl::Process;
     auto createSdlSystem(const QString &chartName, ::sdl::Process process) -> ::sdl::System;
@@ -76,6 +81,9 @@ protected:
             -> TransitionList;
     auto createTransitionOnInput(const QString &signalName, ::sdl::State *sourceState,
             const ::sdl::State *targetState) const -> std::unique_ptr<::sdl::Transition>;
+
+    auto getArgumentsTypes(const ::sdl::Rename *signal) const -> std::vector<QString>;
+    auto findIvInterface(const QString &ivFunctionName, const QString &ivInterfaceName) const -> ivm::IVInterface *;
 
 protected:
     inline static const QString m_observerNameThen = "then";

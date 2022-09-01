@@ -103,23 +103,19 @@ void NeverSequenceTranslator::handleMessageEvent(
                 && sig.second.parameterList == mscMessage->parameters();
     });
 
-    if (signalRenamed == context.signals.end()) {
-        auto signalRename = std::make_unique<Rename>();
-        signalRename->setName(m_signalRenameNameTemplate.arg(context.signalCounter));
-        signalRename->setDirection(Rename::Direction::Input);
-        signalRename->setReferencedName(Escaper::escapeSdlName(mscMessage->name()));
-        signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
+    uint32_t sequenceValue = 0;
 
-        SignalInfo signalInfo;
-        signalInfo.signal = std::move(signalRename);
-        signalInfo.parameterList = mscMessage->parameters();
+    if (signalRenamed == context.signals.end()) {
+        const auto name = m_signalRenameNameTemplate.arg(context.signalCounter);
+        auto signalInfo = renameSignal(name, mscMessage);
 
         context.signals.insert({ context.signalCounter, std::move(signalInfo) });
-
-        context.sequence.push_back(context.signalCounter++);
+        sequenceValue = context.signalCounter++;
     } else {
-        context.sequence.push_back(signalRenamed->first);
+        sequenceValue = signalRenamed->first;
     }
+
+    context.sequence.push_back(sequenceValue);
 }
 
 std::unique_ptr<StateMachine> NeverSequenceTranslator::createStateMachine(
@@ -130,7 +126,7 @@ std::unique_ptr<StateMachine> NeverSequenceTranslator::createStateMachine(
     auto states = createStates(context.sequence.size());
     context.errorState = states.back().get();
 
-    MscParameterValueParser messageParser(context.chartName, m_observerAsn1File, m_ivModel);
+    MscParameterValueParser messageParser(context.chartName, m_observerAsn1File);
     messageParser.parseSignals(context.signals);
 
     TFTable table(context.sequence, context.signals.size());
