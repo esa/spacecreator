@@ -34,14 +34,24 @@ def exit_if_not_exists(path: str):
         print("Path {} does not exist. Exiting".format(path))
         exit(1)
 
+
 def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str) -> None:
     """
-    Copy all files and dirs in src_dir to dst_dir
+    Copy all files and dirs in src_dir to dst_dir. Creates dirs in dst_dir if need be.
     :param src_dir: source dir
     :param dst_dir: destination dir
     """
-    for content in os.listdir(src_dir):
-        if os.path.isdir(content):
-            shutil.copytree(content, dst_dir)
-        if os.path.isfile(content):
-            shutil.copy2(content, dst_dir)
+    def ensure_dst_dir(path: str) -> None:
+        if not os.path.exists(path):
+            os.makedirs(path)
+            
+    for item_name in os.listdir(src_dir):
+        item = join_dir(src_dir, item_name)
+        if os.path.isfile(item):
+            shutil.copy2(item, dst_dir)
+        elif os.path.isdir(item):
+            dst_dir_item = join_dir(dst_dir, item_name)
+            ensure_dst_dir(dst_dir_item)
+            copy_content_of_dir_to_other_dir(item, dst_dir_item)
+        else:
+            print("Unknown content ", item)
