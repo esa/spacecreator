@@ -20,6 +20,7 @@
 #pragma once
 
 #include "signal.h"
+#include <QStringList>
 
 namespace sdl {
 
@@ -108,6 +109,9 @@ public:
      */
     auto setReferencedFunctionName(QString name) -> void;
 
+    auto parametersTypes() const -> const QStringList&;
+    auto setParametersTypes(QStringList parametersTypes) -> void;
+
 public:
     /**
      * @brief   Visitor acceptor (shall call visit method of the given visitor)
@@ -118,6 +122,7 @@ private:
     Direction m_direction;
     QString m_referencedName;
     QString m_referencedFunctionName;
+    QStringList m_parametersTypes;
 };
 
 } // namespace sdl

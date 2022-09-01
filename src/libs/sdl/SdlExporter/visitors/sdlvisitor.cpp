@@ -422,7 +422,16 @@ void SdlVisitor::visit(const Rename &rename)
         throw ExportException("Signal rename shall have a name but it doesn't");
     }
 
-    m_writer.beginLine(QString("signal %1 renames").arg(rename.name()));
+    m_writer.beginLine(QString("signal %1").arg(rename.name()));
+
+    const auto parametersTypes = rename.parametersTypes();
+    if (!parametersTypes.empty()) {
+        m_writer.write("(");
+        m_writer.write(parametersTypes.join(", "));
+        m_writer.write(")");
+    }
+
+    m_writer.write(" renames");
 
     if (rename.referencedName().isEmpty()) {
         return;
