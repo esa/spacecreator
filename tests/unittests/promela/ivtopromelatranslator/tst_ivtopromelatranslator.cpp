@@ -1048,19 +1048,24 @@ void tst_IvToPromelaTranslator::verifyProctypeSimple(
     QCOMPARE(processingChannelRecv->getChannelRef().getElements().front().m_name, expectedChannelName);
     QVERIFY(processingChannelRecv->getChannelRef().getElements().front().m_index.get() == nullptr);
 
-    const Assignment *channelUsedAssignment = findProctypeElement<Assignment>(processingSequence, 2);
-    QVERIFY(channelUsedAssignment);
+    size_t element_index = 2;
+    if (expectedParameters > 0) {
+        const Assignment *channelUsedAssignment = findProctypeElement<Assignment>(processingSequence, element_index);
+        QVERIFY(channelUsedAssignment);
 
-    QCOMPARE(channelUsedAssignment->getVariableRef().getElements().size(), 1);
-    QCOMPARE(channelUsedAssignment->getVariableRef().getElements().front().m_name, expectedChannelUsedName);
-    QVERIFY(channelUsedAssignment->getVariableRef().getElements().front().m_index.get() == nullptr);
+        QCOMPARE(channelUsedAssignment->getVariableRef().getElements().size(), 1);
+        QCOMPARE(channelUsedAssignment->getVariableRef().getElements().front().m_name, expectedChannelUsedName);
+        QVERIFY(channelUsedAssignment->getVariableRef().getElements().front().m_index.get() == nullptr);
+        ++element_index;
+    }
 
-    const InlineCall *sdlProcessingCall = findProctypeElement<InlineCall>(processingSequence, 3);
+    const InlineCall *sdlProcessingCall = findProctypeElement<InlineCall>(processingSequence, element_index);
     QVERIFY(sdlProcessingCall);
     QCOMPARE(sdlProcessingCall->getName(), expectedProcessInlineName);
     QCOMPARE(sdlProcessingCall->getArguments().size(), expectedParameters);
+    ++element_index;
 
-    const GoTo *gotoLoop = findProctypeElement<GoTo>(processingSequence, 4);
+    const GoTo *gotoLoop = findProctypeElement<GoTo>(processingSequence, element_index);
     QVERIFY(gotoLoop);
     QCOMPARE(gotoLoop->getLabel(), expectedLoopLabel);
 

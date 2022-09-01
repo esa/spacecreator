@@ -526,8 +526,10 @@ void IvToPromelaTranslator::generateProctype(Context &context, const QString &fu
                 : QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
         std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements;
-        preProcessingElements.push_back(
-                std::make_unique<ProctypeElement>(Assignment(VariableRef(channelUsedName), Expression(Constant(1)))));
+        if (!parameterType.isEmpty()) {
+            preProcessingElements.push_back(std::make_unique<ProctypeElement>(
+                    Assignment(VariableRef(channelUsedName), Expression(Constant(1)))));
+        }
 
         // Observers can be also attached to environment
         std::list<std::unique_ptr<promela::model::ProctypeElement>> observerStatements =
