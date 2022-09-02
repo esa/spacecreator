@@ -23,6 +23,7 @@
 #include <QSaveFile>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
+#include <ivcore/ivcommonprops.h>
 #include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
 #include <libiveditor/ivexporter.h>
@@ -62,37 +63,14 @@ void InterfaceViewOptimizer::optimizeModel(
     removeDeadFunctions(ivModel);
 }
 
-void InterfaceViewOptimizer::discardFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
-{
-    for (const auto &functionName : functionNames) {
-        auto function = ivModel->getFunction(functionName, Qt::CaseInsensitive);
-
-        if (function == nullptr) {
-            auto errorMessage = QString("InterfaceView optimizer cannot find function '%1'").arg(functionName);
-            throw TranslationException(errorMessage);
-        }
-
-        markAsEnvironment(function);
-    }
-}
-
-void InterfaceViewOptimizer::keepFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
-{
-    for (auto function : ivModel->allObjectsByType<IVFunction>()) {
-        const auto functionFound = std::find(functionNames.begin(), functionNames.end(), function->title());
-        if (functionFound == functionNames.end()) {
-            markAsEnvironment(function);
-        }
-    }
-}
-
 InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
 {
     ParentFunctionsInfo parentFunctionsInfo;
+
     std::vector<IVFunctionType *> functionsToRemove;
+    std::vector<IVConnection *> connectionsToRemove;
 
     for (auto function : ivModel->allObjectsByType<IVFunctionType>()) {
-
         if (isFunctionParent(function)) {
             std::vector<QString> children;
             for (auto childFunction : function->functions()) {
@@ -102,8 +80,12 @@ InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel
 
             functionsToRemove.push_back(function);
         } else {
-            flattenConnections(function, ivModel);
+            flattenConnections(function, connectionsToRemove, ivModel);
         }
+    }
+
+    for (auto connection : connectionsToRemove) {
+        ivModel->removeObject(connection);
     }
 
     for (auto function : functionsToRemove) {
@@ -118,7 +100,8 @@ InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel
     return parentFunctionsInfo;
 }
 
-void InterfaceViewOptimizer::flattenConnections(IVFunctionType *function, IVModel *ivModel)
+void InterfaceViewOptimizer::flattenConnections(
+        IVFunctionType *function, std::vector<IVConnection *> &connectionsToRemove, IVModel *ivModel)
 {
     const auto &connections = ivModel->getConnectionsForFunction(function->id());
 
@@ -130,7 +113,8 @@ void InterfaceViewOptimizer::flattenConnections(IVFunctionType *function, IVMode
         const auto sourceInterface = connection->sourceInterface();
         auto lastConnection = findLastConnection(connection, ivModel);
         const auto targetInterface = lastConnection->targetInterface();
-        ivModel->removeObject(lastConnection);
+
+        connectionsToRemove.push_back(lastConnection);
 
         auto newConnection = new IVConnection(sourceInterface, targetInterface);
         ivModel->addObject(newConnection);
@@ -174,6 +158,30 @@ IVConnection *InterfaceViewOptimizer::findLastConnection(IVConnection *connectio
         return findLastConnection(*foundNextConnection, ivModel);
     } else {
         return connection;
+    }
+}
+
+void InterfaceViewOptimizer::discardFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
+{
+    for (const auto &functionName : functionNames) {
+        auto function = ivModel->getFunction(functionName, Qt::CaseInsensitive);
+
+        if (function == nullptr) {
+            auto errorMessage = QString("InterfaceView optimizer cannot find function '%1'").arg(functionName);
+            throw TranslationException(errorMessage);
+        }
+
+        markAsEnvironment(function);
+    }
+}
+
+void InterfaceViewOptimizer::keepFunctions(IVModel *ivModel, const std::vector<QString> &functionNames)
+{
+    for (auto function : ivModel->allObjectsByType<IVFunction>()) {
+        const auto functionFound = std::find(functionNames.begin(), functionNames.end(), function->title());
+        if (functionFound == functionNames.end()) {
+            markAsEnvironment(function);
+        }
     }
 }
 
@@ -236,6 +244,9 @@ void InterfaceViewOptimizer::setGuiAsDefaultImplementation(IVFunction *function)
         function->addImplementation(m_environmentImplementationName, m_environmentImplementationType);
     }
 
+    function->setInstanceOf(nullptr);
+    function->setEntityAttribute(Props::token(Props::Token::instance_of), "");
+
     function->setDefaultImplementation(m_environmentImplementationName);
 
     // GUI interfaces cannot have any cyclic interfaces
@@ -260,8 +271,18 @@ void InterfaceViewOptimizer::removeDeadConnections(IVModel *ivModel)
     for (auto connection : ivModel->allObjectsByType<IVConnection>()) {
         if (isConnectionDead(connection)) {
             objectsToRemove.push_back(connection);
-            objectsToRemove.push_back(connection->sourceInterface());
-            objectsToRemove.push_back(connection->targetInterface());
+
+            const auto sourceInterface = connection->sourceInterface();
+            const auto connectionsForSourceInterface = ivModel->getConnectionsForIface(sourceInterface->id());
+            if (connectionsForSourceInterface.size() <= 1) {
+                objectsToRemove.push_back(sourceInterface);
+            }
+
+            const auto targetInterface = connection->targetInterface();
+            const auto connectionsForTargetInterface = ivModel->getConnectionsForIface(targetInterface->id());
+            if (connectionsForTargetInterface.size() <= 1) {
+                objectsToRemove.push_back(targetInterface);
+            }
         }
     }
 
@@ -353,6 +374,20 @@ bool InterfaceViewOptimizer::isConnectionDead(const IVConnection *connection)
 
 bool InterfaceViewOptimizer::isInterfaceDead(const IVInterface *interface, const IVModel *ivModel)
 {
+    if (interface->kind() == IVInterface::OperationKind::Cyclic) {
+        return false;
+    }
+
+    const auto parentFunction = interface->function();
+
+    if (parentFunction == nullptr) {
+        return true;
+    }
+
+    if (parentFunction->type() == IVObject::Type::FunctionType) {
+        return false;
+    }
+
     const auto connection = ivModel->getConnectionForIface(interface->id());
 
     return connection == nullptr;

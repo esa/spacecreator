@@ -73,6 +73,19 @@ public:
 
 public:
     /**
+     * @brief   Return model name
+     *
+     * @return  Reference to model name
+     */
+    auto name() const -> const common::String &;
+    /**
+     * @brief   Set model name
+     *
+     * @param   name     Model name
+     */
+    auto setName(const common::String name) -> void;
+
+    /**
      * @brief   Return data type that has name equal to 'name' param
      *
      * @param   name     Data type name
@@ -120,6 +133,9 @@ public:
     auto addOutport(Outport outport) -> void;
 
 private:
+    /** @brief  Model name */
+    common::String m_modelName;
+
     /** @brief  Data types using by model */
     DataTypes m_dataTypes;
 

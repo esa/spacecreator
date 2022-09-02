@@ -526,10 +526,33 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *i
  */
 void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
 {
-    // CALL IF make rule via terminal, saving make return in statusfile
+    // First save current configuration to hidden file .mcconfig.xml
+    if (!saveConfiguration()) {
+        return;
+    }
+
+    // build and run the interactive simulator
     QString callSimCmd = "xterm -hold -e make simu";
     if (QProcess::execute(callSimCmd) != 0) {
         QMessageBox::warning(this, tr("Interactive Simulator"),
+                             "Error executing: " + callSimCmd);
+    }
+}
+
+/*!
+ * \brief ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked Calls the exhaustive simulator
+ */
+void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
+{
+    // First save current configuration to hidden file .mcconfig.xml
+    if (!saveConfiguration()) {
+        return;
+    }
+
+    // build and run the exhaustive simulator
+    QString callSimCmd = "xterm -hold -e make native_modelchecker";
+    if (QProcess::execute(callSimCmd) != 0) {
+        QMessageBox::warning(this, tr("Exhaustive Simulator"),
                              "Error executing: " + callSimCmd);
     }
 }

@@ -38,6 +38,8 @@ public:
         InterfaceArchetype,
         FunctionArchetype,
         ArchetypeLibrary,
+        CommunicationLayerTypes,
+        CommunicationLayerType,
 
         // attrs:
         name,

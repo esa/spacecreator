@@ -93,6 +93,13 @@ void ArchetypeXMLReader::processTagOpen(QXmlStreamReader &xml)
         }
         break;
     }
+    case ArchetypeProps::Token::CommunicationLayerType: {
+        object = new LayerArchetype(objectName);
+        break;
+    }
+    case ArchetypeProps::Token::CommunicationLayerTypes: {
+        break;
+    }
     default:
         static const QString msg("The '%1' is unknown/unexpected here: %2@%3 %4");
         shared::ErrorHub::addError(shared::ErrorItem::Warning,

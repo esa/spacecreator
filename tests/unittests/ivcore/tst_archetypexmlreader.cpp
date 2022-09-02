@@ -23,6 +23,7 @@
 #include "archetypes/functionarchetype.h"
 #include "archetypes/interfacearchetype.h"
 #include "archetypes/parameterarchetype.h"
+#include "archetypes/layerarchetype.h"
 
 #include <QBuffer>
 #include <QSignalSpy>
@@ -36,6 +37,7 @@ private Q_SLOTS:
     void test_readFunction();
     void test_readInterface();
     void test_readParameter();
+    void test_readLayer();
 };
 
 void tst_ArchetypeXMLReader::test_readFunction()
@@ -124,6 +126,35 @@ void tst_ArchetypeXMLReader::test_readParameter()
     QCOMPARE(parameter->title(), "ParamaeterTest");
     QCOMPARE(parameter->getType(), "S32");
     QCOMPARE(parameter->getDirection(), ivm::ParameterArchetype::ParameterDirection::OUT);
+}
+
+void tst_ArchetypeXMLReader::test_readLayer()
+{
+    QByteArray xml(R"(<ArchetypeLibrary>
+	                    <CommunicationLayerTypes>
+		                    <CommunicationLayerType name="TestLib1"/>
+	                    </CommunicationLayerTypes>
+                      </ArchetypeLibrary>)");
+
+    QBuffer buffer(&xml);
+    buffer.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    ivm::ArchetypeXMLReader reader;
+
+    const bool ok = reader.read(&buffer);
+    QVERIFY(ok);
+    const QVector<ivm::ArchetypeObject *> objectsList = reader.parsedObjects();
+    QCOMPARE(objectsList.size(), 1);
+    ivm::LayerArchetype *layer { nullptr };
+
+    for (auto archetypeObject : objectsList) {
+        if (archetypeObject->type() == ivm::ArchetypeObject::Type::LayerArchetype) {
+            layer = archetypeObject->as<ivm::LayerArchetype *>();
+        }
+    }
+
+    QVERIFY(layer != nullptr);
+    QCOMPARE(layer->title(), "TestLib1");
 }
 
 QTEST_APPLESS_MAIN(tst_ArchetypeXMLReader)

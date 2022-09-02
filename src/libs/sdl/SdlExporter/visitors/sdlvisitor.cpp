@@ -334,10 +334,11 @@ void SdlVisitor::visit(const Process &process)
 
     const auto hasVariables = !process.variables().empty();
     const auto hasTimers = !process.timerNames().empty();
+    const auto hasSuccessStates = !process.successStates().empty();
     const auto hasErrorStates = !process.errorStates().empty();
     const auto hasProcedures = !process.procedures().empty();
 
-    if (hasVariables || hasTimers || hasErrorStates) {
+    if (hasVariables || hasTimers || hasSuccessStates || hasErrorStates) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
 
@@ -347,6 +348,10 @@ void SdlVisitor::visit(const Process &process)
         }
 
         exportCollection(process.variables());
+
+        if (hasSuccessStates) {
+            m_writer.writeLine(QString("successstates %1;").arg(process.successStates().join(", ")));
+        }
 
         if (hasErrorStates) {
             m_writer.writeLine(QString("errorstates %1;").arg(process.errorStates().join(", ")));

@@ -46,6 +46,7 @@ public:
     enum class Type
     {
         Unknown = 0,
+        LayerArchetype,
         ParameterArchetype,
         InterfaceArchetype,
         FunctionArchetype,
@@ -73,13 +74,6 @@ public:
     ArchetypeModel *model() const;
 
     bool isRootObject() const;
-
-    /*!
-    Returns false, if the "is_visible" is set to false.
-    Returns true, if set to true or is not set at all. Also does not take the parent's visibility into account.
-    */
-    void setVisible(bool isVisible);
-    bool isVisible() const;
 
     /**
      * @brief Returns list of attributes for using in string templates.

@@ -62,6 +62,7 @@ private Q_SLOTS:
     void on_treeWidget_subtyping_itemChanged(QTreeWidgetItem *item, int column);
     void on_pushButton_callIF_clicked();
     void on_pushButton_interactiveSim_clicked();
+    void on_pushButton_exhaustiveSim_clicked();
     void on_treeWidget_results_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void convertToObs();
     void addProperty();

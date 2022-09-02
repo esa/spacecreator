@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<InterfaceView%{IVAsnFile}>
+
+<Function name="Broker" is_type="NO" instance_of="" language="C" default_implementation="default" fixed_system_element="YES" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="6600 28800 26600 41100"/>
+<Provided_Interface name="Init" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="validBusses" type="SystemBusArray" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26600 31800"/>
+</Provided_Interface>
+
+<Required_Interface name="Deliver" kind="Sporadic" layer="default" required_system_element="NO" miat="0" wcet="0" stack_size="1024" queue_size="1" priority="1">
+    <Input_Parameter name="deliverReqSeq" type="DeliveredRequestData" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26600 35000"/>
+</Required_Interface>
+
+<Provided_Interface name="Receive" kind="Sporadic" layer="default" required_system_element="NO">
+    <Input_Parameter name="receiveReqSeq" type="ReceivedRequestData" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26600 38500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Layer name="default"/>
+
+</InterfaceView>

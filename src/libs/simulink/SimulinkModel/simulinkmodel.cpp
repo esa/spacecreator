@@ -26,6 +26,16 @@ conversion::ModelType SimulinkModel::modelType() const
     return conversion::ModelProperties<SimulinkModel>::type;
 }
 
+const common::String &SimulinkModel::name() const
+{
+    return m_modelName;
+}
+
+void SimulinkModel::setName(const common::String name)
+{
+    m_modelName = name;
+}
+
 const DataType *SimulinkModel::dataType(const QString &name) const
 {
     auto result = std::find_if(m_dataTypes.begin(), m_dataTypes.end(),

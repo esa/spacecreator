@@ -1,8 +1,10 @@
 Left-Datamodel DEFINITIONS ::=
 BEGIN
+--  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   Gui-leftinterface-leftArg, Gui-rightinterface-rightArg FROM GUI-SUBTYPE;
 
 Left-States ::= ENUMERATED {wait}
 
@@ -17,9 +19,11 @@ END
 
 Right-Datamodel DEFINITIONS ::=
 BEGIN
+--  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   Gui-leftinterface-leftArg, Gui-rightinterface-rightArg FROM GUI-SUBTYPE;
 
 Right-States ::= ENUMERATED {wait}
 
@@ -95,6 +99,38 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
+GUI-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
+
+
+
+
+MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Gui-leftinterface-leftArg ::= MyInteger
+
+
+
+
+Gui-rightinterface-rightArg ::= MyInteger
+
+
+
+
+END
+
 
 Simulation-DataView DEFINITIONS ::=
 BEGIN
@@ -109,6 +145,8 @@ BEGIN
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
       Left-Context  FROM Left-Datamodel
       Right-Context FROM Right-Datamodel
@@ -201,13 +239,39 @@ BEGIN
    --  Global system state (excluding observers, which are defined later)
    left-queue-size INTEGER ::= 2
    right-queue-size INTEGER ::= 2
+
    System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
       --  Message queues
       left-queue  Events-Ty (SIZE (0 .. left-queue-size)),
       right-queue Events-Ty (SIZE (0 .. right-queue-size)),
 
       left   Left-Context,
       right  Right-Context
+   }
+
+END
+
+Simulation-Timers-DataView DEFINITIONS ::=
+BEGIN
+
+   TimerData ::= SEQUENCE {
+      timer-enabled BOOLEAN,
+      interval INTEGER (0 .. 50000)
+   }
+
+   AggregateTimerData ::= SEQUENCE {
+      
+      
+      
+      left SEQUENCE {
+      },
+      
+      right SEQUENCE {
+      },
+      
+      dummy-entry SEQUENCE {}
    }
 
 END

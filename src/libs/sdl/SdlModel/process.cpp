@@ -85,6 +85,16 @@ void Process::addTimer(QString timerName)
     m_timerNames.push_back(std::move(timerName));
 }
 
+const QStringList &Process::successStates() const
+{
+    return m_successStates;
+}
+
+void Process::addSuccessState(QString stateName)
+{
+    m_successStates.push_back(std::move(stateName));
+}
+
 const QStringList &Process::errorStates() const
 {
     return m_errorStates;

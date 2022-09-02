@@ -70,10 +70,8 @@ private:
 
     auto findDataType(const QString &dataTypeName) -> const seds::model::DataType *;
 
-    auto markTemporary(const seds::model::DataType *dataType) -> void;
-    auto markPermanent(const seds::model::DataType *dataType) -> void;
-    auto isTemporarilyMarked(const seds::model::DataType *dataType) -> bool;
-    auto isPermanentlyMarked(const seds::model::DataType *dataType) -> bool;
+    auto markDataTypeAs(const seds::model::DataType *dataType, MarkType markType) -> void;
+    auto isDataTypeMarkedAs(const seds::model::DataType *dataType, MarkType markType) const -> bool;
 
 private:
     const DataTypes *m_dataTypes;
