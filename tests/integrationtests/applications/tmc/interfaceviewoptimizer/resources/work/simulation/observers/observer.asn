@@ -1,3 +1,14 @@
+-- Dummy data model for the timer manager (needed to populate observer.asn)
+Demo-timer-manager-Datamodel DEFINITIONS ::=
+BEGIN
+Demo-timer-manager-States ::= ENUMERATED {wait}
+
+Demo-timer-manager-Context ::= SEQUENCE {
+   state Demo-timer-manager-States
+}
+
+END
+
 Pinger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
@@ -16,22 +27,59 @@ Pinger-Context ::= SEQUENCE {
 
 END
 
+Context-pinger DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      T-Int8 FROM TASTE-BasicTypes;
+
+--  Group all context parameters of this function in a record
+Context-pinger ::= SEQUENCE {
+   pingerparam T-Int8
+
+}
+
+--  Declare a constant with the values set by the user in the interface view
+pinger-ctxt Context-pinger ::= {
+   pingerparam 2
+
+}
+END
+
 Ponger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM ENVIRONMENT-SELECTOR-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID FROM System-Dataview
+   Context-ponger FROM Context-ponger;
 
 Ponger-States ::= ENUMERATED {wait}
 
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
-   result MyInteger,
-   arg MyInteger
+   pingarg MyInteger
 }
 
+END
+
+Context-ponger DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      T-Int8 FROM TASTE-BasicTypes;
+
+--  Group all context parameters of this function in a record
+Context-ponger ::= SEQUENCE {
+   pongerparam T-Int8
+
+}
+
+--  Declare a constant with the values set by the user in the interface view
+ponger-ctxt Context-ponger ::= {
+   pongerparam 12
+
+}
 END
 
 ENVIRONMENT-SELECTOR-DATAVIEW DEFINITIONS ::=
@@ -62,6 +110,22 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+-- List of functions (instances) present in the system
+PID ::= ENUMERATED {
+    clock,
+    pinger,
+    ponger,
+    
+    env
+}
+
+END
+
 CLOCK-SUBTYPE DEFINITIONS ::=
 BEGIN
 
@@ -88,22 +152,22 @@ BEGIN
       
       
       
+      
+      
       --  ASN.1 modules used by thread ponger_PingInterface
       MyInteger FROM ENVIRONMENT-SELECTOR-DATAVIEW
       
+      
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      PID      FROM System-Dataview
       -- Import timers
       AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
-      Pinger-Context FROM Pinger-Datamodel
-      Ponger-Context FROM Ponger-Datamodel
+      Demo-timer-manager-Context FROM Demo-timer-manager-Datamodel
+      Pinger-Context             FROM Pinger-Datamodel
+      Ponger-Context             FROM Ponger-Datamodel
    ;
-
-   --  List all the TASTE functions present in the system
-   PID ::= ENUMERATED {
-        env, clock, pinger, ponger
-   }
 
    --  Simulator needs to knows about cyclic interfaces
    Periodic-Event {Event-Ty} ::= SEQUENCE {
@@ -124,11 +188,29 @@ BEGIN
       }
    }
    
+   Demo-Timer-Manager-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         tick SEQUENCE {  }
+      },
+      msg-out CHOICE {
+         pinger-pingertimer SEQUENCE {   },
+         ponger-pongertimer SEQUENCE {   }
+      }
+   }
+   Demo-Timer-Manager-Periodic-Events ::=
+      Periodic-Events {Demo-Timer-Manager-Event, 1}
+   
+   demo-timer-manager-periodic-events Demo-Timer-Manager-Periodic-Events ::= {
+      { period 10, event msg-in: tick : {} }
+   }
+   
    Pinger-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
          clockinterface        SEQUENCE {  },
-         pingercyclicinterface SEQUENCE {  }
+         pingercyclicinterface SEQUENCE {  },
+         pingertimer SEQUENCE {}
       },
       msg-out CHOICE {
          pinginterface SEQUENCE { arg MyInteger }
@@ -144,7 +226,8 @@ BEGIN
    Ponger-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         pinginterface SEQUENCE { arg MyInteger}
+         pinginterface SEQUENCE { arg MyInteger},
+         pongertimer SEQUENCE {}
       }
    }
    
@@ -159,9 +242,10 @@ BEGIN
 
    --  Event related to the execution of a PI or call of a RI in the functional code
    Function-Event ::= CHOICE {
-      clock  Clock-Event,
-      pinger Pinger-Event,
-      ponger Ponger-Event
+      clock              Clock-Event,
+      demo-timer-manager Demo-Timer-Manager-Event,
+      pinger             Pinger-Event,
+      ponger             Ponger-Event
    }
 
    --  Type used to store events in a database: associate a name to the event
@@ -204,8 +288,9 @@ BEGIN
       pinger-queue Events-Ty (SIZE (0 .. pinger-queue-size)),
       ponger-queue Events-Ty (SIZE (0 .. ponger-queue-size)),
 
-      pinger  Pinger-Context,
-      ponger  Ponger-Context
+      demo-timer-manager  Demo-timer-manager-Context,
+      pinger              Pinger-Context,
+      ponger              Ponger-Context
    }
 
 END
@@ -223,9 +308,13 @@ BEGIN
       
       
       pinger SEQUENCE {
+         pingertimer TimerData
+      
       },
       
       ponger SEQUENCE {
+         pongertimer TimerData
+      
       },
       
       dummy-entry SEQUENCE {}
