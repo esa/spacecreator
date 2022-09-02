@@ -1,0 +1,13 @@
+<InterfaceView>
+<Function name="simulink" is_type="NO" language="QGenC" default_implementation="default">
+<Provided_Interface name="interface" kind="Protected" layer="default">
+    <Input_Parameter name="i1" type="BusDef" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="BusDef" encoding="NATIVE"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>
