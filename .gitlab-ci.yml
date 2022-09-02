@@ -27,7 +27,7 @@ default:
     # install OpenGEODE dependencies
     # *Python (both for OpenGEODE and sdl2promela)
     - pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
-    # install newest OpenGEODE (must be intalled in the same directory, removal is more robust than git clean/checkout/force)
+    # install newest OpenGEODE (must be installed in the same directory, removal is more robust than git clean/checkout/force)
     - pushd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; make install; popd
     # install sdl2promela
     - git clone https://github.com/n7space/sdl2promela.git
@@ -49,7 +49,7 @@ space-creator-dev:
     - python3 ${PROJECT_ROOT}/scripts/build_spacecreator.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release
     # unit tests
     - cd ${DOWNLOAD_DIR}
-    - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
+    - #wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}
@@ -75,7 +75,7 @@ space-creator:
     - cmake --build . --target all
     # unit tests
     - cd ${DOWNLOAD_DIR}
-    - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
+    #- wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}

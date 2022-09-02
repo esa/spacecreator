@@ -4,7 +4,11 @@ import argparse
 import os.path
 import subprocess
 import urllib.request
+import zipfile
+import tarfile
 import py7zr
+import platform
+import re
 
 from utils import join_dir, print_cmd, ensure_dir
 from git.repo import Repo
@@ -173,6 +177,43 @@ def install_grantlee(env_dir: str) -> None:
         exit(5)
 
 
+def download_asn1scc(env_dir: str) -> None:
+    asn_url = "https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2"
+    ans_tarbz2 = join_dir(env_dir, 'asn1scc-bin-4.2.4.7f.tar.bz2')
+    print('Downloading {} to {}'.format(asn_url, ans_tarbz2))
+    try:
+        urllib.request.urlretrieve(asn_url, ans_tarbz2)  # download qtcreator.7z to the root of the env folder
+    except:
+        print("Could not download asn1scc from {}".format(asn_url))
+        exit(4)
+    print('Extracting {}'.format(ans_tarbz2))
+    with tarfile.open(ans_tarbz2, 'r:bz2') as ans_tarbz2_file:
+        ans_tarbz2_file.extractall(env_dir)
+
+
+def download_app_image_tool(env_dir: str) -> None:
+    def detect_architecture() -> str:
+        uname_machine = platform.uname().machine
+        if uname_machine in ['x86_64', 'amd64']:
+            return 'x86_64'
+        if re.search("i?86", uname_machine):
+            return 'i686'
+        if uname_machine in ['unknown', 'AuthenticAMD', 'GenuineIntel']:
+            return ''
+
+    arch = detect_architecture()
+    url = "https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-{}.AppImage".format(arch)
+
+    app_image_tool = join_dir(env_dir, 'appimagetool')
+    print('Downloading {} to {}'.format(url, app_image_tool))
+    try:
+        urllib.request.urlretrieve(url, app_image_tool)  # download qtcreator.7z to the root of the env folder
+    except:
+        print("Could not download AppImage tool from {}".format(url))
+        exit(4)
+    os.chmod(app_image_tool, 0o0755)
+
+
 if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='prebuild',
@@ -211,3 +252,9 @@ if __name__ == '__main__':
     download_grantlee(env_dir)
     build_grantlee(env_dir, paths.env_qt_dir, is_qt6)
     install_grantlee(env_dir)
+
+    # Abstract Syntax Notation
+    download_asn1scc(env_dir)
+
+    # AppImage
+    download_app_image_tool(env_dir)
