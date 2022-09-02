@@ -26,7 +26,7 @@
 #include <conversion/common/escaper/escaper.h>
 #include <memory>
 
-namespace conversion::asn1::translator {
+namespace conversion::simulink {
 
 /**
  * @brief  MatLabStandardDataTypes class provides various methods for handling MatLab's Standard Types
@@ -38,6 +38,19 @@ public:
      * @brief   Deleted constructor
      */
     MatLabStandardDataTypes() = delete;
+
+public:
+    /**
+     * @brief   Method builds proper ASN.1 type name from MatLab Standard DataType name
+     *
+     * @param   typeName    Name of referenced data type
+     *
+     * @return  It returns built ASN.1 type name
+     */
+    static inline auto buildMatLabDataTypeName(const QString &dataType) -> QString
+    {
+        return getStandardDataTypesPrefix() + Escaper::escapeAsn1TypeName(dataType);
+    }
 
     /**
      * @brief  Return escaped package name for standard MatLab data types
@@ -57,6 +70,7 @@ public:
      */
     static inline auto getAsn1EnumBitSize() -> int { return 32; }
 
+public:
     /**
      * @brief Create ASN.1 Boolean type related to MatLab Boolean Standard Type
      */
@@ -96,6 +110,14 @@ public:
 
 public:
     /**
+     * @brief   Check if given data type name is MatLab's Standard Type
+     *
+     * @param   typeName    Name of referenced data type
+     *
+     * @return  true if given data type name is MatLab's Standard Type, false otherwise
+     */
+    static auto isMatLabType(const QString &typeName) -> bool;
+    /**
      * @brief   Check if given data type name is MatLab's boolean Logical Type
      *
      * @param   typeName    Name of referenced data type
@@ -117,4 +139,4 @@ private:
     static const QStringList m_standardNumericTypes;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::simulink

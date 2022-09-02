@@ -31,7 +31,7 @@ using Asn1Acn::Types::IntegerEncoding;
 using Asn1Acn::Types::Real;
 using Asn1Acn::Types::RealEncoding;
 
-namespace conversion::asn1::translator {
+namespace conversion::simulink {
 
 // clang-format off
 const QStringList MatLabStandardDataTypes::m_standardLogicalTypes = 
@@ -193,6 +193,11 @@ std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1UInt32DataType(
     asn1Type->constraints().append(std::move(rangeConstraint));
 
     return std::move(asn1Type);
+}
+
+bool MatLabStandardDataTypes::isMatLabType(const QString &typeName)
+{
+    return isNumericType(typeName) || isBooleanType(typeName);
 }
 
 bool MatLabStandardDataTypes::isBooleanType(const QString &typeName)

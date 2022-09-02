@@ -17,35 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "tastestandarddatatypes.h"
 
-#include <QStringList>
-#include <memory>
+namespace conversion::simulink {
 
-namespace conversion::asn1::translator {
-
-/**
- * @brief  TasteStandardDataTypes class provides various methods for handling TASTE's Standard Types
- */
-class TasteStandardDataTypes final
+// clang-format off
+const QStringList TasteStandardDataTypes::m_tasteStandardDataTypes = 
 {
-public:
-    /**
-     * @brief   Deleted constructor
-     */
-    TasteStandardDataTypes() = delete;
-
-    /**
-     * @brief   Check if given data type name is one of TASTE's Standard Types
-     *
-     * @param   typeName    Name of referenced data type
-     *
-     * @return  true if given data type name is one of TASTE's Standard Types, false otherwise
-     */
-    static auto isTasteType(const QString &typeName) -> bool;
-
-private:
-    static const QStringList m_tasteStandardDataTypes;
+    "T-Null-Record",
+    "T-Boolean",
+    "T-Int8",
+    "T-UInt8",
+    "T-Int32",
+    "T-UInt32",
 };
+// clang-format on
 
-} // namespace conversion::asn1::translator
+bool TasteStandardDataTypes::isTasteType(const QString &typeName)
+{
+    return m_tasteStandardDataTypes.contains(typeName, Qt::CaseSensitive);
+}
+
+} // namespace conversion::simulink
