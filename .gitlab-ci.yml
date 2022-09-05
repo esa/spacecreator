@@ -26,27 +26,30 @@ default:
     - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect 
     # install OpenGEODE dependencies
     # *Python (both for OpenGEODE and sdl2promela)
-    - pip3 install black==21.10b0 multipledispatch pyside6 pytest
-    # install newest OpenGEODE (must be intalled in the same directory, removal is more robust than git clean/checkout/force)
+    - pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
+    # install newest OpenGEODE (must be installed in the same directory, removal is more robust than git clean/checkout/force)
     - pushd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; make install; popd
     # install sdl2promela
     - git clone https://github.com/n7space/sdl2promela.git
     - pushd sdl2promela ; make install ; popd
     # install qtcreator sources
-    - ./scripts/download_qtcreator.sh
-    - ./scripts/build_grantlee.sh
+    #- ./scripts/download_qtcreator.sh
+    #- ./scripts/build_grantlee.sh
+    # SpaceCreator
+    - python3 ${PROJECT_ROOT}/scripts/prebuild.py --output_dir ${DOWNLOAD_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
 
 
 space-creator-dev:
   stage: build-test
   script:
     # build space creator
-    - cd ${BUILD_DIR}
-    - cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DCMAKE_PREFIX_PATH:STRING=${ENV_QT_BASE_DIR} -DQT_QMAKE_EXECUTABLE:STRING=${ENV_QT_BASE_DIR}/bin/qmake
-    - cmake --build . --target all
+    #- cd ${BUILD_DIR}
+    #- cmake -GNinja -S ${PROJECT_ROOT} -B ${BUILD_DIR} ${CMAKE_BUILD} -DBUILD_PATCH_NUMBER=$CI_BUILD_ID -DCMAKE_PREFIX_PATH:STRING=${ENV_QT_BASE_DIR} -DQT_QMAKE_EXECUTABLE:STRING=${ENV_QT_BASE_DIR}/bin/qmake
+    #- cmake --build . --target all
+    - python3 ${PROJECT_ROOT}/scripts/build_spacecreator.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release
     # unit tests
     - cd ${DOWNLOAD_DIR}
-    - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
+    - #wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}
@@ -72,7 +75,7 @@ space-creator:
     - cmake --build . --target all
     # unit tests
     - cd ${DOWNLOAD_DIR}
-    - wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
+    #- wget -q -O - https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2 | tar jxvf -
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}

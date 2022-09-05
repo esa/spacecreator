@@ -2,6 +2,7 @@ import os.path
 import os
 import subprocess
 import shutil
+import re
 
 
 def join_dir(*subdir):
@@ -55,3 +56,30 @@ def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str) -> None:
             copy_content_of_dir_to_other_dir(item, dst_dir_item)
         else:
             print("Unknown content ", item)
+
+
+def check_cmake_version(min_major: int, min_minor: int, min_patch: int) -> None:
+    cmake_cmd = ['cmake', '--version']
+    completed_process = subprocess.run(cmake_cmd, capture_output=True)
+    if not completed_process.returncode == 0:
+        print("Could not call CMake. Is it installed?")
+        exit(1)
+    output = completed_process.stdout.decode('utf-8')
+    match = re.search("([0-9]+).([0-9]+).([0-9]+)", output)
+    if not match:
+        print("Could not find version number in ", output)
+        exit(2)
+    groups = match.groups()
+    if not len(groups) == 3:
+        print("Could not find version number in format X.Y.Z in ", output)
+        exit(3)
+    major = int(groups[0])
+    minor = int(groups[1])
+    patch = int(groups[2])
+    minimum_version_required = "{}.{}.{}".format(min_major, min_minor, min_patch)
+    actual_version = "{}.{}.{}".format(major, minor, patch)
+    actual_version_to_small = min_major > major or min_minor > minor or min_patch > patch
+    if actual_version_to_small:
+        print("Found CMake version is {} but minimum required version is {}. Consult quickstart.md for how to upgrade CMake".format(actual_version, minimum_version_required))
+        exit(4)
+    print("Found CMake version {} which is greater than or equal to required version {}".format(actual_version, minimum_version_required))
