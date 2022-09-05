@@ -3,7 +3,7 @@
 import argparse
 import os.path
 import subprocess
-from utils import join_dir, print_cmd, exit_if_not_exists
+from utils import join_dir, print_cmd, exit_if_not_exists, check_cmake_version
 
 """
 Builds the SpaceCreator Project.
@@ -111,5 +111,7 @@ if __name__ == '__main__':
 
     env_dir = args.env_dir
     env_qt_dir = args.env_qt_dir
+
+    check_cmake_version(3, 16, 0)
 
     build_spacecreator(project_dir, build_dir, build_type, env_dir, env_qt_dir)

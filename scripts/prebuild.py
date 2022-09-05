@@ -10,7 +10,7 @@ import py7zr
 import platform
 import re
 
-from utils import join_dir, print_cmd, ensure_dir
+from utils import join_dir, print_cmd, ensure_dir, check_cmake_version
 from git.repo import Repo
 
 '''
@@ -238,6 +238,8 @@ if __name__ == '__main__':
 
     is_qt6 = qt_version.split('.')[0] == '6'
     print('qt_version was {}. Building with qt6 is {}'.format(qt_version, is_qt6))
+
+    check_cmake_version(3, 16, 0)
 
     # Ensure dirs
     ensure_dir(paths.env_dir)

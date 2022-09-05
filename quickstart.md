@@ -18,6 +18,30 @@ Used by developer to develop SpaceCreator plugin.
 Used by users to load SpaceCreator plugin. It is a normal QtCreator that has headers for plugin development placed along side it.
 
 ## Prerequisites
+Before we can work with SpaceCreator we need tools to be available on the computer 
+and some libraries to compile against.
+
+### Tools
+
+**Apt**<br>
+Install tools by typing: <br>
+`$ apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect`
+
+**CMake** <br>
+Because Qt 6 requires CMake 3.16 or later, we need to install a backport when running Debian 10 (buster). 
+This done by editing `/etc/apt/sources.list` and adding the line <br>
+`deb http://ftp.debian.org/debian buster-backports main` <br>
+Then update Apt for the changes to take effect<br>
+`$ sudo apt update`<br>
+Finally install CMake 18 by typing<br>
+`$ sudo apt install -t buster-backports cmake`
+
+**Python**<br>
+Python needs some additional packages which can be installed by typing: <br>
+`$ pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython`
+
+### Build environment
+
 Blue QtCreator and the SpaceCreator plugin needs to be compiled against the EXACT same Qt version. Further more, Blue QtCreator needs to be the source from that exact Qt version as well. To garantee this, the SpaceCreator project has a script for downloading and installing a specific version of Qt and the corresponding QtCreator sourcecode. 
 Running the following command:
 
