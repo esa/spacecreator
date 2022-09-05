@@ -41,6 +41,8 @@ public:
     inline static const QString externalRefFilepath = "Seds_Import_ExternalRefFilepath";
     /** @brief Skip SEDS validation */
     inline static const QString skipValidation = "Seds_Import_SkipValidation";
+    /** @brief No mangling for interfaces names in SEDS to IV translation */
+    inline static const QString noMangling = "Seds_translation_no_mangling";
     /** @brief Don't remove intermediate files after import */
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
     /** @brief  Filepath of output file */

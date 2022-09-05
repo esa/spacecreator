@@ -28,6 +28,7 @@
 #include <conversion/iv/SedsToIvTranslator/translator.h>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/dimensionsize.h>
+#include <seds/SedsOptions/options.h>
 #include <shared/parameter.h>
 
 using conversion::UnhandledValueException;
@@ -38,7 +39,7 @@ namespace conversion::iv::translator {
 
 ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &name,
         ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind,
-        const seds::model::Description &sedsDescription, ivm::IVFunction *m_ivFunction)
+        const ::seds::model::Description &sedsDescription, ivm::IVFunction *m_ivFunction)
 {
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.name = name;
@@ -81,17 +82,26 @@ QString InterfaceTranslatorHelper::buildParameterInterfaceName(const QString &se
     }
 }
 
-QString InterfaceTranslatorHelper::buildCommandInterfaceName(
-        const QString &sedsInterfaceName, const QString &commandName, const ivm::IVInterface::InterfaceType type)
+QString InterfaceTranslatorHelper::buildCommandInterfaceName(const QString &sedsInterfaceName,
+        const QString &commandName, const ivm::IVInterface::InterfaceType type, const conversion::Options *options)
 {
+    if (options != nullptr && options->isSet(conversion::seds::SedsOptions::noMangling)) {
+
+        int typeLen = interfaceTypeToString(type).length();
+        QString sedsInterfaceNameNoType = sedsInterfaceName;
+        sedsInterfaceNameNoType.chop(typeLen);
+
+        return Escaper::escapeIvName(m_ivCommandInterfaceNameNoManglingTemplate.arg(sedsInterfaceNameNoType));
+    }
+
     return Escaper::escapeIvName(
             m_ivCommandInterfaceNameTemplate.arg(sedsInterfaceName).arg(commandName).arg(interfaceTypeToString(type)));
 }
 
-const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfaceDeclaration(
-        const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
-        const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
-        const std::vector<seds::model::Package> &sedsPackages)
+const ::seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfaceDeclaration(
+        const ::seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
+        const ::seds::model::Component &sedsComponent, const ::seds::model::Package *sedsPackage,
+        const std::vector<::seds::model::Package> &sedsPackages)
 {
     const auto &name = interfaceDeclarationRef.nameStr();
 
@@ -102,7 +112,7 @@ const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfac
         const auto &sedsPackageInterfaceDeclarations = otherSedsPackage->declaredInterfaces();
         const auto found =
                 std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
-                        [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                        [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
                             return interfaceDeclaration.nameStr() == name;
                         });
         if (found != sedsPackageInterfaceDeclarations.end()) {
@@ -111,7 +121,7 @@ const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfac
     } else {
         const auto &sedsComponentInterfaceDeclarations = sedsComponent.declaredInterfaces();
         auto found = std::find_if(sedsComponentInterfaceDeclarations.begin(), sedsComponentInterfaceDeclarations.end(),
-                [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
                     return interfaceDeclaration.nameStr() == name;
                 });
         if (found != sedsComponentInterfaceDeclarations.end()) {
@@ -120,7 +130,7 @@ const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfac
 
         const auto &sedsPackageInterfaceDeclarations = sedsPackage->declaredInterfaces();
         found = std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
-                [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
                     return interfaceDeclaration.nameStr() == name;
                 });
         if (found != sedsPackageInterfaceDeclarations.end()) {

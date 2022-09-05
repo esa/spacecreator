@@ -38,10 +38,11 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-ComponentsTranslator::ComponentsTranslator(
-        const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages)
+ComponentsTranslator::ComponentsTranslator(const seds::model::Package *sedsPackage,
+        const std::vector<seds::model::Package> &sedsPackages, const Options &options)
     : m_sedsPackage(sedsPackage)
     , m_sedsPackages(sedsPackages)
+    , m_options(options)
 {
 }
 
@@ -148,8 +149,8 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
         const InterfaceTypeNameHelper &typeNameHelper) const
 {
-    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName, typeNameHelper);
-    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName, typeNameHelper);
+    AsyncInterfaceCommandTranslator asyncCommandTranslator(ivFunction, sedsInterfaceName, typeNameHelper, m_options);
+    SyncInterfaceCommandTranslator syncCommandTranslator(ivFunction, sedsInterfaceName, typeNameHelper, m_options);
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration->commands()) {
         switch (sedsCommand.mode()) {

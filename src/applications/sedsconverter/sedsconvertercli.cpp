@@ -54,6 +54,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRef);
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRefFilepath);
     m_parser.handlePositional(CommandArg::SedsConverterSkipValidation);
+    m_parser.handlePositional(CommandArg::SedsConverterNoMangling);
     m_parser.handlePositional(CommandArg::SedsConverterKeepIntermediateFiles);
     m_parser.handlePositional(CommandArg::SedsConverterAcnFilepathPrefix);
     m_parser.handlePositional(CommandArg::SedsConverterAsn1FilepathPrefix);
@@ -237,6 +238,10 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
 
     if (m_arguments.contains(CommandArg::SedsConverterSkipValidation)) {
         options.add(SedsOptions::skipValidation);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterNoMangling)) {
+        options.add(SedsOptions::noMangling);
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterKeepIntermediateFiles)) {

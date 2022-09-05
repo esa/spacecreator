@@ -69,6 +69,7 @@ public:
         SedsConverterPatcherFunctionsFilepathPrefix,
         SedsConverterMappingFunctionsModuleFileName,
         SedsConverterSdlFilepathPrefix,
+        SedsConverterNoMangling,
 
         Unknown
     };
