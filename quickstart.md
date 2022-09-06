@@ -45,10 +45,7 @@ Python needs some additional packages which can be installed by typing: <br>
 Blue QtCreator and the SpaceCreator plugin needs to be compiled against the EXACT same Qt version. Further more, Blue QtCreator needs to be the source from that exact Qt version as well. To garantee this, the SpaceCreator project has a script for downloading and installing a specific version of Qt and the corresponding QtCreator sourcecode. 
 Running the following command:
 
-`~/projects/spacecreator$ python3 ./scripts/prebuild 
-    –output_dir /home/<user>/opt/spacecreatorenv6
-    –qt_version 6.3.1 
-    –qtcreator_version 8.0.1
+`~/projects/spacecreator$ python3 ./scripts/prebuild.py --output_dir /home/<user>/opt/spacecreatorenv6 –-qt_version 6.3.1 –-qtcreator_version 8.0.1
 `
 
 will create a folder (~/opt/spacecreatorenv6) containing:
