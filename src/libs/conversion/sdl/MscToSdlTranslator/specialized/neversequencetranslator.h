@@ -72,6 +72,7 @@ private:
     struct Context {
         QString chartName;
         std::vector<uint32_t> sequence;
+        std::vector<std::unique_ptr<::sdl::Rename>> signalRenames;
         std::unordered_map<uint32_t, SignalInfo> signals;
         ::sdl::State *errorState;
         std::size_t signalCounter;

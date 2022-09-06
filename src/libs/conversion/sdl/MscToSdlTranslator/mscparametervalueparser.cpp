@@ -37,10 +37,10 @@ MscParameterValueParser::MscParameterValueParser(const QString &chartName, const
 {
 }
 
-MscParameterValueParser::SignalsParametersRequirementsMap MscParameterValueParser::parseSignals(
+MscParameterValueParser::SignalRequirementsMap MscParameterValueParser::parseSignals(
         const std::unordered_map<uint32_t, SignalInfo> &signals) const
 {
-    SignalsParametersRequirementsMap signalsParametersRequirements;
+    SignalRequirementsMap signalRequirements;
 
     for (const auto &[signalId, signalInfo] : signals) {
         const auto &parameterList = signalInfo.parameterList;
@@ -49,15 +49,14 @@ MscParameterValueParser::SignalsParametersRequirementsMap MscParameterValueParse
             continue;
         }
 
-        auto signalParametersRequirements = parseSignal(signalInfo);
-
-        signalsParametersRequirements.insert({ signalId, std::move(signalParametersRequirements) });
+        auto parametersRequirements = parseSignal(signalInfo);
+        signalRequirements.insert({ signalId, std::move(parametersRequirements) });
     }
 
-    return signalsParametersRequirements;
+    return signalRequirements;
 }
 
-MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::parseSignal(
+MscParameterValueParser::ParametersRequirementsMap MscParameterValueParser::parseSignal(
         const SignalInfo &signalInfo) const
 {
     const auto &mscParameters = signalInfo.parameterList;
@@ -73,7 +72,7 @@ MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::p
 
     const auto &ivInterfaceName = signalInfo.signal->referencedName();
 
-    SignalParametersRequirements signalParametersRequirements;
+    ParametersRequirementsMap parametersRequirements;
 
     for (int parameterIndex = 0; parameterIndex < parametersTypes.size(); ++parameterIndex) {
         const auto &ivParameterTypeName = parametersTypes.at(parameterIndex);
@@ -81,15 +80,11 @@ MscParameterValueParser::SignalParametersRequirements MscParameterValueParser::p
 
         const auto asn1ValueMap = parseParameter(ivParameterTypeName, mscParameter, ivInterfaceName, parameterIndex);
 
-        ParameterRequirementsMap parameterRequirements;
-
         const auto signalVariableName = QString("%1_param%2").arg(signalInfo.signal->name()).arg(parameterIndex);
-        parseValueMap(asn1ValueMap, signalVariableName, false, parameterRequirements);
-
-        signalParametersRequirements.push_back(std::move(parameterRequirements));
+        parseValueMap(asn1ValueMap, signalVariableName, false, parametersRequirements);
     }
 
-    return signalParametersRequirements;
+    return parametersRequirements;
 }
 
 QVariantMap MscParameterValueParser::parseParameter(const QString &ivParameterTypeName,
@@ -130,7 +125,7 @@ QVariantMap MscParameterValueParser::parseParameter(const QString &ivParameterTy
 }
 
 void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const QString &parentName, const bool isChoice,
-        ParameterRequirementsMap &result) const
+        ParametersRequirementsMap &result) const
 {
     if (!valueMap.contains("name")) {
         throw TranslationException("Missing 'name' key in value map from ASN.1 value parser");
@@ -167,7 +162,7 @@ void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const Q
 }
 
 void MscParameterValueParser::parseValueSequence(
-        const QVariantList &seqOfValue, const QString &parentName, ParameterRequirementsMap &result) const
+        const QVariantList &seqOfValue, const QString &parentName, ParametersRequirementsMap &result) const
 {
     for (int i = 0; i < seqOfValue.size(); ++i) {
         const auto &elem = seqOfValue.at(i);
@@ -182,7 +177,7 @@ void MscParameterValueParser::parseValueSequence(
 }
 
 void MscParameterValueParser::parseValueChildren(
-        const QVariantList &children, const QString &name, ParameterRequirementsMap &result) const
+        const QVariantList &children, const QString &name, ParametersRequirementsMap &result) const
 {
     for (int i = 0; i < children.size(); ++i) {
         const auto &child = children.at(i);

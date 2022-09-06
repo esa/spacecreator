@@ -26,7 +26,7 @@
 namespace conversion::sdl::translator {
 
 struct SignalInfo {
-    std::unique_ptr<::sdl::Rename> signal;
+    const ::sdl::Rename *signal;
     msc::MscParameterList parameterList;
 };
 

@@ -33,6 +33,7 @@
 #include <sdl/SdlExporter/exporter.h>
 #include <sdl/SdlOptions/options.h>
 #include <shared/common.h>
+#include <shared/sharedlibrary.h>
 
 int main(int argc, char **argv)
 {
@@ -45,6 +46,7 @@ int main(int argc, char **argv)
 
     ivm::initIVLibrary();
     msc::initMscLibrary();
+    shared::initSharedLibrary();
 
     auto dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     dynPropConfig->init(shared::interfaceCustomAttributesFilePath());

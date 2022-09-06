@@ -167,7 +167,7 @@ private:
             const QStringList &environmentFunctions);
     bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
 
-    bool convertMscObservers();
+    bool convertMscObservers(const QString &ivFilePath);
     bool generateObserverDatamodel(QProcess &process, const QString &sdlFileName);
 
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);

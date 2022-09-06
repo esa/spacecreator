@@ -22,6 +22,7 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/msc/MscOptions/options.h>
+#include <iostream>
 #include <ivcore/ivfunction.h>
 #include <msccore/mscinstance.h>
 #include <sdl/SdlModel/nextstate.h>
@@ -32,7 +33,11 @@ using conversion::translator::TranslationException;
 using ivm::IVInterface;
 using ivm::IVModel;
 using msc::MscMessage;
+using sdl::Action;
+using sdl::Answer;
 using sdl::Block;
+using sdl::Decision;
+using sdl::Expression;
 using sdl::Input;
 using sdl::NextState;
 using sdl::Process;
@@ -43,6 +48,8 @@ using sdl::StateMachine;
 using sdl::System;
 using sdl::Transition;
 using sdl::VariableDeclaration;
+using sdl::VariableLiteral;
+using sdl::VariableReference;
 
 namespace conversion::sdl::translator {
 
@@ -55,7 +62,7 @@ SequenceTranslator::SequenceTranslator(
 {
 }
 
-SignalInfo SequenceTranslator::renameSignal(const QString &name, const MscMessage *mscMessage) const
+std::unique_ptr<Rename> SequenceTranslator::renameSignal(const QString &name, const MscMessage *mscMessage) const
 {
     const auto &referencedFunctionName = Escaper::escapeSdlName(mscMessage->targetInstance()->name());
     const auto &referencedName = Escaper::escapeSdlName(mscMessage->name());
@@ -69,11 +76,7 @@ SignalInfo SequenceTranslator::renameSignal(const QString &name, const MscMessag
     signalRename->setReferencedFunctionName(referencedFunctionName);
     signalRename->setParametersTypes(std::move(parametersTypes));
 
-    SignalInfo signalInfo;
-    signalInfo.signal = std::move(signalRename);
-    signalInfo.parameterList = mscMessage->parameters();
-
-    return signalInfo;
+    return signalRename;
 }
 
 Process SequenceTranslator::createSdlProcess(const QString &chartName, std::unique_ptr<StateMachine> stateMachine)
@@ -117,7 +120,7 @@ System SequenceTranslator::createSdlSystem(const QString &chartName, Process pro
 
 SequenceTranslator::StateList SequenceTranslator::createStates(const uint32_t stateCount) const
 {
-    std::vector<std::unique_ptr<State>> states;
+    StateList states;
 
     for (uint32_t stateId = 0; stateId <= stateCount; ++stateId) {
         auto state = std::make_unique<State>();
@@ -129,48 +132,114 @@ SequenceTranslator::StateList SequenceTranslator::createStates(const uint32_t st
     return states;
 }
 
-SequenceTranslator::TransitionList SequenceTranslator::createTransitions(
-        const TFTable &table, StateList &states, const uint32_t startStateId) const
+SequenceTranslator::TransitionList SequenceTranslator::createTransitions(const TFTable &table, StateList &states,
+        const SignalsMap &signals, const MscParameterValueParser::SignalRequirementsMap &signalRequirements,
+        const uint32_t startStateId) const
 {
-    std::vector<std::unique_ptr<Transition>> transitions;
+    TransitionList transitions;
 
     const auto startState = states.at(startStateId).get();
 
     for (uint32_t stateId = 0; stateId < table.stateCount(); ++stateId) {
-        const auto &transitionsForState = table.transitionsForState(stateId);
-
         auto sourceState = states.at(stateId).get();
 
-        for (uint32_t signalId = 0; signalId < transitionsForState.size(); ++signalId) {
-            const auto targetStateId = transitionsForState.at(signalId);
+        const auto &transitionsForState = table.transitionsForState(stateId);
+        auto signalActions =
+                createSignalActions(startStateId, transitionsForState, states, signals, signalRequirements);
 
-            if (targetStateId == startStateId) {
-                continue;
+        for (auto &[signal, actions] : signalActions) {
+            const auto &signalName = signal->name();
+
+            const auto parameterCount = signal->parametersTypes().size();
+            auto transition = createTransitionOnSignal(signalName, parameterCount, sourceState);
+            for (auto &action : actions) {
+                transition->addAction(std::move(action));
             }
 
-            const auto signalName = m_signalRenameNameTemplate.arg(signalId);
-            const auto targetState = states.at(targetStateId).get();
+            const auto lastAction = transition->actions().back().get();
+            const auto endsWithNextState = (dynamic_cast<NextState *>(lastAction) != nullptr);
+            if (!endsWithNextState) {
+                auto startStateAction = std::make_unique<NextState>(startState->name(), startState);
+                transition->addAction(std::move(startStateAction));
+            }
 
-            auto transition = createTransitionOnInput(signalName, sourceState, targetState);
             transitions.push_back(std::move(transition));
         }
 
-        auto returnTransition = createTransitionOnInput(m_anySignalName, sourceState, startState);
+        auto returnTransition = createTransitionOnSignal(m_anySignalName, 0, sourceState);
+        returnTransition->addAction(std::make_unique<NextState>(startState->name(), startState));
         transitions.push_back(std::move(returnTransition));
     }
 
     return transitions;
 }
 
-std::unique_ptr<Transition> SequenceTranslator::createTransitionOnInput(
-        const QString &signalName, State *sourceState, const State *targetState) const
+std::unique_ptr<Action> SequenceTranslator::createSignalRequirements(
+        const MscParameterValueParser::ParametersRequirementsMap &parametersRequirements,
+        const State *targetState) const
+{
+    std::unique_ptr<Action> lastAction = std::make_unique<NextState>(targetState->name(), targetState);
+
+    for (const auto &[name, value] : parametersRequirements) {
+        lastAction = createParameterRequirements(name, value, std::move(lastAction));
+    }
+
+    return lastAction;
+}
+
+std::unique_ptr<Decision> SequenceTranslator::createParameterRequirements(
+        const QString &name, const std::optional<QString> &value, std::unique_ptr<Action> trueAction) const
+{
+    Q_UNUSED(name);
+    Q_UNUSED(value);
+
+    auto decision = std::make_unique<Decision>();
+
+    if (value.has_value()) {
+        auto decisionExpression = std::make_unique<Expression>(name);
+        decision->setExpression(std::move(decisionExpression));
+
+        auto trueTransition = std::make_unique<Transition>();
+        trueTransition->addAction(std::move(trueAction));
+        auto trueAnswer = std::make_unique<Answer>();
+        trueAnswer->setLiteral(VariableLiteral(*value));
+        trueAnswer->setTransition(std::move(trueTransition));
+        decision->addAnswer(std::move(trueAnswer));
+    } else {
+        auto decisionExpression = std::make_unique<Expression>(m_isPresentTemplate.arg(name));
+        decision->setExpression(std::move(decisionExpression));
+
+        auto trueTransition = std::make_unique<Transition>();
+        trueTransition->addAction(std::move(trueAction));
+        auto trueAnswer = std::make_unique<Answer>();
+        trueAnswer->setLiteral(VariableLiteral(m_trueLiteral));
+        trueAnswer->setTransition(std::move(trueTransition));
+        decision->addAnswer(std::move(trueAnswer));
+    }
+
+    auto elseTransition = std::make_unique<Transition>();
+    auto elseAnswer = std::make_unique<Answer>();
+    elseAnswer->setLiteral(VariableLiteral(m_elseLiteral));
+    elseAnswer->setTransition(std::move(elseTransition));
+    decision->addAnswer(std::move(elseAnswer));
+
+    return decision;
+}
+
+std::unique_ptr<Transition> SequenceTranslator::createTransitionOnSignal(
+        const QString &signalName, const int parameterCount, State *sourceState) const
 {
     auto transition = std::make_unique<Transition>();
-    transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
 
     auto input = std::make_unique<Input>();
     input->setName(signalName);
     input->setTransition(transition.get());
+
+    for (int i = 0; i < parameterCount; ++i) {
+        auto paramName = m_signalParameterNameTemplate.arg(signalName).arg(i);
+        auto param = std::make_unique<VariableReference>(std::move(paramName));
+        input->addParameter(std::move(param));
+    }
 
     sourceState->addInput(std::move(input));
 
@@ -182,10 +251,7 @@ QStringList SequenceTranslator::getArgumentsTypes(const QString &ivFunctionName,
     QStringList types;
 
     const auto ivInterface = findIvInterface(ivFunctionName, ivInterfaceName);
-
-    const auto &ivInterfaceParameters = ivInterface->params();
-
-    for (const auto &param : ivInterfaceParameters) {
+    for (const auto &param : ivInterface->params()) {
         types << param.paramTypeName();
     }
 
@@ -213,6 +279,39 @@ IVInterface *SequenceTranslator::findIvInterface(const QString &ivFunctionName, 
     }
 
     return *ivInterfaceFound;
+}
+
+SequenceTranslator::ActionsMap SequenceTranslator::createSignalActions(const uint32_t startStateId,
+        const std::vector<uint32_t> &transitions, StateList &states, const SignalsMap &signals,
+        const MscParameterValueParser::SignalRequirementsMap &signalRequirements) const
+{
+    ActionsMap signalActions;
+
+    for (uint32_t signalId = 0; signalId < transitions.size(); ++signalId) {
+        const auto targetStateId = transitions.at(signalId);
+
+        if (targetStateId == startStateId) {
+            continue;
+        }
+
+        const auto &signalInfo = signals.at(signalId);
+        const auto targetState = states.at(targetStateId).get();
+
+        auto &actions = signalActions[signalInfo.signal];
+
+        const auto signalHasRequirements = (signalRequirements.count(signalId) != 0);
+        if (signalHasRequirements) {
+            const auto &parametersRequirements = signalRequirements.at(signalId);
+
+            auto decisions = createSignalRequirements(parametersRequirements, targetState);
+            actions.push_back(std::move(decisions));
+        } else {
+            auto nextStateAction = std::make_unique<NextState>(targetState->name(), targetState);
+            actions.push_back(std::move(nextStateAction));
+        }
+    }
+
+    return signalActions;
 }
 
 } // namespace conversion::sdl::translator

@@ -80,6 +80,7 @@ private:
         QString chartName;
         std::vector<uint32_t> whenSequence;
         std::vector<uint32_t> thenSequence;
+        std::vector<std::unique_ptr<::sdl::Rename>> signalRenames;
         std::unordered_map<uint32_t, SignalInfo> signals;
         ::sdl::State *endState;
         std::size_t signalCounter;
@@ -94,9 +95,11 @@ private:
     auto handleMessageEvent(Context &context, const msc::MscMessage *mscMessage) const -> void;
 
     auto createStateMachine(Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
-    auto createThenTransitions(Context &context, StateList &states, const uint32_t startStateId) const
+    auto createThenTransitions(Context &context, StateList &states, const SignalsMap &signals,
+            const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
-    auto createThenNotTransitions(Context &context, StateList &states, const uint32_t startStateId) const
+    auto createThenNotTransitions(Context &context, StateList &states, const SignalsMap &signals,
+        const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
 };
 

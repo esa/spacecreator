@@ -26,6 +26,7 @@
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1valueparser.h>
 #include <ivcore/ivinterface.h>
+#include <optional>
 #include <shared/parameter.h>
 #include <shared/qstringhash.h>
 #include <unordered_map>
@@ -64,28 +65,26 @@ public:
     MscParameterValueParser &operator=(MscParameterValueParser &&) = delete;
 
 public:
-    using ParameterRequirementsMap = std::unordered_map<QString, std::optional<QString>>;
-    using SignalParametersRequirements = std::vector<ParameterRequirementsMap>;
-    using SignalsParametersRequirementsMap = std::unordered_map<uint32_t, SignalParametersRequirements>;
+    using ParametersRequirementsMap = std::unordered_map<QString, std::optional<QString>>;
+    using SignalRequirementsMap = std::unordered_map<uint32_t, ParametersRequirementsMap>;
 
     /**
      * @brief   Parse given signals
      *
      * @param   signals     Signals to parse
      */
-    auto parseSignals(const std::unordered_map<uint32_t, SignalInfo> &signals) const
-            -> SignalsParametersRequirementsMap;
+    auto parseSignals(const std::unordered_map<uint32_t, SignalInfo> &signals) const -> SignalRequirementsMap;
 
 private:
-    auto parseSignal(const SignalInfo &signalInfo) const -> SignalParametersRequirements;
+    auto parseSignal(const SignalInfo &signalInfo) const -> ParametersRequirementsMap;
     auto parseParameter(const QString &ivParameterTypeName, const msc::MscParameter &mscParameter,
             const QString &ivInterfaceName, const int parameterIndex) const -> QVariantMap;
 
     auto parseValueMap(const QVariantMap &valueMap, const QString &parentName, const bool isChoice,
-            ParameterRequirementsMap &result) const -> void;
+            ParametersRequirementsMap &result) const -> void;
     auto parseValueSequence(
-            const QVariantList &seqOfValue, const QString &parentName, ParameterRequirementsMap &result) const -> void;
-    auto parseValueChildren(const QVariantList &children, const QString &name, ParameterRequirementsMap &result) const
+            const QVariantList &seqOfValue, const QString &parentName, ParametersRequirementsMap &result) const -> void;
+    auto parseValueChildren(const QVariantList &children, const QString &name, ParametersRequirementsMap &result) const
             -> void;
 
 private:

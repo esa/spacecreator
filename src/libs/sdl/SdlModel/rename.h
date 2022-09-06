@@ -20,6 +20,7 @@
 #pragma once
 
 #include "signal.h"
+
 #include <QStringList>
 
 namespace sdl {
@@ -109,7 +110,17 @@ public:
      */
     auto setReferencedFunctionName(QString name) -> void;
 
-    auto parametersTypes() const -> const QStringList&;
+    /**
+     * @brief   Getter for parameter type names
+     *
+     * @return  Parameter type names
+     */
+    auto parametersTypes() const -> const QStringList &;
+    /**
+     * @brief   Setter for parameter type names
+     *
+     * @param   parametersTypes     Paramerter type names
+     */
     auto setParametersTypes(QStringList parametersTypes) -> void;
 
 public:

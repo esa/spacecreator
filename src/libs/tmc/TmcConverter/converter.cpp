@@ -494,14 +494,15 @@ bool TmcConverter::convertMscObservers(const QString &ivFilePath)
 
         options.add(MscOptions::inputFilepath, mscFilePath);
         options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
-        options.add(IvOptions::inputFilepath, ivFilePath)
+        options.add(IvOptions::inputFilepath, ivFilePath);
         options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
         options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
         options.add(SdlOptions::filepathPrefix, outputPath);
 
         qDebug() << "Converting MSC file" << mscFilePath << "to an SDL observer";
 
-        if (!convertModel({ ModelType::Msc, ModelType::Asn1 }, ModelType::Sdl, {}, std::move(options))) {
+        if (!convertModel({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, {},
+                    std::move(options))) {
             qCritical() << "Unable to translate MSC file" << mscFilePath << "to SDL observer";
             return false;
         }

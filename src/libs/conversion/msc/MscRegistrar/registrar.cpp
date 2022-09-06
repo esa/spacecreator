@@ -36,7 +36,8 @@ bool MscRegistrar::registerCapabilities(conversion::Registry &registry)
     }
 
     auto mscToSdlTranslator = std::make_unique<sdl::translator::MscToSdlTranslator>();
-    result = registry.registerTranslator({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, std::move(mscToSdlTranslator));
+    result = registry.registerTranslator({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl,
+            std::move(mscToSdlTranslator));
     if (!result) {
         return false;
     }

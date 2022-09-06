@@ -23,12 +23,14 @@
 #include "signalinfo.h"
 #include "tftable.h"
 
+#include <QStringList>
 #include <asn1library/asn1/file.h>
 #include <conversion/common/options.h>
 #include <ivcore/ivinterface.h>
 #include <ivcore/ivmodel.h>
 #include <memory>
 #include <msccore/mscmessage.h>
+#include <sdl/SdlModel/decision.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <vector>
 
@@ -67,34 +69,52 @@ public:
     SequenceTranslator &operator=(SequenceTranslator &&) = delete;
 
 protected:
+    using SignalsMap = std::unordered_map<uint32_t, SignalInfo>;
     using StateList = std::vector<std::unique_ptr<::sdl::State>>;
+    using ActionsMap = std::unordered_map<const ::sdl::Rename *, std::vector<std::unique_ptr<::sdl::Action>>>;
     using TransitionList = std::vector<std::unique_ptr<::sdl::Transition>>;
 
-    auto renameSignal(const QString &name, const msc::MscMessage *mscMessage) const -> SignalInfo;
+    auto renameSignal(const QString &name, const msc::MscMessage *mscMessage) const -> std::unique_ptr<::sdl::Rename>;
 
     auto createSdlProcess(const QString &chartName, std::unique_ptr<::sdl::StateMachine> stateMachine)
             -> ::sdl::Process;
     auto createSdlSystem(const QString &chartName, ::sdl::Process process) -> ::sdl::System;
 
     auto createStates(const uint32_t stateCount) const -> StateList;
-    auto createTransitions(const TFTable &table, StateList &states, const uint32_t startStateId) const
+    auto createTransitions(const TFTable &table, StateList &states, const SignalsMap &signals,
+            const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
-    auto createTransitionOnInput(const QString &signalName, ::sdl::State *sourceState,
-            const ::sdl::State *targetState) const -> std::unique_ptr<::sdl::Transition>;
+
+    auto createSignalRequirements(const MscParameterValueParser::ParametersRequirementsMap &parametersRequirements,
+            const ::sdl::State *targetState) const -> std::unique_ptr<::sdl::Action>;
+    auto createParameterRequirements(const QString &name, const std::optional<QString> &value,
+            std::unique_ptr<::sdl::Action> trueAction) const -> std::unique_ptr<::sdl::Decision>;
+
+    auto createTransitionOnSignal(const QString &signalName, const int parameterCount, ::sdl::State *sourceState) const
+            -> std::unique_ptr<::sdl::Transition>;
 
     auto getArgumentsTypes(const QString &ivFunctionName, const QString &ivInterfaceName) const -> QStringList;
     auto findIvInterface(const QString &ivFunctionName, const QString &ivInterfaceName) const -> ivm::IVInterface *;
+
+private:
+    auto createSignalActions(const uint32_t startStateId, const std::vector<uint32_t> &transitions, StateList &states,
+            const SignalsMap &signals, const MscParameterValueParser::SignalRequirementsMap &signalRequirements) const
+            -> ActionsMap;
 
 protected:
     inline static const QString m_observerNameThen = "then";
     inline static const QString m_observerNameThenNot = "then not";
     inline static const QString m_stateNameTemplate = "s%1";
     inline static const QString m_signalRenameNameTemplate = "sig%1";
+    inline static const QString m_signalParameterNameTemplate = "%1_param%2";
     inline static const QString m_errorStateName = "sErr";
     inline static const QString m_okStateName = "sOk";
     inline static const QString m_anySignalName = "*";
     inline static const QString m_defaultChannelName = "c";
     inline static const QString m_defaultRouteName = "r";
+    inline static const QString m_isPresentTemplate = "present(%1)";
+    inline static const QString m_trueLiteral = "TRUE";
+    inline static const QString m_elseLiteral = "ELSE";
 
     ::sdl::SdlModel *m_sdlModel;
     const Asn1Acn::File *m_observerAsn1File;

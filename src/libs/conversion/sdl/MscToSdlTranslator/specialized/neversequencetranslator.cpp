@@ -23,6 +23,7 @@
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 
 using conversion::translator::TranslationException;
 using ivm::IVModel;
@@ -51,8 +52,8 @@ void NeverSequenceTranslator::createObserver(const MscChart *mscChart)
     process.addErrorState(context.errorState->name());
 
     auto system = createSdlSystem(context.chartName, std::move(process));
-    for (auto &[id, signalInfo] : context.signals) {
-        system.addSignal(std::move(signalInfo.signal));
+    for (auto &signalRename : context.signalRenames) {
+        system.addSignal(std::move(signalRename));
     }
     system.createRoutes(m_defaultChannelName, m_defaultRouteName);
 
@@ -98,21 +99,34 @@ void NeverSequenceTranslator::handleEvent(
 void NeverSequenceTranslator::handleMessageEvent(
         NeverSequenceTranslator::Context &context, const MscMessage *mscMessage) const
 {
-    const auto signalRenamed = std::find_if(context.signals.begin(), context.signals.end(), [&](auto &&sig) {
-        return sig.second.signal->referencedName() == mscMessage->name()
-                && sig.second.parameterList == mscMessage->parameters();
-    });
+    auto signalRenamed = std::find_if(context.signalRenames.begin(), context.signalRenames.end(),
+            [&](const auto &signalRename) { return signalRename->referencedName() == mscMessage->name(); });
+
+    if (signalRenamed == context.signalRenames.end()) {
+        const auto name = m_signalRenameNameTemplate.arg(context.signalCounter);
+        context.signalRenames.push_back(renameSignal(name, mscMessage));
+        signalRenamed = std::prev(context.signalRenames.end());
+    }
+
+    const auto renamedSignal = (*signalRenamed).get();
+    const auto &parameterList = mscMessage->parameters();
 
     uint32_t sequenceValue = 0;
 
-    if (signalRenamed == context.signals.end()) {
-        const auto name = m_signalRenameNameTemplate.arg(context.signalCounter);
-        auto signalInfo = renameSignal(name, mscMessage);
+    auto signalCaptured = std::find_if(context.signals.begin(), context.signals.end(), [&](const auto &sig) {
+        const auto &signalInfo = sig.second;
+        return signalInfo.signal == renamedSignal && signalInfo.parameterList == parameterList;
+    });
+
+    if (signalCaptured == context.signals.end()) {
+        SignalInfo signalInfo;
+        signalInfo.signal = (*signalRenamed).get();
+        signalInfo.parameterList = parameterList;
 
         context.signals.insert({ context.signalCounter, std::move(signalInfo) });
         sequenceValue = context.signalCounter++;
     } else {
-        sequenceValue = signalRenamed->first;
+        sequenceValue = signalCaptured->first;
     }
 
     context.sequence.push_back(sequenceValue);
@@ -127,14 +141,14 @@ std::unique_ptr<StateMachine> NeverSequenceTranslator::createStateMachine(
     context.errorState = states.back().get();
 
     MscParameterValueParser messageParser(context.chartName, m_observerAsn1File);
-    messageParser.parseSignals(context.signals);
+    const auto &signalRequirements = messageParser.parseSignals(context.signals);
 
     TFTable table(context.sequence, context.signals.size());
-    auto transitions = createTransitions(table, states, 0);
+    auto transitions = createTransitions(table, states, context.signals, signalRequirements, 0);
+
     for (auto &transition : transitions) {
         stateMachine->addTransition(std::move(transition));
     }
-
     for (auto &state : states) {
         stateMachine->addState(std::move(state));
     }

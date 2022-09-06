@@ -67,8 +67,8 @@ void WhenSequenceTranslator::createObserver(const MscChart *mscChart)
     }
 
     auto system = createSdlSystem(context.chartName, std::move(process));
-    for (auto &[id, signalInfo] : context.signals) {
-        system.addSignal(std::move(signalInfo.signal));
+    for (auto &signalRename : context.signalRenames) {
+        system.addSignal(std::move(signalRename));
     }
     system.createRoutes(m_defaultChannelName, m_defaultRouteName);
 
@@ -119,21 +119,34 @@ void WhenSequenceTranslator::handleEvent(
 void WhenSequenceTranslator::handleMessageEvent(
         WhenSequenceTranslator::Context &context, const MscMessage *mscMessage) const
 {
-    const auto signalRenamed = std::find_if(context.signals.begin(), context.signals.end(), [&](auto &&sig) {
-        return sig.second.signal->referencedName() == mscMessage->name()
-                && sig.second.parameterList == mscMessage->parameters();
-    });
+    auto signalRenamed = std::find_if(context.signalRenames.begin(), context.signalRenames.end(),
+            [&](const auto &signalRename) { return signalRename->referencedName() == mscMessage->name(); });
+
+    if (signalRenamed == context.signalRenames.end()) {
+        const auto name = m_signalRenameNameTemplate.arg(context.signalCounter);
+        context.signalRenames.push_back(renameSignal(name, mscMessage));
+        signalRenamed = std::prev(context.signalRenames.end());
+    }
+
+    const auto renamedSignal = (*signalRenamed).get();
+    const auto &parameterList = mscMessage->parameters();
 
     uint32_t sequenceValue = 0;
 
-    if (signalRenamed == context.signals.end()) {
-        const auto name = m_signalRenameNameTemplate.arg(context.signalCounter);
-        auto signalInfo = renameSignal(name, mscMessage);
+    auto signalCaptured = std::find_if(context.signals.begin(), context.signals.end(), [&](const auto &sig) {
+        const auto &signalInfo = sig.second;
+        return signalInfo.signal == renamedSignal && signalInfo.parameterList == parameterList;
+    });
+
+    if (signalCaptured == context.signals.end()) {
+        SignalInfo signalInfo;
+        signalInfo.signal = (*signalRenamed).get();
+        signalInfo.parameterList = parameterList;
 
         context.signals.insert({ context.signalCounter, std::move(signalInfo) });
         sequenceValue = context.signalCounter++;
     } else {
-        sequenceValue = signalRenamed->first;
+        sequenceValue = signalCaptured->first;
     }
 
     if (context.mode == Mode::When) {
@@ -178,13 +191,19 @@ void WhenSequenceTranslator::handleConditionEvent(
 
 std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSequenceTranslator::Context &context) const
 {
+    Q_UNUSED(context);
+
     auto stateMachine = std::make_unique<StateMachine>();
 
     auto states = createStates(context.whenSequence.size() + context.thenSequence.size());
     context.endState = states.back().get();
 
+    MscParameterValueParser messageParser(context.chartName, m_observerAsn1File);
+    const auto &signalRequirements = messageParser.parseSignals(context.signals);
+
     TFTable table(context.whenSequence, context.signals.size());
-    auto whenTransitions = createTransitions(table, states, 0);
+    auto whenTransitions = createTransitions(table, states, context.signals, signalRequirements, 0);
+
     for (auto &transition : whenTransitions) {
         stateMachine->addTransition(std::move(transition));
     }
@@ -192,12 +211,13 @@ std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSeq
     const auto requirementStartStateId = context.whenSequence.size();
 
     if (context.mode == Mode::Then) {
-        auto thenTransitions = createThenTransitions(context, states, requirementStartStateId);
+        auto thenTransitions =
+                createThenTransitions(context, states, context.signals, signalRequirements, requirementStartStateId);
         for (auto &transition : thenTransitions) {
             stateMachine->addTransition(std::move(transition));
         }
     } else if (context.mode == Mode::ThenNot) {
-        auto thenNotTransitions = createThenNotTransitions(context, states, requirementStartStateId);
+        auto thenNotTransitions = createThenNotTransitions(context, states, context.signals, signalRequirements, requirementStartStateId);
         for (auto &transition : thenNotTransitions) {
             stateMachine->addTransition(std::move(transition));
         }
@@ -211,7 +231,8 @@ std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSeq
 }
 
 WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenTransitions(
-        WhenSequenceTranslator::Context &context, StateList &states, const uint32_t startStateId) const
+        WhenSequenceTranslator::Context &context, StateList &states, const SignalsMap &signals,
+        const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
 {
     auto errorState = std::make_unique<State>();
     errorState->setName(m_errorStateName);
@@ -224,26 +245,35 @@ WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenTransit
     uint32_t stateId = startStateId;
 
     for (const auto &signalId : context.thenSequence) {
-        const auto signalName = m_signalRenameNameTemplate.arg(signalId);
+        const auto &signalInfo = signals.at(signalId);
+        const auto signal = signalInfo.signal;
+        const auto &signalName = signal->name();
+
         auto sourceState = states.at(stateId).get();
         const auto targetState = states.at(stateId + 1).get();
 
-        auto transition = std::make_unique<Transition>();
-        transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
+        const auto parameterCount = signal->parametersTypes().size();
+        auto transition = createTransitionOnSignal(signalName, parameterCount, sourceState);
 
-        auto input = std::make_unique<Input>();
-        input->setName(signalName);
-        input->setTransition(transition.get());
+        const auto signalHasRequirements = (signalRequirements.count(signalId) != 0);
+        if (signalHasRequirements) {
+            const auto &parametersRequirements = signalRequirements.at(signalId);
+            auto signalRequirementAction = createSignalRequirements(parametersRequirements, targetState);
 
-        sourceState->addInput(std::move(input));
+            transition->addAction(std::move(signalRequirementAction));
+
+            auto errorStateAction = std::make_unique<NextState>(errorState->name(), errorState.get());
+            transition->addAction(std::move(errorStateAction));
+        } else {
+            transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
+        }
+
+        transitions.push_back(std::move(transition));
 
         auto errorInput = std::make_unique<Input>();
         errorInput->setName(m_anySignalName);
         errorInput->setTransition(errorTransition.get());
-
         sourceState->addInput(std::move(errorInput));
-
-        transitions.push_back(std::move(transition));
 
         ++stateId;
     }
@@ -255,7 +285,8 @@ WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenTransit
 }
 
 WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenNotTransitions(
-        WhenSequenceTranslator::Context &context, StateList &states, const uint32_t startStateId) const
+        WhenSequenceTranslator::Context &context, StateList &states, const SignalsMap &signals,
+        const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
 {
     auto okState = std::make_unique<State>();
     okState->setName(m_okStateName);
@@ -268,26 +299,35 @@ WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenNotTran
     uint32_t stateId = startStateId;
 
     for (const auto &signalId : context.thenSequence) {
-        const auto signalName = m_signalRenameNameTemplate.arg(signalId);
+        const auto &signalInfo = signals.at(signalId);
+        const auto signal = signalInfo.signal;
+        const auto &signalName = signal->name();
+
         auto sourceState = states.at(stateId).get();
         const auto targetState = states.at(stateId + 1).get();
 
-        auto transition = std::make_unique<Transition>();
-        transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
+        const auto parameterCount = signal->parametersTypes().size();
+        auto transition = createTransitionOnSignal(signalName, parameterCount, sourceState);
 
-        auto input = std::make_unique<Input>();
-        input->setName(signalName);
-        input->setTransition(transition.get());
+        const auto signalHasRequirements = (signalRequirements.count(signalId) != 0);
+        if (signalHasRequirements) {
+            const auto &parametersRequirements = signalRequirements.at(signalId);
+            auto signalRequirementAction = createSignalRequirements(parametersRequirements, targetState);
 
-        sourceState->addInput(std::move(input));
+            transition->addAction(std::move(signalRequirementAction));
+
+            auto okStateAction = std::make_unique<NextState>(okState->name(), okState.get());
+            transition->addAction(std::move(okStateAction));
+        } else {
+            transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
+        }
+
+        transitions.push_back(std::move(transition));
 
         auto okInput = std::make_unique<Input>();
         okInput->setName(m_anySignalName);
         okInput->setTransition(okTransition.get());
-
         sourceState->addInput(std::move(okInput));
-
-        transitions.push_back(std::move(transition));
 
         ++stateId;
     }
