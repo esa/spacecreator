@@ -45,7 +45,7 @@ Python needs some additional packages which can be installed by typing: <br>
 Blue QtCreator and the SpaceCreator plugin needs to be compiled against the EXACT same Qt version. Further more, Blue QtCreator needs to be the source from that exact Qt version as well. To garantee this, the SpaceCreator project has a script for downloading and installing a specific version of Qt and the corresponding QtCreator sourcecode. 
 Running the following command:
 
-`~/projects/spacecreator$ python3 ./scripts/prebuild.py --output_dir /home/<user>/opt/spacecreatorenv6 --qt_version 6.3.1 --qtcreator_version 8.0.1
+`~/projects/spacecreator$ python3 ./scripts/prebuild.py --output_dir $HOME/opt/spacecreatorenv6 --qt_version 6.3.1 --qtcreator_version 8.0.1
 `
 
 will create a folder (~/opt/spacecreatorenv6) containing:
@@ -60,8 +60,8 @@ The idea is to have a build environment that is contained in a single folder
 Running the following command will build the SpaceCreator plugin:
 
 `~/projects/spacecreator$ python3 ./scripts/build_spacecreator.py
---env_dir /home/<user>/opt/spacecreatorenv6
---env_qt_dir  /home/<user>/opt/spacecreatorenv6/Qt/6.3.1/gcc_64`
+--env_dir $HOME/opt/spacecreatorenv6
+--env_qt_dir  $HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64`
 
 This will build the plugin in ~/projects/spacecreator/build
 
@@ -73,7 +73,7 @@ In addition, we need to copy templates for creating spacecreator projects and sp
 This is done by running the following command:
 
 `~/projects/spacecreator$ python3 ./scripts/postbuild.py
---env_dir=/home/<user>/opt/spacecreatorenv6 
+--env_dir=$HOME/opt/spacecreatorenv6 
 `
 
 Then the blue QtCreator can be run:
@@ -92,7 +92,7 @@ Then we make a new Manual Kit named ***spacecreator6*** where we select the Qt v
 ### Build Settings
 The CMakeLists.txt file of the project needs to be able to find the grantlee template library and the Qt instance in our build environment, so we give it Additional CMake options: 
 
--DCMAKE_PREFIX_PATH="/home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/cmake;/home/fisker/opt/spacecreatorenv6/grantlee/lib/cmake/Grantlee5"
+-DCMAKE_PREFIX_PATH="$HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/cmake;$HOME/opt/spacecreatorenv6/grantlee/lib/cmake/Grantlee5"
 
 This should result in the 
 CMAKE_PREIFX_PATH variable being updated in the ***Current Configuration*** tab.
@@ -100,9 +100,9 @@ Grantlee5_DIR variable being set
 
 Other variables:<br>
 QTC_SOURCE - Path to where /lib and /include for QtCreators dev code is located
-/home/fisker/opt/spacecreatorenv5/spacecreator.AppDir<br>
+$HOME/opt/spacecreatorenv5/spacecreator.AppDir<br>
 QTC_INSTALL - Path to where the spacecreator-plugin is to be put.
-/home/fisker/opt/spacecreatorenv5/spacecreator.AppDir
+$HOME/opt/spacecreatorenv5/spacecreator.AppDir
 
 Turn ENABLE_FORMAT_CHECK off.
 
@@ -113,13 +113,13 @@ We need to have QtCreator run the postbuild.py script after the build stop, so w
 ***Deployment Method*** that is a Custom Process Step. The command is
 python3 and the arguments are:
 
-`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=/home/<user>/opt/spacecreatorenv6 --build_dir=%{buildDir}
+`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6 --build_dir=%{buildDir}
 `
 
-This will call the correct **postbuild.py** script and tell it where the build environment is and where the plugins was build.
+This will call the correct **postbuild.py** script and tell it where the build environment is and where the plugins were build.
 
 Now we need a Run configuration of the type ***Custom Executable***:<br>
-**Executable**: `/home/<user>/opt/spacecreatorenv6/spacecreator.AppDir/bin/qtcreator`<br>
+**Executable**: `$HOME/opt/spacecreatorenv6/spacecreator.AppDir/bin/qtcreator`<br>
 **Command line arguments**: `-color blue`
 
 
