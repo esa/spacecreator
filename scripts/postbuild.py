@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
+import glob
 import shutil
 import os.path
 import subprocess
+import tarfile
 
 import utils
-from utils import join_dir, copy_content_of_dir_to_other_dir
+from utils import join_dir, copy_content_of_dir_to_other_dir, ensure_dir, copy_file_pattern_to_dir
 
 """
 When the spacecreator plugin has been build, it needs to be copied to the plugin folder of the
@@ -69,7 +71,8 @@ if __name__ == '__main__':
                                      epilog='python3 ./scripts/postbuild.py '
                                             '--project_dir /home/<user>/projects/spacecreator/ '
                                             '--build_dir /home/<user>/projects/spacecreator/build '
-                                            '--env_dir /home/<user>/opt/spacecreatorenv6 ')
+                                            '--env_dir /home/<user>/opt/spacecreatorenv6 '
+                                            '--env_qt_dir /home/<user>/opt/qtcreatorenv/Qt/6.3.1/gcc_64/ ')
 
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
                         help='Path to the folder where spacecreator project is')
@@ -77,6 +80,8 @@ if __name__ == '__main__':
                         help='Path to the folder where spacecreator was build')
     parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
                         help='Path to the folder that contains the build environment')
+    parser.add_argument('--env_qt_dir', dest='env_qt_dir', type=str, required=True,
+                        help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
     args = parser.parse_args()
 
     if args.project_dir:
@@ -94,6 +99,7 @@ if __name__ == '__main__':
         print("Defaulting to build dir {}".format(build_dir))
 
     env_dir = args.env_dir
+    env_qt_dir = args.env_qt_dir
     plugin_build_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     plugin_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'qtcreator', 'plugins')
     copy_plugins_to_plugin_dir(plugin_build_dir, plugin_install_dir)
@@ -101,3 +107,5 @@ if __name__ == '__main__':
     wizards_dir = join_dir(project_dir, 'wizards')
     wizards_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'share', 'qtcreator', 'templates', 'wizards')
     copy_wizards(wizards_dir, wizards_install_dir)
+
+

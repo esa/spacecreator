@@ -4,11 +4,9 @@ import argparse
 import os.path
 import subprocess
 import urllib.request
-import zipfile
 import tarfile
 import py7zr
-import platform
-import re
+
 
 from utils import join_dir, print_cmd, ensure_dir, check_cmake_version
 from git.repo import Repo
@@ -191,29 +189,6 @@ def download_asn1scc(env_dir: str) -> None:
         ans_tarbz2_file.extractall(env_dir)
 
 
-def download_app_image_tool(env_dir: str) -> None:
-    def detect_architecture() -> str:
-        uname_machine = platform.uname().machine
-        if uname_machine in ['x86_64', 'amd64']:
-            return 'x86_64'
-        if re.search("i?86", uname_machine):
-            return 'i686'
-        if uname_machine in ['unknown', 'AuthenticAMD', 'GenuineIntel']:
-            return ''
-
-    arch = detect_architecture()
-    url = "https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-{}.AppImage".format(arch)
-
-    app_image_tool = join_dir(env_dir, 'appimagetool')
-    print('Downloading {} to {}'.format(url, app_image_tool))
-    try:
-        urllib.request.urlretrieve(url, app_image_tool)  # download qtcreator.7z to the root of the env folder
-    except:
-        print("Could not download AppImage tool from {}".format(url))
-        exit(4)
-    os.chmod(app_image_tool, 0o0755)
-
-
 if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='prebuild',
@@ -258,5 +233,3 @@ if __name__ == '__main__':
     # Abstract Syntax Notation
     download_asn1scc(env_dir)
 
-    # AppImage
-    download_app_image_tool(env_dir)

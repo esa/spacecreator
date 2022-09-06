@@ -3,6 +3,7 @@ import os
 import subprocess
 import shutil
 import re
+import glob
 
 
 def join_dir(*subdir):
@@ -56,6 +57,15 @@ def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str) -> None:
             copy_content_of_dir_to_other_dir(item, dst_dir_item)
         else:
             print("Unknown content ", item)
+
+
+def copy_file_pattern_to_dir(pattern: str, dst_dir: str) -> None:
+    if not os.path.exists(dst_dir):
+        os.makedirs(dst_dir)
+    files = glob.glob(pattern, recursive=False)
+    for file_to_copy in files:
+        #print('copied {} to {}'.format(file_to_copy, dst_dir))
+        shutil.copy2(file_to_copy, dst_dir)
 
 
 def check_cmake_version(min_major: int, min_minor: int, min_patch: int) -> None:
