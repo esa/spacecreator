@@ -51,7 +51,7 @@ std::vector<std::unique_ptr<Model>> SedsToSdlTranslator::translateModels(
     auto *asn1Model = getModel<Asn1Model>(sourceModels);
     auto *ivModel = getModel<IVModel>(sourceModels);
 
-    return translateSedsModel(sedsModel, asn1Model, ivModel);
+    return translateSedsModel(sedsModel, asn1Model, ivModel, options);
 }
 
 ModelType SedsToSdlTranslator::getSourceModelType() const
@@ -71,18 +71,18 @@ std::set<ModelType> SedsToSdlTranslator::getDependencies() const
 }
 
 std::vector<std::unique_ptr<Model>> SedsToSdlTranslator::translateSedsModel(
-        const SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel) const
+        const SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, const Options &options) const
 {
     auto sdlModel = std::make_unique<SdlModel>();
 
     const auto &sedsModelData = sedsModel->data();
     if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
         const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
-        translatePackage(sedsPackage, {}, asn1Model, ivModel, sdlModel.get());
+        translatePackage(sedsPackage, {}, asn1Model, ivModel, sdlModel.get(), options);
     } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
         const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &sedsPackage : sedsPackages) {
-            translatePackage(sedsPackage, sedsPackages, asn1Model, ivModel, sdlModel.get());
+            translatePackage(sedsPackage, sedsPackages, asn1Model, ivModel, sdlModel.get(), options);
         }
     } else {
         throw TranslationException("Unhandled SEDS model data type");
@@ -96,16 +96,17 @@ std::vector<std::unique_ptr<Model>> SedsToSdlTranslator::translateSedsModel(
 
 auto SedsToSdlTranslator::translatePackage(const seds::model::Package &sedsPackage,
         const std::vector<seds::model::Package> &sedsPackages, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-        ::sdl::SdlModel *model) const -> void
+        ::sdl::SdlModel *model, const Options &options) const -> void
 {
     for (const auto &component : sedsPackage.components()) {
-        translateComponent(sedsPackage, sedsPackages, component, asn1Model, ivModel, model);
+        translateComponent(sedsPackage, sedsPackages, component, asn1Model, ivModel, model, options);
     }
 }
 
 auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPackage,
         const std::vector<seds::model::Package> &sedsPackages, const seds::model::Component &sedsComponent,
-        Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void
+        Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::SdlModel *model, const Options &options) const
+        -> void
 {
 
     const auto &implementation = sedsComponent.implementation();
@@ -139,7 +140,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         if (stateMachineCount == 1) {
             const auto &sedsStateMachine = implementation.stateMachines()[0];
             StateMachineTranslator::createTimerVariables(context, sedsStateMachine);
-            StateMachineTranslator::translateStateMachine(context, sedsStateMachine);
+            StateMachineTranslator::translateStateMachine(context, sedsStateMachine, options);
         }
         StateMachineTranslator::ensureMinimalStateMachineExists(context);
 
