@@ -79,7 +79,7 @@ space-creator:
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}
-    - ./scripts/run_tests.sh ${BUILD_DIR}
+    #- ./scripts/run_tests.sh ${BUILD_DIR}
     # Create AppImage
     #- ${PROJECT_ROOT}/scripts/create_appimage.sh
     - ${PROJECT_ROOT}/VERSION # exports the env var SC_VERSION
