@@ -54,7 +54,8 @@ space-creator-dev:
     - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}
     - ./scripts/run_tests.sh ${BUILD_DIR}
-    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir --env_qt_dir ${ENV_QT_BASE_DIR} --version 0.12.0
+    - source ./VERSION # set ${SC_VERSION}
+    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir --env_qt_dir ${ENV_QT_BASE_DIR} --project_version ${SC_VERSION}
   cache:
     key: asn1scc
     paths:
