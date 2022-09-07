@@ -81,7 +81,10 @@ space-creator:
     - cd ${PROJECT_ROOT}
     - ./scripts/run_tests.sh ${BUILD_DIR}
     # Create AppImage
-    - ${PROJECT_ROOT}/scripts/create_appimage.sh
+    #- ${PROJECT_ROOT}/scripts/create_appimage.sh
+    - ${PROJECT_ROOT}/VERSION # exports the env var SC_VERSION
+    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir --env_qt_dir ${ENV_QT_BASE_DIR} --version ${SC_VERSION}
+
   cache:
     key: asn1scc
     paths:
@@ -93,7 +96,7 @@ space-creator:
       - package
     expire_in: 2 days
   rules:
-    - if: "$CI_COMMIT_BRANCH == 'master'"
+    #- if: "$CI_COMMIT_BRANCH == 'master'"
 
 
 space-creator-coverage:

@@ -93,3 +93,11 @@ def check_cmake_version(min_major: int, min_minor: int, min_patch: int) -> None:
         print("Found CMake version is {} but minimum required version is {}. Consult quickstart.md for how to upgrade CMake".format(actual_version, minimum_version_required))
         exit(4)
     print("Found CMake version {} which is greater than or equal to required version {}".format(actual_version, minimum_version_required))
+
+def read_version_from_file(version_file: str, ci_build_id: str) -> []:
+    version_cmd = [version_file]
+
+    completed_process = subprocess.run(version_cmd, shell=True, env={'CI_BUILD_ID': ci_build_id})
+    if not completed_process.returncode == 0:
+        print("Could not read ", version_file)
+        exit(1)
