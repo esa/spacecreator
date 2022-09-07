@@ -103,12 +103,13 @@ if __name__ == '__main__':
     default_project_dir = join_dir(script_dir, '..')
 
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='postbuild',
-                                     epilog='python3 ./scripts/postbuild.py '
+    parser = argparse.ArgumentParser(prog='create_appimage.py',
+                                     epilog='python3 ./scripts/create_appimage.py '
                                             '--project_dir /home/<user>/projects/spacecreator/ '
                                             '--build_dir /home/<user>/projects/spacecreator/build '
                                             '--env_dir /home/<user>/opt/spacecreatorenv6 '
-                                            '--env_qt_dir /home/<user>/opt/qtcreatorenv/Qt/6.3.1/gcc_64/ ')
+                                            '--env_qt_dir /home/<user>/opt/qtcreatorenv/Qt/6.3.1/gcc_64/ '
+                                            '--project_version 1.2.3')
 
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
                         help='Path to the folder where spacecreator project is')
@@ -118,7 +119,7 @@ if __name__ == '__main__':
                         help='Path to the folder that contains the build environment')
     parser.add_argument('--env_qt_dir', dest='env_qt_dir', type=str, required=True,
                         help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
-    parser.add_argument('--version', dest='version', type=str, required=True,
+    parser.add_argument('--project_version', dest='version', type=str, required=True,
                         help='Version number of spacecreator in the format X.Y.Z')
     args = parser.parse_args()
 
@@ -135,6 +136,13 @@ if __name__ == '__main__':
     else:
         build_dir = join_dir(project_dir, 'build')
         print("Defaulting to build dir {}".format(build_dir))
+
+    if args.version:
+        version = args.version
+        print("Version is {}".format(version))
+    else:
+        version = '0.0.0'
+        print("Defaulting to version 0.0.0")
 
     env_dir = args.env_dir
     env_qt_dir = args.env_qt_dir
