@@ -12,7 +12,8 @@ default:
     - export ENV_QTC_VERSION_SHORT=4.8
     - export ENV_QTC_VERSION=4.8.2
     - export ENV_QT_VERSION=5.12.1
-    - export DOWNLOAD_DIR=/opt/qt-creator-dev
+    #- export DOWNLOAD_DIR=/opt/qt-creator-dev
+    - export DOWNLOAD_DIR=/opt/spacecreator5
     - export BUILD_DIR=${PROJECT_ROOT}/build
     - export PACKAGE_DIR=${PROJECT_ROOT}/package
     - export CMAKE_BUILD=-DCMAKE_BUILD_TYPE=Release
