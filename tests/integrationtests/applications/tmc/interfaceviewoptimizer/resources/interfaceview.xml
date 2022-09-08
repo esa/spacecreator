@@ -1,7 +1,7 @@
-<InterfaceView asn1file="environment-selector.asn">
-<Function name="Clock" is_type="NO" language="GUI" default_implementation="default" FPGA_Configurations="">
+<InterfaceView asn1file="environment-selector.acn">
+<Function name="Clock" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="26700 6200 52400 21800"/>
-<Required_Interface name="ClockInterface" kind="Sporadic" layer="default" priority="1" stack_size="1024" queue_size="1" wcet="0" miat="0">
+<Required_Interface name="ClockInterface" kind="Sporadic" layer="default" required_system_element="NO" queue_size="1" wcet="0" miat="0" stack_size="1024" priority="1">
     <Property name="Taste::coordinates" value="43400 21800"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
@@ -12,17 +12,33 @@
     </Implementations>
 </Function>
 
-<Function name="Pinger" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
+<Function name="Ponger" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="80100 32600 105900 50500"/>
+    <ContextParameter name="pongertimer" type="Timer" value=""/>
+    <ContextParameter name="pongerparam" type="T-Int8" value="12"/>
+<Provided_Interface name="PingInterface" kind="Sporadic" layer="default" required_system_element="NO" queue_size="1" wcet="0" miat="0" stack_size="1024" priority="1">
+    <Input_Parameter name="arg" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="80100 36900"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Pinger" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="27400 32600 53200 50500"/>
-<Provided_Interface name="ClockInterface" kind="Sporadic" layer="default" priority="1" stack_size="1024" queue_size="1" wcet="0" miat="0">
+    <ContextParameter name="pingertimer" type="Timer" value=""/>
+    <ContextParameter name="pingerparam" type="T-Int8" value="2"/>
+<Provided_Interface name="ClockInterface" kind="Sporadic" layer="default" required_system_element="NO" queue_size="1" wcet="0" miat="0" stack_size="1024" priority="1">
     <Property name="Taste::coordinates" value="43300 32600"/>
 </Provided_Interface>
 
-<Provided_Interface name="PingerCyclicInterface" kind="Cyclic" layer="default" priority="1" stack_size="1024" wcet="0">
+<Provided_Interface name="PingerCyclicInterface" kind="Cyclic" layer="default" required_system_element="NO" wcet="0" period="1000" dispatch_offset="0" stack_size="1024" priority="1">
     <Property name="Taste::coordinates" value="29900 34100"/>
 </Provided_Interface>
 
-<Required_Interface name="PingInterface" kind="Sporadic" layer="default" priority="1" stack_size="1024" queue_size="1" wcet="0" miat="0">
+<Required_Interface name="PingInterface" kind="Sporadic" layer="default" required_system_element="NO" queue_size="1" wcet="0" miat="0" stack_size="1024" priority="1">
     <Input_Parameter name="arg" type="MyInteger" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="53200 37100"/>
     <Property name="Taste::InheritPI" value="true"/>
@@ -34,25 +50,13 @@
     </Implementations>
 </Function>
 
-<Function name="Ponger" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="80000 32700 105800 50600"/>
-<Provided_Interface name="PingInterface" kind="Sporadic" layer="default" priority="1" stack_size="1024" queue_size="1" wcet="0" miat="0">
-    <Input_Parameter name="arg" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="80000 37000"/>
-</Provided_Interface>
-
-    <Implementations>
-        <Implementation name="default" language="SDL"/>
-    </Implementations>
-</Function>
-
-<Connection >
+<Connection  required_system_element="NO">
     <Source func_name="Pinger" ri_name="PingInterface"/>
     <Target func_name="Ponger" pi_name="PingInterface"/>
-    <Property name="Taste::coordinates" value="53800 37100 79700 37000"/>
+    <Property name="Taste::coordinates" value="53800 37100 79800 36900"/>
 </Connection>
 
-<Connection >
+<Connection  required_system_element="NO">
     <Source func_name="Clock" ri_name="ClockInterface"/>
     <Target func_name="Pinger" pi_name="ClockInterface"/>
     <Property name="Taste::coordinates" value="43400 22400 43300 32300"/>

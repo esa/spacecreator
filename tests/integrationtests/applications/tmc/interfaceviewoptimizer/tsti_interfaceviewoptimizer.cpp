@@ -31,6 +31,8 @@ private Q_SLOTS:
     void test_interfaceViewOptimizer();
     void test_interfaceViewOptimizer_standalone();
     void test_interfaceViewOptimizer_keep();
+    void test_interfaceViewOptimizer_ergo_agent();
+    void test_interfaceViewOptimizer_ergo_battery();
 };
 
 void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer()
@@ -48,6 +50,18 @@ void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_standalone()
 void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_keep()
 {
     const int result = system("./test_interface_view_optimizer_keep.sh");
+    QCOMPARE(result, 0);
+}
+
+void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_ergo_agent()
+{
+    const int result = system("./test_interface_view_optimizer_ergo_agent.sh");
+    QCOMPARE(result, 0);
+}
+
+void tsti_InterfaceViewOptimizer::test_interfaceViewOptimizer_ergo_battery()
+{
+    const int result = system("./test_interface_view_optimizer_ergo_battery.sh");
     QCOMPARE(result, 0);
 }
 

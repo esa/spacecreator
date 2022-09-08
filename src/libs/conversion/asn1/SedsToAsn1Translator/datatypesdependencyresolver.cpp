@@ -50,7 +50,7 @@ DataTypesDependencyResolver::ResultList DataTypesDependencyResolver::resolve(
 
     if (m_globalDataTypes) {
         for (const auto *dataType : *m_globalDataTypes) {
-            markPermanent(dataType);
+            markDataTypeAs(dataType, MarkType::Permanent);
         }
     }
 
@@ -63,15 +63,15 @@ DataTypesDependencyResolver::ResultList DataTypesDependencyResolver::resolve(
 
 void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
 {
-    if (isPermanentlyMarked(dataType)) {
+    if (isDataTypeMarkedAs(dataType, MarkType::Permanent)) {
         return;
     }
 
-    if (isTemporarilyMarked(dataType)) {
+    if (isDataTypeMarkedAs(dataType, MarkType::Temporary)) {
         throw NotDagException(dataTypeNameStr(*dataType));
     }
 
-    markTemporary(dataType);
+    markDataTypeAs(dataType, MarkType::Temporary);
 
     if (const auto *arrayDataType = std::get_if<seds::model::ArrayDataType>(dataType)) {
         visitArray(*arrayDataType);
@@ -79,7 +79,7 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
         visitContainer(*containerDataType);
     }
 
-    markPermanent(dataType);
+    markDataTypeAs(dataType, MarkType::Permanent);
     m_result.push_back(dataType);
 }
 
@@ -168,32 +168,18 @@ const seds::model::DataType *DataTypesDependencyResolver::findDataType(const QSt
     return nullptr;
 }
 
-void DataTypesDependencyResolver::markTemporary(const seds::model::DataType *dataType)
+void DataTypesDependencyResolver::markDataTypeAs(const seds::model::DataType *dataType, MarkType markType)
 {
-    m_marks.insert({ dataType, MarkType::Temporary });
+    m_marks[dataType] = markType;
 }
 
-void DataTypesDependencyResolver::markPermanent(const seds::model::DataType *dataType)
-{
-    m_marks[dataType] = MarkType::Permanent;
-}
-
-bool DataTypesDependencyResolver::isTemporarilyMarked(const seds::model::DataType *dataType)
+bool DataTypesDependencyResolver::isDataTypeMarkedAs(const seds::model::DataType *dataType, MarkType markType) const
 {
     if (m_marks.count(dataType) == 0) {
         return false;
     }
 
-    return m_marks.at(dataType) == MarkType::Temporary;
-}
-
-bool DataTypesDependencyResolver::isPermanentlyMarked(const seds::model::DataType *dataType)
-{
-    if (m_marks.count(dataType) == 0) {
-        return false;
-    }
-
-    return m_marks.at(dataType) == MarkType::Permanent;
+    return m_marks.at(dataType) == markType;
 }
 
 } // namespace conversion::asn1::translator

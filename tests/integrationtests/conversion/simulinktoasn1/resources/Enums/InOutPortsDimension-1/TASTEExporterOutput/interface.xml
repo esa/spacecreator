@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModelInterface>
+   <DataTypes>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolInt16Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="-1"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolInt32Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="-1"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolInt8Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="-1"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolSimulinkIntEnumType">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="-1"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolUInt16Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="0"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolUInt8Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="0"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+   </DataTypes>
+   <Inports>
+      <Inport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i1"
+              OutDataTypeStr="BoolSimulinkIntEnumType"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="1"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="off"/>
+      <Inport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i2"
+              OutDataTypeStr="BoolUInt8Enum"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="2"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="off"/>
+      <Inport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i3"
+              OutDataTypeStr="BoolUInt16Enum"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="3"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="off"/>
+      <Inport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i4"
+              OutDataTypeStr="BoolInt8Enum"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="4"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="off"/>
+      <Inport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i5"
+              OutDataTypeStr="BoolInt16Enum"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="5"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="off"/>
+      <Inport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i6"
+              OutDataTypeStr="BoolInt32Enum"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="6"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="off"/>
+   </Inports>
+   <Outports>
+      <Outport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o1"
+               OutDataTypeStr="BoolSimulinkIntEnumType"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="1"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="off"
+               VarSizeSig="Inherit"/>
+      <Outport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o2"
+               OutDataTypeStr="BoolUInt8Enum"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="2"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="off"
+               VarSizeSig="Inherit"/>
+      <Outport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o3"
+               OutDataTypeStr="BoolUInt16Enum"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="3"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="off"
+               VarSizeSig="Inherit"/>
+      <Outport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o4"
+               OutDataTypeStr="BoolInt8Enum"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="4"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="off"
+               VarSizeSig="Inherit"/>
+      <Outport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o5"
+               OutDataTypeStr="BoolInt16Enum"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="5"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="off"
+               VarSizeSig="Inherit"/>
+      <Outport BusObject="BusObject" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o6"
+               OutDataTypeStr="BoolInt32Enum"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="6"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="off"
+               VarSizeSig="Inherit"/>
+   </Outports>
+</ModelInterface>

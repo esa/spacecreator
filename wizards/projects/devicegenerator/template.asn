@@ -1,6 +1,42 @@
 %{Model}-DATAVIEW DEFINITIONS ::= BEGIN
 
-    MyInteger ::= INTEGER (0 .. 10000)
+    PlatformSpecificPointer ::= INTEGER (0 .. 4294967295)
+
+    SystemBus ::= INTEGER (0 .. 255)
+
+    RemoteInterface ::= INTEGER (0 .. 255)
+
+    InputDataPtr ::= PlatformSpecificPointer
+
+    OutputDataPtr ::= PlatformSpecificPointer
+
+    DataLength ::= INTEGER (0 .. 4294967295) --(Broker/Packetizer)const size_t dataSize/Length
+
+    PacketType ::= INTEGER (0 .. 255) --(Broker/Packetizer)const Packetizer_PacketType packetType
+
+    PacketSource ::= INTEGER (0 .. 65535) --(Packetizer)const uint16_t source
+
+    PacketDestination ::= INTEGER (0 .. 65535) --(Packetizer)const uint16_t destination
+
+    PacketPointer ::= PlatformSpecificPointer --(Packetizer)uint8_t* const packetPointer
+
+    PacketDataOffset ::= INTEGER (0 .. 4294967295) --(Packetizer)const size_t dataOffset
+
+    RequestErrorCodePtr ::= PlatformSpecificPointer --(Depacketizer)int32_t* const errorCode
+
+    SystemBusArray ::= SEQUENCE (SIZE (255)) OF SystemBus --(Broker)enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER]
+
+    DeliveredRequestData ::= SEQUENCE{
+        interface RemoteInterface, --(Broker)const enum RemoteInterface
+        data InputDataPtr, --(Broker)const uint8_t* const
+        length DataLength --(Broker)const size_t
+    }
+
+    ReceivedRequestData ::= SEQUENCE{
+        bus-id SystemBus, --(Broker)enum SystemBus
+        data OutputDataPtr, --(Broker)uint8_t* const
+        length DataLength --(Broker)const size_t
+    }
 
     -- ASN.1 Type definitions must start with an uppercase
     -- Field names in records (SEQUENCE) must start with a lowercase

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModelInterface>
+   <DataTypes>
+      <BusDataType Alignment="-1" DataScope="Auto" Description="" HeaderFile="" Name="BusDef">
+         <BusMembers>
+            <BusMember Complexity="real" DataType="double" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="doubleMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="single" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="singleMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="int8" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="int8Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="uint8" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="uint8Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="int16" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="int16Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="uint16" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="uint16Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="int32" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="int32Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="uint32" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="uint32Member"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="boolean" Description="" Dimensions="1"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="booleanMember"
+                       SampleTime="-1"
+                       Unit=""/>
+         </BusMembers>
+      </BusDataType>
+   </DataTypes>
+   <Inports>
+      <Inport BusObject="BusDef" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i1"
+              OutDataTypeStr="BusDef"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="1"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="on"/>
+   </Inports>
+   <Outports>
+      <Outport BusObject="BusDef" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o1"
+               OutDataTypeStr="BusDef"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="1"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="on"
+               VarSizeSig="Inherit"/>
+   </Outports>
+</ModelInterface>

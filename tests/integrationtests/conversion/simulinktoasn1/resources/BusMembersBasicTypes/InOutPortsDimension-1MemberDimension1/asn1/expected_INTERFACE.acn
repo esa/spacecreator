@@ -1,0 +1,15 @@
+INTERFACE DEFINITIONS ::= BEGIN
+BusDef []
+{
+    doubleMember [],
+    singleMember [],
+    int8Member [],
+    uint8Member [],
+    int16Member [],
+    uint16Member [],
+    int32Member [],
+    uint32Member [],
+    booleanMember []
+}
+END
+

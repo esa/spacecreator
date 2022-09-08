@@ -107,6 +107,7 @@ void AcnTypeComponentReconstructingVisitor::visit(const Types::Enumerated &type)
 
     tryAppendAlignToNext(type, params);
     tryAppendIntegerAcnParams(type, params);
+    tryAppendEncodeValues(type, params);
 
     endParamsList(params);
 }
@@ -259,6 +260,14 @@ void AcnTypeComponentReconstructingVisitor::tryAppendTerminationPattern(
     const auto &terminationPattern = type.terminationPattern();
     if (!terminationPattern.isEmpty()) {
         params << QStringLiteral("termination-pattern ") + OctetStringValue::asString(terminationPattern);
+    }
+}
+
+void AcnTypeComponentReconstructingVisitor::tryAppendEncodeValues(
+        const Types::Enumerated &type, QStringList &params) const
+{
+    if (type.encodeValues()) {
+        params << QStringLiteral("encode-values");
     }
 }
 
