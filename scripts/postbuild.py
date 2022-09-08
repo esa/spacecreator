@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
-import glob
 import shutil
 import os.path
-import subprocess
-import tarfile
 
 import utils
 from utils import join_dir, copy_content_of_dir_to_other_dir, ensure_dir, copy_file_pattern_to_dir
