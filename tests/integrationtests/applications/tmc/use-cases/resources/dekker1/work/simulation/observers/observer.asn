@@ -4,9 +4,9 @@ BEGIN
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   Testgui-writerequesta-p1, Testgui-writerequestb-p1 FROM TESTGUI-SUBTYPE;
+   PID FROM System-Dataview;
 
-Lock-States ::= ENUMERATED {wait-nocontention, writing, idle, wait-turn}
+Lock-States ::= ENUMERATED {wait-turn, writing, idle, wait-nocontention}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,
@@ -32,7 +32,7 @@ BEGIN
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   Testgui-writerequesta-p1, Testgui-writerequestb-p1 FROM TESTGUI-SUBTYPE;
+   PID FROM System-Dataview;
 
 Sharedmemory-States ::= ENUMERATED {idle}
 
@@ -90,35 +90,21 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
-TESTGUI-SUBTYPE DEFINITIONS ::=
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
 BEGIN
 
-IMPORTS 
-
-T-WriteRequest FROM DEKKER1-DATAVIEW
-
-
-
-
-T-WriteRequest FROM DEKKER1-DATAVIEW
-
- ;
-
-
-
-
-
-
-
-Testgui-writerequesta-p1 ::= T-WriteRequest
-
-
-
-
-Testgui-writerequestb-p1 ::= T-WriteRequest
-
-
-
+-- List of functions (instances) present in the system
+PID ::= ENUMERATED {
+    lock,
+    locka,
+    lockb,
+    sharedmemory,
+    testgui,
+    
+    env
+}
 
 END
 
@@ -156,6 +142,7 @@ BEGIN
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      PID      FROM System-Dataview
       -- Import timers
       AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
@@ -163,11 +150,6 @@ BEGIN
       Lock-Context         FROM Lock-Datamodel
       Sharedmemory-Context FROM Sharedmemory-Datamodel
    ;
-
-   --  List all the TASTE functions present in the system
-   PID ::= ENUMERATED {
-        env, locka, lockb, sharedmemory, testgui
-   }
 
    --  Simulator needs to knows about cyclic interfaces
    Periodic-Event {Event-Ty} ::= SEQUENCE {

@@ -1,5 +1,5 @@
 system OutputObserver;
-    /* CIF TEXT (144, 214), (507, 136) */
+    /* CIF TEXT (144, 214), (457, 140) */
     use datamodel comment 'observer.asn';
     
     signal notification(T_Boolean) renames output WantToEnter from LockB;
@@ -13,9 +13,9 @@ system OutputObserver;
             from env to OutputObserver with notification;
             from OutputObserver to env with notification;
         connect c and r;
-        /* CIF PROCESS (259, 87), (150, 75) */
+        /* CIF PROCESS (267, 87), (150, 75) */
         process OutputObserver;
-            /* CIF TEXT (0, 57), (256, 112) */
+            /* CIF TEXT (0, 57), (222, 140) */
             monitor st System_State;
             
             monitor event Observable_Event;
@@ -26,27 +26,26 @@ system OutputObserver;
             START;
                 /* CIF NEXTSTATE (352, 123), (70, 35) */
                 NEXTSTATE Wait;
-            /* CIF state (346, 222), (70, 38) */
-            state Wait
-;
-                /* CIF input (327, 280), (106, 35) */
+            /* CIF state (655, 77), (106, 35) */
+            state WantsToEnter;
+            endstate;
+            /* CIF state (346, 222), (70, 35) */
+            state Wait;
+                /* CIF input (326, 277), (106, 35) */
                 input notification(x);
-                    /* CIF output (317, 335), (126, 35) */
+                    /* CIF output (326, 332), (106, 35) */
                     output notification(x);
-                    /* CIF decision (346, 385), (70, 50) */
+                    /* CIF decision (345, 382), (70, 50) */
                     decision x;
-                        /* CIF ANSWER (301, 455), (70, 23) */
+                        /* CIF ANSWER (301, 452), (70, 23) */
                         (true):
-                            /* CIF NEXTSTATE (282, 498), (106, 35) */
+                            /* CIF NEXTSTATE (282, 495), (106, 35) */
                             NEXTSTATE WantsToEnter;
-                        /* CIF ANSWER (391, 455), (70, 23) */
+                        /* CIF ANSWER (391, 452), (70, 23) */
                         (false):
-                            /* CIF NEXTSTATE (391, 498), (70, 35) */
+                            /* CIF NEXTSTATE (391, 495), (70, 35) */
                             NEXTSTATE Wait;
                     enddecision;
-            endstate;
-            /* CIF state (656, 77), (106, 35) */
-            state WantsToEnter;
             endstate;
         endprocess OutputObserver;
     endblock;
