@@ -18,17 +18,10 @@
 #include "ivfunctiongraphicsitem.h"
 
 #include "colors/colormanager.h"
-#include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
-#include "itemeditor/common/ivutils.h"
-#include "ivcommentgraphicsitem.h"
-#include "ivconnection.h"
-#include "ivconnectiongraphicsitem.h"
 #include "ivfunction.h"
-#include "ivfunctionnamegraphicsitem.h"
-#include "ivinterfacegraphicsitem.h"
-#include "ivmodel.h"
 #include "miniviewrenderer.h"
+#include "ui/textitem.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
