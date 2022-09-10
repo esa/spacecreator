@@ -134,7 +134,7 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
         StateMachineTranslator::createIoVariables(context);
         StateMachineTranslator::createExternalProcedures(context);
         for (const auto &activity : implementation.activities()) {
-            ActivityTranslator::translateActivity(context, activity, &process);
+            ActivityTranslator::translateActivity(context, activity, &process, options);
         }
         // TODO provide additional translation for parameter (activity) maps
         if (stateMachineCount == 1) {

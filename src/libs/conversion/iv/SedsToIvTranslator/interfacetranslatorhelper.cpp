@@ -83,15 +83,14 @@ QString InterfaceTranslatorHelper::buildParameterInterfaceName(const QString &se
 }
 
 QString InterfaceTranslatorHelper::buildCommandInterfaceName(const QString &sedsInterfaceName,
-        const QString &commandName, const ivm::IVInterface::InterfaceType type, const conversion::Options *options)
+        const QString &commandName, const ivm::IVInterface::InterfaceType type, const conversion::Options &options)
 {
-    if (options != nullptr && options->isSet(conversion::seds::SedsOptions::noMangling)) {
-
-        int typeLen = interfaceTypeToString(type).length();
+    if (options.isSet(conversion::seds::SedsOptions::noMangling)) {
+        const auto typeLen = interfaceTypeToString(type).length();
         QString sedsInterfaceNameNoType = sedsInterfaceName;
         sedsInterfaceNameNoType.chop(typeLen);
 
-        return Escaper::escapeIvName(m_ivCommandInterfaceNameNoManglingTemplate.arg(sedsInterfaceNameNoType));
+        return Escaper::escapeIvName(sedsInterfaceNameNoType);
     }
 
     return Escaper::escapeIvName(

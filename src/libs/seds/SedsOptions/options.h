@@ -42,7 +42,7 @@ public:
     /** @brief Skip SEDS validation */
     inline static const QString skipValidation = "Seds_Import_SkipValidation";
     /** @brief No mangling for interfaces names in SEDS to IV translation */
-    inline static const QString noMangling = "Seds_translation_no_mangling";
+    inline static const QString noMangling = "Seds_Translation_No_Mangling";
     /** @brief Don't remove intermediate files after import */
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
     /** @brief  Filepath of output file */

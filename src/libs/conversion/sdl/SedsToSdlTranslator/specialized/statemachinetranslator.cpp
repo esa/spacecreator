@@ -190,7 +190,7 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
         const QString &interfaceName, const seds::model::InterfaceCommand &command, const Options &options) -> void
 {
     const auto &name = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided, &options);
+            interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided, options);
     const auto &ivInterface = getInterfaceByName(context.ivFunction(), name);
     auto procedure = std::make_unique<::sdl::Procedure>(name);
     for (const auto &ivParameter : ivInterface->params()) {
@@ -608,8 +608,8 @@ auto StateMachineTranslator::translatePrimitive(
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
     // Input signal can be received only via a provided interface
-    const auto &inputName = InterfaceTranslatorHelper::buildCommandInterfaceName(command.interface().value(),
-            command.command().value(), ivm::IVInterface::InterfaceType::Provided, &options);
+    const auto &inputName = InterfaceTranslatorHelper::buildCommandInterfaceName(
+            command.interface().value(), command.command().value(), ivm::IVInterface::InterfaceType::Provided, options);
     input->setName(inputName);
 
     if (command.argumentValues().empty()) {

@@ -97,7 +97,7 @@ public:
      * @return  Assembled name
      */
     static auto buildCommandInterfaceName(const QString &sedsInterfaceName, const QString &commandName,
-            const ivm::IVInterface::InterfaceType type, const conversion::Options *options = nullptr) -> QString;
+            const ivm::IVInterface::InterfaceType type, const conversion::Options &options) -> QString;
 
     /**
      * @brief   Searches for interface declaration
@@ -137,8 +137,6 @@ private:
     inline static const QString m_ivParameterInterfaceNameTemplate = "%1_%2_%3_%4";
     /// @brief  Template for command interface view interfaces
     inline static const QString m_ivCommandInterfaceNameTemplate = "%1_%2_%3";
-    /// @brief  Template for command interface view interfaces with no mangling
-    inline static const QString m_ivCommandInterfaceNameNoManglingTemplate = "%1";
     /// @brief  Prefix for getter interfaces
     inline static const QString m_getterInterfacePrefix = "Get";
     /// @brief  Prefix for setter interfaces

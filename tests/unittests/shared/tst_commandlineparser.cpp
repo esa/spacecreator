@@ -450,10 +450,10 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterSkipValidation()
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterNoManglig() 
 {
-    const QCommandLineOption cmdExportToFile =
+    const QCommandLineOption cmdNoMangling =
             CommandLineParser::positionalArg(CommandArg::SedsConverterNoMangling);
     const QStringList args = { QApplication::instance()->applicationFilePath(),
-        QString("--%1").arg(cmdExportToFile.names().first()) };
+        QString("--%1").arg(cmdNoMangling.names().first()) };
 
     CommandLineParser parser;
     parser.handlePositional(CommandArg::SedsConverterNoMangling);
