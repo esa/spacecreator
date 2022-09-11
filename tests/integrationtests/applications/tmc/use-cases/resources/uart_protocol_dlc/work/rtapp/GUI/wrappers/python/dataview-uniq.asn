@@ -1,0 +1,232 @@
+
+Basic-Types DEFINITIONS ::=
+BEGIN
+
+-- Basic types -- ToDo factor out
+UINT40 ::= INTEGER (0 .. 1099511627775)
+UINT32 ::= INTEGER (0 .. 4294967295)
+UINT24 ::= INTEGER (0 .. 16777215)
+UINT16 ::= INTEGER (0 .. 65535)
+UINT14 ::= INTEGER (0 .. 16383)
+UINT12 ::= INTEGER (0 .. 4095)
+UINT11 ::= INTEGER (0 .. 2047)
+UINT10 ::= INTEGER (0 .. 1023)
+UINT8  ::= INTEGER (0 .. 255)
+UINT7  ::= INTEGER (0 .. 127)
+UINT6  ::= INTEGER (0 .. 63)
+UINT5  ::= INTEGER (0 .. 31)
+UINT4  ::= INTEGER (0 .. 15)
+UINT3  ::= INTEGER (0 .. 7)
+UINT2  ::= INTEGER (0 .. 3)
+UINT1  ::= INTEGER (0 .. 1)
+T-Bit  ::= UINT1
+
+INT16 ::= INTEGER (-32768 .. 32767)
+INT32 ::= INTEGER (-2147483648 .. 2147483647)
+INT24 ::= INTEGER (-8388608 .. 8388607)
+
+T-OCTET ::= OCTET STRING (SIZE(1))
+
+END
+
+
+
+
+
+
+
+
+
+Bilevel-Types DEFINITIONS ::=
+BEGIN
+
+T-OnOffState              ::= ENUMERATED{off(0), on(1)}
+T-NominalRedundantState   ::= ENUMERATED{redundant(0), nominal(1)}
+T-ConnectionState         ::= ENUMERATED{disconnected(0), connected(1)}
+T-SwitchState             ::= ENUMERATED{switch-open(0),switch-closed(1)}
+T-FaultState              ::= ENUMERATED{fault(0), ok(1)}
+T-SelectionState          ::= ENUMERATED{not-selected(0), selected(1)}
+T-PresenceState           ::= ENUMERATED{absent(0), present(1)}
+T-ForwardBackwardState    ::= ENUMERATED{backward(0), forward(1)}
+T-LeftRightState          ::= ENUMERATED{left(0), right(1)}
+T-UsedUnusedState         ::= ENUMERATED{unused(0), used(1)}
+T-MovingStillState        ::= ENUMERATED{stationary(0), moving(1)}
+T-PlusMinusState          ::= ENUMERATED{plus(0), minus(1)}
+T-ArmedDisarmedState      ::= ENUMERATED{disarmed(0), armed(1)}
+T-ActiveInactiveState     ::= ENUMERATED{inactive(0), active(1)}
+T-EnabledInhibitedState   ::= ENUMERATED{inhibited(0), enabled(1)}
+T-FlagState               ::= ENUMERATED{clear(0),set(1)}
+T-SuccessFailState        ::= ENUMERATED{fail(0), success(1)}
+T-HighLowState            ::= ENUMERATED{low(0), high(1)}
+T-OverrideState           ::= ENUMERATED{normal(0), overridden(1)}
+T-LockedUnlockedState     ::= ENUMERATED{unlocked(0), locked(1)}
+T-WarningState            ::= ENUMERATED{ok(0), warning(1)}
+T-ValidInvalidState       ::= ENUMERATED{invalid(0), valid(1)}
+END
+
+
+
+UART-DLC DEFINITIONS ::=
+BEGIN
+
+IMPORTS
+UINT8 
+FROM Basic-Types;
+
+c-UART-DLC-SDU-SIZE UINT8 ::= 14
+c-UART-DLC-PDU-SIZE UINT8 ::= 16
+
+-----------------------------------------------------------------------------------
+-- UART Protocol definitions
+-----------------------------------------------------------------------------------
+--T-UART-DLC-FrameBuffer ::= SEQUENCE (SIZE(c-UART-DLC-PDU-SIZE )) OF UINT8
+T-UART-DLC-FrameBuffer ::= OCTET STRING (SIZE(c-UART-DLC-PDU-SIZE ))
+
+-----------------------------------------------------------------------------------
+-- UART DLC Layer Definitions
+-----------------------------------------------------------------------------------
+
+c-UART-DLC-SYNC-VALUE UINT8 ::= 22
+
+T-UART-DLC-Header   ::= UINT8(c-UART-DLC-SYNC-VALUE)
+T-UART-DLC-FrameCRC ::= UINT8
+
+--T-UART-DLC-SDU ::= SEQUENCE (SIZE(c-UART-DLC-SDU-SIZE)) OF UINT8
+T-UART-DLC-SDU ::= OCTET STRING (SIZE(c-UART-DLC-SDU-SIZE))
+
+T-UART-DLC-PDU ::= SEQUENCE {
+  dlc-header   T-UART-DLC-Header,
+  dlc-payload  T-UART-DLC-SDU,
+  crc          T-UART-DLC-FrameCRC
+}
+
+T-UART-DLC-RxErrorCode ::= ENUMERATED {
+    no-error (0),
+    bad-start-char (1),
+    crc-fail (2),
+    frame-timeout (3),
+    bad-request-type (4)
+}
+
+
+T-RMAPCRCTable ::= SEQUENCE (SIZE(256)) OF UINT8
+
+c-RMAPCRCTable T-RMAPCRCTable ::= {
+     0,     7,    14,     9,    28,    27,    18,    21,
+    56,    63,    54,    49,    36,    35,    42,    45,
+   112,   119,   126,   121,   108,   107,    98,   101,
+    72,    79,    70,    65,    84,    83,    90,    93,
+   224,   231,   238,   233,   252,   251,   242,   245,
+   216,   223,   214,   209,   196,   195,   202,   205,
+   144,   151,   158,   153,   140,   139,   130,   133,
+   168,   175,   166,   161,   180,   179,   186,   189,
+   199,   192,   201,   206,   219,   220,   213,   210,
+   255,   248,   241,   246,   227,   228,   237,   234,
+   183,   176,   185,   190,   171,   172,   165,   162,
+   143,   136,   129,   134,   147,   148,   157,   154,
+    39,    32,    41,    46,    59,    60,    53,    50,
+    31,    24,    17,    22,     3,     4,    13,    10,
+    87,    80,    89,    94,    75,    76,    69,    66,
+   111,   104,    97,   102,   115,   116,   125,   122,
+   137,   142,   135,   128,   149,   146,   155,   156,
+   177,   182,   191,   184,   173,   170,   163,   164,
+   249,   254,   247,   240,   229,   226,   235,   236,
+   193,   198,   207,   200,   221,   218,   211,   212,
+   105,   110,   103,    96,   117,   114,   123,   124,
+    81,    86,    95,    88,    77,    74,    67,    68,
+    25,    30,    23,    16,     5,     2,    11,    12,
+    33,    38,    47,    40,    61,    58,    51,    52,
+    78,    73,    64,    71,    82,    85,    92,    91,
+   118,   113,   120,   127,   106,   109,   100,    99,
+    62,    57,    48,    55,    34,    37,    44,    43,
+     6,     1,     8,    15,    26,    29,    20,    19,
+   174,   169,   160,   167,   178,   181,   188,   187,
+   150,   145,   152,   159,   138,   141,   132,   131,
+   222,   217,   208,   215,   194,   197,   204,   203,
+   230,   225,   232,   239,   250,   253,   244,   243
+}
+
+END
+
+TASTE-BasicTypes DEFINITIONS ::=
+BEGIN
+
+-- Set of TASTE predefined basic types
+
+T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
+
+T-UInt32 ::= INTEGER (0 .. 4294967295)
+
+T-Int8 ::= INTEGER (-128 .. 127)
+
+T-UInt8 ::= INTEGER (0 .. 255)
+
+T-Boolean ::= BOOLEAN
+
+T-Null-Record ::= SEQUENCE {}
+
+END
+
+
+UART-PROTOCOL-DLC-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+
+-- ASN.1 Type definitions must start with an uppercase
+-- Field names in records (SEQUENCE) must start with a lowercase
+-- Underscores are not allowed: use dash (hyphen) 
+-- For integers do not assume that small ranges will be translated to small
+-- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
+-- for the range in Ada)
+
+-- Simple types:
+
+-- TASTE-Boolean ::= BOOLEAN
+-- MyInteger   ::= INTEGER (0..255)
+-- MyReal      ::= REAL (0.0 .. 1000.0)
+-- MyBool      ::= BOOLEAN
+-- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
+
+-- Complex types:
+
+--  MySeq       ::= SEQUENCE {
+--      input-data  MyInteger,
+--      output-data MyInteger,
+--      validity    ENUMERATED { valid, invalid }
+--  }
+--
+--  MyChoice    ::= CHOICE {
+--      a BOOLEAN,
+--      b MySeq
+--  }
+--
+--  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
+--
+--  MyOctStr    ::= OCTET STRING (SIZE (3))
+--
+--  -- You can also declare constants
+--  myVar       MySeqOf     ::= { hello, world }
+
+END
+
+
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+-- List of functions (instances) present in the system
+PID ::= ENUMERATED {
+    bcapp,
+    bcdlct,
+    channeleffects,
+    erroredchannel,
+    rtapp,
+    rtdlcr,
+    
+    env
+}
+
+END
+

@@ -1,0 +1,112 @@
+/* CIF PROCESS (248, 150), (150, 75) */
+process ProtocolObserver;
+    /* CIF TEXT (1130, 133), (272, 158) */
+    monitor st System_State;
+    monitor event Observable_Event;
+    
+    DCL dontcare UINT8;
+    DCL resyncCount UINT16;
+    
+    DCL txSDU T_UART_DLC_SDU;
+    DCL rxSDU T_UART_DLC_SDU;
+    
+    DCL C_MAX_RESYNC_COUNT UINT16 := 2;
+    /* CIF ENDTEXT */
+    /* CIF START (49, 83), (70, 35) */
+    START;
+        /* CIF task (23, 138), (120, 35) */
+        task resyncCount := 0;
+        /* CIF NEXTSTATE (49, 188), (70, 35) */
+        NEXTSTATE IDLE;
+    /* CIF state (614, 152), (70, 35) */
+    state *;
+        /* CIF input (582, 207), (131, 35) */
+        input DLCRxSDU(rxSDU);
+            /* CIF decision (593, 262), (110, 50) */
+            decision rxSDU = txSDU;
+                /* CIF ANSWER (660, 332), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (643, 375), (103, 35) */
+                    NEXTSTATE BAD_PACKET;
+                /* CIF ANSWER (541, 332), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (541, 375), (70, 35) */
+                    NEXTSTATE IDLE;
+            enddecision;
+    endstate;
+    /* CIF state (863, 355), (163, 35) */
+    state CORRUPTED, DROPPED;
+        /* CIF input (880, 410), (130, 35) */
+        input DLCTxSDU(txSDU);
+            /* CIF task (887, 465), (117, 38) */
+            task resyncCount :=
+resyncCount + 1;
+            /* CIF decision (897, 523), (96, 50) */
+            decision resyncCount;
+                /* CIF ANSWER (817, 593), (166, 23) */
+                (> MAX_RESYNC_COUNT):
+                    /* CIF NEXTSTATE (841, 636), (119, 35) */
+                    NEXTSTATE RESYNC_FAILED;
+                /* CIF ANSWER (1011, 593), (70, 23) */
+                else:
+                    /* CIF NEXTSTATE (999, 636), (92, 35) */
+                    NEXTSTATE RESYNCING;
+            enddecision;
+    endstate;
+    /* CIF state (874, 145), (103, 35) */
+    state BAD_PACKET;
+    endstate;
+    /* CIF state (875, 201), (119, 35) */
+    state RESYNC_FAILED;
+    endstate;
+    /* CIF state (311, 501), (70, 35) */
+    state *;
+        /* CIF input (206, 558), (79, 35) */
+        input DropChar;
+            /* CIF task (186, 613), (120, 35) */
+            task resyncCount := 0;
+            /* CIF NEXTSTATE (205, 663), (82, 35) */
+            NEXTSTATE DROPPED;
+        /* CIF input (332, 556), (157, 35) */
+        input CorruptChar(dontcare);
+            /* CIF task (351, 611), (120, 35) */
+            task resyncCount := 0;
+            /* CIF NEXTSTATE (362, 661), (98, 35) */
+            NEXTSTATE CORRUPTED;
+    endstate;
+    /* CIF state (1259, 363), (82, 35) */
+    state DROPPED;
+        /* CIF provided (1208, 418), (185, 35) */
+        provided BCDLT.process_state = IDLE
+        /* CIF comment (1414, 418), (209, 68) */
+        comment 'Detect a state change to IDLE
+in the BC DLC TX process (i.e. 
+no more characters to transmit)
+ToDo: check syntax';
+            /* CIF decision (1266, 473), (70, 50) */
+            decision any;
+                /* CIF ANSWER (1204, 543), (70, 23) */
+                (0):
+                    /* CIF NEXTSTATE (1197, 586), (82, 35) */
+                    NEXTSTATE DROPPED;
+                /* CIF ANSWER (1312, 543), (70, 23) */
+                (1):
+                    /* CIF output (1292, 586), (109, 35) */
+                    output FrameTimeout
+                    /* CIF comment (1421, 586), (152, 68) */
+                    comment 'Simulates no new Tx
+packet arriving within 
+Rx frame timeout
+period';
+                    /* CIF NEXTSTATE (1305, 641), (82, 35) */
+                    NEXTSTATE DROPPED;
+            enddecision;
+    endstate;
+    /* CIF state (348, 141), (70, 35) */
+    state IDLE;
+        /* CIF input (318, 196), (130, 35) */
+        input DLCTxSDU(txSDU);
+            /* CIF NEXTSTATE (349, 251), (70, 35) */
+            NEXTSTATE IDLE;
+    endstate;
+endprocess ProtocolObserver;

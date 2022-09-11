@@ -1,0 +1,272 @@
+/* CIF PROCESS (248, 148), (150, 75) */
+process rtdlcr;
+    /* CIF TEXT (1781, 593), (302, 293) */
+    -- Text area for declarations and comments
+    
+    timer FrameTimer;
+    
+    DCL rxChar UINT8;
+    DCL rxCount UINT8;
+    DCL rxFrameBuffer T_UART_DLC_FrameBuffer;
+    DCL rxPDU T_UART_DLC_PDU;
+    
+    DCL headerValid T_ValidInvalidState;
+    DCL crcResult T_SuccessFailState;
+    
+    DCL FRAME_TIMEOUT UINT16 := 1000;
+    
+    --procedure ComputeCRC;
+    --fpar
+        --in rxFrame T_UART_DLC_SDU,
+        --out result T_UART_DLC_FrameCRC;
+    --EXTERNAL;
+    /* CIF ENDTEXT */
+    /* CIF procedure (1563, 446), (101, 35) */
+    procedure ComputeCRC;
+        /* CIF TEXT (690, 284), (267, 158) */
+        -- Text area for declarations and comments
+        
+        fpar
+            in rxFrame T_UART_DLC_SDU,
+            out result T_UART_DLC_FrameCRC;
+        
+        
+        DCL dataIndex UINT16;
+        DCL crc UINT8;
+        DCL inputByte UINT8;
+        /* CIF ENDTEXT */
+        /* CIF START (390, 306), (70, 35) */
+        START;
+            /* CIF task (372, 361), (105, 38) */
+            task crc := 0,
+dataIndex := 0;
+            /* CIF label (390, 419), (70, 35) */
+            L1:
+            /* CIF decision (328, 469), (192, 50) */
+            decision dataIndex = length(rxFrame);
+                /* CIF ANSWER (270, 539), (70, 23) */
+                (true):
+                    /* CIF task (259, 582), (90, 35) */
+                    task result := crc;
+                    /* CIF return (287, 637), (35, 35) */
+                    return ;
+                /* CIF ANSWER (521, 539), (70, 23) */
+                (false):
+                    /* CIF task (449, 582), (213, 35) */
+                    task inputByte := rxFrame(dataIndex);
+                    /* CIF task (420, 637), (270, 35) */
+                    task crc := c_RMAPCRCTable(crc xor inputByte);
+                    /* CIF task (466, 692), (178, 35) */
+                    task dataIndex := dataIndex + 1;
+                    /* CIF join (538, 742), (35, 35) */
+                    join L1;
+            enddecision;
+    endprocedure;
+    /* CIF procedure (1791, 512), (88, 35) */
+    procedure ResetDLCR;
+        /* CIF START (226, 92), (70, 35) */
+        START;
+            /* CIF task (213, 147), (94, 35) */
+            task rxCount := 0;
+            /* CIF task (113, 202), (294, 53) */
+            task for index in range(0, C_UART_DLC_PDU_SIZE):
+  rxFrameBuffer(index) := 0
+endfor;
+            /* CIF return (243, 286), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF procedure (1785, 310), (70, 35) */
+    procedure Decode
+    /* CIF comment (1885, 308), (204, 38) */
+    comment 'Takes a byte array and decodes
+it into an ASN.1 structure';
+        /* CIF TEXT (897, 311), (271, 140) */
+        -- Text area for declarations and comments
+        
+        fpar
+          in byteBuffer T_UART_DLC_FrameBuffer,
+          out frame T_UART_DLC_PDU;
+        /* CIF ENDTEXT */
+        /* CIF START (313, 137), (70, 35) */
+        START
+        /* CIF comment (557, 118), (250, 68) */
+        comment 'It would be nice to have access to ACN 
+encoder/decoder functions from SDL.
+In the meantime we use this bespoke
+decoding procedure.';
+            /* CIF task (195, 242), (304, 35) */
+            task frame.dlc_header := C_UART_DLC_SYNC_VALUE
+            /* CIF comment (520, 239), (242, 38) */
+            comment 'This ought not to give an OpenGeode
+warning.';
+            /* CIF task (190, 297), (314, 53) */
+            task for  index in RANGE (0,c_UART_DLC_SDU_SIZE) :
+  frame.dlc_payload(index) := byteBuffer(1+index)
+endfor;
+            /* CIF task (187, 381), (320, 35) */
+            task frame.crc := byteBuffer(c_UART_DLC_SDU_SIZE+1);
+            /* CIF return (330, 431), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF procedure (1791, 384), (119, 35) */
+    procedure CheckFrameCRC
+    /* CIF comment (1930, 373), (243, 38) */
+    comment 'Checks the CRC of a complete
+DLC frame.  Returns SUCCESS or FAIL.';
+        /* CIF TEXT (663, 123), (285, 140) */
+        -- Text area for declarations and comments
+        
+        fpar
+            in rxFrame T_UART_DLC_PDU,
+            out result T_SuccessFailState;
+        
+        DCL computedCRC T_UART_DLC_FrameCRC;
+        /* CIF ENDTEXT */
+        /* CIF START (732, 412), (70, 35) */
+        START;
+            /* CIF PROCEDURECALL (606, 467), (321, 35) */
+            call ComputeCRC(rxFrame.dlc_payload, computedCRC);
+            /* CIF decision (708, 517), (117, 50) */
+            decision computedCRC =
+rxFrame.crc;
+                /* CIF ANSWER (651, 587), (70, 23) */
+                (true):
+                    /* CIF PROCEDURECALL (609, 630), (153, 35) */
+                    call writeln('Rx CRC pass');
+                    /* CIF task (627, 680), (117, 35) */
+                    task result := success;
+                /* CIF ANSWER (812, 587), (70, 23) */
+                else:
+                    /* CIF PROCEDURECALL (774, 630), (145, 35) */
+                    call writeln('Rx CRC fail');
+                    /* CIF task (800, 680), (92, 35) */
+                    task result := fail;
+            enddecision;
+            /* CIF return (749, 731), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF procedure (1794, 446), (130, 35) */
+    procedure IsValidUartHeader
+    /* CIF comment (1942, 444), (229, 38) */
+    comment 'Returns true if a character is a valid
+UART frame header';
+        /* CIF TEXT (381, 131), (267, 140) */
+        -- Text area for declarations and comments
+        
+        fpar
+          in inChar UINT8,
+          out result T_ValidInvalidState;
+        /* CIF ENDTEXT */
+        /* CIF START (178, 143), (70, 35) */
+        START;
+            /* CIF decision (178, 198), (70, 50) */
+            decision inChar;
+                /* CIF ANSWER (0, 268), (184, 23) */
+                (C_UART_DLC_SYNC_VALUE):
+                    /* CIF task (41, 311), (101, 35) */
+                    task result := valid;
+                    /* CIF return (74, 361), (35, 35) */
+                    return ;
+                /* CIF ANSWER (279, 274), (70, 23) */
+                else:
+                    /* CIF task (258, 317), (112, 35) */
+                    task result := invalid;
+                    /* CIF return (296, 367), (35, 35) */
+                    return ;
+            enddecision;
+    endprocedure;
+    /* CIF START (670, 25), (70, 35) */
+    START;
+        /* CIF PROCEDURECALL (660, 80), (88, 35) */
+        call ResetDLCR;
+        /* CIF NEXTSTATE (670, 130), (70, 35) */
+        NEXTSTATE IDLE;
+    /* CIF state (1771, 35), (70, 35) */
+    state *;
+        /* CIF input (1571, 90), (93, 35) */
+        input FrameTimer;
+            /* CIF PROCEDURECALL (1573, 145), (88, 35) */
+            call ResetDLCR;
+            /* CIF output (1515, 195), (205, 35) */
+            output DLCRxError(FRAME_TIMEOUT);
+            /* CIF NEXTSTATE (1583, 256), (70, 35) */
+            NEXTSTATE IDLE;
+        /* CIF input (1861, 90), (95, 35) */
+        input DLCRxReset;
+            /* CIF PROCEDURECALL (1864, 142), (88, 35) */
+            call ResetDLCR;
+            /* CIF NEXTSTATE (1874, 192), (70, 35) */
+            NEXTSTATE IDLE;
+    endstate;
+    /* CIF state (980, 18), (70, 35) */
+    state IDLE;
+        /* CIF input (948, 74), (137, 35) */
+        input PHYRxChar(rxChar);
+            /* CIF PROCEDURECALL (913, 129), (208, 35) */
+            call writeln('received char ', rxChar);
+            /* CIF PROCEDURECALL (890, 179), (254, 35) */
+            call IsValidUartHeader(rxChar, headerValid);
+            /* CIF decision (970, 234), (93, 50) */
+            decision headerValid;
+                /* CIF ANSWER (779, 312), (70, 23) */
+                (valid):
+                    /* CIF task (723, 355), (181, 35) */
+                    task rxFrameBuffer(0) := rxChar;
+                    /* CIF task (767, 410), (94, 35) */
+                    task rxCount := 1;
+                    /* CIF PROCEDURECALL (678, 460), (272, 35) */
+                    call set_timer(FRAME_TIMEOUT, FrameTimer);
+                    /* CIF NEXTSTATE (770, 515), (87, 35) */
+                    NEXTSTATE RECEIVING;
+                /* CIF ANSWER (1089, 322), (70, 23) */
+                (invalid):
+                    /* CIF output (1018, 365), (210, 35) */
+                    output DLCRxError(BAD_START_CHAR);
+                    /* CIF PROCEDURECALL (1079, 420), (88, 35) */
+                    call ResetDLCR;
+                    /* CIF NEXTSTATE (1089, 470), (70, 35) */
+                    NEXTSTATE IDLE;
+            enddecision;
+    endstate;
+    /* CIF state (1086, 715), (87, 35) */
+    state RECEIVING;
+        /* CIF input (1063, 771), (137, 35) */
+        input PHYRxChar(rxChar);
+            /* CIF PROCEDURECALL (1028, 826), (208, 35) */
+            call writeln('received char ', rxChar);
+            /* CIF task (1021, 876), (221, 35) */
+            task rxFrameBuffer(rxCount) := rxChar;
+            /* CIF task (1023, 931), (218, 35) */
+            task rxCount := (rxCount + 1) mod 256;
+            /* CIF decision (1097, 981), (70, 50) */
+            decision rxCount;
+                /* CIF ANSWER (813, 1063), (164, 23) */
+                (C_UART_DLC_PDU_SIZE):
+                    /* CIF PROCEDURECALL (808, 1106), (175, 35) */
+                    call reset_timer(FrameTimer);
+                    /* CIF PROCEDURECALL (792, 1160), (206, 35) */
+                    call Decode(rxFrameBuffer, rxPDU);
+                    /* CIF PROCEDURECALL (782, 1215), (226, 35) */
+                    call CheckFrameCRC(rxPDU, crcResult);
+                    /* CIF decision (857, 1265), (77, 50) */
+                    decision crcResult;
+                        /* CIF ANSWER (766, 1335), (70, 23) */
+                        (success):
+                            /* CIF output (698, 1378), (205, 35) */
+                            output DLCRxSDU(rxPDU.dlc_payload);
+                        /* CIF ANSWER (966, 1335), (70, 23) */
+                        (fail):
+                            /* CIF output (921, 1378), (158, 35) */
+                            output DLCRxError (CRC_FAIL);
+                    enddecision;
+                    /* CIF PROCEDURECALL (851, 1429), (88, 35) */
+                    call ResetDLCR;
+                    /* CIF NEXTSTATE (861, 1479), (70, 35) */
+                    NEXTSTATE IDLE;
+                /* CIF ANSWER (1281, 1060), (70, 23) */
+                else:
+                    /* CIF NEXTSTATE (1272, 1103), (87, 35) */
+                    NEXTSTATE RECEIVING;
+            enddecision;
+    endstate;
+endprocess rtdlcr;

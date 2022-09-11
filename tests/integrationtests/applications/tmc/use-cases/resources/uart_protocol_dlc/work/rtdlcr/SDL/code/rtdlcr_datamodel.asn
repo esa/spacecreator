@@ -1,0 +1,26 @@
+Rtdlcr-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   UINT40, UINT32, UINT24, UINT16, UINT14, UINT12, UINT11, UINT10, UINT8, UINT7, UINT6, UINT5, UINT4, UINT3, UINT2, UINT1, T-Bit, INT16, INT32, INT24, T-OCTET FROM Basic-Types
+   T-OnOffState, T-NominalRedundantState, T-ConnectionState, T-SwitchState, T-FaultState, T-SelectionState, T-PresenceState, T-ForwardBackwardState, T-LeftRightState, T-UsedUnusedState, T-MovingStillState, T-PlusMinusState, T-ArmedDisarmedState, T-ActiveInactiveState, T-EnabledInhibitedState, T-FlagState, T-SuccessFailState, T-HighLowState, T-OverrideState, T-LockedUnlockedState, T-WarningState, T-ValidInvalidState FROM Bilevel-Types
+   T-UART-DLC-FrameBuffer, T-UART-DLC-Header, T-UART-DLC-FrameCRC, T-UART-DLC-SDU, T-UART-DLC-PDU, T-UART-DLC-RxErrorCode, T-RMAPCRCTable FROM UART-DLC
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
+   PID FROM System-Dataview;
+
+Rtdlcr-States ::= ENUMERATED {idle, receiving}
+
+Rtdlcr-Context ::= SEQUENCE {
+   state Rtdlcr-States,
+   init-done BOOLEAN,
+   rxchar UINT8,
+   rxcount UINT8,
+   rxframebuffer T-UART-DLC-FrameBuffer,
+   rxpdu T-UART-DLC-PDU,
+   headervalid T-ValidInvalidState,
+   crcresult T-SuccessFailState,
+   frame-timeout UINT16
+}
+
+END

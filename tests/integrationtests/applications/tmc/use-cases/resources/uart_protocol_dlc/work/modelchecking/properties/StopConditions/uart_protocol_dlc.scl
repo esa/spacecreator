@@ -1,0 +1,5 @@
+never get_state(ProtocolObserver) = RESYNC_FAILED;
+never get_state(ProtocolObserver) = BAD_PACKET;
+
+
+
