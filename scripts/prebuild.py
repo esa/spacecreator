@@ -134,7 +134,7 @@ def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
                  '-DCMAKE_PREFIX_PATH:STRING=' + env_qt_dir,
                  '-DQT_QMAKE_EXECUTABLE:STRING=' + qmake_dir,
                  '-DCMAKE_BUILD_TYPE=Release',
-                 '-DCMAKE_INSTALL_PREFIX=' + cmake_install_dir,
+                 '-DCMAKE_INSTALL_PREFIX=' + env_qt_dir,
                  '-B', cmake_build_dir,
                  '-S', cmake_source_dir]
     if build_with_qt6:

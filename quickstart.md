@@ -89,21 +89,14 @@ We want to use the Qt installation in our build environment (~/opt/spacecreatore
 So we go to ***Kits / Qt Version*** and create a manual Qt Version named ***spacecreatorenvqt6***.
 Then we make a new Manual Kit named ***spacecreator6*** where we select the Qt version above.
 
+In the ***CMake Configuration*** inside the kit, click the ***Change...*** button.
+Add two lines there:<br>
+-DQTC_SOURCE:PATH=$HOME/opt/spacecreatorenv5/spacecreator.AppDir<br>
+-DQTC_INSTALL:PATH=$HOME/opt/spacecreatorenv5/spacecreator.AppDir
+
+
 ### Build Settings
-The CMakeLists.txt file of the project needs to be able to find the grantlee template library and the Qt instance in our build environment, so we give it Additional CMake options: 
-
--DCMAKE_PREFIX_PATH="$HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/cmake;$HOME/opt/spacecreatorenv6/grantlee/lib/cmake/Grantlee5"
-
-This should result in the 
-CMAKE_PREIFX_PATH variable being updated in the ***Current Configuration*** tab.
-Grantlee5_DIR variable being set
-
-Other variables:<br>
-QTC_SOURCE - Path to where /lib and /include for QtCreators dev code is located
-$HOME/opt/spacecreatorenv5/spacecreator.AppDir<br>
-QTC_INSTALL - Path to where the spacecreator-plugin is to be put.
-$HOME/opt/spacecreatorenv5/spacecreator.AppDir
-
+Variables:<br>
 Turn ENABLE_FORMAT_CHECK off.
 
 Click ***Run CMake***
