@@ -25,7 +25,6 @@
 #include "baseitems/msgidentificationitem.h"
 #include "chartlayoutmanager.h"
 #include "cif/cifblockfactory.h"
-#include "cif/cifblocks.h"
 #include "cif/ciflines.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitynamechange.h"
@@ -34,10 +33,8 @@
 #include "commands/cmdsetparameterlist.h"
 #include "commentitem.h"
 #include "messagedialog.h"
-#include "mscchart.h"
 #include "msccommandsstack.h"
 #include "mscinstance.h"
-#include "systemchecks.h"
 #include "ui/grippointshandler.h"
 
 #include <QBrush>
@@ -117,9 +114,8 @@ MessageItem::MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutMan
         }
     });
 
-    if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
-        connect(m_chartLayoutManager->systemChecker(), &msc::SystemChecks::ivDataReset, this,
-                &msc::MessageItem::checkIVConnection);
+    if (m_chartLayoutManager) {
+        updateSystemChecker(m_chartLayoutManager->systemChecker());
     }
 
     if (!isCreator()) {
@@ -839,6 +835,15 @@ void MessageItem::checkIVConnection()
         m_arrowItem->setColor(lineColor);
         updateTooltip();
     }
+}
+
+void MessageItem::updateSystemChecker(SystemChecks *checker)
+{
+    if (!m_chartLayoutManager || !m_chartLayoutManager->systemChecker()) {
+        return;
+    }
+    connect(m_chartLayoutManager->systemChecker(), &msc::SystemChecks::ivDataReset, this,
+            &msc::MessageItem::checkIVConnection);
 }
 
 void MessageItem::addMessagePoint(const QPointF &scenePoint)
