@@ -2,13 +2,14 @@
 
 import argparse
 import os.path
+import shutil
 import subprocess
 import urllib.request
 import tarfile
 import py7zr
 
 
-from utils import join_dir, print_cmd, ensure_dir, check_cmake_version
+from utils import join_dir, print_cmd, ensure_dir, check_cmake_version, copy_content_of_dir_to_other_dir, copy_file_pattern_to_dir
 from git.repo import Repo
 
 '''
@@ -124,8 +125,7 @@ def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
 
     cmake_build_dir = join_dir(env_dir, 'build')
     cmake_source_dir = join_dir(env_dir, 'grantlee')
-    cmake_install_dir = join_dir(env_dir, 'grantlee')
-    qmake_dir = join_dir(env_qt_dir, 'bin/qmake')
+    qmake_dir = join_dir(env_qt_dir, 'bin', 'qmake')
 
     print('Building grantlee')
     # Make ninja.build
@@ -159,7 +159,8 @@ def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
 
 def install_grantlee(env_dir: str) -> None:
     """
-    Install grantlee in the spacecreator build environment
+    Install grantlee in the Qt SDK, for build time usage
+    In addition copy grantlee to the spacecreator build environment, to be used at run time
     :param env_dir: path to the build environment (i.e ~/opt/spacecreatorenv6)
     """
     cmake_build_dir = join_dir(env_dir, 'build')
@@ -173,6 +174,18 @@ def install_grantlee(env_dir: str) -> None:
     if not completed_process.returncode == 0:
         print("Could not install grantlee in {}".format(cmake_build_dir))
         exit(5)
+
+    # Install grantlee in spacecreator
+    grantlee_lib_dir = join_dir(cmake_build_dir, 'grantlee')
+    spacecreator_qt_lib_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'Qt', 'lib')
+    spacecreator_grantlee_lib_dir = join_dir(spacecreator_qt_lib_dir, 'grantlee')
+    ensure_dir(spacecreator_grantlee_lib_dir)
+    shutil.copytree(grantlee_lib_dir, spacecreator_grantlee_lib_dir, dirs_exist_ok=True)
+
+    templates_lib_dir = join_dir(cmake_build_dir, 'templates', 'lib')
+    pattern = join_dir(templates_lib_dir, 'libGrantlee_Templates.so*')
+    copy_file_pattern_to_dir(pattern, spacecreator_qt_lib_dir)
+
 
 
 def download_asn1scc(env_dir: str) -> None:
