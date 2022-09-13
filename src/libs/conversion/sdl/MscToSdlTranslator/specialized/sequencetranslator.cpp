@@ -175,8 +175,7 @@ SequenceTranslator::TransitionList SequenceTranslator::createTransitions(const T
 }
 
 std::unique_ptr<Action> SequenceTranslator::createSignalRequirements(
-        const MscParameterValueParser::ParametersRequirementsMap &parametersRequirements,
-        const State *targetState) const
+        const MscParameterValueParser::ParametersRequirements &parametersRequirements, const State *targetState) const
 {
     std::unique_ptr<Action> lastAction = std::make_unique<NextState>(targetState->name(), targetState);
 
@@ -190,9 +189,6 @@ std::unique_ptr<Action> SequenceTranslator::createSignalRequirements(
 std::unique_ptr<Decision> SequenceTranslator::createParameterRequirements(
         const QString &name, const std::optional<QString> &value, std::unique_ptr<Action> trueAction) const
 {
-    Q_UNUSED(name);
-    Q_UNUSED(value);
-
     auto decision = std::make_unique<Decision>();
 
     if (value.has_value()) {
@@ -206,13 +202,16 @@ std::unique_ptr<Decision> SequenceTranslator::createParameterRequirements(
         trueAnswer->setTransition(std::move(trueTransition));
         decision->addAnswer(std::move(trueAnswer));
     } else {
-        auto decisionExpression = std::make_unique<Expression>(m_isPresentTemplate.arg(name));
+        const auto choiceName = name.section('.', 0, -2);
+        const auto choiceFieldName = name.section('.', -1);
+
+        auto decisionExpression = std::make_unique<Expression>(m_isPresentTemplate.arg(choiceName));
         decision->setExpression(std::move(decisionExpression));
 
         auto trueTransition = std::make_unique<Transition>();
         trueTransition->addAction(std::move(trueAction));
         auto trueAnswer = std::make_unique<Answer>();
-        trueAnswer->setLiteral(VariableLiteral(m_trueLiteral));
+        trueAnswer->setLiteral(VariableLiteral(choiceFieldName));
         trueAnswer->setTransition(std::move(trueTransition));
         decision->addAnswer(std::move(trueAnswer));
     }

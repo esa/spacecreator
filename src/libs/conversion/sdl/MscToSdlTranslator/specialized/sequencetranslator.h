@@ -85,7 +85,7 @@ protected:
             const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
 
-    auto createSignalRequirements(const MscParameterValueParser::ParametersRequirementsMap &parametersRequirements,
+    auto createSignalRequirements(const MscParameterValueParser::ParametersRequirements &parametersRequirements,
             const ::sdl::State *targetState) const -> std::unique_ptr<::sdl::Action>;
     auto createParameterRequirements(const QString &name, const std::optional<QString> &value,
             std::unique_ptr<::sdl::Action> trueAction) const -> std::unique_ptr<::sdl::Decision>;
@@ -113,7 +113,6 @@ protected:
     inline static const QString m_defaultChannelName = "c";
     inline static const QString m_defaultRouteName = "r";
     inline static const QString m_isPresentTemplate = "present(%1)";
-    inline static const QString m_trueLiteral = "TRUE";
     inline static const QString m_elseLiteral = "ELSE";
 
     ::sdl::SdlModel *m_sdlModel;

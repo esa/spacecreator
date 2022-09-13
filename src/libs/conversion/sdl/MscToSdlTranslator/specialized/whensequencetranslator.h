@@ -99,7 +99,7 @@ private:
             const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
     auto createThenNotTransitions(Context &context, StateList &states, const SignalsMap &signals,
-        const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
+            const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
 };
 

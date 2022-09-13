@@ -217,7 +217,8 @@ std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSeq
             stateMachine->addTransition(std::move(transition));
         }
     } else if (context.mode == Mode::ThenNot) {
-        auto thenNotTransitions = createThenNotTransitions(context, states, context.signals, signalRequirements, requirementStartStateId);
+        auto thenNotTransitions =
+                createThenNotTransitions(context, states, context.signals, signalRequirements, requirementStartStateId);
         for (auto &transition : thenNotTransitions) {
             stateMachine->addTransition(std::move(transition));
         }

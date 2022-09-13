@@ -50,14 +50,14 @@ MscParameterValueParser::SignalRequirementsMap MscParameterValueParser::parseSig
         }
 
         auto parametersRequirements = parseSignal(signalInfo);
+        std::reverse(parametersRequirements.begin(), parametersRequirements.end());
         signalRequirements.insert({ signalId, std::move(parametersRequirements) });
     }
 
     return signalRequirements;
 }
 
-MscParameterValueParser::ParametersRequirementsMap MscParameterValueParser::parseSignal(
-        const SignalInfo &signalInfo) const
+MscParameterValueParser::ParametersRequirements MscParameterValueParser::parseSignal(const SignalInfo &signalInfo) const
 {
     const auto &mscParameters = signalInfo.parameterList;
     const auto &parametersTypes = signalInfo.signal->parametersTypes();
@@ -72,7 +72,7 @@ MscParameterValueParser::ParametersRequirementsMap MscParameterValueParser::pars
 
     const auto &ivInterfaceName = signalInfo.signal->referencedName();
 
-    ParametersRequirementsMap parametersRequirements;
+    ParametersRequirements parametersRequirements;
 
     for (int parameterIndex = 0; parameterIndex < parametersTypes.size(); ++parameterIndex) {
         const auto &ivParameterTypeName = parametersTypes.at(parameterIndex);
@@ -81,7 +81,7 @@ MscParameterValueParser::ParametersRequirementsMap MscParameterValueParser::pars
         const auto asn1ValueMap = parseParameter(ivParameterTypeName, mscParameter, ivInterfaceName, parameterIndex);
 
         const auto signalVariableName = QString("%1_param%2").arg(signalInfo.signal->name()).arg(parameterIndex);
-        parseValueMap(asn1ValueMap, signalVariableName, false, parametersRequirements);
+        parseValueMap(asn1ValueMap, signalVariableName, true, false, parametersRequirements);
     }
 
     return parametersRequirements;
@@ -90,14 +90,6 @@ MscParameterValueParser::ParametersRequirementsMap MscParameterValueParser::pars
 QVariantMap MscParameterValueParser::parseParameter(const QString &ivParameterTypeName,
         const MscParameter &mscParameter, const QString &ivInterfaceName, const int parameterIndex) const
 {
-    if (mscParameter.type() == MscParameter::Type::Unknown) {
-        auto errorMessage = QString("MSC parameter #%1 is of unknown type").arg(parameterIndex);
-        throw TranslationException(std::move(errorMessage));
-    } else if (mscParameter.type() == MscParameter::Type::Expression) {
-        auto errorMessage = QString("MSC parameter #%1 is an expression which is unsupported").arg(parameterIndex);
-        throw TranslationException(std::move(errorMessage));
-    }
-
     const auto ivParameterType = m_observerAsn1File->typeFromName(ivParameterTypeName);
 
     if (ivParameterType == nullptr) {
@@ -108,7 +100,20 @@ QVariantMap MscParameterValueParser::parseParameter(const QString &ivParameterTy
         throw TranslationException(std::move(errorMessage));
     }
 
-    const auto &mscParameterValue = mscParameter.pattern();
+    QString mscParameterValue;
+
+    switch (mscParameter.type()) {
+    case MscParameter::Type::Unknown: {
+        auto errorMessage = QString("MSC parameter #%1 is of unknown type").arg(parameterIndex);
+        throw TranslationException(std::move(errorMessage));
+    } break;
+    case MscParameter::Type::Pattern: {
+        mscParameterValue = mscParameter.pattern();
+    } break;
+    case MscParameter::Type::Expression: {
+        mscParameterValue = mscParameter.expression();
+    }
+    }
 
     bool ok;
     auto asn1Value = m_asn1ValueParser.parseAsn1Value(ivParameterType, mscParameterValue, &ok);
@@ -124,15 +129,16 @@ QVariantMap MscParameterValueParser::parseParameter(const QString &ivParameterTy
     return asn1Value;
 }
 
-void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const QString &parentName, const bool isChoice,
-        ParametersRequirementsMap &result) const
+void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const QString &parentName, const bool skipName,
+        const bool isChoice, ParametersRequirements &result) const
 {
     if (!valueMap.contains("name")) {
         throw TranslationException("Missing 'name' key in value map from ASN.1 value parser");
     }
 
     const auto &nameValue = valueMap["name"].toString();
-    const auto name = nameValue.isEmpty() ? parentName : QString("%1.%2").arg(parentName).arg(nameValue);
+
+    const auto name = skipName || nameValue.isEmpty() ? parentName : QString("%1.%2").arg(parentName).arg(nameValue);
 
     for (auto iter = valueMap.constBegin(); iter != valueMap.constEnd(); ++iter) {
         const auto &key = iter.key();
@@ -143,16 +149,17 @@ void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const Q
         }
 
         if (key == "seqofvalue") {
-            parseValueSequence(value.toList(), parentName, result);
+            parseValueSequence(value.toList(), name, result);
         } else if (key == "children") {
             parseValueChildren(value.toList(), name, result);
         } else if (key == "choice") {
-            parseValueMap(value.toMap(), name, true, result);
+            parseValueMap(value.toMap(), name, false, true, result);
         } else if (key == "value") {
+            if (isChoice) {
+                result.push_back({ name, std::nullopt });
+            }
             if (value.isValid()) {
-                result.insert({ name, value.toString() });
-            } else if (isChoice) {
-                result.insert({ name, std::nullopt });
+                result.push_back({ name, value.toString() });
             }
         } else {
             auto errorMessage = QString("Unknown ASN.1 value map key '%1'").arg(key);
@@ -162,7 +169,7 @@ void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const Q
 }
 
 void MscParameterValueParser::parseValueSequence(
-        const QVariantList &seqOfValue, const QString &parentName, ParametersRequirementsMap &result) const
+        const QVariantList &seqOfValue, const QString &parentName, ParametersRequirements &result) const
 {
     for (int i = 0; i < seqOfValue.size(); ++i) {
         const auto &elem = seqOfValue.at(i);
@@ -172,12 +179,12 @@ void MscParameterValueParser::parseValueSequence(
         }
 
         const auto name = QString("%1(%2)").arg(parentName).arg(i);
-        parseValueMap(elem.toMap(), name, false, result);
+        parseValueMap(elem.toMap(), name, false, false, result);
     }
 }
 
 void MscParameterValueParser::parseValueChildren(
-        const QVariantList &children, const QString &name, ParametersRequirementsMap &result) const
+        const QVariantList &children, const QString &name, ParametersRequirements &result) const
 {
     for (int i = 0; i < children.size(); ++i) {
         const auto &child = children.at(i);
@@ -186,7 +193,7 @@ void MscParameterValueParser::parseValueChildren(
             throw TranslationException("ASN.1 value children element is not a map");
         }
 
-        parseValueMap(child.toMap(), name, false, result);
+        parseValueMap(child.toMap(), name, false, false, result);
     }
 }
 
