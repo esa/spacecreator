@@ -37,6 +37,7 @@ private Q_SLOTS:
     void test_mscNeverSequenceParametersFailure();
     void test_mscWhenThenSequence();
     void test_mscWhenThenSequenceFailure();
+    void test_mscWhenThenSequenceParameters();
     void test_mscWhenThenNotSequence();
     void test_mscWhenThenNotSequenceFailure();
     void test_differentInterfaceNames();
@@ -93,6 +94,12 @@ void tst_Tmc_Observers::test_mscWhenThenSequence()
 void tst_Tmc_Observers::test_mscWhenThenSequenceFailure()
 {
     const int result = system("./test_msc_when_then_sequence_failure.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Observers::test_mscWhenThenSequenceParameters()
+{
+    const int result = system("./test_msc_when_then_sequence_parameters.sh");
     QCOMPARE(result, 0);
 }
 
