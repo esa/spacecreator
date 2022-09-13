@@ -25,6 +25,7 @@
 #include "libraries.h"
 
 #include <QWidget>
+#include <QRegularExpression>
 
 #include <asn1acnconstants.h>
 #include <tr.h>
@@ -54,7 +55,7 @@ bool Libraries::matches(const QString &searchKeyWord) const
     for (const auto &keyword : keywords)
         if (keyword.contains(searchKeyWord, Qt::CaseInsensitive))
             return true;
-    return Core::IOptionsPage::matches(searchKeyWord);
+    return Core::IOptionsPage::matches(QRegularExpression(searchKeyWord));
 }
 
 QWidget *Libraries::widget()
