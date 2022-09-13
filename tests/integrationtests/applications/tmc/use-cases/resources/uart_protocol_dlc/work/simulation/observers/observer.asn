@@ -1,0 +1,544 @@
+-- Dummy data model for the timer manager (needed to populate observer.asn)
+Demo-timer-manager-Datamodel DEFINITIONS ::=
+BEGIN
+Demo-timer-manager-States ::= ENUMERATED {wait}
+
+Demo-timer-manager-Context ::= SEQUENCE {
+   state Demo-timer-manager-States
+}
+
+END
+
+Rtdlcr-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   UINT40, UINT32, UINT24, UINT16, UINT14, UINT12, UINT11, UINT10, UINT8, UINT7, UINT6, UINT5, UINT4, UINT3, UINT2, UINT1, T-Bit, INT16, INT32, INT24, T-OCTET FROM Basic-Types
+   T-OnOffState, T-NominalRedundantState, T-ConnectionState, T-SwitchState, T-FaultState, T-SelectionState, T-PresenceState, T-ForwardBackwardState, T-LeftRightState, T-UsedUnusedState, T-MovingStillState, T-PlusMinusState, T-ArmedDisarmedState, T-ActiveInactiveState, T-EnabledInhibitedState, T-FlagState, T-SuccessFailState, T-HighLowState, T-OverrideState, T-LockedUnlockedState, T-WarningState, T-ValidInvalidState FROM Bilevel-Types
+   T-UART-DLC-FrameBuffer, T-UART-DLC-Header, T-UART-DLC-FrameCRC, T-UART-DLC-SDU, T-UART-DLC-PDU, T-UART-DLC-RxErrorCode, T-RMAPCRCTable FROM UART-DLC
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
+   PID FROM System-Dataview;
+
+Rtdlcr-States ::= ENUMERATED {idle, receiving}
+
+Rtdlcr-Context ::= SEQUENCE {
+   state Rtdlcr-States,
+   init-done BOOLEAN,
+   rxchar UINT8,
+   rxcount UINT8,
+   rxframebuffer T-UART-DLC-FrameBuffer,
+   rxpdu T-UART-DLC-PDU,
+   headervalid T-ValidInvalidState,
+   crcresult T-SuccessFailState,
+   frame-timeout UINT16
+}
+
+END
+
+
+Basic-Types DEFINITIONS ::=
+BEGIN
+
+-- Basic types -- ToDo factor out
+UINT40 ::= INTEGER (0 .. 1099511627775)
+UINT32 ::= INTEGER (0 .. 4294967295)
+UINT24 ::= INTEGER (0 .. 16777215)
+UINT16 ::= INTEGER (0 .. 65535)
+UINT14 ::= INTEGER (0 .. 16383)
+UINT12 ::= INTEGER (0 .. 4095)
+UINT11 ::= INTEGER (0 .. 2047)
+UINT10 ::= INTEGER (0 .. 1023)
+UINT8  ::= INTEGER (0 .. 255)
+UINT7  ::= INTEGER (0 .. 127)
+UINT6  ::= INTEGER (0 .. 63)
+UINT5  ::= INTEGER (0 .. 31)
+UINT4  ::= INTEGER (0 .. 15)
+UINT3  ::= INTEGER (0 .. 7)
+UINT2  ::= INTEGER (0 .. 3)
+UINT1  ::= INTEGER (0 .. 1)
+T-Bit  ::= UINT1
+
+INT16 ::= INTEGER (-32768 .. 32767)
+INT32 ::= INTEGER (-2147483648 .. 2147483647)
+INT24 ::= INTEGER (-8388608 .. 8388607)
+
+T-OCTET ::= OCTET STRING (SIZE(1))
+
+END
+
+
+
+
+
+
+
+
+
+Bilevel-Types DEFINITIONS ::=
+BEGIN
+
+T-OnOffState              ::= ENUMERATED{off(0), on(1)}
+T-NominalRedundantState   ::= ENUMERATED{redundant(0), nominal(1)}
+T-ConnectionState         ::= ENUMERATED{disconnected(0), connected(1)}
+T-SwitchState             ::= ENUMERATED{switch-open(0),switch-closed(1)}
+T-FaultState              ::= ENUMERATED{fault(0), ok(1)}
+T-SelectionState          ::= ENUMERATED{not-selected(0), selected(1)}
+T-PresenceState           ::= ENUMERATED{absent(0), present(1)}
+T-ForwardBackwardState    ::= ENUMERATED{backward(0), forward(1)}
+T-LeftRightState          ::= ENUMERATED{left(0), right(1)}
+T-UsedUnusedState         ::= ENUMERATED{unused(0), used(1)}
+T-MovingStillState        ::= ENUMERATED{stationary(0), moving(1)}
+T-PlusMinusState          ::= ENUMERATED{plus(0), minus(1)}
+T-ArmedDisarmedState      ::= ENUMERATED{disarmed(0), armed(1)}
+T-ActiveInactiveState     ::= ENUMERATED{inactive(0), active(1)}
+T-EnabledInhibitedState   ::= ENUMERATED{inhibited(0), enabled(1)}
+T-FlagState               ::= ENUMERATED{clear(0),set(1)}
+T-SuccessFailState        ::= ENUMERATED{fail(0), success(1)}
+T-HighLowState            ::= ENUMERATED{low(0), high(1)}
+T-OverrideState           ::= ENUMERATED{normal(0), overridden(1)}
+T-LockedUnlockedState     ::= ENUMERATED{unlocked(0), locked(1)}
+T-WarningState            ::= ENUMERATED{ok(0), warning(1)}
+T-ValidInvalidState       ::= ENUMERATED{invalid(0), valid(1)}
+END
+
+
+
+UART-DLC DEFINITIONS ::=
+BEGIN
+
+IMPORTS
+UINT8 
+FROM Basic-Types;
+
+c-UART-DLC-SDU-SIZE UINT8 ::= 14
+c-UART-DLC-PDU-SIZE UINT8 ::= 16
+
+-----------------------------------------------------------------------------------
+-- UART Protocol definitions
+-----------------------------------------------------------------------------------
+--T-UART-DLC-FrameBuffer ::= SEQUENCE (SIZE(c-UART-DLC-PDU-SIZE )) OF UINT8
+T-UART-DLC-FrameBuffer ::= OCTET STRING (SIZE(c-UART-DLC-PDU-SIZE ))
+
+-----------------------------------------------------------------------------------
+-- UART DLC Layer Definitions
+-----------------------------------------------------------------------------------
+
+c-UART-DLC-SYNC-VALUE UINT8 ::= 22
+
+T-UART-DLC-Header   ::= UINT8(c-UART-DLC-SYNC-VALUE)
+T-UART-DLC-FrameCRC ::= UINT8
+
+--T-UART-DLC-SDU ::= SEQUENCE (SIZE(c-UART-DLC-SDU-SIZE)) OF UINT8
+T-UART-DLC-SDU ::= OCTET STRING (SIZE(c-UART-DLC-SDU-SIZE))
+
+T-UART-DLC-PDU ::= SEQUENCE {
+  dlc-header   T-UART-DLC-Header,
+  dlc-payload  T-UART-DLC-SDU,
+  crc          T-UART-DLC-FrameCRC
+}
+
+T-UART-DLC-RxErrorCode ::= ENUMERATED {
+    no-error (0),
+    bad-start-char (1),
+    crc-fail (2),
+    frame-timeout (3),
+    bad-request-type (4)
+}
+
+
+T-RMAPCRCTable ::= SEQUENCE (SIZE(256)) OF UINT8
+
+c-RMAPCRCTable T-RMAPCRCTable ::= {
+     0,     7,    14,     9,    28,    27,    18,    21,
+    56,    63,    54,    49,    36,    35,    42,    45,
+   112,   119,   126,   121,   108,   107,    98,   101,
+    72,    79,    70,    65,    84,    83,    90,    93,
+   224,   231,   238,   233,   252,   251,   242,   245,
+   216,   223,   214,   209,   196,   195,   202,   205,
+   144,   151,   158,   153,   140,   139,   130,   133,
+   168,   175,   166,   161,   180,   179,   186,   189,
+   199,   192,   201,   206,   219,   220,   213,   210,
+   255,   248,   241,   246,   227,   228,   237,   234,
+   183,   176,   185,   190,   171,   172,   165,   162,
+   143,   136,   129,   134,   147,   148,   157,   154,
+    39,    32,    41,    46,    59,    60,    53,    50,
+    31,    24,    17,    22,     3,     4,    13,    10,
+    87,    80,    89,    94,    75,    76,    69,    66,
+   111,   104,    97,   102,   115,   116,   125,   122,
+   137,   142,   135,   128,   149,   146,   155,   156,
+   177,   182,   191,   184,   173,   170,   163,   164,
+   249,   254,   247,   240,   229,   226,   235,   236,
+   193,   198,   207,   200,   221,   218,   211,   212,
+   105,   110,   103,    96,   117,   114,   123,   124,
+    81,    86,    95,    88,    77,    74,    67,    68,
+    25,    30,    23,    16,     5,     2,    11,    12,
+    33,    38,    47,    40,    61,    58,    51,    52,
+    78,    73,    64,    71,    82,    85,    92,    91,
+   118,   113,   120,   127,   106,   109,   100,    99,
+    62,    57,    48,    55,    34,    37,    44,    43,
+     6,     1,     8,    15,    26,    29,    20,    19,
+   174,   169,   160,   167,   178,   181,   188,   187,
+   150,   145,   152,   159,   138,   141,   132,   131,
+   222,   217,   208,   215,   194,   197,   204,   203,
+   230,   225,   232,   239,   250,   253,   244,   243
+}
+
+END
+
+TASTE-BasicTypes DEFINITIONS ::=
+BEGIN
+
+-- Set of TASTE predefined basic types
+
+T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
+
+T-UInt32 ::= INTEGER (0 .. 4294967295)
+
+T-Int8 ::= INTEGER (-128 .. 127)
+
+T-UInt8 ::= INTEGER (0 .. 255)
+
+T-Boolean ::= BOOLEAN
+
+T-Null-Record ::= SEQUENCE {}
+
+END
+
+
+UART-PROTOCOL-DLC-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+
+END
+
+
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+-- List of functions (instances) present in the system
+PID ::= ENUMERATED {
+    bcapp,
+    bcdlct,
+    channeleffects,
+    erroredchannel,
+    rtapp,
+    rtdlcr,
+    
+    env
+}
+
+END
+
+BCAPP-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+T-UART-DLC-SDU FROM UART-DLC
+
+ ;
+
+
+
+
+
+
+
+Bcapp-dlctxsdu-p1 ::= T-UART-DLC-SDU
+
+
+
+
+END
+CHANNELEFFECTS-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+UINT8 FROM Basic-Types
+
+ ;
+
+
+
+
+
+
+
+Channeleffects-corruptchar-p1 ::= UINT8
+
+
+
+
+END
+RTAPP-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS T-UART-DLC-RxErrorCode FROM UART-DLC
+
+
+
+
+T-UART-DLC-SDU FROM UART-DLC
+
+
+ ;
+
+
+
+
+Rtapp-dlcrxerror-p1 ::= T-UART-DLC-RxErrorCode
+
+
+
+
+Rtapp-dlcrxsdu-p1 ::= T-UART-DLC-SDU
+
+
+
+
+
+
+
+END
+
+
+Simulation-DataView DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      
+      
+      
+      --  ASN.1 modules used by thread bcdlct_DLCTxSDU
+      T-UART-DLC-SDU FROM UART-DLC
+      
+      
+      
+      
+      --  ASN.1 modules used by thread erroredchannel_CorruptChar
+      UINT8 FROM Basic-Types
+      
+      
+      --  ASN.1 modules used by thread erroredchannel_PHYTxChar
+      UINT8 FROM Basic-Types
+      
+      --  ASN.1 modules used by thread rtapp_DLCRxError
+      T-UART-DLC-RxErrorCode FROM UART-DLC
+      
+      --  ASN.1 modules used by thread rtapp_DLCRxSDU
+      T-UART-DLC-SDU FROM UART-DLC
+      
+      
+      
+      
+      --  ASN.1 modules used by thread rtdlcr_PHYRxChar
+      UINT8 FROM Basic-Types
+      
+      
+      -- Import generic integer type (used for timers)
+      T-UInt32 FROM TASTE-BasicTypes
+      PID      FROM System-Dataview
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
+      --  Import the SDL function states needed for the global system state
+      Bcdlct-Context             FROM Bcdlct-Datamodel
+      Demo-timer-manager-Context FROM Demo-timer-manager-Datamodel
+      Erroredchannel-Context     FROM Erroredchannel-Datamodel
+      Rtdlcr-Context             FROM Rtdlcr-Datamodel
+   ;
+
+   --  Simulator needs to knows about cyclic interfaces
+   Periodic-Event {Event-Ty} ::= SEQUENCE {
+      period INTEGER (0 .. 500000),  -- Upper limit is arbitrary
+      event  Event-Ty
+   }
+
+   --  To keep a constant list of events.
+   Periodic-Events {Event-Ty, INTEGER:max} ::=
+      SEQUENCE (SIZE (0 .. max)) OF Periodic-Event {Event-Ty}
+
+   
+   
+   
+   Bcapp-Event ::= CHOICE {
+      msg-out CHOICE {
+         dlctxreset SEQUENCE {   },
+         dlctxsdu   SEQUENCE { p1 T-UART-DLC-SDU }
+      }
+   }
+   
+   Bcdlct-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         dlctxreset SEQUENCE {  },
+         dlctxsdu   SEQUENCE { p1 T-UART-DLC-SDU},
+         phytxerror SEQUENCE {  }
+      },
+      msg-out CHOICE {
+         phytxchar SEQUENCE { p1 UINT8 }
+      }
+   }
+   
+   Channeleffects-Event ::= CHOICE {
+      msg-out CHOICE {
+         corruptchar SEQUENCE { p1 UINT8 },
+         dropchar    SEQUENCE {   }
+      }
+   }
+   
+   Demo-Timer-Manager-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         tick SEQUENCE {  }
+      },
+      msg-out CHOICE {
+         rtdlcr-frametimer SEQUENCE {   }
+      }
+   }
+   Demo-Timer-Manager-Periodic-Events ::=
+      Periodic-Events {Demo-Timer-Manager-Event, 1}
+   
+   demo-timer-manager-periodic-events Demo-Timer-Manager-Periodic-Events ::= {
+      { period 10, event msg-in: tick : {} }
+   }
+   
+   Erroredchannel-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         corruptchar SEQUENCE { p1 UINT8},
+         dropchar    SEQUENCE {  },
+         phytxchar   SEQUENCE { p1 UINT8}
+      },
+      msg-out CHOICE {
+         phyrxchar  SEQUENCE { p1 UINT8 },
+         phyrxerror SEQUENCE {   },
+         phytxerror SEQUENCE {   }
+      }
+   }
+   
+   Rtapp-Event ::= CHOICE {
+      msg-in CHOICE {
+         dlcrxerror SEQUENCE { p1 T-UART-DLC-RxErrorCode},
+         dlcrxsdu   SEQUENCE { p1 T-UART-DLC-SDU}
+      },
+      msg-out CHOICE {
+         dlcrxreset SEQUENCE {   }
+      }
+   }
+   
+   Rtdlcr-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         dlcrxreset SEQUENCE {  },
+         phyrxchar  SEQUENCE { p1 UINT8},
+         phyrxerror SEQUENCE {  },
+         FrameTimer SEQUENCE {}
+      },
+      msg-out CHOICE {
+         dlcrxerror SEQUENCE { p1 T-UART-DLC-RxErrorCode },
+         dlcrxsdu   SEQUENCE { p1 T-UART-DLC-SDU }
+      }
+   }
+   
+
+   --  Current observer state flag (used by model checkers)
+   Observer-State-Kind ::= ENUMERATED {
+      regular-state,
+      error-state,
+      ignore-state,
+      success-state
+   }
+
+   --  Event related to the execution of a PI or call of a RI in the functional code
+   Function-Event ::= CHOICE {
+      bcapp              Bcapp-Event,
+      bcdlct             Bcdlct-Event,
+      channeleffects     Channeleffects-Event,
+      demo-timer-manager Demo-Timer-Manager-Event,
+      erroredchannel     Erroredchannel-Event,
+      rtapp              Rtapp-Event,
+      rtdlcr             Rtdlcr-Event
+   }
+
+   --  Type used to store events in a database: associate a name to the event
+   Named-Function-Event ::= SEQUENCE {
+      id    IA5String (SIZE (1..80)),
+      event Function-Event
+   }
+
+   --  Event at interface level (PI or RI), including source and destination ID
+   Interface-Event ::= SEQUENCE {
+      source PID,
+      dest   PID,
+      event  Function-Event
+   }
+
+   --  Event sent to the observers
+   Observable-Event ::= CHOICE {
+      no-event        SEQUENCE {},
+      system-startup  SEQUENCE {},
+      input-event     Interface-Event,   --  input event is evaluated after the transition
+      output-event    Interface-Event,   --  output event is evaluated before the message is sent
+      unhandled-input Interface-Event    --  message received in a state where it is not expected
+   }
+
+   --  constant that can be used to refer to the absence of an input/output event
+   nothing Observable-Event ::= no-event : {}
+
+   --  Define a queue of events, corresponding to the input queue for each function
+   max-events INTEGER ::= 10
+   Events-Ty ::= SEQUENCE (SIZE (0 .. max-events)) OF Observable-Event
+
+   --  Global system state (excluding observers, which are defined later)
+   bcdlct-queue-size INTEGER ::= 2
+   erroredchannel-queue-size INTEGER ::= 2
+   rtdlcr-queue-size INTEGER ::= 2
+
+   System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
+      --  Message queues
+      bcdlct-queue         Events-Ty (SIZE (0 .. bcdlct-queue-size)),
+      erroredchannel-queue Events-Ty (SIZE (0 .. erroredchannel-queue-size)),
+      rtdlcr-queue         Events-Ty (SIZE (0 .. rtdlcr-queue-size)),
+
+      bcdlct              Bcdlct-Context,
+      demo-timer-manager  Demo-timer-manager-Context,
+      erroredchannel      Erroredchannel-Context,
+      rtdlcr              Rtdlcr-Context
+   }
+
+END
+
+Simulation-Timers-DataView DEFINITIONS ::=
+BEGIN
+
+   TimerData ::= SEQUENCE {
+      timer-enabled BOOLEAN,
+      interval INTEGER (0 .. 50000)
+   }
+
+   AggregateTimerData ::= SEQUENCE {
+      
+      
+      
+      bcdlct SEQUENCE {
+      },
+      
+      erroredchannel SEQUENCE {
+      },
+      
+      rtdlcr SEQUENCE {
+         frametimer TimerData
+      
+      },
+      
+      dummy-entry SEQUENCE {}
+   }
+
+END
+
