@@ -17,12 +17,12 @@
 
 #include "verectgraphicsitem.h"
 
-#include "commandsstackbase.h"
 #include "graphicsviewutils.h"
 #include "ui/grippointshandler.h"
 #include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
 
+#include <QApplication>
 #include <QGraphicsScene>
 #include <QtDebug>
 
@@ -300,7 +300,7 @@ void VERectGraphicsItem::onGeometryChanged()
     QSet<VEInteractiveObject *> newItems(items);
     newItems.subtract(m_collidedItems);
     for (auto item : newItems)
-        item->doHighlighting(Qt::red, false);
+        item->doHighlighting(Qt::red, true);
 
     QSet<VEInteractiveObject *> oldItems(m_collidedItems);
     oldItems.subtract(items);
@@ -310,8 +310,12 @@ void VERectGraphicsItem::onGeometryChanged()
 
     m_collidedItems = items;
 
-    if (m_collidedItems.isEmpty())
+    if (m_collidedItems.isEmpty()) {
+        qApp->restoreOverrideCursor();
         clearHighlight();
+    } else {
+        qApp->setOverrideCursor(Qt::ForbiddenCursor);
+    }
 }
 
 bool VERectGraphicsItem::doLayout()

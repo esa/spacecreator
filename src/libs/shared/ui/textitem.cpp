@@ -34,7 +34,6 @@ namespace shared {
 namespace ui {
 
 static const QColor ERROR_BACKGROUND_COLOR(255, 128, 128);
-static const Qt::TextInteractionFlags kEditableMarker = Qt::TextEditable | Qt::TextSelectableByKeyboard;
 
 /*!
   \class shared::ui::TextItem
@@ -145,7 +144,7 @@ bool TextItem::isEditable() const
 
 bool TextItem::isEditing() const
 {
-    return isEditable() && (textInteractionFlags() & kEditableMarker);
+    return isEditable() && (textInteractionFlags() & Qt::TextEditorInteraction);
 }
 
 void TextItem::setEditable(bool editable)
@@ -165,7 +164,7 @@ void TextItem::enableEditMode()
 
     selectText(true);
 
-    setTextInteractionFlags(textInteractionFlags() | kEditableMarker);
+    setTextInteractionFlags(textInteractionFlags() | Qt::TextEditorInteraction);
 
     // Bugfix for issue #284
     // Inspired by workaround from https://bugreports.qt.io/browse/QTBUG-8188
@@ -199,7 +198,7 @@ void TextItem::disableEditMode()
     }
     selectText(false);
     m_prevText.clear();
-    setTextInteractionFlags(textInteractionFlags() & ~kEditableMarker);
+    setTextInteractionFlags(textInteractionFlags() & ~Qt::TextEditorInteraction);
 
     m_disableEditingGuard = false;
     Q_EMIT editingModeOff();

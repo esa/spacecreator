@@ -18,11 +18,9 @@
 #include "instanceitem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/mscutils.h"
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "baseitems/objectslinkitem.h"
-#include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
@@ -32,7 +30,6 @@
 #include "commands/cmdchangeinstanceposition.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdinstancekindchange.h"
-#include "messageitem.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "mscinstance.h"
@@ -93,10 +90,10 @@ InstanceItem::InstanceItem(
     });
     connect(m_headSymbol, &InstanceHeadItem::editingModeOff, this, &InstanceItem::checkforInitialName);
 
-    if (m_chartLayoutManager && m_chartLayoutManager->systemChecker()) {
-        m_headSymbol->setSystemChecker(m_chartLayoutManager->systemChecker());
-        connect(m_chartLayoutManager->systemChecker(), &msc::SystemChecks::ivDataReset, this,
-                &msc::InstanceItem::checkIVFunction);
+    if (m_chartLayoutManager) {
+        updateSystemChecker(m_chartLayoutManager->systemChecker());
+        connect(m_chartLayoutManager, &ChartLayoutManager::systemCheckerChanged, this,
+                &InstanceItem::updateSystemChecker);
     }
 
     setDenominatorAndKind(instance->denominatorAndKind());
@@ -358,6 +355,17 @@ void InstanceItem::checkIVFunction()
         axisPen = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::InstanceErrorLine).pen();
     }
     m_axisSymbol->setPen(axisPen);
+}
+
+void InstanceItem::updateSystemChecker(SystemChecks *checker)
+{
+    if (!m_chartLayoutManager || !m_chartLayoutManager->systemChecker()) {
+        return;
+    }
+
+    m_headSymbol->setSystemChecker(m_chartLayoutManager->systemChecker());
+    connect(m_chartLayoutManager->systemChecker(), &msc::SystemChecks::ivDataReset, this,
+            &msc::InstanceItem::checkIVFunction);
 }
 
 void InstanceItem::reflectTextLayoutChange()
