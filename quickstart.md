@@ -48,12 +48,32 @@ Running the following command:
 `~/projects/spacecreator$ python3 ./scripts/prebuild.py --output_dir $HOME/opt/spacecreatorenv6 --qt_version 6.3.1 --qtcreator_version 8.0.1
 `
 
-will create a folder (~/opt/spacecreatorenv6) containing:
-* Qt 6.3.1
-* The template library Grantlee
-* A folder named **spacecreator.AppDir** containing QtCreator with dev files
+will create a folder (~/opt/spacecreatorenv6) containing among other files:
+```
+├── asn1scc
+├── Qt
+│   └── 6.3.1
+└── spacecreator.AppDir
+    ├── bin
+    ├── include
+    ├── lib
+    │   └── Qt
+    │       └── bin
+    │       └── lib
+    │           └── grantlee
+    │               └── 5.2
+    │                   └── grantlee_
+    ├── libexec
+    └── share
+        └── qtcreator
+            ├── templates
+            │   └── wizards
+            │       ├── files
+            │       └── projects
+            └── plugins
+```  
 
-The idea is to have a build environment that is contained in a single folder
+
 
 ## Building the SpaceCreator Plugin
 
@@ -72,8 +92,7 @@ to the spacecreator.AppDir folder.
 In addition, we need to copy templates for creating spacecreator projects and spacecreator files.
 This is done by running the following command:
 
-`~/projects/spacecreator$ python3 ./scripts/postbuild.py
---env_dir=$HOME/opt/spacecreatorenv6 
+`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6 --build_dir=%{buildDir}
 `
 
 Then the blue QtCreator can be run:
@@ -85,7 +104,7 @@ and it will now be possible to load a sample project.
 To develop the spacecreator plugin in black QtCreator we need to setup a project.
 
 ### Manage Kits...
-We want to use the Qt installation in our build environment (~/opt/spacecreatorenv6/’Qt)
+We want to use the Qt installation in our build environment (~/opt/spacecreatorenv6/Qt)
 So we go to ***Kits / Qt Version*** and create a manual Qt Version named ***spacecreatorenvqt6***.
 Then we make a new Manual Kit named ***spacecreator6*** where we select the Qt version above.
 
@@ -106,7 +125,7 @@ We need to have QtCreator run the postbuild.py script after the build stop, so w
 ***Deployment Method*** that is a Custom Process Step. The command is
 python3 and the arguments are:
 
-`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6 --build_dir=%{buildDir}
+`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6 --env_qt_dir=$HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64 --build_dir=%{buildDir}
 `
 
 This will call the correct **postbuild.py** script and tell it where the build environment is and where the plugins were build.

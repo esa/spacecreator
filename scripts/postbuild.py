@@ -24,15 +24,6 @@ python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir
 """
 
 
-def install_plugins() -> None:
-    install_cmd = ['cmake', '--target', 'FileWizards']
-    print_cmd(install_cmd)
-    completed_process = subprocess.run(install_cmd)
-    if not completed_process.returncode == 0:
-        print("Could not install file-wizards. Error was:", completed_process)
-        exit(1)
-
-
 def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: str) -> None:
     if not os.path.exists(plugin_build_dir):
         print("Could not find plugin build dir: {}".format(plugin_build_dir))
@@ -84,8 +75,7 @@ if __name__ == '__main__':
                         help='Path to the folder where spacecreator was build')
     parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
                         help='Path to the folder that contains the build environment')
-    parser.add_argument('--env_qt_dir', dest='env_qt_dir', type=str, required=True,
-                        help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
+
     args = parser.parse_args()
 
     if args.project_dir:
@@ -103,14 +93,10 @@ if __name__ == '__main__':
         print("Defaulting to build dir {}".format(build_dir))
 
     env_dir = args.env_dir
-    env_qt_dir = args.env_qt_dir
     plugin_build_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     plugin_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'qtcreator', 'plugins')
-    #copy_plugins_to_plugin_dir(plugin_build_dir, plugin_install_dir)
+    copy_plugins_to_plugin_dir(plugin_build_dir, plugin_install_dir)
 
-    wizards_dir = join_dir(project_dir, 'wizards')
-    wizards_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'share', 'qtcreator', 'templates', 'wizards')
-    #copy_wizards(wizards_dir, wizards_install_dir)
 
-    install_plugins()
+
 
