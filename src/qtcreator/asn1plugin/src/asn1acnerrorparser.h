@@ -37,7 +37,7 @@ class Asn1AcnErrorParser : public ProjectExplorer::IOutputParser
     Q_OBJECT
 
 public:
-    void stdError(const QString &line) override;
+    void stdError(const QString &line);
 
 private:
     ErrorMessageParser m_parser;
