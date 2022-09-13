@@ -1,0 +1,291 @@
+Pinger-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   SmallInteger, BigInteger, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID FROM System-Dataview;
+
+Pinger-States ::= ENUMERATED {wait, ok1, ok2}
+
+Pinger-Context ::= SEQUENCE {
+   state Pinger-States,
+   init-done BOOLEAN,
+   value1 MySequence,
+   value2 MySequence
+}
+
+Pinger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+END
+
+Ponger-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   SmallInteger, BigInteger, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID FROM System-Dataview;
+
+Ponger-States ::= ENUMERATED {wait}
+
+Ponger-Context ::= SEQUENCE {
+   state Ponger-States,
+   init-done BOOLEAN,
+   pingarg MySequence
+}
+
+Ponger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+END
+
+MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+    SmallInteger ::= INTEGER (0 .. 2)
+    BigInteger ::= INTEGER (3 .. 5)
+    MyChoice ::= CHOICE {
+       small SmallInteger,
+       big BigInteger
+    }
+    MySequence ::= SEQUENCE {
+       value SmallInteger,
+       version MyChoice
+    }
+
+-- ASN.1 Type definitions must start with an uppercase
+-- Field names in records (SEQUENCE) must start with a lowercase
+-- Underscores are not allowed: use dash (hyphen) 
+-- For integers do not assume that small ranges will be translated to small
+-- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
+-- for the range in Ada)
+
+-- Simple types:
+
+-- TASTE-Boolean ::= BOOLEAN
+-- MyInteger   ::= INTEGER (0..255)
+-- MyReal      ::= REAL (0.0 .. 1000.0)
+-- MyBool      ::= BOOLEAN
+-- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
+
+-- Complex types:
+
+--  MySeq       ::= SEQUENCE {
+--      input-data  MyInteger,
+--      output-data MyInteger,
+--      validity    ENUMERATED { valid, invalid }
+--  }
+--
+--  MyChoice    ::= CHOICE {
+--      a BOOLEAN,
+--      b MySeq
+--  }
+--
+--  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
+--
+--  MyOctStr    ::= OCTET STRING (SIZE (3))
+--
+--  -- You can also declare constants
+--  myVar       MySeqOf     ::= { hello, world }
+
+END
+
+
+TASTE-BasicTypes DEFINITIONS ::=
+BEGIN
+
+-- Set of TASTE predefined basic types
+
+T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
+
+T-UInt32 ::= INTEGER (0 .. 4294967295)
+
+T-Int8 ::= INTEGER (-128 .. 127)
+
+T-UInt8 ::= INTEGER (0 .. 255)
+
+T-Boolean ::= BOOLEAN
+
+T-Null-Record ::= SEQUENCE {}
+
+END
+
+
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+-- List of functions (instances) present in the system
+PID ::= ENUMERATED {
+    clk,
+    pinger,
+    ponger,
+    
+    env
+}
+
+END
+
+CLK-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+ ;
+
+
+
+
+
+
+
+
+
+
+END
+
+
+Simulation-DataView DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      
+      
+      
+      
+      --  ASN.1 modules used by thread ponger_Ping
+      MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
+      
+      -- Import generic integer type (used for timers)
+      T-UInt32 FROM TASTE-BasicTypes
+      PID      FROM System-Dataview
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
+      --  Import the SDL function states needed for the global system state
+      Pinger-Context FROM Pinger-Datamodel
+      Ponger-Context FROM Ponger-Datamodel
+   ;
+
+   --  Simulator needs to knows about cyclic interfaces
+   Periodic-Event {Event-Ty} ::= SEQUENCE {
+      period INTEGER (0 .. 500000),  -- Upper limit is arbitrary
+      event  Event-Ty
+   }
+
+   --  To keep a constant list of events.
+   Periodic-Events {Event-Ty, INTEGER:max} ::=
+      SEQUENCE (SIZE (0 .. max)) OF Periodic-Event {Event-Ty}
+
+   
+   
+   
+   Clk-Event ::= CHOICE {
+      msg-out CHOICE {
+         clk SEQUENCE {   }
+      }
+   }
+   
+   Pinger-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         clk  SEQUENCE {  },
+         pong SEQUENCE {  }
+      },
+      msg-out CHOICE {
+         ping SEQUENCE { pingarg MySequence }
+      }
+   }
+   
+   Ponger-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         ping SEQUENCE { pingarg MySequence}
+      },
+      msg-out CHOICE {
+         pong SEQUENCE {   }
+      }
+   }
+   
+
+   --  Current observer state flag (used by model checkers)
+   Observer-State-Kind ::= ENUMERATED {
+      regular-state,
+      error-state,
+      ignore-state,
+      success-state
+   }
+
+   --  Event related to the execution of a PI or call of a RI in the functional code
+   Function-Event ::= CHOICE {
+      clk    Clk-Event,
+      pinger Pinger-Event,
+      ponger Ponger-Event
+   }
+
+   --  Type used to store events in a database: associate a name to the event
+   Named-Function-Event ::= SEQUENCE {
+      id    IA5String (SIZE (1..80)),
+      event Function-Event
+   }
+
+   --  Event at interface level (PI or RI), including source and destination ID
+   Interface-Event ::= SEQUENCE {
+      source PID,
+      dest   PID,
+      event  Function-Event
+   }
+
+   --  Event sent to the observers
+   Observable-Event ::= CHOICE {
+      no-event        SEQUENCE {},
+      system-startup  SEQUENCE {},
+      input-event     Interface-Event,   --  input event is evaluated after the transition
+      output-event    Interface-Event,   --  output event is evaluated before the message is sent
+      unhandled-input Interface-Event    --  message received in a state where it is not expected
+   }
+
+   --  constant that can be used to refer to the absence of an input/output event
+   nothing Observable-Event ::= no-event : {}
+
+   --  Define a queue of events, corresponding to the input queue for each function
+   max-events INTEGER ::= 10
+   Events-Ty ::= SEQUENCE (SIZE (0 .. max-events)) OF Observable-Event
+
+   --  Global system state (excluding observers, which are defined later)
+   pinger-queue-size INTEGER ::= 2
+   ponger-queue-size INTEGER ::= 2
+
+   System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
+      --  Message queues
+      pinger-queue Events-Ty (SIZE (0 .. pinger-queue-size)),
+      ponger-queue Events-Ty (SIZE (0 .. ponger-queue-size)),
+
+      pinger  Pinger-Context,
+      ponger  Ponger-Context
+   }
+
+END
+
+Simulation-Timers-DataView DEFINITIONS ::=
+BEGIN
+
+   TimerData ::= SEQUENCE {
+      timer-enabled BOOLEAN,
+      interval INTEGER (0 .. 50000)
+   }
+
+   AggregateTimerData ::= SEQUENCE {
+      
+      
+      
+      pinger SEQUENCE {
+      },
+      
+      ponger SEQUENCE {
+      },
+      
+      dummy-entry SEQUENCE {}
+   }
+
+END
+
