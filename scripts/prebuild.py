@@ -159,8 +159,13 @@ def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
 
 def install_grantlee(env_dir: str) -> None:
     """
-    Install grantlee in the Qt SDK, for build time usage
-    In addition copy grantlee to the spacecreator build environment, to be used at run time
+    Install grantlee into the Qt SDK, for build time usage (i.e. ~/opt/spacecreatorenv6/Qt)
+    In addition copy grantlee to the spacecreator build environment, to be used at
+    run time (~/opt/spacecreatorenv6/spacecreator.AppDir/Qt)
+
+    Grantlee is traditionally installed on top of a Qt installation instead of adding the location of
+    grantlee to CMAKE_PREFIX_PATH so we do that as well.
+
     :param env_dir: path to the build environment (i.e ~/opt/spacecreatorenv6)
     """
     cmake_build_dir = join_dir(env_dir, 'build')
@@ -175,17 +180,16 @@ def install_grantlee(env_dir: str) -> None:
         print("Could not install grantlee in {}".format(cmake_build_dir))
         exit(5)
 
-    # Install grantlee in spacecreator
-    grantlee_lib_dir = join_dir(cmake_build_dir, 'grantlee')
+    # Install grantlee in spacecreator.AppDir
+    grantlee_lib_dir = join_dir(cmake_build_dir, 'grantlee')  # source of .so files
     spacecreator_qt_lib_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'Qt', 'lib')
-    spacecreator_grantlee_lib_dir = join_dir(spacecreator_qt_lib_dir, 'grantlee')
+    spacecreator_grantlee_lib_dir = join_dir(spacecreator_qt_lib_dir, 'grantlee')  # dest of .so files
     ensure_dir(spacecreator_grantlee_lib_dir)
     shutil.copytree(grantlee_lib_dir, spacecreator_grantlee_lib_dir, dirs_exist_ok=True)
 
     templates_lib_dir = join_dir(cmake_build_dir, 'templates', 'lib')
     pattern = join_dir(templates_lib_dir, 'libGrantlee_Templates.so*')
     copy_file_pattern_to_dir(pattern, spacecreator_qt_lib_dir)
-
 
 
 def download_asn1scc(env_dir: str) -> None:

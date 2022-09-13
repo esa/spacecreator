@@ -12,7 +12,7 @@ Prerequisites: A spacecreator build environment produced by the prebuild.py scri
 Build SpaceCreator with Qt6:
 python3 ./scripts/build_spacecreator.py 
     --project_dir ~/projects/spacecreator
-    --build_dir ./build
+    --build_dir ~/projects/spacecreator/build
     --env_dir ~/opt/spacecreatorenv6
     --env_qt_dir ~/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/ 
 """
@@ -21,7 +21,6 @@ python3 ./scripts/build_spacecreator.py
 def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_dir: str, env_qt_dir: str) -> None:
     env_qmake_bin = join_dir(env_qt_dir, 'bin', 'qmake')
     qtc_install = join_dir(env_dir, 'spacecreator.AppDir')
-    grantlee_dir = join_dir(env_dir, 'grantlee', 'lib', 'cmake', 'Grantlee5')
     env_qt_cmake_dir = join_dir(env_qt_dir, 'lib', 'cmake')
 
     exit_if_not_exists(project_dir)
@@ -29,10 +28,9 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
     exit_if_not_exists(env_qt_dir)
     exit_if_not_exists(env_qmake_bin)
     exit_if_not_exists(qtc_install)
-    exit_if_not_exists(grantlee_dir)
     exit_if_not_exists(env_qt_cmake_dir)
 
-    cmake_prefix_path = env_qt_cmake_dir + ';' + grantlee_dir
+    cmake_prefix_path = env_qt_cmake_dir
     ninja_cmd = ['cmake',
                  '-GNinja',
                  '-S', project_dir,

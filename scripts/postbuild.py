@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 import argparse
-import shutil
 import os.path
-
+import subprocess
 import utils
-from utils import join_dir, copy_content_of_dir_to_other_dir, ensure_dir, copy_file_pattern_to_dir
+from utils import join_dir, copy_content_of_dir_to_other_dir, print_cmd
 
 """
 When the spacecreator plugin has been build, it needs to be copied to the plugin folder of the
@@ -25,6 +24,15 @@ python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir
 """
 
 
+def install_plugins() -> None:
+    install_cmd = ['cmake', '--target', 'FileWizards']
+    print_cmd(install_cmd)
+    completed_process = subprocess.run(install_cmd)
+    if not completed_process.returncode == 0:
+        print("Could not install file-wizards. Error was:", completed_process)
+        exit(1)
+
+
 def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: str) -> None:
     if not os.path.exists(plugin_build_dir):
         print("Could not find plugin build dir: {}".format(plugin_build_dir))
@@ -35,8 +43,6 @@ def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: 
 
     print("Copying plugins from {} to {}".format(plugin_build_dir, qtcreator_app_plugin_dir))
     copy_content_of_dir_to_other_dir(plugin_build_dir, qtcreator_app_plugin_dir)
-    #libspacecreatorplugin = join_dir(plugin_build_dir, "libSpaceCreatorPlugin.so")
-    #shutil.copy2(libspacecreatorplugin, qtcreator_app_plugin_dir)
 
 
 def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
@@ -100,10 +106,11 @@ if __name__ == '__main__':
     env_qt_dir = args.env_qt_dir
     plugin_build_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     plugin_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'qtcreator', 'plugins')
-    copy_plugins_to_plugin_dir(plugin_build_dir, plugin_install_dir)
+    #copy_plugins_to_plugin_dir(plugin_build_dir, plugin_install_dir)
 
     wizards_dir = join_dir(project_dir, 'wizards')
     wizards_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'share', 'qtcreator', 'templates', 'wizards')
-    copy_wizards(wizards_dir, wizards_install_dir)
+    #copy_wizards(wizards_dir, wizards_install_dir)
 
+    install_plugins()
 
