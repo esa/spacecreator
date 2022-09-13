@@ -48,29 +48,39 @@ Running the following command:
 `~/projects/spacecreator$ python3 ./scripts/prebuild.py --output_dir $HOME/opt/spacecreatorenv6 --qt_version 6.3.1 --qtcreator_version 8.0.1
 `
 
-will create a folder (~/opt/spacecreatorenv6) containing among other files:
+will create a folder (~/opt/spacecreatorenv6) containing (among other) the files:
 ```
-├── asn1scc
-├── Qt
-│   └── 6.3.1
-└── spacecreator.AppDir
-    ├── bin
-    ├── include
-    ├── lib
-    │   └── Qt
-    │       └── bin
-    │       └── lib
-    │           └── grantlee
-    │               └── 5.2
-    │                   └── grantlee_
-    ├── libexec
-    └── share
-        └── qtcreator
-            ├── templates
-            │   └── wizards
-            │       ├── files
-            │       └── projects
-            └── plugins
+├── asn1scc/
+├── Qt/
+│   └── 6.3.1/
+└── spacecreator.AppDir/
+    ├── bin/
+    ├── include/
+    ├── lib/
+    │   └── Qt/
+    │       └── bin/
+    │       └── lib/
+    │           ├── grantlee/
+    │           │   ├── 5.2/
+    │           │   │   ├── grantlee_defaultfilters.so
+    │           │   │   └── ... 4 more grantlee_x.so files
+    │           │   └── libGrantlee_Templates.so  (these libGrantlee_Templates.so needs the grantlee_x.so files above)
+    │           ├── qtcreator/
+    │           │   └── plugins/
+    │           │        ├── libSpaceCreatorPlugin.so
+    │           │        ├── libSedsPlugin.so
+    │           │        ├── libDeviceGeneratorPlugin.so
+    │           │        ├── libFunctionTesterPlugin.so
+    │           │        └── ...
+    │           └── libXxx.so          
+    ├── libexec/
+    └── share/
+        └── qtcreator/
+            └── templates/
+                └── wizards/
+                   ├── files/
+                   └── projects/
+   
 ```  
 
 
