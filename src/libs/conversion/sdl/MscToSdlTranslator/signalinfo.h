@@ -25,8 +25,13 @@
 
 namespace conversion::sdl::translator {
 
+/**
+ * @brief   Small structure for keeping signal information in MSC to SDL translation
+ */
 struct SignalInfo {
+    /// @brief  Signal
     const ::sdl::Rename *signal;
+    /// @brief  List of parameters for that signal message
     msc::MscParameterList parameterList;
 };
 
