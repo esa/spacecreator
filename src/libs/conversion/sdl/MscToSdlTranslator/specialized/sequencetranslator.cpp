@@ -179,7 +179,8 @@ std::unique_ptr<Action> SequenceTranslator::createSignalRequirements(
 {
     std::unique_ptr<Action> lastAction = std::make_unique<NextState>(targetState->name(), targetState);
 
-    for (const auto &[name, value] : parametersRequirements) {
+    for (auto it = parametersRequirements.rbegin(); it != parametersRequirements.rend(); ++it) {
+        const auto &[name, value] = *it;
         lastAction = createParameterRequirements(name, value, std::move(lastAction));
     }
 

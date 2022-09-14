@@ -50,7 +50,6 @@ MscParameterValueParser::SignalRequirementsMap MscParameterValueParser::parseSig
         }
 
         auto parametersRequirements = parseSignal(signalInfo);
-        std::reverse(parametersRequirements.begin(), parametersRequirements.end());
         signalRequirements.insert({ signalId, std::move(parametersRequirements) });
     }
 
