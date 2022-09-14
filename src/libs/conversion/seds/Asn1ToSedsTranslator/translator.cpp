@@ -20,6 +20,8 @@
 
 #include "specialized/typetranslator.h"
 
+#include <conversion/common/escaper/escaper.h>
+
 using Asn1Acn::Asn1Model;
 using conversion::translator::TranslationException;
 using seds::model::SedsModel;
@@ -56,20 +58,25 @@ std::vector<std::unique_ptr<Model>> Asn1ToSedsTranslator::translateAsn1Model(
         const Asn1Model *asn1Model, const Options &options)
 {
     Q_UNUSED(options);
+
     std::vector<std::unique_ptr<Model>> resultModels;
 
     for (const auto &file : asn1Model->data()) {
+        ::seds::model::DataSheet sedsDataSheet;
+        ::seds::model::Device sedsDevice;
+        sedsDevice.setName(file->name());
+        sedsDataSheet.setDevice(std::move(sedsDevice));
+
         for (const auto &definitions : file->definitionsList()) {
             if (definitions->types().empty()) {
                 continue;
             }
             auto sedsPackage = translateAsn1Definitions(asn1Model, definitions.get());
-
-            ::seds::model::PackageFile sedsPackageFile;
-            sedsPackageFile.setPackage(std::move(sedsPackage));
-            auto sedsModel = std::make_unique<SedsModel>(std::move(sedsPackageFile));
-            resultModels.push_back(std::move(sedsModel));
+            sedsDataSheet.addPackage(std::move(sedsPackage));
         }
+
+        auto sedsModel = std::make_unique<SedsModel>(std::move(sedsDataSheet));
+        resultModels.push_back(std::move(sedsModel));
     }
 
     return resultModels;
@@ -79,7 +86,7 @@ auto Asn1ToSedsTranslator::translateAsn1Definitions(const Asn1Model *asn1Model, 
         -> ::seds::model::Package
 {
     ::seds::model::Package package;
-    package.setName(definitions->name());
+    package.setName(Escaper::escapeIvName(definitions->name()));
     for (const auto &type : definitions->types()) {
         TypeTranslator::translateType(asn1Model, definitions, type.get(), &package);
     }
