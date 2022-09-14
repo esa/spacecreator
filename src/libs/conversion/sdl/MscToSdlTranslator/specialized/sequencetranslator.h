@@ -42,12 +42,12 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sdlModel            Parent SDL model
-     * @param   observerAsn1File    ASN.1 with observer dataview
-     * @param   ivModel             IV model
-     * @param   options             Conversion options
+     * @param   sdlModel    Parent SDL model
+     * @param   asn1File    ASN.1 with observer dataview
+     * @param   ivModel     IV model
+     * @param   options     Conversion options
      */
-    SequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel,
+    SequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *asn1File, const ivm::IVModel *ivModel,
             const Options &options);
 
     /**
@@ -116,7 +116,7 @@ protected:
     inline static const QString m_elseLiteral = "ELSE";
 
     ::sdl::SdlModel *m_sdlModel;
-    const Asn1Acn::File *m_observerAsn1File;
+    const Asn1Acn::File *m_asn1File;
     const ivm::IVModel *m_ivModel;
     const Options &m_options;
 };

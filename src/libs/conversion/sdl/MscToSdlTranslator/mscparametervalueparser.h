@@ -42,10 +42,10 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   chartName           Name of the MSC chart
-     * @param   observerAsn1File    ASN.1 with observer dataview
+     * @param   chartName   Name of the MSC chart
+     * @param   asn1File    ASN.1 with observer dataview
      */
-    MscParameterValueParser(const QString &chartName, const Asn1Acn::File *observerAsn1File);
+    MscParameterValueParser(const QString &chartName, const Asn1Acn::File *asn1File);
     /**
      * @brief   Deleted copy constructor
      */
@@ -89,7 +89,7 @@ private:
 
 private:
     QString m_chartName;
-    const Asn1Acn::File *m_observerAsn1File;
+    const Asn1Acn::File *m_asn1File;
 
     Asn1Acn::Asn1ValueParser m_asn1ValueParser;
 };

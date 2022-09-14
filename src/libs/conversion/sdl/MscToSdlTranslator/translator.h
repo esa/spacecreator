@@ -67,14 +67,14 @@ private:
     /**
      * @brief   Translate MSC model
      *
-     * @param   mscModel            MSC model to translate
-     * @param   observerAsn1File    ASN.1 with observer dataview
-     * @param   options             List of options
+     * @param   mscModel    MSC model to translate
+     * @param   asn1File    ASN.1 with observer dataview
+     * @param   options     List of options
      *
      * @return  Result SDL model
      */
-    auto translateMscModel(const ::msc::MscModel *mscModel, const Asn1Acn::File *observerAsn1File,
-            const ivm::IVModel *ivModel, const Options &options) const -> std::vector<std::unique_ptr<Model>>;
+    auto translateMscModel(const ::msc::MscModel *mscModel, const Asn1Acn::File *asn1File, const ivm::IVModel *ivModel,
+            const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 };
 
 } // namespace conversion::sdl::translator

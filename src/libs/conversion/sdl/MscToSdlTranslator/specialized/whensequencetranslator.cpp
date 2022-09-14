@@ -42,8 +42,8 @@ using sdl::Transition;
 namespace conversion::sdl::translator {
 
 WhenSequenceTranslator::WhenSequenceTranslator(
-        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options)
-    : SequenceTranslator(sdlModel, observerAsn1File, ivModel, options)
+        SdlModel *sdlModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options)
+    : SequenceTranslator(sdlModel, asn1File, ivModel, options)
 {
 }
 
@@ -198,7 +198,7 @@ std::unique_ptr<StateMachine> WhenSequenceTranslator::createStateMachine(WhenSeq
     auto states = createStates(context.whenSequence.size() + context.thenSequence.size());
     context.endState = states.back().get();
 
-    MscParameterValueParser messageParser(context.chartName, m_observerAsn1File);
+    MscParameterValueParser messageParser(context.chartName, m_asn1File);
     const auto &signalRequirements = messageParser.parseSignals(context.signals);
 
     TFTable table(context.whenSequence, context.signals.size());

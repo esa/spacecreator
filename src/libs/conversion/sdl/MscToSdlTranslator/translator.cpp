@@ -49,9 +49,9 @@ std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateModels(
         throw TranslationException("Only observer.asn file is allowed in the MSC to SDL translation");
     }
 
-    const auto *observerAsn1File = asn1Model->data().front().get();
+    const auto *asn1File = asn1Model->data().front().get();
 
-    return translateMscModel(mscModel, observerAsn1File, ivModel, options);
+    return translateMscModel(mscModel, asn1File, ivModel, options);
 }
 
 ModelType MscToSdlTranslator::getSourceModelType() const
@@ -70,12 +70,12 @@ std::set<ModelType> MscToSdlTranslator::getDependencies() const
     return dependencies;
 }
 
-std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(const MscModel *mscModel,
-        const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options) const
+std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(
+        const MscModel *mscModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options) const
 {
     auto sdlModel = std::make_unique<SdlModel>();
 
-    DocumentTranslator documentTranslator(sdlModel.get(), observerAsn1File, ivModel, options);
+    DocumentTranslator documentTranslator(sdlModel.get(), asn1File, ivModel, options);
     for (const auto mscDocument : mscModel->allDocuments()) {
         documentTranslator.translateDocument(mscDocument);
     }

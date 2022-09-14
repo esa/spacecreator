@@ -38,8 +38,8 @@ using sdl::StateMachine;
 namespace conversion::sdl::translator {
 
 NeverSequenceTranslator::NeverSequenceTranslator(
-        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options)
-    : SequenceTranslator(sdlModel, observerAsn1File, ivModel, options)
+        SdlModel *sdlModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options)
+    : SequenceTranslator(sdlModel, asn1File, ivModel, options)
 {
 }
 
@@ -140,7 +140,7 @@ std::unique_ptr<StateMachine> NeverSequenceTranslator::createStateMachine(
     auto states = createStates(context.sequence.size());
     context.errorState = states.back().get();
 
-    MscParameterValueParser messageParser(context.chartName, m_observerAsn1File);
+    MscParameterValueParser messageParser(context.chartName, m_asn1File);
     const auto &signalRequirements = messageParser.parseSignals(context.signals);
 
     TFTable table(context.sequence, context.signals.size());

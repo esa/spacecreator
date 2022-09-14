@@ -37,12 +37,12 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   sdlModel            Parent SDL model
-     * @param   observerAsn1File    ASN.1 with observer dataview
-     * @param   ivModel             IV model
-     * @param   options             Conversion options
+     * @param   sdlModel    Parent SDL model
+     * @param   asn1File    ASN.1 with observer dataview
+     * @param   ivModel     IV model
+     * @param   options     Conversion options
      */
-    DocumentTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const ivm::IVModel *ivModel,
+    DocumentTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *asn1File, const ivm::IVModel *ivModel,
             const Options &options);
 
     /**

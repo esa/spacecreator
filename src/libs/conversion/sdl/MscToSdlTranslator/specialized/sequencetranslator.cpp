@@ -54,9 +54,9 @@ using sdl::VariableReference;
 namespace conversion::sdl::translator {
 
 SequenceTranslator::SequenceTranslator(
-        SdlModel *sdlModel, const Asn1Acn::File *observerAsn1File, const IVModel *ivModel, const Options &options)
+        SdlModel *sdlModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options)
     : m_sdlModel(sdlModel)
-    , m_observerAsn1File(observerAsn1File)
+    , m_asn1File(asn1File)
     , m_ivModel(ivModel)
     , m_options(options)
 {
