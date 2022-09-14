@@ -89,6 +89,8 @@ protected:
             const ::sdl::State *targetState) const -> std::unique_ptr<::sdl::Action>;
     auto createParameterRequirements(const QString &name, const std::optional<QString> &value,
             std::unique_ptr<::sdl::Action> trueAction) const -> std::unique_ptr<::sdl::Decision>;
+    auto createTrueAnswer(std::unique_ptr<::sdl::Action> action, const QString &literal) const -> std::unique_ptr<::sdl::Answer>;
+    auto createElseAnswer() const -> std::unique_ptr<::sdl::Answer>;
 
     auto createTransitionOnSignal(const QString &signalName, const int parameterCount, ::sdl::State *sourceState) const
             -> std::unique_ptr<::sdl::Transition>;
@@ -100,6 +102,8 @@ private:
     auto createSignalActions(const uint32_t startStateId, const std::vector<uint32_t> &transitions, StateList &states,
             const SignalsMap &signals, const MscParameterValueParser::SignalRequirementsMap &signalRequirements) const
             -> ActionsMap;
+
+    auto splitChoiceName(const QString &name) const -> std::pair<QString, QString>;
 
 protected:
     inline static const QString m_observerNameThen = "then";

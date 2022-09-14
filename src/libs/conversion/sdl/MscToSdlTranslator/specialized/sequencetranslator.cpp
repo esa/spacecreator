@@ -193,37 +193,47 @@ std::unique_ptr<Decision> SequenceTranslator::createParameterRequirements(
     auto decision = std::make_unique<Decision>();
 
     if (value.has_value()) {
+        auto trueAnswer = createTrueAnswer(std::move(trueAction), *value);
+
         auto decisionExpression = std::make_unique<Expression>(name);
         decision->setExpression(std::move(decisionExpression));
-
-        auto trueTransition = std::make_unique<Transition>();
-        trueTransition->addAction(std::move(trueAction));
-        auto trueAnswer = std::make_unique<Answer>();
-        trueAnswer->setLiteral(VariableLiteral(*value));
-        trueAnswer->setTransition(std::move(trueTransition));
         decision->addAnswer(std::move(trueAnswer));
     } else {
-        const auto choiceName = name.section('.', 0, -2);
-        const auto choiceFieldName = name.section('.', -1);
+        const auto [choiceName, choiceFieldName] = splitChoiceName(name);
+
+        auto trueAnswer = createTrueAnswer(std::move(trueAction), choiceFieldName);
 
         auto decisionExpression = std::make_unique<Expression>(m_isPresentTemplate.arg(choiceName));
         decision->setExpression(std::move(decisionExpression));
-
-        auto trueTransition = std::make_unique<Transition>();
-        trueTransition->addAction(std::move(trueAction));
-        auto trueAnswer = std::make_unique<Answer>();
-        trueAnswer->setLiteral(VariableLiteral(choiceFieldName));
-        trueAnswer->setTransition(std::move(trueTransition));
         decision->addAnswer(std::move(trueAnswer));
     }
 
-    auto elseTransition = std::make_unique<Transition>();
-    auto elseAnswer = std::make_unique<Answer>();
-    elseAnswer->setLiteral(VariableLiteral(m_elseLiteral));
-    elseAnswer->setTransition(std::move(elseTransition));
+    auto elseAnswer = createElseAnswer();
     decision->addAnswer(std::move(elseAnswer));
 
     return decision;
+}
+
+std::unique_ptr<Answer> SequenceTranslator::createTrueAnswer(std::unique_ptr<Action> action, const QString &literal) const
+{
+    auto transition = std::make_unique<Transition>();
+    transition->addAction(std::move(action));
+
+    auto answer = std::make_unique<Answer>();
+    answer->setLiteral(VariableLiteral(literal));
+    answer->setTransition(std::move(transition));
+
+    return answer;
+}
+
+std::unique_ptr<Answer> SequenceTranslator::createElseAnswer() const
+{
+    auto transition = std::make_unique<Transition>();
+    auto answer = std::make_unique<Answer>();
+    answer->setLiteral(VariableLiteral(m_elseLiteral));
+    answer->setTransition(std::move(transition));
+
+    return answer;
 }
 
 std::unique_ptr<Transition> SequenceTranslator::createTransitionOnSignal(
@@ -312,6 +322,14 @@ SequenceTranslator::ActionsMap SequenceTranslator::createSignalActions(const uin
     }
 
     return signalActions;
+}
+
+std::pair<QString, QString> SequenceTranslator::splitChoiceName(const QString &name) const
+{
+    const auto choiceName = name.section('.', 0, -2);
+    const auto choiceFieldName = name.section('.', -1);
+
+    return {choiceName, choiceFieldName};
 }
 
 } // namespace conversion::sdl::translator
