@@ -139,6 +139,12 @@ void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const Q
 
     const auto name = skipName || nameValue.isEmpty() ? parentName : QString("%1.%2").arg(parentName).arg(nameValue);
 
+    // If we are currently handling a choice parameter we want to first check if given option is present
+    // We annotate that by using nullopt as the value, because we only check the parameter itself, not the value
+    if (isChoice) {
+        result.push_back({ name, std::nullopt });
+    }
+
     for (auto iter = valueMap.constBegin(); iter != valueMap.constEnd(); ++iter) {
         const auto &key = iter.key();
         const auto &value = iter.value();
@@ -154,9 +160,8 @@ void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const Q
         } else if (key == "choice") {
             parseValueMap(value.toMap(), name, false, true, result);
         } else if (key == "value") {
-            if (isChoice) {
-                result.push_back({ name, std::nullopt });
-            }
+            // If the value is invalid it means that value is present but it can be any value (denoted as *)
+            // If any value is allowed then we don't need to create any value requirement for that parameter
             if (value.isValid()) {
                 result.push_back({ name, value.toString() });
             }

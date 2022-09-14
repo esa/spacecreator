@@ -3,9 +3,11 @@ BEGIN
 
     SmallInteger ::= INTEGER (0 .. 2)
     BigInteger ::= INTEGER (3 .. 5)
+    SeqOfSmall ::= SEQUENCE (SIZE(1)) OF SmallInteger
+    SeqOfBig ::= SEQUENCE (SIZE(1)) OF BigInteger
     MyChoice ::= CHOICE {
-       small SmallInteger,
-       big BigInteger
+       small SeqOfSmall,
+       big SeqOfBig
     }
     MySequence ::= SEQUENCE {
        value SmallInteger,

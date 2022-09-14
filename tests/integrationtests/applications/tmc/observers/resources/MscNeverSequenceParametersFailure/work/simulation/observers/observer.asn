@@ -2,7 +2,7 @@ Pinger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   SmallInteger, BigInteger, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
+   SmallInteger, BigInteger, SeqOfSmall, SeqOfBig, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID FROM System-Dataview;
 
@@ -42,9 +42,11 @@ BEGIN
 
     SmallInteger ::= INTEGER (0 .. 2)
     BigInteger ::= INTEGER (3 .. 5)
+    SeqOfSmall ::= SEQUENCE (SIZE(1)) OF SmallInteger
+    SeqOfBig ::= SEQUENCE (SIZE(1)) OF BigInteger
     MyChoice ::= CHOICE {
-       small SmallInteger,
-       big BigInteger
+       small SeqOfSmall,
+       big SeqOfBig
     }
     MySequence ::= SEQUENCE {
        value SmallInteger,

@@ -10,19 +10,19 @@ msc MscObserver;
 instance Pinger;
 /* CIF CONDITION (35, 198) (836, 67) */
 condition Never shared all;
-/* CIF MESSAGE (111, 331) (802, 331) */
-out Ping({ value 1, version big : 4 }) to Ponger;
-/* CIF MESSAGE (111, 421) (802, 421) */
-out Ping({ value 2, version small : 2 }) to Ponger;
+/* CIF MESSAGE (111, 331) (804, 331) */
+out Ping({ value 1, version big : { 4 } }) to Ponger;
+/* CIF MESSAGE (111, 421) (804, 421) */
+out Ping({ value 2, version small : { 2 } }) to Ponger;
 endinstance;
-/* CIF INSTANCE (722, 63) (159, 87) (800, 2125) */
+/* CIF INSTANCE (725, 63) (159, 87) (800, 2125) */
 instance Ponger;
 /* CIF CONDITION (35, 198) (836, 67) */
 condition Never shared all;
-/* CIF MESSAGE (111, 331) (802, 331) */
-in Ping({ value 1, version big : 4 }) from Pinger;
-/* CIF MESSAGE (111, 421) (802, 421) */
-in Ping({ value 2, version small : 2 }) from Pinger;
+/* CIF MESSAGE (111, 331) (804, 331) */
+in Ping({ value 1, version big : { 4 } }) from Pinger;
+/* CIF MESSAGE (111, 421) (804, 421) */
+in Ping({ value 2, version small : { 2 } }) from Pinger;
 endinstance;
 endmsc;
 endmscdocument;
