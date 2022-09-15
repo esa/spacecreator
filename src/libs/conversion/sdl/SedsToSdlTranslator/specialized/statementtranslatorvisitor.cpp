@@ -278,9 +278,6 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
     const auto commandName = sendCommand.command().value();
     const auto interfaceName = sendCommand.interface().value();
 
-    const auto callName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            interfaceName, commandName, ivm::IVInterface::InterfaceType::Required, m_options);
-
     // Check, if this is a sync return call
     const auto &command = m_context.getCommand(interfaceName, commandName);
     if (command != nullptr && command->interfaceType() == CommandInfo::HostInterfaceType::Provided
@@ -303,6 +300,9 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
         return;
     }
 
+    const auto callName = InterfaceTranslatorHelper::buildCommandInterfaceName(
+            interfaceName, commandName, ivm::IVInterface::InterfaceType::Required, m_options);
+
     // Process name carries iv-escaped component name
     const auto interface = findIvInterface(m_context.ivFunction(), callName);
     if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
@@ -312,7 +312,6 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
         }
     } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
             || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
-
         auto call = translateCall(m_context.sdlProcess(), callName, sendCommand);
         m_sdlTransition->addAction(std::move(call));
     }

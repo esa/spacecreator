@@ -149,7 +149,7 @@ static inline auto getConsistentUnconditionalActivityInvocation(
     for (const auto &otherTransition : transitions) {
         if (!std::holds_alternative<::seds::model::OnCommandPrimitive>(otherTransition->primitive())) {
             throw TranslationException(
-                    "Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                    "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
                     "a transition which is not OnCommandPrimitive");
         }
         const auto &otherPrimitive = std::get<::seds::model::OnCommandPrimitive>(otherTransition->primitive());
@@ -211,9 +211,10 @@ static inline auto generateProcedureForSyncCommand(Context &context,
     const auto activityInvocation = getConsistentUnconditionalActivityInvocation(transitions);
     // If a consistent invocation is found, the transitions consistently contain an OnCommandPrimitive
     // The first one is exactly the same as the other ones
-    if (!std::holds_alternative<::seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
-        throw TranslationException("Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
-                                   "a transition which is not OnCommandPrimitive");
+    if (!std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
+        throw TranslationException(
+                "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                "a transition which is not OnCommandPrimitive");
     }
 
     const auto &primitive = std::get<::seds::model::OnCommandPrimitive>(transitions[0]->primitive());
