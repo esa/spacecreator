@@ -16,7 +16,16 @@
         { "key": "AcnFile", "value": "%{JS: Util.fileName('%{ProjectName}', 'acn')}" },
         { "key": "IVFile", "value": "interfaceview.xml" },
         { "key": "Model", "value": "%{JS: '%{ProjectName}'.toUpperCase()}" },
-        { "key": "IVAsnFile", "value": " asn1file=\"%{AsnFile}\"" }
+        { "key": "IVAsnFile", "value": " asn1file=\"%{AsnFile}\"" },
+        { "key": "DV", "value": "%{JS: DgJsExtension.testExtension('aaa')}" },
+
+        { "key": "CommDevNameX86Linux", "value": "x86 Linux CPP" },
+        { "key": "CommDevTypeX86Linux", "value": "ocarina_processors_x86::x86.generic_linux" },
+        { "key": "CommDevNamespaceX86Linux", "value": "ocarina_processors_x86" },
+
+        { "key": "CommDevNameSAMV71", "value": "SAM V71 FreeRTOS N7S" },
+        { "key": "CommDevTypeSAMV71", "value": "ocarina_processors_arm::samv71.freertos" },
+        { "key": "CommDevNamespaceSAMV71", "value": "ocarina_processors_arm" }
     ],
 
     "pages":[
@@ -46,6 +55,25 @@
                             {
                                 "trKey": "Broker_Packetizer",
                                 "value": "broker_packetizer"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "CDBoard",
+                    "trDisplayName": "Communication Device board:",
+                    "type": "ComboBox",
+                    "data":
+                    {
+                        "index": 0,
+                        "items":[
+                            {
+                                "trKey": "x86 Linux CPP",
+                                "value": "X86Linux"
+                            },
+                            {
+                                "trKey": "SAM V71 FreeRTOS N7S",
+                                "value": "SAMV71"
                             }
                         ]
                     }
@@ -101,6 +129,10 @@
                 {
                     "source": "Makefile",
                     "target": "%{ProjectDirectory}/Makefile"
+                },
+                {
+                    "source": "deploymentview.dv.xml",
+                    "target": "%{ProjectDirectory}/deploymentview.dv.xml"
                 }
             ]
         }
