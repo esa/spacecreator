@@ -17,7 +17,6 @@
         { "key": "IVFile", "value": "interfaceview.xml" },
         { "key": "Model", "value": "%{JS: '%{ProjectName}'.toUpperCase()}" },
         { "key": "IVAsnFile", "value": " asn1file=\"%{AsnFile}\"" },
-        { "key": "DV", "value": "%{JS: DgJsExtension.testExtension('aaa')}" },
 
         { "key": "CommDevNameX86Linux", "value": "x86 Linux CPP" },
         { "key": "CommDevTypeX86Linux", "value": "ocarina_processors_x86::x86.generic_linux" },
