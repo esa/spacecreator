@@ -33,6 +33,7 @@ private Q_SLOTS:
     void testSequencesOf();
     void testChoices();
     void testWithComponents();
+    void testMultipleAsnModels();
 };
 
 /// \SRS  ETB-FUN-3010
@@ -101,6 +102,13 @@ void tst_SedsConverter_Asn1ToSeds::testChoices()
 void tst_SedsConverter_Asn1ToSeds::testWithComponents()
 {
     const int result = system("./test_with_components.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \ETD  ETD-18
+void tst_SedsConverter_Asn1ToSeds::testMultipleAsnModels()
+{
+    const int result = system("./test_multiple_asn_models.sh");
     QCOMPARE(result, 0);
 }
 
