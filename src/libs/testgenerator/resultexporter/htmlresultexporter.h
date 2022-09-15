@@ -100,11 +100,13 @@ private:
     auto generateHtmlStream(QTextStream &stream) -> void;
     auto generateTableRow(QTextStream &stream, int row) -> void;
     auto generateTableHeader(QTextStream &stream) -> void;
+    auto getResultAtIndex(int index) -> QVariant;
 
     QString boardName;
     QString interfaceName;
     QString functionName;
     QVector<shared::InterfaceParameter> ifaceParams;
+    QVector<QVariant> resultList;
     CellTable cells;
     QVector<QString> columnNames;
     QVector<ColumnSize> columnSizes;

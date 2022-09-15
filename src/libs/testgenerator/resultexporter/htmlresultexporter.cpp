@@ -31,11 +31,21 @@ HtmlResultExporter::HtmlResultExporter(const QString &chosenBoardName, const IVI
     , interfaceName(interface.title())
     , functionName(interface.function()->title())
     , ifaceParams(interface.params())
-    , rows(results.size() / ifaceParams.size())
+    , resultList(results)
+    , rows(csvModel.records().size())
     , maxDelta(delta)
 {
     initTableCells(csvModel, results);
     initTableHeader();
+}
+
+auto HtmlResultExporter::getResultAtIndex(int index) -> QVariant
+{
+    if (index < resultList.size()) {
+        return resultList[index];
+    } else {
+        return QVariant("");
+    }
 }
 
 auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<QVariant> &results) -> void
@@ -53,12 +63,12 @@ auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<
         std::vector<QString>::size_type parameterIndex = 0;
         for (const auto &csvField : csvFields) {
             if (ifaceParams[parameterIndex].isInDirection()) {
-                cells[rowIndex].push_back({ results[resultIndex], CellColor::Black });
+                cells[rowIndex].push_back({ getResultAtIndex(resultIndex), CellColor::Black });
             } else {
-                auto currDelta = abs(results[resultIndex].toFloat() - csvField.toFloat());
+                auto currDelta = abs(getResultAtIndex(resultIndex).toFloat() - csvField.toFloat());
                 auto color = currDelta > maxDelta ? CellColor::Red : CellColor::Green;
                 cells[rowIndex].push_back({ csvField, CellColor::Black });
-                cells[rowIndex].push_back({ results[resultIndex], color });
+                cells[rowIndex].push_back({ getResultAtIndex(resultIndex), color });
                 cells[rowIndex].push_back({ currDelta, color });
             }
             parameterIndex++;
