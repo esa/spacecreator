@@ -6,7 +6,7 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID FROM System-Dataview;
 
-Pinger-States ::= ENUMERATED {ok2, wait, ok1}
+Pinger-States ::= ENUMERATED {ok3, ok4, wait, ok1, ok2}
 
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,

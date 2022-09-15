@@ -28,6 +28,5 @@ cd $TEST_OUTPUT_DIR \
     && $CC -o system.out pan.c \
     && ./system.out -m1000000 -a -n -E > system.output \
     && grep -q "errors: 1" system.output \
-
-    # && cd .. \
-    # && rm -r $TEST_OUTPUT_DIR
+    && cd .. \
+    && rm -r $TEST_OUTPUT_DIR

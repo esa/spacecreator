@@ -14,17 +14,26 @@ process Pinger;
         task value2 := { value 2, version small : 2 };
         /* CIF NEXTSTATE (530, 441), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (871, 63), (70, 35) */
-    state Ok1;
-        /* CIF input (871, 119), (70, 35) */
+    /* CIF state (1066, 46), (70, 35) */
+    state Ok3;
+        /* CIF input (1066, 101), (70, 35) */
         input Pong;
-            /* CIF output (857, 174), (96, 35) */
+            /* CIF output (1052, 156), (96, 35) */
             output Ping(value2);
-            /* CIF NEXTSTATE (871, 224), (70, 35) */
-            NEXTSTATE Ok2;
+            /* CIF NEXTSTATE (1066, 211), (70, 35) */
+            NEXTSTATE Ok4;
     endstate;
-    /* CIF state (900, 416), (70, 35) */
+    /* CIF state (944, 46), (70, 35) */
     state Ok2;
+        /* CIF input (944, 101), (70, 35) */
+        input Pong;
+            /* CIF output (930, 156), (96, 35) */
+            output Ping(value2);
+            /* CIF NEXTSTATE (944, 211), (70, 35) */
+            NEXTSTATE Ok3;
+    endstate;
+    /* CIF state (1304, 70), (70, 35) */
+    state Ok4;
     endstate;
     /* CIF state (685, 44), (70, 35) */
     state Wait;
@@ -34,5 +43,14 @@ process Pinger;
             output Ping(value1);
             /* CIF NEXTSTATE (685, 204), (70, 35) */
             NEXTSTATE Ok1;
+    endstate;
+    /* CIF state (816, 48), (70, 35) */
+    state Ok1;
+        /* CIF input (816, 104), (70, 35) */
+        input Pong;
+            /* CIF output (802, 159), (96, 35) */
+            output Ping(value1);
+            /* CIF NEXTSTATE (816, 209), (70, 35) */
+            NEXTSTATE Ok2;
     endstate;
 endprocess Pinger;
