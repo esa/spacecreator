@@ -592,9 +592,9 @@ QVector<QAction *> IVAppWidget::initActions()
         centerView();
     });
     connect(m_document->objectsSelectionModel(), &QItemSelectionModel::selectionChanged, this,
-            [this](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
-                m_actRemove->setEnabled(!selected.isEmpty());
-                const QModelIndexList idxs = selected.indexes();
+            [this](const QItemSelection &selected, const QItemSelection &deselected) {
+                const QModelIndexList idxs = m_document->objectsSelectionModel()->selectedIndexes();
+                m_actRemove->setEnabled(!idxs.isEmpty());
                 auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
                     return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
                             == static_cast<int>(ivm::IVObject::Type::Connection);

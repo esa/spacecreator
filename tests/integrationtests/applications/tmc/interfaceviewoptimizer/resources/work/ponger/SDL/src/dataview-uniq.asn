@@ -26,3 +26,38 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+-- List of functions (instances) present in the system
+PID ::= ENUMERATED {
+    clock,
+    pinger,
+    ponger,
+    
+    env
+}
+
+END
+
+
+Context-ponger DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      T-Int8 FROM TASTE-BasicTypes;
+
+--  Group all context parameters of this function in a record
+Context-ponger ::= SEQUENCE {
+   pongerparam T-Int8
+
+}
+
+--  Declare a constant with the values set by the user in the interface view
+ponger-ctxt Context-ponger ::= {
+   pongerparam 12
+
+}
+END
+

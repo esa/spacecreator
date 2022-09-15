@@ -244,12 +244,17 @@ void InterfaceViewOptimizer::setGuiAsDefaultImplementation(IVFunction *function)
         function->addImplementation(m_environmentImplementationName, m_environmentImplementationType);
     }
 
+    // GUI functions cannot be an instance of function type
     function->setInstanceOf(nullptr);
     function->setEntityAttribute(Props::token(Props::Token::instance_of), "");
 
+    // GUI functions cannot have context parameters and timers
+    function->clearContextParams();
+
+    // Set this implementation as default
     function->setDefaultImplementation(m_environmentImplementationName);
 
-    // GUI interfaces cannot have any cyclic interfaces
+    // GUI functions cannot have any cyclic interfaces
     removeUnallowedInterfaces(function);
 }
 

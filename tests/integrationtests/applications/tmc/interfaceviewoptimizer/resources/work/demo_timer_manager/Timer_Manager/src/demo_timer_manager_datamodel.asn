@@ -1,0 +1,10 @@
+-- Dummy data model for the timer manager (needed to populate observer.asn)
+Demo-timer-manager-Datamodel DEFINITIONS ::=
+BEGIN
+Demo-timer-manager-States ::= ENUMERATED {wait}
+
+Demo-timer-manager-Context ::= SEQUENCE {
+   state Demo-timer-manager-States
+}
+
+END

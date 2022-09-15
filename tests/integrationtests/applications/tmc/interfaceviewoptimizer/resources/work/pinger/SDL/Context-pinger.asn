@@ -1,0 +1,17 @@
+Context-pinger DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      T-Int8 FROM TASTE-BasicTypes;
+
+--  Group all context parameters of this function in a record
+Context-pinger ::= SEQUENCE {
+   pingerparam T-Int8
+
+}
+
+--  Declare a constant with the values set by the user in the interface view
+pinger-ctxt Context-pinger ::= {
+   pingerparam 2
+
+}
+END
