@@ -69,12 +69,24 @@ public:
     SequenceTranslator &operator=(SequenceTranslator &&) = delete;
 
 protected:
+    struct Context {
+        QString chartName;
+        std::vector<std::unique_ptr<::sdl::Rename>> signalRenames;
+        std::unordered_map<uint32_t, SignalInfo> signals;
+        std::size_t signalCounter;
+    };
+
+protected:
     using SignalsMap = std::unordered_map<uint32_t, SignalInfo>;
     using StateList = std::vector<std::unique_ptr<::sdl::State>>;
     using ActionsMap = std::unordered_map<const ::sdl::Rename *, std::vector<std::unique_ptr<::sdl::Action>>>;
     using TransitionList = std::vector<std::unique_ptr<::sdl::Transition>>;
 
+    auto getRenamedSignal(Context &context, const msc::MscMessage *mscMessage) const -> ::sdl::Rename *;
     auto renameSignal(const QString &name, const msc::MscMessage *mscMessage) const -> std::unique_ptr<::sdl::Rename>;
+
+    auto getSequenceValue(Context &context, const ::sdl::Rename *renamedSignal, const msc::MscMessage *mscMessage) const
+            -> uint32_t;
 
     auto createSdlProcess(const QString &chartName, std::unique_ptr<::sdl::StateMachine> stateMachine)
             -> ::sdl::Process;
@@ -89,7 +101,8 @@ protected:
             const ::sdl::State *targetState) const -> std::unique_ptr<::sdl::Action>;
     auto createParameterRequirements(const QString &name, const std::optional<QString> &value,
             std::unique_ptr<::sdl::Action> trueAction) const -> std::unique_ptr<::sdl::Decision>;
-    auto createTrueAnswer(std::unique_ptr<::sdl::Action> action, const QString &literal) const -> std::unique_ptr<::sdl::Answer>;
+    auto createTrueAnswer(std::unique_ptr<::sdl::Action> action, const QString &literal) const
+            -> std::unique_ptr<::sdl::Answer>;
     auto createElseAnswer() const -> std::unique_ptr<::sdl::Answer>;
 
     auto createTransitionOnSignal(const QString &signalName, const int parameterCount, ::sdl::State *sourceState) const

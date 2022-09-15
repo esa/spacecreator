@@ -137,7 +137,10 @@ void MscParameterValueParser::parseValueMap(const QVariantMap &valueMap, const Q
 
     const auto &nameValue = valueMap["name"].toString();
 
-    const auto name = skipName || nameValue.isEmpty() ? parentName : QString("%1.%2").arg(parentName).arg(nameValue);
+    auto name = parentName;
+    if (!skipName && !nameValue.isEmpty()) {
+        name += QString(".%2").arg(nameValue);
+    }
 
     // If we are currently handling a choice parameter we want to first check if given option is present
     // We annotate that by using nullopt as the value, because we only check the parameter itself, not the value

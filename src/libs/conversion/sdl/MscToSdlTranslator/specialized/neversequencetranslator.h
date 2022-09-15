@@ -69,22 +69,18 @@ public:
     auto createObserver(const msc::MscChart *mscChart) -> void;
 
 private:
-    struct Context {
-        QString chartName;
+    struct NeverContext : public Context {
         std::vector<uint32_t> sequence;
-        std::vector<std::unique_ptr<::sdl::Rename>> signalRenames;
-        std::unordered_map<uint32_t, SignalInfo> signals;
         ::sdl::State *errorState;
-        std::size_t signalCounter;
     };
 
 private:
-    auto collectData(const msc::MscChart *mscChart) const -> NeverSequenceTranslator::Context;
+    auto collectData(const msc::MscChart *mscChart) const -> NeverSequenceTranslator::NeverContext;
 
-    auto handleEvent(Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
-    auto handleMessageEvent(Context &context, const msc::MscMessage *mscMessage) const -> void;
+    auto handleEvent(NeverContext &context, const msc::MscInstanceEvent *mscEvent) const -> void;
+    auto handleMessageEvent(NeverContext &context, const msc::MscMessage *mscMessage) const -> void;
 
-    auto createStateMachine(Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
+    auto createStateMachine(NeverContext &context) const -> std::unique_ptr<::sdl::StateMachine>;
 };
 
 } // namespace conversion::sdl::translator

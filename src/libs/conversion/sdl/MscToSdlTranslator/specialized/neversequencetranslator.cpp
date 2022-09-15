@@ -60,9 +60,9 @@ void NeverSequenceTranslator::createObserver(const MscChart *mscChart)
     m_sdlModel->addSystem(std::move(system));
 }
 
-NeverSequenceTranslator::Context NeverSequenceTranslator::collectData(const MscChart *mscChart) const
+NeverSequenceTranslator::NeverContext NeverSequenceTranslator::collectData(const MscChart *mscChart) const
 {
-    Context context;
+    NeverContext context;
     context.chartName = Escaper::escapeSdlName(mscChart->name());
     context.signalCounter = 0;
 
@@ -75,7 +75,7 @@ NeverSequenceTranslator::Context NeverSequenceTranslator::collectData(const MscC
 }
 
 void NeverSequenceTranslator::handleEvent(
-        NeverSequenceTranslator::Context &context, const MscInstanceEvent *mscEvent) const
+        NeverSequenceTranslator::NeverContext &context, const MscInstanceEvent *mscEvent) const
 {
     switch (mscEvent->entityType()) {
     case MscEntity::EntityType::Message: {
@@ -97,43 +97,16 @@ void NeverSequenceTranslator::handleEvent(
 }
 
 void NeverSequenceTranslator::handleMessageEvent(
-        NeverSequenceTranslator::Context &context, const MscMessage *mscMessage) const
+        NeverSequenceTranslator::NeverContext &context, const MscMessage *mscMessage) const
 {
-    auto signalRenamed = std::find_if(context.signalRenames.begin(), context.signalRenames.end(),
-            [&](const auto &signalRename) { return signalRename->referencedName() == mscMessage->name(); });
-
-    if (signalRenamed == context.signalRenames.end()) {
-        const auto name = m_signalRenameNameTemplate.arg(context.signalCounter);
-        context.signalRenames.push_back(renameSignal(name, mscMessage));
-        signalRenamed = std::prev(context.signalRenames.end());
-    }
-
-    const auto renamedSignal = (*signalRenamed).get();
-    const auto &parameterList = mscMessage->parameters();
-
-    uint32_t sequenceValue = 0;
-
-    auto signalCaptured = std::find_if(context.signals.begin(), context.signals.end(), [&](const auto &sig) {
-        const auto &signalInfo = sig.second;
-        return signalInfo.signal == renamedSignal && signalInfo.parameterList == parameterList;
-    });
-
-    if (signalCaptured == context.signals.end()) {
-        SignalInfo signalInfo;
-        signalInfo.signal = (*signalRenamed).get();
-        signalInfo.parameterList = parameterList;
-
-        context.signals.insert({ context.signalCounter, std::move(signalInfo) });
-        sequenceValue = context.signalCounter++;
-    } else {
-        sequenceValue = signalCaptured->first;
-    }
+    const auto renamedSignal = getRenamedSignal(context, mscMessage);
+    const auto sequenceValue = getSequenceValue(context, renamedSignal, mscMessage);
 
     context.sequence.push_back(sequenceValue);
 }
 
 std::unique_ptr<StateMachine> NeverSequenceTranslator::createStateMachine(
-        NeverSequenceTranslator::Context &context) const
+        NeverSequenceTranslator::NeverContext &context) const
 {
     auto stateMachine = std::make_unique<StateMachine>();
 

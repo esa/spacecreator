@@ -62,6 +62,20 @@ SequenceTranslator::SequenceTranslator(
 {
 }
 
+Rename *SequenceTranslator::getRenamedSignal(Context &context, const MscMessage *mscMessage) const
+{
+    auto signalRenamed = std::find_if(context.signalRenames.begin(), context.signalRenames.end(),
+            [&](const auto &signalRename) { return signalRename->referencedName() == mscMessage->name(); });
+
+    if (signalRenamed == context.signalRenames.end()) {
+        const auto name = m_signalRenameNameTemplate.arg(context.signalCounter);
+        context.signalRenames.push_back(renameSignal(name, mscMessage));
+        signalRenamed = std::prev(context.signalRenames.end());
+    }
+
+    return (*signalRenamed).get();
+}
+
 std::unique_ptr<Rename> SequenceTranslator::renameSignal(const QString &name, const MscMessage *mscMessage) const
 {
     const auto &referencedFunctionName = Escaper::escapeSdlName(mscMessage->targetInstance()->name());
@@ -77,6 +91,28 @@ std::unique_ptr<Rename> SequenceTranslator::renameSignal(const QString &name, co
     signalRename->setParametersTypes(std::move(parametersTypes));
 
     return signalRename;
+}
+
+uint32_t SequenceTranslator::getSequenceValue(
+        Context &context, const Rename *renamedSignal, const MscMessage *mscMessage) const
+{
+    const auto &parameterList = mscMessage->parameters();
+
+    auto signalHandled = std::find_if(context.signals.begin(), context.signals.end(), [&](const auto &sig) {
+        const auto &signalInfo = sig.second;
+        return signalInfo.signal == renamedSignal && signalInfo.parameterList == parameterList;
+    });
+
+    if (signalHandled == context.signals.end()) {
+        SignalInfo signalInfo;
+        signalInfo.signal = renamedSignal;
+        signalInfo.parameterList = parameterList;
+
+        context.signals.insert({ context.signalCounter, std::move(signalInfo) });
+        return context.signalCounter++;
+    } else {
+        return signalHandled->first;
+    }
 }
 
 Process SequenceTranslator::createSdlProcess(const QString &chartName, std::unique_ptr<StateMachine> stateMachine)
@@ -214,7 +250,8 @@ std::unique_ptr<Decision> SequenceTranslator::createParameterRequirements(
     return decision;
 }
 
-std::unique_ptr<Answer> SequenceTranslator::createTrueAnswer(std::unique_ptr<Action> action, const QString &literal) const
+std::unique_ptr<Answer> SequenceTranslator::createTrueAnswer(
+        std::unique_ptr<Action> action, const QString &literal) const
 {
     auto transition = std::make_unique<Transition>();
     transition->addAction(std::move(action));
@@ -329,7 +366,7 @@ std::pair<QString, QString> SequenceTranslator::splitChoiceName(const QString &n
     const auto choiceName = name.section('.', 0, -2);
     const auto choiceFieldName = name.section('.', -1);
 
-    return {choiceName, choiceFieldName};
+    return { choiceName, choiceFieldName };
 }
 
 } // namespace conversion::sdl::translator

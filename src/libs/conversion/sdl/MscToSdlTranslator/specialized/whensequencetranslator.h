@@ -76,29 +76,25 @@ private:
         ThenNot
     };
 
-    struct Context {
-        QString chartName;
+    struct WhenContext : public Context {
         std::vector<uint32_t> whenSequence;
         std::vector<uint32_t> thenSequence;
-        std::vector<std::unique_ptr<::sdl::Rename>> signalRenames;
-        std::unordered_map<uint32_t, SignalInfo> signals;
         ::sdl::State *endState;
-        std::size_t signalCounter;
         Mode mode;
     };
 
 private:
-    auto collectData(const msc::MscChart *mscChart) const -> WhenSequenceTranslator::Context;
+    auto collectData(const msc::MscChart *mscChart) const -> WhenSequenceTranslator::WhenContext;
 
-    auto handleEvent(Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
-    auto handleConditionEvent(Context &context, const msc::MscCondition *mscCondition) const -> void;
-    auto handleMessageEvent(Context &context, const msc::MscMessage *mscMessage) const -> void;
+    auto handleEvent(WhenContext &context, const msc::MscInstanceEvent *mscEvent) const -> void;
+    auto handleConditionEvent(WhenContext &context, const msc::MscCondition *mscCondition) const -> void;
+    auto handleMessageEvent(WhenContext &context, const msc::MscMessage *mscMessage) const -> void;
 
-    auto createStateMachine(Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
-    auto createThenTransitions(Context &context, StateList &states, const SignalsMap &signals,
+    auto createStateMachine(WhenContext &context) const -> std::unique_ptr<::sdl::StateMachine>;
+    auto createThenTransitions(WhenContext &context, StateList &states, const SignalsMap &signals,
             const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
-    auto createThenNotTransitions(Context &context, StateList &states, const SignalsMap &signals,
+    auto createThenNotTransitions(WhenContext &context, StateList &states, const SignalsMap &signals,
             const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
 };
