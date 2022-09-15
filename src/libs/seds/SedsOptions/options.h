@@ -41,6 +41,8 @@ public:
     inline static const QString externalRefFilepath = "Seds_Import_ExternalRefFilepath";
     /** @brief Skip SEDS validation */
     inline static const QString skipValidation = "Seds_Import_SkipValidation";
+    /** @brief Enable translation of single asn file with multiple models */
+    inline static const QString multipleAsnModels = "Seds_Translation_Multiple_Asn_Models";
     /** @brief Don't remove intermediate files after import */
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
     /** @brief  Filepath of output file */
