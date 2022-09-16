@@ -41,6 +41,13 @@ using simulink::model::SimulinkModel;
 
 namespace conversion::iv::translator {
 
+// clang-format off
+const QStringList SimulinkToIvTranslator::m_supportedIVFunctionImplementations = 
+{
+    "QGenC"
+};
+// clang-format on
+
 std::vector<std::unique_ptr<Model>> SimulinkToIvTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
@@ -92,6 +99,11 @@ std::vector<std::unique_ptr<Model>> SimulinkToIvTranslator::translateSimulinkMod
     return resultModels;
 }
 
+bool SimulinkToIvTranslator::isIVFunctionImplementationSupported(const QString &ivFunctionImplementation)
+{
+    return m_supportedIVFunctionImplementations.contains(ivFunctionImplementation, Qt::CaseSensitive);
+}
+
 QString SimulinkToIvTranslator::getIVConfigFilePathIfExists(const Options &options)
 {
     const auto ivConfigFilePath = options.value(IvOptions::configFilepath);
@@ -115,10 +127,20 @@ IVFunction *SimulinkToIvTranslator::createIVFunction(const Options &options)
         throw TranslationException("IV Function block name wasn't specified");
     }
 
+    const auto ivFunctionImplementation = options.value(SimulinkToIvOptions::ivFunctionImplementation);
+    if (!ivFunctionImplementation) {
+        throw TranslationException("IV Function block implementation wasn't specified");
+    }
+
+    if (!isIVFunctionImplementationSupported(*ivFunctionImplementation)) {
+        auto errorMsg = QString("'%1' IV Function block implementation isn't supported").arg(*ivFunctionImplementation);
+        throw TranslationException(std::move(errorMsg));
+    }
+
     IVFunction *ivFunction = new IVFunction();
 
     ivFunction->setEntityAttribute(Props::token(Props::Token::name), Escaper::escapeIvName(*ivFunctionName));
-    ivFunction->setEntityAttribute(Props::token(Props::Token::language), "QGenC");
+    ivFunction->setEntityAttribute(Props::token(Props::Token::language), *ivFunctionImplementation);
     ivFunction->setEntityAttribute(Props::token(Props::Token::is_type), "NO");
 
     return ivFunction;

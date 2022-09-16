@@ -17,22 +17,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "portsdatatypes.h"
 
-#include <QString>
+#include <conversion/common/escaper/escaper.h>
 
-namespace conversion::iv {
+namespace conversion::simulink {
 
-/**
- * @brief   Possible options for SimulinkToIV conversion
- */
-class SimulinkToIvOptions
+QString PortsDataTypes::buildMultiDimensionalPortDataTypeName(const QString &portName)
 {
-public:
-    /** @brief  IVFunction block name */
-    inline static const QString ivFunctionName = "SimulinkToIv_IVFunction_Name";
-    /** @brief  IVFunction block implementation */
-    inline static const QString ivFunctionImplementation = "SimulinkToIv_IVFunction_Implementation";
-};
+    return Escaper::escapeAsn1TypeName(portName + getMultiDimensionalPortsSuffix());
+}
 
-} // namespace conversion::iv
+} // namespace conversion::simulink

@@ -47,10 +47,7 @@ public:
      *
      * @return  It returns built ASN.1 type name
      */
-    static inline auto buildMatLabDataTypeName(const QString &dataType) -> QString
-    {
-        return getStandardDataTypesPrefix() + Escaper::escapeAsn1TypeName(dataType);
-    }
+    static auto buildMatLabDataTypeName(const QString &dataType) -> QString;
 
     /**
      * @brief  Return escaped package name for standard MatLab data types

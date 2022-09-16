@@ -62,6 +62,11 @@ public:
      */
     auto translatePorts() -> void;
 
+    /**
+     * @brief  Return encoding for created InterfaceParameter
+     */
+    static inline auto getEncodingForInterfaceParameter() -> QString { return "NATIVE"; }
+
 private:
     auto translatePort(const simulink::model::Port &port, shared::InterfaceParameter::Direction direction) -> void;
 

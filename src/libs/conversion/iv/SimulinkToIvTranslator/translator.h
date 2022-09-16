@@ -68,9 +68,14 @@ private:
             ivm::IVPropertyTemplateConfig &ivConfig, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
 
+    static auto isIVFunctionImplementationSupported(const QString &ivFunctionImplementation) -> bool;
+
     static auto getIVConfigFilePathIfExists(const conversion::Options &options) -> QString;
     static auto createIVFunction(const conversion::Options &options) -> ivm::IVFunction *;
     static auto createIVInterface(const QString &interfaceName, ivm::IVFunction *ivFunction) -> ivm::IVInterface *;
+
+private:
+    static const QStringList m_supportedIVFunctionImplementations;
 };
 
 } // namespace conversion::iv::translator

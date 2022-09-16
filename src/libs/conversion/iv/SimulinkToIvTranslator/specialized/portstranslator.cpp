@@ -82,8 +82,8 @@ void PortsTranslator::translatePort(const Port &port, InterfaceParameter::Direct
         interfaceParameterTypeName = PortsDataTypes::buildMultiDimensionalPortDataTypeName(port.name());
     }
 
-    const auto ivParameter = InterfaceParameter(
-            port.name(), BasicParameter::Type::Other, interfaceParameterTypeName, "NATIVE", direction);
+    const auto ivParameter = InterfaceParameter(port.name(), BasicParameter::Type::Other, interfaceParameterTypeName,
+            getEncodingForInterfaceParameter(), direction);
 
     m_ivInterface.addParam(ivParameter);
 }

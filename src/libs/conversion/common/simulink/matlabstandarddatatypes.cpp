@@ -48,6 +48,11 @@ const QStringList MatLabStandardDataTypes::m_standardNumericTypes =
 };
 // clang-format on
 
+QString MatLabStandardDataTypes::buildMatLabDataTypeName(const QString &dataType)
+{
+    return getStandardDataTypesPrefix() + Escaper::escapeAsn1TypeName(dataType);
+}
+
 std::unique_ptr<Boolean> MatLabStandardDataTypes::getStandardAsn1BooleanDataType()
 {
     const auto asn1TypeName = getStandardDataTypesPrefix() + "Boolean";
@@ -210,4 +215,4 @@ bool MatLabStandardDataTypes::isNumericType(const QString &typeName)
     return m_standardNumericTypes.contains(typeName, Qt::CaseSensitive);
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::simulink

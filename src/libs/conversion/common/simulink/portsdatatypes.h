@@ -20,7 +20,6 @@
 #pragma once
 
 #include <QString>
-#include <conversion/common/escaper/escaper.h>
 
 namespace conversion::simulink {
 
@@ -43,10 +42,7 @@ public:
      *
      * @return  It returns built ASN.1 type name
      */
-    static inline auto buildMultiDimensionalPortDataTypeName(const QString &portName) -> QString
-    {
-        return Escaper::escapeAsn1TypeName(portName + getMultiDimensionalPortsSuffix());
-    }
+    static auto buildMultiDimensionalPortDataTypeName(const QString &portName) -> QString;
 
     /**
      * @brief  Return suffix for multidimensional data types of ports

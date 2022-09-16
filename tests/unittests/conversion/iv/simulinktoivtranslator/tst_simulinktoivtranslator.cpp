@@ -140,6 +140,7 @@ void tst_SimulinkToIvTranslator::testTranslatePortsWithScalarDataTypes()
     Options options;
     options.add(IvOptions::configFilepath, "config.xml");
     options.add(SimulinkToIvOptions::ivFunctionName, "simulink");
+    options.add(SimulinkToIvOptions::ivFunctionImplementation, "QGenC");
 
     SimulinkToIvTranslator translator;
 
@@ -209,6 +210,7 @@ void tst_SimulinkToIvTranslator::testTranslatePortsWithMultiDimensionalDataTypes
     Options options;
     options.add(IvOptions::configFilepath, "config.xml");
     options.add(SimulinkToIvOptions::ivFunctionName, "simulink");
+    options.add(SimulinkToIvOptions::ivFunctionImplementation, "QGenC");
 
     SimulinkToIvTranslator translator;
 

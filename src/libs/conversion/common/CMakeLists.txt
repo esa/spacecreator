@@ -11,7 +11,8 @@ set(SOURCES exceptions.cpp
             translation/exceptions.cpp
             translation/translator.cpp
             simulink/matlabstandarddatatypes.cpp
-            simulink/tastestandarddatatypes.cpp)
+            simulink/tastestandarddatatypes.cpp
+            simulink/portsdatatypes.cpp)
 set(INCLUDES exceptions.h
              model.h
              modelproperties.h

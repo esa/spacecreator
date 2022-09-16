@@ -46,7 +46,7 @@ class tsti_SimulinkToIV : public QObject
 
 private Q_SLOTS:
     void initTestCase();
-    void testComparingAsn1TranslationResultWithExpectedResult();
+    void testComparingIVTranslationResultWithExpectedResult();
 
 private:
     static const std::array<const QString, 24> m_directoriesOfTests;
@@ -123,6 +123,7 @@ std::vector<std::unique_ptr<conversion::Model>> translateModel(SimulinkModel *si
     Options options;
     options.add(IvOptions::configFilepath, "config.xml");
     options.add(SimulinkToIvOptions::ivFunctionName, "simulink");
+    options.add(SimulinkToIvOptions::ivFunctionImplementation, "QGenC");
 
     SimulinkToIvTranslator translator;
 
@@ -146,7 +147,7 @@ void tsti_SimulinkToIV::initTestCase()
     ive::initIVEditor();
 }
 
-void tsti_SimulinkToIV::testComparingAsn1TranslationResultWithExpectedResult()
+void tsti_SimulinkToIV::testComparingIVTranslationResultWithExpectedResult()
 {
     for (const QString &m_directoryOfTest : m_directoriesOfTests) {
         try {
