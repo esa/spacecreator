@@ -17,8 +17,11 @@
 
 #pragma once
 
+#include "instanceitem.h"
 #include "mscchart.h"
+#include "mscentity.h"
 #include "mscmessage.h"
+#include "systemchecks.h"
 
 #include <QObject>
 #include <QPointF>
@@ -41,10 +44,8 @@ class ChartItem;
 class CommentItem;
 class ConditionItem;
 class CoregionItem;
-class InstanceItem;
 class InteractiveObject;
 class MessageItem;
-class SystemChecks;
 class TimerItem;
 
 class MscAction;
@@ -62,6 +63,7 @@ class ChartLayoutManager : public QObject
     Q_OBJECT
     Q_PROPERTY(msc::MscChart *currentChart READ currentChart WRITE setCurrentChart NOTIFY currentChartChanged)
     Q_PROPERTY(QRectF instanceRect READ instancesRect NOTIFY instancesRectChanged)
+    Q_PROPERTY(msc::SystemChecks *systeckchecker READ systemChecker WRITE setSystemChecker NOTIFY systemCheckerChanged)
 
 public:
     explicit ChartLayoutManager(MscCommandsStack *undoStack, QObject *parent = nullptr);
@@ -144,6 +146,7 @@ Q_SIGNALS:
     void cifDataChanged();
     void instancesRectChanged(const QRectF &rect);
     void initialNameAccepted(MscEntity *entity);
+    void systemCheckerChanged(msc::SystemChecks *checker);
 
 private Q_SLOTS:
     void onInstanceGeometryChanged();

@@ -4,6 +4,7 @@
 *.ini
 *.gpr
 *.md5
+*.default_subtypes.asn
 
 **/wrappers/*
 **/cache/*

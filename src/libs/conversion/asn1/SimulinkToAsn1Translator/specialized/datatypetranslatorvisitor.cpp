@@ -19,12 +19,11 @@
 
 #include "datatypetranslatorvisitor.h"
 
-#include "matlabstandarddatatypes.h"
-
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
-#include <conversion/asn1/SimulinkToAsn1Translator/tastestandarddatatypes.h>
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/simulink/matlabstandarddatatypes.h>
+#include <conversion/common/simulink/tastestandarddatatypes.h>
 
 using Asn1Acn::SourceLocation;
 using Asn1Acn::TypeAssignment;
@@ -34,6 +33,8 @@ using Asn1Acn::Types::EnumeratedItem;
 using Asn1Acn::Types::IntegerEncoding;
 using Asn1Acn::Types::UserdefinedType;
 using conversion::Escaper;
+using conversion::simulink::MatLabStandardDataTypes;
+using conversion::simulink::TasteStandardDataTypes;
 using simulink::model::AliasDataType;
 using simulink::model::BusDataType;
 using simulink::model::EnumDataType;

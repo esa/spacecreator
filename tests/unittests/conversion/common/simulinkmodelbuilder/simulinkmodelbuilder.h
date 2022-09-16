@@ -37,10 +37,10 @@ public:
     auto withAliasDataType(QString name, QString baseType, simulink::model::DataScope dataScope, QString description,
             QString headerFile) -> SimulinkModelBuilder &;
     auto withBusDataType(simulink::model::BusDataType busDataType) -> SimulinkModelBuilder &;
-    auto withInport(QString name, QString outputSignalNames, QString outDataTypeStr, QString port)
-            -> SimulinkModelBuilder &;
-    auto withOutport(QString name, QString inputSignalNames, QString outDataTypeStr, QString port)
-            -> SimulinkModelBuilder &;
+    auto withInport(QString name, QString outputSignalNames, QString outDataTypeStr, QString port,
+            simulink::model::PortDimension portDimension) -> SimulinkModelBuilder &;
+    auto withOutport(QString name, QString inputSignalNames, QString outDataTypeStr, QString port,
+            simulink::model::PortDimension portDimension) -> SimulinkModelBuilder &;
 
 private:
     simulink::model::SimulinkModel m_simulinkModel;

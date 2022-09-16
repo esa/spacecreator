@@ -533,7 +533,6 @@ void VEConnectionGraphicsItem::rebuildLayout()
         if (doLayout()) {
             mergeGeometry();
         }
-        return;
     }
 
     updateBoundingRect();

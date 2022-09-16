@@ -1,0 +1,17 @@
+Context-ponger DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      T-Int8 FROM TASTE-BasicTypes;
+
+--  Group all context parameters of this function in a record
+Context-ponger ::= SEQUENCE {
+   pongerparam T-Int8
+
+}
+
+--  Declare a constant with the values set by the user in the interface view
+ponger-ctxt Context-ponger ::= {
+   pongerparam 12
+
+}
+END
