@@ -120,8 +120,8 @@ Then we make a new Manual Kit named ***spacecreator6*** where we select the Qt v
 
 In the ***CMake Configuration*** inside the kit, click the ***Change...*** button.
 Add two lines there:<br>
--DQTC_SOURCE:PATH=$HOME/opt/spacecreatorenv5/spacecreator.AppDir<br>
--DQTC_INSTALL:PATH=$HOME/opt/spacecreatorenv5/spacecreator.AppDir
+QTC_SOURCE:PATH=$HOME/opt/spacecreatorenv5/spacecreator.AppDir<br>
+QTC_INSTALL:PATH=$HOME/opt/spacecreatorenv5/spacecreator.AppDir
 
 
 ### Build Settings
