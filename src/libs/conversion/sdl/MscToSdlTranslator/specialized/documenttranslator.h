@@ -38,7 +38,7 @@ public:
      * @brief   Constructor
      *
      * @param   sdlModel    Parent SDL model
-     * @param   asn1File    ASN.1 with observer dataview
+     * @param   asn1File    ASN.1 file
      * @param   ivModel     IV model
      * @param   options     Conversion options
      */

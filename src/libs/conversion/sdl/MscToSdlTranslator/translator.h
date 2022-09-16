@@ -68,7 +68,7 @@ private:
      * @brief   Translate MSC model
      *
      * @param   mscModel    MSC model to translate
-     * @param   asn1File    ASN.1 with observer dataview
+     * @param   asn1File    ASN.1 file
      * @param   options     List of options
      *
      * @return  Result SDL model

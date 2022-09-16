@@ -43,7 +43,7 @@ public:
      * @brief   Constructor
      *
      * @param   chartName   Name of the MSC chart
-     * @param   asn1File    ASN.1 with observer dataview
+     * @param   asn1File    ASN.1 file
      */
     MscParameterValueParser(const QString &chartName, const Asn1Acn::File *asn1File);
     /**
