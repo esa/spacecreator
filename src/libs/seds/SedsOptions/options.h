@@ -43,6 +43,8 @@ public:
     inline static const QString skipValidation = "Seds_Import_SkipValidation";
     /** @brief No mangling for interfaces names in SEDS to IV translation */
     inline static const QString noMangling = "Seds_Translation_NoMangling";
+    /** @brief Enable translation of single asn file with multiple models */
+    inline static const QString multipleAsnModels = "Seds_Translation_Multiple_Asn_Models";
     /** @brief Don't remove intermediate files after import */
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
     /** @brief  Filepath of output file */

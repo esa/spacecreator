@@ -1,0 +1,29 @@
+<InterfaceView>
+<Function name="simulink" is_type="NO" language="QGenC" default_implementation="default">
+<Provided_Interface name="interface" kind="Protected" layer="default">
+    <Input_Parameter name="i1" type="AliasDouble" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="AliasSingle" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="AliasInt8" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="AliasUInt8" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="AliasInt16" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="AliasUInt16" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="AliasInt32" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="AliasUInt32" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="AliasBoolean" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="AliasDouble" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="AliasSingle" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="AliasInt8" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="AliasUInt8" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="AliasInt16" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="AliasUInt16" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="AliasInt32" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="AliasUInt32" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="AliasBoolean" encoding="NATIVE"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

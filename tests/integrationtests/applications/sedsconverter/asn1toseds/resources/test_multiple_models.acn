@@ -1,0 +1,49 @@
+ModelOne DEFINITIONS ::= BEGIN
+
+TypeOne1 [encoding pos-int, size 32, endianness big]
+TypeOne2 [encoding pos-int, size 32, endianness big]
+
+SimpleChoiceOne [] 
+{
+    altOne1 [],
+    altOne2 []
+}
+
+SimpleChoiceWithAnonymousTypesOne []
+{
+    altOne1 [encoding pos-int, size 16, endianness big],
+    altOne2 [encoding twos-complement, size 16, endianness little]
+}
+
+SimpleChoiceWithEncodingOverrideOne []
+{
+    altOne1 [encoding pos-int, size 16, endianness little],
+    altOne2 [encoding pos-int, size 16, endianness little]
+}
+
+END
+
+ModelTwo DEFINITIONS ::= BEGIN
+
+TypeTwo1 [encoding pos-int, size 32, endianness big]
+TypeTwo2 [encoding pos-int, size 32, endianness big]
+
+SimpleChoiceTwo [] 
+{
+    altTwo1 [],
+    altTwo2 []
+}
+
+SimpleChoiceWithAnonymousTypesTwo []
+{
+    altTwo1 [encoding pos-int, size 16, endianness big],
+    altTwo2 [encoding twos-complement, size 16, endianness little]
+}
+
+SimpleChoiceWithEncodingOverrideTwo []
+{
+    altTwo1 [encoding pos-int, size 16, endianness little],
+    altTwo2 [encoding pos-int, size 16, endianness little]
+}
+
+END

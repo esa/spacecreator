@@ -18,6 +18,8 @@
 #pragma once
 
 #include "baseitems/interactiveobject.h"
+#include "mscentity.h"
+#include "systemchecks.h"
 
 #include <QLineF>
 #include <QPointer>
@@ -115,6 +117,7 @@ private Q_SLOTS:
     void onKindEdited(const QString &newKind);
     void checkforInitialName();
     void checkIVFunction();
+    void updateSystemChecker(msc::SystemChecks *checker);
 
 private:
     qreal m_axisHeight = defaultAxisHeight();

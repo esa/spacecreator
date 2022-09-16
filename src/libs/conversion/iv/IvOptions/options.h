@@ -46,4 +46,4 @@ public:
     inline static const QString defaultOutputFilename = "interfaceview.xml";
 };
 
-} // namespace conversion::seds
+} // namespace conversion::iv

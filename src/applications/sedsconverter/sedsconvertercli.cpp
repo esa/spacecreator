@@ -55,6 +55,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRefFilepath);
     m_parser.handlePositional(CommandArg::SedsConverterSkipValidation);
     m_parser.handlePositional(CommandArg::SedsConverterNoMangling);
+    m_parser.handlePositional(CommandArg::SedsConverterMultipleAsnModels);
     m_parser.handlePositional(CommandArg::SedsConverterKeepIntermediateFiles);
     m_parser.handlePositional(CommandArg::SedsConverterAcnFilepathPrefix);
     m_parser.handlePositional(CommandArg::SedsConverterAsn1FilepathPrefix);
@@ -232,6 +233,7 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
             options.add(SedsOptions::externalRefFilepath, value);
         }
     }
+
     if (m_arguments.contains(CommandArg::SedsConverterSedsExtRefFilepath)) {
         options.add(SedsOptions::externalRefFilepath, m_parser.value(CommandArg::SedsConverterSedsExtRefFilepath));
     }
@@ -242,6 +244,10 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
 
     if (m_arguments.contains(CommandArg::SedsConverterNoMangling)) {
         options.add(SedsOptions::noMangling);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterMultipleAsnModels)) {
+        options.add(SedsOptions::multipleAsnModels);
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterKeepIntermediateFiles)) {

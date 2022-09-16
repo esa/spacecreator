@@ -21,9 +21,10 @@
 #include "baseitems/eventitem.h"
 #include "chartlayoutmanager.h"
 #include "instanceitem.h"
+#include "mscmessage.h"
+#include "systemchecks.h"
 
 #include <QPointer>
-#include <mscmessage.h>
 
 namespace msc {
 class LabeledArrowItem;
@@ -129,6 +130,7 @@ private Q_SLOTS:
     void onManualGeometryChangeFinished(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
     void updateDisplayText();
     void checkIVConnection();
+    void updateSystemChecker(msc::SystemChecks *checker);
 
 private:
     QString displayTextFromModel() const;

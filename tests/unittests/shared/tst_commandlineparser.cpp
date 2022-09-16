@@ -69,6 +69,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterSedsExtRefFilepath();
     void testCmdArgumentSedsConverterSkipValidation();
     void testCmdArgumentSedsConverterNoManglig();
+    void testCmdArgumentSedsConverterMultipleAsnModels();
     void testCmdArgumentSedsConverterKeepIntermediateFiles();
     void testCmdArgumentSedsConverterAcnFilepathPrefix();
     void testCmdArgumentSedsConverterAsn1FilepathPrefix();
@@ -448,10 +449,9 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterSkipValidation()
     QVERIFY(parser.isSet(CommandArg::SedsConverterSkipValidation));
 }
 
-void tst_CommandLineParser::testCmdArgumentSedsConverterNoManglig() 
+void tst_CommandLineParser::testCmdArgumentSedsConverterNoManglig()
 {
-    const QCommandLineOption cmdNoMangling =
-            CommandLineParser::positionalArg(CommandArg::SedsConverterNoMangling);
+    const QCommandLineOption cmdNoMangling = CommandLineParser::positionalArg(CommandArg::SedsConverterNoMangling);
     const QStringList args = { QApplication::instance()->applicationFilePath(),
         QString("--%1").arg(cmdNoMangling.names().first()) };
 
@@ -461,6 +461,21 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterNoManglig()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterNoMangling));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterMultipleAsnModels()
+{
+    const QCommandLineOption cmdMultipleAsnModels =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterMultipleAsnModels);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdMultipleAsnModels.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterMultipleAsnModels);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterMultipleAsnModels));
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterKeepIntermediateFiles()
