@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- android-sdk-module.qdoc -->
+  <title>Android.sdk QML Type | Qbs Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="index.html">Qbs Manual</a></td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right">Qbs 1.12.2</td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<p class="naviNextPrevious headerNavi">
+</p><p/>
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#properties">Properties</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+<li class="level2"><a href="#relevant-file-tags">Relevant File Tags</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">Android.sdk QML Type</h1>
+<span class="subtitle"></span>
+<!-- $$$Android.sdk-brief -->
+<p>Provides support for building Android packages. <a href="#details">More...</a></p>
+<!-- @@@Android.sdk -->
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Import Statement:</td><td class="memItemRight bottomAlign"> import QbsModules .</td></tr><tr><td class="memItemLeft rightAlign topAlign"> Since:</td><td class="memItemRight bottomAlign">  Qbs 1.4</td></tr></table></div><ul>
+<li><a href="qml-qbsmodules-android-sdk-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="properties"></a>
+<h2 id="properties">Properties</h2>
+<ul>
+<li class="fn"><b><b><a href="qml-qbsmodules-android-sdk.html#buildToolsVersion-prop">buildToolsVersion</a></b></b> : string</li>
+<li class="fn"><b><b><a href="qml-qbsmodules-android-sdk.html#embedJar-prop">embedJar</a></b></b> : bool</li>
+<li class="fn"><b><b><a href="qml-qbsmodules-android-sdk.html#ndkDir-prop">ndkDir</a></b></b> : string</li>
+<li class="fn"><b><b><a href="qml-qbsmodules-android-sdk.html#platform-prop">platform</a></b></b> : string</li>
+<li class="fn"><b><b><a href="qml-qbsmodules-android-sdk.html#sdkDir-prop">sdkDir</a></b></b> : string</li>
+</ul>
+<!-- $$$Android.sdk-description -->
+<a name="details"></a>
+<h2 id="details">Detailed Description</h2>
+<p>The Android.sdk module contains the properties and rules to create Android application packages from Java sources, resources, and so on.</p>
+<p>Normally, you will not use this module directly, but instead work with the <a href="qml-qbsconvenienceitems-androidapk.html">AndroidApk</a> item that Qbs provides.</p>
+<a name="relevant-file-tags"></a>
+<h3 >Relevant File Tags</h3>
+<a name="filetags-android-sdk"></a><div class="table"><table class="generic">
+ <thead><tr class="qt-style"><th >Tag</th><th >Auto-tagged File Names</th><th >Since</th><th >Description</th></tr></thead>
+<tr valign="top" class="odd"><td ><code>&quot;android.aidl&quot;</code></td><td ><code>*.aidl</code></td><td >1.4&#x2e;0</td><td >Attached to Android AIDL files. One Java source file will be generated for each such file.</td></tr>
+<tr valign="top" class="even"><td ><code>&quot;android.assets&quot;</code></td><td >-</td><td >1.4&#x2e;0</td><td >Attached to Android assets, which are typically located in an <code>assets/</code> subdirectory. Using the <a href="qml-qbsconvenienceitems-androidapk.html">AndroidApk</a> item takes care of tagging these files for you.</td></tr>
+<tr valign="top" class="odd"><td ><code>&quot;android.apk&quot;</code></td><td >n/a</td><td >1.4&#x2e;0</td><td >Attached to the output artifact of the rule that creates an APK package. It is the default type of the <a href="qml-qbsconvenienceitems-androidapk.html">AndroidApk</a> item.</td></tr>
+<tr valign="top" class="even"><td ><code>&quot;android.manifest&quot;</code></td><td ><code>AndroidManifest.xml</code></td><td >1.4&#x2e;0</td><td >Attached to the Android manifest. There must be one such file for every Android app.</td></tr>
+<tr valign="top" class="odd"><td ><code>&quot;android.resources&quot;</code></td><td >-</td><td >1.4&#x2e;0</td><td >Attached to Android resources, which are typically located in a <code>res/</code> subdirectory. Using the <a href="qml-qbsconvenienceitems-androidapk.html">AndroidApk</a> item takes care of tagging these files for you.</td></tr>
+</table></div>
+<!-- @@@Android.sdk -->
+<h2>Property Documentation</h2>
+<!-- $$$buildToolsVersion -->
+<div class="qmlitem"><div class="qmlproto">
+<div class="table"><table class="qmlname">
+<tr valign="top" class="odd" id="buildToolsVersion-prop">
+<td class="tblQmlPropNode"><p>
+<a name="buildToolsVersion-prop"></a><span class="name">buildToolsVersion</span> : <span class="type">string</span></p></td></tr>
+</table></div>
+</div><div class="qmldoc"><p>The version of the build tools such as <code>aapt</code> and <code>dx</code>.</p>
+<p>Default: Highest build tools version version available in the SDK.</p>
+</div></div><!-- @@@buildToolsVersion -->
+<br/>
+<!-- $$$embedJar -->
+<div class="qmlitem"><div class="qmlproto">
+<div class="table"><table class="qmlname">
+<tr valign="top" class="odd" id="embedJar-prop">
+<td class="tblQmlPropNode"><p>
+<a name="embedJar-prop"></a><span class="name">embedJar</span> : <span class="type">bool</span></p></td></tr>
+</table></div>
+</div><div class="qmldoc"><p>If <code>true</code>, then if the dependency is a JAR file, its classes and the classes of its dependencies (if <code>embedJar</code> is also true for them) will be recursively processed by <code>dex</code> and included in the final APK.</p>
+<p>Default: <code>true</code></p>
+<p>This property was introduced in  Qbs 1.10.</p>
+</div></div><!-- @@@embedJar -->
+<br/>
+<!-- $$$ndkDir -->
+<div class="qmlitem"><div class="qmlproto">
+<div class="table"><table class="qmlname">
+<tr valign="top" class="odd" id="ndkDir-prop">
+<td class="tblQmlPropNode"><p>
+<a name="ndkDir-prop"></a><span class="name">ndkDir</span> : <span class="type">string</span></p></td></tr>
+</table></div>
+</div><div class="qmldoc"><p>The NDK base directory, if an NDK is present.</p>
+<p>Default: Determined automatically based on standard search paths.</p>
+</div></div><!-- @@@ndkDir -->
+<br/>
+<!-- $$$platform -->
+<div class="qmlitem"><div class="qmlproto">
+<div class="table"><table class="qmlname">
+<tr valign="top" class="odd" id="platform-prop">
+<td class="tblQmlPropNode"><p>
+<a name="platform-prop"></a><span class="name">platform</span> : <span class="type">string</span></p></td></tr>
+</table></div>
+</div><div class="qmldoc"><p>The versioned platform name (for example, <code>&quot;android-21&quot;</code>).</p>
+<p>Default: Highest build tools version version available in the SDK.</p>
+</div></div><!-- @@@platform -->
+<br/>
+<!-- $$$sdkDir -->
+<div class="qmlitem"><div class="qmlproto">
+<div class="table"><table class="qmlname">
+<tr valign="top" class="odd" id="sdkDir-prop">
+<td class="tblQmlPropNode"><p>
+<a name="sdkDir-prop"></a><span class="name">sdkDir</span> : <span class="type">string</span></p></td></tr>
+</table></div>
+</div><div class="qmldoc"><p>The SDK base directory.</p>
+<p>Default: Determined automatically based on standard search paths.</p>
+</div></div><!-- @@@sdkDir -->
+<br/>
+<p class="naviNextPrevious footerNavi">
+</p>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

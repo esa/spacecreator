@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- symbolgroupnode.cpp -->
+  <title>DumpParameters Class | Extending Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="extending-index.html">Extending Qt Creator Manual</a></td><td >DumpParameters</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="extending-index.html">Extending Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#public-types">Public Types</a></li>
+<li class="level1"><a href="#public-functions">Public Functions</a></li>
+<li class="level1"><a href="#public-variables">Public Variables</a></li>
+<li class="level1"><a href="#static-public-members">Static Public Members</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">DumpParameters Class</h1>
+<!-- $$$DumpParameters-brief -->
+<p>The <a href="dumpparameters.html">DumpParameters</a> class contains all parameters for GDBMI dumping of a symbol group in one class. The debugging engine passes maps of type names/inames to special integer values indicating hex/dec, etc. <a href="#details">More...</a></p>
+<!-- @@@DumpParameters -->
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">   <span class="preprocessor">#include &lt;DumpParameters&gt;</span>
+</td></tr></table></div><ul>
+<li><a href="dumpparameters-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="public-types"></a>
+<h2 id="public-types">Public Types</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> enum </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#DumpFlags-enum">DumpFlags</a></b> { DumpHumanReadable, DumpComplexDumpers, DumpAlphabeticallySorted }</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#FormatMap-typedef">FormatMap</a></b></td></tr>
+</table></div>
+<a name="public-functions"></a>
+<h2 id="public-functions">Public Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#format">format</a></b>(const std::string &amp;<i>type</i>, const std::string &amp;<i>iname</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#humanReadable">humanReadable</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#isAlphabeticallySorted">isAlphabeticallySorted</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#recode">recode</a></b>(const std::string &amp;<i>type</i>, const std::string &amp;<i>iname</i>, const SymbolGroupValueContext &amp;<i>ctx</i>, int <i>address</i>, std::wstring *<i>value</i>, std::string *<i>encoding</i>) const</td></tr>
+</table></div>
+<a name="public-variables"></a>
+<h2 id="public-variables">Public Variables</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#dumpFlags-var">dumpFlags</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> DumpParameters::FormatMap </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#individualFormats-var">individualFormats</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> DumpParameters::FormatMap </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#typeFormats-var">typeFormats</a></b></td></tr>
+</table></div>
+<a name="static-public-members"></a>
+<h2 id="static-public-members">Static Public Members</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> DumpParameterRecodeResult </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#checkRecode">checkRecode</a></b>(const std::string &amp;<i>type</i>, const std::string &amp;<i>iname</i>, const std::wstring &amp;<i>value</i>, const SymbolGroupValueContext &amp;<i>ctx</i>, int <i>address</i>, const DumpParameters *<i>dp</i> = 0)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> DumpParameters::FormatMap </td><td class="memItemRight bottomAlign"><b><a href="dumpparameters.html#decodeFormatArgument">decodeFormatArgument</a></b>(const std::string &amp;<i>f</i>, bool <i>isHex</i>)</td></tr>
+</table></div>
+<a name="details"></a>
+<!-- $$$DumpParameters-description -->
+<div class="descr">
+<h2 id="details">Detailed Description</h2>
+<p>The <a href="dumpparameters.html">DumpParameters</a> class contains all parameters for GDBMI dumping of a symbol group in one class. The debugging engine passes maps of type names/inames to special integer values indicating hex/dec, etc.</p>
+</div>
+<!-- @@@DumpParameters -->
+<div class="types">
+<h2>Member Type Documentation</h2>
+<!-- $$$DumpFlags$$$DumpHumanReadable$$$DumpComplexDumpers$$$DumpAlphabeticallySorted -->
+<h3 class="fn" id="DumpFlags-enum"><a name="DumpFlags-enum"></a>enum DumpParameters::<span class="name">DumpFlags</span></h3>
+<!-- @@@DumpFlags -->
+<!-- $$$FormatMap -->
+<h3 class="fn" id="FormatMap-typedef"><a name="FormatMap-typedef"></a>typedef DumpParameters::<span class="name">FormatMap</span></h3>
+<!-- @@@FormatMap -->
+</div>
+<div class="func">
+<h2>Member Function Documentation</h2>
+<!-- $$$checkRecode[overload1]$$$checkRecodeconststd::string&conststd::string&conststd::wstring&constSymbolGroupValueContext&intconstDumpParameters* -->
+<h3 class="fn" id="checkRecode"><a name="checkRecode"></a><code>[static] </code><span class="type">DumpParameterRecodeResult</span> DumpParameters::<span class="name">checkRecode</span>(const <span class="type">std::string</span> &amp;<i>type</i>, const <span class="type">std::string</span> &amp;<i>iname</i>, const <span class="type">std::wstring</span> &amp;<i>value</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>ctx</i>, <span class="type">int</span> <i>address</i>, const <span class="type"><a href="dumpparameters.html">DumpParameters</a></span> *<i>dp</i> = 0)</h3>
+<!-- @@@checkRecode -->
+<!-- $$$decodeFormatArgument[overload1]$$$decodeFormatArgumentconststd::string&bool -->
+<h3 class="fn" id="decodeFormatArgument"><a name="decodeFormatArgument"></a><code>[static] </code><span class="type"><a href="dumpparameters.html#FormatMap-typedef">DumpParameters::FormatMap</a></span> DumpParameters::<span class="name">decodeFormatArgument</span>(const <span class="type">std::string</span> &amp;<i>f</i>, <span class="type">bool</span> <i>isHex</i>)</h3>
+<!-- @@@decodeFormatArgument -->
+<!-- $$$format[overload1]$$$formatconststd::string&conststd::string& -->
+<h3 class="fn" id="format"><a name="format"></a><span class="type">std::string</span> DumpParameters::<span class="name">format</span>(const <span class="type">std::string</span> &amp;<i>type</i>, const <span class="type">std::string</span> &amp;<i>iname</i>) const</h3>
+<!-- @@@format -->
+<!-- $$$humanReadable[overload1]$$$humanReadable -->
+<h3 class="fn" id="humanReadable"><a name="humanReadable"></a><span class="type">bool</span> DumpParameters::<span class="name">humanReadable</span>() const</h3>
+<!-- @@@humanReadable -->
+<!-- $$$isAlphabeticallySorted[overload1]$$$isAlphabeticallySorted -->
+<h3 class="fn" id="isAlphabeticallySorted"><a name="isAlphabeticallySorted"></a><span class="type">bool</span> DumpParameters::<span class="name">isAlphabeticallySorted</span>() const</h3>
+<!-- @@@isAlphabeticallySorted -->
+<!-- $$$recode[overload1]$$$recodeconststd::string&conststd::string&constSymbolGroupValueContext&intstd::wstring*std::string* -->
+<h3 class="fn" id="recode"><a name="recode"></a><span class="type">bool</span> DumpParameters::<span class="name">recode</span>(const <span class="type">std::string</span> &amp;<i>type</i>, const <span class="type">std::string</span> &amp;<i>iname</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>ctx</i>, <span class="type">int</span> <i>address</i>, <span class="type">std::wstring</span> *<i>value</i>, <span class="type">std::string</span> *<i>encoding</i>) const</h3>
+<!-- @@@recode -->
+</div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

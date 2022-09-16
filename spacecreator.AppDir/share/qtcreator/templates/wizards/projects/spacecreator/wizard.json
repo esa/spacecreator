@@ -1,0 +1,146 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ "CMakeProjectManager.CMakeProject", "Qt4ProjectManager.Qt4Project" ],
+    "id": "S.SpaceCreator Project",
+    "category": "I.Projects",
+    "trDescription": "Create SpaceCreator project with optional default models.",
+    "trDisplayName": "SpaceCreator Project",
+    "trDisplayCategory": "Non-Qt Project",
+    "enabled": true,
+
+    "options":
+    [
+        { "key": "BuildSystem", "value": "qmake" },
+        { "key": "ProjectFile", "value": "%{JS: '%{BuildSystem}' === 'qmake' ? '%{ProFile}' : '%{CMakeFile}'}" },
+        { "key": "ProFile", "value": "%{JS: Util.fileName('%{ProjectDirectory}/%{ProjectName}', 'pro')}" },
+        { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" },
+        { "key": "AsnFile", "value": "%{ProjectName}.asn" },
+        { "key": "MSCFile", "value": "%{ProjectName}.msc" },
+        { "key": "DVFile", "value": "deploymentview.dv.xml" },
+        { "key": "IVFile", "value": "interfaceview.xml" },
+        { "key": "MSCAsnFile", "value": "    language ASN.1;\n    data dataview-uniq.asn;" },
+        { "key": "IVAsnFile", "value": " asn1file=\"dataview-uniq.asn\"" }
+    ],
+
+    "pages":
+    [
+        {
+            "trDisplayName": "Project Location",
+            "trShortTitle": "Location",
+            "typeId": "Project"
+        },
+        {
+            "trDisplayName": "ASN.1 Model",
+            "trShortTitle": "ASN.1 Model",
+            "trSubTitle": "Name of the ASN.1 model",
+            "typeId": "Fields",
+            "enabled": true,
+            "data" :
+            [
+                {
+                    "name": "Model",
+                    "trDisplayName": "Model name:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "isComplete": "%{JS: /[A-Z]([a-zA-Z0-9]|-)*/.test('%{Model}') }",
+                    "trIncompleteMessage": "The ASN.1 model name has to start with upper case letter. And only contain letters, numbers and dashes.",
+                    "data":
+                    {
+                        "validator": "[A-Z]([a-zA-Z0-9]|-)*",
+                        "fixup": "%{JS: '%{INPUT}'.charAt(0).toUpperCase() + '%{INPUT}'.slice(1).replace('_', '-') }",
+                        "trText": "%{JS: '%{ProjectName}'.charAt(0).toUpperCase() + '%{ProjectName}'.slice(1).replace('_', '-') }"
+                    }
+                }
+            ]
+        },
+        {
+            "trDisplayName": "Kit Selection",
+            "trShortTitle": "Kits",
+            "typeId": "Kits",
+            "enabled": true,
+            "data": { "projectFilePath": "%{ProjectFile}" }
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators":
+    [
+        {
+            "typeId": "File",
+            "data":
+            [
+                {
+                    "source": "file.pro",
+                    "target": "%{ProFile}",
+                    "openAsProject": true,
+                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
+                },
+                {
+                    "source": "../asn1acn/handleAsn1AcnBuild.pri",
+                    "target": "handleAsn1AcnBuild.pri",
+                    "openAsProject": false,
+                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
+                },
+                {
+                    "source": "../asn1acn/updateSourcesList.pri",
+                    "target": "updateSourcesList.pri",
+                    "openAsProject": false,
+                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
+                },
+                {
+                    "source": "../asn1acn/generateFromAsn1.pri",
+                    "target": "generateFromAsn1.pri",
+                    "openAsProject": false,
+                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
+                },
+                {
+                    "source": "CMakeLists.txt",
+                    "target": "CMakeLists.txt",
+                    "openAsProject": true,
+                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
+                },
+                {
+                    "source": "../asn1acn/asn1sccSettings.cmake",
+                    "target": "asn1sccSettings.cmake",
+                    "openAsProject": false,
+                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
+                },
+                {
+                    "source": "../asn1acn/configureAsn1SccTarget.cmake",
+                    "target": "configureAsn1SccTarget.cmake",
+                    "openAsProject": false,
+                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
+                },
+                {
+                    "source": "../asn1acn/createFilesList.cmake",
+                    "target": "createFilesList.cmake",
+                    "openAsProject": false,
+                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
+                },
+                {
+                    "source": "../asn1acn/template.asn",
+                    "target": "%{AsnFile}",
+                    "openInEditor": false
+                },
+                {
+                    "source": "empty.msc",
+                    "target": "%{MSCFile}",
+                    "openInEditor": false
+                },
+                {
+                    "source": "deploymentview.dv.xml",
+                    "target": "%{DVFile}",
+                    "openInEditor": false
+                },
+                {
+                    "source": "interfaceview.xml",
+                    "target": "%{IVFile}",
+                    "openInEditor": true
+                }
+            ]
+        }
+    ]
+}

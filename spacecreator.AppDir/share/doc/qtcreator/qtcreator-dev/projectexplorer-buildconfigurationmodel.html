@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- projectconfigurationmodel.cpp -->
+  <title>BuildConfigurationModel Class | Extending Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="extending-index.html">Extending Qt Creator Manual</a></td><td >BuildConfigurationModel</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="extending-index.html">Extending Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#public-functions">Public Functions</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">BuildConfigurationModel Class</h1>
+<span class="small-subtitle">(<a href="projectexplorer-buildconfigurationmodel.html">ProjectExplorer::BuildConfigurationModel</a>)<br/></span>
+<!-- $$$BuildConfigurationModel-brief -->
+<p>The <a href="projectexplorer-buildconfigurationmodel.html">BuildConfigurationModel</a> class is a model to represent the build configurations of a target. <a href="#details">More...</a></p>
+<!-- @@@BuildConfigurationModel -->
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">   <span class="preprocessor">#include &lt;BuildConfigurationModel&gt;</span>
+</td></tr><tr><td class="memItemLeft rightAlign topAlign"> Inherits:</td><td class="memItemRight bottomAlign"> <a href="projectexplorer-projectconfigurationmodel.html">ProjectExplorer::ProjectConfigurationModel</a></td></tr></table></div><ul>
+<li><a href="projectexplorer-buildconfigurationmodel-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="public-functions"></a>
+<h2 id="public-functions">Public Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-buildconfigurationmodel.html#BuildConfigurationModel">BuildConfigurationModel</a></b>(ProjectExplorer::Target *<i>t</i>, int *<i>parent</i> = nullptr)</td></tr>
+</table></div>
+<a name="details"></a>
+<!-- $$$BuildConfigurationModel-description -->
+<div class="descr">
+<h2 id="details">Detailed Description</h2>
+<p>The <a href="projectexplorer-buildconfigurationmodel.html">BuildConfigurationModel</a> class is a model to represent the build configurations of a target.</p>
+<p>To be used in the dropdown lists of comboboxes. Automatically adjusts itself to added and removed BuildConfigurations. Very similar to the Run Configuration Model.</p>
+<p>TODO might it possible to share code without making the code a complete mess.</p>
+</div>
+<!-- @@@BuildConfigurationModel -->
+<div class="func">
+<h2>Member Function Documentation</h2>
+<!-- $$$BuildConfigurationModel[overload1]$$$BuildConfigurationModelProjectExplorer::Target*int* -->
+<h3 class="fn" id="BuildConfigurationModel"><a name="BuildConfigurationModel"></a>BuildConfigurationModel::<span class="name">BuildConfigurationModel</span>(<span class="type">ProjectExplorer::Target</span> *<i>t</i>, <span class="type">int</span> *<i>parent</i> = nullptr)</h3>
+<p>Default constructs an instance of BuildConfigurationModel.</p><!-- @@@BuildConfigurationModel -->
+</div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

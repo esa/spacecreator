@@ -44,7 +44,7 @@ IVFunctionNameGraphicsItem::IVFunctionNameGraphicsItem(QGraphicsItem *parent)
 
 bool IVFunctionNameGraphicsItem::validateText(const QString &text) const
 {
-    QRegularExpression re(shared::namePatternUI);
+    static QRegularExpression re(shared::namePatternUI);
     return re.match(text).hasMatch();
 }
 

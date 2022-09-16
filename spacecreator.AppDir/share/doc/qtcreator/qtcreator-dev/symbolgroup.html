@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- symbolgroup.cpp -->
+  <title>SymbolGroup Class | Extending Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="extending-index.html">Extending Qt Creator Manual</a></td><td >SymbolGroup</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="extending-index.html">Extending Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#public-types">Public Types</a></li>
+<li class="level1"><a href="#public-functions">Public Functions</a></li>
+<li class="level1"><a href="#static-public-members">Static Public Members</a></li>
+<li class="level1"><a href="#protected-functions">Protected Functions</a></li>
+<li class="level1"><a href="#static-protected-members">Static Protected Members</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">SymbolGroup Class</h1>
+<!-- $$$SymbolGroup-brief -->
+<p>The <a href="symbolgroup.html">SymbolGroup</a> class creates a symbol group storing a tree of expanded symbols rooted on a fake &quot;locals&quot; root element. <a href="#details">More...</a></p>
+<!-- @@@SymbolGroup -->
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">   <span class="preprocessor">#include &lt;SymbolGroup&gt;</span>
+</td></tr><tr><td class="memItemLeft rightAlign topAlign"> Inherited By:</td><td class="memItemRight bottomAlign"> <p><a href="localssymbolgroup.html">LocalsSymbolGroup</a> and <a href="watchessymbolgroup.html">WatchesSymbolGroup</a></p>
+</td></tr></table></div><ul>
+<li><a href="symbolgroup-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="public-types"></a>
+<h2 id="public-types">Public Types</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#AbstractSymbolGroupNodePtrVector-typedef">AbstractSymbolGroupNodePtrVector</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#SymbolParameterVector-typedef">SymbolParameterVector</a></b></td></tr>
+</table></div>
+<a name="public-functions"></a>
+<h2 id="public-functions">Public Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> virtual </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#dtor.SymbolGroup">~SymbolGroup</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#accept">accept</a></b>(SymbolGroupNodeVisitor &amp;<i>visitor</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupNode *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#addSymbol">addSymbol</a></b>(const std::string &amp;<i>module</i>, const std::string &amp;<i>name</i>, const std::string &amp;<i>displayName</i>, const std::string &amp;<i>iname</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupNode *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#addSymbol-1">addSymbol</a></b>(const std::string &amp;<i>module</i>, const std::string &amp;<i>name</i>, const std::string &amp;<i>iname</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#assign">assign</a></b>(const std::string &amp;<i>node</i>, int <i>valueEncoding</i>, const std::string &amp;<i>value</i>, const SymbolGroupValueContext &amp;<i>ctx</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#collapse">collapse</a></b>(const std::string &amp;<i>node</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#debug">debug</a></b>(const std::string &amp;<i>iname</i> = std::string(), const std::string &amp;<i>filter</i> = std::string(), unsigned int <i>verbosity</i> = 0) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> CIDebugSymbolGroup *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#debugSymbolGroup">debugSymbolGroup</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#dump">dump</a></b>(const SymbolGroupValueContext &amp;<i>ctx</i>, const DumpParameters &amp;<i>p</i> = DumpParameters()) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#dump-1">dump</a></b>(const std::string &amp;<i>iname</i>, const SymbolGroupValueContext &amp;<i>ctx</i>, const DumpParameters &amp;<i>p</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#expand">expand</a></b>(const std::string &amp;<i>node</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#expandList">expandList</a></b>(const int &amp;<i>nodes</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#expandListRunComplexDumpers">expandListRunComplexDumpers</a></b>(const int &amp;<i>nodes</i>, const SymbolGroupValueContext &amp;<i>ctx</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#expandRunComplexDumpers">expandRunComplexDumpers</a></b>(const std::string &amp;<i>node</i>, const SymbolGroupValueContext &amp;<i>ctx</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> AbstractSymbolGroupNode *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#find">find</a></b>(const std::string &amp;<i>iname</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#markUninitialized">markUninitialized</a></b>(const int &amp;<i>nodes</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupNode *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#root">root</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> const SymbolGroupNode *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#root-1">root</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#typeCast">typeCast</a></b>(const std::string &amp;<i>iname</i>, const std::string &amp;<i>desiredType</i>, std::string *<i>errorMessage</i>)</td></tr>
+</table></div>
+<a name="static-public-members"></a>
+<h2 id="static-public-members">Static Public Members</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#getSymbolParameters">getSymbolParameters</a></b>(CIDebugSymbolGroup *<i>m_symbolGroup</i>, unsigned long <i>start</i>, unsigned long <i>count</i>, SymbolGroup::SymbolParameterVector *<i>vec</i>, std::string *<i>errorMessage</i>)</td></tr>
+</table></div>
+<a name="protected-functions"></a>
+<h2 id="protected-functions">Protected Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#SymbolGroup">SymbolGroup</a></b>(<i>CIDebugSymbolGroup *</i>, const SymbolGroup::SymbolParameterVector &amp;<i>vec</i>, const std::string &amp;<i>rootModule</i>, const char *<i>rootName</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#removeSymbol">removeSymbol</a></b>(AbstractSymbolGroupNode *<i>n</i>, std::string *<i>errorMessage</i>)</td></tr>
+</table></div>
+<a name="static-protected-members"></a>
+<h2 id="static-protected-members">Static Protected Members</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroup.html#getSymbolParameters-1">getSymbolParameters</a></b>(CIDebugSymbolGroup *<i>m_symbolGroup</i>, SymbolGroup::SymbolParameterVector *<i>vec</i>, std::string *<i>errorMessage</i>)</td></tr>
+</table></div>
+<a name="details"></a>
+<!-- $$$SymbolGroup-description -->
+<div class="descr">
+<h2 id="details">Detailed Description</h2>
+<p>The <a href="symbolgroup.html">SymbolGroup</a> class creates a symbol group storing a tree of expanded symbols rooted on a fake &quot;locals&quot; root element.</p>
+<p>Provides a <a href="symbolgroup.html#find">find</a>() function based on inames (&quot;locals.this.i1.data&quot;) and <a href="symbolgroup.html#dump">dump</a>() functions used for GDBMI-format dumping and debug helpers. Qt Creator's WatchModel is fed from this class. It basically represents the symbol group tree with some additional node types (Reference and Map Node types.</p>
+</div>
+<!-- @@@SymbolGroup -->
+<div class="types">
+<h2>Member Type Documentation</h2>
+<!-- $$$AbstractSymbolGroupNodePtrVector -->
+<h3 class="fn" id="AbstractSymbolGroupNodePtrVector-typedef"><a name="AbstractSymbolGroupNodePtrVector-typedef"></a>typedef SymbolGroup::<span class="name">AbstractSymbolGroupNodePtrVector</span></h3>
+<!-- @@@AbstractSymbolGroupNodePtrVector -->
+<!-- $$$SymbolParameterVector -->
+<h3 class="fn" id="SymbolParameterVector-typedef"><a name="SymbolParameterVector-typedef"></a>typedef SymbolGroup::<span class="name">SymbolParameterVector</span></h3>
+<!-- @@@SymbolParameterVector -->
+</div>
+<div class="func">
+<h2>Member Function Documentation</h2>
+<!-- $$$SymbolGroup[overload1]$$$SymbolGroupCIDebugSymbolGroup*constSymbolGroup::SymbolParameterVector&conststd::string&constchar* -->
+<h3 class="fn" id="SymbolGroup"><a name="SymbolGroup"></a><code>[protected] </code>SymbolGroup::<span class="name">SymbolGroup</span>(<i>CIDebugSymbolGroup *</i>, const <span class="type"><a href="symbolgroup.html#SymbolParameterVector-typedef">SymbolGroup::SymbolParameterVector</a></span> &amp;<i>vec</i>, const <span class="type">std::string</span> &amp;<i>rootModule</i>, const <span class="type">char</span> *<i>rootName</i>)</h3>
+<p>Default constructs an instance of SymbolGroup.</p><!-- @@@SymbolGroup -->
+<!-- $$$~SymbolGroup[overload1]$$$~SymbolGroup -->
+<h3 class="fn" id="dtor.SymbolGroup"><a name="dtor.SymbolGroup"></a><code>[virtual] </code>SymbolGroup::<span class="name">~SymbolGroup</span>()</h3>
+<p>Destroys the instance of SymbolGroup. The destructor is virtual.</p><!-- @@@~SymbolGroup -->
+<!-- $$$accept[overload1]$$$acceptSymbolGroupNodeVisitor& -->
+<h3 class="fn" id="accept"><a name="accept"></a><span class="type">bool</span> SymbolGroup::<span class="name">accept</span>(<span class="type"><a href="symbolgroupnodevisitor.html">SymbolGroupNodeVisitor</a></span> &amp;<i>visitor</i>) const</h3>
+<!-- @@@accept -->
+<!-- $$$addSymbol[overload1]$$$addSymbolconststd::string&conststd::string&conststd::string&conststd::string&std::string* -->
+<h3 class="fn" id="addSymbol"><a name="addSymbol"></a><span class="type"><a href="symbolgroupnode.html">SymbolGroupNode</a></span> *SymbolGroup::<span class="name">addSymbol</span>(const <span class="type">std::string</span> &amp;<i>module</i>, const <span class="type">std::string</span> &amp;<i>name</i>, const <span class="type">std::string</span> &amp;<i>displayName</i>, const <span class="type">std::string</span> &amp;<i>iname</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@addSymbol -->
+<!-- $$$addSymbol$$$addSymbolconststd::string&conststd::string&conststd::string&std::string* -->
+<h3 class="fn" id="addSymbol-1"><a name="addSymbol-1"></a><span class="type"><a href="symbolgroupnode.html">SymbolGroupNode</a></span> *SymbolGroup::<span class="name">addSymbol</span>(const <span class="type">std::string</span> &amp;<i>module</i>, const <span class="type">std::string</span> &amp;<i>name</i>, const <span class="type">std::string</span> &amp;<i>iname</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@addSymbol -->
+<!-- $$$assign[overload1]$$$assignconststd::string&intconststd::string&constSymbolGroupValueContext&std::string* -->
+<h3 class="fn" id="assign"><a name="assign"></a><span class="type">bool</span> SymbolGroup::<span class="name">assign</span>(const <span class="type">std::string</span> &amp;<i>node</i>, <span class="type">int</span> <i>valueEncoding</i>, const <span class="type">std::string</span> &amp;<i>value</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>ctx</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@assign -->
+<!-- $$$collapse[overload1]$$$collapseconststd::string&std::string* -->
+<h3 class="fn" id="collapse"><a name="collapse"></a><span class="type">bool</span> SymbolGroup::<span class="name">collapse</span>(const <span class="type">std::string</span> &amp;<i>node</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@collapse -->
+<!-- $$$debug[overload1]$$$debugconststd::string&conststd::string&unsignedint -->
+<h3 class="fn" id="debug"><a name="debug"></a><span class="type">std::string</span> SymbolGroup::<span class="name">debug</span>(const <span class="type">std::string</span> &amp;<i>iname</i> = std::string(), const <span class="type">std::string</span> &amp;<i>filter</i> = std::string(), <span class="type">unsigned</span> <span class="type">int</span> <i>verbosity</i> = 0) const</h3>
+<!-- @@@debug -->
+<!-- $$$debugSymbolGroup[overload1]$$$debugSymbolGroup -->
+<h3 class="fn" id="debugSymbolGroup"><a name="debugSymbolGroup"></a><span class="type">CIDebugSymbolGroup</span> *SymbolGroup::<span class="name">debugSymbolGroup</span>() const</h3>
+<!-- @@@debugSymbolGroup -->
+<!-- $$$dump[overload1]$$$dumpconstSymbolGroupValueContext&constDumpParameters& -->
+<h3 class="fn" id="dump"><a name="dump"></a><span class="type">std::string</span> SymbolGroup::<span class="name">dump</span>(const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>ctx</i>, const <span class="type"><a href="dumpparameters.html">DumpParameters</a></span> &amp;<i>p</i> = DumpParameters()) const</h3>
+<!-- @@@dump -->
+<!-- $$$dump$$$dumpconststd::string&constSymbolGroupValueContext&constDumpParameters&std::string* -->
+<h3 class="fn" id="dump-1"><a name="dump-1"></a><span class="type">std::string</span> SymbolGroup::<span class="name">dump</span>(const <span class="type">std::string</span> &amp;<i>iname</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>ctx</i>, const <span class="type"><a href="dumpparameters.html">DumpParameters</a></span> &amp;<i>p</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@dump -->
+<!-- $$$expand[overload1]$$$expandconststd::string&std::string* -->
+<h3 class="fn" id="expand"><a name="expand"></a><span class="type">bool</span> SymbolGroup::<span class="name">expand</span>(const <span class="type">std::string</span> &amp;<i>node</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@expand -->
+<!-- $$$expandList[overload1]$$$expandListconstint&std::string* -->
+<h3 class="fn" id="expandList"><a name="expandList"></a><span class="type">unsigned</span> <span class="type">int</span> SymbolGroup::<span class="name">expandList</span>(const <span class="type">int</span> &amp;<i>nodes</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@expandList -->
+<!-- $$$expandListRunComplexDumpers[overload1]$$$expandListRunComplexDumpersconstint&constSymbolGroupValueContext&std::string* -->
+<h3 class="fn" id="expandListRunComplexDumpers"><a name="expandListRunComplexDumpers"></a><span class="type">unsigned</span> <span class="type">int</span> SymbolGroup::<span class="name">expandListRunComplexDumpers</span>(const <span class="type">int</span> &amp;<i>nodes</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>ctx</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@expandListRunComplexDumpers -->
+<!-- $$$expandRunComplexDumpers[overload1]$$$expandRunComplexDumpersconststd::string&constSymbolGroupValueContext&std::string* -->
+<h3 class="fn" id="expandRunComplexDumpers"><a name="expandRunComplexDumpers"></a><span class="type">bool</span> SymbolGroup::<span class="name">expandRunComplexDumpers</span>(const <span class="type">std::string</span> &amp;<i>node</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>ctx</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@expandRunComplexDumpers -->
+<!-- $$$find[overload1]$$$findconststd::string& -->
+<h3 class="fn" id="find"><a name="find"></a><span class="type"><a href="abstractsymbolgroupnode.html">AbstractSymbolGroupNode</a></span> *SymbolGroup::<span class="name">find</span>(const <span class="type">std::string</span> &amp;<i>iname</i>) const</h3>
+<!-- @@@find -->
+<!-- $$$getSymbolParameters[overload1]$$$getSymbolParametersCIDebugSymbolGroup*unsignedlongunsignedlongSymbolGroup::SymbolParameterVector*std::string* -->
+<h3 class="fn" id="getSymbolParameters"><a name="getSymbolParameters"></a><code>[static] </code><span class="type">bool</span> SymbolGroup::<span class="name">getSymbolParameters</span>(<span class="type">CIDebugSymbolGroup</span> *<i>m_symbolGroup</i>, <span class="type">unsigned</span> <span class="type">long</span> <i>start</i>, <span class="type">unsigned</span> <span class="type">long</span> <i>count</i>, <span class="type"><a href="symbolgroup.html#SymbolParameterVector-typedef">SymbolGroup::SymbolParameterVector</a></span> *<i>vec</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@getSymbolParameters -->
+<!-- $$$getSymbolParameters$$$getSymbolParametersCIDebugSymbolGroup*SymbolGroup::SymbolParameterVector*std::string* -->
+<h3 class="fn" id="getSymbolParameters-1"><a name="getSymbolParameters-1"></a><code>[static protected] </code><span class="type">bool</span> SymbolGroup::<span class="name">getSymbolParameters</span>(<span class="type">CIDebugSymbolGroup</span> *<i>m_symbolGroup</i>, <span class="type"><a href="symbolgroup.html#SymbolParameterVector-typedef">SymbolGroup::SymbolParameterVector</a></span> *<i>vec</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@getSymbolParameters -->
+<!-- $$$markUninitialized[overload1]$$$markUninitializedconstint& -->
+<h3 class="fn" id="markUninitialized"><a name="markUninitialized"></a><span class="type">void</span> SymbolGroup::<span class="name">markUninitialized</span>(const <span class="type">int</span> &amp;<i>nodes</i>)</h3>
+<!-- @@@markUninitialized -->
+<!-- $$$removeSymbol[overload1]$$$removeSymbolAbstractSymbolGroupNode*std::string* -->
+<h3 class="fn" id="removeSymbol"><a name="removeSymbol"></a><code>[protected] </code><span class="type">bool</span> SymbolGroup::<span class="name">removeSymbol</span>(<span class="type"><a href="abstractsymbolgroupnode.html">AbstractSymbolGroupNode</a></span> *<i>n</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@removeSymbol -->
+<!-- $$$root[overload1]$$$root -->
+<h3 class="fn" id="root"><a name="root"></a><span class="type"><a href="symbolgroupnode.html">SymbolGroupNode</a></span> *SymbolGroup::<span class="name">root</span>()</h3>
+<!-- @@@root -->
+<!-- $$$root$$$root -->
+<h3 class="fn" id="root-1"><a name="root-1"></a>const <span class="type"><a href="symbolgroupnode.html">SymbolGroupNode</a></span> *SymbolGroup::<span class="name">root</span>() const</h3>
+<!-- @@@root -->
+<!-- $$$typeCast[overload1]$$$typeCastconststd::string&conststd::string&std::string* -->
+<h3 class="fn" id="typeCast"><a name="typeCast"></a><span class="type">bool</span> SymbolGroup::<span class="name">typeCast</span>(const <span class="type">std::string</span> &amp;<i>iname</i>, const <span class="type">std::string</span> &amp;<i>desiredType</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@typeCast -->
+</div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

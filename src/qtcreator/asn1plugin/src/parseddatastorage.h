@@ -35,8 +35,6 @@
 
 #if QTC_VERSION == 408
 
-#include <utils/filepath.h>
-
 #include "asn1/file.h"
 #include "asn1/root.h"
 

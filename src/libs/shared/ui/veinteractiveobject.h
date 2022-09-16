@@ -64,7 +64,7 @@ public:
     virtual void childBoundingBoxChanged();
 
 Q_SIGNALS:
-    void clicked();
+    void clicked(const QPointF &scenePos);
     void doubleClicked();
 
 public Q_SLOTS:

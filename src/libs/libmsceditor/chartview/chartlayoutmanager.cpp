@@ -20,7 +20,6 @@
 #include "actionitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
-#include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
 #include "chartverticalcheck.h"
@@ -38,10 +37,8 @@
 #include "msccomment.h"
 #include "msccondition.h"
 #include "msccoregion.h"
-#include "msccreate.h"
 #include "mscinstance.h"
 #include "msctimer.h"
-#include "systemchecks.h"
 #include "timeritem.h"
 #include "ui/graphicsscenebase.h"
 
@@ -1863,7 +1860,11 @@ void insertEntity(QMap<int, msc::MscInstanceEvent *> &events, int key, msc::MscI
  */
 void ChartLayoutManager::setSystemChecker(SystemChecks *checker)
 {
+    if (checker == d->m_systemChecker) {
+        return;
+    }
     d->m_systemChecker = checker;
+    Q_EMIT systemCheckerChanged(d->m_systemChecker);
 }
 
 /*!

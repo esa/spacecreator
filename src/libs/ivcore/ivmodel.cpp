@@ -24,7 +24,6 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivarchetypelibraryreference.h"
-#include "ivnamevalidator.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 

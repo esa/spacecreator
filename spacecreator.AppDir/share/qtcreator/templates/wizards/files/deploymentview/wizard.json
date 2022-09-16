@@ -1,0 +1,41 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ ],
+    "id": "ESA.DeploymentViewXML",
+    "category": "X.SpaceCreator",
+    "trDescription": "Creates an empty deployment view file.",
+    "trDisplayName": "Deployment View File",
+    "trDisplayCategory": "Space Creator",
+    "icon": "icon.png",
+    "platformIndependent": true,
+
+    "options": [
+        { "key": "InitialFileName", "value": "deploymentview.dv.xml" }
+    ],
+
+    "pages" :
+    [
+        {
+            "trDisplayName": "Location",
+            "trShortTitle": "Location",
+            "typeId": "File"
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators" :
+    [
+        {
+            "typeId": "File",
+            "data":
+            {
+                "source": "deploymentview.dv.xml",
+                "target": "%{JS: Util.fileName('%{TargetPath}', '%{JS: Util.preferredSuffix('text/xml')}')}",
+                "openInEditor": true
+            }
+        }
+    ]
+}

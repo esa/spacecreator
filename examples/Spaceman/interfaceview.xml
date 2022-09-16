@@ -1,0 +1,104 @@
+<InterfaceView asn1file="Spaceman.asn">
+<Function name="Britta" url="" is_type="NO" instance_of="" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="-800 -3600 37800 113800"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+<Required_Interface name="give_payraise" kind="Sporadic" group_name="group" enable_multicast="false" layer="default" miat="0" priority="1" wcet="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="amount" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="37800 27800"/>
+    <Property name="Taste::RootCoordinates" value="-50700 -23200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Required_Interface>
+
+<Required_Interface name="hello" kind="Sporadic" group_name="group" enable_multicast="false" layer="default" miat="0" priority="1" wcet="0" stack_size="50" queue_size="1">
+    <Property name="Taste::coordinates" value="37800 30800"/>
+    <Property name="Taste::RootCoordinates" value="-50700 -19000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="HR" url="" is_type="NO" instance_of="" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="62000 -3100 83700 113400"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+<Provided_Interface name="give_payraise" kind="Sporadic" group_name="group" enable_multicast="false" layer="default" miat="0" priority="1" wcet="0" stack_size="50" queue_size="1">
+    <Input_Parameter name="amount" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="62000 27200"/>
+    <Property name="Taste::RootCoordinates" value="-50700 -23200"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Provided_Interface>
+
+<Provided_Interface name="hello" kind="Sporadic" group_name="group" enable_multicast="false" layer="default" miat="0" priority="1" wcet="0" stack_size="50" queue_size="1">
+    <Property name="Taste::coordinates" value="62000 30500"/>
+    <Property name="Taste::RootCoordinates" value="-50700 -19000"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Provided_Interface>
+
+<Function name="Function_3" url="" is_type="NO" instance_of="" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="-40700 -52100 -20700 -44100"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+<Required_Interface name="PI_1" kind="Sporadic" enable_multicast="false" layer="default" miat="0" priority="1" wcet="0" stack_size="50" queue_size="1">
+    <Property name="Taste::coordinates" value="-20700 -47000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Function_4" url="" is_type="NO" instance_of="" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="-8200 -51800 11800 -43800"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+<Provided_Interface name="PI_1" kind="Sporadic" enable_multicast="false" layer="default" miat="0" priority="1" wcet="0" stack_size="50" queue_size="1">
+    <Property name="Taste::coordinates" value="-8200 -47200"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection  name="Function_3.RI_1 -&gt; Function_4.PI_1">
+    <Source func_name="Function_3" ri_name="PI_1"/>
+    <Target func_name="Function_4" pi_name="PI_1"/>
+    <Property name="Taste::coordinates" value="-20100 -47000 -8500 -47200"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Connection>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<ConnectionGroup name="group">
+    <Property name="Taste::coordinates" value="38400 30800 61700 30500"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+<Connection  name="Britta.hello -&gt; HR.hello" group_name="group">
+    <Source func_name="Britta" ri_name="hello"/>
+    <Target func_name="HR" pi_name="hello"/>
+    <Property name="Taste::coordinates" value="38400 30800 61700 30500"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Connection>
+
+<Connection  name=". -&gt; ." group_name="group">
+    <Source func_name="Britta" ri_name="give_payraise"/>
+    <Target func_name="HR" pi_name="give_payraise"/>
+    <Property name="Taste::coordinates" value="38400 27800 61700 27200"/>
+    <Property name="Taste::InnerCoordinates" value=""/>
+</Connection>
+
+</ConnectionGroup>
+
+<Layer name="default"/>
+
+</InterfaceView>

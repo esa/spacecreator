@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- symbolgroup.cpp -->
+  <title>List of All Members for WatchesSymbolGroup | Extending Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="extending-index.html">Extending Qt Creator Manual</a></td><td >WatchesSymbolGroup</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="extending-index.html">Extending Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar"><div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">List of All Members for WatchesSymbolGroup</h1>
+<p>This is the complete list of members for <a href="watchessymbolgroup.html">WatchesSymbolGroup</a>, including inherited members.</p>
+<div class="table"><table class="propsummary">
+<tr><td class="topAlign"><ul>
+<li class="fn">typedef <span class="name"><b><a href="symbolgroup.html#AbstractSymbolGroupNodePtrVector-typedef">AbstractSymbolGroupNodePtrVector</a></b></span></li>
+<li class="fn">typedef <span class="name"><b><a href="watchessymbolgroup.html#InameExpressionMap-typedef">InameExpressionMap</a></b></span></li>
+<li class="fn">typedef <span class="name"><b><a href="symbolgroup.html#SymbolParameterVector-typedef">SymbolParameterVector</a></b></span></li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#accept">accept</a></b></span>(SymbolGroupNodeVisitor &amp;) const : bool</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#addSymbol">addSymbol</a></b></span>(const std::string &amp;, const std::string &amp;, const std::string &amp;, const std::string &amp;, std::string *) : SymbolGroupNode *</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#addSymbol-1">addSymbol</a></b></span>(const std::string &amp;, const std::string &amp;, const std::string &amp;, std::string *) : SymbolGroupNode *</li>
+<li class="fn"><span class="name"><b><a href="watchessymbolgroup.html#addWatch">addWatch</a></b></span>(CIDebugSymbols *, std::string , const std::string &amp;, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#assign">assign</a></b></span>(const std::string &amp;, int , const std::string &amp;, const SymbolGroupValueContext &amp;, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#collapse">collapse</a></b></span>(const std::string &amp;, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="watchessymbolgroup.html#create">create</a></b></span>(<i>CIDebugSymbols *</i>, std::string *) : WatchesSymbolGroup *</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#debug">debug</a></b></span>(const std::string &amp;, const std::string &amp;, unsigned int ) const : std::string</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#debugSymbolGroup">debugSymbolGroup</a></b></span>() const : CIDebugSymbolGroup *</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#dump">dump</a></b></span>(const SymbolGroupValueContext &amp;, const DumpParameters &amp;) const : std::string</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#dump-1">dump</a></b></span>(const std::string &amp;, const SymbolGroupValueContext &amp;, const DumpParameters &amp;, std::string *) : std::string</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#expand">expand</a></b></span>(const std::string &amp;, std::string *) : bool</li>
+</ul></td><td class="topAlign"><ul>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#expandList">expandList</a></b></span>(const int &amp;, std::string *) : unsigned int</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#expandListRunComplexDumpers">expandListRunComplexDumpers</a></b></span>(const int &amp;, const SymbolGroupValueContext &amp;, std::string *) : unsigned int</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#expandRunComplexDumpers">expandRunComplexDumpers</a></b></span>(const std::string &amp;, const SymbolGroupValueContext &amp;, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#find">find</a></b></span>(const std::string &amp;) const : AbstractSymbolGroupNode *</li>
+<li class="fn"><span class="name"><b><a href="watchessymbolgroup.html#fixWatchExpression">fixWatchExpression</a></b></span>(CIDebugSymbols *, const std::string &amp;) : std::string</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#getSymbolParameters">getSymbolParameters</a></b></span>(CIDebugSymbolGroup *, unsigned long , unsigned long , SymbolGroup::SymbolParameterVector *, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#getSymbolParameters-1">getSymbolParameters</a></b></span>(CIDebugSymbolGroup *, SymbolGroup::SymbolParameterVector *, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="watchessymbolgroup.html#isWatchIname">isWatchIname</a></b></span>(const std::string &amp;) : bool</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#markUninitialized">markUninitialized</a></b></span>(const int &amp;)</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#removeSymbol">removeSymbol</a></b></span>(AbstractSymbolGroupNode *, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#root">root</a></b></span>() : SymbolGroupNode *</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#root-1">root</a></b></span>() const : const SymbolGroupNode *</li>
+<li class="fn"><span class="name"><b><a href="watchessymbolgroup.html#synchronize">synchronize</a></b></span>(CIDebugSymbols *, const WatchesSymbolGroup::InameExpressionMap &amp;, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="symbolgroup.html#typeCast">typeCast</a></b></span>(const std::string &amp;, const std::string &amp;, std::string *) : bool</li>
+<li class="fn"><span class="name"><b><a href="watchessymbolgroup.html#watchInamePrefix-var">watchInamePrefix</a></b></span> : const char *</li>
+</ul>
+</td></tr>
+</table></div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

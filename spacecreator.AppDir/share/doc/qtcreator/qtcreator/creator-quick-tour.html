@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- creator-ui.qdoc -->
+  <title>User Interface | Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="index.html">Qt Creator Manual</a></td><td >User Interface</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="index.html">Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+  <link rel="prev" href="creator-overview.html" />
+  <link rel="next" href="creator-configuring.html" />
+<p class="naviNextPrevious headerNavi">
+<a class="prevPage" href="creator-overview.html">IDE Overview</a>
+<span class="naviSeparator">  &#9702;  </span>
+<a class="nextPage" href="creator-configuring.html">Configuring Qt Creator</a>
+</p><p/>
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#modes">Modes</a></li>
+<li class="level1"><a href="#browsing-project-contents">Browsing Project Contents</a></li>
+<li class="level2"><a href="#viewing-project-files">Viewing Project Files</a></li>
+<li class="level2"><a href="#viewing-the-file-system">Viewing the File System</a></li>
+<li class="level2"><a href="#viewing-qml-types">Viewing QML Types</a></li>
+<li class="level2"><a href="#viewing-the-class-hierarchy">Viewing the Class Hierarchy</a></li>
+<li class="level2"><a href="#viewing-type-hierarchy">Viewing Type Hierarchy</a></li>
+<li class="level2"><a href="#viewing-include-hierarchy">Viewing Include Hierarchy</a></li>
+<li class="level1"><a href="#viewing-output">Viewing Output</a></li>
+<li class="level2"><a href="#issues">Issues</a></li>
+<li class="level2"><a href="#search-results">Search Results</a></li>
+<li class="level2"><a href="#application-output">Application Output</a></li>
+<li class="level2"><a href="#compile-output">Compile Output</a></li>
+<li class="level2"><a href="#to-do-entries">To-Do Entries</a></li>
+<li class="level1"><a href="#changing-languages">Changing Languages</a></li>
+<li class="level1"><a href="#viewing-images">Viewing Images</a></li>
+<li class="level2"><a href="#exporting-svg-images">Exporting SVG Images</a></li>
+<li class="level1"><a href="#navigating-with-keyboard">Navigating with Keyboard</a></li>
+<li class="level1"><a href="#useful-features">Useful Features</a></li>
+<li class="level1"><a href="#platform-notes">Platform Notes</a></li>
+<li class="level2"><a href="#location-of-functions">Location of Functions</a></li>
+<li class="level2"><a href="#location-of-settings-files">Location of Settings Files</a></li>
+<li class="level2"><a href="#high-dpi-scaling">High DPI Scaling</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">User Interface</h1>
+<span class="subtitle"></span>
+<!-- $$$creator-quick-tour.html-description -->
+<div class="descr"> <a name="details"></a>
+<p>When you start Qt Creator, it opens to the <b>Welcome</b> mode, where you can:</p>
+<ul>
+<li>Open recent sessions and projects</li>
+<li>Create and open projects</li>
+<li>Open tutorials and example projects</li>
+<li>Read news from the online community and Qt blogs</li>
+<li>Create or manage a Qt Account</li>
+</ul>
+<p class="centerAlign"><img src="images/qtcreator-breakdown.png" alt="" /></p><p>You can use the mode selector (1) to change to another Qt Creator mode.</p>
+<p>You can use the kit selector (2) to select the <a href="creator-glossary.html#glossary-buildandrun-kit">kit</a> for running (3), debugging (4), or building (5) the application. Output from these actions is displayed in the output panes (7).</p>
+<p>You can use the locator (6) to to browse through projects, files, classes, functions, documentation, and file systems.</p>
+<a name="modes"></a>
+<h2 id="modes">Modes</h2>
+<p>The mode selector allows you to quickly switch between tasks such as editing project and source files, designing application UIs, configuring how projects are built and executed, and debugging your applications. To change modes, click the icons, or use the <a href="creator-keyboard-shortcuts.html">corresponding keyboard shortcut</a>.</p>
+<p>To hide the mode selector and to save space on the display, select <b>Window</b> &gt; <b>Mode Selector Style</b> &gt; <b>Hidden</b>. To only show icons on the mode selector, select the <b>Icons Only</b> style.</p>
+<p>The following image displays an example application in <b>Edit</b> mode (1) and <b>Design</b> mode (2).</p>
+<p class="centerAlign"><img src="images/qtcreator-qt-quick-editors.png" alt="&quot;Edit mode and Design mode&quot;" /></p><p>You can use Qt Creator in the following modes:</p>
+<ul>
+<li><b>Welcome</b> mode for opening projects.</li>
+<li><b><a href="creator-coding.html">Edit</a></b> mode for editing project and source files.</li>
+<li><b><a href="creator-design-mode.html">Design</a></b> mode for designing and developing application user interfaces. This mode is available for UI files.</li>
+<li><b><a href="creator-debugging.html">Debug</a></b> mode for inspecting the state of your application while debugging and for using code analysis tools to detect memory leaks and profile C++ or QML code.</li>
+<li><b><a href="creator-build-settings.html">Projects</a></b> mode for configuring project building and execution. This mode is available when a project is open.</li>
+<li><b><a href="creator-help-overview.html">Help</a></b> mode for viewing Qt documentation.</li>
+</ul>
+<p>Certain actions in Qt Creator trigger a mode change. Clicking on <b>Debug</b> &gt; <b>Start Debugging</b> &gt; <b>Start Debugging</b> automatically switches to <b>Debug</b> mode.</p>
+<a name="browsing-project-contents"></a>
+<h2 id="browsing-project-contents">Browsing Project Contents</h2>
+<p>A left and right sidebar are available in most Qt Creator modes. The availability of the sidebars and their contents depend on the mode.</p>
+<p>In the <b>Edit</b> mode, you can use the sidebars to browse the project contents.</p>
+<p class="centerAlign"><img src="images/qtcreator-sidebar.png" alt="" /></p><p>You can select the contents of the sidebars in the sidebar menu (1):</p>
+<ul>
+<li><b>Projects</b> shows a list of projects open in the current session and the project files needed by the build system.</li>
+<li><b>Open Documents</b> shows currently open files.</li>
+<li><b>Bookmarks</b> shows all bookmarks for the current session.</li>
+<li><b>File System</b> shows all files in the currently selected directory.</li>
+<li><b>Git Branches</b> shows the local and remote brances for the project in the Git version control system. For more information, see <a href="creator-vcs-git.html#working-with-branches">Working with Branches</a>.</li>
+<li><b>Outline</b> shows an overview of defined types and other symbols, as well as their properties and hierarchy in a source file.</li>
+</ul>
+<p>The following views display additional information about C++ code:</p>
+<ul>
+<li><b>Class View</b> shows the class hierarchy of the currently open projects.</li>
+<li><b>Tests</b> lists autotests and Qt Quick tests in the project. For more information, see <a href="creator-autotest.html">Running Autotests</a>.</li>
+<li><b>Type Hierarchy</b> shows the base classes of a class.</li>
+<li><b>Include Hierarchy</b> shows which files are included in the current file and which files include the current file.</li>
+</ul>
+<p>For more information about the sidebar views that are only available when editing QML files in the Design mode, see <a href="creator-using-qt-quick-designer.html">Editing QML Files in Design Mode</a>.</p>
+<p>You can change the view of the sidebars in the following ways:</p>
+<ul>
+<li>To toggle the left sidebar, click <img src="images/leftsidebaricon.png" alt="" /> (<b>Hide Left Sidebar/Show Left Sidebar</b>) or press <b>Alt+0</b> (<b>Cmd+0</b> on macOS). To toggle the right sidebar, click <img src="images/rightsidebaricon.png" alt="" /> (<b>Hide Right Sidebar/Show Right Sidebar</b>) or press <b>Alt+Shift+0</b> (<b>Cmd+Shift+0</b> on macOS).</li>
+<li>To split a sidebar, click <img src="images/splitbutton_horizontal.png" alt="" /> (<b>Split</b>). Select new content to view in the split view.</li>
+<li>To close a sidebar view, click <img src="images/splitbutton_closetop.png" alt="" /> (<b>Close</b>).</li>
+</ul>
+<p>The additional options in each view are described in the following sections.</p>
+<p>In some views, right-clicking opens a context menu that contains functions for managing the objects listed in the view.</p>
+<a name="viewing-project-files"></a>
+<h3 >Viewing Project Files</h3>
+<p>The sidebar displays projects in a project tree. The project tree contains a list of all projects open in the current session. For each project, the tree visualizes the build system structure of the project and lists all files that are part of the project.</p>
+<p>Some build systems support adding and removing files to a project in Qt Creator (currently qmake and Qbs). The faithful display of the project structure allows to specify exactly where a new file should be placed in the build system. If the project is under version control, information from the version control system might be displayed in brackets after the project name. This is currently implemented for Git (the branch name or a tag is displayed) and ClearCase (the view name is displayed). You can use the project tree in the following ways:</p>
+<ul>
+<li>To open files that belong to a project, double-click them in the project tree. Files open in the appropriate editor, according to the file type. For example, code source files open in the code editor.</li>
+<li>To bring up a context menu containing the actions most commonly needed, right-click an item in the project tree. For example, through the menu of the project root directory you can, among other actions, run and close the project.</li>
+<li>To hide the categories and sort project files alphabetically, click <img src="images/filtericon.png" alt="" /> (<b>Filter Tree</b>) and select <b>Simplify Tree</b>.</li>
+<li>To hide source files which are automatically generated by the build system, select <b>Filter Tree &gt; Hide Generated Files</b>.</li>
+<li>To stop synchronizing the position in the project tree with the file currently opened in the editor, deselect <img src="images/linkicon.png" alt="" /> (<b>Synchronize with Editor</b>). You can specify a keyboard shortcut to use when synchronization is needed. Select <b>Tools</b> &gt; <b>Options</b> &gt; <b>Environment</b> &gt; <b>Keyboard</b>, and then search for <b>Show in Explorer</b>.</li>
+<li>To see the absolute path of a file, move the mouse pointer over the file name.</li>
+</ul>
+<p>Files that are not sources or data can be still included into a project's distribution tarball by adding their paths to the <code>DISTFILES</code> variable in the .pro file. This way they also become known to Qt Creator, so that they are visible in the <b>Projects</b> view and are known to the locator and search. The <b>Projects</b> view contains context menus for managing projects, subprojects, folders, and files. The following functions are available for managing projects and subprojects:</p>
+<ul>
+<li>Set a project as the active project.</li>
+<li>Execute the <b>Build</b> menu commands.</li>
+<li>Create new files. For more information, see <a href="creator-project-creating.html#adding-files-to-projects">Adding Files to Projects</a>.</li>
+<li>Add existing files and directories.</li>
+<li>Add libraries. For more information, see <a href="creator-project-qmake-libraries.html">Adding Libraries to Projects</a>.</li>
+<li>Add and remove subprojects.</li>
+<li>Search from the selected directory.</li>
+<li>Close projects.</li>
+</ul>
+<p>For managing files and directories, the same functions are available as in the <b>File System</b> view. In addition, you can remove and rename files.</p>
+<a name="viewing-the-file-system"></a>
+<h3 >Viewing the File System</h3>
+<p>If you cannot see a file in the <b>Projects</b> view, switch to the <b>File System</b> view, which shows all the files in the file system.</p>
+<p class="centerAlign"><img src="images/qtcreator-filesystem-view.png" alt="" /></p><p>By default, the contents of the directory that contains the file currently active in the editor are displayed. To stop the synchronization, delesect the <b>Synchronize Root Directory with Editor</b> button.</p>
+<p>The path to the active file is displayed as bread crumbs. You can move to any directory along the path by clicking it. To hide the bread crumbs, select <img src="images/filtericon.png" alt="" /> (<b>Options</b>) and then deselect the <b>Show Bread Crumbs</b> check box.</p>
+<p>To move to the root directory of the file system, select <b>Computer</b> in the menu (1). Select <b>Home</b> to move to the user's home directory. Further, you can select a project to move to an open project or <b>Projects</b> to open the <b>Projects</b> view.</p>
+<p>By default, folders are separated from files and listed first in the view. To list all items in alphabetic order, select <b>Options</b> and then deselect the <b>Show Folders on Top</b> check box.</p>
+<p>To also show hidden files, select <b>Options</b> &gt; <b>Show Hidden Files</b>.</p>
+<p>To stop the synchronization with the file currently opened in the editor, deselect <b>Synchronize with Editor</b>.</p>
+<p>Use the context menu functions to:</p>
+<ul>
+<li>Open files with the default editor or some other editor.</li>
+<li>Open a project located in the selected directory.</li>
+<li>Show the file or directory in the file explorer.</li>
+<li>Open a terminal window in the selected directory or in the directory that contains the file. To specify the terminal to use on Linux and macOS, select <b>Tools</b> &gt; <b>Options</b> &gt; <b>Environment</b> &gt; <b>System</b>.</li>
+<li>Search from the selected directory.</li>
+<li>View file properties, such as MIME type, default editor, and size.</li>
+<li>Create new files. For more information, see <a href="creator-project-creating.html#adding-files-to-projects">Adding Files to Projects</a>.</li>
+<li>Rename or remove existing files.</li>
+<li>Create new folders.</li>
+<li>Compare the selected file with the currently open file in the diff editor. For more information, see <a href="creator-diff-editor.html">Comparing Files</a>.</li>
+<li>Display the contents of a particular directory in the view.</li>
+<li>Collapse all open folders.</li>
+</ul>
+<a name="viewing-qml-types"></a>
+<h3 >Viewing QML Types</h3>
+<p>The <b>Outline</b> view shows the type hierarchy in a QML file.</p>
+<ul>
+<li>To see a complete list of all bindings, select <b>Filter Tree</b> &gt; <b>Show All Bindings</b>.</li>
+<li>To stop the synchronization with the QML type selected in the editor, deselect <b>Synchronize with Editor</b>.</li>
+</ul>
+<a name="viewing-the-class-hierarchy"></a>
+<h3 >Viewing the Class Hierarchy</h3>
+<p>The <b>Class View</b> shows the class hierarchy of the currently open projects. To organize the view by subprojects, click <img src="images/qtcreator-show-subprojects.png" alt="" /> (<b>Show Subprojects</b>).</p>
+<p>To visit all parts of a namespace, double-click on the namespace item multiple times.</p>
+<a name="viewing-type-hierarchy"></a>
+<h3 >Viewing Type Hierarchy</h3>
+<p>To view the base classes of a class, right-click the class and select <b>Open Type Hierarchy</b> or press <b>Ctrl+Shift+T</b>.</p>
+<a name="viewing-include-hierarchy"></a>
+<h3 >Viewing Include Hierarchy</h3>
+<p>To view which files are included in the current file and which files include the current file, right-click in the editor and select <b>Open Include Hierarchy</b> or press <b>Ctrl+Shift+I</b>.</p>
+<a name="viewing-output"></a>
+<h2 id="viewing-output">Viewing Output</h2>
+<p>The task pane in Qt Creator can display one of the following panes:</p>
+<ul>
+<li><b>Issues</b></li>
+<li><b>Search Results</b></li>
+<li><b>Application Output</b></li>
+<li><b>Compile Output</b></li>
+<li><b>Debugger Console</b></li>
+<li><b>To-Do Entries</b></li>
+<li><b>Version Control</b></li>
+<li><b>General Messages</b></li>
+<li><b>Test Results</b></li>
+</ul>
+<p>Output panes are available in all <a href="creator-quick-tour.html#modes">modes</a>. Click the name of an output pane to open the pane. To maximize an open output pane, click the <b>Maximize Output Pane</b> button or press <b>Alt+9</b>.</p>
+<p>To search within the <b>Application Output</b> and <b>Compile Output</b> panes, press <b>Ctrl+F</b> when the pane is active. Enter search criteria in the <b>Find</b> field and click the left and right arrows to search down and up in the pane. In these panes, you can also use the zoom buttons to increase and decrease the text size of the output.</p>
+<p>To open the <b>General Messages</b> and <a href="creator-version-control.html">Version Control</a> panes, select <b>Window &gt; Output Panes</b>. To display the <b>To-Do Entries</b> pane, enable the Todo plugin.</p>
+<p>For more information about the <b>Debugger Console</b> view, see <a href="creator-debugging-qml.html#executing-javascript-expressions">Executing JavaScript Expressions</a>.</p>
+<a name="issues"></a>
+<h3 >Issues</h3>
+<p>The <b>Issues</b> pane provides lists of following types of issues:</p>
+<ul>
+<li><b>Build System</b> - Errors and warnings encountered during a build.</li>
+<li><b>Clang Code Model</b> - <a href="creator-clang-codemodel.html">Errors and warnings from the current editor</a>.</li>
+<li><b>Compile</b> - Selected output from the compiler. Open the <b>Compile Output</b> pane for more detailed information.</li>
+<li><b>Debug Information</b> - Lists debug information packages that might be missing.</li>
+<li><b>Debugger</b> - Errors encountered while running the <a href="creator-analyze-mode.html">Valgrind code analysis tools</a>.</li>
+<li><b>Debugger Runtime</b> - Errors encountered when starting Qt Creator. For example, information about missing DLLs.</li>
+<li><b>Deployment</b> - Errors encountered between building an application successfully and starting it on a <a href="creator-glossary.html#glossary-device">device</a>.</li>
+<li><b>My Tasks</b> - Entries from a task list file (.tasks) generated by <a href="creator-task-lists.html">code scanning and analysis tools</a>.</li>
+<li><b>Python</b> - Runtime errors and exceptions of Python scripts.</li>
+<li><b>QML</b> and <b>QML Analysis</b> - <a href="creator-checking-code-syntax.html#javascript-and-qml-error-codes">QML and JavaScript syntax errors</a>.</li>
+</ul>
+<p>The pane filters out irrelevant output from the build tools and presents the issues in an organized way. To further filter the output by type, select <b>Filter Tree</b> and then select a filter.</p>
+<p class="centerAlign"><img src="images/qtcreator-build-issues.png" alt="" /></p><p>Right-clicking on a line brings up a context menu with actions that you can apply to the contents of the line. You can remove a line, copy its contents to the clipboard, or search the Internet for a solution using the contents of the line as search criteria. In addition, you can show a version control annotation view of the line that causes the error message.</p>
+<p>To navigate to the corresponding source code, click an issue or select <b>Show in Editor</b> in the context menu. The entry must contain the name of the file where the issue was found.</p>
+<p>To view more information about an issue in the <b>Compile Output</b> pane, select <b>Show Output</b> in the context menu.</p>
+<p>To jump from one issue to the next or previous one, press <b>F6</b> and <b>Shift+F6</b>.</p>
+<a name="search-results"></a>
+<h3 >Search Results</h3>
+<p>In the <b>Search Results</b> pane, you can search through projects, files on a file system or the currently open files:</p>
+<p class="centerAlign"><img src="images/qtcreator-search-results.png" alt="&quot;Search Results output pane&quot;" /></p><p>The search results are stored in the search history (1) from which you can select earlier searches.</p>
+<p>The figure below shows an example search result for all occurrences of the search string in the specified directory.</p>
+<p class="centerAlign"><img src="images/qtcreator-searchresults.png" alt="" /></p><p>For more information about the different search options, see <a href="creator-editor-finding.html">Finding and Replacing</a>.</p>
+<a name="application-output"></a>
+<h3 >Application Output</h3>
+<p>The <b>Application Output</b> pane displays the status of a program when it is executed, and the debug output.</p>
+<p class="centerAlign"><img src="images/qtcreator-application-output.png" alt="" /></p><p>Select toolbar buttons to run applications, to attach the debugger to the running application, and to stop running or debugging.</p>
+<p>To specify settings for displaying application output, select <b>Tools</b> &gt; <b>Options</b> &gt; <b>Build &amp; Run</b> &gt; <b>General</b>. You can select whether to open the <b>Application Output</b> pane on output when running or debugging applications, to clear old output on a new run, to word-wrap output, and to limit output to the specified number of lines.</p>
+<a name="compile-output"></a>
+<h3 >Compile Output</h3>
+<p>The <b>Compile Output</b> pane provides all output from the compiler. The <b>Compile Output</b> is a more detailed version of information displayed in the <b>Issues</b> pane.</p>
+<p class="centerAlign"><img src="images/qtcreator-compile-pane.png" alt="" /></p><p>Double-click on a file name in an error message to open the file in the code editor.</p>
+<p>Select the <b>Cancel Build</b> button to cancel the build.</p>
+<p>To specify whether to open the <b>Compile Output</b> pane on output when building applications, select <b>Tools</b> &gt; <b>Options</b> &gt; <b>Build &amp; Run</b> &gt; <b>General</b>, and then select the <b>Open Compile Output pane when building</b> check box. In the <b>Limit build output to</b> field, you can specify the maximum amount of build output lines to display in the pane.</p>
+<a name="to-do-entries"></a>
+<h3 >To-Do Entries</h3>
+<p>The <b>To-Do Entries</b> pane lists the BUG, FIXME, NOTE, TODO, and WARNING keywords from the current file, from all project files, or from a subproject. Click the icons on the toolbar to show only the selected keywords.</p>
+<p class="centerAlign"><img src="images/qtcreator-todo-pane.png" alt="" /></p><p>To add keywords, select <b>Tools</b> &gt; <b>Options</b> &gt; <b>To-Do</b> &gt; <b>Add</b>. Set an icon and a line background color for the keyword.</p>
+<p class="centerAlign"><img src="images/qtcreator-todo-options.png" alt="" /></p><p>To change the icon and line background color of the selected keyword, select <b>Edit</b>.</p>
+<p>To remove the selected keyword, select <b>Remove</b>.</p>
+<p>To reset the list to predefined keywords, select <b>Reset</b>. All your changes will be permanently lost.</p>
+<p>To determine whether the keywords in the whole project, in the current file, or in a subproject are displayed by default, select the appropriate option in the <b>Scanning scope</b> group.</p>
+<p>To exclude files from scanning, select <b>Project Settings</b> &gt; <b>To-Do</b> in the <b>Projects</b> mode. Select <b>Add</b> and enter a regular expression that matches the path to files to exclude. Use a forward slash (/) as a separator in the path also on Windows.</p>
+<p>The Todo plugin is disabled by default. To enable the plugin, select <b>Help</b> &gt; <b>About Plugins</b> &gt; <b>Utilities</b> &gt; <b>Todo</b> and restart Qt Creator.</p>
+<p>In addition, you can open task list files generated by code scanning and analysis tools in the <b>Issues</b> pane. For more information, see <a href="creator-task-lists.html">Showing Task List Files in Issues Pane</a>.</p>
+<a name="changing-languages"></a>
+<h2 id="changing-languages">Changing Languages</h2>
+<p>Qt Creator has been localized into several languages. If the system language is one of the supported languages, it is automatically selected. To change the language, select <b>Tools &gt; Options &gt; Environment</b> and select a language in the <b>Language</b> field. The change takes effect after you restart Qt Creator.</p>
+<a name="viewing-images"></a>
+<h2 id="viewing-images">Viewing Images</h2>
+<p>Qt Creator opens image files in the image viewer.</p>
+<p class="centerAlign"><img src="images/qtcreator-image-viewer.png" alt="&quot;Image viewer&quot;" /></p><p>Use the toolbar buttons (1) or <a href="creator-keyboard-shortcuts.html">keyboard shortcuts</a> to:</p>
+<ul>
+<li>Export SVG images to pixmaps</li>
+<li>Switch between background and outline modes</li>
+<li>Zoom in and out</li>
+<li>Fit images to screen</li>
+<li>Return to original size</li>
+<li>Play and pause animated GIF and MNG images</li>
+</ul>
+<a name="exporting-svg-images"></a>
+<h3 >Exporting SVG Images</h3>
+<p>If you receive a freely scalable icon in the SVG format from an UI designer, you can export it to several images of different sizes to create a set of pixmaps. You can then use <a href="http://doc.qt.io/qt-5/qicon.html#addPixmap">QIcon::addPixmap</a>() to add the pixmaps to icons in different modes and states.</p>
+<a name="navigating-with-keyboard"></a>
+<h2 id="navigating-with-keyboard">Navigating with Keyboard</h2>
+<p>Qt Creator caters not only to developers who are used to using the mouse, but also to developers who are more comfortable with the keyboard. A wide range of <a href="creator-keyboard-shortcuts.html">keyboard</a> and <a href="creator-editor-locator.html">navigation</a> shortcuts are available to help speed up the process of developing your application.</p>
+<a name="useful-features"></a>
+<h2 id="useful-features">Useful Features</h2>
+<p>For a list of useful Qt Creator features described in other parts of the documentation, see <a href="creator-tips.html">Tips and Tricks</a>.</p>
+<a name="platform-notes"></a>
+<h2 id="platform-notes">Platform Notes</h2>
+<p>This section describes the cases where the behavior of Qt Creator depends on the operating system it runs on.</p>
+<a name="location-of-functions"></a>
+<h3 >Location of Functions</h3>
+<p>Qt Creator uses standard names and locations for standard features, such as <i>options</i> or <i>preferences</i>. In this manual, the names and locations on Windows and Linux are usually used to keep the instructions short. Here are some places to check if you cannot find a function, dialog, or keyboard shortcut on macOS when following the instructions:</p>
+<div class="table"><table class="generic">
+ <thead><tr class="qt-style"><th >For</th><th >Look In</th></tr></thead>
+<tr valign="top" class="odd"><td ><b>Tools</b> &gt; <b>Options</b></td><td ><b>Qt Creator</b> &gt; <b>Preferences</b></td></tr>
+<tr valign="top" class="even"><td ><b>Help</b> &gt; <b>About Plugins</b></td><td ><b>Qt Creator</b> &gt; <b>About Plugins</b></td></tr>
+<tr valign="top" class="odd"><td >Keyboard shortcuts</td><td ><b>Qt Creator</b> &gt; <b>Preferences</b> &gt; <b>Environment</b> &gt; <b>Keyboard</b></td></tr>
+</table></div>
+<a name="location-of-settings-files"></a>
+<h3 >Location of Settings Files</h3>
+<p>Qt Creator creates the following files and directories:</p>
+<ul>
+<li>QtCreator.db</li>
+<li>QtCreator.ini</li>
+<li>qtversion.xml</li>
+<li>toolChains.xml</li>
+<li>qtcreator</li>
+<li>qtc-qmldump</li>
+</ul>
+<p>The location of the above files and directories depends on the platform:</p>
+<ul>
+<li>On Linux and other Unix platforms, the files are located in <code>~/.config/QtProject</code> and <code>~/.local/share/data/QtProject/qtcreator</code>.</li>
+<li>On macOS, the files are located in <code>~/.config/QtProject</code> and <code>~/Library/Application Support/QtProject/Qt Creator</code>.</li>
+<li>On Windows XP, the files are located in <code>%SystemDrive%\Documents and Settings\%USERNAME%\Application Data\QtProject</code> and <code>%SystemDrive%\Documents and Settings\%USERNAME%\Local Settings\Application Data\QtProject</code>.</li>
+<li>On Windows 7, the files are located in <code>%SystemDrive%\Users\%USERNAME%\AppData\Roaming\QtProject</code> and <code>%SystemDrive%\Users\%USERNAME%\AppData\Local\QtProject</code>.</li>
+</ul>
+<a name="high-dpi-scaling"></a>
+<h3 >High DPI Scaling</h3>
+<p>The operating systems supported by Qt Creator implement high dots-per-inch (DPI) scaling at varying levels. Therefore, Qt Creator handles high DPI scaling differently on different operating system:</p>
+<ul>
+<li>On macOS, high DPI scaling is forced, which means that Qt Creator allows Qt to use the system scaling factor as the Qt Creator scaling factor.</li>
+<li>On Windows, if no <a href="http://doc.qt.io/qt-5/highdpi.html#high-dpi-support-in-qt">scaling environment variables</a> are set, Qt Creator instructs Qt to detect the scaling factor and use it for Qt Creator.</li>
+<li>On Linux, Qt Creator leaves it to the user to enable high DPI scaling, because the process varies so much on different distributions and windowing systems that it cannot be reliably done automatically.</li>
+</ul>
+<p>To override the default approach and always enable high-DPI scaling, select <b>Tools</b> &gt; <b>Options</b> &gt; <b>Environment</b> &gt; <b>Enable high DPI scaling</b>. The changes will take effect after you restart Qt Creator.</p>
+</div>
+<!-- @@@creator-quick-tour.html -->
+<p class="naviNextPrevious footerNavi">
+<a class="prevPage" href="creator-overview.html">IDE Overview</a>
+<span class="naviSeparator">  &#9702;  </span>
+<a class="nextPage" href="creator-configuring.html">Configuring Qt Creator</a>
+</p>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

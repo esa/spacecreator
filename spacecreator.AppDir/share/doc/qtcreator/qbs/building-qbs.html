@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- qbs.qdoc -->
+  <title>Appendix A: Building Qbs | Qbs Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="index.html">Qbs Manual</a></td><td >Appendix A: Building Qbs</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right">Qbs 1.12.2</td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+  <link rel="prev" href="reference.html" />
+  <link rel="next" href="porting-to-qbs.html" />
+<p class="naviNextPrevious headerNavi">
+<a class="prevPage" href="reference.html">Reference</a>
+<span class="naviSeparator">  &#9702;  </span>
+<a class="nextPage" href="porting-to-qbs.html">Appendix B: Migrating from Other Build Systems</a>
+</p><p/>
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#supported-platforms">Supported Platforms</a></li>
+<li class="level1"><a href="#system-requirements">System Requirements</a></li>
+<li class="level2"><a href="#documentation">Documentation</a></li>
+<li class="level1"><a href="#building">Building</a></li>
+<li class="level1"><a href="#configure-options">Configure Options</a></li>
+<li class="level1"><a href="#using-docker">Using Docker</a></li>
+<li class="level2"><a href="#linux-containers">Linux Containers</a></li>
+<li class="level2"><a href="#windows-containers">Windows Containers</a></li>
+<li class="level2"><a href="#building-release-packages">Building Release Packages</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">Appendix A: Building Qbs</h1>
+<span class="subtitle"></span>
+<!-- $$$building-qbs.html-description -->
+<div class="descr"> <a name="details"></a>
+<p>Qbs can be <a href="installing.html">installed from binary packages</a> or built from sources, as described in this appendix. In addition, this appendix describes how to use Docker images for developing Qbs.</p>
+<a name="supported-platforms"></a>
+<h2 id="supported-platforms">Supported Platforms</h2>
+<p>Qbs can be installed and run on the following platforms:</p>
+<ul>
+<li>Windows 7, or later</li>
+<li>Linux (tested on Debian 8 and 9, Ubuntu 16.04, OpenSuSE 13.2, and Arch Linux)</li>
+<li>macOS 10.7, or later</li>
+</ul>
+<a name="system-requirements"></a>
+<h2 id="system-requirements">System Requirements</h2>
+<p>To build Qbs from the source, you need:</p>
+<ul>
+<li>Qt 5.9, or later</li>
+<li>Windows: MinGW with GCC 4.9 or Microsoft Visual Studio 2015, or later</li>
+<li>Linux: GCC 4.9, or later, or Clang 3.9&#x2e;0, or later</li>
+<li>macOS: Xcode 6.2, or later</li>
+</ul>
+<p>An installed toolchain has to match the one that Qt was compiled with.</p>
+<a name="documentation"></a>
+<h3 >Documentation</h3>
+<p>Building the Qbs documentation requires Python 2.7 or 3.2 or above, as well as some third party Python modules. These can be installed via <code>pip</code>:</p>
+<pre class="cpp">
+
+  pip install beautifulsoup4 lxml
+
+</pre>
+<p>Regenerating the man page requires the <code>help2man</code> tool.</p>
+<a name="building"></a>
+<h2 id="building">Building</h2>
+<p>To build Qbs, enter the following command:</p>
+<pre class="cpp">
+
+  qmake <span class="operator">-</span>r qbs<span class="operator">.</span>pro <span class="operator">&amp;</span><span class="operator">&amp;</span> make
+
+</pre>
+<p>Depending on your platform, you might use <code>mingw32-make</code>, <code>nmake</code>, or <code>jom</code> instead of <code>make</code>.</p>
+<p>Installation by using <code>make install</code> is usually not needed. It is however possible, by entering the following command.</p>
+<pre class="cpp">
+
+  make install INSTALL_ROOT<span class="operator">=</span>$INSTALL_DIRECTORY
+
+</pre>
+<a name="configure-options"></a>
+<h2 id="configure-options">Configure Options</h2>
+<p>Qbs recognizes the following qmake CONFIG options to customize the build:</p>
+<div class="table"><table class="generic">
+ <thead><tr class="qt-style"><th >Option</th><th >Notes</th></tr></thead>
+<tr valign="top" class="odd"><td >qbs_enable_unit_tests</td><td >Enable additional autotests.</td></tr>
+<tr valign="top" class="even"><td >qbs_disable_rpath</td><td >Disable the use of rpath. This can be used when packaging Qbs for distributions which do not permit the use of rpath, such as Fedora.</td></tr>
+<tr valign="top" class="odd"><td >qbs_no_dev_install</td><td >Exclude header files from installation, that is, perform a non-developer build.</td></tr>
+<tr valign="top" class="even"><td >qbs_no_man_install</td><td >Exclude the man page from installation.</td></tr>
+<tr valign="top" class="odd"><td >qbs_enable_project_file_updates</td><td >Enable API for updating project files. This implies a dependency to the Qt GUI module.</td></tr>
+<tr valign="top" class="even"><td >qbs_use_bundled_qtscript</td><td >Use the bundled QtScript library.</td></tr>
+</table></div>
+<p>In addition, you can set the <code>QBS_SYSTEM_SETTINGS_DIR</code> environment variable before running qmake to specify a custom location for Qbs to look for its system-level settings.</p>
+<a name="using-docker"></a>
+<h2 id="using-docker">Using Docker</h2>
+<p>A set of Docker images for developing Qbs (which are maintained by the Qbs team) is available <a href="https://hub.docker.com/u/qbsbuild/">on Docker Hub</a>. Both Windows Server Core and Debian Linux container types are available.</p>
+<p><b>Note: </b>The source code for the Qbs development Docker images is located in the <code>docker/</code> directory of the Qbs source tree, if you wish to build them yourself.</p><a name="linux-containers"></a>
+<h3 >Linux Containers</h3>
+<p>The easiest way to get started is to build Qbs using a Linux container. These types of containers are supported out of the box on all the supported host platforms: Windows, macOS, and Linux. Run the following to download the Qbs development image based on Debian 9 <i>Stretch</i>:</p>
+<pre class="cpp">
+
+  docker pull qbsbuild<span class="operator">/</span>qbsdev:stretch
+
+</pre>
+<p>You can then create a new container with the Qbs source directory mounted from your host machine's file system, by running:</p>
+<pre class="cpp">
+
+  docker run <span class="operator">-</span>it <span class="operator">-</span>v $PWD:<span class="operator">/</span>qbs <span class="operator">-</span>w <span class="operator">/</span>qbs qbsbuild<span class="operator">/</span>qbsdev:stretch
+
+</pre>
+<p>Or with a slightly different syntax for Windows:</p>
+<pre class="cpp">
+
+  docker run <span class="operator">-</span>it <span class="operator">-</span>v <span class="operator">%</span>CD<span class="operator">%</span>:<span class="operator">/</span>qbs <span class="operator">-</span>w <span class="operator">/</span>qbs qbsbuild<span class="operator">/</span>qbsdev:stretch
+
+</pre>
+<p>You will now be in an interactive Linux shell where you can develop and build Qbs.</p>
+<a name="windows-containers"></a>
+<h3 >Windows Containers</h3>
+<p>To build Qbs for Windows using Windows containers, your host OS must be running Windows 10 Pro and have Hyper-V enabled. <a href="https://docs.docker.com/docker-for-windows/#switch-between-windows-and-linux-containers">Switch your Docker environment to use Windows containers</a>, then run the following command to download the Windows 10 Qbs development image:</p>
+<pre class="cpp">
+
+  docker pull qbsbuild<span class="operator">/</span>qbsdev:windowsservercore
+
+</pre>
+<p>You can then create a new container with the Qbs source directory mounted from your host machine's file system, by running:</p>
+<pre class="cpp">
+
+  docker run <span class="operator">-</span>it <span class="operator">-</span>v <span class="operator">%</span>CD<span class="operator">%</span>:C:\qbs <span class="operator">-</span>w C:\qbs qbsbuild<span class="operator">/</span>qbsdev:windowsservercore
+
+</pre>
+<p>If you want to use Windows containers on a macOS or Linux host, you will have to create a virtual machine running Windows 10 and register it with <code>docker-machine</code>. There is at least <a href="https://github.com/StefanScherer/windows-docker-machine">one Open Source project</a> that helps to facilitate this by using using Packer, Vagrant, and VirtualBox.</p>
+<p>The <code>docker run</code> command to spawn a Windows container on a Unix host will look slightly different (assuming <code>windows</code> is the name of the Docker machine associated with the Windows container hosting VM):</p>
+<pre class="cpp">
+
+  eval $(docker<span class="operator">-</span>machine env windows)
+  docker run <span class="operator">-</span>it <span class="operator">-</span>v C:$PWD:C:\\qbs <span class="operator">-</span>w C:\\qbs qbsbuild<span class="operator">/</span>qbsdev:windowsservercore
+
+</pre>
+<a name="building-release-packages"></a>
+<h3 >Building Release Packages</h3>
+<p>Release packages for Qbs for Windows can be built using the following command on Windows:</p>
+<pre class="cpp">
+
+  docker run <span class="operator">-</span><span class="operator">-</span>rm <span class="operator">-</span>v <span class="operator">%</span>CD<span class="operator">%</span>:C:\qbs <span class="operator">-</span>w C:\qbs qbsbuild<span class="operator">/</span>qbsdev:windowsservercore cmd <span class="operator">/</span>c scripts\make<span class="operator">-</span>release<span class="operator">-</span>archives
+
+</pre>
+<p>For building release packages for Windows on macOS or Linux:</p>
+<pre class="cpp">
+
+  eval $(docker<span class="operator">-</span>machine env windows)
+  docker run <span class="operator">-</span><span class="operator">-</span>rm <span class="operator">-</span>v C:$PWD:C:\\qbs <span class="operator">-</span>w C:\\qbs qbsbuild<span class="operator">/</span>qbsdev:windowsservercore cmd <span class="operator">/</span>c scripts\\make<span class="operator">-</span>release<span class="operator">-</span>archives
+
+</pre>
+</div>
+<!-- @@@building-qbs.html -->
+<p class="naviNextPrevious footerNavi">
+<a class="prevPage" href="reference.html">Reference</a>
+<span class="naviSeparator">  &#9702;  </span>
+<a class="nextPage" href="porting-to-qbs.html">Appendix B: Migrating from Other Build Systems</a>
+</p>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

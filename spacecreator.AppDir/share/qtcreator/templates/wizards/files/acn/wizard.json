@@ -1,0 +1,77 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ ],
+    "id": "C.ACN",
+    "category": "R.Asn1Acn",
+    "trDescription": "Creates an ACN encoding model.",
+    "trDisplayName": "ACN Model",
+    "trDisplayCategory": "ASN.1/ACN",
+    "enabled": "%{JS: [ %{Plugins} ].indexOf('ASN.1/ACN') >= 0}",
+
+    "options":
+    [
+        { "key": "FilePath", "value": "%{TargetPath}/%{SrcFileName}" }
+    ],
+
+    "pages" :
+    [
+        {
+            "trDisplayName": "Define ACN Model",
+            "trShortTitle": "Details",
+            "typeId": "Fields",
+            "data":
+            [
+                {
+                    "name": "Model",
+                    "trDisplayName": "Model name:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data":
+                    {
+                        "validator": "[A-Z]([a-zA-Z0-9]|-)*",
+                        "fixup": "%{JS: '%{INPUT}'.charAt(0).toUpperCase() + '%{INPUT}'.slice(1) }"
+                    }
+                },
+                {
+                    "name": "SrcFileName",
+                    "type": "LineEdit",
+                    "trDisplayName": "Source file:",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "trText": "%{JS: Util.fileName('%{Model}', '%{JS: Util.preferredSuffix('text/x-acn')}')}"
+                    }
+                },
+                {
+                    "name": "TargetPath",
+                    "type": "PathChooser",
+                    "trDisplayName": "Path:",
+                    "mandatory": true,
+                    "data":
+                    {
+                        "kind": "existingDirectory",
+                        "basePath": "%{InitialPath}",
+                        "path": "%{InitialPath}"
+                    }
+                }
+            ]
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators" :
+    [
+        {
+            "typeId": "File",
+            "data":
+            {
+                "source": "template.acn",
+                "target": "%{FilePath}",
+                "openInEditor": true
+            }
+        }
+    ]
+}

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- extensioncontext.cpp -->
+  <title>ExtensionContext Class | Extending Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="extending-index.html">Extending Qt Creator Manual</a></td><td >ExtensionContext</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="extending-index.html">Extending Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#public-types">Public Types</a></li>
+<li class="level1"><a href="#public-functions">Public Functions</a></li>
+<li class="level1"><a href="#static-public-members">Static Public Members</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">ExtensionContext Class</h1>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">   <span class="preprocessor">#include &lt;ExtensionContext&gt;</span>
+</td></tr></table></div><ul>
+<li><a href="extensioncontext-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="public-types"></a>
+<h2 id="public-types">Public Types</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> class </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext-cdbversion.html">CdbVersion</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> enum </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#CallFlags-enum">CallFlags</a></b> { CallWithExceptionsHandled, CallWithExceptionsNotHandled }</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#StopReasonMap-typedef">StopReasonMap</a></b></td></tr>
+</table></div>
+<a name="public-functions"></a>
+<h2 id="public-functions">Public Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#dtor.ExtensionContext">~ExtensionContext</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#call">call</a></b>(const std::string &amp;<i>functionCall</i>, unsigned int <i>callFlags</i>, std::wstring *<i>output</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> ExtensionContext::CdbVersion </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#cdbVersion">cdbVersion</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#discardSymbolGroup">discardSymbolGroup</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#discardWatchesSymbolGroup">discardWatchesSymbolGroup</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#executionStatus">executionStatus</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#hookCallbacks">hookCallbacks</a></b>(CIDebugClient *<i>client</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> CIDebugClient *</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#hookedClient">hookedClient</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#initialize">initialize</a></b>(<i>int</i>, <i>int</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#jsExecutionEngine">jsExecutionEngine</a></b>(<i>ExtensionCommandContext &amp;</i>, <i>std::string *</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#notifyIdleCommand">notifyIdleCommand</a></b>(CIDebugClient *<i>client</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#notifyState">notifyState</a></b>(int <i>Notify</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> const Parameters &amp;</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#parameters">parameters</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> Parameters &amp;</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#parameters-1">parameters</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#report">report</a></b>(char <i>code</i>, int <i>remainingChunks</i>, int <i>token</i>, const char *<i>serviceName</i>, int <i>Format</i>, <i>...</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#reportLong">reportLong</a></b>(char <i>code</i>, int <i>token</i>, const char *<i>serviceName</i>, const std::string &amp;<i>message</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#setStateNotification">setStateNotification</a></b>(bool <i>s</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#setStopReason">setStopReason</a></b>(<i>const ExtensionContext::StopReasonMap &amp;</i>, const std::string &amp;<i>reason</i> = std::string())</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#startRecordingOutput">startRecordingOutput</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#stateNotification">stateNotification</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::wstring </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#stopRecordingOutput">stopRecordingOutput</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> LocalsSymbolGroup *</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#symbolGroup">symbolGroup</a></b>(CIDebugSymbols *<i>symbols</i>, int <i>threadId</i>, int <i>frame</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#symbolGroupFrame">symbolGroupFrame</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#unhookCallbacks">unhookCallbacks</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> WatchesSymbolGroup *</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#watchesSymbolGroup">watchesSymbolGroup</a></b>(CIDebugSymbols *<i>symbols</i>, std::string *<i>errorMessage</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> WatchesSymbolGroup *</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#watchesSymbolGroup-1">watchesSymbolGroup</a></b>() const</td></tr>
+</table></div>
+<a name="static-public-members"></a>
+<h2 id="static-public-members">Static Public Members</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> const char *</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#breakPointStopReasonC-var">breakPointStopReasonC</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> ExtensionContext &amp;</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#instance">instance</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> const size_t </td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#outputChunkSize-var">outputChunkSize</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> const char *</td><td class="memItemRight bottomAlign"><b><a href="extensioncontext.html#stopReasonKeyC-var">stopReasonKeyC</a></b></td></tr>
+</table></div>
+<a name="details"></a>
+<!-- $$$ExtensionContext-description -->
+<div class="descr">
+<h2 id="details">Detailed Description</h2>
+<p>Global singleton with context. Caches a symbolgroup per frame and thread as long as the session is accessible.</p>
+</div>
+<!-- @@@ExtensionContext -->
+<div class="types">
+<h2>Member Type Documentation</h2>
+<!-- $$$CallFlags$$$CallWithExceptionsHandled$$$CallWithExceptionsNotHandled -->
+<h3 class="fn" id="CallFlags-enum"><a name="CallFlags-enum"></a>enum ExtensionContext::<span class="name">CallFlags</span></h3>
+<!-- @@@CallFlags -->
+<!-- $$$StopReasonMap -->
+<h3 class="fn" id="StopReasonMap-typedef"><a name="StopReasonMap-typedef"></a>typedef ExtensionContext::<span class="name">StopReasonMap</span></h3>
+<!-- @@@StopReasonMap -->
+</div>
+<div class="func">
+<h2>Member Function Documentation</h2>
+<!-- $$$~ExtensionContext[overload1]$$$~ExtensionContext -->
+<h3 class="fn" id="dtor.ExtensionContext"><a name="dtor.ExtensionContext"></a>ExtensionContext::<span class="name">~ExtensionContext</span>()</h3>
+<p>Destroys the instance of ExtensionContext.</p><!-- @@@~ExtensionContext -->
+<!-- $$$call[overload1]$$$callconststd::string&unsignedintstd::wstring*std::string* -->
+<h3 class="fn" id="call"><a name="call"></a><span class="type">bool</span> ExtensionContext::<span class="name">call</span>(const <span class="type">std::string</span> &amp;<i>functionCall</i>, <span class="type">unsigned</span> <span class="type">int</span> <i>callFlags</i>, <span class="type">std::wstring</span> *<i>output</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@call -->
+<!-- $$$cdbVersion[overload1]$$$cdbVersion -->
+<h3 class="fn" id="cdbVersion"><a name="cdbVersion"></a><span class="type"><a href="extensioncontext-cdbversion.html">ExtensionContext::CdbVersion</a></span> ExtensionContext::<span class="name">cdbVersion</span>()</h3>
+<!-- @@@cdbVersion -->
+<!-- $$$discardSymbolGroup[overload1]$$$discardSymbolGroup -->
+<h3 class="fn" id="discardSymbolGroup"><a name="discardSymbolGroup"></a><span class="type">void</span> ExtensionContext::<span class="name">discardSymbolGroup</span>()</h3>
+<!-- @@@discardSymbolGroup -->
+<!-- $$$discardWatchesSymbolGroup[overload1]$$$discardWatchesSymbolGroup -->
+<h3 class="fn" id="discardWatchesSymbolGroup"><a name="discardWatchesSymbolGroup"></a><span class="type">void</span> ExtensionContext::<span class="name">discardWatchesSymbolGroup</span>()</h3>
+<!-- @@@discardWatchesSymbolGroup -->
+<!-- $$$executionStatus[overload1]$$$executionStatus -->
+<h3 class="fn" id="executionStatus"><a name="executionStatus"></a><span class="type">int</span> ExtensionContext::<span class="name">executionStatus</span>() const</h3>
+<!-- @@@executionStatus -->
+<!-- $$$hookCallbacks[overload1]$$$hookCallbacksCIDebugClient* -->
+<h3 class="fn" id="hookCallbacks"><a name="hookCallbacks"></a><span class="type">void</span> ExtensionContext::<span class="name">hookCallbacks</span>(<span class="type">CIDebugClient</span> *<i>client</i>)</h3>
+<!-- @@@hookCallbacks -->
+<!-- $$$hookedClient[overload1]$$$hookedClient -->
+<h3 class="fn" id="hookedClient"><a name="hookedClient"></a><span class="type">CIDebugClient</span> *ExtensionContext::<span class="name">hookedClient</span>() const</h3>
+<!-- @@@hookedClient -->
+<!-- $$$initialize[overload1]$$$initializeintint -->
+<h3 class="fn" id="initialize"><a name="initialize"></a><span class="type">int</span> ExtensionContext::<span class="name">initialize</span>(<i>int</i>, <i>int</i>)</h3>
+<!-- @@@initialize -->
+<!-- $$$instance[overload1]$$$instance -->
+<h3 class="fn" id="instance"><a name="instance"></a><code>[static] </code><span class="type">ExtensionContext</span> &amp;ExtensionContext::<span class="name">instance</span>()</h3>
+<!-- @@@instance -->
+<!-- $$$jsExecutionEngine[overload1]$$$jsExecutionEngineExtensionCommandContext&std::string* -->
+<h3 class="fn" id="jsExecutionEngine"><a name="jsExecutionEngine"></a><span class="type">int</span> ExtensionContext::<span class="name">jsExecutionEngine</span>(<i>ExtensionCommandContext &amp;</i>, <i>std::string *</i>)</h3>
+<!-- @@@jsExecutionEngine -->
+<!-- $$$notifyIdleCommand[overload1]$$$notifyIdleCommandCIDebugClient* -->
+<h3 class="fn" id="notifyIdleCommand"><a name="notifyIdleCommand"></a><span class="type">void</span> ExtensionContext::<span class="name">notifyIdleCommand</span>(<span class="type">CIDebugClient</span> *<i>client</i>)</h3>
+<!-- @@@notifyIdleCommand -->
+<!-- $$$notifyState[overload1]$$$notifyStateint -->
+<h3 class="fn" id="notifyState"><a name="notifyState"></a><span class="type">void</span> ExtensionContext::<span class="name">notifyState</span>(<span class="type">int</span> <i>Notify</i>)</h3>
+<!-- @@@notifyState -->
+<!-- $$$parameters[overload1]$$$parameters -->
+<h3 class="fn" id="parameters"><a name="parameters"></a>const <span class="type">Parameters</span> &amp;ExtensionContext::<span class="name">parameters</span>() const</h3>
+<!-- @@@parameters -->
+<!-- $$$parameters$$$parameters -->
+<h3 class="fn" id="parameters-1"><a name="parameters-1"></a><span class="type">Parameters</span> &amp;ExtensionContext::<span class="name">parameters</span>()</h3>
+<!-- @@@parameters -->
+<!-- $$$report[overload1]$$$reportcharintintconstchar*int... -->
+<h3 class="fn" id="report"><a name="report"></a><span class="type">bool</span> ExtensionContext::<span class="name">report</span>(<span class="type">char</span> <i>code</i>, <span class="type">int</span> <i>remainingChunks</i>, <span class="type">int</span> <i>token</i>, const <span class="type">char</span> *<i>serviceName</i>, <span class="type">int</span> <i>Format</i>, <i>...</i>)</h3>
+<!-- @@@report -->
+<!-- $$$reportLong[overload1]$$$reportLongcharintconstchar*conststd::string& -->
+<h3 class="fn" id="reportLong"><a name="reportLong"></a><span class="type">bool</span> ExtensionContext::<span class="name">reportLong</span>(<span class="type">char</span> <i>code</i>, <span class="type">int</span> <i>token</i>, const <span class="type">char</span> *<i>serviceName</i>, const <span class="type">std::string</span> &amp;<i>message</i>)</h3>
+<!-- @@@reportLong -->
+<!-- $$$setStateNotification[overload1]$$$setStateNotificationbool -->
+<h3 class="fn" id="setStateNotification"><a name="setStateNotification"></a><span class="type">void</span> ExtensionContext::<span class="name">setStateNotification</span>(<span class="type">bool</span> <i>s</i>)</h3>
+<p><b>See also </b><a href="extensioncontext.html#stateNotification">stateNotification</a>().</p>
+<!-- @@@setStateNotification -->
+<!-- $$$setStopReason[overload1]$$$setStopReasonconstExtensionContext::StopReasonMap&conststd::string& -->
+<h3 class="fn" id="setStopReason"><a name="setStopReason"></a><span class="type">void</span> ExtensionContext::<span class="name">setStopReason</span>(<i>const ExtensionContext::StopReasonMap &amp;</i>, const <span class="type">std::string</span> &amp;<i>reason</i> = std::string())</h3>
+<!-- @@@setStopReason -->
+<!-- $$$startRecordingOutput[overload1]$$$startRecordingOutput -->
+<h3 class="fn" id="startRecordingOutput"><a name="startRecordingOutput"></a><span class="type">void</span> ExtensionContext::<span class="name">startRecordingOutput</span>()</h3>
+<!-- @@@startRecordingOutput -->
+<!-- $$$stateNotification[overload1]$$$stateNotification -->
+<h3 class="fn" id="stateNotification"><a name="stateNotification"></a><span class="type">bool</span> ExtensionContext::<span class="name">stateNotification</span>() const</h3>
+<p><b>See also </b><a href="extensioncontext.html#setStateNotification">setStateNotification</a>().</p>
+<!-- @@@stateNotification -->
+<!-- $$$stopRecordingOutput[overload1]$$$stopRecordingOutput -->
+<h3 class="fn" id="stopRecordingOutput"><a name="stopRecordingOutput"></a><span class="type">std::wstring</span> ExtensionContext::<span class="name">stopRecordingOutput</span>()</h3>
+<!-- @@@stopRecordingOutput -->
+<!-- $$$symbolGroup[overload1]$$$symbolGroupCIDebugSymbols*intintstd::string* -->
+<h3 class="fn" id="symbolGroup"><a name="symbolGroup"></a><span class="type"><a href="localssymbolgroup.html">LocalsSymbolGroup</a></span> *ExtensionContext::<span class="name">symbolGroup</span>(<span class="type">CIDebugSymbols</span> *<i>symbols</i>, <span class="type">int</span> <i>threadId</i>, <span class="type">int</span> <i>frame</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@symbolGroup -->
+<!-- $$$symbolGroupFrame[overload1]$$$symbolGroupFrame -->
+<h3 class="fn" id="symbolGroupFrame"><a name="symbolGroupFrame"></a><span class="type">int</span> ExtensionContext::<span class="name">symbolGroupFrame</span>() const</h3>
+<!-- @@@symbolGroupFrame -->
+<!-- $$$unhookCallbacks[overload1]$$$unhookCallbacks -->
+<h3 class="fn" id="unhookCallbacks"><a name="unhookCallbacks"></a><span class="type">void</span> ExtensionContext::<span class="name">unhookCallbacks</span>()</h3>
+<!-- @@@unhookCallbacks -->
+<!-- $$$watchesSymbolGroup[overload1]$$$watchesSymbolGroupCIDebugSymbols*std::string* -->
+<h3 class="fn" id="watchesSymbolGroup"><a name="watchesSymbolGroup"></a><span class="type"><a href="watchessymbolgroup.html">WatchesSymbolGroup</a></span> *ExtensionContext::<span class="name">watchesSymbolGroup</span>(<span class="type">CIDebugSymbols</span> *<i>symbols</i>, <span class="type">std::string</span> *<i>errorMessage</i>)</h3>
+<!-- @@@watchesSymbolGroup -->
+<!-- $$$watchesSymbolGroup$$$watchesSymbolGroup -->
+<h3 class="fn" id="watchesSymbolGroup-1"><a name="watchesSymbolGroup-1"></a><span class="type"><a href="watchessymbolgroup.html">WatchesSymbolGroup</a></span> *ExtensionContext::<span class="name">watchesSymbolGroup</span>() const</h3>
+<!-- @@@watchesSymbolGroup -->
+</div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- symbolgroupvalue.cpp -->
+  <title>SymbolGroupValue Class | Extending Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="extending-index.html">Extending Qt Creator Manual</a></td><td >SymbolGroupValue</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="extending-index.html">Extending Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#public-types">Public Types</a></li>
+<li class="level1"><a href="#public-functions">Public Functions</a></li>
+<li class="level1"><a href="#static-public-members">Static Public Members</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">SymbolGroupValue Class</h1>
+<!-- $$$SymbolGroupValue-brief -->
+<p>The <a href="symbolgroupvalue.html">SymbolGroupValue</a> class is a flyweight tied to a <a href="symbolgroupnode.html">SymbolGroupNode</a> providing a convenient operator[] (name, index) and value getters for notation of dumpers. <a href="#details">More...</a></p>
+<!-- @@@SymbolGroupValue -->
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">   <span class="preprocessor">#include &lt;SymbolGroupValue&gt;</span>
+</td></tr></table></div><ul>
+<li><a href="symbolgroupvalue-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="public-types"></a>
+<h2 id="public-types">Public Types</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#Symbol-typedef">Symbol</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#SymbolList-typedef">SymbolList</a></b></td></tr>
+</table></div>
+<a name="public-functions"></a>
+<h2 id="public-functions">Public Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></b>(SymbolGroupNode *<i>node</i>, const SymbolGroupValueContext &amp;<i>c</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#SymbolGroupValue-2">SymbolGroupValue</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#addSymbol">addSymbol</a></b>(const int <i>address</i>, const std::string &amp;<i>type</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#addSymbolForAncestor">addSymbolForAncestor</a></b>(const std::string &amp;<i>ancestorName</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#address">address</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#addressOfAncestor">addressOfAncestor</a></b>(<i>const std::string &amp;</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#childCount">childCount</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValueContext </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#context">context</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#error">error</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> double </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#floatValue">floatValue</a></b>(double <i>defaultValue</i> = -999) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolAncestorInfo </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#infoOfAncestor">infoOfAncestor</a></b>(const std::string &amp;<i>name</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#innerTypes">innerTypes</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#intValue">intValue</a></b>(int <i>defaultValue</i> = -1) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#isValid">isValid</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#module">module</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#name">name</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupNode *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#node">node</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#offsetOfAncestor">offsetOfAncestor</a></b>(<i>const std::string &amp;</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#offsetOfChild">offsetOfChild</a></b>(<i>const SymbolGroupValue &amp;</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#parent">parent</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned char *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#pointerData">pointerData</a></b>(unsigned int <i>length</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#pointerTypeCast">pointerTypeCast</a></b>(const char *<i>type</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#pointerValue">pointerValue</a></b>(<i>int</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#readIntegerFromAncestor">readIntegerFromAncestor</a></b>(const std::string &amp;<i>name</i>, int <i>defaultValue</i> = -1) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#readPointerValueFromAncestor">readPointerValueFromAncestor</a></b>(<i>const std::string &amp;</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#size">size</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#type">type</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#typeCast">typeCast</a></b>(const char *<i>type</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#typeOfAncestor">typeOfAncestor</a></b>(const std::string &amp;<i>childName</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::wstring </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#value">value</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::wstring </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#wcharPointerData">wcharPointerData</a></b>(unsigned int <i>charCount</i>, unsigned int <i>maxCharCount</i> = 512) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#operator-bool">operator bool</a></b>() const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#operator-5b-5d">operator[]</a></b>(const char *<i>name</i>) const</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#operator-5b-5d-1">operator[]</a></b>(<i>unsigned int</i>) const</td></tr>
+</table></div>
+<a name="static-public-members"></a>
+<h2 id="static-public-members">Static Public Members</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#addPointerType">addPointerType</a></b>(<i>const std::string &amp;</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#fieldOffset">fieldOffset</a></b>(const char *<i>type</i>, const char *<i>field</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#findMember">findMember</a></b>(const SymbolGroupValue &amp;<i>start</i>, const std::string &amp;<i>symbolName</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#getAllModuleNames">getAllModuleNames</a></b>(<i>const SymbolGroupValueContext &amp;</i>, <i>std::string *</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#innerTypesOf">innerTypesOf</a></b>(<i>const std::string &amp;</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#intSize">intSize</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#isArrayType">isArrayType</a></b>(<i>const std::string &amp;</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#isMovable">isMovable</a></b>(<i>const std::string &amp;</i>, const SymbolGroupValue &amp;<i>v</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#isPointerType">isPointerType</a></b>(<i>const std::string &amp;</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#isVTableType">isVTableType</a></b>(const std::string &amp;<i>t</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#moduleOfType">moduleOfType</a></b>(const std::string &amp;<i>type</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#pointedToSymbolName">pointedToSymbolName</a></b>(int <i>address</i>, const std::string &amp;<i>type</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#pointerDiffSize">pointerDiffSize</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#pointerSize">pointerSize</a></b>()</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#pointerType">pointerType</a></b>(const std::string &amp;<i>type</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> double </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#readDouble">readDouble</a></b>(CIDebugDataSpaces *<i>ds</i>, int <i>address</i>, double <i>defaultValue</i> = 0.0, std::string *<i>errorMessage</i> = 0)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#readIntValue">readIntValue</a></b>(CIDebugDataSpaces *<i>ds</i>, int <i>address</i>, int <i>defaultValue</i> = 0, std::string *<i>errorMessage</i> = 0)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned char *</td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#readMemory">readMemory</a></b>(CIDebugDataSpaces *<i>ds</i>, int <i>address</i>, int <i>length</i>, std::string *<i>errorMessage</i> = 0)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#readPointerValue">readPointerValue</a></b>(<i>CIDebugDataSpaces *</i>, <i>int</i>, <i>std::string *</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#readSignedValue">readSignedValue</a></b>(<i>CIDebugDataSpaces *</i>, <i>int</i>, <i>int</i>, <i>int</i>, <i>std::string *</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#readUnsignedValue">readUnsignedValue</a></b>(<i>CIDebugDataSpaces *</i>, <i>int</i>, <i>int</i>, <i>int</i>, <i>std::string *</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> SymbolGroupValue::SymbolList </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#resolveSymbol">resolveSymbol</a></b>(const char *<i>pattern</i>, const SymbolGroupValueContext &amp;<i>c</i>, std::string *<i>errorMessage</i> = 0)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#resolveSymbolName">resolveSymbolName</a></b>(<i>const char *</i>, <i>const SymbolGroupValueContext &amp;</i>, <i>std::string *</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#resolveType">resolveType</a></b>(const std::string &amp;<i>type</i>, const SymbolGroupValueContext &amp;<i>ctx</i>, const std::string &amp;<i>currentModule</i> = std::string())</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#sizeOf">sizeOf</a></b>(const char *<i>type</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#stripArrayType">stripArrayType</a></b>(<i>const std::string &amp;</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#stripClassPrefixes">stripClassPrefixes</a></b>(<i>const std::string &amp;</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#stripConst">stripConst</a></b>(const std::string &amp;<i>type</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#stripModuleFromType">stripModuleFromType</a></b>(const std::string &amp;<i>type</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> std::string </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#stripPointerType">stripPointerType</a></b>(<i>const std::string &amp;</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> unsigned int </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#verbose-var">verbose</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="symbolgroupvalue.html#writeMemory">writeMemory</a></b>(CIDebugDataSpaces *<i>ds</i>, int <i>address</i>, const unsigned char *<i>data</i>, int <i>length</i>, std::string *<i>errorMessage</i> = 0)</td></tr>
+</table></div>
+<a name="details"></a>
+<!-- $$$SymbolGroupValue-description -->
+<div class="descr">
+<h2 id="details">Detailed Description</h2>
+<p>The <a href="symbolgroupvalue.html">SymbolGroupValue</a> class is a flyweight tied to a <a href="symbolgroupnode.html">SymbolGroupNode</a> providing a convenient operator[] (name, index) and value getters for notation of dumpers.</p>
+<p>Inaccessible members return a <a href="symbolgroupvalue.html">SymbolGroupValue</a> in state 'invalid'. Example:</p>
+<pre class="cpp">
+
+  SymbolGroupValue container(symbolGroupNode<span class="operator">,</span> symbolGroupValueContext);
+  <span class="keyword">if</span> (SymbolGroupValue sizeV <span class="operator">=</span> container<span class="operator">[</span><span class="string">&quot;d&quot;</span><span class="operator">]</span><span class="operator">[</span><span class="string">&quot;size&quot;</span><span class="operator">]</span>)
+    <span class="type">int</span> size <span class="operator">=</span> sizeV<span class="operator">.</span>intValue()
+
+</pre>
+</div>
+<!-- @@@SymbolGroupValue -->
+<div class="types">
+<h2>Member Type Documentation</h2>
+<!-- $$$Symbol -->
+<h3 class="fn" id="Symbol-typedef"><a name="Symbol-typedef"></a>typedef SymbolGroupValue::<span class="name">Symbol</span></h3>
+<!-- @@@Symbol -->
+<!-- $$$SymbolList -->
+<h3 class="fn" id="SymbolList-typedef"><a name="SymbolList-typedef"></a>typedef SymbolGroupValue::<span class="name">SymbolList</span></h3>
+<!-- @@@SymbolList -->
+</div>
+<div class="func">
+<h2>Member Function Documentation</h2>
+<!-- $$$SymbolGroupValue[overload1]$$$SymbolGroupValueSymbolGroupNode*constSymbolGroupValueContext& -->
+<h3 class="fn" id="SymbolGroupValue"><a name="SymbolGroupValue"></a>SymbolGroupValue::<span class="name">SymbolGroupValue</span>(<span class="type"><a href="symbolgroupnode.html">SymbolGroupNode</a></span> *<i>node</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>c</i>)</h3>
+<p>Default constructs an instance of SymbolGroupValue.</p><!-- @@@SymbolGroupValue -->
+<!-- $$$SymbolGroupValue$$$SymbolGroupValue -->
+<h3 class="fn" id="SymbolGroupValue-2"><a name="SymbolGroupValue-2"></a>SymbolGroupValue::<span class="name">SymbolGroupValue</span>()</h3>
+<p>Default constructs an instance of SymbolGroupValue.</p><!-- @@@SymbolGroupValue -->
+<!-- $$$addPointerType[overload1]$$$addPointerTypeconststd::string& -->
+<h3 class="fn" id="addPointerType"><a name="addPointerType"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">addPointerType</span>(<i>const std::string &amp;</i>)</h3>
+<!-- @@@addPointerType -->
+<!-- $$$addSymbol[overload1]$$$addSymbolconstintconststd::string& -->
+<h3 class="fn" id="addSymbol"><a name="addSymbol"></a><span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> SymbolGroupValue::<span class="name">addSymbol</span>(const <span class="type">int</span> <i>address</i>, const <span class="type">std::string</span> &amp;<i>type</i>) const</h3>
+<!-- @@@addSymbol -->
+<!-- $$$addSymbolForAncestor[overload1]$$$addSymbolForAncestorconststd::string& -->
+<h3 class="fn" id="addSymbolForAncestor"><a name="addSymbolForAncestor"></a><span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> SymbolGroupValue::<span class="name">addSymbolForAncestor</span>(const <span class="type">std::string</span> &amp;<i>ancestorName</i>) const</h3>
+<!-- @@@addSymbolForAncestor -->
+<!-- $$$address[overload1]$$$address -->
+<h3 class="fn" id="address"><a name="address"></a><span class="type">int</span> SymbolGroupValue::<span class="name">address</span>() const</h3>
+<!-- @@@address -->
+<!-- $$$addressOfAncestor[overload1]$$$addressOfAncestorconststd::string& -->
+<h3 class="fn" id="addressOfAncestor"><a name="addressOfAncestor"></a><span class="type">int</span> SymbolGroupValue::<span class="name">addressOfAncestor</span>(<i>const std::string &amp;</i>) const</h3>
+<!-- @@@addressOfAncestor -->
+<!-- $$$childCount[overload1]$$$childCount -->
+<h3 class="fn" id="childCount"><a name="childCount"></a><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">childCount</span>() const</h3>
+<!-- @@@childCount -->
+<!-- $$$context[overload1]$$$context -->
+<h3 class="fn" id="context"><a name="context"></a><span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> SymbolGroupValue::<span class="name">context</span>() const</h3>
+<!-- @@@context -->
+<!-- $$$error[overload1]$$$error -->
+<h3 class="fn" id="error"><a name="error"></a><span class="type">std::string</span> SymbolGroupValue::<span class="name">error</span>() const</h3>
+<!-- @@@error -->
+<!-- $$$fieldOffset[overload1]$$$fieldOffsetconstchar*constchar* -->
+<h3 class="fn" id="fieldOffset"><a name="fieldOffset"></a><code>[static] </code><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">fieldOffset</span>(const <span class="type">char</span> *<i>type</i>, const <span class="type">char</span> *<i>field</i>)</h3>
+<!-- @@@fieldOffset -->
+<!-- $$$findMember[overload1]$$$findMemberconstSymbolGroupValue&conststd::string& -->
+<h3 class="fn" id="findMember"><a name="findMember"></a><code>[static] </code><span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> SymbolGroupValue::<span class="name">findMember</span>(const <span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> &amp;<i>start</i>, const <span class="type">std::string</span> &amp;<i>symbolName</i>)</h3>
+<!-- @@@findMember -->
+<!-- $$$floatValue[overload1]$$$floatValuedouble -->
+<h3 class="fn" id="floatValue"><a name="floatValue"></a><span class="type">double</span> SymbolGroupValue::<span class="name">floatValue</span>(<span class="type">double</span> <i>defaultValue</i> = -999) const</h3>
+<!-- @@@floatValue -->
+<!-- $$$getAllModuleNames[overload1]$$$getAllModuleNamesconstSymbolGroupValueContext&std::string* -->
+<h3 class="fn" id="getAllModuleNames"><a name="getAllModuleNames"></a><code>[static] </code><span class="type">int</span> SymbolGroupValue::<span class="name">getAllModuleNames</span>(<i>const SymbolGroupValueContext &amp;</i>, <i>std::string *</i>)</h3>
+<!-- @@@getAllModuleNames -->
+<!-- $$$infoOfAncestor[overload1]$$$infoOfAncestorconststd::string& -->
+<h3 class="fn" id="infoOfAncestor"><a name="infoOfAncestor"></a><span class="type">SymbolAncestorInfo</span> SymbolGroupValue::<span class="name">infoOfAncestor</span>(const <span class="type">std::string</span> &amp;<i>name</i>) const</h3>
+<!-- @@@infoOfAncestor -->
+<!-- $$$innerTypes[overload1]$$$innerTypes -->
+<h3 class="fn" id="innerTypes"><a name="innerTypes"></a><span class="type">int</span> SymbolGroupValue::<span class="name">innerTypes</span>() const</h3>
+<!-- @@@innerTypes -->
+<!-- $$$innerTypesOf[overload1]$$$innerTypesOfconststd::string& -->
+<h3 class="fn" id="innerTypesOf"><a name="innerTypesOf"></a><code>[static] </code><span class="type">int</span> SymbolGroupValue::<span class="name">innerTypesOf</span>(<i>const std::string &amp;</i>)</h3>
+<!-- @@@innerTypesOf -->
+<!-- $$$intSize[overload1]$$$intSize -->
+<h3 class="fn" id="intSize"><a name="intSize"></a><code>[static] </code><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">intSize</span>()</h3>
+<!-- @@@intSize -->
+<!-- $$$intValue[overload1]$$$intValueint -->
+<h3 class="fn" id="intValue"><a name="intValue"></a><span class="type">int</span> SymbolGroupValue::<span class="name">intValue</span>(<span class="type">int</span> <i>defaultValue</i> = -1) const</h3>
+<!-- @@@intValue -->
+<!-- $$$isArrayType[overload1]$$$isArrayTypeconststd::string& -->
+<h3 class="fn" id="isArrayType"><a name="isArrayType"></a><code>[static] </code><span class="type">bool</span> SymbolGroupValue::<span class="name">isArrayType</span>(<i>const std::string &amp;</i>)</h3>
+<!-- @@@isArrayType -->
+<!-- $$$isMovable[overload1]$$$isMovableconststd::string&constSymbolGroupValue& -->
+<h3 class="fn" id="isMovable"><a name="isMovable"></a><code>[static] </code><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">isMovable</span>(<i>const std::string &amp;</i>, const <span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> &amp;<i>v</i>)</h3>
+<!-- @@@isMovable -->
+<!-- $$$isPointerType[overload1]$$$isPointerTypeconststd::string& -->
+<h3 class="fn" id="isPointerType"><a name="isPointerType"></a><code>[static] </code><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">isPointerType</span>(<i>const std::string &amp;</i>)</h3>
+<!-- @@@isPointerType -->
+<!-- $$$isVTableType[overload1]$$$isVTableTypeconststd::string& -->
+<h3 class="fn" id="isVTableType"><a name="isVTableType"></a><code>[static] </code><span class="type">bool</span> SymbolGroupValue::<span class="name">isVTableType</span>(const <span class="type">std::string</span> &amp;<i>t</i>)</h3>
+<!-- @@@isVTableType -->
+<!-- $$$isValid[overload1]$$$isValid -->
+<h3 class="fn" id="isValid"><a name="isValid"></a><span class="type">bool</span> SymbolGroupValue::<span class="name">isValid</span>() const</h3>
+<!-- @@@isValid -->
+<!-- $$$module[overload1]$$$module -->
+<h3 class="fn" id="module"><a name="module"></a><span class="type">std::string</span> SymbolGroupValue::<span class="name">module</span>() const</h3>
+<!-- @@@module -->
+<!-- $$$moduleOfType[overload1]$$$moduleOfTypeconststd::string& -->
+<h3 class="fn" id="moduleOfType"><a name="moduleOfType"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">moduleOfType</span>(const <span class="type">std::string</span> &amp;<i>type</i>)</h3>
+<!-- @@@moduleOfType -->
+<!-- $$$name[overload1]$$$name -->
+<h3 class="fn" id="name"><a name="name"></a><span class="type">std::string</span> SymbolGroupValue::<span class="name">name</span>() const</h3>
+<!-- @@@name -->
+<!-- $$$node[overload1]$$$node -->
+<h3 class="fn" id="node"><a name="node"></a><span class="type"><a href="symbolgroupnode.html">SymbolGroupNode</a></span> *SymbolGroupValue::<span class="name">node</span>() const</h3>
+<!-- @@@node -->
+<!-- $$$offsetOfAncestor[overload1]$$$offsetOfAncestorconststd::string& -->
+<h3 class="fn" id="offsetOfAncestor"><a name="offsetOfAncestor"></a><span class="type">int</span> SymbolGroupValue::<span class="name">offsetOfAncestor</span>(<i>const std::string &amp;</i>) const</h3>
+<!-- @@@offsetOfAncestor -->
+<!-- $$$offsetOfChild[overload1]$$$offsetOfChildconstSymbolGroupValue& -->
+<h3 class="fn" id="offsetOfChild"><a name="offsetOfChild"></a><span class="type">int</span> SymbolGroupValue::<span class="name">offsetOfChild</span>(<i>const SymbolGroupValue &amp;</i>) const</h3>
+<!-- @@@offsetOfChild -->
+<!-- $$$parent[overload1]$$$parent -->
+<h3 class="fn" id="parent"><a name="parent"></a><span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> SymbolGroupValue::<span class="name">parent</span>() const</h3>
+<!-- @@@parent -->
+<!-- $$$pointedToSymbolName[overload1]$$$pointedToSymbolNameintconststd::string& -->
+<h3 class="fn" id="pointedToSymbolName"><a name="pointedToSymbolName"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">pointedToSymbolName</span>(<span class="type">int</span> <i>address</i>, const <span class="type">std::string</span> &amp;<i>type</i>)</h3>
+<!-- @@@pointedToSymbolName -->
+<!-- $$$pointerData[overload1]$$$pointerDataunsignedint -->
+<h3 class="fn" id="pointerData"><a name="pointerData"></a><span class="type">unsigned</span> <span class="type">char</span> *SymbolGroupValue::<span class="name">pointerData</span>(<span class="type">unsigned</span> <span class="type">int</span> <i>length</i>) const</h3>
+<!-- @@@pointerData -->
+<!-- $$$pointerDiffSize[overload1]$$$pointerDiffSize -->
+<h3 class="fn" id="pointerDiffSize"><a name="pointerDiffSize"></a><code>[static] </code><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">pointerDiffSize</span>()</h3>
+<!-- @@@pointerDiffSize -->
+<!-- $$$pointerSize[overload1]$$$pointerSize -->
+<h3 class="fn" id="pointerSize"><a name="pointerSize"></a><code>[static] </code><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">pointerSize</span>()</h3>
+<!-- @@@pointerSize -->
+<!-- $$$pointerType[overload1]$$$pointerTypeconststd::string& -->
+<h3 class="fn" id="pointerType"><a name="pointerType"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">pointerType</span>(const <span class="type">std::string</span> &amp;<i>type</i>)</h3>
+<!-- @@@pointerType -->
+<!-- $$$pointerTypeCast[overload1]$$$pointerTypeCastconstchar* -->
+<h3 class="fn" id="pointerTypeCast"><a name="pointerTypeCast"></a><span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> SymbolGroupValue::<span class="name">pointerTypeCast</span>(const <span class="type">char</span> *<i>type</i>) const</h3>
+<!-- @@@pointerTypeCast -->
+<!-- $$$pointerValue[overload1]$$$pointerValueint -->
+<h3 class="fn" id="pointerValue"><a name="pointerValue"></a><span class="type">int</span> SymbolGroupValue::<span class="name">pointerValue</span>(<i>int</i>) const</h3>
+<!-- @@@pointerValue -->
+<!-- $$$readDouble[overload1]$$$readDoubleCIDebugDataSpaces*intdoublestd::string* -->
+<h3 class="fn" id="readDouble"><a name="readDouble"></a><code>[static] </code><span class="type">double</span> SymbolGroupValue::<span class="name">readDouble</span>(<span class="type">CIDebugDataSpaces</span> *<i>ds</i>, <span class="type">int</span> <i>address</i>, <span class="type">double</span> <i>defaultValue</i> = 0.0, <span class="type">std::string</span> *<i>errorMessage</i> = 0)</h3>
+<!-- @@@readDouble -->
+<!-- $$$readIntValue[overload1]$$$readIntValueCIDebugDataSpaces*intintstd::string* -->
+<h3 class="fn" id="readIntValue"><a name="readIntValue"></a><code>[static] </code><span class="type">int</span> SymbolGroupValue::<span class="name">readIntValue</span>(<span class="type">CIDebugDataSpaces</span> *<i>ds</i>, <span class="type">int</span> <i>address</i>, <span class="type">int</span> <i>defaultValue</i> = 0, <span class="type">std::string</span> *<i>errorMessage</i> = 0)</h3>
+<!-- @@@readIntValue -->
+<!-- $$$readIntegerFromAncestor[overload1]$$$readIntegerFromAncestorconststd::string&int -->
+<h3 class="fn" id="readIntegerFromAncestor"><a name="readIntegerFromAncestor"></a><span class="type">int</span> SymbolGroupValue::<span class="name">readIntegerFromAncestor</span>(const <span class="type">std::string</span> &amp;<i>name</i>, <span class="type">int</span> <i>defaultValue</i> = -1) const</h3>
+<!-- @@@readIntegerFromAncestor -->
+<!-- $$$readMemory[overload1]$$$readMemoryCIDebugDataSpaces*intintstd::string* -->
+<h3 class="fn" id="readMemory"><a name="readMemory"></a><code>[static] </code><span class="type">unsigned</span> <span class="type">char</span> *SymbolGroupValue::<span class="name">readMemory</span>(<span class="type">CIDebugDataSpaces</span> *<i>ds</i>, <span class="type">int</span> <i>address</i>, <span class="type">int</span> <i>length</i>, <span class="type">std::string</span> *<i>errorMessage</i> = 0)</h3>
+<!-- @@@readMemory -->
+<!-- $$$readPointerValue[overload1]$$$readPointerValueCIDebugDataSpaces*intstd::string* -->
+<h3 class="fn" id="readPointerValue"><a name="readPointerValue"></a><code>[static] </code><span class="type">int</span> SymbolGroupValue::<span class="name">readPointerValue</span>(<i>CIDebugDataSpaces *</i>, <i>int</i>, <i>std::string *</i>)</h3>
+<!-- @@@readPointerValue -->
+<!-- $$$readPointerValueFromAncestor[overload1]$$$readPointerValueFromAncestorconststd::string& -->
+<h3 class="fn" id="readPointerValueFromAncestor"><a name="readPointerValueFromAncestor"></a><span class="type">int</span> SymbolGroupValue::<span class="name">readPointerValueFromAncestor</span>(<i>const std::string &amp;</i>) const</h3>
+<!-- @@@readPointerValueFromAncestor -->
+<!-- $$$readSignedValue[overload1]$$$readSignedValueCIDebugDataSpaces*intintintstd::string* -->
+<h3 class="fn" id="readSignedValue"><a name="readSignedValue"></a><code>[static] </code><span class="type">int</span> SymbolGroupValue::<span class="name">readSignedValue</span>(<i>CIDebugDataSpaces *</i>, <i>int</i>, <i>int</i>, <i>int</i>, <i>std::string *</i>)</h3>
+<!-- @@@readSignedValue -->
+<!-- $$$readUnsignedValue[overload1]$$$readUnsignedValueCIDebugDataSpaces*intintintstd::string* -->
+<h3 class="fn" id="readUnsignedValue"><a name="readUnsignedValue"></a><code>[static] </code><span class="type">int</span> SymbolGroupValue::<span class="name">readUnsignedValue</span>(<i>CIDebugDataSpaces *</i>, <i>int</i>, <i>int</i>, <i>int</i>, <i>std::string *</i>)</h3>
+<!-- @@@readUnsignedValue -->
+<!-- $$$resolveSymbol[overload1]$$$resolveSymbolconstchar*constSymbolGroupValueContext&std::string* -->
+<h3 class="fn" id="resolveSymbol"><a name="resolveSymbol"></a><code>[static] </code><span class="type"><a href="symbolgroupvalue.html#SymbolList-typedef">SymbolGroupValue::SymbolList</a></span> SymbolGroupValue::<span class="name">resolveSymbol</span>(const <span class="type">char</span> *<i>pattern</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>c</i>, <span class="type">std::string</span> *<i>errorMessage</i> = 0)</h3>
+<!-- @@@resolveSymbol -->
+<!-- $$$resolveSymbolName[overload1]$$$resolveSymbolNameconstchar*constSymbolGroupValueContext&std::string* -->
+<h3 class="fn" id="resolveSymbolName"><a name="resolveSymbolName"></a><code>[static] </code><span class="type">int</span> SymbolGroupValue::<span class="name">resolveSymbolName</span>(<i>const char *</i>, <i>const SymbolGroupValueContext &amp;</i>, <i>std::string *</i>)</h3>
+<!-- @@@resolveSymbolName -->
+<!-- $$$resolveType[overload1]$$$resolveTypeconststd::string&constSymbolGroupValueContext&conststd::string& -->
+<h3 class="fn" id="resolveType"><a name="resolveType"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">resolveType</span>(const <span class="type">std::string</span> &amp;<i>type</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>ctx</i>, const <span class="type">std::string</span> &amp;<i>currentModule</i> = std::string())</h3>
+<!-- @@@resolveType -->
+<!-- $$$size[overload1]$$$size -->
+<h3 class="fn" id="size"><a name="size"></a><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">size</span>() const</h3>
+<!-- @@@size -->
+<!-- $$$sizeOf[overload1]$$$sizeOfconstchar* -->
+<h3 class="fn" id="sizeOf"><a name="sizeOf"></a><code>[static] </code><span class="type">unsigned</span> <span class="type">int</span> SymbolGroupValue::<span class="name">sizeOf</span>(const <span class="type">char</span> *<i>type</i>)</h3>
+<!-- @@@sizeOf -->
+<!-- $$$stripArrayType[overload1]$$$stripArrayTypeconststd::string& -->
+<h3 class="fn" id="stripArrayType"><a name="stripArrayType"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">stripArrayType</span>(<i>const std::string &amp;</i>)</h3>
+<!-- @@@stripArrayType -->
+<!-- $$$stripClassPrefixes[overload1]$$$stripClassPrefixesconststd::string& -->
+<h3 class="fn" id="stripClassPrefixes"><a name="stripClassPrefixes"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">stripClassPrefixes</span>(<i>const std::string &amp;</i>)</h3>
+<!-- @@@stripClassPrefixes -->
+<!-- $$$stripConst[overload1]$$$stripConstconststd::string& -->
+<h3 class="fn" id="stripConst"><a name="stripConst"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">stripConst</span>(const <span class="type">std::string</span> &amp;<i>type</i>)</h3>
+<!-- @@@stripConst -->
+<!-- $$$stripModuleFromType[overload1]$$$stripModuleFromTypeconststd::string& -->
+<h3 class="fn" id="stripModuleFromType"><a name="stripModuleFromType"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">stripModuleFromType</span>(const <span class="type">std::string</span> &amp;<i>type</i>)</h3>
+<!-- @@@stripModuleFromType -->
+<!-- $$$stripPointerType[overload1]$$$stripPointerTypeconststd::string& -->
+<h3 class="fn" id="stripPointerType"><a name="stripPointerType"></a><code>[static] </code><span class="type">std::string</span> SymbolGroupValue::<span class="name">stripPointerType</span>(<i>const std::string &amp;</i>)</h3>
+<!-- @@@stripPointerType -->
+<!-- $$$type[overload1]$$$type -->
+<h3 class="fn" id="type"><a name="type"></a><span class="type">std::string</span> SymbolGroupValue::<span class="name">type</span>() const</h3>
+<!-- @@@type -->
+<!-- $$$typeCast[overload1]$$$typeCastconstchar* -->
+<h3 class="fn" id="typeCast"><a name="typeCast"></a><span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> SymbolGroupValue::<span class="name">typeCast</span>(const <span class="type">char</span> *<i>type</i>) const</h3>
+<!-- @@@typeCast -->
+<!-- $$$typeOfAncestor[overload1]$$$typeOfAncestorconststd::string& -->
+<h3 class="fn" id="typeOfAncestor"><a name="typeOfAncestor"></a><span class="type">std::string</span> SymbolGroupValue::<span class="name">typeOfAncestor</span>(const <span class="type">std::string</span> &amp;<i>childName</i>) const</h3>
+<!-- @@@typeOfAncestor -->
+<!-- $$$value[overload1]$$$value -->
+<h3 class="fn" id="value"><a name="value"></a><span class="type">std::wstring</span> SymbolGroupValue::<span class="name">value</span>() const</h3>
+<!-- @@@value -->
+<!-- $$$wcharPointerData[overload1]$$$wcharPointerDataunsignedintunsignedint -->
+<h3 class="fn" id="wcharPointerData"><a name="wcharPointerData"></a><span class="type">std::wstring</span> SymbolGroupValue::<span class="name">wcharPointerData</span>(<span class="type">unsigned</span> <span class="type">int</span> <i>charCount</i>, <span class="type">unsigned</span> <span class="type">int</span> <i>maxCharCount</i> = 512) const</h3>
+<!-- @@@wcharPointerData -->
+<!-- $$$writeMemory[overload1]$$$writeMemoryCIDebugDataSpaces*intconstunsignedchar*intstd::string* -->
+<h3 class="fn" id="writeMemory"><a name="writeMemory"></a><code>[static] </code><span class="type">bool</span> SymbolGroupValue::<span class="name">writeMemory</span>(<span class="type">CIDebugDataSpaces</span> *<i>ds</i>, <span class="type">int</span> <i>address</i>, const <span class="type">unsigned</span> <span class="type">char</span> *<i>data</i>, <span class="type">int</span> <i>length</i>, <span class="type">std::string</span> *<i>errorMessage</i> = 0)</h3>
+<!-- @@@writeMemory -->
+<!-- $$$operator bool[overload1]$$$operator bool -->
+<h3 class="fn" id="operator-bool"><a name="operator-bool"></a><span class="type">bool</span> SymbolGroupValue::<span class="name">operator bool</span>() const</h3>
+<!-- @@@operator bool -->
+<!-- $$$operator[][overload1]$$$operator[]constchar* -->
+<h3 class="fn" id="operator-5b-5d"><a name="operator-5b-5d"></a><span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> SymbolGroupValue::<span class="name">operator[]</span>(const <span class="type">char</span> *<i>name</i>) const</h3>
+<!-- @@@operator[] -->
+<!-- $$$operator[]$$$operator[]unsignedint -->
+<h3 class="fn" id="operator-5b-5d-1"><a name="operator-5b-5d-1"></a><span class="type"><a href="symbolgroupvalue.html#SymbolGroupValue">SymbolGroupValue</a></span> SymbolGroupValue::<span class="name">operator[]</span>(<i>unsigned int</i>) const</h3>
+<!-- @@@operator[] -->
+</div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

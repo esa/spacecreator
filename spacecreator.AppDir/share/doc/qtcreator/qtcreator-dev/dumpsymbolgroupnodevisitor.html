@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- symbolgroupnode.cpp -->
+  <title>DumpSymbolGroupNodeVisitor Class | Extending Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="extending-index.html">Extending Qt Creator Manual</a></td><td >DumpSymbolGroupNodeVisitor</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="extending-index.html">Extending Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#public-functions">Public Functions</a></li>
+<li class="level1"><a href="#reimplemented-protected-functions">Reimplemented Protected Functions</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">DumpSymbolGroupNodeVisitor Class</h1>
+<!-- $$$DumpSymbolGroupNodeVisitor-brief -->
+<p>The <a href="dumpsymbolgroupnodevisitor.html">DumpSymbolGroupNodeVisitor</a> class is a GDBMI dump output visitor used to report locals values back to the debugging engine. <a href="#details">More...</a></p>
+<!-- @@@DumpSymbolGroupNodeVisitor -->
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">   <span class="preprocessor">#include &lt;DumpSymbolGroupNodeVisitor&gt;</span>
+</td></tr><tr><td class="memItemLeft rightAlign topAlign"> Inherits:</td><td class="memItemRight bottomAlign"> <a href="symbolgroupnodevisitor.html">SymbolGroupNodeVisitor</a></td></tr></table></div><ul>
+<li><a href="dumpsymbolgroupnodevisitor-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="public-functions"></a>
+<h2 id="public-functions">Public Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> </td><td class="memItemRight bottomAlign"><b><a href="dumpsymbolgroupnodevisitor.html#DumpSymbolGroupNodeVisitor">DumpSymbolGroupNodeVisitor</a></b>(std::ostream &amp;<i>os</i>, const SymbolGroupValueContext &amp;<i>context</i>, const DumpParameters &amp;<i>parameters</i> = DumpParameters())</td></tr>
+</table></div>
+<a name="reimplemented-protected-functions"></a>
+<h2 id="reimplemented-protected-functions">Reimplemented Protected Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> virtual void </td><td class="memItemRight bottomAlign"><b><a href="dumpsymbolgroupnodevisitor.html#childrenVisited">childrenVisited</a></b>(const AbstractSymbolGroupNode *<i>node</i>, unsigned int <i>depth</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> virtual bool </td><td class="memItemRight bottomAlign"><b><a href="dumpsymbolgroupnodevisitor.html#sortChildrenAlphabetically">sortChildrenAlphabetically</a></b>() const override</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> virtual SymbolGroupNodeVisitor::VisitResult </td><td class="memItemRight bottomAlign"><b><a href="dumpsymbolgroupnodevisitor.html#visit">visit</a></b>(AbstractSymbolGroupNode *<i>node</i>, const std::string &amp;<i>fullIname</i>, unsigned int <i>child</i>, unsigned int <i>depth</i>)</td></tr>
+</table></div>
+<ul>
+<li class="fn">3 protected functions inherited from <a href="symbolgroupnodevisitor.html#protected-functions">SymbolGroupNodeVisitor</a></li>
+</ul>
+<h3>Additional Inherited Members</h3>
+<ul>
+<li class="fn">1 static public member inherited from <a href="symbolgroupnodevisitor.html#static-public-members">SymbolGroupNodeVisitor</a></li>
+<li class="fn">3 protected functions inherited from <a href="symbolgroupnodevisitor.html#protected-functions">SymbolGroupNodeVisitor</a></li>
+</ul>
+<a name="details"></a>
+<!-- $$$DumpSymbolGroupNodeVisitor-description -->
+<div class="descr">
+<h2 id="details">Detailed Description</h2>
+<p>The <a href="dumpsymbolgroupnodevisitor.html">DumpSymbolGroupNodeVisitor</a> class is a GDBMI dump output visitor used to report locals values back to the debugging engine.</p>
+</div>
+<!-- @@@DumpSymbolGroupNodeVisitor -->
+<div class="func">
+<h2>Member Function Documentation</h2>
+<!-- $$$DumpSymbolGroupNodeVisitor[overload1]$$$DumpSymbolGroupNodeVisitorstd::ostream&constSymbolGroupValueContext&constDumpParameters& -->
+<h3 class="fn" id="DumpSymbolGroupNodeVisitor"><a name="DumpSymbolGroupNodeVisitor"></a>DumpSymbolGroupNodeVisitor::<span class="name">DumpSymbolGroupNodeVisitor</span>(<span class="type">std::ostream</span> &amp;<i>os</i>, const <span class="type"><a href="symbolgroupvaluecontext.html">SymbolGroupValueContext</a></span> &amp;<i>context</i>, const <span class="type"><a href="dumpparameters.html">DumpParameters</a></span> &amp;<i>parameters</i> = DumpParameters())</h3>
+<p>Default constructs an instance of DumpSymbolGroupNodeVisitor.</p><!-- @@@DumpSymbolGroupNodeVisitor -->
+<!-- $$$childrenVisited[overload1]$$$childrenVisitedconstAbstractSymbolGroupNode*unsignedint -->
+<h3 class="fn" id="childrenVisited"><a name="childrenVisited"></a><code>[virtual protected] </code><span class="type">void</span> DumpSymbolGroupNodeVisitor::<span class="name">childrenVisited</span>(const <span class="type"><a href="abstractsymbolgroupnode.html">AbstractSymbolGroupNode</a></span> *<i>node</i>, <span class="type">unsigned</span> <span class="type">int</span> <i>depth</i>)</h3>
+<!-- @@@childrenVisited -->
+<!-- $$$sortChildrenAlphabetically[overload1]$$$sortChildrenAlphabetically -->
+<h3 class="fn" id="sortChildrenAlphabetically"><a name="sortChildrenAlphabetically"></a><code>[override virtual protected] </code><span class="type">bool</span> DumpSymbolGroupNodeVisitor::<span class="name">sortChildrenAlphabetically</span>() const</h3>
+<!-- @@@sortChildrenAlphabetically -->
+<!-- $$$visit[overload1]$$$visitAbstractSymbolGroupNode*conststd::string&unsignedintunsignedint -->
+<h3 class="fn" id="visit"><a name="visit"></a><code>[virtual protected] </code><span class="type"><a href="symbolgroupnodevisitor.html#VisitResult-enum">SymbolGroupNodeVisitor::VisitResult</a></span> DumpSymbolGroupNodeVisitor::<span class="name">visit</span>(<span class="type"><a href="abstractsymbolgroupnode.html">AbstractSymbolGroupNode</a></span> *<i>node</i>, const <span class="type">std::string</span> &amp;<i>fullIname</i>, <span class="type">unsigned</span> <span class="type">int</span> <i>child</i>, <span class="type">unsigned</span> <span class="type">int</span> <i>depth</i>)</h3>
+<!-- @@@visit -->
+</div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>

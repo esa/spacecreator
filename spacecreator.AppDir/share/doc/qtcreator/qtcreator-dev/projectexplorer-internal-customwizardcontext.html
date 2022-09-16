@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- customwizardparameters.cpp -->
+  <title>CustomWizardContext Class | Extending Qt Creator Manual</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="extending-index.html">Extending Qt Creator Manual</a></td><td >CustomWizardContext</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right"><a href="extending-index.html">Extending Qt Creator Manual 4.8&#x2e;2</a></td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#public-types">Public Types</a></li>
+<li class="level1"><a href="#public-functions">Public Functions</a></li>
+<li class="level1"><a href="#public-variables">Public Variables</a></li>
+<li class="level1"><a href="#static-public-members">Static Public Members</a></li>
+<li class="level1"><a href="#details">Detailed Description</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">CustomWizardContext Class</h1>
+<span class="small-subtitle">(<a href="projectexplorer-internal-customwizardcontext.html">ProjectExplorer::Internal::CustomWizardContext</a>)<br/></span>
+<!-- $$$CustomWizardContext-brief -->
+<p>The <a href="projectexplorer-internal-customwizardcontext.html">CustomWizardContext</a> class provides the context for one custom wizard run. <a href="#details">More...</a></p>
+<!-- @@@CustomWizardContext -->
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> Header:</td><td class="memItemRight bottomAlign">   <span class="preprocessor">#include &lt;CustomWizardContext&gt;</span>
+</td></tr></table></div><ul>
+<li><a href="projectexplorer-internal-customwizardcontext-members.html">List of all members, including inherited members</a></li>
+</ul>
+<a name="public-types"></a>
+<h2 id="public-types">Public Types</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#FieldReplacementMap-typedef">FieldReplacementMap</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#TemporaryFilePtr-typedef">TemporaryFilePtr</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> typedef </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#TemporaryFilePtrList-typedef">TemporaryFilePtrList</a></b></td></tr>
+</table></div>
+<a name="public-functions"></a>
+<h2 id="public-functions">Public Functions</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> void </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#reset">reset</a></b>()</td></tr>
+</table></div>
+<a name="public-variables"></a>
+<h2 id="public-variables">Public Variables</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> ProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#baseReplacements-var">baseReplacements</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#path-var">path</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> ProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#replacements-var">replacements</a></b></td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#targetPath-var">targetPath</a></b></td></tr>
+</table></div>
+<a name="static-public-members"></a>
+<h2 id="static-public-members">Static Public Members</h2>
+<div class="table"><table class="alignedsummary">
+<tr><td class="memItemLeft rightAlign topAlign"> int </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#processFile">processFile</a></b>(<i>const ProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap &amp;</i>, <i>int</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#replaceFields">replaceFields</a></b>(const ProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap &amp;<i>fm</i>, int *<i>s</i>)</td></tr>
+<tr><td class="memItemLeft rightAlign topAlign"> bool </td><td class="memItemRight bottomAlign"><b><a href="projectexplorer-internal-customwizardcontext.html#replaceFields-1">replaceFields</a></b>(const ProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap &amp;<i>fm</i>, int *<i>s</i>, ProjectExplorer::Internal::CustomWizardContext::TemporaryFilePtrList *<i>files</i>)</td></tr>
+</table></div>
+<a name="details"></a>
+<!-- $$$CustomWizardContext-description -->
+<div class="descr">
+<h2 id="details">Detailed Description</h2>
+<p>The <a href="projectexplorer-internal-customwizardcontext.html">CustomWizardContext</a> class provides the context for one custom wizard run.</p>
+<p>Shared between <a href="projectexplorer-sub-qt-creator.html#CustomWizard-var">CustomWizard</a> and the <a href="projectexplorer-internal-customwizardpage.html">CustomWizardPage</a> as it is used for the <a href="http://doc.qt.io/qt-5/qlineedit.html">QLineEdit</a>-type fields' default texts as well. Contains basic replacement fields like <code>'%CppSourceSuffix%'</code>, <code>'%CppHeaderSuffix%'</code> (settings-dependent). <a href="projectexplorer-internal-customwizardcontext.html#reset">reset</a>() should be called before each wizard run to refresh them. <a href="projectexplorer-sub-qt-creator.html#CustomProjectWizard-var">CustomProjectWizard</a> additionally inserts <code>'%ProjectName%'</code> from the intro page to have it available for default texts.</p>
+</div>
+<p><b>See also </b><a href="projectexplorer-sub-qt-creator.html#CustomWizard-var">ProjectExplorer::CustomWizard</a>.</p>
+<!-- @@@CustomWizardContext -->
+<div class="types">
+<h2>Member Type Documentation</h2>
+<!-- $$$FieldReplacementMap -->
+<h3 class="fn" id="FieldReplacementMap-typedef"><a name="FieldReplacementMap-typedef"></a>typedef CustomWizardContext::<span class="name">FieldReplacementMap</span></h3>
+<!-- @@@FieldReplacementMap -->
+<!-- $$$TemporaryFilePtr -->
+<h3 class="fn" id="TemporaryFilePtr-typedef"><a name="TemporaryFilePtr-typedef"></a>typedef CustomWizardContext::<span class="name">TemporaryFilePtr</span></h3>
+<!-- @@@TemporaryFilePtr -->
+<!-- $$$TemporaryFilePtrList -->
+<h3 class="fn" id="TemporaryFilePtrList-typedef"><a name="TemporaryFilePtrList-typedef"></a>typedef CustomWizardContext::<span class="name">TemporaryFilePtrList</span></h3>
+<!-- @@@TemporaryFilePtrList -->
+</div>
+<div class="func">
+<h2>Member Function Documentation</h2>
+<!-- $$$processFile[overload1]$$$processFileconstProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap&int -->
+<h3 class="fn" id="processFile"><a name="processFile"></a><code>[static] </code><span class="type">int</span> CustomWizardContext::<span class="name">processFile</span>(<i>const ProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap &amp;</i>, <i>int</i>)</h3>
+<!-- @@@processFile -->
+<!-- $$$replaceFields[overload1]$$$replaceFieldsconstProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap&int* -->
+<h3 class="fn" id="replaceFields"><a name="replaceFields"></a><code>[static] </code><span class="type">bool</span> CustomWizardContext::<span class="name">replaceFields</span>(const <span class="type"><a href="projectexplorer-internal-customwizardcontext.html#FieldReplacementMap-typedef">ProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap</a></span> &amp;<i>fm</i>, <span class="type">int</span> *<i>s</i>)</h3>
+<p>Replaces field values delimited by '%' with special modifiers:</p>
+<ul>
+<li>%Field% -&gt; simple replacement</li>
+<li>%Field:l% -&gt; replace with everything changed to lower case</li>
+<li>%Field:u% -&gt; replace with everything changed to upper case</li>
+<li>%Field:c% -&gt; replace with first character capitalized</li>
+<li>%Field:h% -&gt; replace with something usable as header guard</li>
+<li>%Field:s% -&gt; replace with something usable as structure or class name</li>
+</ul>
+<p>The return value indicates whether non-empty replacements were encountered.</p>
+<!-- @@@replaceFields -->
+<!-- $$$replaceFields$$$replaceFieldsconstProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap&int*ProjectExplorer::Internal::CustomWizardContext::TemporaryFilePtrList* -->
+<h3 class="fn" id="replaceFields-1"><a name="replaceFields-1"></a><code>[static] </code><span class="type">bool</span> CustomWizardContext::<span class="name">replaceFields</span>(const <span class="type"><a href="projectexplorer-internal-customwizardcontext.html#FieldReplacementMap-typedef">ProjectExplorer::Internal::CustomWizardContext::FieldReplacementMap</a></span> &amp;<i>fm</i>, <span class="type">int</span> *<i>s</i>, <span class="type"><a href="projectexplorer-internal-customwizardcontext.html#TemporaryFilePtrList-typedef">ProjectExplorer::Internal::CustomWizardContext::TemporaryFilePtrList</a></span> *<i>files</i>)</h3>
+<p>This function is a special <a href="projectexplorer-internal-customwizardcontext.html#replaceFields">replaceFields</a>() overload used for the arguments of a generator script.</p>
+<p>Writes the expanded field values out to temporary files specified by <i>files</i> and inserts file names instead of the expanded fields in the string <i>s</i>.</p>
+<!-- @@@replaceFields -->
+<!-- $$$reset[overload1]$$$reset -->
+<h3 class="fn" id="reset"><a name="reset"></a><span class="type">void</span> CustomWizardContext::<span class="name">reset</span>()</h3>
+<!-- @@@reset -->
+</div>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2019 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>
