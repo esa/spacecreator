@@ -35,7 +35,7 @@ HtmlResultExporter::HtmlResultExporter(const QString &chosenBoardName, const IVI
     , rows(csvModel.records().size())
     , maxDelta(delta)
 {
-    initTableCells(csvModel, results);
+    initTableCells(csvModel);
     initTableHeader();
 }
 
@@ -48,11 +48,22 @@ auto HtmlResultExporter::getResultAtIndex(int index) -> QVariant
     }
 }
 
-auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<QVariant> &results) -> void
+auto HtmlResultExporter::initErrorMessage(int csvCellsCount) -> void
 {
-    std::vector<QString>::size_type rowIndex = 0;
-    std::vector<QString>::size_type resultIndex = 0;
-    if (results.empty()) {
+    if (csvCellsCount != resultList.size()) {
+        errorMessage = "Error: Wrong number of results. Either the results are wrong, "
+                       "they were decoded improperly or wrong CSV file was loaded.";
+        qCritical() << errorMessage;
+    }
+    qDebug() << "Number of CSV cells: " << csvCellsCount;
+    qDebug() << "Number of results: " << resultList.size();
+}
+
+auto HtmlResultExporter::initTableCells(const CsvModel &csvModel) -> void
+{
+    int rowIndex = 0;
+    int csvRecordIndex = 0;
+    if (resultList.empty()) {
         qWarning() << "Results vector is empty";
         return;
     }
@@ -60,22 +71,23 @@ auto HtmlResultExporter::initTableCells(const CsvModel &csvModel, const QVector<
         csv::Row csvRow = *row;
         auto csvFields = csvRow.fields();
         cells.push_back({});
-        std::vector<QString>::size_type parameterIndex = 0;
+        int parameterIndex = 0;
         for (const auto &csvField : csvFields) {
             if (ifaceParams[parameterIndex].isInDirection()) {
-                cells[rowIndex].push_back({ getResultAtIndex(resultIndex), CellColor::Black });
+                cells[rowIndex].push_back({ getResultAtIndex(csvRecordIndex), CellColor::Black });
             } else {
-                auto currDelta = abs(getResultAtIndex(resultIndex).toFloat() - csvField.toFloat());
+                auto currDelta = abs(getResultAtIndex(csvRecordIndex).toFloat() - csvField.toFloat());
                 auto color = currDelta > maxDelta ? CellColor::Red : CellColor::Green;
                 cells[rowIndex].push_back({ csvField, CellColor::Black });
-                cells[rowIndex].push_back({ getResultAtIndex(resultIndex), color });
+                cells[rowIndex].push_back({ getResultAtIndex(csvRecordIndex), color });
                 cells[rowIndex].push_back({ currDelta, color });
             }
             parameterIndex++;
-            resultIndex++;
+            csvRecordIndex++;
         }
         rowIndex++;
     }
+    initErrorMessage(csvRecordIndex);
 }
 
 auto HtmlResultExporter::initTableHeader() -> void
@@ -123,6 +135,9 @@ auto HtmlResultExporter::generateHtmlStream(QTextStream &stream) -> void
     stream << "\t\t<h2>Test results for interface " << interfaceName << " of function " << functionName << "</h2>\n";
     stream << "\t\t<p style='font-size: 22px'>Chosen board: " << boardName << "</p>\n";
     stream << "\t\t<p style='font-size: 22px'>Maximum allowed absolute error: " << maxDelta << "</p>\n";
+    if (!errorMessage.isEmpty()) {
+        stream << "\t\t<p style='font-size: 22px;color:red;'>" << errorMessage << "</p>\n";
+    }
     stream << "\t\t<table>\n";
 
     generateTableHeader(stream);
