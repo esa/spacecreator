@@ -1,22 +1,12 @@
 SUBTYPES DEFINITIONS ::=
 BEGIN
 
-MySimpleInt ::= INTEGER(0..1)
-MySimpleArray ::= SEQUENCE (SIZE(1 .. 2)) OF MySimpleInt
+-- Tailored-Byte ::= INTEGER(0 | 10 | 255) 
 
-Testgui-writerequesta-p1 ::= SEQUENCE {
-    start-address MySimpleInt,
-    values        MySimpleArray
-}
+-- Bcapp-dlctxsdu-p1 ::= SEQUENCE (SIZE(2)) OF Tailored-Byte
 
-Testgui-writerequestb-p1 ::= SEQUENCE {
-    start-address MySimpleInt,
-    values        MySimpleArray
-}
+Bcapp-dlctxsdu-p1 ::= OCTET STRING (SIZE(2))
 
-Tailored-Byte ::= INTEGER(0 | 10 | 255) 
-
-Bcapp-dlctxsdu-p1 ::= SEQUENCE (SIZE(2)) OF Tailored-Byte
 
 Channeleffects-corruptchar-p1 ::= INTEGER(1 | 15)
 
