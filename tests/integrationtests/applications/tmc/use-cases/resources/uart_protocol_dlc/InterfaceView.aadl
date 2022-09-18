@@ -6,6 +6,121 @@
 ---------------------------------------------------
 
 
+PACKAGE interfaceview::IV::BCDLCT
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::BCApp;
+WITH interfaceview::IV::ErroredChannel;
+
+SUBPROGRAM PI_PHYTxError
+END PI_PHYTxError;
+
+SUBPROGRAM IMPLEMENTATION PI_PHYTxError.others
+END PI_PHYTxError.others;
+
+
+SUBPROGRAM PI_DLCTxSDU
+FEATURES
+    p1 : IN PARAMETER DataView::T_UART_DLC_SDU {
+       Taste::encoding => NATIVE;
+    };
+END PI_DLCTxSDU;
+
+SUBPROGRAM IMPLEMENTATION PI_DLCTxSDU.others
+END PI_DLCTxSDU.others;
+
+
+SUBPROGRAM PI_DLCTxReset
+END PI_DLCTxReset;
+
+SUBPROGRAM IMPLEMENTATION PI_DLCTxReset.others
+END PI_DLCTxReset.others;
+
+
+SUBPROGRAM RI_PHYTxChar
+FEATURES
+    p1 : IN PARAMETER DataView::UINT8 {
+       Taste::encoding => NATIVE;
+    };
+END RI_PHYTxChar;
+
+SUBPROGRAM IMPLEMENTATION RI_PHYTxChar.others
+END RI_PHYTxChar.others;
+
+
+
+SYSTEM BCDLCT
+FEATURES
+   PI_PHYTxError : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_PHYTxError.others {
+      Taste::InterfaceName           => "PHYTxError";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+   PI_DLCTxSDU : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_DLCTxSDU.others {
+      Taste::InterfaceName           => "DLCTxSDU";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+   PI_DLCTxReset : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_DLCTxReset.others {
+      Taste::InterfaceName           => "DLCTxReset";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+   RI_PHYTxChar : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ErroredChannel:: PI_PHYTxChar.others {
+      Taste::labelInheritance        => "false";
+      Taste::InterfaceName           => "PHYTxChar";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+PROPERTIES
+   -- ignored property: name = BCDLCT
+   -- ignored property: is_type = NO
+   Source_Language => (SDL);
+   -- ignored property: default_implementation = default
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END BCDLCT;
+
+SYSTEM IMPLEMENTATION BCDLCT.others
+END BCDLCT.others;
+
+END interfaceview::IV::BCDLCT;
+
+
+
 PACKAGE interfaceview::IV::RTDLCR
 PUBLIC
 
@@ -71,11 +186,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 16;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 16;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    PI_DLCRxReset : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: RTDLCR:: PI_DLCRxReset.others {
       Taste::InterfaceName           => "DLCRxReset";            
@@ -83,11 +198,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    PI_PHYRxError : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: RTDLCR:: PI_PHYRxError.others {
       Taste::InterfaceName           => "PHYRxError";            
@@ -95,11 +210,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    RI_DLCRxSDU : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: RTApp:: PI_DLCRxSDU.others {
       Taste::labelInheritance        => "true";
@@ -108,11 +223,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    RI_DLCRxError : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: RTApp:: PI_DLCRxError.others {
       Taste::labelInheritance        => "true";
@@ -121,11 +236,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
 PROPERTIES
    -- ignored property: name = RTDLCR
@@ -149,194 +264,6 @@ SUBCOMPONENTS
 END RTDLCR.others;
 
 END interfaceview::IV::RTDLCR;
-
-
-
-PACKAGE interfaceview::IV::BCDLCT
-PUBLIC
-
-WITH Taste;
-WITH DataView;
-WITH TASTE_IV_Properties;
-WITH interfaceview::IV::BCApp;
-WITH interfaceview::IV::ErroredChannel;
-
-SUBPROGRAM PI_PHYTxError
-END PI_PHYTxError;
-
-SUBPROGRAM IMPLEMENTATION PI_PHYTxError.others
-END PI_PHYTxError.others;
-
-
-SUBPROGRAM PI_DLCTxSDU
-FEATURES
-    p1 : IN PARAMETER DataView::T_UART_DLC_SDU {
-       Taste::encoding => NATIVE;
-    };
-END PI_DLCTxSDU;
-
-SUBPROGRAM IMPLEMENTATION PI_DLCTxSDU.others
-END PI_DLCTxSDU.others;
-
-
-SUBPROGRAM PI_DLCTxReset
-END PI_DLCTxReset;
-
-SUBPROGRAM IMPLEMENTATION PI_DLCTxReset.others
-END PI_DLCTxReset.others;
-
-
-SUBPROGRAM RI_PHYTxChar
-FEATURES
-    p1 : IN PARAMETER DataView::UINT8 {
-       Taste::encoding => NATIVE;
-    };
-END RI_PHYTxChar;
-
-SUBPROGRAM IMPLEMENTATION RI_PHYTxChar.others
-END RI_PHYTxChar.others;
-
-
-
-SYSTEM BCDLCT
-FEATURES
-   PI_PHYTxError : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_PHYTxError.others {
-      Taste::InterfaceName           => "PHYTxError";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => false      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
-      Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-   };
-   PI_DLCTxSDU : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_DLCTxSDU.others {
-      Taste::InterfaceName           => "DLCTxSDU";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => false      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
-      Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-   };
-   PI_DLCTxReset : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_DLCTxReset.others {
-      Taste::InterfaceName           => "DLCTxReset";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => false      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
-      Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-   };
-   RI_PHYTxChar : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ErroredChannel:: PI_PHYTxChar.others {
-      Taste::labelInheritance        => "false";
-      Taste::InterfaceName           => "PHYTxChar";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => false      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
-      Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-   };
-PROPERTIES
-   -- ignored property: name = BCDLCT
-   -- ignored property: is_type = NO
-   Source_Language => (SDL);
-   -- ignored property: default_implementation = default
-   -- ignored property: fixed_system_element = NO
-   -- ignored property: required_system_element = NO
-   Taste::Startup_Priority => 1;
-   -- ignored property: FPGA_Configurations = 
-END BCDLCT;
-
-SYSTEM IMPLEMENTATION BCDLCT.others
-END BCDLCT.others;
-
-END interfaceview::IV::BCDLCT;
-
-
-
-PACKAGE interfaceview::IV::BCApp
-PUBLIC
-
-WITH Taste;
-WITH DataView;
-WITH TASTE_IV_Properties;
-WITH interfaceview::IV::BCDLCT;
-
-SUBPROGRAM RI_DLCTxSDU
-FEATURES
-    p1 : IN PARAMETER DataView::T_UART_DLC_SDU {
-       Taste::encoding => NATIVE;
-    };
-END RI_DLCTxSDU;
-
-SUBPROGRAM IMPLEMENTATION RI_DLCTxSDU.others
-END RI_DLCTxSDU.others;
-
-
-SUBPROGRAM RI_DLCTxReset
-END RI_DLCTxReset;
-
-SUBPROGRAM IMPLEMENTATION RI_DLCTxReset.others
-END RI_DLCTxReset.others;
-
-
-
-SYSTEM BCApp
-FEATURES
-   RI_DLCTxSDU : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_DLCTxSDU.others {
-      Taste::labelInheritance        => "true";
-      Taste::InterfaceName           => "DLCTxSDU";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => false      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
-      Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-   };
-   RI_DLCTxReset : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_DLCTxReset.others {
-      Taste::labelInheritance        => "true";
-      Taste::InterfaceName           => "DLCTxReset";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => false      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
-      Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-   };
-PROPERTIES
-   -- ignored property: name = BCApp
-   -- ignored property: is_type = NO
-   Source_Language => (GUI);
-   -- ignored property: default_implementation = default
-   -- ignored property: fixed_system_element = NO
-   -- ignored property: required_system_element = NO
-   Taste::Startup_Priority => 1;
-   -- ignored property: FPGA_Configurations = 
-END BCApp;
-
-SYSTEM IMPLEMENTATION BCApp.others
-END BCApp.others;
-
-END interfaceview::IV::BCApp;
 
 
 
@@ -386,11 +313,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    PI_DLCRxSDU : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: RTApp:: PI_DLCRxSDU.others {
       Taste::InterfaceName           => "DLCRxSDU";            
@@ -398,11 +325,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    RI_DLCRxReset : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: RTDLCR:: PI_DLCRxReset.others {
       Taste::labelInheritance        => "true";
@@ -411,11 +338,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
 PROPERTIES
    -- ignored property: name = RTApp
@@ -432,6 +359,79 @@ SYSTEM IMPLEMENTATION RTApp.others
 END RTApp.others;
 
 END interfaceview::IV::RTApp;
+
+
+
+PACKAGE interfaceview::IV::BCApp
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::BCDLCT;
+
+SUBPROGRAM RI_DLCTxSDU
+FEATURES
+    p1 : IN PARAMETER DataView::T_UART_DLC_SDU {
+       Taste::encoding => NATIVE;
+    };
+END RI_DLCTxSDU;
+
+SUBPROGRAM IMPLEMENTATION RI_DLCTxSDU.others
+END RI_DLCTxSDU.others;
+
+
+SUBPROGRAM RI_DLCTxReset
+END RI_DLCTxReset;
+
+SUBPROGRAM IMPLEMENTATION RI_DLCTxReset.others
+END RI_DLCTxReset.others;
+
+
+
+SYSTEM BCApp
+FEATURES
+   RI_DLCTxSDU : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_DLCTxSDU.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "DLCTxSDU";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+   RI_DLCTxReset : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_DLCTxReset.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "DLCTxReset";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => false      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+PROPERTIES
+   -- ignored property: name = BCApp
+   -- ignored property: is_type = NO
+   Source_Language => (GUI);
+   -- ignored property: default_implementation = default
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END BCApp;
+
+SYSTEM IMPLEMENTATION BCApp.others
+END BCApp.others;
+
+END interfaceview::IV::BCApp;
 
 
 
@@ -508,11 +508,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    PI_DropChar : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: ErroredChannel:: PI_DropChar.others {
       Taste::InterfaceName           => "DropChar";            
@@ -520,11 +520,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    PI_CorruptChar : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: ErroredChannel:: PI_CorruptChar.others {
       Taste::InterfaceName           => "CorruptChar";            
@@ -532,11 +532,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    RI_PHYRxChar : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: RTDLCR:: PI_PHYRxChar.others {
       Taste::labelInheritance        => "true";
@@ -545,11 +545,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 16;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 16;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    RI_PHYTxError : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: BCDLCT:: PI_PHYTxError.others {
       Taste::labelInheritance        => "true";
@@ -558,11 +558,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    RI_PHYRxError : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: RTDLCR:: PI_PHYRxError.others {
       Taste::labelInheritance        => "true";
@@ -571,11 +571,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
 PROPERTIES
    -- ignored property: name = ErroredChannel
@@ -631,11 +631,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
    RI_CorruptChar : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ErroredChannel:: PI_CorruptChar.others {
       Taste::labelInheritance        => "true";
@@ -644,11 +644,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Associated_Queue_Size   => 1;      
       Taste::Interface_Priority      => 1;      
-      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
+      Taste::Associated_Queue_Size   => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
    };
 PROPERTIES
    -- ignored property: name = ChannelEffects
@@ -670,10 +670,10 @@ END interfaceview::IV::ChannelEffects;
 PACKAGE interfaceview::IV
 PUBLIC
 
-WITH interfaceview::IV::RTDLCR;
 WITH interfaceview::IV::BCDLCT;
-WITH interfaceview::IV::BCApp;
+WITH interfaceview::IV::RTDLCR;
 WITH interfaceview::IV::RTApp;
+WITH interfaceview::IV::BCApp;
 WITH interfaceview::IV::ErroredChannel;
 WITH interfaceview::IV::ChannelEffects;
 WITH Taste;
@@ -688,24 +688,24 @@ END interfaceview;
 
 SYSTEM IMPLEMENTATION interfaceview.others
 SUBCOMPONENTS
-  RTDLCR : SYSTEM interfaceview::IV::RTDLCR::RTDLCR.others;
   BCDLCT : SYSTEM interfaceview::IV::BCDLCT::BCDLCT.others;
-  BCApp : SYSTEM interfaceview::IV::BCApp::BCApp.others;
+  RTDLCR : SYSTEM interfaceview::IV::RTDLCR::RTDLCR.others;
   RTApp : SYSTEM interfaceview::IV::RTApp::RTApp.others;
+  BCApp : SYSTEM interfaceview::IV::BCApp::BCApp.others;
   ErroredChannel : SYSTEM interfaceview::IV::ErroredChannel::ErroredChannel.others;
   ChannelEffects : SYSTEM interfaceview::IV::ChannelEffects::ChannelEffects.others;
 CONNECTIONS
-   ErroredChannel_RI_PHYTxError : SUBPROGRAM ACCESS BCDLCT.PI_PHYTxError -> ErroredChannel.RI_PHYTxError;
-   BCApp_RI_DLCTxReset : SUBPROGRAM ACCESS BCDLCT.PI_DLCTxReset -> BCApp.RI_DLCTxReset;
+   BCApp_RI_DLCTxSDU : SUBPROGRAM ACCESS BCDLCT.PI_DLCTxSDU -> BCApp.RI_DLCTxSDU;
+   ErroredChannel_RI_PHYRxError : SUBPROGRAM ACCESS RTDLCR.PI_PHYRxError -> ErroredChannel.RI_PHYRxError;
+   RTApp_RI_DLCRxReset : SUBPROGRAM ACCESS RTDLCR.PI_DLCRxReset -> RTApp.RI_DLCRxReset;
    ChannelEffects_RI_DropChar : SUBPROGRAM ACCESS ErroredChannel.PI_DropChar -> ChannelEffects.RI_DropChar;
+   BCApp_RI_DLCTxReset : SUBPROGRAM ACCESS BCDLCT.PI_DLCTxReset -> BCApp.RI_DLCTxReset;
+   ErroredChannel_RI_PHYRxChar : SUBPROGRAM ACCESS RTDLCR.PI_PHYRxChar -> ErroredChannel.RI_PHYRxChar;
+   BCDLCT_RI_PHYTxChar : SUBPROGRAM ACCESS ErroredChannel.PI_PHYTxChar -> BCDLCT.RI_PHYTxChar;
+   ErroredChannel_RI_PHYTxError : SUBPROGRAM ACCESS BCDLCT.PI_PHYTxError -> ErroredChannel.RI_PHYTxError;
    RTDLCR_RI_DLCRxError : SUBPROGRAM ACCESS RTApp.PI_DLCRxError -> RTDLCR.RI_DLCRxError;
    RTDLCR_RI_DLCRxSDU : SUBPROGRAM ACCESS RTApp.PI_DLCRxSDU -> RTDLCR.RI_DLCRxSDU;
-   ErroredChannel_RI_PHYRxError : SUBPROGRAM ACCESS RTDLCR.PI_PHYRxError -> ErroredChannel.RI_PHYRxError;
    ChannelEffects_RI_CorruptChar : SUBPROGRAM ACCESS ErroredChannel.PI_CorruptChar -> ChannelEffects.RI_CorruptChar;
-   BCDLCT_RI_PHYTxChar : SUBPROGRAM ACCESS ErroredChannel.PI_PHYTxChar -> BCDLCT.RI_PHYTxChar;
-   BCApp_RI_DLCTxSDU : SUBPROGRAM ACCESS BCDLCT.PI_DLCTxSDU -> BCApp.RI_DLCTxSDU;
-   ErroredChannel_RI_PHYRxChar : SUBPROGRAM ACCESS RTDLCR.PI_PHYRxChar -> ErroredChannel.RI_PHYRxChar;
-   RTApp_RI_DLCRxReset : SUBPROGRAM ACCESS RTDLCR.PI_DLCRxReset -> RTApp.RI_DLCRxReset;
 END interfaceview.others;
 
 PROPERTIES
