@@ -15,7 +15,101 @@ DATAVIEW_AADLV2 := ${DATAVIEW_PATH}/dataview_aadlv2.aadl
 # Project cache folder is used to speed up all ASN.1-related processing
 export PROJECT_CACHE=${HOME}/.taste_AST_cache
 
-all:	build-default
+
+
+# Extract the list of properties from the current model checking configuration
+# that is set in the GUI and saved in .mcconfig.xml when calling the model checkers
+PROPERTIES_CONFIG := $(shell xmllint --xpath xmel/ModelCheckingWindow/Configuration/Properties/Property/@path modelchecking/configurations/.mcconfig.xml | grep -Po "(?<= path=\")[a-zA-Z0-9-_./]*(?=\")")
+
+ifneq ($(shell xmllint --xpath "string(xmel/ModelCheckingWindow/Configuration/Subtyping/@name)" modelchecking/configurations/.mcconfig.xml),)
+SUBTYPE := $(shell xmllint --xpath "string(xmel/ModelCheckingWindow/Configuration/Subtyping/@name)" modelchecking/configurations/.mcconfig.xml)
+else
+SUBTYPE := .default_subtypes.asn
+endif
+
+# Build an interactive simulator and model checker (experimental)
+all:	${DATAVIEW_PATH}/iterators/asn1_ada_iterators.ads
+	$(MAKE) -j -C build -f Makefile.taste simu
+	mkdir -p simulation/mcsrc
+	cp -u ${TOOL_INST}/share/simu-common/mc.ad[sb] simulation/mcsrc
+	cp -u ${TOOL_INST}/share/simu-common/modelcheck.adb simulation/mcsrc
+	cp -u ${TOOL_INST}/share/simu-common/mc.gpr simulation
+	cp -u ${TOOL_INST}/share/simu-common/guilayout.ui simulation
+	cp -u ${TOOL_INST}/share/simu-common/simu_params.ui simulation
+	cp -u ${TOOL_INST}/share/simu-common/toolbar.ui simulation
+	$(info [-] Processing observers ${PROPERTIES_CONFIG})
+	cd simulation && ln -fs observers/observer.asn . && taste-process-observers ${PROPERTIES_CONFIG}
+
+# Create the ASN.1 Iterators that are used by the native model checker
+${DATAVIEW_PATH}/iterators/asn1_ada_iterators.ads:	${DATAVIEW_PATH}/built
+	cd ${DATAVIEW_PATH} && taste-asn1-iterators --raw dataview-uniq.asn
+
+obs-skeleton:
+	sed 's/my_observer/$(NAME)/g' $(TOOL_INST)/share/modelchecking/skeletons/observer.pr > modelchecking/properties/$(NAME)/$(NAME).pr
+	cp $(TOOL_INST)/share/modelchecking/skeletons/Makefile.observer modelchecking/properties/$(NAME)/Makefile
+	cp ${PWD}/work/simulation/observers/observer.asn modelchecking/properties/$(NAME)/
+
+msc-skeleton:
+	sed 's/Untitled_Document/$(NAME)/g' $(TOOL_INST)/share/modelchecking/skeletons/msc.msc > modelchecking/properties/$(NAME)/$(NAME).msc
+	cp $(TOOL_INST)/share/modelchecking/skeletons/Makefile.msc modelchecking/properties/$(NAME)/Makefile
+	cp ${PWD}/work/simulation/observers/observer.asn modelchecking/properties/$(NAME)/
+
+bsc-skeleton:
+	sed 's/my_observer/$(NAME)/g' $(TOOL_INST)/share/modelchecking/skeletons/bsc.pr > modelchecking/properties/$(NAME)/$(NAME).pr
+	cp $(TOOL_INST)/share/modelchecking/skeletons/Makefile.observer modelchecking/properties/$(NAME)/Makefile
+	cp ${PWD}/work/simulation/observers/observer.asn modelchecking/properties/$(NAME)/
+
+model-check : aadl2glueC build/system_config.h ${DATAVIEW_PATH}/built ifgen
+
+build/modelchecking:
+	mkdir -p build/modelchecking
+	mkdir -p build/modelchecking/properties
+	mkdir -p build/modelchecking/output
+
+
+sdl-to-if : bcdlct/SDL/src/bcdlct_sdl2if_built 	demo_timer_manager/Timer_Manager/src/demo_timer_manager_built erroredchannel/SDL/src/erroredchannel_sdl2if_built rtdlcr/SDL/src/rtdlcr_sdl2if_built
+
+bcdlct/SDL/src/bcdlct_sdl2if_built :
+	$(MAKE) -C bcdlct/SDL generate-code
+	$(MAKE) -C bcdlct/SDL sdl-to-if
+
+demo_timer_manager/Timer_Manager/src/demo_timer_manager_built :
+	$(MAKE) -C demo_timer_manager/Timer_Manager generate-code
+
+erroredchannel/SDL/src/erroredchannel_sdl2if_built :
+	$(MAKE) -C erroredchannel/SDL generate-code
+	$(MAKE) -C erroredchannel/SDL sdl-to-if
+
+rtdlcr/SDL/src/rtdlcr_sdl2if_built :
+	$(MAKE) -C rtdlcr/SDL generate-code
+	$(MAKE) -C rtdlcr/SDL sdl-to-if
+
+
+
+
+modelchecking/subtypes:
+	mkdir -p modelchecking/subtypes
+
+modelchecking/subtypes/.default_subtypes.asn: modelchecking/subtypes
+	find . -path ./binaries -prune -o -name subtype_*.asn -exec cat {} \; >  $@
+
+obs-to-if: $(PROPERTIES_CONFIG)
+
+
+$(PROPERTIES_CONFIG):
+	$(MAKE) -C modelchecking/properties/$(dir $@)
+
+aadl-to-if:
+	cd Dump/IF &&\
+	mv * ../../build/modelchecking
+
+asn-to-if:
+	cd Dump/IF &&\
+	asn2if ../../dataview/dataview-uniq.asn dataview.if
+
+ifgen: build/modelchecking sdl-to-if asn-to-if aadl-to-if obs-to-if
+	$(MAKE) -C build -f Makefile.taste model-check
+
 
 
 # Check that all runtimes used in the system are installed
@@ -23,7 +117,7 @@ check_targets:
 	$(MAKE) -C build -f Makefile.taste check_targets
 
 # Generate the language-specific data view needed before editing user code
-dataview:	dataview/C/built dataview/Ada/built
+dataview:	dataview/Ada/built
 	# Copy the dataview to SDL/SEDS function BCDLCT (no context parameters)
 	cp -u ${DATAVIEW_UNIQ} bcdlct/SDL/src
 	# Compute MD5 of the dataview, needed to decide if code needs to be re-generated
@@ -38,7 +132,7 @@ dataview:	dataview/C/built dataview/Ada/built
 	md5sum -c "rtdlcr/SDL/src/dataview.md5"  &> /dev/null || md5sum  "rtdlcr/SDL/src/dataview-uniq.asn" >  "rtdlcr/SDL/src/dataview.md5"
 
 # Generate the complete dataview, including Python bindings if there is a GUI
-${DATAVIEW_PATH}/built:	dataview dataview/Python/built
+${DATAVIEW_PATH}/built:  # simulation: no dependency to "dataview" (already built by top-level Makefile)
 	touch $@
 
 # Build based on the deployment view
@@ -66,7 +160,7 @@ sql_db/DV.py:
 	mkdir -p sql_db && touch $@
 
 # Create dataview-uniq.asn by concatenating all asn1 input files
-${DATAVIEW_UNIQ}:	${ASN1_FILES}
+${DATAVIEW_UNIQ}:	${ASN1_FILES} modelchecking/subtypes/$(SUBTYPE)
 	mkdir -p ${PROJECT_CACHE} && mkdir -p ${DATAVIEW_PATH}
 	sed -e '$$s/$$/\n/' -s $^ > $@
 

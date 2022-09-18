@@ -1,4 +1,5 @@
 # SDL
+#Taste::Startup_Priority 1
 SEDS_CONVERTER?=spacecreator.AppImage --sedsconverter
 OPENGEODE?=opengeode
 VISUAL?=kate

@@ -19,17 +19,17 @@ END deploymentview::DV::Node_Linux;
 PACKAGE deploymentview::DV
 PUBLIC
 
-WITH interfaceview::IV::RTApp;
-
-WITH interfaceview::IV::ChannelEffects;
+WITH interfaceview::IV::RTDLCR;
 
 WITH interfaceview::IV::ErroredChannel;
 
-WITH interfaceview::IV::BCApp;
+WITH interfaceview::IV::RTApp;
 
 WITH interfaceview::IV::BCDLCT;
 
-WITH interfaceview::IV::RTDLCR;
+WITH interfaceview::IV::ChannelEffects;
+
+WITH interfaceview::IV::BCApp;
 
 
 WITH ocarina_processors_x86;
@@ -44,28 +44,28 @@ END Node_Linux;
 
 SYSTEM IMPLEMENTATION Node_Linux.others
 SUBCOMPONENTS
-   IV_RTApp : SYSTEM interfaceview::IV::RTApp::RTApp.others {
-      Taste::FunctionName => "RTApp";
-   };
-
-   IV_ChannelEffects : SYSTEM interfaceview::IV::ChannelEffects::ChannelEffects.others {
-      Taste::FunctionName => "ChannelEffects";
+   IV_RTDLCR : SYSTEM interfaceview::IV::RTDLCR::RTDLCR.others {
+      Taste::FunctionName => "RTDLCR";
    };
 
    IV_ErroredChannel : SYSTEM interfaceview::IV::ErroredChannel::ErroredChannel.others {
       Taste::FunctionName => "ErroredChannel";
    };
 
-   IV_BCApp : SYSTEM interfaceview::IV::BCApp::BCApp.others {
-      Taste::FunctionName => "BCApp";
+   IV_RTApp : SYSTEM interfaceview::IV::RTApp::RTApp.others {
+      Taste::FunctionName => "RTApp";
    };
 
    IV_BCDLCT : SYSTEM interfaceview::IV::BCDLCT::BCDLCT.others {
       Taste::FunctionName => "BCDLCT";
    };
 
-   IV_RTDLCR : SYSTEM interfaceview::IV::RTDLCR::RTDLCR.others {
-      Taste::FunctionName => "RTDLCR";
+   IV_ChannelEffects : SYSTEM interfaceview::IV::ChannelEffects::ChannelEffects.others {
+      Taste::FunctionName => "ChannelEffects";
+   };
+
+   IV_BCApp : SYSTEM interfaceview::IV::BCApp::BCApp.others {
+      Taste::FunctionName => "BCApp";
    };
 
    demo : PROCESS deploymentview::DV::Node_Linux::demo.others {
@@ -77,16 +77,7 @@ SUBCOMPONENTS
    x86_linux : PROCESSOR ocarina_processors_x86::x86.linux;
 PROPERTIES
    
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_RTApp;
-   
-   
-   
-   
-   
-   
-
-   
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_ChannelEffects;
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_RTDLCR;
    
    
    
@@ -104,7 +95,7 @@ PROPERTIES
    
 
    
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_BCApp;
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_RTApp;
    
    
    
@@ -122,7 +113,16 @@ PROPERTIES
    
 
    
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_RTDLCR;
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_ChannelEffects;
+   
+   
+   
+   
+   
+   
+
+   
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_BCApp;
    
    
    

@@ -5,9 +5,9 @@
 --! InputASN1FileChecksum:ff35cd78b1e82f09b63b209ab7cf7c34:/home/taste/tool-inst/share/taste-types/taste-types.asn:
 --! InputASN1FileChecksum:f5b944b785fee7f4d10244c199cc212f:data_model/basic_types.asn:
 --! InputASN1FileChecksum:557e6c7e89416c061fcb3b526e686ad0:data_model/bilevel_types.asn:
---! InputASN1FileChecksum:3b54759884c586a2e1468178a73e342e:data_model/uart_dlc.asn:
+--! InputASN1FileChecksum:4c28dc7b5243dbdaaa37fb5b83543bfe:data_model/uart_dlc.asn:
 --! InputASN1FileChecksum:7788def2887f97004e4f7a84c541f4f1:uart_protocol_dlc.acn:
---! InputASN1FileChecksum:520d7245aae72bfb6a3c57971df133b5:uart_protocol_dlc.asn:
+--! InputASN1FileChecksum:673acff93f274ff9d8987ad1697a8880:uart_protocol_dlc.asn:
 --------------------------------------------------------
 
 package DataView
