@@ -180,8 +180,8 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     } break;
     case CommandLineParser::Positional::SedsConverterModelsFrom: {
         names << "from";
-        description = QCoreApplication::translate(
-                "CommandLineParser", "Specify <list> of source models for conversion from: ASN.1, SEDS, InterfaceView, e.g. model1,model2");
+        description = QCoreApplication::translate("CommandLineParser",
+                "Specify <list> of source models for conversion from: ASN.1, SEDS, InterfaceView, e.g. model1,model2");
         valueName = QCoreApplication::translate("CommandLineParser", "list");
     } break;
     case CommandLineParser::Positional::SedsConverterModelTo: {
@@ -192,7 +192,8 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     } break;
     case CommandLineParser::Positional::SedsConverterModelsAux: {
         names << "aux-models";
-        description = QCoreApplication::translate("CommandLineParser", "<list> of auxillary models for conversion, e.g. model1,model2,...");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "<list> of auxillary models for conversion, e.g. model1,model2,...");
         valueName = QCoreApplication::translate("CommandLineParser", "list");
     } break;
     case CommandLineParser::Positional::SedsConverterIvConfig: {
@@ -202,11 +203,13 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     } break;
     case CommandLineParser::Positional::SedsConverterIvGenerateParentFunctions: {
         names << "iv-generate-parent-functions";
-        description = QCoreApplication::translate("CommandLineParser", "Generate parent functions for each SEDS package");
+        description =
+                QCoreApplication::translate("CommandLineParser", "Generate parent functions for each SEDS package");
     } break;
     case CommandLineParser::Positional::SedsConverterSedsPreprocessedFilepath: {
         names << "seds-preprocessed-filepath";
-        description = QCoreApplication::translate("CommandLineParser", "Path to the intermediate file that will be created during preprocessing");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Path to the intermediate file that will be created during preprocessing");
         valueName = QCoreApplication::translate("CommandLineParser", "filepath");
     } break;
     case CommandLineParser::Positional::SedsConverterSedsSchemaFilepath: {
@@ -216,45 +219,57 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     } break;
     case CommandLineParser::Positional::SedsConverterSedsExtRef: {
         names << "seds-ext-ref";
-        description = QCoreApplication::translate("CommandLineParser", "Specify external <references> for SEDS, e.g. foo:bar,foo2:bar2,foo3:bar3,...");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Specify external <references> for SEDS, e.g. foo:bar,foo2:bar2,foo3:bar3,...");
         valueName = QCoreApplication::translate("CommandLineParser", "references");
     } break;
     case CommandLineParser::Positional::SedsConverterSedsExtRefFilepath: {
         names << "seds-ext-ref-file";
-        description = QCoreApplication::translate("CommandLineParser", "Specify <file> with an external references for SEDS");
+        description =
+                QCoreApplication::translate("CommandLineParser", "Specify <file> with an external references for SEDS");
         valueName = QCoreApplication::translate("CommandLineParser", "file");
     } break;
     case CommandLineParser::Positional::SedsConverterSkipValidation: {
         names << "skip-validation";
         description = QCoreApplication::translate("CommandLineParser", "Skip validation for SEDS");
     } break;
+    case CommandLineParser::Positional::SedsConverterMultipleAsnModels: {
+        names << "multiple-asn-models";
+        description = QCoreApplication::translate("CommandLineParser",
+                "Enable translation of single asn file with multiple asn models - DataSheet as an output");
+    }
     case CommandLineParser::Positional::SedsConverterKeepIntermediateFiles: {
         names << "keep-intermediate-files";
         description = QCoreApplication::translate("CommandLineParser", "Keep SEDS intermediate files");
     } break;
     case CommandLineParser::Positional::SedsConverterAcnFilepathPrefix: {
         names << "acn-filepath-prefix";
-        description = QCoreApplication::translate("CommandLineParser", "<prefix> to add at the beginning of the ACN output filepath");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "<prefix> to add at the beginning of the ACN output filepath");
         valueName = QCoreApplication::translate("CommandLineParser", "prefix");
     } break;
     case CommandLineParser::Positional::SedsConverterAsn1FilepathPrefix: {
         names << "asn1-filepath-prefix";
-        description = QCoreApplication::translate("CommandLineParser", "<prefix> to add at the beginning of the ASN1 output filepath");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "<prefix> to add at the beginning of the ASN1 output filepath");
         valueName = QCoreApplication::translate("CommandLineParser", "prefix");
     } break;
     case CommandLineParser::Positional::SedsConverterAsn1SequenceSizeThreshold: {
         names << "asn1-sequence-size-threshold";
-        description = QCoreApplication::translate("CommandLineParser", "Maximum SEQUENCE size (values will be clamped)");
+        description =
+                QCoreApplication::translate("CommandLineParser", "Maximum SEQUENCE size (values will be clamped)");
         valueName = QCoreApplication::translate("CommandLineParser", "threshold");
     } break;
     case CommandLineParser::Positional::SedsConverterPatcherFunctionsFilepathPrefix: {
         names << "patcher-functions-filepath-prefix";
-        description = QCoreApplication::translate("CommandLineParser", "<prefix> to add at the beginning of the patcher functions output filepath");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "<prefix> to add at the beginning of the patcher functions output filepath");
         valueName = QCoreApplication::translate("CommandLineParser", "prefix");
     } break;
     case CommandLineParser::Positional::SedsConverterMappingFunctionsModuleFileName: {
         names << "mapping-functions-module-filename";
-        description = QCoreApplication::translate("CommandLineParser", "Name of the header including all other patcher function files");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Name of the header including all other patcher function files");
         valueName = QCoreApplication::translate("CommandLineParser", "prefix");
     } break;
     case CommandLineParser::Positional::SedsConverterSdlFilepathPrefix: {

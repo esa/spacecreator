@@ -31,11 +31,12 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
 # Run the model and expect an error.
 # This way the working of a condition is confirmed in
 # the fastest possible way.
+# State number comparison is discarded, as state numbering is not stable
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
     && $CC -DVECTORSZ=65536 -o system.out pan.c \
     && ./system.out > system.log \
     && grep -q "errors: 1" system.log \
-    && grep -q "assertion violated  !((global_state.inputobserver.state==0))" system.log \
+    && grep -q "assertion violated  !((global_state.inputobserver.state" system.log \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR

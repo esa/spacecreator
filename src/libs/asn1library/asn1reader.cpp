@@ -408,6 +408,13 @@ QByteArray Asn1Reader::fileHash(const QStringList &fileNames) const
 
     QByteArray content;
     for (const QString &fileName : tmp) {
+        /*
+         * Append filename to the content to generate different
+         * hash for the same files, but in different locations.
+         * The cache xml file contains original locations
+         * of input ASN.1 files, what was origin of at least one bug.
+         */
+        content.append(fileName);
         QFile file(fileName);
         if (file.open(QIODevice::ReadOnly)) {
             content.append(file.readAll());

@@ -88,7 +88,7 @@ private:
     QPointF m_manualMovementFrom;
     QPointF m_manualMovementTo;
     QRectF m_explicitTextBox;
-    SystemChecks *m_checker = nullptr;
+    QPointer<SystemChecks> m_checker;
     QPointer<MscChart> m_chart;
 };
 

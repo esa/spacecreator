@@ -19,9 +19,8 @@
 
 #include "context.h"
 
-#include "matlabstandarddatatypes.h"
-
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/simulink/matlabstandarddatatypes.h>
 #include <conversion/common/translation/exceptions.h>
 
 using Asn1Acn::Definitions;
@@ -30,6 +29,7 @@ using Asn1Acn::SourceLocation;
 using Asn1Acn::TypeAssignment;
 using Asn1Acn::Types::Type;
 using conversion::Escaper;
+using conversion::simulink::MatLabStandardDataTypes;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using simulink::model::SimulinkModel;
 
@@ -70,13 +70,11 @@ void Context::addMatLabStandardAsn1Type(std::unique_ptr<Type> asn1Type)
 
 Type *Context::findAsn1Type(const QString &dataType)
 {
-    const auto &dataTypeName = Escaper::escapeAsn1TypeName(dataType);
-
-    if (auto *typeAssignment = m_simulinkModelDefinitions->type(dataTypeName)) {
+    if (auto *typeAssignment = m_simulinkModelDefinitions->type(Escaper::escapeAsn1TypeName(dataType))) {
         return typeAssignment->type();
     }
 
-    const auto matlabDataTypeName = MatLabStandardDataTypes::getStandardDataTypesPrefix() + dataTypeName;
+    const auto matlabDataTypeName = MatLabStandardDataTypes::buildMatLabDataTypeName(dataType);
 
     if (auto *matlabTypeAssignment = m_matlabDefinitions->type(matlabDataTypeName)) {
         return matlabTypeAssignment->type();

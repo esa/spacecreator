@@ -21,6 +21,7 @@
 #include "commands/cmdentityautolayout.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commandsstackbase.h"
+#include "graphicsviewutils.h"
 #include "textitem.h"
 #include "veobject.h"
 
@@ -31,6 +32,8 @@
 
 namespace shared {
 namespace ui {
+
+static const qreal kClickTreshold = 5;
 
 VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent)
     : ui::InteractiveObjectBase(parent)
@@ -174,7 +177,10 @@ void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()),
             event->scenePos());
-    Q_EMIT clicked();
+
+    const qreal distance = graphicsviewutils::distanceLine(event->buttonDownScenePos(event->button()), event->scenePos());
+    if (distance <= kClickTreshold)
+        Q_EMIT clicked(event->scenePos());
     QGraphicsObject::mouseReleaseEvent(event);
 }
 

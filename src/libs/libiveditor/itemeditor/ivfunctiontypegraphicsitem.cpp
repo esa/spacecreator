@@ -214,6 +214,10 @@ void IVFunctionTypeGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF 
 shared::ui::TextItem *IVFunctionTypeGraphicsItem::initTextItem()
 {
     shared::ui::TextItem *textItem = new IVFunctionNameGraphicsItem(this);
+    connect(this, &IVFunctionTypeGraphicsItem::clicked, textItem, [this, textItem](const QPointF &scenePos){
+        if (scene()->items(scenePos).contains(textItem))
+            textItem->enableEditMode();
+    });
     connect(textItem, &shared::ui::TextItem::edited, this, &IVFunctionTypeGraphicsItem::updateNameFromUi);
     connect(entity(), &ivm::IVFunction::attributeChanged, this, [this](const QString &token) {
         const ivm::meta::Props::Token attr = ivm::meta::Props::token(token);

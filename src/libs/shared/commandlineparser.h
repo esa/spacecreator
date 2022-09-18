@@ -49,7 +49,7 @@ public:
         ExportToFile,
         DropUnsavedChangesSilently,
 
-        //Seds Converter
+        // Seds Converter
         SedsConverterInputFilepaths,
         SedsConverterOutputFilepath,
         SedsConverterModelsFrom,
@@ -69,6 +69,7 @@ public:
         SedsConverterPatcherFunctionsFilepathPrefix,
         SedsConverterMappingFunctionsModuleFileName,
         SedsConverterSdlFilepathPrefix,
+        SedsConverterMultipleAsnModels,
 
         Unknown
     };
