@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=SpaceCreator
-Exec=qtcreator
-Icon=/share/icons/hicolor/64x64/apps/QtProject-qtcreator
-Type=Application
-Categories=Development;
-Terminal=true

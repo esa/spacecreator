@@ -1,8 +1,0 @@
-Item {
-}
-
-ColorEditor {
-    caption: "%1"
-    backendValue: backendValues.%2
-    supportGradient: false
-}
