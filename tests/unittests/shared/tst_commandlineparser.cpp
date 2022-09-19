@@ -68,6 +68,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterSedsExtRef();
     void testCmdArgumentSedsConverterSedsExtRefFilepath();
     void testCmdArgumentSedsConverterSkipValidation();
+    void testCmdArgumentSedsConverterMultipleAsnModels();
     void testCmdArgumentSedsConverterKeepIntermediateFiles();
     void testCmdArgumentSedsConverterAcnFilepathPrefix();
     void testCmdArgumentSedsConverterAsn1FilepathPrefix();
@@ -445,6 +446,21 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterSkipValidation()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterSkipValidation));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterMultipleAsnModels()
+{
+    const QCommandLineOption cmdMultipleAsnModels =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterMultipleAsnModels);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdMultipleAsnModels.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterMultipleAsnModels);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterMultipleAsnModels));
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterKeepIntermediateFiles()

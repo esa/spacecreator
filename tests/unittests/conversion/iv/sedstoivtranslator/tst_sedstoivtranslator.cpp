@@ -19,6 +19,8 @@
 
 #include <QObject>
 #include <QtTest>
+#include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/type.h>
 #include <asn1modelbuilder/asn1modelbuilder.h>
 #include <conversion/asn1/SedsToAsn1Translator/context.h>
 #include <conversion/asn1/SedsToAsn1Translator/generictypemapper.h>
@@ -39,6 +41,7 @@
 
 using namespace ivm;
 using namespace seds::model;
+using namespace Asn1Acn::Types;
 
 using conversion::Options;
 using conversion::asn1::translator::Context;
@@ -159,7 +162,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithProvidedInterface()
     // clang-format off
     const auto asn1Model =
         Asn1ModelBuilder("PACKAGE")
-            .withIntegerDataType("MyInteger")
+            .withIntegerDataType("MyInteger", 64, 0, 0, Endianness::little, IntegerEncoding::pos_int, 0, 0)
         .build();
     // clang-format on
 
@@ -228,7 +231,7 @@ void tst_SedsToIvTranslator::testTranslateComponentWithRequiredInterface()
     // clang-format off
     const auto asn1Model =
         Asn1ModelBuilder("PACKAGE")
-            .withIntegerDataType("MyInteger")
+            .withIntegerDataType("MyInteger", 64, 0, 0, Endianness::little, IntegerEncoding::pos_int, 0, 0)
         .build();
     // clang-format on
 
@@ -280,8 +283,8 @@ void tst_SedsToIvTranslator::testGenericTypeMappingAmbiguousDeterminant()
     // clang-format off
     const auto asn1Model =
         Asn1ModelBuilder("MYPACKAGE")
-            .withIntegerDataType("ConcreteType")
-            .withIntegerDataType("DeterminantType")
+            .withIntegerDataType("ConcreteType", 64, 0, 0, Endianness::little, IntegerEncoding::pos_int, 0, 0)
+            .withIntegerDataType("DeterminantType", 64, 0, 0, Endianness::little, IntegerEncoding::pos_int, 0, 0)
         .build();
     // clang-format on
 

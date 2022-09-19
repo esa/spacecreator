@@ -1,0 +1,49 @@
+ModelOne DEFINITIONS ::= BEGIN
+
+TypeOne1 ::= INTEGER(100..200)
+TypeOne2 ::= INTEGER(50..100)
+
+SimpleChoiceOne ::= CHOICE 
+{
+    altOne1 TypeOne1,
+    altOne2 TypeOne2
+}
+
+SimpleChoiceWithAnonymousTypesOne ::= CHOICE 
+{
+    altOne1 INTEGER(0..50),
+    altOne2 INTEGER(-1..1)
+}
+
+SimpleChoiceWithEncodingOverrideOne ::= CHOICE 
+{
+    altOne1 TypeOne1,
+    altOne2 TypeOne2
+}
+
+END
+
+ModelTwo DEFINITIONS ::= BEGIN
+
+TypeTwo1 ::= INTEGER(100..200)
+TypeTwo2 ::= INTEGER(50..100)
+
+SimpleChoiceTwo ::= CHOICE 
+{
+    altTwo1 TypeTwo1,
+    altTwo2 TypeTwo2
+}
+
+SimpleChoiceWithAnonymousTypesTwo ::= CHOICE 
+{
+    altTwo1 INTEGER(0..50),
+    altTwo2 INTEGER(-1..1)
+}
+
+SimpleChoiceWithEncodingOverrideTwo ::= CHOICE 
+{
+    altTwo1 TypeTwo1,
+    altTwo2 TypeTwo2
+}
+
+END
