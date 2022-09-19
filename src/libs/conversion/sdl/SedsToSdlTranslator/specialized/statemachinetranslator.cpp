@@ -187,10 +187,10 @@ static inline auto getConsistentUnconditionalActivityInvocation(
 }
 
 static inline auto generateProcedureForSyncCommand(Context &context, const seds::model::StateMachine &sedsStateMachine,
-        const QString &interfaceName, const seds::model::InterfaceCommand &command) -> void
+        const QString &interfaceName, const seds::model::InterfaceCommand &command, const Options &options) -> void
 {
     const auto &name = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided);
+            interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided, options);
     const auto &ivInterface = getInterfaceByName(context.ivFunction(), name);
     auto procedure = std::make_unique<::sdl::Procedure>(name);
     for (const auto &ivParameter : ivInterface->params()) {
@@ -282,19 +282,20 @@ auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 }
 
 static inline auto generateProceduresForSyncCommands(
-        Context &context, const seds::model::StateMachine &sedsStateMachine) -> void
+        Context &context, const seds::model::StateMachine &sedsStateMachine, const Options &options) -> void
 {
     for (const auto &command : context.commands()) {
         if (command.second->interfaceType() == CommandInfo::HostInterfaceType::Provided
                 && command.second->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
             // Procedures are generated only for sync commands in provided interfaces
-            generateProcedureForSyncCommand(context, sedsStateMachine, command.first, *command.second->definition());
+            generateProcedureForSyncCommand(
+                    context, sedsStateMachine, command.first, *command.second->definition(), options);
         }
     }
 }
 
-auto StateMachineTranslator::translateStateMachine(Context &context, const seds::model::StateMachine &sedsStateMachine)
-        -> void
+auto StateMachineTranslator::translateStateMachine(
+        Context &context, const seds::model::StateMachine &sedsStateMachine, const Options &options) -> void
 {
     // Consider rewriting this to filters when C++20 is supported
     std::map<QString, std::unique_ptr<::sdl::State>> stateMap;
@@ -315,7 +316,7 @@ auto StateMachineTranslator::translateStateMachine(Context &context, const seds:
         // clang-format on
     }
 
-    generateProceduresForSyncCommands(context, sedsStateMachine);
+    generateProceduresForSyncCommands(context, sedsStateMachine, options);
 
     // Setup the start transition
     createStartTransition(context, sedsStateMachine, stateMap);
@@ -323,7 +324,8 @@ auto StateMachineTranslator::translateStateMachine(Context &context, const seds:
     // Second pass through transitions
     for (auto &element : sedsStateMachine.elements()) {
         if (std::holds_alternative<seds::model::Transition>(element)) {
-            translateTransition(context, sedsStateMachine, std::get<seds::model::Transition>(element), stateMap);
+            translateTransition(
+                    context, sedsStateMachine, std::get<seds::model::Transition>(element), stateMap, options);
         }
     }
     for (auto &entry : stateMap) {
@@ -599,15 +601,15 @@ auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsS
     return state;
 }
 
-auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnCommandPrimitive &command)
-        -> InputHandler
+auto StateMachineTranslator::translatePrimitive(
+        Context &context, const seds::model::OnCommandPrimitive &command, const Options &options) -> InputHandler
 {
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
     // Input signal can be received only via a provided interface
     const auto &inputName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            command.interface().value(), command.command().value(), ivm::IVInterface::InterfaceType::Provided);
+            command.interface().value(), command.command().value(), ivm::IVInterface::InterfaceType::Provided, options);
     input->setName(inputName);
 
     if (command.argumentValues().empty()) {
@@ -697,13 +699,13 @@ auto StateMachineTranslator::translatePrimitive(::sdl::State *sdlFromState) -> I
 }
 
 auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *sdlFromState,
-        const seds::model::Transition::Primitive &primitive) -> InputHandler
+        const seds::model::Transition::Primitive &primitive, const Options &options) -> InputHandler
 {
     // clang-format off
     return std::visit(
             overloaded {
-                [&context](const seds::model::OnCommandPrimitive &command) {
-                        return translatePrimitive(context, command);
+                [&context, &options](const seds::model::OnCommandPrimitive &command) {
+                        return translatePrimitive(context, command, options);
                     },
                 [&context](const seds::model::OnParameterPrimitive &parameter) {
                         return translatePrimitive(context, parameter);
@@ -718,8 +720,8 @@ auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *
 }
 
 auto StateMachineTranslator::translateTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
-        const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap)
-        -> void
+        const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap,
+        const Options &options) -> void
 {
     const auto fromStateName = Escaper::escapeSdlName(sedsTransition.fromState().nameStr());
     const auto toStateName = Escaper::escapeSdlName(sedsTransition.toState().nameStr());
@@ -736,7 +738,7 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
     auto sdlFromState = (*fromStateIterator).second.get();
     auto sdlToState = (*toStateIterator).second.get();
 
-    auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition.primitive());
+    auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition.primitive(), options);
 
     auto mainTransition = std::make_unique<::sdl::Transition>();
     DescriptionTranslator::translate(sedsTransition, mainTransition.get());

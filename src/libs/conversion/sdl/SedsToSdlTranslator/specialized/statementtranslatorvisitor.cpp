@@ -126,9 +126,11 @@ auto StatementTranslatorVisitor::StatementContext::getCommand(const QString &int
     return m_masterContext.getCommand(interface, name);
 }
 
-StatementTranslatorVisitor::StatementTranslatorVisitor(StatementContext &context, ::sdl::Transition *sdlTransition)
+StatementTranslatorVisitor::StatementTranslatorVisitor(
+        StatementContext &context, ::sdl::Transition *sdlTransition, const Options &options)
     : m_context(context)
     , m_sdlTransition(sdlTransition)
+    , m_options(options)
 {
 }
 
@@ -198,8 +200,9 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Conditional &cond
             translateBooleanExpression(m_context.sdlProcess(), m_context.sdlProcedure(), conditional.condition());
     auto label = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(CONDITION_END_LABEL_PREFIX));
 
-    auto trueAnswer = translateAnswer(m_context, label.get(), TRUE_LITERAL, conditional.onConditionTrue());
-    auto falseAnswer = translateAnswer(m_context, label.get(), FALSE_LITERAL, conditional.onConditionFalse());
+    auto trueAnswer = translateAnswer(m_context, label.get(), TRUE_LITERAL, conditional.onConditionTrue(), m_options);
+    auto falseAnswer =
+            translateAnswer(m_context, label.get(), FALSE_LITERAL, conditional.onConditionFalse(), m_options);
     decision->addAnswer(std::move(trueAnswer));
     decision->addAnswer(std::move(falseAnswer));
 
@@ -243,7 +246,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::Iteration &iterat
     m_sdlTransition->addAction(std::move(endLabel));
 
     // Generate loop body and insert it into the True decision
-    translateBody(m_context, transitionPointer, iteration.doBody());
+    translateBody(m_context, transitionPointer, iteration.doBody(), m_options);
 
     generateLoopEnd(transitionPointer, iteration, startLabelPointer);
 }
@@ -274,7 +277,7 @@ auto StatementTranslatorVisitor::operator()(const seds::model::SendCommandPrimit
     const auto interfaceName = sendCommand.interface().value();
 
     const auto callName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            interfaceName, commandName, ivm::IVInterface::InterfaceType::Required);
+            interfaceName, commandName, ivm::IVInterface::InterfaceType::Required, m_options);
 
     // Check, if this is a sync return call
     const auto &command = m_context.getCommand(interfaceName, commandName);
@@ -683,13 +686,13 @@ auto StatementTranslatorVisitor::comparisonOperatorToString(const seds::model::C
 }
 
 auto StatementTranslatorVisitor::translateAnswer(StatementContext &context, ::sdl::Label *joinLabel,
-        const QString &value, const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>
+        const QString &value, const seds::model::Body *body, const Options &options) -> std::unique_ptr<::sdl::Answer>
 {
     auto answer = std::make_unique<::sdl::Answer>();
     answer->setLiteral(::sdl::VariableLiteral(value));
     auto transition = std::make_unique<::sdl::Transition>();
     if (body != nullptr) {
-        StatementTranslatorVisitor nestedVisitor(context, transition.get());
+        StatementTranslatorVisitor nestedVisitor(context, transition.get(), options);
         for (const auto &statement : body->statements()) {
             std::visit(nestedVisitor, statement);
         }
@@ -715,11 +718,11 @@ auto StatementTranslatorVisitor::getOperandValue(const seds::model::Operand &ope
     return "";
 }
 
-auto StatementTranslatorVisitor::translateBody(
-        StatementContext &context, ::sdl::Transition *transition, const seds::model::Body *body) -> void
+auto StatementTranslatorVisitor::translateBody(StatementContext &context, ::sdl::Transition *transition,
+        const seds::model::Body *body, const Options &options) -> void
 {
     if (body != nullptr) {
-        StatementTranslatorVisitor nestedVisitor(context, transition);
+        StatementTranslatorVisitor nestedVisitor(context, transition, options);
         for (const auto &statement : body->statements()) {
             std::visit(nestedVisitor, statement);
         }

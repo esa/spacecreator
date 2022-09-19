@@ -233,11 +233,16 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         names << "skip-validation";
         description = QCoreApplication::translate("CommandLineParser", "Skip validation for SEDS");
     } break;
+    case CommandLineParser::Positional::SedsConverterNoMangling: {
+        names << "no-mangling";
+        description = QCoreApplication::translate(
+                "CommandLineParser", "No mangling for interfaces names in SEDS to IV translation");
+    } break;
     case CommandLineParser::Positional::SedsConverterMultipleAsnModels: {
         names << "multiple-asn-models";
         description = QCoreApplication::translate("CommandLineParser",
                 "Enable translation of single asn file with multiple asn models - DataSheet as an output");
-    }
+    } break;
     case CommandLineParser::Positional::SedsConverterKeepIntermediateFiles: {
         names << "keep-intermediate-files";
         description = QCoreApplication::translate("CommandLineParser", "Keep SEDS intermediate files");

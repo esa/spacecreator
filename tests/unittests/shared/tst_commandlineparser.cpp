@@ -68,6 +68,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterSedsExtRef();
     void testCmdArgumentSedsConverterSedsExtRefFilepath();
     void testCmdArgumentSedsConverterSkipValidation();
+    void testCmdArgumentSedsConverterNoManglig();
     void testCmdArgumentSedsConverterMultipleAsnModels();
     void testCmdArgumentSedsConverterKeepIntermediateFiles();
     void testCmdArgumentSedsConverterAcnFilepathPrefix();
@@ -446,6 +447,20 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterSkipValidation()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterSkipValidation));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterNoManglig()
+{
+    const QCommandLineOption cmdNoMangling = CommandLineParser::positionalArg(CommandArg::SedsConverterNoMangling);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdNoMangling.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterNoMangling);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterNoMangling));
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterMultipleAsnModels()
