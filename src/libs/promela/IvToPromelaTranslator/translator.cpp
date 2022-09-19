@@ -633,13 +633,17 @@ std::unique_ptr<ProctypeElement> IvToPromelaTranslator::generateProcessMessageBl
 }
 
 void IvToPromelaTranslator::generateEnvironmentProctype(Context &context, const QString &functionName,
-        const QString &interfaceName, const QString &parameterType, const QString &sendInline) const
+        const QString &interfaceName, const std::pair<QString, QString> &interfaceParameter,
+        const QString &sendInline) const
 {
     Sequence sequence(Sequence::Type::NORMAL);
     sequence.appendElement(createWaitForInitStatement());
 
+    const auto &parameterName = interfaceParameter.first;
+    const auto &parameterType = Escaper::escapePromelaName(interfaceParameter.second);
+
     if (!parameterType.isEmpty()) {
-        sequence.appendElement(Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), "value"));
+        sequence.appendElement(Declaration(DataType(UtypeRef(parameterType)), "value"));
     }
 
     const auto &globalInputVectorLengthLimit = context.options().value(PromelaOptions::globalInputVectorLengthLimit);
@@ -648,17 +652,18 @@ void IvToPromelaTranslator::generateEnvironmentProctype(Context &context, const 
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
-    if (parameterType.isEmpty()) {
-        loopSequence->appendElement(InlineCall(sendInline, {}));
-    } else {
-        const QString generateValueInlineName =
-                QString("%1_generate_value").arg(Escaper::escapePromelaName(parameterType));
-        QList<InlineCall::Argument> arguments;
-        arguments.append(VariableRef("value"));
+    QList<InlineCall::Argument> sendInlineArguments;
 
-        loopSequence->appendElement(InlineCall(generateValueInlineName, arguments));
-        loopSequence->appendElement(InlineCall(sendInline, arguments));
+    if (!parameterType.isEmpty()) {
+        sendInlineArguments.append(VariableRef("value"));
+
+        const auto parameterSubtype =
+                handleParameterSubtype(context, parameterType, parameterName, interfaceName, functionName);
+        const QString generateValueInlineName = QString("%1_generate_value").arg(parameterSubtype);
+        loopSequence->appendElement(InlineCall(generateValueInlineName, sendInlineArguments));
     }
+
+    loopSequence->appendElement(InlineCall(sendInline, sendInlineArguments));
 
     int limit = 0;
     if (interfaceInputVectorLenghtLimit.has_value()) {
@@ -703,7 +708,7 @@ std::unique_ptr<model::ProctypeElement> IvToPromelaTranslator::createWaitForInit
 
 void IvToPromelaTranslator::generateSendInline(Context &context, const QString &functionName,
         const QString &interfaceName, const QString &parameterName, const QString &parameterType,
-        const QString &sourceFunctionName, const QString &sourceInterfaceName, const bool parameterSubtyped) const
+        const QString &sourceFunctionName, const QString &sourceInterfaceName) const
 {
     QString inlineName =
             QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(sourceFunctionName)).arg(sourceInterfaceName);
@@ -720,12 +725,7 @@ void IvToPromelaTranslator::generateSendInline(Context &context, const QString &
     if (argumentName.isEmpty()) {
         params.append(Expression(VariableRef(m_dummyParamName)));
     } else {
-        if (parameterSubtyped) {
-            params.append(handleSendInlineParameter(argumentName, parameterType, sequence));
-        } else {
-            params.append(Expression(VariableRef(argumentName)));
-        }
-
+        params.append(Expression(VariableRef(argumentName)));
         arguments.push_back(argumentName);
     }
 
@@ -791,11 +791,8 @@ void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslato
     const auto queueSize = getInterfaceQueueSize(providedInterface);
     const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
-    const auto parameterSubtyped =
-            isParameterSubtyped(context, parameterType, parameterName, sourceInterfaceName, sourceFunctionName);
-
     generateSendInline(context, functionName, interfaceName, parameterName, parameterType, sourceFunctionName,
-            sourceInterfaceName, parameterSubtyped);
+            sourceInterfaceName);
 
     generateProctype(context, functionName, interfaceName, parameterType, queueSize, priority, false);
 }
@@ -845,11 +842,8 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
         const QString interfaceName = getInterfaceName(providedInterface);
         const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
-        const auto parameterSubtyped =
-                isParameterSubtyped(context, parameterType, parameterName, interfaceName, functionName);
-
         generateSendInline(context, functionName, interfaceName, parameterName, parameterType, sourceFunctionName,
-                sourceInterfaceName, parameterSubtyped);
+                sourceInterfaceName);
 
         const size_t queueSize = getInterfaceQueueSize(providedInterface);
         const size_t priority = getInterfacePriority(providedInterface) + context.getBaseProctypePriority();
@@ -870,14 +864,10 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
 
         const std::pair<QString, QString> parameter = getInterfaceParameter(requiredInterface);
 
-        const QString parameterName = parameter.first;
-        const QString parameterType =
-                handleParameterSubtype(context, parameter.second, parameterName, interfaceName, functionName);
-
         const QString sendInline =
                 QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
 
-        generateEnvironmentProctype(context, functionName, interfaceName, parameterType, sendInline);
+        generateEnvironmentProctype(context, functionName, interfaceName, parameter, sendInline);
     }
 }
 
@@ -1247,7 +1237,7 @@ QString IvToPromelaTranslator::handleParameterSubtype(Context &context, const QS
         const auto parameterSubtype = definitions->type(parameterSubtypeName);
 
         if (parameterSubtype != nullptr) {
-            return parameterSubtypeName;
+            return Escaper::escapePromelaName(parameterSubtypeName);
         }
     }
 
@@ -1282,13 +1272,6 @@ Expression IvToPromelaTranslator::handleSendInlineParameter(
     sequence.appendElement(std::move(inlineCall));
 
     return Expression(VariableRef(parameterName));
-}
-
-bool IvToPromelaTranslator::isParameterSubtyped(Context &context, const QString &parameterType,
-        const QString &parameterName, const QString &interfaceName, const QString &functionName) const
-{
-    const auto subtype = handleParameterSubtype(context, parameterType, parameterName, interfaceName, functionName);
-    return parameterType != subtype;
 }
 
 QString IvToPromelaTranslator::buildParameterSubtypeName(

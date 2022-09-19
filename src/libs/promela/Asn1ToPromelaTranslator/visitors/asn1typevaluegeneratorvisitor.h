@@ -45,10 +45,12 @@ public:
 
      * @brief Constructor
      *
-     * @param promelaModel target promela model
-     * @param name name of ASN.1 type
+     * @param   promelaModel    target promela model
+     * @param   name            name of ASN.1 type
+     * @param   overridenType   ASN.1 type that this type overrides by subtyping
      */
-    Asn1TypeValueGeneratorVisitor(model::PromelaModel &promelaModel, QString name);
+    Asn1TypeValueGeneratorVisitor(
+            model::PromelaModel &promelaModel, QString name, const Asn1Acn::Types::Type *overridenType);
 
     /**
      * @brief Visit Asn1Acn::Types::Boolean
@@ -166,6 +168,7 @@ private:
 private:
     model::PromelaModel &m_promelaModel;
     QString m_name;
+    const Asn1Acn::Types::Type *m_overridenType;
 };
 
 } // namespace promela::translator
