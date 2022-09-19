@@ -34,3 +34,4 @@ tests/unittests/sdl/SdlExporter/references/*/work/binaries/*
 tests/unittests/sdl/SdlExporter/references/*/work/*
 
 /build/
+/spacecreator.AppDir/
