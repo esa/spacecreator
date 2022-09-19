@@ -301,10 +301,10 @@ private:
             std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements) const
             -> std::unique_ptr<model::ProctypeElement>;
     auto generateEnvironmentProctype(Context &context, const QString &functionName, const QString &interfaceName,
-            const QString &parameterType, const QString &sendInline) const -> void;
+            const std::pair<QString, QString> &interfaceParameter, const QString &sendInline) const -> void;
     auto generateSendInline(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterName, const QString &parameterType, const QString &sourceFunctionName,
-            const QString &sourceInterfaceName, const bool parameterSubtyped) const -> void;
+            const QString &sourceInterfaceName) const -> void;
     auto createPromelaObjectsForFunction(
             Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
     auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVInterface *providedInterface,
@@ -344,9 +344,6 @@ private:
     auto handleSendInlineArgument(const QString &parameterType, const QString &functionName,
             const QString &interfaceName, const QString parameterName, promela::model::Sequence &sequence) const
             -> QString;
-
-    auto isParameterSubtyped(Context &context, const QString &parameterTypeName, const QString &parameterName,
-            const QString &interfaceName, const QString &functionName) const -> bool;
 
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;

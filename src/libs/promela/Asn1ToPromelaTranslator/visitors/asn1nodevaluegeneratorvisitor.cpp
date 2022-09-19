@@ -23,27 +23,33 @@
 
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
+#include <conversion/common/translation/exceptions.h>
 
+using Asn1Acn::Asn1Model;
 using Asn1Acn::Definitions;
 using Asn1Acn::File;
 using Asn1Acn::Project;
 using Asn1Acn::Root;
 using Asn1Acn::TypeAssignment;
 using Asn1Acn::ValueAssignment;
+using Asn1Acn::Types::Type;
+using conversion::translator::TranslationException;
 using promela::model::PromelaModel;
 
 namespace promela::translator {
 
-Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel)
+Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel, const Asn1Model *asn1Model)
     : m_promelaModel(promelaModel)
-    , m_generateAll(true)
+    , m_asn1Model(asn1Model)
+    , m_generateSubtypes(true)
 {
 }
 
 Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel, QStringList typeNames)
     : m_promelaModel(promelaModel)
+    , m_asn1Model(nullptr)
     , m_typeNames(std::move(typeNames))
-    , m_generateAll(false)
+    , m_generateSubtypes(false)
 {
 }
 
@@ -63,8 +69,13 @@ void Asn1NodeValueGeneratorVisitor::visit(const File &file)
 
 void Asn1NodeValueGeneratorVisitor::visit(const TypeAssignment &type)
 {
-    if (m_generateAll || m_typeNames.contains(type.name())) {
-        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name());
+    if (m_generateSubtypes) {
+        const auto overridenType = findOverridenType(type.name());
+
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), overridenType);
+        type.type()->accept(typeVisitor);
+    } else if (m_typeNames.contains(type.name())) {
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), nullptr);
         type.type()->accept(typeVisitor);
     }
 }
@@ -83,4 +94,24 @@ void Asn1NodeValueGeneratorVisitor::visit(const Root &root)
 {
     Q_UNUSED(root);
 }
+
+const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(const QString &subtypeName) const
+{
+    Q_UNUSED(subtypeName);
+
+    for (const auto &asn1File : m_asn1Model->data()) {
+        const auto foundType = asn1File->typeFromName("MyOctoString");
+        if (foundType != nullptr) {
+            return foundType;
+        }
+    }
+
+    auto errorMessage = QString("Unable to find argument %1 in interface %2 in function %3 used in subtyping")
+                                .arg("")
+                                .arg("")
+                                .arg("");
+    throw TranslationException(std::move(errorMessage));
+    return nullptr;
+}
+
 }
