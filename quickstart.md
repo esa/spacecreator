@@ -93,7 +93,7 @@ Running the following command will build the SpaceCreator plugin:
 --env_dir $HOME/opt/spacecreatorenv6
 --env_qt_dir  $HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64`
 
-This will build the plugin in ~/projects/spacecreator/build
+This will build the plugin in `~/projects/spacecreator/build`
 
 ## Running SpaceCreator
 
@@ -102,12 +102,12 @@ to the spacecreator.AppDir folder.
 In addition, we need to copy templates for creating spacecreator projects and spacecreator files.
 This is done by running the following command:
 
-`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6 --build_dir=%{buildDir}
-`
+`~/projects/spacecreator$ python3 ./scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6`
 
-Then the blue QtCreator can be run:
-$ ~/opt/spacecreator.AppDir/bin/qtcreator -color blue
+Then the blue QtCreator can be run:<br>
+`$ ~/opt/spacecreator.AppDir/bin/qtcreator -color blue`<br>
 and it will now be possible to load a sample project.
+
 
 
 ## Setting up QtCreator
@@ -133,12 +133,12 @@ Click ***Run CMake***
 ### Run Settings
 We need to have QtCreator run the postbuild.py script after the build stop, so we add a 
 ***Deployment Method*** that is a Custom Process Step. The command is
-python3 and the arguments are:
+`python3` and the arguments are:
 
-`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6 --env_qt_dir=$HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64 --build_dir=%{buildDir}
-`
+`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6 --env_qt_dir=$HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64 --build_dir=%{buildDir}`
 
-This will call the correct **postbuild.py** script and tell it where the build environment is and where the plugins were build.
+This will call the correct **postbuild.py** script and tell it where the build environment is and where the plugins were build.<br>
+The variables `%{ActiveProject:Path}` and `%{buildDir}` are substituted by QtCreator.
 
 Now we need a Run configuration of the type ***Custom Executable***:<br>
 **Executable**: `$HOME/opt/spacecreatorenv6/spacecreator.AppDir/bin/qtcreator`<br>
