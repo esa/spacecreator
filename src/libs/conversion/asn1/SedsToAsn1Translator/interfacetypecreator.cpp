@@ -183,12 +183,12 @@ void InterfaceTypeCreator::createAsyncCommandBundledType(const seds::model::Inte
 {
     const auto commandName = Escaper::escapeAsn1TypeName(command.nameStr());
     const auto isGeneric = typeCreatorContext.isCommandGeneric(command);
+    auto parentName = isGeneric ? typeCreatorContext.parentName() : interfaceDeclarationName;
+    const auto escapedParentName = parentName.isEmpty() ? parentName : Escaper::escapeAsn1TypeName(parentName);
 
     const auto bundledTypeName = isGeneric
-            ? DataTypeTranslationHelper::buildBundledTypeName(
-                      Escaper::escapeAsn1TypeName(typeCreatorContext.parentName()), commandName, requestedArgumentMode)
-            : DataTypeTranslationHelper::buildBundledTypeName(
-                      Escaper::escapeAsn1TypeName(interfaceDeclarationName), commandName, requestedArgumentMode);
+            ? DataTypeTranslationHelper::buildBundledTypeName(escapedParentName, commandName, requestedArgumentMode)
+            : DataTypeTranslationHelper::buildBundledTypeName(escapedParentName, commandName, requestedArgumentMode);
 
     auto &context = isGeneric ? typeCreatorContext.mainContext() : typeCreatorContext.interfaceContext();
 
