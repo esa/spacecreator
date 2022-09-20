@@ -5,14 +5,8 @@ Type2 [size 32, encoding pos-int, endianness little]
 
 SimpleSequence []
 
-SimpleSequenceWithEncodingOverride [] {}
+EmptySequence1 [] {}
 
-AnonymousTypes []
-
-AnonymousTypesWithEncoding [] {}
-
-SequenceWithPattern [] {}
-
-SequenceWithOptional []
+EmptySequence2 []
 
 END

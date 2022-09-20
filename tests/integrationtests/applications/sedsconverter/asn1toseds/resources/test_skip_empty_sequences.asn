@@ -9,14 +9,8 @@ SimpleSequence ::= SEQUENCE {
     c Type2
 }
 
-SimpleSequenceWithEncodingOverride ::= SEQUENCE {}
+EmptySequence1 ::= SEQUENCE {}
 
-AnonymousTypes ::= SEQUENCE {}
-
-AnonymousTypesWithEncoding ::= SEQUENCE {}
-
-SequenceWithPattern ::= SEQUENCE {}
-
-SequenceWithOptional ::= SEQUENCE {}
+EmptySequence2 ::= SEQUENCE {}
 
 END
