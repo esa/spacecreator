@@ -38,6 +38,7 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
@@ -276,7 +277,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Enumerated &type)
     int computedValue = 0;
     for (const auto &item : type.items()) {
         ::seds::model::ValueEnumeration valueEnumeration;
-        valueEnumeration.setLabel(item.name());
+        valueEnumeration.setLabel(Escaper::escapeIvName(item.name()));
         valueEnumeration.setValue(type.encodeValues() ? item.value() : computedValue++);
         sedsType.addEnumeration(std::move(valueEnumeration));
     }
