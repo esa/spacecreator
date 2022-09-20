@@ -46,11 +46,13 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
             }
 
             const int dataLength = typeLayoutInfos.value(type->typeName()).first;
-            const int paddingLength = typeLayoutInfos.value(type->typeName()).second;
-            const int variableLength = dataLength + paddingLength;
+        
+            if (i % dataLength != 0) {
+                i += dataLength - i % dataLength;
+            }
 
             QByteArray rawVariable = rawData.mid(i, dataLength);
-            i += variableLength;
+            i += dataLength;
 
             if (endianness == QDataStream::BigEndian) {
                 std::reverse(rawVariable.begin(), rawVariable.end());
@@ -66,7 +68,6 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
             }
         }
     }
-
     return output;
 }
 
