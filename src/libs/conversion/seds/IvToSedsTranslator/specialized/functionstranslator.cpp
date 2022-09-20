@@ -21,6 +21,7 @@
 
 #include "parameter.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <seds/SedsModel/package/package.h>
@@ -101,7 +102,7 @@ void FunctionsTranslator::createInterfaceArgument(
 {
     ::seds::model::CommandArgument sedsInterfaceCommandArgument;
     sedsInterfaceCommandArgument.setName(ivInterfaceParameter.name());
-    sedsInterfaceCommandArgument.setType(ivInterfaceParameter.paramTypeName());
+    sedsInterfaceCommandArgument.setType(Escaper::escapeIvName(ivInterfaceParameter.paramTypeName()));
 
     switch (ivInterfaceParameter.direction()) {
     case shared::InterfaceParameter::Direction::IN:
