@@ -49,6 +49,17 @@ Libraries::Libraries(Settings::LibrariesPtr settings)
                     Utils::Icon::Tint));
 }
 
+#if QTC_VERSION == 408
+bool Libraries::matches(const QString &searchKeyWord) const
+{
+    const QStringList keywords{"asn1", "asn.1", "acn", "libraries", "components"};
+    for (const auto &keyword : keywords)
+        if (keyword.contains(searchKeyWord, Qt::CaseInsensitive))
+            return true;
+    return Core::IOptionsPage::matches(searchKeyWord);
+}
+#endif
+#if QTC_VERSION == 800
 bool Libraries::matches(const QString &searchKeyWord) const
 {
     const QStringList keywords{"asn1", "asn.1", "acn", "libraries", "components"};
@@ -57,6 +68,7 @@ bool Libraries::matches(const QString &searchKeyWord) const
             return true;
     return Core::IOptionsPage::matches(QRegularExpression(searchKeyWord));
 }
+#endif
 
 QWidget *Libraries::widget()
 {
