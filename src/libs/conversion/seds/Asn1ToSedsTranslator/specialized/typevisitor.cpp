@@ -38,6 +38,7 @@
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
+#include <conversion/common/options.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
@@ -56,6 +57,7 @@
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 #include <seds/SedsModel/types/stringdatatype.h>
 #include <seds/SedsModel/types/subrangedatatype.h>
+#include <seds/SedsOptions/options.h>
 
 using Asn1Acn::BitStringValue;
 using Asn1Acn::BooleanValue;
@@ -100,11 +102,12 @@ static const QString BYTE_TYPE_NAME = "Byte";
 namespace conversion::seds::translator {
 
 TypeVisitor::Context::Context(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions,
-        QString name, ::seds::model::Package *sedsPackage)
+        QString name, ::seds::model::Package *sedsPackage, const Options &options)
     : m_asn1Model(asn1Model)
     , m_definitions(definitions)
     , m_name(std::move(name))
     , m_sedsPackage(sedsPackage)
+    , m_options(options)
 {
 }
 
@@ -125,6 +128,11 @@ auto TypeVisitor::Context::name() -> const QString &
 auto TypeVisitor::Context::package() -> ::seds::model::Package *
 {
     return m_sedsPackage;
+}
+
+auto TypeVisitor::Context::options() -> const Options &
+{
+    return m_options;
 }
 
 TypeVisitor::TypeVisitor(Context &context)
@@ -491,7 +499,7 @@ static inline auto expectedTypeMatchesExistingOne(TypeVisitor::Context &context,
     // Create temporary package to perform "look-ahead" translation into SEDS
     // It is much easier to verify encoding in SEDS than ASN.1/ACN
     ::seds::model::Package tempPackage;
-    TypeVisitor::Context tempContext(context.model(), context.definitions(), typeName, &tempPackage);
+    TypeVisitor::Context tempContext(context.model(), context.definitions(), typeName, &tempPackage, context.options());
     TypeVisitor visitor(tempContext);
     type->accept(visitor);
     const auto &expectedType = retrieveTypeFromPackage(&tempPackage, typeName);
@@ -612,14 +620,14 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
             }
         }
         const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
-        Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
+        Context context(m_context.model(), m_context.definitions(), typeName, m_context.package(), m_context.options());
         TypeVisitor visitor(context);
         component->type()->accept(visitor);
         addEntry(EntryType::Entry, typeName, component->name(), sedsType);
     }
 
     // option to skip empty sequences
-    if (!sedsType.hasEntries()) {
+    if (m_context.options().isSet(conversion::seds::SedsOptions::skipEmptySequences) && !sedsType.hasEntries()) {
         // seds validation schema do not accepts empty sequences
         return;
     }
@@ -689,7 +697,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
             addEntry(EntryType::Entry, component->type()->typeName(), CHOICE_ELEMENT_MEMBER_NAME, innerSedsType);
         } else {
             const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
-            Context context(m_context.model(), m_context.definitions(), typeName, m_context.package());
+            Context context(
+                    m_context.model(), m_context.definitions(), typeName, m_context.package(), m_context.options());
             TypeVisitor visitor(context);
             component->type()->accept(visitor);
             addEntry(EntryType::Entry, typeName, CHOICE_ELEMENT_MEMBER_NAME, innerSedsType);
@@ -716,7 +725,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 
     } else {
         itemTypeName = ITEM_TYPE_NAME_PATTERN.arg(m_context.name());
-        Context context(m_context.model(), m_context.definitions(), itemTypeName, m_context.package());
+        Context context(
+                m_context.model(), m_context.definitions(), itemTypeName, m_context.package(), m_context.options());
         TypeVisitor visitor(context);
         type.itemsType()->accept(visitor);
     }
@@ -893,7 +903,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::UserdefinedType &type)
 {
-    Context context(m_context.model(), m_context.definitions(), m_context.name(), m_context.package());
+    Context context(
+            m_context.model(), m_context.definitions(), m_context.name(), m_context.package(), m_context.options());
     type.type()->accept(*this);
 }
 
