@@ -618,6 +618,12 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
         addEntry(EntryType::Entry, typeName, component->name(), sedsType);
     }
 
+    // option to skip empty sequences
+    if (!sedsType.hasEntries()) {
+        // seds validation schema do not accepts empty sequences
+        return;
+    }
+
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
 }

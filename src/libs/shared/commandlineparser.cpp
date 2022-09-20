@@ -243,6 +243,11 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate("CommandLineParser",
                 "Enable translation of single asn file with multiple asn models - DataSheet as an output");
     } break;
+    case CommandLineParser::Positional::SedsConverterSkipEmptySequences: {
+        names << "skip-empty-sequences";
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Enable skipping of empty asn sequences during asn to seds translation");
+    } break;
     case CommandLineParser::Positional::SedsConverterKeepIntermediateFiles: {
         names << "keep-intermediate-files";
         description = QCoreApplication::translate("CommandLineParser", "Keep SEDS intermediate files");

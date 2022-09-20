@@ -71,6 +71,7 @@ public:
         SedsConverterSdlFilepathPrefix,
         SedsConverterNoMangling,
         SedsConverterMultipleAsnModels,
+        SedsConverterSkipEmptySequences,
 
         Unknown
     };
