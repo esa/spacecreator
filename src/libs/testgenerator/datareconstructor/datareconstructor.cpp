@@ -46,7 +46,7 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
             }
 
             const int dataLength = typeLayoutInfos.value(type->typeName()).first;
-        
+
             if (i % dataLength != 0) {
                 i += dataLength - i % dataLength;
             }
