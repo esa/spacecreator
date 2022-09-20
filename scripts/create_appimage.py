@@ -68,11 +68,7 @@ def create_app_dir(app_dir: str, project_dir: str, build_dir: str, env_dir: str,
     grantlee_build_dir = join_dir(env_dir, 'build')
     grantlee_templates_pattern = join_dir(grantlee_build_dir, 'templates', 'lib', 'libGrantlee_Templates.*')
     copy_file_pattern_to_dir(grantlee_templates_pattern, join_dir(app_dir, 'lib', 'Qt', 'lib'))
-    # Grantlee plugins
-    copy_content_of_dir_to_other_dir(
-        join_dir(grantlee_build_dir, 'grantlee'),
-        join_dir(app_dir, 'lib', 'Qt', 'plugins', 'grantlee')
-    )
+ 
     # Qt files from environment
     qt_web_sockets_pattern = join_dir(env_qt_dir, 'lib', 'libQt*WebSockets*')
     copy_file_pattern_to_dir(qt_web_sockets_pattern, join_dir(app_dir, 'lib', 'Qt', 'lib'))
