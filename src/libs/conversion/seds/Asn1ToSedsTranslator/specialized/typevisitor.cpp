@@ -628,7 +628,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
 
     // option to skip empty sequences
     if (m_context.options().isSet(conversion::seds::SedsOptions::skipEmptySequences) && !sedsType.hasEntries()) {
-        // seds validation schema do not accepts empty sequences
+        // seds validation schema does not accept empty sequences
         return;
     }
 

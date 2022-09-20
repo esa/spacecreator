@@ -45,7 +45,7 @@ public:
     inline static const QString noMangling = "Seds_Translation_NoMangling";
     /** @brief Enable translation of single asn file with multiple models */
     inline static const QString multipleAsnModels = "Seds_Translation_MultipleAsnModels";
-    /** @brief Enable skipping of empty asn sequences during asn to seds translation */
+    /** @brief Enable skipping of empty ASN.1 sequences during ASN.1 to SEDS translation */
     inline static const QString skipEmptySequences = "Seds_Translation_SkipEmptySequences";
     /** @brief Don't remove intermediate files after import */
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
