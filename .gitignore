@@ -37,3 +37,4 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 /spacecreator.AppDir/
 *.log
 /scripts/.idea
+*.pyc
