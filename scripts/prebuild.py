@@ -185,7 +185,7 @@ def install_grantlee(env_dir: str) -> None:
     spacecreator_qt_lib_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'Qt', 'lib')
     spacecreator_grantlee_lib_dir = join_dir(spacecreator_qt_lib_dir, 'grantlee')  # dest of .so files
     ensure_dir(spacecreator_grantlee_lib_dir)
-    shutil.copytree(grantlee_lib_dir, spacecreator_grantlee_lib_dir, dirs_exist_ok=True)
+    copy_content_of_dir_to_other_dir(grantlee_lib_dir, spacecreator_grantlee_lib_dir)
 
     templates_lib_dir = join_dir(cmake_build_dir, 'templates', 'lib')
     pattern = join_dir(templates_lib_dir, 'libGrantlee_Templates.so*')

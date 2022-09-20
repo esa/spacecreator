@@ -1,5 +1,8 @@
 # SpaceCreator
-Building SpaceCreator
+This document describes how to clone, build and run SpaceCreator. The first sections
+details how to set up an environment in which to build. The second section how to build and run
+SpaceCreator on the commandline, and the final section deals with getting the build and run
+steps to work from with in QtCreator.
 
 ## GitLab
 [https://gitrepos.estec.esa.int/taste/spacecreator](https://gitrepos.estec.esa.int/taste/spacecreator)
