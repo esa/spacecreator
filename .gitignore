@@ -35,3 +35,4 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 
 /build/
 /spacecreator.AppDir/
+*.log

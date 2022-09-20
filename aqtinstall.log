@@ -11234,3 +11234,109 @@ In the future, please use the command 'install-qt' instead.
 2022-09-16 12:25:11,983 - aqt.updater - INFO - updater 140618296184832 Patching /home/fisker/opt/spacecreatorenv5/Qt/5.12.1/gcc_64/lib/libQt5Core.so.5.12.1
 2022-09-16 12:25:11,993 - aqt.main - INFO - installer 140618296184832 Finished installation
 2022-09-16 12:25:11,993 - aqt.main - INFO - installer 140618296184832 Time elapsed: 8.57635816 second
+2022-09-19 11:03:05,421 - aqt.main - INFO - installer 140402189004800 aqtinstall(aqt) v2.1.0 on Python 3.10.4 [CPython GCC 11.2.0]
+2022-09-19 11:03:05,421 - aqt.main - WARNING - installer 140402189004800 Specified Qt version is unknown: 6.3.1.
+2022-09-19 11:03:05,421 - aqt.helper - DEBUG - helper 140402189004800 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/Updates.xml.sha256
+2022-09-19 11:03:05,957 - aqt.helper - DEBUG - helper 140184828411904 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.addons.qtwebsockets.gcc_64/6.3.1-0-202206090324qtwebsockets-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z.sha256
+2022-09-19 11:03:05,957 - aqt.helper - DEBUG - helper 139674864029696 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtbase-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z.sha256
+2022-09-19 11:03:05,958 - aqt.helper - DEBUG - helper 139658700410880 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtsvg-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z.sha256
+2022-09-19 11:03:05,964 - aqt.helper - DEBUG - helper 140640268603392 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtdeclarative-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z.sha256
+2022-09-19 11:03:06,183 - aqt.helper - INFO - helper 139674864029696 Downloading qtbase...
+2022-09-19 11:03:06,184 - aqt.installer - DEBUG - installer 139674864029696 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtbase-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,189 - aqt.helper - INFO - helper 139658700410880 Downloading qtsvg...
+2022-09-19 11:03:06,190 - aqt.installer - DEBUG - installer 139658700410880 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtsvg-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,233 - aqt.helper - INFO - helper 140184828411904 Downloading qtwebsockets...
+2022-09-19 11:03:06,234 - aqt.installer - DEBUG - installer 140184828411904 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.addons.qtwebsockets.gcc_64/6.3.1-0-202206090324qtwebsockets-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,243 - aqt.helper - INFO - helper 140640268603392 Downloading qtdeclarative...
+2022-09-19 11:03:06,244 - aqt.installer - DEBUG - installer 140640268603392 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtdeclarative-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,331 - aqt.helper - DEBUG - helper 139658700410880 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtsvg-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,331 - aqt.helper - INFO - helper 139658700410880 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:06,333 - aqt.helper - DEBUG - helper 139674864029696 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtbase-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,333 - aqt.helper - INFO - helper 139674864029696 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:06,361 - aqt.helper - DEBUG - helper 140184828411904 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.addons.qtwebsockets.gcc_64/6.3.1-0-202206090324qtwebsockets-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,361 - aqt.helper - INFO - helper 140184828411904 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:06,380 - aqt.helper - DEBUG - helper 140640268603392 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtdeclarative-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,380 - aqt.helper - INFO - helper 140640268603392 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:06,529 - aqt.installer - INFO - installer 140184828411904 Finished installation of qtwebsockets-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z in 0.57361617
+2022-09-19 11:03:06,536 - aqt.helper - DEBUG - helper 140184828411904 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qttools-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z.sha256
+2022-09-19 11:03:06,541 - aqt.installer - INFO - installer 139658700410880 Finished installation of qtsvg-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z in 0.58410353
+2022-09-19 11:03:06,547 - aqt.helper - DEBUG - helper 139658700410880 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qttranslations-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z.sha256
+2022-09-19 11:03:06,678 - aqt.helper - INFO - helper 140184828411904 Downloading qttools...
+2022-09-19 11:03:06,679 - aqt.installer - DEBUG - installer 140184828411904 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qttools-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,690 - aqt.helper - INFO - helper 139658700410880 Downloading qttranslations...
+2022-09-19 11:03:06,690 - aqt.installer - DEBUG - installer 139658700410880 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qttranslations-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,823 - aqt.helper - DEBUG - helper 140184828411904 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qttools-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,823 - aqt.helper - INFO - helper 140184828411904 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:06,841 - aqt.helper - DEBUG - helper 139658700410880 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qttranslations-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:06,841 - aqt.helper - INFO - helper 139658700410880 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:07,254 - aqt.installer - INFO - installer 139658700410880 Finished installation of qttranslations-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z in 0.70789900
+2022-09-19 11:03:07,260 - aqt.helper - DEBUG - helper 139658700410880 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtwayland-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z.sha256
+2022-09-19 11:03:07,398 - aqt.helper - INFO - helper 139658700410880 Downloading qtwayland...
+2022-09-19 11:03:07,398 - aqt.installer - DEBUG - installer 139658700410880 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtwayland-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:07,534 - aqt.helper - DEBUG - helper 139658700410880 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324qtwayland-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:07,535 - aqt.helper - INFO - helper 139658700410880 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:07,783 - aqt.installer - INFO - installer 139658700410880 Finished installation of qtwayland-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z in 0.52422077
+2022-09-19 11:03:07,791 - aqt.helper - DEBUG - helper 139658700410880 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324icu-linux-Rhel7.2-x64.7z.sha256
+2022-09-19 11:03:07,924 - aqt.helper - INFO - helper 139658700410880 Downloading icu...
+2022-09-19 11:03:07,924 - aqt.installer - DEBUG - installer 139658700410880 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324icu-linux-Rhel7.2-x64.7z
+2022-09-19 11:03:08,071 - aqt.helper - DEBUG - helper 139658700410880 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.gcc_64/6.3.1-0-202206090324icu-linux-Rhel7.2-x64.7z
+2022-09-19 11:03:08,071 - aqt.helper - INFO - helper 139658700410880 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:08,456 - aqt.installer - INFO - installer 139674864029696 Finished installation of qtbase-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z in 2.49932629
+2022-09-19 11:03:08,462 - aqt.helper - DEBUG - helper 139674864029696 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.qt5compat.gcc_64/6.3.1-0-202206090324qt5compat-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z.sha256
+2022-09-19 11:03:08,611 - aqt.helper - INFO - helper 139674864029696 Downloading qt5compat...
+2022-09-19 11:03:08,611 - aqt.installer - DEBUG - installer 139674864029696 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.qt5compat.gcc_64/6.3.1-0-202206090324qt5compat-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:08,748 - aqt.helper - DEBUG - helper 139674864029696 Asked to redirect(302) to: https://mirrors.dotsrc.org/qtproject/online/qtsdkrepository/linux_x64/desktop/qt6_631/qt.qt6.631.qt5compat.gcc_64/6.3.1-0-202206090324qt5compat-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z
+2022-09-19 11:03:08,748 - aqt.helper - INFO - helper 139674864029696 Redirected: mirrors.dotsrc.org
+2022-09-19 11:03:08,947 - aqt.installer - INFO - installer 139674864029696 Finished installation of qt5compat-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z in 0.48589710
+2022-09-19 11:03:09,023 - aqt.installer - INFO - installer 139658700410880 Finished installation of icu-linux-Rhel7.2-x64.7z in 1.23281202
+2022-09-19 11:03:09,535 - aqt.installer - INFO - installer 140184828411904 Finished installation of qttools-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z in 2.99998255
+2022-09-19 11:03:12,397 - aqt.installer - INFO - installer 140640268603392 Finished installation of qtdeclarative-Linux-RHEL_8_4-GCC-Linux-RHEL_8_4-X86_64.7z in 6.43480446
+2022-09-19 11:03:12,442 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/bin/qmake
+2022-09-19 11:03:12,444 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickDialogs2.pc
+2022-09-19 11:03:12,444 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Gui.pc
+2022-09-19 11:03:12,444 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickControls2.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QmlCore.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Core5Compat.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6PrintSupport.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6LabsQmlModels.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Designer.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6UiPlugin.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Test.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Core.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickDialogs2Utils.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Help.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickWidgets.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickDialogs2QuickImpl.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickLayouts.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6DBus.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6LabsSharedImage.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6LabsFolderListModel.pc
+2022-09-19 11:03:12,445 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Widgets.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QmlIntegration.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Platform.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickTemplates2.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickTest.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QmlModels.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6WaylandClient.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6SvgWidgets.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Xml.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QmlWorkerScript.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Linguist.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6LabsAnimation.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QmlXmlListModel.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QuickControls2Impl.pc
+2022-09-19 11:03:12,446 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6OpenGLWidgets.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Qml.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6LabsSettings.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6UiTools.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Quick.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Network.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Svg.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Sql.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6LabsWavefrontMesh.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6Concurrent.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6OpenGL.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6QmlLocalStorage.pc
+2022-09-19 11:03:12,447 - aqt.updater - INFO - updater 140402189004800 Patching /home/fisker/opt/spacecreatorenv6/Qt/6.3.1/gcc_64/lib/pkgconfig/Qt6WebSockets.pc
+2022-09-19 11:03:12,448 - aqt.main - INFO - installer 140402189004800 Finished installation
+2022-09-19 11:03:12,448 - aqt.main - INFO - installer 140402189004800 Time elapsed: 7.02700227 second
