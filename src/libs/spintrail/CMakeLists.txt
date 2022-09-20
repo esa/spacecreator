@@ -1,0 +1,2 @@
+add_subdirectory(SpinTrailModel)
+add_subdirectory(SpinTrailImporter)
