@@ -21,6 +21,6 @@ if(${QTC_FOUND})
     add_subdirectory(testgenerator)
 endif()
 
-if (${QTC_FOUND} AND QTC_VERSION EQUAL 408)
+if (${QTC_FOUND} AND ${BUILD_ASN1PLUGIN})
     add_subdirectory(asn1plugin)
 endif()

@@ -1,6 +1,8 @@
 #if (QTC_VERSION EQUAL 408)
-add_subdirectory(asn1plugin)
-#endif()
+option(BUILD_ASN1PLUGIN "Build the ANS1Plugin" ON)
+if (BUILD_ASN1PLUGIN)
+    add_subdirectory(asn1plugin)
+endif()
 
 add_subdirectory(spacecreatorplugin)
 add_subdirectory(sedsplugin)

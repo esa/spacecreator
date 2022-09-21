@@ -18,7 +18,7 @@ python3 ./scripts/build_spacecreator.py
 """
 
 
-def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_dir: str, env_qt_dir: str) -> None:
+def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_dir: str, env_qt_dir: str, build_asn1plugin: bool) -> None:
     env_qmake_bin = join_dir(env_qt_dir, 'bin', 'qmake')
     qtc_install = join_dir(env_dir, 'spacecreator.AppDir')
     env_qt_cmake_dir = join_dir(env_qt_dir, 'lib', 'cmake')
@@ -41,7 +41,8 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
                  '-DQT_QMAKE_EXECUTABLE:STRING=' + env_qmake_bin,
                  '-DENABLE_FORMAT_CHECK=OFF',
                  '-DQTC_INSTALL=' + qtc_install,
-                 '-DQTC_SOURCE=' + qtc_install
+                 '-DQTC_SOURCE=' + qtc_install,
+                 '-DBUILD_ASN1PLUGIN=' + ('True' if build_asn1plugin else 'False')
                  ]
     print_cmd(ninja_cmd)
     completed_process = subprocess.run(ninja_cmd)
@@ -83,6 +84,7 @@ if __name__ == '__main__':
                         help='Path to the build environment dir created by prebuild.py')
     parser.add_argument('--env_qt_dir', dest='env_qt_dir', type=str, required=True,
                         help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
+    parser.add_argument('--no_build_asn1plugin', dest='no_build_asn1plugin', action='store_true')
 
     args = parser.parse_args()
 
@@ -107,9 +109,16 @@ if __name__ == '__main__':
         build_type = 'Release'
         print("Defaulting to build type {}".format(build_type))
 
+    if args.no_build_asn1plugin:
+        build_asn1plugin = False
+        print("Skipping ASN1Plugin")
+    else:
+        build_asn1plugin = True
+        print("Building ASN1Plugin")
+
     env_dir = args.env_dir
     env_qt_dir = args.env_qt_dir
 
     check_cmake_version(3, 16, 0)
 
-    build_spacecreator(project_dir, build_dir, build_type, env_dir, env_qt_dir)
+    build_spacecreator(project_dir, build_dir, build_type, env_dir, env_qt_dir, build_asn1plugin)

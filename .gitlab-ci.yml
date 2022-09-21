@@ -9,7 +9,6 @@ stages:
 default:
   before_script:
     - export PROJECT_ROOT=$(pwd)
-    - export ENV_QTC_VERSION_SHORT=4.8
     - export ENV_QTC_VERSION=4.8.2
     - export ENV_QT_VERSION=5.12.1
     #- export DOWNLOAD_DIR=/opt/qt-creator-dev
@@ -63,7 +62,7 @@ space-creator-dev:
     - when: never
 
 
-space-creator:
+space-creator-qt5:
   stage: build-test-and-bundle
   script:
     # build space creator
@@ -93,6 +92,43 @@ space-creator:
      #- if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
 
+space-creator-qt6:
+  stage: build-test-and-bundle
+  script:
+    - export ENV_QTC_VERSION=8.0.1
+    - export ENV_QT_VERSION=6.3.1
+    - export ENV_DIR=/opt/spacecreator6
+    - export ENV_QT_BASE_DIR=${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
+    - export BUILD_DIR=${PROJECT_ROOT}/build
+    - export PACKAGE_DIR=${PROJECT_ROOT}/package
+    - export QTC_INSTALL=${ENV_DIR}/spacecreator.AppDir
+    - export QTC_SOURCE=${QTC_INSTALL}
+    # build space creator
+    - python3 ${PROJECT_ROOT}/scripts/build_spacecreator.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin
+    # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
+    - python3 ${PROJECT_ROOT}/scripts/postbuild.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR}
+    # unit tests
+    - cd ${ENV_DIR}
+    - export PATH=$PATH:${ENV_DIR}/asn1scc
+    - export PATH=$PATH:/root/.local/bin
+    - cd ${PROJECT_ROOT}
+    - ./scripts/run_tests.sh ${BUILD_DIR}
+    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
+    # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
+    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
+  cache:
+    key: asn1scc
+    paths:
+      - build/asn1scc_bin
+  artifacts:
+    reports:
+      junit: build/tst_*-result.xml
+    paths:
+      - package
+    expire_in: 2 days
+  rules:
+     #- if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
 
 space-creator-coverage:
   stage: code-coverage
