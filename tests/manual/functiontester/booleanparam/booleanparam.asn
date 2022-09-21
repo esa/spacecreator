@@ -1,0 +1,7 @@
+BOOLEANPARAM-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+   MyBool      ::= BOOLEAN
+END
+
