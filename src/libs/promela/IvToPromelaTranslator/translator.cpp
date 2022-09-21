@@ -62,7 +62,7 @@ using promela::model::InlineDef;
 using promela::model::Label;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
-using promela::model::PromelaModel;
+using promela::model::PromelaSystemModel;
 using promela::model::Sequence;
 using promela::model::Skip;
 using promela::model::Utype;
@@ -167,7 +167,7 @@ IvToPromelaTranslator::ObserverAttachment::Priority IvToPromelaTranslator::Obser
     return m_priority;
 }
 
-IvToPromelaTranslator::Context::Context(model::PromelaModel *promelaModel, const IVModel *ivModel,
+IvToPromelaTranslator::Context::Context(model::PromelaSystemModel *promelaModel, const IVModel *ivModel,
         const conversion::Options &options, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons,
         const std::vector<QString> &modelFunctions, const std::vector<QString> &observerNames)
     : m_promelaModel(promelaModel)
@@ -246,7 +246,7 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const ObserverAttach
     return result;
 }
 
-auto IvToPromelaTranslator::Context::model() const -> model::PromelaModel *
+auto IvToPromelaTranslator::Context::model() const -> model::PromelaSystemModel *
 {
     return m_promelaModel;
 }
@@ -310,7 +310,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     const auto &environmentFunctions = options.values(PromelaOptions::environmentFunctionName);
     const auto &observerAttachmentInfos = options.values(PromelaOptions::observerAttachment);
     const auto &observerNames = options.values(PromelaOptions::observerFunctionName);
-    auto promelaModel = std::make_unique<PromelaModel>();
+    auto promelaModel = std::make_unique<PromelaSystemModel>();
     const auto *ivModel = getModel<IVModel>(sourceModels);
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
     const auto asn1SubtypesDefinitions = getSubtypesDefinitions(asn1Model, options);
@@ -381,7 +381,7 @@ ModelType IvToPromelaTranslator::getSourceModelType() const
 
 ModelType IvToPromelaTranslator::getTargetModelType() const
 {
-    return ModelType::Promela;
+    return ModelType::PromelaSystem;
 }
 
 std::set<ModelType> IvToPromelaTranslator::getDependencies() const
@@ -872,7 +872,7 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironment(
 }
 
 void IvToPromelaTranslator::createCheckQueueInline(
-        PromelaModel *promelaModel, const QString &functionName, const QList<QString> &channelNames) const
+        PromelaSystemModel *promelaModel, const QString &functionName, const QList<QString> &channelNames) const
 {
     if (channelNames.empty()) {
         auto message = QString("No sporadic nor cyclic interfaces in function %1").arg(functionName);
