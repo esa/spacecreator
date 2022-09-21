@@ -68,7 +68,7 @@ space-creator-qt5:
     # build space creator
     - python3 ${PROJECT_ROOT}/scripts/build_spacecreator.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${PROJECT_ROOT}/scripts/postbuild.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR}
+    - python3 ${PROJECT_ROOT}/scripts/postbuild.py --env_dir ${DOWNLOAD_DIR} --build_dir ${BUILD_DIR}
     # unit tests
     - cd ${DOWNLOAD_DIR}
     - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
@@ -106,7 +106,7 @@ space-creator-qt6:
     # build space creator
     - python3 ${PROJECT_ROOT}/scripts/build_spacecreator.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${PROJECT_ROOT}/scripts/postbuild.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR}
+    - python3 ${PROJECT_ROOT}/scripts/postbuild.py --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR}
     # unit tests
     - cd ${ENV_DIR}
     - export PATH=$PATH:${ENV_DIR}/asn1scc
