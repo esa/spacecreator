@@ -45,7 +45,7 @@ bool PromelaRegistrar::registerCapabilities(conversion::Registry &registry)
 
     auto asn1ToPromelaTranslator = std::make_unique<Asn1ToPromelaTranslator>();
     result = registry.registerTranslator(
-            { ModelType::Asn1 }, ModelType::PromelaData, std::move(asn1ToPromelaTranslator));
+            { ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, std::move(asn1ToPromelaTranslator));
     if (!result) {
         return false;
     }

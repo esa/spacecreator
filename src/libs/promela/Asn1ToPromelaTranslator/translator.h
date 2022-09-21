@@ -21,6 +21,7 @@
 
 #include <QStringList>
 #include <conversion/common/translation/translator.h>
+#include <ivcore/ivmodel.h>
 #include <promela/PromelaModel/promeladatamodel.h>
 
 namespace Asn1Acn {
@@ -69,8 +70,9 @@ public:
 private:
     auto translateAsn1Model(const Asn1Acn::Asn1Model *model, bool enhancedSpinSupport) const
             -> std::vector<std::unique_ptr<conversion::Model>>;
-    auto generateValueGenerationInlines(const Asn1Acn::Asn1Model *asn1Model, const QStringList &typeNames,
-            const conversion::Options &options) const -> std::vector<std::unique_ptr<conversion::Model>>;
+    auto generateValueGenerationInlines(const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel,
+            const QStringList &typeNames, const conversion::Options &options) const
+            -> std::vector<std::unique_ptr<conversion::Model>>;
     auto createDataviewInitInline(
             promela::model::PromelaDataModel &model, const QVector<QString> &initInlineNames) const -> void;
 };

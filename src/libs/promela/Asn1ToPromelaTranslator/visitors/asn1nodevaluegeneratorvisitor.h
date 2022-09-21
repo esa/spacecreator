@@ -23,6 +23,7 @@
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/visitor.h>
+#include <ivcore/ivmodel.h>
 #include <promela/PromelaModel/promelamodel.h>
 
 namespace promela::translator {
@@ -38,8 +39,10 @@ public:
      *
      * @param   promelaModel    Target promela model
      * @param   asn1Model       ASN.1 model
+     * @param   ivModel         Interface View model
      */
-    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, const Asn1Acn::Asn1Model *asn1Model);
+    Asn1NodeValueGeneratorVisitor(
+            model::PromelaModel &promelaModel, const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel);
     /**
      * @brief Constructor.
      *
@@ -67,6 +70,7 @@ private:
 private:
     model::PromelaModel &m_promelaModel;
     const Asn1Acn::Asn1Model *m_asn1Model;
+    const ivm::IVModel *m_ivModel;
     QStringList m_typeNames;
     bool m_generateSubtypes;
 };
