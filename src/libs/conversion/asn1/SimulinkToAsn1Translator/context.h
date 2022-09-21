@@ -35,13 +35,11 @@ public:
     /**
      * @brief   Constructor
      *
-     * @param   simulinkModel               Current simulink model
      * @param   matlabDefinitions           Current MatLab Standard DataTypes ASN.1 definitions
      * @param   simulinkModelDefinitions    Current simulink model ASN.1 definitions
      * @param   options                     Translation options
      */
-    Context(const simulink::model::SimulinkModel &simulinkModel,
-            std::unique_ptr<Asn1Acn::Definitions> &matlabDefinitions,
+    Context(std::unique_ptr<Asn1Acn::Definitions> &matlabDefinitions,
             std::unique_ptr<Asn1Acn::Definitions> &simulinkModelDefinitions, const Options &options);
     /**
      * @brief   Deleted copy constructor
@@ -105,10 +103,9 @@ public:
     auto getSimulinkModelAsn1Definitions() const -> Asn1Acn::Definitions *;
 
 private:
-    const simulink::model::SimulinkModel &m_simulinkModel;
     std::unique_ptr<Asn1Acn::Definitions> &m_matlabDefinitions;
     std::unique_ptr<Asn1Acn::Definitions> &m_simulinkModelDefinitions;
-    const Options &m_options;
+    [[maybe_unused]] const Options &m_options;
 };
 
 } // namespace conversion::asn1::translator

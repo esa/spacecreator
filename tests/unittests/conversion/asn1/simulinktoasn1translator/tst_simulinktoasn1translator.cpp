@@ -795,7 +795,7 @@ std::vector<std::unique_ptr<conversion::Model>> tst_SimulinkToAsn1Translator::tr
 
     auto resultModels = translator.translateModels({ emptySimulinkModel.get() }, options);
 
-    return std::move(resultModels);
+    return resultModels;
 }
 
 const TypeAssignment *tst_SimulinkToAsn1Translator::getTypeAssignment(
