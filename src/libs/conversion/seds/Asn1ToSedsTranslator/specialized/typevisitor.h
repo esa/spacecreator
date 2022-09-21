@@ -24,6 +24,10 @@
 #include <optional>
 #include <seds/SedsModel/sedsmodel.h>
 
+namespace conversion {
+class Options;
+} // namespace conversion
+
 namespace conversion::seds::translator {
 /**
  * @brief Visitor for ASN.1/ACN types, translating them into SEDS equivalents
@@ -45,9 +49,10 @@ public:
          * @param   definitions Parent ASN.1/ACN definitions group
          * @param   name        Target type name
          * @param   sedsPackage Target package to add the type to
+         * @param   options     Options
          */
         Context(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions, QString name,
-                ::seds::model::Package *sedsPackage);
+                ::seds::model::Package *sedsPackage, const Options &options);
 
         /**
          * @brief Parent ASN.1 model accessor
@@ -73,12 +78,19 @@ public:
          * @returns SEDS Package
          */
         auto package() -> ::seds::model::Package *;
+        /**
+         * @brief Target SEDS package conversion options
+         *
+         * @returns conversion Options
+         */
+        auto options() -> const Options &;
 
     private:
         const Asn1Acn::Asn1Model *m_asn1Model;
         const Asn1Acn::Definitions *m_definitions;
         const QString m_name;
         ::seds::model::Package *m_sedsPackage;
+        const Options &m_options;
     };
 
     /**

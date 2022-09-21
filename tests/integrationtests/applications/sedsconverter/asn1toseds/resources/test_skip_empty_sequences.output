@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+	<Package name="Sequences">
+		<DataTypeSet>
+			<IntegerDataType name="Type1">
+				<IntegerDataEncoding byteOrder="bigEndian" sizeInBits="16" encoding="unsigned" />
+				<Range>
+					<MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax" />
+				</Range>
+			</IntegerDataType>
+			<IntegerDataType name="Type2">
+				<IntegerDataEncoding byteOrder="littleEndian" sizeInBits="32" encoding="unsigned" />
+				<Range>
+					<MinMaxRange min="21" max="50" rangeType="inclusiveMinInclusiveMax" />
+				</Range>
+			</IntegerDataType>
+			<ContainerDataType name="SimpleSequence">
+				<EntryList>
+					<Entry type="Type1" name="a" />
+					<Entry type="Type2" name="b" />
+					<Entry type="Type2" name="c" />
+				</EntryList>
+			</ContainerDataType>
+		</DataTypeSet>
+	</Package>
+</PackageFile>
