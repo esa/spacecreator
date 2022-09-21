@@ -20,6 +20,9 @@
 #pragma once
 
 #include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/real.h>
+#include <asn1library/asn1/types/type.h>
 #include <memory>
 
 namespace Asn1Acn {
@@ -35,7 +38,12 @@ public:
     std::unique_ptr<Asn1Acn::Asn1Model> build();
 
 public:
-    auto withIntegerDataType(QString name) -> Asn1ModelBuilder &;
+    auto withBooleanDataType(QString name, QString trueValue, QString falseValue) -> Asn1ModelBuilder &;
+    auto withRealDataType(QString name, Asn1Acn::Types::Endianness endianness,
+            Asn1Acn::Types::RealEncoding realEncoding, double min, double max) -> Asn1ModelBuilder &;
+    auto withIntegerDataType(QString name, int size, int acnMinSize, int acnMaxSize,
+            Asn1Acn::Types::Endianness endianness, Asn1Acn::Types::IntegerEncoding integerEncoding, int64_t min,
+            int64_t max) -> Asn1ModelBuilder &;
 
 private:
     std::unique_ptr<Asn1Acn::File> m_file;

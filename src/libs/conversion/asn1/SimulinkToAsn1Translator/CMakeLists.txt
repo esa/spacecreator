@@ -2,8 +2,6 @@ project(SimulinkToAsn1Translator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES  translator.cpp
              datatypesdependencyresolver.cpp
-             matlabstandarddatatypes.cpp
-             tastestandarddatatypes.cpp
              context.cpp
              specialized/datatypetranslatorvisitor.cpp
              specialized/busdatatypetranslator.cpp
@@ -11,8 +9,6 @@ set(SOURCES  translator.cpp
              specialized/portdatatypetranslator.cpp)
 set(INCLUDES translator.h
              datatypesdependencyresolver.h
-             matlabstandarddatatypes.h
-             tastestandarddatatypes.h
              context.h
              specialized/datatypetranslatorvisitor.h
              specialized/busdatatypetranslator.h

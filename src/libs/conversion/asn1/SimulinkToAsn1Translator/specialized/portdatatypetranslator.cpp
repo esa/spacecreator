@@ -22,10 +22,12 @@
 #include "dimensiontranslator.h"
 
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/simulink/portsdatatypes.h>
 
 using Asn1Acn::SourceLocation;
 using Asn1Acn::TypeAssignment;
 using conversion::Escaper;
+using conversion::simulink::PortsDataTypes;
 using simulink::model::Port;
 using simulink::model::VectorDimensions;
 
@@ -40,7 +42,7 @@ PortDataTypeTranslator::PortDataTypeTranslator(Context &context)
 void PortDataTypeTranslator::translate(const Port &port)
 {
     const auto *portDataTypeAsn1Type = m_context.findAsn1Type(port.outDataTypeStr());
-    const auto portAsn1TypeName = Escaper::escapeAsn1TypeName(port.name() + "-Type");
+    const auto portAsn1TypeName = PortsDataTypes::buildMultiDimensionalPortDataTypeName(port.name());
 
     if (const auto *scalarDimensionsPtr = std::get_if<int64_t>(&port.portDimensions())) {
         const auto scalarDimensions = *scalarDimensionsPtr;

@@ -45,7 +45,7 @@ public:
      * @param   typeNameHelper      Helper for ASN.1 type names
      */
     SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
-            const InterfaceTypeNameHelper &typeNameHelper);
+            const InterfaceTypeNameHelper &typeNameHelper, const Options &options);
     /**
      * @brief   Deleted copy constructor
      */
@@ -87,6 +87,8 @@ private:
     const QString &m_sedsInterfaceName;
     /// @brief  Helper for ASN.1 names
     const InterfaceTypeNameHelper &m_typeNameHelper;
+    /// @brief Options
+    const Options &m_options;
 };
 
 } // namespace conversion::iv::translator

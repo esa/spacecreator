@@ -43,7 +43,7 @@ private Q_SLOTS:
 private:
     static const std::array<const QString, 24> m_directoriesOfTests;
 
-    static const QString m_interfaceXmlFilePath;
+    static const QString m_interfaceXmlFileSubPath;
 
     static const QString m_expectedInterfaceFileSubPath;
     static const QString m_expectedMatLabStandardDataTypesFileSubPath;
@@ -88,7 +88,7 @@ const std::array<const QString, 24> tsti_SimulinkToAsn1::m_directoriesOfTests
     "resources/BusMembersBasicTypesAliasesEnums/InOutPortsDimension-1MemberDimension[2 2]",
 };
 
-const QString tsti_SimulinkToAsn1::m_interfaceXmlFilePath = "/TASTEExporterOutput/interface.xml";
+const QString tsti_SimulinkToAsn1::m_interfaceXmlFileSubPath = "/TASTEExporterOutput/interface.xml";
 
 const QString tsti_SimulinkToAsn1::m_expectedInterfaceFileSubPath = "/asn1/expected_INTERFACE";
 const QString tsti_SimulinkToAsn1::m_expectedMatLabStandardDataTypesFileSubPath = "/asn1/expected_MATLAB-STANDARD-DATATYPES";
@@ -107,38 +107,38 @@ QString getFileContents(const QString &filename)
 
 std::unique_ptr<conversion::Model> loadModel(const QString &interfaceFilePath)
 {
-    Options importerOptions;
-    importerOptions.add(SimulinkOptions::inputFilepath, interfaceFilePath);
+    Options options;
+    options.add(SimulinkOptions::inputFilepath, interfaceFilePath);
 
     SimulinkXmlImporter importer;
-    auto importedModel = importer.importModel(importerOptions);
+    auto importedModel = importer.importModel(options);
 
     return std::move(importedModel);
 }
 
 std::vector<std::unique_ptr<conversion::Model>> translateModel(SimulinkModel *simulinkModel)
 {
-    Options translatorOptions;
+    Options options;
     SimulinkToAsn1Translator translator;
 
-    auto translatedModels = translator.translateModels({ simulinkModel }, translatorOptions);
+    auto translatedModels = translator.translateModels({ simulinkModel }, options);
 
     return std::move(translatedModels);
 }
 
 void exportModel(const Asn1Model *asn1Model)
 {
-    Options exporterOptions;
-    Asn1Exporter asn1Exporter;
+    Options options;
+    Asn1Exporter exporter;
 
-    asn1Exporter.exportModel(asn1Model, exporterOptions);
+    exporter.exportModel(asn1Model, options);
 }
 
 void tsti_SimulinkToAsn1::testComparingAsn1TranslationResultWithExpectedResult()
 {
     for (const QString &m_directoryOfTest : m_directoriesOfTests) {
         try {
-            QString interfaceFilePath = m_directoryOfTest + m_interfaceXmlFilePath;
+            QString interfaceFilePath = m_directoryOfTest + m_interfaceXmlFileSubPath;
 
             const auto importedModel = loadModel(interfaceFilePath);
             auto *simulinkModel = dynamic_cast<SimulinkModel *>(importedModel.get());

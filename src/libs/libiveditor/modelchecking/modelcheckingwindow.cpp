@@ -76,9 +76,13 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
         QDir().mkdir(this->subtypesPath);
     }
     // check if configurations dir exists
-    Q_ASSERT(QDir(this->configurationsPath).exists());
+    if (!QDir(this->configurationsPath).exists()){
+        QDir().mkdir(this->configurationsPath);
+    }
     // check if output dir exists
-    Q_ASSERT(QDir(this->outputPath).exists());
+    if (!QDir(this->outputPath).exists()){
+        QDir().mkdir(this->outputPath);
+    }
 
     // Define right-click menus and set menu policy
     this->contextMenuPropertiesTop = new QMenu(d->ui->treeWidget_properties);

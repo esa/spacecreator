@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModelInterface>
+   <DataTypes>
+      <BusDataType Alignment="-1" DataScope="Auto" Description="" HeaderFile="" Name="BusDef">
+         <BusMembers>
+            <BusMember Complexity="real" DataType="BoolSimulinkIntEnumType" Description=""
+                       Dimensions="[2 2]"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="BoolSimulinkIntEnumTypeMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="BoolUInt8Enum" Description="" Dimensions="[2 2]"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="BoolUInt8EnumMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="BoolUInt16Enum" Description="" Dimensions="[2 2]"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="BoolUInt16EnumMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="BoolInt8Enum" Description="" Dimensions="[2 2]"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="BoolInt8EnumMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="BoolInt16Enum" Description="" Dimensions="[2 2]"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="BoolInt16EnumMember"
+                       SampleTime="-1"
+                       Unit=""/>
+            <BusMember Complexity="real" DataType="BoolInt32Enum" Description="" Dimensions="[2 2]"
+                       DimensionsMode="Fixed"
+                       Max=""
+                       Min=""
+                       Name="BoolInt32EnumMember"
+                       SampleTime="-1"
+                       Unit=""/>
+         </BusMembers>
+      </BusDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolSimulinkIntEnumType">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="-1"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolInt16Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="-1"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolInt32Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="-1"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolInt8Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="-1"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolUInt16Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="0"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+      <EnumDataType AddClassNameToEnumNames="false" DataScope="Auto" DefaultValue="No"
+                    Description=""
+                    HeaderFile=""
+                    Name="BoolUInt8Enum">
+         <EnumValues>
+            <EnumValue Description="" DetailedDescription="" Name="No" Value="0"/>
+            <EnumValue Description="" DetailedDescription="" Name="Yes" Value="1"/>
+         </EnumValues>
+      </EnumDataType>
+   </DataTypes>
+   <Inports>
+      <Inport BusObject="BusDef" BusOutputAsStruct="off" IconDisplay="Port number"
+              Interpolate="on"
+              LatchByDelayingOutsideSignal="off"
+              LatchInputForFeedbackSignals="off"
+              LockScale="off"
+              Name="i1"
+              OutDataTypeStr="BusDef"
+              OutMax="[]"
+              OutMin="[]"
+              OutputSignalNames=""
+              Port="1"
+              PortDimensions="-1"
+              SampleTime="-1"
+              SignalType="auto"
+              Unit="inherit"
+              UnitNoProp=""
+              UseBusObject="on"/>
+   </Inports>
+   <Outports>
+      <Outport BusObject="BusDef" BusOutputAsStruct="off" IconDisplay="Port number"
+               InitialOutput="[]"
+               InputSignalNames=""
+               LockScale="off"
+               MustResolveToSignalObject="off"
+               Name="o1"
+               OutDataTypeStr="BusDef"
+               OutMax="[]"
+               OutMin="[]"
+               OutputWhenDisabled="held"
+               Port="1"
+               PortDimensions="-1"
+               SampleTime="-1"
+               SignalName=""
+               SignalObject=""
+               SignalType="auto"
+               StorageClass="Auto"
+               Unit="inherit"
+               UnitNoProp=""
+               UseBusObject="on"
+               VarSizeSig="Inherit"/>
+   </Outports>
+</ModelInterface>

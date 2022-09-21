@@ -31,11 +31,12 @@ using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator {
 
-SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
-        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper)
+SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
+        const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper, const Options &options)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
     , m_typeNameHelper(typeNameHelper)
+    , m_options(options)
 {
 }
 
@@ -43,7 +44,7 @@ void SyncInterfaceCommandTranslator::translateCommand(
         const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType)
 {
     const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
+            m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType, m_options);
 
     switch (sedsCommand.argumentsCombination()) {
     case seds::model::ArgumentsCombination::NoArgs:

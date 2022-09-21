@@ -59,6 +59,7 @@ using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
 using simulink::model::DataScope;
 using simulink::model::Dimensions;
+using simulink::model::PortDimension;
 using simulink::model::VectorDimensions;
 using tests::conversion::common::SimulinkBusDataTypeBuilder;
 using tests::conversion::common::SimulinkModelBuilder;
@@ -165,10 +166,10 @@ void tst_SimulinkToAsn1Translator::testTooManyModels()
 {
     // clang-format off
     const auto simulinkModel1 = SimulinkModelBuilder("SimulinkModel1")
-                                    .withInport("Inport", "Inport", "double", "1")
+                                    .withInport("Inport", "Inport", "double", "1", PortDimension(-1))
                                     .build();
     const auto simulinkModel2 = SimulinkModelBuilder("SimulinkModel2")
-                                    .withInport("Inport", "Inport", "double", "1")
+                                    .withInport("Inport", "Inport", "double", "1", PortDimension(-1))
                                     .build();
     // clang-format on
 
