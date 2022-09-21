@@ -449,7 +449,8 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(Asn1Options::inputFilepath, inputFileName);
     }
 
-    return convertModel({ ModelType::InterfaceView, ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
+    return convertModel(
+            { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::PromelaSystem, {}, std::move(options));
 }
 
 bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath)
@@ -474,7 +475,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
 
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
-    return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
+    return convertModel({ ModelType::Asn1 }, ModelType::PromelaData, {}, std::move(options));
 }
 
 bool TmcConverter::convertMscObservers(const QString &ivFilePath)
@@ -683,10 +684,8 @@ bool TmcConverter::createEnvGenerationInlines(
         options.add(PromelaOptions::asn1ValueGenerationForType, datatype);
     }
 
-    ModelType sourceModelType = ModelType::Asn1;
-
     try {
-        return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+        return convertModel({ ModelType::Asn1 }, ModelType::PromelaData, {}, std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

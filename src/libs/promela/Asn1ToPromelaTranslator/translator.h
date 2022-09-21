@@ -21,7 +21,7 @@
 
 #include <QStringList>
 #include <conversion/common/translation/translator.h>
-#include <promela/PromelaModel/promelamodel.h>
+#include <promela/PromelaModel/promeladatamodel.h>
 
 namespace Asn1Acn {
 class Asn1Model;
@@ -31,7 +31,7 @@ class File;
 
 namespace promela::translator {
 /**
- * @brief Translate between ASN.1 model and PromelaModel
+ * @brief Translate between ASN.1 model and PromelaDataModel
  */
 class Asn1ToPromelaTranslator final : public ::conversion::translator::Translator
 {
@@ -71,7 +71,7 @@ private:
             -> std::vector<std::unique_ptr<conversion::Model>>;
     auto generateValueGenerationInlines(const Asn1Acn::Asn1Model *asn1Model, const QStringList &typeNames,
             const conversion::Options &options) const -> std::vector<std::unique_ptr<conversion::Model>>;
-    auto createDataviewInitInline(promela::model::PromelaModel &model, const QVector<QString> &initInlineNames) const
-            -> void;
+    auto createDataviewInitInline(
+            promela::model::PromelaDataModel &model, const QVector<QString> &initInlineNames) const -> void;
 };
 }
