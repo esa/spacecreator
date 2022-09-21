@@ -77,7 +77,7 @@ space-creator-qt5:
     - ./scripts/run_tests.sh ${BUILD_DIR}
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${DOWNLOAD_DIR} --project_version ${SC_VERSION}
+    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --project_version ${SC_VERSION}
   cache:
     key: asn1scc
     paths:
@@ -115,7 +115,7 @@ space-creator-qt6:
     - ./scripts/run_tests.sh ${BUILD_DIR}
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
+    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --project_version ${SC_VERSION}
   cache:
     key: asn1scc
     paths:
