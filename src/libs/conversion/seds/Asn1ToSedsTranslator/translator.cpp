@@ -61,23 +61,23 @@ std::vector<std::unique_ptr<Model>> Asn1ToSedsTranslator::translateAsn1Model(
     std::vector<std::unique_ptr<Model>> resultModels;
 
     if (options.isSet(conversion::seds::SedsOptions::multipleAsnModels)) {
-        translateAsn1ModelMultipleAsnModels(asn1Model, resultModels);
+        translateAsn1ModelMultipleAsnModels(asn1Model, resultModels, options);
         return resultModels;
     }
 
-    translateAsn1ModelOneAsnModel(asn1Model, resultModels);
+    translateAsn1ModelOneAsnModel(asn1Model, resultModels, options);
     return resultModels;
 }
 
 void Asn1ToSedsTranslator::translateAsn1ModelOneAsnModel(
-        const Asn1Acn::Asn1Model *asn1Model, std::vector<std::unique_ptr<Model>> &resultModels)
+        const Asn1Acn::Asn1Model *asn1Model, std::vector<std::unique_ptr<Model>> &resultModels, const Options &options)
 {
     for (const auto &file : asn1Model->data()) {
         for (const auto &definitions : file->definitionsList()) {
             if (definitions->types().empty()) {
                 continue;
             }
-            auto sedsPackage = translateAsn1Definitions(asn1Model, definitions.get());
+            auto sedsPackage = translateAsn1Definitions(asn1Model, definitions.get(), options);
             ::seds::model::PackageFile sedsPackageFile;
             sedsPackageFile.setPackage(std::move(sedsPackage));
             auto sedsModel = std::make_unique<SedsModel>(std::move(sedsPackageFile));
@@ -87,7 +87,7 @@ void Asn1ToSedsTranslator::translateAsn1ModelOneAsnModel(
 }
 
 void Asn1ToSedsTranslator::translateAsn1ModelMultipleAsnModels(
-        const Asn1Acn::Asn1Model *asn1Model, std::vector<std::unique_ptr<Model>> &resultModels)
+        const Asn1Acn::Asn1Model *asn1Model, std::vector<std::unique_ptr<Model>> &resultModels, const Options &options)
 {
     for (const auto &file : asn1Model->data()) {
         ::seds::model::DataSheet sedsDataSheet;
@@ -99,7 +99,7 @@ void Asn1ToSedsTranslator::translateAsn1ModelMultipleAsnModels(
             if (definitions->types().empty()) {
                 continue;
             }
-            auto sedsPackage = translateAsn1Definitions(asn1Model, definitions.get());
+            auto sedsPackage = translateAsn1Definitions(asn1Model, definitions.get(), options);
             sedsDataSheet.addPackage(std::move(sedsPackage));
         }
 
@@ -108,13 +108,13 @@ void Asn1ToSedsTranslator::translateAsn1ModelMultipleAsnModels(
     }
 }
 
-auto Asn1ToSedsTranslator::translateAsn1Definitions(const Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions)
-        -> ::seds::model::Package
+auto Asn1ToSedsTranslator::translateAsn1Definitions(const Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions,
+        const Options &options) -> ::seds::model::Package
 {
     ::seds::model::Package package;
     package.setName(Escaper::escapeIvName(definitions->name()));
     for (const auto &type : definitions->types()) {
-        TypeTranslator::translateType(asn1Model, definitions, type.get(), &package);
+        TypeTranslator::translateType(asn1Model, definitions, type.get(), &package, options);
     }
 
     return package;
