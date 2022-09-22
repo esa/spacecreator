@@ -193,7 +193,10 @@ void SdlVisitor::visit(const System &system)
 
     m_writer.pushIndent(INDENT);
 
-    if (!system.freeformTexts().empty()) {
+    const auto hasFreeformTexts = !system.freeformTexts().empty();
+    const auto hasSignals = !system.getSignals().empty();
+
+    if (hasFreeformTexts || hasSignals) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
 
@@ -202,13 +205,8 @@ void SdlVisitor::visit(const System &system)
             m_writer.endLine(";");
         }
 
-        m_writer.writeLine("/* CIF ENDTEXT */");
-    }
-
-    if (!system.getSignals().empty()) {
-        m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
-        m_layouter.moveDown(Layouter::ElementType::Text);
         exportCollection(system.getSignals());
+
         m_writer.writeLine("/* CIF ENDTEXT */");
     }
 
@@ -424,7 +422,16 @@ void SdlVisitor::visit(const Rename &rename)
         throw ExportException("Signal rename shall have a name but it doesn't");
     }
 
-    m_writer.beginLine(QString("signal %1 renames").arg(rename.name()));
+    m_writer.beginLine(QString("signal %1").arg(rename.name()));
+
+    const auto parametersTypes = rename.parametersTypes();
+    if (!parametersTypes.empty()) {
+        m_writer.write("(");
+        m_writer.write(parametersTypes.join(", "));
+        m_writer.write(")");
+    }
+
+    m_writer.write(" renames");
 
     if (rename.referencedName().isEmpty()) {
         return;
@@ -607,7 +614,7 @@ void SdlVisitor::visit(const Answer &answer)
 
     m_layouter.pushPosition();
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Answer));
-    if (answer.literal().value() == "else") {
+    if (answer.literal().value().toLower() == "else") {
         m_writer.writeLine(answer.literal().value() + ":");
     } else {
         m_writer.writeLine("(" + answer.literal().value() + "):");

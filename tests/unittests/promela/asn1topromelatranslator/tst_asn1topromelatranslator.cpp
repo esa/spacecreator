@@ -159,7 +159,7 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
     QVERIFY(std::holds_alternative<BasicType>(expectedNull.getType()));
     QCOMPARE(std::get<BasicType>(expectedNull.getType()), BasicType::BIT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 6);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 7);
 
     {
         const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_assign_value");
@@ -213,6 +213,19 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
 
         const auto skip = findProctypeElement<Skip>(sequence, 0);
         QVERIFY(skip != nullptr);
+    }
+
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyReal_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyBoolean_range_check");
+        QVERIFY(inlineDef != nullptr);
     }
 }
 
@@ -706,7 +719,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_ch1");
     QCOMPARE(promelaModel.getTypeAliases().at(1).getName(), "MyType_ch2");
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 6);
     {
         const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -738,6 +751,10 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch1_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch2_range_check");
         QVERIFY(inlineDef != nullptr);
     }
     {
@@ -803,7 +820,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -829,6 +846,14 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_range_check");
+        QVERIFY(inlineDef != nullptr);
     }
 }
 
@@ -901,7 +926,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -990,6 +1015,14 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_range_check");
+        QVERIFY(inlineDef != nullptr);
     }
 }
 

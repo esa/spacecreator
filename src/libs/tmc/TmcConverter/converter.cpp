@@ -325,7 +325,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         }
     }
 
-    if (!convertMscObservers()) {
+    if (!convertMscObservers(outputOptimizedIvFileName)) {
         return false;
     }
 
@@ -477,7 +477,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
     return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
 }
 
-bool TmcConverter::convertMscObservers()
+bool TmcConverter::convertMscObservers(const QString &ivFilePath)
 {
     for (const QString &mscFilePath : m_mscObserverFiles) {
         QFileInfo mscFile(mscFilePath);
@@ -493,12 +493,16 @@ bool TmcConverter::convertMscObservers()
         Options options;
 
         options.add(MscOptions::inputFilepath, mscFilePath);
+        options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
+        options.add(IvOptions::inputFilepath, ivFilePath);
+        options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
         options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
         options.add(SdlOptions::filepathPrefix, outputPath);
 
         qDebug() << "Converting MSC file" << mscFilePath << "to an SDL observer";
 
-        if (!convertModel({ ModelType::Msc }, ModelType::Sdl, {}, std::move(options))) {
+        if (!convertModel({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, {},
+                    std::move(options))) {
             qCritical() << "Unable to translate MSC file" << mscFilePath << "to SDL observer";
             return false;
         }

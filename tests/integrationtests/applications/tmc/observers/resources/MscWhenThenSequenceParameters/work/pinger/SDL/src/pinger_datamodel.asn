@@ -1,0 +1,19 @@
+Pinger-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   SmallInteger, BigInteger, MyChoice, MySequence FROM MSCWHENTHENSEQUENCEPARAMETERS-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID FROM System-Dataview;
+
+Pinger-States ::= ENUMERATED {ok3, ok4, wait, ok1, ok2}
+
+Pinger-Context ::= SEQUENCE {
+   state Pinger-States,
+   init-done BOOLEAN,
+   value1 MySequence,
+   value2 MySequence
+}
+
+Pinger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+END

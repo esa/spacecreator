@@ -139,7 +139,7 @@ bool IVFunctionType::removeChild(IVObject *child)
             break;
         }
         case IVObject::Type::Function: {
-            d->m_functionTypes.removeAll(child->as<IVFunction *>());
+            d->m_functions.removeAll(child->as<IVFunction *>());
             break;
         }
         case IVObject::Type::InterfaceGroup: {
