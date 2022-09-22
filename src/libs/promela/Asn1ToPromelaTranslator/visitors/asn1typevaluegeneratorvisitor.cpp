@@ -171,7 +171,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
     const size_t minSize = constraintVisitor.getMinSize();
     const size_t maxSize = constraintVisitor.getMaxSize();
-    if (minSize == maxSize) {
+
+    const auto isConstSize = minSize == maxSize;
+
+    if (isConstSize) {
         sequence->appendElement(
                 ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, Expression(maxSize - 1)));
     } else { // OctetString has variable length
@@ -185,7 +188,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
         sequence->appendElement(ProctypeMaker::makeInlineCall(
                 QString("%1_generate_value").arg(lengthGeneratorTypeName), valueLengthVariableName));
 
-        Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(argumentName, 1);
+        Expression end = InlineDefAdder::getValueLengthMinusConstAsExpression(argumentName, 1);
         sequence->appendElement(ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, end));
     }
 
@@ -199,11 +202,28 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
         }
 
         overridenOctetString->constraints().accept(constraintVisitor);
+        const size_t overridenMinSize = constraintVisitor.getMinSize();
         const size_t overridenMaxSize = constraintVisitor.getMaxSize();
 
-        auto initCall = ProctypeMaker::makeCallForEachValue(
-                "OctetStringElement_init_value", argumentName, Expression(maxSize), Expression(overridenMaxSize - 1));
-        sequence->appendElement(std::move(initCall));
+        if (minSize < overridenMinSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
+            throw TranslationException(std::move(errorMessage));
+        } else if (maxSize > overridenMaxSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        if (isConstSize) {
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    "OctetStringElement_init_value", argumentName, Expression(maxSize), Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        } else {
+            Expression start = InlineDefAdder::getValueLengthAsExpression(argumentName);
+
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    "OctetStringElement_init_value", argumentName, start, Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        }
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -236,7 +256,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
     const size_t minSize = constraintVisitor.getMinSize();
     const size_t maxSize = constraintVisitor.getMaxSize();
-    if (minSize == maxSize) {
+
+    const auto isConstSize = minSize == maxSize;
+
+    if (isConstSize) {
         sequence->appendElement(
                 ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, Expression(maxSize - 1)));
     } else { // IA5String has variable length
@@ -250,7 +273,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
         sequence->appendElement(ProctypeMaker::makeInlineCall(
                 QString("%1_generate_value").arg(lengthGeneratorTypeName), valueLengthVariableName));
 
-        Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(argumentName, 1);
+        Expression end = InlineDefAdder::getValueLengthMinusConstAsExpression(argumentName, 1);
         sequence->appendElement(ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, end));
     }
 
@@ -264,11 +287,28 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
         }
 
         overridenIA5String->constraints().accept(constraintVisitor);
+        const size_t overridenMinSize = constraintVisitor.getMinSize();
         const size_t overridenMaxSize = constraintVisitor.getMaxSize();
 
-        auto initCall = ProctypeMaker::makeCallForEachValue(
-                "IA5StringElement_init_value", argumentName, Expression(maxSize), Expression(overridenMaxSize - 1));
-        sequence->appendElement(std::move(initCall));
+        if (minSize < overridenMinSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
+            throw TranslationException(std::move(errorMessage));
+        } else if (maxSize > overridenMaxSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        if (isConstSize) {
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    "IA5StringElement_init_value", argumentName, Expression(maxSize), Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        } else {
+            Expression start = InlineDefAdder::getValueLengthAsExpression(argumentName);
+
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    "IA5StringElement_init_value", argumentName, start, Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        }
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -413,7 +453,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
     const size_t minSize = constraintVisitor.getMinSize();
     const size_t maxSize = constraintVisitor.getMaxSize();
-    if (minSize == maxSize) {
+
+    const auto isConstSize = minSize == maxSize;
+
+    if (isConstSize) {
         sequence->appendElement(ProctypeMaker::makeCallForEachValue(
                 inlineTypeGeneratorName, valueVariableName, Expression(maxSize - 1)));
     } else { // sequenceOf has variable length
@@ -425,7 +468,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         sequence->appendElement(ProctypeMaker::makeInlineCall(QString("%1_generate_value").arg(lengthGeneratorTypeName),
                 QString("%1.%2").arg(valueVariableName).arg(InlineDefAdder::lengthMemberName)));
 
-        Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(valueVariableName, 1);
+        Expression end = InlineDefAdder::getValueLengthMinusConstAsExpression(valueVariableName, 1);
         sequence->appendElement(ProctypeMaker::makeCallForEachValue(inlineTypeGeneratorName, valueVariableName, end));
     }
 
@@ -439,12 +482,30 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         }
 
         overridenSequenceOf->constraints().accept(constraintVisitor);
+        const size_t overridenMinSize = constraintVisitor.getMinSize();
         const size_t overridenMaxSize = constraintVisitor.getMaxSize();
 
+        if (minSize < overridenMinSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
+            throw TranslationException(std::move(errorMessage));
+        } else if (maxSize > overridenMaxSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
+            throw TranslationException(std::move(errorMessage));
+        }
+
         const auto initCallName = QString("%1_elem_init_value").arg(m_overridenType->identifier());
-        auto initCall = ProctypeMaker::makeCallForEachValue(
-                initCallName, valueVariableName, Expression(maxSize), Expression(overridenMaxSize - 1));
-        sequence->appendElement(std::move(initCall));
+
+        if(isConstSize) {
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    initCallName, valueVariableName, Expression(maxSize), Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        } else {
+            Expression start = InlineDefAdder::getValueLengthAsExpression(valueVariableName);
+
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    initCallName, valueVariableName, start, Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        }
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -658,7 +719,15 @@ void Asn1TypeValueGeneratorVisitor::InlineDefAdder::addRangedIntegerGeneratorToM
     lengthType.accept(lenVisitor);
 }
 
-Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLenghtMinusConstAsExpression(
+
+Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLengthAsExpression(const QString &valueVariableName)
+{
+    const VariableRef varRef(QString("%1.%2").arg(valueVariableName).arg(lengthMemberName));
+
+    return Expression(varRef);
+}
+
+Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLengthMinusConstAsExpression(
         const QString &valueVariableName, const int x)
 {
     const auto subtractOperator = model::BinaryExpression::Operator::SUBTRACT;
