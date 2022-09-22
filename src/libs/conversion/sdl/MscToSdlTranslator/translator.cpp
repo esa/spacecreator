@@ -21,11 +21,14 @@
 
 #include "specialized/documenttranslator.h"
 
+#include <asn1library/asn1/asn1model.h>
 #include <conversion/common/translation/exceptions.h>
 #include <msccore/mscdocument.h>
 #include <sdl/SdlModel/nextstate.h>
 
+using Asn1Acn::Asn1Model;
 using conversion::translator::TranslationException;
+using ivm::IVModel;
 using msc::MscModel;
 using sdl::SdlModel;
 
@@ -37,8 +40,18 @@ std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateModels(
     checkSourceModelCount(sourceModels);
 
     const auto *mscModel = getModel<MscModel>(sourceModels);
+    const auto *asn1Model = getModel<Asn1Model>(sourceModels);
+    const auto *ivModel = getModel<IVModel>(sourceModels);
 
-    return translateMscModel(mscModel, options);
+    if (asn1Model->data().empty()) {
+        throw TranslationException("Missing observer.asn file in the MSC to SDL translation");
+    } else if (asn1Model->data().size() > 1) {
+        throw TranslationException("Only observer.asn file is allowed in the MSC to SDL translation");
+    }
+
+    const auto *asn1File = asn1Model->data().front().get();
+
+    return translateMscModel(mscModel, asn1File, ivModel, options);
 }
 
 ModelType MscToSdlTranslator::getSourceModelType() const
@@ -53,16 +66,16 @@ ModelType MscToSdlTranslator::getTargetModelType() const
 
 std::set<ModelType> MscToSdlTranslator::getDependencies() const
 {
-    static std::set<ModelType> dependencies { ModelType::Msc };
+    static std::set<ModelType> dependencies { ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView };
     return dependencies;
 }
 
 std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(
-        const MscModel *mscModel, const Options &options) const
+        const MscModel *mscModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options) const
 {
     auto sdlModel = std::make_unique<SdlModel>();
 
-    DocumentTranslator documentTranslator(sdlModel.get(), options);
+    DocumentTranslator documentTranslator(sdlModel.get(), asn1File, ivModel, options);
     for (const auto mscDocument : mscModel->allDocuments()) {
         documentTranslator.translateDocument(mscDocument);
     }

@@ -19,12 +19,14 @@
 
 #include "specialized/documenttranslator.h"
 
+using ivm::IVModel;
 using sdl::SdlModel;
 
 namespace conversion::sdl::translator {
 
-DocumentTranslator::DocumentTranslator(SdlModel *sdlModel, const Options &options)
-    : m_chartTranslator(sdlModel, options)
+DocumentTranslator::DocumentTranslator(
+        SdlModel *sdlModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options)
+    : m_chartTranslator(sdlModel, asn1File, ivModel, options)
 {
 }
 

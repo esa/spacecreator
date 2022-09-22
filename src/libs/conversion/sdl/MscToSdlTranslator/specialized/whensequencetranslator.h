@@ -22,7 +22,6 @@
 #include "specialized/sequencetranslator.h"
 
 #include <msccore/mscchart.h>
-#include <sdl/SdlModel/rename.h>
 
 namespace conversion::sdl::translator {
 
@@ -36,9 +35,12 @@ public:
      * @brief   Constructor
      *
      * @param   sdlModel    Parent SDL model
+     * @param   asn1File    ASN.1 file
+     * @param   ivModel     IV model
      * @param   options     Conversion options
      */
-    WhenSequenceTranslator(::sdl::SdlModel *sdlModel, const Options &options);
+    WhenSequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *asn1File, const ivm::IVModel *ivModel,
+            const Options &options);
 
     /**
      * @brief   Deleted copy constuctor
@@ -74,27 +76,26 @@ private:
         ThenNot
     };
 
-    struct Context {
-        QString chartName;
+    struct WhenContext : public Context {
         std::vector<uint32_t> whenSequence;
         std::vector<uint32_t> thenSequence;
-        std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
         ::sdl::State *endState;
-        std::size_t signalCounter;
         Mode mode;
     };
 
 private:
-    auto collectData(const msc::MscChart *mscChart) const -> WhenSequenceTranslator::Context;
+    auto collectData(const msc::MscChart *mscChart) const -> WhenSequenceTranslator::WhenContext;
 
-    auto handleEvent(Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
-    auto handleConditionEvent(Context &context, const msc::MscCondition *mscCondition) const -> void;
-    auto handleMessageEvent(Context &context, const msc::MscMessage *mscMessage) const -> void;
+    auto handleEvent(WhenContext &context, const msc::MscInstanceEvent *mscEvent) const -> void;
+    auto handleConditionEvent(WhenContext &context, const msc::MscCondition *mscCondition) const -> void;
+    auto handleMessageEvent(WhenContext &context, const msc::MscMessage *mscMessage) const -> void;
 
-    auto createStateMachine(Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
-    auto createThenTransitions(Context &context, StateList &states, const uint32_t startStateId) const
+    auto createStateMachine(WhenContext &context) const -> std::unique_ptr<::sdl::StateMachine>;
+    auto createThenTransitions(WhenContext &context, StateList &states, const SignalsMap &signals,
+            const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
-    auto createThenNotTransitions(Context &context, StateList &states, const uint32_t startStateId) const
+    auto createThenNotTransitions(WhenContext &context, StateList &states, const SignalsMap &signals,
+            const MscParameterValueParser::SignalRequirementsMap &signalRequirements, const uint32_t startStateId) const
             -> TransitionList;
 };
 
