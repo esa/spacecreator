@@ -148,7 +148,8 @@ private:
         static void addRangedIntegerGeneratorToModel(
                 const QString &inlineName, model::PromelaModel &model, long minSize, long maxSize);
 
-        static Expression getValueLenghtMinusConstAsExpression(const QString &valueVariableName, int x);
+        static Expression getValueLengthAsExpression(const QString &valueVariableName);
+        static Expression getValueLengthMinusConstAsExpression(const QString &valueVariableName, int x);
     };
 
     auto createValueGenerationInline(model::Sequence sequence) -> void;
