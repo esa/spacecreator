@@ -20,14 +20,26 @@
 #include "registrar.h"
 
 #include <simulatortrail/SimulatorTrailExporter/simulatortrailexporter.h>
+#include <simulatortrail/SpinTrailToSimulatorTrailTranslator/spintrailtosimulatortrailtranslator.h>
 
 using simulatortrail::exporter::SimulatorTrailExporter;
+using simulatortrail::translator::SpinTrailToSimulatorTrailTranslator;
 
 namespace conversion::simulatortrail {
 bool SimulatorTrailRegistrar::registerCapabilities(conversion::Registry &registry)
 {
-    std::unique_ptr<SimulatorTrailExporter> simulatorTrailExporter = std::make_unique<SimulatorTrailExporter>();
-    bool result = registry.registerExporter(ModelType::SimulatorTrail, std::move(simulatorTrailExporter));
+    std::unique_ptr<SimulatorTrailExporter> exporter = std::make_unique<SimulatorTrailExporter>();
+    bool result = registry.registerExporter(ModelType::SimulatorTrail, std::move(exporter));
+
+    if (!result) {
+        return false;
+    }
+
+    std::unique_ptr<SpinTrailToSimulatorTrailTranslator> translator =
+            std::make_unique<SpinTrailToSimulatorTrailTranslator>();
+
+    result = registry.registerTranslator({ ModelType::SpinTrail, ModelType::InterfaceView, ModelType::Asn1 },
+            ModelType::SimulatorTrail, std::move(translator));
 
     if (!result) {
         return false;

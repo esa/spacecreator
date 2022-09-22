@@ -19,6 +19,7 @@
 
 #include "spintrailtosimulatortrailtranslator.h"
 
+#include <QDebug>
 #include <simulatortrail/SimulatorTrailModel/simulatortrailmodel.h>
 
 using namespace simulatortrail::model;
@@ -34,6 +35,8 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
     std::vector<std::unique_ptr<Model>> result;
 
     std::unique_ptr<SimulatorTrailModel> simulatorTrail = std::make_unique<SimulatorTrailModel>();
+
+    qDebug() << "converter " << (simulatorTrail->modelType() == ModelType::SimulatorTrail);
 
     result.push_back(std::move(simulatorTrail));
 
@@ -52,7 +55,11 @@ conversion::ModelType SpinTrailToSimulatorTrailTranslator::getTargetModelType() 
 
 std::set<conversion::ModelType> SpinTrailToSimulatorTrailTranslator::getDependencies() const
 {
-    return std::set<ModelType> { ModelType::SpinTrail };
+    std::set<ModelType> dependencies;
+    dependencies.insert(ModelType::SpinTrail);
+    dependencies.insert(ModelType::InterfaceView);
+    dependencies.insert(ModelType::Asn1);
+    return dependencies;
 }
 
 }

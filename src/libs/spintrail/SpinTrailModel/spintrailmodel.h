@@ -21,6 +21,7 @@
 
 #include <conversion/common/model.h>
 #include <conversion/common/modelproperties.h>
+#include <conversion/common/modeltype.h>
 
 namespace spintrail::model {
 
@@ -35,5 +36,20 @@ public:
      * @return  Model type
      */
     conversion::ModelType modelType() const override;
+};
+}
+
+namespace conversion {
+/**
+ * @brief   Specialization for SpinTrail model
+ */
+template<>
+struct ModelProperties<::spintrail::model::SpinTrailModel> {
+    /// @brief  Model type
+    static const ModelType type = ModelType::SpinTrail;
+    /// @brief  Model name
+    static inline const QString name = ModelTypeProperties<type>::name;
+    /// @brief  Model extension
+    static inline const QStringList extensions = ModelTypeProperties<type>::extensions;
 };
 }

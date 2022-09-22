@@ -20,15 +20,33 @@
 #include "simulatortrailexporter.h"
 
 #include <QDebug>
+#include <conversion/common/export/exceptions.h>
+#include <simulatortrail/SimulatorTrailOptions/options.h>
 
 using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
+using conversion::exporter::ExportException;
+using conversion::simulatortrail::SimulatorTrailOptions;
 
 namespace simulatortrail::exporter {
 void SimulatorTrailExporter::exportModel(const Model *model, const Options &options) const
 {
     Q_UNUSED(model);
-    Q_UNUSED(options);
+
+    std::optional<QString> outputFilepath = options.value(SimulatorTrailOptions::outputFilepath);
+
+    if (outputFilepath.has_value()) {
+        QSaveFile outputFile(outputFilepath.value());
+        const bool opened = outputFile.open(QIODevice::WriteOnly);
+        if (!opened) {
+            throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
+        }
+
+        const bool commited = outputFile.commit();
+        if (!commited) {
+            throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
+        }
+    }
 }
 }

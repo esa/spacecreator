@@ -15,7 +15,8 @@ target_link_libraries(SpinTrailToSimulatorTrailTranslator
   PUBLIC              Conversion::Common
                       Conversion::Converter
                       asn1library
-                      Promela::Model
+                      SimulatorTrail::Model
+					  SpinTrail::Model
   PRIVATE             CommonProjectWarnings)
 
 add_format_target(SpinTrailToSimulatorTrailTranslator)

@@ -14,6 +14,7 @@ target_include_directories(SimulatorTrailRegistrar
 
 target_link_libraries(SimulatorTrailRegistrar
 	PRIVATE SimulatorTrail::Exporter
+	Conversion::SpinTrailToSimulatorTrailTranslator
 	CommonProjectWarnings
 	PUBLIC Conversion::Common)
 

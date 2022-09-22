@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     std::optional<QString> outputSimulatorTrailFilepath;
 
     for (int i = 1; i < args.size(); ++i) {
-        const QString &arg = args[1];
+        const QString &arg = args[i];
         if (arg == "-iv") {
             if (i + 1 == args.size()) {
                 qCritical("Missing filename after -iv");
