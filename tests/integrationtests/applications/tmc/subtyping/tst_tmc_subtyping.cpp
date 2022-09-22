@@ -29,11 +29,25 @@ class tst_Tmc_Subtyping : public QObject
 
 private Q_SLOTS:
     void test_subtyping();
+    void test_ia5string();
+    void test_octetstring();
 };
 
 void tst_Tmc_Subtyping::test_subtyping()
 {
     const int result = system("./test_subtyping.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping::test_ia5string()
+{
+    const int result = system("./test_ia5string.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping::test_octetstring()
+{
+    const int result = system("./test_octetstring.sh");
     QCOMPARE(result, 0);
 }
 

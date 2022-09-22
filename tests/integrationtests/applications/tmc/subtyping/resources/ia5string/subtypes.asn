@@ -1,0 +1,6 @@
+MYSUBTYPES DEFINITIONS ::=
+BEGIN
+
+Clk-tick-arg ::= IA5String (SIZE(1))
+
+END

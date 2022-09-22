@@ -1,8 +1,0 @@
-SUBTYPES1 DEFINITIONS ::=
-BEGIN
-
-IMPORTS MyArray FROM USERDEFINED-TYPES-DATAVIEW;
-
-Pinger-pongbutarray-pongarg::= MyArray (SIZE(0 .. 1))
-
-END
