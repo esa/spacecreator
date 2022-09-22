@@ -275,6 +275,8 @@ void IVXMLReader::test_readArchetypeReference()
         case ivm::IVObject::Type::ArchetypeReference:
             reference = ivObject->as<ivm::IVArchetypeReference *>();
             break;
+        default:
+            break;
         }
     }
 

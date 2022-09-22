@@ -187,6 +187,7 @@ QList<int> knownGraphicsItemTypes()
             break;
         case ivm::IVObject::Type::ConnectionLayer:
         case ivm::IVObject::Type::Unknown:
+        default:
             continue;
         }
         if (itemType != 0) {

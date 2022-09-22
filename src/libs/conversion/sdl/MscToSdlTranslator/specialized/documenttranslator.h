@@ -21,6 +21,8 @@
 
 #include "specialized/charttranslator.h"
 
+#include <asn1library/asn1/file.h>
+#include <ivcore/ivmodel.h>
 #include <msccore/mscdocument.h>
 #include <sdl/SdlModel/sdlmodel.h>
 
@@ -36,9 +38,12 @@ public:
      * @brief   Constructor
      *
      * @param   sdlModel    Parent SDL model
+     * @param   asn1File    ASN.1 file
+     * @param   ivModel     IV model
      * @param   options     Conversion options
      */
-    DocumentTranslator(::sdl::SdlModel *sdlModel, const Options &options);
+    DocumentTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *asn1File, const ivm::IVModel *ivModel,
+            const Options &options);
 
     /**
      * @brief   Deleted copy constuctor
