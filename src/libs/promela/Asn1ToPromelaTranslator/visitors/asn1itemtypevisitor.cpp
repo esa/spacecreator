@@ -194,9 +194,7 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
-    if (m_generateInits) {
-        addSimpleValueInitializationInline(utypeName, Constant(0));
-    }
+    addOctetStringElementInitializationInline();
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -225,9 +223,7 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
-    if (m_generateInits) {
-        addSimpleValueInitializationInline(utypeName, Constant(0));
-    }
+    addIA5StringElementInitializationInline();
 
     m_resultDataType = DataType(UtypeRef(utypeName));
 }
@@ -676,6 +672,38 @@ void Asn1ItemTypeVisitor::addSimpleValueInitializationInline(const QString &type
     sequence.appendElement(std::move(assignValueInlineCall));
 
     addInitializeValueInline(typeName, std::move(sequence));
+}
+
+void Asn1ItemTypeVisitor::addIA5StringElementInitializationInline()
+{
+    static bool inlineCreated = false;
+
+    if(inlineCreated) {
+        return;
+    }
+
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+    sequence.appendElement(Assignment(VariableRef("dst"), Expression(Constant(0))));
+
+    addInitializeValueInline("IA5StringElement", std::move(sequence));
+
+    inlineCreated = true;
+}
+
+void Asn1ItemTypeVisitor::addOctetStringElementInitializationInline()
+{
+    static bool inlineCreated = false;
+
+    if(inlineCreated) {
+        return;
+    }
+
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+    sequence.appendElement(Assignment(VariableRef("dst"), Expression(Constant(0))));
+
+    addInitializeValueInline("OctetStringElement", std::move(sequence));
+
+    inlineCreated = true;
 }
 
 void Asn1ItemTypeVisitor::addEmptyValueInitializationInline(const QString &typeName)

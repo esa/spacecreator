@@ -153,6 +153,8 @@ private:
     void addAssignValueInline(const QString &typeName, model::Sequence sequence);
 
     void addSimpleValueInitializationInline(const QString &typeName, model::InlineCall::Argument initValue);
+    void addIA5StringElementInitializationInline();
+    void addOctetStringElementInitializationInline();
     void addEmptyValueInitializationInline(const QString &typeName);
     void addInitializeValueInline(const QString &typeName, model::Sequence sequence);
 
