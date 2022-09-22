@@ -105,7 +105,7 @@ public:
 private:
     std::unique_ptr<Asn1Acn::Definitions> &m_matlabDefinitions;
     std::unique_ptr<Asn1Acn::Definitions> &m_simulinkModelDefinitions;
-    [[maybe_unused]] const Options &m_options;
+    const Options &m_options;
 };
 
 } // namespace conversion::asn1::translator

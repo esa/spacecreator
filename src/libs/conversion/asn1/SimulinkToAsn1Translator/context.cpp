@@ -41,6 +41,7 @@ Context::Context(std::unique_ptr<Definitions> &matlabDefinitions,
     , m_simulinkModelDefinitions(simulinkModelDefinitions)
     , m_options(options)
 {
+    Q_UNUSED(m_options);
 }
 
 void Context::addSimulinkModelAsn1Type(std::unique_ptr<Type> asn1Type, QString description)
