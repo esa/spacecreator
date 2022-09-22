@@ -30,6 +30,10 @@
 #include <seds/SedsModel/components/states/exitstate.h>
 #include <seds/SedsModel/sedsmodel.h>
 
+namespace conversion {
+class Options;
+} // namespace conversion
+
 namespace conversion::sdl::translator {
 
 /**
@@ -46,7 +50,8 @@ public:
      * @param context           Translation context
      * @param sedsStateMachine  State machine to be translated
      */
-    static auto translateStateMachine(Context &context, const seds::model::StateMachine &sedsStateMachine) -> void;
+    static auto translateStateMachine(
+            Context &context, const seds::model::StateMachine &sedsStateMachine, const Options &options) -> void;
 
     /**
      * @brief   Extract SEDS component implementation's variables into SDL variable declarations
@@ -157,19 +162,20 @@ private:
 
     static auto translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>;
 
-    static auto translatePrimitive(Context &context, const seds::model::OnCommandPrimitive &command) -> InputHandler;
+    static auto translatePrimitive(
+            Context &context, const seds::model::OnCommandPrimitive &command, const Options &options) -> InputHandler;
 
     static auto translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
             -> InputHandler;
 
     static auto translatePrimitive(Context &context, ::sdl::State *sdlFromState,
-            const seds::model::Transition::Primitive &primitive) -> InputHandler;
+            const seds::model::Transition::Primitive &primitive, const Options &options) -> InputHandler;
 
     static auto translatePrimitive(::sdl::State *sdlFromState) -> InputHandler;
 
     static auto translateTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
-            const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap)
-            -> void;
+            const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap,
+            const Options &options) -> void;
 
     static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 

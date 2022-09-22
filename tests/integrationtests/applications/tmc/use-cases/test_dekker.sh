@@ -8,8 +8,11 @@ CC=gcc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_dekker
 RESOURCE_DIR=resources/dekker1
+SUBTYPES_DIR=${RESOURCE_DIR}/work/modelchecking/subtypes
+OBSERVERS_DIR=${RESOURCE_DIR}/work/modelchecking/properties/observers
+PROPERTIES_DIR=${RESOURCE_DIR}/work/modelchecking/properties
 
 echo "Running TMC test: ${0##*/}'"
 
@@ -19,10 +22,15 @@ mkdir $TEST_OUTPUT_DIR
 
 # Translate
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
+    -ivl 1 \
+    -sub ${SUBTYPES_DIR}/subtypes.asn \
+    -scl ${PROPERTIES_DIR}/sc.scl \
+    -os ${PROPERTIES_DIR}/InputObserver/InputObserver.pr \
+    -os ${PROPERTIES_DIR}/OutputObserver/OutputObserver.pr \
     -o $TEST_OUTPUT_DIR
 
 # Compile the actual Spin model checker. This tests
-# whether all the features are supported, and that 
+# whether all the features are supported, and that
 # one feature does not interfere with another.
 # The model is not checked, as it would take a huge amounth of time,
 # potentially infinite given no signal generation optimizations.

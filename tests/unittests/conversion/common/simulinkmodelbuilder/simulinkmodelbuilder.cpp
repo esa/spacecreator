@@ -87,7 +87,7 @@ SimulinkModelBuilder &SimulinkModelBuilder::withBusDataType(BusDataType busDataT
 }
 
 SimulinkModelBuilder &SimulinkModelBuilder::withInport(
-        QString name, QString outputSignalNames, QString outDataTypeStr, QString port)
+        QString name, QString outputSignalNames, QString outDataTypeStr, QString port, PortDimension portDimension)
 {
     Inport inport;
 
@@ -104,7 +104,7 @@ SimulinkModelBuilder &SimulinkModelBuilder::withInport(
     inport.setOutMin("[]");
     inport.setOutputSignalNames(std::move(outputSignalNames));
     inport.setPort(std::move(port));
-    inport.setPortDimensions(PortDimension(-1));
+    inport.setPortDimensions(std::move(portDimension));
     inport.setSampleTime("-1");
     inport.setSignalType(SignalType::Auto);
     inport.setUnit("inherit");
@@ -117,7 +117,7 @@ SimulinkModelBuilder &SimulinkModelBuilder::withInport(
 }
 
 SimulinkModelBuilder &SimulinkModelBuilder::withOutport(
-        QString name, QString inputSignalNames, QString outDataTypeStr, QString port)
+        QString name, QString inputSignalNames, QString outDataTypeStr, QString port, PortDimension portDimension)
 {
     Outport outport;
 
@@ -134,7 +134,7 @@ SimulinkModelBuilder &SimulinkModelBuilder::withOutport(
     outport.setOutMin("[]");
     outport.setOutputWhenDisabled("held");
     outport.setPort(std::move(port));
-    outport.setPortDimensions(PortDimension(-1));
+    outport.setPortDimensions(std::move(portDimension));
     outport.setSampleTime("-1");
     outport.setSignalName("");
     outport.setSignalObject("");

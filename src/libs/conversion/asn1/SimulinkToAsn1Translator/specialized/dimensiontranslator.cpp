@@ -51,7 +51,7 @@ std::unique_ptr<SequenceOf> DimensionTranslator::translate(
 
     addSizeConstraint(asn1SequenceOfType.get(), scalarDimensions);
 
-    return std::move(asn1SequenceOfType);
+    return asn1SequenceOfType;
 }
 
 std::unique_ptr<SequenceOf> DimensionTranslator::translate(
@@ -78,7 +78,7 @@ std::unique_ptr<SequenceOf> DimensionTranslator::translate(
 
     lastAsn1SequenceOfType->setItemsType(std::move(asn1UserdefinedType));
 
-    return std::move(asn1SequenceOfType);
+    return asn1SequenceOfType;
 }
 
 void DimensionTranslator::addSizeConstraint(Asn1Acn::Types::SequenceOf *sequenceOf, const int64_t size)

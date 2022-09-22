@@ -38,3 +38,13 @@ configure_file(test_with_components.sh test_with_components.sh COPYONLY)
 configure_file(resources/test_with_components.output resources/test_with_components.output COPYONLY)
 configure_file(resources/test_with_components.asn resources/test_with_components.asn COPYONLY)
 configure_file(resources/test_with_components.acn resources/test_with_components.acn COPYONLY)
+
+configure_file(test_multiple_asn_models.sh test_multiple_asn_models.sh COPYONLY)
+configure_file(resources/test_multiple_models.output resources/test_multiple_models.output COPYONLY)
+configure_file(resources/test_multiple_models.asn resources/test_multiple_models.asn COPYONLY)
+configure_file(resources/test_multiple_models.acn resources/test_multiple_models.acn COPYONLY)
+
+configure_file(test_skip_empty_sequences.sh test_skip_empty_sequences.sh COPYONLY)
+configure_file(resources/test_skip_empty_sequences.output resources/test_skip_empty_sequences.output COPYONLY)
+configure_file(resources/test_skip_empty_sequences.asn resources/test_skip_empty_sequences.asn COPYONLY)
+configure_file(resources/test_skip_empty_sequences.acn resources/test_skip_empty_sequences.acn COPYONLY)

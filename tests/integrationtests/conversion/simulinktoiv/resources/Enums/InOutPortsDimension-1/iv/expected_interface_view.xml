@@ -1,0 +1,23 @@
+<InterfaceView>
+<Function name="simulink" is_type="NO" language="QGenC" default_implementation="default">
+<Provided_Interface name="interface" kind="Protected" layer="default">
+    <Input_Parameter name="i1" type="BoolSimulinkIntEnumType" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="BoolUInt8Enum" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="BoolUInt16Enum" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="BoolInt8Enum" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="BoolInt16Enum" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="BoolInt32Enum" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="BoolSimulinkIntEnumType" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="BoolUInt8Enum" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="BoolUInt16Enum" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="BoolInt8Enum" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="BoolInt16Enum" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="BoolInt32Enum" encoding="NATIVE"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+</InterfaceView>

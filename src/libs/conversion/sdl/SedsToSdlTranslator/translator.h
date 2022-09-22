@@ -72,7 +72,7 @@ private:
      * @return  Result SDL model
      */
     auto translateSedsModel(const seds::model::SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model,
-            ivm::IVModel *ivModel) const -> std::vector<std::unique_ptr<Model>>;
+            ivm::IVModel *ivModel, const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 
     /**
      * @brief   Translate SEDS package
@@ -85,7 +85,7 @@ private:
      */
     auto translatePackage(const seds::model::Package &sedsPackage,
             const std::vector<seds::model::Package> &sedsPackages, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
-            ::sdl::SdlModel *model) const -> void;
+            ::sdl::SdlModel *model, const Options &options) const -> void;
 
     /**
      * @brief   Translate SEDS component
@@ -99,7 +99,8 @@ private:
      */
     auto translateComponent(const seds::model::Package &sedsPackage,
             const std::vector<seds::model::Package> &sedsPackages, const seds::model::Component &sedsComponent,
-            Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::SdlModel *model) const -> void;
+            Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::SdlModel *model, const Options &options) const
+            -> void;
 };
 
 } // namespace conversion::sdl::translator

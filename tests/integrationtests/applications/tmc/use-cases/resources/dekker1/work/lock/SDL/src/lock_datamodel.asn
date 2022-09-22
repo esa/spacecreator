@@ -4,9 +4,9 @@ BEGIN
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   Testgui-writerequesta-p1, Testgui-writerequestb-p1 FROM TESTGUI-SUBTYPE;
+   PID FROM System-Dataview;
 
-Lock-States ::= ENUMERATED {writing, wait-nocontention, idle, wait-turn}
+Lock-States ::= ENUMERATED {wait-turn, writing, idle, wait-nocontention}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,

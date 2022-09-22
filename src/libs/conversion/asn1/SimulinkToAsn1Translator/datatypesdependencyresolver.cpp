@@ -19,14 +19,15 @@
 
 #include "datatypesdependencyresolver.h"
 
-#include "matlabstandarddatatypes.h"
-#include "tastestandarddatatypes.h"
-
 #include <algorithm>
+#include <conversion/common/simulink/matlabstandarddatatypes.h>
+#include <conversion/common/simulink/tastestandarddatatypes.h>
 #include <conversion/common/translation/exceptions.h>
 #include <simulink/SimulinkModel/datatypes/aliasdatatype.h>
 #include <simulink/SimulinkModel/datatypes/busdatatype.h>
 
+using conversion::simulink::MatLabStandardDataTypes;
+using conversion::simulink::TasteStandardDataTypes;
 using conversion::translator::NotDagException;
 using conversion::translator::UndeclaredDataTypeException;
 using simulink::model::AliasDataType;
@@ -78,8 +79,7 @@ void DataTypesDependencyResolver::visitAlias(const AliasDataType &aliasDataType)
 {
     const auto &baseType = aliasDataType.baseType();
 
-    if (MatLabStandardDataTypes::isNumericType(baseType) || MatLabStandardDataTypes::isBooleanType(baseType)
-            || TasteStandardDataTypes::isTasteType(baseType)) {
+    if (MatLabStandardDataTypes::isMatLabType(baseType) || TasteStandardDataTypes::isTasteType(baseType)) {
         return;
     }
 
@@ -92,8 +92,7 @@ void DataTypesDependencyResolver::visitBus(const BusDataType &busDataType)
     for (const auto &busMember : busDataType.busMembers()) {
         const auto &busMemberDataType = busMember.dataType();
 
-        if (MatLabStandardDataTypes::isNumericType(busMemberDataType)
-                || MatLabStandardDataTypes::isBooleanType(busMemberDataType)
+        if (MatLabStandardDataTypes::isMatLabType(busMemberDataType)
                 || TasteStandardDataTypes::isTasteType(busMemberDataType)) {
             continue;
         }
@@ -103,7 +102,7 @@ void DataTypesDependencyResolver::visitBus(const BusDataType &busDataType)
     }
 }
 
-const simulink::model::DataType &DataTypesDependencyResolver::findDataType(const QString &dataTypeName)
+const DataType &DataTypesDependencyResolver::findDataType(const QString &dataTypeName)
 {
     auto compareNamesOfDataTypes = [&dataTypeName](
                                            const auto &dataType) { return dataTypeNameStr(dataType) == dataTypeName; };
