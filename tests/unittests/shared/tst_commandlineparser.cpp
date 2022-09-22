@@ -70,6 +70,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterSkipValidation();
     void testCmdArgumentSedsConverterNoManglig();
     void testCmdArgumentSedsConverterMultipleAsnModels();
+    void testCmdArgumentSkipEmptySequences();
     void testCmdArgumentSedsConverterKeepIntermediateFiles();
     void testCmdArgumentSedsConverterAcnFilepathPrefix();
     void testCmdArgumentSedsConverterAsn1FilepathPrefix();
@@ -476,6 +477,21 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterMultipleAsnModels()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterMultipleAsnModels));
+}
+
+void tst_CommandLineParser::testCmdArgumentSkipEmptySequences()
+{
+    const QCommandLineOption cmdSkipEmptySequences =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterSkipEmptySequences);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdSkipEmptySequences.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterSkipEmptySequences);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterSkipEmptySequences));
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterKeepIntermediateFiles()

@@ -40,7 +40,7 @@ public:
      * @param   sedsPackage Target package to add the type to
      */
     static auto translateType(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions,
-            const Asn1Acn::TypeAssignment *type, ::seds::model::Package *sedsPackage) -> void;
+            const Asn1Acn::TypeAssignment *type, ::seds::model::Package *sedsPackage, const Options &options) -> void;
 };
 
 } // namespace conversion::seds::translator

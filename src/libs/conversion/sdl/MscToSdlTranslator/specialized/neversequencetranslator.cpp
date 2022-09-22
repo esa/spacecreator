@@ -19,10 +19,14 @@
 
 #include "specialized/neversequencetranslator.h"
 
+#include "mscparametervalueparser.h"
+
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <iostream>
 
 using conversion::translator::TranslationException;
+using ivm::IVModel;
 using msc::MscChart;
 using msc::MscEntity;
 using msc::MscInstanceEvent;
@@ -33,8 +37,9 @@ using sdl::StateMachine;
 
 namespace conversion::sdl::translator {
 
-NeverSequenceTranslator::NeverSequenceTranslator(SdlModel *sdlModel, const Options &options)
-    : SequenceTranslator(sdlModel, options)
+NeverSequenceTranslator::NeverSequenceTranslator(
+        SdlModel *sdlModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options)
+    : SequenceTranslator(sdlModel, asn1File, ivModel, options)
 {
 }
 
@@ -47,7 +52,7 @@ void NeverSequenceTranslator::createObserver(const MscChart *mscChart)
     process.addErrorState(context.errorState->name());
 
     auto system = createSdlSystem(context.chartName, std::move(process));
-    for (auto &[id, signalRename] : context.signals) {
+    for (auto &signalRename : context.signalRenames) {
         system.addSignal(std::move(signalRename));
     }
     system.createRoutes(m_defaultChannelName, m_defaultRouteName);
@@ -55,9 +60,9 @@ void NeverSequenceTranslator::createObserver(const MscChart *mscChart)
     m_sdlModel->addSystem(std::move(system));
 }
 
-NeverSequenceTranslator::Context NeverSequenceTranslator::collectData(const MscChart *mscChart) const
+NeverSequenceTranslator::NeverContext NeverSequenceTranslator::collectData(const MscChart *mscChart) const
 {
-    Context context;
+    NeverContext context;
     context.chartName = Escaper::escapeSdlName(mscChart->name());
     context.signalCounter = 0;
 
@@ -70,7 +75,7 @@ NeverSequenceTranslator::Context NeverSequenceTranslator::collectData(const MscC
 }
 
 void NeverSequenceTranslator::handleEvent(
-        NeverSequenceTranslator::Context &context, const MscInstanceEvent *mscEvent) const
+        NeverSequenceTranslator::NeverContext &context, const MscInstanceEvent *mscEvent) const
 {
     switch (mscEvent->entityType()) {
     case MscEntity::EntityType::Message: {
@@ -92,40 +97,31 @@ void NeverSequenceTranslator::handleEvent(
 }
 
 void NeverSequenceTranslator::handleMessageEvent(
-        NeverSequenceTranslator::Context &context, const MscMessage *mscMessage) const
+        NeverSequenceTranslator::NeverContext &context, const MscMessage *mscMessage) const
 {
-    const auto signalRenamed = std::find_if(context.signals.begin(), context.signals.end(),
-            [&](auto &&sig) { return sig.second->referencedName() == mscMessage->name(); });
+    const auto renamedSignal = getRenamedSignal(context, mscMessage);
+    const auto sequenceValue = getSequenceValue(context, renamedSignal, mscMessage);
 
-    if (signalRenamed == context.signals.end()) {
-        auto signalRename = std::make_unique<Rename>();
-        signalRename->setName(m_signalRenameNameTemplate.arg(context.signalCounter));
-        signalRename->setDirection(Rename::Direction::Input);
-        signalRename->setReferencedName(Escaper::escapeSdlName(mscMessage->name()));
-        signalRename->setReferencedFunctionName(Escaper::escapeSdlName(mscMessage->targetInstance()->name()));
-
-        context.signals.insert({ context.signalCounter, std::move(signalRename) });
-
-        context.sequence.push_back(context.signalCounter++);
-    } else {
-        context.sequence.push_back(signalRenamed->first);
-    }
+    context.sequence.push_back(sequenceValue);
 }
 
 std::unique_ptr<StateMachine> NeverSequenceTranslator::createStateMachine(
-        NeverSequenceTranslator::Context &context) const
+        NeverSequenceTranslator::NeverContext &context) const
 {
     auto stateMachine = std::make_unique<StateMachine>();
 
     auto states = createStates(context.sequence.size());
     context.errorState = states.back().get();
 
+    MscParameterValueParser messageParser(context.chartName, m_asn1File);
+    const auto &signalRequirements = messageParser.parseSignals(context.signals);
+
     TFTable table(context.sequence, context.signals.size());
-    auto transitions = createTransitions(table, states, 0);
+    auto transitions = createTransitions(table, states, context.signals, signalRequirements, 0);
+
     for (auto &transition : transitions) {
         stateMachine->addTransition(std::move(transition));
     }
-
     for (auto &state : states) {
         stateMachine->addState(std::move(state));
     }

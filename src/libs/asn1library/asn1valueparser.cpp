@@ -88,119 +88,127 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
 
     valueMap["name"] = type->identifier();
 
-    switch (type->typeEnum()) {
-    case Asn1Acn::Types::Type::INTEGER: {
-        const auto *integerType = dynamic_cast<const Asn1Acn::Types::Integer *>(type);
-        const auto integerValue = value.toInt(&ok);
-        if (ok && (ok = checkRange<Asn1Acn::IntegerValue>(integerType, integerValue))) {
-            valueMap["value"] = value;
-        }
-        break;
-    }
-    case Asn1Acn::Types::Type::REAL: {
-        const auto *realType = dynamic_cast<const Asn1Acn::Types::Real *>(type);
-        const auto realValue = value.toDouble(&ok);
-        if (ok && (ok = checkRange<Asn1Acn::RealValue>(realType, realValue))) {
-            valueMap["value"] = value;
-        }
-        break;
-    }
-    case Asn1Acn::Types::Type::BOOLEAN: {
-        ok = (value == "TRUE" || value == "FALSE");
-        if (ok) {
-            valueMap["value"] = value == "TRUE";
-        }
-        break;
-    }
-    case Asn1Acn::Types::Type::SEQUENCE: {
-        ok = parseSequenceValue(type, value, valueMap);
-        break;
-    }
-    case Asn1Acn::Types::Type::SEQUENCEOF: {
-        const auto *sequenceOfType = dynamic_cast<const Asn1Acn::Types::SequenceOf *>(type);
-        ok = parseSequenceOfValue(type, value, valueMap)
-                && checkSize<IntegerValue>(sequenceOfType, valueMap["seqofvalue"].toList().count());
-        break;
-    }
-    case Asn1Acn::Types::Type::ENUMERATED: {
-        const auto *enumeratedType = dynamic_cast<const Asn1Acn::Types::Enumerated *>(type);
-        const auto &enumeratedItems = enumeratedType->items();
-        ok = enumeratedItems.contains(value);
-        if (ok) {
-            valueMap["value"] = value;
-        }
-        break;
-    }
-    case Asn1Acn::Types::Type::CHOICE: {
-        ok = parseChoiceValue(type, value, valueMap);
-        break;
-    }
-    case Asn1Acn::Types::Type::BITSTRING: {
-        const auto *bitStringType = dynamic_cast<const Asn1Acn::Types::BitString *>(type);
+    if (value == "*") {
+        // We want to use empty and invalid QVariant as an information that value is present, but it can be any value
+        QVariant empty;
+        empty.clear();
 
-        if (value.startsWith("\"")) {
-            value = value.remove(0, 1);
+        valueMap["value"] = empty;
+    } else {
+        switch (type->typeEnum()) {
+        case Asn1Acn::Types::Type::INTEGER: {
+            const auto *integerType = dynamic_cast<const Asn1Acn::Types::Integer *>(type);
+            const auto integerValue = value.toInt(&ok);
+            if (ok && (ok = checkRange<Asn1Acn::IntegerValue>(integerType, integerValue))) {
+                valueMap["value"] = value;
+            }
+            break;
         }
-        if (value.endsWith("\"")) {
-            value.chop(1);
+        case Asn1Acn::Types::Type::REAL: {
+            const auto *realType = dynamic_cast<const Asn1Acn::Types::Real *>(type);
+            const auto realValue = value.toDouble(&ok);
+            if (ok && (ok = checkRange<Asn1Acn::RealValue>(realType, realValue))) {
+                valueMap["value"] = value;
+            }
+            break;
         }
+        case Asn1Acn::Types::Type::BOOLEAN: {
+            ok = (value == "TRUE" || value == "FALSE");
+            if (ok) {
+                valueMap["value"] = value == "TRUE";
+            }
+            break;
+        }
+        case Asn1Acn::Types::Type::SEQUENCE: {
+            ok = parseSequenceValue(type, value, valueMap);
+            break;
+        }
+        case Asn1Acn::Types::Type::SEQUENCEOF: {
+            const auto *sequenceOfType = dynamic_cast<const Asn1Acn::Types::SequenceOf *>(type);
+            ok = parseSequenceOfValue(type, value, valueMap)
+                    && checkSize<IntegerValue>(sequenceOfType, valueMap["seqofvalue"].toList().count());
+            break;
+        }
+        case Asn1Acn::Types::Type::ENUMERATED: {
+            const auto *enumeratedType = dynamic_cast<const Asn1Acn::Types::Enumerated *>(type);
+            const auto &enumeratedItems = enumeratedType->items();
+            ok = enumeratedItems.contains(value);
+            if (ok) {
+                valueMap["value"] = value;
+            }
+            break;
+        }
+        case Asn1Acn::Types::Type::CHOICE: {
+            ok = parseChoiceValue(type, value, valueMap);
+            break;
+        }
+        case Asn1Acn::Types::Type::BITSTRING: {
+            const auto *bitStringType = dynamic_cast<const Asn1Acn::Types::BitString *>(type);
 
-        ok = checkStringLength(bitStringType, value);
-        if (ok) {
-            valueMap["value"] = value;
-        }
-        break;
-    }
-    case Asn1Acn::Types::Type::IA5STRING: {
-        const auto *ia5String = dynamic_cast<const Asn1Acn::Types::IA5String *>(type);
+            if (value.startsWith("\"")) {
+                value = value.remove(0, 1);
+            }
+            if (value.endsWith("\"")) {
+                value.chop(1);
+            }
 
-        if (value.startsWith("\"")) {
-            value = value.remove(0, 1);
+            ok = checkStringLength(bitStringType, value);
+            if (ok) {
+                valueMap["value"] = value;
+            }
+            break;
         }
-        if (value.endsWith("\"")) {
-            value.chop(1);
-        }
+        case Asn1Acn::Types::Type::IA5STRING: {
+            const auto *ia5String = dynamic_cast<const Asn1Acn::Types::IA5String *>(type);
 
-        ok = checkStringLength(ia5String, value);
-        if (ok) {
-            valueMap["value"] = value;
-        }
-        break;
-    }
-    case Asn1Acn::Types::Type::NUMERICSTRING: {
-        const auto *numericString = dynamic_cast<const Asn1Acn::Types::NumericString *>(type);
+            if (value.startsWith("\"")) {
+                value = value.remove(0, 1);
+            }
+            if (value.endsWith("\"")) {
+                value.chop(1);
+            }
 
-        if (value.startsWith("\"")) {
-            value = value.remove(0, 1);
+            ok = checkStringLength(ia5String, value);
+            if (ok) {
+                valueMap["value"] = value;
+            }
+            break;
         }
-        if (value.endsWith("\"")) {
-            value.chop(1);
-        }
+        case Asn1Acn::Types::Type::NUMERICSTRING: {
+            const auto *numericString = dynamic_cast<const Asn1Acn::Types::NumericString *>(type);
 
-        ok = checkStringLength(numericString, value);
-        if (ok) {
-            valueMap["value"] = value;
-        }
-        break;
-    }
-    case Asn1Acn::Types::Type::OCTETSTRING: {
-        const auto *octetString = dynamic_cast<const Asn1Acn::Types::OctetString *>(type);
+            if (value.startsWith("\"")) {
+                value = value.remove(0, 1);
+            }
+            if (value.endsWith("\"")) {
+                value.chop(1);
+            }
 
-        if (value.startsWith("\"")) {
-            value = value.remove(0, 1);
+            ok = checkStringLength(numericString, value);
+            if (ok) {
+                valueMap["value"] = value;
+            }
+            break;
         }
-        if (value.endsWith("\"")) {
-            value.chop(1);
-        }
+        case Asn1Acn::Types::Type::OCTETSTRING: {
+            const auto *octetString = dynamic_cast<const Asn1Acn::Types::OctetString *>(type);
 
-        ok = checkStringLength(octetString, value);
-        if (ok) {
-            valueMap["value"] = value;
+            if (value.startsWith("\"")) {
+                value = value.remove(0, 1);
+            }
+            if (value.endsWith("\"")) {
+                value.chop(1);
+            }
+
+            ok = checkStringLength(octetString, value);
+            if (ok) {
+                valueMap["value"] = value;
+            }
+            break;
         }
-        break;
-    }
-    default:
-        break;
+        default:
+            break;
+        }
     }
 
     if (!ok) {
