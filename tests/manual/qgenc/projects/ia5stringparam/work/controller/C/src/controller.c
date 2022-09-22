@@ -24,6 +24,5 @@ void controller_PI_Trigger(void)
     asn1SccMyIA5String output;
     controller_RI_Iface(&input, &output);
     printf("output: %s\n", output);
-    printf("strcmp: %d\n", strcmp(output, expectedOutput));
     assert(strcmp(output, expectedOutput) == 0);
 }
