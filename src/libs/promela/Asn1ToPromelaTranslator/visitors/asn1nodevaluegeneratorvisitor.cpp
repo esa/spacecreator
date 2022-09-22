@@ -134,7 +134,7 @@ const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(const QString &subt
     const auto ivParameters = ivInterface->params();
 
     const auto &ivParameterName = splittedSubtypeName.at(2);
-    const auto foundIvParameter = std::find_if(ivParameters.begin(), ivParameters.end(), [&](const auto &parameter) { return parameter.name() == ivParameterName; });
+    const auto foundIvParameter = std::find_if(ivParameters.begin(), ivParameters.end(), [&](const auto &parameter) { return QString::compare(parameter.name(), ivParameterName, Qt::CaseInsensitive) == 0; });
     if(foundIvParameter == ivParameters.end()) {
         auto errorMessage = QString("Unable to find parameter %1 in required interface %2 in function %3 from subtype name %4").arg(ivParameterName).arg(ivInterfaceName).arg(ivFunctionName).arg(subtypeName);
         throw TranslationException(std::move(errorMessage));

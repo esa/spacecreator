@@ -1,0 +1,8 @@
+SUBTYPES1 DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyArray FROM SUBTYPING-DATAVIEW;
+
+Pinger-pingbutarray-pingbutarrayarg ::= MyArray (SIZE(0 .. 1))
+
+END
