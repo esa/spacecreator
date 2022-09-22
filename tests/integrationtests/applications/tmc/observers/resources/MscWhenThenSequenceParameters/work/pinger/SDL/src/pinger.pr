@@ -1,0 +1,56 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Pinger;
+    /* CIF TEXT (168, 460), (267, 140) */
+    -- Text area for declarations and comments
+    
+    dcl value1 MySequence;
+    dcl value2 MySequence;
+    /* CIF ENDTEXT */
+    /* CIF START (530, 281), (70, 35) */
+    START;
+        /* CIF task (454, 336), (221, 35) */
+        task value1 := { value 1, version big : 4 };
+        /* CIF task (447, 391), (234, 35) */
+        task value2 := { value 2, version small : 2 };
+        /* CIF NEXTSTATE (530, 441), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (1066, 46), (70, 35) */
+    state Ok3;
+        /* CIF input (1066, 101), (70, 35) */
+        input Pong;
+            /* CIF output (1052, 156), (96, 35) */
+            output Ping(value2);
+            /* CIF NEXTSTATE (1066, 211), (70, 35) */
+            NEXTSTATE Ok4;
+    endstate;
+    /* CIF state (944, 46), (70, 35) */
+    state Ok2;
+        /* CIF input (944, 101), (70, 35) */
+        input Pong;
+            /* CIF output (930, 156), (96, 35) */
+            output Ping(value2);
+            /* CIF NEXTSTATE (944, 211), (70, 35) */
+            NEXTSTATE Ok3;
+    endstate;
+    /* CIF state (1304, 70), (70, 35) */
+    state Ok4;
+    endstate;
+    /* CIF state (685, 44), (70, 35) */
+    state Wait;
+        /* CIF input (685, 99), (70, 35) */
+        input Clk;
+            /* CIF output (671, 154), (96, 35) */
+            output Ping(value1);
+            /* CIF NEXTSTATE (685, 204), (70, 35) */
+            NEXTSTATE Ok1;
+    endstate;
+    /* CIF state (816, 48), (70, 35) */
+    state Ok1;
+        /* CIF input (816, 104), (70, 35) */
+        input Pong;
+            /* CIF output (802, 159), (96, 35) */
+            output Ping(value1);
+            /* CIF NEXTSTATE (816, 209), (70, 35) */
+            NEXTSTATE Ok2;
+    endstate;
+endprocess Pinger;

@@ -1,0 +1,18 @@
+Ponger-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   SmallInteger, BigInteger, MyChoice, MySequence FROM MSCWHENTHENNOTSEQUENCEPARAMETERSFAILURE-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID FROM System-Dataview;
+
+Ponger-States ::= ENUMERATED {wait}
+
+Ponger-Context ::= SEQUENCE {
+   state Ponger-States,
+   init-done BOOLEAN,
+   pingarg MySequence
+}
+
+Ponger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+END
