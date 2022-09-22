@@ -20,6 +20,8 @@
 #include "scversion.h"
 
 #include <QCoreApplication>
+#include <QDebug>
+#include <QRegularExpression>
 #include <QString>
 #include <iostream>
 #include <string.h>
@@ -32,7 +34,24 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(spaceCreatorVersion);
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
-
+    const QStringList arguments = app.arguments();
+    // check if spin message exists
+    if (arguments.size() < 2) {
+        qCritical("No spin message passed");
+        exit(EXIT_FAILURE);
+    }
+    // get passed spin message
+    const auto spinMessage = arguments.at(1);
+    // build pattern for error matching
+    const QRegularExpression regex("^(.*)\\n");
+    const QRegularExpressionMatch match = regex.match(spinMessage);
+    // check for match success
+    if (!match.hasMatch()) {
+        qCritical("Unable to match spin error");
+        exit(EXIT_FAILURE);
+    }
+    // extract match tokens
+    const QString token = match.captured(1);
 
     return EXIT_SUCCESS;
 }
