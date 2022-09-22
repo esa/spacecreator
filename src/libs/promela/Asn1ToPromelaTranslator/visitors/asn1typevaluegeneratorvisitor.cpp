@@ -189,6 +189,23 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
         sequence->appendElement(ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, end));
     }
 
+    if (m_overridenType != nullptr) {
+        const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
+        if (overridenOctetString == nullptr) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which is not a OCTET STRING")
+                                        .arg(m_overridenType->identifier())
+                                        .arg(m_name);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        overridenOctetString->constraints().accept(constraintVisitor);
+        const size_t overridenMaxSize = constraintVisitor.getMaxSize();
+
+        auto initCall = ProctypeMaker::makeCallForEachValue(
+                "OctetStringElement_init_value", argumentName, Expression(maxSize), Expression(overridenMaxSize - 1));
+        sequence->appendElement(std::move(initCall));
+    }
+
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
     const QStringList inlineArguments = { argumentName };
     auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(*sequence));
@@ -235,6 +252,23 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
 
         Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(argumentName, 1);
         sequence->appendElement(ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, end));
+    }
+
+    if (m_overridenType != nullptr) {
+        const auto overridenIA5String = dynamic_cast<const IA5String *>(m_overridenType);
+        if (overridenIA5String == nullptr) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which is not a IA5String")
+                                        .arg(m_overridenType->identifier())
+                                        .arg(m_name);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        overridenIA5String->constraints().accept(constraintVisitor);
+        const size_t overridenMaxSize = constraintVisitor.getMaxSize();
+
+        auto initCall = ProctypeMaker::makeCallForEachValue(
+                "IA5StringElement_init_value", argumentName, Expression(maxSize), Expression(overridenMaxSize - 1));
+        sequence->appendElement(std::move(initCall));
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -398,7 +432,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     if (m_overridenType != nullptr) {
         const auto overridenSequenceOf = dynamic_cast<const SequenceOf *>(m_overridenType);
         if (overridenSequenceOf == nullptr) {
-            auto errorMessage = QString("Trying to override %1 with %2 which is not a SEQUENCE OF")
+            auto errorMessage = QString("Trying to subtype %1 with %2 which is not a SEQUENCE OF")
                                         .arg(m_overridenType->identifier())
                                         .arg(m_name);
             throw TranslationException(std::move(errorMessage));
