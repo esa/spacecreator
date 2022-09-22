@@ -11,7 +11,6 @@ default:
     - export PROJECT_ROOT=$(pwd)
     - export ENV_QTC_VERSION=4.8.2
     - export ENV_QT_VERSION=5.12.1
-    #- export DOWNLOAD_DIR=/opt/qt-creator-dev
     - export DOWNLOAD_DIR=/opt/spacecreator5
     - export BUILD_DIR=${PROJECT_ROOT}/build
     - export PACKAGE_DIR=${PROJECT_ROOT}/package
@@ -33,7 +32,7 @@ default:
     - git clone https://github.com/n7space/sdl2promela.git
     - pushd sdl2promela ; make install ; popd
     # SpaceCreator
-    - python3 ${PROJECT_ROOT}/scripts/prebuild.py --output_dir ${DOWNLOAD_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
+    - python3 ${PROJECT_ROOT}/scripts/prebuild.py --output_dir /opt/spacecreator6 --qt_version 6.3.1 --qtcreator_version 8.0.1
 
 
 space-creator-dev:
@@ -64,20 +63,29 @@ space-creator-dev:
 
 space-creator-qt5:
   stage: build-test-and-bundle
+  variables:
+    ENV_DIR: /opt/spacecreator5
+    ENV_QT_VERSION: 5.12.1
+    ENV_QTC_VERSION: 4.8.2
+    ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
+    BUILD_DIR: ${PROJECT_ROOT}/build5
+
   script:
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
+    - python3 ${PROJECT_ROOT}/scripts/prebuild.py --output_dir ${ENV_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
-    - python3 ${PROJECT_ROOT}/scripts/build_spacecreator.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release
+    - python3 ${PROJECT_ROOT}/scripts/build_spacecreator.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${PROJECT_ROOT}/scripts/postbuild.py --env_dir ${DOWNLOAD_DIR} --build_dir ${BUILD_DIR}
     # unit tests
-    - cd ${DOWNLOAD_DIR}
-    - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
+    - cd ${ENV_DIR}
+    - export PATH=$PATH:${ENV_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
     - cd ${PROJECT_ROOT}
     - ./scripts/run_tests.sh ${BUILD_DIR}
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --project_version ${SC_VERSION}
+    - python3 ${PROJECT_ROOT}/scripts/create_appimage.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --project_version ${SC_VERSION}
   cache:
     key: asn1scc
     paths:
@@ -94,15 +102,15 @@ space-creator-qt5:
 
 space-creator-qt6:
   stage: build-test-and-bundle
+  variables:
+    ENV_DIR: /opt/spacecreator5
+    ENV_QT_VERSION: 5.12.1
+    ENV_QTC_VERSION: 4.8.2
+    ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
+    BUILD_DIR: ${PROJECT_ROOT}/build6
   script:
-    - export ENV_QTC_VERSION=8.0.1
-    - export ENV_QT_VERSION=6.3.1
-    - export ENV_DIR=/opt/spacecreator6
-    - export ENV_QT_BASE_DIR=${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
-    - export BUILD_DIR=${PROJECT_ROOT}/build
-    - export PACKAGE_DIR=${PROJECT_ROOT}/package
-    - export QTC_INSTALL=${ENV_DIR}/spacecreator.AppDir
-    - export QTC_SOURCE=${QTC_INSTALL}
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
+    - python3 ${PROJECT_ROOT}/scripts/prebuild.py --output_dir ${ENV_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
     - python3 ${PROJECT_ROOT}/scripts/build_spacecreator.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
