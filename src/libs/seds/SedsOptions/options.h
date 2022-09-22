@@ -51,6 +51,8 @@ public:
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
     /** @brief  Filepath of output file */
     inline static const QString outputFilepath = "Seds_Export_OutputFilepath";
+    /** @brief  Taste translation option */
+    inline static const QString tasteTranslation = "Seds_Translation_Taste";
 
     /** @brief Default output filename */
     inline static const QString defaultOutputFilepath = "seds.xml";
