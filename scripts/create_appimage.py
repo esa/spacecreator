@@ -82,10 +82,17 @@ def create_app_dir(app_dir: str, project_dir: str, build_dir: str, env_dir: str,
         libzxbutil_file.extractall(join_dir(app_dir, 'lib'))
 
 
-def create_app_image(env_dir: str, app_dir: str, package_dir: str, version: str):
-    app_image_tool = join_dir(env_dir, 'appimagetool')
-    app_image_dir = join_dir(package_dir, 'spacecreator-x86_64-{}.AppImage'.format(version))
-    app_image_tool_cmd = [app_image_tool, app_dir, app_image_dir]
+def create_app_image(appimagetool_dir: str, app_dir: str, output_dir: str, version: str):
+    """
+    Creates an AppImage file from a directory with the
+    :param appimagetool_dir: Dir in which to find the AppImage-tool
+    :param app_dir: Dir with the content to turn into an AppImage
+    :param output_dir: Where to put the resulting AppImage
+    :param version: The version of SpaceCreator to make an AppImage out of
+    """
+    app_image_tool = join_dir(appimagetool_dir, 'appimagetool')
+    app_image = join_dir(output_dir, 'spacecreator-x86_64-{}.AppImage'.format(version))
+    app_image_tool_cmd = [app_image_tool, app_dir, app_image]
     print_cmd(app_image_tool_cmd)
 
     completed_process = subprocess.run(app_image_tool_cmd, env={'ARCH': 'x86_64'})
@@ -97,6 +104,7 @@ def create_app_image(env_dir: str, app_dir: str, package_dir: str, version: str)
 if __name__ == '__main__':
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
+    root_dir = join_dir(script_dir, '..', '..')
 
     # Parse arguments
     parser = argparse.ArgumentParser(prog='create_appimage.py',
@@ -117,6 +125,8 @@ if __name__ == '__main__':
                         help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
     parser.add_argument('--project_version', dest='version', type=str, required=True,
                         help='Version number of spacecreator in the format X.Y.Z')
+    parser.add_argument('--package_dir', dest='package_dir', type=str, required=False,
+                        help='Path to the folder where the')
     args = parser.parse_args()
 
     if args.project_dir:
@@ -147,8 +157,7 @@ if __name__ == '__main__':
     download_app_image_tool(env_dir)
 
     # AppDir
-    app_dir = join_dir(project_dir, 'spacecreator.AppDir')
+    app_dir = join_dir(root_dir, 'spacecreator.AppDir')
     create_app_dir(app_dir, project_dir, build_dir, env_dir, env_qt_dir)
 
-    package_dir = join_dir(project_dir, 'package')
-    create_app_image(env_dir, app_dir, package_dir, version)
+    create_app_image(env_dir, app_dir, root_dir, version)

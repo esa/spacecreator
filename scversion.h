@@ -4,4 +4,4 @@
 
 static const QString spaceCreatorVersion("0.12.0");
 
-static const QString spaceCreatorGitHash("2c54545ad");
+static const QString spaceCreatorGitHash("f6a59193e");
