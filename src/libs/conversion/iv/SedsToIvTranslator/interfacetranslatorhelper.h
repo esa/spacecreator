@@ -143,4 +143,4 @@ private:
     inline static const QString m_setterInterfacePrefix = "Set";
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds
