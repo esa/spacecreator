@@ -50,8 +50,8 @@ using namespace Asn1Acn;
 using namespace seds::model;
 
 using conversion::Options;
-using conversion::asn1::translator::DataTypesDependencyResolver;
-using conversion::asn1::translator::SedsToAsn1Translator;
+using conversion::asn1::translator::seds::DataTypesDependencyResolver;
+using conversion::asn1::translator::seds::SedsToAsn1Translator;
 using conversion::translator::NotDagException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
