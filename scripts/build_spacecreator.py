@@ -66,17 +66,11 @@ if __name__ == '__main__':
     default_project_dir = join_dir(script_dir, '..')
 
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='build_spacecreator',
-                                     epilog='Example: python3 ./scripts/build_spacecreator.py '
-                                            '--project_dir=/home/<user>/projects/spacecreator/ '
-                                            '--build_dir=./build '
-                                            '--build_type=Release'
-                                            '--env_dir=/home/<user>/opt/qtcreatorenv/ '
-                                            '--env_qt_dir /home/<user>/opt/qtcreatorenv/Qt/6.3.1/gcc_64/ ')
+    parser = argparse.ArgumentParser(prog='build_spacecreator')
 
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=False, default=default_project_dir,
                         help='Path to the folder where spacecreator is located')
-    parser.add_argument('--build_dir', dest='build_dir', type=str, required=False,
+    parser.add_argument('--build_dir', dest='build_dir', type=str, required=True,
                         help='Path to the build directory where spacecreator is to be build')
     parser.add_argument('--build_type', dest='build_type', type=str, required=False,
                         help='Release or Debug')
@@ -97,27 +91,34 @@ if __name__ == '__main__':
 
     if args.build_dir:
         build_dir = args.build_dir
-        print("build dir is {}".format(build_dir))
+        print("build_spacecreator: build dir is {}".format(build_dir))
     else:
         build_dir = join_dir(project_dir, 'build')
-        print("Defaulting to build dir {}".format(build_dir))
+        print("build_spacecreator: Defaulting to build dir {}".format(build_dir))
 
     if args.build_type:
         build_type = args.build_type
-        print("Build type {}".format(build_type))
+        print("build_spacecreator: Build type {}".format(build_type))
     else:
         build_type = 'Release'
-        print("Defaulting to build type {}".format(build_type))
+        print("build_spacecreator: Defaulting to build type {}".format(build_type))
 
     if args.no_build_asn1plugin:
         build_asn1plugin = False
-        print("Skipping ASN1Plugin")
+        print("build_spacecreator: Skipping ASN1Plugin")
     else:
         build_asn1plugin = True
-        print("Building ASN1Plugin")
+        print("build_spacecreator: Building ASN1Plugin")
 
     env_dir = args.env_dir
     env_qt_dir = args.env_qt_dir
+
+    print("build_spacecreator.py: project_dir is {}".format(project_dir))
+    print("build_spacecreator.py: build_dir".format(build_dir))
+    print("build_spacecreator.py: build_type".format(build_type))
+    print("build_spacecreator.py: env_dir".format(env_dir))
+    print("build_spacecreator.py: env_qt_dir".format(env_qt_dir))
+    print("build_spacecreator.py: build_asn1plugin".format(build_asn1plugin))
 
     check_cmake_version(3, 16, 0)
 

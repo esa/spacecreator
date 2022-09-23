@@ -95,6 +95,9 @@ if __name__ == '__main__':
     env_dir = args.env_dir
     plugin_build_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     plugin_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'qtcreator', 'plugins')
+
+    print("postbuild.py: plugin_build_dir is {}".format(plugin_build_dir))
+    print("postbuild.py: plugin_install_dir is {}".format(plugin_install_dir))
     copy_plugins_to_plugin_dir(plugin_build_dir, plugin_install_dir)
 
 

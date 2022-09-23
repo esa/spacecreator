@@ -156,4 +156,9 @@ if __name__ == '__main__':
     app_dir = join_dir(root_dir, 'spacecreator.AppDir')
     create_app_dir(app_dir, project_dir, build_dir, env_dir, env_qt_dir)
 
+    print("create_appimage.py: env_dir is {}".format(env_dir))
+    print("create_appimage.py: app_dir is {}".format(app_dir))
+    print("create_appimage.py: output_dir is {}".format(output_dir))
+    print("create_appimage.py: version is {}".format(version))
+
     create_app_image(env_dir, app_dir, output_dir, version)

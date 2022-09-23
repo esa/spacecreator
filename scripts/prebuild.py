@@ -2,7 +2,6 @@
 
 import argparse
 import os.path
-import shutil
 import subprocess
 import urllib.request
 import tarfile
@@ -208,12 +207,9 @@ def download_asn1scc(env_dir: str) -> None:
 
 if __name__ == '__main__':
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='prebuild',
-                                     epilog="Example: python3 ./prebuild.py --output_dir=/home/<user>/opt/qtcreatorenv "
-                                            "--qt_version='6.3.1' "
-                                            "--qtcreator_version='8.0.1'")
+    parser = argparse.ArgumentParser(prog='prebuild')
     parser.add_argument('--output_dir', dest='env_path', type=str, required=True,
-                        help='Where to put the build environment t . This means the '
+                        help='Where to put the build environment . This means the '
                              'specified version of Qt, GrantLee lib and the spacecrator.AppDir which'
                              ' is the final application')
     parser.add_argument('--qt_version', dest='qt_version', type=str, required=True,
@@ -229,7 +225,9 @@ if __name__ == '__main__':
     paths = build_path_object(env_dir, qt_version)
 
     is_qt6 = qt_version.split('.')[0] == '6'
-    print('qt_version was {}. Building with qt6 is {}'.format(qt_version, is_qt6))
+    print("prebuild.py: env_dir is {}".format(env_dir))
+    print('prebuild.py: qt_version was {}. Building with qt6 is {}'.format(qt_version, is_qt6))
+    print("prebuild.py: qtcreator_version is {}".format(qtcreator_version))
 
     check_cmake_version(3, 16, 0)
 
