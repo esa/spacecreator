@@ -703,16 +703,29 @@ void Asn1TypeValueGeneratorVisitor::handleOverridenType(
     }
 
     if (isConstSize) {
-        auto initCall = ProctypeMaker::makeCallForEachValue(
-                initInlineName, valueName, Expression(maxSize), Expression(overridenMaxSize - 1));
-        sequence->appendElement(std::move(initCall));
+        if (initInlineName.isEmpty()) {
+            auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+            VariableRef dst(valueName);
+            dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+
+            loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
+
+            auto forLoop = ForLoop(
+                    VariableRef("i"), Expression(maxSize), Expression(overridenMaxSize - 1), std::move(loopSequence));
+            sequence->appendElement(std::move(forLoop));
+        } else {
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    initInlineName, valueName, Expression(maxSize), Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        }
     } else {
         Expression start = InlineDefAdder::getValueLengthAsExpression(valueName);
 
         if (initInlineName.isEmpty()) {
             auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
-            VariableRef dst("dst");
+            VariableRef dst(valueName);
             dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
 
             loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
