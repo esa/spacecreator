@@ -32,11 +32,11 @@ using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
 using conversion::translator::UndeclaredInterfaceException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
-Context::Context(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
-        Asn1Acn::Definitions *parentDefinitions, const seds::model::Component *component,
-        const std::list<const seds::model::Package *> &sedsPackages,
+Context::Context(const ::seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
+        Asn1Acn::Definitions *parentDefinitions, const ::seds::model::Component *component,
+        const std::list<const ::seds::model::Package *> &sedsPackages,
         const std::vector<std::unique_ptr<Asn1Acn::File>> &asn1Files, const Options &options)
     : m_sedsPackage(sedsPackage)
     , m_definitions(definitions)
@@ -49,7 +49,7 @@ Context::Context(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *
 }
 
 void Context::addAsn1Type(
-        std::unique_ptr<Asn1Acn::Types::Type> asn1Type, const seds::model::Description *sedsDescription)
+        std::unique_ptr<Asn1Acn::Types::Type> asn1Type, const ::seds::model::Description *sedsDescription)
 {
     const auto &asn1TypeName = asn1Type->identifier();
     auto asn1TypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
@@ -59,7 +59,7 @@ void Context::addAsn1Type(
     m_definitions->addType(std::move(asn1TypeAssignment));
 }
 
-const seds::model::DataType *Context::findSedsType(const seds::model::DataTypeRef &typeRef)
+const ::seds::model::DataType *Context::findSedsType(const ::seds::model::DataTypeRef &typeRef)
 {
     const auto package = typeRef.packageStr() ? getSedsPackage(*typeRef.packageStr()) : m_sedsPackage;
     const auto type = package->dataType(typeRef.nameStr());
@@ -71,7 +71,7 @@ const seds::model::DataType *Context::findSedsType(const seds::model::DataTypeRe
     return type;
 }
 
-Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &typeRef)
+Asn1Acn::Types::Type *Context::findAsn1Type(const ::seds::model::DataTypeRef &typeRef)
 {
     const auto &typeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
 
@@ -107,7 +107,7 @@ Asn1Acn::Types::Type *Context::findAsn1Type(const seds::model::DataTypeRef &type
     throw MissingAsn1TypeDefinitionException(typeRef.value().pathStr());
 }
 
-Asn1Acn::Definitions *Context::findAsn1TypeDefinitions(const seds::model::DataTypeRef &typeRef)
+Asn1Acn::Definitions *Context::findAsn1TypeDefinitions(const ::seds::model::DataTypeRef &typeRef)
 {
     const auto &typeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
 
@@ -137,12 +137,12 @@ Asn1Acn::Definitions *Context::findAsn1TypeDefinitions(const seds::model::DataTy
     throw MissingAsn1TypeDefinitionException(typeRef.value().pathStr());
 }
 
-const seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
-        const seds::model::InterfaceDeclarationRef &interfaceRef)
+const ::seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
+        const ::seds::model::InterfaceDeclarationRef &interfaceRef)
 {
     const auto &name = interfaceRef.nameStr();
 
-    const auto namesEqual = [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+    const auto namesEqual = [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
         return interfaceDeclaration.nameStr() == name;
     };
 
@@ -176,7 +176,7 @@ const seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
     throw UndeclaredInterfaceException(interfaceRef.value().pathStr());
 }
 
-bool Context::hasAsn1Type(const seds::model::DataTypeRef &typeRef) const
+bool Context::hasAsn1Type(const ::seds::model::DataTypeRef &typeRef) const
 {
     const auto &typeName = Escaper::escapeAsn1TypeName(typeRef.nameStr());
 
@@ -206,12 +206,12 @@ bool Context::hasAsn1Type(const seds::model::DataTypeRef &typeRef) const
     return false;
 }
 
-const seds::model::Package *Context::getSedsPackage() const
+const ::seds::model::Package *Context::getSedsPackage() const
 {
     return m_sedsPackage;
 }
 
-const seds::model::Package *Context::getSedsPackage(const QString &packageName) const
+const ::seds::model::Package *Context::getSedsPackage(const QString &packageName) const
 {
     const auto sedsPackage = std::find_if(m_sedsPackages.begin(), m_sedsPackages.end(),
             [&](const auto &package) { return package->nameStr() == packageName; });
@@ -295,4 +295,4 @@ Context Context::cloneForPackage(const QString &packageName)
     return Context(package, definitions, nullptr, nullptr, m_sedsPackages, m_asn1Files, m_options);
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

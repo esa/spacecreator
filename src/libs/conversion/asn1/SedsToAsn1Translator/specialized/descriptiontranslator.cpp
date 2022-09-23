@@ -29,9 +29,9 @@
 #include <seds/SedsModel/types/stringdatatype.h>
 #include <seds/SedsModel/types/subrangedatatype.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
-void DescriptionTranslator::translate(const seds::model::Description *sedsDescription, Asn1Acn::Node *asn1Node)
+void DescriptionTranslator::translate(const ::seds::model::Description *sedsDescription, Asn1Acn::Node *asn1Node)
 {
     if (sedsDescription == nullptr) {
         return;
@@ -41,7 +41,7 @@ void DescriptionTranslator::translate(const seds::model::Description *sedsDescri
     asn1Node->setComment(std::move(description));
 }
 
-QString DescriptionTranslator::combineDescriptions(const seds::model::Description *sedsDescription)
+QString DescriptionTranslator::combineDescriptions(const ::seds::model::Description *sedsDescription)
 {
     auto description = sedsDescription->shortDescription().value_or("");
 
@@ -56,4 +56,4 @@ QString DescriptionTranslator::combineDescriptions(const seds::model::Descriptio
     return description;
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

@@ -26,7 +26,7 @@
 #include <simulink/SimulinkModel/datatypes/busdatatype.h>
 #include <simulink/SimulinkModel/datatypes/enumdatatype.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 /**
  * @brief   Translator visitor for SIMULINK data type
@@ -66,19 +66,19 @@ public:
      *
      * @param   simulinkEnumType    Type to translate
      */
-    auto operator()(const simulink::model::EnumDataType &simulinkEnumType) -> void;
+    auto operator()(const ::simulink::model::EnumDataType &simulinkEnumType) -> void;
     /**
      * @brief   Translate SIMULINK alias data type
      *
      * @param   simulinkAliasType    Type to translate
      */
-    auto operator()(const simulink::model::AliasDataType &simulinkAliasType) -> void;
+    auto operator()(const ::simulink::model::AliasDataType &simulinkAliasType) -> void;
     /**
      * @brief   Translate SIMULINK bus data type
      *
      * @param   simulinkBusType    Type to translate
      */
-    auto operator()(const simulink::model::BusDataType &simulinkBusType) -> void;
+    auto operator()(const ::simulink::model::BusDataType &simulinkBusType) -> void;
 
 private:
     Context &m_context;
@@ -86,4 +86,4 @@ private:
     BusDataTypeTranslator m_busDataTypeTranslator;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

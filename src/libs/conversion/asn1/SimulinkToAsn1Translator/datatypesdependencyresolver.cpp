@@ -34,7 +34,7 @@ using simulink::model::AliasDataType;
 using simulink::model::BusDataType;
 using simulink::model::DataType;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 DataTypesDependencyResolver::DataTypesDependencyResolver(const SimulinkDataTypes &simulinkDataTypes)
     : m_simulinkDataTypes(simulinkDataTypes)
@@ -130,4 +130,4 @@ bool DataTypesDependencyResolver::isDataTypeMarkedAs(const DataType &dataType, M
     return m_marks.at(&dataType) == markType;
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

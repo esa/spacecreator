@@ -37,7 +37,7 @@ namespace seds::model {
 class Package;
 } // namespace seds::model
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Context with current SEDS to ASN.1 translation state
@@ -56,9 +56,9 @@ public:
      * @param   asn1Files           List of all already translated ASN.1 files
      * @param   options             Translation options
      */
-    Context(const seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
-            Asn1Acn::Definitions *parentDefinitions, const seds::model::Component *component,
-            const std::list<const seds::model::Package *> &sedsPackages,
+    Context(const ::seds::model::Package *sedsPackage, Asn1Acn::Definitions *definitions,
+            Asn1Acn::Definitions *parentDefinitions, const ::seds::model::Component *component,
+            const std::list<const ::seds::model::Package *> &sedsPackages,
             const std::vector<std::unique_ptr<Asn1Acn::File>> &asn1Files, const Options &options);
     /**
      * @brief   Deleted copy constructor
@@ -85,7 +85,7 @@ public:
      * @param   asn1Type            Type to add
      * @param   sedsDescription     Description that should be applied to this type
      */
-    auto addAsn1Type(std::unique_ptr<Asn1Acn::Types::Type> asn1Type, const seds::model::Description *sedsDescription)
+    auto addAsn1Type(std::unique_ptr<Asn1Acn::Types::Type> asn1Type, const ::seds::model::Description *sedsDescription)
             -> void;
 
     /**
@@ -95,7 +95,7 @@ public:
      *
      * @return  Pointer to the found type, nullptr otherwise
      */
-    auto findSedsType(const seds::model::DataTypeRef &typeRef) -> const seds::model::DataType *;
+    auto findSedsType(const ::seds::model::DataTypeRef &typeRef) -> const ::seds::model::DataType *;
     /**
      * @brief   Find ASN.1 data type by SEDS type reference
      *
@@ -103,7 +103,7 @@ public:
      *
      * @return  Pointer to the found type, nullptr otherwise
      */
-    auto findAsn1Type(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::Types::Type *;
+    auto findAsn1Type(const ::seds::model::DataTypeRef &typeRef) -> Asn1Acn::Types::Type *;
     /**
      * @brief   Find ASN.1 definitions where ASN.1 type is present
      *
@@ -111,7 +111,7 @@ public:
      *
      * @return  Pointer to the found definitions, nullptr otherwise
      */
-    auto findAsn1TypeDefinitions(const seds::model::DataTypeRef &typeRef) -> Asn1Acn::Definitions *;
+    auto findAsn1TypeDefinitions(const ::seds::model::DataTypeRef &typeRef) -> Asn1Acn::Definitions *;
     /**
      * @brief   Find SEDS interface declaration by SEDS interface reference
      *
@@ -119,8 +119,8 @@ public:
      *
      * @return  Pointer to the found interface declaration, nullptr otherwise
      */
-    auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceRef)
-            -> const seds::model::InterfaceDeclaration *;
+    auto findInterfaceDeclaration(const ::seds::model::InterfaceDeclarationRef &interfaceRef)
+            -> const ::seds::model::InterfaceDeclaration *;
 
     /**
      * @brief   Check if given type is known
@@ -129,14 +129,14 @@ public:
      *
      * @return  True if type exists, false otherwise
      */
-    auto hasAsn1Type(const seds::model::DataTypeRef &typeRef) const -> bool;
+    auto hasAsn1Type(const ::seds::model::DataTypeRef &typeRef) const -> bool;
 
     /**
      * @brief   Getter for current SEDS package
      *
      * @return  Pointer to the package
      */
-    auto getSedsPackage() const -> const seds::model::Package *;
+    auto getSedsPackage() const -> const ::seds::model::Package *;
     /**
      * @brief   Getter for SEDS package with given name
      *
@@ -144,7 +144,7 @@ public:
      *
      * @return  Pointer to the found package, nullptr otherwise
      */
-    auto getSedsPackage(const QString &packageName) const -> const seds::model::Package *;
+    auto getSedsPackage(const QString &packageName) const -> const ::seds::model::Package *;
     /**
      * @brief   Getter for current ASN.1 definitions
      *
@@ -204,15 +204,15 @@ public:
     auto cloneForPackage(const QString &packageName) -> Context;
 
 private:
-    const seds::model::Package *m_sedsPackage;
+    const ::seds::model::Package *m_sedsPackage;
     Asn1Acn::Definitions *m_definitions;
     Asn1Acn::Definitions *m_parentDefinitions;
-    const seds::model::Component *m_component;
+    const ::seds::model::Component *m_component;
 
-    const std::list<const seds::model::Package *> &m_sedsPackages;
+    const std::list<const ::seds::model::Package *> &m_sedsPackages;
     const std::vector<std::unique_ptr<Asn1Acn::File>> &m_asn1Files;
 
     const Options &m_options;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds
