@@ -63,10 +63,10 @@ space-creator-dev:
 space-creator-qt5:
   stage: build-test-and-bundle
   variables:
-    ROOT: $(pwd)/..
-    ENV_DIR: /opt/spacecreator5
     ENV_QT_VERSION: 5.12.1
     ENV_QTC_VERSION: 4.8.2
+    ROOT: $(pwd)/..
+    ENV_DIR: /opt/spacecreator5
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     BUILD_DIR: ${ROOT}/spacecreator_build_qt5
 
@@ -94,7 +94,7 @@ space-creator-qt5:
     reports:
       junit: build/tst_*-result.xml
     paths:
-      - package
+      - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
   rules:
      #- if: "$CI_COMMIT_BRANCH == 'master'"
@@ -104,9 +104,9 @@ space-creator-qt5:
 space-creator-qt6:
   stage: build-test-and-bundle
   variables:
-    ENV_DIR: /opt/spacecreator5
     ENV_QT_VERSION: 6.3.1
     ENV_QTC_VERSION: 8.0.1
+    ENV_DIR: /opt/spacecreator5
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     BUILD_DIR: ${ROOT}/spacecreator_build_qt6
   script:

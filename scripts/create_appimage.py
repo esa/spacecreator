@@ -125,7 +125,7 @@ if __name__ == '__main__':
                         help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
     parser.add_argument('--project_version', dest='version', type=str, required=True,
                         help='Version number of spacecreator in the format X.Y.Z')
-    parser.add_argument('--package_dir', dest='package_dir', type=str, required=False,
+    parser.add_argument('--output_dir', dest='output_dir', type=str, required=False,
                         help='Path to the folder where the')
     args = parser.parse_args()
 
@@ -150,6 +150,13 @@ if __name__ == '__main__':
         version = '0.0.0'
         print("Defaulting to version 0.0.0")
 
+    if args.output_dir:
+        output_dir = args.output_dir
+        print("Output dir is {}".format(output_dir))
+    else:
+        output_dir = build_dir
+        print("Defaulting to output dir {}".format(output_dir))
+
     env_dir = args.env_dir
     env_qt_dir = args.env_qt_dir
     version = args.version
@@ -160,4 +167,4 @@ if __name__ == '__main__':
     app_dir = join_dir(root_dir, 'spacecreator.AppDir')
     create_app_dir(app_dir, project_dir, build_dir, env_dir, env_qt_dir)
 
-    create_app_image(env_dir, app_dir, root_dir, version)
+    create_app_image(env_dir, app_dir, output_dir, version)
