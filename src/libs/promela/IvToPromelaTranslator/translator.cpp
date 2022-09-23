@@ -640,10 +640,10 @@ void IvToPromelaTranslator::generateEnvironmentProctype(Context &context, const 
     sequence.appendElement(createWaitForInitStatement());
 
     const auto &parameterName = interfaceParameter.first;
-    const auto &parameterType = Escaper::escapePromelaName(interfaceParameter.second);
+    const auto &parameterType = interfaceParameter.second;
 
     if (!parameterType.isEmpty()) {
-        sequence.appendElement(Declaration(DataType(UtypeRef(parameterType)), "value"));
+        sequence.appendElement(Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), "value"));
     }
 
     const auto &globalInputVectorLengthLimit = context.options().value(PromelaOptions::globalInputVectorLengthLimit);
@@ -657,8 +657,8 @@ void IvToPromelaTranslator::generateEnvironmentProctype(Context &context, const 
     if (!parameterType.isEmpty()) {
         sendInlineArguments.append(VariableRef("value"));
 
-        const auto parameterSubtype =
-                handleParameterSubtype(context, parameterType, parameterName, interfaceName, functionName);
+        const auto parameterSubtype = handleParameterSubtype(
+                context, Escaper::escapePromelaName(parameterType), parameterName, interfaceName, functionName);
         const QString generateValueInlineName = QString("%1_generate_value").arg(parameterSubtype);
         loopSequence->appendElement(InlineCall(generateValueInlineName, sendInlineArguments));
     }
