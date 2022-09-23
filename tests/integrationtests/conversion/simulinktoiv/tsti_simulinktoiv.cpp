@@ -19,24 +19,20 @@
 
 #include <QObject>
 #include <QtTest>
+#include <conversion/converter/converter.h>
 #include <conversion/iv/IvOptions/options.h>
-#include <conversion/iv/IvXmlExporter/exporter.h>
+#include <conversion/iv/IvRegistrar/registrar.h>
 #include <conversion/iv/SimulinkToIvTranslator/options.h>
-#include <conversion/iv/SimulinkToIvTranslator/translator.h>
-#include <ivcore/ivlibrary.h>
-#include <ivcore/ivmodel.h>
-#include <libiveditor/iveditor.h>
+#include <conversion/registry/registry.h>
+#include <conversion/simulink/SimulinkRegistrar/registrar.h>
 #include <simulink/SimulinkOptions/options.h>
-#include <simulink/SimulinkXmlImporter/importer.h>
 
+using conversion::Registry;
 using conversion::iv::IvOptions;
+using conversion::iv::IvRegistrar;
 using conversion::iv::SimulinkToIvOptions;
-using conversion::iv::exporter::IvXmlExporter;
-using conversion::iv::translator::SimulinkToIvTranslator;
 using conversion::simulink::SimulinkOptions;
-using ivm::IVModel;
-using simulink::importer::SimulinkXmlImporter;
-using simulink::model::SimulinkModel;
+using conversion::simulink::SimulinkRegistrar;
 
 namespace conversion::iv::test {
 
@@ -55,6 +51,9 @@ private:
 
     static const QString m_expectedIVFileSubPath;
     static const QString m_currentIVFileName;
+
+private:
+    Registry m_registry;
 };
 
 // clang-format off
@@ -107,44 +106,19 @@ QString getFileContents(const QString &filename)
     return file.readAll();
 }
 
-std::unique_ptr<conversion::Model> loadModel(const QString &interfaceFilePath)
-{
-    Options options;
-    options.add(SimulinkOptions::inputFilepath, interfaceFilePath);
-
-    SimulinkXmlImporter importer;
-    auto importedModel = importer.importModel(options);
-
-    return std::move(importedModel);
-}
-
-std::vector<std::unique_ptr<conversion::Model>> translateModel(SimulinkModel *simulinkModel)
-{
-    Options options;
-    options.add(IvOptions::configFilepath, "config.xml");
-    options.add(SimulinkToIvOptions::ivFunctionName, "simulink");
-    options.add(SimulinkToIvOptions::ivFunctionImplementation, "QGenC");
-
-    SimulinkToIvTranslator translator;
-
-    auto translatedModels = translator.translateModels({ simulinkModel }, options);
-
-    return std::move(translatedModels);
-}
-
-void exportModel(const IVModel *ivModel, const QString &outputIVFilePath)
-{
-    Options options;
-    options.add(IvOptions::outputFilepath, outputIVFilePath);
-    IvXmlExporter exporter;
-
-    exporter.exportModel(ivModel, options);
-}
-
 void tsti_SimulinkToIV::initTestCase()
 {
-    ivm::initIVLibrary();
-    ive::initIVEditor();
+    IvRegistrar ivRegistrar;
+    auto result = ivRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        QFAIL("Failed to register IV capabilities");
+    }
+
+    SimulinkRegistrar simulinkRegistrar;
+    result = simulinkRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        QFAIL("Failed to register SIMULINK capabilities");
+    }
 }
 
 void tsti_SimulinkToIV::testComparingIVTranslationResultWithExpectedResult()
@@ -152,21 +126,17 @@ void tsti_SimulinkToIV::testComparingIVTranslationResultWithExpectedResult()
     for (const QString &m_directoryOfTest : m_directoriesOfTests) {
         try {
             const QString interfaceFilePath = m_directoryOfTest + m_interfaceXmlFileSubPath;
-
-            const auto importedModel = loadModel(interfaceFilePath);
-            auto *simulinkModel = dynamic_cast<SimulinkModel *>(importedModel.get());
-            QVERIFY(simulinkModel);
-
-            const auto translatedModels = translateModel(simulinkModel);
-            QCOMPARE(translatedModels.size(), 1);
-
-            const auto &translatedModel = translatedModels[0];
-            const auto *ivModel = dynamic_cast<IVModel *>(translatedModel.get());
-            QVERIFY(ivModel);
-
-            exportModel(ivModel, m_currentIVFileName);
-
             const QString expectedIVFilePath = m_directoryOfTest + m_expectedIVFileSubPath;
+
+            Options options;
+            options.add(SimulinkOptions::inputFilepath, interfaceFilePath);
+            options.add(IvOptions::configFilepath, "config.xml");
+            options.add(IvOptions::outputFilepath, m_currentIVFileName);
+            options.add(SimulinkToIvOptions::ivFunctionName, "simulink");
+            options.add(SimulinkToIvOptions::ivFunctionImplementation, "QGenC");
+
+            Converter converter(m_registry, std::move(options));
+            converter.convert({ ModelType::Simulink }, ModelType::InterfaceView, {});
 
             QVERIFY(getFileContents(m_currentIVFileName) == getFileContents(expectedIVFilePath));
         } catch (const std::exception &ex) {
