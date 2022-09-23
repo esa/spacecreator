@@ -30,10 +30,10 @@ using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
 using conversion::translator::UndeclaredPackageReferenceException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 PackagesDependencyResolver::ResultList PackagesDependencyResolver::resolve(
-        const std::vector<seds::model::Package> *packages)
+        const std::vector<::seds::model::Package> *packages)
 {
     m_marks.clear();
     m_result.clear();
@@ -47,7 +47,7 @@ PackagesDependencyResolver::ResultList PackagesDependencyResolver::resolve(
     return m_result;
 }
 
-void PackagesDependencyResolver::visit(const seds::model::Package *package)
+void PackagesDependencyResolver::visit(const ::seds::model::Package *package)
 {
     if (isPermanentlyMarked(package)) {
         return;
@@ -68,21 +68,21 @@ void PackagesDependencyResolver::visit(const seds::model::Package *package)
     m_result.push_back(package);
 }
 
-void PackagesDependencyResolver::handleDataTypes(const std::vector<seds::model::DataType> &dataTypes)
+void PackagesDependencyResolver::handleDataTypes(const std::vector<::seds::model::DataType> &dataTypes)
 {
     for (const auto &dataType : dataTypes) {
-        if (const auto *arrayDataType = std::get_if<seds::model::ArrayDataType>(&dataType)) {
+        if (const auto *arrayDataType = std::get_if<::seds::model::ArrayDataType>(&dataType)) {
             handleArray(*arrayDataType);
             handleArrayDimensions(arrayDataType->dimensions());
-        } else if (const auto *containerDataType = std::get_if<seds::model::ContainerDataType>(&dataType)) {
+        } else if (const auto *containerDataType = std::get_if<::seds::model::ContainerDataType>(&dataType)) {
             handleContainer(*containerDataType);
-        } else if (const auto *subRangeDataType = std::get_if<seds::model::SubRangeDataType>(&dataType)) {
+        } else if (const auto *subRangeDataType = std::get_if<::seds::model::SubRangeDataType>(&dataType)) {
             handleSubRangeDataType(*subRangeDataType);
         }
     }
 }
 
-void PackagesDependencyResolver::handleDataTypeRef(const seds::model::DataTypeRef &dataTypeRef)
+void PackagesDependencyResolver::handleDataTypeRef(const ::seds::model::DataTypeRef &dataTypeRef)
 {
     if (dataTypeRef.packageStr()) {
         const auto package = findPackage(*dataTypeRef.packageStr());
@@ -90,12 +90,12 @@ void PackagesDependencyResolver::handleDataTypeRef(const seds::model::DataTypeRe
     }
 }
 
-void PackagesDependencyResolver::handleArray(const seds::model::ArrayDataType &arrayDataType)
+void PackagesDependencyResolver::handleArray(const ::seds::model::ArrayDataType &arrayDataType)
 {
     handleDataTypeRef(arrayDataType.type());
 }
 
-void PackagesDependencyResolver::handleArrayDimensions(const std::vector<seds::model::DimensionSize> &dimensions)
+void PackagesDependencyResolver::handleArrayDimensions(const std::vector<::seds::model::DimensionSize> &dimensions)
 {
     for (const auto &dimension : dimensions) {
         if (dimension.indexTypeRef()) {
@@ -104,11 +104,11 @@ void PackagesDependencyResolver::handleArrayDimensions(const std::vector<seds::m
     }
 }
 
-void PackagesDependencyResolver::handleContainer(const seds::model::ContainerDataType &containerDataType)
+void PackagesDependencyResolver::handleContainer(const ::seds::model::ContainerDataType &containerDataType)
 {
     const auto visitor = [&](auto &&entry) {
         using T = std::decay_t<decltype(entry)>;
-        if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
+        if constexpr (std::is_same_v<T, ::seds::model::PaddingEntry>) {
             return;
         } else {
             handleDataTypeRef(entry.type());
@@ -123,19 +123,19 @@ void PackagesDependencyResolver::handleContainer(const seds::model::ContainerDat
     }
 
     for (const auto &containerConstraint : containerDataType.constraints()) {
-        if (auto typeConstraint = std::get_if<seds::model::ContainerTypeConstraint>(&containerConstraint)) {
+        if (auto typeConstraint = std::get_if<::seds::model::ContainerTypeConstraint>(&containerConstraint)) {
             handleDataTypeRef(typeConstraint->type());
         }
     }
 }
 
-void PackagesDependencyResolver::handleSubRangeDataType(const seds::model::SubRangeDataType &subRangeDataType)
+void PackagesDependencyResolver::handleSubRangeDataType(const ::seds::model::SubRangeDataType &subRangeDataType)
 {
     handleDataTypeRef(subRangeDataType.type());
 }
 
 void PackagesDependencyResolver::handleInterfaceDeclarations(
-        const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations)
+        const std::vector<::seds::model::InterfaceDeclaration> &interfaceDeclarations)
 {
     for (const auto &interfaceDeclaration : interfaceDeclarations) {
         handleInterfaceDeclaration(interfaceDeclaration);
@@ -143,7 +143,7 @@ void PackagesDependencyResolver::handleInterfaceDeclarations(
 }
 
 void PackagesDependencyResolver::handleInterfaceDeclaration(
-        const seds::model::InterfaceDeclaration &interfaceDeclaration)
+        const ::seds::model::InterfaceDeclaration &interfaceDeclaration)
 {
     for (const auto &baseInterface : interfaceDeclaration.baseInterfaces()) {
         const auto &baseInterfaceDeclarationRef = baseInterface.type();
@@ -158,14 +158,14 @@ void PackagesDependencyResolver::handleInterfaceDeclaration(
     handleCommands(interfaceDeclaration.commands());
 }
 
-void PackagesDependencyResolver::handleParameters(const std::vector<seds::model::InterfaceParameter> &parameters)
+void PackagesDependencyResolver::handleParameters(const std::vector<::seds::model::InterfaceParameter> &parameters)
 {
     for (const auto &parameter : parameters) {
         handleDataTypeRef(parameter.type());
     }
 }
 
-void PackagesDependencyResolver::handleCommands(const std::vector<seds::model::InterfaceCommand> &commands)
+void PackagesDependencyResolver::handleCommands(const std::vector<::seds::model::InterfaceCommand> &commands)
 {
     for (const auto &command : commands) {
         for (const auto &argument : command.arguments()) {
@@ -175,7 +175,7 @@ void PackagesDependencyResolver::handleCommands(const std::vector<seds::model::I
 }
 
 void PackagesDependencyResolver::handleComponents(
-        const std::vector<seds::model::Component> &components, const seds::model::Package *package)
+        const std::vector<::seds::model::Component> &components, const ::seds::model::Package *package)
 {
     for (const auto &component : components) {
         handleDataTypes(component.dataTypes());
@@ -185,8 +185,8 @@ void PackagesDependencyResolver::handleComponents(
     }
 }
 
-void PackagesDependencyResolver::handleInterfaces(const std::vector<seds::model::Interface> &interfaces,
-        const seds::model::Component &component, const seds::model::Package *package)
+void PackagesDependencyResolver::handleInterfaces(const std::vector<::seds::model::Interface> &interfaces,
+        const ::seds::model::Component &component, const ::seds::model::Package *package)
 {
     for (const auto &interface : interfaces) {
         const auto &interfaceDeclarationRef = interface.type();
@@ -204,7 +204,7 @@ void PackagesDependencyResolver::handleInterfaces(const std::vector<seds::model:
     }
 }
 
-void PackagesDependencyResolver::handleTypeMapSet(const std::optional<seds::model::GenericTypeMapSet> &typeMapSet)
+void PackagesDependencyResolver::handleTypeMapSet(const std::optional<::seds::model::GenericTypeMapSet> &typeMapSet)
 {
     if (!typeMapSet) {
         return;
@@ -217,7 +217,8 @@ void PackagesDependencyResolver::handleTypeMapSet(const std::optional<seds::mode
     handleAlternateSet(typeMapSet->alternateSet());
 }
 
-void PackagesDependencyResolver::handleAlternateSet(const std::optional<seds::model::GenericAlternateSet> &alternateSet)
+void PackagesDependencyResolver::handleAlternateSet(
+        const std::optional<::seds::model::GenericAlternateSet> &alternateSet)
 {
     if (!alternateSet) {
         return;
@@ -230,7 +231,7 @@ void PackagesDependencyResolver::handleAlternateSet(const std::optional<seds::mo
     }
 }
 
-const seds::model::Package *PackagesDependencyResolver::findPackage(const QString &packageName) const
+const ::seds::model::Package *PackagesDependencyResolver::findPackage(const QString &packageName) const
 {
     auto foundPackage = std::find_if(m_packages->begin(), m_packages->end(),
             [&](const auto &package) { return package.nameStr() == packageName; });
@@ -243,12 +244,12 @@ const seds::model::Package *PackagesDependencyResolver::findPackage(const QStrin
     return nullptr;
 }
 
-const seds::model::InterfaceDeclaration &PackagesDependencyResolver::findInterfaceDeclaration(
-        const QString &name, const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage)
+const ::seds::model::InterfaceDeclaration &PackagesDependencyResolver::findInterfaceDeclaration(
+        const QString &name, const ::seds::model::Component &sedsComponent, const ::seds::model::Package *sedsPackage)
 {
     const auto &sedsComponentInterfaceDeclarations = sedsComponent.declaredInterfaces();
     auto found = std::find_if(sedsComponentInterfaceDeclarations.begin(), sedsComponentInterfaceDeclarations.end(),
-            [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+            [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
                 return interfaceDeclaration.nameStr() == name;
             });
     if (found != sedsComponentInterfaceDeclarations.end()) {
@@ -257,7 +258,7 @@ const seds::model::InterfaceDeclaration &PackagesDependencyResolver::findInterfa
 
     const auto &sedsPackageInterfaceDeclarations = sedsPackage->declaredInterfaces();
     found = std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
-            [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+            [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
                 return interfaceDeclaration.nameStr() == name;
             });
     if (found != sedsPackageInterfaceDeclarations.end()) {
@@ -267,17 +268,17 @@ const seds::model::InterfaceDeclaration &PackagesDependencyResolver::findInterfa
     throw UndeclaredInterfaceException(name);
 }
 
-void PackagesDependencyResolver::markTemporary(const seds::model::Package *package)
+void PackagesDependencyResolver::markTemporary(const ::seds::model::Package *package)
 {
     m_marks.insert({ package, MarkType::Temporary });
 }
 
-void PackagesDependencyResolver::markPermanent(const seds::model::Package *package)
+void PackagesDependencyResolver::markPermanent(const ::seds::model::Package *package)
 {
     m_marks[package] = MarkType::Permanent;
 }
 
-bool PackagesDependencyResolver::isTemporarilyMarked(const seds::model::Package *package)
+bool PackagesDependencyResolver::isTemporarilyMarked(const ::seds::model::Package *package)
 {
     if (m_marks.count(package) == 0) {
         return false;
@@ -286,7 +287,7 @@ bool PackagesDependencyResolver::isTemporarilyMarked(const seds::model::Package 
     return m_marks.at(package) == MarkType::Temporary;
 }
 
-bool PackagesDependencyResolver::isPermanentlyMarked(const seds::model::Package *package)
+bool PackagesDependencyResolver::isPermanentlyMarked(const ::seds::model::Package *package)
 {
     if (m_marks.count(package) == 0) {
         return false;
@@ -295,4 +296,4 @@ bool PackagesDependencyResolver::isPermanentlyMarked(const seds::model::Package 
     return m_marks.at(package) == MarkType::Permanent;
 }
 
-} // namespace conversion::asn1::translator {
+} // namespace conversion::asn1::translator::seds {

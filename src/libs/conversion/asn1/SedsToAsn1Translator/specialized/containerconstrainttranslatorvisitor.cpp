@@ -38,7 +38,7 @@
 using ASN1Type = Asn1Acn::Types::Type::ASN1Type;
 using conversion::translator::TranslationException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 ContainerConstraintTranslatorVisitor::ContainerConstraintTranslatorVisitor(
         Context &context, Asn1Acn::Types::Sequence *sequence)
@@ -47,26 +47,26 @@ ContainerConstraintTranslatorVisitor::ContainerConstraintTranslatorVisitor(
 {
 }
 
-void ContainerConstraintTranslatorVisitor::operator()(const seds::model::ContainerRangeConstraint &rangeConstraint)
+void ContainerConstraintTranslatorVisitor::operator()(const ::seds::model::ContainerRangeConstraint &rangeConstraint)
 {
     auto asn1ConstrainedType = getConstrainedType(rangeConstraint.entry());
     applyContainerRangeConstraint(rangeConstraint, asn1ConstrainedType);
 }
 
-void ContainerConstraintTranslatorVisitor::operator()(const seds::model::ContainerTypeConstraint &typeConstraint)
+void ContainerConstraintTranslatorVisitor::operator()(const ::seds::model::ContainerTypeConstraint &typeConstraint)
 {
     auto asn1ConstrainedType = getConstrainedType(typeConstraint.entry());
     applyContainerTypeConstraint(typeConstraint, asn1ConstrainedType);
 }
 
-void ContainerConstraintTranslatorVisitor::operator()(const seds::model::ContainerValueConstraint &valueConstraint)
+void ContainerConstraintTranslatorVisitor::operator()(const ::seds::model::ContainerValueConstraint &valueConstraint)
 {
     auto asn1ConstrainedType = getConstrainedType(valueConstraint.entry());
     applyContainerValueConstraint(valueConstraint, asn1ConstrainedType);
 }
 
 void ContainerConstraintTranslatorVisitor::applyContainerRangeConstraint(
-        const seds::model::ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Type *asn1Type) const
+        const ::seds::model::ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Type *asn1Type) const
 {
     const auto &range = rangeConstraint.range();
 
@@ -95,13 +95,13 @@ void ContainerConstraintTranslatorVisitor::applyContainerRangeConstraint(
 }
 
 void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
-        const seds::model::ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Type *asn1Type) const
+        const ::seds::model::ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Type *asn1Type) const
 {
     const auto referencedType = m_context.findSedsType(typeConstraint.type());
 
     switch (asn1Type->typeEnum()) {
     case ASN1Type::INTEGER: {
-        const auto referencedIntegerType = std::get_if<seds::model::IntegerDataType>(referencedType);
+        const auto referencedIntegerType = std::get_if<::seds::model::IntegerDataType>(referencedType);
 
         if (referencedIntegerType == nullptr) {
             auto errorMessage = QString("ContainerTypeConstraint cannot be applied to integer \"%1\" entry because "
@@ -115,7 +115,7 @@ void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
         std::visit(rangeTranslator, referencedIntegerType->range());
     } break;
     case ASN1Type::REAL: {
-        const auto referencedFloatType = std::get_if<seds::model::FloatDataType>(referencedType);
+        const auto referencedFloatType = std::get_if<::seds::model::FloatDataType>(referencedType);
 
         if (referencedFloatType == nullptr) {
             auto errorMessage = QString("ContainerTypeConstraint cannot be applied to float \"%1\" entry because "
@@ -142,7 +142,7 @@ void ContainerConstraintTranslatorVisitor::applyContainerTypeConstraint(
 }
 
 void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(
-        const seds::model::ContainerValueConstraint &valueConstraint, Asn1Acn::Types::Type *asn1Type) const
+        const ::seds::model::ContainerValueConstraint &valueConstraint, Asn1Acn::Types::Type *asn1Type) const
 {
     const auto &value = valueConstraint.value().value();
 
@@ -213,7 +213,8 @@ void ContainerConstraintTranslatorVisitor::applyContainerValueConstraint(
     }
 }
 
-Asn1Acn::Types::Type *ContainerConstraintTranslatorVisitor::getConstrainedType(const seds::model::EntryRef &entry) const
+Asn1Acn::Types::Type *ContainerConstraintTranslatorVisitor::getConstrainedType(
+        const ::seds::model::EntryRef &entry) const
 {
     const auto constrainedEntryName = Escaper::escapeAsn1FieldName(entry.nameStr());
     const auto asn1ConstrainedComponent = m_sequence->component(constrainedEntryName);
@@ -228,4 +229,4 @@ Asn1Acn::Types::Type *ContainerConstraintTranslatorVisitor::getConstrainedType(c
     return asn1ConstrainedComponent->type();
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

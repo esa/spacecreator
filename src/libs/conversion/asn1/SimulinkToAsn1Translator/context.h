@@ -24,7 +24,7 @@
 #include <conversion/common/options.h>
 #include <simulink/SimulinkModel/simulinkmodel.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 /**
  * @brief   Context with current SIMULINK to ASN.1 translation state
@@ -40,7 +40,7 @@ public:
      * @param   simulinkModelDefinitions    Current simulink model ASN.1 definitions
      * @param   options                     Translation options
      */
-    Context(const simulink::model::SimulinkModel &simulinkModel,
+    Context(const ::simulink::model::SimulinkModel &simulinkModel,
             std::unique_ptr<Asn1Acn::Definitions> &matlabDefinitions,
             std::unique_ptr<Asn1Acn::Definitions> &simulinkModelDefinitions, const Options &options);
     /**
@@ -105,10 +105,10 @@ public:
     auto getSimulinkModelAsn1Definitions() const -> Asn1Acn::Definitions *;
 
 private:
-    const simulink::model::SimulinkModel &m_simulinkModel;
+    const ::simulink::model::SimulinkModel &m_simulinkModel;
     std::unique_ptr<Asn1Acn::Definitions> &m_matlabDefinitions;
     std::unique_ptr<Asn1Acn::Definitions> &m_simulinkModelDefinitions;
     const Options &m_options;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

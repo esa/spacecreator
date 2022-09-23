@@ -33,7 +33,7 @@ using Asn1Acn::Types::Type;
 using Asn1Acn::Types::UserdefinedType;
 using simulink::model::VectorDimensions;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 DimensionTranslator::DimensionTranslator(Context &context)
     : m_context(context)
@@ -92,4 +92,4 @@ void DimensionTranslator::addSizeConstraint(Asn1Acn::Types::SequenceOf *sequence
     sequenceOf->constraints().append(std::move(sizeConstraint));
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

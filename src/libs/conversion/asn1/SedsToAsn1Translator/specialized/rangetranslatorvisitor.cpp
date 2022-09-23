@@ -27,7 +27,7 @@
 
 using conversion::translator::TranslationException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 template<>
 typename Asn1Acn::IntegerValue::Type
@@ -42,87 +42,52 @@ typename Asn1Acn::RealValue::Type RangeTranslatorVisitor<Asn1Acn::Types::Real, A
 
 template<>
 void RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::operator()(
-        const seds::model::MinMaxRange &range)
+        const ::seds::model::MinMaxRange &range)
 {
     switch (range.type()) {
-    case seds::model::RangeType::ExclusiveMinExclusiveMax: {
+    case ::seds::model::RangeType::ExclusiveMinExclusiveMax: {
         const auto min = getMin(range) + 1;
         const auto max = getMax(range) - 1;
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::RangeType::InclusiveMinInclusiveMax: {
+    case ::seds::model::RangeType::InclusiveMinInclusiveMax: {
         const auto min = getMin(range);
         const auto max = getMax(range);
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::RangeType::InclusiveMinExclusiveMax: {
+    case ::seds::model::RangeType::InclusiveMinExclusiveMax: {
         const auto min = getMin(range);
         const auto max = getMax(range) - 1;
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::RangeType::ExclusiveMinInclusiveMax: {
+    case ::seds::model::RangeType::ExclusiveMinInclusiveMax: {
         const auto min = getMin(range) + 1;
         const auto max = getMax(range);
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::RangeType::GreaterThan: {
+    case ::seds::model::RangeType::GreaterThan: {
         const auto min = getMin(range) + 1;
         const auto max = getGreatest();
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::RangeType::LessThan: {
+    case ::seds::model::RangeType::LessThan: {
         const auto min = getSmallest();
         const auto max = getMax(range) - 1;
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::RangeType::AtLeast: {
+    case ::seds::model::RangeType::AtLeast: {
         const auto min = getMin(range);
         const auto max = getGreatest();
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::RangeType::AtMost: {
-        const auto min = getSmallest();
-        const auto max = getMax(range);
-
-        addRangeConstraint(min, max);
-    } break;
-    }
-}
-
-template<>
-void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(const seds::model::MinMaxRange &range)
-{
-    switch (range.type()) {
-    case seds::model::RangeType::ExclusiveMinExclusiveMax:
-    case seds::model::RangeType::InclusiveMinExclusiveMax:
-    case seds::model::RangeType::ExclusiveMinInclusiveMax:
-    case seds::model::RangeType::GreaterThan:
-    case seds::model::RangeType::LessThan: {
-        auto errorMessage =
-                QString("Exclusive min-max ranges are not supported for floating point values (in type \"%1\")")
-                        .arg(m_asn1Type->identifier());
-        throw TranslationException(std::move(errorMessage));
-    } break;
-    case seds::model::RangeType::InclusiveMinInclusiveMax: {
-        const auto min = getMin(range);
-        const auto max = getMax(range);
-
-        addRangeConstraint(min, max);
-    } break;
-    case seds::model::RangeType::AtLeast: {
-        const auto min = getMin(range);
-        const auto max = getGreatest();
-
-        addRangeConstraint(min, max);
-    } break;
-    case seds::model::RangeType::AtMost: {
+    case ::seds::model::RangeType::AtMost: {
         const auto min = getSmallest();
         const auto max = getMax(range);
 
@@ -133,22 +98,58 @@ void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator(
 
 template<>
 void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(
-        const seds::model::FloatPrecisionRange &range)
+        const ::seds::model::MinMaxRange &range)
+{
+    switch (range.type()) {
+    case ::seds::model::RangeType::ExclusiveMinExclusiveMax:
+    case ::seds::model::RangeType::InclusiveMinExclusiveMax:
+    case ::seds::model::RangeType::ExclusiveMinInclusiveMax:
+    case ::seds::model::RangeType::GreaterThan:
+    case ::seds::model::RangeType::LessThan: {
+        auto errorMessage =
+                QString("Exclusive min-max ranges are not supported for floating point values (in type \"%1\")")
+                        .arg(m_asn1Type->identifier());
+        throw TranslationException(std::move(errorMessage));
+    } break;
+    case ::seds::model::RangeType::InclusiveMinInclusiveMax: {
+        const auto min = getMin(range);
+        const auto max = getMax(range);
+
+        addRangeConstraint(min, max);
+    } break;
+    case ::seds::model::RangeType::AtLeast: {
+        const auto min = getMin(range);
+        const auto max = getGreatest();
+
+        addRangeConstraint(min, max);
+    } break;
+    case ::seds::model::RangeType::AtMost: {
+        const auto min = getSmallest();
+        const auto max = getMax(range);
+
+        addRangeConstraint(min, max);
+    } break;
+    }
+}
+
+template<>
+void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(
+        const ::seds::model::FloatPrecisionRange &range)
 {
     switch (range) {
-    case seds::model::FloatPrecisionRange::Single: {
+    case ::seds::model::FloatPrecisionRange::Single: {
         const auto min = static_cast<double>(std::numeric_limits<float>::lowest());
         const auto max = static_cast<double>(std::numeric_limits<float>::max());
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::FloatPrecisionRange::Double: {
+    case ::seds::model::FloatPrecisionRange::Double: {
         const auto min = std::numeric_limits<double>::lowest();
         const auto max = std::numeric_limits<double>::max();
 
         addRangeConstraint(min, max);
     } break;
-    case seds::model::FloatPrecisionRange::Quad:
+    case ::seds::model::FloatPrecisionRange::Quad:
         throw conversion::UnsupportedValueException("FloatPrecisionRange", "Quad");
     default:
         throw conversion::UnhandledValueException("FloatPrecisionRange");
@@ -157,7 +158,7 @@ void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator(
 
 template<>
 void RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>::operator()(
-        const seds::model::EnumeratedDataTypeRange &range)
+        const ::seds::model::EnumeratedDataTypeRange &range)
 {
     const auto &items = range.items();
 
@@ -252,4 +253,4 @@ typename Asn1Acn::RealValue::Type RangeTranslatorVisitor<Asn1Acn::Types::Real, A
     }
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

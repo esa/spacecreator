@@ -29,7 +29,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Data structure for SEDS generic type mapping
@@ -111,7 +111,7 @@ public:
      *
      * @param   typeMapSet      Generic type mappings
      */
-    auto addMappings(const seds::model::GenericTypeMapSet &typeMapSet) -> void;
+    auto addMappings(const ::seds::model::GenericTypeMapSet &typeMapSet) -> void;
     /**
      * @brief   Get mapping for given generic type
      *
@@ -135,14 +135,14 @@ public:
     auto determinantTypePath() const -> const std::optional<QString> &;
 
 private:
-    auto addSimpleMapping(const seds::model::GenericTypeMap &typeMap) -> void;
-    auto addAlternateMapping(const seds::model::GenericAlternate &alternate) -> void;
+    auto addSimpleMapping(const ::seds::model::GenericTypeMap &typeMap) -> void;
+    auto addAlternateMapping(const ::seds::model::GenericAlternate &alternate) -> void;
 
-    auto findDeterminant(const std::vector<seds::model::GenericAlternate> &alternates)
-            -> std::pair<QString, seds::model::DataTypeRef>;
-    auto getPossibleDeterminants(const seds::model::GenericAlternate &alternate)
-            -> std::vector<std::pair<QString, seds::model::DataTypeRef>>;
-    auto handleDeterminantTypePath(const seds::model::DataTypeRef &determinantTypeRef) -> QString;
+    auto findDeterminant(const std::vector<::seds::model::GenericAlternate> &alternates)
+            -> std::pair<QString, ::seds::model::DataTypeRef>;
+    auto getPossibleDeterminants(const ::seds::model::GenericAlternate &alternate)
+            -> std::vector<std::pair<QString, ::seds::model::DataTypeRef>>;
+    auto handleDeterminantTypePath(const ::seds::model::DataTypeRef &determinantTypeRef) -> QString;
 
 private:
     Context &m_context;
@@ -153,4 +153,4 @@ private:
     std::unordered_map<QString, TypeMapping> m_mappings;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

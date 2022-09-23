@@ -36,7 +36,7 @@ using conversion::simulink::MatLabStandardDataTypes;
 using simulink::model::DataType;
 using simulink::model::SimulinkModel;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 ModelType SimulinkToAsn1Translator::getSourceModelType() const
 {
@@ -141,4 +141,4 @@ void SimulinkToAsn1Translator::translateDataTypesOfPorts(Context &context, const
     }
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

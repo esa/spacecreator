@@ -23,7 +23,7 @@
 #include <seds/SedsModel/base/description.h>
 #include <seds/SedsModel/types/datatype.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Translator for SEDS short and long descriptions
@@ -43,10 +43,10 @@ public:
      * @param   sedsDescription     Description to translate
      * @param   asn1Node            Node that should contain the comment
      */
-    static auto translate(const seds::model::Description *sedsDescription, Asn1Acn::Node *asn1Node) -> void;
+    static auto translate(const ::seds::model::Description *sedsDescription, Asn1Acn::Node *asn1Node) -> void;
 
 private:
-    static auto combineDescriptions(const seds::model::Description *sedsDescription) -> QString;
+    static auto combineDescriptions(const ::seds::model::Description *sedsDescription) -> QString;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

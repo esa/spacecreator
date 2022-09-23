@@ -33,7 +33,7 @@ using conversion::simulink::MatLabStandardDataTypes;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using simulink::model::SimulinkModel;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 Context::Context(const SimulinkModel &simulinkModel, std::unique_ptr<Definitions> &matlabDefinitions,
         std::unique_ptr<Definitions> &simulinkModelDefinitions, const Options &options)
@@ -98,4 +98,4 @@ Asn1Acn::Definitions *Context::getSimulinkModelAsn1Definitions() const
     return m_simulinkModelDefinitions.get();
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

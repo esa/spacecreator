@@ -24,7 +24,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <seds/SedsModel/types/dimensionsize.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Translator for SEDS dimensions
@@ -63,16 +63,16 @@ public:
      * @param   dimension       Dimension to translate
      * @param   asn1Type        Sequence to constraint
      */
-    auto translate(const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+    auto translate(const ::seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
 
 private:
-    auto translateSizeDimension(const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
-            -> void;
+    auto translateSizeDimension(
+            const ::seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
     auto translateIndexDimension(
-            const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+            const ::seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
 
     auto translateEnumDimensionIndex(
-            const seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
+            const ::seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1Type) const -> void;
 
 private:
     Context &m_context;
@@ -80,4 +80,4 @@ private:
     std::optional<uint64_t> m_threshold;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

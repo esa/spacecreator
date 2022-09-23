@@ -24,7 +24,7 @@
 
 #include <simulink/SimulinkModel/common/port.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 /**
  * @brief   When port (inport or outport) has "Port Dimensions" parameter different from -1 or greater than 1 or it is a
@@ -67,11 +67,11 @@ public:
      *
      * @param   port    port (inport or outport) to translation
      */
-    auto translate(const simulink::model::Port &port) -> void;
+    auto translate(const ::simulink::model::Port &port) -> void;
 
 private:
     Context &m_context;
     DimensionTranslator m_dimensionTranslator;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

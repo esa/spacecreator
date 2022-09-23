@@ -37,7 +37,7 @@ using conversion::Escaper;
 using conversion::translator::TranslationException;
 using seds::model::SedsModel;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
@@ -72,11 +72,11 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(
 
     const auto &sedsModelData = sedsModel->data();
 
-    if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
-        const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
+    if (std::holds_alternative<::seds::model::PackageFile>(sedsModelData)) {
+        const auto &sedsPackage = std::get<::seds::model::PackageFile>(sedsModelData).package();
         translatePackage(&sedsPackage, asn1Model.get(), { &sedsPackage }, options);
-    } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
-        const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
+    } else if (std::holds_alternative<::seds::model::DataSheet>(sedsModelData)) {
+        const auto &sedsPackages = std::get<::seds::model::DataSheet>(sedsModelData).packages();
 
         PackagesDependencyResolver packagesDependencyResolver;
         const auto resolvedSedsPackages = packagesDependencyResolver.resolve(&sedsPackages);
@@ -94,8 +94,8 @@ std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(
     return result;
 }
 
-void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-        const std::list<const seds::model::Package *> &sedsPackages, const Options &options) const
+void SedsToAsn1Translator::translatePackage(const ::seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+        const std::list<const ::seds::model::Package *> &sedsPackages, const Options &options) const
 {
     DataTypesDependencyResolver typesDependencyResolver;
 
@@ -162,7 +162,7 @@ void SedsToAsn1Translator::translatePackage(const seds::model::Package *sedsPack
 }
 
 void SedsToAsn1Translator::translateDataTypeSet(
-        const std::list<const seds::model::DataType *> &dataTypes, Context &context) const
+        const std::list<const ::seds::model::DataType *> &dataTypes, Context &context) const
 {
     DataTypeTranslatorVisitor dataTypeTranslator(context);
 
@@ -172,7 +172,7 @@ void SedsToAsn1Translator::translateDataTypeSet(
 }
 
 void SedsToAsn1Translator::translateInterfaceDeclarations(
-        const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations, Context &context) const
+        const std::vector<::seds::model::InterfaceDeclaration> &interfaceDeclarations, Context &context) const
 {
     InterfaceTypeCreator typeCreator;
 
@@ -182,7 +182,7 @@ void SedsToAsn1Translator::translateInterfaceDeclarations(
 }
 
 void SedsToAsn1Translator::translateInterfaceImplementations(
-        const std::vector<seds::model::Interface> &interfaces, Context &context) const
+        const std::vector<::seds::model::Interface> &interfaces, Context &context) const
 {
     InterfaceTypeCreator typeCreator;
 
@@ -191,12 +191,12 @@ void SedsToAsn1Translator::translateInterfaceImplementations(
     }
 }
 
-std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
-        const seds::model::Package *package) const
+std::vector<const ::seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
+        const ::seds::model::Package *package) const
 {
     const auto extractPointer = [](const auto &dataType) { return &dataType; };
 
-    std::vector<const seds::model::DataType *> sedsDataTypes;
+    std::vector<const ::seds::model::DataType *> sedsDataTypes;
 
     std::transform(package->dataTypes().begin(), package->dataTypes().end(), std::back_inserter(sedsDataTypes),
             extractPointer);
@@ -204,12 +204,12 @@ std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataType
     return sedsDataTypes;
 }
 
-std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
-        const seds::model::Component &component) const
+std::vector<const ::seds::model::DataType *> SedsToAsn1Translator::collectDataTypes(
+        const ::seds::model::Component &component) const
 {
     const auto extractPointer = [](const auto &dataType) { return &dataType; };
 
-    std::vector<const seds::model::DataType *> sedsDataTypes;
+    std::vector<const ::seds::model::DataType *> sedsDataTypes;
 
     std::transform(component.dataTypes().begin(), component.dataTypes().end(), std::back_inserter(sedsDataTypes),
             extractPointer);
@@ -217,4 +217,4 @@ std::vector<const seds::model::DataType *> SedsToAsn1Translator::collectDataType
     return sedsDataTypes;
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds
