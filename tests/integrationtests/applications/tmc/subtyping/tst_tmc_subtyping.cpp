@@ -29,8 +29,8 @@ class tst_Tmc_Subtyping : public QObject
 
 private Q_SLOTS:
     void test_subtyping();
-    void test_ia5string();
-    void test_octetstring();
+    void test_ia5string_fixed_size();
+    void test_octetstring_fixed_size();
 };
 
 void tst_Tmc_Subtyping::test_subtyping()
@@ -39,15 +39,15 @@ void tst_Tmc_Subtyping::test_subtyping()
     QCOMPARE(result, 0);
 }
 
-void tst_Tmc_Subtyping::test_ia5string()
+void tst_Tmc_Subtyping::test_ia5string_fixed_size()
 {
-    const int result = system("./test_ia5string.sh");
+    const int result = system("./test_ia5string_fixed_size.sh");
     QCOMPARE(result, 0);
 }
 
-void tst_Tmc_Subtyping::test_octetstring()
+void tst_Tmc_Subtyping::test_octetstring_fixed_size()
 {
-    const int result = system("./test_octetstring.sh");
+    const int result = system("./test_octetstring_fixed_size.sh");
     QCOMPARE(result, 0);
 }
 

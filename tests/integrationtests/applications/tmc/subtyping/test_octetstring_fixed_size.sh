@@ -9,7 +9,7 @@ CC=gcc
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
-RESOURCES_DIR=resources/octetstring
+RESOURCES_DIR=resources/octetstring_fixed_size
 PROPERTIES_DIR=$RESOURCES_DIR/work/modelchecking/properties
 
 echo "Running TMC test: ${0##*/}"
