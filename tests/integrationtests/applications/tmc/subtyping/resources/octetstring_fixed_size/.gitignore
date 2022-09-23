@@ -13,10 +13,10 @@
 **/clk/**/*.md5
 **/clk/**/Makefile
 **/clk/**/*.pro
-**/thereceiver/**/*.ad*
-**/thereceiver/**/*.md5
-**/thereceiver/**/Makefile
-**/thereceiver/**/*.pro
+**/thething/**/*.ad*
+**/thething/**/*.md5
+**/thething/**/Makefile
+**/thething/**/*.pro
 **/modelchecking/**/*.adb
 **/modelchecking/**/*.ads
 work/**/GUI/src
