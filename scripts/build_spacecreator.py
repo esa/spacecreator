@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     if args.project_dir:
         project_dir = args.project_dir
-        print("Project dir is {}".format(project_dir))
+        print("build_spacecreator: Project dir is {}".format(project_dir))
     else:
         project_dir = default_project_dir
         print("Defaulting to project dir {}".format(project_dir))
@@ -114,11 +114,11 @@ if __name__ == '__main__':
     env_qt_dir = args.env_qt_dir
 
     print("build_spacecreator.py: project_dir is {}".format(project_dir))
-    print("build_spacecreator.py: build_dir".format(build_dir))
-    print("build_spacecreator.py: build_type".format(build_type))
-    print("build_spacecreator.py: env_dir".format(env_dir))
-    print("build_spacecreator.py: env_qt_dir".format(env_qt_dir))
-    print("build_spacecreator.py: build_asn1plugin".format(build_asn1plugin))
+    print("build_spacecreator.py: build_dir is {}".format(build_dir))
+    print("build_spacecreator.py: build_type is {}".format(build_type))
+    print("build_spacecreator.py: env_dir is {}".format(env_dir))
+    print("build_spacecreator.py: env_qt_dir is {}".format(env_qt_dir))
+    print("build_spacecreator.py: build_asn1plugin is {}".format(build_asn1plugin))
 
     check_cmake_version(3, 16, 0)
 
