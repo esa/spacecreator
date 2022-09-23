@@ -15,6 +15,7 @@ target_link_libraries(IvRegistrar
                 IV::XmlImporter
                 IV::XmlExporter
                 Conversion::SedsToIvTranslator
+                Conversion::SimulinkToIvTranslator
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(IvRegistrar)
