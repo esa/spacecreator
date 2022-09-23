@@ -43,15 +43,15 @@ int main(int argc, char *argv[])
     // get passed spin message
     const auto spinMessage = arguments.at(1);
     // build pattern for error matching
-    const QRegularExpression regex("^(.*)\\n");
-    const QRegularExpressionMatch match = regex.match(spinMessage);
-    // check for match success
-    if (!match.hasMatch()) {
-        qCritical("Unable to match spin error");
-        exit(EXIT_FAILURE);
+    const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)\\n");
+    auto globalMatch = regex.globalMatch(spinMessage);
+    while (globalMatch.hasNext()) {
+        const auto match = globalMatch.next();
+        // extract match tokens
+        const QString errorCode = match.captured(1);
+        const QString errorType = match.captured(2);
+        const QString errorDetails = match.captured(3);
+        const QString errorDepth = match.captured(4);
     }
-    // extract match tokens
-    const QString token = match.captured(1);
-
     return EXIT_SUCCESS;
 }
