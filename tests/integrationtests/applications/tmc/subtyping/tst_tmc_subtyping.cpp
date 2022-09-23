@@ -29,6 +29,7 @@ class tst_Tmc_Subtyping : public QObject
 
 private Q_SLOTS:
     void test_subtyping();
+    void test_sequenceof_fixed_size();
     void test_ia5string_fixed_size();
     void test_octetstring_fixed_size();
 };
@@ -36,6 +37,12 @@ private Q_SLOTS:
 void tst_Tmc_Subtyping::test_subtyping()
 {
     const int result = system("./test_subtyping.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping::test_sequenceof_fixed_size()
+{
+    const int result = system("./test_sequenceof_fixed_size.sh");
     QCOMPARE(result, 0);
 }
 
