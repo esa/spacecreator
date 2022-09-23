@@ -11,6 +11,11 @@ target_sources(Report
     PRIVATE    "${SOURCES}"
                "${INCLUDES}")
 
-#add_format_target(Report)
-#add_tidy_target(Report)
+target_link_libraries(Report
+    PUBLIC      ivcore
+                libiveditor
+    PRIVATE     CommonProjectWarnings)
+
+add_format_target(Report)
+add_tidy_target(Report)
 

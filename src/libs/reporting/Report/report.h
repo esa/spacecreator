@@ -17,8 +17,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#pragma once
+
+#include <QList>
+#include <QString>
+
 namespace reporting {
-class Report {
-    
+
+/**
+ * @brief   Structure to hold parsed spin report data.
+ */
+struct Report {
+    /** Spin error number, counted from 1 up */
+    int errorNumber;
+    /** Error depth reported by spin */
+    int errorDepth;
+    /** Error type reported by the message */
+    QString errorType;
+    /** Raw error details reported by the message */
+    QString errorDetails;
+    /** Name of the constraint violating variable */
+    QString violationVariableName;
+    /** Violated constraints */
+    QList<QString> constraints;
 };
+
 }

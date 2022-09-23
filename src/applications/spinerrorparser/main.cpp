@@ -20,17 +20,13 @@
 #include "scversion.h"
 
 #include <QCoreApplication>
-#include <QDebug>
 #include <QRegularExpression>
 #include <QString>
 #include <iostream>
+#include <reporting/Report/report.h>
 #include <string.h>
 
-struct SpinError {
-    int errorCode;
-    int errorDepth;
-    QString errorDetails;
-};
+using namespace reporting;
 
 int main(int argc, char *argv[])
 {
@@ -41,6 +37,7 @@ int main(int argc, char *argv[])
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
     const QStringList arguments = app.arguments();
+
     // check if spin message exists
     if (arguments.size() < 2) {
         qCritical("No spin message passed");
@@ -49,19 +46,21 @@ int main(int argc, char *argv[])
     // get passed spin message
     const auto spinMessage = arguments.at(1);
     // build pattern for error matching
-    const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\(at depth (\\d+)\\)\\n");
+    // error handling to be moved to the reporting lib
+    const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)\\n");
     // convert all matches to spin errors
-    QList <SpinError> spinErrors;
+    QList<Report> reports;
+
     auto globalMatch = regex.globalMatch(spinMessage);
     while (globalMatch.hasNext()) {
         const auto match = globalMatch.next();
-        // extract match tokens
-        int errorCode = match.captured(1).toInt();
-        int errorDepth = match.captured(3).toInt();
-        const QString errorDetails = match.captured(2);
-        // build error
-        SpinError spinError { errorCode, errorDepth, errorDetails };
-        spinErrors.append(spinError);
+        // build error from match tokens
+        Report report;
+        report.errorNumber = match.captured(1).toInt();
+        report.errorDepth = match.captured(4).toInt();
+        report.errorType = match.captured(2);
+        report.errorDetails = match.captured(3);
+        reports.append(report);
     }
     return EXIT_SUCCESS;
 }

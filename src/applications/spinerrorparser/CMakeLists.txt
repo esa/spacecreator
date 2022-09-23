@@ -12,8 +12,9 @@ target_include_directories(spinerrorparser
     PRIVATE    .
                ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(spinerrorparser
-    PRIVATE    Tmc::InterfaceViewOptimizer
-               CommonProjectWarnings)
+    PUBLIC      ivcore
+                libiveditor
+    PRIVATE     CommonProjectWarnings)
 
 add_format_target(spinerrorparser)
 
