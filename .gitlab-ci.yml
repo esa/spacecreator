@@ -91,7 +91,7 @@ space-creator-qt5:
       - ${BUILD_DIR}/asn1scc_bin
   artifacts:
     reports:
-      junit: build/tst_*-result.xml
+      junit: ${BUILD_DIR}/tst_*-result.xml
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
@@ -127,12 +127,12 @@ space-creator-qt6:
   cache:
     key: asn1scc
     paths:
-      - build/asn1scc_bin
+      - ${BUILD_DIR}/asn1scc_bin
   artifacts:
     reports:
-      junit: build/tst_*-result.xml
+      junit: ${BUILD_DIR}/tst_*-result.xml
     paths:
-      - package
+      - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
   rules:
      #- if: "$CI_COMMIT_BRANCH == 'master'"
