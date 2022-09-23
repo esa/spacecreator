@@ -27,7 +27,7 @@
 #include <seds/SedsModel/interfaces/commandargument.h>
 #include <seds/SedsModel/package/package.h>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Helper for InterfaceView translator
@@ -53,7 +53,7 @@ public:
      * @return  InterfaceView interface
      */
     static auto createIvInterface(const QString &name, ivm::IVInterface::InterfaceType type,
-            ivm::IVInterface::OperationKind kind, const seds::model::Description &sedsDescription,
+            ivm::IVInterface::OperationKind kind, const ::seds::model::Description &sedsDescription,
             ivm::IVFunction *ivFunction) -> ivm::IVInterface *;
     /**
      * @brief   Create InterfaceView parameter
@@ -109,9 +109,9 @@ public:
      *
      * @return  Found interface declarartion
      */
-    static auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
-            const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
-            const std::vector<seds::model::Package> &sedsPackages) -> const seds::model::InterfaceDeclaration &;
+    static auto findInterfaceDeclaration(const ::seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
+            const ::seds::model::Component &sedsComponent, const ::seds::model::Package *sedsPackage,
+            const std::vector<::seds::model::Package> &sedsPackages) -> const ::seds::model::InterfaceDeclaration &;
 
     /**
      * @brief   Switch interface type
@@ -138,4 +138,4 @@ private:
     inline static const QString m_setterInterfacePrefix = "Set";
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

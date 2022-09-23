@@ -24,15 +24,15 @@
 
 using conversion::translator::UndeclaredInterfaceException;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
-Context::Context(const seds::model::Package *package, const seds::model::Component *component)
+Context::Context(const ::seds::model::Package *package, const ::seds::model::Component *component)
     : m_package(package)
     , m_component(component)
 {
 }
 
-const seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
+const ::seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
         const QString &interfaceDeclarationName) const
 {
     if (m_component != nullptr) {
@@ -58,4 +58,4 @@ const seds::model::InterfaceDeclaration *Context::findInterfaceDeclaration(
     throw UndeclaredInterfaceException(interfaceDeclarationName);
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

@@ -27,7 +27,7 @@
 #include <ivcore/ivinterface.h>
 #include <seds/SedsModel/interfaces/interfaceparameter.h>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Translator from SEDS interface parameter to InterfaceView interface
@@ -79,20 +79,20 @@ public:
      * @param   sedsParameter   SEDS interface parameter
      * @param   interfaceType   Interface type that will be created
      */
-    auto translateParameter(const seds::model::InterfaceParameter &sedsParameter,
+    auto translateParameter(const ::seds::model::InterfaceParameter &sedsParameter,
             const ivm::IVInterface::InterfaceType interfaceType) -> void;
 
 private:
-    auto translateGetterParameter(const seds::model::InterfaceParameter &sedsParameter,
+    auto translateGetterParameter(const ::seds::model::InterfaceParameter &sedsParameter,
             const ivm::IVInterface::InterfaceType interfaceType) -> void;
-    auto translateSetterParameter(const seds::model::InterfaceParameter &sedsParameter,
+    auto translateSetterParameter(const ::seds::model::InterfaceParameter &sedsParameter,
             const ivm::IVInterface::InterfaceType interfaceType) -> void;
 
-    auto buildParameter(const seds::model::InterfaceParameter &sedsParameter,
+    auto buildParameter(const ::seds::model::InterfaceParameter &sedsParameter,
             InterfaceTranslatorHelper::InterfaceParameterType interfaceParameterType,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVInterface::OperationKind interfaceKind,
             shared::InterfaceParameter::Direction interfaceDirection) -> void;
-    auto handleParameterTypeName(const seds::model::InterfaceParameter &sedsParameter) const -> QString;
+    auto handleParameterTypeName(const ::seds::model::InterfaceParameter &sedsParameter) const -> QString;
 
 private:
     /// @brief  Output interface view function
@@ -106,4 +106,4 @@ private:
     inline static const QString m_ivInterfaceParameterName = "Param";
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

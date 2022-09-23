@@ -23,10 +23,10 @@
 #include <conversion/common/translation/exceptions.h>
 
 using conversion::UnhandledValueException;
-using conversion::asn1::translator::DataTypeTranslationHelper;
+using conversion::asn1::translator::seds::DataTypeTranslationHelper;
 using conversion::translator::TranslationException;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 InterfaceParameterTranslator::InterfaceParameterTranslator(
         ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper)
@@ -37,7 +37,7 @@ InterfaceParameterTranslator::InterfaceParameterTranslator(
 }
 
 void InterfaceParameterTranslator::translateParameter(
-        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
+        const ::seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
 {
     translateGetterParameter(sedsParameter, interfaceType);
 
@@ -47,14 +47,14 @@ void InterfaceParameterTranslator::translateParameter(
 }
 
 void InterfaceParameterTranslator::translateGetterParameter(
-        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
+        const ::seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
 {
     switch (sedsParameter.mode()) {
-    case seds::model::InterfaceParameterMode::Sync: {
+    case ::seds::model::InterfaceParameterMode::Sync: {
         buildParameter(sedsParameter, InterfaceTranslatorHelper::InterfaceParameterType::Getter, interfaceType,
                 ivm::IVInterface::OperationKind::Protected, shared::InterfaceParameter::Direction::OUT);
     } break;
-    case seds::model::InterfaceParameterMode::Async: {
+    case ::seds::model::InterfaceParameterMode::Async: {
         buildParameter(sedsParameter, InterfaceTranslatorHelper::InterfaceParameterType::Getter,
                 InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
                 ivm::IVInterface::OperationKind::Sporadic, shared::InterfaceParameter::Direction::IN);
@@ -66,14 +66,14 @@ void InterfaceParameterTranslator::translateGetterParameter(
 }
 
 void InterfaceParameterTranslator::translateSetterParameter(
-        const seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
+        const ::seds::model::InterfaceParameter &sedsParameter, const ivm::IVInterface::InterfaceType interfaceType)
 {
     switch (sedsParameter.mode()) {
-    case seds::model::InterfaceParameterMode::Sync: {
+    case ::seds::model::InterfaceParameterMode::Sync: {
         buildParameter(sedsParameter, InterfaceTranslatorHelper::InterfaceParameterType::Setter, interfaceType,
                 ivm::IVInterface::OperationKind::Protected, shared::InterfaceParameter::Direction::IN);
     } break;
-    case seds::model::InterfaceParameterMode::Async: {
+    case ::seds::model::InterfaceParameterMode::Async: {
         buildParameter(sedsParameter, InterfaceTranslatorHelper::InterfaceParameterType::Setter, interfaceType,
                 ivm::IVInterface::OperationKind::Sporadic, shared::InterfaceParameter::Direction::IN);
     } break;
@@ -83,7 +83,7 @@ void InterfaceParameterTranslator::translateSetterParameter(
     }
 }
 
-void InterfaceParameterTranslator::buildParameter(const seds::model::InterfaceParameter &sedsParameter,
+void InterfaceParameterTranslator::buildParameter(const ::seds::model::InterfaceParameter &sedsParameter,
         InterfaceTranslatorHelper::InterfaceParameterType interfaceParameterType,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVInterface::OperationKind interfaceKind,
         shared::InterfaceParameter::Direction interfaceDirection)
@@ -103,7 +103,7 @@ void InterfaceParameterTranslator::buildParameter(const seds::model::InterfacePa
 }
 
 QString InterfaceParameterTranslator::handleParameterTypeName(
-        const seds::model::InterfaceParameter &sedsParameter) const
+        const ::seds::model::InterfaceParameter &sedsParameter) const
 {
     const auto &parameterTypeRef = sedsParameter.type();
     const auto &parameterDimensions = sedsParameter.arrayDimensions();
@@ -111,4 +111,4 @@ QString InterfaceParameterTranslator::handleParameterTypeName(
     return m_typeNameHelper.handleTypeName(parameterTypeRef, parameterDimensions);
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

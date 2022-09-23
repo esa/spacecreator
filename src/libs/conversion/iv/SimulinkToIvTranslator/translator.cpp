@@ -39,7 +39,7 @@ using ivm::IVPropertyTemplateConfig;
 using ivm::meta::Props;
 using simulink::model::SimulinkModel;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::simulink {
 
 // clang-format off
 const QStringList SimulinkToIvTranslator::m_supportedIVFunctionImplementations = 
@@ -158,4 +158,4 @@ IVInterface *SimulinkToIvTranslator::createIVInterface(const QString &interfaceN
     return IVInterface::createIface(creationInfo);
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::simulink

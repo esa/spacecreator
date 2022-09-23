@@ -36,10 +36,10 @@ using conversion::Escaper;
 using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 ComponentsTranslator::ComponentsTranslator(
-        const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages)
+        const ::seds::model::Package *sedsPackage, const std::vector<::seds::model::Package> &sedsPackages)
     : m_sedsPackage(sedsPackage)
     , m_sedsPackages(sedsPackages)
 {
@@ -57,7 +57,7 @@ QVector<ivm::IVFunction *> ComponentsTranslator::translateComponents()
     return ivComponents;
 }
 
-ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Component &sedsComponent)
+ivm::IVFunction *ComponentsTranslator::translateComponent(const ::seds::model::Component &sedsComponent)
 {
     auto *ivFunction = new ivm::IVFunction();
     ivFunction->setEntityAttribute(
@@ -76,8 +76,8 @@ ivm::IVFunction *ComponentsTranslator::translateComponent(const seds::model::Com
     return ivFunction;
 }
 
-void ComponentsTranslator::translateInterface(const seds::model::Interface &sedsInterface,
-        const seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
+void ComponentsTranslator::translateInterface(const ::seds::model::Interface &sedsInterface,
+        const ::seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
         ivm::IVFunction *ivFunction)
 {
     const auto &sedsInterfaceName = sedsInterface.nameStr();
@@ -99,8 +99,8 @@ void ComponentsTranslator::translateInterface(const seds::model::Interface &seds
 }
 
 void ComponentsTranslator::translateInterfaceDeclaration(
-        const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration, const QString &sedsInterfaceName,
-        const seds::model::Component &sedsComponent, const QString &parentName,
+        const ::seds::model::InterfaceDeclaration *sedsInterfaceDeclaration, const QString &sedsInterfaceName,
+        const ::seds::model::Component &sedsComponent, const QString &parentName,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction, Context context) const
 {
     for (const auto &sedsBaseInterface : sedsInterfaceDeclaration->baseInterfaces()) {
@@ -132,7 +132,7 @@ void ComponentsTranslator::translateInterfaceDeclaration(
 }
 
 void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
-        const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+        const ::seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
         const InterfaceTypeNameHelper &typeNameHelper) const
 {
@@ -144,7 +144,7 @@ void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
 }
 
 void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
-        const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+        const ::seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
         const InterfaceTypeNameHelper &typeNameHelper) const
 {
@@ -153,10 +153,10 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
 
     for (const auto &sedsCommand : sedsInterfaceDeclaration->commands()) {
         switch (sedsCommand.mode()) {
-        case seds::model::InterfaceCommandMode::Sync:
+        case ::seds::model::InterfaceCommandMode::Sync:
             syncCommandTranslator.translateCommand(sedsCommand, interfaceType);
             break;
-        case seds::model::InterfaceCommandMode::Async:
+        case ::seds::model::InterfaceCommandMode::Async:
             asyncCommandTranslator.translateCommand(sedsCommand, interfaceType);
             break;
         default:
@@ -166,4 +166,4 @@ void ComponentsTranslator::translateCommands(const QString &sedsInterfaceName,
     }
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

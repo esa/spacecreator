@@ -19,9 +19,9 @@
 
 #include "specialized/descriptiontranslator.h"
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
-void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ivm::IVFunction *ivFunction)
+void DescriptionTranslator::translate(const ::seds::model::Description &sedsDescription, ivm::IVFunction *ivFunction)
 {
     auto description = combineDescriptions(sedsDescription);
 
@@ -31,7 +31,7 @@ void DescriptionTranslator::translate(const seds::model::Description &sedsDescri
     }
 }
 
-void DescriptionTranslator::translate(const seds::model::Description &sedsDescription, ivm::IVInterface *ivInterface)
+void DescriptionTranslator::translate(const ::seds::model::Description &sedsDescription, ivm::IVInterface *ivInterface)
 {
     auto description = combineDescriptions(sedsDescription);
 
@@ -41,7 +41,7 @@ void DescriptionTranslator::translate(const seds::model::Description &sedsDescri
     }
 }
 
-QString DescriptionTranslator::combineDescriptions(const seds::model::Description &sedsDescription)
+QString DescriptionTranslator::combineDescriptions(const ::seds::model::Description &sedsDescription)
 {
     auto description = sedsDescription.shortDescription().value_or("");
 
@@ -58,4 +58,4 @@ QString DescriptionTranslator::combineDescriptions(const seds::model::Descriptio
     return description.toHtmlEscaped();
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

@@ -31,7 +31,7 @@
 #include <shared/qstringhash.h>
 #include <unordered_map>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Translator from SEDS async interface command to InterfaceView interface
@@ -75,11 +75,11 @@ public:
      * @param   interfaceType   Interface type that will be created
      */
     auto translateCommand(
-            const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType) -> void;
+            const ::seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType) -> void;
 
 private:
-    auto translateArguments(const seds::model::InterfaceCommand &sedsCommand,
-            const seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
+    auto translateArguments(const ::seds::model::InterfaceCommand &sedsCommand,
+            const ::seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
 
 private:
     /// @brief  Output interface view function
@@ -93,4 +93,4 @@ private:
     inline static const QString m_ivInterfaceParameterName = "InputParam";
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

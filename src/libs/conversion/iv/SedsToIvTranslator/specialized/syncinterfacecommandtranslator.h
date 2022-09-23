@@ -29,7 +29,7 @@
 #include <seds/SedsModel/interfaces/interfacecommand.h>
 #include <seds/SedsModel/package/package.h>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Translator from SEDS async interface command to InterfaceView interface
@@ -73,12 +73,12 @@ public:
      * @param   interfaceType   Interface type that will be created
      */
     auto translateCommand(
-            const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType) -> void;
+            const ::seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType) -> void;
 
 private:
     auto translateArguments(
-            const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
-    auto handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const -> QString;
+            const std::vector<::seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface) -> void;
+    auto handleArgumentTypeName(const ::seds::model::CommandArgument &sedsArgument) const -> QString;
 
 private:
     /// @brief  Output interface view function
@@ -89,4 +89,4 @@ private:
     const InterfaceTypeNameHelper &m_typeNameHelper;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

@@ -34,11 +34,11 @@ using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &name,
         ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind,
-        const seds::model::Description &sedsDescription, ivm::IVFunction *m_ivFunction)
+        const ::seds::model::Description &sedsDescription, ivm::IVFunction *m_ivFunction)
 {
     ivm::IVInterface::CreationInfo creationInfo;
     creationInfo.name = name;
@@ -88,10 +88,10 @@ QString InterfaceTranslatorHelper::buildCommandInterfaceName(
             m_ivCommandInterfaceNameTemplate.arg(sedsInterfaceName).arg(commandName).arg(interfaceTypeToString(type)));
 }
 
-const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfaceDeclaration(
-        const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
-        const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
-        const std::vector<seds::model::Package> &sedsPackages)
+const ::seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfaceDeclaration(
+        const ::seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
+        const ::seds::model::Component &sedsComponent, const ::seds::model::Package *sedsPackage,
+        const std::vector<::seds::model::Package> &sedsPackages)
 {
     const auto &name = interfaceDeclarationRef.nameStr();
 
@@ -102,7 +102,7 @@ const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfac
         const auto &sedsPackageInterfaceDeclarations = otherSedsPackage->declaredInterfaces();
         const auto found =
                 std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
-                        [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                        [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
                             return interfaceDeclaration.nameStr() == name;
                         });
         if (found != sedsPackageInterfaceDeclarations.end()) {
@@ -111,7 +111,7 @@ const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfac
     } else {
         const auto &sedsComponentInterfaceDeclarations = sedsComponent.declaredInterfaces();
         auto found = std::find_if(sedsComponentInterfaceDeclarations.begin(), sedsComponentInterfaceDeclarations.end(),
-                [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
                     return interfaceDeclaration.nameStr() == name;
                 });
         if (found != sedsComponentInterfaceDeclarations.end()) {
@@ -120,7 +120,7 @@ const seds::model::InterfaceDeclaration &InterfaceTranslatorHelper::findInterfac
 
         const auto &sedsPackageInterfaceDeclarations = sedsPackage->declaredInterfaces();
         found = std::find_if(sedsPackageInterfaceDeclarations.begin(), sedsPackageInterfaceDeclarations.end(),
-                [&name](const seds::model::InterfaceDeclaration &interfaceDeclaration) {
+                [&name](const ::seds::model::InterfaceDeclaration &interfaceDeclaration) {
                     return interfaceDeclaration.nameStr() == name;
                 });
         if (found != sedsPackageInterfaceDeclarations.end()) {
@@ -166,4 +166,4 @@ const QString &InterfaceTranslatorHelper::interfaceTypeToString(ivm::IVInterface
     }
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

@@ -23,7 +23,7 @@
 #include <ivcore/ivinterface.h>
 #include <seds/SedsModel/base/description.h>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Translator for SEDS short and long descriptions
@@ -43,17 +43,17 @@ public:
      * @param   sedsDescription     Description to translate
      * @param   ivFunction          Function that should contain the comment
      */
-    static auto translate(const seds::model::Description &sedsDescription, ivm::IVFunction *ivFunction) -> void;
+    static auto translate(const ::seds::model::Description &sedsDescription, ivm::IVFunction *ivFunction) -> void;
     /**
      * @brief   Translate SEDS description to IV interface comment
      *
      * @param   sedsDescription     Description to translate
      * @param   ivFunction          Interface that should contain the comment
      */
-    static auto translate(const seds::model::Description &sedsDescription, ivm::IVInterface *ivInterface) -> void;
+    static auto translate(const ::seds::model::Description &sedsDescription, ivm::IVInterface *ivInterface) -> void;
 
 private:
-    static auto combineDescriptions(const seds::model::Description &sedsDescription) -> QString;
+    static auto combineDescriptions(const ::seds::model::Description &sedsDescription) -> QString;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

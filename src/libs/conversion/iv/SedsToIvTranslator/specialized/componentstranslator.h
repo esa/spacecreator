@@ -43,7 +43,7 @@ class InterfaceDeclaration;
 class Package;
 } // namespace seds::model
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Translator from SEDS components to InterfaceView functions
@@ -58,7 +58,7 @@ public:
      * @param   sedsPackages        List of SEDS packages
      */
     ComponentsTranslator(
-            const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
+            const ::seds::model::Package *sedsPackage, const std::vector<::seds::model::Package> &sedsPackages);
     /**
      * @brief   Deleted copy constructor
      */
@@ -92,7 +92,7 @@ private:
      *
      * @return  Result InterfaceView function
      */
-    auto translateComponent(const seds::model::Component &sedsComponent) -> ivm::IVFunction *;
+    auto translateComponent(const ::seds::model::Component &sedsComponent) -> ivm::IVFunction *;
 
     /**
      * @brief   Translates SEDS interface to InterfaceView interface
@@ -102,26 +102,27 @@ private:
      * @param   interfaceType       Type of the IV interface
      * @param   ivFunction          IV Function where the result should be added
      */
-    auto translateInterface(const seds::model::Interface &sedsInterface, const seds::model::Component &sedsComponent,
-            const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction) -> void;
-    auto translateInterfaceDeclaration(const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
-            const QString &sedsInterfaceName, const seds::model::Component &sedsComponent, const QString &parentName,
+    auto translateInterface(const ::seds::model::Interface &sedsInterface,
+            const ::seds::model::Component &sedsComponent, const ivm::IVInterface::InterfaceType interfaceType,
+            ivm::IVFunction *ivFunction) -> void;
+    auto translateInterfaceDeclaration(const ::seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+            const QString &sedsInterfaceName, const ::seds::model::Component &sedsComponent, const QString &parentName,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction, Context context) const
             -> void;
     auto translateParameters(const QString &sedsInterfaceName,
-            const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+            const ::seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
             const InterfaceTypeNameHelper &typeNameHelper) const -> void;
     auto translateCommands(const QString &sedsInterfaceName,
-            const seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
+            const ::seds::model::InterfaceDeclaration *sedsInterfaceDeclaration,
             const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
             const InterfaceTypeNameHelper &typeNameHelper) const -> void;
 
 private:
     /// @brief  Parent package
-    const seds::model::Package *m_sedsPackage;
+    const ::seds::model::Package *m_sedsPackage;
     /// @brief  List of SEDS packages
-    const std::vector<seds::model::Package> &m_sedsPackages;
+    const std::vector<::seds::model::Package> &m_sedsPackages;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

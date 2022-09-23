@@ -26,10 +26,10 @@
 #include <conversion/common/translation/exceptions.h>
 #include <shared/parameter.h>
 
-using conversion::asn1::translator::DataTypeTranslationHelper;
+using conversion::asn1::translator::seds::DataTypeTranslationHelper;
 using conversion::translator::TranslationException;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
         ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper)
@@ -40,25 +40,25 @@ SyncInterfaceCommandTranslator::SyncInterfaceCommandTranslator(
 }
 
 void SyncInterfaceCommandTranslator::translateCommand(
-        const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType)
+        const ::seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType)
 {
     const auto interfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
             m_sedsInterfaceName, sedsCommand.nameStr(), interfaceType);
 
     switch (sedsCommand.argumentsCombination()) {
-    case seds::model::ArgumentsCombination::NoArgs:
-    case seds::model::ArgumentsCombination::InOnly:
-    case seds::model::ArgumentsCombination::OutOnly:
-    case seds::model::ArgumentsCombination::InAndOut: {
+    case ::seds::model::ArgumentsCombination::NoArgs:
+    case ::seds::model::ArgumentsCombination::InOnly:
+    case ::seds::model::ArgumentsCombination::OutOnly:
+    case ::seds::model::ArgumentsCombination::InAndOut: {
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
                 interfaceName, interfaceType, ivm::IVInterface::OperationKind::Protected, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand.arguments(), ivInterface);
         m_ivFunction->addChild(ivInterface);
     } break;
-    case seds::model::ArgumentsCombination::NotifyOnly:
-    case seds::model::ArgumentsCombination::InAndNotify:
-    case seds::model::ArgumentsCombination::OutAndNotify:
-    case seds::model::ArgumentsCombination::All: {
+    case ::seds::model::ArgumentsCombination::NotifyOnly:
+    case ::seds::model::ArgumentsCombination::InAndNotify:
+    case ::seds::model::ArgumentsCombination::OutAndNotify:
+    case ::seds::model::ArgumentsCombination::All: {
         const auto message = QString(
                 "Interface command arguments combination '%1' is not supported for TASTE InterfaceView sync interface")
                                      .arg(argumentsCombinationToString(sedsCommand.argumentsCombination()));
@@ -71,23 +71,23 @@ void SyncInterfaceCommandTranslator::translateCommand(
 }
 
 void SyncInterfaceCommandTranslator::translateArguments(
-        const std::vector<seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface)
+        const std::vector<::seds::model::CommandArgument> &sedsArguments, ivm::IVInterface *ivInterface)
 {
     for (const auto &sedsArgument : sedsArguments) {
         const auto sedsArgumentTypeName = handleArgumentTypeName(sedsArgument);
 
         switch (sedsArgument.mode()) {
-        case seds::model::CommandArgumentMode::In: {
+        case ::seds::model::CommandArgumentMode::In: {
             const auto ivParameter = InterfaceTranslatorHelper::createInterfaceParameter(
                     sedsArgument.nameStr(), sedsArgumentTypeName, shared::InterfaceParameter::Direction::IN);
             ivInterface->addParam(ivParameter);
         } break;
-        case seds::model::CommandArgumentMode::Out: {
+        case ::seds::model::CommandArgumentMode::Out: {
             const auto ivParameter = InterfaceTranslatorHelper::createInterfaceParameter(
                     sedsArgument.nameStr(), sedsArgumentTypeName, shared::InterfaceParameter::Direction::OUT);
             ivInterface->addParam(ivParameter);
         } break;
-        case seds::model::CommandArgumentMode::InOut: {
+        case ::seds::model::CommandArgumentMode::InOut: {
             const auto ivParameterIn =
                     InterfaceTranslatorHelper::createInterfaceParameter(QString("%1_In").arg(sedsArgument.nameStr()),
                             sedsArgumentTypeName, shared::InterfaceParameter::Direction::IN);
@@ -97,14 +97,14 @@ void SyncInterfaceCommandTranslator::translateArguments(
                             sedsArgumentTypeName, shared::InterfaceParameter::Direction::OUT);
             ivInterface->addParam(ivParameterOut);
         } break;
-        case seds::model::CommandArgumentMode::Notify:
+        case ::seds::model::CommandArgumentMode::Notify:
             throw UnsupportedValueException("CommandArgumentMode", "Notify");
             break;
         }
     }
 }
 
-QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model::CommandArgument &sedsArgument) const
+QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const ::seds::model::CommandArgument &sedsArgument) const
 {
     const auto &argumentTypeRef = sedsArgument.type();
     const auto &argumentDimensions = sedsArgument.arrayDimensions();
@@ -112,4 +112,4 @@ QString SyncInterfaceCommandTranslator::handleArgumentTypeName(const seds::model
     return m_typeNameHelper.handleTypeName(argumentTypeRef, argumentDimensions);
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

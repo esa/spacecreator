@@ -36,13 +36,13 @@
 
 using Asn1Acn::Asn1Model;
 using conversion::Escaper;
-using conversion::asn1::translator::SedsToAsn1Translator;
+using conversion::asn1::translator::seds::SedsToAsn1Translator;
 using conversion::iv::IvOptions;
 using conversion::translator::TranslationException;
 using ivm::IVModel;
 using seds::model::SedsModel;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
@@ -94,11 +94,11 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
     auto ivModel = std::make_unique<IVModel>(ivConfig);
 
     const auto &sedsModelData = sedsModel->data();
-    if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
-        const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
+    if (std::holds_alternative<::seds::model::PackageFile>(sedsModelData)) {
+        const auto &sedsPackage = std::get<::seds::model::PackageFile>(sedsModelData).package();
         translatePackage(sedsPackage, ivModel.get(), {}, generateFunctionsForPackages);
-    } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
-        const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
+    } else if (std::holds_alternative<::seds::model::DataSheet>(sedsModelData)) {
+        const auto &sedsPackages = std::get<::seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &sedsPackage : sedsPackages) {
             translatePackage(sedsPackage, ivModel.get(), sedsPackages, generateFunctionsForPackages);
         }
@@ -112,8 +112,8 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
     return resultModels;
 }
 
-void SedsToIvTranslator::translatePackage(const seds::model::Package &sedsPackage, IVModel *ivModel,
-        const std::vector<seds::model::Package> &sedsPackages, bool generateFunction) const
+void SedsToIvTranslator::translatePackage(const ::seds::model::Package &sedsPackage, IVModel *ivModel,
+        const std::vector<::seds::model::Package> &sedsPackages, bool generateFunction) const
 {
     ComponentsTranslator componentsTranslator(&sedsPackage, sedsPackages);
     auto ivFunctions = componentsTranslator.translateComponents();
@@ -134,8 +134,8 @@ void SedsToIvTranslator::translatePackage(const seds::model::Package &sedsPackag
     }
 }
 
-const seds::model::Package *SedsToIvTranslator::getSedsPackage(
-        const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
+const ::seds::model::Package *SedsToIvTranslator::getSedsPackage(
+        const QString &packageName, const std::vector<::seds::model::Package> &sedsPackages)
 {
     const auto sedsPackage = std::find_if(sedsPackages.begin(), sedsPackages.end(),
             [&](const auto &package) { return package.nameStr() == packageName; });
@@ -147,4 +147,4 @@ const seds::model::Package *SedsToIvTranslator::getSedsPackage(
     return &(*sedsPackage);
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds
