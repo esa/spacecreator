@@ -107,23 +107,17 @@ if __name__ == '__main__':
     root_dir = join_dir(script_dir, '..', '..')
 
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='create_appimage.py',
-                                     epilog='python3 ./scripts/create_appimage.py '
-                                            '--project_dir /home/<user>/projects/spacecreator/ '
-                                            '--build_dir /home/<user>/projects/spacecreator/build '
-                                            '--env_dir /home/<user>/opt/spacecreatorenv6 '
-                                            '--env_qt_dir /home/<user>/opt/qtcreatorenv/Qt/6.3.1/gcc_64/ '
-                                            '--project_version 1.2.3')
+    parser = argparse.ArgumentParser(prog='create_appimage.py')
 
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
                         help='Path to the folder where spacecreator project is')
-    parser.add_argument('--build_dir', dest='build_dir', type=str, required=False,
+    parser.add_argument('--build_dir', dest='build_dir', type=str, required=True,
                         help='Path to the folder where spacecreator was build')
     parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
                         help='Path to the folder that contains the build environment')
     parser.add_argument('--env_qt_dir', dest='env_qt_dir', type=str, required=True,
                         help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
-    parser.add_argument('--project_version', dest='version', type=str, required=True,
+    parser.add_argument('--project_version', dest='version', type=str, required=False,
                         help='Version number of spacecreator in the format X.Y.Z')
     parser.add_argument('--output_dir', dest='output_dir', type=str, required=False,
                         help='Path to the folder where the')
@@ -136,12 +130,7 @@ if __name__ == '__main__':
         project_dir = default_project_dir
         print("Defaulting to project dir {}".format(project_dir))
 
-    if args.build_dir:
-        build_dir = args.build_dir
-        print("build dir is {}".format(build_dir))
-    else:
-        build_dir = join_dir(project_dir, 'build')
-        print("Defaulting to build dir {}".format(build_dir))
+    build_dir = args.build_dir
 
     if args.version:
         version = args.version
