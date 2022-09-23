@@ -149,7 +149,7 @@ private:
 private:
     QString constructTypeName(QString name);
     void addSimpleValueAssignmentInline(const QString &typeName);
-    void addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent);
+    void addSimpleArrayAssignInlineValue(const QString &typeName, std::size_t length, bool isConst);
     void addAssignValueInline(const QString &typeName, model::Sequence sequence);
 
     void addSimpleValueInitializationInline(const QString &typeName, model::InlineCall::Argument initValue);
@@ -167,7 +167,9 @@ private:
     QString buildCheckArgumentName(const QString &typeName, const QString &postfix) const;
 
     model::ForLoop createSequenceOfDataLoop(const QString &utypeName, const model::Expression loopRangeEnd) const;
-    model::ForLoop createSequenceOfZeroingLoop(const QString &utypeName, const std::size_t loopRangeEnd) const;
+    model::ForLoop createStringDataLoop(const model::Expression loopRangeEnd) const;
+    model::ForLoop createSequenceOfInitLoop(const QString &utypeName, const std::size_t loopRangeEnd) const;
+    model::ForLoop createStringInitLoop(const std::size_t loopRangeEnd) const;
 
 private:
     model::PromelaModel &m_promelaModel;

@@ -50,6 +50,7 @@
 #include <promela/PromelaModel/binaryexpression.h>
 #include <promela/PromelaModel/conditional.h>
 #include <promela/PromelaModel/constant.h>
+#include <promela/PromelaModel/forloop.h>
 #include <promela/PromelaModel/inlinecall.h>
 #include <promela/PromelaModel/inlinedef.h>
 #include <promela/PromelaModel/proctypeelement.h>
@@ -84,6 +85,7 @@ using promela::model::Constant;
 using promela::model::DoLoop;
 using promela::model::ExitLoop;
 using promela::model::Expression;
+using promela::model::ForLoop;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::ProctypeElement;
@@ -201,29 +203,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
             throw TranslationException(std::move(errorMessage));
         }
 
-        overridenOctetString->constraints().accept(constraintVisitor);
-        const size_t overridenMinSize = constraintVisitor.getMinSize();
-        const size_t overridenMaxSize = constraintVisitor.getMaxSize();
-
-        if (minSize < overridenMinSize) {
-            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
-            throw TranslationException(std::move(errorMessage));
-        } else if (maxSize > overridenMaxSize) {
-            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
-            throw TranslationException(std::move(errorMessage));
-        }
-
-        if (isConstSize) {
-            auto initCall = ProctypeMaker::makeCallForEachValue(
-                    "OctetStringElement_init_value", argumentName, Expression(maxSize), Expression(overridenMaxSize - 1));
-            sequence->appendElement(std::move(initCall));
-        } else {
-            Expression start = InlineDefAdder::getValueLengthAsExpression(argumentName);
-
-            auto initCall = ProctypeMaker::makeCallForEachValue(
-                    "OctetStringElement_init_value", argumentName, start, Expression(overridenMaxSize - 1));
-            sequence->appendElement(std::move(initCall));
-        }
+        handleOverridenType(overridenOctetString->constraints(), "", argumentName, minSize, maxSize, sequence.get());
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -286,29 +266,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
             throw TranslationException(std::move(errorMessage));
         }
 
-        overridenIA5String->constraints().accept(constraintVisitor);
-        const size_t overridenMinSize = constraintVisitor.getMinSize();
-        const size_t overridenMaxSize = constraintVisitor.getMaxSize();
-
-        if (minSize < overridenMinSize) {
-            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
-            throw TranslationException(std::move(errorMessage));
-        } else if (maxSize > overridenMaxSize) {
-            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
-            throw TranslationException(std::move(errorMessage));
-        }
-
-        if (isConstSize) {
-            auto initCall = ProctypeMaker::makeCallForEachValue(
-                    "IA5StringElement_init_value", argumentName, Expression(maxSize), Expression(overridenMaxSize - 1));
-            sequence->appendElement(std::move(initCall));
-        } else {
-            Expression start = InlineDefAdder::getValueLengthAsExpression(argumentName);
-
-            auto initCall = ProctypeMaker::makeCallForEachValue(
-                    "IA5StringElement_init_value", argumentName, start, Expression(overridenMaxSize - 1));
-            sequence->appendElement(std::move(initCall));
-        }
+        handleOverridenType(overridenIA5String->constraints(), "", argumentName, minSize, maxSize, sequence.get());
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -481,31 +439,9 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
             throw TranslationException(std::move(errorMessage));
         }
 
-        overridenSequenceOf->constraints().accept(constraintVisitor);
-        const size_t overridenMinSize = constraintVisitor.getMinSize();
-        const size_t overridenMaxSize = constraintVisitor.getMaxSize();
-
-        if (minSize < overridenMinSize) {
-            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
-            throw TranslationException(std::move(errorMessage));
-        } else if (maxSize > overridenMaxSize) {
-            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
-            throw TranslationException(std::move(errorMessage));
-        }
-
         const auto initCallName = QString("%1_elem_init_value").arg(m_overridenType->identifier());
-
-        if(isConstSize) {
-            auto initCall = ProctypeMaker::makeCallForEachValue(
-                    initCallName, valueVariableName, Expression(maxSize), Expression(overridenMaxSize - 1));
-            sequence->appendElement(std::move(initCall));
-        } else {
-            Expression start = InlineDefAdder::getValueLengthAsExpression(valueVariableName);
-
-            auto initCall = ProctypeMaker::makeCallForEachValue(
-                    initCallName, valueVariableName, start, Expression(overridenMaxSize - 1));
-            sequence->appendElement(std::move(initCall));
-        }
+        handleOverridenType(
+                overridenSequenceOf->constraints(), initCallName, valueVariableName, minSize, maxSize, sequence.get());
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -719,7 +655,6 @@ void Asn1TypeValueGeneratorVisitor::InlineDefAdder::addRangedIntegerGeneratorToM
     lengthType.accept(lenVisitor);
 }
 
-
 Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLengthAsExpression(const QString &valueVariableName)
 {
     const VariableRef varRef(QString("%1.%2").arg(valueVariableName).arg(lengthMemberName));
@@ -740,6 +675,56 @@ Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLengthMinusCon
             subtractOperator, std::move(endVarRefExpression), std::move(oneConstExpression));
 
     return Expression(endBinaryExpression);
+}
+
+template<typename ValueType>
+void Asn1TypeValueGeneratorVisitor::handleOverridenType(
+        const Asn1Acn::Constraints::ConstraintList<ValueType> &constraints, const QString &initInlineName,
+        const QString &valueName, const size_t minSize, const size_t maxSize, model::Sequence *sequence) const
+{
+    SizeConstraintVisitor<ValueType> constraintVisitor;
+    constraints.accept(constraintVisitor);
+
+    const size_t overridenMinSize = constraintVisitor.getMinSize();
+    const size_t overridenMaxSize = constraintVisitor.getMaxSize();
+
+    const auto isConstSize = minSize == maxSize;
+    const auto isOverridenConstSize = overridenMinSize == overridenMaxSize;
+
+    // We allow to subtype one const size with another const size
+    if (!isConstSize && !isOverridenConstSize) {
+        if (minSize < overridenMinSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
+            throw TranslationException(std::move(errorMessage));
+        } else if (maxSize > overridenMaxSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
+            throw TranslationException(std::move(errorMessage));
+        }
+    }
+
+    if (isConstSize) {
+        auto initCall = ProctypeMaker::makeCallForEachValue(
+                initInlineName, valueName, Expression(maxSize), Expression(overridenMaxSize - 1));
+        sequence->appendElement(std::move(initCall));
+    } else {
+        Expression start = InlineDefAdder::getValueLengthAsExpression(valueName);
+
+        if (initInlineName.isEmpty()) {
+            auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+            VariableRef dst("dst");
+            dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+
+            loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
+
+            auto forLoop = ForLoop(VariableRef("i"), start, Expression(overridenMaxSize - 1), std::move(loopSequence));
+            sequence->appendElement(std::move(forLoop));
+        } else {
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    initInlineName, valueName, start, Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        }
+    }
 }
 
 } // namespace promela::translator

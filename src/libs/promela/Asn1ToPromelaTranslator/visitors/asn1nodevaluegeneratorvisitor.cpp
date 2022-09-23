@@ -25,8 +25,8 @@
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
 #include <conversion/common/translation/exceptions.h>
-#include <ivcore/ivfunction.h>
 #include <iostream>
+#include <ivcore/ivfunction.h>
 
 using Asn1Acn::Asn1Model;
 using Asn1Acn::Definitions;
@@ -120,23 +120,35 @@ const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(const QString &subt
 
     const auto &ivFunctionName = splittedSubtypeName.at(0);
     const auto ivFunction = m_ivModel->getFunction(ivFunctionName, Qt::CaseInsensitive);
-    if(ivFunction == nullptr) {
-        auto errorMessage = QString("Unable to find function %1 from subtype name %2").arg(ivFunctionName).arg(subtypeName);
+    if (ivFunction == nullptr) {
+        auto errorMessage =
+                QString("Unable to find function %1 from subtype name %2").arg(ivFunctionName).arg(subtypeName);
         throw TranslationException(std::move(errorMessage));
     }
 
     const auto &ivInterfaceName = splittedSubtypeName.at(1);
-    const auto ivInterface = m_ivModel->getIfaceByName(ivInterfaceName, IVInterface::InterfaceType::Required, ivFunction, Qt::CaseInsensitive);
-    if(ivInterface == nullptr) {
-        auto errorMessage = QString("Unable to find required interface %1 in function %2 from subtype name %3").arg(ivInterfaceName).arg(ivFunctionName).arg(subtypeName);
+    const auto ivInterface = m_ivModel->getIfaceByName(
+            ivInterfaceName, IVInterface::InterfaceType::Required, ivFunction, Qt::CaseInsensitive);
+    if (ivInterface == nullptr) {
+        auto errorMessage = QString("Unable to find required interface %1 in function %2 from subtype name %3")
+                                    .arg(ivInterfaceName)
+                                    .arg(ivFunctionName)
+                                    .arg(subtypeName);
         throw TranslationException(std::move(errorMessage));
     }
     const auto ivParameters = ivInterface->params();
 
     const auto &ivParameterName = splittedSubtypeName.at(2);
-    const auto foundIvParameter = std::find_if(ivParameters.begin(), ivParameters.end(), [&](const auto &parameter) { return QString::compare(parameter.name(), ivParameterName, Qt::CaseInsensitive) == 0; });
-    if(foundIvParameter == ivParameters.end()) {
-        auto errorMessage = QString("Unable to find parameter %1 in required interface %2 in function %3 from subtype name %4").arg(ivParameterName).arg(ivInterfaceName).arg(ivFunctionName).arg(subtypeName);
+    const auto foundIvParameter = std::find_if(ivParameters.begin(), ivParameters.end(), [&](const auto &parameter) {
+        return QString::compare(parameter.name(), ivParameterName, Qt::CaseInsensitive) == 0;
+    });
+    if (foundIvParameter == ivParameters.end()) {
+        auto errorMessage =
+                QString("Unable to find parameter %1 in required interface %2 in function %3 from subtype name %4")
+                        .arg(ivParameterName)
+                        .arg(ivInterfaceName)
+                        .arg(ivFunctionName)
+                        .arg(subtypeName);
         throw TranslationException(std::move(errorMessage));
     }
 
@@ -149,7 +161,13 @@ const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(const QString &subt
         }
     }
 
-    auto errorMessage = QString("Unable to find ASN.1 type %1 of parameter %2 in required interface %3 in function %4 from subtype name %5").arg(ivParameterTypeName).arg(ivParameterName).arg(ivInterfaceName).arg(ivFunctionName).arg(subtypeName);
+    auto errorMessage = QString(
+            "Unable to find ASN.1 type %1 of parameter %2 in required interface %3 in function %4 from subtype name %5")
+                                .arg(ivParameterTypeName)
+                                .arg(ivParameterName)
+                                .arg(ivInterfaceName)
+                                .arg(ivFunctionName)
+                                .arg(subtypeName);
     throw TranslationException(std::move(errorMessage));
 
     return nullptr;
