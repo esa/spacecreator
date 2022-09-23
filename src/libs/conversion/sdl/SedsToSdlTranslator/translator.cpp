@@ -29,6 +29,7 @@
 #include <ivcore/ivfunction.h>
 #include <sdl/SdlModel/sdlmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
+#include <seds/SedsOptions/options.h>
 #include <shared/parameter.h>
 
 using Asn1Acn::Asn1Model;
@@ -76,11 +77,11 @@ std::vector<std::unique_ptr<Model>> SedsToSdlTranslator::translateSedsModel(
     auto sdlModel = std::make_unique<SdlModel>();
 
     const auto &sedsModelData = sedsModel->data();
-    if (std::holds_alternative<seds::model::PackageFile>(sedsModelData)) {
-        const auto &sedsPackage = std::get<seds::model::PackageFile>(sedsModelData).package();
+    if (std::holds_alternative<::seds::model::PackageFile>(sedsModelData)) {
+        const auto &sedsPackage = std::get<::seds::model::PackageFile>(sedsModelData).package();
         translatePackage(sedsPackage, {}, asn1Model, ivModel, sdlModel.get(), options);
-    } else if (std::holds_alternative<seds::model::DataSheet>(sedsModelData)) {
-        const auto &sedsPackages = std::get<seds::model::DataSheet>(sedsModelData).packages();
+    } else if (std::holds_alternative<::seds::model::DataSheet>(sedsModelData)) {
+        const auto &sedsPackages = std::get<::seds::model::DataSheet>(sedsModelData).packages();
         for (const auto &sedsPackage : sedsPackages) {
             translatePackage(sedsPackage, sedsPackages, asn1Model, ivModel, sdlModel.get(), options);
         }
@@ -94,8 +95,8 @@ std::vector<std::unique_ptr<Model>> SedsToSdlTranslator::translateSedsModel(
     return result;
 }
 
-auto SedsToSdlTranslator::translatePackage(const seds::model::Package &sedsPackage,
-        const std::vector<seds::model::Package> &sedsPackages, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
+auto SedsToSdlTranslator::translatePackage(const ::seds::model::Package &sedsPackage,
+        const std::vector<::seds::model::Package> &sedsPackages, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel,
         ::sdl::SdlModel *model, const Options &options) const -> void
 {
     for (const auto &component : sedsPackage.components()) {
@@ -103,8 +104,8 @@ auto SedsToSdlTranslator::translatePackage(const seds::model::Package &sedsPacka
     }
 }
 
-auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPackage,
-        const std::vector<seds::model::Package> &sedsPackages, const seds::model::Component &sedsComponent,
+auto SedsToSdlTranslator::translateComponent(const ::seds::model::Package &sedsPackage,
+        const std::vector<::seds::model::Package> &sedsPackages, const ::seds::model::Component &sedsComponent,
         Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, ::sdl::SdlModel *model, const Options &options) const
         -> void
 {
@@ -131,7 +132,11 @@ auto SedsToSdlTranslator::translateComponent(const seds::model::Package &sedsPac
 
         StateMachineTranslator::buildCommandMap(context);
         StateMachineTranslator::translateVariables(context, implementation.variables());
-        StateMachineTranslator::createIoVariables(context);
+
+        if (!options.isSet(conversion::seds::SedsOptions::tasteTranslation)) {
+            StateMachineTranslator::createIoVariables(context);
+        }
+
         StateMachineTranslator::createExternalProcedures(context);
         for (const auto &activity : implementation.activities()) {
             ActivityTranslator::translateActivity(context, activity, &process, options);
