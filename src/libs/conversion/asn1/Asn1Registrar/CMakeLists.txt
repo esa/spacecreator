@@ -15,6 +15,7 @@ target_link_libraries(Asn1Registrar
                 ASN1::Exporter
                 ASN1::Importer
                 Conversion::SedsToAsn1Translator
+                Conversion::SimulinkToAsn1Translator
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(Asn1Registrar)
