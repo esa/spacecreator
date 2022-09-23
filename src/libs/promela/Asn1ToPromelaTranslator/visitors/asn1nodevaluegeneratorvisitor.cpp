@@ -21,6 +21,7 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include <QDebug>
 #include <QString>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
@@ -112,10 +113,7 @@ const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(const QString &subt
 #endif
 
     if (splittedSubtypeName.size() != 3) {
-        auto errorMessage =
-                QString("Subtype name %1 doesn't fit the template '<function_name>-<interface_name>-<argument_name>'")
-                        .arg(subtypeName);
-        throw TranslationException(std::move(errorMessage));
+        return nullptr;
     }
 
     const auto &ivFunctionName = splittedSubtypeName.at(0);
@@ -157,6 +155,7 @@ const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(const QString &subt
     for (const auto &asn1File : m_asn1Model->data()) {
         const auto foundType = asn1File->typeFromName(ivParameterTypeName);
         if (foundType != nullptr) {
+            qInfo() << "Type" << subtypeName << "is used to subtype type" << foundType->identifier();
             return foundType;
         }
     }
