@@ -17,22 +17,39 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "spintrailmodel.h"
+#pragma once
+
+#include <QList>
+#include <QString>
 
 namespace spintrail::model {
-SpinTrailModel::SpinTrailModel() {}
+class ChannelEvent
+{
+public:
+    enum class Type
+    {
+        Send,
+        Recv,
+    };
 
-conversion::ModelType SpinTrailModel::modelType() const
-{
-    return conversion::ModelProperties<SpinTrailModel>::type;
-}
-void SpinTrailModel::appendEvent(std::unique_ptr<ChannelEvent> event)
-{
-    m_events.push_back(std::move(event));
-}
+    ChannelEvent(Type type, QString proctypeName, QString channelName, QList<QString> parameters);
 
-const std::list<std::unique_ptr<ChannelEvent>> &SpinTrailModel::getEvents() const
-{
-    return m_events;
-}
+    void setType(Type type);
+    Type getType() const;
+
+    void setProctypeName(QString proctypeName);
+    const QString &getProctypeName() const;
+
+    void setChannelName(QString channelName);
+    const QString &getChannelName() const;
+
+    void setParameters(QList<QString> parameters);
+    const QList<QString> &getParameters() const;
+
+private:
+    Type m_type;
+    QString m_proctypeName;
+    QString m_channelName;
+    QList<QString> m_parameters;
+};
 }

@@ -19,9 +19,13 @@
 
 #pragma once
 
+#include "channelevent.h"
+
 #include <conversion/common/model.h>
 #include <conversion/common/modelproperties.h>
 #include <conversion/common/modeltype.h>
+#include <list>
+#include <memory>
 
 namespace spintrail::model {
 
@@ -36,6 +40,13 @@ public:
      * @return  Model type
      */
     conversion::ModelType modelType() const override;
+
+    void appendEvent(std::unique_ptr<ChannelEvent> event);
+
+    const std::list<std::unique_ptr<ChannelEvent>> &getEvents() const;
+
+private:
+    std::list<std::unique_ptr<ChannelEvent>> m_events;
 };
 }
 

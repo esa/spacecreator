@@ -22,6 +22,8 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QRegExp>
+#include <QStringList>
 #include <QTextStream>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/import/exceptions.h>
@@ -32,6 +34,7 @@ using namespace conversion::spintrail;
 
 using conversion::ConversionException;
 using conversion::FileNotFoundException;
+using spintrail::model::ChannelEvent;
 using spintrail::model::SpinTrailModel;
 
 namespace spintrail::importer {
@@ -66,7 +69,46 @@ std::unique_ptr<conversion::Model> SpinTrailImporter::importModel(const conversi
 
 void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, const QString &line) const
 {
-    qDebug() << "SpinTrailImporter: parsing line : " << line;
+    // example input line:
+    // '9387:	proc  3 (Actuator_step:1) system.pml:53 Send 84	-> queue 5 (Controller_result_channel)'
+    // The line shall contains three substrings separated by tab character '\t'
+    // first step is to split the line and check if the result has 3 substrings
+    const QStringList elements = line.split('\t');
+    if (elements.length() != 3) {
+        return;
+    }
+
+    // use this to additionaly validate if the parsed line is an trail event
+    QRegExp eventValidation(R"( *\d+:)");
+
+    // use this to get proctype name, command (send or recv) and parameters
+    // the first parsed group contains proctype name
+    // the second parsed group contains command type and parameters
+    // for the example input is 'proc  3 (Actuator_step:1) system.pml:53 Send 84'
+    // the first group shall be 'Actuator_step:1' and the second 'Send 84'
+    QRegExp commandValidation(R"(proc\s+\d+\s+\(([\w:]+)\)\s+[\w\.]+:\d+\s([\w\s,]+))");
+
+    // channel name is enclosed by '(' and ')'
+    QRegExp channelValidation(R"(\((\w+)\))");
+
+    if (eventValidation.exactMatch(elements.front())) {
+        if (commandValidation.exactMatch(elements[1]) && channelValidation.indexIn(elements[2]) != -1) {
+            const QString proctypeString = commandValidation.cap(1);
+            QString proctypeName = proctypeString.split(':').front();
+            const QString commandString = commandValidation.cap(2);
+            const QString command = commandString.split(' ').front();
+            QStringList parameters = commandString.split(' ').back().split(',');
+            QString channelName = channelValidation.cap(1);
+            const ChannelEvent::Type eventType = command.compare("recv", Qt::CaseInsensitive) == 0
+                    ? ChannelEvent::Type::Recv
+                    : ChannelEvent::Type::Send;
+            qDebug() << "Found event " << proctypeName << " " << command << parameters.join(" ") << " to channel "
+                     << channelName;
+            model.appendEvent(std::make_unique<ChannelEvent>(
+                    eventType, std::move(proctypeName), std::move(channelName), std::move(parameters)));
+        }
+    }
+
     Q_UNUSED(model);
 }
 }
