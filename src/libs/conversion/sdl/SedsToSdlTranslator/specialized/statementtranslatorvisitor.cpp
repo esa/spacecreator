@@ -36,7 +36,7 @@
 #include <seds/SedsOptions/options.h>
 
 using conversion::Escaper;
-using conversion::iv::translator::InterfaceTranslatorHelper;
+using conversion::iv::translator::seds::InterfaceTranslatorHelper;
 using conversion::translator::TranslationException;
 using ::seds::model::CoreMathOperator;
 using ::seds::model::Polynomial;
