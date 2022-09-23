@@ -23,7 +23,7 @@
 #include <QRegularExpression>
 #include <QString>
 #include <iostream>
-#include <reporting/Report/report.h>
+#include <reporting/Report/spinerrorreport.h>
 #include <string.h>
 
 using namespace reporting;
@@ -49,13 +49,13 @@ int main(int argc, char *argv[])
     // error handling to be moved to the reporting lib
     const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)\\n");
     // convert all matches to spin errors
-    QList<Report> reports;
+    QList<SpinErrorReport> reports;
 
     auto globalMatch = regex.globalMatch(spinMessage);
     while (globalMatch.hasNext()) {
         const auto match = globalMatch.next();
         // build error from match tokens
-        Report report;
+        SpinErrorReport report;
         report.errorNumber = match.captured(1).toInt();
         report.errorDepth = match.captured(4).toInt();
         report.errorType = match.captured(2);

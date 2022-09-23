@@ -27,7 +27,7 @@ namespace reporting {
 /**
  * @brief   Structure to hold parsed spin report data.
  */
-struct Report {
+struct SpinErrorReport {
     /** Spin error number, counted from 1 up */
     int errorNumber;
     /** Error depth reported by spin */

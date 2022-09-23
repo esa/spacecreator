@@ -1,10 +1,10 @@
 project(Report VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
-    report.cpp)
+    spinerrorreport.cpp)
 
 set(INCLUDES
-    report.h)
+    spinerrorreport.h)
 
 add_library(Report STATIC)
 target_sources(Report
