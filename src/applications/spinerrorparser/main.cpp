@@ -26,6 +26,12 @@
 #include <iostream>
 #include <string.h>
 
+struct SpinError {
+    int errorCode;
+    int errorDepth;
+    QString errorDetails;
+};
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -43,15 +49,19 @@ int main(int argc, char *argv[])
     // get passed spin message
     const auto spinMessage = arguments.at(1);
     // build pattern for error matching
-    const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)\\n");
+    const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\(at depth (\\d+)\\)\\n");
+    // convert all matches to spin errors
+    QList <SpinError> spinErrors;
     auto globalMatch = regex.globalMatch(spinMessage);
     while (globalMatch.hasNext()) {
         const auto match = globalMatch.next();
         // extract match tokens
-        const QString errorCode = match.captured(1);
-        const QString errorType = match.captured(2);
-        const QString errorDetails = match.captured(3);
-        const QString errorDepth = match.captured(4);
+        int errorCode = match.captured(1).toInt();
+        int errorDepth = match.captured(3).toInt();
+        const QString errorDetails = match.captured(2);
+        // build error
+        SpinError spinError { errorCode, errorDepth, errorDetails };
+        spinErrors.append(spinError);
     }
     return EXIT_SUCCESS;
 }
