@@ -65,6 +65,7 @@ private Q_SLOTS:
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
+    void enterNestedView(const shared::Id &id);
     void onItemDoubleClicked(const shared::Id &id);
     void onItemCreated(const shared::Id &id);
 
