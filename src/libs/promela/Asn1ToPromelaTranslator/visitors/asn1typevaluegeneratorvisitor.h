@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/constraints/constraintlist.h>
 #include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/typereadingvisitor.h>
@@ -165,6 +166,11 @@ private:
     auto isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool;
     auto getInlineGeneratorName(const QString &typeName) -> QString;
     auto getInlineArgumentName() -> QString;
+
+    template<typename ValueType>
+    auto handleOverridenType(const Asn1Acn::Constraints::ConstraintList<ValueType> &constraints,
+            const QString &initInlineName, const QString &valueName, const size_t minSize, const size_t maxSize,
+            model::Sequence *sequence) const -> void;
 
 private:
     model::PromelaModel &m_promelaModel;
