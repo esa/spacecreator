@@ -21,29 +21,44 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include <QDebug>
+#include <QString>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
+#include <conversion/common/translation/exceptions.h>
+#include <iostream>
+#include <ivcore/ivfunction.h>
 
+using Asn1Acn::Asn1Model;
 using Asn1Acn::Definitions;
 using Asn1Acn::File;
 using Asn1Acn::Project;
 using Asn1Acn::Root;
 using Asn1Acn::TypeAssignment;
 using Asn1Acn::ValueAssignment;
+using Asn1Acn::Types::Type;
+using conversion::translator::TranslationException;
+using ivm::IVInterface;
+using ivm::IVModel;
 using promela::model::PromelaModel;
 
 namespace promela::translator {
 
-Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel)
+Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(
+        PromelaModel &promelaModel, const Asn1Model *asn1Model, const IVModel *ivModel)
     : m_promelaModel(promelaModel)
-    , m_generateAll(true)
+    , m_asn1Model(asn1Model)
+    , m_ivModel(ivModel)
+    , m_generateSubtypes(true)
 {
 }
 
 Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel, QStringList typeNames)
     : m_promelaModel(promelaModel)
+    , m_asn1Model(nullptr)
+    , m_ivModel(nullptr)
     , m_typeNames(std::move(typeNames))
-    , m_generateAll(false)
+    , m_generateSubtypes(false)
 {
 }
 
@@ -63,8 +78,13 @@ void Asn1NodeValueGeneratorVisitor::visit(const File &file)
 
 void Asn1NodeValueGeneratorVisitor::visit(const TypeAssignment &type)
 {
-    if (m_generateAll || m_typeNames.contains(type.name())) {
-        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name());
+    if (m_generateSubtypes) {
+        const auto overridenType = findOverridenType(type.name());
+
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), overridenType);
+        type.type()->accept(typeVisitor);
+    } else if (m_typeNames.contains(type.name())) {
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), nullptr);
         type.type()->accept(typeVisitor);
     }
 }
@@ -83,4 +103,73 @@ void Asn1NodeValueGeneratorVisitor::visit(const Root &root)
 {
     Q_UNUSED(root);
 }
+
+const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(const QString &subtypeName) const
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    const auto splittedSubtypeName = subtypeName.split('-', Qt::SkipEmptyParts);
+#else
+    const auto splittedSubtypeName = subtypeName.split('-', QString::SkipEmptyParts);
+#endif
+
+    if (splittedSubtypeName.size() != 3) {
+        return nullptr;
+    }
+
+    const auto &ivFunctionName = splittedSubtypeName.at(0);
+    const auto ivFunction = m_ivModel->getFunction(ivFunctionName, Qt::CaseInsensitive);
+    if (ivFunction == nullptr) {
+        auto errorMessage =
+                QString("Unable to find function %1 from subtype name %2").arg(ivFunctionName).arg(subtypeName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto &ivInterfaceName = splittedSubtypeName.at(1);
+    const auto ivInterface = m_ivModel->getIfaceByName(
+            ivInterfaceName, IVInterface::InterfaceType::Required, ivFunction, Qt::CaseInsensitive);
+    if (ivInterface == nullptr) {
+        auto errorMessage = QString("Unable to find required interface %1 in function %2 from subtype name %3")
+                                    .arg(ivInterfaceName)
+                                    .arg(ivFunctionName)
+                                    .arg(subtypeName);
+        throw TranslationException(std::move(errorMessage));
+    }
+    const auto ivParameters = ivInterface->params();
+
+    const auto &ivParameterName = splittedSubtypeName.at(2);
+    const auto foundIvParameter = std::find_if(ivParameters.begin(), ivParameters.end(), [&](const auto &parameter) {
+        return QString::compare(parameter.name(), ivParameterName, Qt::CaseInsensitive) == 0;
+    });
+    if (foundIvParameter == ivParameters.end()) {
+        auto errorMessage =
+                QString("Unable to find parameter %1 in required interface %2 in function %3 from subtype name %4")
+                        .arg(ivParameterName)
+                        .arg(ivInterfaceName)
+                        .arg(ivFunctionName)
+                        .arg(subtypeName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto &ivParameterTypeName = foundIvParameter->paramTypeName();
+
+    for (const auto &asn1File : m_asn1Model->data()) {
+        const auto foundType = asn1File->typeFromName(ivParameterTypeName);
+        if (foundType != nullptr) {
+            qInfo() << "Type" << subtypeName << "is used to subtype type" << foundType->identifier();
+            return foundType;
+        }
+    }
+
+    auto errorMessage = QString(
+            "Unable to find ASN.1 type %1 of parameter %2 in required interface %3 in function %4 from subtype name %5")
+                                .arg(ivParameterTypeName)
+                                .arg(ivParameterName)
+                                .arg(ivInterfaceName)
+                                .arg(ivFunctionName)
+                                .arg(subtypeName);
+    throw TranslationException(std::move(errorMessage));
+
+    return nullptr;
+}
+
 }

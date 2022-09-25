@@ -31,21 +31,27 @@ using promela::translator::IvToPromelaTranslator;
 namespace conversion::promela {
 bool PromelaRegistrar::registerCapabilities(conversion::Registry &registry)
 {
-    auto promelaExporter = std::make_unique<PromelaExporter>();
-    bool result = registry.registerExporter(ModelType::Promela, std::move(promelaExporter));
+    auto promelaDataExporter = std::make_unique<PromelaExporter>();
+    bool result = registry.registerExporter(ModelType::PromelaData, std::move(promelaDataExporter));
+    if (!result) {
+        return false;
+    }
+
+    auto promelaSystemExporter = std::make_unique<PromelaExporter>();
+    result = registry.registerExporter(ModelType::PromelaSystem, std::move(promelaSystemExporter));
     if (!result) {
         return false;
     }
 
     auto asn1ToPromelaTranslator = std::make_unique<Asn1ToPromelaTranslator>();
-
-    result = registry.registerTranslator({ ModelType::Asn1 }, ModelType::Promela, std::move(asn1ToPromelaTranslator));
+    result = registry.registerTranslator(
+            { ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, std::move(asn1ToPromelaTranslator));
     if (!result) {
         return false;
     }
 
     auto ivToPromelaTranslator = std::make_unique<IvToPromelaTranslator>();
     return registry.registerTranslator(
-            { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::Promela, std::move(ivToPromelaTranslator));
+            { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::PromelaSystem, std::move(ivToPromelaTranslator));
 }
 }

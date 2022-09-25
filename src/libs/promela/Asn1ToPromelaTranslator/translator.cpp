@@ -25,7 +25,6 @@
 
 #include <algorithm>
 #include <asn1library/asn1/asn1model.h>
-#include <promela/PromelaModel/promelamodel.h>
 #include <promela/PromelaOptions/options.h>
 
 using Asn1Acn::Asn1Model;
@@ -34,10 +33,11 @@ using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
 using conversion::promela::PromelaOptions;
+using ivm::IVModel;
 
 using promela::model::InlineCall;
 using promela::model::InlineDef;
-using promela::model::PromelaModel;
+using promela::model::PromelaDataModel;
 using promela::model::Skip;
 
 namespace promela::translator {
@@ -51,11 +51,12 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
+    const auto *ivModel = getModel<IVModel>(sourceModels);
 
     if (asn1ValueGeneration) {
         QStringList typeNames;
         std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
-        return generateValueGenerationInlines(asn1Model, typeNames, options);
+        return generateValueGenerationInlines(asn1Model, ivModel, typeNames, options);
     } else {
         return translateAsn1Model(asn1Model, enhancedSpinSupport);
     }
@@ -68,19 +69,19 @@ ModelType Asn1ToPromelaTranslator::getSourceModelType() const
 
 ModelType Asn1ToPromelaTranslator::getTargetModelType() const
 {
-    return ModelType::Promela;
+    return ModelType::PromelaData;
 }
 
 std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
 {
-    return std::set<ModelType> { ModelType::Asn1 };
+    return std::set<ModelType> { ModelType::Asn1, ModelType::InterfaceView };
 }
 
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
         const Asn1Model *model, bool enhancedSpinSupport) const
 {
     QVector<QString> initInlineNames;
-    std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
+    auto promelaModel = std::make_unique<PromelaDataModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
         Asn1NodeVisitor visitor(*promelaModel, enhancedSpinSupport);
         visitor.visit(*file);
@@ -98,12 +99,13 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 }
 
 std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
-        const Asn1Acn::Asn1Model *model, const QStringList &typeNames, const Options &options) const
+        const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel, const QStringList &typeNames,
+        const Options &options) const
 {
     const auto subtypesFilepaths = options.values(PromelaOptions::subtypesFilepath);
 
-    std::unique_ptr<PromelaModel> promelaModel = std::make_unique<PromelaModel>();
-    for (const std::unique_ptr<File> &file : model->data()) {
+    auto promelaModel = std::make_unique<PromelaDataModel>();
+    for (const std::unique_ptr<File> &file : asn1Model->data()) {
         const auto subtypesFilepathFound = std::find_if(subtypesFilepaths.begin(), subtypesFilepaths.end(),
                 [&](const auto &filepath) { return filepath == file->name(); });
 
@@ -111,7 +113,7 @@ std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generat
             Asn1NodeValueGeneratorVisitor visitor(*promelaModel, typeNames);
             visitor.visit(*file);
         } else {
-            Asn1NodeValueGeneratorVisitor visitor(*promelaModel);
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, asn1Model, ivModel);
             visitor.visit(*file);
         }
     }
@@ -121,7 +123,7 @@ std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generat
 }
 
 void Asn1ToPromelaTranslator::createDataviewInitInline(
-        promela::model::PromelaModel &model, const QVector<QString> &initInlineNames) const
+        promela::model::PromelaDataModel &model, const QVector<QString> &initInlineNames) const
 {
     promela::model::Sequence initSequence(promela::model::Sequence::Type::D_STEP);
 
