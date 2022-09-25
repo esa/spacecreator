@@ -29,8 +29,8 @@ using conversion::Escaper;
 
 namespace conversion::sdl::translator {
 
-auto ActivityTranslator::translateActivity(
-        Context &context, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void
+auto ActivityTranslator::translateActivity(Context &context, const seds::model::Activity &sedsActivity,
+        ::sdl::Process *sdlProcess, const Options &options) -> void
 {
     const auto name = Escaper::escapeSdlName(sedsActivity.nameStr());
 
@@ -45,16 +45,16 @@ auto ActivityTranslator::translateActivity(
         procedure->addParameter(std::move(parameter));
     }
 
-    translateBody(context, sedsActivity, sdlProcess, procedure.get());
+    translateBody(context, sedsActivity, sdlProcess, procedure.get(), options);
     sdlProcess->addProcedure(std::move(procedure));
 }
 
 auto ActivityTranslator::translateBody(Context &context, const seds::model::Activity &sedsActivity,
-        ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure) -> void
+        ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure, const Options &options) -> void
 {
     auto transition = std::make_unique<::sdl::Transition>();
     StatementTranslatorVisitor::StatementContext statementContext(context, sdlProcess, procedure);
-    StatementTranslatorVisitor visitor(statementContext, transition.get());
+    StatementTranslatorVisitor visitor(statementContext, transition.get(), options);
     for (const auto &statement : sedsActivity.body()->statements()) {
         std::visit(visitor, statement);
     }

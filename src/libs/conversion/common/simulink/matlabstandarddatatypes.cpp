@@ -61,7 +61,7 @@ std::unique_ptr<Boolean> MatLabStandardDataTypes::getStandardAsn1BooleanDataType
     asn1Type->setTrueValue("1");
     asn1Type->setFalseValue("0");
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 std::unique_ptr<Real> MatLabStandardDataTypes::getStandardAsn1DoubleDataType()
@@ -78,7 +78,7 @@ std::unique_ptr<Real> MatLabStandardDataTypes::getStandardAsn1DoubleDataType()
     auto rangeConstraint = RangeConstraint<RealValue>::create({ min, max });
     asn1Type->constraints().append(std::move(rangeConstraint));
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 std::unique_ptr<Real> MatLabStandardDataTypes::getStandardAsn1SingleDataType()
@@ -95,7 +95,7 @@ std::unique_ptr<Real> MatLabStandardDataTypes::getStandardAsn1SingleDataType()
     auto rangeConstraint = RangeConstraint<RealValue>::create({ min, max });
     asn1Type->constraints().append(std::move(rangeConstraint));
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1Int8DataType()
@@ -112,7 +112,7 @@ std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1Int8DataType()
     auto rangeConstraint = RangeConstraint<IntegerValue>::create({ -128, 127 });
     asn1Type->constraints().append(std::move(rangeConstraint));
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1UInt8DataType()
@@ -129,7 +129,7 @@ std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1UInt8DataType()
     auto rangeConstraint = RangeConstraint<IntegerValue>::create({ 0, 255 });
     asn1Type->constraints().append(std::move(rangeConstraint));
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1Int16DataType()
@@ -146,7 +146,7 @@ std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1Int16DataType()
     auto rangeConstraint = RangeConstraint<IntegerValue>::create({ -32768, 32767 });
     asn1Type->constraints().append(std::move(rangeConstraint));
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1UInt16DataType()
@@ -163,7 +163,7 @@ std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1UInt16DataType(
     auto rangeConstraint = RangeConstraint<IntegerValue>::create({ 0, 65535 });
     asn1Type->constraints().append(std::move(rangeConstraint));
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1Int32DataType()
@@ -180,7 +180,7 @@ std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1Int32DataType()
     auto rangeConstraint = RangeConstraint<IntegerValue>::create({ -2147483648, 2147483647 });
     asn1Type->constraints().append(std::move(rangeConstraint));
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1UInt32DataType()
@@ -197,7 +197,7 @@ std::unique_ptr<Integer> MatLabStandardDataTypes::getStandardAsn1UInt32DataType(
     auto rangeConstraint = RangeConstraint<IntegerValue>::create({ 0, 4294967295 });
     asn1Type->constraints().append(std::move(rangeConstraint));
 
-    return std::move(asn1Type);
+    return asn1Type;
 }
 
 bool MatLabStandardDataTypes::isMatLabType(const QString &typeName)

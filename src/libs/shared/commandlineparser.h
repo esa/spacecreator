@@ -69,7 +69,10 @@ public:
         SedsConverterPatcherFunctionsFilepathPrefix,
         SedsConverterMappingFunctionsModuleFileName,
         SedsConverterSdlFilepathPrefix,
+        SedsConverterNoMangling,
         SedsConverterMultipleAsnModels,
+        SedsConverterSkipEmptySequences,
+        SedsConverterTasteTranslation,
 
         Unknown
     };

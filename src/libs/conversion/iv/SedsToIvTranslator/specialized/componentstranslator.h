@@ -28,6 +28,10 @@
 #include <optional>
 #include <seds/SedsModel/interfaces/interfacedeclarationref.h>
 
+namespace conversion {
+class Options;
+} // namespace conversion
+
 namespace Asn1Acn {
 class Definitions;
 } // namespace Asn1Acn
@@ -57,8 +61,8 @@ public:
      * @param   sedsPackage         Package with components to translate
      * @param   sedsPackages        List of SEDS packages
      */
-    ComponentsTranslator(
-            const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages);
+    ComponentsTranslator(const seds::model::Package *sedsPackage, const std::vector<seds::model::Package> &sedsPackages,
+            const Options &options);
     /**
      * @brief   Deleted copy constructor
      */
@@ -122,6 +126,8 @@ private:
     const seds::model::Package *m_sedsPackage;
     /// @brief  List of SEDS packages
     const std::vector<seds::model::Package> &m_sedsPackages;
+    /// @brief  Options
+    const Options &m_options;
 };
 
 } // namespace conversion::iv::translator

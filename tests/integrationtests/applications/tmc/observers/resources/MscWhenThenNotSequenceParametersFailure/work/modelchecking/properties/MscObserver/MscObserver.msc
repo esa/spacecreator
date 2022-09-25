@@ -1,0 +1,33 @@
+mscdocument MscObserver /* MSC AND */;
+    language ASN.1;
+    data MscWhenThenNotSequenceParametersFailure.asn;
+/* CIF MSCDOCUMENT (0, 0) (4202, 2300) */
+mscdocument MscObserver /* MSC LEAF */;
+    language ASN.1;
+    data MscWhenThenNotSequenceParametersFailure.asn;
+msc MscObserver;
+/* CIF INSTANCE (37, 63) (148, 87) (800, 299) */
+instance Pinger;
+/* CIF CONDITION (35, 198) (836, 67) */
+condition When shared all;
+/* CIF MESSAGE (111, 331) (812, 331) */
+out Ping({ value 1, version big : 4 }) to Ponger;
+/* CIF CONDITION (37, 400) (847, 66) */
+condition Then Not shared all;
+/* CIF MESSAGE (111, 534) (812, 534) */
+out Ping({ value 2, version small : 2 }) to Ponger;
+endinstance;
+/* CIF INSTANCE (733, 63) (159, 87) (800, 299) */
+instance Ponger;
+/* CIF CONDITION (35, 198) (836, 67) */
+condition When shared all;
+/* CIF MESSAGE (111, 331) (812, 331) */
+in Ping({ value 1, version big : 4 }) from Pinger;
+/* CIF CONDITION (37, 400) (847, 66) */
+condition Then Not shared all;
+/* CIF MESSAGE (111, 534) (812, 534) */
+in Ping({ value 2, version small : 2 }) from Pinger;
+endinstance;
+endmsc;
+endmscdocument;
+endmscdocument;

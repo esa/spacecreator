@@ -35,6 +35,8 @@ const QString &modelTypeToString(ModelType modelType)
         return ModelTypeProperties<ModelType::Asn1>::name;
     case ModelType::InterfaceView:
         return ModelTypeProperties<ModelType::InterfaceView>::name;
+    case ModelType::Msc:
+        return ModelTypeProperties<ModelType::Msc>::name;
     case ModelType::Promela:
         return ModelTypeProperties<ModelType::Promela>::name;
     case ModelType::Sdl:

@@ -41,12 +41,18 @@ public:
     inline static const QString externalRefFilepath = "Seds_Import_ExternalRefFilepath";
     /** @brief Skip SEDS validation */
     inline static const QString skipValidation = "Seds_Import_SkipValidation";
+    /** @brief No mangling for interfaces names in SEDS to IV translation */
+    inline static const QString noMangling = "Seds_Translation_NoMangling";
     /** @brief Enable translation of single asn file with multiple models */
-    inline static const QString multipleAsnModels = "Seds_Translation_Multiple_Asn_Models";
+    inline static const QString multipleAsnModels = "Seds_Translation_MultipleAsnModels";
+    /** @brief Enable skipping of empty ASN.1 sequences during ASN.1 to SEDS translation */
+    inline static const QString skipEmptySequences = "Seds_Translation_SkipEmptySequences";
     /** @brief Don't remove intermediate files after import */
     inline static const QString keepIntermediateFiles = "Seds_Import_KeepIntermediateFiles";
     /** @brief  Filepath of output file */
     inline static const QString outputFilepath = "Seds_Export_OutputFilepath";
+    /** @brief  Taste translation option */
+    inline static const QString tasteTranslation = "Seds_Translation_Taste";
 
     /** @brief Default output filename */
     inline static const QString defaultOutputFilepath = "seds.xml";

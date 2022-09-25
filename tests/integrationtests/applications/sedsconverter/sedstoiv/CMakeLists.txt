@@ -132,3 +132,6 @@ configure_file(resources/test_descriptions.output resources/test_descriptions.ou
 configure_file(test_interface_inheritance_types.sh test_interface_inheritance_types.sh COPYONLY)
 configure_file(resources/test_interface_inheritance_types.xml resources/test_interface_inheritance_types.xml COPYONLY)
 configure_file(resources/test_interface_inheritance_types.output resources/test_interface_inheritance_types.output COPYONLY)
+
+configure_file(test_no_mangling.sh test_no_mangling.sh COPYONLY)
+configure_file(resources/test_no_mangling_iv_input.xml resources/test_no_mangling_iv_input.xml COPYONLY)

@@ -41,6 +41,11 @@ const ContainerDataType::EntryList &ContainerDataType::entries() const
     return m_entries;
 }
 
+bool ContainerDataType::hasEntries() const
+{
+    return m_entries.size() != 0;
+}
+
 void ContainerDataType::addEntry(EntryType entry)
 {
     m_entries.push_back(std::move(entry));

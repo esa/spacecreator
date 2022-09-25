@@ -23,6 +23,7 @@
 #include <msccore/msccondition.h>
 
 using conversion::translator::TranslationException;
+using ivm::IVModel;
 using msc::MscChart;
 using msc::MscCondition;
 using msc::MscEntity;
@@ -31,9 +32,10 @@ using sdl::SdlModel;
 
 namespace conversion::sdl::translator {
 
-ChartTranslator::ChartTranslator(SdlModel *sdlModel, const Options &options)
-    : m_neverSequenceTranslator(sdlModel, options)
-    , m_whenSequenceTranslator(sdlModel, options)
+ChartTranslator::ChartTranslator(
+        SdlModel *sdlModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options)
+    : m_neverSequenceTranslator(sdlModel, asn1File, ivModel, options)
+    , m_whenSequenceTranslator(sdlModel, asn1File, ivModel, options)
 {
 }
 

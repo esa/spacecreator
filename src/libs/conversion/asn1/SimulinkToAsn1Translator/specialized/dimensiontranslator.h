@@ -39,26 +39,22 @@ public:
      */
     explicit DimensionTranslator(Context &context);
     /**
-     * @brief   Default destructor
-     */
-    ~DimensionTranslator() = default;
-    /**
      * @brief   Default copy constructor
      */
-    DimensionTranslator(const DimensionTranslator &) = default;
+    DimensionTranslator(const DimensionTranslator &) = delete;
     /**
      * @brief   Default move constructor
      */
-    DimensionTranslator(DimensionTranslator &&) = default;
+    DimensionTranslator(DimensionTranslator &&) = delete;
 
     /**
      * @brief   Default copy assignment operator
      */
-    DimensionTranslator &operator=(const DimensionTranslator &) = default;
+    DimensionTranslator &operator=(const DimensionTranslator &) = delete;
     /**
      * @brief   Default move assignment operator
      */
-    DimensionTranslator &operator=(DimensionTranslator &&) = default;
+    DimensionTranslator &operator=(DimensionTranslator &&) = delete;
 
 public:
     /**
