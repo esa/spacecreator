@@ -19,6 +19,7 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
+#include "types/type.h"
 #include "visitors/integerrangeconstraintvisitor.h"
 #include "visitors/sizeconstraintvisitor.h"
 
@@ -445,7 +446,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
                     sequence.get());
         } else if (const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
                    overridenOctetString != nullptr) {
-            if (type.itemsType()->typeEnum() != Ans1Acn::Types::Type::ASN1Type::INTEGER) {
+            if (type.itemsType()->typeEnum() != Asn1Acn::Types::Type::INTEGER) {
                 auto errorMessage =
                         QString("Trying to subtype OCTET STRING %1 with %2 which isn't a SEQUENCE OF INTEGER")
                                 .arg(m_overridenType->identifier())
@@ -457,7 +458,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
                     overridenOctetString->constraints(), "", valueVariableName, minSize, maxSize, sequence.get());
         } else if (const auto overridenIA5String = dynamic_cast<const IA5String *>(m_overridenType);
                    overridenIA5String != nullptr) {
-            if (type.itemsType()->typeEnum() != Ans1Acn::Types::Type::ASN1Type::INTEGER) {
+            if (type.itemsType()->typeEnum() != Asn1Acn::Types::Type::INTEGER) {
                 auto errorMessage = QString("Trying to subtype IA5String %1 with %2 which isn't a SEQUENCE OF INTEGER")
                                             .arg(m_overridenType->identifier())
                                             .arg(m_name);

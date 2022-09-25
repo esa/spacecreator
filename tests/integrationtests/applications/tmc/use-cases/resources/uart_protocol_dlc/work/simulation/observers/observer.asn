@@ -405,7 +405,7 @@ BEGIN
          dlcrxreset SEQUENCE {  },
          phyrxchar  SEQUENCE { p1 UINT8},
          phyrxerror SEQUENCE {  },
-         FrameTimer SEQUENCE {}
+         frameTimer SEQUENCE {}
       },
       msg-out CHOICE {
          dlcrxerror SEQUENCE { p1 T-UART-DLC-RxErrorCode },
