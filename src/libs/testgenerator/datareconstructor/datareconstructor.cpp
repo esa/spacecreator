@@ -28,6 +28,13 @@ DataReconstructor::TypeLayoutInfos::TypeLayoutInfos(std::initializer_list<TypeLa
     }
 }
 
+void setIndexToMultipleOf(int number, int &i)
+{
+    if (i % number != 0) {
+        i += number - i % number;
+    }
+}
+
 QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArray &rawData,
         ivm::IVInterface *const iface, Asn1Acn::Asn1Model *const asn1Model, QDataStream::ByteOrder endianness,
         const TypeLayoutInfos &typeLayoutInfos)
@@ -36,6 +43,7 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
     output.reserve(rawData.size());
 
     const auto definitionNameToTypeMap = mapDefinitionNameToType(asn1Model);
+    constexpr int DATA_ROW_ALINGMENT = 8;
 
     int i = 0;
     while (i < rawData.size()) {
@@ -46,10 +54,7 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
             }
 
             const int dataLength = typeLayoutInfos.value(type->typeName()).first;
-
-            if (i % dataLength != 0) {
-                i += dataLength - i % dataLength;
-            }
+            setIndexToMultipleOf(dataLength, i);
 
             QByteArray rawVariable = rawData.mid(i, dataLength);
             i += dataLength;
@@ -67,6 +72,7 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
                 pushBackCopyToVariantVector<bool>(output, rawVariable);
             }
         }
+        setIndexToMultipleOf(DATA_ROW_ALINGMENT, i);
     }
     return output;
 }

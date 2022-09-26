@@ -72,10 +72,9 @@ void tst_datareconstructor::testNominal() const
 
     const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg("testharness.asn");
     const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
-
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
         { "INTEGER", 8, 0 },
-        { "BOOLEAN", 1, 7 },
+        { "BOOLEAN", 1, 0 },
         { "REAL", 8, 0 },
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
@@ -121,7 +120,7 @@ void tst_datareconstructor::testNominalBigEndian() const
 
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
         { "INTEGER", 8, 0 },
-        { "BOOLEAN", 1, 7 },
+        { "BOOLEAN", 1, 0 },
         { "REAL", 8, 0 },
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
