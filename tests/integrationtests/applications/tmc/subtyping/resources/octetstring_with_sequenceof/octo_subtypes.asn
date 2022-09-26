@@ -1,8 +1,7 @@
-SEQUENCEOF-SUBTYPES-DATAVIEW DEFINITIONS ::=
+OCTO-SUBTYPES-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (1)
-   MyArray ::= SEQUENCE (SIZE(10)) OF MyInteger
+   MyOctoString ::= OCTET STRING (SIZE(1..5))
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
@@ -38,42 +37,6 @@ BEGIN
 --
 --  -- You can also declare constants
 --  myVar       MySeqOf     ::= { hello, world }
-
-END
-
-
-TASTE-BasicTypes DEFINITIONS ::=
-BEGIN
-
--- Set of TASTE predefined basic types
-
-T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
-
-T-UInt32 ::= INTEGER (0 .. 4294967295)
-
-T-Int8 ::= INTEGER (-128 .. 127)
-
-T-UInt8 ::= INTEGER (0 .. 255)
-
-T-Boolean ::= BOOLEAN
-
-T-Null-Record ::= SEQUENCE {}
-
-END
-
-
--- Dataview generated on-the-fly providing information on the system
--- and made available to the user code.
-System-Dataview DEFINITIONS ::=
-BEGIN
-
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    clk,
-    thething,
-    
-    env
-}
 
 END
 

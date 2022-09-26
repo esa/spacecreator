@@ -2,7 +2,7 @@ Thething-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyArray FROM SEQUENCEOF-SUBTYPES-DATAVIEW
+   MyOctoString FROM OCTO-SUBTYPES-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID FROM System-Dataview;
 
@@ -11,17 +11,16 @@ Thething-States ::= ENUMERATED {wait}
 Thething-Context ::= SEQUENCE {
    state Thething-States,
    init-done BOOLEAN,
-   arg MyArray,
-   result MyArray
+   arg MyOctoString,
+   result MyOctoString
 }
 
 END
 
-SEQUENCEOF-SUBTYPES-DATAVIEW DEFINITIONS ::=
+OCTO-SUBTYPES-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (1)
-   MyArray ::= SEQUENCE (SIZE(10)) OF MyInteger
+   MyOctoString ::= OCTET STRING (SIZE(1..5))
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
@@ -103,11 +102,7 @@ BEGIN
       
       
       --  ASN.1 modules used by thread thething_Tick
-<<<<<<< HEAD
-      MyArray FROM OCTO-SUBTYPES-DATAVIEW
-=======
-      MyArray FROM SEQUENCEOF-SUBTYPES-DATAVIEW
->>>>>>> origin/master
+      MyOctoString FROM OCTO-SUBTYPES-DATAVIEW
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
@@ -133,14 +128,14 @@ BEGIN
    
    Clk-Event ::= CHOICE {
       msg-out CHOICE {
-         tick SEQUENCE { arg MyArray }
+         tick SEQUENCE { arg MyOctoString }
       }
    }
    
    Thething-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         tick SEQUENCE { arg MyArray}
+         tick SEQUENCE { arg MyOctoString}
       }
    }
    

@@ -1,8 +1,8 @@
 <InterfaceView asn1file="/home/taste/tool-inst/share/taste-types/taste-types.asn">
-<Function name="Clk" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+<Function name="Clk" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="32200 36500 52200 44500"/>
-<Required_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" priority="1" wcet="0" miat="0" queue_size="1">
-    <Input_Parameter name="arg" type="MyString" encoding="NATIVE"/>
+<Required_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" miat="0" queue_size="1" priority="1" stack_size="1024" wcet="0">
+    <Input_Parameter name="arg" type="MyOctoString" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="52200 40700"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
@@ -13,10 +13,10 @@
     </Implementations>
 </Function>
 
-<Function name="TheThing" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+<Function name="TheThing" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="69700 36600 89700 44600"/>
-<Provided_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" priority="1" wcet="0" miat="0" queue_size="1">
-    <Input_Parameter name="arg" type="MyString" encoding="NATIVE"/>
+<Provided_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" miat="0" queue_size="1" priority="1" stack_size="1024" wcet="0">
+    <Input_Parameter name="arg" type="MyOctoString" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="69700 40400"/>
 </Provided_Interface>
 

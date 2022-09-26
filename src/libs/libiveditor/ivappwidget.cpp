@@ -346,6 +346,19 @@ void IVAppWidget::instantiateEntity(const shared::Id &id, const QPointF &sceneDr
     m_document->commandsStack()->push(cmdInstantiate);
 }
 
+void IVAppWidget::enterNestedView(const shared::Id &id)
+{
+    if (id.isNull()) {
+        return;
+    }
+
+    if (auto entity = m_document->objectsModel()->getObject(id)) {
+        if (entity->isFunction()) {
+            m_document->itemsModel()->changeRootItem(id);
+        }
+    }
+}
+
 void IVAppWidget::onItemDoubleClicked(const shared::Id &id)
 {
     if (id.isNull()) {
@@ -475,6 +488,7 @@ QVector<QAction *> IVAppWidget::initActions()
             Qt::QueuedConnection);
     connect(m_tool, &IVCreatorTool::propertyEditorRequest, this, &IVAppWidget::showPropertyEditor,
             Qt::QueuedConnection);
+    connect(m_tool, &IVCreatorTool::nestedViewRequest, this, &IVAppWidget::enterNestedView, Qt::QueuedConnection);
     connect(m_tool, &IVCreatorTool::informUser, m_document.data(), &InterfaceDocument::showInfoMessage);
     connect(m_tool, &IVCreatorTool::copyActionTriggered, this, &IVAppWidget::copyItems);
     connect(m_tool, &IVCreatorTool::cutActionTriggered, this, &IVAppWidget::cutItems);

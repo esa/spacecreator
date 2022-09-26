@@ -434,37 +434,15 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     if (m_overridenType != nullptr) {
         if (const auto overridenSequenceOf = dynamic_cast<const SequenceOf *>(m_overridenType);
                 overridenSequenceOf != nullptr) {
-            if (type.itemsType()->typeEnum() != overridenSequenceOf->itemsType()->typeEnum()) {
-                auto errorMessage = QString("Trying to subtype %1 with %2 which is a SEQUENCE OF of different type")
-                                            .arg(m_overridenType->identifier())
-                                            .arg(m_name);
-                throw TranslationException(std::move(errorMessage));
-            }
-
             const auto initCallName = QString("%1_elem_init_value").arg(m_overridenType->identifier());
             handleOverridenType(overridenSequenceOf->constraints(), initCallName, valueVariableName, minSize, maxSize,
                     sequence.get());
         } else if (const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
                    overridenOctetString != nullptr) {
-            if (type.itemsType()->typeEnum() != Asn1Acn::Types::Type::INTEGER) {
-                auto errorMessage =
-                        QString("Trying to subtype OCTET STRING %1 with %2 which isn't a SEQUENCE OF INTEGER")
-                                .arg(m_overridenType->identifier())
-                                .arg(m_name);
-                throw TranslationException(std::move(errorMessage));
-            }
-
             handleOverridenType(
                     overridenOctetString->constraints(), "", valueVariableName, minSize, maxSize, sequence.get());
         } else if (const auto overridenIA5String = dynamic_cast<const IA5String *>(m_overridenType);
                    overridenIA5String != nullptr) {
-            if (type.itemsType()->typeEnum() != Asn1Acn::Types::Type::INTEGER) {
-                auto errorMessage = QString("Trying to subtype IA5String %1 with %2 which isn't a SEQUENCE OF INTEGER")
-                                            .arg(m_overridenType->identifier())
-                                            .arg(m_name);
-                throw TranslationException(std::move(errorMessage));
-            }
-
             handleOverridenType(
                     overridenIA5String->constraints(), "", valueVariableName, minSize, maxSize, sequence.get());
         } else {

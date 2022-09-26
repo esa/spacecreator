@@ -451,6 +451,29 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
     }
 }
 
+void IVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos)
+{
+    CreatorTool::populateContextMenu_commonEdit(menu, scenePos);
+    QGraphicsScene *scene = m_view->scene();
+    if (!scene)
+        return;
+
+
+    QGraphicsItem *gi = shared::graphicsviewutils::nearestItem(scene, scenePos, kContextMenuItemTolerance, { IVFunctionGraphicsItem::Type });
+    if (!gi) {
+        return;
+    }
+
+    if (auto fnItem = qobject_cast<IVFunctionGraphicsItem *>(gi->toGraphicsObject())) {
+        if (fnItem->entity()) {
+            menu->addAction(QIcon(QLatin1String(":/toolbar/icns/nested_view.svg")), tr("Enter nested view"),
+                            this, [this, id = fnItem->entity()->id()]() {
+                Q_EMIT nestedViewRequest(id);
+            });
+        }
+    }
+}
+
 void IVCreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
 {
     QGraphicsScene *scene = m_view->scene();
