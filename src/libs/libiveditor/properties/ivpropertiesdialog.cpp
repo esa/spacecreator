@@ -72,6 +72,8 @@ IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVProper
         m_isRequiredSystemElement = iface->isRequiredSystemElement();
         break;
     }
+    default:
+        break;
     }
 }
 

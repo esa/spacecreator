@@ -35,13 +35,13 @@ using simulink::model::SimulinkModel;
 
 namespace conversion::asn1::translator {
 
-Context::Context(const SimulinkModel &simulinkModel, std::unique_ptr<Definitions> &matlabDefinitions,
+Context::Context(std::unique_ptr<Definitions> &matlabDefinitions,
         std::unique_ptr<Definitions> &simulinkModelDefinitions, const Options &options)
-    : m_simulinkModel(simulinkModel)
-    , m_matlabDefinitions(matlabDefinitions)
+    : m_matlabDefinitions(matlabDefinitions)
     , m_simulinkModelDefinitions(simulinkModelDefinitions)
     , m_options(options)
 {
+    Q_UNUSED(m_options);
 }
 
 void Context::addSimulinkModelAsn1Type(std::unique_ptr<Type> asn1Type, QString description)

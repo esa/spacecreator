@@ -961,7 +961,7 @@ std::unique_ptr<PromelaModel> tst_IvToPromelaTranslator::translateIvToPromela(
     if (result.empty()) {
         return {};
     }
-    if (result.front()->modelType() != conversion::ModelType::Promela) {
+    if (result.front()->modelType() != conversion::ModelType::PromelaSystem) {
         return {};
     }
 

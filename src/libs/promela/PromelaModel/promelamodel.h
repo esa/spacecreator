@@ -38,10 +38,11 @@
 #include <memory>
 
 namespace promela::model {
+
 /**
- * @brief Representation of Promela model.
+ * @brief   Representation of Promela model.
  */
-class PromelaModel final : public conversion::Model
+class PromelaModel : public conversion::Model
 {
 public:
     /// @brief Default constructor.
@@ -239,7 +240,8 @@ private:
     std::optional<InitProctype> m_initProctype;
     QList<QString> m_epilogueIncludes;
 };
-}
+
+} // namespace promela::model
 
 namespace conversion {
 

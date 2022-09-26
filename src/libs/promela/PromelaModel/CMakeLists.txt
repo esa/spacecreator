@@ -25,7 +25,9 @@ set(SOURCES
   namedmtype.cpp
   proctype.cpp
   proctypeelement.cpp
+  promeladatamodel.cpp
   promelamodel.cpp
+  promelasystemmodel.cpp
   select.cpp
   sequence.cpp
   typealias.cpp
@@ -62,7 +64,9 @@ set(INCLUDES
   namedmtype.h
   proctype.h
   proctypeelement.h
+  promeladatamodel.h
   promelamodel.h
+  promelasystemmodel.h
   select.h
   sequence.h
   skip.h

@@ -71,6 +71,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterNoManglig();
     void testCmdArgumentSedsConverterMultipleAsnModels();
     void testCmdArgumentSkipEmptySequences();
+    void testCmdArgumentTasteTranslation();
     void testCmdArgumentSedsConverterKeepIntermediateFiles();
     void testCmdArgumentSedsConverterAcnFilepathPrefix();
     void testCmdArgumentSedsConverterAsn1FilepathPrefix();
@@ -492,6 +493,21 @@ void tst_CommandLineParser::testCmdArgumentSkipEmptySequences()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterSkipEmptySequences));
+}
+
+void tst_CommandLineParser::testCmdArgumentTasteTranslation()
+{
+    const QCommandLineOption cmdTasteTranslation =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterTasteTranslation);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdTasteTranslation.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterTasteTranslation);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterTasteTranslation));
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterKeepIntermediateFiles()
