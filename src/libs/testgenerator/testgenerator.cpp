@@ -269,7 +269,8 @@ auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const
 
     constexpr int LOGGED_DATA_SIZE = 250;
     qDebug() << "Raw test data size: " << rawTestData.size();
-    qDebug() << "Raw test data (first 100 bytes): " << rawTestData.left(LOGGED_DATA_SIZE).toHex(' ');
+    qDebug() << "Raw test data (first " << LOGGED_DATA_SIZE
+             << " bytes): " << rawTestData.left(LOGGED_DATA_SIZE).toHex(' ');
 
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestData, &interface, &asn1Model, launchConfig.endianess, launchConfig.typeLayoutInfos);
