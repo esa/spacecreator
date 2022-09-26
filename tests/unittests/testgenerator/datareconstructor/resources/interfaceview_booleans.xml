@@ -1,0 +1,50 @@
+<InterfaceView>
+<Function name="Controller" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="18400 36600 38400 44600"/>
+<Provided_Interface name="Trigger" kind="Cyclic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" dispatch_offset="0" period="1000" priority="1">
+    <Property name="Taste::coordinates" value="30900 38100"/>
+</Provided_Interface>
+
+<Required_Interface name="Calculate" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="param1" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="param2" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="param3" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="result" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="38400 40900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function name="Host" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="54800 30200 74800 38200"/>
+<Provided_Interface name="Calculate" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="param1" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="param2" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="param3" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="result" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="54800 34200"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="Calculate"/>
+    <Target func_name="Host" pi_name="Calculate"/>
+    <Property name="Taste::coordinates" value="39000 40900 46700 40900 46700 34200 54500 34200"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3" required_system_element="NO">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+<Layer name="default"/>
+
+</InterfaceView>

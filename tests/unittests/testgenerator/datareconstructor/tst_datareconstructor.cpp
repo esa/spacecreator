@@ -42,6 +42,7 @@ class tst_datareconstructor final : public QObject
 private Q_SLOTS:
     void testNominal() const;
     void testNominalBigEndian() const;
+    void testBooleansInARow() const;
 };
 auto printQByteArrayInHex(const QByteArray &array) -> void;
 static auto byteToHexStr(char byte) -> QString;
@@ -125,6 +126,47 @@ void tst_datareconstructor::testNominalBigEndian() const
     };
     const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
             rawTestByteArray, ivIface, asn1Model.get(), QDataStream::BigEndian, typeLayoutInfos);
+
+    QCOMPARE(readTestData.size(), expectedTestData.size());
+    const int dataSize = readTestData.size();
+    for (int i = 0; i < dataSize; i++) {
+        if (readTestData.at(i) != expectedTestData.at(i)) {
+            printQByteArrayInHex(rawTestData);
+
+            const char readChar = readTestData.at(i).toChar().toLatin1();
+            const char expectedChar = expectedTestData.at(i).toChar().toLatin1();
+            qDebug().noquote() << i << byteToHexStr(readChar) << byteToHexStr(expectedChar);
+        }
+
+        QCOMPARE(readTestData.at(i), expectedTestData.at(i));
+    }
+}
+
+void tst_datareconstructor::testBooleansInARow() const
+{
+    const QVector<QVariant> expectedTestData = {
+        true, true, true, true, //
+        false, false, false, false //
+    };
+
+    const char *const rawTestData = "\x01\x01\x01\x01\x00\x00\x00\x00";
+
+    const int resultBytesNum = 4;
+    QByteArray rawTestByteArray = QByteArray::fromRawData(rawTestData, resultBytesNum);
+
+    const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview_booleans.xml");
+    ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel("Calculate", ivModel.get());
+
+    const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg("testharness.asn");
+    const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
+
+    const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
+        { "INTEGER", 8, 0 },
+        { "BOOLEAN", 1, 0 },
+        { "REAL", 8, 0 },
+    };
+    const QVector<QVariant> readTestData = DataReconstructor::getVariantVectorFromRawData(
+            rawTestByteArray, ivIface, asn1Model.get(), QDataStream::LittleEndian, typeLayoutInfos);
 
     QCOMPARE(readTestData.size(), expectedTestData.size());
     const int dataSize = readTestData.size();
