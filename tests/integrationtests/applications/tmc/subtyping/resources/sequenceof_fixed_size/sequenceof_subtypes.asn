@@ -1,7 +1,8 @@
-OCTO-SUBTYPES-DATAVIEW DEFINITIONS ::=
+SEQUENCEOF-SUBTYPES-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyString ::= IA5String (SIZE(10))
+   MyInteger ::= INTEGER (1)
+   MyArray ::= SEQUENCE (SIZE(10)) OF MyInteger
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase

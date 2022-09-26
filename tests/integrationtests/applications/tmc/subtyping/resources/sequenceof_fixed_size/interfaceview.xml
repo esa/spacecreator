@@ -1,4 +1,4 @@
-<InterfaceView asn1file="/home/taste/tool-inst/share/taste-types/taste-types.asn">
+<InterfaceView asn1file="sequenceof_subtypes.asn">
 <Function name="TheThing" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="69700 36600 89700 44600"/>
 <Provided_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" miat="0" queue_size="1" priority="1">

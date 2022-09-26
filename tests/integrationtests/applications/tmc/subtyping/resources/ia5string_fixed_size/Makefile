@@ -18,7 +18,7 @@ SPACECREATOR?=spacecreator.AppImage
 export NO_PROGRESS_BAR=1
 
 # Get the list of ASN.1 files from Space Creator project file:
-DISTFILES=$(shell qmake octo_subtypes.pro -o /tmp/null 2>&1)
+DISTFILES=$(shell qmake ia5string_subtypes.pro -o /tmp/null 2>&1)
 ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
 
 all:	release

@@ -2,7 +2,7 @@ Thething-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyArray FROM OCTO-SUBTYPES-DATAVIEW
+   MyInteger, MyArray FROM SEQUENCEOF-SUBTYPES-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID FROM System-Dataview;
 
@@ -17,7 +17,7 @@ Thething-Context ::= SEQUENCE {
 
 END
 
-OCTO-SUBTYPES-DATAVIEW DEFINITIONS ::=
+SEQUENCEOF-SUBTYPES-DATAVIEW DEFINITIONS ::=
 BEGIN
 
    MyInteger ::= INTEGER (1)
@@ -103,7 +103,7 @@ BEGIN
       
       
       --  ASN.1 modules used by thread thething_Tick
-      MyArray FROM OCTO-SUBTYPES-DATAVIEW
+      MyArray FROM SEQUENCEOF-SUBTYPES-DATAVIEW
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
