@@ -610,8 +610,16 @@ QVector<QAction *> IVAppWidget::initActions()
     m_actShrinkScene->setEnabled(true);
     m_actShrinkScene->setIcon(QIcon(QLatin1String(":/toolbar/icns/shrink.svg")));
     connect(m_actShrinkScene, &QAction::triggered, this, [this]() {
-        centerView();
-        m_document->itemsModel()->updateSceneRect();
+        const QList<QGraphicsItem *> items = m_document->scene()->items();
+        const QRectF rect = std::accumulate(items.cbegin(), items.cend(), QRectF(),
+                                            [](const QRectF &rect, const QGraphicsItem *item) -> QRectF{
+            if (!item->parentItem() && item->type() > QGraphicsItem::UserType)
+                return rect.united(item->sceneBoundingRect());
+
+            return rect;
+        });
+        graphicsView()->centerOn(rect.center());
+        graphicsView()->scene()->setSceneRect(rect.marginsAdded(shared::graphicsviewutils::kContentMargins));
     });
 
     m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
