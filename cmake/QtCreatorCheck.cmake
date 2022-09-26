@@ -50,7 +50,7 @@ elseif(WIN32)
 endif()
 
 if (${QTC_LIB_DIR} STREQUAL "QTC_LIB_DIR-NOTFOUND")
-    message("Could not find libExtensionSystem.so|dylib|dll in " ${QTC_INSTALL}/lib/qtcreator)
+    message(FATAL_ERROR "Could not find libExtensionSystem.so|dylib|dll in " ${QTC_INSTALL}/lib/qtcreator)
 endif()
 
 message("QtCreatorCheck: Looked for QTC_LIB_DIR. Found " ${QTC_LIB_DIR})
