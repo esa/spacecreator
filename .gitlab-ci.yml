@@ -105,7 +105,7 @@ space-creator-qt6:
   variables:
     ENV_QT_VERSION: 6.3.1
     ENV_QTC_VERSION: 8.0.1
-    ENV_DIR: /opt/spacecreator5
+    ENV_DIR: /opt/spacecreator6
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt6
   script:
