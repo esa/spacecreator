@@ -20,6 +20,7 @@ configure_file(test_sequenceof_fixed_size.sh test_sequenceof_fixed_size.sh COPYO
 configure_file(test_ia5string_fixed_size.sh test_ia5string_fixed_size.sh COPYONLY)
 configure_file(test_octetstring_fixed_size.sh test_octetstring_fixed_size.sh COPYONLY)
 configure_file(test_octetstring.sh test_octetstring.sh COPYONLY)
+configure_file(test_octetstring_with_sequenceof.sh test_octetstring_with_sequenceof.sh COPYONLY)
 add_custom_target(${TEST_NAME}_copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources
     DEPENDS ${TEST_NAME})
