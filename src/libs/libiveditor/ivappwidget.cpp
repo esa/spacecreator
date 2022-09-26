@@ -20,7 +20,10 @@
 #include "archetypesmanagerdialog.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
+#include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitiesinstantiate.h"
+#include "commands/cmdfunctionitemcreate.h"
+#include "ivfunction.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "errorhub.h"
@@ -264,6 +267,106 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
     m_document->commandsStack()->push(cmdImport);
 }
 
+void IVAppWidget::wrapItems()
+{
+    m_document->commandsStack()->beginMacro(tr("Wrap selected into Function"));
+
+    /// Prepare items for serialization
+    QBuffer buffer;
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        shared::ErrorHub::addError(
+                    shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()), QString());
+        return;
+    }
+
+    QList<shared::VEObject *> objects;
+    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
+        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
+        if (ivm::IVObject *object = m_document->objectsModel()->getObject(index.data(role).toUuid())) {
+            objects.append(object);
+        }
+    }
+    /// Filter out connections without linked functions selected
+    auto it = std::remove_if(objects.begin(), objects.end(), [&objects](const shared::VEObject *obj){
+        if (auto iObj = qobject_cast<const ivm::IVConnection *>(obj)) {
+            return !objects.contains(iObj->source()) && !objects.contains(iObj->target());
+        }
+        return false;
+    });
+
+    /// deselect excluded from wrapping items
+    for (auto selIt = it; selIt != objects.end(); ++selIt) {
+        if (auto item = m_document->itemsModel()->getItem((*it)->id()))
+            item->setSelected(false);
+    }
+    objects.erase(it, objects.end());
+
+    /// Serialize prepared for wrapping items
+    if (!m_document->exporter()->exportObjects(objects, &buffer, m_document->archetypesModel())) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
+        return;
+    }
+    buffer.close();
+
+    /// Remove selected items from scene
+    QList<QPointer<ivm::IVObject>> entities;
+    for (auto ioIt = objects.cbegin(); ioIt != objects.cend(); ++ioIt) {
+        if (auto entity = (*ioIt)->as<ivm::IVObject *>()) {
+            if (entity->isRootObject()) {
+                continue;
+            }
+            if (entity->isFixedSystemElement()) {
+                continue;
+            }
+            if (entity->isInterface()) {
+                if (auto iface = entity->as<const ivm::IVInterface *>()) {
+                    if (iface->isRequiredSystemElement()) {
+                        continue;
+                    }
+                    if (auto srcIface = iface->cloneOf()) {
+                        continue;
+                    }
+                }
+            }
+            entities.append(entity);
+        }
+
+    }
+    auto cmdRm = new cmd::CmdEntitiesRemove(entities, m_document->objectsModel());
+    cmdRm->setText(tr("Remove selected item(s)"));
+    m_document->commandsStack()->push(cmdRm);
+
+    /// Calculate rectangle for new function according to selected rectangular items
+    static const QSet<ivm::IVObject::Type> kRectTypes {
+        ivm::IVObject::Type::Function,
+        ivm::IVObject::Type::FunctionType,
+        ivm::IVObject::Type::Comment
+    };
+    QRectF itemSceneRect;
+    for (shared::VEObject *obj: qAsConst(objects)) {
+        if (auto iObj = qobject_cast<ivm::IVObject *>(obj)) {
+            if (kRectTypes.contains(iObj->type())) {
+                itemSceneRect |= shared::graphicsviewutils::rect(iObj->coordinates());
+            }
+        }
+    }
+    /// TODO: check if `itemSceneRect` intersects with some rectangular items in the scene
+    /// then reduce `itemSceneRect` to minimal accepted size and put in the center of wrapped items
+
+    /// Create Wrapping Function
+    const shared::Id id = shared::createId();
+    auto fn = qobject_cast<ivm::IVFunction *>(m_document->objectsModel()->rootObject());
+    auto cmd = new cmd::CmdFunctionItemCreate(m_document->objectsModel(), fn, itemSceneRect, QString(), id);
+    if (m_document->commandsStack()->push(cmd)) {
+        /// Inject wrapped items into newly created Function
+        auto cmdImport = new cmd::CmdEntitiesImport(buffer.data(), m_document->objectsModel()->getFunction(id),
+                                                    m_document->objectsModel(), m_document->asn1Check(),
+                                                    QPointF(0, 0), QFileInfo(m_document->path()).absolutePath());
+        m_document->commandsStack()->push(cmdImport);
+    }
+    m_document->commandsStack()->endMacro();
+}
+
 void IVAppWidget::showPropertyEditor(const shared::Id &id)
 {
     Q_ASSERT(m_document);
@@ -272,7 +375,7 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
     }
 
     ivm::IVObject *obj = m_document->objectsModel()->getObject(id);
-    if (!obj || obj->type() == ivm::IVObject::Type::InterfaceGroup || obj->type() == ivm::IVObject::Type::Connection) {
+    if (!obj || obj->isInterfaceGroup() || obj->isConnection()) {
         return;
     }
 
@@ -488,10 +591,11 @@ QVector<QAction *> IVAppWidget::initActions()
             Qt::QueuedConnection);
     connect(m_tool, &IVCreatorTool::propertyEditorRequest, this, &IVAppWidget::showPropertyEditor,
             Qt::QueuedConnection);
-    connect(m_tool, &IVCreatorTool::nestedViewRequest, this, &IVAppWidget::enterNestedView, Qt::QueuedConnection);
+    connect(m_tool, &IVCreatorTool::nestedViewTriggered, this, &IVAppWidget::enterNestedView, Qt::QueuedConnection);
     connect(m_tool, &IVCreatorTool::informUser, m_document.data(), &InterfaceDocument::showInfoMessage);
     connect(m_tool, &IVCreatorTool::copyActionTriggered, this, &IVAppWidget::copyItems);
     connect(m_tool, &IVCreatorTool::cutActionTriggered, this, &IVAppWidget::cutItems);
+    connect(m_tool, &IVCreatorTool::wrapSelectedItemsTriggered, this, &IVAppWidget::wrapItems);
     connect(m_tool, &IVCreatorTool::pasteActionTriggered, this, qOverload<const QPointF &>(&IVAppWidget::pasteItems));
 
     auto actCreateFunctionType = new QAction(tr("Function Type"));

@@ -44,5 +44,6 @@
         <file>icns/model_checking_window.png</file>
         <file>icns/nested_view.svg</file>
         <file>icns/shrink.svg</file>
+        <file>icns/wrap_function.svg</file>
     </qresource>
 </RCC>

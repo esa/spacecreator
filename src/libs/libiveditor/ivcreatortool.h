@@ -58,7 +58,8 @@ public:
 
 Q_SIGNALS:
     void functionCreated(const shared::Id &id);
-    void nestedViewRequest(const shared::Id &id) const;
+    void nestedViewTriggered(const shared::Id &id);
+    void wrapSelectedItemsTriggered();
 
 protected:
     bool onMousePress(QMouseEvent *e) override;

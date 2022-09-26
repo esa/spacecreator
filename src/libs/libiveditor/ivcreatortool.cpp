@@ -20,7 +20,6 @@
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
 #include "commands/cmdconnectionitemcreate.h"
-#include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -46,7 +45,7 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
-#include "ui/grippointshandler.h"
+#include "itemeditor/graphicsitemhelpers.h"
 
 #include <QAction>
 #include <QApplication>
@@ -458,6 +457,15 @@ void IVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
     if (!scene)
         return;
 
+    const QList<QGraphicsItem *> selectedItems = scene->selectedItems();
+    if (std::any_of(selectedItems.cbegin(), selectedItems.cend(),
+                    [](QGraphicsItem *item){ return ive::gi::rectangularTypes().contains(item->type()); })) {
+        menu->addAction(QIcon(QLatin1String(":/toolbar/icns/wrap_function.svg")), tr("Wrap into function"),
+                        this, [this]() {
+            clearPreviewItem();
+            Q_EMIT wrapSelectedItemsTriggered();
+        });
+    }
 
     QGraphicsItem *gi = shared::graphicsviewutils::nearestItem(scene, scenePos, kContextMenuItemTolerance, { IVFunctionGraphicsItem::Type });
     if (!gi) {
@@ -468,7 +476,7 @@ void IVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
         if (fnItem->entity()) {
             menu->addAction(QIcon(QLatin1String(":/toolbar/icns/nested_view.svg")), tr("Enter nested view"),
                             this, [this, id = fnItem->entity()->id()]() {
-                Q_EMIT nestedViewRequest(id);
+                Q_EMIT nestedViewTriggered(id);
             });
         }
     }

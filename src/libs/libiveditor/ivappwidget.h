@@ -61,6 +61,7 @@ private Q_SLOTS:
     void cutItems();
     void pasteItems();
     void pasteItems(const QPointF &sceneDropPoint);
+    void wrapItems();
     void showPropertyEditor(const shared::Id &id);
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
