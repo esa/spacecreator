@@ -31,11 +31,11 @@ class SpinErrorParser
 public:
     SpinErrorParser() = default;
 
-    QList<SpinErrorReport> parse(const QString &spinMessage);
+    QList<SpinErrorReport> parse(const QString &spinMessage) const;
 
 private:
-    QRegularExpressionMatchIterator findErrors(const QString &spinMessage);
-    SpinErrorReport buildReport(const QRegularExpressionMatch &matchedError);
+    QRegularExpressionMatchIterator findErrors(const QString &spinMessage) const;
+    SpinErrorReport buildReport(const QRegularExpressionMatch &matchedError) const;
 };
 
 }
