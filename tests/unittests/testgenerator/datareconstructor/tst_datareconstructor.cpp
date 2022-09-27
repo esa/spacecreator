@@ -115,8 +115,7 @@ void tst_datareconstructor::testNominalBigEndian() const
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview_big_endian.xml");
     ivm::IVInterface *const ivIface = IvTools::getIfaceFromModel("Calculate", ivModel.get());
 
-    const QString asn1Filepath =
-            QString("%1%2%3").arg("resources").arg(QDir::separator()).arg("testharness_big_endian.asn");
+    const QString asn1Filepath = QString("%1%2%3").arg("resources").arg(QDir::separator()).arg("testharness.asn");
     const auto asn1Model = ModelLoader::loadAsn1Model(asn1Filepath);
 
     const DataReconstructor::TypeLayoutInfos typeLayoutInfos = {
@@ -145,11 +144,11 @@ void tst_datareconstructor::testNominalBigEndian() const
 void tst_datareconstructor::testBooleansInARow() const
 {
     const QVector<QVariant> expectedTestData = {
-        true, true, true, true, //
-        false, false, false, false //
+        true, false, true, true, //
+        false, true, false, true //
     };
 
-    const char *const rawTestData = "\x01\x01\x01\x01\x00\x00\x00\x00";
+    const char *const rawTestData = "\x01\x00\x01\x01\x00\x01\x00\x01";
 
     const int resultBytesNum = 8;
     QByteArray rawTestByteArray = QByteArray::fromRawData(rawTestData, resultBytesNum);
