@@ -19,6 +19,8 @@
 
 #include "datareconstructor.h"
 
+#include <QDebug>
+
 namespace testgenerator {
 
 DataReconstructor::TypeLayoutInfos::TypeLayoutInfos(std::initializer_list<TypeLayoutInfo> infos)
@@ -28,10 +30,12 @@ DataReconstructor::TypeLayoutInfos::TypeLayoutInfos(std::initializer_list<TypeLa
     }
 }
 
-void setIndexToMultipleOf(int number, int &i)
+int findNextMultipleOf(int number, int i)
 {
     if (i % number != 0) {
-        i += number - i % number;
+        return i + number - i % number;
+    } else {
+        return i;
     }
 }
 
@@ -46,6 +50,8 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
     constexpr int DATA_ROW_ALINGMENT = 8;
 
     int i = 0;
+    int rowSize = 0;
+    int rowCounter = 0;
     while (i < rawData.size()) {
         for (const auto &param : iface->params()) {
             const auto &type = definitionNameToTypeMap.value(param.paramTypeName());
@@ -54,7 +60,7 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
             }
 
             const int dataLength = typeLayoutInfos.value(type->typeName()).first;
-            setIndexToMultipleOf(dataLength, i);
+            i = findNextMultipleOf(dataLength, i);
 
             QByteArray rawVariable = rawData.mid(i, dataLength);
             i += dataLength;
@@ -72,7 +78,14 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
                 pushBackCopyToVariantVector<bool>(output, rawVariable);
             }
         }
-        setIndexToMultipleOf(DATA_ROW_ALINGMENT, i);
+        if (rowCounter == 0) {
+            rowSize = i;
+        }
+        int nextMultiple = findNextMultipleOf(DATA_ROW_ALINGMENT, i);
+        if (i + rowSize > nextMultiple) {
+            i = nextMultiple;
+        }
+        rowCounter++;
     }
     return output;
 }

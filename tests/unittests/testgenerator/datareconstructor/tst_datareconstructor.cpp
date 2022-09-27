@@ -151,7 +151,7 @@ void tst_datareconstructor::testBooleansInARow() const
 
     const char *const rawTestData = "\x01\x01\x01\x01\x00\x00\x00\x00";
 
-    const int resultBytesNum = 4;
+    const int resultBytesNum = 8;
     QByteArray rawTestByteArray = QByteArray::fromRawData(rawTestData, resultBytesNum);
 
     const auto ivModel = ModelLoader::loadIvModel("resources/config.xml", "resources/interfaceview_booleans.xml");

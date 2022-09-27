@@ -9,7 +9,7 @@
     <Input_Parameter name="param1" type="MyBool" encoding="NATIVE"/>
     <Input_Parameter name="param2" type="MyBool" encoding="NATIVE"/>
     <Input_Parameter name="param3" type="MyBool" encoding="NATIVE"/>
-    <Output_Parameter name="result" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="result" type="MyBool" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="38400 40900"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
@@ -26,7 +26,7 @@
     <Input_Parameter name="param1" type="MyBool" encoding="NATIVE"/>
     <Input_Parameter name="param2" type="MyBool" encoding="NATIVE"/>
     <Input_Parameter name="param3" type="MyBool" encoding="NATIVE"/>
-    <Output_Parameter name="result" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="result" type="MyBool" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="54800 34200"/>
 </Provided_Interface>
 
