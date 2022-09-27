@@ -20,6 +20,7 @@
 #pragma once
 
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <asn1library/asn1/constraints/constraintlist.h>
 #include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/types/typereadingvisitor.h>
@@ -45,10 +46,12 @@ public:
 
      * @brief Constructor
      *
-     * @param promelaModel target promela model
-     * @param name name of ASN.1 type
+     * @param   promelaModel    target promela model
+     * @param   name            name of ASN.1 type
+     * @param   overridenType   ASN.1 type that this type overrides by subtyping
      */
-    Asn1TypeValueGeneratorVisitor(model::PromelaModel &promelaModel, QString name);
+    Asn1TypeValueGeneratorVisitor(
+            model::PromelaModel &promelaModel, QString name, const Asn1Acn::Types::Type *overridenType);
 
     /**
      * @brief Visit Asn1Acn::Types::Boolean
@@ -146,7 +149,8 @@ private:
         static void addRangedIntegerGeneratorToModel(
                 const QString &inlineName, model::PromelaModel &model, long minSize, long maxSize);
 
-        static Expression getValueLenghtMinusConstAsExpression(const QString &valueVariableName, int x);
+        static Expression getValueLengthAsExpression(const QString &valueVariableName);
+        static Expression getValueLengthMinusConstAsExpression(const QString &valueVariableName, int x);
     };
 
     auto createValueGenerationInline(model::Sequence sequence) -> void;
@@ -163,9 +167,15 @@ private:
     auto getInlineGeneratorName(const QString &typeName) -> QString;
     auto getInlineArgumentName() -> QString;
 
+    template<typename ValueType>
+    auto handleOverridenType(const Asn1Acn::Constraints::ConstraintList<ValueType> &constraints,
+            const QString &initInlineName, const QString &valueName, const size_t minSize, const size_t maxSize,
+            model::Sequence *sequence) const -> void;
+
 private:
     model::PromelaModel &m_promelaModel;
     QString m_name;
+    const Asn1Acn::Types::Type *m_overridenType;
 };
 
 } // namespace promela::translator

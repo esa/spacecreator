@@ -1,0 +1,22 @@
+/* CIF PROCESS (249, 150), (150, 75) */
+process Thething;
+    /* CIF TEXT (631, 34), (267, 140) */
+    -- Text area for declarations and comments
+    
+    dcl arg MyArray;
+    dcl result MyArray;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (451, 10), (70, 35) */
+    state Wait;
+        /* CIF input (445, 65), (74, 35) */
+        input Tick(arg);
+            /* CIF task (436, 120), (93, 35) */
+            task result := arg;
+            /* CIF NEXTSTATE (448, 175), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Thething;

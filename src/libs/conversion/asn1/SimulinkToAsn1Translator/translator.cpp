@@ -74,7 +74,7 @@ std::vector<std::unique_ptr<Model>> SimulinkToAsn1Translator::translateSimulinkM
     auto simulinkModelAsn1AcnDefinitions =
             std::make_unique<Definitions>(simulinkModelAsn1AcnDefinitionsName, SourceLocation());
 
-    Context context(simulinkModel, matlabStandardDataTypesAsn1AcnDefinitions, simulinkModelAsn1AcnDefinitions, options);
+    Context context(matlabStandardDataTypesAsn1AcnDefinitions, simulinkModelAsn1AcnDefinitions, options);
 
     addMatLabStandardDataTypes(context);
 

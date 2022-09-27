@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+	<Package name="function_1">
+		<DataTypeSet>
+			<IntegerDataType name="T_Int32">
+				<Range>
+					<MinMaxRange min="-2147483648" max="2147483647" rangeType="inclusiveMinInclusiveMax" />
+				</Range>
+			</IntegerDataType>
+		</DataTypeSet>
+		<ComponentSet>
+			<Component name="function_1">
+				<ProvidedInterfaceSet>
+					<Interface type="Function_1PI_2Pi" name="PI_2Pi" />
+				</ProvidedInterfaceSet>
+				<RequiredInterfaceSet>
+					<Interface type="Function_1PI_1Ri" name="PI_1Ri" />
+				</RequiredInterfaceSet>
+				<DeclaredInterfaceSet>
+					<Interface name="Function_1PI_2Pi">
+						<CommandSet>
+							<Command name="PI_2Pi" mode="async">
+								<Argument type="T_Int32" name="testArg" mode="in" />
+							</Command>
+						</CommandSet>
+					</Interface>
+					<Interface name="Function_1PI_1Ri">
+						<CommandSet>
+							<Command name="PI_1Ri" mode="async">
+								<Argument type="T_Int32" name="testArg2" mode="in" />
+							</Command>
+						</CommandSet>
+					</Interface>
+				</DeclaredInterfaceSet>
+				<Implementation>
+					<VariableSet>
+						<Variable name="mVar" type="T_Int32" />
+					</VariableSet>
+					<ActivitySet>
+						<Activity name="Activity">
+							<Body>
+								<SendCommandPrimitive command="PI_1Ri" interface="PI_1Ri">
+									<ArgumentValue name="testArg">
+										<VariableRef variableRef="mVar">
+										</VariableRef>
+									</ArgumentValue>
+								</SendCommandPrimitive>
+							</Body>
+						</Activity>
+					</ActivitySet>
+					<StateMachineSet>
+						<StateMachine name="StateMachine">
+							<State name="StateB" />
+							<EntryState name="StateA" />
+							<Transition fromState="StateA" toState="StateB" name="dummy">
+								<OnCommandPrimitive command="PI_2Pi" interface="PI_2Pi">
+									<ArgumentValue name="testArg" outputVariableRef="mVar" />
+								</OnCommandPrimitive>
+								<Do activity="Activity" />
+							</Transition>
+						</StateMachine>
+					</StateMachineSet>
+				</Implementation>
+			</Component>
+		</ComponentSet>
+	</Package>
+</PackageFile>

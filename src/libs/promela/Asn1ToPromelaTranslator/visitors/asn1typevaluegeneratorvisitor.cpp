@@ -50,6 +50,7 @@
 #include <promela/PromelaModel/binaryexpression.h>
 #include <promela/PromelaModel/conditional.h>
 #include <promela/PromelaModel/constant.h>
+#include <promela/PromelaModel/forloop.h>
 #include <promela/PromelaModel/inlinecall.h>
 #include <promela/PromelaModel/inlinedef.h>
 #include <promela/PromelaModel/proctypeelement.h>
@@ -84,6 +85,7 @@ using promela::model::Constant;
 using promela::model::DoLoop;
 using promela::model::ExitLoop;
 using promela::model::Expression;
+using promela::model::ForLoop;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::ProctypeElement;
@@ -99,9 +101,11 @@ const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::lengthMemberName = 
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::octetGeneratorName = "OctetStringElement_generate_value";
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::ia5StringGeneratorName = "IA5StringElement_generate_value";
 
-Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name)
+Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(
+        PromelaModel &promelaModel, QString name, const Asn1Acn::Types::Type *overridenType)
     : m_promelaModel(promelaModel)
     , m_name(std::move(name))
+    , m_overridenType(overridenType)
 {
 }
 
@@ -169,7 +173,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
     const size_t minSize = constraintVisitor.getMinSize();
     const size_t maxSize = constraintVisitor.getMaxSize();
-    if (minSize == maxSize) {
+
+    const auto isConstSize = minSize == maxSize;
+
+    if (isConstSize) {
         sequence->appendElement(
                 ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, Expression(maxSize - 1)));
     } else { // OctetString has variable length
@@ -183,8 +190,20 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
         sequence->appendElement(ProctypeMaker::makeInlineCall(
                 QString("%1_generate_value").arg(lengthGeneratorTypeName), valueLengthVariableName));
 
-        Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(argumentName, 1);
+        Expression end = InlineDefAdder::getValueLengthMinusConstAsExpression(argumentName, 1);
         sequence->appendElement(ProctypeMaker::makeCallForEachValue(octetGeneratorName, argumentName, end));
+    }
+
+    if (m_overridenType != nullptr) {
+        const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
+        if (overridenOctetString == nullptr) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which is not a OCTET STRING")
+                                        .arg(m_overridenType->identifier())
+                                        .arg(m_name);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        handleOverridenType(overridenOctetString->constraints(), "", argumentName, minSize, maxSize, sequence.get());
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -217,7 +236,10 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
     const size_t minSize = constraintVisitor.getMinSize();
     const size_t maxSize = constraintVisitor.getMaxSize();
-    if (minSize == maxSize) {
+
+    const auto isConstSize = minSize == maxSize;
+
+    if (isConstSize) {
         sequence->appendElement(
                 ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, Expression(maxSize - 1)));
     } else { // IA5String has variable length
@@ -231,8 +253,20 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
         sequence->appendElement(ProctypeMaker::makeInlineCall(
                 QString("%1_generate_value").arg(lengthGeneratorTypeName), valueLengthVariableName));
 
-        Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(argumentName, 1);
+        Expression end = InlineDefAdder::getValueLengthMinusConstAsExpression(argumentName, 1);
         sequence->appendElement(ProctypeMaker::makeCallForEachValue(ia5StringGeneratorName, argumentName, end));
+    }
+
+    if (m_overridenType != nullptr) {
+        const auto overridenIA5String = dynamic_cast<const IA5String *>(m_overridenType);
+        if (overridenIA5String == nullptr) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which is not a IA5String")
+                                        .arg(m_overridenType->identifier())
+                                        .arg(m_name);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        handleOverridenType(overridenIA5String->constraints(), "", argumentName, minSize, maxSize, sequence.get());
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -307,7 +341,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
 
         if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
             auto *const choiceComponentType = getChoiceComponentType(choiceComponent);
-            Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName);
+            Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
             choiceComponentType->accept(visitor);
         }
 
@@ -342,7 +376,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
             const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
             if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
                 auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
-                Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName);
+                Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
                 asnSequenceComponentType->accept(visitor);
             }
 
@@ -364,7 +398,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     const QString inlineTypeGeneratorName = Escaper::escapePromelaName(getInlineGeneratorName(componentTypeName));
     if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
         auto *const asnSequenceComponentType = type.itemsType();
-        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName);
+        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
         asnSequenceComponentType->accept(visitor);
     }
 
@@ -377,10 +411,12 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     sequence->appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, "i"));
     const size_t minSize = constraintVisitor.getMinSize();
     const size_t maxSize = constraintVisitor.getMaxSize();
-    const QString typeGeneratorInline = QString("%1%2").arg(componentTypeName).arg("_generate_value");
-    if (minSize == maxSize) {
-        sequence->appendElement(
-                ProctypeMaker::makeCallForEachValue(typeGeneratorInline, valueVariableName, Expression(maxSize - 1)));
+
+    const auto isConstSize = minSize == maxSize;
+
+    if (isConstSize) {
+        sequence->appendElement(ProctypeMaker::makeCallForEachValue(
+                inlineTypeGeneratorName, valueVariableName, Expression(maxSize - 1)));
     } else { // sequenceOf has variable length
         const QString lengthGeneratorTypeName =
                 QString("%1_%2").arg(typeIdentifier).arg(InlineDefAdder::lengthMemberName);
@@ -390,8 +426,30 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         sequence->appendElement(ProctypeMaker::makeInlineCall(QString("%1_generate_value").arg(lengthGeneratorTypeName),
                 QString("%1.%2").arg(valueVariableName).arg(InlineDefAdder::lengthMemberName)));
 
-        Expression end = InlineDefAdder::getValueLenghtMinusConstAsExpression(valueVariableName, 1);
-        sequence->appendElement(ProctypeMaker::makeCallForEachValue(typeGeneratorInline, valueVariableName, end));
+        Expression end = InlineDefAdder::getValueLengthMinusConstAsExpression(valueVariableName, 1);
+        sequence->appendElement(ProctypeMaker::makeCallForEachValue(inlineTypeGeneratorName, valueVariableName, end));
+    }
+
+    if (m_overridenType != nullptr) {
+        if (const auto overridenSequenceOf = dynamic_cast<const SequenceOf *>(m_overridenType);
+                overridenSequenceOf != nullptr) {
+            const auto initCallName = QString("%1_elem_init_value").arg(m_overridenType->identifier());
+            handleOverridenType(overridenSequenceOf->constraints(), initCallName, valueVariableName, minSize, maxSize,
+                    sequence.get());
+        } else if (const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
+                   overridenOctetString != nullptr) {
+            handleOverridenType(
+                    overridenOctetString->constraints(), "", valueVariableName, minSize, maxSize, sequence.get());
+        } else if (const auto overridenIA5String = dynamic_cast<const IA5String *>(m_overridenType);
+                   overridenIA5String != nullptr) {
+            handleOverridenType(
+                    overridenIA5String->constraints(), "", valueVariableName, minSize, maxSize, sequence.get());
+        } else {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which is not a SEQUENCE OF")
+                                        .arg(m_overridenType->identifier())
+                                        .arg(m_name);
+            throw TranslationException(std::move(errorMessage));
+        }
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -460,7 +518,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const UserdefinedType &type)
     auto *const typeType = type.type();
     if (typeType != nullptr) {
         const auto name = m_name.isEmpty() ? type.typeName() : m_name;
-        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, name);
+        Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, name, m_overridenType);
         typeType->accept(visitor);
     }
 }
@@ -601,11 +659,18 @@ void Asn1TypeValueGeneratorVisitor::InlineDefAdder::addRangedIntegerGeneratorToM
     const Asn1Acn::Range<Asn1Acn::IntegerValue::Type> range(minSize, maxSize);
     lengthType.constraints().append(range);
 
-    Asn1TypeValueGeneratorVisitor lenVisitor(model, inlineName);
+    Asn1TypeValueGeneratorVisitor lenVisitor(model, inlineName, nullptr);
     lengthType.accept(lenVisitor);
 }
 
-Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLenghtMinusConstAsExpression(
+Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLengthAsExpression(const QString &valueVariableName)
+{
+    const VariableRef varRef(QString("%1.%2").arg(valueVariableName).arg(lengthMemberName));
+
+    return Expression(varRef);
+}
+
+Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLengthMinusConstAsExpression(
         const QString &valueVariableName, const int x)
 {
     const auto subtractOperator = model::BinaryExpression::Operator::SUBTRACT;
@@ -618,6 +683,69 @@ Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLenghtMinusCon
             subtractOperator, std::move(endVarRefExpression), std::move(oneConstExpression));
 
     return Expression(endBinaryExpression);
+}
+
+template<typename ValueType>
+void Asn1TypeValueGeneratorVisitor::handleOverridenType(
+        const Asn1Acn::Constraints::ConstraintList<ValueType> &constraints, const QString &initInlineName,
+        const QString &valueName, const size_t minSize, const size_t maxSize, model::Sequence *sequence) const
+{
+    SizeConstraintVisitor<ValueType> constraintVisitor;
+    constraints.accept(constraintVisitor);
+
+    const size_t overridenMinSize = constraintVisitor.getMinSize();
+    const size_t overridenMaxSize = constraintVisitor.getMaxSize();
+
+    const auto isConstSize = minSize == maxSize;
+    const auto isOverridenConstSize = overridenMinSize == overridenMaxSize;
+
+    // We allow to subtype one const size with another const size
+    if (!isConstSize && !isOverridenConstSize) {
+        if (minSize < overridenMinSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
+            throw TranslationException(std::move(errorMessage));
+        } else if (maxSize > overridenMaxSize) {
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
+            throw TranslationException(std::move(errorMessage));
+        }
+    }
+
+    if (isConstSize) {
+        if (initInlineName.isEmpty()) {
+            auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+            VariableRef dst(valueName);
+            dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+
+            loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
+
+            auto forLoop = ForLoop(
+                    VariableRef("i"), Expression(maxSize), Expression(overridenMaxSize - 1), std::move(loopSequence));
+            sequence->appendElement(std::move(forLoop));
+        } else {
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    initInlineName, valueName, Expression(maxSize), Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        }
+    } else {
+        Expression start = InlineDefAdder::getValueLengthAsExpression(valueName);
+
+        if (initInlineName.isEmpty()) {
+            auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+            VariableRef dst(valueName);
+            dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+
+            loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
+
+            auto forLoop = ForLoop(VariableRef("i"), start, Expression(overridenMaxSize - 1), std::move(loopSequence));
+            sequence->appendElement(std::move(forLoop));
+        } else {
+            auto initCall = ProctypeMaker::makeCallForEachValue(
+                    initInlineName, valueName, start, Expression(overridenMaxSize - 1));
+            sequence->appendElement(std::move(initCall));
+        }
+    }
 }
 
 } // namespace promela::translator

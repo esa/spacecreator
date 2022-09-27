@@ -72,6 +72,7 @@ public:
         SedsConverterNoMangling,
         SedsConverterMultipleAsnModels,
         SedsConverterSkipEmptySequences,
+        SedsConverterTasteTranslation,
 
         Unknown
     };
