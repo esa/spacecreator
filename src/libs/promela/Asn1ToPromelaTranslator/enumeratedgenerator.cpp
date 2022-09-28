@@ -57,4 +57,14 @@ bool EnumeratedGenerator::has_next() const
     return m_iter != m_items.end();
 }
 
+QString EnumeratedGenerator::getNameForValue(int32_t value) const
+{
+    auto result = std::find_if(
+            m_items.begin(), m_items.end(), [value](const EnumeratedItem &item) { return item.value() == value; });
+    if (result == m_items.end()) {
+        return QString();
+    } else {
+        return result->name();
+    }
+}
 }

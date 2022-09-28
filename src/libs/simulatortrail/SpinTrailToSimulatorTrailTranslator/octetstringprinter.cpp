@@ -17,30 +17,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "octetstringprinter.h"
 
-#include "export/modelexporter.h"
-
-#include <QTextStream>
-#include <simulatortrail/SimulatorTrailModel/simulatortrailmodel.h>
-
-namespace simulatortrail::exporter {
-/**
- * @brief SimulatorTrailExporter exports SimulatorTrailModel to textual representation.
- */
-class SimulatorTrailExporter final : public ::conversion::exporter::ModelExporter
+namespace simulatortrail::translator {
+QString OctetStringPrinter::operator()(const QString &arg) const
 {
-public:
-    /**
-     * @brief   Exports SimulatorTrailModel to file
-     *
-     * @param   model       Model to export
-     * @param   options     Options for export configuration
-     */
-    void exportModel(const conversion::Model *model, const conversion::Options &options) const override;
-
-private:
-    void doExport(const simulatortrail::model::SimulatorTrailModel &model, QTextStream &stream) const;
-};
-
+    return QString("\"%1\"H").arg(arg);
+}
 }

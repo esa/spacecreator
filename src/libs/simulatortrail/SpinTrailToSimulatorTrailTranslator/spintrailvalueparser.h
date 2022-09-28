@@ -19,28 +19,20 @@
 
 #pragma once
 
-#include "export/modelexporter.h"
+#include <QStringList>
+#include <asn1library/asn1/types/type.h>
+#include <asn1library/asn1/value.h>
 
-#include <QTextStream>
-#include <simulatortrail/SimulatorTrailModel/simulatortrailmodel.h>
+namespace simulatortrail::translator {
 
-namespace simulatortrail::exporter {
-/**
- * @brief SimulatorTrailExporter exports SimulatorTrailModel to textual representation.
- */
-class SimulatorTrailExporter final : public ::conversion::exporter::ModelExporter
+class SpinTrailValueParser final
 {
 public:
-    /**
-     * @brief   Exports SimulatorTrailModel to file
-     *
-     * @param   model       Model to export
-     * @param   options     Options for export configuration
-     */
-    void exportModel(const conversion::Model *model, const conversion::Options &options) const override;
+    SpinTrailValueParser();
+
+    Asn1Acn::ValuePtr parseValue(const QStringList &spinTrailValue, const Asn1Acn::Types::Type *asn1Type);
 
 private:
-    void doExport(const simulatortrail::model::SimulatorTrailModel &model, QTextStream &stream) const;
+    Asn1Acn::ValuePtr parseValue(QStringList &spinTrailValue, const Asn1Acn::Types::Type *asn1Type);
 };
-
 }

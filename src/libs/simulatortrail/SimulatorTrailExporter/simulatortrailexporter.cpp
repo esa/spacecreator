@@ -23,30 +23,59 @@
 #include <conversion/common/export/exceptions.h>
 #include <simulatortrail/SimulatorTrailOptions/options.h>
 
+using Asn1Acn::ValuePtr;
 using conversion::Model;
 using conversion::ModelType;
 using conversion::Options;
 using conversion::exporter::ExportException;
+using conversion::exporter::IncorrectModelException;
 using conversion::simulatortrail::SimulatorTrailOptions;
+using simulatortrail::model::SimulatorTrailModel;
 
 namespace simulatortrail::exporter {
 void SimulatorTrailExporter::exportModel(const Model *model, const Options &options) const
 {
-    Q_UNUSED(model);
+    if (model == nullptr) {
+        throw ExportException("Model to export is null");
+    }
+    const SimulatorTrailModel *simulatorTrailModel = dynamic_cast<const SimulatorTrailModel *>(model);
+    if (simulatorTrailModel == nullptr) {
+        throw IncorrectModelException(ModelType::SimulatorTrail, model->modelType());
+    }
 
     std::optional<QString> outputFilepath = options.value(SimulatorTrailOptions::outputFilepath);
 
     if (outputFilepath.has_value()) {
+        QString output;
+        QTextStream outputStream(&output, QIODevice::WriteOnly);
+
+        doExport(*simulatorTrailModel, outputStream);
+
         QSaveFile outputFile(outputFilepath.value());
         const bool opened = outputFile.open(QIODevice::WriteOnly);
         if (!opened) {
             throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
         }
 
+        const std::string data = output.toStdString();
+        const int64_t written = outputFile.write(data.c_str());
+
+        if (written != output.length()) {
+            throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
+        }
+
         const bool commited = outputFile.commit();
         if (!commited) {
             throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
         }
+    }
+}
+
+void SimulatorTrailExporter::doExport(
+        const simulatortrail::model::SimulatorTrailModel &model, QTextStream &stream) const
+{
+    for (const ValuePtr &value : model.getValues()) {
+        stream << value->asString() << "\n";
     }
 }
 }

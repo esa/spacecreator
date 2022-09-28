@@ -19,9 +19,11 @@
 
 #pragma once
 
+#include <asn1library/asn1/value.h>
 #include <conversion/common/model.h>
 #include <conversion/common/modelproperties.h>
 #include <conversion/common/modeltype.h>
+#include <list>
 
 namespace simulatortrail::model {
 
@@ -36,6 +38,13 @@ public:
      * @return  Model type
      */
     conversion::ModelType modelType() const override;
+
+    void appendValue(Asn1Acn::ValuePtr value);
+
+    const std::list<Asn1Acn::ValuePtr> &getValues() const;
+
+private:
+    std::list<Asn1Acn::ValuePtr> m_values;
 };
 }
 

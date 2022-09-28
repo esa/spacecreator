@@ -28,4 +28,13 @@ conversion::ModelType SimulatorTrailModel::modelType() const
     return conversion::ModelProperties<SimulatorTrailModel>::type;
 }
 
+void SimulatorTrailModel::appendValue(Asn1Acn::ValuePtr value)
+{
+    m_values.push_back(std::move(value));
+}
+
+const std::list<Asn1Acn::ValuePtr> &SimulatorTrailModel::getValues() const
+{
+    return m_values;
+}
 }

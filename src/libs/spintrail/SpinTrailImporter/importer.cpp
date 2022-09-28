@@ -102,8 +102,8 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
             const ChannelEvent::Type eventType = command.compare("recv", Qt::CaseInsensitive) == 0
                     ? ChannelEvent::Type::Recv
                     : ChannelEvent::Type::Send;
-            qDebug() << "Found event " << proctypeName << " " << command << parameters.join(" ") << " to channel "
-                     << channelName;
+            // qDebug() << "Found event " << proctypeName << " " << command << parameters.join(" ") << " to channel "
+            //          << channelName;
             model.appendEvent(std::make_unique<ChannelEvent>(
                     eventType, std::move(proctypeName), std::move(channelName), std::move(parameters)));
         }
