@@ -95,6 +95,6 @@ case $1 in
     exec $bindir/IVeditor "--version"
     ;;
 *)
-    exec "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" ${1+"$@"}
+    exec "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" ${1+"$@"} -color blue
     ;;
 esac
