@@ -591,9 +591,40 @@ QVector<QAction *> IVAppWidget::initActions()
     });
     m_actExitToParent->setIcon(QIcon(":/toolbar/icns/exit_parent.svg"));
 
+    m_actEnterNestedView = new QAction(tr("Enter function nested view"));
+    m_actEnterNestedView->setActionGroup(actionGroup);
+    m_actEnterNestedView->setEnabled(false);
+    m_actEnterNestedView->setIcon(QIcon(QLatin1String(":/toolbar/icns/nested_view.svg")));
+    connect(m_actEnterNestedView, &QAction::triggered, this, [this]() {
+        const QModelIndexList idxs = m_document->objectsSelectionModel()->selectedIndexes();
+        const auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
+            return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
+                    == static_cast<int>(ivm::IVObject::Type::Function);
+        });
+        if (it != idxs.cend())
+            enterNestedView(it->data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
+    });
+
+    m_actShrinkScene = new QAction(tr("Shrink scene"));
+    m_actShrinkScene->setActionGroup(actionGroup);
+    m_actShrinkScene->setEnabled(true);
+    m_actShrinkScene->setIcon(QIcon(QLatin1String(":/toolbar/icns/shrink.svg")));
+    connect(m_actShrinkScene, &QAction::triggered, this, [this]() {
+        const QList<QGraphicsItem *> items = m_document->scene()->items();
+        const QRectF rect = std::accumulate(items.cbegin(), items.cend(), QRectF(),
+                                            [](const QRectF &rect, const QGraphicsItem *item) -> QRectF{
+            if (!item->parentItem() && item->type() > QGraphicsItem::UserType)
+                return rect.united(item->sceneBoundingRect());
+
+            return rect;
+        });
+        graphicsView()->centerOn(rect.center());
+        graphicsView()->scene()->setSceneRect(rect.marginsAdded(shared::graphicsviewutils::kContentMargins));
+    });
+
     m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
         actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup, m_actRemove,
-        m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent };
+        m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent, m_actEnterNestedView, m_actShrinkScene };
 
     connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
         Q_UNUSED(rootId)
@@ -614,6 +645,12 @@ QVector<QAction *> IVAppWidget::initActions()
                             == static_cast<int>(ivm::IVObject::Type::Connection);
                 });
                 m_actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
+
+                const auto count = std::count_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
+                    return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
+                            == static_cast<int>(ivm::IVObject::Type::Function);
+                });
+                m_actEnterNestedView->setEnabled(count == 1);
             });
     return m_toolbarActions;
 }
