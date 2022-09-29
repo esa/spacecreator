@@ -20,10 +20,10 @@
 #include "scversion.h"
 
 #include <QCoreApplication>
-#include <QDebug>
 #include <QRegularExpression>
 #include <QString>
 #include <iostream>
+#include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorreport.h>
 #include <string.h>
 
@@ -85,7 +85,6 @@ int main(int argc, char *argv[])
         report.errorType = SpinErrorReport::DataConstraintViolation;
         report.rawErrorDetails = match.captured(3);
         reports.append(report);
-        qDebug() << report.rawErrorDetails;
     }
     return EXIT_SUCCESS;
 }

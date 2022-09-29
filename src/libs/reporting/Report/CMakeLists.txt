@@ -1,9 +1,11 @@
 project(Report VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
+    dataconstraintviolationreport.cpp
     spinerrorreport.cpp)
 
 set(INCLUDES
+    dataconstraintviolationreport.h
     spinerrorreport.h)
 
 add_library(Report STATIC)
