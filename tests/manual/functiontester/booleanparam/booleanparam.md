@@ -15,5 +15,5 @@
 **2. Expected results:**
 
 * Project should succesfully build
-* It should launch the default browser with a page displaying results in form o the array
+* It should launch the default browser with a page displaying results in the form of the array
 * All the numbers should be green and there should be no missing cells and no error info
