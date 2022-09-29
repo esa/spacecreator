@@ -1,12 +1,9 @@
 SUBTYPES DEFINITIONS ::=
 BEGIN
 
--- Tailored-Byte ::= INTEGER(0 | 10 | 255) 
+Tailored-Byte ::= INTEGER(0 | 10) 
 
--- Bcapp-dlctxsdu-p1 ::= SEQUENCE (SIZE(2)) OF Tailored-Byte
-
-Bcapp-dlctxsdu-p1 ::= OCTET STRING (SIZE(2))
-
+Bcapp-dlctxsdu-p1 ::= SEQUENCE (SIZE(1)) OF Tailored-Byte
 
 Channeleffects-corruptchar-p1 ::= INTEGER(1 | 15)
 

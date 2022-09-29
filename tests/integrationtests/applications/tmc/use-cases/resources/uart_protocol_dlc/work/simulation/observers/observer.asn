@@ -456,7 +456,7 @@ BEGIN
    }
 
    --  constant that can be used to refer to the absence of an input/output event
-   nothing Observable-Event ::= no-event : {}
+   -- nothing Observable-Event ::= no-event : {}
 
    --  Define a queue of events, corresponding to the input queue for each function
    max-events INTEGER ::= 10

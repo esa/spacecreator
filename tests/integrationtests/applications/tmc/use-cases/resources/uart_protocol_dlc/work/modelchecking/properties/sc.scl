@@ -1,1 +1,1 @@
-never get_state(Rtdlcr) = receiving;
+never get_state(Erroredchannel) = drop;

@@ -34,9 +34,9 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
 # State number comparison is discarded, as state numbering is not stable
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
-    && $CC -DVECTORSZ=65536 -o system.out pan.c \
+    && $CC -DVECTORSZ=16384 -DBITSTATE -o system.out pan.c \
     && ./system.out > system.log \
     && grep -q "errors: 1" system.log \
-    && grep -q "assertion violated  !((global_state.locka.state==" system.log \
-    && cd .. 
-#    && rm -r $TEST_OUTPUT_DIR
+    && grep -q "assertion violated  !((global_state.erroredchannel.state==" system.log \
+    && cd .. \
+    && rm -r $TEST_OUTPUT_DIR
