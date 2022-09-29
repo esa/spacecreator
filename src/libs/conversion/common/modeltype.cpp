@@ -39,6 +39,10 @@ const QString &modelTypeToString(ModelType modelType)
         return ModelTypeProperties<ModelType::Msc>::name;
     case ModelType::Promela:
         return ModelTypeProperties<ModelType::Promela>::name;
+    case ModelType::PromelaData:
+        return ModelTypeProperties<ModelType::PromelaData>::name;
+    case ModelType::PromelaSystem:
+        return ModelTypeProperties<ModelType::PromelaSystem>::name;
     case ModelType::Sdl:
         return ModelTypeProperties<ModelType::Sdl>::name;
     case ModelType::Seds:
@@ -68,6 +72,10 @@ const QStringList &modelTypeExtensions(ModelType modelType)
         return ModelTypeProperties<ModelType::InterfaceView>::extensions;
     case ModelType::Promela:
         return ModelTypeProperties<ModelType::Promela>::extensions;
+    case ModelType::PromelaData:
+        return ModelTypeProperties<ModelType::PromelaData>::extensions;
+    case ModelType::PromelaSystem:
+        return ModelTypeProperties<ModelType::PromelaSystem>::extensions;
     case ModelType::Sdl:
         return ModelTypeProperties<ModelType::Sdl>::extensions;
     case ModelType::Seds:
@@ -99,6 +107,12 @@ ModelType stringToModelType(const QString &s)
     }
     if (!s.compare(ModelTypeProperties<ModelType::Promela>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::Promela;
+    }
+    if (!s.compare(ModelTypeProperties<ModelType::PromelaData>::name, Qt::CaseInsensitive)) {
+        return conversion::ModelType::PromelaData;
+    }
+    if (!s.compare(ModelTypeProperties<ModelType::PromelaSystem>::name, Qt::CaseInsensitive)) {
+        return conversion::ModelType::PromelaSystem;
     }
     return conversion::ModelType::Unspecified;
 }

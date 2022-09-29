@@ -23,7 +23,7 @@
 #include <asn1library/asn1/definitions.h>
 #include <conversion/common/translation/translator.h>
 #include <ivcore/ivinterface.h>
-#include <promela/PromelaModel/promelamodel.h>
+#include <promela/PromelaModel/promelasystemmodel.h>
 #include <shared/veobject.h>
 
 namespace promela::translator {
@@ -135,7 +135,8 @@ private:
          *
          * @param promelaModel The model that is being created
          */
-        Context(model::PromelaModel *promelaModel, const ivm::IVModel *ivModel, const conversion::Options &options,
+        Context(model::PromelaSystemModel *promelaModel, const ivm::IVModel *ivModel,
+                const conversion::Options &options,
                 const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons,
                 const std::vector<QString> &modelFunctions, const std::vector<QString> &observerNames);
 
@@ -178,7 +179,7 @@ private:
          *
          * @return Promela model
          */
-        auto model() const -> model::PromelaModel *;
+        auto model() const -> model::PromelaSystemModel *;
 
         /**
          * Getter for the IV model that is translated
@@ -237,7 +238,7 @@ private:
         auto getObserversWithContinuousSignals() const -> const std::vector<QString> &;
 
     private:
-        model::PromelaModel *m_promelaModel;
+        model::PromelaSystemModel *m_promelaModel;
         const ivm::IVModel *m_ivModel;
         const conversion::Options &m_options;
         const std::vector<const Asn1Acn::Definitions *> &m_asn1SubtypesDefinitons;
@@ -301,10 +302,10 @@ private:
             std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements) const
             -> std::unique_ptr<model::ProctypeElement>;
     auto generateEnvironmentProctype(Context &context, const QString &functionName, const QString &interfaceName,
-            const QString &parameterType, const QString &sendInline) const -> void;
+            const std::pair<QString, QString> &interfaceParameter, const QString &sendInline) const -> void;
     auto generateSendInline(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterName, const QString &parameterType, const QString &sourceFunctionName,
-            const QString &sourceInterfaceName, const bool parameterSubtyped) const -> void;
+            const QString &sourceInterfaceName) const -> void;
     auto createPromelaObjectsForFunction(
             Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
     auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVInterface *providedInterface,
@@ -313,7 +314,7 @@ private:
             Context &context, const ivm::IVInterface *requiredInterface, const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(
             Context &context, const ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
-    auto createCheckQueueInline(model::PromelaModel *promelaModel, const QString &functionName,
+    auto createCheckQueueInline(model::PromelaSystemModel *promelaModel, const QString &functionName,
             const QList<QString> &channelNames) const -> void;
     auto createCheckQueuesExpression(const QList<QString> &channelNames, bool empty) const
             -> std::unique_ptr<::promela::model::Expression>;
@@ -344,9 +345,6 @@ private:
     auto handleSendInlineArgument(const QString &parameterType, const QString &functionName,
             const QString &interfaceName, const QString parameterName, promela::model::Sequence &sequence) const
             -> QString;
-
-    auto isParameterSubtyped(Context &context, const QString &parameterTypeName, const QString &parameterName,
-            const QString &interfaceName, const QString &functionName) const -> bool;
 
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;

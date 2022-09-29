@@ -64,6 +64,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
     m_parser.handlePositional(CommandArg::SedsConverterMappingFunctionsModuleFileName);
     m_parser.handlePositional(CommandArg::SedsConverterSdlFilepathPrefix);
+    m_parser.handlePositional(CommandArg::SedsConverterTasteTranslation);
 
     m_parser.process(arguments);
     m_arguments = m_parser.positionalsSet();
@@ -253,6 +254,10 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
 
     if (m_arguments.contains(CommandArg::SedsConverterSkipEmptySequences)) {
         options.add(SedsOptions::skipEmptySequences);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterTasteTranslation)) {
+        options.add(SedsOptions::tasteTranslation);
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterKeepIntermediateFiles)) {

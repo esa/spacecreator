@@ -33,6 +33,7 @@
 #include <ivcore/ivmodel.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/task.h>
+#include <seds/SedsOptions/options.h>
 
 using conversion::Escaper;
 using conversion::asn1::translator::SedsToAsn1Translator;
@@ -53,7 +54,7 @@ static const QString TIMER_NAME_PATTERN = "timer_%1";
 static ::sdl::Procedure BUILT_IN_SET_TIMER_PROCEDURE("set_timer");
 
 template<typename ElementType>
-static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMachine, const QString &name)
+static inline auto getElementOfName(const ::seds::model::StateMachine &sedsStateMachine, const QString &name)
         -> std::optional<const ElementType *>
 {
     for (auto &element : sedsStateMachine.elements()) {
@@ -67,11 +68,11 @@ static inline auto getElementOfName(const seds::model::StateMachine &sedsStateMa
     return std::nullopt;
 }
 
-static inline auto getOnExit(const seds::model::StateMachine &sedsStateMachine, const QString &name)
-        -> std::optional<const seds::model::ActivityInvocation *>
+static inline auto getOnExit(const ::seds::model::StateMachine &sedsStateMachine, const QString &name)
+        -> std::optional<const ::seds::model::ActivityInvocation *>
 {
     // OnExit applies only to states, not entry or exit states
-    const auto &state = getElementOfName<seds::model::State>(sedsStateMachine, name);
+    const auto &state = getElementOfName<::seds::model::State>(sedsStateMachine, name);
     if (!state.has_value()) {
         return std::nullopt;
     }
@@ -82,11 +83,11 @@ static inline auto getOnExit(const seds::model::StateMachine &sedsStateMachine, 
     return &(*((*state)->onExit()));
 }
 
-static inline auto getOnEntry(const seds::model::StateMachine &sedsStateMachine, const QString &name)
-        -> std::optional<const seds::model::ActivityInvocation *>
+static inline auto getOnEntry(const ::seds::model::StateMachine &sedsStateMachine, const QString &name)
+        -> std::optional<const ::seds::model::ActivityInvocation *>
 {
     // OnEntry applies only to states, not entry or exit states
-    const auto &state = getElementOfName<seds::model::State>(sedsStateMachine, name);
+    const auto &state = getElementOfName<::seds::model::State>(sedsStateMachine, name);
     if (!state.has_value()) {
         return std::nullopt;
     }
@@ -107,15 +108,15 @@ static inline auto getInterfaceByName(ivm::IVFunction *function, const QString &
     return nullptr;
 }
 
-static inline auto getTransitionsForCommand(const seds::model::StateMachine &sedsStateMachine, const QString &interface,
-        const QString &command) -> std::vector<const seds::model::Transition *>
+static inline auto getTransitionsForCommand(const ::seds::model::StateMachine &sedsStateMachine,
+        const QString &interface, const QString &command) -> std::vector<const ::seds::model::Transition *>
 {
-    std::vector<const seds::model::Transition *> result;
+    std::vector<const ::seds::model::Transition *> result;
     for (const auto &element : sedsStateMachine.elements()) {
-        if (std::holds_alternative<seds::model::Transition>(element)) {
-            const auto &transition = std::get<seds::model::Transition>(element);
-            if (std::holds_alternative<seds::model::OnCommandPrimitive>(transition.primitive())) {
-                const auto &onCommandPrimitive = std::get<seds::model::OnCommandPrimitive>(transition.primitive());
+        if (std::holds_alternative<::seds::model::Transition>(element)) {
+            const auto &transition = std::get<::seds::model::Transition>(element);
+            if (std::holds_alternative<::seds::model::OnCommandPrimitive>(transition.primitive())) {
+                const auto &onCommandPrimitive = std::get<::seds::model::OnCommandPrimitive>(transition.primitive());
                 if (onCommandPrimitive.interface().value()
                                 == interface && onCommandPrimitive.command().value() == command) {
                     result.push_back(&transition);
@@ -128,7 +129,7 @@ static inline auto getTransitionsForCommand(const seds::model::StateMachine &sed
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 static inline auto getConsistentUnconditionalActivityInvocation(
-        std::vector<const seds::model::Transition *> transitions) -> const seds::model::ActivityInvocation *
+        std::vector<const ::seds::model::Transition *> transitions) -> const ::seds::model::ActivityInvocation *
 {
     if (transitions.empty()) {
         throw TranslationException("Sync commands with no associated transitions are not supported");
@@ -140,18 +141,18 @@ static inline auto getConsistentUnconditionalActivityInvocation(
         }
     }
     // primitive is now guaranteed to be OnCommandPrimitive
-    if (!std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
+    if (!std::holds_alternative<::seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
         throw TranslationException("Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
                                    "a transition which is not OnCommandPrimitive");
     }
-    const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
+    const auto &primitive = std::get<::seds::model::OnCommandPrimitive>(transitions[0]->primitive());
     for (const auto &otherTransition : transitions) {
-        if (!std::holds_alternative<seds::model::OnCommandPrimitive>(otherTransition->primitive())) {
+        if (!std::holds_alternative<::seds::model::OnCommandPrimitive>(otherTransition->primitive())) {
             throw TranslationException(
                     "Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
                     "a transition which is not OnCommandPrimitive");
         }
-        const auto &otherPrimitive = std::get<seds::model::OnCommandPrimitive>(otherTransition->primitive());
+        const auto &otherPrimitive = std::get<::seds::model::OnCommandPrimitive>(otherTransition->primitive());
         if (primitive.argumentValues().size() != otherPrimitive.argumentValues().size()) {
             throw TranslationException("Inconsistent number of arguments associated with a sync command");
         }
@@ -186,8 +187,9 @@ static inline auto getConsistentUnconditionalActivityInvocation(
     return invocation;
 }
 
-static inline auto generateProcedureForSyncCommand(Context &context, const seds::model::StateMachine &sedsStateMachine,
-        const QString &interfaceName, const seds::model::InterfaceCommand &command, const Options &options) -> void
+static inline auto generateProcedureForSyncCommand(Context &context,
+        const ::seds::model::StateMachine &sedsStateMachine, const QString &interfaceName,
+        const ::seds::model::InterfaceCommand &command, const Options &options) -> void
 {
     const auto &name = InterfaceTranslatorHelper::buildCommandInterfaceName(
             interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided, options);
@@ -209,12 +211,12 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
     const auto activityInvocation = getConsistentUnconditionalActivityInvocation(transitions);
     // If a consistent invocation is found, the transitions consistently contain an OnCommandPrimitive
     // The first one is exactly the same as the other ones
-    if (!std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
+    if (!std::holds_alternative<::seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
         throw TranslationException("Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
                                    "a transition which is not OnCommandPrimitive");
     }
 
-    const auto &primitive = std::get<seds::model::OnCommandPrimitive>(transitions[0]->primitive());
+    const auto &primitive = std::get<::seds::model::OnCommandPrimitive>(transitions[0]->primitive());
     for (const auto &argument : primitive.argumentValues()) {
         const auto targetVariableName = Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
         const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
@@ -237,7 +239,7 @@ static inline auto generateProcedureForSyncCommand(Context &context, const seds:
 }
 
 static inline auto buildCommandMapInternal(Context &context, const bool isProvided, const QString &interfaceName,
-        const seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
+        const ::seds::model::InterfaceDeclaration &intefaceDeclaration) -> void
 {
     for (const auto &command : intefaceDeclaration.commands()) {
         if (isProvided) {
@@ -255,7 +257,7 @@ static inline auto buildCommandMapInternal(Context &context, const bool isProvid
 }
 
 auto StateMachineTranslator::setInitialVariableValues(
-        const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Transition *transition) -> void
+        const ::seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Transition *transition) -> void
 {
     for (const auto &variable : variables) {
         if (variable.initialValue().has_value()) {
@@ -282,11 +284,11 @@ auto StateMachineTranslator::buildCommandMap(Context &context) -> void
 }
 
 static inline auto generateProceduresForSyncCommands(
-        Context &context, const seds::model::StateMachine &sedsStateMachine, const Options &options) -> void
+        Context &context, const ::seds::model::StateMachine &sedsStateMachine, const Options &options) -> void
 {
     for (const auto &command : context.commands()) {
         if (command.second->interfaceType() == CommandInfo::HostInterfaceType::Provided
-                && command.second->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
+                && command.second->definition()->mode() == ::seds::model::InterfaceCommandMode::Sync) {
             // Procedures are generated only for sync commands in provided interfaces
             generateProcedureForSyncCommand(
                     context, sedsStateMachine, command.first, *command.second->definition(), options);
@@ -295,7 +297,7 @@ static inline auto generateProceduresForSyncCommands(
 }
 
 auto StateMachineTranslator::translateStateMachine(
-        Context &context, const seds::model::StateMachine &sedsStateMachine, const Options &options) -> void
+        Context &context, const ::seds::model::StateMachine &sedsStateMachine, const Options &options) -> void
 {
     // Consider rewriting this to filters when C++20 is supported
     std::map<QString, std::unique_ptr<::sdl::State>> stateMap;
@@ -309,7 +311,7 @@ auto StateMachineTranslator::translateStateMachine(
                     DescriptionTranslator::translate(element, state.get());
                     stateMap.insert({ element.nameStr(), std::move(state) });
                 },
-                [&](const seds::model::Transition &transition) {
+                [&](const ::seds::model::Transition &transition) {
                     Q_UNUSED(transition);
                 }
             }, sedsElement);
@@ -323,9 +325,9 @@ auto StateMachineTranslator::translateStateMachine(
 
     // Second pass through transitions
     for (auto &element : sedsStateMachine.elements()) {
-        if (std::holds_alternative<seds::model::Transition>(element)) {
+        if (std::holds_alternative<::seds::model::Transition>(element)) {
             translateTransition(
-                    context, sedsStateMachine, std::get<seds::model::Transition>(element), stateMap, options);
+                    context, sedsStateMachine, std::get<::seds::model::Transition>(element), stateMap, options);
         }
     }
     for (auto &entry : stateMap) {
@@ -334,7 +336,7 @@ auto StateMachineTranslator::translateStateMachine(
 }
 
 auto StateMachineTranslator::translateVariables(
-        Context &context, const seds::model::ComponentImplementation::VariableSet &variables) -> void
+        Context &context, const ::seds::model::ComponentImplementation::VariableSet &variables) -> void
 {
     for (const auto &variable : variables) {
         const auto variableName = Escaper::escapeSdlVariableName(variable.nameStr());
@@ -349,14 +351,14 @@ auto StateMachineTranslator::translateVariables(
     }
 }
 
-auto StateMachineTranslator::createTimerVariables(Context &context, const seds::model::StateMachine &sedsStateMachine)
+auto StateMachineTranslator::createTimerVariables(Context &context, const ::seds::model::StateMachine &sedsStateMachine)
         -> void
 {
     std::set<QString> statesWithTimers;
     for (auto &element : sedsStateMachine.elements()) {
-        if (std::holds_alternative<seds::model::Transition>(element)) {
-            const auto &transition = std::get<seds::model::Transition>(element);
-            if (std::holds_alternative<seds::model::TimerSink>(transition.primitive())) {
+        if (std::holds_alternative<::seds::model::Transition>(element)) {
+            const auto &transition = std::get<::seds::model::Transition>(element);
+            if (std::holds_alternative<::seds::model::TimerSink>(transition.primitive())) {
                 const auto stateName = transition.fromState().nameStr();
                 if (statesWithTimers.find(stateName) == statesWithTimers.end()) {
                     statesWithTimers.insert(stateName);
@@ -443,7 +445,7 @@ auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, co
     return nullptr;
 }
 
-auto StateMachineTranslator::createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
+auto StateMachineTranslator::createParameterSyncPi(ivm::IVInterface *interface, const ::seds::model::ParameterMap &map,
         ::sdl::Process *sdlProcess, const ParameterType type) -> void
 {
     const auto paramName = Escaper::escapeSdlVariableName(interface->params()[0].name());
@@ -483,7 +485,7 @@ static inline auto getInputOfName(::sdl::State *state, const QString name) -> ::
 }
 
 auto StateMachineTranslator::createParameterAsyncPi(
-        ivm::IVInterface *interface, const seds::model::ParameterMap &map, ::sdl::StateMachine *stateMachine) -> void
+        ivm::IVInterface *interface, const ::seds::model::ParameterMap &map, ::sdl::StateMachine *stateMachine) -> void
 {
     for (const auto &state : stateMachine->states()) {
         const auto &existingInput = getInputOfName(state.get(), interface->title());
@@ -508,7 +510,7 @@ auto StateMachineTranslator::createParameterAsyncPi(
     }
 }
 
-auto StateMachineTranslator::translateParameter(Context &context, const seds::model::ParameterMap &map) -> void
+auto StateMachineTranslator::translateParameter(Context &context, const ::seds::model::ParameterMap &map) -> void
 {
     // Sync Setters/Getters require a procedure
     // Associated transition (defined as an Input) is optionally translated
@@ -538,20 +540,21 @@ auto StateMachineTranslator::translateParameter(Context &context, const seds::mo
 }
 
 auto StateMachineTranslator::translateParameterMaps(
-        Context &context, const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps) -> void
+        Context &context, const ::seds::model::ComponentImplementation::ParameterMapSet &parameterMaps) -> void
 {
     for (const auto &map : parameterMaps) {
         translateParameter(context, map);
     }
 }
 
-auto StateMachineTranslator::createStartTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
-        std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void
+auto StateMachineTranslator::createStartTransition(Context &context,
+        const ::seds::model::StateMachine &sedsStateMachine, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap)
+        -> void
 {
     bool entryStateHandled = false;
 
     for (auto &element : sedsStateMachine.elements()) {
-        if (std::holds_alternative<seds::model::EntryState>(element)) {
+        if (std::holds_alternative<::seds::model::EntryState>(element)) {
             if (entryStateHandled) {
                 throw TranslationException("Multiple entry states are not supported");
             }
@@ -565,7 +568,7 @@ auto StateMachineTranslator::createStartTransition(Context &context, const seds:
             DescriptionTranslator::translate(sedsStateMachine, transition);
 
             setInitialVariableValues(context.sedsComponent().implementation().variables(), transition);
-            const auto &state = std::get<seds::model::EntryState>(element);
+            const auto &state = std::get<::seds::model::EntryState>(element);
             const auto timerTime = getTimerInvocationTime(sedsStateMachine, state.nameStr());
             if (timerTime.has_value()) {
                 transition->addAction(createTimerSetCall(timerName(state.nameStr()), *timerTime));
@@ -577,7 +580,7 @@ auto StateMachineTranslator::createStartTransition(Context &context, const seds:
     }
 }
 
-auto StateMachineTranslator::translateState(const seds::model::State &sedsState) -> std::unique_ptr<::sdl::State>
+auto StateMachineTranslator::translateState(const ::seds::model::State &sedsState) -> std::unique_ptr<::sdl::State>
 {
     auto state = std::make_unique<::sdl::State>();
     state->setName(Escaper::escapeSdlName(sedsState.nameStr()));
@@ -585,7 +588,7 @@ auto StateMachineTranslator::translateState(const seds::model::State &sedsState)
     return state;
 }
 
-auto StateMachineTranslator::translateState(const seds::model::ExitState &sedsState) -> std::unique_ptr<::sdl::State>
+auto StateMachineTranslator::translateState(const ::seds::model::ExitState &sedsState) -> std::unique_ptr<::sdl::State>
 {
     auto state = std::make_unique<::sdl::State>();
     state->setName(Escaper::escapeSdlName(sedsState.nameStr()));
@@ -593,7 +596,7 @@ auto StateMachineTranslator::translateState(const seds::model::ExitState &sedsSt
     return state;
 }
 
-auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>
+auto StateMachineTranslator::translateState(const ::seds::model::EntryState &sedsState) -> std::unique_ptr<::sdl::State>
 {
     auto state = std::make_unique<::sdl::State>();
     state->setName(Escaper::escapeSdlName(sedsState.nameStr()));
@@ -602,7 +605,7 @@ auto StateMachineTranslator::translateState(const seds::model::EntryState &sedsS
 }
 
 auto StateMachineTranslator::translatePrimitive(
-        Context &context, const seds::model::OnCommandPrimitive &command, const Options &options) -> InputHandler
+        Context &context, const ::seds::model::OnCommandPrimitive &command, const Options &options) -> InputHandler
 {
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
@@ -621,6 +624,22 @@ auto StateMachineTranslator::translatePrimitive(
     }
     const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
     if (isSporadic) {
+
+        //--taste translation
+        if (options.isSet(conversion::seds::SedsOptions::tasteTranslation)) {
+            if (command.argumentValues().size() != 1) {
+                throw TranslationException(
+                        QString("More than one(%1) command.argumentValue is not allowed for --taste translation option")
+                                .arg(command.argumentValues().size()));
+            }
+
+            const auto &argument = command.argumentValues().at(0);
+            const auto targetVariableName =
+                    Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
+            input->addParameter(std::make_unique<::sdl::VariableReference>(targetVariableName));
+            return std::make_pair(std::move(input), std::move(unpackingActions));
+        }
+
         const auto variableName = ioVariableName(input->name());
         input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
 
@@ -639,10 +658,10 @@ auto StateMachineTranslator::translatePrimitive(
     }
 }
 
-auto StateMachineTranslator::translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
+auto StateMachineTranslator::translatePrimitive(Context &context, const ::seds::model::OnParameterPrimitive &parameter)
         -> InputHandler
 {
-    const auto parameterType = parameter.operation() == seds::model::ParameterOperation::Set
+    const auto parameterType = parameter.operation() == ::seds::model::ParameterOperation::Set
             ? InterfaceTranslatorHelper::InterfaceParameterType::Setter
             : InterfaceTranslatorHelper::InterfaceParameterType::Getter;
     auto input = std::make_unique<::sdl::Input>();
@@ -699,18 +718,18 @@ auto StateMachineTranslator::translatePrimitive(::sdl::State *sdlFromState) -> I
 }
 
 auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *sdlFromState,
-        const seds::model::Transition::Primitive &primitive, const Options &options) -> InputHandler
+        const ::seds::model::Transition::Primitive &primitive, const Options &options) -> InputHandler
 {
     // clang-format off
     return std::visit(
             overloaded {
-                [&context, &options](const seds::model::OnCommandPrimitive &command) {
+                [&context, &options](const ::seds::model::OnCommandPrimitive &command) {
                         return translatePrimitive(context, command, options);
                     },
-                [&context](const seds::model::OnParameterPrimitive &parameter) {
+                [&context](const ::seds::model::OnParameterPrimitive &parameter) {
                         return translatePrimitive(context, parameter);
                     },
-                [&sdlFromState](const seds::model::TimerSink &) {
+                [&sdlFromState](const ::seds::model::TimerSink &) {
                         return translatePrimitive(sdlFromState);
                     }
 
@@ -719,8 +738,8 @@ auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *
     // clang-format on
 }
 
-auto StateMachineTranslator::translateTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
-        const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap,
+auto StateMachineTranslator::translateTransition(Context &context, const ::seds::model::StateMachine &sedsStateMachine,
+        const ::seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap,
         const Options &options) -> void
 {
     const auto fromStateName = Escaper::escapeSdlName(sedsTransition.fromState().nameStr());
@@ -763,15 +782,15 @@ auto StateMachineTranslator::translateTransition(Context &context, const seds::m
         }
     }
     bool invokeDoActivity = true;
-    if (std::holds_alternative<seds::model::OnCommandPrimitive>(sedsTransition.primitive())) {
-        const auto &onCommandPrimitive = std::get<seds::model::OnCommandPrimitive>(sedsTransition.primitive());
+    if (std::holds_alternative<::seds::model::OnCommandPrimitive>(sedsTransition.primitive())) {
+        const auto &onCommandPrimitive = std::get<::seds::model::OnCommandPrimitive>(sedsTransition.primitive());
         const auto command =
                 context.getCommand(onCommandPrimitive.interface().value(), onCommandPrimitive.command().value());
         if (command == nullptr) {
             throw TranslationException(
                     QString("Transition on undefined command %1").arg(onCommandPrimitive.command().value()));
         }
-        if (command->definition()->mode() == seds::model::InterfaceCommandMode::Sync) {
+        if (command->definition()->mode() == ::seds::model::InterfaceCommandMode::Sync) {
             invokeDoActivity = false;
         }
     }
@@ -829,7 +848,7 @@ auto StateMachineTranslator::createExternalProcedure(ivm::IVInterface const *int
 }
 
 auto StateMachineTranslator::translateGuard(::sdl::Process *sdlProcess, ::sdl::State *fromState,
-        ::sdl::Transition *currentTransitionPtr, const seds::model::BooleanExpression &guard) -> ::sdl::Transition *
+        ::sdl::Transition *currentTransitionPtr, const ::seds::model::BooleanExpression &guard) -> ::sdl::Transition *
 {
     auto decision = StatementTranslatorVisitor::translateBooleanExpression(sdlProcess, nullptr, guard);
 
@@ -854,17 +873,17 @@ auto StateMachineTranslator::translateGuard(::sdl::Process *sdlProcess, ::sdl::S
     return newTransitionPtr;
 }
 auto StateMachineTranslator::getTimerInvocationTime(
-        const seds::model::StateMachine &sedsStateMachine, const QString &stateName) -> std::optional<uint64_t>
+        const ::seds::model::StateMachine &sedsStateMachine, const QString &stateName) -> std::optional<uint64_t>
 {
     // TODO - consider supporting multiple different OnTimer events for a state timed separately
     for (auto &element : sedsStateMachine.elements()) {
-        if (std::holds_alternative<seds::model::Transition>(element)) {
-            const auto &transition = std::get<seds::model::Transition>(element);
+        if (std::holds_alternative<::seds::model::Transition>(element)) {
+            const auto &transition = std::get<::seds::model::Transition>(element);
             if (transition.fromState().nameStr() != stateName) {
                 continue;
             }
-            if (std::holds_alternative<seds::model::TimerSink>(transition.primitive())) {
-                return std::get<seds::model::TimerSink>(transition.primitive()).nanosecondsAfterEntry();
+            if (std::holds_alternative<::seds::model::TimerSink>(transition.primitive())) {
+                return std::get<::seds::model::TimerSink>(transition.primitive()).nanosecondsAfterEntry();
             }
         }
     }
