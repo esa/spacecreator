@@ -190,6 +190,8 @@ private:
 
     static auto createTimerSetCall(QString timerName, const uint64_t callTimeInNanoseconds)
             -> std::unique_ptr<::sdl::ProcedureCall>;
+
+    static auto getStateInput(const ::sdl::State *state, const QString &inputName) -> ::sdl::Input*;
 };
 
 } // namespace conversion::sdl::translator

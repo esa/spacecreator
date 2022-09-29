@@ -127,74 +127,105 @@ static inline auto getTransitionsForCommand(const ::seds::model::StateMachine &s
     return result;
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-static inline auto getConsistentUnconditionalActivityInvocation(
-        std::vector<const ::seds::model::Transition *> transitions) -> const ::seds::model::ActivityInvocation *
-{
-    if (transitions.empty()) {
+static inline auto createSyncCommandProcedureSdl(Context &context, const ::seds::model::Transition *sedsTransition, const ::seds::model::OnCommandPrimitive *primitive) -> std::unique_ptr<::sdl::Transition> {
+    auto sdlTransition = std::make_unique<::sdl::Transition>();
+
+    if (sedsTransition == nullptr) {
         throw TranslationException("Sync commands with no associated transitions are not supported");
     }
-    for (const auto &transition : transitions) {
-        if (!transition->doActivity().has_value()) {
-            throw TranslationException(
-                    "Sync commands with transitions without associated activities are not supported");
+
+    if (!sedsTransition->doActivity().has_value()) {
+        throw TranslationException(
+                "Sync commands with transition without associated activity are not supported");
+    }
+
+    for (const auto &argument : primitive->argumentValues()) {
+        const auto targetVariableName = Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
+        const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
+
+        sdlTransition->addAction(
+            std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, fieldName)));
+    }
+
+    const auto &activityInvocation = sedsTransition->doActivity().value();
+
+    auto call = StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), activityInvocation);
+    sdlTransition->addAction(std::move(call));
+
+    const auto &activityName = activityInvocation.activity().value();
+    const auto activityInfo = context.getActivityInfo(activityName);
+
+    if (activityInfo != nullptr) {
+        for (const auto &assignment : activityInfo->returnAssignments()) {
+            sdlTransition->addAction(std::make_unique<::sdl::Task>(
+                    "", QString("%1 := %2").arg(assignment.left()).arg(assignment.right())));
         }
     }
-    // primitive is now guaranteed to be OnCommandPrimitive
-    if (!std::holds_alternative<::seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
-        throw TranslationException("Uknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
-                                   "a transition which is not OnCommandPrimitive");
+
+    return sdlTransition;
+}
+
+static inline auto handleTransactions(Context &context, const std::vector<const ::seds::model::Transition *> &sedsTransitions, ::sdl::Procedure *procedure, ivm::IVInterface *ivInterface)
+{
+    const QString paramName = "sedsTransactionName";
+    const QString paramTypeName = "CString";
+
+    // Add transaction name parameter to the IV interface
+    auto ivParameter = shared::InterfaceParameter(paramName, shared::BasicParameter::Type::Other, paramTypeName);
+    ivInterface->addParam(ivParameter);
+
+    // Add transaction name parameter to the interface procedure 
+    auto transactionParameter = std::make_unique<::sdl::ProcedureParameter>(paramName, paramTypeName, "in");
+    procedure->addParameter(std::move(transactionParameter));
+
+    // Create a decision based on the transaction name
+    auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(paramName);
+    auto sdlDecision = std::make_unique<::sdl::Decision>();
+    sdlDecision->setExpression(std::move(sdlDecisionExpression));
+
+    for (const auto sedsTransition : sedsTransitions) {
+        const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&sedsTransition->primitive());
+        if (primitive == nullptr) {
+            throw TranslationException("Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                                "a transition which is not OnCommandPrimitive");
+        }
+
+        const auto &transaction = primitive->transaction();
+        if(!transaction.has_value()) {
+            throw TranslationException("Missing transaction name in one of the transitions");
+        }
+        const auto &transactionName = QString("\"%1\"").arg(transaction->value());
+
+        auto sdlAnswerTransition = createSyncCommandProcedureSdl(context, sedsTransition, primitive);
+
+        auto sdlAnswer = std::make_unique<::sdl::Answer>();
+        sdlAnswer->setLiteral(transactionName);
+        sdlAnswer->setTransition(std::move(sdlAnswerTransition));
+
+        sdlDecision->addAnswer(std::move(sdlAnswer));
     }
-    const auto &primitive = std::get<::seds::model::OnCommandPrimitive>(transitions[0]->primitive());
-    for (const auto &otherTransition : transitions) {
-        if (!std::holds_alternative<::seds::model::OnCommandPrimitive>(otherTransition->primitive())) {
-            throw TranslationException(
-                    "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
-                    "a transition which is not OnCommandPrimitive");
-        }
-        const auto &otherPrimitive = std::get<::seds::model::OnCommandPrimitive>(otherTransition->primitive());
-        if (primitive.argumentValues().size() != otherPrimitive.argumentValues().size()) {
-            throw TranslationException("Inconsistent number of arguments associated with a sync command");
-        }
-        for (size_t i = 0; i < primitive.argumentValues().size(); i++) {
-            const auto &argumentName = primitive.argumentValues()[i].name().value();
-            const auto &otherArgumentName = otherPrimitive.argumentValues()[i].name().value();
-            const auto &outputVariable = primitive.argumentValues()[i].outputVariableRef().value().value();
-            const auto &otherOutputVariable = otherPrimitive.argumentValues()[i].outputVariableRef().value().value();
-            if ((argumentName != otherArgumentName) || (outputVariable != otherOutputVariable)) {
-                throw TranslationException("Inconsistent argument assignments associated with a sync command");
-            }
-        }
-    }
-    // doActivity optional is now guaranteed to have a value
-    const auto invocation = &(*(transitions[0]->doActivity()));
-    for (const auto &transition : transitions) {
-        const auto otherInvocation = &(*(transition->doActivity()));
-        if (invocation->activity().value() != otherInvocation->activity().value()) {
-            throw TranslationException("Inconsistent activities associated with a sync command");
-        }
-        if (invocation->argumentValues().size() != otherInvocation->argumentValues().size()) {
-            throw TranslationException("Inconsistent number of arguments associated with a sync command");
-        }
-        for (size_t i = 0; i < invocation->argumentValues().size(); i++) {
-            const auto &argument = invocation->argumentValues()[i];
-            const auto &otherArgument = otherInvocation->argumentValues()[i];
-            if (argument.name().value() != otherArgument.name().value()) {
-                throw TranslationException("Inconsistent argument names associated with a sync command");
-            }
-        }
-    }
-    return invocation;
+
+    auto sdlTransition = std::make_unique<::sdl::Transition>();
+    sdlTransition->addAction(std::move(sdlDecision));
+    procedure->setTransition(std::move(sdlTransition));
 }
 
 static inline auto generateProcedureForSyncCommand(Context &context,
         const ::seds::model::StateMachine &sedsStateMachine, const QString &interfaceName,
         const ::seds::model::InterfaceCommand &command, const Options &options) -> void
 {
-    const auto &name = InterfaceTranslatorHelper::buildCommandInterfaceName(
+    const auto sedsTransitions = getTransitionsForCommand(sedsStateMachine, interfaceName, command.nameStr());
+
+    if (sedsTransitions.empty()) {
+        return;
+    }
+
+    const auto &ivInterfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(
             interfaceName, command.nameStr(), ivm::IVInterface::InterfaceType::Provided, options);
-    const auto &ivInterface = getInterfaceByName(context.ivFunction(), name);
-    auto procedure = std::make_unique<::sdl::Procedure>(name);
+    const auto &ivInterface = getInterfaceByName(context.ivFunction(), ivInterfaceName);
+
+    auto procedure = std::make_unique<::sdl::Procedure>(ivInterfaceName);
+
     for (const auto &ivParameter : ivInterface->params()) {
         // TASTE skeleton generator generates upper-case names
         const auto parameterName = Escaper::escapeSdlVariableName(ivParameter.name());
@@ -205,37 +236,25 @@ static inline auto generateProcedureForSyncCommand(Context &context,
                 std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterType, parameterDirection);
         procedure->addParameter(std::move(sdlParameter));
     }
-    auto transition = std::make_unique<::sdl::Transition>();
-    const auto transitions = getTransitionsForCommand(sedsStateMachine, interfaceName, command.nameStr());
 
-    const auto activityInvocation = getConsistentUnconditionalActivityInvocation(transitions);
-    // If a consistent invocation is found, the transitions consistently contain an OnCommandPrimitive
-    // The first one is exactly the same as the other ones
-    if (!std::holds_alternative<seds::model::OnCommandPrimitive>(transitions[0]->primitive())) {
-        throw TranslationException(
-                "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
-                "a transition which is not OnCommandPrimitive");
-    }
+    // If there are many transitions for the same command then they have to have a transaction name
+    const auto transactionsRequired = sedsTransitions.size() > 1;
 
-    const auto &primitive = std::get<::seds::model::OnCommandPrimitive>(transitions[0]->primitive());
-    for (const auto &argument : primitive.argumentValues()) {
-        const auto targetVariableName = Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
-        const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
-        transition->addAction(
-                std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, fieldName)));
-    }
-    auto call = StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), *activityInvocation);
-    transition->addAction(std::move(call));
+    if (transactionsRequired) {
+        handleTransactions(context, sedsTransitions, procedure.get(), ivInterface);
+    } else {
+        const auto sedsTransition = sedsTransitions.front();
 
-    const auto activityInfo = context.getActivityInfo(activityInvocation->activity().value());
-    if (activityInfo != nullptr) {
-        for (const auto &assignment : activityInfo->returnAssignments()) {
-            transition->addAction(std::make_unique<::sdl::Task>(
-                    "", QString("%1 := %2").arg(assignment.left()).arg(assignment.right())));
+        const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&sedsTransition->primitive());
+        if (primitive == nullptr) {
+            throw TranslationException("Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                                "a transition which is not OnCommandPrimitive");
         }
+
+        auto sdlTransition = createSyncCommandProcedureSdl(context, sedsTransition, primitive);
+        procedure->setTransition(std::move(sdlTransition));
     }
 
-    procedure->setTransition(std::move(transition));
     context.sdlProcess()->addProcedure(std::move(procedure));
 }
 
@@ -625,7 +644,6 @@ auto StateMachineTranslator::translatePrimitive(
     }
     const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
     if (isSporadic) {
-
         //--taste translation
         if (options.isSet(conversion::seds::SedsOptions::tasteTranslation)) {
             if (command.argumentValues().size() != 1) {
@@ -759,12 +777,30 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
     auto sdlToState = (*toStateIterator).second.get();
 
     auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition.primitive(), options);
+    auto &input = inputHandler.first;
+
+    // TODO: We should handle that situation
+    if(const auto existingInput = getStateInput(sdlFromState, input->name()); existingInput != nullptr) {
+        const auto existingInputTransition = existingInput->transition();
+        const auto &existingInputTransitionActions = existingInputTransition->actions();
+        const auto &existingInputTransitionLastAction = existingInputTransitionActions.back();
+
+        const auto existingInputTransitionNextState = dynamic_cast<::sdl::NextState *>(existingInputTransitionLastAction.get());
+        if (existingInputTransitionNextState != nullptr) {
+            if (existingInputTransitionNextState->state()->name() != sdlToState->name()) {
+                auto errorMessage = QString("Two transitions on same Input doesn't go to the same end state");
+                throw TranslationException(std::move(errorMessage));
+            }
+        }
+
+        return;
+    }
 
     auto mainTransition = std::make_unique<::sdl::Transition>();
     DescriptionTranslator::translate(sedsTransition, mainTransition.get());
     auto currentTransitionPtr = mainTransition.get();
-    inputHandler.first->setTransition(mainTransition.get());
-    sdlFromState->addInput(std::move(inputHandler.first));
+    input->setTransition(mainTransition.get());
+    sdlFromState->addInput(std::move(input));
     // Argument unpacking
     for (auto &action : inputHandler.second) {
         currentTransitionPtr->addAction(std::move(action));
@@ -905,6 +941,19 @@ auto StateMachineTranslator::createTimerSetCall(QString timerName, const uint64_
             std::make_unique<::sdl::VariableLiteral>(QString::number(nanosecondsToMiliseconds(callTimeInNanoseconds))));
     call->addArgument(std::make_unique<::sdl::VariableLiteral>(std::move(timerName)));
     return call;
+}
+
+auto StateMachineTranslator::getStateInput(const ::sdl::State *state, const QString &inputName) -> ::sdl::Input*
+{
+    const auto &stateInputs = state->inputs();
+
+    const auto inputFound = std::find_if(stateInputs.begin(), stateInputs.end(), [&](const auto &input) { return input->name() == inputName; });
+
+    if (inputFound == stateInputs.end()) {
+        return nullptr;
+    } else {
+        return (*inputFound).get();
+    }
 }
 
 } // namespace conversion::sdl::translator

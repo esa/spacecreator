@@ -312,7 +312,7 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
         }
     } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
             || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
-        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand, interface);
         m_sdlTransition->addAction(std::move(call));
     }
 }
@@ -459,7 +459,8 @@ auto StatementTranslatorVisitor::translatePolynomial(
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>
+        const ::seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface)
+        -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -476,6 +477,9 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
     for (const auto &argument : sendCommand.argumentValues()) {
         call->addArgument(translateArgument(argument));
     }
+
+    handleTransaction(sendCommand.transaction(), call.get(), ivInterface);
+
     return call;
 }
 
@@ -784,6 +788,24 @@ auto StatementTranslatorVisitor::generateLoopEnd(
     auto loopBackJoin = std::make_unique<::sdl::Join>();
     loopBackJoin->setLabel(startLabel->name());
     transition->addAction(std::move(loopBackJoin));
+}
+
+auto StatementTranslatorVisitor::handleTransaction(const std::optional<::seds::model::Name> &transaction, ::sdl::ProcedureCall *call, ivm::IVInterface *ivInterface) -> void
+{
+    if (!transaction) {
+        return;
+    }
+
+    const auto &transactionName = QString("\"%1\"").arg(transaction->value());
+
+    auto transactionNameLiteral = std::make_unique<::sdl::VariableLiteral>(transactionName);
+    call->addArgument(std::move(transactionNameLiteral));
+
+    const QString paramName = "sedsTransactionName";
+    const QString paramTypeName = "CString";
+
+    auto ivParameter = shared::InterfaceParameter(paramName, shared::BasicParameter::Type::Other, paramTypeName);
+    ivInterface->addParam(ivParameter);
 }
 
 }
