@@ -87,6 +87,8 @@ private:
     QAction *m_actZoomOut { nullptr };
     QAction *m_actExitToRoot { nullptr };
     QAction *m_actExitToParent { nullptr };
+    QAction *m_actEnterNestedView { nullptr };
+    QAction *m_actShrinkScene { nullptr };
 
     QVector<QAction *> m_toolbarActions;
     QVector<QAction *> m_viewActions;
