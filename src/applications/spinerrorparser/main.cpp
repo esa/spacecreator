@@ -56,10 +56,10 @@ int main(int argc, char *argv[])
         const auto match = globalMatch.next();
         // build error from match tokens
         SpinErrorReport report;
-        report.errorNumber = match.captured(1).toInt();
-        report.errorDepth = match.captured(4).toInt();
-        report.errorType = match.captured(2);
-        report.errorDetails = match.captured(3);
+        report.errorNumber = match.captured(1).toUInt();
+        report.errorDepth = match.captured(4).toUInt();
+        report.errorType = SpinErrorReport::DataConstraintViolation;
+        report.rawErrorDetails = match.captured(3);
         reports.append(report);
     }
     return EXIT_SUCCESS;

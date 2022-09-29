@@ -28,12 +28,21 @@ namespace reporting {
  * @brief   Structure to hold parsed spin report data.
  */
 struct SpinErrorReport {
+    /** Error types */
+    enum ErrorType
+    {
+        DataConstraintViolation,
+        StopConditionViolation,
+        ObserverFailure,
+        OtherError
+    };
+
     /** Spin error number, counted from 1 up */
     uint32_t errorNumber;
     /** Error depth reported by spin */
     uint32_t errorDepth;
     /** Error type reported by the message */
-    QString errorType;
+    ErrorType errorType;
     /** Raw error details reported by the message */
     QString rawErrorDetails;
     /** Name of the constraint violating variable */
