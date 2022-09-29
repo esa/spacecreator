@@ -29,13 +29,13 @@ namespace reporting {
  */
 struct SpinErrorReport {
     /** Spin error number, counted from 1 up */
-    int errorNumber;
+    uint32_t errorNumber;
     /** Error depth reported by spin */
-    int errorDepth;
+    uint32_t errorDepth;
     /** Error type reported by the message */
     QString errorType;
     /** Raw error details reported by the message */
-    QString errorDetails;
+    QString rawErrorDetails;
     /** Name of the constraint violating variable */
     QString violationVariableName;
     /** Violated constraints */
