@@ -1,0 +1,12 @@
+SUBTYPES DEFINITIONS ::=
+BEGIN
+
+Tailored-Byte ::= INTEGER(0 | 10) 
+
+Bcapp-dlctxsdu-p1 ::= SEQUENCE (SIZE(1)) OF Tailored-Byte
+
+Channeleffects-corruptchar-p1 ::= INTEGER(1 | 15)
+
+
+END
+

@@ -19,6 +19,11 @@ configure_file(test_dekkerRunningWithInputObserver.sh test_dekkerRunningWithInpu
 configure_file(test_dekkerRunningWithOutputObserver.sh test_dekkerRunningWithOutputObserver.sh COPYONLY)
 configure_file(test_dekkerRunningWithStopCondition.sh test_dekkerRunningWithStopCondition.sh COPYONLY)
 
+configure_file(test_uart.sh test_uart.sh COPYONLY)
+configure_file(test_uartRunningWithInputObserver.sh test_uartRunningWithInputObserver.sh COPYONLY)
+configure_file(test_uartRunningWithOutputObserver.sh test_uartRunningWithOutputObserver.sh COPYONLY)
+configure_file(test_uartRunningWithStopCondition.sh test_uartRunningWithStopCondition.sh COPYONLY)
+
 add_custom_target(${TEST_NAME}_copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources
     DEPENDS ${TEST_NAME})

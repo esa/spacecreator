@@ -32,6 +32,10 @@ private Q_SLOTS:
     void test_dekkerRunningWithStopCondition();
     void test_dekkerRunningWithInputObserver();
     void test_dekkerRunningWithOutputObserver();
+    void test_uart();
+    void test_uartRunningWithStopCondition();
+    void test_uartRunningWithInputObserver();
+    void test_uartRunningWithOutputObserver();
 };
 
 void tst_Tmc_UseCases::test_dekker()
@@ -55,6 +59,30 @@ void tst_Tmc_UseCases::test_dekkerRunningWithInputObserver()
 void tst_Tmc_UseCases::test_dekkerRunningWithOutputObserver()
 {
     const int result = system("./test_dekkerRunningWithOutputObserver.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_UseCases::test_uart()
+{
+    const int result = system("./test_uart.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_UseCases::test_uartRunningWithStopCondition()
+{
+    const int result = system("./test_uartRunningWithStopCondition.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_UseCases::test_uartRunningWithInputObserver()
+{
+    const int result = system("./test_uartRunningWithInputObserver.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_UseCases::test_uartRunningWithOutputObserver()
+{
+    const int result = system("./test_uartRunningWithOutputObserver.sh");
     QCOMPARE(result, 0);
 }
 
