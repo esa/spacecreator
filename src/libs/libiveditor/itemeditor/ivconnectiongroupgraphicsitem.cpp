@@ -53,7 +53,7 @@ void IVConnectionGroupGraphicsItem::updateBoundingRect()
 
 void IVConnectionGroupGraphicsItem::updateLabel(const QString &text)
 {
-    if (text != m_textItem->toPlainText()) {
+    if (m_textItem && text != m_textItem->toPlainText()) {
         const QFontMetrics fm(m_textItem->font());
         m_textItem->setPlainText(fm.elidedText(text, Qt::ElideRight, kConnectionGroupTitleMaxLength));
         instantLayoutUpdate();
@@ -62,6 +62,10 @@ void IVConnectionGroupGraphicsItem::updateLabel(const QString &text)
 
 void IVConnectionGroupGraphicsItem::updateTextPosition()
 {
+    if (!m_textItem) {
+        return;
+    }
+
     const QVector<QPointF> scenePoints = points();
     const QString text = m_textItem->toPlainText().trimmed();
     if (scenePoints.size() < 2 || text.isEmpty())
@@ -101,6 +105,11 @@ void IVConnectionGroupGraphicsItem::updateTextPosition()
 
     const QPointF topLeft = mapFromScene(textRect.topLeft());
     m_textItem->setPos(topLeft);
+}
+
+shared::ui::TextItem *IVConnectionGroupGraphicsItem::initTextItem()
+{
+    return VEInteractiveObject::initTextItem();
 }
 
 } // namespace ive
