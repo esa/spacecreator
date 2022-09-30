@@ -1,7 +1,0 @@
-all:
-	mkdir -p code
-	cd code && opengeode --toAda /home/taste/workspace/SpaceCreator/spacecreator/tests/integrationtests/applications/tmc/use-cases/resources/uart_protocol_dlc/work/modelchecking/properties/OutputObserver/OutputObserver.pr 
-	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada observer.asn code/OutputObserver_datamodel.asn
-	cd code && gnat make OutputObserver
-clean:
-	rm -rf code
