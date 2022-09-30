@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
 
     if (!spinMessage.has_value()) {
         qCritical("Missing mandatory argument: input spinMessage");
+        exit(EXIT_FAILURE);
     }
 
     // build pattern for error matching

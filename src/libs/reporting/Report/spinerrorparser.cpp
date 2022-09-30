@@ -26,9 +26,9 @@ QRegularExpressionMatchIterator reporting::SpinErrorParser::findErrors(const QSt
 reporting::SpinErrorReport reporting::SpinErrorParser::buildReport(const QRegularExpressionMatch &matchedError) const
 {
     SpinErrorReport report;
-    report.errorNumber = matchedError.captured(1).toInt();
-    report.errorDepth = matchedError.captured(4).toInt();
-    report.errorType = matchedError.captured(2);
-    report.errorDetails = matchedError.captured(3);
+    report.errorNumber = matchedError.captured(1).toUInt();
+    report.errorDepth = matchedError.captured(4).toUInt();
+    report.errorType = SpinErrorReport::DataConstraintViolation;
+    report.rawErrorDetails = matchedError.captured(3);
     return report;
 }
