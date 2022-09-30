@@ -63,8 +63,8 @@ CmdIfaceParamBase::~CmdIfaceParamBase()
 
 void CmdIfaceParamBase::prepareRmCommands()
 {
-    QList<QPointer<ivm::IVObject>> entities;
     if (auto model = m_iface->model()) {
+        QVector<ivm::IVObject *> entities;
         for (auto connection : qAsConst(m_connections)) {
             if (connection->sourceInterface() && connection->targetInterface()) {
                 if (connection->sourceInterface()->params() != connection->targetInterface()->params()) {

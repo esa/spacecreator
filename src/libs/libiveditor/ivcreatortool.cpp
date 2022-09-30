@@ -86,7 +86,7 @@ void IVCreatorTool::removeSelectedItems()
     if (auto scene = m_view->scene()) {
         QStringList clonedIfaces;
         QStringList nonRemovableEntities;
-        QList<QPointer<ivm::IVObject>> entities;
+        QVector<ivm::IVObject *> entities;
         clearPreviewItem();
         while (!scene->selectedItems().isEmpty()) {
             QGraphicsItem *item = scene->selectedItems().first();

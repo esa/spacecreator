@@ -38,6 +38,7 @@
 #include "ivexporter.h"
 #include "ivnamevalidator.h"
 #include "ivvisualizationmodelbase.h"
+#include "ivxmlreader.h"
 #include "properties/ivpropertiesdialog.h"
 #include "ui_ivappwidget.h"
 
@@ -257,99 +258,89 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
         return;
     }
 
-    QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
-        itemAtScenePos = itemAtScenePos->parentItem();
+    ivm::IVXMLReader parser;
+    if (parser.read(data)) {
+        QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
+        while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
+            itemAtScenePos = itemAtScenePos->parentItem();
+        }
+        ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+        QVector<ivm::IVObject *> objects = parser.parsedObjects();
+        auto cmdImport = new cmd::CmdEntitiesImport(objects, parentObject, m_document->objectsModel(), m_document->asn1Check(),
+                                                    sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+        m_document->commandsStack()->push(cmdImport);
     }
-    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport(data, parentObject, m_document->objectsModel(), m_document->asn1Check(),
-            sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
-    m_document->commandsStack()->push(cmdImport);
 }
 
 void IVAppWidget::wrapItems()
 {
     m_document->commandsStack()->beginMacro(tr("Wrap selected into Function"));
 
-    /// Prepare items for serialization
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(
-                    shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()), QString());
-        return;
-    }
-
-    QList<shared::VEObject *> objects;
-    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
-        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
-        if (ivm::IVObject *object = m_document->objectsModel()->getObject(index.data(role).toUuid())) {
-            objects.append(object);
-        }
-    }
-    /// Filter out connections without linked functions selected
-    auto it = std::remove_if(objects.begin(), objects.end(), [&objects](const shared::VEObject *obj){
-        if (auto iObj = qobject_cast<const ivm::IVConnection *>(obj)) {
-            return !objects.contains(iObj->source()) && !objects.contains(iObj->target());
-        }
-        return false;
-    });
-
-    /// deselect excluded from wrapping items
-    for (auto selIt = it; selIt != objects.end(); ++selIt) {
-        if (auto item = m_document->itemsModel()->getItem((*it)->id()))
+    auto deselectGraphicsItem = [this](ivm::IVObject *iObj) {
+        if (auto item = m_document->itemsModel()->getItem(iObj->id())) {
             item->setSelected(false);
-    }
-    objects.erase(it, objects.end());
-
-    /// Serialize prepared for wrapping items
-    if (!m_document->exporter()->exportObjects(objects, &buffer, m_document->archetypesModel())) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
-        return;
-    }
-    buffer.close();
-
-    /// Remove selected items from scene
-    QList<QPointer<ivm::IVObject>> entities;
-    for (auto ioIt = objects.cbegin(); ioIt != objects.cend(); ++ioIt) {
-        if (auto entity = (*ioIt)->as<ivm::IVObject *>()) {
-            if (entity->isRootObject()) {
-                continue;
-            }
-            if (entity->isFixedSystemElement()) {
-                continue;
-            }
-            if (entity->isInterface()) {
-                if (auto iface = entity->as<const ivm::IVInterface *>()) {
-                    if (iface->isRequiredSystemElement()) {
-                        continue;
-                    }
-                    if (auto srcIface = iface->cloneOf()) {
-                        continue;
-                    }
-                }
-            }
-            entities.append(entity);
         }
+    };
 
-    }
-    auto cmdRm = new cmd::CmdEntitiesRemove(entities, m_document->objectsModel());
-    cmdRm->setText(tr("Remove selected item(s)"));
-    m_document->commandsStack()->push(cmdRm);
-
-    /// Calculate rectangle for new function according to selected rectangular items
     static const QSet<ivm::IVObject::Type> kRectTypes {
         ivm::IVObject::Type::Function,
         ivm::IVObject::Type::FunctionType,
         ivm::IVObject::Type::Comment
     };
     QRectF itemSceneRect;
-    for (shared::VEObject *obj: qAsConst(objects)) {
-        if (auto iObj = qobject_cast<ivm::IVObject *>(obj)) {
-            if (kRectTypes.contains(iObj->type())) {
-                itemSceneRect |= shared::graphicsviewutils::rect(iObj->coordinates());
+    QVector<ivm::IVObject *> objects;
+
+    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
+        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
+        ivm::IVObject *object = m_document->objectsModel()->getObject(index.data(role).toUuid());
+        if (!object) {
+            continue;
+        }
+        if (object->isRootObject()) {
+            deselectGraphicsItem(object);
+            continue;
+        }
+        if (object->isFixedSystemElement()) {
+            deselectGraphicsItem(object);
+            continue;
+        }
+        if (object->isInterface()) {
+            if (auto iface = object->as<const ivm::IVInterface *>()) {
+                if (iface->isRequiredSystemElement()) {
+                    deselectGraphicsItem(object);
+                    continue;
+                }
+                if (auto srcIface = iface->cloneOf()) {
+                    deselectGraphicsItem(object);
+                    continue;
+                }
             }
         }
+
+        if (auto iConnectionObj = object->as<ivm::IVConnection *>()) {
+            const bool isSourceCloned = objects.contains(iConnectionObj->source());
+            const bool isTargetCloned = objects.contains(iConnectionObj->target());
+            if (!isSourceCloned && !isTargetCloned) {
+                deselectGraphicsItem(object);
+                continue;
+            }
+
+            if (!isSourceCloned) {
+                /// TODO: clone
+            } else if (!isTargetCloned) {
+
+            }
+        } else if (kRectTypes.contains(object->type())) {
+            itemSceneRect |= shared::graphicsviewutils::rect(object->coordinates());
+        }
+
+        objects.append(object);
     }
+
+    auto cmdRm = new cmd::CmdEntitiesRemove(objects, m_document->objectsModel());
+    cmdRm->setText(tr("Remove selected item(s)"));
+    m_document->commandsStack()->push(cmdRm);
+
     /// TODO: check if `itemSceneRect` intersects with some rectangular items in the scene
     /// then reduce `itemSceneRect` to minimal accepted size and put in the center of wrapped items
 
@@ -359,7 +350,7 @@ void IVAppWidget::wrapItems()
     auto cmd = new cmd::CmdFunctionItemCreate(m_document->objectsModel(), fn, itemSceneRect, QString(), id);
     if (m_document->commandsStack()->push(cmd)) {
         /// Inject wrapped items into newly created Function
-        auto cmdImport = new cmd::CmdEntitiesImport(buffer.data(), m_document->objectsModel()->getFunction(id),
+        auto cmdImport = new cmd::CmdEntitiesImport(objects, m_document->objectsModel()->getFunction(id),
                                                     m_document->objectsModel(), m_document->asn1Check(),
                                                     QPointF(0, 0), QFileInfo(m_document->path()).absolutePath());
         m_document->commandsStack()->push(cmdImport);
@@ -412,23 +403,10 @@ void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoi
     while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
         itemAtScenePos = itemAtScenePos->parentItem();
     }
-
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
-        return;
-    }
-
-    if (!m_document->exporter()->exportObjects({ obj }, &buffer, m_document->archetypesModel())) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
-        return;
-    }
-    buffer.close();
-
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport(buffer.data(), parentObject, m_document->objectsModel(),
-            m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+    auto cmdImport = new cmd::CmdEntitiesImport({ obj }, parentObject, m_document->objectsModel(),
+                                                m_document->asn1Check(), sceneDropPoint,
+                                                QFileInfo(m_document->path()).absolutePath());
     m_document->commandsStack()->push(cmdImport);
 }
 
@@ -445,7 +423,7 @@ void IVAppWidget::instantiateEntity(const shared::Id &id, const QPointF &sceneDr
     }
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
     auto cmdInstantiate = new cmd::CmdEntitiesInstantiate(
-            obj->as<ivm::IVFunctionType *>(), parentObject, m_document->objectsModel(), sceneDropPoint);
+                obj->as<ivm::IVFunctionType *>(), parentObject, m_document->objectsModel(), sceneDropPoint);
     m_document->commandsStack()->push(cmdInstantiate);
 }
 

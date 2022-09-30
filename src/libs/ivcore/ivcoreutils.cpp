@@ -19,6 +19,9 @@
 
 #include "ivfunction.h"
 #include "ivinterface.h"
+#include "ivmodel.h"
+
+#include <QSet>
 
 namespace ivm {
 namespace utils {
@@ -57,7 +60,7 @@ int nestingLevel(ivm::IVObject *object)
     int level = 0;
     while (auto parentObject = object->parentObject()) {
         if ((parentObject->type() == ivm::IVObject::Type::Function
-                    || parentObject->type() == ivm::IVObject::Type::FunctionType)) {
+             || parentObject->type() == ivm::IVObject::Type::FunctionType)) {
             ++level;
         }
         object = parentObject;

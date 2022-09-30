@@ -67,86 +67,80 @@ QSet<QString> fnTypeNames(const QVector<ivm::IVObject *> &objects)
     return names;
 }
 
-CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model,
-        Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath)
+CmdEntitiesImport::CmdEntitiesImport(QVector<ivm::IVObject *> objects, ivm::IVFunctionType *parent,
+                                     ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks,
+                                     const QPointF &pos, const QString &destPath)
     : UndoCommand()
     , m_asn1Checks(asn1Checks)
     , m_model(model)
     , m_parent(parent)
     , m_destPath(destPath)
 {
-    ivm::IVXMLReader parser;
-    if (parser.read(data)) {
-        QVector<ivm::IVObject *> objects = parser.parsedObjects();
-        ivm::IVObject::sortObjectList(objects);
-        const QSet<QString> functionNames = m_model->nestedFunctionNames();
-        QSet<QString> importingNames = fnTypeNames(objects);
-        QRectF importingRect;
-        for (ivm::IVObject *obj : qAsConst(objects)) {
-            obj->setModel(m_model);
-            if (isRectangularType(obj) && functionNames.contains(obj->title())) {
-                const QString objName = obj->title();
-                while (functionNames.contains(obj->title())) {
-                    do {
-                        obj->setTitle(ivm::IVNameValidator::nextNameFor(obj));
-                    } while (importingNames.contains(obj->title()));
-                }
-                if (objName != obj->title()) {
-                    m_renamedFunctions.insert(objName, obj->title());
-                    importingNames.insert(obj->title());
-                }
+    ivm::IVObject::sortObjectList(objects);
+    const QSet<QString> functionNames = m_model->nestedFunctionNames();
+    QSet<QString> importingNames = fnTypeNames(objects);
+    QRectF importingRect;
+    for (ivm::IVObject *obj : qAsConst(objects)) {
+        obj->setModel(m_model);
+        if (isRectangularType(obj) && functionNames.contains(obj->title())) {
+            const QString objName = obj->title();
+            while (functionNames.contains(obj->title())) {
+                do {
+                    obj->setTitle(ivm::IVNameValidator::nextNameFor(obj));
+                } while (importingNames.contains(obj->title()));
             }
-
-            if (isRectangularType(obj) || obj->parentObject() || m_parent) {
-                m_importedEntities.append(obj);
-                m_parentChildMappings[obj->id()] = obj->parentObject() ? obj->parentObject() : m_parent;
-                if (obj->parentObject()) {
-                    continue;
-                } else {
-                    m_rootEntities.append(obj);
-                }
-
-                if (isRectangularType(obj)) {
-                    const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
-                    importingRect |= objRect;
-                }
+            if (objName != obj->title()) {
+                m_renamedFunctions.insert(objName, obj->title());
+                importingNames.insert(obj->title());
             }
         }
-        QRectF parentRect;
-        if (m_parent) {
-            const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates);
-            const QString coordStr = m_parent->entityAttributeValue<QString>(coordToken);
-            parentRect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
-        }
-        const QPointF basePoint = importingRect.topLeft();
-        importingRect.moveTopLeft(pos);
-        QList<QRectF> existingRects = existingModelRects();
-        shared::graphicsviewutils::findGeometryForRect(importingRect, parentRect, existingRects);
-        const QPointF offset = pos - basePoint;
 
-        for (ivm::IVObject *obj : qAsConst(objects)) {
-            switch (obj->type()) {
-            case ivm::IVObject::Type::Function:
-            case ivm::IVObject::Type::FunctionType:
-            case ivm::IVObject::Type::Comment:
-                prepareRectangularType(obj, offset, parentRect, existingRects);
-                break;
-            case ivm::IVObject::Type::RequiredInterface:
-            case ivm::IVObject::Type::ProvidedInterface:
-            case ivm::IVObject::Type::InterfaceGroup:
-                prepareEndPointType(obj, offset);
-                break;
-            case ivm::IVObject::Type::Connection:
-            case ivm::IVObject::Type::ConnectionGroup:
-                prepareConnectionType(obj, objects);
-                break;
-            default:
-                break;
+        if (isRectangularType(obj) || obj->parentObject() || m_parent) {
+            m_importedEntities.append(obj);
+            m_parentChildMappings[obj->id()] = obj->parentObject() ? obj->parentObject() : m_parent;
+            if (obj->parentObject()) {
+                continue;
+            } else {
+                m_rootEntities.append(obj);
+            }
+
+            if (isRectangularType(obj)) {
+                const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
+                importingRect |= objRect;
             }
         }
-    } else {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, parser.errorString(), "");
-        setObsolete(true);
+    }
+    QRectF parentRect;
+    if (m_parent) {
+        const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates);
+        const QString coordStr = m_parent->entityAttributeValue<QString>(coordToken);
+        parentRect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
+    }
+    const QPointF basePoint = importingRect.topLeft();
+    importingRect.moveTopLeft(pos);
+    QList<QRectF> existingRects = existingModelRects();
+    shared::graphicsviewutils::findGeometryForRect(importingRect, parentRect, existingRects);
+    const QPointF offset = pos - basePoint;
+
+    for (ivm::IVObject *obj : qAsConst(objects)) {
+        switch (obj->type()) {
+        case ivm::IVObject::Type::Function:
+        case ivm::IVObject::Type::FunctionType:
+        case ivm::IVObject::Type::Comment:
+            prepareRectangularType(obj, offset, parentRect, existingRects);
+            break;
+        case ivm::IVObject::Type::RequiredInterface:
+        case ivm::IVObject::Type::ProvidedInterface:
+        case ivm::IVObject::Type::InterfaceGroup:
+            prepareEndPointType(obj, offset);
+            break;
+        case ivm::IVObject::Type::Connection:
+        case ivm::IVObject::Type::ConnectionGroup:
+            prepareConnectionType(obj, objects);
+            break;
+        default:
+            break;
+        }
     }
 }
 

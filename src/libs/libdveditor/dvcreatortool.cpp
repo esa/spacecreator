@@ -68,7 +68,7 @@ void DVCreatorTool::removeSelectedItems()
         return;
 
     if (auto scene = m_view->scene()) {
-        QList<QPointer<dvm::DVObject>> entities;
+        QVector<dvm::DVObject *> entities;
         clearPreviewItem();
         while (!scene->selectedItems().isEmpty()) {
             QGraphicsItem *item = scene->selectedItems().first();

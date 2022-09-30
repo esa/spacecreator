@@ -205,14 +205,13 @@ void CmdFunctionAttrChange::prepareUnsetFunctionTypeCommands(const ivm::IVFuncti
     if (useOppositeCommands(m_cmdUnset, m_cmdSet, fnTypeId))
         return;
 
-    Commands &cmdStorage = m_cmdUnset[fnTypeId];
     const QVector<ivm::IVInterface *> &fnIfaces = m_entity->interfaces();
     const QVector<ivm::IVInterface *> &fnTypeIfaces = fnType->interfaces();
-    QList<QPointer<ivm::IVObject>> entities;
+    QVector<ivm::IVObject *> entities;
     for (auto fnTypeIface : fnTypeIfaces) {
         for (const auto &clone : fnTypeIface->clones()) {
             auto found = std::find_if(fnIfaces.cbegin(), fnIfaces.cend(),
-                    [clone](ivm::IVInterface *fnIface) { return clone == fnIface; });
+                    [clone](const ivm::IVInterface *fnIface) { return clone == fnIface; });
 
             if (found != fnIfaces.cend()) {
                 entities.append(clone.data());
@@ -221,7 +220,7 @@ void CmdFunctionAttrChange::prepareUnsetFunctionTypeCommands(const ivm::IVFuncti
     }
     if (!entities.isEmpty()) {
         auto cmdRm = new cmd::CmdEntitiesRemove(entities, m_entity->model());
-        cmdStorage.append(cmdRm);
+        m_cmdUnset[fnTypeId].append(cmdRm);
     }
 }
 

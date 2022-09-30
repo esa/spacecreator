@@ -431,7 +431,7 @@ void DVEditorCore::changeDvFunctionBindingName(const QString &oldName, const QSt
 void DVEditorCore::removeDvFunctionBinding(const QString &functionName)
 {
     dvm::DVModel *model = d->m_appModel->objectsModel();
-    QList<QPointer<dvm::DVObject>> toDelete;
+    QVector<dvm::DVObject *> toDelete;
     for (dvm::DVFunction *fn : model->allObjectsByType<dvm::DVFunction>()) {
         if (fn->title() == functionName) {
             toDelete.append(fn);
@@ -487,7 +487,7 @@ void DVEditorCore::removeDvMessageBinding(const QString &sourceFunction, const Q
         const QString &targetFunction, const QString &targetInterface)
 {
     dvm::DVModel *model = d->m_appModel->objectsModel();
-    QList<QPointer<dvm::DVObject>> toDelete;
+    QVector<dvm::DVObject *> toDelete;
     for (dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
         if (msg->fromFunction() == sourceFunction && msg->fromInterface() == sourceInterface
                 && msg->toFunction() == targetFunction && msg->toInterface() == targetInterface) {

@@ -38,8 +38,9 @@ class CmdEntitiesImport : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model,
-            Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
+    explicit CmdEntitiesImport(QVector<ivm::IVObject *> objects, ivm::IVFunctionType *parent, ivm::IVModel *model,
+                               Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
+
     ~CmdEntitiesImport() override;
 
     void redo() override;

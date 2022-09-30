@@ -29,15 +29,15 @@
 namespace dve {
 namespace cmd {
 
-CmdEntitiesRemove::CmdEntitiesRemove(const QList<QPointer<dvm::DVObject>> &entities, dvm::DVModel *model)
+CmdEntitiesRemove::CmdEntitiesRemove(const QVector<dvm::DVObject *> &entities, dvm::DVModel *model)
     : shared::UndoCommand()
     , m_model(model)
-    , m_entities(entities)
 {
     setText(tr("Remove selected item(s)"));
 
-    for (const QPointer<dvm::DVObject> &entity : entities) {
+    for (dvm::DVObject *entity : entities) {
         collectRelatedItems(entity);
+        m_entities.append(entity);
     }
 }
 
