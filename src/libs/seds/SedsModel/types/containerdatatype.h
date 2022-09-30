@@ -49,6 +49,7 @@ public:
     auto addConstraint(ContainerConstraintType constraint) -> void;
 
     auto entries() const -> const EntryList &;
+    auto hasEntries() const -> bool;
     auto addEntry(EntryType entry) -> void;
 
     auto trailerEntries() const -> const EntryList &;

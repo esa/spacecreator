@@ -22,7 +22,6 @@
 #include "specialized/sequencetranslator.h"
 
 #include <msccore/mscchart.h>
-#include <sdl/SdlModel/rename.h>
 
 namespace conversion::sdl::translator {
 
@@ -36,9 +35,12 @@ public:
      * @brief   Constructor
      *
      * @param   sdlModel    Parent SDL model
+     * @param   asn1File    ASN.1 file
+     * @param   ivModel     IV model
      * @param   options     Conversion options
      */
-    NeverSequenceTranslator(::sdl::SdlModel *sdlModel, const Options &options);
+    NeverSequenceTranslator(::sdl::SdlModel *sdlModel, const Asn1Acn::File *asn1File, const ivm::IVModel *ivModel,
+            const Options &options);
 
     /**
      * @brief   Deleted copy constuctor
@@ -67,21 +69,18 @@ public:
     auto createObserver(const msc::MscChart *mscChart) -> void;
 
 private:
-    struct Context {
-        QString chartName;
+    struct NeverContext : public Context {
         std::vector<uint32_t> sequence;
-        std::unordered_map<uint32_t, std::unique_ptr<::sdl::Rename>> signals;
         ::sdl::State *errorState;
-        std::size_t signalCounter;
     };
 
 private:
-    auto collectData(const msc::MscChart *mscChart) const -> NeverSequenceTranslator::Context;
+    auto collectData(const msc::MscChart *mscChart) const -> NeverSequenceTranslator::NeverContext;
 
-    auto handleEvent(Context &context, const msc::MscInstanceEvent *mscEvent) const -> void;
-    auto handleMessageEvent(Context &context, const msc::MscMessage *mscMessage) const -> void;
+    auto handleEvent(NeverContext &context, const msc::MscInstanceEvent *mscEvent) const -> void;
+    auto handleMessageEvent(NeverContext &context, const msc::MscMessage *mscMessage) const -> void;
 
-    auto createStateMachine(Context &context) const -> std::unique_ptr<::sdl::StateMachine>;
+    auto createStateMachine(NeverContext &context) const -> std::unique_ptr<::sdl::StateMachine>;
 };
 
 } // namespace conversion::sdl::translator

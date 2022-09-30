@@ -26,6 +26,10 @@
 #include <sdl/SdlModel/sdlmodel.h>
 #include <seds/SedsModel/sedsmodel.h>
 
+namespace conversion {
+class Options;
+} // namespace conversion
+
 namespace conversion::sdl::translator {
 
 /**
@@ -42,12 +46,12 @@ public:
      * @param sedsActivity      Source SEDS activity
      * @param sdlProcess        Target SDL process
      */
-    static auto translateActivity(
-            Context &context, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess) -> void;
+    static auto translateActivity(Context &context, const seds::model::Activity &sedsActivity,
+            ::sdl::Process *sdlProcess, const Options &options) -> void;
 
 private:
     static auto translateBody(Context &context, const seds::model::Activity &sedsActivity, ::sdl::Process *sdlProcess,
-            ::sdl::Procedure *procedure) -> void;
+            ::sdl::Procedure *procedure, const Options &options) -> void;
 };
 
 }

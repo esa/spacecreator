@@ -27,6 +27,10 @@
 #include <seds/SedsModel/interfaces/commandargument.h>
 #include <seds/SedsModel/package/package.h>
 
+namespace conversion {
+class Options;
+} // namespace conversion
+
 namespace conversion::iv::translator {
 
 /**
@@ -53,7 +57,7 @@ public:
      * @return  InterfaceView interface
      */
     static auto createIvInterface(const QString &name, ivm::IVInterface::InterfaceType type,
-            ivm::IVInterface::OperationKind kind, const seds::model::Description &sedsDescription,
+            ivm::IVInterface::OperationKind kind, const ::seds::model::Description &sedsDescription,
             ivm::IVFunction *ivFunction) -> ivm::IVInterface *;
     /**
      * @brief   Create InterfaceView parameter
@@ -88,11 +92,12 @@ public:
      * @param   sedsInterfaceName   Name of the interface hosting the command
      * @param   type                Interface type
      * @param   commandName         Name of the command
+     * @param   options             Options
      *
      * @return  Assembled name
      */
     static auto buildCommandInterfaceName(const QString &sedsInterfaceName, const QString &commandName,
-            const ivm::IVInterface::InterfaceType type) -> QString;
+            const ivm::IVInterface::InterfaceType type, const conversion::Options &options) -> QString;
 
     /**
      * @brief   Searches for interface declaration
@@ -109,9 +114,9 @@ public:
      *
      * @return  Found interface declarartion
      */
-    static auto findInterfaceDeclaration(const seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
-            const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
-            const std::vector<seds::model::Package> &sedsPackages) -> const seds::model::InterfaceDeclaration &;
+    static auto findInterfaceDeclaration(const ::seds::model::InterfaceDeclarationRef &interfaceDeclarationRef,
+            const ::seds::model::Component &sedsComponent, const ::seds::model::Package *sedsPackage,
+            const std::vector<::seds::model::Package> &sedsPackages) -> const ::seds::model::InterfaceDeclaration &;
 
     /**
      * @brief   Switch interface type

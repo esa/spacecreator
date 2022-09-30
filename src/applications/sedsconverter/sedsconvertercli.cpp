@@ -54,6 +54,9 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRef);
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRefFilepath);
     m_parser.handlePositional(CommandArg::SedsConverterSkipValidation);
+    m_parser.handlePositional(CommandArg::SedsConverterNoMangling);
+    m_parser.handlePositional(CommandArg::SedsConverterMultipleAsnModels);
+    m_parser.handlePositional(CommandArg::SedsConverterSkipEmptySequences);
     m_parser.handlePositional(CommandArg::SedsConverterKeepIntermediateFiles);
     m_parser.handlePositional(CommandArg::SedsConverterAcnFilepathPrefix);
     m_parser.handlePositional(CommandArg::SedsConverterAsn1FilepathPrefix);
@@ -61,6 +64,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterPatcherFunctionsFilepathPrefix);
     m_parser.handlePositional(CommandArg::SedsConverterMappingFunctionsModuleFileName);
     m_parser.handlePositional(CommandArg::SedsConverterSdlFilepathPrefix);
+    m_parser.handlePositional(CommandArg::SedsConverterTasteTranslation);
 
     m_parser.process(arguments);
     m_arguments = m_parser.positionalsSet();
@@ -231,12 +235,29 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
             options.add(SedsOptions::externalRefFilepath, value);
         }
     }
+
     if (m_arguments.contains(CommandArg::SedsConverterSedsExtRefFilepath)) {
         options.add(SedsOptions::externalRefFilepath, m_parser.value(CommandArg::SedsConverterSedsExtRefFilepath));
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterSkipValidation)) {
         options.add(SedsOptions::skipValidation);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterNoMangling)) {
+        options.add(SedsOptions::noMangling);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterMultipleAsnModels)) {
+        options.add(SedsOptions::multipleAsnModels);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterSkipEmptySequences)) {
+        options.add(SedsOptions::skipEmptySequences);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterTasteTranslation)) {
+        options.add(SedsOptions::tasteTranslation);
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterKeepIntermediateFiles)) {

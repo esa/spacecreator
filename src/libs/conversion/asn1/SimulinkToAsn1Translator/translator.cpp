@@ -20,12 +20,11 @@
 #include "translator.h"
 
 #include "datatypesdependencyresolver.h"
-#include "matlabstandarddatatypes.h"
 #include "specialized/datatypetranslatorvisitor.h"
 #include "specialized/portdatatypetranslator.h"
-#include "tastestandarddatatypes.h"
 
 #include <conversion/common/escaper/escaper.h>
+#include <conversion/common/simulink/matlabstandarddatatypes.h>
 #include <simulink/SimulinkModel/simulinkmodel.h>
 
 using Asn1Acn::Asn1Model;
@@ -33,6 +32,7 @@ using Asn1Acn::Definitions;
 using Asn1Acn::File;
 using Asn1Acn::SourceLocation;
 using conversion::Escaper;
+using conversion::simulink::MatLabStandardDataTypes;
 using simulink::model::DataType;
 using simulink::model::SimulinkModel;
 
@@ -74,7 +74,7 @@ std::vector<std::unique_ptr<Model>> SimulinkToAsn1Translator::translateSimulinkM
     auto simulinkModelAsn1AcnDefinitions =
             std::make_unique<Definitions>(simulinkModelAsn1AcnDefinitionsName, SourceLocation());
 
-    Context context(simulinkModel, matlabStandardDataTypesAsn1AcnDefinitions, simulinkModelAsn1AcnDefinitions, options);
+    Context context(matlabStandardDataTypesAsn1AcnDefinitions, simulinkModelAsn1AcnDefinitions, options);
 
     addMatLabStandardDataTypes(context);
 

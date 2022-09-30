@@ -36,6 +36,8 @@ enum class ModelType
     InterfaceView,
     Msc,
     Promela,
+    PromelaData,
+    PromelaSystem,
     Sdl,
     Seds,
     Simulink
@@ -127,6 +129,28 @@ template<>
 struct ModelTypeProperties<ModelType::Promela> {
     /// @brief  Model name
     static inline const QString name = "Promela";
+    /// @brief  Model extension
+    static inline const QStringList extensions = { ".pml" };
+};
+
+/**
+ * @brief   Specialization for Promela data model type
+ */
+template<>
+struct ModelTypeProperties<ModelType::PromelaData> {
+    /// @brief  Model name
+    static inline const QString name = "Promela-Data";
+    /// @brief  Model extension
+    static inline const QStringList extensions = { ".pml" };
+};
+
+/**
+ * @brief   Specialization for Promela system model type
+ */
+template<>
+struct ModelTypeProperties<ModelType::PromelaSystem> {
+    /// @brief  Model name
+    static inline const QString name = "Promela-System";
     /// @brief  Model extension
     static inline const QStringList extensions = { ".pml" };
 };

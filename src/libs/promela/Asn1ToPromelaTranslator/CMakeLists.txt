@@ -48,6 +48,7 @@ target_link_libraries(Asn1ToPromelaTranslator
   PUBLIC              Conversion::Common
                       Conversion::Converter
                       asn1library
+                      ivcore
                       Promela::Model
   PRIVATE             CommonProjectWarnings)
 

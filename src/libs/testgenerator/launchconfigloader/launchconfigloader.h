@@ -23,6 +23,7 @@
 
 #include <QDataStream>
 #include <QTextStream>
+#include <optional>
 
 namespace testgenerator {
 

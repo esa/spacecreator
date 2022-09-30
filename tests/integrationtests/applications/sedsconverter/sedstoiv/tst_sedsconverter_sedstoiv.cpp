@@ -42,6 +42,7 @@ private Q_SLOTS:
     void testCrossReferenceInterfaces();
     void testDescriptions();
     void testInterfaceInheritanceTypes();
+    void testIvSedsIvWithNoMangling();
 };
 
 /// \SRS  ETB-FUN-10
@@ -184,6 +185,13 @@ void tst_SedsConverter_SedsToIv::testDescriptions()
 void tst_SedsConverter_SedsToIv::testInterfaceInheritanceTypes()
 {
     const int result = system("./test_interface_inheritance_types.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETD-18
+void tst_SedsConverter_SedsToIv::testIvSedsIvWithNoMangling()
+{
+    const int result = system("./test_no_mangling.sh");
     QCOMPARE(result, 0);
 }
 

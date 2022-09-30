@@ -3,9 +3,9 @@
     <Property name="Taste::coordinates" value="46200 10600 66200 18600"/>
 <Provided_Interface name="Calculate" kind="Protected" layer="default" wcet="0">
     <Input_Parameter name="paramint" type="MyInteger" encoding="NATIVE"/>
-    <Input_Parameter name="paramfloat" type="MyFloat" encoding="NATIVE"/>
+    <Input_Parameter name="paramfloat" type="MyReal" encoding="NATIVE"/>
     <Input_Parameter name="parambool" type="MyBool" encoding="NATIVE"/>
-    <Output_Parameter name="paramout" type="MyFloat" encoding="NATIVE"/>
+    <Output_Parameter name="paramout" type="MyReal" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="46200 14200"/>
 </Provided_Interface>
 
@@ -22,9 +22,9 @@
 
 <Required_Interface name="Calculate" kind="Protected" layer="default" wcet="0">
     <Input_Parameter name="paramint" type="MyInteger" encoding="NATIVE"/>
-    <Input_Parameter name="paramfloat" type="MyFloat" encoding="NATIVE"/>
+    <Input_Parameter name="paramfloat" type="MyReal" encoding="NATIVE"/>
     <Input_Parameter name="parambool" type="MyBool" encoding="NATIVE"/>
-    <Output_Parameter name="paramout" type="MyFloat" encoding="NATIVE"/>
+    <Output_Parameter name="paramout" type="MyReal" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="27500 21800"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>

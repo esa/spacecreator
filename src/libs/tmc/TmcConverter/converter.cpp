@@ -325,7 +325,7 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
         }
     }
 
-    if (!convertMscObservers()) {
+    if (!convertMscObservers(outputOptimizedIvFileName)) {
         return false;
     }
 
@@ -364,10 +364,10 @@ bool TmcConverter::convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles
     }
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
-    convertDataview(asn1Files, outputDataview.absoluteFilePath());
+    convertDataview(asn1Files, outputOptimizedIvFileName, outputDataview.absoluteFilePath());
 
     const QFileInfo outputEnv = outputFilepath("env_inlines.pml");
-    createEnvGenerationInlines(simuDataView, outputEnv, environmentDatatypes);
+    createEnvGenerationInlines(simuDataView, outputOptimizedIvFileName, outputEnv, environmentDatatypes);
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
     convertInterfaceview(outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), asn1Files, modelFunctions,
@@ -449,10 +449,12 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
         options.add(Asn1Options::inputFilepath, inputFileName);
     }
 
-    return convertModel({ ModelType::InterfaceView, ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
+    return convertModel(
+            { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::PromelaSystem, {}, std::move(options));
 }
 
-bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath)
+bool TmcConverter::convertDataview(
+        const QList<QString> &inputFilepathList, const QString &ivFilepath, const QString &outputFilepath)
 {
     qDebug() << "Converting ASN.1 files:";
     for (const QString &file : inputFilepathList) {
@@ -472,12 +474,15 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
         options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
     }
 
+    options.add(IvOptions::inputFilepath, ivFilepath);
+    options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
+
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
-    return convertModel({ ModelType::Asn1 }, ModelType::Promela, {}, std::move(options));
+    return convertModel({ ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, {}, std::move(options));
 }
 
-bool TmcConverter::convertMscObservers()
+bool TmcConverter::convertMscObservers(const QString &ivFilePath)
 {
     for (const QString &mscFilePath : m_mscObserverFiles) {
         QFileInfo mscFile(mscFilePath);
@@ -493,12 +498,16 @@ bool TmcConverter::convertMscObservers()
         Options options;
 
         options.add(MscOptions::inputFilepath, mscFilePath);
+        options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
+        options.add(IvOptions::inputFilepath, ivFilePath);
+        options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
         options.add(MscOptions::simuDataViewFilepath, simuDataViewLocation().absoluteFilePath());
         options.add(SdlOptions::filepathPrefix, outputPath);
 
         qDebug() << "Converting MSC file" << mscFilePath << "to an SDL observer";
 
-        if (!convertModel({ ModelType::Msc }, ModelType::Sdl, {}, std::move(options))) {
+        if (!convertModel({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, {},
+                    std::move(options))) {
             qCritical() << "Unable to translate MSC file" << mscFilePath << "to SDL observer";
             return false;
         }
@@ -655,8 +664,8 @@ void TmcConverter::findEnvironmentDatatypes(
     }
 }
 
-bool TmcConverter::createEnvGenerationInlines(
-        const QFileInfo &inputDataView, const QFileInfo &outputFilepath, const QStringList &envDatatypes)
+bool TmcConverter::createEnvGenerationInlines(const QFileInfo &inputDataView, const QString &ivFilepath,
+        const QFileInfo &outputFilepath, const QStringList &envDatatypes)
 {
     qDebug() << "Converting ASN.1 environment value generators using " << inputDataView.absoluteFilePath();
     Options options;
@@ -671,6 +680,9 @@ bool TmcConverter::createEnvGenerationInlines(
         options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
     }
 
+    options.add(IvOptions::inputFilepath, ivFilepath);
+    options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
+
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
     options.add(PromelaOptions::asn1ValueGeneration);
@@ -679,10 +691,9 @@ bool TmcConverter::createEnvGenerationInlines(
         options.add(PromelaOptions::asn1ValueGenerationForType, datatype);
     }
 
-    ModelType sourceModelType = ModelType::Asn1;
-
     try {
-        return convertModel({ sourceModelType }, ModelType::Promela, {}, std::move(options));
+        return convertModel(
+                { ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, {}, std::move(options));
     } catch (const ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

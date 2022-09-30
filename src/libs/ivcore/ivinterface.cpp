@@ -67,7 +67,7 @@ IVInterface::CreationInfo IVInterface::CreationInfo::initFromIface(
     };
 
     return { iface->model(), (iface->parentObject() ? iface->parentObject()->as<IVFunctionType *>() : nullptr), {},
-        iface->direction(), iface->id(), iface->params(), iface->kind(), iface->layer(), iface->title(), policy,
+        iface->direction(), shared::createId(), iface->params(), iface->kind(), iface->layer(), iface->title(), policy,
         iface };
 }
 
