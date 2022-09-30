@@ -18,8 +18,6 @@ with TASTE_BasicTypes;
 use TASTE_BasicTypes;
 with UART_PROTOCOL_DLC_DATAVIEW;
 use UART_PROTOCOL_DLC_DATAVIEW;
-with System_Dataview;
-use System_Dataview;
 with adaasn1rtl;
 use adaasn1rtl;
 with rtdlcr_Datamodel; use rtdlcr_Datamodel;
@@ -52,5 +50,5 @@ package rtdlcr with Elaborate_Body is
    procedure SET_FrameTimer (Val : in out asn1SccT_UInt32) renames rtdlcr_RI.Set_FrameTimer;
    procedure RESET_FrameTimer renames rtdlcr_RI.Reset_FrameTimer;
    procedure Execute_Transition (Id : Integer);
-   CS_Only : constant := 5;
+   CS_Only : constant := 4;
 end rtdlcr;

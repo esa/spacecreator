@@ -8,7 +8,7 @@ CC=gcc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output_uart_sc
+TEST_OUTPUT_DIR=output_uart_oo
 RESOURCE_DIR=resources/uart_protocol_dlc
 SUBTYPES_DIR=${RESOURCE_DIR}/work/modelchecking/subtypes
 OBSERVERS_DIR=${RESOURCE_DIR}/work/modelchecking/properties/observers
@@ -24,7 +24,7 @@ mkdir $TEST_OUTPUT_DIR
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -ivl 1 \
     -sub ${SUBTYPES_DIR}/subtypes.asn \
-    -scl ${PROPERTIES_DIR}/sc.scl \
+    -os ${PROPERTIES_DIR}/OutputObserver/OutputObserver.pr \
     -o $TEST_OUTPUT_DIR
 
 # Compile the actual Spin model checker.
@@ -37,6 +37,6 @@ cd $TEST_OUTPUT_DIR \
     && $CC -DVECTORSZ=16384 -DBITSTATE -o system.out pan.c \
     && ./system.out > system.log \
     && grep -q "errors: 1" system.log \
-    && grep -q "assertion violated  !((global_state.erroredchannel.state==" system.log \
+    && grep -q "assertion violated  !((global_state.outputobserver.state==" system.log \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR

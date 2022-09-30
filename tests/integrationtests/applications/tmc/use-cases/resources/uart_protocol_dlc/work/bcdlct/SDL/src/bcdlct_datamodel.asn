@@ -9,11 +9,16 @@ IMPORTS
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID FROM System-Dataview;
 
-Bcdlct-States ::= ENUMERATED {wait}
+Bcdlct-States ::= ENUMERATED {idle, transmitting}
 
 Bcdlct-Context ::= SEQUENCE {
    state Bcdlct-States,
-   init-done BOOLEAN
+   init-done BOOLEAN,
+   txsdu T-UART-DLC-SDU,
+   txpdu T-UART-DLC-PDU,
+   txcount UINT8,
+   txcrc T-UART-DLC-FrameCRC,
+   txframebuffer T-UART-DLC-FrameBuffer
 }
 
 END

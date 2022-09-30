@@ -37,6 +37,6 @@ cd $TEST_OUTPUT_DIR \
     && $CC -DVECTORSZ=16384 -DBITSTATE -o system.out pan.c \
     && ./system.out > system.log \
     && grep -q "errors: 1" system.log \
-    && grep -q "assertion violated  !((global_state.erroredchannel.state==" system.log \
-    && cd ..
-#    && rm -r $TEST_OUTPUT_DIR
+    && grep -q "assertion violated  !((global_state.inputobserver.state==" system.log \
+    && cd .. \
+    && rm -r $TEST_OUTPUT_DIR

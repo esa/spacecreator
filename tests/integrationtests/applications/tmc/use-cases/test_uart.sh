@@ -25,9 +25,9 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
      -o $TEST_OUTPUT_DIR \
     -ivl 1 \
     -sub ${SUBTYPES_DIR}/subtypes.asn \
-    -scl ${PROPERTIES_DIR}/sc.scl
-#    -os ${PROPERTIES_DIR}/InputObserver/InputObserver.pr \
-#    -os ${PROPERTIES_DIR}/OutputObserver/OutputObserver.pr \
+    -scl ${PROPERTIES_DIR}/sc.scl \
+    -os ${PROPERTIES_DIR}/OutputObserver/OutputObserver.pr \
+    -os ${PROPERTIES_DIR}/InputObserver/InputObserver.pr
 
 # Compile the actual Spin model checker. This tests
 # whether all the features are supported, and that
@@ -39,5 +39,5 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
     && $CC -DVECTORSZ=65536 -o system.out pan.c \
-    && cd .. 
-#    && rm -r $TEST_OUTPUT_DIR
+    && cd .. \
+    && rm -r $TEST_OUTPUT_DIR

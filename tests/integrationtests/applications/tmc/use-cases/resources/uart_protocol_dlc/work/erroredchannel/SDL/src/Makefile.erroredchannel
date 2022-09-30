@@ -1,0 +1,7 @@
+all:
+	mkdir -p code
+	cd code && opengeode --toAda /home/taste/workspace/SpaceCreator/spacecreator/tests/integrationtests/applications/tmc/use-cases/resources/uart_protocol_dlc/work/erroredchannel/SDL/src/erroredchannel.pr 
+	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada dataview-uniq.asn code/erroredchannel_datamodel.asn
+	cd code && gnat make erroredchannel
+clean:
+	rm -rf code

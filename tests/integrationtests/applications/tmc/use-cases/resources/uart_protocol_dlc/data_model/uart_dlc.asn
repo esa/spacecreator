@@ -38,7 +38,8 @@ T-UART-DLC-RxErrorCode ::= ENUMERATED {
     bad-start-char (1),
     crc-fail (2),
     frame-timeout (3),
-    bad-request-type (4)
+    bad-request-type (4),
+    phy-rx-error(5)
 }
 
 

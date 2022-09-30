@@ -1,0 +1,12 @@
+mscdocument uart_protocol_dlc /* MSC AND */;
+    language ASN.1;
+    data uart_protocol_dlc.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc uart_protocol_dlc;
+endmsc;
+endmscdocument;
+endmscdocument;

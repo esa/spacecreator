@@ -1,4 +1,4 @@
-/* CIF PROCESS (258, 150), (150, 75) */
+/* CIF PROCESS (262, 146), (150, 75) */
 process Erroredchannel;
     /* CIF TEXT (278, 328), (209, 140) */
     DCL corruption UINT8;

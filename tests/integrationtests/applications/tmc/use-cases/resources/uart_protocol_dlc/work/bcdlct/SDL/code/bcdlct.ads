@@ -18,8 +18,6 @@ with TASTE_BasicTypes;
 use TASTE_BasicTypes;
 with UART_PROTOCOL_DLC_DATAVIEW;
 use UART_PROTOCOL_DLC_DATAVIEW;
-with System_Dataview;
-use System_Dataview;
 with adaasn1rtl;
 use adaasn1rtl;
 with Bcdlct_Datamodel; use Bcdlct_Datamodel;
@@ -43,5 +41,7 @@ package Bcdlct with Elaborate_Body is
    --  Required interface "PHYTxChar"
    procedure RI_0_PHYTxChar (p1 : in out asn1SccUINT8) renames Bcdlct_RI.PHYTxChar;
    procedure Execute_Transition (Id : Integer);
-   CS_Only : constant := 1;
+   CS_Only : constant := 4;
+   procedure Check_Queue (Res : out Asn1Boolean)
+   with Import, Convention => C, Link_Name => "bcdlct_check_queue";
 end Bcdlct;

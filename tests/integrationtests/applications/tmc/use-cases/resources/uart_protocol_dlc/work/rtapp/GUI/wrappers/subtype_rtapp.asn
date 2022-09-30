@@ -1,0 +1,30 @@
+RTAPP-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS T-UART-DLC-RxErrorCode FROM UART-DLC
+
+
+
+
+T-UART-DLC-SDU FROM UART-DLC
+
+
+ ;
+
+
+
+
+Rtapp-dlcrxerror-p1 ::= T-UART-DLC-RxErrorCode
+
+
+
+
+Rtapp-dlcrxsdu-p1 ::= T-UART-DLC-SDU
+
+
+
+
+
+
+
+END

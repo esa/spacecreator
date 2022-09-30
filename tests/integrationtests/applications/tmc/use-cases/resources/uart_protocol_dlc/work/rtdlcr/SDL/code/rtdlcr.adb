@@ -131,10 +131,10 @@ package body rtdlcr is
    procedure DLCRxReset is
       begin
          case ctxt.state is
-            when asn1Sccidle =>
-               Execute_Transition (4);
             when asn1Sccreceiving =>
-               Execute_Transition (4);
+               Execute_Transition (2);
+            when asn1Sccidle =>
+               Execute_Transition (2);
             when others =>
                Execute_Transition (CS_Only);
          end case;
@@ -144,12 +144,12 @@ package body rtdlcr is
    procedure PHYRxChar(p1: in out asn1SccUINT8) is
       begin
          case ctxt.state is
-            when asn1Sccidle =>
-               ctxt.rxchar := p1;
-               Execute_Transition (2);
             when asn1Sccreceiving =>
                ctxt.rxchar := p1;
-               Execute_Transition (1);
+               Execute_Transition (3);
+            when asn1Sccidle =>
+               ctxt.rxchar := p1;
+               Execute_Transition (3);
             when others =>
                Execute_Transition (CS_Only);
          end case;
@@ -168,10 +168,10 @@ package body rtdlcr is
    procedure FrameTimer is
       begin
          case ctxt.state is
-            when asn1Sccidle =>
-               Execute_Transition (3);
             when asn1Sccreceiving =>
-               Execute_Transition (3);
+               Execute_Transition (1);
+            when asn1Sccidle =>
+               Execute_Transition (1);
             when others =>
                Execute_Transition (CS_Only);
          end case;
@@ -180,114 +180,108 @@ package body rtdlcr is
 
    procedure Execute_Transition (Id : Integer) is
       trId : Integer := Id;
-      tmp36 : asn1SccT_UART_DLC_RxErrorCode;
-      tmp33 : asn1SccT_UART_DLC_SDU;
-      tmp62 : asn1SccT_UART_DLC_RxErrorCode;
-      tmp60 : asn1SccT_UART_DLC_RxErrorCode;
-      tmp56 : asn1SccT_UInt32;
+      tmp2 : asn1SccT_UART_DLC_RxErrorCode;
+      tmp33 : asn1SccT_UART_DLC_RxErrorCode;
+      tmp50 : asn1SccT_UART_DLC_SDU;
+      tmp29 : asn1SccT_UInt32;
+      tmp53 : asn1SccT_UART_DLC_RxErrorCode;
+      --  !! stack: _call_external_function line 1440
       begin
          while (trId /= -1) loop
             case trId is
                when 0 =>
                   --  ResetDLCR (181,13)
                   p_0_ResetDLCR;
-                  --  NEXT_STATE IDLE (183,18) at 670, 130
+                  --  NEXT_STATE IDLE (183,18) at 636, 105
                   trId := -1;
                   ctxt.State := asn1SccIDLE;
                   goto Continuous_Signals;
                when 1 =>
-                  --  writeln('received char ', rxChar) (189,17)
+                  --  ResetDLCR (189,17)
+                  p_0_ResetDLCR;
+                  --  DLCRxError(FRAME_TIMEOUT) (191,19)
+                  tmp2 := asn1Sccframe_timeout;
+                  RI_0_DLCRxError(tmp2);
+                  --  NEXT_STATE IDLE (193,22) at 1583, 256
+                  trId := -1;
+                  ctxt.State := asn1SccIDLE;
+                  goto Continuous_Signals;
+               when 2 =>
+                  --  ResetDLCR (197,17)
+                  p_0_ResetDLCR;
+                  --  NEXT_STATE IDLE (199,22) at 1874, 195
+                  trId := -1;
+                  ctxt.State := asn1SccIDLE;
+                  goto Continuous_Signals;
+               when 3 =>
+                  --  writeln('received char ', rxChar) (207,17)
                   Put ("received char ");
                   Put (asn1SccUINT8'Image (ctxt.rxChar));
                   New_Line;
-                  --  rxFrameBuffer(rxCount) := rxChar (191,17)
+                  --  rxFrameBuffer(rxCount) := rxChar (209,17)
                   ctxt.rxFrameBuffer.Data(1 + Integer (ctxt.rxCount)) := Interfaces.Unsigned_8 (ctxt.rxChar);
-                  --  rxCount := (rxCount + 1) mod 256 (193,17)
+                  --  rxCount := (rxCount + 1) mod 256 (211,17)
                   ctxt.rxCount := ((ctxt.rxCount + 1) mod 256);
                   --  DECISION rxCount (-1,-1)
-                  --  ANSWER C_UART_DLC_PDU_SIZE (197,17)
-                  if (ctxt.rxCount) = asn1SccUINT8(c_UART_DLC_PDU_SIZE) then
-                     --  reset_timer(FrameTimer) (199,25)
+                  --  ANSWER 1 (215,17)
+                  if (ctxt.rxCount) = asn1SccUINT8(1) then
+                     --  IsValidUartHeader(rxChar, headerValid) (217,25)
+                     p_0_IsValidUartHeader(ctxt.rxChar, ctxt.headerValid);
+                     --  DECISION headerValid (-1,-1)
+                     --  ANSWER valid (221,25)
+                     if (ctxt.headerValid) = asn1Sccvalid then
+                        --  set_timer(FRAME_TIMEOUT, FrameTimer) (223,33)
+                        tmp29 := ctxt.FRAME_TIMEOUT;
+                        SET_FrameTimer (tmp29);
+                        --  NEXT_STATE RECEIVING (225,38) at 471, 709
+                        trId := -1;
+                        ctxt.State := asn1SccRECEIVING;
+                        goto Continuous_Signals;
+                        --  ANSWER invalid (227,25)
+                     elsif (ctxt.headerValid) = asn1Sccinvalid then
+                        --  DLCRxError(BAD_START_CHAR) (229,35)
+                        tmp33 := asn1Sccbad_start_char;
+                        RI_0_DLCRxError(tmp33);
+                        --  ResetDLCR (231,33)
+                        p_0_ResetDLCR;
+                        --  NEXT_STATE IDLE (233,38) at 790, 759
+                        trId := -1;
+                        ctxt.State := asn1SccIDLE;
+                        goto Continuous_Signals;
+                     end if;
+                     --  ANSWER C_UART_DLC_PDU_SIZE (236,17)
+                  elsif (ctxt.rxCount) = asn1SccUINT8(c_UART_DLC_PDU_SIZE) then
+                     --  reset_timer(FrameTimer) (238,25)
                      RESET_FrameTimer;
-                     --  Decode(rxFrameBuffer, rxPDU) (201,25)
+                     --  Decode(rxFrameBuffer, rxPDU) (240,25)
                      p_0_Decode(ctxt.rxFrameBuffer, ctxt.rxPDU);
-                     --  CheckFrameCRC(rxPDU, crcResult) (203,25)
+                     --  CheckFrameCRC(rxPDU, crcResult) (242,25)
                      p_0_CheckFrameCRC(ctxt.rxPDU, ctxt.crcResult);
                      --  DECISION crcResult (-1,-1)
-                     --  ANSWER success (207,25)
+                     --  ANSWER success (246,25)
                      if (ctxt.crcResult) = asn1Sccsuccess then
-                        --  DLCRxSDU(rxPDU.dlc_payload) (209,35)
-                        tmp33 := ctxt.rxPDU.dlc_payload;
-                        RI_0_DLCRxSDU(tmp33);
-                        --  ANSWER fail (211,25)
+                        --  DLCRxSDU(rxPDU.dlc_payload) (248,35)
+                        tmp50 := ctxt.rxPDU.dlc_payload;
+                        RI_0_DLCRxSDU(tmp50);
+                        --  ANSWER fail (250,25)
                      elsif (ctxt.crcResult) = asn1Sccfail then
-                        --  DLCRxError (CRC_FAIL) (213,35)
-                        tmp36 := asn1Scccrc_fail;
-                        RI_0_DLCRxError(tmp36);
+                        --  DLCRxError (CRC_FAIL) (252,35)
+                        tmp53 := asn1Scccrc_fail;
+                        RI_0_DLCRxError(tmp53);
                      end if;
-                     --  ResetDLCR (216,25)
+                     --  ResetDLCR (255,25)
                      p_0_ResetDLCR;
-                     --  NEXT_STATE IDLE (218,30) at 862, 1491
+                     --  NEXT_STATE IDLE (257,30) at 1238, 827
                      trId := -1;
                      ctxt.State := asn1SccIDLE;
                      goto Continuous_Signals;
                      --  ANSWER else (None,None)
                   else
-                     --  NEXT_STATE RECEIVING (222,30) at 1272, 1114
+                     --  NEXT_STATE RECEIVING (261,30) at 973, 451
                      trId := -1;
                      ctxt.State := asn1SccRECEIVING;
                      goto Continuous_Signals;
                   end if;
-               when 2 =>
-                  --  writeln('received char ', rxChar) (230,17)
-                  Put ("received char ");
-                  Put (asn1SccUINT8'Image (ctxt.rxChar));
-                  New_Line;
-                  --  IsValidUartHeader(rxChar, headerValid) (232,17)
-                  p_0_IsValidUartHeader(ctxt.rxChar, ctxt.headerValid);
-                  --  DECISION headerValid (-1,-1)
-                  --  ANSWER valid (236,17)
-                  if (ctxt.headerValid) = asn1Sccvalid then
-                     --  rxFrameBuffer(0) := rxChar (238,25)
-                     ctxt.rxFrameBuffer.Data(1) := Interfaces.Unsigned_8 (ctxt.rxChar);
-                     --  rxCount := 1 (240,25)
-                     ctxt.rxCount := 1;
-                     --  set_timer(FRAME_TIMEOUT, FrameTimer) (242,25)
-                     tmp56 := ctxt.FRAME_TIMEOUT;
-                     SET_FrameTimer (tmp56);
-                     --  NEXT_STATE RECEIVING (244,30) at 770, 552
-                     trId := -1;
-                     ctxt.State := asn1SccRECEIVING;
-                     goto Continuous_Signals;
-                     --  ANSWER invalid (246,17)
-                  elsif (ctxt.headerValid) = asn1Sccinvalid then
-                     --  DLCRxError(BAD_START_CHAR) (248,27)
-                     tmp60 := asn1Sccbad_start_char;
-                     RI_0_DLCRxError(tmp60);
-                     --  ResetDLCR (250,25)
-                     p_0_ResetDLCR;
-                     --  NEXT_STATE IDLE (252,30) at 1089, 506
-                     trId := -1;
-                     ctxt.State := asn1SccIDLE;
-                     goto Continuous_Signals;
-                  end if;
-               when 3 =>
-                  --  ResetDLCR (260,17)
-                  p_0_ResetDLCR;
-                  --  DLCRxError(FRAME_TIMEOUT) (262,19)
-                  tmp62 := asn1Sccframe_timeout;
-                  RI_0_DLCRxError(tmp62);
-                  --  NEXT_STATE IDLE (264,22) at 1583, 256
-                  trId := -1;
-                  ctxt.State := asn1SccIDLE;
-                  goto Continuous_Signals;
-               when 4 =>
-                  --  ResetDLCR (268,17)
-                  p_0_ResetDLCR;
-                  --  NEXT_STATE IDLE (270,22) at 1874, 195
-                  trId := -1;
-                  ctxt.State := asn1SccIDLE;
-                  goto Continuous_Signals;
                when CS_Only =>
                   trId := -1;
                   goto Continuous_Signals;

@@ -1,0 +1,119 @@
+/* CIF PROCESS (250, 149), (150, 75) */
+process Bcdlct;
+    /* CIF TEXT (935, 46), (302, 233) */
+    -- Text area for declarations and comments
+    
+    DCL txSDU T_UART_DLC_SDU;
+    DCL txPDU T_UART_DLC_PDU;
+    
+    DCL txCount UINT8;
+    DCL txCRC T_UART_DLC_FrameCRC;
+    
+    DCL txFrameBuffer T_UART_DLC_FrameBuffer;
+    
+    --procedure ComputeCRC;
+    --fpar
+    --    in rxFrame T_UART_DLC_SDU,
+    --    out result T_UART_DLC_FrameCRC;
+    --EXTERNAL;
+    /* CIF ENDTEXT */
+    /* CIF procedure (952, 374), (70, 35) */
+    procedure Encode;
+        /* CIF TEXT (789, 82), (287, 140) */
+        -- Text area for declarations and comments
+        
+        fpar
+            in frame T_UART_DLC_PDU,
+            out byteBuffer T_UART_DLC_FrameBuffer;
+        /* CIF ENDTEXT */
+        /* CIF START (157, 44), (70, 35) */
+        START;
+            /* CIF task (80, 99), (223, 35) */
+            task byteBuffer(0) := frame.dlc_header;
+            /* CIF task (33, 154), (317, 53) */
+            task for  index in RANGE (0,c_UART_DLC_SDU_SIZE) :
+   byteBuffer(1+index) := frame.dlc_payload(index)
+endfor;
+            /* CIF task (26, 227), (331, 35) */
+            task byteBuffer(C_UART_DLC_SDU_SIZE + 1) := txPDU.crc;
+            /* CIF return (174, 277), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF procedure (987, 481), (101, 35) */
+    procedure ComputeCRC;
+        /* CIF TEXT (709, 97), (267, 158) */
+        -- Text area for declarations and comments
+        
+        fpar
+            in rxFrame T_UART_DLC_SDU,
+            out result T_UART_DLC_FrameCRC;
+        
+        
+        DCL dataIndex UINT16;
+        DCL crc UINT8;
+        DCL inputByte UINT8;
+        /* CIF ENDTEXT */
+        /* CIF START (306, 182), (70, 35) */
+        START;
+            /* CIF task (288, 237), (105, 38) */
+            task crc := 0,
+dataIndex := 0;
+            /* CIF label (306, 295), (70, 35) */
+            L1:
+            /* CIF decision (244, 345), (192, 50) */
+            decision dataIndex = length(rxFrame);
+                /* CIF ANSWER (163, 415), (70, 23) */
+                (true):
+                    /* CIF task (152, 458), (90, 35) */
+                    task result := crc;
+                    /* CIF return (180, 513), (35, 35) */
+                    return ;
+                /* CIF ANSWER (414, 415), (70, 23) */
+                (false):
+                    /* CIF task (342, 458), (213, 35) */
+                    task inputByte := rxFrame(dataIndex);
+                    /* CIF task (313, 513), (270, 35) */
+                    task crc := c_RMAPCRCTable(crc xor inputByte);
+                    /* CIF task (359, 568), (178, 35) */
+                    task dataIndex := dataIndex + 1;
+                    /* CIF join (431, 618), (35, 35) */
+                    join L1;
+            enddecision;
+    endprocedure;
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE IDLE;
+    /* CIF state (566, 42), (70, 35) */
+    state IDLE;
+        /* CIF input (536, 97), (130, 35) */
+        input DLCTxSDU(txSDU);
+            /* CIF task (447, 152), (307, 35) */
+            task txPDU.dlc_header := C_UART_DLC_SYNC_VALUE;
+            /* CIF task (507, 207), (187, 35) */
+            task txPDU.dlc_payload := txSDU;
+            /* CIF PROCEDURECALL (496, 257), (210, 35) */
+            call ComputeCRC(txSDU, txPDU.crc);
+            /* CIF PROCEDURECALL (498, 312), (206, 35) */
+            call Encode(txPDU, txFrameBuffer);
+            /* CIF task (554, 362), (94, 35) */
+            task txCount := 0;
+            /* CIF NEXTSTATE (543, 412), (115, 35) */
+            NEXTSTATE TRANSMITTING;
+    endstate;
+    /* CIF state (527, 463), (115, 35) */
+    state TRANSMITTING;
+        /* CIF provided (351, 518), (225, 35) */
+        provided txCount < C_UART_DLC_PDU_SIZE;
+            /* CIF output (342, 573), (243, 35) */
+            output PHYTxChar( txFrameBuffer(txCount));
+            /* CIF task (386, 628), (155, 35) */
+            task txCount := txCount + 1;
+            /* CIF NEXTSTATE (406, 678), (115, 35) */
+            NEXTSTATE TRANSMITTING;
+        /* CIF provided (613, 518), (232, 35) */
+        provided txCount >= C_UART_DLC_PDU_SIZE;
+            /* CIF NEXTSTATE (695, 573), (70, 35) */
+            NEXTSTATE IDLE;
+    endstate;
+endprocess Bcdlct;

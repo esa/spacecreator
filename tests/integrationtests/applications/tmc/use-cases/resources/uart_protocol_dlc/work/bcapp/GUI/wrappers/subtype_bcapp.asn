@@ -1,0 +1,21 @@
+BCAPP-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+T-UART-DLC-SDU FROM UART-DLC
+
+ ;
+
+
+
+
+
+
+
+Bcapp-dlctxsdu-p1 ::= T-UART-DLC-SDU
+
+
+
+
+END
