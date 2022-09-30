@@ -178,6 +178,12 @@ static inline auto handleTransactions(Context &context, const std::vector<const 
     auto transactionParameter = std::make_unique<::sdl::ProcedureParameter>(paramName, paramTypeName, "in");
     procedure->addParameter(std::move(transactionParameter));
 
+    // Add variable to pass transaction name outside of the procedure
+    const auto transactionVariableName = QString("%1_transactionName").arg(ivInterface->title());
+    auto transactionVariable = std::make_unique<::sdl::VariableDeclaration>(transactionVariableName, paramTypeName);
+    auto sdlProcess = context.sdlProcess();
+    sdlProcess->addVariable(std::move(transactionVariable));
+
     // Create a decision based on the transaction name
     auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(paramName);
     auto sdlDecision = std::make_unique<::sdl::Decision>();
@@ -206,6 +212,10 @@ static inline auto handleTransactions(Context &context, const std::vector<const 
     }
 
     auto sdlTransition = std::make_unique<::sdl::Transition>();
+
+    auto transactionVariableAssignment = std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(transactionVariableName).arg(paramName));
+    sdlTransition->addAction(std::move(transactionVariableAssignment));
+
     sdlTransition->addAction(std::move(sdlDecision));
     procedure->setTransition(std::move(sdlTransition));
 }
@@ -757,6 +767,33 @@ auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *
     // clang-format on
 }
 
+static inline auto handleTransitionTransaction(const ::seds::model::Name &transaction, const ::sdl::Input *input, ::sdl::Transition *currentTransition) -> ::sdl::Transition *
+{
+    const auto transactionVariableName = QString("%1_transactionName").arg(input->name());
+    auto transactionDecisionExpression = std::make_unique<::sdl::Expression>(transactionVariableName);
+
+    auto transactionAnswerTransition = std::make_unique<::sdl::Transition>();
+    auto transactionAnswerTransitionPtr = transactionAnswerTransition.get();
+
+    const auto &transactionName = QString("\"%1\"").arg(transaction.value());
+
+    auto transactionAnswer = std::make_unique<::sdl::Answer>();
+    transactionAnswer->setLiteral(transactionName);
+    transactionAnswer->setTransition(std::move(transactionAnswerTransition));
+
+    auto transitionElse = std::make_unique<::sdl::Answer>();
+    transitionElse->setLiteral(QString("ELSE"));
+    transitionElse->setTransition(std::make_unique<::sdl::Transition>());
+
+    auto transactionDecision = std::make_unique<::sdl::Decision>();
+    transactionDecision->setExpression(std::move(transactionDecisionExpression));
+    transactionDecision->addAnswer(std::move(transactionAnswer));
+    transactionDecision->addAnswer(std::move(transitionElse));
+
+    currentTransition->addAction(std::move(transactionDecision));
+    return transactionAnswerTransitionPtr;
+}
+
 auto StateMachineTranslator::translateTransition(Context &context, const ::seds::model::StateMachine &sedsStateMachine,
         const ::seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap,
         const Options &options) -> void
@@ -779,28 +816,46 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
     auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition.primitive(), options);
     auto &input = inputHandler.first;
 
-    // TODO: We should handle that situation
+    ::sdl::Transition *currentTransitionPtr = nullptr;
+    ::sdl::Input *currentInputPtr = nullptr;
+
     if(const auto existingInput = getStateInput(sdlFromState, input->name()); existingInput != nullptr) {
-        const auto existingInputTransition = existingInput->transition();
-        const auto &existingInputTransitionActions = existingInputTransition->actions();
-        const auto &existingInputTransitionLastAction = existingInputTransitionActions.back();
+        currentInputPtr = existingInput;
+        currentTransitionPtr = existingInput->transition();
+    } else {
+        auto mainTransition = std::make_unique<::sdl::Transition>();
+        DescriptionTranslator::translate(sedsTransition, mainTransition.get());
 
-        const auto existingInputTransitionNextState = dynamic_cast<::sdl::NextState *>(existingInputTransitionLastAction.get());
-        if (existingInputTransitionNextState != nullptr) {
-            if (existingInputTransitionNextState->state()->name() != sdlToState->name()) {
-                auto errorMessage = QString("Two transitions on same Input doesn't go to the same end state");
-                throw TranslationException(std::move(errorMessage));
-            }
-        }
+        currentTransitionPtr = mainTransition.get();
+        currentInputPtr = input.get();
 
-        return;
+        input->setTransition(mainTransition.get());
+        sdlFromState->addInput(std::move(input));
+
+        context.sdlStateMachine()->addTransition(std::move(mainTransition));
     }
 
-    auto mainTransition = std::make_unique<::sdl::Transition>();
-    DescriptionTranslator::translate(sedsTransition, mainTransition.get());
-    auto currentTransitionPtr = mainTransition.get();
-    input->setTransition(mainTransition.get());
-    sdlFromState->addInput(std::move(input));
+    bool invokeDoActivity = true;
+    if (std::holds_alternative<::seds::model::OnCommandPrimitive>(sedsTransition.primitive())) {
+        const auto &onCommandPrimitive = std::get<::seds::model::OnCommandPrimitive>(sedsTransition.primitive());
+
+        const auto command =
+                context.getCommand(onCommandPrimitive.interface().value(), onCommandPrimitive.command().value());
+        if (command == nullptr) {
+            throw TranslationException(
+                    QString("Transition on undefined command %1").arg(onCommandPrimitive.command().value()));
+        }
+
+        if (command->definition()->mode() == ::seds::model::InterfaceCommandMode::Sync) {
+            invokeDoActivity = false;
+        }
+
+        const auto &transaction = onCommandPrimitive.transaction();
+        if (transaction) {
+            currentTransitionPtr = handleTransitionTransaction(*transaction, currentInputPtr, currentTransitionPtr);
+        }
+    }
+
     // Argument unpacking
     for (auto &action : inputHandler.second) {
         currentTransitionPtr->addAction(std::move(action));
@@ -816,19 +871,6 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
         if (onExit.has_value()) {
             currentTransitionPtr->addAction(
                     StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), **onExit));
-        }
-    }
-    bool invokeDoActivity = true;
-    if (std::holds_alternative<::seds::model::OnCommandPrimitive>(sedsTransition.primitive())) {
-        const auto &onCommandPrimitive = std::get<::seds::model::OnCommandPrimitive>(sedsTransition.primitive());
-        const auto command =
-                context.getCommand(onCommandPrimitive.interface().value(), onCommandPrimitive.command().value());
-        if (command == nullptr) {
-            throw TranslationException(
-                    QString("Transition on undefined command %1").arg(onCommandPrimitive.command().value()));
-        }
-        if (command->definition()->mode() == ::seds::model::InterfaceCommandMode::Sync) {
-            invokeDoActivity = false;
         }
     }
 
@@ -851,8 +893,6 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
 
     // State switch
     currentTransitionPtr->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
-
-    context.sdlStateMachine()->addTransition(std::move(mainTransition));
 }
 
 auto StateMachineTranslator::createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void
