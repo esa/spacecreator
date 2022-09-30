@@ -23,11 +23,9 @@
 #include "errorhub.h"
 #include "file.h"
 #include "graphicsviewutils.h"
-#include "itemeditor/common/ivutils.h"
-#include "itemeditor/graphicsitemhelpers.h"
 #include "ivconnection.h"
-#include "ivexporter.h"
 #include "ivfunctiontype.h"
+#include "ivfunction.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivxmlreader.h"
@@ -469,47 +467,66 @@ void CmdEntitiesImport::prepareConnectionType(ivm::IVObject *obj, const QVector<
             }
             return false;
         });
-        return it != objects.cend();
+        return it != objects.cend() ? (*it)->as<ivm::IVInterface *>() : nullptr;
     };
-    auto checkEndPoint = [&](ivm::IVConnection::EndPointInfo &endPointInfo, const QVector<ivm::IVObject *> &objects) {
-        if (!endPointInfo.isReady()) {
-            return false;
-        }
 
-        bool endPointDataChanged = false;
-        auto it = m_renamedFunctions.find(endPointInfo.m_functionName);
-        if (it != m_renamedFunctions.end()) {
-            endPointInfo.m_functionName = it.value();
-            endPointDataChanged = true;
-        }
-
-        if (findIface(endPointInfo, objects)) {
-            return endPointDataChanged;
-        }
+    auto createEnvIface = [&](const ivm::IVConnection::EndPointInfo &pointInfo, const QVector<ivm::IVObject *> &objects) -> ivm::IVConnection::EndPointInfo {
         /// TODO: restore needed fields
-        ivm::IVInterface::CreationInfo info;
-        info.name = endPointInfo.m_interfaceName;
-        info.type = endPointInfo.m_ifaceDirection;
-        info.model = m_model;
-        info.function = m_parent;
+        ivm::IVInterface *envIface = findIface(pointInfo, objects);
+        const ivm::IVInterface::CreationInfo info = ivm::IVInterface::CreationInfo::cloneIface(envIface, m_parent);
         ivm::IVInterface *iface = ivm::IVInterface::createIface(info);
 
         m_importedEntities.append(iface);
+        m_rootEntities.append(iface);
         m_parentChildMappings[iface->id()] = info.function;
 
         /// TODO: setup coordinates after function extracting
-        endPointInfo.m_functionName = m_parent->title();
-        endPointInfo.m_interfaceName = iface->title();
-        return endPointDataChanged;
+        return {
+            iface->function()->title(),
+            iface->title(),
+            pointInfo.m_ifaceDirection
+        };
+    };
+
+    auto checkEndPoints = [&](ivm::IVConnection::EndPointInfo &startInfo, ivm::IVConnection::EndPointInfo &endInfo,
+            const QVector<ivm::IVObject *> &objects) -> bool {
+        if (!startInfo.isReady() && !endInfo.isReady())
+            return false;
+
+        bool functionNameChanged = false;
+        auto it = m_renamedFunctions.find(startInfo.m_functionName);
+        if (it != m_renamedFunctions.end()) {
+            startInfo.m_functionName = it.value();
+            functionNameChanged = true;
+        }
+        it = m_renamedFunctions.find(endInfo.m_functionName);
+        if (it != m_renamedFunctions.end()) {
+            endInfo.m_functionName = it.value();
+            functionNameChanged = true;
+        }
+
+        if (findIface(startInfo, objects)) {
+            if (findIface(endInfo, objects)) {
+                return functionNameChanged;
+            } else {
+                endInfo = createEnvIface(startInfo, objects);
+            }
+        } else if (findIface(endInfo, objects)) {
+            startInfo = createEnvIface(endInfo, objects);
+        } else {
+            return false;
+        }
+
+        return true;
     };
 
     if (auto connection = qobject_cast<ivm::IVConnection *>(obj)) {
-        ivm::IVConnection::EndPointInfo info = connection->delayedStart();
-        if (checkEndPoint(info, objects))
-            connection->setDelayedStart(info);
-        info = connection->delayedEnd();
-        if (checkEndPoint(info, objects))
-            connection->setDelayedEnd(info);
+        ivm::IVConnection::EndPointInfo startInfo = connection->delayedStart();
+        ivm::IVConnection::EndPointInfo endInfo = connection->delayedEnd();
+        if (checkEndPoints(startInfo, endInfo, objects)) {
+            connection->setDelayedStart(startInfo);
+            connection->setDelayedEnd(endInfo);
+        }
     }
 
     if (!obj->parentObject() && m_parent) {
@@ -522,7 +539,7 @@ void CmdEntitiesImport::prepareConnectionType(ivm::IVObject *obj, const QVector<
 QList<QRectF> CmdEntitiesImport::existingModelRects() const
 {
     QList<QRectF> existingRects;
-    for (auto obj : m_model->allObjectsByType<shared::VEObject>()) {
+    for (const auto &obj : m_model->allObjectsByType<shared::VEObject>()) {
         if (obj->parentObject() == m_parent) {
             const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
             if (objRect.isValid()) {

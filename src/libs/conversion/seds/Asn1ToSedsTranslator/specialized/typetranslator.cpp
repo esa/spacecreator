@@ -21,14 +21,17 @@
 
 #include "typevisitor.h"
 
+#include <conversion/common/escaper/escaper.h>
+
 namespace conversion::seds::translator {
 
 using Asn1Acn::Types::Type;
 
 auto TypeTranslator::translateType(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions,
-        const Asn1Acn::TypeAssignment *type, ::seds::model::Package *sedsPackage) -> void
+        const Asn1Acn::TypeAssignment *type, ::seds::model::Package *sedsPackage, const Options &options) -> void
 {
-    TypeVisitor::Context context(asn1Model, definitions, type->name(), sedsPackage);
+    const auto typeNameEscaped = Escaper::escapeIvName(type->name());
+    TypeVisitor::Context context(asn1Model, definitions, typeNameEscaped, sedsPackage, options);
     TypeVisitor visitor(context);
 
     type->type()->accept(visitor);

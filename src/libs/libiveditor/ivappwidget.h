@@ -65,6 +65,7 @@ private Q_SLOTS:
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
+    void enterNestedView(const shared::Id &id);
     void onItemDoubleClicked(const shared::Id &id);
     void onItemCreated(const shared::Id &id);
 
@@ -86,6 +87,8 @@ private:
     QAction *m_actZoomOut { nullptr };
     QAction *m_actExitToRoot { nullptr };
     QAction *m_actExitToParent { nullptr };
+    QAction *m_actEnterNestedView { nullptr };
+    QAction *m_actShrinkScene { nullptr };
 
     QVector<QAction *> m_toolbarActions;
     QVector<QAction *> m_viewActions;

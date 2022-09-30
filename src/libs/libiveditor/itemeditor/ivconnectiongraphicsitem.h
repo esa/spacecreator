@@ -53,10 +53,11 @@ public:
 
 protected:
     shared::ColorManager::HandledColors handledColorType() const override;
+    shared::ui::TextItem *initTextItem() override;
 
 protected Q_SLOTS:
     void applyColorScheme() override;
     void rebuildLayout() override;
 };
 
-}
+} // namespace ive

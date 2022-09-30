@@ -34,6 +34,10 @@
 #include <sdl/SdlModel/task.h>
 #include <seds/SedsModel/sedsmodel.h>
 
+namespace conversion {
+class Options;
+} // namespace conversion
+
 namespace conversion::sdl::translator {
 
 /**
@@ -171,7 +175,7 @@ public:
      * @param context           Shared translation context
      * @param sdlTransition     Target SDL transition
      */
-    StatementTranslatorVisitor(StatementContext &context, ::sdl::Transition *sdlTransition);
+    StatementTranslatorVisitor(StatementContext &context, ::sdl::Transition *sdlTransition, const Options &options);
 
     /**
      * @brief   Translates SEDS activity invocation
@@ -264,6 +268,7 @@ public:
 private:
     StatementContext &m_context;
     ::sdl::Transition *m_sdlTransition;
+    const Options &m_options;
 
     static auto findIvInterface(ivm::IVFunction *function, const QString &interfaceName) -> ivm::IVInterface *;
 
@@ -277,8 +282,8 @@ private:
     static auto translateCall(::sdl::Process *hostProcess, const QString callName,
             const seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>;
 
-    static auto translateOutput(const QString &callName, const seds::model::SendCommandPrimitive &sendCommand)
-            -> std::vector<std::unique_ptr<::sdl::Action>>;
+    static auto translateOutput(const QString &callName, const seds::model::SendCommandPrimitive &sendCommand,
+            const Options &options) -> std::vector<std::unique_ptr<::sdl::Action>>;
 
     static auto translateOutput(const QString &callName, const seds::model::SendParameterPrimitive &sendParameter)
             -> std::vector<std::unique_ptr<::sdl::Action>>;
@@ -295,14 +300,14 @@ private:
             const seds::model::TypeCheck &check) -> QString;
 
     static auto translateAnswer(StatementContext &context, ::sdl::Label *joinLabel, const QString &value,
-            const seds::model::Body *body) -> std::unique_ptr<::sdl::Answer>;
+            const seds::model::Body *body, const Options &options) -> std::unique_ptr<::sdl::Answer>;
 
     static auto comparisonOperatorToString(const seds::model::ComparisonOperator op) -> QString;
 
     static auto getOperandValue(const seds::model::Operand &operand) -> QString;
 
-    static auto translateBody(StatementContext &context, ::sdl::Transition *transition, const seds::model::Body *body)
-            -> void;
+    static auto translateBody(StatementContext &context, ::sdl::Transition *transition, const seds::model::Body *body,
+            const Options &options) -> void;
 
     auto generateSplineCalibratorBoilerplate(const seds::model::SplineCalibrator &splineCalibrator) const -> void;
 

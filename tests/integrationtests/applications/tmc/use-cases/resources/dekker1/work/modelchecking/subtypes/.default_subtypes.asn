@@ -1,0 +1,31 @@
+TESTGUI-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+T-WriteRequest FROM DEKKER1-DATAVIEW
+
+
+
+
+T-WriteRequest FROM DEKKER1-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Testgui-writerequesta-p1 ::= T-WriteRequest
+
+
+
+
+Testgui-writerequestb-p1 ::= T-WriteRequest
+
+
+
+
+END

@@ -1,0 +1,30 @@
+/* CIF Process (0, 0), (800, 100) */
+process function_1;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl Mvar T_Int32;
+    /* CIF ENDTEXT */
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure Activity;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF Output (0, 187), (200, 50) */
+            output PI_1(Mvar);
+    return;
+    endprocedure;
+    /* CIF Start (0, 975), (200, 75) */
+    START;
+        /* CIF NextState (0, 1162), (200, 50) */
+        NEXTSTATE StateA;
+    /* CIF State (0, 1237), (200, 50) */
+    state StateA;
+        /* CIF Input (0, 1237), (200, 50) */
+        input PI_2(Mvar);
+            /* CIF ProcedureCall (0, 1312), (100, 50) */
+            call Activity;
+            /* CIF NextState (0, 1387), (200, 50) */
+            NEXTSTATE StateB;
+    endstate;
+    /* CIF State (600, 1237), (200, 50) */
+    state StateB;
+    endstate;
+endprocess function_1;

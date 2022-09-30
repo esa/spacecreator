@@ -1,0 +1,6 @@
+MYSUBTYPES DEFINITIONS ::=
+BEGIN
+
+Clk-tick-arg ::= OCTET STRING (SIZE(1))
+
+END

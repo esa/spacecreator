@@ -1,0 +1,18 @@
+SUBTYPES DEFINITIONS ::=
+BEGIN
+
+MySimpleInt ::= INTEGER(0..1)
+MySimpleArray ::= SEQUENCE (SIZE(1 .. 2)) OF MySimpleInt
+
+Testgui-writerequesta-p1 ::= SEQUENCE {
+    start-address MySimpleInt,
+    values        MySimpleArray
+}
+
+Testgui-writerequestb-p1 ::= SEQUENCE {
+    start-address MySimpleInt,
+    values        MySimpleArray
+}
+
+END
+

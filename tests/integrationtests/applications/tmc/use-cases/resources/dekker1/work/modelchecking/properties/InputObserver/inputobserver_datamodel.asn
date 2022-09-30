@@ -1,0 +1,33 @@
+Inputobserver-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   Lock-States, Lock-Context FROM Lock-Datamodel
+   Sharedmemory-States, Sharedmemory-Context FROM Sharedmemory-Datamodel
+   T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID FROM System-Dataview
+   Locka-Event, Lockb-Event, Sharedmemory-Event, Testgui-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
+   TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
+
+Inputobserver-States ::= ENUMERATED {wait, zerowrite}
+
+Inputobserver-Context ::= SEQUENCE {
+   state Inputobserver-States,
+   init-done BOOLEAN
+}
+
+Inputobserver-Testgui-Event-Msg-In-Selection  ::= ENUMERATED {writeacka-present(1), writeackb-present(2)}
+Inputobserver-Testgui-Event-Msg-Out-Selection  ::= ENUMERATED {writerequesta-present(1), writerequestb-present(2)}
+Inputobserver-Testgui-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Locka-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), remotesetsturn-present(2), remotewantstoenter-present(3), writerequest-present(4)}
+Inputobserver-Locka-Event-Msg-Out-Selection  ::= ENUMERATED {memwrite-present(1), setturn-present(2), wanttoenter-present(3), writeack-present(4)}
+Inputobserver-Locka-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Lockb-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), remotesetsturn-present(2), remotewantstoenter-present(3), writerequest-present(4)}
+Inputobserver-Lockb-Event-Msg-Out-Selection  ::= ENUMERATED {memwrite-present(1), setturn-present(2), wanttoenter-present(3), writeack-present(4)}
+Inputobserver-Lockb-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Sharedmemory-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), memwritea-present(2), memwriteb-present(3)}
+Inputobserver-Sharedmemory-Event-Selection  ::= ENUMERATED {msg-in-present(1)}
+Inputobserver-Function-Event-Selection  ::= ENUMERATED {locka-present(1), lockb-present(2), sharedmemory-present(3), testgui-present(4)}
+Inputobserver-Observable-Event-Selection  ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
+END

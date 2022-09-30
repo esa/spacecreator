@@ -17,4 +17,5 @@
 *.aadl
 skeletons_built
 glue_debug
+glue_release
 built

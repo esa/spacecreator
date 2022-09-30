@@ -21,6 +21,8 @@
 
 #include "signal.h"
 
+#include <QStringList>
+
 namespace sdl {
 
 /**
@@ -108,6 +110,19 @@ public:
      */
     auto setReferencedFunctionName(QString name) -> void;
 
+    /**
+     * @brief   Getter for parameter type names
+     *
+     * @return  Parameter type names
+     */
+    auto parametersTypes() const -> const QStringList &;
+    /**
+     * @brief   Setter for parameter type names
+     *
+     * @param   parametersTypes     Paramerter type names
+     */
+    auto setParametersTypes(QStringList parametersTypes) -> void;
+
 public:
     /**
      * @brief   Visitor acceptor (shall call visit method of the given visitor)
@@ -118,6 +133,7 @@ private:
     Direction m_direction;
     QString m_referencedName;
     QString m_referencedFunctionName;
+    QStringList m_parametersTypes;
 };
 
 } // namespace sdl

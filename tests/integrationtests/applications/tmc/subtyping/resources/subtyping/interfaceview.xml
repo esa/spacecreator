@@ -1,0 +1,70 @@
+<InterfaceView asn1file="subtyping.acn">
+<Function name="Receiver" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="45800 38400 65800 46400"/>
+<Provided_Interface name="Ping" kind="Sporadic" layer="default" required_system_element="NO" priority="1" wcet="0" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="pingArg" type="MyBetterInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="49800 38400"/>
+</Provided_Interface>
+
+<Provided_Interface name="PingButArray" kind="Sporadic" layer="default" required_system_element="NO" priority="1" wcet="0" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="pingButArrayArg" type="MyArray" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="62700 38400"/>
+</Provided_Interface>
+
+<Required_Interface name="Pong" kind="Sporadic" layer="default" required_system_element="NO" priority="1" wcet="0" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="56400 38400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Pinger" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="45500 19100 65500 27100"/>
+<Provided_Interface name="Pong" kind="Sporadic" layer="default" required_system_element="NO" priority="1" wcet="0" miat="0" stack_size="1024" queue_size="1">
+    <Property name="Taste::coordinates" value="56500 27100"/>
+</Provided_Interface>
+
+<Required_Interface name="Ping" kind="Sporadic" layer="default" required_system_element="NO" priority="1" wcet="0" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="pingArg" type="MyBetterInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="49800 27100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="PingButArray" kind="Sporadic" layer="default" required_system_element="NO" priority="1" wcet="0" miat="0" stack_size="1024" queue_size="1">
+    <Input_Parameter name="pingButArrayArg" type="MyArray" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="62800 27100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Receiver" ri_name="Pong"/>
+    <Target func_name="Pinger" pi_name="Pong"/>
+    <Property name="Taste::coordinates" value="56400 37800 56400 32600 56500 27400"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Pinger" ri_name="PingButArray"/>
+    <Target func_name="Receiver" pi_name="PingButArray"/>
+    <Property name="Taste::coordinates" value="62800 27700 62800 32900 62700 38100"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Pinger" ri_name="Ping"/>
+    <Target func_name="Receiver" pi_name="Ping"/>
+    <Property name="Taste::coordinates" value="49800 27700 49800 38100"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>

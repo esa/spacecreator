@@ -156,15 +156,14 @@ void Asn1ItemTypeVisitor::visit(const BitString &type)
 
     m_promelaModel.addUtype(utype);
 
-    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
-            constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(), isConstSize);
 
     if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
     if (m_generateInits) {
-        addSimpleValueInitializationInline(utypeName, Constant(0));
+        addEmptyValueInitializationInline(utypeName);
     }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
@@ -187,15 +186,14 @@ void Asn1ItemTypeVisitor::visit(const OctetString &type)
 
     m_promelaModel.addUtype(utype);
 
-    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
-            constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(), isConstSize);
 
     if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
     if (m_generateInits) {
-        addSimpleValueInitializationInline(utypeName, Constant(0));
+        addEmptyValueInitializationInline(utypeName);
     }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
@@ -218,15 +216,14 @@ void Asn1ItemTypeVisitor::visit(const IA5String &type)
 
     m_promelaModel.addUtype(utype);
 
-    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(),
-            constraintVisitor.getMinSize() != constraintVisitor.getMaxSize());
+    addSimpleArrayAssignInlineValue(utypeName, constraintVisitor.getMaxSize(), isConstSize);
 
     if (!isConstSize) {
         addSizeCheckInline(constraintVisitor.getMinSize(), constraintVisitor.getMaxSize(), utypeName);
     }
 
     if (m_generateInits) {
-        addSimpleValueInitializationInline(utypeName, Constant(0));
+        addEmptyValueInitializationInline(utypeName);
     }
 
     m_resultDataType = DataType(UtypeRef(utypeName));
@@ -485,7 +482,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
         auto dataLoop = createSequenceOfDataLoop(utypeName, Expression(std::move(loopRangeEnd)));
         sequence.appendElement(std::move(dataLoop));
 
-        auto zeroingLoop = createSequenceOfZeroingLoop(utypeName, constraintVisitor.getMaxSize() - 1);
+        auto zeroingLoop = createSequenceOfInitLoop(utypeName, constraintVisitor.getMaxSize() - 1);
         sequence.appendElement(std::move(zeroingLoop));
     }
 
@@ -521,6 +518,18 @@ void Asn1ItemTypeVisitor::visit(const Real &type)
     }
 
     addSimpleValueAssignmentInline(typeName);
+
+    // TODO: empty check_range inline is generated, full implementation is required
+    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_rangeCheckInlineSuffix);
+    const auto argumentName = buildCheckArgumentName(typeName, "v");
+    const QList<QString> arguments = { argumentName };
+
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+    sequence.appendElement(Skip());
+
+    std::unique_ptr<InlineDef> checkInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
+
+    m_promelaModel.addInlineDef(std::move(checkInline));
 
     if (m_generateInits) {
         // TODO: Implement when floating points will be implemented
@@ -597,11 +606,11 @@ void Asn1ItemTypeVisitor::addSimpleValueAssignmentInline(const QString &typeName
     addAssignValueInline(typeName, std::move(sequence));
 }
 
-void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeName, int length, bool lengthFieldPresent)
+void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeName, std::size_t length, bool isConstSize)
 {
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
-    if (lengthFieldPresent) {
+    if (!isConstSize) {
         QList<InlineCall::Argument> sizeCheckCallArguments;
 
         VariableRef src_length = VariableRef("src");
@@ -616,18 +625,26 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
 
     sequence.appendElement(Declaration(DataType(BasicType::INT), "i"));
 
-    std::unique_ptr<model::Sequence> loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+    if (isConstSize) {
+        auto loopRangeEnd = Constant(length - 1);
 
-    VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
-    VariableRef src("src");
-    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+        auto dataLoop = createStringDataLoop(Expression(std::move(loopRangeEnd)));
+        sequence.appendElement(std::move(dataLoop));
+    } else {
+        auto srcLength = VariableRef("src");
+        srcLength.appendElement("length");
 
-    loopSequence->appendElement(Assignment(dst, Expression(src)));
+        auto loopRangeEnd = BinaryExpression(BinaryExpression::Operator::SUBTRACT,
+                std::make_unique<Expression>(srcLength), std::make_unique<Expression>(1));
 
-    sequence.appendElement(ForLoop(VariableRef("i"), 0, length - 1, std::move(loopSequence)));
+        auto dataLoop = createStringDataLoop(Expression(std::move(loopRangeEnd)));
+        sequence.appendElement(std::move(dataLoop));
 
-    if (lengthFieldPresent) {
+        auto zeroingLoop = createStringInitLoop(length - 1);
+        sequence.appendElement(std::move(zeroingLoop));
+    }
+
+    if (!isConstSize) {
         VariableRef dst_length = VariableRef("dst");
         dst_length.appendElement("length");
         VariableRef src_length = VariableRef("src");
@@ -830,7 +847,23 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfDataLoop(const QString &utypeName, 
     return forLoop;
 }
 
-ForLoop Asn1ItemTypeVisitor::createSequenceOfZeroingLoop(const QString &utypeName, const std::size_t loopRangeEnd) const
+ForLoop Asn1ItemTypeVisitor::createStringDataLoop(Expression loopRangeEnd) const
+{
+    auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+    VariableRef dst("dst");
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    VariableRef src("src");
+    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+
+    loopSequence->appendElement(Assignment(dst, Expression(src)));
+
+    auto forLoop = ForLoop(VariableRef("i"), 0, std::move(loopRangeEnd), std::move(loopSequence));
+
+    return forLoop;
+}
+
+ForLoop Asn1ItemTypeVisitor::createSequenceOfInitLoop(const QString &utypeName, const std::size_t loopRangeEnd) const
 {
     auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
@@ -845,6 +878,22 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfZeroingLoop(const QString &utypeNam
     const auto inlineName = QString("%1_elem%2").arg(utypeName).arg(m_initializeValueInlineSuffix);
     auto inlineCall = InlineCall(inlineName, inlineArguments);
     loopSequence->appendElement(std::move(inlineCall));
+
+    auto forLoop = ForLoop(VariableRef("i"), Expression(srcLength), loopRangeEnd, std::move(loopSequence));
+
+    return forLoop;
+}
+
+ForLoop Asn1ItemTypeVisitor::createStringInitLoop(const std::size_t loopRangeEnd) const
+{
+    auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+    VariableRef dst("dst");
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    VariableRef srcLength = VariableRef("src");
+    srcLength.appendElement("length");
+
+    loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
 
     auto forLoop = ForLoop(VariableRef("i"), Expression(srcLength), loopRangeEnd, std::move(loopSequence));
 

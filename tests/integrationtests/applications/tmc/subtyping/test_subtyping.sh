@@ -9,7 +9,7 @@ CC=gcc
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 TEST_OUTPUT_DIR=output
-RESOURCE_DIR=resources
+RESOURCE_DIR=resources/subtyping
 PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 
 echo "Running TMC test: ${0##*/}"
@@ -24,9 +24,7 @@ $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -sub $RESOURCE_DIR/subtypes2.asn
 
 cd $TEST_OUTPUT_DIR \
-    && $SPIN -a system.pml \
-    && $CC -o system.out pan.c \
-    && ./system.out -m1000000 -a -n > system.output \
+    && $SPIN -a -run -bfspar -n system.pml > system.output \
     && grep -q "errors: 0" system.output \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR

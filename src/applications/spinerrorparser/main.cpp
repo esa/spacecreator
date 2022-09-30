@@ -23,6 +23,7 @@
 #include <QRegularExpression>
 #include <QString>
 #include <iostream>
+#include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorreport.h>
 #include <string.h>
 
@@ -36,30 +37,53 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(spaceCreatorVersion);
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
-    const QStringList arguments = app.arguments();
+    std::optional<QString> spinMessage;
 
-    // check if spin message exists
-    if (arguments.size() < 2) {
-        qCritical("No spin message passed");
-        exit(EXIT_FAILURE);
+    const QStringList args = app.arguments();
+    for (int i = 1; i < args.size(); ++i) {
+        const QString &arg = args[i];
+        if (arg == "-im") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing error message after -im");
+                exit(EXIT_FAILURE);
+            }
+            if (spinMessage.has_value()) {
+                qCritical("Duplicated -m argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            spinMessage = args[i];
+        } else if (arg == "-h" || arg == "--help") {
+            qInfo("spinerrorparser: Spin Error Parser");
+            qInfo("Usage: spinerrorparser [OPTIONS]");
+            qInfo("  -im <message>          Message from spin");
+            qInfo("  -h, --help             Print this message and exit");
+            exit(EXIT_SUCCESS);
+        } else {
+            qCritical("Unrecognized command line option");
+            exit(EXIT_FAILURE);
+        }
     }
-    // get passed spin message
-    const auto spinMessage = arguments.at(1);
+
+    if (!spinMessage.has_value()) {
+        qCritical("Missing mandatory argument: input spinMessage");
+    }
+
     // build pattern for error matching
     // error handling to be moved to the reporting lib
     const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)\\n");
     // convert all matches to spin errors
     QList<SpinErrorReport> reports;
 
-    auto globalMatch = regex.globalMatch(spinMessage);
+    auto globalMatch = regex.globalMatch(spinMessage.value());
     while (globalMatch.hasNext()) {
         const auto match = globalMatch.next();
         // build error from match tokens
         SpinErrorReport report;
-        report.errorNumber = match.captured(1).toInt();
-        report.errorDepth = match.captured(4).toInt();
-        report.errorType = match.captured(2);
-        report.errorDetails = match.captured(3);
+        report.errorNumber = match.captured(1).toUInt();
+        report.errorDepth = match.captured(4).toUInt();
+        report.errorType = SpinErrorReport::DataConstraintViolation;
+        report.rawErrorDetails = match.captured(3);
         reports.append(report);
     }
     return EXIT_SUCCESS;

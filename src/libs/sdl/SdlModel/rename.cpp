@@ -61,6 +61,16 @@ void Rename::setReferencedFunctionName(QString name)
     m_referencedFunctionName = std::move(name);
 }
 
+const QStringList &Rename::parametersTypes() const
+{
+    return m_parametersTypes;
+}
+
+void Rename::setParametersTypes(QStringList parametersTypes)
+{
+    m_parametersTypes = std::move(parametersTypes);
+}
+
 void Rename::accept(Visitor &visitor) const
 {
     visitor.visit(*this);

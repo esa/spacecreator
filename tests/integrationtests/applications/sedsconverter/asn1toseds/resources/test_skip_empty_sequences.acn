@@ -1,0 +1,12 @@
+Sequences DEFINITIONS ::= BEGIN
+
+Type1 [size 16, encoding pos-int, endianness big]
+Type2 [size 32, encoding pos-int, endianness little]
+
+SimpleSequence []
+
+EmptySequence1 [] {}
+
+EmptySequence2 []
+
+END

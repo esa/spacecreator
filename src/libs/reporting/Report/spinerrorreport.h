@@ -21,6 +21,7 @@
 
 #include <QList>
 #include <QString>
+#include <QVariant>
 
 namespace reporting {
 
@@ -28,18 +29,25 @@ namespace reporting {
  * @brief   Structure to hold parsed spin report data.
  */
 struct SpinErrorReport {
+    /** Error types */
+    enum ErrorType
+    {
+        DataConstraintViolation,
+        StopConditionViolation,
+        ObserverFailure,
+        OtherError
+    };
+
     /** Spin error number, counted from 1 up */
-    int errorNumber;
+    uint32_t errorNumber;
     /** Error depth reported by spin */
-    int errorDepth;
+    uint32_t errorDepth;
     /** Error type reported by the message */
-    QString errorType;
+    ErrorType errorType;
     /** Raw error details reported by the message */
-    QString errorDetails;
-    /** Name of the constraint violating variable */
-    QString violationVariableName;
-    /** Violated constraints */
-    QList<QString> constraints;
+    QString rawErrorDetails;
+    /** Parsed error details */
+    QVariant parsedErrorDetails;
 };
 
 }

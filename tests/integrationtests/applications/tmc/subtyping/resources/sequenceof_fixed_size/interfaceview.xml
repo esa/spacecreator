@@ -1,0 +1,36 @@
+<InterfaceView asn1file="sequenceof_subtypes.asn">
+<Function name="TheThing" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="69700 36600 89700 44600"/>
+<Provided_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" miat="0" queue_size="1" priority="1">
+    <Input_Parameter name="arg" type="MyArray" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="69700 40400"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Clk" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="32200 36500 52200 44500"/>
+<Required_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" miat="0" queue_size="1" priority="1">
+    <Input_Parameter name="arg" type="MyArray" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="52200 40700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Clk" ri_name="Tick"/>
+    <Target func_name="TheThing" pi_name="Tick"/>
+    <Property name="Taste::coordinates" value="52800 40700 61100 40700 69400 40400"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>

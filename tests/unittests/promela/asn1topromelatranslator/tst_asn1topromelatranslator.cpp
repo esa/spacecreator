@@ -159,7 +159,7 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
     QVERIFY(std::holds_alternative<BasicType>(expectedNull.getType()));
     QCOMPARE(std::get<BasicType>(expectedNull.getType()), BasicType::BIT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 6);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 7);
 
     {
         const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_assign_value");
@@ -213,6 +213,19 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
 
         const auto skip = findProctypeElement<Skip>(sequence, 0);
         QVERIFY(skip != nullptr);
+    }
+
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyReal_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyBoolean_range_check");
+        QVERIFY(inlineDef != nullptr);
     }
 }
 
@@ -326,7 +339,7 @@ void tst_Asn1ToPromelaTranslator::testVariableBitString()
         QCOMPARE(inlineDef->getArguments().size(), 2);
 
         const auto &sequence = inlineDef->getSequence();
-        QCOMPARE(sequence.getContent().size(), 4);
+        QCOMPARE(sequence.getContent().size(), 5);
 
         const auto sizeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
         QVERIFY(sizeCheckCall != nullptr);
@@ -334,13 +347,43 @@ void tst_Asn1ToPromelaTranslator::testVariableBitString()
         const auto decl = findProctypeElement<Declaration>(sequence, 1);
         QVERIFY(decl != nullptr);
 
-        const auto loop = findProctypeElement<ForLoop>(sequence, 2);
-        QVERIFY(loop != nullptr);
-        QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstIntValue(), 0);
-        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
+        const auto dataLoop = findProctypeElement<ForLoop>(sequence, 2);
+        QVERIFY(dataLoop != nullptr);
+        QCOMPARE(dataLoop->getType(), ForLoop::Type::RANGE);
+        QCOMPARE(dataLoop->getFirstIntValue(), 0);
+        const auto dataLoopLastExpression = std::get_if<BinaryExpression>(&dataLoop->getLastExpression().getContent());
+        QVERIFY(dataLoopLastExpression != nullptr);
+        QCOMPARE(dataLoopLastExpression->getOperator(), BinaryExpression::Operator::SUBTRACT);
+        QVERIFY(dataLoopLastExpression->getLeft() != nullptr);
+        const auto dataLoopLastExpressionLeft =
+                std::get_if<VariableRef>(&dataLoopLastExpression->getLeft()->getContent());
+        QVERIFY(dataLoopLastExpressionLeft != nullptr);
+        auto iter = dataLoopLastExpressionLeft->getElements().begin();
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "src");
+        ++iter;
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "length");
+        QVERIFY(dataLoopLastExpression->getRight() != nullptr);
+        const auto dataLoopLastExpressionRight =
+                std::get_if<Constant>(&dataLoopLastExpression->getRight()->getContent());
+        QVERIFY(dataLoopLastExpressionRight != nullptr);
+        QCOMPARE(dataLoopLastExpressionRight->getValue(), 1);
 
-        const auto assignment = findProctypeElement<Assignment>(sequence, 3);
+        const auto zeroLoop = findProctypeElement<ForLoop>(sequence, 3);
+        QVERIFY(zeroLoop != nullptr);
+        QCOMPARE(zeroLoop->getType(), ForLoop::Type::RANGE);
+        const auto zeroLoopFirstExpression = std::get_if<VariableRef>(&zeroLoop->getFirstExpression().getContent());
+        QVERIFY(zeroLoopFirstExpression != nullptr);
+        iter = zeroLoopFirstExpression->getElements().begin();
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "src");
+        ++iter;
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "length");
+        QCOMPARE(zeroLoop->getLastIntValue(), EXPECTED_SIZE - 1);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 4);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -446,7 +489,7 @@ void tst_Asn1ToPromelaTranslator::testVariableOctetString()
         QCOMPARE(inlineDef->getArguments().size(), 2);
 
         const auto &sequence = inlineDef->getSequence();
-        QCOMPARE(sequence.getContent().size(), 4);
+        QCOMPARE(sequence.getContent().size(), 5);
 
         const auto sizeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
         QVERIFY(sizeCheckCall != nullptr);
@@ -454,13 +497,43 @@ void tst_Asn1ToPromelaTranslator::testVariableOctetString()
         const auto decl = findProctypeElement<Declaration>(sequence, 1);
         QVERIFY(decl != nullptr);
 
-        const auto loop = findProctypeElement<ForLoop>(sequence, 2);
-        QVERIFY(loop != nullptr);
-        QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstIntValue(), 0);
-        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
+        const auto dataLoop = findProctypeElement<ForLoop>(sequence, 2);
+        QVERIFY(dataLoop != nullptr);
+        QCOMPARE(dataLoop->getType(), ForLoop::Type::RANGE);
+        QCOMPARE(dataLoop->getFirstIntValue(), 0);
+        const auto dataLoopLastExpression = std::get_if<BinaryExpression>(&dataLoop->getLastExpression().getContent());
+        QVERIFY(dataLoopLastExpression != nullptr);
+        QCOMPARE(dataLoopLastExpression->getOperator(), BinaryExpression::Operator::SUBTRACT);
+        QVERIFY(dataLoopLastExpression->getLeft() != nullptr);
+        const auto dataLoopLastExpressionLeft =
+                std::get_if<VariableRef>(&dataLoopLastExpression->getLeft()->getContent());
+        QVERIFY(dataLoopLastExpressionLeft != nullptr);
+        auto iter = dataLoopLastExpressionLeft->getElements().begin();
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "src");
+        ++iter;
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "length");
+        QVERIFY(dataLoopLastExpression->getRight() != nullptr);
+        const auto dataLoopLastExpressionRight =
+                std::get_if<Constant>(&dataLoopLastExpression->getRight()->getContent());
+        QVERIFY(dataLoopLastExpressionRight != nullptr);
+        QCOMPARE(dataLoopLastExpressionRight->getValue(), 1);
 
-        const auto assignment = findProctypeElement<Assignment>(sequence, 3);
+        const auto zeroLoop = findProctypeElement<ForLoop>(sequence, 3);
+        QVERIFY(zeroLoop != nullptr);
+        QCOMPARE(zeroLoop->getType(), ForLoop::Type::RANGE);
+        const auto zeroLoopFirstExpression = std::get_if<VariableRef>(&zeroLoop->getFirstExpression().getContent());
+        QVERIFY(zeroLoopFirstExpression != nullptr);
+        iter = zeroLoopFirstExpression->getElements().begin();
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "src");
+        ++iter;
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "length");
+        QCOMPARE(zeroLoop->getLastIntValue(), EXPECTED_SIZE - 1);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 4);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -567,7 +640,7 @@ void tst_Asn1ToPromelaTranslator::testVariableIA5String()
         QCOMPARE(inlineDef->getArguments().size(), 2);
 
         const auto &sequence = inlineDef->getSequence();
-        QCOMPARE(sequence.getContent().size(), 4);
+        QCOMPARE(sequence.getContent().size(), 5);
 
         const auto sizeCheckCall = findProctypeElement<InlineCall>(sequence, 0);
         QVERIFY(sizeCheckCall != nullptr);
@@ -575,13 +648,43 @@ void tst_Asn1ToPromelaTranslator::testVariableIA5String()
         const auto decl = findProctypeElement<Declaration>(sequence, 1);
         QVERIFY(decl != nullptr);
 
-        const auto loop = findProctypeElement<ForLoop>(sequence, 2);
-        QVERIFY(loop != nullptr);
-        QCOMPARE(loop->getType(), ForLoop::Type::RANGE);
-        QCOMPARE(loop->getFirstIntValue(), 0);
-        QCOMPARE(loop->getLastIntValue(), EXPECTED_SIZE - 1);
+        const auto dataLoop = findProctypeElement<ForLoop>(sequence, 2);
+        QVERIFY(dataLoop != nullptr);
+        QCOMPARE(dataLoop->getType(), ForLoop::Type::RANGE);
+        QCOMPARE(dataLoop->getFirstIntValue(), 0);
+        const auto dataLoopLastExpression = std::get_if<BinaryExpression>(&dataLoop->getLastExpression().getContent());
+        QVERIFY(dataLoopLastExpression != nullptr);
+        QCOMPARE(dataLoopLastExpression->getOperator(), BinaryExpression::Operator::SUBTRACT);
+        QVERIFY(dataLoopLastExpression->getLeft() != nullptr);
+        const auto dataLoopLastExpressionLeft =
+                std::get_if<VariableRef>(&dataLoopLastExpression->getLeft()->getContent());
+        QVERIFY(dataLoopLastExpressionLeft != nullptr);
+        auto iter = dataLoopLastExpressionLeft->getElements().begin();
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "src");
+        ++iter;
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "length");
+        QVERIFY(dataLoopLastExpression->getRight() != nullptr);
+        const auto dataLoopLastExpressionRight =
+                std::get_if<Constant>(&dataLoopLastExpression->getRight()->getContent());
+        QVERIFY(dataLoopLastExpressionRight != nullptr);
+        QCOMPARE(dataLoopLastExpressionRight->getValue(), 1);
 
-        const auto assignment = findProctypeElement<Assignment>(sequence, 3);
+        const auto zeroLoop = findProctypeElement<ForLoop>(sequence, 3);
+        QVERIFY(zeroLoop != nullptr);
+        QCOMPARE(zeroLoop->getType(), ForLoop::Type::RANGE);
+        const auto zeroLoopFirstExpression = std::get_if<VariableRef>(&zeroLoop->getFirstExpression().getContent());
+        QVERIFY(zeroLoopFirstExpression != nullptr);
+        iter = zeroLoopFirstExpression->getElements().begin();
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "src");
+        ++iter;
+        QVERIFY(iter->m_index.get() == nullptr);
+        QCOMPARE(iter->m_name, "length");
+        QCOMPARE(zeroLoop->getLastIntValue(), EXPECTED_SIZE - 1);
+
+        const auto assignment = findProctypeElement<Assignment>(sequence, 4);
         QVERIFY(assignment != nullptr);
     }
 }
@@ -706,7 +809,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_ch1");
     QCOMPARE(promelaModel.getTypeAliases().at(1).getName(), "MyType_ch2");
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 6);
     {
         const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -738,6 +841,10 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch1_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch2_range_check");
         QVERIFY(inlineDef != nullptr);
     }
     {
@@ -803,7 +910,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -829,6 +936,14 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_range_check");
+        QVERIFY(inlineDef != nullptr);
     }
 }
 
@@ -901,7 +1016,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 
-    QCOMPARE(promelaModel.getInlineDefs().size(), 4);
+    QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
         const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_assign_value");
         QVERIFY(inlineDef != nullptr);
@@ -990,6 +1105,14 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
         const Assignment *assignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 0);
         QVERIFY(assignment != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_range_check");
+        QVERIFY(inlineDef != nullptr);
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_range_check");
+        QVERIFY(inlineDef != nullptr);
     }
 }
 

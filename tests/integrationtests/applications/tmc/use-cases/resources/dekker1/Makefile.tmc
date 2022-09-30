@@ -1,0 +1,47 @@
+TMC=/home/taste/workspace/SpaceCreator/build/bin/tmc
+TEST_OUTPUT_DIR=../../output
+SPIN=spin
+CC=gcc
+PROJECT_DIR=.
+PROPERTIES_DIR=${PROJECT_DIR}/work/modelchecking/properties
+SUBTYPES_DIR=${PROJECT_DIR}/work/modelchecking/subtypes
+
+all: verify
+
+clean:
+	rm -r -f ${TEST_OUTPUT_DIR}
+
+setup: clean
+	mkdir ${TEST_OUTPUT_DIR}
+
+promela: setup
+	${TMC} -iv ${PROJECT_DIR}/interfaceview.xml \
+		-o ${TEST_OUTPUT_DIR} \
+		-sub ${SUBTYPES_DIR}/subtypes.asn \
+		-ivl 1
+#		-scl ${PROPERTIES_DIR}/StopConditions/sc.scl \
+#		-os ${PROPERTIES_DIR}/Observers/InputObserver.pr
+
+#-DVECTORSZ=65536 
+#-DCOLLAPSE
+
+verifier: promela
+	cd ${TEST_OUTPUT_DIR} && ${SPIN} -a system.pml
+	${CC} -o ${TEST_OUTPUT_DIR}/system.out ${TEST_OUTPUT_DIR}/pan.c -DVECTORSZ=65536 -DNFAIR=4
+	
+#	 -DREACH -DNCORE=12 -DMEMLIM=4096 -DSEP_STATE
+
+# -i
+
+verify: verifier
+	cd ${TEST_OUTPUT_DIR} && ./system.out -v -m1000000 -f -a -n -E > system.output
+	cat ${TEST_OUTPUT_DIR}/system.output
+
+verify_bfs: promela
+	cd ${TEST_OUTPUT_DIR} && ${SPIN} -run -bfs -E -n system.pml
+
+trail:
+	cd ${TEST_OUTPUT_DIR} && ./system.out -r
+
+trail_bfs:
+	cd ${TEST_OUTPUT_DIR} && ${SPIN} -g -l -replay system.pml 

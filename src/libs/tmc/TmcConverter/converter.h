@@ -165,9 +165,10 @@ private:
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
             const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
             const QStringList &environmentFunctions);
-    bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
+    bool convertDataview(
+            const QList<QString> &inputFilepathList, const QString &ivFilepath, const QString &outputFilepath);
 
-    bool convertMscObservers();
+    bool convertMscObservers(const QString &ivFilePath);
     bool generateObserverDatamodel(QProcess &process, const QString &sdlFileName);
 
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
@@ -177,8 +178,8 @@ private:
     bool isSdlFunction(const ivm::IVFunction *function);
     void findEnvironmentDatatypes(
             const ivm::IVModel &model, const QStringList &envFunctions, QStringList &envDataTypes);
-    bool createEnvGenerationInlines(
-            const QFileInfo &inputDataView, const QFileInfo &outputFilepath, const QStringList &envDatatypes);
+    bool createEnvGenerationInlines(const QFileInfo &inputDataView, const QString &ivFilepath,
+            const QFileInfo &outputFilepath, const QStringList &envDatatypes);
 
     QFileInfo workDirectory() const;
     QFileInfo simuDataViewLocation() const;

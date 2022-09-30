@@ -19,12 +19,23 @@
 
 #include "datareconstructor.h"
 
+#include <QDebug>
+
 namespace testgenerator {
 
 DataReconstructor::TypeLayoutInfos::TypeLayoutInfos(std::initializer_list<TypeLayoutInfo> infos)
 {
     for (const auto &info : infos) {
         this->insert(std::get<0>(info), QPair<TypeDataLength, TypePaddingLength>(std::get<1>(info), std::get<2>(info)));
+    }
+}
+
+int findNextMultipleOf(int number, int i)
+{
+    if (i % number != 0) {
+        return i + number - i % number;
+    } else {
+        return i;
     }
 }
 
@@ -36,8 +47,11 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
     output.reserve(rawData.size());
 
     const auto definitionNameToTypeMap = mapDefinitionNameToType(asn1Model);
+    constexpr int DATA_ROW_ALINGMENT = 8;
 
     int i = 0;
+    int rowSize = 0;
+    int rowCounter = 0;
     while (i < rawData.size()) {
         for (const auto &param : iface->params()) {
             const auto &type = definitionNameToTypeMap.value(param.paramTypeName());
@@ -46,11 +60,10 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
             }
 
             const int dataLength = typeLayoutInfos.value(type->typeName()).first;
-            const int paddingLength = typeLayoutInfos.value(type->typeName()).second;
-            const int variableLength = dataLength + paddingLength;
+            i = findNextMultipleOf(dataLength, i);
 
             QByteArray rawVariable = rawData.mid(i, dataLength);
-            i += variableLength;
+            i += dataLength;
 
             if (endianness == QDataStream::BigEndian) {
                 std::reverse(rawVariable.begin(), rawVariable.end());
@@ -65,8 +78,15 @@ QVector<QVariant> DataReconstructor::getVariantVectorFromRawData(const QByteArra
                 pushBackCopyToVariantVector<bool>(output, rawVariable);
             }
         }
+        if (rowCounter == 0) {
+            rowSize = i;
+        }
+        int nextMultiple = findNextMultipleOf(DATA_ROW_ALINGMENT, i);
+        if (i + rowSize > nextMultiple) {
+            i = nextMultiple;
+        }
+        rowCounter++;
     }
-
     return output;
 }
 
