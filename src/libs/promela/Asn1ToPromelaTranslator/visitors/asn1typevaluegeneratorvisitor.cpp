@@ -19,7 +19,6 @@
 
 #include "asn1typevaluegeneratorvisitor.h"
 
-#include "types/type.h"
 #include "visitors/integerrangeconstraintvisitor.h"
 #include "visitors/sizeconstraintvisitor.h"
 
