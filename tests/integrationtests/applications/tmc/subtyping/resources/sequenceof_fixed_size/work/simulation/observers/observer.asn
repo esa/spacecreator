@@ -103,11 +103,7 @@ BEGIN
       
       
       --  ASN.1 modules used by thread thething_Tick
-<<<<<<< HEAD
-      MyArray FROM OCTO-SUBTYPES-DATAVIEW
-=======
       MyArray FROM SEQUENCEOF-SUBTYPES-DATAVIEW
->>>>>>> origin/master
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
