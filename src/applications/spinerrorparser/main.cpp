@@ -24,6 +24,7 @@
 #include <QString>
 #include <iostream>
 #include <reporting/Report/dataconstraintviolationreport.h>
+#include <reporting/Report/spinerrorparser.h>
 #include <reporting/Report/spinerrorreport.h>
 #include <string.h>
 
@@ -70,22 +71,8 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // build pattern for error matching
-    // error handling to be moved to the reporting lib
-    const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)\\n");
-    // convert all matches to spin errors
-    QList<SpinErrorReport> reports;
-
-    auto globalMatch = regex.globalMatch(spinMessage.value());
-    while (globalMatch.hasNext()) {
-        const auto match = globalMatch.next();
-        // build error from match tokens
-        SpinErrorReport report;
-        report.errorNumber = match.captured(1).toUInt();
-        report.errorDepth = match.captured(4).toUInt();
-        report.errorType = SpinErrorReport::DataConstraintViolation;
-        report.rawErrorDetails = match.captured(3);
-        reports.append(report);
-    }
+    // parse message
+    SpinErrorParser parser;
+    auto report = parser.parse(spinMessage.value());
     return EXIT_SUCCESS;
 }

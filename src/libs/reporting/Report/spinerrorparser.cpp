@@ -1,26 +1,31 @@
 #include "spinerrorparser.h"
 
-#include <QDebug>
 #include <QRegularExpression>
 
 QList<reporting::SpinErrorReport> reporting::SpinErrorParser::parse(const QString &spinMessage) const
 {
     // match message report
-    QRegularExpressionMatchIterator matches = findErrors(spinMessage);
+    QRegularExpressionMatchIterator matches = findSpinErrors(spinMessage);
     // iterate over all reports
     QList<SpinErrorReport> reports;
     while (matches.hasNext()) {
         // build report
         auto report = buildReport(matches.next());
+        reports.append(report);
     }
     return reports;
 }
 
-QRegularExpressionMatchIterator reporting::SpinErrorParser::findErrors(const QString &spinMessage) const
+QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const QString &spinMessage) const
 {
-    const QString pattern = QStringLiteral("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)\\n");
+    const QString pattern = QStringLiteral("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)");
     const QRegularExpression regex(pattern);
     return regex.globalMatch(spinMessage);
+}
+
+QRegularExpressionMatchIterator reporting::SpinErrorParser::findVariableViolations(const QString &) const
+{
+    return QRegularExpressionMatchIterator();
 }
 
 reporting::SpinErrorReport reporting::SpinErrorParser::buildReport(const QRegularExpressionMatch &matchedError) const

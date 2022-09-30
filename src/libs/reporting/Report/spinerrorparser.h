@@ -34,7 +34,9 @@ public:
     QList<SpinErrorReport> parse(const QString &spinMessage) const;
 
 private:
-    QRegularExpressionMatchIterator findErrors(const QString &spinMessage) const;
+    QRegularExpressionMatchIterator findSpinErrors(const QString &spinMessage) const;
+    QRegularExpressionMatchIterator findVariableViolations(const QString &variableViolation) const;
+
     SpinErrorReport buildReport(const QRegularExpressionMatch &matchedError) const;
 };
 
