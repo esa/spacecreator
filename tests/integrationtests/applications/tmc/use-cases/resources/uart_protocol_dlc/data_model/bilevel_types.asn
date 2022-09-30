@@ -1,0 +1,28 @@
+
+Bilevel-Types DEFINITIONS ::=
+BEGIN
+
+T-OnOffState              ::= ENUMERATED{off(0), on(1)}
+T-NominalRedundantState   ::= ENUMERATED{redundant(0), nominal(1)}
+T-ConnectionState         ::= ENUMERATED{disconnected(0), connected(1)}
+T-SwitchState             ::= ENUMERATED{switch-open(0),switch-closed(1)}
+T-FaultState              ::= ENUMERATED{fault(0), ok(1)}
+T-SelectionState          ::= ENUMERATED{not-selected(0), selected(1)}
+T-PresenceState           ::= ENUMERATED{absent(0), present(1)}
+T-ForwardBackwardState    ::= ENUMERATED{backward(0), forward(1)}
+T-LeftRightState          ::= ENUMERATED{left(0), right(1)}
+T-UsedUnusedState         ::= ENUMERATED{unused(0), used(1)}
+T-MovingStillState        ::= ENUMERATED{stationary(0), moving(1)}
+T-PlusMinusState          ::= ENUMERATED{plus(0), minus(1)}
+T-ArmedDisarmedState      ::= ENUMERATED{disarmed(0), armed(1)}
+T-ActiveInactiveState     ::= ENUMERATED{inactive(0), active(1)}
+T-EnabledInhibitedState   ::= ENUMERATED{inhibited(0), enabled(1)}
+T-FlagState               ::= ENUMERATED{clear(0),set(1)}
+T-SuccessFailState        ::= ENUMERATED{fail(0), success(1)}
+T-HighLowState            ::= ENUMERATED{low(0), high(1)}
+T-OverrideState           ::= ENUMERATED{normal(0), overridden(1)}
+T-LockedUnlockedState     ::= ENUMERATED{unlocked(0), locked(1)}
+T-WarningState            ::= ENUMERATED{ok(0), warning(1)}
+T-ValidInvalidState       ::= ENUMERATED{invalid(0), valid(1)}
+END
+

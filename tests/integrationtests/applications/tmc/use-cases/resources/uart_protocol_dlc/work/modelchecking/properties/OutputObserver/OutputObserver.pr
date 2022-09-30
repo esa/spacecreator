@@ -1,0 +1,48 @@
+system OutputObserver;
+    /* CIF TEXT (144, 214), (379, 140) */
+    use datamodel comment 'observer.asn';
+    
+    signal sig(UINT8) renames output PHYTxChar from BCDLCT;
+    /* CIF ENDTEXT */
+    channel c
+        from env to OutputObserver with sig;
+        from OutputObserver to env with sig;
+    endchannel;
+    block OutputObserver;
+        signalroute r
+            from env to OutputObserver with sig;
+            from OutputObserver to env with sig;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process OutputObserver;
+            /* CIF TEXT (0, 57), (222, 140) */
+            monitor st System_State;
+            monitor event Observable_Event;
+            errorstates error;
+            /* CIF ENDTEXT */
+            /* CIF START (363, 74), (70, 35) */
+            START;
+                /* CIF NEXTSTATE (363, 129), (70, 35) */
+                NEXTSTATE Wait;
+            /* CIF state (614, 98), (70, 35) */
+            state error;
+            endstate;
+            /* CIF state (363, 129), (70, 35) */
+            state Wait;
+                /* CIF input (363, 184), (70, 35) */
+                input sig(x);
+                    /* CIF decision (363, 239), (70, 50) */
+                    decision x;
+                        /* CIF ANSWER (318, 309), (70, 23) */
+                        (> 255):
+                            /* CIF NEXTSTATE (318, 352), (70, 35) */
+                            NEXTSTATE Wait;
+                        /* CIF ANSWER (408, 309), (70, 23) */
+                        else:
+                            /* CIF NEXTSTATE (408, 352), (70, 35) */
+                            NEXTSTATE error;
+                    enddecision;
+            endstate;
+        endprocess OutputObserver;
+    endblock;
+endsystem;

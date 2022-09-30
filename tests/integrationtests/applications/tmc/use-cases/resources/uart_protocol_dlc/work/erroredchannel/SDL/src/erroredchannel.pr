@@ -1,0 +1,48 @@
+/* CIF PROCESS (262, 146), (150, 75) */
+process Erroredchannel;
+    /* CIF TEXT (278, 328), (209, 140) */
+    DCL corruption UINT8;
+    DCL txChar UINT8;
+    
+    -- ToDo: add repeated characters
+    /* CIF ENDTEXT */
+    /* CIF START (51, 50), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (51, 105), (70, 35) */
+        NEXTSTATE IDLE;
+    /* CIF state (868, 319), (82, 35) */
+    state CORRUPT;
+        /* CIF input (841, 374), (136, 35) */
+        input PHYTxChar(txChar);
+            /* CIF task (807, 429), (205, 35) */
+            task txChar := txChar xor corruption;
+            /* CIF output (841, 479), (137, 35) */
+            output PHYRxChar(txChar);
+            /* CIF NEXTSTATE (875, 534), (70, 35) */
+            NEXTSTATE IDLE;
+    endstate;
+    /* CIF state (468, 79), (70, 35) */
+    state IDLE;
+        /* CIF input (251, 135), (136, 35) */
+        input PHYTxChar(txChar);
+            /* CIF output (251, 190), (137, 35) */
+            output PHYRxChar(txChar);
+            /* CIF NEXTSTATE (285, 245), (70, 35) */
+            NEXTSTATE IDLE;
+        /* CIF input (595, 135), (166, 35) */
+        input CorruptChar(corruption);
+            /* CIF NEXTSTATE (637, 190), (82, 35) */
+            NEXTSTATE CORRUPT;
+        /* CIF input (460, 137), (79, 35) */
+        input DropChar;
+            /* CIF NEXTSTATE (465, 192), (70, 35) */
+            NEXTSTATE DROP;
+    endstate;
+    /* CIF state (974, 101), (70, 35) */
+    state DROP;
+        /* CIF input (938, 156), (136, 35) */
+        input PHYTxChar(txChar);
+            /* CIF NEXTSTATE (972, 211), (70, 35) */
+            NEXTSTATE IDLE;
+    endstate;
+endprocess Erroredchannel;
