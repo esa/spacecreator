@@ -52,6 +52,7 @@ public:
     void zoomChanged();
     void updateSceneRect();
     void clearScene();
+    void shrinkScene();
 
     template<typename T>
     T getItem(const shared::Id id) const
