@@ -23,17 +23,28 @@ QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const
     return regex.globalMatch(spinMessage);
 }
 
-QRegularExpressionMatchIterator reporting::SpinErrorParser::findVariableViolations(const QString &) const
+QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &) const
 {
-    return QRegularExpressionMatchIterator();
+    return QList<QVariant>();
 }
 
 reporting::SpinErrorReport reporting::SpinErrorParser::buildReport(const QRegularExpressionMatch &matchedError) const
 {
+    // build report
     SpinErrorReport report;
     report.errorNumber = matchedError.captured(1).toUInt();
     report.errorDepth = matchedError.captured(4).toUInt();
     report.errorType = SpinErrorReport::DataConstraintViolation;
     report.rawErrorDetails = matchedError.captured(3);
+    // parse data constraint violation
+    // for now, only
+    switch (report.errorType) {
+    case SpinErrorReport::DataConstraintViolation:
+        report.parsedErrorDetails = findVariableViolations(report.rawErrorDetails);
+        break;
+    default:
+        break;
+    }
+
     return report;
 }

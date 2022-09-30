@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "dataconstraintviolationreport.h"
 #include "spinerrorreport.h"
 
 class QRegularExpressionMatch;
@@ -35,7 +36,7 @@ public:
 
 private:
     QRegularExpressionMatchIterator findSpinErrors(const QString &spinMessage) const;
-    QRegularExpressionMatchIterator findVariableViolations(const QString &variableViolation) const;
+    QList<QVariant> findVariableViolations(const QString &variableViolation) const;
 
     SpinErrorReport buildReport(const QRegularExpressionMatch &matchedError) const;
 };
