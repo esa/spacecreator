@@ -34,14 +34,16 @@ class SpinErrorParser
 {
 public:
     /**
-     * @brief Constructor
+     * @brief   Constructor
      */
     SpinErrorParser() = default;
 
     /**
-     * @brief   Getter for assert expression
+     * @brief   Parse spin message
      *
-     * @return  Assert expression
+     * @param   spinMessage      Spin command output
+     *
+     * @return  List of spin errors
      */
     QList<SpinErrorReport> parse(const QString &spinMessage) const;
 

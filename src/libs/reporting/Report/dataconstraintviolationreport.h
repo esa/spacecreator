@@ -32,4 +32,5 @@ struct DataConstraintViolationReport {
     int boundingValue;
 };
 
+// Add meta type for QVariant compability
 Q_DECLARE_METATYPE(DataConstraintViolationReport)
