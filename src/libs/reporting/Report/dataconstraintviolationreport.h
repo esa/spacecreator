@@ -25,9 +25,11 @@
 
 struct DataConstraintViolationReport {
     /** Name of the constraint violating variable */
-    QString violationVariableName;
-    /** Violated constraints */
-    QList<QString> constraints;
+    QString variableName;
+    /** Boundary operator (less than, greater than etc.) */
+    QString constraint;
+    /** Bounding value */
+    int boundingValue;
 };
 
 Q_DECLARE_METATYPE(DataConstraintViolationReport)

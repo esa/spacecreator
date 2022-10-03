@@ -23,9 +23,25 @@ QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const
     return regex.globalMatch(spinMessage);
 }
 
-QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &) const
+QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &str) const
 {
-    return QList<QVariant>();
+    QList<QVariant> violations;
+    const QString pattern = QStringLiteral("\\(([a-z_][\\w\\.]+)(.+?)(\\d+)\\)");
+    const QRegularExpression regex(pattern);
+    QRegularExpressionMatchIterator matches = regex.globalMatch(str);
+    while (matches.hasNext()) {
+        const QRegularExpressionMatch matchedError = matches.next();
+        // build violation report
+        DataConstraintViolationReport report;
+        report.variableName = matchedError.captured(1);
+        report.constraint = matchedError.captured(2);
+        report.boundingValue = matchedError.captured(3).toInt();
+        // add report to violations
+        QVariant violation;
+        violation.setValue(report);
+        violations.append(violation);
+    }
+    return violations;
 }
 
 reporting::SpinErrorReport reporting::SpinErrorParser::buildReport(const QRegularExpressionMatch &matchedError) const
@@ -45,6 +61,5 @@ reporting::SpinErrorReport reporting::SpinErrorParser::buildReport(const QRegula
     default:
         break;
     }
-
     return report;
 }

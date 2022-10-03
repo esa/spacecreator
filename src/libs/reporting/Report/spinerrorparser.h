@@ -27,11 +27,22 @@ class QRegularExpressionMatchIterator;
 
 namespace reporting {
 
+/**
+ * @brief   Parses and generates error reports based on spin messages.
+ */
 class SpinErrorParser
 {
 public:
+    /**
+     * @brief Constructor
+     */
     SpinErrorParser() = default;
 
+    /**
+     * @brief   Getter for assert expression
+     *
+     * @return  Assert expression
+     */
     QList<SpinErrorReport> parse(const QString &spinMessage) const;
 
 private:
