@@ -27,7 +27,7 @@
     SystemBusArray ::= SEQUENCE (SIZE (255)) OF SystemBus --(Broker)enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER]
 
     DeliveredRequestData ::= SEQUENCE{
-        interface RemoteInterface, --(Broker)const enum RemoteInterface
+        iface RemoteInterface, --(Broker)const enum RemoteInterface
         data InputDataPtr, --(Broker)const uint8_t* const
         length DataLength --(Broker)const size_t
     }
