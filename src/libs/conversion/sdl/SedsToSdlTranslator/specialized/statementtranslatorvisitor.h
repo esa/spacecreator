@@ -271,6 +271,8 @@ private:
     ::sdl::Transition *m_sdlTransition;
     const Options &m_options;
 
+    static const inline QString m_sedsTransactionParamName = "sedsTransactionName";
+
     static auto findIvInterface(ivm::IVFunction *function, const QString &interfaceName) -> ivm::IVInterface *;
 
     static auto translateArgument(const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;
@@ -278,7 +280,7 @@ private:
     static auto translatePolynomial(const QString variable, const seds::model::Polynomial &polynomial) -> QString;
 
     static auto translateCall(::sdl::Process *hostProcess, const QString callName,
-            const seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface)
+            const seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface, const Options &options)
             -> std::unique_ptr<::sdl::ProcedureCall>;
 
     static auto translateCall(::sdl::Process *hostProcess, const QString callName,
@@ -319,7 +321,8 @@ private:
     static auto generateLoopEnd(
             ::sdl::Transition *transition, const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void;
 
-    static auto handleTransaction(const std::optional<::seds::model::Name> &transaction, ::sdl::ProcedureCall *call, ivm::IVInterface *ivInterface) -> void;
+    static auto handleTransaction(const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call,
+            ivm::IVInterface *ivInterface, const Options &options) -> void;
 
     friend class ExpressionTranslatorVisitor;
 };

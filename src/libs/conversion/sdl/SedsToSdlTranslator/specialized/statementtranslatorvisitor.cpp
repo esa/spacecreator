@@ -312,7 +312,7 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
         }
     } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
             || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
-        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand, interface);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand, interface, m_options);
         m_sdlTransition->addAction(std::move(call));
     }
 }
@@ -459,7 +459,7 @@ auto StatementTranslatorVisitor::translatePolynomial(
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface)
+        const ::seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface, const Options &options)
         -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
@@ -478,7 +478,9 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
         call->addArgument(translateArgument(argument));
     }
 
-    handleTransaction(sendCommand.transaction(), call.get(), ivInterface);
+    if (sendCommand.transaction()) {
+        handleTransaction(*sendCommand.transaction(), call.get(), ivInterface, options);
+    }
 
     return call;
 }
@@ -790,21 +792,22 @@ auto StatementTranslatorVisitor::generateLoopEnd(
     transition->addAction(std::move(loopBackJoin));
 }
 
-auto StatementTranslatorVisitor::handleTransaction(const std::optional<::seds::model::Name> &transaction, ::sdl::ProcedureCall *call, ivm::IVInterface *ivInterface) -> void
+auto StatementTranslatorVisitor::handleTransaction(const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call,
+        ivm::IVInterface *ivInterface, const Options &options) -> void
 {
-    if (!transaction) {
-        return;
+    if (!options.isSet(conversion::seds::SedsOptions::transactionNameType)) {
+        throw TranslationException(
+                "SEDS transaction feature was used but no ASN.1 type for transaction name was specified");
     }
 
-    const auto &transactionName = QString("\"%1\"").arg(transaction->value());
+    const auto &transactionName = QString("\"%1\"").arg(transaction.value());
+    const auto transactionParamTypeName = options.value(conversion::seds::SedsOptions::transactionNameType).value();
 
     auto transactionNameLiteral = std::make_unique<::sdl::VariableLiteral>(transactionName);
     call->addArgument(std::move(transactionNameLiteral));
 
-    const QString paramName = "sedsTransactionName";
-    const QString paramTypeName = "CString";
-
-    auto ivParameter = shared::InterfaceParameter(paramName, shared::BasicParameter::Type::Other, paramTypeName);
+    auto ivParameter = shared::InterfaceParameter(
+            m_sedsTransactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
     ivInterface->addParam(ivParameter);
 }
 
