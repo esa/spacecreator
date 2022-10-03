@@ -166,6 +166,86 @@ static inline auto createSyncCommandProcedureSdl(Context &context, const ::seds:
     return sdlTransition;
 }
 
+static inline auto areTransactionsRequired(const std::vector<const ::seds::model::Transition *> &transitions) -> bool
+{
+    if (transitions.empty()) {
+        throw TranslationException("Sync commands with no associated transitions are not supported");
+    }
+
+    if (transitions.size() == 1) {
+        return false;
+    }
+
+    for (const auto &transition : transitions) {
+        if (!transition->doActivity().has_value()) {
+            throw TranslationException(
+                    "Sync commands with transitions without associated activities are not supported");
+        }
+    }
+
+    // primitive is now guaranteed to be OnCommandPrimitive
+    const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&transitions[0]->primitive());
+    if (primitive == nullptr) {
+        throw TranslationException("Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                                   "a transition which is not OnCommandPrimitive");
+    }
+
+    for (const auto &otherTransition : transitions) {
+        const auto otherPrimitive = std::get_if<::seds::model::OnCommandPrimitive>(&otherTransition->primitive());
+        if (otherPrimitive == nullptr) {
+            throw TranslationException(
+                    "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                    "a transition which is not OnCommandPrimitive");
+        }
+
+        if (primitive->argumentValues().size() != otherPrimitive->argumentValues().size()) {
+            return true;
+        }
+
+        for (size_t i = 0; i < primitive->argumentValues().size(); i++) {
+            const auto &argumentName = primitive->argumentValues()[i].name().value();
+            const auto &otherArgumentName = otherPrimitive->argumentValues()[i].name().value();
+
+            if (argumentName != otherArgumentName) {
+                return true;
+            }
+
+            const auto &outputVariable = primitive->argumentValues()[i].outputVariableRef().value().value();
+            const auto &otherOutputVariable = otherPrimitive->argumentValues()[i].outputVariableRef().value().value();
+
+            if (outputVariable != otherOutputVariable) {
+                return true;
+            }
+        }
+    }
+
+    // doActivity optional is now guaranteed to have a value
+    const auto invocation = &(*(transitions[0]->doActivity()));
+
+    for (const auto &otherTransition : transitions) {
+        const auto otherInvocation = &(*(otherTransition->doActivity()));
+
+        if (invocation->activity().value() != otherInvocation->activity().value()) {
+            return true;
+        }
+
+        if (invocation->argumentValues().size() != otherInvocation->argumentValues().size()) {
+            return true;
+        }
+
+        for (size_t i = 0; i < invocation->argumentValues().size(); i++) {
+            const auto &argument = invocation->argumentValues()[i];
+            const auto &otherArgument = otherInvocation->argumentValues()[i];
+
+            if (argument.name().value() != otherArgument.name().value()) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 static inline auto handleTransactions(Context &context,
         const std::vector<const ::seds::model::Transition *> &sedsTransitions, ::sdl::Procedure *procedure,
         ivm::IVInterface *ivInterface, const Options &options)
@@ -261,7 +341,7 @@ static inline auto generateProcedureForSyncCommand(Context &context,
     }
 
     // If there are many transitions for the same command then they have to have a transaction name
-    const auto transactionsRequired = sedsTransitions.size() > 1;
+    const auto transactionsRequired = areTransactionsRequired(sedsTransitions);
 
     if (transactionsRequired) {
         handleTransactions(context, sedsTransitions, procedure.get(), ivInterface, options);
