@@ -63,16 +63,23 @@ private:
     struct ChannelInfo {
         QString m_functionName;
         QString m_interfaceName;
+        QString m_parameterName;
         QString m_parameterTypeName;
+        const Asn1Acn::Types::Type *m_parameterType;
+        QStringList m_possibleSenders;
+        size_t m_channelSize;
+        QStringList m_senders;
     };
 
 private:
-    void findChannelNames(const ivm::IVModel &ivModel, QMap<QString, ChannelInfo> &channel) const;
+    void findChannelNames(const ivm::IVModel &ivModel, const Asn1Acn::Asn1Model &asn1Model,
+            QMap<QString, ChannelInfo> &channel) const;
+    void findProctypes(const ivm::IVModel &ivModel, QMap<QString, QString> &proctypes) const;
     void translate(simulatortrail::model::SimulatorTrailModel &result,
-            const spintrail::model::SpinTrailModel &spinTrailModel, const QMap<QString, ChannelInfo> &channels,
-            const Asn1Acn::Asn1Model &asn1Model) const;
-    Asn1Acn::ValuePtr getValue(
-            const QStringList &parameters, const ChannelInfo &info, const Asn1Acn::Asn1Model &asn1Model) const;
+            const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
+            const QMap<QString, QString> &proctypes, const Asn1Acn::Types::Type *observableEvent) const;
+    Asn1Acn::ValuePtr getValue(const QString &source, const QString &target, const ChannelInfo &info,
+            const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters, bool isInput) const;
 
     bool isFunctionLockChannel(const QString &channelName) const;
 };

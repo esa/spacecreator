@@ -23,7 +23,7 @@ namespace simulatortrail::translator {
 QString IA5StringPrinter::operator()(const QString &arg) const
 {
     QString escaped = arg;
-    escaped.replace("\"", "\\\"");
-    return QString("\"%1\"").arg(escaped);
+    escaped.replace("'", "\\'");
+    return QString("'%1'").arg(escaped);
 }
 }

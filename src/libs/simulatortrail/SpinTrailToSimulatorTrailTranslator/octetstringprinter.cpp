@@ -22,6 +22,6 @@
 namespace simulatortrail::translator {
 QString OctetStringPrinter::operator()(const QString &arg) const
 {
-    return QString("\"%1\"H").arg(arg);
+    return QString("'%1'H").arg(arg);
 }
 }
