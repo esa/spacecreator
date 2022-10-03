@@ -15,6 +15,8 @@ target_link_libraries(spinerrorparser
     PUBLIC      ivcore
                 libiveditor
                 Report
+                Grantlee5::TextDocument
+                Grantlee5::Templates
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(spinerrorparser)

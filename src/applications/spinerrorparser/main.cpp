@@ -20,8 +20,11 @@
 #include "scversion.h"
 
 #include <QCoreApplication>
+#include <QDebug>
 #include <QRegularExpression>
 #include <QString>
+#include <grantlee/template.h>
+#include <grantlee/texthtmlbuilder.h>
 #include <iostream>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorparser.h>
@@ -73,6 +76,10 @@ int main(int argc, char *argv[])
 
     // parse message
     SpinErrorParser parser;
-    auto report = parser.parse(spinMessage.value());
+    auto reports = parser.parse(spinMessage.value());
+    for (auto report : reports) {
+        Grantlee::TextHTMLBuilder textHtmlBuilder;
+    }
+
     return EXIT_SUCCESS;
 }
