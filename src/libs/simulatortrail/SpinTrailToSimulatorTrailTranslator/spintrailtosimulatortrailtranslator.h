@@ -66,7 +66,7 @@ private:
         QString m_parameterName;
         QString m_parameterTypeName;
         const Asn1Acn::Types::Type *m_parameterType;
-        QStringList m_possibleSenders;
+        QMap<QString, QString> m_possibleSenders;
         size_t m_channelSize;
         QStringList m_senders;
     };

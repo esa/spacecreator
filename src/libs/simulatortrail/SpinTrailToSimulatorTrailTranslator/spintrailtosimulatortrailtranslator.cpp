@@ -133,6 +133,7 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(
             IVConnection *connection = ivModel.getConnectionForIface(providedInterface->id());
             IVInterface *requiredInterface = connection->sourceInterface();
             const QString sourceFunctionName = requiredInterface->function()->property("name").toString();
+            const QString sourceInterfaceName = requiredInterface->property("name").toString();
             const QVector<InterfaceParameter> parameterList = providedInterface->params();
             const QString channelName =
                     QString("%1_%2_channel").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(interfaceName);
@@ -143,7 +144,8 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(
             info.m_functionName = targetFunctionName;
             info.m_interfaceName = interfaceName;
             info.m_channelSize = channelSize;
-            info.m_possibleSenders.append(sourceFunctionName);
+            info.m_possibleSenders.insert(sourceFunctionName, sourceInterfaceName);
+
             if (parameterList.length() == 1) {
                 info.m_parameterTypeName = parameterList.front().paramTypeName();
                 info.m_parameterName = parameterList.front().name();
@@ -200,8 +202,8 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
         if (event->getType() == ChannelEvent::Type::Send) {
             if (channels.contains(event->getChannelName())) {
                 ChannelInfo &channelInfo = channels[event->getChannelName()];
-                const QString source = event->getProctypeName().isEmpty() ? channelInfo.m_possibleSenders.front()
-                                                                          : proctypes.value(event->getProctypeName());
+                qDebug() << "output from proctype " << event->getProctypeName();
+                const QString source = channelInfo.m_possibleSenders.firstKey();
                 const QString destination = channelInfo.m_functionName;
                 ValuePtr message =
                         getValue(source, destination, channelInfo, observableEvent, event->getParameters(), false);
@@ -246,7 +248,7 @@ Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getValue(const QString &s
 
     const Asn1Acn::Types::Choice *choice = dynamic_cast<const Asn1Acn::Types::Choice *>(observableEvent);
 
-    QString messageType = QString(isInput ? "input-event" : "output-event");
+    const QString messageType = QString(isInput ? "input-event" : "output-event");
 
     const Asn1Acn::Types::ChoiceAlternative *alt = choice->component(messageType);
     if (alt == nullptr) {
@@ -261,20 +263,21 @@ Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getValue(const QString &s
             : valueParser.parseValue(parameters, info.m_parameterType);
 
     std::unique_ptr<NamedValue> interfaceParamValue = std::make_unique<NamedValue>();
-    interfaceParamValue->addValue(info.m_parameterName, std::move(parameterValue));
+    interfaceParamValue->addValue(Escaper::escapeAsn1FieldName(info.m_parameterName), std::move(parameterValue));
 
+    const QString interfaceName = isInput ? info.m_interfaceName : info.m_possibleSenders.value(source);
     std::unique_ptr<ChoiceValue> interfaceValue =
-            std::make_unique<ChoiceValue>(info.m_interfaceName, std::move(interfaceParamValue));
+            std::make_unique<ChoiceValue>(Escaper::escapeAsn1FieldName(interfaceName), std::move(interfaceParamValue));
 
     std::unique_ptr<ChoiceValue> event =
             std::make_unique<ChoiceValue>(QString(isInput ? "msg-in" : "msg-out"), std::move(interfaceValue));
 
     std::unique_ptr<ChoiceValue> functionEvent =
-            std::make_unique<ChoiceValue>(isInput ? target : source, std::move(event));
+            std::make_unique<ChoiceValue>(Escaper::escapeAsn1FieldName(isInput ? target : source), std::move(event));
 
     std::unique_ptr<NamedValue> interfaceEventValue = std::make_unique<NamedValue>();
-    interfaceEventValue->addValue("source", std::make_unique<SingleValue>(source));
-    interfaceEventValue->addValue("dest", std::make_unique<SingleValue>(target));
+    interfaceEventValue->addValue("source", std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(source)));
+    interfaceEventValue->addValue("dest", std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(target)));
     interfaceEventValue->addValue("event", std::move(functionEvent));
 
     return std::make_unique<ChoiceValue>(messageType, std::move(interfaceEventValue));
