@@ -192,6 +192,8 @@ void IVFunction::reflectAttrs(const EntityAttributes &attributes)
     }
 
     setEntityAttributes(prepared);
+    setEntityAttribute(meta::Props::token(meta::Props::Token::language),
+                       attributes.value(meta::Props::token(meta::Props::Token::type_language)).value());
 }
 
 void IVFunction::reflectAttr(const QString &attrName)
