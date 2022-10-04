@@ -205,7 +205,7 @@ def download_asn1scc(env_dir: str) -> None:
     except:
         print("Could not download asn1scc from {}".format(asn_url))
         exit(4)
-    print('Extracting {}'.format(ans_tarbz2))
+    print('Extracting {} to {}'.format(ans_tarbz2, env_dir))
     with tarfile.open(ans_tarbz2, 'r:bz2') as ans_tarbz2_file:
         ans_tarbz2_file.extractall(env_dir)
 

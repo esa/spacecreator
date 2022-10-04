@@ -70,6 +70,34 @@ def copy_plugins(build_plugins_dir: str, app_dir_plugins_dir: str) -> None:
     utils.copy_content_of_dir_to_other_dir(build_plugins_dir, app_dir_plugins_dir)
 
 
+def copy_ans1scc_fuzzer(build_dir: str, app_dir: str) -> None:
+    """
+    This method copies asn1scc-fuzzer tool from build_dir/asn1scc_bin/libexec to the app_dir.
+    Ideally this method should not be needed as project_dir/asn1scc/CMakeFile.txt should install it.
+
+    :param build_dir:
+    :param app_dir:
+    """
+    build_libexec_dir = join_dir(build_dir, 'asn1scc_bin', 'libexec')
+    app_libexec_dir = join_dir(app_dir, 'libexec')
+    print("postbuild.py: Copying ans1scc-fuzzer from {} to {}".format(build_libexec_dir, app_libexec_dir))
+    utils.copy_content_of_dir_to_other_dir(build_libexec_dir, app_libexec_dir)
+
+
+def copy_asn1acn(build_dir: str, app_dir: str) -> None:
+    """
+    This method copies asn1acn lib from build_dir/asn1scc_bin/share to the app_dir.
+    Ideally this method should not be needed as project_dir/asn1scc/CMakeFile.txt should install it.
+
+    :param build_dir:
+    :param app_dir:
+    """
+    build_share_dir = join_dir(build_dir, 'asn1scc_bin', 'share')
+    app_share_dir = join_dir(app_dir, 'share')
+    print("postbuild.py: Copying ans1acn from {} to {}".format(build_share_dir, app_share_dir))
+    utils.copy_content_of_dir_to_other_dir(build_share_dir, app_share_dir)
+
+
 if __name__ == '__main__':
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
@@ -107,6 +135,9 @@ if __name__ == '__main__':
     app_dir_plugins_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
     copy_plugins(build_plugins_dir, app_dir_plugins_dir)
 
+    # ToDo: These two methods should be made superfluous 
+    copy_ans1scc_fuzzer(build_dir, app_dir)
+    copy_ans1scc_fuzzer(build_dir, app_dir)
 
 
 
