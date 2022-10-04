@@ -46,7 +46,6 @@ def build_path_object(project_dir: str, env_path: str, qt_version: str):
         env_qt_dir = join_dir(env_dir, 'Qt', qt_version, 'gcc_64')
         env_app_dir = join_dir(env_dir, 'spacecreator.AppDir')  # This is where we put QtCreator and the SpaceCreator plugin
         install_dir = join_dir(project_dir, 'install')
-        gnu_dir = join_dir(env_app_dir, 'lib', 'x86-64-linux-gnu')
     _paths = Paths()
     return _paths
 
@@ -226,11 +225,11 @@ def copy_additional_qt_modules(env_qt_dir: str, app_dir: str):
     copy_file_pattern_to_dir(pattern, app_lib_dir)
 
 
-def extract_libzxb_util(install_dir: str, gnu_dir: str) -> None:
+def extract_libzxb_util(install_dir: str, lib_dir: str) -> None:
     libzxb_util_gz = join_dir(install_dir, 'libzxb-util.tar.gz')
-    print('Extracting {} to {}'.format(libzxb_util_gz, gnu_dir))
+    print('Extracting {} to {}'.format(libzxb_util_gz, lib_dir))
     with tarfile.open(libzxb_util_gz) as archive:
-        archive.extractall(gnu_dir)
+        archive.extractall(lib_dir)
 
 
 if __name__ == '__main__':
@@ -277,9 +276,10 @@ if __name__ == '__main__':
     build_grantlee(env_dir, paths.env_qt_dir, is_qt6)
     install_grantlee(env_dir)
 
+    # libzxb-util
     install_dir = paths.install_dir
-    gnu_dir = paths.gnu_dir
-    extract_libzxb_util(install_dir, gnu_dir)
+    lib_dir = join_dir(paths.env_app_dir, 'lib')
+    extract_libzxb_util(install_dir, lib_dir)
 
     # Abstract Syntax Notation
     download_asn1scc(env_dir)
