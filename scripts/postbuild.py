@@ -26,10 +26,10 @@ python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir
 
 def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: str) -> None:
     if not os.path.exists(plugin_build_dir):
-        print("Could not find plugin build dir: {}".format(plugin_build_dir))
+        print("postbuild.py: Could not find plugin build dir: {}".format(plugin_build_dir))
         exit(1)
     if not os.path.exists(qtcreator_app_plugin_dir):
-        print("Could not find QtCreators plugin dir: {}".format(qtcreator_app_plugin_dir))
+        print("postbuild.py: Could not find QtCreators plugin dir: {}".format(qtcreator_app_plugin_dir))
         exit(2)
 
     print("Copying plugins from {} to {}".format(plugin_build_dir, qtcreator_app_plugin_dir))
@@ -38,10 +38,10 @@ def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: 
 
 def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     if not os.path.exists(wizards_dir):
-        print("Could not find wizards dir: {}". format(wizards_dir))
+        print("postbuild.py: Could not find wizards dir: {}". format(wizards_dir))
         exit(1)
     if not os.path.exists(wizards_install_dir):
-        print("Could not find wizards install dir: {}".format(wizards_install_dir))
+        print("postbuild.py: Could not find wizards install dir: {}".format(wizards_install_dir))
         exit(2)
 
     # File wizards
@@ -53,8 +53,22 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     # Projects wizards
     projects_dir = join_dir(wizards_dir, 'projects')
     projects_install_dir = join_dir(wizards_install_dir, 'projects')
-    print("Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
+    print("postbuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
     utils.copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
+
+def copy_applications(build_dir: str, app_dir: str):
+    if not os.path.exists(build_dir):
+        print("postbuild.py: Could not find build dir: {}". format(build_dir))
+        exit(1)
+    if not os.path.exists(app_dir):
+        print("postbuild.py: Could not find app dir: {}".format(app_dir))
+        exit(2)
+
+    build_bin_dir = join_dir(build_dir, 'bin')
+    app_bin_dir = join_dir(app_dir, 'bin')
+    print("postbuild.py: Copying applications from {} to {}".format(build_bin_dir, app_bin_dir))
+    utils.copy_content_of_dir_to_other_dir(build_bin_dir, app_bin_dir)
+
 
 
 if __name__ == '__main__':
@@ -62,19 +76,14 @@ if __name__ == '__main__':
     default_project_dir = join_dir(script_dir, '..')
 
     # Parse arguments
-    parser = argparse.ArgumentParser(prog='postbuild',
-                                     epilog='python3 ./scripts/postbuild.py '
-                                            '--project_dir /home/<user>/projects/spacecreator/ '
-                                            '--build_dir /home/<user>/projects/spacecreator/build '
-                                            '--env_dir /home/<user>/opt/spacecreatorenv6 '
-                                            '--env_qt_dir /home/<user>/opt/qtcreatorenv/Qt/6.3.1/gcc_64/ ')
+    parser = argparse.ArgumentParser(prog='postbuild')
 
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
                         help='Path to the folder where spacecreator project is')
     parser.add_argument('--build_dir', dest='build_dir', type=str, required=False,
                         help='Path to the folder where spacecreator was build')
-    parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
-                        help='Path to the folder that contains the build environment')
+    parser.add_argument('--app_dir', dest='app_dir', type=str, required=True,
+                        help='Path to the folder that contains AppDir')
 
     args = parser.parse_args()
 
@@ -92,9 +101,9 @@ if __name__ == '__main__':
         build_dir = join_dir(project_dir, 'build')
         print("Defaulting to build dir {}".format(build_dir))
 
-    env_dir = args.env_dir
+    app_dir = args.app_dir
     plugin_build_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
-    plugin_install_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'qtcreator', 'plugins')
+    plugin_install_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
 
     print("postbuild.py: plugin_build_dir is {}".format(plugin_build_dir))
     print("postbuild.py: plugin_install_dir is {}".format(plugin_install_dir))
