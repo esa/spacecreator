@@ -59,6 +59,17 @@ def copy_applications(build_dir: str, app_dir: str) -> None:
     utils.copy_content_of_dir_to_other_dir(build_bin_dir, app_bin_dir)
 
 
+def copy_plugins(build_plugins_dir: str, app_dir_plugins_dir: str) -> None:
+    if not os.path.exists(build_plugins_dir):
+        print("postbuild.py: Could not find build dir: {}". format(build_plugins_dir))
+        exit(1)
+    if not os.path.exists(app_dir_plugins_dir):
+        print("postbuild.py: Could not find app dir: {}".format(app_dir_plugins_dir))
+        exit(2)
+    print("postbuild.py: Copying plugins from {} to {}".format(build_plugins_dir, app_dir_plugins_dir))
+    utils.copy_content_of_dir_to_other_dir(build_plugins_dir, app_dir_plugins_dir)
+
+
 if __name__ == '__main__':
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
@@ -94,10 +105,9 @@ if __name__ == '__main__':
     # Copy plugins from build tree to AppDir tree
     build_plugins_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     app_dir_plugins_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
-    print("postbuild.py: Copying plugins from {} to {}".format(build_plugins_dir, app_dir_plugins_dir))
-    utils.copy_content_of_dir_to_other_dir(build_plugins_dir, app_dir_plugins_dir)
+    copy_plugins(build_plugins_dir, app_dir_plugins_dir)
 
-    
+
 
 
 
