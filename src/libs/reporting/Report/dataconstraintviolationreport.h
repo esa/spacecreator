@@ -22,6 +22,7 @@
 #include <QList>
 #include <QMetaType>
 #include <QString>
+#include <QVariant>
 
 struct DataConstraintViolationReport {
     /** Name of the constraint violating variable */
@@ -29,7 +30,7 @@ struct DataConstraintViolationReport {
     /** Boundary operator (less than, greater than etc.) */
     QString constraint;
     /** Bounding value */
-    int boundingValue;
+    QVariant boundingValue;
 };
 
 // Add meta type for QVariant compability

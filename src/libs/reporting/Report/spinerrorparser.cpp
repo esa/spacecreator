@@ -35,7 +35,7 @@ QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString
         DataConstraintViolationReport report;
         report.variableName = matchedError.captured(1);
         report.constraint = matchedError.captured(2);
-        report.boundingValue = matchedError.captured(3).toInt();
+        report.boundingValue.setValue(matchedError.captured(3).toInt());
         // add report to violations
         QVariant violation;
         violation.setValue(report);
