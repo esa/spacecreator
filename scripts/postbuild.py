@@ -135,9 +135,9 @@ if __name__ == '__main__':
     app_dir_plugins_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
     copy_plugins(build_plugins_dir, app_dir_plugins_dir)
 
-    # ToDo: These two methods should be made superfluous 
+    # ToDo: These two methods should be made superfluous
     copy_ans1scc_fuzzer(build_dir, app_dir)
-    copy_ans1scc_fuzzer(build_dir, app_dir)
+    copy_asn1acn(build_dir, app_dir)
 
 
 
