@@ -319,7 +319,6 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
 
 auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPrimitive &sendParameter) -> void
 {
-
     const auto parameterType = sendParameter.operation() == ::seds::model::ParameterOperation::Get
             ? InterfaceTranslatorHelper::InterfaceParameterType::Getter
             : InterfaceTranslatorHelper::InterfaceParameterType::Setter;
@@ -330,9 +329,9 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPr
             interfaceName, parameterName, parameterType, ivm::IVInterface::InterfaceType::Required);
 
     // Process name carries iv-escaped component name
-    const auto interface = findIvInterface(m_context.ivFunction(), callName);
+    const auto ivInterface = findIvInterface(m_context.ivFunction(), callName);
 
-    switch (interface->kind()) {
+    switch (ivInterface->kind()) {
     case ivm::IVInterface::OperationKind::Sporadic: {
         auto outputActions = translateOutput(callName, sendParameter);
         for (auto &action : outputActions) {
@@ -342,7 +341,7 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPr
     }
     case ivm::IVInterface::OperationKind::Protected:
     case ivm::IVInterface::OperationKind::Unprotected: {
-        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter, ivInterface, m_options);
         m_sdlTransition->addAction(std::move(call));
         return;
     }
@@ -486,7 +485,8 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>
+        const ::seds::model::SendParameterPrimitive &sendParameter, ivm::IVInterface *ivInterface,
+        const Options &options) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -513,6 +513,10 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
         }
     }, value);
     // clang-format on
+
+    if (sendParameter.transaction()) {
+        handleTransaction(*sendParameter.transaction(), call.get(), ivInterface, options);
+    }
 
     return call;
 }
