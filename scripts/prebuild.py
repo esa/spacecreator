@@ -183,11 +183,12 @@ def install_grantlee(env_dir: str) -> None:
 
     # Install grantlee in spacecreator.AppDir
     grantlee_lib_dir = join_dir(cmake_build_dir, 'grantlee')  # source of .so files
-    spacecreator_qt_lib_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'Qt', 'lib')
-    spacecreator_grantlee_lib_dir = join_dir(spacecreator_qt_lib_dir, 'grantlee')  # dest of .so files
-    ensure_dir(spacecreator_grantlee_lib_dir)
-    copy_content_of_dir_to_other_dir(grantlee_lib_dir, spacecreator_grantlee_lib_dir)
+    spacecreator_qt_plugins_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'Qt', 'plugins')
+    spacecreator_grantlee_plugins_dir = join_dir(spacecreator_qt_plugins_dir, 'grantlee')  # dest of .so files
+    ensure_dir(spacecreator_grantlee_plugins_dir)
+    copy_content_of_dir_to_other_dir(grantlee_lib_dir, spacecreator_grantlee_plugins_dir)
 
+    spacecreator_qt_lib_dir = join_dir(env_dir, 'spacecreator.AppDir', 'lib', 'Qt', 'lib')
     templates_lib_dir = join_dir(cmake_build_dir, 'templates', 'lib')
     pattern = join_dir(templates_lib_dir, 'libGrantlee_Templates.so*')
     copy_file_pattern_to_dir(pattern, spacecreator_qt_lib_dir)
@@ -217,7 +218,7 @@ def copy_additional_qt_modules(env_qt_dir: str, app_dir: str):
 
     env_qt_lib_dir = join_dir(env_qt_dir, 'lib')
     app_lib_dir = join_dir(app_dir, 'lib', 'Qt', 'lib')
-    print("postbuild.py: Copying applications from {} to {}".format(env_qt_lib_dir, app_lib_dir))
+    print("postbuild.py: Copying additional qt modules from {} to {}".format(env_qt_lib_dir, app_lib_dir))
     pattern = join_dir(env_qt_lib_dir, 'libQt*WebSockets*')
     copy_file_pattern_to_dir(pattern, app_lib_dir)
 
