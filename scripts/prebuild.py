@@ -31,11 +31,12 @@ python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6
 '''
 
 
-def build_path_object(env_path: str, qt_version: str):
+def build_path_object(env_path: str, qt_version: str, project_dir: str):
     """
     Builds an object with named paths for files and folders.
     :param qt_version: Version of Qt to be used. Format is X.Y.Z
     :param env_path: path to build environment.
+    :param project_dir: path to where the spacecreator project is cloned
     :return: an object with attributes named after files and folders.
     """
 
@@ -44,6 +45,8 @@ def build_path_object(env_path: str, qt_version: str):
         env_qt_install_dir = join_dir(env_dir, 'Qt')
         env_qt_dir = join_dir(env_dir, 'Qt', qt_version, 'gcc_64')
         env_app_dir = join_dir(env_dir, 'spacecreator.AppDir')  # This is where we put QtCreator and the SpaceCreator plugin
+        install_dir = join_dir(project_dir, 'install')
+        gnu_dir = join_dir(env_app_dir, 'lib', 'x86-64-linux-gnu')
     _paths = Paths()
     return _paths
 
@@ -210,17 +213,24 @@ def download_asn1scc(env_dir: str) -> None:
 
 def copy_additional_qt_modules(env_qt_dir: str, app_dir: str):
     if not os.path.exists(env_qt_dir):
-        print("postbuild.py: Could not find env qt dir: {}". format(env_qt_dir))
+        print("prebuild.py: Could not find env qt dir: {}". format(env_qt_dir))
         exit(1)
     if not os.path.exists(app_dir):
-        print("postbuild.py: Could not find env app dir: {}".format(app_dir))
+        print("prebuild.py: Could not find env app dir: {}".format(app_dir))
         exit(2)
 
     env_qt_lib_dir = join_dir(env_qt_dir, 'lib')
     app_lib_dir = join_dir(app_dir, 'lib', 'Qt', 'lib')
-    print("postbuild.py: Copying additional qt modules from {} to {}".format(env_qt_lib_dir, app_lib_dir))
+    print("prebuild.py: Copying additional qt modules from {} to {}".format(env_qt_lib_dir, app_lib_dir))
     pattern = join_dir(env_qt_lib_dir, 'libQt*WebSockets*')
     copy_file_pattern_to_dir(pattern, app_lib_dir)
+
+
+def extract_libzxb_util(install_dir: str, gnu_dir: str) -> None:
+    libzxb_util_gz = join_dir(install_dir, 'libzxb-util.tar.gz')
+    print('Extracting {} to {}'.format(libzxb_util_gz, gnu_dir))
+    with tarfile.open(libzxb_util_gz) as archive:
+        archive.extractall(gnu_dir)
 
 
 if __name__ == '__main__':
@@ -230,6 +240,8 @@ if __name__ == '__main__':
                         help='Where to put the build environment . This means the '
                              'specified version of Qt, GrantLee lib and the spacecrator.AppDir which'
                              ' is the final application')
+    parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
+                        help='Path to the folder where spacecreator project is')
     parser.add_argument('--qt_version', dest='qt_version', type=str, required=True,
                         help='Version of Qt to download to the build environment. Format X.Y.Z')
     parser.add_argument('--qtcreator_version', dest='qtcreator_version', type=str, required=True,
@@ -237,10 +249,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Build the paths object
+    project_dir = args.project_dir
     env_dir = args.env_path
     qt_version = args.qt_version
     qtcreator_version = args.qtcreator_version
-    paths = build_path_object(env_dir, qt_version)
+    paths = build_path_object(project_dir, env_dir, qt_version)
 
     is_qt6 = qt_version.split('.')[0] == '6'
     print("prebuild.py: env_dir is {}".format(env_dir))
@@ -263,6 +276,10 @@ if __name__ == '__main__':
     download_grantlee(env_dir)
     build_grantlee(env_dir, paths.env_qt_dir, is_qt6)
     install_grantlee(env_dir)
+
+    install_dir = paths.install_dir
+    gnu_dir = paths.gnu_dir
+    extract_libzxb_util(install_dir, gnu_dir)
 
     # Abstract Syntax Notation
     download_asn1scc(env_dir)
