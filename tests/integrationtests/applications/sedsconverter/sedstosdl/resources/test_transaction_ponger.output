@@ -2,7 +2,11 @@
 process Ponger;
     /* CIF Text (0, 150), (400, 500) */
     dcl Pongvar Number;
+    dcl Mpingargsmall Number;
+    dcl Mpingargbig Number;
+    dcl Coolparam Number;
     dcl Ping_PingCommand_Pi_transactionName CString;
+    dcl Set_Ping_CoolParam_Pi_transactionName CString;
     /* CIF ENDTEXT */
     /* CIF Procedure (0, 900), (800, 50) */
     procedure DoPongSmall;
@@ -13,7 +17,7 @@ process Ponger;
         /* CIF Start (0, 750), (200, 75) */
         START;
             /* CIF ProcedureCall (0, 937), (100, 50) */
-            call Pong_PongCommand_Ri(Pongvar);
+            call Pong_PongCommand_Ri(Pongvar, "PongSmall");
     return;
     endprocedure;
     /* CIF Procedure (0, 975), (800, 50) */
@@ -25,10 +29,34 @@ process Ponger;
         /* CIF Start (0, 750), (200, 75) */
         START;
             /* CIF ProcedureCall (0, 937), (100, 50) */
-            call Pong_PongCommand_Ri(999);
+            call Pong_PongCommand_Ri(Pongvar, "PongBig");
     return;
     endprocedure;
     /* CIF Procedure (0, 1050), (800, 50) */
+    procedure DoParamSmall;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Pongvar Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF ProcedureCall (0, 937), (100, 50) */
+            call Pong_PongCommand_Ri(Pongvar, "PongParamSmall");
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 1125), (800, 50) */
+    procedure DoParamBig;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Pongvar Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF ProcedureCall (0, 937), (100, 50) */
+            call Pong_PongCommand_Ri(Pongvar, "PongParamBig");
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 1200), (800, 50) */
     procedure Ping_PingCommand_Pi;
         /* CIF Text (0, 0), (400, 500) */
         fpar
@@ -43,43 +71,105 @@ process Ponger;
             decision sedsTransactionName;
                 /* CIF Answer (0, 1012), (400, 50) */
                 ("MakeItSmall"):
-                    /* CIF ProcedureCall (0, 1087), (100, 50) */
-                    call DoPongSmall(Pingarg);
+                    /* CIF Task (0, 1087), (100, 50) */
+                    task Mpingargsmall := Pingarg;
+                    /* CIF ProcedureCall (0, 1162), (100, 50) */
+                    call DoPongSmall(Mpingargsmall);
                 /* CIF Answer (600, 1012), (400, 50) */
                 ("MakeItBig"):
-                    /* CIF ProcedureCall (600, 1087), (100, 50) */
+                    /* CIF Task (600, 1087), (100, 50) */
+                    task Mpingargbig := Pingarg;
+                    /* CIF ProcedureCall (600, 1162), (100, 50) */
                     call DoPongBig(Pingarg);
             enddecision;
     return;
     endprocedure;
-    /* CIF Start (0, 1125), (200, 75) */
-    START;
-        /* CIF NextState (0, 1312), (200, 50) */
-        NEXTSTATE s1;
-    /* CIF State (0, 1387), (200, 50) */
-    state s1;
-        /* CIF Input (0, 1387), (200, 50) */
-        input Ping_PingCommand_Pi;
-            /* CIF Decision (0, 1387), (400, 50) */
-            decision Ping_PingCommand_Pi_transactionName;
-                /* CIF Answer (0, 1462), (400, 50) */
-                ("MakeItSmall"):
-                    /* CIF NextState (0, 1537), (200, 50) */
-                    NEXTSTATE s1;
-                /* CIF Answer (1800, 1462), (400, 50) */
+    /* CIF Procedure (0, 1275), (800, 50) */
+    procedure Get_Ping_CoolParam_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in/out Param Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Param := Coolparam;
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 1350), (800, 50) */
+    procedure Set_Ping_CoolParam_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Param Number,
+            in sedsTransactionName CString;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Set_Ping_CoolParam_Pi_transactionName := sedsTransactionName;
+            /* CIF Decision (0, 937), (400, 50) */
+            decision sedsTransactionName;
+                /* CIF Answer (0, 1012), (400, 50) */
+                ("MakeItSmall", "MakeItBig"):
+                    /* CIF Task (0, 1087), (100, 50) */
+                    task Coolparam := Param;
+                /* CIF Answer (600, 1012), (400, 50) */
                 ELSE:
             enddecision;
-            /* CIF Decision (2400, 1462), (400, 50) */
+    return;
+    endprocedure;
+    /* CIF Start (0, 1425), (200, 75) */
+    START;
+        /* CIF NextState (0, 1612), (200, 50) */
+        NEXTSTATE s1;
+    /* CIF State (0, 1687), (200, 50) */
+    state s1;
+        /* CIF Input (0, 1687), (200, 50) */
+        input Ping_PingCommand_Pi;
+            /* CIF Decision (0, 1687), (400, 50) */
             decision Ping_PingCommand_Pi_transactionName;
-                /* CIF Answer (2400, 1537), (400, 50) */
+                /* CIF Answer (0, 1762), (400, 50) */
+                ("MakeItSmall"):
+                    /* CIF NextState (0, 1837), (200, 50) */
+                    NEXTSTATE s1;
+                /* CIF Answer (1800, 1762), (400, 50) */
+                ELSE:
+            enddecision;
+            /* CIF Decision (2400, 1762), (400, 50) */
+            decision Ping_PingCommand_Pi_transactionName;
+                /* CIF Answer (2400, 1837), (400, 50) */
                 ("MakeItBig"):
-                    /* CIF NextState (2400, 1612), (200, 50) */
+                    /* CIF NextState (2400, 1912), (200, 50) */
                     NEXTSTATE s2;
-                /* CIF Answer (3000, 1537), (400, 50) */
+                /* CIF Answer (3000, 1837), (400, 50) */
                 ELSE:
             enddecision;
     endstate;
-    /* CIF State (3900, 1387), (200, 50) */
+    /* CIF State (3900, 1687), (200, 50) */
     state s2;
+        /* CIF Input (3900, 1687), (200, 50) */
+        input Set_Ping_CoolParam_Pi;
+            /* CIF Decision (3900, 1687), (400, 50) */
+            decision Set_Ping_CoolParam_Pi_transactionName;
+                /* CIF Answer (3900, 1762), (400, 50) */
+                ("MakeItSmall"):
+                    /* CIF ProcedureCall (3900, 1837), (100, 50) */
+                    call DoParamSmall(1);
+                    /* CIF NextState (3900, 1912), (200, 50) */
+                    NEXTSTATE s2;
+                /* CIF Answer (4500, 1762), (400, 50) */
+                ELSE:
+            enddecision;
+            /* CIF Decision (5100, 1762), (400, 50) */
+            decision Set_Ping_CoolParam_Pi_transactionName;
+                /* CIF Answer (5100, 1837), (400, 50) */
+                ("MakeItBig"):
+                    /* CIF ProcedureCall (5100, 1912), (100, 50) */
+                    call DoParamBig(999);
+                    /* CIF NextState (5100, 1987), (200, 50) */
+                    NEXTSTATE s1;
+                /* CIF Answer (5700, 1837), (400, 50) */
+                ELSE:
+            enddecision;
     endstate;
 endprocess Ponger;
