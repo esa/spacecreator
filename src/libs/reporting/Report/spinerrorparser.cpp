@@ -1,5 +1,6 @@
 #include "spinerrorparser.h"
 
+#include <QDebug>
 #include <QRegularExpression>
 
 QList<reporting::SpinErrorReport> reporting::SpinErrorParser::parse(const QString &spinMessage) const
@@ -18,7 +19,15 @@ QList<reporting::SpinErrorReport> reporting::SpinErrorParser::parse(const QStrin
 
 QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const QString &spinMessage) const
 {
-    const QString pattern = QStringLiteral("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)");
+    // error number
+    QString pattern = QStringLiteral("pan:(\\d+):\\s+");
+    // error type
+    pattern += QStringLiteral("(.+?)\\s+");
+    // erro details
+    pattern += QStringLiteral("\\((.+?)\\)\\s+");
+    // error depth
+    pattern += QStringLiteral("\\(at depth (\\d+)\\)");
+
     const QRegularExpression regex(pattern);
     return regex.globalMatch(spinMessage);
 }
