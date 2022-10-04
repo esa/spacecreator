@@ -31,7 +31,7 @@ python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6
 '''
 
 
-def build_path_object(env_path: str, qt_version: str, project_dir: str):
+def build_path_object(project_dir: str, env_path: str, qt_version: str):
     """
     Builds an object with named paths for files and folders.
     :param qt_version: Version of Qt to be used. Format is X.Y.Z
