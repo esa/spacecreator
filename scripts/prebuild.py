@@ -26,6 +26,8 @@ python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv5 --qt_version=5
 
 Installing Qt 6.3.1 with QtCreator 8.0.1:
 python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6.3.1 --qtcreator_version=8.0.1
+
+
 '''
 
 
@@ -205,6 +207,21 @@ def download_asn1scc(env_dir: str) -> None:
         ans_tarbz2_file.extractall(env_dir)
 
 
+def copy_additional_qt_modules(env_qt_dir: str, app_dir: str):
+    if not os.path.exists(env_qt_dir):
+        print("postbuild.py: Could not find env qt dir: {}". format(env_qt_dir))
+        exit(1)
+    if not os.path.exists(app_dir):
+        print("postbuild.py: Could not find env app dir: {}".format(app_dir))
+        exit(2)
+
+    env_qt_lib_dir = join_dir(env_qt_dir, 'lib')
+    app_lib_dir = join_dir(app_dir, 'lib', 'Qt', 'lib')
+    print("postbuild.py: Copying applications from {} to {}".format(env_qt_lib_dir, app_lib_dir))
+    pattern = join_dir(env_qt_lib_dir, 'libQt*WebSockets*')
+    copy_file_pattern_to_dir(pattern, app_lib_dir)
+
+
 if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='prebuild')
@@ -239,6 +256,7 @@ if __name__ == '__main__':
     # Setup Qt and QtCreator with plugin development files
     download_qt(paths.env_qt_install_dir, qt_version)
     download_qtcreator(env_dir, qtcreator_version, paths.env_app_dir, is_qt6)
+    copy_additional_qt_modules(paths.env_qt_dir, paths.env_app_dir)
 
     # Grant Lee Template Library
     download_grantlee(env_dir)
