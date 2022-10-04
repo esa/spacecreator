@@ -24,18 +24,6 @@ python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir
 """
 
 
-def copy_plugins_to_plugin_dir(plugin_build_dir: str, qtcreator_app_plugin_dir: str) -> None:
-    if not os.path.exists(plugin_build_dir):
-        print("postbuild.py: Could not find plugin build dir: {}".format(plugin_build_dir))
-        exit(1)
-    if not os.path.exists(qtcreator_app_plugin_dir):
-        print("postbuild.py: Could not find QtCreators plugin dir: {}".format(qtcreator_app_plugin_dir))
-        exit(2)
-
-    print("Copying plugins from {} to {}".format(plugin_build_dir, qtcreator_app_plugin_dir))
-    copy_content_of_dir_to_other_dir(plugin_build_dir, qtcreator_app_plugin_dir)
-
-
 def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     if not os.path.exists(wizards_dir):
         print("postbuild.py: Could not find wizards dir: {}". format(wizards_dir))
@@ -56,7 +44,8 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     print("postbuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
     utils.copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
 
-def copy_applications(build_dir: str, app_dir: str):
+
+def copy_applications(build_dir: str, app_dir: str) -> None:
     if not os.path.exists(build_dir):
         print("postbuild.py: Could not find build dir: {}". format(build_dir))
         exit(1)
@@ -68,7 +57,6 @@ def copy_applications(build_dir: str, app_dir: str):
     app_bin_dir = join_dir(app_dir, 'bin')
     print("postbuild.py: Copying applications from {} to {}".format(build_bin_dir, app_bin_dir))
     utils.copy_content_of_dir_to_other_dir(build_bin_dir, app_bin_dir)
-
 
 
 if __name__ == '__main__':
@@ -102,12 +90,14 @@ if __name__ == '__main__':
         print("Defaulting to build dir {}".format(build_dir))
 
     app_dir = args.app_dir
-    plugin_build_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
-    plugin_install_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
 
-    print("postbuild.py: plugin_build_dir is {}".format(plugin_build_dir))
-    print("postbuild.py: plugin_install_dir is {}".format(plugin_install_dir))
-    copy_plugins_to_plugin_dir(plugin_build_dir, plugin_install_dir)
+    # Copy plugins from build tree to AppDir tree
+    build_plugins_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
+    app_dir_plugins_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
+    print("postbuild.py: Copying plugins from {} to {}".format(build_plugins_dir, app_dir_plugins_dir))
+    utils.copy_content_of_dir_to_other_dir(build_plugins_dir, app_dir_plugins_dir)
+
+    
 
 
 
