@@ -42,9 +42,10 @@ QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString
         const QRegularExpressionMatch matchedError = matches.next();
         // build violation report
         DataConstraintViolationReport report;
-        report.variableName = matchedError.captured(1);
-        report.constraint = matchedError.captured(2);
-        report.boundingValue.setValue(matchedError.captured(3).toInt());
+        report.variableName = matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName);
+        report.constraint = matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationType);
+        report.boundingValue.setValue(
+                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationBoundingValue).toInt());
         // add report to violations
         QVariant violation;
         violation.setValue(report);
@@ -57,10 +58,10 @@ reporting::SpinErrorReport reporting::SpinErrorParser::buildReport(const QRegula
 {
     // build report
     SpinErrorReport report;
-    report.errorNumber = matchedError.captured(1).toUInt();
-    report.errorDepth = matchedError.captured(4).toUInt();
+    report.errorNumber = matchedError.captured(ReportParseTokens::ErrorNumber).toUInt();
+    report.errorDepth = matchedError.captured(ReportParseTokens::ErrorDepth).toUInt();
     report.errorType = SpinErrorReport::DataConstraintViolation;
-    report.rawErrorDetails = matchedError.captured(3);
+    report.rawErrorDetails = matchedError.captured(ReportParseTokens::ErrorDetails);
     // parse data constraint violation
     // for now, only
     switch (report.errorType) {

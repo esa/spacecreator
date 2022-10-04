@@ -33,6 +33,20 @@ namespace reporting {
 class SpinErrorParser
 {
 public:
+    enum ConstraintViolationParseTokens
+    {
+        ConstraintViolationVariableName = 1,
+        ConstraintViolationType,
+        ConstraintViolationBoundingValue
+    };
+
+    enum ReportParseTokens
+    {
+        ErrorNumber = 1,
+        ErrorType,
+        ErrorDetails,
+        ErrorDepth
+    };
     /**
      * @brief   Constructor
      */
