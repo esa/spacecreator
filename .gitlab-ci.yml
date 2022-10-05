@@ -63,7 +63,7 @@ space-creator-dev:
 space-creator-qt5:
   stage: build-test-and-bundle
   variables:
-    PROJECT_DIR: $(CI_PROJECT_DIR)
+    PROJECT_DIR: ${CI_PROJECT_DIR}
     ENV_QT_VERSION: 5.12.1
     ENV_QTC_VERSION: 4.8.2
     ENV_DIR: /opt/spacecreator5
