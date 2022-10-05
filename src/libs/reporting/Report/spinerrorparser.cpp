@@ -3,12 +3,12 @@
 #include <QDebug>
 #include <QRegularExpression>
 
-QList<reporting::SpinErrorReport> reporting::SpinErrorParser::parse(const QString &spinMessage) const
+QList<reporting::SpinErrorReportItem> reporting::SpinErrorParser::parse(const QString &spinMessage) const
 {
     // match message report
     QRegularExpressionMatchIterator matches = findSpinErrors(spinMessage);
     // iterate over all reports
-    QList<SpinErrorReport> reports;
+    QList<SpinErrorReportItem> reports;
     while (matches.hasNext()) {
         // build report
         auto report = buildReport(matches.next());
@@ -65,18 +65,19 @@ QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString
     return violations;
 }
 
-reporting::SpinErrorReport reporting::SpinErrorParser::buildReport(const QRegularExpressionMatch &matchedError) const
+reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReport(
+        const QRegularExpressionMatch &matchedError) const
 {
     // build report
-    SpinErrorReport report;
+    SpinErrorReportItem report;
     report.errorNumber = matchedError.captured(ReportParseTokens::ErrorNumber).toUInt();
     report.errorDepth = matchedError.captured(ReportParseTokens::ErrorDepth).toUInt();
-    report.errorType = SpinErrorReport::DataConstraintViolation;
+    report.errorType = SpinErrorReportItem::DataConstraintViolation;
     report.rawErrorDetails = matchedError.captured(ReportParseTokens::ErrorDetails);
     // parse data constraint violation
-    // for now, only
+    // for now, only data constraint violation
     switch (report.errorType) {
-    case SpinErrorReport::DataConstraintViolation:
+    case SpinErrorReportItem::DataConstraintViolation:
         report.parsedErrorDetails = findVariableViolations(report.rawErrorDetails);
         break;
     default:

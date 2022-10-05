@@ -20,7 +20,34 @@
 #pragma once
 
 #include <QList>
+#include <QString>
+#include <QVariant>
 
-class SpinErrorReportItem;
+namespace reporting {
 
-typedef QList<SpinErrorReportItem> SpinErrorReport;
+/**
+ * @brief   Structure to hold parsed spin report data.
+ */
+struct SpinErrorReportItem {
+    /** Error types */
+    enum ErrorType
+    {
+        DataConstraintViolation,
+        StopConditionViolation,
+        ObserverFailure,
+        OtherError
+    };
+
+    /** Spin error number, counted from 1 up */
+    uint32_t errorNumber;
+    /** Error depth reported by spin */
+    uint32_t errorDepth;
+    /** Error type reported by the message */
+    ErrorType errorType;
+    /** Raw error details reported by the message */
+    QString rawErrorDetails;
+    /** Parsed error details */
+    QList<QVariant> parsedErrorDetails;
+};
+
+}

@@ -20,7 +20,7 @@
 #pragma once
 
 #include "dataconstraintviolationreport.h"
-#include "spinerrorreport.h"
+#include "spinerrorreportitem.h"
 
 class QRegularExpressionMatch;
 class QRegularExpressionMatchIterator;
@@ -59,13 +59,13 @@ public:
      *
      * @return  List of spin errors
      */
-    QList<SpinErrorReport> parse(const QString &spinMessage) const;
+    QList<SpinErrorReportItem> parse(const QString &spinMessage) const;
 
 private:
     QRegularExpressionMatchIterator findSpinErrors(const QString &spinMessage) const;
     QList<QVariant> findVariableViolations(const QString &variableViolation) const;
 
-    SpinErrorReport buildReport(const QRegularExpressionMatch &matchedError) const;
+    SpinErrorReportItem buildReport(const QRegularExpressionMatch &matchedError) const;
 };
 
 }
