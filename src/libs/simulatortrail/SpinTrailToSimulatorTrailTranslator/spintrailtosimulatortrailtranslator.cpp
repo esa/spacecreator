@@ -258,12 +258,14 @@ Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getValue(const QString &s
 
     SpinTrailValueParser valueParser;
 
-    ValuePtr parameterValue = info.m_parameterTypeName.isEmpty()
-            ? std::make_unique<NamedValue>()
-            : valueParser.parseValue(parameters, info.m_parameterType);
-
     std::unique_ptr<NamedValue> interfaceParamValue = std::make_unique<NamedValue>();
-    interfaceParamValue->addValue(Escaper::escapeAsn1FieldName(info.m_parameterName), std::move(parameterValue));
+
+    if (!info.m_parameterTypeName.isEmpty()) {
+        ValuePtr parameterValue = info.m_parameterTypeName.isEmpty()
+                ? std::make_unique<NamedValue>()
+                : valueParser.parseValue(parameters, info.m_parameterType);
+        interfaceParamValue->addValue(Escaper::escapeAsn1FieldName(info.m_parameterName), std::move(parameterValue));
+    }
 
     const QString interfaceName = isInput ? info.m_interfaceName : info.m_possibleSenders.value(source);
     std::unique_ptr<ChoiceValue> interfaceValue =
