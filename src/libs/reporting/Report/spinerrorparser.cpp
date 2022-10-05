@@ -8,7 +8,6 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spin
     QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
     reporting::SpinErrorReport report;
     while (matches.hasNext()) {
-        // build report
         auto reportItem = buildReportItem(matches.next());
         report.append(reportItem);
     }
@@ -28,7 +27,6 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawEr
     QRegularExpressionMatchIterator matches = regex.globalMatch(rawError);
     while (matches.hasNext()) {
         const QRegularExpressionMatch matchedError = matches.next();
-        // build violation report
         violationReport.variableName =
                 matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName);
         violationReport.constraints.append(
@@ -53,7 +51,6 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawEr
 reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
         const QRegularExpressionMatch &matchedError) const
 {
-    // build report
     SpinErrorReportItem reportItem;
     reportItem.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
     reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();

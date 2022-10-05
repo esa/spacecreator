@@ -49,6 +49,7 @@ public:
         ErrorDetails,
         ErrorDepth
     };
+
     /**
      * @brief   Constructor
      */
