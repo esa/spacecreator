@@ -43,7 +43,6 @@ XmelReader::XmelReader()
 int XmelReader::read(QIODevice *device)
 {
     int ret = -2;
-
     xml.setDevice(device);
 
     if (xml.readNextStartElement()) {

@@ -40,18 +40,21 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
 {
     QString configFilePath = "config.xml";
     QFile configFile(configFilePath);
-    Q_ASSERT(configFile.open(QFile::ReadWrite | QFile::Text) == true);
+    Q_ASSERT(configFile.open(QFile::WriteOnly | QFile::Text));
 
     SpinConfigData spinConfigInput;
+    spinConfigInput.numberOfCores = 4;
 
-    XmelWriter writer({}, {}, {}, {}, spinConfigInput);
-    Q_ASSERT(writer.writeFile(&configFile, configFilePath) == true);
+    XmelWriter writer({}, {}, { "DummyFunction" }, {}, spinConfigInput);
+    Q_ASSERT(writer.writeFile(&configFile, configFilePath));
+    configFile.close();
 
+    Q_ASSERT(configFile.open(QFile::ReadOnly | QFile::Text));
     XmelReader reader;
     Q_ASSERT(reader.read(&configFile) == 0);
 
     SpinConfigData spinConfig = reader.getSpinConfig();
-    qDebug() << "Result: " << spinConfig.numberOfCores;
+    Q_ASSERT(spinConfig.numberOfCores == 4);
 
     configFile.remove();
 }
