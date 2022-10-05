@@ -24,9 +24,6 @@ python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir
 """
 
 
-
-
-
 def copy_applications(build_dir: str, app_dir: str) -> None:
     if not os.path.exists(build_dir):
         print("postbuild.py: Could not find build dir: {}". format(build_dir))
@@ -112,7 +109,6 @@ if __name__ == '__main__':
 
     app_dir = args.app_dir
 
-
     # Copy plugins from build tree to AppDir tree
     build_plugins_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     app_dir_plugins_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
@@ -121,8 +117,6 @@ if __name__ == '__main__':
     # ToDo: These two methods should be made superfluous
     copy_ans1scc_fuzzer(build_dir, app_dir)
     copy_asn1acn(build_dir, app_dir)
-
-    # Generic-highlighter
 
 
 

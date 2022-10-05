@@ -227,7 +227,7 @@ def copy_additional_qt_modules(env_qt_dir: str, app_dir: str):
 def extract_libzxb_util(install_dir: str, lib_dir: str) -> None:
     libzxb_util_gz = join_dir(install_dir, 'libzxb-util.tar.gz')
     print('Extracting {} to {}'.format(libzxb_util_gz, lib_dir))
-    with tarfile.open(libzxb_util_gz) as archive:
+    with tarfile.open(libzxb_util_gz, 'r:gz') as archive:
         archive.extractall(lib_dir)
 
 
@@ -323,6 +323,9 @@ if __name__ == '__main__':
     generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
     generic_highlighter_install_dir = join_dir(paths.env_app_dir, 'share', 'generic-highlighter')
     copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
+
+    # AppImage files SpaceCreator.desktop and AppRun
+    copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), paths.env_app_dir)
 
     # Copy snippets from asn1plugin
     snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
