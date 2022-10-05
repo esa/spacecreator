@@ -75,6 +75,7 @@ public:
         SedsConverterTasteTranslation,
         SedsConverterTransactionNameType,
         SedsConverterEnableFailureReporting,
+        SedsConverterFailureReportingType,
 
         Unknown
     };

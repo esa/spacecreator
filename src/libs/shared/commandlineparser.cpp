@@ -302,6 +302,12 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description =
                 QCoreApplication::translate("CommandLineParser", "Enable SEDS failure reporting");
     } break;
+    case CommandLineParser::Positional::SedsConverterFailureReportingType: {
+        names << "seds-failure-reporting-type";
+        description =
+                QCoreApplication::translate("CommandLineParser", "Specify which ASN.1 <type> should be used for SEDS failure reporting");
+        valueName = QCoreApplication::translate("CommandLineParser", "type");
+    } break;
     default:
         qWarning() << Q_FUNC_INFO << "It seems the new option type is not handled here.";
         return QCommandLineOption("Unknown option");

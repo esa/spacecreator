@@ -81,6 +81,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterSdlFilepathPrefix();
     void testCmdArgumentSedsConverterTransactionNameType();
     void testCmdArgumentSedsEnableFailureReporting();
+    void testCmdArgumentSedsConverterFailureReportingType();
 
     void initTestCase();
     void testCoverage();
@@ -673,6 +674,25 @@ void tst_CommandLineParser::testCmdArgumentSedsEnableFailureReporting()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterEnableFailureReporting));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterFailureReportingType()
+{
+    const QCommandLineOption cmdFailureReportingType =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterFailureReportingType);
+    const QString failureReportingType("CoolBool");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdFailureReportingType.names().first(), failureReportingType) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterFailureReportingType);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterFailureReportingType));
+
+    const QString value = parser.value(CommandArg::SedsConverterFailureReportingType);
+    QCOMPARE(value, failureReportingType);
 }
 
 void tst_CommandLineParser::initTestCase()

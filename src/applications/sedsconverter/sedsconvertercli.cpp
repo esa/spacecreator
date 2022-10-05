@@ -67,6 +67,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterTasteTranslation);
     m_parser.handlePositional(CommandArg::SedsConverterTransactionNameType);
     m_parser.handlePositional(CommandArg::SedsConverterEnableFailureReporting);
+    m_parser.handlePositional(CommandArg::SedsConverterFailureReportingType);
 
     m_parser.process(arguments);
     m_arguments = m_parser.positionalsSet();
@@ -276,6 +277,10 @@ void SedsConverterCLI::addSedsTranslationOptions(Options &options)
 
     if (m_arguments.contains(CommandArg::SedsConverterEnableFailureReporting)) {
         options.add(SedsOptions::enableFailureReporting);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterFailureReportingType)) {
+        options.add(SedsOptions::failureReportingType, m_parser.value(CommandArg::SedsConverterFailureReportingType));
     }
 }
 
