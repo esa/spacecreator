@@ -321,22 +321,23 @@ if __name__ == '__main__':
 
     # Copy the wizards from source tree to AppDir tree
     wizards_dir = join_dir(project_dir, 'wizards')
-    wizards_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'templates')
+    wizards_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'templates', 'wizards')
     copy_wizards(wizards_dir, wizards_install_dir)
 
-    # Copy syntax highlighter files from asn1plugin
-    generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
-    generic_highlighter_install_dir = join_dir(paths.env_app_dir, 'share', 'generic-highlighter')
-    copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
+    # Abstract Syntax Notation
+    download_asn1scc(env_dir)
 
     # AppImage files SpaceCreator.desktop and AppRun
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), paths.env_app_dir)
 
+    # Copy syntax highlighter files from asn1plugin
+    generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
+    generic_highlighter_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'generic-highlighter')
+    copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
     # Copy snippets from asn1plugin
     snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
     snippets_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'snippets')
     copy_snippets(snippets_dir, snippets_install_dir)
 
-    # Abstract Syntax Notation
-    download_asn1scc(env_dir)
+
 
