@@ -24,25 +24,7 @@ python3 ./scripts/postbuild.py --project_dir ~/projects/spacecreator --build_dir
 """
 
 
-def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
-    if not os.path.exists(wizards_dir):
-        print("postbuild.py: Could not find wizards dir: {}". format(wizards_dir))
-        exit(1)
-    if not os.path.exists(wizards_install_dir):
-        print("postbuild.py: Could not find wizards install dir: {}".format(wizards_install_dir))
-        exit(2)
 
-    # File wizards
-    files_dir = join_dir(wizards_dir, 'files')
-    files_install_dir = join_dir(wizards_install_dir, 'files')
-
-    utils.copy_content_of_dir_to_other_dir(files_dir, files_install_dir)
-
-    # Projects wizards
-    projects_dir = join_dir(wizards_dir, 'projects')
-    projects_install_dir = join_dir(wizards_install_dir, 'projects')
-    print("postbuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
-    utils.copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
 
 
 def copy_applications(build_dir: str, app_dir: str) -> None:
@@ -130,6 +112,7 @@ if __name__ == '__main__':
 
     app_dir = args.app_dir
 
+
     # Copy plugins from build tree to AppDir tree
     build_plugins_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     app_dir_plugins_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
@@ -138,6 +121,8 @@ if __name__ == '__main__':
     # ToDo: These two methods should be made superfluous
     copy_ans1scc_fuzzer(build_dir, app_dir)
     copy_asn1acn(build_dir, app_dir)
+
+    # Generic-highlighter
 
 
 

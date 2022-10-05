@@ -7,7 +7,6 @@ import urllib.request
 import tarfile
 import py7zr
 
-
 from utils import join_dir, print_cmd, ensure_dir, check_cmake_version, copy_content_of_dir_to_other_dir, copy_file_pattern_to_dir
 from git.repo import Repo
 
@@ -232,6 +231,40 @@ def extract_libzxb_util(install_dir: str, lib_dir: str) -> None:
         archive.extractall(lib_dir)
 
 
+def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
+    if not os.path.exists(wizards_dir):
+        print("prebuild.py: Could not find wizards dir: {}". format(wizards_dir))
+        exit(1)
+
+    # File wizards
+    files_dir = join_dir(wizards_dir, 'files')
+    files_install_dir = join_dir(wizards_install_dir, 'files')
+
+    copy_content_of_dir_to_other_dir(files_dir, files_install_dir)
+
+    # Projects wizards
+    projects_dir = join_dir(wizards_dir, 'projects')
+    projects_install_dir = join_dir(wizards_install_dir, 'projects')
+    print("prebuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
+    copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
+
+
+def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
+    if not os.path.exists(generic_highlighter_dir):
+        print("prebuild.py: Could not find wizards dir: {}".format(wizards_dir))
+        exit(1)
+    print("prebuild.py: Copying generic highlighter files from {} to {}".format(generic_highlighter_dir, generic_highlighter_install_dir))
+    copy_content_of_dir_to_other_dir(generic_highlighter_dir, generic_highlighter_install_dir)
+
+
+def copy_snippets(snippets_dir: str, snippets_install_dir: str) -> None:
+    if not os.path.exists(snippets_dir):
+        print("prebuild.py: Could not find snippets dir {}".format(snippets_dir))
+        exit(1)
+    print("prebuild.py: Copying snippets from {} to {}".format(snippets_dir, snippets_install_dir))
+    copy_content_of_dir_to_other_dir(snippets_dir, snippets_install_dir)
+
+
 if __name__ == '__main__':
     # Parse arguments
     parser = argparse.ArgumentParser(prog='prebuild')
@@ -280,6 +313,21 @@ if __name__ == '__main__':
     install_dir = paths.install_dir
     lib_dir = join_dir(paths.env_app_dir, 'lib')
     extract_libzxb_util(install_dir, lib_dir)
+
+    # Copy the wizards from source tree to AppDir tree
+    wizards_dir = join_dir(project_dir, 'wizards')
+    wizards_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'templates')
+    copy_wizards(wizards_dir, wizards_install_dir)
+
+    # Copy syntax highlighter files from asn1plugin
+    generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
+    generic_highlighter_install_dir = join_dir(paths.env_app_dir, 'share', 'generic-highlighter')
+    copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
+
+    # Copy snippets from asn1plugin
+    snippets_dir = join_dir(project_dir, 'qtcreator', 'asn1plugin', 'snippets')
+    snippets_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'snippets')
+    copy_snippets(snippets_dir, snippets_install_dir)
 
     # Abstract Syntax Notation
     download_asn1scc(env_dir)
