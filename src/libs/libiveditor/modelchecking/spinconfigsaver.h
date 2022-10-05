@@ -1,8 +1,25 @@
+/*
+   Copyright (C) 2022 N7Space - <akoszewski@n7space.com>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+*/
+
 #ifndef SPINCONFIGSAVER_H
 #define SPINCONFIGSAVER_H
 
-#include <QList>
 #include <QIODevice>
+#include <QList>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
@@ -12,8 +29,7 @@ enum class ExplorationMode
     BreadthFirst
 };
 
-struct SpinConfigData
-{
+struct SpinConfigData {
     ExplorationMode explorationMode = ExplorationMode::DepthFirst;
     bool searchShortestPath = false;
     bool useFairScheduling = false;
@@ -35,6 +51,7 @@ public:
     void saveSpinConfig(const SpinConfigData &configData, QXmlStreamWriter &xml);
     bool readSpinConfig(QXmlStreamReader &xml);
     SpinConfigData getConfigData() const;
+
 private:
     QString explorationModeToString(const ExplorationMode &explorationMode);
     ExplorationMode explorationModeFromStringRef(const QStringRef &explorationModeStr);
