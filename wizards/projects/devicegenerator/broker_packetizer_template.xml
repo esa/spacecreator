@@ -33,8 +33,8 @@
 
 <Required_Interface name="Packetize" kind="Protected" layer="default" required_system_element="NO" wcet="0">
     <Input_Parameter name="packetType" type="PacketType" encoding="NATIVE"/>
-    <Input_Parameter name="source" type="PacketSource" encoding="NATIVE"/>
-    <Input_Parameter name="destination" type="PacketDestination" encoding="NATIVE"/>
+    <Input_Parameter name="pSource" type="PacketSource" encoding="NATIVE"/>
+    <Input_Parameter name="pDestination" type="PacketDestination" encoding="NATIVE"/>
     <Input_Parameter name="packetPointer" type="PacketPointer" encoding="NATIVE"/>
     <Input_Parameter name="dataOffset" type="PacketDataOffset" encoding="NATIVE"/>
     <Input_Parameter name="dataSize" type="DataLength" encoding="NATIVE"/>
@@ -45,13 +45,17 @@
     <Input_Parameter name="packetType" type="PacketType" encoding="NATIVE"/>
     <Input_Parameter name="packetPointer" type="PacketPointer" encoding="NATIVE"/>
     <Input_Parameter name="packetSize" type="DataLength" encoding="NATIVE"/>
-    <Output_Parameter name="source" type="PacketSource" encoding="NATIVE"/>
-    <Output_Parameter name="destination" type="PacketDestination" encoding="NATIVE"/>
+    <Output_Parameter name="pSource" type="PacketSource" encoding="NATIVE"/>
+    <Output_Parameter name="pDestination" type="PacketDestination" encoding="NATIVE"/>
     <Output_Parameter name="dataOffset" type="PacketDataOffset" encoding="NATIVE"/>
     <Output_Parameter name="dataSize" type="DataLength" encoding="NATIVE"/>
     <Output_Parameter name="errorCode" type="RequestErrorCodePtr" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="26700 53800"/>
 </Required_Interface>
+
+<Provided_Interface name="Trigger" kind="Cyclic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="1">
+    <Property name="Taste::coordinates" value="21500 55500"/>
+</Provided_Interface>
 
     <Implementations>
         <Implementation name="default" language="C"/>
