@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -24,7 +24,15 @@ namespace Report::test {
 class tst_SpinErrorParser : public QObject
 {
     Q_OBJECT
+
+private Q_SLOTS:
+    void testNoError();
+    void testViolationVariableType();
 };
+
+void tst_SpinErrorParser::testNoError() {}
+
+void tst_SpinErrorParser::testViolationVariableType() {}
 
 } // namespace tmc::test
 
