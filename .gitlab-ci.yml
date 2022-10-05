@@ -105,6 +105,7 @@ space-creator-qt5:
 space-creator-qt6:
   stage: build-test-and-bundle
   variables:
+    PROJECT_DIR: ${CI_PROJECT_DIR}
     ENV_QT_VERSION: 6.3.1
     ENV_QTC_VERSION: 8.0.1
     ENV_DIR: /opt/spacecreator6
