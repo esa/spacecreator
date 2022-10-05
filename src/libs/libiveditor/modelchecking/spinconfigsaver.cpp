@@ -88,12 +88,11 @@ void SpinConfigSaver::saveSpinConfig(const SpinConfigData &configData, QXmlStrea
 
     xml.writeAttribute("errorlimit", QString::number(configData.errorLimit));
     xml.writeAttribute("explorationmode", explorationModeToString(configData.explorationMode));
-    xml.writeAttribute(
-            "globalinputvectorgenerationlimit", QString::number(configData.globalInputVectorGenerationLimit));
-    xml.writeAttribute(
-            "interfacegenerationlimits", interfaceGenerationLimitsToString(configData.interfaceGenerationLimits));
+    xml.writeAttribute("inputvectorgenerationlimit", QString::number(configData.globalInputVectorGenerationLimit));
+    xml.writeAttribute("ifacegenerationlimits", interfaceGenerationLimitsToString(configData.ifaceGenerationLimits));
     xml.writeAttribute("memorylimitmb", QString::number(configData.memoryLimitMB));
     xml.writeAttribute("numberofcores", QString::number(configData.numberOfCores));
+    xml.writeAttribute("rawcommandline", configData.rawCommandLine);
     xml.writeAttribute("searchshortestpath", QString::number(configData.searchShortestPath));
     xml.writeAttribute("searchstatelimit", QString::number(configData.searchStateLimit));
     xml.writeAttribute("timelimitseconds", QString::number(configData.timeLimitSeconds));
@@ -107,10 +106,11 @@ bool SpinConfigSaver::readSpinConfig(QXmlStreamReader &xml)
 {
     configData.errorLimit = readAttribute("errorlimit", xml).toInt();
     configData.explorationMode = explorationModeFromStringRef(readAttribute("explorationmode", xml));
-    configData.globalInputVectorGenerationLimit = readAttribute("globalinputevectorgenerationlimit", xml).toInt();
-    configData.interfaceGenerationLimits = parseIfaceGenerationLimits(readAttribute("interfacegenerationlimits", xml));
+    configData.globalInputVectorGenerationLimit = readAttribute("inputvectorgenerationlimit", xml).toInt();
+    configData.ifaceGenerationLimits = parseIfaceGenerationLimits(readAttribute("ifacegenerationlimits", xml));
     configData.memoryLimitMB = readAttribute("memorylimitmb", xml).toInt();
     configData.numberOfCores = readAttribute("numberofcores", xml).toInt();
+    configData.rawCommandLine = readAttribute("rawcommandline", xml).toString();
     configData.searchShortestPath = readAttribute("searchshortestpath", xml).toInt();
     configData.searchStateLimit = readAttribute("searchstatelimit", xml).toInt();
     configData.useBitHashing = readAttribute("usebithashing", xml).toInt();

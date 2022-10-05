@@ -40,7 +40,7 @@ struct SpinConfigData {
     int errorLimit = 1;
     int memoryLimitMB = 2048;
     int globalInputVectorGenerationLimit = 4;
-    QList<QPair<QString, int>> interfaceGenerationLimits;
+    QList<QPair<QString, int>> ifaceGenerationLimits;
     QString rawCommandLine; // if non-empty, overrides other configuration settings
 };
 

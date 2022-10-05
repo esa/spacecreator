@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xmel>
+<xmel version="1.0">
+    <ModelCheckingWindow name="/home/taste/BoolTests/bool3/work/modelchecking/configurations/asd.xml">
+        <Configuration>
+            <Properties>
+                <Property path="new_property/new_property.pr"/>
+            </Properties>
+            <Submodel>
+                <Function name="Controller"/>
+                <Function name="Host"/>
+            </Submodel>
+        </Configuration>
+        <NativeModelChecker/>
+        <IFModelChecker maxscenarios="5" errorscenarios="true" successscenarios="true" timelimit="120" maxenvironmentcalls="" explorationalgorithm="dfs" maxstates=""/>
+        <SPINModelChecker errorlimit="1" explorationmode="DepthFirst" globalinputvectorgenerationlimit="4" interfacegenerationlimits="" memorylimitmb="2048" numberofcores="5" searchshortestpath="0" searchstatelimit="1000000" timelimitseconds="300" usebithashing="0" usefairscheduling="0"/>
+    </ModelCheckingWindow>
+</xmel>

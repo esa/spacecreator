@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2022 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2022 N7Space - <akoszewski@n7space.com>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -50,8 +50,8 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     XmelReader reader;
     Q_ASSERT(reader.read(&configFile) == 0);
 
-    // SpinConfigData spinConfig = reader.getSpinConfig();
-    // qDebug() << "Result: " << spinConfig.numberOfCores;
+    SpinConfigData spinConfig = reader.getSpinConfig();
+    qDebug() << "Result: " << spinConfig.numberOfCores;
 
     configFile.remove();
 }
