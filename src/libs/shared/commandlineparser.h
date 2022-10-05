@@ -74,6 +74,7 @@ public:
         SedsConverterSkipEmptySequences,
         SedsConverterTasteTranslation,
         SedsConverterTransactionNameType,
+        SedsConverterEnableFailureReporting,
 
         Unknown
     };

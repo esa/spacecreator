@@ -53,6 +53,8 @@ public:
     inline static const QString tasteTranslation = "Seds_Translation_Taste";
     /** @brief  Name of the type to used for SEDS transaction name */
     inline static const QString transactionNameType = "Seds_Translation_TransactionNameType";
+    /** @brief  Enable failure reporting */
+    inline static const QString enableFailureReporting = "Seds_Translation_EnableErrorReporting";
     /** @brief  Filepath of output file */
     inline static const QString outputFilepath = "Seds_Export_OutputFilepath";
 

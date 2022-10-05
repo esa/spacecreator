@@ -80,6 +80,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterMappingFunctionsModuleFileName();
     void testCmdArgumentSedsConverterSdlFilepathPrefix();
     void testCmdArgumentSedsConverterTransactionNameType();
+    void testCmdArgumentSedsEnableFailureReporting();
 
     void initTestCase();
     void testCoverage();
@@ -657,6 +658,21 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterTransactionNameType()
 
     const QString value = parser.value(CommandArg::SedsConverterTransactionNameType);
     QCOMPARE(value, transactionNameType);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsEnableFailureReporting()
+{
+    const QCommandLineOption cmdEnableFailureReporting =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterEnableFailureReporting);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdEnableFailureReporting.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterEnableFailureReporting);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterEnableFailureReporting));
 }
 
 void tst_CommandLineParser::initTestCase()
