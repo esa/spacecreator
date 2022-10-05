@@ -33,6 +33,7 @@ namespace reporting {
 class SpinErrorParser
 {
 public:
+    /// @brief  Regex match tokens for constraint violation parsing
     enum ConstraintViolationParseTokens
     {
         ConstraintViolationVariableName = 1,
@@ -40,7 +41,8 @@ public:
         ConstraintViolationBoundingValue
     };
 
-    enum ReportParseTokens
+    /// @brief  Regex match tokens for report item parsing
+    enum ReportItemParseTokens
     {
         ErrorNumber = 1,
         ErrorType,

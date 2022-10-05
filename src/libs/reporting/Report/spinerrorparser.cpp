@@ -6,13 +6,13 @@
 reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spinMessage) const
 {
     QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
-    reporting::SpinErrorReport reports;
+    reporting::SpinErrorReport report;
     while (matches.hasNext()) {
         // build report
-        auto report = buildReportItem(matches.next());
-        reports.append(report);
+        auto reportItem = buildReportItem(matches.next());
+        report.append(reportItem);
     }
-    return reports;
+    return report;
 }
 
 QRegularExpressionMatchIterator reporting::SpinErrorParser::matchSpinErrors(const QString &spinMessage) const
@@ -53,10 +53,10 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
 {
     // build report
     SpinErrorReportItem report;
-    report.errorNumber = matchedError.captured(ReportParseTokens::ErrorNumber).toUInt();
-    report.errorDepth = matchedError.captured(ReportParseTokens::ErrorDepth).toUInt();
+    report.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
+    report.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
     report.errorType = SpinErrorReportItem::DataConstraintViolation;
-    report.rawErrorDetails = matchedError.captured(ReportParseTokens::ErrorDetails);
+    report.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
     // parse data constraint violation
     // for now, only data constraint violation
     switch (report.errorType) {
