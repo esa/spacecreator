@@ -18,6 +18,7 @@ add_subdirectory(simulink)
 add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
 add_subdirectory(spintrail)
+add_subdirectory(simulatortrail)
 
 if(${QTC_FOUND})
     add_subdirectory(testgenerator)
