@@ -43,7 +43,6 @@ def build_path_object(project_dir: str, env_path: str, qt_version: str):
         env_dir = os.path.abspath(env_path)
         env_qt_install_dir = join_dir(env_dir, 'Qt')
         env_qt_dir = join_dir(env_dir, 'Qt', qt_version, 'gcc_64')
-        env_app_dir = join_dir(env_dir, 'spacecreator.AppDir')  # This is where we put QtCreator and the SpaceCreator plugin
         install_dir = join_dir(project_dir, 'install')
     _paths = Paths()
     return _paths
@@ -283,10 +282,13 @@ if __name__ == '__main__':
                         help='Version of Qt to download to the build environment. Format X.Y.Z')
     parser.add_argument('--qtcreator_version', dest='qtcreator_version', type=str, required=True,
                         help='Version of Qt Creator to download. Format X.Y.Z')
+    parser.add_argument('--app_dir', dest='app_dir', type=str, required=True,
+                        help='Path to the folder that contains AppDir')
     args = parser.parse_args()
 
     # Build the paths object
     project_dir = args.project_dir
+    app_dir = args.app_dir
     env_dir = args.env_path
     qt_version = args.qt_version
     qtcreator_version = args.qtcreator_version
@@ -302,12 +304,12 @@ if __name__ == '__main__':
     # Ensure dirs
     ensure_dir(paths.env_dir)
     ensure_dir(paths.env_qt_dir)
-    ensure_dir(paths.env_app_dir)
+    ensure_dir(app_dir)
 
     # Setup Qt and QtCreator with plugin development files
     download_qt(paths.env_qt_install_dir, qt_version)
-    download_qtcreator(env_dir, qtcreator_version, paths.env_app_dir, is_qt6)
-    copy_additional_qt_modules(paths.env_qt_dir, paths.env_app_dir)
+    download_qtcreator(env_dir, qtcreator_version, app_dir, is_qt6)
+    copy_additional_qt_modules(paths.env_qt_dir, app_dir)
 
     # Grant Lee Template Library
     download_grantlee(env_dir)
@@ -316,27 +318,27 @@ if __name__ == '__main__':
 
     # libzxb-util
     install_dir = paths.install_dir
-    lib_dir = join_dir(paths.env_app_dir, 'lib')
+    lib_dir = join_dir(app_dir, 'lib')
     extract_libzxb_util(install_dir, lib_dir)
 
     # Copy the wizards from source tree to AppDir tree
     wizards_dir = join_dir(project_dir, 'wizards')
-    wizards_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'templates', 'wizards')
+    wizards_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'templates', 'wizards')
     copy_wizards(wizards_dir, wizards_install_dir)
 
     # Abstract Syntax Notation
     download_asn1scc(env_dir)
 
     # AppImage files SpaceCreator.desktop and AppRun
-    copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), paths.env_app_dir)
+    copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)
 
     # Copy syntax highlighter files from asn1plugin
     generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
-    generic_highlighter_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'generic-highlighter')
+    generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
     copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
     # Copy snippets from asn1plugin
     snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
-    snippets_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'snippets')
+    snippets_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'snippets')
     copy_snippets(snippets_dir, snippets_install_dir)
 
 
