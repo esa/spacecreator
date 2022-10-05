@@ -21,58 +21,53 @@ QRegularExpressionMatchIterator reporting::SpinErrorParser::matchSpinErrors(cons
     return regex.globalMatch(spinMessage);
 }
 
-QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &str) const
+QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawError) const
 {
-    qDebug() << "vv" << str;
-
+    DataConstraintViolationReport violationReport;
     const QRegularExpression regex = buildDataConstraintViolationRegex();
-    qDebug() << "vv" << regex;
-    QList<QVariant> violations;
-    QRegularExpressionMatchIterator matches = regex.globalMatch(str);
+    QRegularExpressionMatchIterator matches = regex.globalMatch(rawError);
     while (matches.hasNext()) {
         const QRegularExpressionMatch matchedError = matches.next();
         // build violation report
-        DataConstraintViolationReport report;
-        report.variableName = matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName);
-        report.constraint = matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationType);
-        // put either int or float value into the report
+        violationReport.variableName =
+                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName);
+        violationReport.constraints.append(
+                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationType));
+        QVariant boundingValue;
+        // put either int or float value into the report,
+        // depending on whether the "." character exists in the matched token
         const QString boundingValueToken =
                 matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationBoundingValue);
         if (boundingValueToken.contains(QChar('.'))) {
-            report.boundingValue.setValue(boundingValueToken.toFloat());
+            boundingValue.setValue(boundingValueToken.toFloat());
         } else {
-            report.boundingValue.setValue(boundingValueToken.toInt());
+            boundingValue.setValue(boundingValueToken.toInt());
         }
-        qDebug() << "vv" << report.variableName << report.constraint << report.boundingValue;
-        // add report to violations
-        QVariant violation;
-        violation.setValue(report);
-        violations.append(violation);
-
-        qDebug() << "vv" << qvariant_cast<DataConstraintViolationReport>(violations.last()).variableName;
+        violationReport.boundingValues.append(boundingValue);
     }
-    return violations;
+    QVariant variableViolation;
+    variableViolation.setValue(violationReport);
+    return variableViolation;
 }
 
 reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
         const QRegularExpressionMatch &matchedError) const
 {
     // build report
-    SpinErrorReportItem report;
-    report.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
-    report.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
-    report.errorType = SpinErrorReportItem::DataConstraintViolation;
-    report.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
-    // parse data constraint violation
-    // for now, only data constraint violation
-    switch (report.errorType) {
+    SpinErrorReportItem reportItem;
+    reportItem.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
+    reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
+    reportItem.errorType = SpinErrorReportItem::DataConstraintViolation;
+    reportItem.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
+    // for now, only parse data constraint violation
+    switch (reportItem.errorType) {
     case SpinErrorReportItem::DataConstraintViolation:
-        report.parsedErrorDetails = findVariableViolations(report.rawErrorDetails);
+        reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
         break;
     default:
         break;
     }
-    return report;
+    return reportItem;
 }
 
 QRegularExpression reporting::SpinErrorParser::buildSpinErrorRegex()

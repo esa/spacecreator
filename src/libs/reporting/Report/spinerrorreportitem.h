@@ -47,7 +47,7 @@ struct SpinErrorReportItem {
     /** Raw error details reported by the message */
     QString rawErrorDetails;
     /** Parsed error details */
-    QList<QVariant> parsedErrorDetails;
+    QVariant parsedErrorDetails;
 };
 
 typedef QList<SpinErrorReportItem> SpinErrorReport;

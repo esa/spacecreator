@@ -30,9 +30,9 @@ struct DataConstraintViolationReport {
     /** Name of the constraint violating variable */
     QString variableName;
     /** Boundary operator (less than, greater than etc.) */
-    QString constraint;
+    QList<QString> constraints;
     /** Bounding value */
-    QVariant boundingValue;
+    QList<QVariant> boundingValues;
 };
 
 }

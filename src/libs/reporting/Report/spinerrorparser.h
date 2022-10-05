@@ -65,7 +65,7 @@ public:
 
 private:
     QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
-    QList<QVariant> findVariableViolations(const QString &variableViolation) const;
+    QVariant parseVariableViolation(const QString &rawError) const;
 
     SpinErrorReportItem buildReportItem(const QRegularExpressionMatch &matchedError) const;
 

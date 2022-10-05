@@ -80,15 +80,10 @@ int main(int argc, char *argv[])
         qDebug() << "Error number:" << report.errorNumber;
         qDebug() << "Error type:" << report.errorType;
         qDebug() << "Error depth:" << report.errorDepth;
-        qDebug() << "Error details:";
-        for (auto violationReport : report.parsedErrorDetails) {
-            DataConstraintViolationReport dataConstraintViolationReport =
-                    qvariant_cast<DataConstraintViolationReport>(violationReport);
-            qDebug() << "    ----- Error -----";
-            qDebug() << "    Variable name:" << dataConstraintViolationReport.variableName;
-            qDebug() << "    Operator:" << dataConstraintViolationReport.constraint;
-            qDebug() << "    Value:" << dataConstraintViolationReport.boundingValue;
-        }
+        qDebug() << "Error details (raw):" << report.rawErrorDetails;
+        const DataConstraintViolationReport dataConstraintViolationReport =
+                qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
+        qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
     }
 
     return EXIT_SUCCESS;
