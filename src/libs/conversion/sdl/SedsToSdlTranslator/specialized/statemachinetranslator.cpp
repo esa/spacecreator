@@ -475,7 +475,7 @@ static inline auto handleParameterTransactions(const std::vector<const ::seds::m
 
     auto sdlElseTransition = std::make_unique<::sdl::Transition>();
     auto sdlElseAnswer = std::make_unique<::sdl::Answer>();
-    sdlElseAnswer->setLiteral(QString("ELSE"));
+    sdlElseAnswer->setLiteral(::sdl::Answer::ElseLiteral);
     sdlElseAnswer->setTransition(std::move(sdlElseTransition));
 
     sdlDecision->addAnswer(std::move(sdlAnswer));
@@ -1082,7 +1082,7 @@ static inline auto handleTransitionTransaction(const ::seds::model::Name &transa
     transactionAnswer->setTransition(std::move(transactionAnswerTransition));
 
     auto transitionElse = std::make_unique<::sdl::Answer>();
-    transitionElse->setLiteral(QString("ELSE"));
+    transitionElse->setLiteral(::sdl::Answer::ElseLiteral);
     transitionElse->setTransition(std::make_unique<::sdl::Transition>());
 
     auto transactionDecision = std::make_unique<::sdl::Decision>();

@@ -130,7 +130,6 @@ protected:
     inline static const QString m_defaultChannelName = "c";
     inline static const QString m_defaultRouteName = "r";
     inline static const QString m_isPresentTemplate = "present(%1)";
-    inline static const QString m_elseLiteral = "ELSE";
 
     ::sdl::SdlModel *m_sdlModel;
     const Asn1Acn::File *m_asn1File;
