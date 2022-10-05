@@ -73,11 +73,24 @@ space-creator-qt5:
 
   script:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
-    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
+    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py \
+      --output_dir ${ENV_DIR} \
+      --project_dir ${PROJECT_DIR} \
+      --app_dir ${APP_DIR} \
+      --qt_version ${ENV_QT_VERSION} \
+      --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
-    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release
+    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py \
+      --project_dir ${PROJECT_DIR} \
+      --env_dir ${ENV_DIR} \
+      --env_qt_dir ${ENV_QT_BASE_DIR} \
+      --build_dir ${BUILD_DIR} \
+      --build_type Release
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py \
+      --project_dir {$PROJECT_DIR} \
+      --app_dir ${APP_DIR} \
+      --build_dir ${BUILD_DIR}
     # unit tests
     - cd ${ENV_DIR}
     - export PATH=$PATH:${ENV_DIR}/asn1scc
@@ -86,7 +99,12 @@ space-creator-qt5:
     - ./scripts/run_tests.sh ${BUILD_DIR}
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --env_dir ${ENV_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --project_version ${SC_VERSION}
+    - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py \
+      --project_dir ${PROJECT_DIR} \
+      --build_dir ${BUILD_DIR} \
+      --env_dir ${ENV_DIR} \
+      --env_qt_dir ${ENV_QT_BASE_DIR} \
+      --project_version ${SC_VERSION}
   cache:
     key: asn1scc
     paths:
