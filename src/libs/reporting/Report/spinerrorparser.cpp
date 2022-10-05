@@ -5,9 +5,7 @@
 
 reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spinMessage) const
 {
-    // match message report
     QRegularExpressionMatchIterator matches = findSpinErrors(spinMessage);
-    // iterate over all reports
     reporting::SpinErrorReport reports;
     while (matches.hasNext()) {
         // build report
@@ -25,6 +23,8 @@ QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const
 
 QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &str) const
 {
+    qDebug() << "vv:" << str;
+
     const QRegularExpression regex = buildDataConstraintViolationRegex();
     QList<QVariant> violations;
     QRegularExpressionMatchIterator matches = regex.globalMatch(str);
@@ -34,8 +34,14 @@ QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString
         DataConstraintViolationReport report;
         report.variableName = matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName);
         report.constraint = matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationType);
-        report.boundingValue.setValue(
-                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationBoundingValue).toInt());
+        // put either int or float value into the report
+        const QString boundingValueToken =
+                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationBoundingValue);
+        if (boundingValueToken.contains(QChar('.'))) {
+            report.boundingValue.setValue(boundingValueToken.toFloat());
+        } else {
+            report.boundingValue.setValue(boundingValueToken.toInt());
+        }
         // add report to violations
         QVariant violation;
         violation.setValue(report);
