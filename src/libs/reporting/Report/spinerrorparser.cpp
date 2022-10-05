@@ -34,9 +34,20 @@ QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const
 
 QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &str) const
 {
-    QList<QVariant> violations;
-    const QString pattern = QStringLiteral("\\(([a-z_][\\w\\.]+)(.+?)(\\d+)\\)");
+    QString pattern;
+    // opening parenthesis
+    pattern += QStringLiteral("\\(");
+    // variable name
+    pattern += QStringLiteral("([a-z_][\\w\\.]+)");
+    // operator
+    pattern += QStringLiteral("(.+?)");
+    // bounding value
+    pattern += QStringLiteral("([\\d\\.]+)");
+    // closing parenthesis
+    pattern += QStringLiteral("\\)");
     const QRegularExpression regex(pattern);
+
+    QList<QVariant> violations;
     QRegularExpressionMatchIterator matches = regex.globalMatch(str);
     while (matches.hasNext()) {
         const QRegularExpressionMatch matchedError = matches.next();
