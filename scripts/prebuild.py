@@ -325,7 +325,7 @@ if __name__ == '__main__':
     copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
 
     # Copy snippets from asn1plugin
-    snippets_dir = join_dir(project_dir, 'qtcreator', 'asn1plugin', 'snippets')
+    snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
     snippets_install_dir = join_dir(paths.env_app_dir, 'share', 'qtcreator', 'snippets')
     copy_snippets(snippets_dir, snippets_install_dir)
 
