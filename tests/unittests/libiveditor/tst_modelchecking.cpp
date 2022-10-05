@@ -68,7 +68,7 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     Q_ASSERT(spinConfig.errorLimit == spinConfigInput.errorLimit);
     Q_ASSERT(spinConfig.explorationMode == spinConfigInput.explorationMode);
     Q_ASSERT(spinConfig.globalInputVectorGenerationLimit == spinConfigInput.globalInputVectorGenerationLimit);
-    // Q_ASSERT(spinConfig.ifaceGenerationLimits == spinConfigInput.ifaceGenerationLimits);
+    Q_ASSERT(spinConfig.ifaceGenerationLimits == spinConfigInput.ifaceGenerationLimits);
     Q_ASSERT(spinConfig.memoryLimitMB == spinConfigInput.memoryLimitMB);
     Q_ASSERT(spinConfig.numberOfCores == spinConfigInput.numberOfCores);
     Q_ASSERT(spinConfig.rawCommandLine == spinConfigInput.rawCommandLine);
@@ -78,7 +78,7 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     Q_ASSERT(spinConfig.useBitHashing == spinConfigInput.useBitHashing);
     Q_ASSERT(spinConfig.useFairScheduling == spinConfigInput.useFairScheduling);
 
-    // configFile.remove();
+    configFile.remove();
 }
 
 QTEST_MAIN(tst_ModelChecking)
