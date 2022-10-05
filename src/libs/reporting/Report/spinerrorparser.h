@@ -66,6 +66,9 @@ private:
     QList<QVariant> findVariableViolations(const QString &variableViolation) const;
 
     SpinErrorReportItem buildReport(const QRegularExpressionMatch &matchedError) const;
+
+    static QRegularExpression buildSpinErrorRegex();
+    static QRegularExpression buildDataConstraintViolationRegex();
 };
 
 }

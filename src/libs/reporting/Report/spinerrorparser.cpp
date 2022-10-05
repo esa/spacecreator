@@ -19,34 +19,13 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spin
 
 QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const QString &spinMessage) const
 {
-    // error number
-    QString pattern = QStringLiteral("pan:(\\d+):\\s+");
-    // error type
-    pattern += QStringLiteral("(.+?)\\s+");
-    // erro details
-    pattern += QStringLiteral("\\((.+?)\\)\\s+");
-    // error depth
-    pattern += QStringLiteral("\\(at depth (\\d+)\\)");
-
-    const QRegularExpression regex(pattern);
+    const QRegularExpression regex = buildSpinErrorRegex();
     return regex.globalMatch(spinMessage);
 }
 
 QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &str) const
 {
-    QString pattern;
-    // opening parenthesis
-    pattern += QStringLiteral("\\(");
-    // variable name
-    pattern += QStringLiteral("([a-z_][\\w\\.]+)");
-    // operator
-    pattern += QStringLiteral("(.+?)");
-    // bounding value
-    pattern += QStringLiteral("([\\d\\.]+)");
-    // closing parenthesis
-    pattern += QStringLiteral("\\)");
-    const QRegularExpression regex(pattern);
-
+    const QRegularExpression regex = buildDataConstraintViolationRegex();
     QList<QVariant> violations;
     QRegularExpressionMatchIterator matches = regex.globalMatch(str);
     while (matches.hasNext()) {
@@ -84,4 +63,32 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReport(
         break;
     }
     return report;
+}
+
+QRegularExpression reporting::SpinErrorParser::buildSpinErrorRegex()
+{
+    // error number
+    QString pattern = QStringLiteral("pan:(\\d+):\\s+");
+    // error type
+    pattern += QStringLiteral("(.+?)\\s+");
+    // error details
+    pattern += QStringLiteral("\\((.+?)\\)\\s+");
+    // error depth
+    pattern += QStringLiteral("\\(at depth (\\d+)\\)");
+    return QRegularExpression(pattern);
+}
+
+QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex()
+{
+    // opening parenthesis
+    QString pattern = QStringLiteral("\\(");
+    // variable name
+    pattern += QStringLiteral("([a-z_][\\w\\.]+)");
+    // operator
+    pattern += QStringLiteral("(.+?)");
+    // bounding value
+    pattern += QStringLiteral("([\\d\\.]+)");
+    // closing parenthesis
+    pattern += QStringLiteral("\\)");
+    return QRegularExpression(pattern);
 }
