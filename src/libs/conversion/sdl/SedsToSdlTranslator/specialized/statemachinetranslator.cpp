@@ -404,6 +404,11 @@ static inline auto handleCommandTransactions(Context &context,
         sdlDecision->addAnswer(std::move(sdlAnswer));
     }
 
+    auto sdlElseAnswer = std::make_unique<::sdl::Answer>();
+    sdlElseAnswer->setLiteral(::sdl::Answer::ElseLiteral);
+    sdlElseAnswer->setTransition(std::make_unique<::sdl::Transition>());
+    sdlDecision->addAnswer(std::move(sdlElseAnswer));
+
     auto sdlTransition = std::make_unique<::sdl::Transition>();
 
     auto transactionVariableAssignment = std::make_unique<::sdl::Task>(
@@ -1069,6 +1074,11 @@ auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *
 static inline auto handleTransitionTransaction(const ::seds::model::Name &transaction, const ::sdl::Input *input,
         ::sdl::Transition *currentTransition) -> ::sdl::Transition *
 {
+    if (const auto lastAction = currentTransition->lastAction();
+            dynamic_cast<const ::sdl::NextState *>(lastAction) != nullptr) {
+        currentTransition->removeLastAction();
+    }
+
     const auto transactionVariableName = QString("%1_transactionName").arg(input->name());
     auto transactionDecisionExpression = std::make_unique<::sdl::Expression>(transactionVariableName);
 
@@ -1091,6 +1101,8 @@ static inline auto handleTransitionTransaction(const ::seds::model::Name &transa
     transactionDecision->addAnswer(std::move(transitionElse));
 
     currentTransition->addAction(std::move(transactionDecision));
+    currentTransition->addAction(std::make_unique<::sdl::NextState>("", nullptr));
+
     return transactionAnswerTransitionPtr;
 }
 

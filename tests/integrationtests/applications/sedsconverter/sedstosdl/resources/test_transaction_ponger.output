@@ -81,6 +81,8 @@ process Ponger;
                     task Mpingargbig := Pingarg;
                     /* CIF ProcedureCall (600, 1162), (100, 50) */
                     call DoPongBig(Pingarg);
+                /* CIF Answer (1200, 1012), (400, 50) */
+                ELSE:
             enddecision;
     return;
     endprocedure;
@@ -144,6 +146,8 @@ process Ponger;
                 /* CIF Answer (3000, 1837), (400, 50) */
                 ELSE:
             enddecision;
+            /* CIF NextState (3600, 1912), (200, 50) */
+            NEXTSTATE -;
     endstate;
     /* CIF State (3900, 1687), (200, 50) */
     state s2;
@@ -171,5 +175,7 @@ process Ponger;
                 /* CIF Answer (5700, 1837), (400, 50) */
                 ELSE:
             enddecision;
+            /* CIF NextState (6300, 1912), (200, 50) */
+            NEXTSTATE -;
     endstate;
 endprocess Ponger;
