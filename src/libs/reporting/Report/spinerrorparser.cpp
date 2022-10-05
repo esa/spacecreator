@@ -23,7 +23,10 @@ QRegularExpressionMatchIterator reporting::SpinErrorParser::matchSpinErrors(cons
 
 QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &str) const
 {
+    qDebug() << "vv" << str;
+
     const QRegularExpression regex = buildDataConstraintViolationRegex();
+    qDebug() << "vv" << regex;
     QList<QVariant> violations;
     QRegularExpressionMatchIterator matches = regex.globalMatch(str);
     while (matches.hasNext()) {
@@ -40,10 +43,13 @@ QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString
         } else {
             report.boundingValue.setValue(boundingValueToken.toInt());
         }
+        qDebug() << "vv" << report.variableName << report.constraint << report.boundingValue;
         // add report to violations
         QVariant violation;
         violation.setValue(report);
         violations.append(violation);
+
+        qDebug() << "vv" << qvariant_cast<DataConstraintViolationReport>(violations.last()).variableName;
     }
     return violations;
 }

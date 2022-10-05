@@ -76,7 +76,19 @@ int main(int argc, char *argv[])
     auto reports = parser.parse(spinMessage.value());
 
     for (auto report : reports) {
-        qDebug() << report.rawErrorDetails;
+        qDebug() << "----- Report -----";
+        qDebug() << "Error number:" << report.errorNumber;
+        qDebug() << "Error type:" << report.errorType;
+        qDebug() << "Error depth:" << report.errorDepth;
+        qDebug() << "Error details:";
+        for (auto violationReport : report.parsedErrorDetails) {
+            DataConstraintViolationReport dataConstraintViolationReport =
+                    qvariant_cast<DataConstraintViolationReport>(violationReport);
+            qDebug() << "    ----- Error -----";
+            qDebug() << "    Variable name:" << dataConstraintViolationReport.variableName;
+            qDebug() << "    Operator:" << dataConstraintViolationReport.constraint;
+            qDebug() << "    Value:" << dataConstraintViolationReport.boundingValue;
+        }
     }
 
     return EXIT_SUCCESS;
