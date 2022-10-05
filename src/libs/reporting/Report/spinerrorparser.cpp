@@ -5,7 +5,7 @@
 
 reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spinMessage) const
 {
-    QRegularExpressionMatchIterator matches = findSpinErrors(spinMessage);
+    QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
     reporting::SpinErrorReport reports;
     while (matches.hasNext()) {
         // build report
@@ -15,7 +15,7 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spin
     return reports;
 }
 
-QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const QString &spinMessage) const
+QRegularExpressionMatchIterator reporting::SpinErrorParser::matchSpinErrors(const QString &spinMessage) const
 {
     const QRegularExpression regex = buildSpinErrorRegex();
     return regex.globalMatch(spinMessage);
