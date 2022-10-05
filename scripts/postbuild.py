@@ -109,6 +109,9 @@ if __name__ == '__main__':
 
     app_dir = args.app_dir
 
+    # Copy applications from build tree to AppDir tree
+    copy_applications(build_dir, app_dir)
+
     # Copy plugins from build tree to AppDir tree
     build_plugins_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     app_dir_plugins_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')

@@ -196,15 +196,20 @@ def install_grantlee(env_dir: str) -> None:
 
 
 def download_asn1scc(env_dir: str) -> None:
+    """
+    Downloads asn1scc archive. In the build step it will we compiled into the asn1scc-fuzzer executable
+    :param env_dir: The dir in which asn1scc is extracted
+    :return:
+    """
     asn_url = "https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2"
     ans_tarbz2 = join_dir(env_dir, 'asn1scc-bin-4.2.4.7f.tar.bz2')
-    print('Downloading {} to {}'.format(asn_url, ans_tarbz2))
+    print('prebuild.py: Downloading {} to {}'.format(asn_url, ans_tarbz2))
     try:
         urllib.request.urlretrieve(asn_url, ans_tarbz2)  # download qtcreator.7z to the root of the env folder
     except:
         print("Could not download asn1scc from {}".format(asn_url))
         exit(4)
-    print('Extracting {} to {}'.format(ans_tarbz2, env_dir))
+    print('prebuild.py: Extracting {} to {}'.format(ans_tarbz2, env_dir))
     with tarfile.open(ans_tarbz2, 'r:bz2') as ans_tarbz2_file:
         ans_tarbz2_file.extractall(env_dir)
 
