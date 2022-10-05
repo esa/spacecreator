@@ -20,6 +20,7 @@
 #include "scversion.h"
 
 #include <QCoreApplication>
+#include <QDebug>
 #include <QRegularExpression>
 #include <QString>
 #include <iostream>
@@ -74,5 +75,10 @@ int main(int argc, char *argv[])
     // parse message
     SpinErrorParser parser;
     auto report = parser.parse(spinMessage.value());
+
+    for (auto item : report) {
+        qDebug() << item.rawErrorDetails;
+    }
+
     return EXIT_SUCCESS;
 }
