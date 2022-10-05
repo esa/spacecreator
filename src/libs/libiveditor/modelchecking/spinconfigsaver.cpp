@@ -50,7 +50,7 @@ QString SpinConfigSaver::interfaceGenerationLimitsToString(const QList<QPair<QSt
 {
     QString generationLimitsStr;
     for (const auto &limitPair : interfaceGenerationLimits) {
-        generationLimitsStr += limitPair.first + " " + limitPair.second + ";";
+        generationLimitsStr += limitPair.first + " " + QString::number(limitPair.second) + ";";
     }
     return generationLimitsStr;
 }
@@ -113,6 +113,7 @@ bool SpinConfigSaver::readSpinConfig(QXmlStreamReader &xml)
     configData.rawCommandLine = readAttribute("rawcommandline", xml).toString();
     configData.searchShortestPath = readAttribute("searchshortestpath", xml).toInt();
     configData.searchStateLimit = readAttribute("searchstatelimit", xml).toInt();
+    configData.timeLimitSeconds = readAttribute("timelimitseconds", xml).toInt();
     configData.useBitHashing = readAttribute("usebithashing", xml).toInt();
     configData.useFairScheduling = readAttribute("usefairscheduling", xml).toInt();
 

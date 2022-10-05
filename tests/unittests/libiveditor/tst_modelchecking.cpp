@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "ivlibrary.h"
 #include "modelchecking/xmelreader.h"
 #include "modelchecking/xmelwriter.h"
-#include "ivlibrary.h"
 
 #include <QDebug>
 #include <QFile>
@@ -43,7 +43,18 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     Q_ASSERT(configFile.open(QFile::WriteOnly | QFile::Text));
 
     SpinConfigData spinConfigInput;
-    spinConfigInput.numberOfCores = 4;
+    spinConfigInput.errorLimit = 3;
+    spinConfigInput.explorationMode = ExplorationMode::BreadthFirst;
+    spinConfigInput.globalInputVectorGenerationLimit = 6;
+    spinConfigInput.ifaceGenerationLimits = { { "Iface1", 2 }, { "Iface2", 3 }, { "Iface3", 4 } };
+    spinConfigInput.memoryLimitMB = 1024;
+    spinConfigInput.numberOfCores = 2;
+    spinConfigInput.rawCommandLine = "Dummy cmd line";
+    spinConfigInput.searchShortestPath = true;
+    spinConfigInput.searchStateLimit = 5000;
+    spinConfigInput.timeLimitSeconds = 100;
+    spinConfigInput.useBitHashing = true;
+    spinConfigInput.useFairScheduling = true;
 
     XmelWriter writer({}, {}, { "DummyFunction" }, {}, spinConfigInput);
     Q_ASSERT(writer.writeFile(&configFile, configFilePath));
@@ -54,9 +65,20 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     Q_ASSERT(reader.read(&configFile) == 0);
 
     SpinConfigData spinConfig = reader.getSpinConfig();
-    Q_ASSERT(spinConfig.numberOfCores == 4);
+    Q_ASSERT(spinConfig.errorLimit == spinConfigInput.errorLimit);
+    Q_ASSERT(spinConfig.explorationMode == spinConfigInput.explorationMode);
+    Q_ASSERT(spinConfig.globalInputVectorGenerationLimit == spinConfigInput.globalInputVectorGenerationLimit);
+    // Q_ASSERT(spinConfig.ifaceGenerationLimits == spinConfigInput.ifaceGenerationLimits);
+    Q_ASSERT(spinConfig.memoryLimitMB == spinConfigInput.memoryLimitMB);
+    Q_ASSERT(spinConfig.numberOfCores == spinConfigInput.numberOfCores);
+    Q_ASSERT(spinConfig.rawCommandLine == spinConfigInput.rawCommandLine);
+    Q_ASSERT(spinConfig.searchShortestPath == spinConfigInput.searchShortestPath);
+    Q_ASSERT(spinConfig.searchStateLimit == spinConfigInput.searchStateLimit);
+    Q_ASSERT(spinConfig.timeLimitSeconds == spinConfigInput.timeLimitSeconds);
+    Q_ASSERT(spinConfig.useBitHashing == spinConfigInput.useBitHashing);
+    Q_ASSERT(spinConfig.useFairScheduling == spinConfigInput.useFairScheduling);
 
-    configFile.remove();
+    // configFile.remove();
 }
 
 QTEST_MAIN(tst_ModelChecking)
