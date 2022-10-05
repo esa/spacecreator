@@ -19,7 +19,7 @@
 
 #include "registrar.h"
 
-#include <spintrail/SpinTrailImporter/importer.h>
+#include <spintrail/SpinTrailImporter/spintrailimporter.h>
 
 using spintrail::importer::SpinTrailImporter;
 

@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "importer.h"
+#include "spintrailimporter.h"
 
 #include <QDebug>
 #include <QFile>
@@ -108,7 +108,5 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
                     eventType, std::move(proctypeName), std::move(channelName), std::move(parameters)));
         }
     }
-
-    Q_UNUSED(model);
 }
 }

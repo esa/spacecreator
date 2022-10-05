@@ -1,8 +1,8 @@
 project(SpinTrailImporter VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES importer.cpp)
+set(SOURCES spintrailimporter.cpp)
 
-set(INCLUDES importer.h)
+set(INCLUDES spintrailimporter.h)
 
 add_library(SpinTrailImporter STATIC)
 target_sources(SpinTrailImporter
