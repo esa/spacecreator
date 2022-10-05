@@ -16,6 +16,9 @@
 */
 
 #include "xmelreader.h"
+
+#include "spinconfigsaver.h"
+
 #include <QMessageBox>
 #include <QObject>
 
@@ -30,7 +33,10 @@ struct XmelReader::IFConfig {
 };
 
 XmelReader::XmelReader()
-    : propertiesSelected({}), subtypesSelected({}), functionsSelected({}), ifConfig(new IFConfig)
+    : propertiesSelected({})
+    , subtypesSelected({})
+    , functionsSelected({})
+    , ifConfig(new IFConfig)
 {
 }
 
@@ -42,7 +48,7 @@ int XmelReader::read(QIODevice *device)
 
     if (xml.readNextStartElement()) {
         if (xml.name() == QLatin1String("xmel")
-            && xml.attributes().value(QStringLiteral("version")) == QLatin1String("1.0")) {
+                && xml.attributes().value(QStringLiteral("version")) == QLatin1String("1.0")) {
             ret = readXMEL();
         } else {
             xml.raiseError(QObject::tr("The file is not a xmel version 1.0!"));
@@ -58,10 +64,10 @@ int XmelReader::readXMEL()
     Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("xmel"));
 
     while (xml.readNextStartElement()) {
-        if (xml.name() == QLatin1String("ModelCheckingWindow")){
-            if (readModelCheckingWindow() != 0) return -1;
-        }
-        else {
+        if (xml.name() == QLatin1String("ModelCheckingWindow")) {
+            if (readModelCheckingWindow() != 0)
+                return -1;
+        } else {
             xml.skipCurrentElement();
         }
     }
@@ -74,19 +80,18 @@ int XmelReader::readModelCheckingWindow()
     Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("ModelCheckingWindow"));
 
     while (xml.readNextStartElement()) {
-        if (xml.name() == QLatin1String("Configuration")){
-            if (readConfiguration() != 0) return -1;
-        }
-        else if (xml.name() == QLatin1String("NativeModelChecker")){
+        if (xml.name() == QLatin1String("Configuration")) {
+            if (readConfiguration() != 0)
+                return -1;
+        } else if (xml.name() == QLatin1String("NativeModelChecker")) {
             xml.skipCurrentElement();
-        }
-        else if (xml.name() == QLatin1String("IFModelChecker")){
-            if (!readIfModelChecker()) return -2;
-        }
-        else if (xml.name() == QLatin1String("SPINModelChecker")){
-            xml.skipCurrentElement();
-        }
-        else {
+        } else if (xml.name() == QLatin1String("IFModelChecker")) {
+            if (!readIfModelChecker())
+                return -2;
+        } else if (xml.name() == QLatin1String("SPINModelChecker")) {
+            if (!spinConfigSaver.readSpinConfig(xml))
+                return -3;
+        } else {
             xml.skipCurrentElement();
         }
     }
@@ -99,16 +104,16 @@ int XmelReader::readConfiguration()
     Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("Configuration"));
 
     while (xml.readNextStartElement()) {
-        if (xml.name() == QLatin1String("Properties")){
-            if (!readProperties()) return -1;
-        }
-        else if (xml.name() == QLatin1String("Subtyping")){
-            if (!readSubtyping()) return -2;
-        }
-        else if (xml.name() == QLatin1String("Submodel")){
-            if (!readSubmodel()) return -3;
-        }
-        else {
+        if (xml.name() == QLatin1String("Properties")) {
+            if (!readProperties())
+                return -1;
+        } else if (xml.name() == QLatin1String("Subtyping")) {
+            if (!readSubtyping())
+                return -2;
+        } else if (xml.name() == QLatin1String("Submodel")) {
+            if (!readSubmodel())
+                return -3;
+        } else {
             xml.skipCurrentElement();
         }
     }
@@ -123,7 +128,7 @@ bool XmelReader::readProperties()
     propertiesSelected.clear();
 
     while (xml.readNextStartElement()) {
-        if (xml.name() == QLatin1String("Property")){
+        if (xml.name() == QLatin1String("Property")) {
             Q_ASSERT(xml.attributes().hasAttribute("path"));
             propertiesSelected.append(xml.attributes().value("path").toString());
             xml.skipCurrentElement();
@@ -144,7 +149,6 @@ bool XmelReader::readSubtyping()
     Q_ASSERT(xml.attributes().hasAttribute("name"));
     subtypesSelected.append(xml.attributes().value("name").toString());
 
-
     xml.skipCurrentElement();
     return true;
 }
@@ -158,7 +162,7 @@ bool XmelReader::readSubmodel()
     bool hasFunction = false;
 
     while (xml.readNextStartElement()) {
-        if (xml.name() == QLatin1String("Function")){
+        if (xml.name() == QLatin1String("Function")) {
             Q_ASSERT(xml.attributes().hasAttribute("name"));
             functionsSelected.append(xml.attributes().value("name").toString());
             hasFunction = true;
@@ -204,22 +208,23 @@ bool XmelReader::readIfModelChecker()
 
 QString XmelReader::errorString() const
 {
-    return QObject::tr("%1\nLine %2, column %3")
-            .arg(xml.errorString())
-            .arg(xml.lineNumber())
-            .arg(xml.columnNumber());
+    return QObject::tr("%1\nLine %2, column %3").arg(xml.errorString()).arg(xml.lineNumber()).arg(xml.columnNumber());
 }
 
-QStringList XmelReader::getPropertiesSelected(){
+QStringList XmelReader::getPropertiesSelected()
+{
     return propertiesSelected;
 }
-QStringList XmelReader::getSubtypesSelected(){
+QStringList XmelReader::getSubtypesSelected()
+{
     return subtypesSelected;
 }
-QStringList XmelReader::getFunctionsSelected(){
+QStringList XmelReader::getFunctionsSelected()
+{
     return functionsSelected;
 }
-QStringList XmelReader::getIfConfig(){
+QStringList XmelReader::getIfConfig()
+{
     QStringList res = {};
 
     res.append(ifConfig->maxScenarios);
@@ -233,3 +238,7 @@ QStringList XmelReader::getIfConfig(){
     return res;
 }
 
+SpinConfigData XmelReader::getSpinConfig()
+{
+    return spinConfigSaver.getConfigData();
+}

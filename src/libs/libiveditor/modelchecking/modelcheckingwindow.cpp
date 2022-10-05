@@ -1156,7 +1156,10 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     ifOptions.append(d->ui->lineEdit_maxNumEnvRICalls->text());
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
-    XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
+
+    SpinConfigData spinConfigData;
+
+    XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions, spinConfigData);
     if (writer.writeFile(&configFile, configurationFileName)){
         statusBar()->showMessage("Configuration file saved as " + configurationFileName, 6000);
     } else {
@@ -1222,7 +1225,10 @@ bool ModelCheckingWindow::saveConfiguration()
     ifOptions.append(d->ui->lineEdit_maxNumEnvRICalls->text());
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
-    XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions);
+
+    SpinConfigData spinConfigData;
+
+    XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions, spinConfigData);
     if (writer.writeFile(&file, fileName + ".xml")){
         return true;
     } else {
@@ -1274,6 +1280,7 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
     setPropertiesSelection(reader.getPropertiesSelected());
     setSubtypesSelection(reader.getSubtypesSelected());
     setFunctionsSelection(reader.getFunctionsSelected());
+    setSpinConfigSelection(reader.getSpinConfig());
 
     // check IF options validity
     if (reader.getIfConfig().at(1) == "false" && reader.getIfConfig().at(2) == "false") {
@@ -1355,6 +1362,11 @@ void ModelCheckingWindow::setFunctionsSelection(QStringList functionsSelected){
     }
     // rebuild tree with selection
     listModelFunctions(this->functionsTopNodeWidgetItem, functionsSelected);
+
+}
+
+void ModelCheckingWindow::setSpinConfigSelection(const SpinConfigData &spinConfig){
+    qDebug() << "Spin config data number of cores: " << spinConfig.numberOfCores;
 
 }
 

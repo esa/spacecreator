@@ -11,3 +11,5 @@ addQtTest(tst_iveditorcore libiveditor)
 addQtTest(tst_positionlookuphelper libiveditor)
 addQtTest(tst_utils libiveditor)
 addQtTest(tst_xmldocexporter libiveditor)
+addQtTest(tst_modelchecking libiveditor "config-xmel.xml")
+

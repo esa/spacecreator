@@ -115,6 +115,8 @@ target_sources(${LIB_NAME} PRIVATE
     modelchecking/modelcheckingwindow.cpp
     modelchecking/modelcheckingwindow.h
     modelchecking/modelcheckingwindow.ui
+    modelchecking/spinconfigsaver.h
+    modelchecking/spinconfigsaver.cpp
     modelchecking/xmelwriter.h
     modelchecking/xmelwriter.cpp
     modelchecking/xmelreader.h

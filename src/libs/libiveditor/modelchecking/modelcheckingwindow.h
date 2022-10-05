@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "spinconfigsaver.h"
+
 #include <QMainWindow>
 #include <QFileInfo>
 #include <QTreeWidgetItem>
@@ -78,6 +80,7 @@ private Q_SLOTS:
     void setPropertiesSelection(QStringList propertiesSelected);
     void setSubtypesSelection(QStringList subtypesSelected);
     void setFunctionsSelection(QStringList functionsSelected);
+    void setSpinConfigSelection(const SpinConfigData &spinConfig);
     void on_checkBox_errorScenarios_stateChanged(int arg1);
     void on_checkBox_successScenarios_stateChanged(int arg1);
 
