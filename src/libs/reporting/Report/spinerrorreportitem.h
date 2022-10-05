@@ -50,4 +50,6 @@ struct SpinErrorReportItem {
     QList<QVariant> parsedErrorDetails;
 };
 
+typedef QList<SpinErrorReportItem> SpinErrorReport;
+
 }

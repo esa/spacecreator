@@ -59,7 +59,7 @@ public:
      *
      * @return  List of spin errors
      */
-    QList<SpinErrorReportItem> parse(const QString &spinMessage) const;
+    SpinErrorReport parse(const QString &spinMessage) const;
 
 private:
     QRegularExpressionMatchIterator findSpinErrors(const QString &spinMessage) const;

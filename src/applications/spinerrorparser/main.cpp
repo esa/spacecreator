@@ -26,7 +26,6 @@
 #include <iostream>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorparser.h>
-#include <reporting/Report/spinerrorreport.h>
 #include <string.h>
 
 using namespace reporting;
@@ -74,10 +73,10 @@ int main(int argc, char *argv[])
 
     // parse message
     SpinErrorParser parser;
-    auto report = parser.parse(spinMessage.value());
+    auto reports = parser.parse(spinMessage.value());
 
-    for (auto item : report) {
-        qDebug() << item.rawErrorDetails;
+    for (auto report : reports) {
+        qDebug() << report.rawErrorDetails;
     }
 
     return EXIT_SUCCESS;

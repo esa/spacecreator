@@ -8,7 +8,6 @@ set(SOURCES
 set(INCLUDES
     dataconstraintviolationreport.h
     spinerrorparser.h
-    spinerrorreport.h
     spinerrorreportitem.h)
 
 add_library(Report STATIC)

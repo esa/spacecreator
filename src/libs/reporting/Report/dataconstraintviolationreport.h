@@ -24,6 +24,8 @@
 #include <QString>
 #include <QVariant>
 
+namespace reporting {
+
 struct DataConstraintViolationReport {
     /** Name of the constraint violating variable */
     QString variableName;
@@ -33,5 +35,7 @@ struct DataConstraintViolationReport {
     QVariant boundingValue;
 };
 
+}
+
 // Add meta type for QVariant compability
-Q_DECLARE_METATYPE(DataConstraintViolationReport)
+Q_DECLARE_METATYPE(reporting::DataConstraintViolationReport)

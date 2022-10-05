@@ -3,12 +3,12 @@
 #include <QDebug>
 #include <QRegularExpression>
 
-QList<reporting::SpinErrorReportItem> reporting::SpinErrorParser::parse(const QString &spinMessage) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spinMessage) const
 {
     // match message report
     QRegularExpressionMatchIterator matches = findSpinErrors(spinMessage);
     // iterate over all reports
-    QList<SpinErrorReportItem> reports;
+    reporting::SpinErrorReport reports;
     while (matches.hasNext()) {
         // build report
         auto report = buildReport(matches.next());
