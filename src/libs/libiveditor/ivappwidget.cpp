@@ -500,7 +500,6 @@ QVector<QAction *> IVAppWidget::initActions()
     actCreateFunctionType->setActionGroup(actionGroup);
     connect(actCreateFunctionType, &QAction::triggered, this, [this]() {
         m_tool->setCurrentToolType(IVCreatorTool::ToolType::FunctionType);
-        qWarning() << Q_FUNC_INFO << "Not implemented yet.";
     });
     actCreateFunctionType->setIcon(QIcon(":/toolbar/icns/function_type.svg"));
 

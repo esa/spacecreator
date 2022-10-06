@@ -92,8 +92,10 @@ void IVFunction::cloneInternals()
     if (d->m_fnType) {
         d->m_fnType->rememberInstance(this);
 
+        d->m_implementations.clear();
         reflectAttrs(d->m_fnType->entityAttributes());
         reflectContextParams(d->m_fnType->contextParams());
+        checkDefaultFunctionImplementation();
     }
 }
 
@@ -103,6 +105,9 @@ void IVFunction::restoreInternals()
         d->m_fnType->forgetInstance(this);
 
     if (m_originalFields.collected()) {
+        for (const EntityAttribute &attr: qAsConst(d->m_implementations))
+            addImplementation(attr.name(), attr.value<QString>());
+        setDefaultImplementation(m_originalFields.defaultImplementation);
         reflectAttrs(m_originalFields.attrs);
         reflectContextParams(m_originalFields.params);
     }
@@ -192,8 +197,10 @@ void IVFunction::reflectAttrs(const EntityAttributes &attributes)
     }
 
     setEntityAttributes(prepared);
-    setEntityAttribute(meta::Props::token(meta::Props::Token::language),
-                       attributes.value(meta::Props::token(meta::Props::Token::type_language)).value());
+    if (attributes.contains(meta::Props::token(meta::Props::Token::type_language))) {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::language),
+                           attributes.value(meta::Props::token(meta::Props::Token::type_language)).value());
+    }
 }
 
 void IVFunction::reflectAttr(const QString &attrName)
