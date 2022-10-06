@@ -85,8 +85,8 @@ space-creator-qt5:
     - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
-    # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
+    # Create an AppImage from the app_dir and place it in the build dir
+    - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
   cache:
     key: asn1scc
     paths:
@@ -126,8 +126,8 @@ space-creator-qt6:
     - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
-    # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
+    # Create an AppImage from the app_dir and place it in the build dir
+    - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
   cache:
     key: asn1scc
     paths:
