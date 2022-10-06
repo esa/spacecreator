@@ -18,9 +18,9 @@ python3 ./scripts/build_spacecreator.py
 """
 
 
-def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_dir: str, env_qt_dir: str, build_asn1plugin: bool) -> None:
+def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_type: str, env_dir: str, env_qt_dir: str, build_asn1plugin: bool) -> None:
     env_qmake_bin = join_dir(env_qt_dir, 'bin', 'qmake')
-    qtc_install = join_dir(env_dir, 'spacecreator.AppDir')
+    qtc_install = app_dir
     env_qt_cmake_dir = join_dir(env_qt_dir, 'lib', 'cmake')
 
     exit_if_not_exists(project_dir)
@@ -72,6 +72,8 @@ if __name__ == '__main__':
                         help='Path to the folder where spacecreator is located')
     parser.add_argument('--build_dir', dest='build_dir', type=str, required=True,
                         help='Path to the build directory where spacecreator is to be build')
+    parser.add_argument('--app_dir', dest='app_dir', type=str, required=True,
+                        help='Path to the folder that contains AppDir')
     parser.add_argument('--build_type', dest='build_type', type=str, required=False,
                         help='Release or Debug')
     parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
@@ -96,6 +98,10 @@ if __name__ == '__main__':
         build_dir = join_dir(project_dir, 'build')
         print("build_spacecreator.py: Defaulting to build dir {}".format(build_dir))
 
+    if args.app_dir:
+        app_dir = args.app_dir
+        print("build_spacecreator.py: app_dir is {}".format(app_dir))
+
     if args.build_type:
         build_type = args.build_type
         print("build_spacecreator.py:  Build type {}".format(build_type))
@@ -113,13 +119,5 @@ if __name__ == '__main__':
     env_dir = args.env_dir
     env_qt_dir = args.env_qt_dir
 
-    print("build_spacecreator.py: project_dir is {}".format(project_dir))
-    print("build_spacecreator.py: build_dir is {}".format(build_dir))
-    print("build_spacecreator.py: build_type is {}".format(build_type))
-    print("build_spacecreator.py: env_dir is {}".format(env_dir))
-    print("build_spacecreator.py: env_qt_dir is {}".format(env_qt_dir))
-    print("build_spacecreator.py: build_asn1plugin is {}".format(build_asn1plugin))
-
     check_cmake_version(3, 16, 0)
-
-    build_spacecreator(project_dir, build_dir, build_type, env_dir, env_qt_dir, build_asn1plugin)
+    build_spacecreator(project_dir, build_dir, app_dir, build_type, env_dir, env_qt_dir, build_asn1plugin)
