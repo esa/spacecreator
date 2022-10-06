@@ -65,10 +65,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='create_appimage.py')
     parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
                         help='Path to the folder where spacecreator project is')
-    parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
-                        help='Path to the folder that contains the build environment')
     parser.add_argument('--app_dir', dest='app_dir', type=str, required=True,
                         help='Path to the folder that contains AppDir')
+    parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
+                        help='Path to the folder that contains the build environment')
     parser.add_argument('--project_version', dest='version', type=str, required=False,
                         help='Version number of spacecreator in the format X.Y.Z')
     parser.add_argument('--output_dir', dest='output_dir', type=str, required=False,
@@ -81,9 +81,13 @@ if __name__ == '__main__':
     else:
         project_dir = default_project_dir
         print("Defaulting to project dir {}".format(project_dir))
-
+    if args.app_dir:
+        app_dir = args.app_dir
+        print("App dir is {}".format(app_dir))
+    else:
+        project_dir = default_project_dir
+        print("Defaulting to project dir {}".format(project_dir))
     env_dir = args.env_dir
-    app_dir = args.app_dir
 
     if args.version:
         version = args.version
