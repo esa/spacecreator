@@ -85,6 +85,12 @@ int main(int argc, char *argv[])
         const DataConstraintViolationReport dataConstraintViolationReport =
                 qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
         qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
+        for (auto constraint : dataConstraintViolationReport.constraints) {
+            qDebug() << "    Constraint:" << constraint;
+        }
+        for (auto boundingValue : dataConstraintViolationReport.boundingValues) {
+            qDebug() << "    Bounding value:" << boundingValue;
+        }
     }
 
     return EXIT_SUCCESS;
