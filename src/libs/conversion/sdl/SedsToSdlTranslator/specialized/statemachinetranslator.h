@@ -114,6 +114,8 @@ public:
      *
      * @param context           Translation context
      * @param parameterMaps     Parameter maps
+     * @param stateMachine      SEDS state machine
+     * @param options           Conversion options
      */
     static auto translateParameterMaps(Context &context,
             const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps,

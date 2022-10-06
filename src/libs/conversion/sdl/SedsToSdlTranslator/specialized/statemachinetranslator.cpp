@@ -199,17 +199,6 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
         throw TranslationException("Sync commands with no associated transitions are not supported");
     }
 
-    if (transitions.size() == 1) {
-        return false;
-    }
-
-    for (const auto &transition : transitions) {
-        if (!transition->doActivity().has_value()) {
-            throw TranslationException(
-                    "Sync commands with transitions without associated activities are not supported");
-        }
-    }
-
     // primitive is now guaranteed to be OnCommandPrimitive
     const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&transitions[0]->primitive());
     if (primitive == nullptr) {
@@ -220,6 +209,17 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
 
     if (primitive->transaction().has_value()) {
         return true;
+    }
+
+    if (transitions.size() == 1) {
+        return false;
+    }
+
+    for (const auto &transition : transitions) {
+        if (!transition->doActivity().has_value()) {
+            throw TranslationException(
+                    "Sync commands with transitions without associated activities are not supported");
+        }
     }
 
     for (const auto &otherTransition : transitions) {

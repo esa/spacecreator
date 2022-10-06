@@ -37,8 +37,8 @@ cd $TEST_OUTPUT_DIR
 $DIFF pinger.pr ../resources/test_transaction_pinger.output \
     && $DIFF ponger.pr ../resources/test_transaction_ponger.output \
     && $OPENGEODE --toAda test_transaction_pinger.system_structure pinger.pr \
-    && asn1scc -Ada --type-prefix asn1Scc -equal dataview-uniq.asn pinger_datamodel.asn \
+    && asn1scc -Ada --type-prefix asn1Scc -equal dataview-uniq.asn pinger_datamodel.asn \ # TODO: gcc -c pinger.adb
     && $OPENGEODE --toAda test_transaction_ponger.system_structure ponger.pr \
-    && asn1scc -Ada --type-prefix asn1Scc -equal dataview-uniq.asn ponger_datamodel.asn \
+    && asn1scc -Ada --type-prefix asn1Scc -equal dataview-uniq.asn ponger_datamodel.asn \ # TODO: gcc -c ponger.adb
     && cd .. \
     && rm -r -f $TEST_OUTPUT_DIR
