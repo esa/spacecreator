@@ -26,6 +26,7 @@
 #include <extensionsystem/iplugin.h>
 #include <conversion/registry/registry.h>
 #include <QMenu>
+#include <QMap>
 #include <projectexplorer/project.h>
 
 namespace spctr {
@@ -52,6 +53,9 @@ private:
     auto importXml() -> void;
 
 private:
+    auto importXml(const QString &inputFilePath, const QString &functionBlockName, QStringList &asn1FileNames) -> void;
+    auto importXmlAndRemoveTemporaries(const QString &inputFilePath, const QString &functionBlockName) -> void;
+
     auto convert(const std::set<conversion::ModelType> &srcModelType, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxModelTypes, conversion::Options options)
             -> std::vector<std::unique_ptr<conversion::Model>>;
@@ -61,9 +65,19 @@ private:
     auto askAboutFilePathAndCheck(QString caption, QString filter, QString &inputFilePath) -> bool;
     auto askAboutFunctionBlockNameAndCheck(QString &functionBlockName) -> bool;
 
+    auto searchAndCheckMatLabModelWorkspaceFile(const QString& inputFilePath, QFileInfo &matlabModelWorkspaceFileInfo) -> bool;
+    auto generateMatLabCommand(const QString& inputFilePath, QFileInfo &matlabModelWorkspaceFileInfo) -> QString;
+    auto generateWorkspaceLoadFunction(QFileInfo &matlabModelWorkspaceFileInfo) -> QString;
+    auto generateTasteExporterFunction(const QString& inputFilePath) -> QString;
+    auto generateExportedXmlFilePath(const QString& inputFilePath) -> QString;
+    auto getWorkspaceLoadFunctionForWorkspaceFileExt(const QString &workspaceFileExt) -> QString;
+    auto copySlxFileToWorkDirectory(const QString &inputFilePath, const QString &functionBlockName) -> void;
+    auto removeMatLabTemporaries() -> void;
+
     auto getAsnModelFilenames(const std::vector<std::unique_ptr<conversion::Model>> &models) -> QStringList;
     auto addAsn1FilesToCurrentProject(QStringList fileNames) -> void;
     auto tryAddIvToCurrentProject(const QString &ivConfig) -> bool;
+    auto removeConvertersTemporaries(const QStringList &asn1FileNames) -> void;
 
     auto mergeIvModels(ivm::IVModel *const dstIvModel, ivm::IVModel *const srcIvModel) -> void;
     auto doesModelContainFunction(ivm::IVModel *const model, ivm::IVFunction *const function) -> bool;
@@ -71,14 +85,26 @@ private:
     auto getCurrentIvModel() -> ivm::IVModel *;
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto isFileIsOneOfMatLabStandardDataTypesFiles(const QString &fileName) -> bool;
+    auto checkIfFileExistsAndRemoveIt(const QString &filePath) -> void;
     auto createActionContainerInTools(const QString &title) -> Core::ActionContainer *;
     auto onActiveProjectChanged(ProjectExplorer::Project *project) -> void;
 
 private:
-    conversion::Registry m_registry;
-    
     const QString m_tmpIvFileName = "tmp-interfaceview.xml";
     const QString m_functionBlockDefaultImplementation = "QGenC";
+    const QString m_tasteExporterResultDirectory = "exported";
+
+    const QStringList m_matlabWorkspaceFilesExtFilter = { "*.m", "*.mat" };
+    const QMap<QString, QString> m_matlabWorkspaceLoadFunctions = {{"m", "run"}, {"mat", "load"}};
+
+    const QString m_matlabWorkspaceLoadFunctionTemplate = "%1('%2')";
+    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "matlab -batch \"%1 exit;\"";
+    const QString m_matlabCommandWithWorkspaceLoadTemplate = "matlab -batch \"%1 %2 exit;\"";
+    const QString m_tasteExporterFunctionTemplate = "taste_export('%1', '%2');";
+    const QString m_exportedXmlFilePathTemplate = "%1/%2.xml";
+    const QString m_slxFileWorkDirectoryTemplate = "%1/work/%2/%3/src";
+
+    conversion::Registry m_registry;
 
     QMenu *m_simulinkMenu = nullptr;
     ProjectExplorer::Project *m_currentProject = nullptr;
