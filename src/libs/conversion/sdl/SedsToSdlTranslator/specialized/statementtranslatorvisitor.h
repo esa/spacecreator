@@ -271,8 +271,6 @@ private:
     ::sdl::Transition *m_sdlTransition;
     const Options &m_options;
 
-    static const inline QString m_sedsTransactionParamName = "sedsTransactionName";
-
     static auto findIvInterface(ivm::IVFunction *function, const QString &interfaceName) -> ivm::IVInterface *;
 
     static auto translateArgument(const seds::model::NamedArgumentValue &argument) -> ::sdl::ProcedureCall::Argument;

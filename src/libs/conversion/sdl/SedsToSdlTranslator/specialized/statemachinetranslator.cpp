@@ -19,8 +19,9 @@
 
 #include "statemachinetranslator.h"
 
-#include "descriptiontranslator.h"
-#include "statementtranslatorvisitor.h"
+#include "constants.h"
+#include "specialized/descriptiontranslator.h"
+#include "specialized/statementtranslatorvisitor.h"
 
 #include <algorithm>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
@@ -356,17 +357,16 @@ static inline auto handleCommandTransactions(Context &context,
                 "SEDS transaction feature was used but no ASN.1 type for transaction name was specified");
     }
 
-    const QString transactionParamName = "sedsTransactionName";
     const auto transactionParamTypeName = options.value(conversion::seds::SedsOptions::transactionNameType).value();
 
     // Add transaction name parameter to the IV interface
     auto ivParameter = shared::InterfaceParameter(
-            transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
+            Constants::transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
     ivInterface->addParam(ivParameter);
 
     // Add transaction name parameter to the interface procedure
-    auto transactionParameter =
-            std::make_unique<::sdl::ProcedureParameter>(transactionParamName, transactionParamTypeName, "in");
+    auto transactionParameter = std::make_unique<::sdl::ProcedureParameter>(
+            Constants::transactionParamName, transactionParamTypeName, "in");
     procedure->addParameter(std::move(transactionParameter));
 
     // Add variable to pass transaction name outside of the procedure
@@ -377,7 +377,7 @@ static inline auto handleCommandTransactions(Context &context,
     sdlProcess->addVariable(std::move(transactionVariable));
 
     // Create a decision based on the transaction name
-    auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(transactionParamName);
+    auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(Constants::transactionParamName);
     auto sdlDecision = std::make_unique<::sdl::Decision>();
     sdlDecision->setExpression(std::move(sdlDecisionExpression));
 
@@ -412,7 +412,7 @@ static inline auto handleCommandTransactions(Context &context,
     auto sdlTransition = std::make_unique<::sdl::Transition>();
 
     auto transactionVariableAssignment = std::make_unique<::sdl::Task>(
-            "", QString("%1 := %2").arg(transactionVariableName).arg(transactionParamName));
+            "", QString("%1 := %2").arg(transactionVariableName).arg(Constants::transactionParamName));
     sdlTransition->addAction(std::move(transactionVariableAssignment));
 
     sdlTransition->addAction(std::move(sdlDecision));
@@ -429,17 +429,16 @@ static inline auto handleParameterTransactions(const std::vector<const ::seds::m
                 "SEDS transaction feature was used but no ASN.1 type for transaction name was specified");
     }
 
-    const QString transactionParamName = "sedsTransactionName";
     const auto transactionParamTypeName = options.value(conversion::seds::SedsOptions::transactionNameType).value();
 
     // Add transaction name parameter to the IV interface
     auto ivParameter = shared::InterfaceParameter(
-            transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
+            Constants::transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
     ivInterface->addParam(ivParameter);
 
     // Add transaction name parameter to the interface procedure
-    auto transactionParameter =
-            std::make_unique<::sdl::ProcedureParameter>(transactionParamName, transactionParamTypeName, "in");
+    auto transactionParameter = std::make_unique<::sdl::ProcedureParameter>(
+            Constants::transactionParamName, transactionParamTypeName, "in");
     procedure->addParameter(std::move(transactionParameter));
 
     // Add variable to pass transaction name outside of the procedure
@@ -467,7 +466,7 @@ static inline auto handleParameterTransactions(const std::vector<const ::seds::m
     }
 
     // Create a decision based on the transaction names
-    auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(transactionParamName);
+    auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(Constants::transactionParamName);
     auto sdlDecision = std::make_unique<::sdl::Decision>();
     sdlDecision->setExpression(std::move(sdlDecisionExpression));
 
@@ -489,7 +488,7 @@ static inline auto handleParameterTransactions(const std::vector<const ::seds::m
     auto sdlTransition = std::make_unique<::sdl::Transition>();
 
     auto transactionVariableAssignment = std::make_unique<::sdl::Task>(
-            "", QString("%1 := %2").arg(transactionVariableName).arg(transactionParamName));
+            "", QString("%1 := %2").arg(transactionVariableName).arg(Constants::transactionParamName));
     sdlTransition->addAction(std::move(transactionVariableAssignment));
 
     sdlTransition->addAction(std::move(sdlDecision));

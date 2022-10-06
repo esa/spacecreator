@@ -19,20 +19,21 @@
 
 #include "statementtranslatorvisitor.h"
 
-#include "components/activities/coremathoperator.h"
-#include "descriptiontranslator.h"
-#include "mathoperationtranslator.h"
-#include "splinecalibratortranslator.h"
-#include "statemachinetranslator.h"
-#include "translation/exceptions.h"
+#include "constants.h"
+#include "specialized/descriptiontranslator.h"
+#include "specialized/mathoperationtranslator.h"
+#include "specialized/splinecalibratortranslator.h"
+#include "specialized/statemachinetranslator.h"
 
 #include <algorithm>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/options.h>
 #include <conversion/common/overloaded.h>
+#include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/interfacetranslatorhelper.h>
 #include <ivcore/ivfunction.h>
 #include <regex>
+#include <seds/SedsModel/components/activities/coremathoperator.h>
 #include <seds/SedsOptions/options.h>
 
 using conversion::Escaper;
@@ -811,7 +812,7 @@ auto StatementTranslatorVisitor::handleTransaction(const ::seds::model::Name &tr
     call->addArgument(std::move(transactionNameLiteral));
 
     auto ivParameter = shared::InterfaceParameter(
-            m_sedsTransactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
+            Constants::transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
     ivInterface->addParam(ivParameter);
 }
 
