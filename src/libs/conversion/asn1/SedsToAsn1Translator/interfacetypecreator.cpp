@@ -20,7 +20,6 @@
 #include "interfacetypecreator.h"
 
 #include "datatypetranslationhelper.h"
-//#include "generictypecreator.h"
 
 #include <asn1library/asn1/acnsequencecomponent.h>
 #include <asn1library/asn1/asnsequencecomponent.h>

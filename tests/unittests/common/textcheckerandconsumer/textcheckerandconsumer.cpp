@@ -53,8 +53,6 @@ const QStringList TextCheckerAndConsumer::readLinesFromFile(const QString &filen
     const QByteArray expectedData = expectedOutFile.readAll();
     const QString expectedText = QString::fromStdString(expectedData.toStdString());
     QStringList expectedStringList = expectedText.split("\n");
-    // const QVector<QString> expectedStringVector = expectedStringList.toVector();
-    // std::vector<QString> expectedOutput = expectedStringVector.toStdVector();
 
     for (auto &out : expectedStringList) {
         out = out.trimmed();
