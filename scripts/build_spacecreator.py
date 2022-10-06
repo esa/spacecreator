@@ -47,7 +47,7 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
     print_cmd(ninja_cmd)
     completed_process = subprocess.run(ninja_cmd)
     if not completed_process.returncode == 0:
-        print("CMake failed")
+        print("build_spacecreator.py: CMake failed")
         exit(1)
 
     # Build SpaceCreator using ninja
@@ -57,7 +57,7 @@ def build_spacecreator(project_dir: str, build_dir: str, build_type: str, env_di
     print_cmd(build_cmd)
     completed_process = subprocess.run(build_cmd)
     if not completed_process.returncode == 0:
-        print("Building Spacecreator failed")
+        print("build_spacecreator.py: Building Spacecreator failed")
         exit(2)
 
 
@@ -84,31 +84,31 @@ if __name__ == '__main__':
 
     if args.project_dir:
         project_dir = args.project_dir
-        print("build_spacecreator: Project dir is {}".format(project_dir))
+        print("build_spacecreator.py: Project dir is {}".format(project_dir))
     else:
         project_dir = default_project_dir
-        print("Defaulting to project dir {}".format(project_dir))
+        print("build_spacecreator.py: Defaulting to project dir {}".format(project_dir))
 
     if args.build_dir:
         build_dir = args.build_dir
-        print("build_spacecreator: build dir is {}".format(build_dir))
+        print("build_spacecreator.py: build dir is {}".format(build_dir))
     else:
         build_dir = join_dir(project_dir, 'build')
-        print("build_spacecreator: Defaulting to build dir {}".format(build_dir))
+        print("build_spacecreator.py: Defaulting to build dir {}".format(build_dir))
 
     if args.build_type:
         build_type = args.build_type
-        print("build_spacecreator: Build type {}".format(build_type))
+        print("build_spacecreator.py:  Build type {}".format(build_type))
     else:
         build_type = 'Release'
-        print("build_spacecreator: Defaulting to build type {}".format(build_type))
+        print("build_spacecreator.py:  Defaulting to build type {}".format(build_type))
 
     if args.no_build_asn1plugin:
         build_asn1plugin = False
-        print("build_spacecreator: Skipping ASN1Plugin")
+        print("build_spacecreator.py:  Skipping ASN1Plugin")
     else:
         build_asn1plugin = True
-        print("build_spacecreator: Building ASN1Plugin")
+        print("build_spacecreator.py:  Building ASN1Plugin")
 
     env_dir = args.env_dir
     env_qt_dir = args.env_qt_dir

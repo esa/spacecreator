@@ -34,7 +34,7 @@ def ensure_dir(dir_str: str) -> None:
 def exit_if_not_exists(path: str):
     if not os.path.exists(path):
         print("Path {} does not exist. Exiting".format(path))
-        exit(1)
+        raise Exception("Path {} does not exist. Exiting".format(path))
 
 
 def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str) -> None:
@@ -90,9 +90,9 @@ def check_cmake_version(min_major: int, min_minor: int, min_patch: int) -> None:
     actual_version = "{}.{}.{}".format(major, minor, patch)
     actual_version_to_small = min_major > major or min_minor > minor or min_patch > patch
     if actual_version_to_small:
-        print("Found CMake version is {} but minimum required version is {}. Consult quickstart.md for how to upgrade CMake".format(actual_version, minimum_version_required))
+        print("build_spacecreator.py: Found CMake version is {} but minimum required version is {}. Consult quickstart.md for how to upgrade CMake".format(actual_version, minimum_version_required))
         exit(4)
-    print("Found CMake version {} which is greater than or equal to required version {}".format(actual_version, minimum_version_required))
+
 
 def read_version_from_file(version_file: str, ci_build_id: str) -> []:
     version_cmd = [version_file]
