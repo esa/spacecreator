@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Create AppImage package of SpaceCreator
 set -e
 
