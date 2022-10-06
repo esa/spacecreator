@@ -26,7 +26,7 @@ mkdir -p ${PACKAGE_DIR}
 ### INSTALL REQUIRED SYSTEM PACKAGES
 ###
 
-apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip
+apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip mesa-common-dev libglu1-mesa-dev libxml2-dev
 
 ###
 ### DOWNLOAD QTCREATOR AND GRANTLEE
