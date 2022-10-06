@@ -9,7 +9,5 @@ execute_process(
 # Installing the asn compiler
 
 set(IDE_LIBEXEC_DIR "lib/x86_64-linux-gnu/qtcreator/libexec")
-message(STATUS "---- moving dir ${ASNSCC_DIR}/libexec/qtcreator/asn1scc-Fuzzer to ${IDE_LIBEXEC_DIR}")
-message(STATUS "---- moving dir ${ASNSCC_DIR}/share/qtcreator/asn1acn to ${IDE_DATA_PATH}")
 install(DIRECTORY "${ASNSCC_DIR}/libexec/qtcreator/asn1scc-Fuzzer" DESTINATION "${IDE_LIBEXEC_DIR}" USE_SOURCE_PERMISSIONS)
 install(DIRECTORY "${ASNSCC_DIR}/share/qtcreator/asn1acn" DESTINATION "${IDE_DATA_PATH}" USE_SOURCE_PERMISSIONS)
