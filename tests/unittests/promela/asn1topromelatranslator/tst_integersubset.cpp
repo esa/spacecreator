@@ -49,8 +49,8 @@ void tst_IntegerSubset::testSimpleSumTwoNumbersB()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 2);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 1l)});
-    QCOMPARE(result.getRanges().back(), {std::make_pair(5l, 5l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 1l)});
+    QCOMPARE(result.getRanges().back(), IntegerSubset::Range{std::make_pair(5l, 5l)});
 }
 
 void tst_IntegerSubset::testSimpleSumSameNumber()
@@ -76,8 +76,8 @@ void tst_IntegerSubset::testSumRangeAndNumberSeparatedLeft()
     QVERIFY(!result.isSingleValue());
 
     QCOMPARE(result.getRanges().size(), 2);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 1l)});
-    QCOMPARE(result.getRanges().back(), {std::make_pair(3l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 1l)});
+    QCOMPARE(result.getRanges().back(), IntegerSubset::Range{std::make_pair(3l, 10l)});
 }
 
 void tst_IntegerSubset::testSumRangeAndNumberSeparatedRight()
@@ -90,8 +90,8 @@ void tst_IntegerSubset::testSumRangeAndNumberSeparatedRight()
     QVERIFY(!result.isSingleValue());
 
     QCOMPARE(result.getRanges().size(), 2);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(3l, 5l)});
-    QCOMPARE(result.getRanges().back(), {std::make_pair(7l, 7l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(3l, 5l)});
+    QCOMPARE(result.getRanges().back(), IntegerSubset::Range{std::make_pair(7l, 7l)});
 }
 
 void tst_IntegerSubset::testSumRangeAndNumberIncludedMiddle()
@@ -103,7 +103,7 @@ void tst_IntegerSubset::testSumRangeAndNumberIncludedMiddle()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumRangeAndNumberIncludedLeft()
@@ -115,7 +115,7 @@ void tst_IntegerSubset::testSumRangeAndNumberIncludedLeft()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumRangeAndNumberIncludedRight()
@@ -127,7 +127,7 @@ void tst_IntegerSubset::testSumRangeAndNumberIncludedRight()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumRangeAndNumberNextLeft()
@@ -139,7 +139,7 @@ void tst_IntegerSubset::testSumRangeAndNumberNextLeft()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumRangeAndNumberNextRight()
@@ -151,7 +151,7 @@ void tst_IntegerSubset::testSumRangeAndNumberNextRight()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumTwoRangesSeparated()
@@ -163,8 +163,8 @@ void tst_IntegerSubset::testSumTwoRangesSeparated()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 2);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 3l)});
-    QCOMPARE(result.getRanges().back(), {std::make_pair(7l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 3l)});
+    QCOMPARE(result.getRanges().back(), IntegerSubset::Range{std::make_pair(7l, 10l)});
 }
 
 void tst_IntegerSubset::testSumTwoRangesSeparatedNext()
@@ -176,7 +176,7 @@ void tst_IntegerSubset::testSumTwoRangesSeparatedNext()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumTwoRangesIncludedMiddle()
@@ -188,7 +188,7 @@ void tst_IntegerSubset::testSumTwoRangesIncludedMiddle()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumTwoRangesIncludedLeft()
@@ -200,7 +200,7 @@ void tst_IntegerSubset::testSumTwoRangesIncludedLeft()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumTwoRangesIncludedRight()
@@ -212,7 +212,7 @@ void tst_IntegerSubset::testSumTwoRangesIncludedRight()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testSumThreeRanges()
@@ -228,7 +228,7 @@ void tst_IntegerSubset::testSumThreeRanges()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 10l)});
 }
 
 void tst_IntegerSubset::testIntersectTwoNumbers()
@@ -250,7 +250,7 @@ void tst_IntegerSubset::testIntersectSameNumber()
 
     QVERIFY(result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(2l, 2l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(2l, 2l)});
 }
 
 void tst_IntegerSubset::testIntersectRangeNumberMiddle()
@@ -262,7 +262,7 @@ void tst_IntegerSubset::testIntersectRangeNumberMiddle()
 
     QVERIFY(result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(2l, 2l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(2l, 2l)});
 }
 
 void tst_IntegerSubset::testIntersectRangeNumberLeft()
@@ -274,7 +274,7 @@ void tst_IntegerSubset::testIntersectRangeNumberLeft()
 
     QVERIFY(result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(1l, 1l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(1l, 1l)});
 }
 
 void tst_IntegerSubset::testIntersectRangeNumberRight()
@@ -286,7 +286,7 @@ void tst_IntegerSubset::testIntersectRangeNumberRight()
 
     QVERIFY(result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(10l, 10l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(10l, 10l)});
 }
 
 void tst_IntegerSubset::testIntersectRangesSeparated()
@@ -308,7 +308,7 @@ void tst_IntegerSubset::testIntersectRangesEdge()
 
     QVERIFY(result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(5l, 5l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(5l, 5l)});
 }
 
 void tst_IntegerSubset::testIntersectRangesIncludedMiddle()
@@ -320,7 +320,7 @@ void tst_IntegerSubset::testIntersectRangesIncludedMiddle()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(2l, 5l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(2l, 5l)});
 }
 
 void tst_IntegerSubset::testIntersectRangesIncludedLeft()
@@ -332,7 +332,7 @@ void tst_IntegerSubset::testIntersectRangesIncludedLeft()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(2l, 5l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(2l, 5l)});
 }
 
 void tst_IntegerSubset::testIntersectRangesIncludedRight()
@@ -344,7 +344,7 @@ void tst_IntegerSubset::testIntersectRangesIncludedRight()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 1);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(2l, 5l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(2l, 5l)});
 }
 
 void tst_IntegerSubset::testIntersectThreeRanges()
@@ -360,8 +360,8 @@ void tst_IntegerSubset::testIntersectThreeRanges()
 
     QVERIFY(!result.isSingleValue());
     QCOMPARE(result.getRanges().size(), 2);
-    QCOMPARE(result.getRanges().front(), {std::make_pair(2l, 3l)});
-    QCOMPARE(result.getRanges().back(), {std::make_pair(7l, 8l)});
+    QCOMPARE(result.getRanges().front(), IntegerSubset::Range{std::make_pair(2l, 3l)});
+    QCOMPARE(result.getRanges().back(), IntegerSubset::Range{std::make_pair(7l, 8l)});
 }
 
 }

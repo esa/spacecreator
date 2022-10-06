@@ -54,10 +54,10 @@ std::vector<QString> TextCheckerAndConsumer::readLinesFromFile(const QString &fi
     const QString expectedText = QString::fromStdString(expectedData.toStdString());
     const QStringList expectedStringList = expectedText.split("\n");
     const QVector<QString> expectedStringVector = expectedStringList.toVector();
-    std::vector<QString> expectedOutput = expectedStringVector.toStdVector();
+    std::vector<QString> expectedOutput;
 
-    for (auto &out : expectedOutput) {
-        out = out.trimmed();
+    for (auto &out : expectedStringVector) {
+        expectedOutput.push_back(out.trimmed());
     }
 
     return expectedOutput;

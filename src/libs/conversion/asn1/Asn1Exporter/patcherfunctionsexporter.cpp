@@ -28,6 +28,13 @@ using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::Type;
 using conversion::exporter::ExportException;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define SEDS_SPLIT_BEHAVIOR QString::SkipEmptyParts
+#else
+#define SEDS_SPLIT_BEHAVIOR Qt::SkipEmptyParts
+#endif
+
+
 namespace conversion::asn1::exporter {
 
 void PatcherFunctionsExporter::exportModel(const Asn1Model *model, const Options &options)
@@ -195,7 +202,7 @@ void PatcherFunctionsExporter::generateEncodingFunctionBody(const Sequence *sequ
     for (const auto &patcherSnippet : sequence->patcherSnippets()) {
         stream << '\n';
 
-        for (const auto &line : patcherSnippet.encodingFunction.split('\n', QString::SkipEmptyParts)) {
+        for (const auto &line : patcherSnippet.encodingFunction.split('\n', SEDS_SPLIT_BEHAVIOR)) {
             stream << "\n\t" << line;
         }
     }
@@ -241,7 +248,7 @@ void PatcherFunctionsExporter::generateDecodingValidatorBody(const Sequence *seq
     for (const auto &patcherSnippet : sequence->patcherSnippets()) {
         stream << '\n';
 
-        for (const auto &line : patcherSnippet.decodingValidator.split('\n', QString::SkipEmptyParts)) {
+        for (const auto &line : patcherSnippet.encodingFunction.split('\n', SEDS_SPLIT_BEHAVIOR)) {
             stream << "\n\t" << line;
         }
     }

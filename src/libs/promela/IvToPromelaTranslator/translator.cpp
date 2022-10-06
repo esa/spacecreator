@@ -72,6 +72,13 @@ using shared::ExportableProperty;
 using shared::InterfaceParameter;
 using shared::VEObject;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define SEDS_SPLIT_BEHAVIOR QString::SkipEmptyParts
+#else
+#define SEDS_SPLIT_BEHAVIOR Qt::SkipEmptyParts
+#endif
+
+
 namespace promela::translator {
 
 IvToPromelaTranslator::ObserverAttachment::Kind IvToPromelaTranslator::ObserverAttachment::stringToKind(
@@ -98,7 +105,7 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(const QString &spe
     const auto recipientPrefix = QString(">");
     const auto senderPrefix = QString("<");
     const auto priorityPrefix = QString("p");
-    const auto elements = specification.split(separator, QString::KeepEmptyParts);
+    const auto elements = specification.split(separator, SEDS_SPLIT_BEHAVIOR);
     if (elements.size() < 4) {
         const auto message =
                 QString("Observer attachment specification <%1> contains too few elements").arg(specification);

@@ -31,6 +31,12 @@
 #include <QWidget>
 #include <cmath>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define SEDS_SPLIT_BEHAVIOR QString::SkipEmptyParts
+#else
+#define SEDS_SPLIT_BEHAVIOR Qt::SkipEmptyParts
+#endif
+
 namespace shared {
 
 AddPropertyTemplateDialog::AddPropertyTemplateDialog(
@@ -115,11 +121,7 @@ bool AddPropertyTemplateDialog::validateType()
 QStringList AddPropertyTemplateDialog::listValues() const
 {
     const QString &values = ui->teValues->toPlainText().trimmed();
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-    return values.split(QLatin1Char(','), QString::SkipEmptyParts);
-#else
-    return values.split(QLatin1Char(','), Qt::SkipEmptyParts);
-#endif
+    return values.split(QLatin1Char(','), SEDS_SPLIT_BEHAVIOR);
 }
 
 bool AddPropertyTemplateDialog::validateValuesList()

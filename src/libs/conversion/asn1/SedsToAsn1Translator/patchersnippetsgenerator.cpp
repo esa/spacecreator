@@ -19,6 +19,7 @@
 
 #include "patchersnippetsgenerator.h"
 
+#include <QIODevice>
 #include <QTextStream>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>

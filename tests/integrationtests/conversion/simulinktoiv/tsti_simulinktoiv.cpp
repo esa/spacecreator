@@ -28,6 +28,7 @@
 #include <libiveditor/iveditor.h>
 #include <simulink/SimulinkOptions/options.h>
 #include <simulink/SimulinkXmlImporter/importer.h>
+#include <array>
 
 using conversion::iv::IvOptions;
 using conversion::iv::SimulinkToIvOptions;

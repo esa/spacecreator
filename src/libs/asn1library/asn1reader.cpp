@@ -414,7 +414,7 @@ QByteArray Asn1Reader::fileHash(const QStringList &fileNames) const
          * The cache xml file contains original locations
          * of input ASN.1 files, what was origin of at least one bug.
          */
-        content.append(fileName);
+        content.append(fileName.toUtf8());
         QFile file(fileName);
         if (file.open(QIODevice::ReadOnly)) {
             content.append(file.readAll());

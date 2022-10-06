@@ -27,6 +27,7 @@
 #include <asn1library/asn1valueparser.h>
 #include <ivcore/ivinterface.h>
 #include <map>
+#include <unordered_map>
 #include <optional>
 #include <shared/parameter.h>
 #include <shared/qstringhash.h>
