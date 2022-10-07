@@ -67,6 +67,7 @@ space-creator-deploy:
   image: debian:buster
   stage: build-test
   before_script:
+    - apt update
     - ./install-requirements.sh
   script:
     - ./build-and-generate-appimage.sh
