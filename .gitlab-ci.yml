@@ -64,7 +64,7 @@ space-creator-dev:
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
 
 space-creator-deploy:
-  image: ${CI_REGISTRY_IMAGE}/debian:buster
+  image: debian:buster
   stage: build-test
   before_script:
     - ./install-requirements.sh
