@@ -695,9 +695,9 @@
          </widget>
         </item>
         <item row="1" column="3" colspan="3">
-         <widget class="QCheckBox" name="checkBox_successScenarios">
+         <widget class="QCheckBox" name="checkBox_useFairScheduling">
           <property name="text">
-           <string>Success scenarios</string>
+           <string>Use fair scheduling</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -744,9 +744,12 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_10">
+         <widget class="QCheckBox" name="checkBox_useBitHashing">
           <property name="text">
-           <string>Options:</string>
+           <string>Use bit hashing</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -793,9 +796,9 @@
          </widget>
         </item>
         <item row="1" column="1" colspan="2">
-         <widget class="QCheckBox" name="checkBox_errorScenarios">
+         <widget class="QCheckBox" name="checkBox_searchShortestPath">
           <property name="text">
-           <string>Error scenarios</string>
+           <string>Search shortest path</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -823,7 +826,7 @@
         <item row="2" column="0" colspan="4">
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Max. number of scenarios to look for:</string>
+           <string>Number of cores:</string>
           </property>
          </widget>
         </item>
@@ -847,7 +850,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Max. number of environment calls:</string>
+           <string>Search state limit:</string>
           </property>
          </widget>
         </item>
@@ -859,7 +862,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Max. number of states to explore:</string>
+           <string>Error limit:</string>
           </property>
          </widget>
         </item>
