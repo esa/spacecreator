@@ -103,8 +103,8 @@ private:
      * @param   options             Options
      */
     auto translatePackage(const ::seds::model::Package &sedsPackage, ivm::IVModel *ivModel,
-            const std::vector<::seds::model::Package> &sedsPackages, bool generateFunction, const Options &options) const
-            -> void;
+            const std::vector<::seds::model::Package> &sedsPackages, bool generateFunction,
+            const Options &options) const -> void;
 };
 
 } // namespace conversion::iv::translator::seds

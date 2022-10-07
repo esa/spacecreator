@@ -31,7 +31,7 @@ namespace conversion {
 class Options;
 } // namespace conversion
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Helper for InterfaceView translator

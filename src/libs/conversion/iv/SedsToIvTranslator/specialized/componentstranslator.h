@@ -61,8 +61,8 @@ public:
      * @param   sedsPackage         Package with components to translate
      * @param   sedsPackages        List of SEDS packages
      */
-    ComponentsTranslator(const ::seds::model::Package *sedsPackage, const std::vector<::seds::model::Package> &sedsPackages,
-            const Options &options);
+    ComponentsTranslator(const ::seds::model::Package *sedsPackage,
+            const std::vector<::seds::model::Package> &sedsPackages, const Options &options);
     /**
      * @brief   Deleted copy constructor
      */
