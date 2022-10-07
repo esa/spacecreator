@@ -1,4 +1,3 @@
-image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
 
 stages:
   - build-test
@@ -7,6 +6,7 @@ stages:
   - documentation
 
 default:
+  image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
   before_script:
     - export PROJECT_ROOT=$(pwd)
     - export ENV_QTC_VERSION_SHORT=4.8
@@ -38,6 +38,7 @@ default:
 
 
 space-creator-dev:
+  image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
   stage: build-test
   script:
     # build space creator
@@ -62,8 +63,23 @@ space-creator-dev:
     # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
 
+space-creator-deploy:
+  image: ${CI_REGISTRY_IMAGE}/debian:buster
+  stage: build-test
+  before_script:
+    - ./install-requirements.sh
+  script:
+    - ./build-and-generate-appimage.sh
+  after_script:
+    - cp package/spacecreator*.AppImage spacecreator.AppImage
+  artifacts:
+    paths: ['spacecreator.AppImage']
+    expose_as: 'spacecreator.AppImage'
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'compasta_master'"
 
 space-creator:
+  image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
   stage: build-test-and-bundle
   script:
     # build space creator
@@ -94,6 +110,7 @@ space-creator:
 
 
 space-creator-coverage:
+  image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
   stage: code-coverage
   coverage: '/Code coverage: ^ *lines\.*:\s+(\d+.\d+\%)/'
   script:
@@ -112,6 +129,7 @@ space-creator-coverage:
 
 
 space-creator-doc:
+  image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
   stage: documentation
   script:
     - ./scripts/generate_documentation.sh
