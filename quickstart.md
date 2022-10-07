@@ -8,6 +8,9 @@ steps to work from with in QtCreator.
 [https://gitrepos.estec.esa.int/taste/spacecreator](https://gitrepos.estec.esa.int/taste/spacecreator)
 
 Clone to ~/project/spacecreator
+```commandline
+~/project$ git clone https://gitrepos.estec.esa.int/taste/spacecreator.git
+```
 
 ## Project
 
@@ -48,7 +51,7 @@ Python needs some additional packages which can be installed by typing: <br>
 Blue QtCreator and the SpaceCreator plugin needs to be compiled against the EXACT same Qt version. Furthermore, Blue QtCreator needs to be the source from that exact Qt version as well. To garantee this, the SpaceCreator project has a script for downloading and installing a specific version of Qt and the corresponding QtCreator sourcecode. 
 Running the following command:
 ```commandline
-~/projects/spacecreator$ python3 ./scripts/prebuild.py
+~/project/spacecreator$ python3 ./scripts/prebuild.py
  --output_dir $HOME/project/spacecreatorenv6 
  --app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
  --qt_version 6.3.1 
@@ -98,7 +101,7 @@ will create a folder (~/project/spacecreatorenv6) containing (among other) the f
 
 Running the following command will build the SpaceCreator plugin:
 ```commandline
-~/projects/spacecreator$ python3 ./scripts/build_spacecreator.py
+~/project/spacecreator$ python3 ./scripts/build_spacecreator.py
 --build_dir $HOME/project/spacecreator_build
 --build_type Release
 --app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
@@ -115,7 +118,7 @@ to the spacecreator.AppDir folder.
 In addition, we need to copy templates for creating spacecreator projects and spacecreator files.
 This is done by running the following command:
 ```commandline
-~/projects/spacecreator$ python3 ./scripts/postbuild.py
+~/project/spacecreator$ python3 ./scripts/postbuild.py
 --build_dir $HOME/project/spacecreator_build
 --app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir
 ```
