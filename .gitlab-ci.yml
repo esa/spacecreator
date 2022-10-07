@@ -69,6 +69,8 @@ space-creator-deploy:
   before_script:
     - apt update
     - ./install-requirements.sh
+    - apt-get install -y curl
+    - curl --location --output /usr/bin/release-cli "https://release-cli-downloads.s3.amazonaws.com/latest/release-cli-linux-amd64" && chmod +x /usr/bin/release-cli
   script:
     - ./build-and-generate-appimage.sh
   after_script:
