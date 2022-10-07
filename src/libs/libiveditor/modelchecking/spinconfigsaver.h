@@ -51,6 +51,7 @@ public:
     void saveSpinConfig(const SpinConfigData &configData, QXmlStreamWriter &xml);
     bool readSpinConfig(QXmlStreamReader &xml);
     SpinConfigData getConfigData() const;
+
 private:
     QString explorationModeToString(const ExplorationMode &explorationMode);
     ExplorationMode explorationModeFromStringRef(const QStringRef &explorationModeStr);

@@ -148,6 +148,9 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->lineEdit_maxNumStates->setValidator( new QIntValidator(0, 10000000, this) );
     d->ui->lineEdit_timeLimit->setValidator( new QIntValidator(0, 100000, this) );
 
+    SpinConfigData defaultSpinConfig;
+    setSpinConfigParams(defaultSpinConfig);
+
     // set status bar text color
     statusBar()->setStyleSheet("color: white");
 
@@ -1280,7 +1283,6 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
     setPropertiesSelection(reader.getPropertiesSelected());
     setSubtypesSelection(reader.getSubtypesSelected());
     setFunctionsSelection(reader.getFunctionsSelected());
-    setSpinConfigSelection(reader.getSpinConfig());
 
     // check IF options validity
     if (reader.getIfConfig().at(1) == "false" && reader.getIfConfig().at(2) == "false") {
@@ -1304,6 +1306,8 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
     d->ui->lineEdit_maxNumEnvRICalls->setText(reader.getIfConfig().at(4));
     reader.getIfConfig().at(5) == "dfs" ? d->ui->comboBox_expAlgorithm->setCurrentIndex(0) : d->ui->comboBox_expAlgorithm->setCurrentIndex(1);
     d->ui->lineEdit_maxNumStates->setText(reader.getIfConfig().at(6));
+
+    setSpinConfigParams(reader.getSpinConfig());
 
     statusBar()->showMessage("Configuration file " + file.fileName() + " loaded", 6000);
 }
@@ -1365,9 +1369,28 @@ void ModelCheckingWindow::setFunctionsSelection(QStringList functionsSelected){
 
 }
 
-void ModelCheckingWindow::setSpinConfigSelection(const SpinConfigData &spinConfig){
-    qDebug() << "Spin config data number of cores: " << spinConfig.numberOfCores;
+void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
+{
+    setCheckBoxState(d->ui->checkBox_searchShortestPath, spinConfig.searchShortestPath);
+    setCheckBoxState(d->ui->checkBox_useFairScheduling, spinConfig.useFairScheduling);
+    setCheckBoxState(d->ui->checkBox_useBitHashing, spinConfig.useBitHashing);
 
+    d->ui->lineEdit_numberOfCores->setText(QString::number(spinConfig.numberOfCores));
+    d->ui->lineEdit_searchStateLimit->setText(QString::number(spinConfig.searchStateLimit));
+    d->ui->lineEdit_errorLimit->setText(QString::number(spinConfig.errorLimit));
+    d->ui->lineEdit_memoryLimit->setText(QString::number(spinConfig.memoryLimitMB));
+    d->ui->lineEdit_spinTimeLimit->setText(QString::number(spinConfig.timeLimitSeconds));
+    d->ui->lineEdit_generationLimit->setText(QString::number(spinConfig.globalInputVectorGenerationLimit));
+    d->ui->lineEdit_rawCommandLine->setText(spinConfig.rawCommandLine);
+
+    spinConfig.explorationMode == ExplorationMode::BreadthFirst
+        ? d->ui->comboBox_spinExpAlgorithm->setCurrentText("Breadth First Search")
+        : d->ui->comboBox_spinExpAlgorithm->setCurrentText("Depth First Search");
+}
+
+void ModelCheckingWindow::setCheckBoxState(QCheckBox *checkBox, bool isChecked)
+{
+    isChecked ? checkBox->setCheckState(Qt::Checked) : checkBox->setCheckState(Qt::Unchecked);
 }
 
 /*!

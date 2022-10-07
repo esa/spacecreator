@@ -647,7 +647,6 @@
         </item>
        </layout>
       </widget>
-    
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
         <string>SPIN model-checker</string>
@@ -661,22 +660,22 @@
          </widget>
         </item>
         <item row="6" column="4">
-         <widget class="QLineEdit" name="lineEdit_numOfCores">
+         <widget class="QLineEdit" name="lineEdit_errorLimit">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
         <item row="4" column="4" colspan="2">
-         <widget class="QComboBox" name="comboBox_expAlgorithm">
+         <widget class="QComboBox" name="comboBox_spinExpAlgorithm">
           <item>
            <property name="text">
-            <string>DFS (Depth First Search)</string>
+            <string>Depth First Search</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>BFS (Breadth First Search)</string>
+            <string>Breadth First Search</string>
            </property>
           </item>
          </widget>
@@ -728,7 +727,7 @@
          </widget>
         </item>
         <item row="5" column="4">
-         <widget class="QLineEdit" name="lineEdit_maxNumEnvRICalls">
+         <widget class="QLineEdit" name="lineEdit_searchStateLimit">
           <property name="text">
            <string/>
           </property>
@@ -828,7 +827,7 @@
          </widget>
         </item>
         <item row="7" column="0" colspan="3">
-         <widget class="QLabel" name="label_MemoryLimit">
+         <widget class="QLabel" name="label_memoryLimit">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -840,7 +839,7 @@
          </widget>
         </item>
         <item row="7" column="4">
-         <widget class="QLineEdit" name="lineEdit_MemoryLimit">
+         <widget class="QLineEdit" name="lineEdit_memoryLimit">
           <property name="text">
            <string></string>
           </property>
@@ -850,7 +849,7 @@
          </widget>
         </item>
         <item row="8" column="0" colspan="3">
-         <widget class="QLabel" name="label_GenerationLimit">
+         <widget class="QLabel" name="label_generationLimit">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -862,7 +861,7 @@
          </widget>
         </item>
         <item row="8" column="4">
-         <widget class="QLineEdit" name="lineEdit_GenerationLimit">
+         <widget class="QLineEdit" name="lineEdit_generationLimit">
           <property name="text">
            <string></string>
           </property>
@@ -872,7 +871,7 @@
          </widget>
         </item>
         <item row="9" column="0" colspan="3">
-         <widget class="QLabel" name="label_CommandLine">
+         <widget class="QLabel" name="label_rawCommandLine">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -884,7 +883,7 @@
          </widget>
         </item>
         <item row="9" column="4">
-         <widget class="QLineEdit" name="lineEdit_CommandLine">
+         <widget class="QLineEdit" name="lineEdit_rawCommandLine">
           <property name="text">
            <string></string>
           </property>
@@ -921,7 +920,6 @@
        </layout>
       </widget>
      </widget>
-    
     </item>
    </layout>
   </widget>

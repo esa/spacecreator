@@ -19,6 +19,8 @@
 
 #include "spinconfigsaver.h"
 
+#include <QCheckBox>
+#include <QInputDialog>
 #include <QMainWindow>
 #include <QFileInfo>
 #include <QTreeWidgetItem>
@@ -80,7 +82,7 @@ private Q_SLOTS:
     void setPropertiesSelection(QStringList propertiesSelected);
     void setSubtypesSelection(QStringList subtypesSelected);
     void setFunctionsSelection(QStringList functionsSelected);
-    void setSpinConfigSelection(const SpinConfigData &spinConfig);
+    void setSpinConfigParams(SpinConfigData spinConfig);
     void on_checkBox_errorScenarios_stateChanged(int arg1);
     void on_checkBox_successScenarios_stateChanged(int arg1);
 
@@ -108,6 +110,8 @@ private:
     QTreeWidgetItem *subtypesTopDirWidgetItem;
     QTreeWidgetItem *functionsTopNodeWidgetItem;
     QTreeWidgetItem *resultsTopDirWidgetItem;
+
+    void setCheckBoxState(QCheckBox *checkBox, bool isChecked);
 };
 
 }
