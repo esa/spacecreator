@@ -31,6 +31,7 @@
 #include "ivnamevalidator.h"
 #include "ui/grippointshandler.h"
 #include "ivcoreutils.h"
+#include "ui/textitem.h"
 
 #include <QGuiApplication>
 #include <QPainter>
@@ -85,6 +86,11 @@ void IVConnectionGraphicsItem::rebuildLayout()
 shared::ColorManager::HandledColors IVConnectionGraphicsItem::handledColorType() const
 {
     return shared::ColorManager::HandledColors::Connection;
+}
+
+shared::ui::TextItem *IVConnectionGraphicsItem::initTextItem()
+{
+    return nullptr;
 }
 
 void IVConnectionGraphicsItem::applyColorScheme()

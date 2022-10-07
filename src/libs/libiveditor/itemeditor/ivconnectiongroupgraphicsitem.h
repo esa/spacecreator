@@ -39,6 +39,7 @@ public:
 protected:
     void updateBoundingRect() override;
     void updateTextPosition() override;
+    shared::ui::TextItem *initTextItem() override;
 
 private Q_SLOTS:
     void updateLabel(const QString &text);

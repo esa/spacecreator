@@ -701,11 +701,15 @@ void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
 {
     d->objectsModel->initFromObjects(objects);
     d->objectsModel->setRootObject({});
+    if (d->itemsModel)
+        d->itemsModel->shrinkScene();
 }
 
 void InterfaceDocument::setLayers(const QVector<ivm::IVObject *> &layers)
 {
     d->layersModel->initFromObjects(layers);
+    if (d->itemsModel)
+        d->itemsModel->shrinkScene();
 }
 
 void InterfaceDocument::onAttributesManagerRequested()

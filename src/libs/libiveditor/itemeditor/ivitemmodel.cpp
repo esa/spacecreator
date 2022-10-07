@@ -159,6 +159,8 @@ void IVItemModel::onRootObjectChanged(shared::Id rootId)
     for (auto obj : objectsModel()->visibleObjects()) {
         onObjectAdded(obj->id());
     }
+
+    shrinkScene();
 }
 
 void IVItemModel::onObjectRemoved(shared::Id objectId)
@@ -633,11 +635,16 @@ shared::ui::VEInteractiveObject *IVItemModel::createItem(shared::Id objectId)
                 return getItem<ive::IVInterfaceGroupGraphicsItem *>(id);
             };
 
+            const QVector<QPointF> coords = shared::graphicsviewutils::polygon(connection->coordinates());
             IVInterfaceGroupGraphicsItem *startItem =
                     connection->sourceInterface() ? ifaceGroupItem(connection->sourceInterface()->id()) : nullptr;
+            if (startItem && startItem->entity())
+                startItem->entity()->setCoordinates(shared::graphicsviewutils::coordinates(coords.front()));
 
             IVInterfaceGroupGraphicsItem *endItem =
                     connection->targetInterface() ? ifaceGroupItem(connection->targetInterface()->id()) : nullptr;
+            if (endItem && endItem->entity())
+                endItem->entity()->setCoordinates(shared::graphicsviewutils::coordinates(coords.back()));
 
             return new IVConnectionGroupGraphicsItem(connection, startItem, endItem, parentItem);
         }

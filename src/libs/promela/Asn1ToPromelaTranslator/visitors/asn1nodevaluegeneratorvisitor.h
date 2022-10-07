@@ -20,7 +20,10 @@
 #pragma once
 
 #include <QStringList>
+#include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/types/type.h>
 #include <asn1library/asn1/visitor.h>
+#include <ivcore/ivmodel.h>
 #include <promela/PromelaModel/promelamodel.h>
 
 namespace promela::translator {
@@ -34,14 +37,17 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param promelaModel         target promela model
+     * @param   promelaModel    Target promela model
+     * @param   asn1Model       ASN.1 model
+     * @param   ivModel         Interface View model
      */
-    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel);
+    Asn1NodeValueGeneratorVisitor(
+            model::PromelaModel &promelaModel, const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel);
     /**
      * @brief Constructor.
      *
-     * @param promelaModel         target promela model
-     * @param typeNames            list of top-level type names to generate value generation inlines
+     * @param   promelaModel    Target promela model
+     * @param   typeNames       List of top-level type names to generate value generation inlines
      */
     Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, QStringList typeNames);
 
@@ -59,8 +65,13 @@ public:
     void visit(const Asn1Acn::Root &root) override;
 
 private:
+    const Asn1Acn::Types::Type *findOverridenType(const QString &subtypeName) const;
+
+private:
     model::PromelaModel &m_promelaModel;
+    const Asn1Acn::Asn1Model *m_asn1Model;
+    const ivm::IVModel *m_ivModel;
     QStringList m_typeNames;
-    bool m_generateAll;
+    bool m_generateSubtypes;
 };
 }

@@ -1,0 +1,8 @@
+SUBTYPES2 DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyBetterInteger FROM SUBTYPING-DATAVIEW;
+
+Pinger-ping-pingarg ::= MyBetterInteger (4 .. 7)
+
+END

@@ -20,6 +20,7 @@
 #include "promelamodel.h"
 
 namespace promela::model {
+
 conversion::ModelType PromelaModel::modelType() const
 {
     return conversion::ModelProperties<PromelaModel>::type;
@@ -145,4 +146,5 @@ const QList<QString> &PromelaModel::getEpilogueIncludes() const noexcept
 {
     return m_epilogueIncludes;
 }
-}
+
+} // namespace promela::model

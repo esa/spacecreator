@@ -1,0 +1,235 @@
+<InterfaceView asn1file="uart_protocol_dlc.asn">
+<Function name="RTApp" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="53200 -20200 81200 -1200"/>
+<Provided_Interface name="DLCRxError" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="T-UART-DLC-RxErrorCode" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="76100 -1200"/>
+</Provided_Interface>
+
+<Provided_Interface name="DLCRxSDU" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="T-UART-DLC-SDU" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="56400 -1200"/>
+</Provided_Interface>
+
+<Required_Interface name="DLCRxReset" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="66400 -1200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="ErroredChannel" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="5600 39000 82200 47000"/>
+<Provided_Interface name="PHYTxChar" kind="Sporadic" layer="default" required_system_element="NO" priority="1" miat="0" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="UINT8" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="28800 39000"/>
+</Provided_Interface>
+
+<Provided_Interface name="DropChar" kind="Sporadic" layer="default" required_system_element="NO" priority="1" miat="0" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="37500 47000"/>
+</Provided_Interface>
+
+<Provided_Interface name="CorruptChar" kind="Sporadic" layer="default" required_system_element="NO" priority="1" miat="0" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="UINT8" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="48900 47000"/>
+</Provided_Interface>
+
+<Required_Interface name="PHYRxChar" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="16" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="UINT8" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="57000 39000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="PHYTxError" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="12100 39000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="PHYRxError" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="72400 39000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="BCDLCT" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="5600 12800 36000 31400"/>
+<Provided_Interface name="PHYTxError" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="12000 31400"/>
+</Provided_Interface>
+
+<Provided_Interface name="DLCTxSDU" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="T-UART-DLC-SDU" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="11900 12800"/>
+</Provided_Interface>
+
+<Provided_Interface name="DLCTxReset" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="27200 12800"/>
+</Provided_Interface>
+
+<Required_Interface name="PHYTxChar" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="UINT8" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="28900 31400"/>
+    <Property name="Taste::InheritPI" value="false"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="RTDLCR" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="51600 12400 81700 31700"/>
+    <ContextParameter name="FrameTimer" type="Timer" value=""/>
+<Provided_Interface name="PHYRxChar" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="16" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="UINT8" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="56900 31700"/>
+</Provided_Interface>
+
+<Provided_Interface name="DLCRxReset" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="66300 12400"/>
+</Provided_Interface>
+
+<Provided_Interface name="PHYRxError" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="72300 31700"/>
+</Provided_Interface>
+
+<Required_Interface name="DLCRxSDU" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="T-UART-DLC-SDU" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="56500 12400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="DLCRxError" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="T-UART-DLC-RxErrorCode" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="76300 12400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="BCApp" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="5800 -20800 34800 -1200"/>
+<Required_Interface name="DLCTxSDU" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="T-UART-DLC-SDU" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="11800 -1200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="DLCTxReset" kind="Sporadic" layer="default" required_system_element="NO" miat="0" priority="1" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="27300 -1200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="ChannelEffects" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="33200 53000 53200 61000"/>
+<Required_Interface name="DropChar" kind="Sporadic" layer="default" required_system_element="NO" priority="1" miat="0" queue_size="1" wcet="0" stack_size="1024">
+    <Property name="Taste::coordinates" value="37600 53000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="CorruptChar" kind="Sporadic" layer="default" required_system_element="NO" priority="1" miat="0" queue_size="1" wcet="0" stack_size="1024">
+    <Input_Parameter name="p1" type="UINT8" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="49000 53000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="BCApp" ri_name="DLCTxReset"/>
+    <Target func_name="BCDLCT" pi_name="DLCTxReset"/>
+    <Property name="Taste::coordinates" value="27300 -600 27200 12500"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="ChannelEffects" ri_name="DropChar"/>
+    <Target func_name="ErroredChannel" pi_name="DropChar"/>
+    <Property name="Taste::coordinates" value="37600 52400 37500 47300"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="ErroredChannel" ri_name="PHYRxChar"/>
+    <Target func_name="RTDLCR" pi_name="PHYRxChar"/>
+    <Property name="Taste::coordinates" value="57000 38400 56900 32000"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="BCDLCT" ri_name="PHYTxChar"/>
+    <Target func_name="ErroredChannel" pi_name="PHYTxChar"/>
+    <Property name="Taste::coordinates" value="28900 32000 28800 38700"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="RTDLCR" ri_name="DLCRxSDU"/>
+    <Target func_name="RTApp" pi_name="DLCRxSDU"/>
+    <Property name="Taste::coordinates" value="56500 11800 56500 5500 56400 -900"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="ErroredChannel" ri_name="PHYTxError"/>
+    <Target func_name="BCDLCT" pi_name="PHYTxError"/>
+    <Property name="Taste::coordinates" value="12100 38400 12100 35100 12000 31700"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="ErroredChannel" ri_name="PHYRxError"/>
+    <Target func_name="RTDLCR" pi_name="PHYRxError"/>
+    <Property name="Taste::coordinates" value="72400 38400 72400 35200 72300 32000"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="BCApp" ri_name="DLCTxSDU"/>
+    <Target func_name="BCDLCT" pi_name="DLCTxSDU"/>
+    <Property name="Taste::coordinates" value="11800 -600 11900 12500"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="RTDLCR" ri_name="DLCRxError"/>
+    <Target func_name="RTApp" pi_name="DLCRxError"/>
+    <Property name="Taste::coordinates" value="76300 11800 76300 5500 76100 -900"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="RTApp" ri_name="DLCRxReset"/>
+    <Target func_name="RTDLCR" pi_name="DLCRxReset"/>
+    <Property name="Taste::coordinates" value="66400 -600 66400 5700 66300 12100"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="ChannelEffects" ri_name="CorruptChar"/>
+    <Target func_name="ErroredChannel" pi_name="CorruptChar"/>
+    <Property name="Taste::coordinates" value="49000 52400 48900 47300"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>

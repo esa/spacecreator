@@ -39,3 +39,6 @@ add_subdirectory(tmc)
 
 # Total SpaceCreator system
 add_subdirectory(spacecreatorsystem)
+
+# Reporting
+add_subdirectory(reporting)
