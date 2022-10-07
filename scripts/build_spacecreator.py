@@ -3,7 +3,8 @@
 import argparse
 import os.path
 import subprocess
-from utils import join_dir, print_cmd, exit_if_not_exists, check_cmake_version
+
+from utils import join_dir, print_cmd, exit_if_not_exists, check_cmake_version, qt_dir_from_env_dir
 
 """
 Builds the SpaceCreator Project.
@@ -18,7 +19,8 @@ python3 ./scripts/build_spacecreator.py
 """
 
 
-def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_type: str, env_dir: str, env_qt_dir: str, build_asn1plugin: bool) -> None:
+def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_type: str, env_dir: str, build_asn1plugin: bool) -> None:
+    env_qt_dir = qt_dir_from_env_dir(env_dir)
     env_qmake_bin = join_dir(env_qt_dir, 'bin', 'qmake')
     qtc_install = app_dir
     env_qt_cmake_dir = join_dir(env_qt_dir, 'lib', 'cmake')
@@ -78,8 +80,6 @@ if __name__ == '__main__':
                         help='Release or Debug')
     parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
                         help='Path to the build environment dir created by prebuild.py')
-    parser.add_argument('--env_qt_dir', dest='env_qt_dir', type=str, required=True,
-                        help='Path to the Qt distribution (./Qt/6.3.1/gcc_64/)')
     parser.add_argument('--no_build_asn1plugin', dest='no_build_asn1plugin', action='store_true')
 
     args = parser.parse_args()
@@ -117,7 +117,6 @@ if __name__ == '__main__':
         print("build_spacecreator.py:  Building ASN1Plugin")
 
     env_dir = args.env_dir
-    env_qt_dir = args.env_qt_dir
 
     check_cmake_version(3, 16, 0)
-    build_spacecreator(project_dir, build_dir, app_dir, build_type, env_dir, env_qt_dir, build_asn1plugin)
+    build_spacecreator(project_dir, build_dir, app_dir, build_type, env_dir, build_asn1plugin)

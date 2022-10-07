@@ -61,6 +61,7 @@ will create a folder (~/project/spacecreatorenv6) containing (among other) the f
 ├── asn1scc/
 ├── Qt/
 │   └── 6.3.1/
+│       └── gcc_64/
 └── spacecreator.AppDir/
     ├── bin/
     ├── include/
@@ -102,7 +103,6 @@ Running the following command will build the SpaceCreator plugin:
 --build_type Release
 --app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
 --env_dir $HOME/project/spacecreatorenv6
---env_qt_dir  $HOME/project/spacecreatorenv6/Qt/6.3.1/gcc_64
 ```
 
 
