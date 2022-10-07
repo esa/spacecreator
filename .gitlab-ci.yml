@@ -74,7 +74,7 @@ space-creator-deploy:
     - cp package/spacecreator*.AppImage spacecreator.AppImage
   artifacts:
     paths: ['spacecreator.AppImage']
-    expose_as: 'spacecreator.AppImage'
+    expose_as: 'spacecreator'
   rules:
     - if: "$CI_COMMIT_BRANCH == 'compasta_master'"
 
