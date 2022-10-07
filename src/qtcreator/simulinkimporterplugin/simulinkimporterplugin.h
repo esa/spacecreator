@@ -66,8 +66,8 @@ private:
     auto copyInputSlxFileToWorkDirectory(const QString &inputFilePath, const QString &functionBlockName) -> void;
     auto generateExportedXmlFilePath(const QString& inputFilePath) -> QString;
 
-    auto importXmlFileAndRemoveTemporaries(const QString &inputFilePath, const QString &functionBlockName) -> void;
-    auto importXmlFile(const QString &inputFilePath, const QString &functionBlockName, QStringList &generatedAsn1FileNames) -> void;
+    auto importXmlFileAndRemoveTemporaries(const QString &inputFilePath, const QString &functionBlockName) -> bool;
+    auto importXmlFile(const QString &inputFilePath, const QString &functionBlockName, QStringList &generatedAsn1FileNames) -> bool;
 
     auto convertXmlFileToAsn1(const QString &inputFilePath, QStringList &generatedAsn1FileNames) -> bool;
     auto getGeneratedAsn1FileNamesFromModels(const std::vector<std::unique_ptr<conversion::Model>> &models) -> QStringList;
@@ -76,12 +76,12 @@ private:
             const std::set<conversion::ModelType> &auxModelTypes, conversion::Options options)
             -> std::vector<std::unique_ptr<conversion::Model>>;
 
-    auto tryAddIvToCurrentProject(const QString &ivConfig) -> bool;
+    auto addIvToCurrentProject(const QString &ivConfig) -> bool;
     auto getCurrentIvModel() -> ivm::IVModel *;
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
-    auto mergeIvModels(ivm::IVModel *const destinationIvModel, ivm::IVModel *const sourceIvModel) -> void;
+    auto mergeIvModels(ivm::IVModel *const destinationIvModel, ivm::IVModel *const sourceIvModel) -> bool;
     auto doesModelContainIvFunction(ivm::IVModel *const model, ivm::IVFunction *const function) -> bool;
-    auto addIvFunctionToIvModel(ivm::IVFunction *const srcFun, ivm::IVModel *const model) -> void;
+    auto addIvFunctionToIvModel(ivm::IVFunction *const srcFun, ivm::IVModel *const model) -> bool;
 
     auto addGeneratedAsn1FilesToCurrentProject(const QStringList &generatedAsn1FileNames) -> void;
     auto isFileIsOneOfMatLabStandardDataTypesFiles(const QString &fileName) -> bool;
@@ -96,6 +96,7 @@ private:
     const QString m_functionBlockDefaultImplementation = "QGenC";
     const QString m_tasteExporterOutputDirectory = "exported";
     const QString m_defaultFunctionBlockName = "simulink";
+    const QString m_defaultFunctionBlockImplementationName = "default";
 
     const QStringList m_workspaceFilesExtensionsFilter = { "*.m", "*.mat" };
     const QMap<QString, QString> m_workspaceLoadFunctionsMap = {{"m", "run"}, {"mat", "load"}};
