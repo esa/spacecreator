@@ -112,6 +112,7 @@ private:
     QTreeWidgetItem *resultsTopDirWidgetItem;
 
     void setCheckBoxState(QCheckBox *checkBox, bool isChecked);
+    SpinConfigData readSpinConfigFromUI();
 };
 
 }

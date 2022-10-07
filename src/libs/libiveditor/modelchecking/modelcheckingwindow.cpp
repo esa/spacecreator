@@ -148,6 +148,13 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->lineEdit_maxNumStates->setValidator( new QIntValidator(0, 10000000, this) );
     d->ui->lineEdit_timeLimit->setValidator( new QIntValidator(0, 100000, this) );
 
+    d->ui->lineEdit_numberOfCores->setValidator(new QIntValidator(0, 1000, this));
+    d->ui->lineEdit_searchStateLimit->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui->lineEdit_errorLimit->setValidator(new QIntValidator(0, 1000000, this));
+    d->ui->lineEdit_memoryLimit->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui->lineEdit_spinTimeLimit->setValidator(new QIntValidator(0, 100000, this));
+    d->ui->lineEdit_generationLimit->setValidator(new QIntValidator(0, 10000000, this));
+
     SpinConfigData defaultSpinConfig;
     setSpinConfigParams(defaultSpinConfig);
 
@@ -1160,7 +1167,7 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
 
-    SpinConfigData spinConfigData;
+    SpinConfigData spinConfigData = readSpinConfigFromUI();
 
     XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions, spinConfigData);
     if (writer.writeFile(&configFile, configurationFileName)){
@@ -1229,7 +1236,7 @@ bool ModelCheckingWindow::saveConfiguration()
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
 
-    SpinConfigData spinConfigData;
+    SpinConfigData spinConfigData = readSpinConfigFromUI();
 
     XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions, spinConfigData);
     if (writer.writeFile(&file, fileName + ".xml")){
@@ -1391,6 +1398,27 @@ void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
 void ModelCheckingWindow::setCheckBoxState(QCheckBox *checkBox, bool isChecked)
 {
     isChecked ? checkBox->setCheckState(Qt::Checked) : checkBox->setCheckState(Qt::Unchecked);
+}
+
+SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
+{
+    SpinConfigData spinConfigData;
+    spinConfigData.errorLimit = d->ui->lineEdit_errorLimit->text().toInt();
+    spinConfigData.globalInputVectorGenerationLimit = d->ui->lineEdit_generationLimit->text().toInt();
+    spinConfigData.memoryLimitMB = d->ui->lineEdit_memoryLimit->text().toInt();
+    spinConfigData.numberOfCores = d->ui->lineEdit_numberOfCores->text().toInt();
+    spinConfigData.searchStateLimit = d->ui->lineEdit_searchStateLimit->text().toInt();
+    spinConfigData.timeLimitSeconds = d->ui->lineEdit_spinTimeLimit->text().toInt();
+
+    spinConfigData.searchShortestPath = d->ui->checkBox_searchShortestPath->checkState() == Qt::Checked ? true : false;
+    spinConfigData.useFairScheduling = d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked ? true : false;
+    spinConfigData.useBitHashing = d->ui->checkBox_useBitHashing->checkState() == Qt::Checked ? true : false;
+
+    spinConfigData.rawCommandLine = d->ui->lineEdit_rawCommandLine->text();
+
+    spinConfigData.explorationMode = d->ui->comboBox_spinExpAlgorithm->currentText() == "Breadth First Search"
+        ? ExplorationMode::BreadthFirst : ExplorationMode::DepthFirst;
+    return spinConfigData;
 }
 
 /*!
