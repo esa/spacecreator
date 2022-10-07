@@ -103,10 +103,6 @@ public:
     auto getSimulinkModelAsn1Definitions() const -> Asn1Acn::Definitions *;
 
 private:
-<<<<<<< HEAD
-=======
-    const ::simulink::model::SimulinkModel &m_simulinkModel;
->>>>>>> SimulinkImporterPlugin: fixed namespaces for seds and simulink to asn1 translators
     std::unique_ptr<Asn1Acn::Definitions> &m_matlabDefinitions;
     std::unique_ptr<Asn1Acn::Definitions> &m_simulinkModelDefinitions;
     const Options &m_options;
