@@ -150,7 +150,7 @@ IVInterface *SimulinkToIvTranslator::createIVInterface(const QString &interfaceN
 {
     IVInterface::CreationInfo creationInfo;
 
-    creationInfo.name = interfaceName;
+    creationInfo.name = Escaper::escapeIvName(interfaceName);
     creationInfo.type = IVInterface::InterfaceType::Provided;
     creationInfo.kind = IVInterface::OperationKind::Protected;
     creationInfo.function = ivFunction;
