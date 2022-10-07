@@ -7,7 +7,7 @@ steps to work from with in QtCreator.
 ## GitLab
 [https://gitrepos.estec.esa.int/taste/spacecreator](https://gitrepos.estec.esa.int/taste/spacecreator)
 
-Clone to ~/projects/spacecreator
+Clone to ~/project/spacecreator
 
 ## Project
 
@@ -47,11 +47,16 @@ Python needs some additional packages which can be installed by typing: <br>
 
 Blue QtCreator and the SpaceCreator plugin needs to be compiled against the EXACT same Qt version. Furthermore, Blue QtCreator needs to be the source from that exact Qt version as well. To garantee this, the SpaceCreator project has a script for downloading and installing a specific version of Qt and the corresponding QtCreator sourcecode. 
 Running the following command:
+```commandline
+~/projects/spacecreator$ python3 ./scripts/prebuild.py
+ --output_dir $HOME/project/spacecreatorenv6 
+ --app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
+ --qt_version 6.3.1 
+ --qtcreator_version 8.0.1
 
-`~/projects/spacecreator$ python3 ./scripts/prebuild.py --output_dir $HOME/opt/spacecreatorenv6 --qt_version 6.3.1 --qtcreator_version 8.0.1
-`
+```
 
-will create a folder (~/opt/spacecreatorenv6) containing (among other) the files:
+will create a folder (~/project/spacecreatorenv6) containing (among other) the files:
 ```
 ├── asn1scc/
 ├── Qt/
@@ -91,12 +96,17 @@ will create a folder (~/opt/spacecreatorenv6) containing (among other) the files
 ## Building the SpaceCreator Plugin
 
 Running the following command will build the SpaceCreator plugin:
+```commandline
+~/projects/spacecreator$ python3 ./scripts/build_spacecreator.py
+--build_dir $HOME/project/spacecreator_build
+--build_type Release
+--app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
+--env_dir $HOME/project/spacecreatorenv6
+--env_qt_dir  $HOME/project/spacecreatorenv6/Qt/6.3.1/gcc_64
+```
 
-`~/projects/spacecreator$ python3 ./scripts/build_spacecreator.py
---env_dir $HOME/opt/spacecreatorenv6
---env_qt_dir  $HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64`
 
-This will build the plugin in `~/projects/spacecreator/build`
+This will build the plugin in `$HOME/project/spacecreator_build` which is outside the source tree
 
 ## Running SpaceCreator
 
@@ -104,11 +114,14 @@ Before running the blue QtCreator we need to copy the plugin from the build fold
 to the spacecreator.AppDir folder.
 In addition, we need to copy templates for creating spacecreator projects and spacecreator files.
 This is done by running the following command:
-
-`~/projects/spacecreator$ python3 ./scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6`
+```commandline
+~/projects/spacecreator$ python3 ./scripts/postbuild.py
+--build_dir $HOME/project/spacecreator_build
+--app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir
+```
 
 Then the blue QtCreator can be run:<br>
-`$ ~/opt/spacecreator.AppDir/bin/qtcreator -color blue`<br>
+`$ $HOME/project/spacecreatorenv6/spacecreator.AppDir/bin/qtcreator -color blue`<br>
 and it will now be possible to load a sample project.
 
 
@@ -117,14 +130,14 @@ and it will now be possible to load a sample project.
 To develop the spacecreator plugin in black QtCreator we need to setup a project.
 
 ### Manage Kits...
-We want to use the Qt installation in our build environment (~/opt/spacecreatorenv6/Qt)
+We want to use the Qt installation in our build environment ($HOME/project/spacecreatorenv6/Qt)
 So we go to ***Kits / Qt Version*** and create a manual Qt Version named ***spacecreatorenvqt6***.
 Then we make a new Manual Kit named ***spacecreator6*** where we select the Qt version above.
 
 In the ***CMake Configuration*** inside the kit, click the ***Change...*** button.
 Add two lines there:<br>
-QTC_SOURCE:PATH=$HOME/opt/spacecreatorenv5/spacecreator.AppDir<br>
-QTC_INSTALL:PATH=$HOME/opt/spacecreatorenv5/spacecreator.AppDir
+QTC_SOURCE:PATH=$HOME/project/spacecreatorenv6/spacecreator.AppDir<br>
+QTC_INSTALL:PATH=$HOME/project/spacecreatorenv6/spacecreator.AppDir
 
 
 ### Build Settings
@@ -138,13 +151,13 @@ We need to have QtCreator run the postbuild.py script after the build stop, so w
 ***Deployment Method*** that is a Custom Process Step. The command is
 `python3` and the arguments are:
 
-`%{ActiveProject:Path}/scripts/postbuild.py --env_dir=$HOME/opt/spacecreatorenv6 --env_qt_dir=$HOME/opt/spacecreatorenv6/Qt/6.3.1/gcc_64 --build_dir=%{buildDir}`
+`%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=$HOME/project/spacecreatorenv6/spacecreator.AppDir`
 
-This will call the correct **postbuild.py** script and tell it where the build environment is and where the plugins were build.<br>
+This will call the correct **postbuild.py** script and tell it where the plugins were build and where to put them.<br>
 The variables `%{ActiveProject:Path}` and `%{buildDir}` are substituted by QtCreator.
 
 Now we need a Run configuration of the type ***Custom Executable***:<br>
-**Executable**: `$HOME/opt/spacecreatorenv6/spacecreator.AppDir/bin/qtcreator`<br>
+**Executable**: `$HOME/project/spacecreatorenv6/spacecreator.AppDir/bin/qtcreator`<br>
 **Command line arguments**: `-color blue`
 
 

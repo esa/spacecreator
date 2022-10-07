@@ -270,6 +270,9 @@ def copy_snippets(snippets_dir: str, snippets_install_dir: str) -> None:
 
 
 if __name__ == '__main__':
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    default_project_dir = join_dir(script_dir, '..')
+
     # Parse arguments
     parser = argparse.ArgumentParser(prog='prebuild')
     parser.add_argument('--output_dir', dest='env_path', type=str, required=True,
@@ -287,7 +290,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Build the paths object
-    project_dir = args.project_dir
+    if args.project_dir:
+        project_dir = args.project_dir
+    else:
+        project_dir = default_project_dir
+        print("prebuild.py: project_dir defaults to {}".format(project_dir))
+
     app_dir = args.app_dir
     env_dir = args.env_path
     qt_version = args.qt_version
