@@ -74,7 +74,7 @@ if __name__ == '__main__':
                         help='Path to the folder where spacecreator is located')
     parser.add_argument('--build_dir', dest='build_dir', type=str, required=True,
                         help='Path to the build directory where spacecreator is to be build')
-    parser.add_argument('--app_dir', dest='app_dir', type=str, required=True,
+    parser.add_argument('--app_dir', dest='app_dir', type=str, required=False,
                         help='Path to the folder that contains AppDir')
     parser.add_argument('--build_type', dest='build_type', type=str, required=False,
                         help='Release or Debug')
@@ -98,9 +98,13 @@ if __name__ == '__main__':
         build_dir = join_dir(project_dir, 'build')
         print("build_spacecreator.py: Defaulting to build dir {}".format(build_dir))
 
+    env_dir = args.env_dir
+
     if args.app_dir:
         app_dir = args.app_dir
-        print("build_spacecreator.py: app_dir is {}".format(app_dir))
+    else:
+        app_dir = join_dir(args.env_dir, 'spacecreator.AppDir')
+    print("build_spacecreator.py: app_dir is {}".format(app_dir))
 
     if args.build_type:
         build_type = args.build_type
@@ -115,8 +119,6 @@ if __name__ == '__main__':
     else:
         build_asn1plugin = True
         print("build_spacecreator.py:  Building ASN1Plugin")
-
-    env_dir = args.env_dir
 
     check_cmake_version(3, 16, 0)
     build_spacecreator(project_dir, build_dir, app_dir, build_type, env_dir, build_asn1plugin)

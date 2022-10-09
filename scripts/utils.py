@@ -101,3 +101,18 @@ def read_version_from_file(version_file: str, ci_build_id: str) -> []:
     if not completed_process.returncode == 0:
         print("Could not read ", version_file)
         exit(1)
+
+
+def qt_dir_from_env_dir(env_dir: str):
+    pattern = join_dir(env_dir, 'Qt', '*.*.*', 'gcc_64', 'bin', 'qmake')
+    files = glob.glob(pattern, recursive=False)
+    if len(files) == 0:
+        print('util.py: Could not find env_qt_dir from env_dir which was {}. Has Qt been installed in env_dir?'.format(env_dir))
+        exit(1)
+    if len(files) > 1:
+        print('util.py: found more than one directory under env_dir/Qt containing a file named qmake. Only one version of Qt should be present in env_dir')
+        exit(2)
+
+    qmake_file = files.pop()
+    gcc_64_dir = join_dir(qmake_file, '..', '..')
+    return gcc_64_dir

@@ -285,8 +285,8 @@ if __name__ == '__main__':
                         help='Version of Qt to download to the build environment. Format X.Y.Z')
     parser.add_argument('--qtcreator_version', dest='qtcreator_version', type=str, required=True,
                         help='Version of Qt Creator to download. Format X.Y.Z')
-    parser.add_argument('--app_dir', dest='app_dir', type=str, required=True,
-                        help='Path to the folder that contains AppDir')
+    parser.add_argument('--app_dir', dest='app_dir', type=str, required=False,
+                        help='Path to the folder that contains AppDir. Defaults to output_dir/spacecreator.AppDir')
     args = parser.parse_args()
 
     # Build the paths object
@@ -296,8 +296,12 @@ if __name__ == '__main__':
         project_dir = default_project_dir
         print("prebuild.py: project_dir defaults to {}".format(project_dir))
 
-    app_dir = args.app_dir
     env_dir = args.env_path
+    if args.app_dir:
+        app_dir = args.app_dir
+    else:
+        app_dir = join_dir(env_dir, 'spacecreator.AppDir')
+
     qt_version = args.qt_version
     qtcreator_version = args.qtcreator_version
     paths = build_path_object(project_dir, env_dir, qt_version)
@@ -348,6 +352,3 @@ if __name__ == '__main__':
     snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
     snippets_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'snippets')
     copy_snippets(snippets_dir, snippets_install_dir)
-
-
-

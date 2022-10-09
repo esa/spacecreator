@@ -53,7 +53,6 @@ Running the following command:
 ```commandline
 ~/project/spacecreator$ python3 ./scripts/prebuild.py
  --output_dir $HOME/project/spacecreatorenv6 
- --app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
  --qt_version 6.3.1 
  --qtcreator_version 8.0.1
 
@@ -104,7 +103,6 @@ Running the following command will build the SpaceCreator plugin:
 ~/project/spacecreator$ python3 ./scripts/build_spacecreator.py
 --build_dir $HOME/project/spacecreator_build
 --build_type Release
---app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
 --env_dir $HOME/project/spacecreatorenv6
 ```
 
