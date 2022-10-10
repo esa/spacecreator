@@ -1,4 +1,3 @@
-
 stages:
   - build-test
   - build-test-and-bundle
@@ -85,7 +84,7 @@ space-creator-deploy:
     assets:
       links: 
         - name: 'Linux Appimage'
-          url: 'https://gitlab.fbk.eu/compasta-devel/spacecreatorfbk/-/jobs/${GE_JOB_ID}/artifacts/file/spacecreator.AppImage'
+          url: 'https://gitlab.fbk.eu/compasta-devel/spacecreatorfbk/-/jobs/${CI_JOB_ID}/artifacts/file/spacecreator.AppImage'
   rules:
     - if: "$CI_COMMIT_BRANCH == 'compasta_master'"
 
