@@ -85,6 +85,8 @@ private Q_SLOTS:
     void setSpinConfigParams(SpinConfigData spinConfig);
     void on_checkBox_errorScenarios_stateChanged(int arg1);
     void on_checkBox_successScenarios_stateChanged(int arg1);
+    void addGenerationLimitsTableRow();
+    void removeGenerationLimitsTableRow();
 
 private:
     QString propertiesPath;

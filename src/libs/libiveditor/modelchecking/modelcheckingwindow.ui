@@ -765,8 +765,8 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="2" colspan="4">
-         <widget class="QTreeWidget" name="treeWidget_results">
+        <item row="10" column="2" colspan="2">
+         <widget class="QTableWidget" name="tableWidget_generationLimits">
           <attribute name="headerDefaultSectionSize">
            <number>400</number>
           </attribute>
@@ -774,13 +774,42 @@
            <number>400</number>
           </attribute>
           <attribute name="headerStretchLastSection">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
           <column>
            <property name="text">
-            <string>Name</string>
+            <string>Interface</string>
            </property>
           </column>
+          <column>
+           <property name="text">
+            <string>Generation limit</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+                <item row="11" column="2">
+         <widget class="QPushButton" name="tableAddButton">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Add row</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="2">
+         <widget class="QPushButton" name="tableDeleteButton">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Delete row</string>
+          </property>
          </widget>
         </item>
         <item row="2" column="0" colspan="4">

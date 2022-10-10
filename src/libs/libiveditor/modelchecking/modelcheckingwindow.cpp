@@ -100,6 +100,8 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     connect(deletePropertyFile, SIGNAL(triggered()), this, SLOT(deleteProperty()));
     connect(newSubtypes, SIGNAL(triggered()), this, SLOT(addSubtypes()));
     connect(deleteSubtypes, SIGNAL(triggered()), this, SLOT(deleteSubtypes()));
+    connect(d->ui->tableAddButton, &QPushButton::clicked, this, &ModelCheckingWindow::addGenerationLimitsTableRow);
+    connect(d->ui->tableDeleteButton, &QPushButton::clicked, this, &ModelCheckingWindow::removeGenerationLimitsTableRow);
 
     // Make tree views show horizontal scroll bars
     d->ui->treeWidget_properties->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -154,6 +156,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->lineEdit_memoryLimit->setValidator(new QIntValidator(0, 10000000, this));
     d->ui->lineEdit_spinTimeLimit->setValidator(new QIntValidator(0, 100000, this));
     d->ui->lineEdit_generationLimit->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui->tableWidget_generationLimits->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     SpinConfigData defaultSpinConfig;
     setSpinConfigParams(defaultSpinConfig);
@@ -1393,6 +1396,30 @@ void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
     spinConfig.explorationMode == ExplorationMode::BreadthFirst
         ? d->ui->comboBox_spinExpAlgorithm->setCurrentText("Breadth First Search")
         : d->ui->comboBox_spinExpAlgorithm->setCurrentText("Depth First Search");
+    
+    QTableWidget *tableWidget = d->ui->tableWidget_generationLimits;
+    tableWidget->setRowCount(spinConfig.ifaceGenerationLimits.length());
+    tableWidget->setColumnCount(tableWidget->horizontalHeader()->count());
+
+    for (int i = 0; i < spinConfig.ifaceGenerationLimits.length(); i++) {
+        tableWidget->setItem(i, 0, new QTableWidgetItem(spinConfig.ifaceGenerationLimits.at(i).first));
+        tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(spinConfig.ifaceGenerationLimits.at(i).second)));
+    }
+}
+
+void ModelCheckingWindow::addGenerationLimitsTableRow()
+{
+    QTableWidget *tableWidget = d->ui->tableWidget_generationLimits;
+    tableWidget->insertRow(tableWidget->rowCount());
+}
+
+void ModelCheckingWindow::removeGenerationLimitsTableRow()
+{
+    QTableWidget *tableWidget = d->ui->tableWidget_generationLimits;
+    QModelIndexList selection = tableWidget->selectionModel()->selectedRows();
+    if (!selection.isEmpty()) {
+        tableWidget->removeRow(selection.at(0).row());
+    }
 }
 
 void ModelCheckingWindow::setCheckBoxState(QCheckBox *checkBox, bool isChecked)
@@ -1418,6 +1445,15 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
 
     spinConfigData.explorationMode = d->ui->comboBox_spinExpAlgorithm->currentText() == "Breadth First Search"
         ? ExplorationMode::BreadthFirst : ExplorationMode::DepthFirst;
+
+    const auto tableWidget = d->ui->tableWidget_generationLimits;
+    spinConfigData.ifaceGenerationLimits.clear();
+    for (int i = 0; i < tableWidget->rowCount(); i++) {
+        QString ifaceName = tableWidget->item(i, 0)->text();
+        int ifaceGenerationLimit = tableWidget->item(i, 1)->text().toInt();
+        spinConfigData.ifaceGenerationLimits.append({ifaceName, ifaceGenerationLimit});
+    }
+
     return spinConfigData;
 }
 
