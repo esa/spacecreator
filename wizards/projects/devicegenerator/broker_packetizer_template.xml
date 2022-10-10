@@ -35,7 +35,7 @@
     <Input_Parameter name="packetType" type="PacketType" encoding="NATIVE"/>
     <Input_Parameter name="pSource" type="PacketSource" encoding="NATIVE"/>
     <Input_Parameter name="pDestination" type="PacketDestination" encoding="NATIVE"/>
-    <Input_Parameter name="packetPointer" type="PacketPointer" encoding="NATIVE"/>
+    <Output_Parameter name="packetPointer" type="PacketPointer" encoding="NATIVE"/>
     <Input_Parameter name="dataOffset" type="PacketDataOffset" encoding="NATIVE"/>
     <Input_Parameter name="dataSize" type="DataLength" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="26700 50600"/>
