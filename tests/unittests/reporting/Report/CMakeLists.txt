@@ -14,4 +14,6 @@ target_link_libraries(${TEST_NAME}
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
 
+configure_file(resources/spin_error_output.txt resources/spin_error_output.txt COPYONLY)
+
 add_format_target(${TEST_NAME})
