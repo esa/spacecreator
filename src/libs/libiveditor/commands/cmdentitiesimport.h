@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include "asn1systemchecks.h"
+#include "asn1componentsimport.h"
 #include "common.h"
-#include "undocommand.h"
 
 #include <QPointer>
-#include <QVector>
+#include <QUndoCommand>
+//#include <QVector>
 
 class QTemporaryDir;
 namespace ivm {
@@ -34,7 +34,7 @@ class IVModel;
 namespace ive {
 namespace cmd {
 
-class CmdEntitiesImport : public shared::UndoCommand
+class CmdEntitiesImport : public ASN1ComponentsImport, public QUndoCommand
 {
     Q_OBJECT
 public:
@@ -47,34 +47,20 @@ public:
     bool mergeWith(const QUndoCommand *command) override;
     int id() const override;
 
-Q_SIGNALS:
-    void asn1FilesImported(const QStringList &files);
-    void asn1FileRemoved(const QStringList &files);
-
 private:
-    void redoSourceCloning(const ivm::IVObject *object);
-    void undoSourceCloning(const ivm::IVObject *object);
-    void redoAsnFileImport(const ivm::IVObject *object);
-    void undoAsnFileImport();
-    QString relativePathForObject(const ivm::IVObject *object) const;
-
     void prepareRectangularType(
             ivm::IVObject *obj, const QPointF &offset, QRectF &parentRect, QList<QRectF> &existingRects);
     void prepareEndPointType(ivm::IVObject *obj, const QPointF &offset);
     void prepareConnectionType(ivm::IVObject *obj, const QVector<ivm::IVObject *> &objects);
     QList<QRectF> existingModelRects() const;
 
-    Asn1Acn::Asn1SystemChecks *m_asn1Checks;
+private:
     QPointer<ivm::IVModel> m_model;
     QPointer<ivm::IVModel> m_importModel;
     QPointer<ivm::IVFunctionType> m_parent;
     QVector<QPointer<ivm::IVObject>> m_rootEntities;
     QVector<QPointer<ivm::IVObject>> m_importedEntities;
     QHash<QString, QString> m_renamedFunctions;
-
-    QString m_destPath;
-    QScopedPointer<QTemporaryDir> m_tempDir;
-    QStringList m_importedAsnFiles;
     QHash<shared::Id, QPointer<ivm::IVObject>> m_parentChildMappings;
 };
 

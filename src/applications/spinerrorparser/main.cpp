@@ -23,6 +23,7 @@
 #include <QRegularExpression>
 #include <QString>
 #include <iostream>
+#include <optional>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorreport.h>
 #include <string.h>
