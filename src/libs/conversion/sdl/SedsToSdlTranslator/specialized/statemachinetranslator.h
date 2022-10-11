@@ -29,6 +29,7 @@
 #include <seds/SedsModel/components/states/entrystate.h>
 #include <seds/SedsModel/components/states/exitstate.h>
 #include <seds/SedsModel/sedsmodel.h>
+#include <unordered_map>
 
 namespace conversion {
 class Options;
@@ -141,6 +142,14 @@ private:
         Async
     };
 
+    struct TransitionInfo {
+        std::unique_ptr<::sdl::Transition> transition;
+        std::unique_ptr<::sdl::Input> input;
+        std::optional<QString> transactionName;
+    };
+
+    using InputsForStatesMap = std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>>;
+
     static auto setInitialVariableValues(
             const seds::model::ComponentImplementation::VariableSet &variables, ::sdl::Transition *transition) -> void;
 
@@ -178,15 +187,28 @@ private:
 
     static auto translatePrimitive(::sdl::State *sdlFromState) -> InputHandler;
 
-    static auto translateTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
-            const seds::model::Transition &sedsTransition, std::map<QString, std::unique_ptr<::sdl::State>> &stateMap,
-            const Options &options) -> void;
+    static auto translateTransitions(Context &context,
+            const std::vector<const ::seds::model::Transition *> sedsTransitions,
+            std::map<QString, std::unique_ptr<::sdl::State>> &stateMap,
+            const ::seds::model::StateMachine &sedsStateMachine, const Options &options)
+            -> std::unordered_map<::sdl::State *, InputsForStatesMap>;
+    static auto translateTransition(Context &context, const ::seds::model::Transition *sedsTransition,
+            const ::sdl::State *sdlFromState, const bool stateChange,
+            std::vector<std::unique_ptr<::sdl::Action>> actions, const ::seds::model::StateMachine &sedsStateMachine)
+            -> TransitionInfo;
+
+    static auto createInputs(Context &context, ::sdl::State *fromState,
+            std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitions) -> void;
+    static auto createInputWithTransactions(Context &context, ::sdl::State *fromState,
+            std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void;
+    static auto createInputWithoutTransactions(
+            Context &context, ::sdl::State *fromState, StateMachineTranslator::TransitionInfo transitionInfo) -> void;
 
     static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 
     static auto createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 
-    static auto translateGuard(::sdl::Process *sdlProcess, ::sdl::State *fromState,
+    static auto translateGuard(::sdl::Process *sdlProcess, const ::sdl::State *fromState,
             ::sdl::Transition *currentTransitionPtr, const seds::model::BooleanExpression &guard)
             -> ::sdl::Transition *;
 
@@ -196,6 +218,8 @@ private:
     static auto createTimerSetCall(QString timerName, const uint64_t callTimeInNanoseconds)
             -> std::unique_ptr<::sdl::ProcedureCall>;
 
+    static auto getSdlState(const ::seds::model::StateRef &sedsState,
+            std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> ::sdl::State *;
     static auto getStateInput(const ::sdl::State *state, const QString &inputName) -> ::sdl::Input *;
 };
 
