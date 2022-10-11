@@ -266,6 +266,50 @@ bool TmcConverter::convertTrace(const QString &inputFile, const QString &outputF
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
 
+    QStringList asn1Files;
+
+    for (const auto &info : m_observerInfos) {
+        const auto process = QFileInfo(info.path());
+        const auto processName = process.baseName();
+        const auto directory = process.absoluteDir();
+        const auto datamodel =
+                QFileInfo(directory.absolutePath() + QDir::separator() + processName.toLower() + "_datamodel.asn");
+        ProcessMetadata meta(
+                Escaper::escapePromelaName(processName), std::nullopt, process, datamodel, QList<QFileInfo>());
+
+        m_observerNames.append(Escaper::escapePromelaIV(processName));
+        // asn1Files.append(datamodel.absoluteFilePath());
+        // this breaks stuff
+        allSdlFiles.emplace(processName, meta);
+        const auto infoPath = outputFilepath(Escaper::escapePromelaIV(processName) + ".info");
+
+        QFile infoFile(infoPath.absoluteFilePath());
+        if (infoFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&infoFile);
+            while (!in.atEnd()) {
+                m_observerAttachmentInfos.append(in.readLine() + ":" + QString::number(info.priority()));
+            }
+            infoFile.close();
+        } else {
+            const auto message = QString("Could not open observer info file %1").arg(infoPath.absoluteFilePath());
+            throw TranslationException(message);
+        }
+    }
+
+    const QFileInfo simuDataView = simuDataViewLocation();
+    asn1Files.append(simuDataView.absoluteFilePath());
+
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
+
+        if (!subtypesFileInfo.exists()) {
+            qCritical() << "File " << subtypesFileInfo.absoluteFilePath() << " with subtypes does not exist.";
+            return false;
+        }
+
+        asn1Files.append(subtypesFileInfo.absoluteFilePath());
+    }
+
     conversion::Options options;
     options.add(SimulatorTrailOptions::outputFilepath, outputFile);
     options.add(SpinTrailOptions::inputFilepath, inputFile);
@@ -309,26 +353,6 @@ bool TmcConverter::convertTrace(const QString &inputFile, const QString &outputF
 
     if (!m_stopConditionsFiles.isEmpty() || !m_observerNames.isEmpty()) {
         options.add(PromelaOptions::additionalIncludes, "scl.pml");
-    }
-
-    QStringList asn1Files;
-
-    for (const auto &info : m_observerInfos) {
-        integrateObserver(info, m_observerNames, asn1Files, allSdlFiles, m_observerAttachmentInfos);
-    }
-
-    const QFileInfo simuDataView = simuDataViewLocation();
-    asn1Files.append(simuDataView.absoluteFilePath());
-
-    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
-        QFileInfo subtypesFileInfo(subtypesFilepath);
-
-        if (!subtypesFileInfo.exists()) {
-            qCritical() << "File " << subtypesFileInfo.absoluteFilePath() << " with subtypes does not exist.";
-            return false;
-        }
-
-        asn1Files.append(subtypesFileInfo.absoluteFilePath());
     }
 
     for (const QString &inputFileName : asn1Files) {

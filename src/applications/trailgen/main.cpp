@@ -34,6 +34,28 @@
 
 using tmc::converter::TmcConverter;
 
+const auto separator = QString(":");
+
+static QString extractObserverPath(const QString &info)
+{
+    const auto elements = info.split(separator, QString::KeepEmptyParts);
+    if (elements.size() == 0) {
+        qCritical("Malformed observer info: missing path");
+    }
+    return elements[0];
+}
+
+static uint32_t extractObserverPriority(const QString &info)
+{
+    const auto elements = info.split(separator, QString::KeepEmptyParts);
+    bool ok = true;
+    const auto priority = elements.size() > 1 ? elements[1].toUInt(&ok) : 1;
+    if (!ok) {
+        qCritical("Malformed observer info: priority could not be parsed as an integer");
+    }
+    return priority;
+}
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
@@ -141,6 +163,14 @@ int main(int argc, char *argv[])
 
     try {
         std::unique_ptr<TmcConverter> converter = std::make_unique<TmcConverter>(inputIvFilepath.value(), "tmc");
+        converter->setEnvironmentFunctions(environmentFunctions);
+        converter->setKeepFunctions(keepFunctions);
+        converter->setMscObserverFiles(mscObserverFiles);
+        for (const auto &info : observerInfos) {
+            if (!converter->attachObserver(extractObserverPath(info), extractObserverPriority(info))) {
+                exit(EXIT_FAILURE);
+            }
+        }
         converter->convertTrace(inputSpinTrailFilepath.value(), outputSimulatorTrailFilepath.value());
     } catch (const conversion::importer::ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
