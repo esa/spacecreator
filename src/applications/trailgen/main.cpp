@@ -23,35 +23,41 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
-#include <conversion/asn1/Asn1Options/options.h>
-#include <conversion/asn1/Asn1Registrar/registrar.h>
 #include <conversion/common/export/exceptions.h>
 #include <conversion/common/import/exceptions.h>
-#include <conversion/common/options.h>
 #include <conversion/common/translation/exceptions.h>
-#include <conversion/converter/converter.h>
 #include <conversion/converter/exceptions.h>
-#include <conversion/iv/IvOptions/options.h>
-#include <conversion/iv/IvRegistrar/registrar.h>
-#include <conversion/registry/registry.h>
-#include <conversion/simulatortrail/SimulatorTrailRegistrar/registrar.h>
-#include <conversion/spintrail/SpinTrailRegistrar/registrar.h>
 #include <ivcore/ivlibrary.h>
-#include <ivcore/ivpropertytemplateconfig.h>
-#include <shared/common.h>
+#include <msccore/msclibrary.h>
 #include <shared/sharedlibrary.h>
-#include <simulatortrail/SimulatorTrailOptions/options.h>
-#include <spintrail/SpinTrailOptions/options.h>
+#include <tmc/TmcConverter/converter.h>
+
+using tmc::converter::TmcConverter;
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(asn1_resources);
+
+    ivm::initIVLibrary();
+    shared::initSharedLibrary();
+    msc::initMscLibrary();
+
     QCoreApplication app(argc, argv);
+
+    app.setOrganizationName(SC_ORGANISATION);
+    app.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
+    app.setApplicationVersion(spaceCreatorVersion);
+    app.setApplicationName(QObject::tr("TASTE Model Checker"));
 
     const QStringList args = app.arguments();
 
     std::optional<QString> inputIvFilepath;
     std::optional<QString> inputSpinTrailFilepath;
     std::optional<QString> outputSimulatorTrailFilepath;
+    QStringList observerInfos;
+    QStringList mscObserverFiles;
+    std::vector<QString> environmentFunctions;
+    std::vector<QString> keepFunctions;
 
     for (int i = 1; i < args.size(); ++i) {
         const QString &arg = args[i];
@@ -77,15 +83,38 @@ int main(int argc, char *argv[])
             }
             ++i;
             outputSimulatorTrailFilepath = args[i];
+            qDebug() << "Parse " << outputSimulatorTrailFilepath.value();
+        } else if (arg == "-os") {
+            ++i;
+            observerInfos.append(args[i]);
+        } else if (arg == "-mos") {
+            ++i;
+            mscObserverFiles.append(args[i]);
+        } else if (arg == "-e" || arg == "--envfunc") {
+            ++i;
+            environmentFunctions.emplace_back(args[i]);
+        } else if (arg == "-k" || arg == "--keep") {
+            ++i;
+            keepFunctions.emplace_back(args[i]);
         } else if (arg == "-h" || arg == "--help") {
             qInfo("trailgen: TASTE Model Checker trail generator");
             qInfo("Usage: trailgen [OPTIONS] <input spin trail>");
             qInfo("  -iv <filepath>         Use <filepath> as input InterfaceView");
             qInfo("  -o  <filepath>         Use <filepath> as output Simulator Trail");
+            qInfo("  -os <filepath>[:priority]");
+            qInfo("                         Use <filepath> as an Observer source file.");
+            qInfo("                         Integer <priority> of the Observer is optional");
+            qInfo("  -mos <filepath>        Use <filepath> as an MSC validation.");
+            qInfo("  -e, --envfunc <name>   Use <name> to specify a SDL function that should be treated as "
+                  "environment");
+            qInfo("  -k, --keepfunc <name>  Use <name> to specify a SDL function that shouldn't be treated as "
+                  "environment.");
+            qInfo("                         All other functions will be treated as environment");
             qInfo("  -h, --help             Print this message and exit.");
         } else {
             if (inputSpinTrailFilepath.has_value()) {
                 qCritical("Duplicated input file argument.");
+                qDebug() << inputSpinTrailFilepath.value();
                 exit(EXIT_FAILURE);
             }
             inputSpinTrailFilepath = args[i];
@@ -110,55 +139,9 @@ int main(int argc, char *argv[])
     const QString observerAsn1Filepath = baseDirectory.absolutePath() + QDir::separator() + "work" + QDir::separator()
             + "simulation" + QDir::separator() + "observers" + QDir::separator() + "observer.asn";
 
-    ivm::initIVLibrary();
-    shared::initSharedLibrary();
-
-    auto dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
-    dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
-
-    conversion::Registry registry;
-
-    {
-        conversion::spintrail::SpinTrailRegistrar spinTrailRegistrar;
-        if (!spinTrailRegistrar.registerCapabilities(registry)) {
-            exit(EXIT_FAILURE);
-        }
-    }
-    {
-        conversion::simulatortrail::SimulatorTrailRegistrar simulatorTrailRegistrar;
-        if (!simulatorTrailRegistrar.registerCapabilities(registry)) {
-            exit(EXIT_FAILURE);
-        }
-    }
-    {
-        conversion::asn1::Asn1Registrar asn1Registrar;
-        if (!asn1Registrar.registerCapabilities(registry)) {
-            exit(EXIT_FAILURE);
-        }
-    }
-    {
-        conversion::iv::IvRegistrar ivRegistrar;
-        if (!ivRegistrar.registerCapabilities(registry)) {
-            exit(EXIT_FAILURE);
-        }
-    }
-
     try {
-        std::set<conversion::ModelType> sourceModels;
-        sourceModels.insert(conversion::ModelType::Asn1);
-        sourceModels.insert(conversion::ModelType::InterfaceView);
-        sourceModels.insert(conversion::ModelType::SpinTrail);
-
-        conversion::Options options;
-        options.add(conversion::simulatortrail::SimulatorTrailOptions::outputFilepath,
-                outputSimulatorTrailFilepath.value());
-        options.add(conversion::spintrail::SpinTrailOptions::inputFilepath, inputSpinTrailFilepath.value());
-        options.add(conversion::asn1::Asn1Options::inputFilepath, observerAsn1Filepath);
-        options.add(conversion::iv::IvOptions::inputFilepath, inputIvFilepath.value());
-        options.add(conversion::iv::IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
-
-        conversion::Converter converter(registry, std::move(options));
-        converter.convert(sourceModels, conversion::ModelType::SimulatorTrail, {});
+        std::unique_ptr<TmcConverter> converter = std::make_unique<TmcConverter>(inputIvFilepath.value(), "tmc");
+        converter->convertTrace(inputSpinTrailFilepath.value(), outputSimulatorTrailFilepath.value());
     } catch (const conversion::importer::ImportException &ex) {
         const auto errorMessage = QString("Import failure: %1").arg(ex.errorMessage());
         qFatal("%s", errorMessage.toLatin1().constData());

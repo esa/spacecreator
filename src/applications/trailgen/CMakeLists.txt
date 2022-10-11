@@ -13,13 +13,8 @@ target_include_directories(trailgen
 	           ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(trailgen
     PRIVATE    Conversion::Converter
-	           Conversion::Registry
 	           Conversion::Common
-	           Conversion::SpinTrailRegistrar
-	           Conversion::SimulatorTrailRegistrar
-			   Conversion::IvRegistrar
-			   Conversion::Asn1Registrar
-			   IV::XmlImporter
+	           Tmc::Converter
 			   shared
 	           CommonProjectWarnings)
 

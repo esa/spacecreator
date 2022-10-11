@@ -24,6 +24,7 @@ target_link_libraries(SpinTrailToSimulatorTrailTranslator
                       SimulatorTrail::Model
 					  SpinTrail::Model
 					  Conversion::Asn1ToPromelaTranslator
+					  Conversion::IvToPromelaTranslator
   PRIVATE             CommonProjectWarnings)
 
 add_format_target(SpinTrailToSimulatorTrailTranslator)

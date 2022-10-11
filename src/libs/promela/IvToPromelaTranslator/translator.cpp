@@ -389,6 +389,52 @@ std::set<ModelType> IvToPromelaTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::InterfaceView, ModelType::Asn1 };
 }
 
+std::unique_ptr<IvToPromelaTranslator::SystemInfo> IvToPromelaTranslator::prepareSystemInfo(
+        const ivm::IVModel *model, const conversion::Options &options) const
+{
+    const auto &modelFunctions = options.values(PromelaOptions::modelFunctionName);
+    const auto &environmentFunctions = options.values(PromelaOptions::environmentFunctionName);
+    const auto &observerAttachmentInfos = options.values(PromelaOptions::observerAttachment);
+    const auto &observerNames = options.values(PromelaOptions::observerFunctionName);
+    return prepareSystemInfo(model, modelFunctions, environmentFunctions, observerAttachmentInfos, observerNames);
+}
+
+std::unique_ptr<IvToPromelaTranslator::SystemInfo> IvToPromelaTranslator::prepareSystemInfo(const ivm::IVModel *ivModel,
+        const std::vector<QString> &modelFunctions, const std::vector<QString> &environmentFunctions,
+        const std::vector<QString> &observerAttachmentInfos, const std::vector<QString> &observerNames) const
+{
+    conversion::Options options;
+    std::vector<const Asn1Acn::Definitions *> asn1Definitions;
+
+    Context context(nullptr, ivModel, options, asn1Definitions, modelFunctions, observerNames);
+
+    for (const QString &info : observerAttachmentInfos) {
+        context.addObserverAttachment(ObserverAttachment(info));
+    }
+
+    std::unique_ptr<SystemInfo> result = std::make_unique<SystemInfo>();
+
+    const QVector<IVFunction *> ivFunctionList = ivModel->allObjectsByType<IVFunction>();
+
+    for (const IVFunction *ivFunction : ivFunctionList) {
+        const QString functionName = ivFunction->property("name").toString();
+        if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
+            std::unique_ptr<FunctionInfo> functionInfo = std::make_unique<FunctionInfo>();
+            functionInfo->m_isEnvironment = false;
+            prepareFunctionInfo(context, ivFunction, functionName, *functionInfo);
+            result->m_functions.emplace(functionName, std::move(functionInfo));
+        } else if (std::find(environmentFunctions.begin(), environmentFunctions.end(), functionName)
+                != environmentFunctions.end()) {
+            std::unique_ptr<FunctionInfo> functionInfo = std::make_unique<FunctionInfo>();
+            functionInfo->m_isEnvironment = true;
+            prepareEnvironmentFunctionInfo(context, ivFunction, functionName, *functionInfo);
+            result->m_functions.emplace(functionName, std::move(functionInfo));
+        }
+    }
+
+    return result;
+}
+
 void IvToPromelaTranslator::initializeFunction(Sequence &sequence, const QString &functionName) const
 {
     QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaIV(functionName));
@@ -1457,6 +1503,108 @@ IvToPromelaTranslator::ObserverAttachments IvToPromelaTranslator::getObserverAtt
     }
 
     return result;
+}
+
+void IvToPromelaTranslator::prepareFunctionInfo(Context &context, const ::ivm::IVFunction *ivFunction,
+        const QString &functionName, FunctionInfo &functionInfo) const
+{
+    for (const IVInterface *providedInterface : ivFunction->pis()) {
+        if (providedInterface->kind() == IVInterface::OperationKind::Cyclic
+                || providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
+            std::unique_ptr<ProctypeInfo> proctypeInfo = prepareProctypeInfo(context, providedInterface, functionName);
+            const QString proctypeName = proctypeInfo->m_proctypeName;
+            functionInfo.m_proctypes.emplace(proctypeName, std::move(proctypeInfo));
+        } else {
+            auto message =
+                    QString("Unallowed interface kind in function %1, only sporadic and cyclic interfaces are allowed")
+                            .arg(functionName);
+            throw TranslationException(message);
+        }
+    }
+}
+
+void IvToPromelaTranslator::prepareEnvironmentFunctionInfo(Context &context, const ::ivm::IVFunction *ivFunction,
+        const QString &functionName, FunctionInfo &functionInfo) const
+{
+    for (const IVInterface *providedInterface : ivFunction->pis()) {
+        if (providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
+            std::unique_ptr<ProctypeInfo> proctypeInfo = prepareProctypeInfo(context, providedInterface, functionName);
+            const QString proctypeName = proctypeInfo->m_proctypeName;
+            functionInfo.m_environmentSinkProctypes.emplace(proctypeName, std::move(proctypeInfo));
+        }
+    }
+    for (const IVInterface *requiredInterface : ivFunction->ris()) {
+        if (requiredInterface->kind() == IVInterface::OperationKind::Sporadic) {
+            std::unique_ptr<EnvProctypeInfo> proctypeInfo =
+                    prepareEnvProctypeInfo(context, requiredInterface, functionName);
+            const QString proctypeName = proctypeInfo->m_proctypeName;
+            functionInfo.m_environmentProctypes.emplace(proctypeName, std::move(proctypeInfo));
+        } else {
+            auto message =
+                    QString("Unallowed interface kind in function %1, only sporadic required interfaces are allowed")
+                            .arg(functionName);
+            throw TranslationException(message);
+        }
+    }
+}
+
+std::unique_ptr<IvToPromelaTranslator::ProctypeInfo> IvToPromelaTranslator::prepareProctypeInfo(
+        Context &context, const ivm::IVInterface *providedInterface, const QString &functionName) const
+{
+    const QString interfaceName = getInterfaceName(providedInterface);
+    const QString proctypeName = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
+
+    const size_t priority = getInterfacePriority(providedInterface) + context.getBaseProctypePriority();
+    const size_t queueSize = getInterfaceQueueSize(providedInterface);
+    const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
+
+    const ObserverAttachments outputObservers =
+            context.getObserverAttachments(functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
+
+    std::unique_ptr<ProctypeInfo> proctypeInfo = std::make_unique<ProctypeInfo>();
+
+    const IVConnection *connection = context.ivModel()->getConnectionForIface(providedInterface->id());
+    const IVInterface *requiredInterface = connection->sourceInterface();
+    const QString sourceFunctionName = requiredInterface->function()->property("name").toString();
+    const QString sourceInterfaceName = requiredInterface->property("name").toString();
+
+    proctypeInfo->m_proctypeName = proctypeName;
+    proctypeInfo->m_interfaceName = interfaceName;
+    proctypeInfo->m_queueName = constructChannelName(functionName, interfaceName);
+    proctypeInfo->m_queueSize = queueSize;
+    proctypeInfo->m_priority = priority;
+    proctypeInfo->m_parameterTypeName = parameterType;
+    proctypeInfo->m_parameterName = parameterName;
+    proctypeInfo->m_possibleSenders.insert(sourceFunctionName, sourceInterfaceName);
+
+    for (const ObserverAttachment &attachment : outputObservers) {
+        const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
+        const QString &channelName = observerChannelName(attachment, toFunction);
+
+        std::unique_ptr<ObserverInfo> observerInfo = std::make_unique<ObserverInfo>();
+
+        observerInfo->m_observerName = attachment.observer();
+        observerInfo->m_observerInterface = attachment.observerInterface();
+        observerInfo->m_observerQueue = channelName;
+        proctypeInfo->m_observers.push_back(std::move(observerInfo));
+    }
+
+    return proctypeInfo;
+}
+
+std::unique_ptr<IvToPromelaTranslator::EnvProctypeInfo> IvToPromelaTranslator::prepareEnvProctypeInfo(
+        Context &context, const ivm::IVInterface *requiredInterface, const QString &functionName) const
+{
+    Q_UNUSED(context);
+    const QString interfaceName = getInterfaceName(requiredInterface);
+
+    const QString proctypeName = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
+
+    std::unique_ptr<EnvProctypeInfo> proctypeInfo = std::make_unique<EnvProctypeInfo>();
+    proctypeInfo->m_proctypeName = proctypeName;
+    proctypeInfo->m_interfaceName = interfaceName;
+
+    return proctypeInfo;
 }
 
 }

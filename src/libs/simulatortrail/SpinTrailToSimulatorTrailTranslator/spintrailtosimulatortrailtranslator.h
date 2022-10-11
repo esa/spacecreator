@@ -22,6 +22,7 @@
 #include <asn1library/asn1/asn1model.h>
 #include <conversion/common/translation/translator.h>
 #include <ivcore/ivmodel.h>
+#include <promela/IvToPromelaTranslator/translator.h>
 #include <simulatortrail/SimulatorTrailModel/simulatortrailmodel.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 
@@ -72,9 +73,10 @@ private:
     };
 
 private:
-    void findChannelNames(const ivm::IVModel &ivModel, const Asn1Acn::Asn1Model &asn1Model,
-            QMap<QString, ChannelInfo> &channel) const;
-    void findProctypes(const ivm::IVModel &ivModel, QMap<QString, QString> &proctypes) const;
+    void findChannelNames(const promela::translator::IvToPromelaTranslator::SystemInfo &systemInfo,
+            const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channel) const;
+    void findProctypes(const promela::translator::IvToPromelaTranslator::SystemInfo &systemInfo,
+            QMap<QString, QString> &proctypes) const;
     void translate(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
             const QMap<QString, QString> &proctypes, const Asn1Acn::Types::Type *observableEvent) const;

@@ -22,6 +22,8 @@ target_link_libraries(TmcConverter
                Conversion::MscRegistrar
                Conversion::PromelaRegistrar
                Conversion::SdlRegistrar
+	           Conversion::SpinTrailRegistrar
+	           Conversion::SimulatorTrailRegistrar
                Tmc::SdlToPromelaConverter
     PRIVATE    CommonProjectWarnings
                Tmc::InterfaceViewOptimizer)

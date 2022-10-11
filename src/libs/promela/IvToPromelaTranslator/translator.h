@@ -281,6 +281,47 @@ public:
      */
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
+    struct ObserverInfo {
+        QString m_observerName;
+        QString m_observerInterface;
+        QString m_observerQueue;
+    };
+
+    struct ProctypeInfo {
+        QString m_proctypeName;
+        QString m_interfaceName;
+        QString m_queueName;
+        size_t m_queueSize;
+        size_t m_priority;
+        QString m_parameterTypeName;
+        QString m_parameterName;
+
+        QMap<QString, QString> m_possibleSenders;
+        std::list<std::unique_ptr<ObserverInfo>> m_observers;
+    };
+
+    struct EnvProctypeInfo {
+        QString m_proctypeName;
+        QString m_interfaceName;
+        size_t m_priority;
+    };
+
+    struct FunctionInfo {
+        bool m_isEnvironment;
+        std::map<QString, std::unique_ptr<ProctypeInfo>> m_proctypes;
+        std::map<QString, std::unique_ptr<EnvProctypeInfo>> m_environmentProctypes;
+        std::map<QString, std::unique_ptr<ProctypeInfo>> m_environmentSinkProctypes;
+    };
+
+    struct SystemInfo {
+        std::map<QString, std::unique_ptr<FunctionInfo>> m_functions; // functions from IV
+    };
+
+    std::unique_ptr<SystemInfo> prepareSystemInfo(const ivm::IVModel *model, const conversion::Options &options) const;
+    std::unique_ptr<SystemInfo> prepareSystemInfo(const ivm::IVModel *model, const std::vector<QString> &modelFunctions,
+            const std::vector<QString> &environmentFunctions, const std::vector<QString> &observerAttachmentInfos,
+            const std::vector<QString> &observerNames) const;
+
 private:
     inline static const QString m_timerManagerProctypeName = "timer_manager_proc";
     inline static const QString m_dummyParamName = "dummy";
@@ -369,5 +410,14 @@ private:
             const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
     auto getObserverAttachments(Context &context, const QString &function, const QString &interface,
             const ObserverAttachment::Kind kind) const -> ObserverAttachments;
+
+    auto prepareFunctionInfo(Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName,
+            FunctionInfo &functionInfo) const -> void;
+    auto prepareEnvironmentFunctionInfo(Context &context, const ::ivm::IVFunction *ivFunction,
+            const QString &functionName, FunctionInfo &functionInfo) const -> void;
+    auto prepareProctypeInfo(Context &context, const ivm::IVInterface *providedInterface,
+            const QString &functionName) const -> std::unique_ptr<ProctypeInfo>;
+    auto prepareEnvProctypeInfo(Context &context, const ivm::IVInterface *requiredInterface,
+            const QString &functionName) const -> std::unique_ptr<EnvProctypeInfo>;
 };
 }

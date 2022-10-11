@@ -31,6 +31,7 @@
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
+#include <simulatortrail/SimulatorTrailOptions/options.h>
 
 using namespace simulatortrail::model;
 using Asn1Acn::Asn1Model;
@@ -42,21 +43,68 @@ using Asn1Acn::Types::Type;
 using conversion::Escaper;
 using conversion::Model;
 using conversion::ModelType;
+using conversion::simulatortrail::SimulatorTrailOptions;
 using conversion::translator::TranslationException;
 using ivm::IVConnection;
 using ivm::IVFunction;
 using ivm::IVInterface;
 using ivm::IVModel;
+using promela::translator::IvToPromelaTranslator;
 using shared::InterfaceParameter;
 using spintrail::model::ChannelEvent;
 using spintrail::model::SpinTrailModel;
 
 namespace simulatortrail::translator {
+
+namespace {
+void showPossibleSenders(const QMap<QString, QString> &data)
+{
+    qDebug() << "        possibleSenders ";
+    for (auto iter = data.begin(); iter != data.end(); ++iter) {
+        qDebug() << "            " << iter.key() << " " << iter.value();
+    }
+}
+
+void showObservers(const std::list<std::unique_ptr<IvToPromelaTranslator::ObserverInfo>> &data)
+{
+    qDebug() << "        observers ";
+    for (auto iter = data.begin(); iter != data.end(); ++iter) {
+        qDebug() << "            observerName " << (*iter)->m_observerName;
+        qDebug() << "            observerInterface " << (*iter)->m_observerInterface;
+        qDebug() << "            observerQueue " << (*iter)->m_observerQueue;
+    }
+}
+
+void showProctype(const QString &name, const IvToPromelaTranslator::ProctypeInfo &info, bool isEnv)
+{
+    if (isEnv) {
+        qDebug() << "    Environment proctype " << name;
+    } else {
+        qDebug() << "    Proctype " << name;
+    }
+    qDebug() << "        interfaceName " << info.m_interfaceName;
+    qDebug() << "        queueName " << info.m_queueName;
+    qDebug() << "        queueSize " << info.m_queueSize;
+    qDebug() << "        priority " << info.m_priority;
+    if (!info.m_parameterTypeName.isEmpty()) {
+        qDebug() << "        parameterName " << info.m_parameterName;
+        qDebug() << "        parameterType " << info.m_parameterTypeName;
+    }
+    showPossibleSenders(info.m_possibleSenders);
+    showObservers(info.m_observers);
+}
+
+void showEnvironmentProctype(const QString &name, const IvToPromelaTranslator::EnvProctypeInfo &info)
+{
+    qDebug() << "    Value generation proctype " << name;
+    qDebug() << "        interfaceName " << info.m_interfaceName;
+    qDebug() << "        priority " << info.m_priority;
+}
+}
+
 std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTranslator::translateModels(
         std::vector<conversion::Model *> sourceModels, const conversion::Options &options) const
 {
-    Q_UNUSED(options);
-
     const IVModel *ivModel = getModel<IVModel>(sourceModels);
     const Asn1Model *asn1Model = getModel<Asn1Model>(sourceModels);
     const SpinTrailModel *spinTrailModel = getModel<SpinTrailModel>(sourceModels);
@@ -71,11 +119,32 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
         throw TranslationException("Missing SpinTrail model.");
     }
 
+    IvToPromelaTranslator translator;
+
+    std::unique_ptr<IvToPromelaTranslator::SystemInfo> systemInfo = translator.prepareSystemInfo(ivModel, options);
+
+    qDebug() << "SystemInfo";
+    for (auto iter = systemInfo->m_functions.begin(); iter != systemInfo->m_functions.end(); ++iter) {
+        qDebug() << "Function " << iter->first << " env " << iter->second->m_isEnvironment;
+        for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
+                ++proctypeIter) {
+            showProctype(proctypeIter->first, *proctypeIter->second, false);
+        }
+        for (auto proctypeIter = iter->second->m_environmentProctypes.begin();
+                proctypeIter != iter->second->m_environmentProctypes.end(); ++proctypeIter) {
+            showEnvironmentProctype(proctypeIter->first, *proctypeIter->second);
+        }
+        for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
+                proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
+            showProctype(proctypeIter->first, *proctypeIter->second, true);
+        }
+    }
+
     QMap<QString, ChannelInfo> channels;
-    findChannelNames(*ivModel, *asn1Model, channels);
+    findChannelNames(*systemInfo, *asn1Model, channels);
 
     QMap<QString, QString> proctypes;
-    findProctypes(*ivModel, proctypes);
+    findProctypes(*systemInfo, proctypes);
 
     const Asn1Acn::File &asn1File = *asn1Model->data().front();
 
@@ -113,75 +182,80 @@ std::set<conversion::ModelType> SpinTrailToSimulatorTrailTranslator::getDependen
     return dependencies;
 }
 
-void SpinTrailToSimulatorTrailTranslator::findChannelNames(
-        const ivm::IVModel &ivModel, const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channels) const
+void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTranslator::SystemInfo &systemInfo,
+        const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channels) const
 {
     const Asn1Acn::File &ans1file = *asn1Model.data().front();
 
-    const QVector<IVFunction *> ivFunctionList = ivModel.allObjectsByType<IVFunction>();
-    for (const IVFunction *ivFunction : ivFunctionList) {
-        const QString targetFunctionName = ivFunction->property("name").toString();
-        QList<QString> channelNames;
-        for (const IVInterface *providedInterface : ivFunction->pis()) {
-            if (providedInterface->kind() != IVInterface::OperationKind::Sporadic) {
-                continue;
-            }
-            const QString interfaceName = providedInterface->property("name").toString();
-            const QVariant queueSizeProperty = providedInterface->property("queue_size");
-            const size_t channelSize = queueSizeProperty.isValid() ? queueSizeProperty.toULongLong() : 1;
-            // this does not support multiple connections
-            IVConnection *connection = ivModel.getConnectionForIface(providedInterface->id());
-            IVInterface *requiredInterface = connection->sourceInterface();
-            const QString sourceFunctionName = requiredInterface->function()->property("name").toString();
-            const QString sourceInterfaceName = requiredInterface->property("name").toString();
-            const QVector<InterfaceParameter> parameterList = providedInterface->params();
-            const QString channelName =
-                    QString("%1_%2_channel").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(interfaceName);
-            if (parameterList.length() > 1) {
-                throw TranslationException("Sporadic interface with more than one parameters is not allowed");
-            }
+    for (auto iter = systemInfo.m_functions.begin(); iter != systemInfo.m_functions.end(); ++iter) {
+        for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
+                ++proctypeIter) {
             ChannelInfo info;
-            info.m_functionName = targetFunctionName;
-            info.m_interfaceName = interfaceName;
-            info.m_channelSize = channelSize;
-            info.m_possibleSenders.insert(sourceFunctionName, sourceInterfaceName);
+            info.m_functionName = iter->first;
+            info.m_interfaceName = proctypeIter->second->m_interfaceName;
+            info.m_parameterName = proctypeIter->second->m_parameterName;
+            info.m_parameterTypeName = proctypeIter->second->m_parameterTypeName;
+            info.m_possibleSenders = proctypeIter->second->m_possibleSenders;
+            info.m_channelSize = proctypeIter->second->m_queueSize;
 
-            if (parameterList.length() == 1) {
-                info.m_parameterTypeName = parameterList.front().paramTypeName();
-                info.m_parameterName = parameterList.front().name();
+            if (!info.m_parameterTypeName.isEmpty()) {
                 info.m_parameterType = ans1file.typeFromName(info.m_parameterTypeName);
                 if (info.m_parameterType == nullptr) {
                     QString message = QString("Cannot find type of queue %1:%2, name %3")
-                                              .arg(targetFunctionName)
-                                              .arg(interfaceName)
+                                              .arg(info.m_functionName)
+                                              .arg(info.m_interfaceName)
                                               .arg(info.m_parameterTypeName);
                     throw TranslationException(std::move(message));
                 }
             } else {
                 info.m_parameterType = nullptr;
             }
-            channels.insert(channelName, info);
+
+            channels.insert(proctypeIter->second->m_queueName, info);
+        }
+        for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
+                proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
+            ChannelInfo info;
+            info.m_functionName = iter->first;
+            info.m_interfaceName = proctypeIter->second->m_interfaceName;
+            info.m_parameterName = proctypeIter->second->m_parameterName;
+            info.m_parameterTypeName = proctypeIter->second->m_parameterTypeName;
+            info.m_possibleSenders = proctypeIter->second->m_possibleSenders;
+            info.m_channelSize = proctypeIter->second->m_queueSize;
+
+            if (!info.m_parameterTypeName.isEmpty()) {
+                info.m_parameterType = ans1file.typeFromName(info.m_parameterTypeName);
+                if (info.m_parameterType == nullptr) {
+                    QString message = QString("Cannot find type of queue %1:%2, name %3")
+                                              .arg(info.m_functionName)
+                                              .arg(info.m_interfaceName)
+                                              .arg(info.m_parameterTypeName);
+                    throw TranslationException(std::move(message));
+                }
+            } else {
+                info.m_parameterType = nullptr;
+            }
+
+            channels.insert(proctypeIter->second->m_queueName, info);
         }
     }
 }
 
 void SpinTrailToSimulatorTrailTranslator::findProctypes(
-        const ivm::IVModel &ivModel, QMap<QString, QString> &proctypes) const
+        const IvToPromelaTranslator::SystemInfo &systemInfo, QMap<QString, QString> &proctypes) const
 {
-    const QVector<IVFunction *> ivFunctionList = ivModel.allObjectsByType<IVFunction>();
-    for (const IVFunction *ivFunction : ivFunctionList) {
-        const QString functionName = ivFunction->property("name").toString();
-        QList<QString> channelNames;
-        for (const IVInterface *providedInterface : ivFunction->pis()) {
-            if (providedInterface->kind() != IVInterface::OperationKind::Sporadic) {
-                continue;
-            }
-            const QString interfaceName = providedInterface->property("name").toString();
-
-            const QString proctypeName =
-                    QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
-
-            proctypes.insert(proctypeName, functionName);
+    for (auto iter = systemInfo.m_functions.begin(); iter != systemInfo.m_functions.end(); ++iter) {
+        for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
+                ++proctypeIter) {
+            proctypes.insert(proctypeIter->first, iter->first);
+        }
+        for (auto proctypeIter = iter->second->m_environmentProctypes.begin();
+                proctypeIter != iter->second->m_environmentProctypes.end(); ++proctypeIter) {
+            proctypes.insert(proctypeIter->first, iter->first);
+        }
+        for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
+                proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
+            proctypes.insert(proctypeIter->first, iter->first);
         }
     }
 }
@@ -202,12 +276,12 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
         if (event->getType() == ChannelEvent::Type::Send) {
             if (channels.contains(event->getChannelName())) {
                 ChannelInfo &channelInfo = channels[event->getChannelName()];
-                qDebug() << "output from proctype " << event->getProctypeName();
+                // qDebug() << "output from proctype " << event->getProctypeName();
                 const QString source = channelInfo.m_possibleSenders.firstKey();
                 const QString destination = channelInfo.m_functionName;
                 ValuePtr message =
                         getValue(source, destination, channelInfo, observableEvent, event->getParameters(), false);
-                qDebug() << "output from " << source << " to " << destination << " value " << message->asString();
+                // qDebug() << "output from " << source << " to " << destination << " value " << message->asString();
                 result.appendValue(std::move(message));
                 if (channelInfo.m_senders.length() < static_cast<int>(channelInfo.m_channelSize)) {
                     channelInfo.m_senders.push_back(source);
@@ -216,6 +290,7 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
                 }
             } else {
                 qCritical() << "Cannot process trail event";
+                throw TranslationException("Cannot process trail event");
             }
         }
         if (event->getType() == ChannelEvent::Type::Recv) {
@@ -229,10 +304,11 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
                 channelInfo.m_senders.pop_front();
                 ValuePtr message =
                         getValue(source, destination, channelInfo, observableEvent, event->getParameters(), true);
-                qDebug() << "input from " << source << " to " << destination << " value " << message->asString();
+                // qDebug() << "input from " << source << " to " << destination << " value " << message->asString();
                 result.appendValue(std::move(message));
             } else {
                 qCritical() << "Cannot process trail event";
+                throw TranslationException("Cannot process trail event");
             }
         }
     }
