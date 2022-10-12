@@ -24,6 +24,8 @@
 #include <ivcore/ivmodel.h>
 #include <promela/IvToPromelaTranslator/translator.h>
 #include <simulatortrail/SimulatorTrailModel/simulatortrailmodel.h>
+#include <spintrail/SpinTrailModel/channelevent.h>
+#include <spintrail/SpinTrailModel/continuoussignal.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 
 namespace simulatortrail::translator {
@@ -82,6 +84,12 @@ private:
             const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
             const Asn1Acn::Types::Type *observableEvent) const;
+    void processSpinTrailEvent(simulatortrail::model::SimulatorTrailModel &result,
+            const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
+            const Asn1Acn::Types::Type *observableEvent) const;
+    void processSpinTrailEvent(
+            simulatortrail::model::SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const;
     Asn1Acn::ValuePtr getValue(const QString &source, const QString &target, const ChannelInfo &info,
             const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters, bool isInput) const;
 

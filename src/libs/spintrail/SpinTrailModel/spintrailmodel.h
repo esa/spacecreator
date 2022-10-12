@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "channelevent.h"
+#include "trailevent.h"
 
 #include <conversion/common/model.h>
 #include <conversion/common/modelproperties.h>
@@ -41,12 +41,12 @@ public:
      */
     conversion::ModelType modelType() const override;
 
-    void appendEvent(std::unique_ptr<ChannelEvent> event);
+    void appendEvent(std::unique_ptr<TrailEvent> event);
 
-    const std::list<std::unique_ptr<ChannelEvent>> &getEvents() const;
+    const std::list<std::unique_ptr<TrailEvent>> &getEvents() const;
 
 private:
-    std::list<std::unique_ptr<ChannelEvent>> m_events;
+    std::list<std::unique_ptr<TrailEvent>> m_events;
 };
 }
 

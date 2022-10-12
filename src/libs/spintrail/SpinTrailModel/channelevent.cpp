@@ -68,4 +68,9 @@ const QList<QString> &ChannelEvent::getParameters() const
 {
     return m_parameters;
 }
+
+TrailEvent::EventType ChannelEvent::getEventType() const
+{
+    return TrailEvent::EventType::CHANNEL_EVENT;
+}
 }

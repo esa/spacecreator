@@ -27,6 +27,8 @@
 #include <QTextStream>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/import/exceptions.h>
+#include <spintrail/SpinTrailModel/channelevent.h>
+#include <spintrail/SpinTrailModel/continuoussignal.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 #include <spintrail/SpinTrailOptions/options.h>
 
@@ -35,6 +37,7 @@ using namespace conversion::spintrail;
 using conversion::ConversionException;
 using conversion::FileNotFoundException;
 using spintrail::model::ChannelEvent;
+using spintrail::model::ContinuousSignal;
 using spintrail::model::SpinTrailModel;
 
 namespace spintrail::importer {
@@ -69,6 +72,12 @@ std::unique_ptr<conversion::Model> SpinTrailImporter::importModel(const conversi
 
 void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, const QString &line) const
 {
+    QRegExp continuousSignalValidation(R"( *process continuous signals in (\w+))");
+    if (continuousSignalValidation.exactMatch(line)) {
+        const QString functionName = continuousSignalValidation.cap(1);
+        model.appendEvent(std::make_unique<ContinuousSignal>(functionName));
+        return;
+    }
     // example input line:
     // '9387:	proc  3 (Actuator_step:1) system.pml:53 Send 84	-> queue 5 (Controller_result_channel)'
     // The line shall contains three substrings separated by tab character '\t'

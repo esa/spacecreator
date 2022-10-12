@@ -1,10 +1,13 @@
 project(SpinTrailModel VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES spintrailmodel.h
-	channelevent.h)
+	trailevent.h
+	channelevent.h
+	continuoussignal.h)
 
 set(INCLUDES spintrailmodel.cpp
-	channelevent.cpp)
+	channelevent.cpp
+	continuoussignal.cpp)
 
 add_library(SpinTrailModel STATIC)
 target_sources(SpinTrailModel

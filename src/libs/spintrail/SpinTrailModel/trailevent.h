@@ -17,22 +17,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "spintrailmodel.h"
+#pragma once
 
 namespace spintrail::model {
-SpinTrailModel::SpinTrailModel() {}
+class TrailEvent
+{
+public:
+    enum class EventType
+    {
+        CHANNEL_EVENT,
+        CONTINUOUS_SIGNAL,
+    };
 
-conversion::ModelType SpinTrailModel::modelType() const
-{
-    return conversion::ModelProperties<SpinTrailModel>::type;
-}
-void SpinTrailModel::appendEvent(std::unique_ptr<TrailEvent> event)
-{
-    m_events.push_back(std::move(event));
-}
-
-const std::list<std::unique_ptr<TrailEvent>> &SpinTrailModel::getEvents() const
-{
-    return m_events;
-}
+    virtual ~TrailEvent() = default;
+    virtual EventType getEventType() const = 0;
+};
 }

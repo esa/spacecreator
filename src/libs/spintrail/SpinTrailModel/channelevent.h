@@ -19,11 +19,13 @@
 
 #pragma once
 
+#include "trailevent.h"
+
 #include <QList>
 #include <QString>
 
 namespace spintrail::model {
-class ChannelEvent
+class ChannelEvent : public TrailEvent
 {
 public:
     enum class Type
@@ -45,6 +47,8 @@ public:
 
     void setParameters(QList<QString> parameters);
     const QList<QString> &getParameters() const;
+
+    EventType getEventType() const override;
 
 private:
     Type m_type;

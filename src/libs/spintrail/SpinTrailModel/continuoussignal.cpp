@@ -17,22 +17,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "spintrailmodel.h"
+#include "continuoussignal.h"
 
 namespace spintrail::model {
-SpinTrailModel::SpinTrailModel() {}
-
-conversion::ModelType SpinTrailModel::modelType() const
+ContinuousSignal::ContinuousSignal(QString functionName)
+    : m_functionName(functionName)
 {
-    return conversion::ModelProperties<SpinTrailModel>::type;
-}
-void SpinTrailModel::appendEvent(std::unique_ptr<TrailEvent> event)
-{
-    m_events.push_back(std::move(event));
 }
 
-const std::list<std::unique_ptr<TrailEvent>> &SpinTrailModel::getEvents() const
+const QString &ContinuousSignal::getFunctionName() const
 {
-    return m_events;
+    return m_functionName;
+}
+
+TrailEvent::EventType ContinuousSignal::getEventType() const
+{
+    return TrailEvent::EventType::CONTINUOUS_SIGNAL;
 }
 }

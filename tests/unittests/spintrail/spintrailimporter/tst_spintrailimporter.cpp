@@ -20,6 +20,8 @@
 #include <QObject>
 #include <QtTest>
 #include <spintrail/SpinTrailImporter/spintrailimporter.h>
+#include <spintrail/SpinTrailModel/channelevent.h>
+#include <spintrail/SpinTrailModel/continuoussignal.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 #include <spintrail/SpinTrailOptions/options.h>
 
@@ -27,7 +29,9 @@ namespace spintrail::test {
 using conversion::spintrail::SpinTrailOptions;
 using spintrail::importer::SpinTrailImporter;
 using spintrail::model::ChannelEvent;
+using spintrail::model::ContinuousSignal;
 using spintrail::model::SpinTrailModel;
+using spintrail::model::TrailEvent;
 
 class tst_SpinTrailImporter : public QObject
 {
@@ -48,13 +52,15 @@ void tst_SpinTrailImporter::testScenario()
     const SpinTrailModel *model = dynamic_cast<const SpinTrailModel *>(abstractModel.get());
     QVERIFY(model != nullptr);
 
-    QCOMPARE(model->getEvents().size(), 7);
+    QCOMPARE(model->getEvents().size(), 8);
 
     auto iter = model->getEvents().begin();
 
     {
-        const ChannelEvent &event = **iter;
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
         ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
         QCOMPARE(event.getType(), ChannelEvent::Type::Send);
         QCOMPARE(event.getProctypeName(), "");
         QCOMPARE(event.getChannelName(), "Actuator_lock");
@@ -62,8 +68,10 @@ void tst_SpinTrailImporter::testScenario()
         QCOMPARE(event.getParameters().front(), "1");
     }
     {
-        const ChannelEvent &event = **iter;
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
         ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
         QCOMPARE(event.getType(), ChannelEvent::Type::Send);
         QCOMPARE(event.getProctypeName(), "");
         QCOMPARE(event.getChannelName(), "Controller_lock");
@@ -71,8 +79,10 @@ void tst_SpinTrailImporter::testScenario()
         QCOMPARE(event.getParameters().front(), "1");
     }
     {
-        const ChannelEvent &event = **iter;
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
         ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
         QCOMPARE(event.getType(), ChannelEvent::Type::Send);
         QCOMPARE(event.getProctypeName(), "Environ_test");
         QCOMPARE(event.getChannelName(), "Controller_test_channel");
@@ -80,8 +90,10 @@ void tst_SpinTrailImporter::testScenario()
         QCOMPARE(event.getParameters().front(), "0");
     }
     {
-        const ChannelEvent &event = **iter;
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
         ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
         QCOMPARE(event.getType(), ChannelEvent::Type::Recv);
         QCOMPARE(event.getProctypeName(), "Controller_test");
         QCOMPARE(event.getChannelName(), "Controller_lock");
@@ -89,8 +101,10 @@ void tst_SpinTrailImporter::testScenario()
         QCOMPARE(event.getParameters().front(), "1");
     }
     {
-        const ChannelEvent &event = **iter;
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
         ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
         QCOMPARE(event.getType(), ChannelEvent::Type::Recv);
         QCOMPARE(event.getProctypeName(), "Controller_test");
         QCOMPARE(event.getChannelName(), "Controller_test_channel");
@@ -98,8 +112,10 @@ void tst_SpinTrailImporter::testScenario()
         QCOMPARE(event.getParameters().front(), "0");
     }
     {
-        const ChannelEvent &event = **iter;
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
         ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
         QCOMPARE(event.getType(), ChannelEvent::Type::Send);
         QCOMPARE(event.getProctypeName(), "Controller_test");
         QCOMPARE(event.getChannelName(), "Actuator_reset_acc_channel");
@@ -107,13 +123,22 @@ void tst_SpinTrailImporter::testScenario()
         QCOMPARE(event.getParameters().front(), "0");
     }
     {
-        const ChannelEvent &event = **iter;
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
         ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
         QCOMPARE(event.getType(), ChannelEvent::Type::Send);
         QCOMPARE(event.getProctypeName(), "Controller_test");
         QCOMPARE(event.getChannelName(), "Controller_lock");
         QCOMPARE(event.getParameters().size(), 1);
         QCOMPARE(event.getParameters().front(), "1");
+    }
+    {
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
+        ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CONTINUOUS_SIGNAL);
+        const ContinuousSignal &event = dynamic_cast<const ContinuousSignal &>(*trailEvent);
+        QCOMPARE(event.getFunctionName(), "Actuator");
     }
 }
 }
