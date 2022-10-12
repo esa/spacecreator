@@ -22,7 +22,7 @@
 
 #include <QPointer>
 #include <QUndoCommand>
-//#include <QVector>
+#include <QVector>
 
 class QTemporaryDir;
 namespace ivm {
