@@ -28,6 +28,7 @@
 #include <QMenu>
 #include <QMap>
 #include <projectexplorer/project.h>
+#include <optional>
 
 namespace spctr {
 
@@ -55,9 +56,9 @@ private:
     auto importXml() -> void;
 
 private:
-    auto askAboutAndCheckFilePath(QString caption, QString filter, QString &inputFilePath) -> bool;
-    auto askAboutAndCheckFunctionBlockName(QString &functionBlockName) -> bool;
-    auto searchAndCheckMatLabModelWorkspaceFile(const QString& inputFilePath, QFileInfo &workspaceFileInfo) -> bool;
+    auto askAboutAndCheckFilePath(QString caption, QString filter) -> std::optional<QString>;
+    auto askAboutAndCheckFunctionBlockName() -> std::optional<QString>;
+    auto searchAndCheckMatLabModelWorkspaceFile(const QString& inputFilePath) -> std::optional<QFileInfo>;
 
     auto generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString;
     auto generateWorkspaceLoadCallFunction(QFileInfo &workspaceFileInfo) -> QString;
@@ -67,9 +68,9 @@ private:
     auto generateExportedXmlFilePath(const QString& inputFilePath) -> QString;
 
     auto importXmlFileAndRemoveTemporaries(const QString &inputFilePath, const QString &functionBlockName) -> bool;
-    auto importXmlFile(const QString &inputFilePath, const QString &functionBlockName, QStringList &generatedAsn1FileNames) -> bool;
+    auto importXmlFile(const QString &inputFilePath, const QString &functionBlockName) -> std::optional<QStringList>;
 
-    auto convertXmlFileToAsn1(const QString &inputFilePath, QStringList &generatedAsn1FileNames) -> bool;
+    auto convertXmlFileToAsn1(const QString &inputFilePath) -> std::optional<QStringList>;
     auto getGeneratedAsn1FileNamesFromModels(const std::vector<std::unique_ptr<conversion::Model>> &models) -> QStringList;
     auto convertXmlFileToIv(const QString &inputFilePath, const QString &functionBlockName, const QString &ivConfig) -> bool;
     auto convert(const std::set<conversion::ModelType> &srcModelType, conversion::ModelType targetModelType,
@@ -80,13 +81,13 @@ private:
     auto getCurrentIvModel() -> ivm::IVModel *;
     auto getCurrentIvEditorCore() -> IVEditorCorePtr;
     auto mergeIvModels(ivm::IVModel *const destinationIvModel, ivm::IVModel *const sourceIvModel) -> bool;
-    auto doesModelContainIvFunction(ivm::IVModel *const model, ivm::IVFunction *const function) -> bool;
-    auto addIvFunctionToIvModel(ivm::IVFunction *const srcFun, ivm::IVModel *const model) -> bool;
+    auto doesModelContainIvFunction(ivm::IVModel *const ivModel, ivm::IVFunction *const ivFunction) -> bool;
+    auto addIvFunctionToIvModel(ivm::IVFunction *const sourceIvFunction, ivm::IVModel *const ivModel) -> bool;
 
     auto addGeneratedAsn1FilesToCurrentProject(const QStringList &generatedAsn1FileNames) -> void;
     auto isFileIsOneOfMatLabStandardDataTypesFiles(const QString &fileName) -> bool;
 
-    auto removeConvertersTemporaries(const QStringList &generatedAsn1FileNames) -> void;
+    auto removeConvertersTemporaries(const std::optional<QStringList> &generatedAsn1FileNames) -> void;
     auto removeMatLabCommandTemporaries() -> void;
 
     auto checkIfFileExistsAndRemoveIt(const QString &filePath) -> void;
