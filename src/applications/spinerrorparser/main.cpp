@@ -21,6 +21,7 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <QFile>
 #include <QRegularExpression>
 #include <QString>
 #include <grantlee/template.h>
@@ -118,7 +119,17 @@ int main(int argc, char *argv[])
     const HtmlReportBuilder htmlReportBuilder;
     const auto htmlReport = htmlReportBuilder.parse(reports);
 
-    qDebug() << targetFile.value();
+    QFile file(targetFile.value());
+    if (file.open(QFile::WriteOnly)) {
+        const qint64 bytesWritten = file.write(htmlReport.toUtf8());
+        if (bytesWritten == -1) {
+            qCritical("Unable to write to target filename");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        qCritical("Unable to open target filename");
+        exit(EXIT_FAILURE);
+    }
 
     return EXIT_SUCCESS;
 }
