@@ -154,7 +154,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->lineEdit_searchStateLimit->setValidator(new QIntValidator(0, 10000000, this));
     d->ui->lineEdit_errorLimit->setValidator(new QIntValidator(0, 1000000, this));
     d->ui->lineEdit_memoryLimit->setValidator(new QIntValidator(0, 10000000, this));
-    d->ui->lineEdit_spinTimeLimit->setValidator(new QIntValidator(0, 100000, this));
+    d->ui->lineEdit_spinTimeLimit->setValidator(new QIntValidator(0, 10000000, this));
     d->ui->lineEdit_generationLimit->setValidator(new QIntValidator(0, 10000000, this));
     d->ui->tableWidget_generationLimits->setSelectionBehavior(QAbstractItemView::SelectRows);
     d->ui->tableWidget_generationLimits->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -1429,9 +1429,9 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
     spinConfigData.searchStateLimit = d->ui->lineEdit_searchStateLimit->text().toInt();
     spinConfigData.timeLimitSeconds = d->ui->lineEdit_spinTimeLimit->text().toInt();
 
-    spinConfigData.searchShortestPath = d->ui->checkBox_searchShortestPath->checkState() == Qt::Checked ? true : false;
-    spinConfigData.useFairScheduling = d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked ? true : false;
-    spinConfigData.useBitHashing = d->ui->checkBox_useBitHashing->checkState() == Qt::Checked ? true : false;
+    spinConfigData.searchShortestPath = (d->ui->checkBox_searchShortestPath->checkState() == Qt::Checked);
+    spinConfigData.useFairScheduling = (d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked);
+    spinConfigData.useBitHashing = (d->ui->checkBox_useBitHashing->checkState() == Qt::Checked);
 
     spinConfigData.rawCommandLine = d->ui->lineEdit_rawCommandLine->text();
 
