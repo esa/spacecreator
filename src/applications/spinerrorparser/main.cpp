@@ -27,6 +27,7 @@
 #include <grantlee/texthtmlbuilder.h>
 #include <iostream>
 #include <optional>
+#include <reporting/HtmlReport/htmlreportbuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorparser.h>
 #include <string.h>
@@ -93,6 +94,10 @@ int main(int argc, char *argv[])
             qDebug() << "    Bounding value:" << boundingValue;
         }
     }
+
+    const HtmlReportBuilder htmlReportBuilder;
+    const auto htmlReport = htmlReportBuilder.parse(QString());
+    qDebug() << htmlReport;
 
     return EXIT_SUCCESS;
 }

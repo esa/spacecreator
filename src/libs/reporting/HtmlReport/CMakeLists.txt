@@ -14,6 +14,9 @@ target_sources(HtmlReport
 target_link_libraries(HtmlReport
     PUBLIC      ivcore
                 libiveditor
+                Report
+                Grantlee5::TextDocument
+                Grantlee5::Templates
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(HtmlReport)
