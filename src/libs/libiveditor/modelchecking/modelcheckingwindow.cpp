@@ -1332,9 +1332,6 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
  * \brief ModelCheckingWindow::setPropertiesSelection Rebuilds properties tree with property selection provided, keeping expanded nodes. Needed when loading configuration.
  */
 void ModelCheckingWindow::setPropertiesSelection(QStringList propertiesSelected){
-
-    Q_ASSERT(propertiesSelected.size() > 0);
-
     QFileInfo propertiesFileInfo(this->propertiesPath);
 
     // save user expanded nodes
@@ -1354,9 +1351,6 @@ void ModelCheckingWindow::setPropertiesSelection(QStringList propertiesSelected)
  * \brief ModelCheckingWindow::setSubtypesSelection Rebuilds subtypes tree with subtyping selection provided. Needed when loading configuration.
  */
 void ModelCheckingWindow::setSubtypesSelection(QStringList subtypesSelected){
-
-    Q_ASSERT(subtypesSelected.size() <= 1);
-
     QFileInfo subtypesFileInfo(this->subtypesPath);
     // destroy tree except root
     QTreeWidgetItem *treeRoot = this->subtypesTopDirWidgetItem;
@@ -1372,9 +1366,6 @@ void ModelCheckingWindow::setSubtypesSelection(QStringList subtypesSelected){
  * \brief ModelCheckingWindow::setFunctionsSelection Rebuilds Functions tree with Function selection provided. Needed when loading configuration.
  */
 void ModelCheckingWindow::setFunctionsSelection(QStringList functionsSelected){
-
-    Q_ASSERT(functionsSelected.size() > 0);
-
     // destroy tree except root
     QTreeWidgetItem *treeRoot = this->functionsTopNodeWidgetItem;
     for (int i = treeRoot->childCount(); i > 0; i--){
