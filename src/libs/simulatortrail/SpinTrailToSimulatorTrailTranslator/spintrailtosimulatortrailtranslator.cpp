@@ -141,7 +141,8 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
     }
 
     QMap<QString, ChannelInfo> channels;
-    findChannelNames(*systemInfo, *asn1Model, channels);
+    QMap<QString, std::pair<ChannelInfo, bool>> observerChannels;
+    findChannelNames(*systemInfo, *asn1Model, channels, observerChannels);
 
     QMap<QString, QString> proctypes;
     findProctypes(*systemInfo, proctypes);
@@ -156,7 +157,7 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
 
     std::unique_ptr<SimulatorTrailModel> simulatorTrail = std::make_unique<SimulatorTrailModel>();
 
-    translate(*simulatorTrail, *spinTrailModel, channels, proctypes, observableEventType);
+    translate(*simulatorTrail, *spinTrailModel, channels, observerChannels, proctypes, observableEventType);
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(simulatorTrail));
@@ -183,7 +184,8 @@ std::set<conversion::ModelType> SpinTrailToSimulatorTrailTranslator::getDependen
 }
 
 void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTranslator::SystemInfo &systemInfo,
-        const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channels) const
+        const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channels,
+        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const
 {
     const Asn1Acn::File &ans1file = *asn1Model.data().front();
 
@@ -212,6 +214,13 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTran
             }
 
             channels.insert(proctypeIter->second->m_queueName, info);
+
+            bool first = true;
+            for (const std::unique_ptr<IvToPromelaTranslator::ObserverInfo> &observerInfo :
+                    proctypeIter->second->m_observers) {
+                observerChannels.insert(observerInfo->m_observerQueue, std::make_pair(info, first));
+                first = false;
+            }
         }
         for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
                 proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
@@ -237,6 +246,12 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTran
             }
 
             channels.insert(proctypeIter->second->m_queueName, info);
+            bool first = true;
+            for (const std::unique_ptr<IvToPromelaTranslator::ObserverInfo> &observerInfo :
+                    proctypeIter->second->m_observers) {
+                observerChannels.insert(observerInfo->m_observerQueue, std::make_pair(info, first));
+                first = false;
+            }
         }
     }
 }
@@ -262,7 +277,8 @@ void SpinTrailToSimulatorTrailTranslator::findProctypes(
 
 void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::SimulatorTrailModel &result,
         const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
-        const QMap<QString, QString> &proctypes, const Asn1Acn::Types::Type *observableEvent) const
+        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
+        const Asn1Acn::Types::Type *observableEvent) const
 {
     const std::list<std::unique_ptr<ChannelEvent>> &events = spinTrailModel.getEvents();
 
@@ -288,8 +304,29 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
                 } else {
                     qDebug() << "message loss";
                 }
+            } else if (observerChannels.contains(event->getChannelName())) {
+                // if this is first observer
+                // then register output event
+                // else ignore
+                // ignore, but keep info about sender
+                std::pair<ChannelInfo, bool> &channelInfo = observerChannels[event->getChannelName()];
+                const QString source = channelInfo.first.m_possibleSenders.firstKey();
+                const QString destination = channelInfo.first.m_functionName;
+
+                if (channelInfo.first.m_senders.length() < static_cast<int>(channelInfo.first.m_channelSize)) {
+                    channelInfo.first.m_senders.push_back(source);
+                } else {
+                    qDebug() << "message loss";
+                }
+
+                if (channelInfo.second) {
+                    ValuePtr message = getValue(
+                            source, destination, channelInfo.first, observableEvent, event->getParameters(), false);
+                    result.appendValue(std::move(message));
+                }
+
             } else {
-                qCritical() << "Cannot process trail event";
+                qCritical() << "Cannot process trail event, unknown channel " << event->getChannelName();
                 throw TranslationException("Cannot process trail event");
             }
         }
@@ -306,8 +343,13 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
                         getValue(source, destination, channelInfo, observableEvent, event->getParameters(), true);
                 // qDebug() << "input from " << source << " to " << destination << " value " << message->asString();
                 result.appendValue(std::move(message));
+            } else if (observerChannels.contains(event->getChannelName())
+                    && proctypes.contains(event->getProctypeName())) {
+                // do not produce input event when observer receives message
+                std::pair<ChannelInfo, bool> &channelInfo = observerChannels[event->getChannelName()];
+                channelInfo.first.m_senders.pop_front();
             } else {
-                qCritical() << "Cannot process trail event";
+                qCritical() << "Cannot process trail event, unknown channel " << event->getChannelName();
                 throw TranslationException("Cannot process trail event");
             }
         }

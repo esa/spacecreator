@@ -74,12 +74,14 @@ private:
 
 private:
     void findChannelNames(const promela::translator::IvToPromelaTranslator::SystemInfo &systemInfo,
-            const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channel) const;
+            const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channel,
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const;
     void findProctypes(const promela::translator::IvToPromelaTranslator::SystemInfo &systemInfo,
             QMap<QString, QString> &proctypes) const;
     void translate(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
-            const QMap<QString, QString> &proctypes, const Asn1Acn::Types::Type *observableEvent) const;
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
+            const Asn1Acn::Types::Type *observableEvent) const;
     Asn1Acn::ValuePtr getValue(const QString &source, const QString &target, const ChannelInfo &info,
             const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters, bool isInput) const;
 

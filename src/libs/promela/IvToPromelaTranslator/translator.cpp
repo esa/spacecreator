@@ -1570,13 +1570,13 @@ std::unique_ptr<IvToPromelaTranslator::ProctypeInfo> IvToPromelaTranslator::prep
 
     proctypeInfo->m_proctypeName = proctypeName;
     proctypeInfo->m_interfaceName = interfaceName;
-    proctypeInfo->m_queueName = constructChannelName(functionName, interfaceName);
     proctypeInfo->m_queueSize = queueSize;
     proctypeInfo->m_priority = priority;
     proctypeInfo->m_parameterTypeName = parameterType;
     proctypeInfo->m_parameterName = parameterName;
     proctypeInfo->m_possibleSenders.insert(sourceFunctionName, sourceInterfaceName);
 
+    QString currentQueueName = constructChannelName(functionName, interfaceName);
     for (const ObserverAttachment &attachment : outputObservers) {
         const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
         const QString &channelName = observerChannelName(attachment, toFunction);
@@ -1585,9 +1585,13 @@ std::unique_ptr<IvToPromelaTranslator::ProctypeInfo> IvToPromelaTranslator::prep
 
         observerInfo->m_observerName = attachment.observer();
         observerInfo->m_observerInterface = attachment.observerInterface();
-        observerInfo->m_observerQueue = channelName;
+        observerInfo->m_observerQueue = currentQueueName;
         proctypeInfo->m_observers.push_back(std::move(observerInfo));
+
+        currentQueueName = channelName;
     }
+
+    proctypeInfo->m_queueName = currentQueueName;
 
     return proctypeInfo;
 }
