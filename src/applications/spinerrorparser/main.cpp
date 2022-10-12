@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
     std::optional<QString> spinMessage;
+    std::optional<QString> targetFile;
 
     const QStringList args = app.arguments();
     for (int i = 1; i < args.size(); ++i) {
@@ -53,15 +54,29 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             if (spinMessage.has_value()) {
-                qCritical("Duplicated -m argument");
+                qCritical("Duplicated -im argument");
                 exit(EXIT_FAILURE);
             }
             ++i;
             spinMessage = args[i];
-        } else if (arg == "-h" || arg == "--help") {
+        } else if (arg == "-of") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing target file after -of");
+                exit(EXIT_FAILURE);
+            }
+            if (targetFile.has_value()) {
+                qCritical("Duplicated -of argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            targetFile = args[i];
+        }
+
+        else if (arg == "-h" || arg == "--help") {
             qInfo("spinerrorparser: Spin Error Parser");
             qInfo("Usage: spinerrorparser [OPTIONS]");
             qInfo("  -im <message>          Message from spin");
+            qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
             exit(EXIT_SUCCESS);
         } else {
@@ -71,7 +86,12 @@ int main(int argc, char *argv[])
     }
 
     if (!spinMessage.has_value()) {
-        qCritical("Missing mandatory argument: input spinMessage");
+        qCritical("Missing mandatory argument: -im spinMessage");
+        exit(EXIT_FAILURE);
+    }
+
+    if (!targetFile.has_value()) {
+        qCritical("Missing mandatory argument: -of targetFile");
         exit(EXIT_FAILURE);
     }
 
@@ -96,8 +116,9 @@ int main(int argc, char *argv[])
     }
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto htmlReport = htmlReportBuilder.parse(QString());
-    qDebug() << htmlReport;
+    const auto htmlReport = htmlReportBuilder.parse(reports);
+
+    qDebug() << targetFile.value();
 
     return EXIT_SUCCESS;
 }

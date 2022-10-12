@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QString>
+#include <reporting/Report/spinerrorreportitem.h>
 
 namespace reporting {
 
@@ -41,7 +42,7 @@ public:
      *
      * @return  Error report in an HTML document format
      */
-    QString parse(const QString &spinMessage) const;
+    QString parse(const SpinErrorReport &spinErrorReport) const;
 };
 
 }

@@ -1,6 +1,10 @@
 #include "htmlreportbuilder.h"
 
-QString reporting::HtmlReportBuilder::parse(const QString &) const
+QString reporting::HtmlReportBuilder::parse(const SpinErrorReport &spinErrorReport) const
 {
-    return QString("aa");
+    QString out;
+    for (auto item : spinErrorReport) {
+        out = item.rawErrorDetails;
+    }
+    return out;
 }
