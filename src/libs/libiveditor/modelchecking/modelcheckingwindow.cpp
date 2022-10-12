@@ -157,11 +157,6 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->lineEdit_spinTimeLimit->setValidator(new QIntValidator(0, 100000, this));
     d->ui->lineEdit_generationLimit->setValidator(new QIntValidator(0, 10000000, this));
     d->ui->tableWidget_generationLimits->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    int tableWidgetWidth = d->ui->tableWidget_generationLimits->width();
-    d->ui->tableWidget_generationLimits->setColumnWidth(0, 0.8 * tableWidgetWidth);
-    d->ui->tableWidget_generationLimits->setColumnWidth(0, 0.2 * tableWidgetWidth);
-
     d->ui->tableWidget_generationLimits->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     SpinConfigData defaultSpinConfig;
