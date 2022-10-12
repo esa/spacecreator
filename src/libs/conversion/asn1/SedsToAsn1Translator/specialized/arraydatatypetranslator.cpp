@@ -25,7 +25,7 @@
 
 using conversion::translator::TranslationException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 ArrayDataTypeTranslator::ArrayDataTypeTranslator(Context &context)
     : m_context(context)
@@ -33,7 +33,7 @@ ArrayDataTypeTranslator::ArrayDataTypeTranslator(Context &context)
 {
 }
 
-void ArrayDataTypeTranslator::translate(const seds::model::ArrayDataType &sedsType)
+void ArrayDataTypeTranslator::translate(const ::seds::model::ArrayDataType &sedsType)
 {
     const auto &dimensions = sedsType.dimensions();
 
@@ -75,7 +75,7 @@ void ArrayDataTypeTranslator::translate(const seds::model::ArrayDataType &sedsTy
 }
 
 void ArrayDataTypeTranslator::translateArrayType(
-        const seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
+        const ::seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
     const auto *asn1ReferencedType = m_context.findAsn1Type(sedsTypeRef);
 
@@ -86,4 +86,4 @@ void ArrayDataTypeTranslator::translateArrayType(
     asn1Type->setItemsType(std::move(asn1ItemType));
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

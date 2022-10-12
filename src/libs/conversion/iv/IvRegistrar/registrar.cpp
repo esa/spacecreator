@@ -23,6 +23,7 @@
 #include <conversion/iv/IvXmlExporter/exporter.h>
 #include <conversion/iv/IvXmlImporter/importer.h>
 #include <conversion/iv/SedsToIvTranslator/translator.h>
+#include <conversion/iv/SimulinkToIvTranslator/translator.h>
 #include <ivcore/ivlibrary.h>
 #include <libiveditor/iveditor.h>
 #include <memory>
@@ -31,7 +32,8 @@ namespace conversion::iv {
 
 using exporter::IvXmlExporter;
 using importer::IvXmlImporter;
-using translator::SedsToIvTranslator;
+using translator::seds::SedsToIvTranslator;
+using translator::simulink::SimulinkToIvTranslator;
 
 bool IvRegistrar::registerCapabilities(conversion::Registry &registry)
 {
@@ -46,6 +48,13 @@ bool IvRegistrar::registerCapabilities(conversion::Registry &registry)
 
     auto sedsToIvTranslator = std::make_unique<SedsToIvTranslator>();
     result = registry.registerTranslator({ ModelType::Seds }, ModelType::InterfaceView, std::move(sedsToIvTranslator));
+    if (!result) {
+        return false;
+    }
+
+    auto simulinkToIvTranslator = std::make_unique<SimulinkToIvTranslator>();
+    result = registry.registerTranslator(
+            { ModelType::Simulink }, ModelType::InterfaceView, std::move(simulinkToIvTranslator));
     if (!result) {
         return false;
     }

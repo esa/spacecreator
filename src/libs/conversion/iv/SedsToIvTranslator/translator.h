@@ -31,7 +31,7 @@ class Package;
 class SedsModel;
 } // namespace seds::model
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Translator between SEDS model and InterfaceView model
@@ -76,8 +76,8 @@ public:
      *
      * @return  SEDS package
      */
-    static auto getSedsPackage(const QString &packageName, const std::vector<seds::model::Package> &sedsPackages)
-            -> const seds::model::Package *;
+    static auto getSedsPackage(const QString &packageName, const std::vector<::seds::model::Package> &sedsPackages)
+            -> const ::seds::model::Package *;
 
 private:
     /**
@@ -89,7 +89,7 @@ private:
      *
      * @return  Result IV model with auxiliary ASN.1 model
      */
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *ivConfig,
+    auto translateSedsModel(const ::seds::model::SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *ivConfig,
             const Options &options) const -> std::vector<std::unique_ptr<Model>>;
 
 private:
@@ -102,9 +102,9 @@ private:
      * @param   generateFunction    Generate parent function for the translated components
      * @param   options             Options
      */
-    auto translatePackage(const seds::model::Package &sedsPackage, ivm::IVModel *ivModel,
-            const std::vector<seds::model::Package> &sedsPackages, bool generateFunction, const Options &options) const
-            -> void;
+    auto translatePackage(const ::seds::model::Package &sedsPackage, ivm::IVModel *ivModel,
+            const std::vector<::seds::model::Package> &sedsPackages, bool generateFunction,
+            const Options &options) const -> void;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

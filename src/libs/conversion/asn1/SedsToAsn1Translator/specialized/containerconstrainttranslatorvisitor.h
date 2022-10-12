@@ -27,7 +27,7 @@
 #include <seds/SedsModel/types/constraints/containertypeconstraint.h>
 #include <seds/SedsModel/types/constraints/containervalueconstraint.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Translator visitor for SEDS container constraints
@@ -68,33 +68,33 @@ public:
      *
      * @param   rangeConstraint     Constraint to translate
      */
-    auto operator()(const seds::model::ContainerRangeConstraint &rangeConstraint) -> void;
+    auto operator()(const ::seds::model::ContainerRangeConstraint &rangeConstraint) -> void;
     /**
      * @brief   Translates type container constraint
      *
      * @param   typeConstraint      Constraint to translate
      */
-    auto operator()(const seds::model::ContainerTypeConstraint &typeConstraint) -> void;
+    auto operator()(const ::seds::model::ContainerTypeConstraint &typeConstraint) -> void;
     /**
      * @brief   Translates value container constraint
      *
      * @param   valueConstraint     Constraint to translate
      */
-    auto operator()(const seds::model::ContainerValueConstraint &valueConstraint) -> void;
+    auto operator()(const ::seds::model::ContainerValueConstraint &valueConstraint) -> void;
 
 private:
-    auto applyContainerRangeConstraint(
-            const seds::model::ContainerRangeConstraint &rangeConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
+    auto applyContainerRangeConstraint(const ::seds::model::ContainerRangeConstraint &rangeConstraint,
+            Asn1Acn::Types::Type *asn1Type) const -> void;
     auto applyContainerTypeConstraint(
-            const seds::model::ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
-    auto applyContainerValueConstraint(
-            const seds::model::ContainerValueConstraint &valueConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
+            const ::seds::model::ContainerTypeConstraint &typeConstraint, Asn1Acn::Types::Type *asn1Type) const -> void;
+    auto applyContainerValueConstraint(const ::seds::model::ContainerValueConstraint &valueConstraint,
+            Asn1Acn::Types::Type *asn1Type) const -> void;
 
-    auto getConstrainedType(const seds::model::EntryRef &entry) const -> Asn1Acn::Types::Type *;
+    auto getConstrainedType(const ::seds::model::EntryRef &entry) const -> Asn1Acn::Types::Type *;
 
 private:
     Context &m_context;
     Asn1Acn::Types::Sequence *m_sequence;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

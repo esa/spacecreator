@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <QPointF>
+#include "asn1componentsimport.h"
+
 #include <QPointer>
 #include <QUndoCommand>
-#include <QVector>
 
 namespace ivm {
 class IVObject;
@@ -33,11 +33,11 @@ namespace ive {
 namespace cmd {
 class CmdEntityAttributeChange;
 
-class CmdEntitiesInstantiate : public QUndoCommand
+class CmdEntitiesInstantiate : public ASN1ComponentsImport, public QUndoCommand
 {
 public:
-    explicit CmdEntitiesInstantiate(
-            ivm::IVFunctionType *entity, ivm::IVFunctionType *parent, ivm::IVModel *model, const QPointF &pos);
+    explicit CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm::IVFunctionType *parent, ivm::IVModel *model,
+            Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
     ~CmdEntitiesInstantiate() override;
 
     void redo() override;

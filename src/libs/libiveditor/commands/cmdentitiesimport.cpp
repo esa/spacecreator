@@ -17,15 +17,11 @@
 
 #include "cmdentitiesimport.h"
 
-#include "asn1reader.h"
-#include "asn1systemchecks.h"
 #include "commandids.h"
 #include "errorhub.h"
-#include "file.h"
 #include "graphicsviewutils.h"
 #include "ivconnection.h"
 #include "ivfunctiontype.h"
-#include "ivfunction.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivxmlreader.h"
@@ -69,11 +65,10 @@ QSet<QString> fnTypeNames(const QVector<ivm::IVObject *> &objects)
 
 CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model,
         Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath)
-    : UndoCommand()
-    , m_asn1Checks(asn1Checks)
+    : ASN1ComponentsImport(asn1Checks, shared::componentsLibraryPath(), destPath)
+    , QUndoCommand()
     , m_model(model)
     , m_parent(parent)
-    , m_destPath(destPath)
 {
     ivm::IVXMLReader parser;
     if (parser.read(data)) {
@@ -227,175 +222,6 @@ int CmdEntitiesImport::id() const
     return ImportEntities;
 }
 
-void CmdEntitiesImport::redoSourceCloning(const ivm::IVObject *object)
-{
-    if (!object
-            || !(object->type() == ivm::IVObject::Type::Function
-                       || object->type() == ivm::IVObject::Type::FunctionType)) {
-        return;
-    }
-
-    const QStringList objPath = ivm::IVObject::path(object);
-    const QString rootName = objPath.isEmpty() ? object->title() : objPath.front();
-    const QString subPath = relativePathForObject(object);
-    const QString sourcePath =
-            m_tempDir.isNull() ? shared::componentsLibraryPath() + QDir::separator() + rootName : m_tempDir->path();
-    const QDir sourceDir { sourcePath };
-    const QDir targetDir { m_destPath };
-    shared::copyDir(sourceDir.filePath(subPath), targetDir.filePath(subPath));
-}
-
-void CmdEntitiesImport::undoSourceCloning(const ivm::IVObject *object)
-{
-    if (!object
-            || !(object->type() == ivm::IVObject::Type::Function
-                       || object->type() == ivm::IVObject::Type::FunctionType)) {
-        return;
-    }
-
-    const QString subPath = relativePathForObject(object);
-    const QString destPath = m_tempDir->path() + QDir::separator() + subPath;
-    const QString sourcePath { m_destPath + QDir::separator() + subPath };
-    shared::copyDir(sourcePath, destPath);
-    QDir sourceDir(sourcePath);
-    sourceDir.removeRecursively();
-}
-
-static inline bool isSame(const QString &filePath1, const QString &filePath2)
-{
-    QFile file1(filePath1);
-    if (!file1.open(QIODevice::ReadOnly)) {
-        qWarning() << file1.fileName() << file1.errorString();
-        return false;
-    }
-    QFile file2(filePath2);
-    if (!file2.open(QIODevice::ReadOnly)) {
-        qWarning() << file2.fileName() << file2.errorString();
-        return false;
-    }
-    while (!file1.atEnd() && !file2.atEnd()) {
-        if (file1.readLine() != file2.readLine())
-            return false;
-    }
-    return true;
-}
-
-static inline QStringList asn1ModuleDuplication(
-        Asn1Acn::Asn1SystemChecks *asn1Checks, const QVector<QFileInfo> &asn1FileInfos)
-{
-    if (asn1FileInfos.empty()) {
-        return {};
-    }
-    Asn1Acn::Asn1Reader parser;
-    QStringList errorMessages;
-    QStringList modulesNames;
-    const std::map<QString, std::unique_ptr<Asn1Acn::File>> asn1Data =
-            parser.parseAsn1Files(asn1FileInfos, &errorMessages);
-    if (asn1Data.empty()) {
-        QStringList filenames;
-        for (const QFileInfo &fi : qAsConst(asn1FileInfos)) {
-            filenames.append(fi.fileName());
-        }
-        shared::ErrorHub::addError(shared::ErrorItem::Error,
-                QObject::tr("%1 was/were not imported: ").arg(filenames.join(", ")), errorMessages.join(", "));
-        return modulesNames;
-    }
-
-    QStringList projectDefinitionsNames;
-    QStringList projectTypeAssignmentsNames;
-    const std::vector<Asn1Acn::Definitions *> &projectDefinitions = asn1Checks->definitionsList();
-    for_each(projectDefinitions.cbegin(), projectDefinitions.cend(), [&](Asn1Acn::Definitions *defs) {
-        projectDefinitionsNames << defs->name();
-        projectTypeAssignmentsNames << defs->typeAssignmentNames();
-    });
-
-    for (auto it = asn1Data.cbegin(); it != asn1Data.cend(); ++it) {
-        for (const auto &defs : it->second->definitionsList()) {
-            if (projectDefinitionsNames.contains(defs->name())) {
-                modulesNames.append(defs->name());
-            } else {
-                for (const QString &typeAssignment : defs->typeAssignmentNames()) {
-                    if (projectTypeAssignmentsNames.contains(typeAssignment)) {
-                        modulesNames.append(defs->name());
-                    }
-                }
-            }
-        }
-    }
-    return modulesNames;
-}
-
-void CmdEntitiesImport::redoAsnFileImport(const ivm::IVObject *object)
-{
-    if (!object
-            || !(object->type() == ivm::IVObject::Type::Function
-                       || object->type() == ivm::IVObject::Type::FunctionType)) {
-        return;
-    }
-
-    const QStringList objPath = ivm::IVObject::path(object);
-    const QString rootName = objPath.isEmpty() ? object->title() : objPath.front();
-    const QString sourcePrefix = m_tempDir.isNull() ? shared::componentsLibraryPath() : m_tempDir->path();
-    const QDir sourceDir { sourcePrefix + QDir::separator() + rootName };
-    const QDir targetDir { m_destPath };
-
-    QList<QFileInfo> asnFiles = sourceDir.entryInfoList(
-            { QLatin1String("*.asn1"), QLatin1String("*.asn"), QLatin1String("*.acn") }, QDir::Files);
-
-    QVector<QFileInfo> fileInfos;
-    std::copy_if(asnFiles.begin(), asnFiles.end(), std::back_inserter(fileInfos), [targetDir](const QFileInfo &fi) {
-        const QString destFilePath { targetDir.filePath(fi.fileName()) };
-        return !isSame(destFilePath, fi.absoluteFilePath());
-    });
-
-    auto alreadyExistingModules = asn1ModuleDuplication(m_asn1Checks, fileInfos);
-    if (!alreadyExistingModules.isEmpty()) {
-        auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files"),
-                tr("%1 module(s) already exist(s) in project or have(s) same type assignment(s), "
-                   "do you want add it/them anyway?")
-                        .arg(alreadyExistingModules.join(", ")));
-        if (res == QMessageBox::No) {
-            return; // CHECK: probably skip only files with module duplication
-        }
-    }
-
-    for (const QFileInfo &file : qAsConst(fileInfos)) {
-        QString destFilePath { targetDir.filePath(file.fileName()) };
-        if (QFile::exists(destFilePath)) {
-            auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files"),
-                    tr("%1 already exists in project directory, do you want to rename importing one")
-                            .arg(file.fileName()));
-            if (res == QMessageBox::No) {
-                continue;
-            }
-            bool ok;
-            const QString text = QInputDialog::getText(qApp->activeWindow(), tr("Rename importing ASN1 file"),
-                    tr("File name:"), QLineEdit::Normal, rootName + file.fileName(), &ok);
-            if (!ok || !text.isEmpty())
-                destFilePath = targetDir.filePath(text);
-        }
-        if (shared::copyFile(file.absoluteFilePath(), destFilePath)) {
-            m_importedAsnFiles.append(destFilePath);
-        } else {
-            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("%1 wasn't imported").arg(file.fileName()));
-        }
-    }
-}
-
-void CmdEntitiesImport::undoAsnFileImport()
-{
-    for (const QString &filePath : qAsConst(m_importedAsnFiles)) {
-        QFile::remove(filePath);
-    }
-
-    Q_EMIT asn1FileRemoved(m_importedAsnFiles);
-}
-
-QString CmdEntitiesImport::relativePathForObject(const ivm::IVObject *object) const
-{
-    return shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
-}
-
 void CmdEntitiesImport::prepareRectangularType(
         ivm::IVObject *obj, const QPointF &offset, QRectF &parentRect, QList<QRectF> &existingRects)
 {
@@ -470,7 +296,8 @@ void CmdEntitiesImport::prepareConnectionType(ivm::IVObject *obj, const QVector<
         return it != objects.cend() ? (*it)->as<ivm::IVInterface *>() : nullptr;
     };
 
-    auto createEnvIface = [&](const ivm::IVConnection::EndPointInfo &pointInfo, const QVector<ivm::IVObject *> &objects) -> ivm::IVConnection::EndPointInfo {
+    auto createEnvIface = [&](const ivm::IVConnection::EndPointInfo &pointInfo,
+                                  const QVector<ivm::IVObject *> &objects) -> ivm::IVConnection::EndPointInfo {
         /// TODO: restore needed fields
         ivm::IVInterface *envIface = findIface(pointInfo, objects);
         const ivm::IVInterface::CreationInfo info = ivm::IVInterface::CreationInfo::cloneIface(envIface, m_parent);
@@ -481,15 +308,11 @@ void CmdEntitiesImport::prepareConnectionType(ivm::IVObject *obj, const QVector<
         m_parentChildMappings[iface->id()] = info.function;
 
         /// TODO: setup coordinates after function extracting
-        return {
-            iface->function()->title(),
-            iface->title(),
-            pointInfo.m_ifaceDirection
-        };
+        return { iface->function()->title(), iface->title(), pointInfo.m_ifaceDirection };
     };
 
     auto checkEndPoints = [&](ivm::IVConnection::EndPointInfo &startInfo, ivm::IVConnection::EndPointInfo &endInfo,
-            const QVector<ivm::IVObject *> &objects) -> bool {
+                                  const QVector<ivm::IVObject *> &objects) -> bool {
         if (!startInfo.isReady() && !endInfo.isReady())
             return false;
 

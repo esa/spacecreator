@@ -19,17 +19,16 @@
 
 #include <QObject>
 #include <QtTest>
-#include <conversion/asn1/Asn1Exporter/exporter.h>
-#include <conversion/asn1/SimulinkToAsn1Translator/translator.h>
+#include <conversion/asn1/Asn1Registrar/registrar.h>
+#include <conversion/converter/converter.h>
+#include <conversion/registry/registry.h>
+#include <conversion/simulink/SimulinkRegistrar/registrar.h>
 #include <simulink/SimulinkOptions/options.h>
-#include <simulink/SimulinkXmlImporter/importer.h>
 
-using Asn1Acn::Asn1Model;
-using conversion::asn1::exporter::Asn1Exporter;
-using conversion::asn1::translator::SimulinkToAsn1Translator;
+using conversion::Registry;
+using conversion::asn1::Asn1Registrar;
 using conversion::simulink::SimulinkOptions;
-using simulink::importer::SimulinkXmlImporter;
-using simulink::model::SimulinkModel;
+using conversion::simulink::SimulinkRegistrar;
 
 namespace conversion::asn1::test {
 
@@ -38,6 +37,7 @@ class tsti_SimulinkToAsn1 : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void testComparingAsn1TranslationResultWithExpectedResult();
 
 private:
@@ -50,6 +50,9 @@ private:
 
     static const QString m_currentInterfaceFileName;
     static const QString m_currentMatLabStandardDataTypesFileName;
+
+private:
+    Registry m_registry;
 };
 
 // clang-format off
@@ -105,33 +108,19 @@ QString getFileContents(const QString &filename)
     return file.readAll();
 }
 
-std::unique_ptr<conversion::Model> loadModel(const QString &interfaceFilePath)
+void tsti_SimulinkToAsn1::initTestCase()
 {
-    Options options;
-    options.add(SimulinkOptions::inputFilepath, interfaceFilePath);
+    Asn1Registrar asn1Registrar;
+    auto result = asn1Registrar.registerCapabilities(m_registry);
+    if (!result) {
+        QFAIL("Failed to register ASN.1 capabilities");
+    }
 
-    SimulinkXmlImporter importer;
-    auto importedModel = importer.importModel(options);
-
-    return std::move(importedModel);
-}
-
-std::vector<std::unique_ptr<conversion::Model>> translateModel(SimulinkModel *simulinkModel)
-{
-    Options options;
-    SimulinkToAsn1Translator translator;
-
-    auto translatedModels = translator.translateModels({ simulinkModel }, options);
-
-    return std::move(translatedModels);
-}
-
-void exportModel(const Asn1Model *asn1Model)
-{
-    Options options;
-    Asn1Exporter exporter;
-
-    exporter.exportModel(asn1Model, options);
+    SimulinkRegistrar simulinkRegistrar;
+    result = simulinkRegistrar.registerCapabilities(m_registry);
+    if (!result) {
+        QFAIL("Failed to register SIMULINK capabilities");
+    }
 }
 
 void tsti_SimulinkToAsn1::testComparingAsn1TranslationResultWithExpectedResult()
@@ -140,18 +129,11 @@ void tsti_SimulinkToAsn1::testComparingAsn1TranslationResultWithExpectedResult()
         try {
             QString interfaceFilePath = m_directoryOfTest + m_interfaceXmlFileSubPath;
 
-            const auto importedModel = loadModel(interfaceFilePath);
-            auto *simulinkModel = dynamic_cast<SimulinkModel *>(importedModel.get());
-            QVERIFY(simulinkModel);
+            Options options;
+            options.add(SimulinkOptions::inputFilepath, interfaceFilePath);
 
-            const auto translatedModels = translateModel(simulinkModel);
-            QCOMPARE(translatedModels.size(), 1);
-
-            const auto &translatedModel = translatedModels[0];
-            const auto *asn1Model = dynamic_cast<Asn1Model *>(translatedModel.get());
-            QVERIFY(asn1Model);
-
-            exportModel(asn1Model);
+            Converter converter(m_registry, std::move(options));
+            converter.convert({ ModelType::Simulink }, ModelType::Asn1, {});
 
             const QString expectedInterfaceAsnFilePath = m_directoryOfTest + m_expectedInterfaceFileSubPath + ".asn";
             const QString expectedInterfaceAcnFilePath = m_directoryOfTest + m_expectedInterfaceFileSubPath + ".acn";

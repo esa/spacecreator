@@ -58,7 +58,7 @@ using seds::model::IntegerDataType;
 using seds::model::StringDataType;
 using seds::model::SubRangeDataType;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Context &context)
     : m_context(context)
@@ -67,12 +67,12 @@ DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Context &context)
 {
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::ArrayDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::ArrayDataType &sedsType)
 {
     m_arrayTranslator.translate(sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::BinaryDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::BinaryDataType &sedsType)
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::BitString>(asn1TypeName);
@@ -82,7 +82,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::BinaryDataType &se
     m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::BooleanDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::BooleanDataType &sedsType)
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::Boolean>(asn1TypeName);
@@ -92,12 +92,12 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::BooleanDataType &s
     m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::ContainerDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::ContainerDataType &sedsType)
 {
     m_containerTranslator.translate(sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::EnumeratedDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::EnumeratedDataType &sedsType)
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::Enumerated>(asn1TypeName);
@@ -108,7 +108,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::EnumeratedDataType
     m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::FloatDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::FloatDataType &sedsType)
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::Real>(asn1TypeName);
@@ -121,7 +121,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::FloatDataType &sed
     m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::IntegerDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::IntegerDataType &sedsType)
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::Integer>(asn1TypeName);
@@ -134,7 +134,7 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::IntegerDataType &s
     m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::StringDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::StringDataType &sedsType)
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::IA5String>(asn1TypeName);
@@ -145,16 +145,16 @@ void DataTypeTranslatorVisitor::operator()(const seds::model::StringDataType &se
     m_context.addAsn1Type(std::move(asn1Type), &sedsType);
 }
 
-void DataTypeTranslatorVisitor::operator()(const seds::model::SubRangeDataType &sedsType)
+void DataTypeTranslatorVisitor::operator()(const ::seds::model::SubRangeDataType &sedsType)
 {
     const auto baseType = m_context.findSedsType(sedsType.type());
 
     if (std::holds_alternative<IntegerDataType>(*baseType)) {
-        translateIntegerSubRangeDataType(sedsType, std::get<seds::model::IntegerDataType>(*baseType));
+        translateIntegerSubRangeDataType(sedsType, std::get<::seds::model::IntegerDataType>(*baseType));
     } else if (std::holds_alternative<FloatDataType>(*baseType)) {
-        translateFloatSubRangeDataType(sedsType, std::get<seds::model::FloatDataType>(*baseType));
+        translateFloatSubRangeDataType(sedsType, std::get<::seds::model::FloatDataType>(*baseType));
     } else if (std::holds_alternative<EnumeratedDataType>(*baseType)) {
-        translateEnumSubRangeDataType(sedsType, std::get<seds::model::EnumeratedDataType>(*baseType));
+        translateEnumSubRangeDataType(sedsType, std::get<::seds::model::EnumeratedDataType>(*baseType));
     } else {
         auto errorMessage =
                 QString("SubRangeDataType \"%1\" references type \"%2\" that is neither numeric nor enumerated")
@@ -209,7 +209,7 @@ void DataTypeTranslatorVisitor::translateStringLength(
 }
 
 void DataTypeTranslatorVisitor::translateBooleanEncoding(
-        const seds::model::BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const
+        const ::seds::model::BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const
 {
     if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
         asn1Type->setAcnSize(encoding->bits());
@@ -220,13 +220,13 @@ void DataTypeTranslatorVisitor::translateBooleanEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateIntegerEncoding(
-        const std::optional<seds::model::IntegerDataEncoding> &encoding,
+        const std::optional<::seds::model::IntegerDataEncoding> &encoding,
         Asn1Acn::Types::IntegerAcnParameters *asn1Type) const
 {
     if (encoding) {
         // clang-format off
         std::visit(overloaded {
-            [&](seds::model::CoreIntegerEncoding coreEncoding) {
+            [&](::seds::model::CoreIntegerEncoding coreEncoding) {
                 translateCoreIntegerEncoding(coreEncoding, asn1Type);
             }
         }, encoding->encoding());
@@ -241,12 +241,12 @@ void DataTypeTranslatorVisitor::translateIntegerEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateFloatEncoding(
-        const seds::model::FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
+        const ::seds::model::FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
 {
     if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
         // clang-format off
         std::visit(overloaded {
-            [&](seds::model::CoreEncodingAndPrecision coreEncoding) {
+            [&](::seds::model::CoreEncodingAndPrecision coreEncoding) {
                 translateCoreEncodingAndPrecision(coreEncoding, encoding->bits(), asn1Type);
             }
         }, encoding->encoding());
@@ -259,12 +259,12 @@ void DataTypeTranslatorVisitor::translateFloatEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateStringEncoding(
-        const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+        const ::seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
 {
     if (const auto &encoding = sedsType.encoding(); encoding.has_value()) {
         // clang-format off
         std::visit(overloaded {
-            [&](seds::model::CoreStringEncoding coreEncoding) {
+            [&](::seds::model::CoreStringEncoding coreEncoding) {
                 translateCoreStringEncoding(coreEncoding, asn1Type);
             }
         }, encoding->encoding());
@@ -279,7 +279,7 @@ void DataTypeTranslatorVisitor::translateStringEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateEnumerationList(
-        const seds::model::EnumeratedDataType &sedsType, Asn1Acn::Types::Enumerated *asn1Type) const
+        const ::seds::model::EnumeratedDataType &sedsType, Asn1Acn::Types::Enumerated *asn1Type) const
 {
     const auto &items = sedsType.enumerationList();
 
@@ -294,9 +294,9 @@ void DataTypeTranslatorVisitor::translateEnumerationList(
 }
 
 void DataTypeTranslatorVisitor::translateIntegerSubRangeDataType(
-        const seds::model::SubRangeDataType &sedsType, const seds::model::IntegerDataType &sedsBaseType)
+        const ::seds::model::SubRangeDataType &sedsType, const ::seds::model::IntegerDataType &sedsBaseType)
 {
-    if (!std::holds_alternative<seds::model::MinMaxRange>(sedsType.range())) {
+    if (!std::holds_alternative<::seds::model::MinMaxRange>(sedsType.range())) {
         auto errorMessage = QString("Only MinMaxRange can be used as a range in SubRangeDataType \"%1\" because it's "
                                     "base type is an integer")
                                     .arg(sedsType.nameStr());
@@ -315,7 +315,7 @@ void DataTypeTranslatorVisitor::translateIntegerSubRangeDataType(
 }
 
 void DataTypeTranslatorVisitor::translateFloatSubRangeDataType(
-        const seds::model::SubRangeDataType &sedsType, const seds::model::FloatDataType &sedsBaseType)
+        const ::seds::model::SubRangeDataType &sedsType, const ::seds::model::FloatDataType &sedsBaseType)
 {
     if (std::holds_alternative<EnumeratedDataTypeRange>(sedsType.range())) {
         auto errorMessage = QString("EnumeratedDataTypeRange can't be used as a range in SubRangeDataType \"%1\" "
@@ -336,7 +336,7 @@ void DataTypeTranslatorVisitor::translateFloatSubRangeDataType(
 }
 
 void DataTypeTranslatorVisitor::translateEnumSubRangeDataType(
-        const seds::model::SubRangeDataType &sedsType, const seds::model::EnumeratedDataType &sedsBaseType)
+        const ::seds::model::SubRangeDataType &sedsType, const ::seds::model::EnumeratedDataType &sedsBaseType)
 {
     if (!std::holds_alternative<EnumeratedDataTypeRange>(sedsType.range())) {
         auto errorMessage = QString("Only EnumeratedDataTypeRange can be used as a range in SubRangeDataType "
@@ -376,25 +376,25 @@ void DataTypeTranslatorVisitor::translateEnumSubRangeDataType(
 }
 
 void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
-        seds::model::CoreIntegerEncoding coreEncoding, Asn1Acn::Types::IntegerAcnParameters *asn1Type) const
+        ::seds::model::CoreIntegerEncoding coreEncoding, Asn1Acn::Types::IntegerAcnParameters *asn1Type) const
 {
     switch (coreEncoding) {
-    case seds::model::CoreIntegerEncoding::Unsigned:
+    case ::seds::model::CoreIntegerEncoding::Unsigned:
         asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::pos_int);
         break;
-    case seds::model::CoreIntegerEncoding::TwosComplement:
+    case ::seds::model::CoreIntegerEncoding::TwosComplement:
         asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::twos_complement);
         break;
-    case seds::model::CoreIntegerEncoding::Bcd:
+    case ::seds::model::CoreIntegerEncoding::Bcd:
         asn1Type->setEncoding(Asn1Acn::Types::IntegerEncoding::BCD);
         break;
-    case seds::model::CoreIntegerEncoding::SignMagnitude:
+    case ::seds::model::CoreIntegerEncoding::SignMagnitude:
         throw UnsupportedValueException("CoreIntegerEncoding", "SignMagnitude");
         break;
-    case seds::model::CoreIntegerEncoding::OnesComplement:
+    case ::seds::model::CoreIntegerEncoding::OnesComplement:
         throw UnsupportedValueException("CoreIntegerEncoding", "OnesComplement");
         break;
-    case seds::model::CoreIntegerEncoding::PackedBcd:
+    case ::seds::model::CoreIntegerEncoding::PackedBcd:
         throw UnsupportedValueException("CoreIntegerEncoding", "PackedBcd");
         break;
     default:
@@ -404,30 +404,30 @@ void DataTypeTranslatorVisitor::translateCoreIntegerEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
-        seds::model::CoreEncodingAndPrecision coreEncoding, uint64_t bits, Asn1Acn::Types::Real *asn1Type) const
+        ::seds::model::CoreEncodingAndPrecision coreEncoding, uint64_t bits, Asn1Acn::Types::Real *asn1Type) const
 {
     switch (coreEncoding) {
-    case seds::model::CoreEncodingAndPrecision::IeeeSingle: {
+    case ::seds::model::CoreEncodingAndPrecision::IeeeSingle: {
         if (bits != 32) { // NOLINT(readability-magic-numbers)
             auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_32 encoding").arg(bits);
             throw TranslationException(std::move(errorMessage));
         }
         asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_32);
     } break;
-    case seds::model::CoreEncodingAndPrecision::IeeeDouble: {
+    case ::seds::model::CoreEncodingAndPrecision::IeeeDouble: {
         if (bits != 64) { // NOLINT(readability-magic-numbers)
             auto errorMessage = QString("Wrong number of bits specified (%1) for IEEE754_1985_64 encoding").arg(bits);
             throw TranslationException(std::move(errorMessage));
         }
         asn1Type->setEncoding(Asn1Acn::Types::RealEncoding::IEEE754_1985_64);
     } break;
-    case seds::model::CoreEncodingAndPrecision::IeeeQuad:
+    case ::seds::model::CoreEncodingAndPrecision::IeeeQuad:
         throw UnsupportedValueException("CoreEncodingAndPrecision", "IeeeQuad");
         break;
-    case seds::model::CoreEncodingAndPrecision::MilstdSimple:
+    case ::seds::model::CoreEncodingAndPrecision::MilstdSimple:
         throw UnsupportedValueException("CoreEncodingAndPrecision", "MilstdSimple");
         break;
-    case seds::model::CoreEncodingAndPrecision::MilstdExtended:
+    case ::seds::model::CoreEncodingAndPrecision::MilstdExtended:
         throw UnsupportedValueException("CoreEncodingAndPrecision", "MilstdExtended");
         break;
     default:
@@ -437,13 +437,13 @@ void DataTypeTranslatorVisitor::translateCoreEncodingAndPrecision(
 }
 
 void DataTypeTranslatorVisitor::translateCoreStringEncoding(
-        seds::model::CoreStringEncoding coreEncoding, Asn1Acn::Types::IA5String *asn1Type) const
+        ::seds::model::CoreStringEncoding coreEncoding, Asn1Acn::Types::IA5String *asn1Type) const
 {
     switch (coreEncoding) {
-    case seds::model::CoreStringEncoding::Ascii:
+    case ::seds::model::CoreStringEncoding::Ascii:
         asn1Type->setEncoding(Asn1Acn::Types::AsciiStringEncoding::ASCII);
         break;
-    case seds::model::CoreStringEncoding::Utf8:
+    case ::seds::model::CoreStringEncoding::Utf8:
         throw UnsupportedValueException("CoreStringEncoding", "Utf8");
         break;
     default:
@@ -453,13 +453,13 @@ void DataTypeTranslatorVisitor::translateCoreStringEncoding(
 }
 
 void DataTypeTranslatorVisitor::translateFalseValue(
-        seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const
+        ::seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const
 {
     switch (falseValue) {
-    case seds::model::FalseValue::ZeroIsFalse:
+    case ::seds::model::FalseValue::ZeroIsFalse:
         asn1Type->setFalseValue(QString(asn1Type->acnSize(), '0'));
         break;
-    case seds::model::FalseValue::NonZeroIsFalse:
+    case ::seds::model::FalseValue::NonZeroIsFalse:
         asn1Type->setTrueValue(QString(asn1Type->acnSize(), '0'));
         break;
     default:
@@ -468,12 +468,12 @@ void DataTypeTranslatorVisitor::translateFalseValue(
     }
 }
 
-Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(seds::model::ByteOrder sedsByteOrder) const
+Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(::seds::model::ByteOrder sedsByteOrder) const
 {
     switch (sedsByteOrder) {
-    case seds::model::ByteOrder::BigEndian:
+    case ::seds::model::ByteOrder::BigEndian:
         return Asn1Acn::Types::Endianness::big;
-    case seds::model::ByteOrder::LittleEndian:
+    case ::seds::model::ByteOrder::LittleEndian:
         return Asn1Acn::Types::Endianness::little;
     default:
         throw UnhandledValueException("ByteOrder");
@@ -481,4 +481,4 @@ Asn1Acn::Types::Endianness DataTypeTranslatorVisitor::convertByteOrder(seds::mod
     }
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

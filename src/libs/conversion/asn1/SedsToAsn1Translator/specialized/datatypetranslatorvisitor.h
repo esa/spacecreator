@@ -33,7 +33,7 @@
 #include <seds/SedsModel/types/encodings/falsevalue.h>
 #include <seds/SedsModel/types/encodings/integerdataencoding.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Translator visitor for SEDS data type
@@ -73,87 +73,87 @@ public:
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::ArrayDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::ArrayDataType &sedsType) -> void;
     /**
      * @brief   Translates SEDS binary data type
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::BinaryDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::BinaryDataType &sedsType) -> void;
     /**
      * @brief   Translates SEDS boolean data type
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::BooleanDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::BooleanDataType &sedsType) -> void;
     /**
      * @brief   Translates SEDS container data type
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::ContainerDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::ContainerDataType &sedsType) -> void;
     /**
      * @brief   Translates SEDS enumerated data type
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::EnumeratedDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::EnumeratedDataType &sedsType) -> void;
     /**
      * @brief   Translates SEDS float data type
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::FloatDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::FloatDataType &sedsType) -> void;
     /**
      * @brief   Translates SEDS integer data type
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::IntegerDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::IntegerDataType &sedsType) -> void;
     /**
      * @brief   Translates SEDS string data type
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::StringDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::StringDataType &sedsType) -> void;
     /**
      * @brief   Translates SEDS subrange data type
      *
      * @param   sedsType    Type to translate
      */
-    auto operator()(const seds::model::SubRangeDataType &sedsType) -> void;
+    auto operator()(const ::seds::model::SubRangeDataType &sedsType) -> void;
 
 private:
     auto translateBitStringLength(
-            const seds::model::BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const -> void;
-    auto translateStringLength(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
+            const ::seds::model::BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const -> void;
+    auto translateStringLength(const ::seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
             -> void;
-    auto translateBooleanEncoding(const seds::model::BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const
-            -> void;
-    auto translateIntegerEncoding(const std::optional<seds::model::IntegerDataEncoding> &encoding,
+    auto translateBooleanEncoding(
+            const ::seds::model::BooleanDataType &sedsType, Asn1Acn::Types::Boolean *asn1Type) const -> void;
+    auto translateIntegerEncoding(const std::optional<::seds::model::IntegerDataEncoding> &encoding,
             Asn1Acn::Types::IntegerAcnParameters *asn1Type) const -> void;
-    auto translateFloatEncoding(const seds::model::FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
+    auto translateFloatEncoding(const ::seds::model::FloatDataType &sedsType, Asn1Acn::Types::Real *asn1Type) const
             -> void;
-    auto translateStringEncoding(const seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
-            -> void;
+    auto translateStringEncoding(
+            const ::seds::model::StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const -> void;
     auto translateEnumerationList(
-            const seds::model::EnumeratedDataType &sedsType, Asn1Acn::Types::Enumerated *asn1Type) const -> void;
-    auto translateIntegerSubRangeDataType(
-            const seds::model::SubRangeDataType &sedsType, const seds::model::IntegerDataType &sedsBaseType) -> void;
+            const ::seds::model::EnumeratedDataType &sedsType, Asn1Acn::Types::Enumerated *asn1Type) const -> void;
+    auto translateIntegerSubRangeDataType(const ::seds::model::SubRangeDataType &sedsType,
+            const ::seds::model::IntegerDataType &sedsBaseType) -> void;
     auto translateFloatSubRangeDataType(
-            const seds::model::SubRangeDataType &sedsType, const seds::model::FloatDataType &sedsBaseType) -> void;
-    auto translateEnumSubRangeDataType(
-            const seds::model::SubRangeDataType &sedsType, const seds::model::EnumeratedDataType &sedsBaseType) -> void;
+            const ::seds::model::SubRangeDataType &sedsType, const ::seds::model::FloatDataType &sedsBaseType) -> void;
+    auto translateEnumSubRangeDataType(const ::seds::model::SubRangeDataType &sedsType,
+            const ::seds::model::EnumeratedDataType &sedsBaseType) -> void;
 
-    auto translateCoreIntegerEncoding(seds::model::CoreIntegerEncoding coreEncoding,
+    auto translateCoreIntegerEncoding(::seds::model::CoreIntegerEncoding coreEncoding,
             Asn1Acn::Types::IntegerAcnParameters *asn1Type) const -> void;
-    auto translateCoreEncodingAndPrecision(seds::model::CoreEncodingAndPrecision coreEncoding, uint64_t bits,
+    auto translateCoreEncodingAndPrecision(::seds::model::CoreEncodingAndPrecision coreEncoding, uint64_t bits,
             Asn1Acn::Types::Real *asn1Type) const -> void;
     auto translateCoreStringEncoding(
-            seds::model::CoreStringEncoding coreEncoding, Asn1Acn::Types::IA5String *asn1Type) const -> void;
-    auto translateFalseValue(seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
+            ::seds::model::CoreStringEncoding coreEncoding, Asn1Acn::Types::IA5String *asn1Type) const -> void;
+    auto translateFalseValue(::seds::model::FalseValue falseValue, Asn1Acn::Types::Boolean *asn1Type) const -> void;
 
-    auto convertByteOrder(seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
+    auto convertByteOrder(::seds::model::ByteOrder sedsByteOrder) const -> Asn1Acn::Types::Endianness;
 
 private:
     Context &m_context;
@@ -162,4 +162,4 @@ private:
     ContainerDataTypeTranslator m_containerTranslator;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

@@ -30,7 +30,7 @@
 #include <simulink/SimulinkModel/simulinkmodel.h>
 #include <vector>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 /**
  * @brief   Translation between SIMULINK model and ASN.1 model
@@ -69,12 +69,14 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
-    auto translateSimulinkModel(const simulink::model::SimulinkModel &simulinkModel, const Options &options) const
+    auto translateSimulinkModel(const ::simulink::model::SimulinkModel &simulinkModel, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
 
     auto addMatLabStandardDataTypes(Context &context) const -> void;
-    auto translateDataTypesOfModel(Context &context, const simulink::model::SimulinkModel &simulinkModel) const -> void;
-    auto translateDataTypesOfPorts(Context &context, const simulink::model::SimulinkModel &simulinkModel) const -> void;
+    auto translateDataTypesOfModel(Context &context, const ::simulink::model::SimulinkModel &simulinkModel) const
+            -> void;
+    auto translateDataTypesOfPorts(Context &context, const ::simulink::model::SimulinkModel &simulinkModel) const
+            -> void;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

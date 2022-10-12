@@ -58,6 +58,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "func_name", Token::func_name },
     { "is_visible", Token::is_visible },
     { "language", Token::language },
+    { "type_language", Token::type_language },
     { "default_implementation", Token::default_implementation },
     { "enable_multicast", Token::enable_multicast },
     { "layer", Token::layer },

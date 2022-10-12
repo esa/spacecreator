@@ -18,14 +18,9 @@
 #include "exportableivfunction.h"
 
 #include "exportableproperty.h"
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
-#include "ivinterface.h"
-#include "ivinterfacechain.h"
-#include "ivmodel.h"
+
 
 namespace ive {
 

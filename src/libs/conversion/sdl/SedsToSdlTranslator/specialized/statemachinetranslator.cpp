@@ -36,8 +36,8 @@
 #include <seds/SedsOptions/options.h>
 
 using conversion::Escaper;
-using conversion::asn1::translator::SedsToAsn1Translator;
-using conversion::iv::translator::InterfaceTranslatorHelper;
+using conversion::asn1::translator::seds::SedsToAsn1Translator;
+using conversion::iv::translator::seds::InterfaceTranslatorHelper;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::MissingInterfaceViewFunctionException;
 using conversion::translator::TranslationException;

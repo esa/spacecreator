@@ -24,7 +24,7 @@
 
 #include <simulink/SimulinkModel/datatypes/busdatatype.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 /**
  * @brief   Translator for SIMULINK bus member
@@ -62,7 +62,7 @@ public:
      *
      * @param   busDataType    Type to translation
      */
-    auto translate(const simulink::model::BusDataType &busDataType) -> void;
+    auto translate(const ::simulink::model::BusDataType &busDataType) -> void;
 
 private:
     auto appendAsn1TypeToSequence(Asn1Acn::Types::Sequence *sequence, const QString &sequenceComponentName,
@@ -73,4 +73,4 @@ private:
     DimensionTranslator m_dimensionTranslator;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

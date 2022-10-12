@@ -37,7 +37,7 @@ using conversion::translator::TranslationException;
 using simulink::model::BusDataType;
 using simulink::model::VectorDimensions;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 BusDataTypeTranslator::BusDataTypeTranslator(Context &context)
     : m_context(context)
@@ -94,4 +94,4 @@ void BusDataTypeTranslator::appendAsn1TypeToSequence(
     sequence->addComponent(std::move(sequenceComponent));
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink
