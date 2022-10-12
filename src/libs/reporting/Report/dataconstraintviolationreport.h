@@ -22,15 +22,20 @@
 #include <QList>
 #include <QMetaType>
 #include <QString>
+#include <QVariant>
+
+namespace reporting {
 
 struct DataConstraintViolationReport {
     /** Name of the constraint violating variable */
     QString variableName;
     /** Boundary operator (less than, greater than etc.) */
-    QString constraint;
+    QList<QString> constraints;
     /** Bounding value */
-    int boundingValue;
+    QList<QVariant> boundingValues;
 };
 
+}
+
 // Add meta type for QVariant compability
-Q_DECLARE_METATYPE(DataConstraintViolationReport)
+Q_DECLARE_METATYPE(reporting::DataConstraintViolationReport)

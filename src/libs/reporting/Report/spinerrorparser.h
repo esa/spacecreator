@@ -20,7 +20,7 @@
 #pragma once
 
 #include "dataconstraintviolationreport.h"
-#include "spinerrorreport.h"
+#include "spinerrorreportitem.h"
 
 class QRegularExpressionMatch;
 class QRegularExpressionMatchIterator;
@@ -33,6 +33,23 @@ namespace reporting {
 class SpinErrorParser
 {
 public:
+    /// @brief  Regex match tokens for constraint violation parsing
+    enum ConstraintViolationParseTokens
+    {
+        ConstraintViolationVariableName = 1,
+        ConstraintViolationType,
+        ConstraintViolationBoundingValue
+    };
+
+    /// @brief  Regex match tokens for report item parsing
+    enum ReportItemParseTokens
+    {
+        ErrorNumber = 1,
+        ErrorType,
+        ErrorDetails,
+        ErrorDepth
+    };
+
     /**
      * @brief   Constructor
      */
@@ -45,13 +62,16 @@ public:
      *
      * @return  List of spin errors
      */
-    QList<SpinErrorReport> parse(const QString &spinMessage) const;
+    SpinErrorReport parse(const QString &spinMessage) const;
 
 private:
-    QRegularExpressionMatchIterator findSpinErrors(const QString &spinMessage) const;
-    QList<QVariant> findVariableViolations(const QString &variableViolation) const;
+    QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
+    QVariant parseVariableViolation(const QString &rawError) const;
 
-    SpinErrorReport buildReport(const QRegularExpressionMatch &matchedError) const;
+    SpinErrorReportItem buildReportItem(const QRegularExpressionMatch &matchedError) const;
+
+    static QRegularExpression buildSpinErrorRegex();
+    static QRegularExpression buildDataConstraintViolationRegex();
 };
 
 }

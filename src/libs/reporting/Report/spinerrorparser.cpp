@@ -1,65 +1,96 @@
 #include "spinerrorparser.h"
 
+#include <QDebug>
 #include <QRegularExpression>
 
-QList<reporting::SpinErrorReport> reporting::SpinErrorParser::parse(const QString &spinMessage) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spinMessage) const
 {
-    // match message report
-    QRegularExpressionMatchIterator matches = findSpinErrors(spinMessage);
-    // iterate over all reports
-    QList<SpinErrorReport> reports;
+    QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
+    reporting::SpinErrorReport report;
     while (matches.hasNext()) {
-        // build report
-        auto report = buildReport(matches.next());
-        reports.append(report);
+        auto reportItem = buildReportItem(matches.next());
+        report.append(reportItem);
     }
-    return reports;
+    return report;
 }
 
-QRegularExpressionMatchIterator reporting::SpinErrorParser::findSpinErrors(const QString &spinMessage) const
+QRegularExpressionMatchIterator reporting::SpinErrorParser::matchSpinErrors(const QString &spinMessage) const
 {
-    const QString pattern = QStringLiteral("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)");
-    const QRegularExpression regex(pattern);
+    const QRegularExpression regex = buildSpinErrorRegex();
     return regex.globalMatch(spinMessage);
 }
 
-QList<QVariant> reporting::SpinErrorParser::findVariableViolations(const QString &str) const
+QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawError) const
 {
-    QList<QVariant> violations;
-    const QString pattern = QStringLiteral("\\(([a-z_][\\w\\.]+)(.+?)(\\d+)\\)");
-    const QRegularExpression regex(pattern);
-    QRegularExpressionMatchIterator matches = regex.globalMatch(str);
+    DataConstraintViolationReport violationReport;
+    const QRegularExpression regex = buildDataConstraintViolationRegex();
+    QRegularExpressionMatchIterator matches = regex.globalMatch(rawError);
     while (matches.hasNext()) {
         const QRegularExpressionMatch matchedError = matches.next();
-        // build violation report
-        DataConstraintViolationReport report;
-        report.variableName = matchedError.captured(1);
-        report.constraint = matchedError.captured(2);
-        report.boundingValue = matchedError.captured(3).toInt();
-        // add report to violations
-        QVariant violation;
-        violation.setValue(report);
-        violations.append(violation);
+        violationReport.variableName =
+                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName);
+        violationReport.constraints.append(
+                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationType));
+        QVariant boundingValue;
+        // put either int or float value into the report,
+        // depending on whether the "." character exists in the matched token
+        const QString boundingValueToken =
+                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationBoundingValue);
+        if (boundingValueToken.contains(QChar('.'))) {
+            boundingValue.setValue(boundingValueToken.toFloat());
+        } else {
+            boundingValue.setValue(boundingValueToken.toInt());
+        }
+        violationReport.boundingValues.append(boundingValue);
     }
-    return violations;
+    QVariant variableViolation;
+    variableViolation.setValue(violationReport);
+    return variableViolation;
 }
 
-reporting::SpinErrorReport reporting::SpinErrorParser::buildReport(const QRegularExpressionMatch &matchedError) const
+reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
+        const QRegularExpressionMatch &matchedError) const
 {
-    // build report
-    SpinErrorReport report;
-    report.errorNumber = matchedError.captured(1).toUInt();
-    report.errorDepth = matchedError.captured(4).toUInt();
-    report.errorType = SpinErrorReport::DataConstraintViolation;
-    report.rawErrorDetails = matchedError.captured(3);
-    // parse data constraint violation
-    // for now, only
-    switch (report.errorType) {
-    case SpinErrorReport::DataConstraintViolation:
-        report.parsedErrorDetails = findVariableViolations(report.rawErrorDetails);
+    SpinErrorReportItem reportItem;
+    reportItem.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
+    reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
+    reportItem.errorType = SpinErrorReportItem::DataConstraintViolation;
+    reportItem.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
+    // for now, only parse data constraint violation
+    switch (reportItem.errorType) {
+    case SpinErrorReportItem::DataConstraintViolation:
+        reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
         break;
     default:
         break;
     }
-    return report;
+    return reportItem;
+}
+
+QRegularExpression reporting::SpinErrorParser::buildSpinErrorRegex()
+{
+    // error number
+    QString pattern = QStringLiteral("pan:(\\d+):\\s+");
+    // error type
+    pattern += QStringLiteral("(.+?)\\s+");
+    // error details
+    pattern += QStringLiteral("\\((.+?)\\)\\s+");
+    // error depth
+    pattern += QStringLiteral("\\(at depth (\\d+)\\)");
+    return QRegularExpression(pattern);
+}
+
+QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex()
+{
+    // opening parenthesis
+    QString pattern = QStringLiteral("\\(");
+    // variable name
+    pattern += QStringLiteral("([a-z_][\\w\\.]+)");
+    // operator
+    pattern += QStringLiteral("(.+?)");
+    // bounding value
+    pattern += QStringLiteral("([\\d\\.]+)");
+    // closing parenthesis
+    pattern += QStringLiteral("\\)");
+    return QRegularExpression(pattern);
 }

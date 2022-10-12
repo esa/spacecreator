@@ -26,9 +26,9 @@
 #include <grantlee/template.h>
 #include <grantlee/texthtmlbuilder.h>
 #include <iostream>
+#include <optional>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorparser.h>
-#include <reporting/Report/spinerrorreport.h>
 #include <string.h>
 
 using namespace reporting;
@@ -78,7 +78,20 @@ int main(int argc, char *argv[])
     SpinErrorParser parser;
     auto reports = parser.parse(spinMessage.value());
     for (auto report : reports) {
-        Grantlee::TextHTMLBuilder textHtmlBuilder;
+        qDebug() << "----- Report -----";
+        qDebug() << "Error number:" << report.errorNumber;
+        qDebug() << "Error type:" << report.errorType;
+        qDebug() << "Error depth:" << report.errorDepth;
+        qDebug() << "Error details (raw):" << report.rawErrorDetails;
+        const DataConstraintViolationReport dataConstraintViolationReport =
+                qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
+        qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
+        for (auto constraint : dataConstraintViolationReport.constraints) {
+            qDebug() << "    Constraint:" << constraint;
+        }
+        for (auto boundingValue : dataConstraintViolationReport.boundingValues) {
+            qDebug() << "    Bounding value:" << boundingValue;
+        }
     }
 
     return EXIT_SUCCESS;

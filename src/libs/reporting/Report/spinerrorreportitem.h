@@ -28,7 +28,7 @@ namespace reporting {
 /**
  * @brief   Structure to hold parsed spin report data.
  */
-struct SpinErrorReport {
+struct SpinErrorReportItem {
     /** Error types */
     enum ErrorType
     {
@@ -47,7 +47,9 @@ struct SpinErrorReport {
     /** Raw error details reported by the message */
     QString rawErrorDetails;
     /** Parsed error details */
-    QList<QVariant> parsedErrorDetails;
+    QVariant parsedErrorDetails;
 };
+
+typedef QList<SpinErrorReportItem> SpinErrorReport;
 
 }
