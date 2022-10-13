@@ -33,6 +33,7 @@
 #include "goto.h"
 #include "inlinecall.h"
 #include "label.h"
+#include "printfstatement.h"
 #include "select.h"
 #include "sequence.h"
 #include "skip.h"
@@ -50,7 +51,7 @@ public:
      * @brief Variant representation of different alternatives of proctype element
      */
     using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment, InlineCall, Skip,
-            Conditional, Sequence, ForLoop, ExitLoop, Select, AssertCall, ElseStatement, Label, GoTo>;
+            Conditional, Sequence, ForLoop, ExitLoop, Select, AssertCall, ElseStatement, Label, GoTo, PrintfStatement>;
 
     /**
      * @brief Constructor

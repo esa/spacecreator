@@ -60,11 +60,13 @@ using promela::model::InitProctype;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::Label;
+using promela::model::PrintfStatement;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaSystemModel;
 using promela::model::Sequence;
 using promela::model::Skip;
+using promela::model::StringConstant;
 using promela::model::Utype;
 using promela::model::UtypeRef;
 using promela::model::VariableRef;
@@ -1043,9 +1045,9 @@ void IvToPromelaTranslator::createTimerInlinesForFunction(
 
     Sequence setTimerSequence(Sequence::Type::NORMAL);
 
-    QString setTimerParameterName = QString("%1_%2_interval")
-                                            .arg(Escaper::escapePromelaName(functionName))
-                                            .arg(Escaper::escapePromelaName(timerName));
+    const QString setTimerParameterName = QString("%1_%2_interval")
+                                                  .arg(Escaper::escapePromelaName(functionName))
+                                                  .arg(Escaper::escapePromelaName(timerName));
 
     VariableRef timerIntervalVar(timerData);
     timerIntervalVar.appendElement("interval");
@@ -1054,10 +1056,19 @@ void IvToPromelaTranslator::createTimerInlinesForFunction(
     VariableRef timerEnabledVar(timerData);
     timerEnabledVar.appendElement("timer_enabled");
     setTimerSequence.appendElement(Assignment(timerEnabledVar, Expression(BooleanConstant(true))));
+    const QString setTimerMessage = QString("set_timer %1 %2 %d\\n").arg(functionName).arg(timerName);
+    QList<Expression> setTimerMessageArgs;
+    setTimerMessageArgs.append(Expression(StringConstant(setTimerMessage)));
+    setTimerMessageArgs.append(Expression(VariableRef(setTimerParameterName)));
+    setTimerSequence.appendElement(PrintfStatement(setTimerMessageArgs));
 
     Sequence resetTimerSequence(Sequence::Type::NORMAL);
 
     resetTimerSequence.appendElement(Assignment(timerEnabledVar, Expression(BooleanConstant(false))));
+    const QString resetTimerMessage = QString("reset_timer %1 %2").arg(functionName).arg(timerName);
+    QList<Expression> resetTimerMessageArgs;
+    resetTimerMessageArgs.append(Expression(StringConstant(resetTimerMessage)));
+    resetTimerSequence.appendElement(PrintfStatement(resetTimerMessageArgs));
 
     QList<QString> params;
     params.append(setTimerParameterName);
