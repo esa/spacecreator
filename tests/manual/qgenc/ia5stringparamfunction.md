@@ -8,9 +8,6 @@
 
 Results:
 
-* Project build fails with error:
-
-For type MyIA5String:
-    IA5String and types that depend on them cannot be used as a parameter.
-    Use OCTET STRINGs instead!
-    (file dataview/dataview-uniq.asn, line 5)
+* Project should succesfully build and run.
+* It should display the "Output: bcdef" message in a loop informing about the QGen function output.
+* No "assertion failed" info should appear.
