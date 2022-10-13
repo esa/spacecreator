@@ -39,7 +39,7 @@ QString SpinConfigSaver::explorationModeToString(const ExplorationMode &explorat
     return "";
 }
 
-ExplorationMode SpinConfigSaver::explorationModeFromStringRef(const QStringRef &explorationModeStr)
+ExplorationMode SpinConfigSaver::explorationModeFromString(const QString &explorationModeStr)
 {
     if (explorationModeStr == "BreadthFirst") {
         return ExplorationMode::BreadthFirst;
@@ -57,7 +57,7 @@ QString SpinConfigSaver::interfaceGenerationLimitsToString(const QList<QPair<QSt
     return generationLimitsStr;
 }
 
-QList<QPair<QString, int>> SpinConfigSaver::parseIfaceGenerationLimits(const QStringRef &interfaceGenerationLimitsStr)
+QList<QPair<QString, int>> SpinConfigSaver::parseIfaceGenerationLimits(const QString &interfaceGenerationLimitsStr)
 {
     constexpr int INTERFACE_IDX = 0;
     constexpr int LIMIT_IDX = 1;
@@ -65,39 +65,49 @@ QList<QPair<QString, int>> SpinConfigSaver::parseIfaceGenerationLimits(const QSt
 
     QList<QPair<QString, int>> ifaceGenerationLimits;
     for (const auto limitPairStr : interfaceGenerationLimitsStr.split(";")) {
-        QVector<QStringRef> limitPairVect = limitPairStr.split(" ");
+        QStringList limitPairVect = limitPairStr.split(" ");
         if (limitPairVect.length() == LIMIT_PAIR_SIZE) {
-            ifaceGenerationLimits.push_back(
-                    QPair<QString, int> { limitPairVect[INTERFACE_IDX].toString(), limitPairVect[LIMIT_IDX].toInt() });
+            ifaceGenerationLimits.append(
+                    QPair<QString, int> { limitPairVect[INTERFACE_IDX], limitPairVect[LIMIT_IDX].toInt() });
         }
     }
     return ifaceGenerationLimits;
 }
 
-QStringRef readAttribute(const QString &attribute, const QXmlStreamReader &xml)
+QString readAttribute(const QString &attribute, const QXmlStreamReader &xml)
 {
     if (xml.attributes().hasAttribute(attribute)) {
-        return xml.attributes().value(attribute);
+        return xml.attributes().value(attribute).toString();
     } else {
         qWarning() << "Error, no attribute " << attribute << " in the xmel file";
     }
     return {};
 }
 
+std::optional<int> optionalIntFromString(const QString str)
+{
+    return str.isEmpty() ? std::nullopt : std::optional<int>(str.toInt());
+}
+
+QString optionalIntToString(std::optional<int> opt)
+{
+    return opt == std::nullopt ? "" : QString::number(opt.value());
+}
+
 void SpinConfigSaver::saveSpinConfig(const SpinConfigData &configData, QXmlStreamWriter &xml)
 {
     xml.writeStartElement("SPINModelChecker");
 
-    xml.writeAttribute("errorlimit", QString::number(configData.errorLimit));
+    xml.writeAttribute("errorlimit", optionalIntToString(configData.errorLimit));
     xml.writeAttribute("explorationmode", explorationModeToString(configData.explorationMode));
-    xml.writeAttribute("inputvectorgenerationlimit", QString::number(configData.globalInputVectorGenerationLimit));
+    xml.writeAttribute("inputvectorgenerationlimit", optionalIntToString(configData.globalInputVectorGenerationLimit));
     xml.writeAttribute("ifacegenerationlimits", interfaceGenerationLimitsToString(configData.ifaceGenerationLimits));
-    xml.writeAttribute("memorylimitmb", QString::number(configData.memoryLimitMB));
-    xml.writeAttribute("numberofcores", QString::number(configData.numberOfCores));
+    xml.writeAttribute("memorylimitmb", optionalIntToString(configData.memoryLimitMB));
+    xml.writeAttribute("numberofcores", optionalIntToString(configData.numberOfCores));
     xml.writeAttribute("rawcommandline", configData.rawCommandLine);
     xml.writeAttribute("searchshortestpath", QString::number(configData.searchShortestPath));
-    xml.writeAttribute("searchstatelimit", QString::number(configData.searchStateLimit));
-    xml.writeAttribute("timelimitseconds", QString::number(configData.timeLimitSeconds));
+    xml.writeAttribute("searchstatelimit", optionalIntToString(configData.searchStateLimit));
+    xml.writeAttribute("timelimitseconds", optionalIntToString(configData.timeLimitSeconds));
     xml.writeAttribute("usebithashing", QString::number(configData.useBitHashing));
     xml.writeAttribute("usefairscheduling", QString::number(configData.useFairScheduling));
 
@@ -107,15 +117,15 @@ void SpinConfigSaver::saveSpinConfig(const SpinConfigData &configData, QXmlStrea
 bool SpinConfigSaver::readSpinConfig(QXmlStreamReader &xml)
 {
     configData.errorLimit = readAttribute("errorlimit", xml).toInt();
-    configData.explorationMode = explorationModeFromStringRef(readAttribute("explorationmode", xml));
-    configData.globalInputVectorGenerationLimit = readAttribute("inputvectorgenerationlimit", xml).toInt();
+    configData.explorationMode = explorationModeFromString(readAttribute("explorationmode", xml));
+    configData.globalInputVectorGenerationLimit = optionalIntFromString(readAttribute("inputvectorgenerationlimit", xml));
     configData.ifaceGenerationLimits = parseIfaceGenerationLimits(readAttribute("ifacegenerationlimits", xml));
-    configData.memoryLimitMB = readAttribute("memorylimitmb", xml).toInt();
-    configData.numberOfCores = readAttribute("numberofcores", xml).toInt();
-    configData.rawCommandLine = readAttribute("rawcommandline", xml).toString();
+    configData.memoryLimitMB = optionalIntFromString(readAttribute("memorylimitmb", xml));
+    configData.numberOfCores = optionalIntFromString(readAttribute("numberofcores", xml));
+    configData.rawCommandLine = readAttribute("rawcommandline", xml);
     configData.searchShortestPath = readAttribute("searchshortestpath", xml).toInt();
-    configData.searchStateLimit = readAttribute("searchstatelimit", xml).toInt();
-    configData.timeLimitSeconds = readAttribute("timelimitseconds", xml).toInt();
+    configData.searchStateLimit = optionalIntFromString(readAttribute("searchstatelimit", xml));
+    configData.timeLimitSeconds = optionalIntFromString(readAttribute("timelimitseconds", xml));
     configData.useBitHashing = readAttribute("usebithashing", xml).toInt();
     configData.useFairScheduling = readAttribute("usefairscheduling", xml).toInt();
 

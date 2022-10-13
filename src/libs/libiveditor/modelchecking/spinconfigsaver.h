@@ -20,6 +20,7 @@
 #ifndef SPINCONFIGSAVER_H
 #define SPINCONFIGSAVER_H
 
+#include <optional>
 #include <QIODevice>
 #include <QList>
 #include <QXmlStreamReader>
@@ -36,15 +37,18 @@ struct SpinConfigData {
     bool searchShortestPath = false;
     bool useFairScheduling = false;
     bool useBitHashing = false;
-    int numberOfCores = 1;
-    int timeLimitSeconds = 300;
-    int searchStateLimit = 1000000;
-    int errorLimit = 1;
-    int memoryLimitMB = 2048;
-    int globalInputVectorGenerationLimit = 4;
+    std::optional<int> numberOfCores = 1;
+    std::optional<int> timeLimitSeconds = 300;
+    std::optional<int> searchStateLimit = 1000000;
+    std::optional<int> errorLimit = 1;
+    std::optional<int> memoryLimitMB = 2048;
+    std::optional<int> globalInputVectorGenerationLimit = 4;
     QList<QPair<QString, int>> ifaceGenerationLimits;
     QString rawCommandLine; // if non-empty, overrides other configuration settings
 };
+
+std::optional<int> optionalIntFromString(const QString str);
+QString optionalIntToString(std::optional<int> opt);
 
 class SpinConfigSaver
 {
@@ -56,9 +60,9 @@ public:
 
 private:
     QString explorationModeToString(const ExplorationMode &explorationMode);
-    ExplorationMode explorationModeFromStringRef(const QStringRef &explorationModeStr);
+    ExplorationMode explorationModeFromString(const QString &explorationModeStr);
     QString interfaceGenerationLimitsToString(const QList<QPair<QString, int>> &interfaceGenerationLimits);
-    QList<QPair<QString, int>> parseIfaceGenerationLimits(const QStringRef &interfaceGenerationLimitsStr);
+    QList<QPair<QString, int>> parseIfaceGenerationLimits(const QString &interfaceGenerationLimitsStr);
     SpinConfigData configData;
 };
 
