@@ -71,6 +71,7 @@ private:
         const Asn1Acn::Types::Type *m_parameterType;
         QMap<QString, QString> m_possibleSenders;
         size_t m_channelSize;
+        bool m_isTimer;
         QStringList m_senders;
     };
 

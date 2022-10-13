@@ -295,6 +295,7 @@ public:
         size_t m_priority;
         QString m_parameterTypeName;
         QString m_parameterName;
+        bool m_isTimer;
 
         QMap<QString, QString> m_possibleSenders;
         std::list<std::unique_ptr<ObserverInfo>> m_observers;
@@ -318,9 +319,6 @@ public:
     };
 
     std::unique_ptr<SystemInfo> prepareSystemInfo(const ivm::IVModel *model, const conversion::Options &options) const;
-    std::unique_ptr<SystemInfo> prepareSystemInfo(const ivm::IVModel *model, const std::vector<QString> &modelFunctions,
-            const std::vector<QString> &environmentFunctions, const std::vector<QString> &observerAttachmentInfos,
-            const std::vector<QString> &observerNames) const;
 
 private:
     inline static const QString m_timerManagerProctypeName = "timer_manager_proc";
@@ -347,14 +345,14 @@ private:
     auto generateSendInline(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterName, const QString &parameterType, const QString &sourceFunctionName,
             const QString &sourceInterfaceName) const -> void;
-    auto createPromelaObjectsForFunction(
-            Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
+    auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVFunction *ivFunction,
+            const QString &functionName, const FunctionInfo &functionInfo) const -> void;
     auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVInterface *providedInterface,
             const QString &functionName, const QString &interfaceName, const std::size_t priority) const -> void;
     auto createPromelaObjectsForSyncRis(
             Context &context, const ivm::IVInterface *requiredInterface, const QString &functionName) const -> void;
-    auto createPromelaObjectsForEnvironment(
-            Context &context, const ivm::IVFunction *ivFunction, const QString &functionName) const -> void;
+    auto createPromelaObjectsForEnvironment(Context &context, const ivm::IVFunction *ivFunction,
+            const QString &functionName, const FunctionInfo &functionInfo) const -> void;
     auto createCheckQueueInline(model::PromelaSystemModel *promelaModel, const QString &functionName,
             const QList<QString> &channelNames) const -> void;
     auto createCheckQueuesExpression(const QList<QString> &channelNames, bool empty) const
