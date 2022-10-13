@@ -60,6 +60,7 @@ private:
     auto askAboutAndCheckFunctionBlockName() -> std::optional<QString>;
     auto searchAndCheckMatLabModelWorkspaceFile(const QString& inputFilePath) -> std::optional<QFileInfo>;
 
+    auto prepareMatLabTemporaryWorkingDirectory() -> void;
     auto generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString;
     auto generateWorkspaceLoadCallFunction(QFileInfo &workspaceFileInfo) -> QString;
     auto generateTasteExporterCallFunction(const QString& inputFilePath) -> QString;
@@ -95,6 +96,7 @@ private:
 private:
     const QString m_temporaryIvFileName = "tmp-interfaceview.xml";
     const QString m_functionBlockDefaultImplementation = "QGenC";
+    const QString m_matlabTemporaryWorkingDirectory = "matlab_temporary_working_directory";
     const QString m_tasteExporterOutputDirectory = "exported";
     const QString m_defaultFunctionBlockName = "simulink";
     const QString m_defaultFunctionBlockImplementationName = "default";
@@ -103,8 +105,8 @@ private:
     const QMap<QString, QString> m_workspaceLoadFunctionsMap = {{"m", "run"}, {"mat", "load"}};
 
     const QString m_workspaceLoadCallFunctionTemplate = "%1('%2')";
-    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "matlab -batch \"%1 exit;\"";
-    const QString m_matlabCommandWithWorkspaceLoadTemplate = "matlab -batch \"%1 %2 exit;\"";
+    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2 exit;\"";
+    const QString m_matlabCommandWithWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2 %3 exit;\"";
     const QString m_tasteExporterCallFunctionTemplate = "taste_export('%1', '%2');";
     const QString m_functionBlockInWorkDirectoryPathTemplate = "%1/work/%2/%3/src";
 

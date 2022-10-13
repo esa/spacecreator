@@ -188,16 +188,19 @@ auto SimulinkImporterPlugin::importSlx() -> void
         return;
     }
 
+    prepareMatLabTemporaryWorkingDirectory();
+
     const QString matlabCmd = generateMatLabCommand(*workspaceFileInfo, *inputFilePath);
 
-    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::executingMatlabCommand));
+    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::executingMatlabCommand.arg(matlabCmd)));
 
     if(QProcess::execute(matlabCmd) != 0) {
         MessageManager::write(GenMsg::msgError.arg(GenMsg::matlabCommandHasFailed));
+        removeMatLabCommandTemporaries();
         return;
     }
 
-    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::done));
+    MessageManager::write(GenMsg::msgInfo.arg(GenMsg::matlabCommandHasExecuted));
 
     if(importXmlFileAndRemoveTemporaries(generateExportedXmlFilePath(*inputFilePath), *functionBlockName)) {
         copyInputSlxFileToWorkDirectory(*inputFilePath, *functionBlockName);
@@ -277,15 +280,31 @@ auto SimulinkImporterPlugin::searchAndCheckMatLabModelWorkspaceFile(const QStrin
     return QFileInfo();
 }
 
+auto SimulinkImporterPlugin::prepareMatLabTemporaryWorkingDirectory() -> void
+{
+    const bool isMatLabTemporaryWorkingDirectoryExists = QDir().exists(m_matlabTemporaryWorkingDirectory);
+
+    if(isMatLabTemporaryWorkingDirectoryExists) { 
+        QDir(m_matlabTemporaryWorkingDirectory).removeRecursively();
+    }
+
+    QDir().mkdir(m_matlabTemporaryWorkingDirectory);
+}
+
 auto SimulinkImporterPlugin::generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString
 {
     const QString workspaceLoadFunction = generateWorkspaceLoadCallFunction(workspaceFileInfo);
     const QString tasteExporterFunction = generateTasteExporterCallFunction(inputFilePath);
 
     if(workspaceLoadFunction.isEmpty()) {
-        return m_matlabCommandWithoutWorkspaceLoadTemplate.arg(tasteExporterFunction);
+        return m_matlabCommandWithoutWorkspaceLoadTemplate
+                .arg(m_matlabTemporaryWorkingDirectory)
+                .arg(tasteExporterFunction);
     } else {
-        return m_matlabCommandWithWorkspaceLoadTemplate.arg(workspaceLoadFunction).arg(tasteExporterFunction);
+        return m_matlabCommandWithWorkspaceLoadTemplate
+                .arg(m_matlabTemporaryWorkingDirectory)
+                .arg(workspaceLoadFunction)
+                .arg(tasteExporterFunction);
     }
 }
 
@@ -342,7 +361,10 @@ auto SimulinkImporterPlugin::generateExportedXmlFilePath(const QString& inputFil
 {
     const QFileInfo inputFileInfo(inputFilePath);
 
-    return QString("%1/%2.xml").arg(m_tasteExporterOutputDirectory).arg(inputFileInfo.baseName());
+    return QString("%1/%2/%3.xml")
+            .arg(m_matlabTemporaryWorkingDirectory)
+            .arg(m_tasteExporterOutputDirectory)
+            .arg(inputFileInfo.baseName());
 }
 
 auto SimulinkImporterPlugin::importXmlFileAndRemoveTemporaries(const QString &inputFilePath, const QString &functionBlockName) -> bool
@@ -647,10 +669,10 @@ auto SimulinkImporterPlugin::removeConvertersTemporaries(const std::optional<QSt
 
 auto SimulinkImporterPlugin::removeMatLabCommandTemporaries() -> void
 {
-    QDir tasteExporterOutputDirectory(m_tasteExporterOutputDirectory);
+    QDir matlabTemporaryWorkingDirectory(m_matlabTemporaryWorkingDirectory);
     
-    if(tasteExporterOutputDirectory.exists()) {
-        tasteExporterOutputDirectory.removeRecursively();
+    if(matlabTemporaryWorkingDirectory.exists()) {
+        matlabTemporaryWorkingDirectory.removeRecursively();
     }
 }
 
