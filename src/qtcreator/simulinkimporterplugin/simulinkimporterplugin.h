@@ -56,9 +56,10 @@ private:
     auto importXml() -> void;
 
 private:
-    auto askAboutAndCheckFilePath(QString caption, QString filter) -> std::optional<QString>;
+    auto askAboutAndCheckFilePath(const QString &caption, const QString &filter) -> std::optional<QString>;
     auto askAboutAndCheckFunctionBlockName() -> std::optional<QString>;
     auto searchAndCheckMatLabModelWorkspaceFile(const QString& inputFilePath) -> std::optional<QFileInfo>;
+    auto printInfoAboutInputs(const QString& inputFilePath, const QString& functionBlockName, const QString& inputWorkspaceFilePath = QString()) -> void;
 
     auto prepareMatLabTemporaryWorkingDirectory() -> void;
     auto generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString;
@@ -69,9 +70,8 @@ private:
     auto generateExportedXmlFilePath(const QString& inputFilePath) -> QString;
 
     auto importXmlFileAndRemoveTemporaries(const QString &inputFilePath, const QString &functionBlockName) -> bool;
-    auto importXmlFile(const QString &inputFilePath, const QString &functionBlockName) -> std::optional<QStringList>;
 
-    auto convertXmlFileToAsn1(const QString &inputFilePath) -> std::optional<QStringList>;
+    auto convertXmlFileToAsn1(const QString &inputFilePath) -> QStringList;
     auto getGeneratedAsn1FileNamesFromModels(const std::vector<std::unique_ptr<conversion::Model>> &models) -> QStringList;
     auto convertXmlFileToIv(const QString &inputFilePath, const QString &functionBlockName, const QString &ivConfig) -> bool;
     auto convert(const std::set<conversion::ModelType> &srcModelType, conversion::ModelType targetModelType,
@@ -88,7 +88,7 @@ private:
     auto addGeneratedAsn1FilesToCurrentProject(const QStringList &generatedAsn1FileNames) -> void;
     auto isFileIsOneOfMatLabStandardDataTypesFiles(const QString &fileName) -> bool;
 
-    auto removeConvertersTemporaries(const std::optional<QStringList> &generatedAsn1FileNames) -> void;
+    auto removeConvertersTemporaries(const QStringList &generatedAsn1FileNames) -> void;
     auto removeMatLabCommandTemporaries() -> void;
 
     auto checkIfFileExistsAndRemoveIt(const QString &filePath) -> void;
