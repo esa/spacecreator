@@ -2,7 +2,7 @@
 
 **1. Steps:**
 
-* Open project `tests/manual/qgenc/projects/not-working/sequenceparam/sequenceparam.pro`
+* Open project `tests/manual/qgenc/projects/sequenceparam/sequenceparam.pro`
 * Open the `interfaceview.xml` file
 * Build and run the project
 

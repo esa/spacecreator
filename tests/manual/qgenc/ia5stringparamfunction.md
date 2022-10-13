@@ -2,7 +2,7 @@
 
 **1. Steps:**
 
-* Open project `tests/manual/qgenc/projects/not-working/ia5stringparam/ia5stringparam.pro`
+* Open project `tests/manual/qgenc/projects/ia5stringparam/ia5stringparam.pro`
 * Open the `interfaceview.xml` file
 * Try to build the project
 
