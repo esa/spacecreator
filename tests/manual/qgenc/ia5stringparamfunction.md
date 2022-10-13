@@ -4,6 +4,8 @@
 
 * Open project `tests/manual/qgenc/projects/ia5stringparam/ia5stringparam.pro`
 * Open the `interfaceview.xml` file
+* Clean the project
+* Right click on the interfaceview and select "Generate/update code skeletons" option
 * Try to build the project
 
 Results:
