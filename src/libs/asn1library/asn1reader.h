@@ -22,6 +22,7 @@
 #include <QStringList>
 #include <QVector>
 #include <memory>
+#include <QPair>
 
 class QFileInfo;
 
@@ -67,7 +68,7 @@ Q_SIGNALS:
     void parseError(const QString &error);
 
 private:
-    QString asn1CompilerCommand() const;
+    QPair<QString, QStringList> asn1CompilerCommand() const;
     QString temporaryFileName(const QString &basename, const QString &suffix) const;
 
     QByteArray fileHash(const QStringList &fileNames) const;
