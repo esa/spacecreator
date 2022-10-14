@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
     std::optional<QString> spinMessage;
+    std::optional<QString> templateFile;
     std::optional<QString> targetFile;
 
     const QStringList args = app.arguments();
@@ -60,6 +61,17 @@ int main(int argc, char *argv[])
             }
             ++i;
             spinMessage = args[i];
+        } else if (arg == "-it") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing template file after -it");
+                exit(EXIT_FAILURE);
+            }
+            if (templateFile.has_value()) {
+                qCritical("Duplicated -it argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            templateFile = args[i];
         } else if (arg == "-of") {
             if (i + 1 == args.size()) {
                 qCritical("Missing target file after -of");
@@ -77,6 +89,7 @@ int main(int argc, char *argv[])
             qInfo("spinerrorparser: Spin Error Parser");
             qInfo("Usage: spinerrorparser [OPTIONS]");
             qInfo("  -im <message>          Message from spin");
+            qInfo("  -it <filename>         HTML template file name");
             qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
             exit(EXIT_SUCCESS);
@@ -88,6 +101,11 @@ int main(int argc, char *argv[])
 
     if (!spinMessage.has_value()) {
         qCritical("Missing mandatory argument: -im spinMessage");
+        exit(EXIT_FAILURE);
+    }
+
+    if (!templateFile.has_value()) {
+        qCritical("Missing mandatory argument: -it templateFile");
         exit(EXIT_FAILURE);
     }
 
@@ -117,7 +135,7 @@ int main(int argc, char *argv[])
     }
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto htmlReport = htmlReportBuilder.parse(reports);
+    const auto htmlReport = htmlReportBuilder.parse(reports, templateFile.value());
 
     QFile file(targetFile.value());
     if (file.open(QFile::WriteOnly)) {

@@ -19,6 +19,9 @@ target_link_libraries(HtmlReport
                 Grantlee5::Templates
     PRIVATE     CommonProjectWarnings)
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/template.html
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 add_format_target(HtmlReport)
 add_tidy_target(HtmlReport)
 

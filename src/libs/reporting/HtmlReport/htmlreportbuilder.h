@@ -19,21 +19,27 @@
 
 #pragma once
 
+#include <QSharedPointer>
 #include <QString>
 #include <reporting/Report/spinerrorreportitem.h>
+
+namespace Grantlee {
+class Engine;
+class FileSystemTemplateLoader;
+}
 
 namespace reporting {
 
 /**
  * @brief   Builds HTML document from SpinErrorReport.
  */
-class HtmlReportBuilder
+class HtmlReportBuilder : public QObject
 {
 public:
     /**
      * @brief   Constructor
      */
-    HtmlReportBuilder() = default;
+    HtmlReportBuilder();
 
     /**
      * @brief   Parse spin error report
@@ -42,7 +48,18 @@ public:
      *
      * @return  Error report in an HTML document format
      */
-    QString parse(const SpinErrorReport &spinErrorReport) const;
+    QString parse(const SpinErrorReport &spinErrorReport, const QString &templateFile) const;
+
+private:
+    Grantlee::Engine *m_engine = nullptr;
+    QSharedPointer<Grantlee::FileSystemTemplateLoader> m_fileLoader;
+
+    static const QHash<reporting::SpinErrorReportItem::ErrorType, QString> m_errorTypeNames;
+
+    static QVariantList buildReportVariant(const SpinErrorReport &spinErrorReport);
+    static QVariantHash buildReportItemVariant(const SpinErrorReportItem &spinErrorReportItem);
+
+    static QVariantHash buildDataConstraintViolationVariant(const QVariant &errorDetails);
 };
 
 }
