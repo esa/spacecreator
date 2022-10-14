@@ -111,9 +111,9 @@ private:
     const QMap<QString, QString> m_workspaceLoadFunctionsMap = {{"m", "run"}, {"mat", "load"}};
 
     const QString m_workspaceLoadCallFunctionTemplate = "%1('%2')";
-    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2 exit;\"";
-    const QString m_matlabCommandWithWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2 %3 exit;\"";
-    const QString m_tasteExporterCallFunctionTemplate = "taste_export('%1', '%2');";
+    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2; exit;\"";
+    const QString m_matlabCommandWithWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2; %3; exit;\"";
+    const QString m_tasteExporterCallFunctionTemplate = "taste_export('%1', '%2')";
     const QString m_functionBlockInWorkDirectoryPathTemplate = "%1/work/%2/%3/src";
 
     conversion::Registry m_registry;
