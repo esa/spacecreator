@@ -435,7 +435,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     if (m_overridenType != nullptr) {
         if (const auto overridenSequenceOf = dynamic_cast<const SequenceOf *>(m_overridenType);
                 overridenSequenceOf != nullptr) {
-            const auto initCallName = QString("%1_elem_init_value").arg(m_overridenType->identifier());
+            const auto initCallName =
+                    QString("%1_elem_init_value").arg(Escaper::escapePromelaName(m_overridenType->identifier()));
             handleOverridenType(type.identifier(), overridenSequenceOf->constraints(), initCallName, valueVariableName,
                     minSize, maxSize, sequence.get());
         } else if (const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
