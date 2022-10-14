@@ -53,6 +53,8 @@ using promela::translator::IvToPromelaTranslator;
 using shared::InterfaceParameter;
 using spintrail::model::ChannelEvent;
 using spintrail::model::ContinuousSignal;
+using spintrail::model::ResetTimerEvent;
+using spintrail::model::SetTimerEvent;
 using spintrail::model::SpinTrailModel;
 using spintrail::model::TrailEvent;
 
@@ -288,13 +290,24 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
     const std::list<std::unique_ptr<TrailEvent>> &events = spinTrailModel.getEvents();
 
     for (const std::unique_ptr<TrailEvent> &trailEvent : events) {
-        if (trailEvent->getEventType() == TrailEvent::EventType::CHANNEL_EVENT) {
+        switch (trailEvent->getEventType()) {
+        case TrailEvent::EventType::CHANNEL_EVENT: {
             const ChannelEvent *event = dynamic_cast<const ChannelEvent *>(trailEvent.get());
             processSpinTrailEvent(result, event, channels, observerChannels, proctypes, observableEvent);
-        } else if (trailEvent->getEventType() == TrailEvent::EventType::CONTINUOUS_SIGNAL) {
+        } break;
+        case TrailEvent::EventType::CONTINUOUS_SIGNAL: {
             const ContinuousSignal *event = dynamic_cast<const ContinuousSignal *>(trailEvent.get());
             processSpinTrailEvent(result, event);
+        } break;
+        case TrailEvent::EventType::SET_TIMER_EVENT: {
+            const SetTimerEvent *event = dynamic_cast<const SetTimerEvent *>(trailEvent.get());
+            processSpinTrailEvent(event);
+        } break;
+        case TrailEvent::EventType::RESET_TIMER_EVENT:
+            const ResetTimerEvent *event = dynamic_cast<const ResetTimerEvent *>(trailEvent.get());
+            processSpinTrailEvent(event);
         }
+        break;
     }
 }
 
@@ -406,6 +419,17 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(
     inputEvent->addValue("dest", std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(event->getFunctionName())));
     inputEvent->addValue("event", std::move(functionEvent));
     result.appendValue(std::make_unique<ChoiceValue>("input-event", std::move(inputEvent)));
+}
+
+void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(const SetTimerEvent *event) const
+{
+    qDebug() << event->getFunctionName() << " calls set_timer(" << event->getInterval() << ", " << event->getTimerName()
+             << ")";
+}
+
+void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(const ResetTimerEvent *event) const
+{
+    qDebug() << event->getFunctionName() << " calls reset_timer(" << event->getTimerName() << ")";
 }
 
 Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getValue(const QString &source, const QString &target,

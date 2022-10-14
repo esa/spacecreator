@@ -17,21 +17,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
+#include "settimerevent.h"
 
 namespace spintrail::model {
-class TrailEvent
+SetTimerEvent::SetTimerEvent(QString functionName, QString timerName, size_t interval)
+    : m_functionName(std::move(functionName))
+    , m_timerName(std::move(timerName))
+    , m_interval(interval)
 {
-public:
-    enum class EventType
-    {
-        CHANNEL_EVENT,
-        CONTINUOUS_SIGNAL,
-        SET_TIMER_EVENT,
-        RESET_TIMER_EVENT,
-    };
+}
 
-    virtual ~TrailEvent() = default;
-    virtual EventType getEventType() const = 0;
-};
+const QString &SetTimerEvent::getFunctionName() const
+{
+    return m_functionName;
+}
+
+const QString &SetTimerEvent::getTimerName() const
+{
+    return m_timerName;
+}
+
+size_t SetTimerEvent::getInterval() const
+{
+    return m_interval;
+}
+
+TrailEvent::EventType SetTimerEvent::getEventType() const
+{
+    return TrailEvent::EventType::SET_TIMER_EVENT;
+}
 }

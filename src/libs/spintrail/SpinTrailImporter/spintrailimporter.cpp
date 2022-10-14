@@ -29,6 +29,8 @@
 #include <conversion/common/import/exceptions.h>
 #include <spintrail/SpinTrailModel/channelevent.h>
 #include <spintrail/SpinTrailModel/continuoussignal.h>
+#include <spintrail/SpinTrailModel/resettimerevent.h>
+#include <spintrail/SpinTrailModel/settimerevent.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 #include <spintrail/SpinTrailOptions/options.h>
 
@@ -38,6 +40,8 @@ using conversion::ConversionException;
 using conversion::FileNotFoundException;
 using spintrail::model::ChannelEvent;
 using spintrail::model::ContinuousSignal;
+using spintrail::model::ResetTimerEvent;
+using spintrail::model::SetTimerEvent;
 using spintrail::model::SpinTrailModel;
 
 namespace spintrail::importer {
@@ -76,6 +80,21 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
     if (continuousSignalValidation.exactMatch(line)) {
         const QString functionName = continuousSignalValidation.cap(1);
         model.appendEvent(std::make_unique<ContinuousSignal>(functionName));
+        return;
+    }
+    QRegExp setTimerEventValidation(R"( *set_timer (\w+) (\w+) (\d+))");
+    if (setTimerEventValidation.exactMatch(line)) {
+        const QString functionName = setTimerEventValidation.cap(1);
+        const QString interfaceName = setTimerEventValidation.cap(2);
+        size_t interval = setTimerEventValidation.cap(2).toULong();
+        model.appendEvent(std::make_unique<SetTimerEvent>(functionName, interfaceName, interval));
+        return;
+    }
+    QRegExp resetTimerEventValidation(R"( *reset_timer (\w+) (\w+))");
+    if (resetTimerEventValidation.exactMatch(line)) {
+        const QString functionName = setTimerEventValidation.cap(1);
+        const QString interfaceName = setTimerEventValidation.cap(2);
+        model.appendEvent(std::make_unique<ResetTimerEvent>(functionName, interfaceName));
         return;
     }
     // example input line:

@@ -16,22 +16,27 @@
  * You should have received a copy of the GNU Library General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-
-#pragma once
+#include "resettimerevent.h"
 
 namespace spintrail::model {
-class TrailEvent
-{
-public:
-    enum class EventType
-    {
-        CHANNEL_EVENT,
-        CONTINUOUS_SIGNAL,
-        SET_TIMER_EVENT,
-        RESET_TIMER_EVENT,
-    };
+ResetTimerEvent::ResetTimerEvent(QString functionName, QString timerName)
+    : m_functionName(std::move(functionName))
 
-    virtual ~TrailEvent() = default;
-    virtual EventType getEventType() const = 0;
-};
+    , m_timerName(std::move(timerName))
+{
+}
+
+const QString &ResetTimerEvent::getFunctionName() const
+{
+    return m_functionName;
+}
+const QString &ResetTimerEvent::getTimerName() const
+{
+    return m_timerName;
+}
+
+TrailEvent::EventType ResetTimerEvent::getEventType() const
+{
+    return TrailEvent::EventType::RESET_TIMER_EVENT;
+}
 }

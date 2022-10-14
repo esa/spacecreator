@@ -26,6 +26,8 @@
 #include <simulatortrail/SimulatorTrailModel/simulatortrailmodel.h>
 #include <spintrail/SpinTrailModel/channelevent.h>
 #include <spintrail/SpinTrailModel/continuoussignal.h>
+#include <spintrail/SpinTrailModel/resettimerevent.h>
+#include <spintrail/SpinTrailModel/settimerevent.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 
 namespace simulatortrail::translator {
@@ -91,6 +93,8 @@ private:
             const Asn1Acn::Types::Type *observableEvent) const;
     void processSpinTrailEvent(
             simulatortrail::model::SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const;
+    void processSpinTrailEvent(const spintrail::model::SetTimerEvent *event) const;
+    void processSpinTrailEvent(const spintrail::model::ResetTimerEvent *event) const;
     Asn1Acn::ValuePtr getValue(const QString &source, const QString &target, const ChannelInfo &info,
             const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters, bool isInput) const;
 

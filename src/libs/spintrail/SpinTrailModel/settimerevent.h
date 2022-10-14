@@ -19,19 +19,26 @@
 
 #pragma once
 
+#include "trailevent.h"
+
+#include <QString>
+#include <cstddef>
+
 namespace spintrail::model {
-class TrailEvent
+class SetTimerEvent : public TrailEvent
 {
 public:
-    enum class EventType
-    {
-        CHANNEL_EVENT,
-        CONTINUOUS_SIGNAL,
-        SET_TIMER_EVENT,
-        RESET_TIMER_EVENT,
-    };
+    SetTimerEvent(QString functionName, QString timerName, size_t interval);
 
-    virtual ~TrailEvent() = default;
-    virtual EventType getEventType() const = 0;
+    const QString &getFunctionName() const;
+    const QString &getTimerName() const;
+    size_t getInterval() const;
+
+    EventType getEventType() const override;
+
+private:
+    QString m_functionName;
+    QString m_timerName;
+    size_t m_interval;
 };
 }
