@@ -93,7 +93,13 @@ private:
 
     auto checkIfFileExistsAndRemoveIt(const QString &filePath) -> void;
 
+    auto printPluginSelfIntroductionInGeneralMessages() -> void;
+    auto printInfoInGeneralMessages(const QString &message) -> void;
+    auto printErrorInGeneralMessages(const QString &message) -> void;
+
 private:
+    const QString m_pluginNameInGeneralMessages = "SimulinkImporterPlugin";
+
     const QString m_temporaryIvFileName = "tmp-interfaceview.xml";
     const QString m_functionBlockDefaultImplementation = "QGenC";
     const QString m_matlabTemporaryWorkingDirectory = "matlab_temporary_working_directory";
