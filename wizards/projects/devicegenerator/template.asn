@@ -4,6 +4,8 @@
 
     SystemBus ::= INTEGER (0 .. 255)
 
+    SystemDevice ::= INTEGER (0 .. 255)
+
     RemoteInterface ::= INTEGER (0 .. 255)
 
     InputDataPtr ::= PlatformSpecificPointer
@@ -26,16 +28,22 @@
 
     SystemBusArray ::= SEQUENCE (SIZE (255)) OF SystemBus --(Broker)enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER]
 
+    InitRequestData ::= SEQUENCE{
+        private-data InputDataPtr, --(Broker)void* private_data
+        bus-id SystemBus, --(Broker)const enum SystemBus bus_id
+        device-id SystemDevice, --(Broker)const enum SystemDevice device_id
+        device-configuration InputDataPtr, --(Broker)void* device_configuration,
+        remote-device-configuration InputDataPtr --(Broker)void* remote_device_configuration
+    }
+
     DeliveredRequestData ::= SEQUENCE{
-        iface RemoteInterface, --(Broker)const enum RemoteInterface
+        private-data InputDataPtr, --(Broker)void* private_data
         data InputDataPtr, --(Broker)const uint8_t* const
         length DataLength --(Broker)const size_t
     }
 
     ReceivedRequestData ::= SEQUENCE{
-        bus-id SystemBus, --(Broker)enum SystemBus
-        data OutputDataPtr, --(Broker)uint8_t* const
-        length DataLength --(Broker)const size_t
+        private-data OutputDataPtr --(Broker)void* private_data
     }
 
     -- ASN.1 Type definitions must start with an uppercase
