@@ -370,7 +370,7 @@ static inline auto handleCommandTransactions(Context &context,
     procedure->addParameter(std::move(transactionParameter));
 
     // Add variable to pass transaction name outside of the procedure
-    const auto transactionVariableName = QString("%1_transactionName").arg(ivInterface->title());
+    const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(ivInterface->title());
     auto transactionVariable =
             std::make_unique<::sdl::VariableDeclaration>(transactionVariableName, transactionParamTypeName);
     auto sdlProcess = context.sdlProcess();
@@ -442,7 +442,7 @@ static inline auto handleParameterTransactions(const std::vector<const ::seds::m
     procedure->addParameter(std::move(transactionParameter));
 
     // Add variable to pass transaction name outside of the procedure
-    const auto transactionVariableName = QString("%1_transactionName").arg(ivInterface->title());
+    const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(ivInterface->title());
     auto transactionVariable =
             std::make_unique<::sdl::VariableDeclaration>(transactionVariableName, transactionParamTypeName);
     sdlProcess->addVariable(std::move(transactionVariable));
@@ -1132,7 +1132,7 @@ auto StateMachineTranslator::createInputWithTransactions(Context &context, ::sdl
 
     auto transactionDecision = std::make_unique<::sdl::Decision>();
 
-    const auto transactionVariableName = QString("%1_transactionName").arg(sdlInput->name());
+    const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(sdlInput->name());
     auto transactionDecisionExpression = std::make_unique<::sdl::Expression>(transactionVariableName);
     transactionDecision->setExpression(std::move(transactionDecisionExpression));
 
