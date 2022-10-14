@@ -16,6 +16,7 @@ target_link_libraries(${TEST_NAME}
 add_format_target(${TEST_NAME})
 
 configure_file(test_subtyping.sh test_subtyping.sh COPYONLY)
+configure_file(test_same_size.sh test_same_size.sh COPYONLY)
 configure_file(test_sequenceof_fixed_size.sh test_sequenceof_fixed_size.sh COPYONLY)
 configure_file(test_ia5string_fixed_size.sh test_ia5string_fixed_size.sh COPYONLY)
 configure_file(test_octetstring_fixed_size.sh test_octetstring_fixed_size.sh COPYONLY)

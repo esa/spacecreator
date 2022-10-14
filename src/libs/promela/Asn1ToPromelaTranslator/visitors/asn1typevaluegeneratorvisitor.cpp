@@ -701,6 +701,13 @@ void Asn1TypeValueGeneratorVisitor::handleOverridenType(const QString &typeName,
     const auto isConstSize = minSize == maxSize;
     const auto isOverridenConstSize = overridenMinSize == overridenMaxSize;
 
+    const auto areSameSize = (minSize == overridenMinSize && maxSize == overridenMaxSize);
+
+    // If both types have the same size, then we don't need to do anything
+    if (areSameSize) {
+        return;
+    }
+
     // We allow to subtype one const size with another const size
     if (!isConstSize && !isOverridenConstSize) {
         if (minSize < overridenMinSize) {
