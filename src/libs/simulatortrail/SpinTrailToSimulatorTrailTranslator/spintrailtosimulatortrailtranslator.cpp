@@ -303,11 +303,11 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
             const SetTimerEvent *event = dynamic_cast<const SetTimerEvent *>(trailEvent.get());
             processSpinTrailEvent(event);
         } break;
-        case TrailEvent::EventType::RESET_TIMER_EVENT:
+        case TrailEvent::EventType::RESET_TIMER_EVENT: {
             const ResetTimerEvent *event = dynamic_cast<const ResetTimerEvent *>(trailEvent.get());
             processSpinTrailEvent(event);
+        } break;
         }
-        break;
     }
 }
 

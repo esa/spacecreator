@@ -86,7 +86,7 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
     if (setTimerEventValidation.exactMatch(line)) {
         const QString functionName = setTimerEventValidation.cap(1);
         const QString interfaceName = setTimerEventValidation.cap(2);
-        size_t interval = setTimerEventValidation.cap(2).toULong();
+        size_t interval = setTimerEventValidation.cap(3).toULong();
         model.appendEvent(std::make_unique<SetTimerEvent>(functionName, interfaceName, interval));
         return;
     }
