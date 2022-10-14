@@ -92,8 +92,8 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
     }
     QRegExp resetTimerEventValidation(R"( *reset_timer (\w+) (\w+))");
     if (resetTimerEventValidation.exactMatch(line)) {
-        const QString functionName = setTimerEventValidation.cap(1);
-        const QString interfaceName = setTimerEventValidation.cap(2);
+        const QString functionName = resetTimerEventValidation.cap(1);
+        const QString interfaceName = resetTimerEventValidation.cap(2);
         model.appendEvent(std::make_unique<ResetTimerEvent>(functionName, interfaceName));
         return;
     }

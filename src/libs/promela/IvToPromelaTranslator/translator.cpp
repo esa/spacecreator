@@ -1065,7 +1065,7 @@ void IvToPromelaTranslator::createTimerInlinesForFunction(
     Sequence resetTimerSequence(Sequence::Type::NORMAL);
 
     resetTimerSequence.appendElement(Assignment(timerEnabledVar, Expression(BooleanConstant(false))));
-    const QString resetTimerMessage = QString("reset_timer %1 %2").arg(functionName).arg(timerName);
+    const QString resetTimerMessage = QString("reset_timer %1 %2\\n").arg(functionName).arg(timerName);
     QList<Expression> resetTimerMessageArgs;
     resetTimerMessageArgs.append(Expression(StringConstant(resetTimerMessage)));
     resetTimerSequence.appendElement(PrintfStatement(resetTimerMessageArgs));
