@@ -68,7 +68,7 @@ void tst_Tmc_Subtyping::test_octetstring()
 
 void tst_Tmc_Subtyping::test_octetstring_sequenceof()
 {
-    const int result = system("./test_octetstring_sequenceof.sh");
+    const int result = system("./test_octetstring_with_sequenceof.sh");
     QCOMPARE(result, 0);
 }
 
