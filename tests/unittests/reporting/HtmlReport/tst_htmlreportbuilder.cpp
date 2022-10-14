@@ -17,7 +17,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include <QDebug>
 #include <QtTest>
+#include <reporting/HtmlReport/htmlreportbuilder.h>
+#include <reporting/Report/spinerrorparser.h>
+
+using namespace reporting;
 
 namespace Report::test {
 
@@ -27,6 +32,7 @@ class tst_HtmlReportBuilder : public QObject
 
 private Q_SLOTS:
     void testNoError();
+    void testDataConstraintViolation();
 
 private:
     QString readFile(const QString &filepath);
@@ -34,7 +40,47 @@ private:
 
 void tst_HtmlReportBuilder::testNoError()
 {
-    QVERIFY(true);
+    const QString spinMessagePath("resources/empty_message.txt");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/result_empty.html");
+
+    const QString spinMessage = readFile(spinMessagePath);
+    const QString htmlResult = readFile(htmlResultPath);
+
+    const SpinErrorParser parser;
+    auto reports = parser.parse(spinMessage);
+
+    const HtmlReportBuilder htmlReportBuilder;
+    const auto html = htmlReportBuilder.parse(reports, htmlTemplatePath);
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testDataConstraintViolation()
+{
+    const QString spinMessagePath("resources/spin_error_output.txt");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/result_error.html");
+
+    const QString spinMessage = readFile(spinMessagePath);
+    const QString htmlResult = readFile(htmlResultPath);
+
+    const SpinErrorParser parser;
+    auto reports = parser.parse(spinMessage);
+
+    const HtmlReportBuilder htmlReportBuilder;
+    const auto html = htmlReportBuilder.parse(reports, htmlTemplatePath);
+    QVERIFY(html == htmlResult);
+}
+
+QString tst_HtmlReportBuilder::readFile(const QString &filepath)
+{
+    QFile file(filepath);
+    if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
+        return QString(file.readAll());
+    }
+
+    qCritical("Unable to open file");
+    return QString();
 }
 
 } // namespace tmc::test
