@@ -116,7 +116,7 @@ void SpinConfigSaver::saveSpinConfig(const SpinConfigData &configData, QXmlStrea
 
 bool SpinConfigSaver::readSpinConfig(QXmlStreamReader &xml)
 {
-    configData.errorLimit = readAttribute("errorlimit", xml).toInt();
+    configData.errorLimit = optionalIntFromString(readAttribute("errorlimit", xml));
     configData.explorationMode = explorationModeFromString(readAttribute("explorationmode", xml));
     configData.globalInputVectorGenerationLimit = optionalIntFromString(readAttribute("inputvectorgenerationlimit", xml));
     configData.ifaceGenerationLimits = parseIfaceGenerationLimits(readAttribute("ifacegenerationlimits", xml));

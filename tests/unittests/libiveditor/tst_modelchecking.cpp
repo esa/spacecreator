@@ -31,6 +31,7 @@ class tst_ModelChecking : public QObject
 private Q_SLOTS:
     void initTestCase();
     void tst_spinConfigReadWrite();
+    void tst_spinConfigEmptyFields();
 };
 
 void tst_ModelChecking::initTestCase()
@@ -77,6 +78,51 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     Q_ASSERT(spinConfig.searchShortestPath == spinConfigInput.searchShortestPath);
     Q_ASSERT(spinConfig.searchStateLimit == spinConfigInput.searchStateLimit);
     Q_ASSERT(spinConfig.timeLimitSeconds == spinConfigInput.timeLimitSeconds);
+    Q_ASSERT(spinConfig.useBitHashing == spinConfigInput.useBitHashing);
+    Q_ASSERT(spinConfig.useFairScheduling == spinConfigInput.useFairScheduling);
+
+    configFile.remove();
+}
+
+void tst_ModelChecking::tst_spinConfigEmptyFields()
+{
+    QString configFilePath = "config.xml";
+    QFile configFile(configFilePath);
+    Q_ASSERT(configFile.open(QFile::WriteOnly | QFile::Text));
+
+    SpinConfigData spinConfigInput;
+    spinConfigInput.errorLimit = std::nullopt;
+    spinConfigInput.explorationMode = ExplorationMode::BreadthFirst;
+    spinConfigInput.globalInputVectorGenerationLimit = std::nullopt;
+    spinConfigInput.ifaceGenerationLimits = { { "Iface1", 2 }, { "Iface2", 3 }, { "Iface3", 4 } };
+    spinConfigInput.memoryLimitMB = std::nullopt;
+    spinConfigInput.numberOfCores = std::nullopt;
+    spinConfigInput.rawCommandLine = "Dummy cmd line";
+    spinConfigInput.searchShortestPath = true;
+    spinConfigInput.searchStateLimit = std::nullopt;
+    spinConfigInput.timeLimitSeconds = std::nullopt;
+    spinConfigInput.useBitHashing = true;
+    spinConfigInput.useFairScheduling = true;
+
+    XmelWriter writer({}, {}, { "DummyFunction" }, {}, spinConfigInput);
+    Q_ASSERT(writer.writeFile(&configFile, configFilePath));
+    configFile.close();
+
+    Q_ASSERT(configFile.open(QFile::ReadOnly | QFile::Text));
+    XmelReader reader;
+    Q_ASSERT(reader.read(&configFile) == 0);
+
+    SpinConfigData spinConfig = reader.getSpinConfig();
+    Q_ASSERT(spinConfig.errorLimit == std::nullopt);
+    Q_ASSERT(spinConfig.explorationMode == spinConfigInput.explorationMode);
+    Q_ASSERT(spinConfig.globalInputVectorGenerationLimit == std::nullopt);
+    Q_ASSERT(spinConfig.ifaceGenerationLimits == spinConfigInput.ifaceGenerationLimits);
+    Q_ASSERT(spinConfig.memoryLimitMB == std::nullopt);
+    Q_ASSERT(spinConfig.numberOfCores == std::nullopt);
+    Q_ASSERT(spinConfig.rawCommandLine == spinConfigInput.rawCommandLine);
+    Q_ASSERT(spinConfig.searchShortestPath == spinConfigInput.searchShortestPath);
+    Q_ASSERT(spinConfig.searchStateLimit == std::nullopt);
+    Q_ASSERT(spinConfig.timeLimitSeconds == std::nullopt);
     Q_ASSERT(spinConfig.useBitHashing == spinConfigInput.useBitHashing);
     Q_ASSERT(spinConfig.useFairScheduling == spinConfigInput.useFairScheduling);
 
