@@ -6,5 +6,6 @@ endif()
 
 add_subdirectory(spacecreatorplugin)
 add_subdirectory(sedsplugin)
+add_subdirectory(simulinkimporterplugin)
 add_subdirectory(functiontesterplugin)
 add_subdirectory(devicegeneratorplugin)

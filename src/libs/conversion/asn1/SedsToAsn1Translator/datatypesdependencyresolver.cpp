@@ -36,7 +36,7 @@ using conversion::translator::NotDagException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredDataTypeException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 DataTypesDependencyResolver::ResultList DataTypesDependencyResolver::resolve(
         const DataTypesDependencyResolver::DataTypes *dataTypes,
@@ -61,7 +61,7 @@ DataTypesDependencyResolver::ResultList DataTypesDependencyResolver::resolve(
     return m_result;
 }
 
-void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
+void DataTypesDependencyResolver::visit(const ::seds::model::DataType *dataType)
 {
     if (isDataTypeMarkedAs(dataType, MarkType::Permanent)) {
         return;
@@ -73,9 +73,9 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
 
     markDataTypeAs(dataType, MarkType::Temporary);
 
-    if (const auto *arrayDataType = std::get_if<seds::model::ArrayDataType>(dataType)) {
+    if (const auto *arrayDataType = std::get_if<::seds::model::ArrayDataType>(dataType)) {
         visitArray(*arrayDataType);
-    } else if (const auto *containerDataType = std::get_if<seds::model::ContainerDataType>(dataType)) {
+    } else if (const auto *containerDataType = std::get_if<::seds::model::ContainerDataType>(dataType)) {
         visitContainer(*containerDataType);
     }
 
@@ -83,7 +83,7 @@ void DataTypesDependencyResolver::visit(const seds::model::DataType *dataType)
     m_result.push_back(dataType);
 }
 
-void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &arrayDataType)
+void DataTypesDependencyResolver::visitArray(const ::seds::model::ArrayDataType &arrayDataType)
 {
     const auto &itemDataTypeRef = arrayDataType.type();
 
@@ -107,7 +107,7 @@ void DataTypesDependencyResolver::visitArray(const seds::model::ArrayDataType &a
     }
 }
 
-void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDataType &containerDataType)
+void DataTypesDependencyResolver::visitContainer(const ::seds::model::ContainerDataType &containerDataType)
 {
     const auto &baseTypeRef = containerDataType.baseType();
     if (baseTypeRef) {
@@ -124,7 +124,7 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
 
     const auto visitor = [this](auto &&entry) {
         using T = std::decay_t<decltype(entry)>;
-        if constexpr (std::is_same_v<T, seds::model::PaddingEntry>) {
+        if constexpr (std::is_same_v<T, ::seds::model::PaddingEntry>) {
             return;
         } else {
             const auto &entryTypeRef = entry.type();
@@ -146,7 +146,7 @@ void DataTypesDependencyResolver::visitContainer(const seds::model::ContainerDat
     }
 }
 
-const seds::model::DataType *DataTypesDependencyResolver::findDataType(const QString &dataTypeName)
+const ::seds::model::DataType *DataTypesDependencyResolver::findDataType(const QString &dataTypeName)
 {
     auto result = std::find_if(m_dataTypes->begin(), m_dataTypes->end(),
             [&dataTypeName](const auto *dataType) { return dataTypeNameStr(*dataType) == dataTypeName; });
@@ -168,12 +168,12 @@ const seds::model::DataType *DataTypesDependencyResolver::findDataType(const QSt
     return nullptr;
 }
 
-void DataTypesDependencyResolver::markDataTypeAs(const seds::model::DataType *dataType, MarkType markType)
+void DataTypesDependencyResolver::markDataTypeAs(const ::seds::model::DataType *dataType, MarkType markType)
 {
     m_marks[dataType] = markType;
 }
 
-bool DataTypesDependencyResolver::isDataTypeMarkedAs(const seds::model::DataType *dataType, MarkType markType) const
+bool DataTypesDependencyResolver::isDataTypeMarkedAs(const ::seds::model::DataType *dataType, MarkType markType) const
 {
     if (m_marks.count(dataType) == 0) {
         return false;
@@ -182,4 +182,4 @@ bool DataTypesDependencyResolver::isDataTypeMarkedAs(const seds::model::DataType
     return m_marks.at(dataType) == markType;
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

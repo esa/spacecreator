@@ -35,7 +35,7 @@ using conversion::UnhandledValueException;
 using conversion::translator::TranslationException;
 using conversion::translator::UndeclaredInterfaceException;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 ivm::IVInterface *InterfaceTranslatorHelper::createIvInterface(const QString &name,
         ivm::IVInterface::InterfaceType type, ivm::IVInterface::OperationKind kind,
@@ -175,4 +175,4 @@ const QString &InterfaceTranslatorHelper::interfaceTypeToString(ivm::IVInterface
     }
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

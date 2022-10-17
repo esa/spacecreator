@@ -614,7 +614,7 @@ void SdlVisitor::visit(const Answer &answer)
 
     m_layouter.pushPosition();
     m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Answer));
-    if (answer.literal().value().toLower() == "else") {
+    if (answer.literal().value().toUpper() == ::sdl::Answer::ElseLiteral) {
         m_writer.writeLine(answer.literal().value() + ":");
     } else {
         m_writer.writeLine("(" + answer.literal().value() + "):");

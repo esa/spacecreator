@@ -35,7 +35,7 @@
 #include <sdl/SdlModel/return.h>
 #include <seds/SedsModel/types/ranges/floatprecisionrange.h>
 
-using conversion::asn1::translator::SedsToAsn1Translator;
+using conversion::asn1::translator::seds::SedsToAsn1Translator;
 using conversion::translator::TranslationException;
 
 namespace conversion::sdl::translator {

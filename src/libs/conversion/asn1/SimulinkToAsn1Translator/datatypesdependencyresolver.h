@@ -23,7 +23,7 @@
 #include <simulink/SimulinkModel/simulinkmodel.h>
 #include <unordered_map>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 /**
  * @brief   Utility used for resolving dependencies in the SIMULINK types
@@ -41,9 +41,9 @@ private:
         Permanent
     };
 
-    using SimulinkDataTypes = simulink::model::SimulinkModel::DataTypes;
-    using MarksMap = std::unordered_map<const simulink::model::DataType *, MarkType>;
-    using ResultList = std::list<const simulink::model::DataType *>;
+    using SimulinkDataTypes = ::simulink::model::SimulinkModel::DataTypes;
+    using MarksMap = std::unordered_map<const ::simulink::model::DataType *, MarkType>;
+    using ResultList = std::list<const ::simulink::model::DataType *>;
 
 public:
     /**
@@ -60,14 +60,14 @@ public:
     auto resolve() -> const ResultList &;
 
 private:
-    auto visit(const simulink::model::DataType &dataType) -> void;
-    auto visitAlias(const simulink::model::AliasDataType &aliasDataType) -> void;
-    auto visitBus(const simulink::model::BusDataType &busDataType) -> void;
+    auto visit(const ::simulink::model::DataType &dataType) -> void;
+    auto visitAlias(const ::simulink::model::AliasDataType &aliasDataType) -> void;
+    auto visitBus(const ::simulink::model::BusDataType &busDataType) -> void;
 
-    auto findDataType(const QString &dataTypeName) -> const simulink::model::DataType &;
+    auto findDataType(const QString &dataTypeName) -> const ::simulink::model::DataType &;
 
-    auto markDataTypeAs(const simulink::model::DataType &dataType, MarkType markType) -> void;
-    auto isDataTypeMarkedAs(const simulink::model::DataType &dataType, MarkType markType) const -> bool;
+    auto markDataTypeAs(const ::simulink::model::DataType &dataType, MarkType markType) -> void;
+    auto isDataTypeMarkedAs(const ::simulink::model::DataType &dataType, MarkType markType) const -> bool;
 
 private:
     const SimulinkDataTypes &m_simulinkDataTypes;
@@ -76,4 +76,4 @@ private:
     ResultList m_result;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

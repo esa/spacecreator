@@ -24,7 +24,7 @@
 #include <seds/SedsModel/generics/generictype.h>
 #include <seds/SedsModel/generics/generictypemapset.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Helper for creating generic types
@@ -82,4 +82,4 @@ private:
     const GenericTypeMapper &m_typeMapper;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

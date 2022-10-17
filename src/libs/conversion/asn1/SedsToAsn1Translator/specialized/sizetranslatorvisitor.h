@@ -27,7 +27,7 @@
 #include <optional>
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   SEDS ranges to ASN.1 size constraint translator
@@ -108,13 +108,13 @@ public:
      *
      * @param   range   Range to translate
      */
-    auto operator()(const seds::model::MinMaxRange &range) -> void;
+    auto operator()(const ::seds::model::MinMaxRange &range) -> void;
     /**
      * @brief   Translate SEDS float precision range
      *
      * @param   range   Range to translate
      */
-    auto operator()(const seds::model::FloatPrecisionRange &range) -> void;
+    auto operator()(const ::seds::model::FloatPrecisionRange &range) -> void;
 
 public:
     /**
@@ -144,7 +144,7 @@ private:
      *
      * @return  Minimum value
      */
-    auto getMin(const seds::model::MinMaxRange &range) const -> typename Asn1Acn::IntegerValue::Type;
+    auto getMin(const ::seds::model::MinMaxRange &range) const -> typename Asn1Acn::IntegerValue::Type;
     /**
      * @brief   Get maximum value from given range
      *
@@ -152,7 +152,7 @@ private:
      *
      * @return  Maximum value
      */
-    auto getMax(const seds::model::MinMaxRange &range) const -> typename Asn1Acn::IntegerValue::Type;
+    auto getMax(const ::seds::model::MinMaxRange &range) const -> typename Asn1Acn::IntegerValue::Type;
 
 private:
     Type *m_asn1Type;
@@ -179,52 +179,52 @@ auto SizeTranslatorVisitor<Type, ValueType>::getLastSetMin() const -> typename A
 }
 
 template<typename Type, typename ValueType>
-void SizeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::MinMaxRange &range)
+void SizeTranslatorVisitor<Type, ValueType>::operator()(const ::seds::model::MinMaxRange &range)
 {
     switch (range.type()) {
-    case seds::model::RangeType::ExclusiveMinExclusiveMax: {
+    case ::seds::model::RangeType::ExclusiveMinExclusiveMax: {
         const auto min = getMin(range) + 1;
         const auto max = getMax(range) - 1;
 
         addSizeConstraint(min, max);
     } break;
-    case seds::model::RangeType::InclusiveMinInclusiveMax: {
+    case ::seds::model::RangeType::InclusiveMinInclusiveMax: {
         const auto min = getMin(range);
         const auto max = getMax(range);
 
         addSizeConstraint(min, max);
     } break;
-    case seds::model::RangeType::InclusiveMinExclusiveMax: {
+    case ::seds::model::RangeType::InclusiveMinExclusiveMax: {
         const auto min = getMin(range);
         const auto max = getMax(range) - 1;
 
         addSizeConstraint(min, max);
     } break;
-    case seds::model::RangeType::ExclusiveMinInclusiveMax: {
+    case ::seds::model::RangeType::ExclusiveMinInclusiveMax: {
         const auto min = getMin(range) + 1;
         const auto max = getMax(range);
 
         addSizeConstraint(min, max);
     } break;
-    case seds::model::RangeType::GreaterThan: {
+    case ::seds::model::RangeType::GreaterThan: {
         const auto min = getMin(range) + 1;
         const auto max = std::numeric_limits<Asn1Acn::IntegerValue::Type>::max();
 
         addSizeConstraint(min, max);
     } break;
-    case seds::model::RangeType::LessThan: {
+    case ::seds::model::RangeType::LessThan: {
         const auto min = std::numeric_limits<Asn1Acn::IntegerValue::Type>::min();
         const auto max = getMax(range) - 1;
 
         addSizeConstraint(min, max);
     } break;
-    case seds::model::RangeType::AtLeast: {
+    case ::seds::model::RangeType::AtLeast: {
         const auto min = getMin(range);
         const auto max = std::numeric_limits<Asn1Acn::IntegerValue::Type>::max();
 
         addSizeConstraint(min, max);
     } break;
-    case seds::model::RangeType::AtMost: {
+    case ::seds::model::RangeType::AtMost: {
         const auto min = std::numeric_limits<Asn1Acn::IntegerValue::Type>::min();
         const auto max = getMax(range);
 
@@ -272,7 +272,7 @@ void SizeTranslatorVisitor<Type, ValueType>::addSizeConstraint(
 
 template<typename Type, typename ValueType>
 typename Asn1Acn::IntegerValue::Type SizeTranslatorVisitor<Type, ValueType>::getMin(
-        const seds::model::MinMaxRange &range) const
+        const ::seds::model::MinMaxRange &range) const
 {
     const auto hasMin = range.min().has_value();
 
@@ -286,7 +286,7 @@ typename Asn1Acn::IntegerValue::Type SizeTranslatorVisitor<Type, ValueType>::get
 
 template<typename Type, typename ValueType>
 typename Asn1Acn::IntegerValue::Type SizeTranslatorVisitor<Type, ValueType>::getMax(
-        const seds::model::MinMaxRange &range) const
+        const ::seds::model::MinMaxRange &range) const
 {
     const auto hasMax = range.max().has_value();
 
@@ -298,4 +298,4 @@ typename Asn1Acn::IntegerValue::Type SizeTranslatorVisitor<Type, ValueType>::get
     return Asn1Acn::IntegerValue::fromAstValue(range.max()->value());
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

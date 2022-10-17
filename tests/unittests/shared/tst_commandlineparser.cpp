@@ -79,6 +79,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterPatcherFunctionsFilepathPrefix();
     void testCmdArgumentSedsConverterMappingFunctionsModuleFileName();
     void testCmdArgumentSedsConverterSdlFilepathPrefix();
+    void testCmdArgumentSedsConverterTransactionNameType();
 
     void initTestCase();
     void testCoverage();
@@ -637,6 +638,25 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterSdlFilepathPrefix()
 
     const QString value = parser.value(CommandArg::SedsConverterSdlFilepathPrefix);
     QCOMPARE(value, prefix);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterTransactionNameType()
+{
+    const QCommandLineOption cmdTransactionNameType =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterTransactionNameType);
+    const QString transactionNameType("CString");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdTransactionNameType.names().first(), transactionNameType) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterTransactionNameType);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterTransactionNameType));
+
+    const QString value = parser.value(CommandArg::SedsConverterTransactionNameType);
+    QCOMPARE(value, transactionNameType);
 }
 
 void tst_CommandLineParser::initTestCase()

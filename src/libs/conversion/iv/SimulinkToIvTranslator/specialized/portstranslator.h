@@ -24,7 +24,7 @@
 #include <simulink/SimulinkModel/common/port.h>
 #include <simulink/SimulinkModel/simulinkmodel.h>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::simulink {
 
 /**
  * @brief   Translator from SIMULINK ports to InterfaceView parameters
@@ -38,7 +38,7 @@ public:
      * @param   simulinkModel       Model with ports to translate
      * @param   ivInterface         IVInterface where translated ports will be added
      */
-    PortsTranslator(const simulink::model::SimulinkModel &simulinkModel, ivm::IVInterface &ivInterface);
+    PortsTranslator(const ::simulink::model::SimulinkModel &simulinkModel, ivm::IVInterface &ivInterface);
     /**
      * @brief   Deleted copy constructor
      */
@@ -68,11 +68,11 @@ public:
     static inline auto getEncodingForInterfaceParameter() -> QString { return "NATIVE"; }
 
 private:
-    auto translatePort(const simulink::model::Port &port, shared::InterfaceParameter::Direction direction) -> void;
+    auto translatePort(const ::simulink::model::Port &port, shared::InterfaceParameter::Direction direction) -> void;
 
 private:
-    const simulink::model::SimulinkModel &m_simulinkModel;
+    const ::simulink::model::SimulinkModel &m_simulinkModel;
     ivm::IVInterface &m_ivInterface;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::simulink

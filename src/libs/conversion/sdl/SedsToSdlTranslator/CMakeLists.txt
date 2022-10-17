@@ -8,7 +8,8 @@ set(SOURCES translator.cpp
             specialized/splinecalibratortranslator.cpp
             specialized/statemachinetranslator.cpp
             specialized/statementtranslatorvisitor.cpp)
-set(INCLUDES translator.h
+set(INCLUDES constants.h
+             translator.h
              specialized/activitytranslator.h
              specialized/common.h
              specialized/descriptiontranslator.h

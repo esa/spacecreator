@@ -26,7 +26,7 @@
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <simulink/SimulinkModel/simulinkmodel.h>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::simulink {
 
 /**
  * @brief   Translator between SIMULINK model to InterfaceView model
@@ -64,7 +64,7 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
-    auto translateSimulinkModel(const simulink::model::SimulinkModel &simulinkModel,
+    auto translateSimulinkModel(const ::simulink::model::SimulinkModel &simulinkModel,
             ivm::IVPropertyTemplateConfig &ivConfig, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
 
@@ -78,4 +78,4 @@ private:
     static const QStringList m_supportedIVFunctionImplementations;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::simulink

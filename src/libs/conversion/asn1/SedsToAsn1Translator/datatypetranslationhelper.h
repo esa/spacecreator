@@ -28,7 +28,7 @@
 #include <seds/SedsModel/types/dimensionsize.h>
 #include <vector>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Helper for data types translation
@@ -51,7 +51,7 @@ public:
      * @return  Array type name
      */
     static auto buildArrayTypeName(
-            const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions) -> QString;
+            const QString &baseTypeName, const std::vector<::seds::model::DimensionSize> &dimensions) -> QString;
     /**
      * @brief   Build name for the bundled type
      *
@@ -62,7 +62,7 @@ public:
      * @return  Bundled type name
      */
     static auto buildBundledTypeName(const QString &parentName, const QString &commandName,
-            const seds::model::CommandArgumentMode mode) -> QString;
+            const ::seds::model::CommandArgumentMode mode) -> QString;
     /**
      * @brief   Build name for the concrete type name
      *
@@ -82,8 +82,8 @@ public:
      *
      * @return  Type reference for the created type
      */
-    static auto createArrayType(Context &context, const seds::model::DataTypeRef &typeRef,
-            const std::vector<seds::model::DimensionSize> &dimensions) -> seds::model::DataTypeRef;
+    static auto createArrayType(Context &context, const ::seds::model::DataTypeRef &typeRef,
+            const std::vector<::seds::model::DimensionSize> &dimensions) -> ::seds::model::DataTypeRef;
     /**
      * @brief   Create array type if it doesn't exists, return reference to it otherwise
      *
@@ -93,8 +93,8 @@ public:
      *
      * @return  ASN.1 type
      */
-    static auto handleArrayType(Context &context, const seds::model::DataTypeRef &argumentTypeRef,
-            const std::vector<seds::model::DimensionSize> &dimensions) -> Asn1Acn::Types::Type *;
+    static auto handleArrayType(Context &context, const ::seds::model::DataTypeRef &argumentTypeRef,
+            const std::vector<::seds::model::DimensionSize> &dimensions) -> Asn1Acn::Types::Type *;
 
     /**
      * @brief   Check if given type is a generic type
@@ -104,8 +104,8 @@ public:
      *
      * @return  True of type is generic, false otherwise
      */
-    static auto isTypeGeneric(
-            const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::GenericType> &genericTypes) -> bool;
+    static auto isTypeGeneric(const ::seds::model::DataTypeRef &typeRef,
+            const std::vector<::seds::model::GenericType> &genericTypes) -> bool;
 
 private:
     inline static const QString m_arrayTypeNameTemplate = "%1Array-%2";
@@ -115,4 +115,4 @@ private:
     inline static const QString m_concreteTypeNameImplementationTemplate = "%1-%2-%3";
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

@@ -267,7 +267,7 @@ std::unique_ptr<Answer> SequenceTranslator::createElseAnswer() const
 {
     auto transition = std::make_unique<Transition>();
     auto answer = std::make_unique<Answer>();
-    answer->setLiteral(VariableLiteral(m_elseLiteral));
+    answer->setLiteral(::sdl::Answer::ElseLiteral);
     answer->setTransition(std::move(transition));
 
     return answer;

@@ -32,7 +32,7 @@ using simulink::model::Port;
 using simulink::model::SimulinkModel;
 using simulink::model::VectorDimensions;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::simulink {
 
 PortsTranslator::PortsTranslator(const SimulinkModel &simulinkModel, IVInterface &ivInterface)
     : m_simulinkModel(simulinkModel)
@@ -88,4 +88,4 @@ void PortsTranslator::translatePort(const Port &port, InterfaceParameter::Direct
     m_ivInterface.addParam(ivParameter);
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::simulink
