@@ -26,7 +26,11 @@
         <tr>
           <td>Error Details</td>
           <td>
+            <i>Function Name:</i> <tt>{{ reportItem.errorDetails.functionName }}</tt><br>
             <i>Variable Name:</i> <tt>{{ reportItem.errorDetails.variableName }}</tt><br>
+            {% if reportItem.errorDetails.nestedStateName|length > 0 %}
+              <i>Nested State Name:</i> <tt>{{ reportItem.errorDetails.nestedStateName }}</tt><br>
+            {% endif %}
             <i>Constraint Details:</i><br>
             <table>
               <tr>

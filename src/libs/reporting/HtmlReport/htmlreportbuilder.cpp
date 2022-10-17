@@ -73,7 +73,9 @@ QVariantHash reporting::HtmlReportBuilder::buildDataConstraintViolationVariant(c
     reporting::DataConstraintViolationReport report =
             qvariant_cast<reporting::DataConstraintViolationReport>(errorDetails);
     QVariantHash variantHash;
+    variantHash.insert("functionName", report.functionName);
     variantHash.insert("variableName", report.variableName);
+    variantHash.insert("nestedStateName", report.nestedStateName);
 
     QVariantList variantConstraints;
     for (const auto &constraint : report.constraints) {
