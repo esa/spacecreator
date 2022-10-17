@@ -17,7 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QDebug>
 #include <QtTest>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
 #include <reporting/Report/spinerrorparser.h>
@@ -33,6 +32,7 @@ class tst_HtmlReportBuilder : public QObject
 private Q_SLOTS:
     void testNoError();
     void testDataConstraintViolation();
+    void testDataConstraintViolationNested();
 
 private:
     QString readFile(const QString &filepath);
@@ -40,7 +40,7 @@ private:
 
 void tst_HtmlReportBuilder::testNoError()
 {
-    const QString spinMessagePath("resources/empty_message.txt");
+    const QString spinMessagePath("resources/spin_no_error_output.txt");
     const QString htmlTemplatePath("resources/template.html");
     const QString htmlResultPath("resources/result_empty.html");
 
@@ -60,6 +60,23 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
     const QString spinMessagePath("resources/spin_error_output.txt");
     const QString htmlTemplatePath("resources/template.html");
     const QString htmlResultPath("resources/result_error.html");
+
+    const QString spinMessage = readFile(spinMessagePath);
+    const QString htmlResult = readFile(htmlResultPath);
+
+    const SpinErrorParser parser;
+    auto reports = parser.parse(spinMessage);
+
+    const HtmlReportBuilder htmlReportBuilder;
+    const auto html = htmlReportBuilder.parse(reports, htmlTemplatePath);
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testDataConstraintViolationNested()
+{
+    const QString spinMessagePath("resources/spin_nested_error_output.txt");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/result_nested.html");
 
     const QString spinMessage = readFile(spinMessagePath);
     const QString htmlResult = readFile(htmlResultPath);
