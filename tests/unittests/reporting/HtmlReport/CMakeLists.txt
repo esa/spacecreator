@@ -15,10 +15,12 @@ target_link_libraries(${TEST_NAME}
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
 
-configure_file(resources/empty_message.txt resources/empty_message.txt COPYONLY)
 configure_file(resources/result_empty.html resources/result_empty.html COPYONLY)
 configure_file(resources/result_error.html resources/result_error.html COPYONLY)
+configure_file(resources/result_nested.html resources/result_nested.html COPYONLY)
 configure_file(resources/spin_error_output.txt resources/spin_error_output.txt COPYONLY)
+configure_file(resources/spin_nested_error_output.txt resources/spin_nested_error_output.txt COPYONLY)
+configure_file(resources/spin_no_error_output.txt resources/spin_no_error_output .txt COPYONLY)
 configure_file(resources/template.html resources/template.html COPYONLY)
 
 add_format_target(${TEST_NAME})
