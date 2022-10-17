@@ -4,7 +4,8 @@
 
 * Open project `tests/manual/qgenc/projects/basicqgencfunction/basicqgencfunction.pro`
 * Open the `interfaceview.xml` file
-* Right click at any place and choose "Generate/update code skeletons"
+* Clean the project
+* Right click on the interfaceview and select the "Generate/update code skeletons" option
 
 Expected results:
 

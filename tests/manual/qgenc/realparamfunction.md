@@ -4,6 +4,8 @@
 
 * Open project `tests/manual/qgenc/projects/realparam/realparam.pro`
 * Open the `interfaceview.xml` file
+* Clean the project
+* Right click on the interfaceview and select the "Generate/update code skeletons" option
 * Build and run the project
 
 Expected results:
