@@ -296,31 +296,67 @@ ivm::IVModel *IvSystemQueries::ivModel() const
     return ivCore()->document()->objectsModel();
 }
 
+static inline const ivm::IVFunction *findEnclosingFunctionAtParentLevel(
+        const ivm::IVFunction *const function, shared::VEObject *parent)
+{
+    auto candidate = function;
+    while (candidate != nullptr) {
+        auto candidateParent = candidate->parentObject();
+        if (candidateParent == parent) {
+            return candidate;
+        }
+        candidate = dynamic_cast<ivm::IVFunction *>(candidateParent);
+    }
+    return nullptr;
+}
+
 QString IvSystemQueries::resolvedTargetFunction(const QString &sourceFunction, const QString &sourceInterface,
         const QString &targetFunction, const QString &targetInterface) const
 {
     Q_UNUSED(sourceInterface);
     Q_UNUSED(targetInterface);
+
+    // Debug output is left in this function on purpose
+    qDebug() << "[Function] Resolving connection from " << sourceFunction << " to " << targetFunction;
+
     auto target = functionByName(targetFunction);
     auto source = functionByName(sourceFunction);
 
     auto targetParent = target->parentObject();
     auto sourceParent = source->parentObject();
+
     if (targetParent == sourceParent) {
         // Same level
         return target->title();
     }
-    // Nested function -> first connection is to parent
+
+    // Nesting detected
+    // There are two options:
+    // If the source is nested, then the connection is to parent, irrespective of the nesting of the target
+    // Otherwise, if the target is nested, then the connection is to the target's parent at the level of the source
+    auto enclosingFunction = findEnclosingFunctionAtParentLevel(target, sourceParent);
+    if (enclosingFunction != nullptr) {
+        // Found a parent of the target which is on the same level as the source
+        qDebug() << "Found enclosing function for target " << targetFunction << ", returning the enclosing function "
+                 << enclosingFunction->title();
+        return enclosingFunction->title();
+    }
     auto parentFunction = dynamic_cast<ivm::IVFunction *>(source->parent());
     if (parentFunction != nullptr) {
+        qDebug() << "Target function " << targetFunction << " is not in source's " << sourceFunction
+                 << " parent, returning the parent " << parentFunction->title();
         return parentFunction->title();
     }
+    qDebug() << "Unknown case, target function could not be resolved";
     return "";
 }
 
 QString IvSystemQueries::resolvedTargetInterface(const QString &sourceFunction, const QString &sourceInterface,
         const QString &targetFunction, const QString &targetInterface) const
 {
+    // Debug output is left in this function on purpose
+    qDebug() << "[Interface] Resolving connection from " << sourceFunction << " to " << targetFunction;
+
     auto target = functionByName(targetFunction);
     auto source = functionByName(sourceFunction);
 
@@ -330,11 +366,25 @@ QString IvSystemQueries::resolvedTargetInterface(const QString &sourceFunction, 
         // Same level
         return targetInterface;
     }
-    // Nested function -> first connection is to parent
+
+    // Nesting detected
+    // There are two options:
+    // If the source is nested, then the connection is to parent, irrespective of the nesting of the target
+    // Otherwise, if the target is nested, then the connection is to the target's parent at the level of the source
+    auto enclosingFunction = findEnclosingFunctionAtParentLevel(target, sourceParent);
+    if (enclosingFunction != nullptr) {
+        // Found a parent of the target which is on the same level as the source
+        qDebug() << "Found enclosing function for target " << targetFunction << ", returning target interface "
+                 << targetInterface;
+        return targetInterface;
+    }
     auto parentFunction = dynamic_cast<ivm::IVFunction *>(source->parent());
     if (parentFunction != nullptr) {
+        qDebug() << "Target function " << targetFunction << " is not in source's " << sourceFunction
+                 << " parent, returning the source interface " << sourceInterface;
         return sourceInterface;
     }
+    qDebug() << "Unknown case, target function could not be resolved";
     return "";
 }
 

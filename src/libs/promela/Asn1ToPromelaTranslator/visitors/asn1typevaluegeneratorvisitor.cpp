@@ -203,7 +203,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const OctetString &type)
             throw TranslationException(std::move(errorMessage));
         }
 
-        handleOverridenType(overridenOctetString->constraints(), "", argumentName, minSize, maxSize, sequence.get());
+        handleOverridenType(type.identifier(), overridenOctetString->constraints(), "", argumentName, minSize, maxSize,
+                sequence.get());
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -266,7 +267,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const IA5String &type)
             throw TranslationException(std::move(errorMessage));
         }
 
-        handleOverridenType(overridenIA5String->constraints(), "", argumentName, minSize, maxSize, sequence.get());
+        handleOverridenType(type.identifier(), overridenIA5String->constraints(), "", argumentName, minSize, maxSize,
+                sequence.get());
     }
 
     const QString inlineSeqGeneratorName = QString("%1_generate_value").arg(typeIdentifier);
@@ -433,17 +435,18 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     if (m_overridenType != nullptr) {
         if (const auto overridenSequenceOf = dynamic_cast<const SequenceOf *>(m_overridenType);
                 overridenSequenceOf != nullptr) {
-            const auto initCallName = QString("%1_elem_init_value").arg(m_overridenType->identifier());
-            handleOverridenType(overridenSequenceOf->constraints(), initCallName, valueVariableName, minSize, maxSize,
-                    sequence.get());
+            const auto initCallName =
+                    QString("%1_elem_init_value").arg(Escaper::escapePromelaName(m_overridenType->identifier()));
+            handleOverridenType(type.identifier(), overridenSequenceOf->constraints(), initCallName, valueVariableName,
+                    minSize, maxSize, sequence.get());
         } else if (const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
                    overridenOctetString != nullptr) {
-            handleOverridenType(
-                    overridenOctetString->constraints(), "", valueVariableName, minSize, maxSize, sequence.get());
+            handleOverridenType(type.identifier(), overridenOctetString->constraints(), "", valueVariableName, minSize,
+                    maxSize, sequence.get());
         } else if (const auto overridenIA5String = dynamic_cast<const IA5String *>(m_overridenType);
                    overridenIA5String != nullptr) {
-            handleOverridenType(
-                    overridenIA5String->constraints(), "", valueVariableName, minSize, maxSize, sequence.get());
+            handleOverridenType(type.identifier(), overridenIA5String->constraints(), "", valueVariableName, minSize,
+                    maxSize, sequence.get());
         } else {
             auto errorMessage = QString("Trying to subtype %1 with %2 which is not a SEQUENCE OF")
                                         .arg(m_overridenType->identifier())
@@ -686,7 +689,7 @@ Expression Asn1TypeValueGeneratorVisitor::InlineDefAdder::getValueLengthMinusCon
 }
 
 template<typename ValueType>
-void Asn1TypeValueGeneratorVisitor::handleOverridenType(
+void Asn1TypeValueGeneratorVisitor::handleOverridenType(const QString &typeName,
         const Asn1Acn::Constraints::ConstraintList<ValueType> &constraints, const QString &initInlineName,
         const QString &valueName, const size_t minSize, const size_t maxSize, model::Sequence *sequence) const
 {
@@ -699,35 +702,61 @@ void Asn1TypeValueGeneratorVisitor::handleOverridenType(
     const auto isConstSize = minSize == maxSize;
     const auto isOverridenConstSize = overridenMinSize == overridenMaxSize;
 
+    const auto areSameSize = (minSize == overridenMinSize && maxSize == overridenMaxSize);
+
+    // If both types have the same size, then we don't need to do anything
+    if (areSameSize) {
+        return;
+    }
+
     // We allow to subtype one const size with another const size
     if (!isConstSize && !isOverridenConstSize) {
         if (minSize < overridenMinSize) {
-            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size");
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has smaller minimum size")
+                                        .arg(m_overridenType->identifier())
+                                        .arg(typeName);
             throw TranslationException(std::move(errorMessage));
         } else if (maxSize > overridenMaxSize) {
-            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size");
+            auto errorMessage = QString("Trying to subtype %1 with %2 which has bigger maximum size")
+                                        .arg(m_overridenType->identifier())
+                                        .arg(typeName);
             throw TranslationException(std::move(errorMessage));
         }
     }
 
     if (isConstSize) {
-        if (initInlineName.isEmpty()) {
-            auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+        if (isOverridenConstSize) {
+            if (initInlineName.isEmpty()) {
+                auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
-            VariableRef dst(valueName);
-            dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+                VariableRef dst(valueName);
+                dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
 
-            loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
+                loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
 
-            auto forLoop = ForLoop(
-                    VariableRef("i"), Expression(maxSize), Expression(overridenMaxSize - 1), std::move(loopSequence));
-            sequence->appendElement(std::move(forLoop));
+                auto forLoop = ForLoop(VariableRef("i"), Expression(maxSize), Expression(overridenMaxSize - 1),
+                        std::move(loopSequence));
+                sequence->appendElement(std::move(forLoop));
+            } else {
+                auto initCall = ProctypeMaker::makeCallForEachValue(
+                        initInlineName, valueName, Expression(maxSize), Expression(overridenMaxSize - 1));
+                sequence->appendElement(std::move(initCall));
+            }
         } else {
-            auto initCall = ProctypeMaker::makeCallForEachValue(
-                    initInlineName, valueName, Expression(maxSize), Expression(overridenMaxSize - 1));
-            sequence->appendElement(std::move(initCall));
+            // If we are overriding a variable size type with const size type we just need to set length
+            VariableRef dst(valueName);
+            dst.appendElement("length");
+
+            sequence->appendElement(Assignment(dst, Expression(Constant(maxSize))));
         }
     } else {
+        if (isOverridenConstSize) {
+            auto errorMessage = QString("Trying to subtype fixed-size %1 with variable-size %2")
+                                        .arg(m_overridenType->identifier())
+                                        .arg(typeName);
+            throw TranslationException(std::move(errorMessage));
+        }
+
         Expression start = InlineDefAdder::getValueLengthAsExpression(valueName);
 
         if (initInlineName.isEmpty()) {

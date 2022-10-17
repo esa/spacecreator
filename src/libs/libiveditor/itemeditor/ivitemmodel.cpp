@@ -159,6 +159,8 @@ void IVItemModel::onRootObjectChanged(shared::Id rootId)
     for (auto obj : objectsModel()->visibleObjects()) {
         onObjectAdded(obj->id());
     }
+
+    shrinkScene();
 }
 
 void IVItemModel::onObjectRemoved(shared::Id objectId)

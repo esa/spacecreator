@@ -38,7 +38,7 @@ class QXmlStreamReader;
 
 namespace ivm {
 
-struct CurrentObjectHolder {
+struct CurrentArchetypeObjectHolder {
     void set(ArchetypeObject *object);
 
     QPointer<ArchetypeObject> getObject() { return m_object; }
@@ -75,7 +75,7 @@ private:
 
 private:
     QVector<ArchetypeObject *> m_allObjects {};
-    CurrentObjectHolder m_currentObject;
+    CurrentArchetypeObjectHolder m_currentObject;
 };
 
 }

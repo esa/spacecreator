@@ -25,7 +25,7 @@
 #include <seds/SedsModel/types/containerdatatype.h>
 #include <vector>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Generator for functions for patching ErrorControlEntry and LengthEntry
@@ -41,7 +41,7 @@ public:
      * @param   sequence    ASN.1 sequence where translated entries will be added
      */
     PatcherSnippetsGenerator(
-            Context &context, const seds::model::ContainerDataType &container, Asn1Acn::Types::Sequence *sequence);
+            Context &context, const ::seds::model::ContainerDataType &container, Asn1Acn::Types::Sequence *sequence);
     /**
      * @brief   Deleted copy constructor
      */
@@ -67,31 +67,31 @@ public:
     auto generate() -> void;
 
 private:
-    auto generatePatcherSnippets(const seds::model::ContainerDataType &container) -> void;
+    auto generatePatcherSnippets(const ::seds::model::ContainerDataType &container) -> void;
 
-    auto buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry) -> void;
-    auto buildLengthEntryFunction(const seds::model::LengthEntry &lengthEntry) -> void;
+    auto buildErrorControlEntryFunction(const ::seds::model::ErrorControlEntry &errorControlEntry) -> void;
+    auto buildLengthEntryFunction(const ::seds::model::LengthEntry &lengthEntry) -> void;
 
     auto buildErrorControlEntryEncodingFunction(
-            const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const -> QString;
+            const ::seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const -> QString;
     auto buildErrorControlEntryDecodingValidator(
-            const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const -> QString;
+            const ::seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const -> QString;
     auto buildLengthEntryEncodingFunction(
-            const seds::model::IntegerDataEncoding &encoding, const QString &entryName) const -> QString;
+            const ::seds::model::IntegerDataEncoding &encoding, const QString &entryName) const -> QString;
     auto buildLengthEntryDecodingValidator(
-            const seds::model::IntegerDataEncoding &encoding, const QString &entryName) const -> QString;
+            const ::seds::model::IntegerDataEncoding &encoding, const QString &entryName) const -> QString;
 
-    auto getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const -> uint64_t;
-    auto getLengthEncoding(const seds::model::LengthEntry &entry) const -> const seds::model::IntegerDataEncoding &;
+    auto getErrorControlBitCount(const ::seds::model::ErrorControlEntry &entry) const -> uint64_t;
+    auto getLengthEncoding(const ::seds::model::LengthEntry &entry) const -> const ::seds::model::IntegerDataEncoding &;
 
 private:
     Context &m_context;
 
-    const seds::model::ContainerDataType &m_container;
+    const ::seds::model::ContainerDataType &m_container;
     Asn1Acn::Types::Sequence *m_sequence;
 
     inline static const QString m_encodingFunctionTemplate = "%1-encoding-function";
     inline static const QString m_decodingValidatorTemplate = "%1-decoding-validator";
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

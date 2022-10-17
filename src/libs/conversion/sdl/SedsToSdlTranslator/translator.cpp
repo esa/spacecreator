@@ -146,10 +146,11 @@ auto SedsToSdlTranslator::translateComponent(const ::seds::model::Package &sedsP
             const auto &sedsStateMachine = implementation.stateMachines()[0];
             StateMachineTranslator::createTimerVariables(context, sedsStateMachine);
             StateMachineTranslator::translateStateMachine(context, sedsStateMachine, options);
+            StateMachineTranslator::translateParameterMaps(
+                    context, implementation.parameterMaps(), sedsStateMachine, options);
         }
         StateMachineTranslator::ensureMinimalStateMachineExists(context);
 
-        StateMachineTranslator::translateParameterMaps(context, implementation.parameterMaps());
         // Register all timers in the interface view
         for (const auto &timerName : process.timerNames()) {
             shared::ContextParameter timer(timerName, shared::BasicParameter::Type::Timer);

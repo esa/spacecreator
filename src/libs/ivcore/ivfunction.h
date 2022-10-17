@@ -64,7 +64,9 @@ private:
     struct OriginalPropsHolder {
         // TODO: unite with IVInterface::OriginalPropsHolder
         EntityAttributes attrs;
+        QList<EntityAttribute> implementations;
         QVector<shared::ContextParameter> params;
+        QString defaultImplementation;
 
         QString name() const
         {
@@ -79,6 +81,8 @@ private:
 
             attrs = src->entityAttributes();
             params = src->contextParams();
+            implementations = src->implementations();
+            defaultImplementation = src->defaultImplementation();
 
             m_collected = true;
         }

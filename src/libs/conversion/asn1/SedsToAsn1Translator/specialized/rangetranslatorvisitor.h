@@ -30,7 +30,7 @@
 #include <seds/SedsModel/types/ranges/floatprecisionrange.h>
 #include <seds/SedsModel/types/ranges/minmaxrange.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Translator for all SEDS ranges
@@ -72,19 +72,19 @@ public:
      *
      * @param   range   Range to translate
      */
-    auto operator()(const seds::model::MinMaxRange &range) -> void;
+    auto operator()(const ::seds::model::MinMaxRange &range) -> void;
     /**
      * @brief   Translate SEDS float precision range
      *
      * @param   range   Range to translate
      */
-    auto operator()(const seds::model::FloatPrecisionRange &range) -> void;
+    auto operator()(const ::seds::model::FloatPrecisionRange &range) -> void;
     /**
      * @brief   Translate SEDS enumerated data type range
      *
      * @param   range   Range to translate
      */
-    auto operator()(const seds::model::EnumeratedDataTypeRange &range) -> void;
+    auto operator()(const ::seds::model::EnumeratedDataTypeRange &range) -> void;
 
 public:
     /**
@@ -121,7 +121,7 @@ private:
      *
      * @return  Minimum value
      */
-    auto getMin(const seds::model::MinMaxRange &range) const -> typename ValueType::Type;
+    auto getMin(const ::seds::model::MinMaxRange &range) const -> typename ValueType::Type;
     /**
      * @brief   Get maximum value from given range
      *
@@ -129,7 +129,7 @@ private:
      *
      * @return  Maximum value
      */
-    auto getMax(const seds::model::MinMaxRange &range) const -> typename ValueType::Type;
+    auto getMax(const ::seds::model::MinMaxRange &range) const -> typename ValueType::Type;
     /**
      * @brief   Get smallest value that is valid for the ASN.1 type encoding
      *
@@ -156,16 +156,16 @@ private:
 
 template<>
 void RangeTranslatorVisitor<Asn1Acn::Types::Integer, Asn1Acn::IntegerValue>::operator()(
-        const seds::model::MinMaxRange &range);
+        const ::seds::model::MinMaxRange &range);
 template<>
 void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(
-        const seds::model::MinMaxRange &range);
+        const ::seds::model::MinMaxRange &range);
 template<>
 void RangeTranslatorVisitor<Asn1Acn::Types::Real, Asn1Acn::RealValue>::operator()(
-        const seds::model::FloatPrecisionRange &range);
+        const ::seds::model::FloatPrecisionRange &range);
 template<>
 void RangeTranslatorVisitor<Asn1Acn::Types::Enumerated, Asn1Acn::EnumValue>::operator()(
-        const seds::model::EnumeratedDataTypeRange &range);
+        const ::seds::model::EnumeratedDataTypeRange &range);
 
 template<typename Type, typename ValueType>
 RangeTranslatorVisitor<Type, ValueType>::RangeTranslatorVisitor(Asn1Acn::Types::Type *asn1Type)
@@ -174,14 +174,14 @@ RangeTranslatorVisitor<Type, ValueType>::RangeTranslatorVisitor(Asn1Acn::Types::
 }
 
 template<typename Type, typename ValueType>
-void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::MinMaxRange &range)
+void RangeTranslatorVisitor<Type, ValueType>::operator()(const ::seds::model::MinMaxRange &range)
 {
     Q_UNUSED(range);
     throw ::conversion::translator::TranslationException("Applying MinMaxRange on non-numeric data type is invalid");
 }
 
 template<typename Type, typename ValueType>
-void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::FloatPrecisionRange &range)
+void RangeTranslatorVisitor<Type, ValueType>::operator()(const ::seds::model::FloatPrecisionRange &range)
 {
     Q_UNUSED(range);
     throw ::conversion::translator::TranslationException(
@@ -189,7 +189,7 @@ void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::Floa
 }
 
 template<typename Type, typename ValueType>
-void RangeTranslatorVisitor<Type, ValueType>::operator()(const seds::model::EnumeratedDataTypeRange &range)
+void RangeTranslatorVisitor<Type, ValueType>::operator()(const ::seds::model::EnumeratedDataTypeRange &range)
 {
     Q_UNUSED(range);
     throw ::conversion::translator::TranslationException(
@@ -223,7 +223,7 @@ void RangeTranslatorVisitor<Type, ValueType>::addRangeConstraint(
 }
 
 template<typename Type, typename ValueType>
-typename ValueType::Type RangeTranslatorVisitor<Type, ValueType>::getMin(const seds::model::MinMaxRange &range) const
+typename ValueType::Type RangeTranslatorVisitor<Type, ValueType>::getMin(const ::seds::model::MinMaxRange &range) const
 {
     const auto hasMin = range.min().has_value();
 
@@ -236,7 +236,7 @@ typename ValueType::Type RangeTranslatorVisitor<Type, ValueType>::getMin(const s
 }
 
 template<typename Type, typename ValueType>
-typename ValueType::Type RangeTranslatorVisitor<Type, ValueType>::getMax(const seds::model::MinMaxRange &range) const
+typename ValueType::Type RangeTranslatorVisitor<Type, ValueType>::getMax(const ::seds::model::MinMaxRange &range) const
 {
     const auto hasMax = range.max().has_value();
 
@@ -256,4 +256,4 @@ void RangeTranslatorVisitor<Type, ValueType>::checkIfValid(typename ValueType::T
     }
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

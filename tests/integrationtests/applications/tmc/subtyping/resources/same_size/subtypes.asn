@@ -1,0 +1,7 @@
+MYSUBTYPES DEFINITIONS ::=
+BEGIN
+
+MyOctoInteger ::= INTEGER (0 | 16)
+Clk-tick-arg ::= SEQUENCE (SIZE(1..2)) OF MyOctoInteger
+
+END

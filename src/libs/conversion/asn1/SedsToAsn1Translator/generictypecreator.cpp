@@ -49,7 +49,7 @@ using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using seds::model::GenericType;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 GenericTypeCreator::GenericTypeCreator(Context &context, QString parentName, const GenericTypeMapper &typeMapper)
     : m_context(context)
@@ -228,4 +228,4 @@ void GenericTypeCreator::handleFixedValue(Asn1Acn::Types::Type *type, const QStr
     }
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

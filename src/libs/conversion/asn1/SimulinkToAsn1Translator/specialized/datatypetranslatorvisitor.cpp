@@ -39,7 +39,7 @@ using simulink::model::AliasDataType;
 using simulink::model::BusDataType;
 using simulink::model::EnumDataType;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 DataTypeTranslatorVisitor::DataTypeTranslatorVisitor(Context &context)
     : m_context(context)
@@ -109,4 +109,4 @@ void DataTypeTranslatorVisitor::operator()(const BusDataType &simulinkBusType)
     m_busDataTypeTranslator.translate(simulinkBusType);
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

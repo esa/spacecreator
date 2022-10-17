@@ -25,7 +25,7 @@
 #include <seds/SedsModel/types/datatyperef.h>
 #include <seds/SedsModel/types/dimensionsize.h>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Helper for building names for interface command argument types
@@ -42,8 +42,8 @@ public:
      * @param   sedsPackages            List of all SEDS packages
      */
     InterfaceTypeNameHelper(Context context, QString parentName,
-            const seds::model::InterfaceDeclaration *interfaceDeclaration,
-            const std::vector<seds::model::Package> &sedsPackages);
+            const ::seds::model::InterfaceDeclaration *interfaceDeclaration,
+            const std::vector<::seds::model::Package> &sedsPackages);
     /**
      * @brief   Deleted copy constructor
      */
@@ -71,8 +71,8 @@ public:
      *
      * @return  Type name
      */
-    auto handleTypeName(const seds::model::DataTypeRef &typeRef,
-            const std::vector<seds::model::DimensionSize> &dimensions) const -> QString;
+    auto handleTypeName(const ::seds::model::DataTypeRef &typeRef,
+            const std::vector<::seds::model::DimensionSize> &dimensions) const -> QString;
     /**
      * @brief   Handle bundled name of the async command type
      *
@@ -81,23 +81,24 @@ public:
      *
      * @return  Command bundled type name
      */
-    auto handleAsyncCommandTypeName(const seds::model::InterfaceCommand &command,
-            const seds::model::CommandArgumentMode requestedArgumentMode) const -> QString;
+    auto handleAsyncCommandTypeName(const ::seds::model::InterfaceCommand &command,
+            const ::seds::model::CommandArgumentMode requestedArgumentMode) const -> QString;
 
 private:
-    auto isCommandGeneric(const seds::model::InterfaceCommand &command) const -> bool;
-    auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) const -> bool;
+    auto isCommandGeneric(const ::seds::model::InterfaceCommand &command) const -> bool;
+    auto isTypeGeneric(const ::seds::model::DataTypeRef &typeRef) const -> bool;
 
-    auto collectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration) -> void;
-    auto doCollectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &context) -> void;
+    auto collectGenericTypes(const ::seds::model::InterfaceDeclaration *interfaceDeclaration) -> void;
+    auto doCollectGenericTypes(const ::seds::model::InterfaceDeclaration *interfaceDeclaration, Context &context)
+            -> void;
 
 private:
     Context m_context;
     QString m_parentName;
     QString m_interfaceDeclarationName;
-    const std::vector<seds::model::Package> &m_sedsPackages;
+    const std::vector<::seds::model::Package> &m_sedsPackages;
 
-    std::vector<const seds::model::GenericType *> m_genericTypes;
+    std::vector<const ::seds::model::GenericType *> m_genericTypes;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

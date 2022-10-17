@@ -73,6 +73,7 @@ public:
         SedsConverterMultipleAsnModels,
         SedsConverterSkipEmptySequences,
         SedsConverterTasteTranslation,
+        SedsConverterTransactionNameType,
 
         Unknown
     };

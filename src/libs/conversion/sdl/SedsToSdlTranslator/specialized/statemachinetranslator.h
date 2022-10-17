@@ -114,9 +114,12 @@ public:
      *
      * @param context           Translation context
      * @param parameterMaps     Parameter maps
+     * @param stateMachine      SEDS state machine
+     * @param options           Conversion options
      */
-    static auto translateParameterMaps(
-            Context &context, const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps) -> void;
+    static auto translateParameterMaps(Context &context,
+            const seds::model::ComponentImplementation::ParameterMapSet &parameterMaps,
+            const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
 
     /**
      * @brief   Build mapping of names to command declarations
@@ -147,11 +150,13 @@ private:
             const QString &interfaceName, const QString &parameterName) -> ivm::IVInterface *;
 
     static auto createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
-            ::sdl::Process *sdlProcess, const ParameterType type) -> void;
+            const std::vector<const ::seds::model::Transition *> &sedsTransitions, ::sdl::Process *sdlProcess,
+            const ParameterType type, const Options &options) -> void;
     static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
             ::sdl::StateMachine *stateMachine) -> void;
 
-    static auto translateParameter(Context &context, const seds::model::ParameterMap &map) -> void;
+    static auto translateParameter(Context &context, const seds::model::ParameterMap &map,
+            const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
 
     static auto createStartTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
@@ -190,6 +195,8 @@ private:
 
     static auto createTimerSetCall(QString timerName, const uint64_t callTimeInNanoseconds)
             -> std::unique_ptr<::sdl::ProcedureCall>;
+
+    static auto getStateInput(const ::sdl::State *state, const QString &inputName) -> ::sdl::Input *;
 };
 
 } // namespace conversion::sdl::translator

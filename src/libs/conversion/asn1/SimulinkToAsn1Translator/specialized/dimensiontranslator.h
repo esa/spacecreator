@@ -24,7 +24,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <simulink/SimulinkModel/common/vectordimensions.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 /**
  * @brief   Translator for SIMULINK dimensions
@@ -77,8 +77,8 @@ public:
      *
      * @return  Constructed SequenceOf object
      */
-    auto translate(
-            const Asn1Acn::Types::Type *itemAsn1Type, const simulink::model::VectorDimensions::Vector &vectorDimensions)
+    auto translate(const Asn1Acn::Types::Type *itemAsn1Type,
+            const ::simulink::model::VectorDimensions::Vector &vectorDimensions)
             -> std::unique_ptr<Asn1Acn::Types::SequenceOf>;
 
 private:
@@ -88,4 +88,4 @@ private:
     Context &m_context;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink
