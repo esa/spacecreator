@@ -1091,15 +1091,12 @@ auto StateMachineTranslator::translateTransitions(Context &context,
         const auto sdlFromState = getSdlState(sedsTransition->fromState(), stateMap);
         const auto sdlToState = getSdlState(sedsTransition->toState(), stateMap);
 
-        const auto stateChange = sdlFromState->name() != sdlToState->name();
-
         auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition->primitive(), options);
         auto &input = inputHandler.first;
         auto &actions = inputHandler.second;
 
         auto transitionInfo = translateTransition(
-                context, sedsTransition, sdlFromState, stateChange, std::move(actions), sedsStateMachine);
-        transitionInfo.transition->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
+                context, sedsTransition, sdlFromState, sdlToState, std::move(actions), sedsStateMachine);
 
         const auto &inputName = input->name();
         transitionInfo.input = std::move(input);
@@ -1182,8 +1179,9 @@ auto StateMachineTranslator::createInputWithoutTransactions(
 }
 
 auto StateMachineTranslator::translateTransition(Context &context, const ::seds::model::Transition *sedsTransition,
-        const ::sdl::State *sdlFromState, const bool stateChange, std::vector<std::unique_ptr<::sdl::Action>> actions,
-        const ::seds::model::StateMachine &sedsStateMachine) -> StateMachineTranslator::TransitionInfo
+        const ::sdl::State *sdlFromState, const ::sdl::State *sdlToState,
+        std::vector<std::unique_ptr<::sdl::Action>> actions, const ::seds::model::StateMachine &sedsStateMachine)
+        -> StateMachineTranslator::TransitionInfo
 {
     TransitionInfo transitionInfo;
 
@@ -1229,6 +1227,8 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
         sdlTransition = translateGuard(context.sdlProcess(), sdlFromState, sdlTransition, *sedsTransition->guard());
     }
 
+    const auto stateChange = sdlFromState->name() != sdlToState->name();
+
     if (stateChange) {
         const auto onExit = getOnExit(sedsStateMachine, sedsTransition->fromState().nameStr());
         if (onExit.has_value()) {
@@ -1252,6 +1252,9 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
     if (timerTime.has_value()) {
         sdlTransition->addAction(createTimerSetCall(timerName(sedsTransition->toState().nameStr()), *timerTime));
     }
+
+    // State switch
+    sdlTransition->addAction(std::make_unique<::sdl::NextState>("", sdlToState));
 
     return transitionInfo;
 }

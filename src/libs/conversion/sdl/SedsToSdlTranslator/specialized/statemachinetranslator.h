@@ -193,7 +193,7 @@ private:
             const ::seds::model::StateMachine &sedsStateMachine, const Options &options)
             -> std::unordered_map<::sdl::State *, InputsForStatesMap>;
     static auto translateTransition(Context &context, const ::seds::model::Transition *sedsTransition,
-            const ::sdl::State *sdlFromState, const bool stateChange,
+            const ::sdl::State *sdlFromState, const ::sdl::State *sdlToState,
             std::vector<std::unique_ptr<::sdl::Action>> actions, const ::seds::model::StateMachine &sedsStateMachine)
             -> TransitionInfo;
 
