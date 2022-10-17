@@ -106,21 +106,48 @@ process Pinger;
     state s2;
         /* CIF Input (2700, 1612), (200, 50) */
         input Pong_PongCommand_Pi;
-            /* CIF NextState (2700, 1687), (200, 50) */
-            NEXTSTATE s3;
+            /* CIF Decision (2700, 1612), (400, 50) */
+            decision Pong_PongCommand_Pi_transactionName;
+                /* CIF Answer (2700, 1687), (400, 50) */
+                ("PongSmall"):
+                    /* CIF NextState (2700, 1762), (200, 50) */
+                    NEXTSTATE s3;
+                /* CIF Answer (3300, 1687), (400, 50) */
+                ELSE:
+                    /* CIF NextState (3300, 1762), (200, 50) */
+                    NEXTSTATE -;
+            enddecision;
     endstate;
-    /* CIF State (3300, 1612), (200, 50) */
+    /* CIF State (4200, 1612), (200, 50) */
     state s3;
-        /* CIF Input (3300, 1612), (200, 50) */
+        /* CIF Input (4200, 1612), (200, 50) */
         input Pong_PongCommand_Pi;
-            /* CIF NextState (3300, 1687), (200, 50) */
-            NEXTSTATE s4;
+            /* CIF Decision (4200, 1612), (400, 50) */
+            decision Pong_PongCommand_Pi_transactionName;
+                /* CIF Answer (4200, 1687), (400, 50) */
+                ("PongBig"):
+                    /* CIF NextState (4200, 1762), (200, 50) */
+                    NEXTSTATE s4;
+                /* CIF Answer (4800, 1687), (400, 50) */
+                ELSE:
+                    /* CIF NextState (4800, 1762), (200, 50) */
+                    NEXTSTATE -;
+            enddecision;
     endstate;
-    /* CIF State (3900, 1612), (200, 50) */
+    /* CIF State (5700, 1612), (200, 50) */
     state s4;
-        /* CIF Input (3900, 1612), (200, 50) */
+        /* CIF Input (5700, 1612), (200, 50) */
         input Pong_PongCommand_Pi;
-            /* CIF NextState (3900, 1687), (200, 50) */
-            NEXTSTATE s1;
+            /* CIF Decision (5700, 1612), (400, 50) */
+            decision Pong_PongCommand_Pi_transactionName;
+                /* CIF Answer (5700, 1687), (400, 50) */
+                ("PongParamSmall"):
+                    /* CIF NextState (5700, 1762), (200, 50) */
+                    NEXTSTATE s1;
+                /* CIF Answer (6300, 1687), (400, 50) */
+                ELSE:
+                    /* CIF NextState (6300, 1762), (200, 50) */
+                    NEXTSTATE -;
+            enddecision;
     endstate;
 endprocess Pinger;

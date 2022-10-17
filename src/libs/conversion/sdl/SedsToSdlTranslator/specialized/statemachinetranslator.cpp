@@ -1112,7 +1112,7 @@ auto StateMachineTranslator::createInputs(Context &context, ::sdl::State *fromSt
         -> void
 {
     for (auto &[inputName, transitionInfos] : sdlTransitionsForInputs) {
-        const auto transactionsRequired = transitionInfos.size() > 1;
+        const auto transactionsRequired = transitionInfos.front().transactionName.has_value();
 
         if (transactionsRequired) {
             createInputWithTransactions(context, fromState, std::move(transitionInfos));
