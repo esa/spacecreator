@@ -50,6 +50,13 @@ public:
         ErrorDepth
     };
 
+    enum VariableParseTokens
+    {
+        VariableGlobalState = 0,
+        VariableFunction,
+        VariableName
+    };
+
     /**
      * @brief   Constructor
      */
@@ -72,6 +79,8 @@ private:
 
     static QRegularExpression buildSpinErrorRegex();
     static QRegularExpression buildDataConstraintViolationRegex();
+
+    static void parseVariableName(const QString &variable, DataConstraintViolationReport &violationReport);
 };
 
 }

@@ -125,7 +125,9 @@ int main(int argc, char *argv[])
         qDebug() << "Error details (raw):" << report.rawErrorDetails;
         const DataConstraintViolationReport dataConstraintViolationReport =
                 qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
+        qDebug() << "Function name:" << dataConstraintViolationReport.functionName;
         qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
+        qDebug() << "Nested state:" << dataConstraintViolationReport.nestedStateName;
         for (auto constraint : dataConstraintViolationReport.constraints) {
             qDebug() << "    Constraint:" << constraint;
         }

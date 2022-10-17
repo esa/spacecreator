@@ -95,6 +95,19 @@ void VEItemModel::clearScene()
     updateSceneRect();
 }
 
+void VEItemModel::shrinkScene()
+{
+    const QList<QGraphicsItem *> items = m_graphicsScene->items();
+    const QRectF rect = std::accumulate(items.cbegin(), items.cend(), QRectF(),
+                                        [](const QRectF &rect, const QGraphicsItem *item) -> QRectF{
+        if (!item->parentItem() && item->type() > QGraphicsItem::UserType)
+            return rect.united(item->sceneBoundingRect());
+
+        return rect;
+    });
+    m_graphicsScene->setSceneRect(rect.marginsAdded(shared::graphicsviewutils::kContentMargins));
+}
+
 void VEItemModel::onSceneSelectionChanged()
 {
     QList<shared::Id> ids;

@@ -26,11 +26,11 @@
 
 using conversion::translator::TranslationException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 InterfaceTypeCreatorContext::InterfaceTypeCreatorContext(Context &mainContext, Context &interfaceContext,
-        const seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
-        const std::optional<seds::model::GenericTypeMapSet> &mappings)
+        const ::seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
+        const std::optional<::seds::model::GenericTypeMapSet> &mappings)
     : m_mainContext(mainContext)
     , m_interfaceContext(interfaceContext)
     , m_parentName(std::move(parentName))
@@ -45,8 +45,8 @@ InterfaceTypeCreatorContext::InterfaceTypeCreatorContext(Context &mainContext, C
     }
 }
 
-std::optional<seds::model::DataTypeRef> InterfaceTypeCreatorContext::handleType(
-        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
+std::optional<::seds::model::DataTypeRef> InterfaceTypeCreatorContext::handleType(
+        const ::seds::model::DataTypeRef &typeRef, const std::vector<::seds::model::DimensionSize> &dimensions)
 {
     const auto isGeneric = isTypeGeneric(typeRef);
 
@@ -89,7 +89,7 @@ const QString &InterfaceTypeCreatorContext::parentName() const
 }
 
 std::optional<QString> InterfaceTypeCreatorContext::findDeterminantArgument(
-        const std::vector<seds::model::CommandArgument> &arguments)
+        const std::vector<::seds::model::CommandArgument> &arguments)
 {
     const auto &determinantName = m_typeMapper.determinantName();
 
@@ -97,8 +97,10 @@ std::optional<QString> InterfaceTypeCreatorContext::findDeterminantArgument(
         return std::nullopt;
     }
 
-    const auto foundArgument = std::find_if(arguments.begin(), arguments.end(),
-            [&](const seds::model::CommandArgument &argument) { return argument.type().nameStr() == determinantName; });
+    const auto foundArgument =
+            std::find_if(arguments.begin(), arguments.end(), [&](const ::seds::model::CommandArgument &argument) {
+                return argument.type().nameStr() == determinantName;
+            });
 
     if (foundArgument == arguments.end()) {
         return std::nullopt;
@@ -107,7 +109,7 @@ std::optional<QString> InterfaceTypeCreatorContext::findDeterminantArgument(
     }
 }
 
-bool InterfaceTypeCreatorContext::isTypeGeneric(const seds::model::DataTypeRef &typeRef)
+bool InterfaceTypeCreatorContext::isTypeGeneric(const ::seds::model::DataTypeRef &typeRef)
 {
     if (typeRef.packageStr()) {
         return false;
@@ -119,7 +121,7 @@ bool InterfaceTypeCreatorContext::isTypeGeneric(const seds::model::DataTypeRef &
     return (found != m_genericTypes.end());
 }
 
-bool InterfaceTypeCreatorContext::isCommandGeneric(const seds::model::InterfaceCommand &command)
+bool InterfaceTypeCreatorContext::isCommandGeneric(const ::seds::model::InterfaceCommand &command)
 {
     const auto &arguments = command.arguments();
     for (const auto &argument : arguments) {
@@ -132,7 +134,7 @@ bool InterfaceTypeCreatorContext::isCommandGeneric(const seds::model::InterfaceC
     return false;
 }
 
-void InterfaceTypeCreatorContext::collectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration)
+void InterfaceTypeCreatorContext::collectGenericTypes(const ::seds::model::InterfaceDeclaration *interfaceDeclaration)
 {
     doCollectGenericTypes(interfaceDeclaration, m_interfaceContext);
 
@@ -146,7 +148,7 @@ void InterfaceTypeCreatorContext::collectGenericTypes(const seds::model::Interfa
 }
 
 void InterfaceTypeCreatorContext::doCollectGenericTypes(
-        const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &interfaceContext)
+        const ::seds::model::InterfaceDeclaration *interfaceDeclaration, Context &interfaceContext)
 {
     const auto &interfaceGenericTypes = interfaceDeclaration->genericTypes();
 
@@ -167,4 +169,4 @@ void InterfaceTypeCreatorContext::doCollectGenericTypes(
     }
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

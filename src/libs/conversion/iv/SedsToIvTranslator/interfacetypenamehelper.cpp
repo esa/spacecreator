@@ -24,14 +24,14 @@
 #include <conversion/asn1/SedsToAsn1Translator/datatypetranslationhelper.h>
 #include <conversion/common/translation/exceptions.h>
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
-using asn1::translator::DataTypeTranslationHelper;
+using asn1::translator::seds::DataTypeTranslationHelper;
 using conversion::translator::TranslationException;
 
 InterfaceTypeNameHelper::InterfaceTypeNameHelper(Context context, QString parentName,
-        const seds::model::InterfaceDeclaration *interfaceDeclaration,
-        const std::vector<seds::model::Package> &sedsPackages)
+        const ::seds::model::InterfaceDeclaration *interfaceDeclaration,
+        const std::vector<::seds::model::Package> &sedsPackages)
     : m_context(context)
     , m_parentName(std::move(parentName))
     , m_interfaceDeclarationName(interfaceDeclaration->nameStr())
@@ -41,7 +41,7 @@ InterfaceTypeNameHelper::InterfaceTypeNameHelper(Context context, QString parent
 }
 
 QString InterfaceTypeNameHelper::handleTypeName(
-        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions) const
+        const ::seds::model::DataTypeRef &typeRef, const std::vector<::seds::model::DimensionSize> &dimensions) const
 {
     auto typeName = typeRef.nameStr();
 
@@ -59,8 +59,8 @@ QString InterfaceTypeNameHelper::handleTypeName(
     return typeName;
 }
 
-QString InterfaceTypeNameHelper::handleAsyncCommandTypeName(const seds::model::InterfaceCommand &command,
-        const seds::model::CommandArgumentMode requestedArgumentMode) const
+QString InterfaceTypeNameHelper::handleAsyncCommandTypeName(const ::seds::model::InterfaceCommand &command,
+        const ::seds::model::CommandArgumentMode requestedArgumentMode) const
 {
     const auto commandName = Escaper::escapeAsn1TypeName(command.nameStr());
 
@@ -74,7 +74,7 @@ QString InterfaceTypeNameHelper::handleAsyncCommandTypeName(const seds::model::I
     }
 }
 
-bool InterfaceTypeNameHelper::isCommandGeneric(const seds::model::InterfaceCommand &command) const
+bool InterfaceTypeNameHelper::isCommandGeneric(const ::seds::model::InterfaceCommand &command) const
 {
     const auto &arguments = command.arguments();
     for (const auto &argument : arguments) {
@@ -87,7 +87,7 @@ bool InterfaceTypeNameHelper::isCommandGeneric(const seds::model::InterfaceComma
     return false;
 }
 
-bool InterfaceTypeNameHelper::isTypeGeneric(const seds::model::DataTypeRef &typeRef) const
+bool InterfaceTypeNameHelper::isTypeGeneric(const ::seds::model::DataTypeRef &typeRef) const
 {
     if (typeRef.packageStr()) {
         return false;
@@ -99,7 +99,7 @@ bool InterfaceTypeNameHelper::isTypeGeneric(const seds::model::DataTypeRef &type
     return (found != m_genericTypes.end());
 }
 
-void InterfaceTypeNameHelper::collectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration)
+void InterfaceTypeNameHelper::collectGenericTypes(const ::seds::model::InterfaceDeclaration *interfaceDeclaration)
 {
     doCollectGenericTypes(interfaceDeclaration, m_context);
 
@@ -113,7 +113,7 @@ void InterfaceTypeNameHelper::collectGenericTypes(const seds::model::InterfaceDe
 }
 
 void InterfaceTypeNameHelper::doCollectGenericTypes(
-        const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &context)
+        const ::seds::model::InterfaceDeclaration *interfaceDeclaration, Context &context)
 {
     const auto &interfaceGenericTypes = interfaceDeclaration->genericTypes();
 
@@ -138,4 +138,4 @@ void InterfaceTypeNameHelper::doCollectGenericTypes(
     }
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

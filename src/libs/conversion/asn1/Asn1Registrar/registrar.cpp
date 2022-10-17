@@ -22,6 +22,7 @@
 #include <conversion/asn1/Asn1Exporter/exporter.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
+#include <conversion/asn1/SimulinkToAsn1Translator/translator.h>
 #include <conversion/common/modeltype.h>
 #include <memory>
 
@@ -35,8 +36,14 @@ bool Asn1Registrar::registerCapabilities(conversion::Registry &registry)
         return false;
     }
 
-    auto sedsToAsn1Translator = std::make_unique<translator::SedsToAsn1Translator>();
+    auto sedsToAsn1Translator = std::make_unique<translator::seds::SedsToAsn1Translator>();
     result = registry.registerTranslator({ ModelType::Seds }, ModelType::Asn1, std::move(sedsToAsn1Translator));
+    if (!result) {
+        return false;
+    }
+
+    auto simulinkToAsn1Translator = std::make_unique<translator::simulink::SimulinkToAsn1Translator>();
+    result = registry.registerTranslator({ ModelType::Simulink }, ModelType::Asn1, std::move(simulinkToAsn1Translator));
     if (!result) {
         return false;
     }

@@ -31,14 +31,14 @@
 
 using conversion::translator::TranslationException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 ContainerDataTypeTranslator::ContainerDataTypeTranslator(Context &context)
     : m_context(context)
 {
 }
 
-void ContainerDataTypeTranslator::translate(const seds::model::ContainerDataType &sedsType)
+void ContainerDataTypeTranslator::translate(const ::seds::model::ContainerDataType &sedsType)
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::Sequence>(asn1TypeName);
@@ -64,7 +64,7 @@ void ContainerDataTypeTranslator::translate(const seds::model::ContainerDataType
 }
 
 void ContainerDataTypeTranslator::handleEntries(
-        const std::vector<seds::model::EntryType> &entries, EntryTranslatorVisitor &entryTranslator) const
+        const std::vector<::seds::model::EntryType> &entries, EntryTranslatorVisitor &entryTranslator) const
 {
     for (const auto &entry : entries) {
         std::visit(entryTranslator, entry);
@@ -72,7 +72,7 @@ void ContainerDataTypeTranslator::handleEntries(
 }
 
 void ContainerDataTypeTranslator::handleTrailerEntries(
-        const std::vector<seds::model::EntryType> &trailerEntries, EntryTranslatorVisitor &entryTranslator) const
+        const std::vector<::seds::model::EntryType> &trailerEntries, EntryTranslatorVisitor &entryTranslator) const
 {
     for (const auto &trailerEntry : trailerEntries) {
         std::visit(entryTranslator, trailerEntry);
@@ -80,14 +80,14 @@ void ContainerDataTypeTranslator::handleTrailerEntries(
 }
 
 void ContainerDataTypeTranslator::handleBaseTypeEntries(
-        const seds::model::ContainerDataType &sedsType, EntryTranslatorVisitor &entryTranslator) const
+        const ::seds::model::ContainerDataType &sedsType, EntryTranslatorVisitor &entryTranslator) const
 {
     if (!sedsType.baseType()) {
         return;
     }
 
     const auto baseType = m_context.findSedsType(*sedsType.baseType());
-    const auto baseContainerType = std::get_if<seds::model::ContainerDataType>(baseType);
+    const auto baseContainerType = std::get_if<::seds::model::ContainerDataType>(baseType);
 
     if (baseContainerType == nullptr) {
         auto errorMessage = QString("Container '%1' has a base type '%2' that is not a container")
@@ -101,14 +101,14 @@ void ContainerDataTypeTranslator::handleBaseTypeEntries(
 }
 
 void ContainerDataTypeTranslator::handleBaseTypeTrailerEntries(
-        const seds::model::ContainerDataType &sedsType, EntryTranslatorVisitor &entryTranslator) const
+        const ::seds::model::ContainerDataType &sedsType, EntryTranslatorVisitor &entryTranslator) const
 {
     if (!sedsType.baseType()) {
         return;
     }
 
     const auto baseType = m_context.findSedsType(*sedsType.baseType());
-    const auto baseContainerType = std::get_if<seds::model::ContainerDataType>(baseType);
+    const auto baseContainerType = std::get_if<::seds::model::ContainerDataType>(baseType);
 
     if (baseContainerType == nullptr) {
         auto errorMessage = QString("Container '%1' has a base type '%2' that is not a container")
@@ -122,7 +122,7 @@ void ContainerDataTypeTranslator::handleBaseTypeTrailerEntries(
 }
 
 void ContainerDataTypeTranslator::applyContainerConstraints(
-        const seds::model::ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
+        const ::seds::model::ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const
 {
     ContainerConstraintTranslatorVisitor constraintTranslator(m_context, asn1Type);
 
@@ -132,7 +132,7 @@ void ContainerDataTypeTranslator::applyContainerConstraints(
 }
 
 void ContainerDataTypeTranslator::updateParentContainer(
-        const seds::model::DataTypeRef &baseTypeRef, Asn1Acn::Types::Sequence *asn1Type)
+        const ::seds::model::DataTypeRef &baseTypeRef, Asn1Acn::Types::Sequence *asn1Type)
 {
     auto asn1BaseType = m_context.findAsn1Type(baseTypeRef);
     auto asn1BaseSequence = dynamic_cast<Asn1Acn::Types::Sequence *>(asn1BaseType);
@@ -182,4 +182,4 @@ void ContainerDataTypeTranslator::createRealizationContainerField(Asn1Acn::Types
     asn1Sequence->addComponent(std::move(realizationComponent));
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

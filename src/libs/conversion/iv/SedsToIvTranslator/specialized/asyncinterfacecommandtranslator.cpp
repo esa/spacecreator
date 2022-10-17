@@ -31,13 +31,13 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 
-using conversion::asn1::translator::DataTypeTranslationHelper;
+using conversion::asn1::translator::seds::DataTypeTranslationHelper;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using seds::model::ArgumentsCombination;
 using seds::model::CommandArgumentMode;
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(ivm::IVFunction *ivFunction,
         const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper, const Options &options)
@@ -49,7 +49,7 @@ AsyncInterfaceCommandTranslator::AsyncInterfaceCommandTranslator(ivm::IVFunction
 }
 
 void AsyncInterfaceCommandTranslator::translateCommand(
-        const seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType)
+        const ::seds::model::InterfaceCommand &sedsCommand, ivm::IVInterface::InterfaceType interfaceType)
 {
     // Process command based on its commands
     switch (sedsCommand.argumentsCombination()) {
@@ -116,7 +116,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
     }
 }
 
-void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::InterfaceCommand &sedsCommand,
+void AsyncInterfaceCommandTranslator::translateArguments(const ::seds::model::InterfaceCommand &sedsCommand,
         const CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface)
 {
     // Async commands are translated to sporadic interfaces, which can accept only one argument
@@ -128,4 +128,4 @@ void AsyncInterfaceCommandTranslator::translateArguments(const seds::model::Inte
     ivInterface->addParam(ivParameter);
 }
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

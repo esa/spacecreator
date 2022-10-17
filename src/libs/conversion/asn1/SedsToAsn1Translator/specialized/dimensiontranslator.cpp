@@ -30,7 +30,7 @@
 
 using conversion::translator::TranslationException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 using SizeTranslator = SizeTranslatorVisitor<Asn1Acn::Types::SequenceOf, Asn1Acn::IntegerValue>;
 
@@ -41,7 +41,7 @@ DimensionTranslator::DimensionTranslator(Context &context)
 }
 
 void DimensionTranslator::translate(
-        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
+        const ::seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
     if (dimension.size()) {
         translateSizeDimension(dimension, asn1Type);
@@ -53,7 +53,7 @@ void DimensionTranslator::translate(
 }
 
 void DimensionTranslator::translateSizeDimension(
-        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
+        const ::seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
     auto dimensionSize = dimension.size()->value();
 
@@ -81,11 +81,11 @@ void DimensionTranslator::translateSizeDimension(
 }
 
 void DimensionTranslator::translateIndexDimension(
-        const seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
+        const ::seds::model::DimensionSize &dimension, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
     const auto indexType = m_context.findSedsType(*dimension.indexTypeRef());
 
-    if (const auto integerIndexType = std::get_if<seds::model::IntegerDataType>(indexType); integerIndexType) {
+    if (const auto integerIndexType = std::get_if<::seds::model::IntegerDataType>(indexType); integerIndexType) {
         SizeTranslator sizeTranslator(
                 asn1Type, SizeTranslator::LengthType::FixedLength, SizeTranslator::SourceType::Index, m_threshold);
         std::visit(sizeTranslator, integerIndexType->range());
@@ -97,7 +97,7 @@ void DimensionTranslator::translateIndexDimension(
                                         .arg(asn1Type->identifier());
             throw TranslationException(std::move(errorMessage));
         }
-    } else if (const auto enumIndexType = std::get_if<seds::model::EnumeratedDataType>(indexType); enumIndexType) {
+    } else if (const auto enumIndexType = std::get_if<::seds::model::EnumeratedDataType>(indexType); enumIndexType) {
         translateEnumDimensionIndex(*enumIndexType, asn1Type);
     } else {
         throw TranslationException("Only integer and enum dimension index types are supported");
@@ -105,7 +105,7 @@ void DimensionTranslator::translateIndexDimension(
 }
 
 void DimensionTranslator::translateEnumDimensionIndex(
-        const seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1Type) const
+        const ::seds::model::EnumeratedDataType &indexType, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
     const auto &enumItems = indexType.enumerationList();
 
@@ -140,4 +140,4 @@ void DimensionTranslator::translateEnumDimensionIndex(
     sizeTranslator.addSizeConstraint(enumValues.back() - enumValues.front());
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

@@ -27,8 +27,12 @@
 namespace reporting {
 
 struct DataConstraintViolationReport {
+    /** Name of the function */
+    QString functionName;
     /** Name of the constraint violating variable */
     QString variableName;
+    /** Name of the nested state */
+    QString nestedStateName;
     /** Boundary operator (less than, greater than etc.) */
     QList<QString> constraints;
     /** Bounding value */

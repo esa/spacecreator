@@ -31,7 +31,7 @@
 #include <seds/SedsModel/types/dimensionsize.h>
 #include <vector>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Context for creating types for interface commands
@@ -49,8 +49,8 @@ public:
      * @param   mappings                Mappings for generic types
      */
     InterfaceTypeCreatorContext(Context &mainContext, Context &interfaceContext,
-            const seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
-            const std::optional<seds::model::GenericTypeMapSet> &mappings);
+            const ::seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
+            const std::optional<::seds::model::GenericTypeMapSet> &mappings);
     /**
      * @brief   Deleted copy constructor
      */
@@ -76,8 +76,8 @@ public:
      * @param   typeRef         Type reference
      * @param   dimensions      Type array dimensions
      */
-    auto handleType(const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
-            -> std::optional<seds::model::DataTypeRef>;
+    auto handleType(const ::seds::model::DataTypeRef &typeRef,
+            const std::vector<::seds::model::DimensionSize> &dimensions) -> std::optional<::seds::model::DataTypeRef>;
 
     /**
      * @brief   Getter for main context
@@ -104,7 +104,8 @@ public:
      *
      * @return  Name of the determinant argument if found, nullopt otherwise
      */
-    auto findDeterminantArgument(const std::vector<seds::model::CommandArgument> &arguments) -> std::optional<QString>;
+    auto findDeterminantArgument(const std::vector<::seds::model::CommandArgument> &arguments)
+            -> std::optional<QString>;
     /**
      * @brief   Check if given type is a generic type
      *
@@ -112,7 +113,7 @@ public:
      *
      * @return  True if type is generic, false otherwise
      */
-    auto isTypeGeneric(const seds::model::DataTypeRef &typeRef) -> bool;
+    auto isTypeGeneric(const ::seds::model::DataTypeRef &typeRef) -> bool;
     /**
      * @brief   Check if given command has any argument with generic type
      *
@@ -120,21 +121,21 @@ public:
      *
      * @true    True if command is generic, false otherwise
      */
-    auto isCommandGeneric(const seds::model::InterfaceCommand &command) -> bool;
+    auto isCommandGeneric(const ::seds::model::InterfaceCommand &command) -> bool;
 
 private:
-    auto collectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration) -> void;
-    auto doCollectGenericTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration, Context &interfaceContext)
-            -> void;
+    auto collectGenericTypes(const ::seds::model::InterfaceDeclaration *interfaceDeclaration) -> void;
+    auto doCollectGenericTypes(
+            const ::seds::model::InterfaceDeclaration *interfaceDeclaration, Context &interfaceContext) -> void;
 
 private:
     Context &m_mainContext;
     Context &m_interfaceContext;
     QString m_parentName;
-    std::vector<const seds::model::GenericType *> m_genericTypes;
-    const std::optional<seds::model::GenericTypeMapSet> &m_mappings;
+    std::vector<const ::seds::model::GenericType *> m_genericTypes;
+    const std::optional<::seds::model::GenericTypeMapSet> &m_mappings;
     GenericTypeMapper m_typeMapper;
     GenericTypeCreator m_genericTypeCreator;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

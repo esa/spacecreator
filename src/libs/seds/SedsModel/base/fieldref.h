@@ -34,6 +34,10 @@ public:
 public:
     auto value() const -> const common::String &;
 
+public:
+    friend auto operator==(const FieldRef &lhs, const FieldRef &rhs) -> bool;
+    friend auto operator!=(const FieldRef &lhs, const FieldRef &rhs) -> bool;
+
 private:
     common::String m_value;
 };

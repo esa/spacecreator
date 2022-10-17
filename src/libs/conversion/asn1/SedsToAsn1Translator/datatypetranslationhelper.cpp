@@ -26,12 +26,12 @@
 
 using conversion::translator::MissingAsn1TypeDefinitionException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 QString DataTypeTranslationHelper::buildArrayTypeName(
-        const QString &baseTypeName, const std::vector<seds::model::DimensionSize> &dimensions)
+        const QString &baseTypeName, const std::vector<::seds::model::DimensionSize> &dimensions)
 {
-    const auto dimensionSizeFunc = [&](const seds::model::DimensionSize &dimension) {
+    const auto dimensionSizeFunc = [&](const ::seds::model::DimensionSize &dimension) {
         if (dimension.size()) {
             return QString::number(dimension.size()->value());
         } else if (dimension.indexTypeRef()) {
@@ -42,7 +42,7 @@ QString DataTypeTranslationHelper::buildArrayTypeName(
     };
 
     const auto dimensionSuffix = std::accumulate(std::next(dimensions.begin()), dimensions.end(),
-            dimensionSizeFunc(dimensions.front()), [&](const auto &acc, const seds::model::DimensionSize &dimension) {
+            dimensionSizeFunc(dimensions.front()), [&](const auto &acc, const ::seds::model::DimensionSize &dimension) {
                 return acc + "x" + dimensionSizeFunc(dimension);
             });
 
@@ -50,10 +50,10 @@ QString DataTypeTranslationHelper::buildArrayTypeName(
 }
 
 QString DataTypeTranslationHelper::buildBundledTypeName(
-        const QString &parentName, const QString &commandName, const seds::model::CommandArgumentMode mode)
+        const QString &parentName, const QString &commandName, const ::seds::model::CommandArgumentMode mode)
 {
     QString postfix;
-    if (mode == seds::model::CommandArgumentMode::Notify) {
+    if (mode == ::seds::model::CommandArgumentMode::Notify) {
         postfix = "Notify";
     }
 
@@ -66,8 +66,8 @@ QString DataTypeTranslationHelper::buildConcreteTypeName(
     return m_concreteTypeNameDeclarationTemplate.arg(interfaceDeclarationName).arg(genericName);
 }
 
-seds::model::DataTypeRef DataTypeTranslationHelper::createArrayType(Context &context,
-        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
+::seds::model::DataTypeRef DataTypeTranslationHelper::createArrayType(Context &context,
+        const ::seds::model::DataTypeRef &typeRef, const std::vector<::seds::model::DimensionSize> &dimensions)
 {
     if (dimensions.empty()) {
         return typeRef;
@@ -76,7 +76,7 @@ seds::model::DataTypeRef DataTypeTranslationHelper::createArrayType(Context &con
     const auto name = buildArrayTypeName(typeRef.nameStr(), dimensions);
 
     if (!context.hasAsn1Type(name)) {
-        seds::model::ArrayDataType sedsArray;
+        ::seds::model::ArrayDataType sedsArray;
         sedsArray.setName(name);
         sedsArray.setType(typeRef);
 
@@ -92,7 +92,7 @@ seds::model::DataTypeRef DataTypeTranslationHelper::createArrayType(Context &con
 }
 
 Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &context,
-        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::DimensionSize> &dimensions)
+        const ::seds::model::DataTypeRef &typeRef, const std::vector<::seds::model::DimensionSize> &dimensions)
 {
     if (dimensions.empty()) {
         return context.findAsn1Type(typeRef);
@@ -103,7 +103,7 @@ Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &contex
 }
 
 bool DataTypeTranslationHelper::isTypeGeneric(
-        const seds::model::DataTypeRef &typeRef, const std::vector<seds::model::GenericType> &genericTypes)
+        const ::seds::model::DataTypeRef &typeRef, const std::vector<::seds::model::GenericType> &genericTypes)
 {
     if (typeRef.packageStr()) {
         return false;
@@ -112,9 +112,9 @@ bool DataTypeTranslationHelper::isTypeGeneric(
     const auto &typeName = typeRef.nameStr();
 
     const auto found = std::find_if(genericTypes.begin(), genericTypes.end(),
-            [&](const seds::model::GenericType &genericType) { return genericType.nameStr() == typeName; });
+            [&](const ::seds::model::GenericType &genericType) { return genericType.nameStr() == typeName; });
 
     return found != genericTypes.end();
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

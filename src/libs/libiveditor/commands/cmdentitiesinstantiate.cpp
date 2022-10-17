@@ -21,12 +21,14 @@
 #include "commandids.h"
 #include "commands/cmdentityattributeschange.h"
 #include "graphicsviewutils.h"
-#include "itemeditor/common/ivutils.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
+
+#include <QStandardPaths>
+#include <QTemporaryDir>
 
 static inline void shiftObjects(const QVector<ivm::IVObject *> &objects, const QPointF &offset)
 {
@@ -47,9 +49,10 @@ static inline void shiftObjects(const QVector<ivm::IVObject *> &objects, const Q
 namespace ive {
 namespace cmd {
 
-CmdEntitiesInstantiate::CmdEntitiesInstantiate(
-        ivm::IVFunctionType *entity, ivm::IVFunctionType *parent, ivm::IVModel *model, const QPointF &pos)
-    : QUndoCommand()
+CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm::IVFunctionType *parent,
+        ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath)
+    : ASN1ComponentsImport(asn1Checks, shared::sharedTypesPath(), destPath)
+    , QUndoCommand()
     , m_parent(parent)
     , m_model(model)
 
@@ -93,18 +96,31 @@ CmdEntitiesInstantiate::~CmdEntitiesInstantiate()
 void CmdEntitiesInstantiate::redo()
 {
     if (!m_instantiatedEntity.isNull()) {
+        m_importedAsnFiles.clear();
+
         if (m_parent) {
             m_parent->addChild(m_instantiatedEntity);
         }
-        m_model->addObject(m_instantiatedEntity);
+        if (m_model->addObject(m_instantiatedEntity)) {
+            redoAsnFileImport(m_instantiatedEntity->instanceOf());
+            redoSourceCloning(m_instantiatedEntity->instanceOf());
+        }
         for (QUndoCommand *cmd : qAsConst(m_subCmds)) {
             cmd->redo();
         }
+
+        if (!m_tempDir.isNull()) {
+            m_tempDir.reset();
+        }
+        Q_EMIT asn1FilesImported(m_importedAsnFiles);
     }
 }
 
 void CmdEntitiesInstantiate::undo()
 {
+    m_tempDir.reset(new QTemporaryDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
+            + QDir::separator() + QLatin1String("import")));
+
     if (!m_instantiatedEntity.isNull()) {
         for (QUndoCommand *cmd : qAsConst(m_subCmds)) {
             cmd->undo();
@@ -116,6 +132,7 @@ void CmdEntitiesInstantiate::undo()
             m_instantiatedEntity->setParentObject(nullptr);
         }
     }
+    undoAsnFileImport();
 }
 
 bool CmdEntitiesInstantiate::mergeWith(const QUndoCommand *command)

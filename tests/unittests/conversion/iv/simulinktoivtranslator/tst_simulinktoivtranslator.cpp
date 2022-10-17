@@ -38,7 +38,7 @@ using Asn1Acn::Types::Endianness;
 using Asn1Acn::Types::IntegerEncoding;
 using Asn1Acn::Types::RealEncoding;
 using conversion::ModelType;
-using conversion::iv::translator::SimulinkToIvTranslator;
+using conversion::iv::translator::simulink::SimulinkToIvTranslator;
 using conversion::translator::TranslationException;
 using ivm::IVModel;
 using simulink::model::PortDimension;

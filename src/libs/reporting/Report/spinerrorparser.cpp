@@ -27,8 +27,9 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawEr
     QRegularExpressionMatchIterator matches = regex.globalMatch(rawError);
     while (matches.hasNext()) {
         const QRegularExpressionMatch matchedError = matches.next();
-        violationReport.variableName =
-                matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName);
+
+        parseVariableName(matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName),
+                violationReport);
         violationReport.constraints.append(
                 matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationType));
         QVariant boundingValue;
@@ -93,4 +94,22 @@ QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex
     // closing parenthesis
     pattern += QStringLiteral("\\)");
     return QRegularExpression(pattern);
+}
+
+void reporting::SpinErrorParser::parseVariableName(
+        const QString &variable, reporting::DataConstraintViolationReport &violationReport)
+{
+    static const QString nestedStateSeparator = QStringLiteral("_0_");
+    const auto tokens = variable.split(QChar('.'));
+    violationReport.functionName = tokens.at(VariableParseTokens::VariableFunction);
+    // try to split last token into nested state and proper variable name
+    if (tokens.at(VariableParseTokens::VariableName).contains(nestedStateSeparator)) {
+        const auto nestedTokens = tokens.at(VariableParseTokens::VariableName).split(nestedStateSeparator);
+        violationReport.variableName = nestedTokens.last();
+        violationReport.nestedStateName = nestedTokens.first();
+    } else {
+        // name doesn't contain a nested state separator, indicating a nested state doesn't exist
+        violationReport.variableName = tokens.at(VariableParseTokens::VariableName);
+        violationReport.nestedStateName = QString();
+    }
 }

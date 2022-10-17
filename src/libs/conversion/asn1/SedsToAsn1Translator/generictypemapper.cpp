@@ -27,7 +27,7 @@ using seds::model::GenericAlternate;
 using seds::model::GenericTypeMap;
 using seds::model::GenericTypeMapSet;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 GenericTypeMapper::GenericTypeMapper(Context &context, QString parentName)
     : m_context(context)
@@ -35,7 +35,7 @@ GenericTypeMapper::GenericTypeMapper(Context &context, QString parentName)
 {
 }
 
-void GenericTypeMapper::addMappings(const seds::model::GenericTypeMapSet &typeMapSet)
+void GenericTypeMapper::addMappings(const ::seds::model::GenericTypeMapSet &typeMapSet)
 {
     const auto &typeMaps = typeMapSet.genericTypeMaps();
     for (const auto &typeMap : typeMaps) {
@@ -45,7 +45,7 @@ void GenericTypeMapper::addMappings(const seds::model::GenericTypeMapSet &typeMa
     if (typeMapSet.alternateSet()) {
         const auto &alternates = typeMapSet.alternateSet()->alternates();
 
-        seds::model::DataTypeRef determinantTypeRef;
+        ::seds::model::DataTypeRef determinantTypeRef;
         std::tie(m_determinantName, determinantTypeRef) = findDeterminant(alternates);
 
         m_determinantTypePath = handleDeterminantTypePath(determinantTypeRef);
@@ -121,12 +121,12 @@ void GenericTypeMapper::addAlternateMapping(const GenericAlternate &alternate)
     }
 }
 
-std::pair<QString, seds::model::DataTypeRef> GenericTypeMapper::findDeterminant(
+std::pair<QString, ::seds::model::DataTypeRef> GenericTypeMapper::findDeterminant(
         const std::vector<GenericAlternate> &alternates)
 {
     const auto determinants = std::accumulate(std::next(alternates.begin()), alternates.end(),
             getPossibleDeterminants(alternates.front()), [&](const auto &acc, const auto &alternate) {
-                std::vector<std::pair<QString, seds::model::DataTypeRef>> result;
+                std::vector<std::pair<QString, ::seds::model::DataTypeRef>> result;
 
                 const auto possibleDeterminants = getPossibleDeterminants(alternate);
 
@@ -148,10 +148,10 @@ std::pair<QString, seds::model::DataTypeRef> GenericTypeMapper::findDeterminant(
     return determinants.front();
 }
 
-std::vector<std::pair<QString, seds::model::DataTypeRef>> GenericTypeMapper::getPossibleDeterminants(
+std::vector<std::pair<QString, ::seds::model::DataTypeRef>> GenericTypeMapper::getPossibleDeterminants(
         const GenericAlternate &alternate)
 {
-    std::vector<std::pair<QString, seds::model::DataTypeRef>> possibleDeterminants;
+    std::vector<std::pair<QString, ::seds::model::DataTypeRef>> possibleDeterminants;
 
     for (const auto &typeMap : alternate.genericTypeMaps()) {
         if (typeMap.fixedValue().has_value()) {
@@ -165,7 +165,7 @@ std::vector<std::pair<QString, seds::model::DataTypeRef>> GenericTypeMapper::get
     return possibleDeterminants;
 }
 
-QString GenericTypeMapper::handleDeterminantTypePath(const seds::model::DataTypeRef &determinantTypeRef)
+QString GenericTypeMapper::handleDeterminantTypePath(const ::seds::model::DataTypeRef &determinantTypeRef)
 {
     const auto determinantTypeName = Escaper::escapeAsn1TypeName(determinantTypeRef.nameStr());
     const auto determinantTypeDefinitions = m_context.findAsn1TypeDefinitions(determinantTypeRef);
@@ -178,4 +178,4 @@ QString GenericTypeMapper::handleDeterminantTypePath(const seds::model::DataType
     }
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

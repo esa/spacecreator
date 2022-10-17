@@ -31,7 +31,7 @@ using conversion::simulink::PortsDataTypes;
 using simulink::model::Port;
 using simulink::model::VectorDimensions;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 PortDataTypeTranslator::PortDataTypeTranslator(Context &context)
     : m_context(context)
@@ -71,4 +71,4 @@ void PortDataTypeTranslator::translate(const Port &port)
     }
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

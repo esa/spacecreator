@@ -41,7 +41,7 @@ class Package;
 class Component;
 } // namespace seds::model
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Translator between SEDS model and ASN.1 model
@@ -80,29 +80,30 @@ public:
     virtual auto getDependencies() const -> std::set<ModelType> override;
 
 private:
-    auto translateSedsModel(const seds::model::SedsModel *sedsModel, const Options &options) const
+    auto translateSedsModel(const ::seds::model::SedsModel *sedsModel, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
 
-    auto translatePackage(const seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model,
-            const std::list<const seds::model::Package *> &sedsPackages, const Options &options) const -> void;
+    auto translatePackage(const ::seds::model::Package *sedsPackage, Asn1Acn::Asn1Model *asn1Model,
+            const std::list<const ::seds::model::Package *> &sedsPackages, const Options &options) const -> void;
 
-    auto translateComponent(const seds::model::Component &sedsComponent, const seds::model::Package *sedsPackage,
+    auto translateComponent(const ::seds::model::Component &sedsComponent, const ::seds::model::Package *sedsPackage,
             Asn1Acn::Definitions *packageAsn1Definitions, Asn1Acn::Asn1Model *asn1Model,
-            const std::list<const seds::model::Package *> &sedsPackages, const Options &options) const -> void;
+            const std::list<const ::seds::model::Package *> &sedsPackages, const Options &options) const -> void;
 
-    auto translateDataTypeSet(const std::list<const seds::model::DataType *> &sedsDataTypes, Context &context) const
+    auto translateDataTypeSet(const std::list<const ::seds::model::DataType *> &sedsDataTypes, Context &context) const
             -> void;
-    auto translateInterfaceDeclarations(const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations,
+    auto translateInterfaceDeclarations(const std::vector<::seds::model::InterfaceDeclaration> &interfaceDeclarations,
             Context &context) const -> void;
     auto translateInterfaceImplementations(
-            const std::vector<seds::model::Interface> &providedInterfaces, Context &context) const -> void;
-    auto translateGenericTypes(const seds::model::Interface &interface,
-            const seds::model::InterfaceDeclaration *interfaceDeclaration, const seds::model::Component &component,
+            const std::vector<::seds::model::Interface> &providedInterfaces, Context &context) const -> void;
+    auto translateGenericTypes(const ::seds::model::Interface &interface,
+            const ::seds::model::InterfaceDeclaration *interfaceDeclaration, const ::seds::model::Component &component,
             Context &context, Context &interfaceContext) const -> void;
 
 private:
-    auto collectDataTypes(const seds::model::Package *package) const -> std::vector<const seds::model::DataType *>;
-    auto collectDataTypes(const seds::model::Component &component) const -> std::vector<const seds::model::DataType *>;
+    auto collectDataTypes(const ::seds::model::Package *package) const -> std::vector<const ::seds::model::DataType *>;
+    auto collectDataTypes(const ::seds::model::Component &component) const
+            -> std::vector<const ::seds::model::DataType *>;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds
