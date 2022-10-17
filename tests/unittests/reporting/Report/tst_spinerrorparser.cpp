@@ -36,6 +36,7 @@ class tst_SpinErrorParser : public QObject
 private Q_SLOTS:
     void testNoError();
     void testViolationVariableType();
+    void testNestedVariable();
 
 private:
     QString readFile(const QString &filepath);
@@ -43,7 +44,10 @@ private:
 
 void tst_SpinErrorParser::testNoError()
 {
-    const QString spinMessage;
+    // read message file
+    const QString filepath("resources/spin_no_error_output.txt");
+    const QString spinMessage = readFile(filepath);
+
     const SpinErrorParser parser;
     const SpinErrorReport errorReport = parser.parse(spinMessage);
 
@@ -65,11 +69,37 @@ void tst_SpinErrorParser::testViolationVariableType()
     QVERIFY(errorReportItem.errorDepth == 553);
 
     const auto errorDetails = qvariant_cast<DataConstraintViolationReport>(errorReportItem.parsedErrorDetails);
-    QVERIFY(errorDetails.variableName == QString("global_state.asw.tmp"));
+    QVERIFY(errorDetails.functionName == QString("asw"));
+    QVERIFY(errorDetails.variableName == QString("tmp"));
+    QVERIFY(errorDetails.nestedStateName == QString());
     QVERIFY(errorDetails.constraints
             == QList<QString>() << ">="
                                 << "<=");
     QVERIFY(errorDetails.boundingValues == QList<QVariant>() << QVariant(0.0f) << QVariant(10.0f));
+}
+
+void tst_SpinErrorParser::testNestedVariable()
+{
+    // read message file
+    const QString filepath("resources/spin_error_nested_output.txt");
+    const QString spinMessage = readFile(filepath);
+
+    const SpinErrorParser parser;
+    const auto errorReport = parser.parse(spinMessage);
+    QVERIFY(errorReport.size() == 1);
+
+    const auto errorReportItem = errorReport.at(0);
+    QVERIFY(errorReportItem.errorType == SpinErrorReportItem::DataConstraintViolation);
+    QVERIFY(errorReportItem.errorDepth == 293);
+
+    const auto errorDetails = qvariant_cast<DataConstraintViolationReport>(errorReportItem.parsedErrorDetails);
+    QVERIFY(errorDetails.functionName == QString("function2"));
+    QVERIFY(errorDetails.variableName == QString("b"));
+    QVERIFY(errorDetails.nestedStateName == QString("nestedstate"));
+    QVERIFY(errorDetails.constraints
+            == QList<QString>() << ">="
+                                << "<=");
+    QVERIFY(errorDetails.boundingValues == QList<QVariant>() << QVariant(5.0f) << QVariant(15.0f));
 }
 
 QString tst_SpinErrorParser::readFile(const QString &filepath)
