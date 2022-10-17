@@ -1,6 +1,6 @@
 %{Model}-DATAVIEW DEFINITIONS ::= BEGIN
 
-    PlatformSpecificPointer ::= INTEGER (0 .. 4294967295)
+    PlatformSpecificPointer ::= INTEGER (0 .. 18446744073709551615) -- 64bit max
 
     SystemBus ::= INTEGER (0 .. 255)
 
