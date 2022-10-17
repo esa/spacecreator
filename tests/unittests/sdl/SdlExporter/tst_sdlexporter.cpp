@@ -65,6 +65,7 @@ using conversion::Options;
 using conversion::exporter::ExportException;
 using conversion::sdl::SdlOptions;
 using sdl::Action;
+using sdl::Answer;
 using sdl::ContinuousSignal;
 using sdl::Decision;
 using sdl::Expression;
@@ -447,6 +448,7 @@ void tst_sdlexporter::testGenerateProcessWithDecisionExpressionAndAnswer()
                                                     .build())
                                     .withAnswer(
                                             SdlAnswerBuilder()
+                                                    .withLiteral(sdl::Answer::ElseLiteral)
                                                     .withTransition(
                                                             SdlTransitionBuilder()
                                                                     .withTask(SdlTaskBuilder()
@@ -515,7 +517,7 @@ void tst_sdlexporter::testGenerateProcessWithDecisionExpressionAndAnswer()
         "output sendOutput(x);",
         "task 'SOME EXAMPLE TASK';",
         "NEXTSTATE -;",
-        "else:",
+        "ELSE:",
         "task 'ANSWER UNKNOWN';",
         "NEXTSTATE -;",
         "enddecision;",

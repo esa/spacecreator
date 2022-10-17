@@ -31,4 +31,14 @@ const common::String &FieldRef::value() const
     return m_value;
 }
 
+bool operator==(const FieldRef &lhs, const FieldRef &rhs)
+{
+    return lhs.m_value == rhs.m_value;
+}
+
+bool operator!=(const FieldRef &lhs, const FieldRef &rhs)
+{
+    return !(lhs == rhs);
+}
+
 } // namespace seds::model

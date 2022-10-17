@@ -91,7 +91,7 @@ public:
      */
     virtual auto accept(Visitor &visitor) const -> void = 0;
 
-private:
+protected:
     QString m_name;
     QString m_comment;
 };

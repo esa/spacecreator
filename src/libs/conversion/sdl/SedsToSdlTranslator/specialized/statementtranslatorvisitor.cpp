@@ -19,20 +19,21 @@
 
 #include "statementtranslatorvisitor.h"
 
-#include "components/activities/coremathoperator.h"
-#include "descriptiontranslator.h"
-#include "mathoperationtranslator.h"
-#include "splinecalibratortranslator.h"
-#include "statemachinetranslator.h"
-#include "translation/exceptions.h"
+#include "constants.h"
+#include "specialized/descriptiontranslator.h"
+#include "specialized/mathoperationtranslator.h"
+#include "specialized/splinecalibratortranslator.h"
+#include "specialized/statemachinetranslator.h"
 
 #include <algorithm>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/options.h>
 #include <conversion/common/overloaded.h>
+#include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/SedsToIvTranslator/interfacetranslatorhelper.h>
 #include <ivcore/ivfunction.h>
 #include <regex>
+#include <seds/SedsModel/components/activities/coremathoperator.h>
 #include <seds/SedsOptions/options.h>
 
 using conversion::Escaper;
@@ -278,9 +279,6 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
     const auto commandName = sendCommand.command().value();
     const auto interfaceName = sendCommand.interface().value();
 
-    const auto callName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            interfaceName, commandName, ivm::IVInterface::InterfaceType::Required, m_options);
-
     // Check, if this is a sync return call
     const auto &command = m_context.getCommand(interfaceName, commandName);
     if (command != nullptr && command->interfaceType() == CommandInfo::HostInterfaceType::Provided
@@ -303,6 +301,9 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
         return;
     }
 
+    const auto callName = InterfaceTranslatorHelper::buildCommandInterfaceName(
+            interfaceName, commandName, ivm::IVInterface::InterfaceType::Required, m_options);
+
     // Process name carries iv-escaped component name
     const auto interface = findIvInterface(m_context.ivFunction(), callName);
     if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
@@ -312,15 +313,13 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
         }
     } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
             || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
-
-        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand, interface, m_options);
         m_sdlTransition->addAction(std::move(call));
     }
 }
 
 auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPrimitive &sendParameter) -> void
 {
-
     const auto parameterType = sendParameter.operation() == ::seds::model::ParameterOperation::Get
             ? InterfaceTranslatorHelper::InterfaceParameterType::Getter
             : InterfaceTranslatorHelper::InterfaceParameterType::Setter;
@@ -331,9 +330,9 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPr
             interfaceName, parameterName, parameterType, ivm::IVInterface::InterfaceType::Required);
 
     // Process name carries iv-escaped component name
-    const auto interface = findIvInterface(m_context.ivFunction(), callName);
+    const auto ivInterface = findIvInterface(m_context.ivFunction(), callName);
 
-    switch (interface->kind()) {
+    switch (ivInterface->kind()) {
     case ivm::IVInterface::OperationKind::Sporadic: {
         auto outputActions = translateOutput(callName, sendParameter);
         for (auto &action : outputActions) {
@@ -343,7 +342,7 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPr
     }
     case ivm::IVInterface::OperationKind::Protected:
     case ivm::IVInterface::OperationKind::Unprotected: {
-        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter, ivInterface, m_options);
         m_sdlTransition->addAction(std::move(call));
         return;
     }
@@ -460,7 +459,8 @@ auto StatementTranslatorVisitor::translatePolynomial(
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>
+        const ::seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface, const Options &options)
+        -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -477,11 +477,17 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
     for (const auto &argument : sendCommand.argumentValues()) {
         call->addArgument(translateArgument(argument));
     }
+
+    if (sendCommand.transaction()) {
+        handleTransaction(*sendCommand.transaction(), call.get(), ivInterface, options);
+    }
+
     return call;
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>
+        const ::seds::model::SendParameterPrimitive &sendParameter, ivm::IVInterface *ivInterface,
+        const Options &options) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -508,6 +514,10 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
         }
     }, value);
     // clang-format on
+
+    if (sendParameter.transaction()) {
+        handleTransaction(*sendParameter.transaction(), call.get(), ivInterface, options);
+    }
 
     return call;
 }
@@ -785,6 +795,25 @@ auto StatementTranslatorVisitor::generateLoopEnd(
     auto loopBackJoin = std::make_unique<::sdl::Join>();
     loopBackJoin->setLabel(startLabel->name());
     transition->addAction(std::move(loopBackJoin));
+}
+
+auto StatementTranslatorVisitor::handleTransaction(const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call,
+        ivm::IVInterface *ivInterface, const Options &options) -> void
+{
+    if (!options.isSet(conversion::seds::SedsOptions::transactionNameType)) {
+        throw TranslationException(
+                "SEDS transaction feature was used but no ASN.1 type for transaction name was specified");
+    }
+
+    const auto &transactionName = QString("\"%1\"").arg(transaction.value());
+    const auto transactionParamTypeName = options.value(conversion::seds::SedsOptions::transactionNameType).value();
+
+    auto transactionNameLiteral = std::make_unique<::sdl::VariableLiteral>(transactionName);
+    call->addArgument(std::move(transactionNameLiteral));
+
+    auto ivParameter = shared::InterfaceParameter(
+            Constants::transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
+    ivInterface->addParam(ivParameter);
 }
 
 }

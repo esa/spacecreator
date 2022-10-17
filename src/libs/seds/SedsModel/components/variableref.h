@@ -34,6 +34,12 @@ public:
 public:
     auto value() const -> const FieldRef &;
 
+public:
+    auto nameStr() const -> const QString &;
+
+    friend auto operator==(const VariableRef &lhs, const VariableRef &rhs) -> bool;
+    friend auto operator!=(const VariableRef &lhs, const VariableRef &rhs) -> bool;
+
 private:
     FieldRef m_value;
 };

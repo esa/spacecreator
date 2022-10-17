@@ -88,6 +88,9 @@ public:
      */
     virtual auto accept(Visitor &visitor) const -> void override;
 
+public:
+    const static inline QString ElseLiteral = "ELSE";
+
 private:
     std::unique_ptr<Transition> m_transition;
     VariableLiteral m_literal;

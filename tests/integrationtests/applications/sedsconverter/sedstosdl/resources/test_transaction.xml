@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Transaction">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <LongDescription>Number</LongDescription>
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+      <StringDataType name="CString" length="64" fixedLength="false">
+        <LongDescription>A simple variable-length C-style NULL terminated ASCII string</LongDescription>
+        <StringDataEncoding encoding="ASCII" terminationByte="0" />
+      </StringDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="ClkType">
+        <CommandSet>
+          <Command name="Tick" mode="sync"/>
+        </CommandSet>
+      </Interface>
+      <Interface name="PingType">
+        <CommandSet>
+          <Command name="PingCommand" mode="sync">
+            <Argument name="pingArg" type="Number" mode="in" />
+          </Command>
+        </CommandSet>
+        <ParameterSet>
+          <Parameter name="CoolParam" mode="sync" type="Number" readOnly="false"/>
+        </ParameterSet>
+      </Interface>
+      <Interface name="PongType">
+        <CommandSet>
+          <Command name="PongCommand" mode="sync">
+            <Argument name="PongArg" type="Number" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Pinger">
+        <ProvidedInterfaceSet>
+          <Interface name="Clk" type="ClkType"/>
+          <Interface name="Pong" type="PongType"/>
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="Ping" type="PingType"/>
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="pingVar" type="Number"/>
+            <Variable name="paramVar" type="Number"/>
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="DoPingSmall">
+              <Argument name="pingVar" type="Number"/>
+              <Body>
+                <SendCommandPrimitive interface="Ping" command="PingCommand" transaction="MakeItSmall">
+                  <ArgumentValue name="pingArg">
+                    <VariableRef variableRef="pingVar"/>
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="DoPingBig">
+              <Argument name="pingVar" type="Number"/>
+              <Body>
+                <SendCommandPrimitive interface="Ping" command="PingCommand" transaction="MakeItBig">
+                  <ArgumentValue name="pingArg">
+                    <VariableRef variableRef="pingVar"/>
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="DoParamSmall">
+              <Argument name="paramVar" type="Number"/>
+              <Body>
+                <SendParameterPrimitive interface="Ping" parameter="CoolParam" operation="set" transaction="MakeItSmall">
+                  <ArgumentValue>
+                    <VariableRef variableRef="paramVar"/>
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="DoParamBig">
+              <Argument name="paramVar" type="Number"/>
+              <Body>
+                <SendParameterPrimitive interface="Ping" parameter="CoolParam" operation="set" transaction="MakeItBig">
+                  <ArgumentValue>
+                    <VariableRef variableRef="paramVar"/>
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s1"/>
+              <State name="s2"/>
+              <State name="s3"/>
+              <State name="s4"/>
+              <Transition fromState="s1" toState="s2" name="t1">
+                <OnCommandPrimitive command="Tick" interface="Clk"/>
+                <Do activity="DoPingSmall">
+                  <ArgumentValue name="pingVar">
+                    <Value value="1" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="s2" toState="s3" name="t2">
+                <OnCommandPrimitive command="PongCommand" interface="Pong" transaction="PongSmall"/>
+                <Do activity="DoPingBig">
+                  <ArgumentValue name="pingVar">
+                    <Value value="10" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="s3" toState="s4" name="t3">
+                <OnCommandPrimitive command="PongCommand" interface="Pong" transaction="PongBig"/>
+                <Do activity="DoParamSmall">
+                  <ArgumentValue name="paramVar">
+                    <Value value="2" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="s4" toState="s1" name="t4">
+                <OnCommandPrimitive command="PongCommand" interface="Pong" transaction="PongParamSmall"/>
+                <Do activity="DoParamBig">
+                  <ArgumentValue name="paramVar">
+                    <Value value="20" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+      <Component name="Ponger">
+        <ProvidedInterfaceSet>
+          <Interface name="Ping" type="PingType"/>
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="Pong" type="PongType"/>
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="pongVar" type="Number"/>
+            <Variable name="mPingArgSmall" type="Number"/>
+            <Variable name="mPingArgBig" type="Number"/>
+            <Variable name="coolParam" type="Number"/>
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="coolParam" interface="Ping" parameter="CoolParam"/>
+          </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="DoPongSmall">
+              <Argument name="pongVar" type="Number"/>
+              <Body>
+                <SendCommandPrimitive interface="Pong" command="PongCommand" transaction="PongSmall">
+                  <ArgumentValue name="pongArg">
+                    <VariableRef variableRef="pongVar"/>
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="DoPongBig">
+              <Argument name="pongVar" type="Number"/>
+              <Body>
+                <SendCommandPrimitive interface="Pong" command="PongCommand" transaction="PongBig">
+                  <ArgumentValue name="pongArg">
+                    <VariableRef variableRef="pongVar"/>
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="DoParamSmall">
+              <Argument name="pongVar" type="Number"/>
+              <Body>
+                <SendCommandPrimitive interface="Pong" command="PongCommand" transaction="PongParamSmall">
+                  <ArgumentValue name="pongArg">
+                    <VariableRef variableRef="pongVar"/>
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+            <Activity name="DoParamBig">
+              <Argument name="pongVar" type="Number"/>
+              <Body>
+                <SendCommandPrimitive interface="Pong" command="PongCommand" transaction="PongParamBig">
+                  <ArgumentValue name="pongArg">
+                    <VariableRef variableRef="pongVar"/>
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s1"/>
+              <State name="s2"/>
+              <Transition fromState="s1" toState="s1" name="t1">
+                <OnCommandPrimitive command="PingCommand" interface="Ping" transaction="MakeItSmall">
+                  <ArgumentValue name="pingArg" outputVariableRef="mPingArgSmall"/>
+                </OnCommandPrimitive>
+                <Do activity="DoPongSmall">
+                  <ArgumentValue name="pongVar">
+                    <VariableRef variableRef="mPingArgSmall" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="s1" toState="s2" name="t2">
+                <OnCommandPrimitive command="PingCommand" interface="Ping" transaction="MakeItBig">
+                  <ArgumentValue name="pingArg" outputVariableRef="mPingArgBig"/>
+                </OnCommandPrimitive>
+                <Do activity="DoPongBig">
+                  <ArgumentValue name="pongVar">
+                    <VariableRef variableRef="pingArg" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="s2" toState="s2" name="t3">
+                <OnParameterPrimitive parameter="CoolParam" interface="Ping" operation="set" transaction="MakeItSmall"/>
+                <Do activity="DoParamSmall">
+                  <ArgumentValue name="pongVar">
+                     <Value value="1"/>
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="s2" toState="s1" name="t4">
+                <OnParameterPrimitive parameter="CoolParam" interface="Ping" operation="set" transaction="MakeItBig"/>
+                <Do activity="DoParamBig">
+                  <ArgumentValue name="pongVar">
+                     <Value value="999"/>
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>
