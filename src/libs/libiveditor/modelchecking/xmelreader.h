@@ -18,6 +18,8 @@
 #ifndef XMELREADER_H
 #define XMELREADER_H
 
+#include "spinconfigsaver.h"
+
 #include <QIODevice>
 #include <QXmlStreamReader>
 
@@ -35,6 +37,7 @@ public:
     QStringList getSubtypesSelected();
     QStringList getFunctionsSelected();
     QStringList getIfConfig();
+    SpinConfigData getSpinConfig();
 
 private:
     int readXMEL();
@@ -50,6 +53,8 @@ private:
     QStringList propertiesSelected;
     QStringList subtypesSelected;
     QStringList functionsSelected;
+
+    SpinConfigSaver spinConfigSaver;
 
     struct IFConfig;
     IFConfig *ifConfig;
