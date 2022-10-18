@@ -114,9 +114,9 @@ process Pinger;
                     NEXTSTATE s3;
                 /* CIF Answer (3300, 1687), (400, 50) */
                 ELSE:
+                    /* CIF NextState (3300, 1762), (200, 50) */
+                    NEXTSTATE -;
             enddecision;
-            /* CIF NextState (3900, 1762), (200, 50) */
-            NEXTSTATE -;
     endstate;
     /* CIF State (4200, 1612), (200, 50) */
     state s3;
@@ -130,9 +130,9 @@ process Pinger;
                     NEXTSTATE s4;
                 /* CIF Answer (4800, 1687), (400, 50) */
                 ELSE:
+                    /* CIF NextState (4800, 1762), (200, 50) */
+                    NEXTSTATE -;
             enddecision;
-            /* CIF NextState (5400, 1762), (200, 50) */
-            NEXTSTATE -;
     endstate;
     /* CIF State (5700, 1612), (200, 50) */
     state s4;
@@ -146,8 +146,8 @@ process Pinger;
                     NEXTSTATE s1;
                 /* CIF Answer (6300, 1687), (400, 50) */
                 ELSE:
+                    /* CIF NextState (6300, 1762), (200, 50) */
+                    NEXTSTATE -;
             enddecision;
-            /* CIF NextState (6900, 1762), (200, 50) */
-            NEXTSTATE -;
     endstate;
 endprocess Pinger;

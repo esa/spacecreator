@@ -100,6 +100,9 @@ public:
      */
     virtual auto accept(Visitor &visitor) const -> void override;
 
+    friend auto operator==(const Input &lhs, const Input &rhs) -> bool;
+    friend auto operator!=(const Input &lhs, const Input &rhs) -> bool;
+
 private:
     Transition *m_transition;
 

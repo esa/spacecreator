@@ -54,4 +54,14 @@ void Input::accept(Visitor &visitor) const
     visitor.visit(*this);
 }
 
+bool operator==(const Input &lhs, const Input &rhs)
+{
+    return lhs.m_name == rhs.m_name && lhs.m_parameters == rhs.m_parameters;
+}
+
+bool operator!=(const Input &lhs, const Input &rhs)
+{
+    return !(lhs == rhs);
+}
+
 } // namespace sdl
