@@ -51,7 +51,7 @@ void tst_HtmlReportBuilder::testNoError()
     auto reports = parser.parse(spinMessage);
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.parse(reports, htmlTemplatePath);
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
     QVERIFY(html == htmlResult);
 }
 
@@ -68,7 +68,7 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
     auto reports = parser.parse(spinMessage);
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.parse(reports, htmlTemplatePath);
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
     QVERIFY(html == htmlResult);
 }
 
@@ -85,7 +85,7 @@ void tst_HtmlReportBuilder::testDataConstraintViolationNested()
     auto reports = parser.parse(spinMessage);
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.parse(reports, htmlTemplatePath);
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
     QVERIFY(html == htmlResult);
 }
 

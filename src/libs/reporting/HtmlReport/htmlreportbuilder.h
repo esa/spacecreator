@@ -42,13 +42,14 @@ public:
     HtmlReportBuilder();
 
     /**
-     * @brief   Parse spin error report
+     * @brief   Build spin error report
      *
      * @param   spinErrorReport      Parsed error report from spin
+     * @param   templateFile         Path to the HTML template file
      *
      * @return  Error report in an HTML document format
      */
-    QString parse(const SpinErrorReport &spinErrorReport, const QString &templateFile) const;
+    QString buildHtmlReport(const SpinErrorReport &spinErrorReport, const QString &templateFile) const;
 
 private:
     Grantlee::Engine *m_engine = nullptr;

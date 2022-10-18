@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     }
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto htmlReport = htmlReportBuilder.parse(reports, templateFile.value());
+    const auto htmlReport = htmlReportBuilder.buildHtmlReport(reports, templateFile.value());
 
     QFile file(targetFile.value());
     if (file.open(QFile::WriteOnly)) {

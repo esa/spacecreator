@@ -34,7 +34,8 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
     m_engine->addTemplateLoader(m_fileLoader);
 }
 
-QString reporting::HtmlReportBuilder::parse(const SpinErrorReport &spinErrorReport, const QString &templateFile) const
+QString reporting::HtmlReportBuilder::buildHtmlReport(
+        const SpinErrorReport &spinErrorReport, const QString &templateFile) const
 {
     // get absolute path for template file
     const QFileInfo templateFileInfo(templateFile);
