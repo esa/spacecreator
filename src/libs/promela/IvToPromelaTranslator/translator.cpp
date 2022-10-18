@@ -309,7 +309,6 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 {
     const auto &additionalIncludes = options.values(PromelaOptions::additionalIncludes);
     const auto &modelFunctions = options.values(PromelaOptions::modelFunctionName);
-    // const auto &environmentFunctions = options.values(PromelaOptions::environmentFunctionName);
     const auto &observerAttachmentInfos = options.values(PromelaOptions::observerAttachment);
     const auto &observerNames = options.values(PromelaOptions::observerFunctionName);
     auto promelaModel = std::make_unique<PromelaSystemModel>();

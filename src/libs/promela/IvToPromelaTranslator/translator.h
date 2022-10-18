@@ -281,43 +281,138 @@ public:
      */
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
+    /**
+     * @brief Information about output observer
+     */
     struct ObserverInfo {
+        /**
+         * @brief Name of the observer
+         */
         QString m_observerName;
+        /**
+         * @brief Name of the interface to call in the observer
+         */
         QString m_observerInterface;
+        /**
+         * @brief Name of the channel which is owned by observer
+         */
         QString m_observerQueue;
     };
 
+    /**
+     * @brief Information about proctype in promela
+     */
     struct ProctypeInfo {
+        /**
+         * @brief name of the proctype in promela
+         */
         QString m_proctypeName;
+        /**
+         * @brief name of the interface which proctype originates from
+         */
         QString m_interfaceName;
+        /**
+         * @brief name of the channel in promela used to receive signals
+         */
         QString m_queueName;
+        /**
+         * @brief size of channel in promela
+         */
         size_t m_queueSize;
+        /**
+         * @brief proctype priority
+         */
         size_t m_priority;
+        /**
+         * @brief parameter type name (or empty for parameterless interfaces)
+         */
         QString m_parameterTypeName;
+        /**
+         * @brief parameter name (or empty for parameterless interfaces)
+         */
         QString m_parameterName;
+        /**
+         * @brief true if proctype originates from timer
+         */
         bool m_isTimer;
 
+        /**
+         * @brief map of possible senders.
+         *
+         * Currently only one sender is supported.
+         * The key is name of IV function
+         * The value is name of interface.
+         * In case of timer, this is empty container.
+         */
         QMap<QString, QString> m_possibleSenders;
+        /**
+         * @brief List of observers that shall be triggered before processing signal in proctype
+         */
         std::list<std::unique_ptr<ObserverInfo>> m_observers;
     };
 
+    /**
+     * @brief Information about environment proctype
+     */
     struct EnvProctypeInfo {
+        /**
+         * @brief name of the proctype in promela
+         */
         QString m_proctypeName;
+        /**
+         * @brief name of the interface which proctype originates from
+         */
         QString m_interfaceName;
+        /**
+         * @brief proctype priority
+         */
         size_t m_priority;
     };
 
+    /**
+     * @brief Representation of information about IV function in promela system.
+     *
+     * Every function consists of set proctypes.
+     */
     struct FunctionInfo {
+        /**
+         * @brief The flag to mark IV function as environment
+         */
         bool m_isEnvironment;
+        /**
+         * @brief all model proctypes of function.
+         * In case of normal function, only m_proctypes shall be non empty.
+         */
         std::map<QString, std::unique_ptr<ProctypeInfo>> m_proctypes;
+        /**
+         * @brief all environment proctypes, which are used to generate value.
+         */
         std::map<QString, std::unique_ptr<EnvProctypeInfo>> m_environmentProctypes;
+        /**
+         * @brief all environment proctypes, which are used to receive signals from model functions
+         */
         std::map<QString, std::unique_ptr<ProctypeInfo>> m_environmentSinkProctypes;
     };
 
+    /**
+     * @brief Representation of structure of promela system.
+     */
     struct SystemInfo {
-        std::map<QString, std::unique_ptr<FunctionInfo>> m_functions; // functions from IV
+        /**
+         * @brief all functions from IV that are part of promela system.
+         *
+         * This includes environment functions. The key in the map is name of the function.
+         */
+        std::map<QString, std::unique_ptr<FunctionInfo>> m_functions;
     };
 
+    /**
+     * @brief Prepare System Information based on model and conversion options.
+     *
+     * @param model input IVModel
+     * @param options conversion options
+     * @return system information
+     */
     std::unique_ptr<SystemInfo> prepareSystemInfo(const ivm::IVModel *model, const conversion::Options &options) const;
 
 private:
