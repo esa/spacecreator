@@ -82,6 +82,7 @@ public:
      * @param   filepaths    Paths to the files
      */
     void setSubtypesFilepaths(const std::vector<QString> &filepath);
+    void setDelta(std::optional<int> delta);
     /**
      * @brief Add Stop Condition files to verifier.
      *

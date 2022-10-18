@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
     std::optional<QString> processesBasePriority;
     std::vector<QString> subtypesFilepaths;
+    std::optional<int> delta;
 
     const QStringList args = app.arguments();
 
@@ -189,6 +190,26 @@ int main(int argc, char *argv[])
             }
             ++i;
             subtypesFilepaths.emplace_back(args[i]);
+        } else if (arg == "-delta") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing value after -delta");
+                exit(EXIT_FAILURE);
+            }
+            if (delta.has_value()) {
+                qCritical("Duplicated -delta argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+
+            bool valueOk;
+            args[i].toUInt(&valueOk);
+
+            if (!valueOk) {
+                qCritical("Delta is not an unsigned integer");
+                exit(EXIT_FAILURE);
+            }
+
+            delta = args[i].toInt();
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -211,6 +232,7 @@ int main(int argc, char *argv[])
             qInfo("                         Base priority will be added to interfaces priorities specified in ");
             qInfo("                         the Interface View");
             qInfo("  -sub <filepath>        Use <filepath> as an ASN.1 file used for subtyping");
+            qInfo("  -delta <delta value>   Set delta for reals generation");
             qInfo("  -h, --help             Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
@@ -241,6 +263,7 @@ int main(int argc, char *argv[])
     verifier.setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
     verifier.setProcessesBasePriority(std::move(processesBasePriority));
     verifier.setSubtypesFilepaths(subtypesFilepaths);
+    verifier.setDelta(delta);
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;

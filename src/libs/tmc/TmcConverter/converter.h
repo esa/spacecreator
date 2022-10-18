@@ -127,6 +127,7 @@ public:
      * @param   value   Priority to set
      */
     void setProcessesBasePriority(std::optional<QString> value);
+    void setDelta(std::optional<int> value);
     /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
@@ -203,6 +204,7 @@ private:
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
     std::optional<QString> m_processesBasePriority;
+    std::optional<int> m_delta;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;
