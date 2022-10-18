@@ -22,11 +22,24 @@
 #include <QString>
 
 namespace promela::model {
+/**
+ * @brief Representation of string literal in promela
+ */
 class StringConstant final
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param value Value of the string literal
+     */
     StringConstant(QString value);
 
+    /**
+     * @brief Getter for value of string literal
+     *
+     * @return value of string literal
+     */
     const QString &getValue() const noexcept;
 
 private:

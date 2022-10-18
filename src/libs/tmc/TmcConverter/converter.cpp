@@ -564,7 +564,6 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     Options options;
 
-    // options.add(PromelaOptions::enhancedSpinSupport);
     options.add(IvOptions::inputFilepath, inputFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
     options.add(PromelaOptions::outputFilepath, outputFilepath);
@@ -638,7 +637,6 @@ bool TmcConverter::convertDataview(
     options.add(IvOptions::inputFilepath, ivFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
 
-    // options.add(PromelaOptions::enhancedSpinSupport);
     options.add(PromelaOptions::outputFilepath, outputFilepath);
 
     return convertModel({ ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, {}, std::move(options));
@@ -847,7 +845,6 @@ bool TmcConverter::createEnvGenerationInlines(const QFileInfo &inputDataView, co
 
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
-    // options.add(PromelaOptions::enhancedSpinSupport);
     options.add(PromelaOptions::asn1ValueGeneration);
 
     for (const QString &datatype : envDatatypes) {

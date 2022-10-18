@@ -22,9 +22,18 @@
 #include <QString>
 
 namespace simulatortrail::translator {
+/**
+ * @brief Printer to properly print OCTET STRING value.
+ */
 class OctetStringPrinter final
 {
 public:
+    /**
+     * @brief Call operator used to convert string value to printable representation
+     *
+     * @brief arg value of OCTET STRING
+     * @return printable representation of OCTET STRING
+     */
     QString operator()(const QString &arg) const;
 };
 }

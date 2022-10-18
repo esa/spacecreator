@@ -24,13 +24,31 @@
 #include <QString>
 
 namespace spintrail::model {
+/**
+ * @brief Representation of continuous signal processing in spin trail
+ */
 class ContinuousSignal : public TrailEvent
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param functionName name of the function which owns continuous signal
+     */
     ContinuousSignal(QString functionName);
 
+    /**
+     * @brief Getter for function name
+     *
+     * @return Name of the function
+     */
     const QString &getFunctionName() const;
 
+    /**
+     * @brief Getter for event type
+     *
+     * @return Type of event
+     */
     EventType getEventType() const override;
 
 private:

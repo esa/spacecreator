@@ -9,14 +9,14 @@ target_sources(SpinTrailRegistrar
   ${INCLUDES})
 
 target_include_directories(SpinTrailRegistrar
-	PUBLIC .
-	PRIVATE ${CMAKE_SOURCE_DIR}/src/libs)
+    PUBLIC .
+    PRIVATE ${CMAKE_SOURCE_DIR}/src/libs)
 
 target_link_libraries(SpinTrailRegistrar
-	PRIVATE SpinTrail::Importer
-	Conversion::Registry
-	CommonProjectWarnings
-	PUBLIC Conversion::Common)
+    PRIVATE SpinTrail::Importer
+    Conversion::Registry
+    CommonProjectWarnings
+    PUBLIC Conversion::Common)
 
 add_format_target(SpinTrailRegistrar)
 add_tidy_target(SpinTrailRegistrar)

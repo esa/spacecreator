@@ -22,11 +22,24 @@
 #include "expression.h"
 
 namespace promela::model {
+/**
+ * @brief Representation of printf statement call in promela
+ */
 class PrintfStatement final
 {
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param arguments List of expressions for printf call
+     */
     PrintfStatement(const QList<Expression> &arguments);
 
+    /**
+     * @brief Getter for printf arguments
+     *
+     * @return List of arguments
+     */
     const QList<Expression> &getArguments() const noexcept;
 
 private:

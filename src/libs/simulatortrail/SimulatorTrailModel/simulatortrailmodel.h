@@ -27,9 +27,18 @@
 
 namespace simulatortrail::model {
 
+/**
+ * @brief Representation of Simulator trail model.
+ *
+ * The model consists of list of values in ASN.1 value notation.
+ * Every shall be instance of 'Observable-Event' type.
+ */
 class SimulatorTrailModel final : public conversion::Model
 {
 public:
+    /**
+     * @brief Default constructor. Constructs empty model.
+     */
     SimulatorTrailModel();
 
     /**
@@ -39,8 +48,18 @@ public:
      */
     conversion::ModelType modelType() const override;
 
+    /**
+     * @brief Add value to the model
+     *
+     * @param value Value to add
+     */
     void appendValue(Asn1Acn::ValuePtr value);
 
+    /**
+     * @brief Getter for all values in the model
+     *
+     * @return List of all values in simulator trail model
+     */
     const std::list<Asn1Acn::ValuePtr> &getValues() const;
 
 private:

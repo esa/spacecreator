@@ -25,15 +25,45 @@
 #include <cstddef>
 
 namespace spintrail::model {
+/**
+ * @brief Representation of reset_timer call in spin trail
+ */
 class SetTimerEvent : public TrailEvent
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param functionName name of the function
+     * @param timerName name of the timer
+     * @param interval interval of timer
+     */
     SetTimerEvent(QString functionName, QString timerName, size_t interval);
 
+    /**
+     * @brief Getter for function name
+     *
+     * @return name of the function
+     */
     const QString &getFunctionName() const;
+    /**
+     * @brief Getter for name of the timer
+     *
+     * @return name of the timer.
+     */
     const QString &getTimerName() const;
+    /**
+     * @brief Getter for the timer interval
+     *
+     * @return interval of timer
+     */
     size_t getInterval() const;
 
+    /**
+     * @brief Getter for event type
+     *
+     * @return Type of event
+     */
     EventType getEventType() const override;
 
 private:

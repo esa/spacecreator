@@ -22,9 +22,17 @@
 #include <conversion/common/registrar.h>
 
 namespace conversion::simulatortrail {
+/**
+   @brief Registers conversion capabilities for Simulator Trail model
+ */
 class SimulatorTrailRegistrar final : public Registrar
 {
 public:
+    /**
+     * @brief Register Simulator Trail conversion capabilities
+     *
+     * @param registry Registry to use
+     */
     bool registerCapabilities(conversion::Registry &registry) override;
 };
 }

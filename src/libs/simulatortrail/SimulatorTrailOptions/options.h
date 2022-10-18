@@ -22,9 +22,15 @@
 #include <QString>
 
 namespace conversion::simulatortrail {
+/**
+ * @brief Possible options for Simulator Trail conversion
+ */
 class SimulatorTrailOptions
 {
 public:
+    /**
+     * @brief Filepath of output file to save exported model
+     */
     inline static const QString outputFilepath = "SimulatorTrail_Export_OutputFilepath";
 };
 }

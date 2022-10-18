@@ -6,16 +6,16 @@ set(INCLUDES spintrailimporter.h)
 
 add_library(SpinTrailImporter STATIC)
 target_sources(SpinTrailImporter
-	PRIVATE "${SOURCES}"
-	"${INCLUDES}")
+    PRIVATE "${SOURCES}"
+    "${INCLUDES}")
 
 target_include_directories(SpinTrailImporter
-	PUBLIC .
-	PRIVATE ${CMAKE_SOURCE_DIR}/src/libs)
+    PUBLIC .
+    PRIVATE ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(SpinTrailImporter
-	PUBLIC Conversion::Common
-	SpinTrail::Model
-	PRIVATE CommonProjectWarnings)
+    PUBLIC Conversion::Common
+    SpinTrail::Model
+    PRIVATE CommonProjectWarnings)
 
 add_format_target(SpinTrailImporter)
 add_tidy_target(SpinTrailImporter)

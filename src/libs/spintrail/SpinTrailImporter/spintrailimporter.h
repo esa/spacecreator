@@ -28,7 +28,9 @@ class Options;
 }
 
 namespace spintrail::importer {
-
+/**
+ * @brief Importer to read spin trail
+ */
 class SpinTrailImporter final : public conversion::importer::ModelImporter
 {
 public:

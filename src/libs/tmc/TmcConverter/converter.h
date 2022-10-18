@@ -150,6 +150,15 @@ public:
      */
     auto attachObserver(const QString &observerPath, const uint32_t priority) -> bool;
 
+    /**
+     * @brief Process trace conversion
+     *
+     * This method converts spin trail into simulator trail
+     *
+     * @param inputFile input spin trail filepath
+     * @param outputFile output simulator trail filepath
+     * @return true if conversion succeed, otherwise false.
+     */
     bool convertTrace(const QString &inputFile, const QString &outputFile);
 
 private:

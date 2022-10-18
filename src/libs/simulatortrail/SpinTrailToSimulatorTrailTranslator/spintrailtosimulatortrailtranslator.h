@@ -31,6 +31,9 @@
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 
 namespace simulatortrail::translator {
+/**
+ * @brief Translate between Spin Trail model and Simulator Trail model
+ */
 class SpinTrailToSimulatorTrailTranslator final : public ::conversion::translator::Translator
 {
 public:

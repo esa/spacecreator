@@ -9,14 +9,14 @@ target_sources(SimulatorTrailRegistrar
   ${INCLUDES})
 
 target_include_directories(SimulatorTrailRegistrar
-	PUBLIC .
-	PRIVATE ${CMAKE_SOURCE_DIR}/src/libs)
+    PUBLIC .
+    PRIVATE ${CMAKE_SOURCE_DIR}/src/libs)
 
 target_link_libraries(SimulatorTrailRegistrar
-	PRIVATE SimulatorTrail::Exporter
-	Conversion::SpinTrailToSimulatorTrailTranslator
-	CommonProjectWarnings
-	PUBLIC Conversion::Common)
+    PRIVATE SimulatorTrail::Exporter
+    Conversion::SpinTrailToSimulatorTrailTranslator
+    CommonProjectWarnings
+    PUBLIC Conversion::Common)
 
 add_format_target(SimulatorTrailRegistrar)
 add_tidy_target(SimulatorTrailRegistrar)

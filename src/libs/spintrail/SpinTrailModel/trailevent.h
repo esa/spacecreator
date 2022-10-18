@@ -20,9 +20,15 @@
 #pragma once
 
 namespace spintrail::model {
+/**
+ * @brief Base class for all spin trail events
+ */
 class TrailEvent
 {
 public:
+    /**
+     * @brief Type of spin trail event
+     */
     enum class EventType
     {
         CHANNEL_EVENT,
@@ -31,7 +37,16 @@ public:
         RESET_TIMER_EVENT,
     };
 
+    /**
+     * @brief default destructor
+     */
     virtual ~TrailEvent() = default;
+
+    /**
+     * @brief Getter for event type
+     *
+     * @return Type of event
+     */
     virtual EventType getEventType() const = 0;
 };
 }

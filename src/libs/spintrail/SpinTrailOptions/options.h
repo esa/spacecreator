@@ -22,9 +22,13 @@
 #include <QString>
 
 namespace conversion::spintrail {
+/**
+ * @brief Possible options for Spin Trail conversion
+ */
 class SpinTrailOptions
 {
 public:
+    /** @brief Filepath of input file */
     inline static const QString inputFilepath = "SpinTrail_Import_InputFilepath";
 };
 }

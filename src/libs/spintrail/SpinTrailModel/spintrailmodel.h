@@ -28,10 +28,15 @@
 #include <memory>
 
 namespace spintrail::model {
-
+/**
+ * @brief Representation of Spin Trail model
+ */
 class SpinTrailModel final : public conversion::Model
 {
 public:
+    /**
+     * @brief Constructor. Constructs empty model
+     */
     SpinTrailModel();
 
     /**
@@ -41,8 +46,18 @@ public:
      */
     conversion::ModelType modelType() const override;
 
+    /**
+     * @brief Append event to the model
+     *
+     * @param event event to be added
+     */
     void appendEvent(std::unique_ptr<TrailEvent> event);
 
+    /**
+     * @brief Getter for all events in the model
+     *
+     * @return List of all events in model
+     */
     const std::list<std::unique_ptr<TrailEvent>> &getEvents() const;
 
 private:

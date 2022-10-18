@@ -22,9 +22,17 @@
 #include <conversion/common/registrar.h>
 
 namespace conversion::spintrail {
+/**
+ * @brief Registers conversion capabilities for Spin Trail model
+ */
 class SpinTrailRegistrar final : public Registrar
 {
 public:
+    /**
+     * @brief Register Spin Model conversion capabilities
+     *
+     * @param registry Registry to use
+     */
     bool registerCapabilities(conversion::Registry &registry) override;
 };
 }

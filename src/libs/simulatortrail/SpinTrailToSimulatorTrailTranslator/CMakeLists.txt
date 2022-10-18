@@ -1,13 +1,13 @@
 project(SpinTrailToSimulatorTrailTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES spintrailtosimulatortrailtranslator.cpp
-	spintrailvalueparser.cpp
-	octetstringprinter.cpp
-	ia5stringprinter.cpp)
+    spintrailvalueparser.cpp
+    octetstringprinter.cpp
+    ia5stringprinter.cpp)
 set(INCLUDES spintrailtosimulatortrailtranslator.h
-	spintrailvalueparser.h
-	octetstringprinter.h
-	ia5stringprinter.h)
+    spintrailvalueparser.h
+    octetstringprinter.h
+    ia5stringprinter.h)
 
 add_library(SpinTrailToSimulatorTrailTranslator STATIC)
 target_sources(SpinTrailToSimulatorTrailTranslator
@@ -22,9 +22,9 @@ target_link_libraries(SpinTrailToSimulatorTrailTranslator
                       Conversion::Converter
                       asn1library
                       SimulatorTrail::Model
-					  SpinTrail::Model
-					  Conversion::Asn1ToPromelaTranslator
-					  Conversion::IvToPromelaTranslator
+                      SpinTrail::Model
+                      Conversion::Asn1ToPromelaTranslator
+                      Conversion::IvToPromelaTranslator
   PRIVATE             CommonProjectWarnings)
 
 add_format_target(SpinTrailToSimulatorTrailTranslator)

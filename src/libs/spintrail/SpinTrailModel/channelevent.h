@@ -25,29 +25,88 @@
 #include <QString>
 
 namespace spintrail::model {
+/**
+ * @brief Representation of channel involved activity in Spin.
+ */
 class ChannelEvent : public TrailEvent
 {
 public:
+    /**
+     * @brief Type of channel operation
+     */
     enum class Type
     {
         Send,
         Recv,
     };
 
+    /**
+     * @brief Constructor
+     *
+     * @param type type of channel event
+     * @param proctypeName name of proctype that performed operation, or empty string for init
+     * @param channelName name of the channel
+     * @param parameters list of values send/received from channel
+     */
     ChannelEvent(Type type, QString proctypeName, QString channelName, QList<QString> parameters);
 
+    /**
+     * @brief Setter for channel operation event type
+     *
+     * @param type type of channel operation
+     */
     void setType(Type type);
+    /**
+     * @brief Getter for channel operation event type
+     *
+     * @return Type of channel operation
+     */
     Type getType() const;
 
+    /**
+     * @brief Setter for proctype name
+     *
+     * @param proctypeName name of proctype
+     */
     void setProctypeName(QString proctypeName);
+    /**
+     * @brief Getter for proctype name
+     *
+     * @return Name of proctype
+     */
     const QString &getProctypeName() const;
 
+    /**
+     * @brief Setter for channel name
+     *
+     * @param channelName name of channel
+     */
     void setChannelName(QString channelName);
+    /**
+     * @brief Getter for channel name
+     *
+     * @return Name of channel
+     */
     const QString &getChannelName() const;
 
+    /**
+     * @brief Setter for parameters
+     *
+     * @param parameters list of parameters
+     */
     void setParameters(QList<QString> parameters);
+    /**
+     * @brief Getter for parameters
+     *
+     * @return List of parameters
+     */
     const QList<QString> &getParameters() const;
 
+    /**
+     * @brief Getter for event type
+     *
+     * @return Type of event
+     */
     EventType getEventType() const override;
 
 private:

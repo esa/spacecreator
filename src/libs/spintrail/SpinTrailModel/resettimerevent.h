@@ -24,14 +24,38 @@
 #include <QString>
 
 namespace spintrail::model {
+/**
+ * @brief Representation of reset_timer call in spin trail
+ */
 class ResetTimerEvent : public TrailEvent
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param functionName name of the function
+     * @param timerName name of the timer
+     */
     ResetTimerEvent(QString functionName, QString timerName);
 
+    /**
+     * @brief Getter for function name
+     *
+     * @return name of the function
+     */
     const QString &getFunctionName() const;
+    /**
+     * @brief Getter for name of the timer
+     *
+     * @return name of the timer.
+     */
     const QString &getTimerName() const;
 
+    /**
+     * @brief Getter for event type
+     *
+     * @return Type of event
+     */
     EventType getEventType() const override;
 
 private:

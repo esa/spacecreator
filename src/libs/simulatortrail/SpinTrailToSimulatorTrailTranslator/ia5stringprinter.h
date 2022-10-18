@@ -22,9 +22,18 @@
 #include <QString>
 
 namespace simulatortrail::translator {
+/**
+ * @brief Printer to properly print IA5String value.
+ */
 class IA5StringPrinter final
 {
 public:
+    /**
+     * @brief Call operator used to convert string value to printable representation
+     *
+     * @brief arg value of IA5String
+     * @return printable representation of IA5String
+     */
     QString operator()(const QString &arg) const;
 };
 }

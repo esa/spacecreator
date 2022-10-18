@@ -24,12 +24,25 @@
 #include <asn1library/asn1/value.h>
 
 namespace simulatortrail::translator {
-
+/**
+ * @brief Parse value from Spin trail to value of Simulator Trail
+ */
 class SpinTrailValueParser final
 {
 public:
+    /**
+     * @brief Default constructor.
+     */
     SpinTrailValueParser();
 
+    /**
+     * @brief Parse value of spin trail to ASN.1 value with given type.
+     *
+     * @param spinTrailValue list of values from Spin Trail
+     * @param asn1Type desired ASN.1 type
+     * @return ASN.1 value of asn1Type constructed from spinTrailValue
+     * @throw TranslationException if value cannot be constructed
+     */
     Asn1Acn::ValuePtr parseValue(const QStringList &spinTrailValue, const Asn1Acn::Types::Type *asn1Type);
 
 private:
