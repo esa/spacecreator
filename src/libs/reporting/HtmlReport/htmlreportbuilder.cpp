@@ -39,9 +39,9 @@ QString reporting::HtmlReportBuilder::buildHtmlReport(
 {
     // get absolute path for template file
     const QFileInfo templateFileInfo(templateFile);
-    const auto templateFileAbs = templateFileInfo.absoluteFilePath();
+    const auto templateFileAbsolutePath = templateFileInfo.absoluteFilePath();
 
-    const Grantlee::Template stringTemplate = m_engine->loadByName(templateFileAbs);
+    const Grantlee::Template stringTemplate = m_engine->loadByName(templateFileAbsolutePath);
     const auto reportVariantList = buildReportVariant(spinErrorReport);
 
     QVariantHash mapping;
