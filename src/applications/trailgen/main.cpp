@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
     const QStringList args = app.arguments();
 
     std::optional<QString> inputIvFilepath;
+    std::optional<QString> outputDirectory;
     std::optional<QString> inputSpinTrailFilepath;
     std::optional<QString> outputSimulatorTrailFilepath;
     QStringList observerInfos;
@@ -99,13 +100,23 @@ int main(int argc, char *argv[])
                 qCritical("Missing filename after -o");
                 exit(EXIT_FAILURE);
             }
-            if (outputSimulatorTrailFilepath.has_value()) {
+            if (outputDirectory.has_value()) {
                 qCritical("Duplicated -o argument");
                 exit(EXIT_FAILURE);
             }
             ++i;
+            outputDirectory = args[i];
+        } else if (arg == "-ot") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing filename after -ot");
+                exit(EXIT_FAILURE);
+            }
+            if (outputSimulatorTrailFilepath.has_value()) {
+                qCritical("Duplicated -ot argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
             outputSimulatorTrailFilepath = args[i];
-            qDebug() << "Parse " << outputSimulatorTrailFilepath.value();
         } else if (arg == "-os") {
             ++i;
             observerInfos.append(args[i]);
@@ -122,7 +133,8 @@ int main(int argc, char *argv[])
             qInfo("trailgen: TASTE Model Checker trail generator");
             qInfo("Usage: trailgen [OPTIONS] <input spin trail>");
             qInfo("  -iv <filepath>         Use <filepath> as input InterfaceView");
-            qInfo("  -o  <filepath>         Use <filepath> as output Simulator Trail");
+            qInfo("  -o  <dir>              Use <dir> as output directory.");
+            qInfo("  -ot  <filepath>         Use <filepath> as output Simulator Trail");
             qInfo("  -os <filepath>[:priority]");
             qInfo("                         Use <filepath> as an Observer source file.");
             qInfo("                         Integer <priority> of the Observer is optional");
@@ -147,6 +159,10 @@ int main(int argc, char *argv[])
         qCritical("Missing mandatory argument: input InterfaceView");
         exit(EXIT_FAILURE);
     }
+    if (!outputDirectory.has_value()) {
+        qCritical("Missing mandatory argument: output directory");
+        exit(EXIT_FAILURE);
+    }
     if (!outputSimulatorTrailFilepath.has_value()) {
         qCritical("Missing mandatory argument: output SimulatorTrail filepath");
         exit(EXIT_FAILURE);
@@ -162,7 +178,8 @@ int main(int argc, char *argv[])
             + "simulation" + QDir::separator() + "observers" + QDir::separator() + "observer.asn";
 
     try {
-        std::unique_ptr<TmcConverter> converter = std::make_unique<TmcConverter>(inputIvFilepath.value(), "tmc");
+        std::unique_ptr<TmcConverter> converter =
+                std::make_unique<TmcConverter>(inputIvFilepath.value(), outputDirectory.value());
         converter->setEnvironmentFunctions(environmentFunctions);
         converter->setKeepFunctions(keepFunctions);
         converter->setMscObserverFiles(mscObserverFiles);

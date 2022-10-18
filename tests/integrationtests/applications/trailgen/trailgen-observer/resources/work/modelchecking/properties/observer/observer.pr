@@ -1,0 +1,52 @@
+system observer;
+    /* CIF TEXT (144, 214), (481, 140) */
+    use datamodel comment 'observer.asn';
+    
+    signal do_work(MyInteger) renames output work from controller to actuator;
+    /* CIF ENDTEXT */
+    channel c
+        from env to observer with do_work;
+        from observer to env with do_work;
+    endchannel;
+    block observer;
+        signalroute r
+            from env to observer with do_work;
+            from observer to env with do_work;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process observer;
+            /* CIF TEXT (8, 67), (222, 140) */
+            monitor st System_State;
+            
+            monitor event Observable_Event;
+            
+            errorstates error;
+            /* CIF ENDTEXT */
+            /* CIF START (363, 74), (70, 35) */
+            START;
+                /* CIF NEXTSTATE (363, 129), (70, 35) */
+                NEXTSTATE Wait;
+            /* CIF state (593, 235), (70, 35) */
+            state Wait;
+                /* CIF input (559, 290), (137, 35) */
+                input do_work(myparam);
+                    /* CIF decision (574, 345), (105, 50) */
+                    decision myparam > 15;
+                        /* CIF ANSWER (523, 415), (70, 23) */
+                        (true):
+                            /* CIF NEXTSTATE (523, 458), (70, 35) */
+                            NEXTSTATE error;
+                        /* CIF ANSWER (638, 415), (70, 23) */
+                        (false):
+                            /* CIF output (604, 458), (137, 35) */
+                            output do_work(myparam);
+                            /* CIF NEXTSTATE (638, 513), (70, 35) */
+                            NEXTSTATE Wait;
+                    enddecision;
+            endstate;
+            /* CIF state (614, 98), (70, 35) */
+            state error;
+            endstate;
+        endprocess observer;
+    endblock;
+endsystem;

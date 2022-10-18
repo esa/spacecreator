@@ -22,6 +22,8 @@
 #include <spintrail/SpinTrailImporter/spintrailimporter.h>
 #include <spintrail/SpinTrailModel/channelevent.h>
 #include <spintrail/SpinTrailModel/continuoussignal.h>
+#include <spintrail/SpinTrailModel/resettimerevent.h>
+#include <spintrail/SpinTrailModel/settimerevent.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 #include <spintrail/SpinTrailOptions/options.h>
 
@@ -30,6 +32,8 @@ using conversion::spintrail::SpinTrailOptions;
 using spintrail::importer::SpinTrailImporter;
 using spintrail::model::ChannelEvent;
 using spintrail::model::ContinuousSignal;
+using spintrail::model::ResetTimerEvent;
+using spintrail::model::SetTimerEvent;
 using spintrail::model::SpinTrailModel;
 using spintrail::model::TrailEvent;
 
@@ -52,7 +56,7 @@ void tst_SpinTrailImporter::testScenario()
     const SpinTrailModel *model = dynamic_cast<const SpinTrailModel *>(abstractModel.get());
     QVERIFY(model != nullptr);
 
-    QCOMPARE(model->getEvents().size(), 8);
+    QCOMPARE(model->getEvents().size(), 10);
 
     auto iter = model->getEvents().begin();
 
@@ -139,6 +143,23 @@ void tst_SpinTrailImporter::testScenario()
         QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CONTINUOUS_SIGNAL);
         const ContinuousSignal &event = dynamic_cast<const ContinuousSignal &>(*trailEvent);
         QCOMPARE(event.getFunctionName(), "Actuator");
+    }
+    {
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
+        ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::SET_TIMER_EVENT);
+        const SetTimerEvent &event = dynamic_cast<const SetTimerEvent &>(*trailEvent);
+        QCOMPARE(event.getFunctionName(), "actuator");
+        QCOMPARE(event.getTimerName(), "trigger");
+        QCOMPARE(event.getInterval(), 1000);
+    }
+    {
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
+        ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::RESET_TIMER_EVENT);
+        const ResetTimerEvent &event = dynamic_cast<const ResetTimerEvent &>(*trailEvent);
+        QCOMPARE(event.getFunctionName(), "actuator");
+        QCOMPARE(event.getTimerName(), "trigger");
     }
 }
 }

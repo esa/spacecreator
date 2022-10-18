@@ -1,0 +1,9 @@
+TEST-SIMU-CS-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+
+   MyTestInteger ::= MyInteger (3)
+
+END
+
