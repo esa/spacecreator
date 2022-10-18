@@ -19,6 +19,7 @@
 
 #include "htmlreportbuilder.h"
 
+#include <QDir>
 #include <QFileInfo>
 #include <grantlee/outputstream.h>
 #include <grantlee_templates.h>
@@ -28,8 +29,7 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
 {
     // initialize file loader relative to the root path
     m_fileLoader = QSharedPointer<Grantlee::FileSystemTemplateLoader>::create();
-    m_fileLoader->setTemplateDirs({ "/" });
-
+    m_fileLoader->setTemplateDirs({ QDir::rootPath() });
     m_engine = new Grantlee::Engine(this);
     m_engine->addTemplateLoader(m_fileLoader);
 }
