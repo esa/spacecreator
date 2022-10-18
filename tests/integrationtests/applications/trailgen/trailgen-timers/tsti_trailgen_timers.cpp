@@ -13,7 +13,7 @@ private Q_SLOTS:
 void tsti_TrailgenTimers::test_trailgenTimers()
 {
     const int result = system("./test_trailgen_timers.sh");
-    QCOMPARE(result, 1);
+    QCOMPARE(result, 0);
 }
 }
 
