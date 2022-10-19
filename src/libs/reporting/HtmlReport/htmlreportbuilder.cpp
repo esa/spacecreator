@@ -81,6 +81,9 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
     case reporting::SpinErrorReportItem::DataConstraintViolation:
         variantErrorDetails = buildDataConstraintViolationVariant(spinErrorReportItem.parsedErrorDetails);
         break;
+    case reporting::SpinErrorReportItem::StopConditionViolation:
+        variantErrorDetails = buildStopConditionViolationVariant(spinErrorReportItem.parsedErrorDetails);
+        break;
     default:
         break;
     }
@@ -112,6 +115,12 @@ QVariantHash reporting::HtmlReportBuilder::buildDataConstraintViolationVariant(c
 
     variantHash.insert("constraints", variantConstraints);
     variantHash.insert("boundingValues", variantBoundingValues);
+    return variantHash;
+}
+
+QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(const QVariant &)
+{
+    QVariantHash variantHash;
     return variantHash;
 }
 

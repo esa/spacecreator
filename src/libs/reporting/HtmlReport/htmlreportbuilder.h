@@ -61,6 +61,7 @@ private:
     static QVariantHash buildReportItemVariant(const SpinErrorReportItem &spinErrorReportItem);
 
     static QVariantHash buildDataConstraintViolationVariant(const QVariant &errorDetails);
+    static QVariantHash buildStopConditionViolationVariant(const QVariant &errorDetails);
 };
 
 }
