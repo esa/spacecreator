@@ -1,0 +1,150 @@
+/* CIF Process (0, 0), (800, 100) */
+process Calculator;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl Xvaluevar Number;
+    dcl Yvaluevar Number;
+    dcl Resultvar Number;
+    dcl Coolparam Number;
+    dcl Paramvar Number;
+    dcl sedsFailureReportingVariable CoolBool;
+    dcl sedsFailureReportingReturnVariable CoolBool;
+    dcl CalculatorInterface_DivideCommand_Pi_transactionName CString;
+    dcl Set_CalculatorInterface_CoolParam_Pi_transactionName CString;
+    /* CIF ENDTEXT */
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure DoDivide;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Xvaluearg Number,
+            in Yvaluearg Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Decision (0, 862), (400, 50) */
+            decision Yvaluearg = 0;
+                /* CIF Answer (0, 937), (400, 50) */
+                (True):
+                    /* CIF Task (0, 1012), (100, 50) */
+                    task sedsFailureReportingReturnVariable := true;
+                    /* CIF Join (0, 1087), (100, 50) */
+                    join condition_1;
+                /* CIF Answer (600, 937), (400, 50) */
+                (False):
+                    /* CIF Task (600, 1012), (100, 50) */
+                    task Resultvar := Xvaluearg / Yvaluearg;
+                    /* CIF Task (600, 1087), (100, 50) */
+                    task sedsFailureReportingReturnVariable := false;
+                    /* CIF Join (600, 1162), (100, 50) */
+                    join condition_1;
+            enddecision;
+            /* CIF Label (1200, 1012), (100, 50) */
+            condition_1:
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 975), (800, 50) */
+    procedure CalculatorInterface_DivideCommand_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Xvalue Number,
+            in Yvalue Number,
+            in/out Result Number,
+            in/out Sedsfailure CoolBool,
+            in sedsTransactionName CString;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task CalculatorInterface_DivideCommand_Pi_transactionName := sedsTransactionName;
+            /* CIF Decision (0, 937), (400, 50) */
+            decision sedsTransactionName;
+                /* CIF Answer (0, 1012), (400, 50) */
+                ("Command"):
+                    /* CIF Task (0, 1087), (100, 50) */
+                    task Xvaluevar := Xvalue;
+                    /* CIF Task (0, 1162), (100, 50) */
+                    task Yvaluevar := Yvalue;
+                    /* CIF ProcedureCall (0, 1237), (100, 50) */
+                    call DoDivide(Xvaluevar, Yvaluevar);
+                    /* CIF Task (0, 1312), (100, 50) */
+                    task Result := Resultvar;
+                    /* CIF Task (0, 1387), (100, 50) */
+                    task sedsFailure := sedsFailureReportingReturnVariable;
+                /* CIF Answer (600, 1012), (400, 50) */
+                ELSE:
+            enddecision;
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 1050), (800, 50) */
+    procedure Get_CalculatorInterface_CoolParam_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in/out Param Number,
+            in/out Sedsfailure CoolBool;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Param := Coolparam;
+            /* CIF Task (0, 1012), (100, 50) */
+            task sedsFailureReportingVariable := false;
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 1125), (800, 50) */
+    procedure Set_CalculatorInterface_CoolParam_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Param Number,
+            in/out Sedsfailure CoolBool,
+            in sedsTransactionName CString;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Set_CalculatorInterface_CoolParam_Pi_transactionName := sedsTransactionName;
+            /* CIF Decision (0, 937), (400, 50) */
+            decision sedsTransactionName;
+                /* CIF Answer (0, 1012), (400, 50) */
+                ("Param"):
+                    /* CIF Task (0, 1087), (100, 50) */
+                    task Coolparam := Param;
+                /* CIF Answer (600, 1012), (400, 50) */
+                ELSE:
+            enddecision;
+            /* CIF Task (1200, 1087), (100, 50) */
+            task sedsFailureReportingVariable := false;
+    return;
+    endprocedure;
+    /* CIF Start (0, 1200), (200, 75) */
+    START;
+        /* CIF NextState (0, 1387), (200, 50) */
+        NEXTSTATE s1;
+    /* CIF State (0, 1462), (200, 50) */
+    state s1;
+        /* CIF Input (0, 1462), (200, 50) */
+        input Set_CalculatorInterface_CoolParam_Pi;
+            /* CIF Decision (0, 1462), (400, 50) */
+            decision Set_CalculatorInterface_CoolParam_Pi_transactionName;
+                /* CIF Answer (0, 1537), (400, 50) */
+                ("Param"):
+                    /* CIF NextState (0, 1612), (200, 50) */
+                    NEXTSTATE s1;
+                /* CIF Answer (1800, 1537), (400, 50) */
+                ELSE:
+                    /* CIF NextState (1800, 1612), (200, 50) */
+                    NEXTSTATE -;
+            enddecision;
+        /* CIF Input (300, 1462), (200, 50) */
+        input CalculatorInterface_DivideCommand_Pi;
+            /* CIF Decision (300, 1462), (400, 50) */
+            decision CalculatorInterface_DivideCommand_Pi_transactionName;
+                /* CIF Answer (300, 1537), (400, 50) */
+                ("Command"):
+                    /* CIF NextState (300, 1612), (200, 50) */
+                    NEXTSTATE s1;
+                /* CIF Answer (3000, 1537), (400, 50) */
+                ELSE:
+                    /* CIF NextState (3000, 1612), (200, 50) */
+                    NEXTSTATE -;
+            enddecision;
+    endstate;
+endprocess Calculator;
