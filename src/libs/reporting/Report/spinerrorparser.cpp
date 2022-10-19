@@ -68,6 +68,11 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawEr
     return variableViolation;
 }
 
+QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &) const
+{
+    return QVariant();
+}
+
 reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
         const QRegularExpressionMatch &matchedError) const
 {
@@ -80,6 +85,9 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
     switch (reportItem.errorType) {
     case SpinErrorReportItem::DataConstraintViolation:
         reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
+        break;
+    case SpinErrorReportItem::StopConditionViolation:
+        reportItem.parsedErrorDetails = parseStopConditionViolation(reportItem.rawErrorDetails);
         break;
     default:
         break;
@@ -112,6 +120,12 @@ QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex
     pattern += QStringLiteral("([\\d\\.]+)");
     // closing parenthesis
     pattern += QStringLiteral("\\)");
+    return QRegularExpression(pattern);
+}
+
+QRegularExpression reporting::SpinErrorParser::buildStopConditionViolationRegex()
+{
+    QString pattern;
     return QRegularExpression(pattern);
 }
 

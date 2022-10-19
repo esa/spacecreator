@@ -41,5 +41,5 @@ struct DataConstraintViolationReport {
 
 }
 
-// Add meta type for QVariant compability
+// Add meta type for QVariant compatibility
 Q_DECLARE_METATYPE(reporting::DataConstraintViolationReport)

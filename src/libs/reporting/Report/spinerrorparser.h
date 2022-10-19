@@ -21,6 +21,7 @@
 
 #include "dataconstraintviolationreport.h"
 #include "spinerrorreportitem.h"
+#include "stopconditionviolationreport.h"
 
 class QRegularExpressionMatch;
 class QRegularExpressionMatchIterator;
@@ -74,11 +75,13 @@ public:
 private:
     QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
     QVariant parseVariableViolation(const QString &rawError) const;
+    QVariant parseStopConditionViolation(const QString &rawError) const;
 
     SpinErrorReportItem buildReportItem(const QRegularExpressionMatch &matchedError) const;
 
     static QRegularExpression buildSpinErrorRegex();
     static QRegularExpression buildDataConstraintViolationRegex();
+    static QRegularExpression buildStopConditionViolationRegex();
 
     static void parseVariableName(const QString &variable, DataConstraintViolationReport &violationReport);
 };
