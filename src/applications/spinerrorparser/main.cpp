@@ -123,16 +123,29 @@ int main(int argc, char *argv[])
         qDebug() << "Error type:" << report.errorType;
         qDebug() << "Error depth:" << report.errorDepth;
         qDebug() << "Error details (raw):" << report.rawErrorDetails;
-        const DataConstraintViolationReport dataConstraintViolationReport =
-                qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
-        qDebug() << "Function name:" << dataConstraintViolationReport.functionName;
-        qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
-        qDebug() << "Nested state:" << dataConstraintViolationReport.nestedStateName;
-        for (auto constraint : dataConstraintViolationReport.constraints) {
-            qDebug() << "    Constraint:" << constraint;
-        }
-        for (auto boundingValue : dataConstraintViolationReport.boundingValues) {
-            qDebug() << "    Bounding value:" << boundingValue;
+
+        switch (report.errorType) {
+        case SpinErrorReportItem::DataConstraintViolation: {
+            const DataConstraintViolationReport dataConstraintViolationReport =
+                    qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
+            qDebug() << "Function name:" << dataConstraintViolationReport.functionName;
+            qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
+            qDebug() << "Nested state:" << dataConstraintViolationReport.nestedStateName;
+            for (auto constraint : dataConstraintViolationReport.constraints) {
+                qDebug() << "    Constraint:" << constraint;
+            }
+            for (auto boundingValue : dataConstraintViolationReport.boundingValues) {
+                qDebug() << "    Bounding value:" << boundingValue;
+            }
+        } break;
+        case SpinErrorReportItem::StopConditionViolation: {
+            const StopConditionViolationReport stopConditionViolationReport =
+                    qvariant_cast<StopConditionViolationReport>(report.parsedErrorDetails);
+            qDebug() << "Function name:" << stopConditionViolationReport.functionName;
+        } break;
+        default:
+            qDebug() << "unknown error";
+            break;
         }
     }
 
