@@ -1,0 +1,29 @@
+pan:1: assertion violated ((global_state.function2.nestedstate_0_b>=5)&&(global_state.function2.nestedstate_0_b<=15)) (at depth 293)
+pan: wrote system.pml.trail
+
+(Spin Version 6.4.9 -- 17 December 2018)
+Warning: Search not completed
+
+Full statespace search for:
+	never claim         	- (none specified)
+	assertion violations	+
+	acceptance   cycles 	- (not selected)
+	invalid end states	+
+
+State-vector 296 byte, depth reached 293, errors: 1
+       63 states, stored
+        7 states, matched
+       70 transitions (= stored+matched)
+      307 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.019	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.276	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.611	memory used for DFS stack (-m10000)
+  128.806	total actual memory usage
+
+
+
+pan: elapsed time 0.01 seconds

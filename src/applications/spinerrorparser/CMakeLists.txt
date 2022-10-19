@@ -14,6 +14,7 @@ target_include_directories(spinerrorparser
 target_link_libraries(spinerrorparser
     PUBLIC      ivcore
                 libiveditor
+                HtmlReport
                 Report
     PRIVATE     CommonProjectWarnings)
 

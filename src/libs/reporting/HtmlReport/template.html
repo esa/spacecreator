@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <title>Spin Error Report</title>
+    <style>
+      table, td {border: 1px black solid;}
+      td {padding: 6px;}
+    </style>
+  </head>
+  <body>
+    <h1>Spin Error Report</h1>
+  
+    {% for reportItem in report %}
+      <table>
+        <tr>
+          <td>Error Type</td>
+          <td>{{ reportItem.errorType }}</td>
+        </tr>
+        <tr>
+          <td>Error Number</td>
+          <td><tt>{{ reportItem.errorNumber }}</tt></td>
+        </tr>
+        <tr>
+          <td>Error Depth</td>
+          <td><tt>{{ reportItem.errorDepth }}</tt></td>
+        </tr>
+        <tr>
+          <td>Error Details</td>
+          <td>
+            <i>Function Name:</i> <tt>{{ reportItem.errorDetails.functionName }}</tt><br>
+            <i>Variable Name:</i> <tt>{{ reportItem.errorDetails.variableName }}</tt><br>
+            {% if reportItem.errorDetails.nestedStateName|length > 0 %}
+              <i>Nested State Name:</i> <tt>{{ reportItem.errorDetails.nestedStateName }}</tt><br>
+            {% endif %}
+            <i>Constraint Details:</i><br>
+            <table>
+              <tr>
+                <td>Constraint</td>
+                {% for constraint in reportItem.errorDetails.constraints %}
+                  <td><tt>{{ constraint }}</tt></td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <td>Bounding Value</td>
+                {% for boundingValue in reportItem.errorDetails.boundingValues %}
+                  <td><tt>{{ boundingValue }}</tt></td>
+                {% endfor %}
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <i>Parsed from:</i><br>
+      <tt>{{ reportItem.rawErrorDetails }}</tt><br><br>
+    {% endfor %}
+  </body>
+</html>

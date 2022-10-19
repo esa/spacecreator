@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QList>
+#include <QMetaType>
 #include <QString>
 #include <QVariant>
 
@@ -53,3 +54,6 @@ struct SpinErrorReportItem {
 typedef QList<SpinErrorReportItem> SpinErrorReport;
 
 }
+
+// Add meta type for QVariant compability
+Q_DECLARE_METATYPE(reporting::SpinErrorReportItem)
