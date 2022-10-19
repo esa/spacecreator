@@ -59,6 +59,11 @@ void TmcVerifier::setProcessesBasePriority(std::optional<QString> value)
     m_converter->setProcessesBasePriority(std::move(value));
 }
 
+void TmcVerifier::setRealTypeEnabled(bool isRealTypeEnabled)
+{
+    m_converter->setRealTypeEnabled(isRealTypeEnabled);
+}
+
 void TmcVerifier::setDelta(std::optional<int> value)
 {
     m_converter->setDelta(std::move(value));

@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
     std::optional<QString> processesBasePriority;
     std::vector<QString> subtypesFilepaths;
     std::optional<int> delta;
+    bool isRealTypeEnabled;
 
     const QStringList args = app.arguments();
 
@@ -210,6 +211,9 @@ int main(int argc, char *argv[])
             }
 
             delta = args[i].toInt();
+        } else if (arg == "-real") {
+            ++i;
+            isRealTypeEnabled = true;
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Chcecker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -232,6 +236,7 @@ int main(int argc, char *argv[])
             qInfo("                         Base priority will be added to interfaces priorities specified in ");
             qInfo("                         the Interface View");
             qInfo("  -sub <filepath>        Use <filepath> as an ASN.1 file used for subtyping");
+            qInfo("  -real                  Enable support for real type");
             qInfo("  -delta <delta value>   Set delta for reals generation");
             qInfo("  -h, --help             Print this message and exit.");
             exit(EXIT_SUCCESS);
@@ -264,6 +269,7 @@ int main(int argc, char *argv[])
     verifier.setProcessesBasePriority(std::move(processesBasePriority));
     verifier.setSubtypesFilepaths(subtypesFilepaths);
     verifier.setDelta(delta);
+    verifier.setRealTypeEnabled(isRealTypeEnabled);
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;
