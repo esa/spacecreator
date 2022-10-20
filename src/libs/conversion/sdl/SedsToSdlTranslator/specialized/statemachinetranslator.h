@@ -43,8 +43,6 @@ namespace conversion::sdl::translator {
 class StateMachineTranslator final
 {
 public:
-    using InputHandler = std::pair<std::unique_ptr<::sdl::Input>, std::vector<std::unique_ptr<::sdl::Action>>>;
-
     /**
      * @brief   Translate the given SEDS state machine into SDL state machine
      *
@@ -59,8 +57,9 @@ public:
      *
      * @param context           Translation context
      * @param variables         Variables to be translated
+     * @param options           Conversion options
      */
-    static auto translateVariables(Context &context, const seds::model::ComponentImplementation::VariableSet &variables)
+    static auto translateVariables(Context &context, const seds::model::ComponentImplementation::VariableSet &variables, const Options &options)
             -> void;
 
     /**
@@ -142,10 +141,19 @@ private:
         Async
     };
 
+    struct InputHandler {
+        std::unique_ptr<::sdl::Input> input;
+        std::vector<std::unique_ptr<::sdl::Action>> actions;
+        bool isSporadic;
+    };
+
     struct TransitionInfo {
-        std::unique_ptr<::sdl::Transition> transition;
+        ::seds::model::Transition const *sedsTransition;
+        std::unique_ptr<::sdl::Transition> sdlTransition;
         std::unique_ptr<::sdl::Input> input;
         std::optional<QString> transactionName;
+        bool isSporadic;
+        bool isFailed;
     };
 
     using InputsForStatesMap = std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>>;
@@ -158,7 +166,7 @@ private:
     static auto getParameterInterface(ivm::IVFunction *function, const ParameterType type, const ParameterMode mode,
             const QString &interfaceName, const QString &parameterName) -> ivm::IVInterface *;
 
-    static auto createParameterSyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
+    static auto createParameterSyncPi(Context &context, ivm::IVInterface *ivInterface, const seds::model::ParameterMap &map,
             const std::vector<const ::seds::model::Transition *> &sedsTransitions, ::sdl::Process *sdlProcess,
             const ParameterType type, const Options &options) -> void;
     static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
@@ -179,8 +187,8 @@ private:
     static auto translatePrimitive(
             Context &context, const seds::model::OnCommandPrimitive &command, const Options &options) -> InputHandler;
 
-    static auto translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter)
-            -> InputHandler;
+    static auto translatePrimitive(Context &context, const seds::model::OnParameterPrimitive &parameter,
+            const Options &options) -> InputHandler;
 
     static auto translatePrimitive(Context &context, ::sdl::State *sdlFromState,
             const seds::model::Transition::Primitive &primitive, const Options &options) -> InputHandler;
@@ -199,10 +207,14 @@ private:
 
     static auto createInputs(Context &context, ::sdl::State *fromState,
             std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitions) -> void;
+    static auto createInput(
+            Context &context, ::sdl::State *fromState, StateMachineTranslator::TransitionInfo transitionInfo) -> void;
+    static auto createInputWithFailureReporting(Context &context, ::sdl::State *fromState,
+            std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void;
     static auto createInputWithTransactions(Context &context, ::sdl::State *fromState,
             std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void;
-    static auto createInputWithoutTransactions(
-            Context &context, ::sdl::State *fromState, StateMachineTranslator::TransitionInfo transitionInfo) -> void;
+    static auto createInputWithTransactionsAndFailureReporting(Context &context, ::sdl::State *fromState,
+            std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void;
 
     static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 

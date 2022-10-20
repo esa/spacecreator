@@ -26,6 +26,7 @@
 #include "specialized/statemachinetranslator.h"
 
 #include <algorithm>
+#include <conversion/asn1/SedsToAsn1Translator/constants.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/options.h>
 #include <conversion/common/overloaded.h>
@@ -38,6 +39,7 @@
 
 using conversion::Escaper;
 using conversion::iv::translator::seds::InterfaceTranslatorHelper;
+using conversion::seds::SedsOptions;
 using conversion::translator::TranslationException;
 using ::seds::model::CoreMathOperator;
 using ::seds::model::Polynomial;
@@ -297,7 +299,22 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
                         std::get<std::unique_ptr<::sdl::VariableLiteral>>(argumentValue)->value()));
             }
         }
+
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            const auto &failureParameterName = asn1::translator::seds::Constants::failureParamName;
+            const auto &failureVariableName = asn1::translator::seds::Constants::failureReturnVariableName;
+            const auto failureValue = sendCommand.isFailed() ? "true" : "false";
+
+            const auto failureVariableAssignment = QString("%1 := %2").arg(failureVariableName).arg(failureValue);
+            auto failureVariableAssignmentTask = std::make_unique<::sdl::Task>("", failureVariableAssignment);
+            m_sdlTransition->addAction(std::move(failureVariableAssignmentTask));
+
+            auto failureAssignmentInfo = AssignmentInfo(failureParameterName, failureVariableName);
+            info.addAssignment(std::move(failureAssignmentInfo));
+        }
+
         m_context.addActivityInfo(info.name(), info);
+
         return;
     }
 
@@ -305,15 +322,24 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
             interfaceName, commandName, ivm::IVInterface::InterfaceType::Required, m_options);
 
     // Process name carries iv-escaped component name
-    const auto interface = findIvInterface(m_context.ivFunction(), callName);
-    if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
+    const auto ivInterface = findIvInterface(m_context.ivFunction(), callName);
+    if (ivInterface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
         auto outputActions = translateOutput(callName, sendCommand, m_options);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
         }
-    } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
-            || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
-        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand, interface, m_options);
+    } else if (ivInterface->kind() == ivm::IVInterface::OperationKind::Protected
+            || ivInterface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
+        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand);
+
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            handleFailureReporting(call.get());
+        }
+
+        if (sendCommand.transaction()) {
+            handleTransaction(*sendCommand.transaction(), call.get(), ivInterface);
+        }
+
         m_sdlTransition->addAction(std::move(call));
     }
 }
@@ -342,7 +368,16 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPr
     }
     case ivm::IVInterface::OperationKind::Protected:
     case ivm::IVInterface::OperationKind::Unprotected: {
-        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter, ivInterface, m_options);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter);
+
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            handleFailureReporting(call.get());
+        }
+
+        if (sendParameter.transaction()) {
+            handleTransaction(*sendParameter.transaction(), call.get(), ivInterface);
+        }
+
         m_sdlTransition->addAction(std::move(call));
         return;
     }
@@ -459,8 +494,7 @@ auto StatementTranslatorVisitor::translatePolynomial(
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface, const Options &options)
-        -> std::unique_ptr<::sdl::ProcedureCall>
+        const ::seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -478,16 +512,11 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
         call->addArgument(translateArgument(argument));
     }
 
-    if (sendCommand.transaction()) {
-        handleTransaction(*sendCommand.transaction(), call.get(), ivInterface, options);
-    }
-
     return call;
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendParameterPrimitive &sendParameter, ivm::IVInterface *ivInterface,
-        const Options &options) -> std::unique_ptr<::sdl::ProcedureCall>
+        const ::seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -515,10 +544,6 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
     }, value);
     // clang-format on
 
-    if (sendParameter.transaction()) {
-        handleTransaction(*sendParameter.transaction(), call.get(), ivInterface, options);
-    }
-
     return call;
 }
 
@@ -531,9 +556,8 @@ auto StatementTranslatorVisitor::translateOutput(
     auto output = std::make_unique<::sdl::Output>();
     output->setName(callName);
     if (!sendCommand.argumentValues().empty()) {
-
         //--taste translation
-        if (options.isSet(conversion::seds::SedsOptions::tasteTranslation)) {
+        if (options.isSet(SedsOptions::tasteTranslation)) {
             if (sendCommand.argumentValues().size() != 1) {
                 throw TranslationException(
                         QString("More than one(%1) command.argumentValue is not allowed for --taste translation option")
@@ -656,14 +680,14 @@ auto StatementTranslatorVisitor::translateBooleanExpression(::sdl::Process *host
 auto StatementTranslatorVisitor::translateComparison(const ::seds::model::Comparison &comparison) -> QString
 {
     const auto left = translateVariableReference(comparison.firstOperand().variableRef().value().value());
-    const auto &right = std::visit(
-            overloaded {
-                    [](const ::seds::model::VariableRefOperand &reference) {
-                        return translateVariableReference(reference.variableRef().value().value());
-                    },
-                    [](const ::seds::model::ValueOperand &value) { return value.value().value(); },
-            },
-            comparison.secondOperand());
+    const auto &right =
+            std::visit(overloaded {
+                               [](const ::seds::model::VariableRefOperand &reference) {
+                                   return translateVariableReference(reference.variableRef().value().value());
+                               },
+                               [](const ::seds::model::ValueOperand &value) { return value.value().value(); },
+                       },
+                    comparison.secondOperand());
     const auto op = comparisonOperatorToString(comparison.comparisonOperator());
     return QString("%1 %2 %3").arg(left, op, right);
 }
@@ -797,16 +821,30 @@ auto StatementTranslatorVisitor::generateLoopEnd(
     transition->addAction(std::move(loopBackJoin));
 }
 
-auto StatementTranslatorVisitor::handleTransaction(const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call,
-        ivm::IVInterface *ivInterface, const Options &options) -> void
+auto StatementTranslatorVisitor::handleFailureReporting(::sdl::ProcedureCall *call) const -> void
 {
-    if (!options.isSet(conversion::seds::SedsOptions::transactionNameType)) {
+    const auto &failureVariableName = asn1::translator::seds::Constants::failureVariableName;
+
+    // Reset failure variable value
+    const auto failureVariableAssignment = QString("%1 := false").arg(failureVariableName);
+    auto failureVariableAssignmentTask = std::make_unique<::sdl::Task>("", failureVariableAssignment);
+    m_sdlTransition->addAction(std::move(failureVariableAssignmentTask));
+
+    // Add failure variable to the call
+    auto failureLiteral = std::make_unique<::sdl::VariableLiteral>(failureVariableName);
+    call->addArgument(std::move(failureLiteral));
+}
+
+auto StatementTranslatorVisitor::handleTransaction(
+        const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call, ivm::IVInterface *ivInterface) const -> void
+{
+    if (!m_options.isSet(SedsOptions::transactionNameType)) {
         throw TranslationException(
                 "SEDS transaction feature was used but no ASN.1 type for transaction name was specified");
     }
 
     const auto &transactionName = QString("\"%1\"").arg(transaction.value());
-    const auto transactionParamTypeName = options.value(conversion::seds::SedsOptions::transactionNameType).value();
+    const auto transactionParamTypeName = m_options.value(SedsOptions::transactionNameType).value();
 
     auto transactionNameLiteral = std::make_unique<::sdl::VariableLiteral>(transactionName);
     call->addArgument(std::move(transactionNameLiteral));
