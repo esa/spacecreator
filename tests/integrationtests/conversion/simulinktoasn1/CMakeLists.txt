@@ -9,10 +9,10 @@ target_sources(${TEST_NAME}
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(${TEST_NAME}
-    PRIVATE     Conversion::Common
-                SIMULINK::XmlImporter
-                Conversion::SimulinkToAsn1Translator
-                ASN1::Exporter
+    PRIVATE     Conversion::Converter
+                Conversion::Registry
+                Conversion::Asn1Registrar;
+                Conversion::SimulinkRegistrar;
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
 

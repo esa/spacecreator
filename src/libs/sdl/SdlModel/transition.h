@@ -64,11 +64,23 @@ public:
      */
     auto actions() -> const std::vector<std::unique_ptr<Action>> &;
     /**
+     * @brief   Getter for the last action
+     *
+     * @return  Pointer to the last action
+     */
+    auto lastAction() const -> const Action *;
+    /**
      * @brief    Setter for the actions
      *
      * @param    action  a pointer to action
      */
     auto addAction(std::unique_ptr<Action> action) -> void;
+    /**
+     * @brief   Removes last action
+     *
+     * @return  True if removed successfully, false otherwise
+     */
+    auto removeLastAction() -> bool;
 
     /**
      * @brief   Getter for this transition comment

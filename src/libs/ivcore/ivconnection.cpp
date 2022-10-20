@@ -365,7 +365,6 @@ bool IVConnection::postInit()
 
 IVConnection::ConnectionType IVConnection::connectionType() const
 {
-
     const IVInterface *srcIface = sourceInterface();
     const IVInterface *dstIface = targetInterface();
     if (!srcIface || !dstIface)

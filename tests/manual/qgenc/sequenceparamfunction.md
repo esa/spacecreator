@@ -2,8 +2,10 @@
 
 **1. Steps:**
 
-* Open project `tests/manual/qgenc/projects/not-working/sequenceparam/sequenceparam.pro`
+* Open project `tests/manual/qgenc/projects/sequenceparam/sequenceparam.pro`
 * Open the `interfaceview.xml` file
+* Clean the project
+* Right click on the interfaceview and select the "Generate/update code skeletons" option
 * Build and run the project
 
 Expected results:

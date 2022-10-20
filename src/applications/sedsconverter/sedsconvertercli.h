@@ -84,6 +84,10 @@ private:
      */
     void addSedsInputOptions(conversion::Options &options);
     /**
+     * @brief   Process options for translating SEDS model
+     */
+    void addSedsTranslationOptions(conversion::Options &options);
+    /**
      * @brief   Process options for output SEDS model
      */
     void addSedsOutputOptions(conversion::Options &options);

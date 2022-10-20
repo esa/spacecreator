@@ -1289,6 +1289,9 @@ const ::ivm::IVInterface *IvToPromelaTranslator::findProvidedInterface(
         const ::ivm::IVModel *model, const QString &fromFunction, const QString &interfaceName) const
 {
     const IVInterface *ri = findRequiredInterface(model, fromFunction, interfaceName);
+    if (ri == nullptr) {
+        return nullptr;
+    }
     const IVConnection *connection = model->getConnectionForIface(ri->id());
     if (connection != nullptr) {
         return connection->targetInterface();
@@ -1428,10 +1431,10 @@ IvToPromelaTranslator::ObserverAttachments IvToPromelaTranslator::getObserverAtt
             const QString fromFunction = getAttachmentFromFunction(context.ivModel(), attachment);
             const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
             const IVInterface *i = findProvidedInterface(context.ivModel(), fromFunction, attachment.interface());
-            const IVConnection *connection = context.ivModel()->getConnectionForIface(i->id());
+            const IVConnection *connection = i == nullptr ? nullptr : context.ivModel()->getConnectionForIface(i->id());
 
             // check possible connection
-            if (function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
+            if (connection != nullptr && function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
                     && interface.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0) {
                 result.push_back(attachment);
             }

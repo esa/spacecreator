@@ -18,7 +18,6 @@
 #pragma once
 
 #include "exportableivfunctiontype.h"
-#include "exportableivobject.h"
 
 namespace ivm {
 class IVFunction;

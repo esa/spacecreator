@@ -67,6 +67,7 @@ public:
         func_name,
         is_visible,
         language,
+        type_language,
         default_implementation,
         enable_multicast,
         layer,

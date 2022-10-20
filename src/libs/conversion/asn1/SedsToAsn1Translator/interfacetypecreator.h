@@ -29,7 +29,7 @@
 #include <seds/SedsModel/interfaces/interfacedeclaration.h>
 #include <seds/SedsModel/interfaces/interfaceparameter.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Helper for creating types for interface commands
@@ -66,35 +66,35 @@ public:
      * @param   interfaceDeclaration    Interface delcaration to handle
      * @param   context                 Current translation context
      */
-    auto createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context) -> void;
+    auto createTypes(const ::seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context) -> void;
     /**
      * @brief   Create types for interface
      *
      * @param   interface   Interface to handle
      * @param   context     Current translation context
      */
-    auto createTypes(const seds::model::Interface &interface, Context &context) -> void;
+    auto createTypes(const ::seds::model::Interface &interface, Context &context) -> void;
 
 private:
-    auto doCreateTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
-            const std::optional<seds::model::GenericTypeMapSet> &mappings, Context &mainContext,
+    auto doCreateTypes(const ::seds::model::InterfaceDeclaration *interfaceDeclaration, QString parentName,
+            const std::optional<::seds::model::GenericTypeMapSet> &mappings, Context &mainContext,
             Context &interfaceContext) -> void;
 
-    auto createTypesForParameter(
-            const seds::model::InterfaceParameter &parameter, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
-    auto createTypesForCommand(const seds::model::InterfaceCommand &command, const QString &interfaceDeclarationName,
+    auto createTypesForParameter(const ::seds::model::InterfaceParameter &parameter,
+            InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+    auto createTypesForCommand(const ::seds::model::InterfaceCommand &command, const QString &interfaceDeclarationName,
             InterfaceTypeCreatorContext &typeCreatorContext) -> void;
 
     auto createTypesForSyncCommand(
-            const seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
-    auto createTypesForAsyncCommand(const seds::model::InterfaceCommand &command,
+            const ::seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+    auto createTypesForAsyncCommand(const ::seds::model::InterfaceCommand &command,
             const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
-    auto createAsyncCommandBundledType(const seds::model::InterfaceCommand &command,
-            const QString &interfaceDeclarationName, const seds::model::CommandArgumentMode requestedArgumentMode,
+    auto createAsyncCommandBundledType(const ::seds::model::InterfaceCommand &command,
+            const QString &interfaceDeclarationName, const ::seds::model::CommandArgumentMode requestedArgumentMode,
             InterfaceTypeCreatorContext &typeCreatorContext) -> void;
-    auto createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
+    auto createAsyncCommandBundledTypeComponent(const ::seds::model::CommandArgument &argument,
             Asn1Acn::Types::Sequence *bundledType, const std::optional<QString> &determinantArgumentName,
             Context &bundledTypeContext, InterfaceTypeCreatorContext &typeCreatorContext) -> bool;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

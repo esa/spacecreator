@@ -19,35 +19,12 @@
 
 #pragma once
 
-#include <QList>
-#include <QString>
-#include <QVariant>
+namespace spctr {
+namespace Constants {
 
-namespace reporting {
+const char SLX_IMPORT_ID[] = "Slx.Import";
+const char XML_IMPORT_ID[] = "Xml.Import";
+const char M_TOOLS_SIMULINK[] = "QtCreator.Menu.Tools.SIMULINK";
 
-/**
- * @brief   Structure to hold parsed spin report data.
- */
-struct SpinErrorReport {
-    /** Error types */
-    enum ErrorType
-    {
-        DataConstraintViolation,
-        StopConditionViolation,
-        ObserverFailure,
-        OtherError
-    };
-
-    /** Spin error number, counted from 1 up */
-    uint32_t errorNumber;
-    /** Error depth reported by spin */
-    uint32_t errorDepth;
-    /** Error type reported by the message */
-    ErrorType errorType;
-    /** Raw error details reported by the message */
-    QString rawErrorDetails;
-    /** Parsed error details */
-    QVariant parsedErrorDetails;
-};
-
+}
 }

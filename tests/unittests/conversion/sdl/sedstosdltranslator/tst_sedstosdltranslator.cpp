@@ -199,8 +199,8 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineIntoProcess()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -261,8 +261,8 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineStates()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -329,8 +329,8 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputs()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -401,8 +401,8 @@ void tst_SedsToSdlTranslator::testTranslateStateMachineInputsWithVariables()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -455,8 +455,8 @@ void tst_SedsToSdlTranslator::testTranslateActivity()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -520,8 +520,8 @@ void tst_SedsToSdlTranslator::testTranslateStateTransitionActivity()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -829,8 +829,8 @@ static inline auto translateAndVerifyActivityContainsAction(const std::unique_pt
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ model.get() }, options);
@@ -944,8 +944,8 @@ void tst_SedsToSdlTranslator::testTranslateActivityCallWithReference()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -1000,8 +1000,8 @@ void tst_SedsToSdlTranslator::testTranslateActivityCallWithValue()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -1062,8 +1062,8 @@ void tst_SedsToSdlTranslator::testTranslateSendCommand()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);
@@ -1145,8 +1145,8 @@ void tst_SedsToSdlTranslator::testTranslateOnEntryAndOnExit()
     Options options;
     options.add(conversion::iv::IvOptions::configFilepath, "config.xml");
 
-    conversion::asn1::translator::SedsToAsn1Translator asn1Translator;
-    conversion::iv::translator::SedsToIvTranslator ivTranslator;
+    conversion::asn1::translator::seds::SedsToAsn1Translator asn1Translator;
+    conversion::iv::translator::seds::SedsToIvTranslator ivTranslator;
     SedsToSdlTranslator sdlTranslator;
 
     const auto asn1Models = asn1Translator.translateModels({ sedsModel.get() }, options);

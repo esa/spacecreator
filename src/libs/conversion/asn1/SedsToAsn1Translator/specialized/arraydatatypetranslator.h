@@ -25,7 +25,7 @@
 #include <asn1library/asn1/types/sequenceof.h>
 #include <seds/SedsModel/types/arraydatatype.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Translator for SEDS array data type
@@ -63,10 +63,10 @@ public:
      *
      * @param   sedsType    Type to translation
      */
-    auto translate(const seds::model::ArrayDataType &sedsType) -> void;
+    auto translate(const ::seds::model::ArrayDataType &sedsType) -> void;
 
 private:
-    auto translateArrayType(const seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
+    auto translateArrayType(const ::seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
             -> void;
 
 private:
@@ -75,4 +75,4 @@ private:
     DimensionTranslator m_dimensionTranslator;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

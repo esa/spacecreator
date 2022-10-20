@@ -541,9 +541,9 @@ void IVInterface::reflectAttrs(const IVInterface *from)
             return iface != this && iface->isRequired() && iface->title() == title();
         });
         if (it != ifaces.cend()) {
-            auto it = newAttrs.find(meta::Props::token(meta::Props::Token::name));
-            if (it != newAttrs.end()) {
-                it->setValue(from->function()->title() + QLatin1Char('_') + from->title());
+            auto newAttrIt = newAttrs.find(meta::Props::token(meta::Props::Token::name));
+            if (newAttrIt != newAttrs.end()) {
+                newAttrIt->setValue(from->function()->title() + QLatin1Char('_') + from->title());
             }
         }
     }

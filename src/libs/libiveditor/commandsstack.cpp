@@ -73,13 +73,12 @@ bool CommandsStack::push(QUndoCommand *command)
         connect(attrCommand, &shared::cmd::CmdEntityAttributesChange::attributeChanged, this,
                 &CommandsStack::attributeChanged, Qt::UniqueConnection);
     }
-    if (auto importCommand = dynamic_cast<CmdEntitiesImport *>(command)) {
-        connect(importCommand, &CmdEntitiesImport::asn1FilesImported, this, &CommandsStack::asn1FilesImported,
+    if (auto importCommand = dynamic_cast<ASN1ComponentsImport *>(command)) {
+        connect(importCommand, &ASN1ComponentsImport::asn1FilesImported, this, &CommandsStack::asn1FilesImported,
                 Qt::UniqueConnection);
-        connect(importCommand, &CmdEntitiesImport::asn1FileRemoved, this, &CommandsStack::asn1FileRemoved,
+        connect(importCommand, &ASN1ComponentsImport::asn1FileRemoved, this, &CommandsStack::asn1FileRemoved,
                 Qt::UniqueConnection);
     }
-
     m_undoStack->push(command);
     return true;
 }

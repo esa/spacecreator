@@ -29,7 +29,7 @@ namespace seds::model {
 class DataTypeRef;
 } // namespace seds::model
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Utility used for resolving dependencies in the SEDS types
@@ -49,9 +49,9 @@ private:
         Permanent
     };
 
-    using DataTypes = std::vector<const seds::model::DataType *>;
-    using MarksMap = std::unordered_map<const seds::model::DataType *, MarkType>;
-    using ResultList = std::list<const seds::model::DataType *>;
+    using DataTypes = std::vector<const ::seds::model::DataType *>;
+    using MarksMap = std::unordered_map<const ::seds::model::DataType *, MarkType>;
+    using ResultList = std::list<const ::seds::model::DataType *>;
 
 public:
     /**
@@ -64,14 +64,14 @@ public:
     auto resolve(const DataTypes *dataTypes, const DataTypes *globalDataTypes) -> ResultList;
 
 private:
-    auto visit(const seds::model::DataType *dataType) -> void;
-    auto visitArray(const seds::model::ArrayDataType &arrayDataType) -> void;
-    auto visitContainer(const seds::model::ContainerDataType &containerDataType) -> void;
+    auto visit(const ::seds::model::DataType *dataType) -> void;
+    auto visitArray(const ::seds::model::ArrayDataType &arrayDataType) -> void;
+    auto visitContainer(const ::seds::model::ContainerDataType &containerDataType) -> void;
 
-    auto findDataType(const QString &dataTypeName) -> const seds::model::DataType *;
+    auto findDataType(const QString &dataTypeName) -> const ::seds::model::DataType *;
 
-    auto markDataTypeAs(const seds::model::DataType *dataType, MarkType markType) -> void;
-    auto isDataTypeMarkedAs(const seds::model::DataType *dataType, MarkType markType) const -> bool;
+    auto markDataTypeAs(const ::seds::model::DataType *dataType, MarkType markType) -> void;
+    auto isDataTypeMarkedAs(const ::seds::model::DataType *dataType, MarkType markType) const -> bool;
 
 private:
     const DataTypes *m_dataTypes;
@@ -81,4 +81,4 @@ private:
     ResultList m_result;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

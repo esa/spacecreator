@@ -31,4 +31,19 @@ const FieldRef &VariableRef::value() const
     return m_value;
 }
 
+const QString &VariableRef::nameStr() const
+{
+    return m_value.value();
+}
+
+bool operator==(const VariableRef &lhs, const VariableRef &rhs)
+{
+    return lhs.m_value == rhs.m_value;
+}
+
+bool operator!=(const VariableRef &lhs, const VariableRef &rhs)
+{
+    return !(lhs == rhs);
+}
+
 } // namespace seds::model

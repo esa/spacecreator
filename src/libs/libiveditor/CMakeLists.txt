@@ -70,6 +70,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdrequiredifacepropertychange.h
     commands/cmdrootentitychange.cpp
     commands/cmdrootentitychange.h
+    commands/asn1componentsimport.cpp
+    commands/asn1componentsimport.h
     commands/commandids.h
     commandsstack.cpp
     commandsstack.h
@@ -115,6 +117,8 @@ target_sources(${LIB_NAME} PRIVATE
     modelchecking/modelcheckingwindow.cpp
     modelchecking/modelcheckingwindow.h
     modelchecking/modelcheckingwindow.ui
+    modelchecking/spinconfigsaver.h
+    modelchecking/spinconfigsaver.cpp
     modelchecking/xmelwriter.h
     modelchecking/xmelwriter.cpp
     modelchecking/xmelreader.h
