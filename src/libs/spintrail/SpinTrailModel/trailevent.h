@@ -21,13 +21,13 @@
 
 namespace spintrail::model {
 /**
- * @brief Base class for all spin trail events
+ * @brief Base class for all Spin Trail events
  */
 class TrailEvent
 {
 public:
     /**
-     * @brief Type of spin trail event
+     * @brief Type of Spin Trail event
      */
     enum class EventType
     {

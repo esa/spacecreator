@@ -214,7 +214,6 @@ bool TmcConverter::attachObserver(const QString &observerPath, const uint32_t pr
 
 bool TmcConverter::convertTrace(const QString &inputFile, const QString &outputFile)
 {
-    qDebug() << "Converting trace";
     const QFileInfo ivFileInfo(m_inputIvFilepath);
 
     if (!ivFileInfo.exists()) {
@@ -278,8 +277,6 @@ bool TmcConverter::convertTrace(const QString &inputFile, const QString &outputF
                 Escaper::escapePromelaName(processName), std::nullopt, process, datamodel, QList<QFileInfo>());
 
         m_observerNames.append(Escaper::escapePromelaIV(processName));
-        // asn1Files.append(datamodel.absoluteFilePath());
-        // this breaks stuff
         allSdlFiles.emplace(processName, meta);
         const auto infoPath = outputFilepath(Escaper::escapePromelaIV(processName) + ".info");
 

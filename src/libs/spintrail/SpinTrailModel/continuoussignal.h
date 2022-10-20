@@ -25,7 +25,7 @@
 
 namespace spintrail::model {
 /**
- * @brief Representation of continuous signal processing in spin trail
+ * @brief Representation of continuous signal processing in Spin Trail
  */
 class ContinuousSignal : public TrailEvent
 {

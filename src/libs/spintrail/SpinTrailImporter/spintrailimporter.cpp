@@ -22,7 +22,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
-#include <QRegExp>
 #include <QStringList>
 #include <QTextStream>
 #include <conversion/common/exceptions.h>
@@ -36,8 +35,8 @@
 
 using namespace conversion::spintrail;
 
-using conversion::ConversionException;
 using conversion::FileNotFoundException;
+using conversion::importer::ImportException;
 using spintrail::model::ChannelEvent;
 using spintrail::model::ContinuousSignal;
 using spintrail::model::ResetTimerEvent;
@@ -60,7 +59,7 @@ std::unique_ptr<conversion::Model> SpinTrailImporter::importModel(const conversi
 
         QFile inputFile(inputFileinfo.absoluteFilePath());
         if (!inputFile.open(QFileDevice::ReadOnly | QFileDevice::Text)) {
-            throw ConversionException(QString("Cannot open file: %1").arg(inputFileinfo.absoluteFilePath()));
+            throw ImportException(QString("Cannot open file: %1").arg(inputFileinfo.absoluteFilePath()));
         }
 
         QTextStream input(&inputFile);
@@ -69,6 +68,8 @@ std::unique_ptr<conversion::Model> SpinTrailImporter::importModel(const conversi
             QString line = input.readLine();
             processLine(*model, line);
         }
+    } else {
+        throw ImportException("Spin Trail file to import wasn't specified");
     }
 
     return model;
@@ -109,12 +110,7 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
     // use this to additionaly validate if the parsed line is an trail event
     QRegExp eventValidation(R"( *\d+:)");
 
-    // use this to get proctype name, command (send or recv) and parameters
-    // the first parsed group contains proctype name
-    // the second parsed group contains command type and parameters
-    // for the example input is 'proc  3 (Actuator_step:1) system.pml:53 Send 84'
-    // the first group shall be 'Actuator_step:1' and the second 'Send 84'
-    QRegExp commandValidation(R"(proc\s+\d+\s+\(([\w:]+)\)\s+[\w\.]+:\d+\s([\w\s,]+))");
+    QRegExp commandValidation = buildChannelCommandRegexp();
 
     // channel name is enclosed by '(' and ')'
     QRegExp channelValidation(R"(\((\w+)\))");
@@ -130,11 +126,33 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
             const ChannelEvent::Type eventType = command.compare("recv", Qt::CaseInsensitive) == 0
                     ? ChannelEvent::Type::Recv
                     : ChannelEvent::Type::Send;
-            // qDebug() << "Found event " << proctypeName << " " << command << parameters.join(" ") << " to channel "
-            //          << channelName;
             model.appendEvent(std::make_unique<ChannelEvent>(
                     eventType, std::move(proctypeName), std::move(channelName), std::move(parameters)));
         }
     }
+}
+
+QRegExp SpinTrailImporter::buildChannelCommandRegexp() const
+{
+    // use this to get proctype name, command (send or recv) and parameters
+    // the first parsed group contains proctype name
+    // the second parsed group contains command type and parameters
+    // for the example input is 'proc  3 (Actuator_step:1) system.pml:53 Send 84'
+    // the first group shall be 'Actuator_step:1' and the second 'Send 84'
+
+    // match "proc" and spin proctype number
+    QString pattern = QStringLiteral(R"(proc\s+\d+\s+)");
+
+    // match proctype name enclosed within parentheses
+    pattern += QStringLiteral(R"(\(([\w:]+)\)\s+)");
+
+    // match file and line number
+    pattern += QStringLiteral(R"([\w\.]+:\d+\s)");
+
+    // match operation (Send/Recv) and list of arguments
+    pattern += QStringLiteral(R"(([\w\s,]+))");
+    // QRegExp commandValidation(R"(proc\s+\d+\s+\(([\w:]+)\)\s+[\w\.]+:\d+\s([\w\s,]+))");
+    QRegExp commandValidation(pattern);
+    return commandValidation;
 }
 }

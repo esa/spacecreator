@@ -47,5 +47,13 @@ public:
 
 private:
     Asn1Acn::ValuePtr parseValue(QStringList &spinTrailValue, const Asn1Acn::Types::Type *asn1Type);
+    Asn1Acn::ValuePtr parseInteger(QStringList &spinTrailValue);
+    Asn1Acn::ValuePtr parseBoolean(QStringList &spinTrailValue);
+    Asn1Acn::ValuePtr parseSequence(QStringList &spinTrailValue, const Asn1Acn::Types::Sequence *sequence);
+    Asn1Acn::ValuePtr parseSequenceOf(QStringList &spinTrailValue, const Asn1Acn::Types::SequenceOf *sequenceOf);
+    Asn1Acn::ValuePtr parseEnumerated(QStringList &spinTrailValue, const Asn1Acn::Types::Enumerated *enumerated);
+    Asn1Acn::ValuePtr parseChoice(QStringList &spinTrailValue, const Asn1Acn::Types::Choice *choice);
+    Asn1Acn::ValuePtr parseOctetString(QStringList &spinTrailValue, const Asn1Acn::Types::OctetString *octetString);
+    Asn1Acn::ValuePtr parseIA5String(QStringList &spinTrailValue, const Asn1Acn::Types::IA5String *ia5string);
 };
 }

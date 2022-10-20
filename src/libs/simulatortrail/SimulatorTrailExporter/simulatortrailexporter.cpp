@@ -68,6 +68,8 @@ void SimulatorTrailExporter::exportModel(const Model *model, const Options &opti
         if (!commited) {
             throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
         }
+    } else {
+        throw ExportException("Simulator Trail file to export wasn't specified");
     }
 }
 

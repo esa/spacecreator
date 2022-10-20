@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <QRegExp>
 #include <conversion/common/import/modelimporter.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 
@@ -29,7 +30,7 @@ class Options;
 
 namespace spintrail::importer {
 /**
- * @brief Importer to read spin trail
+ * @brief Importer to read Spin Trail
  */
 class SpinTrailImporter final : public conversion::importer::ModelImporter
 {
@@ -45,5 +46,6 @@ public:
 
 private:
     void processLine(spintrail::model::SpinTrailModel &model, const QString &line) const;
+    QRegExp buildChannelCommandRegexp() const;
 };
 }

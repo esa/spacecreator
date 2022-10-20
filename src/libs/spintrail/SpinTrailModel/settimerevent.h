@@ -26,7 +26,7 @@
 
 namespace spintrail::model {
 /**
- * @brief Representation of reset_timer call in spin trail
+ * @brief Representation of set_timer call in Spin Trail
  */
 class SetTimerEvent : public TrailEvent
 {
