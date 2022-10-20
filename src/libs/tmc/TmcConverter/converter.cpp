@@ -171,7 +171,7 @@ void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
     m_processesBasePriority = std::move(value);
 }
 
-void TmcConverter::setDelta(std::optional<int> value)
+void TmcConverter::setDelta(std::optional<float> value)
 {
     m_delta = std::move(value);
 }

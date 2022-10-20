@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
     std::optional<QString> processesBasePriority;
     std::vector<QString> subtypesFilepaths;
-    std::optional<int> delta;
+    std::optional<float> delta;
     bool isRealTypeEnabled;
 
     const QStringList args = app.arguments();
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
             }
 
             delta = args[i].toInt();
-        } else if (arg == "-real") {
+        } else if (arg == "-enable-reals") {
             ++i;
             isRealTypeEnabled = true;
         } else if (arg == "-h" || arg == "--help") {

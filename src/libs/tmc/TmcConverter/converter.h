@@ -138,7 +138,7 @@ public:
      *
      * @param   delta Value of the interval
      */
-    void setDelta(std::optional<int> value);
+    void setDelta(std::optional<float> value);
     /**
      * @brief   Set path to the ASN.1 containing subtypes
      *

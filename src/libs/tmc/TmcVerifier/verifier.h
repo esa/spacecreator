@@ -93,7 +93,7 @@ public:
      *
      * @param   delta Value of the interval
      */
-    void setDelta(std::optional<int> delta);
+    void setDelta(std::optional<float> delta);
     /**
      * @brief Add Stop Condition files to verifier.
      *
