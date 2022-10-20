@@ -442,6 +442,8 @@ private:
             const QString &sourceInterfaceName) const -> void;
     auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVFunction *ivFunction,
             const QString &functionName, const FunctionInfo &functionInfo) const -> void;
+    auto generateProctypeForTimer(Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName,
+            const QString &interfaceName, const ProctypeInfo &proctypeInfo) const -> void;
     auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVInterface *providedInterface,
             const QString &functionName, const QString &interfaceName, const std::size_t priority) const -> void;
     auto createPromelaObjectsForSyncRis(

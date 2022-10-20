@@ -782,26 +782,20 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
     QList<QString> channelNames;
 
     const QVector<IVInterface *> pis = ivFunction->pis();
-    const QVector<shared::ContextParameter> parameters = ivFunction->contextParams();
 
     for (auto iter = functionInfo.m_proctypes.begin(); iter != functionInfo.m_proctypes.end(); ++iter) {
         const QString interfaceName = iter->second->m_interfaceName;
+        if (iter->second->m_isTimer) {
+            generateProctypeForTimer(context, ivFunction, functionName, interfaceName, *iter->second);
+            continue;
+        }
+
         auto findResult = std::find_if(pis.begin(), pis.end(), [&interfaceName](IVInterface *i) {
             return interfaceName.compare(i->property("name").toString()) == 0;
         });
         if (findResult == pis.end()) {
-            auto timerCandidate = std::find_if(
-                    parameters.begin(), parameters.end(), [&interfaceName](const shared::ContextParameter &p) {
-                        return interfaceName.compare(p.name(), Qt::CaseInsensitive) == 0
-                                && p.paramType() == shared::BasicParameter::Type::Timer;
-                    });
-            if (timerCandidate == parameters.end()) {
-                auto message = QString("Cannot find interface with name %1").arg(interfaceName);
-                throw TranslationException(message);
-            }
-            generateProctype(context, functionName, interfaceName.toLower(), iter->second->m_parameterTypeName,
-                    iter->second->m_queueSize, iter->second->m_priority, false);
-            continue;
+            auto message = QString("Cannot find interface with name %1").arg(interfaceName);
+            throw TranslationException(message);
         }
         const IVInterface *providedInterface = *findResult;
         const size_t priority = iter->second->m_priority;
@@ -821,6 +815,25 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
             createPromelaObjectsForSyncRis(context, requiredInterface, functionName);
         }
     }
+}
+
+void IvToPromelaTranslator::generateProctypeForTimer(IvToPromelaTranslator::Context &context,
+        const IVFunction *ivFunction, const QString &functionName, const QString &interfaceName,
+        const ProctypeInfo &proctypeInfo) const
+{
+    const QVector<shared::ContextParameter> parameters = ivFunction->contextParams();
+
+    auto timerCandidate =
+            std::find_if(parameters.begin(), parameters.end(), [&interfaceName](const shared::ContextParameter &p) {
+                return interfaceName.compare(p.name(), Qt::CaseInsensitive) == 0
+                        && p.paramType() == shared::BasicParameter::Type::Timer;
+            });
+    if (timerCandidate == parameters.end()) {
+        auto message = QString("Cannot find interface for timer with name %1").arg(interfaceName);
+        throw TranslationException(message);
+    }
+    generateProctype(context, functionName, interfaceName.toLower(), proctypeInfo.m_parameterTypeName,
+            proctypeInfo.m_queueSize, proctypeInfo.m_priority, false);
 }
 
 void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslator::Context &context,
