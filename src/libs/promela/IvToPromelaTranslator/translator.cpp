@@ -1590,7 +1590,7 @@ void IvToPromelaTranslator::prepareEnvironmentFunctionInfo(Context &context, con
             std::unique_ptr<EnvProctypeInfo> proctypeInfo =
                     prepareEnvProctypeInfo(context, requiredInterface, functionName);
             const QString proctypeName = proctypeInfo->m_proctypeName;
-            functionInfo.m_environmentProctypes.emplace(proctypeName, std::move(proctypeInfo));
+            functionInfo.m_environmentSourceProctypes.emplace(proctypeName, std::move(proctypeInfo));
         } else {
             auto message =
                     QString("Unallowed interface kind in function %1, only sporadic required interfaces are allowed")

@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2022 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName(SC_ORGANISATION);
     app.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
     app.setApplicationVersion(spaceCreatorVersion);
-    app.setApplicationName(QObject::tr("TASTE Model Checker"));
+    app.setApplicationName(QObject::tr("TASTE Model Checker trace generator"));
 
     const QStringList args = app.arguments();
 

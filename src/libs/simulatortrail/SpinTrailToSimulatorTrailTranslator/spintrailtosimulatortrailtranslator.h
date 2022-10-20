@@ -81,6 +81,9 @@ private:
     };
 
 private:
+    inline static const QString m_environmentName = "env";
+
+private:
     void findChannelNames(const promela::translator::IvToPromelaTranslator::SystemInfo &systemInfo,
             const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channel,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const;
@@ -94,11 +97,19 @@ private:
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
             const Asn1Acn::Types::Type *observableEvent) const;
+    void processSpinTrailSendEvent(simulatortrail::model::SimulatorTrailModel &result,
+            const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels,
+            const Asn1Acn::Types::Type *observableEvent) const;
+    void processSpinTrailRecvEvent(simulatortrail::model::SimulatorTrailModel &result,
+            const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
+            const Asn1Acn::Types::Type *observableEvent) const;
     void processSpinTrailEvent(
             simulatortrail::model::SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const;
     void processSpinTrailEvent(const spintrail::model::SetTimerEvent *event) const;
     void processSpinTrailEvent(const spintrail::model::ResetTimerEvent *event) const;
-    Asn1Acn::ValuePtr getValue(const QString &source, const QString &target, const ChannelInfo &info,
+    Asn1Acn::ValuePtr getMessageValue(const QString &source, const QString &target, const ChannelInfo &info,
             const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters, bool isInput) const;
 
     bool isFunctionLockChannel(const QString &channelName) const;

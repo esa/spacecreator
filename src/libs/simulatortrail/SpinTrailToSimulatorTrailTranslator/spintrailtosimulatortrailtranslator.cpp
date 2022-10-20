@@ -135,8 +135,8 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
                 ++proctypeIter) {
             showProctype(proctypeIter->first, *proctypeIter->second, false);
         }
-        for (auto proctypeIter = iter->second->m_environmentProctypes.begin();
-                proctypeIter != iter->second->m_environmentProctypes.end(); ++proctypeIter) {
+        for (auto proctypeIter = iter->second->m_environmentSourceProctypes.begin();
+                proctypeIter != iter->second->m_environmentSourceProctypes.end(); ++proctypeIter) {
             showEnvironmentProctype(proctypeIter->first, *proctypeIter->second);
         }
         for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
@@ -271,8 +271,8 @@ void SpinTrailToSimulatorTrailTranslator::findProctypes(
                 ++proctypeIter) {
             proctypes.insert(proctypeIter->first, iter->first);
         }
-        for (auto proctypeIter = iter->second->m_environmentProctypes.begin();
-                proctypeIter != iter->second->m_environmentProctypes.end(); ++proctypeIter) {
+        for (auto proctypeIter = iter->second->m_environmentSourceProctypes.begin();
+                proctypeIter != iter->second->m_environmentSourceProctypes.end(); ++proctypeIter) {
             proctypes.insert(proctypeIter->first, iter->first);
         }
         for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
@@ -319,90 +319,107 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(simulatortrail::
     if (isFunctionLockChannel(event->getChannelName())) {
         return;
     }
-    if (event->getProctypeName().isEmpty()) {
-        // TODO this is init proctype
-    }
     if (event->getType() == ChannelEvent::Type::Send) {
-        if (channels.contains(event->getChannelName())) {
-            ChannelInfo &channelInfo = channels[event->getChannelName()];
-            if (channelInfo.m_isTimer) {
-                // ignore
-                return;
-            }
-            const QString source = channelInfo.m_possibleSenders.firstKey();
-            const QString destination = channelInfo.m_functionName;
-            ValuePtr message =
-                    getValue(source, destination, channelInfo, observableEvent, event->getParameters(), false);
-            result.appendValue(std::move(message));
-            if (channelInfo.m_senders.length() < static_cast<int>(channelInfo.m_channelSize)) {
-                channelInfo.m_senders.push_back(source);
-            } else {
-                qDebug() << "message loss";
-            }
-        } else if (observerChannels.contains(event->getChannelName())) {
-            // if this is first observer
-            // then register output event
-            // else ignore
-            // ignore, but keep info about sender
-            std::pair<ChannelInfo, bool> &channelInfo = observerChannels[event->getChannelName()];
-            if (channelInfo.first.m_isTimer) {
-                // ignore
-                return;
-            }
-            const QString source = channelInfo.first.m_possibleSenders.firstKey();
-            const QString destination = channelInfo.first.m_functionName;
-
-            if (channelInfo.first.m_senders.length() < static_cast<int>(channelInfo.first.m_channelSize)) {
-                channelInfo.first.m_senders.push_back(source);
-            } else {
-                qDebug() << "message loss";
-            }
-
-            if (channelInfo.second) {
-                ValuePtr message = getValue(
-                        source, destination, channelInfo.first, observableEvent, event->getParameters(), false);
-                result.appendValue(std::move(message));
-            }
-
-        } else {
-            qCritical() << "Cannot process trail event, unknown channel " << event->getChannelName();
-            throw TranslationException("Cannot process trail event");
-        }
+        processSpinTrailSendEvent(result, event, channels, observerChannels, observableEvent);
     }
     if (event->getType() == ChannelEvent::Type::Recv) {
-        if (channels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
-            ChannelInfo &channelInfo = channels[event->getChannelName()];
-            if (channelInfo.m_isTimer) {
-                std::unique_ptr<ChoiceValue> inputNone = std::make_unique<ChoiceValue>(
-                        Escaper::escapeAsn1FieldName(channelInfo.m_interfaceName), std::make_unique<NamedValue>());
-                std::unique_ptr<ChoiceValue> eventValue = std::make_unique<ChoiceValue>("msg-in", std::move(inputNone));
-                std::unique_ptr<ChoiceValue> functionEvent = std::make_unique<ChoiceValue>(
-                        Escaper::escapeAsn1FieldName(channelInfo.m_functionName), std::move(eventValue));
-                std::unique_ptr<NamedValue> inputEvent = std::make_unique<NamedValue>();
-                inputEvent->addValue("source", std::make_unique<SingleValue>("env"));
-                inputEvent->addValue("dest",
-                        std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(channelInfo.m_functionName)));
-                inputEvent->addValue("event", std::move(functionEvent));
-                result.appendValue(std::make_unique<ChoiceValue>("input-event", std::move(inputEvent)));
-            } else {
-                const QString destination = channelInfo.m_functionName;
-                if (channelInfo.m_senders.isEmpty()) {
-                    throw TranslationException("Cannot find sender of message");
-                }
-                const QString source = channelInfo.m_senders.front();
-                channelInfo.m_senders.pop_front();
-                ValuePtr message =
-                        getValue(source, destination, channelInfo, observableEvent, event->getParameters(), true);
-                result.appendValue(std::move(message));
-            }
-        } else if (observerChannels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
-            // do not produce input event when observer receives message
-            std::pair<ChannelInfo, bool> &channelInfo = observerChannels[event->getChannelName()];
-            channelInfo.first.m_senders.pop_front();
-        } else {
-            qCritical() << "Cannot process trail event, unknown channel " << event->getChannelName();
-            throw TranslationException("Cannot process trail event");
+        processSpinTrailRecvEvent(result, event, channels, observerChannels, proctypes, observableEvent);
+    }
+}
+
+void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(simulatortrail::model::SimulatorTrailModel &result,
+        const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
+        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels,
+        const Asn1Acn::Types::Type *observableEvent) const
+{
+    if (channels.contains(event->getChannelName())) {
+        ChannelInfo &channelInfo = channels[event->getChannelName()];
+        if (channelInfo.m_isTimer) {
+            // this is a send to channel related to timer
+            // ignore - the receive event shall produce value for simulator
+            return;
         }
+        const QString source = channelInfo.m_possibleSenders.firstKey();
+        const QString destination = channelInfo.m_functionName;
+        ValuePtr message =
+                getMessageValue(source, destination, channelInfo, observableEvent, event->getParameters(), false);
+        result.appendValue(std::move(message));
+        if (channelInfo.m_senders.length() < static_cast<int>(channelInfo.m_channelSize)) {
+            channelInfo.m_senders.push_back(source);
+        } else {
+            qDebug() << "message loss";
+        }
+    } else if (observerChannels.contains(event->getChannelName())) {
+        // If message is processed by observers, the simulator trail shall contain
+        // the output-signal to first observer (but the destination is model function)
+        // and input-signal to the model function (if any)
+        //
+        // if this is first output observer
+        // then register output value for simulator,
+        // else do not produce simulator value, but keep info about sender
+        std::pair<ChannelInfo, bool> &channelInfo = observerChannels[event->getChannelName()];
+        if (channelInfo.first.m_isTimer) {
+            // ignore
+            return;
+        }
+        const QString source = channelInfo.first.m_possibleSenders.firstKey();
+        const QString destination = channelInfo.first.m_functionName;
+
+        if (channelInfo.first.m_senders.length() < static_cast<int>(channelInfo.first.m_channelSize)) {
+            channelInfo.first.m_senders.push_back(source);
+        } else {
+            qDebug() << "message loss";
+        }
+
+        if (channelInfo.second) {
+            ValuePtr message = getMessageValue(
+                    source, destination, channelInfo.first, observableEvent, event->getParameters(), false);
+            result.appendValue(std::move(message));
+        }
+
+    } else {
+        qCritical() << "Cannot process trail event, unknown channel " << event->getChannelName();
+        throw TranslationException("Cannot process trail event");
+    }
+}
+
+void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(simulatortrail::model::SimulatorTrailModel &result,
+        const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
+        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
+        const Asn1Acn::Types::Type *observableEvent) const
+{
+    if (channels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
+        ChannelInfo &channelInfo = channels[event->getChannelName()];
+        if (channelInfo.m_isTimer) {
+            std::unique_ptr<ChoiceValue> inputNone = std::make_unique<ChoiceValue>(
+                    Escaper::escapeAsn1FieldName(channelInfo.m_interfaceName), std::make_unique<NamedValue>());
+            std::unique_ptr<ChoiceValue> eventValue = std::make_unique<ChoiceValue>("msg-in", std::move(inputNone));
+            std::unique_ptr<ChoiceValue> functionEvent = std::make_unique<ChoiceValue>(
+                    Escaper::escapeAsn1FieldName(channelInfo.m_functionName), std::move(eventValue));
+            std::unique_ptr<NamedValue> inputEvent = std::make_unique<NamedValue>();
+            inputEvent->addValue("source", std::make_unique<SingleValue>(m_environmentName));
+            inputEvent->addValue(
+                    "dest", std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(channelInfo.m_functionName)));
+            inputEvent->addValue("event", std::move(functionEvent));
+            result.appendValue(std::make_unique<ChoiceValue>("input-event", std::move(inputEvent)));
+        } else {
+            const QString destination = channelInfo.m_functionName;
+            if (channelInfo.m_senders.isEmpty()) {
+                throw TranslationException("Cannot find sender of message");
+            }
+            const QString source = channelInfo.m_senders.front();
+            channelInfo.m_senders.pop_front();
+            ValuePtr message =
+                    getMessageValue(source, destination, channelInfo, observableEvent, event->getParameters(), true);
+            result.appendValue(std::move(message));
+        }
+    } else if (observerChannels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
+        // do not produce input event when observer receives message
+        std::pair<ChannelInfo, bool> &channelInfo = observerChannels[event->getChannelName()];
+        channelInfo.first.m_senders.pop_front();
+    } else {
+        qCritical() << "Cannot process trail event, unknown channel " << event->getChannelName();
+        throw TranslationException("Cannot process trail event");
     }
 }
 
@@ -415,7 +432,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(
     std::unique_ptr<ChoiceValue> functionEvent = std::make_unique<ChoiceValue>(
             Escaper::escapeAsn1FieldName(event->getFunctionName()), std::move(eventValue));
     std::unique_ptr<NamedValue> inputEvent = std::make_unique<NamedValue>();
-    inputEvent->addValue("source", std::make_unique<SingleValue>("env"));
+    inputEvent->addValue("source", std::make_unique<SingleValue>(m_environmentName));
     inputEvent->addValue("dest", std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(event->getFunctionName())));
     inputEvent->addValue("event", std::move(functionEvent));
     result.appendValue(std::make_unique<ChoiceValue>("input-event", std::move(inputEvent)));
@@ -432,7 +449,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(const ResetTimer
     qDebug() << event->getFunctionName() << " calls reset_timer(" << event->getTimerName() << ")";
 }
 
-Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getValue(const QString &source, const QString &target,
+Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getMessageValue(const QString &source, const QString &target,
         const ChannelInfo &info, const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters,
         bool isInput) const
 {
@@ -481,6 +498,6 @@ Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getValue(const QString &s
 
 bool SpinTrailToSimulatorTrailTranslator::isFunctionLockChannel(const QString &channelName) const
 {
-    return !channelName.endsWith("_channel");
+    return channelName.endsWith("_lock");
 }
 }

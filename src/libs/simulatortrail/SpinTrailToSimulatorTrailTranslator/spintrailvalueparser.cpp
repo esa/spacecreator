@@ -96,17 +96,45 @@ Asn1Acn::ValuePtr SpinTrailValueParser::parseValue(QStringList &spinTrailValue, 
         throw TranslationException("Translation from Spin Trail to Simulator Trail for REAL is not implemented.");
     }
     if (asn1Type->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
-        std::unique_ptr<NamedValue> result = std::make_unique<NamedValue>();
-        // TODO support for optional
         const Asn1Acn::Types::Sequence *sequence = dynamic_cast<const Asn1Acn::Types::Sequence *>(asn1Type);
+
+        std::list<QString> componentNames;
+        std::map<QString, ValuePtr> values;
+        std::list<QString> optionalComponents;
+        // iterate over all components
         for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : sequence->components()) {
             const Asn1Acn::AsnSequenceComponent *asnSequenceComponent =
                     dynamic_cast<const Asn1Acn::AsnSequenceComponent *>(component.get());
             if (asnSequenceComponent == nullptr) {
                 continue;
             }
+            componentNames.push_back(component->name());
             ValuePtr componentValue = parseValue(spinTrailValue, component->type());
-            result->addValue(component->name(), std::move(componentValue));
+            values.emplace(component->name(), std::move(componentValue));
+            if (asnSequenceComponent->isOptional()) {
+                optionalComponents.push_back(component->name());
+            }
+        }
+        // iterate over 'exist' structure
+        // remove not existing values
+        for (const QString &component : optionalComponents) {
+            if (spinTrailValue.isEmpty()) {
+                throw TranslationException("Invalid value for SEQUENCE type");
+            }
+            int exists = spinTrailValue.front().toInt();
+            spinTrailValue.pop_front();
+            if (exists == 0) {
+                values.erase(component);
+            }
+        }
+
+        // construct final value
+        std::unique_ptr<NamedValue> result = std::make_unique<NamedValue>();
+        for (const QString &component : componentNames) {
+            auto iter = values.find(component);
+            if (iter != values.end()) {
+                result->addValue(iter->first, std::move(iter->second));
+            }
         }
 
         return result;

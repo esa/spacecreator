@@ -387,7 +387,7 @@ public:
         /**
          * @brief all environment proctypes, which are used to generate value.
          */
-        std::map<QString, std::unique_ptr<EnvProctypeInfo>> m_environmentProctypes;
+        std::map<QString, std::unique_ptr<EnvProctypeInfo>> m_environmentSourceProctypes;
         /**
          * @brief all environment proctypes, which are used to receive signals from model functions
          */
