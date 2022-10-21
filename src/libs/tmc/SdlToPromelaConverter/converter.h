@@ -75,6 +75,7 @@ private:
     QStringList m_sdl2PromelaArgs;
 
     const static QString m_sdl2PromelaCommand;
-    constexpr static int m_externalCommandTimeout = 60000;
+    constexpr static int m_externalCommandStartTimeout = 45000;
+    constexpr static int m_externalCommandFinishTimeout = 60000;
 };
 }

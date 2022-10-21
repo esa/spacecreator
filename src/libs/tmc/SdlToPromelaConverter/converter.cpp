@@ -163,7 +163,7 @@ bool SdlToPromelaConverter::startSdl2PromelaProcess(QProcess &process, const QSt
 
     process.start(m_sdl2PromelaCommand, arguments);
 
-    if (!process.waitForStarted()) {
+    if (!process.waitForStarted(m_externalCommandStartTimeout)) {
         qCritical("Cannot start process.");
         QByteArray standardError = process.readAllStandardError();
         QByteArray standardOutput = process.readAllStandardOutput();
@@ -194,7 +194,7 @@ bool SdlToPromelaConverter::waitForSdl2PromelaProcess(QProcess &process)
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    if (!process.waitForFinished(m_externalCommandTimeout)) {
+    if (!process.waitForFinished(m_externalCommandFinishTimeout)) {
         qCritical() << "Timeout while waiting for external process.";
 
         auto end = std::chrono::high_resolution_clock::now();
