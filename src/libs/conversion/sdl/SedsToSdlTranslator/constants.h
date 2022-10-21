@@ -25,6 +25,8 @@ namespace conversion::sdl::translator {
 struct Constants {
     /// @brief  Name of the parameter for SEDS transaction mechanism
     static inline const QString transactionParamName = "sedsTransactionName";
+    /// @brief  Template for name of the variable for SEDS transaction mechanism
+    static inline const QString transactionVariableNameTemplate = "%1_transactionName";
 };
 
 } // namespace conversion::sdl::translator

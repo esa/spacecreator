@@ -1,4 +1,4 @@
-/** @file
+/* @file
  * This file is part of the SpaceCreator.
  *
  * @copyright (C) 2021 N7 Space Sp. z o.o.
@@ -34,6 +34,16 @@ const QString &VariableReference::variableName() const
 void VariableReference::setVariableName(QString variableName)
 {
     m_variableName = std::move(variableName);
+}
+
+bool operator==(const VariableReference &lhs, const VariableReference &rhs)
+{
+    return lhs.m_variableName == rhs.m_variableName;
+}
+
+bool operator!=(const VariableReference &lhs, const VariableReference &rhs)
+{
+    return !(lhs == rhs);
 }
 
 } // namespace sdl

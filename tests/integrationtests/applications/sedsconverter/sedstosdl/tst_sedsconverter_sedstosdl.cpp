@@ -308,8 +308,10 @@ void tst_SedsConverter_SedsToSdl::testSedsSdlWithTasteOption()
 }
 
 /// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2120
 /// \SRS  ETB-FUN-2180
 /// \SRS  ETB-FUN-2580
+/// \SRS  ETB-FUN-2620
 /// \SRS  ETB-FUN-2710
 void tst_SedsConverter_SedsToSdl::testTransaction()
 {

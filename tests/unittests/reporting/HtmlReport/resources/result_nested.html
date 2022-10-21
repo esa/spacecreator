@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>Spin Error Report</title>
+    <style>
+      table, td {border: 1px black solid;}
+      td {padding: 6px;}
+    </style>
+  </head>
+  <body>
+    <h1>Spin Error Report</h1>
+  
+    
+      <table>
+        <tr>
+          <td>Error Type</td>
+          <td>Data Constraint Violation</td>
+        </tr>
+        <tr>
+          <td>Error Number</td>
+          <td><tt>1</tt></td>
+        </tr>
+        <tr>
+          <td>Error Depth</td>
+          <td><tt>293</tt></td>
+        </tr>
+        <tr>
+          <td>Error Details</td>
+          <td>
+            <i>Function Name:</i> <tt>function2</tt><br>
+            <i>Variable Name:</i> <tt>b</tt><br>
+            
+              <i>Nested State Name:</i> <tt>nestedstate</tt><br>
+            
+            <i>Constraint Details:</i><br>
+            <table>
+              <tr>
+                <td>Constraint</td>
+                
+                  <td><tt>&gt;=</tt></td>
+                
+                  <td><tt>&lt;=</tt></td>
+                
+              </tr>
+              <tr>
+                <td>Bounding Value</td>
+                
+                  <td><tt>5</tt></td>
+                
+                  <td><tt>15</tt></td>
+                
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <i>Parsed from:</i><br>
+      <tt>(global_state.function2.nestedstate_0_b&gt;=5)&amp;&amp;(global_state.function2.nestedstate_0_b&lt;=15)</tt><br><br>
+    
+  </body>
+</html>

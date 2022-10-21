@@ -17,37 +17,4 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#pragma once
-
-#include <QList>
-#include <QString>
-#include <QVariant>
-
-namespace reporting {
-
-/**
- * @brief   Structure to hold parsed spin report data.
- */
-struct SpinErrorReport {
-    /** Error types */
-    enum ErrorType
-    {
-        DataConstraintViolation,
-        StopConditionViolation,
-        ObserverFailure,
-        OtherError
-    };
-
-    /** Spin error number, counted from 1 up */
-    uint32_t errorNumber;
-    /** Error depth reported by spin */
-    uint32_t errorDepth;
-    /** Error type reported by the message */
-    ErrorType errorType;
-    /** Raw error details reported by the message */
-    QString rawErrorDetails;
-    /** Parsed error details */
-    QVariant parsedErrorDetails;
-};
-
-}
+#include "spinerrorreportitem.h"
