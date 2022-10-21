@@ -25,6 +25,26 @@
 namespace reporting {
 
 struct StopConditionViolationReport {
+    enum ViolationType {
+        EmptyLength = 0,
+        Eventually,
+        Exist,
+        FunctionType,
+        GetStateNested,
+        GetStateParallel,
+        GetStateParallelProctype,
+        GetStateProctype,
+        Length,
+        NestedState,
+        NeverFilterOut,
+        Observer,
+        ParallelState,
+        Present,
+        QueueLast,
+        QueueLastEventually,
+        QueueLastFilterOut
+    };
+
     /** Name of the function */
     QString functionName;
 };
