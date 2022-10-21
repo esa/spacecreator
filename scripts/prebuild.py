@@ -45,6 +45,7 @@ def build_path_object(project_dir: str, env_path: str, qt_version: str):
         env_qt_install_dir = join_dir(env_dir, 'Qt')
         env_qt_dir = join_dir(env_dir, 'Qt', qt_version, 'gcc_64')
         env_qt_libexec_dir = join_dir(env_qt_dir, 'libexec')
+        env_qt_bin_dir = join_dir(env_qt_dir, 'bin')
         install_dir = join_dir(project_dir, 'install')
     _paths = Paths()
     return _paths
@@ -270,12 +271,15 @@ def copy_snippets(snippets_dir: str, snippets_install_dir: str) -> None:
     print("prebuild.py: Copying snippets from {} to {}".format(snippets_dir, snippets_install_dir))
     copy_content_of_dir_to_other_dir(snippets_dir, snippets_install_dir)
 
-def copy_qhelpgenerator(qt_libexec_dir: str, target_libexec_dir: str) -> None:
-    qhelpgenerator = join_dir(qt_libexec_dir, 'qhelpgenerator')
-    if not os.path.exists(qhelpgenerator):
-        print("prebuild.py: Could not find qhelpgenerator in {}".format(qt_libexec_dir))
+
+def copy_qhelpgenerator(qhelpgenerator_dir: str, target_libexec_dir: str) -> None:
+    if not os.path.exists(qhelpgenerator_dir):
+        print("prebuild.py: Could not find qhelpgenerator in {}".format(qhelpgenerator_dir))
         exit(1)
-    print("prebuild.py: Copying qhelpgenerator from {} to {}".format(qt_libexec_dir, target_libexec_dir))
+    if not os.path.exists(target_libexec_dir):
+        os.makedirs(target_libexec_dir)  # in QtC 4 this folder does not exist
+    qhelpgenerator = join_dir(qhelpgenerator_dir, 'qhelpgenerator')
+    print("prebuild.py: Copying qhelpgenerator from {} to {}".format(qhelpgenerator_dir, target_libexec_dir))
     shutil.copy2(qhelpgenerator, target_libexec_dir)
 
 
@@ -364,4 +368,8 @@ if __name__ == '__main__':
     copy_snippets(snippets_dir, snippets_install_dir)
 
     # Copy qhelpgenerator
-    copy_qhelpgenerator(paths.env_qt_libexec_dir, join_dir(app_dir, 'libexec'))
+    if is_qt6:
+        qhelpgenerator_dir = paths.env_qt_libexec_dir
+    else:
+        qhelpgenerator_dir = paths.env_qt_bin_dir
+    copy_qhelpgenerator(qhelpgenerator_dir, join_dir(app_dir, 'libexec'))
