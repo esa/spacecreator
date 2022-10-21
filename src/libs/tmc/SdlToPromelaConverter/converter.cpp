@@ -159,12 +159,18 @@ bool SdlToPromelaConverter::startSdl2PromelaProcess(QProcess &process, const QSt
         qDebug() << "    " << arg;
     }
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     process.start(m_sdl2PromelaCommand, arguments);
 
     if (!process.waitForStarted()) {
         qCritical("Cannot start process.");
         QByteArray standardError = process.readAllStandardError();
         QByteArray standardOutput = process.readAllStandardOutput();
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        qCritical() << "Elapsed time:" << elapsed << "ms";
 
         QString str = QString(standardError);
         qCritical() << "Stderr: " << str;
@@ -175,21 +181,43 @@ bool SdlToPromelaConverter::startSdl2PromelaProcess(QProcess &process, const QSt
         return false;
     }
 
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    qDebug() << "Starting a process took:" << elapsed << "ms";
+
     return true;
 }
 
 bool SdlToPromelaConverter::waitForSdl2PromelaProcess(QProcess &process)
 {
+    qDebug() << "Waiting for sdl2promela process now";
+
+    auto start = std::chrono::high_resolution_clock::now();
+
     if (!process.waitForFinished(m_externalCommandTimeout)) {
-        qCritical() << "Timeot while waiting for external process.";
+        qCritical() << "Timeout while waiting for external process.";
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        qCritical() << "Elapsed time:" << elapsed << "ms";
+
         process.terminate();
         return false;
     }
 
     if (process.exitCode() != EXIT_SUCCESS) {
         qCritical() << "External process finished with code: " << process.exitCode();
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        qCritical() << "Elapsed time:" << elapsed << "ms";
+
         return false;
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    qDebug() << "Process was working for:" << elapsed << "ms";
 
     return true;
 }
