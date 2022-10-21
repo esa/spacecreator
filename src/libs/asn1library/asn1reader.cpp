@@ -375,7 +375,13 @@ QPair<QString, QStringList> Asn1Reader::asn1CompilerCommand() const
     QSettings settings;
     QString asn1Compiler = settings.value("SpaceCreator/asn1compiler").toString();
     QString parameter = settings.value("SpaceCreator/asn1compilerparameter").toString();
+#if QTC_VERSION == 408
+    QStringList params = parameter.split(' ', QString::SkipEmptyParts);
+#endif
+#if QTC_VERSION == 800
     QStringList params = parameter.split(' ', Qt::SkipEmptyParts);
+#endif
+
 
     if (asn1Compiler.isEmpty() || !QFile::exists(asn1Compiler)) {
         asn1Compiler = checkforCompiler();
