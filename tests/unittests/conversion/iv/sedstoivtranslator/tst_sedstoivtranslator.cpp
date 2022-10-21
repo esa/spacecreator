@@ -44,10 +44,10 @@ using namespace seds::model;
 using namespace Asn1Acn::Types;
 
 using conversion::Options;
-using conversion::asn1::translator::Context;
-using conversion::asn1::translator::GenericTypeMapper;
+using conversion::asn1::translator::seds::Context;
+using conversion::asn1::translator::seds::GenericTypeMapper;
 using conversion::iv::IvOptions;
-using conversion::iv::translator::SedsToIvTranslator;
+using conversion::iv::translator::seds::SedsToIvTranslator;
 using conversion::translator::TranslationException;
 
 using tests::conversion::common::Asn1ModelBuilder;

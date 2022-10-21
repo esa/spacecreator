@@ -37,14 +37,15 @@ using seds::model::GenericTypeMap;
 using seds::model::GenericTypeMapSet;
 using seds::model::InterfaceCommandMode;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
-void InterfaceTypeCreator::createTypes(const seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context)
+void InterfaceTypeCreator::createTypes(
+        const ::seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context)
 {
     doCreateTypes(&interfaceDeclaration, "", std::nullopt, context, context);
 }
 
-void InterfaceTypeCreator::createTypes(const seds::model::Interface &interface, Context &context)
+void InterfaceTypeCreator::createTypes(const ::seds::model::Interface &interface, Context &context)
 {
     const auto &interfaceTypeRef = interface.type();
     const auto &interfaceDeclaration = context.findInterfaceDeclaration(interfaceTypeRef);
@@ -59,8 +60,8 @@ void InterfaceTypeCreator::createTypes(const seds::model::Interface &interface, 
     }
 }
 
-void InterfaceTypeCreator::doCreateTypes(const seds::model::InterfaceDeclaration *interfaceDeclaration,
-        QString parentName, const std::optional<seds::model::GenericTypeMapSet> &mappings, Context &mainContext,
+void InterfaceTypeCreator::doCreateTypes(const ::seds::model::InterfaceDeclaration *interfaceDeclaration,
+        QString parentName, const std::optional<::seds::model::GenericTypeMapSet> &mappings, Context &mainContext,
         Context &interfaceContext)
 {
     InterfaceTypeCreatorContext typeCreatorContext(
@@ -97,7 +98,7 @@ void InterfaceTypeCreator::doCreateTypes(const seds::model::InterfaceDeclaration
 }
 
 void InterfaceTypeCreator::createTypesForParameter(
-        const seds::model::InterfaceParameter &parameter, InterfaceTypeCreatorContext &typeCreatorContext)
+        const ::seds::model::InterfaceParameter &parameter, InterfaceTypeCreatorContext &typeCreatorContext)
 {
     const auto parameterTypeRef = parameter.type();
     const auto &parameterDimensions = parameter.arrayDimensions();
@@ -105,7 +106,7 @@ void InterfaceTypeCreator::createTypesForParameter(
     typeCreatorContext.handleType(parameterTypeRef, parameterDimensions);
 }
 
-void InterfaceTypeCreator::createTypesForCommand(const seds::model::InterfaceCommand &command,
+void InterfaceTypeCreator::createTypesForCommand(const ::seds::model::InterfaceCommand &command,
         const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext)
 {
     switch (command.mode()) {
@@ -121,7 +122,7 @@ void InterfaceTypeCreator::createTypesForCommand(const seds::model::InterfaceCom
 }
 
 void InterfaceTypeCreator::createTypesForSyncCommand(
-        const seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &typeCreatorContext)
+        const ::seds::model::InterfaceCommand &command, InterfaceTypeCreatorContext &typeCreatorContext)
 {
     const auto &arguments = command.arguments();
     for (const auto &argument : arguments) {
@@ -132,39 +133,39 @@ void InterfaceTypeCreator::createTypesForSyncCommand(
     }
 }
 
-void InterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::InterfaceCommand &command,
+void InterfaceTypeCreator::createTypesForAsyncCommand(const ::seds::model::InterfaceCommand &command,
         const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext)
 {
     // Process command based on its arguments
     switch (command.argumentsCombination()) {
-    case seds::model::ArgumentsCombination::InOnly: {
+    case ::seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handled as-is
         createAsyncCommandBundledType(
-                command, interfaceDeclarationName, seds::model::CommandArgumentMode::In, typeCreatorContext);
+                command, interfaceDeclarationName, ::seds::model::CommandArgumentMode::In, typeCreatorContext);
     } break;
-    case seds::model::ArgumentsCombination::OutOnly: {
+    case ::seds::model::ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
         createAsyncCommandBundledType(
-                command, interfaceDeclarationName, seds::model::CommandArgumentMode::Out, typeCreatorContext);
+                command, interfaceDeclarationName, ::seds::model::CommandArgumentMode::Out, typeCreatorContext);
     } break;
-    case seds::model::ArgumentsCombination::InAndNotify: {
+    case ::seds::model::ArgumentsCombination::InAndNotify: {
         // InAndNotify arguments are separated onto two interfaces
         // In arguments - as-is
         createAsyncCommandBundledType(
-                command, interfaceDeclarationName, seds::model::CommandArgumentMode::In, typeCreatorContext);
+                command, interfaceDeclarationName, ::seds::model::CommandArgumentMode::In, typeCreatorContext);
         // Notify arguments - switched interface type (provided <-> required)
         createAsyncCommandBundledType(
-                command, interfaceDeclarationName, seds::model::CommandArgumentMode::Notify, typeCreatorContext);
+                command, interfaceDeclarationName, ::seds::model::CommandArgumentMode::Notify, typeCreatorContext);
     } break;
-    case seds::model::ArgumentsCombination::NoArgs: {
+    case ::seds::model::ArgumentsCombination::NoArgs: {
         // No arguments, no problems
         break;
     }
-    case seds::model::ArgumentsCombination::NotifyOnly:
-    case seds::model::ArgumentsCombination::InAndOut:
-    case seds::model::ArgumentsCombination::OutAndNotify:
-    case seds::model::ArgumentsCombination::All: {
+    case ::seds::model::ArgumentsCombination::NotifyOnly:
+    case ::seds::model::ArgumentsCombination::InAndOut:
+    case ::seds::model::ArgumentsCombination::OutAndNotify:
+    case ::seds::model::ArgumentsCombination::All: {
         const auto message = QString(
                 "Interface command arguments combination '%1' is not supported for TASTE InterfaceView async interface")
                                      .arg(argumentsCombinationToString(command.argumentsCombination()));
@@ -176,8 +177,8 @@ void InterfaceTypeCreator::createTypesForAsyncCommand(const seds::model::Interfa
     }
 }
 
-void InterfaceTypeCreator::createAsyncCommandBundledType(const seds::model::InterfaceCommand &command,
-        const QString &interfaceDeclarationName, const seds::model::CommandArgumentMode requestedArgumentMode,
+void InterfaceTypeCreator::createAsyncCommandBundledType(const ::seds::model::InterfaceCommand &command,
+        const QString &interfaceDeclarationName, const ::seds::model::CommandArgumentMode requestedArgumentMode,
         InterfaceTypeCreatorContext &typeCreatorContext)
 {
     const auto commandName = Escaper::escapeAsn1TypeName(command.nameStr());
@@ -218,7 +219,7 @@ void InterfaceTypeCreator::createAsyncCommandBundledType(const seds::model::Inte
     }
 }
 
-bool InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const seds::model::CommandArgument &argument,
+bool InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const ::seds::model::CommandArgument &argument,
         Asn1Acn::Types::Sequence *bundledType, const std::optional<QString> &determinantArgumentName,
         Context &bundledTypeContext, InterfaceTypeCreatorContext &typeCreatorContext)
 {
@@ -279,4 +280,4 @@ bool InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const seds::mo
     return true;
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

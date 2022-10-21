@@ -65,6 +65,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterMappingFunctionsModuleFileName);
     m_parser.handlePositional(CommandArg::SedsConverterSdlFilepathPrefix);
     m_parser.handlePositional(CommandArg::SedsConverterTasteTranslation);
+    m_parser.handlePositional(CommandArg::SedsConverterTransactionNameType);
 
     m_parser.process(arguments);
     m_arguments = m_parser.positionalsSet();
@@ -115,6 +116,7 @@ void SedsConverterCLI::processOptions(Options &options)
     addSdlInputOptions(options);
     addSedsInputOptions(options);
 
+    addSedsTranslationOptions(options);
     addAsn1TranslationOptions(options);
     addIvTranslationOptions(options);
 
@@ -244,6 +246,13 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
         options.add(SedsOptions::skipValidation);
     }
 
+    if (m_arguments.contains(CommandArg::SedsConverterKeepIntermediateFiles)) {
+        options.add(SedsOptions::keepIntermediateFiles);
+    }
+}
+
+void SedsConverterCLI::addSedsTranslationOptions(Options &options)
+{
     if (m_arguments.contains(CommandArg::SedsConverterNoMangling)) {
         options.add(SedsOptions::noMangling);
     }
@@ -260,8 +269,8 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
         options.add(SedsOptions::tasteTranslation);
     }
 
-    if (m_arguments.contains(CommandArg::SedsConverterKeepIntermediateFiles)) {
-        options.add(SedsOptions::keepIntermediateFiles);
+    if (m_arguments.contains(CommandArg::SedsConverterTransactionNameType)) {
+        options.add(SedsOptions::transactionNameType, m_parser.value(CommandArg::SedsConverterTransactionNameType));
     }
 }
 

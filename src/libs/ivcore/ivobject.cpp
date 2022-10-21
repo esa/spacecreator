@@ -52,7 +52,7 @@ IVObject::IVObject(const IVObject::Type t, QObject *parent, const shared::Id &id
         setModel(model);
 }
 
-IVObject::~IVObject() {}
+IVObject::~IVObject() { }
 
 QString IVObject::title() const
 {
@@ -65,7 +65,8 @@ QString IVObject::titleUI() const
     static const QString urlAttrName { ivm::meta::Props::token(ivm::meta::Props::Token::url) };
     if (hasEntityAttribute(urlAttrName)) {
         const QString url = entityAttributeValue<QString>(urlAttrName);
-        text = QStringLiteral("<a href=\"%1\">%2</a>").arg(url, text);
+        if (!url.isEmpty())
+            text = QStringLiteral("<a href=\"%1\">%2</a>").arg(url, text);
     }
     return text;
 }

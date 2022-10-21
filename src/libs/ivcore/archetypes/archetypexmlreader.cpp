@@ -48,7 +48,7 @@ static inline QString attrValue(
     return attrValue(attrs, meta::ArchetypeProps::token(token), defaultValue);
 }
 
-void CurrentObjectHolder::set(ArchetypeObject *object)
+void CurrentArchetypeObjectHolder::set(ArchetypeObject *object)
 {
     m_object = object;
     m_function = m_object ? m_object->as<FunctionArchetype *>() : nullptr;

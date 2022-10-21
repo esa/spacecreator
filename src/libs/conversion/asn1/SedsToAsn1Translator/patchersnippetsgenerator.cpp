@@ -28,10 +28,10 @@
 
 using conversion::translator::TranslationException;
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 PatcherSnippetsGenerator::PatcherSnippetsGenerator(
-        Context &context, const seds::model::ContainerDataType &container, Asn1Acn::Types::Sequence *sequence)
+        Context &context, const ::seds::model::ContainerDataType &container, Asn1Acn::Types::Sequence *sequence)
     : m_context(context)
     , m_container(container)
     , m_sequence(sequence)
@@ -50,11 +50,11 @@ void PatcherSnippetsGenerator::generate()
     }
 }
 
-void PatcherSnippetsGenerator::generatePatcherSnippets(const seds::model::ContainerDataType &container)
+void PatcherSnippetsGenerator::generatePatcherSnippets(const ::seds::model::ContainerDataType &container)
 {
     if (container.baseType()) {
         const auto baseType = m_context.findSedsType(*container.baseType());
-        const auto baseContainerType = std::get_if<seds::model::ContainerDataType>(baseType);
+        const auto baseContainerType = std::get_if<::seds::model::ContainerDataType>(baseType);
 
         if (baseContainerType == nullptr) {
             auto errorMessage = QString("Container '%1' has a base type '%2' that is not a container")
@@ -69,10 +69,10 @@ void PatcherSnippetsGenerator::generatePatcherSnippets(const seds::model::Contai
     for (const auto &entry : container.entries()) {
         // clang-format off
         std::visit(overloaded {
-            [&](const seds::model::ErrorControlEntry &errorControlEntry) {
+            [&](const ::seds::model::ErrorControlEntry &errorControlEntry) {
                 buildErrorControlEntryFunction(errorControlEntry);
             },
-            [&](const seds::model::LengthEntry &lengthEntry) {
+            [&](const ::seds::model::LengthEntry &lengthEntry) {
                 buildLengthEntryFunction(lengthEntry);
             },
             [&](const auto &e) {
@@ -83,7 +83,7 @@ void PatcherSnippetsGenerator::generatePatcherSnippets(const seds::model::Contai
     }
 }
 
-void PatcherSnippetsGenerator::buildErrorControlEntryFunction(const seds::model::ErrorControlEntry &errorControlEntry)
+void PatcherSnippetsGenerator::buildErrorControlEntryFunction(const ::seds::model::ErrorControlEntry &errorControlEntry)
 {
     const auto bitCount = getErrorControlBitCount(errorControlEntry);
 
@@ -93,7 +93,7 @@ void PatcherSnippetsGenerator::buildErrorControlEntryFunction(const seds::model:
     m_sequence->addPatcherSnippet({ std::move(encodingFunction), std::move(decodingValidator) });
 }
 
-void PatcherSnippetsGenerator::buildLengthEntryFunction(const seds::model::LengthEntry &lengthEntry)
+void PatcherSnippetsGenerator::buildLengthEntryFunction(const ::seds::model::LengthEntry &lengthEntry)
 {
     const auto entryName = Escaper::escapeCFieldName(lengthEntry.nameStr());
     const auto &encoding = getLengthEncoding(lengthEntry);
@@ -105,7 +105,7 @@ void PatcherSnippetsGenerator::buildLengthEntryFunction(const seds::model::Lengt
 }
 
 QString PatcherSnippetsGenerator::buildErrorControlEntryEncodingFunction(
-        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const
+        const ::seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const
 {
     const auto sequenceName = Escaper::escapeCSequenceName(m_container.nameStr());
     const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
@@ -117,18 +117,18 @@ QString PatcherSnippetsGenerator::buildErrorControlEntryEncodingFunction(
 
     // clang-format off
     std::visit(overloaded {
-        [&](const seds::model::CoreErrorControl &coreErrorControl) {
+        [&](const ::seds::model::CoreErrorControl &coreErrorControl) {
             switch(coreErrorControl) {
-                case seds::model::CoreErrorControl::Crc16:
+                case ::seds::model::CoreErrorControl::Crc16:
                     stream << "Crc16";
                     break;
-                case seds::model::CoreErrorControl::Crc8:
+                case ::seds::model::CoreErrorControl::Crc8:
                     stream << "Crc8";
                     break;
-                case seds::model::CoreErrorControl::Checksum:
+                case ::seds::model::CoreErrorControl::Checksum:
                     stream << "Checksum";
                     break;
-                case seds::model::CoreErrorControl::ChecksumLongitundinal:
+                case ::seds::model::CoreErrorControl::ChecksumLongitundinal:
                     stream << "ChecksumLongitundinal";
                     break;
                 default: {
@@ -154,7 +154,7 @@ QString PatcherSnippetsGenerator::buildErrorControlEntryEncodingFunction(
 }
 
 QString PatcherSnippetsGenerator::buildErrorControlEntryDecodingValidator(
-        const seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const
+        const ::seds::model::ErrorControlEntry &entry, const uint64_t bitCount) const
 {
     const auto sequenceName = Escaper::escapeCSequenceName(m_container.nameStr());
     const auto entryName = Escaper::escapeCFieldName(entry.nameStr());
@@ -166,18 +166,18 @@ QString PatcherSnippetsGenerator::buildErrorControlEntryDecodingValidator(
 
     // clang-format off
     std::visit(overloaded {
-        [&](const seds::model::CoreErrorControl &coreErrorControl) {
+        [&](const ::seds::model::CoreErrorControl &coreErrorControl) {
             switch(coreErrorControl) {
-                case seds::model::CoreErrorControl::Crc16:
+                case ::seds::model::CoreErrorControl::Crc16:
                     stream << "Crc16";
                     break;
-                case seds::model::CoreErrorControl::Crc8:
+                case ::seds::model::CoreErrorControl::Crc8:
                     stream << "Crc8";
                     break;
-                case seds::model::CoreErrorControl::Checksum:
+                case ::seds::model::CoreErrorControl::Checksum:
                     stream << "Checksum";
                     break;
-                case seds::model::CoreErrorControl::ChecksumLongitundinal:
+                case ::seds::model::CoreErrorControl::ChecksumLongitundinal:
                     stream << "ChecksumLongitundinal";
                     break;
                 default: {
@@ -208,7 +208,7 @@ QString PatcherSnippetsGenerator::buildErrorControlEntryDecodingValidator(
 }
 
 QString PatcherSnippetsGenerator::buildLengthEntryEncodingFunction(
-        const seds::model::IntegerDataEncoding &encoding, const QString &entryName) const
+        const ::seds::model::IntegerDataEncoding &encoding, const QString &entryName) const
 {
     const auto sequenceName = Escaper::escapeCSequenceName(m_container.nameStr());
 
@@ -219,15 +219,15 @@ QString PatcherSnippetsGenerator::buildLengthEntryEncodingFunction(
 
     // clang-format off
     std::visit(overloaded {
-        [&](const seds::model::CoreIntegerEncoding &coreEncoding) {
+        [&](const ::seds::model::CoreIntegerEncoding &coreEncoding) {
             switch(coreEncoding) {
-                case seds::model::CoreIntegerEncoding::Unsigned:
+                case ::seds::model::CoreIntegerEncoding::Unsigned:
                     stream << "PositiveInteger";
                     break;
-                case seds::model::CoreIntegerEncoding::TwosComplement:
+                case ::seds::model::CoreIntegerEncoding::TwosComplement:
                     stream << "TwosComplement";
                     break;
-                case seds::model::CoreIntegerEncoding::Bcd:
+                case ::seds::model::CoreIntegerEncoding::Bcd:
                     stream << "BCD";
                     break;
                 default: {
@@ -251,7 +251,7 @@ QString PatcherSnippetsGenerator::buildLengthEntryEncodingFunction(
 }
 
 QString PatcherSnippetsGenerator::buildLengthEntryDecodingValidator(
-        const seds::model::IntegerDataEncoding &encoding, const QString &entryName) const
+        const ::seds::model::IntegerDataEncoding &encoding, const QString &entryName) const
 {
     const auto sequenceName = Escaper::escapeCSequenceName(m_container.nameStr());
 
@@ -263,15 +263,15 @@ QString PatcherSnippetsGenerator::buildLengthEntryDecodingValidator(
 
     // clang-format off
     std::visit(overloaded {
-        [&](const seds::model::CoreIntegerEncoding &coreEncoding) {
+        [&](const ::seds::model::CoreIntegerEncoding &coreEncoding) {
             switch(coreEncoding) {
-                case seds::model::CoreIntegerEncoding::Unsigned:
+                case ::seds::model::CoreIntegerEncoding::Unsigned:
                     stream << "PositiveInteger";
                     break;
-                case seds::model::CoreIntegerEncoding::TwosComplement:
+                case ::seds::model::CoreIntegerEncoding::TwosComplement:
                     stream << "TwosComplement";
                     break;
-                case seds::model::CoreIntegerEncoding::Bcd:
+                case ::seds::model::CoreIntegerEncoding::Bcd:
                     stream << "BCD";
                     break;
                 default: {
@@ -299,10 +299,10 @@ QString PatcherSnippetsGenerator::buildLengthEntryDecodingValidator(
     return buffer;
 }
 
-uint64_t PatcherSnippetsGenerator::getErrorControlBitCount(const seds::model::ErrorControlEntry &entry) const
+uint64_t PatcherSnippetsGenerator::getErrorControlBitCount(const ::seds::model::ErrorControlEntry &entry) const
 {
     const auto entryType = m_context.findSedsType(entry.type());
-    const auto entryBinaryType = std::get_if<seds::model::BinaryDataType>(entryType);
+    const auto entryBinaryType = std::get_if<::seds::model::BinaryDataType>(entryType);
 
     if (!entryBinaryType) {
         auto errorMessage =
@@ -318,11 +318,11 @@ uint64_t PatcherSnippetsGenerator::getErrorControlBitCount(const seds::model::Er
 
     return entryBinaryType->bits();
 }
-const seds::model::IntegerDataEncoding &PatcherSnippetsGenerator::getLengthEncoding(
-        const seds::model::LengthEntry &entry) const
+const ::seds::model::IntegerDataEncoding &PatcherSnippetsGenerator::getLengthEncoding(
+        const ::seds::model::LengthEntry &entry) const
 {
     const auto entryType = m_context.findSedsType(entry.type());
-    const auto entryIntegerType = std::get_if<seds::model::IntegerDataType>(entryType);
+    const auto entryIntegerType = std::get_if<::seds::model::IntegerDataType>(entryType);
 
     if (!entryIntegerType) {
         auto errorMessage =
@@ -340,4 +340,4 @@ const seds::model::IntegerDataEncoding &PatcherSnippetsGenerator::getLengthEncod
     return entryIntegerEncoding.value();
 }
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds

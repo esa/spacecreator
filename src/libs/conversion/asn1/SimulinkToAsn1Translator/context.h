@@ -24,7 +24,7 @@
 #include <conversion/common/options.h>
 #include <simulink/SimulinkModel/simulinkmodel.h>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::simulink {
 
 /**
  * @brief   Context with current SIMULINK to ASN.1 translation state
@@ -108,4 +108,4 @@ private:
     const Options &m_options;
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::simulink

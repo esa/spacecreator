@@ -129,16 +129,18 @@ and it will now be possible to load a sample project.
 
 ## Setting up QtCreator
 To develop the spacecreator plugin in black QtCreator we need to setup a project.
+Note that values entered in QtCreator is not substituted like in a shell, so 
+$HOME and ~/ does not work. Instead we assume the user to be 'taste'
 
 ### Manage Kits...
-We want to use the Qt installation in our build environment ($HOME/project/spacecreatorenv6/Qt)
+We want to use the Qt installation in our build environment (/home/taste/project/spacecreatorenv6/Qt)
 So we go to ***Kits / Qt Version*** and create a manual Qt Version named ***spacecreatorenvqt6***.
 Then we make a new Manual Kit named ***spacecreator6*** where we select the Qt version above.
 
 In the ***CMake Configuration*** inside the kit, click the ***Change...*** button.
 Add two lines there:<br>
-QTC_SOURCE:PATH=$HOME/project/spacecreatorenv6/spacecreator.AppDir<br>
-QTC_INSTALL:PATH=$HOME/project/spacecreatorenv6/spacecreator.AppDir
+QTC_SOURCE:PATH=/home/taste/project/spacecreatorenv6/spacecreator.AppDir<br>
+QTC_INSTALL:PATH=/home/taste/project/spacecreatorenv6/spacecreator.AppDir
 
 
 ### Build Settings
@@ -152,13 +154,13 @@ We need to have QtCreator run the postbuild.py script after the build stop, so w
 ***Deployment Method*** that is a Custom Process Step. The command is
 `python3` and the arguments are:
 
-`%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=$HOME/project/spacecreatorenv6/spacecreator.AppDir`
+`%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=/home/taste/project/spacecreatorenv6/spacecreator.AppDir`
 
 This will call the correct **postbuild.py** script and tell it where the plugins were build and where to put them.<br>
 The variables `%{ActiveProject:Path}` and `%{buildDir}` are substituted by QtCreator.
 
 Now we need a Run configuration of the type ***Custom Executable***:<br>
-**Executable**: `$HOME/project/spacecreatorenv6/spacecreator.AppDir/bin/qtcreator`<br>
+**Executable**: `/home/taste/project/spacecreatorenv6/spacecreator.AppDir/bin/qtcreator`<br>
 **Command line arguments**: `-color blue`
 
 

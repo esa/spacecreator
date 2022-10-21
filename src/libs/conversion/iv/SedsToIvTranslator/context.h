@@ -26,7 +26,7 @@ class Package;
 class Component;
 } // namespace seds::model
 
-namespace conversion::iv::translator {
+namespace conversion::iv::translator::seds {
 
 /**
  * @brief   Context with current SEDS to IV translation state
@@ -40,7 +40,7 @@ public:
      * @param   package     Current package
      * @param   component   Current componen
      */
-    Context(const seds::model::Package *package, const seds::model::Component *component);
+    Context(const ::seds::model::Package *package, const ::seds::model::Component *component);
 
 public:
     /**
@@ -51,11 +51,11 @@ public:
      * @return  Pointer to the interface declaration if found, nullptr otherwise
      */
     auto findInterfaceDeclaration(const QString &interfaceDeclarationName) const
-            -> const seds::model::InterfaceDeclaration *;
+            -> const ::seds::model::InterfaceDeclaration *;
 
 private:
-    const seds::model::Package *m_package;
-    const seds::model::Component *m_component;
+    const ::seds::model::Package *m_package;
+    const ::seds::model::Component *m_component;
 };
 
-} // namespace conversion::iv::translator
+} // namespace conversion::iv::translator::seds

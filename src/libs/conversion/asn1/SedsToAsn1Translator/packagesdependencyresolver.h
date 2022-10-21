@@ -24,7 +24,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Utility used for resolving dependencies between SEDS packages
@@ -44,8 +44,8 @@ private:
         Permanent
     };
 
-    using MarksMap = std::unordered_map<const seds::model::Package *, MarkType>;
-    using ResultList = std::list<const seds::model::Package *>;
+    using MarksMap = std::unordered_map<const ::seds::model::Package *, MarkType>;
+    using ResultList = std::list<const ::seds::model::Package *>;
 
 public:
     /**
@@ -55,48 +55,48 @@ public:
      *
      * @return  Sorted list of packages
      */
-    auto resolve(const std::vector<seds::model::Package> *packages) -> ResultList;
+    auto resolve(const std::vector<::seds::model::Package> *packages) -> ResultList;
 
 private:
-    auto visit(const seds::model::Package *package) -> void;
+    auto visit(const ::seds::model::Package *package) -> void;
 
-    auto handleDataTypes(const std::vector<seds::model::DataType> &dataTypes) -> void;
-    auto handleArray(const seds::model::ArrayDataType &arrayDataType) -> void;
-    auto handleContainer(const seds::model::ContainerDataType &containerDataType) -> void;
-    auto handleSubRangeDataType(const seds::model::SubRangeDataType &subRangeDataType) -> void;
+    auto handleDataTypes(const std::vector<::seds::model::DataType> &dataTypes) -> void;
+    auto handleArray(const ::seds::model::ArrayDataType &arrayDataType) -> void;
+    auto handleContainer(const ::seds::model::ContainerDataType &containerDataType) -> void;
+    auto handleSubRangeDataType(const ::seds::model::SubRangeDataType &subRangeDataType) -> void;
 
-    auto handleInterfaceDeclarations(const std::vector<seds::model::InterfaceDeclaration> &interfaceDeclarations)
+    auto handleInterfaceDeclarations(const std::vector<::seds::model::InterfaceDeclaration> &interfaceDeclarations)
             -> void;
-    auto handleInterfaceDeclaration(const seds::model::InterfaceDeclaration &interfaceDeclaration) -> void;
-    auto handleParameters(const std::vector<seds::model::InterfaceParameter> &parameters) -> void;
-    auto handleCommands(const std::vector<seds::model::InterfaceCommand> &commands) -> void;
+    auto handleInterfaceDeclaration(const ::seds::model::InterfaceDeclaration &interfaceDeclaration) -> void;
+    auto handleParameters(const std::vector<::seds::model::InterfaceParameter> &parameters) -> void;
+    auto handleCommands(const std::vector<::seds::model::InterfaceCommand> &commands) -> void;
 
-    auto handleComponents(const std::vector<seds::model::Component> &components, const seds::model::Package *package)
-            -> void;
-    auto handleInterfaces(const std::vector<seds::model::Interface> &interfaces,
-            const seds::model::Component &component, const seds::model::Package *package) -> void;
+    auto handleComponents(
+            const std::vector<::seds::model::Component> &components, const ::seds::model::Package *package) -> void;
+    auto handleInterfaces(const std::vector<::seds::model::Interface> &interfaces,
+            const ::seds::model::Component &component, const ::seds::model::Package *package) -> void;
 
-    auto handleTypeMapSet(const std::optional<seds::model::GenericTypeMapSet> &typeMapSet) -> void;
-    auto handleAlternateSet(const std::optional<seds::model::GenericAlternateSet> &alternateSet) -> void;
+    auto handleTypeMapSet(const std::optional<::seds::model::GenericTypeMapSet> &typeMapSet) -> void;
+    auto handleAlternateSet(const std::optional<::seds::model::GenericAlternateSet> &alternateSet) -> void;
 
-    auto handleArrayDimensions(const std::vector<seds::model::DimensionSize> &dimensions) -> void;
+    auto handleArrayDimensions(const std::vector<::seds::model::DimensionSize> &dimensions) -> void;
 
-    auto handleDataTypeRef(const seds::model::DataTypeRef &typeRef) -> void;
+    auto handleDataTypeRef(const ::seds::model::DataTypeRef &typeRef) -> void;
 
-    auto findPackage(const QString &packageName) const -> const seds::model::Package *;
-    auto findInterfaceDeclaration(const QString &name, const seds::model::Component &sedsComponent,
-            const seds::model::Package *sedsPackage) -> const seds::model::InterfaceDeclaration &;
+    auto findPackage(const QString &packageName) const -> const ::seds::model::Package *;
+    auto findInterfaceDeclaration(const QString &name, const ::seds::model::Component &sedsComponent,
+            const ::seds::model::Package *sedsPackage) -> const ::seds::model::InterfaceDeclaration &;
 
-    auto markTemporary(const seds::model::Package *package) -> void;
-    auto markPermanent(const seds::model::Package *package) -> void;
-    auto isTemporarilyMarked(const seds::model::Package *package) -> bool;
-    auto isPermanentlyMarked(const seds::model::Package *package) -> bool;
+    auto markTemporary(const ::seds::model::Package *package) -> void;
+    auto markPermanent(const ::seds::model::Package *package) -> void;
+    auto isTemporarilyMarked(const ::seds::model::Package *package) -> bool;
+    auto isPermanentlyMarked(const ::seds::model::Package *package) -> bool;
 
 private:
-    const std::vector<seds::model::Package> *m_packages;
+    const std::vector<::seds::model::Package> *m_packages;
 
     MarksMap m_marks;
     ResultList m_result;
 };
 
-} // namespace conversion::asn1::translator {
+} // namespace conversion::asn1::translator::seds {

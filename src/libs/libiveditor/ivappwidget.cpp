@@ -341,8 +341,9 @@ void IVAppWidget::instantiateEntity(const shared::Id &id, const QPointF &sceneDr
         itemAtScenePos = itemAtScenePos->parentItem();
     }
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdInstantiate = new cmd::CmdEntitiesInstantiate(
-            obj->as<ivm::IVFunctionType *>(), parentObject, m_document->objectsModel(), sceneDropPoint);
+    auto cmdInstantiate =
+            new cmd::CmdEntitiesInstantiate(obj->as<ivm::IVFunctionType *>(), parentObject, m_document->objectsModel(),
+                    m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
     m_document->commandsStack()->push(cmdInstantiate);
 }
 
@@ -498,9 +499,8 @@ QVector<QAction *> IVAppWidget::initActions()
     ActionsManager::registerAction(Q_FUNC_INFO, actCreateFunctionType, "Function Type", "Create FunctionType object");
     actCreateFunctionType->setCheckable(true);
     actCreateFunctionType->setActionGroup(actionGroup);
-    connect(actCreateFunctionType, &QAction::triggered, this, [this]() {
-        m_tool->setCurrentToolType(IVCreatorTool::ToolType::FunctionType);
-    });
+    connect(actCreateFunctionType, &QAction::triggered, this,
+            [this]() { m_tool->setCurrentToolType(IVCreatorTool::ToolType::FunctionType); });
     actCreateFunctionType->setIcon(QIcon(":/toolbar/icns/function_type.svg"));
 
     auto actCreateFunction = new QAction(tr("Function"));
@@ -608,7 +608,7 @@ QVector<QAction *> IVAppWidget::initActions()
     m_actShrinkScene->setActionGroup(actionGroup);
     m_actShrinkScene->setEnabled(true);
     m_actShrinkScene->setIcon(QIcon(QLatin1String(":/toolbar/icns/shrink.svg")));
-    connect(m_actShrinkScene, &QAction::triggered, this, [this](){
+    connect(m_actShrinkScene, &QAction::triggered, this, [this]() {
         m_document->itemsModel()->shrinkScene();
         graphicsView()->centerOn(m_document->scene()->sceneRect().center());
     });

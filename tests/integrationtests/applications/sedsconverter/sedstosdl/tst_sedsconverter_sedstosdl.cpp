@@ -46,6 +46,7 @@ private Q_SLOTS:
     void testCrossReference();
     void testSplineCalibrators();
     void testSedsSdlWithTasteOption();
+    void testTransaction();
 };
 
 /// \SRS  ETB-FUN-10
@@ -303,6 +304,16 @@ void tst_SedsConverter_SedsToSdl::testSplineCalibrators()
 void tst_SedsConverter_SedsToSdl::testSedsSdlWithTasteOption()
 {
     const int result = system("./test_translation_taste_option.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2180
+/// \SRS  ETB-FUN-2580
+/// \SRS  ETB-FUN-2710
+void tst_SedsConverter_SedsToSdl::testTransaction()
+{
+    const int result = system("./test_transaction.sh");
     QCOMPARE(result, 0);
 }
 

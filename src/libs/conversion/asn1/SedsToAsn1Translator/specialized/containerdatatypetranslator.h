@@ -26,7 +26,7 @@
 #include <seds/SedsModel/types/containerdatatype.h>
 #include <vector>
 
-namespace conversion::asn1::translator {
+namespace conversion::asn1::translator::seds {
 
 /**
  * @brief   Translator for SEDS container data type
@@ -64,21 +64,22 @@ public:
      *
      * @param   sedsType    Type to translation
      */
-    auto translate(const seds::model::ContainerDataType &sedsType) -> void;
+    auto translate(const ::seds::model::ContainerDataType &sedsType) -> void;
 
 private:
-    auto handleEntries(
-            const std::vector<seds::model::EntryType> &entries, EntryTranslatorVisitor &entryTranslator) const -> void;
-    auto handleTrailerEntries(
-            const std::vector<seds::model::EntryType> &entries, EntryTranslatorVisitor &entryTranslator) const -> void;
+    auto handleEntries(const std::vector<::seds::model::EntryType> &entries,
+            EntryTranslatorVisitor &entryTranslator) const -> void;
+    auto handleTrailerEntries(const std::vector<::seds::model::EntryType> &entries,
+            EntryTranslatorVisitor &entryTranslator) const -> void;
     auto handleBaseTypeEntries(
-            const seds::model::ContainerDataType &sedsType, EntryTranslatorVisitor &entryTranslator) const -> void;
+            const ::seds::model::ContainerDataType &sedsType, EntryTranslatorVisitor &entryTranslator) const -> void;
     auto handleBaseTypeTrailerEntries(
-            const seds::model::ContainerDataType &sedsType, EntryTranslatorVisitor &entryTranslator) const -> void;
+            const ::seds::model::ContainerDataType &sedsType, EntryTranslatorVisitor &entryTranslator) const -> void;
 
     auto applyContainerConstraints(
-            const seds::model::ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const -> void;
-    auto updateParentContainer(const seds::model::DataTypeRef &baseTypeRef, Asn1Acn::Types::Sequence *asn1Type) -> void;
+            const ::seds::model::ContainerDataType &sedsType, Asn1Acn::Types::Sequence *asn1Type) const -> void;
+    auto updateParentContainer(const ::seds::model::DataTypeRef &baseTypeRef, Asn1Acn::Types::Sequence *asn1Type)
+            -> void;
 
     auto createRealizationContainerField(Asn1Acn::Types::Sequence *asn1Sequence) -> void;
 
@@ -89,4 +90,4 @@ private:
     inline static const QString m_realizationComponentsAlternativeNameTemplate = "realization%1";
 };
 
-} // namespace conversion::asn1::translator
+} // namespace conversion::asn1::translator::seds
