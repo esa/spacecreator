@@ -48,6 +48,7 @@ private Q_SLOTS:
     void testSedsSdlWithTasteOption();
     void testTransaction();
     void testFailureReportingSync();
+    void testFailureReportingAsync();
 };
 
 /// \SRS  ETB-FUN-10
@@ -326,6 +327,15 @@ void tst_SedsConverter_SedsToSdl::testTransaction()
 void tst_SedsConverter_SedsToSdl::testFailureReportingSync()
 {
     const int result = system("./test_failure_reporting_sync.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2130
+/// \SRS  ETB-FUN-2190
+void tst_SedsConverter_SedsToSdl::testFailureReportingAsync()
+{
+    const int result = system("./test_failure_reporting_async.sh");
     QCOMPARE(result, 0);
 }
 
