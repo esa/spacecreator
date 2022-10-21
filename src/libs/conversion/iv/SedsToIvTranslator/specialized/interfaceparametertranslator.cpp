@@ -19,20 +19,24 @@
 
 #include "specialized/interfaceparametertranslator.h"
 
+#include <conversion/asn1/SedsToAsn1Translator/constants.h>
 #include <conversion/asn1/SedsToAsn1Translator/datatypetranslationhelper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <seds/SedsOptions/options.h>
 
 using conversion::UnhandledValueException;
 using conversion::asn1::translator::seds::DataTypeTranslationHelper;
+using conversion::seds::SedsOptions;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator::seds {
 
-InterfaceParameterTranslator::InterfaceParameterTranslator(
-        ivm::IVFunction *ivFunction, const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper)
+InterfaceParameterTranslator::InterfaceParameterTranslator(ivm::IVFunction *ivFunction,
+        const QString &sedsInterfaceName, const InterfaceTypeNameHelper &typeNameHelper, const Options &options)
     : m_ivFunction(ivFunction)
     , m_sedsInterfaceName(sedsInterfaceName)
     , m_typeNameHelper(typeNameHelper)
+    , m_options(options)
 {
 }
 
@@ -99,6 +103,10 @@ void InterfaceParameterTranslator::buildParameter(const ::seds::model::Interface
             interfaceName, interfaceType, interfaceKind, sedsParameter, m_ivFunction);
     ivInterface->addParam(ivParameter);
 
+    if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+        handleFailureReporting(ivInterface);
+    }
+
     m_ivFunction->addChild(ivInterface);
 }
 
@@ -109,6 +117,22 @@ QString InterfaceParameterTranslator::handleParameterTypeName(
     const auto &parameterDimensions = sedsParameter.arrayDimensions();
 
     return m_typeNameHelper.handleTypeName(parameterTypeRef, parameterDimensions);
+}
+
+void InterfaceParameterTranslator::handleFailureReporting(ivm::IVInterface *ivInterface) const
+{
+    if (!m_options.isSet(SedsOptions::failureReportingType)) {
+        throw TranslationException(
+                "SEDS failure reporting feature was used but no ASN.1 type for failure parameter was specified");
+    }
+
+    const auto failureParamTypeName = m_options.value(SedsOptions::failureReportingType).value();
+
+    // Add transaction name parameter to the IV interface
+    const auto ivParameter =
+            InterfaceTranslatorHelper::createInterfaceParameter(asn1::translator::seds::Constants::failureParamName,
+                    failureParamTypeName, shared::InterfaceParameter::Direction::OUT);
+    ivInterface->addParam(ivParameter);
 }
 
 } // namespace conversion::iv::translator::seds

@@ -59,8 +59,8 @@ public:
      * @param variables         Variables to be translated
      * @param options           Conversion options
      */
-    static auto translateVariables(Context &context, const seds::model::ComponentImplementation::VariableSet &variables, const Options &options)
-            -> void;
+    static auto translateVariables(Context &context, const seds::model::ComponentImplementation::VariableSet &variables,
+            const Options &options) -> void;
 
     /**
      * @brief   Create timer variables
@@ -166,9 +166,9 @@ private:
     static auto getParameterInterface(ivm::IVFunction *function, const ParameterType type, const ParameterMode mode,
             const QString &interfaceName, const QString &parameterName) -> ivm::IVInterface *;
 
-    static auto createParameterSyncPi(Context &context, ivm::IVInterface *ivInterface, const seds::model::ParameterMap &map,
-            const std::vector<const ::seds::model::Transition *> &sedsTransitions, ::sdl::Process *sdlProcess,
-            const ParameterType type, const Options &options) -> void;
+    static auto createParameterSyncPi(Context &context, ivm::IVInterface *ivInterface,
+            const seds::model::ParameterMap &map, const std::vector<const ::seds::model::Transition *> &sedsTransitions,
+            ::sdl::Process *sdlProcess, const ParameterType type, const Options &options) -> void;
     static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
             ::sdl::StateMachine *stateMachine) -> void;
 

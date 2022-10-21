@@ -166,8 +166,10 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
         throw TranslationException("Sync commands with no associated transitions are not supported");
     }
 
+    const auto firstTransition = transitions.front();
+
     // primitive is now guaranteed to be OnCommandPrimitive
-    const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&transitions[0]->primitive());
+    const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&firstTransition->primitive());
     if (primitive == nullptr) {
         throw TranslationException(
                 "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
@@ -187,20 +189,6 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
 
     if (transitions.size() == 1) {
         return false;
-    }
-
-    if (transitions.size() == 2) {
-        const auto &secondTransition = transitions[1];
-        const auto secondPrimitive = std::get_if<::seds::model::OnCommandPrimitive>(&secondTransition->primitive());
-        if (secondPrimitive == nullptr) {
-            throw TranslationException(
-                    "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
-                    "a transition which is not OnCommandPrimitive");
-        }
-
-        if (primitive->isFailed() != secondPrimitive->isFailed()) {
-            return false;
-        }
     }
 
     for (const auto &otherTransition : transitions) {
@@ -233,7 +221,7 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
     }
 
     // doActivity optional is now guaranteed to have a value
-    const auto invocation = &(*(transitions[0]->doActivity()));
+    const auto invocation = &(*(firstTransition->doActivity()));
 
     for (const auto &otherTransition : transitions) {
         const auto otherInvocation = &(*(otherTransition->doActivity()));
@@ -262,7 +250,7 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
 static inline auto areParameterTransactionsRequired(const std::vector<const ::seds::model::Transition *> &transitions)
         -> bool
 {
-    if (transitions.size() < 2) {
+    if (transitions.empty()) {
         return false;
     }
 
@@ -278,6 +266,10 @@ static inline auto areParameterTransactionsRequired(const std::vector<const ::se
 
     if (primitive->transaction().has_value()) {
         return true;
+    }
+
+    if (transitions.size() == 1) {
+        return false;
     }
 
     for (const auto &otherTransition : transitions) {
@@ -828,45 +820,59 @@ auto StateMachineTranslator::createParameterSyncPi(Context &context, ivm::IVInte
         const ::seds::model::ParameterMap &map, const std::vector<const ::seds::model::Transition *> &sedsTransitions,
         ::sdl::Process *sdlProcess, const ParameterType type, const Options &options) -> void
 {
-    const auto &parameter = ivInterface->params().front();
-    const auto parameterName = Escaper::escapeSdlVariableName(parameter.name());
-    const auto parameterTypeName = Escaper::escapeSdlName(parameter.paramTypeName());
-    const auto outputVariableName = Escaper::escapeSdlVariableName(map.variableRef().nameStr());
-
-    QString parameterDirection;
-    QString assignmentAction;
-
-    switch (type) {
-    case ParameterType::Getter:
-        parameterDirection = "in/out";
-        assignmentAction = QString("%1 := %2").arg(parameterName).arg(outputVariableName);
-        break;
-    case ParameterType::Setter:
-        parameterDirection = "in";
-        assignmentAction = QString("%2 := %1").arg(parameterName).arg(outputVariableName);
-        break;
-    }
 
     auto procedure = std::make_unique<::sdl::Procedure>(ivInterface->title());
 
-    auto procedureParameter =
-            std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterTypeName, parameterDirection);
-    procedure->addParameter(std::move(procedureParameter));
+    for (const auto &ivParameter : ivInterface->params()) {
+        const auto parameterName = Escaper::escapeSdlVariableName(ivParameter.name());
+        const auto &parameterTypeName = Escaper::escapeSdlName(ivParameter.paramTypeName());
+        const auto &parameterDirection =
+                ivParameter.direction() == shared::InterfaceParameter::Direction::IN ? "in" : "in/out";
+
+        auto procedureParameter =
+                std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterTypeName, parameterDirection);
+        procedure->addParameter(std::move(procedureParameter));
+    }
+
+    const auto &firstParameter = procedure->parameters().front();
+    const auto outputVariableName = Escaper::escapeSdlVariableName(map.variableRef().nameStr());
+
+    const auto assignmentAction = [&]() {
+        switch (type) {
+        case ParameterType::Getter:
+            return QString("%1 := %2").arg(firstParameter->name()).arg(outputVariableName);
+        case ParameterType::Setter:
+            return QString("%2 := %1").arg(firstParameter->name()).arg(outputVariableName);
+        default:
+            return QString();
+        }
+    }();
 
     const auto transactionsRequired = areParameterTransactionsRequired(sedsTransitions);
 
-    if (transactionsRequired) {
-        const auto transactionVariableName = QString("%1_transactionName").arg(ivInterface->title());
-        createTransactionsElements(context, procedure.get(), ivInterface, transactionVariableName, options);
+    auto sdlTransition = [&]() {
+        if (transactionsRequired) {
+            const auto transactionVariableName = QString("%1_transactionName").arg(ivInterface->title());
+            createTransactionsElements(context, procedure.get(), ivInterface, transactionVariableName, options);
 
-        auto sdlTransition =
-                createParameterTransitionWithTransactions(sedsTransitions, assignmentAction, transactionVariableName);
-        procedure->setTransition(std::move(sdlTransition));
-    } else {
-        auto transition = std::make_unique<::sdl::Transition>();
-        transition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
-        procedure->setTransition(std::move(transition));
+            return createParameterTransitionWithTransactions(
+                    sedsTransitions, assignmentAction, transactionVariableName);
+        } else {
+            auto transition = std::make_unique<::sdl::Transition>();
+            transition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
+            return transition;
+        }
+    }();
+
+    if (options.isSet(SedsOptions::enableFailureReporting)) {
+        const auto &failureVariableName = asn1::translator::seds::Constants::failureVariableName;
+
+        const auto failureVariableAssignment = QString("%1 := false").arg(failureVariableName);
+        auto failureVariableAssignmentTask = std::make_unique<::sdl::Task>("", failureVariableAssignment);
+        sdlTransition->addAction(std::move(failureVariableAssignmentTask));
     }
+
+    procedure->setTransition(std::move(sdlTransition));
 
     sdlProcess->addProcedure(std::move(procedure));
 }
@@ -1188,7 +1194,8 @@ auto StateMachineTranslator::translateTransitions(Context &context,
 }
 
 auto StateMachineTranslator::createInputs(Context &context, ::sdl::State *fromState,
-        std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitionsForInputs) -> void
+        std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitionsForInputs)
+        -> void
 {
     for (auto &[inputName, transitionInfos] : sdlTransitionsForInputs) {
         const auto transactionsRequired = transitionInfos.front().transactionName.has_value();
