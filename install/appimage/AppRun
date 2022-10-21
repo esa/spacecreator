@@ -35,6 +35,8 @@ Options:
             Run the IVeditor
         [--MSCeditor [--help]]
             Run the MSC editor
+        [--qhelpgenerator [--help]]
+            Run the QHelpGenerator
         [--help]
             Output this message
         [--version]
@@ -50,6 +52,7 @@ qtlibdir=$libdir/Qt/lib
 if test -d "$qtlibdir"; then
     qtlibpath=:$qtlibdir
 fi
+libexecdir=${HERE}/libexec
 # Add Qt Creator library path
 LD_LIBRARY_PATH=$libdir:$libdir/qtcreator$qtlibpath${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
@@ -89,6 +92,9 @@ case $1 in
     ;;
 --MSCeditor)
     exec "$bindir/msceditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    ;;
+--qhelpgenerator)
+    exec "$libexecdir/qhelpgenerator" "$2" "$3" "$4" "$5" "$6" "$7"
     ;;
 --version|-version)
     "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" "-version"
