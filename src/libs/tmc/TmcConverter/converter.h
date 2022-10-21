@@ -153,7 +153,7 @@ public:
     /**
      * @brief Process trace conversion
      *
-     * This method converts spin trail into simulator trail
+     * This method converts Spin Trail into Simulator Trail
      *
      * @param inputFile input spin trail filepath
      * @param outputFile output simulator trail filepath
