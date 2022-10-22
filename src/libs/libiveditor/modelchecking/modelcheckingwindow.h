@@ -25,6 +25,7 @@
 #include <QFileInfo>
 #include <QTreeWidgetItem>
 #include <functional>
+#include <QStandardPaths>
 
 namespace ive {
 
@@ -130,6 +131,14 @@ private:
         "Observer"
     };
 
+    const QString defaultProjectPropertiesDirectoryPath = "work/modelchecking/properties";
+    const QString defaultMessageSequenceChartWhenThenMscTemplateName = "when-then-property-tmpl.msc";
+    const QString defaultMessageSequenceChartWhenThenMscTemplatePath = 
+                    QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) +
+                    "/model-checker/" +
+                    defaultMessageSequenceChartWhenThenMscTemplateName;
+    const QString sedCommandForWhenThenPropertyTemplate = "sed -i \"s/Untitled_Document/%1/g\" %2";
+
     QString askAboutNewPropertyType();
     bool isPropertyTypeSupported(const QString &propertyType);
     QString askAboutNewPropertyName(const QString &propertyType);
@@ -137,6 +146,7 @@ private:
     void checkNewPropertyNameAndAppendSuffixIfNeeded(QString &propertyName);
     QString getMakeRuleForPropertyType(const QString &propertyType);
     bool invokeMake(const QString &makeRule, const QString &propertyName);
+    bool handleMessageSequenceChartWhenThen(const QString &propertyName);
     void refreshPropertiesTreeViewWithPreselection();
 
     void setCheckBoxState(QCheckBox *checkBox, bool isChecked);
