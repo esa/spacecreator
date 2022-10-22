@@ -113,6 +113,32 @@ private:
     QTreeWidgetItem *functionsTopNodeWidgetItem;
     QTreeWidgetItem *resultsTopDirWidgetItem;
 
+    const QStringList availablePropertyTypes
+    {
+        "Boolean Stop Condition - LTL",
+        "Boolean Stop Condition - Observer",
+        "Message Sequence Chart Search/Verify",
+        "Message Sequence Chart When/Then",
+        "Observer"
+    };
+
+    const QStringList supportedPropertyTypes
+    {
+        "Boolean Stop Condition - Observer",
+        "Message Sequence Chart Search/Verify",
+        "Message Sequence Chart When/Then",
+        "Observer"
+    };
+
+    QString askAboutNewPropertyType();
+    bool isPropertyTypeSupported(const QString &propertyType);
+    QString askAboutNewPropertyName(const QString &propertyType);
+    void escapeNewPropertyName(QString &propertyName);
+    void checkNewPropertyNameAndAppendSuffixIfNeeded(QString &propertyName);
+    QString getMakeRuleForPropertyType(const QString &propertyType);
+    bool invokeMake(const QString &makeRule, const QString &propertyName);
+    void refreshPropertiesTreeViewWithPreselection();
+
     void setCheckBoxState(QCheckBox *checkBox, bool isChecked);
     SpinConfigData readSpinConfigFromUI();
 };
