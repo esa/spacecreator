@@ -20,13 +20,13 @@
 
 Expected results:
 
-* Project `demo_project` should compile correctly without any errors
+* Skeletons should be generated without any errors
 
 **2. Resources:**
 
-* If project contains file with data types definitions, it will be a `workspace.mat` file.
+* If the project contains a file with data types definitions, it will be a `workspace.mat` file.
 * There is one project `tests/manual/simulinkimporterplugin/resources/Aliases/InOutPortsDimension-1WorkspaceMFile`
-*   that contains `workspace.m` file instead of `workspace.mat` to test handling .m files with data types definitions.
+*   that contains `workspace.m` file instead of `workspace.mat` to test handling of .m files with data types definitions.
 
 * List of working projects:
     1. "tests/manual/simulinkimporterplugin/resources/BasicTypes/InOutPortsDimension-1",
