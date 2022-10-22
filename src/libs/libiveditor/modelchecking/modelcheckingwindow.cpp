@@ -799,20 +799,28 @@ void ModelCheckingWindow::addProperty()
 
     const QString makeRule = getMakeRuleForPropertyType(propertyType);
 
-    if(!makeRule.isEmpty()) {
-        if(!invokeMake(makeRule, propertyName)) {
-            QMessageBox::warning(this, tr("Add new property"), tr("Error executing make command."));
-            return;
+    bool wasPropertyHandled = false;
+
+    if (!makeRule.isEmpty()) {
+        if (invokeMake(makeRule, propertyName)) {
+            wasPropertyHandled = true;
+        }
+    } else if (propertyType == "Message Sequence Chart When/Then") {
+        if (handleMessageSequenceChartWhenThen(propertyName)) {
+            wasPropertyHandled = true;
         }
     } else {
-        return;
+        QMessageBox::warning(this, tr("Add new property"), propertyType + " property is not handled.");
     }
 
-    refreshPropertiesTreeViewWithPreselection();
+    if (wasPropertyHandled) {
+        refreshPropertiesTreeViewWithPreselection();
+        statusBar()->showMessage("New property '" + propertyName + "' has been added.", 6000);
+    } else {
+        statusBar()->showMessage("New property '" + propertyName + "' has not been added.", 6000);
+    }
 
     QDir::setCurrent(currentPath);
-
-    statusBar()->showMessage("New property '" + propertyName + "' has been added.", 6000);
 }
 
 QString ModelCheckingWindow::ModelCheckingWindow::askAboutNewPropertyType()
@@ -859,7 +867,7 @@ void ModelCheckingWindow::checkNewPropertyNameAndAppendSuffixIfNeeded(QString &p
 {
     QString propertyDirectoryPath = this->propertiesPath + QDir::separator() + propertyName;
 
-    while(QDir(propertyDirectoryPath).exists())
+    while (QDir(propertyDirectoryPath).exists())
     {
         propertyName.append("_1");
 
@@ -869,13 +877,13 @@ void ModelCheckingWindow::checkNewPropertyNameAndAppendSuffixIfNeeded(QString &p
 
 QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyType)
 {
-    if(propertyType == "Observer") {
+    if (propertyType == "Observer") {
         return "create-obs";
     }
-    else if(propertyType == "Message Sequence Chart Search/Verify") {
+    else if (propertyType == "Message Sequence Chart Search/Verify") {
         return "create-msc";
     }
-    else if(propertyType == "Boolean Stop Condition - Observer") {
+    else if (propertyType == "Boolean Stop Condition - Observer") {
         return "create-bsc";
     }
 
@@ -884,10 +892,45 @@ QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyT
 
 bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &propertyName)
 {
+    const QProcess *const makeCommandProcess = new QProcess(this);
     const QString makeCommand = "make " + makeRule + " NAME=" + propertyName;
-    const QProcess *const makeCallerProcess = new QProcess(this);
 
-    return !makeCallerProcess->execute(makeCommand);
+    if (makeCommandProcess->execute(makeCommand)) {
+        QMessageBox::warning(this, tr("Add new property"), makeCommand + " command can not be executed.");
+        return false;
+    }
+
+    return true;
+}
+
+bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(const QString &propertyName)
+{
+    const QString newPropertyDirectoryPath = defaultProjectPropertiesDirectoryPath + QDir::separator() + propertyName;
+
+    if (!QDir().mkpath(newPropertyDirectoryPath)) {
+        QMessageBox::warning(this, tr("Add new property"), newPropertyDirectoryPath + " can not be created.");
+        return false;
+    }
+
+    const QString newPropertyFilePath = newPropertyDirectoryPath + QDir::separator() + propertyName + ".msc";
+
+    if (!QFile(defaultMessageSequenceChartWhenThenMscTemplatePath).copy(newPropertyFilePath)) {
+        QMessageBox::warning(this, tr("Add new property"), 
+                                    defaultMessageSequenceChartWhenThenMscTemplatePath + 
+                                    " can not be copied to " + 
+                                    newPropertyFilePath);
+        return false;
+    }
+
+    const QProcess *const sedCommandProcess = new QProcess(this);
+    const QString sedCommand = sedCommandForWhenThenPropertyTemplate.arg(propertyName).arg(newPropertyFilePath);
+
+    if (sedCommandProcess->execute(sedCommand)) {
+        QMessageBox::warning(this, tr("Add new property"), sedCommand + " command can not be executed.");
+        return false;
+    }
+
+    return true;
 }
 
 void ModelCheckingWindow::refreshPropertiesTreeViewWithPreselection()
