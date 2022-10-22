@@ -23,6 +23,7 @@
 #include "xmelwriter.h"
 #include "xmelreader.h"
 #include "xmelreader.h"
+#include <conversion/common/escaper/escaper.h>
 
 #include <QDir>
 #include <QProcess>
@@ -805,7 +806,7 @@ void ModelCheckingWindow::addProperty()
         if (invokeMake(makeRule, propertyName)) {
             wasPropertyHandled = true;
         }
-    } else if (propertyType == "Message Sequence Chart When/Then") {
+    } else if (propertyType == messageSequenceChartWhenThen) {
         if (handleMessageSequenceChartWhenThen(propertyName)) {
             wasPropertyHandled = true;
         }
@@ -859,12 +860,12 @@ QString ModelCheckingWindow::askAboutNewPropertyName(const QString &propertyType
 
 void ModelCheckingWindow::escapeNewPropertyName(QString &propertyName)
 {
-    propertyName.replace(" ", "_");
-    propertyName.replace("-", "_");
+    propertyName = conversion::Escaper::escapeIvName(propertyName);
 }
 
 void ModelCheckingWindow::checkNewPropertyNameAndAppendSuffixIfNeeded(QString &propertyName)
 {
+    const QString originalPropertyName = propertyName;
     QString propertyDirectoryPath = this->propertiesPath + QDir::separator() + propertyName;
 
     while (QDir(propertyDirectoryPath).exists())
@@ -873,17 +874,24 @@ void ModelCheckingWindow::checkNewPropertyNameAndAppendSuffixIfNeeded(QString &p
 
         propertyDirectoryPath = this->propertiesPath + QDir::separator() + propertyName;
     }
+
+    if(propertyName != originalPropertyName) {
+        const QString newPropertyNameMessage = QString("'%1' already exists. '%1' has been replaced by '%2'")
+                                                    .arg(originalPropertyName)
+                                                    .arg(propertyName);
+        QMessageBox::information(this, tr("Property name has been replaced"), newPropertyNameMessage);
+    }
 }
 
 QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyType)
 {
-    if (propertyType == "Observer") {
+    if (propertyType == observer) {
         return "create-obs";
     }
-    else if (propertyType == "Message Sequence Chart Search/Verify") {
+    else if (propertyType == messageSequenceChartSearchVerify) {
         return "create-msc";
     }
-    else if (propertyType == "Boolean Stop Condition - Observer") {
+    else if (propertyType == booleanStopConditionObserver) {
         return "create-bsc";
     }
 
