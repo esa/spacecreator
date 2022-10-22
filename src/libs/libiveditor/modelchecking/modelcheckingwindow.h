@@ -114,21 +114,27 @@ private:
     QTreeWidgetItem *functionsTopNodeWidgetItem;
     QTreeWidgetItem *resultsTopDirWidgetItem;
 
+    const QString booleanStopConditionLTL = "Boolean Stop Condition - LTL";
+    const QString booleanStopConditionObserver = "Boolean Stop Condition - Observer";
+    const QString messageSequenceChartSearchVerify = "Message Sequence Chart Search/Verify";
+    const QString messageSequenceChartWhenThen = "Message Sequence Chart When/Then";
+    const QString observer = "Observer";
+
     const QStringList availablePropertyTypes
     {
-        "Boolean Stop Condition - LTL",
-        "Boolean Stop Condition - Observer",
-        "Message Sequence Chart Search/Verify",
-        "Message Sequence Chart When/Then",
-        "Observer"
+        booleanStopConditionLTL,
+        booleanStopConditionObserver,
+        messageSequenceChartSearchVerify,
+        messageSequenceChartWhenThen,
+        observer
     };
 
     const QStringList supportedPropertyTypes
     {
-        "Boolean Stop Condition - Observer",
-        "Message Sequence Chart Search/Verify",
-        "Message Sequence Chart When/Then",
-        "Observer"
+        booleanStopConditionObserver,
+        messageSequenceChartSearchVerify,
+        messageSequenceChartWhenThen,
+        observer
     };
 
     const QString defaultProjectPropertiesDirectoryPath = "work/modelchecking/properties";
