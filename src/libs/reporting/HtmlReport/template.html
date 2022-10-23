@@ -25,28 +25,36 @@
         </tr>
         <tr>
           <td>Error Details</td>
-          <td>
-            <i>Function Name:</i> <tt>{{ reportItem.errorDetails.functionName }}</tt><br>
-            <i>Variable Name:</i> <tt>{{ reportItem.errorDetails.variableName }}</tt><br>
-            {% if reportItem.errorDetails.nestedStateName|length > 0 %}
-              <i>Nested State Name:</i> <tt>{{ reportItem.errorDetails.nestedStateName }}</tt><br>
-            {% endif %}
-            <i>Constraint Details:</i><br>
-            <table>
-              <tr>
-                <td>Constraint</td>
-                {% for constraint in reportItem.errorDetails.constraints %}
-                  <td><tt>{{ constraint }}</tt></td>
-                {% endfor %}
-              </tr>
-              <tr>
-                <td>Bounding Value</td>
-                {% for boundingValue in reportItem.errorDetails.boundingValues %}
-                  <td><tt>{{ boundingValue }}</tt></td>
-                {% endfor %}
-              </tr>
-            </table>
-          </td>
+          {# Check for data constraint violation #}
+          {% if reportItem.errorCode == 0 %}
+            <td>
+              <i>Function Name:</i> <tt>{{ reportItem.errorDetails.functionName }}</tt><br>
+              <i>Variable Name:</i> <tt>{{ reportItem.errorDetails.variableName }}</tt><br>
+              {% if reportItem.errorDetails.nestedStateName|length > 0 %}
+                <i>Nested State Name:</i> <tt>{{ reportItem.errorDetails.nestedStateName }}</tt><br>
+              {% endif %}
+              <i>Constraint Details:</i><br>
+              <table>
+                <tr>
+                  <td>Constraint</td>
+                  {% for constraint in reportItem.errorDetails.constraints %}
+                    <td><tt>{{ constraint }}</tt></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Bounding Value</td>
+                  {% for boundingValue in reportItem.errorDetails.boundingValues %}
+                    <td><tt>{{ boundingValue }}</tt></td>
+                  {% endfor %}
+                </tr>
+              </table>
+            </td>
+          {# Check for stop condition violation #}
+          {% elif reportItem.errorCore == 1 %}
+            <td>
+              <i>Violation Type:</i> <tt>{{ reportItem.violationType }}</tt>
+            </td>
+          {% endif %}
         </tr>
       </table>
       <i>Parsed from:</i><br>

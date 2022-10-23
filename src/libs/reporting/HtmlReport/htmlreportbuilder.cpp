@@ -68,6 +68,7 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
     QVariantHash variantHash;
     variantHash.insert("errorNumber", spinErrorReportItem.errorNumber);
     variantHash.insert("errorDepth", spinErrorReportItem.errorDepth);
+    variantHash.insert("errorCode", spinErrorReportItem.errorType);
     variantHash.insert("rawErrorDetails", spinErrorReportItem.rawErrorDetails);
 
     // resolve error type as string
@@ -118,9 +119,17 @@ QVariantHash reporting::HtmlReportBuilder::buildDataConstraintViolationVariant(c
     return variantHash;
 }
 
-QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(const QVariant &)
+QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(const QVariant &errorDetails)
 {
+    reporting::StopConditionViolationReport report =
+            qvariant_cast<reporting::StopConditionViolationReport>(errorDetails);
     QVariantHash variantHash;
+    variantHash.insert("functionName", report.functionName);
+    // resolve violation type as string
+    variantHash.insert("violationType",
+            m_stopConditionViolationTypeNames.value(report.violationType,
+                    m_stopConditionViolationTypeNames[reporting::StopConditionViolationReport::UnknownType]));
+
     return variantHash;
 }
 
