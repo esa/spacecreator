@@ -50,9 +50,10 @@
               </table>
             </td>
           {# Check for stop condition violation #}
-          {% elif reportItem.errorCore == 1 %}
+          {% elif reportItem.errorCode == 1 %}
             <td>
-              <i>Violation Type:</i> <tt>{{ reportItem.violationType }}</tt>
+              <i>Function Name:</i> <tt>{{ reportItem.errorDetails.functionName }}</tt><br>
+              <i>Violation Type:</i> <tt>{{ reportItem.errorDetails.violationType }}</tt>
             </td>
           {% endif %}
         </tr>

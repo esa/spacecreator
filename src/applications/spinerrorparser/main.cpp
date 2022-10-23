@@ -89,6 +89,8 @@ int main(int argc, char *argv[])
             qInfo("spinerrorparser: Spin Error Parser");
             qInfo("Usage: spinerrorparser [OPTIONS]");
             qInfo("  -im <message>          Message from spin");
+            qInfo("  -is <condition>        Condition from scl.txt");
+
             qInfo("  -it <filename>         HTML template file name");
             qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");

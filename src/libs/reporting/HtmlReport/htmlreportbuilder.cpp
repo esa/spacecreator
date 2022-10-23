@@ -88,6 +88,7 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
     default:
         break;
     }
+
     variantHash.insert("errorDetails", variantErrorDetails);
     return variantHash;
 }

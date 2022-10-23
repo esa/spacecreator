@@ -70,7 +70,13 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawEr
 
 QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &) const
 {
-    return QVariant();
+    StopConditionViolationReport violationReport;
+    violationReport.functionName = "Function Name2";
+    violationReport.violationType = StopConditionViolationReport::NeverFilterOut;
+
+    QVariant stopConditionViolation;
+    stopConditionViolation.setValue(violationReport);
+    return stopConditionViolation;
 }
 
 reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
@@ -79,7 +85,7 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
     SpinErrorReportItem reportItem;
     reportItem.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
     reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
-    reportItem.errorType = SpinErrorReportItem::DataConstraintViolation;
+    reportItem.errorType = SpinErrorReportItem::StopConditionViolation;
     reportItem.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
     // for now, only parse data constraint violation
     switch (reportItem.errorType) {
