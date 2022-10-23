@@ -25,7 +25,8 @@
 namespace reporting {
 
 struct StopConditionViolationReport {
-    enum ViolationType {
+    enum ViolationType
+    {
         EmptyLength = 0,
         Eventually,
         Exist,
@@ -45,6 +46,8 @@ struct StopConditionViolationReport {
         QueueLastFilterOut
     };
 
+    /** Type of the violation */
+    ViolationType violationType;
     /** Name of the function */
     QString functionName;
 };
