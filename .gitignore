@@ -33,3 +33,5 @@ tests/unittests/sdl/SdlExporter/references/*/*.msc
 tests/unittests/sdl/SdlExporter/references/*/work/binaries/*
 tests/unittests/sdl/SdlExporter/references/*/work/*
 
+# ccls-cache
+.ccls-cache/*

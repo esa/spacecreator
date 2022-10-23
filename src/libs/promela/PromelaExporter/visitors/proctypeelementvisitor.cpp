@@ -38,7 +38,10 @@ using promela::model::ElseStatement;
 using promela::model::ExitLoop;
 using promela::model::Expression;
 using promela::model::ForLoop;
+using promela::model::GoTo;
 using promela::model::InlineCall;
+using promela::model::Label;
+using promela::model::PrintfStatement;
 using promela::model::ProctypeElement;
 using promela::model::Select;
 using promela::model::Sequence;
@@ -254,15 +257,33 @@ void ProctypeElementVisitor::operator()(const ElseStatement &statement)
     m_stream << "else;\n";
 }
 
-void ProctypeElementVisitor::operator()(const model::Label &label)
+void ProctypeElementVisitor::operator()(const Label &label)
 {
     m_stream << label.getName() << ":\n";
 }
 
-void ProctypeElementVisitor::operator()(const model::GoTo &statement)
+void ProctypeElementVisitor::operator()(const GoTo &statement)
 {
     m_stream << m_indent;
     m_stream << "goto " << statement.getLabel() << ";\n";
+}
+
+void ProctypeElementVisitor::operator()(const PrintfStatement &statement)
+{
+    m_stream << m_indent;
+    m_stream << "printf(";
+    ExpressionVisitor visitor(m_stream);
+
+    bool first = true;
+    for (const Expression &argument : statement.getArguments()) {
+        if (!first) {
+            m_stream << ", ";
+        } else {
+            first = false;
+        }
+        visitor.visit(argument);
+    }
+    m_stream << ");\n";
 }
 
 QString ProctypeElementVisitor::expressionContentToString(const model::Expression &expression)

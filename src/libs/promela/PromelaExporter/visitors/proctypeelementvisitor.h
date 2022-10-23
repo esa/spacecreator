@@ -147,6 +147,12 @@ public:
      * @param statement GoTo to export
      */
     void operator()(const model::GoTo &statement);
+    /**
+     * @brief Handle PrintfStatement
+     *
+     * @param statement PrintfStatement to export
+     */
+    void operator()(const model::PrintfStatement &statement);
 
 private:
     QString expressionContentToString(const model::Expression &expression);

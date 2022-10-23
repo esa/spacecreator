@@ -73,6 +73,12 @@ public:
      * @param constant BooleanConstant to export
      */
     void operator()(const model::BooleanConstant &constant);
+    /**
+     * @brief Handle String Constant
+     *
+     * @param constant StringConstant to export
+     */
+    void operator()(const model::StringConstant &constant);
 
 private:
     QTextStream &m_stream;

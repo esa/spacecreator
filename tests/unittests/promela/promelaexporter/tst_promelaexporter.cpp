@@ -48,11 +48,13 @@ using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::MtypeRef;
 using promela::model::NamedMtype;
+using promela::model::PrintfStatement;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::Sequence;
 using promela::model::Skip;
+using promela::model::StringConstant;
 using promela::model::TypeAlias;
 using promela::model::UnsignedDataType;
 using promela::model::Utype;
@@ -90,6 +92,7 @@ private Q_SLOTS:
     void testForRangeLoop();
     void testForEachLoop();
     void testExpressions();
+    void testPrintfStatement();
 
 private:
     QString getFileContents(const QString &filename);
@@ -1019,6 +1022,28 @@ void tst_PromelaExporter::testExpressions()
         QFAIL(ex.what());
     }
     QString out2 = getFileContents("expect_promela_expressions.pml");
+    showInfo(out, out2);
+    QCOMPARE(out, out2);
+}
+
+void tst_PromelaExporter::testPrintfStatement()
+{
+    PromelaModel model;
+    Sequence initSequence(Sequence::Type::NORMAL);
+
+    QList<Expression> arguments;
+    arguments.append(Expression(StringConstant("Hello world\\n")));
+    initSequence.appendElement(PrintfStatement(arguments));
+    InitProctype init(std::move(initSequence));
+    model.setInit(std::move(init));
+
+    QString out;
+    try {
+        out = generatePromelaFromModel(model);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+    QString out2 = getFileContents("expect_promela_printf.pml");
     showInfo(out, out2);
     QCOMPARE(out, out2);
 }
