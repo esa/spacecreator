@@ -130,3 +130,25 @@ const QHash<reporting::SpinErrorReportItem::ErrorType, QString> reporting::HtmlR
     { reporting::SpinErrorReportItem::ObserverFailure, "Observer Failure" },
     { reporting::SpinErrorReportItem::OtherError, "Unknown Error" }
 };
+
+const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
+        reporting::HtmlReportBuilder::m_stopConditionViolationTypeNames = {
+            { reporting::StopConditionViolationReport::EmptyLength, "Empty Length" },
+            { reporting::StopConditionViolationReport::Eventually, "Eventually" },
+            { reporting::StopConditionViolationReport::Exist, "Exist" },
+            { reporting::StopConditionViolationReport::FunctionType, "Function Type" },
+            { reporting::StopConditionViolationReport::GetStateNested, "Get State Nested" },
+            { reporting::StopConditionViolationReport::GetStateParallel, "Get State Parallel" },
+            { reporting::StopConditionViolationReport::GetStateParallelProctype, "Get State Parallel Proctype" },
+            { reporting::StopConditionViolationReport::GetStateProctype, "Get State Proctype" },
+            { reporting::StopConditionViolationReport::Length, "Length" },
+            { reporting::StopConditionViolationReport::NestedState, "Nested State" },
+            { reporting::StopConditionViolationReport::NeverFilterOut, "Never Filter Out" },
+            { reporting::StopConditionViolationReport::Observer, "Observer" },
+            { reporting::StopConditionViolationReport::ParallelState, "Parallel State" },
+            { reporting::StopConditionViolationReport::Present, "Present" },
+            { reporting::StopConditionViolationReport::QueueLast, "Queue Last" },
+            { reporting::StopConditionViolationReport::QueueLastEventually, "Queue Last Eventually" },
+            { reporting::StopConditionViolationReport::QueueLastFilterOut, "Queue Last Filter Out" },
+            { reporting::StopConditionViolationReport::UnknownType, "Unknown Type" },
+        };

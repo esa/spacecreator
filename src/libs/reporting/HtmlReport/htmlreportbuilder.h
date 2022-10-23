@@ -22,6 +22,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <reporting/Report/spinerrorreportitem.h>
+#include <reporting/Report/stopconditionviolationreport.h>
 
 namespace Grantlee {
 class Engine;
@@ -56,6 +57,8 @@ private:
     QSharedPointer<Grantlee::FileSystemTemplateLoader> m_fileLoader;
 
     static const QHash<reporting::SpinErrorReportItem::ErrorType, QString> m_errorTypeNames;
+    static const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
+            m_stopConditionViolationTypeNames;
 
     static QVariantList buildReportVariant(const SpinErrorReport &spinErrorReport);
     static QVariantHash buildReportItemVariant(const SpinErrorReportItem &spinErrorReportItem);

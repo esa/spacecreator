@@ -43,7 +43,8 @@ struct StopConditionViolationReport {
         Present,
         QueueLast,
         QueueLastEventually,
-        QueueLastFilterOut
+        QueueLastFilterOut,
+        UnknownType
     };
 
     /** Type of the violation */
