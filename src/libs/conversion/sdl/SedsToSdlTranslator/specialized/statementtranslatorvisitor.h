@@ -284,7 +284,8 @@ private:
             const seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>;
 
     static auto translateOutput(const QString &callName, const seds::model::SendCommandPrimitive &sendCommand,
-            const Options &options) -> std::vector<std::unique_ptr<::sdl::Action>>;
+            const ivm::IVInterface *ivInterface, const bool isReturnCall, const Options &options)
+            -> std::vector<std::unique_ptr<::sdl::Action>>;
 
     static auto translateOutput(const QString &callName, const seds::model::SendParameterPrimitive &sendParameter)
             -> std::vector<std::unique_ptr<::sdl::Action>>;

@@ -599,7 +599,7 @@ auto StateMachineTranslator::translateStateMachine(
     auto sdlInputsForStates = translateTransitions(context, sedsTransitions, stateMap, sedsStateMachine, options);
 
     for (auto &[state, sdlTransitionsForInputs] : sdlInputsForStates) {
-        createInputs(context, state, std::move(sdlTransitionsForInputs));
+        createInputs(context, state, std::move(sdlTransitionsForInputs), options);
     }
 
     for (auto &entry : stateMap) {
@@ -1021,48 +1021,58 @@ auto StateMachineTranslator::translateState(const ::seds::model::EntryState &sed
     return state;
 }
 
-auto StateMachineTranslator::translatePrimitive(
-        Context &context, const ::seds::model::OnCommandPrimitive &command, const Options &options) -> InputHandler
+auto StateMachineTranslator::translatePrimitive(Context &context,
+        const ::seds::model::OnCommandPrimitive &commandPrimitive, const Options &options) -> InputHandler
 {
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
+    const auto interfaceName = commandPrimitive.interface().value();
+    const auto commandName = commandPrimitive.command().value();
+
     // Input signal can be received only via a provided interface
     const auto &inputName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            command.interface().value(), command.command().value(), ivm::IVInterface::InterfaceType::Provided, options);
+            interfaceName, commandName, ivm::IVInterface::InterfaceType::Provided, options);
     input->setName(inputName);
 
-    const auto interface = getInterfaceByName(context.ivFunction(), inputName);
-    if (interface == nullptr) {
+    const auto ivInterface = getInterfaceByName(context.ivFunction(), inputName);
+    if (ivInterface == nullptr) {
         throw TranslationException(QString("Interface %1 not found").arg(inputName));
     }
 
-    const auto isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
+    const auto &command = context.getCommand(interfaceName, commandName);
+    if (command == nullptr) {
+        auto errorMessage = QString("Command '%1' of interface '%2' not found").arg(commandName, interfaceName);
+        throw TranslationException(std::move(errorMessage));
+    }
 
-    if (command.argumentValues().empty()) {
-        return { std::move(input), std::move(unpackingActions), isSporadic };
+    const auto isSporadic = ivInterface->kind() == ivm::IVInterface::OperationKind::Sporadic;
+    const auto isReturnCall = command->interfaceType() == CommandInfo::HostInterfaceType::Required;
+
+    if (commandPrimitive.argumentValues().empty()) {
+        return { std::move(input), std::move(unpackingActions), isSporadic, isReturnCall };
     }
 
     if (isSporadic) {
         //--taste translation
         if (options.isSet(SedsOptions::tasteTranslation)) {
-            if (command.argumentValues().size() != 1) {
+            if (commandPrimitive.argumentValues().size() != 1) {
                 throw TranslationException(
                         QString("More than one(%1) command.argumentValue is not allowed for --taste translation option")
-                                .arg(command.argumentValues().size()));
+                                .arg(commandPrimitive.argumentValues().size()));
             }
 
-            const auto &argument = command.argumentValues().at(0);
+            const auto &argument = commandPrimitive.argumentValues().at(0);
             const auto targetVariableName =
                     Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
             input->addParameter(std::make_unique<::sdl::VariableReference>(targetVariableName));
-            return { std::move(input), std::move(unpackingActions), isSporadic };
+            return { std::move(input), std::move(unpackingActions), isSporadic, isReturnCall };
         }
 
         const auto variableName = ioVariableName(input->name());
         input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
 
-        for (const auto &argument : command.argumentValues()) {
+        for (const auto &argument : commandPrimitive.argumentValues()) {
             const auto targetVariableName =
                     Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
             const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
@@ -1070,10 +1080,10 @@ auto StateMachineTranslator::translatePrimitive(
                     "", QString("%1 := %2.%3").arg(targetVariableName, variableName, fieldName)));
         }
 
-        return { std::move(input), std::move(unpackingActions), isSporadic };
+        return { std::move(input), std::move(unpackingActions), isSporadic, isReturnCall };
     } else {
         // Protected/unprotected - assignments done in the reception procedure
-        return { std::move(input), std::move(unpackingActions), isSporadic };
+        return { std::move(input), std::move(unpackingActions), isSporadic, isReturnCall };
     }
 }
 
@@ -1091,12 +1101,12 @@ auto StateMachineTranslator::translatePrimitive(
             parameter.parameter().value(), parameterType, ivm::IVInterface::InterfaceType::Provided);
     input->setName(name);
 
-    const auto interface = getInterfaceByName(context.ivFunction(), name);
-    if (interface == nullptr) {
+    const auto ivInterface = getInterfaceByName(context.ivFunction(), name);
+    if (ivInterface == nullptr) {
         throw TranslationException(QString("Interface %1 not found").arg(name));
     }
 
-    const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
+    const bool isSporadic = ivInterface->kind() == ivm::IVInterface::OperationKind::Sporadic;
 
     if (isSporadic) {
         if (options.isSet(SedsOptions::enableFailureReporting)) {
@@ -1133,14 +1143,14 @@ auto StateMachineTranslator::translatePrimitive(
             throw TranslationException(QString("VariableRef mapping is not supported for sync parameter %1").arg(name));
         }
     }
-    return { std::move(input), std::move(unpackingActions), isSporadic };
+    return { std::move(input), std::move(unpackingActions), isSporadic, false };
 }
 
 auto StateMachineTranslator::translatePrimitive(::sdl::State *sdlFromState) -> InputHandler
 {
     auto input = std::make_unique<::sdl::Input>();
     input->setName(TIMER_NAME_PATTERN.arg(sdlFromState->name()));
-    return { std::move(input), std::vector<std::unique_ptr<::sdl::Action>>(), false };
+    return { std::move(input), std::vector<std::unique_ptr<::sdl::Action>>(), false, false };
 }
 
 auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *sdlFromState,
@@ -1175,7 +1185,7 @@ auto StateMachineTranslator::translateTransitions(Context &context,
         const auto sdlFromState = getSdlState(sedsTransition->fromState(), stateMap);
         const auto sdlToState = getSdlState(sedsTransition->toState(), stateMap);
 
-        auto [input, actions, isSporadic] =
+        auto [input, actions, isSporadic, isReturnCall] =
                 translatePrimitive(context, sdlFromState, sedsTransition->primitive(), options);
 
         auto transitionInfo = translateTransition(
@@ -1183,6 +1193,7 @@ auto StateMachineTranslator::translateTransitions(Context &context,
 
         transitionInfo.sedsTransition = sedsTransition;
         transitionInfo.isSporadic = isSporadic;
+        transitionInfo.isReturnCall = isReturnCall;
 
         const auto &inputName = input->name();
         transitionInfo.input = std::move(input);
@@ -1194,16 +1205,30 @@ auto StateMachineTranslator::translateTransitions(Context &context,
 }
 
 auto StateMachineTranslator::createInputs(Context &context, ::sdl::State *fromState,
-        std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitionsForInputs)
-        -> void
+        std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitionsForInputs,
+        const Options &options) -> void
 {
     for (auto &[inputName, transitionInfos] : sdlTransitionsForInputs) {
-        const auto transactionsRequired = transitionInfos.front().transactionName.has_value();
+        // Some data are common for all transitions
+        auto &firstTransitionInfo = transitionInfos.front();
 
-        if (transactionsRequired) {
-            createInputWithTransactions(context, fromState, std::move(transitionInfos));
+        const auto isSporadic = firstTransitionInfo.isSporadic;
+        const auto isReturnCall = firstTransitionInfo.isReturnCall;
+
+        if (isSporadic) {
+            if (isReturnCall && options.isSet(SedsOptions::enableFailureReporting)) {
+                createInputWithFailureReporting(context, fromState, std::move(transitionInfos));
+            } else {
+                createInput(context, fromState, std::move(firstTransitionInfo));
+            }
         } else {
-            createInput(context, fromState, std::move(transitionInfos.front()));
+            const auto transactionsRequired = firstTransitionInfo.transactionName.has_value();
+
+            if (transactionsRequired) {
+                createInputWithTransactions(context, fromState, std::move(transitionInfos));
+            } else {
+                createInput(context, fromState, std::move(firstTransitionInfo));
+            }
         }
     }
 }
@@ -1262,6 +1287,68 @@ auto StateMachineTranslator::createInputWithTransactions(Context &context, ::sdl
     // Create result transition
     auto sdlTransition = std::make_unique<::sdl::Transition>();
     sdlTransition->addAction(std::move(transactionDecision));
+
+    sdlInput->setTransition(sdlTransition.get());
+    fromState->addInput(std::move(sdlInput));
+    context.sdlStateMachine()->addTransition(std::move(sdlTransition));
+}
+
+auto StateMachineTranslator::createInputWithFailureReporting(Context &context, ::sdl::State *fromState,
+        std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void
+{
+    auto &sdlInput = transitionInfos.front().input;
+
+    // Create decision based on the failure reporting
+    auto failureDecision = std::make_unique<::sdl::Decision>();
+
+    const auto variableName = ioVariableName(sdlInput->name());
+    const auto &failureFieldName = asn1::translator::seds::Constants::failureParamName;
+    const auto failureVariableName = QString("%1.%2").arg(variableName).arg(failureFieldName);
+
+    auto failureDecisionExpression = std::make_unique<::sdl::Expression>(failureVariableName);
+    failureDecision->setExpression(std::move(failureDecisionExpression));
+
+    if (transitionInfos.size() > 2) {
+        auto errorMessage = QString(
+                "Error while creating input, there are more than two transitions that have the same failure value");
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    // Create answer for each transition
+    for (auto &transitionInfo : transitionInfos) {
+        if (*sdlInput != *transitionInfo.input) {
+            auto errorMessage = QString("Two inputs with name %1 are different").arg(sdlInput->name());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        if (!transitionInfo.isSporadic) {
+            auto errorMessage = QString("Found transition for input %1 that is not sporadic").arg(sdlInput->name());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const QString &failureValue = transitionInfo.isFailed ? "true" : "false";
+
+        auto failureDecisionAnswer = std::make_unique<::sdl::Answer>();
+        failureDecisionAnswer->setLiteral(failureValue);
+        failureDecisionAnswer->setTransition(std::move(transitionInfo.sdlTransition));
+        failureDecision->addAnswer(std::move(failureDecisionAnswer));
+    }
+
+    // It means we need to create an else transition
+    if (failureDecision->answers().size() != 2) {
+        auto failureDecisionElseAnswer = std::make_unique<::sdl::Answer>();
+        failureDecisionElseAnswer->setLiteral(::sdl::Answer::ElseLiteral);
+
+        auto failureDecisionElseAnswerTransition = std::make_unique<::sdl::Transition>();
+        failureDecisionElseAnswerTransition->addAction(std::make_unique<::sdl::NextState>(""));
+        failureDecisionElseAnswer->setTransition(std::move(failureDecisionElseAnswerTransition));
+
+        failureDecision->addAnswer(std::move(failureDecisionElseAnswer));
+    }
+
+    // Create result transition
+    auto sdlTransition = std::make_unique<::sdl::Transition>();
+    sdlTransition->addAction(std::move(failureDecision));
 
     sdlInput->setTransition(sdlTransition.get());
     fromState->addInput(std::move(sdlInput));

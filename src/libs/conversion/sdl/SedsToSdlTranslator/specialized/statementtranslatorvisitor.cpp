@@ -281,10 +281,16 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
     const auto commandName = sendCommand.command().value();
     const auto interfaceName = sendCommand.interface().value();
 
+    const auto command = m_context.getCommand(interfaceName, commandName);
+    if (command == nullptr) {
+        auto errorMessage = QString("Command '%1' of interface '%2' not found").arg(commandName, interfaceName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto isReturnCall = command->interfaceType() == CommandInfo::HostInterfaceType::Provided;
+
     // Check, if this is a sync return call
-    const auto &command = m_context.getCommand(interfaceName, commandName);
-    if (command != nullptr && command->interfaceType() == CommandInfo::HostInterfaceType::Provided
-            && command->definition()->mode() == ::seds::model::InterfaceCommandMode::Sync) {
+    if (isReturnCall && command->definition()->mode() == ::seds::model::InterfaceCommandMode::Sync) {
         // Registered and provided sync command
         // SendCommandPrimitive is basically a return statement
         ActivityInfo info(m_context.sdlProcedure()->name());
@@ -324,7 +330,7 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
     // Process name carries iv-escaped component name
     const auto ivInterface = findIvInterface(m_context.ivFunction(), callName);
     if (ivInterface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
-        auto outputActions = translateOutput(callName, sendCommand, m_options);
+        auto outputActions = translateOutput(callName, sendCommand, ivInterface, isReturnCall, m_options);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
         }
@@ -360,6 +366,11 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPr
 
     switch (ivInterface->kind()) {
     case ivm::IVInterface::OperationKind::Sporadic: {
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            auto errorMessage = QString("Async parameters are not allowed when using SEDS failure reporting mechanism");
+            throw TranslationException(std::move(errorMessage));
+        }
+
         auto outputActions = translateOutput(callName, sendParameter);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
@@ -547,55 +558,76 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
     return call;
 }
 
-auto StatementTranslatorVisitor::translateOutput(
-        const QString &callName, const ::seds::model::SendCommandPrimitive &sendCommand, const Options &options)
-        -> std::vector<std::unique_ptr<::sdl::Action>>
+auto StatementTranslatorVisitor::translateOutput(const QString &callName,
+        const ::seds::model::SendCommandPrimitive &sendCommand, const ivm::IVInterface *ivInterface,
+        const bool isReturnCall, const Options &options) -> std::vector<std::unique_ptr<::sdl::Action>>
 {
     std::vector<std::unique_ptr<::sdl::Action>> result;
 
     auto output = std::make_unique<::sdl::Output>();
+    DescriptionTranslator::translate(sendCommand, output.get());
     output->setName(callName);
-    if (!sendCommand.argumentValues().empty()) {
-        //--taste translation
-        if (options.isSet(SedsOptions::tasteTranslation)) {
-            if (sendCommand.argumentValues().size() != 1) {
-                throw TranslationException(
-                        QString("More than one(%1) command.argumentValue is not allowed for --taste translation option")
-                                .arg(sendCommand.argumentValues().size()));
-            }
 
-            const auto &argument = sendCommand.argumentValues().at(0);
-            const auto source = std::visit(
-                    overloaded { [](const ::seds::model::ValueOperand &operand) { return operand.value().value(); },
-                            [](const ::seds::model::VariableRefOperand &operand) {
-                                return translateVariableReference(operand.variableRef().value().value());
-                            } },
-                    argument.value());
-            output->setParameter(std::make_unique<::sdl::VariableReference>(source));
-            DescriptionTranslator::translate(sendCommand, output.get());
-            result.emplace_back(std::move(output));
-            return result;
-        }
+    const auto paramsCount = ivInterface->params().size();
 
-        const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
-        output->setParameter(std::make_unique<::sdl::VariableReference>(ioVariable));
-        DescriptionTranslator::translate(sendCommand, output.get());
-        for (const auto &argument : sendCommand.argumentValues()) {
-            const auto fieldName = translateVariableReference(argument.name().value());
-            const auto source = std::visit(
-                    overloaded { [](const ::seds::model::ValueOperand &operand) { return operand.value().value(); },
-                            [](const ::seds::model::VariableRefOperand &operand) {
-                                return translateVariableReference(operand.variableRef().value().value());
-                            } },
-                    argument.value());
-            auto assignment =
-                    std::make_unique<::sdl::Task>("", QString("%1.%2 := %3").arg(ioVariable, fieldName, source));
-            result.emplace_back(std::move(assignment));
-        }
+    if (paramsCount == 0) {
+        result.push_back(std::move(output));
+        return result;
     }
 
-    result.emplace_back(std::move(output));
+    // clang-format off
+    auto operandValueVisitor = overloaded {
+        [](const ::seds::model::ValueOperand &operand) {
+            return operand.value().value(); },
+        [](const ::seds::model::VariableRefOperand &operand) {
+            return translateVariableReference(operand.variableRef().value().value());
+        }
+    };
+    // clang-format on
 
+    //--taste translation
+    if (options.isSet(SedsOptions::tasteTranslation)) {
+        if (paramsCount != 1) {
+            auto errorMessage =
+                    QString("More than one(%1) IV interface parameter is not allowed for --taste translation option")
+                            .arg(paramsCount);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const auto &argument = sendCommand.argumentValues().front();
+
+        const auto source = std::visit(operandValueVisitor, argument.value());
+        output->setParameter(std::make_unique<::sdl::VariableReference>(source));
+
+        result.push_back(std::move(output));
+        return result;
+    }
+
+    const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
+    output->setParameter(std::make_unique<::sdl::VariableReference>(ioVariable));
+
+    for (const auto &argument : sendCommand.argumentValues()) {
+        const auto fieldName = translateVariableReference(argument.name().value());
+
+        const auto source = std::visit(operandValueVisitor, argument.value());
+
+        auto assignment = QString("%1.%2 := %3").arg(ioVariable, fieldName, source);
+        auto assignmentTask = std::make_unique<::sdl::Task>("", assignment);
+
+        result.push_back(std::move(assignmentTask));
+    }
+
+    if (isReturnCall && options.isSet(SedsOptions::enableFailureReporting)) {
+        const auto failureFieldName = asn1::translator::seds::Constants::failureParamName;
+        const auto failureValue = sendCommand.isFailed() ? "true" : "false";
+
+        auto assignment = QString("%1.%2 := %3").arg(ioVariable, failureFieldName, failureValue);
+        auto assignmentTask = std::make_unique<::sdl::Task>("", assignment);
+
+        result.push_back(std::move(assignmentTask));
+    }
+
+    result.push_back(std::move(output));
     return result;
 }
 
@@ -853,5 +885,4 @@ auto StatementTranslatorVisitor::handleTransaction(
             Constants::transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
     ivInterface->addParam(ivParameter);
 }
-
 }

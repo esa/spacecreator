@@ -145,6 +145,7 @@ private:
         std::unique_ptr<::sdl::Input> input;
         std::vector<std::unique_ptr<::sdl::Action>> actions;
         bool isSporadic;
+        bool isReturnCall;
     };
 
     struct TransitionInfo {
@@ -153,6 +154,7 @@ private:
         std::unique_ptr<::sdl::Input> input;
         std::optional<QString> transactionName;
         bool isSporadic;
+        bool isReturnCall;
         bool isFailed;
     };
 
@@ -206,14 +208,13 @@ private:
             -> TransitionInfo;
 
     static auto createInputs(Context &context, ::sdl::State *fromState,
-            std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitions) -> void;
+            std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitions,
+            const Options &options) -> void;
     static auto createInput(
             Context &context, ::sdl::State *fromState, StateMachineTranslator::TransitionInfo transitionInfo) -> void;
-    static auto createInputWithFailureReporting(Context &context, ::sdl::State *fromState,
-            std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void;
     static auto createInputWithTransactions(Context &context, ::sdl::State *fromState,
             std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void;
-    static auto createInputWithTransactionsAndFailureReporting(Context &context, ::sdl::State *fromState,
+    static auto createInputWithFailureReporting(Context &context, ::sdl::State *fromState,
             std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void;
 
     static auto createIoVariable(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
