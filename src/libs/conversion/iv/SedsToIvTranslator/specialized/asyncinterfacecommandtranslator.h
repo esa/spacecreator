@@ -79,7 +79,8 @@ public:
 
 private:
     auto translateArguments(const ::seds::model::InterfaceCommand &sedsCommand,
-            const ::seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) -> void;
+            const ::seds::model::CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) const
+            -> void;
 
 private:
     /// @brief  Output interface view function
