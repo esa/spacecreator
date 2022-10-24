@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
             qInfo("                         Base priority will be added to interfaces priorities specified in ");
             qInfo("                         the Interface View");
             qInfo("  -sub <filepath>        Use <filepath> as an ASN.1 file used for subtyping");
-            qInfo("  -real                  Enable support for real type");
+            qInfo("  -enable-reals          Enable support for real type");
             qInfo("  -delta <delta value>   Set delta for reals generation");
             qInfo("  -h, --help             Print this message and exit.");
             exit(EXIT_SUCCESS);
