@@ -23,6 +23,7 @@
 #include "generictypemapper.h"
 #include "interfacetypecreatorcontext.h"
 
+#include <conversion/common/options.h>
 #include <optional>
 #include <seds/SedsModel/components/interface.h>
 #include <seds/SedsModel/generics/generictypemapset.h>
@@ -38,9 +39,11 @@ class InterfaceTypeCreator final
 {
 public:
     /**
-     * @brief   Default constructor
+     * @brief   Constructor
+     *
+     * @param   options     Conversion options
      */
-    InterfaceTypeCreator() = default;
+    InterfaceTypeCreator(const Options &options);
     /**
      * @brief   Deleted copy constructor
      */
@@ -91,10 +94,18 @@ private:
             const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
     auto createAsyncCommandBundledType(const ::seds::model::InterfaceCommand &command,
             const QString &interfaceDeclarationName, const ::seds::model::CommandArgumentMode requestedArgumentMode,
-            InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+            const bool createFailureComponent, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
     auto createAsyncCommandBundledTypeComponent(const ::seds::model::CommandArgument &argument,
             Asn1Acn::Types::Sequence *bundledType, const std::optional<QString> &determinantArgumentName,
             Context &bundledTypeContext, InterfaceTypeCreatorContext &typeCreatorContext) -> bool;
+
+    auto createAsyncCommandFailureReportingBundledType(const ::seds::model::InterfaceCommand &command,
+            const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+    auto createAsyncCommandFailureReportingBundledTypeComponent(Asn1Acn::Types::Sequence *bundledType,
+            Context &bundledTypeContext, InterfaceTypeCreatorContext &typeCreatorContext) -> void;
+
+private:
+    const Options &m_options;
 };
 
 } // namespace conversion::asn1::translator::seds

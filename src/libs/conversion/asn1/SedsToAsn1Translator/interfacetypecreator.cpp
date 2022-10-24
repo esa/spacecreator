@@ -19,6 +19,7 @@
 
 #include "interfacetypecreator.h"
 
+#include "constants.h"
 #include "datatypetranslationhelper.h"
 #include "generictypecreator.h"
 
@@ -30,15 +31,23 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/translation/exceptions.h>
+#include <seds/SedsOptions/options.h>
 
 using conversion::UnhandledValueException;
+using conversion::seds::SedsOptions;
 using conversion::translator::TranslationException;
+using seds::model::CommandArgumentMode;
 using seds::model::GenericType;
 using seds::model::GenericTypeMap;
 using seds::model::GenericTypeMapSet;
 using seds::model::InterfaceCommandMode;
 
 namespace conversion::asn1::translator::seds {
+
+InterfaceTypeCreator::InterfaceTypeCreator(const Options &options)
+    : m_options(options)
+{
+}
 
 void InterfaceTypeCreator::createTypes(
         const ::seds::model::InterfaceDeclaration &interfaceDeclaration, Context &context)
@@ -142,25 +151,32 @@ void InterfaceTypeCreator::createTypesForAsyncCommand(const ::seds::model::Inter
     case ::seds::model::ArgumentsCombination::InOnly: {
         // In arguments are 'native', so they are handled as-is
         createAsyncCommandBundledType(
-                command, interfaceDeclarationName, ::seds::model::CommandArgumentMode::In, typeCreatorContext);
+                command, interfaceDeclarationName, CommandArgumentMode::In, false, typeCreatorContext);
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            createAsyncCommandFailureReportingBundledType(command, interfaceDeclarationName, typeCreatorContext);
+        }
     } break;
     case ::seds::model::ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
         // We cannot change the argument direction, so we switch interface type (provided <-> required)
-        createAsyncCommandBundledType(
-                command, interfaceDeclarationName, ::seds::model::CommandArgumentMode::Out, typeCreatorContext);
+        const auto createFailureComponent = m_options.isSet(SedsOptions::enableFailureReporting);
+        createAsyncCommandBundledType(command, interfaceDeclarationName, CommandArgumentMode::Out,
+                createFailureComponent, typeCreatorContext);
     } break;
     case ::seds::model::ArgumentsCombination::InAndNotify: {
         // InAndNotify arguments are separated onto two interfaces
         // In arguments - as-is
         createAsyncCommandBundledType(
-                command, interfaceDeclarationName, ::seds::model::CommandArgumentMode::In, typeCreatorContext);
+                command, interfaceDeclarationName, CommandArgumentMode::In, false, typeCreatorContext);
         // Notify arguments - switched interface type (provided <-> required)
-        createAsyncCommandBundledType(
-                command, interfaceDeclarationName, ::seds::model::CommandArgumentMode::Notify, typeCreatorContext);
+        const auto createFailureComponent = m_options.isSet(SedsOptions::enableFailureReporting);
+        createAsyncCommandBundledType(command, interfaceDeclarationName, CommandArgumentMode::Notify,
+                createFailureComponent, typeCreatorContext);
     } break;
     case ::seds::model::ArgumentsCombination::NoArgs: {
-        // No arguments, no problems
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            createAsyncCommandFailureReportingBundledType(command, interfaceDeclarationName, typeCreatorContext);
+        }
         break;
     }
     case ::seds::model::ArgumentsCombination::NotifyOnly:
@@ -179,8 +195,8 @@ void InterfaceTypeCreator::createTypesForAsyncCommand(const ::seds::model::Inter
 }
 
 void InterfaceTypeCreator::createAsyncCommandBundledType(const ::seds::model::InterfaceCommand &command,
-        const QString &interfaceDeclarationName, const ::seds::model::CommandArgumentMode requestedArgumentMode,
-        InterfaceTypeCreatorContext &typeCreatorContext)
+        const QString &interfaceDeclarationName, const CommandArgumentMode requestedArgumentMode,
+        const bool createFailureComponent, InterfaceTypeCreatorContext &typeCreatorContext)
 {
     const auto commandName = Escaper::escapeAsn1TypeName(command.nameStr());
     const auto isGeneric = typeCreatorContext.isCommandGeneric(command);
@@ -213,6 +229,10 @@ void InterfaceTypeCreator::createAsyncCommandBundledType(const ::seds::model::In
         if (!isConcrete) {
             break;
         }
+    }
+
+    if (createFailureComponent) {
+        createAsyncCommandFailureReportingBundledTypeComponent(bundledType.get(), context, typeCreatorContext);
     }
 
     if (isConcrete) {
@@ -270,15 +290,63 @@ bool InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const ::seds::
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), "");
         sequenceComponentType->setType(argumentType->clone());
 
-        std::unique_ptr<Asn1Acn::SequenceComponent> sequenceComponent =
-                std::make_unique<Asn1Acn::AsnSequenceComponent>(argumentName, argumentName, false, std::nullopt, "",
-                        Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
-                        std::move(sequenceComponentType));
+        auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(argumentName, argumentName, false,
+                std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+                std::move(sequenceComponentType));
 
         bundledType->addComponent(std::move(sequenceComponent));
     }
 
     return true;
+}
+
+void InterfaceTypeCreator::createAsyncCommandFailureReportingBundledType(const ::seds::model::InterfaceCommand &command,
+        const QString &interfaceDeclarationName, InterfaceTypeCreatorContext &typeCreatorContext)
+{
+    const auto commandName = Escaper::escapeAsn1TypeName(command.nameStr());
+    const auto &parentName = interfaceDeclarationName;
+    const auto escapedParentName = parentName.isEmpty() ? parentName : Escaper::escapeAsn1TypeName(parentName);
+
+    const auto bundledTypeName = DataTypeTranslationHelper::buildBundledTypeName(
+            escapedParentName, commandName, CommandArgumentMode::Notify);
+
+    auto &context = typeCreatorContext.interfaceContext();
+
+    if (context.hasAsn1Type(bundledTypeName)) {
+        return;
+    }
+
+    auto bundledType = std::make_unique<Asn1Acn::Types::Sequence>(bundledTypeName);
+
+    createAsyncCommandFailureReportingBundledTypeComponent(bundledType.get(), context, typeCreatorContext);
+
+    context.addAsn1Type(std::move(bundledType), nullptr);
+}
+
+void InterfaceTypeCreator::createAsyncCommandFailureReportingBundledTypeComponent(Asn1Acn::Types::Sequence *bundledType,
+        Context &bundledTypeContext, InterfaceTypeCreatorContext &typeCreatorContext)
+{
+    if (!m_options.isSet(SedsOptions::failureReportingType)) {
+        throw TranslationException(
+                "SEDS failure reporting feature was used but no ASN.1 type for failure parameter was specified");
+    }
+
+    const auto &argumentName = Constants::failureParamName;
+    const auto argumentTypeName = m_options.value(SedsOptions::failureReportingType).value();
+
+    auto &typeContext = typeCreatorContext.interfaceContext();
+
+    const auto argumentType = typeContext.findAsn1Type(argumentTypeName);
+    bundledTypeContext.importType(typeContext.definitionsName(), argumentType->identifier());
+
+    auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), "");
+    sequenceComponentType->setType(argumentType->clone());
+
+    auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(argumentName, argumentName, false,
+            std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
+            std::move(sequenceComponentType));
+
+    bundledType->addComponent(std::move(sequenceComponent));
 }
 
 } // namespace conversion::asn1::translator::seds
