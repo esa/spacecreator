@@ -3,7 +3,7 @@
 set -euo pipefail
 
 TMC=$SPACECREATOR_BUILD_DIR/bin/tmc
-SPIN=/home/taste/Spin/Src/spin
+SPIN=n7s-spin
 CC=gcc
 
 # diff ignoring white space and blank lines
