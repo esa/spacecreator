@@ -1,0 +1,8 @@
+TEST-SIMU-TIMER-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+
+   MyTestInteger ::= INTEGER (3)
+
+END

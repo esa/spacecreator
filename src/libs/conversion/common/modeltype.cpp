@@ -49,6 +49,10 @@ const QString &modelTypeToString(ModelType modelType)
         return ModelTypeProperties<ModelType::Seds>::name;
     case ModelType::Simulink:
         return ModelTypeProperties<ModelType::Simulink>::name;
+    case ModelType::SpinTrail:
+        return ModelTypeProperties<ModelType::SpinTrail>::name;
+    case ModelType::SimulatorTrail:
+        return ModelTypeProperties<ModelType::SimulatorTrail>::name;
     default:
         static const auto unhandled = QStringLiteral("unhandled model type name");
         return unhandled;
@@ -82,6 +86,10 @@ const QStringList &modelTypeExtensions(ModelType modelType)
         return ModelTypeProperties<ModelType::Seds>::extensions;
     case ModelType::Simulink:
         return ModelTypeProperties<ModelType::Simulink>::extensions;
+    case ModelType::SpinTrail:
+        return ModelTypeProperties<ModelType::SpinTrail>::extensions;
+    case ModelType::SimulatorTrail:
+        return ModelTypeProperties<ModelType::SimulatorTrail>::extensions;
     default:
         static const QStringList unhandled = { QStringLiteral("unhandled model type extension") };
         return unhandled;
@@ -113,6 +121,12 @@ ModelType stringToModelType(const QString &s)
     }
     if (!s.compare(ModelTypeProperties<ModelType::PromelaSystem>::name, Qt::CaseInsensitive)) {
         return conversion::ModelType::PromelaSystem;
+    }
+    if (!s.compare(ModelTypeProperties<ModelType::SpinTrail>::name, Qt::CaseInsensitive)) {
+        return conversion::ModelType::SpinTrail;
+    }
+    if (!s.compare(ModelTypeProperties<ModelType::SimulatorTrail>::name, Qt::CaseInsensitive)) {
+        return conversion::ModelType::SimulatorTrail;
     }
     return conversion::ModelType::Unspecified;
 }

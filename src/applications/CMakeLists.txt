@@ -11,4 +11,4 @@ add_subdirectory(spinerrorparser)
 add_subdirectory(xmlvalidator)
 add_subdirectory(tmc)
 add_subdirectory(tmcivoptimizer)
-
+add_subdirectory(trailgen)

@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
             ++i;
             isRealTypeEnabled = true;
         } else if (arg == "-h" || arg == "--help") {
-            qInfo("tmc: TASTE Model Chcecker");
+            qInfo("tmc: TASTE Model Checker");
             qInfo("Usage: tmc [OPTIONS]");
             qInfo("  -iv <filepath>         Use <filepath> as input InterfaceView");
             qInfo("  -o <dir>               Use <dir> as output directory.");

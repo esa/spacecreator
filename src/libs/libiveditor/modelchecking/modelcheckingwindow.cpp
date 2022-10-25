@@ -23,6 +23,7 @@
 #include "xmelwriter.h"
 #include "xmelreader.h"
 #include "xmelreader.h"
+#include <conversion/common/escaper/escaper.h>
 
 #include <QDir>
 #include <QProcess>
@@ -773,75 +774,192 @@ void ModelCheckingWindow::convertToObs()
  */
 void ModelCheckingWindow::addProperty()
 {
-    bool ok1;
-    QString propertyType = "";
-    QStringList propertyTypes = { "Boolean Stop Condition - LTL", "Boolean Stop Condition - Observer", "Message Sequence Chart Search/Verify", "Observer" };
-    propertyType = QInputDialog::getItem(this, tr("New Property"), tr("Property type:"), propertyTypes, 0, false, &ok1);
+    const QString propertyType = askAboutNewPropertyType();
 
-    if (ok1 && !propertyType.isEmpty()){
-        QString makeRule = "";
-        if(propertyType == "Observer") {makeRule = "create-obs";}
-        if(propertyType == "Message Sequence Chart Search/Verify") {makeRule = "create-msc";}
-        if(propertyType == "Boolean Stop Condition - Observer") {makeRule = "create-bsc";}
-        if(propertyType == "Boolean Stop Condition - LTL") {
-            QMessageBox::warning(this, tr("Add property"),
-                                 "LTL not yet supported.");
-            return;
-        }
-        bool ok2;
-        QString label = "Property name: (no whitespace or '-')                                                                             ";
-        QString propertyName = QInputDialog::getText(this, "New " + propertyType,
-                                                label, QLineEdit::Normal,
-                                                "new_property", &ok2);
-
-        if (ok2 && !propertyName.isEmpty()){
-            // CHECK FILE NAME
-            // use "_" instead of whitespace or '-', if existing
-            propertyName.replace(" ", "_");
-            propertyName.replace("-", "_");
-            // check if file with same name exists already, append suffix in that case
-            QFile file;
-            QString filePath = this->propertiesPath + "/" + propertyName;
-            file.setFileName(filePath);
-            while(file.exists())
-            {
-                filePath = filePath + "_1";
-                propertyName = propertyName + "_1";
-                file.setFileName(filePath);
-            }
-            // CALL MAKE RULE
-            QString makeCall = "make " + makeRule + " NAME=" + propertyName;
-            QProcess *makeCallerProcess = new QProcess(this);
-            // set path to project dir
-            QString qDirAppPath = QDir::currentPath();
-            QDir::setCurrent(this->projectDir+"/");
-            if (makeCallerProcess->execute(makeCall)) {
-                QMessageBox::warning(this, tr("Add property"),
-                                     tr("Error executing '%1'").arg(makeCall));
-            }
-
-            // REFRESH TREEVIEW with preselection
-            QFileInfo propertiesFileInfo(this->propertiesPath);
-            // save user selection
-            QStringList preSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
-            // save user expanded nodes
-            QStringList expandedNodes = getExpandedNodes(this->propertiesTopDirWidgetItem, {this->propertiesTopDirWidgetItem->text(0)});
-            // destroy tree except root
-            QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
-            for (int i = treeRoot->childCount(); i > 0; i--){
-                treeRoot->removeChild(treeRoot->child(i-1));
-            }
-            // rebuild tree with saved selection
-            this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes, 0));
-
-            if (QDir(filePath).exists() && !QDir(filePath).isEmpty()){
-                statusBar()->showMessage("Property " + propertyName + " added.", 6000);
-            }
-
-            // reset path
-            QDir::setCurrent(qDirAppPath);
-        }
+    if (propertyType.isEmpty()) {
+        return;
     }
+
+    if (!isPropertyTypeSupported(propertyType)) {
+        QMessageBox::warning(this, tr("Add new property"), propertyType + " is not supported yet.");
+        return;
+    }
+
+    QString propertyName = askAboutNewPropertyName(propertyType);
+
+    if (propertyName.isEmpty()) {
+        QMessageBox::warning(this, tr("New property name"), tr("Property name is empty."));
+        return;
+    }
+
+    escapeNewPropertyName(propertyName);
+    checkNewPropertyNameAndAppendSuffixIfNeeded(propertyName);
+
+    const QString currentPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir + QDir::separator());
+
+    const QString makeRule = getMakeRuleForPropertyType(propertyType);
+
+    bool wasPropertyHandled = false;
+
+    if (!makeRule.isEmpty()) {
+        if (invokeMake(makeRule, propertyName)) {
+            wasPropertyHandled = true;
+        }
+    } else if (propertyType == messageSequenceChartWhenThen) {
+        if (handleMessageSequenceChartWhenThen(propertyName)) {
+            wasPropertyHandled = true;
+        }
+    } else {
+        QMessageBox::warning(this, tr("Add new property"), propertyType + " property is not handled.");
+    }
+
+    if (wasPropertyHandled) {
+        refreshPropertiesTreeViewWithPreselection();
+        statusBar()->showMessage("New property '" + propertyName + "' has been added.", 6000);
+    } else {
+        statusBar()->showMessage("New property '" + propertyName + "' has not been added.", 6000);
+    }
+
+    QDir::setCurrent(currentPath);
+}
+
+QString ModelCheckingWindow::ModelCheckingWindow::askAboutNewPropertyType()
+{
+    bool isOk;
+
+    const QString propertyType = QInputDialog::getItem(this, tr("New Property"), tr("Property type :"), this->availablePropertyTypes, 0, false, &isOk);
+
+    if (!isOk || propertyType.isEmpty()) {
+        return "";
+    }
+
+    return propertyType;
+}
+
+bool ModelCheckingWindow::isPropertyTypeSupported(const QString &propertyType)
+{
+    return supportedPropertyTypes.contains(propertyType, Qt::CaseInsensitive);
+}
+
+QString ModelCheckingWindow::askAboutNewPropertyName(const QString &propertyType)
+{
+    bool isOk;
+    const QString label = "New property name : (no whitespace or '-')";
+
+    const QString propertyName = QInputDialog::getText(this, "New " + propertyType,
+                                            label, QLineEdit::Normal,
+                                            "new_property", &isOk);
+
+    if (!isOk || propertyName.isEmpty()) {
+        return "";
+    }
+
+    return propertyName;
+}
+
+void ModelCheckingWindow::escapeNewPropertyName(QString &propertyName)
+{
+    propertyName = conversion::Escaper::escapeIvName(propertyName);
+}
+
+void ModelCheckingWindow::checkNewPropertyNameAndAppendSuffixIfNeeded(QString &propertyName)
+{
+    const QString originalPropertyName = propertyName;
+    QString propertyDirectoryPath = this->propertiesPath + QDir::separator() + propertyName;
+
+    while (QDir(propertyDirectoryPath).exists())
+    {
+        propertyName.append("_1");
+
+        propertyDirectoryPath = this->propertiesPath + QDir::separator() + propertyName;
+    }
+
+    if(propertyName != originalPropertyName) {
+        const QString newPropertyNameMessage = QString("'%1' already exists. '%1' has been replaced by '%2'")
+                                                    .arg(originalPropertyName)
+                                                    .arg(propertyName);
+        QMessageBox::information(this, tr("Property name has been replaced"), newPropertyNameMessage);
+    }
+}
+
+QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyType)
+{
+    if (propertyType == observer) {
+        return "create-obs";
+    }
+    else if (propertyType == messageSequenceChartSearchVerify) {
+        return "create-msc";
+    }
+    else if (propertyType == booleanStopConditionObserver) {
+        return "create-bsc";
+    }
+
+    return "";
+}
+
+bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &propertyName)
+{
+    const QProcess *const makeCommandProcess = new QProcess(this);
+    const QString makeCommand = "make " + makeRule + " NAME=" + propertyName;
+
+    if (makeCommandProcess->execute(makeCommand)) {
+        QMessageBox::warning(this, tr("Add new property"), makeCommand + " command can not be executed.");
+        return false;
+    }
+
+    return true;
+}
+
+bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(const QString &propertyName)
+{
+    const QString newPropertyDirectoryPath = defaultProjectPropertiesDirectoryPath + QDir::separator() + propertyName;
+
+    if (!QDir().mkpath(newPropertyDirectoryPath)) {
+        QMessageBox::warning(this, tr("Add new property"), newPropertyDirectoryPath + " can not be created.");
+        return false;
+    }
+
+    const QString newPropertyFilePath = newPropertyDirectoryPath + QDir::separator() + propertyName + ".msc";
+
+    if (!QFile(defaultMessageSequenceChartWhenThenMscTemplatePath).copy(newPropertyFilePath)) {
+        QMessageBox::warning(this, tr("Add new property"), 
+                                    defaultMessageSequenceChartWhenThenMscTemplatePath + 
+                                    " can not be copied to " + 
+                                    newPropertyFilePath);
+        return false;
+    }
+
+    const QProcess *const sedCommandProcess = new QProcess(this);
+    const QString sedCommand = sedCommandForWhenThenPropertyTemplate.arg(propertyName).arg(newPropertyFilePath);
+
+    if (sedCommandProcess->execute(sedCommand)) {
+        QMessageBox::warning(this, tr("Add new property"), sedCommand + " command can not be executed.");
+        return false;
+    }
+
+    return true;
+}
+
+void ModelCheckingWindow::refreshPropertiesTreeViewWithPreselection()
+{
+    QFileInfo propertiesFileInfo(this->propertiesPath);
+
+    // save user selection
+    QStringList preSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
+
+    // save user expanded nodes
+    QStringList expandedNodes = getExpandedNodes(this->propertiesTopDirWidgetItem, {this->propertiesTopDirWidgetItem->text(0)});
+
+    // destroy tree except root
+    QTreeWidgetItem *treeRoot = this->propertiesTopDirWidgetItem;
+
+    for (auto i = treeRoot->childCount(); i > 0; i--) {
+        treeRoot->removeChild(treeRoot->child(i-1));
+    }
+
+    // rebuild tree with saved selection
+    this->propertiesTopDirWidgetItem->setCheckState(0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, preSelection, expandedNodes, 0));
 }
 
 /*!

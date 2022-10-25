@@ -1,0 +1,14 @@
+starting claim 7
+Never claim moves to line 6	[else]
+  7:	proc  6 (:init::1) system.pml:178 Send 1	-> queue 1 (Actuator_lock)
+ 12:	proc  6 (:init::1) system.pml:180 Send 1	-> queue 2 (Controller_lock)
+Never claim moves to line 4	[(inited)]
+Never claim moves to line 15	[else]
+ 31:	proc  1 (Environ_test:1) system.pml:49 Send 0	-> queue 3 (Controller_test_channel)
+ 34:	proc  4 (Controller_test:2) system.pml:137 Recv 1	<- queue 2 (Controller_lock)
+ 36:	proc  4 (Controller_test:2) system.pml:141 Recv 0	<- queue 3 (Controller_test_channel)
+ 45:	proc  4 (Controller_test:2) system.pml:35 Send 0	-> queue 4 (Actuator_reset_acc_channel)
+ 54:	proc  4 (Controller_test:2) system.pml:148 Send 1	-> queue 2 (Controller_lock)
+                          process continuous signals in Actuator
+                  set_timer actuator trigger 1000
+                  reset_timer actuator trigger

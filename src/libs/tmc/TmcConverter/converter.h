@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "processmetadata.h"
-
 #include <QDir>
 #include <QFileInfo>
 #include <QList>
@@ -164,11 +162,22 @@ public:
      */
     auto attachObserver(const QString &observerPath, const uint32_t priority) -> bool;
 
+    /**
+     * @brief Process trace conversion
+     *
+     * This method converts Spin Trail into Simulator Trail
+     *
+     * @param inputFile input spin trail filepath
+     * @param outputFile output simulator trail filepath
+     * @return true if conversion succeed, otherwise false.
+     */
+    bool convertTrace(const QString &inputFile, const QString &outputFile);
+
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
-    auto integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
+    void integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
             std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos);
     bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
 

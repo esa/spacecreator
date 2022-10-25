@@ -352,7 +352,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
         alternative->appendElement(ProctypeMaker::makeInlineCall(inlineTypeGeneratorName,
                 QString("%1.data.%2").arg(valueVariableName).arg(Escaper::escapePromelaName(componentName))));
         alternative->appendElement(ProctypeMaker::makeAssignmentProctypeElement(
-                QString("%1.selection").arg(valueVariableName), thisComponentSelected));
+                QString("%1.selection").arg(valueVariableName), VariableRef(thisComponentSelected)));
 
         conditional->appendAlternative(std::move(alternative));
     }

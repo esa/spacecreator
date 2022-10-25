@@ -1,0 +1,46 @@
+/* CIF PROCESS (250, 149), (150, 75) */
+process Actuator;
+    /* CIF TEXT (393, 314), (267, 140) */
+    -- Text area for declarations and comments
+    
+    dcl param MyInteger;
+    dcl counter MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (427, 72), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (427, 122), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (1234, 295), (70, 35) */
+    state Work;
+        /* CIF provided (1223, 350), (86, 35) */
+        provided param /= 0;
+            /* CIF task (1171, 405), (190, 35) */
+            task counter := counter + counter;
+            /* CIF decision (1226, 460), (81, 50) */
+            decision param = 1;
+                /* CIF ANSWER (1299, 530), (70, 23) */
+                (false):
+                    /* CIF task (1268, 573), (131, 35) */
+                    task param := param - 1;
+                    /* CIF NEXTSTATE (1299, 628), (70, 35) */
+                    NEXTSTATE Work;
+                /* CIF ANSWER (1167, 530), (70, 23) */
+                (true):
+                    /* CIF task (1159, 573), (84, 35) */
+                    task param := 0;
+                    /* CIF output (1146, 628), (111, 35) */
+                    output result(counter);
+                    /* CIF NEXTSTATE (1167, 683), (70, 35) */
+                    NEXTSTATE Wait;
+            enddecision;
+    endstate;
+    /* CIF state (951, 296), (70, 35) */
+    state Wait;
+        /* CIF input (935, 351), (97, 35) */
+        input work(param);
+            /* CIF task (938, 406), (92, 35) */
+            task counter := 1;
+            /* CIF NEXTSTATE (949, 461), (70, 35) */
+            NEXTSTATE Work;
+    endstate;
+endprocess Actuator;
