@@ -131,13 +131,13 @@ private:
 
     const QStringList supportedPropertyTypes
     {
+        booleanStopConditionLTL,
         booleanStopConditionObserver,
         messageSequenceChartSearchVerify,
         messageSequenceChartWhenThen,
         observer
     };
 
-    const QString defaultProjectPropertiesDirectoryPath = "work/modelchecking/properties";
     const QString defaultMessageSequenceChartWhenThenMscTemplateName = "when-then-property-tmpl.msc";
     const QString defaultMessageSequenceChartWhenThenMscTemplatePath = 
                     QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) +
@@ -148,11 +148,15 @@ private:
     QString askAboutNewPropertyType();
     bool isPropertyTypeSupported(const QString &propertyType);
     QString askAboutNewPropertyName(const QString &propertyType);
-    void escapeNewPropertyName(QString &propertyName);
+    void escapeNewPropertyName(QString &propertyName) const;
     void checkNewPropertyNameAndAppendSuffixIfNeeded(QString &propertyName);
-    QString getMakeRuleForPropertyType(const QString &propertyType);
+    QString getMakeRuleForPropertyType(const QString &propertyType) const;
     bool invokeMake(const QString &makeRule, const QString &propertyName);
-    bool handleMessageSequenceChartWhenThen(const QString &propertyName);
+    bool handleNoneMakePropertyTypes(const QString &propertyType, const QString &propertyName);
+    bool handleBooleanStopConditionLTL(const QString newPropertyDirectoryPath, const QString &propertyName);
+    bool handleMessageSequenceChartWhenThen(const QString newPropertyDirectoryPath, const QString &propertyName);
+    QString getNewPropertyDirectoryPath(const QString &propertyName) const;
+    bool createSubTypesDirectoryAndDirectoryForNewProperty(const QString &newPropertyDirectoryPath);
     void refreshPropertiesTreeViewWithPreselection();
 
     void setCheckBoxState(QCheckBox *checkBox, bool isChecked);

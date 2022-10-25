@@ -254,14 +254,20 @@ Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidget
             }
         }
         else { // is file
-            if (childFileInfo.suffix() == "msc" || childFileInfo.suffix() == "pr"){
+            const QString childFileSuffix = childFileInfo.suffix();
+
+            if (childFileSuffix == "msc" || childFileSuffix == "pr" || childFileSuffix == "scl") {
                 childWidgetInfo.append(childFileInfo.filePath());
                 QTreeWidgetItem *childWidgetItem = new QTreeWidgetItem(childWidgetInfo);
-                if (childFileInfo.suffix() == "msc") {
+
+                if (childFileSuffix == "msc") {
                     childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaPlay));
-                } else {
+                } else if (childFileSuffix == "pr") {
                     childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogContentsView));
+                } else if (childFileSuffix == "scl") {
+                    childWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaStop));
                 }
+
                 checkState = getCheckState(preSelection, childFileInfo.filePath());
                 childWidgetItem->setCheckState(0, checkState);
                 parentWidgetItem->addChild(childWidgetItem);
@@ -277,8 +283,8 @@ Qt::CheckState ModelCheckingWindow::listProperties(QTreeWidgetItem *parentWidget
     if (!parentIsFullyChecked && parentIsUnchecked){return Qt::Unchecked;}
     // empty dir
     if (parentIsFullyChecked && parentIsUnchecked){return Qt::Unchecked;}
-    return Qt::PartiallyChecked;
 
+    return Qt::PartiallyChecked;
 }
 
 /*!
@@ -374,18 +380,18 @@ void ModelCheckingWindow::listResults(QTreeWidgetItem *parentWidgetItem, QFileIn
             continue;
         }
         else { // is file
-                if (fileInfo.suffix() == "msc"){
-                    fileColumn.append(fileInfo.filePath());
-                    QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
-                    child->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaPlay));
-                    parentWidgetItem->addChild(child);
-                }
-                if (fileInfo.suffix() == "scn"){
-                    fileColumn.append(fileInfo.filePath());
-                    QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
-                    child->setIcon(0, this->style()->standardIcon(QStyle::SP_FileIcon));
-                    parentWidgetItem->addChild(child);
-                }
+            if (fileInfo.suffix() == "msc"){
+                fileColumn.append(fileInfo.filePath());
+                QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
+                child->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaPlay));
+                parentWidgetItem->addChild(child);
+            }
+            if (fileInfo.suffix() == "scn"){
+                fileColumn.append(fileInfo.filePath());
+                QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
+                child->setIcon(0, this->style()->standardIcon(QStyle::SP_FileIcon));
+                parentWidgetItem->addChild(child);
+            }
         }
     }
 }
@@ -470,14 +476,18 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     if (item->text(1) == "") { // is directory node
         return;
     }
+
     // is property file
     QFileInfo fileInfo(item->text(1)); // text(1) of file hosts the file absolute path
+    const QString fileSuffix = fileInfo.completeSuffix();
     QString cmd;
-    if (fileInfo.completeSuffix() == "msc"){
+
+    if (fileSuffix == "msc" || fileSuffix == "scl") {
         cmd = "spacecreator.AppImage -client " + item->text(1);
-    } else{ // then has to be a .pr file
+    } else { // then has to be a .pr file
         cmd = "opengeode " + item->text(1);
     }
+
     QProcess *p = new QProcess();
     p->start(cmd);
     if(!p->waitForStarted(10000)) {
@@ -485,6 +495,7 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
                              tr("Error when calling '%1'.").arg(cmd));
         return;
     }
+
     statusBar()->showMessage("File open.", 6000);
 }
 
@@ -710,21 +721,29 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
  */
 void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    if (item->text(1) == "") {return;}
+    if (item->text(1) == "") {
+        return;
+    }
+
     QFileInfo fileInfo(item->text(1));
+    const QString fileSuffix = fileInfo.completeSuffix();
     QString cmd;
-    if (fileInfo.completeSuffix() == "msc"){
+
+    if (fileSuffix == "msc" || fileSuffix == "scl") {
         cmd = "spacecreator.AppImage -client " + item->text(1);
-    } else{
+    } else {
         cmd = "kate " + item->text(1);
     }
+
     QProcess *p = new QProcess();
     p->start(cmd);
+    
     if(!p->waitForStarted(10000)) {
         QMessageBox::warning(this, tr("Open scenario"),
                              tr("Error when calling '%1'.").arg(cmd));
         return;
     }
+
     statusBar()->showMessage("File open.", 6000);
 }
 
@@ -781,14 +800,12 @@ void ModelCheckingWindow::addProperty()
     }
 
     if (!isPropertyTypeSupported(propertyType)) {
-        QMessageBox::warning(this, tr("Add new property"), propertyType + " is not supported yet.");
         return;
     }
 
     QString propertyName = askAboutNewPropertyName(propertyType);
 
     if (propertyName.isEmpty()) {
-        QMessageBox::warning(this, tr("New property name"), tr("Property name is empty."));
         return;
     }
 
@@ -806,14 +823,12 @@ void ModelCheckingWindow::addProperty()
         if (invokeMake(makeRule, propertyName)) {
             wasPropertyHandled = true;
         }
-    } else if (propertyType == messageSequenceChartWhenThen) {
-        if (handleMessageSequenceChartWhenThen(propertyName)) {
+    } else {
+        if (handleNoneMakePropertyTypes(propertyType, propertyName)) {
             wasPropertyHandled = true;
         }
-    } else {
-        QMessageBox::warning(this, tr("Add new property"), propertyType + " property is not handled.");
     }
-
+    
     if (wasPropertyHandled) {
         refreshPropertiesTreeViewWithPreselection();
         statusBar()->showMessage("New property '" + propertyName + "' has been added.", 6000);
@@ -824,7 +839,7 @@ void ModelCheckingWindow::addProperty()
     QDir::setCurrent(currentPath);
 }
 
-QString ModelCheckingWindow::ModelCheckingWindow::askAboutNewPropertyType()
+QString ModelCheckingWindow::askAboutNewPropertyType()
 {
     bool isOk;
 
@@ -839,26 +854,33 @@ QString ModelCheckingWindow::ModelCheckingWindow::askAboutNewPropertyType()
 
 bool ModelCheckingWindow::isPropertyTypeSupported(const QString &propertyType)
 {
-    return supportedPropertyTypes.contains(propertyType, Qt::CaseInsensitive);
+    if (!supportedPropertyTypes.contains(propertyType, Qt::CaseInsensitive)) {
+        QMessageBox::warning(this, tr("Add new property"), propertyType + " property type is not supported yet.");
+        return false;
+    }
+
+    return true;
 }
 
 QString ModelCheckingWindow::askAboutNewPropertyName(const QString &propertyType)
 {
     bool isOk;
-    const QString label = "New property name : (no whitespace or '-')";
+    const QString label = QString("Name for new \"%1\" property type :")
+                                .arg(propertyType);
 
-    const QString propertyName = QInputDialog::getText(this, "New " + propertyType,
+    const QString propertyName = QInputDialog::getText(this, "Name for new property",
                                             label, QLineEdit::Normal,
                                             "new_property", &isOk);
 
     if (!isOk || propertyName.isEmpty()) {
+        QMessageBox::warning(this, tr("New property name"), tr("Property name is empty."));
         return "";
     }
 
     return propertyName;
 }
 
-void ModelCheckingWindow::escapeNewPropertyName(QString &propertyName)
+void ModelCheckingWindow::escapeNewPropertyName(QString &propertyName) const
 {
     propertyName = conversion::Escaper::escapeIvName(propertyName);
 }
@@ -866,13 +888,13 @@ void ModelCheckingWindow::escapeNewPropertyName(QString &propertyName)
 void ModelCheckingWindow::checkNewPropertyNameAndAppendSuffixIfNeeded(QString &propertyName)
 {
     const QString originalPropertyName = propertyName;
-    QString propertyDirectoryPath = this->propertiesPath + QDir::separator() + propertyName;
+    QString propertyDirectoryPath = getNewPropertyDirectoryPath(propertyName);
 
     while (QDir(propertyDirectoryPath).exists())
     {
         propertyName.append("_1");
 
-        propertyDirectoryPath = this->propertiesPath + QDir::separator() + propertyName;
+        propertyDirectoryPath = getNewPropertyDirectoryPath(propertyName);
     }
 
     if(propertyName != originalPropertyName) {
@@ -883,7 +905,7 @@ void ModelCheckingWindow::checkNewPropertyNameAndAppendSuffixIfNeeded(QString &p
     }
 }
 
-QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyType)
+QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyType) const
 {
     if (propertyType == observer) {
         return "create-obs";
@@ -911,15 +933,48 @@ bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &pro
     return true;
 }
 
-bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(const QString &propertyName)
+bool ModelCheckingWindow::handleNoneMakePropertyTypes(const QString &propertyType, const QString &propertyName)
 {
-    const QString newPropertyDirectoryPath = defaultProjectPropertiesDirectoryPath + QDir::separator() + propertyName;
+    const QString newPropertyDirectoryPath = getNewPropertyDirectoryPath(propertyName);
 
-    if (!QDir().mkpath(newPropertyDirectoryPath)) {
-        QMessageBox::warning(this, tr("Add new property"), newPropertyDirectoryPath + " can not be created.");
+    if (!createSubTypesDirectoryAndDirectoryForNewProperty(newPropertyDirectoryPath)) {
         return false;
     }
 
+    if (propertyType == booleanStopConditionLTL) {
+        if (!handleBooleanStopConditionLTL(newPropertyDirectoryPath, propertyName)) {
+            return false;
+        }
+    } else if (propertyType == messageSequenceChartWhenThen) {
+        if (!handleMessageSequenceChartWhenThen(newPropertyDirectoryPath, propertyName)) {
+            return false;
+        }
+    } else {
+        QMessageBox::warning(this, tr("Add new property"), propertyType + " property is not handled.");
+        return false;
+    }
+
+    return true;
+}
+
+bool ModelCheckingWindow::handleBooleanStopConditionLTL(const QString newPropertyDirectoryPath, const QString &propertyName)
+{
+    const QString newPropertyFilePath = newPropertyDirectoryPath + QDir::separator() + propertyName + ".scl";
+
+    QFile newPropertyFile(newPropertyFilePath);
+
+    if (!newPropertyFile.open(QIODevice::NewOnly)) {
+        QMessageBox::warning(this, tr("Add new property"), newPropertyFilePath + " file can not be created.");
+        return false;
+    }
+
+    newPropertyFile.close();
+
+    return true;
+}
+
+bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(const QString newPropertyDirectoryPath, const QString &propertyName)
+{
     const QString newPropertyFilePath = newPropertyDirectoryPath + QDir::separator() + propertyName + ".msc";
 
     if (!QFile(defaultMessageSequenceChartWhenThenMscTemplatePath).copy(newPropertyFilePath)) {
@@ -935,6 +990,23 @@ bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(const QString &prop
 
     if (sedCommandProcess->execute(sedCommand)) {
         QMessageBox::warning(this, tr("Add new property"), sedCommand + " command can not be executed.");
+        return false;
+    }
+
+    return true;
+}
+
+QString ModelCheckingWindow::getNewPropertyDirectoryPath(const QString &propertyName) const
+{
+    return this->propertiesPath + QDir::separator() + propertyName;
+}
+
+bool ModelCheckingWindow::createSubTypesDirectoryAndDirectoryForNewProperty(const QString &newPropertyDirectoryPath)
+{
+    QDir().mkpath(this->subtypesPath);
+
+    if (!QDir().mkpath(newPropertyDirectoryPath)) {
+        QMessageBox::warning(this, tr("Add new property"), newPropertyDirectoryPath + " path can not be created.");
         return false;
     }
 
