@@ -831,9 +831,9 @@ void ModelCheckingWindow::addProperty()
     
     if (wasPropertyHandled) {
         refreshPropertiesTreeViewWithPreselection();
-        statusBar()->showMessage("New property '" + propertyName + "' has been added.", 6000);
+        statusBar()->showMessage(tr("New property '%1' has been added.").arg(propertyName), 6000);
     } else {
-        statusBar()->showMessage("New property '" + propertyName + "' has not been added.", 6000);
+        statusBar()->showMessage(tr("New property '%1' has not been added.").arg(propertyName), 6000);
     }
 
     QDir::setCurrent(currentPath);
@@ -855,7 +855,7 @@ QString ModelCheckingWindow::askAboutNewPropertyType()
 bool ModelCheckingWindow::isPropertyTypeSupported(const QString &propertyType)
 {
     if (!supportedPropertyTypes.contains(propertyType, Qt::CaseInsensitive)) {
-        QMessageBox::warning(this, tr("Add new property"), propertyType + " property type is not supported yet.");
+        QMessageBox::warning(this, tr("Add new property"), tr("%1 property type is not supported yet.").arg(propertyType));
         return false;
     }
 
@@ -865,10 +865,10 @@ bool ModelCheckingWindow::isPropertyTypeSupported(const QString &propertyType)
 QString ModelCheckingWindow::askAboutNewPropertyName(const QString &propertyType)
 {
     bool isOk;
-    const QString label = QString("Name for new \"%1\" property type :")
+    const QString label = tr("Name for new '%1' property type :")
                                 .arg(propertyType);
 
-    const QString propertyName = QInputDialog::getText(this, "Name for new property",
+    const QString propertyName = QInputDialog::getText(this, tr("Name for new property"),
                                             label, QLineEdit::Normal,
                                             "new_property", &isOk);
 
@@ -898,7 +898,7 @@ void ModelCheckingWindow::checkNewPropertyNameAndAppendSuffixIfNeeded(QString &p
     }
 
     if(propertyName != originalPropertyName) {
-        const QString newPropertyNameMessage = QString("'%1' already exists. '%1' has been replaced by '%2'")
+        const QString newPropertyNameMessage = tr("'%1' already exists. '%1' has been replaced by '%2'")
                                                     .arg(originalPropertyName)
                                                     .arg(propertyName);
         QMessageBox::information(this, tr("Property name has been replaced"), newPropertyNameMessage);
@@ -926,7 +926,7 @@ bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &pro
     const QString makeCommand = "make " + makeRule + " NAME=" + propertyName;
 
     if (makeCommandProcess->execute(makeCommand)) {
-        QMessageBox::warning(this, tr("Add new property"), makeCommand + " command can not be executed.");
+        QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(makeCommand));
         return false;
     }
 
@@ -950,7 +950,7 @@ bool ModelCheckingWindow::handleNoneMakePropertyTypes(const QString &propertyTyp
             return false;
         }
     } else {
-        QMessageBox::warning(this, tr("Add new property"), propertyType + " property is not handled.");
+        QMessageBox::warning(this, tr("Add new property"), tr("%1 property is not handled.").arg(propertyType));
         return false;
     }
 
@@ -964,7 +964,7 @@ bool ModelCheckingWindow::handleBooleanStopConditionLTL(const QString newPropert
     QFile newPropertyFile(newPropertyFilePath);
 
     if (!newPropertyFile.open(QIODevice::NewOnly)) {
-        QMessageBox::warning(this, tr("Add new property"), newPropertyFilePath + " file can not be created.");
+        QMessageBox::warning(this, tr("Add new property"), tr("%1 file can not be created.").arg(newPropertyFilePath));
         return false;
     }
 
@@ -979,17 +979,19 @@ bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(const QString newPr
 
     if (!QFile(defaultMessageSequenceChartWhenThenMscTemplatePath).copy(newPropertyFilePath)) {
         QMessageBox::warning(this, tr("Add new property"), 
-                                    defaultMessageSequenceChartWhenThenMscTemplatePath + 
-                                    " can not be copied to " + 
-                                    newPropertyFilePath);
+                                   tr("%1 can not be copied to %2")
+                                        .arg(defaultMessageSequenceChartWhenThenMscTemplatePath)
+                                        .arg(newPropertyFilePath));
         return false;
     }
 
     const QProcess *const sedCommandProcess = new QProcess(this);
-    const QString sedCommand = sedCommandForWhenThenPropertyTemplate.arg(propertyName).arg(newPropertyFilePath);
+    const QString sedCommand = sedCommandForWhenThenPropertyTemplate
+                                    .arg(propertyName)
+                                    .arg(newPropertyFilePath);
 
     if (sedCommandProcess->execute(sedCommand)) {
-        QMessageBox::warning(this, tr("Add new property"), sedCommand + " command can not be executed.");
+        QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(sedCommand));
         return false;
     }
 
@@ -1006,7 +1008,7 @@ bool ModelCheckingWindow::createSubTypesDirectoryAndDirectoryForNewProperty(cons
     QDir().mkpath(this->subtypesPath);
 
     if (!QDir().mkpath(newPropertyDirectoryPath)) {
-        QMessageBox::warning(this, tr("Add new property"), newPropertyDirectoryPath + " path can not be created.");
+        QMessageBox::warning(this, tr("Add new property"), tr("%1 path can not be created.").arg(newPropertyDirectoryPath));
         return false;
     }
 
