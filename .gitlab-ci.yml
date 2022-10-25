@@ -30,7 +30,7 @@ default:
     # install newest OpenGEODE (must be intalled in the same directory, removal is more robust than git clean/checkout/force)
     - pushd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; make install; popd
     # install newest version of Spin model checker
-    - pushd $HOME/tool-src; rm -r Spin ; git clone https://github.com/n7space/Spin.git ; cd Spin ; make; popd ; mv $HOME/tool-src/Spin/Src/spin $HOME/tool-inst/bin/n7s-spin
+    - pushd $HOME/tool-src; rm -rf Spin ; git clone https://github.com/n7space/Spin.git ; cd Spin ; make; popd ; mv $HOME/tool-src/Spin/Src/spin $HOME/tool-inst/bin/n7s-spin
     # install sdl2promela
     - git clone https://github.com/n7space/sdl2promela.git
     - pushd sdl2promela ; make install ; popd
