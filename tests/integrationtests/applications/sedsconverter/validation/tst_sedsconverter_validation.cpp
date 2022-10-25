@@ -32,6 +32,7 @@ private Q_SLOTS:
     void testMissingCoreSemanticsFails();
     void testMissingExtensionSemanticsFails();
     void testValidPasses();
+    void testValidationDisabled();
 };
 
 /// \SRS  ETB-FUN-20
@@ -65,6 +66,13 @@ void tst_SedsConverter_Validation::testMissingExtensionSemanticsFails()
 void tst_SedsConverter_Validation::testValidPasses()
 {
     const int result = system("./test_valid_passes.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-30
+void tst_SedsConverter_Validation::testValidationDisabled()
+{
+    const int result = system("./test_validation_disabled.sh");
     QCOMPARE(result, 0);
 }
 

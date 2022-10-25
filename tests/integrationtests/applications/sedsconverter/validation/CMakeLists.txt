@@ -18,6 +18,7 @@ configure_file(test_invalid_fails.sh test_invalid_fails.sh COPYONLY)
 configure_file(test_missing_core_semantics_fails.sh test_missing_core_semantics_fails.sh COPYONLY)
 configure_file(test_missing_extension_semantics_fails.sh test_missing_extension_semantics_fails.sh COPYONLY)
 configure_file(test_valid_passes.sh test_valid_passes.sh COPYONLY)
+configure_file(test_validation_disabled.sh test_validation_disabled.sh COPYONLY)
 
 configure_file(resources/invalid/input-seds.xml resources/invalid/input-seds.xml COPYONLY)
 configure_file(resources/invalid/seds-core-semantics.xsd resources/invalid/seds-core-semantics.xsd COPYONLY)
@@ -40,3 +41,9 @@ configure_file(resources/missing-extension-semantics/input-seds.xml resources/mi
 configure_file(resources/missing-extension-semantics/seds-core-semantics.xsd resources/missing-extension-semantics/seds-core-semantics.xsd COPYONLY)
 configure_file(resources/missing-extension-semantics/seds.xsd resources/missing-extension-semantics/seds.xsd COPYONLY)
 configure_file(resources/missing-extension-semantics/xml.xsd resources/missing-extension-semantics/xml.xsd COPYONLY)
+
+configure_file(resources/validation-disabled/input-seds.xml resources/validation-disabled/input-seds.xml COPYONLY)
+configure_file(resources/validation-disabled/seds-core-semantics.xsd resources/validation-disabled/seds-core-semantics.xsd COPYONLY)
+configure_file(resources/validation-disabled/seds-extension-semantics.xsd resources/validation-disabled/seds-extension-semantics.xsd COPYONLY)
+configure_file(resources/validation-disabled/seds.xsd resources/validation-disabled/seds.xsd COPYONLY)
+configure_file(resources/validation-disabled/xml.xsd resources/validation-disabled/xml.xsd COPYONLY)
