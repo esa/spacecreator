@@ -172,6 +172,7 @@ void tst_SedsConverter_SedsToIv::testCrossReferenceInterfaces()
 }
 
 /// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-1010
 /// \SRS  ETB-FUN-1020
 /// \SRS  ETB-FUN-1030
 void tst_SedsConverter_SedsToIv::testDescriptions()
