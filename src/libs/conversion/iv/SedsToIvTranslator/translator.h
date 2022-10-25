@@ -27,6 +27,7 @@ class IVPropertyTemplateConfig;
 } // namespace ivm
 
 namespace seds::model {
+class Device;
 class Package;
 class SedsModel;
 } // namespace seds::model
@@ -94,10 +95,17 @@ private:
 
 private:
     /**
+     * @brief   Translate SEDS device
+     *
+     * @param   sedsDevice      Device to translate
+     * @param   ivModel         InterfaceView model to which elements will be added
+     */
+    auto translateDevice(const ::seds::model::Device &sedsDevice, ivm::IVModel *ivModel) const -> void;
+    /**
      * @brief   Translate SEDS package
      *
      * @param   sedsPackage         Package to translate
-     * @param   ivModel             InterfaceView model to which should translated IV functions will be added
+     * @param   ivModel             InterfaceView model to which translated IV functions will be added
      * @param   sedsPackages        List of SEDS packages
      * @param   generateFunction    Generate parent function for the translated components
      * @param   options             Options
