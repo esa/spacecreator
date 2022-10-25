@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
     std::optional<QString> spinMessage;
+    std::optional<QString> spinTraces;
+    std::optional<QString> sclCondition;
     std::optional<QString> templateFile;
     std::optional<QString> targetFile;
 
@@ -61,6 +63,28 @@ int main(int argc, char *argv[])
             }
             ++i;
             spinMessage = args[i];
+        } else if (arg == "-is") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing spin traces after -is");
+                exit(EXIT_FAILURE);
+            }
+            if (spinTraces.has_value()) {
+                qCritical("Duplicated -is argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            spinTraces = args[i];
+        } else if (arg == "-ic") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing scl condition after -ic");
+                exit(EXIT_FAILURE);
+            }
+            if (sclCondition.has_value()) {
+                qCritical("Duplicated -ic argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            sclCondition = args[i];
         } else if (arg == "-it") {
             if (i + 1 == args.size()) {
                 qCritical("Missing template file after -it");
@@ -89,8 +113,8 @@ int main(int argc, char *argv[])
             qInfo("spinerrorparser: Spin Error Parser");
             qInfo("Usage: spinerrorparser [OPTIONS]");
             qInfo("  -im <message>          Message from spin");
-            qInfo("  -is <condition>        Condition from scl.txt");
-
+            qInfo("  -is <message>          Spin traces");
+            qInfo("  -ic <condition>        Condition from scl.txt");
             qInfo("  -it <filename>         HTML template file name");
             qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
@@ -106,6 +130,16 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    if (!spinTraces.has_value()) {
+        qCritical("Missing mandatory argument: -is spinTraces");
+        exit(EXIT_FAILURE);
+    }
+
+    if (!sclCondition.has_value()) {
+        qCritical("Missing mandatory argument: -ic sclCondition");
+        exit(EXIT_FAILURE);
+    }
+
     if (!templateFile.has_value()) {
         qCritical("Missing mandatory argument: -it templateFile");
         exit(EXIT_FAILURE);
@@ -116,9 +150,12 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    qDebug() << spinTraces.value();
+    qDebug() << sclCondition.value();
+
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessage.value());
+    auto reports = parser.parse(spinMessage.value(), spinTraces.value(), sclCondition.value());
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;

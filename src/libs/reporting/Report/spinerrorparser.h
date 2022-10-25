@@ -67,17 +67,22 @@ public:
      * @brief   Parse spin message
      *
      * @param   spinMessage      Spin command output
+     * @param   spinTraces       Spin traces
+     * @param   sclConditions    SCL file conditions
      *
      * @return  List of spin errors
      */
-    SpinErrorReport parse(const QString &spinMessage) const;
+    SpinErrorReport parse(const QString &spinMessage, const QString &spinTraces, const QString &sclConditions) const;
 
 private:
+    static const QString m_spinNoTrailFileMessage;
+
+    SpinErrorReportItem buildReportItem(const QRegularExpressionMatch &matchedError) const;
+    SpinErrorReportItem buildStopConditionViolationReportItem(const QString &conditions) const;
+
     QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
     QVariant parseVariableViolation(const QString &rawError) const;
     QVariant parseStopConditionViolation(const QString &rawError) const;
-
-    SpinErrorReportItem buildReportItem(const QRegularExpressionMatch &matchedError) const;
 
     static QRegularExpression buildSpinErrorRegex();
     static QRegularExpression buildDataConstraintViolationRegex();

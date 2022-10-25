@@ -47,9 +47,11 @@ void tst_SpinErrorParser::testNoError()
     // read message file
     const QString filepath("resources/spin_no_error_output.txt");
     const QString spinMessage = readFile(filepath);
+    const QString spinTraces = QString();
+    const QString sclConditions = QString();
 
     const SpinErrorParser parser;
-    const SpinErrorReport errorReport = parser.parse(spinMessage);
+    const SpinErrorReport errorReport = parser.parse(spinMessage, spinTraces, sclConditions);
 
     QVERIFY(errorReport.size() == 0);
 }
@@ -59,9 +61,11 @@ void tst_SpinErrorParser::testViolationVariableType()
     // read message file
     const QString filepath("resources/spin_error_output.txt");
     const QString spinMessage = readFile(filepath);
+    const QString spinTraces = QString();
+    const QString sclConditions = QString();
 
     const SpinErrorParser parser;
-    const auto errorReport = parser.parse(spinMessage);
+    const auto errorReport = parser.parse(spinMessage, spinTraces, sclConditions);
     QVERIFY(errorReport.size() == 1);
 
     const auto errorReportItem = errorReport.at(0);
@@ -83,9 +87,11 @@ void tst_SpinErrorParser::testNestedVariable()
     // read message file
     const QString filepath("resources/spin_error_nested_output.txt");
     const QString spinMessage = readFile(filepath);
+    const QString spinTraces = QString();
+    const QString sclConditions = QString();
 
     const SpinErrorParser parser;
-    const auto errorReport = parser.parse(spinMessage);
+    const auto errorReport = parser.parse(spinMessage, spinTraces, sclConditions);
     QVERIFY(errorReport.size() == 1);
 
     const auto errorReportItem = errorReport.at(0);

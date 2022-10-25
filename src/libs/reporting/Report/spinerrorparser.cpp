@@ -22,15 +22,52 @@
 #include <QDebug>
 #include <QRegularExpression>
 
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spinMessage) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(
+        const QString &spinMessage, const QString &spinTraces, const QString &sclConditions) const
 {
-    QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
     reporting::SpinErrorReport report;
+    // parse variable violations
+    QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
     while (matches.hasNext()) {
         auto reportItem = buildReportItem(matches.next());
         report.append(reportItem);
     }
+    // parse stop condition violation
+    if (!spinTraces.isEmpty() && spinTraces.trimmed() != m_spinNoTrailFileMessage) {
+        auto reportItem = buildStopConditionViolationReportItem(sclConditions);
+        report.append(reportItem);
+    }
     return report;
+}
+
+reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
+        const QRegularExpressionMatch &matchedError) const
+{
+    SpinErrorReportItem reportItem;
+    reportItem.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
+    reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
+    reportItem.errorType = SpinErrorReportItem::DataConstraintViolation;
+    reportItem.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
+    // for now, only parse data constraint violation
+    switch (reportItem.errorType) {
+    case SpinErrorReportItem::DataConstraintViolation:
+        reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
+        break;
+    case SpinErrorReportItem::StopConditionViolation:
+        reportItem.parsedErrorDetails = parseStopConditionViolation(reportItem.rawErrorDetails);
+        break;
+    default:
+        break;
+    }
+    return reportItem;
+}
+
+reporting::SpinErrorReportItem reporting::SpinErrorParser::buildStopConditionViolationReportItem(const QString &) const
+{
+    SpinErrorReportItem reportItem;
+    reportItem.errorNumber = 0;
+    reportItem.errorType = SpinErrorReportItem::OtherError;
+    return reportItem;
 }
 
 QRegularExpressionMatchIterator reporting::SpinErrorParser::matchSpinErrors(const QString &spinMessage) const
@@ -77,28 +114,6 @@ QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &
     QVariant stopConditionViolation;
     stopConditionViolation.setValue(violationReport);
     return stopConditionViolation;
-}
-
-reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
-        const QRegularExpressionMatch &matchedError) const
-{
-    SpinErrorReportItem reportItem;
-    reportItem.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
-    reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
-    reportItem.errorType = SpinErrorReportItem::StopConditionViolation;
-    reportItem.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
-    // for now, only parse data constraint violation
-    switch (reportItem.errorType) {
-    case SpinErrorReportItem::DataConstraintViolation:
-        reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
-        break;
-    case SpinErrorReportItem::StopConditionViolation:
-        reportItem.parsedErrorDetails = parseStopConditionViolation(reportItem.rawErrorDetails);
-        break;
-    default:
-        break;
-    }
-    return reportItem;
 }
 
 QRegularExpression reporting::SpinErrorParser::buildSpinErrorRegex()
@@ -152,3 +167,5 @@ void reporting::SpinErrorParser::parseVariableName(
         violationReport.nestedStateName = QString();
     }
 }
+
+const QString reporting::SpinErrorParser::m_spinNoTrailFileMessage = QStringLiteral("spin: cannot find trail file");
