@@ -56,7 +56,16 @@ void Input::accept(Visitor &visitor) const
 
 bool operator==(const Input &lhs, const Input &rhs)
 {
-    return lhs.m_name == rhs.m_name && lhs.m_parameters == rhs.m_parameters;
+    if (QString::compare(lhs.m_name, rhs.m_name, Qt::CaseInsensitive) != 0) {
+        return false;
+    }
+
+    if (lhs.m_parameters.size() != rhs.m_parameters.size()) {
+        return false;
+    }
+
+    return std::equal(lhs.m_parameters.begin(), lhs.m_parameters.end(), rhs.m_parameters.begin(),
+            [](const auto &lhsParam, const auto &rhsParam) { return *lhsParam == *rhsParam; });
 }
 
 bool operator!=(const Input &lhs, const Input &rhs)
