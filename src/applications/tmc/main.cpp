@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     std::optional<QString> processesBasePriority;
     std::vector<QString> subtypesFilepaths;
     std::optional<float> delta;
-    bool isRealTypeEnabled;
+    bool isRealTypeEnabled = false;
 
     const QStringList args = app.arguments();
 
@@ -203,14 +203,14 @@ int main(int argc, char *argv[])
             ++i;
 
             bool valueOk;
-            args[i].toUInt(&valueOk);
+            args[i].toFloat(&valueOk);
 
             if (!valueOk) {
-                qCritical("Delta is not an unsigned integer");
+                qCritical("Delta is not a float");
                 exit(EXIT_FAILURE);
             }
 
-            delta = args[i].toInt();
+            delta = std::abs(args[i].toFloat());
         } else if (arg == "-enable-reals") {
             ++i;
             isRealTypeEnabled = true;
