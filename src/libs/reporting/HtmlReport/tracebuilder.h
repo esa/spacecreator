@@ -26,12 +26,13 @@ namespace reporting {
 /**
  * @brief Builds a HTML-compatible trace report.
  */
-class TraceBuilder {
+class TraceBuilder
+{
 public:
     /**
      * @brief   Constructor
      */
-    TraceBuilder();
+    TraceBuilder() = default;
 
     /**
      * @brief   Add HTML formatting to a trace report
