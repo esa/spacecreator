@@ -4,48 +4,11 @@ BEGIN
    MyInteger ::= INTEGER (0 .. 10000)
    MyReal      ::= REAL (0.0 .. 1000.0)
 
--- ASN.1 Type definitions must start with an uppercase
--- Field names in records (SEQUENCE) must start with a lowercase
--- Underscores are not allowed: use dash (hyphen) 
--- For integers do not assume that small ranges will be translated to small
--- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
--- for the range in Ada)
-
--- Simple types:
-
--- TASTE-Boolean ::= BOOLEAN
--- MyInteger   ::= INTEGER (0..255)
--- MyReal      ::= REAL (0.0 .. 1000.0)
--- MyBool      ::= BOOLEAN
--- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
-
--- Complex types:
-
---  MySeq       ::= SEQUENCE {
---      input-data  MyInteger,
---      output-data MyInteger,
---      validity    ENUMERATED { valid, invalid }
---  }
---
---  MyChoice    ::= CHOICE {
---      a BOOLEAN,
---      b MySeq
---  }
---
---  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
---
---  MyOctStr    ::= OCTET STRING (SIZE (3))
---
---  -- You can also declare constants
---  myVar       MySeqOf     ::= { hello, world }
-
 END
 
 
 TASTE-BasicTypes DEFINITIONS ::=
 BEGIN
-
--- Set of TASTE predefined basic types
 
 T-Int32 ::=  INTEGER (-2147483648 .. 2147483647)
 
@@ -61,16 +24,11 @@ T-Null-Record ::= SEQUENCE {}
 
 END
 
-
--- Dataview generated on-the-fly providing information on the system
--- and made available to the user code.
 System-Dataview DEFINITIONS ::=
 BEGIN
 
-   -- Range of PID - type can be used to size arrays of PID type
    PID-Range ::= INTEGER(0..2)
 
-   -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        controller,
        host,
@@ -79,4 +37,3 @@ BEGIN
    }
 
 END
-
