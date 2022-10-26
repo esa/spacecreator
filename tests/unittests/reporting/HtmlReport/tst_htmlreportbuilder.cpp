@@ -33,6 +33,8 @@ private Q_SLOTS:
     void testNoError();
     void testDataConstraintViolation();
     void testDataConstraintViolationNested();
+    void testStopConditionViolationEmpty();
+    void testStopConditionViolationGetState();
 
 private:
     QString readFile(const QString &filepath);
@@ -73,6 +75,7 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
 
     const HtmlReportBuilder htmlReportBuilder;
     const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+
     QVERIFY(html == htmlResult);
 }
 
@@ -93,6 +96,54 @@ void tst_HtmlReportBuilder::testDataConstraintViolationNested()
     const HtmlReportBuilder htmlReportBuilder;
     const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
     QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testStopConditionViolationEmpty()
+{
+    const QString spinMessagePath("resources/spin_scv_empty_output.txt");
+    const QString spinTracesPath("resources/spin_scv_empty_trails.txt");
+    const QString spinSclConditionsPath("resources/spin_scv_empty_scl.txt");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/result_scv_empty.html");
+
+    const QString spinMessage = readFile(spinMessagePath);
+    const QString spinTraces = readFile(spinTracesPath);
+    const QString sclConditions = readFile(spinSclConditionsPath);
+    const QString htmlResult = readFile(htmlResultPath);
+
+    const SpinErrorParser parser;
+    auto reports = parser.parse(spinMessage, spinTraces, sclConditions);
+
+    const HtmlReportBuilder htmlReportBuilder;
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testStopConditionViolationGetState()
+{
+    const QString spinMessagePath("resources/spin_scv_get_state_output.txt");
+    const QString spinTracesPath("resources/spin_scv_get_state_trails.txt");
+    const QString spinSclConditionsPath("resources/spin_scv_get_state_scl.txt");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/result_scv_get_state.html");
+
+    const QString spinMessage = readFile(spinMessagePath);
+    const QString spinTraces = readFile(spinTracesPath);
+    const QString sclConditions = readFile(spinSclConditionsPath);
+    const QString htmlResult = readFile(htmlResultPath);
+
+    const SpinErrorParser parser;
+    auto reports = parser.parse(spinMessage, spinTraces, sclConditions);
+
+    const HtmlReportBuilder htmlReportBuilder;
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+
+    QFile file("/home/taste/result_scv_get_state.html");
+    file.open(QFile::WriteOnly);
+    file.write(html.toUtf8());
+    file.close();
+
+    QVERIFY(true);
 }
 
 QString tst_HtmlReportBuilder::readFile(const QString &filepath)

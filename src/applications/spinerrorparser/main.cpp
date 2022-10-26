@@ -178,7 +178,6 @@ int main(int argc, char *argv[])
             const StopConditionViolationReport stopConditionViolationReport =
                     qvariant_cast<StopConditionViolationReport>(report.parsedErrorDetails);
             qDebug() << "Violation type:" << stopConditionViolationReport.violationType;
-            qDebug() << "Function name:" << stopConditionViolationReport.functionName;
         } break;
         case SpinErrorReportItem::ObserverFailure:
             break;

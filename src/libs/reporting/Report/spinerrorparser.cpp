@@ -19,7 +19,6 @@
 
 #include "spinerrorparser.h"
 
-#include <QDebug>
 #include <QRegularExpression>
 
 reporting::SpinErrorReport reporting::SpinErrorParser::parse(
@@ -30,7 +29,10 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(
     QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
     while (matches.hasNext()) {
         auto reportItem = buildDataConstraintViolationReportItem(matches.next());
-        report.append(reportItem);
+        // verify if item is valid
+        if (!qvariant_cast<DataConstraintViolationReport>(reportItem.parsedErrorDetails).functionName.isEmpty()) {
+            report.append(reportItem);
+        }
     }
     if (!spinTraces.isEmpty() && spinTraces.trimmed() != m_spinNoTrailFileMessage) {
         // parse stop condition violation
@@ -179,7 +181,6 @@ reporting::StopConditionViolationReport::ViolationType reporting::SpinErrorParse
         while (matches.hasNext()) {
             const auto match = matches.next();
             const auto identifier = (match.captured(IdentifierParseTokens::IdentifierName));
-            qDebug() << identifier;
             if (m_stopConditionViolationIdentifiers.contains(identifier)) {
                 return m_stopConditionViolationIdentifiers.value(identifier);
             }

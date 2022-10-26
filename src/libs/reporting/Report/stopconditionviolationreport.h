@@ -39,8 +39,6 @@ struct StopConditionViolationReport {
 
     /** Type of the violation */
     ViolationType violationType;
-    /** Name of the function */
-    QString functionName;
 };
 
 }

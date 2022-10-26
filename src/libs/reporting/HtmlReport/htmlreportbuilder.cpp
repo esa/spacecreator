@@ -125,7 +125,6 @@ QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(co
     reporting::StopConditionViolationReport report =
             qvariant_cast<reporting::StopConditionViolationReport>(errorDetails);
     QVariantHash variantHash;
-    variantHash.insert("functionName", report.functionName);
     // resolve violation type as string
     variantHash.insert("violationType",
             m_stopConditionViolationTypeNames.value(report.violationType,

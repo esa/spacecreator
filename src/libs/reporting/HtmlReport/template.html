@@ -52,7 +52,6 @@
           {# Check for stop condition violation #}
           {% elif reportItem.errorCode == 1 %}
             <td>
-              <i>Function Name:</i> <tt>{{ reportItem.errorDetails.functionName }}</tt><br>
               <i>Violation Type:</i> <tt>{{ reportItem.errorDetails.violationType }}</tt>
             </td>
           {% endif %}
