@@ -1,12 +1,8 @@
 SimpleDataTypes DEFINITIONS ::= BEGIN
 
-    MyBoolean []
+    MyBoolean [size 16]
 
-    -- MyBoolean [size 16]
-
-    MyInvertedBoolean []
-
-    --MyInvertedBoolean [size 3, true-value '000'B]
+    MyInvertedBoolean [size 3, true-value '000'B]
 
     MyInteger []
 

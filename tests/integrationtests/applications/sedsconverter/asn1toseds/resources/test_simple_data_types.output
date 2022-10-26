@@ -2,8 +2,12 @@
 <PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
  <Package name="SimpleDataTypes">
   <DataTypeSet>
-   <BooleanDataType name="MyBoolean"/>
-   <BooleanDataType name="MyInvertedBoolean"/>
+  <BooleanDataType name="MyBoolean">
+    <BooleanDataEncoding sizeInBits="1" falseValue="zeroIsFalse"/>
+  </BooleanDataType>
+  <BooleanDataType name="MyInvertedBoolean">
+    <BooleanDataEncoding sizeInBits="3" falseValue="nonZeroIsFalse"/>
+  </BooleanDataType>
    <IntegerDataType name="MyInteger">
     <Range>
      <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>

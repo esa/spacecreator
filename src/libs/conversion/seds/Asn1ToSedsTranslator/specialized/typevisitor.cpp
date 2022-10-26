@@ -42,7 +42,6 @@
 #include <conversion/common/options.h>
 #include <conversion/common/overloaded.h>
 #include <conversion/common/translation/exceptions.h>
-#include <iostream>
 #include <seds/SedsModel/types/arraydatatype.h>
 #include <seds/SedsModel/types/binarydatatype.h>
 #include <seds/SedsModel/types/booleandatatype.h>
@@ -187,29 +186,20 @@ static inline auto isZero(const QString &value) -> bool
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
 {
-    ConstraintVisitor<BooleanValue> constraintVisitor;
-
-    type.constraints().accept(constraintVisitor);
-
     ::seds::model::BooleanDataType sedsType;
 
-    if (constraintVisitor.isSizeConstraintVisited() || !type.trueValue().isEmpty() || !type.falseValue().isEmpty()) {
-        if (constraintVisitor.isVariableSize()) {
-            throw UnsupportedDataTypeException("variable size Boolean");
-        }
+    ::seds::model::BooleanDataEncoding encoding;
+    encoding.setBits(static_cast<::seds::model::PositiveLong::Value>(type.acnSize()));
 
-        ::seds::model::BooleanDataEncoding encoding;
-        encoding.setBits(constraintVisitor.getMaxSize());
-        if (type.trueValue() != "") {
-            encoding.setFalseValue(isZero(type.trueValue()) ? ::seds::model::FalseValue::NonZeroIsFalse
-                                                            : ::seds::model::FalseValue::ZeroIsFalse);
-        } else if (type.falseValue() != "") {
-            encoding.setFalseValue(isZero(type.falseValue()) ? ::seds::model::FalseValue::ZeroIsFalse
-                                                             : ::seds::model::FalseValue::NonZeroIsFalse);
-        }
-
-        sedsType.setEncoding(std::move(encoding));
+    if (type.trueValue() != "") {
+        encoding.setFalseValue(isZero(type.trueValue()) ? ::seds::model::FalseValue::NonZeroIsFalse
+                                                        : ::seds::model::FalseValue::ZeroIsFalse);
+    } else if (type.falseValue() != "") {
+        encoding.setFalseValue(isZero(type.falseValue()) ? ::seds::model::FalseValue::ZeroIsFalse
+                                                         : ::seds::model::FalseValue::NonZeroIsFalse);
     }
+
+    sedsType.setEncoding(std::move(encoding));
 
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
