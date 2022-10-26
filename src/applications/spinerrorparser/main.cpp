@@ -150,9 +150,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    qDebug() << spinTraces.value();
-    qDebug() << sclCondition.value();
-
     // parse message
     SpinErrorParser parser;
     auto reports = parser.parse(spinMessage.value(), spinTraces.value(), sclCondition.value());

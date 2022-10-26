@@ -27,23 +27,13 @@ namespace reporting {
 struct StopConditionViolationReport {
     enum ViolationType
     {
-        EmptyLength = 0,
-        Eventually,
+        Empty = 0,
         Exist,
-        FunctionType,
-        GetStateNested,
-        GetStateParallel,
-        GetStateParallelProctype,
-        GetStateProctype,
+        GetState,
         Length,
-        NestedState,
-        NeverFilterOut,
-        Observer,
-        ParallelState,
-        Present,
         QueueLast,
-        QueueLastEventually,
-        QueueLastFilterOut,
+        QueueLength,
+        Present,
         UnknownType
     };
 

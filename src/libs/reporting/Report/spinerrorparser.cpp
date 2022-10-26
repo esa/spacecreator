@@ -29,18 +29,18 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(
     // parse variable violations
     QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
     while (matches.hasNext()) {
-        auto reportItem = buildReportItem(matches.next());
+        auto reportItem = buildDataConstraintViolationReportItem(matches.next());
         report.append(reportItem);
     }
-    // parse stop condition violation
     if (!spinTraces.isEmpty() && spinTraces.trimmed() != m_spinNoTrailFileMessage) {
+        // parse stop condition violation
         auto reportItem = buildStopConditionViolationReportItem(sclConditions);
         report.append(reportItem);
     }
     return report;
 }
 
-reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
+reporting::SpinErrorReportItem reporting::SpinErrorParser::buildDataConstraintViolationReportItem(
         const QRegularExpressionMatch &matchedError) const
 {
     SpinErrorReportItem reportItem;
@@ -48,25 +48,19 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
     reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
     reportItem.errorType = SpinErrorReportItem::DataConstraintViolation;
     reportItem.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
-    // for now, only parse data constraint violation
-    switch (reportItem.errorType) {
-    case SpinErrorReportItem::DataConstraintViolation:
-        reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
-        break;
-    case SpinErrorReportItem::StopConditionViolation:
-        reportItem.parsedErrorDetails = parseStopConditionViolation(reportItem.rawErrorDetails);
-        break;
-    default:
-        break;
-    }
+    reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
     return reportItem;
 }
 
-reporting::SpinErrorReportItem reporting::SpinErrorParser::buildStopConditionViolationReportItem(const QString &) const
+reporting::SpinErrorReportItem reporting::SpinErrorParser::buildStopConditionViolationReportItem(
+        const QString &conditions) const
 {
     SpinErrorReportItem reportItem;
     reportItem.errorNumber = 0;
-    reportItem.errorType = SpinErrorReportItem::OtherError;
+    reportItem.errorType = SpinErrorReportItem::StopConditionViolation;
+    reportItem.errorDepth = 0;
+    reportItem.rawErrorDetails = conditions;
+    reportItem.parsedErrorDetails = parseStopConditionViolation(conditions);
     return reportItem;
 }
 
@@ -105,11 +99,26 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawEr
     return variableViolation;
 }
 
-QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &) const
+QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &conditions) const
 {
     StopConditionViolationReport violationReport;
-    violationReport.functionName = "Function Name2";
-    violationReport.violationType = StopConditionViolationReport::NeverFilterOut;
+    violationReport.violationType = StopConditionViolationReport::UnknownType;
+
+    const QString sanitized = cleanUpSclComments(conditions);
+    const QRegularExpression regex = buildStopConditionViolationRegex();
+    auto matches = regex.globalMatch(sanitized);
+    while (matches.hasNext()) {
+        // parse clause and expressions
+        const auto match = matches.next();
+        const auto clause = match.captured(StopConditionParseTokens::StopConditionClause);
+        const auto expressions = splitExpression(match.captured(StopConditionParseTokens::StopConditionExpression));
+        // check violation type can be matched in current expression
+        const auto currentViolationType = resolveViolationType(expressions);
+        if (currentViolationType != reporting::StopConditionViolationReport::UnknownType) {
+            violationReport.violationType = currentViolationType;
+            break;
+        }
+    }
 
     QVariant stopConditionViolation;
     stopConditionViolation.setValue(violationReport);
@@ -146,8 +155,42 @@ QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex
 
 QRegularExpression reporting::SpinErrorParser::buildStopConditionViolationRegex()
 {
-    QString pattern;
-    return QRegularExpression(pattern);
+    QString pattern("(never|always|eventually|filter_out)\\s+(.+?);");
+    return QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption);
+}
+
+QString reporting::SpinErrorParser::cleanUpSclComments(const QString &scl)
+{
+    QString sanitized;
+    const auto lines = scl.split(QChar('\n'));
+    for (auto line : lines) {
+        sanitized.append(line.mid(0, line.indexOf(QStringLiteral("--"))) + " ");
+    }
+    return sanitized;
+}
+
+reporting::StopConditionViolationReport::ViolationType reporting::SpinErrorParser::resolveViolationType(
+        const QStringList &expressions)
+{
+    QStringList identifiers;
+    QRegularExpression regex("([a-z0-9_]+)\\s*\\(", QRegularExpression::CaseInsensitiveOption);
+    for (const auto &expression : expressions) {
+        auto matches = regex.globalMatch(expression);
+        while (matches.hasNext()) {
+            const auto match = matches.next();
+            const auto identifier = (match.captured(IdentifierParseTokens::IdentifierName));
+            qDebug() << identifier;
+            if (m_stopConditionViolationIdentifiers.contains(identifier)) {
+                return m_stopConditionViolationIdentifiers.value(identifier);
+            }
+        }
+    }
+    return reporting::StopConditionViolationReport::UnknownType;
+}
+
+QStringList reporting::SpinErrorParser::splitExpression(const QString &expression)
+{
+    return expression.split(QRegularExpression("\\s+(?:or|xor|and)\\s+", QRegularExpression::CaseInsensitiveOption));
 }
 
 void reporting::SpinErrorParser::parseVariableName(
@@ -169,3 +212,14 @@ void reporting::SpinErrorParser::parseVariableName(
 }
 
 const QString reporting::SpinErrorParser::m_spinNoTrailFileMessage = QStringLiteral("spin: cannot find trail file");
+
+const QHash<QString, reporting::StopConditionViolationReport::ViolationType>
+        reporting::SpinErrorParser::m_stopConditionViolationIdentifiers = {
+            { "empty", reporting::StopConditionViolationReport::Empty },
+            { "exist", reporting::StopConditionViolationReport::Exist },
+            { "get_state", reporting::StopConditionViolationReport::GetState },
+            { "length", reporting::StopConditionViolationReport::Length },
+            { "queue_last", reporting::StopConditionViolationReport::QueueLast },
+            { "queue_length", reporting::StopConditionViolationReport::QueueLength },
+            { "present", reporting::StopConditionViolationReport::Present },
+        };

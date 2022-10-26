@@ -58,6 +58,17 @@ public:
         VariableName
     };
 
+    enum StopConditionParseTokens
+    {
+        StopConditionClause = 1,
+        StopConditionExpression
+    };
+
+    enum IdentifierParseTokens
+    {
+        IdentifierName = 1
+    };
+
     /**
      * @brief   Constructor
      */
@@ -76,8 +87,9 @@ public:
 
 private:
     static const QString m_spinNoTrailFileMessage;
+    static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationIdentifiers;
 
-    SpinErrorReportItem buildReportItem(const QRegularExpressionMatch &matchedError) const;
+    SpinErrorReportItem buildDataConstraintViolationReportItem(const QRegularExpressionMatch &matchedError) const;
     SpinErrorReportItem buildStopConditionViolationReportItem(const QString &conditions) const;
 
     QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
@@ -86,7 +98,13 @@ private:
 
     static QRegularExpression buildSpinErrorRegex();
     static QRegularExpression buildDataConstraintViolationRegex();
+
     static QRegularExpression buildStopConditionViolationRegex();
+    static QRegularExpression buildStopConditionExpressionRegex();
+
+    static QString cleanUpSclComments(const QString &scl);
+    static QStringList splitExpression(const QString &expression);
+    static StopConditionViolationReport::ViolationType resolveViolationType(const QStringList &expressions);
 
     static void parseVariableName(const QString &variable, DataConstraintViolationReport &violationReport);
 };
