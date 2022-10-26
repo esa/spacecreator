@@ -4,6 +4,8 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyInvertedBoolean ::= BOOLEAN
 
+    MyNotInvertedBoolean ::= BOOLEAN
+
     MyInteger ::= INTEGER(0..20)
 
     MyIntegerWithEncoding ::= INTEGER(5..200)
