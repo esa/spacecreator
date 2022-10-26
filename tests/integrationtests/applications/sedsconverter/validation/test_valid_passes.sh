@@ -15,4 +15,5 @@ mkdir -p $TEST_OUTPUT_DIR
 # Translate
 $SEDS_CONVERTER --from SEDS --to ASN.1 -i resources/valid/input-seds.xml \
   --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/ \
+  --seds-schema resources/valid/seds-schema.xsd \
   && rm -r -f $TEST_OUTPUT_DIR

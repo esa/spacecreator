@@ -29,7 +29,7 @@ configure_file(resources/invalid/xml.xsd resources/invalid/xml.xsd COPYONLY)
 configure_file(resources/valid/input-seds.xml resources/valid/input-seds.xml COPYONLY)
 configure_file(resources/valid/seds-core-semantics.xsd resources/valid/seds-core-semantics.xsd COPYONLY)
 configure_file(resources/valid/seds-extension-semantics.xsd resources/valid/seds-extension-semantics.xsd COPYONLY)
-configure_file(resources/valid/seds.xsd resources/valid/seds.xsd COPYONLY)
+configure_file(resources/valid/seds.xsd resources/valid/seds-schema.xsd COPYONLY)
 configure_file(resources/valid/xml.xsd resources/valid/xml.xsd COPYONLY)
 
 configure_file(resources/missing-core-semantics/input-seds.xml resources/missing-core-semantics/input-seds.xml COPYONLY)

@@ -65,6 +65,7 @@ void tst_SedsConverter_Validation::testMissingExtensionSemanticsFails()
 
 /// \SRS  ETB-FUN-20
 /// \SRS  ETB-DAT-20
+//  \SRS  ETB-IF-20
 /// \SRS  ETB-IF-40
 void tst_SedsConverter_Validation::testValidPasses()
 {
