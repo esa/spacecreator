@@ -19,14 +19,43 @@
 
 #include "verifier.h"
 
+#include <QDebug>
+#include <QDirIterator>
+#include <QRegularExpression>
+#include <QTimer>
+
 using tmc::converter::TmcConverter;
 
 namespace tmc::verifier {
 TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory)
     : m_inputIvFilepath(inputIvFilepath)
     , m_outputDirectory(outputDirectory)
+    , m_onlyConvert(false)
+    , m_process(new QProcess(this))
+    , m_verifierProcess(new QProcess(this))
+    , m_traceGeneratorProcess(new QProcess(this))
+    , m_timer(new QTimer(this))
+    , m_trailCounter(1)
 {
     m_converter = std::make_unique<TmcConverter>(m_inputIvFilepath, m_outputDirectory);
+
+    connect(m_converter.get(), SIGNAL(message(QString)), this, SIGNAL(verifierMessage(QString)));
+    m_conversionFinishedConnection =
+            connect(m_converter.get(), SIGNAL(conversionFinished(bool)), this, SLOT(conversionFinished(bool)));
+    connect(m_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
+    connect(m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
+    connect(m_verifierProcess, SIGNAL(readyReadStandardError()), this, SLOT(verifierStderrReady()));
+    connect(m_verifierProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(verifierStdoutReady()));
+
+    connect(m_traceGeneratorProcess, SIGNAL(readyReadStandardError()), this, SLOT(traceStderrReady()));
+    connect(m_traceGeneratorProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(traceStdoutReady()));
+    connect(m_traceGeneratorProcess, SIGNAL(started()), this, SLOT(traceGeneratorStarted()));
+    connect(m_traceGeneratorProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(traceGeneratorFinished(int, QProcess::ExitStatus)));
+
+    m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
+
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
 void TmcVerifier::setMscObserverFiles(const QStringList &mscObserverFiles)
@@ -84,30 +113,461 @@ bool TmcVerifier::attachObserver(const QString &observerPath, const uint32_t pri
     return m_converter->attachObserver(observerPath, priority);
 }
 
-bool TmcVerifier::execute()
+void TmcVerifier::setExplorationMode(ExplorationMode mode)
 {
-    if (!m_converter->convert()) {
+    m_explorationMode = mode;
+}
+
+void TmcVerifier::setSearchShortestPath(bool enabled)
+{
+    m_searchStateLimit = enabled;
+}
+
+void TmcVerifier::setUseFairScheduling(bool enabled)
+{
+    m_useFairScheduling = enabled;
+}
+
+void TmcVerifier::setUseBitHashing(bool enabled)
+{
+    m_useBitHashing = enabled;
+}
+
+void TmcVerifier::setNumberOfCores(int value)
+{
+    m_numberOfCores = value;
+}
+
+void TmcVerifier::setTimeLimit(int timeLimit)
+{
+    m_timeLimitSeconds = timeLimit;
+}
+
+void TmcVerifier::setSearchStateLimit(int searchStateLimit)
+{
+    m_searchStateLimit = searchStateLimit;
+}
+
+void TmcVerifier::setErrorLimit(int errorLimit)
+{
+    m_errorLimit = errorLimit;
+}
+
+void TmcVerifier::setMemoryLimit(int memoryLimit)
+{
+    m_memoryLimit = memoryLimit;
+}
+
+void TmcVerifier::setRawCommandline(QString rawCommandline)
+{
+    m_rawCommandline = rawCommandline;
+}
+
+bool TmcVerifier::execute(bool onlyConvert)
+{
+    Q_EMIT verifierMessage(QString("Starting conversion.\n"));
+    m_onlyConvert = onlyConvert;
+    if (!m_converter->prepare()) {
         return false;
     }
-    if (!buildVerifier()) {
-        return false;
-    }
-    if (!executeVerifier()) {
-        return false;
-    }
+    m_converter->convert();
     return true;
 }
 
-bool TmcVerifier::buildVerifier()
+void TmcVerifier::buildVerifier()
 {
-    // TODO to implement
-    return true;
+    Q_EMIT verifierMessage(QString("Building verifier.\n"));
+
+    executeSpin();
 }
 
-bool TmcVerifier::executeVerifier()
+void TmcVerifier::executeVerifier()
 {
-    // TODO to implement
-    return true;
+    Q_EMIT verifierMessage(QString("Executing verifier.\n"));
+
+    QDir(m_outputDirectory).remove("pan.output");
+
+    const QString exe = "./pan";
+
+    m_verifierProcess->setWorkingDirectory(m_outputDirectory);
+
+    disconnect(m_processFinishedConnection);
+    m_processFinishedConnection = connect(m_verifierProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(panFinished(int, QProcess::ExitStatus)));
+    disconnect(m_processStartedConnection);
+    m_processStartedConnection = connect(m_verifierProcess, SIGNAL(started()), this, SLOT(panStarted()));
+
+    QStringList arguments;
+    if (m_rawCommandline.isEmpty()) {
+        arguments.append("-n");
+
+        if (m_explorationMode != ExplorationMode::BreadthFirst) {
+            arguments.append("-a");
+        }
+
+        if (m_useFairScheduling) {
+            arguments.append("-f");
+        }
+
+        if (m_errorLimit.has_value()) {
+            arguments.append("-e");
+            arguments.append(QString("-c%1").arg(m_errorLimit.value()));
+        }
+
+        if (m_searchStateLimit.has_value()) {
+            arguments.append(QString("-m%1").arg(m_searchStateLimit.value()));
+        }
+
+        if (m_searchShortestPath) {
+            arguments.append("-i");
+        }
+
+    } else {
+        arguments = m_rawCommandline.split(' ');
+    }
+
+    Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(exe).arg(arguments.join(" ")));
+    m_timer->setSingleShot(true);
+    m_timer->start(m_startTimeout);
+    m_verifierProcess->start(exe, arguments);
 }
 
+void TmcVerifier::executeSpin()
+{
+    const QString inputFile = "system.pml";
+    const QString spinExe = "spin";
+
+    m_process->setWorkingDirectory(m_outputDirectory);
+
+    m_processFinishedConnection = connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(spinFinished(int, QProcess::ExitStatus)));
+    m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(spinStarted()));
+
+    QStringList arguments;
+    arguments.append("-a");
+    arguments.append(inputFile);
+    Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(spinExe).arg(arguments.join(" ")));
+    m_timer->setSingleShot(true);
+    m_timer->start(m_startTimeout);
+    m_process->start(spinExe, arguments);
+}
+
+void TmcVerifier::executeCC()
+{
+    const QString inputFile = "pan.c";
+    const QString outputFile = "pan";
+    const QString compilerExe = "gcc";
+    QStringList standardArguments;
+    standardArguments.append("-O0");
+
+    m_process->setWorkingDirectory(m_outputDirectory);
+
+    disconnect(m_processFinishedConnection);
+    m_processFinishedConnection = connect(
+            m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(ccFinished(int, QProcess::ExitStatus)));
+    disconnect(m_processStartedConnection);
+    m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
+
+    QStringList arguments = standardArguments;
+    arguments.append("-o");
+    arguments.append(outputFile);
+
+    if (m_useBitHashing) {
+        arguments.append("-DBITSTATE");
+    }
+
+    if (m_explorationMode == ExplorationMode::BreadthFirst) {
+        arguments.append("-DBFS");
+    }
+
+    if (m_memoryLimit.has_value()) {
+        arguments.append(QString("-DMEMLIM=%1").arg(m_memoryLimit.value()));
+    }
+
+    if (m_numberOfCores.has_value()) {
+        arguments.append(QString("-DNCORE=%1").arg(m_numberOfCores.value()));
+    }
+
+    if (m_useFairScheduling) {
+        arguments.append(QString("-DNFAIR=%1").arg(m_converter->getNumberOfProctypes()));
+    }
+
+    if (m_searchShortestPath) {
+        arguments.append("-DREACH");
+    }
+
+    arguments.append(inputFile);
+
+    Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(compilerExe).arg(arguments.join(" ")));
+    m_timer->setSingleShot(true);
+    m_timer->start(m_startTimeout);
+    m_process->start(compilerExe, arguments);
+}
+
+void TmcVerifier::collectErrors()
+{
+    QString outputFilepath = m_outputDirectory + QDir::separator() + "pan.output";
+    QFile file(outputFilepath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        Q_EMIT verifierMessage(QString("Cannot read file %1\n").arg(outputFilepath));
+        Q_EMIT conversionFinished(false);
+    }
+
+    QTextStream stream(&file);
+
+    QRegularExpression searchRegExp(R"(errors: (\d+))");
+
+    std::optional<int> errors;
+
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        QRegularExpressionMatch match = searchRegExp.match(line);
+        if (match.hasMatch()) {
+            errors = match.captured(1).toInt();
+            break;
+        }
+    }
+
+    file.close();
+    if (errors.has_value()) {
+        Q_EMIT verifierMessage(QString("Found %1 errors\n").arg(errors.value()));
+        generateTraces(errors.value());
+    } else {
+        Q_EMIT finished(true);
+    }
+}
+
+void TmcVerifier::generateTraces(int count)
+{
+    QDirIterator iter(m_outputDirectory, { "*.trail" }, QDir::Files);
+    while (iter.hasNext()) {
+        iter.next();
+        QString file = iter.fileName();
+        qDebug() << "Adding " << file;
+        m_trailFiles.append(file);
+    }
+
+    if (m_trailFiles.size() != count) {
+        Q_EMIT verifierMessage(
+                QString("Expected number of trail files: %1, but found %2\n").arg(count).arg(m_trailFiles.size()));
+    }
+
+    generateNextTrace();
+}
+
+void TmcVerifier::generateNextTrace()
+{
+    if (m_trailFiles.isEmpty()) {
+        Q_EMIT finished(true);
+        return;
+    }
+
+    QString trailFile = m_trailFiles.front();
+    m_trailFiles.pop_front();
+
+    qDebug() << "Write to " << m_currentTraceFile;
+    m_currentTraceFile = m_outputDirectory + QDir::separator() + QString("trace_%1.spt").arg(m_trailCounter);
+    ++m_trailCounter;
+    m_traceGeneratorProcess->setWorkingDirectory(m_outputDirectory);
+
+    const QString inputFile = "system.pml";
+    const QString spinExe = "spin";
+
+    QStringList arguments;
+    arguments.append("-k");
+    arguments.append(trailFile);
+    arguments.append("-t");
+    arguments.append("-r");
+    arguments.append("-s");
+    arguments.append(inputFile);
+    Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(spinExe).arg(arguments.join(" ")));
+    m_timer->setSingleShot(true);
+    m_timer->start(m_startTimeout);
+    m_traceGeneratorProcess->start(spinExe, arguments);
+}
+
+void TmcVerifier::processStderrReady()
+{
+    QByteArray buffer = m_process->readAllStandardError();
+    QString text = QString(buffer);
+    Q_EMIT verifierMessage(text);
+}
+
+void TmcVerifier::processStdoutReady()
+{
+    QByteArray buffer = m_process->readAllStandardOutput();
+    QString text = QString(buffer);
+    Q_EMIT verifierMessage(text);
+}
+
+void TmcVerifier::verifierStderrReady()
+{
+    QByteArray buffer = m_verifierProcess->readAllStandardError();
+    QString text = QString(buffer);
+    Q_EMIT verifierMessage(text);
+
+    QString outputFilepath = m_outputDirectory + QDir::separator() + "pan.output";
+    QFile file(outputFilepath);
+    file.open(QIODevice::Append);
+    QTextStream stream(&file);
+    stream << buffer;
+    file.close();
+}
+
+void TmcVerifier::verifierStdoutReady()
+{
+    QByteArray buffer = m_verifierProcess->readAllStandardOutput();
+    QString text = QString(buffer);
+    Q_EMIT verifierMessage(text);
+
+    QString outputFilepath = m_outputDirectory + QDir::separator() + "pan.output";
+    QFile file(outputFilepath);
+    file.open(QIODevice::Append);
+    QTextStream stream(&file);
+    stream << buffer;
+    file.close();
+}
+
+void TmcVerifier::traceStderrReady()
+{
+    QByteArray buffer = m_traceGeneratorProcess->readAllStandardError();
+    QFile file(m_currentTraceFile);
+    file.open(QIODevice::Append);
+    QTextStream stream(&file);
+    stream << buffer;
+    file.close();
+}
+
+void TmcVerifier::traceStdoutReady()
+{
+    QByteArray buffer = m_traceGeneratorProcess->readAllStandardOutput();
+    QFile file(m_currentTraceFile);
+    file.open(QIODevice::Append);
+    QTextStream stream(&file);
+    stream << buffer;
+    file.close();
+}
+
+void TmcVerifier::conversionFinished(bool success)
+{
+    if (success) {
+        if (m_onlyConvert) {
+            Q_EMIT(finished(true));
+        } else {
+            buildVerifier();
+        }
+    } else {
+        Q_EMIT finished(false);
+    }
+}
+
+void TmcVerifier::spinStarted()
+{
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(m_commandTimeout);
+}
+
+void TmcVerifier::spinFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    m_process->terminate();
+    if (exitCode != EXIT_SUCCESS) {
+        auto message = QString("Spin finished with code: %1\n").arg(exitCode);
+        Q_EMIT verifierMessage(message);
+        Q_EMIT finished(false);
+        return;
+    }
+    executeCC();
+}
+
+void TmcVerifier::ccStarted()
+{
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(m_commandTimeout);
+}
+
+void TmcVerifier::ccFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    m_process->terminate();
+    if (exitCode != EXIT_SUCCESS) {
+        auto message = QString("CC finished with code: %1\n").arg(exitCode);
+        Q_EMIT verifierMessage(message);
+        Q_EMIT finished(false);
+        return;
+    }
+    executeVerifier();
+}
+
+void TmcVerifier::panStarted()
+{
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    if (m_timeLimitSeconds.has_value()) {
+        m_timer->start(m_timeLimitSeconds.value() * 1000);
+    } else {
+        m_timer->start(m_verifierDefaultTimeout);
+    }
+}
+
+void TmcVerifier::panFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    m_verifierProcess->terminate();
+    if (exitCode != EXIT_SUCCESS) {
+        auto message = QString("Verifier finished with code: %1\n").arg(exitCode);
+        Q_EMIT verifierMessage(message);
+        Q_EMIT finished(false);
+        return;
+    }
+    collectErrors();
+}
+
+void TmcVerifier::traceGeneratorStarted()
+{
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(5000);
+}
+
+void TmcVerifier::traceGeneratorFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    m_traceGeneratorProcess->terminate();
+    if (exitCode != EXIT_SUCCESS) {
+        auto message = QString("Spin finished with code : %1\n").arg(exitCode);
+        Q_EMIT verifierMessage(message);
+        Q_EMIT finished(false);
+        return;
+    }
+
+    QFileInfo info(m_currentTraceFile);
+    QString outputFile = m_outputDirectory + QDir::separator() + info.baseName() + ".sim";
+
+    if (m_conversionFinishedConnection) {
+        disconnect(m_conversionFinishedConnection);
+    }
+    Q_EMIT verifierMessage(QString("Converting %1 to %2\n").arg(info.fileName()).arg(info.baseName() + ".sim"));
+    m_converter->convertTrace(m_currentTraceFile, outputFile);
+
+    generateNextTrace();
+}
+
+void TmcVerifier::timeout()
+{
+    Q_EMIT verifierMessage(QString("Timeout.\n"));
+    if (m_process->state() != QProcess::ProcessState::NotRunning) {
+        m_process->terminate();
+    }
+    if (m_verifierProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_verifierProcess->terminate();
+    }
+    Q_EMIT finished(false);
+}
 }

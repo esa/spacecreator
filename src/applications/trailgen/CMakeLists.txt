@@ -1,8 +1,9 @@
 project(trailgen VERSION 1.0.0 LANGUAGES CXX)
 
-set(SOURCES main.cpp)
+set(SOURCES main.cpp
+    executor.cpp)
 
-set(INCLUDES )
+set(INCLUDES executor.h)
 
 add_executable(trailgen)
 target_sources(trailgen
