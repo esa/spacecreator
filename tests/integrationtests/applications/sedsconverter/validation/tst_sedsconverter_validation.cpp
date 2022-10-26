@@ -74,6 +74,7 @@ void tst_SedsConverter_Validation::testValidPasses()
 }
 
 /// \SRS  ETB-FUN-30
+/// \SRS  ETB-IF-110
 void tst_SedsConverter_Validation::testValidationDisabled()
 {
     const int result = system("./test_validation_disabled.sh");
