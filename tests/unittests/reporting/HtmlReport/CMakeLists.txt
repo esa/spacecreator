@@ -5,7 +5,11 @@ add_executable(${TEST_NAME})
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 target_sources(${TEST_NAME}
-    PRIVATE     ${TEST_NAME}.cpp)
+    PRIVATE     tst_htmlreportbuilder.cpp
+                tst_tracebuilder.cpp
+    PRIVATE     main.cpp
+                tst_htmlreportbuilder.h
+                tst_tracebuilder.h)
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
                 ${CMAKE_SOURCE_DIR}/tests)

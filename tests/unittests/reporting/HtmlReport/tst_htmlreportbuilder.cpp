@@ -17,28 +17,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QtTest>
+#include "tst_htmlreportbuilder.h"
+
 #include <reporting/HtmlReport/htmlreportbuilder.h>
 #include <reporting/Report/spinerrorparser.h>
 
 using namespace reporting;
 
 namespace Report::test {
-
-class tst_HtmlReportBuilder : public QObject
-{
-    Q_OBJECT
-
-private Q_SLOTS:
-    void testNoError();
-    void testDataConstraintViolation();
-    void testDataConstraintViolationNested();
-    void testStopConditionViolationEmpty();
-    void testStopConditionViolationGetState();
-
-private:
-    QString readFile(const QString &filepath);
-};
 
 void tst_HtmlReportBuilder::testNoError()
 {
@@ -157,8 +143,4 @@ QString tst_HtmlReportBuilder::readFile(const QString &filepath)
     return QString();
 }
 
-} // namespace tmc::test
-
-QTEST_MAIN(Report::test::tst_HtmlReportBuilder)
-
-#include "tst_htmlreportbuilder.moc"
+} // namespace Report::test
