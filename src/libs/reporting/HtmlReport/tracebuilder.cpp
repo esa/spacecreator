@@ -19,7 +19,7 @@
 
 #include "tracebuilder.h"
 
-QString reporting::TraceBuilder::buildTraceReport(const QString &report)
+QString reporting::TraceBuilder::buildTraceReport(const QString &report) const
 {
     // convert html entities and whitespace characters (tabulator, newline)
     QString html = report.toHtmlEscaped();

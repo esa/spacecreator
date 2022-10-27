@@ -41,7 +41,7 @@ public:
      *
      * @return  HTML-formatted trace report
      */
-    QString buildTraceReport(const QString &report);
+    QString buildTraceReport(const QString &report) const;
 };
 
 }

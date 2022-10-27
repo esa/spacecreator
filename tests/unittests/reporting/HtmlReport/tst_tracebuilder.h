@@ -31,7 +31,7 @@ class tst_TraceBuilder : public QObject
 private Q_SLOTS:
     void testSingleLineMessage();
     void testMultiLineMessage();
-    void testMultipleSpaces();
+    void testHtmlEntities();
     void testTabulators();
 };
 }
