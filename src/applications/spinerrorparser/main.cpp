@@ -29,6 +29,7 @@
 #include <iostream>
 #include <optional>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
+#include <reporting/HtmlReport/tracebuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorparser.h>
 #include <string.h>
@@ -46,6 +47,7 @@ int main(int argc, char *argv[])
     std::optional<QString> spinMessage;
     std::optional<QString> spinTraces;
     std::optional<QString> sclCondition;
+    QStringList trailFiles;
     std::optional<QString> templateFile;
     std::optional<QString> targetFile;
 
@@ -85,6 +87,13 @@ int main(int argc, char *argv[])
             }
             ++i;
             sclCondition = args[i];
+        } else if (arg == "-ir") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing trail file after -ir");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            trailFiles.append(args[i]);
         } else if (arg == "-it") {
             if (i + 1 == args.size()) {
                 qCritical("Missing template file after -it");
@@ -115,6 +124,7 @@ int main(int argc, char *argv[])
             qInfo("  -im <message>          Message from spin");
             qInfo("  -is <message>          Spin traces");
             qInfo("  -ic <condition>        Condition from scl.txt");
+            qInfo("  -ir <filename>         Trail files (can be repeated)");
             qInfo("  -it <filename>         HTML template file name");
             qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
@@ -148,6 +158,21 @@ int main(int argc, char *argv[])
     if (!targetFile.has_value()) {
         qCritical("Missing mandatory argument: -of targetFile");
         exit(EXIT_FAILURE);
+    }
+
+    // parse trails
+    const TraceBuilder traceBuilder;
+    QStringList trailsHtml;
+    for (auto trailFile : trailFiles) {
+        QFile file(trailFile);
+        if (file.open(QFile::ReadOnly)) {
+            const QString fileContents(file.readAll());
+            trailsHtml.append(traceBuilder.buildTraceReport(fileContents));
+            file.close();
+        } else {
+            qCritical("Unable to open trail file");
+            exit(EXIT_FAILURE);
+        }
     }
 
     // parse message
