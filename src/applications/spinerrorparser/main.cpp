@@ -74,13 +74,13 @@ int main(int argc, char *argv[])
             }
             ++i;
             spinTraces = args[i];
-        } else if (arg == "-ic") {
+        } else if (arg == "-scl") {
             if (i + 1 == args.size()) {
-                qCritical("Missing scl condition after -ic");
+                qCritical("Missing scl condition after -scl");
                 exit(EXIT_FAILURE);
             }
             if (sclCondition.has_value()) {
-                qCritical("Duplicated -ic argument");
+                qCritical("Duplicated -scl argument");
                 exit(EXIT_FAILURE);
             }
             ++i;
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
             qInfo("Usage: spinerrorparser [OPTIONS]");
             qInfo("  -im <message>          Message from spin");
             qInfo("  -is <message>          Spin traces");
-            qInfo("  -ic <condition>        Condition from scl.txt");
+            qInfo("  -scl <condition>       Condition from scl.txt");
             qInfo("  -it <filename>         HTML template file name");
             qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
