@@ -126,6 +126,18 @@ public:
      */
     void setProcessesBasePriority(std::optional<QString> value);
     /**
+     * @brief   Enable or disable Real ASN.1 type
+     *
+     * @param   isRealTypeEnabled True if Real type should be enabled
+     */
+    void setRealTypeEnabled(bool isRealTypeEnabled);
+    /**
+     * @brief   Set delta (interval) for Real values generation
+     *
+     * @param   delta Value of the interval
+     */
+    void setDelta(std::optional<float> value);
+    /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
      * @param   filepaths   Paths to the files
@@ -212,6 +224,8 @@ private:
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
     std::optional<QString> m_processesBasePriority;
+    std::optional<int> m_delta;
+    bool m_isRealTypeEnabled;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;

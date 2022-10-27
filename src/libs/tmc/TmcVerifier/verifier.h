@@ -83,6 +83,18 @@ public:
      */
     void setSubtypesFilepaths(const std::vector<QString> &filepath);
     /**
+     * @brief   Enable or disable Real ASN.1 type
+     *
+     * @param   isRealTypeEnabled True if Real type should be enabled
+     */
+    void setRealTypeEnabled(bool isRealTypeEnabled);
+    /**
+     * @brief   Set delta (interval) for Real values generation
+     *
+     * @param   delta Value of the interval
+     */
+    void setDelta(std::optional<float> delta);
+    /**
      * @brief Add Stop Condition files to verifier.
      *
      * @param files A list of paths with Stop Condition files.

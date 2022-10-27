@@ -1,0 +1,22 @@
+/* CIF PROCESS (251, 150), (150, 75) */
+process Host;
+    /* CIF TEXT (637, 233), (267, 140) */
+    -- Text area for declarations and comments
+    dcl param MyReal;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (525, 28), (70, 35) */
+    state Wait;
+        /* CIF input (512, 83), (94, 35) */
+        input Ping(param);
+            /* CIF task (487, 138), (144, 35) */
+            task param := param * 2.0;
+            /* CIF output (510, 193), (98, 35) */
+            output Pong(param);
+            /* CIF NEXTSTATE (525, 248), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Host;
