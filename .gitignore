@@ -38,3 +38,6 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 *.log
 /scripts/.idea
 *.pyc
+
+# ccls-cache
+.ccls-cache/*

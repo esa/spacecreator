@@ -1,0 +1,31 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Controller;
+    /* CIF TEXT (346, 434), (267, 140) */
+    -- Text area for declarations and comments
+    
+    dcl my_param MyTestInteger;
+    dcl my_value MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (456, 176), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (456, 226), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (780, 207), (70, 35) */
+    state Wait;
+        /* CIF input (756, 262), (115, 35) */
+        input test(my_param);
+            /* CIF output (753, 317), (121, 35) */
+            output work(my_param);
+            /* CIF NEXTSTATE (775, 372), (77, 35) */
+            NEXTSTATE Calculate;
+    endstate;
+    /* CIF state (1137, 205), (77, 35) */
+    state Calculate;
+        /* CIF input (1115, 260), (121, 35) */
+        input result(my_value);
+            /* CIF output (1114, 315), (124, 35) */
+            output report(my_value);
+            /* CIF NEXTSTATE (1141, 370), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Controller;

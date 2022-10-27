@@ -1,0 +1,17 @@
+output-event:{source environ, dest controller, event environ:msg-out:test:{p1 3}}
+input-event:{source environ, dest controller, event controller:msg-in:test:{p1 3}}
+output-event:{source controller, dest actuator, event controller:msg-out:work:{p1 3}}
+output-event:{source environ, dest controller, event environ:msg-out:test:{p1 3}}
+input-event:{source environ, dest controller, event controller:msg-in:test:{p1 3}}
+output-event:{source environ, dest controller, event environ:msg-out:test:{p1 3}}
+input-event:{source environ, dest controller, event controller:msg-in:test:{p1 3}}
+output-event:{source environ, dest controller, event environ:msg-out:test:{p1 3}}
+input-event:{source environ, dest controller, event controller:msg-in:test:{p1 3}}
+input-event:{source controller, dest actuator, event actuator:msg-in:work:{p1 3}}
+input-event:{source env, dest actuator, event actuator:msg-in:input-none:{}}
+input-event:{source env, dest actuator, event actuator:msg-in:input-none:{}}
+input-event:{source env, dest actuator, event actuator:msg-in:input-none:{}}
+output-event:{source actuator, dest controller, event actuator:msg-out:result:{p1 8}}
+output-event:{source environ, dest controller, event environ:msg-out:test:{p1 3}}
+input-event:{source actuator, dest controller, event controller:msg-in:result:{p1 8}}
+output-event:{source controller, dest environ, event controller:msg-out:report:{p1 8}}

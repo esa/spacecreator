@@ -25,6 +25,7 @@
 #include <QFileInfo>
 #include <QTreeWidgetItem>
 #include <functional>
+#include <QStandardPaths>
 
 namespace ive {
 
@@ -112,6 +113,51 @@ private:
     QTreeWidgetItem *subtypesTopDirWidgetItem;
     QTreeWidgetItem *functionsTopNodeWidgetItem;
     QTreeWidgetItem *resultsTopDirWidgetItem;
+
+    const QString booleanStopConditionLTL = "Boolean Stop Condition - LTL";
+    const QString booleanStopConditionObserver = "Boolean Stop Condition - Observer";
+    const QString messageSequenceChartSearchVerify = "Message Sequence Chart Search/Verify";
+    const QString messageSequenceChartWhenThen = "Message Sequence Chart When/Then";
+    const QString observer = "Observer";
+
+    const QStringList availablePropertyTypes
+    {
+        booleanStopConditionLTL,
+        booleanStopConditionObserver,
+        messageSequenceChartSearchVerify,
+        messageSequenceChartWhenThen,
+        observer
+    };
+
+    const QStringList supportedPropertyTypes
+    {
+        booleanStopConditionLTL,
+        booleanStopConditionObserver,
+        messageSequenceChartSearchVerify,
+        messageSequenceChartWhenThen,
+        observer
+    };
+
+    const QString defaultMessageSequenceChartWhenThenMscTemplateName = "when-then-property-tmpl.msc";
+    const QString defaultMessageSequenceChartWhenThenMscTemplatePath = 
+                    QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) +
+                    "/model-checker/" +
+                    defaultMessageSequenceChartWhenThenMscTemplateName;
+    const QString sedCommandForWhenThenPropertyTemplate = "sed -i \"s/Untitled_Document/%1/g\" %2";
+
+    QString askAboutNewPropertyType();
+    bool isPropertyTypeSupported(const QString &propertyType);
+    QString askAboutNewPropertyName(const QString &propertyType);
+    void escapeNewPropertyName(QString &propertyName) const;
+    void checkNewPropertyNameAndAppendSuffixIfNeeded(QString &propertyName);
+    QString getMakeRuleForPropertyType(const QString &propertyType) const;
+    bool invokeMake(const QString &makeRule, const QString &propertyName);
+    bool handleNoneMakePropertyTypes(const QString &propertyType, const QString &propertyName);
+    bool handleBooleanStopConditionLTL(const QString newPropertyDirectoryPath, const QString &propertyName);
+    bool handleMessageSequenceChartWhenThen(const QString newPropertyDirectoryPath, const QString &propertyName);
+    QString getNewPropertyDirectoryPath(const QString &propertyName) const;
+    bool createSubTypesDirectoryAndDirectoryForNewProperty(const QString &newPropertyDirectoryPath);
+    void refreshPropertiesTreeViewWithPreselection();
 
     void setCheckBoxState(QCheckBox *checkBox, bool isChecked);
     SpinConfigData readSpinConfigFromUI();

@@ -87,7 +87,7 @@ public:
     void addMtype(const QString &value);
 
     /**
-     * @brief Getter fo all unnamed mtype values.
+     * @brief Getter for all unnamed mtype values.
      *
      * @return Unnamed mtype values
      */

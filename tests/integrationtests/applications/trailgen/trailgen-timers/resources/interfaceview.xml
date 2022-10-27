@@ -1,0 +1,98 @@
+<InterfaceView asn1file="test_simu_timer.acn">
+<Function name="controller" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="18000 53000 40000 85400"/>
+<Provided_Interface name="test" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="p1" type="MyTestInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="20900 53000"/>
+</Provided_Interface>
+
+<Provided_Interface name="response" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="40000 78700"/>
+</Provided_Interface>
+
+<Required_Interface name="report" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="35600 53000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="work" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="40000 62500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="environ" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="15400 12800 40500 34700"/>
+<Provided_Interface name="report" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="34900 34700"/>
+</Provided_Interface>
+
+<Required_Interface name="test" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="p1" type="MyTestInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="20200 34700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="actuator" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="73600 58300 94100 85500"/>
+    <ContextParameter name="trigger" type="Timer" value=""/>
+<Provided_Interface name="work" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="73600 62700"/>
+</Provided_Interface>
+
+<Required_Interface name="response" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="73600 79100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="actuator" ri_name="response"/>
+    <Target func_name="controller" pi_name="response"/>
+    <Property name="Taste::coordinates" value="73000 79100 56700 79100 40300 78700"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="controller" ri_name="work"/>
+    <Target func_name="actuator" pi_name="work"/>
+    <Property name="Taste::coordinates" value="40600 62500 56900 62500 73300 62700"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="environ" ri_name="test"/>
+    <Target func_name="controller" pi_name="test"/>
+    <Property name="Taste::coordinates" value="20200 35300 20200 44000 20900 51100 20900 52700"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="controller" ri_name="report"/>
+    <Target func_name="environ" pi_name="report"/>
+    <Property name="Taste::coordinates" value="35600 52400 35600 43700 34900 36600 34900 35000"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>

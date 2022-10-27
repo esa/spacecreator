@@ -82,6 +82,8 @@ int main(int argc, char *argv[])
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
     std::optional<QString> processesBasePriority;
     std::vector<QString> subtypesFilepaths;
+    std::optional<float> delta;
+    bool isRealTypeEnabled = false;
 
     const QStringList args = app.arguments();
 
@@ -195,8 +197,31 @@ int main(int argc, char *argv[])
             }
             ++i;
             subtypesFilepaths.emplace_back(args[i]);
+        } else if (arg == "-delta") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing value after -delta");
+                exit(EXIT_FAILURE);
+            }
+            if (delta.has_value()) {
+                qCritical("Duplicated -delta argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+
+            bool valueOk;
+            args[i].toFloat(&valueOk);
+
+            if (!valueOk) {
+                qCritical("Delta is not a float");
+                exit(EXIT_FAILURE);
+            }
+
+            delta = std::abs(args[i].toFloat());
+        } else if (arg == "-enable-reals") {
+            ++i;
+            isRealTypeEnabled = true;
         } else if (arg == "-h" || arg == "--help") {
-            qInfo("tmc: TASTE Model Chcecker");
+            qInfo("tmc: TASTE Model Checker");
             qInfo("Usage: tmc [OPTIONS]");
             qInfo("  -iv <filepath>         Use <filepath> as input InterfaceView");
             qInfo("  -o <dir>               Use <dir> as output directory.");
@@ -217,6 +242,8 @@ int main(int argc, char *argv[])
             qInfo("                         Base priority will be added to interfaces priorities specified in ");
             qInfo("                         the Interface View");
             qInfo("  -sub <filepath>        Use <filepath> as an ASN.1 file used for subtyping");
+            qInfo("  -enable-reals          Enable support for real type");
+            qInfo("  -delta <delta value>   Set delta for reals generation");
             qInfo("  -h, --help             Print this message and exit.");
             exit(EXIT_SUCCESS);
         } else {
@@ -247,6 +274,8 @@ int main(int argc, char *argv[])
     verifier.setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
     verifier.setProcessesBasePriority(std::move(processesBasePriority));
     verifier.setSubtypesFilepaths(subtypesFilepaths);
+    verifier.setDelta(delta);
+    verifier.setRealTypeEnabled(isRealTypeEnabled);
 
     if (!verifier.addStopConditionFiles(stopConditionFiles)) {
         return EXIT_FAILURE;

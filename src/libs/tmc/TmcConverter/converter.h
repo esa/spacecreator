@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "processmetadata.h"
-
 #include <QDir>
 #include <QFileInfo>
 #include <QList>
@@ -128,6 +126,18 @@ public:
      */
     void setProcessesBasePriority(std::optional<QString> value);
     /**
+     * @brief   Enable or disable Real ASN.1 type
+     *
+     * @param   isRealTypeEnabled True if Real type should be enabled
+     */
+    void setRealTypeEnabled(bool isRealTypeEnabled);
+    /**
+     * @brief   Set delta (interval) for Real values generation
+     *
+     * @param   delta Value of the interval
+     */
+    void setDelta(std::optional<float> value);
+    /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
      * @param   filepaths   Paths to the files
@@ -152,11 +162,22 @@ public:
      */
     auto attachObserver(const QString &observerPath, const uint32_t priority) -> bool;
 
+    /**
+     * @brief Process trace conversion
+     *
+     * This method converts Spin Trail into Simulator Trail
+     *
+     * @param inputFile input spin trail filepath
+     * @param outputFile output simulator trail filepath
+     * @return true if conversion succeed, otherwise false.
+     */
+    bool convertTrace(const QString &inputFile, const QString &outputFile);
+
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
             const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
 
-    auto integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
+    void integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
             std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos);
     bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
 
@@ -203,6 +224,8 @@ private:
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
     std::optional<QString> m_processesBasePriority;
+    std::optional<int> m_delta;
+    bool m_isRealTypeEnabled;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;
