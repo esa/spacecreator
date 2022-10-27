@@ -18,6 +18,7 @@
 #define XMELWRITER_H
 
 #include "modelcheckingwindow.h"
+#include "spinconfigsaver.h"
 
 #include <QTreeWidget>
 #include <QXmlStreamWriter>
@@ -25,7 +26,8 @@
 class XmelWriter
 {
 public:
-    explicit XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected,  QStringList ifConfiguration);
+    explicit XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected,
+            QStringList ifConfiguration, SpinConfigData spinConfiguration);
     bool writeFile(QIODevice *device, QString fileName);
 
 private:
@@ -38,6 +40,7 @@ private:
 
     struct IFConfig;
     IFConfig *ifConfig;
+    SpinConfigData spinConfigData;
 };
 
 #endif // XMELWRITER_H

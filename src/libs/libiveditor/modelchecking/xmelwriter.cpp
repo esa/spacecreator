@@ -16,6 +16,8 @@
 */
 #include "xmelwriter.h"
 
+#include "spinconfigsaver.h"
+
 struct XmelWriter::IFConfig {
     QString maxScenarios { "" };
     QString errorScenarios { "" };
@@ -26,18 +28,26 @@ struct XmelWriter::IFConfig {
     QString maxStates { "" };
 };
 
-XmelWriter::XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected, QStringList ifConfiguration)
-    : propertiesSelected(propertiesSelected), subtypesSelected(subtypesSelected), functionsSelected(functionsSelected), ifConfig(new IFConfig)
+XmelWriter::XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected,
+        QStringList ifConfiguration, SpinConfigData spinConfiguration)
+    : propertiesSelected(propertiesSelected)
+    , subtypesSelected(subtypesSelected)
+    , functionsSelected(functionsSelected)
+    , ifConfig(new IFConfig)
+    , spinConfigData(spinConfiguration)
 {
     xml.setAutoFormatting(true);
 
-    ifConfig->maxScenarios = ifConfiguration.at(0);
-    ifConfig->errorScenarios = ifConfiguration.at(1);
-    ifConfig->successScenarios = ifConfiguration.at(2);
-    ifConfig->timeLimit = ifConfiguration.at(3);
-    ifConfig->maxEnvironmentCalls = ifConfiguration.at(4);
-    ifConfig->explorationAlgorithm = ifConfiguration.at(5);
-    ifConfig->maxStates = ifConfiguration.at(6);
+    constexpr int IFCONFIG_SIZE = 6;
+    if (ifConfiguration.length() > IFCONFIG_SIZE) {
+        ifConfig->maxScenarios = ifConfiguration.at(0);
+        ifConfig->errorScenarios = ifConfiguration.at(1);
+        ifConfig->successScenarios = ifConfiguration.at(2);
+        ifConfig->timeLimit = ifConfiguration.at(3);
+        ifConfig->maxEnvironmentCalls = ifConfiguration.at(4);
+        ifConfig->explorationAlgorithm = ifConfiguration.at(5);
+        ifConfig->maxStates = ifConfiguration.at(6);
+    }
 }
 
 bool XmelWriter::writeFile(QIODevice *device, QString fileName)
@@ -48,7 +58,7 @@ bool XmelWriter::writeFile(QIODevice *device, QString fileName)
     // XEML stands for XML MODELCHECKING EXCHANGE LANGUAGE
     xml.writeDTD(QStringLiteral("<!DOCTYPE xmel>"));
     xml.writeStartElement(QStringLiteral("xmel"));
-    //TODO use instead XmlReader::versionAttributes()
+    // TODO use instead XmlReader::versionAttributes()
     xml.writeAttribute(QStringLiteral("version"), QStringLiteral("1.0"));
 
     xml.writeStartElement("ModelCheckingWindow");
@@ -56,25 +66,27 @@ bool XmelWriter::writeFile(QIODevice *device, QString fileName)
     xml.writeStartElement("Configuration");
 
     xml.writeStartElement("Properties");
-    for (int i = 0; i < propertiesSelected.size(); ++i){
-            writeItem(propertiesSelected.at(i), "Property");
+    for (int i = 0; i < propertiesSelected.size(); ++i) {
+        writeItem(propertiesSelected.at(i), "Property");
     }
     xml.writeEndElement();
 
-    //for (int i = 0; i < subtypesSelected.size(); ++i){ // only one subtyping can be selected
-    if (0 < subtypesSelected.size()) {writeItem(subtypesSelected.at(0), "Subtyping");}
+    // for (int i = 0; i < subtypesSelected.size(); ++i){ // only one subtyping can be selected
+    if (0 < subtypesSelected.size()) {
+        writeItem(subtypesSelected.at(0), "Subtyping");
+    }
     //}
 
     xml.writeStartElement("Submodel");
-    for (int i = 0; i < functionsSelected.size(); ++i){
-            writeItem(functionsSelected.at(i), "Function");
+    for (int i = 0; i < functionsSelected.size(); ++i) {
+        writeItem(functionsSelected.at(i), "Function");
     }
     xml.writeEndElement();
 
     // closing Configuration
     xml.writeEndElement();
 
-    //TODO write Native options
+    // TODO write Native options
     xml.writeStartElement("NativeModelChecker");
     xml.writeEndElement();
 
@@ -89,9 +101,8 @@ bool XmelWriter::writeFile(QIODevice *device, QString fileName)
     xml.writeAttribute("maxstates", ifConfig->maxStates);
     xml.writeEndElement();
 
-    //TODO write SPIN options
-    xml.writeStartElement("SPINModelChecker");
-    xml.writeEndElement();
+    SpinConfigSaver spinConfigSaver;
+    spinConfigSaver.saveSpinConfig(spinConfigData, xml);
 
     // closing ModelCheckingWindow
     xml.writeEndElement();
@@ -103,13 +114,14 @@ bool XmelWriter::writeFile(QIODevice *device, QString fileName)
     return true;
 }
 
-void XmelWriter::writeItem(QString str, QString type){
+void XmelWriter::writeItem(QString str, QString type)
+{
     xml.writeStartElement(type);
-    if (type == "Property"){
+    if (type == "Property") {
         xml.writeAttribute("path", str);
-    } else if (type == "Subtyping"){
+    } else if (type == "Subtyping") {
         xml.writeAttribute("name", str);
-    } else if (type == "Function"){
+    } else if (type == "Function") {
         xml.writeAttribute("name", str);
     }
     xml.writeEndElement();

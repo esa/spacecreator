@@ -20,12 +20,17 @@
 #include "scversion.h"
 
 #include <QCoreApplication>
+#include <QDebug>
+#include <QFile>
 #include <QRegularExpression>
 #include <QString>
+#include <grantlee/template.h>
+#include <grantlee/texthtmlbuilder.h>
 #include <iostream>
 #include <optional>
+#include <reporting/HtmlReport/htmlreportbuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
-#include <reporting/Report/spinerrorreport.h>
+#include <reporting/Report/spinerrorparser.h>
 #include <string.h>
 
 using namespace reporting;
@@ -39,6 +44,8 @@ int main(int argc, char *argv[])
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
     std::optional<QString> spinMessage;
+    std::optional<QString> templateFile;
+    std::optional<QString> targetFile;
 
     const QStringList args = app.arguments();
     for (int i = 1; i < args.size(); ++i) {
@@ -49,15 +56,41 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             if (spinMessage.has_value()) {
-                qCritical("Duplicated -m argument");
+                qCritical("Duplicated -im argument");
                 exit(EXIT_FAILURE);
             }
             ++i;
             spinMessage = args[i];
-        } else if (arg == "-h" || arg == "--help") {
+        } else if (arg == "-it") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing template file after -it");
+                exit(EXIT_FAILURE);
+            }
+            if (templateFile.has_value()) {
+                qCritical("Duplicated -it argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            templateFile = args[i];
+        } else if (arg == "-of") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing target file after -of");
+                exit(EXIT_FAILURE);
+            }
+            if (targetFile.has_value()) {
+                qCritical("Duplicated -of argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            targetFile = args[i];
+        }
+
+        else if (arg == "-h" || arg == "--help") {
             qInfo("spinerrorparser: Spin Error Parser");
             qInfo("Usage: spinerrorparser [OPTIONS]");
             qInfo("  -im <message>          Message from spin");
+            qInfo("  -it <filename>         HTML template file name");
+            qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
             exit(EXIT_SUCCESS);
         } else {
@@ -67,25 +100,56 @@ int main(int argc, char *argv[])
     }
 
     if (!spinMessage.has_value()) {
-        qCritical("Missing mandatory argument: input spinMessage");
+        qCritical("Missing mandatory argument: -im spinMessage");
+        exit(EXIT_FAILURE);
     }
 
-    // build pattern for error matching
-    // error handling to be moved to the reporting lib
-    const QRegularExpression regex("pan:(\\d+):\\s+(.+?)\\s+\\((.+?)\\)\\s+\\(at depth (\\d+)\\)\\n");
-    // convert all matches to spin errors
-    QList<SpinErrorReport> reports;
-
-    auto globalMatch = regex.globalMatch(spinMessage.value());
-    while (globalMatch.hasNext()) {
-        const auto match = globalMatch.next();
-        // build error from match tokens
-        SpinErrorReport report;
-        report.errorNumber = match.captured(1).toUInt();
-        report.errorDepth = match.captured(4).toUInt();
-        report.errorType = SpinErrorReport::DataConstraintViolation;
-        report.rawErrorDetails = match.captured(3);
-        reports.append(report);
+    if (!templateFile.has_value()) {
+        qCritical("Missing mandatory argument: -it templateFile");
+        exit(EXIT_FAILURE);
     }
+
+    if (!targetFile.has_value()) {
+        qCritical("Missing mandatory argument: -of targetFile");
+        exit(EXIT_FAILURE);
+    }
+
+    // parse message
+    SpinErrorParser parser;
+    auto reports = parser.parse(spinMessage.value());
+    for (auto report : reports) {
+        qDebug() << "----- Report -----";
+        qDebug() << "Error number:" << report.errorNumber;
+        qDebug() << "Error type:" << report.errorType;
+        qDebug() << "Error depth:" << report.errorDepth;
+        qDebug() << "Error details (raw):" << report.rawErrorDetails;
+        const DataConstraintViolationReport dataConstraintViolationReport =
+                qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
+        qDebug() << "Function name:" << dataConstraintViolationReport.functionName;
+        qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
+        qDebug() << "Nested state:" << dataConstraintViolationReport.nestedStateName;
+        for (auto constraint : dataConstraintViolationReport.constraints) {
+            qDebug() << "    Constraint:" << constraint;
+        }
+        for (auto boundingValue : dataConstraintViolationReport.boundingValues) {
+            qDebug() << "    Bounding value:" << boundingValue;
+        }
+    }
+
+    const HtmlReportBuilder htmlReportBuilder;
+    const auto htmlReport = htmlReportBuilder.buildHtmlReport(reports, templateFile.value());
+
+    QFile file(targetFile.value());
+    if (file.open(QFile::WriteOnly)) {
+        const qint64 bytesWritten = file.write(htmlReport.toUtf8());
+        if (bytesWritten == -1) {
+            qCritical("Unable to write to target filename");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        qCritical("Unable to open target filename");
+        exit(EXIT_FAILURE);
+    }
+
     return EXIT_SUCCESS;
 }

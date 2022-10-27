@@ -70,6 +70,10 @@ public:
      */
     auto setVariableName(QString variableName) -> void;
 
+public:
+    friend auto operator==(const VariableReference &lhs, const VariableReference &rhs) -> bool;
+    friend auto operator!=(const VariableReference &lhs, const VariableReference &rhs) -> bool;
+
 private:
     QString m_variableName;
 };
