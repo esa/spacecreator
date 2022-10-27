@@ -4,6 +4,7 @@ set(SOURCES
   enumeratedgenerator.cpp
   integergenerator.cpp
   integersubset.cpp
+  realsubset.cpp
   proctypemaker.cpp
   promelatypesorter.cpp
   translator.cpp
@@ -14,6 +15,7 @@ set(SOURCES
   visitors/asn1typevaluegeneratorvisitor.cpp
   visitors/enumvalueconstraintvisitor.cpp
   visitors/integerrangeconstraintvisitor.cpp
+  visitors/realrangeconstraintvisitor.cpp
   visitors/sequencecomponentvaluevisitor.cpp
   visitors/valueassignmentvisitor.cpp
 )
@@ -23,6 +25,7 @@ set(INCLUDES
   integersubset.h
   proctypemaker.h
   promelatypesorter.h
+  realsubset.h
   translator.h
   visitors/asn1itemtypevisitor.h
   visitors/asn1nodevaluegeneratorvisitor.h
@@ -31,6 +34,7 @@ set(INCLUDES
   visitors/asn1typevaluegeneratorvisitor.h
   visitors/enumvalueconstraintvisitor.h
   visitors/integerrangeconstraintvisitor.h
+  visitors/realrangeconstraintvisitor.h
   visitors/sequencecomponentvaluevisitor.h
   visitors/sizeconstraintvisitor.h
   visitors/valueassignmentvisitor.h

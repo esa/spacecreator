@@ -24,6 +24,7 @@
 #include "enumvalueconstraintvisitor.h"
 #include "integerrangeconstraintvisitor.h"
 #include "proctypemaker.h"
+#include "realrangeconstraintvisitor.h"
 #include "sizeconstraintvisitor.h"
 
 #include <asn1library/asn1/types/bitstring.h>
@@ -509,8 +510,18 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
 
 void Asn1ItemTypeVisitor::visit(const Real &type)
 {
-    Q_UNUSED(type);
     const QString typeName = constructTypeName(m_name);
+
+    RealRangeConstraintVisitor visitor;
+    type.constraints().accept(visitor);
+
+    const auto &rangeSubsets = visitor.getResultSubset();
+
+    if (!rangeSubsets.has_value() || rangeSubsets->isEmpty()) {
+        auto errorMessage = QString("Real type %1 allows for no value").arg(m_name);
+        throw TranslationException(std::move(errorMessage));
+    }
+
     if (m_enhancedSpinSupport) {
         m_promelaModel.addTypeAlias(TypeAlias(typeName, BasicType::FLOAT));
     } else {
@@ -518,23 +529,24 @@ void Asn1ItemTypeVisitor::visit(const Real &type)
     }
 
     addSimpleValueAssignmentInline(typeName);
+    addRealRangeCheckInline(typeName, *rangeSubsets);
 
     // TODO: empty check_range inline is generated, full implementation is required
-    const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_rangeCheckInlineSuffix);
-    const auto argumentName = buildCheckArgumentName(typeName, "v");
-    const QList<QString> arguments = { argumentName };
+    // const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_rangeCheckInlineSuffix);
+    // const auto argumentName = buildCheckArgumentName(typeName, "v");
+    // const QList<QString> arguments = { argumentName };
 
-    model::Sequence sequence(model::Sequence::Type::NORMAL);
-    sequence.appendElement(Skip());
+    // model::Sequence sequence(model::Sequence::Type::NORMAL);
+    // sequence.appendElement(Skip());
 
-    std::unique_ptr<InlineDef> checkInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
+    // std::unique_ptr<InlineDef> checkInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
 
-    m_promelaModel.addInlineDef(std::move(checkInline));
+    // m_promelaModel.addInlineDef(std::move(checkInline));
 
-    if (m_generateInits) {
-        // TODO: Implement when floating points will be implemented
-        addEmptyValueInitializationInline(typeName);
-    }
+    // if (m_generateInits) {
+    //     // TODO: Implement when floating points will be implemented
+    //     addEmptyValueInitializationInline(typeName);
+    // }
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
@@ -738,6 +750,38 @@ void Asn1ItemTypeVisitor::addEnumRangeCheckInline(const QString &typeName, const
 }
 
 void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const QString &typeName, const IntegerSubset &rangeSubsets)
+{
+    const auto argumentName = buildCheckArgumentName(typeName, "v");
+
+    // Build one big expression for range check
+    std::vector<BinaryExpression> rangeCheckingExpressions;
+    for (const auto &range : rangeSubsets.getRanges()) {
+        auto minValueConst = std::make_unique<Expression>(Constant(range.first));
+        auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
+        auto greaterThanExpr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
+
+        auto maxValueConst = std::make_unique<Expression>(Constant(range.second));
+        auto maxValueVar = std::make_unique<Expression>(VariableRef(argumentName));
+        auto lessThanExpr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
+
+        BinaryExpression combinedExpr(
+                BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
+        rangeCheckingExpressions.push_back(std::move(combinedExpr));
+    }
+
+    auto rangeCheckingExpression =
+            std::accumulate(std::next(rangeCheckingExpressions.begin()), rangeCheckingExpressions.end(),
+                    std::make_unique<Expression>(rangeCheckingExpressions.front()), [&](auto &&acc, const auto &expr) {
+                        return std::make_unique<Expression>(BinaryExpression(
+                                BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
+                    });
+
+    addRangeCheckInline(*rangeCheckingExpression, typeName);
+}
+
+void Asn1ItemTypeVisitor::addRealRangeCheckInline(const QString &typeName, const RealSubset &rangeSubsets)
 {
     const auto argumentName = buildCheckArgumentName(typeName, "v");
 
