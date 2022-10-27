@@ -35,7 +35,7 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
 }
 
 QString reporting::HtmlReportBuilder::buildHtmlReport(
-        const SpinErrorReport &spinErrorReport, const QString &templateFile) const
+        const SpinErrorReport &spinErrorReport, const QStringList &trails, const QString &templateFile) const
 {
     // get absolute path for template file
     const QFileInfo templateFileInfo(templateFile);
@@ -46,6 +46,7 @@ QString reporting::HtmlReportBuilder::buildHtmlReport(
 
     QVariantHash mapping;
     mapping.insert("report", reportVariantList);
+    mapping.insert("trails", trails);
 
     Grantlee::Context context(mapping);
     const auto html = stringTemplate->render(&context);

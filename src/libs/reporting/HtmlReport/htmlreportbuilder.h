@@ -46,11 +46,13 @@ public:
      * @brief   Build spin error report
      *
      * @param   spinErrorReport      Parsed error report from spin
+     * @param   trails               Parsed trail file contents
      * @param   templateFile         Path to the HTML template file
      *
      * @return  Error report in an HTML document format
      */
-    QString buildHtmlReport(const SpinErrorReport &spinErrorReport, const QString &templateFile) const;
+    QString buildHtmlReport(
+            const SpinErrorReport &spinErrorReport, const QStringList &trails, const QString &templateFile) const;
 
 private:
     Grantlee::Engine *m_engine = nullptr;

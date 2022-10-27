@@ -35,13 +35,14 @@ void tst_HtmlReportBuilder::testNoError()
     const QString spinMessage = readFile(spinMessagePath);
     const QString spinTraces = QString();
     const QString sclConditions = QString();
+    const QStringList trails = QStringList();
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
     auto reports = parser.parse(spinMessage, spinTraces, sclConditions);
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, trails, htmlTemplatePath);
     QVERIFY(html == htmlResult);
 }
 
@@ -54,13 +55,14 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
     const QString spinMessage = readFile(spinMessagePath);
     const QString spinTraces = QString();
     const QString sclConditions = QString();
+    const QStringList trails = QStringList();
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
     auto reports = parser.parse(spinMessage, spinTraces, sclConditions);
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, trails, htmlTemplatePath);
 
     QVERIFY(html == htmlResult);
 }
@@ -74,13 +76,14 @@ void tst_HtmlReportBuilder::testDataConstraintViolationNested()
     const QString spinMessage = readFile(spinMessagePath);
     const QString spinTraces = QString();
     const QString sclConditions = QString();
+    const QStringList trails = QStringList();
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
     auto reports = parser.parse(spinMessage, spinTraces, sclConditions);
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, trails, htmlTemplatePath);
     QVERIFY(html == htmlResult);
 }
 
@@ -95,13 +98,14 @@ void tst_HtmlReportBuilder::testStopConditionViolationEmpty()
     const QString spinMessage = readFile(spinMessagePath);
     const QString spinTraces = readFile(spinTracesPath);
     const QString sclConditions = readFile(spinSclConditionsPath);
+    const QStringList trails = QStringList();
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
     auto reports = parser.parse(spinMessage, spinTraces, sclConditions);
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, trails, htmlTemplatePath);
     QVERIFY(html == htmlResult);
 }
 
@@ -116,13 +120,14 @@ void tst_HtmlReportBuilder::testStopConditionViolationGetState()
     const QString spinMessage = readFile(spinMessagePath);
     const QString spinTraces = readFile(spinTracesPath);
     const QString sclConditions = readFile(spinSclConditionsPath);
+    const QStringList trails = QStringList();
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
     auto reports = parser.parse(spinMessage, spinTraces, sclConditions);
 
     const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+    const auto html = htmlReportBuilder.buildHtmlReport(reports, trails, htmlTemplatePath);
 
     QFile file("/home/taste/result_scv_get_state.html");
     file.open(QFile::WriteOnly);
