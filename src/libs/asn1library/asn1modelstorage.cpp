@@ -37,6 +37,7 @@ Asn1ModelStorage::Asn1ModelStorage(QObject *parent)
     : QObject(parent)
     , m_asn1Watcher(new QFileSystemWatcher(this))
 {
+    // Call invalidateStorage in 100 ms
     m_reloadTimer.setSingleShot(true);
     connect(&m_reloadTimer, &QTimer::timeout, this, &Asn1Acn::Asn1ModelStorage::invalidateStorage);
     connect(m_asn1Watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
@@ -109,19 +110,24 @@ void Asn1ModelStorage::watchFiles(const QStringList &fileNames)
 
 void Asn1ModelStorage::invalidateStorage()
 {
-    m_store.clear();
     const QStringList fileNames = m_asn1Watcher->files();
     QStringList errorMessages;
     Asn1Acn::Asn1Reader parser;
+
+    // convert fileNames to fileInfos
     QVector<QFileInfo> fileInfos;
     std::for_each(fileNames.cbegin(), fileNames.cend(),
             [&fileInfos](const QString &fileName) { fileInfos.append(QFileInfo(fileName)); });
+
+    m_store.clear();
     m_store = parser.parseAsn1Files(fileInfos, &errorMessages);
+
     if (m_store.empty()) {
         qWarning() << "Can't read file(s) " << fileNames.join(", ") << ":" << errorMessages.join(", ");
         Q_EMIT error(fileNames, errorMessages);
         return;
     }
+
     Q_EMIT success(fileNames);
 }
 

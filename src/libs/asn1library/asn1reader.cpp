@@ -35,7 +35,7 @@ namespace Asn1Acn {
 
 QCache<QString, QString> Asn1Reader::m_cache {};
 
-static const QString defaultParameter("--field-prefix AUTO --xml-ast ");
+static const QStringList defaultParameter{"--field-prefix", "AUTO", "--xml-ast"};
 
 Asn1Reader::Asn1Reader(QObject *parent)
     : QObject(parent)
@@ -158,6 +158,7 @@ std::map<QString, std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1Files(
     for (const QFileInfo &fileInfo : fileInfos) {
         absoluteFilePaths.append(fileInfo.absoluteFilePath());
     }
+
 
     const QByteArray asn1FileHash = fileHash(absoluteFilePaths);
 
@@ -309,7 +310,7 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
 
 /*!
    Does search in the system path for asn1scc and returns the full file path.
-   An empty string is retunred if asn1scc was not found.
+   An empty string is returned if asn1scc was not found.
  */
 QString Asn1Reader::checkforCompiler() const
 {
@@ -343,10 +344,11 @@ QString Asn1Reader::checkforCompiler() const
 #endif
 }
 
-QString Asn1Reader::defaultParameter() const
+QStringList Asn1Reader::defaultParameter() const
 {
     return Asn1Acn::defaultParameter;
 }
+
 
 int Asn1Reader::lineNumberFromError(const QString &error) const
 {
@@ -375,33 +377,38 @@ QPair<QString, QStringList> Asn1Reader::asn1CompilerCommand() const
     QSettings settings;
     QString asn1Compiler = settings.value("SpaceCreator/asn1compiler").toString();
     QString parameter = settings.value("SpaceCreator/asn1compilerparameter").toString();
-#if QTC_VERSION == 408
-    QStringList params = parameter.split(' ', QString::SkipEmptyParts);
-#endif
-#if QTC_VERSION == 800
-    QStringList params = parameter.split(' ', Qt::SkipEmptyParts);
-#endif
 
-
+    // Compiler. Use compiler set by user or see if it is installed on the system
     if (asn1Compiler.isEmpty() || !QFile::exists(asn1Compiler)) {
         asn1Compiler = checkforCompiler();
     }
-
-    if (parameter.isEmpty()) {
-        parameter = defaultParameter();
-    }
-
     if (asn1Compiler.isEmpty()) {
         qWarning() << "No asn1scc compiler found";
-        return {{}, params};
-
+        return {{}, {}};
     }
+
+    // Parameters to compiler. Use parameters set by user or use the default ones
+    QStringList paramsList;
+    if (parameter.isEmpty()) {
+        paramsList = defaultParameter();
+    }
+    else {
+#if QTC_VERSION == 408
+    QStringList paramsList = parameter.split(' ', QString::SkipEmptyParts);
+#endif
+#if QTC_VERSION == 800
+    QStringList paramsList = parameter.split(' ', Qt::SkipEmptyParts);
+#endif
+    }
+
+    // replace %1 in users parameters with path to the asn1 compiler.
     QFileInfo asnFile(asn1Compiler);
-    if (parameter.contains("%1")) {
-        qWarning() << "asn1compilerparameter contained %1. Substitution of asn1Compiler name is no longer supported";
+    if (paramsList.contains("%1")) {
+        int pos = paramsList.indexOf("%1");
+        paramsList[pos] = asnFile.path();
     }
 
-    return {asn1Compiler, params};
+    return {asn1Compiler, paramsList};
 }
 
 QString Asn1Reader::temporaryFileName(const QString &basename, const QString &suffix) const

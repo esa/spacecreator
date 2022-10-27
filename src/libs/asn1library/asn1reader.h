@@ -59,7 +59,7 @@ public:
 
     QString checkforCompiler() const;
 
-    QString defaultParameter() const;
+    QStringList defaultParameter() const;
 
     int lineNumberFromError(const QString &error) const;
     QString fileNameFromError(const QString &error) const;
