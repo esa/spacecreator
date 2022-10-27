@@ -51,6 +51,7 @@ public:
         ErrorDepth
     };
 
+    /// @brief  Match tokens for nested variable name parsing
     enum VariableParseTokens
     {
         VariableGlobalState = 0,
@@ -58,12 +59,14 @@ public:
         VariableName
     };
 
+    /// @brief  Regex match tokens for stop condition parsing
     enum StopConditionParseTokens
     {
         StopConditionClause = 1,
         StopConditionExpression
     };
 
+    /// @brief  Regex match token for identifier parsing within stop condition
     enum IdentifierParseTokens
     {
         IdentifierName = 1
