@@ -24,7 +24,11 @@
 
 namespace reporting {
 
+/**
+ * @brief   Contains parsed information from an error identified as a stop condition violation.
+ */
 struct StopConditionViolationReport {
+    /// @brief  Violation type
     enum ViolationType
     {
         Empty = 0,
@@ -37,7 +41,7 @@ struct StopConditionViolationReport {
         UnknownType
     };
 
-    /** Type of the violation */
+    /** Violation type */
     ViolationType violationType;
 };
 
