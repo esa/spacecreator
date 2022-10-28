@@ -7,19 +7,23 @@ system Controller;
 
    /* CIF Keep Specific Geode PARAMNAMES p1 */
    signal Pong (MyReal);
+   
+   
+   /* CIF Keep Specific Geode PARAMNAMES paramOverflow */
+   signal PongOverflow (MyReal);
 
    /* CIF Keep Specific Geode PARAMNAMES p1 */
    signal Ping (MyReal);
 
    channel c
-      from env to Controller with Pong;
+      from env to Controller with Pong, PongOverflow;
       from Controller to env with Ping;
    endchannel;
 
    block Controller;
 
       signalroute r
-      from env to Controller with Pong;
+      from env to Controller with Pong, PongOverflow;
       from Controller to env with Ping;
       connect c and r;
 

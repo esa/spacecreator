@@ -42,7 +42,7 @@ cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
     && $CC -o system.out pan.c \
     && ./system.out -m1000000 -a -n > system.output \
-    && grep -q "errors: 1" system.output \
+    && grep -q "errors: 0" system.output \
     && cd ..
 
 rm -rf $TEST_OUTPUT_DIR
@@ -59,3 +59,6 @@ cd $TEST_OUTPUT_DIR \
     && ./system.out -m1000000 -a -n > system.output \
     && grep -q "errors: 0" system.output \
     && cd ..
+
+rm -rf $TEST_OUTPUT_DIR
+mkdir $TEST_OUTPUT_DIR

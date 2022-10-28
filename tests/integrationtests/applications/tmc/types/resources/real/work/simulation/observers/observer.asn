@@ -6,13 +6,12 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {finish, overflow, wait, failure}
+Controller-States ::= ENUMERATED {failure, wait, finish}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
-   param MyReal,
-   paramoverflow MyReal
+   param MyReal
 }
 
 END
@@ -43,7 +42,6 @@ BEGIN
    MyReal      ::= REAL (0.0 .. 1000.0)
 
 END
-
 
 TASTE-BasicTypes DEFINITIONS ::=
 BEGIN

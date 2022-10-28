@@ -1,1 +1,1 @@
-never get_state(Controller) = Finish;
+never get_state(Controller) = Overflow;

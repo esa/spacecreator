@@ -1,1 +1,1 @@
-eventually get_state(Controller) = Failure;
+never get_state(Controller) = Failure;
