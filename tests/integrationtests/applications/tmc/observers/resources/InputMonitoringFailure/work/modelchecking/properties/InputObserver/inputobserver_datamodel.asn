@@ -5,14 +5,17 @@ IMPORTS
    Model-States, Model-Context FROM Model-Datamodel
    MyInteger, MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview
    Mmi-action-y, Mmi-trigger-z FROM MMI-SUBTYPE
-   PID, Mmi-Event, Model-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView;
+   Mmi-Event, Model-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
+   TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Inputobserver-States ::= ENUMERATED {waitfortrigger, done, waitforaction}
+Inputobserver-States ::= ENUMERATED {waitfortrigger, waitforaction, done}
 
 Inputobserver-Context ::= SEQUENCE {
    state Inputobserver-States,
    init-done BOOLEAN,
+   sender PID,
    received-action T-Boolean,
    received-trigger T-Boolean
 }

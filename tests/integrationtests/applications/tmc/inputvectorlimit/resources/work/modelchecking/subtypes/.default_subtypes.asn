@@ -1,0 +1,31 @@
+GUI-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
+
+
+
+
+MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Gui-leftinterface-leftArg ::= MyInteger
+
+
+
+
+Gui-rightinterface-rightArg ::= MyInteger
+
+
+
+
+END

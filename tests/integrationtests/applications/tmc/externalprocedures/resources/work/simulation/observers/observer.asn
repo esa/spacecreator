@@ -3,13 +3,15 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM EXTERNAL-PROCEDURES-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview;
 
 Ponger-States ::= ENUMERATED {wait}
 
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
+   sender PID,
    pingarg MyInteger,
    pongarg MyInteger,
    argoutval MyInteger
@@ -42,6 +44,25 @@ T-Null-Record ::= SEQUENCE {}
 
 END
 
+
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..3)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       pinger,
+       ponger,
+       utils,
+       
+       env
+   }
+
+END
 
 PINGER-SUBTYPE DEFINITIONS ::=
 BEGIN
@@ -76,16 +97,12 @@ BEGIN
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      PID      FROM System-Dataview
       -- Import timers
       AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
       Ponger-Context FROM Ponger-Datamodel
    ;
-
-   --  List all the TASTE functions present in the system
-   PID ::= ENUMERATED {
-        env, pinger, ponger, utils
-   }
 
    --  Simulator needs to knows about cyclic interfaces
    Periodic-Event {Event-Ty} ::= SEQUENCE {

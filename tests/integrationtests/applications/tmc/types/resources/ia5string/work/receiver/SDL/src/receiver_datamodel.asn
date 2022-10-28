@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    MyString, MyBetterString FROM IA5STRING-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   Pinger-stringinterface-stringArg FROM PINGER-SUBTYPE;
+   PID-Range, PID FROM System-Dataview;
 
 Receiver-States ::= ENUMERATED {wait}
 
 Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
+   sender PID,
    stringarg MyBetterString,
    stringval MyBetterString,
    stringhandled T-Boolean

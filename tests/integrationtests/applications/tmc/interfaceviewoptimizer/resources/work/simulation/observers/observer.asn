@@ -14,13 +14,16 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM ENVIRONMENT-SELECTOR-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview
+   Context-pinger FROM Context-pinger;
 
 Pinger-States ::= ENUMERATED {wait}
 
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
+   sender PID,
    value MyInteger,
    result MyInteger
 }
@@ -51,7 +54,7 @@ BEGIN
 IMPORTS
    MyInteger FROM ENVIRONMENT-SELECTOR-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview
+   PID-Range, PID FROM System-Dataview
    Context-ponger FROM Context-ponger;
 
 Ponger-States ::= ENUMERATED {wait}
@@ -59,6 +62,7 @@ Ponger-States ::= ENUMERATED {wait}
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
+   sender PID,
    pingarg MyInteger
 }
 
@@ -115,14 +119,17 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    clock,
-    pinger,
-    ponger,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..3)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       clock,
+       pinger,
+       ponger,
+       
+       env
+   }
 
 END
 
@@ -242,10 +249,10 @@ BEGIN
 
    --  Event related to the execution of a PI or call of a RI in the functional code
    Function-Event ::= CHOICE {
-      clock              Clock-Event,
-      demo-timer-manager Demo-Timer-Manager-Event,
-      pinger             Pinger-Event,
-      ponger             Ponger-Event
+      clock  Clock-Event,
+      env    Demo-Timer-Manager-Event,
+      pinger Pinger-Event,
+      ponger Ponger-Event
    }
 
    --  Type used to store events in a database: associate a name to the event

@@ -1,8 +1,7 @@
 OCTO-SUBTYPES-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-    MyInteger ::= INTEGER (1)
-   MyOctoString ::= OCTET STRING(SIZE(10))
+   MyOctoString ::= OCTET STRING (SIZE(10))
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
@@ -67,13 +66,16 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    clk,
-    thething,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..2)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       clk,
+       thething,
+       
+       env
+   }
 
 END
 
