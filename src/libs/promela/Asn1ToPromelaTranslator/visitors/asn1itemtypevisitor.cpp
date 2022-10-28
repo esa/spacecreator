@@ -531,22 +531,10 @@ void Asn1ItemTypeVisitor::visit(const Real &type)
     addSimpleValueAssignmentInline(typeName);
     addRealRangeCheckInline(typeName, *rangeSubsets);
 
-    // TODO: empty check_range inline is generated, full implementation is required
-    // const auto inlineName = QString("%1%2").arg(Escaper::escapePromelaName(typeName)).arg(m_rangeCheckInlineSuffix);
-    // const auto argumentName = buildCheckArgumentName(typeName, "v");
-    // const QList<QString> arguments = { argumentName };
-
-    // model::Sequence sequence(model::Sequence::Type::NORMAL);
-    // sequence.appendElement(Skip());
-
-    // std::unique_ptr<InlineDef> checkInline = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
-
-    // m_promelaModel.addInlineDef(std::move(checkInline));
-
-    // if (m_generateInits) {
-    //     // TODO: Implement when floating points will be implemented
-    //     addEmptyValueInitializationInline(typeName);
-    // }
+    if (m_generateInits) {
+        // TODO: Implement when floating points will be implemented
+        addEmptyValueInitializationInline(typeName);
+    }
 
     m_resultDataType = DataType(UtypeRef(typeName));
 }
