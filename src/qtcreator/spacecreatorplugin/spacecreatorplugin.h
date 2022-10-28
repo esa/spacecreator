@@ -49,6 +49,7 @@ class EditorCore;
 
 namespace spctr {
 
+class SclEditorFactory;
 class IVEditorFactory;
 class DVEditorFactory;
 class MscEditorFactory;
@@ -70,6 +71,7 @@ public:
 private:
     void addHelp();
 
+    SclEditorFactory *m_sclFactory = nullptr;
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;
     DVEditorFactory *m_dvFactory = nullptr;
