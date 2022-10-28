@@ -34,14 +34,22 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
     m_engine->addTemplateLoader(m_fileLoader);
 }
 
+QString reporting::HtmlReportBuilder::buildHtmlReport(const reporting::SpinErrorReport &spinErrorReport) const
+{
+    initResource();
+    return buildHtmlReport(spinErrorReport, m_defaultTemplateFile);
+}
+
 QString reporting::HtmlReportBuilder::buildHtmlReport(
         const SpinErrorReport &spinErrorReport, const QString &templateFile) const
 {
     // get absolute path for template file
     const QFileInfo templateFileInfo(templateFile);
     const auto templateFileAbsolutePath = templateFileInfo.absoluteFilePath();
+    // load template to string
+    QString templateContent = loadTemplateFile(templateFile);
 
-    const Grantlee::Template stringTemplate = m_engine->loadByName(templateFileAbsolutePath);
+    const Grantlee::Template stringTemplate = m_engine->newTemplate(templateContent, "template");
     const auto reportVariantList = buildReportVariant(spinErrorReport);
 
     QVariantHash mapping;
@@ -50,6 +58,18 @@ QString reporting::HtmlReportBuilder::buildHtmlReport(
     Grantlee::Context context(mapping);
     const auto html = stringTemplate->render(&context);
     return html;
+}
+
+QString reporting::HtmlReportBuilder::loadTemplateFile(const QString &path) const
+{
+    QFile templateFile(path);
+    if (templateFile.open(QFile::ReadOnly)) {
+        QString templateContent = templateFile.readAll();
+        templateFile.close();
+        return templateContent;
+    } else {
+        return QString();
+    }
 }
 
 QVariantList reporting::HtmlReportBuilder::buildReportVariant(const reporting::SpinErrorReport &spinErrorReport)
@@ -132,6 +152,8 @@ QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(co
 
     return variantHash;
 }
+
+const QString reporting::HtmlReportBuilder::m_defaultTemplateFile = QStringLiteral(":/template.html");
 
 const QHash<reporting::SpinErrorReportItem::ErrorType, QString> reporting::HtmlReportBuilder::m_errorTypeNames = {
     { reporting::SpinErrorReportItem::DataConstraintViolation, "Data Constraint Violation" },

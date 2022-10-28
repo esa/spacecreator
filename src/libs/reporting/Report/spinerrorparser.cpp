@@ -22,6 +22,18 @@
 #include <QRegularExpression>
 
 reporting::SpinErrorReport reporting::SpinErrorParser::parse(
+        const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const
+{
+    reporting::SpinErrorReport report;
+    // find number of elements
+    int elementCount = qMin(spinMessages.size(), qMin(spinTraces.size(), sclConditions.size()));
+    for (int i = 0; i < elementCount; ++i) {
+        report.append(parse(spinMessages[i], spinTraces[i], sclConditions[i]));
+    }
+    return report;
+}
+
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(
         const QString &spinMessage, const QString &spinTraces, const QString &sclConditions) const
 {
     reporting::SpinErrorReport report;

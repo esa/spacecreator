@@ -113,23 +113,18 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!spinMessages.isEmpty()) {
+    if (spinMessages.isEmpty()) {
         qCritical("Missing mandatory argument: -im spinMessage");
         exit(EXIT_FAILURE);
     }
 
-    if (!spinTraces.isEmpty()) {
+    if (spinTraces.isEmpty()) {
         qCritical("Missing mandatory argument: -is spinTraces");
         exit(EXIT_FAILURE);
     }
 
-    if (!sclConditions.isEmpty()) {
+    if (sclConditions.isEmpty()) {
         qCritical("Missing mandatory argument: -ic sclCondition");
-        exit(EXIT_FAILURE);
-    }
-
-    if (!templateFile.has_value()) {
-        qCritical("Missing mandatory argument: -it templateFile");
         exit(EXIT_FAILURE);
     }
 
@@ -140,7 +135,7 @@ int main(int argc, char *argv[])
 
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages.first(), spinTraces.first(), sclConditions.first());
+    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;
@@ -175,8 +170,13 @@ int main(int argc, char *argv[])
         }
     }
 
+    QString htmlReport;
     const HtmlReportBuilder htmlReportBuilder;
-    const auto htmlReport = htmlReportBuilder.buildHtmlReport(reports, templateFile.value());
+    if (templateFile.has_value()) {
+        htmlReport = htmlReportBuilder.buildHtmlReport(reports, templateFile.value());
+    } else {
+        htmlReport = htmlReportBuilder.buildHtmlReport(reports);
+    }
 
     QFile file(targetFile.value());
     if (file.open(QFile::WriteOnly)) {
