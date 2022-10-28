@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <conversion/common/import/modelimporter.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 
@@ -46,6 +46,6 @@ public:
 
 private:
     void processLine(spintrail::model::SpinTrailModel &model, const QString &line) const;
-    QRegExp buildChannelCommandRegexp() const;
+    QRegularExpression buildChannelCommandRegexp() const;
 };
 }

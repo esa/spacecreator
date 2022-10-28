@@ -77,24 +77,27 @@ std::unique_ptr<conversion::Model> SpinTrailImporter::importModel(const conversi
 
 void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, const QString &line) const
 {
-    QRegExp continuousSignalValidation(R"( *process continuous signals in (\w+))");
-    if (continuousSignalValidation.exactMatch(line)) {
-        const QString functionName = continuousSignalValidation.cap(1);
+    QRegularExpression continuousSignalValidation(R"(^ *process continuous signals in (\w+)$)");
+    QRegularExpressionMatch match = continuousSignalValidation.match(line);
+    if (match.hasMatch()) {
+        const QString functionName = match.captured(1);
         model.appendEvent(std::make_unique<ContinuousSignal>(functionName));
         return;
     }
-    QRegExp setTimerEventValidation(R"( *set_timer (\w+) (\w+) (\d+))");
-    if (setTimerEventValidation.exactMatch(line)) {
-        const QString functionName = setTimerEventValidation.cap(1);
-        const QString interfaceName = setTimerEventValidation.cap(2);
-        size_t interval = setTimerEventValidation.cap(3).toULong();
+    QRegularExpression setTimerEventValidation(R"(^ *set_timer (\w+) (\w+) (\d+)$)");
+    match = setTimerEventValidation.match(line);
+    if (match.hasMatch()) {
+        const QString functionName = match.captured(1);
+        const QString interfaceName = match.captured(2);
+        size_t interval = match.captured(3).toULong();
         model.appendEvent(std::make_unique<SetTimerEvent>(functionName, interfaceName, interval));
         return;
     }
-    QRegExp resetTimerEventValidation(R"( *reset_timer (\w+) (\w+))");
-    if (resetTimerEventValidation.exactMatch(line)) {
-        const QString functionName = resetTimerEventValidation.cap(1);
-        const QString interfaceName = resetTimerEventValidation.cap(2);
+    QRegularExpression resetTimerEventValidation(R"( *reset_timer (\w+) (\w+))");
+    match = resetTimerEventValidation.match(line);
+    if (match.hasMatch()) {
+        const QString functionName = match.captured(1);
+        const QString interfaceName = match.captured(2);
         model.appendEvent(std::make_unique<ResetTimerEvent>(functionName, interfaceName));
         return;
     }
@@ -108,21 +111,25 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
     }
 
     // use this to additionaly validate if the parsed line is an trail event
-    QRegExp eventValidation(R"( *\d+:)");
+    QRegularExpression eventValidation(R"(^ *\d+:)");
 
-    QRegExp commandValidation = buildChannelCommandRegexp();
+    QRegularExpression commandValidation = buildChannelCommandRegexp();
 
     // channel name is enclosed by '(' and ')'
-    QRegExp channelValidation(R"(\((\w+)\))");
+    QRegularExpression channelValidation(R"(\((\w+)\))");
 
-    if (eventValidation.exactMatch(elements.front())) {
-        if (commandValidation.exactMatch(elements[1]) && channelValidation.indexIn(elements[2]) != -1) {
-            const QString proctypeString = commandValidation.cap(1);
+    QRegularExpressionMatch eventMatch = eventValidation.match(elements[0]);
+
+    if (eventMatch.hasMatch()) {
+        QRegularExpressionMatch commandMatch = commandValidation.match(elements[1]);
+        QRegularExpressionMatch channelMatch = channelValidation.match(elements[2]);
+        if (commandMatch.hasMatch() && channelMatch.hasMatch()) {
+            const QString proctypeString = commandMatch.captured(1);
             QString proctypeName = proctypeString.split(':').front();
-            const QString commandString = commandValidation.cap(2);
+            const QString commandString = commandMatch.captured(2);
             const QString command = commandString.split(' ').front();
             QStringList parameters = commandString.split(' ').back().split(',');
-            QString channelName = channelValidation.cap(1);
+            QString channelName = channelMatch.captured(1);
             const ChannelEvent::Type eventType = command.compare("recv", Qt::CaseInsensitive) == 0
                     ? ChannelEvent::Type::Recv
                     : ChannelEvent::Type::Send;
@@ -132,7 +139,7 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
     }
 }
 
-QRegExp SpinTrailImporter::buildChannelCommandRegexp() const
+QRegularExpression SpinTrailImporter::buildChannelCommandRegexp() const
 {
     // use this to get proctype name, command (send or recv) and parameters
     // the first parsed group contains proctype name
@@ -140,8 +147,11 @@ QRegExp SpinTrailImporter::buildChannelCommandRegexp() const
     // for the example input is 'proc  3 (Actuator_step:1) system.pml:53 Send 84'
     // the first group shall be 'Actuator_step:1' and the second 'Send 84'
 
+    // begin
+    QString pattern = QStringLiteral("^");
+
     // match "proc" and spin proctype number
-    QString pattern = QStringLiteral(R"(proc\s+\d+\s+)");
+    pattern += QStringLiteral(R"(proc\s+\d+\s+)");
 
     // match proctype name enclosed within parentheses
     pattern += QStringLiteral(R"(\(([\w:]+)\)\s+)");
@@ -151,8 +161,11 @@ QRegExp SpinTrailImporter::buildChannelCommandRegexp() const
 
     // match operation (Send/Recv) and list of arguments
     pattern += QStringLiteral(R"(([\w\s,]+))");
-    // QRegExp commandValidation(R"(proc\s+\d+\s+\(([\w:]+)\)\s+[\w\.]+:\d+\s([\w\s,]+))");
-    QRegExp commandValidation(pattern);
+
+    // end
+    pattern += QStringLiteral("$");
+
+    QRegularExpression commandValidation(pattern);
     return commandValidation;
 }
 }
