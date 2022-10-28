@@ -24,6 +24,7 @@
 #include <grantlee/outputstream.h>
 #include <grantlee_templates.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
+#include <reporting/Report/spinerrorparser.h>
 
 reporting::HtmlReportBuilder::HtmlReportBuilder()
 {
@@ -32,6 +33,21 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
     m_fileLoader->setTemplateDirs({ QDir::rootPath() });
     m_engine = new Grantlee::Engine(this);
     m_engine->addTemplateLoader(m_fileLoader);
+}
+
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(
+        const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const
+{
+    initResource();
+    return parseAndBuildHtmlReport(spinMessages, spinTraces, sclConditions, m_defaultTemplateFile);
+}
+
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
+        const QStringList &spinTraces, const QStringList &sclConditions, const QString &templateFile) const
+{
+    SpinErrorParser parser;
+    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
+    return buildHtmlReport(reports, templateFile);
 }
 
 QString reporting::HtmlReportBuilder::buildHtmlReport(const reporting::SpinErrorReport &spinErrorReport) const
