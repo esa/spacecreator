@@ -11,8 +11,7 @@ Host-States ::= ENUMERATED {wait}
 Host-Context ::= SEQUENCE {
    state Host-States,
    init-done BOOLEAN,
-   param MyReal,
-   paramoverflow MyReal
+   param MyReal
 }
 
 END

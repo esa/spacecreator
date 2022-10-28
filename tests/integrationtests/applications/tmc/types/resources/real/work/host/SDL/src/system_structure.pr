@@ -10,21 +10,17 @@ system Host;
 
    /* CIF Keep Specific Geode PARAMNAMES p1 */
    signal Pong (MyReal);
-   
-   
-   /* CIF Keep Specific Geode PARAMNAMES paramOverflow */
-   signal PongOverflow (MyReal);
 
    channel c
       from env to Host with Ping;
-      from Host to env with Pong, PongOverflow;
+      from Host to env with Pong;
    endchannel;
 
    block Host;
 
       signalroute r
       from env to Host with Ping;
-      from Host to env with Pong, PongOverflow;
+      from Host to env with Pong;
       connect c and r;
 
       process Host referenced;

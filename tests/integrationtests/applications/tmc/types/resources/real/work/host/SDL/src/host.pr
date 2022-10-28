@@ -3,8 +3,6 @@ process Host;
     /* CIF TEXT (637, 233), (267, 140) */
     -- Text area for declarations and comments
     dcl param MyReal;
-    dcl paramOverflow MyReal;
-    
     /* CIF ENDTEXT */
     /* CIF START (320, 10), (70, 35) */
     START;
@@ -12,17 +10,13 @@ process Host;
         NEXTSTATE Wait;
     /* CIF state (525, 28), (70, 35) */
     state Wait;
-        /* CIF input (511, 83), (94, 35) */
+        /* CIF input (512, 83), (94, 35) */
         input Ping(param);
-            /* CIF task (486, 138), (144, 35) */
+            /* CIF task (487, 138), (144, 35) */
             task param := param * 2.0;
-            /* CIF task (480, 193), (157, 35) */
-            task paramOverflow := 10.0;
-            /* CIF output (509, 246), (98, 35) */
+            /* CIF output (510, 193), (98, 35) */
             output Pong(param);
-            /* CIF output (482, 301), (153, 35) */
-            output Pong(paramOverflow);
-            /* CIF NEXTSTATE (524, 351), (70, 35) */
+            /* CIF NEXTSTATE (525, 248), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Host;
