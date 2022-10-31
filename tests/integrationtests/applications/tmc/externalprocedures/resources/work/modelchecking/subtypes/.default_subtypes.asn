@@ -1,0 +1,21 @@
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyInteger FROM EXTERNAL-PROCEDURES-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-ping-pingArg ::= MyInteger
+
+
+
+
+END

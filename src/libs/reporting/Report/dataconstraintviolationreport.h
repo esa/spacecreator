@@ -26,6 +26,9 @@
 
 namespace reporting {
 
+/**
+ * @brief   Contains parsed information from an error identified as a data constraint violation.
+ */
 struct DataConstraintViolationReport {
     /** Name of the function */
     QString functionName;

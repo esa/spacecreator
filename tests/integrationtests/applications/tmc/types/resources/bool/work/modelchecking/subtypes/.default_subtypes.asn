@@ -1,0 +1,21 @@
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyBetterBoolean FROM USERDEFINED-TYPES-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-boolinterface-boolArg ::= MyBetterBoolean
+
+
+
+
+END

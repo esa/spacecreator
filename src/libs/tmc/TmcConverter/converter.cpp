@@ -188,6 +188,16 @@ void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
     m_processesBasePriority = std::move(value);
 }
 
+void TmcConverter::setDelta(std::optional<float> value)
+{
+    m_delta = std::move(value);
+}
+
+void TmcConverter::setRealTypeEnabled(bool isRealTypeEnabled)
+{
+    m_isRealTypeEnabled = isRealTypeEnabled;
+}
+
 void TmcConverter::setSubtypesFilepaths(const std::vector<QString> &filepaths)
 {
     m_subtypesFilepaths = filepaths;
@@ -561,6 +571,9 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     Options options;
 
+    if (m_isRealTypeEnabled) {
+        options.add(PromelaOptions::enhancedSpinSupport);
+    }
     options.add(IvOptions::inputFilepath, inputFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
     options.add(PromelaOptions::outputFilepath, outputFilepath);
@@ -631,6 +644,10 @@ bool TmcConverter::convertDataview(
         options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
     }
 
+    if (m_isRealTypeEnabled) {
+        options.add(PromelaOptions::enhancedSpinSupport);
+    }
+
     options.add(IvOptions::inputFilepath, ivFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
 
@@ -653,7 +670,9 @@ bool TmcConverter::convertMscObservers(const QString &ivFilePath)
         const auto &outputPath = outputDir.path() + QDir::separator();
 
         Options options;
-
+        if (m_isRealTypeEnabled) {
+            options.add(PromelaOptions::enhancedSpinSupport);
+        }
         options.add(MscOptions::inputFilepath, mscFilePath);
         options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
         options.add(IvOptions::inputFilepath, ivFilePath);

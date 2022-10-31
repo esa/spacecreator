@@ -7,13 +7,19 @@ IMPORTS
    T-UART-DLC-FrameBuffer, T-UART-DLC-Header, T-UART-DLC-FrameCRC, T-UART-DLC-SDU, T-UART-DLC-PDU, T-UART-DLC-RxErrorCode, T-RMAPCRCTable FROM UART-DLC
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Bcdlct-States ::= ENUMERATED {wait}
+Bcdlct-States ::= ENUMERATED {transmitting, idle}
 
 Bcdlct-Context ::= SEQUENCE {
    state Bcdlct-States,
-   init-done BOOLEAN
+   init-done BOOLEAN,
+   sender PID,
+   txsdu T-UART-DLC-SDU,
+   txpdu T-UART-DLC-PDU,
+   txcount UINT8,
+   txcrc T-UART-DLC-FrameCRC,
+   txframebuffer T-UART-DLC-FrameBuffer
 }
 
 END
@@ -38,13 +44,14 @@ IMPORTS
    T-UART-DLC-FrameBuffer, T-UART-DLC-Header, T-UART-DLC-FrameCRC, T-UART-DLC-SDU, T-UART-DLC-PDU, T-UART-DLC-RxErrorCode, T-RMAPCRCTable FROM UART-DLC
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Erroredchannel-States ::= ENUMERATED {corrupt, drop, idle}
+Erroredchannel-States ::= ENUMERATED {drop, idle, corrupt}
 
 Erroredchannel-Context ::= SEQUENCE {
    state Erroredchannel-States,
    init-done BOOLEAN,
+   sender PID,
    corruption UINT8,
    txchar UINT8
 }
@@ -60,13 +67,14 @@ IMPORTS
    T-UART-DLC-FrameBuffer, T-UART-DLC-Header, T-UART-DLC-FrameCRC, T-UART-DLC-SDU, T-UART-DLC-PDU, T-UART-DLC-RxErrorCode, T-RMAPCRCTable FROM UART-DLC
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
 Rtdlcr-States ::= ENUMERATED {receiving, idle}
 
 Rtdlcr-Context ::= SEQUENCE {
    state Rtdlcr-States,
    init-done BOOLEAN,
+   sender PID,
    rxchar UINT8,
    rxcount UINT8,
    rxframebuffer T-UART-DLC-FrameBuffer,
@@ -185,7 +193,8 @@ T-UART-DLC-RxErrorCode ::= ENUMERATED {
     bad-start-char (1),
     crc-fail (2),
     frame-timeout (3),
-    bad-request-type (4)
+    bad-request-type (4),
+    phy-rx-error(5)
 }
 
 
@@ -253,6 +262,41 @@ BEGIN
 
    MyInteger ::= INTEGER (0 .. 10000)
 
+-- ASN.1 Type definitions must start with an uppercase
+-- Field names in records (SEQUENCE) must start with a lowercase
+-- Underscores are not allowed: use dash (hyphen) 
+-- For integers do not assume that small ranges will be translated to small
+-- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
+-- for the range in Ada)
+
+-- Simple types:
+
+-- TASTE-Boolean ::= BOOLEAN
+-- MyInteger   ::= INTEGER (0..255)
+-- MyReal      ::= REAL (0.0 .. 1000.0)
+-- MyBool      ::= BOOLEAN
+-- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
+
+-- Complex types:
+
+--  MySeq       ::= SEQUENCE {
+--      input-data  MyInteger,
+--      output-data MyInteger,
+--      validity    ENUMERATED { valid, invalid }
+--  }
+--
+--  MyChoice    ::= CHOICE {
+--      a BOOLEAN,
+--      b MySeq
+--  }
+--
+--  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
+--
+--  MyOctStr    ::= OCTET STRING (SIZE (3))
+--
+--  -- You can also declare constants
+--  myVar       MySeqOf     ::= { hello, world }
+
 END
 
 
@@ -261,17 +305,20 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    bcapp,
-    bcdlct,
-    channeleffects,
-    erroredchannel,
-    rtapp,
-    rtdlcr,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..6)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       bcapp,
+       bcdlct,
+       channeleffects,
+       erroredchannel,
+       rtapp,
+       rtdlcr,
+       
+       env
+   }
 
 END
 
@@ -405,7 +452,7 @@ BEGIN
          dlcrxreset SEQUENCE {  },
          phyrxchar  SEQUENCE { p1 UINT8},
          phyrxerror SEQUENCE {  },
-         frameTimer SEQUENCE {}
+         frametimer SEQUENCE {}
       },
       msg-out CHOICE {
          dlcrxerror SEQUENCE { p1 T-UART-DLC-RxErrorCode },
@@ -424,13 +471,13 @@ BEGIN
 
    --  Event related to the execution of a PI or call of a RI in the functional code
    Function-Event ::= CHOICE {
-      bcapp              Bcapp-Event,
-      bcdlct             Bcdlct-Event,
-      channeleffects     Channeleffects-Event,
-      demo-timer-manager Demo-Timer-Manager-Event,
-      erroredchannel     Erroredchannel-Event,
-      rtapp              Rtapp-Event,
-      rtdlcr             Rtdlcr-Event
+      bcapp          Bcapp-Event,
+      bcdlct         Bcdlct-Event,
+      channeleffects Channeleffects-Event,
+      env            Demo-Timer-Manager-Event,
+      erroredchannel Erroredchannel-Event,
+      rtapp          Rtapp-Event,
+      rtdlcr         Rtdlcr-Event
    }
 
    --  Type used to store events in a database: associate a name to the event
@@ -456,7 +503,7 @@ BEGIN
    }
 
    --  constant that can be used to refer to the absence of an input/output event
-   -- nothing Observable-Event ::= no-event : {}
+   nothing Observable-Event ::= no-event : {}
 
    --  Define a queue of events, corresponding to the input queue for each function
    max-events INTEGER ::= 10

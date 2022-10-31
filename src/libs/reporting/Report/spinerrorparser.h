@@ -51,6 +51,7 @@ public:
         ErrorDepth
     };
 
+    /// @brief  Match tokens for nested variable name parsing
     enum VariableParseTokens
     {
         VariableGlobalState = 0,
@@ -58,12 +59,14 @@ public:
         VariableName
     };
 
+    /// @brief  Regex match tokens for stop condition parsing
     enum StopConditionParseTokens
     {
         StopConditionClause = 1,
         StopConditionExpression
     };
 
+    /// @brief  Regex match token for identifier parsing within stop condition
     enum IdentifierParseTokens
     {
         IdentifierName = 1
@@ -75,7 +78,19 @@ public:
     SpinErrorParser() = default;
 
     /**
-     * @brief   Parse spin message
+     * @brief   Parse multiple spin messages
+     *
+     * @param   spinMessages     Spin command outputs
+     * @param   spinTraces       Spin traces
+     * @param   sclConditions    SCL file conditions
+     *
+     * @return  List of spin errors
+     */
+    SpinErrorReport parse(
+            const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const;
+
+    /**
+     * @brief   Parse single spin message
      *
      * @param   spinMessage      Spin command output
      * @param   spinTraces       Spin traces

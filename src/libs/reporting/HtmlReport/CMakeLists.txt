@@ -8,10 +8,16 @@ set(INCLUDES
     htmlreportbuilder.h
     tracebuilder.h)
 
+set(RESOURCES
+    htmlreportbuilder.qrc)
+
+set(CMAKE_AUTORCC ON)
+
 add_library(HtmlReport STATIC)
 target_sources(HtmlReport
     PRIVATE    "${SOURCES}"
-               "${INCLUDES}")
+               "${INCLUDES}"
+               "${RESOURCES}")
 
 target_link_libraries(HtmlReport
     PUBLIC      ivcore
