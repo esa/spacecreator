@@ -18,7 +18,7 @@ SPACECREATOR?=spacecreator.AppImage
 export NO_PROGRESS_BAR=1
 
 # Get the list of ASN.1 files from Space Creator project file:
-DISTFILES=$(shell qmake GuiProject.pro -o /tmp/null 2>&1)
+DISTFILES=$(shell qmake reals.pro -o /tmp/null 2>&1)
 ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
 
 all:	release
@@ -53,10 +53,10 @@ edit_cv:
 
 # Simulation target (experimental - for systems made of SDL functions only)
 simu:	
+	if [ -f work/glue_debug ] || [ -f work/glue_release ] || [ -f work/glue_coverage ]; then $(MAKE) clean; fi
 	$(MAKE) interfaceview work/glue_simu
 	$(MAKE) -C work
 	$(MAKE) -C work/simulation -f Makefile.Simulation simu
-
 
 # Simulation and model checking: shortcut to create observer.asn
 observer_dataview:

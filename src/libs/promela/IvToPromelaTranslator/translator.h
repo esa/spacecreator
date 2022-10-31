@@ -454,6 +454,7 @@ private:
             const QList<QString> &channelNames) const -> void;
     auto createCheckQueuesExpression(const QList<QString> &channelNames, bool empty) const
             -> std::unique_ptr<::promela::model::Expression>;
+    auto createGetSenderInline(model::PromelaSystemModel *promelaModel, const QString &functionName) const -> void;
     auto createSystemState(Context &context) const -> void;
     auto createPromelaObjectsForTimers(Context &context) const -> void;
     auto createTimerInlinesForFunction(Context &context, const QString &functionName, const QString &timerName,

@@ -2,15 +2,16 @@ Thething-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyOctoString FROM OCTO-SUBTYPES-DATAVIEW
+   MyOctoString FROM OCTO-SUBTYPES-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
 Thething-States ::= ENUMERATED {wait}
 
 Thething-Context ::= SEQUENCE {
    state Thething-States,
    init-done BOOLEAN,
+   sender PID,
    arg MyOctoString,
    result MyOctoString
 }

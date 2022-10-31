@@ -1,0 +1,21 @@
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyBetterSequence FROM USERDEFINED-TYPES-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-sequenceinterface-seqArg ::= MyBetterSequence
+
+
+
+
+END

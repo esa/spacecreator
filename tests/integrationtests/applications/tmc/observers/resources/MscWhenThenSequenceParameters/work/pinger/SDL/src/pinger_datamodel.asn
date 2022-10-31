@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    SmallInteger, BigInteger, MyChoice, MySequence FROM MSCWHENTHENSEQUENCEPARAMETERS-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Pinger-States ::= ENUMERATED {ok3, ok4, wait, ok1, ok2}
+Pinger-States ::= ENUMERATED {ok4, ok3, ok2, ok1, wait}
 
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
+   sender PID,
    value1 MySequence,
    value2 MySequence
 }

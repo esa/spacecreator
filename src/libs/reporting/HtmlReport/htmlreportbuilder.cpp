@@ -24,6 +24,7 @@
 #include <grantlee/outputstream.h>
 #include <grantlee_templates.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
+#include <reporting/Report/spinerrorparser.h>
 
 reporting::HtmlReportBuilder::HtmlReportBuilder()
 {
@@ -34,14 +35,37 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
     m_engine->addTemplateLoader(m_fileLoader);
 }
 
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(
+        const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const
+{
+    initResource();
+    return parseAndBuildHtmlReport(spinMessages, spinTraces, sclConditions, m_defaultTemplateFile);
+}
+
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
+        const QStringList &spinTraces, const QStringList &sclConditions, const QString &templateFile) const
+{
+    SpinErrorParser parser;
+    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
+    return buildHtmlReport(reports, templateFile);
+}
+
+QString reporting::HtmlReportBuilder::buildHtmlReport(const reporting::SpinErrorReport &spinErrorReport) const
+{
+    initResource();
+    return buildHtmlReport(spinErrorReport, m_defaultTemplateFile);
+}
+
 QString reporting::HtmlReportBuilder::buildHtmlReport(
         const SpinErrorReport &spinErrorReport, const QString &templateFile) const
 {
     // get absolute path for template file
     const QFileInfo templateFileInfo(templateFile);
     const auto templateFileAbsolutePath = templateFileInfo.absoluteFilePath();
+    // load template to string
+    QString templateContent = loadTemplateFile(templateFile);
 
-    const Grantlee::Template stringTemplate = m_engine->loadByName(templateFileAbsolutePath);
+    const Grantlee::Template stringTemplate = m_engine->newTemplate(templateContent, "template");
     const auto reportVariantList = buildReportVariant(spinErrorReport);
 
     QVariantHash mapping;
@@ -50,6 +74,18 @@ QString reporting::HtmlReportBuilder::buildHtmlReport(
     Grantlee::Context context(mapping);
     const auto html = stringTemplate->render(&context);
     return html;
+}
+
+QString reporting::HtmlReportBuilder::loadTemplateFile(const QString &path) const
+{
+    QFile templateFile(path);
+    if (templateFile.open(QFile::ReadOnly)) {
+        QString templateContent = templateFile.readAll();
+        templateFile.close();
+        return templateContent;
+    } else {
+        return QString();
+    }
 }
 
 QVariantList reporting::HtmlReportBuilder::buildReportVariant(const reporting::SpinErrorReport &spinErrorReport)
@@ -68,6 +104,7 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
     QVariantHash variantHash;
     variantHash.insert("errorNumber", spinErrorReportItem.errorNumber);
     variantHash.insert("errorDepth", spinErrorReportItem.errorDepth);
+    variantHash.insert("errorCode", spinErrorReportItem.errorType);
     variantHash.insert("rawErrorDetails", spinErrorReportItem.rawErrorDetails);
 
     // resolve error type as string
@@ -81,9 +118,13 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
     case reporting::SpinErrorReportItem::DataConstraintViolation:
         variantErrorDetails = buildDataConstraintViolationVariant(spinErrorReportItem.parsedErrorDetails);
         break;
+    case reporting::SpinErrorReportItem::StopConditionViolation:
+        variantErrorDetails = buildStopConditionViolationVariant(spinErrorReportItem.parsedErrorDetails);
+        break;
     default:
         break;
     }
+
     variantHash.insert("errorDetails", variantErrorDetails);
     return variantHash;
 }
@@ -115,9 +156,36 @@ QVariantHash reporting::HtmlReportBuilder::buildDataConstraintViolationVariant(c
     return variantHash;
 }
 
+QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(const QVariant &errorDetails)
+{
+    reporting::StopConditionViolationReport report =
+            qvariant_cast<reporting::StopConditionViolationReport>(errorDetails);
+    QVariantHash variantHash;
+    // resolve violation type as string
+    variantHash.insert("violationType",
+            m_stopConditionViolationTypeNames.value(report.violationType,
+                    m_stopConditionViolationTypeNames[reporting::StopConditionViolationReport::UnknownType]));
+
+    return variantHash;
+}
+
+const QString reporting::HtmlReportBuilder::m_defaultTemplateFile = QStringLiteral(":/template.html");
+
 const QHash<reporting::SpinErrorReportItem::ErrorType, QString> reporting::HtmlReportBuilder::m_errorTypeNames = {
     { reporting::SpinErrorReportItem::DataConstraintViolation, "Data Constraint Violation" },
     { reporting::SpinErrorReportItem::StopConditionViolation, "Stop Condition Violation" },
     { reporting::SpinErrorReportItem::ObserverFailure, "Observer Failure" },
     { reporting::SpinErrorReportItem::OtherError, "Unknown Error" }
 };
+
+const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
+        reporting::HtmlReportBuilder::m_stopConditionViolationTypeNames = {
+            { reporting::StopConditionViolationReport::Empty, "Empty" },
+            { reporting::StopConditionViolationReport::Exist, "Exist" },
+            { reporting::StopConditionViolationReport::GetState, "Get State" },
+            { reporting::StopConditionViolationReport::Length, "Length" },
+            { reporting::StopConditionViolationReport::QueueLast, "Queue Last" },
+            { reporting::StopConditionViolationReport::QueueLength, "Queue Length" },
+            { reporting::StopConditionViolationReport::Present, "Present" },
+            { reporting::StopConditionViolationReport::UnknownType, "Unknown Type" },
+        };
