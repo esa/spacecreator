@@ -808,7 +808,7 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
     }
 
     createCheckQueueInline(context.model(), functionName, channelNames);
-
+    createGetSenderInline(context.model(), functionName);
     for (const auto requiredInterface : ivFunction->ris()) {
         if (requiredInterface->kind() == IVInterface::OperationKind::Protected
                 || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
@@ -977,6 +977,24 @@ std::unique_ptr<Expression> IvToPromelaTranslator::createCheckQueuesExpression(
     }
 
     return expr;
+}
+
+void IvToPromelaTranslator::createGetSenderInline(
+        model::PromelaSystemModel *promelaModel, const QString &functionName) const
+{
+    // the SDL process required a procedure '_get_sender'
+    // currently this feature is not fully supported in model checking
+    // to ensure that the generated model will be valid
+    // the empty inline with required name is created here.
+    Sequence sequence(Sequence::Type::NORMAL);
+
+    sequence.appendElement(Skip());
+
+    QList<QString> arguments;
+    arguments.append(QString("%1_sender_arg").arg(Escaper::escapePromelaIV(functionName)));
+
+    const QString checkQueueInlineName = QString("%1_0_get_sender").arg(Escaper::escapePromelaIV(functionName));
+    promelaModel->addInlineDef(std::make_unique<InlineDef>(checkQueueInlineName, arguments, std::move(sequence)));
 }
 
 void IvToPromelaTranslator::createSystemState(Context &context) const

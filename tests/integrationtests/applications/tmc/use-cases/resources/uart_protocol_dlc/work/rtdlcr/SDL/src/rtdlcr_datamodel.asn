@@ -7,13 +7,14 @@ IMPORTS
    T-UART-DLC-FrameBuffer, T-UART-DLC-Header, T-UART-DLC-FrameCRC, T-UART-DLC-SDU, T-UART-DLC-PDU, T-UART-DLC-RxErrorCode, T-RMAPCRCTable FROM UART-DLC
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
 Rtdlcr-States ::= ENUMERATED {receiving, idle}
 
 Rtdlcr-Context ::= SEQUENCE {
    state Rtdlcr-States,
    init-done BOOLEAN,
+   sender PID,
    rxchar UINT8,
    rxcount UINT8,
    rxframebuffer T-UART-DLC-FrameBuffer,

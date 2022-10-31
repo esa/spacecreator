@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Lock-States ::= ENUMERATED {wait-turn, writing, idle, wait-nocontention}
+Lock-States ::= ENUMERATED {idle, wait-nocontention, wait-turn, writing}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,
    init-done BOOLEAN,
+   sender PID,
    remotewantstoenter T-Boolean,
    writesize T-UInt8,
    myprocid T-ProcID,
@@ -32,13 +33,14 @@ BEGIN
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
 Sharedmemory-States ::= ENUMERATED {idle}
 
 Sharedmemory-Context ::= SEQUENCE {
    state Sharedmemory-States,
    init-done BOOLEAN,
+   sender PID,
    membuffer T-MemBuffer,
    writeaccess T-WriteAccess
 }
@@ -95,16 +97,19 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    lock,
-    locka,
-    lockb,
-    sharedmemory,
-    testgui,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..5)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       lock,
+       locka,
+       lockb,
+       sharedmemory,
+       testgui,
+       
+       env
+   }
 
 END
 

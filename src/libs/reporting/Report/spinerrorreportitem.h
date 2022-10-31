@@ -33,7 +33,7 @@ struct SpinErrorReportItem {
     /** Error types */
     enum ErrorType
     {
-        DataConstraintViolation,
+        DataConstraintViolation = 0,
         StopConditionViolation,
         ObserverFailure,
         OtherError

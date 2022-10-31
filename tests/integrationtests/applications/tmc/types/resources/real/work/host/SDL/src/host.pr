@@ -8,15 +8,15 @@ process Host;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (525, 28), (70, 35) */
+    /* CIF state (510, 30), (70, 35) */
     state Wait;
-        /* CIF input (512, 83), (94, 35) */
+        /* CIF input (496, 85), (94, 35) */
         input Ping(param);
-            /* CIF task (487, 138), (144, 35) */
+            /* CIF task (471, 140), (144, 35) */
             task param := param * 2.0;
-            /* CIF output (510, 193), (98, 35) */
+            /* CIF output (494, 195), (98, 35) */
             output Pong(param);
-            /* CIF NEXTSTATE (525, 248), (70, 35) */
+            /* CIF NEXTSTATE (509, 250), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Host;

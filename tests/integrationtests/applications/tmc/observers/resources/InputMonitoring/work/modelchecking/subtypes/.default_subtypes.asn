@@ -1,0 +1,24 @@
+MMI-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyIntegerBigger FROM INPUTMONITORING-DATAVIEW
+
+
+MyInteger FROM INPUTMONITORING-DATAVIEW
+
+ ;
+
+
+
+
+Mmi-action-y ::= MyIntegerBigger
+
+
+
+
+Mmi-trigger-z ::= MyInteger
+
+
+
+
+END

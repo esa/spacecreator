@@ -26,6 +26,9 @@
 
 namespace reporting {
 
+/**
+ * @brief   Contains parsed information from an error identified as a data constraint violation.
+ */
 struct DataConstraintViolationReport {
     /** Name of the function */
     QString functionName;
@@ -41,5 +44,5 @@ struct DataConstraintViolationReport {
 
 }
 
-// Add meta type for QVariant compability
+// Add meta type for QVariant compatibility
 Q_DECLARE_METATYPE(reporting::DataConstraintViolationReport)

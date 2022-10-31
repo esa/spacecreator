@@ -5,3 +5,4 @@ BEGIN
    MyReal      ::= REAL (0.0 .. 1000.0)
 
 END
+

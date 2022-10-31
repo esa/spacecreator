@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    MyInteger, MyArray FROM SEQUENCEOF-SUBTYPES-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
 Thething-States ::= ENUMERATED {wait}
 
 Thething-Context ::= SEQUENCE {
    state Thething-States,
    init-done BOOLEAN,
+   sender PID,
    arg MyArray,
    result MyArray
 }
@@ -86,13 +87,16 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    clk,
-    thething,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..2)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       clk,
+       thething,
+       
+       env
+   }
 
 END
 

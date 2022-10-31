@@ -6,16 +6,17 @@ IMPORTS
    Controller-States, Controller-Context FROM Controller-Datamodel
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger, MyTestInteger FROM TEST-SIMU-OBSERVER-DATAVIEW
-   PID FROM System-Dataview
+   PID-Range, PID FROM System-Dataview
    Environ-report-p1, Environ-test-p1 FROM ENVIRON-SUBTYPE
    Actuator-Event, Controller-Event, Environ-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Observer-States ::= ENUMERATED {error, wait}
+Observer-States ::= ENUMERATED {wait, error}
 
 Observer-Context ::= SEQUENCE {
    state Observer-States,
-   init-done BOOLEAN
+   init-done BOOLEAN,
+   sender PID
 }
 
 Observer-Actuator-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), reset-present(2), work-present(3)}

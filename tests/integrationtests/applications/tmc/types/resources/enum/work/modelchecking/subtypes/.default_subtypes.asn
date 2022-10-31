@@ -1,0 +1,21 @@
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyBetterEnum FROM USERDEFINED-TYPES-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-enuminterface-enumArg ::= MyBetterEnum
+
+
+
+
+END

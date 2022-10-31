@@ -11,6 +11,7 @@ Host-States ::= ENUMERATED {wait}
 Host-Context ::= SEQUENCE {
    state Host-States,
    init-done BOOLEAN,
+   sender PID,
    param MyReal
 }
 

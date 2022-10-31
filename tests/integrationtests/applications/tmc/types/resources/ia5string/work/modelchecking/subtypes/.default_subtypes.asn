@@ -1,0 +1,21 @@
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyBetterString FROM IA5STRING-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-stringinterface-stringArg ::= MyBetterString
+
+
+
+
+END

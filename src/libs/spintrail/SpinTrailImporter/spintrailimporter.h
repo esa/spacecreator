@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <conversion/common/import/modelimporter.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
 
@@ -45,7 +45,21 @@ public:
     virtual std::unique_ptr<conversion::Model> importModel(const conversion::Options &options) const override;
 
 private:
+    constexpr static inline size_t CONTINUOUS_SIGNAL_EVENT_FUNCTION_NAME = 1;
+    constexpr static inline size_t SET_TIMER_EVENT_FUNCTION_NAME = 1;
+    constexpr static inline size_t SET_TIMER_EVENT_INTERFACE_NAME = 2;
+    constexpr static inline size_t SET_TIMER_EVENT_INTERVAL = 3;
+    constexpr static inline size_t RESET_TIMER_EVENT_FUNCTION_NAME = 1;
+    constexpr static inline size_t RESET_TIMER_EVENT_INTERFACE_NAME = 2;
+    constexpr static inline size_t CHANNEL_EVENT_PROCTYPE_NAME = 1;
+    constexpr static inline size_t CHANNEL_EVENT_COMMAND_STRING = 2;
+    constexpr static inline size_t CHANNEL_EVENT_CHANNEL_NAME = 1;
+    constexpr static inline size_t CHANNEL_EVENT_VALIDATION_PART = 0;
+    constexpr static inline size_t CHANNEL_EVENT_COMMAND_PART = 1;
+    constexpr static inline size_t CHANNEL_EVENT_CHANNEL_PART = 2;
+
+private:
     void processLine(spintrail::model::SpinTrailModel &model, const QString &line) const;
-    QRegExp buildChannelCommandRegexp() const;
+    QRegularExpression buildChannelCommandRegexp() const;
 };
 }
