@@ -19,10 +19,12 @@
 
 #include "htmlreportbuilder.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <grantlee/outputstream.h>
 #include <grantlee_templates.h>
+#include <reporting/HtmlReport/tracebuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorparser.h>
 
@@ -100,11 +102,18 @@ QVariantList reporting::HtmlReportBuilder::buildReportVariant(const reporting::S
 QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
         const reporting::SpinErrorReportItem &spinErrorReportItem)
 {
+    // add html formatting to spin trails
+    const TraceBuilder traceBuilder;
+    const auto trailsHtml = traceBuilder.buildTraceReport(spinErrorReportItem.trails);
+
+    qDebug() << trailsHtml;
+
     QVariantHash variantHash;
     variantHash.insert("errorNumber", spinErrorReportItem.errorNumber);
     variantHash.insert("errorDepth", spinErrorReportItem.errorDepth);
     variantHash.insert("errorCode", spinErrorReportItem.errorType);
     variantHash.insert("rawErrorDetails", spinErrorReportItem.rawErrorDetails);
+    variantHash.insert("trails", trailsHtml);
 
     // resolve error type as string
     variantHash.insert("errorType",

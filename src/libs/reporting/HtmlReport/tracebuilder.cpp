@@ -21,11 +21,10 @@
 
 QString reporting::TraceBuilder::buildTraceReport(const QString &report) const
 {
-    // convert html entities and whitespace characters (tabulator, newline)
-    QString html = report.toHtmlEscaped();
-    html = html.replace(QChar('\n'), QStringLiteral("\n<br>"));
+    // convert whitespace characters
+    // html entities conversion will be handled by grantlee,
+    // newlines are handled by "pre-wrap" css property in template
+    QString html = report;
     html = html.replace(QChar('\t'), QStringLiteral("&Tab;"));
-    // allow multiple consecutive spaces
-    html = QStringLiteral("<span style=\"white-space: pre-wrap;\">%1</span>").arg(html);
     return html;
 }
