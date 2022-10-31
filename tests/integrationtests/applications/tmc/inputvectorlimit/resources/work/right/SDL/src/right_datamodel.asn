@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   Gui-leftinterface-leftArg, Gui-rightinterface-rightArg FROM GUI-SUBTYPE;
+   PID-Range, PID FROM System-Dataview;
 
 Right-States ::= ENUMERATED {wait}
 
 Right-Context ::= SEQUENCE {
    state Right-States,
    init-done BOOLEAN,
+   sender PID,
    rightarg MyInteger,
    rightval MyInteger
 }

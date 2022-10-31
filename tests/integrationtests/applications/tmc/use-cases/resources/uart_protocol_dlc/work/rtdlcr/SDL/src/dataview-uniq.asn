@@ -217,17 +217,20 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    bcapp,
-    bcdlct,
-    channeleffects,
-    erroredchannel,
-    rtapp,
-    rtdlcr,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..6)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       bcapp,
+       bcdlct,
+       channeleffects,
+       erroredchannel,
+       rtapp,
+       rtdlcr,
+       
+       env
+   }
 
 END
 

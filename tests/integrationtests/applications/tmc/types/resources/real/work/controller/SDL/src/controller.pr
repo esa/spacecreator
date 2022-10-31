@@ -13,26 +13,26 @@ process Controller;
         output Ping(param);
         /* CIF NEXTSTATE (320, 173), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (503, 90), (70, 35) */
-    state Wait;
-        /* CIF input (488, 145), (98, 35) */
-        input Pong(param);
-            /* CIF decision (428, 200), (218, 50) */
-            decision param > 10.49 and param < 10.51;
-                /* CIF ANSWER (458, 270), (70, 23) */
-                (true):
-                    /* CIF NEXTSTATE (458, 313), (70, 35) */
-                    NEXTSTATE Finish;
-                /* CIF ANSWER (548, 270), (70, 23) */
-                (false):
-                    /* CIF NEXTSTATE (548, 313), (70, 35) */
-                    NEXTSTATE Failure;
-            enddecision;
+    /* CIF state (715, 102), (70, 35) */
+    state Finish;
     endstate;
     /* CIF state (719, 156), (70, 35) */
     state Failure;
     endstate;
-    /* CIF state (715, 102), (70, 35) */
-    state Finish;
+    /* CIF state (510, 85), (70, 35) */
+    state Wait;
+        /* CIF input (494, 140), (98, 35) */
+        input Pong(param);
+            /* CIF decision (434, 195), (218, 50) */
+            decision param > 10.49 and param < 10.51;
+                /* CIF ANSWER (465, 265), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (465, 308), (70, 35) */
+                    NEXTSTATE Finish;
+                /* CIF ANSWER (555, 265), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (555, 308), (70, 35) */
+                    NEXTSTATE Failure;
+            enddecision;
     endstate;
 endprocess Controller;

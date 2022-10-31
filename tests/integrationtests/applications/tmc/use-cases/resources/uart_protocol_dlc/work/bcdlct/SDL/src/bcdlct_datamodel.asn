@@ -7,13 +7,14 @@ IMPORTS
    T-UART-DLC-FrameBuffer, T-UART-DLC-Header, T-UART-DLC-FrameCRC, T-UART-DLC-SDU, T-UART-DLC-PDU, T-UART-DLC-RxErrorCode, T-RMAPCRCTable FROM UART-DLC
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Bcdlct-States ::= ENUMERATED {idle, transmitting}
+Bcdlct-States ::= ENUMERATED {transmitting, idle}
 
 Bcdlct-Context ::= SEQUENCE {
    state Bcdlct-States,
    init-done BOOLEAN,
+   sender PID,
    txsdu T-UART-DLC-SDU,
    txpdu T-UART-DLC-PDU,
    txcount UINT8,
