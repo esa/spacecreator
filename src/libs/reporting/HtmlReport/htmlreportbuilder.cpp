@@ -106,8 +106,6 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
     const TraceBuilder traceBuilder;
     const auto trailsHtml = traceBuilder.buildTraceReport(spinErrorReportItem.trails);
 
-    qDebug() << trailsHtml;
-
     QVariantHash variantHash;
     variantHash.insert("errorNumber", spinErrorReportItem.errorNumber);
     variantHash.insert("errorDepth", spinErrorReportItem.errorDepth);
