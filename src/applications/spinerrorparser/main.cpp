@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
+    auto reports = parser.parse(rawErrors);
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;
@@ -215,9 +215,9 @@ int main(int argc, char *argv[])
     QString htmlReport;
     const HtmlReportBuilder htmlReportBuilder;
     if (templateFile.has_value()) {
-        htmlReport = htmlReportBuilder.buildHtmlReport(reports, trailsHtml, templateFile.value());
+        htmlReport = htmlReportBuilder.buildHtmlReport(reports, templateFile.value());
     } else {
-        htmlReport = htmlReportBuilder.buildHtmlReport(reports, trailsHtml);
+        htmlReport = htmlReportBuilder.buildHtmlReport(reports);
     }
 
     QFile file(targetFile.value());

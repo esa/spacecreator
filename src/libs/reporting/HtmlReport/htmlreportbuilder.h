@@ -21,6 +21,7 @@
 
 #include <QSharedPointer>
 #include <QString>
+#include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorreportitem.h>
 #include <reporting/Report/stopconditionviolationreport.h>
 
@@ -50,8 +51,7 @@ public:
      * @param   sclConditions    SCL file conditions
      * @param   trails           Parsed trail file contents
      */
-    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &spinTraces,
-            const QStringList &sclConditions, const QStringList &trails) const;
+    QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const;
 
     /**
      * @brief   Parse and build report using a default template file embedded into the library
@@ -62,8 +62,7 @@ public:
      * @param   trails           Parsed trail file contents
      * @param   templateFile     Path to the HTML template file
      */
-    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &spinTraces,
-            const QStringList &sclConditions, const QStringList &trails, const QString &templateFile) const;
+    QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors, const QString &templateFile) const;
 
     /**
      * @brief   Build spin error report using a default template file embedded into the library
@@ -73,7 +72,7 @@ public:
      *
      * @return  Error report in an HTML document format
      */
-    QString buildHtmlReport(const SpinErrorReport &spinErrorReport, const QStringList &trails) const;
+    QString buildHtmlReport(const SpinErrorReport &spinErrorReport) const;
 
     /**
      * @brief   Build spin error report using a custom template file
@@ -84,8 +83,7 @@ public:
      *
      * @return  Error report in an HTML document format
      */
-    QString buildHtmlReport(
-            const SpinErrorReport &spinErrorReport, const QStringList &trails, const QString &templateFile) const;
+    QString buildHtmlReport(const SpinErrorReport &spinErrorReport, const QString &templateFile) const;
 
 private:
     Grantlee::Engine *m_engine = nullptr;

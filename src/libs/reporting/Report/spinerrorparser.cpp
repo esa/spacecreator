@@ -25,39 +25,28 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QList<reporti
 {
     reporting::SpinErrorReport report;
     for (auto rawError : rawErrors) {
-        report.append(parse(rawError.spinMessages, rawError.spinTraces, rawError.sclConditions));
+        report.append(parse(rawError));
     }
     return report;
 }
 
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(
-        const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const
-{
-    reporting::SpinErrorReport report;
-    // find number of elements
-    int elementCount = qMin(spinMessages.size(), qMin(spinTraces.size(), sclConditions.size()));
-    for (int i = 0; i < elementCount; ++i) {
-        report.append(parse(spinMessages[i], spinTraces[i], sclConditions[i]));
-    }
-    return report;
-}
-
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(
-        const QString &spinMessage, const QString &spinTraces, const QString &sclConditions) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(const RawErrorItem &rawError) const
 {
     reporting::SpinErrorReport report;
     // parse variable violations
-    QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
+    QRegularExpressionMatchIterator matches = matchSpinErrors(rawError.spinMessages);
     while (matches.hasNext()) {
         auto reportItem = buildDataConstraintViolationReportItem(matches.next());
+        reportItem.trails = rawError.trails;
         // verify if item is valid
         if (!qvariant_cast<DataConstraintViolationReport>(reportItem.parsedErrorDetails).functionName.isEmpty()) {
             report.append(reportItem);
         }
     }
-    if (!spinTraces.isEmpty() && spinTraces.trimmed() != m_spinNoTrailFileMessage) {
+    if (!rawError.spinTraces.isEmpty() && rawError.spinTraces.trimmed() != m_spinNoTrailFileMessage) {
         // parse stop condition violation
-        auto reportItem = buildStopConditionViolationReportItem(sclConditions);
+        auto reportItem = buildStopConditionViolationReportItem(rawError.sclConditions);
+        reportItem.trails = rawError.trails;
         report.append(reportItem);
     }
     return report;

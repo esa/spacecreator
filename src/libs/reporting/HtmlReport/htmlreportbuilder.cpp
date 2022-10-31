@@ -35,31 +35,28 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
     m_engine->addTemplateLoader(m_fileLoader);
 }
 
-QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
-        const QStringList &spinTraces, const QStringList &sclConditions, const QStringList &trails) const
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const
 {
     initResource();
-    return parseAndBuildHtmlReport(spinMessages, spinTraces, sclConditions, trails, m_defaultTemplateFile);
+    return parseAndBuildHtmlReport(rawErrors, m_defaultTemplateFile);
 }
 
-QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
-        const QStringList &spinTraces, const QStringList &sclConditions, const QStringList &trails,
-        const QString &templateFile) const
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(
+        const QList<RawErrorItem> &rawErrors, const QString &templateFile) const
 {
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
-    return buildHtmlReport(reports, trails, templateFile);
+    auto reports = parser.parse(rawErrors);
+    return buildHtmlReport(reports, templateFile);
 }
 
-QString reporting::HtmlReportBuilder::buildHtmlReport(
-        const reporting::SpinErrorReport &spinErrorReport, const QStringList &trails) const
+QString reporting::HtmlReportBuilder::buildHtmlReport(const reporting::SpinErrorReport &spinErrorReport) const
 {
     initResource();
-    return buildHtmlReport(spinErrorReport, trails, m_defaultTemplateFile);
+    return buildHtmlReport(spinErrorReport, m_defaultTemplateFile);
 }
 
 QString reporting::HtmlReportBuilder::buildHtmlReport(
-        const SpinErrorReport &spinErrorReport, const QStringList &trails, const QString &templateFile) const
+        const SpinErrorReport &spinErrorReport, const QString &templateFile) const
 {
     // get absolute path for template file
     const QFileInfo templateFileInfo(templateFile);
@@ -72,7 +69,6 @@ QString reporting::HtmlReportBuilder::buildHtmlReport(
 
     QVariantHash mapping;
     mapping.insert("report", reportVariantList);
-    mapping.insert("trails", trails);
 
     Grantlee::Context context(mapping);
     const auto html = stringTemplate->render(&context);

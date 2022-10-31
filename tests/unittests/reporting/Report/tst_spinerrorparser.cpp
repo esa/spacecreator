@@ -23,6 +23,7 @@
 #include <QList>
 #include <QtTest>
 #include <reporting/Report/dataconstraintviolationreport.h>
+#include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorparser.h>
 
 using namespace reporting;
@@ -46,12 +47,15 @@ void tst_SpinErrorParser::testNoError()
 {
     // read message file
     const QString filepath("resources/spin_no_error_output.txt");
-    const QString spinMessage = readFile(filepath);
-    const QString spinTraces = QString();
-    const QString sclConditions = QString();
+
+    RawErrorItem rawError;
+    rawError.spinMessages = readFile(filepath);
+    rawError.spinTraces = QString();
+    rawError.sclConditions = QString();
+    rawError.trails = QString();
 
     const SpinErrorParser parser;
-    const SpinErrorReport errorReport = parser.parse(spinMessage, spinTraces, sclConditions);
+    const SpinErrorReport errorReport = parser.parse(rawError);
 
     QVERIFY(errorReport.size() == 0);
 }
@@ -60,12 +64,15 @@ void tst_SpinErrorParser::testViolationVariableType()
 {
     // read message file
     const QString filepath("resources/spin_error_output.txt");
-    const QString spinMessage = readFile(filepath);
-    const QString spinTraces = QString();
-    const QString sclConditions = QString();
+
+    RawErrorItem rawError;
+    rawError.spinMessages = readFile(filepath);
+    rawError.spinTraces = QString();
+    rawError.sclConditions = QString();
+    rawError.trails = QString();
 
     const SpinErrorParser parser;
-    const auto errorReport = parser.parse(spinMessage, spinTraces, sclConditions);
+    const auto errorReport = parser.parse(rawError);
     QVERIFY(errorReport.size() == 1);
 
     const auto errorReportItem = errorReport.at(0);
@@ -86,12 +93,15 @@ void tst_SpinErrorParser::testNestedVariable()
 {
     // read message file
     const QString filepath("resources/spin_error_nested_output.txt");
-    const QString spinMessage = readFile(filepath);
-    const QString spinTraces = QString();
-    const QString sclConditions = QString();
+
+    RawErrorItem rawError;
+    rawError.spinMessages = readFile(filepath);
+    rawError.spinTraces = QString();
+    rawError.sclConditions = QString();
+    rawError.trails = QString();
 
     const SpinErrorParser parser;
-    const auto errorReport = parser.parse(spinMessage, spinTraces, sclConditions);
+    const auto errorReport = parser.parse(rawError);
     QVERIFY(errorReport.size() == 1);
 
     const auto errorReportItem = errorReport.at(0);
