@@ -237,6 +237,15 @@ def build_asn1scc_language_server(env_dir: str) -> None:
         exit(7)
 
 
+def install_python_language_server() -> None:
+    pip_cmd = ["python3", "-m", "pip", "install", "'python-lsp-server[all]'", "--user"]
+    print_cmd(pip_cmd)
+    completed_process = subprocess.run(pip_cmd)
+    if not completed_process.returncode == 0:
+        print("prebuild.py: Could not install python-lsp-server")
+        exit(1)
+
+
 def copy_additional_qt_modules(env_qt_dir: str, app_dir: str):
     if not os.path.exists(env_qt_dir):
         print("prebuild.py: Could not find env qt dir: {}". format(env_qt_dir))
@@ -357,6 +366,8 @@ if __name__ == '__main__':
     download_qt(paths.env_qt_install_dir, qt_version)
     download_qtcreator(env_dir, qtcreator_version, app_dir, is_qt6)
     copy_additional_qt_modules(paths.env_qt_dir, app_dir)
+
+    install_python_language_server()
 
     # Grant Lee Template Library
     download_grantlee(env_dir)
