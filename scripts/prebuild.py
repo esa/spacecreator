@@ -201,52 +201,35 @@ def download_asn1scc(env_dir: str) -> None:
     """
     Downloads asn1scc archive. In the build step it will we compiled into the asn1scc-fuzzer executable
     :param env_dir: The dir in which asn1scc is extracted
-    :return:
     """
     asn_url = "https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2"
-    asn1scc_url = "https://github.com/ttsiodras/asn1scc/releases/download/4.3.1.3/asn1scc-bin-4.3.1.3.tar.bz2"
-    ans_tarbz2 = join_dir(env_dir, 'asn1scc-bin-4.2.4.7f.tar.bz2')
-    print('prebuild.py: Downloading {} to {}'.format(asn_url, ans_tarbz2))
+    asn_tarbz2 = join_dir(env_dir, 'asn1scc-bin-4.2.4.7f.tar.bz2')
+    print('prebuild.py: Downloading {} to {}'.format(asn_url, asn_tarbz2))
     try:
-        urllib.request.urlretrieve(asn_url, ans_tarbz2)  # download qtcreator.7z to the root of the env folder
+        urllib.request.urlretrieve(asn_url, asn_tarbz2)  # download qtcreator.7z to the root of the env folder
     except:
         print("prebuild.py: Could not download asn1scc from {}".format(asn_url))
         exit(4)
-    print('prebuild.py: Extracting {} to {}'.format(ans_tarbz2, env_dir))
-    with tarfile.open(ans_tarbz2, 'r:bz2') as ans_tarbz2_file:
-        ans_tarbz2_file.extractall(env_dir)
+    print('prebuild.py: Extracting {} to {}'.format(asn_tarbz2, env_dir))
+    with tarfile.open(asn_tarbz2, 'r:bz2') as asn_tarbz2_file:
+        asn_tarbz2_file.extractall(env_dir)
 
 
-def build_asn1scc_language_server(env_dir: str) -> None:
-    makefile = join_dir(env_dir, 'Makefile.debian')
-    if not os.path.exists(makefile):
-        print("prebuild.py: No Makefile.debian found in {}".format(makefile))
-        exit(5)
-    make_cmd = ['make', '-f', makefile]
-    print('prebuild.py: Building Language Server')
-    print_cmd(make_cmd)
-    completed_process = subprocess.run(make_cmd)
-    if not completed_process.returncode == 0:
-        print("prebuild.py: Could build asn1scc")
-        exit(6)
-    server = join_dir(env_dir, 'asn1scc', 'lsp', 'Server', 'Server', 'bin', 'Release', 'net6.0', 'Server')
-    if os.path.exists(server):
-        print("prebuild.py: Successfully build {}".format(server))
-    else:
-        print("prebuild.py: Failed building language server. File not build: {}", server)
-        exit(7)
+def download_asn1scc_language_server() -> None:
+    url = "https://github.com/ttsiodras/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
+    asn1cc_lsp_tarbz2 = join_dir(env_dir, 'asn1scc-lsp.tar.bz2')
+    print('prebuild.py: Downloading {} to {}'.format(url, asn1cc_lsp_tarbz2))
+    try:
+        urllib.request.urlretrieve(url, asn1cc_lsp_tarbz2)  # download qtcreator.7z to the root of the env folder
+    except:
+        print("prebuild.py: Could not download asn1scc language server from {}".format(url))
+        exit(4)
+    print('prebuild.py: Extracting {} to {}'.format(asn1cc_lsp_tarbz2, env_dir))
+    with tarfile.open(asn1cc_lsp_tarbz2, 'r:bz2') as ans_lsp_tarbz2_file:
+        ans_lsp_tarbz2_file.extractall(env_dir)
 
 
-def install_python_language_server() -> None:
-    pip_cmd = ["python3", "-m", "pip", "install", "'python-lsp-server[all]'", "--user"]
-    print_cmd(pip_cmd)
-    completed_process = subprocess.run(pip_cmd)
-    if not completed_process.returncode == 0:
-        print("prebuild.py: Could not install python-lsp-server")
-        exit(1)
-
-
-def copy_additional_qt_modules(env_qt_dir: str, app_dir: str):
+def copy_additional_qt_modules(env_qt_dir: str, app_dir: str) -> None:
     if not os.path.exists(env_qt_dir):
         print("prebuild.py: Could not find env qt dir: {}". format(env_qt_dir))
         exit(1)
@@ -367,7 +350,7 @@ if __name__ == '__main__':
     download_qtcreator(env_dir, qtcreator_version, app_dir, is_qt6)
     copy_additional_qt_modules(paths.env_qt_dir, app_dir)
 
-    install_python_language_server()
+    download_asn1scc_language_server()
 
     # Grant Lee Template Library
     download_grantlee(env_dir)
