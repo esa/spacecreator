@@ -32,12 +32,13 @@ void tst_HtmlReportBuilder::testNoError()
     const QString spinMessagePath("resources/spin_no_error_output.txt");
     const QString htmlTemplatePath("resources/template.html");
     const QString htmlResultPath("resources/result_empty.html");
+    const QString scenario("resources/scenario.sim");
 
     RawErrorItem rawError;
     rawError.spinMessages = readFile(spinMessagePath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = QString();
+    rawError.trails = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -53,12 +54,13 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
     const QString spinMessagePath("resources/spin_error_output.txt");
     const QString htmlTemplatePath("resources/template.html");
     const QString htmlResultPath("resources/result_error.html");
+    const QString scenario("resources/scenario.sim");
 
     RawErrorItem rawError;
     rawError.spinMessages = readFile(spinMessagePath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = QString();
+    rawError.trails = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -66,6 +68,11 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
 
     const HtmlReportBuilder htmlReportBuilder;
     const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+
+    QFile file("/home/taste/result_dcv.html");
+    file.open(QFile::WriteOnly);
+    file.write(html.toUtf8());
+    file.close();
 
     QVERIFY(html == htmlResult);
 }
@@ -75,12 +82,13 @@ void tst_HtmlReportBuilder::testDataConstraintViolationNested()
     const QString spinMessagePath("resources/spin_nested_error_output.txt");
     const QString htmlTemplatePath("resources/template.html");
     const QString htmlResultPath("resources/result_nested.html");
+    const QString scenario("resources/scenario.sim");
 
     RawErrorItem rawError;
     rawError.spinMessages = readFile(spinMessagePath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = QString();
+    rawError.trails = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -98,12 +106,13 @@ void tst_HtmlReportBuilder::testStopConditionViolationEmpty()
     const QString spinSclConditionsPath("resources/spin_scv_empty_scl.txt");
     const QString htmlTemplatePath("resources/template.html");
     const QString htmlResultPath("resources/result_scv_empty.html");
+    const QString scenario("resources/scenario.sim");
 
     RawErrorItem rawError;
     rawError.spinMessages = readFile(spinMessagePath);
-    rawError.spinTraces = QString();
-    rawError.sclConditions = QString();
-    rawError.trails = QString();
+    rawError.spinTraces = readFile(spinTracesPath);
+    rawError.sclConditions = readFile(spinSclConditionsPath);
+    rawError.trails = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -121,12 +130,13 @@ void tst_HtmlReportBuilder::testStopConditionViolationGetState()
     const QString spinSclConditionsPath("resources/spin_scv_get_state_scl.txt");
     const QString htmlTemplatePath("resources/template.html");
     const QString htmlResultPath("resources/result_scv_get_state.html");
+    const QString scenario("resources/scenario.sim");
 
     RawErrorItem rawError;
     rawError.spinMessages = readFile(spinMessagePath);
-    rawError.spinTraces = QString();
-    rawError.sclConditions = QString();
-    rawError.trails = QString();
+    rawError.spinTraces = readFile(spinTracesPath);
+    rawError.sclConditions = readFile(spinSclConditionsPath);
+    rawError.trails = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -134,6 +144,11 @@ void tst_HtmlReportBuilder::testStopConditionViolationGetState()
 
     const HtmlReportBuilder htmlReportBuilder;
     const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+
+    QFile file("/home/taste/result_scv_get_state.html");
+    file.open(QFile::WriteOnly);
+    file.write(html.toUtf8());
+    file.close();
 
     QVERIFY(html == htmlResult);
 }

@@ -28,7 +28,7 @@ namespace Report::test {
 void tst_TraceBuilder::testSingleLineMessage()
 {
     const QString message("Sample Message");
-    const QString target("<span style=\"white-space: pre-wrap;\">Sample Message</span>");
+    const QString target("Sample Message");
 
     const TraceBuilder traceBuilder;
     const QString converted = traceBuilder.buildTraceReport(message);
@@ -38,7 +38,7 @@ void tst_TraceBuilder::testSingleLineMessage()
 void tst_TraceBuilder::testMultiLineMessage()
 {
     const QString message("Sample\nMessage");
-    const QString target("<span style=\"white-space: pre-wrap;\">Sample\n<br>Message</span>");
+    const QString target("Sample\nMessage");
 
     const TraceBuilder traceBuilder;
     const QString converted = traceBuilder.buildTraceReport(message);
@@ -48,7 +48,7 @@ void tst_TraceBuilder::testMultiLineMessage()
 void tst_TraceBuilder::testHtmlEntities()
 {
     const QString message("Sample & <b>Message</b>");
-    const QString target("<span style=\"white-space: pre-wrap;\">Sample &amp; &lt;b&gt;Message&lt;/b&gt;</span>");
+    const QString target("Sample & <b>Message</b>");
 
     const TraceBuilder traceBuilder;
     const QString converted = traceBuilder.buildTraceReport(message);
@@ -58,7 +58,7 @@ void tst_TraceBuilder::testHtmlEntities()
 void tst_TraceBuilder::testTabulators()
 {
     const QString message("Sample\t\tMessage");
-    const QString target("<span style=\"white-space: pre-wrap;\">Sample&Tab;&Tab;Message</span>");
+    const QString target("Sample&Tab;&Tab;Message");
 
     const TraceBuilder traceBuilder;
     const QString converted = traceBuilder.buildTraceReport(message);
