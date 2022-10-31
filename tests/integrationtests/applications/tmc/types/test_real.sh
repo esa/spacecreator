@@ -46,4 +46,3 @@ cd $TEST_OUTPUT_DIR \
     && cd ..
 
 rm -rf $TEST_OUTPUT_DIR
-mkdir $TEST_OUTPUT_DIR

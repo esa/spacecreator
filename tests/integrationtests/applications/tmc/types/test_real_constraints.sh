@@ -17,7 +17,6 @@ echo "Running TMC test: ${0##*/}"
 rm -rf $TEST_OUTPUT_DIR
 mkdir $TEST_OUTPUT_DIR
 
-# Translate
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -scl $PROPERTIES_DIR/StopConditions/Overflow.scl \
     -o $TEST_OUTPUT_DIR \
@@ -28,8 +27,7 @@ cd $TEST_OUTPUT_DIR \
     && $CC -o system.out pan.c \
     && ./system.out -m1000000 -a -n > system.output \
     && grep -q "errors: 1" system.output \
-    && grep -q "assertion violated  !(((global_state.controller.param>=" system.output \
+    && grep -q "assertion violated ((global_state.controller.param>=" system.output \
     && cd ..
 
 rm -rf $TEST_OUTPUT_DIR
-mkdir $TEST_OUTPUT_DIR
