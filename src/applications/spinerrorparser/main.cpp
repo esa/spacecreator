@@ -31,6 +31,7 @@
 #include <reporting/HtmlReport/htmlreportbuilder.h>
 #include <reporting/HtmlReport/tracebuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
+#include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorparser.h>
 #include <string.h>
 
@@ -156,6 +157,22 @@ int main(int argc, char *argv[])
             qCritical("Unable to open trail file");
             exit(EXIT_FAILURE);
         }
+    }
+
+    // build struct with raw errors
+    QList<RawErrorItem> rawErrors;
+    const auto spinMessagesSize = spinMessages.size();
+    const auto spinTracesSize = spinTraces.size();
+    const auto sclConditionsSize = sclConditions.size();
+    const auto trailsSize = trailFiles.size();
+    const auto minSize = qMin(qMin(spinMessagesSize, spinTracesSize), qMin(sclConditionsSize, trailsSize));
+    for (int i = 0; i < minSize; ++i) {
+        RawErrorItem rawError;
+        rawError.spinMessages = spinMessages[i];
+        rawError.spinTraces = spinTraces[i];
+        rawError.sclConditions = sclConditions[i];
+        rawError.trails = trailFiles[i];
+        rawErrors.append(rawError);
     }
 
     // parse message

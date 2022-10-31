@@ -21,6 +21,15 @@
 
 #include <QRegularExpression>
 
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QList<reporting::RawErrorItem> rawErrors) const
+{
+    reporting::SpinErrorReport report;
+    for (auto rawError : rawErrors) {
+        report.append(parse(rawError.spinMessages, rawError.spinTraces, rawError.sclConditions));
+    }
+    return report;
+}
+
 reporting::SpinErrorReport reporting::SpinErrorParser::parse(
         const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const
 {

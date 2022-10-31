@@ -20,6 +20,7 @@
 #pragma once
 
 #include "dataconstraintviolationreport.h"
+#include "rawerroritem.h"
 #include "spinerrorreportitem.h"
 #include "stopconditionviolationreport.h"
 
@@ -76,6 +77,8 @@ public:
      * @brief   Constructor
      */
     SpinErrorParser() = default;
+
+    SpinErrorReport parse(const QList<RawErrorItem> rawErrors) const;
 
     /**
      * @brief   Parse multiple spin messages
