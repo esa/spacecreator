@@ -41,6 +41,12 @@ public:
         BreadthFirst,
     };
 
+    enum class ExecuteMode
+    {
+        ConvertOnly,
+        ConvertAndVerify,
+    };
+
 public:
     /**
      * @brief Constructor.
@@ -140,7 +146,7 @@ public:
      * @param onlyConvert if true, only convert model to promela - do not process verification
      * @return true if whole process succed, otherwise false
      */
-    bool execute(bool onlyConvert = false);
+    bool execute(ExecuteMode executeMode);
 
 Q_SIGNALS:
     void verifierMessage(QString text);
@@ -192,7 +198,7 @@ private:
     std::optional<int> m_memoryLimit;
     QString m_rawCommandline;
 
-    bool m_onlyConvert;
+    ExecuteMode m_executeMode;
     QProcess *m_process;
     QProcess *m_verifierProcess;
     QProcess *m_traceGeneratorProcess;

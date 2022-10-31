@@ -134,7 +134,7 @@ void SpinRunWorker::run()
     connect(m_verifier.get(), SIGNAL(finished(bool)), this, SIGNAL(jobFinished(bool)));
     connect(m_verifier.get(), SIGNAL(finished(bool)), &loop, SLOT(quit()), Qt::QueuedConnection);
 
-    m_verifier->execute(false);
+    m_verifier->execute(TmcVerifier::ExecuteMode::ConvertAndVerify);
 
     loop.exec();
     qDebug() << "Worker thread finished\n";

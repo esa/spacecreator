@@ -102,7 +102,7 @@ void SpinRunDialog::workerTextAvailable(QString text)
 void SpinRunDialog::workerFinished(bool success)
 {
     if (success) {
-        m_browser->append("Finished.");
+        m_browser->append("FINISHED.");
         m_browser->moveCursor(QTextCursor::MoveOperation::End);
     } else {
         m_browser->append("FAILURE.");

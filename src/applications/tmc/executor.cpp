@@ -309,7 +309,8 @@ void TmcExecutor::execute()
         }
     }
 
-    if (m_verifier->execute(!verify)) {
+    if (m_verifier->execute(
+                verify ? TmcVerifier::ExecuteMode::ConvertAndVerify : TmcVerifier::ExecuteMode::ConvertOnly)) {
         return;
     } else {
         QCoreApplication::exit(EXIT_FAILURE);

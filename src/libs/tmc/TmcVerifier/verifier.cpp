@@ -36,7 +36,7 @@ TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDi
     , m_searchShortestPath(false)
     , m_useFairScheduling(false)
     , m_useBitHashing(false)
-    , m_onlyConvert(false)
+    , m_executeMode(ExecuteMode::ConvertAndVerify)
     , m_process(new QProcess(this))
     , m_verifierProcess(new QProcess(this))
     , m_traceGeneratorProcess(new QProcess(this))
@@ -169,10 +169,10 @@ void TmcVerifier::setRawCommandline(QString rawCommandline)
     m_rawCommandline = rawCommandline;
 }
 
-bool TmcVerifier::execute(bool onlyConvert)
+bool TmcVerifier::execute(ExecuteMode executeMode)
 {
     Q_EMIT verifierMessage(QString("Starting conversion.\n"));
-    m_onlyConvert = onlyConvert;
+    m_executeMode = executeMode;
     if (!m_converter->prepare()) {
         return false;
     }
@@ -498,7 +498,7 @@ void TmcVerifier::traceStdoutReady()
 void TmcVerifier::conversionFinished(bool success)
 {
     if (success) {
-        if (m_onlyConvert) {
+        if (m_executeMode == ExecuteMode::ConvertOnly) {
             Q_EMIT(finished(true));
         } else {
             buildVerifier();
