@@ -80,24 +80,24 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
     QRegularExpression continuousSignalValidation(R"(^ *process continuous signals in (\w+)$)");
     QRegularExpressionMatch match = continuousSignalValidation.match(line);
     if (match.hasMatch()) {
-        const QString functionName = match.captured(1);
+        const QString functionName = match.captured(CONTINUOUS_SIGNAL_EVENT_FUNCTION_NAME);
         model.appendEvent(std::make_unique<ContinuousSignal>(functionName));
         return;
     }
     QRegularExpression setTimerEventValidation(R"(^ *set_timer (\w+) (\w+) (\d+)$)");
     match = setTimerEventValidation.match(line);
     if (match.hasMatch()) {
-        const QString functionName = match.captured(1);
-        const QString interfaceName = match.captured(2);
-        size_t interval = match.captured(3).toULong();
+        const QString functionName = match.captured(SET_TIMER_EVENT_FUNCTION_NAME);
+        const QString interfaceName = match.captured(SET_TIMER_EVENT_INTERFACE_NAME);
+        size_t interval = match.captured(SET_TIMER_EVENT_INTERVAL).toULong();
         model.appendEvent(std::make_unique<SetTimerEvent>(functionName, interfaceName, interval));
         return;
     }
     QRegularExpression resetTimerEventValidation(R"( *reset_timer (\w+) (\w+))");
     match = resetTimerEventValidation.match(line);
     if (match.hasMatch()) {
-        const QString functionName = match.captured(1);
-        const QString interfaceName = match.captured(2);
+        const QString functionName = match.captured(RESET_TIMER_EVENT_FUNCTION_NAME);
+        const QString interfaceName = match.captured(RESET_TIMER_EVENT_INTERFACE_NAME);
         model.appendEvent(std::make_unique<ResetTimerEvent>(functionName, interfaceName));
         return;
     }
@@ -118,18 +118,18 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
     // channel name is enclosed by '(' and ')'
     QRegularExpression channelValidation(R"(\((\w+)\))");
 
-    QRegularExpressionMatch eventMatch = eventValidation.match(elements[0]);
+    QRegularExpressionMatch eventMatch = eventValidation.match(elements[CHANNEL_EVENT_VALIDATION_PART]);
 
     if (eventMatch.hasMatch()) {
-        QRegularExpressionMatch commandMatch = commandValidation.match(elements[1]);
-        QRegularExpressionMatch channelMatch = channelValidation.match(elements[2]);
+        QRegularExpressionMatch commandMatch = commandValidation.match(elements[CHANNEL_EVENT_COMMAND_PART]);
+        QRegularExpressionMatch channelMatch = channelValidation.match(elements[CHANNEL_EVENT_CHANNEL_PART]);
         if (commandMatch.hasMatch() && channelMatch.hasMatch()) {
-            const QString proctypeString = commandMatch.captured(1);
+            const QString proctypeString = commandMatch.captured(CHANNEL_EVENT_PROCTYPE_NAME);
             QString proctypeName = proctypeString.split(':').front();
-            const QString commandString = commandMatch.captured(2);
+            const QString commandString = commandMatch.captured(CHANNEL_EVENT_COMMAND_STRING);
             const QString command = commandString.split(' ').front();
             QStringList parameters = commandString.split(' ').back().split(',');
-            QString channelName = channelMatch.captured(1);
+            QString channelName = channelMatch.captured(CHANNEL_EVENT_CHANNEL_NAME);
             const ChannelEvent::Type eventType = command.compare("recv", Qt::CaseInsensitive) == 0
                     ? ChannelEvent::Type::Recv
                     : ChannelEvent::Type::Send;
