@@ -303,6 +303,11 @@ bool TmcConverter::addStopConditionFiles(const QStringList &files)
     return true;
 }
 
+const QStringList &TmcConverter::getStopConditionFiles() const
+{
+    return m_stopConditionsFiles;
+}
+
 bool TmcConverter::attachObserver(const QString &observerPath, const uint32_t priority)
 {
     m_observerInfos.emplace_back(ObserverInfo(observerPath, priority));

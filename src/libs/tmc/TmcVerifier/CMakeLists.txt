@@ -16,8 +16,9 @@ target_include_directories(TmcVerifier
 target_link_libraries(TmcVerifier
     PUBLIC     Conversion::Common
                Tmc::Converter
+               Tmc::HtmlReport
                ${QT_CORE}
-	PRIVATE    CommonProjectWarnings)
+    PRIVATE    CommonProjectWarnings)
 
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_autogen/mocs_compilation.cpp PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
 

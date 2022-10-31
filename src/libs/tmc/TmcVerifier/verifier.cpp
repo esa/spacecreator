@@ -23,7 +23,9 @@
 #include <QDirIterator>
 #include <QRegularExpression>
 #include <QTimer>
+#include <reporting/HtmlReport/htmlreportbuilder.h>
 
+using reporting::HtmlReportBuilder;
 using tmc::converter::TmcConverter;
 
 namespace tmc::verifier {
@@ -120,7 +122,7 @@ void TmcVerifier::setExplorationMode(ExplorationMode mode)
 
 void TmcVerifier::setSearchShortestPath(bool enabled)
 {
-    m_searchStateLimit = enabled;
+    m_searchShortestPath = enabled;
 }
 
 void TmcVerifier::setUseFairScheduling(bool enabled)
@@ -344,12 +346,13 @@ void TmcVerifier::generateTraces(int count)
         iter.next();
         QString file = iter.fileName();
         qDebug() << "Adding " << file;
-        m_trailFiles.append(file);
+        m_trailFilesToConvert.append(file);
     }
 
-    if (m_trailFiles.size() != count) {
-        Q_EMIT verifierMessage(
-                QString("Expected number of trail files: %1, but found %2\n").arg(count).arg(m_trailFiles.size()));
+    if (m_trailFilesToConvert.size() != count) {
+        Q_EMIT verifierMessage(QString("Expected number of trail files: %1, but found %2\n")
+                                       .arg(count)
+                                       .arg(m_trailFilesToConvert.size()));
     }
 
     generateNextTrace();
@@ -357,13 +360,13 @@ void TmcVerifier::generateTraces(int count)
 
 void TmcVerifier::generateNextTrace()
 {
-    if (m_trailFiles.isEmpty()) {
-        Q_EMIT finished(true);
+    if (m_trailFilesToConvert.isEmpty()) {
+        generateReport();
         return;
     }
 
-    QString trailFile = m_trailFiles.front();
-    m_trailFiles.pop_front();
+    QString trailFile = m_trailFilesToConvert.front();
+    m_trailFilesToConvert.pop_front();
 
     qDebug() << "Write to " << m_currentTraceFile;
     m_currentTraceFile = m_outputDirectory + QDir::separator() + QString("trace_%1.spt").arg(m_trailCounter);
@@ -384,6 +387,46 @@ void TmcVerifier::generateNextTrace()
     m_timer->setSingleShot(true);
     m_timer->start(m_startTimeout);
     m_traceGeneratorProcess->start(spinExe, arguments);
+}
+
+void TmcVerifier::generateReport()
+{
+    Q_EMIT verifierMessage(QString("Generating report\n"));
+    HtmlReportBuilder builder;
+
+    QString outputFilepath = m_outputDirectory + QDir::separator() + "pan.output";
+
+    QStringList spinMessages;
+    spinMessages.append(outputFilepath);
+
+    QStringList sclFiles = m_converter->getStopConditionFiles();
+
+    QString report = builder.parseAndBuildHtmlReport(spinMessages, m_spinTraceFiles, sclFiles);
+
+    saveReport(report);
+
+    Q_EMIT finished(true);
+}
+
+void TmcVerifier::saveReport(const QString &data)
+{
+    QFileInfo reportFilepath = m_outputDirectory + QDir::separator() + "report.html";
+
+    Q_EMIT verifierMessage(QString("Generated %1 chars\n").arg(data.length()));
+
+    QFile file(reportFilepath.absoluteFilePath());
+    file.open(QIODevice::WriteOnly);
+    if (!file.isOpen()) {
+        Q_EMIT verifierMessage(QString("Cannot open %1\n").arg(file.errorString()));
+    }
+    QByteArray buffer = data.toUtf8();
+    qint64 bytesWritten = file.write(buffer);
+    if (bytesWritten != data.size()) {
+        Q_EMIT verifierMessage(QString("write error %1\n").arg(file.errorString()));
+    }
+    file.close();
+
+    Q_EMIT verifierMessage(QString("Report saved to %1\n").arg(reportFilepath.absoluteFilePath()));
 }
 
 void TmcVerifier::processStderrReady()
@@ -555,6 +598,9 @@ void TmcVerifier::traceGeneratorFinished(int exitCode, QProcess::ExitStatus exit
     }
     Q_EMIT verifierMessage(QString("Converting %1 to %2\n").arg(info.fileName()).arg(info.baseName() + ".sim"));
     m_converter->convertTrace(m_currentTraceFile, outputFile);
+
+    m_spinTraceFiles.append(m_currentTraceFile);
+    m_traceFiles.append(outputFile);
 
     generateNextTrace();
 }

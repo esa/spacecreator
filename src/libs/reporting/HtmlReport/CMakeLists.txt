@@ -31,3 +31,4 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/template.html
 add_format_target(HtmlReport)
 add_tidy_target(HtmlReport)
 
+add_library(Tmc::HtmlReport ALIAS HtmlReport)

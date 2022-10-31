@@ -167,6 +167,13 @@ public:
     bool addStopConditionFiles(const QStringList &files);
 
     /**
+     * @brief Getter for stop condition files.
+     *
+     * @return list of stop condition files.
+     */
+    const QStringList &getStopConditionFiles() const;
+
+    /**
      * @brief Attach an Observer
      *
      * @param observerPath Path to the observer process file

@@ -155,6 +155,8 @@ private:
     void collectErrors();
     void generateTraces(int count);
     void generateNextTrace();
+    void generateReport();
+    void saveReport(const QString &data);
 
 private Q_SLOTS:
     void processStderrReady();
@@ -196,8 +198,10 @@ private:
     QProcess *m_traceGeneratorProcess;
     QTimer *m_timer;
 
-    QStringList m_trailFiles;
+    QStringList m_trailFilesToConvert;
     int m_trailCounter;
+    QStringList m_spinTraceFiles;
+    QStringList m_traceFiles;
     QString m_currentTraceFile;
 
     QMetaObject::Connection m_processStartedConnection;
