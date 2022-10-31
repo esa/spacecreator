@@ -204,16 +204,37 @@ def download_asn1scc(env_dir: str) -> None:
     :return:
     """
     asn_url = "https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2"
+    asn1scc_url = "https://github.com/ttsiodras/asn1scc/releases/download/4.3.1.3/asn1scc-bin-4.3.1.3.tar.bz2"
     ans_tarbz2 = join_dir(env_dir, 'asn1scc-bin-4.2.4.7f.tar.bz2')
     print('prebuild.py: Downloading {} to {}'.format(asn_url, ans_tarbz2))
     try:
         urllib.request.urlretrieve(asn_url, ans_tarbz2)  # download qtcreator.7z to the root of the env folder
     except:
-        print("Could not download asn1scc from {}".format(asn_url))
+        print("prebuild.py: Could not download asn1scc from {}".format(asn_url))
         exit(4)
     print('prebuild.py: Extracting {} to {}'.format(ans_tarbz2, env_dir))
     with tarfile.open(ans_tarbz2, 'r:bz2') as ans_tarbz2_file:
         ans_tarbz2_file.extractall(env_dir)
+
+
+def build_asn1scc_language_server(env_dir: str) -> None:
+    makefile = join_dir(env_dir, 'Makefile.debian')
+    if not os.path.exists(makefile):
+        print("prebuild.py: No Makefile.debian found in {}".format(makefile))
+        exit(5)
+    make_cmd = ['make', '-f', makefile]
+    print('prebuild.py: Building Language Server')
+    print_cmd(make_cmd)
+    completed_process = subprocess.run(make_cmd)
+    if not completed_process.returncode == 0:
+        print("prebuild.py: Could build asn1scc")
+        exit(6)
+    server = join_dir(env_dir, 'asn1scc', 'lsp', 'Server', 'Server', 'bin', 'Release', 'net6.0', 'Server')
+    if os.path.exists(server):
+        print("prebuild.py: Successfully build {}".format(server))
+    else:
+        print("prebuild.py: Failed building language server. File not build: {}", server)
+        exit(7)
 
 
 def copy_additional_qt_modules(env_qt_dir: str, app_dir: str):
