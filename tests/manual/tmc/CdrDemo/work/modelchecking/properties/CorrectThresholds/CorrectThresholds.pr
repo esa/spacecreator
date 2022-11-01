@@ -1,0 +1,59 @@
+system CorrectThresholds;
+    /* CIF TEXT (144, 214), (519, 140) */
+    use datamodel comment 'observer.asn';
+    
+    signal tc(SystemCommand) renames output systemTc from EGSE to ModeManager; 
+    /* CIF ENDTEXT */
+    channel c
+        from env to CorrectThresholds with tc;
+        from CorrectThresholds to env with tc;
+    endchannel;
+    block CorrectThresholds;
+        signalroute r
+            from env to CorrectThresholds with tc;
+            from CorrectThresholds to env with tc;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process CorrectThresholds;
+            /* CIF TEXT (13, 57), (222, 140) */
+            monitor st System_State;
+            
+            
+            monitor event Observable_Event;
+            DCL x dataItem;
+            
+            
+            /* CIF ENDTEXT */
+            /* CIF START (280, 58), (70, 35) */
+            START;
+                /* CIF NEXTSTATE (280, 113), (70, 35) */
+                NEXTSTATE Idle;
+            /* CIF state (405, 68), (70, 35) */
+            state Idle;
+                /* CIF input (405, 123), (70, 35) */
+                input tc(cmd);
+                    /* CIF decision (388, 178), (104, 50) */
+                    decision present(cmd);
+                        /* CIF ANSWER (279, 248), (123, 23) */
+                        (goToOperational):
+                            /* CIF decision (128, 291), (424, 50) */
+                            decision cmd.gotoOperational.threshold1 > cmd.gotoOperational.threshold2;
+                                /* CIF ANSWER (179, 361), (70, 23) */
+                                (true):
+                                    /* CIF task (48, 404), (331, 38) */
+                                    task x := cmd.gotoOperational.threshold2,
+cmd := gotoOperational: {threshold1 x, threshold2 x};
+                                /* CIF ANSWER (431, 361), (70, 23) */
+                                else:
+                            enddecision;
+                        /* CIF ANSWER (567, 248), (70, 23) */
+                        else:
+                    enddecision;
+                    /* CIF output (405, 473), (70, 35) */
+                    output tc(cmd);
+                    /* CIF NEXTSTATE (405, 528), (70, 35) */
+                    NEXTSTATE -;
+            endstate;
+        endprocess CorrectThresholds;
+    endblock;
+endsystem;

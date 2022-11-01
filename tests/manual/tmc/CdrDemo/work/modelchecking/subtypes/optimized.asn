@@ -1,0 +1,21 @@
+EGSE-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS Dummy FROM CDRDEMO-DATAVIEW;
+
+OptimizedDataItem ::= INTEGER(10 | 50 | 100)
+
+OptimizedConfiguration ::= SEQUENCE {
+    threshold1 OptimizedDataItem,
+    threshold2 OptimizedDataItem
+}
+
+Egse-systemtc-tc ::= CHOICE {
+    goToIdle Dummy,
+    goToOperational OptimizedConfiguration,
+    doReport Dummy
+}
+
+Sensor-reading-x ::= OptimizedDataItem
+
+END

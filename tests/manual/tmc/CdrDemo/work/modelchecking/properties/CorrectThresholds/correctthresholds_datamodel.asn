@@ -1,0 +1,38 @@
+Correctthresholds-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   Actuator-States, Actuator-Context, Actuator-Systemcommand-Selection FROM Actuator-Datamodel
+   Modemanager-States, Modemanager-Context, Modemanager-Systemcommand-Selection FROM Modemanager-Datamodel
+   Dummy, DataItem, ActuatorIndex, ActuatorCommand, ActuatorStatus, ActuatorConfiguration, SystemCommand, SystemTelemetry FROM CDRDEMO-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview
+   Egse-systemtm-tm, Egse-systemtc-tc FROM EGSE-SUBTYPE
+   Actuator1-Event, Actuator2-Event, Egse-Event, Modemanager-Event, Sensor-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
+   TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
+
+Correctthresholds-States ::= ENUMERATED {idle}
+
+Correctthresholds-Context ::= SEQUENCE {
+   state Correctthresholds-States,
+   init-done BOOLEAN,
+   sender PID,
+   x DataItem
+}
+
+Correctthresholds-Systemcommand-Selection  ::= ENUMERATED {goToIdle-present(1), goToOperational-present(2), doReport-present(3)}
+Correctthresholds-Actuator1-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), actuatortc-present(2)}
+Correctthresholds-Actuator1-Event-Msg-Out-Selection  ::= ENUMERATED {actuatortm-present(1)}
+Correctthresholds-Actuator1-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Correctthresholds-Actuator2-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), actuatortc-present(2)}
+Correctthresholds-Actuator2-Event-Msg-Out-Selection  ::= ENUMERATED {actuatortm-present(1)}
+Correctthresholds-Actuator2-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Correctthresholds-Egse-Event-Msg-In-Selection  ::= ENUMERATED {systemtm-present(1)}
+Correctthresholds-Egse-Event-Msg-Out-Selection  ::= ENUMERATED {systemtc-present(1)}
+Correctthresholds-Egse-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Correctthresholds-Modemanager-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), actuatortm1-present(2), actuatortm2-present(3), reading-present(4), systemtc-present(5)}
+Correctthresholds-Modemanager-Event-Msg-Out-Selection  ::= ENUMERATED {actuatortc1-present(1), actuatortc2-present(2), systemtm-present(3)}
+Correctthresholds-Modemanager-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Correctthresholds-Function-Event-Selection  ::= ENUMERATED {actuator1-present(1), actuator2-present(2), egse-present(3), modemanager-present(4), sensor-present(5)}
+Correctthresholds-Observable-Event-Selection  ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
+END
