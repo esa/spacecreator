@@ -23,18 +23,23 @@
 
 #include <QFileInfo>
 #include <QList>
+#include <QObject>
 #include <QProcess>
 #include <QString>
 #include <QStringList>
+#include <QTimer>
+#include <chrono>
 #include <map>
 
 namespace tmc::converter {
 /**
  * @brief Wrapper class used to run sdl2promela.
  */
-class SdlToPromelaConverter final
+class SdlToPromelaConverter final : public QObject
 {
+    Q_OBJECT
 public:
+    SdlToPromelaConverter(QObject *parent = nullptr);
     /**
      * @brief Convert SDL files into promela file.
      *
@@ -67,12 +72,35 @@ public:
     bool convertStopConditions(const QList<QFileInfo> &inputFiles, const QFileInfo &outputFile,
             const std::map<QString, ProcessMetadata> &inputSdlFiles, bool includeObservers);
 
+Q_SIGNALS:
+    /**
+     * @brief Conversion message.
+     *
+     * @param text message text.
+     */
+    void message(QString text);
+    /**
+     * @brief Conversion was finished.
+     *
+     * @param success true if conversion was successful, otherwise false.
+     */
+    void conversionFinished(bool success);
+
 private:
-    bool startSdl2PromelaProcess(QProcess &process, const QStringList &arguments);
-    bool waitForSdl2PromelaProcess(QProcess &process);
+    void startSdl2PromelaProcess(QProcess &process, const QStringList &arguments);
+
+private Q_SLOTS:
+    void processStderrReady();
+    void processStdoutReady();
+    void processStarted();
+    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void timeout();
 
 private:
     QStringList m_sdl2PromelaArgs;
+    QTimer *m_timer;
+    QProcess *m_process;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_startPoint;
 
     const static QString m_sdl2PromelaCommand;
     constexpr static int m_externalCommandStartTimeout = 45000;

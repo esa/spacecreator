@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="SCL" section="Modeling"
+          version="1" kateversion="2.3"
+          extensions="*.scl"
+          mimetype="text/x-scl"
+          author="N7 Space sp. z o.o."
+          license="GPLv3"
+          >
+    <highlighting>
+        <list name="keywords">
+            <item>never</item>
+            <item>always</item>
+            <item>eventually</item>
+            <item>filter_out</item>
+            <item>or</item>
+            <item>and</item>
+            <item>xor</item>
+            <item>not</item>
+        </list>
+        
+        <list name="functions">
+            <item>get_state</item>
+            <item>empty</item>
+            <item>exist</item>
+            <item>length</item>
+            <item>present</item>
+            <item>queue_last</item>
+            <item>queue_length</item>
+        </list>
+        
+        <list name="builtin">
+            <item>true</item>
+            <item>false</item>
+        </list>
+        
+        <contexts>
+            <context name="Normal Text" attribute="Normal Text" lineEndContext="#stay">
+                <keyword attribute="Keyword"  context="#stay" String="keywords" />
+                <keyword attribute="Function" context="#stay" String="functions" />
+                <keyword attribute="Built In" context="#stay" String="builtin" />
+                <Detect2Chars attribute="Comment" context="Comment" char="-" char1="-" />
+                <AnyChar attribute="Function" String="()" />
+                <AnyChar attribute="Operator" String="=/&lt;&gt;*%+-" />
+                <RegExpr attribute="Decimal"  context="#stay" String="[1-9][0-9]*|0"/>
+            </context>
+            
+            <context attribute="Comment" lineEndContext="#pop" name="Comment" />
+        </contexts>
+        
+        <itemDatas>
+            <itemData name="Normal Text" defStyleNum="dsNormal" />
+            <itemData name="Keyword" defStyleNum="dsKeyword"  bold="1" />
+            <itemData name="Built In" defStyleNum="dsBuiltIn"  bold="1" />
+            <itemData name="Operator" defStyleNum="dsOperator" bold="1" />
+            <itemData name="Function" defStyleNum="dsFunction" bold="1" italic="1" />
+            <itemData name="Decimal" defStyleNum="dsDecVal"   bold="1" />
+            <itemData name="Comment" defStyleNum="dsComment" />
+        </itemDatas>
+        
+        <general>
+            <comments>
+                <comment name="singleLine" start="--"/>
+            </comments>
+            
+            <keywords casesensitive="1" weakDeliminator="-" />
+        </general>
+    </highlighting>
+</language>
