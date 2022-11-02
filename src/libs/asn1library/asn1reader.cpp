@@ -460,11 +460,12 @@ bool Asn1Reader::convertToXML(
         return false;
     }
 
-    // Put together the parameters
+    // Add parameters for output xml file
     QString asn1XMLFileName = temporaryFileName("asn1", "xml");
-    QString asn1FileNamesParameter = createFilenameParameter(asn1FileNames);
-    parameters << asn1XMLFileName << asn1FileNamesParameter;
+    parameters << asn1XMLFileName;
 
+    // Add parameters for asn1 input files
+    parameters << asn1FileNames;
 
     // Setup the process
     QProcess asn1Process;
@@ -499,16 +500,6 @@ bool Asn1Reader::convertToXML(
     QFile::rename(asn1XMLFileName, xmlFilename);
 
     return QFile::exists(xmlFilename);
-}
-
-QString Asn1Reader::createFilenameParameter(const QStringList &asn1FileNames) const
-{
-    QStringList result;
-
-    std::transform(asn1FileNames.begin(), asn1FileNames.end(), std::back_inserter(result),
-            [](const QString &file) { return QString("\"%1\"").arg(file); });
-
-    return result.join(QChar(' '));
 }
 
 void Asn1Reader::parseAsn1SccErrors(QString errorString, QStringList *errorMessages) const
