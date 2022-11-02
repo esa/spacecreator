@@ -255,27 +255,28 @@ void TmcVerifier::executeVerifier()
 
     QStringList arguments;
     if (m_rawCommandline.isEmpty()) {
-        arguments.append("-n");
+        arguments.append("-E"); // suppress the reporting of invalid endstate errors
+        arguments.append("-n"); // no listing of unreached states at the end of the run
 
         if (m_explorationMode != ExplorationMode::BreadthFirst) {
-            arguments.append("-a");
+            arguments.append("-a"); // find acceptance cycles, not available in BFS
         }
 
         if (m_useFairScheduling) {
-            arguments.append("-f");
+            arguments.append("-f"); // add weak fairness
         }
 
         if (m_errorLimit.has_value()) {
-            arguments.append("-e");
-            arguments.append(QString("-c%1").arg(m_errorLimit.value()));
+            arguments.append("-e"); // create trails for all errors encountered
+            arguments.append(QString("-c%1").arg(m_errorLimit.value())); // stop at Nth error
         }
 
         if (m_searchStateLimit.has_value()) {
-            arguments.append(QString("-m%1").arg(m_searchStateLimit.value()));
+            arguments.append(QString("-m%1").arg(m_searchStateLimit.value())); // set max search depth to N steps
         }
 
         if (m_searchShortestPath) {
-            arguments.append("-i");
+            arguments.append("-i"); // search for shortest path to error
         }
 
     } else {
