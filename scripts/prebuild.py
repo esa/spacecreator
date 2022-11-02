@@ -215,6 +215,26 @@ def download_asn1scc(env_dir: str) -> None:
         asn_tarbz2_file.extractall(env_dir)
 
 
+def build_asn1scc_language_server(env_dir: str) -> None:
+    makefile = join_dir(env_dir, 'Makefile.debian')
+    if not os.path.exists(makefile):
+        print("prebuild.py: No Makefile.debian found in {}".format(makefile))
+        exit(5)
+    make_cmd = ['make', '-f', makefile]
+    print('prebuild.py: Building Language Server')
+    print_cmd(make_cmd)
+    completed_process = subprocess.run(make_cmd)
+    if not completed_process.returncode == 0:
+        print("prebuild.py: Could build asn1scc")
+        exit(6)
+    server = join_dir(env_dir, 'asn1scc', 'lsp', 'Server', 'Server', 'bin', 'Release', 'net6.0', 'Server')
+    if os.path.exists(server):
+        print("prebuild.py: Successfully build {}".format(server))
+    else:
+        print("prebuild.py: Failed building language server. File not build: {}", server)
+        exit(7)
+
+
 def download_asn1scc_language_server() -> None:
     url = "https://github.com/ttsiodras/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
     asn1cc_lsp_tarbz2 = join_dir(env_dir, 'asn1scc-lsp.tar.bz2')
