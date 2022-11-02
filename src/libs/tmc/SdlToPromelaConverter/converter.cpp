@@ -38,6 +38,15 @@ SdlToPromelaConverter::SdlToPromelaConverter(QObject *parent)
             SLOT(processFinished(int, QProcess::ExitStatus)));
 }
 
+SdlToPromelaConverter::~SdlToPromelaConverter()
+{
+    m_timer->stop();
+    if (m_process->state() != QProcess::ProcessState::NotRunning) {
+        m_process->kill();
+        m_process->waitForFinished();
+    }
+}
+
 bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile)
 {
     if (processMetadata.getSystemStructure().has_value() && !processMetadata.getSystemStructure().value().exists()) {

@@ -57,6 +57,11 @@ public:
     TmcVerifier(const QString &inputIvFilepath, const QString &outputDirectory);
 
     /**
+     * @brief Destructor.
+     */
+    ~TmcVerifier() override;
+
+    /**
      * @brief   Set paths to MSC files to be converted to observers
      *
      * @param   mscObserverFiles    Paths to the files
@@ -147,6 +152,8 @@ public:
      * @return true if whole process succed, otherwise false
      */
     bool execute(ExecuteMode executeMode);
+
+    void stop();
 
 Q_SIGNALS:
     void verifierMessage(QString text);
