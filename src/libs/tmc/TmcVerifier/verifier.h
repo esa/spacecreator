@@ -160,6 +160,7 @@ Q_SIGNALS:
     void finished(bool success);
 
 private:
+    void generateObserverDataview();
     void buildVerifier();
     void executeVerifier();
 
@@ -179,6 +180,8 @@ private Q_SLOTS:
     void traceStderrReady();
     void traceStdoutReady();
     void conversionFinished(bool success);
+    void makeStarted();
+    void makeFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void spinStarted();
     void spinFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void ccStarted();
