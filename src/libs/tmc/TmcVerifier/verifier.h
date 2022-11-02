@@ -140,7 +140,7 @@ public:
     bool attachObserver(const QString &observerPath, const uint32_t priority);
 
     /**
-     * @brief Setter Exploration Mode.
+     * @brief Setter for Exploration Mode.
      *
      * When exploration mode is set to breadth first,
      * then search for eventually SCL and success states is not supported.
@@ -151,7 +151,7 @@ public:
     /**
      * @brief Setter for search for shortest path.
      *
-     * @param enabled if true, then the shortest scenarion to the error will be produced.
+     * @param enabled if true, then the shortest scenario to the error will be produced.
      */
     void setSearchShortestPath(bool enabled = true);
     /**
@@ -197,7 +197,7 @@ public:
      */
     void setMemoryLimit(int memoryLimit);
     /**
-     * @brief Set raw commandline for pan executable.
+     * @brief Setter for raw commandline for pan executable.
      *
      * If raw commandline is not empty, then the other parameters
      * for pan executable are ignored.
