@@ -8,6 +8,7 @@
 # IDE files
 CMakeLists.txt.user
 *.pro.user
+.idea
 
 # System files
 .directory
@@ -37,6 +38,7 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 /spacecreator.AppDir/
 *.log
 
+# precompiles python files
 *.pyc
 
 # ccls-cache
@@ -45,5 +47,4 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 # cmake filebased api
 .cmake
 
-# IDE
-.idea
+
