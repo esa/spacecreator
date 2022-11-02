@@ -42,6 +42,7 @@ public:
     void setSubtypesPath(const QString &subtypesPath);
     void setPropertiesPath(const QString &propertiesPath);
 
+public Q_SLOTS:
     void stop();
 
 Q_SIGNALS:

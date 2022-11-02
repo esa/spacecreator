@@ -64,6 +64,24 @@ TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDi
     connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
+TmcVerifier::~TmcVerifier()
+{
+    m_converter.reset();
+    m_timer->stop();
+    if (m_process->state() != QProcess::ProcessState::NotRunning) {
+        m_process->kill();
+        m_process->waitForFinished();
+    }
+    if (m_verifierProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_verifierProcess->kill();
+        m_verifierProcess->waitForFinished();
+    }
+    if (m_traceGeneratorProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_traceGeneratorProcess->kill();
+        m_traceGeneratorProcess->waitForFinished();
+    }
+}
+
 void TmcVerifier::setMscObserverFiles(const QStringList &mscObserverFiles)
 {
     m_converter->setMscObserverFiles(mscObserverFiles);

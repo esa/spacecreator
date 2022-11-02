@@ -137,6 +137,7 @@ void SpinRunWorker::run()
     m_verifier->execute(TmcVerifier::ExecuteMode::ConvertAndVerify);
 
     loop.exec();
-    qDebug() << "Worker thread finished\n";
+
+    m_verifier.reset();
 }
 }
