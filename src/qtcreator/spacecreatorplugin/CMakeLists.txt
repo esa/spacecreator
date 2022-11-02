@@ -36,6 +36,8 @@ set(SC_PLUGIN_SOURCES
     msc/mscmainwidget.h
     msc/mscqtceditor.cpp
     msc/mscqtceditor.h
+    scl/scleditorfactory.cpp
+    scl/scleditorfactory.h
     options/asn1sccoption.cpp
     options/asn1sccoption.h
     options/asn1sccoptionwidget.cpp
@@ -99,3 +101,5 @@ target_include_directories(${PLUGIN_NAME}
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
 source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")
+
+install(FILES scl/generic-highlighter/scl.xml DESTINATION ${IDE_DATA_PATH}/generic-highlighter)

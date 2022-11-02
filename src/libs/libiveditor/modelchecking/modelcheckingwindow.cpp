@@ -22,7 +22,7 @@
 #include "ivmodel.h"
 #include "xmelwriter.h"
 #include "xmelreader.h"
-#include "xmelreader.h"
+#include "spinrundialog.h"
 #include <conversion/common/escaper/escaper.h>
 
 #include <QDir>
@@ -1616,6 +1616,52 @@ void ModelCheckingWindow::removeGenerationLimitsTableRow()
     if (!selection.isEmpty()) {
         tableWidget->removeRow(selection.at(0).row());
     }
+}
+
+void ModelCheckingWindow::on_pushButton_callSpin_clicked()
+{
+    int ret = QMessageBox::warning(this, tr("Call Spin"),
+            tr("Do you confirm you want to call Spin? Default output folder will be rebuilt!"),
+            QMessageBox::Yes | QMessageBox::No);
+    if (ret != QMessageBox::Yes) {
+        return;
+    }
+
+    if (!saveConfiguration()) {
+        QMessageBox::critical(this, tr("Call Spin"), tr("Cannot save configuration file!"));
+        return;
+    }
+
+    QString fileName = ".mcconfig";
+
+    QString configFilePath = this->configurationsPath + "/" + fileName + ".xml";
+
+    QFile file(configFilePath);
+
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::critical(
+                this, tr("Call Spin"), tr("Cannot read file %1: %2").arg(configFilePath).arg(file.errorString()));
+        return;
+    }
+
+    XmelReader reader;
+    int readRet = reader.read(&file);
+
+    if (readRet != 0) {
+        QMessageBox::critical(
+                this, tr("Call Spin"), tr("Cannot read file %1: %2").arg(configFilePath).arg(reader.errorString()));
+        return;
+    }
+    SpinRunDialog dialog(this);
+    dialog.setPropertiesSelected(reader.getPropertiesSelected());
+    dialog.setSubtypesSelected(reader.getSubtypesSelected());
+    dialog.setFunctionsSelected(reader.getFunctionsSelected());
+    dialog.setSpinConfig(reader.getSpinConfig());
+    dialog.setProjectRoot(projectDir);
+    dialog.setPropertiesPath(propertiesPath);
+    dialog.setSubtypesPath(subtypesPath);
+
+    dialog.exec();
 }
 
 void ModelCheckingWindow::setCheckBoxState(QCheckBox *checkBox, bool isChecked)

@@ -17,34 +17,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "executor.h"
-#include "scversion.h"
+#pragma once
 
-#include <QCoreApplication>
-#include <QTimer>
-#include <QtGlobal>
-#include <ivcore/ivlibrary.h>
-#include <msccore/msclibrary.h>
-#include <shared/sharedlibrary.h>
+#include <QObject>
+#include <tmc/TmcConverter/converter.h>
 
-int main(int argc, char *argv[])
+namespace tmc {
+class TrailgenExecutor final : public QObject
 {
-    Q_INIT_RESOURCE(asn1_resources);
+    Q_OBJECT
+public:
+    TrailgenExecutor(QObject *parent = nullptr);
+    ~TrailgenExecutor();
 
-    ivm::initIVLibrary();
-    shared::initSharedLibrary();
-    msc::initMscLibrary();
+public Q_SLOTS:
+    void execute();
+    void message(QString text);
+    void finished(bool success);
+    void start();
 
-    QCoreApplication app(argc, argv);
-
-    app.setOrganizationName(SC_ORGANISATION);
-    app.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
-    app.setApplicationVersion(spaceCreatorVersion);
-    app.setApplicationName(QObject::tr("TASTE Model Checker trace generator"));
-
-    tmc::TrailgenExecutor *executor = new tmc::TrailgenExecutor();
-
-    QTimer::singleShot(0, executor, SLOT(execute()));
-
-    return app.exec();
+private:
+    tmc::converter::TmcConverter *m_converter;
+    QString m_inputSpinTrailFilepath;
+    QString m_outputSimulatorTrailFilepath;
+};
 }

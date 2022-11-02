@@ -19,7 +19,11 @@
 
 #pragma once
 
+#include <QObject>
+#include <QProcess>
+#include <QString>
 #include <QStringList>
+#include <QTimer>
 #include <tmc/TmcConverter/converter.h>
 
 namespace tmc::verifier {
@@ -27,8 +31,22 @@ namespace tmc::verifier {
  * @brief Main class uses to process formal model verification on TASTE project.
  *
  */
-class TmcVerifier final
+class TmcVerifier final : public QObject
 {
+    Q_OBJECT
+public:
+    enum class ExplorationMode
+    {
+        DepthFirst,
+        BreadthFirst,
+    };
+
+    enum class ExecuteMode
+    {
+        ConvertOnly,
+        ConvertAndVerify,
+    };
+
 public:
     /**
      * @brief Constructor.
@@ -111,20 +129,93 @@ public:
      */
     bool attachObserver(const QString &observerPath, const uint32_t priority);
 
+    void setExplorationMode(ExplorationMode mode);
+    void setSearchShortestPath(bool enabled = true);
+    void setUseFairScheduling(bool enabled = true);
+    void setUseBitHashing(bool enabled = true);
+    void setNumberOfCores(int value);
+    void setTimeLimit(int timeLimit);
+    void setSearchStateLimit(int searchStateLimit);
+    void setErrorLimit(int errorLimit);
+    void setMemoryLimit(int memoryLimit);
+    void setRawCommandline(QString rawCommandline);
+
     /**
      * @brief Prepare the system and process formal model verification.
      *
+     * @param onlyConvert if true, only convert model to promela - do not process verification
      * @return true if whole process succed, otherwise false
      */
-    bool execute();
+    bool execute(ExecuteMode executeMode);
+
+Q_SIGNALS:
+    void verifierMessage(QString text);
+    void finished(bool success);
 
 private:
-    bool buildVerifier();
-    bool executeVerifier();
+    void buildVerifier();
+    void executeVerifier();
+
+    void executeSpin();
+    void executeCC();
+    void collectErrors();
+    void generateTraces(int count);
+    void generateNextTrace();
+    void generateReport();
+    void saveReport(const QString &data);
+
+private Q_SLOTS:
+    void processStderrReady();
+    void processStdoutReady();
+    void verifierStderrReady();
+    void verifierStdoutReady();
+    void traceStderrReady();
+    void traceStdoutReady();
+    void conversionFinished(bool success);
+    void spinStarted();
+    void spinFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void ccStarted();
+    void ccFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void panStarted();
+    void panFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void traceGeneratorStarted();
+    void traceGeneratorFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void timeout();
 
 private:
     const QString m_inputIvFilepath;
     const QString m_outputDirectory;
     std::unique_ptr<::tmc::converter::TmcConverter> m_converter;
+
+    ExplorationMode m_explorationMode;
+    bool m_searchShortestPath;
+    bool m_useFairScheduling;
+    bool m_useBitHashing;
+    std::optional<int> m_numberOfCores;
+    std::optional<int> m_timeLimitSeconds;
+    std::optional<int> m_searchStateLimit;
+    std::optional<int> m_errorLimit;
+    std::optional<int> m_memoryLimit;
+    QString m_rawCommandline;
+
+    ExecuteMode m_executeMode;
+    QProcess *m_process;
+    QProcess *m_verifierProcess;
+    QProcess *m_traceGeneratorProcess;
+    QTimer *m_timer;
+
+    QStringList m_trailFilesToConvert;
+    int m_trailCounter;
+    QStringList m_spinTraceFiles;
+    QStringList m_traceFiles;
+    QString m_currentTraceFile;
+
+    QMetaObject::Connection m_processStartedConnection;
+    QMetaObject::Connection m_processFinishedConnection;
+    QMetaObject::Connection m_conversionFinishedConnection;
+
+    constexpr static int m_startTimeout = 30000;
+    constexpr static int m_commandTimeout = 60000;
+    constexpr static int m_verifierDefaultTimeout = 360000;
 };
 }
