@@ -33,14 +33,17 @@ tests/unittests/sdl/SdlExporter/references/*/*.msc
 tests/unittests/sdl/SdlExporter/references/*/work/binaries/*
 tests/unittests/sdl/SdlExporter/references/*/work/*
 
-/build/
+/build
 /spacecreator.AppDir/
 *.log
-/scripts/.idea
+
 *.pyc
 
 # ccls-cache
-.ccls-cache/*
+.ccls-cache
 
 # cmake filebased api
 .cmake
+
+# IDE
+.idea
