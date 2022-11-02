@@ -87,11 +87,7 @@ public:
 
     /**
      * @brief   Parse from single spin error
-     *
-     * @param   rawError         Raw error message
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     *
+     * @param   rawErrors        List of raw error messages
      * @return  List of spin errors
      */
     SpinErrorReport parse(const RawErrorItem &rawError) const;

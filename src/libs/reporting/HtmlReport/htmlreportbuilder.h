@@ -49,11 +49,12 @@ public:
      * @param   spinMessages     Spin command outputs
      * @param   spinTraces       Spin traces
      * @param   sclConditions    SCL file conditions
+     * @param   scenario         scenario.sim file contents
      *
      * @return  Error report in HTML format
      */
-    QString parseAndBuildHtmlReport(
-            const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const;
+    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &spinTraces,
+            const QStringList &sclConditions, const QStringList &scenario = QStringList()) const;
 
     /**
      * @brief   Parse and build report using a default template file embedded into the library
@@ -69,6 +70,8 @@ public:
      *
      * @param   rawErrors        List of raw error strings
      * @param   templateFile     Path to the HTML template file
+     *
+     * @return  Error report in HTML document format
      */
     QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors, const QString &templateFile) const;
 
