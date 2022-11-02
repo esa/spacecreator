@@ -78,12 +78,17 @@ public:
      */
     SpinErrorParser() = default;
 
+    /**
+     * @brief   Parse from multiple spin errors
+     * @param   rawErrors        List of raw error messages
+     * @return  List of spin errors
+     */
     SpinErrorReport parse(const QList<RawErrorItem> rawErrors) const;
 
     /**
-     * @brief   Parse single spin message
+     * @brief   Parse from single spin error
      *
-     * @param   spinMessage      Spin command output
+     * @param   rawError         Raw error message
      * @param   spinTraces       Spin traces
      * @param   sclConditions    SCL file conditions
      *

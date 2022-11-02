@@ -37,6 +37,27 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
     m_engine->addTemplateLoader(m_fileLoader);
 }
 
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(
+        const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const
+{
+    QList<RawErrorItem> rawErrors;
+    const auto spinMessagesSize = spinMessages.size();
+    const auto spinTracesSize = spinTraces.size();
+    const auto sclConditionsSize = sclConditions.size();
+    const auto trailsSize = sclConditions.size();
+    const auto minSize = qMin(qMin(spinMessagesSize, spinTracesSize), qMin(sclConditionsSize, trailsSize));
+    for (int i = 0; i < minSize; ++i) {
+        RawErrorItem rawError;
+        rawError.spinMessages = spinMessages[i];
+        rawError.spinTraces = spinTraces[i];
+        rawError.sclConditions = sclConditions[i];
+        rawError.trails = QString();
+        rawErrors.append(rawError);
+    }
+
+    return parseAndBuildHtmlReport(rawErrors);
+}
+
 QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const
 {
     initResource();

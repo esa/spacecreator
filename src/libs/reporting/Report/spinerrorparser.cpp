@@ -33,21 +33,23 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QList<reporti
 reporting::SpinErrorReport reporting::SpinErrorParser::parse(const RawErrorItem &rawError) const
 {
     reporting::SpinErrorReport report;
-    // parse variable violations
-    QRegularExpressionMatchIterator matches = matchSpinErrors(rawError.spinMessages);
-    while (matches.hasNext()) {
-        auto reportItem = buildDataConstraintViolationReportItem(matches.next());
-        reportItem.trails = rawError.trails;
-        // verify if item is valid
-        if (!qvariant_cast<DataConstraintViolationReport>(reportItem.parsedErrorDetails).functionName.isEmpty()) {
-            report.append(reportItem);
-        }
-    }
+
+    // check for stop condition violation
     if (!rawError.spinTraces.isEmpty() && rawError.spinTraces.trimmed() != m_spinNoTrailFileMessage) {
-        // parse stop condition violation
         auto reportItem = buildStopConditionViolationReportItem(rawError.sclConditions);
         reportItem.trails = rawError.trails;
         report.append(reportItem);
+    } else {
+        // check for observer failure
+        QRegularExpressionMatchIterator matches = matchSpinErrors(rawError.spinMessages);
+        while (matches.hasNext()) {
+            auto reportItem = buildDataConstraintViolationReportItem(matches.next());
+            reportItem.trails = rawError.trails;
+            // verify if item is valid
+            if (!qvariant_cast<DataConstraintViolationReport>(reportItem.parsedErrorDetails).functionName.isEmpty()) {
+                report.append(reportItem);
+            }
+        }
     }
     return report;
 }

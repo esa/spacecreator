@@ -44,22 +44,30 @@ public:
     HtmlReportBuilder();
 
     /**
-     * @brief   Parse and build report using a default template file embedded into the library
+     * @brief   Convenience function for building report from multiple string lists
      *
      * @param   spinMessages     Spin command outputs
      * @param   spinTraces       Spin traces
      * @param   sclConditions    SCL file conditions
-     * @param   trails           Parsed trail file contents
+     *
+     * @return  Error report in HTML format
+     */
+    QString parseAndBuildHtmlReport(
+            const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const;
+
+    /**
+     * @brief   Parse and build report using a default template file embedded into the library
+     *
+     * @param   rawErrors        List of raw error strings
+     *
+     * @return  Error report in HTML document format
      */
     QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const;
 
     /**
      * @brief   Parse and build report using a default template file embedded into the library
      *
-     * @param   spinMessages     Spin command outputs
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     * @param   trails           Parsed trail file contents
+     * @param   rawErrors        List of raw error strings
      * @param   templateFile     Path to the HTML template file
      */
     QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors, const QString &templateFile) const;
