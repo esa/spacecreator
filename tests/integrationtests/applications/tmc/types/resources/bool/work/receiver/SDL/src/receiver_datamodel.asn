@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyBool, MyBetterBoolean FROM USERDEFINED-TYPES-DATAVIEW
-   Pinger-boolinterface-boolArg FROM PINGER-SUBTYPE;
+   PID-Range, PID FROM System-Dataview;
 
 Receiver-States ::= ENUMERATED {wait}
 
 Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
+   sender PID,
    boolarg MyBetterBoolean,
    boolvalue MyBetterBoolean,
    boolhandled T-Boolean

@@ -88,6 +88,7 @@ private Q_SLOTS:
     void on_checkBox_successScenarios_stateChanged(int arg1);
     void addGenerationLimitsTableRow();
     void removeGenerationLimitsTableRow();
+    void on_pushButton_callSpin_clicked();
 
 private:
     QString propertiesPath;

@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger, MyTestInteger FROM TEST-SIMU-CS-DATAVIEW
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
 Actuator-States ::= ENUMERATED {work, wait}
 
 Actuator-Context ::= SEQUENCE {
    state Actuator-States,
    init-done BOOLEAN,
+   sender PID,
    param MyInteger,
    counter MyInteger
 }
@@ -23,13 +24,14 @@ BEGIN
 IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger, MyTestInteger FROM TEST-SIMU-CS-DATAVIEW
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
 Controller-States ::= ENUMERATED {calculate, wait}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
+   sender PID,
    my-param MyTestInteger,
    my-value MyInteger
 }
@@ -71,14 +73,17 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    actuator,
-    controller,
-    environ,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..3)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       actuator,
+       controller,
+       environ,
+       
+       env
+   }
 
 END
 

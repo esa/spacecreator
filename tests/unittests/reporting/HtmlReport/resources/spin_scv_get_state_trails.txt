@@ -1,0 +1,87 @@
+starting claim 3
+Never claim moves to line 6	[else]
+  9:	proc  2 (:init::1) system.pml:69 Send 1	-> queue 1 (Actuator_lock)
+ 13:	proc  2 (:init::1) system.pml:30 Send 0	-> queue 2 (Actuator_ping_channel)
+ 16:	proc  2 (:init::1) system.pml:71 Send 1	-> queue 3 (Controller_lock)
+Never claim moves to line 4	[(inited)]
+Never claim moves to line 13	[else]
+ 24:	proc  1 (Actuator_ping:1) system.pml:57 Recv 0	<- queue 2 (Actuator_ping_channel)
+ 25:	proc  1 (Actuator_ping:1) system.pml:58 Recv 1	<- queue 1 (Actuator_lock)
+ 30:	proc  1 (Actuator_ping:1) system.pml:19 Send 0	-> queue 4 (Controller_pong_channel)
+ 33:	proc  1 (Actuator_ping:1) system.pml:60 Send 1	-> queue 1 (Actuator_lock)
+ 39:	proc  0 (Controller_pong:1) system.pml:44 Recv 0	<- queue 4 (Controller_pong_channel)
+ 40:	proc  0 (Controller_pong:1) system.pml:45 Recv 1	<- queue 3 (Controller_lock)
+ 45:	proc  0 (Controller_pong:1) system.pml:30 Send 0	-> queue 2 (Actuator_ping_channel)
+ 48:	proc  0 (Controller_pong:1) system.pml:47 Send 1	-> queue 3 (Controller_lock)
+  <<<<<START OF CYCLE>>>>>
+ 50:	proc  1 (Actuator_ping:1) system.pml:57 Recv 0	<- queue 2 (Actuator_ping_channel)
+ 51:	proc  1 (Actuator_ping:1) system.pml:58 Recv 1	<- queue 1 (Actuator_lock)
+ 56:	proc  1 (Actuator_ping:1) system.pml:19 Send 0	-> queue 4 (Controller_pong_channel)
+ 59:	proc  1 (Actuator_ping:1) system.pml:60 Send 1	-> queue 1 (Actuator_lock)
+ 61:	proc  0 (Controller_pong:1) system.pml:44 Recv 0	<- queue 4 (Controller_pong_channel)
+ 62:	proc  0 (Controller_pong:1) system.pml:45 Recv 1	<- queue 3 (Controller_lock)
+ 67:	proc  0 (Controller_pong:1) system.pml:30 Send 0	-> queue 2 (Actuator_ping_channel)
+ 70:	proc  0 (Controller_pong:1) system.pml:47 Send 1	-> queue 3 (Controller_lock)
+spin: trail ends after 70 steps
+#processes: 2
+		nothing.data.no_event.dummy = 0
+		nothing.data.system_startup.dummy = 0
+		nothing.data.input_event.source = 0
+		nothing.data.input_event.dest = 0
+		nothing.data.input_event.event.data.actuator.data.msg_in.data.input_none.dummy = 0
+		nothing.data.input_event.event.data.actuator.data.msg_in.data.ping.dummy = 0
+		nothing.data.input_event.event.data.actuator.data.msg_in.selection = 0
+		nothing.data.input_event.event.data.actuator.data.msg_out.data.pong.dummy = 0
+		nothing.data.input_event.event.data.actuator.data.msg_out.selection = 0
+		nothing.data.input_event.event.data.actuator.selection = 0
+		nothing.data.input_event.event.data.controller.data.msg_in.data.input_none.dummy = 0
+		nothing.data.input_event.event.data.controller.data.msg_in.data.pong.dummy = 0
+		nothing.data.input_event.event.data.controller.data.msg_in.selection = 0
+		nothing.data.input_event.event.data.controller.data.msg_out.data.ping.dummy = 0
+		nothing.data.input_event.event.data.controller.data.msg_out.selection = 0
+		nothing.data.input_event.event.data.controller.selection = 0
+		nothing.data.input_event.event.selection = 0
+		nothing.data.output_event.source = 0
+		nothing.data.output_event.dest = 0
+		nothing.data.output_event.event.data.actuator.data.msg_in.data.input_none.dummy = 0
+		nothing.data.output_event.event.data.actuator.data.msg_in.data.ping.dummy = 0
+		nothing.data.output_event.event.data.actuator.data.msg_in.selection = 0
+		nothing.data.output_event.event.data.actuator.data.msg_out.data.pong.dummy = 0
+		nothing.data.output_event.event.data.actuator.data.msg_out.selection = 0
+		nothing.data.output_event.event.data.actuator.selection = 0
+		nothing.data.output_event.event.data.controller.data.msg_in.data.input_none.dummy = 0
+		nothing.data.output_event.event.data.controller.data.msg_in.data.pong.dummy = 0
+		nothing.data.output_event.event.data.controller.data.msg_in.selection = 0
+		nothing.data.output_event.event.data.controller.data.msg_out.data.ping.dummy = 0
+		nothing.data.output_event.event.data.controller.data.msg_out.selection = 0
+		nothing.data.output_event.event.data.controller.selection = 0
+		nothing.data.output_event.event.selection = 0
+		nothing.data.unhandled_input.source = 0
+		nothing.data.unhandled_input.dest = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_in.data.input_none.dummy = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_in.data.ping.dummy = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_in.selection = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_out.data.pong.dummy = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_out.selection = 0
+		nothing.data.unhandled_input.event.data.actuator.selection = 0
+		nothing.data.unhandled_input.event.data.controller.data.msg_in.data.input_none.dummy = 0
+		nothing.data.unhandled_input.event.data.controller.data.msg_in.data.pong.dummy = 0
+		nothing.data.unhandled_input.event.data.controller.data.msg_in.selection = 0
+		nothing.data.unhandled_input.event.data.controller.data.msg_out.data.ping.dummy = 0
+		nothing.data.unhandled_input.event.data.controller.data.msg_out.selection = 0
+		nothing.data.unhandled_input.event.data.controller.selection = 0
+		nothing.data.unhandled_input.event.selection = 0
+		nothing.selection = 0
+		inited = 1
+		queue 4 (Controller_pong_channel): 
+		queue 2 (Actuator_ping_channel): [0]
+		global_state.controller.state = 0
+		global_state.controller.init_done = 0
+		global_state.actuator.state = 0
+		global_state.actuator.init_done = 0
+		queue 1 (Actuator_lock): [1]
+		queue 3 (Controller_lock): [1]
+ 70:	proc  1 (Actuator_ping:1) system.pml:55 (state 129)
+ 70:	proc  0 (Controller_pong:1) system.pml:42 (state 38)
+ 70:	proc  - (never_0:1) scl.pml:10 (state 12)
+3 processes created

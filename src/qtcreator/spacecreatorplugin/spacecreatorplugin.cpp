@@ -33,6 +33,7 @@
 #include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
 #include "msc/mscqtceditor.h"
+#include "scl/scleditorfactory.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msclibrary.h"
@@ -103,6 +104,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
     };
     ive::ActionsManager::registerDeploymentFilesCallback(deploymentFilesCallback);
 
+    m_sclFactory = new SclEditorFactory();
     m_mscFactory = new MscEditorFactory(m_projectsManager, this);
     m_ivFactory = new IVEditorFactory(m_projectsManager, this);
     m_dvFactory = new DVEditorFactory(m_projectsManager, this);

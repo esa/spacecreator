@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    MyString, MyBetterString FROM IA5STRING-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   Pinger-stringinterface-stringArg FROM PINGER-SUBTYPE;
+   PID-Range, PID FROM System-Dataview;
 
 Receiver-States ::= ENUMERATED {wait}
 
 Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
+   sender PID,
    stringarg MyBetterString,
    stringval MyBetterString,
    stringhandled T-Boolean
@@ -47,6 +48,24 @@ T-Null-Record ::= SEQUENCE {}
 END
 
 
+-- Dataview generated on-the-fly providing information on the system
+-- and made available to the user code.
+System-Dataview DEFINITIONS ::=
+BEGIN
+
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..2)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       pinger,
+       receiver,
+       
+       env
+   }
+
+END
+
 PINGER-SUBTYPE DEFINITIONS ::=
 BEGIN
 
@@ -80,16 +99,12 @@ BEGIN
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
+      PID      FROM System-Dataview
       -- Import timers
       AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
       Receiver-Context FROM Receiver-Datamodel
    ;
-
-   --  List all the TASTE functions present in the system
-   PID ::= ENUMERATED {
-        env, pinger, receiver
-   }
 
    --  Simulator needs to knows about cyclic interfaces
    Periodic-Event {Event-Ty} ::= SEQUENCE {
