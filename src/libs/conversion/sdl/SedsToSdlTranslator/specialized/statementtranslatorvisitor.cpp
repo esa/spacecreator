@@ -258,22 +258,40 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::Iteration &iter
 
 auto StatementTranslatorVisitor::operator()(const ::seds::model::MathOperation &operation) -> void
 {
-    if (!operation.elements().empty() && std::holds_alternative<::seds::model::Operator>(operation.elements()[0])) {
-        // Check for a special case of the swap operator
-        const auto &op = std::get<::seds::model::Operator>(operation.elements()[0]);
-        if (std::get<CoreMathOperator>(op.mathOperator()) == CoreMathOperator::Swap) {
-            // TODO This needs proper knowledge of types
-            throw TranslationException("Swap operator is not implemented");
-        }
+    if (operation.elements().empty()) {
+        throw TranslationException("Empty MathOperation");
     }
-    const auto targetName = translateVariableReference(operation.outputVariableRef().value().value());
-    const auto value = MathOperationTranslator::translateOperation(operation.elements());
-    const auto action = QString("%1 := %2").arg(targetName, value);
 
-    auto sdlTask = std::make_unique<::sdl::Task>("", action);
-    DescriptionTranslator::translate(operation, sdlTask.get());
+    const auto &elements = operation.elements();
+    const auto &firstElement = elements.front();
 
-    m_sdlTransition->addAction(std::move(sdlTask));
+    const auto isSwap = isSwapOperator(firstElement);
+
+    if (isSwap) {
+        const auto swapOperations = MathOperationTranslator::translateSwapOperation(operation);
+
+        bool first = true;
+
+        for (const auto &swapOperation : swapOperations) {
+            auto sdlTask = std::make_unique<::sdl::Task>("", swapOperation);
+
+            if (first) {
+                DescriptionTranslator::translate(operation, sdlTask.get());
+                first = false;
+            }
+
+            m_sdlTransition->addAction(std::move(sdlTask));
+        }
+    } else {
+        const auto targetName = translateVariableReference(operation.outputVariableRef().value().value());
+        const auto value = MathOperationTranslator::translateOperation(operation.elements());
+        const auto action = QString("%1 := %2").arg(targetName, value);
+
+        auto sdlTask = std::make_unique<::sdl::Task>("", action);
+        DescriptionTranslator::translate(operation, sdlTask.get());
+
+        m_sdlTransition->addAction(std::move(sdlTask));
+    }
 }
 
 auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrimitive &sendCommand) -> void
@@ -712,14 +730,17 @@ auto StatementTranslatorVisitor::translateBooleanExpression(::sdl::Process *host
 auto StatementTranslatorVisitor::translateComparison(const ::seds::model::Comparison &comparison) -> QString
 {
     const auto left = translateVariableReference(comparison.firstOperand().variableRef().value().value());
+    // clang-format off
     const auto &right = std::visit(
-            overloaded {
-                    [](const ::seds::model::VariableRefOperand &reference) {
-                        return translateVariableReference(reference.variableRef().value().value());
-                    },
-                    [](const ::seds::model::ValueOperand &value) { return value.value().value(); },
+        overloaded {
+            [](const ::seds::model::VariableRefOperand &reference) {
+                return translateVariableReference(reference.variableRef().value().value());
             },
-            comparison.secondOperand());
+            [](const ::seds::model::ValueOperand &value) {
+                return value.value().value();
+            }
+        }, comparison.secondOperand());
+    // clang-format on
     const auto op = comparisonOperatorToString(comparison.comparisonOperator());
     return QString("%1 %2 %3").arg(left, op, right);
 }
@@ -885,4 +906,20 @@ auto StatementTranslatorVisitor::handleTransaction(
             Constants::transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
     ivInterface->addParam(ivParameter);
 }
+
+auto StatementTranslatorVisitor::isSwapOperator(const ::seds::model::MathOperation::Element &element) -> bool
+{
+    const auto op = std::get_if<::seds::model::Operator>(&element);
+    if (op == nullptr) {
+        return false;
+    }
+
+    const auto mathOp = std::get_if<::seds::model::CoreMathOperator>(&op->mathOperator());
+    if (mathOp == nullptr) {
+        return false;
+    }
+
+    return *mathOp == CoreMathOperator::Swap;
+}
+
 }
