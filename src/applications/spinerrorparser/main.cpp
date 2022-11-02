@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
         rawError.spinMessages = spinMessages[i];
         rawError.spinTraces = spinTraces[i];
         rawError.sclConditions = sclConditions[i];
-        rawError.trails = trails[i];
+        rawError.scenario = trails[i];
         rawErrors.append(rawError);
     }
 

@@ -38,7 +38,7 @@ void tst_HtmlReportBuilder::testNoError()
     rawError.spinMessages = readFile(spinMessagePath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = readFile(scenario);
+    rawError.scenario = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -60,7 +60,7 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
     rawError.spinMessages = readFile(spinMessagePath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = readFile(scenario);
+    rawError.scenario = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -88,7 +88,7 @@ void tst_HtmlReportBuilder::testDataConstraintViolationNested()
     rawError.spinMessages = readFile(spinMessagePath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = readFile(scenario);
+    rawError.scenario = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -112,7 +112,7 @@ void tst_HtmlReportBuilder::testStopConditionViolationEmpty()
     rawError.spinMessages = readFile(spinMessagePath);
     rawError.spinTraces = readFile(spinTracesPath);
     rawError.sclConditions = readFile(spinSclConditionsPath);
-    rawError.trails = readFile(scenario);
+    rawError.scenario = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;
@@ -136,7 +136,7 @@ void tst_HtmlReportBuilder::testStopConditionViolationGetState()
     rawError.spinMessages = readFile(spinMessagePath);
     rawError.spinTraces = readFile(spinTracesPath);
     rawError.sclConditions = readFile(spinSclConditionsPath);
-    rawError.trails = readFile(scenario);
+    rawError.scenario = readFile(scenario);
     const QString htmlResult = readFile(htmlResultPath);
 
     const SpinErrorParser parser;

@@ -52,7 +52,7 @@ QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList 
         rawError.spinMessages = spinMessages[i];
         rawError.spinTraces = spinTraces[i];
         rawError.sclConditions = sclConditions[i];
-        rawError.trails = QString(); // scenario[i];
+        rawError.scenario = QString(); // scenario[i];
         rawErrors.append(rawError);
     }
 
@@ -126,14 +126,14 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
 {
     // add html formatting to spin trails
     const TraceBuilder traceBuilder;
-    const auto trailsHtml = traceBuilder.buildTraceReport(spinErrorReportItem.trails);
+    const auto scenarioHtml = traceBuilder.buildTraceReport(spinErrorReportItem.scenario);
 
     QVariantHash variantHash;
     variantHash.insert("errorNumber", spinErrorReportItem.errorNumber);
     variantHash.insert("errorDepth", spinErrorReportItem.errorDepth);
     variantHash.insert("errorCode", spinErrorReportItem.errorType);
     variantHash.insert("rawErrorDetails", spinErrorReportItem.rawErrorDetails);
-    variantHash.insert("trails", trailsHtml);
+    variantHash.insert("scenario", scenarioHtml);
 
     // resolve error type as string
     variantHash.insert("errorType",

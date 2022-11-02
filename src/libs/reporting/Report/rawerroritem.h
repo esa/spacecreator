@@ -30,7 +30,7 @@ struct RawErrorItem {
     QString spinMessages;
     QString spinTraces;
     QString sclConditions;
-    QString trails;
+    QString scenario;
 };
 
 }

@@ -37,14 +37,14 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const RawErrorItem 
     // check for stop condition violation
     if (!rawError.spinTraces.isEmpty() && rawError.spinTraces.trimmed() != m_spinNoTrailFileMessage) {
         auto reportItem = buildStopConditionViolationReportItem(rawError.sclConditions);
-        reportItem.trails = rawError.trails;
+        reportItem.scenario = rawError.scenario;
         report.append(reportItem);
     } else {
         // check for observer failure
         QRegularExpressionMatchIterator matches = matchSpinErrors(rawError.spinMessages);
         while (matches.hasNext()) {
             auto reportItem = buildDataConstraintViolationReportItem(matches.next());
-            reportItem.trails = rawError.trails;
+            reportItem.scenario = rawError.scenario;
             // verify if item is valid
             if (!qvariant_cast<DataConstraintViolationReport>(reportItem.parsedErrorDetails).functionName.isEmpty()) {
                 report.append(reportItem);

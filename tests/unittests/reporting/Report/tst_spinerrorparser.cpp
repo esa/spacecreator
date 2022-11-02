@@ -52,7 +52,7 @@ void tst_SpinErrorParser::testNoError()
     rawError.spinMessages = readFile(filepath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = QString();
+    rawError.scenario = QString();
 
     const SpinErrorParser parser;
     const SpinErrorReport errorReport = parser.parse(rawError);
@@ -69,7 +69,7 @@ void tst_SpinErrorParser::testViolationVariableType()
     rawError.spinMessages = readFile(filepath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = QString();
+    rawError.scenario = QString();
 
     const SpinErrorParser parser;
     const auto errorReport = parser.parse(rawError);
@@ -98,7 +98,7 @@ void tst_SpinErrorParser::testNestedVariable()
     rawError.spinMessages = readFile(filepath);
     rawError.spinTraces = QString();
     rawError.sclConditions = QString();
-    rawError.trails = QString();
+    rawError.scenario = QString();
 
     const SpinErrorParser parser;
     const auto errorReport = parser.parse(rawError);
