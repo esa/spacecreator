@@ -48,7 +48,7 @@ struct SpinErrorReportItem {
     /** Raw error details reported by the message */
     QString rawErrorDetails;
     /** Raw trails attached to the report */
-    QString trails;
+    QString scenario;
     /** Parsed error details */
     QVariant parsedErrorDetails;
 };
