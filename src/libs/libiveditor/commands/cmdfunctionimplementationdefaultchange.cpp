@@ -73,8 +73,10 @@ void CmdFunctionImplementationDefaultChange::redo()
     if (fileInfo.isSymLink()) {
         QFile::remove(fileInfo.absoluteFilePath());
     } else if (fileInfo.exists()) {
-        shared::copyDir(fileInfo.absoluteFilePath(), oldImplementationPath(), shared::FileCopyingMode::Overwrite);
-        QDir(fileInfo.absoluteFilePath()).removeRecursively();
+        if (!shared::moveDir(
+                    fileInfo.absoluteFilePath(), oldImplementationPath(), shared::FileCopyingMode::Overwrite)) {
+            /// TODO: ROLLBACK;
+        }
     }
 
     shared::ensureDirExists(newImplementationPath());
