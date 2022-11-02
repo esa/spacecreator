@@ -81,7 +81,9 @@ enum FileCopyingMode
     Overwrite
 };
 
-void copyDir(const QString &source, const QString &dest, FileCopyingMode replaceMode = FileCopyingMode::Keep);
+bool moveDir(const QString &source, const QString &dest, FileCopyingMode replaceMode = FileCopyingMode::Keep);
+
+bool copyDir(const QString &source, const QString &dest, FileCopyingMode replaceMode = FileCopyingMode::Keep);
 
 bool copyFile(const QString &source, const QString &target, FileCopyingMode replaceMode = FileCopyingMode::Keep);
 
@@ -190,7 +192,8 @@ QString uniteNames(const QVector<Type> &collection, const QString &prefix)
     return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
 }
 
-bool moveDefaultDirectories(const QString &currentImplName, const QString &projectPath, const QString &functionName, const QString &language);
+bool moveDefaultDirectories(const QString &currentImplName, const QString &projectPath, const QString &functionName,
+        const QString &language);
 
 }
 
