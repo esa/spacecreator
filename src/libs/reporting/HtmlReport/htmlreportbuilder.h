@@ -21,6 +21,7 @@
 
 #include <QSharedPointer>
 #include <QString>
+#include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorreportitem.h>
 #include <reporting/Report/stopconditionviolationreport.h>
 
@@ -43,30 +44,42 @@ public:
     HtmlReportBuilder();
 
     /**
-     * @brief   Parse and build report using a default template file embedded into the library
+     * @brief   Convenience function for building report from multiple string lists
      *
      * @param   spinMessages     Spin command outputs
      * @param   spinTraces       Spin traces
      * @param   sclConditions    SCL file conditions
+     * @param   scenario         scenario.sim file contents
+     *
+     * @return  Error report in HTML format
      */
-    QString parseAndBuildHtmlReport(
-            const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const;
+    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &spinTraces,
+            const QStringList &sclConditions, const QStringList &scenario = QStringList()) const;
 
     /**
      * @brief   Parse and build report using a default template file embedded into the library
      *
-     * @param   spinMessages     Spin command outputs
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     * @param   templateFile         Path to the HTML template file
+     * @param   rawErrors        List of raw error strings
+     *
+     * @return  Error report in HTML document format
      */
-    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &spinTraces,
-            const QStringList &sclConditions, const QString &templateFile) const;
+    QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const;
+
+    /**
+     * @brief   Parse and build report using a default template file embedded into the library
+     *
+     * @param   rawErrors        List of raw error strings
+     * @param   templateFile     Path to the HTML template file
+     *
+     * @return  Error report in HTML document format
+     */
+    QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors, const QString &templateFile) const;
 
     /**
      * @brief   Build spin error report using a default template file embedded into the library
      *
      * @param   spinErrorReport      Parsed error report from spin
+     * @param   trails               Parsed trail file contents
      *
      * @return  Error report in an HTML document format
      */
@@ -76,6 +89,7 @@ public:
      * @brief   Build spin error report using a custom template file
      *
      * @param   spinErrorReport      Parsed error report from spin
+     * @param   trails               Parsed trail file contents
      * @param   templateFile         Path to the HTML template file
      *
      * @return  Error report in an HTML document format

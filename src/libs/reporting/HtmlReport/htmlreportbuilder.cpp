@@ -19,10 +19,12 @@
 
 #include "htmlreportbuilder.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <grantlee/outputstream.h>
 #include <grantlee_templates.h>
+#include <reporting/HtmlReport/tracebuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorparser.h>
 
@@ -35,18 +37,39 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
     m_engine->addTemplateLoader(m_fileLoader);
 }
 
-QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(
-        const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
+        const QStringList &spinTraces, const QStringList &sclConditions, const QStringList &) const
 {
-    initResource();
-    return parseAndBuildHtmlReport(spinMessages, spinTraces, sclConditions, m_defaultTemplateFile);
+    QList<RawErrorItem> rawErrors;
+    const auto spinMessagesSize = spinMessages.size();
+    const auto spinTracesSize = spinTraces.size();
+    const auto sclConditionsSize = sclConditions.size();
+    // temporary bypassing of scenario
+    const auto scenarioSize = sclConditions.size();
+    const auto minSize = qMin(qMin(spinMessagesSize, spinTracesSize), qMin(sclConditionsSize, scenarioSize));
+    for (int i = 0; i < minSize; ++i) {
+        RawErrorItem rawError;
+        rawError.spinMessages = spinMessages[i];
+        rawError.spinTraces = spinTraces[i];
+        rawError.sclConditions = sclConditions[i];
+        rawError.trails = QString(); // scenario[i];
+        rawErrors.append(rawError);
+    }
+
+    return parseAndBuildHtmlReport(rawErrors);
 }
 
-QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
-        const QStringList &spinTraces, const QStringList &sclConditions, const QString &templateFile) const
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const
+{
+    initResource();
+    return parseAndBuildHtmlReport(rawErrors, m_defaultTemplateFile);
+}
+
+QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(
+        const QList<RawErrorItem> &rawErrors, const QString &templateFile) const
 {
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
+    auto reports = parser.parse(rawErrors);
     return buildHtmlReport(reports, templateFile);
 }
 
@@ -101,11 +124,16 @@ QVariantList reporting::HtmlReportBuilder::buildReportVariant(const reporting::S
 QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
         const reporting::SpinErrorReportItem &spinErrorReportItem)
 {
+    // add html formatting to spin trails
+    const TraceBuilder traceBuilder;
+    const auto trailsHtml = traceBuilder.buildTraceReport(spinErrorReportItem.trails);
+
     QVariantHash variantHash;
     variantHash.insert("errorNumber", spinErrorReportItem.errorNumber);
     variantHash.insert("errorDepth", spinErrorReportItem.errorDepth);
     variantHash.insert("errorCode", spinErrorReportItem.errorType);
     variantHash.insert("rawErrorDetails", spinErrorReportItem.rawErrorDetails);
+    variantHash.insert("trails", trailsHtml);
 
     // resolve error type as string
     variantHash.insert("errorType",

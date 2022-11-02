@@ -20,6 +20,7 @@
 #pragma once
 
 #include "dataconstraintviolationreport.h"
+#include "rawerroritem.h"
 #include "spinerrorreportitem.h"
 #include "stopconditionviolationreport.h"
 
@@ -78,27 +79,18 @@ public:
     SpinErrorParser() = default;
 
     /**
-     * @brief   Parse multiple spin messages
-     *
-     * @param   spinMessages     Spin command outputs
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     *
+     * @brief   Parse from multiple spin errors
+     * @param   rawErrors        List of raw error messages
      * @return  List of spin errors
      */
-    SpinErrorReport parse(
-            const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const;
+    SpinErrorReport parse(const QList<RawErrorItem> rawErrors) const;
 
     /**
-     * @brief   Parse single spin message
-     *
-     * @param   spinMessage      Spin command output
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     *
+     * @brief   Parse from single spin error
+     * @param   rawErrors        List of raw error messages
      * @return  List of spin errors
      */
-    SpinErrorReport parse(const QString &spinMessage, const QString &spinTraces, const QString &sclConditions) const;
+    SpinErrorReport parse(const RawErrorItem &rawError) const;
 
 private:
     static const QString m_spinNoTrailFileMessage;

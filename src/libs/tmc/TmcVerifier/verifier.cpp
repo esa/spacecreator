@@ -405,7 +405,7 @@ void TmcVerifier::generateReport()
 
     QStringList sclFiles = m_converter->getStopConditionFiles();
 
-    QString report = builder.parseAndBuildHtmlReport(spinMessages, m_spinTraceFiles, sclFiles);
+    QString report = builder.parseAndBuildHtmlReport(spinMessages, m_spinTraceFiles, sclFiles, m_traceFiles);
 
     saveReport(report);
 

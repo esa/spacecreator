@@ -30,6 +30,7 @@
 #include <optional>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
+#include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorparser.h>
 #include <string.h>
 
@@ -46,6 +47,7 @@ int main(int argc, char *argv[])
     QStringList spinMessages;
     QStringList spinTraces;
     QStringList sclConditions;
+    QStringList trailFiles;
     std::optional<QString> templateFile;
     std::optional<QString> targetFile;
 
@@ -73,6 +75,13 @@ int main(int argc, char *argv[])
             }
             ++i;
             sclConditions.append(args[i]);
+        } else if (arg == "-ir") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing trail file after -ir");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            trailFiles.append(args[i]);
         } else if (arg == "-it") {
             if (i + 1 == args.size()) {
                 qCritical("Missing template file after -it");
@@ -103,7 +112,8 @@ int main(int argc, char *argv[])
             qInfo("  -im <message>          Message from spin (can be repeated)");
             qInfo("  -is <message>          Spin traces (can be repeated)");
             qInfo("  -scl <condition>       Condition from scl.txt (can be repeated)");
-            qInfo("  -it <filename>         HTML template file name");
+            qInfo("  -ir <filename>         Trail files (can be repeated)");
+            qInfo("  -it <filename>         HTML template file name (optional)");
             qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
             exit(EXIT_SUCCESS);
@@ -133,9 +143,39 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // parse trails
+    QStringList trails;
+    for (auto trailFile : trailFiles) {
+        QFile file(trailFile);
+        if (file.open(QFile::ReadOnly)) {
+            const QString fileContents(file.readAll());
+            trails.append(fileContents);
+            file.close();
+        } else {
+            qCritical("Unable to open trail file");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // build struct with raw errors
+    QList<RawErrorItem> rawErrors;
+    const auto spinMessagesSize = spinMessages.size();
+    const auto spinTracesSize = spinTraces.size();
+    const auto sclConditionsSize = sclConditions.size();
+    const auto trailsSize = trails.size();
+    const auto minSize = qMin(qMin(spinMessagesSize, spinTracesSize), qMin(sclConditionsSize, trailsSize));
+    for (int i = 0; i < minSize; ++i) {
+        RawErrorItem rawError;
+        rawError.spinMessages = spinMessages[i];
+        rawError.spinTraces = spinTraces[i];
+        rawError.sclConditions = sclConditions[i];
+        rawError.trails = trails[i];
+        rawErrors.append(rawError);
+    }
+
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
+    auto reports = parser.parse(rawErrors);
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;

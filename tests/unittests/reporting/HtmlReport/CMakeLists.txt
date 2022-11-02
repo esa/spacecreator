@@ -5,7 +5,11 @@ add_executable(${TEST_NAME})
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 target_sources(${TEST_NAME}
-    PRIVATE     ${TEST_NAME}.cpp)
+    PRIVATE     tst_htmlreportbuilder.cpp
+                tst_tracebuilder.cpp
+    PRIVATE     main.cpp
+                tst_htmlreportbuilder.h
+                tst_tracebuilder.h)
 target_include_directories(${TEST_NAME}
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
                 ${CMAKE_SOURCE_DIR}/tests)
@@ -20,6 +24,7 @@ configure_file(resources/result_error.html resources/result_error.html COPYONLY)
 configure_file(resources/result_nested.html resources/result_nested.html COPYONLY)
 configure_file(resources/result_scv_empty.html resources/result_scv_empty.html COPYONLY)
 configure_file(resources/result_scv_get_state.html resources/result_scv_get_state.html COPYONLY)
+configure_file(resources/scenario.sim resources/scenario.sim COPYONLY)
 configure_file(resources/spin_error_output.txt resources/spin_error_output.txt COPYONLY)
 configure_file(resources/spin_nested_error_output.txt resources/spin_nested_error_output.txt COPYONLY)
 configure_file(resources/spin_no_error_output.txt resources/spin_no_error_output.txt COPYONLY)
