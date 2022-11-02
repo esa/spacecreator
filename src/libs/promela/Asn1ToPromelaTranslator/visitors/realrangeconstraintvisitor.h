@@ -32,11 +32,11 @@
 
 namespace promela::translator {
 /**
- * @brief Visitor for ASN.1 integer constraints
+ * @brief Visitor for ASN.1 real type constraints
  *
  * This is a part of Asn1ToPromelaTranslator.
  *
- * Visitor finds a subset of allowed values for integer or for size constraints
+ * Visitor finds a subset of allowed values for real type or for size constraints
  */
 class RealRangeConstraintVisitor : public Asn1Acn::Constraints::ConstraintVisitor<Asn1Acn::RealValue>
 {

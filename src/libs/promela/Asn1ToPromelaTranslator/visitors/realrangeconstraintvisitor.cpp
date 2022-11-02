@@ -82,20 +82,20 @@ void RealRangeConstraintVisitor::visit(const Asn1Acn::Constraints::SizeConstrain
 
 void RealRangeConstraintVisitor::visit(const Asn1Acn::Constraints::ConstraintList<RealValue> &constraint)
 {
-    std::optional<RealSubset> tmp;
-    for (const auto &c : constraint.constraints()) {
+    std::optional<RealSubset> subset;
+    for (const auto &singleConstraint : constraint.constraints()) {
         RealRangeConstraintVisitor nestedVisitor;
-        c->accept(nestedVisitor);
+        singleConstraint->accept(nestedVisitor);
         std::optional<RealSubset> rhs = nestedVisitor.getResultSubset();
 
-        if (!tmp.has_value()) {
-            tmp = rhs;
+        if (!subset.has_value()) {
+            subset = rhs;
         } else if (rhs.has_value()) {
-            tmp = tmp.value() & rhs.value();
+            subset = subset.value() & rhs.value();
         }
     }
 
-    m_subset = tmp;
+    m_subset = subset;
 }
 
 bool RealRangeConstraintVisitor::isSizeConstraintVisited() const noexcept
@@ -106,18 +106,12 @@ bool RealRangeConstraintVisitor::isSizeConstraintVisited() const noexcept
 size_t RealRangeConstraintVisitor::getMinSize() const noexcept
 {
     int min = m_subset.value().getMin().value();
-    if (min < 0) {
-        return 0;
-    }
     return static_cast<size_t>(min);
 }
 
 size_t RealRangeConstraintVisitor::getMaxSize() const noexcept
 {
     int max = m_subset.value().getMax().value();
-    if (max < 0) {
-        return 0;
-    }
     return static_cast<size_t>(max);
 }
 

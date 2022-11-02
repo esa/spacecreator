@@ -28,9 +28,9 @@ cd $TEST_OUTPUT_DIR \
     && $CC -o system.out pan.c \
     && ./system.out -m1000000 -a -n > system.output \
     && grep -q "errors: 0" system.output \
-    && cd ..
+    && cd .. \
+    && rm -rf $TEST_OUTPUT_DIR
 
-rm -rf $TEST_OUTPUT_DIR
 mkdir $TEST_OUTPUT_DIR
 
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
@@ -43,6 +43,5 @@ cd $TEST_OUTPUT_DIR \
     && $CC -o system.out pan.c \
     && ./system.out -m1000000 -a -n > system.output \
     && grep -q "errors: 0" system.output \
-    && cd ..
-
-rm -rf $TEST_OUTPUT_DIR
+    && cd .. \
+    && rm -rf $TEST_OUTPUT_DIR

@@ -107,7 +107,7 @@ void RealSubset::mergeOverlappingNeighbours()
     while (iter != m_allowedValues.end() && std::next(iter) != m_allowedValues.end()) {
         auto successor = std::next(iter);
 
-        if (iter->second + 1 >= successor->first) {
+        if (iter->second >= successor->first) {
             iter->second = std::max(iter->second, successor->second);
             m_allowedValues.erase(successor);
         } else {

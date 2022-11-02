@@ -28,6 +28,5 @@ cd $TEST_OUTPUT_DIR \
     && ./system.out -m1000000 -a -n > system.output \
     && grep -q "errors: 1" system.output \
     && grep -q "assertion violated ((global_state.controller.param>=" system.output \
-    && cd ..
-
-rm -rf $TEST_OUTPUT_DIR
+    && cd .. \
+    && rm -rf $TEST_OUTPUT_DIR
