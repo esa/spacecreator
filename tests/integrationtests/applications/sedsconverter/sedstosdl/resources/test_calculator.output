@@ -3,6 +3,8 @@ process Calculator;
     /* CIF Text (0, 150), (400, 500) */
     dcl X Number;
     dcl Y Number;
+    dcl R Number;
+    dcl Result Number;
     dcl Tmp Number;
     dcl Io_asynccalculator_add_pi AsyncCalculatorType_Add_Type;
     dcl Io_asynccalculator_add_ri AsyncCalculatorType_Add_TypeNotify;
@@ -17,10 +19,16 @@ process Calculator;
         /* CIF Start (0, 750), (200, 75) */
         START;
             /* CIF Task (0, 937), (100, 50) */
-            task Tmp := (X1 + X2)  + 2;
+            task R := (X1 + X2) + 2;
             /* CIF Task (0, 1012), (100, 50) */
-            task Io_asynccalculator_add_ri.Result := Tmp;
-            /* CIF Output (0, 1087), (200, 50) */
+            task Tmp := R;
+            /* CIF Task (0, 1087), (100, 50) */
+            task R := Result;
+            /* CIF Task (0, 1162), (100, 50) */
+            task Result := Tmp;
+            /* CIF Task (0, 1237), (100, 50) */
+            task Io_asynccalculator_add_ri.Result := Result;
+            /* CIF Output (0, 1312), (200, 50) */
             output AsyncCalculator_Add_Ri(Io_asynccalculator_add_ri);
         return;
     endprocedure;
