@@ -41,3 +41,6 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 
 # ccls-cache
 .ccls-cache/*
+
+# cmake filebased api
+.cmake
