@@ -26,9 +26,9 @@
 namespace tmc {
 /**
  * @brief TrailgenExecutor creates TmcConverter and starts conversion from
- * taste project and spin trail files to simulator files.
+ * TASTE project and Spin trail files to simulator files.
  * After conversion finishes it quits QCoreApplication.
- * During conversion the messages are reported on stdout.
+ * During the conversion the messages are reported on stdout.
  */
 class TrailgenExecutor final : public QObject
 {
@@ -37,7 +37,7 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param parent, parent of the object.
+     * @param parent parent of the object.
      */
     TrailgenExecutor(QObject *parent = nullptr);
 

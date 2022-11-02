@@ -26,9 +26,9 @@
 namespace tmc {
 /**
  * @brief TmcExecutor creates TmcVerifier and starts conversion
- * from taste project to promela files.
+ * from TASTE project to Promela files.
  * After conversion finishes it quits QCoreApplication.
- * During conversion the messages are reported on stdout.
+ * During the conversion the messages are reported on stdout.
  */
 class TmcExecutor final : public QObject
 {
@@ -37,7 +37,7 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param parent, parent of the object.
+     * @param parent parent of the object.
      */
     TmcExecutor(QObject *parent = nullptr);
 
