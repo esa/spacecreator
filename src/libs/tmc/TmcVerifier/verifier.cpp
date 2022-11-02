@@ -414,7 +414,7 @@ void TmcVerifier::generateReport()
 
 void TmcVerifier::saveReport(const QString &data)
 {
-    QFileInfo reportFilepath = m_outputDirectory + QDir::separator() + "report.html";
+    QFileInfo reportFilepath(m_outputDirectory + QDir::separator() + "report.html");
 
     Q_EMIT verifierMessage(QString("Generated %1 chars\n").arg(data.length()));
 
