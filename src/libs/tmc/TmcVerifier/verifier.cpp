@@ -222,6 +222,7 @@ void TmcVerifier::generateObserverDataview()
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(makeStarted()));
 
     QStringList arguments;
+    arguments.append("SUBTYPE=empty.asn");
     arguments.append("observer_dataview");
 
     Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(makeExe).arg(arguments.join(" ")));
