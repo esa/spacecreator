@@ -22,20 +22,21 @@
 #include <QDebug>
 #include <QRegularExpression>
 
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(
-        const QStringList &, const QStringList &spinTraces, const QStringList &, const QStringList &scenario) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &, const QStringList &spinTraces,
+        const QStringList &sclConditions, const QStringList &scenario) const
 {
     reporting::SpinErrorReport report;
 
     // number of errors is equal to the number of separate spin traces
     int errorCount = spinTraces.size();
-    qDebug() << errorCount;
-
     for (int i = 0; i < errorCount; ++i) {
         const auto currentSpinTraces = spinTraces[i];
         const auto currentScenario = scenario[i];
 
-        // find observer failure (success states) by acceptance cycles
+        SpinErrorReportItem newReportItem;
+        newReportItem.scenario = currentScenario;
+        // parse current error
+        parseSpinTraces(currentSpinTraces, sclConditions, newReportItem);
 
         auto matches = matchSpinErrors(currentSpinTraces);
         while (matches.hasNext()) {
@@ -82,6 +83,11 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const RawErrorItem 
         }
     }
     return report;
+}
+
+void reporting::SpinErrorParser::parseSpinTraces(
+        const QString &, const QStringList &, reporting::SpinErrorReportItem &) const
+{
 }
 
 reporting::SpinErrorReportItem reporting::SpinErrorParser::buildDataConstraintViolationReportItem(
