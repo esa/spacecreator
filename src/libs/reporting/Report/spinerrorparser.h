@@ -109,6 +109,9 @@ private:
     static const QString m_spinNoTrailFileMessage;
     static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationIdentifiers;
 
+    void parseSpinTraces(
+            const QString &currentSpinTraces, const QStringList &sclConditions, SpinErrorReportItem &reportItem) const;
+
     SpinErrorReportItem buildDataConstraintViolationReportItem(const QRegularExpressionMatch &matchedError) const;
     SpinErrorReportItem buildStopConditionViolationReportItem(const QString &conditions) const;
 
