@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="FailureReporting">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+      <StringDataType name="CString" length="64" fixedLength="false">
+        <StringDataEncoding encoding="ASCII" terminationByte="0" />
+      </StringDataType>
+      <BooleanDataType name="CoolBool">
+        <BooleanDataEncoding sizeInBits="8" />
+      </BooleanDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="ClkType">
+        <CommandSet>
+          <Command name="Tick" mode="async"/>
+        </CommandSet>
+      </Interface>
+      <Interface name="CalculatorType">
+        <CommandSet>
+          <Command name="DivideCommand" mode="async">
+            <Argument name="xValue" type="Number" mode="in" />
+            <Argument name="yValue" type="Number" mode="in" />
+            <Argument name="result" type="Number" mode="notify" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Client">
+        <ProvidedInterfaceSet>
+          <Interface name="Clk" type="ClkType"/>
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="CalculatorInterface" type="CalculatorType"/>
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="resultVar" type="Number"/>
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="PleaseDivide">
+              <Argument name="xValueArg" type="Number"/>
+              <Argument name="yValueArg" type="Number"/>
+              <Body>
+                <SendCommandPrimitive interface="CalculatorInterface" command="DivideCommand">
+                  <ArgumentValue name="xValue">
+                    <VariableRef variableRef="xValueArg"/>
+                  </ArgumentValue>
+                  <ArgumentValue name="yValue">
+                    <VariableRef variableRef="yValueArg"/>
+                  </ArgumentValue>
+                </SendCommandPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s1"/>
+              <State name="s2"/>
+              <State name="s3"/>
+              <State name="s4"/>
+              <State name="s5"/>
+              <Transition fromState="s1" toState="s2" name="t1">
+                <OnCommandPrimitive command="Tick" interface="Clk"/>
+                <Do activity="PleaseDivide">
+                  <ArgumentValue name="xValueArg">
+                    <Value value="42" />
+                  </ArgumentValue>
+                  <ArgumentValue name="yValueArg">
+                    <Value value="2" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="s2" toState="s3" name="t2">
+                <OnCommandPrimitive command="DivideCommand" interface="CalculatorInterface" failed="false">
+                  <ArgumentValue name="result" outputVariableRef="resultVar"/>
+                </OnCommandPrimitive>
+              </Transition>
+              <Transition fromState="s2" toState="s1" name="t3">
+                <OnCommandPrimitive command="DivideCommand" interface="CalculatorInterface" failed="true">
+                  <ArgumentValue name="result" outputVariableRef="resultVar"/>
+                </OnCommandPrimitive>
+              </Transition>
+              <Transition fromState="s3" toState="s4" name="t4">
+                <OnCommandPrimitive command="Tick" interface="Clk"/>
+                <Do activity="PleaseDivide">
+                  <ArgumentValue name="xValueArg">
+                    <Value value="314" />
+                  </ArgumentValue>
+                  <ArgumentValue name="yValueArg">
+                    <Value value="0" />
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+              <Transition fromState="s4" toState="s1" name="t5">
+                <OnCommandPrimitive command="DivideCommand" interface="CalculatorInterface" failed="false">
+                  <ArgumentValue name="result" outputVariableRef="resultVar"/>
+                </OnCommandPrimitive>
+              </Transition>
+              <Transition fromState="s4" toState="s5" name="t6">
+                <OnCommandPrimitive command="DivideCommand" interface="CalculatorInterface" failed="true">
+                  <ArgumentValue name="result" outputVariableRef="resultVar"/>
+                </OnCommandPrimitive>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+      <Component name="Calculator">
+        <ProvidedInterfaceSet>
+          <Interface name="CalculatorInterface" type="CalculatorType"/>
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="xValueVar" type="Number" />
+            <Variable name="yValueVar" type="Number" />
+            <Variable name="resultVar" type="Number"/>
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="DoDivide">
+              <Argument name="xValueArg" type="Number"/>
+              <Argument name="yValueArg" type="Number"/>
+              <Body>
+                <Conditional>
+                  <Condition>
+                    <Condition>
+                      <FirstOperand variableRef="yValueArg" />
+                      <ComparisonOperator>equals</ComparisonOperator>
+                      <Value value="0" />
+                    </Condition>
+                  </Condition>
+                  <OnConditionTrue>
+                    <SendCommandPrimitive command="DivideCommand" interface="CalculatorInterface" failed="true"/>
+                  </OnConditionTrue>
+                  <OnConditionFalse>
+                    <MathOperation outputVariableRef="resultVar">
+                      <Operator operator="divide" />
+                      <VariableRef variableRef="xValueArg" />
+                      <VariableRef variableRef="yValueArg" />
+                    </MathOperation>
+                    <SendCommandPrimitive command="DivideCommand" interface="CalculatorInterface" failed="false">
+                      <ArgumentValue name="result">
+                        <VariableRef variableRef="resultVar" />
+                      </ArgumentValue>
+                    </SendCommandPrimitive>
+                  </OnConditionFalse>
+                </Conditional>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s1"/>
+              <Transition fromState="s1" toState="s1" name="t1">
+                <OnCommandPrimitive command="DivideCommand" interface="CalculatorInterface">
+                  <ArgumentValue name="xValue" outputVariableRef="xValueVar" />
+                  <ArgumentValue name="yValue" outputVariableRef="yValueVar" />
+                </OnCommandPrimitive>
+                <Do activity="DoDivide">
+                  <ArgumentValue name="xValueArg">
+                    <VariableRef variableRef="xValueVar"/>
+                  </ArgumentValue>
+                  <ArgumentValue name="yValueArg">
+                    <VariableRef variableRef="yValueVar"/>
+                  </ArgumentValue>
+                </Do>
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

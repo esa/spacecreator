@@ -191,11 +191,43 @@ bool TmcVerifier::execute(ExecuteMode executeMode)
 {
     Q_EMIT verifierMessage(QString("Starting conversion.\n"));
     m_executeMode = executeMode;
-    if (!m_converter->prepare()) {
-        return false;
+    if (m_executeMode == ExecuteMode::ConvertOnly) {
+        // run only TmcConverter
+        if (!m_converter->prepare()) {
+            return false;
+        }
+        m_converter->convert();
+    } else {
+        // start from `make observer_dataview`
+        // then run TmcConverter and start verification process
+        generateObserverDataview();
     }
-    m_converter->convert();
     return true;
+}
+
+void TmcVerifier::generateObserverDataview()
+{
+    const QString makeExe = "make";
+    QFileInfo info(m_inputIvFilepath);
+    m_process->setWorkingDirectory(info.absoluteDir().path());
+
+    if (m_processFinishedConnection) {
+        disconnect(m_processFinishedConnection);
+    }
+    m_processFinishedConnection = connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(makeFinished(int, QProcess::ExitStatus)));
+    if (m_processStartedConnection) {
+        disconnect(m_processStartedConnection);
+    }
+    m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(makeStarted()));
+
+    QStringList arguments;
+    arguments.append("observer_dataview");
+
+    Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(makeExe).arg(arguments.join(" ")));
+    m_timer->setSingleShot(true);
+    m_timer->start(m_startTimeout);
+    m_process->start(makeExe, arguments);
 }
 
 void TmcVerifier::buildVerifier()
@@ -223,27 +255,28 @@ void TmcVerifier::executeVerifier()
 
     QStringList arguments;
     if (m_rawCommandline.isEmpty()) {
-        arguments.append("-n");
+        arguments.append("-E"); // suppress the reporting of invalid endstate errors
+        arguments.append("-n"); // no listing of unreached states at the end of the run
 
         if (m_explorationMode != ExplorationMode::BreadthFirst) {
-            arguments.append("-a");
+            arguments.append("-a"); // find acceptance cycles, not available in BFS
         }
 
         if (m_useFairScheduling) {
-            arguments.append("-f");
+            arguments.append("-f"); // add weak fairness
         }
 
         if (m_errorLimit.has_value()) {
-            arguments.append("-e");
-            arguments.append(QString("-c%1").arg(m_errorLimit.value()));
+            arguments.append("-e"); // create trails for all errors encountered
+            arguments.append(QString("-c%1").arg(m_errorLimit.value())); // stop at Nth error
         }
 
         if (m_searchStateLimit.has_value()) {
-            arguments.append(QString("-m%1").arg(m_searchStateLimit.value()));
+            arguments.append(QString("-m%1").arg(m_searchStateLimit.value())); // set max search depth to N steps
         }
 
         if (m_searchShortestPath) {
-            arguments.append("-i");
+            arguments.append("-i"); // search for shortest path to error
         }
 
     } else {
@@ -263,8 +296,14 @@ void TmcVerifier::executeSpin()
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
+    if (m_processFinishedConnection) {
+        disconnect(m_processFinishedConnection);
+    }
     m_processFinishedConnection = connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(spinFinished(int, QProcess::ExitStatus)));
+    if (m_processStartedConnection) {
+        disconnect(m_processStartedConnection);
+    }
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(spinStarted()));
 
     QStringList arguments;
@@ -524,6 +563,32 @@ void TmcVerifier::conversionFinished(bool success)
     } else {
         Q_EMIT finished(false);
     }
+}
+
+void TmcVerifier::makeStarted()
+{
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(m_commandTimeout);
+}
+
+void TmcVerifier::makeFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    m_process->terminate();
+    if (exitCode != EXIT_SUCCESS) {
+        auto message = QString("Make finished with code: %1\n").arg(exitCode);
+        Q_EMIT verifierMessage(message);
+        Q_EMIT finished(false);
+        return;
+    }
+
+    if (!m_converter->prepare()) {
+        Q_EMIT finished(false);
+        return;
+    }
+    m_converter->convert();
 }
 
 void TmcVerifier::spinStarted()

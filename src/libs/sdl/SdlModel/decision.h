@@ -70,6 +70,14 @@ public:
      * @param   answer  answer to add
      */
     auto addAnswer(std::unique_ptr<Answer> answer) -> void;
+    /**
+     * @brief   Checks if decision contains answer for given literal
+     *
+     * @param   answerLiteral   Literal to look for
+     *
+     * @return  True if answer was found, false otherwise
+     */
+    auto hasAnswer(const VariableLiteral &answerLiteral) -> bool;
 
     /**
      * @brief   Getter for expression

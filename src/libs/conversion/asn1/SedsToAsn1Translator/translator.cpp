@@ -117,7 +117,7 @@ void SedsToAsn1Translator::translatePackage(const ::seds::model::Package *sedsPa
 
     // Translate package interface declarations
     const auto &packageInterfaceDeclarations = sedsPackage->declaredInterfaces();
-    translateInterfaceDeclarations(packageInterfaceDeclarations, packageContext);
+    translateInterfaceDeclarations(packageInterfaceDeclarations, packageContext, options);
 
     // Create and add package ASN.1 file
     auto packageAsn1File = std::make_unique<Asn1Acn::File>(packageAsn1DefinitionsName);
@@ -145,13 +145,13 @@ void SedsToAsn1Translator::translatePackage(const ::seds::model::Package *sedsPa
 
         // Translate component interface declarations
         const auto &componentInterfaceDeclarations = sedsComponent.declaredInterfaces();
-        translateInterfaceDeclarations(componentInterfaceDeclarations, componentContext);
+        translateInterfaceDeclarations(componentInterfaceDeclarations, componentContext, options);
 
         // Translate component interface implementations
         const auto &providedInterfaces = sedsComponent.providedInterfaces();
-        translateInterfaceImplementations(providedInterfaces, componentContext);
+        translateInterfaceImplementations(providedInterfaces, componentContext, options);
         const auto &requiredInterfaces = sedsComponent.requiredInterfaces();
-        translateInterfaceImplementations(requiredInterfaces, componentContext);
+        translateInterfaceImplementations(requiredInterfaces, componentContext, options);
 
         // Create and add component ASN.1 file
         auto componentAsn1File = std::make_unique<Asn1Acn::File>(componentAsn1DefinitionsName);
@@ -172,9 +172,10 @@ void SedsToAsn1Translator::translateDataTypeSet(
 }
 
 void SedsToAsn1Translator::translateInterfaceDeclarations(
-        const std::vector<::seds::model::InterfaceDeclaration> &interfaceDeclarations, Context &context) const
+        const std::vector<::seds::model::InterfaceDeclaration> &interfaceDeclarations, Context &context,
+        const Options &options) const
 {
-    InterfaceTypeCreator typeCreator;
+    InterfaceTypeCreator typeCreator(options);
 
     for (const auto &interfaceDeclaration : interfaceDeclarations) {
         typeCreator.createTypes(interfaceDeclaration, context);
@@ -182,9 +183,9 @@ void SedsToAsn1Translator::translateInterfaceDeclarations(
 }
 
 void SedsToAsn1Translator::translateInterfaceImplementations(
-        const std::vector<::seds::model::Interface> &interfaces, Context &context) const
+        const std::vector<::seds::model::Interface> &interfaces, Context &context, const Options &options) const
 {
-    InterfaceTypeCreator typeCreator;
+    InterfaceTypeCreator typeCreator(options);
 
     for (const auto &interface : interfaces) {
         typeCreator.createTypes(interface, context);

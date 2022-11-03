@@ -30,8 +30,10 @@
 #include <conversion/asn1/SedsToAsn1Translator/datatypetranslationhelper.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <seds/SedsOptions/options.h>
 
 using conversion::asn1::translator::seds::DataTypeTranslationHelper;
+using conversion::seds::SedsOptions;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::TranslationException;
 using seds::model::ArgumentsCombination;
@@ -61,6 +63,16 @@ void AsyncInterfaceCommandTranslator::translateCommand(
                 interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
         translateArguments(sedsCommand, CommandArgumentMode::In, ivInterface);
         m_ivFunction->addChild(ivInterface);
+
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            const auto notifyInterfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(m_sedsInterfaceName,
+                    sedsCommand.nameStr(), InterfaceTranslatorHelper::switchInterfaceType(interfaceType), m_options);
+            auto *ivInterfaceNotify = InterfaceTranslatorHelper::createIvInterface(notifyInterfaceName,
+                    InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
+                    ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
+            translateArguments(sedsCommand, CommandArgumentMode::Notify, ivInterfaceNotify);
+            m_ivFunction->addChild(ivInterfaceNotify);
+        }
     } break;
     case ArgumentsCombination::OutOnly: {
         // Out arguments aren't supported by TASTE sporadic interface.
@@ -99,8 +111,17 @@ void AsyncInterfaceCommandTranslator::translateCommand(
         auto *ivInterface = InterfaceTranslatorHelper::createIvInterface(
                 interfaceName, interfaceType, ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
         m_ivFunction->addChild(ivInterface);
-        break;
-    }
+
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            const auto notifyInterfaceName = InterfaceTranslatorHelper::buildCommandInterfaceName(m_sedsInterfaceName,
+                    sedsCommand.nameStr(), InterfaceTranslatorHelper::switchInterfaceType(interfaceType), m_options);
+            auto *ivInterfaceNotify = InterfaceTranslatorHelper::createIvInterface(notifyInterfaceName,
+                    InterfaceTranslatorHelper::switchInterfaceType(interfaceType),
+                    ivm::IVInterface::OperationKind::Sporadic, sedsCommand, m_ivFunction);
+            translateArguments(sedsCommand, CommandArgumentMode::Notify, ivInterfaceNotify);
+            m_ivFunction->addChild(ivInterfaceNotify);
+        }
+    } break;
     case ArgumentsCombination::NotifyOnly:
     case ArgumentsCombination::InAndOut:
     case ArgumentsCombination::OutAndNotify:
@@ -117,7 +138,7 @@ void AsyncInterfaceCommandTranslator::translateCommand(
 }
 
 void AsyncInterfaceCommandTranslator::translateArguments(const ::seds::model::InterfaceCommand &sedsCommand,
-        const CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface)
+        const CommandArgumentMode requestedArgumentMode, ivm::IVInterface *ivInterface) const
 {
     // Async commands are translated to sporadic interfaces, which can accept only one argument
     // To satisfy this we need to pack all command arguments into one

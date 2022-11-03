@@ -29,18 +29,23 @@
 namespace tmc::verifier {
 /**
  * @brief Main class uses to process formal model verification on TASTE project.
- *
  */
 class TmcVerifier final : public QObject
 {
     Q_OBJECT
 public:
+    /**
+     * @brief Verifier exploration mode.
+     */
     enum class ExplorationMode
     {
         DepthFirst,
         BreadthFirst,
     };
 
+    /**
+     * @brief Verifier execute mode.
+     */
     enum class ExecuteMode
     {
         ConvertOnly,
@@ -134,21 +139,77 @@ public:
      */
     bool attachObserver(const QString &observerPath, const uint32_t priority);
 
+    /**
+     * @brief Setter for Exploration Mode.
+     *
+     * When exploration mode is set to breadth first,
+     * then search for eventually SCL and success states is not supported.
+     *
+     * @param mode Exploration Mode to be set.
+     */
     void setExplorationMode(ExplorationMode mode);
+    /**
+     * @brief Setter for search for shortest path.
+     *
+     * @param enabled if true, then the shortest scenario to the error will be produced.
+     */
     void setSearchShortestPath(bool enabled = true);
+    /**
+     * @brief Setter for fair scheduling.
+     *
+     * @param enabled if true, then fair scheduling is enabled.
+     */
     void setUseFairScheduling(bool enabled = true);
+    /**
+     * @brief Setter for bit hashing.
+     *
+     * @param value if true, then bit hashing is enabled.
+     */
     void setUseBitHashing(bool enabled = true);
+    /**
+     * @brief Setter for number of cores for pan executable.
+     *
+     * @param value number of cores to use.
+     */
     void setNumberOfCores(int value);
+    /**
+     * @brief Setter for time limit for pan executable.
+     *
+     * @param timeLimit time limit in seconds for pan executable.
+     */
     void setTimeLimit(int timeLimit);
+    /**
+     * @brief Setter for maximum state depth for pan executable.
+     *
+     * @param searchStateLimit the maximum depth of states during exploration.
+     */
     void setSearchStateLimit(int searchStateLimit);
+    /**
+     * @brief Setter for error limit for pan executable.
+     *
+     * @param errorLimit error limit for verification.
+     */
     void setErrorLimit(int errorLimit);
+    /**
+     * @brief Setter for memory limit for pan executable.
+     *
+     * @param memoryLimit memory limit in mega bytes.
+     */
     void setMemoryLimit(int memoryLimit);
+    /**
+     * @brief Setter for raw commandline for pan executable.
+     *
+     * If raw commandline is not empty, then the other parameters
+     * for pan executable are ignored.
+     *
+     * @param rawCommandline parameters for pan executable.
+     */
     void setRawCommandline(QString rawCommandline);
 
     /**
      * @brief Prepare the system and process formal model verification.
      *
-     * @param onlyConvert if true, only convert model to promela - do not process verification
+     * @param executeMode determines what needs to be executed by verifier
      * @return true if whole process succed, otherwise false
      */
     bool execute(ExecuteMode executeMode);
@@ -156,10 +217,21 @@ public:
     void stop();
 
 Q_SIGNALS:
+    /**
+     * @brief Informs about new message from verifier.
+     *
+     * @param text message text.
+     */
     void verifierMessage(QString text);
+    /**
+     * @brief Informs that the verification process is finished.
+     *
+     * @param success If the verification succed then true, otherwise false.
+     */
     void finished(bool success);
 
 private:
+    void generateObserverDataview();
     void buildVerifier();
     void executeVerifier();
 
@@ -179,6 +251,8 @@ private Q_SLOTS:
     void traceStderrReady();
     void traceStdoutReady();
     void conversionFinished(bool success);
+    void makeStarted();
+    void makeFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void spinStarted();
     void spinFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void ccStarted();

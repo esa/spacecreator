@@ -51,8 +51,12 @@ public:
     inline static const QString skipEmptySequences = "Seds_Translation_SkipEmptySequences";
     /** @brief  Taste translation option */
     inline static const QString tasteTranslation = "Seds_Translation_Taste";
-    /** @brief  Name of the type to used for SEDS transaction name */
+    /** @brief  Name of the type to use for SEDS transaction name */
     inline static const QString transactionNameType = "Seds_Translation_TransactionNameType";
+    /** @brief  Enable failure reporting */
+    inline static const QString enableFailureReporting = "Seds_Translation_EnableFailureReporting";
+    /** @brief  Name of the type to use for SEDS failure reporting */
+    inline static const QString failureReportingType = "Seds_Translation_FailureReportingType";
     /** @brief  Filepath of output file */
     inline static const QString outputFilepath = "Seds_Export_OutputFilepath";
 

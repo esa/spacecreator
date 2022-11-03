@@ -30,15 +30,6 @@ const std::vector<std::unique_ptr<Action>> &Transition::actions()
     return m_actions;
 }
 
-const Action *Transition::lastAction() const
-{
-    if (m_actions.empty()) {
-        return nullptr;
-    }
-
-    return m_actions.back().get();
-}
-
 void Transition::addAction(std::unique_ptr<Action> action)
 {
     if (!m_actions.empty()) {
@@ -52,17 +43,6 @@ void Transition::addAction(std::unique_ptr<Action> action)
     }
 
     m_actions.push_back(std::move(action));
-}
-
-bool Transition::removeLastAction()
-{
-    if (m_actions.empty()) {
-        return false;
-    }
-
-    m_actions.pop_back();
-
-    return true;
 }
 
 const QString &Transition::comment() const

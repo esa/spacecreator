@@ -20,22 +20,38 @@
 #pragma once
 
 #include <QObject>
+#include <memory>
 #include <tmc/TmcVerifier/verifier.h>
 
 namespace tmc {
+/**
+ * @brief TmcExecutor creates TmcVerifier and starts conversion
+ * from TASTE project to Promela files.
+ * After conversion finishes it quits QCoreApplication.
+ * During the conversion the messages are reported on stdout.
+ */
 class TmcExecutor final : public QObject
 {
     Q_OBJECT
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param parent parent of the object.
+     */
     TmcExecutor(QObject *parent = nullptr);
-    ~TmcExecutor();
 
 public Q_SLOTS:
+    /**
+     * @brief Start the execution of verification.
+     */
     void execute();
+
+private Q_SLOTS:
     void verifierMessage(QString text);
     void finished(bool success);
 
 private:
-    tmc::verifier::TmcVerifier *m_verifier;
+    std::unique_ptr<tmc::verifier::TmcVerifier> m_verifier;
 };
 }
