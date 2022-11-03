@@ -45,9 +45,13 @@ public:
 
     int exec() override;
 
+protected:
+    void reject() override;
+
 private Q_SLOTS:
     void workerTextAvailable(QString text);
-    void workerFinished(bool success);
+    void workerFinished();
+    void jobFinished(bool success);
     void closeButtonClicked();
 
 private:
@@ -65,5 +69,8 @@ private:
     QString m_projectRoot;
     QString m_propertiesPath;
     QString m_subtypesPath;
+
+    bool m_closePending;
+    bool m_finished;
 };
 }

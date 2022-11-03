@@ -1,0 +1,75 @@
+<InterfaceView asn1file="MscWhenThenSequenceParametersAny.acn">
+<Function name="Clk" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="30900 26000 50900 34000"/>
+<Required_Interface name="Tick" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="1" queue_size="1" miat="0">
+    <Property name="Taste::coordinates" value="44100 34000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="Pinger" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="31100 44100 51100 52100"/>
+<Provided_Interface name="Tick" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="1" queue_size="1" miat="0">
+    <Property name="Taste::coordinates" value="44400 44100"/>
+</Provided_Interface>
+
+<Provided_Interface name="Pong" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="5" queue_size="1" miat="0">
+    <Input_Parameter name="pongArg" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="51100 49900"/>
+</Provided_Interface>
+
+<Required_Interface name="Ping" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="2" queue_size="1" miat="0">
+    <Property name="Taste::coordinates" value="51100 46600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Ponger" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="67900 44100 87900 52100"/>
+<Provided_Interface name="Ping" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="2" queue_size="1" miat="0">
+    <Property name="Taste::coordinates" value="67900 46400"/>
+</Provided_Interface>
+
+<Required_Interface name="Pong" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="5" queue_size="1" miat="0">
+    <Input_Parameter name="pongArg" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="67900 50100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Pinger" ri_name="Ping"/>
+    <Target func_name="Ponger" pi_name="Ping"/>
+    <Property name="Taste::coordinates" value="51700 46600 59600 46600 67600 46400"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Clk" ri_name="Tick"/>
+    <Target func_name="Pinger" pi_name="Tick"/>
+    <Property name="Taste::coordinates" value="44100 34600 44100 39200 44400 42200 44400 43800"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Ponger" ri_name="Pong"/>
+    <Target func_name="Pinger" pi_name="Pong"/>
+    <Property name="Taste::coordinates" value="67300 50100 59400 50100 51400 49900"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>

@@ -19,12 +19,16 @@
 
 #include "spinrundialog.h"
 
+#include <QDebug>
+
 namespace ive {
 SpinRunDialog::SpinRunDialog(QWidget *parent)
     : QDialog(parent)
     , m_layout(new QVBoxLayout(this))
     , m_browser(new QTextBrowser(this))
     , m_secondLayout(new QHBoxLayout())
+    , m_closePending(false)
+    , m_finished(false)
 {
     m_closeButton = new QPushButton(tr("Close"), this);
     setWindowTitle("Spin model-checker");
@@ -41,8 +45,6 @@ SpinRunDialog::SpinRunDialog(QWidget *parent)
     font.setStyleHint(QFont::StyleHint::Monospace);
     font.setFixedPitch(true);
     m_browser->setFont(font);
-
-    connect(m_closeButton, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
 }
 
 void SpinRunDialog::setPropertiesSelected(const QStringList &properties)
@@ -87,9 +89,22 @@ int SpinRunDialog::exec()
     m_worker->setPropertiesPath(m_propertiesPath);
     m_worker->setSubtypesPath(m_subtypesPath);
     connect(m_worker, SIGNAL(textAvailable(QString)), this, SLOT(workerTextAvailable(QString)), Qt::QueuedConnection);
-    connect(m_worker, SIGNAL(jobFinished(bool)), this, SLOT(workerFinished(bool)), Qt::QueuedConnection);
+    connect(m_worker, SIGNAL(jobFinished(bool)), this, SLOT(jobFinished(bool)), Qt::QueuedConnection);
+    connect(m_worker, SIGNAL(finished()), this, SLOT(workerFinished()));
+    connect(m_closeButton, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
     m_worker->start();
     return QDialog::exec();
+}
+
+void SpinRunDialog::reject()
+{
+    if (m_finished) {
+        accept();
+    } else {
+        m_closePending = true;
+        m_worker->stop();
+        setDisabled(true);
+    }
 }
 
 void SpinRunDialog::workerTextAvailable(QString text)
@@ -99,8 +114,16 @@ void SpinRunDialog::workerTextAvailable(QString text)
     m_browser->moveCursor(QTextCursor::MoveOperation::End);
 }
 
-void SpinRunDialog::workerFinished(bool success)
+void SpinRunDialog::workerFinished()
 {
+    if (m_closePending) {
+        accept();
+    }
+}
+
+void SpinRunDialog::jobFinished(bool success)
+{
+    m_finished = true;
     if (success) {
         m_browser->append("FINISHED.");
         m_browser->moveCursor(QTextCursor::MoveOperation::End);
@@ -112,6 +135,12 @@ void SpinRunDialog::workerFinished(bool success)
 
 void SpinRunDialog::closeButtonClicked()
 {
-    m_worker->stop();
+    if (m_finished) {
+        accept();
+    } else {
+        m_closePending = true;
+        m_worker->stop();
+        setDisabled(true);
+    }
 }
 }
