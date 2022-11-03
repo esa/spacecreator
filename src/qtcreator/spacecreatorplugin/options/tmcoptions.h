@@ -17,35 +17,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QObject>
-#include <QtTest>
-#include <stdlib.h>
+#pragma once
 
-namespace tmc {
+#include <QPointer>
+#include <coreplugin/dialogs/ioptionspage.h>
 
-class tsti_InputVectorLimit : public QObject
+namespace spctr {
+class TmcOptionsWidget;
+
+class TmcOptions : public Core::IOptionsPage
 {
-    Q_OBJECT
+public:
+    TmcOptions(QObject *parent = nullptr);
 
-private Q_SLOTS:
-    void test_inputVectorLimit();
-    void test_inputVectorLimitZero();
+    QWidget *widget() override;
+    void apply() override;
+    void finish() override;
+
+private:
+    QPointer<TmcOptionsWidget> m_widget;
 };
-
-void tsti_InputVectorLimit::test_inputVectorLimit()
-{
-    const int result = system("./test_input_vector_limit.sh");
-    QCOMPARE(result, 0);
 }
-
-void tsti_InputVectorLimit::test_inputVectorLimitZero()
-{
-    const int result = system("./test_input_vector_limit_zero.sh");
-    QCOMPARE(result, 0);
-}
-
-} // namespace sedsconverter
-
-QTEST_MAIN(tmc::tsti_InputVectorLimit)
-
-#include "tsti_inputvectorlimit.moc"

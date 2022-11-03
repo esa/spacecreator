@@ -17,35 +17,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QObject>
-#include <QtTest>
-#include <stdlib.h>
+#pragma once
+
+#include <QString>
 
 namespace tmc {
-
-class tsti_InputVectorLimit : public QObject
+class TmcConstants
 {
-    Q_OBJECT
-
-private Q_SLOTS:
-    void test_inputVectorLimit();
-    void test_inputVectorLimitZero();
+public:
+    inline static const QString SETTINGS_TMC_SPIN_EXE_KEY = "SpaceCreator/tmcSpinExe";
 };
-
-void tsti_InputVectorLimit::test_inputVectorLimit()
-{
-    const int result = system("./test_input_vector_limit.sh");
-    QCOMPARE(result, 0);
 }
-
-void tsti_InputVectorLimit::test_inputVectorLimitZero()
-{
-    const int result = system("./test_input_vector_limit_zero.sh");
-    QCOMPARE(result, 0);
-}
-
-} // namespace sedsconverter
-
-QTEST_MAIN(tmc::tsti_InputVectorLimit)
-
-#include "tsti_inputvectorlimit.moc"

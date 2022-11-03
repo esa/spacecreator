@@ -17,35 +17,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QObject>
-#include <QtTest>
-#include <stdlib.h>
+#include "tmcoptionswidget.h"
 
-namespace tmc {
+#include "ui_tmcoptionswidget.h"
 
-class tsti_InputVectorLimit : public QObject
+namespace spctr {
+TmcOptionsWidget::TmcOptionsWidget(QWidget *parent)
+    : QWidget(parent)
+    , m_ui(new Ui::TmcOptionsWidget())
 {
-    Q_OBJECT
-
-private Q_SLOTS:
-    void test_inputVectorLimit();
-    void test_inputVectorLimitZero();
-};
-
-void tsti_InputVectorLimit::test_inputVectorLimit()
-{
-    const int result = system("./test_input_vector_limit.sh");
-    QCOMPARE(result, 0);
+    m_ui->setupUi(this);
 }
 
-void tsti_InputVectorLimit::test_inputVectorLimitZero()
+TmcOptionsWidget::~TmcOptionsWidget()
 {
-    const int result = system("./test_input_vector_limit_zero.sh");
-    QCOMPARE(result, 0);
+    delete m_ui;
 }
 
-} // namespace sedsconverter
+void TmcOptionsWidget::setSpinExecutable(const QString &spinExecutable)
+{
+    m_ui->spinExecutableLineEdit->setText(spinExecutable);
+}
 
-QTEST_MAIN(tmc::tsti_InputVectorLimit)
-
-#include "tsti_inputvectorlimit.moc"
+QString TmcOptionsWidget::getSpinExecutable()
+{
+    return m_ui->spinExecutableLineEdit->text();
+}
+}

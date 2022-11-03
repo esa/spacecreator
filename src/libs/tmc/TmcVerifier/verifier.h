@@ -205,6 +205,12 @@ public:
      * @param rawCommandline parameters for pan executable.
      */
     void setRawCommandline(QString rawCommandline);
+    /**
+     * @brief Setter for spin executable.
+     *
+     * @param spinExecutable name or path of spin executable.
+     */
+    void setSpinExecutable(QString spinExecutable);
 
     /**
      * @brief Prepare the system and process formal model verification.
@@ -278,6 +284,7 @@ private:
     std::optional<int> m_errorLimit;
     std::optional<int> m_memoryLimit;
     QString m_rawCommandline;
+    QString m_spinExecutable;
 
     ExecuteMode m_executeMode;
     QProcess *m_process;

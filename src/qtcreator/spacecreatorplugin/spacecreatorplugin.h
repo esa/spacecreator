@@ -23,6 +23,7 @@
 #include "options/hwlibraryoption.h"
 #include "options/ivlibraryoption.h"
 #include "options/propertyoptions.h"
+#include "options/tmcoptions.h"
 #include "spacecreatorplugin_global.h"
 
 #include <QSharedPointer>
@@ -83,6 +84,7 @@ private:
     PropertyOptions m_propertyOptions;
     HwLibraryOption m_hwLibraryOptions;
     IVLibraryOption m_ivLibraryOptions;
+    TmcOptions m_tmcOptions;
 };
 
 }
