@@ -207,9 +207,24 @@ bool TmcVerifier::execute(ExecuteMode executeMode)
 
 void TmcVerifier::generateObserverDataview()
 {
+    const QFileInfo inputIvInfo(m_inputIvFilepath);
+    const QString emptyAsnName = "empty.asn";
+
+    // create empty
+    QString emptyAsnFilepath = inputIvInfo.absoluteDir().path() + QDir::separator() + "work" + QDir::separator()
+            + "modelchecking" + QDir::separator() + "subtypes" + QDir::separator() + emptyAsnName;
+
+    QFileInfo emptyAsnInfo(emptyAsnFilepath);
+
+    if (!emptyAsnInfo.exists()) {
+        QFile emptyAsnFile(emptyAsnFilepath);
+        emptyAsnFile.open(QIODevice::WriteOnly | QIODevice::Append);
+
+        emptyAsnFile.close();
+    }
+
     const QString makeExe = "make";
-    QFileInfo info(m_inputIvFilepath);
-    m_process->setWorkingDirectory(info.absoluteDir().path());
+    m_process->setWorkingDirectory(inputIvInfo.absoluteDir().path());
 
     if (m_processFinishedConnection) {
         disconnect(m_processFinishedConnection);
@@ -222,7 +237,7 @@ void TmcVerifier::generateObserverDataview()
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(makeStarted()));
 
     QStringList arguments;
-    arguments.append("SUBTYPE=empty.asn");
+    arguments.append(QString("SUBTYPE=%1").arg(emptyAsnName));
     arguments.append("observer_dataview");
 
     Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(makeExe).arg(arguments.join(" ")));
