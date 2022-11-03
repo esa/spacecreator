@@ -22,6 +22,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <reporting/Report/rawerroritem.h>
+#include <reporting/Report/spinerrorparser.h>
 #include <reporting/Report/spinerrorreportitem.h>
 #include <reporting/Report/stopconditionviolationreport.h>
 
@@ -54,8 +55,8 @@ public:
      *
      * @return  HTML-formatted error report string
      */
-    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &spinTraces,
-            const QStringList &sclConditions, const QStringList &scenario,
+    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &sclConditions,
+            const QList<TempParameter> &parameters, const QStringList &observerNames,
             const QString &templateFile = QString()) const;
 
     /**

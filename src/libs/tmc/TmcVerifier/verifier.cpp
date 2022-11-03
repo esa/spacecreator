@@ -24,6 +24,7 @@
 #include <QRegularExpression>
 #include <QTimer>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
+#include <reporting/Report/spinerrorparser.h>
 
 using reporting::HtmlReportBuilder;
 using tmc::converter::TmcConverter;
@@ -487,7 +488,17 @@ void TmcVerifier::generateReport()
 
     QStringList sclFiles = m_converter->getStopConditionFiles();
 
-    QString report = builder.parseAndBuildHtmlReport(spinMessages, m_spinTraceFiles, sclFiles, m_traceFiles);
+    QList<reporting::TempParameter> tempParameters;
+    const int traceCount = m_spinTraceFiles.size();
+    for (int i = 0; i < traceCount; ++i) {
+        reporting::TempParameter tempParameter;
+        tempParameter.spinTraceFile = m_spinTraceFiles[i];
+        tempParameter.scenarioFile = m_traceFiles[i];
+        tempParameter.possibleCycleSource = std::make_pair(QString(), 0);
+        tempParameters.append(tempParameter);
+    };
+
+    QString report = builder.parseAndBuildHtmlReport(spinMessages, sclFiles, tempParameters, QStringList());
 
     saveReport(report);
 

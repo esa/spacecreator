@@ -173,9 +173,20 @@ int main(int argc, char *argv[])
         rawErrors.append(rawError);
     }
 
+    // build error structure
+    QList<reporting::TempParameter> tempParameters;
+    const int traceCount = spinTraces.size();
+    for (int i = 0; i < traceCount; ++i) {
+        reporting::TempParameter tempParameter;
+        tempParameter.spinTraceFile = spinTraces[i];
+        tempParameter.scenarioFile = scenario[i];
+        tempParameter.possibleCycleSource = std::make_pair(QString(), 0);
+        tempParameters.append(tempParameter);
+    };
+
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, spinTraces, sclConditions, scenario);
+    auto reports = parser.parse(spinMessages, sclConditions, tempParameters, QStringList());
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;

@@ -22,31 +22,18 @@
 #include <QDebug>
 #include <QRegularExpression>
 
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &, const QStringList &spinTraces,
-        const QStringList &sclConditions, const QStringList &scenario) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &, const QStringList &sclConditions,
+        const QList<TempParameter> &parameters, const QStringList &) const
 {
     reporting::SpinErrorReport report;
 
     // number of errors is equal to the number of separate spin traces
-    int errorCount = spinTraces.size();
-    for (int i = 0; i < errorCount; ++i) {
-        const auto currentSpinTraces = spinTraces[i];
-        const auto currentScenario = scenario[i];
-
-        SpinErrorReportItem newReportItem;
-        newReportItem.scenario = currentScenario;
-        // parse current error
-        parseSpinTraces(currentSpinTraces, sclConditions, newReportItem);
-
-        auto matches = matchSpinErrors(currentSpinTraces);
-        while (matches.hasNext()) {
-            auto reportItem = buildDataConstraintViolationReportItem(matches.next());
-            reportItem.scenario = currentScenario;
-            // verify if item is valid
-            if (!qvariant_cast<DataConstraintViolationReport>(reportItem.parsedErrorDetails).functionName.isEmpty()) {
-                report.append(reportItem);
-            }
-        }
+    for (auto parameter : parameters) {
+        SpinErrorReportItem newReportItem = parseSpinTraces(parameter.spinTraceFile, sclConditions);
+        // add scenario to new report item
+        newReportItem.errorNumber = 0;
+        newReportItem.scenario = parameter.scenarioFile;
+        report.append(newReportItem);
     }
 
     return report;
@@ -85,9 +72,42 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const RawErrorItem 
     return report;
 }
 
-void reporting::SpinErrorParser::parseSpinTraces(
-        const QString &, const QStringList &, reporting::SpinErrorReportItem &) const
+reporting::SpinErrorReportItem reporting::SpinErrorParser::parseSpinTraces(
+        const QString &spinTraces, const QStringList &) const
 {
+    SpinErrorReportItem reportItem;
+
+    auto acceptanceCycleMatch = matchAcceptanceCycle(spinTraces);
+    if (acceptanceCycleMatch.hasMatch()) {
+        // found an acceptance cycle, indicating an observer failure (success state)
+        reportItem.errorType = SpinErrorReportItem::ObserverFailure;
+        reportItem.errorDepth = 0;
+        reportItem.rawErrorDetails = acceptanceCycleMatch.captured();
+        reportItem.parsedErrorDetails = parseObserverFailureSuccessState();
+        return reportItem;
+    }
+
+    // search for variable violation
+    auto variableViolationMatch = matchVariableViolation(spinTraces);
+    reportItem.errorType = SpinErrorReportItem::OtherError;
+    reportItem.errorDepth = 0;
+    return reportItem;
+}
+
+QRegularExpressionMatch reporting::SpinErrorParser::matchAcceptanceCycle(const QString &spinTraces) const
+{
+    const QRegularExpression regex(QStringLiteral("<<<<<START OF CYCLE>>>>>"));
+    return regex.match(spinTraces);
+}
+
+QRegularExpressionMatch reporting::SpinErrorParser::matchVariableViolation(const QString &spinTraces) const
+{
+    QString pattern;
+    pattern += QStringLiteral("spin: text of failed assertion: ");
+    pattern += QStringLiteral("(.+)\\n");
+
+    const QRegularExpression regex(pattern);
+    return regex.match(spinTraces);
 }
 
 reporting::SpinErrorReportItem reporting::SpinErrorParser::buildDataConstraintViolationReportItem(
@@ -173,6 +193,26 @@ QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &
     QVariant stopConditionViolation;
     stopConditionViolation.setValue(violationReport);
     return stopConditionViolation;
+}
+
+QVariant reporting::SpinErrorParser::parseObserverFailureErrorState() const
+{
+    ObserverFailureReport violationReport;
+    violationReport.observerState = ObserverFailureReport::ErrorState;
+
+    QVariant observerFailure;
+    observerFailure.setValue(violationReport);
+    return observerFailure;
+}
+
+QVariant reporting::SpinErrorParser::parseObserverFailureSuccessState() const
+{
+    ObserverFailureReport violationReport;
+    violationReport.observerState = ObserverFailureReport::SuccessState;
+
+    QVariant observerFailure;
+    observerFailure.setValue(violationReport);
+    return observerFailure;
 }
 
 QRegularExpression reporting::SpinErrorParser::buildSpinErrorRegex()
