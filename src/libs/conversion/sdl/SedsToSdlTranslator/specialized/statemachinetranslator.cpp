@@ -187,6 +187,7 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
         return true;
     }
 
+    // Only one transition, but it doesn't have transaction
     if (transitions.size() == 1) {
         return false;
     }
@@ -268,6 +269,7 @@ static inline auto areParameterTransactionsRequired(const std::vector<const ::se
         return true;
     }
 
+    // Only one transition, but it doesn't have transaction
     if (transitions.size() == 1) {
         return false;
     }
