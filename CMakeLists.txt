@@ -67,8 +67,6 @@ if (WIN32)
     get_target_property(QtCore_location ${QT_CORE} LOCATION)
     get_filename_component(QT_DIR ${QtCore_location} DIRECTORY)
     get_filename_component(QT_DIR ${QT_DIR} DIRECTORY)
-    # set(Grantlee5_DIR "${QT_DIR}/lib/cmake/Grantlee5")
-    # message("Grantlee cmake dir: ${Grantlee5_DIR}")
 endif()
 
 find_package(Grantlee5 CONFIG REQUIRED)

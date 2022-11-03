@@ -31,7 +31,7 @@
 #include "asn1/project.h"
 
 using namespace Asn1Acn::Internal;
-#if QTC_VERSION == 408
+#if (QT_VERSION <= QT_VERSION_CHECK(5, 13, 0))
 ParsedDataStorage::ParsedDataStorage()
     : m_root(std::make_unique<Asn1Acn::Root>())
 {}
@@ -239,9 +239,7 @@ Asn1Acn::SourceLocation ParsedDataStorage::getLocationFromModule(
         return {};
     return type->location();
 }
-#endif
-
-#if QTC_VERSION == 800
+#else
 ParsedDataStorage::ParsedDataStorage()
     : m_root(std::make_unique<Asn1Acn::Root>())
 {}
@@ -389,8 +387,10 @@ int ParsedDataStorage::getDocumentsCount()
 
     QMutexLocker locker(&m_documentsMutex);
 
-    for (auto it = m_root->projects().begin(); it != m_root->projects().end(); it++)
+    auto projects = m_root->projects();
+    for (auto it = projects.begin(); it != projects.end(); it++) {
         cnt += static_cast<int>((*it)->files().size());
+    }
 
     return cnt;
 }
@@ -434,7 +434,8 @@ const Utils::FilePaths ParsedDataStorage::getFilesPathsFromProjectInternal(
 
 Asn1Acn::File *ParsedDataStorage::getFileForPathInternal(const Utils::FilePath &filePath) const
 {
-    for (auto it = m_root->projects().begin(); it != m_root->projects().end(); it++)
+    auto projects = m_root->projects();
+    for (auto it = projects.begin(); it != projects.end(); it++)
         if ((*it)->file(filePath.toString()) != nullptr)
             return (*it)->file(filePath.toString());
 

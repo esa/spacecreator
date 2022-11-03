@@ -46,10 +46,9 @@ QString extractObserverPath(const QString &info)
 
 uint32_t extractObserverPriority(const QString &info)
 {
-#if QTC_VERSION == 408
+#if (QT_VERSION <= QT_VERSION_CHECK(5, 13, 0))
     const auto elements = info.split(separator, QString::KeepEmptyParts);
-#endif
-#if QTC_VERSION == 800
+#else
     const auto elements = info.split(separator, Qt::KeepEmptyParts);
 #endif
     bool ok = true;
