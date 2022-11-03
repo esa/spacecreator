@@ -6,11 +6,12 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {wait, overflow}
+Controller-States ::= ENUMERATED {overflow, wait}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
+   sender PID,
    param MyReal
 }
 
@@ -29,6 +30,7 @@ Host-States ::= ENUMERATED {wait}
 Host-Context ::= SEQUENCE {
    state Host-States,
    init-done BOOLEAN,
+   sender PID,
    param MyReal
 }
 
