@@ -80,6 +80,19 @@ public:
 
     /**
      * @brief   Parse from multiple spin errors
+     *
+     * @param   spinMessages     Spin command outputs
+     * @param   spinTraces       Spin traces
+     * @param   sclConditions    SCL file conditions
+     * @param   scenario         scenario.sim file contents
+     *
+     * @return  List of spin errors
+     */
+    SpinErrorReport parse(const QStringList &spinMessages, const QStringList &spinTraces,
+            const QStringList &sclConditions, const QStringList &scenario) const;
+
+    /**
+     * @brief   Parse from multiple spin errors
      * @param   rawErrors        List of raw error messages
      * @return  List of spin errors
      */
