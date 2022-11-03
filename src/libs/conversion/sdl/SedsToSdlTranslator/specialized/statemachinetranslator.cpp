@@ -867,7 +867,7 @@ auto StateMachineTranslator::createParameterSyncPi(Context &context, ivm::IVInte
     }();
 
     if (options.isSet(SedsOptions::enableFailureReporting)) {
-        const auto &failureVariableName = asn1::translator::seds::Constants::failureVariableName;
+        const auto &failureVariableName = asn1::translator::seds::Constants::failureParamName;
 
         const auto failureVariableAssignment = QString("%1 := false").arg(failureVariableName);
         auto failureVariableAssignmentTask = std::make_unique<::sdl::Task>("", failureVariableAssignment);
