@@ -6,13 +6,12 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {finish, overflow, wait, failure}
+Controller-States ::= ENUMERATED {wait, overflow}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
-   param MyReal,
-   paramoverflow MyReal
+   param MyReal
 }
 
 END
@@ -30,8 +29,7 @@ Host-States ::= ENUMERATED {wait}
 Host-Context ::= SEQUENCE {
    state Host-States,
    init-done BOOLEAN,
-   param MyReal,
-   paramoverflow MyReal
+   param MyReal
 }
 
 END
@@ -41,41 +39,6 @@ BEGIN
 
    MyInteger ::= INTEGER (0 .. 10000)
    MyReal      ::= REAL (0.0 .. 1000.0)
-
--- ASN.1 Type definitions must start with an uppercase
--- Field names in records (SEQUENCE) must start with a lowercase
--- Underscores are not allowed: use dash (hyphen) 
--- For integers do not assume that small ranges will be translated to small
--- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
--- for the range in Ada)
-
--- Simple types:
-
--- TASTE-Boolean ::= BOOLEAN
--- MyInteger   ::= INTEGER (0..255)
--- MyReal      ::= REAL (0.0 .. 1000.0)
--- MyBool      ::= BOOLEAN
--- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
-
--- Complex types:
-
---  MySeq       ::= SEQUENCE {
---      input-data  MyInteger,
---      output-data MyInteger,
---      validity    ENUMERATED { valid, invalid }
---  }
---
---  MyChoice    ::= CHOICE {
---      a BOOLEAN,
---      b MySeq
---  }
---
---  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
---
---  MyOctStr    ::= OCTET STRING (SIZE (3))
---
---  -- You can also declare constants
---  myVar       MySeqOf     ::= { hello, world }
 
 END
 
@@ -126,9 +89,6 @@ BEGIN
       --  ASN.1 modules used by thread controller_Pong
       MyReal FROM GUIPROJECT-DATAVIEW
       
-      --  ASN.1 modules used by thread controller_PongOverflow
-      MyReal FROM GUIPROJECT-DATAVIEW
-      
       --  ASN.1 modules used by thread host_Ping
       MyReal FROM GUIPROJECT-DATAVIEW
       
@@ -158,8 +118,7 @@ BEGIN
    Controller-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         pong         SEQUENCE { p1 MyReal},
-         pongoverflow SEQUENCE { paramoverflow MyReal}
+         pong SEQUENCE { p1 MyReal}
       },
       msg-out CHOICE {
          ping SEQUENCE { p1 MyReal }
@@ -172,8 +131,7 @@ BEGIN
          ping SEQUENCE { p1 MyReal}
       },
       msg-out CHOICE {
-         pong         SEQUENCE { p1 MyReal },
-         pongoverflow SEQUENCE { paramoverflow MyReal }
+         pong SEQUENCE { p1 MyReal }
       }
    }
    
