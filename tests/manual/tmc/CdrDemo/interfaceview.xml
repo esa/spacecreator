@@ -1,130 +1,7 @@
-<InterfaceView asn1file="CdrDemo.acn">
-<Function name="EGSE" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
-    <Property name="Taste::coordinates" value="15100 43600 35100 51600"/>
-<Provided_Interface name="systemTm" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tm" type="SystemTelemetry" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="35100 49700"/>
-</Provided_Interface>
-
-<Required_Interface name="systemTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tc" type="SystemCommand" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="35100 45300"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
-</Required_Interface>
-
-    <Implementations>
-        <Implementation name="default" language="GUI"/>
-    </Implementations>
-</Function>
-
-<Function name="ModeManager" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
-    <Property name="Taste::coordinates" value="53500 37000 73500 58800"/>
-<Provided_Interface name="reading" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="x" type="DataItem" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="61900 58800"/>
-</Provided_Interface>
-
-<Provided_Interface name="actuatorTm1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tm" type="ActuatorStatus" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="73500 42900"/>
-</Provided_Interface>
-
-<Provided_Interface name="actuatorTm2" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tm" type="ActuatorStatus" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="73500 55500"/>
-</Provided_Interface>
-
-<Provided_Interface name="systemTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tc" type="SystemCommand" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="53500 45400"/>
-</Provided_Interface>
-
-<Required_Interface name="actuatorTc1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="73500 39100"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="false"/>
-</Required_Interface>
-
-<Required_Interface name="actuatorTc2" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="73500 51700"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="false"/>
-</Required_Interface>
-
-<Required_Interface name="systemTm" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tm" type="SystemTelemetry" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="53500 50600"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
-</Required_Interface>
-
-    <Implementations>
-        <Implementation name="default" language="SDL"/>
-    </Implementations>
-</Function>
-
-<Function name="Actuator2" is_type="NO" instance_of="Actuator" language="SDL" type_language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
-    <Property name="Taste::coordinates" value="97600 50200 117600 58200"/>
-<Provided_Interface name="actuatorTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="97600 51900"/>
-</Provided_Interface>
-
-<Required_Interface name="actuatorTm" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tm" type="ActuatorStatus" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="97600 55200"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="false"/>
-</Required_Interface>
-
-    <Implementations>
-        <Implementation name="default" language="SDL"/>
-    </Implementations>
-</Function>
-
-<Function name="Sensor" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
-    <Property name="Taste::coordinates" value="54100 69600 74100 77600"/>
-<Provided_Interface name="trigger" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="1">
-    <Property name="Taste::coordinates" value="57800 76100"/>
-</Provided_Interface>
-
-<Required_Interface name="reading" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="x" type="DataItem" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="61700 69600"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="true"/>
-</Required_Interface>
-
-    <Implementations>
-        <Implementation name="default" language="C"/>
-    </Implementations>
-</Function>
-
-<Function name="Actuator1" is_type="NO" instance_of="Actuator" language="SDL" type_language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
-    <Property name="Taste::coordinates" value="98200 37500 118200 45500"/>
-<Provided_Interface name="actuatorTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="98200 39200"/>
-</Provided_Interface>
-
-<Required_Interface name="actuatorTm" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
-    <Input_Parameter name="tm" type="ActuatorStatus" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="98200 42500"/>
-    <Property name="Taste::InheritPI" value="true"/>
-    <Property name="Taste::Autonamed" value="false"/>
-</Required_Interface>
-
-    <Implementations>
-        <Implementation name="default" language="SDL"/>
-    </Implementations>
-</Function>
-
-<Function name="Actuator" is_type="YES" type_language="SDL" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+<InterfaceView asn1file="CdrDemo.asn">
+<Function name="Actuator" is_type="YES" type_language="SDL" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="98700 26600 118700 34600"/>
-<Provided_Interface name="actuatorTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" priority="1" queue_size="1">
+<Provided_Interface name="actuatorTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
     <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
     <Property name="Taste::coordinates" value="98700 28200"/>
 </Provided_Interface>
@@ -137,6 +14,141 @@
 </Required_Interface>
 
 </Function>
+
+<Function name="EGSE" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="15100 43600 35100 51600"/>
+<Provided_Interface name="systemTm" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tm" type="SystemTelemetry" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="35100 49700"/>
+</Provided_Interface>
+
+<Required_Interface name="systemTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tc" type="SystemCommand" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="35100 45300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="Actuator1" is_type="NO" instance_of="Actuator" language="SDL" type_language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="98200 37500 118200 45500"/>
+<Provided_Interface name="actuatorTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="2" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="98200 39200"/>
+</Provided_Interface>
+
+<Required_Interface name="actuatorTm" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tm" type="ActuatorStatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="98200 42500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Actuator2" is_type="NO" instance_of="Actuator" language="SDL" type_language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="97600 50200 117600 58200"/>
+<Provided_Interface name="actuatorTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="2" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="97600 51900"/>
+</Provided_Interface>
+
+<Required_Interface name="actuatorTm" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tm" type="ActuatorStatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="97600 55200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="ModeManager" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="53500 37000 73500 58800"/>
+<Provided_Interface name="reading" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="x" type="DataItem" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="61900 58800"/>
+</Provided_Interface>
+
+<Provided_Interface name="actuatorTm1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tm" type="ActuatorStatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="73500 42900"/>
+</Provided_Interface>
+
+<Provided_Interface name="actuatorTm2" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tm" type="ActuatorStatus" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="73500 55500"/>
+</Provided_Interface>
+
+<Provided_Interface name="systemTc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tc" type="SystemCommand" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 45400"/>
+</Provided_Interface>
+
+<Required_Interface name="actuatorTc1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="2" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="73500 39100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="actuatorTc2" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="2" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tc" type="ActuatorCommand" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="73500 51700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface name="systemTm" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="tm" type="SystemTelemetry" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53500 50600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Sensor" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="54100 69600 74100 77600"/>
+<Provided_Interface name="trigger" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" dispatch_offset="0" priority="1" stack_size="1024" period="1000" wcet="0">
+    <Property name="Taste::coordinates" value="57800 76100"/>
+</Provided_Interface>
+
+<Required_Interface name="reading" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" priority="1" miat="0" stack_size="1024" wcet="0">
+    <Input_Parameter name="x" type="DataItem" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="61700 69600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="EGSE" ri_name="systemTc"/>
+    <Target func_name="ModeManager" pi_name="systemTc"/>
+    <Property name="Taste::coordinates" value="35700 45300 53200 45400"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="ModeManager" ri_name="actuatorTc1"/>
+    <Target func_name="Actuator1" pi_name="actuatorTc"/>
+    <Property name="Taste::coordinates" value="74100 39100 97900 39200"/>
+</Connection>
 
 <Connection  required_system_element="NO">
     <Source func_name="Actuator1" ri_name="actuatorTm"/>
@@ -151,15 +163,9 @@
 </Connection>
 
 <Connection  required_system_element="NO">
-    <Source func_name="ModeManager" ri_name="actuatorTc2"/>
-    <Target func_name="Actuator2" pi_name="actuatorTc"/>
-    <Property name="Taste::coordinates" value="74100 51700 85700 51700 97300 51900"/>
-</Connection>
-
-<Connection  required_system_element="NO">
-    <Source func_name="EGSE" ri_name="systemTc"/>
-    <Target func_name="ModeManager" pi_name="systemTc"/>
-    <Property name="Taste::coordinates" value="35700 45300 53200 45400"/>
+    <Source func_name="Sensor" ri_name="reading"/>
+    <Target func_name="ModeManager" pi_name="reading"/>
+    <Property name="Taste::coordinates" value="61700 69000 61900 59100"/>
 </Connection>
 
 <Connection  required_system_element="NO">
@@ -169,15 +175,9 @@
 </Connection>
 
 <Connection  required_system_element="NO">
-    <Source func_name="Sensor" ri_name="reading"/>
-    <Target func_name="ModeManager" pi_name="reading"/>
-    <Property name="Taste::coordinates" value="61700 69000 61900 59100"/>
-</Connection>
-
-<Connection  required_system_element="NO">
-    <Source func_name="ModeManager" ri_name="actuatorTc1"/>
-    <Target func_name="Actuator1" pi_name="actuatorTc"/>
-    <Property name="Taste::coordinates" value="74100 39100 97900 39200"/>
+    <Source func_name="ModeManager" ri_name="actuatorTc2"/>
+    <Target func_name="Actuator2" pi_name="actuatorTc"/>
+    <Property name="Taste::coordinates" value="74100 51700 85700 51700 97300 51900"/>
 </Connection>
 
 <Layer name="default"/>
