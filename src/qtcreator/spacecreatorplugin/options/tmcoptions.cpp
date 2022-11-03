@@ -23,6 +23,7 @@
 #include "tmcoptionswidget.h"
 
 #include <QSettings>
+#include <tmc/TmcConfig/constants.h>
 
 namespace spctr {
 
@@ -30,7 +31,7 @@ TmcOptions::TmcOptions(QObject *parent)
     : Core::IOptionsPage(parent)
 {
     setId(Constants::SETTINGS_TMC_ID);
-    setDisplayName(tr("Taste Model Checker settigns"));
+    setDisplayName(tr("Taste Model Checker settings"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
     setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
@@ -42,7 +43,7 @@ QWidget *TmcOptions::widget()
         m_widget = new TmcOptionsWidget();
 
         QSettings settings;
-        QVariant spinExecutable = settings.value(Constants::SETTINGS_TMC_SPIN_EXE_KEY);
+        QVariant spinExecutable = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_EXE_KEY);
         if (!spinExecutable.isValid()) {
             spinExecutable = QString("spin");
         }
@@ -58,7 +59,7 @@ void TmcOptions::apply()
     }
 
     QSettings settings;
-    settings.setValue(Constants::SETTINGS_TMC_SPIN_EXE_KEY, m_widget->getSpinExecutable());
+    settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_EXE_KEY, m_widget->getSpinExecutable());
 }
 
 void TmcOptions::finish()
