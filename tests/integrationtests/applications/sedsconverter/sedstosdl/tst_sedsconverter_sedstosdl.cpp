@@ -332,7 +332,6 @@ void tst_SedsConverter_SedsToSdl::testFailureReportingSync()
 
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2130
-/// \SRS  ETB-FUN-2190
 void tst_SedsConverter_SedsToSdl::testFailureReportingAsync()
 {
     const int result = system("./test_failure_reporting_async.sh");
