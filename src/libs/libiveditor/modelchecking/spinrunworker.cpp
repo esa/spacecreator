@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <QEventLoop>
+#include <QSettings>
 #include <tmc/TmcVerifier/verifier.h>
 
 using tmc::verifier::TmcVerifier;
@@ -91,6 +92,13 @@ void SpinRunWorker::run()
     if (!m_spinConfig.rawCommandLine.isEmpty()) {
         m_verifier->setRawCommandline(m_spinConfig.rawCommandLine);
     }
+
+    QSettings settings;
+    QVariant spinExecutable = settings.value("SpaceCreator/tmcSpinExe");
+    if (spinExecutable.isValid()) {
+        m_verifier->setSpinExecutable(spinExecutable.toString());
+    }
+
     if (m_spinConfig.globalInputVectorGenerationLimit.has_value()) {
         m_verifier->setGlobalInputVectorLengthLimit(
                 QString::number(m_spinConfig.globalInputVectorGenerationLimit.value()));

@@ -184,7 +184,12 @@ void TmcVerifier::setMemoryLimit(int memoryLimit)
 
 void TmcVerifier::setRawCommandline(QString rawCommandline)
 {
-    m_rawCommandline = rawCommandline;
+    m_rawCommandline = std::move(rawCommandline);
+}
+
+void TmcVerifier::setSpinExecutable(QString spinExecutable)
+{
+    m_spinExecutable = std::move(spinExecutable);
 }
 
 bool TmcVerifier::execute(ExecuteMode executeMode)
@@ -308,7 +313,7 @@ void TmcVerifier::executeVerifier()
 void TmcVerifier::executeSpin()
 {
     const QString inputFile = "system.pml";
-    const QString spinExe = "spin";
+    const QString spinExe = m_spinExecutable.isEmpty() ? QString("spin") : m_spinExecutable;
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
