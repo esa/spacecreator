@@ -19,7 +19,37 @@
 
 #include "spinerrorparser.h"
 
+#include <QDebug>
 #include <QRegularExpression>
+
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(
+        const QStringList &, const QStringList &spinTraces, const QStringList &, const QStringList &scenario) const
+{
+    reporting::SpinErrorReport report;
+
+    // number of errors is equal to the number of separate spin traces
+    int errorCount = spinTraces.size();
+    qDebug() << errorCount;
+
+    for (int i = 0; i < errorCount; ++i) {
+        const auto currentSpinTraces = spinTraces[i];
+        const auto currentScenario = scenario[i];
+
+        // find observer failure (success states) by acceptance cycles
+
+        auto matches = matchSpinErrors(currentSpinTraces);
+        while (matches.hasNext()) {
+            auto reportItem = buildDataConstraintViolationReportItem(matches.next());
+            reportItem.scenario = currentScenario;
+            // verify if item is valid
+            if (!qvariant_cast<DataConstraintViolationReport>(reportItem.parsedErrorDetails).functionName.isEmpty()) {
+                report.append(reportItem);
+            }
+        }
+    }
+
+    return report;
+}
 
 reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QList<reporting::RawErrorItem> rawErrors) const
 {

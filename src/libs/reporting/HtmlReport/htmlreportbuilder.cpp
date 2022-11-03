@@ -38,25 +38,17 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
 }
 
 QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
-        const QStringList &spinTraces, const QStringList &sclConditions, const QStringList &) const
+        const QStringList &spinTraces, const QStringList &sclConditions, const QStringList &scenario,
+        const QString &templateFile) const
 {
-    QList<RawErrorItem> rawErrors;
-    const auto spinMessagesSize = spinMessages.size();
-    const auto spinTracesSize = spinTraces.size();
-    const auto sclConditionsSize = sclConditions.size();
-    // temporary bypassing of scenario
-    const auto scenarioSize = sclConditions.size();
-    const auto minSize = qMin(qMin(spinMessagesSize, spinTracesSize), qMin(sclConditionsSize, scenarioSize));
-    for (int i = 0; i < minSize; ++i) {
-        RawErrorItem rawError;
-        rawError.spinMessages = spinMessages[i];
-        rawError.spinTraces = spinTraces[i];
-        rawError.sclConditions = sclConditions[i];
-        rawError.scenario = QString(); // scenario[i];
-        rawErrors.append(rawError);
+    SpinErrorParser parser;
+    auto reports = parser.parse(spinMessages, spinTraces, sclConditions, scenario);
+    if (templateFile.isEmpty()) {
+        initResource();
+        return buildHtmlReport(reports, m_defaultTemplateFile);
+    } else {
+        return buildHtmlReport(reports, templateFile);
     }
-
-    return parseAndBuildHtmlReport(rawErrors);
 }
 
 QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const

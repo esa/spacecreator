@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     QStringList spinMessages;
     QStringList spinTraces;
     QStringList sclConditions;
-    QStringList trailFiles;
+    QStringList scenarioFiles;
     std::optional<QString> templateFile;
     std::optional<QString> targetFile;
 
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             ++i;
-            trailFiles.append(args[i]);
+            scenarioFiles.append(args[i]);
         } else if (arg == "-it") {
             if (i + 1 == args.size()) {
                 qCritical("Missing template file after -it");
@@ -144,12 +144,12 @@ int main(int argc, char *argv[])
     }
 
     // parse trails
-    QStringList trails;
-    for (auto trailFile : trailFiles) {
-        QFile file(trailFile);
+    QStringList scenario;
+    for (auto scenarioFile : scenarioFiles) {
+        QFile file(scenarioFile);
         if (file.open(QFile::ReadOnly)) {
             const QString fileContents(file.readAll());
-            trails.append(fileContents);
+            scenario.append(fileContents);
             file.close();
         } else {
             qCritical("Unable to open trail file");
@@ -162,20 +162,20 @@ int main(int argc, char *argv[])
     const auto spinMessagesSize = spinMessages.size();
     const auto spinTracesSize = spinTraces.size();
     const auto sclConditionsSize = sclConditions.size();
-    const auto trailsSize = trails.size();
+    const auto trailsSize = scenario.size();
     const auto minSize = qMin(qMin(spinMessagesSize, spinTracesSize), qMin(sclConditionsSize, trailsSize));
     for (int i = 0; i < minSize; ++i) {
         RawErrorItem rawError;
         rawError.spinMessages = spinMessages[i];
         rawError.spinTraces = spinTraces[i];
         rawError.sclConditions = sclConditions[i];
-        rawError.scenario = trails[i];
+        rawError.scenario = scenario[i];
         rawErrors.append(rawError);
     }
 
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(rawErrors);
+    auto reports = parser.parse(spinMessages, spinTraces, sclConditions, scenario);
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;

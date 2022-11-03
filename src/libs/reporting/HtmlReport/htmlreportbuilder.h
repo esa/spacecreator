@@ -44,17 +44,19 @@ public:
     HtmlReportBuilder();
 
     /**
-     * @brief   Convenience function for building report from multiple string lists
+     * @brief   Builds HTML report from multiple string lists and a default template
      *
      * @param   spinMessages     Spin command outputs
      * @param   spinTraces       Spin traces
      * @param   sclConditions    SCL file conditions
      * @param   scenario         scenario.sim file contents
+     * @param   template         HTML template file, uses default if empty
      *
-     * @return  Error report in HTML format
+     * @return  HTML-formatted error report string
      */
     QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &spinTraces,
-            const QStringList &sclConditions, const QStringList &scenario = QStringList()) const;
+            const QStringList &sclConditions, const QStringList &scenario,
+            const QString &templateFile = QString()) const;
 
     /**
      * @brief   Parse and build report using a default template file embedded into the library
