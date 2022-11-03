@@ -20,6 +20,7 @@
 #pragma once
 
 #include "dataconstraintviolationreport.h"
+#include "observerfailurereport.h"
 #include "rawerroritem.h"
 #include "spinerrorreportitem.h"
 #include "stopconditionviolationreport.h"
@@ -28,6 +29,12 @@ class QRegularExpressionMatch;
 class QRegularExpressionMatchIterator;
 
 namespace reporting {
+
+struct TempParameter {
+    QString spinTraceFile;
+    QString scenarioFile;
+    std::pair<QString, int> possibleCycleSource;
+};
 
 /**
  * @brief   Parses and generates error reports based on spin messages.
@@ -88,8 +95,8 @@ public:
      *
      * @return  List of spin errors
      */
-    SpinErrorReport parse(const QStringList &spinMessages, const QStringList &spinTraces,
-            const QStringList &sclConditions, const QStringList &scenario) const;
+    SpinErrorReport parse(const QStringList &spinMessages, const QStringList &sclConditions,
+            const QList<TempParameter> &parameters, const QStringList &observerNames) const;
 
     /**
      * @brief   Parse from multiple spin errors
@@ -109,8 +116,10 @@ private:
     static const QString m_spinNoTrailFileMessage;
     static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationIdentifiers;
 
-    void parseSpinTraces(
-            const QString &currentSpinTraces, const QStringList &sclConditions, SpinErrorReportItem &reportItem) const;
+    SpinErrorReportItem parseSpinTraces(const QString &spinTraces, const QStringList &sclConditions) const;
+
+    QRegularExpressionMatch matchAcceptanceCycle(const QString &spinTraces) const;
+    QRegularExpressionMatch matchVariableViolation(const QString &spinTraces) const;
 
     SpinErrorReportItem buildDataConstraintViolationReportItem(const QRegularExpressionMatch &matchedError) const;
     SpinErrorReportItem buildStopConditionViolationReportItem(const QString &conditions) const;
@@ -118,6 +127,8 @@ private:
     QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
     QVariant parseVariableViolation(const QString &rawError) const;
     QVariant parseStopConditionViolation(const QString &rawError) const;
+    QVariant parseObserverFailureErrorState() const;
+    QVariant parseObserverFailureSuccessState() const;
 
     static QRegularExpression buildSpinErrorRegex();
     static QRegularExpression buildDataConstraintViolationRegex();
