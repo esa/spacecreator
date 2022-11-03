@@ -73,7 +73,6 @@ private:
 
     QByteArray fileHash(const QStringList &fileNames) const;
     bool convertToXML(const QStringList &asn1FileNames, const QString &xmlFilename, QStringList *errorMessages) const;
-    QString createFilenameParameter(const QStringList &asn1FileNames) const;
     void parseAsn1SccErrors(QString errorString, QStringList *errorMessages) const;
     std::map<QString, std::unique_ptr<Asn1Acn::File>> parseAsn1XmlFileImpl(const QString &fileName);
 
