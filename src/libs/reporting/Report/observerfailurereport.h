@@ -40,3 +40,6 @@ struct ObserverFailureReport {
 };
 
 }
+
+// Add meta type for QVariant compatibility
+Q_DECLARE_METATYPE(reporting::ObserverFailureReport)
