@@ -103,18 +103,6 @@ bool RealRangeConstraintVisitor::isSizeConstraintVisited() const noexcept
     return m_subset.has_value();
 }
 
-size_t RealRangeConstraintVisitor::getMinSize() const noexcept
-{
-    int min = m_subset.value().getMin().value();
-    return static_cast<size_t>(min);
-}
-
-size_t RealRangeConstraintVisitor::getMaxSize() const noexcept
-{
-    int max = m_subset.value().getMax().value();
-    return static_cast<size_t>(max);
-}
-
 const std::optional<RealSubset> &RealRangeConstraintVisitor::getResultSubset() const
 {
     return m_subset;

@@ -69,18 +69,6 @@ public:
     bool isSizeConstraintVisited() const noexcept;
 
     /**
-     * @brief Getter for found minimal value constraint
-     *
-     * @return minimal allowed value
-     */
-    size_t getMinSize() const noexcept;
-    /**
-     * @brief Getter for found maximal value constraint
-     *
-     * @return maximal allowed value
-     */
-    size_t getMaxSize() const noexcept;
-    /**
      * @brief Getter for result RealSubset which describes allowed size values
      *
      * @return RealSubset with allowed size values
