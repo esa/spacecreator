@@ -337,7 +337,7 @@ void TmcVerifier::executeCC()
     const QString outputFile = "pan";
     const QString compilerExe = "gcc";
     QStringList standardArguments;
-    standardArguments.append("-O0");
+    standardArguments.append("-O2");
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
@@ -348,8 +348,12 @@ void TmcVerifier::executeCC()
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
 
     QStringList arguments = standardArguments;
+
     arguments.append("-o");
     arguments.append(outputFile);
+
+    // This is a temporary sane default, TODO - make it configurable
+    arguments.append("-DVECTORSZ=65535");
 
     if (m_useBitHashing) {
         arguments.append("-DBITSTATE");
