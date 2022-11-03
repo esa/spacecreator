@@ -707,27 +707,35 @@ void IvToPromelaTranslator::generateEnvironmentProctype(Context &context, const 
 
     loopSequence->appendElement(InlineCall(sendInline, sendInlineArguments));
 
-    int limit = 0;
-    if (interfaceInputVectorLenghtLimit.has_value()) {
-        limit = interfaceInputVectorLenghtLimit->toInt();
-    } else if (globalInputVectorLengthLimit.has_value()) {
-        limit = globalInputVectorLengthLimit->toInt();
-    }
+    // clang-format off
+    auto limit = [&]() -> std::optional<int> {
+        if (interfaceInputVectorLenghtLimit.has_value()) {
+            return interfaceInputVectorLenghtLimit->toInt();
+        } else if (globalInputVectorLengthLimit.has_value()) {
+            return globalInputVectorLengthLimit->toInt();
+        } else {
+            return std::nullopt;
+        }
+    }();
+    // clang-format on
 
-    if (limit == 0) {
+    if (limit.has_value()) {
+        // If limit was set to 0, then we don't generate the loop at all
+        if (*limit != 0) {
+            Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
+            sequence.appendElement(std::move(iteratorVariable));
+
+            VariableRef iteratorVariableRef("inputVectorCounter");
+            Expression firstExpression(0);
+            Expression lastExpression(*limit - 1);
+
+            ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
+
+            sequence.appendElement(std::move(loop));
+        }
+    } else {
         DoLoop loop;
         loop.appendSequence(std::move(loopSequence));
-
-        sequence.appendElement(std::move(loop));
-    } else {
-        Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
-        sequence.appendElement(std::move(iteratorVariable));
-
-        VariableRef iteratorVariableRef("inputVectorCounter");
-        Expression firstExpression(0);
-        Expression lastExpression(limit - 1);
-
-        ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
 
         sequence.appendElement(std::move(loop));
     }
