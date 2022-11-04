@@ -461,7 +461,7 @@ void TmcVerifier::generateNextTrace()
     m_traceGeneratorProcess->setWorkingDirectory(m_outputDirectory);
 
     const QString inputFile = "system.pml";
-    const QString spinExe = "spin";
+    const QString spinExe = m_spinExecutable.isEmpty() ? QString("spin") : m_spinExecutable;
 
     QStringList arguments;
     arguments.append("-k");
