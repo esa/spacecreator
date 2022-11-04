@@ -55,6 +55,15 @@
               <i>Violation Clause:</i> <tt>{{ reportItem.errorDetails.violationClause }}</tt><br>
               <i>Violation Type:</i> <tt>{{ reportItem.errorDetails.violationType }}</tt>
             </td>
+          {# Check for observer failure #}
+          {% elif reportItem.errorCode == 2 %}
+            <td>
+              <i>Observer Name:</i> <tt>{{ reportItem.errorDetails.observerName }}</tt><br>
+              <i>Observer State:</i> <tt>{{ reportItem.errorDetails.observerState }}</tt>
+            </td>
+          {# Unknown error type #}
+          {% else %}
+            <td></td>
           {% endif %}
           
         </tr>

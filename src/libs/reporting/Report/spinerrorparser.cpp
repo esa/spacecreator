@@ -68,7 +68,7 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
     auto observerFailureErrorStateMatch = matchObserverFailureErrorState(spinTraces);
     if (observerFailureErrorStateMatch.hasMatch()) {
         // found observer failure (error state)
-        auto observerName = stopConditionMatch.captured(ErrorDetailsMatch);
+        auto observerName = observerFailureErrorStateMatch.captured(ErrorDetailsMatch);
         auto report = parseObserverFailureErrorState(observerName);
         reportItem.errorDepth = 0;
         reportItem.errorType = SpinErrorReportItem::ObserverFailure;
