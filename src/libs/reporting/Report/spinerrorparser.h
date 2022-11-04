@@ -94,11 +94,14 @@ public:
 
 private:
     static const QString m_spinNoTrailFileMessage;
-    static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationIdentifiers;
+    static const QHash<QString, StopConditionViolationReport::ViolationClause> m_stopConditionViolationClauses;
+    static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationTypes;
 
-    SpinErrorReportItem parseSpinTraces(const QString &spinTraces, const QStringList &sclConditions) const;
+    SpinErrorReportItem parseTrace(const QString &spinTraces, const QStringList &sclConditions) const;
 
-    QRegularExpressionMatch matchAcceptanceCycle(const QString &spinTraces) const;
+    QRegularExpressionMatch matchStopCondition(const QString &spinTraces) const;
+    QRegularExpressionMatch matchObserverFailureErrorState(const QString &spinTraces) const;
+    QRegularExpressionMatch matchObserverFailureSuccessState(const QString &spinTraces) const;
     QRegularExpressionMatch matchVariableViolation(const QString &spinTraces) const;
 
     SpinErrorReportItem buildDataConstraintViolationReportItem(const QRegularExpressionMatch &matchedError) const;
