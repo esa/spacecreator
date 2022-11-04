@@ -167,6 +167,10 @@ QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(co
     reporting::StopConditionViolationReport report =
             qvariant_cast<reporting::StopConditionViolationReport>(errorDetails);
     QVariantHash variantHash;
+    // resolve violation clause as string
+    variantHash.insert("violationClause",
+            m_stopConditionViolationClauseNames.value(report.violationClause,
+                    m_stopConditionViolationClauseNames[reporting::StopConditionViolationReport::UnknownClause]));
     // resolve violation type as string
     variantHash.insert("violationType",
             m_stopConditionViolationTypeNames.value(report.violationType,
@@ -183,6 +187,15 @@ const QHash<reporting::SpinErrorReportItem::ErrorType, QString> reporting::HtmlR
     { reporting::SpinErrorReportItem::ObserverFailure, "Observer Failure" },
     { reporting::SpinErrorReportItem::OtherError, "Unknown Error" }
 };
+
+const QHash<reporting::StopConditionViolationReport::ViolationClause, QString>
+        reporting::HtmlReportBuilder::m_stopConditionViolationClauseNames = {
+            { reporting::StopConditionViolationReport::Never, "Never" },
+            { reporting::StopConditionViolationReport::Always, "Always" },
+            { reporting::StopConditionViolationReport::Eventually, "Eventually" },
+            { reporting::StopConditionViolationReport::FilterOut, "Filter Out" },
+            { reporting::StopConditionViolationReport::UnknownClause, "Unknown Clause" },
+        };
 
 const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
         reporting::HtmlReportBuilder::m_stopConditionViolationTypeNames = {
