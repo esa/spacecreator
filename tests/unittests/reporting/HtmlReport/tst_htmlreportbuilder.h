@@ -32,8 +32,9 @@ private Q_SLOTS:
     void testNoError();
     void testDataConstraintViolation();
     void testDataConstraintViolationNested();
-    void testStopConditionViolationEmpty();
-    void testStopConditionViolationGetState();
+    void testStopConditionViolation();
+    void testObserverFailureErrorState();
+    void testObserverFailureSuccessState();
 
 private:
     QString readFile(const QString &filepath);

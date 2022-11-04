@@ -1,0 +1,29 @@
+pan:1: assertion violated (q_len(Actuator_test_channel)==0) (at depth 70)
+pan: wrote system.pml.trail
+
+(Spin Version 6.4.9 -- 17 December 2018)
+Warning: Search not completed
+
+Full statespace search for:
+	never claim         	+ (never_0)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	- (not selected)
+	invalid end states	- (disabled by never claim)
+
+State-vector 452 byte, depth reached 70, errors: 1
+       14 states, stored
+        0 states, matched
+       14 transitions (= stored+matched)
+       46 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.006	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.261	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+   61.035	memory used for DFS stack (-m1000000)
+  189.231	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
