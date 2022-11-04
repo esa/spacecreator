@@ -24,6 +24,7 @@
 #include "specialized/statementtranslatorvisitor.h"
 
 #include <algorithm>
+#include <conversion/asn1/SedsToAsn1Translator/constants.h>
 #include <conversion/asn1/SedsToAsn1Translator/translator.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/overloaded.h>
@@ -39,9 +40,13 @@
 using conversion::Escaper;
 using conversion::asn1::translator::seds::SedsToAsn1Translator;
 using conversion::iv::translator::seds::InterfaceTranslatorHelper;
+using conversion::seds::SedsOptions;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 using conversion::translator::MissingInterfaceViewFunctionException;
 using conversion::translator::TranslationException;
+
+using SedsCommandPrimitiveFilterFunc = std::function<bool(const ::seds::model::OnCommandPrimitive *)>;
+using SedsParameterPrimitiveFilterFunc = std::function<bool(const ::seds::model::OnParameterPrimitive *)>;
 
 namespace conversion::sdl::translator {
 
@@ -154,45 +159,6 @@ static inline auto getTransitionsForParameter(const ::seds::model::StateMachine 
     return result;
 }
 
-static inline auto createSyncCommandProcedureSdl(Context &context, const ::seds::model::Transition *sedsTransition,
-        const ::seds::model::OnCommandPrimitive *primitive) -> std::unique_ptr<::sdl::Transition>
-{
-    auto sdlTransition = std::make_unique<::sdl::Transition>();
-
-    if (sedsTransition == nullptr) {
-        throw TranslationException("Sync commands with no associated transitions are not supported");
-    }
-
-    if (!sedsTransition->doActivity().has_value()) {
-        throw TranslationException("Sync commands with transition without associated activity are not supported");
-    }
-
-    for (const auto &argument : primitive->argumentValues()) {
-        const auto targetVariableName = Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
-        const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
-
-        sdlTransition->addAction(
-                std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, fieldName)));
-    }
-
-    const auto &activityInvocation = sedsTransition->doActivity().value();
-
-    auto call = StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), activityInvocation);
-    sdlTransition->addAction(std::move(call));
-
-    const auto &activityName = activityInvocation.activity().value();
-    const auto activityInfo = context.getActivityInfo(activityName);
-
-    if (activityInfo != nullptr) {
-        for (const auto &assignment : activityInfo->returnAssignments()) {
-            sdlTransition->addAction(std::make_unique<::sdl::Task>(
-                    "", QString("%1 := %2").arg(assignment.left()).arg(assignment.right())));
-        }
-    }
-
-    return sdlTransition;
-}
-
 static inline auto areCommandTransactionsRequired(const std::vector<const ::seds::model::Transition *> &transitions)
         -> bool
 {
@@ -200,20 +166,14 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
         throw TranslationException("Sync commands with no associated transitions are not supported");
     }
 
+    const auto firstTransition = transitions.front();
+
     // primitive is now guaranteed to be OnCommandPrimitive
-    const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&transitions[0]->primitive());
+    const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&firstTransition->primitive());
     if (primitive == nullptr) {
         throw TranslationException(
                 "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
                 "a transition which is not OnCommandPrimitive");
-    }
-
-    if (primitive->transaction().has_value()) {
-        return true;
-    }
-
-    if (transitions.size() == 1) {
-        return false;
     }
 
     for (const auto &transition : transitions) {
@@ -221,6 +181,15 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
             throw TranslationException(
                     "Sync commands with transitions without associated activities are not supported");
         }
+    }
+
+    if (primitive->transaction().has_value()) {
+        return true;
+    }
+
+    // Only one transition, but it doesn't have transaction
+    if (transitions.size() == 1) {
+        return false;
     }
 
     for (const auto &otherTransition : transitions) {
@@ -253,7 +222,7 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
     }
 
     // doActivity optional is now guaranteed to have a value
-    const auto invocation = &(*(transitions[0]->doActivity()));
+    const auto invocation = &(*(firstTransition->doActivity()));
 
     for (const auto &otherTransition : transitions) {
         const auto otherInvocation = &(*(otherTransition->doActivity()));
@@ -282,7 +251,7 @@ static inline auto areCommandTransactionsRequired(const std::vector<const ::seds
 static inline auto areParameterTransactionsRequired(const std::vector<const ::seds::model::Transition *> &transitions)
         -> bool
 {
-    if (transitions.size() < 2) {
+    if (transitions.empty()) {
         return false;
     }
 
@@ -298,6 +267,11 @@ static inline auto areParameterTransactionsRequired(const std::vector<const ::se
 
     if (primitive->transaction().has_value()) {
         return true;
+    }
+
+    // Only one transition, but it doesn't have transaction
+    if (transitions.size() == 1) {
+        return false;
     }
 
     for (const auto &otherTransition : transitions) {
@@ -348,16 +322,15 @@ static inline auto areParameterTransactionsRequired(const std::vector<const ::se
     return false;
 }
 
-static inline auto handleCommandTransactions(Context &context,
-        const std::vector<const ::seds::model::Transition *> &sedsTransitions, ::sdl::Procedure *procedure,
-        ivm::IVInterface *ivInterface, const Options &options)
+static inline auto createTransactionsElements(Context &context, ::sdl::Procedure *procedure,
+        ::ivm::IVInterface *ivInterface, const QString &transactionVariableName, const Options &options)
 {
-    if (!options.isSet(conversion::seds::SedsOptions::transactionNameType)) {
+    if (!options.isSet(SedsOptions::transactionNameType)) {
         throw TranslationException(
                 "SEDS transaction feature was used but no ASN.1 type for transaction name was specified");
     }
 
-    const auto transactionParamTypeName = options.value(conversion::seds::SedsOptions::transactionNameType).value();
+    const auto transactionParamTypeName = options.value(SedsOptions::transactionNameType).value();
 
     // Add transaction name parameter to the IV interface
     auto ivParameter = shared::InterfaceParameter(
@@ -370,13 +343,62 @@ static inline auto handleCommandTransactions(Context &context,
     procedure->addParameter(std::move(transactionParameter));
 
     // Add variable to pass transaction name outside of the procedure
-    const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(ivInterface->title());
     auto transactionVariable =
             std::make_unique<::sdl::VariableDeclaration>(transactionVariableName, transactionParamTypeName);
     auto sdlProcess = context.sdlProcess();
     sdlProcess->addVariable(std::move(transactionVariable));
+}
 
-    // Create a decision based on the transaction name
+static inline auto createCommandTransition(Context &context, const ::seds::model::Transition *sedsTransition)
+        -> std::unique_ptr<::sdl::Transition>
+{
+    if (sedsTransition == nullptr) {
+        throw TranslationException("Sync commands with no associated transitions are not supported");
+    }
+
+    if (!sedsTransition->doActivity().has_value()) {
+        throw TranslationException("Sync commands with transition without associated activity are not supported");
+    }
+
+    const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&sedsTransition->primitive());
+    if (primitive == nullptr) {
+        throw TranslationException(
+                "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
+                "a transition which is not OnCommandPrimitive");
+    }
+
+    auto sdlTransition = std::make_unique<::sdl::Transition>();
+
+    for (const auto &argument : primitive->argumentValues()) {
+        const auto targetVariableName = Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
+        const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
+
+        sdlTransition->addAction(
+                std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(targetVariableName, fieldName)));
+    }
+
+    const auto &activityInvocation = sedsTransition->doActivity().value();
+
+    auto call = StatementTranslatorVisitor::translateActivityCall(context.sdlProcess(), activityInvocation);
+    sdlTransition->addAction(std::move(call));
+
+    const auto &activityName = activityInvocation.activity().value();
+    const auto activityInfo = context.getActivityInfo(activityName);
+
+    if (activityInfo != nullptr) {
+        for (const auto &assignment : activityInfo->returnAssignments()) {
+            sdlTransition->addAction(std::make_unique<::sdl::Task>(
+                    "", QString("%1 := %2").arg(assignment.left()).arg(assignment.right())));
+        }
+    }
+
+    return sdlTransition;
+}
+
+static inline auto createCommandTransactionDecision(Context &context,
+        const std::vector<const ::seds::model::Transition *> &sedsTransitions,
+        SedsCommandPrimitiveFilterFunc filterFunc) -> std::unique_ptr<::sdl::Decision>
+{
     auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(Constants::transactionParamName);
     auto sdlDecision = std::make_unique<::sdl::Decision>();
     sdlDecision->setExpression(std::move(sdlDecisionExpression));
@@ -389,13 +411,17 @@ static inline auto handleCommandTransactions(Context &context,
                     "a transition which is not OnCommandPrimitive");
         }
 
+        if (!filterFunc(primitive)) {
+            continue;
+        }
+
         const auto &transaction = primitive->transaction();
         if (!transaction.has_value()) {
             throw TranslationException("Missing transaction name in one of the command transitions");
         }
         const auto &transactionName = QString("\"%1\"").arg(transaction->value());
 
-        auto sdlAnswerTransition = createSyncCommandProcedureSdl(context, sedsTransition, primitive);
+        auto sdlAnswerTransition = createCommandTransition(context, sedsTransition);
 
         auto sdlAnswer = std::make_unique<::sdl::Answer>();
         sdlAnswer->setLiteral(transactionName);
@@ -409,91 +435,27 @@ static inline auto handleCommandTransactions(Context &context,
     sdlElseAnswer->setTransition(std::make_unique<::sdl::Transition>());
     sdlDecision->addAnswer(std::move(sdlElseAnswer));
 
-    auto sdlTransition = std::make_unique<::sdl::Transition>();
-
-    auto transactionVariableAssignment = std::make_unique<::sdl::Task>(
-            "", QString("%1 := %2").arg(transactionVariableName).arg(Constants::transactionParamName));
-    sdlTransition->addAction(std::move(transactionVariableAssignment));
-
-    sdlTransition->addAction(std::move(sdlDecision));
-
-    procedure->setTransition(std::move(sdlTransition));
+    return sdlDecision;
 }
 
-static inline auto handleParameterTransactions(const std::vector<const ::seds::model::Transition *> &sedsTransitions,
-        ::sdl::Process *sdlProcess, ::sdl::Procedure *procedure, ivm::IVInterface *ivInterface,
-        const QString &assignmentAction, const Options &options)
+static inline auto createCommandTransitionWithTransactions(Context &context,
+        const std::vector<const ::seds::model::Transition *> &sedsTransitions, const QString &transactionVariableName)
+        -> std::unique_ptr<::sdl::Transition>
 {
-    if (!options.isSet(conversion::seds::SedsOptions::transactionNameType)) {
-        throw TranslationException(
-                "SEDS transaction feature was used but no ASN.1 type for transaction name was specified");
-    }
+    // Create decision based on the transaction
+    auto sdlTransactionDecision = createCommandTransactionDecision(context, sedsTransitions, [](auto) { return true; });
 
-    const auto transactionParamTypeName = options.value(conversion::seds::SedsOptions::transactionNameType).value();
-
-    // Add transaction name parameter to the IV interface
-    auto ivParameter = shared::InterfaceParameter(
-            Constants::transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
-    ivInterface->addParam(ivParameter);
-
-    // Add transaction name parameter to the interface procedure
-    auto transactionParameter = std::make_unique<::sdl::ProcedureParameter>(
-            Constants::transactionParamName, transactionParamTypeName, "in");
-    procedure->addParameter(std::move(transactionParameter));
-
-    // Add variable to pass transaction name outside of the procedure
-    const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(ivInterface->title());
-    auto transactionVariable =
-            std::make_unique<::sdl::VariableDeclaration>(transactionVariableName, transactionParamTypeName);
-    sdlProcess->addVariable(std::move(transactionVariable));
-
-    QStringList transactionNames;
-
-    for (const auto sedsTransition : sedsTransitions) {
-        const auto primitive = std::get_if<::seds::model::OnParameterPrimitive>(&sedsTransition->primitive());
-        if (primitive == nullptr) {
-            throw TranslationException(
-                    "Unknown translator bug: set of Transitions filtered for OnParameterPrimitive contains "
-                    "a transition which is not OnParameterPrimitive");
-        }
-
-        const auto &transaction = primitive->transaction();
-        if (!transaction.has_value()) {
-            throw TranslationException("Missing transaction name in one of the parameter transitions");
-        }
-        const auto &transactionName = QString("\"%1\"").arg(transaction->value());
-        transactionNames.push_back(transactionName);
-    }
-
-    // Create a decision based on the transaction names
-    auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(Constants::transactionParamName);
-    auto sdlDecision = std::make_unique<::sdl::Decision>();
-    sdlDecision->setExpression(std::move(sdlDecisionExpression));
-
-    auto sdlAnswerTransition = std::make_unique<::sdl::Transition>();
-    sdlAnswerTransition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
-
-    auto sdlAnswer = std::make_unique<::sdl::Answer>();
-    sdlAnswer->setLiteral(transactionNames.join(", "));
-    sdlAnswer->setTransition(std::move(sdlAnswerTransition));
-
-    auto sdlElseTransition = std::make_unique<::sdl::Transition>();
-    auto sdlElseAnswer = std::make_unique<::sdl::Answer>();
-    sdlElseAnswer->setLiteral(::sdl::Answer::ElseLiteral);
-    sdlElseAnswer->setTransition(std::move(sdlElseTransition));
-
-    sdlDecision->addAnswer(std::move(sdlAnswer));
-    sdlDecision->addAnswer(std::move(sdlElseAnswer));
-
+    // Create result transition
     auto sdlTransition = std::make_unique<::sdl::Transition>();
 
-    auto transactionVariableAssignment = std::make_unique<::sdl::Task>(
-            "", QString("%1 := %2").arg(transactionVariableName).arg(Constants::transactionParamName));
-    sdlTransition->addAction(std::move(transactionVariableAssignment));
+    const auto transactionVariableAssignment =
+            QString("%1 := %2").arg(transactionVariableName).arg(Constants::transactionParamName);
+    auto transactionVariableAssignmentTask = std::make_unique<::sdl::Task>("", transactionVariableAssignment);
+    sdlTransition->addAction(std::move(transactionVariableAssignmentTask));
 
-    sdlTransition->addAction(std::move(sdlDecision));
+    sdlTransition->addAction(std::move(sdlTransactionDecision));
 
-    procedure->setTransition(std::move(sdlTransition));
+    return sdlTransition;
 }
 
 static inline auto generateProcedureForSyncCommand(Context &context,
@@ -527,18 +489,13 @@ static inline auto generateProcedureForSyncCommand(Context &context,
     const auto transactionsRequired = areCommandTransactionsRequired(sedsTransitions);
 
     if (transactionsRequired) {
-        handleCommandTransactions(context, sedsTransitions, procedure.get(), ivInterface, options);
+        const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(ivInterface->title());
+        createTransactionsElements(context, procedure.get(), ivInterface, transactionVariableName, options);
+
+        auto sdlTransition = createCommandTransitionWithTransactions(context, sedsTransitions, transactionVariableName);
+        procedure->setTransition(std::move(sdlTransition));
     } else {
-        const auto sedsTransition = sedsTransitions.front();
-
-        const auto primitive = std::get_if<::seds::model::OnCommandPrimitive>(&sedsTransition->primitive());
-        if (primitive == nullptr) {
-            throw TranslationException(
-                    "Unknown translator bug: set of Transitions filtered for OnCommandPrimitive contains "
-                    "a transition which is not OnCommandPrimitive");
-        }
-
-        auto sdlTransition = createSyncCommandProcedureSdl(context, sedsTransition, primitive);
+        auto sdlTransition = createCommandTransition(context, sedsTransitions.front());
         procedure->setTransition(std::move(sdlTransition));
     }
 
@@ -644,7 +601,7 @@ auto StateMachineTranslator::translateStateMachine(
     auto sdlInputsForStates = translateTransitions(context, sedsTransitions, stateMap, sedsStateMachine, options);
 
     for (auto &[state, sdlTransitionsForInputs] : sdlInputsForStates) {
-        createInputs(context, state, std::move(sdlTransitionsForInputs));
+        createInputs(context, state, std::move(sdlTransitionsForInputs), options);
     }
 
     for (auto &entry : stateMap) {
@@ -652,8 +609,8 @@ auto StateMachineTranslator::translateStateMachine(
     }
 }
 
-auto StateMachineTranslator::translateVariables(
-        Context &context, const ::seds::model::ComponentImplementation::VariableSet &variables) -> void
+auto StateMachineTranslator::translateVariables(Context &context,
+        const ::seds::model::ComponentImplementation::VariableSet &variables, const Options &options) -> void
 {
     for (const auto &variable : variables) {
         const auto variableName = Escaper::escapeSdlVariableName(variable.nameStr());
@@ -665,6 +622,25 @@ auto StateMachineTranslator::translateVariables(
         DescriptionTranslator::translate(variable, sdlVariable.get());
 
         context.sdlProcess()->addVariable(std::move(sdlVariable));
+    }
+
+    if (options.isSet(SedsOptions::enableFailureReporting)) {
+        if (!options.isSet(SedsOptions::failureReportingType)) {
+            throw TranslationException(
+                    "SEDS failure reporting feature was used but no ASN.1 type for failure parameter was specified");
+        }
+
+        const auto failureVariableTypeName = options.value(SedsOptions::failureReportingType).value();
+
+        const auto &failureVariableName = asn1::translator::seds::Constants::failureVariableName;
+        auto failureVariable = std::make_unique<::sdl::VariableDeclaration>(
+                failureVariableName, Escaper::escapeSdlName(failureVariableTypeName));
+        context.sdlProcess()->addVariable(std::move(failureVariable));
+
+        const auto &failureReturnVariableName = asn1::translator::seds::Constants::failureReturnVariableName;
+        auto failureReturnVariable = std::make_unique<::sdl::VariableDeclaration>(
+                failureReturnVariableName, Escaper::escapeSdlName(failureVariableTypeName));
+        context.sdlProcess()->addVariable(std::move(failureReturnVariable));
     }
 }
 
@@ -762,43 +738,143 @@ auto StateMachineTranslator::getParameterInterface(ivm::IVFunction *function, co
     return nullptr;
 }
 
-auto StateMachineTranslator::createParameterSyncPi(ivm::IVInterface *interface, const ::seds::model::ParameterMap &map,
-        const std::vector<const ::seds::model::Transition *> &sedsTransitions, ::sdl::Process *sdlProcess,
-        const ParameterType type, const Options &options) -> void
+static inline auto collectParameterTransactionNames(
+        const std::vector<const ::seds::model::Transition *> &sedsTransitions,
+        SedsParameterPrimitiveFilterFunc filterFunc) -> QStringList
 {
-    const auto &parameter = interface->params().front();
-    const auto parameterName = Escaper::escapeSdlVariableName(parameter.name());
-    const auto parameterTypeName = Escaper::escapeSdlName(parameter.paramTypeName());
+    QStringList transactionNames;
+
+    for (const auto sedsTransition : sedsTransitions) {
+        const auto primitive = std::get_if<::seds::model::OnParameterPrimitive>(&sedsTransition->primitive());
+        if (primitive == nullptr) {
+            throw TranslationException(
+                    "Unknown translator bug: set of Transitions filtered for OnParameterPrimitive contains "
+                    "a transition which is not OnParameterPrimitive");
+        }
+
+        if (!filterFunc(primitive)) {
+            continue;
+        }
+
+        const auto &transaction = primitive->transaction();
+        if (!transaction.has_value()) {
+            throw TranslationException("Missing transaction name in one of the parameter transitions");
+        }
+        const auto &transactionName = QString("\"%1\"").arg(transaction->value());
+        transactionNames.push_back(transactionName);
+    }
+
+    return transactionNames;
+}
+
+static inline auto createParameterTransactionDecision(
+        const std::vector<const ::seds::model::Transition *> &sedsTransitions, const QString &assignmentAction,
+        SedsParameterPrimitiveFilterFunc filterFunc) -> std::unique_ptr<::sdl::Decision>
+{
+    const auto transactionNames = collectParameterTransactionNames(sedsTransitions, filterFunc);
+
+    auto sdlDecisionExpression = std::make_unique<::sdl::Expression>(Constants::transactionParamName);
+    auto sdlDecision = std::make_unique<::sdl::Decision>();
+    sdlDecision->setExpression(std::move(sdlDecisionExpression));
+
+    if (!transactionNames.empty()) {
+        auto sdlAnswerTransition = std::make_unique<::sdl::Transition>();
+        sdlAnswerTransition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
+
+        auto sdlAnswer = std::make_unique<::sdl::Answer>();
+        sdlAnswer->setLiteral(transactionNames.join(", "));
+        sdlAnswer->setTransition(std::move(sdlAnswerTransition));
+
+        sdlDecision->addAnswer(std::move(sdlAnswer));
+    }
+
+    auto sdlElseTransition = std::make_unique<::sdl::Transition>();
+    auto sdlElseAnswer = std::make_unique<::sdl::Answer>();
+    sdlElseAnswer->setLiteral(::sdl::Answer::ElseLiteral);
+    sdlElseAnswer->setTransition(std::move(sdlElseTransition));
+
+    sdlDecision->addAnswer(std::move(sdlElseAnswer));
+
+    return sdlDecision;
+}
+
+static inline auto createParameterTransitionWithTransactions(
+        const std::vector<const ::seds::model::Transition *> &sedsTransitions, const QString &assignmentAction,
+        const QString &transactionVariableName) -> std::unique_ptr<::sdl::Transition>
+{
+    // Create a decision based on the transaction names
+    auto sdlTransactionDecision =
+            createParameterTransactionDecision(sedsTransitions, assignmentAction, [](auto) { return true; });
+
+    // Create result transition
+    auto sdlTransition = std::make_unique<::sdl::Transition>();
+
+    auto transactionVariableAssignment = std::make_unique<::sdl::Task>(
+            "", QString("%1 := %2").arg(transactionVariableName).arg(Constants::transactionParamName));
+    sdlTransition->addAction(std::move(transactionVariableAssignment));
+
+    sdlTransition->addAction(std::move(sdlTransactionDecision));
+
+    return sdlTransition;
+}
+
+auto StateMachineTranslator::createParameterSyncPi(Context &context, ivm::IVInterface *ivInterface,
+        const ::seds::model::ParameterMap &map, const std::vector<const ::seds::model::Transition *> &sedsTransitions,
+        ::sdl::Process *sdlProcess, const ParameterType type, const Options &options) -> void
+{
+
+    auto procedure = std::make_unique<::sdl::Procedure>(ivInterface->title());
+
+    for (const auto &ivParameter : ivInterface->params()) {
+        const auto parameterName = Escaper::escapeSdlVariableName(ivParameter.name());
+        const auto &parameterTypeName = Escaper::escapeSdlName(ivParameter.paramTypeName());
+        const auto &parameterDirection =
+                ivParameter.direction() == shared::InterfaceParameter::Direction::IN ? "in" : "in/out";
+
+        auto procedureParameter =
+                std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterTypeName, parameterDirection);
+        procedure->addParameter(std::move(procedureParameter));
+    }
+
+    const auto &firstParameter = procedure->parameters().front();
     const auto outputVariableName = Escaper::escapeSdlVariableName(map.variableRef().nameStr());
 
-    QString parameterDirection;
-    QString assignmentAction;
-
-    switch (type) {
-    case ParameterType::Getter:
-        parameterDirection = "in/out";
-        assignmentAction = QString("%1 := %2").arg(parameterName).arg(outputVariableName);
-        break;
-    case ParameterType::Setter:
-        parameterDirection = "in";
-        assignmentAction = QString("%2 := %1").arg(parameterName).arg(outputVariableName);
-        break;
-    }
-
-    auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
-
-    auto procedureParameter =
-            std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterTypeName, parameterDirection);
-    procedure->addParameter(std::move(procedureParameter));
+    const auto assignmentAction = [&]() {
+        switch (type) {
+        case ParameterType::Getter:
+            return QString("%1 := %2").arg(firstParameter->name()).arg(outputVariableName);
+        case ParameterType::Setter:
+            return QString("%2 := %1").arg(firstParameter->name()).arg(outputVariableName);
+        default:
+            return QString();
+        }
+    }();
 
     const auto transactionsRequired = areParameterTransactionsRequired(sedsTransitions);
-    if (transactionsRequired) {
-        handleParameterTransactions(sedsTransitions, sdlProcess, procedure.get(), interface, assignmentAction, options);
-    } else {
-        auto transition = std::make_unique<::sdl::Transition>();
-        transition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
-        procedure->setTransition(std::move(transition));
+
+    auto sdlTransition = [&]() {
+        if (transactionsRequired) {
+            const auto transactionVariableName = QString("%1_transactionName").arg(ivInterface->title());
+            createTransactionsElements(context, procedure.get(), ivInterface, transactionVariableName, options);
+
+            return createParameterTransitionWithTransactions(
+                    sedsTransitions, assignmentAction, transactionVariableName);
+        } else {
+            auto transition = std::make_unique<::sdl::Transition>();
+            transition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
+            return transition;
+        }
+    }();
+
+    if (options.isSet(SedsOptions::enableFailureReporting)) {
+        const auto &failureVariableName = asn1::translator::seds::Constants::failureParamName;
+
+        const auto failureVariableAssignment = QString("%1 := false").arg(failureVariableName);
+        auto failureVariableAssignmentTask = std::make_unique<::sdl::Task>("", failureVariableAssignment);
+        sdlTransition->addAction(std::move(failureVariableAssignmentTask));
     }
+
+    procedure->setTransition(std::move(sdlTransition));
 
     sdlProcess->addProcedure(std::move(procedure));
 }
@@ -858,14 +934,14 @@ auto StateMachineTranslator::translateParameter(Context &context, const ::seds::
     if (syncGetter != nullptr) {
         const auto sedsTransitions = getTransitionsForParameter(
                 sedsStateMachine, interfaceName, parameterName, ::seds::model::ParameterOperation::Get);
-        createParameterSyncPi(syncGetter, map, sedsTransitions, sdlProcess, ParameterType::Getter, options);
+        createParameterSyncPi(context, syncGetter, map, sedsTransitions, sdlProcess, ParameterType::Getter, options);
     }
     const auto syncSetter =
             getParameterInterface(ivFunction, ParameterType::Setter, ParameterMode::Sync, interfaceName, parameterName);
     if (syncSetter != nullptr) {
         const auto sedsTransitions = getTransitionsForParameter(
                 sedsStateMachine, interfaceName, parameterName, ::seds::model::ParameterOperation::Set);
-        createParameterSyncPi(syncSetter, map, sedsTransitions, sdlProcess, ParameterType::Setter, options);
+        createParameterSyncPi(context, syncSetter, map, sedsTransitions, sdlProcess, ParameterType::Setter, options);
     }
 
     // Handle all async Setters/Getters not handled during onParameterPrimitiveTranslation
@@ -947,45 +1023,58 @@ auto StateMachineTranslator::translateState(const ::seds::model::EntryState &sed
     return state;
 }
 
-auto StateMachineTranslator::translatePrimitive(
-        Context &context, const ::seds::model::OnCommandPrimitive &command, const Options &options) -> InputHandler
+auto StateMachineTranslator::translatePrimitive(Context &context,
+        const ::seds::model::OnCommandPrimitive &commandPrimitive, const Options &options) -> InputHandler
 {
     auto input = std::make_unique<::sdl::Input>();
     std::vector<std::unique_ptr<::sdl::Action>> unpackingActions;
 
+    const auto interfaceName = commandPrimitive.interface().value();
+    const auto commandName = commandPrimitive.command().value();
+
     // Input signal can be received only via a provided interface
     const auto &inputName = InterfaceTranslatorHelper::buildCommandInterfaceName(
-            command.interface().value(), command.command().value(), ivm::IVInterface::InterfaceType::Provided, options);
+            interfaceName, commandName, ivm::IVInterface::InterfaceType::Provided, options);
     input->setName(inputName);
 
-    if (command.argumentValues().empty()) {
-        return std::make_pair(std::move(input), std::move(unpackingActions));
-    }
-    const auto interface = getInterfaceByName(context.ivFunction(), inputName);
-    if (interface == nullptr) {
+    const auto ivInterface = getInterfaceByName(context.ivFunction(), inputName);
+    if (ivInterface == nullptr) {
         throw TranslationException(QString("Interface %1 not found").arg(inputName));
     }
-    const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
+
+    const auto &command = context.getCommand(interfaceName, commandName);
+    if (command == nullptr) {
+        auto errorMessage = QString("Command '%1' of interface '%2' not found").arg(commandName, interfaceName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto isSporadic = ivInterface->kind() == ivm::IVInterface::OperationKind::Sporadic;
+    const auto isReturnCall = command->interfaceType() == CommandInfo::HostInterfaceType::Required;
+
+    if (commandPrimitive.argumentValues().empty()) {
+        return { std::move(input), std::move(unpackingActions), isSporadic, isReturnCall };
+    }
+
     if (isSporadic) {
         //--taste translation
-        if (options.isSet(conversion::seds::SedsOptions::tasteTranslation)) {
-            if (command.argumentValues().size() != 1) {
+        if (options.isSet(SedsOptions::tasteTranslation)) {
+            if (commandPrimitive.argumentValues().size() != 1) {
                 throw TranslationException(
                         QString("More than one(%1) command.argumentValue is not allowed for --taste translation option")
-                                .arg(command.argumentValues().size()));
+                                .arg(commandPrimitive.argumentValues().size()));
             }
 
-            const auto &argument = command.argumentValues().at(0);
+            const auto &argument = commandPrimitive.argumentValues().at(0);
             const auto targetVariableName =
                     Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
             input->addParameter(std::make_unique<::sdl::VariableReference>(targetVariableName));
-            return std::make_pair(std::move(input), std::move(unpackingActions));
+            return { std::move(input), std::move(unpackingActions), isSporadic, isReturnCall };
         }
 
         const auto variableName = ioVariableName(input->name());
         input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
 
-        for (const auto &argument : command.argumentValues()) {
+        for (const auto &argument : commandPrimitive.argumentValues()) {
             const auto targetVariableName =
                     Escaper::escapeSdlVariableName(argument.outputVariableRef().value().value());
             const auto fieldName = Escaper::escapeSdlVariableName(argument.name().value());
@@ -993,15 +1082,15 @@ auto StateMachineTranslator::translatePrimitive(
                     "", QString("%1 := %2.%3").arg(targetVariableName, variableName, fieldName)));
         }
 
-        return std::make_pair(std::move(input), std::move(unpackingActions));
+        return { std::move(input), std::move(unpackingActions), isSporadic, isReturnCall };
     } else {
         // Protected/unprotected - assignments done in the reception procedure
-        return std::make_pair(std::move(input), std::move(unpackingActions));
+        return { std::move(input), std::move(unpackingActions), isSporadic, isReturnCall };
     }
 }
 
-auto StateMachineTranslator::translatePrimitive(Context &context, const ::seds::model::OnParameterPrimitive &parameter)
-        -> InputHandler
+auto StateMachineTranslator::translatePrimitive(
+        Context &context, const ::seds::model::OnParameterPrimitive &parameter, const Options &options) -> InputHandler
 {
     const auto parameterType = parameter.operation() == ::seds::model::ParameterOperation::Set
             ? InterfaceTranslatorHelper::InterfaceParameterType::Setter
@@ -1013,13 +1102,20 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const ::seds::
     const auto name = InterfaceTranslatorHelper::buildParameterInterfaceName(parameter.interface().value(),
             parameter.parameter().value(), parameterType, ivm::IVInterface::InterfaceType::Provided);
     input->setName(name);
-    const auto interface = getInterfaceByName(context.ivFunction(), name);
-    if (interface == nullptr) {
+
+    const auto ivInterface = getInterfaceByName(context.ivFunction(), name);
+    if (ivInterface == nullptr) {
         throw TranslationException(QString("Interface %1 not found").arg(name));
     }
-    const bool isSporadic = interface->kind() == ivm::IVInterface::OperationKind::Sporadic;
+
+    const bool isSporadic = ivInterface->kind() == ivm::IVInterface::OperationKind::Sporadic;
 
     if (isSporadic) {
+        if (options.isSet(SedsOptions::enableFailureReporting)) {
+            auto errorMessage = QString("Async parameters are not allowed when using SEDS failure reporting mechanism");
+            throw TranslationException(std::move(errorMessage));
+        }
+
         // This is a sporadic interface, so we must unpack the value.
         const auto variableName = ioVariableName(name);
         input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
@@ -1049,14 +1145,14 @@ auto StateMachineTranslator::translatePrimitive(Context &context, const ::seds::
             throw TranslationException(QString("VariableRef mapping is not supported for sync parameter %1").arg(name));
         }
     }
-    return std::make_pair(std::move(input), std::move(unpackingActions));
+    return { std::move(input), std::move(unpackingActions), isSporadic, false };
 }
 
 auto StateMachineTranslator::translatePrimitive(::sdl::State *sdlFromState) -> InputHandler
 {
     auto input = std::make_unique<::sdl::Input>();
     input->setName(TIMER_NAME_PATTERN.arg(sdlFromState->name()));
-    return std::make_pair(std::move(input), std::vector<std::unique_ptr<::sdl::Action>>());
+    return { std::move(input), std::vector<std::unique_ptr<::sdl::Action>>(), false, false };
 }
 
 auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *sdlFromState,
@@ -1065,13 +1161,13 @@ auto StateMachineTranslator::translatePrimitive(Context &context, ::sdl::State *
     // clang-format off
     return std::visit(
             overloaded {
-                [&context, &options](const ::seds::model::OnCommandPrimitive &command) {
+                [&](const ::seds::model::OnCommandPrimitive &command) {
                         return translatePrimitive(context, command, options);
                     },
-                [&context](const ::seds::model::OnParameterPrimitive &parameter) {
-                        return translatePrimitive(context, parameter);
+                [&](const ::seds::model::OnParameterPrimitive &parameter) {
+                        return translatePrimitive(context, parameter, options);
                     },
-                [&sdlFromState](const ::seds::model::TimerSink &) {
+                [&](const ::seds::model::TimerSink &) {
                         return translatePrimitive(sdlFromState);
                     }
 
@@ -1091,12 +1187,15 @@ auto StateMachineTranslator::translateTransitions(Context &context,
         const auto sdlFromState = getSdlState(sedsTransition->fromState(), stateMap);
         const auto sdlToState = getSdlState(sedsTransition->toState(), stateMap);
 
-        auto inputHandler = translatePrimitive(context, sdlFromState, sedsTransition->primitive(), options);
-        auto &input = inputHandler.first;
-        auto &actions = inputHandler.second;
+        auto [input, actions, isSporadic, isReturnCall] =
+                translatePrimitive(context, sdlFromState, sedsTransition->primitive(), options);
 
         auto transitionInfo = translateTransition(
                 context, sedsTransition, sdlFromState, sdlToState, std::move(actions), sedsStateMachine);
+
+        transitionInfo.sedsTransition = sedsTransition;
+        transitionInfo.isSporadic = isSporadic;
+        transitionInfo.isReturnCall = isReturnCall;
 
         const auto &inputName = input->name();
         transitionInfo.input = std::move(input);
@@ -1108,18 +1207,41 @@ auto StateMachineTranslator::translateTransitions(Context &context,
 }
 
 auto StateMachineTranslator::createInputs(Context &context, ::sdl::State *fromState,
-        std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitionsForInputs)
-        -> void
+        std::unordered_map<QString, std::vector<StateMachineTranslator::TransitionInfo>> sdlTransitionsForInputs,
+        const Options &options) -> void
 {
     for (auto &[inputName, transitionInfos] : sdlTransitionsForInputs) {
-        const auto transactionsRequired = transitionInfos.front().transactionName.has_value();
+        // Some data are common for all transitions
+        auto &firstTransitionInfo = transitionInfos.front();
 
-        if (transactionsRequired) {
-            createInputWithTransactions(context, fromState, std::move(transitionInfos));
+        const auto isSporadic = firstTransitionInfo.isSporadic;
+        const auto isReturnCall = firstTransitionInfo.isReturnCall;
+
+        if (isSporadic) {
+            if (isReturnCall && options.isSet(SedsOptions::enableFailureReporting)) {
+                createInputWithFailureReporting(context, fromState, std::move(transitionInfos));
+            } else {
+                createInput(context, fromState, std::move(firstTransitionInfo));
+            }
         } else {
-            createInputWithoutTransactions(context, fromState, std::move(transitionInfos.front()));
+            const auto transactionsRequired = firstTransitionInfo.transactionName.has_value();
+
+            if (transactionsRequired) {
+                createInputWithTransactions(context, fromState, std::move(transitionInfos));
+            } else {
+                createInput(context, fromState, std::move(firstTransitionInfo));
+            }
         }
     }
+}
+
+auto StateMachineTranslator::createInput(
+        Context &context, ::sdl::State *fromState, StateMachineTranslator::TransitionInfo transitionInfo) -> void
+{
+    auto &input = transitionInfo.input;
+    input->setTransition(transitionInfo.sdlTransition.get());
+    fromState->addInput(std::move(input));
+    context.sdlStateMachine()->addTransition(std::move(transitionInfo.sdlTransition));
 }
 
 auto StateMachineTranslator::createInputWithTransactions(Context &context, ::sdl::State *fromState,
@@ -1127,12 +1249,14 @@ auto StateMachineTranslator::createInputWithTransactions(Context &context, ::sdl
 {
     auto &sdlInput = transitionInfos.front().input;
 
+    // Create decision based on the transaction
     auto transactionDecision = std::make_unique<::sdl::Decision>();
 
     const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(sdlInput->name());
     auto transactionDecisionExpression = std::make_unique<::sdl::Expression>(transactionVariableName);
     transactionDecision->setExpression(std::move(transactionDecisionExpression));
 
+    // Create answer for each transition
     for (auto &transitionInfo : transitionInfos) {
         if (*sdlInput != *transitionInfo.input) {
             auto errorMessage = QString("Two inputs with name %1 are different").arg(sdlInput->name());
@@ -1147,12 +1271,13 @@ auto StateMachineTranslator::createInputWithTransactions(Context &context, ::sdl
 
         const auto &transactionName = QString("\"%1\"").arg(*transitionInfo.transactionName);
 
-        auto transactionDecisionTransactionAnswer = std::make_unique<::sdl::Answer>();
-        transactionDecisionTransactionAnswer->setLiteral(transactionName);
-        transactionDecisionTransactionAnswer->setTransition(std::move(transitionInfo.transition));
-        transactionDecision->addAnswer(std::move(transactionDecisionTransactionAnswer));
+        auto transactionDecisionAnswer = std::make_unique<::sdl::Answer>();
+        transactionDecisionAnswer->setLiteral(transactionName);
+        transactionDecisionAnswer->setTransition(std::move(transitionInfo.sdlTransition));
+        transactionDecision->addAnswer(std::move(transactionDecisionAnswer));
     }
 
+    // Add else to the transaction decision
     auto transactionDecisionElseAnswerTransition = std::make_unique<::sdl::Transition>();
     transactionDecisionElseAnswerTransition->addAction(std::make_unique<::sdl::NextState>(""));
 
@@ -1161,21 +1286,75 @@ auto StateMachineTranslator::createInputWithTransactions(Context &context, ::sdl
     transactionDecisionElseAnswer->setTransition(std::move(transactionDecisionElseAnswerTransition));
     transactionDecision->addAnswer(std::move(transactionDecisionElseAnswer));
 
-    auto transactionTransition = std::make_unique<::sdl::Transition>();
-    transactionTransition->addAction(std::move(transactionDecision));
+    // Create result transition
+    auto sdlTransition = std::make_unique<::sdl::Transition>();
+    sdlTransition->addAction(std::move(transactionDecision));
 
-    sdlInput->setTransition(transactionTransition.get());
+    sdlInput->setTransition(sdlTransition.get());
     fromState->addInput(std::move(sdlInput));
-    context.sdlStateMachine()->addTransition(std::move(transactionTransition));
+    context.sdlStateMachine()->addTransition(std::move(sdlTransition));
 }
 
-auto StateMachineTranslator::createInputWithoutTransactions(
-        Context &context, ::sdl::State *fromState, StateMachineTranslator::TransitionInfo transitionInfo) -> void
+auto StateMachineTranslator::createInputWithFailureReporting(Context &context, ::sdl::State *fromState,
+        std::vector<StateMachineTranslator::TransitionInfo> transitionInfos) -> void
 {
-    auto &input = transitionInfo.input;
-    input->setTransition(transitionInfo.transition.get());
-    fromState->addInput(std::move(input));
-    context.sdlStateMachine()->addTransition(std::move(transitionInfo.transition));
+    auto &sdlInput = transitionInfos.front().input;
+
+    // Create decision based on the failure reporting
+    auto failureDecision = std::make_unique<::sdl::Decision>();
+
+    const auto variableName = ioVariableName(sdlInput->name());
+    const auto &failureFieldName = asn1::translator::seds::Constants::failureParamName;
+    const auto failureVariableName = QString("%1.%2").arg(variableName).arg(failureFieldName);
+
+    auto failureDecisionExpression = std::make_unique<::sdl::Expression>(failureVariableName);
+    failureDecision->setExpression(std::move(failureDecisionExpression));
+
+    if (transitionInfos.size() > 2) {
+        auto errorMessage = QString(
+                "Error while creating input, there are more than two transitions that have the same failure value");
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    // Create answer for each transition
+    for (auto &transitionInfo : transitionInfos) {
+        if (*sdlInput != *transitionInfo.input) {
+            auto errorMessage = QString("Two inputs with name %1 are different").arg(sdlInput->name());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        if (!transitionInfo.isSporadic) {
+            auto errorMessage = QString("Found transition for input %1 that is not sporadic").arg(sdlInput->name());
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const QString &failureValue = transitionInfo.isFailed ? "true" : "false";
+
+        auto failureDecisionAnswer = std::make_unique<::sdl::Answer>();
+        failureDecisionAnswer->setLiteral(failureValue);
+        failureDecisionAnswer->setTransition(std::move(transitionInfo.sdlTransition));
+        failureDecision->addAnswer(std::move(failureDecisionAnswer));
+    }
+
+    // It means we need to create an else transition
+    if (failureDecision->answers().size() != 2) {
+        auto failureDecisionElseAnswer = std::make_unique<::sdl::Answer>();
+        failureDecisionElseAnswer->setLiteral(::sdl::Answer::ElseLiteral);
+
+        auto failureDecisionElseAnswerTransition = std::make_unique<::sdl::Transition>();
+        failureDecisionElseAnswerTransition->addAction(std::make_unique<::sdl::NextState>(""));
+        failureDecisionElseAnswer->setTransition(std::move(failureDecisionElseAnswerTransition));
+
+        failureDecision->addAnswer(std::move(failureDecisionElseAnswer));
+    }
+
+    // Create result transition
+    auto sdlTransition = std::make_unique<::sdl::Transition>();
+    sdlTransition->addAction(std::move(failureDecision));
+
+    sdlInput->setTransition(sdlTransition.get());
+    fromState->addInput(std::move(sdlInput));
+    context.sdlStateMachine()->addTransition(std::move(sdlTransition));
 }
 
 auto StateMachineTranslator::translateTransition(Context &context, const ::seds::model::Transition *sedsTransition,
@@ -1185,8 +1364,8 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
 {
     TransitionInfo transitionInfo;
 
-    transitionInfo.transition = std::make_unique<::sdl::Transition>();
-    auto sdlTransition = transitionInfo.transition.get();
+    transitionInfo.sdlTransition = std::make_unique<::sdl::Transition>();
+    auto sdlTransition = transitionInfo.sdlTransition.get();
 
     DescriptionTranslator::translate(*sedsTransition, sdlTransition);
 
@@ -1209,6 +1388,8 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
         if (transaction) {
             transitionInfo.transactionName = transaction->value();
         }
+
+        transitionInfo.isFailed = onCommandPrimitive.isFailed();
     } else if (std::holds_alternative<::seds::model::OnParameterPrimitive>(sedsTransition->primitive())) {
         const auto &onParameterPrimitive = std::get<::seds::model::OnParameterPrimitive>(sedsTransition->primitive());
 
@@ -1216,6 +1397,8 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
         if (transaction) {
             transitionInfo.transactionName = transaction->value();
         }
+
+        transitionInfo.isFailed = onParameterPrimitive.isFailed();
     }
 
     // Argument unpacking

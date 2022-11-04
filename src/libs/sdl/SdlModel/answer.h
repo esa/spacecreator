@@ -89,6 +89,8 @@ public:
     virtual auto accept(Visitor &visitor) const -> void override;
 
 public:
+    const static inline QString TrueLiteral = "True";
+    const static inline QString FalseLiteral = "False";
     const static inline QString ElseLiteral = "ELSE";
 
 private:

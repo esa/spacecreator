@@ -23,6 +23,7 @@
 #include "interfacetranslatorhelper.h"
 #include "interfacetypenamehelper.h"
 
+#include <conversion/common/options.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivinterface.h>
 #include <seds/SedsModel/interfaces/interfaceparameter.h>
@@ -50,9 +51,10 @@ public:
      * @param   ivFunction          Output interface view function
      * @param   sedsInterfaceName   Parent interface name
      * @param   typeNameHelper      Helper for ASN.1 type names
+     * @param   options             Conversion options
      */
     InterfaceParameterTranslator(ivm::IVFunction *ivFunction, const QString &sedsInterfaceName,
-            const InterfaceTypeNameHelper &typeNameHelper);
+            const InterfaceTypeNameHelper &typeNameHelper, const Options &options);
     /**
      * @brief   Deleted copy constructor
      */
@@ -94,6 +96,8 @@ private:
             shared::InterfaceParameter::Direction interfaceDirection) -> void;
     auto handleParameterTypeName(const ::seds::model::InterfaceParameter &sedsParameter) const -> QString;
 
+    auto handleFailureReporting(ivm::IVInterface *ivInterface) const -> void;
+
 private:
     /// @brief  Output interface view function
     ivm::IVFunction *m_ivFunction;
@@ -101,6 +105,8 @@ private:
     const QString &m_sedsInterfaceName;
     /// @brief  Helper for ASN.1 names
     const InterfaceTypeNameHelper &m_typeNameHelper;
+    /// @brief  Conversion options
+    const Options &m_options;
 
     /// @brief  Name for the argument in the IV interface
     inline static const QString m_ivInterfaceParameterName = "Param";

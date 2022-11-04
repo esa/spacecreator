@@ -31,7 +31,18 @@ const std::vector<std::unique_ptr<Answer>> &Decision::answers() const
 
 void Decision::addAnswer(std::unique_ptr<Answer> answer)
 {
+    if (hasAnswer(answer->literal())) {
+        throw std::logic_error("Adding two Decision Answers with the same literal is illegal");
+    }
+
     m_answers.push_back(std::move(answer));
+}
+
+bool Decision::hasAnswer(const VariableLiteral &answerLiteral)
+{
+    const auto foundAnswer = std::find_if(
+            m_answers.begin(), m_answers.end(), [&](const auto &answer) { return answer->literal() == answerLiteral; });
+    return foundAnswer != m_answers.end();
 }
 
 Expression *Decision::expression() const

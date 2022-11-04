@@ -38,7 +38,7 @@ void VariableReference::setVariableName(QString variableName)
 
 bool operator==(const VariableReference &lhs, const VariableReference &rhs)
 {
-    return lhs.m_variableName == rhs.m_variableName;
+    return (QString::compare(lhs.m_variableName, rhs.m_variableName, Qt::CaseInsensitive) == 0);
 }
 
 bool operator!=(const VariableReference &lhs, const VariableReference &rhs)

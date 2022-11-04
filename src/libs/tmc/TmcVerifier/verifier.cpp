@@ -185,7 +185,12 @@ void TmcVerifier::setMemoryLimit(int memoryLimit)
 
 void TmcVerifier::setRawCommandline(QString rawCommandline)
 {
-    m_rawCommandline = rawCommandline;
+    m_rawCommandline = std::move(rawCommandline);
+}
+
+void TmcVerifier::setSpinExecutable(QString spinExecutable)
+{
+    m_spinExecutable = std::move(spinExecutable);
 }
 
 bool TmcVerifier::execute(ExecuteMode executeMode)
@@ -208,9 +213,24 @@ bool TmcVerifier::execute(ExecuteMode executeMode)
 
 void TmcVerifier::generateObserverDataview()
 {
+    const QFileInfo inputIvInfo(m_inputIvFilepath);
+    const QString emptyAsnName = "empty.asn";
+
+    // create empty
+    QString emptyAsnFilepath = inputIvInfo.absoluteDir().path() + QDir::separator() + "work" + QDir::separator()
+            + "modelchecking" + QDir::separator() + "subtypes" + QDir::separator() + emptyAsnName;
+
+    QFileInfo emptyAsnInfo(emptyAsnFilepath);
+
+    if (!emptyAsnInfo.exists()) {
+        QFile emptyAsnFile(emptyAsnFilepath);
+        emptyAsnFile.open(QIODevice::WriteOnly | QIODevice::Append);
+
+        emptyAsnFile.close();
+    }
+
     const QString makeExe = "make";
-    QFileInfo info(m_inputIvFilepath);
-    m_process->setWorkingDirectory(info.absoluteDir().path());
+    m_process->setWorkingDirectory(inputIvInfo.absoluteDir().path());
 
     if (m_processFinishedConnection) {
         disconnect(m_processFinishedConnection);
@@ -223,6 +243,7 @@ void TmcVerifier::generateObserverDataview()
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(makeStarted()));
 
     QStringList arguments;
+    arguments.append(QString("SUBTYPE=%1").arg(emptyAsnName));
     arguments.append("observer_dataview");
 
     Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(makeExe).arg(arguments.join(" ")));
@@ -293,7 +314,7 @@ void TmcVerifier::executeVerifier()
 void TmcVerifier::executeSpin()
 {
     const QString inputFile = "system.pml";
-    const QString spinExe = "spin";
+    const QString spinExe = m_spinExecutable.isEmpty() ? QString("spin") : m_spinExecutable;
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
@@ -322,7 +343,7 @@ void TmcVerifier::executeCC()
     const QString outputFile = "pan";
     const QString compilerExe = "gcc";
     QStringList standardArguments;
-    standardArguments.append("-O0");
+    standardArguments.append("-O2");
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
@@ -333,8 +354,12 @@ void TmcVerifier::executeCC()
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
 
     QStringList arguments = standardArguments;
+
     arguments.append("-o");
     arguments.append(outputFile);
+
+    // This is a temporary sane default, TODO - make it configurable
+    arguments.append("-DVECTORSZ=65535");
 
     if (m_useBitHashing) {
         arguments.append("-DBITSTATE");
