@@ -774,8 +774,9 @@ static inline auto collectParameterTransactionNames(
 }
 
 static inline auto createParameterTransactionDecision(
-        const std::vector<const ::seds::model::Transition *> &sedsTransitions, const QString &assignmentAction,
-        SedsParameterPrimitiveFilterFunc filterFunc) -> std::unique_ptr<::sdl::Decision>
+        const std::vector<const ::seds::model::Transition *> &sedsTransitions,
+        std::unique_ptr<::sdl::Transition> baseTransition, SedsParameterPrimitiveFilterFunc filterFunc)
+        -> std::unique_ptr<::sdl::Decision>
 {
     const auto transactionNames = collectParameterTransactionNames(sedsTransitions, filterFunc);
 
@@ -784,12 +785,9 @@ static inline auto createParameterTransactionDecision(
     sdlDecision->setExpression(std::move(sdlDecisionExpression));
 
     if (!transactionNames.empty()) {
-        auto sdlAnswerTransition = std::make_unique<::sdl::Transition>();
-        sdlAnswerTransition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
-
         auto sdlAnswer = std::make_unique<::sdl::Answer>();
         sdlAnswer->setLiteral(transactionNames.join(", "));
-        sdlAnswer->setTransition(std::move(sdlAnswerTransition));
+        sdlAnswer->setTransition(std::move(baseTransition));
 
         sdlDecision->addAnswer(std::move(sdlAnswer));
     }
@@ -805,12 +803,13 @@ static inline auto createParameterTransactionDecision(
 }
 
 static inline auto createParameterTransitionWithTransactions(
-        const std::vector<const ::seds::model::Transition *> &sedsTransitions, const QString &assignmentAction,
-        const QString &transactionVariableName) -> std::unique_ptr<::sdl::Transition>
+        const std::vector<const ::seds::model::Transition *> &sedsTransitions,
+        std::unique_ptr<::sdl::Transition> baseTransition, const QString &transactionVariableName)
+        -> std::unique_ptr<::sdl::Transition>
 {
     // Create a decision based on the transaction names
     auto sdlTransactionDecision =
-            createParameterTransactionDecision(sedsTransitions, assignmentAction, [](auto) { return true; });
+            createParameterTransactionDecision(sedsTransitions, std::move(baseTransition), [](auto) { return true; });
 
     // Create result transition
     auto sdlTransition = std::make_unique<::sdl::Transition>();
@@ -859,15 +858,16 @@ auto StateMachineTranslator::createParameterSyncPi(Context &context, ivm::IVInte
     const auto transactionsRequired = areParameterTransactionsRequired(sedsTransitions);
 
     auto sdlTransition = [&]() {
+        auto transition = std::make_unique<::sdl::Transition>();
+        transition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
+
         if (transactionsRequired) {
-            const auto transactionVariableName = QString("%1_transactionName").arg(ivInterface->title());
+            const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(ivInterface->title());
             createTransactionsElements(context, procedure.get(), ivInterface, transactionVariableName, options);
 
             return createParameterTransitionWithTransactions(
-                    sedsTransitions, assignmentAction, transactionVariableName);
+                    sedsTransitions, std::move(transition), transactionVariableName);
         } else {
-            auto transition = std::make_unique<::sdl::Transition>();
-            transition->addAction(std::make_unique<::sdl::Task>("", assignmentAction));
             return transition;
         }
     }();
@@ -895,7 +895,7 @@ static inline auto getInputOfName(::sdl::State *state, const QString name) -> ::
     return input->get();
 }
 
-auto StateMachineTranslator::createParameterActivityGetSyncPi(Context &context, ivm::IVInterface *interface,
+auto StateMachineTranslator::createParameterActivityGetSyncPi(Context &context, ivm::IVInterface *ivInterface,
         const ::seds::model::ParameterActivityMap &map,
         const std::vector<const ::seds::model::Transition *> &sedsTransitions, const Options &options)
         -> std::unique_ptr<::sdl::Procedure>
@@ -903,12 +903,12 @@ auto StateMachineTranslator::createParameterActivityGetSyncPi(Context &context, 
     Q_UNUSED(sedsTransitions);
     Q_UNUSED(options);
 
-    const auto &parameter = interface->params().front();
+    const auto &parameter = ivInterface->params().front();
     const auto parameterName = Escaper::escapeSdlVariableName(parameter.name());
     const auto parameterTypeName = Escaper::escapeSdlName(parameter.paramTypeName());
     const auto parameterDirection = QString("in/out");
 
-    auto procedure = std::make_unique<::sdl::Procedure>(interface->title());
+    auto procedure = std::make_unique<::sdl::Procedure>(ivInterface->title());
 
     auto procedureParameter =
             std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterTypeName, parameterDirection);
@@ -959,6 +959,24 @@ auto StateMachineTranslator::createParameterActivityGetSyncPi(Context &context, 
 
     transition->addAction(
             std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(parameterName, providedInterfaceVariableName)));
+
+    const auto transactionsRequired = areParameterTransactionsRequired(sedsTransitions);
+
+    if (transactionsRequired) {
+        const auto transactionVariableName = Constants::transactionVariableNameTemplate.arg(ivInterface->title());
+        createTransactionsElements(context, procedure.get(), ivInterface, transactionVariableName, options);
+
+        transition = createParameterTransitionWithTransactions(
+                sedsTransitions, std::move(transition), transactionVariableName);
+    }
+
+    if (options.isSet(SedsOptions::enableFailureReporting)) {
+        const auto &failureVariableName = asn1::translator::seds::Constants::failureParamName;
+
+        const auto failureVariableAssignment = QString("%1 := false").arg(failureVariableName);
+        auto failureVariableAssignmentTask = std::make_unique<::sdl::Task>("", failureVariableAssignment);
+        transition->addAction(std::move(failureVariableAssignmentTask));
+    }
 
     procedure->setTransition(std::move(transition));
 
