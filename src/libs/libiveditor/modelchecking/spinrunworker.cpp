@@ -62,8 +62,14 @@ void SpinRunWorker::run()
 {
     QString interfaceView = m_projectRoot + QDir::separator() + "interfaceview.xml";
     QDir::setCurrent(m_projectRoot);
-    QDir dir(m_projectRoot);
-    dir.mkdir(m_outputDirectory);
+    QDir projectRootDir(m_projectRoot);
+
+    if (projectRootDir.exists(m_outputDirectory)) {
+        QDir outputDirectory(projectRootDir.filePath(m_outputDirectory));
+        outputDirectory.removeRecursively();
+    }
+
+    projectRootDir.mkdir(m_outputDirectory);
 
     m_verifier = std::make_unique<TmcVerifier>(interfaceView, m_outputDirectory);
 

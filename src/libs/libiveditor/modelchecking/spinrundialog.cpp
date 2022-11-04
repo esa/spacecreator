@@ -47,6 +47,11 @@ SpinRunDialog::SpinRunDialog(QWidget *parent)
     m_browser->setFont(font);
 }
 
+void SpinRunDialog::setOutputDirectory(const QString &outputDirectory)
+{
+    m_outputDirectory = outputDirectory;
+}
+
 void SpinRunDialog::setPropertiesSelected(const QStringList &properties)
 {
     m_propertiesSelected = properties;
@@ -85,7 +90,7 @@ void SpinRunDialog::setSubtypesPath(const QString &subtypesPath)
 int SpinRunDialog::exec()
 {
     m_worker = new SpinRunWorker(this, m_propertiesSelected, m_subtypesSelected, m_functionsSelected, m_spinConfig,
-            m_projectRoot, "tmc-out");
+            m_projectRoot, m_outputDirectory);
     m_worker->setPropertiesPath(m_propertiesPath);
     m_worker->setSubtypesPath(m_subtypesPath);
     connect(m_worker, SIGNAL(textAvailable(QString)), this, SLOT(workerTextAvailable(QString)), Qt::QueuedConnection);
