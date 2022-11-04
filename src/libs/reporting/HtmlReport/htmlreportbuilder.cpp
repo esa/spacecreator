@@ -127,6 +127,9 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
     case reporting::SpinErrorReportItem::StopConditionViolation:
         variantErrorDetails = buildStopConditionViolationVariant(spinErrorReportItem.parsedErrorDetails);
         break;
+    case reporting::SpinErrorReportItem::ObserverFailure:
+        variantErrorDetails = buildObserverFailureVariant(spinErrorReportItem.parsedErrorDetails);
+        break;
     default:
         break;
     }
@@ -179,6 +182,19 @@ QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(co
     return variantHash;
 }
 
+QVariantHash reporting::HtmlReportBuilder::buildObserverFailureVariant(const QVariant &errorDetails)
+{
+    reporting::ObserverFailureReport report = qvariant_cast<reporting::ObserverFailureReport>(errorDetails);
+    QVariantHash variantHash;
+    variantHash.insert("observerName", report.observerName);
+    // resolve observer state as string
+    variantHash.insert("observerState",
+            m_observerFailureObserverStateNames.value(report.observerState,
+                    m_observerFailureObserverStateNames[reporting::ObserverFailureReport::UnknownState]));
+
+    return variantHash;
+}
+
 const QString reporting::HtmlReportBuilder::m_defaultTemplateFile = QStringLiteral(":/template.html");
 
 const QHash<reporting::SpinErrorReportItem::ErrorType, QString> reporting::HtmlReportBuilder::m_errorTypeNames = {
@@ -207,4 +223,11 @@ const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
             { reporting::StopConditionViolationReport::QueueLength, "Queue Length" },
             { reporting::StopConditionViolationReport::Present, "Present" },
             { reporting::StopConditionViolationReport::UnknownType, "Unknown Type" },
+        };
+
+const QHash<reporting::ObserverFailureReport::ObserverState, QString>
+        reporting::HtmlReportBuilder::m_observerFailureObserverStateNames = {
+            { reporting::ObserverFailureReport::ErrorState, "Error State" },
+            { reporting::ObserverFailureReport::SuccessState, "Success State" },
+            { reporting::ObserverFailureReport::UnknownState, "Unknown State" },
         };

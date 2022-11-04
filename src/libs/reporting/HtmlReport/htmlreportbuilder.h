@@ -21,6 +21,7 @@
 
 #include <QSharedPointer>
 #include <QString>
+#include <reporting/Report/observerfailurereport.h>
 #include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorparser.h>
 #include <reporting/Report/spinerrorreportitem.h>
@@ -90,12 +91,14 @@ private:
             m_stopConditionViolationClauseNames;
     static const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
             m_stopConditionViolationTypeNames;
+    static const QHash<reporting::ObserverFailureReport::ObserverState, QString> m_observerFailureObserverStateNames;
 
     static QVariantList buildReportVariant(const SpinErrorReport &spinErrorReport);
     static QVariantHash buildReportItemVariant(const SpinErrorReportItem &spinErrorReportItem);
 
     static QVariantHash buildDataConstraintViolationVariant(const QVariant &errorDetails);
     static QVariantHash buildStopConditionViolationVariant(const QVariant &errorDetails);
+    static QVariantHash buildObserverFailureVariant(const QVariant &errorDetails);
 };
 
 }

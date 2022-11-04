@@ -32,7 +32,8 @@ struct ObserverFailureReport {
     enum ObserverState
     {
         ErrorState = 0,
-        SuccessState
+        SuccessState,
+        UnknownState
     };
 
     /** Observer state */
