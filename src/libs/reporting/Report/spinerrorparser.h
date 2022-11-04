@@ -113,7 +113,6 @@ private:
     SpinErrorReportItem buildDataConstraintViolationReportItem(const QRegularExpressionMatch &matchedError) const;
     SpinErrorReportItem buildStopConditionViolationReportItem(const QString &conditions) const;
 
-    QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
     QVariant parseVariableViolation(const QString &rawError) const;
     QVariant parseStopConditionViolation(const QString &rawError) const;
     QVariant parseObserverFailureErrorState(const QString &rawError) const;
@@ -121,9 +120,7 @@ private:
 
     static QString readFile(const QString &filePath);
 
-    static QRegularExpression buildSpinErrorRegex();
     static QRegularExpression buildDataConstraintViolationRegex();
-
     static QRegularExpression buildStopConditionViolationRegex();
     static QRegularExpression buildStopConditionExpressionRegex();
 

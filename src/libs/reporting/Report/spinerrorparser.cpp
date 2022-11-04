@@ -165,12 +165,6 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::buildStopConditionVio
     return reportItem;
 }
 
-QRegularExpressionMatchIterator reporting::SpinErrorParser::matchSpinErrors(const QString &spinMessage) const
-{
-    const QRegularExpression regex = buildSpinErrorRegex();
-    return regex.globalMatch(spinMessage);
-}
-
 QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawError) const
 {
     DataConstraintViolationReport violationReport;
@@ -261,19 +255,6 @@ QString reporting::SpinErrorParser::readFile(const QString &filePath)
     return QString();
 }
 
-QRegularExpression reporting::SpinErrorParser::buildSpinErrorRegex()
-{
-    // error number
-    QString pattern = QStringLiteral("pan:(\\d+):\\s+");
-    // error type
-    pattern += QStringLiteral("(.+?)\\s+");
-    // error details
-    pattern += QStringLiteral("\\((.+?)\\)\\s+");
-    // error depth
-    pattern += QStringLiteral("\\(at depth (\\d+)\\)");
-    return QRegularExpression(pattern);
-}
-
 QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex()
 {
     // opening parenthesis
@@ -291,7 +272,10 @@ QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex
 
 QRegularExpression reporting::SpinErrorParser::buildStopConditionViolationRegex()
 {
-    QString pattern("(never|always|eventually|filter_out)\\s+(.+?);");
+    // clause
+    QString pattern = QStringLiteral("(never|always|eventually|filter_out)\\s+");
+    // conditions
+    pattern += QStringLiteral("(.+?);");
     return QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption);
 }
 
