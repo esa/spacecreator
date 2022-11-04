@@ -157,6 +157,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->lineEdit_memoryLimit->setValidator(new QIntValidator(0, 10000000, this));
     d->ui->lineEdit_spinTimeLimit->setValidator(new QIntValidator(0, 10000000, this));
     d->ui->lineEdit_generationLimit->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui->lineEdit_deltaValue->setValidator(new QDoubleValidator(0.0, 100.0, 6, this));
     d->ui->tableWidget_generationLimits->setSelectionBehavior(QAbstractItemView::SelectRows);
     d->ui->tableWidget_generationLimits->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
@@ -1568,19 +1569,21 @@ void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
     setCheckBoxState(d->ui->checkBox_searchShortestPath, spinConfig.searchShortestPath);
     setCheckBoxState(d->ui->checkBox_useFairScheduling, spinConfig.useFairScheduling);
     setCheckBoxState(d->ui->checkBox_useBitHashing, spinConfig.useBitHashing);
+    setCheckBoxState(d->ui->checkBox_useReal, spinConfig.supportReal);
 
-    d->ui->lineEdit_numberOfCores->setText(optionalIntToString(spinConfig.numberOfCores));
-    d->ui->lineEdit_searchStateLimit->setText(optionalIntToString(spinConfig.searchStateLimit));
-    d->ui->lineEdit_errorLimit->setText(optionalIntToString(spinConfig.errorLimit));
-    d->ui->lineEdit_memoryLimit->setText(optionalIntToString(spinConfig.memoryLimitMB));
-    d->ui->lineEdit_spinTimeLimit->setText(optionalIntToString(spinConfig.timeLimitSeconds));
-    d->ui->lineEdit_generationLimit->setText(optionalIntToString(spinConfig.globalInputVectorGenerationLimit));
+    d->ui->lineEdit_numberOfCores->setText(SpinConfigData::optionalIntToString(spinConfig.numberOfCores));
+    d->ui->lineEdit_searchStateLimit->setText(SpinConfigData::optionalIntToString(spinConfig.searchStateLimit));
+    d->ui->lineEdit_errorLimit->setText(SpinConfigData::optionalIntToString(spinConfig.errorLimit));
+    d->ui->lineEdit_memoryLimit->setText(SpinConfigData::optionalIntToString(spinConfig.memoryLimitMB));
+    d->ui->lineEdit_spinTimeLimit->setText(SpinConfigData::optionalIntToString(spinConfig.timeLimitSeconds));
+    d->ui->lineEdit_generationLimit->setText(SpinConfigData::optionalIntToString(spinConfig.globalInputVectorGenerationLimit));
     d->ui->lineEdit_rawCommandLine->setText(spinConfig.rawCommandLine);
+    d->ui->lineEdit_deltaValue->setText(SpinConfigData::optionalFloatToString(spinConfig.deltaValue));
 
     spinConfig.explorationMode == ExplorationMode::BreadthFirst
         ? d->ui->comboBox_spinExpAlgorithm->setCurrentText("Breadth First Search")
         : d->ui->comboBox_spinExpAlgorithm->setCurrentText("Depth First Search");
-    
+
     QTableWidget *tableWidget = d->ui->tableWidget_generationLimits;
     tableWidget->setRowCount(spinConfig.ifaceGenerationLimits.length());
     tableWidget->setColumnCount(tableWidget->horizontalHeader()->count());
@@ -1660,16 +1663,18 @@ void ModelCheckingWindow::setCheckBoxState(QCheckBox *checkBox, bool isChecked)
 SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
 {
     SpinConfigData spinConfigData;
-    spinConfigData.errorLimit = optionalIntFromString(d->ui->lineEdit_errorLimit->text());
-    spinConfigData.globalInputVectorGenerationLimit = optionalIntFromString(d->ui->lineEdit_generationLimit->text());
-    spinConfigData.memoryLimitMB = optionalIntFromString(d->ui->lineEdit_memoryLimit->text());
-    spinConfigData.numberOfCores = optionalIntFromString(d->ui->lineEdit_numberOfCores->text());
-    spinConfigData.searchStateLimit = optionalIntFromString(d->ui->lineEdit_searchStateLimit->text());
-    spinConfigData.timeLimitSeconds = optionalIntFromString(d->ui->lineEdit_spinTimeLimit->text());
+    spinConfigData.errorLimit = SpinConfigData::optionalIntFromString(d->ui->lineEdit_errorLimit->text());
+    spinConfigData.globalInputVectorGenerationLimit = SpinConfigData::optionalIntFromString(d->ui->lineEdit_generationLimit->text());
+    spinConfigData.memoryLimitMB = SpinConfigData::optionalIntFromString(d->ui->lineEdit_memoryLimit->text());
+    spinConfigData.numberOfCores = SpinConfigData::optionalIntFromString(d->ui->lineEdit_numberOfCores->text());
+    spinConfigData.searchStateLimit = SpinConfigData::optionalIntFromString(d->ui->lineEdit_searchStateLimit->text());
+    spinConfigData.timeLimitSeconds = SpinConfigData::optionalIntFromString(d->ui->lineEdit_spinTimeLimit->text());
+    spinConfigData.deltaValue = SpinConfigData::optionalFloatFromString(d->ui->lineEdit_deltaValue->text());
 
     spinConfigData.searchShortestPath = (d->ui->checkBox_searchShortestPath->checkState() == Qt::Checked);
     spinConfigData.useFairScheduling = (d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked);
     spinConfigData.useBitHashing = (d->ui->checkBox_useBitHashing->checkState() == Qt::Checked);
+    spinConfigData.supportReal = (d->ui->checkBox_useReal->checkState() == Qt::Checked);
 
     spinConfigData.rawCommandLine = d->ui->lineEdit_rawCommandLine->text();
 

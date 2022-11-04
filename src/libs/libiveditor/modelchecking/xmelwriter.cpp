@@ -29,7 +29,7 @@ struct XmelWriter::IFConfig {
 };
 
 XmelWriter::XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected,
-        QStringList ifConfiguration, SpinConfigData spinConfiguration)
+                       QStringList ifConfiguration, ive::SpinConfigData spinConfiguration)
     : propertiesSelected(propertiesSelected)
     , subtypesSelected(subtypesSelected)
     , functionsSelected(functionsSelected)
@@ -101,7 +101,7 @@ bool XmelWriter::writeFile(QIODevice *device, QString fileName)
     xml.writeAttribute("maxstates", ifConfig->maxStates);
     xml.writeEndElement();
 
-    SpinConfigSaver spinConfigSaver;
+    ive::SpinConfigSaver spinConfigSaver;
     spinConfigSaver.saveSpinConfig(spinConfigData, xml);
 
     // closing ModelCheckingWindow
