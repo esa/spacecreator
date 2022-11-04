@@ -30,12 +30,6 @@ class QRegularExpressionMatchIterator;
 
 namespace reporting {
 
-struct TempParameter {
-    QString spinTraceFile;
-    QString scenarioFile;
-    std::pair<QString, int> possibleCycleSource;
-};
-
 /**
  * @brief   Parses and generates error reports based on spin messages.
  */
@@ -95,8 +89,8 @@ public:
      *
      * @return  List of spin errors
      */
-    SpinErrorReport parse(const QStringList &spinMessages, const QStringList &sclConditions,
-            const QList<TempParameter> &parameters, const QStringList &observerNames) const;
+    SpinErrorReport parse(const QStringList &spinMessages, const QStringList &sclConditionFiles,
+            const QList<RawErrorItem> &parameters, const QStringList &observerNames) const;
 
     /**
      * @brief   Parse from multiple spin errors
@@ -129,6 +123,8 @@ private:
     QVariant parseStopConditionViolation(const QString &rawError) const;
     QVariant parseObserverFailureErrorState() const;
     QVariant parseObserverFailureSuccessState() const;
+
+    static QString readFile(const QString &filePath);
 
     static QRegularExpression buildSpinErrorRegex();
     static QRegularExpression buildDataConstraintViolationRegex();

@@ -20,55 +20,32 @@
 #include "spinerrorparser.h"
 
 #include <QDebug>
+#include <QFile>
 #include <QRegularExpression>
 
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &, const QStringList &sclConditions,
-        const QList<TempParameter> &parameters, const QStringList &) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &, const QStringList &sclConditionFiles,
+        const QList<RawErrorItem> &parameters, const QStringList &) const
 {
     reporting::SpinErrorReport report;
+
+    // read scl files
+    QStringList sclConditions;
+    for (auto sclFile : sclConditionFiles) {
+        sclConditions.append(readFile(sclFile));
+    }
 
     // number of errors is equal to the number of separate spin traces
     for (auto parameter : parameters) {
-        SpinErrorReportItem newReportItem = parseSpinTraces(parameter.spinTraceFile, sclConditions);
-        // add scenario to new report item
+        // read traces and scenario
+        const auto spinTrace = readFile(parameter.spinTraceFile);
+        const auto scenario = readFile(parameter.scenarioFile);
+
+        SpinErrorReportItem newReportItem = parseSpinTraces(spinTrace, sclConditionFiles);
         newReportItem.errorNumber = 0;
-        newReportItem.scenario = parameter.scenarioFile;
+        newReportItem.scenario = scenario;
         report.append(newReportItem);
     }
 
-    return report;
-}
-
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QList<reporting::RawErrorItem> rawErrors) const
-{
-    reporting::SpinErrorReport report;
-    for (auto rawError : rawErrors) {
-        report.append(parse(rawError));
-    }
-    return report;
-}
-
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(const RawErrorItem &rawError) const
-{
-    reporting::SpinErrorReport report;
-
-    // check for stop condition violation
-    if (!rawError.spinTraces.isEmpty() && rawError.spinTraces.trimmed() != m_spinNoTrailFileMessage) {
-        auto reportItem = buildStopConditionViolationReportItem(rawError.sclConditions);
-        reportItem.scenario = rawError.scenario;
-        report.append(reportItem);
-    } else {
-        // check for observer failure
-        QRegularExpressionMatchIterator matches = matchSpinErrors(rawError.spinMessages);
-        while (matches.hasNext()) {
-            auto reportItem = buildDataConstraintViolationReportItem(matches.next());
-            reportItem.scenario = rawError.scenario;
-            // verify if item is valid
-            if (!qvariant_cast<DataConstraintViolationReport>(reportItem.parsedErrorDetails).functionName.isEmpty()) {
-                report.append(reportItem);
-            }
-        }
-    }
     return report;
 }
 
@@ -213,6 +190,15 @@ QVariant reporting::SpinErrorParser::parseObserverFailureSuccessState() const
     QVariant observerFailure;
     observerFailure.setValue(violationReport);
     return observerFailure;
+}
+
+QString reporting::SpinErrorParser::readFile(const QString &filePath)
+{
+    QFile file(filePath);
+    if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
+        return QString(file.readAll());
+    }
+    return QString();
 }
 
 QRegularExpression reporting::SpinErrorParser::buildSpinErrorRegex()

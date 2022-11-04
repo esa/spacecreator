@@ -38,31 +38,17 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
 }
 
 QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
-        const QStringList &sclConditions, const QList<TempParameter> &parameters, const QStringList &observerNames,
+        const QStringList &sclConditions, const QList<RawErrorItem> &rawErrorItems, const QStringList &observerNames,
         const QString &templateFile) const
 {
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, sclConditions, parameters, observerNames);
+    auto reports = parser.parse(spinMessages, sclConditions, rawErrorItems, observerNames);
     if (templateFile.isEmpty()) {
         initResource();
         return buildHtmlReport(reports, m_defaultTemplateFile);
     } else {
         return buildHtmlReport(reports, templateFile);
     }
-}
-
-QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const
-{
-    initResource();
-    return parseAndBuildHtmlReport(rawErrors, m_defaultTemplateFile);
-}
-
-QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(
-        const QList<RawErrorItem> &rawErrors, const QString &templateFile) const
-{
-    SpinErrorParser parser;
-    auto reports = parser.parse(rawErrors);
-    return buildHtmlReport(reports, templateFile);
 }
 
 QString reporting::HtmlReportBuilder::buildHtmlReport(const reporting::SpinErrorReport &spinErrorReport) const

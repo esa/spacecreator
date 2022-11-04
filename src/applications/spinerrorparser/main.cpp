@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
     QStringList spinMessages;
-    QStringList spinTraces;
-    QStringList sclConditions;
+    QStringList spinTraceFiles;
+    QStringList sclConditionFiles;
     QStringList scenarioFiles;
     std::optional<QString> templateFile;
     std::optional<QString> targetFile;
@@ -67,14 +67,14 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             ++i;
-            spinTraces.append(args[i]);
+            spinTraceFiles.append(args[i]);
         } else if (arg == "-scl") {
             if (i + 1 == args.size()) {
                 qCritical("Missing scl condition after -scl");
                 exit(EXIT_FAILURE);
             }
             ++i;
-            sclConditions.append(args[i]);
+            sclConditionFiles.append(args[i]);
         } else if (arg == "-ir") {
             if (i + 1 == args.size()) {
                 qCritical("Missing trail file after -ir");
@@ -128,12 +128,12 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    if (spinTraces.isEmpty()) {
+    if (spinTraceFiles.isEmpty()) {
         qCritical("Missing mandatory argument: -is spinTraces");
         exit(EXIT_FAILURE);
     }
 
-    if (sclConditions.isEmpty()) {
+    if (sclConditionFiles.isEmpty()) {
         qCritical("Missing mandatory argument: -ic sclCondition");
         exit(EXIT_FAILURE);
     }
@@ -143,50 +143,20 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // parse trails
-    QStringList scenario;
-    for (auto scenarioFile : scenarioFiles) {
-        QFile file(scenarioFile);
-        if (file.open(QFile::ReadOnly)) {
-            const QString fileContents(file.readAll());
-            scenario.append(fileContents);
-            file.close();
-        } else {
-            qCritical("Unable to open trail file");
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    // build struct with raw errors
-    QList<RawErrorItem> rawErrors;
-    const auto spinMessagesSize = spinMessages.size();
-    const auto spinTracesSize = spinTraces.size();
-    const auto sclConditionsSize = sclConditions.size();
-    const auto trailsSize = scenario.size();
-    const auto minSize = qMin(qMin(spinMessagesSize, spinTracesSize), qMin(sclConditionsSize, trailsSize));
-    for (int i = 0; i < minSize; ++i) {
-        RawErrorItem rawError;
-        rawError.spinMessages = spinMessages[i];
-        rawError.spinTraces = spinTraces[i];
-        rawError.sclConditions = sclConditions[i];
-        rawError.scenario = scenario[i];
-        rawErrors.append(rawError);
-    }
-
     // build error structure
-    QList<reporting::TempParameter> tempParameters;
-    const int traceCount = spinTraces.size();
+    QList<reporting::RawErrorItem> rawErrorItems;
+    const int traceCount = spinTraceFiles.size();
     for (int i = 0; i < traceCount; ++i) {
-        reporting::TempParameter tempParameter;
-        tempParameter.spinTraceFile = spinTraces[i];
-        tempParameter.scenarioFile = scenario[i];
-        tempParameter.possibleCycleSource = std::make_pair(QString(), 0);
-        tempParameters.append(tempParameter);
+        reporting::RawErrorItem rawErrorItem;
+        rawErrorItem.spinTraceFile = spinTraceFiles[i];
+        rawErrorItem.scenarioFile = scenarioFiles[i];
+        rawErrorItem.possibleCycleSource = std::make_pair(QString(), 0);
+        rawErrorItems.append(rawErrorItem);
     };
 
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, sclConditions, tempParameters, QStringList());
+    auto reports = parser.parse(spinMessages, sclConditionFiles, rawErrorItems, QStringList());
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;
