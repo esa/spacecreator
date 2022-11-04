@@ -1,35 +1,38 @@
-starting claim 3
+starting claim 4
 Never claim moves to line 6	[else]
-  9:	proc  2 (:init::1) system.pml:69 Send 1	-> queue 1 (Actuator_lock)
- 13:	proc  2 (:init::1) system.pml:30 Send 0	-> queue 2 (Actuator_ping_channel)
- 16:	proc  2 (:init::1) system.pml:71 Send 1	-> queue 3 (Controller_lock)
+  6:	proc  3 (:init::1) system.pml:31 Send 0	-> queue 1 (Actuator_ping_channel)
+  9:	proc  3 (:init::1) system.pml:88 Send 1	-> queue 2 (Controller_lock)
+ 14:	proc  3 (:init::1) system.pml:90 Send 1	-> queue 3 (Actuator_lock)
 Never claim moves to line 4	[(inited)]
-Never claim moves to line 13	[else]
- 24:	proc  1 (Actuator_ping:1) system.pml:57 Recv 0	<- queue 2 (Actuator_ping_channel)
- 25:	proc  1 (Actuator_ping:1) system.pml:58 Recv 1	<- queue 1 (Actuator_lock)
- 30:	proc  1 (Actuator_ping:1) system.pml:19 Send 0	-> queue 4 (Controller_pong_channel)
- 33:	proc  1 (Actuator_ping:1) system.pml:60 Send 1	-> queue 1 (Actuator_lock)
- 39:	proc  0 (Controller_pong:1) system.pml:44 Recv 0	<- queue 4 (Controller_pong_channel)
- 40:	proc  0 (Controller_pong:1) system.pml:45 Recv 1	<- queue 3 (Controller_lock)
- 45:	proc  0 (Controller_pong:1) system.pml:30 Send 0	-> queue 2 (Actuator_ping_channel)
- 48:	proc  0 (Controller_pong:1) system.pml:47 Send 1	-> queue 3 (Controller_lock)
-  <<<<<START OF CYCLE>>>>>
- 50:	proc  1 (Actuator_ping:1) system.pml:57 Recv 0	<- queue 2 (Actuator_ping_channel)
- 51:	proc  1 (Actuator_ping:1) system.pml:58 Recv 1	<- queue 1 (Actuator_lock)
- 56:	proc  1 (Actuator_ping:1) system.pml:19 Send 0	-> queue 4 (Controller_pong_channel)
- 59:	proc  1 (Actuator_ping:1) system.pml:60 Send 1	-> queue 1 (Actuator_lock)
- 61:	proc  0 (Controller_pong:1) system.pml:44 Recv 0	<- queue 4 (Controller_pong_channel)
- 62:	proc  0 (Controller_pong:1) system.pml:45 Recv 1	<- queue 3 (Controller_lock)
- 67:	proc  0 (Controller_pong:1) system.pml:30 Send 0	-> queue 2 (Actuator_ping_channel)
- 70:	proc  0 (Controller_pong:1) system.pml:47 Send 1	-> queue 3 (Controller_lock)
-spin: trail ends after 70 steps
-#processes: 2
+Never claim moves to line 16	[else]
+ 30:	proc  1 (Actuator_ping:1) system.pml:63 Recv 0	<- queue 1 (Actuator_ping_channel)
+ 31:	proc  1 (Actuator_ping:1) system.pml:64 Recv 1	<- queue 3 (Actuator_lock)
+ 36:	proc  1 (Actuator_ping:1) system.pml:20 Send 0	-> queue 4 (Controller_pong_channel)
+ 38:	proc  0 (Controller_pong:2) system.pml:50 Recv 0	<- queue 4 (Controller_pong_channel)
+ 39:	proc  0 (Controller_pong:2) system.pml:51 Recv 1	<- queue 2 (Controller_lock)
+ 44:	proc  0 (Controller_pong:2) system.pml:31 Send 0	-> queue 1 (Actuator_ping_channel)
+ 47:	proc  0 (Controller_pong:2) system.pml:53 Send 1	-> queue 2 (Controller_lock)
+ 51:	proc  1 (Actuator_ping:1) system.pml:66 Send 1	-> queue 3 (Actuator_lock)
+ 53:	proc  1 (Actuator_ping:1) system.pml:63 Recv 0	<- queue 1 (Actuator_ping_channel)
+ 54:	proc  1 (Actuator_ping:1) system.pml:64 Recv 1	<- queue 3 (Actuator_lock)
+ 59:	proc  1 (Actuator_ping:1) system.pml:20 Send 0	-> queue 4 (Controller_pong_channel)
+ 61:	proc  0 (Controller_pong:2) system.pml:50 Recv 0	<- queue 4 (Controller_pong_channel)
+ 62:	proc  0 (Controller_pong:2) system.pml:51 Recv 1	<- queue 2 (Controller_lock)
+ 67:	proc  0 (Controller_pong:2) system.pml:36 Send 0	-> queue 5 (Actuator_test_channel)
+ 70:	proc  0 (Controller_pong:2) system.pml:53 Send 1	-> queue 2 (Controller_lock)
+      SCL violation: always empty(actuator.test);
+spin: scl.pml:14, Error: assertion violated
+spin: text of failed assertion: assert((len(Actuator_test_channel)==0))
+Never claim moves to line 14	[assert((len(Actuator_test_channel)==0))]
+spin: trail ends after 71 steps
+#processes: 3
 		nothing.data.no_event.dummy = 0
 		nothing.data.system_startup.dummy = 0
 		nothing.data.input_event.source = 0
 		nothing.data.input_event.dest = 0
 		nothing.data.input_event.event.data.actuator.data.msg_in.data.input_none.dummy = 0
 		nothing.data.input_event.event.data.actuator.data.msg_in.data.ping.dummy = 0
+		nothing.data.input_event.event.data.actuator.data.msg_in.data.test.dummy = 0
 		nothing.data.input_event.event.data.actuator.data.msg_in.selection = 0
 		nothing.data.input_event.event.data.actuator.data.msg_out.data.pong.dummy = 0
 		nothing.data.input_event.event.data.actuator.data.msg_out.selection = 0
@@ -38,6 +41,7 @@ spin: trail ends after 70 steps
 		nothing.data.input_event.event.data.controller.data.msg_in.data.pong.dummy = 0
 		nothing.data.input_event.event.data.controller.data.msg_in.selection = 0
 		nothing.data.input_event.event.data.controller.data.msg_out.data.ping.dummy = 0
+		nothing.data.input_event.event.data.controller.data.msg_out.data.test.dummy = 0
 		nothing.data.input_event.event.data.controller.data.msg_out.selection = 0
 		nothing.data.input_event.event.data.controller.selection = 0
 		nothing.data.input_event.event.selection = 0
@@ -45,6 +49,7 @@ spin: trail ends after 70 steps
 		nothing.data.output_event.dest = 0
 		nothing.data.output_event.event.data.actuator.data.msg_in.data.input_none.dummy = 0
 		nothing.data.output_event.event.data.actuator.data.msg_in.data.ping.dummy = 0
+		nothing.data.output_event.event.data.actuator.data.msg_in.data.test.dummy = 0
 		nothing.data.output_event.event.data.actuator.data.msg_in.selection = 0
 		nothing.data.output_event.event.data.actuator.data.msg_out.data.pong.dummy = 0
 		nothing.data.output_event.event.data.actuator.data.msg_out.selection = 0
@@ -53,6 +58,7 @@ spin: trail ends after 70 steps
 		nothing.data.output_event.event.data.controller.data.msg_in.data.pong.dummy = 0
 		nothing.data.output_event.event.data.controller.data.msg_in.selection = 0
 		nothing.data.output_event.event.data.controller.data.msg_out.data.ping.dummy = 0
+		nothing.data.output_event.event.data.controller.data.msg_out.data.test.dummy = 0
 		nothing.data.output_event.event.data.controller.data.msg_out.selection = 0
 		nothing.data.output_event.event.data.controller.selection = 0
 		nothing.data.output_event.event.selection = 0
@@ -60,6 +66,7 @@ spin: trail ends after 70 steps
 		nothing.data.unhandled_input.dest = 0
 		nothing.data.unhandled_input.event.data.actuator.data.msg_in.data.input_none.dummy = 0
 		nothing.data.unhandled_input.event.data.actuator.data.msg_in.data.ping.dummy = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_in.data.test.dummy = 0
 		nothing.data.unhandled_input.event.data.actuator.data.msg_in.selection = 0
 		nothing.data.unhandled_input.event.data.actuator.data.msg_out.data.pong.dummy = 0
 		nothing.data.unhandled_input.event.data.actuator.data.msg_out.selection = 0
@@ -68,20 +75,23 @@ spin: trail ends after 70 steps
 		nothing.data.unhandled_input.event.data.controller.data.msg_in.data.pong.dummy = 0
 		nothing.data.unhandled_input.event.data.controller.data.msg_in.selection = 0
 		nothing.data.unhandled_input.event.data.controller.data.msg_out.data.ping.dummy = 0
+		nothing.data.unhandled_input.event.data.controller.data.msg_out.data.test.dummy = 0
 		nothing.data.unhandled_input.event.data.controller.data.msg_out.selection = 0
 		nothing.data.unhandled_input.event.data.controller.selection = 0
 		nothing.data.unhandled_input.event.selection = 0
 		nothing.selection = 0
 		inited = 1
 		queue 4 (Controller_pong_channel): 
-		queue 2 (Actuator_ping_channel): [0]
+		queue 1 (Actuator_ping_channel): 
+		queue 5 (Actuator_test_channel): [0]
 		global_state.controller.state = 0
 		global_state.controller.init_done = 0
 		global_state.actuator.state = 0
 		global_state.actuator.init_done = 0
-		queue 1 (Actuator_lock): [1]
-		queue 3 (Controller_lock): [1]
- 70:	proc  1 (Actuator_ping:1) system.pml:55 (state 129)
- 70:	proc  0 (Controller_pong:1) system.pml:42 (state 38)
- 70:	proc  - (never_0:1) scl.pml:10 (state 12)
-3 processes created
+		queue 2 (Controller_lock): [1]
+		queue 3 (Actuator_lock): 
+ 71:	proc  2 (Actuator_test:1) system.pml:74 (state 42)
+ 71:	proc  1 (Actuator_ping:1) actuator.pml:25 (state 30)
+ 71:	proc  0 (Controller_pong:2) system.pml:48 (state 78)
+ 71:	proc  - (never_0:1) scl.pml:10 (state 14)
+4 processes created

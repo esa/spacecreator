@@ -1,4 +1,4 @@
-pan:1: assertion violated (q_len(Actuator_test_channel)==0) (at depth 70)
+pan:1: assertion violated  !((global_state.observer.state==0)) (at depth 322)
 pan: wrote system.pml.trail
 
 (Spin Version 6.4.9 -- 17 December 2018)
@@ -10,20 +10,19 @@ Full statespace search for:
 	acceptance   cycles 	- (not selected)
 	invalid end states	- (disabled by never claim)
 
-State-vector 460 byte, depth reached 70, errors: 1
-       14 states, stored
+State-vector 352 byte, depth reached 322, errors: 1
+       18 states, stored
         0 states, matched
-       14 transitions (= stored+matched)
-       46 atomic steps
+       18 transitions (= stored+matched)
+      288 atomic steps
 hash conflicts:         0 (resolved)
 
 Stats on memory usage (in Megabytes):
     0.007	equivalent memory usage for states (stored*(State-vector + overhead))
-   17.497	actual memory usage for states
+    0.551	actual memory usage for states
   128.000	memory used for hash table (-w24)
-    0.611	memory used for DFS stack (-m10000)
-    5.608	memory lost to fragmentation
-  140.500	total actual memory usage
+   61.035	memory used for DFS stack (-m1000000)
+  189.426	total actual memory usage
 
 
 
