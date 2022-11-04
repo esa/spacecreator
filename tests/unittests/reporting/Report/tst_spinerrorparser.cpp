@@ -45,43 +45,33 @@ private:
 
 void tst_SpinErrorParser::testNoError()
 {
-    // read message file
-    const QString filepath("resources/spin_no_error_output.txt");
-
-    QVERIFY(true);
-
-    /*RawErrorItem rawError;
-    rawError.spinMessages = readFile(filepath);
-    rawError.spinTraces = QString();
-    rawError.sclConditions = QString();
-    rawError.scenario = QString();
-
     const SpinErrorParser parser;
-    const SpinErrorReport errorReport = parser.parse(rawError);
+    const SpinErrorReport errorReport = parser.parse({}, {}, {}, QStringList());
 
-    QVERIFY(errorReport.size() == 0);*/
+    QVERIFY(errorReport.size() == 0);
 }
 
 void tst_SpinErrorParser::testViolationVariableType()
 {
     // read message file
-    const QString filepath("resources/spin_error_output.txt");
+    const QString spinMessagePath("resources/data_constraint_msg.txt");
+    const QString spinTracesPath("resources/data_constraint_spin.txt");
+    const QString sclPath("resources/data_constraint_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
 
     QVERIFY(true);
 
-    /*RawErrorItem rawError;
-    rawError.spinMessages = readFile(filepath);
-    rawError.spinTraces = QString();
-    rawError.sclConditions = QString();
-    rawError.scenario = QString();
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
 
     const SpinErrorParser parser;
-    const auto errorReport = parser.parse(rawError);
+    const auto errorReport = parser.parse({ spinMessagePath }, { sclPath }, { rawError }, QStringList());
     QVERIFY(errorReport.size() == 1);
 
     const auto errorReportItem = errorReport.at(0);
     QVERIFY(errorReportItem.errorType == SpinErrorReportItem::DataConstraintViolation);
-    QVERIFY(errorReportItem.errorDepth == 553);
+    QVERIFY(errorReportItem.errorDepth == 0);
 
     const auto errorDetails = qvariant_cast<DataConstraintViolationReport>(errorReportItem.parsedErrorDetails);
     QVERIFY(errorDetails.functionName == QString("asw"));
@@ -90,29 +80,30 @@ void tst_SpinErrorParser::testViolationVariableType()
     QVERIFY(errorDetails.constraints
             == QList<QString>() << ">="
                                 << "<=");
-    QVERIFY(errorDetails.boundingValues == QList<QVariant>() << QVariant(0.0f) << QVariant(10.0f));*/
+    QVERIFY(errorDetails.boundingValues == QList<QVariant>() << QVariant(0.0f) << QVariant(10.0f));
 }
 
 void tst_SpinErrorParser::testNestedVariable()
 {
     // read message file
-    const QString filepath("resources/spin_error_nested_output.txt");
+    const QString spinMessagePath("resources/data_constraint_nested_msg.txt");
+    const QString spinTracesPath("resources/data_constraint_nested_spin.txt");
+    const QString sclPath("resources/data_constraint_nested_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
 
     QVERIFY(true);
 
-    /*RawErrorItem rawError;
-    rawError.spinMessages = readFile(filepath);
-    rawError.spinTraces = QString();
-    rawError.sclConditions = QString();
-    rawError.scenario = QString();
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
 
     const SpinErrorParser parser;
-    const auto errorReport = parser.parse(rawError);
+    const auto errorReport = parser.parse({ spinMessagePath }, { sclPath }, { rawError }, QStringList());
     QVERIFY(errorReport.size() == 1);
 
     const auto errorReportItem = errorReport.at(0);
     QVERIFY(errorReportItem.errorType == SpinErrorReportItem::DataConstraintViolation);
-    QVERIFY(errorReportItem.errorDepth == 293);
+    QVERIFY(errorReportItem.errorDepth == 0);
 
     const auto errorDetails = qvariant_cast<DataConstraintViolationReport>(errorReportItem.parsedErrorDetails);
     QVERIFY(errorDetails.functionName == QString("function2"));
@@ -121,7 +112,7 @@ void tst_SpinErrorParser::testNestedVariable()
     QVERIFY(errorDetails.constraints
             == QList<QString>() << ">="
                                 << "<=");
-    QVERIFY(errorDetails.boundingValues == QList<QVariant>() << QVariant(5.0f) << QVariant(15.0f));*/
+    QVERIFY(errorDetails.boundingValues == QList<QVariant>() << QVariant(5.0f) << QVariant(15.0f));
 }
 
 QString tst_SpinErrorParser::readFile(const QString &filepath)
