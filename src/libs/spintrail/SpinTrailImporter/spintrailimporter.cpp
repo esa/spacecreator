@@ -160,7 +160,7 @@ QRegularExpression SpinTrailImporter::buildChannelCommandRegexp() const
     pattern += QStringLiteral(R"([\w\.]+:\d+\s)");
 
     // match operation (Send/Recv) and list of arguments
-    pattern += QStringLiteral(R"(([\w\s,]+))");
+    pattern += QStringLiteral(R"(([\w\s,\.]+))");
 
     // end
     pattern += QStringLiteral("$");

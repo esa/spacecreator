@@ -56,7 +56,7 @@ void tst_SpinTrailImporter::testScenario()
     const SpinTrailModel *model = dynamic_cast<const SpinTrailModel *>(abstractModel.get());
     QVERIFY(model != nullptr);
 
-    QCOMPARE(model->getEvents().size(), 10);
+    QCOMPARE(model->getEvents().size(), 12);
 
     auto iter = model->getEvents().begin();
 
@@ -160,6 +160,28 @@ void tst_SpinTrailImporter::testScenario()
         const ResetTimerEvent &event = dynamic_cast<const ResetTimerEvent &>(*trailEvent);
         QCOMPARE(event.getFunctionName(), "actuator");
         QCOMPARE(event.getTimerName(), "trigger");
+    }
+    {
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
+        ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
+        QCOMPARE(event.getType(), ChannelEvent::Type::Send);
+        QCOMPARE(event.getProctypeName(), "Controller_result");
+        QCOMPARE(event.getChannelName(), "Actuator_work_channel");
+        QCOMPARE(event.getParameters().size(), 1);
+        QCOMPARE(event.getParameters().front(), "11.300000");
+    }
+    {
+        const std::unique_ptr<TrailEvent> &trailEvent = *iter;
+        ++iter;
+        QCOMPARE(trailEvent->getEventType(), TrailEvent::EventType::CHANNEL_EVENT);
+        const ChannelEvent &event = dynamic_cast<const ChannelEvent &>(*trailEvent);
+        QCOMPARE(event.getType(), ChannelEvent::Type::Recv);
+        QCOMPARE(event.getProctypeName(), "Actuator_work");
+        QCOMPARE(event.getChannelName(), "Actuator_work_channel");
+        QCOMPARE(event.getParameters().size(), 1);
+        QCOMPARE(event.getParameters().front(), "11.300000");
     }
 }
 }
