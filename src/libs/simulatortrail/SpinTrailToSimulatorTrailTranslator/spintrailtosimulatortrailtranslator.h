@@ -113,5 +113,7 @@ private:
             const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters, bool isInput) const;
 
     bool isFunctionLockChannel(const QString &channelName) const;
+
+    const Asn1Acn::Types::Type *findType(const Asn1Acn::Asn1Model &asn1Model, const QString &name) const;
 };
 }
