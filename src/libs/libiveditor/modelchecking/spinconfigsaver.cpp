@@ -21,7 +21,29 @@
 
 #include <QDebug>
 
-SpinConfigSaver::SpinConfigSaver() { }
+namespace ive {
+
+std::optional<int> SpinConfigData::optionalIntFromString(const QString str)
+{
+    return str.isEmpty() ? std::nullopt : std::optional<int>(str.toInt());
+}
+
+QString SpinConfigData::optionalIntToString(std::optional<int> opt)
+{
+    return opt == std::nullopt ? "" : QString::number(opt.value());
+}
+
+std::optional<float> SpinConfigData::optionalFloatFromString(const QString str)
+{
+    return str.isEmpty() ? std::nullopt : std::optional<float>(str.toFloat());
+}
+
+QString SpinConfigData::optionalFloatToString(std::optional<float> opt)
+{
+    return opt == std::nullopt ? "" : QString::number(opt.value());
+}
+
+SpinConfigSaver::SpinConfigSaver() {}
 
 SpinConfigData SpinConfigSaver::getConfigData() const
 {
@@ -84,51 +106,48 @@ QString readAttribute(const QString &attribute, const QXmlStreamReader &xml)
     return {};
 }
 
-std::optional<int> optionalIntFromString(const QString str)
-{
-    return str.isEmpty() ? std::nullopt : std::optional<int>(str.toInt());
-}
-
-QString optionalIntToString(std::optional<int> opt)
-{
-    return opt == std::nullopt ? "" : QString::number(opt.value());
-}
-
 void SpinConfigSaver::saveSpinConfig(const SpinConfigData &configData, QXmlStreamWriter &xml)
 {
     xml.writeStartElement("SPINModelChecker");
 
-    xml.writeAttribute("errorlimit", optionalIntToString(configData.errorLimit));
+    xml.writeAttribute("errorlimit", SpinConfigData::optionalIntToString(configData.errorLimit));
     xml.writeAttribute("explorationmode", explorationModeToString(configData.explorationMode));
-    xml.writeAttribute("inputvectorgenerationlimit", optionalIntToString(configData.globalInputVectorGenerationLimit));
+    xml.writeAttribute("inputvectorgenerationlimit",
+            SpinConfigData::optionalIntToString(configData.globalInputVectorGenerationLimit));
     xml.writeAttribute("ifacegenerationlimits", interfaceGenerationLimitsToString(configData.ifaceGenerationLimits));
-    xml.writeAttribute("memorylimitmb", optionalIntToString(configData.memoryLimitMB));
-    xml.writeAttribute("numberofcores", optionalIntToString(configData.numberOfCores));
+    xml.writeAttribute("memorylimitmb", SpinConfigData::optionalIntToString(configData.memoryLimitMB));
+    xml.writeAttribute("numberofcores", SpinConfigData::optionalIntToString(configData.numberOfCores));
     xml.writeAttribute("rawcommandline", configData.rawCommandLine);
     xml.writeAttribute("searchshortestpath", QString::number(configData.searchShortestPath));
-    xml.writeAttribute("searchstatelimit", optionalIntToString(configData.searchStateLimit));
-    xml.writeAttribute("timelimitseconds", optionalIntToString(configData.timeLimitSeconds));
+    xml.writeAttribute("searchstatelimit", SpinConfigData::optionalIntToString(configData.searchStateLimit));
+    xml.writeAttribute("timelimitseconds", SpinConfigData::optionalIntToString(configData.timeLimitSeconds));
     xml.writeAttribute("usebithashing", QString::number(configData.useBitHashing));
     xml.writeAttribute("usefairscheduling", QString::number(configData.useFairScheduling));
+    xml.writeAttribute("supportReal", QString::number(configData.supportReal));
+    xml.writeAttribute("deltaValue", SpinConfigData::optionalFloatToString(configData.deltaValue));
 
     xml.writeEndElement();
 }
 
 bool SpinConfigSaver::readSpinConfig(QXmlStreamReader &xml)
 {
-    configData.errorLimit = optionalIntFromString(readAttribute("errorlimit", xml));
+    configData.errorLimit = SpinConfigData::optionalIntFromString(readAttribute("errorlimit", xml));
     configData.explorationMode = explorationModeFromString(readAttribute("explorationmode", xml));
-    configData.globalInputVectorGenerationLimit = optionalIntFromString(readAttribute("inputvectorgenerationlimit", xml));
+    configData.globalInputVectorGenerationLimit =
+            SpinConfigData::optionalIntFromString(readAttribute("inputvectorgenerationlimit", xml));
     configData.ifaceGenerationLimits = parseIfaceGenerationLimits(readAttribute("ifacegenerationlimits", xml));
-    configData.memoryLimitMB = optionalIntFromString(readAttribute("memorylimitmb", xml));
-    configData.numberOfCores = optionalIntFromString(readAttribute("numberofcores", xml));
+    configData.memoryLimitMB = SpinConfigData::optionalIntFromString(readAttribute("memorylimitmb", xml));
+    configData.numberOfCores = SpinConfigData::optionalIntFromString(readAttribute("numberofcores", xml));
     configData.rawCommandLine = readAttribute("rawcommandline", xml);
     configData.searchShortestPath = readAttribute("searchshortestpath", xml).toInt();
-    configData.searchStateLimit = optionalIntFromString(readAttribute("searchstatelimit", xml));
-    configData.timeLimitSeconds = optionalIntFromString(readAttribute("timelimitseconds", xml));
+    configData.searchStateLimit = SpinConfigData::optionalIntFromString(readAttribute("searchstatelimit", xml));
+    configData.timeLimitSeconds = SpinConfigData::optionalIntFromString(readAttribute("timelimitseconds", xml));
     configData.useBitHashing = readAttribute("usebithashing", xml).toInt();
     configData.useFairScheduling = readAttribute("usefairscheduling", xml).toInt();
+    configData.supportReal = readAttribute("supportReal", xml).toInt();
+    configData.deltaValue = SpinConfigData::optionalFloatFromString(readAttribute("deltaValue", xml));
 
     xml.skipCurrentElement();
     return true;
+}
 }

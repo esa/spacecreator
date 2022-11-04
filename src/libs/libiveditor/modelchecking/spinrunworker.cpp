@@ -71,7 +71,13 @@ void SpinRunWorker::run()
                     ? TmcVerifier::ExplorationMode::DepthFirst
                     : TmcVerifier::ExplorationMode::BreadthFirst);
 
-    m_verifier->setRealTypeEnabled(false);
+    if (m_spinConfig.supportReal) {
+        m_verifier->setRealTypeEnabled(true);
+        m_verifier->setDelta(m_spinConfig.deltaValue);
+    } else {
+        m_verifier->setRealTypeEnabled(false);
+    }
+
     m_verifier->setSearchShortestPath(m_spinConfig.searchShortestPath);
     m_verifier->setUseFairScheduling(m_spinConfig.useFairScheduling);
     m_verifier->setUseBitHashing(m_spinConfig.useBitHashing);
