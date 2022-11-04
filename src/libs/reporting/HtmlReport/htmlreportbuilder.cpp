@@ -38,11 +38,11 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
 }
 
 QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
-        const QStringList &sclConditions, const QList<RawErrorItem> &rawErrorItems, const QStringList &observerNames,
+        const QStringList &sclFiles, const QList<RawErrorItem> &errors, const QStringList &observerNames,
         const QString &templateFile) const
 {
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, sclConditions, rawErrorItems, observerNames);
+    auto reports = parser.parse(spinMessages, sclFiles, errors, observerNames);
     if (templateFile.isEmpty()) {
         initResource();
         return buildHtmlReport(reports, m_defaultTemplateFile);

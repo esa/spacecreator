@@ -23,24 +23,24 @@
 #include <QFile>
 #include <QRegularExpression>
 
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &, const QStringList &sclConditionFiles,
-        const QList<RawErrorItem> &parameters, const QStringList &) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(
+        const QStringList &, const QStringList &sclFiles, const QList<RawErrorItem> &errors, const QStringList &) const
 {
     reporting::SpinErrorReport report;
 
     // read scl files
     QStringList sclConditions;
-    for (auto sclFile : sclConditionFiles) {
+    for (auto sclFile : sclFiles) {
         sclConditions.append(readFile(sclFile));
     }
 
     // number of errors is equal to the number of separate spin traces
-    for (auto parameter : parameters) {
+    for (auto error : errors) {
         // read traces and scenario
-        const auto spinTrace = readFile(parameter.spinTraceFile);
-        const auto scenario = readFile(parameter.scenarioFile);
+        const auto spinTrace = readFile(error.spinTraceFile);
+        const auto scenario = readFile(error.scenarioFile);
 
-        SpinErrorReportItem newReportItem = parseSpinTraces(spinTrace, sclConditionFiles);
+        SpinErrorReportItem newReportItem = parseSpinTraces(spinTrace, sclFiles);
         newReportItem.errorNumber = 0;
         newReportItem.scenario = scenario;
         report.append(newReportItem);
