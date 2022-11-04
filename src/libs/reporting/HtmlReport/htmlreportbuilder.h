@@ -86,6 +86,8 @@ private:
 
     static const QString m_defaultTemplateFile;
     static const QHash<reporting::SpinErrorReportItem::ErrorType, QString> m_errorTypeNames;
+    static const QHash<reporting::StopConditionViolationReport::ViolationClause, QString>
+            m_stopConditionViolationClauseNames;
     static const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
             m_stopConditionViolationTypeNames;
 
