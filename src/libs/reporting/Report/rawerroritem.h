@@ -27,8 +27,12 @@ namespace reporting {
  * @brief Structure to hold raw error messages for parsing.
  */
 struct RawErrorItem {
+    /** Path to the file containing spin traces */
     QString spinTraceFile;
+    /** Path to scenario.sim associated with the error */
     QString scenarioFile;
+    /** Cycle number identified as a error source in the spin trace file,
+     * along with the detected observer name */
     std::pair<QString, int> possibleCycleSource;
 };
 

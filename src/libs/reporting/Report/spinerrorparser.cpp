@@ -76,6 +76,8 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
         reportItem.parsedErrorDetails = report;
         return reportItem;
     }
+    // out of two remaining error types, observer failure (entering success state)
+    // can be detected by finding an acceptance cycle in the report
     auto observerFailureSuccessStateMatch = matchObserverFailureSuccessState(spinTraces);
     if (observerFailureSuccessStateMatch.hasMatch()) {
         // found observer failure (success state)
@@ -165,11 +167,11 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::buildStopConditionVio
     return reportItem;
 }
 
-QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawError) const
+QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &parsedErrorToken) const
 {
     DataConstraintViolationReport violationReport;
     const QRegularExpression regex = buildDataConstraintViolationRegex();
-    QRegularExpressionMatchIterator matches = regex.globalMatch(rawError);
+    QRegularExpressionMatchIterator matches = regex.globalMatch(parsedErrorToken);
     while (matches.hasNext()) {
         const QRegularExpressionMatch matchedError = matches.next();
 
@@ -194,12 +196,12 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawEr
     return variableViolation;
 }
 
-QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &conditions) const
+QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &parsedErrorToken) const
 {
     StopConditionViolationReport violationReport;
     violationReport.violationType = StopConditionViolationReport::UnknownType;
 
-    const QString sanitized = cleanUpSclComments(conditions);
+    const QString sanitized = cleanUpSclComments(parsedErrorToken);
     const QRegularExpression regex = buildStopConditionViolationRegex();
     auto matches = regex.globalMatch(sanitized);
     while (matches.hasNext()) {
@@ -223,11 +225,11 @@ QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &
     return stopConditionViolation;
 }
 
-QVariant reporting::SpinErrorParser::parseObserverFailureErrorState(const QString &rawError) const
+QVariant reporting::SpinErrorParser::parseObserverFailureErrorState(const QString &parsedErrorToken) const
 {
     ObserverFailureReport violationReport;
     violationReport.observerState = ObserverFailureReport::ErrorState;
-    violationReport.observerName = rawError;
+    violationReport.observerName = parsedErrorToken;
 
     QVariant observerFailure;
     observerFailure.setValue(violationReport);

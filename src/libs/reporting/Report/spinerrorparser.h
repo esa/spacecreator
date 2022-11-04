@@ -113,10 +113,10 @@ private:
     SpinErrorReportItem buildDataConstraintViolationReportItem(const QRegularExpressionMatch &matchedError) const;
     SpinErrorReportItem buildStopConditionViolationReportItem(const QString &conditions) const;
 
-    QVariant parseVariableViolation(const QString &rawError) const;
-    QVariant parseStopConditionViolation(const QString &rawError) const;
-    QVariant parseObserverFailureErrorState(const QString &rawError) const;
-    QVariant parseObserverFailureSuccessState(const QString &rawError) const;
+    QVariant parseVariableViolation(const QString &parsedErrorToken) const;
+    QVariant parseStopConditionViolation(const QString &parsedErrorToken) const;
+    QVariant parseObserverFailureErrorState(const QString &parsedErrorToken) const;
+    QVariant parseObserverFailureSuccessState(const QString &parsedErrorToken) const;
 
     static QString readFile(const QString &filePath);
 
