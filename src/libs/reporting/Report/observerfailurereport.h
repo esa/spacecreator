@@ -37,6 +37,8 @@ struct ObserverFailureReport {
 
     /** Observer state */
     ObserverState observerState;
+    /** Observer name */
+    QString observerName;
 };
 
 }

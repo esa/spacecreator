@@ -52,8 +52,6 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(
 reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
         const QString &spinTraces, const QStringList &) const
 {
-    qDebug() << spinTraces;
-
     SpinErrorReportItem reportItem;
     auto stopConditionMatch = matchStopCondition(spinTraces);
     if (stopConditionMatch.hasMatch()) {
@@ -61,7 +59,7 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
         auto report = parseStopConditionViolation(violationString);
         reportItem.errorDepth = 0;
         reportItem.errorType = SpinErrorReportItem::StopConditionViolation;
-        reportItem.rawErrorDetails = stopConditionMatch.captured(0);
+        reportItem.rawErrorDetails = stopConditionMatch.captured(0).trimmed();
         reportItem.parsedErrorDetails = report;
         // found stop condition violation
         return reportItem;
@@ -69,11 +67,22 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
     auto observerFailureErrorStateMatch = matchObserverFailureErrorState(spinTraces);
     if (observerFailureErrorStateMatch.hasMatch()) {
         // found observer failure (error state)
+        auto observerName = stopConditionMatch.captured(1);
+        auto report = parseObserverFailureErrorState(observerName);
+        reportItem.errorDepth = 0;
+        reportItem.errorType = SpinErrorReportItem::ObserverFailure;
+        reportItem.rawErrorDetails = observerFailureErrorStateMatch.captured(0).trimmed();
+        reportItem.parsedErrorDetails = report;
         return reportItem;
     }
     auto observerFailureSuccessStateMatch = matchObserverFailureSuccessState(spinTraces);
     if (observerFailureSuccessStateMatch.hasMatch()) {
         // found observer failure (success state)
+        auto report = parseObserverFailureSuccessState(QString());
+        reportItem.errorDepth = 0;
+        reportItem.errorType = SpinErrorReportItem::ObserverFailure;
+        reportItem.rawErrorDetails = observerFailureSuccessStateMatch.captured(0).trimmed();
+        reportItem.parsedErrorDetails = report;
         return reportItem;
     }
     auto variableViolationMatch = matchVariableViolation(spinTraces);
@@ -93,7 +102,7 @@ QRegularExpressionMatch reporting::SpinErrorParser::matchStopCondition(const QSt
 
 QRegularExpressionMatch reporting::SpinErrorParser::matchObserverFailureErrorState(const QString &spinTraces) const
 {
-    const QRegularExpression regex(QStringLiteral("<<<<<START OF CYCLE>>>>>"));
+    const QRegularExpression regex(QStringLiteral("Observer entered errorstate:\\s*(.+)\\n"));
     return regex.match(spinTraces);
 }
 
@@ -201,20 +210,23 @@ QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &
     return stopConditionViolation;
 }
 
-QVariant reporting::SpinErrorParser::parseObserverFailureErrorState() const
+QVariant reporting::SpinErrorParser::parseObserverFailureErrorState(const QString &rawError) const
 {
     ObserverFailureReport violationReport;
     violationReport.observerState = ObserverFailureReport::ErrorState;
+    violationReport.observerName = rawError;
 
     QVariant observerFailure;
     observerFailure.setValue(violationReport);
     return observerFailure;
 }
 
-QVariant reporting::SpinErrorParser::parseObserverFailureSuccessState() const
+QVariant reporting::SpinErrorParser::parseObserverFailureSuccessState(const QString &) const
 {
     ObserverFailureReport violationReport;
     violationReport.observerState = ObserverFailureReport::SuccessState;
+    // observer name is currently not parsed in success states
+    violationReport.observerName = QString();
 
     QVariant observerFailure;
     observerFailure.setValue(violationReport);

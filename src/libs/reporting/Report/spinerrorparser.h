@@ -110,8 +110,8 @@ private:
     QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
     QVariant parseVariableViolation(const QString &rawError) const;
     QVariant parseStopConditionViolation(const QString &rawError) const;
-    QVariant parseObserverFailureErrorState() const;
-    QVariant parseObserverFailureSuccessState() const;
+    QVariant parseObserverFailureErrorState(const QString &rawError) const;
+    QVariant parseObserverFailureSuccessState(const QString &rawError) const;
 
     static QString readFile(const QString &filePath);
 
