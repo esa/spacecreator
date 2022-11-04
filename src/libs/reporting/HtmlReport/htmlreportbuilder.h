@@ -48,22 +48,21 @@ public:
      * @brief   Builds HTML report from multiple string lists and a default template
      *
      * @param   spinMessages     Spin command outputs
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     * @param   scenario         scenario.sim file contents
+     * @param   sclFiles         SCL condition files
+     * @param   errors           Raw error data
+     * @param   observerNames    Observer names
      * @param   template         HTML template file, uses default if empty
      *
      * @return  HTML-formatted error report string
      */
-    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &sclConditions,
-            const QList<RawErrorItem> &rawErrorItems, const QStringList &observerNames,
+    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &sclFiles,
+            const QList<RawErrorItem> &errors, const QStringList &observerNames,
             const QString &templateFile = QString()) const;
 
     /**
      * @brief   Build spin error report using a default template file embedded into the library
      *
      * @param   spinErrorReport      Parsed error report from spin
-     * @param   trails               Parsed trail file contents
      *
      * @return  Error report in an HTML document format
      */
@@ -73,7 +72,6 @@ public:
      * @brief   Build spin error report using a custom template file
      *
      * @param   spinErrorReport      Parsed error report from spin
-     * @param   trails               Parsed trail file contents
      * @param   templateFile         Path to the HTML template file
      *
      * @return  Error report in an HTML document format
