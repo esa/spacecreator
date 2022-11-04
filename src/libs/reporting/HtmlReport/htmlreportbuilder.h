@@ -56,27 +56,8 @@ public:
      * @return  HTML-formatted error report string
      */
     QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &sclConditions,
-            const QList<TempParameter> &parameters, const QStringList &observerNames,
+            const QList<RawErrorItem> &rawErrorItems, const QStringList &observerNames,
             const QString &templateFile = QString()) const;
-
-    /**
-     * @brief   Parse and build report using a default template file embedded into the library
-     *
-     * @param   rawErrors        List of raw error strings
-     *
-     * @return  Error report in HTML document format
-     */
-    QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors) const;
-
-    /**
-     * @brief   Parse and build report using a default template file embedded into the library
-     *
-     * @param   rawErrors        List of raw error strings
-     * @param   templateFile     Path to the HTML template file
-     *
-     * @return  Error report in HTML document format
-     */
-    QString parseAndBuildHtmlReport(const QList<RawErrorItem> &rawErrors, const QString &templateFile) const;
 
     /**
      * @brief   Build spin error report using a default template file embedded into the library

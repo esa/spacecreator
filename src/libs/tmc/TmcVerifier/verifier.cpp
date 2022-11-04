@@ -488,17 +488,17 @@ void TmcVerifier::generateReport()
 
     QStringList sclFiles = m_converter->getStopConditionFiles();
 
-    QList<reporting::TempParameter> tempParameters;
+    QList<reporting::RawErrorItem> rawErrorItems;
     const int traceCount = m_spinTraceFiles.size();
     for (int i = 0; i < traceCount; ++i) {
-        reporting::TempParameter tempParameter;
-        tempParameter.spinTraceFile = m_spinTraceFiles[i];
-        tempParameter.scenarioFile = m_traceFiles[i];
-        tempParameter.possibleCycleSource = std::make_pair(QString(), 0);
-        tempParameters.append(tempParameter);
+        reporting::RawErrorItem rawErrorItem;
+        rawErrorItem.spinTraceFile = m_spinTraceFiles[i];
+        rawErrorItem.scenarioFile = m_traceFiles[i];
+        rawErrorItem.possibleCycleSource = std::make_pair(QString(), 0);
+        rawErrorItems.append(rawErrorItem);
     };
 
-    QString report = builder.parseAndBuildHtmlReport(spinMessages, sclFiles, tempParameters, QStringList());
+    QString report = builder.parseAndBuildHtmlReport(spinMessages, sclFiles, rawErrorItems, QStringList());
 
     saveReport(report);
 

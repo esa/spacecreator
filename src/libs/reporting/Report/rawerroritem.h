@@ -24,13 +24,12 @@
 namespace reporting {
 
 /**
- * @brief Structure to hold raw error strings for parsing.
+ * @brief Structure to hold raw error messages for parsing.
  */
 struct RawErrorItem {
-    QString spinMessages;
-    QString spinTraces;
-    QString sclConditions;
-    QString scenario;
+    QString spinTraceFile;
+    QString scenarioFile;
+    std::pair<QString, int> possibleCycleSource;
 };
 
 }
