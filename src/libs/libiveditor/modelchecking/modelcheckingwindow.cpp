@@ -1609,40 +1609,37 @@ void ModelCheckingWindow::removeGenerationLimitsTableRow()
 
 void ModelCheckingWindow::on_pushButton_callSpin_clicked()
 {
-    if (false) { // TODO : FIX THIS
-        QString outputDirectoryFilepath;
-        {
-            QFileDialog fileDialog;
-            fileDialog.setDirectory(projectDir);
-            fileDialog.setFileMode(QFileDialog::FileMode::Directory);
-            fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
-            fileDialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
+    QString outputDirectoryFilepath;
+    {
+        QFileDialog fileDialog;
+        fileDialog.setDirectory(projectDir);
+        fileDialog.setFileMode(QFileDialog::FileMode::Directory);
+        fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
+        fileDialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
 
-            if (fileDialog.exec()) {
-                QStringList selectedFiles = fileDialog.selectedFiles();
-                if (selectedFiles.isEmpty()) {
-                    return;
-                }
-                outputDirectoryFilepath = selectedFiles.first();
-            } else {
+        if (fileDialog.exec()) {
+            QStringList selectedFiles = fileDialog.selectedFiles();
+            if (selectedFiles.isEmpty()) {
                 return;
             }
+            outputDirectoryFilepath = selectedFiles.first();
+        } else {
+            return;
         }
+    }
 
-        QFileInfo outputDirectory(outputDirectoryFilepath);
+    QFileInfo outputDirectory(outputDirectoryFilepath);
 
-        if (outputDirectory.exists()) {
-            if (!outputDirectory.isDir()) {
-                QMessageBox::warning(
-                        this, tr("Call Spin"), tr("Selected output is not directory!"), QMessageBox::Cancel);
-            }
-            int ret = QMessageBox::warning(this, tr("Call Spin"),
-                    tr("Do you confirm you want to call Spin? The output folder %1 will be rebuilt!")
-                            .arg(outputDirectoryFilepath),
-                    QMessageBox::Yes | QMessageBox::No);
-            if (ret != QMessageBox::Yes) {
-                return;
-            }
+    if (outputDirectory.exists()) {
+        if (!outputDirectory.isDir()) {
+            QMessageBox::warning(this, tr("Call Spin"), tr("Selected output is not directory!"), QMessageBox::Cancel);
+        }
+        int ret = QMessageBox::warning(this, tr("Call Spin"),
+                tr("Do you confirm you want to call Spin? The output folder %1 will be rebuilt!")
+                        .arg(outputDirectoryFilepath),
+                QMessageBox::Yes | QMessageBox::No);
+        if (ret != QMessageBox::Yes) {
+            return;
         }
     }
 
