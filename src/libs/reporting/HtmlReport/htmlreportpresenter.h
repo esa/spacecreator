@@ -24,11 +24,16 @@
 namespace reporting {
 
 /**
- * @brief   Presents simplified HTML with an error report.
+ * @brief   Presents HTML with an error report.
  */
 class HtmlReportPresenter
 {
 public:
+    /**
+     * @brief Presents a HTML report
+     *
+     * @param filePath path to the report to be presented
+     */
     static auto present(const QString &filePath) -> void;
 };
 

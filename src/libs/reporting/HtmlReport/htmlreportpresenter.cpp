@@ -20,8 +20,7 @@
 #include "htmlreportpresenter.h"
 
 #include <QDesktopServices>
-#include <QFileInfo>
-#include <QTextBrowser>
+#include <QUrl>
 
 namespace reporting {
 
