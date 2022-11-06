@@ -1,0 +1,37 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Controlsystem;
+    /* CIF TEXT (964, 27), (190, 140) */
+    DCL cfg PidConfig;
+    DCL inputValue Number;
+    DCL outputValue Number;
+    DCL i Number := 0.0;
+    DCL d Number := 0.0;
+    DCL previous Number := 0.0;
+    /* CIF ENDTEXT */
+    /* CIF START (300, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (300, 60), (70, 35) */
+        NEXTSTATE Off;
+    /* CIF state (655, 31), (89, 35) */
+    state Configured;
+        /* CIF input (629, 86), (140, 35) */
+        input reading(inputValue);
+            /* CIF task (613, 141), (173, 53) */
+            task i := i + inputvalue, 
+d := inputvalue - previous,
+previous := inputValue;
+            /* CIF task (521, 214), (356, 35) */
+            task outputSignal := cfg.kp * inputvalue + cfg.ki * i + cfg.kd * d;
+            /* CIF output (608, 269), (183, 35) */
+            output controlSignal(outputValue);
+            /* CIF NEXTSTATE (665, 324), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+    /* CIF state (411, 10), (70, 35) */
+    state Off;
+        /* CIF input (381, 65), (129, 35) */
+        input configuration(cfg);
+            /* CIF NEXTSTATE (401, 120), (89, 35) */
+            NEXTSTATE Configured;
+    endstate;
+endprocess Controlsystem;

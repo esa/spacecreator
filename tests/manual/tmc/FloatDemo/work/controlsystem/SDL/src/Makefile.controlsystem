@@ -1,0 +1,7 @@
+all:
+	mkdir -p code
+	cd code && opengeode --toAda /home/taste/spacecreator/tests/manual/tmc/FloatDemo/work/controlsystem/SDL/src/controlsystem.pr 
+	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada dataview-uniq.asn code/controlsystem_datamodel.asn
+	cd code && gnat make controlsystem
+clean:
+	rm -rf code

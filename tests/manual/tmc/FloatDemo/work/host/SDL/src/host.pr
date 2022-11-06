@@ -1,0 +1,19 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Host;
+    /* CIF TEXT (554, 156), (170, 140) */
+    DCL cfg PidConfig;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF task (306, 65), (96, 53) */
+        task cfg.kp := 1.3,
+cfg.kd := 2.1,
+cfg.ki := 3.2;
+        /* CIF output (290, 148), (129, 35) */
+        output configuration(cfg);
+        /* CIF NEXTSTATE (320, 198), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (450, 10), (70, 35) */
+    state Wait;
+    endstate;
+endprocess Host;
