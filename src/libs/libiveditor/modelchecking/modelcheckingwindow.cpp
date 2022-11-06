@@ -1679,6 +1679,7 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
     dialog.setProjectRoot(projectDir);
     dialog.setPropertiesPath(propertiesPath);
     dialog.setSubtypesPath(subtypesPath);
+    dialog.setOutputDirectory(outputDirectoryFilepath);
 
     dialog.exec();
 }

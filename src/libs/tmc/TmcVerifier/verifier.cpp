@@ -199,6 +199,11 @@ bool TmcVerifier::execute(ExecuteMode executeMode)
 {
     Q_EMIT verifierMessage(QString("Starting conversion.\n"));
     m_executeMode = executeMode;
+    if (m_outputDirectory.isEmpty()) {
+        Q_EMIT verifierMessage(QString("Output directory path is not specified. Aborting.\n"));
+        Q_EMIT finished(false);
+        return false;
+    }
     if (m_executeMode == ExecuteMode::ConvertOnly) {
         // run only TmcConverter
         if (!m_converter->prepare()) {
