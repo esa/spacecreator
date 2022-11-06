@@ -7,7 +7,6 @@ IMPORTS
    Dummy, DataItem, ActuatorIndex, ActuatorCommand, ActuatorStatus, ActuatorConfiguration, SystemCommand, SystemTelemetry FROM CDRDEMO-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview
-   Egse-systemtm-tm, Egse-systemtc-tc FROM EGSE-SUBTYPE
    Actuator1-Event, Actuator2-Event, Egse-Event, Modemanager-Event, Sensor-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 

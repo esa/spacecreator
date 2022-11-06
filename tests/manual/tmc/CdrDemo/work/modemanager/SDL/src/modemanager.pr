@@ -13,67 +13,57 @@ process Modemanager;
     START;
         /* CIF NEXTSTATE (206, 174), (70, 35) */
         NEXTSTATE Idle;
-    /* CIF state (912, 132), (76, 35) */
-    state Stopping;
-        /* CIF input (1085, 187), (150, 35) */
-        input actuatorTm2(status2);
-            /* CIF join (1142, 242), (35, 35) */
-            join stopcheck;
-        /* CIF input (673, 187), (150, 35) */
-        input actuatorTm1(status1);
-            /* CIF label (707, 242), (82, 35) */
-            stopcheck:
-            /* CIF decision (548, 297), (400, 50) */
-            decision status1 = actuatorStandingBy and status2 = actuatorStandingBy;
-                /* CIF ANSWER (758, 367), (70, 23) */
-                (false):
-                    /* CIF NEXTSTATE (758, 410), (70, 35) */
-                    NEXTSTATE -;
-                /* CIF ANSWER (668, 367), (70, 23) */
-                (true):
-                    /* CIF NEXTSTATE (668, 410), (70, 35) */
-                    NEXTSTATE Idle;
-            enddecision;
-    endstate;
-    /* CIF state (904, 449), (70, 35) */
-    state Starting;
-        /* CIF input (1075, 504), (150, 35) */
-        input actuatorTm2(status2);
-            /* CIF join (1133, 559), (35, 35) */
-            join startcheck;
-        /* CIF input (788, 504), (150, 35) */
-        input actuatorTm1(status1);
-            /* CIF label (821, 559), (84, 35) */
-            startcheck:
-            /* CIF decision (691, 614), (344, 50) */
-            decision status1 = actuatorArmed and status2 = actuatorArmed;
-                /* CIF ANSWER (874, 684), (70, 23) */
-                (false):
-                    /* CIF NEXTSTATE (874, 727), (70, 35) */
-                    NEXTSTATE -;
-                /* CIF ANSWER (784, 684), (70, 23) */
-                (true):
-                    /* CIF NEXTSTATE (772, 727), (93, 35) */
-                    NEXTSTATE Operational;
-            enddecision;
-    endstate;
-    /* CIF state (1593, 155), (93, 35) */
-    state Operational;
-        /* CIF input (1421, 210), (102, 35) */
+    /* CIF state (309, 120), (70, 35) */
+    state Idle;
+        /* CIF input (289, 175), (102, 35) */
         input systemTc(stc);
-            /* CIF decision (1424, 265), (96, 50) */
+            /* CIF decision (292, 230), (96, 50) */
             decision present(stc);
-                /* CIF ANSWER (1312, 335), (74, 23) */
+                /* CIF ANSWER (163, 300), (123, 23) */
+                (goToOperational):
+                    /* CIF task (79, 343), (291, 35) */
+                    task threshold1 := stc.goToOperational.threshold1;
+                    /* CIF task (79, 398), (291, 35) */
+                    task threshold2 := stc.goToOperational.threshold2;
+                    /* CIF output (137, 453), (175, 35) */
+                    output actuatorTc1(actuatorArm);
+                    /* CIF output (137, 508), (175, 35) */
+                    output actuatorTc2(actuatorArm);
+                    /* CIF NEXTSTATE (190, 558), (70, 35) */
+                    NEXTSTATE Starting;
+                /* CIF ANSWER (418, 300), (79, 23) */
+                (doReport):
+                    /* CIF task (380, 343), (155, 53) */
+                    task stm.status1 := status1,
+stm.status2 := status2,
+stm.reading := r;
+                    /* CIF output (402, 426), (112, 35) */
+                    output systemTm(stm);
+                    /* CIF NEXTSTATE (423, 481), (70, 35) */
+                    NEXTSTATE -;
+                /* CIF ANSWER (0, 300), (70, 23) */
+                else:
+                    /* CIF NEXTSTATE (0, 343), (70, 35) */
+                    NEXTSTATE -;
+            enddecision;
+    endstate;
+    /* CIF state (1592, 155), (93, 35) */
+    state Operational;
+        /* CIF input (1420, 210), (102, 35) */
+        input systemTc(stc);
+            /* CIF decision (1423, 265), (96, 50) */
+            decision present(stc);
+                /* CIF ANSWER (1311, 335), (74, 23) */
                 (goToIdle):
                     /* CIF output (1249, 378), (199, 35) */
                     output actuatorTc1(actuatorStandby);
                     /* CIF output (1249, 433), (199, 35) */
                     output actuatorTc2(actuatorStandby);
-                    /* CIF NEXTSTATE (1311, 488), (76, 35) */
+                    /* CIF NEXTSTATE (1310, 488), (76, 35) */
                     NEXTSTATE Stopping;
-                /* CIF ANSWER (1579, 335), (79, 23) */
+                /* CIF ANSWER (1578, 335), (79, 23) */
                 (doReport):
-                    /* CIF task (1541, 378), (155, 53) */
+                    /* CIF task (1540, 378), (155, 53) */
                     task stm.status1 := status1,
 stm.status2 := status2,
 stm.reading := r;
@@ -86,11 +76,11 @@ stm.reading := r;
                     /* CIF NEXTSTATE (1460, 378), (70, 35) */
                     NEXTSTATE -;
             enddecision;
-        /* CIF input (1990, 216), (81, 35) */
+        /* CIF input (1989, 216), (81, 35) */
         input reading(r);
             /* CIF decision (1995, 271), (70, 50) */
             decision r;
-                /* CIF ANSWER (1757, 341), (97, 23) */
+                /* CIF ANSWER (1756, 341), (97, 23) */
                 (< threshold1):
                     /* CIF output (1706, 384), (198, 35) */
                     output actuatorTc1(actuatorExecute);
@@ -101,7 +91,7 @@ stm.reading := r;
             enddecision;
             /* CIF decision (1995, 435), (70, 50) */
             decision r;
-                /* CIF ANSWER (1871, 505), (97, 23) */
+                /* CIF ANSWER (1870, 505), (97, 23) */
                 (> threshold2):
                     /* CIF output (1820, 548), (198, 35) */
                     output actuatorTc2(actuatorExecute);
@@ -113,38 +103,48 @@ stm.reading := r;
             /* CIF NEXTSTATE (1995, 599), (70, 35) */
             NEXTSTATE -;
     endstate;
-    /* CIF state (309, 120), (70, 35) */
-    state Idle;
-        /* CIF input (290, 175), (102, 35) */
-        input systemTc(stc);
-            /* CIF decision (293, 230), (96, 50) */
-            decision present(stc);
-                /* CIF ANSWER (164, 300), (123, 23) */
-                (goToOperational):
-                    /* CIF task (80, 343), (291, 35) */
-                    task threshold1 := stc.goToOperational.threshold1;
-                    /* CIF task (80, 398), (291, 35) */
-                    task threshold2 := stc.goToOperational.threshold2;
-                    /* CIF output (138, 453), (175, 35) */
-                    output actuatorTc1(actuatorArm);
-                    /* CIF output (138, 508), (175, 35) */
-                    output actuatorTc2(actuatorArm);
-                    /* CIF NEXTSTATE (191, 558), (70, 35) */
-                    NEXTSTATE Starting;
-                /* CIF ANSWER (419, 300), (79, 23) */
-                (doReport):
-                    /* CIF task (381, 343), (155, 53) */
-                    task stm.status1 := status1,
-stm.status2 := status2,
-stm.reading := r;
-                    /* CIF output (403, 426), (112, 35) */
-                    output systemTm(stm);
-                    /* CIF NEXTSTATE (424, 481), (70, 35) */
+    /* CIF state (903, 449), (70, 35) */
+    state Starting;
+        /* CIF input (1074, 504), (150, 35) */
+        input actuatorTm2(status2);
+            /* CIF join (1132, 559), (35, 35) */
+            join startcheck;
+        /* CIF input (787, 504), (150, 35) */
+        input actuatorTm1(status1);
+            /* CIF label (820, 559), (84, 35) */
+            startcheck:
+            /* CIF decision (690, 614), (344, 50) */
+            decision status1 = actuatorArmed and status2 = actuatorArmed;
+                /* CIF ANSWER (874, 684), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (874, 727), (70, 35) */
                     NEXTSTATE -;
-                /* CIF ANSWER (0, 300), (70, 23) */
-                else:
-                    /* CIF NEXTSTATE (0, 343), (70, 35) */
+                /* CIF ANSWER (784, 684), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (772, 727), (93, 35) */
+                    NEXTSTATE Operational;
+            enddecision;
+    endstate;
+    /* CIF state (911, 132), (76, 35) */
+    state Stopping;
+        /* CIF input (1084, 187), (150, 35) */
+        input actuatorTm2(status2);
+            /* CIF join (1142, 242), (35, 35) */
+            join stopcheck;
+        /* CIF input (672, 187), (150, 35) */
+        input actuatorTm1(status1);
+            /* CIF label (706, 242), (82, 35) */
+            stopcheck:
+            /* CIF decision (547, 297), (400, 50) */
+            decision status1 = actuatorStandingBy and status2 = actuatorStandingBy;
+                /* CIF ANSWER (758, 367), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (758, 410), (70, 35) */
                     NEXTSTATE -;
+                /* CIF ANSWER (668, 367), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (668, 410), (70, 35) */
+                    NEXTSTATE Idle;
             enddecision;
     endstate;
 endprocess Modemanager;

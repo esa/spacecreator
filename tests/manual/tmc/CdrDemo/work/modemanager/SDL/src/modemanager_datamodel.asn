@@ -6,7 +6,7 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Modemanager-States ::= ENUMERATED {idle, stopping, operational, starting}
+Modemanager-States ::= ENUMERATED {starting, operational, stopping, idle}
 
 Modemanager-Context ::= SEQUENCE {
    state Modemanager-States,

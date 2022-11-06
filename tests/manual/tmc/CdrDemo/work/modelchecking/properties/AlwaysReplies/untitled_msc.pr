@@ -1,0 +1,64 @@
+system Untitled_MSC;
+    /* CIF Text (0, 0), (400, 500) */
+    use datamodel comment '/home/taste/spacecreator/tests/manual/tmc/CdrDemo/work/simulation/observers/observer.asn';
+    signal sig0(SystemCommand) renames input systemTc to ModeManager;
+    signal sig1(SystemTelemetry) renames input systemTm to EGSE;
+    /* CIF ENDTEXT */
+    channel c
+        from env to Untitled_MSC with sig0, sig1;
+    endchannel;
+    block Untitled_MSC;
+        signalroute r
+            from env to Untitled_MSC with sig0, sig1;
+        connect c and r;
+        /* CIF Process (0, 750), (800, 100) */
+        process Untitled_MSC;
+            /* CIF Text (0, 900), (400, 500) */
+            monitor event Observable_Event;
+            successstates s2;
+            errorstates sErr;
+            /* CIF ENDTEXT */
+            /* CIF Start (0, 1650), (200, 75) */
+            START;
+                /* CIF NextState (0, 1837), (200, 50) */
+                NEXTSTATE s0;
+            /* CIF State (0, 1912), (200, 50) */
+            state s0;
+                /* CIF Input (0, 1912), (200, 50) */
+                input sig0(sig0_param0);
+                    /* CIF Decision (0, 1912), (400, 50) */
+                    decision present(sig0_param0);
+                        /* CIF Answer (0, 1987), (400, 50) */
+                        (doReport):
+                            /* CIF NextState (0, 2062), (200, 50) */
+                            NEXTSTATE s1;
+                        /* CIF Answer (600, 1987), (400, 50) */
+                        ELSE:
+                    enddecision;
+                    /* CIF NextState (1200, 2062), (200, 50) */
+                    NEXTSTATE s0;
+                /* CIF Input (300, 1912), (200, 50) */
+                input *;
+                    /* CIF NextState (300, 1987), (200, 50) */
+                    NEXTSTATE s0;
+            endstate;
+            /* CIF State (1500, 1912), (200, 50) */
+            state s1;
+                /* CIF Input (1500, 1912), (200, 50) */
+                input sig1(sig1_param0);
+                    /* CIF NextState (1500, 1987), (200, 50) */
+                    NEXTSTATE s2;
+                /* CIF Input (1800, 1912), (200, 50) */
+                input *;
+                    /* CIF NextState (1800, 1987), (200, 50) */
+                    NEXTSTATE sErr;
+            endstate;
+            /* CIF State (2400, 1912), (200, 50) */
+            state s2;
+            endstate;
+            /* CIF State (2700, 1912), (200, 50) */
+            state sErr;
+            endstate;
+        endprocess Untitled_MSC;
+    endblock;
+endsystem;

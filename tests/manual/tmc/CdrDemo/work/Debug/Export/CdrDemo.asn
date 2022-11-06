@@ -1,0 +1,44 @@
+CDRDEMO-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   Dummy ::= INTEGER(0..0)
+
+   DataItem ::= INTEGER(0..255)
+
+   ActuatorIndex ::= ENUMERATED {
+       actuator1,
+       actuator2
+   }
+
+   ActuatorCommand ::= ENUMERATED {
+       actuatorArm,
+       actuatorExecute,
+       actuatorStandby
+   }
+
+    ActuatorStatus ::= ENUMERATED {
+        actuatorArmed,
+        actuatorExecuting,
+        actuatorStandingBy
+    }
+
+    ActuatorConfiguration ::= SEQUENCE {
+       threshold1 DataItem,
+       threshold2 DataItem
+    }
+
+   SystemCommand ::= CHOICE
+   {
+       goToIdle Dummy,
+       goToOperational ActuatorConfiguration,
+       doReport Dummy
+   }
+
+    SystemTelemetry ::= SEQUENCE {
+        reading DataItem,
+        status1 ActuatorStatus,
+        status2 ActuatorStatus
+    }
+
+END
+

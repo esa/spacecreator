@@ -1,0 +1,1593 @@
+warning: -i or -I work for safety properties only
+pan:1: acceptance cycle (at depth 1432)
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+Depth=    1434 States=    1e+06 Transitions= 5.74e+06 Memory=   301.534	t=     9.38 R=   1e+05
+pan:55: assertion violated  !((global_state.untitled_msc.state==3)) (at depth 1434)
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1435
+pan: wrote system.pml.trail
+pan: reducing search depth to 1433
+pan: wrote system.pml.trail
+pan: reducing search depth to 1433
+pan: wrote system.pml.trail
+pan: reducing search depth to 1424
+pan: wrote system.pml.trail
+pan: reducing search depth to 1424
+pan: wrote system.pml.trail
+pan: reducing search depth to 1423
+pan: wrote system.pml.trail
+pan: reducing search depth to 1423
+Depth=    1434 States=    2e+06 Transitions= 1.28e+07 Memory=   464.031	t=     20.7 R=   1e+05
+pan: wrote system.pml.trail
+pan: reducing search depth to 1410
+pan: wrote system.pml.trail
+pan: reducing search depth to 1395
+pan: wrote system.pml.trail
+pan: reducing search depth to 1395
+pan: wrote system.pml.trail
+pan: reducing search depth to 1395
+pan: wrote system.pml.trail
+pan: reducing search depth to 1395
+pan: wrote system.pml.trail
+pan: reducing search depth to 1394
+pan: wrote system.pml.trail
+pan: reducing search depth to 1394
+pan: wrote system.pml.trail
+pan: reducing search depth to 1393
+pan: wrote system.pml.trail
+pan: reducing search depth to 1393
+pan: wrote system.pml.trail
+pan: reducing search depth to 1393
+pan: wrote system.pml.trail
+pan: reducing search depth to 1393
+pan: wrote system.pml.trail
+pan: reducing search depth to 1392
+pan: wrote system.pml.trail
+pan: reducing search depth to 1392
+pan: wrote system.pml.trail
+pan: reducing search depth to 1391
+pan: wrote system.pml.trail
+pan: reducing search depth to 1391
+pan: wrote system.pml.trail
+pan: reducing search depth to 1381
+pan: wrote system.pml.trail
+pan: reducing search depth to 1381
+pan: wrote system.pml.trail
+pan: reducing search depth to 1381
+pan: wrote system.pml.trail
+pan: reducing search depth to 1381
+pan: wrote system.pml.trail
+pan: reducing search depth to 1381
+pan: wrote system.pml.trail
+pan: reducing search depth to 1377
+pan: wrote system.pml.trail
+pan: reducing search depth to 1377
+pan: wrote system.pml.trail
+pan: reducing search depth to 1375
+pan: wrote system.pml.trail
+pan: reducing search depth to 1375
+pan: wrote system.pml.trail
+pan: reducing search depth to 1365
+pan: wrote system.pml.trail
+pan: reducing search depth to 1365
+pan: wrote system.pml.trail
+pan: reducing search depth to 1365
+pan: wrote system.pml.trail
+pan: reducing search depth to 1365
+pan: wrote system.pml.trail
+pan: reducing search depth to 1365
+pan: wrote system.pml.trail
+pan: reducing search depth to 1365
+pan: wrote system.pml.trail
+pan: reducing search depth to 1361
+pan: wrote system.pml.trail
+pan: reducing search depth to 1361
+pan: wrote system.pml.trail
+pan: reducing search depth to 1359
+pan: wrote system.pml.trail
+pan: reducing search depth to 1359
+pan: wrote system.pml.trail
+pan: reducing search depth to 1349
+pan: wrote system.pml.trail
+pan: reducing search depth to 1349
+pan: wrote system.pml.trail
+pan: reducing search depth to 1349
+pan: wrote system.pml.trail
+pan: reducing search depth to 1349
+pan: wrote system.pml.trail
+pan: reducing search depth to 1349
+pan: wrote system.pml.trail
+pan: reducing search depth to 1349
+pan: wrote system.pml.trail
+pan: reducing search depth to 1345
+pan: wrote system.pml.trail
+pan: reducing search depth to 1345
+pan: wrote system.pml.trail
+pan: reducing search depth to 1343
+pan: wrote system.pml.trail
+pan: reducing search depth to 1343
+pan: wrote system.pml.trail
+pan: reducing search depth to 1333
+pan: wrote system.pml.trail
+pan: reducing search depth to 1333
+pan: wrote system.pml.trail
+pan: reducing search depth to 1333
+pan: wrote system.pml.trail
+pan: reducing search depth to 1333
+pan: wrote system.pml.trail
+pan: reducing search depth to 1333
+pan: wrote system.pml.trail
+pan: reducing search depth to 1333
+pan: wrote system.pml.trail
+pan: reducing search depth to 1329
+pan: wrote system.pml.trail
+pan: reducing search depth to 1329
+pan: wrote system.pml.trail
+pan: reducing search depth to 1327
+pan: wrote system.pml.trail
+pan: reducing search depth to 1327
+pan: wrote system.pml.trail
+pan: reducing search depth to 1317
+pan: wrote system.pml.trail
+pan: reducing search depth to 1317
+pan: wrote system.pml.trail
+pan: reducing search depth to 1317
+pan: wrote system.pml.trail
+pan: reducing search depth to 1317
+pan: wrote system.pml.trail
+pan: reducing search depth to 1317
+pan: wrote system.pml.trail
+pan: reducing search depth to 1317
+pan: wrote system.pml.trail
+pan: reducing search depth to 1313
+pan: wrote system.pml.trail
+pan: reducing search depth to 1313
+pan: wrote system.pml.trail
+pan: reducing search depth to 1311
+pan: wrote system.pml.trail
+pan: reducing search depth to 1311
+pan: wrote system.pml.trail
+pan: reducing search depth to 1301
+pan: wrote system.pml.trail
+pan: reducing search depth to 1301
+pan: wrote system.pml.trail
+pan: reducing search depth to 1301
+pan: wrote system.pml.trail
+pan: reducing search depth to 1301
+pan: wrote system.pml.trail
+pan: reducing search depth to 1301
+pan: wrote system.pml.trail
+pan: reducing search depth to 1301
+pan: wrote system.pml.trail
+pan: reducing search depth to 1301
+pan: wrote system.pml.trail
+pan: reducing search depth to 1301
+pan: wrote system.pml.trail
+pan: reducing search depth to 1297
+pan: wrote system.pml.trail
+pan: reducing search depth to 1297
+pan: wrote system.pml.trail
+pan: reducing search depth to 1295
+pan: wrote system.pml.trail
+pan: reducing search depth to 1295
+pan: wrote system.pml.trail
+pan: reducing search depth to 1285
+pan: wrote system.pml.trail
+pan: reducing search depth to 1285
+pan: wrote system.pml.trail
+pan: reducing search depth to 1285
+pan: wrote system.pml.trail
+pan: reducing search depth to 1285
+pan: wrote system.pml.trail
+pan: reducing search depth to 1285
+pan: wrote system.pml.trail
+pan: reducing search depth to 1285
+pan: wrote system.pml.trail
+pan: reducing search depth to 1283
+pan: wrote system.pml.trail
+pan: reducing search depth to 1283
+Depth=    1434 States=    3e+06 Transitions= 2.07e+07 Memory=   689.028	t=     31.9 R=   9e+04
+pan: wrote system.pml.trail
+pan: reducing search depth to 1281
+pan: wrote system.pml.trail
+pan: reducing search depth to 1281
+pan: wrote system.pml.trail
+pan: reducing search depth to 1279
+pan: wrote system.pml.trail
+pan: reducing search depth to 1279
+pan: wrote system.pml.trail
+pan: reducing search depth to 1279
+pan: wrote system.pml.trail
+pan: reducing search depth to 1279
+pan: wrote system.pml.trail
+pan: reducing search depth to 1279
+pan: wrote system.pml.trail
+pan: reducing search depth to 1279
+pan: wrote system.pml.trail
+pan: reducing search depth to 1269
+pan: wrote system.pml.trail
+pan: reducing search depth to 1269
+pan: wrote system.pml.trail
+pan: reducing search depth to 1266
+pan: wrote system.pml.trail
+pan: reducing search depth to 1266
+pan: wrote system.pml.trail
+pan: reducing search depth to 1264
+pan: wrote system.pml.trail
+pan: reducing search depth to 1264
+pan: wrote system.pml.trail
+pan: reducing search depth to 1254
+pan: wrote system.pml.trail
+pan: reducing search depth to 1254
+pan: wrote system.pml.trail
+pan: reducing search depth to 1254
+pan: wrote system.pml.trail
+pan: reducing search depth to 1254
+pan: wrote system.pml.trail
+pan: reducing search depth to 1254
+pan: wrote system.pml.trail
+pan: reducing search depth to 1254
+pan: wrote system.pml.trail
+pan: reducing search depth to 1250
+pan: wrote system.pml.trail
+pan: reducing search depth to 1250
+pan: wrote system.pml.trail
+pan: reducing search depth to 1248
+pan: wrote system.pml.trail
+pan: reducing search depth to 1248
+pan: wrote system.pml.trail
+pan: reducing search depth to 1238
+pan: wrote system.pml.trail
+pan: reducing search depth to 1238
+pan: wrote system.pml.trail
+pan: reducing search depth to 1238
+pan: wrote system.pml.trail
+pan: reducing search depth to 1238
+pan: wrote system.pml.trail
+pan: reducing search depth to 1237
+pan: wrote system.pml.trail
+pan: reducing search depth to 1237
+pan: wrote system.pml.trail
+pan: reducing search depth to 1234
+pan: wrote system.pml.trail
+pan: reducing search depth to 1234
+pan: wrote system.pml.trail
+pan: reducing search depth to 1232
+pan: wrote system.pml.trail
+pan: reducing search depth to 1232
+pan: wrote system.pml.trail
+pan: reducing search depth to 1222
+pan: wrote system.pml.trail
+pan: reducing search depth to 1222
+pan: wrote system.pml.trail
+pan: reducing search depth to 1221
+pan: wrote system.pml.trail
+pan: reducing search depth to 1221
+pan: wrote system.pml.trail
+pan: reducing search depth to 1221
+pan: wrote system.pml.trail
+pan: reducing search depth to 1221
+pan: wrote system.pml.trail
+pan: reducing search depth to 1218
+pan: wrote system.pml.trail
+pan: reducing search depth to 1218
+pan: wrote system.pml.trail
+pan: reducing search depth to 1216
+pan: wrote system.pml.trail
+pan: reducing search depth to 1216
+pan: wrote system.pml.trail
+pan: reducing search depth to 1206
+pan: wrote system.pml.trail
+pan: reducing search depth to 1206
+pan: wrote system.pml.trail
+pan: reducing search depth to 1205
+pan: wrote system.pml.trail
+pan: reducing search depth to 1205
+pan: wrote system.pml.trail
+pan: reducing search depth to 1202
+pan: wrote system.pml.trail
+pan: reducing search depth to 1202
+pan: wrote system.pml.trail
+pan: reducing search depth to 1200
+pan: wrote system.pml.trail
+pan: reducing search depth to 1200
+pan: wrote system.pml.trail
+pan: reducing search depth to 1190
+pan: wrote system.pml.trail
+pan: reducing search depth to 1190
+pan: wrote system.pml.trail
+pan: reducing search depth to 1188
+pan: wrote system.pml.trail
+pan: reducing search depth to 1188
+pan: wrote system.pml.trail
+pan: reducing search depth to 1186
+pan: wrote system.pml.trail
+pan: reducing search depth to 1186
+pan: wrote system.pml.trail
+pan: reducing search depth to 1176
+pan: wrote system.pml.trail
+pan: reducing search depth to 1176
+pan: wrote system.pml.trail
+pan: reducing search depth to 1176
+pan: wrote system.pml.trail
+pan: reducing search depth to 1176
+pan: wrote system.pml.trail
+pan: reducing search depth to 1176
+pan: wrote system.pml.trail
+pan: reducing search depth to 1172
+pan: wrote system.pml.trail
+pan: reducing search depth to 1172
+pan: wrote system.pml.trail
+pan: reducing search depth to 1170
+pan: wrote system.pml.trail
+pan: reducing search depth to 1170
+pan: wrote system.pml.trail
+pan: reducing search depth to 1160
+pan: wrote system.pml.trail
+pan: reducing search depth to 1160
+pan: wrote system.pml.trail
+pan: reducing search depth to 1160
+pan: wrote system.pml.trail
+pan: reducing search depth to 1160
+pan: wrote system.pml.trail
+pan: reducing search depth to 1160
+pan: wrote system.pml.trail
+pan: reducing search depth to 1160
+pan: wrote system.pml.trail
+pan: reducing search depth to 1156
+pan: wrote system.pml.trail
+pan: reducing search depth to 1156
+pan: wrote system.pml.trail
+pan: reducing search depth to 1154
+pan: wrote system.pml.trail
+pan: reducing search depth to 1154
+pan: wrote system.pml.trail
+pan: reducing search depth to 1144
+pan: wrote system.pml.trail
+pan: reducing search depth to 1144
+pan: wrote system.pml.trail
+pan: reducing search depth to 1144
+pan: wrote system.pml.trail
+pan: reducing search depth to 1144
+pan: wrote system.pml.trail
+pan: reducing search depth to 1144
+pan: wrote system.pml.trail
+pan: reducing search depth to 1144
+pan: wrote system.pml.trail
+pan: reducing search depth to 1140
+pan: wrote system.pml.trail
+pan: reducing search depth to 1140
+pan: wrote system.pml.trail
+pan: reducing search depth to 1138
+pan: wrote system.pml.trail
+pan: reducing search depth to 1138
+pan: wrote system.pml.trail
+pan: reducing search depth to 1128
+pan: wrote system.pml.trail
+pan: reducing search depth to 1128
+pan: wrote system.pml.trail
+pan: reducing search depth to 1128
+pan: wrote system.pml.trail
+pan: reducing search depth to 1128
+pan: wrote system.pml.trail
+pan: reducing search depth to 1128
+pan: wrote system.pml.trail
+pan: reducing search depth to 1128
+pan: wrote system.pml.trail
+pan: reducing search depth to 1124
+pan: wrote system.pml.trail
+pan: reducing search depth to 1124
+pan: wrote system.pml.trail
+pan: reducing search depth to 1122
+pan: wrote system.pml.trail
+pan: reducing search depth to 1122
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1112
+pan: wrote system.pml.trail
+pan: reducing search depth to 1110
+pan: wrote system.pml.trail
+pan: reducing search depth to 1110
+pan: wrote system.pml.trail
+pan: reducing search depth to 1110
+pan: wrote system.pml.trail
+pan: reducing search depth to 1110
+pan: wrote system.pml.trail
+pan: reducing search depth to 1110
+pan: wrote system.pml.trail
+pan: reducing search depth to 1106
+pan: wrote system.pml.trail
+pan: reducing search depth to 1106
+pan: wrote system.pml.trail
+pan: reducing search depth to 1104
+pan: wrote system.pml.trail
+pan: reducing search depth to 1104
+pan: wrote system.pml.trail
+pan: reducing search depth to 1094
+pan: wrote system.pml.trail
+pan: reducing search depth to 1094
+pan: wrote system.pml.trail
+pan: reducing search depth to 1094
+pan: wrote system.pml.trail
+pan: reducing search depth to 1094
+pan: wrote system.pml.trail
+pan: reducing search depth to 1094
+pan: wrote system.pml.trail
+pan: reducing search depth to 1094
+pan: wrote system.pml.trail
+pan: reducing search depth to 1090
+pan: wrote system.pml.trail
+pan: reducing search depth to 1090
+pan: wrote system.pml.trail
+pan: reducing search depth to 1088
+pan: wrote system.pml.trail
+pan: reducing search depth to 1088
+pan: wrote system.pml.trail
+pan: reducing search depth to 1078
+pan: wrote system.pml.trail
+pan: reducing search depth to 1078
+pan: wrote system.pml.trail
+pan: reducing search depth to 1078
+pan: wrote system.pml.trail
+pan: reducing search depth to 1078
+pan: wrote system.pml.trail
+pan: reducing search depth to 1075
+pan: wrote system.pml.trail
+pan: reducing search depth to 1075
+pan: wrote system.pml.trail
+pan: reducing search depth to 1073
+pan: wrote system.pml.trail
+pan: reducing search depth to 1073
+pan: wrote system.pml.trail
+pan: reducing search depth to 1063
+pan: wrote system.pml.trail
+pan: reducing search depth to 1063
+pan: wrote system.pml.trail
+pan: reducing search depth to 1062
+pan: wrote system.pml.trail
+pan: reducing search depth to 1062
+pan: wrote system.pml.trail
+pan: reducing search depth to 1062
+pan: wrote system.pml.trail
+pan: reducing search depth to 1062
+pan: wrote system.pml.trail
+pan: reducing search depth to 1059
+pan: wrote system.pml.trail
+pan: reducing search depth to 1059
+pan: wrote system.pml.trail
+pan: reducing search depth to 1057
+pan: wrote system.pml.trail
+pan: reducing search depth to 1057
+pan: wrote system.pml.trail
+pan: reducing search depth to 1047
+pan: wrote system.pml.trail
+pan: reducing search depth to 1047
+pan: wrote system.pml.trail
+pan: reducing search depth to 1046
+pan: wrote system.pml.trail
+pan: reducing search depth to 1046
+pan: wrote system.pml.trail
+pan: reducing search depth to 1043
+pan: wrote system.pml.trail
+pan: reducing search depth to 1043
+pan: wrote system.pml.trail
+pan: reducing search depth to 1041
+pan: wrote system.pml.trail
+pan: reducing search depth to 1041
+pan: wrote system.pml.trail
+pan: reducing search depth to 1031
+pan: wrote system.pml.trail
+pan: reducing search depth to 1031
+pan: wrote system.pml.trail
+pan: reducing search depth to 1017
+pan: wrote system.pml.trail
+pan: reducing search depth to 1017
+pan: wrote system.pml.trail
+pan: reducing search depth to 1017
+pan: wrote system.pml.trail
+pan: reducing search depth to 1017
+pan: wrote system.pml.trail
+pan: reducing search depth to 1017
+pan: wrote system.pml.trail
+pan: reducing search depth to 1017
+pan: wrote system.pml.trail
+pan: reducing search depth to 1013
+pan: wrote system.pml.trail
+pan: reducing search depth to 1013
+pan: wrote system.pml.trail
+pan: reducing search depth to 1011
+pan: wrote system.pml.trail
+pan: reducing search depth to 1011
+pan: wrote system.pml.trail
+pan: reducing search depth to 1001
+pan: wrote system.pml.trail
+pan: reducing search depth to 1001
+pan: wrote system.pml.trail
+pan: reducing search depth to 1001
+pan: wrote system.pml.trail
+pan: reducing search depth to 1001
+pan: wrote system.pml.trail
+pan: reducing search depth to 1001
+pan: wrote system.pml.trail
+pan: reducing search depth to 1001
+pan: wrote system.pml.trail
+pan: reducing search depth to 997
+pan: wrote system.pml.trail
+pan: reducing search depth to 997
+pan: wrote system.pml.trail
+pan: reducing search depth to 995
+pan: wrote system.pml.trail
+pan: reducing search depth to 995
+pan: wrote system.pml.trail
+pan: reducing search depth to 985
+pan: wrote system.pml.trail
+pan: reducing search depth to 985
+pan: wrote system.pml.trail
+pan: reducing search depth to 985
+pan: wrote system.pml.trail
+pan: reducing search depth to 985
+pan: wrote system.pml.trail
+pan: reducing search depth to 985
+pan: wrote system.pml.trail
+pan: reducing search depth to 985
+pan: wrote system.pml.trail
+pan: reducing search depth to 981
+pan: wrote system.pml.trail
+pan: reducing search depth to 981
+pan: wrote system.pml.trail
+pan: reducing search depth to 979
+pan: wrote system.pml.trail
+pan: reducing search depth to 979
+pan: wrote system.pml.trail
+pan: reducing search depth to 969
+pan: wrote system.pml.trail
+pan: reducing search depth to 969
+pan: wrote system.pml.trail
+pan: reducing search depth to 969
+pan: wrote system.pml.trail
+pan: reducing search depth to 969
+pan: wrote system.pml.trail
+pan: reducing search depth to 969
+pan: wrote system.pml.trail
+pan: reducing search depth to 969
+pan: wrote system.pml.trail
+pan: reducing search depth to 965
+pan: wrote system.pml.trail
+pan: reducing search depth to 965
+pan: wrote system.pml.trail
+pan: reducing search depth to 963
+pan: wrote system.pml.trail
+pan: reducing search depth to 963
+pan: wrote system.pml.trail
+pan: reducing search depth to 953
+pan: wrote system.pml.trail
+pan: reducing search depth to 953
+pan: wrote system.pml.trail
+pan: reducing search depth to 953
+pan: wrote system.pml.trail
+pan: reducing search depth to 953
+pan: wrote system.pml.trail
+pan: reducing search depth to 953
+pan: wrote system.pml.trail
+pan: reducing search depth to 953
+pan: wrote system.pml.trail
+pan: reducing search depth to 949
+pan: wrote system.pml.trail
+pan: reducing search depth to 949
+pan: wrote system.pml.trail
+pan: reducing search depth to 947
+pan: wrote system.pml.trail
+pan: reducing search depth to 947
+pan: wrote system.pml.trail
+pan: reducing search depth to 937
+pan: wrote system.pml.trail
+pan: reducing search depth to 937
+pan: wrote system.pml.trail
+pan: reducing search depth to 937
+pan: wrote system.pml.trail
+pan: reducing search depth to 937
+pan: wrote system.pml.trail
+pan: reducing search depth to 935
+pan: wrote system.pml.trail
+pan: reducing search depth to 935
+pan: wrote system.pml.trail
+pan: reducing search depth to 935
+pan: wrote system.pml.trail
+pan: reducing search depth to 935
+pan: wrote system.pml.trail
+pan: reducing search depth to 932
+pan: wrote system.pml.trail
+pan: reducing search depth to 932
+pan: wrote system.pml.trail
+pan: reducing search depth to 930
+pan: wrote system.pml.trail
+pan: reducing search depth to 930
+pan: wrote system.pml.trail
+pan: reducing search depth to 920
+pan: wrote system.pml.trail
+pan: reducing search depth to 920
+pan: wrote system.pml.trail
+pan: reducing search depth to 919
+pan: wrote system.pml.trail
+pan: reducing search depth to 919
+pan: wrote system.pml.trail
+pan: reducing search depth to 919
+pan: wrote system.pml.trail
+pan: reducing search depth to 919
+pan: wrote system.pml.trail
+pan: reducing search depth to 916
+pan: wrote system.pml.trail
+pan: reducing search depth to 916
+pan: wrote system.pml.trail
+pan: reducing search depth to 914
+pan: wrote system.pml.trail
+pan: reducing search depth to 914
+pan: wrote system.pml.trail
+pan: reducing search depth to 904
+pan: wrote system.pml.trail
+pan: reducing search depth to 904
+pan: wrote system.pml.trail
+pan: reducing search depth to 903
+pan: wrote system.pml.trail
+pan: reducing search depth to 903
+pan: wrote system.pml.trail
+pan: reducing search depth to 901
+pan: wrote system.pml.trail
+pan: reducing search depth to 901
+pan: wrote system.pml.trail
+pan: reducing search depth to 901
+pan: wrote system.pml.trail
+pan: reducing search depth to 901
+pan: wrote system.pml.trail
+pan: reducing search depth to 899
+pan: wrote system.pml.trail
+pan: reducing search depth to 899
+pan: wrote system.pml.trail
+pan: reducing search depth to 899
+pan: wrote system.pml.trail
+pan: reducing search depth to 899
+pan: wrote system.pml.trail
+pan: reducing search depth to 889
+pan: wrote system.pml.trail
+pan: reducing search depth to 889
+pan: wrote system.pml.trail
+pan: reducing search depth to 889
+pan: wrote system.pml.trail
+pan: reducing search depth to 889
+pan: wrote system.pml.trail
+pan: reducing search depth to 886
+pan: wrote system.pml.trail
+pan: reducing search depth to 886
+pan: wrote system.pml.trail
+pan: reducing search depth to 884
+pan: wrote system.pml.trail
+pan: reducing search depth to 884
+pan: wrote system.pml.trail
+pan: reducing search depth to 874
+pan: wrote system.pml.trail
+pan: reducing search depth to 874
+pan: wrote system.pml.trail
+pan: reducing search depth to 874
+pan: wrote system.pml.trail
+pan: reducing search depth to 874
+pan: wrote system.pml.trail
+pan: reducing search depth to 874
+pan: wrote system.pml.trail
+pan: reducing search depth to 874
+pan: wrote system.pml.trail
+pan: reducing search depth to 870
+pan: wrote system.pml.trail
+pan: reducing search depth to 870
+pan: wrote system.pml.trail
+pan: reducing search depth to 868
+pan: wrote system.pml.trail
+pan: reducing search depth to 868
+pan: wrote system.pml.trail
+pan: reducing search depth to 858
+pan: wrote system.pml.trail
+pan: reducing search depth to 858
+pan: wrote system.pml.trail
+pan: reducing search depth to 858
+pan: wrote system.pml.trail
+pan: reducing search depth to 858
+pan: wrote system.pml.trail
+pan: reducing search depth to 857
+pan: wrote system.pml.trail
+pan: reducing search depth to 857
+pan: wrote system.pml.trail
+pan: reducing search depth to 854
+pan: wrote system.pml.trail
+pan: reducing search depth to 854
+pan: wrote system.pml.trail
+pan: reducing search depth to 852
+pan: wrote system.pml.trail
+pan: reducing search depth to 852
+pan: wrote system.pml.trail
+pan: reducing search depth to 842
+pan: wrote system.pml.trail
+pan: reducing search depth to 842
+pan: wrote system.pml.trail
+pan: reducing search depth to 828
+pan: wrote system.pml.trail
+pan: reducing search depth to 828
+pan: wrote system.pml.trail
+pan: reducing search depth to 828
+pan: wrote system.pml.trail
+pan: reducing search depth to 828
+pan: wrote system.pml.trail
+pan: reducing search depth to 828
+pan: wrote system.pml.trail
+pan: reducing search depth to 828
+pan: wrote system.pml.trail
+pan: reducing search depth to 824
+pan: wrote system.pml.trail
+pan: reducing search depth to 824
+pan: wrote system.pml.trail
+pan: reducing search depth to 822
+pan: wrote system.pml.trail
+pan: reducing search depth to 822
+pan: wrote system.pml.trail
+pan: reducing search depth to 812
+pan: wrote system.pml.trail
+pan: reducing search depth to 812
+pan: wrote system.pml.trail
+pan: reducing search depth to 812
+pan: wrote system.pml.trail
+pan: reducing search depth to 812
+pan: wrote system.pml.trail
+pan: reducing search depth to 812
+pan: wrote system.pml.trail
+pan: reducing search depth to 812
+pan: wrote system.pml.trail
+pan: reducing search depth to 808
+pan: wrote system.pml.trail
+pan: reducing search depth to 808
+pan: wrote system.pml.trail
+pan: reducing search depth to 806
+pan: wrote system.pml.trail
+pan: reducing search depth to 806
+pan: wrote system.pml.trail
+pan: reducing search depth to 796
+pan: wrote system.pml.trail
+pan: reducing search depth to 796
+pan: wrote system.pml.trail
+pan: reducing search depth to 796
+pan: wrote system.pml.trail
+pan: reducing search depth to 796
+pan: wrote system.pml.trail
+pan: reducing search depth to 796
+pan: wrote system.pml.trail
+pan: reducing search depth to 796
+pan: wrote system.pml.trail
+pan: reducing search depth to 792
+pan: wrote system.pml.trail
+pan: reducing search depth to 792
+pan: wrote system.pml.trail
+pan: reducing search depth to 790
+pan: wrote system.pml.trail
+pan: reducing search depth to 790
+pan: wrote system.pml.trail
+pan: reducing search depth to 780
+pan: wrote system.pml.trail
+pan: reducing search depth to 780
+pan: wrote system.pml.trail
+pan: reducing search depth to 780
+pan: wrote system.pml.trail
+pan: reducing search depth to 780
+pan: wrote system.pml.trail
+pan: reducing search depth to 780
+pan: wrote system.pml.trail
+pan: reducing search depth to 780
+pan: wrote system.pml.trail
+pan: reducing search depth to 776
+pan: wrote system.pml.trail
+pan: reducing search depth to 776
+pan: wrote system.pml.trail
+pan: reducing search depth to 774
+pan: wrote system.pml.trail
+pan: reducing search depth to 774
+pan: wrote system.pml.trail
+pan: reducing search depth to 764
+pan: wrote system.pml.trail
+pan: reducing search depth to 764
+pan: wrote system.pml.trail
+pan: reducing search depth to 763
+pan: wrote system.pml.trail
+pan: reducing search depth to 763
+pan: wrote system.pml.trail
+pan: reducing search depth to 761
+pan: wrote system.pml.trail
+pan: reducing search depth to 761
+pan: wrote system.pml.trail
+pan: reducing search depth to 751
+pan: wrote system.pml.trail
+pan: reducing search depth to 751
+pan: wrote system.pml.trail
+pan: reducing search depth to 751
+pan: wrote system.pml.trail
+pan: reducing search depth to 751
+pan: wrote system.pml.trail
+pan: reducing search depth to 751
+pan: wrote system.pml.trail
+pan: reducing search depth to 747
+pan: wrote system.pml.trail
+pan: reducing search depth to 747
+pan: wrote system.pml.trail
+pan: reducing search depth to 745
+pan: wrote system.pml.trail
+pan: reducing search depth to 745
+pan: wrote system.pml.trail
+pan: reducing search depth to 735
+pan: wrote system.pml.trail
+pan: reducing search depth to 735
+pan: wrote system.pml.trail
+pan: reducing search depth to 735
+pan: wrote system.pml.trail
+pan: reducing search depth to 735
+pan: wrote system.pml.trail
+pan: reducing search depth to 735
+pan: wrote system.pml.trail
+pan: reducing search depth to 735
+pan: wrote system.pml.trail
+pan: reducing search depth to 731
+pan: wrote system.pml.trail
+pan: reducing search depth to 731
+pan: wrote system.pml.trail
+pan: reducing search depth to 729
+pan: wrote system.pml.trail
+pan: reducing search depth to 729
+pan: wrote system.pml.trail
+pan: reducing search depth to 719
+pan: wrote system.pml.trail
+pan: reducing search depth to 719
+pan: wrote system.pml.trail
+pan: reducing search depth to 719
+pan: wrote system.pml.trail
+pan: reducing search depth to 719
+pan: wrote system.pml.trail
+pan: reducing search depth to 719
+pan: wrote system.pml.trail
+pan: reducing search depth to 719
+pan: wrote system.pml.trail
+pan: reducing search depth to 715
+pan: wrote system.pml.trail
+pan: reducing search depth to 715
+pan: wrote system.pml.trail
+pan: reducing search depth to 713
+pan: wrote system.pml.trail
+pan: reducing search depth to 713
+pan: wrote system.pml.trail
+pan: reducing search depth to 703
+pan: wrote system.pml.trail
+pan: reducing search depth to 703
+pan: wrote system.pml.trail
+pan: reducing search depth to 703
+pan: wrote system.pml.trail
+pan: reducing search depth to 703
+pan: wrote system.pml.trail
+pan: reducing search depth to 703
+pan: wrote system.pml.trail
+pan: reducing search depth to 703
+pan: wrote system.pml.trail
+pan: reducing search depth to 699
+pan: wrote system.pml.trail
+pan: reducing search depth to 699
+pan: wrote system.pml.trail
+pan: reducing search depth to 697
+pan: wrote system.pml.trail
+pan: reducing search depth to 697
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+Depth=    1434 States=    4e+06 Transitions= 4.21e+07 Memory=  1076.522	t=     66.2 R=   6e+04
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 687
+pan: wrote system.pml.trail
+pan: reducing search depth to 678
+pan: wrote system.pml.trail
+pan: reducing search depth to 678
+pan: wrote system.pml.trail
+pan: reducing search depth to 678
+pan: wrote system.pml.trail
+pan: reducing search depth to 674
+pan: wrote system.pml.trail
+pan: reducing search depth to 672
+pan: wrote system.pml.trail
+pan: reducing search depth to 662
+pan: wrote system.pml.trail
+pan: reducing search depth to 662
+pan: wrote system.pml.trail
+pan: reducing search depth to 659
+pan: wrote system.pml.trail
+pan: reducing search depth to 657
+pan: wrote system.pml.trail
+pan: reducing search depth to 647
+pan: wrote system.pml.trail
+pan: reducing search depth to 646
+pan: wrote system.pml.trail
+pan: reducing search depth to 646
+pan: wrote system.pml.trail
+pan: reducing search depth to 643
+pan: wrote system.pml.trail
+pan: reducing search depth to 641
+pan: wrote system.pml.trail
+pan: reducing search depth to 631
+pan: wrote system.pml.trail
+pan: reducing search depth to 630
+pan: wrote system.pml.trail
+pan: reducing search depth to 627
+pan: wrote system.pml.trail
+pan: reducing search depth to 625
+pan: wrote system.pml.trail
+pan: reducing search depth to 615
+pan: wrote system.pml.trail
+pan: reducing search depth to 612
+pan: wrote system.pml.trail
+pan: reducing search depth to 612
+pan: wrote system.pml.trail
+pan: reducing search depth to 610
+pan: wrote system.pml.trail
+pan: reducing search depth to 610
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 600
+pan: wrote system.pml.trail
+pan: reducing search depth to 591
+pan: wrote system.pml.trail
+pan: reducing search depth to 591
+pan: wrote system.pml.trail
+pan: reducing search depth to 591
+pan: wrote system.pml.trail
+pan: reducing search depth to 587
+pan: wrote system.pml.trail
+pan: reducing search depth to 585
+pan: wrote system.pml.trail
+pan: reducing search depth to 575
+pan: wrote system.pml.trail
+pan: reducing search depth to 575
+pan: wrote system.pml.trail
+pan: reducing search depth to 575
+pan: wrote system.pml.trail
+pan: reducing search depth to 571
+pan: wrote system.pml.trail
+pan: reducing search depth to 569
+pan: wrote system.pml.trail
+pan: reducing search depth to 559
+pan: wrote system.pml.trail
+pan: reducing search depth to 559
+pan: wrote system.pml.trail
+pan: reducing search depth to 559
+pan: wrote system.pml.trail
+pan: reducing search depth to 555
+pan: wrote system.pml.trail
+pan: reducing search depth to 553
+pan: wrote system.pml.trail
+pan: reducing search depth to 543
+pan: wrote system.pml.trail
+pan: reducing search depth to 543
+pan: wrote system.pml.trail
+pan: reducing search depth to 543
+pan: wrote system.pml.trail
+pan: reducing search depth to 539
+pan: wrote system.pml.trail
+pan: reducing search depth to 537
+pan: wrote system.pml.trail
+pan: reducing search depth to 527
+pan: wrote system.pml.trail
+pan: reducing search depth to 527
+pan: wrote system.pml.trail
+pan: reducing search depth to 527
+pan: wrote system.pml.trail
+pan: reducing search depth to 523
+pan: wrote system.pml.trail
+pan: reducing search depth to 521
+pan: wrote system.pml.trail
+pan: reducing search depth to 511
+pan: wrote system.pml.trail
+pan: reducing search depth to 511
+pan: wrote system.pml.trail
+pan: reducing search depth to 511
+pan: wrote system.pml.trail
+pan: reducing search depth to 509
+pan: wrote system.pml.trail
+pan: reducing search depth to 509
+pan: wrote system.pml.trail
+pan: reducing search depth to 506
+pan: wrote system.pml.trail
+pan: reducing search depth to 504
+pan: wrote system.pml.trail
+pan: reducing search depth to 494
+pan: wrote system.pml.trail
+pan: reducing search depth to 493
+pan: wrote system.pml.trail
+pan: reducing search depth to 493
+pan: wrote system.pml.trail
+pan: reducing search depth to 490
+pan: wrote system.pml.trail
+pan: reducing search depth to 488
+pan: wrote system.pml.trail
+pan: reducing search depth to 478
+pan: wrote system.pml.trail
+pan: reducing search depth to 477
+pan: wrote system.pml.trail
+pan: reducing search depth to 475
+pan: wrote system.pml.trail
+pan: reducing search depth to 475
+pan: wrote system.pml.trail
+pan: reducing search depth to 475
+pan: wrote system.pml.trail
+pan: reducing search depth to 473
+pan: wrote system.pml.trail
+pan: reducing search depth to 473
+pan: wrote system.pml.trail
+pan: reducing search depth to 473
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 463
+pan: wrote system.pml.trail
+pan: reducing search depth to 459
+pan: wrote system.pml.trail
+pan: reducing search depth to 459
+pan: wrote system.pml.trail
+pan: reducing search depth to 457
+pan: wrote system.pml.trail
+pan: reducing search depth to 457
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+Depth=    1434 States=    5e+06 Transitions= 6.04e+07 Memory=  1589.014	t=     97.6 R=   5e+04
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 447
+pan: wrote system.pml.trail
+pan: reducing search depth to 438
+pan: wrote system.pml.trail
+pan: reducing search depth to 438
+pan: wrote system.pml.trail
+pan: reducing search depth to 438
+pan: wrote system.pml.trail
+pan: reducing search depth to 434
+pan: wrote system.pml.trail
+pan: reducing search depth to 432
+pan: wrote system.pml.trail
+pan: reducing search depth to 422
+pan: wrote system.pml.trail
+pan: reducing search depth to 422
+pan: wrote system.pml.trail
+pan: reducing search depth to 421
+pan: wrote system.pml.trail
+pan: reducing search depth to 418
+pan: wrote system.pml.trail
+pan: reducing search depth to 416
+pan: wrote system.pml.trail
+pan: reducing search depth to 406
+pan: wrote system.pml.trail
+pan: reducing search depth to 403
+pan: wrote system.pml.trail
+pan: reducing search depth to 403
+pan: wrote system.pml.trail
+pan: reducing search depth to 401
+pan: wrote system.pml.trail
+pan: reducing search depth to 401
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 391
+pan: wrote system.pml.trail
+pan: reducing search depth to 382
+pan: wrote system.pml.trail
+pan: reducing search depth to 382
+pan: wrote system.pml.trail
+pan: reducing search depth to 382
+pan: wrote system.pml.trail
+pan: reducing search depth to 378
+pan: wrote system.pml.trail
+pan: reducing search depth to 376
+pan: wrote system.pml.trail
+pan: reducing search depth to 366
+pan: wrote system.pml.trail
+pan: reducing search depth to 366
+pan: wrote system.pml.trail
+pan: reducing search depth to 366
+pan: wrote system.pml.trail
+pan: reducing search depth to 362
+pan: wrote system.pml.trail
+pan: reducing search depth to 360
+pan: wrote system.pml.trail
+pan: reducing search depth to 350
+pan: wrote system.pml.trail
+pan: reducing search depth to 350
+pan: wrote system.pml.trail
+pan: reducing search depth to 350
+pan: wrote system.pml.trail
+pan: reducing search depth to 346
+pan: wrote system.pml.trail
+pan: reducing search depth to 344
+pan: wrote system.pml.trail
+pan: reducing search depth to 334
+pan: wrote system.pml.trail
+pan: reducing search depth to 334
+pan: wrote system.pml.trail
+pan: reducing search depth to 334
+pan: wrote system.pml.trail
+pan: reducing search depth to 330
+pan: wrote system.pml.trail
+pan: reducing search depth to 328
+pan: wrote system.pml.trail
+pan: reducing search depth to 318
+pan: wrote system.pml.trail
+pan: reducing search depth to 316
+pan: wrote system.pml.trail
+pan: reducing search depth to 316
+pan: wrote system.pml.trail
+pan: reducing search depth to 314
+pan: wrote system.pml.trail
+pan: reducing search depth to 314
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 304
+pan: wrote system.pml.trail
+pan: reducing search depth to 295
+pan: wrote system.pml.trail
+pan: reducing search depth to 295
+pan: wrote system.pml.trail
+pan: reducing search depth to 295
+pan: wrote system.pml.trail
+pan: reducing search depth to 291
+pan: wrote system.pml.trail
+pan: reducing search depth to 289
+pan: wrote system.pml.trail
+pan: reducing search depth to 279
+pan: wrote system.pml.trail
+pan: reducing search depth to 279
+pan: wrote system.pml.trail
+pan: reducing search depth to 279
+pan: wrote system.pml.trail
+pan: reducing search depth to 275
+pan: wrote system.pml.trail
+pan: reducing search depth to 273
+pan: wrote system.pml.trail
+pan: reducing search depth to 263
+pan: wrote system.pml.trail
+pan: reducing search depth to 263
+pan: wrote system.pml.trail
+pan: reducing search depth to 263
+pan: wrote system.pml.trail
+pan: reducing search depth to 259
+pan: wrote system.pml.trail
+pan: reducing search depth to 257
+pan: wrote system.pml.trail
+pan: reducing search depth to 247
+pan: wrote system.pml.trail
+pan: reducing search depth to 247
+pan: wrote system.pml.trail
+pan: reducing search depth to 247
+pan: wrote system.pml.trail
+pan: reducing search depth to 243
+pan: wrote system.pml.trail
+pan: reducing search depth to 241
+pan: wrote system.pml.trail
+pan: reducing search depth to 231
+pan: wrote system.pml.trail
+pan: reducing search depth to 231
+pan: wrote system.pml.trail
+pan: reducing search depth to 231
+pan: wrote system.pml.trail
+pan: reducing search depth to 227
+pan: wrote system.pml.trail
+pan: reducing search depth to 225
+pan: wrote system.pml.trail
+pan: reducing search depth to 215
+pan: wrote system.pml.trail
+pan: reducing search depth to 215
+pan: wrote system.pml.trail
+pan: reducing search depth to 215
+pan: wrote system.pml.trail
+pan: reducing search depth to 211
+pan: wrote system.pml.trail
+pan: reducing search depth to 209
+pan: wrote system.pml.trail
+pan: reducing search depth to 199
+pan: wrote system.pml.trail
+pan: reducing search depth to 197
+pan: wrote system.pml.trail
+pan: reducing search depth to 197
+pan: wrote system.pml.trail
+pan: reducing search depth to 197
+pan: wrote system.pml.trail
+pan: reducing search depth to 195
+pan: wrote system.pml.trail
+pan: reducing search depth to 193
+pan: wrote system.pml.trail
+pan: reducing search depth to 193
+pan: wrote system.pml.trail
+pan: reducing search depth to 191
+pan: wrote system.pml.trail
+pan: reducing search depth to 183
+pan: wrote system.pml.trail
+pan: reducing search depth to 181
+pan: wrote system.pml.trail
+pan: reducing search depth to 181
+pan: wrote system.pml.trail
+pan: reducing search depth to 181
+pan: wrote system.pml.trail
+pan: reducing search depth to 179
+pan: wrote system.pml.trail
+pan: reducing search depth to 177
+pan: wrote system.pml.trail
+pan: reducing search depth to 177
+pan: wrote system.pml.trail
+pan: reducing search depth to 175
+pan: wrote system.pml.trail
+pan: reducing search depth to 167
+pan: wrote system.pml.trail
+pan: reducing search depth to 165
+pan: wrote system.pml.trail
+pan: reducing search depth to 165
+pan: wrote system.pml.trail
+pan: reducing search depth to 163
+pan: wrote system.pml.trail
+pan: reducing search depth to 161
+pan: wrote system.pml.trail
+pan: reducing search depth to 161
+pan: wrote system.pml.trail
+pan: reducing search depth to 159
+pan: wrote system.pml.trail
+pan: reducing search depth to 151
+pan: wrote system.pml.trail
+pan: reducing search depth to 149
+pan: reached -DMEMLIM bound
+	2.14461e+09 bytes used
+	6.5535e+06 bytes more needed
+	2.14748e+09 bytes limit
+hint: to reduce memory, recompile with
+  -DCOLLAPSE # good, fast compression, or
+  -DMA=1092   # better/slower compression, or
+  -DHC # hash-compaction, approximation
+  -DBITSTATE # supertrace, approximation
+
+(Spin Version 6.4.9 -- 17 December 2018)
+Warning: Search not completed
+
+Full statespace search for:
+	never claim         	+ (never_0)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness enabled)
+	invalid end states	- (disabled by -E flag)
+
+State-vector 1092 byte, depth reached 1434, errors: 773
+  1836674 states, stored (5.95603e+06 visited)
+ 87154993 states, matched
+ 93111020 transitions (= visited+matched)
+5.1384278e+08 atomic steps
+hash conflicts:   2343272 (resolved)
+
+Stats on memory usage (in Megabytes):
+ 1961.779	equivalent memory usage for states (stored*(State-vector + overhead))
+ 1923.457	actual memory usage for states (compression: 98.05%)
+         	state-vector as stored = 1070 byte + 28 byte overhead
+  128.000	memory used for hash table (-w24)
+    0.009	memory used for DFS stack (-m149)
+    6.211	memory lost to fragmentation
+ 2045.257	total actual memory usage
+
+
+
+pan: elapsed time 156 seconds
+pan: rate 38299.961 states/second

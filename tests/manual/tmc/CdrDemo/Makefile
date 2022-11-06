@@ -64,8 +64,8 @@ observer_dataview:
 	$(MAKE) InterfaceView.aadl
 	$(MAKE) interfaceview
 	$(KAZOO) --glue -t SIMU
-	$(MAKE) -C work dataview/dataview-uniq.asn
-	$(MAKE) -C work/build -f Makefile.taste observer.asn
+	$(MAKE) SUBTYPE=empty.asn -C work dataview/dataview-uniq.asn
+	$(MAKE) SUBTYPE=empty.asn -C work/build -f Makefile.taste observer.asn
 
 skeletons:
 	$(MAKE) work/skeletons_built

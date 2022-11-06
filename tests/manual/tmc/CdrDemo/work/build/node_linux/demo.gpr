@@ -1,0 +1,146 @@
+--  Node name          : demo
+--  Execution platform : PLATFORM_GENERIC_LINUX
+
+project Demo is
+
+   type Build_Type is ("Debug", "Release");
+   Build : Build_Type := external ("CFG", "Debug");
+
+   --  following to be updated with all relevant source dirs
+   for Source_Dirs use
+      (
+       "../../actuator1/SDL/code",
+       "../../actuator1/SDL/wrappers",
+       "../../actuator2/SDL/code",
+       "../../actuator2/SDL/wrappers",
+       "../../egse/GUI/src",
+       "../../egse/GUI/wrappers",
+       "../../modemanager/SDL/code",
+       "../../modemanager/SDL/wrappers",
+       "../../sensor/C/src",
+       "../../sensor/C/wrappers",
+       "../../dataview/C",
+       "../../dataview/Ada/asn1rtl",
+       "../../dataview/Ada/src",
+       "../../dataview/Ada/boards/x86",
+       "../system_spec",
+       "demo/runtime",
+       "demo/runtime/Packetizer",
+       "demo/runtime/Broker",
+       "demo/runtime/RuntimeCommon",
+       "demo/runtime/Escaper",
+       "demo")
+       & external_as_list("EXTERNAL_SOURCE_PATH", ":")
+       & external_as_list("DEMO_EXTERNAL_SOURCE_PATH", ":");
+
+   for Object_Dir use "obj";
+   for Exec_Dir   use "../../binaries";
+
+   for Languages use ("C", "C++", "Ada");
+
+   for Main use ("main.cc");
+
+   package Naming is
+       for Body_Suffix ("C++") use ".cc";
+       for Body_Suffix ("Ada") use ".adb";
+   end Naming;
+
+   package Compiler is
+      for Driver ("C") use "gcc";
+      for Driver ("C++") use "g++";
+
+      for Required_Switches ("C") use ("-c");
+
+      Common_C_Switches :=
+         ("-pthread",
+          "-ffunction-sections",
+          "-Wall",
+          "-Wextra",
+          "-fdiagnostics-show-option",
+          "-Wcast-align",
+          "-fdata-sections",
+          "-ffunction-sections",
+          "-fdiagnostics-color=always",
+          "-Wno-cast-function-type",
+          "-Wno-unused-parameter",
+          "-DGENERIC_LINUX_TARGET")
+          & external_as_list ("STACK_ANALYSIS_FLAGS", " ");
+
+      case Build is
+         when "Release" =>
+            for Default_Switches ("C") use
+               ("-g",
+                "-O2")
+                & Common_C_Switches
+                & external_as_list("DEMO_USER_CFLAGS", " ")
+                & external_as_list("USER_CFLAGS", " ");
+            for Default_Switches ("C++") use
+               ("-std=c++17",
+                "-g",
+                "-O2")
+                & Common_C_Switches
+                & external_as_list("DEMO_USER_CFLAGS", " ")
+                & external_as_list("USER_CFLAGS", " ");
+            for Default_Switches ("Ada") use
+               ("-Wall",
+                "-Wextra",
+                "-gnatd.E")
+                & external_as_list ("STACK_ANALYSIS_FLAGS", " ");
+         when "Debug" =>
+            for Default_Switches ("C") use
+               ("-O0",
+                "-g")
+                & Common_C_Switches
+                & ("-fstack-check", "-fsanitize=address", "-fcommon")
+                & external_as_list("DEMO_USER_CFLAGS", " ")
+                & external_as_list("USER_CFLAGS", " ");
+            for Default_Switches ("C++") use
+               ("-std=c++17",
+                "-O0",
+                "-g")
+                & Common_C_Switches
+                & ("-fsanitize=address", "-fcommon")
+                & external_as_list("DEMO_USER_CFLAGS", " ")
+                & external_as_list("USER_CFLAGS", " ");
+            for Default_Switches ("Ada") use
+               ("-Wall",
+                "-Wextra",
+                "-gnatd.E")
+                & ("-fstack-check")
+                & external_as_list ("STACK_ANALYSIS_FLAGS", " ");
+      end case;
+   end Compiler;
+
+   package Linker is
+
+      Common_LD_Switches :=
+         ("-pthread",
+          "-lrt",
+          "-lgnat",
+          "-lm",
+          "-Wall",
+          "-Wextra",
+          "-Wno-unused-parameter",
+          "-Wl,-Map=main.map",
+          "-Wl,--gc-sections")
+          & external_as_list("DEMO_USER_LDFLAGS", " ")
+          & external_as_list("USER_LDFLAGS", " ");
+
+      case Build is
+          when "Release" =>
+            for Default_Switches ("C")   use Common_LD_Switches;
+            for Default_Switches ("C++") use Common_LD_Switches;
+         when "Debug" =>
+            for Default_Switches ("C")   use Common_LD_Switches
+                 & ("-g", "-fcommon", "-fstack-check", "-fsanitize=address");
+            for Default_Switches ("C++") use Common_LD_Switches
+                 & ("-g", "-fcommon", "-fstack-check", "-fsanitize=address");
+      end case;
+
+   end Linker;
+
+   package Builder is
+      for Executable ("main.cc") use "demo";
+   end Builder;
+
+end Demo;
