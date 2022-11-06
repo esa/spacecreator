@@ -247,7 +247,8 @@ private:
     void generateTraces(int count);
     void generateNextTrace();
     void generateReport();
-    void saveReport(const QString &data);
+    void saveReport(const QFileInfo &reportFilepath, const QString &data);
+    void presentReport(const QFileInfo &reportFilepath);
 
 private Q_SLOTS:
     void processStderrReady();
