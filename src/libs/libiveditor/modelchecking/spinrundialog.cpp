@@ -29,6 +29,7 @@ SpinRunDialog::SpinRunDialog(QWidget *parent)
     , m_secondLayout(new QHBoxLayout())
     , m_closePending(false)
     , m_finished(false)
+    , m_outputDirectory("tmc-out")
 {
     m_closeButton = new QPushButton(tr("Close"), this);
     setWindowTitle("Spin model-checker");
