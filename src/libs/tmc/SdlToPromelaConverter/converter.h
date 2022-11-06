@@ -39,7 +39,18 @@ class SdlToPromelaConverter final : public QObject
 {
     Q_OBJECT
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param parent parent of the object.
+     */
     SdlToPromelaConverter(QObject *parent = nullptr);
+
+    /**
+     * @brief Destructor.
+     */
+    ~SdlToPromelaConverter();
+
     /**
      * @brief Convert SDL files into promela file.
      *

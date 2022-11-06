@@ -152,9 +152,7 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
     QMap<QString, QString> proctypes;
     findProctypes(*systemInfo, proctypes);
 
-    const Asn1Acn::File &asn1File = *asn1Model->data().front();
-
-    const Type *observableEventType = asn1File.typeFromName("Observable-Event");
+    const Type *observableEventType = findType(*asn1Model, "Observable-Event");
 
     if (observableEventType == nullptr) {
         throw TranslationException("Unable to find ASN.1 type Observable-Event");
@@ -192,8 +190,6 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTran
         const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const
 {
-    const Asn1Acn::File &ans1file = *asn1Model.data().front();
-
     for (auto iter = systemInfo.m_functions.begin(); iter != systemInfo.m_functions.end(); ++iter) {
         for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
                 ++proctypeIter) {
@@ -207,7 +203,7 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTran
             info.m_isTimer = proctypeIter->second->m_isTimer;
 
             if (!info.m_parameterTypeName.isEmpty()) {
-                info.m_parameterType = ans1file.typeFromName(info.m_parameterTypeName);
+                info.m_parameterType = findType(asn1Model, info.m_parameterTypeName);
                 if (info.m_parameterType == nullptr) {
                     QString message = QString("Cannot find type of queue %1:%2, name %3")
                                               .arg(info.m_functionName)
@@ -240,7 +236,7 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTran
             info.m_isTimer = false;
 
             if (!info.m_parameterTypeName.isEmpty()) {
-                info.m_parameterType = ans1file.typeFromName(info.m_parameterTypeName);
+                info.m_parameterType = findType(asn1Model, info.m_parameterTypeName);
                 if (info.m_parameterType == nullptr) {
                     QString message = QString("Cannot find type of queue %1:%2, name %3")
                                               .arg(info.m_functionName)
@@ -499,5 +495,18 @@ Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getMessageValue(const QSt
 bool SpinTrailToSimulatorTrailTranslator::isFunctionLockChannel(const QString &channelName) const
 {
     return channelName.endsWith("_lock");
+}
+
+const Asn1Acn::Types::Type *SpinTrailToSimulatorTrailTranslator::findType(
+        const Asn1Acn::Asn1Model &asn1Model, const QString &name) const
+{
+    for (const std::unique_ptr<Asn1Acn::File> &asn1File : asn1Model.data()) {
+        const Asn1Acn::Types::Type *type = asn1File->typeFromName(name);
+        if (type != nullptr) {
+            return type;
+        }
+    }
+
+    return nullptr;
 }
 }

@@ -137,7 +137,7 @@ void ComponentsTranslator::translateParameters(const QString &sedsInterfaceName,
         const ivm::IVInterface::InterfaceType interfaceType, ivm::IVFunction *ivFunction,
         const InterfaceTypeNameHelper &typeNameHelper) const
 {
-    InterfaceParameterTranslator parameterTranslator(ivFunction, sedsInterfaceName, typeNameHelper);
+    InterfaceParameterTranslator parameterTranslator(ivFunction, sedsInterfaceName, typeNameHelper, m_options);
 
     for (const auto &sedsParameter : sedsInterfaceDeclaration->parameters()) {
         parameterTranslator.translateParameter(sedsParameter, interfaceType);

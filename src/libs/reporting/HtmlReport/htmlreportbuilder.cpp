@@ -19,10 +19,12 @@
 
 #include "htmlreportbuilder.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <grantlee/outputstream.h>
 #include <grantlee_templates.h>
+#include <reporting/HtmlReport/tracebuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
 #include <reporting/Report/spinerrorparser.h>
 
@@ -35,19 +37,18 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
     m_engine->addTemplateLoader(m_fileLoader);
 }
 
-QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(
-        const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const
-{
-    initResource();
-    return parseAndBuildHtmlReport(spinMessages, spinTraces, sclConditions, m_defaultTemplateFile);
-}
-
 QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
-        const QStringList &spinTraces, const QStringList &sclConditions, const QString &templateFile) const
+        const QStringList &sclFiles, const QList<RawErrorItem> &errors, const QStringList &observerNames,
+        const QString &templateFile) const
 {
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
-    return buildHtmlReport(reports, templateFile);
+    auto reports = parser.parse(spinMessages, sclFiles, errors, observerNames);
+    if (templateFile.isEmpty()) {
+        initResource();
+        return buildHtmlReport(reports, m_defaultTemplateFile);
+    } else {
+        return buildHtmlReport(reports, templateFile);
+    }
 }
 
 QString reporting::HtmlReportBuilder::buildHtmlReport(const reporting::SpinErrorReport &spinErrorReport) const
@@ -101,11 +102,16 @@ QVariantList reporting::HtmlReportBuilder::buildReportVariant(const reporting::S
 QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
         const reporting::SpinErrorReportItem &spinErrorReportItem)
 {
+    // add html formatting to spin trails
+    const TraceBuilder traceBuilder;
+    const auto scenarioHtml = traceBuilder.buildTraceReport(spinErrorReportItem.scenario);
+
     QVariantHash variantHash;
     variantHash.insert("errorNumber", spinErrorReportItem.errorNumber);
     variantHash.insert("errorDepth", spinErrorReportItem.errorDepth);
     variantHash.insert("errorCode", spinErrorReportItem.errorType);
     variantHash.insert("rawErrorDetails", spinErrorReportItem.rawErrorDetails);
+    variantHash.insert("scenario", scenarioHtml);
 
     // resolve error type as string
     variantHash.insert("errorType",
@@ -120,6 +126,9 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
         break;
     case reporting::SpinErrorReportItem::StopConditionViolation:
         variantErrorDetails = buildStopConditionViolationVariant(spinErrorReportItem.parsedErrorDetails);
+        break;
+    case reporting::SpinErrorReportItem::ObserverFailure:
+        variantErrorDetails = buildObserverFailureVariant(spinErrorReportItem.parsedErrorDetails);
         break;
     default:
         break;
@@ -161,10 +170,27 @@ QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(co
     reporting::StopConditionViolationReport report =
             qvariant_cast<reporting::StopConditionViolationReport>(errorDetails);
     QVariantHash variantHash;
+    // resolve violation clause as string
+    variantHash.insert("violationClause",
+            m_stopConditionViolationClauseNames.value(report.violationClause,
+                    m_stopConditionViolationClauseNames[reporting::StopConditionViolationReport::UnknownClause]));
     // resolve violation type as string
     variantHash.insert("violationType",
             m_stopConditionViolationTypeNames.value(report.violationType,
                     m_stopConditionViolationTypeNames[reporting::StopConditionViolationReport::UnknownType]));
+
+    return variantHash;
+}
+
+QVariantHash reporting::HtmlReportBuilder::buildObserverFailureVariant(const QVariant &errorDetails)
+{
+    reporting::ObserverFailureReport report = qvariant_cast<reporting::ObserverFailureReport>(errorDetails);
+    QVariantHash variantHash;
+    variantHash.insert("observerName", report.observerName);
+    // resolve observer state as string
+    variantHash.insert("observerState",
+            m_observerFailureObserverStateNames.value(report.observerState,
+                    m_observerFailureObserverStateNames[reporting::ObserverFailureReport::UnknownState]));
 
     return variantHash;
 }
@@ -178,6 +204,15 @@ const QHash<reporting::SpinErrorReportItem::ErrorType, QString> reporting::HtmlR
     { reporting::SpinErrorReportItem::OtherError, "Unknown Error" }
 };
 
+const QHash<reporting::StopConditionViolationReport::ViolationClause, QString>
+        reporting::HtmlReportBuilder::m_stopConditionViolationClauseNames = {
+            { reporting::StopConditionViolationReport::Never, "Never" },
+            { reporting::StopConditionViolationReport::Always, "Always" },
+            { reporting::StopConditionViolationReport::Eventually, "Eventually" },
+            { reporting::StopConditionViolationReport::FilterOut, "Filter Out" },
+            { reporting::StopConditionViolationReport::UnknownClause, "Unknown Clause" },
+        };
+
 const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
         reporting::HtmlReportBuilder::m_stopConditionViolationTypeNames = {
             { reporting::StopConditionViolationReport::Empty, "Empty" },
@@ -188,4 +223,11 @@ const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
             { reporting::StopConditionViolationReport::QueueLength, "Queue Length" },
             { reporting::StopConditionViolationReport::Present, "Present" },
             { reporting::StopConditionViolationReport::UnknownType, "Unknown Type" },
+        };
+
+const QHash<reporting::ObserverFailureReport::ObserverState, QString>
+        reporting::HtmlReportBuilder::m_observerFailureObserverStateNames = {
+            { reporting::ObserverFailureReport::ErrorState, "Error State" },
+            { reporting::ObserverFailureReport::SuccessState, "Success State" },
+            { reporting::ObserverFailureReport::UnknownState, "Unknown State" },
         };

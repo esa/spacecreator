@@ -12,3 +12,5 @@ Never claim moves to line 15	[else]
                           process continuous signals in Actuator
                   set_timer actuator trigger 1000
                   reset_timer actuator trigger
+161231:	proc  3 (Controller_result:1) system.pml:33 Send 11.300000	-> queue 6 (Actuator_work_channel)
+161241:	proc  1 (Actuator_work:1) system.pml:98 Recv 11.300000	<- queue 6 (Actuator_work_channel)

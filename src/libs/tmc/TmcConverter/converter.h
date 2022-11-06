@@ -83,6 +83,11 @@ public:
     TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory, QObject *parent = nullptr);
 
     /**
+     * @brief Destructor.
+     */
+    ~TmcConverter();
+
+    /**
      * @brief Prepare system system conversion.
      *
      * This method shall be called after converter setup, but always before

@@ -59,13 +59,6 @@ TrailgenExecutor::TrailgenExecutor(QObject *parent)
 {
 }
 
-TrailgenExecutor::~TrailgenExecutor()
-{
-    if (m_converter != nullptr) {
-        delete m_converter;
-    }
-}
-
 void TrailgenExecutor::execute()
 {
     const QStringList args = QCoreApplication::arguments();
@@ -174,7 +167,7 @@ void TrailgenExecutor::execute()
     const QString observerAsn1Filepath = baseDirectory.absolutePath() + QDir::separator() + "work" + QDir::separator()
             + "simulation" + QDir::separator() + "observers" + QDir::separator() + "observer.asn";
 
-    m_converter = new TmcConverter(inputIvFilepath.value(), outputDirectory.value());
+    m_converter = std::make_unique<TmcConverter>(inputIvFilepath.value(), outputDirectory.value());
     m_converter->setEnvironmentFunctions(environmentFunctions);
     m_converter->setKeepFunctions(keepFunctions);
     m_converter->setMscObserverFiles(mscObserverFiles);
@@ -187,8 +180,8 @@ void TrailgenExecutor::execute()
     m_inputSpinTrailFilepath = inputSpinTrailFilepath.value();
     m_outputSimulatorTrailFilepath = outputSimulatorTrailFilepath.value();
 
-    connect(m_converter, SIGNAL(conversionFinished(bool)), this, SLOT(finished(bool)));
-    connect(m_converter, SIGNAL(message(QString)), this, SLOT(message(QString)));
+    connect(m_converter.get(), SIGNAL(conversionFinished(bool)), this, SLOT(finished(bool)));
+    connect(m_converter.get(), SIGNAL(message(QString)), this, SLOT(message(QString)));
 
     QTimer::singleShot(0, this, SLOT(start()));
 

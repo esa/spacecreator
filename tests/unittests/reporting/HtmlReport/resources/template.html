@@ -20,10 +20,6 @@
           <td><tt>{{ reportItem.errorNumber }}</tt></td>
         </tr>
         <tr>
-          <td>Error Depth</td>
-          <td><tt>{{ reportItem.errorDepth }}</tt></td>
-        </tr>
-        <tr>
           <td>Error Details</td>
           {# Check for data constraint violation #}
           {% if reportItem.errorCode == 0 %}
@@ -52,13 +48,26 @@
           {# Check for stop condition violation #}
           {% elif reportItem.errorCode == 1 %}
             <td>
+              <i>Violation Clause:</i> <tt>{{ reportItem.errorDetails.violationClause }}</tt><br>
               <i>Violation Type:</i> <tt>{{ reportItem.errorDetails.violationType }}</tt>
             </td>
+          {# Check for observer failure #}
+          {% elif reportItem.errorCode == 2 %}
+            <td>
+              <i>Observer Name:</i> <tt>{{ reportItem.errorDetails.observerName }}</tt><br>
+              <i>Observer State:</i> <tt>{{ reportItem.errorDetails.observerState }}</tt>
+            </td>
+          {# Unknown error type #}
+          {% else %}
+            <td></td>
           {% endif %}
+          
         </tr>
       </table>
       <i>Parsed from:</i><br>
       <tt>{{ reportItem.rawErrorDetails }}</tt><br><br>
+      <i>Trails:</i><br>
+      <span style="white-space: pre-wrap;"><tt>{{ reportItem.scenario }}</tt></span><br><br>
     {% endfor %}
   </body>
 </html>

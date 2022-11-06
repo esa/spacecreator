@@ -21,6 +21,8 @@
 
 #include <QDebug>
 #include <QEventLoop>
+#include <QSettings>
+#include <tmc/TmcConfig/constants.h>
 #include <tmc/TmcVerifier/verifier.h>
 
 using tmc::verifier::TmcVerifier;
@@ -60,8 +62,14 @@ void SpinRunWorker::run()
 {
     QString interfaceView = m_projectRoot + QDir::separator() + "interfaceview.xml";
     QDir::setCurrent(m_projectRoot);
-    QDir dir(m_projectRoot);
-    dir.mkdir(m_outputDirectory);
+    QDir projectRootDir(m_projectRoot);
+
+    if (projectRootDir.exists(m_outputDirectory)) {
+        QDir outputDirectory(projectRootDir.filePath(m_outputDirectory));
+        outputDirectory.removeRecursively();
+    }
+
+    projectRootDir.mkdir(m_outputDirectory);
 
     m_verifier = std::make_unique<TmcVerifier>(interfaceView, m_outputDirectory);
 
@@ -69,7 +77,13 @@ void SpinRunWorker::run()
                     ? TmcVerifier::ExplorationMode::DepthFirst
                     : TmcVerifier::ExplorationMode::BreadthFirst);
 
-    m_verifier->setRealTypeEnabled(false);
+    if (m_spinConfig.supportReal) {
+        m_verifier->setRealTypeEnabled(true);
+        m_verifier->setDelta(m_spinConfig.deltaValue);
+    } else {
+        m_verifier->setRealTypeEnabled(false);
+    }
+
     m_verifier->setSearchShortestPath(m_spinConfig.searchShortestPath);
     m_verifier->setUseFairScheduling(m_spinConfig.useFairScheduling);
     m_verifier->setUseBitHashing(m_spinConfig.useBitHashing);
@@ -91,6 +105,13 @@ void SpinRunWorker::run()
     if (!m_spinConfig.rawCommandLine.isEmpty()) {
         m_verifier->setRawCommandline(m_spinConfig.rawCommandLine);
     }
+
+    QSettings settings;
+    QVariant spinExecutable = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_EXE_KEY);
+    if (spinExecutable.isValid()) {
+        m_verifier->setSpinExecutable(spinExecutable.toString());
+    }
+
     if (m_spinConfig.globalInputVectorGenerationLimit.has_value()) {
         m_verifier->setGlobalInputVectorLengthLimit(
                 QString::number(m_spinConfig.globalInputVectorGenerationLimit.value()));
@@ -137,6 +158,7 @@ void SpinRunWorker::run()
     m_verifier->execute(TmcVerifier::ExecuteMode::ConvertAndVerify);
 
     loop.exec();
-    qDebug() << "Worker thread finished\n";
+
+    m_verifier.reset();
 }
 }

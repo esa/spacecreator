@@ -93,9 +93,9 @@ private:
     auto translateDataTypeSet(const std::list<const ::seds::model::DataType *> &sedsDataTypes, Context &context) const
             -> void;
     auto translateInterfaceDeclarations(const std::vector<::seds::model::InterfaceDeclaration> &interfaceDeclarations,
-            Context &context) const -> void;
-    auto translateInterfaceImplementations(
-            const std::vector<::seds::model::Interface> &providedInterfaces, Context &context) const -> void;
+            Context &context, const Options &options) const -> void;
+    auto translateInterfaceImplementations(const std::vector<::seds::model::Interface> &providedInterfaces,
+            Context &context, const Options &options) const -> void;
     auto translateGenericTypes(const ::seds::model::Interface &interface,
             const ::seds::model::InterfaceDeclaration *interfaceDeclaration, const ::seds::model::Component &component,
             Context &context, Context &interfaceContext) const -> void;

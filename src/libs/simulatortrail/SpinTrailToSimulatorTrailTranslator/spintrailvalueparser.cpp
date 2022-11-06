@@ -83,7 +83,7 @@ Asn1Acn::ValuePtr SpinTrailValueParser::parseValue(QStringList &spinTrailValue, 
         return parseBoolean(spinTrailValue);
     }
     if (asn1Type->typeEnum() == Asn1Acn::Types::Type::REAL) {
-        throw TranslationException("Translation from Spin Trail to Simulator Trail for REAL is not implemented.");
+        return parseReal(spinTrailValue);
     }
     if (asn1Type->typeEnum() == Asn1Acn::Types::Type::SEQUENCE) {
         const Asn1Acn::Types::Sequence *sequence = dynamic_cast<const Asn1Acn::Types::Sequence *>(asn1Type);
@@ -124,6 +124,16 @@ Asn1Acn::ValuePtr SpinTrailValueParser::parseInteger(QStringList &spinTrailValue
 {
     if (spinTrailValue.isEmpty()) {
         throw TranslationException("Invalid value for INTEGER type");
+    }
+    QString value = spinTrailValue.first();
+    spinTrailValue.pop_front();
+    return std::make_unique<SingleValue>(value);
+}
+
+Asn1Acn::ValuePtr SpinTrailValueParser::parseReal(QStringList &spinTrailValue)
+{
+    if (spinTrailValue.isEmpty()) {
+        throw TranslationException("Invalid value for REAL type");
     }
     QString value = spinTrailValue.first();
     spinTrailValue.pop_front();

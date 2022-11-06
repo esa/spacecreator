@@ -37,7 +37,7 @@ public:
     QStringList getSubtypesSelected();
     QStringList getFunctionsSelected();
     QStringList getIfConfig();
-    SpinConfigData getSpinConfig();
+    ive::SpinConfigData getSpinConfig();
 
 private:
     int readXMEL();
@@ -54,7 +54,7 @@ private:
     QStringList subtypesSelected;
     QStringList functionsSelected;
 
-    SpinConfigSaver spinConfigSaver;
+    ive::SpinConfigSaver spinConfigSaver;
 
     struct IFConfig;
     IFConfig *ifConfig;

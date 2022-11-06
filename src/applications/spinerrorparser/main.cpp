@@ -30,6 +30,7 @@
 #include <optional>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
+#include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorparser.h>
 #include <string.h>
 
@@ -44,8 +45,9 @@ int main(int argc, char *argv[])
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
     QStringList spinMessages;
-    QStringList spinTraces;
-    QStringList sclConditions;
+    QStringList spinTraceFiles;
+    QStringList sclConditionFiles;
+    QStringList scenarioFiles;
     std::optional<QString> templateFile;
     std::optional<QString> targetFile;
 
@@ -65,14 +67,21 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             ++i;
-            spinTraces.append(args[i]);
+            spinTraceFiles.append(args[i]);
         } else if (arg == "-scl") {
             if (i + 1 == args.size()) {
                 qCritical("Missing scl condition after -scl");
                 exit(EXIT_FAILURE);
             }
             ++i;
-            sclConditions.append(args[i]);
+            sclConditionFiles.append(args[i]);
+        } else if (arg == "-ir") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing trail file after -ir");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            scenarioFiles.append(args[i]);
         } else if (arg == "-it") {
             if (i + 1 == args.size()) {
                 qCritical("Missing template file after -it");
@@ -103,7 +112,8 @@ int main(int argc, char *argv[])
             qInfo("  -im <message>          Message from spin (can be repeated)");
             qInfo("  -is <message>          Spin traces (can be repeated)");
             qInfo("  -scl <condition>       Condition from scl.txt (can be repeated)");
-            qInfo("  -it <filename>         HTML template file name");
+            qInfo("  -ir <filename>         Trail files (can be repeated)");
+            qInfo("  -it <filename>         HTML template file name (optional)");
             qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
             exit(EXIT_SUCCESS);
@@ -118,12 +128,12 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    if (spinTraces.isEmpty()) {
+    if (spinTraceFiles.isEmpty()) {
         qCritical("Missing mandatory argument: -is spinTraces");
         exit(EXIT_FAILURE);
     }
 
-    if (sclConditions.isEmpty()) {
+    if (sclConditionFiles.isEmpty()) {
         qCritical("Missing mandatory argument: -ic sclCondition");
         exit(EXIT_FAILURE);
     }
@@ -133,9 +143,20 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // build error structure
+    QList<reporting::RawErrorItem> rawErrorItems;
+    const int traceCount = spinTraceFiles.size();
+    for (int i = 0; i < traceCount; ++i) {
+        reporting::RawErrorItem rawErrorItem;
+        rawErrorItem.spinTraceFile = spinTraceFiles[i];
+        rawErrorItem.scenarioFile = scenarioFiles[i];
+        rawErrorItem.possibleCycleSource = std::make_pair(QString(), 0);
+        rawErrorItems.append(rawErrorItem);
+    };
+
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, spinTraces, sclConditions);
+    auto reports = parser.parse(spinMessages, sclConditionFiles, rawErrorItems, QStringList());
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;

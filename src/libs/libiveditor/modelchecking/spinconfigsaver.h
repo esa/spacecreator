@@ -20,12 +20,13 @@
 #ifndef SPINCONFIGSAVER_H
 #define SPINCONFIGSAVER_H
 
-#include <optional>
 #include <QIODevice>
 #include <QList>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <optional>
 
+namespace ive {
 enum class ExplorationMode
 {
     DepthFirst,
@@ -33,22 +34,26 @@ enum class ExplorationMode
 };
 
 struct SpinConfigData {
+    static std::optional<int> optionalIntFromString(const QString str);
+    static QString optionalIntToString(std::optional<int> opt);
+    static std::optional<float> optionalFloatFromString(const QString str);
+    static QString optionalFloatToString(std::optional<float> opt);
+
     ExplorationMode explorationMode = ExplorationMode::DepthFirst;
     bool searchShortestPath = false;
     bool useFairScheduling = false;
     bool useBitHashing = false;
+    bool supportReal = false;
     std::optional<int> numberOfCores = 1;
     std::optional<int> timeLimitSeconds = 300;
     std::optional<int> searchStateLimit = 1000000;
     std::optional<int> errorLimit = 1;
     std::optional<int> memoryLimitMB = 2048;
     std::optional<int> globalInputVectorGenerationLimit = 4;
+    std::optional<float> deltaValue;
     QList<QPair<QString, int>> ifaceGenerationLimits;
     QString rawCommandLine; // if non-empty, overrides other configuration settings
 };
-
-std::optional<int> optionalIntFromString(const QString str);
-QString optionalIntToString(std::optional<int> opt);
 
 class SpinConfigSaver
 {
@@ -65,5 +70,6 @@ private:
     QList<QPair<QString, int>> parseIfaceGenerationLimits(const QString &interfaceGenerationLimitsStr);
     SpinConfigData configData;
 };
+}
 
 #endif

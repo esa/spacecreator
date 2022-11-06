@@ -20,6 +20,8 @@
 #pragma once
 
 #include "dataconstraintviolationreport.h"
+#include "observerfailurereport.h"
+#include "rawerroritem.h"
 #include "spinerrorreportitem.h"
 #include "stopconditionviolationreport.h"
 
@@ -34,6 +36,12 @@ namespace reporting {
 class SpinErrorParser
 {
 public:
+    enum ViolationTypeParseTokens
+    {
+        RawErrorMatch = 0,
+        ErrorDetailsMatch = 1
+    };
+
     /// @brief  Regex match tokens for constraint violation parsing
     enum ConstraintViolationParseTokens
     {
@@ -78,42 +86,41 @@ public:
     SpinErrorParser() = default;
 
     /**
-     * @brief   Parse multiple spin messages
+     * @brief   Parse from multiple spin errors
      *
      * @param   spinMessages     Spin command outputs
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
+     * @param   sclFiles         SCL condition files
+     * @param   errors           Raw error data
+     * @param   observerNames    Observer names
      *
      * @return  List of spin errors
      */
-    SpinErrorReport parse(
-            const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const;
-
-    /**
-     * @brief   Parse single spin message
-     *
-     * @param   spinMessage      Spin command output
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     *
-     * @return  List of spin errors
-     */
-    SpinErrorReport parse(const QString &spinMessage, const QString &spinTraces, const QString &sclConditions) const;
+    SpinErrorReport parse(const QStringList &spinMessages, const QStringList &sclFiles,
+            const QList<RawErrorItem> &errors, const QStringList &observerNames) const;
 
 private:
     static const QString m_spinNoTrailFileMessage;
-    static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationIdentifiers;
+    static const QHash<QString, StopConditionViolationReport::ViolationClause> m_stopConditionViolationClauses;
+    static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationTypes;
+
+    SpinErrorReportItem parseTrace(const QString &spinTraces, const QStringList &sclConditions) const;
+
+    QRegularExpressionMatch matchStopCondition(const QString &spinTraces) const;
+    QRegularExpressionMatch matchObserverFailureErrorState(const QString &spinTraces) const;
+    QRegularExpressionMatch matchObserverFailureSuccessState(const QString &spinTraces) const;
+    QRegularExpressionMatch matchVariableViolation(const QString &spinTraces) const;
 
     SpinErrorReportItem buildDataConstraintViolationReportItem(const QRegularExpressionMatch &matchedError) const;
     SpinErrorReportItem buildStopConditionViolationReportItem(const QString &conditions) const;
 
-    QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
-    QVariant parseVariableViolation(const QString &rawError) const;
-    QVariant parseStopConditionViolation(const QString &rawError) const;
+    QVariant parseVariableViolation(const QString &parsedErrorToken) const;
+    QVariant parseStopConditionViolation(const QString &parsedErrorToken) const;
+    QVariant parseObserverFailureErrorState(const QString &parsedErrorToken) const;
+    QVariant parseObserverFailureSuccessState(const QString &parsedErrorToken) const;
 
-    static QRegularExpression buildSpinErrorRegex();
+    static QString readFile(const QString &filePath);
+
     static QRegularExpression buildDataConstraintViolationRegex();
-
     static QRegularExpression buildStopConditionViolationRegex();
     static QRegularExpression buildStopConditionExpressionRegex();
 

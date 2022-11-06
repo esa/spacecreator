@@ -45,9 +45,9 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     QFile configFile(configFilePath);
     Q_ASSERT(configFile.open(QFile::WriteOnly | QFile::Text));
 
-    SpinConfigData spinConfigInput;
+    ive::SpinConfigData spinConfigInput;
     spinConfigInput.errorLimit = 3;
-    spinConfigInput.explorationMode = ExplorationMode::BreadthFirst;
+    spinConfigInput.explorationMode = ive::ExplorationMode::BreadthFirst;
     spinConfigInput.globalInputVectorGenerationLimit = 6;
     spinConfigInput.ifaceGenerationLimits = { { "Iface1", 2 }, { "Iface2", 3 }, { "Iface3", 4 } };
     spinConfigInput.memoryLimitMB = 1024;
@@ -58,6 +58,8 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     spinConfigInput.timeLimitSeconds = 100;
     spinConfigInput.useBitHashing = true;
     spinConfigInput.useFairScheduling = true;
+    spinConfigInput.supportReal = true;
+    spinConfigInput.deltaValue = 0.1;
 
     XmelWriter writer({}, {}, { "DummyFunction" }, {}, spinConfigInput);
     Q_ASSERT(writer.writeFile(&configFile, configFilePath));
@@ -67,7 +69,7 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     XmelReader reader;
     Q_ASSERT(reader.read(&configFile) == 0);
 
-    SpinConfigData spinConfig = reader.getSpinConfig();
+    ive::SpinConfigData spinConfig = reader.getSpinConfig();
     Q_ASSERT(spinConfig.errorLimit == spinConfigInput.errorLimit);
     Q_ASSERT(spinConfig.explorationMode == spinConfigInput.explorationMode);
     Q_ASSERT(spinConfig.globalInputVectorGenerationLimit == spinConfigInput.globalInputVectorGenerationLimit);
@@ -80,6 +82,8 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     Q_ASSERT(spinConfig.timeLimitSeconds == spinConfigInput.timeLimitSeconds);
     Q_ASSERT(spinConfig.useBitHashing == spinConfigInput.useBitHashing);
     Q_ASSERT(spinConfig.useFairScheduling == spinConfigInput.useFairScheduling);
+    Q_ASSERT(spinConfig.supportReal == spinConfigInput.supportReal);
+    Q_ASSERT(abs(spinConfig.deltaValue.value() - spinConfigInput.deltaValue.value()) < 0.0001);
 
     configFile.remove();
 }
@@ -90,9 +94,9 @@ void tst_ModelChecking::tst_spinConfigEmptyFields()
     QFile configFile(configFilePath);
     Q_ASSERT(configFile.open(QFile::WriteOnly | QFile::Text));
 
-    SpinConfigData spinConfigInput;
+    ive::SpinConfigData spinConfigInput;
     spinConfigInput.errorLimit = std::nullopt;
-    spinConfigInput.explorationMode = ExplorationMode::BreadthFirst;
+    spinConfigInput.explorationMode = ive::ExplorationMode::BreadthFirst;
     spinConfigInput.globalInputVectorGenerationLimit = std::nullopt;
     spinConfigInput.ifaceGenerationLimits = { { "Iface1", 2 }, { "Iface2", 3 }, { "Iface3", 4 } };
     spinConfigInput.memoryLimitMB = std::nullopt;
@@ -103,6 +107,8 @@ void tst_ModelChecking::tst_spinConfigEmptyFields()
     spinConfigInput.timeLimitSeconds = std::nullopt;
     spinConfigInput.useBitHashing = true;
     spinConfigInput.useFairScheduling = true;
+    spinConfigInput.deltaValue = std::nullopt;
+    spinConfigInput.supportReal = false;
 
     XmelWriter writer({}, {}, { "DummyFunction" }, {}, spinConfigInput);
     Q_ASSERT(writer.writeFile(&configFile, configFilePath));
@@ -112,7 +118,7 @@ void tst_ModelChecking::tst_spinConfigEmptyFields()
     XmelReader reader;
     Q_ASSERT(reader.read(&configFile) == 0);
 
-    SpinConfigData spinConfig = reader.getSpinConfig();
+    ive::SpinConfigData spinConfig = reader.getSpinConfig();
     Q_ASSERT(spinConfig.errorLimit == std::nullopt);
     Q_ASSERT(spinConfig.explorationMode == spinConfigInput.explorationMode);
     Q_ASSERT(spinConfig.globalInputVectorGenerationLimit == std::nullopt);
@@ -125,6 +131,8 @@ void tst_ModelChecking::tst_spinConfigEmptyFields()
     Q_ASSERT(spinConfig.timeLimitSeconds == std::nullopt);
     Q_ASSERT(spinConfig.useBitHashing == spinConfigInput.useBitHashing);
     Q_ASSERT(spinConfig.useFairScheduling == spinConfigInput.useFairScheduling);
+    Q_ASSERT(spinConfig.supportReal == spinConfigInput.supportReal);
+    Q_ASSERT(spinConfig.deltaValue == spinConfigInput.deltaValue);
 
     configFile.remove();
 }

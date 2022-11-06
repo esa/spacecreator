@@ -237,8 +237,11 @@ WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenTransit
 
             transition->addAction(std::move(signalRequirementAction));
 
-            auto errorStateAction = std::make_unique<NextState>(errorState->name(), errorState.get());
-            transition->addAction(std::move(errorStateAction));
+            // Case for any parameter value (*)
+            if (!parametersRequirements.empty()) {
+                auto errorStateAction = std::make_unique<NextState>(errorState->name(), errorState.get());
+                transition->addAction(std::move(errorStateAction));
+            }
         } else {
             transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
         }
@@ -291,8 +294,11 @@ WhenSequenceTranslator::TransitionList WhenSequenceTranslator::createThenNotTran
 
             transition->addAction(std::move(signalRequirementAction));
 
-            auto okStateAction = std::make_unique<NextState>(okState->name(), okState.get());
-            transition->addAction(std::move(okStateAction));
+            // Case for any parameter value (*)
+            if (!parametersRequirements.empty()) {
+                auto okStateAction = std::make_unique<NextState>(okState->name(), okState.get());
+                transition->addAction(std::move(okStateAction));
+            }
         } else {
             transition->addAction(std::make_unique<NextState>(targetState->name(), targetState));
         }

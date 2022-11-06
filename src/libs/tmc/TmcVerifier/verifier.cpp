@@ -24,8 +24,11 @@
 #include <QRegularExpression>
 #include <QTimer>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
+#include <reporting/HtmlReport/htmlreportpresenter.h>
+#include <reporting/Report/spinerrorparser.h>
 
 using reporting::HtmlReportBuilder;
+using reporting::HtmlReportPresenter;
 using tmc::converter::TmcConverter;
 
 namespace tmc::verifier {
@@ -62,6 +65,24 @@ TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDi
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
 
     connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
+}
+
+TmcVerifier::~TmcVerifier()
+{
+    m_converter.reset();
+    m_timer->stop();
+    if (m_process->state() != QProcess::ProcessState::NotRunning) {
+        m_process->kill();
+        m_process->waitForFinished();
+    }
+    if (m_verifierProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_verifierProcess->kill();
+        m_verifierProcess->waitForFinished();
+    }
+    if (m_traceGeneratorProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_traceGeneratorProcess->kill();
+        m_traceGeneratorProcess->waitForFinished();
+    }
 }
 
 void TmcVerifier::setMscObserverFiles(const QStringList &mscObserverFiles)
@@ -166,18 +187,76 @@ void TmcVerifier::setMemoryLimit(int memoryLimit)
 
 void TmcVerifier::setRawCommandline(QString rawCommandline)
 {
-    m_rawCommandline = rawCommandline;
+    m_rawCommandline = std::move(rawCommandline);
+}
+
+void TmcVerifier::setSpinExecutable(QString spinExecutable)
+{
+    m_spinExecutable = std::move(spinExecutable);
 }
 
 bool TmcVerifier::execute(ExecuteMode executeMode)
 {
     Q_EMIT verifierMessage(QString("Starting conversion.\n"));
     m_executeMode = executeMode;
-    if (!m_converter->prepare()) {
+    if (m_outputDirectory.isEmpty()) {
+        Q_EMIT verifierMessage(QString("Output directory path is not specified. Aborting.\n"));
+        Q_EMIT finished(false);
         return false;
     }
-    m_converter->convert();
+    if (m_executeMode == ExecuteMode::ConvertOnly) {
+        // run only TmcConverter
+        if (!m_converter->prepare()) {
+            return false;
+        }
+        m_converter->convert();
+    } else {
+        // start from `make observer_dataview`
+        // then run TmcConverter and start verification process
+        generateObserverDataview();
+    }
     return true;
+}
+
+void TmcVerifier::generateObserverDataview()
+{
+    const QFileInfo inputIvInfo(m_inputIvFilepath);
+    const QString emptyAsnName = "empty.asn";
+
+    // create empty
+    QString emptyAsnFilepath = inputIvInfo.absoluteDir().path() + QDir::separator() + "work" + QDir::separator()
+            + "modelchecking" + QDir::separator() + "subtypes" + QDir::separator() + emptyAsnName;
+
+    QFileInfo emptyAsnInfo(emptyAsnFilepath);
+
+    if (!emptyAsnInfo.exists()) {
+        QFile emptyAsnFile(emptyAsnFilepath);
+        emptyAsnFile.open(QIODevice::WriteOnly | QIODevice::Append);
+
+        emptyAsnFile.close();
+    }
+
+    const QString makeExe = "make";
+    m_process->setWorkingDirectory(inputIvInfo.absoluteDir().path());
+
+    if (m_processFinishedConnection) {
+        disconnect(m_processFinishedConnection);
+    }
+    m_processFinishedConnection = connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(makeFinished(int, QProcess::ExitStatus)));
+    if (m_processStartedConnection) {
+        disconnect(m_processStartedConnection);
+    }
+    m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(makeStarted()));
+
+    QStringList arguments;
+    arguments.append(QString("SUBTYPE=%1").arg(emptyAsnName));
+    arguments.append("observer_dataview");
+
+    Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(makeExe).arg(arguments.join(" ")));
+    m_timer->setSingleShot(true);
+    m_timer->start(m_startTimeout);
+    m_process->start(makeExe, arguments);
 }
 
 void TmcVerifier::buildVerifier()
@@ -205,27 +284,28 @@ void TmcVerifier::executeVerifier()
 
     QStringList arguments;
     if (m_rawCommandline.isEmpty()) {
-        arguments.append("-n");
+        arguments.append("-E"); // suppress the reporting of invalid endstate errors
+        arguments.append("-n"); // no listing of unreached states at the end of the run
 
         if (m_explorationMode != ExplorationMode::BreadthFirst) {
-            arguments.append("-a");
+            arguments.append("-a"); // find acceptance cycles, not available in BFS
         }
 
         if (m_useFairScheduling) {
-            arguments.append("-f");
+            arguments.append("-f"); // add weak fairness
         }
 
         if (m_errorLimit.has_value()) {
-            arguments.append("-e");
-            arguments.append(QString("-c%1").arg(m_errorLimit.value()));
+            arguments.append("-e"); // create trails for all errors encountered
+            arguments.append(QString("-c%1").arg(m_errorLimit.value())); // stop at Nth error
         }
 
         if (m_searchStateLimit.has_value()) {
-            arguments.append(QString("-m%1").arg(m_searchStateLimit.value()));
+            arguments.append(QString("-m%1").arg(m_searchStateLimit.value())); // set max search depth to N steps
         }
 
         if (m_searchShortestPath) {
-            arguments.append("-i");
+            arguments.append("-i"); // search for shortest path to error
         }
 
     } else {
@@ -241,12 +321,18 @@ void TmcVerifier::executeVerifier()
 void TmcVerifier::executeSpin()
 {
     const QString inputFile = "system.pml";
-    const QString spinExe = "spin";
+    const QString spinExe = m_spinExecutable.isEmpty() ? QString("spin") : m_spinExecutable;
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
+    if (m_processFinishedConnection) {
+        disconnect(m_processFinishedConnection);
+    }
     m_processFinishedConnection = connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(spinFinished(int, QProcess::ExitStatus)));
+    if (m_processStartedConnection) {
+        disconnect(m_processStartedConnection);
+    }
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(spinStarted()));
 
     QStringList arguments;
@@ -264,7 +350,7 @@ void TmcVerifier::executeCC()
     const QString outputFile = "pan";
     const QString compilerExe = "gcc";
     QStringList standardArguments;
-    standardArguments.append("-O0");
+    standardArguments.append("-O2");
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
@@ -275,8 +361,12 @@ void TmcVerifier::executeCC()
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
 
     QStringList arguments = standardArguments;
+
     arguments.append("-o");
     arguments.append(outputFile);
+
+    // This is a temporary sane default, TODO - make it configurable
+    arguments.append("-DVECTORSZ=65535");
 
     if (m_useBitHashing) {
         arguments.append("-DBITSTATE");
@@ -378,7 +468,7 @@ void TmcVerifier::generateNextTrace()
     m_traceGeneratorProcess->setWorkingDirectory(m_outputDirectory);
 
     const QString inputFile = "system.pml";
-    const QString spinExe = "spin";
+    const QString spinExe = m_spinExecutable.isEmpty() ? QString("spin") : m_spinExecutable;
 
     QStringList arguments;
     arguments.append("-k");
@@ -405,17 +495,34 @@ void TmcVerifier::generateReport()
 
     QStringList sclFiles = m_converter->getStopConditionFiles();
 
-    QString report = builder.parseAndBuildHtmlReport(spinMessages, m_spinTraceFiles, sclFiles);
+    QList<reporting::RawErrorItem> rawErrorItems;
+    const int traceCount = m_spinTraceFiles.size();
+    for (int i = 0; i < traceCount; ++i) {
+        reporting::RawErrorItem rawErrorItem;
+        rawErrorItem.spinTraceFile = m_spinTraceFiles[i];
+        rawErrorItem.scenarioFile = m_traceFiles[i];
+        rawErrorItem.possibleCycleSource = std::make_pair(QString(), 0);
+        rawErrorItems.append(rawErrorItem);
+    };
 
-    saveReport(report);
+    QString report = builder.parseAndBuildHtmlReport(spinMessages, sclFiles, rawErrorItems, QStringList());
+
+    QFileInfo reportFilepath = m_outputDirectory + QDir::separator() + "report.html";
+    saveReport(reportFilepath, report);
+    if (m_executeMode == ExecuteMode::ConvertAndVerify) {
+        presentReport(reportFilepath);
+    }
 
     Q_EMIT finished(true);
 }
 
-void TmcVerifier::saveReport(const QString &data)
+void TmcVerifier::presentReport(const QFileInfo &reportFilepath)
 {
-    QFileInfo reportFilepath = m_outputDirectory + QDir::separator() + "report.html";
+    HtmlReportPresenter::present(reportFilepath.absoluteFilePath());
+}
 
+void TmcVerifier::saveReport(const QFileInfo &reportFilepath, const QString &data)
+{
     Q_EMIT verifierMessage(QString("Generated %1 chars\n").arg(data.length()));
 
     QFile file(reportFilepath.absoluteFilePath());
@@ -506,6 +613,32 @@ void TmcVerifier::conversionFinished(bool success)
     } else {
         Q_EMIT finished(false);
     }
+}
+
+void TmcVerifier::makeStarted()
+{
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(m_commandTimeout);
+}
+
+void TmcVerifier::makeFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    m_process->terminate();
+    if (exitCode != EXIT_SUCCESS) {
+        auto message = QString("Make finished with code: %1\n").arg(exitCode);
+        Q_EMIT verifierMessage(message);
+        Q_EMIT finished(false);
+        return;
+    }
+
+    if (!m_converter->prepare()) {
+        Q_EMIT finished(false);
+        return;
+    }
+    m_converter->convert();
 }
 
 void TmcVerifier::spinStarted()

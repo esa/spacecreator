@@ -158,6 +158,15 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     connect(m_sdlToPromelaConverter, SIGNAL(message(QString)), this, SIGNAL(message(QString)));
 }
 
+TmcConverter::~TmcConverter()
+{
+    m_timer->stop();
+    if (m_process->state() != QProcess::ProcessState::NotRunning) {
+        m_process->kill();
+        m_process->waitForFinished();
+    }
+}
+
 bool TmcConverter::prepare()
 {
     m_numberOfProctypes = 0;
