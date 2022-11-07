@@ -20,7 +20,9 @@ default:
     - git clone https://github.com/n7space/sdl2promela.git
     - pushd sdl2promela ; make install ; popd
 
-build-spacecreator:
+
+
+.build-spacecreator:
   stage: build-test-and-bundle
   variables:
     PROJECT_DIR: ${CI_PROJECT_DIR}
@@ -37,8 +39,7 @@ build-spacecreator:
 
 
 space-creator-qt5:
-  extends:
-    - build-spacecreator
+  extends: .build-spacecreator
   variables:
     ENV_QT_VERSION: 5.12.1
     ENV_QTC_VERSION: 4.8.2
@@ -66,8 +67,7 @@ space-creator-qt5:
     expire_in: 2 days
 
 space-creator-qt6:
-  extends:
-    - build-spacecreator
+  extends: .build-spacecreator
   variables:
     ENV_QT_VERSION: 6.3.1
     ENV_QTC_VERSION: 8.0.1
