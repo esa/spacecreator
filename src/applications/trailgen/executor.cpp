@@ -208,6 +208,8 @@ void TrailgenExecutor::start()
         QCoreApplication::exit(EXIT_FAILURE);
         return;
     }
-    m_converter->convertTrace(m_inputSpinTrailFilepath, m_outputSimulatorTrailFilepath);
+    if (m_converter->convertTrace(m_inputSpinTrailFilepath, m_outputSimulatorTrailFilepath)) {
+        QCoreApplication::exit(EXIT_SUCCESS);
+    }
 }
 }
