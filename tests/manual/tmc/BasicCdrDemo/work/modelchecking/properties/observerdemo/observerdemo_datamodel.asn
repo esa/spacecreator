@@ -10,7 +10,7 @@ IMPORTS
    Actuator-Event, Egse-Event, Modemanager-Event, Sensor-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Observerdemo-States ::= ENUMERATED {checking, idle, incorrectvalue}
+Observerdemo-States ::= ENUMERATED {incorrectvalue, checking, idle}
 
 Observerdemo-Context ::= SEQUENCE {
    state Observerdemo-States,

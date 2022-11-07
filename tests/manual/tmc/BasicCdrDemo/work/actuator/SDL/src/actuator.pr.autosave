@@ -7,6 +7,12 @@ process Actuator;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Idle;
+    /* CIF state (321, 113), (70, 35) */
+    state Idle;
+    endstate;
+    /* CIF state (320, 172), (72, 35) */
+    state Working;
+    endstate;
     /* CIF state (450, 10), (70, 35) */
     state *;
         /* CIF input (450, 65), (70, 35) */
@@ -26,11 +32,5 @@ process Actuator;
                     /* CIF NEXTSTATE (508, 288), (70, 35) */
                     NEXTSTATE Idle;
             enddecision;
-    endstate;
-    /* CIF state (319, 172), (72, 35) */
-    state Working;
-    endstate;
-    /* CIF state (321, 113), (70, 35) */
-    state Idle;
     endstate;
 endprocess Actuator;

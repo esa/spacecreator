@@ -1,142 +1,6 @@
 warning: no accept labels are defined, so option -a has no effect (ignored)
-pan:1: assertion violated  !((global_state.observerdemo.state==2)) (at depth 227)
-pan: wrote system.pml.trail
-pan: reducing search depth to 228
-pan: wrote system.pml.trail
-pan: reducing search depth to 228
-pan: wrote system.pml.trail
-pan: reducing search depth to 228
-pan: wrote system.pml.trail
-pan: reducing search depth to 228
-pan: wrote system.pml.trail
-pan: reducing search depth to 228
-pan: wrote system.pml.trail
-pan: reducing search depth to 228
-pan: wrote system.pml.trail
-pan: reducing search depth to 226
-pan: wrote system.pml.trail
-pan: reducing search depth to 226
-pan: wrote system.pml.trail
-pan: reducing search depth to 226
-pan: wrote system.pml.trail
-pan: reducing search depth to 226
-pan: wrote system.pml.trail
-pan: reducing search depth to 226
-pan: wrote system.pml.trail
-pan: reducing search depth to 226
-pan: wrote system.pml.trail
-pan: reducing search depth to 224
-pan: wrote system.pml.trail
-pan: reducing search depth to 224
-pan: wrote system.pml.trail
-pan: reducing search depth to 224
-pan: wrote system.pml.trail
-pan: reducing search depth to 224
-pan: wrote system.pml.trail
-pan: reducing search depth to 224
-pan: wrote system.pml.trail
-pan: reducing search depth to 224
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-Depth=     289 States=    1e+06 Transitions= 1.99e+06 Memory=   889.025	t=     4.28 R=   2e+05
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 212
-pan: wrote system.pml.trail
-pan: reducing search depth to 208
-pan: wrote system.pml.trail
-pan: reducing search depth to 208
-pan: wrote system.pml.trail
-pan: reducing search depth to 208
-pan: wrote system.pml.trail
-pan: reducing search depth to 208
-pan: wrote system.pml.trail
-pan: reducing search depth to 208
-pan: wrote system.pml.trail
-pan: reducing search depth to 208
-pan: wrote system.pml.trail
-pan: reducing search depth to 206
-pan: wrote system.pml.trail
-pan: reducing search depth to 206
-pan: wrote system.pml.trail
-pan: reducing search depth to 206
-pan: wrote system.pml.trail
-pan: reducing search depth to 206
-pan: wrote system.pml.trail
-pan: reducing search depth to 206
-pan: wrote system.pml.trail
-pan: reducing search depth to 206
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-Depth=     289 States=    2e+06 Transitions= 5.49e+06 Memory=  1582.764	t=     12.8 R=   2e+05
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: wrote system.pml.trail
-pan: reducing search depth to 194
-pan: reached -DMEMLIM bound
-	2.14461e+09 bytes used
-	6.5535e+06 bytes more needed
-	2.14748e+09 bytes limit
-hint: to reduce memory, recompile with
-  -DCOLLAPSE # good, fast compression, or
-  -DMA=752   # better/slower compression, or
-  -DHC # hash-compaction, approximation
-  -DBITSTATE # supertrace, approximation
+pan:1: assertion violated  !((global_state.actuator.x>5)) (at depth 156)
+pan: wrote system.pml1.trail
 
 (Spin Version 6.5.2 -- 9 June 2022 +  N7S Custom - Work-in-Progress)
 Warning: Search not completed
@@ -147,23 +11,22 @@ Full statespace search for:
 	acceptance   cycles 	- (not selected)
 	invalid end states	- (disabled by -E flag)
 
-State-vector 752 byte, depth reached 289, errors: 63
-  2672487 states, stored
-  4794177 states, matched
-  7466664 transitions (= stored+matched)
- 42009792 atomic steps
-hash conflicts:    216194 (resolved)
+State-vector 708 byte, depth reached 262, errors: 1
+    47532 states, stored
+    25412 states, matched
+    72944 transitions (= stored+matched)
+   408889 atomic steps
+hash conflicts:         3 (resolved)
 
 Stats on memory usage (in Megabytes):
- 1987.972	equivalent memory usage for states (stored*(State-vector + overhead))
- 1923.450	actual memory usage for states (compression: 96.75%)
-         	state-vector as stored = 727 byte + 28 byte overhead
+   33.363	equivalent memory usage for states (stored*(State-vector + overhead))
+   43.669	actual memory usage for states
   128.000	memory used for hash table (-w24)
-    0.012	memory used for DFS stack (-m194)
-    6.207	memory lost to fragmentation
- 2045.257	total actual memory usage
+   61.035	memory used for DFS stack (-m1000000)
+    6.171	memory lost to fragmentation
+  226.535	total actual memory usage
 
 
 
-pan: elapsed time 17.2 seconds
-pan: rate 155196.69 states/second
+pan: elapsed time 0.17 seconds
+pan: rate    279600 states/second

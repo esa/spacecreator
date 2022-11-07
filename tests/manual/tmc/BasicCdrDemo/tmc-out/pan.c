@@ -531,86 +531,71 @@ uchar reached8 [] = {
 uchar *loopstate8;
 
 short src_ln7 [] = {
-	  0,   0,   0,   0, 12594, 12593, 5377, 5382, 
-	5381, 5376,   4,   4,   7,   8,   9,  10, 
-	 11,  12,  13,  71,  70, 5254, 5259, 5258, 
-	5253, 5254, 5259, 5258, 5253, 5254, 5259, 5258, 
-	5253,  15,  49,  48,  21,  22,  23,  71, 
-	 70, 5254, 5259, 5258, 5253,  35,  34,  27, 
-	 28,  29,  71,  70,  31,  32,  33,   6, 
-	 35,  36,   5,  37,   5,   2,  39, 212, 
-	5377, 5382, 5381, 5376,   4,   4,   7,   8, 
-	  9,  10,  11,  12,  13,  45,  44,  16, 
-	 53,  52,  18,  19,  20,  21,  53,  52, 
-	 23,  24,  25,  15,  27,   6,  28,  29, 
-	  5,  30,   5,   2,  32, 214, 5377, 5382, 
-	5381, 5376,   6,   6,   9,  10,  11,  12, 
-	 13,  14,  15,  17,  18,  19,  20,  21, 
-	 22,  23,  24,  16,  26,  26, 5254, 5259, 
-	5258, 5253,  28,  29,  30,   8,  32,  33, 
-	  7,  34,   7,   4,  40, 216, 217, 209, 
-	219,   0, };
+	  0,   0,   0,   0, 12361, 12360, 5144, 5149, 
+	5148, 5143,   4,   4,   7,   8,   9,  10, 
+	 11,  12,  13,  42,  41,  16,  50,  49, 
+	 18,  19,  20,  21,  50,  49,  23,  24, 
+	 25,  15,  27,   6,  28,  29,   5,  30, 
+	  5,   2,  32, 203, 5144, 5149, 5148, 5143, 
+	  4,   4,   7,   8,   9,  10,  11,  12, 
+	 13,  68,  67,  15,  16,  17,  18,  68, 
+	 67, 5021, 5026, 5025, 5020, 5021, 5026, 5025, 
+	5020, 5021, 5026, 5025, 5020,  20,  46,  45, 
+	 26,  27,  28,  68,  67, 5021, 5026, 5025, 
+	5020,  32,  31,  32,  33,   6,  35,  36, 
+	  5,  37,   5,   2,  39, 205, 206, 200, 
+	208,   0, };
 S_F_MAP src_file7 [] = {
 	{ "-", 0, 3 },
 	{ "dataview.pml", 4, 9 },
-	{ "modemanager.pml", 10, 18 },
+	{ "actuator.pml", 10, 18 },
 	{ "system.pml", 19, 20 },
-	{ "dataview.pml", 21, 32 },
-	{ "modemanager.pml", 33, 33 },
-	{ "system.pml", 34, 35 },
-	{ "modemanager.pml", 36, 38 },
-	{ "system.pml", 39, 40 },
-	{ "dataview.pml", 41, 44 },
-	{ "system.pml", 45, 46 },
-	{ "modemanager.pml", 47, 49 },
-	{ "system.pml", 50, 51 },
-	{ "modemanager.pml", 52, 62 },
-	{ "system.pml", 63, 63 },
-	{ "dataview.pml", 64, 67 },
-	{ "actuator.pml", 68, 76 },
-	{ "system.pml", 77, 78 },
-	{ "actuator.pml", 79, 79 },
-	{ "system.pml", 80, 81 },
-	{ "actuator.pml", 82, 85 },
-	{ "system.pml", 86, 87 },
-	{ "actuator.pml", 88, 100 },
-	{ "system.pml", 101, 101 },
-	{ "dataview.pml", 102, 105 },
-	{ "Observerdemo.pml", 106, 125 },
-	{ "dataview.pml", 126, 129 },
-	{ "Observerdemo.pml", 130, 140 },
-	{ "system.pml", 141, 144 },
-	{ "-", 145, 146 }
+	{ "actuator.pml", 21, 21 },
+	{ "system.pml", 22, 23 },
+	{ "actuator.pml", 24, 27 },
+	{ "system.pml", 28, 29 },
+	{ "actuator.pml", 30, 42 },
+	{ "system.pml", 43, 43 },
+	{ "dataview.pml", 44, 47 },
+	{ "modemanager.pml", 48, 56 },
+	{ "system.pml", 57, 58 },
+	{ "modemanager.pml", 59, 62 },
+	{ "system.pml", 63, 64 },
+	{ "dataview.pml", 65, 76 },
+	{ "modemanager.pml", 77, 77 },
+	{ "system.pml", 78, 79 },
+	{ "modemanager.pml", 80, 82 },
+	{ "system.pml", 83, 84 },
+	{ "dataview.pml", 85, 88 },
+	{ "system.pml", 89, 90 },
+	{ "modemanager.pml", 91, 100 },
+	{ "system.pml", 101, 104 },
+	{ "-", 105, 106 }
 };
 uchar reached7 [] = {
 	  0,   1,   0,   0,   1,   1,   1,   1, 
 	  0,   1,   1,   0,   1,   1,   1,   0, 
 	  0,   1,   1,   1,   0,   1,   1,   0, 
-	  1,   1,   1,   0,   0,   1,   1,   0, 
-	  0,   0,   1,   0,   0,   1,   1,   1, 
-	  0,   1,   1,   0,   0,   1,   0,   0, 
-	  1,   1,   1,   0,   0,   0,   1,   1, 
-	  1,   1,   0,   1,   1,   0,   0,   0, 
-	  1,   1,   0,   1,   1,   0,   1,   1, 
-	  1,   0,   0,   1,   1,   1,   0,   1, 
-	  1,   0,   0,   0,   1,   1,   1,   0, 
-	  0,   0,   1,   0,   1,   1,   1,   1, 
-	  0,   1,   1,   0,   0,   0,   1,   1, 
+	  0,   0,   1,   1,   1,   0,   0,   0, 
+	  1,   0,   1,   1,   1,   1,   0,   1, 
+	  1,   0,   0,   0,   1,   1,   0,   1, 
+	  1,   0,   1,   1,   1,   0,   0,   1, 
+	  1,   1,   0,   0,   0,   1,   1,   1, 
 	  0,   1,   1,   0,   1,   1,   1,   0, 
-	  0,   1,   1,   1,   0,   0,   1,   1, 
-	  0,   0,   1,   0,   1,   1,   1,   1, 
-	  0,   0,   0,   0,   1,   1,   1,   1, 
+	  0,   1,   1,   0,   0,   0,   1,   0, 
+	  0,   1,   1,   1,   0,   1,   1,   0, 
+	  0,   1,   0,   0,   1,   1,   1,   1, 
 	  0,   1,   1,   0,   0,   0,   0,   0, 
 	  0,   0, };
 uchar *loopstate7;
 
 short src_ln6 [] = {
-	  0, 196, 198, 199, 199, 199,  25,  27, 
+	  0, 187, 189, 190, 190, 190,  25,  27, 
 	 27,  27,  27,  27,  28,  27,  26,  30, 
 	 30,  30,  30,  30,  31,  30,  29,  33, 
 	 33,  33,  33,  33,  34,  33,  32,  25, 
-	 36,  36,  23,  57,  56, 201, 199, 205, 
-	205, 205, 206, 205, 206,   0, };
+	 36,  36,  23,  54,  53, 192, 190, 196, 
+	196, 196, 197, 196, 197,   0, };
 S_F_MAP src_file6 [] = {
 	{ "-", 0, 0 },
 	{ "system.pml", 1, 5 },
@@ -628,17 +613,17 @@ uchar reached6 [] = {
 uchar *loopstate6;
 
 short src_ln5 [] = {
-	  0, 175, 178, 179, 182, 183, 184,  66, 
-	5263, 5268, 5267, 5262, 5272, 5277, 5276, 5271, 
-	5280,   4,   4,   7,   8,   9,  10,  11, 
-	 12,  13,  71,  70, 5254, 5259, 5258, 5253, 
-	5254, 5259, 5258, 5253, 5254, 5259, 5258, 5253, 
-	 15,  49,  48,  21,  22,  23,  71,  70, 
-	5254, 5259, 5258, 5253,  35,  34,  27,  28, 
-	 29,  71,  70,  31,  32,  33,   6,  35, 
+	  0, 166, 169, 170, 173, 174, 175,  66, 
+	5030, 5035, 5034, 5029, 5039, 5044, 5043, 5038, 
+	5047,   4,   4,   7,   8,   9,  10,  11, 
+	 12,  13,  68,  67,  15,  16,  17,  18, 
+	 68,  67, 5021, 5026, 5025, 5020, 5021, 5026, 
+	5025, 5020, 5021, 5026, 5025, 5020,  20,  46, 
+	 45,  26,  27,  28,  68,  67, 5021, 5026, 
+	5025, 5020,  32,  31,  32,  33,   6,  35, 
 	 36,   5,  37,   5,   2,  69,  70,  65, 
-	 72,  64, 186, 187, 188, 181, 190, 190, 
-	177, 176, 193, 176, 193,   0, };
+	 72,  64, 177, 178, 179, 172, 181, 181, 
+	168, 167, 184, 167, 184,   0, };
 S_F_MAP src_file5 [] = {
 	{ "-", 0, 0 },
 	{ "system.pml", 1, 6 },
@@ -646,16 +631,16 @@ S_F_MAP src_file5 [] = {
 	{ "dataview.pml", 8, 16 },
 	{ "modemanager.pml", 17, 25 },
 	{ "system.pml", 26, 27 },
-	{ "dataview.pml", 28, 39 },
-	{ "modemanager.pml", 40, 40 },
-	{ "system.pml", 41, 42 },
-	{ "modemanager.pml", 43, 45 },
-	{ "system.pml", 46, 47 },
-	{ "dataview.pml", 48, 51 },
+	{ "modemanager.pml", 28, 31 },
+	{ "system.pml", 32, 33 },
+	{ "dataview.pml", 34, 45 },
+	{ "modemanager.pml", 46, 46 },
+	{ "system.pml", 47, 48 },
+	{ "modemanager.pml", 49, 51 },
 	{ "system.pml", 52, 53 },
-	{ "modemanager.pml", 54, 56 },
-	{ "system.pml", 57, 58 },
-	{ "modemanager.pml", 59, 73 },
+	{ "dataview.pml", 54, 57 },
+	{ "system.pml", 58, 59 },
+	{ "modemanager.pml", 60, 73 },
 	{ "system.pml", 74, 84 },
 	{ "-", 85, 86 }
 };
@@ -663,27 +648,27 @@ uchar reached5 [] = {
 	  0,   0,   1,   0,   1,   0,   0,   1, 
 	  1,   1,   0,   1,   1,   1,   0,   0, 
 	  0,   1,   0,   1,   1,   1,   0,   0, 
-	  1,   1,   1,   0,   1,   1,   0,   1, 
-	  1,   1,   0,   0,   1,   1,   0,   0, 
-	  0,   1,   0,   0,   1,   1,   1,   0, 
-	  1,   1,   0,   0,   1,   0,   0,   1, 
-	  1,   1,   0,   0,   0,   1,   1,   1, 
+	  1,   1,   1,   0,   0,   0,   1,   1, 
+	  1,   0,   1,   1,   0,   1,   1,   1, 
+	  0,   0,   1,   1,   0,   0,   0,   1, 
+	  0,   0,   1,   1,   1,   0,   1,   1, 
+	  0,   0,   1,   0,   0,   1,   1,   1, 
 	  1,   0,   1,   1,   0,   1,   1,   1, 
 	  1,   0,   1,   1,   0,   0,   1,   0, 
 	  1,   0,   1,   1,   0,   0, };
 uchar *loopstate5;
 
 short src_ln4 [] = {
-	  0, 154, 157, 158, 161, 162, 163,  56, 
-	5254, 5259, 5258, 5253,   4,   4,   7,   8, 
-	  9,  10,  11,  12,  13,  71,  70, 5254, 
-	5259, 5258, 5253, 5254, 5259, 5258, 5253, 5254, 
-	5259, 5258, 5253,  15,  49,  48,  21,  22, 
-	 23,  71,  70, 5254, 5259, 5258, 5253,  35, 
-	 34,  27,  28,  29,  71,  70,  31,  32, 
+	  0, 145, 148, 149, 152, 153, 154,  56, 
+	5021, 5026, 5025, 5020,   4,   4,   7,   8, 
+	  9,  10,  11,  12,  13,  68,  67,  15, 
+	 16,  17,  18,  68,  67, 5021, 5026, 5025, 
+	5020, 5021, 5026, 5025, 5020, 5021, 5026, 5025, 
+	5020,  20,  46,  45,  26,  27,  28,  68, 
+	 67, 5021, 5026, 5025, 5020,  32,  31,  32, 
 	 33,   6,  35,  36,   5,  37,   5,   2, 
-	 59,  60,  55,  62,  54, 165, 166, 167, 
-	160, 169, 169, 156, 155, 172, 155, 172, 
+	 59,  60,  55,  62,  54, 156, 157, 158, 
+	151, 160, 160, 147, 146, 163, 146, 163, 
 	  0, };
 S_F_MAP src_file4 [] = {
 	{ "-", 0, 0 },
@@ -692,27 +677,27 @@ S_F_MAP src_file4 [] = {
 	{ "dataview.pml", 8, 11 },
 	{ "modemanager.pml", 12, 20 },
 	{ "system.pml", 21, 22 },
-	{ "dataview.pml", 23, 34 },
-	{ "modemanager.pml", 35, 35 },
-	{ "system.pml", 36, 37 },
-	{ "modemanager.pml", 38, 40 },
-	{ "system.pml", 41, 42 },
-	{ "dataview.pml", 43, 46 },
+	{ "modemanager.pml", 23, 26 },
+	{ "system.pml", 27, 28 },
+	{ "dataview.pml", 29, 40 },
+	{ "modemanager.pml", 41, 41 },
+	{ "system.pml", 42, 43 },
+	{ "modemanager.pml", 44, 46 },
 	{ "system.pml", 47, 48 },
-	{ "modemanager.pml", 49, 51 },
-	{ "system.pml", 52, 53 },
-	{ "modemanager.pml", 54, 68 },
+	{ "dataview.pml", 49, 52 },
+	{ "system.pml", 53, 54 },
+	{ "modemanager.pml", 55, 68 },
 	{ "system.pml", 69, 79 },
 	{ "-", 80, 81 }
 };
 uchar reached4 [] = {
 	  0,   0,   1,   0,   1,   0,   0,   1, 
 	  1,   1,   0,   0,   1,   0,   1,   1, 
-	  1,   0,   0,   1,   1,   1,   0,   1, 
-	  1,   0,   1,   1,   1,   0,   0,   1, 
-	  1,   0,   0,   0,   1,   0,   0,   1, 
-	  1,   1,   0,   1,   1,   0,   0,   1, 
-	  0,   0,   1,   1,   1,   0,   0,   0, 
+	  1,   0,   0,   1,   1,   1,   0,   0, 
+	  0,   1,   1,   1,   0,   1,   1,   0, 
+	  1,   1,   1,   0,   0,   1,   1,   0, 
+	  0,   0,   1,   0,   0,   1,   1,   1, 
+	  0,   1,   1,   0,   0,   1,   0,   0, 
 	  1,   1,   1,   1,   0,   1,   1,   0, 
 	  1,   1,   1,   1,   0,   1,   1,   0, 
 	  0,   1,   0,   1,   0,   1,   1,   0, 
@@ -720,22 +705,17 @@ uchar reached4 [] = {
 uchar *loopstate4;
 
 short src_ln3 [] = {
-	  0, 130, 133, 134, 137, 138, 139,  46, 
-	5254, 5259, 5258, 5253,   4,   4,   7,   8, 
-	  9,  10,  11,  12,  13,  71,  70, 5254, 
-	5259, 5258, 5253, 5254, 5259, 5258, 5253, 5254, 
-	5259, 5258, 5253,  15,  49,  48,  21,  22, 
-	 23,  71,  70, 5254, 5259, 5258, 5253,  35, 
-	 34,  27,  28,  29,  71,  70,  31,  32, 
+	  0, 124, 127, 128, 131, 132, 133,  46, 
+	5021, 5026, 5025, 5020,   4,   4,   7,   8, 
+	  9,  10,  11,  12,  13,  68,  67,  15, 
+	 16,  17,  18,  68,  67, 5021, 5026, 5025, 
+	5020, 5021, 5026, 5025, 5020, 5021, 5026, 5025, 
+	5020,  20,  46,  45,  26,  27,  28,  68, 
+	 67, 5021, 5026, 5025, 5020,  32,  31,  32, 
 	 33,   6,  35,  36,   5,  37,   5,   2, 
-	 49,  50,  45,  52,  44, 141,  57, 5254, 
-	5259, 5258, 5253,   6,   6,   9,  10,  11, 
-	 12,  13,  14,  15,  17,  18,  19,  20, 
-	 21,  22,  23,  24,  16,  26,  26, 5254, 
-	5259, 5258, 5253,  28,  29,  30,   8,  32, 
-	 33,   7,  34,   7,   4,  60,  61,  56, 
-	 63,  55, 143, 144, 145, 146, 136, 148, 
-	148, 132, 131, 151, 131, 151,   0, };
+	 49,  50,  45,  52,  44, 135, 136, 137, 
+	130, 139, 139, 126, 125, 142, 125, 142, 
+	  0, };
 S_F_MAP src_file3 [] = {
 	{ "-", 0, 0 },
 	{ "system.pml", 1, 6 },
@@ -743,46 +723,35 @@ S_F_MAP src_file3 [] = {
 	{ "dataview.pml", 8, 11 },
 	{ "modemanager.pml", 12, 20 },
 	{ "system.pml", 21, 22 },
-	{ "dataview.pml", 23, 34 },
-	{ "modemanager.pml", 35, 35 },
-	{ "system.pml", 36, 37 },
-	{ "modemanager.pml", 38, 40 },
-	{ "system.pml", 41, 42 },
-	{ "dataview.pml", 43, 46 },
+	{ "modemanager.pml", 23, 26 },
+	{ "system.pml", 27, 28 },
+	{ "dataview.pml", 29, 40 },
+	{ "modemanager.pml", 41, 41 },
+	{ "system.pml", 42, 43 },
+	{ "modemanager.pml", 44, 46 },
 	{ "system.pml", 47, 48 },
-	{ "modemanager.pml", 49, 51 },
-	{ "system.pml", 52, 53 },
-	{ "modemanager.pml", 54, 68 },
-	{ "system.pml", 69, 69 },
-	{ "Observerdemo.pml", 70, 70 },
-	{ "dataview.pml", 71, 74 },
-	{ "Observerdemo.pml", 75, 94 },
-	{ "dataview.pml", 95, 98 },
-	{ "Observerdemo.pml", 99, 113 },
-	{ "system.pml", 114, 125 },
-	{ "-", 126, 127 }
+	{ "dataview.pml", 49, 52 },
+	{ "system.pml", 53, 54 },
+	{ "modemanager.pml", 55, 68 },
+	{ "system.pml", 69, 79 },
+	{ "-", 80, 81 }
 };
 uchar reached3 [] = {
 	  0,   0,   1,   0,   1,   0,   0,   1, 
 	  1,   1,   0,   0,   1,   0,   1,   1, 
-	  1,   0,   0,   1,   1,   1,   0,   1, 
-	  1,   0,   1,   1,   1,   0,   0,   1, 
-	  1,   0,   0,   0,   1,   0,   0,   1, 
-	  1,   1,   0,   1,   1,   0,   0,   1, 
-	  0,   0,   1,   1,   1,   0,   0,   0, 
+	  1,   0,   0,   1,   1,   1,   0,   0, 
+	  0,   1,   1,   1,   0,   1,   1,   0, 
+	  1,   1,   1,   0,   0,   1,   1,   0, 
+	  0,   0,   1,   0,   0,   1,   1,   1, 
+	  0,   1,   1,   0,   0,   1,   0,   0, 
 	  1,   1,   1,   1,   0,   1,   1,   0, 
-	  1,   1,   1,   1,   0,   0,   1,   1, 
-	  1,   0,   0,   1,   0,   1,   1,   1, 
-	  0,   0,   1,   1,   1,   0,   0,   1, 
-	  1,   0,   0,   1,   0,   1,   1,   1, 
-	  1,   0,   0,   0,   0,   1,   1,   1, 
-	  1,   0,   1,   1,   0,   1,   1,   1, 
-	  1,   0,   0,   1,   1,   0,   0,   1, 
-	  0,   1,   0,   1,   1,   0,   0, };
+	  1,   1,   1,   1,   0,   1,   1,   0, 
+	  0,   1,   0,   1,   0,   1,   1,   0, 
+	  0, };
 uchar *loopstate3;
 
 short src_ln2 [] = {
-	  0, 117, 119, 120, 120, 120,   4,   6, 
+	  0, 111, 113, 114, 114, 114,   4,   6, 
 	  6,   6,   6,   6,   7,   6,   5,   9, 
 	  9,   9,   9,   9,  10,   9,   8,  12, 
 	 12,  12,  12,  12,  13,  12,  11,   4, 
@@ -790,8 +759,8 @@ short src_ln2 [] = {
 	  6,   7,   6,   5,   9,   9,   9,   9, 
 	  9,  10,   9,   8,  12,  12,  12,  12, 
 	 12,  13,  12,  11,   4,  15,  15,   2, 
-	 18,  61,  60, 122, 120, 126, 126, 126, 
-	127, 126, 127,   0, };
+	 18,  58,  57, 116, 114, 120, 120, 120, 
+	121, 120, 121,   0, };
 S_F_MAP src_file2 [] = {
 	{ "-", 0, 0 },
 	{ "system.pml", 1, 5 },
@@ -813,8 +782,8 @@ uchar reached2 [] = {
 uchar *loopstate2;
 
 short src_ln1 [] = {
-	  0,  99, 102, 105, 106, 107, 108, 109, 
-	110, 104, 112, 101, 100, 114, 100, 114, 
+	  0,  93,  96,  99, 100, 101, 102, 103, 
+	104,  98, 106,  95,  94, 108,  94, 108, 
 	  0, };
 S_F_MAP src_file1 [] = {
 	{ "-", 0, 0 },
@@ -828,24 +797,19 @@ uchar reached1 [] = {
 uchar *loopstate1;
 
 short src_ln0 [] = {
-	  0,  75,  78,  79,  82,  83,  84,  39, 
-	5254, 5259, 5258, 5253,   4,   4,   7,   8, 
-	  9,  10,  11,  12,  13,  45,  44,  16, 
-	 53,  52,  18,  19,  20,  21,  53,  52, 
+	  0,  72,  75,  76,  79,  80,  81,  39, 
+	5021, 5026, 5025, 5020,   4,   4,   7,   8, 
+	  9,  10,  11,  12,  13,  42,  41,  16, 
+	 50,  49,  18,  19,  20,  21,  50,  49, 
 	 23,  24,  25,  15,  27,   6,  28,  29, 
-	  5,  30,   5,   2,  42, 5254, 5259, 5258, 
-	5253,   4,   4,   7,   8,   9,  10,  11, 
-	 12,  13,  45,  44,  16,  53,  52,  18, 
-	 19,  20,  21,  53,  52,  23,  24,  25, 
+	  5,  30,   5,   2,  42, 5021, 5026, 5025, 
+	5020,   4,   4,   7,   8,   9,  10,  11, 
+	 12,  13,  42,  41,  16,  50,  49,  18, 
+	 19,  20,  21,  50,  49,  23,  24,  25, 
 	 15,  27,   6,  28,  29,   5,  30,   5, 
-	  2,  45,  46,  38,  48,  37,  86,  47, 
-	5254, 5259, 5258, 5253,   6,   6,   9,  10, 
-	 11,  12,  13,  14,  15,  17,  18,  19, 
-	 20,  21,  22,  23,  24,  16,  26,  26, 
-	5254, 5259, 5258, 5253,  28,  29,  30,   8, 
-	 32,  33,   7,  34,   7,   4,  50,  51, 
-	 46,  53,  45,  88,  89,  90,  91,  81, 
-	 93,  93,  77,  76,  96,  76,  96,   0, };
+	  2,  45,  46,  38,  48,  37,  83,  84, 
+	 85,  78,  87,  87,  74,  73,  90,  73, 
+	 90,   0, };
 S_F_MAP src_file0 [] = {
 	{ "-", 0, 0 },
 	{ "system.pml", 1, 6 },
@@ -866,14 +830,8 @@ S_F_MAP src_file0 [] = {
 	{ "actuator.pml", 63, 66 },
 	{ "system.pml", 67, 68 },
 	{ "actuator.pml", 69, 85 },
-	{ "system.pml", 86, 86 },
-	{ "Observerdemo.pml", 87, 87 },
-	{ "dataview.pml", 88, 91 },
-	{ "Observerdemo.pml", 92, 111 },
-	{ "dataview.pml", 112, 115 },
-	{ "Observerdemo.pml", 116, 130 },
-	{ "system.pml", 131, 142 },
-	{ "-", 143, 144 }
+	{ "system.pml", 86, 96 },
+	{ "-", 97, 98 }
 };
 uchar reached0 [] = {
 	  0,   0,   1,   0,   1,   0,   0,   1, 
@@ -886,14 +844,9 @@ uchar reached0 [] = {
 	  1,   1,   1,   0,   1,   1,   0,   0, 
 	  0,   1,   1,   1,   0,   0,   0,   1, 
 	  0,   1,   1,   1,   1,   0,   1,   1, 
-	  0,   1,   1,   1,   1,   0,   0,   1, 
-	  1,   1,   0,   0,   1,   0,   1,   1, 
-	  1,   0,   0,   1,   1,   1,   0,   0, 
-	  1,   1,   0,   0,   1,   0,   1,   1, 
-	  1,   1,   0,   0,   0,   0,   1,   1, 
-	  1,   1,   0,   1,   1,   0,   1,   1, 
-	  1,   1,   0,   0,   1,   1,   0,   0, 
-	  1,   0,   1,   0,   1,   1,   0,   0, };
+	  0,   1,   1,   1,   1,   0,   1,   1, 
+	  0,   0,   1,   0,   1,   0,   1,   1, 
+	  0,   0, };
 uchar *loopstate0;
 uchar reached9[3];  /* np_ */
 uchar *loopstate9;  /* np_ */
@@ -1252,20 +1205,18 @@ addproc(int calling_pid, int priority, int n)
 		break;
 	case 7:	/* :init: */
 		((P7 *)pptr(h))->_t = 7;
-		((P7 *)pptr(h))->_p = 143;
+		((P7 *)pptr(h))->_p = 103;
 #ifdef HAS_PRIORITY
 		((P7 *)pptr(h))->_priority = priority; /* was: 1 */
 #endif
-		reached7[143]=1;
+		reached7[103]=1;
 		/* params: */
 		/* locals: */
-		((P7 *)pptr(h))->_712_8_10_21_transition_id = 0;
-		((P7 *)pptr(h))->_712_8_11_23_transition_id = 0;
-		((P7 *)pptr(h))->_712_8_12_25_transition_id = 0;
+		((P7 *)pptr(h))->_710_8_8_17_transition_id = 0;
+		((P7 *)pptr(h))->_710_8_9_19_transition_id = 0;
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)pptr(h))->_712_8_10_21_transition_id);
-		logval(":init::transition_id", ((P7 *)pptr(h))->_712_8_11_23_transition_id);
-		logval(":init::transition_id", ((P7 *)pptr(h))->_712_8_12_25_transition_id);
+		logval(":init::transition_id", ((P7 *)pptr(h))->_710_8_8_17_transition_id);
+		logval(":init::transition_id", ((P7 *)pptr(h))->_710_8_9_19_transition_id);
 #endif
 #ifdef HAS_CODE
 		locinit7(h);
@@ -1282,11 +1233,11 @@ addproc(int calling_pid, int priority, int n)
 		/* locals: */
 		((P6 *)pptr(h))->value = 0;
 		((P6 *)pptr(h))->inputVectorCounter = 0;
-		((P6 *)pptr(h))->_711_7_8_17_Sensor_reading_x_tmp = 0;
+		((P6 *)pptr(h))->_709_7_6_13_Sensor_reading_x_tmp = 0;
 #ifdef VAR_RANGES
 		logval("Sensor_reading:value", ((P6 *)pptr(h))->value);
 		logval("Sensor_reading:inputVectorCounter", ((P6 *)pptr(h))->inputVectorCounter);
-		logval("Sensor_reading:Sensor_reading_x_tmp", ((P6 *)pptr(h))->_711_7_8_17_Sensor_reading_x_tmp);
+		logval("Sensor_reading:Sensor_reading_x_tmp", ((P6 *)pptr(h))->_709_7_6_13_Sensor_reading_x_tmp);
 #endif
 #ifdef HAS_CODE
 		locinit6(h);
@@ -1301,9 +1252,9 @@ addproc(int calling_pid, int priority, int n)
 		reached5[1]=1;
 		/* params: */
 		/* locals: */
-		((P5 *)pptr(h))->_710_6_7_16_transition_id = 0;
+		((P5 *)pptr(h))->_708_6_5_12_transition_id = 0;
 #ifdef VAR_RANGES
-		logval("Modemanager_tc:transition_id", ((P5 *)pptr(h))->_710_6_7_16_transition_id);
+		logval("Modemanager_tc:transition_id", ((P5 *)pptr(h))->_708_6_5_12_transition_id);
 #endif
 #ifdef HAS_CODE
 		locinit5(h);
@@ -1318,9 +1269,9 @@ addproc(int calling_pid, int priority, int n)
 		reached4[1]=1;
 		/* params: */
 		/* locals: */
-		((P4 *)pptr(h))->_709_5_6_14_transition_id = 0;
+		((P4 *)pptr(h))->_707_5_4_10_transition_id = 0;
 #ifdef VAR_RANGES
-		logval("Modemanager_reading:transition_id", ((P4 *)pptr(h))->_709_5_6_14_transition_id);
+		logval("Modemanager_reading:transition_id", ((P4 *)pptr(h))->_707_5_4_10_transition_id);
 #endif
 #ifdef HAS_CODE
 		locinit4(h);
@@ -1335,11 +1286,9 @@ addproc(int calling_pid, int priority, int n)
 		reached3[1]=1;
 		/* params: */
 		/* locals: */
-		((P3 *)pptr(h))->_708_4_4_10_transition_id = 0;
-		((P3 *)pptr(h))->_708_4_5_12_transition_id = 0;
+		((P3 *)pptr(h))->_706_4_3_8_transition_id = 0;
 #ifdef VAR_RANGES
-		logval("Modemanager_feedback:transition_id", ((P3 *)pptr(h))->_708_4_4_10_transition_id);
-		logval("Modemanager_feedback:transition_id", ((P3 *)pptr(h))->_708_4_5_12_transition_id);
+		logval("Modemanager_feedback:transition_id", ((P3 *)pptr(h))->_706_4_3_8_transition_id);
 #endif
 #ifdef HAS_CODE
 		locinit3(h);
@@ -1357,12 +1306,12 @@ addproc(int calling_pid, int priority, int n)
 		((P2 *)pptr(h))->value.param_a = 0;
 		((P2 *)pptr(h))->value.param_b = 0;
 		((P2 *)pptr(h))->inputVectorCounter = 0;
-		((P2 *)pptr(h))->_707_3_3_7_11_T_SmallInteger_tmp = 0;
-		((P2 *)pptr(h))->_707_3_3_7_12_T_SmallInteger_tmp = 0;
+		((P2 *)pptr(h))->_705_3_2_5_9_T_SmallInteger_tmp = 0;
+		((P2 *)pptr(h))->_705_3_2_5_10_T_SmallInteger_tmp = 0;
 #ifdef VAR_RANGES
 		logval("Egse_tc:inputVectorCounter", ((P2 *)pptr(h))->inputVectorCounter);
-		logval("Egse_tc:T_SmallInteger_tmp", ((P2 *)pptr(h))->_707_3_3_7_11_T_SmallInteger_tmp);
-		logval("Egse_tc:T_SmallInteger_tmp", ((P2 *)pptr(h))->_707_3_3_7_12_T_SmallInteger_tmp);
+		logval("Egse_tc:T_SmallInteger_tmp", ((P2 *)pptr(h))->_705_3_2_5_9_T_SmallInteger_tmp);
+		logval("Egse_tc:T_SmallInteger_tmp", ((P2 *)pptr(h))->_705_3_2_5_10_T_SmallInteger_tmp);
 		logval("Egse_tc:value.param_a", ((P2 *)pptr(h))->value.param_a);
 		logval("Egse_tc:value.param_b", ((P2 *)pptr(h))->value.param_b);
 #endif
@@ -1394,13 +1343,11 @@ addproc(int calling_pid, int priority, int n)
 		reached0[1]=1;
 		/* params: */
 		/* locals: */
-		((P0 *)pptr(h))->_705_1_1_2_transition_id = 0;
-		((P0 *)pptr(h))->_705_1_1_4_transition_id = 0;
-		((P0 *)pptr(h))->_705_1_2_6_transition_id = 0;
+		((P0 *)pptr(h))->_703_1_1_2_transition_id = 0;
+		((P0 *)pptr(h))->_703_1_1_4_transition_id = 0;
 #ifdef VAR_RANGES
-		logval("Actuator_ctrl:transition_id", ((P0 *)pptr(h))->_705_1_1_2_transition_id);
-		logval("Actuator_ctrl:transition_id", ((P0 *)pptr(h))->_705_1_1_4_transition_id);
-		logval("Actuator_ctrl:transition_id", ((P0 *)pptr(h))->_705_1_2_6_transition_id);
+		logval("Actuator_ctrl:transition_id", ((P0 *)pptr(h))->_703_1_1_2_transition_id);
+		logval("Actuator_ctrl:transition_id", ((P0 *)pptr(h))->_703_1_1_4_transition_id);
 #endif
 #ifdef HAS_CODE
 		locinit0(h);
@@ -1628,7 +1575,6 @@ run(void)
 	Maxbody = max(Maxbody, ((int) sizeof(Q5)));
 	Maxbody = max(Maxbody, ((int) sizeof(Q6)));
 	Maxbody = max(Maxbody, ((int) sizeof(Q7)));
-	Maxbody = max(Maxbody, ((int) sizeof(Q8)));
 	Maxbody = max(Maxbody, sizeof(State)-VECTORSZ);
 	if ((Maxbody % WS) != 0)
 		Maxbody += WS - (Maxbody % WS);
@@ -13005,11 +12951,8 @@ iniglobals(int calling_pid)
 		now.Modemanager_feedback_channel = addqueue(calling_pid, 3, 0);
 		now.Modemanager_reading_channel = addqueue(calling_pid, 4, 0);
 		now.Modemanager_tc_channel = addqueue(calling_pid, 5, 0);
-		now.Modemanager_lock = addqueue(calling_pid, 6, 0);
-		now.Actuator_lock = addqueue(calling_pid, 7, 0);
-		now.Observerdemo_lock = addqueue(calling_pid, 8, 0);
-		now.observerdemo_0_y = 0;
-		now.observerdemo_0_x = 0;
+		now.Actuator_lock = addqueue(calling_pid, 6, 0);
+		now.Modemanager_lock = addqueue(calling_pid, 7, 0);
 		now.inited = 0;
 		now.Actuator_ctrl_signal_parameter = 0;
 		now.Modemanager_feedback_signal_parameter = 0;
@@ -13118,10 +13061,6 @@ iniglobals(int calling_pid)
 		now.Egse_tm_signal_parameter.feedback = 0;
 		now.Modemanager_tc_signal_parameter.param_a = 0;
 		now.Modemanager_tc_signal_parameter.param_b = 0;
-		now.global_state.observerdemo.state = 0;
-		now.global_state.observerdemo.init_done = 0;
-		now.global_state.observerdemo.sender = 0;
-		now.global_state.observerdemo.reference = 0;
 		now.global_state.actuator.state = 0;
 		now.global_state.actuator.init_done = 0;
 		now.global_state.actuator.sender = 0;
@@ -13141,8 +13080,6 @@ iniglobals(int calling_pid)
 		now.global_state.timers.modemanager.dummy = 0;
 		now.global_state.timers.dummy_entry.dummy = 0;
 #ifdef VAR_RANGES
-		logval("observerdemo_0_y", now.observerdemo_0_y);
-		logval("observerdemo_0_x", now.observerdemo_0_x);
 		logval("inited", now.inited);
 		logval("Actuator_ctrl_signal_parameter", now.Actuator_ctrl_signal_parameter);
 		logval("Modemanager_feedback_signal_parameter", now.Modemanager_feedback_signal_parameter);
@@ -13251,10 +13188,6 @@ iniglobals(int calling_pid)
 		logval("Egse_tm_signal_parameter.feedback", now.Egse_tm_signal_parameter.feedback);
 		logval("Modemanager_tc_signal_parameter.param_a", now.Modemanager_tc_signal_parameter.param_a);
 		logval("Modemanager_tc_signal_parameter.param_b", now.Modemanager_tc_signal_parameter.param_b);
-		logval("global_state.observerdemo.state", now.global_state.observerdemo.state);
-		logval("global_state.observerdemo.init_done", now.global_state.observerdemo.init_done);
-		logval("global_state.observerdemo.sender", now.global_state.observerdemo.sender);
-		logval("global_state.observerdemo.reference", now.global_state.observerdemo.reference);
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 		logval("global_state.actuator.init_done", now.global_state.actuator.init_done);
 		logval("global_state.actuator.sender", now.global_state.actuator.sender);
@@ -13289,7 +13222,6 @@ addqueue(int calling_pid, int n, int is_rv)
 	printf("%4d: add queue %d\n", depth, i);
 #endif
 	switch (n) {
-	case 8: j = sizeof(Q8); q_flds[8] = 1; q_max[8] = 1; break;
 	case 7: j = sizeof(Q7); q_flds[7] = 1; q_max[7] = 1; break;
 	case 6: j = sizeof(Q6); q_flds[6] = 1; q_max[6] = 1; break;
 	case 5: j = sizeof(Q5); q_flds[5] = 2; q_max[5] = 1; break;
@@ -13386,7 +13318,6 @@ what_q_size(int t)
 	case 5: j = sizeof(Q5); break;
 	case 6: j = sizeof(Q6); break;
 	case 7: j = sizeof(Q7); break;
-	case 8: j = sizeof(Q8); break;
 	default: Uerror("bad qtype");
 	}
 	return j;
@@ -13421,19 +13352,6 @@ qsend(int into, int sorted, double fld0, double fld1, double fld2, int args_give
 	z = qptr(into);
 	j = ((Q0 *)qptr(into))->Qlen;
 	switch (((Q0 *)qptr(into))->_t) {
-	case 8:
-#ifdef HAS_SORTED
-		(trpt+1)->ipt = j;
-#endif
-		((Q8 *)z)->Qlen = ((Q8 *)z)->Qlen + 1;
-		((Q8 *)z)->contents[j].fld0 = fld0;
-		if (args_given != 1)
-		{	if (args_given > 1)
-				uerror("too many parameters in send stmnt");
-			else
-				uerror("too few parameters in send stmnt");
-		}
-		break;
 	case 7:
 #ifdef HAS_SORTED
 		(trpt+1)->ipt = j;
@@ -13546,7 +13464,6 @@ q_zero(int from)
 		return 0;
 	}
 	switch(((Q0 *)qptr(from))->_t) {
-	case 8: return 0;
 	case 7: return 0;
 	case 6: return 0;
 	case 5: return 0;
@@ -13655,7 +13572,6 @@ q_full(int from)
 {	if (!from--)
 	uerror("ref to uninitialized chan name (qfull)");
 	switch(((Q0 *)qptr(from))->_t) {
-	case 8: return (q_sz(from) == 1);
 	case 7: return (q_sz(from) == 1);
 	case 6: return (q_sz(from) == 1);
 	case 5: return (q_sz(from) == 1);
@@ -13707,21 +13623,6 @@ qrecv(int from, int slot, int fld, int done)
 		require('r', from);
 #endif
 	switch (((Q0 *)qptr(from))->_t) {
-	case 8:
-		if (fld == 0) r = ((Q8 *)z)->contents[slot].fld0;
-		if (done)
-		{	j = ((Q8 *)z)->Qlen;
-			((Q8 *)z)->Qlen = --j;
-			for (k=slot; k<j; k++)
-			{
-				((Q8 *)z)->contents[k].fld0 = 
-					((Q8 *)z)->contents[k+1].fld0;
-			}
-			((Q8 *)z)->contents[j].fld0 = 0;
-			if (fld+1 != 1)
-				uerror("missing pars in receive");
-		}
-		break;
 	case 7:
 		if (fld == 0) r = ((Q7 *)z)->contents[slot].fld0;
 		if (done)
@@ -13860,7 +13761,6 @@ col_q(int i, char *z)
 	char *x, *y;
 	Q0 *ptr = (Q0 *) qptr(i);
 	switch (ptr->_t) {
-	case 8: j = sizeof(Q8); break;
 	case 7: j = sizeof(Q7); break;
 	case 6: j = sizeof(Q6); break;
 	case 5: j = sizeof(Q5); break;
@@ -13919,10 +13819,6 @@ unsend(int into)
 	j = ((Q0 *)z)->Qlen;
 	((Q0 *)z)->Qlen = --j;
 	switch (((Q0 *)qptr(into))->_t) {
-	case 8:
-		((Q8 *)z)->contents[j].fld0 = 0;
-		_m = trpt->o_m;
-		break;
 	case 7:
 		((Q7 *)z)->contents[j].fld0 = 0;
 		_m = trpt->o_m;
@@ -13983,12 +13879,6 @@ unrecv(int from, int slot, int fld, double fldvar, int strt)
 	j = ((Q0 *)z)->Qlen;
 	if (strt) ((Q0 *)z)->Qlen = j+1;
 	switch (((Q0 *)qptr(from))->_t) {
-	case 8:
-		if (strt) {
-			((Q8 *)z)->contents[slot].fld0 = 0;
-		}
-		if (fld == 0) ((Q8 *)z)->contents[slot].fld0 = fldvar;
-		break;
 	case 7:
 		if (strt) {
 			((Q7 *)z)->contents[slot].fld0 = 0;
@@ -14082,20 +13972,15 @@ q_cond(short II, Trans *t)
 			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Modemanager_tc_channel) )))
 			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Modemanager_tc_channel) )))
 			    ) return 0; break;
-		case 6: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Modemanager_lock) )))
-			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Modemanager_lock) )))
-			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Modemanager_lock) )))
-			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Modemanager_lock) )))
-			    ) return 0; break;
-		case 7: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Actuator_lock) )))
+		case 6: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Actuator_lock) )))
 			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Actuator_lock) )))
 			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Actuator_lock) )))
 			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Actuator_lock) )))
 			    ) return 0; break;
-		case 8: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Observerdemo_lock) )))
-			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Observerdemo_lock) )))
-			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Observerdemo_lock) )))
-			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Observerdemo_lock) )))
+		case 7: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Modemanager_lock) )))
+			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Modemanager_lock) )))
+			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Modemanager_lock) )))
+			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Modemanager_lock) )))
 			    ) return 0; break;
 		default: Uerror("unknown qid - q_cond");
 				return 0;
@@ -15510,8 +15395,6 @@ c_globals(void)
 	printf("	int    selection:	%d\n", now.nothing.data.unhandled_input.event.data.sensor.selection);
 	printf("	int    selection:	%d\n", now.nothing.data.unhandled_input.event.selection);
 	printf("	int    selection:	%d\n", now.nothing.selection);
-	printf("	int    observerdemo_0_y:	%d\n", now.observerdemo_0_y);
-	printf("	int    observerdemo_0_x:	%d\n", now.observerdemo_0_x);
 	printf("	int    inited:	%d\n", now.inited);
 	printf("	chan Actuator_ctrl_channel (=%d):	len %d:\t", now.Actuator_ctrl_channel, q_len(now.Actuator_ctrl_channel));
 	c_chandump(now.Actuator_ctrl_channel);
@@ -15534,10 +15417,6 @@ c_globals(void)
 	printf("	int    param_a:	%d\n", now.Modemanager_tc_signal_parameter.param_a);
 	printf("	int    param_b:	%d\n", now.Modemanager_tc_signal_parameter.param_b);
 		printf("	(struct global_state)\n");
-	printf("	int    state:	%d\n", now.global_state.observerdemo.state);
-	printf("	bit    init_done:	%d\n", now.global_state.observerdemo.init_done);
-	printf("	int    sender:	%d\n", now.global_state.observerdemo.sender);
-	printf("	int    reference:	%d\n", now.global_state.observerdemo.reference);
 	printf("	int    state:	%d\n", now.global_state.actuator.state);
 	printf("	bit    init_done:	%d\n", now.global_state.actuator.init_done);
 	printf("	int    sender:	%d\n", now.global_state.actuator.sender);
@@ -15556,12 +15435,10 @@ c_globals(void)
 	printf("	bit    dummy:	%d\n", now.global_state.timers.actuator.dummy);
 	printf("	bit    dummy:	%d\n", now.global_state.timers.modemanager.dummy);
 	printf("	bit    dummy:	%d\n", now.global_state.timers.dummy_entry.dummy);
-	printf("	chan Modemanager_lock (=%d):	len %d:\t", now.Modemanager_lock, q_len(now.Modemanager_lock));
-	c_chandump(now.Modemanager_lock);
 	printf("	chan Actuator_lock (=%d):	len %d:\t", now.Actuator_lock, q_len(now.Actuator_lock));
 	c_chandump(now.Actuator_lock);
-	printf("	chan Observerdemo_lock (=%d):	len %d:\t", now.Observerdemo_lock, q_len(now.Observerdemo_lock));
-	c_chandump(now.Observerdemo_lock);
+	printf("	chan Modemanager_lock (=%d):	len %d:\t", now.Modemanager_lock, q_len(now.Modemanager_lock));
+	c_chandump(now.Modemanager_lock);
 }
 void
 c_locals(int pid, int tp)
@@ -15572,28 +15449,26 @@ c_locals(int pid, int tp)
 		break;
 	case 7:
 		printf("local vars proc %d (:init:):\n", pid);
-	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_712_8_10_21_transition_id);
-	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_712_8_11_23_transition_id);
-	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_712_8_12_25_transition_id);
+	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_710_8_8_17_transition_id);
+	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_710_8_9_19_transition_id);
 		break;
 	case 6:
 		printf("local vars proc %d (Sensor_reading):\n", pid);
 	printf("	int    value:	%d\n", ((P6 *)pptr(pid))->value);
 	printf("	int    inputVectorCounter:	%d\n", ((P6 *)pptr(pid))->inputVectorCounter);
-	printf("	int    Sensor_reading_x_tmp:	%d\n", ((P6 *)pptr(pid))->_711_7_8_17_Sensor_reading_x_tmp);
+	printf("	int    Sensor_reading_x_tmp:	%d\n", ((P6 *)pptr(pid))->_709_7_6_13_Sensor_reading_x_tmp);
 		break;
 	case 5:
 		printf("local vars proc %d (Modemanager_tc):\n", pid);
-	printf("	int    transition_id:	%d\n", ((P5 *)pptr(pid))->_710_6_7_16_transition_id);
+	printf("	int    transition_id:	%d\n", ((P5 *)pptr(pid))->_708_6_5_12_transition_id);
 		break;
 	case 4:
 		printf("local vars proc %d (Modemanager_reading):\n", pid);
-	printf("	int    transition_id:	%d\n", ((P4 *)pptr(pid))->_709_5_6_14_transition_id);
+	printf("	int    transition_id:	%d\n", ((P4 *)pptr(pid))->_707_5_4_10_transition_id);
 		break;
 	case 3:
 		printf("local vars proc %d (Modemanager_feedback):\n", pid);
-	printf("	int    transition_id:	%d\n", ((P3 *)pptr(pid))->_708_4_4_10_transition_id);
-	printf("	int    transition_id:	%d\n", ((P3 *)pptr(pid))->_708_4_5_12_transition_id);
+	printf("	int    transition_id:	%d\n", ((P3 *)pptr(pid))->_706_4_3_8_transition_id);
 		break;
 	case 2:
 		printf("local vars proc %d (Egse_tc):\n", pid);
@@ -15601,17 +15476,16 @@ c_locals(int pid, int tp)
 	printf("	int    param_a:	%d\n", ((P2 *)pptr(pid))->value.param_a);
 	printf("	int    param_b:	%d\n", ((P2 *)pptr(pid))->value.param_b);
 	printf("	int    inputVectorCounter:	%d\n", ((P2 *)pptr(pid))->inputVectorCounter);
-	printf("	int    T_SmallInteger_tmp:	%d\n", ((P2 *)pptr(pid))->_707_3_3_7_11_T_SmallInteger_tmp);
-	printf("	int    T_SmallInteger_tmp:	%d\n", ((P2 *)pptr(pid))->_707_3_3_7_12_T_SmallInteger_tmp);
+	printf("	int    T_SmallInteger_tmp:	%d\n", ((P2 *)pptr(pid))->_705_3_2_5_9_T_SmallInteger_tmp);
+	printf("	int    T_SmallInteger_tmp:	%d\n", ((P2 *)pptr(pid))->_705_3_2_5_10_T_SmallInteger_tmp);
 		break;
 	case 1:
 		printf("local vars proc %d (Egse_tm):\n", pid);
 		break;
 	case 0:
 		printf("local vars proc %d (Actuator_ctrl):\n", pid);
-	printf("	int    transition_id:	%d\n", ((P0 *)pptr(pid))->_705_1_1_2_transition_id);
-	printf("	int    transition_id:	%d\n", ((P0 *)pptr(pid))->_705_1_1_4_transition_id);
-	printf("	int    transition_id:	%d\n", ((P0 *)pptr(pid))->_705_1_2_6_transition_id);
+	printf("	int    transition_id:	%d\n", ((P0 *)pptr(pid))->_703_1_1_2_transition_id);
+	printf("	int    transition_id:	%d\n", ((P0 *)pptr(pid))->_703_1_1_4_transition_id);
 		break;
 	}
 }
@@ -15630,13 +15504,6 @@ c_chandump(int from)
 	}
 	z = qptr(from);
 	switch (((Q0 *)z)->_t) {
-	case 8:
-		for (slot = 0; slot < ((Q8 *)z)->Qlen; slot++)
-		{	printf(" [");
-			printf("%d,", ((Q8 *)z)->contents[slot].fld0);
-			printf("],");
-		}
-		break;
 	case 7:
 		for (slot = 0; slot < ((Q7 *)z)->Qlen; slot++)
 		{	printf(" [");
@@ -15693,7 +15560,7 @@ c_chandump(int from)
 	printf("\n");
 }
 
-Trans *t_id_lkup[724];
+Trans *t_id_lkup[592];
 
 
 #ifdef BFS_PAR

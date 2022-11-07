@@ -1,12 +1,13 @@
 output-event:{source sensor, dest modeManager, event sensor:msg-out:reading:{x 0}}
 input-event:{source sensor, dest modeManager, event modeManager:msg-in:reading:{x 0}}
 output-event:{source sensor, dest modeManager, event sensor:msg-out:reading:{x 0}}
-output-event:{source eGSE, dest modeManager, event eGSE:msg-out:tc:{cfg {param-a 4, param-b 4}}}
-input-event:{source eGSE, dest modeManager, event modeManager:msg-in:tc:{cfg {param-a 4, param-b 4}}}
 input-event:{source sensor, dest modeManager, event modeManager:msg-in:reading:{x 0}}
-output-event:{source modeManager, dest actuator, event modeManager:msg-out:ctrl:{x 4}}
-input-event:{source modeManager, dest actuator, event actuator:msg-in:ctrl:{x 4}}
+output-event:{source sensor, dest modeManager, event sensor:msg-out:reading:{x 0}}
+input-event:{source sensor, dest modeManager, event modeManager:msg-in:reading:{x 0}}
+output-event:{source sensor, dest modeManager, event sensor:msg-out:reading:{x 0}}
+output-event:{source eGSE, dest modeManager, event eGSE:msg-out:tc:{cfg {param-a 0, param-b 10}}}
+input-event:{source eGSE, dest modeManager, event modeManager:msg-in:tc:{cfg {param-a 0, param-b 10}}}
+input-event:{source sensor, dest modeManager, event modeManager:msg-in:reading:{x 0}}
+output-event:{source modeManager, dest actuator, event modeManager:msg-out:ctrl:{x 10}}
+input-event:{source modeManager, dest actuator, event actuator:msg-in:ctrl:{x 10}}
 output-event:{source actuator, dest modeManager, event actuator:msg-out:feedback:{x 0}}
-input-event:{source actuator, dest modeManager, event modeManager:msg-in:feedback:{x 0}}
-output-event:{source modeManager, dest eGSE, event modeManager:msg-out:tm:{reprt {reading 0, ctrl 4, feedback 0}}}
-input-event:{source modeManager, dest eGSE, event eGSE:msg-in:tm:{reprt {reading 0, ctrl 4, feedback 0}}}

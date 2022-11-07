@@ -4,18 +4,18 @@
     <ModelCheckingWindow name=".mcconfig.xml">
         <Configuration>
             <Properties>
-                <Property path="observerdemo/observerdemo.pr"/>
+                <Property path="scdemo/scdemo.scl"/>
             </Properties>
             <Subtyping name="optimized.asn"/>
             <Submodel>
+                <Function name="ModeManager"/>
                 <Function name="Actuator"/>
                 <Function name="EGSE"/>
-                <Function name="ModeManager"/>
                 <Function name="Sensor"/>
             </Submodel>
         </Configuration>
         <NativeModelChecker/>
         <IFModelChecker maxscenarios="5" errorscenarios="true" successscenarios="true" timelimit="120" maxenvironmentcalls="" explorationalgorithm="dfs" maxstates=""/>
-        <SPINModelChecker errorlimit="1" explorationmode="DepthFirst" inputvectorgenerationlimit="4" ifacegenerationlimits="" memorylimitmb="2048" numberofcores="1" rawcommandline="" searchshortestpath="1" searchstatelimit="1000000" timelimitseconds="300" usebithashing="0" usefairscheduling="0" supportReal="0" deltaValue=""/>
+        <SPINModelChecker errorlimit="1" explorationmode="DepthFirst" inputvectorgenerationlimit="4" ifacegenerationlimits="" memorylimitmb="2048" numberofcores="1" rawcommandline="" searchshortestpath="0" searchstatelimit="1000000" timelimitseconds="300" usebithashing="0" usefairscheduling="0" supportReal="0" deltaValue=""/>
     </ModelCheckingWindow>
 </xmel>

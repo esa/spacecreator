@@ -11,19 +11,26 @@ process Modemanager;
     START;
         /* CIF NEXTSTATE (77, 60), (96, 35) */
         NEXTSTATE Uninitialized;
-    /* CIF state (575, 10), (89, 35) */
+    /* CIF state (167, 10), (96, 35) */
+    state Uninitialized;
+        /* CIF input (181, 65), (70, 35) */
+        input tc(cfg);
+            /* CIF NEXTSTATE (171, 120), (89, 35) */
+            NEXTSTATE Configured;
+    endstate;
+    /* CIF state (574, 10), (89, 35) */
     state Configured;
-        /* CIF input (558, 65), (146, 35) */
+        /* CIF input (557, 65), (146, 35) */
         input feedback(xfeedback);
-            /* CIF task (541, 120), (181, 53) */
+            /* CIF task (540, 120), (181, 53) */
             task rprt.reading := xin,
 rprt.ctrl := xout,
 rprt.feedback := xfeedback;
-            /* CIF output (596, 193), (70, 35) */
+            /* CIF output (595, 193), (70, 35) */
             output tm(rprt);
             /* CIF NEXTSTATE (596, 248), (70, 35) */
             NEXTSTATE -;
-        /* CIF input (356, 65), (93, 35) */
+        /* CIF input (355, 65), (93, 35) */
         input reading(xin);
             /* CIF task (275, 120), (254, 35) */
             task xout := xin * cfg.param_a + cfg.param_b;
@@ -31,12 +38,5 @@ rprt.feedback := xfeedback;
             output ctrl(xout);
             /* CIF NEXTSTATE (367, 230), (70, 35) */
             NEXTSTATE -;
-    endstate;
-    /* CIF state (168, 10), (96, 35) */
-    state Uninitialized;
-        /* CIF input (181, 65), (70, 35) */
-        input tc(cfg);
-            /* CIF NEXTSTATE (171, 120), (89, 35) */
-            NEXTSTATE Configured;
     endstate;
 endprocess Modemanager;
