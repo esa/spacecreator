@@ -377,6 +377,14 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
     return itemValue;
 }
 
+/*!
+ * Returns \p value if within the given range. If value is samller, the range minimum is returned. If larger than max,
+ * the range maximum is returned.
+ * \param value The input value
+ * \param valueItem The QStandardItem holds the min and max values. Accesible via the roles MIN_RANGE_ROLE and
+ *  MAX_RANGE_ROLE
+ * \return The value to be surely within the range
+ */
 int Asn1TreeView::ensureValueInRange(int value, const QStandardItem *valueItem)
 {
     bool ok;
