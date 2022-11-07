@@ -1,0 +1,214 @@
+Function Actuator in context _Root
+├─ Full Prefix : (none)
+├─ Language    : sdl
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+│  └─ Taste::Startup_Priority = 1
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : ctrl - in FV: Actuator
+│     ├─ RCM Kind    : SPORADIC_OPERATION
+│     ├─ Period/MIAT :  0
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     │  ├─ Name            : x
+│     │  │  ├─ Type         : T-Integer
+│     │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+│     │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+│     │  │  ├─ Basic type   : ASN1_INTEGER
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     └─ Connections :
+│        └─ Function ModeManager, interface ctrl
+└─ Required interfaces:
+   └─ Name : feedback - in FV: Actuator
+      ├─ RCM Kind    : SPORADIC_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : x
+      │  │  ├─ Type         : T-Integer
+      │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+      │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+      │  │  ├─ Basic type   : ASN1_INTEGER
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      └─ Connections :
+         └─ Function ModeManager, interface feedback
+
+Function EGSE in context _Root
+├─ Full Prefix : (none)
+├─ Language    : gui
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+│  └─ Taste::Startup_Priority = 1
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : tm - in FV: EGSE
+│     ├─ RCM Kind    : SPORADIC_OPERATION
+│     ├─ Period/MIAT :  0
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     │  ├─ Name            : reprt
+│     │  │  ├─ Type         : T-Report
+│     │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+│     │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+│     │  │  ├─ Basic type   : ASN1_SEQUENCE
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     └─ Connections :
+│        └─ Function ModeManager, interface tm
+└─ Required interfaces:
+   └─ Name : tc - in FV: EGSE
+      ├─ RCM Kind    : SPORADIC_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : cfg
+      │  │  ├─ Type         : T-Config
+      │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+      │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+      │  │  ├─ Basic type   : ASN1_SEQUENCE
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      └─ Connections :
+         └─ Function ModeManager, interface tc
+
+Function ModeManager in context _Root
+├─ Full Prefix : (none)
+├─ Language    : sdl
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+│  └─ Taste::Startup_Priority = 1
+├─ Timers:
+├─ Provided interfaces:
+│  ├─ Name : feedback - in FV: ModeManager
+│  │  ├─ RCM Kind    : SPORADIC_OPERATION
+│  │  ├─ Period/MIAT :  0
+│  │  ├─ WCET (ms)   :  0
+│  │  ├─ Queue Size  :  1
+│  │  ├─ Parameters  :
+│  │  │  ├─ Name            : x
+│  │  │  │  ├─ Type         : T-Integer
+│  │  │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+│  │  │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+│  │  │  │  ├─ Basic type   : ASN1_INTEGER
+│  │  │  │  ├─ Encoding     : NATIVE
+│  │  │  │  └─ Direction    : PARAM_IN
+│  │  └─ Connections :
+│  │     └─ Function Actuator, interface feedback
+│  ├─ Name : reading - in FV: ModeManager
+│  │  ├─ RCM Kind    : SPORADIC_OPERATION
+│  │  ├─ Period/MIAT :  0
+│  │  ├─ WCET (ms)   :  0
+│  │  ├─ Queue Size  :  1
+│  │  ├─ Parameters  :
+│  │  │  ├─ Name            : x
+│  │  │  │  ├─ Type         : T-Integer
+│  │  │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+│  │  │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+│  │  │  │  ├─ Basic type   : ASN1_INTEGER
+│  │  │  │  ├─ Encoding     : NATIVE
+│  │  │  │  └─ Direction    : PARAM_IN
+│  │  └─ Connections :
+│  │     └─ Function Sensor, interface reading
+│  └─ Name : tc - in FV: ModeManager
+│     ├─ RCM Kind    : SPORADIC_OPERATION
+│     ├─ Period/MIAT :  0
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     │  ├─ Name            : cfg
+│     │  │  ├─ Type         : T-Config
+│     │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+│     │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+│     │  │  ├─ Basic type   : ASN1_SEQUENCE
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     └─ Connections :
+│        └─ Function EGSE, interface tc
+└─ Required interfaces:
+   ├─ Name : ctrl - in FV: ModeManager
+   │  ├─ RCM Kind    : SPORADIC_OPERATION
+   │  ├─ Period/MIAT :  0
+   │  ├─ WCET (ms)   :  0
+   │  ├─ Queue Size  :  1
+   │  ├─ Parameters  :
+   │  │  ├─ Name            : x
+   │  │  │  ├─ Type         : T-Integer
+   │  │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+   │  │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+   │  │  │  ├─ Basic type   : ASN1_INTEGER
+   │  │  │  ├─ Encoding     : NATIVE
+   │  │  │  └─ Direction    : PARAM_IN
+   │  └─ Connections :
+   │     └─ Function Actuator, interface ctrl
+   └─ Name : tm - in FV: ModeManager
+      ├─ RCM Kind    : SPORADIC_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : reprt
+      │  │  ├─ Type         : T-Report
+      │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+      │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+      │  │  ├─ Basic type   : ASN1_SEQUENCE
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      └─ Connections :
+         └─ Function EGSE, interface tm
+
+Function Sensor in context _Root
+├─ Full Prefix : (none)
+├─ Language    : gui
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+│  └─ Taste::Startup_Priority = 1
+├─ Timers:
+├─ Provided interfaces:
+└─ Required interfaces:
+   └─ Name : reading - in FV: Sensor
+      ├─ RCM Kind    : SPORADIC_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : x
+      │  │  ├─ Type         : T-Integer
+      │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
+      │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
+      │  │  ├─ Basic type   : ASN1_INTEGER
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      └─ Connections :
+         └─ Function ModeManager, interface reading
+

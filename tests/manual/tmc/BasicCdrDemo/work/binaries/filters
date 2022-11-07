@@ -1,0 +1,7 @@
+-- Add your filters here for the MSC tracing tool (list of instances and message names you don't want to trace)
+-- format of the file: one filter per line
+-- one line is either:
+--   input <name> to <function name>
+--      or
+--   instance <function name>
+

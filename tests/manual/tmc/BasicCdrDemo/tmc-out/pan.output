@@ -1,0 +1,32 @@
+warning: no accept labels are defined, so option -a has no effect (ignored)
+pan:1: assertion violated  !((global_state.actuator.x>5)) (at depth 228)
+pan: wrote system.pml1.trail
+
+(Spin Version 6.4.9 -- 17 December 2018)
+Warning: Search not completed
+
+Full statespace search for:
+	never claim         	+ (never_0)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	- (not selected)
+	invalid end states	- (disabled by -E flag)
+
+State-vector 708 byte, depth reached 256, errors: 1
+   116747 states, stored
+   271784 states, matched
+   388531 transitions (= stored+matched)
+  1248115 atomic steps
+hash conflicts:       508 (resolved)
+
+Stats on memory usage (in Megabytes):
+   81.945	equivalent memory usage for states (stored*(State-vector + overhead))
+   93.671	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+   61.035	memory used for DFS stack (-m1000000)
+    6.174	memory lost to fragmentation
+  276.534	total actual memory usage
+
+
+
+pan: elapsed time 0.54 seconds
+pan: rate 216198.15 states/second

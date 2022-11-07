@@ -1,0 +1,397 @@
+---------------------------------------------------
+-- AADL2.2
+-- TASTE type interfaceview
+-- 
+-- generated code: do not edit
+---------------------------------------------------
+
+
+PACKAGE interfaceview::IV::ModeManager
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::Actuator;
+WITH interfaceview::IV::EGSE;
+WITH interfaceview::IV::Sensor;
+
+SUBPROGRAM PI_tc
+FEATURES
+    cfg : IN PARAMETER DataView::T_Config {
+       Taste::encoding => NATIVE;
+    };
+END PI_tc;
+
+SUBPROGRAM IMPLEMENTATION PI_tc.others
+END PI_tc.others;
+
+
+SUBPROGRAM PI_feedback
+FEATURES
+    x : IN PARAMETER DataView::T_Integer {
+       Taste::encoding => NATIVE;
+    };
+END PI_feedback;
+
+SUBPROGRAM IMPLEMENTATION PI_feedback.others
+END PI_feedback.others;
+
+
+SUBPROGRAM PI_reading
+FEATURES
+    x : IN PARAMETER DataView::T_Integer {
+       Taste::encoding => NATIVE;
+    };
+END PI_reading;
+
+SUBPROGRAM IMPLEMENTATION PI_reading.others
+END PI_reading.others;
+
+
+SUBPROGRAM RI_ctrl
+FEATURES
+    x : IN PARAMETER DataView::T_Integer {
+       Taste::encoding => NATIVE;
+    };
+END RI_ctrl;
+
+SUBPROGRAM IMPLEMENTATION RI_ctrl.others
+END RI_ctrl.others;
+
+
+SUBPROGRAM RI_tm
+FEATURES
+    reprt : IN PARAMETER DataView::T_Report {
+       Taste::encoding => NATIVE;
+    };
+END RI_tm;
+
+SUBPROGRAM IMPLEMENTATION RI_tm.others
+END RI_tm.others;
+
+
+
+SYSTEM ModeManager
+FEATURES
+   PI_tc : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_tc.others {
+      Taste::InterfaceName           => "tc";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+   PI_feedback : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_feedback.others {
+      Taste::InterfaceName           => "feedback";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+   PI_reading : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_reading.others {
+      Taste::InterfaceName           => "reading";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+   RI_ctrl : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Actuator:: PI_ctrl.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "ctrl";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+   RI_tm : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: EGSE:: PI_tm.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "tm";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = ModeManager
+   -- ignored property: is_type = NO
+   Source_Language => (SDL);
+   -- ignored property: default_implementation = default
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END ModeManager;
+
+SYSTEM IMPLEMENTATION ModeManager.others
+END ModeManager.others;
+
+END interfaceview::IV::ModeManager;
+
+
+
+PACKAGE interfaceview::IV::EGSE
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::ModeManager;
+
+SUBPROGRAM PI_tm
+FEATURES
+    reprt : IN PARAMETER DataView::T_Report {
+       Taste::encoding => NATIVE;
+    };
+END PI_tm;
+
+SUBPROGRAM IMPLEMENTATION PI_tm.others
+END PI_tm.others;
+
+
+SUBPROGRAM RI_tc
+FEATURES
+    cfg : IN PARAMETER DataView::T_Config {
+       Taste::encoding => NATIVE;
+    };
+END RI_tc;
+
+SUBPROGRAM IMPLEMENTATION RI_tc.others
+END RI_tc.others;
+
+
+
+SYSTEM EGSE
+FEATURES
+   PI_tm : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: EGSE:: PI_tm.others {
+      Taste::InterfaceName           => "tm";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+   RI_tc : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_tc.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "tc";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = EGSE
+   -- ignored property: is_type = NO
+   Source_Language => (GUI);
+   -- ignored property: default_implementation = default
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END EGSE;
+
+SYSTEM IMPLEMENTATION EGSE.others
+END EGSE.others;
+
+END interfaceview::IV::EGSE;
+
+
+
+PACKAGE interfaceview::IV::Sensor
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::ModeManager;
+
+SUBPROGRAM RI_reading
+FEATURES
+    x : IN PARAMETER DataView::T_Integer {
+       Taste::encoding => NATIVE;
+    };
+END RI_reading;
+
+SUBPROGRAM IMPLEMENTATION RI_reading.others
+END RI_reading.others;
+
+
+
+SYSTEM Sensor
+FEATURES
+   RI_reading : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_reading.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "reading";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = Sensor
+   -- ignored property: is_type = NO
+   Source_Language => (GUI);
+   -- ignored property: default_implementation = default
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END Sensor;
+
+SYSTEM IMPLEMENTATION Sensor.others
+END Sensor.others;
+
+END interfaceview::IV::Sensor;
+
+
+
+PACKAGE interfaceview::IV::Actuator
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::ModeManager;
+
+SUBPROGRAM PI_ctrl
+FEATURES
+    x : IN PARAMETER DataView::T_Integer {
+       Taste::encoding => NATIVE;
+    };
+END PI_ctrl;
+
+SUBPROGRAM IMPLEMENTATION PI_ctrl.others
+END PI_ctrl.others;
+
+
+SUBPROGRAM RI_feedback
+FEATURES
+    x : IN PARAMETER DataView::T_Integer {
+       Taste::encoding => NATIVE;
+    };
+END RI_feedback;
+
+SUBPROGRAM IMPLEMENTATION RI_feedback.others
+END RI_feedback.others;
+
+
+
+SYSTEM Actuator
+FEATURES
+   PI_ctrl : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Actuator:: PI_ctrl.others {
+      Taste::InterfaceName           => "ctrl";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+   RI_feedback : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_feedback.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "feedback";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Priority      => 1;      
+      Taste::RCMperiod               => 0 ms;      
+   };
+PROPERTIES
+   -- ignored property: name = Actuator
+   -- ignored property: is_type = NO
+   Source_Language => (SDL);
+   -- ignored property: default_implementation = default
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END Actuator;
+
+SYSTEM IMPLEMENTATION Actuator.others
+END Actuator.others;
+
+END interfaceview::IV::Actuator;
+
+
+PACKAGE interfaceview::IV
+PUBLIC
+
+WITH interfaceview::IV::ModeManager;
+WITH interfaceview::IV::EGSE;
+WITH interfaceview::IV::Sensor;
+WITH interfaceview::IV::Actuator;
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+
+SYSTEM interfaceview
+PROPERTIES
+   Taste::dataView     => ("DataView");
+   TASTE::dataViewPath => ("DataView.aadl");
+END interfaceview;
+
+SYSTEM IMPLEMENTATION interfaceview.others
+SUBCOMPONENTS
+  ModeManager : SYSTEM interfaceview::IV::ModeManager::ModeManager.others;
+  EGSE : SYSTEM interfaceview::IV::EGSE::EGSE.others;
+  Sensor : SYSTEM interfaceview::IV::Sensor::Sensor.others;
+  Actuator : SYSTEM interfaceview::IV::Actuator::Actuator.others;
+CONNECTIONS
+   Sensor_RI_reading_ModeManager_PI_reading : SUBPROGRAM ACCESS ModeManager.PI_reading -> Sensor.RI_reading;
+   Actuator_RI_feedback_ModeManager_PI_feedback : SUBPROGRAM ACCESS ModeManager.PI_feedback -> Actuator.RI_feedback;
+   ModeManager_RI_ctrl_Actuator_PI_ctrl : SUBPROGRAM ACCESS Actuator.PI_ctrl -> ModeManager.RI_ctrl;
+   EGSE_RI_tc_ModeManager_PI_tc : SUBPROGRAM ACCESS ModeManager.PI_tc -> EGSE.RI_tc;
+   ModeManager_RI_tm_EGSE_PI_tm : SUBPROGRAM ACCESS EGSE.PI_tm -> ModeManager.RI_tm;
+END interfaceview.others;
+
+PROPERTIES
+   Taste::dataView     => ("DataView");
+   Taste::dataViewPath => ("DataView.aadl");
+   Taste::coordinates  => "0 0 297000 210000";
+   Taste::version      => "3.0";
+END interfaceview::IV;

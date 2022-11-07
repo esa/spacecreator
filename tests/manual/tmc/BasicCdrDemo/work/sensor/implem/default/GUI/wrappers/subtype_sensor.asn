@@ -1,0 +1,21 @@
+SENSOR-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+T-Integer FROM BASICCDRDEMO-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Sensor-reading-x ::= T-Integer
+
+
+
+
+END
