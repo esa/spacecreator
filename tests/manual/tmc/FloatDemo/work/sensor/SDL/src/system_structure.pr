@@ -5,7 +5,7 @@ use Datamodel;
 
 system Sensor;
 
-   signal trigger;
+   signal tc;
 
    /* CIF Keep Specific Geode PARAMNAMES signalValue */
    signal reading (Number);
@@ -16,14 +16,14 @@ system Sensor;
    external;
 
    channel c
-      from env to Sensor with trigger;
+      from env to Sensor with tc;
       from Sensor to env with reading;
    endchannel;
 
    block Sensor;
 
       signalroute r
-      from env to Sensor with trigger;
+      from env to Sensor with tc;
       from Sensor to env with reading;
       connect c and r;
 

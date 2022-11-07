@@ -1,0 +1,170 @@
+Simulation-DataView DEFINITIONS ::=
+BEGIN
+   IMPORTS
+      
+      --  ASN.1 modules used by thread actuator_controlSignal
+      Number FROM FLOATDEMO-DATAVIEW
+      
+      --  ASN.1 modules used by thread controlsystem_configuration
+      PidConfig FROM FLOATDEMO-DATAVIEW
+      
+      --  ASN.1 modules used by thread controlsystem_reading
+      Number FROM FLOATDEMO-DATAVIEW
+      
+      
+      
+      
+      
+      -- Import generic integer type (used for timers)
+      T-UInt32 FROM TASTE-BasicTypes
+      PID      FROM System-Dataview
+      -- Import timers
+      AggregateTimerData FROM Simulation-Timers-DataView
+      --  Import the SDL function states needed for the global system state
+      Actuator-Context           FROM Actuator-Datamodel
+      Controlsystem-Context      FROM Controlsystem-Datamodel
+      Demo-timer-manager-Context FROM Demo-timer-manager-Datamodel
+      Host-Context               FROM Host-Datamodel
+      Sensor-Context             FROM Sensor-Datamodel
+   ;
+
+   --  Simulator needs to knows about cyclic interfaces
+   Periodic-Event {Event-Ty} ::= SEQUENCE {
+      period INTEGER (0 .. 500000),  -- Upper limit is arbitrary
+      event  Event-Ty
+   }
+
+   --  To keep a constant list of events.
+   Periodic-Events {Event-Ty, INTEGER:max} ::=
+      SEQUENCE (SIZE (0 .. max)) OF Periodic-Event {Event-Ty}
+
+   
+   
+   
+   Actuator-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         controlsignal SEQUENCE { controlvalue Number}
+      }
+   }
+   
+   Controlsystem-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         configuration SEQUENCE { cfg PidConfig},
+         reading       SEQUENCE { signalvalue Number}
+      },
+      msg-out CHOICE {
+         controlsignal SEQUENCE { controlvalue Number },
+         tm            SEQUENCE {   }
+      }
+   }
+   
+   Demo-Timer-Manager-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         tick SEQUENCE {  }
+      },
+      msg-out CHOICE {
+         sensor-trigger SEQUENCE {   }
+      }
+   }
+   Demo-Timer-Manager-Periodic-Events ::=
+      Periodic-Events {Demo-Timer-Manager-Event, 1}
+   
+   demo-timer-manager-periodic-events Demo-Timer-Manager-Periodic-Events ::= {
+      { period 10, event msg-in: tick : {} }
+   }
+   
+   Host-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         tm SEQUENCE {  }
+      },
+      msg-out CHOICE {
+         configuration SEQUENCE { cfg PidConfig },
+         tc            SEQUENCE {   }
+      }
+   }
+   
+   Sensor-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         tc SEQUENCE {  },
+         trigger SEQUENCE {}
+      },
+      msg-out CHOICE {
+         reading SEQUENCE { signalvalue Number }
+      }
+   }
+   
+
+   --  Current observer state flag (used by model checkers)
+   Observer-State-Kind ::= ENUMERATED {
+      regular-state,
+      error-state,
+      ignore-state,
+      success-state
+   }
+
+   --  Event related to the execution of a PI or call of a RI in the functional code
+   Function-Event ::= CHOICE {
+      actuator      Actuator-Event,
+      controlsystem Controlsystem-Event,
+      env           Demo-Timer-Manager-Event,
+      host          Host-Event,
+      sensor        Sensor-Event
+   }
+
+   --  Type used to store events in a database: associate a name to the event
+   Named-Function-Event ::= SEQUENCE {
+      id    IA5String (SIZE (1..80)),
+      event Function-Event
+   }
+
+   --  Event at interface level (PI or RI), including source and destination ID
+   Interface-Event ::= SEQUENCE {
+      source PID,
+      dest   PID,
+      event  Function-Event
+   }
+
+   --  Event sent to the observers
+   Observable-Event ::= CHOICE {
+      no-event        SEQUENCE {},
+      system-startup  SEQUENCE {},
+      input-event     Interface-Event,   --  input event is evaluated after the transition
+      output-event    Interface-Event,   --  output event is evaluated before the message is sent
+      unhandled-input Interface-Event    --  message received in a state where it is not expected
+   }
+
+   --  constant that can be used to refer to the absence of an input/output event
+   nothing Observable-Event ::= no-event : {}
+
+   --  Define a queue of events, corresponding to the input queue for each function
+   max-events INTEGER ::= 10
+   Events-Ty ::= SEQUENCE (SIZE (0 .. max-events)) OF Observable-Event
+
+   --  Global system state (excluding observers, which are defined later)
+   actuator-queue-size INTEGER ::= 2
+   controlsystem-queue-size INTEGER ::= 2
+   host-queue-size INTEGER ::= 2
+   sensor-queue-size INTEGER ::= 2
+
+   System-State ::= SEQUENCE {
+      --  Timers
+      timers AggregateTimerData,
+      --  Message queues
+      actuator-queue      Events-Ty (SIZE (0 .. actuator-queue-size)),
+      controlsystem-queue Events-Ty (SIZE (0 .. controlsystem-queue-size)),
+      host-queue          Events-Ty (SIZE (0 .. host-queue-size)),
+      sensor-queue        Events-Ty (SIZE (0 .. sensor-queue-size)),
+
+      actuator            Actuator-Context,
+      controlsystem       Controlsystem-Context,
+      demo-timer-manager  Demo-timer-manager-Context,
+      host                Host-Context,
+      sensor              Sensor-Context
+   }
+
+END

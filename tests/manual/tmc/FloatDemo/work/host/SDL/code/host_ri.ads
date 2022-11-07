@@ -10,6 +10,9 @@ with System_Dataview; use System_Dataview;  --  contains definition of the PID t
 package Host_RI is
 
    procedure Configuration (Cfg : in out asn1SccPidconfig; Dest_PID : asn1sccPID := asn1sccEnv);
+   
+   
+   procedure Tc (Dest_PID : asn1SccPID := asn1sccEnv);
 
    procedure Check_Queue (Res : out adaasn1rtl.Asn1Boolean)
       with Import, Convention => C, Link_Name => "host_check_queue";

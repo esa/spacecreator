@@ -1,0 +1,35 @@
+output-event:{source host, dest controlSystem, event host:msg-out:configuration:{cfg {kp 1.300000, ki 3.200000, kd 2.100000}}}
+input-event:{source host, dest controlSystem, event controlSystem:msg-in:configuration:{cfg {kp 1.300000, ki 3.200000, kd 2.100000}}}
+input-event:{source env, dest sensor, event sensor:msg-in:trigger:{}}
+output-event:{source sensor, dest controlSystem, event sensor:msg-out:reading:{signalValue 2.000000}}
+input-event:{source sensor, dest controlSystem, event controlSystem:msg-in:reading:{signalValue 2.000000}}
+output-event:{source controlSystem, dest actuator, event controlSystem:msg-out:controlSignal:{controlValue 13.200000}}
+input-event:{source controlSystem, dest actuator, event actuator:msg-in:controlSignal:{controlValue 13.200000}}
+input-event:{source env, dest sensor, event sensor:msg-in:trigger:{}}
+output-event:{source sensor, dest controlSystem, event sensor:msg-out:reading:{signalValue 4.000000}}
+input-event:{source sensor, dest controlSystem, event controlSystem:msg-in:reading:{signalValue 4.000000}}
+output-event:{source controlSystem, dest actuator, event controlSystem:msg-out:controlSignal:{controlValue 28.600002}}
+input-event:{source controlSystem, dest actuator, event actuator:msg-in:controlSignal:{controlValue 28.600002}}
+input-event:{source env, dest sensor, event sensor:msg-in:trigger:{}}
+output-event:{source sensor, dest controlSystem, event sensor:msg-out:reading:{signalValue 8.000000}}
+input-event:{source sensor, dest controlSystem, event controlSystem:msg-in:reading:{signalValue 8.000000}}
+output-event:{source controlSystem, dest actuator, event controlSystem:msg-out:controlSignal:{controlValue 63.599998}}
+input-event:{source controlSystem, dest actuator, event actuator:msg-in:controlSignal:{controlValue 63.599998}}
+input-event:{source env, dest sensor, event sensor:msg-in:trigger:{}}
+output-event:{source sensor, dest controlSystem, event sensor:msg-out:reading:{signalValue 16.000000}}
+input-event:{source sensor, dest controlSystem, event controlSystem:msg-in:reading:{signalValue 16.000000}}
+output-event:{source controlSystem, dest actuator, event controlSystem:msg-out:controlSignal:{controlValue 133.600006}}
+input-event:{source controlSystem, dest actuator, event actuator:msg-in:controlSignal:{controlValue 133.600006}}
+input-event:{source env, dest sensor, event sensor:msg-in:trigger:{}}
+output-event:{source sensor, dest controlSystem, event sensor:msg-out:reading:{signalValue 32.000000}}
+input-event:{source sensor, dest controlSystem, event controlSystem:msg-in:reading:{signalValue 32.000000}}
+output-event:{source controlSystem, dest actuator, event controlSystem:msg-out:controlSignal:{controlValue 273.600006}}
+input-event:{source controlSystem, dest actuator, event actuator:msg-in:controlSignal:{controlValue 273.600006}}
+input-event:{source env, dest sensor, event sensor:msg-in:trigger:{}}
+output-event:{source sensor, dest controlSystem, event sensor:msg-out:reading:{signalValue 64.000000}}
+input-event:{source sensor, dest controlSystem, event controlSystem:msg-in:reading:{signalValue 64.000000}}
+output-event:{source controlSystem, dest actuator, event controlSystem:msg-out:controlSignal:{controlValue 553.600037}}
+input-event:{source controlSystem, dest actuator, event actuator:msg-in:controlSignal:{controlValue 553.600037}}
+input-event:{source env, dest sensor, event sensor:msg-in:trigger:{}}
+output-event:{source sensor, dest controlSystem, event sensor:msg-out:reading:{signalValue 128.000000}}
+input-event:{source sensor, dest controlSystem, event controlSystem:msg-in:reading:{signalValue 128.000000}}

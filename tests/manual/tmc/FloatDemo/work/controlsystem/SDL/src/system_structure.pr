@@ -14,6 +14,9 @@ system Controlsystem;
 
    /* CIF Keep Specific Geode PARAMNAMES controlValue */
    signal controlSignal (Number);
+   
+   
+   signal tm;
 
    -- For internal use, return the PID of the caller
    procedure get_sender;
@@ -22,14 +25,14 @@ system Controlsystem;
 
    channel c
       from env to Controlsystem with configuration, reading;
-      from Controlsystem to env with controlSignal;
+      from Controlsystem to env with controlSignal, tm;
    endchannel;
 
    block Controlsystem;
 
       signalroute r
       from env to Controlsystem with configuration, reading;
-      from Controlsystem to env with controlSignal;
+      from Controlsystem to env with controlSignal, tm;
       connect c and r;
 
       process Controlsystem referenced;

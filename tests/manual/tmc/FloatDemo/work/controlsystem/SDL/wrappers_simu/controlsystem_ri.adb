@@ -26,5 +26,26 @@ package body Controlsystem_RI is
       end if;
    
    end Controlsignal;
+   
+   
+   
+   procedure Tm (Dest_PID : asn1sccPID := asn1sccEnv) is
+      --  Generate an event to the simulator for the output
+      Event_Out_Host : asn1SccObservable_Event (Kind => Output_Event_PRESENT);
+   begin
+      if Dest_PID = asn1sccEnv or Dest_PID = asn1sccHost then
+         Event_Out_Host.Output_Event :=
+           (Source => asn1sccControlsystem,
+            Dest   => asn1sccHost,
+            Event  => (Kind => Controlsystem_PRESENT,
+                       Controlsystem =>
+                         (Kind   => Msg_Out_PRESENT,
+                          Msg_Out =>
+                             (Kind => Tm_PRESENT,
+                           Tm => (null record)))));
+         Push_Event (Event_Out_Host);
+      end if;
+   
+   end Tm;
 
 end Controlsystem_RI;

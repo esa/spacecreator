@@ -28,7 +28,7 @@ package body Host_PI is
    end Continuous_Signals;
 
    --  Provided interfaces
-   procedure Dummy (Global_State : in out asn1SccSystem_State;
+   procedure Tm (Global_State : in out asn1SccSystem_State;
                                   Sender_PID   : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)
@@ -36,11 +36,11 @@ package body Host_PI is
       Host.Ctxt.Sender := Sender_PID;
       --  If user code calls synchronous RIs, set their state too
       Update_States_For_Synchronous_Calls (Global_State);
-      Host.Dummy;
+      Host.Tm;
       -- Update the global state
       Global_State.Host := Host.Ctxt;
       --  If user code called synchronous RIs, populate their state
       Update_Global_State_After_Synchronous_Calls (Global_State);
-   end Dummy;
+   end Tm;
 
 end Host_PI;

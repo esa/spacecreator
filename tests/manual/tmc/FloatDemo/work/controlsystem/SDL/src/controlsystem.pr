@@ -12,26 +12,26 @@ process Controlsystem;
     START;
         /* CIF NEXTSTATE (300, 60), (70, 35) */
         NEXTSTATE Off;
-    /* CIF state (655, 31), (89, 35) */
+    /* CIF state (411, 10), (70, 35) */
+    state Off;
+        /* CIF input (380, 65), (129, 35) */
+        input configuration(cfg);
+            /* CIF NEXTSTATE (400, 120), (89, 35) */
+            NEXTSTATE Configured;
+    endstate;
+    /* CIF state (654, 31), (89, 35) */
     state Configured;
-        /* CIF input (629, 86), (140, 35) */
+        /* CIF input (628, 86), (140, 35) */
         input reading(inputValue);
-            /* CIF task (613, 141), (173, 53) */
+            /* CIF task (612, 141), (173, 53) */
             task i := i + inputvalue, 
 d := inputvalue - previous,
 previous := inputValue;
-            /* CIF task (522, 214), (354, 35) */
+            /* CIF task (521, 214), (354, 35) */
             task outputValue := cfg.kp * inputvalue + cfg.ki * i + cfg.kd * d;
-            /* CIF output (608, 269), (183, 35) */
+            /* CIF output (607, 269), (183, 35) */
             output controlSignal(outputValue);
-            /* CIF NEXTSTATE (665, 324), (70, 35) */
+            /* CIF NEXTSTATE (664, 324), (70, 35) */
             NEXTSTATE -;
-    endstate;
-    /* CIF state (411, 10), (70, 35) */
-    state Off;
-        /* CIF input (381, 65), (129, 35) */
-        input configuration(cfg);
-            /* CIF NEXTSTATE (401, 120), (89, 35) */
-            NEXTSTATE Configured;
     endstate;
 endprocess Controlsystem;

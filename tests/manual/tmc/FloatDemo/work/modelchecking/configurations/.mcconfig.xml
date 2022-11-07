@@ -5,10 +5,9 @@
         <Configuration>
             <Properties/>
             <Submodel>
+                <Function name="ControlSystem"/>
                 <Function name="Actuator"/>
                 <Function name="Sensor"/>
-                <Function name="Dummy"/>
-                <Function name="ControlSystem"/>
                 <Function name="Host"/>
             </Submodel>
         </Configuration>

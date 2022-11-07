@@ -21,7 +21,7 @@ package Host_PI is
    procedure Continuous_Signals (Global_State : in out asn1SccSystem_State);
 
    --  Provided interfaces
-   procedure Dummy (Global_State : in out asn1SccSystem_State;
+   procedure Tm (Global_State : in out asn1SccSystem_State;
                                   Sender_PID   : asn1SccPID := asn1SccEnv);
 
 end Host_PI;

@@ -3,8 +3,28 @@
 with Simulator;            use Simulator;
 with Simulation_Dataview;  use Simulation_Dataview;
 with System_Dataview;      use System_Dataview;
+with demo_Timer_Manager;
+with demo_Timer_Manager;
 package body Sensor_RI is
 
+   procedure Reset_Trigger (Dest_PID : asn1sccPID := asn1sccEnv) is
+   begin
+      --  The global state of the callee has been set, so we can make a direct call
+         Demo_Timer_Manager.Reset_Sensor_Trigger;
+   end Reset_Trigger;
+   
+   
+   
+   procedure Set_Trigger
+      (Val : in out asn1SccT_Uint32;
+       Dest_PID : asn1sccPID := asn1sccEnv) is
+   begin
+      --  The global state of the callee has been set, so we can make a direct call
+         Demo_Timer_Manager.Set_Sensor_Trigger (Val);
+   end Set_Trigger;
+   
+   
+   
    procedure Reading
       (Signalvalue : in out asn1SccNumber;
        Dest_PID : asn1sccPID := asn1sccEnv) is

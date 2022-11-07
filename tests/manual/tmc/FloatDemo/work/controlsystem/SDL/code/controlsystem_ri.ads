@@ -10,6 +10,9 @@ with System_Dataview; use System_Dataview;  --  contains definition of the PID t
 package Controlsystem_RI is
 
    procedure Controlsignal (Controlvalue : in out asn1SccNumber; Dest_PID : asn1sccPID := asn1sccEnv);
+   
+   
+   procedure Tm (Dest_PID : asn1SccPID := asn1sccEnv);
 
    procedure Check_Queue (Res : out adaasn1rtl.Asn1Boolean)
       with Import, Convention => C, Link_Name => "controlsystem_check_queue";

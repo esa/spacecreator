@@ -21,6 +21,10 @@ package Sensor_PI is
    procedure Continuous_Signals (Global_State : in out asn1SccSystem_State);
 
    --  Provided interfaces
+   procedure Tc (Global_State : in out asn1SccSystem_State;
+                                  Sender_PID   : asn1SccPID := asn1SccEnv);
+   
+   
    procedure Trigger (Global_State : in out asn1SccSystem_State;
                                   Sender_PID   : asn1SccPID := asn1SccEnv);
 

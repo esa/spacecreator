@@ -26,5 +26,26 @@ package body Host_RI is
       end if;
    
    end Configuration;
+   
+   
+   
+   procedure Tc (Dest_PID : asn1sccPID := asn1sccEnv) is
+      --  Generate an event to the simulator for the output
+      Event_Out_Sensor : asn1SccObservable_Event (Kind => Output_Event_PRESENT);
+   begin
+      if Dest_PID = asn1sccEnv or Dest_PID = asn1sccSensor then
+         Event_Out_Sensor.Output_Event :=
+           (Source => asn1sccHost,
+            Dest   => asn1sccSensor,
+            Event  => (Kind => Host_PRESENT,
+                       Host =>
+                         (Kind   => Msg_Out_PRESENT,
+                          Msg_Out =>
+                             (Kind => Tc_PRESENT,
+                           Tc => (null record)))));
+         Push_Event (Event_Out_Sensor);
+      end if;
+   
+   end Tc;
 
 end Host_RI;

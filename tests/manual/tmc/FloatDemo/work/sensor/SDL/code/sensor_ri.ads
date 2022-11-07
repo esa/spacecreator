@@ -11,6 +11,11 @@ package Sensor_RI is
 
    procedure Reading (Signalvalue : in out asn1SccNumber; Dest_PID : asn1sccPID := asn1sccEnv);
 
+   --  Timer trigger Set and Reset functions
+   procedure Set_Trigger (Val : in out asn1SccT_UInt32; Dest_PID : asn1sccPID := asn1sccEnv);
+
+   procedure Reset_Trigger (Dest_PID : asn1SccPID := asn1sccEnv);
+
    procedure Check_Queue (Res : out adaasn1rtl.Asn1Boolean)
       with Import, Convention => C, Link_Name => "sensor_check_queue";
 

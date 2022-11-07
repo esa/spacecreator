@@ -1,6 +1,14 @@
 FLOATDEMO-DATAVIEW DEFINITIONS ::=
 BEGIN
 
+   INumber ::= INTEGER (-1000 .. 1000)
+
+   IPidConfig ::= SEQUENCE {
+       kp INumber,
+       ki INumber,
+       kd INumber
+   }
+
    Number ::= REAL (-1000.0 .. 1000.0)
 
    PidConfig ::= SEQUENCE {
@@ -38,13 +46,12 @@ System-Dataview DEFINITIONS ::=
 BEGIN
 
    -- Range of PID - type can be used to size arrays of PID type
-   PID-Range ::= INTEGER(0..5)
+   PID-Range ::= INTEGER(0..4)
 
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        actuator,
        controlsystem,
-       dummy,
        host,
        sensor,
        

@@ -1,0 +1,31 @@
+warning: no accept labels are defined, so option -a has no effect (ignored)
+pan:1: assertion violated ((global_state.controlsystem.outputvalue>= -(1000))&&(global_state.controlsystem.outputvalue<=1000)) (at depth 483)
+pan: wrote system.pml1.trail
+
+(Spin Version 6.5.2 -- 9 June 2022 +  N7S Custom - Work-in-Progress)
+Warning: Search not completed
+
+Full statespace search for:
+	never claim         	- (none specified)
+	assertion violations	+
+	acceptance   cycles 	- (not selected)
+	invalid end states	- (disabled by -E flag)
+
+State-vector 404 byte, depth reached 483, errors: 1
+       37 states, stored
+        0 states, matched
+       37 transitions (= stored+matched)
+      447 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.015	equivalent memory usage for states (stored*(State-vector + overhead))
+   18.673	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+   61.035	memory used for DFS stack (-m1000000)
+    6.174	memory lost to fragmentation
+  201.535	total actual memory usage
+
+
+
+pan: elapsed time 0.01 seconds

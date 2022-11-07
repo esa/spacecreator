@@ -2,11 +2,11 @@ Controlsystem-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   Number, PidConfig FROM FLOATDEMO-DATAVIEW
+   INumber, IPidConfig, Number, PidConfig FROM FLOATDEMO-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controlsystem-States ::= ENUMERATED {off, configured}
+Controlsystem-States ::= ENUMERATED {configured, off}
 
 Controlsystem-Context ::= SEQUENCE {
    state Controlsystem-States,

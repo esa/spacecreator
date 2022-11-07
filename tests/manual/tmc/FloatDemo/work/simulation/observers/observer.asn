@@ -22,11 +22,11 @@ Controlsystem-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   Number, PidConfig FROM FLOATDEMO-DATAVIEW
+   INumber, IPidConfig, Number, PidConfig FROM FLOATDEMO-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controlsystem-States ::= ENUMERATED {off, configured}
+Controlsystem-States ::= ENUMERATED {configured, off}
 
 Controlsystem-Context ::= SEQUENCE {
    state Controlsystem-States,
@@ -42,11 +42,22 @@ Controlsystem-Context ::= SEQUENCE {
 
 END
 
+-- Dummy data model for the timer manager (needed to populate observer.asn)
+Demo-timer-manager-Datamodel DEFINITIONS ::=
+BEGIN
+Demo-timer-manager-States ::= ENUMERATED {wait}
+
+Demo-timer-manager-Context ::= SEQUENCE {
+   state Demo-timer-manager-States
+}
+
+END
+
 Host-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   Number, PidConfig FROM FLOATDEMO-DATAVIEW
+   INumber, IPidConfig, Number, PidConfig FROM FLOATDEMO-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -65,7 +76,7 @@ Sensor-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   Number, PidConfig FROM FLOATDEMO-DATAVIEW
+   INumber, IPidConfig, Number, PidConfig FROM FLOATDEMO-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -82,6 +93,14 @@ END
 
 FLOATDEMO-DATAVIEW DEFINITIONS ::=
 BEGIN
+
+   INumber ::= INTEGER (-1000 .. 1000)
+
+   IPidConfig ::= SEQUENCE {
+       kp INumber,
+       ki INumber,
+       kd INumber
+   }
 
    Number ::= REAL (-1000.0 .. 1000.0)
 
@@ -120,13 +139,12 @@ System-Dataview DEFINITIONS ::=
 BEGIN
 
    -- Range of PID - type can be used to size arrays of PID type
-   PID-Range ::= INTEGER(0..5)
+   PID-Range ::= INTEGER(0..4)
 
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        actuator,
        controlsystem,
-       dummy,
        host,
        sensor,
        
@@ -152,16 +170,18 @@ BEGIN
       
       
       
+      
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
       PID      FROM System-Dataview
       -- Import timers
       AggregateTimerData FROM Simulation-Timers-DataView
       --  Import the SDL function states needed for the global system state
-      Actuator-Context      FROM Actuator-Datamodel
-      Controlsystem-Context FROM Controlsystem-Datamodel
-      Host-Context          FROM Host-Datamodel
-      Sensor-Context        FROM Sensor-Datamodel
+      Actuator-Context           FROM Actuator-Datamodel
+      Controlsystem-Context      FROM Controlsystem-Datamodel
+      Demo-timer-manager-Context FROM Demo-timer-manager-Datamodel
+      Host-Context               FROM Host-Datamodel
+      Sensor-Context             FROM Sensor-Datamodel
    ;
 
    --  Simulator needs to knows about cyclic interfaces
@@ -191,40 +211,47 @@ BEGIN
          reading       SEQUENCE { signalvalue Number}
       },
       msg-out CHOICE {
-         controlsignal SEQUENCE { controlvalue Number }
+         controlsignal SEQUENCE { controlvalue Number },
+         tm            SEQUENCE {   }
       }
    }
    
-   Dummy-Event ::= CHOICE {
+   Demo-Timer-Manager-Event ::= CHOICE {
+      msg-in CHOICE {
+         input-none SEQUENCE {},
+         tick SEQUENCE {  }
+      },
       msg-out CHOICE {
-         dummy SEQUENCE {   }
+         sensor-trigger SEQUENCE {   }
       }
+   }
+   Demo-Timer-Manager-Periodic-Events ::=
+      Periodic-Events {Demo-Timer-Manager-Event, 1}
+   
+   demo-timer-manager-periodic-events Demo-Timer-Manager-Periodic-Events ::= {
+      { period 10, event msg-in: tick : {} }
    }
    
    Host-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         dummy SEQUENCE {  }
+         tm SEQUENCE {  }
       },
       msg-out CHOICE {
-         configuration SEQUENCE { cfg PidConfig }
+         configuration SEQUENCE { cfg PidConfig },
+         tc            SEQUENCE {   }
       }
    }
    
    Sensor-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         trigger SEQUENCE {  }
+         tc SEQUENCE {  },
+         trigger SEQUENCE {}
       },
       msg-out CHOICE {
          reading SEQUENCE { signalvalue Number }
       }
-   }
-   Sensor-Periodic-Events ::=
-      Periodic-Events {Sensor-Event, 1}
-   
-   sensor-periodic-events Sensor-Periodic-Events ::= {
-      { period 1000, event msg-in: trigger : {} }
    }
    
 
@@ -240,7 +267,7 @@ BEGIN
    Function-Event ::= CHOICE {
       actuator      Actuator-Event,
       controlsystem Controlsystem-Event,
-      dummy         Dummy-Event,
+      env           Demo-Timer-Manager-Event,
       host          Host-Event,
       sensor        Sensor-Event
    }
@@ -289,10 +316,11 @@ BEGIN
       host-queue          Events-Ty (SIZE (0 .. host-queue-size)),
       sensor-queue        Events-Ty (SIZE (0 .. sensor-queue-size)),
 
-      actuator       Actuator-Context,
-      controlsystem  Controlsystem-Context,
-      host           Host-Context,
-      sensor         Sensor-Context
+      actuator            Actuator-Context,
+      controlsystem       Controlsystem-Context,
+      demo-timer-manager  Demo-timer-manager-Context,
+      host                Host-Context,
+      sensor              Sensor-Context
    }
 
 END
@@ -319,6 +347,8 @@ BEGIN
       },
       
       sensor SEQUENCE {
+         trigger TimerData
+      
       },
       
       dummy-entry SEQUENCE {}

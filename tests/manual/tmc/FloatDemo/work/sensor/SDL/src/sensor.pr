@@ -1,13 +1,16 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Sensor;
-    /* CIF TEXT (323, 23), (170, 140) */
+    /* CIF TEXT (288, 31), (170, 140) */
     DCL x Number;
+    Timer trigger;
     /* CIF ENDTEXT */
     /* CIF START (518, 38), (70, 35) */
     START;
         /* CIF task (518, 93), (70, 35) */
         task x := 1.0;
-        /* CIF NEXTSTATE (518, 143), (70, 35) */
+        /* CIF PROCEDURECALL (469, 148), (167, 35) */
+        call set_timer(1000, trigger);
+        /* CIF NEXTSTATE (518, 198), (70, 35) */
         NEXTSTATE Wait;
     /* CIF state (654, 41), (70, 35) */
     state Wait;
@@ -17,7 +20,9 @@ process Sensor;
             task x := x * 2.0;
             /* CIF output (647, 206), (83, 35) */
             output reading(x);
-            /* CIF NEXTSTATE (654, 261), (70, 35) */
+            /* CIF PROCEDURECALL (605, 261), (167, 35) */
+            call set_timer(1000, trigger);
+            /* CIF NEXTSTATE (654, 311), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Sensor;

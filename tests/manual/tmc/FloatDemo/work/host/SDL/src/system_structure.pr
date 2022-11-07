@@ -5,10 +5,13 @@ use Datamodel;
 
 system Host;
 
-   signal dummy;
+   signal tm;
 
    /* CIF Keep Specific Geode PARAMNAMES cfg */
    signal configuration (PidConfig);
+   
+   
+   signal tc;
 
    -- For internal use, return the PID of the caller
    procedure get_sender;
@@ -16,15 +19,15 @@ system Host;
    external;
 
    channel c
-      from env to Host with dummy;
-      from Host to env with configuration;
+      from env to Host with tm;
+      from Host to env with configuration, tc;
    endchannel;
 
    block Host;
 
       signalroute r
-      from env to Host with dummy;
-      from Host to env with configuration;
+      from env to Host with tm;
+      from Host to env with configuration, tc;
       connect c and r;
 
       process Host referenced;
