@@ -942,7 +942,7 @@ void IvToPromelaTranslator::createCheckQueueInline(
         PromelaSystemModel *promelaModel, const QString &functionName, const QList<QString> &channelNames) const
 {
     if (channelNames.empty()) {
-        auto message = QString("No sporadic nor cyclic interfaces in function %1").arg(functionName);
+        auto message = QString("No sporadic interfaces in function %1").arg(functionName);
         throw TranslationException(message);
     }
 
@@ -1557,15 +1557,13 @@ void IvToPromelaTranslator::prepareFunctionInfo(Context &context, const ::ivm::I
         const QString &functionName, FunctionInfo &functionInfo) const
 {
     for (const IVInterface *providedInterface : ivFunction->pis()) {
-        if (providedInterface->kind() == IVInterface::OperationKind::Cyclic
-                || providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
+        if (providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
             std::unique_ptr<ProctypeInfo> proctypeInfo = prepareProctypeInfo(context, providedInterface, functionName);
             const QString proctypeName = proctypeInfo->m_proctypeName;
             functionInfo.m_proctypes.emplace(proctypeName, std::move(proctypeInfo));
         } else {
-            auto message =
-                    QString("Unallowed interface kind in function %1, only sporadic and cyclic interfaces are allowed")
-                            .arg(functionName);
+            auto message = QString("Unallowed interface kind in function %1, only sporadic interfaces are allowed")
+                                   .arg(functionName);
             throw TranslationException(message);
         }
     }
@@ -1647,7 +1645,7 @@ std::unique_ptr<IvToPromelaTranslator::ProctypeInfo> IvToPromelaTranslator::prep
 
     const size_t priority = getInterfacePriority(providedInterface) + context.getBaseProctypePriority();
     const size_t queueSize = getInterfaceQueueSize(providedInterface);
-    const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
+    const auto [parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
     const ObserverAttachments outputObservers =
             context.getObserverAttachments(functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
