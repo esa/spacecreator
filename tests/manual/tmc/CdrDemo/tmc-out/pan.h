@@ -125,16 +125,10 @@
 #endif
 #ifdef NP
 	#define HAS_NP	2
-	#define VERI	11	/* np_ */
+	#define VERI	10	/* np_ */
 #endif
 #if defined(NOCLAIM) && defined(NP)
 	#undef NOCLAIM
-#endif
-#ifndef NOCLAIM
-	#define NCLAIMS	1
-	#ifndef NP
-		#define VERI	10
-	#endif
 #endif
 
 typedef struct S_F_MAP {
@@ -143,50 +137,45 @@ typedef struct S_F_MAP {
 	int upto;
 } S_F_MAP;
 
-#define _nstates10	29	/* never_0 */
-#define minseq10	2337
-#define maxseq10	2364
-#define _endstate10	28
+#define _nstates9	297	/* :init: */
+#define minseq9	1747
+#define maxseq9	2042
+#define _endstate9	296
 
-#define _nstates9	342	/* :init: */
-#define minseq9	1996
-#define maxseq9	2336
-#define _endstate9	341
+#define _nstates8	29	/* Sensor_reading */
+#define minseq8	1719
+#define maxseq8	1746
+#define _endstate8	28
 
-#define _nstates8	39	/* Sensor_reading */
-#define minseq8	1958
-#define maxseq8	1995
-#define _endstate8	38
-
-#define _nstates7	478	/* Modemanager_systemTc */
-#define minseq7	1481
-#define maxseq7	1957
-#define _endstate7	477
+#define _nstates7	365	/* Modemanager_systemTc */
+#define minseq7	1355
+#define maxseq7	1718
+#define _endstate7	364
 
 #define _nstates6	172	/* Modemanager_reading */
-#define minseq6	1310
-#define maxseq6	1480
+#define minseq6	1184
+#define maxseq6	1354
 #define _endstate6	171
 
 #define _nstates5	321	/* Modemanager_actuatorTm2 */
-#define minseq5	990
-#define maxseq5	1309
+#define minseq5	864
+#define maxseq5	1183
 #define _endstate5	320
 
 #define _nstates4	321	/* Modemanager_actuatorTm1 */
-#define minseq4	670
-#define maxseq4	989
+#define minseq4	544
+#define maxseq4	863
 #define _endstate4	320
 
-#define _nstates3	104	/* Egse_systemTc */
-#define minseq3	567
-#define maxseq3	669
-#define _endstate3	103
+#define _nstates3	78	/* Egse_systemTc */
+#define minseq3	467
+#define maxseq3	543
+#define _endstate3	77
 
-#define _nstates2	116	/* Egse_systemTm */
+#define _nstates2	16	/* Egse_systemTm */
 #define minseq2	452
-#define maxseq2	566
-#define _endstate2	115
+#define maxseq2	466
+#define _endstate2	15
 
 #define _nstates1	227	/* Actuator2_actuatorTc */
 #define minseq1	226
@@ -198,7 +187,6 @@ typedef struct S_F_MAP {
 #define maxseq0	225
 #define _endstate0	226
 
-extern short src_ln10[];
 extern short src_ln9[];
 extern short src_ln8[];
 extern short src_ln7[];
@@ -209,7 +197,6 @@ extern short src_ln3[];
 extern short src_ln2[];
 extern short src_ln1[];
 extern short src_ln0[];
-extern S_F_MAP src_file10[];
 extern S_F_MAP src_file9[];
 extern S_F_MAP src_file8[];
 extern S_F_MAP src_file7[];
@@ -222,11 +209,11 @@ extern S_F_MAP src_file1[];
 extern S_F_MAP src_file0[];
 
 #define T_ID	unsigned short
-#define _T5	797
-#define _T2	798
+#define _T5	697
+#define _T2	698
 #define WS		8 /* word size in bytes */
 #define SYNC	0
-#define ASYNC	11
+#define ASYNC	10
 
 #ifndef NCORE
 	#ifdef DUAL_CORE
@@ -290,10 +277,6 @@ struct Egse_Event_msg_in_systemtm_tm { /* user defined type */
 	int status2;
 };
 struct Egse_Event_msg_out_systemtc_tc_goToOperational { /* user defined type */
-	int threshold1;
-	int threshold2;
-};
-struct Egse_systemtc_tc_goToOperational { /* user defined type */
 	int threshold1;
 	int threshold2;
 };
@@ -915,10 +898,6 @@ struct Observable_Event_unhandled_input_event_modemanager_msg_out_systemtm_tm { 
 };
 struct Observable_Event_unhandled_input_event_sensor { /* user defined type */
 	unsigned dummy : 1;
-};
-struct OptimizedConfiguration { /* user defined type */
-	int threshold1;
-	int threshold2;
 };
 struct Sensor_Event { /* user defined type */
 	unsigned dummy : 1;
@@ -1557,11 +1536,6 @@ struct TimerData { /* user defined type */
 	unsigned timer_enabled : 1;
 	int interval;
 };
-struct Untitled_msc_Context { /* user defined type */
-	int state;
-	unsigned init_done : 1;
-	int sender;
-};
 struct Actuator1_Event_msg_in_data { /* user defined type */
 	struct Actuator1_Event_msg_in_input_none input_none;
 	struct Actuator1_Event_msg_in_actuatortc actuatortc;
@@ -1590,11 +1564,6 @@ struct Egse_Event_msg_in_systemtm { /* user defined type */
 struct Egse_Event_msg_out_systemtc_tc_data { /* user defined type */
 	int goToIdle;
 	struct Egse_Event_msg_out_systemtc_tc_goToOperational goToOperational;
-	int doReport;
-};
-struct Egse_systemtc_tc_data { /* user defined type */
-	int goToIdle;
-	struct Egse_systemtc_tc_goToOperational goToOperational;
 	int doReport;
 };
 struct Events_Ty_elem_input_event_event_actuator1_msg_in_data { /* user defined type */
@@ -2215,10 +2184,6 @@ struct Egse_Event_msg_in_data { /* user defined type */
 };
 struct Egse_Event_msg_out_systemtc_tc { /* user defined type */
 	struct Egse_Event_msg_out_systemtc_tc_data data;
-	int selection;
-};
-struct Egse_systemtc_tc { /* user defined type */
-	struct Egse_systemtc_tc_data data;
 	int selection;
 };
 struct Events_Ty_elem_input_event_event_actuator1_msg_in { /* user defined type */
@@ -4277,22 +4242,11 @@ struct System_State { /* user defined type */
 	struct System_State_modemanager modemanager;
 };
 struct system_state { /* user defined type */
-	struct Untitled_msc_Context untitled_msc;
-	struct Actuator_Context actuator1;
 	struct Modemanager_Context modemanager;
+	struct Actuator_Context actuator1;
 	struct Actuator_Context actuator2;
 	struct AggregateTimerData timers;
 };
-typedef struct P10 { /* never_0 */
-	unsigned _pid : 8;  /* 0..255 */
-	unsigned _t   : 5; /* proctype */
-	unsigned _p   : 10; /* state    */
-#ifdef HAS_PRIORITY
-	unsigned _priority : 8; /* 0..255 */
-#endif
-} P10;
-#define Air10	(sizeof(P10) - 3)
-
 #define Pinit	((P9 *)_this)
 typedef struct P9 { /* :init: */
 	unsigned _pid : 8;  /* 0..255 */
@@ -4301,12 +4255,11 @@ typedef struct P9 { /* :init: */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1067_10_14_41_transition_id;
-	int _1067_10_15_43_transition_id;
-	int _1067_10_16_45_transition_id;
-	int _1067_10_17_47_transition_id;
+	int _1061_10_10_33_transition_id;
+	int _1061_10_11_35_transition_id;
+	int _1061_10_12_37_transition_id;
 } P9;
-#define Air9	(sizeof(P9) - Offsetof(P9, _1067_10_17_47_transition_id) - 1*sizeof(int))
+#define Air9	(sizeof(P9) - Offsetof(P9, _1061_10_12_37_transition_id) - 1*sizeof(int))
 
 #define PSensor_reading	((P8 *)_this)
 typedef struct P8 { /* Sensor_reading */
@@ -4317,9 +4270,10 @@ typedef struct P8 { /* Sensor_reading */
 	unsigned _priority : 8; /* 0..255 */
 #endif
 	int value;
-	int _1066_9_11_Sensor_reading_x_tmp;
+	int inputVectorCounter;
+	int _1060_9_8_29_DataItem_tmp;
 } P8;
-#define Air8	(sizeof(P8) - Offsetof(P8, _1066_9_11_Sensor_reading_x_tmp) - 1*sizeof(int))
+#define Air8	(sizeof(P8) - Offsetof(P8, _1060_9_8_29_DataItem_tmp) - 1*sizeof(int))
 
 #define PModemanager_systemTc	((P7 *)_this)
 typedef struct P7 { /* Modemanager_systemTc */
@@ -4329,12 +4283,10 @@ typedef struct P7 { /* Modemanager_systemTc */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1065_8_9_30_transition_id;
-	int _1065_8_9_32_transition_id;
-	int _1065_8_10_34_transition_id;
-	int _1065_8_10_35_transition_id;
+	int _1059_8_7_26_transition_id;
+	int _1059_8_7_28_transition_id;
 } P7;
-#define Air7	(sizeof(P7) - Offsetof(P7, _1065_8_10_35_transition_id) - 1*sizeof(int))
+#define Air7	(sizeof(P7) - Offsetof(P7, _1059_8_7_28_transition_id) - 1*sizeof(int))
 
 #define PModemanager_reading	((P6 *)_this)
 typedef struct P6 { /* Modemanager_reading */
@@ -4344,9 +4296,9 @@ typedef struct P6 { /* Modemanager_reading */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1064_7_8_28_transition_id;
+	int _1058_7_6_24_transition_id;
 } P6;
-#define Air6	(sizeof(P6) - Offsetof(P6, _1064_7_8_28_transition_id) - 1*sizeof(int))
+#define Air6	(sizeof(P6) - Offsetof(P6, _1058_7_6_24_transition_id) - 1*sizeof(int))
 
 #define PModemanager_actuatorTm2	((P5 *)_this)
 typedef struct P5 { /* Modemanager_actuatorTm2 */
@@ -4356,10 +4308,10 @@ typedef struct P5 { /* Modemanager_actuatorTm2 */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1063_6_7_24_transition_id;
-	int _1063_6_7_26_transition_id;
+	int _1057_6_5_20_transition_id;
+	int _1057_6_5_22_transition_id;
 } P5;
-#define Air5	(sizeof(P5) - Offsetof(P5, _1063_6_7_26_transition_id) - 1*sizeof(int))
+#define Air5	(sizeof(P5) - Offsetof(P5, _1057_6_5_22_transition_id) - 1*sizeof(int))
 
 #define PModemanager_actuatorTm1	((P4 *)_this)
 typedef struct P4 { /* Modemanager_actuatorTm1 */
@@ -4369,10 +4321,10 @@ typedef struct P4 { /* Modemanager_actuatorTm1 */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1062_5_6_20_transition_id;
-	int _1062_5_6_22_transition_id;
+	int _1056_5_4_16_transition_id;
+	int _1056_5_4_18_transition_id;
 } P4;
-#define Air4	(sizeof(P4) - Offsetof(P4, _1062_5_6_22_transition_id) - 1*sizeof(int))
+#define Air4	(sizeof(P4) - Offsetof(P4, _1056_5_4_18_transition_id) - 1*sizeof(int))
 
 #define PEgse_systemTc	((P3 *)_this)
 typedef struct P3 { /* Egse_systemTc */
@@ -4382,10 +4334,11 @@ typedef struct P3 { /* Egse_systemTc */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1061_4_4_16_Dummy_tmp;
-	int _1061_4_4_17_53_OptimizedDataItem_tmp;
-	int _1061_4_4_17_54_OptimizedDataItem_tmp;
-	int _1061_4_4_18_Dummy_tmp;
+	int inputVectorCounter;
+	int _1055_4_3_13_49_Dummy_tmp;
+	int _1055_4_3_13_50_2_DataItem_tmp;
+	int _1055_4_3_13_50_3_DataItem_tmp;
+	int _1055_4_3_13_51_Dummy_tmp;
 	struct SystemCommand value;
 } P3;
 #define Air3	0
@@ -4398,10 +4351,8 @@ typedef struct P2 { /* Egse_systemTm */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1060_3_3_13_transition_id;
-	int _1060_3_3_15_transition_id;
 } P2;
-#define Air2	(sizeof(P2) - Offsetof(P2, _1060_3_3_15_transition_id) - 1*sizeof(int))
+#define Air2	(sizeof(P2) - 3)
 
 #define PActuator2_actuatorTc	((P1 *)_this)
 typedef struct P1 { /* Actuator2_actuatorTc */
@@ -4411,11 +4362,11 @@ typedef struct P1 { /* Actuator2_actuatorTc */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1059_2_2_8_transition_id;
-	int _1059_2_2_10_transition_id;
-	int _1059_2_2_12_transition_id;
+	int _1053_2_2_8_transition_id;
+	int _1053_2_2_10_transition_id;
+	int _1053_2_2_12_transition_id;
 } P1;
-#define Air1	(sizeof(P1) - Offsetof(P1, _1059_2_2_12_transition_id) - 1*sizeof(int))
+#define Air1	(sizeof(P1) - Offsetof(P1, _1053_2_2_12_transition_id) - 1*sizeof(int))
 
 #define PActuator1_actuatorTc	((P0 *)_this)
 typedef struct P0 { /* Actuator1_actuatorTc */
@@ -4425,21 +4376,21 @@ typedef struct P0 { /* Actuator1_actuatorTc */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1058_1_1_2_transition_id;
-	int _1058_1_1_4_transition_id;
-	int _1058_1_1_6_transition_id;
+	int _1052_1_1_2_transition_id;
+	int _1052_1_1_4_transition_id;
+	int _1052_1_1_6_transition_id;
 } P0;
-#define Air0	(sizeof(P0) - Offsetof(P0, _1058_1_1_6_transition_id) - 1*sizeof(int))
+#define Air0	(sizeof(P0) - Offsetof(P0, _1052_1_1_6_transition_id) - 1*sizeof(int))
 
-typedef struct P11 { /* np_ */
+typedef struct P10 { /* np_ */
 	unsigned _pid : 8;  /* 0..255 */
 	unsigned _t   : 5; /* proctype */
 	unsigned _p   : 10; /* state    */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-} P11;
-#define Air11	(sizeof(P11) - 3)
+} P10;
+#define Air10	(sizeof(P10) - 3)
 
 #define Pclaim	P0
 #ifndef NCLAIMS
@@ -4641,7 +4592,6 @@ typedef struct State {
 	uchar Actuator1_lock;
 	uchar Actuator2_lock;
 	uchar Modemanager_lock;
-	uchar Untitled_msc_lock;
 	int inited;
 	int Actuator1_actuatortc_signal_parameter;
 	int Actuator2_actuatortc_signal_parameter;
@@ -4649,8 +4599,6 @@ typedef struct State {
 	int Modemanager_actuatortm2_signal_parameter;
 	int Modemanager_reading_signal_parameter;
 	struct Observable_Event nothing;
-	struct SystemCommand Untitled_MSC_0_sig0_param0;
-	struct SystemTelemetry Untitled_MSC_0_sig1_param0;
 	struct SystemTelemetry Egse_systemtm_signal_parameter;
 	struct SystemCommand Modemanager_systemtc_signal_parameter;
 	struct system_state global_state;
@@ -4685,13 +4633,12 @@ typedef struct TRIX_v6 {
 #define FORWARD_MOVES	"pan.m"
 #define BACKWARD_MOVES	"pan.b"
 #define TRANSITIONS	"pan.t"
-#define _NP_	11
-#define _nstates11	3 /* np_ */
-#define _endstate11	2 /* np_ */
+#define _NP_	10
+#define _nstates10	3 /* np_ */
+#define _endstate10	2 /* np_ */
 
-#define _start11	0 /* np_ */
-#define _start10	5
-#define _start9	340
+#define _start10	0 /* np_ */
+#define _start9	295
 #define _start8	1
 #define _start7	1
 #define _start6	1
@@ -4704,7 +4651,7 @@ typedef struct TRIX_v6 {
 #ifdef NP
 	#define ACCEPT_LAB	1 /* at least 1 in np_ */
 #else
-	#define ACCEPT_LAB	1 /* user-defined accept labels */
+	#define ACCEPT_LAB	0 /* user-defined accept labels */
 #endif
 #ifdef MEMCNT
 	#ifdef MEMLIM
@@ -4733,14 +4680,7 @@ typedef struct TRIX_v6 {
 	#define MEMLIM	(2048)	/* need a default, using 2 GB */
 #endif
 #define PROG_LAB	0 /* progress labels */
-#define NQS	11
-typedef struct Q11 {
-	uchar Qlen;	/* q_size */
-	uchar _t;	/* q_type */
-	struct {
-		int fld0;
-	} contents[1];
-} Q11;
+#define NQS	10
 typedef struct Q10 {
 	uchar Qlen;	/* q_size */
 	uchar _t;	/* q_type */
@@ -5143,7 +5083,7 @@ void qsend(int, int, int, int, int, int, int, int);
 #define GLOBAL	7
 #define BAD	8
 #define ALPHA_F	9
-#define NTRANS	799
+#define NTRANS	699
 #if defined(BFS_PAR) || NCORE>1
 	void e_critical(int);
 	void x_critical(int);

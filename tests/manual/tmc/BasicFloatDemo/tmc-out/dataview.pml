@@ -1,3 +1,5 @@
+#define Egse_tm_y int
+#define Egse_tc_x int
 #define Actuator_States int
 #define Actuator_Context_state int
 #define Actuator_Context_init_done bool
@@ -5646,6 +5648,24 @@ typedef System_State {
 
 Sensor_Periodic_Events sensor_periodic_events;
 Observable_Event nothing;
+inline Egse_tm_y_assign_value(dst, src)
+{
+    dst = src;
+    Egse_tm_y_range_check(dst);
+}
+inline Egse_tm_y_range_check(Egse_tm_y_vc)
+{
+    assert((((Egse_tm_y_vc >= 0) && (Egse_tm_y_vc <= 0)) || ((Egse_tm_y_vc >= 100) && (Egse_tm_y_vc <= 100))));
+}
+inline Egse_tc_x_assign_value(dst, src)
+{
+    dst = src;
+    Egse_tc_x_range_check(dst);
+}
+inline Egse_tc_x_range_check(Egse_tc_x_vc)
+{
+    assert((((Egse_tc_x_vc >= 0) && (Egse_tc_x_vc <= 0)) || ((Egse_tc_x_vc >= 10) && (Egse_tc_x_vc <= 10))));
+}
 inline Actuator_States_assign_value(dst, src)
 {
     dst = src;

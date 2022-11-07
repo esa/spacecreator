@@ -6,226 +6,6 @@
 ---------------------------------------------------
 
 
-PACKAGE interfaceview::IV::Sensor
-PUBLIC
-
-WITH Taste;
-WITH DataView;
-WITH TASTE_IV_Properties;
-WITH interfaceview::IV::ModeManager;
-
-SUBPROGRAM PI_trigger
-END PI_trigger;
-
-SUBPROGRAM IMPLEMENTATION PI_trigger.others
-END PI_trigger.others;
-
-
-SUBPROGRAM RI_reading
-FEATURES
-    x : IN PARAMETER DataView::DataItem {
-       Taste::encoding => NATIVE;
-    };
-END RI_reading;
-
-SUBPROGRAM IMPLEMENTATION RI_reading.others
-END RI_reading.others;
-
-
-
-SYSTEM Sensor
-FEATURES
-   PI_trigger : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Sensor:: PI_trigger.others {
-      Taste::InterfaceName           => "trigger";            
-      Taste::RCMoperationKind        => cyclic;      
-      -- Unrecognized property: enable_multicast => true      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Cyclic_Offset => 0;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 1000 ms;      
-      Taste::Interface_Priority      => 1;      
-   };
-   RI_reading : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_reading.others {
-      Taste::labelInheritance        => "true";
-      Taste::InterfaceName           => "reading";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => true      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Taste::Associated_Queue_Size   => 1;      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
-   };
-PROPERTIES
-   -- ignored property: name = Sensor
-   -- ignored property: is_type = NO
-   Source_Language => (C);
-   -- ignored property: default_implementation = default
-   -- ignored property: fixed_system_element = NO
-   -- ignored property: required_system_element = NO
-   -- ignored property: FPGA_Configurations = 
-   Taste::Startup_Priority => 1;
-END Sensor;
-
-SYSTEM IMPLEMENTATION Sensor.others
-END Sensor.others;
-
-END interfaceview::IV::Sensor;
-
-
-
-PACKAGE interfaceview::IV::Actuator
-PUBLIC
-
-WITH Taste;
-WITH DataView;
-WITH TASTE_IV_Properties;
-
-SUBPROGRAM PI_actuatorTc
-FEATURES
-    tc : IN PARAMETER DataView::ActuatorCommand {
-       Taste::encoding => NATIVE;
-    };
-END PI_actuatorTc;
-
-SUBPROGRAM IMPLEMENTATION PI_actuatorTc.others
-END PI_actuatorTc.others;
-
-
-SUBPROGRAM RI_actuatorTm
-FEATURES
-    tm : IN PARAMETER DataView::ActuatorStatus {
-       Taste::encoding => NATIVE;
-    };
-END RI_actuatorTm;
-
-SUBPROGRAM IMPLEMENTATION RI_actuatorTm.others
-END RI_actuatorTm.others;
-
-
-
-SYSTEM Actuator
-FEATURES
-   PI_actuatorTc : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Actuator:: PI_actuatorTc.others {
-      Taste::InterfaceName           => "actuatorTc";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => true      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Taste::Associated_Queue_Size   => 1;      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
-   };
-   RI_actuatorTm : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Actuator:: RI_actuatorTm.others {
-      Taste::labelInheritance        => "true";
-      Taste::InterfaceName           => "actuatorTm";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => true      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-   };
-PROPERTIES
-   -- ignored property: name = Actuator
-   TASTE::Is_Component_Type => true;
-   Source_Language => (SDL);
-   -- ignored property: type_language = SDL
-   -- ignored property: fixed_system_element = NO
-   -- ignored property: required_system_element = NO
-   -- ignored property: FPGA_Configurations = 
-   Taste::Startup_Priority => 1;
-END Actuator;
-
-SYSTEM IMPLEMENTATION Actuator.others
-END Actuator.others;
-
-END interfaceview::IV::Actuator;
-
-
-
-PACKAGE interfaceview::IV::Actuator2
-PUBLIC
-
-WITH Taste;
-WITH DataView;
-WITH TASTE_IV_Properties;
-WITH interfaceview::IV::ModeManager;
-
-SUBPROGRAM PI_actuatorTc
-FEATURES
-    tc : IN PARAMETER DataView::ActuatorCommand {
-       Taste::encoding => NATIVE;
-    };
-END PI_actuatorTc;
-
-SUBPROGRAM IMPLEMENTATION PI_actuatorTc.others
-END PI_actuatorTc.others;
-
-
-SUBPROGRAM RI_actuatorTm
-FEATURES
-    tm : IN PARAMETER DataView::ActuatorStatus {
-       Taste::encoding => NATIVE;
-    };
-END RI_actuatorTm;
-
-SUBPROGRAM IMPLEMENTATION RI_actuatorTm.others
-END RI_actuatorTm.others;
-
-
-
-SYSTEM Actuator2
-FEATURES
-   PI_actuatorTc : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Actuator2:: PI_actuatorTc.others {
-      Taste::InterfaceName           => "actuatorTc";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => true      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Taste::Associated_Queue_Size   => 1;      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
-   };
-   RI_actuatorTm : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_actuatorTm2.others {
-      Taste::labelInheritance        => "true";
-      Taste::InterfaceName           => "actuatorTm";            
-      Taste::RCMoperationKind        => sporadic;      
-      -- Unrecognized property: enable_multicast => true      
-      -- Unrecognized property: layer => default      
-      -- Unrecognized property: required_system_element => NO      
-      Taste::Associated_Queue_Size   => 1;      
-      Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
-   };
-PROPERTIES
-   -- ignored property: name = Actuator2
-   -- ignored property: is_type = NO
-   TASTE_IV_Properties::is_instance_of => "Actuator";
-   Source_Language => (SDL);
-   -- ignored property: type_language = SDL
-   -- ignored property: default_implementation = default
-   -- ignored property: fixed_system_element = NO
-   -- ignored property: required_system_element = NO
-   -- ignored property: FPGA_Configurations = 
-   Taste::Startup_Priority => 1;
-END Actuator2;
-
-SYSTEM IMPLEMENTATION Actuator2.others
-END Actuator2.others;
-
-END interfaceview::IV::Actuator2;
-
-
-
 PACKAGE interfaceview::IV::ModeManager
 PUBLIC
 
@@ -323,11 +103,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
    PI_actuatorTm1 : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_actuatorTm1.others {
       Taste::InterfaceName           => "actuatorTm1";            
@@ -335,11 +115,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
    PI_actuatorTm2 : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_actuatorTm2.others {
       Taste::InterfaceName           => "actuatorTm2";            
@@ -347,11 +127,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
    PI_systemTc : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_systemTc.others {
       Taste::InterfaceName           => "systemTc";            
@@ -359,11 +139,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
    RI_actuatorTc1 : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Actuator1:: PI_actuatorTc.others {
       Taste::labelInheritance        => "true";
@@ -372,11 +152,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
    RI_actuatorTc2 : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Actuator2:: PI_actuatorTc.others {
       Taste::labelInheritance        => "true";
@@ -385,11 +165,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
    RI_systemTm : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: EGSE:: PI_systemTm.others {
       Taste::labelInheritance        => "true";
@@ -398,11 +178,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
 PROPERTIES
    -- ignored property: name = ModeManager
@@ -411,8 +191,8 @@ PROPERTIES
    -- ignored property: default_implementation = default
    -- ignored property: fixed_system_element = NO
    -- ignored property: required_system_element = NO
-   -- ignored property: FPGA_Configurations = 
    Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
 END ModeManager;
 
 SYSTEM IMPLEMENTATION ModeManager.others
@@ -422,7 +202,77 @@ END interfaceview::IV::ModeManager;
 
 
 
-PACKAGE interfaceview::IV::EGSE
+PACKAGE interfaceview::IV::Actuator
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+
+SUBPROGRAM PI_actuatorTc
+FEATURES
+    tc : IN PARAMETER DataView::ActuatorCommand {
+       Taste::encoding => NATIVE;
+    };
+END PI_actuatorTc;
+
+SUBPROGRAM IMPLEMENTATION PI_actuatorTc.others
+END PI_actuatorTc.others;
+
+
+SUBPROGRAM RI_actuatorTm
+FEATURES
+    tm : IN PARAMETER DataView::ActuatorStatus {
+       Taste::encoding => NATIVE;
+    };
+END RI_actuatorTm;
+
+SUBPROGRAM IMPLEMENTATION RI_actuatorTm.others
+END RI_actuatorTm.others;
+
+
+
+SYSTEM Actuator
+FEATURES
+   PI_actuatorTc : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Actuator:: PI_actuatorTc.others {
+      Taste::InterfaceName           => "actuatorTc";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+   RI_actuatorTm : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Actuator:: RI_actuatorTm.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "actuatorTm";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+   };
+PROPERTIES
+   -- ignored property: name = Actuator
+   TASTE::Is_Component_Type => true;
+   Source_Language => (SDL);
+   -- ignored property: type_language = SDL
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END Actuator;
+
+SYSTEM IMPLEMENTATION Actuator.others
+END Actuator.others;
+
+END interfaceview::IV::Actuator;
+
+
+
+PACKAGE interfaceview::IV::Actuator2
 PUBLIC
 
 WITH Taste;
@@ -430,71 +280,73 @@ WITH DataView;
 WITH TASTE_IV_Properties;
 WITH interfaceview::IV::ModeManager;
 
-SUBPROGRAM PI_systemTm
+SUBPROGRAM PI_actuatorTc
 FEATURES
-    tm : IN PARAMETER DataView::SystemTelemetry {
+    tc : IN PARAMETER DataView::ActuatorCommand {
        Taste::encoding => NATIVE;
     };
-END PI_systemTm;
+END PI_actuatorTc;
 
-SUBPROGRAM IMPLEMENTATION PI_systemTm.others
-END PI_systemTm.others;
+SUBPROGRAM IMPLEMENTATION PI_actuatorTc.others
+END PI_actuatorTc.others;
 
 
-SUBPROGRAM RI_systemTc
+SUBPROGRAM RI_actuatorTm
 FEATURES
-    tc : IN PARAMETER DataView::SystemCommand {
+    tm : IN PARAMETER DataView::ActuatorStatus {
        Taste::encoding => NATIVE;
     };
-END RI_systemTc;
+END RI_actuatorTm;
 
-SUBPROGRAM IMPLEMENTATION RI_systemTc.others
-END RI_systemTc.others;
+SUBPROGRAM IMPLEMENTATION RI_actuatorTm.others
+END RI_actuatorTm.others;
 
 
 
-SYSTEM EGSE
+SYSTEM Actuator2
 FEATURES
-   PI_systemTm : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: EGSE:: PI_systemTm.others {
-      Taste::InterfaceName           => "systemTm";            
+   PI_actuatorTc : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Actuator2:: PI_actuatorTc.others {
+      Taste::InterfaceName           => "actuatorTc";            
       Taste::RCMoperationKind        => sporadic;      
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
-   RI_systemTc : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_systemTc.others {
+   RI_actuatorTm : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_actuatorTm2.others {
       Taste::labelInheritance        => "true";
-      Taste::InterfaceName           => "systemTc";            
+      Taste::InterfaceName           => "actuatorTm";            
       Taste::RCMoperationKind        => sporadic;      
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
 PROPERTIES
-   -- ignored property: name = EGSE
+   -- ignored property: name = Actuator2
    -- ignored property: is_type = NO
-   Source_Language => (GUI);
+   TASTE_IV_Properties::is_instance_of => "Actuator";
+   Source_Language => (SDL);
+   -- ignored property: type_language = SDL
    -- ignored property: default_implementation = default
    -- ignored property: fixed_system_element = NO
    -- ignored property: required_system_element = NO
-   -- ignored property: FPGA_Configurations = 
    Taste::Startup_Priority => 1;
-END EGSE;
+   -- ignored property: FPGA_Configurations = 
+END Actuator2;
 
-SYSTEM IMPLEMENTATION EGSE.others
-END EGSE.others;
+SYSTEM IMPLEMENTATION Actuator2.others
+END Actuator2.others;
 
-END interfaceview::IV::EGSE;
+END interfaceview::IV::Actuator2;
 
 
 
@@ -537,11 +389,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
    RI_actuatorTm : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_actuatorTm1.others {
       Taste::labelInheritance        => "true";
@@ -550,11 +402,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => true      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
       Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
       Taste::Interface_Stack_Size    => 1024;      
-      Taste::RCMperiod               => 0 ms;      
-      Taste::Interface_Priority      => 1;      
    };
 PROPERTIES
    -- ignored property: name = Actuator1
@@ -565,8 +417,8 @@ PROPERTIES
    -- ignored property: default_implementation = default
    -- ignored property: fixed_system_element = NO
    -- ignored property: required_system_element = NO
-   -- ignored property: FPGA_Configurations = 
    Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
 END Actuator1;
 
 SYSTEM IMPLEMENTATION Actuator1.others
@@ -575,15 +427,163 @@ END Actuator1.others;
 END interfaceview::IV::Actuator1;
 
 
+
+PACKAGE interfaceview::IV::Sensor
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::ModeManager;
+
+SUBPROGRAM PI_trigger
+END PI_trigger;
+
+SUBPROGRAM IMPLEMENTATION PI_trigger.others
+END PI_trigger.others;
+
+
+SUBPROGRAM RI_reading
+FEATURES
+    x : IN PARAMETER DataView::DataItem {
+       Taste::encoding => NATIVE;
+    };
+END RI_reading;
+
+SUBPROGRAM IMPLEMENTATION RI_reading.others
+END RI_reading.others;
+
+
+
+SYSTEM Sensor
+FEATURES
+   PI_trigger : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: Sensor:: PI_trigger.others {
+      Taste::InterfaceName           => "trigger";            
+      Taste::RCMoperationKind        => cyclic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Cyclic_Offset => 0;      
+      Taste::Interface_Priority      => 1;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+      Taste::RCMperiod               => 1000 ms;      
+   };
+   RI_reading : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_reading.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "reading";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+PROPERTIES
+   -- ignored property: name = Sensor
+   -- ignored property: is_type = NO
+   Source_Language => (C);
+   -- ignored property: default_implementation = default
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END Sensor;
+
+SYSTEM IMPLEMENTATION Sensor.others
+END Sensor.others;
+
+END interfaceview::IV::Sensor;
+
+
+
+PACKAGE interfaceview::IV::EGSE
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+WITH interfaceview::IV::ModeManager;
+
+SUBPROGRAM PI_systemTm
+FEATURES
+    tm : IN PARAMETER DataView::SystemTelemetry {
+       Taste::encoding => NATIVE;
+    };
+END PI_systemTm;
+
+SUBPROGRAM IMPLEMENTATION PI_systemTm.others
+END PI_systemTm.others;
+
+
+SUBPROGRAM RI_systemTc
+FEATURES
+    tc : IN PARAMETER DataView::SystemCommand {
+       Taste::encoding => NATIVE;
+    };
+END RI_systemTc;
+
+SUBPROGRAM IMPLEMENTATION RI_systemTc.others
+END RI_systemTc.others;
+
+
+
+SYSTEM EGSE
+FEATURES
+   PI_systemTm : PROVIDES SUBPROGRAM ACCESS interfaceview::IV:: EGSE:: PI_systemTm.others {
+      Taste::InterfaceName           => "systemTm";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+   RI_systemTc : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: ModeManager:: PI_systemTc.others {
+      Taste::labelInheritance        => "true";
+      Taste::InterfaceName           => "systemTc";            
+      Taste::RCMoperationKind        => sporadic;      
+      -- Unrecognized property: enable_multicast => true      
+      -- Unrecognized property: layer => default      
+      -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Associated_Queue_Size   => 1;      
+      Taste::RCMperiod               => 0 ms;      
+      Compute_Execution_Time => 0 ms .. 0 ms;      
+      Taste::Interface_Stack_Size    => 1024;      
+   };
+PROPERTIES
+   -- ignored property: name = EGSE
+   -- ignored property: is_type = NO
+   Source_Language => (GUI);
+   -- ignored property: default_implementation = default
+   -- ignored property: fixed_system_element = NO
+   -- ignored property: required_system_element = NO
+   Taste::Startup_Priority => 1;
+   -- ignored property: FPGA_Configurations = 
+END EGSE;
+
+SYSTEM IMPLEMENTATION EGSE.others
+END EGSE.others;
+
+END interfaceview::IV::EGSE;
+
+
 PACKAGE interfaceview::IV
 PUBLIC
 
-WITH interfaceview::IV::Sensor;
+WITH interfaceview::IV::ModeManager;
 WITH interfaceview::IV::Actuator;
 WITH interfaceview::IV::Actuator2;
-WITH interfaceview::IV::ModeManager;
-WITH interfaceview::IV::EGSE;
 WITH interfaceview::IV::Actuator1;
+WITH interfaceview::IV::Sensor;
+WITH interfaceview::IV::EGSE;
 WITH Taste;
 WITH DataView;
 WITH TASTE_IV_Properties;
@@ -596,20 +596,20 @@ END interfaceview;
 
 SYSTEM IMPLEMENTATION interfaceview.others
 SUBCOMPONENTS
-  Sensor : SYSTEM interfaceview::IV::Sensor::Sensor.others;
+  ModeManager : SYSTEM interfaceview::IV::ModeManager::ModeManager.others;
   Actuator : SYSTEM interfaceview::IV::Actuator::Actuator.others;
   Actuator2 : SYSTEM interfaceview::IV::Actuator2::Actuator2.others;
-  ModeManager : SYSTEM interfaceview::IV::ModeManager::ModeManager.others;
-  EGSE : SYSTEM interfaceview::IV::EGSE::EGSE.others;
   Actuator1 : SYSTEM interfaceview::IV::Actuator1::Actuator1.others;
+  Sensor : SYSTEM interfaceview::IV::Sensor::Sensor.others;
+  EGSE : SYSTEM interfaceview::IV::EGSE::EGSE.others;
 CONNECTIONS
-   Actuator2_RI_actuatorTm_ModeManager_PI_actuatorTm2 : SUBPROGRAM ACCESS ModeManager.PI_actuatorTm2 -> Actuator2.RI_actuatorTm;
    ModeManager_RI_actuatorTc2_Actuator2_PI_actuatorTc : SUBPROGRAM ACCESS Actuator2.PI_actuatorTc -> ModeManager.RI_actuatorTc2;
+   ModeManager_RI_systemTm_EGSE_PI_systemTm : SUBPROGRAM ACCESS EGSE.PI_systemTm -> ModeManager.RI_systemTm;
    Sensor_RI_reading_ModeManager_PI_reading : SUBPROGRAM ACCESS ModeManager.PI_reading -> Sensor.RI_reading;
-   EGSE_RI_systemTc_ModeManager_PI_systemTc : SUBPROGRAM ACCESS ModeManager.PI_systemTc -> EGSE.RI_systemTc;
    ModeManager_RI_actuatorTc1_Actuator1_PI_actuatorTc : SUBPROGRAM ACCESS Actuator1.PI_actuatorTc -> ModeManager.RI_actuatorTc1;
    Actuator1_RI_actuatorTm_ModeManager_PI_actuatorTm1 : SUBPROGRAM ACCESS ModeManager.PI_actuatorTm1 -> Actuator1.RI_actuatorTm;
-   ModeManager_RI_systemTm_EGSE_PI_systemTm : SUBPROGRAM ACCESS EGSE.PI_systemTm -> ModeManager.RI_systemTm;
+   Actuator2_RI_actuatorTm_ModeManager_PI_actuatorTm2 : SUBPROGRAM ACCESS ModeManager.PI_actuatorTm2 -> Actuator2.RI_actuatorTm;
+   EGSE_RI_systemTc_ModeManager_PI_systemTc : SUBPROGRAM ACCESS ModeManager.PI_systemTc -> EGSE.RI_systemTc;
 END interfaceview.others;
 
 PROPERTIES

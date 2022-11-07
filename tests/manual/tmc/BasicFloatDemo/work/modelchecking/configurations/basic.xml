@@ -6,11 +6,12 @@
             <Properties>
                 <Property path="range_check/range_check.scl"/>
             </Properties>
+            <Subtyping name="optimized.asn"/>
             <Submodel>
-                <Function name="Sensor"/>
-                <Function name="EGSE"/>
-                <Function name="SystemControl"/>
                 <Function name="Actuator"/>
+                <Function name="Sensor"/>
+                <Function name="SystemControl"/>
+                <Function name="EGSE"/>
             </Submodel>
         </Configuration>
         <NativeModelChecker/>

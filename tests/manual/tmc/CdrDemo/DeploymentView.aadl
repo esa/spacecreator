@@ -23,13 +23,13 @@ WITH interfaceview::IV::EGSE;
 
 WITH interfaceview::IV::Actuator;
 
-WITH interfaceview::IV::ModeManager;
+WITH interfaceview::IV::Actuator1;
 
-WITH interfaceview::IV::Actuator2;
+WITH interfaceview::IV::ModeManager;
 
 WITH interfaceview::IV::Sensor;
 
-WITH interfaceview::IV::Actuator1;
+WITH interfaceview::IV::Actuator2;
 
 
 WITH ocarina_processors_x86;
@@ -49,20 +49,20 @@ SUBCOMPONENTS
    };
 
 
-   IV_ModeManager : SYSTEM interfaceview::IV::ModeManager::ModeManager.others {
-      Taste::FunctionName => "ModeManager";
+   IV_Actuator1 : SYSTEM interfaceview::IV::Actuator1::Actuator1.others {
+      Taste::FunctionName => "Actuator1";
    };
 
-   IV_Actuator2 : SYSTEM interfaceview::IV::Actuator2::Actuator2.others {
-      Taste::FunctionName => "Actuator2";
+   IV_ModeManager : SYSTEM interfaceview::IV::ModeManager::ModeManager.others {
+      Taste::FunctionName => "ModeManager";
    };
 
    IV_Sensor : SYSTEM interfaceview::IV::Sensor::Sensor.others {
       Taste::FunctionName => "Sensor";
    };
 
-   IV_Actuator1 : SYSTEM interfaceview::IV::Actuator1::Actuator1.others {
-      Taste::FunctionName => "Actuator1";
+   IV_Actuator2 : SYSTEM interfaceview::IV::Actuator2::Actuator2.others {
+      Taste::FunctionName => "Actuator2";
    };
 
    demo : PROCESS deploymentview::DV::Node_Linux::demo.others {
@@ -91,7 +91,9 @@ PROPERTIES
    
 
    
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_ModeManager;
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_Actuator1;
+   
+   
    
    
    
@@ -100,9 +102,7 @@ PROPERTIES
    
 
    
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_Actuator2;
-   
-   
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_ModeManager;
    
    
    
@@ -120,7 +120,7 @@ PROPERTIES
    
 
    
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_Actuator1;
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_Actuator2;
    
    
    

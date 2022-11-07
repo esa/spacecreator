@@ -2,12 +2,10 @@
 #include "actuator1.pml"
 #include "actuator2.pml"
 #include "modemanager.pml"
-#include "Untitled_msc.pml"
 #include "env_inlines.pml"
 typedef system_state {
-    Untitled_msc_Context untitled_msc;
-    Actuator_Context actuator1;
     Modemanager_Context modemanager;
+    Actuator_Context actuator1;
     Actuator_Context actuator2;
     AggregateTimerData timers;
 }
@@ -38,7 +36,6 @@ system_state global_state;
 chan Actuator1_lock = [1] of {int};
 chan Actuator2_lock = [1] of {int};
 chan Modemanager_lock = [1] of {int};
-chan Untitled_msc_lock = [1] of {int};
 inline Modemanager_0_RI_0_actuatorTc1(Actuator1_actuatorTc_tc)
 {
     Actuator1_actuatorTc_channel!Actuator1_actuatorTc_tc;
@@ -150,9 +147,6 @@ Egse_systemtm_loop:
         ::  nempty(Egse_systemTm_channel);
             Egse_systemTm_channel?Egse_systemtm_signal_parameter;
             Egse_systemtm_channel_used = 1;
-            Untitled_msc_lock?_;
-            Untitled_msc_0_PI_0_sig1(Egse_systemtm_signal_parameter);
-            Untitled_msc_lock!1;
             goto Egse_systemtm_loop;
         ::  empty(Egse_systemTm_channel);
             skip;
@@ -164,12 +158,14 @@ active proctype Egse_systemTc() priority 1
 {
     inited;
     SystemCommand value;
-    do
-    ::  atomic {
-        Egse_systemtc_tc_generate_value(value);
-        Egse_0_RI_0_systemTc(value);
+    int inputVectorCounter;
+    for(inputVectorCounter : 0 .. 3)
+    {
+        atomic {
+            SystemCommand_generate_value(value);
+            Egse_0_RI_0_systemTc(value);
+        }
     }
-    od;
 }
 active proctype Modemanager_actuatorTm1() priority 1
 {
@@ -247,9 +243,6 @@ Modemanager_systemtc_loop:
             Modemanager_systemTc_channel?Modemanager_systemtc_signal_parameter;
             Modemanager_systemtc_channel_used = 1;
             Modemanager_0_PI_0_systemTc(Modemanager_systemtc_signal_parameter);
-            Untitled_msc_lock?_;
-            Untitled_msc_0_PI_0_sig0(Modemanager_systemtc_signal_parameter);
-            Untitled_msc_lock!1;
             goto Modemanager_systemtc_loop;
         ::  empty(Modemanager_systemTc_channel);
             skip;
@@ -262,12 +255,14 @@ active proctype Sensor_reading() priority 1
 {
     inited;
     DataItem value;
-    do
-    ::  atomic {
-        Sensor_reading_x_generate_value(value);
-        Sensor_0_RI_0_reading(value);
+    int inputVectorCounter;
+    for(inputVectorCounter : 0 .. 3)
+    {
+        atomic {
+            DataItem_generate_value(value);
+            Sensor_0_RI_0_reading(value);
+        }
     }
-    od;
 }
 init
 {
@@ -279,9 +274,6 @@ init
         Actuator2_lock!1;
         Modemanager_0_init();
         Modemanager_lock!1;
-        Untitled_msc_0_init();
-        Untitled_msc_lock!1;
         inited = 1;
     }
 }
-#include "scl.pml"

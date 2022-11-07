@@ -39,11 +39,11 @@ extern void init_egse(void);
 }
 extern "C"
 {
-extern void init_modemanager(void);
+extern void init_actuator1(void);
 }
 extern "C"
 {
-extern void init_actuator2(void);
+extern void init_modemanager(void);
 }
 extern "C"
 {
@@ -51,7 +51,7 @@ extern void init_sensor(void);
 }
 extern "C"
 {
-extern void init_actuator1(void);
+extern void init_actuator2(void);
 }
 
 
@@ -74,10 +74,10 @@ static void initializeDevices()
 }
 
 taste::Lock egse_Mutex;
-taste::Lock modemanager_Mutex;
-taste::Lock actuator2_Mutex;
-taste::Lock sensor_Mutex;
 taste::Lock actuator1_Mutex;
+taste::Lock modemanager_Mutex;
+taste::Lock sensor_Mutex;
+taste::Lock actuator2_Mutex;
 
 
 
@@ -210,10 +210,10 @@ int main(void)
     Broker_initialize(valid_buses);
 
     init_egse();
-    init_modemanager();
-    init_actuator2();
-    init_sensor();
     init_actuator1();
+    init_modemanager();
+    init_sensor();
+    init_actuator2();
 
     taste::StartBarrier::initialize(9, &taste::Timer::initialize);
 

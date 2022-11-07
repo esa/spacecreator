@@ -1,30 +1,3 @@
-#define Untitled_msc_States int
-#define Untitled_msc_Context_state int
-#define Untitled_msc_Context_init_done bool
-#define Untitled_msc_Context_sender int
-#define Untitled_Msc_Systemcommand_Selection int
-#define Untitled_Msc_Actuator1_Event_Msg_In_Selection int
-#define Untitled_Msc_Actuator1_Event_Msg_Out_Selection int
-#define Untitled_Msc_Actuator1_Event_Selection int
-#define Untitled_Msc_Actuator2_Event_Msg_In_Selection int
-#define Untitled_Msc_Actuator2_Event_Msg_Out_Selection int
-#define Untitled_Msc_Actuator2_Event_Selection int
-#define Untitled_Msc_Egse_Event_Msg_In_Selection int
-#define Untitled_Msc_Egse_Event_Msg_Out_Selection int
-#define Untitled_Msc_Egse_Event_Selection int
-#define Untitled_Msc_Modemanager_Event_Msg_In_Selection int
-#define Untitled_Msc_Modemanager_Event_Msg_Out_Selection int
-#define Untitled_Msc_Modemanager_Event_Selection int
-#define Untitled_Msc_Function_Event_Selection int
-#define Untitled_Msc_Observable_Event_Selection int
-#define OptimizedDataItem int
-#define OptimizedConfiguration_threshold1 int
-#define OptimizedConfiguration_threshold2 int
-#define Egse_systemtc_tc_goToIdle int
-#define Egse_systemtc_tc_goToOperational_threshold1 int
-#define Egse_systemtc_tc_goToOperational_threshold2 int
-#define Egse_systemtc_tc_doReport int
-#define Sensor_reading_x int
 #define Actuator_States int
 #define Actuator_Context_state int
 #define Actuator_Context_init_done bool
@@ -564,65 +537,6 @@
 #define System_State_modemanager_stm_status2 int
 #define TimerData_timer_enabled bool
 #define TimerData_interval int
-#define Untitled_msc_States_s0 0
-#define Untitled_msc_States_s2 1
-#define Untitled_msc_States_s1 2
-#define Untitled_msc_States_serr 3
-#define Untitled_msc_Context_state_s0 0
-#define Untitled_msc_Context_state_s2 1
-#define Untitled_msc_Context_state_s1 2
-#define Untitled_msc_Context_state_serr 3
-#define Untitled_msc_Context_sender_actuator 0
-#define Untitled_msc_Context_sender_actuator1 1
-#define Untitled_msc_Context_sender_actuator2 2
-#define Untitled_msc_Context_sender_egse 3
-#define Untitled_msc_Context_sender_modemanager 4
-#define Untitled_msc_Context_sender_sensor 5
-#define Untitled_msc_Context_sender_env 6
-#define Untitled_Msc_Systemcommand_Selection_goToIdle_present 1
-#define Untitled_Msc_Systemcommand_Selection_goToOperational_present 2
-#define Untitled_Msc_Systemcommand_Selection_doReport_present 3
-#define Untitled_Msc_Actuator1_Event_Msg_In_Selection_input_none_present 1
-#define Untitled_Msc_Actuator1_Event_Msg_In_Selection_actuatortc_present 2
-#define Untitled_Msc_Actuator1_Event_Msg_Out_Selection_actuatortm_present 1
-#define Untitled_Msc_Actuator1_Event_Selection_msg_in_present 1
-#define Untitled_Msc_Actuator1_Event_Selection_msg_out_present 2
-#define Untitled_Msc_Actuator2_Event_Msg_In_Selection_input_none_present 1
-#define Untitled_Msc_Actuator2_Event_Msg_In_Selection_actuatortc_present 2
-#define Untitled_Msc_Actuator2_Event_Msg_Out_Selection_actuatortm_present 1
-#define Untitled_Msc_Actuator2_Event_Selection_msg_in_present 1
-#define Untitled_Msc_Actuator2_Event_Selection_msg_out_present 2
-#define Untitled_Msc_Egse_Event_Msg_In_Selection_systemtm_present 1
-#define Untitled_Msc_Egse_Event_Msg_Out_Selection_systemtc_present 1
-#define Untitled_Msc_Egse_Event_Selection_msg_in_present 1
-#define Untitled_Msc_Egse_Event_Selection_msg_out_present 2
-#define Untitled_Msc_Modemanager_Event_Msg_In_Selection_input_none_present 1
-#define Untitled_Msc_Modemanager_Event_Msg_In_Selection_actuatortm1_present 2
-#define Untitled_Msc_Modemanager_Event_Msg_In_Selection_actuatortm2_present 3
-#define Untitled_Msc_Modemanager_Event_Msg_In_Selection_reading_present 4
-#define Untitled_Msc_Modemanager_Event_Msg_In_Selection_systemtc_present 5
-#define Untitled_Msc_Modemanager_Event_Msg_Out_Selection_actuatortc1_present 1
-#define Untitled_Msc_Modemanager_Event_Msg_Out_Selection_actuatortc2_present 2
-#define Untitled_Msc_Modemanager_Event_Msg_Out_Selection_systemtm_present 3
-#define Untitled_Msc_Modemanager_Event_Selection_msg_in_present 1
-#define Untitled_Msc_Modemanager_Event_Selection_msg_out_present 2
-#define Untitled_Msc_Function_Event_Selection_actuator1_present 1
-#define Untitled_Msc_Function_Event_Selection_actuator2_present 2
-#define Untitled_Msc_Function_Event_Selection_egse_present 3
-#define Untitled_Msc_Function_Event_Selection_modemanager_present 4
-#define Untitled_Msc_Function_Event_Selection_sensor_present 5
-#define Untitled_Msc_Observable_Event_Selection_no_event_present 1
-#define Untitled_Msc_Observable_Event_Selection_system_startup_present 2
-#define Untitled_Msc_Observable_Event_Selection_input_event_present 3
-#define Untitled_Msc_Observable_Event_Selection_output_event_present 4
-#define Untitled_Msc_Observable_Event_Selection_unhandled_input_present 5
-#define Egse_systemtc_tc_NONE 0
-#define Egse_systemtc_tc_goToIdle_PRESENT 1
-#define Egse_systemtc_tc_selection_goToIdle_PRESENT 1
-#define Egse_systemtc_tc_goToOperational_PRESENT 2
-#define Egse_systemtc_tc_selection_goToOperational_PRESENT 2
-#define Egse_systemtc_tc_doReport_PRESENT 3
-#define Egse_systemtc_tc_selection_doReport_PRESENT 3
 #define Actuator_States_armed 0
 #define Actuator_States_executing 1
 #define Actuator_States_standby 2
@@ -3404,11 +3318,6 @@ typedef Egse_Event_msg_out_systemtc_tc_goToOperational {
     Egse_Event_msg_out_systemtc_tc_goToOperational_threshold2 threshold2;
 }
 
-typedef Egse_systemtc_tc_goToOperational {
-    Egse_systemtc_tc_goToOperational_threshold1 threshold1;
-    Egse_systemtc_tc_goToOperational_threshold2 threshold2;
-}
-
 typedef Events_Ty_elem_input_event_event_actuator1_msg_in_actuatortc {
     Events_Ty_elem_input_event_event_actuator1_msg_in_actuatortc_tc tc;
 }
@@ -4212,11 +4121,6 @@ typedef Observable_Event_unhandled_input_event_modemanager_msg_out_systemtm_tm {
 
 typedef Observable_Event_unhandled_input_event_sensor {
     bit dummy;
-}
-
-typedef OptimizedConfiguration {
-    OptimizedConfiguration_threshold1 threshold1;
-    OptimizedConfiguration_threshold2 threshold2;
 }
 
 typedef Sensor_Event {
@@ -5046,12 +4950,6 @@ typedef TimerData {
     TimerData_interval interval;
 }
 
-typedef Untitled_msc_Context {
-    Untitled_msc_Context_state state;
-    Untitled_msc_Context_init_done init_done;
-    Untitled_msc_Context_sender sender;
-}
-
 typedef Actuator1_Event_msg_in_data {
     Actuator1_Event_msg_in_input_none input_none;
     Actuator1_Event_msg_in_actuatortc actuatortc;
@@ -5087,12 +4985,6 @@ typedef Egse_Event_msg_out_systemtc_tc_data {
     Egse_Event_msg_out_systemtc_tc_goToIdle goToIdle;
     Egse_Event_msg_out_systemtc_tc_goToOperational goToOperational;
     Egse_Event_msg_out_systemtc_tc_doReport doReport;
-}
-
-typedef Egse_systemtc_tc_data {
-    Egse_systemtc_tc_goToIdle goToIdle;
-    Egse_systemtc_tc_goToOperational goToOperational;
-    Egse_systemtc_tc_doReport doReport;
 }
 
 typedef Events_Ty_elem_input_event_event_actuator1_msg_in_data {
@@ -5866,11 +5758,6 @@ typedef Egse_Event_msg_in_data {
 
 typedef Egse_Event_msg_out_systemtc_tc {
     Egse_Event_msg_out_systemtc_tc_data data;
-    int selection;
-}
-
-typedef Egse_systemtc_tc {
-    Egse_systemtc_tc_data data;
     int selection;
 }
 
@@ -8417,283 +8304,6 @@ typedef System_State {
 }
 
 Observable_Event nothing;
-inline Untitled_msc_States_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_msc_States_range_check(dst);
-}
-inline Untitled_msc_States_range_check(Untitled_msc_States_vc)
-{
-    assert(((((Untitled_msc_States_vc == Untitled_msc_States_s0) || (Untitled_msc_States_vc == Untitled_msc_States_s2)) || (Untitled_msc_States_vc == Untitled_msc_States_s1)) || (Untitled_msc_States_vc == Untitled_msc_States_serr)));
-}
-inline Untitled_msc_Context_state_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_msc_Context_state_range_check(dst);
-}
-inline Untitled_msc_Context_state_range_check(Untitled_msc_Context_state_vc)
-{
-    assert(((((Untitled_msc_Context_state_vc == Untitled_msc_Context_state_s0) || (Untitled_msc_Context_state_vc == Untitled_msc_Context_state_s2)) || (Untitled_msc_Context_state_vc == Untitled_msc_Context_state_s1)) || (Untitled_msc_Context_state_vc == Untitled_msc_Context_state_serr)));
-}
-inline Untitled_msc_Context_init_done_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_msc_Context_init_done_range_check(dst);
-}
-inline Untitled_msc_Context_init_done_range_check(Untitled_msc_Context_init_done_vc)
-{
-    assert(true);
-}
-inline Untitled_msc_Context_sender_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_msc_Context_sender_range_check(dst);
-}
-inline Untitled_msc_Context_sender_range_check(Untitled_msc_Context_sender_vc)
-{
-    assert((((((((Untitled_msc_Context_sender_vc == Untitled_msc_Context_sender_actuator) || (Untitled_msc_Context_sender_vc == Untitled_msc_Context_sender_actuator1)) || (Untitled_msc_Context_sender_vc == Untitled_msc_Context_sender_actuator2)) || (Untitled_msc_Context_sender_vc == Untitled_msc_Context_sender_egse)) || (Untitled_msc_Context_sender_vc == Untitled_msc_Context_sender_modemanager)) || (Untitled_msc_Context_sender_vc == Untitled_msc_Context_sender_sensor)) || (Untitled_msc_Context_sender_vc == Untitled_msc_Context_sender_env)));
-}
-inline Untitled_msc_Context_assign_value(dst, src)
-{
-    Untitled_msc_Context_state_assign_value(dst.state, src.state);
-    Untitled_msc_Context_init_done_assign_value(dst.init_done, src.init_done);
-    Untitled_msc_Context_sender_assign_value(dst.sender, src.sender);
-}
-inline Untitled_Msc_Systemcommand_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Systemcommand_Selection_range_check(dst);
-}
-inline Untitled_Msc_Systemcommand_Selection_range_check(Untitled_Msc_Systemcommand_Selection_vc)
-{
-    assert((((Untitled_Msc_Systemcommand_Selection_vc == Untitled_Msc_Systemcommand_Selection_goToIdle_present) || (Untitled_Msc_Systemcommand_Selection_vc == Untitled_Msc_Systemcommand_Selection_goToOperational_present)) || (Untitled_Msc_Systemcommand_Selection_vc == Untitled_Msc_Systemcommand_Selection_doReport_present)));
-}
-inline Untitled_Msc_Actuator1_Event_Msg_In_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Actuator1_Event_Msg_In_Selection_range_check(dst);
-}
-inline Untitled_Msc_Actuator1_Event_Msg_In_Selection_range_check(Untitled_Msc_Actuator1_Event_Msg_In_Selection_vc)
-{
-    assert(((Untitled_Msc_Actuator1_Event_Msg_In_Selection_vc == Untitled_Msc_Actuator1_Event_Msg_In_Selection_input_none_present) || (Untitled_Msc_Actuator1_Event_Msg_In_Selection_vc == Untitled_Msc_Actuator1_Event_Msg_In_Selection_actuatortc_present)));
-}
-inline Untitled_Msc_Actuator1_Event_Msg_Out_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Actuator1_Event_Msg_Out_Selection_range_check(dst);
-}
-inline Untitled_Msc_Actuator1_Event_Msg_Out_Selection_range_check(Untitled_Msc_Actuator1_Event_Msg_Out_Selection_vc)
-{
-    assert((Untitled_Msc_Actuator1_Event_Msg_Out_Selection_vc == Untitled_Msc_Actuator1_Event_Msg_Out_Selection_actuatortm_present));
-}
-inline Untitled_Msc_Actuator1_Event_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Actuator1_Event_Selection_range_check(dst);
-}
-inline Untitled_Msc_Actuator1_Event_Selection_range_check(Untitled_Msc_Actuator1_Event_Selection_vc)
-{
-    assert(((Untitled_Msc_Actuator1_Event_Selection_vc == Untitled_Msc_Actuator1_Event_Selection_msg_in_present) || (Untitled_Msc_Actuator1_Event_Selection_vc == Untitled_Msc_Actuator1_Event_Selection_msg_out_present)));
-}
-inline Untitled_Msc_Actuator2_Event_Msg_In_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Actuator2_Event_Msg_In_Selection_range_check(dst);
-}
-inline Untitled_Msc_Actuator2_Event_Msg_In_Selection_range_check(Untitled_Msc_Actuator2_Event_Msg_In_Selection_vc)
-{
-    assert(((Untitled_Msc_Actuator2_Event_Msg_In_Selection_vc == Untitled_Msc_Actuator2_Event_Msg_In_Selection_input_none_present) || (Untitled_Msc_Actuator2_Event_Msg_In_Selection_vc == Untitled_Msc_Actuator2_Event_Msg_In_Selection_actuatortc_present)));
-}
-inline Untitled_Msc_Actuator2_Event_Msg_Out_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Actuator2_Event_Msg_Out_Selection_range_check(dst);
-}
-inline Untitled_Msc_Actuator2_Event_Msg_Out_Selection_range_check(Untitled_Msc_Actuator2_Event_Msg_Out_Selection_vc)
-{
-    assert((Untitled_Msc_Actuator2_Event_Msg_Out_Selection_vc == Untitled_Msc_Actuator2_Event_Msg_Out_Selection_actuatortm_present));
-}
-inline Untitled_Msc_Actuator2_Event_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Actuator2_Event_Selection_range_check(dst);
-}
-inline Untitled_Msc_Actuator2_Event_Selection_range_check(Untitled_Msc_Actuator2_Event_Selection_vc)
-{
-    assert(((Untitled_Msc_Actuator2_Event_Selection_vc == Untitled_Msc_Actuator2_Event_Selection_msg_in_present) || (Untitled_Msc_Actuator2_Event_Selection_vc == Untitled_Msc_Actuator2_Event_Selection_msg_out_present)));
-}
-inline Untitled_Msc_Egse_Event_Msg_In_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Egse_Event_Msg_In_Selection_range_check(dst);
-}
-inline Untitled_Msc_Egse_Event_Msg_In_Selection_range_check(Untitled_Msc_Egse_Event_Msg_In_Selection_vc)
-{
-    assert((Untitled_Msc_Egse_Event_Msg_In_Selection_vc == Untitled_Msc_Egse_Event_Msg_In_Selection_systemtm_present));
-}
-inline Untitled_Msc_Egse_Event_Msg_Out_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Egse_Event_Msg_Out_Selection_range_check(dst);
-}
-inline Untitled_Msc_Egse_Event_Msg_Out_Selection_range_check(Untitled_Msc_Egse_Event_Msg_Out_Selection_vc)
-{
-    assert((Untitled_Msc_Egse_Event_Msg_Out_Selection_vc == Untitled_Msc_Egse_Event_Msg_Out_Selection_systemtc_present));
-}
-inline Untitled_Msc_Egse_Event_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Egse_Event_Selection_range_check(dst);
-}
-inline Untitled_Msc_Egse_Event_Selection_range_check(Untitled_Msc_Egse_Event_Selection_vc)
-{
-    assert(((Untitled_Msc_Egse_Event_Selection_vc == Untitled_Msc_Egse_Event_Selection_msg_in_present) || (Untitled_Msc_Egse_Event_Selection_vc == Untitled_Msc_Egse_Event_Selection_msg_out_present)));
-}
-inline Untitled_Msc_Modemanager_Event_Msg_In_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Modemanager_Event_Msg_In_Selection_range_check(dst);
-}
-inline Untitled_Msc_Modemanager_Event_Msg_In_Selection_range_check(Untitled_Msc_Modemanager_Event_Msg_In_Selection_vc)
-{
-    assert((((((Untitled_Msc_Modemanager_Event_Msg_In_Selection_vc == Untitled_Msc_Modemanager_Event_Msg_In_Selection_input_none_present) || (Untitled_Msc_Modemanager_Event_Msg_In_Selection_vc == Untitled_Msc_Modemanager_Event_Msg_In_Selection_actuatortm1_present)) || (Untitled_Msc_Modemanager_Event_Msg_In_Selection_vc == Untitled_Msc_Modemanager_Event_Msg_In_Selection_actuatortm2_present)) || (Untitled_Msc_Modemanager_Event_Msg_In_Selection_vc == Untitled_Msc_Modemanager_Event_Msg_In_Selection_reading_present)) || (Untitled_Msc_Modemanager_Event_Msg_In_Selection_vc == Untitled_Msc_Modemanager_Event_Msg_In_Selection_systemtc_present)));
-}
-inline Untitled_Msc_Modemanager_Event_Msg_Out_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Modemanager_Event_Msg_Out_Selection_range_check(dst);
-}
-inline Untitled_Msc_Modemanager_Event_Msg_Out_Selection_range_check(Untitled_Msc_Modemanager_Event_Msg_Out_Selection_vc)
-{
-    assert((((Untitled_Msc_Modemanager_Event_Msg_Out_Selection_vc == Untitled_Msc_Modemanager_Event_Msg_Out_Selection_actuatortc1_present) || (Untitled_Msc_Modemanager_Event_Msg_Out_Selection_vc == Untitled_Msc_Modemanager_Event_Msg_Out_Selection_actuatortc2_present)) || (Untitled_Msc_Modemanager_Event_Msg_Out_Selection_vc == Untitled_Msc_Modemanager_Event_Msg_Out_Selection_systemtm_present)));
-}
-inline Untitled_Msc_Modemanager_Event_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Modemanager_Event_Selection_range_check(dst);
-}
-inline Untitled_Msc_Modemanager_Event_Selection_range_check(Untitled_Msc_Modemanager_Event_Selection_vc)
-{
-    assert(((Untitled_Msc_Modemanager_Event_Selection_vc == Untitled_Msc_Modemanager_Event_Selection_msg_in_present) || (Untitled_Msc_Modemanager_Event_Selection_vc == Untitled_Msc_Modemanager_Event_Selection_msg_out_present)));
-}
-inline Untitled_Msc_Function_Event_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Function_Event_Selection_range_check(dst);
-}
-inline Untitled_Msc_Function_Event_Selection_range_check(Untitled_Msc_Function_Event_Selection_vc)
-{
-    assert((((((Untitled_Msc_Function_Event_Selection_vc == Untitled_Msc_Function_Event_Selection_actuator1_present) || (Untitled_Msc_Function_Event_Selection_vc == Untitled_Msc_Function_Event_Selection_actuator2_present)) || (Untitled_Msc_Function_Event_Selection_vc == Untitled_Msc_Function_Event_Selection_egse_present)) || (Untitled_Msc_Function_Event_Selection_vc == Untitled_Msc_Function_Event_Selection_modemanager_present)) || (Untitled_Msc_Function_Event_Selection_vc == Untitled_Msc_Function_Event_Selection_sensor_present)));
-}
-inline Untitled_Msc_Observable_Event_Selection_assign_value(dst, src)
-{
-    dst = src;
-    Untitled_Msc_Observable_Event_Selection_range_check(dst);
-}
-inline Untitled_Msc_Observable_Event_Selection_range_check(Untitled_Msc_Observable_Event_Selection_vc)
-{
-    assert((((((Untitled_Msc_Observable_Event_Selection_vc == Untitled_Msc_Observable_Event_Selection_no_event_present) || (Untitled_Msc_Observable_Event_Selection_vc == Untitled_Msc_Observable_Event_Selection_system_startup_present)) || (Untitled_Msc_Observable_Event_Selection_vc == Untitled_Msc_Observable_Event_Selection_input_event_present)) || (Untitled_Msc_Observable_Event_Selection_vc == Untitled_Msc_Observable_Event_Selection_output_event_present)) || (Untitled_Msc_Observable_Event_Selection_vc == Untitled_Msc_Observable_Event_Selection_unhandled_input_present)));
-}
-inline OptimizedDataItem_assign_value(dst, src)
-{
-    dst = src;
-    OptimizedDataItem_range_check(dst);
-}
-inline OptimizedDataItem_range_check(OptimizedDataItem_vc)
-{
-    assert(((((OptimizedDataItem_vc >= 10) && (OptimizedDataItem_vc <= 10)) || ((OptimizedDataItem_vc >= 50) && (OptimizedDataItem_vc <= 50))) || ((OptimizedDataItem_vc >= 100) && (OptimizedDataItem_vc <= 100))));
-}
-inline OptimizedConfiguration_threshold1_assign_value(dst, src)
-{
-    dst = src;
-    OptimizedConfiguration_threshold1_range_check(dst);
-}
-inline OptimizedConfiguration_threshold1_range_check(OptimizedConfiguration_threshold1_vc)
-{
-    assert(((((OptimizedConfiguration_threshold1_vc >= 10) && (OptimizedConfiguration_threshold1_vc <= 10)) || ((OptimizedConfiguration_threshold1_vc >= 50) && (OptimizedConfiguration_threshold1_vc <= 50))) || ((OptimizedConfiguration_threshold1_vc >= 100) && (OptimizedConfiguration_threshold1_vc <= 100))));
-}
-inline OptimizedConfiguration_threshold2_assign_value(dst, src)
-{
-    dst = src;
-    OptimizedConfiguration_threshold2_range_check(dst);
-}
-inline OptimizedConfiguration_threshold2_range_check(OptimizedConfiguration_threshold2_vc)
-{
-    assert(((((OptimizedConfiguration_threshold2_vc >= 10) && (OptimizedConfiguration_threshold2_vc <= 10)) || ((OptimizedConfiguration_threshold2_vc >= 50) && (OptimizedConfiguration_threshold2_vc <= 50))) || ((OptimizedConfiguration_threshold2_vc >= 100) && (OptimizedConfiguration_threshold2_vc <= 100))));
-}
-inline OptimizedConfiguration_assign_value(dst, src)
-{
-    OptimizedConfiguration_threshold1_assign_value(dst.threshold1, src.threshold1);
-    OptimizedConfiguration_threshold2_assign_value(dst.threshold2, src.threshold2);
-}
-inline Egse_systemtc_tc_goToIdle_assign_value(dst, src)
-{
-    dst = src;
-    Egse_systemtc_tc_goToIdle_range_check(dst);
-}
-inline Egse_systemtc_tc_goToIdle_range_check(Egse_systemtc_tc_goToIdle_vc)
-{
-    assert(((Egse_systemtc_tc_goToIdle_vc >= 0) && (Egse_systemtc_tc_goToIdle_vc <= 0)));
-}
-inline Egse_systemtc_tc_goToOperational_threshold1_assign_value(dst, src)
-{
-    dst = src;
-    Egse_systemtc_tc_goToOperational_threshold1_range_check(dst);
-}
-inline Egse_systemtc_tc_goToOperational_threshold1_range_check(Egse_systemtc_tc_goToOperational_threshold1_vc)
-{
-    assert(((((Egse_systemtc_tc_goToOperational_threshold1_vc >= 10) && (Egse_systemtc_tc_goToOperational_threshold1_vc <= 10)) || ((Egse_systemtc_tc_goToOperational_threshold1_vc >= 50) && (Egse_systemtc_tc_goToOperational_threshold1_vc <= 50))) || ((Egse_systemtc_tc_goToOperational_threshold1_vc >= 100) && (Egse_systemtc_tc_goToOperational_threshold1_vc <= 100))));
-}
-inline Egse_systemtc_tc_goToOperational_threshold2_assign_value(dst, src)
-{
-    dst = src;
-    Egse_systemtc_tc_goToOperational_threshold2_range_check(dst);
-}
-inline Egse_systemtc_tc_goToOperational_threshold2_range_check(Egse_systemtc_tc_goToOperational_threshold2_vc)
-{
-    assert(((((Egse_systemtc_tc_goToOperational_threshold2_vc >= 10) && (Egse_systemtc_tc_goToOperational_threshold2_vc <= 10)) || ((Egse_systemtc_tc_goToOperational_threshold2_vc >= 50) && (Egse_systemtc_tc_goToOperational_threshold2_vc <= 50))) || ((Egse_systemtc_tc_goToOperational_threshold2_vc >= 100) && (Egse_systemtc_tc_goToOperational_threshold2_vc <= 100))));
-}
-inline Egse_systemtc_tc_goToOperational_assign_value(dst, src)
-{
-    Egse_systemtc_tc_goToOperational_threshold1_assign_value(dst.threshold1, src.threshold1);
-    Egse_systemtc_tc_goToOperational_threshold2_assign_value(dst.threshold2, src.threshold2);
-}
-inline Egse_systemtc_tc_doReport_assign_value(dst, src)
-{
-    dst = src;
-    Egse_systemtc_tc_doReport_range_check(dst);
-}
-inline Egse_systemtc_tc_doReport_range_check(Egse_systemtc_tc_doReport_vc)
-{
-    assert(((Egse_systemtc_tc_doReport_vc >= 0) && (Egse_systemtc_tc_doReport_vc <= 0)));
-}
-inline Egse_systemtc_tc_assign_value(dst, src)
-{
-    dst.selection = src.selection;
-    if
-    ::  (dst.selection == Egse_systemtc_tc_goToIdle_PRESENT);
-        Egse_systemtc_tc_goToIdle_assign_value(dst.data.goToIdle, src.data.goToIdle);
-    ::  (dst.selection == Egse_systemtc_tc_goToOperational_PRESENT);
-        Egse_systemtc_tc_goToOperational_assign_value(dst.data.goToOperational, src.data.goToOperational);
-    ::  (dst.selection == Egse_systemtc_tc_doReport_PRESENT);
-        Egse_systemtc_tc_doReport_assign_value(dst.data.doReport, src.data.doReport);
-    ::  else;
-        skip;
-    fi;
-}
-inline Egse_systemtc_tc_selection_assign_value(dst, src)
-{
-    dst = src;
-}
-inline Sensor_reading_x_assign_value(dst, src)
-{
-    dst = src;
-    Sensor_reading_x_range_check(dst);
-}
-inline Sensor_reading_x_range_check(Sensor_reading_x_vc)
-{
-    assert(((((Sensor_reading_x_vc >= 10) && (Sensor_reading_x_vc <= 10)) || ((Sensor_reading_x_vc >= 50) && (Sensor_reading_x_vc <= 50))) || ((Sensor_reading_x_vc >= 100) && (Sensor_reading_x_vc <= 100))));
-}
 inline Actuator_States_assign_value(dst, src)
 {
     dst = src;

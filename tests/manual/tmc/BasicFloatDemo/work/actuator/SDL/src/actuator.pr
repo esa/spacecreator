@@ -9,9 +9,9 @@ process Actuator;
         NEXTSTATE Wait;
     /* CIF state (450, 10), (70, 35) */
     state Wait;
-        /* CIF input (426, 65), (114, 35) */
+        /* CIF input (425, 65), (114, 35) */
         input controlsignal(x);
-            /* CIF NEXTSTATE (449, 120), (70, 35) */
+            /* CIF NEXTSTATE (448, 120), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Actuator;

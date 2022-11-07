@@ -11,15 +11,15 @@ process Systemcontrol;
         NEXTSTATE Wait;
     /* CIF state (450, 10), (70, 35) */
     state Wait;
-        /* CIF input (437, 65), (93, 35) */
+        /* CIF input (436, 65), (93, 35) */
         input reading(xin);
-            /* CIF task (388, 120), (192, 35) */
+            /* CIF task (387, 120), (192, 35) */
             task xout := xin * 2.5 - lastx * lastx;
-            /* CIF task (441, 175), (85, 35) */
+            /* CIF task (440, 175), (85, 35) */
             task lastx := xin;
-            /* CIF output (417, 230), (134, 35) */
+            /* CIF output (416, 230), (134, 35) */
             output controlsignal(xout);
-            /* CIF NEXTSTATE (449, 285), (70, 35) */
+            /* CIF NEXTSTATE (448, 285), (70, 35) */
             NEXTSTATE -;
     endstate;
 endprocess Systemcontrol;
