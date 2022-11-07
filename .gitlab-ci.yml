@@ -85,10 +85,7 @@ space-creator-qt5:
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
-  rules:
-     #- if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
-  when: manual
+
 
 space-creator-qt6:
   stage: build-test-and-bundle
@@ -126,10 +123,7 @@ space-creator-qt6:
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
-  rules:
-     #- if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
-  when: manual
+
 
 space-creator-coverage:
   stage: code-coverage
