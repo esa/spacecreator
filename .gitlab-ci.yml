@@ -3,8 +3,7 @@ image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
 stages:
   - build-test
   - build-test-and-bundle
-  - code-coverage
-  - documentation
+
 
 default:
   before_script:
@@ -21,64 +20,43 @@ default:
     - git clone https://github.com/n7space/sdl2promela.git
     - pushd sdl2promela ; make install ; popd
 
-
-space-creator-dev:
-  stage: build-test
-  script:
-    # build space creator
-    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --env_dir ${DOWNLOAD_DIR} --env_qt_dir ${ENV_QT_BASE_DIR} --build_dir ${BUILD_DIR} --build_type Release
-    # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
-    - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --env_dir ${DOWNLOAD_DIR} --build_dir ${BUILD_DIR}
-    # unit tests
-    - cd ${DOWNLOAD_DIR}
-    - export PATH=$PATH:${DOWNLOAD_DIR}/asn1scc
-    - export PATH=$PATH:/root/.local/bin
-    - cd ${CI_PROJECT_DIR}
-    - ./scripts/run_tests.sh ${BUILD_DIR}
-  cache:
-    key: asn1scc
-    paths:
-      - build/asn1scc_bin
-  artifacts:
-    reports:
-      junit: build/tst_*-result.xml
-  rules:
-    # For pipelines created when a merge request is created or updated
-    #- if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
-    - when: never
-
-
-space-creator-qt5:
+build-spacecreator:
   stage: build-test-and-bundle
   variables:
     PROJECT_DIR: ${CI_PROJECT_DIR}
+  script:
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
+    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
+    # setup PATH
+    - export PATH=$PATH:${ENV_DIR}/asn1scc
+    - export PATH=$PATH:/root/.local/bin
+  cache:
+    key: asn1scc
+    paths:
+      - ${BUILD_DIR}/asn1scc_bin
+
+
+space-creator-qt5:
+  extends: build-spacecreator
+  variables:
     ENV_QT_VERSION: 5.12.1
     ENV_QTC_VERSION: 4.8.2
     ENV_DIR: /opt/spacecreator5
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt5
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
-
   script:
-    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
-    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # read the version numbers
+    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # unit tests
-    - cd ${ENV_DIR}
-    - export PATH=$PATH:${ENV_DIR}/asn1scc
-    - export PATH=$PATH:/root/.local/bin
     - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
-    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
-  cache:
-    key: asn1scc
-    paths:
-      - ${BUILD_DIR}/asn1scc_bin
   artifacts:
     reports:
       junit: ${BUILD_DIR}/tst_*-result.xml
@@ -86,11 +64,9 @@ space-creator-qt5:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
 
-
 space-creator-qt6:
-  stage: build-test-and-bundle
+  extends: build-spacecreator
   variables:
-    PROJECT_DIR: ${CI_PROJECT_DIR}
     ENV_QT_VERSION: 6.3.1
     ENV_QTC_VERSION: 8.0.1
     ENV_DIR: /opt/spacecreator6
@@ -98,59 +74,16 @@ space-creator-qt6:
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt6
   script:
-    # pre-build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
-    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
-    # build SpaceCreator
+    # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin
-    # post-build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
+    # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
-    # unit tests
-    - cd ${ENV_DIR}
-    - export PATH=$PATH:${ENV_DIR}/asn1scc
-    - export PATH=$PATH:/root/.local/bin
-    - cd ${CI_PROJECT_DIR}
-    # - ./scripts/run_tests.sh ${BUILD_DIR}
+    # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
-  cache:
-    key: asn1scc
-    paths:
-      - ${BUILD_DIR}/asn1scc_bin
   artifacts:
-    reports:
-      junit: ${BUILD_DIR}/tst_*-result.xml
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
 
-
-space-creator-coverage:
-  stage: code-coverage
-  coverage: '/Code coverage: ^ *lines\.*:\s+(\d+.\d+\%)/'
-  script:
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/qtcreator:/usr/lib/x86_64-linux-gnu/qtcreator/plugins
-    - export QT_QPA_PLATFORM=offscreen
-    - mkdir -p coverage ; cd coverage ; rm * -rf
-    - cmake -G Ninja -DCOVERAGE_ENABLED=ON ..
-    - ninja ; ../scripts/run_tests.sh . ; ninja coverage ; ninja coverage_html
-  cache:
-    key: asn1scc
-    paths:
-      - build/asn1scc_bin
-  rules:
-    - if: "$CI_COMMIT_BRANCH == 'master'"
-      when: never
-
-
-space-creator-doc:
-  stage: documentation
-  script:
-    - ./scripts/generate_documentation.sh
-  artifacts:
-    paths:
-      - doc/doxygen/html
-    expire_in: 2 days
-  rules:
-    - if: "$CI_COMMIT_BRANCH == 'master'"
-      when: never
