@@ -1,0 +1,207 @@
+Function Actuator in context _Root
+├─ Full Prefix : (none)
+├─ Language    : sdl
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+│  └─ Taste::Startup_Priority = 1
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : controlsignal - in FV: Actuator
+│     ├─ RCM Kind    : SPORADIC_OPERATION
+│     ├─ Period/MIAT :  0
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     │  ├─ Name            : x
+│     │  │  ├─ Type         : T-Float
+│     │  │  ├─ ASN.1 Module : BASICFLOATDEMO_DATAVIEW
+│     │  │  ├─ ASN.1 File   : BasicFloatDemo.asn
+│     │  │  ├─ Basic type   : ASN1_REAL
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     └─ Connections :
+│        └─ Function SystemControl, interface controlsignal
+└─ Required interfaces:
+   └─ Name : reporting - in FV: Actuator
+      ├─ RCM Kind    : SPORADIC_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      └─ Connections :
+         └─ Function SystemControl, interface reporting
+
+Function EGSE in context _Root
+├─ Full Prefix : (none)
+├─ Language    : gui
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+│  └─ Taste::Startup_Priority = 1
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : tm - in FV: EGSE
+│     ├─ RCM Kind    : SPORADIC_OPERATION
+│     ├─ Period/MIAT :  0
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     │  ├─ Name            : y
+│     │  │  ├─ Type         : T-Int
+│     │  │  ├─ ASN.1 Module : BASICFLOATDEMO_DATAVIEW
+│     │  │  ├─ ASN.1 File   : BasicFloatDemo.asn
+│     │  │  ├─ Basic type   : ASN1_INTEGER
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     └─ Connections :
+│        └─ Function SystemControl, interface tm
+└─ Required interfaces:
+   └─ Name : tc - in FV: EGSE
+      ├─ RCM Kind    : SPORADIC_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : x
+      │  │  ├─ Type         : T-Int
+      │  │  ├─ ASN.1 Module : BASICFLOATDEMO_DATAVIEW
+      │  │  ├─ ASN.1 File   : BasicFloatDemo.asn
+      │  │  ├─ Basic type   : ASN1_INTEGER
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      └─ Connections :
+         └─ Function SystemControl, interface tc
+
+Function Sensor in context _Root
+├─ Full Prefix : (none)
+├─ Language    : sdl
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+│  └─ Taste::Startup_Priority = 1
+├─ Timers:
+├─ Provided interfaces:
+│  └─ Name : trigger - in FV: Sensor
+│     ├─ RCM Kind    : CYCLIC_OPERATION
+│     ├─ Period/MIAT :  1000
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     └─ Connections :
+└─ Required interfaces:
+   └─ Name : reading - in FV: Sensor
+      ├─ RCM Kind    : SPORADIC_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : x
+      │  │  ├─ Type         : T-Float
+      │  │  ├─ ASN.1 Module : BASICFLOATDEMO_DATAVIEW
+      │  │  ├─ ASN.1 File   : BasicFloatDemo.asn
+      │  │  ├─ Basic type   : ASN1_REAL
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      └─ Connections :
+         └─ Function SystemControl, interface reading
+
+Function SystemControl in context _Root
+├─ Full Prefix : (none)
+├─ Language    : sdl
+├─ Zip file    : (none)
+├─ Is type     : FALSE
+├─ Instance of : 
+├─ Context Parameters :
+├─ Directives:
+├─ Simulink Tuneable Parameters:
+├─ Implementations:
+├─ User properties:
+│  └─ Taste::Startup_Priority = 1
+├─ Timers:
+├─ Provided interfaces:
+│  ├─ Name : reading - in FV: SystemControl
+│  │  ├─ RCM Kind    : SPORADIC_OPERATION
+│  │  ├─ Period/MIAT :  0
+│  │  ├─ WCET (ms)   :  0
+│  │  ├─ Queue Size  :  1
+│  │  ├─ Parameters  :
+│  │  │  ├─ Name            : x
+│  │  │  │  ├─ Type         : T-Float
+│  │  │  │  ├─ ASN.1 Module : BASICFLOATDEMO_DATAVIEW
+│  │  │  │  ├─ ASN.1 File   : BasicFloatDemo.asn
+│  │  │  │  ├─ Basic type   : ASN1_REAL
+│  │  │  │  ├─ Encoding     : NATIVE
+│  │  │  │  └─ Direction    : PARAM_IN
+│  │  └─ Connections :
+│  │     └─ Function Sensor, interface reading
+│  ├─ Name : reporting - in FV: SystemControl
+│  │  ├─ RCM Kind    : SPORADIC_OPERATION
+│  │  ├─ Period/MIAT :  0
+│  │  ├─ WCET (ms)   :  0
+│  │  ├─ Queue Size  :  1
+│  │  ├─ Parameters  :
+│  │  └─ Connections :
+│  │     └─ Function Actuator, interface reporting
+│  └─ Name : tc - in FV: SystemControl
+│     ├─ RCM Kind    : SPORADIC_OPERATION
+│     ├─ Period/MIAT :  0
+│     ├─ WCET (ms)   :  0
+│     ├─ Queue Size  :  1
+│     ├─ Parameters  :
+│     │  ├─ Name            : x
+│     │  │  ├─ Type         : T-Int
+│     │  │  ├─ ASN.1 Module : BASICFLOATDEMO_DATAVIEW
+│     │  │  ├─ ASN.1 File   : BasicFloatDemo.asn
+│     │  │  ├─ Basic type   : ASN1_INTEGER
+│     │  │  ├─ Encoding     : NATIVE
+│     │  │  └─ Direction    : PARAM_IN
+│     └─ Connections :
+│        └─ Function EGSE, interface tc
+└─ Required interfaces:
+   ├─ Name : controlsignal - in FV: SystemControl
+   │  ├─ RCM Kind    : SPORADIC_OPERATION
+   │  ├─ Period/MIAT :  0
+   │  ├─ WCET (ms)   :  0
+   │  ├─ Queue Size  :  1
+   │  ├─ Parameters  :
+   │  │  ├─ Name            : x
+   │  │  │  ├─ Type         : T-Float
+   │  │  │  ├─ ASN.1 Module : BASICFLOATDEMO_DATAVIEW
+   │  │  │  ├─ ASN.1 File   : BasicFloatDemo.asn
+   │  │  │  ├─ Basic type   : ASN1_REAL
+   │  │  │  ├─ Encoding     : NATIVE
+   │  │  │  └─ Direction    : PARAM_IN
+   │  └─ Connections :
+   │     └─ Function Actuator, interface controlsignal
+   └─ Name : tm - in FV: SystemControl
+      ├─ RCM Kind    : SPORADIC_OPERATION
+      ├─ Period/MIAT :  0
+      ├─ WCET (ms)   :  0
+      ├─ Queue Size  :  1
+      ├─ Parameters  :
+      │  ├─ Name            : y
+      │  │  ├─ Type         : T-Int
+      │  │  ├─ ASN.1 Module : BASICFLOATDEMO_DATAVIEW
+      │  │  ├─ ASN.1 File   : BasicFloatDemo.asn
+      │  │  ├─ Basic type   : ASN1_INTEGER
+      │  │  ├─ Encoding     : NATIVE
+      │  │  └─ Direction    : PARAM_IN
+      └─ Connections :
+         └─ Function EGSE, interface tm
+

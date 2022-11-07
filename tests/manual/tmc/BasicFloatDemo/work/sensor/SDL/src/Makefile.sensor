@@ -1,0 +1,7 @@
+all:
+	mkdir -p code
+	cd code && opengeode --toAda /home/taste/spacecreator/tests/manual/tmc/BasicFloatDemo/work/sensor/SDL/src/system_structure.pr "../sensor.pr"
+	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada dataview-uniq.asn code/sensor_datamodel.asn
+	cd code && gnat make sensor
+clean:
+	rm -rf code

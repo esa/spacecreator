@@ -1,0 +1,7 @@
+all:
+	mkdir -p code
+	cd code && opengeode --toAda /home/taste/spacecreator/tests/manual/tmc/BasicFloatDemo/work/systemcontrol/SDL/src/system_structure.pr 
+	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada dataview-uniq.asn code/systemcontrol_datamodel.asn
+	cd code && gnat make systemcontrol
+clean:
+	rm -rf code

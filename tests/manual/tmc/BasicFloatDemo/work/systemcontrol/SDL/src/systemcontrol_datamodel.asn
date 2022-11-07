@@ -1,0 +1,20 @@
+Systemcontrol-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   T-Int, T-Float FROM BASICFLOATDEMO-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview;
+
+Systemcontrol-States ::= ENUMERATED {wait}
+
+Systemcontrol-Context ::= SEQUENCE {
+   state Systemcontrol-States,
+   init-done BOOLEAN,
+   sender PID,
+   xin T-Float,
+   lastx T-Float,
+   xout T-Float
+}
+
+END

@@ -1,0 +1,25 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Systemcontrol;
+    /* CIF TEXT (648, 20), (170, 140) */
+    DCL xin T_float := 0.0;
+    DCL lastx T_float := 0.0;
+    DCL xout T_float := 0.0;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (450, 10), (70, 35) */
+    state Wait;
+        /* CIF input (437, 65), (93, 35) */
+        input reading(xin);
+            /* CIF task (388, 120), (192, 35) */
+            task xout := xin * 2.5 - lastx * lastx;
+            /* CIF task (441, 175), (85, 35) */
+            task lastx := xin;
+            /* CIF output (417, 230), (134, 35) */
+            output controlsignal(xout);
+            /* CIF NEXTSTATE (449, 285), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+endprocess Systemcontrol;
