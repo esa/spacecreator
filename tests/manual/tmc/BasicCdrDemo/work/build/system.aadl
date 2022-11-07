@@ -24,7 +24,7 @@ properties
    Dispatch_Offset                   =>  0 ms;
    Compute_Execution_Time            =>  0 ms ..  0 ms;
    Stack_Size                        =>  1024 Bytes;
-   Priority                          =>  1;
+   Priority                          =>  2;
 end Actuator_Ctrl.others;
 
 end Actuator_Ctrl_Thread;
@@ -75,7 +75,7 @@ properties
    Dispatch_Offset                   =>  0 ms;
    Compute_Execution_Time            =>  0 ms ..  0 ms;
    Stack_Size                        =>  1024 Bytes;
-   Priority                          =>  1;
+   Priority                          =>  4;
 end Egse_Tm.others;
 
 end Egse_Tm_Thread;
@@ -103,7 +103,7 @@ properties
    Dispatch_Offset                   =>  0 ms;
    Compute_Execution_Time            =>  0 ms ..  0 ms;
    Stack_Size                        =>  1024 Bytes;
-   Priority                          =>  1;
+   Priority                          =>  3;
 end Modemanager_Feedback.others;
 
 end Modemanager_Feedback_Thread;

@@ -1374,7 +1374,7 @@ bfs_next(void)
 	#endif
 	#ifdef BFS_DISK
 		/* the states actually show up in reverse order (FIFO iso LIFO) here */
-		/* but that doesnt really matter as long as the count is right */
+		/* but that doesn't really matter as long as the count is right */
 		bfs_source_disk(bfs_inp_fd[bfs_qscan], n); /* get the data */
 	#endif
  #endif
@@ -2000,7 +2000,7 @@ bfs_update(void)
 
 	s = &shared_memory->bfs_data[who_am_i];
 	if (who_am_i == 0)
-	{	shared_memory->bfs_flag[who_am_i] = 3; /* or else others dont stop */
+	{	shared_memory->bfs_flag[who_am_i] = 3; /* or else others don't stop */
 		bfs_gcount = 0;
 		for (i = 1; i < Cores; i++) /* start at 1 not 0 */
 		{	while (shared_memory->bfs_flag[i] == 0)
@@ -2366,7 +2366,7 @@ bfs_uerror(char *str)
 
 	errors++;
 	if (strncmp(str, laststr, 254) != 0)
-	{	bfs_printf("pan:%d: %s (at depth %ld)\n",
+	{	bfs_printf("pan:%lu: %s (at depth %ld)\n",
 			errors, str, ((depthfound == -1)?depth:depthfound));
 		strncpy(laststr, str, 254);
 	}
@@ -2385,7 +2385,7 @@ bfs_uerror(char *str)
 void
 bfs_Uerror(char *str)
 {	/* bfs_uerror(str); */
-	bfs_printf("pan:%d: %s (at depth %ld)\n", ++errors, str,
+	bfs_printf("pan:%lu: %s (at depth %ld)\n", ++errors, str,
 		((depthfound == -1)?depth:depthfound));
 	bfs_shutdown("bfs_Uerror");
 }

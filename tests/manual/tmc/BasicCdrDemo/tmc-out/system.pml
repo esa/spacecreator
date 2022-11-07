@@ -3,8 +3,8 @@
 #include "modemanager.pml"
 #include "env_inlines.pml"
 typedef system_state {
-    Actuator_Context actuator;
     Modemanager_Context modemanager;
+    Actuator_Context actuator;
     AggregateTimerData timers;
 }
 
@@ -67,7 +67,7 @@ inline Modemanager_0_get_sender(Modemanager_sender_arg)
 {
     skip;
 }
-active proctype Actuator_ctrl() priority 1
+active proctype Actuator_ctrl() priority 2
 {
     inited;
     do
@@ -88,7 +88,7 @@ Actuator_ctrl_loop:
     }
     od;
 }
-active proctype Egse_tm() priority 1
+active proctype Egse_tm() priority 4
 {
     inited;
     do
@@ -119,7 +119,7 @@ active proctype Egse_tc() priority 1
         }
     }
 }
-active proctype Modemanager_feedback() priority 1
+active proctype Modemanager_feedback() priority 3
 {
     inited;
     do

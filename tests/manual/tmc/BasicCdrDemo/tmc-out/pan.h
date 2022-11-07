@@ -1,7 +1,7 @@
 #ifndef PAN_H
 #define PAN_H
 
-#define SpinVersion	"Spin Version 6.4.9 -- 17 December 2018"
+#define SpinVersion	"Spin Version 6.5.2 -- 9 June 2022 +  N7S Custom - Work-in-Progress"
 #define PanSource	"system.pml"
 
 #define G_long	8
@@ -115,7 +115,7 @@
 #if !defined(HAS_LAST) && defined(BCS)
 	#define HAS_LAST	1 /* use it, but */
 	#ifndef STORE_LAST
-		#define NO_LAST	1 /* dont store it */
+		#define NO_LAST	1 /* don't store it */
 	#endif
 #endif
 #if defined(BCS) && defined(BITSTATE)
@@ -2857,8 +2857,8 @@ struct System_State { /* user defined type */
 	struct System_State_modemanager modemanager;
 };
 struct system_state { /* user defined type */
-	struct Actuator_Context actuator;
 	struct Modemanager_Context modemanager;
+	struct Actuator_Context actuator;
 	struct AggregateTimerData timers;
 };
 typedef struct P8 { /* never_0 */
@@ -3338,7 +3338,7 @@ int q_cond(short, Trans *);
 int q_full(int);
 int q_len(int);
 int q_zero(int);
-int qrecv(int, int, int, int);
+double qrecv(int, int, int, int);
 int unsend(int);
 /* void *sbrk(int); */
 void spin_assert(int, char *, int, int, Trans *);
@@ -3382,7 +3382,7 @@ void sv_restor(void);
 void sv_save(void);
 void tagtable(int, int, int, short *, uchar *);
 void do_dfs(int, int, int, short *, uchar *, uchar *);
-void unrecv(int, int, int, int, int);
+void unrecv(int, int, int, double, int);
 void usage(FILE *);
 void wrap_stats(void);
 
@@ -3398,9 +3398,9 @@ void wrap_stats(void);
 #ifndef XUSAFE
 	int q_S_check(int, int);
 	int q_R_check(int, int);
-	uchar q_claim[MAXQ+1];
-	char *q_name[MAXQ+1];
-	char *p_name[MAXPROC+1];
+	extern uchar q_claim[MAXQ+1];
+	extern char *q_name[MAXQ+1];
+	extern char *p_name[MAXPROC+1];
 #endif
 
 #ifndef NO_V_PROVISO
@@ -3564,8 +3564,8 @@ struct Trail {
 	 short o_priority;
 	#endif
 	union {
-	 int oval;
-	 int *ovals;
+	 double oval;
+	 double *ovals;
 	} bup;
 }; /* end of struct Trail */
 
@@ -3630,7 +3630,7 @@ typedef struct BFS_State {
 } BFS_State;
 #endif
 
-void qsend(int, int, int, int, int, int);
+void qsend(int, int, double, double, double, int);
 
 #define Addproc(x,y)	addproc(256, y, x)
 #define LOCAL	1

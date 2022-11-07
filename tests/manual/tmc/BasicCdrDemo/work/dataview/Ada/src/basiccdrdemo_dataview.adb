@@ -25,7 +25,7 @@ is
     ret : adaasn1rtl.ASN1_RESULT := adaasn1rtl.ASN1_RESULT'(Success => true, ErrorCode => 0);
     pragma Warnings (On, "initialization of ""ret"" has no effect");        
 begin
-    ret.Success := (val <= 10000);
+    ret.Success := (val <= 1000000);
     ret.ErrorCode := (if ret.Success then 0 else ERR_T_INTEGER);
     return ret;
 end asn1SccT_Integer_IsConstraintValid;

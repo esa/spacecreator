@@ -17,14 +17,14 @@ typedef asn1SccUint asn1SccT_Integer;
 
 flag asn1SccT_Integer_Equal(const asn1SccT_Integer* pVal1, const asn1SccT_Integer* pVal2);
 
-#define ERR_T_INTEGER		1  /*(0 .. 10000)*/
+#define ERR_T_INTEGER		1  /*(0 .. 1000000)*/
 flag asn1SccT_Integer_IsConstraintValid(const asn1SccT_Integer* pVal, int* pErrCode);
 
 void asn1SccT_Integer_Initialize(asn1SccT_Integer* pVal);
 
 #define ERR_UPER_ENCODE_T_INTEGER		2  /**/
-#define asn1SccT_Integer_REQUIRED_BYTES_FOR_ENCODING       2 
-#define asn1SccT_Integer_REQUIRED_BITS_FOR_ENCODING        14
+#define asn1SccT_Integer_REQUIRED_BYTES_FOR_ENCODING       3 
+#define asn1SccT_Integer_REQUIRED_BITS_FOR_ENCODING        20
 
 flag asn1SccT_Integer_Encode(const asn1SccT_Integer* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -32,8 +32,8 @@ flag asn1SccT_Integer_Encode(const asn1SccT_Integer* pVal, BitStream* pBitStrm, 
 flag asn1SccT_Integer_Decode(asn1SccT_Integer* pVal, BitStream* pBitStrm, int* pErrCode);
 
 #define ERR_ACN_ENCODE_T_INTEGER		4  /**/
-#define asn1SccT_Integer_REQUIRED_BYTES_FOR_ACN_ENCODING       2 
-#define asn1SccT_Integer_REQUIRED_BITS_FOR_ACN_ENCODING        14
+#define asn1SccT_Integer_REQUIRED_BYTES_FOR_ACN_ENCODING       3 
+#define asn1SccT_Integer_REQUIRED_BITS_FOR_ACN_ENCODING        20
 
 flag asn1SccT_Integer_ACN_Encode(const asn1SccT_Integer* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -58,8 +58,8 @@ void asn1SccT_Config_Initialize(asn1SccT_Config* pVal);
 #define ERR_UPER_ENCODE_T_CONFIG		27  /**/
 #define ERR_UPER_ENCODE_T_CONFIG_PARAM_A_2		12  /**/
 #define ERR_UPER_ENCODE_T_CONFIG_PARAM_B_2		22  /**/
-#define asn1SccT_Config_REQUIRED_BYTES_FOR_ENCODING       4 
-#define asn1SccT_Config_REQUIRED_BITS_FOR_ENCODING        28
+#define asn1SccT_Config_REQUIRED_BYTES_FOR_ENCODING       5 
+#define asn1SccT_Config_REQUIRED_BITS_FOR_ENCODING        40
 
 flag asn1SccT_Config_Encode(const asn1SccT_Config* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -71,8 +71,8 @@ flag asn1SccT_Config_Decode(asn1SccT_Config* pVal, BitStream* pBitStrm, int* pEr
 #define ERR_ACN_ENCODE_T_CONFIG		29  /**/
 #define ERR_ACN_ENCODE_T_CONFIG_PARAM_A_2		14  /**/
 #define ERR_ACN_ENCODE_T_CONFIG_PARAM_B_2		24  /**/
-#define asn1SccT_Config_REQUIRED_BYTES_FOR_ACN_ENCODING       4 
-#define asn1SccT_Config_REQUIRED_BITS_FOR_ACN_ENCODING        28
+#define asn1SccT_Config_REQUIRED_BYTES_FOR_ACN_ENCODING       5 
+#define asn1SccT_Config_REQUIRED_BITS_FOR_ACN_ENCODING        40
 
 flag asn1SccT_Config_ACN_Encode(const asn1SccT_Config* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -102,8 +102,8 @@ void asn1SccT_Report_Initialize(asn1SccT_Report* pVal);
 #define ERR_UPER_ENCODE_T_REPORT_READING_2		37  /**/
 #define ERR_UPER_ENCODE_T_REPORT_CTRL_2		47  /**/
 #define ERR_UPER_ENCODE_T_REPORT_FEEDBACK_2		57  /**/
-#define asn1SccT_Report_REQUIRED_BYTES_FOR_ENCODING       6 
-#define asn1SccT_Report_REQUIRED_BITS_FOR_ENCODING        42
+#define asn1SccT_Report_REQUIRED_BYTES_FOR_ENCODING       8 
+#define asn1SccT_Report_REQUIRED_BITS_FOR_ENCODING        60
 
 flag asn1SccT_Report_Encode(const asn1SccT_Report* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -117,8 +117,8 @@ flag asn1SccT_Report_Decode(asn1SccT_Report* pVal, BitStream* pBitStrm, int* pEr
 #define ERR_ACN_ENCODE_T_REPORT_READING_2		39  /**/
 #define ERR_ACN_ENCODE_T_REPORT_CTRL_2		49  /**/
 #define ERR_ACN_ENCODE_T_REPORT_FEEDBACK_2		59  /**/
-#define asn1SccT_Report_REQUIRED_BYTES_FOR_ACN_ENCODING       6 
-#define asn1SccT_Report_REQUIRED_BITS_FOR_ACN_ENCODING        42
+#define asn1SccT_Report_REQUIRED_BYTES_FOR_ACN_ENCODING       8 
+#define asn1SccT_Report_REQUIRED_BITS_FOR_ACN_ENCODING        60
 
 flag asn1SccT_Report_ACN_Encode(const asn1SccT_Report* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 

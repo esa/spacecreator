@@ -5,4 +5,4 @@ Node : node_linux
     |_ CPU Name       : x86_linux
     |_ CPU Platform   : PLATFORM_GENERIC_LINUX
     |_ CPU Classifier : ocarina_processors_x86::x86.generic_linux
-    |_ Contains       : modemanager sensor actuator egse 
+    |_ Contains       : sensor actuator modemanager egse 

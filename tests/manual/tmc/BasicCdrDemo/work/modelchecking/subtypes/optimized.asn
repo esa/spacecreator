@@ -2,7 +2,7 @@ SUBTYPE DEFINITIONS ::=
 BEGIN
 
 
-T-SmallInteger ::= INTEGER(0 | 10 | 100)
+T-SmallInteger ::= INTEGER(0 | 4 | 10)
 
 Egse-tc-cfg ::= SEQUENCE {
     param-a T-SmallInteger,

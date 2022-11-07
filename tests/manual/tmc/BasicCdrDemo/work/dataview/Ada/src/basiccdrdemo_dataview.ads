@@ -35,12 +35,12 @@ package BASICCDRDEMO_DATAVIEW with SPARK_Mode
 is
 
 
-subtype asn1SccT_Integer is adaasn1rtl.Asn1UInt range 0 .. 10000;
+subtype asn1SccT_Integer is adaasn1rtl.Asn1UInt range 0 .. 1000000;
 
 
 function asn1SccT_Integer_Equal(val1, val2 : asn1SccT_Integer) return Boolean;
 
-ERR_T_INTEGER:constant Integer := 1; -- (0 .. 10000)
+ERR_T_INTEGER:constant Integer := 1; -- (0 .. 1000000)
 function asn1SccT_Integer_IsConstraintValid(val : asn1SccT_Integer) return adaasn1rtl.ASN1_RESULT;
 
 function asn1SccT_Integer_Init  return asn1SccT_Integer is

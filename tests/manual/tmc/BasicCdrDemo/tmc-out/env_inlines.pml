@@ -6,10 +6,10 @@ inline T_SmallInteger_generate_value(T_SmallInteger_gv)
         select (T_SmallInteger_tmp : 0 .. 0);
     }
     ::  atomic {
-        select (T_SmallInteger_tmp : 10 .. 10);
+        select (T_SmallInteger_tmp : 4 .. 4);
     }
     ::  atomic {
-        select (T_SmallInteger_tmp : 100 .. 100);
+        select (T_SmallInteger_tmp : 10 .. 10);
     }
     fi;
     T_SmallInteger_gv = T_SmallInteger_tmp;
@@ -27,10 +27,10 @@ inline Sensor_reading_x_generate_value(Sensor_reading_x_gv)
         select (Sensor_reading_x_tmp : 0 .. 0);
     }
     ::  atomic {
-        select (Sensor_reading_x_tmp : 10 .. 10);
+        select (Sensor_reading_x_tmp : 4 .. 4);
     }
     ::  atomic {
-        select (Sensor_reading_x_tmp : 100 .. 100);
+        select (Sensor_reading_x_tmp : 10 .. 10);
     }
     fi;
     Sensor_reading_x_gv = Sensor_reading_x_tmp;
@@ -40,7 +40,7 @@ inline T_Integer_generate_value(T_Integer_gv)
     int T_Integer_tmp;
     if
     ::  atomic {
-        select (T_Integer_tmp : 0 .. 10000);
+        select (T_Integer_tmp : 0 .. 1000000);
     }
     fi;
     T_Integer_gv = T_Integer_tmp;

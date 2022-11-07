@@ -1,9 +1,33 @@
 warning: no accept labels are defined, so option -a has no effect (ignored)
-pan:1: assertion violated  !((global_state.actuator.x>5)) (at depth 228)
-pan: wrote system.pml1.trail
+pan:1: assertion violated  !((global_state.actuator.x>5)) (at depth 156)
+pan: wrote system.pml.trail
+pan: reducing search depth to 157
+pan: wrote system.pml.trail
+pan: reducing search depth to 155
+pan: wrote system.pml.trail
+pan: reducing search depth to 153
+pan: wrote system.pml.trail
+pan: reducing search depth to 141
+pan: wrote system.pml.trail
+pan: reducing search depth to 137
+pan: wrote system.pml.trail
+pan: reducing search depth to 135
+pan: wrote system.pml.trail
+pan: reducing search depth to 123
+pan: wrote system.pml.trail
+pan: reducing search depth to 119
+pan: wrote system.pml.trail
+pan: reducing search depth to 117
+pan: wrote system.pml.trail
+pan: reducing search depth to 105
+pan: wrote system.pml.trail
+pan: reducing search depth to 101
+pan: wrote system.pml.trail
+pan: reducing search depth to 99
+pan: wrote system.pml.trail
+pan: reducing search depth to 97
 
-(Spin Version 6.4.9 -- 17 December 2018)
-Warning: Search not completed
+(Spin Version 6.5.2 -- 9 June 2022 +  N7S Custom - Work-in-Progress)
 
 Full statespace search for:
 	never claim         	+ (never_0)
@@ -11,22 +35,22 @@ Full statespace search for:
 	acceptance   cycles 	- (not selected)
 	invalid end states	- (disabled by -E flag)
 
-State-vector 708 byte, depth reached 256, errors: 1
-   116747 states, stored
-   271784 states, matched
-   388531 transitions (= stored+matched)
-  1248115 atomic steps
-hash conflicts:       508 (resolved)
+State-vector 708 byte, depth reached 262, errors: 13
+   311499 states, stored
+  1063611 states, matched
+  1375110 transitions (= stored+matched)
+  4359194 atomic steps
+hash conflicts:      1888 (resolved)
 
 Stats on memory usage (in Megabytes):
-   81.945	equivalent memory usage for states (stored*(State-vector + overhead))
-   93.671	actual memory usage for states
+  218.642	equivalent memory usage for states (stored*(State-vector + overhead))
+  279.707	actual memory usage for states
   128.000	memory used for hash table (-w24)
-   61.035	memory used for DFS stack (-m1000000)
-    6.174	memory lost to fragmentation
-  276.534	total actual memory usage
+    0.006	memory used for DFS stack (-m97)
+    6.183	memory lost to fragmentation
+  401.532	total actual memory usage
 
 
 
-pan: elapsed time 0.54 seconds
-pan: rate 216198.15 states/second
+pan: elapsed time 2.14 seconds
+pan: rate 145560.28 states/second

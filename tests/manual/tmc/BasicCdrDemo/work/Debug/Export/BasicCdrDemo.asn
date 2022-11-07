@@ -1,7 +1,7 @@
 BASICCDRDEMO-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   T-Integer ::= INTEGER (0 .. 10000)
+   T-Integer ::= INTEGER (0 .. 1000000)
 
    T-Config ::= SEQUENCE {
        param-a T-Integer,

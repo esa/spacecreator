@@ -1,0 +1,33 @@
+system obs;
+    
+    /* CIF TEXT (144, 214), (507, 136) */
+    use datamodel comment 'observer.asn';
+    
+    exported procedure observe;
+       fpar in/out model           System_State,
+                 in/out last_event  Observable_Event;
+    referenced;
+    
+    /* CIF ENDTEXT */
+    channel c
+        from env to observerdemo with observe;
+    endchannel;
+    block observerdemo;
+        signalroute r
+            from env to observerdemo with observe;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process observerdemo;
+            /* CIF TEXT (0, 57), (256, 112) */
+            monitor st System_State;
+            
+            monitor event Observable_Event;
+            
+            errorstates error;
+            /* CIF ENDTEXT */
+            
+            state error;
+            endstate;
+            endprocess observerdemo;
+    endblock;
+endsystem;

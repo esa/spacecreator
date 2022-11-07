@@ -23,7 +23,7 @@ flag asn1SccT_Integer_Equal(const asn1SccT_Integer* pVal1, const asn1SccT_Intege
 flag asn1SccT_Integer_IsConstraintValid(const asn1SccT_Integer* pVal, int* pErrCode)
 {
     flag ret = TRUE;
-    ret = ((*(pVal)) <= 10000UL);
+    ret = ((*(pVal)) <= 1000000UL);
     *pErrCode = ret ? 0 :  ERR_T_INTEGER; 
 
 	return ret;
@@ -45,7 +45,7 @@ flag asn1SccT_Integer_Encode(const asn1SccT_Integer* pVal, BitStream* pBitStrm, 
 	*pErrCode = 0;
 	ret = bCheckConstraints ? asn1SccT_Integer_IsConstraintValid(pVal, pErrCode) : TRUE ;
 	if (ret && *pErrCode == 0) {
-	    BitStream_EncodeConstraintPosWholeNumber(pBitStrm, (*(pVal)), 0, 10000);
+	    BitStream_EncodeConstraintPosWholeNumber(pBitStrm, (*(pVal)), 0, 1000000);
     } /*COVERAGE_IGNORE*/
 
 	
@@ -58,7 +58,7 @@ flag asn1SccT_Integer_Decode(asn1SccT_Integer* pVal, BitStream* pBitStrm, int* p
 	*pErrCode = 0;
 
 
-	ret = BitStream_DecodeConstraintPosWholeNumber(pBitStrm, pVal, 0, 10000);
+	ret = BitStream_DecodeConstraintPosWholeNumber(pBitStrm, pVal, 0, 1000000);
 	*pErrCode = ret ? 0 : ERR_UPER_DECODE_T_INTEGER;
 
 	return ret  && asn1SccT_Integer_IsConstraintValid(pVal, pErrCode);
@@ -71,7 +71,7 @@ flag asn1SccT_Integer_ACN_Encode(const asn1SccT_Integer* pVal, BitStream* pBitSt
     *pErrCode = 0;
 	ret = bCheckConstraints ? asn1SccT_Integer_IsConstraintValid(pVal, pErrCode) : TRUE ;
 	if (ret && *pErrCode == 0) {
-	    BitStream_EncodeConstraintPosWholeNumber(pBitStrm, (*(pVal)), 0, 10000);
+	    BitStream_EncodeConstraintPosWholeNumber(pBitStrm, (*(pVal)), 0, 1000000);
     } /*COVERAGE_IGNORE*/
 
 	
@@ -84,7 +84,7 @@ flag asn1SccT_Integer_ACN_Decode(asn1SccT_Integer* pVal, BitStream* pBitStrm, in
 	*pErrCode = 0;
 
 
-	ret = BitStream_DecodeConstraintPosWholeNumber(pBitStrm, pVal, 0, 10000);
+	ret = BitStream_DecodeConstraintPosWholeNumber(pBitStrm, pVal, 0, 1000000);
 	*pErrCode = ret ? 0 : ERR_ACN_DECODE_T_INTEGER;
 
     return ret && asn1SccT_Integer_IsConstraintValid(pVal, pErrCode);

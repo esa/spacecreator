@@ -33,15 +33,15 @@ extern "C"
 
 extern "C"
 {
-extern void init_modemanager(void);
-}
-extern "C"
-{
 extern void init_sensor(void);
 }
 extern "C"
 {
 extern void init_actuator(void);
+}
+extern "C"
+{
+extern void init_modemanager(void);
 }
 extern "C"
 {
@@ -67,15 +67,15 @@ static void initializeDevices()
     // initialize devices
 }
 
-taste::Lock modemanager_Mutex;
 taste::Lock sensor_Mutex;
 taste::Lock actuator_Mutex;
+taste::Lock modemanager_Mutex;
 taste::Lock egse_Mutex;
 
 
 
 taste::Queue<ACTUATOR_CTRL_REQUEST_SIZE> actuator_ctrl_Global_Queue( 1, "actuator_ctrl");
-taste::Thread actuator_ctrl_Global_Thread( 1, 8388608);
+taste::Thread actuator_ctrl_Global_Thread( 2, 8388608);
 
 static void Initialize_Thread_actuator_ctrl()
 {
@@ -101,7 +101,7 @@ static void Join_Thread_egse_poll()
 }
 
 taste::Queue<EGSE_TM_REQUEST_SIZE> egse_tm_Global_Queue( 1, "egse_tm");
-taste::Thread egse_tm_Global_Thread( 1, 8388608);
+taste::Thread egse_tm_Global_Thread( 4, 8388608);
 
 static void Initialize_Thread_egse_tm()
 {
@@ -114,7 +114,7 @@ static void Join_Thread_egse_tm()
 }
 
 taste::Queue<MODEMANAGER_FEEDBACK_REQUEST_SIZE> modemanager_feedback_Global_Queue( 1, "modemanager_feedback");
-taste::Thread modemanager_feedback_Global_Thread( 1, 8388608);
+taste::Thread modemanager_feedback_Global_Thread( 3, 8388608);
 
 static void Initialize_Thread_modemanager_feedback()
 {
@@ -176,9 +176,9 @@ int main(void)
     enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER] = { BUS_INVALID_ID };
     Broker_initialize(valid_buses);
 
-    init_modemanager();
     init_sensor();
     init_actuator();
+    init_modemanager();
     init_egse();
 
     taste::StartBarrier::initialize(7, &taste::Timer::initialize);

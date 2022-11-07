@@ -19,11 +19,11 @@ END deploymentview::DV::Node_Linux;
 PACKAGE deploymentview::DV
 PUBLIC
 
-WITH interfaceview::IV::ModeManager;
-
 WITH interfaceview::IV::Sensor;
 
 WITH interfaceview::IV::Actuator;
+
+WITH interfaceview::IV::ModeManager;
 
 WITH interfaceview::IV::EGSE;
 
@@ -40,16 +40,16 @@ END Node_Linux;
 
 SYSTEM IMPLEMENTATION Node_Linux.others
 SUBCOMPONENTS
-   IV_ModeManager : SYSTEM interfaceview::IV::ModeManager::ModeManager.others {
-      Taste::FunctionName => "ModeManager";
-   };
-
    IV_Sensor : SYSTEM interfaceview::IV::Sensor::Sensor.others {
       Taste::FunctionName => "Sensor";
    };
 
    IV_Actuator : SYSTEM interfaceview::IV::Actuator::Actuator.others {
       Taste::FunctionName => "Actuator";
+   };
+
+   IV_ModeManager : SYSTEM interfaceview::IV::ModeManager::ModeManager.others {
+      Taste::FunctionName => "ModeManager";
    };
 
    IV_EGSE : SYSTEM interfaceview::IV::EGSE::EGSE.others {
@@ -65,15 +65,6 @@ SUBCOMPONENTS
    x86_linux : PROCESSOR ocarina_processors_x86::x86.generic_linux;
 PROPERTIES
    
-   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_ModeManager;
-   
-   
-   
-   
-   
-   
-
-   
    Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_Sensor;
    
    
@@ -84,6 +75,15 @@ PROPERTIES
 
    
    Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_Actuator;
+   
+   
+   
+   
+   
+   
+
+   
+   Taste::APLC_Binding => (reference (demo)) APPLIES TO IV_ModeManager;
    
    
    

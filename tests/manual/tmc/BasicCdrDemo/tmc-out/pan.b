@@ -35,7 +35,7 @@
 		((P7 *)_this)->_710_8_8_17_transition_id = trpt->bup.ovals[1];
 		((P7 *)_this)->_710_8_8_17_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 10: // STATE 12
@@ -52,7 +52,7 @@
 	/* 0 */	((P7 *)_this)->_710_8_8_17_transition_id = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 
 	case 12: // STATE 18
@@ -70,7 +70,7 @@
 		((P7 *)_this)->_710_8_8_17_transition_id = trpt->bup.ovals[0];
 		_m = unsend(now.Modemanager_feedback_channel);
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -81,7 +81,7 @@
 		((P7 *)_this)->_710_8_8_17_transition_id = trpt->bup.ovals[0];
 		_m = unsend(now.Modemanager_feedback_channel);
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 17: // STATE 43
@@ -103,7 +103,7 @@
 		((P7 *)_this)->_710_8_9_19_transition_id = trpt->bup.ovals[1];
 		((P7 *)_this)->_710_8_9_19_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 21: // STATE 50
@@ -120,7 +120,7 @@
 	/* 0 */	((P7 *)_this)->_710_8_9_19_transition_id = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 
 	case 23: // STATE 56
@@ -195,7 +195,7 @@
 		now.global_state.modemanager.state = trpt->bup.ovals[1];
 		((P7 *)_this)->_710_8_9_19_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 37: // STATE 102
@@ -222,7 +222,7 @@
 		((P6 *)_this)->inputVectorCounter = trpt->bup.ovals[1];
 		((P6 *)_this)->value = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 ;
 		;
@@ -333,7 +333,7 @@
 		now.Modemanager_tc_signal_parameter.param_b = trpt->bup.ovals[1];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 ;
 		;
@@ -359,7 +359,7 @@
 		((P5 *)_this)->_708_6_5_12_transition_id = trpt->bup.ovals[1];
 		((P5 *)_this)->_708_6_5_12_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 66: // STATE 19
@@ -376,7 +376,7 @@
 	/* 0 */	((P5 *)_this)->_708_6_5_12_transition_id = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 
 	case 68: // STATE 25
@@ -451,7 +451,7 @@
 		now.global_state.modemanager.state = trpt->bup.ovals[1];
 		((P5 *)_this)->_708_6_5_12_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -497,7 +497,7 @@
 		now.Modemanager_reading_signal_parameter = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -515,7 +515,7 @@
 		((P4 *)_this)->_707_5_4_10_transition_id = trpt->bup.ovals[1];
 		((P4 *)_this)->_707_5_4_10_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 95: // STATE 14
@@ -532,7 +532,7 @@
 	/* 0 */	((P4 *)_this)->_707_5_4_10_transition_id = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 
 	case 97: // STATE 20
@@ -607,7 +607,7 @@
 		now.global_state.modemanager.state = trpt->bup.ovals[1];
 		((P4 *)_this)->_707_5_4_10_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -653,7 +653,7 @@
 		now.Modemanager_feedback_signal_parameter = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -671,7 +671,7 @@
 		((P3 *)_this)->_706_4_3_8_transition_id = trpt->bup.ovals[1];
 		((P3 *)_this)->_706_4_3_8_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 124: // STATE 14
@@ -688,7 +688,7 @@
 	/* 0 */	((P3 *)_this)->_706_4_3_8_transition_id = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 
 	case 126: // STATE 20
@@ -763,7 +763,7 @@
 		now.global_state.modemanager.state = trpt->bup.ovals[1];
 		((P3 *)_this)->_706_4_3_8_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -795,7 +795,7 @@
 		((P2 *)_this)->inputVectorCounter = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -966,7 +966,7 @@
 		now.Egse_tm_signal_parameter.feedback = trpt->bup.ovals[2];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 4);
+		ungrab_values(trpt->bup.ovals, 4);
 		goto R999;
 ;
 		;
@@ -1006,7 +1006,7 @@
 		now.Actuator_ctrl_signal_parameter = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -1024,7 +1024,7 @@
 		((P0 *)_this)->_703_1_1_2_transition_id = trpt->bup.ovals[1];
 		((P0 *)_this)->_703_1_1_2_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 187: // STATE 14
@@ -1041,7 +1041,7 @@
 	/* 0 */	((P0 *)_this)->_703_1_1_2_transition_id = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 
 	case 189: // STATE 20
@@ -1059,7 +1059,7 @@
 		((P0 *)_this)->_703_1_1_2_transition_id = trpt->bup.ovals[0];
 		_m = unsend(now.Modemanager_feedback_channel);
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -1070,7 +1070,7 @@
 		((P0 *)_this)->_703_1_1_2_transition_id = trpt->bup.ovals[0];
 		_m = unsend(now.Modemanager_feedback_channel);
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -1088,7 +1088,7 @@
 		((P0 *)_this)->_703_1_1_4_transition_id = trpt->bup.ovals[1];
 		((P0 *)_this)->_703_1_1_4_transition_id = trpt->bup.ovals[0];
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
 	case 198: // STATE 51
@@ -1105,7 +1105,7 @@
 	/* 0 */	((P0 *)_this)->_703_1_1_4_transition_id = trpt->bup.ovals[0];
 		;
 		;
-		ungrab_ints(trpt->bup.ovals, 3);
+		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 
 	case 200: // STATE 57
@@ -1123,7 +1123,7 @@
 		((P0 *)_this)->_703_1_1_4_transition_id = trpt->bup.ovals[0];
 		_m = unsend(now.Modemanager_feedback_channel);
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
@@ -1134,7 +1134,7 @@
 		((P0 *)_this)->_703_1_1_4_transition_id = trpt->bup.ovals[0];
 		_m = unsend(now.Modemanager_feedback_channel);
 		;
-		ungrab_ints(trpt->bup.ovals, 2);
+		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 ;
 		;
