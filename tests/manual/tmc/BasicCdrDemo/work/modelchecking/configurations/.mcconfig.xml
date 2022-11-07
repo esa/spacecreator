@@ -4,14 +4,14 @@
     <ModelCheckingWindow name=".mcconfig.xml">
         <Configuration>
             <Properties>
-                <Property path="scdemo/scdemo.scl"/>
+                <Property path="observerdemo/observerdemo.pr"/>
             </Properties>
             <Subtyping name="optimized.asn"/>
             <Submodel>
-                <Function name="ModeManager"/>
-                <Function name="EGSE"/>
-                <Function name="Sensor"/>
                 <Function name="Actuator"/>
+                <Function name="EGSE"/>
+                <Function name="ModeManager"/>
+                <Function name="Sensor"/>
             </Submodel>
         </Configuration>
         <NativeModelChecker/>

@@ -13,7 +13,7 @@
       <table>
         <tr>
           <td>Error Type</td>
-          <td>Stop Condition Violation</td>
+          <td>Observer Failure</td>
         </tr>
         <tr>
           <td>Error Number</td>
@@ -24,8 +24,8 @@
           
           
             <td>
-              <i>Violation Clause:</i> <tt>Never</tt><br>
-              <i>Violation Type:</i> <tt>Unknown Type</tt>
+              <i>Observer Name:</i> <tt>observerdemo</tt><br>
+              <i>Observer State:</i> <tt>Error State</tt>
             </td>
           
           
@@ -33,15 +33,20 @@
         </tr>
       </table>
       <i>Parsed from:</i><br>
-      <tt>SCL violation: never actuator.x  &gt; 5;</tt><br><br>
+      <tt>Observer entered errorstate: observerdemo</tt><br><br>
       <i>Trails:</i><br>
       <span style="white-space: pre-wrap;"><tt>output-event:{source sensor, dest modeManager, event sensor:msg-out:reading:{x 0}}
-output-event:{source eGSE, dest modeManager, event eGSE:msg-out:tc:{cfg {param-a 0, param-b 10}}}
-input-event:{source eGSE, dest modeManager, event modeManager:msg-in:tc:{cfg {param-a 0, param-b 10}}}
 input-event:{source sensor, dest modeManager, event modeManager:msg-in:reading:{x 0}}
-output-event:{source modeManager, dest actuator, event modeManager:msg-out:ctrl:{x 10}}
-input-event:{source modeManager, dest actuator, event actuator:msg-in:ctrl:{x 10}}
+output-event:{source sensor, dest modeManager, event sensor:msg-out:reading:{x 0}}
+output-event:{source eGSE, dest modeManager, event eGSE:msg-out:tc:{cfg {param-a 4, param-b 4}}}
+input-event:{source eGSE, dest modeManager, event modeManager:msg-in:tc:{cfg {param-a 4, param-b 4}}}
+input-event:{source sensor, dest modeManager, event modeManager:msg-in:reading:{x 0}}
+output-event:{source modeManager, dest actuator, event modeManager:msg-out:ctrl:{x 4}}
+input-event:{source modeManager, dest actuator, event actuator:msg-in:ctrl:{x 4}}
 output-event:{source actuator, dest modeManager, event actuator:msg-out:feedback:{x 0}}
+input-event:{source actuator, dest modeManager, event modeManager:msg-in:feedback:{x 0}}
+output-event:{source modeManager, dest eGSE, event modeManager:msg-out:tm:{reprt {reading 0, ctrl 4, feedback 0}}}
+input-event:{source modeManager, dest eGSE, event eGSE:msg-in:tm:{reprt {reading 0, ctrl 4, feedback 0}}}
 </tt></span><br><br>
     
   </body>

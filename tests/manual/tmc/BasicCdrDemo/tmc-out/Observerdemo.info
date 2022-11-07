@@ -1,0 +1,2 @@
+observerdemo:ObservedSignalKind.INPUT:ctrl_sig:ctrl:>Actuator
+observerdemo:ObservedSignalKind.INPUT:feedback_sig:feedback:>ModeManager

@@ -1,26 +1,42 @@
 starting claim 8
 Never claim moves to line 6	[else]
-  9:	proc  7 (:init::1) system.pml:203 Send 1	-> queue 1 (Actuator_lock)
- 16:	proc  7 (:init::1) system.pml:205 Send 1	-> queue 2 (Modemanager_lock)
+  9:	proc  7 (:init::1) system.pml:212 Send 1	-> queue 1 (Modemanager_lock)
+ 16:	proc  7 (:init::1) system.pml:214 Send 1	-> queue 2 (Actuator_lock)
+ 23:	proc  7 (:init::1) system.pml:216 Send 1	-> queue 3 (Observerdemo_lock)
 Never claim moves to line 4	[(inited)]
 Never claim moves to line 16	[else]
- 33:	proc  6 (Sensor_reading:1) system.pml:54 Send 0	-> queue 3 (Modemanager_reading_channel)
- 51:	proc  2 (Egse_tc:1) system.pml:58 Send 0,10	-> queue 4 (Modemanager_tc_channel)
- 54:	proc  5 (Modemanager_tc:1) system.pml:170 Recv 1	<- queue 2 (Modemanager_lock)
- 56:	proc  5 (Modemanager_tc:1) system.pml:174 Recv 0,10	<- queue 4 (Modemanager_tc_channel)
- 69:	proc  5 (Modemanager_tc:1) system.pml:181 Send 1	-> queue 2 (Modemanager_lock)
- 72:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 2 (Modemanager_lock)
- 74:	proc  4 (Modemanager_reading:1) system.pml:153 Recv 0	<- queue 3 (Modemanager_reading_channel)
- 83:	proc  4 (Modemanager_reading:1) system.pml:32 Send 10	-> queue 5 (Actuator_ctrl_channel)
- 86:	proc  0 (Actuator_ctrl:2) system.pml:76 Recv 1	<- queue 1 (Actuator_lock)
- 88:	proc  0 (Actuator_ctrl:2) system.pml:80 Recv 10	<- queue 5 (Actuator_ctrl_channel)
- 96:	proc  0 (Actuator_ctrl:2) system.pml:50 Send 0	-> queue 6 (Modemanager_feedback_channel)
-      SCL violation: never actuator.x  > 5;
+ 42:	proc  6 (Sensor_reading:1) system.pml:57 Send 0	-> queue 4 (Modemanager_reading_channel)
+ 55:	proc  4 (Modemanager_reading:1) system.pml:158 Recv 1	<- queue 1 (Modemanager_lock)
+ 57:	proc  4 (Modemanager_reading:1) system.pml:162 Recv 0	<- queue 4 (Modemanager_reading_channel)
+ 62:	proc  4 (Modemanager_reading:1) system.pml:169 Send 1	-> queue 1 (Modemanager_lock)
+ 64:	proc  6 (Sensor_reading:1) system.pml:57 Send 0	-> queue 4 (Modemanager_reading_channel)
+ 84:	proc  2 (Egse_tc:1) system.pml:61 Send 4,4	-> queue 5 (Modemanager_tc_channel)
+ 87:	proc  5 (Modemanager_tc:1) system.pml:179 Recv 1	<- queue 1 (Modemanager_lock)
+ 89:	proc  5 (Modemanager_tc:1) system.pml:183 Recv 4,4	<- queue 5 (Modemanager_tc_channel)
+102:	proc  5 (Modemanager_tc:1) system.pml:190 Send 1	-> queue 1 (Modemanager_lock)
+105:	proc  4 (Modemanager_reading:1) system.pml:158 Recv 1	<- queue 1 (Modemanager_lock)
+107:	proc  4 (Modemanager_reading:1) system.pml:162 Recv 0	<- queue 4 (Modemanager_reading_channel)
+116:	proc  4 (Modemanager_reading:1) system.pml:35 Send 4	-> queue 6 (Actuator_ctrl_channel)
+119:	proc  0 (Actuator_ctrl:2) system.pml:79 Recv 1	<- queue 2 (Actuator_lock)
+121:	proc  0 (Actuator_ctrl:2) system.pml:83 Recv 4	<- queue 6 (Actuator_ctrl_channel)
+129:	proc  0 (Actuator_ctrl:2) system.pml:53 Send 0	-> queue 7 (Modemanager_feedback_channel)
+135:	proc  0 (Actuator_ctrl:2) system.pml:86 Recv 1	<- queue 3 (Observerdemo_lock)
+145:	proc  0 (Actuator_ctrl:2) system.pml:88 Send 1	-> queue 3 (Observerdemo_lock)
+148:	proc  0 (Actuator_ctrl:2) system.pml:93 Send 1	-> queue 2 (Actuator_lock)
+154:	proc  4 (Modemanager_reading:1) system.pml:169 Send 1	-> queue 1 (Modemanager_lock)
+156:	proc  3 (Modemanager_feedback:3) system.pml:134 Recv 1	<- queue 1 (Modemanager_lock)
+158:	proc  3 (Modemanager_feedback:3) system.pml:138 Recv 0	<- queue 7 (Modemanager_feedback_channel)
+171:	proc  3 (Modemanager_feedback:3) system.pml:49 Send 0,4,0	-> queue 8 (Egse_tm_channel)
+175:	proc  1 (Egse_tm:4) system.pml:106 Recv 0,4,0	<- queue 8 (Egse_tm_channel)
+181:	proc  3 (Modemanager_feedback:3) system.pml:141 Recv 1	<- queue 3 (Observerdemo_lock)
+190:	proc  3 (Modemanager_feedback:3) system.pml:143 Send 1	-> queue 3 (Observerdemo_lock)
+193:	proc  3 (Modemanager_feedback:3) system.pml:148 Send 1	-> queue 1 (Modemanager_lock)
+      Observer entered errorstate: observerdemo
 spin: scl.pml:14, Error: assertion violated
-spin: text of failed assertion: assert(!((global_state.actuator.x>5)))
-Never claim moves to line 14	[assert(!((global_state.actuator.x>5)))]
-spin: trail ends after 97 steps
-#processes: 8
+spin: text of failed assertion: assert(!((global_state.observerdemo.state==2)))
+Never claim moves to line 14	[assert(!((global_state.observerdemo.state==2)))]
+spin: trail ends after 194 steps
+#processes: 7
 		nothing.data.no_event.dummy = 0
 		nothing.data.system_startup.dummy = 0
 		nothing.data.input_event.source = 0
@@ -120,51 +136,58 @@ spin: trail ends after 97 steps
 		nothing.data.unhandled_input.event.data.sensor.selection = 0
 		nothing.data.unhandled_input.event.selection = 0
 		nothing.selection = 1
+		observerdemo_0_y = 0
+		observerdemo_0_x = 4
 		inited = 1
-		queue 5 (Actuator_ctrl_channel): 
-		Actuator_ctrl_signal_parameter = 10
+		queue 6 (Actuator_ctrl_channel): 
+		Actuator_ctrl_signal_parameter = 4
 		Actuator_ctrl_channel_used = 1
+		queue 8 (Egse_tm_channel): 
 		Egse_tm_signal_parameter.reading = 0
-		Egse_tm_signal_parameter.ctrl = 0
+		Egse_tm_signal_parameter.ctrl = 4
 		Egse_tm_signal_parameter.feedback = 0
-		Egse_tm_channel_used = 0
-		queue 6 (Modemanager_feedback_channel): [0]
+		Egse_tm_channel_used = 1
+		queue 7 (Modemanager_feedback_channel): 
 		Modemanager_feedback_signal_parameter = 0
-		Modemanager_feedback_channel_used = 0
-		queue 3 (Modemanager_reading_channel): 
+		Modemanager_feedback_channel_used = 1
+		queue 4 (Modemanager_reading_channel): 
 		Modemanager_reading_signal_parameter = 0
 		Modemanager_reading_channel_used = 1
-		queue 4 (Modemanager_tc_channel): 
-		Modemanager_tc_signal_parameter.param_a = 0
-		Modemanager_tc_signal_parameter.param_b = 10
+		queue 5 (Modemanager_tc_channel): 
+		Modemanager_tc_signal_parameter.param_a = 4
+		Modemanager_tc_signal_parameter.param_b = 4
 		Modemanager_tc_channel_used = 1
-		global_state.modemanager.state = 0
-		global_state.modemanager.init_done = 0
-		global_state.modemanager.sender = 4
-		global_state.modemanager.cfg.param_a = 0
-		global_state.modemanager.cfg.param_b = 10
-		global_state.modemanager.xin = 0
-		global_state.modemanager.xout = 10
-		global_state.modemanager.xfeedback = 0
-		global_state.modemanager.rprt.reading = 0
-		global_state.modemanager.rprt.ctrl = 0
-		global_state.modemanager.rprt.feedback = 0
+		global_state.observerdemo.state = 2
+		global_state.observerdemo.init_done = 0
+		global_state.observerdemo.sender = 4
+		global_state.observerdemo.reference = 4
 		global_state.actuator.state = 0
 		global_state.actuator.init_done = 0
 		global_state.actuator.sender = 4
-		global_state.actuator.x = 10
+		global_state.actuator.x = 4
+		global_state.modemanager.state = 0
+		global_state.modemanager.init_done = 0
+		global_state.modemanager.sender = 4
+		global_state.modemanager.cfg.param_a = 4
+		global_state.modemanager.cfg.param_b = 4
+		global_state.modemanager.xin = 0
+		global_state.modemanager.xout = 4
+		global_state.modemanager.xfeedback = 0
+		global_state.modemanager.rprt.reading = 0
+		global_state.modemanager.rprt.ctrl = 4
+		global_state.modemanager.rprt.feedback = 0
 		global_state.timers.actuator.dummy = 0
 		global_state.timers.modemanager.dummy = 0
 		global_state.timers.dummy_entry.dummy = 0
-		queue 1 (Actuator_lock): 
-		queue 2 (Modemanager_lock): 
- 97:	proc  7 (:init::1) system.pml:208 (state 104) <valid end state>
- 97:	proc  6 (Sensor_reading:1) system.pml:196 (state 41)
- 97:	proc  5 (Modemanager_tc:1) system.pml:167 (state 81)
- 97:	proc  4 (Modemanager_reading:1) modemanager.pml:36 (state 59)
- 97:	proc  3 (Modemanager_feedback:3) system.pml:125 (state 76)
- 97:	proc  2 (Egse_tc:1) system.pml:120 (state 71)
- 97:	proc  1 (Egse_tm:4) system.pml:94 (state 12)
- 97:	proc  0 (Actuator_ctrl:2) actuator.pml:29 (state 39)
- 97:	proc  - (never_0:1) scl.pml:10 (state 14)
+		queue 1 (Modemanager_lock): [1]
+		queue 2 (Actuator_lock): [1]
+		queue 3 (Observerdemo_lock): [1]
+194:	proc  6 (Sensor_reading:1) system.pml:56 (state 36)
+194:	proc  5 (Modemanager_tc:1) system.pml:176 (state 81)
+194:	proc  4 (Modemanager_reading:1) system.pml:155 (state 76)
+194:	proc  3 (Modemanager_feedback:3) system.pml:131 (state 122)
+194:	proc  2 (Egse_tc:1) system.pml:126 (state 71)
+194:	proc  1 (Egse_tm:4) system.pml:100 (state 12)
+194:	proc  0 (Actuator_ctrl:2) system.pml:76 (state 139)
+194:	proc  - (never_0:1) scl.pml:10 (state 14)
 8 processes created

@@ -1,3 +1,21 @@
+#define Observerdemo_States int
+#define Observerdemo_Context_state int
+#define Observerdemo_Context_init_done bool
+#define Observerdemo_Context_sender int
+#define Observerdemo_Context_reference int
+#define Observerdemo_Actuator_Event_Msg_In_Selection int
+#define Observerdemo_Actuator_Event_Msg_Out_Selection int
+#define Observerdemo_Actuator_Event_Selection int
+#define Observerdemo_Sensor_Event_Msg_Out_Selection int
+#define Observerdemo_Sensor_Event_Selection int
+#define Observerdemo_Egse_Event_Msg_In_Selection int
+#define Observerdemo_Egse_Event_Msg_Out_Selection int
+#define Observerdemo_Egse_Event_Selection int
+#define Observerdemo_Modemanager_Event_Msg_In_Selection int
+#define Observerdemo_Modemanager_Event_Msg_Out_Selection int
+#define Observerdemo_Modemanager_Event_Selection int
+#define Observerdemo_Function_Event_Selection int
+#define Observerdemo_Observable_Event_Selection int
 #define T_SmallInteger int
 #define Egse_tc_cfg_param_a int
 #define Egse_tc_cfg_param_b int
@@ -332,6 +350,45 @@
 #define System_State_modemanager_rprt_feedback int
 #define TimerData_timer_enabled bool
 #define TimerData_interval int
+#define Observerdemo_States_checking 0
+#define Observerdemo_States_idle 1
+#define Observerdemo_States_incorrectvalue 2
+#define Observerdemo_Context_state_checking 0
+#define Observerdemo_Context_state_idle 1
+#define Observerdemo_Context_state_incorrectvalue 2
+#define Observerdemo_Context_sender_actuator 0
+#define Observerdemo_Context_sender_egse 1
+#define Observerdemo_Context_sender_modemanager 2
+#define Observerdemo_Context_sender_sensor 3
+#define Observerdemo_Context_sender_env 4
+#define Observerdemo_Actuator_Event_Msg_In_Selection_input_none_present 1
+#define Observerdemo_Actuator_Event_Msg_In_Selection_ctrl_present 2
+#define Observerdemo_Actuator_Event_Msg_Out_Selection_feedback_present 1
+#define Observerdemo_Actuator_Event_Selection_msg_in_present 1
+#define Observerdemo_Actuator_Event_Selection_msg_out_present 2
+#define Observerdemo_Sensor_Event_Msg_Out_Selection_reading_present 1
+#define Observerdemo_Sensor_Event_Selection_msg_out_present 1
+#define Observerdemo_Egse_Event_Msg_In_Selection_tm_present 1
+#define Observerdemo_Egse_Event_Msg_Out_Selection_tc_present 1
+#define Observerdemo_Egse_Event_Selection_msg_in_present 1
+#define Observerdemo_Egse_Event_Selection_msg_out_present 2
+#define Observerdemo_Modemanager_Event_Msg_In_Selection_input_none_present 1
+#define Observerdemo_Modemanager_Event_Msg_In_Selection_feedback_present 2
+#define Observerdemo_Modemanager_Event_Msg_In_Selection_reading_present 3
+#define Observerdemo_Modemanager_Event_Msg_In_Selection_tc_present 4
+#define Observerdemo_Modemanager_Event_Msg_Out_Selection_ctrl_present 1
+#define Observerdemo_Modemanager_Event_Msg_Out_Selection_tm_present 2
+#define Observerdemo_Modemanager_Event_Selection_msg_in_present 1
+#define Observerdemo_Modemanager_Event_Selection_msg_out_present 2
+#define Observerdemo_Function_Event_Selection_actuator_present 1
+#define Observerdemo_Function_Event_Selection_egse_present 2
+#define Observerdemo_Function_Event_Selection_modemanager_present 3
+#define Observerdemo_Function_Event_Selection_sensor_present 4
+#define Observerdemo_Observable_Event_Selection_no_event_present 1
+#define Observerdemo_Observable_Event_Selection_system_startup_present 2
+#define Observerdemo_Observable_Event_Selection_input_event_present 3
+#define Observerdemo_Observable_Event_Selection_output_event_present 4
+#define Observerdemo_Observable_Event_Selection_unhandled_input_present 5
 #define Actuator_States_idle 0
 #define Actuator_States_working 1
 #define Actuator_Context_state_idle 0
@@ -2056,6 +2113,13 @@ typedef Observable_Event_unhandled_input_event_modemanager_msg_out_tm_reprt {
 
 typedef Observable_Event_unhandled_input_event_sensor_msg_out_reading {
     Observable_Event_unhandled_input_event_sensor_msg_out_reading_x x;
+}
+
+typedef Observerdemo_Context {
+    Observerdemo_Context_state state;
+    Observerdemo_Context_init_done init_done;
+    Observerdemo_Context_sender sender;
+    Observerdemo_Context_reference reference;
 }
 
 typedef Sensor_Event_msg_out_reading {
@@ -4793,6 +4857,175 @@ typedef System_State {
 }
 
 Observable_Event nothing;
+inline Observerdemo_States_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_States_range_check(dst);
+}
+inline Observerdemo_States_range_check(Observerdemo_States_vc)
+{
+    assert((((Observerdemo_States_vc == Observerdemo_States_checking) || (Observerdemo_States_vc == Observerdemo_States_idle)) || (Observerdemo_States_vc == Observerdemo_States_incorrectvalue)));
+}
+inline Observerdemo_Context_state_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Context_state_range_check(dst);
+}
+inline Observerdemo_Context_state_range_check(Observerdemo_Context_state_vc)
+{
+    assert((((Observerdemo_Context_state_vc == Observerdemo_Context_state_checking) || (Observerdemo_Context_state_vc == Observerdemo_Context_state_idle)) || (Observerdemo_Context_state_vc == Observerdemo_Context_state_incorrectvalue)));
+}
+inline Observerdemo_Context_init_done_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Context_init_done_range_check(dst);
+}
+inline Observerdemo_Context_init_done_range_check(Observerdemo_Context_init_done_vc)
+{
+    assert(true);
+}
+inline Observerdemo_Context_sender_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Context_sender_range_check(dst);
+}
+inline Observerdemo_Context_sender_range_check(Observerdemo_Context_sender_vc)
+{
+    assert((((((Observerdemo_Context_sender_vc == Observerdemo_Context_sender_actuator) || (Observerdemo_Context_sender_vc == Observerdemo_Context_sender_egse)) || (Observerdemo_Context_sender_vc == Observerdemo_Context_sender_modemanager)) || (Observerdemo_Context_sender_vc == Observerdemo_Context_sender_sensor)) || (Observerdemo_Context_sender_vc == Observerdemo_Context_sender_env)));
+}
+inline Observerdemo_Context_reference_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Context_reference_range_check(dst);
+}
+inline Observerdemo_Context_reference_range_check(Observerdemo_Context_reference_vc)
+{
+    assert(((Observerdemo_Context_reference_vc >= 0) && (Observerdemo_Context_reference_vc <= 1000000)));
+}
+inline Observerdemo_Context_assign_value(dst, src)
+{
+    Observerdemo_Context_state_assign_value(dst.state, src.state);
+    Observerdemo_Context_init_done_assign_value(dst.init_done, src.init_done);
+    Observerdemo_Context_sender_assign_value(dst.sender, src.sender);
+    Observerdemo_Context_reference_assign_value(dst.reference, src.reference);
+}
+inline Observerdemo_Actuator_Event_Msg_In_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Actuator_Event_Msg_In_Selection_range_check(dst);
+}
+inline Observerdemo_Actuator_Event_Msg_In_Selection_range_check(Observerdemo_Actuator_Event_Msg_In_Selection_vc)
+{
+    assert(((Observerdemo_Actuator_Event_Msg_In_Selection_vc == Observerdemo_Actuator_Event_Msg_In_Selection_input_none_present) || (Observerdemo_Actuator_Event_Msg_In_Selection_vc == Observerdemo_Actuator_Event_Msg_In_Selection_ctrl_present)));
+}
+inline Observerdemo_Actuator_Event_Msg_Out_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Actuator_Event_Msg_Out_Selection_range_check(dst);
+}
+inline Observerdemo_Actuator_Event_Msg_Out_Selection_range_check(Observerdemo_Actuator_Event_Msg_Out_Selection_vc)
+{
+    assert((Observerdemo_Actuator_Event_Msg_Out_Selection_vc == Observerdemo_Actuator_Event_Msg_Out_Selection_feedback_present));
+}
+inline Observerdemo_Actuator_Event_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Actuator_Event_Selection_range_check(dst);
+}
+inline Observerdemo_Actuator_Event_Selection_range_check(Observerdemo_Actuator_Event_Selection_vc)
+{
+    assert(((Observerdemo_Actuator_Event_Selection_vc == Observerdemo_Actuator_Event_Selection_msg_in_present) || (Observerdemo_Actuator_Event_Selection_vc == Observerdemo_Actuator_Event_Selection_msg_out_present)));
+}
+inline Observerdemo_Sensor_Event_Msg_Out_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Sensor_Event_Msg_Out_Selection_range_check(dst);
+}
+inline Observerdemo_Sensor_Event_Msg_Out_Selection_range_check(Observerdemo_Sensor_Event_Msg_Out_Selection_vc)
+{
+    assert((Observerdemo_Sensor_Event_Msg_Out_Selection_vc == Observerdemo_Sensor_Event_Msg_Out_Selection_reading_present));
+}
+inline Observerdemo_Sensor_Event_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Sensor_Event_Selection_range_check(dst);
+}
+inline Observerdemo_Sensor_Event_Selection_range_check(Observerdemo_Sensor_Event_Selection_vc)
+{
+    assert((Observerdemo_Sensor_Event_Selection_vc == Observerdemo_Sensor_Event_Selection_msg_out_present));
+}
+inline Observerdemo_Egse_Event_Msg_In_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Egse_Event_Msg_In_Selection_range_check(dst);
+}
+inline Observerdemo_Egse_Event_Msg_In_Selection_range_check(Observerdemo_Egse_Event_Msg_In_Selection_vc)
+{
+    assert((Observerdemo_Egse_Event_Msg_In_Selection_vc == Observerdemo_Egse_Event_Msg_In_Selection_tm_present));
+}
+inline Observerdemo_Egse_Event_Msg_Out_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Egse_Event_Msg_Out_Selection_range_check(dst);
+}
+inline Observerdemo_Egse_Event_Msg_Out_Selection_range_check(Observerdemo_Egse_Event_Msg_Out_Selection_vc)
+{
+    assert((Observerdemo_Egse_Event_Msg_Out_Selection_vc == Observerdemo_Egse_Event_Msg_Out_Selection_tc_present));
+}
+inline Observerdemo_Egse_Event_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Egse_Event_Selection_range_check(dst);
+}
+inline Observerdemo_Egse_Event_Selection_range_check(Observerdemo_Egse_Event_Selection_vc)
+{
+    assert(((Observerdemo_Egse_Event_Selection_vc == Observerdemo_Egse_Event_Selection_msg_in_present) || (Observerdemo_Egse_Event_Selection_vc == Observerdemo_Egse_Event_Selection_msg_out_present)));
+}
+inline Observerdemo_Modemanager_Event_Msg_In_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Modemanager_Event_Msg_In_Selection_range_check(dst);
+}
+inline Observerdemo_Modemanager_Event_Msg_In_Selection_range_check(Observerdemo_Modemanager_Event_Msg_In_Selection_vc)
+{
+    assert(((((Observerdemo_Modemanager_Event_Msg_In_Selection_vc == Observerdemo_Modemanager_Event_Msg_In_Selection_input_none_present) || (Observerdemo_Modemanager_Event_Msg_In_Selection_vc == Observerdemo_Modemanager_Event_Msg_In_Selection_feedback_present)) || (Observerdemo_Modemanager_Event_Msg_In_Selection_vc == Observerdemo_Modemanager_Event_Msg_In_Selection_reading_present)) || (Observerdemo_Modemanager_Event_Msg_In_Selection_vc == Observerdemo_Modemanager_Event_Msg_In_Selection_tc_present)));
+}
+inline Observerdemo_Modemanager_Event_Msg_Out_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Modemanager_Event_Msg_Out_Selection_range_check(dst);
+}
+inline Observerdemo_Modemanager_Event_Msg_Out_Selection_range_check(Observerdemo_Modemanager_Event_Msg_Out_Selection_vc)
+{
+    assert(((Observerdemo_Modemanager_Event_Msg_Out_Selection_vc == Observerdemo_Modemanager_Event_Msg_Out_Selection_ctrl_present) || (Observerdemo_Modemanager_Event_Msg_Out_Selection_vc == Observerdemo_Modemanager_Event_Msg_Out_Selection_tm_present)));
+}
+inline Observerdemo_Modemanager_Event_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Modemanager_Event_Selection_range_check(dst);
+}
+inline Observerdemo_Modemanager_Event_Selection_range_check(Observerdemo_Modemanager_Event_Selection_vc)
+{
+    assert(((Observerdemo_Modemanager_Event_Selection_vc == Observerdemo_Modemanager_Event_Selection_msg_in_present) || (Observerdemo_Modemanager_Event_Selection_vc == Observerdemo_Modemanager_Event_Selection_msg_out_present)));
+}
+inline Observerdemo_Function_Event_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Function_Event_Selection_range_check(dst);
+}
+inline Observerdemo_Function_Event_Selection_range_check(Observerdemo_Function_Event_Selection_vc)
+{
+    assert(((((Observerdemo_Function_Event_Selection_vc == Observerdemo_Function_Event_Selection_actuator_present) || (Observerdemo_Function_Event_Selection_vc == Observerdemo_Function_Event_Selection_egse_present)) || (Observerdemo_Function_Event_Selection_vc == Observerdemo_Function_Event_Selection_modemanager_present)) || (Observerdemo_Function_Event_Selection_vc == Observerdemo_Function_Event_Selection_sensor_present)));
+}
+inline Observerdemo_Observable_Event_Selection_assign_value(dst, src)
+{
+    dst = src;
+    Observerdemo_Observable_Event_Selection_range_check(dst);
+}
+inline Observerdemo_Observable_Event_Selection_range_check(Observerdemo_Observable_Event_Selection_vc)
+{
+    assert((((((Observerdemo_Observable_Event_Selection_vc == Observerdemo_Observable_Event_Selection_no_event_present) || (Observerdemo_Observable_Event_Selection_vc == Observerdemo_Observable_Event_Selection_system_startup_present)) || (Observerdemo_Observable_Event_Selection_vc == Observerdemo_Observable_Event_Selection_input_event_present)) || (Observerdemo_Observable_Event_Selection_vc == Observerdemo_Observable_Event_Selection_output_event_present)) || (Observerdemo_Observable_Event_Selection_vc == Observerdemo_Observable_Event_Selection_unhandled_input_present)));
+}
 inline T_SmallInteger_assign_value(dst, src)
 {
     dst = src;

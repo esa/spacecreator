@@ -28,800 +28,924 @@ settable(void)
 
 	trans[8] = (Trans **) emalloc(18*sizeof(Trans *));
 
-	trans[8][6]	= settr(580,0,5,1,0,".(goto)", 0, 2, 0);
-	T = trans[8][5] = settr(579,0,0,0,0,"DO", 0, 2, 0);
-	T = T->nxt	= settr(579,0,1,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(579,0,3,0,0,"DO", 0, 2, 0);
-	trans[8][1]	= settr(575,0,14,3,0,"(inited)", 1, 2, 0);
-	trans[8][2]	= settr(576,0,14,1,0,"goto :b23", 0, 2, 0);
-	trans[8][3]	= settr(577,0,5,2,0,"else", 0, 2, 0);
-	trans[8][4]	= settr(578,0,5,1,0,"goto start", 0, 2, 0);
-	trans[8][7]	= settr(581,0,14,1,0,"break", 0, 2, 0);
-	trans[8][15]	= settr(589,0,14,1,0,".(goto)", 0, 2, 0);
-	T = trans[8][14] = settr(588,0,0,0,0,"DO", 0, 2, 0);
-	T = T->nxt	= settr(588,0,11,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(588,0,12,0,0,"DO", 0, 2, 0);
-	T = trans[ 8][11] = settr(585,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(585,2,8,0,0,"ATOMIC", 1, 2, 0);
-	trans[8][8]	= settr(582,0,14,4,4,"((global_state.actuator.x>5))", 1, 2, 0); /* m: 9 -> 14,0 */
+	trans[8][6]	= settr(712,0,5,1,0,".(goto)", 0, 2, 0);
+	T = trans[8][5] = settr(711,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(711,0,1,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(711,0,3,0,0,"DO", 0, 2, 0);
+	trans[8][1]	= settr(707,0,14,3,0,"(inited)", 1, 2, 0);
+	trans[8][2]	= settr(708,0,14,1,0,"goto :b26", 0, 2, 0);
+	trans[8][3]	= settr(709,0,5,2,0,"else", 0, 2, 0);
+	trans[8][4]	= settr(710,0,5,1,0,"goto start", 0, 2, 0);
+	trans[8][7]	= settr(713,0,14,1,0,"break", 0, 2, 0);
+	trans[8][15]	= settr(721,0,14,1,0,".(goto)", 0, 2, 0);
+	T = trans[8][14] = settr(720,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(720,0,11,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(720,0,12,0,0,"DO", 0, 2, 0);
+	T = trans[ 8][11] = settr(717,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(717,2,8,0,0,"ATOMIC", 1, 2, 0);
+	trans[8][8]	= settr(714,0,14,4,4,"((global_state.observerdemo.state==2))", 1, 2, 0); /* m: 9 -> 14,0 */
 	reached8[9] = 1;
-	trans[8][9]	= settr(0,0,0,0,0,"printf('SCL violation: never actuator.x  > 5;\\n')",0,0,0);
-	trans[8][10]	= settr(0,0,0,0,0,"assert(!((global_state.actuator.x>5)))",0,0,0);
-	trans[8][12]	= settr(586,0,14,2,0,"else", 0, 2, 0);
-	trans[8][13]	= settr(587,0,14,1,0,"goto system_inited", 0, 2, 0);
-	trans[8][16]	= settr(590,0,17,1,0,"break", 0, 2, 0);
-	trans[8][17]	= settr(591,0,0,5,5,"-end-", 0, 3500, 0);
+	trans[8][9]	= settr(0,0,0,0,0,"printf('Observer entered errorstate: observerdemo\\n')",0,0,0);
+	trans[8][10]	= settr(0,0,0,0,0,"assert(!((global_state.observerdemo.state==2)))",0,0,0);
+	trans[8][12]	= settr(718,0,14,2,0,"else", 0, 2, 0);
+	trans[8][13]	= settr(719,0,14,1,0,"goto system_inited", 0, 2, 0);
+	trans[8][16]	= settr(722,0,17,1,0,"break", 0, 2, 0);
+	trans[8][17]	= settr(723,0,0,5,5,"-end-", 0, 3500, 0);
 
 	/* proctype 7: :init: */
 
-	trans[7] = (Trans **) emalloc(105*sizeof(Trans *));
+	trans[7] = (Trans **) emalloc(145*sizeof(Trans *));
 
-	T = trans[ 7][103] = settr(573,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(573,2,5,0,0,"ATOMIC", 1, 8, 9);
-	T = trans[ 7][5] = settr(475,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(475,0,4,0,0,"sub-sequence", 1, 8, 9);
-/*->*/	trans[7][4]	= settr(474,34,42,6,6,"D_STEP12361", 1, 2, 0);
-	T = trans[ 7][42] = settr(512,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(512,0,9,0,0,"sub-sequence", 1, 8, 9);
-	T = trans[ 7][9] = settr(479,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(479,0,6,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][6]	= settr(476,2,8,7,7,"global_state.actuator.sender = 4", 1, 8, 9);
-	T = trans[ 7][8] = settr(478,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(478,0,7,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][7]	= settr(477,2,41,8,0,"assert((((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4)))", 1, 8, 9);
-	T = trans[ 7][41] = settr(511,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(511,0,10,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][10]	= settr(480,2,38,9,9,"transition_id = 0", 1, 8, 9); /* m: 11 -> 0,38 */
+	T = trans[ 7][143] = settr(705,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(705,2,5,0,0,"ATOMIC", 1, 2500, 0);
+	T = trans[ 7][5] = settr(567,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(567,0,4,0,0,"sub-sequence", 1, 2500, 0);
+/*->*/	trans[7][4]	= settr(566,34,62,6,6,"D_STEP12594", 1, 2, 0);
+	T = trans[ 7][62] = settr(624,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(624,0,9,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[ 7][9] = settr(571,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(571,0,6,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][6]	= settr(568,2,8,7,7,"global_state.modemanager.sender = 4", 1, 2500, 0);
+	T = trans[ 7][8] = settr(570,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(570,0,7,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][7]	= settr(569,2,61,8,0,"assert((((((global_state.modemanager.sender==0)||(global_state.modemanager.sender==1))||(global_state.modemanager.sender==2))||(global_state.modemanager.sender==3))||(global_state.modemanager.sender==4)))", 1, 2500, 0);
+	T = trans[ 7][61] = settr(623,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(623,0,10,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][10]	= settr(572,2,58,9,9,"transition_id = 0", 1, 2500, 0); /* m: 11 -> 0,58 */
 	reached7[11] = 1;
 	trans[7][11]	= settr(0,0,0,0,0,"transition_id = 0",0,0,0);
-	trans[7][39]	= settr(509,2,38,1,0,".(goto)", 1, 8, 9);
-	T = trans[7][38] = settr(508,2,0,0,0,"DO", 1, 8, 9);
-	    T->nxt	= settr(508,2,35,0,0,"DO", 1, 8, 9);
-	T = trans[7][35] = settr(505,2,0,0,0,"IF", 1, 8, 9);
-	T = T->nxt	= settr(505,2,12,0,0,"IF", 1, 8, 9);
-	T = T->nxt	= settr(505,2,14,0,0,"IF", 1, 8, 9);
-	    T->nxt	= settr(505,2,18,0,0,"IF", 1, 8, 9);
-	trans[7][12]	= settr(482,2,43,10,10,"((transition_id==-(1)))", 1, 8, 9);
-	trans[7][13]	= settr(483,2,43,1,0,"goto :b21", 1, 8, 9);
-	trans[7][36]	= settr(506,2,37,1,0,".(goto)", 1, 8, 9);
-	trans[7][14]	= settr(484,2,37,11,11,"((transition_id==0))", 1, 8, 9); /* m: 15 -> 37,0 */
+	trans[7][59]	= settr(621,2,58,1,0,".(goto)", 1, 2500, 0);
+	T = trans[7][58] = settr(620,2,0,0,0,"DO", 1, 2500, 0);
+	    T->nxt	= settr(620,2,55,0,0,"DO", 1, 2500, 0);
+	T = trans[7][55] = settr(617,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(617,2,12,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(617,2,14,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(617,2,18,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(617,2,38,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(617,2,49,0,0,"IF", 1, 2500, 0);
+	trans[7][12]	= settr(574,2,63,10,10,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[7][13]	= settr(575,2,63,1,0,"goto :b23", 1, 2500, 0);
+	trans[7][56]	= settr(618,2,57,1,0,".(goto)", 1, 2500, 0);
+	trans[7][14]	= settr(576,2,57,11,11,"((transition_id==0))", 1, 2500, 0); /* m: 15 -> 57,0 */
 	reached7[15] = 1;
 	trans[7][15]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[7][16]	= settr(0,0,0,0,0,"global_state.actuator.state = 0",0,0,0);
-	trans[7][17]	= settr(487,2,37,1,0,"goto continuous_signals", 1, 8, 9);
-	trans[7][18]	= settr(488,2,20,12,12,"((transition_id==1))", 1, 8, 9);
-	T = trans[ 7][20] = settr(490,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(490,0,19,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][19]	= settr(489,2,33,1,0,"(1)", 1, 8, 9);
-	T = trans[7][33] = settr(503,2,0,0,0,"IF", 1, 8, 9);
-	T = T->nxt	= settr(503,2,21,0,0,"IF", 1, 8, 9);
-	    T->nxt	= settr(503,2,27,0,0,"IF", 1, 8, 9);
-	trans[7][21]	= settr(491,2,23,13,0,"(((global_state.actuator.x>10)==1))", 1, 8, 9);
-	T = trans[ 7][23] = settr(493,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(493,0,22,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][22]	= settr(492,2,37,14,14,"Modemanager_feedback_channel!global_state.actuator.x", 1, 8, 9); /* m: 24 -> 37,0 */
-	reached7[24] = 1;
-	trans[7][24]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[7][25]	= settr(0,0,0,0,0,"global_state.actuator.state = 1",0,0,0);
-	trans[7][26]	= settr(496,2,37,1,0,"goto continuous_signals", 1, 8, 9);
-	trans[7][34]	= settr(504,2,37,1,0,".(goto)", 1, 8, 9);
-	trans[7][27]	= settr(497,2,29,15,0,"(((global_state.actuator.x>10)==0))", 1, 8, 9);
-	T = trans[ 7][29] = settr(499,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(499,0,28,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][28]	= settr(498,2,37,16,16,"Modemanager_feedback_channel!0", 1, 8, 9); /* m: 30 -> 37,0 */
-	reached7[30] = 1;
-	trans[7][30]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[7][31]	= settr(0,0,0,0,0,"global_state.actuator.state = 0",0,0,0);
-	trans[7][32]	= settr(502,2,37,1,0,"goto continuous_signals", 1, 8, 9);
-	trans[7][37]	= settr(507,2,38,1,0,"(1)", 1, 8, 9);
-	trans[7][40]	= settr(510,2,43,1,0,"break", 1, 8, 9);
-	trans[7][43]	= settr(513,2,100,17,17,"Actuator_lock!1", 1, 8, 9);
-	T = trans[ 7][100] = settr(570,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(570,0,47,0,0,"sub-sequence", 1, 8, 9);
-	T = trans[ 7][47] = settr(517,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(517,0,44,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][44]	= settr(514,2,46,18,18,"global_state.modemanager.sender = 4", 1, 8, 9);
-	T = trans[ 7][46] = settr(516,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(516,0,45,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][45]	= settr(515,2,99,19,0,"assert((((((global_state.modemanager.sender==0)||(global_state.modemanager.sender==1))||(global_state.modemanager.sender==2))||(global_state.modemanager.sender==3))||(global_state.modemanager.sender==4)))", 1, 8, 9);
-	T = trans[ 7][99] = settr(569,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(569,0,48,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][48]	= settr(518,2,96,20,20,"transition_id = 0", 1, 8, 9); /* m: 49 -> 0,96 */
-	reached7[49] = 1;
-	trans[7][49]	= settr(0,0,0,0,0,"transition_id = 0",0,0,0);
-	trans[7][97]	= settr(567,2,96,1,0,".(goto)", 1, 8, 9);
-	T = trans[7][96] = settr(566,2,0,0,0,"DO", 1, 8, 9);
-	    T->nxt	= settr(566,2,93,0,0,"DO", 1, 8, 9);
-	T = trans[7][93] = settr(563,2,0,0,0,"IF", 1, 8, 9);
-	T = T->nxt	= settr(563,2,50,0,0,"IF", 1, 8, 9);
-	T = T->nxt	= settr(563,2,52,0,0,"IF", 1, 8, 9);
-	T = T->nxt	= settr(563,2,56,0,0,"IF", 1, 8, 9);
-	T = T->nxt	= settr(563,2,76,0,0,"IF", 1, 8, 9);
-	    T->nxt	= settr(563,2,87,0,0,"IF", 1, 8, 9);
-	trans[7][50]	= settr(520,2,101,21,21,"((transition_id==-(1)))", 1, 8, 9);
-	trans[7][51]	= settr(521,2,101,1,0,"goto :b22", 1, 8, 9);
-	trans[7][94]	= settr(564,2,95,1,0,".(goto)", 1, 8, 9);
-	trans[7][52]	= settr(522,2,95,22,22,"((transition_id==0))", 1, 8, 9); /* m: 53 -> 95,0 */
-	reached7[53] = 1;
-	trans[7][53]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[7][54]	= settr(0,0,0,0,0,"global_state.modemanager.state = 1",0,0,0);
-	trans[7][55]	= settr(525,2,95,1,0,"goto continuous_signals", 1, 8, 9);
-	trans[7][56]	= settr(526,2,58,23,23,"((transition_id==1))", 1, 8, 9);
-	T = trans[ 7][58] = settr(528,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(528,0,57,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][57]	= settr(527,2,71,1,0,"(1)", 1, 8, 9);
-	T = trans[ 7][71] = settr(541,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(541,0,62,0,0,"sub-sequence", 1, 8, 9);
-	T = trans[ 7][62] = settr(532,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(532,0,59,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][59]	= settr(529,2,61,24,24,"global_state.modemanager.rprt.reading = global_state.modemanager.xin", 1, 8, 9);
-	T = trans[ 7][61] = settr(531,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(531,0,60,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][60]	= settr(530,2,66,25,0,"assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))", 1, 8, 9);
-	T = trans[ 7][66] = settr(536,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(536,0,63,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][63]	= settr(533,2,65,26,26,"global_state.modemanager.rprt.ctrl = global_state.modemanager.xout", 1, 8, 9);
-	T = trans[ 7][65] = settr(535,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(535,0,64,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][64]	= settr(534,2,70,27,0,"assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))", 1, 8, 9);
-	T = trans[ 7][70] = settr(540,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(540,0,67,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][67]	= settr(537,2,69,28,28,"global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback", 1, 8, 9);
-	T = trans[ 7][69] = settr(539,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(539,0,68,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][68]	= settr(538,2,73,29,0,"assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))", 1, 8, 9);
-	T = trans[ 7][73] = settr(543,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(543,0,72,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][72]	= settr(542,2,95,30,30,"Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback", 1, 8, 9); /* m: 74 -> 95,0 */
-	reached7[74] = 1;
-	trans[7][74]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[7][75]	= settr(545,2,95,1,0,"goto continuous_signals", 1, 8, 9);
-	trans[7][76]	= settr(546,2,78,31,31,"((transition_id==2))", 1, 8, 9);
-	T = trans[ 7][78] = settr(548,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(548,0,77,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][77]	= settr(547,2,82,1,0,"(1)", 1, 8, 9);
-	T = trans[ 7][82] = settr(552,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(552,0,79,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][79]	= settr(549,2,81,32,32,"global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)", 1, 8, 9);
-	T = trans[ 7][81] = settr(551,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(551,0,80,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][80]	= settr(550,2,84,33,0,"assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))", 1, 8, 9);
-	T = trans[ 7][84] = settr(554,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(554,0,83,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][83]	= settr(553,2,95,34,34,"Actuator_ctrl_channel!global_state.modemanager.xout", 1, 8, 9); /* m: 85 -> 95,0 */
-	reached7[85] = 1;
-	trans[7][85]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[7][86]	= settr(556,2,95,1,0,"goto continuous_signals", 1, 8, 9);
-	trans[7][87]	= settr(557,2,89,35,35,"((transition_id==3))", 1, 8, 9);
-	T = trans[ 7][89] = settr(559,0,0,0,0,"sub-sequence", 1, 8, 9);
-	T->nxt	= settr(559,0,88,0,0,"sub-sequence", 1, 8, 9);
-	trans[7][88]	= settr(558,2,95,36,36,"(1)", 1, 8, 9); /* m: 90 -> 95,0 */
-	reached7[90] = 1;
-	trans[7][90]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[7][91]	= settr(0,0,0,0,0,"global_state.modemanager.state = 0",0,0,0);
-	trans[7][92]	= settr(562,2,95,1,0,"goto continuous_signals", 1, 8, 9);
-	trans[7][95]	= settr(565,2,96,1,0,"(1)", 1, 8, 9);
-	trans[7][98]	= settr(568,2,101,1,0,"break", 1, 8, 9);
-	trans[7][101]	= settr(571,4,104,37,37,"Modemanager_lock!1", 1, 8, 9); /* m: 102 -> 104,0 */
-	reached7[102] = 1;
-	trans[7][102]	= settr(0,0,0,0,0,"inited = 1",0,0,0);
-	trans[7][104]	= settr(574,0,0,38,38,"-end-", 0, 3500, 0);
+	trans[7][16]	= settr(0,0,0,0,0,"global_state.modemanager.state = 1",0,0,0);
+	trans[7][17]	= settr(579,2,57,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][18]	= settr(580,2,20,12,12,"((transition_id==1))", 1, 2500, 0);
+	T = trans[ 7][20] = settr(582,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(582,0,19,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][19]	= settr(581,2,33,1,0,"(1)", 1, 2500, 0);
+	T = trans[ 7][33] = settr(595,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(595,0,24,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[ 7][24] = settr(586,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(586,0,21,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][21]	= settr(583,2,23,13,13,"global_state.modemanager.rprt.reading = global_state.modemanager.xin", 1, 2500, 0);
+	T = trans[ 7][23] = settr(585,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(585,0,22,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][22]	= settr(584,2,28,14,0,"assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))", 1, 2500, 0);
+	T = trans[ 7][28] = settr(590,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(590,0,25,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][25]	= settr(587,2,27,15,15,"global_state.modemanager.rprt.ctrl = global_state.modemanager.xout", 1, 2500, 0);
+	T = trans[ 7][27] = settr(589,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(589,0,26,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][26]	= settr(588,2,32,16,0,"assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))", 1, 2500, 0);
+	T = trans[ 7][32] = settr(594,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(594,0,29,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][29]	= settr(591,2,31,17,17,"global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback", 1, 2500, 0);
+	T = trans[ 7][31] = settr(593,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(593,0,30,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][30]	= settr(592,2,35,18,0,"assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))", 1, 2500, 0);
+	T = trans[ 7][35] = settr(597,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(597,0,34,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][34]	= settr(596,2,57,19,19,"Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback", 1, 2500, 0); /* m: 36 -> 57,0 */
+	reached7[36] = 1;
+	trans[7][36]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][37]	= settr(599,2,57,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][38]	= settr(600,2,40,20,20,"((transition_id==2))", 1, 2500, 0);
+	T = trans[ 7][40] = settr(602,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(602,0,39,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][39]	= settr(601,2,44,1,0,"(1)", 1, 2500, 0);
+	T = trans[ 7][44] = settr(606,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(606,0,41,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][41]	= settr(603,2,43,21,21,"global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)", 1, 2500, 0);
+	T = trans[ 7][43] = settr(605,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(605,0,42,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][42]	= settr(604,2,46,22,0,"assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))", 1, 2500, 0);
+	T = trans[ 7][46] = settr(608,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(608,0,45,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][45]	= settr(607,2,57,23,23,"Actuator_ctrl_channel!global_state.modemanager.xout", 1, 2500, 0); /* m: 47 -> 57,0 */
+	reached7[47] = 1;
+	trans[7][47]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][48]	= settr(610,2,57,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][49]	= settr(611,2,51,24,24,"((transition_id==3))", 1, 2500, 0);
+	T = trans[ 7][51] = settr(613,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(613,0,50,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][50]	= settr(612,2,57,25,25,"(1)", 1, 2500, 0); /* m: 52 -> 57,0 */
+	reached7[52] = 1;
+	trans[7][52]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][53]	= settr(0,0,0,0,0,"global_state.modemanager.state = 0",0,0,0);
+	trans[7][54]	= settr(616,2,57,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][57]	= settr(619,2,58,1,0,"(1)", 1, 2500, 0);
+	trans[7][60]	= settr(622,2,63,1,0,"break", 1, 2500, 0);
+	trans[7][63]	= settr(625,2,100,26,26,"Modemanager_lock!1", 1, 2500, 0);
+	T = trans[ 7][100] = settr(662,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(662,0,67,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[ 7][67] = settr(629,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(629,0,64,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][64]	= settr(626,2,66,27,27,"global_state.actuator.sender = 4", 1, 2500, 0);
+	T = trans[ 7][66] = settr(628,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(628,0,65,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][65]	= settr(627,2,99,28,0,"assert((((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4)))", 1, 2500, 0);
+	T = trans[ 7][99] = settr(661,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(661,0,68,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][68]	= settr(630,2,96,29,29,"transition_id = 0", 1, 2500, 0); /* m: 69 -> 0,96 */
+	reached7[69] = 1;
+	trans[7][69]	= settr(0,0,0,0,0,"transition_id = 0",0,0,0);
+	trans[7][97]	= settr(659,2,96,1,0,".(goto)", 1, 2500, 0);
+	T = trans[7][96] = settr(658,2,0,0,0,"DO", 1, 2500, 0);
+	    T->nxt	= settr(658,2,93,0,0,"DO", 1, 2500, 0);
+	T = trans[7][93] = settr(655,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(655,2,70,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(655,2,72,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(655,2,76,0,0,"IF", 1, 2500, 0);
+	trans[7][70]	= settr(632,2,101,30,30,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[7][71]	= settr(633,2,101,1,0,"goto :b24", 1, 2500, 0);
+	trans[7][94]	= settr(656,2,95,1,0,".(goto)", 1, 2500, 0);
+	trans[7][72]	= settr(634,2,95,31,31,"((transition_id==0))", 1, 2500, 0); /* m: 73 -> 95,0 */
+	reached7[73] = 1;
+	trans[7][73]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][74]	= settr(0,0,0,0,0,"global_state.actuator.state = 0",0,0,0);
+	trans[7][75]	= settr(637,2,95,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][76]	= settr(638,2,78,32,32,"((transition_id==1))", 1, 2500, 0);
+	T = trans[ 7][78] = settr(640,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(640,0,77,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][77]	= settr(639,2,91,1,0,"(1)", 1, 2500, 0);
+	T = trans[7][91] = settr(653,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(653,2,79,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(653,2,85,0,0,"IF", 1, 2500, 0);
+	trans[7][79]	= settr(641,2,81,33,0,"(((global_state.actuator.x>10)==1))", 1, 2500, 0);
+	T = trans[ 7][81] = settr(643,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(643,0,80,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][80]	= settr(642,2,95,34,34,"Modemanager_feedback_channel!global_state.actuator.x", 1, 2500, 0); /* m: 82 -> 95,0 */
+	reached7[82] = 1;
+	trans[7][82]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][83]	= settr(0,0,0,0,0,"global_state.actuator.state = 1",0,0,0);
+	trans[7][84]	= settr(646,2,95,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][92]	= settr(654,2,95,1,0,".(goto)", 1, 2500, 0);
+	trans[7][85]	= settr(647,2,87,35,0,"(((global_state.actuator.x>10)==0))", 1, 2500, 0);
+	T = trans[ 7][87] = settr(649,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(649,0,86,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][86]	= settr(648,2,95,36,36,"Modemanager_feedback_channel!0", 1, 2500, 0); /* m: 88 -> 95,0 */
+	reached7[88] = 1;
+	trans[7][88]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][89]	= settr(0,0,0,0,0,"global_state.actuator.state = 0",0,0,0);
+	trans[7][90]	= settr(652,2,95,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][95]	= settr(657,2,96,1,0,"(1)", 1, 2500, 0);
+	trans[7][98]	= settr(660,2,101,1,0,"break", 1, 2500, 0);
+	trans[7][101]	= settr(663,2,140,37,37,"Actuator_lock!1", 1, 2500, 0);
+	T = trans[ 7][140] = settr(702,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(702,0,105,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[ 7][105] = settr(667,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(667,0,102,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][102]	= settr(664,2,104,38,38,"global_state.observerdemo.sender = 4", 1, 2500, 0);
+	T = trans[ 7][104] = settr(666,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(666,0,103,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][103]	= settr(665,2,139,39,0,"assert((((((global_state.observerdemo.sender==0)||(global_state.observerdemo.sender==1))||(global_state.observerdemo.sender==2))||(global_state.observerdemo.sender==3))||(global_state.observerdemo.sender==4)))", 1, 2500, 0);
+	T = trans[ 7][139] = settr(701,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(701,0,106,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][106]	= settr(668,2,136,40,40,"transition_id = 0", 1, 2500, 0); /* m: 107 -> 0,136 */
+	reached7[107] = 1;
+	trans[7][107]	= settr(0,0,0,0,0,"transition_id = 0",0,0,0);
+	trans[7][137]	= settr(699,2,136,1,0,".(goto)", 1, 2500, 0);
+	T = trans[7][136] = settr(698,2,0,0,0,"DO", 1, 2500, 0);
+	    T->nxt	= settr(698,2,133,0,0,"DO", 1, 2500, 0);
+	T = trans[7][133] = settr(695,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(695,2,108,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(695,2,110,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(695,2,114,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(695,2,125,0,0,"IF", 1, 2500, 0);
+	trans[7][108]	= settr(670,2,141,41,41,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[7][109]	= settr(671,2,141,1,0,"goto :b25", 1, 2500, 0);
+	trans[7][134]	= settr(696,2,135,1,0,".(goto)", 1, 2500, 0);
+	trans[7][110]	= settr(672,2,135,42,42,"((transition_id==0))", 1, 2500, 0); /* m: 111 -> 135,0 */
+	reached7[111] = 1;
+	trans[7][111]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][112]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 1",0,0,0);
+	trans[7][113]	= settr(675,2,135,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][114]	= settr(676,2,123,43,43,"((transition_id==1))", 1, 2500, 0);
+	T = trans[7][123] = settr(685,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(685,2,115,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(685,2,119,0,0,"IF", 1, 2500, 0);
+	trans[7][115]	= settr(677,2,135,44,44,"(((observerdemo_0_y==global_state.observerdemo.reference)==0))", 1, 2500, 0); /* m: 116 -> 135,0 */
+	reached7[116] = 1;
+	trans[7][116]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][117]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 2",0,0,0);
+	trans[7][118]	= settr(680,2,135,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][124]	= settr(686,2,135,1,0,".(goto)", 1, 2500, 0);
+	trans[7][119]	= settr(681,2,135,45,45,"(((observerdemo_0_y==global_state.observerdemo.reference)==1))", 1, 2500, 0); /* m: 120 -> 135,0 */
+	reached7[120] = 1;
+	trans[7][120]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][121]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 1",0,0,0);
+	trans[7][122]	= settr(684,2,135,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][125]	= settr(687,2,129,46,46,"((transition_id==2))", 1, 2500, 0);
+	T = trans[ 7][129] = settr(691,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(691,0,126,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][126]	= settr(688,2,128,47,47,"global_state.observerdemo.reference = observerdemo_0_x", 1, 2500, 0);
+	T = trans[ 7][128] = settr(690,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(690,0,127,0,0,"sub-sequence", 1, 2500, 0);
+	trans[7][127]	= settr(689,2,135,48,48,"assert(((global_state.observerdemo.reference>=0)&&(global_state.observerdemo.reference<=1000000)))", 1, 2500, 0); /* m: 130 -> 0,135 */
+	reached7[130] = 1;
+	trans[7][130]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[7][131]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 0",0,0,0);
+	trans[7][132]	= settr(694,2,135,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[7][135]	= settr(697,2,136,1,0,"(1)", 1, 2500, 0);
+	trans[7][138]	= settr(700,2,141,1,0,"break", 1, 2500, 0);
+	trans[7][141]	= settr(703,4,144,49,49,"Observerdemo_lock!1", 1, 2500, 0); /* m: 142 -> 144,0 */
+	reached7[142] = 1;
+	trans[7][142]	= settr(0,0,0,0,0,"inited = 1",0,0,0);
+	trans[7][144]	= settr(706,0,0,50,50,"-end-", 0, 3500, 0);
 
 	/* proctype 6: Sensor_reading */
 
 	trans[6] = (Trans **) emalloc(45*sizeof(Trans *));
 
-	trans[6][1]	= settr(427,0,2,39,0,"(inited)", 1, 2, 0);
-	trans[6][2]	= settr(428,0,41,40,40,"value = 0", 0, 2, 0); /* m: 3 -> 0,41 */
+	trans[6][1]	= settr(519,0,2,51,0,"(inited)", 1, 2, 0);
+	trans[6][2]	= settr(520,0,41,52,52,"value = 0", 0, 2, 0); /* m: 3 -> 0,41 */
 	reached6[3] = 1;
 	trans[6][3]	= settr(0,0,0,0,0,"inputVectorCounter = 0",0,0,0);
 	trans[6][4]	= settr(0,0,0,0,0,"inputVectorCounter = 0",0,0,0);
-	trans[6][42]	= settr(468,0,41,1,0,".(goto)", 0, 2, 0);
-	T = trans[6][41] = settr(467,0,0,0,0,"DO", 0, 2, 0);
-	T = T->nxt	= settr(467,0,5,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(467,0,39,0,0,"DO", 0, 2, 0);
-	trans[6][5]	= settr(431,0,37,41,0,"((inputVectorCounter<=3))", 0, 2, 0);
-	T = trans[ 6][37] = settr(463,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(463,2,34,0,0,"ATOMIC", 1, 2, 0);
-	T = trans[ 6][34] = settr(460,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(460,0,6,0,0,"sub-sequence", 1, 2, 0);
-	trans[6][6]	= settr(432,2,31,42,42,"Sensor_reading_x_tmp = 0", 1, 2, 0);
-	T = trans[6][31] = settr(457,2,0,0,0,"IF", 1, 2, 0);
-	T = T->nxt	= settr(457,2,14,0,0,"IF", 1, 2, 0);
-	T = T->nxt	= settr(457,2,22,0,0,"IF", 1, 2, 0);
-	    T->nxt	= settr(457,2,30,0,0,"IF", 1, 2, 0);
-	T = trans[ 6][14] = settr(440,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(440,0,7,0,0,"sub-sequence", 1, 2, 0);
-	trans[6][7]	= settr(433,2,11,43,43,"Sensor_reading_x_tmp = 0", 1, 2, 0);
-	trans[6][12]	= settr(438,2,11,1,0,".(goto)", 1, 2, 0);
-	T = trans[6][11] = settr(437,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(437,2,10,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(437,2,8,0,0,"DO", 1, 2, 0);
-	trans[6][10]	= settr(436,2,36,44,44,"goto :b18", 1, 2, 0); /* m: 33 -> 0,36 */
+	trans[6][42]	= settr(560,0,41,1,0,".(goto)", 0, 2, 0);
+	T = trans[6][41] = settr(559,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(559,0,5,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(559,0,39,0,0,"DO", 0, 2, 0);
+	trans[6][5]	= settr(523,0,37,53,0,"((inputVectorCounter<=3))", 0, 2, 0);
+	T = trans[ 6][37] = settr(555,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(555,2,34,0,0,"ATOMIC", 1, 2, 0);
+	T = trans[ 6][34] = settr(552,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(552,0,6,0,0,"sub-sequence", 1, 2, 0);
+	trans[6][6]	= settr(524,2,31,54,54,"Sensor_reading_x_tmp = 0", 1, 2, 0);
+	T = trans[6][31] = settr(549,2,0,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(549,2,14,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(549,2,22,0,0,"IF", 1, 2, 0);
+	    T->nxt	= settr(549,2,30,0,0,"IF", 1, 2, 0);
+	T = trans[ 6][14] = settr(532,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(532,0,7,0,0,"sub-sequence", 1, 2, 0);
+	trans[6][7]	= settr(525,2,11,55,55,"Sensor_reading_x_tmp = 0", 1, 2, 0);
+	trans[6][12]	= settr(530,2,11,1,0,".(goto)", 1, 2, 0);
+	T = trans[6][11] = settr(529,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(529,2,10,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(529,2,8,0,0,"DO", 1, 2, 0);
+	trans[6][10]	= settr(528,2,36,56,56,"goto :b20", 1, 2, 0); /* m: 33 -> 0,36 */
 	reached6[33] = 1;
-	trans[6][8]	= settr(434,2,11,45,45,"((Sensor_reading_x_tmp<0))", 1, 2, 0); /* m: 9 -> 11,0 */
+	trans[6][8]	= settr(526,2,11,57,57,"((Sensor_reading_x_tmp<0))", 1, 2, 0); /* m: 9 -> 11,0 */
 	reached6[9] = 1;
 	trans[6][9]	= settr(0,0,0,0,0,"Sensor_reading_x_tmp = (Sensor_reading_x_tmp+1)",0,0,0);
-	trans[6][13]	= settr(439,2,33,1,0,"break", 1, 2, 0);
-	trans[6][32]	= settr(458,2,33,1,0,".(goto)", 1, 2, 0); /* m: 33 -> 0,36 */
+	trans[6][13]	= settr(531,2,33,1,0,"break", 1, 2, 0);
+	trans[6][32]	= settr(550,2,33,1,0,".(goto)", 1, 2, 0); /* m: 33 -> 0,36 */
 	reached6[33] = 1;
-	T = trans[ 6][22] = settr(448,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(448,0,15,0,0,"sub-sequence", 1, 2, 0);
-	trans[6][15]	= settr(441,2,19,46,46,"Sensor_reading_x_tmp = 4", 1, 2, 0);
-	trans[6][20]	= settr(446,2,19,1,0,".(goto)", 1, 2, 0);
-	T = trans[6][19] = settr(445,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(445,2,18,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(445,2,16,0,0,"DO", 1, 2, 0);
-	trans[6][18]	= settr(444,2,36,47,47,"goto :b19", 1, 2, 0); /* m: 33 -> 0,36 */
+	T = trans[ 6][22] = settr(540,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(540,0,15,0,0,"sub-sequence", 1, 2, 0);
+	trans[6][15]	= settr(533,2,19,58,58,"Sensor_reading_x_tmp = 4", 1, 2, 0);
+	trans[6][20]	= settr(538,2,19,1,0,".(goto)", 1, 2, 0);
+	T = trans[6][19] = settr(537,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(537,2,18,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(537,2,16,0,0,"DO", 1, 2, 0);
+	trans[6][18]	= settr(536,2,36,59,59,"goto :b21", 1, 2, 0); /* m: 33 -> 0,36 */
 	reached6[33] = 1;
-	trans[6][16]	= settr(442,2,19,48,48,"((Sensor_reading_x_tmp<4))", 1, 2, 0); /* m: 17 -> 19,0 */
+	trans[6][16]	= settr(534,2,19,60,60,"((Sensor_reading_x_tmp<4))", 1, 2, 0); /* m: 17 -> 19,0 */
 	reached6[17] = 1;
 	trans[6][17]	= settr(0,0,0,0,0,"Sensor_reading_x_tmp = (Sensor_reading_x_tmp+1)",0,0,0);
-	trans[6][21]	= settr(447,2,33,1,0,"break", 1, 2, 0);
-	T = trans[ 6][30] = settr(456,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(456,0,23,0,0,"sub-sequence", 1, 2, 0);
-	trans[6][23]	= settr(449,2,27,49,49,"Sensor_reading_x_tmp = 10", 1, 2, 0);
-	trans[6][28]	= settr(454,2,27,1,0,".(goto)", 1, 2, 0);
-	T = trans[6][27] = settr(453,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(453,2,26,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(453,2,24,0,0,"DO", 1, 2, 0);
-	trans[6][26]	= settr(452,2,36,50,50,"goto :b20", 1, 2, 0); /* m: 33 -> 0,36 */
+	trans[6][21]	= settr(539,2,33,1,0,"break", 1, 2, 0);
+	T = trans[ 6][30] = settr(548,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(548,0,23,0,0,"sub-sequence", 1, 2, 0);
+	trans[6][23]	= settr(541,2,27,61,61,"Sensor_reading_x_tmp = 10", 1, 2, 0);
+	trans[6][28]	= settr(546,2,27,1,0,".(goto)", 1, 2, 0);
+	T = trans[6][27] = settr(545,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(545,2,26,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(545,2,24,0,0,"DO", 1, 2, 0);
+	trans[6][26]	= settr(544,2,36,62,62,"goto :b22", 1, 2, 0); /* m: 33 -> 0,36 */
 	reached6[33] = 1;
-	trans[6][24]	= settr(450,2,27,51,51,"((Sensor_reading_x_tmp<10))", 1, 2, 0); /* m: 25 -> 27,0 */
+	trans[6][24]	= settr(542,2,27,63,63,"((Sensor_reading_x_tmp<10))", 1, 2, 0); /* m: 25 -> 27,0 */
 	reached6[25] = 1;
 	trans[6][25]	= settr(0,0,0,0,0,"Sensor_reading_x_tmp = (Sensor_reading_x_tmp+1)",0,0,0);
-	trans[6][29]	= settr(455,2,33,1,0,"break", 1, 2, 0);
-	trans[6][33]	= settr(459,2,36,52,52,"value = Sensor_reading_x_tmp", 1, 2, 0);
-	T = trans[ 6][36] = settr(462,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(462,0,35,0,0,"sub-sequence", 1, 2, 0);
-	trans[6][35]	= settr(461,0,41,53,53,"Modemanager_reading_channel!value", 1, 6, 0); /* m: 38 -> 41,0 */
+	trans[6][29]	= settr(547,2,33,1,0,"break", 1, 2, 0);
+	trans[6][33]	= settr(551,2,36,64,64,"value = Sensor_reading_x_tmp", 1, 2, 0);
+	T = trans[ 6][36] = settr(554,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(554,0,35,0,0,"sub-sequence", 1, 2, 0);
+	trans[6][35]	= settr(553,0,41,65,65,"Modemanager_reading_channel!value", 1, 6, 0); /* m: 38 -> 41,0 */
 	reached6[38] = 1;
 	trans[6][38]	= settr(0,0,0,0,0,"inputVectorCounter = (inputVectorCounter+1)",0,0,0);
-	trans[6][39]	= settr(465,0,44,2,0,"else", 0, 2, 0);
-	trans[6][40]	= settr(466,0,44,1,0,"goto :b17", 0, 2, 0);
-	trans[6][43]	= settr(469,0,44,1,0,"break", 0, 2, 0);
-	trans[6][44]	= settr(470,0,0,54,54,"-end-", 0, 3500, 0);
+	trans[6][39]	= settr(557,0,44,2,0,"else", 0, 2, 0);
+	trans[6][40]	= settr(558,0,44,1,0,"goto :b19", 0, 2, 0);
+	trans[6][43]	= settr(561,0,44,1,0,"break", 0, 2, 0);
+	trans[6][44]	= settr(562,0,0,66,66,"-end-", 0, 3500, 0);
 
 	/* proctype 5: Modemanager_tc */
 
 	trans[5] = (Trans **) emalloc(85*sizeof(Trans *));
 
-	trans[5][1]	= settr(343,0,81,55,0,"(inited)", 1, 2, 0);
-	trans[5][82]	= settr(424,0,81,1,0,".(goto)", 0, 2, 0);
-	T = trans[5][81] = settr(423,0,0,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(423,0,80,0,0,"DO", 0, 2, 0);
-	T = trans[ 5][80] = settr(422,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(422,2,2,0,0,"ATOMIC", 1, 2500, 0);
-	trans[5][2]	= settr(344,2,3,56,0,"(nempty(Modemanager_tc_channel))", 1, 2500, 0);
-	trans[5][3]	= settr(345,2,77,57,57,"Modemanager_lock?_", 1, 2500, 0);
-	T = trans[5][77] = settr(419,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(419,2,4,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(419,2,75,0,0,"IF", 1, 2500, 0);
-	trans[5][4]	= settr(346,2,5,58,0,"(nempty(Modemanager_tc_channel))", 1, 2500, 0);
-	trans[5][5]	= settr(347,2,73,59,59,"Modemanager_tc_channel?Modemanager_tc_signal_parameter.param_a,Modemanager_tc_signal_parameter.param_b", 1, 2500, 0); /* m: 6 -> 73,0 */
+	trans[5][1]	= settr(435,0,81,67,0,"(inited)", 1, 2, 0);
+	trans[5][82]	= settr(516,0,81,1,0,".(goto)", 0, 2, 0);
+	T = trans[5][81] = settr(515,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(515,0,80,0,0,"DO", 0, 2, 0);
+	T = trans[ 5][80] = settr(514,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(514,2,2,0,0,"ATOMIC", 1, 2500, 0);
+	trans[5][2]	= settr(436,2,3,68,0,"(nempty(Modemanager_tc_channel))", 1, 2500, 0);
+	trans[5][3]	= settr(437,2,77,69,69,"Modemanager_lock?_", 1, 2500, 0);
+	T = trans[5][77] = settr(511,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(511,2,4,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(511,2,75,0,0,"IF", 1, 2500, 0);
+	trans[5][4]	= settr(438,2,5,70,0,"(nempty(Modemanager_tc_channel))", 1, 2500, 0);
+	trans[5][5]	= settr(439,2,73,71,71,"Modemanager_tc_channel?Modemanager_tc_signal_parameter.param_a,Modemanager_tc_signal_parameter.param_b", 1, 2500, 0); /* m: 6 -> 73,0 */
 	reached5[6] = 1;
 	trans[5][6]	= settr(0,0,0,0,0,"Modemanager_tc_channel_used = 1",0,0,0);
-	T = trans[ 5][73] = settr(415,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(415,0,71,0,0,"sub-sequence", 1, 2500, 0);
-	T = trans[5][71] = settr(413,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(413,2,7,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(413,2,69,0,0,"IF", 1, 2500, 0);
-	trans[5][7]	= settr(349,2,16,60,0,"((global_state.modemanager.state==1))", 1, 2500, 0);
-	T = trans[ 5][16] = settr(358,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(358,0,11,0,0,"sub-sequence", 1, 2500, 0);
-	T = trans[ 5][11] = settr(353,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(353,0,8,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][8]	= settr(350,2,10,61,61,"global_state.modemanager.cfg.param_a = Modemanager_tc_signal_parameter.param_a", 1, 2500, 0);
-	T = trans[ 5][10] = settr(352,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(352,0,9,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][9]	= settr(351,2,15,62,0,"assert(((global_state.modemanager.cfg.param_a>=0)&&(global_state.modemanager.cfg.param_a<=1000000)))", 1, 2500, 0);
-	T = trans[ 5][15] = settr(357,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(357,0,12,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][12]	= settr(354,2,14,63,63,"global_state.modemanager.cfg.param_b = Modemanager_tc_signal_parameter.param_b", 1, 2500, 0);
-	T = trans[ 5][14] = settr(356,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(356,0,13,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][13]	= settr(355,2,68,64,0,"assert(((global_state.modemanager.cfg.param_b>=0)&&(global_state.modemanager.cfg.param_b<=1000000)))", 1, 2500, 0);
-	T = trans[ 5][68] = settr(410,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(410,0,17,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][17]	= settr(359,2,65,65,65,"transition_id = 0", 1, 2500, 0); /* m: 18 -> 0,65 */
+	T = trans[ 5][73] = settr(507,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(507,0,71,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[5][71] = settr(505,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(505,2,7,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(505,2,69,0,0,"IF", 1, 2500, 0);
+	trans[5][7]	= settr(441,2,16,72,0,"((global_state.modemanager.state==1))", 1, 2500, 0);
+	T = trans[ 5][16] = settr(450,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(450,0,11,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[ 5][11] = settr(445,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(445,0,8,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][8]	= settr(442,2,10,73,73,"global_state.modemanager.cfg.param_a = Modemanager_tc_signal_parameter.param_a", 1, 2500, 0);
+	T = trans[ 5][10] = settr(444,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(444,0,9,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][9]	= settr(443,2,15,74,0,"assert(((global_state.modemanager.cfg.param_a>=0)&&(global_state.modemanager.cfg.param_a<=1000000)))", 1, 2500, 0);
+	T = trans[ 5][15] = settr(449,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(449,0,12,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][12]	= settr(446,2,14,75,75,"global_state.modemanager.cfg.param_b = Modemanager_tc_signal_parameter.param_b", 1, 2500, 0);
+	T = trans[ 5][14] = settr(448,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(448,0,13,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][13]	= settr(447,2,68,76,0,"assert(((global_state.modemanager.cfg.param_b>=0)&&(global_state.modemanager.cfg.param_b<=1000000)))", 1, 2500, 0);
+	T = trans[ 5][68] = settr(502,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(502,0,17,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][17]	= settr(451,2,65,77,77,"transition_id = 0", 1, 2500, 0); /* m: 18 -> 0,65 */
 	reached5[18] = 1;
 	trans[5][18]	= settr(0,0,0,0,0,"transition_id = 3",0,0,0);
-	trans[5][66]	= settr(408,2,65,1,0,".(goto)", 1, 2500, 0);
-	T = trans[5][65] = settr(407,2,0,0,0,"DO", 1, 2500, 0);
-	    T->nxt	= settr(407,2,62,0,0,"DO", 1, 2500, 0);
-	T = trans[5][62] = settr(404,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(404,2,19,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(404,2,21,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(404,2,25,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(404,2,45,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(404,2,56,0,0,"IF", 1, 2500, 0);
-	trans[5][19]	= settr(361,2,77,66,66,"((transition_id==-(1)))", 1, 2500, 0);
-	trans[5][20]	= settr(362,2,77,1,0,"goto :b16", 1, 2500, 0);
-	trans[5][63]	= settr(405,2,64,1,0,".(goto)", 1, 2500, 0);
-	trans[5][21]	= settr(363,2,64,67,67,"((transition_id==0))", 1, 2500, 0); /* m: 22 -> 64,0 */
+	trans[5][66]	= settr(500,2,65,1,0,".(goto)", 1, 2500, 0);
+	T = trans[5][65] = settr(499,2,0,0,0,"DO", 1, 2500, 0);
+	    T->nxt	= settr(499,2,62,0,0,"DO", 1, 2500, 0);
+	T = trans[5][62] = settr(496,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(496,2,19,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(496,2,21,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(496,2,25,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(496,2,45,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(496,2,56,0,0,"IF", 1, 2500, 0);
+	trans[5][19]	= settr(453,2,77,78,78,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[5][20]	= settr(454,2,77,1,0,"goto :b18", 1, 2500, 0);
+	trans[5][63]	= settr(497,2,64,1,0,".(goto)", 1, 2500, 0);
+	trans[5][21]	= settr(455,2,64,79,79,"((transition_id==0))", 1, 2500, 0); /* m: 22 -> 64,0 */
 	reached5[22] = 1;
 	trans[5][22]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[5][23]	= settr(0,0,0,0,0,"global_state.modemanager.state = 1",0,0,0);
-	trans[5][24]	= settr(366,2,64,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[5][25]	= settr(367,2,27,68,68,"((transition_id==1))", 1, 2500, 0);
-	T = trans[ 5][27] = settr(369,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(369,0,26,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][26]	= settr(368,2,40,1,0,"(1)", 1, 2500, 0);
-	T = trans[ 5][40] = settr(382,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(382,0,31,0,0,"sub-sequence", 1, 2500, 0);
-	T = trans[ 5][31] = settr(373,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(373,0,28,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][28]	= settr(370,2,30,69,69,"global_state.modemanager.rprt.reading = global_state.modemanager.xin", 1, 2500, 0);
-	T = trans[ 5][30] = settr(372,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(372,0,29,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][29]	= settr(371,2,35,70,0,"assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))", 1, 2500, 0);
-	T = trans[ 5][35] = settr(377,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(377,0,32,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][32]	= settr(374,2,34,71,71,"global_state.modemanager.rprt.ctrl = global_state.modemanager.xout", 1, 2500, 0);
-	T = trans[ 5][34] = settr(376,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(376,0,33,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][33]	= settr(375,2,39,72,0,"assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))", 1, 2500, 0);
-	T = trans[ 5][39] = settr(381,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(381,0,36,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][36]	= settr(378,2,38,73,73,"global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback", 1, 2500, 0);
-	T = trans[ 5][38] = settr(380,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(380,0,37,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][37]	= settr(379,2,42,74,0,"assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))", 1, 2500, 0);
-	T = trans[ 5][42] = settr(384,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(384,0,41,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][41]	= settr(383,2,64,75,75,"Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback", 1, 2500, 0); /* m: 43 -> 64,0 */
+	trans[5][24]	= settr(458,2,64,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[5][25]	= settr(459,2,27,80,80,"((transition_id==1))", 1, 2500, 0);
+	T = trans[ 5][27] = settr(461,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(461,0,26,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][26]	= settr(460,2,40,1,0,"(1)", 1, 2500, 0);
+	T = trans[ 5][40] = settr(474,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(474,0,31,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[ 5][31] = settr(465,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(465,0,28,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][28]	= settr(462,2,30,81,81,"global_state.modemanager.rprt.reading = global_state.modemanager.xin", 1, 2500, 0);
+	T = trans[ 5][30] = settr(464,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(464,0,29,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][29]	= settr(463,2,35,82,0,"assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))", 1, 2500, 0);
+	T = trans[ 5][35] = settr(469,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(469,0,32,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][32]	= settr(466,2,34,83,83,"global_state.modemanager.rprt.ctrl = global_state.modemanager.xout", 1, 2500, 0);
+	T = trans[ 5][34] = settr(468,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(468,0,33,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][33]	= settr(467,2,39,84,0,"assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))", 1, 2500, 0);
+	T = trans[ 5][39] = settr(473,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(473,0,36,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][36]	= settr(470,2,38,85,85,"global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback", 1, 2500, 0);
+	T = trans[ 5][38] = settr(472,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(472,0,37,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][37]	= settr(471,2,42,86,0,"assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))", 1, 2500, 0);
+	T = trans[ 5][42] = settr(476,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(476,0,41,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][41]	= settr(475,2,64,87,87,"Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback", 1, 2500, 0); /* m: 43 -> 64,0 */
 	reached5[43] = 1;
 	trans[5][43]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[5][44]	= settr(386,2,64,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[5][45]	= settr(387,2,47,76,76,"((transition_id==2))", 1, 2500, 0);
-	T = trans[ 5][47] = settr(389,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(389,0,46,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][46]	= settr(388,2,51,1,0,"(1)", 1, 2500, 0);
-	T = trans[ 5][51] = settr(393,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(393,0,48,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][48]	= settr(390,2,50,77,77,"global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)", 1, 2500, 0);
-	T = trans[ 5][50] = settr(392,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(392,0,49,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][49]	= settr(391,2,53,78,0,"assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))", 1, 2500, 0);
-	T = trans[ 5][53] = settr(395,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(395,0,52,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][52]	= settr(394,2,64,79,79,"Actuator_ctrl_channel!global_state.modemanager.xout", 1, 2500, 0); /* m: 54 -> 64,0 */
+	trans[5][44]	= settr(478,2,64,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[5][45]	= settr(479,2,47,88,88,"((transition_id==2))", 1, 2500, 0);
+	T = trans[ 5][47] = settr(481,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(481,0,46,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][46]	= settr(480,2,51,1,0,"(1)", 1, 2500, 0);
+	T = trans[ 5][51] = settr(485,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(485,0,48,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][48]	= settr(482,2,50,89,89,"global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)", 1, 2500, 0);
+	T = trans[ 5][50] = settr(484,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(484,0,49,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][49]	= settr(483,2,53,90,0,"assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))", 1, 2500, 0);
+	T = trans[ 5][53] = settr(487,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(487,0,52,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][52]	= settr(486,2,64,91,91,"Actuator_ctrl_channel!global_state.modemanager.xout", 1, 2500, 0); /* m: 54 -> 64,0 */
 	reached5[54] = 1;
 	trans[5][54]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[5][55]	= settr(397,2,64,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[5][56]	= settr(398,2,58,80,80,"((transition_id==3))", 1, 2500, 0);
-	T = trans[ 5][58] = settr(400,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(400,0,57,0,0,"sub-sequence", 1, 2500, 0);
-	trans[5][57]	= settr(399,2,64,81,81,"(1)", 1, 2500, 0); /* m: 59 -> 64,0 */
+	trans[5][55]	= settr(489,2,64,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[5][56]	= settr(490,2,58,92,92,"((transition_id==3))", 1, 2500, 0);
+	T = trans[ 5][58] = settr(492,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(492,0,57,0,0,"sub-sequence", 1, 2500, 0);
+	trans[5][57]	= settr(491,2,64,93,93,"(1)", 1, 2500, 0); /* m: 59 -> 64,0 */
 	reached5[59] = 1;
 	trans[5][59]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[5][60]	= settr(0,0,0,0,0,"global_state.modemanager.state = 0",0,0,0);
-	trans[5][61]	= settr(403,2,64,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[5][64]	= settr(406,2,65,1,0,"(1)", 1, 2500, 0);
-	trans[5][67]	= settr(409,2,77,1,0,"break", 1, 2500, 0);
-	trans[5][72]	= settr(414,2,77,1,0,".(goto)", 1, 2500, 0);
-	trans[5][69]	= settr(411,2,70,2,0,"else", 1, 2500, 0);
-	trans[5][70]	= settr(412,2,77,1,0,"(1)", 1, 2500, 0);
-	trans[5][74]	= settr(416,2,77,1,0,"goto Modemanager_tc_loop", 1, 2500, 0);
-	trans[5][78]	= settr(420,2,79,1,0,".(goto)", 1, 2500, 0);
-	trans[5][75]	= settr(417,2,76,82,0,"(empty(Modemanager_tc_channel))", 1, 2500, 0);
-	trans[5][76]	= settr(418,2,79,83,83,"(1)", 1, 2500, 0); /* m: 78 -> 79,0 */
+	trans[5][61]	= settr(495,2,64,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[5][64]	= settr(498,2,65,1,0,"(1)", 1, 2500, 0);
+	trans[5][67]	= settr(501,2,77,1,0,"break", 1, 2500, 0);
+	trans[5][72]	= settr(506,2,77,1,0,".(goto)", 1, 2500, 0);
+	trans[5][69]	= settr(503,2,70,2,0,"else", 1, 2500, 0);
+	trans[5][70]	= settr(504,2,77,1,0,"(1)", 1, 2500, 0);
+	trans[5][74]	= settr(508,2,77,1,0,"goto Modemanager_tc_loop", 1, 2500, 0);
+	trans[5][78]	= settr(512,2,79,1,0,".(goto)", 1, 2500, 0);
+	trans[5][75]	= settr(509,2,76,94,0,"(empty(Modemanager_tc_channel))", 1, 2500, 0);
+	trans[5][76]	= settr(510,2,79,95,95,"(1)", 1, 2500, 0); /* m: 78 -> 79,0 */
 	reached5[78] = 1;
-	trans[5][79]	= settr(421,0,81,84,84,"Modemanager_lock!1", 1, 2500, 0);
-	trans[5][83]	= settr(425,0,84,1,0,"break", 0, 2, 0);
-	trans[5][84]	= settr(426,0,0,85,85,"-end-", 0, 3500, 0);
+	trans[5][79]	= settr(513,0,81,96,96,"Modemanager_lock!1", 1, 2500, 0);
+	trans[5][83]	= settr(517,0,84,1,0,"break", 0, 2, 0);
+	trans[5][84]	= settr(518,0,0,97,97,"-end-", 0, 3500, 0);
 
 	/* proctype 4: Modemanager_reading */
 
 	trans[4] = (Trans **) emalloc(80*sizeof(Trans *));
 
-	trans[4][1]	= settr(264,0,76,86,0,"(inited)", 1, 2, 0);
-	trans[4][77]	= settr(340,0,76,1,0,".(goto)", 0, 2, 0);
-	T = trans[4][76] = settr(339,0,0,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(339,0,75,0,0,"DO", 0, 2, 0);
-	T = trans[ 4][75] = settr(338,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(338,2,2,0,0,"ATOMIC", 1, 2500, 0);
-	trans[4][2]	= settr(265,2,3,87,0,"(nempty(Modemanager_reading_channel))", 1, 2500, 0);
-	trans[4][3]	= settr(266,2,72,88,88,"Modemanager_lock?_", 1, 2500, 0);
-	T = trans[4][72] = settr(335,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(335,2,4,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(335,2,70,0,0,"IF", 1, 2500, 0);
-	trans[4][4]	= settr(267,2,5,89,0,"(nempty(Modemanager_reading_channel))", 1, 2500, 0);
-	trans[4][5]	= settr(268,2,68,90,90,"Modemanager_reading_channel?Modemanager_reading_signal_parameter", 1, 2500, 0); /* m: 6 -> 68,0 */
+	trans[4][1]	= settr(356,0,76,98,0,"(inited)", 1, 2, 0);
+	trans[4][77]	= settr(432,0,76,1,0,".(goto)", 0, 2, 0);
+	T = trans[4][76] = settr(431,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(431,0,75,0,0,"DO", 0, 2, 0);
+	T = trans[ 4][75] = settr(430,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(430,2,2,0,0,"ATOMIC", 1, 2500, 0);
+	trans[4][2]	= settr(357,2,3,99,0,"(nempty(Modemanager_reading_channel))", 1, 2500, 0);
+	trans[4][3]	= settr(358,2,72,100,100,"Modemanager_lock?_", 1, 2500, 0);
+	T = trans[4][72] = settr(427,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(427,2,4,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(427,2,70,0,0,"IF", 1, 2500, 0);
+	trans[4][4]	= settr(359,2,5,101,0,"(nempty(Modemanager_reading_channel))", 1, 2500, 0);
+	trans[4][5]	= settr(360,2,68,102,102,"Modemanager_reading_channel?Modemanager_reading_signal_parameter", 1, 2500, 0); /* m: 6 -> 68,0 */
 	reached4[6] = 1;
 	trans[4][6]	= settr(0,0,0,0,0,"Modemanager_reading_channel_used = 1",0,0,0);
-	T = trans[ 4][68] = settr(331,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(331,0,66,0,0,"sub-sequence", 1, 2500, 0);
-	T = trans[4][66] = settr(329,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(329,2,7,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(329,2,64,0,0,"IF", 1, 2500, 0);
-	trans[4][7]	= settr(270,2,11,91,0,"((global_state.modemanager.state==0))", 1, 2500, 0);
-	T = trans[ 4][11] = settr(274,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(274,0,8,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][8]	= settr(271,2,10,92,92,"global_state.modemanager.xin = Modemanager_reading_signal_parameter", 1, 2500, 0);
-	T = trans[ 4][10] = settr(273,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(273,0,9,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][9]	= settr(272,2,63,93,0,"assert(((global_state.modemanager.xin>=0)&&(global_state.modemanager.xin<=1000000)))", 1, 2500, 0);
-	T = trans[ 4][63] = settr(326,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(326,0,12,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][12]	= settr(275,2,60,94,94,"transition_id = 0", 1, 2500, 0); /* m: 13 -> 0,60 */
+	T = trans[ 4][68] = settr(423,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(423,0,66,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[4][66] = settr(421,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(421,2,7,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(421,2,64,0,0,"IF", 1, 2500, 0);
+	trans[4][7]	= settr(362,2,11,103,0,"((global_state.modemanager.state==0))", 1, 2500, 0);
+	T = trans[ 4][11] = settr(366,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(366,0,8,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][8]	= settr(363,2,10,104,104,"global_state.modemanager.xin = Modemanager_reading_signal_parameter", 1, 2500, 0);
+	T = trans[ 4][10] = settr(365,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(365,0,9,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][9]	= settr(364,2,63,105,0,"assert(((global_state.modemanager.xin>=0)&&(global_state.modemanager.xin<=1000000)))", 1, 2500, 0);
+	T = trans[ 4][63] = settr(418,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(418,0,12,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][12]	= settr(367,2,60,106,106,"transition_id = 0", 1, 2500, 0); /* m: 13 -> 0,60 */
 	reached4[13] = 1;
 	trans[4][13]	= settr(0,0,0,0,0,"transition_id = 2",0,0,0);
-	trans[4][61]	= settr(324,2,60,1,0,".(goto)", 1, 2500, 0);
-	T = trans[4][60] = settr(323,2,0,0,0,"DO", 1, 2500, 0);
-	    T->nxt	= settr(323,2,57,0,0,"DO", 1, 2500, 0);
-	T = trans[4][57] = settr(320,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(320,2,14,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(320,2,16,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(320,2,20,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(320,2,40,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(320,2,51,0,0,"IF", 1, 2500, 0);
-	trans[4][14]	= settr(277,2,72,95,95,"((transition_id==-(1)))", 1, 2500, 0);
-	trans[4][15]	= settr(278,2,72,1,0,"goto :b14", 1, 2500, 0);
-	trans[4][58]	= settr(321,2,59,1,0,".(goto)", 1, 2500, 0);
-	trans[4][16]	= settr(279,2,59,96,96,"((transition_id==0))", 1, 2500, 0); /* m: 17 -> 59,0 */
+	trans[4][61]	= settr(416,2,60,1,0,".(goto)", 1, 2500, 0);
+	T = trans[4][60] = settr(415,2,0,0,0,"DO", 1, 2500, 0);
+	    T->nxt	= settr(415,2,57,0,0,"DO", 1, 2500, 0);
+	T = trans[4][57] = settr(412,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(412,2,14,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(412,2,16,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(412,2,20,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(412,2,40,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(412,2,51,0,0,"IF", 1, 2500, 0);
+	trans[4][14]	= settr(369,2,72,107,107,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[4][15]	= settr(370,2,72,1,0,"goto :b16", 1, 2500, 0);
+	trans[4][58]	= settr(413,2,59,1,0,".(goto)", 1, 2500, 0);
+	trans[4][16]	= settr(371,2,59,108,108,"((transition_id==0))", 1, 2500, 0); /* m: 17 -> 59,0 */
 	reached4[17] = 1;
 	trans[4][17]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[4][18]	= settr(0,0,0,0,0,"global_state.modemanager.state = 1",0,0,0);
-	trans[4][19]	= settr(282,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[4][20]	= settr(283,2,22,97,97,"((transition_id==1))", 1, 2500, 0);
-	T = trans[ 4][22] = settr(285,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(285,0,21,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][21]	= settr(284,2,35,1,0,"(1)", 1, 2500, 0);
-	T = trans[ 4][35] = settr(298,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(298,0,26,0,0,"sub-sequence", 1, 2500, 0);
-	T = trans[ 4][26] = settr(289,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(289,0,23,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][23]	= settr(286,2,25,98,98,"global_state.modemanager.rprt.reading = global_state.modemanager.xin", 1, 2500, 0);
-	T = trans[ 4][25] = settr(288,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(288,0,24,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][24]	= settr(287,2,30,99,0,"assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))", 1, 2500, 0);
-	T = trans[ 4][30] = settr(293,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(293,0,27,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][27]	= settr(290,2,29,100,100,"global_state.modemanager.rprt.ctrl = global_state.modemanager.xout", 1, 2500, 0);
-	T = trans[ 4][29] = settr(292,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(292,0,28,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][28]	= settr(291,2,34,101,0,"assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))", 1, 2500, 0);
-	T = trans[ 4][34] = settr(297,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(297,0,31,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][31]	= settr(294,2,33,102,102,"global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback", 1, 2500, 0);
-	T = trans[ 4][33] = settr(296,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(296,0,32,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][32]	= settr(295,2,37,103,0,"assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))", 1, 2500, 0);
-	T = trans[ 4][37] = settr(300,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(300,0,36,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][36]	= settr(299,2,59,104,104,"Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback", 1, 2500, 0); /* m: 38 -> 59,0 */
+	trans[4][19]	= settr(374,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[4][20]	= settr(375,2,22,109,109,"((transition_id==1))", 1, 2500, 0);
+	T = trans[ 4][22] = settr(377,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(377,0,21,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][21]	= settr(376,2,35,1,0,"(1)", 1, 2500, 0);
+	T = trans[ 4][35] = settr(390,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(390,0,26,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[ 4][26] = settr(381,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(381,0,23,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][23]	= settr(378,2,25,110,110,"global_state.modemanager.rprt.reading = global_state.modemanager.xin", 1, 2500, 0);
+	T = trans[ 4][25] = settr(380,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(380,0,24,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][24]	= settr(379,2,30,111,0,"assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))", 1, 2500, 0);
+	T = trans[ 4][30] = settr(385,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(385,0,27,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][27]	= settr(382,2,29,112,112,"global_state.modemanager.rprt.ctrl = global_state.modemanager.xout", 1, 2500, 0);
+	T = trans[ 4][29] = settr(384,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(384,0,28,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][28]	= settr(383,2,34,113,0,"assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))", 1, 2500, 0);
+	T = trans[ 4][34] = settr(389,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(389,0,31,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][31]	= settr(386,2,33,114,114,"global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback", 1, 2500, 0);
+	T = trans[ 4][33] = settr(388,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(388,0,32,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][32]	= settr(387,2,37,115,0,"assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))", 1, 2500, 0);
+	T = trans[ 4][37] = settr(392,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(392,0,36,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][36]	= settr(391,2,59,116,116,"Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback", 1, 2500, 0); /* m: 38 -> 59,0 */
 	reached4[38] = 1;
 	trans[4][38]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[4][39]	= settr(302,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[4][40]	= settr(303,2,42,105,105,"((transition_id==2))", 1, 2500, 0);
-	T = trans[ 4][42] = settr(305,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(305,0,41,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][41]	= settr(304,2,46,1,0,"(1)", 1, 2500, 0);
-	T = trans[ 4][46] = settr(309,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(309,0,43,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][43]	= settr(306,2,45,106,106,"global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)", 1, 2500, 0);
-	T = trans[ 4][45] = settr(308,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(308,0,44,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][44]	= settr(307,2,48,107,0,"assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))", 1, 2500, 0);
-	T = trans[ 4][48] = settr(311,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(311,0,47,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][47]	= settr(310,2,59,108,108,"Actuator_ctrl_channel!global_state.modemanager.xout", 1, 2500, 0); /* m: 49 -> 59,0 */
+	trans[4][39]	= settr(394,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[4][40]	= settr(395,2,42,117,117,"((transition_id==2))", 1, 2500, 0);
+	T = trans[ 4][42] = settr(397,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(397,0,41,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][41]	= settr(396,2,46,1,0,"(1)", 1, 2500, 0);
+	T = trans[ 4][46] = settr(401,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(401,0,43,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][43]	= settr(398,2,45,118,118,"global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)", 1, 2500, 0);
+	T = trans[ 4][45] = settr(400,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(400,0,44,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][44]	= settr(399,2,48,119,0,"assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))", 1, 2500, 0);
+	T = trans[ 4][48] = settr(403,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(403,0,47,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][47]	= settr(402,2,59,120,120,"Actuator_ctrl_channel!global_state.modemanager.xout", 1, 2500, 0); /* m: 49 -> 59,0 */
 	reached4[49] = 1;
 	trans[4][49]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[4][50]	= settr(313,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[4][51]	= settr(314,2,53,109,109,"((transition_id==3))", 1, 2500, 0);
-	T = trans[ 4][53] = settr(316,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(316,0,52,0,0,"sub-sequence", 1, 2500, 0);
-	trans[4][52]	= settr(315,2,59,110,110,"(1)", 1, 2500, 0); /* m: 54 -> 59,0 */
+	trans[4][50]	= settr(405,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[4][51]	= settr(406,2,53,121,121,"((transition_id==3))", 1, 2500, 0);
+	T = trans[ 4][53] = settr(408,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(408,0,52,0,0,"sub-sequence", 1, 2500, 0);
+	trans[4][52]	= settr(407,2,59,122,122,"(1)", 1, 2500, 0); /* m: 54 -> 59,0 */
 	reached4[54] = 1;
 	trans[4][54]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[4][55]	= settr(0,0,0,0,0,"global_state.modemanager.state = 0",0,0,0);
-	trans[4][56]	= settr(319,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[4][59]	= settr(322,2,60,1,0,"(1)", 1, 2500, 0);
-	trans[4][62]	= settr(325,2,72,1,0,"break", 1, 2500, 0);
-	trans[4][67]	= settr(330,2,72,1,0,".(goto)", 1, 2500, 0);
-	trans[4][64]	= settr(327,2,65,2,0,"else", 1, 2500, 0);
-	trans[4][65]	= settr(328,2,72,1,0,"(1)", 1, 2500, 0);
-	trans[4][69]	= settr(332,2,72,1,0,"goto Modemanager_reading_loop", 1, 2500, 0);
-	trans[4][73]	= settr(336,2,74,1,0,".(goto)", 1, 2500, 0);
-	trans[4][70]	= settr(333,2,71,111,0,"(empty(Modemanager_reading_channel))", 1, 2500, 0);
-	trans[4][71]	= settr(334,2,74,112,112,"(1)", 1, 2500, 0); /* m: 73 -> 74,0 */
+	trans[4][56]	= settr(411,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[4][59]	= settr(414,2,60,1,0,"(1)", 1, 2500, 0);
+	trans[4][62]	= settr(417,2,72,1,0,"break", 1, 2500, 0);
+	trans[4][67]	= settr(422,2,72,1,0,".(goto)", 1, 2500, 0);
+	trans[4][64]	= settr(419,2,65,2,0,"else", 1, 2500, 0);
+	trans[4][65]	= settr(420,2,72,1,0,"(1)", 1, 2500, 0);
+	trans[4][69]	= settr(424,2,72,1,0,"goto Modemanager_reading_loop", 1, 2500, 0);
+	trans[4][73]	= settr(428,2,74,1,0,".(goto)", 1, 2500, 0);
+	trans[4][70]	= settr(425,2,71,123,0,"(empty(Modemanager_reading_channel))", 1, 2500, 0);
+	trans[4][71]	= settr(426,2,74,124,124,"(1)", 1, 2500, 0); /* m: 73 -> 74,0 */
 	reached4[73] = 1;
-	trans[4][74]	= settr(337,0,76,113,113,"Modemanager_lock!1", 1, 2500, 0);
-	trans[4][78]	= settr(341,0,79,1,0,"break", 0, 2, 0);
-	trans[4][79]	= settr(342,0,0,114,114,"-end-", 0, 3500, 0);
+	trans[4][74]	= settr(429,0,76,125,125,"Modemanager_lock!1", 1, 2500, 0);
+	trans[4][78]	= settr(433,0,79,1,0,"break", 0, 2, 0);
+	trans[4][79]	= settr(434,0,0,126,126,"-end-", 0, 3500, 0);
 
 	/* proctype 3: Modemanager_feedback */
 
-	trans[3] = (Trans **) emalloc(80*sizeof(Trans *));
+	trans[3] = (Trans **) emalloc(126*sizeof(Trans *));
 
-	trans[3][1]	= settr(185,0,76,115,0,"(inited)", 1, 2, 0);
-	trans[3][77]	= settr(261,0,76,1,0,".(goto)", 0, 2, 0);
-	T = trans[3][76] = settr(260,0,0,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(260,0,75,0,0,"DO", 0, 2, 0);
-	T = trans[ 3][75] = settr(259,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(259,2,2,0,0,"ATOMIC", 1, 2500, 0);
-	trans[3][2]	= settr(186,2,3,116,0,"(nempty(Modemanager_feedback_channel))", 1, 2500, 0);
-	trans[3][3]	= settr(187,2,72,117,117,"Modemanager_lock?_", 1, 2500, 0);
-	T = trans[3][72] = settr(256,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(256,2,4,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(256,2,70,0,0,"IF", 1, 2500, 0);
-	trans[3][4]	= settr(188,2,5,118,0,"(nempty(Modemanager_feedback_channel))", 1, 2500, 0);
-	trans[3][5]	= settr(189,2,68,119,119,"Modemanager_feedback_channel?Modemanager_feedback_signal_parameter", 1, 2500, 0); /* m: 6 -> 68,0 */
+	trans[3][1]	= settr(231,0,122,127,0,"(inited)", 1, 2, 0);
+	trans[3][123]	= settr(353,0,122,1,0,".(goto)", 0, 2, 0);
+	T = trans[3][122] = settr(352,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(352,0,121,0,0,"DO", 0, 2, 0);
+	T = trans[ 3][121] = settr(351,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(351,2,2,0,0,"ATOMIC", 1, 2500, 0);
+	trans[3][2]	= settr(232,2,3,128,0,"(nempty(Modemanager_feedback_channel))", 1, 2500, 0);
+	trans[3][3]	= settr(233,2,118,129,129,"Modemanager_lock?_", 1, 2500, 0);
+	T = trans[3][118] = settr(348,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(348,2,4,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(348,2,116,0,0,"IF", 1, 2500, 0);
+	trans[3][4]	= settr(234,2,5,130,0,"(nempty(Modemanager_feedback_channel))", 1, 2500, 0);
+	trans[3][5]	= settr(235,2,68,131,131,"Modemanager_feedback_channel?Modemanager_feedback_signal_parameter", 1, 2500, 0); /* m: 6 -> 68,0 */
 	reached3[6] = 1;
 	trans[3][6]	= settr(0,0,0,0,0,"Modemanager_feedback_channel_used = 1",0,0,0);
-	T = trans[ 3][68] = settr(252,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(252,0,66,0,0,"sub-sequence", 1, 2500, 0);
-	T = trans[3][66] = settr(250,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(250,2,7,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(250,2,64,0,0,"IF", 1, 2500, 0);
-	trans[3][7]	= settr(191,2,11,120,0,"((global_state.modemanager.state==0))", 1, 2500, 0);
-	T = trans[ 3][11] = settr(195,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(195,0,8,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][8]	= settr(192,2,10,121,121,"global_state.modemanager.xfeedback = Modemanager_feedback_signal_parameter", 1, 2500, 0);
-	T = trans[ 3][10] = settr(194,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(194,0,9,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][9]	= settr(193,2,63,122,0,"assert(((global_state.modemanager.xfeedback>=0)&&(global_state.modemanager.xfeedback<=1000000)))", 1, 2500, 0);
-	T = trans[ 3][63] = settr(247,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(247,0,12,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][12]	= settr(196,2,60,123,123,"transition_id = 0", 1, 2500, 0); /* m: 13 -> 0,60 */
+	T = trans[ 3][68] = settr(298,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(298,0,66,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[3][66] = settr(296,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(296,2,7,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(296,2,64,0,0,"IF", 1, 2500, 0);
+	trans[3][7]	= settr(237,2,11,132,0,"((global_state.modemanager.state==0))", 1, 2500, 0);
+	T = trans[ 3][11] = settr(241,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(241,0,8,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][8]	= settr(238,2,10,133,133,"global_state.modemanager.xfeedback = Modemanager_feedback_signal_parameter", 1, 2500, 0);
+	T = trans[ 3][10] = settr(240,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(240,0,9,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][9]	= settr(239,2,63,134,0,"assert(((global_state.modemanager.xfeedback>=0)&&(global_state.modemanager.xfeedback<=1000000)))", 1, 2500, 0);
+	T = trans[ 3][63] = settr(293,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(293,0,12,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][12]	= settr(242,2,60,135,135,"transition_id = 0", 1, 2500, 0); /* m: 13 -> 0,60 */
 	reached3[13] = 1;
 	trans[3][13]	= settr(0,0,0,0,0,"transition_id = 1",0,0,0);
-	trans[3][61]	= settr(245,2,60,1,0,".(goto)", 1, 2500, 0);
-	T = trans[3][60] = settr(244,2,0,0,0,"DO", 1, 2500, 0);
-	    T->nxt	= settr(244,2,57,0,0,"DO", 1, 2500, 0);
-	T = trans[3][57] = settr(241,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(241,2,14,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(241,2,16,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(241,2,20,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(241,2,40,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(241,2,51,0,0,"IF", 1, 2500, 0);
-	trans[3][14]	= settr(198,2,72,124,124,"((transition_id==-(1)))", 1, 2500, 0);
-	trans[3][15]	= settr(199,2,72,1,0,"goto :b12", 1, 2500, 0);
-	trans[3][58]	= settr(242,2,59,1,0,".(goto)", 1, 2500, 0);
-	trans[3][16]	= settr(200,2,59,125,125,"((transition_id==0))", 1, 2500, 0); /* m: 17 -> 59,0 */
+	trans[3][61]	= settr(291,2,60,1,0,".(goto)", 1, 2500, 0);
+	T = trans[3][60] = settr(290,2,0,0,0,"DO", 1, 2500, 0);
+	    T->nxt	= settr(290,2,57,0,0,"DO", 1, 2500, 0);
+	T = trans[3][57] = settr(287,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(287,2,14,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(287,2,16,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(287,2,20,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(287,2,40,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(287,2,51,0,0,"IF", 1, 2500, 0);
+	trans[3][14]	= settr(244,2,69,136,136,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[3][15]	= settr(245,2,69,1,0,"goto :b13", 1, 2500, 0);
+	trans[3][58]	= settr(288,2,59,1,0,".(goto)", 1, 2500, 0);
+	trans[3][16]	= settr(246,2,59,137,137,"((transition_id==0))", 1, 2500, 0); /* m: 17 -> 59,0 */
 	reached3[17] = 1;
 	trans[3][17]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[3][18]	= settr(0,0,0,0,0,"global_state.modemanager.state = 1",0,0,0);
-	trans[3][19]	= settr(203,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[3][20]	= settr(204,2,22,126,126,"((transition_id==1))", 1, 2500, 0);
-	T = trans[ 3][22] = settr(206,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(206,0,21,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][21]	= settr(205,2,35,1,0,"(1)", 1, 2500, 0);
-	T = trans[ 3][35] = settr(219,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(219,0,26,0,0,"sub-sequence", 1, 2500, 0);
-	T = trans[ 3][26] = settr(210,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(210,0,23,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][23]	= settr(207,2,25,127,127,"global_state.modemanager.rprt.reading = global_state.modemanager.xin", 1, 2500, 0);
-	T = trans[ 3][25] = settr(209,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(209,0,24,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][24]	= settr(208,2,30,128,0,"assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))", 1, 2500, 0);
-	T = trans[ 3][30] = settr(214,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(214,0,27,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][27]	= settr(211,2,29,129,129,"global_state.modemanager.rprt.ctrl = global_state.modemanager.xout", 1, 2500, 0);
-	T = trans[ 3][29] = settr(213,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(213,0,28,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][28]	= settr(212,2,34,130,0,"assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))", 1, 2500, 0);
-	T = trans[ 3][34] = settr(218,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(218,0,31,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][31]	= settr(215,2,33,131,131,"global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback", 1, 2500, 0);
-	T = trans[ 3][33] = settr(217,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(217,0,32,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][32]	= settr(216,2,37,132,0,"assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))", 1, 2500, 0);
-	T = trans[ 3][37] = settr(221,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(221,0,36,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][36]	= settr(220,2,59,133,133,"Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback", 1, 2500, 0); /* m: 38 -> 59,0 */
+	trans[3][19]	= settr(249,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[3][20]	= settr(250,2,22,138,138,"((transition_id==1))", 1, 2500, 0);
+	T = trans[ 3][22] = settr(252,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(252,0,21,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][21]	= settr(251,2,35,1,0,"(1)", 1, 2500, 0);
+	T = trans[ 3][35] = settr(265,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(265,0,26,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[ 3][26] = settr(256,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(256,0,23,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][23]	= settr(253,2,25,139,139,"global_state.modemanager.rprt.reading = global_state.modemanager.xin", 1, 2500, 0);
+	T = trans[ 3][25] = settr(255,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(255,0,24,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][24]	= settr(254,2,30,140,0,"assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))", 1, 2500, 0);
+	T = trans[ 3][30] = settr(260,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(260,0,27,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][27]	= settr(257,2,29,141,141,"global_state.modemanager.rprt.ctrl = global_state.modemanager.xout", 1, 2500, 0);
+	T = trans[ 3][29] = settr(259,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(259,0,28,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][28]	= settr(258,2,34,142,0,"assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))", 1, 2500, 0);
+	T = trans[ 3][34] = settr(264,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(264,0,31,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][31]	= settr(261,2,33,143,143,"global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback", 1, 2500, 0);
+	T = trans[ 3][33] = settr(263,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(263,0,32,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][32]	= settr(262,2,37,144,0,"assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))", 1, 2500, 0);
+	T = trans[ 3][37] = settr(267,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(267,0,36,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][36]	= settr(266,2,59,145,145,"Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback", 1, 2500, 0); /* m: 38 -> 59,0 */
 	reached3[38] = 1;
 	trans[3][38]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[3][39]	= settr(223,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[3][40]	= settr(224,2,42,134,134,"((transition_id==2))", 1, 2500, 0);
-	T = trans[ 3][42] = settr(226,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(226,0,41,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][41]	= settr(225,2,46,1,0,"(1)", 1, 2500, 0);
-	T = trans[ 3][46] = settr(230,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(230,0,43,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][43]	= settr(227,2,45,135,135,"global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)", 1, 2500, 0);
-	T = trans[ 3][45] = settr(229,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(229,0,44,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][44]	= settr(228,2,48,136,0,"assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))", 1, 2500, 0);
-	T = trans[ 3][48] = settr(232,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(232,0,47,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][47]	= settr(231,2,59,137,137,"Actuator_ctrl_channel!global_state.modemanager.xout", 1, 2500, 0); /* m: 49 -> 59,0 */
+	trans[3][39]	= settr(269,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[3][40]	= settr(270,2,42,146,146,"((transition_id==2))", 1, 2500, 0);
+	T = trans[ 3][42] = settr(272,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(272,0,41,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][41]	= settr(271,2,46,1,0,"(1)", 1, 2500, 0);
+	T = trans[ 3][46] = settr(276,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(276,0,43,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][43]	= settr(273,2,45,147,147,"global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)", 1, 2500, 0);
+	T = trans[ 3][45] = settr(275,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(275,0,44,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][44]	= settr(274,2,48,148,0,"assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))", 1, 2500, 0);
+	T = trans[ 3][48] = settr(278,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(278,0,47,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][47]	= settr(277,2,59,149,149,"Actuator_ctrl_channel!global_state.modemanager.xout", 1, 2500, 0); /* m: 49 -> 59,0 */
 	reached3[49] = 1;
 	trans[3][49]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
-	trans[3][50]	= settr(234,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[3][51]	= settr(235,2,53,138,138,"((transition_id==3))", 1, 2500, 0);
-	T = trans[ 3][53] = settr(237,0,0,0,0,"sub-sequence", 1, 2500, 0);
-	T->nxt	= settr(237,0,52,0,0,"sub-sequence", 1, 2500, 0);
-	trans[3][52]	= settr(236,2,59,139,139,"(1)", 1, 2500, 0); /* m: 54 -> 59,0 */
+	trans[3][50]	= settr(280,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[3][51]	= settr(281,2,53,150,150,"((transition_id==3))", 1, 2500, 0);
+	T = trans[ 3][53] = settr(283,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(283,0,52,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][52]	= settr(282,2,59,151,151,"(1)", 1, 2500, 0); /* m: 54 -> 59,0 */
 	reached3[54] = 1;
 	trans[3][54]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[3][55]	= settr(0,0,0,0,0,"global_state.modemanager.state = 0",0,0,0);
-	trans[3][56]	= settr(240,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[3][59]	= settr(243,2,60,1,0,"(1)", 1, 2500, 0);
-	trans[3][62]	= settr(246,2,72,1,0,"break", 1, 2500, 0);
-	trans[3][67]	= settr(251,2,72,1,0,".(goto)", 1, 2500, 0);
-	trans[3][64]	= settr(248,2,65,2,0,"else", 1, 2500, 0);
-	trans[3][65]	= settr(249,2,72,1,0,"(1)", 1, 2500, 0);
-	trans[3][69]	= settr(253,2,72,1,0,"goto Modemanager_feedback_loop", 1, 2500, 0);
-	trans[3][73]	= settr(257,2,74,1,0,".(goto)", 1, 2500, 0);
-	trans[3][70]	= settr(254,2,71,140,0,"(empty(Modemanager_feedback_channel))", 1, 2500, 0);
-	trans[3][71]	= settr(255,2,74,141,141,"(1)", 1, 2500, 0); /* m: 73 -> 74,0 */
-	reached3[73] = 1;
-	trans[3][74]	= settr(258,0,76,142,142,"Modemanager_lock!1", 1, 2500, 0);
-	trans[3][78]	= settr(262,0,79,1,0,"break", 0, 2, 0);
-	trans[3][79]	= settr(263,0,0,143,143,"-end-", 0, 3500, 0);
+	trans[3][56]	= settr(286,2,59,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[3][59]	= settr(289,2,60,1,0,"(1)", 1, 2500, 0);
+	trans[3][62]	= settr(292,2,69,1,0,"break", 1, 2500, 0);
+	trans[3][67]	= settr(297,2,69,1,0,".(goto)", 1, 2500, 0);
+	trans[3][64]	= settr(294,2,65,2,0,"else", 1, 2500, 0);
+	trans[3][65]	= settr(295,2,69,1,0,"(1)", 1, 2500, 0);
+	trans[3][69]	= settr(299,2,113,152,152,"Observerdemo_lock?_", 1, 2500, 0);
+	T = trans[ 3][113] = settr(343,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(343,0,111,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[3][111] = settr(341,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(341,2,70,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(341,2,109,0,0,"IF", 1, 2500, 0);
+	trans[3][70]	= settr(300,2,74,153,0,"((global_state.observerdemo.state==0))", 1, 2500, 0);
+	T = trans[ 3][74] = settr(304,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(304,0,71,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][71]	= settr(301,2,73,154,154,"observerdemo_0_y = Modemanager_feedback_signal_parameter", 1, 2500, 0);
+	T = trans[ 3][73] = settr(303,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(303,0,72,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][72]	= settr(302,2,108,155,0,"assert(((observerdemo_0_y>=0)&&(observerdemo_0_y<=1000000)))", 1, 2500, 0);
+	T = trans[ 3][108] = settr(338,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(338,0,75,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][75]	= settr(305,2,105,156,156,"transition_id = 0", 1, 2500, 0); /* m: 76 -> 0,105 */
+	reached3[76] = 1;
+	trans[3][76]	= settr(0,0,0,0,0,"transition_id = 1",0,0,0);
+	trans[3][106]	= settr(336,2,105,1,0,".(goto)", 1, 2500, 0);
+	T = trans[3][105] = settr(335,2,0,0,0,"DO", 1, 2500, 0);
+	    T->nxt	= settr(335,2,102,0,0,"DO", 1, 2500, 0);
+	T = trans[3][102] = settr(332,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(332,2,77,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(332,2,79,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(332,2,83,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(332,2,94,0,0,"IF", 1, 2500, 0);
+	trans[3][77]	= settr(307,2,114,157,157,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[3][78]	= settr(308,2,114,1,0,"goto :b14", 1, 2500, 0);
+	trans[3][103]	= settr(333,2,104,1,0,".(goto)", 1, 2500, 0);
+	trans[3][79]	= settr(309,2,104,158,158,"((transition_id==0))", 1, 2500, 0); /* m: 80 -> 104,0 */
+	reached3[80] = 1;
+	trans[3][80]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[3][81]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 1",0,0,0);
+	trans[3][82]	= settr(312,2,104,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[3][83]	= settr(313,2,92,159,159,"((transition_id==1))", 1, 2500, 0);
+	T = trans[3][92] = settr(322,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(322,2,84,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(322,2,88,0,0,"IF", 1, 2500, 0);
+	trans[3][84]	= settr(314,2,104,160,160,"(((observerdemo_0_y==global_state.observerdemo.reference)==0))", 1, 2500, 0); /* m: 85 -> 104,0 */
+	reached3[85] = 1;
+	trans[3][85]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[3][86]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 2",0,0,0);
+	trans[3][87]	= settr(317,2,104,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[3][93]	= settr(323,2,104,1,0,".(goto)", 1, 2500, 0);
+	trans[3][88]	= settr(318,2,104,161,161,"(((observerdemo_0_y==global_state.observerdemo.reference)==1))", 1, 2500, 0); /* m: 89 -> 104,0 */
+	reached3[89] = 1;
+	trans[3][89]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[3][90]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 1",0,0,0);
+	trans[3][91]	= settr(321,2,104,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[3][94]	= settr(324,2,98,162,162,"((transition_id==2))", 1, 2500, 0);
+	T = trans[ 3][98] = settr(328,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(328,0,95,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][95]	= settr(325,2,97,163,163,"global_state.observerdemo.reference = observerdemo_0_x", 1, 2500, 0);
+	T = trans[ 3][97] = settr(327,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(327,0,96,0,0,"sub-sequence", 1, 2500, 0);
+	trans[3][96]	= settr(326,2,104,164,164,"assert(((global_state.observerdemo.reference>=0)&&(global_state.observerdemo.reference<=1000000)))", 1, 2500, 0); /* m: 99 -> 0,104 */
+	reached3[99] = 1;
+	trans[3][99]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[3][100]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 0",0,0,0);
+	trans[3][101]	= settr(331,2,104,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[3][104]	= settr(334,2,105,1,0,"(1)", 1, 2500, 0);
+	trans[3][107]	= settr(337,2,114,1,0,"break", 1, 2500, 0);
+	trans[3][112]	= settr(342,2,114,1,0,".(goto)", 1, 2500, 0);
+	trans[3][109]	= settr(339,2,110,2,0,"else", 1, 2500, 0);
+	trans[3][110]	= settr(340,2,114,1,0,"(1)", 1, 2500, 0);
+	trans[3][114]	= settr(344,2,118,165,165,"Observerdemo_lock!1", 1, 2500, 0);
+	trans[3][115]	= settr(345,2,118,1,0,"goto Modemanager_feedback_loop", 1, 2500, 0);
+	trans[3][119]	= settr(349,2,120,1,0,".(goto)", 1, 2500, 0);
+	trans[3][116]	= settr(346,2,117,166,0,"(empty(Modemanager_feedback_channel))", 1, 2500, 0);
+	trans[3][117]	= settr(347,2,120,167,167,"(1)", 1, 2500, 0); /* m: 119 -> 120,0 */
+	reached3[119] = 1;
+	trans[3][120]	= settr(350,0,122,168,168,"Modemanager_lock!1", 1, 2500, 0);
+	trans[3][124]	= settr(354,0,125,1,0,"break", 0, 2, 0);
+	trans[3][125]	= settr(355,0,0,169,169,"-end-", 0, 3500, 0);
 
 	/* proctype 2: Egse_tc */
 
 	trans[2] = (Trans **) emalloc(75*sizeof(Trans *));
 
-	trans[2][1]	= settr(111,0,2,144,0,"(inited)", 1, 2, 0);
-	trans[2][2]	= settr(112,0,71,145,145,"", 0, 2, 0); /* m: 3 -> 0,71 */
+	trans[2][1]	= settr(157,0,2,170,0,"(inited)", 1, 2, 0);
+	trans[2][2]	= settr(158,0,71,171,171,"", 0, 2, 0); /* m: 3 -> 0,71 */
 	reached2[3] = 1;
 	trans[2][3]	= settr(0,0,0,0,0,"inputVectorCounter = 0",0,0,0);
 	trans[2][4]	= settr(0,0,0,0,0,"inputVectorCounter = 0",0,0,0);
-	trans[2][72]	= settr(182,0,71,1,0,".(goto)", 0, 2, 0);
-	T = trans[2][71] = settr(181,0,0,0,0,"DO", 0, 2, 0);
-	T = T->nxt	= settr(181,0,5,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(181,0,69,0,0,"DO", 0, 2, 0);
-	trans[2][5]	= settr(115,0,67,146,0,"((inputVectorCounter<=3))", 0, 2, 0);
-	T = trans[ 2][67] = settr(177,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(177,2,64,0,0,"ATOMIC", 1, 2, 0);
-	T = trans[ 2][64] = settr(174,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(174,0,34,0,0,"sub-sequence", 1, 2, 0);
-	T = trans[ 2][34] = settr(144,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(144,0,6,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][6]	= settr(116,2,31,147,147,"T_SmallInteger_tmp = 0", 1, 2, 0);
-	T = trans[2][31] = settr(141,2,0,0,0,"IF", 1, 2, 0);
-	T = T->nxt	= settr(141,2,14,0,0,"IF", 1, 2, 0);
-	T = T->nxt	= settr(141,2,22,0,0,"IF", 1, 2, 0);
-	    T->nxt	= settr(141,2,30,0,0,"IF", 1, 2, 0);
-	T = trans[ 2][14] = settr(124,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(124,0,7,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][7]	= settr(117,2,11,148,148,"T_SmallInteger_tmp = 0", 1, 2, 0);
-	trans[2][12]	= settr(122,2,11,1,0,".(goto)", 1, 2, 0);
-	T = trans[2][11] = settr(121,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(121,2,10,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(121,2,8,0,0,"DO", 1, 2, 0);
-	trans[2][10]	= settr(120,2,63,149,149,"goto :b5", 1, 2, 0); /* m: 33 -> 0,63 */
+	trans[2][72]	= settr(228,0,71,1,0,".(goto)", 0, 2, 0);
+	T = trans[2][71] = settr(227,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(227,0,5,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(227,0,69,0,0,"DO", 0, 2, 0);
+	trans[2][5]	= settr(161,0,67,172,0,"((inputVectorCounter<=3))", 0, 2, 0);
+	T = trans[ 2][67] = settr(223,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(223,2,64,0,0,"ATOMIC", 1, 2, 0);
+	T = trans[ 2][64] = settr(220,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(220,0,34,0,0,"sub-sequence", 1, 2, 0);
+	T = trans[ 2][34] = settr(190,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(190,0,6,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][6]	= settr(162,2,31,173,173,"T_SmallInteger_tmp = 0", 1, 2, 0);
+	T = trans[2][31] = settr(187,2,0,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(187,2,14,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(187,2,22,0,0,"IF", 1, 2, 0);
+	    T->nxt	= settr(187,2,30,0,0,"IF", 1, 2, 0);
+	T = trans[ 2][14] = settr(170,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(170,0,7,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][7]	= settr(163,2,11,174,174,"T_SmallInteger_tmp = 0", 1, 2, 0);
+	trans[2][12]	= settr(168,2,11,1,0,".(goto)", 1, 2, 0);
+	T = trans[2][11] = settr(167,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(167,2,10,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(167,2,8,0,0,"DO", 1, 2, 0);
+	trans[2][10]	= settr(166,2,63,175,175,"goto :b6", 1, 2, 0); /* m: 33 -> 0,63 */
 	reached2[33] = 1;
-	trans[2][8]	= settr(118,2,11,150,150,"((T_SmallInteger_tmp<0))", 1, 2, 0); /* m: 9 -> 11,0 */
+	trans[2][8]	= settr(164,2,11,176,176,"((T_SmallInteger_tmp<0))", 1, 2, 0); /* m: 9 -> 11,0 */
 	reached2[9] = 1;
 	trans[2][9]	= settr(0,0,0,0,0,"T_SmallInteger_tmp = (T_SmallInteger_tmp+1)",0,0,0);
-	trans[2][13]	= settr(123,2,33,1,0,"break", 1, 2, 0);
-	trans[2][32]	= settr(142,2,33,1,0,".(goto)", 1, 2, 0); /* m: 33 -> 0,63 */
+	trans[2][13]	= settr(169,2,33,1,0,"break", 1, 2, 0);
+	trans[2][32]	= settr(188,2,33,1,0,".(goto)", 1, 2, 0); /* m: 33 -> 0,63 */
 	reached2[33] = 1;
-	T = trans[ 2][22] = settr(132,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(132,0,15,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][15]	= settr(125,2,19,151,151,"T_SmallInteger_tmp = 4", 1, 2, 0);
-	trans[2][20]	= settr(130,2,19,1,0,".(goto)", 1, 2, 0);
-	T = trans[2][19] = settr(129,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(129,2,18,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(129,2,16,0,0,"DO", 1, 2, 0);
-	trans[2][18]	= settr(128,2,63,152,152,"goto :b6", 1, 2, 0); /* m: 33 -> 0,63 */
+	T = trans[ 2][22] = settr(178,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(178,0,15,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][15]	= settr(171,2,19,177,177,"T_SmallInteger_tmp = 4", 1, 2, 0);
+	trans[2][20]	= settr(176,2,19,1,0,".(goto)", 1, 2, 0);
+	T = trans[2][19] = settr(175,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(175,2,18,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(175,2,16,0,0,"DO", 1, 2, 0);
+	trans[2][18]	= settr(174,2,63,178,178,"goto :b7", 1, 2, 0); /* m: 33 -> 0,63 */
 	reached2[33] = 1;
-	trans[2][16]	= settr(126,2,19,153,153,"((T_SmallInteger_tmp<4))", 1, 2, 0); /* m: 17 -> 19,0 */
+	trans[2][16]	= settr(172,2,19,179,179,"((T_SmallInteger_tmp<4))", 1, 2, 0); /* m: 17 -> 19,0 */
 	reached2[17] = 1;
 	trans[2][17]	= settr(0,0,0,0,0,"T_SmallInteger_tmp = (T_SmallInteger_tmp+1)",0,0,0);
-	trans[2][21]	= settr(131,2,33,1,0,"break", 1, 2, 0);
-	T = trans[ 2][30] = settr(140,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(140,0,23,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][23]	= settr(133,2,27,154,154,"T_SmallInteger_tmp = 10", 1, 2, 0);
-	trans[2][28]	= settr(138,2,27,1,0,".(goto)", 1, 2, 0);
-	T = trans[2][27] = settr(137,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(137,2,26,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(137,2,24,0,0,"DO", 1, 2, 0);
-	trans[2][26]	= settr(136,2,63,155,155,"goto :b7", 1, 2, 0); /* m: 33 -> 0,63 */
+	trans[2][21]	= settr(177,2,33,1,0,"break", 1, 2, 0);
+	T = trans[ 2][30] = settr(186,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(186,0,23,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][23]	= settr(179,2,27,180,180,"T_SmallInteger_tmp = 10", 1, 2, 0);
+	trans[2][28]	= settr(184,2,27,1,0,".(goto)", 1, 2, 0);
+	T = trans[2][27] = settr(183,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(183,2,26,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(183,2,24,0,0,"DO", 1, 2, 0);
+	trans[2][26]	= settr(182,2,63,181,181,"goto :b8", 1, 2, 0); /* m: 33 -> 0,63 */
 	reached2[33] = 1;
-	trans[2][24]	= settr(134,2,27,156,156,"((T_SmallInteger_tmp<10))", 1, 2, 0); /* m: 25 -> 27,0 */
+	trans[2][24]	= settr(180,2,27,182,182,"((T_SmallInteger_tmp<10))", 1, 2, 0); /* m: 25 -> 27,0 */
 	reached2[25] = 1;
 	trans[2][25]	= settr(0,0,0,0,0,"T_SmallInteger_tmp = (T_SmallInteger_tmp+1)",0,0,0);
-	trans[2][29]	= settr(139,2,33,1,0,"break", 1, 2, 0);
-	trans[2][33]	= settr(143,2,63,157,157,"value.param_a = T_SmallInteger_tmp", 1, 2, 0);
-	T = trans[ 2][63] = settr(173,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(173,0,35,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][35]	= settr(145,2,60,158,158,"T_SmallInteger_tmp = 0", 1, 2, 0);
-	T = trans[2][60] = settr(170,2,0,0,0,"IF", 1, 2, 0);
-	T = T->nxt	= settr(170,2,43,0,0,"IF", 1, 2, 0);
-	T = T->nxt	= settr(170,2,51,0,0,"IF", 1, 2, 0);
-	    T->nxt	= settr(170,2,59,0,0,"IF", 1, 2, 0);
-	T = trans[ 2][43] = settr(153,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(153,0,36,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][36]	= settr(146,2,40,159,159,"T_SmallInteger_tmp = 0", 1, 2, 0);
-	trans[2][41]	= settr(151,2,40,1,0,".(goto)", 1, 2, 0);
-	T = trans[2][40] = settr(150,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(150,2,39,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(150,2,37,0,0,"DO", 1, 2, 0);
-	trans[2][39]	= settr(149,2,66,160,160,"goto :b8", 1, 2, 0); /* m: 62 -> 0,66 */
+	trans[2][29]	= settr(185,2,33,1,0,"break", 1, 2, 0);
+	trans[2][33]	= settr(189,2,63,183,183,"value.param_a = T_SmallInteger_tmp", 1, 2, 0);
+	T = trans[ 2][63] = settr(219,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(219,0,35,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][35]	= settr(191,2,60,184,184,"T_SmallInteger_tmp = 0", 1, 2, 0);
+	T = trans[2][60] = settr(216,2,0,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(216,2,43,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(216,2,51,0,0,"IF", 1, 2, 0);
+	    T->nxt	= settr(216,2,59,0,0,"IF", 1, 2, 0);
+	T = trans[ 2][43] = settr(199,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(199,0,36,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][36]	= settr(192,2,40,185,185,"T_SmallInteger_tmp = 0", 1, 2, 0);
+	trans[2][41]	= settr(197,2,40,1,0,".(goto)", 1, 2, 0);
+	T = trans[2][40] = settr(196,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(196,2,39,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(196,2,37,0,0,"DO", 1, 2, 0);
+	trans[2][39]	= settr(195,2,66,186,186,"goto :b9", 1, 2, 0); /* m: 62 -> 0,66 */
 	reached2[62] = 1;
-	trans[2][37]	= settr(147,2,40,161,161,"((T_SmallInteger_tmp<0))", 1, 2, 0); /* m: 38 -> 40,0 */
+	trans[2][37]	= settr(193,2,40,187,187,"((T_SmallInteger_tmp<0))", 1, 2, 0); /* m: 38 -> 40,0 */
 	reached2[38] = 1;
 	trans[2][38]	= settr(0,0,0,0,0,"T_SmallInteger_tmp = (T_SmallInteger_tmp+1)",0,0,0);
-	trans[2][42]	= settr(152,2,62,1,0,"break", 1, 2, 0);
-	trans[2][61]	= settr(171,2,62,1,0,".(goto)", 1, 2, 0); /* m: 62 -> 0,66 */
+	trans[2][42]	= settr(198,2,62,1,0,"break", 1, 2, 0);
+	trans[2][61]	= settr(217,2,62,1,0,".(goto)", 1, 2, 0); /* m: 62 -> 0,66 */
 	reached2[62] = 1;
-	T = trans[ 2][51] = settr(161,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(161,0,44,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][44]	= settr(154,2,48,162,162,"T_SmallInteger_tmp = 4", 1, 2, 0);
-	trans[2][49]	= settr(159,2,48,1,0,".(goto)", 1, 2, 0);
-	T = trans[2][48] = settr(158,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(158,2,47,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(158,2,45,0,0,"DO", 1, 2, 0);
-	trans[2][47]	= settr(157,2,66,163,163,"goto :b9", 1, 2, 0); /* m: 62 -> 0,66 */
+	T = trans[ 2][51] = settr(207,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(207,0,44,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][44]	= settr(200,2,48,188,188,"T_SmallInteger_tmp = 4", 1, 2, 0);
+	trans[2][49]	= settr(205,2,48,1,0,".(goto)", 1, 2, 0);
+	T = trans[2][48] = settr(204,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(204,2,47,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(204,2,45,0,0,"DO", 1, 2, 0);
+	trans[2][47]	= settr(203,2,66,189,189,"goto :b10", 1, 2, 0); /* m: 62 -> 0,66 */
 	reached2[62] = 1;
-	trans[2][45]	= settr(155,2,48,164,164,"((T_SmallInteger_tmp<4))", 1, 2, 0); /* m: 46 -> 48,0 */
+	trans[2][45]	= settr(201,2,48,190,190,"((T_SmallInteger_tmp<4))", 1, 2, 0); /* m: 46 -> 48,0 */
 	reached2[46] = 1;
 	trans[2][46]	= settr(0,0,0,0,0,"T_SmallInteger_tmp = (T_SmallInteger_tmp+1)",0,0,0);
-	trans[2][50]	= settr(160,2,62,1,0,"break", 1, 2, 0);
-	T = trans[ 2][59] = settr(169,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(169,0,52,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][52]	= settr(162,2,56,165,165,"T_SmallInteger_tmp = 10", 1, 2, 0);
-	trans[2][57]	= settr(167,2,56,1,0,".(goto)", 1, 2, 0);
-	T = trans[2][56] = settr(166,2,0,0,0,"DO", 1, 2, 0);
-	T = T->nxt	= settr(166,2,55,0,0,"DO", 1, 2, 0);
-	    T->nxt	= settr(166,2,53,0,0,"DO", 1, 2, 0);
-	trans[2][55]	= settr(165,2,66,166,166,"goto :b10", 1, 2, 0); /* m: 62 -> 0,66 */
+	trans[2][50]	= settr(206,2,62,1,0,"break", 1, 2, 0);
+	T = trans[ 2][59] = settr(215,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(215,0,52,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][52]	= settr(208,2,56,191,191,"T_SmallInteger_tmp = 10", 1, 2, 0);
+	trans[2][57]	= settr(213,2,56,1,0,".(goto)", 1, 2, 0);
+	T = trans[2][56] = settr(212,2,0,0,0,"DO", 1, 2, 0);
+	T = T->nxt	= settr(212,2,55,0,0,"DO", 1, 2, 0);
+	    T->nxt	= settr(212,2,53,0,0,"DO", 1, 2, 0);
+	trans[2][55]	= settr(211,2,66,192,192,"goto :b11", 1, 2, 0); /* m: 62 -> 0,66 */
 	reached2[62] = 1;
-	trans[2][53]	= settr(163,2,56,167,167,"((T_SmallInteger_tmp<10))", 1, 2, 0); /* m: 54 -> 56,0 */
+	trans[2][53]	= settr(209,2,56,193,193,"((T_SmallInteger_tmp<10))", 1, 2, 0); /* m: 54 -> 56,0 */
 	reached2[54] = 1;
 	trans[2][54]	= settr(0,0,0,0,0,"T_SmallInteger_tmp = (T_SmallInteger_tmp+1)",0,0,0);
-	trans[2][58]	= settr(168,2,62,1,0,"break", 1, 2, 0);
-	trans[2][62]	= settr(172,2,66,168,168,"value.param_b = T_SmallInteger_tmp", 1, 2, 0);
-	T = trans[ 2][66] = settr(176,0,0,0,0,"sub-sequence", 1, 2, 0);
-	T->nxt	= settr(176,0,65,0,0,"sub-sequence", 1, 2, 0);
-	trans[2][65]	= settr(175,0,71,169,169,"Modemanager_tc_channel!value.param_a,value.param_b", 1, 7, 0); /* m: 68 -> 71,0 */
+	trans[2][58]	= settr(214,2,62,1,0,"break", 1, 2, 0);
+	trans[2][62]	= settr(218,2,66,194,194,"value.param_b = T_SmallInteger_tmp", 1, 2, 0);
+	T = trans[ 2][66] = settr(222,0,0,0,0,"sub-sequence", 1, 2, 0);
+	T->nxt	= settr(222,0,65,0,0,"sub-sequence", 1, 2, 0);
+	trans[2][65]	= settr(221,0,71,195,195,"Modemanager_tc_channel!value.param_a,value.param_b", 1, 7, 0); /* m: 68 -> 71,0 */
 	reached2[68] = 1;
 	trans[2][68]	= settr(0,0,0,0,0,"inputVectorCounter = (inputVectorCounter+1)",0,0,0);
-	trans[2][69]	= settr(179,0,74,2,0,"else", 0, 2, 0);
-	trans[2][70]	= settr(180,0,74,1,0,"goto :b4", 0, 2, 0);
-	trans[2][73]	= settr(183,0,74,1,0,"break", 0, 2, 0);
-	trans[2][74]	= settr(184,0,0,170,170,"-end-", 0, 3500, 0);
+	trans[2][69]	= settr(225,0,74,2,0,"else", 0, 2, 0);
+	trans[2][70]	= settr(226,0,74,1,0,"goto :b5", 0, 2, 0);
+	trans[2][73]	= settr(229,0,74,1,0,"break", 0, 2, 0);
+	trans[2][74]	= settr(230,0,0,196,196,"-end-", 0, 3500, 0);
 
 	/* proctype 1: Egse_tm */
 
 	trans[1] = (Trans **) emalloc(16*sizeof(Trans *));
 
-	trans[1][1]	= settr(96,0,12,171,0,"(inited)", 1, 2, 0);
-	trans[1][13]	= settr(108,0,12,1,0,".(goto)", 0, 2, 0);
-	T = trans[1][12] = settr(107,0,0,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(107,0,11,0,0,"DO", 0, 2, 0);
-	T = trans[ 1][11] = settr(106,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(106,2,2,0,0,"ATOMIC", 1, 504, 1004);
-	trans[1][2]	= settr(97,2,9,172,0,"(nempty(Egse_tm_channel))", 1, 504, 1004);
-	T = trans[1][9] = settr(104,2,0,0,0,"IF", 1, 504, 1004);
-	T = T->nxt	= settr(104,2,3,0,0,"IF", 1, 504, 1004);
-	    T->nxt	= settr(104,2,7,0,0,"IF", 1, 504, 1004);
-	trans[1][3]	= settr(98,2,4,173,0,"(nempty(Egse_tm_channel))", 1, 504, 1004);
-	trans[1][4]	= settr(99,2,9,174,174,"Egse_tm_channel?Egse_tm_signal_parameter.reading,Egse_tm_signal_parameter.ctrl,Egse_tm_signal_parameter.feedback", 1, 504, 1004); /* m: 5 -> 9,0 */
+	trans[1][1]	= settr(142,0,12,197,0,"(inited)", 1, 2, 0);
+	trans[1][13]	= settr(154,0,12,1,0,".(goto)", 0, 2, 0);
+	T = trans[1][12] = settr(153,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(153,0,11,0,0,"DO", 0, 2, 0);
+	T = trans[ 1][11] = settr(152,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(152,2,2,0,0,"ATOMIC", 1, 504, 1004);
+	trans[1][2]	= settr(143,2,9,198,0,"(nempty(Egse_tm_channel))", 1, 504, 1004);
+	T = trans[1][9] = settr(150,2,0,0,0,"IF", 1, 504, 1004);
+	T = T->nxt	= settr(150,2,3,0,0,"IF", 1, 504, 1004);
+	    T->nxt	= settr(150,2,7,0,0,"IF", 1, 504, 1004);
+	trans[1][3]	= settr(144,2,4,199,0,"(nempty(Egse_tm_channel))", 1, 504, 1004);
+	trans[1][4]	= settr(145,2,9,200,200,"Egse_tm_channel?Egse_tm_signal_parameter.reading,Egse_tm_signal_parameter.ctrl,Egse_tm_signal_parameter.feedback", 1, 504, 1004); /* m: 5 -> 9,0 */
 	reached1[5] = 1;
 	trans[1][5]	= settr(0,0,0,0,0,"Egse_tm_channel_used = 1",0,0,0);
-	trans[1][6]	= settr(101,2,9,1,0,"goto Egse_tm_loop", 1, 504, 1004);
-	trans[1][10]	= settr(105,0,12,1,0,".(goto)", 1, 504, 1004);
-	trans[1][7]	= settr(102,2,8,175,0,"(empty(Egse_tm_channel))", 1, 504, 1004);
-	trans[1][8]	= settr(103,0,12,176,176,"(1)", 1, 504, 1004); /* m: 10 -> 12,0 */
+	trans[1][6]	= settr(147,2,9,1,0,"goto Egse_tm_loop", 1, 504, 1004);
+	trans[1][10]	= settr(151,0,12,1,0,".(goto)", 1, 504, 1004);
+	trans[1][7]	= settr(148,2,8,201,0,"(empty(Egse_tm_channel))", 1, 504, 1004);
+	trans[1][8]	= settr(149,0,12,202,202,"(1)", 1, 504, 1004); /* m: 10 -> 12,0 */
 	reached1[10] = 1;
-	trans[1][14]	= settr(109,0,15,1,0,"break", 0, 2, 0);
-	trans[1][15]	= settr(110,0,0,177,177,"-end-", 0, 3500, 0);
+	trans[1][14]	= settr(155,0,15,1,0,"break", 0, 2, 0);
+	trans[1][15]	= settr(156,0,0,203,203,"-end-", 0, 3500, 0);
 
 	/* proctype 0: Actuator_ctrl */
 
-	trans[0] = (Trans **) emalloc(97*sizeof(Trans *));
+	trans[0] = (Trans **) emalloc(143*sizeof(Trans *));
 
-	trans[0][1]	= settr(0,0,93,178,0,"(inited)", 1, 2, 0);
-	trans[0][94]	= settr(93,0,93,1,0,".(goto)", 0, 2, 0);
-	T = trans[0][93] = settr(92,0,0,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(92,0,92,0,0,"DO", 0, 2, 0);
-	T = trans[ 0][92] = settr(91,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(91,2,2,0,0,"ATOMIC", 1, 2500, 0);
-	trans[0][2]	= settr(1,2,3,179,0,"(nempty(Actuator_ctrl_channel))", 1, 2500, 0);
-	trans[0][3]	= settr(2,2,89,180,180,"Actuator_lock?_", 1, 2500, 0);
-	T = trans[0][89] = settr(88,2,0,0,0,"IF", 1, 2500, 0);
-	T = T->nxt	= settr(88,2,4,0,0,"IF", 1, 2500, 0);
-	    T->nxt	= settr(88,2,87,0,0,"IF", 1, 2500, 0);
-	trans[0][4]	= settr(3,2,5,181,0,"(nempty(Actuator_ctrl_channel))", 1, 2500, 0);
-	trans[0][5]	= settr(4,2,85,182,182,"Actuator_ctrl_channel?Actuator_ctrl_signal_parameter", 1, 2500, 0); /* m: 6 -> 85,0 */
+	trans[0][1]	= settr(0,0,139,204,0,"(inited)", 1, 2, 0);
+	trans[0][140]	= settr(139,0,139,1,0,".(goto)", 0, 2, 0);
+	T = trans[0][139] = settr(138,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(138,0,138,0,0,"DO", 0, 2, 0);
+	T = trans[ 0][138] = settr(137,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(137,2,2,0,0,"ATOMIC", 1, 2500, 0);
+	trans[0][2]	= settr(1,2,3,205,0,"(nempty(Actuator_ctrl_channel))", 1, 2500, 0);
+	trans[0][3]	= settr(2,2,135,206,206,"Actuator_lock?_", 1, 2500, 0);
+	T = trans[0][135] = settr(134,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(134,2,4,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(134,2,133,0,0,"IF", 1, 2500, 0);
+	trans[0][4]	= settr(3,2,5,207,0,"(nempty(Actuator_ctrl_channel))", 1, 2500, 0);
+	trans[0][5]	= settr(4,2,85,208,208,"Actuator_ctrl_channel?Actuator_ctrl_signal_parameter", 1, 2500, 0); /* m: 6 -> 85,0 */
 	reached0[6] = 1;
 	trans[0][6]	= settr(0,0,0,0,0,"Actuator_ctrl_channel_used = 1",0,0,0);
 	T = trans[ 0][85] = settr(84,0,0,0,0,"sub-sequence", 1, 2500, 0);
@@ -830,16 +954,16 @@ settable(void)
 	T = T->nxt	= settr(82,2,7,0,0,"IF", 1, 2500, 0);
 	T = T->nxt	= settr(82,2,44,0,0,"IF", 1, 2500, 0);
 	    T->nxt	= settr(82,2,81,0,0,"IF", 1, 2500, 0);
-	trans[0][7]	= settr(6,2,11,183,0,"((global_state.actuator.state==0))", 1, 2500, 0);
+	trans[0][7]	= settr(6,2,11,209,0,"((global_state.actuator.state==0))", 1, 2500, 0);
 	T = trans[ 0][11] = settr(10,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(10,0,8,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][8]	= settr(7,2,10,184,184,"global_state.actuator.x = Actuator_ctrl_signal_parameter", 1, 2500, 0);
+	trans[0][8]	= settr(7,2,10,210,210,"global_state.actuator.x = Actuator_ctrl_signal_parameter", 1, 2500, 0);
 	T = trans[ 0][10] = settr(9,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(9,0,9,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][9]	= settr(8,2,43,185,0,"assert(((global_state.actuator.x>=0)&&(global_state.actuator.x<=1000000)))", 1, 2500, 0);
+	trans[0][9]	= settr(8,2,43,211,0,"assert(((global_state.actuator.x>=0)&&(global_state.actuator.x<=1000000)))", 1, 2500, 0);
 	T = trans[ 0][43] = settr(42,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(42,0,12,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][12]	= settr(11,2,40,186,186,"transition_id = 0", 1, 2500, 0); /* m: 13 -> 0,40 */
+	trans[0][12]	= settr(11,2,40,212,212,"transition_id = 0", 1, 2500, 0); /* m: 13 -> 0,40 */
 	reached0[13] = 1;
 	trans[0][13]	= settr(0,0,0,0,0,"transition_id = 1",0,0,0);
 	trans[0][41]	= settr(40,2,40,1,0,".(goto)", 1, 2500, 0);
@@ -849,51 +973,51 @@ settable(void)
 	T = T->nxt	= settr(36,2,14,0,0,"IF", 1, 2500, 0);
 	T = T->nxt	= settr(36,2,16,0,0,"IF", 1, 2500, 0);
 	    T->nxt	= settr(36,2,20,0,0,"IF", 1, 2500, 0);
-	trans[0][14]	= settr(13,2,89,187,187,"((transition_id==-(1)))", 1, 2500, 0);
-	trans[0][15]	= settr(14,2,89,1,0,"goto :b1", 1, 2500, 0);
+	trans[0][14]	= settr(13,2,86,213,213,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[0][15]	= settr(14,2,86,1,0,"goto :b1", 1, 2500, 0);
 	trans[0][38]	= settr(37,2,39,1,0,".(goto)", 1, 2500, 0);
-	trans[0][16]	= settr(15,2,39,188,188,"((transition_id==0))", 1, 2500, 0); /* m: 17 -> 39,0 */
+	trans[0][16]	= settr(15,2,39,214,214,"((transition_id==0))", 1, 2500, 0); /* m: 17 -> 39,0 */
 	reached0[17] = 1;
 	trans[0][17]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[0][18]	= settr(0,0,0,0,0,"global_state.actuator.state = 0",0,0,0);
 	trans[0][19]	= settr(18,2,39,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[0][20]	= settr(19,2,22,189,189,"((transition_id==1))", 1, 2500, 0);
+	trans[0][20]	= settr(19,2,22,215,215,"((transition_id==1))", 1, 2500, 0);
 	T = trans[ 0][22] = settr(21,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(21,0,21,0,0,"sub-sequence", 1, 2500, 0);
 	trans[0][21]	= settr(20,2,35,1,0,"(1)", 1, 2500, 0);
 	T = trans[0][35] = settr(34,2,0,0,0,"IF", 1, 2500, 0);
 	T = T->nxt	= settr(34,2,23,0,0,"IF", 1, 2500, 0);
 	    T->nxt	= settr(34,2,29,0,0,"IF", 1, 2500, 0);
-	trans[0][23]	= settr(22,2,25,190,0,"(((global_state.actuator.x>10)==1))", 1, 2500, 0);
+	trans[0][23]	= settr(22,2,25,216,0,"(((global_state.actuator.x>10)==1))", 1, 2500, 0);
 	T = trans[ 0][25] = settr(24,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(24,0,24,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][24]	= settr(23,2,39,191,191,"Modemanager_feedback_channel!global_state.actuator.x", 1, 2500, 0); /* m: 26 -> 39,0 */
+	trans[0][24]	= settr(23,2,39,217,217,"Modemanager_feedback_channel!global_state.actuator.x", 1, 2500, 0); /* m: 26 -> 39,0 */
 	reached0[26] = 1;
 	trans[0][26]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[0][27]	= settr(0,0,0,0,0,"global_state.actuator.state = 1",0,0,0);
 	trans[0][28]	= settr(27,2,39,1,0,"goto continuous_signals", 1, 2500, 0);
 	trans[0][36]	= settr(35,2,39,1,0,".(goto)", 1, 2500, 0);
-	trans[0][29]	= settr(28,2,31,192,0,"(((global_state.actuator.x>10)==0))", 1, 2500, 0);
+	trans[0][29]	= settr(28,2,31,218,0,"(((global_state.actuator.x>10)==0))", 1, 2500, 0);
 	T = trans[ 0][31] = settr(30,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(30,0,30,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][30]	= settr(29,2,39,193,193,"Modemanager_feedback_channel!0", 1, 2500, 0); /* m: 32 -> 39,0 */
+	trans[0][30]	= settr(29,2,39,219,219,"Modemanager_feedback_channel!0", 1, 2500, 0); /* m: 32 -> 39,0 */
 	reached0[32] = 1;
 	trans[0][32]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[0][33]	= settr(0,0,0,0,0,"global_state.actuator.state = 0",0,0,0);
 	trans[0][34]	= settr(33,2,39,1,0,"goto continuous_signals", 1, 2500, 0);
 	trans[0][39]	= settr(38,2,40,1,0,"(1)", 1, 2500, 0);
-	trans[0][42]	= settr(41,2,89,1,0,"break", 1, 2500, 0);
-	trans[0][84]	= settr(83,2,89,1,0,".(goto)", 1, 2500, 0);
-	trans[0][44]	= settr(43,2,48,194,0,"((global_state.actuator.state==1))", 1, 2500, 0);
+	trans[0][42]	= settr(41,2,86,1,0,"break", 1, 2500, 0);
+	trans[0][84]	= settr(83,2,86,1,0,".(goto)", 1, 2500, 0);
+	trans[0][44]	= settr(43,2,48,220,0,"((global_state.actuator.state==1))", 1, 2500, 0);
 	T = trans[ 0][48] = settr(47,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(47,0,45,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][45]	= settr(44,2,47,195,195,"global_state.actuator.x = Actuator_ctrl_signal_parameter", 1, 2500, 0);
+	trans[0][45]	= settr(44,2,47,221,221,"global_state.actuator.x = Actuator_ctrl_signal_parameter", 1, 2500, 0);
 	T = trans[ 0][47] = settr(46,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(46,0,46,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][46]	= settr(45,2,80,196,0,"assert(((global_state.actuator.x>=0)&&(global_state.actuator.x<=1000000)))", 1, 2500, 0);
+	trans[0][46]	= settr(45,2,80,222,0,"assert(((global_state.actuator.x>=0)&&(global_state.actuator.x<=1000000)))", 1, 2500, 0);
 	T = trans[ 0][80] = settr(79,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(79,0,49,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][49]	= settr(48,2,77,197,197,"transition_id = 0", 1, 2500, 0); /* m: 50 -> 0,77 */
+	trans[0][49]	= settr(48,2,77,223,223,"transition_id = 0", 1, 2500, 0); /* m: 50 -> 0,77 */
 	reached0[50] = 1;
 	trans[0][50]	= settr(0,0,0,0,0,"transition_id = 1",0,0,0);
 	trans[0][78]	= settr(77,2,77,1,0,".(goto)", 1, 2500, 0);
@@ -903,50 +1027,116 @@ settable(void)
 	T = T->nxt	= settr(73,2,51,0,0,"IF", 1, 2500, 0);
 	T = T->nxt	= settr(73,2,53,0,0,"IF", 1, 2500, 0);
 	    T->nxt	= settr(73,2,57,0,0,"IF", 1, 2500, 0);
-	trans[0][51]	= settr(50,2,89,198,198,"((transition_id==-(1)))", 1, 2500, 0);
-	trans[0][52]	= settr(51,2,89,1,0,"goto :b2", 1, 2500, 0);
+	trans[0][51]	= settr(50,2,86,224,224,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[0][52]	= settr(51,2,86,1,0,"goto :b2", 1, 2500, 0);
 	trans[0][75]	= settr(74,2,76,1,0,".(goto)", 1, 2500, 0);
-	trans[0][53]	= settr(52,2,76,199,199,"((transition_id==0))", 1, 2500, 0); /* m: 54 -> 76,0 */
+	trans[0][53]	= settr(52,2,76,225,225,"((transition_id==0))", 1, 2500, 0); /* m: 54 -> 76,0 */
 	reached0[54] = 1;
 	trans[0][54]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[0][55]	= settr(0,0,0,0,0,"global_state.actuator.state = 0",0,0,0);
 	trans[0][56]	= settr(55,2,76,1,0,"goto continuous_signals", 1, 2500, 0);
-	trans[0][57]	= settr(56,2,59,200,200,"((transition_id==1))", 1, 2500, 0);
+	trans[0][57]	= settr(56,2,59,226,226,"((transition_id==1))", 1, 2500, 0);
 	T = trans[ 0][59] = settr(58,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(58,0,58,0,0,"sub-sequence", 1, 2500, 0);
 	trans[0][58]	= settr(57,2,72,1,0,"(1)", 1, 2500, 0);
 	T = trans[0][72] = settr(71,2,0,0,0,"IF", 1, 2500, 0);
 	T = T->nxt	= settr(71,2,60,0,0,"IF", 1, 2500, 0);
 	    T->nxt	= settr(71,2,66,0,0,"IF", 1, 2500, 0);
-	trans[0][60]	= settr(59,2,62,201,0,"(((global_state.actuator.x>10)==1))", 1, 2500, 0);
+	trans[0][60]	= settr(59,2,62,227,0,"(((global_state.actuator.x>10)==1))", 1, 2500, 0);
 	T = trans[ 0][62] = settr(61,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(61,0,61,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][61]	= settr(60,2,76,202,202,"Modemanager_feedback_channel!global_state.actuator.x", 1, 2500, 0); /* m: 63 -> 76,0 */
+	trans[0][61]	= settr(60,2,76,228,228,"Modemanager_feedback_channel!global_state.actuator.x", 1, 2500, 0); /* m: 63 -> 76,0 */
 	reached0[63] = 1;
 	trans[0][63]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[0][64]	= settr(0,0,0,0,0,"global_state.actuator.state = 1",0,0,0);
 	trans[0][65]	= settr(64,2,76,1,0,"goto continuous_signals", 1, 2500, 0);
 	trans[0][73]	= settr(72,2,76,1,0,".(goto)", 1, 2500, 0);
-	trans[0][66]	= settr(65,2,68,203,0,"(((global_state.actuator.x>10)==0))", 1, 2500, 0);
+	trans[0][66]	= settr(65,2,68,229,0,"(((global_state.actuator.x>10)==0))", 1, 2500, 0);
 	T = trans[ 0][68] = settr(67,0,0,0,0,"sub-sequence", 1, 2500, 0);
 	T->nxt	= settr(67,0,67,0,0,"sub-sequence", 1, 2500, 0);
-	trans[0][67]	= settr(66,2,76,204,204,"Modemanager_feedback_channel!0", 1, 2500, 0); /* m: 69 -> 76,0 */
+	trans[0][67]	= settr(66,2,76,230,230,"Modemanager_feedback_channel!0", 1, 2500, 0); /* m: 69 -> 76,0 */
 	reached0[69] = 1;
 	trans[0][69]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
 	trans[0][70]	= settr(0,0,0,0,0,"global_state.actuator.state = 0",0,0,0);
 	trans[0][71]	= settr(70,2,76,1,0,"goto continuous_signals", 1, 2500, 0);
 	trans[0][76]	= settr(75,2,77,1,0,"(1)", 1, 2500, 0);
-	trans[0][79]	= settr(78,2,89,1,0,"break", 1, 2500, 0);
+	trans[0][79]	= settr(78,2,86,1,0,"break", 1, 2500, 0);
 	trans[0][81]	= settr(80,2,82,2,0,"else", 1, 2500, 0);
-	trans[0][82]	= settr(81,2,89,1,0,"(1)", 1, 2500, 0);
-	trans[0][86]	= settr(85,2,89,1,0,"goto Actuator_ctrl_loop", 1, 2500, 0);
-	trans[0][90]	= settr(89,2,91,1,0,".(goto)", 1, 2500, 0);
-	trans[0][87]	= settr(86,2,88,205,0,"(empty(Actuator_ctrl_channel))", 1, 2500, 0);
-	trans[0][88]	= settr(87,2,91,206,206,"(1)", 1, 2500, 0); /* m: 90 -> 91,0 */
-	reached0[90] = 1;
-	trans[0][91]	= settr(90,0,93,207,207,"Actuator_lock!1", 1, 2500, 0);
-	trans[0][95]	= settr(94,0,96,1,0,"break", 0, 2, 0);
-	trans[0][96]	= settr(95,0,0,208,208,"-end-", 0, 3500, 0);
+	trans[0][82]	= settr(81,2,86,1,0,"(1)", 1, 2500, 0);
+	trans[0][86]	= settr(85,2,130,231,231,"Observerdemo_lock?_", 1, 2500, 0);
+	T = trans[ 0][130] = settr(129,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(129,0,128,0,0,"sub-sequence", 1, 2500, 0);
+	T = trans[0][128] = settr(127,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(127,2,87,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(127,2,126,0,0,"IF", 1, 2500, 0);
+	trans[0][87]	= settr(86,2,91,232,0,"((global_state.observerdemo.state==1))", 1, 2500, 0);
+	T = trans[ 0][91] = settr(90,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(90,0,88,0,0,"sub-sequence", 1, 2500, 0);
+	trans[0][88]	= settr(87,2,90,233,233,"observerdemo_0_x = Actuator_ctrl_signal_parameter", 1, 2500, 0);
+	T = trans[ 0][90] = settr(89,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(89,0,89,0,0,"sub-sequence", 1, 2500, 0);
+	trans[0][89]	= settr(88,2,125,234,0,"assert(((observerdemo_0_x>=0)&&(observerdemo_0_x<=1000000)))", 1, 2500, 0);
+	T = trans[ 0][125] = settr(124,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(124,0,92,0,0,"sub-sequence", 1, 2500, 0);
+	trans[0][92]	= settr(91,2,122,235,235,"transition_id = 0", 1, 2500, 0); /* m: 93 -> 0,122 */
+	reached0[93] = 1;
+	trans[0][93]	= settr(0,0,0,0,0,"transition_id = 2",0,0,0);
+	trans[0][123]	= settr(122,2,122,1,0,".(goto)", 1, 2500, 0);
+	T = trans[0][122] = settr(121,2,0,0,0,"DO", 1, 2500, 0);
+	    T->nxt	= settr(121,2,119,0,0,"DO", 1, 2500, 0);
+	T = trans[0][119] = settr(118,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(118,2,94,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(118,2,96,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(118,2,100,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(118,2,111,0,0,"IF", 1, 2500, 0);
+	trans[0][94]	= settr(93,2,131,236,236,"((transition_id==-(1)))", 1, 2500, 0);
+	trans[0][95]	= settr(94,2,131,1,0,"goto :b3", 1, 2500, 0);
+	trans[0][120]	= settr(119,2,121,1,0,".(goto)", 1, 2500, 0);
+	trans[0][96]	= settr(95,2,121,237,237,"((transition_id==0))", 1, 2500, 0); /* m: 97 -> 121,0 */
+	reached0[97] = 1;
+	trans[0][97]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[0][98]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 1",0,0,0);
+	trans[0][99]	= settr(98,2,121,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[0][100]	= settr(99,2,109,238,238,"((transition_id==1))", 1, 2500, 0);
+	T = trans[0][109] = settr(108,2,0,0,0,"IF", 1, 2500, 0);
+	T = T->nxt	= settr(108,2,101,0,0,"IF", 1, 2500, 0);
+	    T->nxt	= settr(108,2,105,0,0,"IF", 1, 2500, 0);
+	trans[0][101]	= settr(100,2,121,239,239,"(((observerdemo_0_y==global_state.observerdemo.reference)==0))", 1, 2500, 0); /* m: 102 -> 121,0 */
+	reached0[102] = 1;
+	trans[0][102]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[0][103]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 2",0,0,0);
+	trans[0][104]	= settr(103,2,121,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[0][110]	= settr(109,2,121,1,0,".(goto)", 1, 2500, 0);
+	trans[0][105]	= settr(104,2,121,240,240,"(((observerdemo_0_y==global_state.observerdemo.reference)==1))", 1, 2500, 0); /* m: 106 -> 121,0 */
+	reached0[106] = 1;
+	trans[0][106]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[0][107]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 1",0,0,0);
+	trans[0][108]	= settr(107,2,121,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[0][111]	= settr(110,2,115,241,241,"((transition_id==2))", 1, 2500, 0);
+	T = trans[ 0][115] = settr(114,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(114,0,112,0,0,"sub-sequence", 1, 2500, 0);
+	trans[0][112]	= settr(111,2,114,242,242,"global_state.observerdemo.reference = observerdemo_0_x", 1, 2500, 0);
+	T = trans[ 0][114] = settr(113,0,0,0,0,"sub-sequence", 1, 2500, 0);
+	T->nxt	= settr(113,0,113,0,0,"sub-sequence", 1, 2500, 0);
+	trans[0][113]	= settr(112,2,121,243,243,"assert(((global_state.observerdemo.reference>=0)&&(global_state.observerdemo.reference<=1000000)))", 1, 2500, 0); /* m: 116 -> 0,121 */
+	reached0[116] = 1;
+	trans[0][116]	= settr(0,0,0,0,0,"transition_id = -(1)",0,0,0);
+	trans[0][117]	= settr(0,0,0,0,0,"global_state.observerdemo.state = 0",0,0,0);
+	trans[0][118]	= settr(117,2,121,1,0,"goto continuous_signals", 1, 2500, 0);
+	trans[0][121]	= settr(120,2,122,1,0,"(1)", 1, 2500, 0);
+	trans[0][124]	= settr(123,2,131,1,0,"break", 1, 2500, 0);
+	trans[0][129]	= settr(128,2,131,1,0,".(goto)", 1, 2500, 0);
+	trans[0][126]	= settr(125,2,127,2,0,"else", 1, 2500, 0);
+	trans[0][127]	= settr(126,2,131,1,0,"(1)", 1, 2500, 0);
+	trans[0][131]	= settr(130,2,135,244,244,"Observerdemo_lock!1", 1, 2500, 0);
+	trans[0][132]	= settr(131,2,135,1,0,"goto Actuator_ctrl_loop", 1, 2500, 0);
+	trans[0][136]	= settr(135,2,137,1,0,".(goto)", 1, 2500, 0);
+	trans[0][133]	= settr(132,2,134,245,0,"(empty(Actuator_ctrl_channel))", 1, 2500, 0);
+	trans[0][134]	= settr(133,2,137,246,246,"(1)", 1, 2500, 0); /* m: 136 -> 137,0 */
+	reached0[136] = 1;
+	trans[0][137]	= settr(136,0,139,247,247,"Actuator_lock!1", 1, 2500, 0);
+	trans[0][141]	= settr(140,0,142,1,0,"break", 0, 2, 0);
+	trans[0][142]	= settr(141,0,0,248,248,"-end-", 0, 3500, 0);
 	/* np_ demon: */
 	trans[_NP_] = (Trans **) emalloc(3*sizeof(Trans *));
 	T = trans[_NP_][0] = settr(9997,0,1,_T5,0,"(np_)", 1,2,0);

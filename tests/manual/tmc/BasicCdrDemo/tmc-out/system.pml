@@ -1,10 +1,12 @@
 #include "dataview.pml"
 #include "actuator.pml"
 #include "modemanager.pml"
+#include "Observerdemo.pml"
 #include "env_inlines.pml"
 typedef system_state {
-    Modemanager_Context modemanager;
+    Observerdemo_Context observerdemo;
     Actuator_Context actuator;
+    Modemanager_Context modemanager;
     AggregateTimerData timers;
 }
 
@@ -25,8 +27,9 @@ chan Modemanager_tc_channel = [1] of {T_Config};
 T_Config Modemanager_tc_signal_parameter;
 bool Modemanager_tc_channel_used = 0;
 system_state global_state;
-chan Actuator_lock = [1] of {int};
 chan Modemanager_lock = [1] of {int};
+chan Actuator_lock = [1] of {int};
+chan Observerdemo_lock = [1] of {int};
 inline Modemanager_0_RI_0_ctrl(Actuator_ctrl_x)
 {
     Actuator_ctrl_channel!Actuator_ctrl_x;
@@ -80,6 +83,9 @@ Actuator_ctrl_loop:
             Actuator_ctrl_channel?Actuator_ctrl_signal_parameter;
             Actuator_ctrl_channel_used = 1;
             Actuator_0_PI_0_ctrl(Actuator_ctrl_signal_parameter);
+            Observerdemo_lock?_;
+            Observerdemo_0_PI_0_ctrl_sig(Actuator_ctrl_signal_parameter);
+            Observerdemo_lock!1;
             goto Actuator_ctrl_loop;
         ::  empty(Actuator_ctrl_channel);
             skip;
@@ -132,6 +138,9 @@ Modemanager_feedback_loop:
             Modemanager_feedback_channel?Modemanager_feedback_signal_parameter;
             Modemanager_feedback_channel_used = 1;
             Modemanager_0_PI_0_feedback(Modemanager_feedback_signal_parameter);
+            Observerdemo_lock?_;
+            Observerdemo_0_PI_0_feedback_sig(Modemanager_feedback_signal_parameter);
+            Observerdemo_lock!1;
             goto Modemanager_feedback_loop;
         ::  empty(Modemanager_feedback_channel);
             skip;
@@ -199,10 +208,12 @@ init
 {
     atomic {
         global_dataview_init();
-        Actuator_0_init();
-        Actuator_lock!1;
         Modemanager_0_init();
         Modemanager_lock!1;
+        Actuator_0_init();
+        Actuator_lock!1;
+        Observerdemo_0_init();
+        Observerdemo_lock!1;
         inited = 1;
     }
 }

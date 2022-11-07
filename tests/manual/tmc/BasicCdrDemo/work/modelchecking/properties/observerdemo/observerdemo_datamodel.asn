@@ -1,0 +1,35 @@
+Observerdemo-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   Actuator-States, Actuator-Context FROM Actuator-Datamodel
+   Modemanager-States, Modemanager-Context FROM Modemanager-Datamodel
+   T-Integer, T-Config, T-Report FROM BASICCDRDEMO-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview
+   Actuator-Event, Egse-Event, Modemanager-Event, Sensor-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
+   TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
+
+Observerdemo-States ::= ENUMERATED {checking, idle, incorrectvalue}
+
+Observerdemo-Context ::= SEQUENCE {
+   state Observerdemo-States,
+   init-done BOOLEAN,
+   sender PID,
+   reference T-Integer
+}
+
+Observerdemo-Actuator-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), ctrl-present(2)}
+Observerdemo-Actuator-Event-Msg-Out-Selection  ::= ENUMERATED {feedback-present(1)}
+Observerdemo-Actuator-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observerdemo-Sensor-Event-Msg-Out-Selection  ::= ENUMERATED {reading-present(1)}
+Observerdemo-Sensor-Event-Selection  ::= ENUMERATED {msg-out-present(1)}
+Observerdemo-Egse-Event-Msg-In-Selection  ::= ENUMERATED {tm-present(1)}
+Observerdemo-Egse-Event-Msg-Out-Selection  ::= ENUMERATED {tc-present(1)}
+Observerdemo-Egse-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observerdemo-Modemanager-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), feedback-present(2), reading-present(3), tc-present(4)}
+Observerdemo-Modemanager-Event-Msg-Out-Selection  ::= ENUMERATED {ctrl-present(1), tm-present(2)}
+Observerdemo-Modemanager-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observerdemo-Function-Event-Selection  ::= ENUMERATED {actuator-present(1), egse-present(2), modemanager-present(3), sensor-present(4)}
+Observerdemo-Observable-Event-Selection  ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
+END

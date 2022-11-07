@@ -9,9 +9,9 @@ never{
   system_inited: 
   do
   :: atomic {
-    (global_state.actuator.x > 5)->
-      printf("SCL violation: never actuator.x  > 5;\n");
-      assert((! (global_state.actuator.x > 5)));
+    (global_state.observerdemo.state == Observerdemo_States_incorrectvalue)->
+      printf("Observer entered errorstate: observerdemo\n");
+      assert((! (global_state.observerdemo.state == Observerdemo_States_incorrectvalue)));
     }
   ::else->
     goto system_inited;
