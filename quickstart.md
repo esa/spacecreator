@@ -101,11 +101,13 @@ will create a folder (~/project/spacecreatorenv6) containing (among other) the f
 Running the following command will build the SpaceCreator plugin:
 ```commandline
 ~/project/spacecreator$ python3 ./scripts/build_spacecreator.py
---build_dir $HOME/project/spacecreator_build
---build_type Release
---env_dir $HOME/project/spacecreatorenv6
+--project_dir $HOME/project/
+--app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
+--env_dir $HOME/project/spacecreatorenv6 
+--build_dir $HOME/project/spacecreator_build 
+--build_type Release 
+--no_build_asn1plugin
 ```
-
 
 This will build the plugin in `$HOME/project/spacecreator_build` which is outside the source tree
 
@@ -155,7 +157,7 @@ We need to have QtCreator run the postbuild.py script after the build stop, so w
 `python3` and the arguments are:
 
 `%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=/home/taste/project/spacecreatorenv6/spacecreator.AppDir`
-
+%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=$HOME/project/spacecreatorenv6/spacecreator.AppDir
 This will call the correct **postbuild.py** script and tell it where the plugins were build and where to put them.<br>
 The variables `%{ActiveProject:Path}` and `%{buildDir}` are substituted by QtCreator.
 
