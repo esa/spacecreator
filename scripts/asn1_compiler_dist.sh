@@ -4,7 +4,7 @@
 DIST_DIR=$1
 if [[ -d "$DIST_DIR" ]]
 then
-    exit 0
+    exit 0 # Gitlab caches DIST_DIR so no need to do all this again
 fi
 
 echo "Installing ASN.1 in $DIST_DIR"
