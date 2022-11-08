@@ -1159,30 +1159,38 @@ auto StateMachineTranslator::handleParameterActivityMapGetActivity(Context &cont
         throw TranslationException("Get activity is required for parameter activity map");
     }
 
-    const auto &providedInterfaceData = map.provided();
-    const auto &providedInterfaceName = providedInterfaceData.interface().value();
-    const auto &providedInterfaceParameterName = providedInterfaceData.parameter().value();
+    const auto &firstInterfaceData = map.provided();
+    const auto &firstInterfaceName = firstInterfaceData.interface().value();
+    const auto &firstParameterName = firstInterfaceData.parameter().value();
 
+    // Check if provided getter interface for this parameter exists (parameter is sync)
     const auto providedParameterInterfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
-            providedInterfaceName, providedInterfaceParameterName,
-            InterfaceTranslatorHelper::InterfaceParameterType::Getter, ivm::IVInterface::InterfaceType::Provided);
+            firstInterfaceName, firstParameterName, InterfaceTranslatorHelper::InterfaceParameterType::Getter,
+            ivm::IVInterface::InterfaceType::Provided);
     auto providedParameterInterface = getInterfaceByName(context.ivFunction(), providedParameterInterfaceName);
 
-    if (providedParameterInterface == nullptr) {
-        auto errorMessage = QString("Unable to find provided interface '%1' used in parameter activity map")
-                                    .arg(providedParameterInterfaceName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    if (providedParameterInterface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
-        throw TranslationException("Parameter activity maps for async parameters are not supported");
-    } else {
-        const auto sedsTransitions = getTransitionsForParameter(sedsStateMachine, providedInterfaceName,
-                providedInterfaceParameterName, ::seds::model::ParameterOperation::Get);
+    if (providedParameterInterface != nullptr) {
+        const auto sedsTransitions = getTransitionsForParameter(
+                sedsStateMachine, firstInterfaceName, firstParameterName, ::seds::model::ParameterOperation::Get);
 
         auto procedure =
                 createParameterActivityGetSyncPi(context, providedParameterInterface, map, sedsTransitions, options);
         context.sdlProcess()->addProcedure(std::move(procedure));
+
+        // Parameter can't be required if it's provided, so early return here
+        return;
+    }
+
+    // Check if required getter interface for this parameter exists (parameter is async)
+    const auto requiredParameterInterfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
+            firstInterfaceName, firstParameterName, InterfaceTranslatorHelper::InterfaceParameterType::Getter,
+            ivm::IVInterface::InterfaceType::Required);
+    auto requiredParameterInterface = getInterfaceByName(context.ivFunction(), requiredParameterInterfaceName);
+
+    if (requiredParameterInterface != nullptr) {
+        auto errorMessage = QString("Parameter activity map for async parameters ('%1') are not implemented yet")
+                                    .arg(requiredParameterInterfaceName);
+        throw TranslationException(std::move(errorMessage));
     }
 }
 
@@ -1195,30 +1203,38 @@ auto StateMachineTranslator::handleParameterActivityMapSetActivity(Context &cont
         return;
     }
 
-    const auto &providedInterfaceData = map.provided();
-    const auto &providedInterfaceName = providedInterfaceData.interface().value();
-    const auto &providedInterfaceParameterName = providedInterfaceData.parameter().value();
+    const auto &firstInterfaceData = map.provided();
+    const auto &firstInterfaceName = firstInterfaceData.interface().value();
+    const auto &firstParameterName = firstInterfaceData.parameter().value();
 
+    // Check if provided setter interface for this parameter exists (parameter is sync)
     const auto providedParameterInterfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
-            providedInterfaceName, providedInterfaceParameterName,
-            InterfaceTranslatorHelper::InterfaceParameterType::Setter, ivm::IVInterface::InterfaceType::Provided);
+            firstInterfaceName, firstParameterName, InterfaceTranslatorHelper::InterfaceParameterType::Setter,
+            ivm::IVInterface::InterfaceType::Provided);
     auto providedParameterInterface = getInterfaceByName(context.ivFunction(), providedParameterInterfaceName);
 
-    if (providedParameterInterface == nullptr) {
-        auto errorMessage = QString("Unable to find provided interface '%1' used in parameter activity map")
-                                    .arg(providedParameterInterfaceName);
-        throw TranslationException(std::move(errorMessage));
-    }
-
-    if (providedParameterInterface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
-        throw TranslationException("Parameter activity maps for async parameters are not supported");
-    } else {
-        const auto sedsTransitions = getTransitionsForParameter(sedsStateMachine, providedInterfaceName,
-                providedInterfaceParameterName, ::seds::model::ParameterOperation::Set);
+    if (providedParameterInterface != nullptr) {
+        const auto sedsTransitions = getTransitionsForParameter(
+                sedsStateMachine, firstInterfaceName, firstParameterName, ::seds::model::ParameterOperation::Set);
 
         auto procedure =
                 createParameterActivitySetSyncPi(context, providedParameterInterface, map, sedsTransitions, options);
         context.sdlProcess()->addProcedure(std::move(procedure));
+
+        // Parameter can't be required if it's provided, so early return here
+        return;
+    }
+
+    // Check if required setter interface for this parameter exists (parameter is async)
+    const auto requiredParameterInterfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
+            firstInterfaceName, firstParameterName, InterfaceTranslatorHelper::InterfaceParameterType::Setter,
+            ivm::IVInterface::InterfaceType::Required);
+    auto requiredParameterInterface = getInterfaceByName(context.ivFunction(), requiredParameterInterfaceName);
+
+    if (requiredParameterInterface != nullptr) {
+        auto errorMessage = QString("Parameter activity map for async parameters ('%1') are not implemented yet")
+                                    .arg(requiredParameterInterfaceName);
+        throw TranslationException(std::move(errorMessage));
     }
 }
 
