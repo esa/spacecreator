@@ -86,14 +86,16 @@ void Asn1ItemModel::setAsn1Model(const std::unique_ptr<Asn1Acn::TypeAssignment> 
  * \param asn1Item The map with the items
  * \return The created item map
  */
-Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Type *asn1Item, const QString &name)
+Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Type *asn1Item, const QString &name, QStandardItem *nameItem)
 {
     ItemMap itemMap;
     QString typeLimit;
     QStandardItem *valueItem = nullptr;
 
-    QStandardItem *nameItem = new QStandardItem(name.isEmpty() ? asn1Item->identifier() : name);
-    nameItem->setEditable(false);
+    if (!nameItem) {
+        nameItem = new QStandardItem(name.isEmpty() ? asn1Item->identifier() : name);
+        nameItem->setEditable(false);
+    }
 
     switch (asn1Item->typeEnum()) {
     case Asn1Acn::Types::Type::INTEGER: {
@@ -160,7 +162,7 @@ Asn1ItemModel::ItemMap Asn1ItemModel::createModelItems(const Asn1Acn::Types::Typ
     case Asn1Acn::Types::Type::USERDEFINED: {
         auto userType = static_cast<const Asn1Acn::Types::UserdefinedType *>(asn1Item);
         if (userType->type()) {
-            return createModelItems(userType->type(), asn1Item->identifier());
+            return createModelItems(userType->type(), nameItem->text(), nameItem);
         }
         break;
     }

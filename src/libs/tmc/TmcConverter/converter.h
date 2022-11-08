@@ -262,9 +262,9 @@ private:
     void convertNextMscObserver();
     void convertNextObserver();
     void attachNextObserver();
-    void finishConversion();
 
 private Q_SLOTS:
+    void finishConversion();
     void processStderrReady();
     void processStdoutReady();
     void processStarted();
