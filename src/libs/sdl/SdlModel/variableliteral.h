@@ -71,6 +71,10 @@ public:
      */
     auto setValue(QString value) -> void;
 
+public:
+    friend auto operator==(const VariableLiteral &lhs, const VariableLiteral &rhs) -> bool;
+    friend auto operator!=(const VariableLiteral &lhs, const VariableLiteral &rhs) -> bool;
+
 private:
     QString m_value;
 };

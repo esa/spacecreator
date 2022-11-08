@@ -21,12 +21,15 @@
 
 #include "interfacetranslatorhelper.h"
 
+#include <conversion/asn1/SedsToAsn1Translator/constants.h>
 #include <conversion/asn1/SedsToAsn1Translator/datatypetranslationhelper.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
+#include <seds/SedsOptions/options.h>
 #include <shared/parameter.h>
 
 using conversion::asn1::translator::seds::DataTypeTranslationHelper;
+using conversion::seds::SedsOptions;
 using conversion::translator::TranslationException;
 
 namespace conversion::iv::translator::seds {
@@ -102,6 +105,20 @@ void SyncInterfaceCommandTranslator::translateArguments(
             throw UnsupportedValueException("CommandArgumentMode", "Notify");
             break;
         }
+    }
+
+    if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+        if (!m_options.isSet(SedsOptions::failureReportingType)) {
+            throw TranslationException(
+                    "SEDS failure reporting feature was used but no ASN.1 type for failure parameter was specified");
+        }
+
+        const auto &failureParamName = asn1::translator::seds::Constants::failureParamName;
+        const auto failureParamTypeName = m_options.value(SedsOptions::failureReportingType).value();
+
+        const auto failureParam = InterfaceTranslatorHelper::createInterfaceParameter(
+                failureParamName, failureParamTypeName, shared::InterfaceParameter::Direction::OUT);
+        ivInterface->addParam(failureParam);
     }
 }
 

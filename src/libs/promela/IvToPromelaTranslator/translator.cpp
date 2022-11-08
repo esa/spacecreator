@@ -712,27 +712,35 @@ void IvToPromelaTranslator::generateEnvironmentProctype(Context &context, const 
 
     loopSequence->appendElement(InlineCall(sendInline, sendInlineArguments));
 
-    int limit = 0;
-    if (interfaceInputVectorLenghtLimit.has_value()) {
-        limit = interfaceInputVectorLenghtLimit->toInt();
-    } else if (globalInputVectorLengthLimit.has_value()) {
-        limit = globalInputVectorLengthLimit->toInt();
-    }
+    // clang-format off
+    auto limit = [&]() -> std::optional<int> {
+        if (interfaceInputVectorLenghtLimit.has_value()) {
+            return interfaceInputVectorLenghtLimit->toInt();
+        } else if (globalInputVectorLengthLimit.has_value()) {
+            return globalInputVectorLengthLimit->toInt();
+        } else {
+            return std::nullopt;
+        }
+    }();
+    // clang-format on
 
-    if (limit == 0) {
+    if (limit.has_value()) {
+        // If limit was set to 0, then we don't generate the loop at all
+        if (*limit != 0) {
+            Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
+            sequence.appendElement(std::move(iteratorVariable));
+
+            VariableRef iteratorVariableRef("inputVectorCounter");
+            Expression firstExpression(0);
+            Expression lastExpression(*limit - 1);
+
+            ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
+
+            sequence.appendElement(std::move(loop));
+        }
+    } else {
         DoLoop loop;
         loop.appendSequence(std::move(loopSequence));
-
-        sequence.appendElement(std::move(loop));
-    } else {
-        Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
-        sequence.appendElement(std::move(iteratorVariable));
-
-        VariableRef iteratorVariableRef("inputVectorCounter");
-        Expression firstExpression(0);
-        Expression lastExpression(limit - 1);
-
-        ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
 
         sequence.appendElement(std::move(loop));
     }
@@ -939,7 +947,7 @@ void IvToPromelaTranslator::createCheckQueueInline(
         PromelaSystemModel *promelaModel, const QString &functionName, const QList<QString> &channelNames) const
 {
     if (channelNames.empty()) {
-        auto message = QString("No sporadic nor cyclic interfaces in function %1").arg(functionName);
+        auto message = QString("No sporadic interfaces in function %1").arg(functionName);
         throw TranslationException(message);
     }
 
@@ -1554,15 +1562,13 @@ void IvToPromelaTranslator::prepareFunctionInfo(Context &context, const ::ivm::I
         const QString &functionName, FunctionInfo &functionInfo) const
 {
     for (const IVInterface *providedInterface : ivFunction->pis()) {
-        if (providedInterface->kind() == IVInterface::OperationKind::Cyclic
-                || providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
+        if (providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
             std::unique_ptr<ProctypeInfo> proctypeInfo = prepareProctypeInfo(context, providedInterface, functionName);
             const QString proctypeName = proctypeInfo->m_proctypeName;
             functionInfo.m_proctypes.emplace(proctypeName, std::move(proctypeInfo));
         } else {
-            auto message =
-                    QString("Unallowed interface kind in function %1, only sporadic and cyclic interfaces are allowed")
-                            .arg(functionName);
+            auto message = QString("Unallowed interface kind in function %1, only sporadic interfaces are allowed")
+                                   .arg(functionName);
             throw TranslationException(message);
         }
     }
@@ -1644,7 +1650,7 @@ std::unique_ptr<IvToPromelaTranslator::ProctypeInfo> IvToPromelaTranslator::prep
 
     const size_t priority = getInterfacePriority(providedInterface) + context.getBaseProctypePriority();
     const size_t queueSize = getInterfaceQueueSize(providedInterface);
-    const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
+    const auto [parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
     const ObserverAttachments outputObservers =
             context.getObserverAttachments(functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);

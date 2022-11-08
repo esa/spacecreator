@@ -1,0 +1,96 @@
+/* CIF Process (0, 0), (800, 100) */
+process Client;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl Resultvar Number;
+    dcl sedsFailureReportingVariable CoolBool;
+    dcl sedsFailureReportingReturnVariable CoolBool;
+    dcl Clk_Tick_Pi_transactionName CString;
+    /* CIF ENDTEXT */
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure PleaseDivide;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Xvaluearg Number,
+            in Yvaluearg Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task sedsFailureReportingVariable := false;
+            /* CIF ProcedureCall (0, 1012), (100, 50) */
+            call CalculatorInterface_DivideCommand_Ri(Xvaluearg, Yvaluearg, Resultvar, sedsFailureReportingVariable, "Command");
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 975), (800, 50) */
+    procedure PleaseSet;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in Valuearg Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task sedsFailureReportingVariable := false;
+            /* CIF ProcedureCall (0, 1012), (100, 50) */
+            call Set_CalculatorInterface_CoolParam_Ri(Valuearg, sedsFailureReportingVariable, "Param");
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 1050), (800, 50) */
+    procedure Clk_Tick_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        fpar
+            in/out Sedsfailure CoolBool,
+            in sedsTransactionName CString;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Clk_Tick_Pi_transactionName := sedsTransactionName;
+            /* CIF Decision (0, 937), (400, 50) */
+            decision sedsTransactionName;
+                /* CIF Answer (0, 1012), (400, 50) */
+                ("Good"):
+                    /* CIF ProcedureCall (0, 1087), (100, 50) */
+                    call PleaseDivide(42, 2);
+                /* CIF Answer (600, 1012), (400, 50) */
+                ("Bad"):
+                    /* CIF ProcedureCall (600, 1087), (100, 50) */
+                    call PleaseDivide(314, 0);
+                /* CIF Answer (1200, 1012), (400, 50) */
+                ("GoodParam"):
+                    /* CIF ProcedureCall (1200, 1087), (100, 50) */
+                    call PleaseSet(314);
+                /* CIF Answer (1800, 1012), (400, 50) */
+                ELSE:
+            enddecision;
+    return;
+    endprocedure;
+    /* CIF Start (0, 1125), (200, 75) */
+    START;
+        /* CIF NextState (0, 1312), (200, 50) */
+        NEXTSTATE s1;
+    /* CIF State (0, 1387), (200, 50) */
+    state s1;
+        /* CIF Input (0, 1387), (200, 50) */
+        input Clk_Tick_Pi;
+            /* CIF Decision (0, 1387), (400, 50) */
+            decision Clk_Tick_Pi_transactionName;
+                /* CIF Answer (0, 1462), (400, 50) */
+                ("Good"):
+                    /* CIF NextState (0, 1537), (200, 50) */
+                    NEXTSTATE s1;
+                /* CIF Answer (3000, 1462), (400, 50) */
+                ("Bad"):
+                    /* CIF NextState (3000, 1537), (200, 50) */
+                    NEXTSTATE s1;
+                /* CIF Answer (3600, 1462), (400, 50) */
+                ("GoodParam"):
+                    /* CIF NextState (3600, 1537), (200, 50) */
+                    NEXTSTATE s1;
+                /* CIF Answer (4200, 1462), (400, 50) */
+                ELSE:
+                    /* CIF NextState (4200, 1537), (200, 50) */
+                    NEXTSTATE -;
+            enddecision;
+    endstate;
+endprocess Client;

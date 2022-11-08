@@ -158,6 +158,15 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     connect(m_sdlToPromelaConverter, SIGNAL(message(QString)), this, SIGNAL(message(QString)));
 }
 
+TmcConverter::~TmcConverter()
+{
+    m_timer->stop();
+    if (m_process->state() != QProcess::ProcessState::NotRunning) {
+        m_process->kill();
+        m_process->waitForFinished();
+    }
+}
+
 bool TmcConverter::prepare()
 {
     m_numberOfProctypes = 0;
@@ -398,14 +407,8 @@ bool TmcConverter::convertTrace(const QString &inputFile, const QString &outputF
         options.add(Asn1Options::inputFilepath, inputFileName);
     }
 
-    if (!convertModel({ ModelType::SpinTrail, ModelType::InterfaceView, ModelType::Asn1 }, ModelType::SimulatorTrail,
-                {}, std::move(options))) {
-        Q_EMIT(conversionFinished(false));
-    } else {
-        Q_EMIT(conversionFinished(true));
-    }
-
-    return true;
+    return convertModel({ ModelType::SpinTrail, ModelType::InterfaceView, ModelType::Asn1 }, ModelType::SimulatorTrail,
+            {}, std::move(options));
 }
 
 size_t TmcConverter::getNumberOfProctypes() const
@@ -613,7 +616,6 @@ bool TmcConverter::convertMscObservers(const QString &ivFilePath)
 
         if (!convertModel({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, {},
                     std::move(options))) {
-            Q_EMIT message(QString("Unable to translate MSC file %1 to SDL observer\n").arg(mscFilePath));
             return false;
         }
 
@@ -777,23 +779,7 @@ bool TmcConverter::createEnvGenerationInlines(const QFileInfo &inputDataView, co
         options.add(PromelaOptions::asn1ValueGenerationForType, datatype);
     }
 
-    try {
-        return convertModel(
-                { ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, {}, std::move(options));
-    } catch (const ImportException &ex) {
-        const auto errorMessage = QString("Import failure: %1\n").arg(ex.errorMessage());
-        Q_EMIT message(errorMessage);
-    } catch (const TranslationException &ex) {
-        const auto errorMessage = QString("Translation failure: %1\n").arg(ex.errorMessage());
-        Q_EMIT message(errorMessage);
-    } catch (const ExportException &ex) {
-        const auto errorMessage = QString("Export failure: %1\n").arg(ex.errorMessage());
-        Q_EMIT message(errorMessage);
-    } catch (const ConversionException &ex) {
-        const auto errorMessage = QString("Conversion failure: %1\n").arg(ex.errorMessage());
-        Q_EMIT message(errorMessage);
-    }
-    return false;
+    return convertModel({ ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, {}, std::move(options));
 }
 
 QFileInfo TmcConverter::workDirectory() const
@@ -905,8 +891,6 @@ void TmcConverter::convertNextMscObserver()
 
     if (!convertModel({ ModelType::Msc, ModelType::Asn1, ModelType::InterfaceView }, ModelType::Sdl, {},
                 std::move(options))) {
-        Q_EMIT message(QString("Unable to translate MSC file %1 to SDL observer\n").arg(mscFilePath));
-        Q_EMIT conversionFinished(false);
         return;
     }
 
@@ -925,7 +909,7 @@ void TmcConverter::convertNextMscObserver()
 void TmcConverter::convertNextObserver()
 {
     if (m_observersToConvert.empty()) {
-        finishConversion();
+        QTimer::singleShot(0, this, SLOT(finishConversion()));
         return;
     }
     const ObserverInfo info = m_observersToConvert.front();
@@ -964,14 +948,20 @@ void TmcConverter::finishConversion()
     const QFileInfo simuDataView = simuDataViewLocation();
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
-    convertDataview(m_asn1Files, m_outputOptimizedIvFileName, outputDataview.absoluteFilePath());
+    if (!convertDataview(m_asn1Files, m_outputOptimizedIvFileName, outputDataview.absoluteFilePath())) {
+        return;
+    }
 
     const QFileInfo outputEnv = outputFilepath("env_inlines.pml");
-    createEnvGenerationInlines(simuDataView, m_outputOptimizedIvFileName, outputEnv, m_environmentDatatypes);
+    if (!createEnvGenerationInlines(simuDataView, m_outputOptimizedIvFileName, outputEnv, m_environmentDatatypes)) {
+        return;
+    }
 
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
-    convertInterfaceview(m_outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), m_asn1Files,
-            m_modelFunctions, m_finalEnvironmentFunctions);
+    if (!convertInterfaceview(m_outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), m_asn1Files,
+                m_modelFunctions, m_finalEnvironmentFunctions)) {
+        return;
+    }
 
     convertStopConditions(m_allSdlFiles);
 }

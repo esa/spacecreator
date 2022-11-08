@@ -67,13 +67,6 @@ TmcExecutor::TmcExecutor(QObject *parent)
 {
 }
 
-TmcExecutor::~TmcExecutor()
-{
-    if (m_verifier != nullptr) {
-        delete m_verifier;
-    }
-}
-
 void TmcExecutor::execute()
 {
     std::optional<QString> inputIvFilepath;
@@ -292,10 +285,10 @@ void TmcExecutor::execute()
         return;
     }
 
-    m_verifier = new TmcVerifier(inputIvFilepath.value(), outputDirectory.value());
+    m_verifier = std::make_unique<TmcVerifier>(inputIvFilepath.value(), outputDirectory.value());
 
-    connect(m_verifier, SIGNAL(finished(bool)), this, SLOT(finished(bool)));
-    connect(m_verifier, SIGNAL(verifierMessage(QString)), this, SLOT(verifierMessage(QString)));
+    connect(m_verifier.get(), SIGNAL(finished(bool)), this, SLOT(finished(bool)));
+    connect(m_verifier.get(), SIGNAL(verifierMessage(QString)), this, SLOT(verifierMessage(QString)));
 
     m_verifier->setMscObserverFiles(mscObserverFiles);
     m_verifier->setEnvironmentFunctions(environmentFunctions);

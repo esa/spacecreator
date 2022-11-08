@@ -21,6 +21,9 @@
 
 #include <QSharedPointer>
 #include <QString>
+#include <reporting/Report/observerfailurereport.h>
+#include <reporting/Report/rawerroritem.h>
+#include <reporting/Report/spinerrorparser.h>
 #include <reporting/Report/spinerrorreportitem.h>
 #include <reporting/Report/stopconditionviolationreport.h>
 
@@ -43,25 +46,19 @@ public:
     HtmlReportBuilder();
 
     /**
-     * @brief   Parse and build report using a default template file embedded into the library
+     * @brief   Builds HTML report from multiple string lists and a default template
      *
      * @param   spinMessages     Spin command outputs
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     */
-    QString parseAndBuildHtmlReport(
-            const QStringList &spinMessages, const QStringList &spinTraces, const QStringList &sclConditions) const;
-
-    /**
-     * @brief   Parse and build report using a default template file embedded into the library
+     * @param   sclFiles         SCL condition files
+     * @param   errors           Raw error data
+     * @param   observerNames    Observer names
+     * @param   template         HTML template file, uses default if empty
      *
-     * @param   spinMessages     Spin command outputs
-     * @param   spinTraces       Spin traces
-     * @param   sclConditions    SCL file conditions
-     * @param   templateFile         Path to the HTML template file
+     * @return  HTML-formatted error report string
      */
-    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &spinTraces,
-            const QStringList &sclConditions, const QString &templateFile) const;
+    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &sclFiles,
+            const QList<RawErrorItem> &errors, const QStringList &observerNames,
+            const QString &templateFile = QString()) const;
 
     /**
      * @brief   Build spin error report using a default template file embedded into the library
@@ -90,14 +87,18 @@ private:
 
     static const QString m_defaultTemplateFile;
     static const QHash<reporting::SpinErrorReportItem::ErrorType, QString> m_errorTypeNames;
+    static const QHash<reporting::StopConditionViolationReport::ViolationClause, QString>
+            m_stopConditionViolationClauseNames;
     static const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
             m_stopConditionViolationTypeNames;
+    static const QHash<reporting::ObserverFailureReport::ObserverState, QString> m_observerFailureObserverStateNames;
 
     static QVariantList buildReportVariant(const SpinErrorReport &spinErrorReport);
     static QVariantHash buildReportItemVariant(const SpinErrorReportItem &spinErrorReportItem);
 
     static QVariantHash buildDataConstraintViolationVariant(const QVariant &errorDetails);
     static QVariantHash buildStopConditionViolationVariant(const QVariant &errorDetails);
+    static QVariantHash buildObserverFailureVariant(const QVariant &errorDetails);
 };
 
 }

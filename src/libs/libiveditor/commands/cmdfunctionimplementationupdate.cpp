@@ -107,15 +107,17 @@ void CmdFunctionImplementationUpdate::updateSymLink(
     } else if (oldFileInfo.exists()) {
         const QString destPath = currentImplPath + shared::kNonCurrentImplementationPath + QDir::separator()
                 + oldValue.name() + QDir::separator() + oldValue.value().toString();
-        shared::copyDir(oldFileInfo.absoluteFilePath(), destPath, shared::FileCopyingMode::Overwrite);
-        QDir(oldFileInfo.absoluteFilePath()).removeRecursively();
+        if (!shared::moveDir(oldFileInfo.absoluteFilePath(), destPath, shared::FileCopyingMode::Overwrite)) {
+            /// TODO: ROLLBACK
+        }
     }
     const QFileInfo newFileInfo(currentImplPath + newValue.value().toString());
     const QString destPath = currentImplPath + shared::kNonCurrentImplementationPath + QDir::separator()
             + newValue.name() + QDir::separator() + newValue.value().toString();
     if (newFileInfo.exists() && newFileInfo.isDir()) {
-        shared::copyDir(newFileInfo.absoluteFilePath(), destPath, shared::FileCopyingMode::Overwrite);
-        QDir(newFileInfo.absoluteFilePath()).removeRecursively();
+        if (!shared::moveDir(newFileInfo.absoluteFilePath(), destPath, shared::FileCopyingMode::Overwrite)) {
+            /// TODO: ROLLBACK
+        }
     }
     if (isDefault) {
         shared::ensureDirExists(destPath);

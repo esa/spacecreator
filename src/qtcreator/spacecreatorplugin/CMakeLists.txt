@@ -53,6 +53,11 @@ set(SC_PLUGIN_SOURCES
     options/propertyoptions.h
     options/ivlibraryoption.cpp
     options/ivlibraryoption.h
+    options/tmcoptionswidget.ui
+    options/tmcoptionswidget.h
+    options/tmcoptionswidget.cpp
+    options/tmcoptions.h
+    options/tmcoptions.cpp
     qtcreatorutils.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h

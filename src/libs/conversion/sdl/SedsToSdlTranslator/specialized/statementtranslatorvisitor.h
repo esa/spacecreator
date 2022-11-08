@@ -278,15 +278,14 @@ private:
     static auto translatePolynomial(const QString variable, const seds::model::Polynomial &polynomial) -> QString;
 
     static auto translateCall(::sdl::Process *hostProcess, const QString callName,
-            const seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface, const Options &options)
-            -> std::unique_ptr<::sdl::ProcedureCall>;
+            const seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>;
 
     static auto translateCall(::sdl::Process *hostProcess, const QString callName,
-            const seds::model::SendParameterPrimitive &sendParameter, ivm::IVInterface *ivInterface,
-            const Options &options) -> std::unique_ptr<::sdl::ProcedureCall>;
+            const seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>;
 
     static auto translateOutput(const QString &callName, const seds::model::SendCommandPrimitive &sendCommand,
-            const Options &options) -> std::vector<std::unique_ptr<::sdl::Action>>;
+            const ivm::IVInterface *ivInterface, const bool isReturnCall, const Options &options)
+            -> std::vector<std::unique_ptr<::sdl::Action>>;
 
     static auto translateOutput(const QString &callName, const seds::model::SendParameterPrimitive &sendParameter)
             -> std::vector<std::unique_ptr<::sdl::Action>>;
@@ -320,8 +319,9 @@ private:
     static auto generateLoopEnd(
             ::sdl::Transition *transition, const seds::model::Iteration &iteration, ::sdl::Label *startLabel) -> void;
 
-    static auto handleTransaction(const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call,
-            ivm::IVInterface *ivInterface, const Options &options) -> void;
+    auto handleFailureReporting(::sdl::ProcedureCall *call) const -> void;
+    auto handleTransaction(const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call,
+            ivm::IVInterface *ivInterface) const -> void;
 
     friend class ExpressionTranslatorVisitor;
 };

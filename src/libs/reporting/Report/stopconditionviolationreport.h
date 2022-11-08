@@ -28,6 +28,16 @@ namespace reporting {
  * @brief   Contains parsed information from an error identified as a stop condition violation.
  */
 struct StopConditionViolationReport {
+    /// @brief  Violation clause
+    enum ViolationClause
+    {
+        Never = 0,
+        Always,
+        Eventually,
+        FilterOut,
+        UnknownClause
+    };
+
     /// @brief  Violation type
     enum ViolationType
     {
@@ -41,6 +51,8 @@ struct StopConditionViolationReport {
         UnknownType
     };
 
+    /** Violation clause */
+    ViolationClause violationClause;
     /** Violation type */
     ViolationType violationType;
 };

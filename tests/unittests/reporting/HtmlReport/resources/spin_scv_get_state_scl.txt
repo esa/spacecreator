@@ -1,1 +1,0 @@
-eventually get_state(actuator) = nested.second;

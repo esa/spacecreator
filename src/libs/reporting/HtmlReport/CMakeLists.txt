@@ -1,10 +1,14 @@
 project(HtmlReport VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
-    htmlreportbuilder.cpp)
+    htmlreportpresenter.cpp
+    htmlreportbuilder.cpp
+    tracebuilder.cpp)
 
 set(INCLUDES
-    htmlreportbuilder.h)
+    htmlreportpresenter.h
+    htmlreportbuilder.h
+    tracebuilder.h)
 
 set(RESOURCES
     htmlreportbuilder.qrc)

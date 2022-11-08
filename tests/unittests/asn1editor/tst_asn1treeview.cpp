@@ -39,6 +39,7 @@ private Q_SLOTS:
     void testSetSequenceWithStringValue();
     void testSetSequenceInSequenceValue();
     void testSetStringValue();
+    void testSetIncompleteSequenceOfValue();
 
 private:
     Asn1TreeView *m_treeView = nullptr;
@@ -171,6 +172,20 @@ void tst_Asn1TreeView::testSetStringValue()
     QVariantMap valueMap = m_valueParser.parseAsn1Value(stringType.get(), value);
     m_treeView->setAsn1Value(valueMap);
     QCOMPARE(m_treeView->getAsn1Value(), QString("\"TestString\""));
+}
+
+void tst_Asn1TreeView::testSetIncompleteSequenceOfValue()
+{
+    m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("dv.xml"));
+    m_definitions = m_types->definitions("DV");
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = m_definitions->types().at(2);
+    m_treeView->setAsn1Model(assignment);
+    const QString inputValue = "{f1  FALSE,}"; // this misses the "sequence of" items completely
+    QVariantMap valueMap = m_valueParser.parseAsn1Value(assignment.get(), inputValue);
+    QCOMPARE(valueMap.size(), 2);
+    m_treeView->setAsn1Value(valueMap);
+    const QString expectedValue = "{ f1  FALSE, f2  { FALSE, FALSE, FALSE } }"; // default items added
+    QCOMPARE(m_treeView->getAsn1Value(), expectedValue);
 }
 
 QTEST_MAIN(tst_Asn1TreeView)

@@ -1,0 +1,29 @@
+pan:1: acceptance cycle (at depth 71)
+pan: wrote system.pml.trail
+
+(Spin Version 6.4.9 -- 17 December 2018)
+Warning: Search not completed
+
+Full statespace search for:
+	never claim         	+ (never_0)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 352 byte, depth reached 295, errors: 1
+       16 states, stored
+        0 states, matched
+       16 transitions (= stored+matched)
+      264 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.006	equivalent memory usage for states (stored*(State-vector + overhead))
+    0.551	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+   61.035	memory used for DFS stack (-m1000000)
+  189.426	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds

@@ -652,21 +652,21 @@
         <string>SPIN model-checker</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="4" column="0" colspan="3">
+        <item row="6" column="0" colspan="3">
          <widget class="QLabel" name="label_spinExpAlgorithm">
           <property name="text">
            <string>Exploration mode:</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="3">
+        <item row="8" column="3">
          <widget class="QLineEdit" name="lineEdit_errorLimit">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
-        <item row="4" column="3" colspan="2">
+        <item row="6" column="3" colspan="2">
          <widget class="QComboBox" name="comboBox_spinExpAlgorithm">
           <item>
            <property name="text">
@@ -680,31 +680,21 @@
           </item>
          </widget>
         </item>
-        <item row="1" column="3" colspan="3">
-         <widget class="QCheckBox" name="checkBox_useFairScheduling">
-          <property name="text">
-           <string>Use fair scheduling</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="4">
+        <item row="5" column="0" colspan="4">
          <widget class="QLabel" name="label_timeLimit">
           <property name="text">
            <string>Time limit (sec) for exploration:</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="3">
+        <item row="5" column="3">
          <widget class="QLineEdit" name="lineEdit_spinTimeLimit">
           <property name="text">
-           <string></string>
+           <string/>
           </property>
          </widget>
         </item>
-        <item row="6" column="5">
+        <item row="8" column="5">
          <widget class="QLabel" name="label_optionalField">
           <property name="font">
            <font>
@@ -716,24 +706,14 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="checkBox_useBitHashing">
-          <property name="text">
-           <string>Use bit hashing</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="3">
+        <item row="7" column="3">
          <widget class="QLineEdit" name="lineEdit_searchStateLimit">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
-        <item row="2" column="5">
+        <item row="4" column="5">
          <widget class="QLabel" name="label_recommendedField2">
           <property name="font">
            <font>
@@ -745,34 +725,18 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="3">
+        <item row="4" column="3">
          <widget class="QLineEdit" name="lineEdit_numberOfCores">
           <property name="text">
-           <string></string>
+           <string/>
           </property>
           <property name="maxLength">
            <number>32767</number>
           </property>
          </widget>
         </item>
-        <item row="1" column="1" colspan="2">
-         <widget class="QCheckBox" name="checkBox_searchShortestPath">
-          <property name="text">
-           <string>Search shortest path</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0" colspan="6">
+        <item row="13" column="0" colspan="6">
          <widget class="QTableWidget" name="tableWidget_generationLimits">
-          <attribute name="headerMinimumSectionSize">
-           <number>400</number>
-          </attribute>
-          <attribute name="headerStretchLastSection">
-           <bool>true</bool>
-          </attribute>
           <column>
            <property name="text">
             <string>Interface</string>
@@ -785,7 +749,7 @@
           </column>
          </widget>
         </item>
-        <item row="11" column="0" colspan="6">
+        <item row="14" column="0" colspan="6">
          <widget class="QPushButton" name="tableAddButton">
           <property name="font">
            <font>
@@ -797,7 +761,7 @@
           </property>
          </widget>
         </item>
-        <item row="12" column="0" colspan="6">
+        <item row="15" column="0" colspan="6">
          <widget class="QPushButton" name="tableDeleteButton">
           <property name="font">
            <font>
@@ -809,14 +773,14 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="3">
+        <item row="4" column="0" colspan="3">
          <widget class="QLabel" name="label_numberOfCores">
           <property name="text">
            <string>Number of cores:</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="5">
+        <item row="5" column="5">
          <widget class="QLabel" name="label_recommendedField">
           <property name="font">
            <font>
@@ -828,79 +792,79 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="0" colspan="3">
+        <item row="7" column="0" colspan="3">
          <widget class="QLabel" name="label_searchStateLimit">
           <property name="text">
            <string>Search state limit:</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="0" colspan="3">
+        <item row="8" column="0" colspan="3">
          <widget class="QLabel" name="label_errorLimit">
           <property name="text">
            <string>Error limit:</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="0" colspan="3">
+        <item row="9" column="0" colspan="3">
          <widget class="QLabel" name="label_memoryLimit">
           <property name="text">
            <string>Memory limit [MB]:</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="0" colspan="3">
+        <item row="12" column="0" colspan="3">
          <widget class="QLabel" name="label_ifaceGenerationLimits">
           <property name="text">
            <string>Interface generation limits:</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="3">
+        <item row="9" column="3">
          <widget class="QLineEdit" name="lineEdit_memoryLimit">
           <property name="text">
-           <string></string>
+           <string/>
           </property>
           <property name="maxLength">
            <number>32767</number>
           </property>
          </widget>
         </item>
-        <item row="8" column="0" colspan="3">
+        <item row="10" column="0" colspan="3">
          <widget class="QLabel" name="label_generationLimit">
           <property name="text">
            <string>Global input vector generation limit:</string>
           </property>
          </widget>
         </item>
-        <item row="8" column="3">
+        <item row="10" column="3">
          <widget class="QLineEdit" name="lineEdit_generationLimit">
           <property name="text">
-           <string></string>
+           <string/>
           </property>
           <property name="maxLength">
            <number>32767</number>
           </property>
          </widget>
         </item>
-        <item row="13" column="0" colspan="3">
+        <item row="16" column="0" colspan="3">
          <widget class="QLabel" name="label_rawCommandLine">
           <property name="text">
            <string>Raw command line (for developers):</string>
           </property>
          </widget>
         </item>
-        <item row="13" column="3" colspan="3">
+        <item row="16" column="3" colspan="3">
          <widget class="QLineEdit" name="lineEdit_rawCommandLine">
           <property name="text">
-           <string></string>
+           <string/>
           </property>
           <property name="maxLength">
            <number>32767</number>
           </property>
          </widget>
         </item>
-        <item row="5" column="5">
+        <item row="7" column="5">
          <widget class="QLabel" name="label_optionalField2">
           <property name="font">
            <font>
@@ -912,7 +876,7 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="5">
+        <item row="9" column="5">
          <widget class="QLabel" name="label_optionalField3">
           <property name="font">
            <font>
@@ -924,7 +888,7 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="5">
+        <item row="10" column="5">
          <widget class="QLabel" name="label_optionalField4">
           <property name="font">
            <font>
@@ -949,7 +913,7 @@
           </property>
          </widget>
         </item>
-        <item row="14" column="0">
+        <item row="17" column="0">
          <widget class="QPushButton" name="pushButton_callSpin">
           <property name="font">
            <font>
@@ -959,6 +923,68 @@
           </property>
           <property name="text">
            <string>Call Spin</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="checkBox_useBitHashing">
+          <property name="text">
+           <string>Use bit hashing</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QCheckBox" name="checkBox_searchShortestPath">
+          <property name="text">
+           <string>Search shortest path</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QCheckBox" name="checkBox_useFairScheduling">
+          <property name="text">
+           <string>Use fair scheduling</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QCheckBox" name="checkBox_useReal">
+          <property name="text">
+           <string>Support ASN.1 REAL</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="3">
+         <widget class="QLineEdit" name="lineEdit_deltaValue"/>
+        </item>
+        <item row="11" column="5">
+         <widget class="QLabel" name="label_26">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>(optional field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0" colspan="3">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Delta value for ASN.1 REAL value generation:</string>
           </property>
          </widget>
         </item>

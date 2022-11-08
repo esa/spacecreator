@@ -31,6 +31,7 @@ private Q_SLOTS:
     void test_bool();
     void test_integer();
     void test_real();
+    void test_real_constraints();
     void test_octet();
     void test_ia5string();
     void test_enum();
@@ -54,6 +55,12 @@ void tst_Tmc_Types::test_integer()
 void tst_Tmc_Types::test_real()
 {
     const int result = system("./test_real.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Types::test_real_constraints()
+{
+    const int result = system("./test_real_constraints.sh");
     QCOMPARE(result, 0);
 }
 
