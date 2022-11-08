@@ -1,8 +1,0 @@
-Node : node_linux
-  |_ Partition        : demo
-    |_ Coverage       : FALSE
-    |_ Package        : ocarina_processors_x86
-    |_ CPU Name       : x86_linux
-    |_ CPU Platform   : PLATFORM_GENERIC_LINUX
-    |_ CPU Classifier : ocarina_processors_x86::x86.generic_linux
-    |_ Contains       : actuator sensor modemanager egse 
