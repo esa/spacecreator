@@ -29,6 +29,7 @@ SpinRunDialog::SpinRunDialog(QWidget *parent)
     , m_secondLayout(new QHBoxLayout())
     , m_closePending(false)
     , m_finished(false)
+    , m_outputDirectory("tmc-out")
 {
     m_closeButton = new QPushButton(tr("Close"), this);
     setWindowTitle("Spin model-checker");
@@ -45,6 +46,11 @@ SpinRunDialog::SpinRunDialog(QWidget *parent)
     font.setStyleHint(QFont::StyleHint::Monospace);
     font.setFixedPitch(true);
     m_browser->setFont(font);
+}
+
+void SpinRunDialog::setOutputDirectory(const QString &outputDirectory)
+{
+    m_outputDirectory = outputDirectory;
 }
 
 void SpinRunDialog::setPropertiesSelected(const QStringList &properties)
@@ -85,7 +91,7 @@ void SpinRunDialog::setSubtypesPath(const QString &subtypesPath)
 int SpinRunDialog::exec()
 {
     m_worker = new SpinRunWorker(this, m_propertiesSelected, m_subtypesSelected, m_functionsSelected, m_spinConfig,
-            m_projectRoot, "tmc-out");
+            m_projectRoot, m_outputDirectory);
     m_worker->setPropertiesPath(m_propertiesPath);
     m_worker->setSubtypesPath(m_subtypesPath);
     connect(m_worker, SIGNAL(textAvailable(QString)), this, SLOT(workerTextAvailable(QString)), Qt::QueuedConnection);

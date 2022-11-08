@@ -35,6 +35,7 @@ class SpinRunDialog : public QDialog
 public:
     SpinRunDialog(QWidget *parent);
 
+    void setOutputDirectory(const QString &outputDirectory);
     void setPropertiesSelected(const QStringList &properties);
     void setSubtypesSelected(const QStringList &subtypes);
     void setFunctionsSelected(const QStringList &functions);
@@ -62,6 +63,7 @@ private:
 
     SpinRunWorker *m_worker;
 
+    QString m_outputDirectory;
     QStringList m_propertiesSelected;
     QStringList m_subtypesSelected;
     QStringList m_functionsSelected;

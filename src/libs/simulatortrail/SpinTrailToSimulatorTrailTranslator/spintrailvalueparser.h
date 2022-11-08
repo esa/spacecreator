@@ -48,6 +48,7 @@ public:
 private:
     Asn1Acn::ValuePtr parseValue(QStringList &spinTrailValue, const Asn1Acn::Types::Type *asn1Type);
     Asn1Acn::ValuePtr parseInteger(QStringList &spinTrailValue);
+    Asn1Acn::ValuePtr parseReal(QStringList &spinTrailValue);
     Asn1Acn::ValuePtr parseBoolean(QStringList &spinTrailValue);
     Asn1Acn::ValuePtr parseSequence(QStringList &spinTrailValue, const Asn1Acn::Types::Sequence *sequence);
     Asn1Acn::ValuePtr parseSequenceOf(QStringList &spinTrailValue, const Asn1Acn::Types::SequenceOf *sequenceOf);

@@ -24,9 +24,11 @@
 #include <QRegularExpression>
 #include <QTimer>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
+#include <reporting/HtmlReport/htmlreportpresenter.h>
 #include <reporting/Report/spinerrorparser.h>
 
 using reporting::HtmlReportBuilder;
+using reporting::HtmlReportPresenter;
 using tmc::converter::TmcConverter;
 
 namespace tmc::verifier {
@@ -197,6 +199,11 @@ bool TmcVerifier::execute(ExecuteMode executeMode)
 {
     Q_EMIT verifierMessage(QString("Starting conversion.\n"));
     m_executeMode = executeMode;
+    if (m_outputDirectory.isEmpty()) {
+        Q_EMIT verifierMessage(QString("Output directory path is not specified. Aborting.\n"));
+        Q_EMIT finished(false);
+        return false;
+    }
     if (m_executeMode == ExecuteMode::ConvertOnly) {
         // run only TmcConverter
         if (!m_converter->prepare()) {
@@ -500,15 +507,22 @@ void TmcVerifier::generateReport()
 
     QString report = builder.parseAndBuildHtmlReport(spinMessages, sclFiles, rawErrorItems, QStringList());
 
-    saveReport(report);
+    QFileInfo reportFilepath = m_outputDirectory + QDir::separator() + "report.html";
+    saveReport(reportFilepath, report);
+    if (m_executeMode == ExecuteMode::ConvertAndVerify) {
+        presentReport(reportFilepath);
+    }
 
     Q_EMIT finished(true);
 }
 
-void TmcVerifier::saveReport(const QString &data)
+void TmcVerifier::presentReport(const QFileInfo &reportFilepath)
 {
-    QFileInfo reportFilepath = m_outputDirectory + QDir::separator() + "report.html";
+    HtmlReportPresenter::present(reportFilepath.absoluteFilePath());
+}
 
+void TmcVerifier::saveReport(const QFileInfo &reportFilepath, const QString &data)
+{
     Q_EMIT verifierMessage(QString("Generated %1 chars\n").arg(data.length()));
 
     QFile file(reportFilepath.absoluteFilePath());
