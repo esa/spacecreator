@@ -54,6 +54,15 @@ protected:
     void onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
     void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
+    /**
+     * @brief transformedRect takes a GripPoint, the point is was moved from and a point it was moved to, and returns the
+     * rectangle that represents that movement with the restraints on that particular GripPoint applied. For instance, the corner GripPoints
+     * can move on both axis while the GripPoints on the horizontal lines can only move on the Y-axia.
+     * @param grip
+     * @param from
+     * @param to
+     * @return a constrained rectangle
+     */
     QRectF transformedRect(GripPoint *grip, const QPointF &from, const QPointF &to);
 
     bool setGeometry(const QRectF &sceneGeometry);

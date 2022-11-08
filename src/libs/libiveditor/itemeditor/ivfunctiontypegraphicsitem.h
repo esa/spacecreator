@@ -20,7 +20,6 @@
 #include "ivfunctiontype.h"
 #include "ivobject.h"
 #include "ui/verectgraphicsitem.h"
-#include "veobject.h"
 
 namespace ive {
 
