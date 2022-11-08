@@ -64,6 +64,17 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
 
     // Set paths for project, properties, subtypes and results/oputputs
     this->projectDir = projectDir;
+
+    QString workDir = projectDir + QDir::separator() + "work";
+    if (!QDir(workDir).exists()) {
+        QDir().mkdir(workDir);
+    }
+
+    QString modelcheckingDir = workDir + QDir::separator() + "modelchecking";
+    if (!QDir(modelcheckingDir).exists()) {
+        QDir().mkdir(modelcheckingDir);
+    }
+
     this->propertiesPath = projectDir + "/work/modelchecking/properties";
     this->subtypesPath = projectDir + "/work/modelchecking/subtypes";
     this->configurationsPath = projectDir + "/work/modelchecking/configurations";
@@ -1645,6 +1656,11 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
     if (outputDirectory.exists()) {
         if (!outputDirectory.isDir()) {
             QMessageBox::warning(this, tr("Call Spin"), tr("Selected output is not directory!"), QMessageBox::Cancel);
+        }
+        if (outputDirectory == QFileInfo(this->projectDir)) {
+            QMessageBox::warning(
+                    this, tr("Call Spin"), tr("Selected output is project root! Aborting."), QMessageBox::Cancel);
+            return;
         }
         int ret = QMessageBox::warning(this, tr("Call Spin"),
                 tr("Do you confirm you want to call Spin? The output folder %1 will be rebuilt!")
