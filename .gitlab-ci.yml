@@ -2,7 +2,7 @@ image: ${CI_REGISTRY_IMAGE}/taste-buster:latest
 
 stages:
   - build-test
-  - build-test-and-bundle
+  - build-test-bundle
 
 
 default:
@@ -19,28 +19,15 @@ default:
     # install sdl2promela
     - git clone https://github.com/n7space/sdl2promela.git
     - pushd sdl2promela ; make install ; popd
-
-
-
-.build-spacecreator:
-  stage: build-test-and-bundle
-  variables:
-    PROJECT_DIR: ${CI_PROJECT_DIR}
-  script:
-    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
-    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # setup PATH
     - export PATH=$PATH:${ENV_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
-  cache:
-    key: asn1scc
-    paths:
-      - ${BUILD_DIR}/asn1scc_bin
 
 
-space-creator-qt5:
-  extends: .build-spacecreator
+spacecreator-qt5-master:
+  stage: build-test-bundle
   variables:
+    PROJECT_DIR: ${CI_PROJECT_DIR}
     ENV_QT_VERSION: 5.12.1
     ENV_QTC_VERSION: 4.8.2
     ENV_DIR: /opt/spacecreator5
@@ -48,6 +35,8 @@ space-creator-qt5:
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt5
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
   script:
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
+    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
@@ -60,15 +49,23 @@ space-creator-qt5:
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
   artifacts:
+    cache:
+      key: asn1scc
+      paths:
+        - ${BUILD_DIR}/asn1scc_bin
     reports:
       junit: ${BUILD_DIR}/tst_*-result.xml
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'master'"
 
-space-creator-qt6:
-  extends: .build-spacecreator
+
+spacecreator-qt6-master:
+  stage: build-test-bundle
   variables:
+    PROJECT_DIR: ${CI_PROJECT_DIR}
     ENV_QT_VERSION: 6.3.1
     ENV_QTC_VERSION: 8.0.1
     ENV_DIR: /opt/spacecreator6
@@ -76,6 +73,8 @@ space-creator-qt6:
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt6
   script:
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
+    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
@@ -85,7 +84,88 @@ space-creator-qt6:
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
   artifacts:
+    cache:
+      key: asn1scc
+      paths:
+        - ${BUILD_DIR}/asn1scc_bin
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+
+
+spacecreator-qt5-feature:
+  stage: build-test
+  variables:
+    PROJECT_DIR: ${CI_PROJECT_DIR}
+    ENV_QT_VERSION: 5.12.1
+    ENV_QTC_VERSION: 4.8.2
+    ENV_DIR: /opt/spacecreator5
+    ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
+    BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt5
+    APP_DIR: ${ENV_DIR}/spacecreator.AppDir
+  script:
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
+    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
+    # build space creator
+    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release
+    # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
+    - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # read the version numbers
+    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
+    # unit tests
+    - cd ${CI_PROJECT_DIR}
+    - ./scripts/run_tests.sh ${BUILD_DIR}
+    # Create an AppImage from the app_dir and place it in the build dir
+    - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
+  artifacts:
+    cache:
+      key: asn1scc
+      paths:
+        - ${BUILD_DIR}/asn1scc_bin
+    reports:
+      junit: ${BUILD_DIR}/tst_*-result.xml
+    paths:
+      - "${BUILD_DIR}/spacecreator*.AppImage"
+    expire_in: 2 days
+  rules:
+    # For pipelines created when a merge request is created or updated
+    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
+
+
+spacecreator-qt6-feature:
+  stage: build-test
+  variables:
+    PROJECT_DIR: ${CI_PROJECT_DIR}
+    ENV_QT_VERSION: 6.3.1
+    ENV_QTC_VERSION: 8.0.1
+    ENV_DIR: /opt/spacecreator6
+    APP_DIR: ${ENV_DIR}/spacecreator.AppDir
+    ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
+    BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt6
+  script:
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
+    - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
+    # build space creator
+    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin
+    # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
+    - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # read the version numbers
+    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
+    # Create an AppImage from the app_dir and place it in the build dir
+    - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
+  artifacts:
+    cache:
+      key: asn1scc
+      paths:
+        - ${BUILD_DIR}/asn1scc_bin
+    paths:
+      - "${BUILD_DIR}/spacecreator*.AppImage"
+    expire_in: 2 days
+  rules:
+    # For pipelines created when a merge request is created or updated
+    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
+
+
 
