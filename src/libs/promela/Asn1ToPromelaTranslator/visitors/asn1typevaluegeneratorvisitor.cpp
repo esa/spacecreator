@@ -20,6 +20,7 @@
 #include "asn1typevaluegeneratorvisitor.h"
 
 #include "visitors/integerrangeconstraintvisitor.h"
+#include "visitors/realrangeconstraintvisitor.h"
 #include "visitors/sizeconstraintvisitor.h"
 
 #include <QList>
@@ -46,6 +47,7 @@
 #include <promela/Asn1ToPromelaTranslator/integergenerator.h>
 #include <promela/Asn1ToPromelaTranslator/integersubset.h>
 #include <promela/Asn1ToPromelaTranslator/proctypemaker.h>
+#include <promela/Asn1ToPromelaTranslator/realgenerator.h>
 #include <promela/PromelaModel/basictypes.h>
 #include <promela/PromelaModel/binaryexpression.h>
 #include <promela/PromelaModel/conditional.h>
@@ -464,11 +466,40 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
 {
-    Q_UNUSED(type);
-    const QString message = QString("Real ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
-                                    .arg(__FILE__)
-                                    .arg(__LINE__);
-    throw std::logic_error(message.toStdString().c_str());
+    float delta = 5; // TODO: Load from front
+    RealRangeConstraintVisitor constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    const auto valueVariableName = getInlineArgumentName();
+    const auto tempName = Escaper::escapePromelaName(QString("%1_tmp").arg(m_name));
+    std::optional<RealSubset> realSubset = constraintVisitor.getResultSubset();
+
+    if (!realSubset.has_value()) {
+        auto message =
+                QString("Unable to generate values for type %1: unable to determine available subset").arg(m_name);
+        throw TranslationException(message);
+    }
+
+    Conditional conditional;
+    RealGenerator generator(realSubset.value(), delta);
+
+    while (generator.has_next()) {
+        auto element = generator.next();
+
+        std::unique_ptr<model::Sequence> nestedSequence =
+                std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
+
+        nestedSequence->appendElement(Expression(VariableRef("true")));
+        nestedSequence->appendElement(
+                Assignment(VariableRef(valueVariableName), Expression(VariableRef(QString::number(element)))));
+
+        conditional.appendAlternative(std::move(nestedSequence));
+    }
+
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+    sequence.appendElement(std::move(conditional));
+
+    createValueGenerationInline(std::move(sequence));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const LabelType &type)

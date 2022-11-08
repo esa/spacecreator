@@ -47,6 +47,7 @@ public:
      * @param content expression content
      */
     Expression(Value content);
+
     /**
      * @brief Constructor.
      *

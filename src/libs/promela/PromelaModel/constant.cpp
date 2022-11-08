@@ -20,6 +20,7 @@
 #include "constant.h"
 
 namespace promela::model {
+
 Constant::Constant(int32_t value)
     : m_value(value)
 {

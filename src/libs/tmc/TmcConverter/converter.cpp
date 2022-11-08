@@ -416,7 +416,7 @@ size_t TmcConverter::getNumberOfProctypes() const
 
 bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceModelTypes,
         conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxilaryModelTypes,
-        conversion::Options options)
+        conversion::Options options, const std::optional<float> &delta)
 {
     try {
         Converter converter(m_registry, std::move(options));

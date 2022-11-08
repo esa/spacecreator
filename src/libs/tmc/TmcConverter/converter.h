@@ -223,7 +223,8 @@ Q_SIGNALS:
 
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
-            const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options);
+            const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options,
+            const std::optional<float> &delta);
 
     void integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
             std::map<QString, ProcessMetadata> &allSdlFiles);
