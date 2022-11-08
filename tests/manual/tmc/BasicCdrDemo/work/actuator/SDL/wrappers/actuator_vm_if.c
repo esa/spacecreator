@@ -49,14 +49,14 @@ void actuator_ctrl
 
    //  Declare user code function as external (it may not have a .h if it is in Ada)
    extern void actuator_PI_ctrl
-      (const asn1SccT_Integer *);
+      (const asn1SccTInteger *);
 
 
 
 
 
    // Call user code
-   actuator_PI_ctrl ((asn1SccT_Integer *)IN_x);
+   actuator_PI_ctrl ((asn1SccTInteger *)IN_x);
 
    // trace the SDL state (appears on the MSC)
    if (1 == innerMsc) {

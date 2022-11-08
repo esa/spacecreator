@@ -29,7 +29,7 @@ package body Egse_Events is
             case Evt.Msg_In.Kind is
                when Tm_PRESENT =>
                   declare
-                     Param : asn1SccT_Report := Evt.Msg_In.Tm.Reprt;
+                     Param : asn1SccTreport := Evt.Msg_In.Tm.Reprt;
                   begin
                      Egse_PI.Tm (Reprt => Param, Global_State => Global_State, Sender_PID => Event.Input_Event.Source);
                   end;
@@ -89,13 +89,13 @@ package body Egse_Events is
             case Event.Msg_In.Kind is
                when Tm_PRESENT =>
                  Put ("EGSE: INPUT Tm");
-                  Put_Line (" (" & T_Report_Pkg.Image (Event.Msg_In.Tm.Reprt) & ")");
+                  Put_Line (" (" & Treport_Pkg.Image (Event.Msg_In.Tm.Reprt) & ")");
             end case;
          when Msg_OUT_Present =>
             case Event.Msg_Out.Kind is
                 when Tc_PRESENT =>
                  Put ("EGSE: OUTPUT Tc");
-                  Put_Line (" (" & T_Config_Pkg.Image (Event.Msg_Out.Tc.Cfg) & ")");
+                  Put_Line (" (" & Tconfig_Pkg.Image (Event.Msg_Out.Tc.Cfg) & ")");
             end case;
       end case;
    end Print_Event;
@@ -114,8 +114,8 @@ package body Egse_Events is
        Callback     : access procedure (Event         : asn1SccObservable_Event;
                                         Limit_Reached : out Boolean))
    is
-       Iterator     : T_Config_Pkg.Instance;
-       Param        : asn1SccT_Config;
+       Iterator     : Tconfig_Pkg.Instance;
+       Param        : asn1SccTconfig;
        Original_State : constant asn1SccSystem_State := Global_State;
        Event          : asn1SccObservable_Event
                          (Kind => Output_Event_PRESENT);
@@ -133,7 +133,7 @@ package body Egse_Events is
 
       for Each of Iterator loop
          --  Iterate exhaustively over the interface parameter
-         Param := T_Config_Pkg.To_ASN1 (Each);
+         Param := Tconfig_Pkg.To_ASN1 (Each);
          Event.Output_Event.Event.Egse.Msg_Out.Tc.cfg := Param;
          --  the Callback will call the observers, then execute the event
          --  (which may have been altered by the observers), and then

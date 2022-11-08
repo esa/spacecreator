@@ -2,7 +2,7 @@ warning: no accept labels are defined, so option -a has no effect (ignored)
 pan:1: assertion violated  !((global_state.actuator.x>5)) (at depth 156)
 pan: wrote system.pml1.trail
 
-(Spin Version 6.5.2 -- 9 June 2022 +  N7S Custom - Work-in-Progress)
+(Spin Version 6.4.9 -- 17 December 2018)
 Warning: Search not completed
 
 Full statespace search for:
@@ -16,7 +16,7 @@ State-vector 708 byte, depth reached 262, errors: 1
     25412 states, matched
     72944 transitions (= stored+matched)
    408889 atomic steps
-hash conflicts:         3 (resolved)
+hash conflicts:        12 (resolved)
 
 Stats on memory usage (in Megabytes):
    33.363	equivalent memory usage for states (stored*(State-vector + overhead))
@@ -28,5 +28,5 @@ Stats on memory usage (in Megabytes):
 
 
 
-pan: elapsed time 0.17 seconds
-pan: rate    279600 states/second
+pan: elapsed time 0.18 seconds
+pan: rate 264066.67 states/second

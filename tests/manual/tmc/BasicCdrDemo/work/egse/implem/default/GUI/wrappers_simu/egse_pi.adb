@@ -38,7 +38,7 @@ package body Egse_PI is
    
    procedure Tm
       (Global_State : in out asn1SccSystem_State;
-      Reprt : in out asn1SccT_Report;
+      Reprt : in out asn1SccTreport;
        Sender_PID : asn1SccPID := asn1SccEnv) is
    begin
       null;  -- ignore messages sent to ENV

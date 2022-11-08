@@ -20,7 +20,7 @@ void sensor_startup(void);
 void sensor_PI_Poll( void );
 
 /* Required interfaces */
-extern void sensor_RI_reading( const asn1SccT_Integer * );
+extern void sensor_RI_reading( const asn1SccTInteger * );
 
 
 #ifdef __cplusplus

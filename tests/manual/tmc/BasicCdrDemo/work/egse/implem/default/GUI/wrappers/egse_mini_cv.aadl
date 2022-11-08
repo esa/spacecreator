@@ -16,7 +16,7 @@ END SP_Poll.GUI_PI;
 
 SUBPROGRAM SP_tm
 FEATURES
-   reprt : IN PARAMETER DataView::T_Report {encoding=>NATIVE;};
+   reprt : IN PARAMETER DataView::TReport {encoding=>NATIVE;};
 
 END SP_tm;
 
@@ -31,7 +31,7 @@ END SP_tm.GUI_PI;
 
 SUBPROGRAM SP_tc
 FEATURES
-   cfg : OUT PARAMETER DataView::T_Config {encoding=>NATIVE;};
+   cfg : OUT PARAMETER DataView::TConfig {encoding=>NATIVE;};
 
 END SP_tc;
 

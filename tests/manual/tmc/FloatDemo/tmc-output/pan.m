@@ -81,250 +81,317 @@ S_375_0: /* 2 */
 		logval("nothing.selection", now.nothing.selection);
 #endif
 		;
-		goto S_423_0;
-S_423_0: /* 1 */
+		goto S_441_0;
+S_441_0: /* 1 */
 
 #if defined(C_States) && (HAS_TRACK==1)
 		c_update((uchar *) &(now.c_state[0]));
 #endif
 		_m = 3; goto P999;
 
-	case 4: // STATE 15 - dataview.pml:8596 - [global_state.sensor.sender = 4] (0:0:1 - 1)
+	case 4: // STATE 15 - dataview.pml:8596 - [global_state.controlsystem.sender = 4] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][15] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.sensor.sender;
-		now.global_state.sensor.sender = 4;
+		(trpt+1)->bup.oval = now.global_state.controlsystem.sender;
+		now.global_state.controlsystem.sender = 4;
 #ifdef VAR_RANGES
-		logval("global_state.sensor.sender", now.global_state.sensor.sender);
+		logval("global_state.controlsystem.sender", now.global_state.controlsystem.sender);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 5: // STATE 16 - dataview.pml:8601 - [assert((((((global_state.sensor.sender==0)||(global_state.sensor.sender==1))||(global_state.sensor.sender==2))||(global_state.sensor.sender==3))||(global_state.sensor.sender==4)))] (0:0:0 - 1)
+	case 5: // STATE 16 - dataview.pml:8601 - [assert((((((global_state.controlsystem.sender==0)||(global_state.controlsystem.sender==1))||(global_state.controlsystem.sender==2))||(global_state.controlsystem.sender==3))||(global_state.controlsystem.sender==4)))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[7][16] = 1;
 		if (TstOnly) return 1; /* T7 */
-		spin_assert((((((now.global_state.sensor.sender==0)||(now.global_state.sensor.sender==1))||(now.global_state.sensor.sender==2))||(now.global_state.sensor.sender==3))||(now.global_state.sensor.sender==4)), "(((((global_state.sensor.sender==0)||(global_state.sensor.sender==1))||(global_state.sensor.sender==2))||(global_state.sensor.sender==3))||(global_state.sensor.sender==4))", II, tt, t);
+		spin_assert((((((now.global_state.controlsystem.sender==0)||(now.global_state.controlsystem.sender==1))||(now.global_state.controlsystem.sender==2))||(now.global_state.controlsystem.sender==3))||(now.global_state.controlsystem.sender==4)), "(((((global_state.controlsystem.sender==0)||(global_state.controlsystem.sender==1))||(global_state.controlsystem.sender==2))||(global_state.controlsystem.sender==3))||(global_state.controlsystem.sender==4))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 6: // STATE 19 - sensor.pml:4 - [transition_id = 0] (0:54:2 - 1)
+	case 6: // STATE 19 - dataview.pml:8496 - [global_state.controlsystem.i = 0.000000] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][19] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_8_12_transition_id;
-		((P7 *)_this)->_1211_8_8_12_transition_id = 0;
+		(trpt+1)->bup.oval = now.global_state.controlsystem.i;
+		now.global_state.controlsystem.i = 0.000000;
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_12_transition_id);
+		logval("global_state.controlsystem.i", now.global_state.controlsystem.i);
 #endif
 		;
-		/* merge: transition_id = 0(54, 20, 54) */
-		reached[7][20] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_8_12_transition_id;
-		((P7 *)_this)->_1211_8_8_12_transition_id = 0;
-#ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_12_transition_id);
-#endif
-		;
-		/* merge: .(goto)(0, 55, 54) */
-		reached[7][55] = 1;
-		;
-		_m = 3; goto P999; /* 2 */
-	case 7: // STATE 21 - sensor.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][21] = 1;
-		if (!((((P7 *)_this)->_1211_8_8_12_transition_id== -(1))))
-			continue;
-		if (TstOnly) return 1; /* TT */
-		/* dead 1: _1211_8_8_12_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_8_12_transition_id;
-#ifdef HAS_CODE
-		if (!readtrail)
-#endif
-			((P7 *)_this)->_1211_8_8_12_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 8: // STATE 23 - sensor.pml:9 - [((transition_id==0))] (0:0:1 - 1)
+	case 7: // STATE 20 - dataview.pml:8501 - [assert(((global_state.controlsystem.i>=-(1000))&&(global_state.controlsystem.i<=1000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[7][20] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.controlsystem.i>= -(1000))&&(now.global_state.controlsystem.i<=1000)), "((global_state.controlsystem.i>= -(1000))&&(global_state.controlsystem.i<=1000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 8: // STATE 23 - dataview.pml:8496 - [global_state.controlsystem.d = 0.000000] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][23] = 1;
-		if (!((((P7 *)_this)->_1211_8_8_12_transition_id==0)))
-			continue;
-		if (TstOnly) return 1; /* TT */
-		/* dead 1: _1211_8_8_12_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_8_12_transition_id;
-#ifdef HAS_CODE
-		if (!readtrail)
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.controlsystem.d;
+		now.global_state.controlsystem.d = 0.000000;
+#ifdef VAR_RANGES
+		logval("global_state.controlsystem.d", now.global_state.controlsystem.d);
 #endif
-			((P7 *)_this)->_1211_8_8_12_transition_id = 0;
+		;
 		_m = 3; goto P999; /* 0 */
-	case 9: // STATE 24 - dataview.pml:8496 - [global_state.sensor.x = 1.000000] (0:0:1 - 1)
+	case 9: // STATE 24 - dataview.pml:8501 - [assert(((global_state.controlsystem.d>=-(1000))&&(global_state.controlsystem.d<=1000)))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[7][24] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.controlsystem.d>= -(1000))&&(now.global_state.controlsystem.d<=1000)), "((global_state.controlsystem.d>= -(1000))&&(global_state.controlsystem.d<=1000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 10: // STATE 27 - dataview.pml:8496 - [global_state.controlsystem.previous = 0.000000] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][27] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.sensor.x;
-		now.global_state.sensor.x = 1.000000;
+		(trpt+1)->bup.oval = now.global_state.controlsystem.previous;
+		now.global_state.controlsystem.previous = 0.000000;
 #ifdef VAR_RANGES
-		logval("global_state.sensor.x", now.global_state.sensor.x);
+		logval("global_state.controlsystem.previous", now.global_state.controlsystem.previous);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 10: // STATE 25 - dataview.pml:8501 - [assert(((global_state.sensor.x>=-(1000))&&(global_state.sensor.x<=1000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][25] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.sensor.x>= -(1000))&&(now.global_state.sensor.x<=1000)), "((global_state.sensor.x>= -(1000))&&(global_state.sensor.x<=1000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 11: // STATE 28 - system.pml:35 - [global_state.timers.sensor.trigger.interval = 1000] (0:53:4 - 1)
+	case 11: // STATE 28 - dataview.pml:8501 - [assert(((global_state.controlsystem.previous>=-(1000))&&(global_state.controlsystem.previous<=1000)))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[7][28] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.controlsystem.previous>= -(1000))&&(now.global_state.controlsystem.previous<=1000)), "((global_state.controlsystem.previous>= -(1000))&&(global_state.controlsystem.previous<=1000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 12: // STATE 31 - controlsystem.pml:4 - [transition_id = 0] (0:72:2 - 1)
+		IfNotBlocked
+		reached[7][31] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(4);
-		(trpt+1)->bup.ovals[0] = now.global_state.timers.sensor.trigger.interval;
-		now.global_state.timers.sensor.trigger.interval = 1000;
+		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_8_15_transition_id;
+		((P7 *)_this)->_1211_8_8_15_transition_id = 0;
 #ifdef VAR_RANGES
-		logval("global_state.timers.sensor.trigger.interval", now.global_state.timers.sensor.trigger.interval);
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_15_transition_id);
 #endif
 		;
-		/* merge: global_state.timers.sensor.trigger.timer_enabled = 1(53, 29, 53) */
-		reached[7][29] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.timers.sensor.trigger.timer_enabled;
-		now.global_state.timers.sensor.trigger.timer_enabled = 1;
-#ifdef VAR_RANGES
-		logval("global_state.timers.sensor.trigger.timer_enabled", ((int)now.global_state.timers.sensor.trigger.timer_enabled));
-#endif
-		;
-		/* merge: printf('set_timer Sensor trigger %d\\n',1000)(53, 30, 53) */
-		reached[7][30] = 1;
-		if (TstOnly) return 1; /* T4 */
-		Printf("set_timer Sensor trigger %d\n", 1000);
-		/* merge: transition_id = -(1)(53, 32, 53) */
+		/* merge: transition_id = 0(72, 32, 72) */
 		reached[7][32] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[2] = ((P7 *)_this)->_1211_8_8_12_transition_id;
-		((P7 *)_this)->_1211_8_8_12_transition_id =  -(1);
+		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_8_15_transition_id;
+		((P7 *)_this)->_1211_8_8_15_transition_id = 0;
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_12_transition_id);
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_15_transition_id);
 #endif
 		;
-		/* merge: global_state.sensor.state = 0(53, 33, 53) */
-		reached[7][33] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[3] = now.global_state.sensor.state;
-		now.global_state.sensor.state = 0;
-#ifdef VAR_RANGES
-		logval("global_state.sensor.state", now.global_state.sensor.state);
-#endif
+		/* merge: .(goto)(0, 73, 72) */
+		reached[7][73] = 1;
 		;
-		/* merge: goto continuous_signals(0, 34, 53) */
-		reached[7][34] = 1;
-		;
-		_m = 3; goto P999; /* 5 */
-	case 12: // STATE 35 - sensor.pml:15 - [((transition_id==1))] (0:0:1 - 1)
+		_m = 3; goto P999; /* 2 */
+	case 13: // STATE 33 - controlsystem.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][35] = 1;
-		if (!((((P7 *)_this)->_1211_8_8_12_transition_id==1)))
+		reached[7][33] = 1;
+		if (!((((P7 *)_this)->_1211_8_8_15_transition_id== -(1))))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _1211_8_8_12_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_8_12_transition_id;
+		/* dead 1: _1211_8_8_15_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_8_15_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
 #endif
-			((P7 *)_this)->_1211_8_8_12_transition_id = 0;
+			((P7 *)_this)->_1211_8_8_15_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 13: // STATE 38 - dataview.pml:8496 - [global_state.sensor.x = (global_state.sensor.x*2.000000)] (0:0:1 - 1)
+	case 14: // STATE 35 - controlsystem.pml:9 - [((transition_id==0))] (71:0:3 - 1)
 		IfNotBlocked
-		reached[7][38] = 1;
+		reached[7][35] = 1;
+		if (!((((P7 *)_this)->_1211_8_8_15_transition_id==0)))
+			continue;
+		if (TstOnly) return 1; /* TT */
+		/* dead 1: _1211_8_8_15_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_8_15_transition_id;
+#ifdef HAS_CODE
+		if (!readtrail)
+#endif
+			((P7 *)_this)->_1211_8_8_15_transition_id = 0;
+		/* merge: transition_id = -(1)(71, 36, 71) */
+		reached[7][36] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.sensor.x;
-		now.global_state.sensor.x = (now.global_state.sensor.x*2.000000);
+		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_8_15_transition_id;
+		((P7 *)_this)->_1211_8_8_15_transition_id =  -(1);
 #ifdef VAR_RANGES
-		logval("global_state.sensor.x", now.global_state.sensor.x);
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_15_transition_id);
 #endif
 		;
-		_m = 3; goto P999; /* 0 */
-	case 14: // STATE 39 - dataview.pml:8501 - [assert(((global_state.sensor.x>=-(1000))&&(global_state.sensor.x<=1000)))] (0:0:0 - 1)
+		/* merge: global_state.controlsystem.state = 1(71, 37, 71) */
+		reached[7][37] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[2] = now.global_state.controlsystem.state;
+		now.global_state.controlsystem.state = 1;
+#ifdef VAR_RANGES
+		logval("global_state.controlsystem.state", now.global_state.controlsystem.state);
+#endif
+		;
+		/* merge: goto continuous_signals(0, 38, 71) */
+		reached[7][38] = 1;
+		;
+		_m = 3; goto P999; /* 3 */
+	case 15: // STATE 39 - controlsystem.pml:13 - [((transition_id==1))] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][39] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.sensor.x>= -(1000))&&(now.global_state.sensor.x<=1000)), "((global_state.sensor.x>= -(1000))&&(global_state.sensor.x<=1000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 15: // STATE 42 - system.pml:64 - [Controlsystem_reading_channel!global_state.sensor.x] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][42] = 1;
-		if (q_full(now.Controlsystem_reading_channel))
+		if (!((((P7 *)_this)->_1211_8_8_15_transition_id==1)))
 			continue;
-		if (TstOnly) return 1; /* T1 */
+		if (TstOnly) return 1; /* TT */
+		/* dead 1: _1211_8_8_15_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_8_15_transition_id;
 #ifdef HAS_CODE
-		if (readtrail && gui) {
-			char simtmp[64];
-			sprintf(simvals, "%d!", now.Controlsystem_reading_channel);
-		sprintf(simtmp, "%f,", now.global_state.sensor.x); strcat(simvals, simtmp);		}
+		if (!readtrail)
 #endif
-		
-		qsend(now.Controlsystem_reading_channel, 0, now.global_state.sensor.x, 0, 0, 1);
-		_m = 2; goto P999; /* 0 */
-	case 16: // STATE 44 - system.pml:35 - [global_state.timers.sensor.trigger.interval = 1000] (0:53:4 - 1)
+			((P7 *)_this)->_1211_8_8_15_transition_id = 0;
+		_m = 3; goto P999; /* 0 */
+	case 16: // STATE 40 - system.pml:74 - [(1)] (71:0:2 - 1)
 		IfNotBlocked
+		reached[7][40] = 1;
+		if (!(1))
+			continue;
+		/* merge: transition_id = -(1)(71, 42, 71) */
+		reached[7][42] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_8_15_transition_id;
+		((P7 *)_this)->_1211_8_8_15_transition_id =  -(1);
+#ifdef VAR_RANGES
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_15_transition_id);
+#endif
+		;
+		/* merge: global_state.controlsystem.state = 0(71, 43, 71) */
+		reached[7][43] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[1] = now.global_state.controlsystem.state;
+		now.global_state.controlsystem.state = 0;
+#ifdef VAR_RANGES
+		logval("global_state.controlsystem.state", now.global_state.controlsystem.state);
+#endif
+		;
+		/* merge: goto continuous_signals(0, 44, 71) */
 		reached[7][44] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(4);
-		(trpt+1)->bup.ovals[0] = now.global_state.timers.sensor.trigger.interval;
-		now.global_state.timers.sensor.trigger.interval = 1000;
-#ifdef VAR_RANGES
-		logval("global_state.timers.sensor.trigger.interval", now.global_state.timers.sensor.trigger.interval);
-#endif
 		;
-		/* merge: global_state.timers.sensor.trigger.timer_enabled = 1(53, 45, 53) */
+		_m = 3; goto P999; /* 3 */
+	case 17: // STATE 45 - controlsystem.pml:18 - [((transition_id==2))] (0:0:1 - 1)
+		IfNotBlocked
 		reached[7][45] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.timers.sensor.trigger.timer_enabled;
-		now.global_state.timers.sensor.trigger.timer_enabled = 1;
-#ifdef VAR_RANGES
-		logval("global_state.timers.sensor.trigger.timer_enabled", ((int)now.global_state.timers.sensor.trigger.timer_enabled));
+		if (!((((P7 *)_this)->_1211_8_8_15_transition_id==2)))
+			continue;
+		if (TstOnly) return 1; /* TT */
+		/* dead 1: _1211_8_8_15_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_8_15_transition_id;
+#ifdef HAS_CODE
+		if (!readtrail)
 #endif
-		;
-		/* merge: printf('set_timer Sensor trigger %d\\n',1000)(53, 46, 53) */
-		reached[7][46] = 1;
-		if (TstOnly) return 1; /* T4 */
-		Printf("set_timer Sensor trigger %d\n", 1000);
-		/* merge: transition_id = -(1)(53, 48, 53) */
+			((P7 *)_this)->_1211_8_8_15_transition_id = 0;
+		_m = 3; goto P999; /* 0 */
+	case 18: // STATE 48 - dataview.pml:8496 - [global_state.controlsystem.i = (global_state.controlsystem.i+global_state.controlsystem.inputvalue)] (0:0:1 - 1)
+		IfNotBlocked
 		reached[7][48] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[2] = ((P7 *)_this)->_1211_8_8_12_transition_id;
-		((P7 *)_this)->_1211_8_8_12_transition_id =  -(1);
+		(trpt+1)->bup.oval = now.global_state.controlsystem.i;
+		now.global_state.controlsystem.i = (now.global_state.controlsystem.i+now.global_state.controlsystem.inputvalue);
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_12_transition_id);
+		logval("global_state.controlsystem.i", now.global_state.controlsystem.i);
 #endif
 		;
-		/* merge: global_state.sensor.state = 0(53, 49, 53) */
-		reached[7][49] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[3] = now.global_state.sensor.state;
-		now.global_state.sensor.state = 0;
-#ifdef VAR_RANGES
-		logval("global_state.sensor.state", now.global_state.sensor.state);
-#endif
-		;
-		/* merge: goto continuous_signals(0, 50, 53) */
-		reached[7][50] = 1;
-		;
-		_m = 3; goto P999; /* 5 */
-	case 17: // STATE 59 - system.pml:250 - [Sensor_lock!1] (0:0:0 - 3)
+		_m = 3; goto P999; /* 0 */
+	case 19: // STATE 49 - dataview.pml:8501 - [assert(((global_state.controlsystem.i>=-(1000))&&(global_state.controlsystem.i<=1000)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][59] = 1;
-		if (q_full(now.Sensor_lock))
+		reached[7][49] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.controlsystem.i>= -(1000))&&(now.global_state.controlsystem.i<=1000)), "((global_state.controlsystem.i>= -(1000))&&(global_state.controlsystem.i<=1000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 20: // STATE 52 - dataview.pml:8496 - [global_state.controlsystem.d = (global_state.controlsystem.inputvalue-global_state.controlsystem.previous)] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][52] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.controlsystem.d;
+		now.global_state.controlsystem.d = (now.global_state.controlsystem.inputvalue-now.global_state.controlsystem.previous);
+#ifdef VAR_RANGES
+		logval("global_state.controlsystem.d", now.global_state.controlsystem.d);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 21: // STATE 53 - dataview.pml:8501 - [assert(((global_state.controlsystem.d>=-(1000))&&(global_state.controlsystem.d<=1000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[7][53] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.controlsystem.d>= -(1000))&&(now.global_state.controlsystem.d<=1000)), "((global_state.controlsystem.d>= -(1000))&&(global_state.controlsystem.d<=1000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 22: // STATE 56 - dataview.pml:8496 - [global_state.controlsystem.previous = global_state.controlsystem.inputvalue] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][56] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.controlsystem.previous;
+		now.global_state.controlsystem.previous = now.global_state.controlsystem.inputvalue;
+#ifdef VAR_RANGES
+		logval("global_state.controlsystem.previous", now.global_state.controlsystem.previous);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 23: // STATE 57 - dataview.pml:8501 - [assert(((global_state.controlsystem.previous>=-(1000))&&(global_state.controlsystem.previous<=1000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[7][57] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.controlsystem.previous>= -(1000))&&(now.global_state.controlsystem.previous<=1000)), "((global_state.controlsystem.previous>= -(1000))&&(global_state.controlsystem.previous<=1000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 24: // STATE 61 - dataview.pml:8496 - [global_state.controlsystem.outputvalue = (((global_state.controlsystem.cfg.kp*global_state.controlsystem.inputvalue)+(global_state.controlsystem.cfg.ki*global_state.controlsystem.i))+(global_state.controlsystem.cfg.kd*global_state.controlsystem.d))] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][61] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.controlsystem.outputvalue;
+		now.global_state.controlsystem.outputvalue = (((now.global_state.controlsystem.cfg.kp*now.global_state.controlsystem.inputvalue)+(now.global_state.controlsystem.cfg.ki*now.global_state.controlsystem.i))+(now.global_state.controlsystem.cfg.kd*now.global_state.controlsystem.d));
+#ifdef VAR_RANGES
+		logval("global_state.controlsystem.outputvalue", now.global_state.controlsystem.outputvalue);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 25: // STATE 62 - dataview.pml:8501 - [assert(((global_state.controlsystem.outputvalue>=-(1000))&&(global_state.controlsystem.outputvalue<=1000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[7][62] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.controlsystem.outputvalue>= -(1000))&&(now.global_state.controlsystem.outputvalue<=1000)), "((global_state.controlsystem.outputvalue>= -(1000))&&(global_state.controlsystem.outputvalue<=1000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 26: // STATE 65 - system.pml:46 - [Actuator_controlSignal_channel!global_state.controlsystem.outputvalue] (71:0:1 - 1)
+		IfNotBlocked
+		reached[7][65] = 1;
+		if (q_full(now.Actuator_controlSignal_channel))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Sensor_lock);
+			sprintf(simvals, "%d!", now.Actuator_controlSignal_channel);
+		sprintf(simtmp, "%f,", now.global_state.controlsystem.outputvalue); strcat(simvals, simtmp);		}
+#endif
+		
+		qsend(now.Actuator_controlSignal_channel, 0, now.global_state.controlsystem.outputvalue, 0, 0, 1);
+		/* merge: transition_id = -(1)(0, 67, 71) */
+		reached[7][67] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_8_15_transition_id;
+		((P7 *)_this)->_1211_8_8_15_transition_id =  -(1);
+#ifdef VAR_RANGES
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_8_15_transition_id);
+#endif
+		;
+		/* merge: goto continuous_signals(0, 68, 71) */
+		reached[7][68] = 1;
+		;
+		_m = 2; goto P999; /* 2 */
+	case 27: // STATE 77 - system.pml:250 - [Controlsystem_lock!1] (0:0:0 - 3)
+		IfNotBlocked
+		reached[7][77] = 1;
+		if (q_full(now.Controlsystem_lock))
+			continue;
+		if (TstOnly) return 1; /* T1 */
+#ifdef HAS_CODE
+		if (readtrail && gui) {
+			char simtmp[64];
+			sprintf(simvals, "%d!", now.Controlsystem_lock);
 		sprintf(simtmp, "%d,", 1); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Sensor_lock, 0, 1, 0, 0, 1);
+		qsend(now.Controlsystem_lock, 0, 1, 0, 0, 1);
 		_m = 2; goto P999; /* 0 */
-	case 18: // STATE 60 - dataview.pml:8596 - [global_state.actuator.sender = 4] (0:0:1 - 1)
+	case 28: // STATE 78 - dataview.pml:8596 - [global_state.actuator.sender = 4] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][60] = 1;
+		reached[7][78] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.oval = now.global_state.actuator.sender;
 		now.global_state.actuator.sender = 4;
@@ -333,15 +400,15 @@ S_423_0: /* 1 */
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 19: // STATE 61 - dataview.pml:8601 - [assert((((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4)))] (0:0:0 - 1)
+	case 29: // STATE 79 - dataview.pml:8601 - [assert((((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][61] = 1;
+		reached[7][79] = 1;
 		if (TstOnly) return 1; /* T7 */
 		spin_assert((((((now.global_state.actuator.sender==0)||(now.global_state.actuator.sender==1))||(now.global_state.actuator.sender==2))||(now.global_state.actuator.sender==3))||(now.global_state.actuator.sender==4)), "(((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 20: // STATE 64 - dataview.pml:8496 - [global_state.actuator.setting = 0.000000] (0:0:1 - 1)
+	case 30: // STATE 82 - dataview.pml:8496 - [global_state.actuator.setting = 0.000000] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][64] = 1;
+		reached[7][82] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.oval = now.global_state.actuator.setting;
 		now.global_state.actuator.setting = 0.000000;
@@ -350,71 +417,71 @@ S_423_0: /* 1 */
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 21: // STATE 65 - dataview.pml:8501 - [assert(((global_state.actuator.setting>=-(1000))&&(global_state.actuator.setting<=1000)))] (0:0:0 - 1)
+	case 31: // STATE 83 - dataview.pml:8501 - [assert(((global_state.actuator.setting>=-(1000))&&(global_state.actuator.setting<=1000)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][65] = 1;
+		reached[7][83] = 1;
 		if (TstOnly) return 1; /* T7 */
 		spin_assert(((now.global_state.actuator.setting>= -(1000))&&(now.global_state.actuator.setting<=1000)), "((global_state.actuator.setting>= -(1000))&&(global_state.actuator.setting<=1000))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 22: // STATE 68 - actuator.pml:4 - [transition_id = 0] (0:96:2 - 1)
+	case 32: // STATE 86 - actuator.pml:4 - [transition_id = 0] (0:114:2 - 1)
 		IfNotBlocked
-		reached[7][68] = 1;
+		reached[7][86] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_9_15_transition_id;
-		((P7 *)_this)->_1211_8_9_15_transition_id = 0;
+		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_9_18_transition_id;
+		((P7 *)_this)->_1211_8_9_18_transition_id = 0;
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_15_transition_id);
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_18_transition_id);
 #endif
 		;
-		/* merge: transition_id = 0(96, 69, 96) */
-		reached[7][69] = 1;
+		/* merge: transition_id = 0(114, 87, 114) */
+		reached[7][87] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_9_15_transition_id;
-		((P7 *)_this)->_1211_8_9_15_transition_id = 0;
+		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_9_18_transition_id;
+		((P7 *)_this)->_1211_8_9_18_transition_id = 0;
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_15_transition_id);
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_18_transition_id);
 #endif
 		;
-		/* merge: .(goto)(0, 97, 96) */
-		reached[7][97] = 1;
+		/* merge: .(goto)(0, 115, 114) */
+		reached[7][115] = 1;
 		;
 		_m = 3; goto P999; /* 2 */
-	case 23: // STATE 70 - actuator.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
+	case 33: // STATE 88 - actuator.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][70] = 1;
-		if (!((((P7 *)_this)->_1211_8_9_15_transition_id== -(1))))
+		reached[7][88] = 1;
+		if (!((((P7 *)_this)->_1211_8_9_18_transition_id== -(1))))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _1211_8_9_15_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_9_15_transition_id;
+		/* dead 1: _1211_8_9_18_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_9_18_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
 #endif
-			((P7 *)_this)->_1211_8_9_15_transition_id = 0;
+			((P7 *)_this)->_1211_8_9_18_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 24: // STATE 72 - actuator.pml:9 - [((transition_id==0))] (95:0:3 - 1)
+	case 34: // STATE 90 - actuator.pml:9 - [((transition_id==0))] (113:0:3 - 1)
 		IfNotBlocked
-		reached[7][72] = 1;
-		if (!((((P7 *)_this)->_1211_8_9_15_transition_id==0)))
+		reached[7][90] = 1;
+		if (!((((P7 *)_this)->_1211_8_9_18_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _1211_8_9_15_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
-		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_9_15_transition_id;
+		/* dead 1: _1211_8_9_18_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_9_18_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
 #endif
-			((P7 *)_this)->_1211_8_9_15_transition_id = 0;
-		/* merge: transition_id = -(1)(95, 73, 95) */
-		reached[7][73] = 1;
+			((P7 *)_this)->_1211_8_9_18_transition_id = 0;
+		/* merge: transition_id = -(1)(113, 91, 113) */
+		reached[7][91] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_9_15_transition_id;
-		((P7 *)_this)->_1211_8_9_15_transition_id =  -(1);
+		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_9_18_transition_id;
+		((P7 *)_this)->_1211_8_9_18_transition_id =  -(1);
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_15_transition_id);
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_18_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 0(95, 74, 95) */
-		reached[7][74] = 1;
+		/* merge: global_state.actuator.state = 0(113, 92, 113) */
+		reached[7][92] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[2] = now.global_state.actuator.state;
 		now.global_state.actuator.state = 0;
@@ -422,25 +489,25 @@ S_423_0: /* 1 */
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 75, 95) */
-		reached[7][75] = 1;
+		/* merge: goto continuous_signals(0, 93, 113) */
+		reached[7][93] = 1;
 		;
 		_m = 3; goto P999; /* 3 */
-	case 25: // STATE 76 - actuator.pml:13 - [((transition_id==1))] (0:0:1 - 1)
+	case 35: // STATE 94 - actuator.pml:13 - [((transition_id==1))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][76] = 1;
-		if (!((((P7 *)_this)->_1211_8_9_15_transition_id==1)))
+		reached[7][94] = 1;
+		if (!((((P7 *)_this)->_1211_8_9_18_transition_id==1)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _1211_8_9_15_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_9_15_transition_id;
+		/* dead 1: _1211_8_9_18_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_9_18_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
 #endif
-			((P7 *)_this)->_1211_8_9_15_transition_id = 0;
+			((P7 *)_this)->_1211_8_9_18_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 26: // STATE 79 - dataview.pml:8496 - [global_state.actuator.setting = (1.500000*global_state.actuator.inputcontrol)] (0:0:1 - 1)
+	case 36: // STATE 97 - dataview.pml:8496 - [global_state.actuator.setting = (1.500000*global_state.actuator.inputcontrol)] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][79] = 1;
+		reached[7][97] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.oval = now.global_state.actuator.setting;
 		now.global_state.actuator.setting = (1.500000*now.global_state.actuator.inputcontrol);
@@ -449,29 +516,29 @@ S_423_0: /* 1 */
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 27: // STATE 80 - dataview.pml:8501 - [assert(((global_state.actuator.setting>=-(1000))&&(global_state.actuator.setting<=1000)))] (0:0:0 - 1)
+	case 37: // STATE 98 - dataview.pml:8501 - [assert(((global_state.actuator.setting>=-(1000))&&(global_state.actuator.setting<=1000)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][80] = 1;
+		reached[7][98] = 1;
 		if (TstOnly) return 1; /* T7 */
 		spin_assert(((now.global_state.actuator.setting>= -(1000))&&(now.global_state.actuator.setting<=1000)), "((global_state.actuator.setting>= -(1000))&&(global_state.actuator.setting<=1000))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 28: // STATE 83 - actuator.pml:17 - [(((global_state.actuator.setting>10.000000)==1))] (95:0:2 - 1)
+	case 38: // STATE 101 - actuator.pml:17 - [(((global_state.actuator.setting>10.000000)==1))] (113:0:2 - 1)
 		IfNotBlocked
-		reached[7][83] = 1;
+		reached[7][101] = 1;
 		if (!(((now.global_state.actuator.setting>10.000000)==1)))
 			continue;
-		/* merge: transition_id = -(1)(95, 84, 95) */
-		reached[7][84] = 1;
+		/* merge: transition_id = -(1)(113, 102, 113) */
+		reached[7][102] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_9_15_transition_id;
-		((P7 *)_this)->_1211_8_9_15_transition_id =  -(1);
+		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_9_18_transition_id;
+		((P7 *)_this)->_1211_8_9_18_transition_id =  -(1);
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_15_transition_id);
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_18_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 1(95, 85, 95) */
-		reached[7][85] = 1;
+		/* merge: global_state.actuator.state = 1(113, 103, 113) */
+		reached[7][103] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
 		now.global_state.actuator.state = 1;
@@ -479,27 +546,27 @@ S_423_0: /* 1 */
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 86, 95) */
-		reached[7][86] = 1;
+		/* merge: goto continuous_signals(0, 104, 113) */
+		reached[7][104] = 1;
 		;
 		_m = 3; goto P999; /* 3 */
-	case 29: // STATE 87 - actuator.pml:21 - [(((global_state.actuator.setting>10.000000)==0))] (95:0:2 - 1)
+	case 39: // STATE 105 - actuator.pml:21 - [(((global_state.actuator.setting>10.000000)==0))] (113:0:2 - 1)
 		IfNotBlocked
-		reached[7][87] = 1;
+		reached[7][105] = 1;
 		if (!(((now.global_state.actuator.setting>10.000000)==0)))
 			continue;
-		/* merge: transition_id = -(1)(95, 88, 95) */
-		reached[7][88] = 1;
+		/* merge: transition_id = -(1)(113, 106, 113) */
+		reached[7][106] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_9_15_transition_id;
-		((P7 *)_this)->_1211_8_9_15_transition_id =  -(1);
+		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_9_18_transition_id;
+		((P7 *)_this)->_1211_8_9_18_transition_id =  -(1);
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_15_transition_id);
+		logval(":init::transition_id", ((P7 *)_this)->_1211_8_9_18_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 0(95, 89, 95) */
-		reached[7][89] = 1;
+		/* merge: global_state.actuator.state = 0(113, 107, 113) */
+		reached[7][107] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
 		now.global_state.actuator.state = 0;
@@ -507,13 +574,13 @@ S_423_0: /* 1 */
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 90, 95) */
-		reached[7][90] = 1;
+		/* merge: goto continuous_signals(0, 108, 113) */
+		reached[7][108] = 1;
 		;
 		_m = 3; goto P999; /* 3 */
-	case 30: // STATE 101 - system.pml:252 - [Actuator_lock!1] (0:0:0 - 3)
+	case 40: // STATE 119 - system.pml:252 - [Actuator_lock!1] (0:0:0 - 3)
 		IfNotBlocked
-		reached[7][101] = 1;
+		reached[7][119] = 1;
 		if (q_full(now.Actuator_lock))
 			continue;
 		if (TstOnly) return 1; /* T1 */
@@ -526,77 +593,26 @@ S_423_0: /* 1 */
 		
 		qsend(now.Actuator_lock, 0, 1, 0, 0, 1);
 		_m = 2; goto P999; /* 0 */
-	case 31: // STATE 102 - dataview.pml:8596 - [global_state.controlsystem.sender = 4] (0:0:1 - 1)
+	case 41: // STATE 120 - dataview.pml:8596 - [global_state.sensor.sender = 4] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][102] = 1;
+		reached[7][120] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.controlsystem.sender;
-		now.global_state.controlsystem.sender = 4;
+		(trpt+1)->bup.oval = now.global_state.sensor.sender;
+		now.global_state.sensor.sender = 4;
 #ifdef VAR_RANGES
-		logval("global_state.controlsystem.sender", now.global_state.controlsystem.sender);
+		logval("global_state.sensor.sender", now.global_state.sensor.sender);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 32: // STATE 103 - dataview.pml:8601 - [assert((((((global_state.controlsystem.sender==0)||(global_state.controlsystem.sender==1))||(global_state.controlsystem.sender==2))||(global_state.controlsystem.sender==3))||(global_state.controlsystem.sender==4)))] (0:0:0 - 1)
+	case 42: // STATE 121 - dataview.pml:8601 - [assert((((((global_state.sensor.sender==0)||(global_state.sensor.sender==1))||(global_state.sensor.sender==2))||(global_state.sensor.sender==3))||(global_state.sensor.sender==4)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][103] = 1;
+		reached[7][121] = 1;
 		if (TstOnly) return 1; /* T7 */
-		spin_assert((((((now.global_state.controlsystem.sender==0)||(now.global_state.controlsystem.sender==1))||(now.global_state.controlsystem.sender==2))||(now.global_state.controlsystem.sender==3))||(now.global_state.controlsystem.sender==4)), "(((((global_state.controlsystem.sender==0)||(global_state.controlsystem.sender==1))||(global_state.controlsystem.sender==2))||(global_state.controlsystem.sender==3))||(global_state.controlsystem.sender==4))", II, tt, t);
+		spin_assert((((((now.global_state.sensor.sender==0)||(now.global_state.sensor.sender==1))||(now.global_state.sensor.sender==2))||(now.global_state.sensor.sender==3))||(now.global_state.sensor.sender==4)), "(((((global_state.sensor.sender==0)||(global_state.sensor.sender==1))||(global_state.sensor.sender==2))||(global_state.sensor.sender==3))||(global_state.sensor.sender==4))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 33: // STATE 106 - dataview.pml:8496 - [global_state.controlsystem.i = 0.000000] (0:0:1 - 1)
+	case 43: // STATE 124 - sensor.pml:4 - [transition_id = 0] (0:159:2 - 1)
 		IfNotBlocked
-		reached[7][106] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.controlsystem.i;
-		now.global_state.controlsystem.i = 0.000000;
-#ifdef VAR_RANGES
-		logval("global_state.controlsystem.i", now.global_state.controlsystem.i);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 34: // STATE 107 - dataview.pml:8501 - [assert(((global_state.controlsystem.i>=-(1000))&&(global_state.controlsystem.i<=1000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][107] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.controlsystem.i>= -(1000))&&(now.global_state.controlsystem.i<=1000)), "((global_state.controlsystem.i>= -(1000))&&(global_state.controlsystem.i<=1000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 35: // STATE 110 - dataview.pml:8496 - [global_state.controlsystem.d = 0.000000] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][110] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.controlsystem.d;
-		now.global_state.controlsystem.d = 0.000000;
-#ifdef VAR_RANGES
-		logval("global_state.controlsystem.d", now.global_state.controlsystem.d);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 36: // STATE 111 - dataview.pml:8501 - [assert(((global_state.controlsystem.d>=-(1000))&&(global_state.controlsystem.d<=1000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][111] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.controlsystem.d>= -(1000))&&(now.global_state.controlsystem.d<=1000)), "((global_state.controlsystem.d>= -(1000))&&(global_state.controlsystem.d<=1000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 37: // STATE 114 - dataview.pml:8496 - [global_state.controlsystem.previous = 0.000000] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][114] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.controlsystem.previous;
-		now.global_state.controlsystem.previous = 0.000000;
-#ifdef VAR_RANGES
-		logval("global_state.controlsystem.previous", now.global_state.controlsystem.previous);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 38: // STATE 115 - dataview.pml:8501 - [assert(((global_state.controlsystem.previous>=-(1000))&&(global_state.controlsystem.previous<=1000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][115] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.controlsystem.previous>= -(1000))&&(now.global_state.controlsystem.previous<=1000)), "((global_state.controlsystem.previous>= -(1000))&&(global_state.controlsystem.previous<=1000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 39: // STATE 118 - controlsystem.pml:4 - [transition_id = 0] (0:159:2 - 1)
-		IfNotBlocked
-		reached[7][118] = 1;
+		reached[7][124] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals = grab_values(2);
 		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_10_20_transition_id;
@@ -605,8 +621,8 @@ S_423_0: /* 1 */
 		logval(":init::transition_id", ((P7 *)_this)->_1211_8_10_20_transition_id);
 #endif
 		;
-		/* merge: transition_id = 0(159, 119, 159) */
-		reached[7][119] = 1;
+		/* merge: transition_id = 0(159, 125, 159) */
+		reached[7][125] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_10_20_transition_id;
 		((P7 *)_this)->_1211_8_10_20_transition_id = 0;
@@ -618,9 +634,9 @@ S_423_0: /* 1 */
 		reached[7][160] = 1;
 		;
 		_m = 3; goto P999; /* 2 */
-	case 40: // STATE 120 - controlsystem.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
+	case 44: // STATE 126 - sensor.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][120] = 1;
+		reached[7][126] = 1;
 		if (!((((P7 *)_this)->_1211_8_10_20_transition_id== -(1))))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -630,43 +646,84 @@ S_423_0: /* 1 */
 #endif
 			((P7 *)_this)->_1211_8_10_20_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 41: // STATE 122 - controlsystem.pml:9 - [((transition_id==0))] (158:0:3 - 1)
+	case 45: // STATE 128 - sensor.pml:9 - [((transition_id==0))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][122] = 1;
+		reached[7][128] = 1;
 		if (!((((P7 *)_this)->_1211_8_10_20_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _1211_8_10_20_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
-		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_10_20_transition_id;
+		/* dead 1: _1211_8_10_20_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_10_20_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
 #endif
 			((P7 *)_this)->_1211_8_10_20_transition_id = 0;
-		/* merge: transition_id = -(1)(158, 123, 158) */
-		reached[7][123] = 1;
+		_m = 3; goto P999; /* 0 */
+	case 46: // STATE 129 - dataview.pml:8496 - [global_state.sensor.x = 1.000000] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][129] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_1211_8_10_20_transition_id;
+		(trpt+1)->bup.oval = now.global_state.sensor.x;
+		now.global_state.sensor.x = 1.000000;
+#ifdef VAR_RANGES
+		logval("global_state.sensor.x", now.global_state.sensor.x);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 47: // STATE 130 - dataview.pml:8501 - [assert(((global_state.sensor.x>=-(1000))&&(global_state.sensor.x<=1000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[7][130] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.sensor.x>= -(1000))&&(now.global_state.sensor.x<=1000)), "((global_state.sensor.x>= -(1000))&&(global_state.sensor.x<=1000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 48: // STATE 133 - system.pml:35 - [global_state.timers.sensor.trigger.interval = 1000] (0:158:4 - 1)
+		IfNotBlocked
+		reached[7][133] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals = grab_values(4);
+		(trpt+1)->bup.ovals[0] = now.global_state.timers.sensor.trigger.interval;
+		now.global_state.timers.sensor.trigger.interval = 1000;
+#ifdef VAR_RANGES
+		logval("global_state.timers.sensor.trigger.interval", now.global_state.timers.sensor.trigger.interval);
+#endif
+		;
+		/* merge: global_state.timers.sensor.trigger.timer_enabled = 1(158, 134, 158) */
+		reached[7][134] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[1] = now.global_state.timers.sensor.trigger.timer_enabled;
+		now.global_state.timers.sensor.trigger.timer_enabled = 1;
+#ifdef VAR_RANGES
+		logval("global_state.timers.sensor.trigger.timer_enabled", ((int)now.global_state.timers.sensor.trigger.timer_enabled));
+#endif
+		;
+		/* merge: printf('set_timer Sensor trigger %d\\n',1000)(158, 135, 158) */
+		reached[7][135] = 1;
+		if (TstOnly) return 1; /* T4 */
+		Printf("set_timer Sensor trigger %d\n", 1000);
+		/* merge: transition_id = -(1)(158, 137, 158) */
+		reached[7][137] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[2] = ((P7 *)_this)->_1211_8_10_20_transition_id;
 		((P7 *)_this)->_1211_8_10_20_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval(":init::transition_id", ((P7 *)_this)->_1211_8_10_20_transition_id);
 #endif
 		;
-		/* merge: global_state.controlsystem.state = 1(158, 124, 158) */
-		reached[7][124] = 1;
+		/* merge: global_state.sensor.state = 0(158, 138, 158) */
+		reached[7][138] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[2] = now.global_state.controlsystem.state;
-		now.global_state.controlsystem.state = 1;
+		(trpt+1)->bup.ovals[3] = now.global_state.sensor.state;
+		now.global_state.sensor.state = 0;
 #ifdef VAR_RANGES
-		logval("global_state.controlsystem.state", now.global_state.controlsystem.state);
+		logval("global_state.sensor.state", now.global_state.sensor.state);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 125, 158) */
-		reached[7][125] = 1;
+		/* merge: goto continuous_signals(0, 139, 158) */
+		reached[7][139] = 1;
 		;
-		_m = 3; goto P999; /* 3 */
-	case 42: // STATE 126 - controlsystem.pml:13 - [((transition_id==1))] (0:0:1 - 1)
+		_m = 3; goto P999; /* 5 */
+	case 49: // STATE 140 - sensor.pml:15 - [((transition_id==1))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][126] = 1;
+		reached[7][140] = 1;
 		if (!((((P7 *)_this)->_1211_8_10_20_transition_id==1)))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -676,155 +733,98 @@ S_423_0: /* 1 */
 #endif
 			((P7 *)_this)->_1211_8_10_20_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 43: // STATE 127 - system.pml:74 - [(1)] (158:0:2 - 1)
-		IfNotBlocked
-		reached[7][127] = 1;
-		if (!(1))
-			continue;
-		/* merge: transition_id = -(1)(158, 129, 158) */
-		reached[7][129] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_1211_8_10_20_transition_id;
-		((P7 *)_this)->_1211_8_10_20_transition_id =  -(1);
-#ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_1211_8_10_20_transition_id);
-#endif
-		;
-		/* merge: global_state.controlsystem.state = 0(158, 130, 158) */
-		reached[7][130] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.controlsystem.state;
-		now.global_state.controlsystem.state = 0;
-#ifdef VAR_RANGES
-		logval("global_state.controlsystem.state", now.global_state.controlsystem.state);
-#endif
-		;
-		/* merge: goto continuous_signals(0, 131, 158) */
-		reached[7][131] = 1;
-		;
-		_m = 3; goto P999; /* 3 */
-	case 44: // STATE 132 - controlsystem.pml:18 - [((transition_id==2))] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][132] = 1;
-		if (!((((P7 *)_this)->_1211_8_10_20_transition_id==2)))
-			continue;
-		if (TstOnly) return 1; /* TT */
-		/* dead 1: _1211_8_10_20_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_10_20_transition_id;
-#ifdef HAS_CODE
-		if (!readtrail)
-#endif
-			((P7 *)_this)->_1211_8_10_20_transition_id = 0;
-		_m = 3; goto P999; /* 0 */
-	case 45: // STATE 135 - dataview.pml:8496 - [global_state.controlsystem.i = (global_state.controlsystem.i+global_state.controlsystem.inputvalue)] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][135] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.controlsystem.i;
-		now.global_state.controlsystem.i = (now.global_state.controlsystem.i+now.global_state.controlsystem.inputvalue);
-#ifdef VAR_RANGES
-		logval("global_state.controlsystem.i", now.global_state.controlsystem.i);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 46: // STATE 136 - dataview.pml:8501 - [assert(((global_state.controlsystem.i>=-(1000))&&(global_state.controlsystem.i<=1000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][136] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.controlsystem.i>= -(1000))&&(now.global_state.controlsystem.i<=1000)), "((global_state.controlsystem.i>= -(1000))&&(global_state.controlsystem.i<=1000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 47: // STATE 139 - dataview.pml:8496 - [global_state.controlsystem.d = (global_state.controlsystem.inputvalue-global_state.controlsystem.previous)] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][139] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.controlsystem.d;
-		now.global_state.controlsystem.d = (now.global_state.controlsystem.inputvalue-now.global_state.controlsystem.previous);
-#ifdef VAR_RANGES
-		logval("global_state.controlsystem.d", now.global_state.controlsystem.d);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 48: // STATE 140 - dataview.pml:8501 - [assert(((global_state.controlsystem.d>=-(1000))&&(global_state.controlsystem.d<=1000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][140] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.controlsystem.d>= -(1000))&&(now.global_state.controlsystem.d<=1000)), "((global_state.controlsystem.d>= -(1000))&&(global_state.controlsystem.d<=1000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 49: // STATE 143 - dataview.pml:8496 - [global_state.controlsystem.previous = global_state.controlsystem.inputvalue] (0:0:1 - 1)
+	case 50: // STATE 143 - dataview.pml:8496 - [global_state.sensor.x = (global_state.sensor.x*2.000000)] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][143] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.controlsystem.previous;
-		now.global_state.controlsystem.previous = now.global_state.controlsystem.inputvalue;
+		(trpt+1)->bup.oval = now.global_state.sensor.x;
+		now.global_state.sensor.x = (now.global_state.sensor.x*2.000000);
 #ifdef VAR_RANGES
-		logval("global_state.controlsystem.previous", now.global_state.controlsystem.previous);
+		logval("global_state.sensor.x", now.global_state.sensor.x);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 50: // STATE 144 - dataview.pml:8501 - [assert(((global_state.controlsystem.previous>=-(1000))&&(global_state.controlsystem.previous<=1000)))] (0:0:0 - 1)
+	case 51: // STATE 144 - dataview.pml:8501 - [assert(((global_state.sensor.x>=-(1000))&&(global_state.sensor.x<=1000)))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[7][144] = 1;
 		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.controlsystem.previous>= -(1000))&&(now.global_state.controlsystem.previous<=1000)), "((global_state.controlsystem.previous>= -(1000))&&(global_state.controlsystem.previous<=1000))", II, tt, t);
+		spin_assert(((now.global_state.sensor.x>= -(1000))&&(now.global_state.sensor.x<=1000)), "((global_state.sensor.x>= -(1000))&&(global_state.sensor.x<=1000))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 51: // STATE 148 - dataview.pml:8496 - [global_state.controlsystem.outputvalue = (((global_state.controlsystem.cfg.kp*global_state.controlsystem.inputvalue)+(global_state.controlsystem.cfg.ki*global_state.controlsystem.i))+(global_state.controlsystem.cfg.kd*global_state.controlsystem.d))] (0:0:1 - 1)
+	case 52: // STATE 147 - system.pml:64 - [Controlsystem_reading_channel!global_state.sensor.x] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][148] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.controlsystem.outputvalue;
-		now.global_state.controlsystem.outputvalue = (((now.global_state.controlsystem.cfg.kp*now.global_state.controlsystem.inputvalue)+(now.global_state.controlsystem.cfg.ki*now.global_state.controlsystem.i))+(now.global_state.controlsystem.cfg.kd*now.global_state.controlsystem.d));
-#ifdef VAR_RANGES
-		logval("global_state.controlsystem.outputvalue", now.global_state.controlsystem.outputvalue);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 52: // STATE 149 - dataview.pml:8501 - [assert(((global_state.controlsystem.outputvalue>=-(1000))&&(global_state.controlsystem.outputvalue<=1000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][149] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.controlsystem.outputvalue>= -(1000))&&(now.global_state.controlsystem.outputvalue<=1000)), "((global_state.controlsystem.outputvalue>= -(1000))&&(global_state.controlsystem.outputvalue<=1000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 53: // STATE 152 - system.pml:46 - [Actuator_controlSignal_channel!global_state.controlsystem.outputvalue] (158:0:1 - 1)
-		IfNotBlocked
-		reached[7][152] = 1;
-		if (q_full(now.Actuator_controlSignal_channel))
+		reached[7][147] = 1;
+		if (q_full(now.Controlsystem_reading_channel))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Actuator_controlSignal_channel);
-		sprintf(simtmp, "%f,", now.global_state.controlsystem.outputvalue); strcat(simvals, simtmp);		}
+			sprintf(simvals, "%d!", now.Controlsystem_reading_channel);
+		sprintf(simtmp, "%f,", now.global_state.sensor.x); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Actuator_controlSignal_channel, 0, now.global_state.controlsystem.outputvalue, 0, 0, 1);
-		/* merge: transition_id = -(1)(0, 154, 158) */
-		reached[7][154] = 1;
+		qsend(now.Controlsystem_reading_channel, 0, now.global_state.sensor.x, 0, 0, 1);
+		_m = 2; goto P999; /* 0 */
+	case 53: // STATE 149 - system.pml:35 - [global_state.timers.sensor.trigger.interval = 1000] (0:158:4 - 1)
+		IfNotBlocked
+		reached[7][149] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = ((P7 *)_this)->_1211_8_10_20_transition_id;
+		(trpt+1)->bup.ovals = grab_values(4);
+		(trpt+1)->bup.ovals[0] = now.global_state.timers.sensor.trigger.interval;
+		now.global_state.timers.sensor.trigger.interval = 1000;
+#ifdef VAR_RANGES
+		logval("global_state.timers.sensor.trigger.interval", now.global_state.timers.sensor.trigger.interval);
+#endif
+		;
+		/* merge: global_state.timers.sensor.trigger.timer_enabled = 1(158, 150, 158) */
+		reached[7][150] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[1] = now.global_state.timers.sensor.trigger.timer_enabled;
+		now.global_state.timers.sensor.trigger.timer_enabled = 1;
+#ifdef VAR_RANGES
+		logval("global_state.timers.sensor.trigger.timer_enabled", ((int)now.global_state.timers.sensor.trigger.timer_enabled));
+#endif
+		;
+		/* merge: printf('set_timer Sensor trigger %d\\n',1000)(158, 151, 158) */
+		reached[7][151] = 1;
+		if (TstOnly) return 1; /* T4 */
+		Printf("set_timer Sensor trigger %d\n", 1000);
+		/* merge: transition_id = -(1)(158, 153, 158) */
+		reached[7][153] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[2] = ((P7 *)_this)->_1211_8_10_20_transition_id;
 		((P7 *)_this)->_1211_8_10_20_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval(":init::transition_id", ((P7 *)_this)->_1211_8_10_20_transition_id);
+#endif
+		;
+		/* merge: global_state.sensor.state = 0(158, 154, 158) */
+		reached[7][154] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[3] = now.global_state.sensor.state;
+		now.global_state.sensor.state = 0;
+#ifdef VAR_RANGES
+		logval("global_state.sensor.state", now.global_state.sensor.state);
 #endif
 		;
 		/* merge: goto continuous_signals(0, 155, 158) */
 		reached[7][155] = 1;
 		;
-		_m = 2; goto P999; /* 2 */
-	case 54: // STATE 164 - system.pml:254 - [Controlsystem_lock!1] (0:0:0 - 3)
+		_m = 3; goto P999; /* 5 */
+	case 54: // STATE 164 - system.pml:254 - [Sensor_lock!1] (0:0:0 - 3)
 		IfNotBlocked
 		reached[7][164] = 1;
-		if (q_full(now.Controlsystem_lock))
+		if (q_full(now.Sensor_lock))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Controlsystem_lock);
+			sprintf(simvals, "%d!", now.Sensor_lock);
 		sprintf(simtmp, "%d,", 1); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Controlsystem_lock, 0, 1, 0, 0, 1);
+		qsend(now.Sensor_lock, 0, 1, 0, 0, 1);
 		_m = 2; goto P999; /* 0 */
 	case 55: // STATE 165 - dataview.pml:8596 - [global_state.host.sender = 4] (0:0:1 - 1)
 		IfNotBlocked

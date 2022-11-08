@@ -513,25 +513,25 @@ int _;	/* predefined write-only variable */
 short src_ln7 [] = {
 	  0,   0,   0,   0,   0,   0,   0,   0, 
 	  0,   0,   0,   0,   0, 19091, 19090, 8596, 
-	8601, 8600, 8595,   4,   4,   7,   8,   9, 
-	8496, 8501, 8500, 8495,  35,  36,  37,  34, 
-	 12,  13,  14,  15, 104, 103, 8496, 8501, 
-	8500, 8495,  64,  63,  35,  36,  37,  34, 
-	 20,  21,  22,   6,  24,  25,   5,  26, 
-	  5,   2,  28, 250, 8596, 8601, 8600, 8595, 
-	8496, 8501, 8500, 8495,   4,   4,   7,   8, 
-	  9,  10,  11,  12,  13,  56,  55, 8496, 
-	8501, 8500, 8495,  17,  18,  19,  20,  21, 
-	 22,  23,  24,  16,  26,   6,  27,  28, 
-	  5,  29,   5,   2,  31, 252, 8596, 8601, 
-	8600, 8595, 8496, 8501, 8500, 8495, 8496, 8501, 
-	8500, 8495, 8496, 8501, 8500, 8495,   4,   4, 
-	  7,   8,   9,  10,  11,  12,  13,  74, 
-	 73,  15,  16,  17,  18,  74,  73, 8496, 
-	8501, 8500, 8495, 8496, 8501, 8500, 8495, 8496, 
-	8501, 8500, 8495,  20, 8496, 8501, 8500, 8495, 
-	 46,  45,  27,  28,   6,  30,  31,   5, 
-	 32,   5,   2,  34, 254, 8596, 8601, 8600, 
+	8601, 8600, 8595, 8496, 8501, 8500, 8495, 8496, 
+	8501, 8500, 8495, 8496, 8501, 8500, 8495,   4, 
+	  4,   7,   8,   9,  10,  11,  12,  13, 
+	 74,  73,  15,  16,  17,  18,  74,  73, 
+	8496, 8501, 8500, 8495, 8496, 8501, 8500, 8495, 
+	8496, 8501, 8500, 8495,  20, 8496, 8501, 8500, 
+	8495,  46,  45,  27,  28,   6,  30,  31, 
+	  5,  32,   5,   2,  34, 250, 8596, 8601, 
+	8600, 8595, 8496, 8501, 8500, 8495,   4,   4, 
+	  7,   8,   9,  10,  11,  12,  13,  56, 
+	 55, 8496, 8501, 8500, 8495,  17,  18,  19, 
+	 20,  21,  22,  23,  24,  16,  26,   6, 
+	 27,  28,   5,  29,   5,   2,  31, 252, 
+	8596, 8601, 8600, 8595,   4,   4,   7,   8, 
+	  9, 8496, 8501, 8500, 8495,  35,  36,  37, 
+	 34,  12,  13,  14,  15, 104, 103, 8496, 
+	8501, 8500, 8495,  64,  63,  35,  36,  37, 
+	 34,  20,  21,  22,   6,  24,  25,   5, 
+	 26,   5,   2,  28, 254, 8596, 8601, 8600, 
 	8595,   4,   4,   7,   8,   9, 8496, 8501, 
 	8500, 8495, 8496, 8501, 8500, 8495, 8496, 8501, 
 	8500, 8495,  10,  60,  59,  16,  17,  18, 
@@ -539,32 +539,32 @@ short src_ln7 [] = {
 	256, 257, 247, 259,   0, };
 S_F_MAP src_file7 [] = {
 	{ "-", 0, 12 },
-	{ "dataview.pml", 13, 18 },
-	{ "sensor.pml", 19, 23 },
-	{ "dataview.pml", 24, 27 },
-	{ "system.pml", 28, 31 },
-	{ "sensor.pml", 32, 35 },
-	{ "system.pml", 36, 37 },
-	{ "dataview.pml", 38, 41 },
-	{ "system.pml", 42, 47 },
-	{ "sensor.pml", 48, 58 },
-	{ "system.pml", 59, 59 },
-	{ "dataview.pml", 60, 67 },
-	{ "actuator.pml", 68, 76 },
-	{ "system.pml", 77, 78 },
-	{ "dataview.pml", 79, 82 },
-	{ "actuator.pml", 83, 100 },
-	{ "system.pml", 101, 101 },
-	{ "dataview.pml", 102, 117 },
-	{ "controlsystem.pml", 118, 126 },
-	{ "system.pml", 127, 128 },
-	{ "controlsystem.pml", 129, 132 },
-	{ "system.pml", 133, 134 },
-	{ "dataview.pml", 135, 146 },
-	{ "controlsystem.pml", 147, 147 },
-	{ "dataview.pml", 148, 151 },
-	{ "system.pml", 152, 153 },
-	{ "controlsystem.pml", 154, 163 },
+	{ "dataview.pml", 13, 30 },
+	{ "controlsystem.pml", 31, 39 },
+	{ "system.pml", 40, 41 },
+	{ "controlsystem.pml", 42, 45 },
+	{ "system.pml", 46, 47 },
+	{ "dataview.pml", 48, 59 },
+	{ "controlsystem.pml", 60, 60 },
+	{ "dataview.pml", 61, 64 },
+	{ "system.pml", 65, 66 },
+	{ "controlsystem.pml", 67, 76 },
+	{ "system.pml", 77, 77 },
+	{ "dataview.pml", 78, 85 },
+	{ "actuator.pml", 86, 94 },
+	{ "system.pml", 95, 96 },
+	{ "dataview.pml", 97, 100 },
+	{ "actuator.pml", 101, 118 },
+	{ "system.pml", 119, 119 },
+	{ "dataview.pml", 120, 123 },
+	{ "sensor.pml", 124, 128 },
+	{ "dataview.pml", 129, 132 },
+	{ "system.pml", 133, 136 },
+	{ "sensor.pml", 137, 140 },
+	{ "system.pml", 141, 142 },
+	{ "dataview.pml", 143, 146 },
+	{ "system.pml", 147, 152 },
+	{ "sensor.pml", 153, 163 },
 	{ "system.pml", 164, 164 },
 	{ "dataview.pml", 165, 168 },
 	{ "host.pml", 169, 173 },
@@ -578,24 +578,24 @@ S_F_MAP src_file7 [] = {
 uchar reached7 [] = {
 	  0,   1,   1,   0,   0,   1,   1,   1, 
 	  0,   0,   1,   0,   0,   1,   1,   1, 
-	  1,   0,   1,   1,   0,   1,   1,   1, 
-	  1,   1,   0,   0,   1,   0,   0,   0, 
-	  0,   0,   1,   1,   1,   0,   1,   1, 
-	  0,   0,   1,   0,   1,   0,   0,   0, 
-	  0,   0,   1,   1,   1,   1,   0,   1, 
-	  1,   0,   0,   0,   1,   1,   0,   1, 
-	  1,   1,   0,   0,   1,   0,   1,   1, 
-	  1,   0,   0,   1,   1,   1,   0,   1, 
-	  1,   0,   0,   1,   0,   0,   1,   1, 
-	  0,   0,   1,   0,   1,   1,   1,   1, 
-	  0,   1,   1,   0,   0,   0,   1,   1, 
-	  0,   1,   1,   1,   0,   0,   1,   1, 
-	  0,   0,   1,   1,   0,   0,   1,   0, 
-	  1,   1,   1,   0,   0,   1,   1,   1, 
-	  0,   0,   0,   1,   1,   1,   0,   1, 
 	  1,   0,   1,   1,   1,   0,   0,   1, 
-	  1,   0,   0,   0,   1,   1,   0,   0, 
-	  1,   0,   0,   1,   1,   1,   1,   0, 
+	  1,   0,   0,   1,   1,   0,   0,   1, 
+	  0,   1,   1,   1,   0,   0,   1,   1, 
+	  1,   0,   0,   0,   1,   1,   1,   0, 
+	  1,   1,   0,   1,   1,   1,   0,   0, 
+	  1,   1,   0,   0,   0,   1,   1,   0, 
+	  0,   1,   0,   0,   1,   1,   1,   1, 
+	  0,   1,   1,   0,   0,   0,   1,   1, 
+	  0,   1,   1,   1,   0,   0,   1,   0, 
+	  1,   1,   1,   0,   0,   1,   1,   1, 
+	  0,   1,   1,   0,   0,   1,   0,   0, 
+	  1,   1,   0,   0,   1,   0,   1,   1, 
+	  1,   1,   0,   1,   1,   0,   0,   0, 
+	  1,   1,   0,   1,   1,   0,   1,   1, 
+	  1,   1,   1,   0,   0,   1,   0,   0, 
+	  0,   0,   0,   1,   1,   1,   0,   1, 
+	  1,   0,   0,   1,   0,   1,   0,   0, 
+	  0,   0,   0,   1,   1,   1,   1,   0, 
 	  1,   1,   0,   0,   0,   1,   1,   0, 
 	  1,   1,   0,   1,   1,   1,   1,   1, 
 	  0,   1,   1,   1,   0,   0,   1,   1, 
@@ -1158,13 +1158,13 @@ addproc(int calling_pid, int priority, int n)
 		reached7[202]=1;
 		/* params: */
 		/* locals: */
-		((P7 *)pptr(h))->_1211_8_8_12_transition_id = 0;
-		((P7 *)pptr(h))->_1211_8_9_15_transition_id = 0;
+		((P7 *)pptr(h))->_1211_8_8_15_transition_id = 0;
+		((P7 *)pptr(h))->_1211_8_9_18_transition_id = 0;
 		((P7 *)pptr(h))->_1211_8_10_20_transition_id = 0;
 		((P7 *)pptr(h))->_1211_8_11_22_transition_id = 0;
 #ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)pptr(h))->_1211_8_8_12_transition_id);
-		logval(":init::transition_id", ((P7 *)pptr(h))->_1211_8_9_15_transition_id);
+		logval(":init::transition_id", ((P7 *)pptr(h))->_1211_8_8_15_transition_id);
+		logval(":init::transition_id", ((P7 *)pptr(h))->_1211_8_9_18_transition_id);
 		logval(":init::transition_id", ((P7 *)pptr(h))->_1211_8_10_20_transition_id);
 		logval(":init::transition_id", ((P7 *)pptr(h))->_1211_8_11_22_transition_id);
 #endif
@@ -12874,9 +12874,9 @@ iniglobals(int calling_pid)
 		now.Host_tm_channel = addqueue(calling_pid, 4, 0);
 		now.Sensor_tc_channel = addqueue(calling_pid, 5, 0);
 		now.Sensor_trigger_channel = addqueue(calling_pid, 6, 0);
-		now.Sensor_lock = addqueue(calling_pid, 7, 0);
+		now.Controlsystem_lock = addqueue(calling_pid, 7, 0);
 		now.Actuator_lock = addqueue(calling_pid, 8, 0);
-		now.Controlsystem_lock = addqueue(calling_pid, 9, 0);
+		now.Sensor_lock = addqueue(calling_pid, 9, 0);
 		now.Host_lock = addqueue(calling_pid, 10, 0);
 		now.inited = 0;
 		now.demo_timer_manager_periodic_events.data[0].period = 0;
@@ -13010,21 +13010,16 @@ iniglobals(int calling_pid)
 		now.Controlsystem_configuration_signal_parameter.kp = 0;
 		now.Controlsystem_configuration_signal_parameter.ki = 0;
 		now.Controlsystem_configuration_signal_parameter.kd = 0;
-		now.global_state.actuator.state = 0;
-		now.global_state.actuator.init_done = 0;
-		now.global_state.actuator.sender = 0;
-		now.global_state.actuator.setting = 0;
-		now.global_state.actuator.inputcontrol = 0;
+		now.global_state.sensor.state = 0;
+		now.global_state.sensor.init_done = 0;
+		now.global_state.sensor.sender = 0;
+		now.global_state.sensor.x = 0;
 		now.global_state.host.state = 0;
 		now.global_state.host.init_done = 0;
 		now.global_state.host.sender = 0;
 		now.global_state.host.cfg.kp = 0;
 		now.global_state.host.cfg.ki = 0;
 		now.global_state.host.cfg.kd = 0;
-		now.global_state.sensor.state = 0;
-		now.global_state.sensor.init_done = 0;
-		now.global_state.sensor.sender = 0;
-		now.global_state.sensor.x = 0;
 		now.global_state.controlsystem.state = 0;
 		now.global_state.controlsystem.init_done = 0;
 		now.global_state.controlsystem.sender = 0;
@@ -13036,6 +13031,11 @@ iniglobals(int calling_pid)
 		now.global_state.controlsystem.i = 0;
 		now.global_state.controlsystem.d = 0;
 		now.global_state.controlsystem.previous = 0;
+		now.global_state.actuator.state = 0;
+		now.global_state.actuator.init_done = 0;
+		now.global_state.actuator.sender = 0;
+		now.global_state.actuator.setting = 0;
+		now.global_state.actuator.inputcontrol = 0;
 		now.global_state.timers.actuator.dummy = 0;
 		now.global_state.timers.controlsystem.dummy = 0;
 		now.global_state.timers.host.dummy = 0;
@@ -13177,21 +13177,16 @@ iniglobals(int calling_pid)
 		logval("Controlsystem_configuration_signal_parameter.kp", now.Controlsystem_configuration_signal_parameter.kp);
 		logval("Controlsystem_configuration_signal_parameter.ki", now.Controlsystem_configuration_signal_parameter.ki);
 		logval("Controlsystem_configuration_signal_parameter.kd", now.Controlsystem_configuration_signal_parameter.kd);
-		logval("global_state.actuator.state", now.global_state.actuator.state);
-		logval("global_state.actuator.init_done", now.global_state.actuator.init_done);
-		logval("global_state.actuator.sender", now.global_state.actuator.sender);
-		logval("global_state.actuator.setting", now.global_state.actuator.setting);
-		logval("global_state.actuator.inputcontrol", now.global_state.actuator.inputcontrol);
+		logval("global_state.sensor.state", now.global_state.sensor.state);
+		logval("global_state.sensor.init_done", now.global_state.sensor.init_done);
+		logval("global_state.sensor.sender", now.global_state.sensor.sender);
+		logval("global_state.sensor.x", now.global_state.sensor.x);
 		logval("global_state.host.state", now.global_state.host.state);
 		logval("global_state.host.init_done", now.global_state.host.init_done);
 		logval("global_state.host.sender", now.global_state.host.sender);
 		logval("global_state.host.cfg.kp", now.global_state.host.cfg.kp);
 		logval("global_state.host.cfg.ki", now.global_state.host.cfg.ki);
 		logval("global_state.host.cfg.kd", now.global_state.host.cfg.kd);
-		logval("global_state.sensor.state", now.global_state.sensor.state);
-		logval("global_state.sensor.init_done", now.global_state.sensor.init_done);
-		logval("global_state.sensor.sender", now.global_state.sensor.sender);
-		logval("global_state.sensor.x", now.global_state.sensor.x);
 		logval("global_state.controlsystem.state", now.global_state.controlsystem.state);
 		logval("global_state.controlsystem.init_done", now.global_state.controlsystem.init_done);
 		logval("global_state.controlsystem.sender", now.global_state.controlsystem.sender);
@@ -13203,6 +13198,11 @@ iniglobals(int calling_pid)
 		logval("global_state.controlsystem.i", now.global_state.controlsystem.i);
 		logval("global_state.controlsystem.d", now.global_state.controlsystem.d);
 		logval("global_state.controlsystem.previous", now.global_state.controlsystem.previous);
+		logval("global_state.actuator.state", now.global_state.actuator.state);
+		logval("global_state.actuator.init_done", now.global_state.actuator.init_done);
+		logval("global_state.actuator.sender", now.global_state.actuator.sender);
+		logval("global_state.actuator.setting", now.global_state.actuator.setting);
+		logval("global_state.actuator.inputcontrol", now.global_state.actuator.inputcontrol);
 		logval("global_state.timers.actuator.dummy", now.global_state.timers.actuator.dummy);
 		logval("global_state.timers.controlsystem.dummy", now.global_state.timers.controlsystem.dummy);
 		logval("global_state.timers.host.dummy", now.global_state.timers.host.dummy);
@@ -14097,20 +14097,20 @@ q_cond(short II, Trans *t)
 			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Sensor_trigger_channel) )))
 			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Sensor_trigger_channel) )))
 			    ) return 0; break;
-		case 7: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Sensor_lock) )))
-			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Sensor_lock) )))
-			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Sensor_lock) )))
-			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Sensor_lock) )))
+		case 7: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Controlsystem_lock) )))
+			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Controlsystem_lock) )))
+			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Controlsystem_lock) )))
+			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Controlsystem_lock) )))
 			    ) return 0; break;
 		case 8: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Actuator_lock) )))
 			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Actuator_lock) )))
 			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Actuator_lock) )))
 			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Actuator_lock) )))
 			    ) return 0; break;
-		case 9: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Controlsystem_lock) )))
-			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Controlsystem_lock) )))
-			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Controlsystem_lock) )))
-			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Controlsystem_lock) )))
+		case 9: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Sensor_lock) )))
+			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Sensor_lock) )))
+			 || 	(t->ty[i] == Q_EMPT_F && ( !q_len((int) ( now.Sensor_lock) )))
+			 || 	(t->ty[i] == Q_EMPT_T && (  q_len((int) ( now.Sensor_lock) )))
 			    ) return 0; break;
 		case 10: if (	(t->ty[i] == Q_FULL_F && ( q_full((int) ( now.Host_lock) )))
 			 || 	(t->ty[i] == Q_FULL_T && (!q_full((int) ( now.Host_lock) )))
@@ -15580,21 +15580,16 @@ c_globals(void)
 	printf("	chan Sensor_trigger_channel (=%d):	len %d:\t", now.Sensor_trigger_channel, q_len(now.Sensor_trigger_channel));
 	c_chandump(now.Sensor_trigger_channel);
 		printf("	(struct global_state)\n");
-	printf("	int    state:	%d\n", now.global_state.actuator.state);
-	printf("	bit    init_done:	%d\n", now.global_state.actuator.init_done);
-	printf("	int    sender:	%d\n", now.global_state.actuator.sender);
-	printf("	float  setting:	%f\n", now.global_state.actuator.setting);
-	printf("	float  inputcontrol:	%f\n", now.global_state.actuator.inputcontrol);
+	printf("	int    state:	%d\n", now.global_state.sensor.state);
+	printf("	bit    init_done:	%d\n", now.global_state.sensor.init_done);
+	printf("	int    sender:	%d\n", now.global_state.sensor.sender);
+	printf("	float  x:	%f\n", now.global_state.sensor.x);
 	printf("	int    state:	%d\n", now.global_state.host.state);
 	printf("	bit    init_done:	%d\n", now.global_state.host.init_done);
 	printf("	int    sender:	%d\n", now.global_state.host.sender);
 	printf("	float  kp:	%f\n", now.global_state.host.cfg.kp);
 	printf("	float  ki:	%f\n", now.global_state.host.cfg.ki);
 	printf("	float  kd:	%f\n", now.global_state.host.cfg.kd);
-	printf("	int    state:	%d\n", now.global_state.sensor.state);
-	printf("	bit    init_done:	%d\n", now.global_state.sensor.init_done);
-	printf("	int    sender:	%d\n", now.global_state.sensor.sender);
-	printf("	float  x:	%f\n", now.global_state.sensor.x);
 	printf("	int    state:	%d\n", now.global_state.controlsystem.state);
 	printf("	bit    init_done:	%d\n", now.global_state.controlsystem.init_done);
 	printf("	int    sender:	%d\n", now.global_state.controlsystem.sender);
@@ -15606,18 +15601,23 @@ c_globals(void)
 	printf("	float  i:	%f\n", now.global_state.controlsystem.i);
 	printf("	float  d:	%f\n", now.global_state.controlsystem.d);
 	printf("	float  previous:	%f\n", now.global_state.controlsystem.previous);
+	printf("	int    state:	%d\n", now.global_state.actuator.state);
+	printf("	bit    init_done:	%d\n", now.global_state.actuator.init_done);
+	printf("	int    sender:	%d\n", now.global_state.actuator.sender);
+	printf("	float  setting:	%f\n", now.global_state.actuator.setting);
+	printf("	float  inputcontrol:	%f\n", now.global_state.actuator.inputcontrol);
 	printf("	bit    dummy:	%d\n", now.global_state.timers.actuator.dummy);
 	printf("	bit    dummy:	%d\n", now.global_state.timers.controlsystem.dummy);
 	printf("	bit    dummy:	%d\n", now.global_state.timers.host.dummy);
 	printf("	bit    timer_enabled:	%d\n", now.global_state.timers.sensor.trigger.timer_enabled);
 	printf("	int    interval:	%d\n", now.global_state.timers.sensor.trigger.interval);
 	printf("	bit    dummy:	%d\n", now.global_state.timers.dummy_entry.dummy);
-	printf("	chan Sensor_lock (=%d):	len %d:\t", now.Sensor_lock, q_len(now.Sensor_lock));
-	c_chandump(now.Sensor_lock);
-	printf("	chan Actuator_lock (=%d):	len %d:\t", now.Actuator_lock, q_len(now.Actuator_lock));
-	c_chandump(now.Actuator_lock);
 	printf("	chan Controlsystem_lock (=%d):	len %d:\t", now.Controlsystem_lock, q_len(now.Controlsystem_lock));
 	c_chandump(now.Controlsystem_lock);
+	printf("	chan Actuator_lock (=%d):	len %d:\t", now.Actuator_lock, q_len(now.Actuator_lock));
+	c_chandump(now.Actuator_lock);
+	printf("	chan Sensor_lock (=%d):	len %d:\t", now.Sensor_lock, q_len(now.Sensor_lock));
+	c_chandump(now.Sensor_lock);
 	printf("	chan Host_lock (=%d):	len %d:\t", now.Host_lock, q_len(now.Host_lock));
 	c_chandump(now.Host_lock);
 }
@@ -15627,8 +15627,8 @@ c_locals(int pid, int tp)
 	switch(tp) {
 	case 7:
 		printf("local vars proc %d (:init:):\n", pid);
-	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_1211_8_8_12_transition_id);
-	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_1211_8_9_15_transition_id);
+	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_1211_8_8_15_transition_id);
+	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_1211_8_9_18_transition_id);
 	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_1211_8_10_20_transition_id);
 	printf("	int    transition_id:	%d\n", ((P7 *)pptr(pid))->_1211_8_11_22_transition_id);
 		break;

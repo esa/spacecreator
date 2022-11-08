@@ -15,7 +15,7 @@ typedef struct _PI_Messages {
 typedef struct _RI_Messages {
    T_sensor_RI_list msg_id;
    union {
-      asn1SccT_Integer reading_param;
+      asn1SccTInteger reading_param;
    } msg_data;
 } RI_Messages;
 
@@ -78,7 +78,7 @@ void sensor_PI_Poll(void)
                                        (int *)&message_received_type)) {
       switch(message_received_type) {
          case i_reading:
-            sensor_RI_reading((asn1SccT_Integer *)msgcontent);
+            sensor_RI_reading((asn1SccTInteger *)msgcontent);
             break;
        default : break;
       }

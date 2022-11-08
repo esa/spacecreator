@@ -1,7 +1,0 @@
-all:
-	mkdir -p code
-	cd code && opengeode --toAda /home/taste/spacecreator/tests/manual/tmc/CdrDemo/work/modelchecking/properties/CorrectThresholds/CorrectThresholds.pr 
-	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada observer.asn code/CorrectThresholds_datamodel.asn
-	cd code && gnat make CorrectThresholds
-clean:
-	rm -rf code

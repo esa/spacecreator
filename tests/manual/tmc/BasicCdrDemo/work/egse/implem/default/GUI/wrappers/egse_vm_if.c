@@ -62,14 +62,14 @@ void egse_tm
 
    //  Declare user code function as external (it may not have a .h if it is in Ada)
    extern void egse_PI_tm
-      (const asn1SccT_Report *);
+      (const asn1SccTReport *);
 
 
 
 
 
    // Call user code
-   egse_PI_tm ((asn1SccT_Report *)IN_reprt);
+   egse_PI_tm ((asn1SccTReport *)IN_reprt);
 
 }
 

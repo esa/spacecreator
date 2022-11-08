@@ -11,7 +11,7 @@ static pthread_mutex_t g_printing_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 #endif
 
-void PrintASN1T_Integer(const char *paramName, const asn1SccT_Integer *pData)
+void PrintASN1TInteger(const char *paramName, const asn1SccTInteger *pData)
 {
     (void)paramName;
     (void)pData;
@@ -19,7 +19,7 @@ void PrintASN1T_Integer(const char *paramName, const asn1SccT_Integer *pData)
     pthread_mutex_lock(&g_printing_mutex);
 #endif
 #ifdef __unix__
-    //printf("%s T-Integer ::= ", paramName);
+    //printf("%s TInteger ::= ", paramName);
     printf("%s ", paramName);
     #if WORD_SIZE==8
     printf("%"PRId64, (*pData));
@@ -32,7 +32,7 @@ void PrintASN1T_Integer(const char *paramName, const asn1SccT_Integer *pData)
 #endif
 }
 
-void PrintASN1T_Config(const char *paramName, const asn1SccT_Config *pData)
+void PrintASN1TConfig(const char *paramName, const asn1SccTConfig *pData)
 {
     (void)paramName;
     (void)pData;
@@ -40,7 +40,7 @@ void PrintASN1T_Config(const char *paramName, const asn1SccT_Config *pData)
     pthread_mutex_lock(&g_printing_mutex);
 #endif
 #ifdef __unix__
-    //printf("%s T-Config ::= ", paramName);
+    //printf("%s TConfig ::= ", paramName);
     printf("%s ", paramName);
     printf("{");
     printf("param-a ");
@@ -63,7 +63,7 @@ void PrintASN1T_Config(const char *paramName, const asn1SccT_Config *pData)
 #endif
 }
 
-void PrintASN1T_Report(const char *paramName, const asn1SccT_Report *pData)
+void PrintASN1TReport(const char *paramName, const asn1SccTReport *pData)
 {
     (void)paramName;
     (void)pData;
@@ -71,7 +71,7 @@ void PrintASN1T_Report(const char *paramName, const asn1SccT_Report *pData)
     pthread_mutex_lock(&g_printing_mutex);
 #endif
 #ifdef __unix__
-    //printf("%s T-Report ::= ", paramName);
+    //printf("%s TReport ::= ", paramName);
     printf("%s ", paramName);
     printf("{");
     printf("reading ");

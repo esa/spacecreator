@@ -5,10 +5,10 @@
 #include "sensor.pml"
 #include "env_inlines.pml"
 typedef system_state {
-    Actuator_Context actuator;
-    Host_Context host;
     Sensor_Context sensor;
+    Host_Context host;
     Controlsystem_Context controlsystem;
+    Actuator_Context actuator;
     AggregateTimerData timers;
 }
 
@@ -26,9 +26,9 @@ chan Host_tm_channel = [1] of {int};
 chan Sensor_tc_channel = [1] of {int};
 chan Sensor_trigger_channel = [1] of {int};
 system_state global_state;
-chan Sensor_lock = [1] of {int};
-chan Actuator_lock = [1] of {int};
 chan Controlsystem_lock = [1] of {int};
+chan Actuator_lock = [1] of {int};
+chan Sensor_lock = [1] of {int};
 chan Host_lock = [1] of {int};
 inline Sensor_0_trigger_set(Sensor_trigger_interval)
 {
@@ -246,12 +246,12 @@ init
 {
     atomic {
         global_dataview_init();
-        Sensor_0_init();
-        Sensor_lock!1;
-        Actuator_0_init();
-        Actuator_lock!1;
         Controlsystem_0_init();
         Controlsystem_lock!1;
+        Actuator_0_init();
+        Actuator_lock!1;
+        Sensor_0_init();
+        Sensor_lock!1;
         Host_0_init();
         Host_lock!1;
         inited = 1;

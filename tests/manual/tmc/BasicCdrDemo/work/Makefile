@@ -109,7 +109,7 @@ check_targets:
 	$(MAKE) -C build -f Makefile.taste check_targets
 
 # Generate the language-specific data view needed before editing user code
-dataview:	dataview/Ada/built
+dataview:	dataview/C/built dataview/Ada/built
 	# Copy the dataview to SDL/SEDS function Actuator (no context parameters)
 	cp -u ${DATAVIEW_UNIQ} actuator/SDL/src
 	# Compute MD5 of the dataview, needed to decide if code needs to be re-generated
@@ -120,7 +120,7 @@ dataview:	dataview/Ada/built
 	md5sum -c "modemanager/SDL/src/dataview.md5"  &> /dev/null || md5sum  "modemanager/SDL/src/dataview-uniq.asn" >  "modemanager/SDL/src/dataview.md5"
 
 # Generate the complete dataview, including Python bindings if there is a GUI
-${DATAVIEW_PATH}/built:  # simulation: no dependency to "dataview" (already built by top-level Makefile)
+${DATAVIEW_PATH}/built:	dataview dataview/Python/built
 	touch $@
 
 # Build based on the deployment view

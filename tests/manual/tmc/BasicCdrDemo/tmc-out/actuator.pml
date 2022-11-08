@@ -37,10 +37,10 @@ inline Actuator_0_PI_0_ctrl(input_param)
 {
   if
   ::(global_state.actuator.state == Actuator_States_idle)->
-    T_Integer_assign_value(global_state.actuator.x, input_param);
+    TInteger_assign_value(global_state.actuator.x, input_param);
     Actuator_0_transition(1);
   ::(global_state.actuator.state == Actuator_States_working)->
-    T_Integer_assign_value(global_state.actuator.x, input_param);
+    TInteger_assign_value(global_state.actuator.x, input_param);
     Actuator_0_transition(1);
   ::else->
     skip;

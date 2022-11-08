@@ -35,51 +35,51 @@ package BASICCDRDEMO_DATAVIEW with SPARK_Mode
 is
 
 
-subtype asn1SccT_Integer is adaasn1rtl.Asn1UInt range 0 .. 1000000;
+subtype asn1SccTInteger is adaasn1rtl.Asn1UInt range 0 .. 1000000;
 
 
-function asn1SccT_Integer_Equal(val1, val2 : asn1SccT_Integer) return Boolean;
+function asn1SccTInteger_Equal(val1, val2 : asn1SccTInteger) return Boolean;
 
-ERR_T_INTEGER:constant Integer := 1; -- (0 .. 1000000)
-function asn1SccT_Integer_IsConstraintValid(val : asn1SccT_Integer) return adaasn1rtl.ASN1_RESULT;
+ERR_TINTEGER:constant Integer := 1; -- (0 .. 1000000)
+function asn1SccTInteger_IsConstraintValid(val : asn1SccTInteger) return adaasn1rtl.ASN1_RESULT;
 
-function asn1SccT_Integer_Init  return asn1SccT_Integer is
+function asn1SccTInteger_Init  return asn1SccTInteger is
 (0);
--- asn1SccT_Config --------------------------------------------
+-- asn1SccTConfig --------------------------------------------
 
-type asn1SccT_Config is record 
-    param_a : asn1SccT_Integer;
-    param_b : asn1SccT_Integer;
+type asn1SccTConfig is record 
+    param_a : asn1SccTInteger;
+    param_b : asn1SccTInteger;
 end record;
 
 
-function asn1SccT_Config_Equal(val1, val2 : asn1SccT_Config) return Boolean;
+function asn1SccTConfig_Equal(val1, val2 : asn1SccTConfig) return Boolean;
 
-ERR_T_CONFIG:constant Integer := 26; -- 
-ERR_T_CONFIG_PARAM_A_2:constant Integer := 11; -- 
-ERR_T_CONFIG_PARAM_B_2:constant Integer := 21; -- 
-function asn1SccT_Config_IsConstraintValid(val : asn1SccT_Config) return adaasn1rtl.ASN1_RESULT;
+ERR_TCONFIG:constant Integer := 26; -- 
+ERR_TCONFIG_PARAM_A_2:constant Integer := 11; -- 
+ERR_TCONFIG_PARAM_B_2:constant Integer := 21; -- 
+function asn1SccTConfig_IsConstraintValid(val : asn1SccTConfig) return adaasn1rtl.ASN1_RESULT;
 
-function asn1SccT_Config_Init  return asn1SccT_Config is
+function asn1SccTConfig_Init  return asn1SccTConfig is
 ((param_a => 0, param_b => 0));
--- asn1SccT_Report --------------------------------------------
+-- asn1SccTReport --------------------------------------------
 
-type asn1SccT_Report is record 
-    reading : asn1SccT_Integer;
-    ctrl : asn1SccT_Integer;
-    feedback : asn1SccT_Integer;
+type asn1SccTReport is record 
+    reading : asn1SccTInteger;
+    ctrl : asn1SccTInteger;
+    feedback : asn1SccTInteger;
 end record;
 
 
-function asn1SccT_Report_Equal(val1, val2 : asn1SccT_Report) return Boolean;
+function asn1SccTReport_Equal(val1, val2 : asn1SccTReport) return Boolean;
 
-ERR_T_REPORT:constant Integer := 61; -- 
-ERR_T_REPORT_READING_2:constant Integer := 36; -- 
-ERR_T_REPORT_CTRL_2:constant Integer := 46; -- 
-ERR_T_REPORT_FEEDBACK_2:constant Integer := 56; -- 
-function asn1SccT_Report_IsConstraintValid(val : asn1SccT_Report) return adaasn1rtl.ASN1_RESULT;
+ERR_TREPORT:constant Integer := 61; -- 
+ERR_TREPORT_READING_2:constant Integer := 36; -- 
+ERR_TREPORT_CTRL_2:constant Integer := 46; -- 
+ERR_TREPORT_FEEDBACK_2:constant Integer := 56; -- 
+function asn1SccTReport_IsConstraintValid(val : asn1SccTReport) return adaasn1rtl.ASN1_RESULT;
 
-function asn1SccT_Report_Init  return asn1SccT_Report is
+function asn1SccTReport_Init  return asn1SccTReport is
 ((reading => 0, ctrl => 0, feedback => 0));
 pragma Warnings (Off, "there are no others");
  

@@ -90,9 +90,6 @@ check_targets:  # check that runtime of every node is installed
 node_linux_x86_linux: demo_glue DriversConfig/drivers_config.h
 	$(MAKE) -j -C node_linux -f Makefile.node_linux
 
-node_linux_simu:	demo_simu DriversConfig/drivers_config.h simulation.asn
-	#asn2dataModel -toAda -allboards -o ../dataview/Ada simulation.asn ../dataview/dataview-uniq.asn
-	$(MAKE) -j -C node_linux -f Makefile.node_linux simulate
 
 
 #  Build of partition demo (common to all targets)
@@ -132,7 +129,9 @@ run_demo_partition: run_EGSE_gui run_Sensor_gui run_demo_binary
 
 
 run_demo_binary:
-	cd ../binaries && ./demo || :
+	# make sure the generated artefacts appear in space creator
+	touch ../../*.pro
+	cd ../binaries && taste-run-and-trace ./demo || :
 
 run_EGSE_gui:
 	uname -a | grep WSL && sudo sysctl fs.mqueue.msg_max=100 || :
@@ -155,7 +154,7 @@ actuator:	../actuator/SDL/code/actuator.adb
 	$(MAKE) -j -C ../actuator/SDL generate-code
 
 # Provide scripts to run the gui and its partition automatically
-egse:  # Simulation target: no dependency
+egse: ../binaries/EGSE
 	touch $@
 
 ../binaries/EGSE:
@@ -174,7 +173,7 @@ modemanager:	../modemanager/SDL/code/modemanager.adb
 	$(MAKE) -j -C ../modemanager/SDL generate-code
 
 # Provide scripts to run the gui and its partition automatically
-sensor:  # Simulation target: no dependency
+sensor: ../binaries/Sensor
 	touch $@
 
 ../binaries/Sensor:

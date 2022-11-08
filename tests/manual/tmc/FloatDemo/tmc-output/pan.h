@@ -4725,10 +4725,10 @@ struct System_State { /* user defined type */
 	struct System_State_sensor sensor;
 };
 struct system_state { /* user defined type */
-	struct Actuator_Context actuator;
-	struct Host_Context host;
 	struct Sensor_Context sensor;
+	struct Host_Context host;
 	struct Controlsystem_Context controlsystem;
+	struct Actuator_Context actuator;
 	struct AggregateTimerData timers;
 };
 #define Pinit	((P7 *)_this)
@@ -4739,8 +4739,8 @@ typedef struct P7 { /* :init: */
 #ifdef HAS_PRIORITY
 	unsigned _priority : 8; /* 0..255 */
 #endif
-	int _1211_8_8_12_transition_id;
-	int _1211_8_9_15_transition_id;
+	int _1211_8_8_15_transition_id;
+	int _1211_8_9_18_transition_id;
 	int _1211_8_10_20_transition_id;
 	int _1211_8_11_22_transition_id;
 } P7;
@@ -5034,9 +5034,9 @@ typedef struct State {
 	uchar Host_tm_channel;
 	uchar Sensor_tc_channel;
 	uchar Sensor_trigger_channel;
-	uchar Sensor_lock;
-	uchar Actuator_lock;
 	uchar Controlsystem_lock;
+	uchar Actuator_lock;
+	uchar Sensor_lock;
 	uchar Host_lock;
 	int inited;
 	struct Demo_Timer_Manager_Periodic_Events demo_timer_manager_periodic_events;

@@ -10,13 +10,13 @@
 extern unsigned actuator_initialized;
 
 void actuator_RI_feedback_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 );
 void actuator_RI_feedback(
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 );
 void actuator_RI_feedback(
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 )
 {
    // When no destination is specified, send to everyone (multicast)
@@ -25,7 +25,7 @@ void actuator_RI_feedback(
 }
 
 void actuator_RI_feedback_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 )
 {
    // Log MSC data on Linux when environment variable is set
@@ -47,7 +47,7 @@ void actuator_RI_feedback_To_PID(asn1SccPID dest_pid,
 
    vm_actuator_feedback
      (dest_pid,
-      (void *)IN_x, sizeof(asn1SccT_Integer));
+      (void *)IN_x, sizeof(asn1SccTInteger));
 
 
 }

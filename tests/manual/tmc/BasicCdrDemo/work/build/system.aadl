@@ -9,11 +9,11 @@ public
 
 thread Actuator_Ctrl
 features
-   INPORT_Ctrl : in event data port DataView::T_Integer_Buffer.impl
+   INPORT_Ctrl : in event data port DataView::TInteger_Buffer.impl
       { Compute_Execution_Time =>  0 ms ..  0 ms;
         Queue_Size =>  1;
         Compute_Entrypoint_Source_Text => "Demo_TASTE_Interface.Actuator_Ctrl_ctrl"; };
-   OUTPORT_Modemanager_Feedback : out event data port DataView::T_Integer_Buffer.impl;
+   OUTPORT_Modemanager_Feedback : out event data port DataView::TInteger_Buffer.impl;
 end Actuator_Ctrl;
 
 thread implementation Actuator_Ctrl.others
@@ -36,7 +36,7 @@ public
 
 thread Egse_Poll
 features
-   OUTPORT_Modemanager_Tc : out event data port DataView::T_Config_Buffer.impl;
+   OUTPORT_Modemanager_Tc : out event data port DataView::TConfig_Buffer.impl;
 end Egse_Poll;
 
 thread implementation Egse_Poll.others
@@ -60,11 +60,11 @@ public
 
 thread Egse_Tm
 features
-   INPORT_Tm : in event data port DataView::T_Report_Buffer.impl
+   INPORT_Tm : in event data port DataView::TReport_Buffer.impl
       { Compute_Execution_Time =>  0 ms ..  0 ms;
         Queue_Size =>  1;
         Compute_Entrypoint_Source_Text => "Demo_TASTE_Interface.Egse_Tm_tm"; };
-   OUTPORT_Modemanager_Tc : out event data port DataView::T_Config_Buffer.impl;
+   OUTPORT_Modemanager_Tc : out event data port DataView::TConfig_Buffer.impl;
 end Egse_Tm;
 
 thread implementation Egse_Tm.others
@@ -87,12 +87,12 @@ public
 
 thread Modemanager_Feedback
 features
-   INPORT_Feedback : in event data port DataView::T_Integer_Buffer.impl
+   INPORT_Feedback : in event data port DataView::TInteger_Buffer.impl
       { Compute_Execution_Time =>  0 ms ..  0 ms;
         Queue_Size =>  1;
         Compute_Entrypoint_Source_Text => "Demo_TASTE_Interface.Modemanager_Feedback_feedback"; };
-   OUTPORT_Actuator_Ctrl : out event data port DataView::T_Integer_Buffer.impl;
-   OUTPORT_Egse_Tm : out event data port DataView::T_Report_Buffer.impl;
+   OUTPORT_Actuator_Ctrl : out event data port DataView::TInteger_Buffer.impl;
+   OUTPORT_Egse_Tm : out event data port DataView::TReport_Buffer.impl;
 end Modemanager_Feedback;
 
 thread implementation Modemanager_Feedback.others
@@ -115,12 +115,12 @@ public
 
 thread Modemanager_Reading
 features
-   INPORT_Reading : in event data port DataView::T_Integer_Buffer.impl
+   INPORT_Reading : in event data port DataView::TInteger_Buffer.impl
       { Compute_Execution_Time =>  0 ms ..  0 ms;
         Queue_Size =>  1;
         Compute_Entrypoint_Source_Text => "Demo_TASTE_Interface.Modemanager_Reading_reading"; };
-   OUTPORT_Actuator_Ctrl : out event data port DataView::T_Integer_Buffer.impl;
-   OUTPORT_Egse_Tm : out event data port DataView::T_Report_Buffer.impl;
+   OUTPORT_Actuator_Ctrl : out event data port DataView::TInteger_Buffer.impl;
+   OUTPORT_Egse_Tm : out event data port DataView::TReport_Buffer.impl;
 end Modemanager_Reading;
 
 thread implementation Modemanager_Reading.others
@@ -143,12 +143,12 @@ public
 
 thread Modemanager_Tc
 features
-   INPORT_Tc : in event data port DataView::T_Config_Buffer.impl
+   INPORT_Tc : in event data port DataView::TConfig_Buffer.impl
       { Compute_Execution_Time =>  0 ms ..  0 ms;
         Queue_Size =>  1;
         Compute_Entrypoint_Source_Text => "Demo_TASTE_Interface.Modemanager_Tc_tc"; };
-   OUTPORT_Actuator_Ctrl : out event data port DataView::T_Integer_Buffer.impl;
-   OUTPORT_Egse_Tm : out event data port DataView::T_Report_Buffer.impl;
+   OUTPORT_Actuator_Ctrl : out event data port DataView::TInteger_Buffer.impl;
+   OUTPORT_Egse_Tm : out event data port DataView::TReport_Buffer.impl;
 end Modemanager_Tc;
 
 thread implementation Modemanager_Tc.others
@@ -171,7 +171,7 @@ public
 
 thread Sensor_Poll
 features
-   OUTPORT_Modemanager_Reading : out event data port DataView::T_Integer_Buffer.impl;
+   OUTPORT_Modemanager_Reading : out event data port DataView::TInteger_Buffer.impl;
 end Sensor_Poll;
 
 thread implementation Sensor_Poll.others

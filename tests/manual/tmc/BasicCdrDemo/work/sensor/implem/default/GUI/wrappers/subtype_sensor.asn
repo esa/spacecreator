@@ -3,7 +3,7 @@ BEGIN
 
 IMPORTS 
 
-T-Integer FROM BASICCDRDEMO-DATAVIEW
+TInteger FROM BASICCDRDEMO-DATAVIEW
 
  ;
 
@@ -13,7 +13,7 @@ T-Integer FROM BASICCDRDEMO-DATAVIEW
 
 
 
-Sensor-reading-x ::= T-Integer
+Sensor-reading-x ::= TInteger
 
 
 

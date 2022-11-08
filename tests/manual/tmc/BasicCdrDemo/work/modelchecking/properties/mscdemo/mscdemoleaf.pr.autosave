@@ -1,0 +1,66 @@
+system mscdemoleaf;
+    /* CIF TEXT (0, 0), (782, 140) */
+    use datamodel comment '/home/taste/spacecreator/tests/manual/tmc/BasicCdrDemo/work/simulation/observers/observer.asn';
+    signal sig0(TInteger) renames input ctrl to Actuator;
+    signal sig1(TInteger) renames input feedback to ModeManager;
+    /* CIF ENDTEXT */
+    channel c
+        from env to mscdemoleaf with sig0,
+sig1;
+    endchannel;
+    block mscdemoleaf;
+        signalroute r
+            from env to mscdemoleaf with sig0,
+sig1;
+        connect c and r;
+        /* CIF PROCESS (325, 750), (150, 75) */
+        process mscdemoleaf;
+            /* CIF TEXT (0, 900), (222, 140) */
+            monitor event Observable_Event;
+            errorstates s2;
+            /* CIF ENDTEXT */
+            /* CIF START (0, 1650), (200, 75) */
+            START;
+                /* CIF NEXTSTATE (65, 1837), (70, 35) */
+                NEXTSTATE s0;
+            /* CIF state (2465, 1912), (70, 35) */
+            state s2;
+            endstate;
+            /* CIF state (965, 1912), (70, 35) */
+            state s1;
+                /* CIF input (934, 1967), (130, 35) */
+                input sig1(sig1_param0);
+                    /* CIF decision (950, 2017), (98, 50) */
+                    decision sig1_param0;
+                        /* CIF ANSWER (1065, 2087), (70, 23) */
+                        (0):
+                            /* CIF NEXTSTATE (1065, 2125), (70, 35) */
+                            NEXTSTATE s2;
+                        /* CIF ANSWER (1665, 2087), (70, 23) */
+                        ELSE:
+                    enddecision;
+                    /* CIF NEXTSTATE (965, 2176), (70, 35) */
+                    NEXTSTATE s0;
+                /* CIF input (1234, 1967), (130, 35) */
+                input sig0(sig0_param0);
+                    /* CIF NEXTSTATE (1265, 2017), (70, 35) */
+                    NEXTSTATE s1;
+                /* CIF input (1565, 1967), (70, 35) */
+                input *;
+                    /* CIF NEXTSTATE (1565, 2017), (70, 35) */
+                    NEXTSTATE s0;
+            endstate;
+            /* CIF state (65, 1912), (70, 35) */
+            state s0;
+                /* CIF input (34, 1967), (130, 35) */
+                input sig0(sig0_param0);
+                    /* CIF NEXTSTATE (65, 2017), (70, 35) */
+                    NEXTSTATE s1;
+                /* CIF input (365, 1967), (70, 35) */
+                input *;
+                    /* CIF NEXTSTATE (365, 2017), (70, 35) */
+                    NEXTSTATE s0;
+            endstate;
+        endprocess mscdemoleaf;
+    endblock;
+endsystem;

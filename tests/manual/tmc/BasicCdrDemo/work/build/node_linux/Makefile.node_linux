@@ -1,11 +1,35 @@
-all:	simulate
+# This file is generated for Generic Linux partition
+#  node_linux x86_linux  PLATFORM_GENERIC_LINUX ocarina_processors_x86::x86.generic_linux
 
-simulate:
-	# Configure gprbuild to use GCC toolchain even if LLVM is installed
+MIN_GCC_VERSION="10"
+GCC_VERSION:="` gcc -dumpversion -r | grep -oP "[0-9]+" | head -1 `"
+GCC_STACKANALYSIS_FLAGS=-fstack-usage
+IS_GCC_ABOVE_MIN_VERSION:=$(shell expr "$(GCC_VERSION)" ">=" "$(MIN_GCC_VERSION)")
+ifeq "$(IS_GCC_ABOVE_MIN_VERSION)" "1"
+    GCC_STACKANALYSIS_FLAGS+=-fcallgraph-info=su,da
+endif
+
+.PHONY: all clean debug release partition_demo partition_debug_demo runtime_demo
+
+all:	debug
+
+release: partition_demo
+
+debug: partition_debug_demo
+
+partition_demo: runtime_demo
+	# Configure gprbuild to use GCC toolchain (for C and C++) even if LLVM is installed
 	gprconfig --batch --config=Ada,,default,,GNAT --config=C,,default,,GCC --config=C++,,default,,G++ || :
-	ADA_PROJECT_PATH=~/.local/share/gpr:${ADA_PROJECT_PATH} gprbuild -p -P simulator.gpr -XCFG="Debug" -cargs:C -DSTATIC=""
-	ADA_PROJECT_PATH=~/.local/share/gpr:${ADA_PROJECT_PATH} gprinstall -f --install-name=simulator -p --prefix=../../simulation/ simulator.gpr
+	gprbuild -R -p -P demo.gpr -XCFG="Release" -XSTACK_ANALYSIS_FLAGS="${GCC_STACKANALYSIS_FLAGS}" -cargs:C -DSTATIC=""
+
+partition_debug_demo: runtime_demo
+	# Configure gprbuild to use GCC toolchain (for C and C++) even if LLVM is installed
+	gprconfig --batch --config=Ada,,default,,GNAT --config=C,,default,,GCC --config=C++,,default,,G++ || :
+	gprbuild -R -p -P demo.gpr -XCFG="Debug" -XSTACK_ANALYSIS_FLAGS="${GCC_STACKANALYSIS_FLAGS}" -cargs:C -DSTATIC=""
 
 clean:
-	rm -rf demo_obj
+	gprclean -P demo.gpr
+
+runtime_demo:
+	sh ./runtime_demo.sh
 

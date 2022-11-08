@@ -3,20 +3,20 @@ BEGIN
    IMPORTS
       
       --  ASN.1 modules used by thread actuator_ctrl
-      T-Integer FROM BASICCDRDEMO-DATAVIEW
+      TInteger FROM BASICCDRDEMO-DATAVIEW
       
       
       --  ASN.1 modules used by thread egse_tm
-      T-Report FROM BASICCDRDEMO-DATAVIEW
+      TReport FROM BASICCDRDEMO-DATAVIEW
       
       --  ASN.1 modules used by thread modemanager_feedback
-      T-Integer FROM BASICCDRDEMO-DATAVIEW
+      TInteger FROM BASICCDRDEMO-DATAVIEW
       
       --  ASN.1 modules used by thread modemanager_reading
-      T-Integer FROM BASICCDRDEMO-DATAVIEW
+      TInteger FROM BASICCDRDEMO-DATAVIEW
       
       --  ASN.1 modules used by thread modemanager_tc
-      T-Config FROM BASICCDRDEMO-DATAVIEW
+      TConfig FROM BASICCDRDEMO-DATAVIEW
       
       
       -- Import generic integer type (used for timers)
@@ -45,38 +45,38 @@ BEGIN
    Actuator-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         ctrl SEQUENCE { x T-Integer}
+         ctrl SEQUENCE { x TInteger}
       },
       msg-out CHOICE {
-         feedback SEQUENCE { x T-Integer }
+         feedback SEQUENCE { x TInteger }
       }
    }
    
    Egse-Event ::= CHOICE {
       msg-in CHOICE {
-         tm SEQUENCE { reprt T-Report}
+         tm SEQUENCE { reprt TReport}
       },
       msg-out CHOICE {
-         tc SEQUENCE { cfg T-Config }
+         tc SEQUENCE { cfg TConfig }
       }
    }
    
    Modemanager-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         feedback SEQUENCE { x T-Integer},
-         reading  SEQUENCE { x T-Integer},
-         tc       SEQUENCE { cfg T-Config}
+         feedback SEQUENCE { x TInteger},
+         reading  SEQUENCE { x TInteger},
+         tc       SEQUENCE { cfg TConfig}
       },
       msg-out CHOICE {
-         ctrl SEQUENCE { x T-Integer },
-         tm   SEQUENCE { reprt T-Report }
+         ctrl SEQUENCE { x TInteger },
+         tm   SEQUENCE { reprt TReport }
       }
    }
    
    Sensor-Event ::= CHOICE {
       msg-out CHOICE {
-         reading SEQUENCE { x T-Integer }
+         reading SEQUENCE { x TInteger }
       }
    }
    

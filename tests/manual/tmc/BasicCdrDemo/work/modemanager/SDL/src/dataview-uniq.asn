@@ -1,17 +1,17 @@
 BASICCDRDEMO-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   T-Integer ::= INTEGER (0 .. 1000000)
+   TInteger ::= INTEGER (0 .. 1000000)
 
-   T-Config ::= SEQUENCE {
-       param-a T-Integer,
-       param-b T-Integer
+   TConfig ::= SEQUENCE {
+       param-a TInteger,
+       param-b TInteger
    }
 
-   T-Report ::= SEQUENCE {
-       reading T-Integer,
-       ctrl T-Integer,
-       feedback T-Integer
+   TReport ::= SEQUENCE {
+       reading TInteger,
+       ctrl TInteger,
+       feedback TInteger
    }
 
 END

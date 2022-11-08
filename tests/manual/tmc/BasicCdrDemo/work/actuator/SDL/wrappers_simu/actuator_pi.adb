@@ -30,7 +30,7 @@ package body Actuator_PI is
    --  Provided interfaces
    procedure Ctrl
       (Global_State : in out asn1SccSystem_State;
-      X : in out asn1SccT_Integer;
+      X : in out asn1SccTinteger;
        Sender_PID : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)

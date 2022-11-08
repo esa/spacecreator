@@ -6,22 +6,22 @@ use Datamodel;
 system Modemanager;
 
    /* CIF Keep Specific Geode PARAMNAMES x */
-   signal feedback (T_Integer);
+   signal feedback (TInteger);
    
    
    /* CIF Keep Specific Geode PARAMNAMES x */
-   signal reading (T_Integer);
+   signal reading (TInteger);
    
    
    /* CIF Keep Specific Geode PARAMNAMES cfg */
-   signal tc (T_Config);
+   signal tc (TConfig);
 
    /* CIF Keep Specific Geode PARAMNAMES x */
-   signal ctrl (T_Integer);
+   signal ctrl (TInteger);
    
    
    /* CIF Keep Specific Geode PARAMNAMES reprt */
-   signal tm (T_Report);
+   signal tm (TReport);
 
    -- For internal use, return the PID of the caller
    procedure get_sender;

@@ -10,13 +10,13 @@
 extern unsigned egse_initialized;
 
 void egse_RI_tc_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Config *IN_cfg
+      const asn1SccTConfig *IN_cfg
 );
 void egse_RI_tc(
-      const asn1SccT_Config *IN_cfg
+      const asn1SccTConfig *IN_cfg
 );
 void egse_RI_tc(
-      const asn1SccT_Config *IN_cfg
+      const asn1SccTConfig *IN_cfg
 )
 {
    // When no destination is specified, send to everyone (multicast)
@@ -25,7 +25,7 @@ void egse_RI_tc(
 }
 
 void egse_RI_tc_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Config *IN_cfg
+      const asn1SccTConfig *IN_cfg
 )
 {
    // Log MSC data on Linux when environment variable is set
@@ -47,7 +47,7 @@ void egse_RI_tc_To_PID(asn1SccPID dest_pid,
 
    vm_egse_tc
      (dest_pid,
-      (void *)IN_cfg, sizeof(asn1SccT_Config));
+      (void *)IN_cfg, sizeof(asn1SccTConfig));
 
 
 }

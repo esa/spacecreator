@@ -1,9 +1,9 @@
 system observerdemo;
-    /* CIF TEXT (144, 214), (462, 140) */
+    /* CIF TEXT (144, 214), (456, 140) */
     use datamodel comment 'observer.asn';
     
-    signal ctrl_sig(T_integer) renames input ctrl to Actuator;
-    signal feedback_sig(T_integer) renames input feedback to ModeManager;
+    signal ctrl_sig(Tinteger) renames input ctrl to Actuator;
+    signal feedback_sig(Tinteger) renames input feedback to ModeManager;
     /* CIF ENDTEXT */
     channel c
         from env to observerdemo with ctrl_sig,
@@ -23,29 +23,17 @@ feedback_sig;
             
             errorstates IncorrectValue;
             
-            DCL reference T_integer;
+            DCL reference Tinteger;
             /* CIF ENDTEXT */
             /* CIF START (275, 63), (70, 35) */
             START;
                 /* CIF NEXTSTATE (275, 118), (70, 35) */
                 NEXTSTATE Idle;
-            /* CIF state (13, 429), (107, 35) */
-            state Incorrectvalue;
-            endstate;
-            /* CIF state (30, 215), (70, 35) */
-            state Idle;
-                /* CIF input (23, 270), (80, 35) */
-                input ctrl_sig(x);
-                    /* CIF task (12, 325), (103, 35) */
-                    task reference := x;
-                    /* CIF NEXTSTATE (25, 375), (76, 35) */
-                    NEXTSTATE Checking;
-            endstate;
-            /* CIF state (268, 176), (76, 35) */
+            /* CIF state (267, 176), (76, 35) */
             state Checking;
-                /* CIF input (249, 231), (115, 35) */
+                /* CIF input (248, 231), (115, 35) */
                 input feedback_sig(y);
-                    /* CIF decision (257, 286), (100, 50) */
+                    /* CIF decision (256, 286), (100, 50) */
                     decision y = reference;
                         /* CIF ANSWER (318, 356), (70, 23) */
                         (false):
@@ -56,6 +44,18 @@ feedback_sig;
                             /* CIF NEXTSTATE (217, 399), (70, 35) */
                             NEXTSTATE Idle;
                     enddecision;
+            endstate;
+            /* CIF state (30, 215), (70, 35) */
+            state Idle;
+                /* CIF input (22, 270), (80, 35) */
+                input ctrl_sig(x);
+                    /* CIF task (11, 325), (103, 35) */
+                    task reference := x;
+                    /* CIF NEXTSTATE (24, 375), (76, 35) */
+                    NEXTSTATE Checking;
+            endstate;
+            /* CIF state (12, 429), (107, 35) */
+            state Incorrectvalue;
             endstate;
         endprocess observerdemo;
     endblock;

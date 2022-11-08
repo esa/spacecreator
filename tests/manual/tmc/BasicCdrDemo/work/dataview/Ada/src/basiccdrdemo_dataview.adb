@@ -11,30 +11,30 @@ pragma Warnings (Off, "condition can only be False if invalid values present");
 pragma Warnings (Off, "condition can only be True if invalid values present");
 
 
-function asn1SccT_Integer_Equal (val1, val2 :  asn1SccT_Integer) return Boolean
+function asn1SccTInteger_Equal (val1, val2 :  asn1SccTInteger) return Boolean
 is
 
 begin
 	return val1 = val2;
 
-end asn1SccT_Integer_Equal;
+end asn1SccTInteger_Equal;
 
-function asn1SccT_Integer_IsConstraintValid(val : asn1SccT_Integer) return adaasn1rtl.ASN1_RESULT
+function asn1SccTInteger_IsConstraintValid(val : asn1SccTInteger) return adaasn1rtl.ASN1_RESULT
 is
     pragma Warnings (Off, "initialization of ""ret"" has no effect");        
     ret : adaasn1rtl.ASN1_RESULT := adaasn1rtl.ASN1_RESULT'(Success => true, ErrorCode => 0);
     pragma Warnings (On, "initialization of ""ret"" has no effect");        
 begin
     ret.Success := (val <= 1000000);
-    ret.ErrorCode := (if ret.Success then 0 else ERR_T_INTEGER);
+    ret.ErrorCode := (if ret.Success then 0 else ERR_TINTEGER);
     return ret;
-end asn1SccT_Integer_IsConstraintValid;
+end asn1SccTInteger_IsConstraintValid;
 
 
 
 
 
-function asn1SccT_Config_Equal (val1, val2 :  asn1SccT_Config) return Boolean
+function asn1SccTConfig_Equal (val1, val2 :  asn1SccTConfig) return Boolean
 is
     pragma Warnings (Off, "initialization of ""ret"" has no effect");
     ret : Boolean := True;
@@ -49,26 +49,26 @@ begin
     end if;
 	return ret;
 
-end asn1SccT_Config_Equal;
+end asn1SccTConfig_Equal;
 
-function asn1SccT_Config_IsConstraintValid(val : asn1SccT_Config) return adaasn1rtl.ASN1_RESULT
+function asn1SccTConfig_IsConstraintValid(val : asn1SccTConfig) return adaasn1rtl.ASN1_RESULT
 is
     pragma Warnings (Off, "initialization of ""ret"" has no effect");        
     ret : adaasn1rtl.ASN1_RESULT := adaasn1rtl.ASN1_RESULT'(Success => true, ErrorCode => 0);
     pragma Warnings (On, "initialization of ""ret"" has no effect");        
 begin
-    ret := asn1SccT_Integer_IsConstraintValid(val.param_a);
+    ret := asn1SccTInteger_IsConstraintValid(val.param_a);
     if ret.Success then
-        ret := asn1SccT_Integer_IsConstraintValid(val.param_b);
+        ret := asn1SccTInteger_IsConstraintValid(val.param_b);
     end if;
     return ret;
-end asn1SccT_Config_IsConstraintValid;
+end asn1SccTConfig_IsConstraintValid;
 
 
 
 
 
-function asn1SccT_Report_Equal (val1, val2 :  asn1SccT_Report) return Boolean
+function asn1SccTReport_Equal (val1, val2 :  asn1SccTReport) return Boolean
 is
     pragma Warnings (Off, "initialization of ""ret"" has no effect");
     ret : Boolean := True;
@@ -87,23 +87,23 @@ begin
     end if;
 	return ret;
 
-end asn1SccT_Report_Equal;
+end asn1SccTReport_Equal;
 
-function asn1SccT_Report_IsConstraintValid(val : asn1SccT_Report) return adaasn1rtl.ASN1_RESULT
+function asn1SccTReport_IsConstraintValid(val : asn1SccTReport) return adaasn1rtl.ASN1_RESULT
 is
     pragma Warnings (Off, "initialization of ""ret"" has no effect");        
     ret : adaasn1rtl.ASN1_RESULT := adaasn1rtl.ASN1_RESULT'(Success => true, ErrorCode => 0);
     pragma Warnings (On, "initialization of ""ret"" has no effect");        
 begin
-    ret := asn1SccT_Integer_IsConstraintValid(val.reading);
+    ret := asn1SccTInteger_IsConstraintValid(val.reading);
     if ret.Success then
-        ret := asn1SccT_Integer_IsConstraintValid(val.ctrl);
+        ret := asn1SccTInteger_IsConstraintValid(val.ctrl);
         if ret.Success then
-            ret := asn1SccT_Integer_IsConstraintValid(val.feedback);
+            ret := asn1SccTInteger_IsConstraintValid(val.feedback);
         end if;
     end if;
     return ret;
-end asn1SccT_Report_IsConstraintValid;
+end asn1SccTReport_IsConstraintValid;
 
 
 

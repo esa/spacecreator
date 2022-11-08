@@ -28,12 +28,12 @@ package Egse_PI is
    
    procedure Tm
       (Global_State : in out asn1SccSystem_State;
-      Reprt : in out asn1SccT_Report;
+      Reprt : in out asn1SccTreport;
        Sender_PID : asn1SccPID := asn1SccEnv);
    
    --  Interface to the C implementation of the interface
    procedure C_Tm
-     (Reprt : in out asn1SccT_Report)
+     (Reprt : in out asn1SccTreport)
    
       with Import, Convention => C, Link_Name => "egse_PI_tm";
 

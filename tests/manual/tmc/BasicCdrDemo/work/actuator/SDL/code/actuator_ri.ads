@@ -9,7 +9,7 @@ with System_Dataview; use System_Dataview;  --  contains definition of the PID t
 
 package Actuator_RI is
 
-   procedure Feedback (X : in out asn1SccT_Integer; Dest_PID : asn1sccPID := asn1sccEnv);
+   procedure Feedback (X : in out asn1SccTinteger; Dest_PID : asn1sccPID := asn1sccEnv);
 
    procedure Check_Queue (Res : out adaasn1rtl.Asn1Boolean)
       with Import, Convention => C, Link_Name => "actuator_check_queue";

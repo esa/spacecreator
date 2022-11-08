@@ -1,0 +1,7 @@
+all:
+	mkdir -p code
+	cd code && opengeode --toAda /home/taste/spacecreator/tests/manual/tmc/FloatDemo/work/modelchecking/properties/yyy/yyy.pr 
+	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada observer.asn code/yyy_datamodel.asn
+	cd code && gnat make yyy
+clean:
+	rm -rf code

@@ -10,13 +10,13 @@
 extern unsigned modemanager_initialized;
 
 void modemanager_RI_ctrl_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 );
 void modemanager_RI_ctrl(
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 );
 void modemanager_RI_ctrl(
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 )
 {
    // When no destination is specified, send to everyone (multicast)
@@ -25,7 +25,7 @@ void modemanager_RI_ctrl(
 }
 
 void modemanager_RI_ctrl_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 )
 {
    // Log MSC data on Linux when environment variable is set
@@ -47,7 +47,7 @@ void modemanager_RI_ctrl_To_PID(asn1SccPID dest_pid,
 
    vm_modemanager_ctrl
      (dest_pid,
-      (void *)IN_x, sizeof(asn1SccT_Integer));
+      (void *)IN_x, sizeof(asn1SccTInteger));
 
 
 }
@@ -55,13 +55,13 @@ void modemanager_RI_ctrl_To_PID(asn1SccPID dest_pid,
 
 
 void modemanager_RI_tm_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Report *IN_reprt
+      const asn1SccTReport *IN_reprt
 );
 void modemanager_RI_tm(
-      const asn1SccT_Report *IN_reprt
+      const asn1SccTReport *IN_reprt
 );
 void modemanager_RI_tm(
-      const asn1SccT_Report *IN_reprt
+      const asn1SccTReport *IN_reprt
 )
 {
    // When no destination is specified, send to everyone (multicast)
@@ -70,7 +70,7 @@ void modemanager_RI_tm(
 }
 
 void modemanager_RI_tm_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Report *IN_reprt
+      const asn1SccTReport *IN_reprt
 )
 {
    // Log MSC data on Linux when environment variable is set
@@ -92,7 +92,7 @@ void modemanager_RI_tm_To_PID(asn1SccPID dest_pid,
 
    vm_modemanager_tm
      (dest_pid,
-      (void *)IN_reprt, sizeof(asn1SccT_Report));
+      (void *)IN_reprt, sizeof(asn1SccTReport));
 
 
 }

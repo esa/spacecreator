@@ -35,18 +35,18 @@ inline Sensor_reading_x_generate_value(Sensor_reading_x_gv)
     fi;
     Sensor_reading_x_gv = Sensor_reading_x_tmp;
 }
-inline T_Integer_generate_value(T_Integer_gv)
+inline TInteger_generate_value(TInteger_gv)
 {
-    int T_Integer_tmp;
+    int TInteger_tmp;
     if
     ::  atomic {
-        select (T_Integer_tmp : 0 .. 1000000);
+        select (TInteger_tmp : 0 .. 1000000);
     }
     fi;
-    T_Integer_gv = T_Integer_tmp;
+    TInteger_gv = TInteger_tmp;
 }
-inline T_Config_generate_value(T_Config_gv)
+inline TConfig_generate_value(TConfig_gv)
 {
-    T_Integer_generate_value(T_Config_gv.param_a);
-    T_Integer_generate_value(T_Config_gv.param_b);
+    TInteger_generate_value(TConfig_gv.param_a);
+    TInteger_generate_value(TConfig_gv.param_b);
 }

@@ -9,9 +9,9 @@
             <Subtyping name="optimized.asn"/>
             <Submodel>
                 <Function name="ModeManager"/>
+                <Function name="Sensor"/>
                 <Function name="Actuator"/>
                 <Function name="EGSE"/>
-                <Function name="Sensor"/>
             </Submodel>
         </Configuration>
         <NativeModelChecker/>

@@ -12,14 +12,14 @@
 typedef struct _PI_Messages {
    T_egse_PI_list msg_id;
    union {
-      asn1SccT_Report tm_param;
+      asn1SccTReport tm_param;
    } msg_data;
 } PI_Messages;
 
 typedef struct _RI_Messages {
    T_egse_RI_list msg_id;
    union {
-      asn1SccT_Config tc_param;
+      asn1SccTConfig tc_param;
    } msg_data;
 } RI_Messages;
 
@@ -108,7 +108,7 @@ void egse_PI_Poll(void)
                                        (int *)&message_received_type)) {
       switch(message_received_type) {
          case i_tc:
-            egse_RI_tc((asn1SccT_Config *)msgcontent);
+            egse_RI_tc((asn1SccTConfig *)msgcontent);
             break;
        default : break;
       }
@@ -119,18 +119,18 @@ void egse_PI_Poll(void)
 }
 
 void egse_PI_tm
-      (const asn1SccT_Report *IN_reprt)
+      (const asn1SccTReport *IN_reprt)
 
 {
    write_message_to_queue
       (egse_PI_queue_id,
-       sizeof(asn1SccT_Report),
+       sizeof(asn1SccTReport),
        (void*)IN_reprt,
        i_tm);
 
    write_message_to_queue
       (egse_PI_Python_queue_id,
-       sizeof(asn1SccT_Report),
+       sizeof(asn1SccTReport),
        (void*)IN_reprt,
        i_tm);
 }

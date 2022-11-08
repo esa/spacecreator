@@ -33,7 +33,7 @@ package body Actuator_Events is
                   CS_Barrier := True;
                when Ctrl_PRESENT =>
                   declare
-                     Param : asn1SccT_Integer := Evt.Msg_In.Ctrl.X;
+                     Param : asn1SccTinteger := Evt.Msg_In.Ctrl.X;
                   begin
                      Actuator_PI.Ctrl (X => Param, Global_State => Global_State, Sender_PID => Event.Input_Event.Source);
                   end;
@@ -95,13 +95,13 @@ package body Actuator_Events is
                   Put_Line ("Actuator: continuous signals");
                when Ctrl_PRESENT =>
                  Put ("Actuator: INPUT Ctrl");
-                  Put_Line (" (" & T_Integer_Pkg.Image (Event.Msg_In.Ctrl.X) & ")");
+                  Put_Line (" (" & Tinteger_Pkg.Image (Event.Msg_In.Ctrl.X) & ")");
             end case;
          when Msg_OUT_Present =>
             case Event.Msg_Out.Kind is
                 when Feedback_PRESENT =>
                  Put ("Actuator: OUTPUT Feedback");
-                  Put_Line (" (" & T_Integer_Pkg.Image (Event.Msg_Out.Feedback.X) & ")");
+                  Put_Line (" (" & Tinteger_Pkg.Image (Event.Msg_Out.Feedback.X) & ")");
             end case;
       end case;
    end Print_Event;

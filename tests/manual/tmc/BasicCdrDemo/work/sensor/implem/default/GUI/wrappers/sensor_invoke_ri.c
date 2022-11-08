@@ -10,13 +10,13 @@
 extern unsigned sensor_initialized;
 
 void sensor_RI_reading_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 );
 void sensor_RI_reading(
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 );
 void sensor_RI_reading(
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 )
 {
    // When no destination is specified, send to everyone (multicast)
@@ -25,7 +25,7 @@ void sensor_RI_reading(
 }
 
 void sensor_RI_reading_To_PID(asn1SccPID dest_pid, 
-      const asn1SccT_Integer *IN_x
+      const asn1SccTInteger *IN_x
 )
 {
    // Log MSC data on Linux when environment variable is set
@@ -47,7 +47,7 @@ void sensor_RI_reading_To_PID(asn1SccPID dest_pid,
 
    vm_sensor_reading
      (dest_pid,
-      (void *)IN_x, sizeof(asn1SccT_Integer));
+      (void *)IN_x, sizeof(asn1SccTInteger));
 
 
 }

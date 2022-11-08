@@ -9,10 +9,10 @@ with System_Dataview; use System_Dataview;  --  contains definition of the PID t
 
 package Modemanager_RI is
 
-   procedure Ctrl (X : in out asn1SccT_Integer; Dest_PID : asn1sccPID := asn1sccEnv);
+   procedure Ctrl (X : in out asn1SccTinteger; Dest_PID : asn1sccPID := asn1sccEnv);
    
    
-   procedure Tm (Reprt : in out asn1SccT_Report; Dest_PID : asn1sccPID := asn1sccEnv);
+   procedure Tm (Reprt : in out asn1SccTreport; Dest_PID : asn1sccPID := asn1sccEnv);
 
    procedure Check_Queue (Res : out adaasn1rtl.Asn1Boolean)
       with Import, Convention => C, Link_Name => "modemanager_check_queue";

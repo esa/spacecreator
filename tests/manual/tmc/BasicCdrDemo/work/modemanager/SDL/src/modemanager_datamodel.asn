@@ -2,21 +2,21 @@ Modemanager-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   T-Integer, T-Config, T-Report FROM BASICCDRDEMO-DATAVIEW
+   TInteger, TConfig, TReport FROM BASICCDRDEMO-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Modemanager-States ::= ENUMERATED {uninitialized, configured}
+Modemanager-States ::= ENUMERATED {configured, uninitialized}
 
 Modemanager-Context ::= SEQUENCE {
    state Modemanager-States,
    init-done BOOLEAN,
    sender PID,
-   cfg T-Config,
-   xin T-Integer,
-   xout T-Integer,
-   xfeedback T-Integer,
-   rprt T-Report
+   cfg TConfig,
+   xin TInteger,
+   xout TInteger,
+   xfeedback TInteger,
+   rprt TReport
 }
 
 END

@@ -66,8 +66,8 @@ if_integer_type if_trunc_function(if_real_type p) {
 
 #ifdef __assign__
 
-if_T_Config_type if_cast_Egse_tc_cfg_to_T_Config_function(if_Egse_tc_cfg_type p) {
-    if_T_Config_type r;
+if_TConfig_type if_cast_Egse_tc_cfg_to_TConfig_function(if_Egse_tc_cfg_type p) {
+    if_TConfig_type r;
     memcpy(&r, &p, sizeof(p));
     return r;
 }
@@ -85,8 +85,8 @@ if_T_Config_type if_cast_Egse_tc_cfg_to_T_Config_function(if_Egse_tc_cfg_type p)
 
 #ifdef __assign__
 
-if_T_Integer_type if_cast_Sensor_reading_x_to_T_Integer_function(if_Sensor_reading_x_type p) {
-    if_T_Integer_type r;
+if_TInteger_type if_cast_Sensor_reading_x_to_TInteger_function(if_Sensor_reading_x_type p) {
+    if_TInteger_type r;
     memcpy(&r, &p, sizeof(p));
     return r;
 }

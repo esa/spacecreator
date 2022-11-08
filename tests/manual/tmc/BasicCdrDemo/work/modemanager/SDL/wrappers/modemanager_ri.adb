@@ -3,11 +3,11 @@
 package body Modemanager_RI is
 
    procedure Ctrl
-      (X : in out asn1SccT_Integer;
+      (X : in out asn1SccTinteger;
        Dest_PID : asn1sccPID := asn1sccEnv) is
       procedure C_Ctrl
          (Dest_PID : asn1sccPID;
-          X : in out asn1SccT_Integer)
+          X : in out asn1SccTinteger)
          with Import,
               Convention => C,
               Link_Name  => "modemanager_RI_ctrl_To_PID";
@@ -18,11 +18,11 @@ package body Modemanager_RI is
    
    
    procedure Tm
-      (Reprt : in out asn1SccT_Report;
+      (Reprt : in out asn1SccTreport;
        Dest_PID : asn1sccPID := asn1sccEnv) is
       procedure C_Tm
          (Dest_PID : asn1sccPID;
-          Reprt : in out asn1SccT_Report)
+          Reprt : in out asn1SccTreport)
          with Import,
               Convention => C,
               Link_Name  => "modemanager_RI_tm_To_PID";

@@ -30,7 +30,7 @@ package body Modemanager_PI is
    --  Provided interfaces
    procedure Feedback
       (Global_State : in out asn1SccSystem_State;
-      X : in out asn1SccT_Integer;
+      X : in out asn1SccTinteger;
        Sender_PID : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)
@@ -49,7 +49,7 @@ package body Modemanager_PI is
    
    procedure Reading
       (Global_State : in out asn1SccSystem_State;
-      X : in out asn1SccT_Integer;
+      X : in out asn1SccTinteger;
        Sender_PID : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)
@@ -68,7 +68,7 @@ package body Modemanager_PI is
    
    procedure Tc
       (Global_State : in out asn1SccSystem_State;
-      Cfg : in out asn1SccT_Config;
+      Cfg : in out asn1SccTconfig;
        Sender_PID : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)

@@ -49,14 +49,14 @@ void modemanager_feedback
 
    //  Declare user code function as external (it may not have a .h if it is in Ada)
    extern void modemanager_PI_feedback
-      (const asn1SccT_Integer *);
+      (const asn1SccTInteger *);
 
 
 
 
 
    // Call user code
-   modemanager_PI_feedback ((asn1SccT_Integer *)IN_x);
+   modemanager_PI_feedback ((asn1SccTInteger *)IN_x);
 
    // trace the SDL state (appears on the MSC)
    if (1 == innerMsc) {
@@ -86,14 +86,14 @@ void modemanager_reading
 
    //  Declare user code function as external (it may not have a .h if it is in Ada)
    extern void modemanager_PI_reading
-      (const asn1SccT_Integer *);
+      (const asn1SccTInteger *);
 
 
 
 
 
    // Call user code
-   modemanager_PI_reading ((asn1SccT_Integer *)IN_x);
+   modemanager_PI_reading ((asn1SccTInteger *)IN_x);
 
    // trace the SDL state (appears on the MSC)
    if (1 == innerMsc) {
@@ -123,14 +123,14 @@ void modemanager_tc
 
    //  Declare user code function as external (it may not have a .h if it is in Ada)
    extern void modemanager_PI_tc
-      (const asn1SccT_Config *);
+      (const asn1SccTConfig *);
 
 
 
 
 
    // Call user code
-   modemanager_PI_tc ((asn1SccT_Config *)IN_cfg);
+   modemanager_PI_tc ((asn1SccTConfig *)IN_cfg);
 
    // trace the SDL state (appears on the MSC)
    if (1 == innerMsc) {

@@ -1,0 +1,22 @@
+system yyy;
+/* CIF TEXT (144, 214), (258, 140) */
+use datamodel comment 'observer.asn';
+
+
+/* CIF ENDTEXT */
+block yyy;
+/* CIF PROCESS (259, 87), (150, 75) */
+process yyy;
+/* CIF TEXT (0, 57), (222, 140) */
+monitor st System_State;
+
+monitor event Observable_Event;
+
+errorstates error;
+/* CIF ENDTEXT */
+/* CIF state (257, 0), (70, 35) */
+state error;
+endstate;
+endprocess yyy;
+endblock;
+endsystem;

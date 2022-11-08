@@ -33,11 +33,11 @@ extern "C"
 
 extern "C"
 {
-extern void init_sensor(void);
+extern void init_actuator(void);
 }
 extern "C"
 {
-extern void init_actuator(void);
+extern void init_sensor(void);
 }
 extern "C"
 {
@@ -67,8 +67,8 @@ static void initializeDevices()
     // initialize devices
 }
 
-taste::Lock sensor_Mutex;
 taste::Lock actuator_Mutex;
+taste::Lock sensor_Mutex;
 taste::Lock modemanager_Mutex;
 taste::Lock egse_Mutex;
 
@@ -176,8 +176,8 @@ int main(void)
     enum SystemBus valid_buses[SYSTEM_BUSES_NUMBER] = { BUS_INVALID_ID };
     Broker_initialize(valid_buses);
 
-    init_sensor();
     init_actuator();
+    init_sensor();
     init_modemanager();
     init_egse();
 

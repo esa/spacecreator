@@ -3,7 +3,7 @@
 
 SUBPROGRAM SP_feedback
 FEATURES
-   x : IN PARAMETER DataView::T_Integer {encoding=>NATIVE;};
+   x : IN PARAMETER DataView::TInteger {encoding=>NATIVE;};
 
 END SP_feedback;
 
@@ -19,7 +19,7 @@ END SP_feedback.Ada;
 
 SUBPROGRAM SP_reading
 FEATURES
-   x : IN PARAMETER DataView::T_Integer {encoding=>NATIVE;};
+   x : IN PARAMETER DataView::TInteger {encoding=>NATIVE;};
 
 END SP_reading;
 
@@ -35,7 +35,7 @@ END SP_reading.Ada;
 
 SUBPROGRAM SP_tc
 FEATURES
-   cfg : IN PARAMETER DataView::T_Config {encoding=>NATIVE;};
+   cfg : IN PARAMETER DataView::TConfig {encoding=>NATIVE;};
 
 END SP_tc;
 
@@ -50,7 +50,7 @@ END SP_tc.Ada;
 
 SUBPROGRAM SP_ctrl
 FEATURES
-   x : OUT PARAMETER DataView::T_Integer {encoding=>NATIVE;};
+   x : OUT PARAMETER DataView::TInteger {encoding=>NATIVE;};
 
 END SP_ctrl;
 
@@ -66,7 +66,7 @@ END SP_ctrl.Ada;
 
 SUBPROGRAM SP_tm
 FEATURES
-   reprt : OUT PARAMETER DataView::T_Report {encoding=>NATIVE;};
+   reprt : OUT PARAMETER DataView::TReport {encoding=>NATIVE;};
 
 END SP_tm;
 

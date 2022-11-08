@@ -3,7 +3,7 @@
 
 SUBPROGRAM SP_ctrl
 FEATURES
-   x : IN PARAMETER DataView::T_Integer {encoding=>NATIVE;};
+   x : IN PARAMETER DataView::TInteger {encoding=>NATIVE;};
 
 END SP_ctrl;
 
@@ -18,7 +18,7 @@ END SP_ctrl.Ada;
 
 SUBPROGRAM SP_feedback
 FEATURES
-   x : OUT PARAMETER DataView::T_Integer {encoding=>NATIVE;};
+   x : OUT PARAMETER DataView::TInteger {encoding=>NATIVE;};
 
 END SP_feedback;
 

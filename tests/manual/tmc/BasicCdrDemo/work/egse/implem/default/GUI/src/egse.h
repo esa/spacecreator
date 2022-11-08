@@ -20,10 +20,10 @@ void egse_startup(void);
 void egse_PI_Poll( void );
 
 
-void egse_PI_tm( const asn1SccT_Report * );
+void egse_PI_tm( const asn1SccTReport * );
 
 /* Required interfaces */
-extern void egse_RI_tc( const asn1SccT_Config * );
+extern void egse_RI_tc( const asn1SccTConfig * );
 
 
 #ifdef __cplusplus

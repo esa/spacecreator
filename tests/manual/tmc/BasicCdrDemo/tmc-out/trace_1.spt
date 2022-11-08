@@ -1,30 +1,30 @@
 starting claim 8
 Never claim moves to line 6	[else]
-  9:	proc  7 (:init::1) system.pml:203 Send 1	-> queue 1 (Actuator_lock)
- 16:	proc  7 (:init::1) system.pml:205 Send 1	-> queue 2 (Modemanager_lock)
+  9:	proc  7 (:init::1) system.pml:203 Send 1	-> queue 1 (Modemanager_lock)
+ 16:	proc  7 (:init::1) system.pml:205 Send 1	-> queue 2 (Actuator_lock)
 Never claim moves to line 4	[(inited)]
 Never claim moves to line 16	[else]
  35:	proc  6 (Sensor_reading:1) system.pml:54 Send 0	-> queue 3 (Modemanager_reading_channel)
- 48:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 2 (Modemanager_lock)
+ 48:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 1 (Modemanager_lock)
  50:	proc  4 (Modemanager_reading:1) system.pml:153 Recv 0	<- queue 3 (Modemanager_reading_channel)
- 55:	proc  4 (Modemanager_reading:1) system.pml:160 Send 1	-> queue 2 (Modemanager_lock)
+ 55:	proc  4 (Modemanager_reading:1) system.pml:160 Send 1	-> queue 1 (Modemanager_lock)
  57:	proc  6 (Sensor_reading:1) system.pml:54 Send 0	-> queue 3 (Modemanager_reading_channel)
- 66:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 2 (Modemanager_lock)
+ 66:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 1 (Modemanager_lock)
  68:	proc  4 (Modemanager_reading:1) system.pml:153 Recv 0	<- queue 3 (Modemanager_reading_channel)
- 73:	proc  4 (Modemanager_reading:1) system.pml:160 Send 1	-> queue 2 (Modemanager_lock)
+ 73:	proc  4 (Modemanager_reading:1) system.pml:160 Send 1	-> queue 1 (Modemanager_lock)
  75:	proc  6 (Sensor_reading:1) system.pml:54 Send 0	-> queue 3 (Modemanager_reading_channel)
- 84:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 2 (Modemanager_lock)
+ 84:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 1 (Modemanager_lock)
  86:	proc  4 (Modemanager_reading:1) system.pml:153 Recv 0	<- queue 3 (Modemanager_reading_channel)
- 91:	proc  4 (Modemanager_reading:1) system.pml:160 Send 1	-> queue 2 (Modemanager_lock)
+ 91:	proc  4 (Modemanager_reading:1) system.pml:160 Send 1	-> queue 1 (Modemanager_lock)
  93:	proc  6 (Sensor_reading:1) system.pml:54 Send 0	-> queue 3 (Modemanager_reading_channel)
 111:	proc  2 (Egse_tc:1) system.pml:58 Send 0,10	-> queue 4 (Modemanager_tc_channel)
-114:	proc  5 (Modemanager_tc:1) system.pml:170 Recv 1	<- queue 2 (Modemanager_lock)
+114:	proc  5 (Modemanager_tc:1) system.pml:170 Recv 1	<- queue 1 (Modemanager_lock)
 116:	proc  5 (Modemanager_tc:1) system.pml:174 Recv 0,10	<- queue 4 (Modemanager_tc_channel)
-129:	proc  5 (Modemanager_tc:1) system.pml:181 Send 1	-> queue 2 (Modemanager_lock)
-132:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 2 (Modemanager_lock)
+129:	proc  5 (Modemanager_tc:1) system.pml:181 Send 1	-> queue 1 (Modemanager_lock)
+132:	proc  4 (Modemanager_reading:1) system.pml:149 Recv 1	<- queue 1 (Modemanager_lock)
 134:	proc  4 (Modemanager_reading:1) system.pml:153 Recv 0	<- queue 3 (Modemanager_reading_channel)
 143:	proc  4 (Modemanager_reading:1) system.pml:32 Send 10	-> queue 5 (Actuator_ctrl_channel)
-146:	proc  0 (Actuator_ctrl:2) system.pml:76 Recv 1	<- queue 1 (Actuator_lock)
+146:	proc  0 (Actuator_ctrl:2) system.pml:76 Recv 1	<- queue 2 (Actuator_lock)
 148:	proc  0 (Actuator_ctrl:2) system.pml:80 Recv 10	<- queue 5 (Actuator_ctrl_channel)
 156:	proc  0 (Actuator_ctrl:2) system.pml:50 Send 0	-> queue 6 (Modemanager_feedback_channel)
       SCL violation: never actuator.x  > 5;
@@ -150,11 +150,11 @@ spin: trail ends after 157 steps
 		Modemanager_tc_signal_parameter.param_a = 0
 		Modemanager_tc_signal_parameter.param_b = 10
 		Modemanager_tc_channel_used = 1
-		global_state.actuator.state = 1
+		global_state.actuator.state = 0
 		global_state.actuator.init_done = 0
 		global_state.actuator.sender = 4
 		global_state.actuator.x = 10
-		global_state.modemanager.state = 1
+		global_state.modemanager.state = 0
 		global_state.modemanager.init_done = 0
 		global_state.modemanager.sender = 4
 		global_state.modemanager.cfg.param_a = 0
@@ -168,8 +168,8 @@ spin: trail ends after 157 steps
 		global_state.timers.actuator.dummy = 0
 		global_state.timers.modemanager.dummy = 0
 		global_state.timers.dummy_entry.dummy = 0
-		queue 1 (Actuator_lock): 
-		queue 2 (Modemanager_lock): 
+		queue 1 (Modemanager_lock): 
+		queue 2 (Actuator_lock): 
 157:	proc  5 (Modemanager_tc:1) system.pml:167 (state 81)
 157:	proc  4 (Modemanager_reading:1) modemanager.pml:36 (state 59)
 157:	proc  3 (Modemanager_feedback:3) system.pml:125 (state 76)

@@ -19,12 +19,12 @@
 #define Modemanager_Context_rprt_reading int
 #define Modemanager_Context_rprt_ctrl int
 #define Modemanager_Context_rprt_feedback int
-#define T_Integer int
-#define T_Config_param_a int
-#define T_Config_param_b int
-#define T_Report_reading int
-#define T_Report_ctrl int
-#define T_Report_feedback int
+#define TInteger int
+#define TConfig_param_a int
+#define TConfig_param_b int
+#define TReport_reading int
+#define TReport_ctrl int
+#define TReport_feedback int
 #define T_Int32 int
 #define T_UInt32 int
 #define T_Int8 int
@@ -332,19 +332,19 @@
 #define System_State_modemanager_rprt_feedback int
 #define TimerData_timer_enabled bool
 #define TimerData_interval int
-#define Actuator_States_working 0
-#define Actuator_States_idle 1
-#define Actuator_Context_state_working 0
-#define Actuator_Context_state_idle 1
+#define Actuator_States_idle 0
+#define Actuator_States_working 1
+#define Actuator_Context_state_idle 0
+#define Actuator_Context_state_working 1
 #define Actuator_Context_sender_actuator 0
 #define Actuator_Context_sender_egse 1
 #define Actuator_Context_sender_modemanager 2
 #define Actuator_Context_sender_sensor 3
 #define Actuator_Context_sender_env 4
-#define Modemanager_States_uninitialized 0
-#define Modemanager_States_configured 1
-#define Modemanager_Context_state_uninitialized 0
-#define Modemanager_Context_state_configured 1
+#define Modemanager_States_configured 0
+#define Modemanager_States_uninitialized 1
+#define Modemanager_Context_state_configured 0
+#define Modemanager_Context_state_uninitialized 1
 #define Modemanager_Context_sender_actuator 0
 #define Modemanager_Context_sender_egse 1
 #define Modemanager_Context_sender_modemanager 2
@@ -1452,15 +1452,15 @@
 #define System_state_modemanager_queue_elem_unhandled_input_event_selection_sensor_PRESENT 4
 #define System_State_modemanager_queue_elem_unhandled_input_PRESENT 5
 #define System_state_modemanager_queue_elem_selection_unhandled_input_PRESENT 5
-#define System_State_actuator_state_working 0
-#define System_State_actuator_state_idle 1
+#define System_State_actuator_state_idle 0
+#define System_State_actuator_state_working 1
 #define System_State_actuator_sender_actuator 0
 #define System_State_actuator_sender_egse 1
 #define System_State_actuator_sender_modemanager 2
 #define System_State_actuator_sender_sensor 3
 #define System_State_actuator_sender_env 4
-#define System_State_modemanager_state_uninitialized 0
-#define System_State_modemanager_state_configured 1
+#define System_State_modemanager_state_configured 0
+#define System_State_modemanager_state_uninitialized 1
 #define System_State_modemanager_sender_actuator 0
 #define System_State_modemanager_sender_egse 1
 #define System_State_modemanager_sender_modemanager 2
@@ -2432,19 +2432,19 @@ typedef System_State_timers_modemanager {
     bit dummy;
 }
 
-typedef T_Config {
-    T_Config_param_a param_a;
-    T_Config_param_b param_b;
+typedef TConfig {
+    TConfig_param_a param_a;
+    TConfig_param_b param_b;
+}
+
+typedef TReport {
+    TReport_reading reading;
+    TReport_ctrl ctrl;
+    TReport_feedback feedback;
 }
 
 typedef T_Null_Record {
     bit dummy;
-}
-
-typedef T_Report {
-    T_Report_reading reading;
-    T_Report_ctrl ctrl;
-    T_Report_feedback feedback;
 }
 
 typedef TimerData {
@@ -4841,7 +4841,7 @@ inline Actuator_States_assign_value(dst, src)
 }
 inline Actuator_States_range_check(Actuator_States_vc)
 {
-    assert(((Actuator_States_vc == Actuator_States_working) || (Actuator_States_vc == Actuator_States_idle)));
+    assert(((Actuator_States_vc == Actuator_States_idle) || (Actuator_States_vc == Actuator_States_working)));
 }
 inline Actuator_Context_state_assign_value(dst, src)
 {
@@ -4850,7 +4850,7 @@ inline Actuator_Context_state_assign_value(dst, src)
 }
 inline Actuator_Context_state_range_check(Actuator_Context_state_vc)
 {
-    assert(((Actuator_Context_state_vc == Actuator_Context_state_working) || (Actuator_Context_state_vc == Actuator_Context_state_idle)));
+    assert(((Actuator_Context_state_vc == Actuator_Context_state_idle) || (Actuator_Context_state_vc == Actuator_Context_state_working)));
 }
 inline Actuator_Context_init_done_assign_value(dst, src)
 {
@@ -4893,7 +4893,7 @@ inline Modemanager_States_assign_value(dst, src)
 }
 inline Modemanager_States_range_check(Modemanager_States_vc)
 {
-    assert(((Modemanager_States_vc == Modemanager_States_uninitialized) || (Modemanager_States_vc == Modemanager_States_configured)));
+    assert(((Modemanager_States_vc == Modemanager_States_configured) || (Modemanager_States_vc == Modemanager_States_uninitialized)));
 }
 inline Modemanager_Context_state_assign_value(dst, src)
 {
@@ -4902,7 +4902,7 @@ inline Modemanager_Context_state_assign_value(dst, src)
 }
 inline Modemanager_Context_state_range_check(Modemanager_Context_state_vc)
 {
-    assert(((Modemanager_Context_state_vc == Modemanager_Context_state_uninitialized) || (Modemanager_Context_state_vc == Modemanager_Context_state_configured)));
+    assert(((Modemanager_Context_state_vc == Modemanager_Context_state_configured) || (Modemanager_Context_state_vc == Modemanager_Context_state_uninitialized)));
 }
 inline Modemanager_Context_init_done_assign_value(dst, src)
 {
@@ -5016,70 +5016,70 @@ inline Modemanager_Context_assign_value(dst, src)
     Modemanager_Context_xfeedback_assign_value(dst.xfeedback, src.xfeedback);
     Modemanager_Context_rprt_assign_value(dst.rprt, src.rprt);
 }
-inline T_Integer_assign_value(dst, src)
+inline TInteger_assign_value(dst, src)
 {
     dst = src;
-    T_Integer_range_check(dst);
+    TInteger_range_check(dst);
 }
-inline T_Integer_range_check(T_Integer_vc)
+inline TInteger_range_check(TInteger_vc)
 {
-    assert(((T_Integer_vc >= 0) && (T_Integer_vc <= 1000000)));
+    assert(((TInteger_vc >= 0) && (TInteger_vc <= 1000000)));
 }
-inline T_Config_param_a_assign_value(dst, src)
-{
-    dst = src;
-    T_Config_param_a_range_check(dst);
-}
-inline T_Config_param_a_range_check(T_Config_param_a_vc)
-{
-    assert(((T_Config_param_a_vc >= 0) && (T_Config_param_a_vc <= 1000000)));
-}
-inline T_Config_param_b_assign_value(dst, src)
+inline TConfig_param_a_assign_value(dst, src)
 {
     dst = src;
-    T_Config_param_b_range_check(dst);
+    TConfig_param_a_range_check(dst);
 }
-inline T_Config_param_b_range_check(T_Config_param_b_vc)
+inline TConfig_param_a_range_check(TConfig_param_a_vc)
 {
-    assert(((T_Config_param_b_vc >= 0) && (T_Config_param_b_vc <= 1000000)));
+    assert(((TConfig_param_a_vc >= 0) && (TConfig_param_a_vc <= 1000000)));
 }
-inline T_Config_assign_value(dst, src)
-{
-    T_Config_param_a_assign_value(dst.param_a, src.param_a);
-    T_Config_param_b_assign_value(dst.param_b, src.param_b);
-}
-inline T_Report_reading_assign_value(dst, src)
+inline TConfig_param_b_assign_value(dst, src)
 {
     dst = src;
-    T_Report_reading_range_check(dst);
+    TConfig_param_b_range_check(dst);
 }
-inline T_Report_reading_range_check(T_Report_reading_vc)
+inline TConfig_param_b_range_check(TConfig_param_b_vc)
 {
-    assert(((T_Report_reading_vc >= 0) && (T_Report_reading_vc <= 1000000)));
+    assert(((TConfig_param_b_vc >= 0) && (TConfig_param_b_vc <= 1000000)));
 }
-inline T_Report_ctrl_assign_value(dst, src)
+inline TConfig_assign_value(dst, src)
 {
-    dst = src;
-    T_Report_ctrl_range_check(dst);
+    TConfig_param_a_assign_value(dst.param_a, src.param_a);
+    TConfig_param_b_assign_value(dst.param_b, src.param_b);
 }
-inline T_Report_ctrl_range_check(T_Report_ctrl_vc)
-{
-    assert(((T_Report_ctrl_vc >= 0) && (T_Report_ctrl_vc <= 1000000)));
-}
-inline T_Report_feedback_assign_value(dst, src)
+inline TReport_reading_assign_value(dst, src)
 {
     dst = src;
-    T_Report_feedback_range_check(dst);
+    TReport_reading_range_check(dst);
 }
-inline T_Report_feedback_range_check(T_Report_feedback_vc)
+inline TReport_reading_range_check(TReport_reading_vc)
 {
-    assert(((T_Report_feedback_vc >= 0) && (T_Report_feedback_vc <= 1000000)));
+    assert(((TReport_reading_vc >= 0) && (TReport_reading_vc <= 1000000)));
 }
-inline T_Report_assign_value(dst, src)
+inline TReport_ctrl_assign_value(dst, src)
 {
-    T_Report_reading_assign_value(dst.reading, src.reading);
-    T_Report_ctrl_assign_value(dst.ctrl, src.ctrl);
-    T_Report_feedback_assign_value(dst.feedback, src.feedback);
+    dst = src;
+    TReport_ctrl_range_check(dst);
+}
+inline TReport_ctrl_range_check(TReport_ctrl_vc)
+{
+    assert(((TReport_ctrl_vc >= 0) && (TReport_ctrl_vc <= 1000000)));
+}
+inline TReport_feedback_assign_value(dst, src)
+{
+    dst = src;
+    TReport_feedback_range_check(dst);
+}
+inline TReport_feedback_range_check(TReport_feedback_vc)
+{
+    assert(((TReport_feedback_vc >= 0) && (TReport_feedback_vc <= 1000000)));
+}
+inline TReport_assign_value(dst, src)
+{
+    TReport_reading_assign_value(dst.reading, src.reading);
+    TReport_ctrl_assign_value(dst.ctrl, src.ctrl);
+    TReport_feedback_assign_value(dst.feedback, src.feedback);
 }
 inline T_Int32_assign_value(dst, src)
 {
@@ -12144,7 +12144,7 @@ inline System_State_actuator_state_assign_value(dst, src)
 }
 inline System_State_actuator_state_range_check(System_State_actuator_state_vc)
 {
-    assert(((System_State_actuator_state_vc == System_State_actuator_state_working) || (System_State_actuator_state_vc == System_State_actuator_state_idle)));
+    assert(((System_State_actuator_state_vc == System_State_actuator_state_idle) || (System_State_actuator_state_vc == System_State_actuator_state_working)));
 }
 inline System_State_actuator_init_done_assign_value(dst, src)
 {
@@ -12187,7 +12187,7 @@ inline System_State_modemanager_state_assign_value(dst, src)
 }
 inline System_State_modemanager_state_range_check(System_State_modemanager_state_vc)
 {
-    assert(((System_State_modemanager_state_vc == System_State_modemanager_state_uninitialized) || (System_State_modemanager_state_vc == System_State_modemanager_state_configured)));
+    assert(((System_State_modemanager_state_vc == System_State_modemanager_state_configured) || (System_State_modemanager_state_vc == System_State_modemanager_state_uninitialized)));
 }
 inline System_State_modemanager_init_done_assign_value(dst, src)
 {

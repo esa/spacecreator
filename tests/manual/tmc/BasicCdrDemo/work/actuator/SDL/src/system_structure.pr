@@ -6,10 +6,10 @@ use Datamodel;
 system Actuator;
 
    /* CIF Keep Specific Geode PARAMNAMES x */
-   signal ctrl (T_Integer);
+   signal ctrl (TInteger);
 
    /* CIF Keep Specific Geode PARAMNAMES x */
-   signal feedback (T_Integer);
+   signal feedback (TInteger);
 
    -- For internal use, return the PID of the caller
    procedure get_sender;

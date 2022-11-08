@@ -33,19 +33,19 @@ package body Modemanager_Events is
                   CS_Barrier := True;
                when Feedback_PRESENT =>
                   declare
-                     Param : asn1SccT_Integer := Evt.Msg_In.Feedback.X;
+                     Param : asn1SccTinteger := Evt.Msg_In.Feedback.X;
                   begin
                      Modemanager_PI.Feedback (X => Param, Global_State => Global_State, Sender_PID => Event.Input_Event.Source);
                   end;
                when Reading_PRESENT =>
                   declare
-                     Param : asn1SccT_Integer := Evt.Msg_In.Reading.X;
+                     Param : asn1SccTinteger := Evt.Msg_In.Reading.X;
                   begin
                      Modemanager_PI.Reading (X => Param, Global_State => Global_State, Sender_PID => Event.Input_Event.Source);
                   end;
                when Tc_PRESENT =>
                   declare
-                     Param : asn1SccT_Config := Evt.Msg_In.Tc.Cfg;
+                     Param : asn1SccTconfig := Evt.Msg_In.Tc.Cfg;
                   begin
                      Modemanager_PI.Tc (Cfg => Param, Global_State => Global_State, Sender_PID => Event.Input_Event.Source);
                   end;
@@ -112,22 +112,22 @@ package body Modemanager_Events is
                   Put_Line ("ModeManager: continuous signals");
                when Feedback_PRESENT =>
                  Put ("ModeManager: INPUT Feedback");
-                  Put_Line (" (" & T_Integer_Pkg.Image (Event.Msg_In.Feedback.X) & ")");
+                  Put_Line (" (" & Tinteger_Pkg.Image (Event.Msg_In.Feedback.X) & ")");
                when Reading_PRESENT =>
                  Put ("ModeManager: INPUT Reading");
-                  Put_Line (" (" & T_Integer_Pkg.Image (Event.Msg_In.Reading.X) & ")");
+                  Put_Line (" (" & Tinteger_Pkg.Image (Event.Msg_In.Reading.X) & ")");
                when Tc_PRESENT =>
                  Put ("ModeManager: INPUT Tc");
-                  Put_Line (" (" & T_Config_Pkg.Image (Event.Msg_In.Tc.Cfg) & ")");
+                  Put_Line (" (" & Tconfig_Pkg.Image (Event.Msg_In.Tc.Cfg) & ")");
             end case;
          when Msg_OUT_Present =>
             case Event.Msg_Out.Kind is
                 when Ctrl_PRESENT =>
                  Put ("ModeManager: OUTPUT Ctrl");
-                  Put_Line (" (" & T_Integer_Pkg.Image (Event.Msg_Out.Ctrl.X) & ")");
+                  Put_Line (" (" & Tinteger_Pkg.Image (Event.Msg_Out.Ctrl.X) & ")");
                 when Tm_PRESENT =>
                  Put ("ModeManager: OUTPUT Tm");
-                  Put_Line (" (" & T_Report_Pkg.Image (Event.Msg_Out.Tm.Reprt) & ")");
+                  Put_Line (" (" & Treport_Pkg.Image (Event.Msg_Out.Tm.Reprt) & ")");
             end case;
       end case;
    end Print_Event;

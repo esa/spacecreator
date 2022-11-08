@@ -136,43 +136,43 @@ S_471_0: /* 2 */
 		logval("nothing.selection", now.nothing.selection);
 #endif
 		;
-		goto S_512_0;
-S_512_0: /* 1 */
+		goto S_532_0;
+S_532_0: /* 1 */
 
 #if defined(C_States) && (HAS_TRACK==1)
 		c_update((uchar *) &(now.c_state[0]));
 #endif
 		_m = 3; goto P999;
 
-	case 7: // STATE 6 - dataview.pml:5144 - [global_state.actuator.sender = 4] (0:0:1 - 1)
+	case 7: // STATE 6 - dataview.pml:5144 - [global_state.modemanager.sender = 4] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][6] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.actuator.sender;
-		now.global_state.actuator.sender = 4;
+		(trpt+1)->bup.oval = now.global_state.modemanager.sender;
+		now.global_state.modemanager.sender = 4;
 #ifdef VAR_RANGES
-		logval("global_state.actuator.sender", now.global_state.actuator.sender);
+		logval("global_state.modemanager.sender", now.global_state.modemanager.sender);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 8: // STATE 7 - dataview.pml:5149 - [assert((((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4)))] (0:0:0 - 1)
+	case 8: // STATE 7 - dataview.pml:5149 - [assert((((((global_state.modemanager.sender==0)||(global_state.modemanager.sender==1))||(global_state.modemanager.sender==2))||(global_state.modemanager.sender==3))||(global_state.modemanager.sender==4)))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[7][7] = 1;
 		if (TstOnly) return 1; /* T7 */
-		spin_assert((((((now.global_state.actuator.sender==0)||(now.global_state.actuator.sender==1))||(now.global_state.actuator.sender==2))||(now.global_state.actuator.sender==3))||(now.global_state.actuator.sender==4)), "(((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4))", II, tt, t);
+		spin_assert((((((now.global_state.modemanager.sender==0)||(now.global_state.modemanager.sender==1))||(now.global_state.modemanager.sender==2))||(now.global_state.modemanager.sender==3))||(now.global_state.modemanager.sender==4)), "(((((global_state.modemanager.sender==0)||(global_state.modemanager.sender==1))||(global_state.modemanager.sender==2))||(global_state.modemanager.sender==3))||(global_state.modemanager.sender==4))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 9: // STATE 10 - actuator.pml:4 - [transition_id = 0] (0:38:2 - 1)
+	case 9: // STATE 10 - modemanager.pml:4 - [transition_id = 0] (0:58:2 - 1)
 		IfNotBlocked
 		reached[7][10] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_710_8_8_17_transition_id;
 		((P7 *)_this)->_710_8_8_17_transition_id = 0;
 #ifdef VAR_RANGES
 		logval(":init::transition_id", ((P7 *)_this)->_710_8_8_17_transition_id);
 #endif
 		;
-		/* merge: transition_id = 0(38, 11, 38) */
+		/* merge: transition_id = 0(58, 11, 58) */
 		reached[7][11] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_710_8_8_17_transition_id;
@@ -181,11 +181,11 @@ S_512_0: /* 1 */
 		logval(":init::transition_id", ((P7 *)_this)->_710_8_8_17_transition_id);
 #endif
 		;
-		/* merge: .(goto)(0, 39, 38) */
-		reached[7][39] = 1;
+		/* merge: .(goto)(0, 59, 58) */
+		reached[7][59] = 1;
 		;
 		_m = 3; goto P999; /* 2 */
-	case 10: // STATE 12 - actuator.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
+	case 10: // STATE 12 - modemanager.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][12] = 1;
 		if (!((((P7 *)_this)->_710_8_8_17_transition_id== -(1))))
@@ -197,19 +197,19 @@ S_512_0: /* 1 */
 #endif
 			((P7 *)_this)->_710_8_8_17_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 11: // STATE 14 - actuator.pml:9 - [((transition_id==0))] (37:0:3 - 1)
+	case 11: // STATE 14 - modemanager.pml:9 - [((transition_id==0))] (57:0:3 - 1)
 		IfNotBlocked
 		reached[7][14] = 1;
 		if (!((((P7 *)_this)->_710_8_8_17_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _710_8_8_17_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		/* dead 1: _710_8_8_17_transition_id */  (trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_710_8_8_17_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
 #endif
 			((P7 *)_this)->_710_8_8_17_transition_id = 0;
-		/* merge: transition_id = -(1)(37, 15, 37) */
+		/* merge: transition_id = -(1)(57, 15, 57) */
 		reached[7][15] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_710_8_8_17_transition_id;
@@ -218,20 +218,20 @@ S_512_0: /* 1 */
 		logval(":init::transition_id", ((P7 *)_this)->_710_8_8_17_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 1(37, 16, 37) */
+		/* merge: global_state.modemanager.state = 1(57, 16, 57) */
 		reached[7][16] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[2] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 1;
+		(trpt+1)->bup.ovals[2] = now.global_state.modemanager.state;
+		now.global_state.modemanager.state = 1;
 #ifdef VAR_RANGES
-		logval("global_state.actuator.state", now.global_state.actuator.state);
+		logval("global_state.modemanager.state", now.global_state.modemanager.state);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 17, 37) */
+		/* merge: goto continuous_signals(0, 17, 57) */
 		reached[7][17] = 1;
 		;
 		_m = 3; goto P999; /* 3 */
-	case 12: // STATE 18 - actuator.pml:13 - [((transition_id==1))] (0:0:1 - 1)
+	case 12: // STATE 18 - modemanager.pml:13 - [((transition_id==1))] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][18] = 1;
 		if (!((((P7 *)_this)->_710_8_8_17_transition_id==1)))
@@ -243,137 +243,227 @@ S_512_0: /* 1 */
 #endif
 			((P7 *)_this)->_710_8_8_17_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 13: // STATE 21 - actuator.pml:16 - [(((global_state.actuator.x>10)==1))] (0:0:0 - 1)
+	case 13: // STATE 21 - dataview.pml:5021 - [global_state.modemanager.rprt.reading = global_state.modemanager.xin] (0:0:1 - 1)
 		IfNotBlocked
 		reached[7][21] = 1;
-		if (!(((now.global_state.actuator.x>10)==1)))
-			continue;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.reading;
+		now.global_state.modemanager.rprt.reading = now.global_state.modemanager.xin;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.reading", now.global_state.modemanager.rprt.reading);
+#endif
+		;
 		_m = 3; goto P999; /* 0 */
-	case 14: // STATE 22 - system.pml:50 - [Modemanager_feedback_channel!global_state.actuator.x] (37:0:2 - 1)
+	case 14: // STATE 22 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[7][22] = 1;
-		if (q_full(now.Modemanager_feedback_channel))
-			continue;
-		if (TstOnly) return 1; /* T1 */
-#ifdef HAS_CODE
-		if (readtrail && gui) {
-			char simtmp[64];
-			sprintf(simvals, "%d!", now.Modemanager_feedback_channel);
-		sprintf(simtmp, "%d,", now.global_state.actuator.x); strcat(simvals, simtmp);		}
-#endif
-		
-		qsend(now.Modemanager_feedback_channel, 0, now.global_state.actuator.x, 0, 0, 1);
-		/* merge: transition_id = -(1)(37, 24, 37) */
-		reached[7][24] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_710_8_8_17_transition_id;
-		((P7 *)_this)->_710_8_8_17_transition_id =  -(1);
-#ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_710_8_8_17_transition_id);
-#endif
-		;
-		/* merge: global_state.actuator.state = 0(37, 25, 37) */
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.reading>=0)&&(now.global_state.modemanager.rprt.reading<=1000000)), "((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 15: // STATE 25 - dataview.pml:5021 - [global_state.modemanager.rprt.ctrl = global_state.modemanager.xout] (0:0:1 - 1)
+		IfNotBlocked
 		reached[7][25] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 0;
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.ctrl;
+		now.global_state.modemanager.rprt.ctrl = now.global_state.modemanager.xout;
 #ifdef VAR_RANGES
-		logval("global_state.actuator.state", now.global_state.actuator.state);
+		logval("global_state.modemanager.rprt.ctrl", now.global_state.modemanager.rprt.ctrl);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 26, 37) */
-		reached[7][26] = 1;
-		;
-		_m = 2; goto P999; /* 3 */
-	case 15: // STATE 27 - actuator.pml:21 - [(((global_state.actuator.x>10)==0))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][27] = 1;
-		if (!(((now.global_state.actuator.x>10)==0)))
-			continue;
 		_m = 3; goto P999; /* 0 */
-	case 16: // STATE 28 - system.pml:50 - [Modemanager_feedback_channel!0] (37:0:2 - 1)
+	case 16: // STATE 26 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][28] = 1;
-		if (q_full(now.Modemanager_feedback_channel))
+		reached[7][26] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.ctrl>=0)&&(now.global_state.modemanager.rprt.ctrl<=1000000)), "((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 17: // STATE 29 - dataview.pml:5021 - [global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][29] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.feedback;
+		now.global_state.modemanager.rprt.feedback = now.global_state.modemanager.xfeedback;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.feedback", now.global_state.modemanager.rprt.feedback);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 18: // STATE 30 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[7][30] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.feedback>=0)&&(now.global_state.modemanager.rprt.feedback<=1000000)), "((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 19: // STATE 34 - system.pml:46 - [Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback] (57:0:1 - 1)
+		IfNotBlocked
+		reached[7][34] = 1;
+		if (q_full(now.Egse_tm_channel))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Modemanager_feedback_channel);
-		sprintf(simtmp, "%d,", 0); strcat(simvals, simtmp);		}
+			sprintf(simvals, "%d!", now.Egse_tm_channel);
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.feedback); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Modemanager_feedback_channel, 0, 0, 0, 0, 1);
-		/* merge: transition_id = -(1)(37, 30, 37) */
-		reached[7][30] = 1;
+		qsend(now.Egse_tm_channel, 0, now.global_state.modemanager.rprt.reading, now.global_state.modemanager.rprt.ctrl, now.global_state.modemanager.rprt.feedback, 3);
+		/* merge: transition_id = -(1)(0, 36, 57) */
+		reached[7][36] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.oval = ((P7 *)_this)->_710_8_8_17_transition_id;
+		((P7 *)_this)->_710_8_8_17_transition_id =  -(1);
+#ifdef VAR_RANGES
+		logval(":init::transition_id", ((P7 *)_this)->_710_8_8_17_transition_id);
+#endif
+		;
+		/* merge: goto continuous_signals(0, 37, 57) */
+		reached[7][37] = 1;
+		;
+		_m = 2; goto P999; /* 2 */
+	case 20: // STATE 38 - modemanager.pml:23 - [((transition_id==2))] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][38] = 1;
+		if (!((((P7 *)_this)->_710_8_8_17_transition_id==2)))
+			continue;
+		if (TstOnly) return 1; /* TT */
+		/* dead 1: _710_8_8_17_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_710_8_8_17_transition_id;
+#ifdef HAS_CODE
+		if (!readtrail)
+#endif
+			((P7 *)_this)->_710_8_8_17_transition_id = 0;
+		_m = 3; goto P999; /* 0 */
+	case 21: // STATE 41 - dataview.pml:5021 - [global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][41] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.xout;
+		now.global_state.modemanager.xout = ((now.global_state.modemanager.xin*now.global_state.modemanager.cfg.param_a)+now.global_state.modemanager.cfg.param_b);
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.xout", now.global_state.modemanager.xout);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 22: // STATE 42 - dataview.pml:5026 - [assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[7][42] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.xout>=0)&&(now.global_state.modemanager.xout<=1000000)), "((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 23: // STATE 45 - system.pml:32 - [Actuator_ctrl_channel!global_state.modemanager.xout] (57:0:1 - 1)
+		IfNotBlocked
+		reached[7][45] = 1;
+		if (q_full(now.Actuator_ctrl_channel))
+			continue;
+		if (TstOnly) return 1; /* T1 */
+#ifdef HAS_CODE
+		if (readtrail && gui) {
+			char simtmp[64];
+			sprintf(simvals, "%d!", now.Actuator_ctrl_channel);
+		sprintf(simtmp, "%d", now.global_state.modemanager.xout); strcat(simvals, simtmp);		}
+#endif
+		
+		qsend(now.Actuator_ctrl_channel, 0, now.global_state.modemanager.xout, 0, 0, 1);
+		/* merge: transition_id = -(1)(0, 47, 57) */
+		reached[7][47] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = ((P7 *)_this)->_710_8_8_17_transition_id;
+		((P7 *)_this)->_710_8_8_17_transition_id =  -(1);
+#ifdef VAR_RANGES
+		logval(":init::transition_id", ((P7 *)_this)->_710_8_8_17_transition_id);
+#endif
+		;
+		/* merge: goto continuous_signals(0, 48, 57) */
+		reached[7][48] = 1;
+		;
+		_m = 2; goto P999; /* 2 */
+	case 24: // STATE 49 - modemanager.pml:29 - [((transition_id==3))] (0:0:1 - 1)
+		IfNotBlocked
+		reached[7][49] = 1;
+		if (!((((P7 *)_this)->_710_8_8_17_transition_id==3)))
+			continue;
+		if (TstOnly) return 1; /* TT */
+		/* dead 1: _710_8_8_17_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_710_8_8_17_transition_id;
+#ifdef HAS_CODE
+		if (!readtrail)
+#endif
+			((P7 *)_this)->_710_8_8_17_transition_id = 0;
+		_m = 3; goto P999; /* 0 */
+	case 25: // STATE 50 - system.pml:68 - [(1)] (57:0:2 - 1)
+		IfNotBlocked
+		reached[7][50] = 1;
+		if (!(1))
+			continue;
+		/* merge: transition_id = -(1)(57, 52, 57) */
+		reached[7][52] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_710_8_8_17_transition_id;
 		((P7 *)_this)->_710_8_8_17_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval(":init::transition_id", ((P7 *)_this)->_710_8_8_17_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 1(37, 31, 37) */
-		reached[7][31] = 1;
+		/* merge: global_state.modemanager.state = 0(57, 53, 57) */
+		reached[7][53] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 1;
+		(trpt+1)->bup.ovals[1] = now.global_state.modemanager.state;
+		now.global_state.modemanager.state = 0;
 #ifdef VAR_RANGES
-		logval("global_state.actuator.state", now.global_state.actuator.state);
+		logval("global_state.modemanager.state", now.global_state.modemanager.state);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 32, 37) */
-		reached[7][32] = 1;
+		/* merge: goto continuous_signals(0, 54, 57) */
+		reached[7][54] = 1;
 		;
-		_m = 2; goto P999; /* 3 */
-	case 17: // STATE 43 - system.pml:203 - [Actuator_lock!1] (0:0:0 - 3)
+		_m = 3; goto P999; /* 3 */
+	case 26: // STATE 63 - system.pml:203 - [Modemanager_lock!1] (0:0:0 - 3)
 		IfNotBlocked
-		reached[7][43] = 1;
-		if (q_full(now.Actuator_lock))
+		reached[7][63] = 1;
+		if (q_full(now.Modemanager_lock))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Actuator_lock);
-		sprintf(simtmp, "%d,", 1); strcat(simvals, simtmp);		}
+			sprintf(simvals, "%d!", now.Modemanager_lock);
+		sprintf(simtmp, "%d", 1); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Actuator_lock, 0, 1, 0, 0, 1);
+		qsend(now.Modemanager_lock, 0, 1, 0, 0, 1);
 		_m = 2; goto P999; /* 0 */
-	case 18: // STATE 44 - dataview.pml:5144 - [global_state.modemanager.sender = 4] (0:0:1 - 1)
+	case 27: // STATE 64 - dataview.pml:5144 - [global_state.actuator.sender = 4] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][44] = 1;
+		reached[7][64] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.sender;
-		now.global_state.modemanager.sender = 4;
+		(trpt+1)->bup.oval = now.global_state.actuator.sender;
+		now.global_state.actuator.sender = 4;
 #ifdef VAR_RANGES
-		logval("global_state.modemanager.sender", now.global_state.modemanager.sender);
+		logval("global_state.actuator.sender", now.global_state.actuator.sender);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 19: // STATE 45 - dataview.pml:5149 - [assert((((((global_state.modemanager.sender==0)||(global_state.modemanager.sender==1))||(global_state.modemanager.sender==2))||(global_state.modemanager.sender==3))||(global_state.modemanager.sender==4)))] (0:0:0 - 1)
+	case 28: // STATE 65 - dataview.pml:5149 - [assert((((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][45] = 1;
+		reached[7][65] = 1;
 		if (TstOnly) return 1; /* T7 */
-		spin_assert((((((now.global_state.modemanager.sender==0)||(now.global_state.modemanager.sender==1))||(now.global_state.modemanager.sender==2))||(now.global_state.modemanager.sender==3))||(now.global_state.modemanager.sender==4)), "(((((global_state.modemanager.sender==0)||(global_state.modemanager.sender==1))||(global_state.modemanager.sender==2))||(global_state.modemanager.sender==3))||(global_state.modemanager.sender==4))", II, tt, t);
+		spin_assert((((((now.global_state.actuator.sender==0)||(now.global_state.actuator.sender==1))||(now.global_state.actuator.sender==2))||(now.global_state.actuator.sender==3))||(now.global_state.actuator.sender==4)), "(((((global_state.actuator.sender==0)||(global_state.actuator.sender==1))||(global_state.actuator.sender==2))||(global_state.actuator.sender==3))||(global_state.actuator.sender==4))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 20: // STATE 48 - modemanager.pml:4 - [transition_id = 0] (0:96:2 - 1)
+	case 29: // STATE 68 - actuator.pml:4 - [transition_id = 0] (0:96:2 - 1)
 		IfNotBlocked
-		reached[7][48] = 1;
+		reached[7][68] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_710_8_9_19_transition_id;
 		((P7 *)_this)->_710_8_9_19_transition_id = 0;
 #ifdef VAR_RANGES
 		logval(":init::transition_id", ((P7 *)_this)->_710_8_9_19_transition_id);
 #endif
 		;
-		/* merge: transition_id = 0(96, 49, 96) */
-		reached[7][49] = 1;
+		/* merge: transition_id = 0(96, 69, 96) */
+		reached[7][69] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_710_8_9_19_transition_id;
 		((P7 *)_this)->_710_8_9_19_transition_id = 0;
@@ -385,9 +475,9 @@ S_512_0: /* 1 */
 		reached[7][97] = 1;
 		;
 		_m = 3; goto P999; /* 2 */
-	case 21: // STATE 50 - modemanager.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
+	case 30: // STATE 70 - actuator.pml:7 - [((transition_id==-(1)))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][50] = 1;
+		reached[7][70] = 1;
 		if (!((((P7 *)_this)->_710_8_9_19_transition_id== -(1))))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -397,20 +487,20 @@ S_512_0: /* 1 */
 #endif
 			((P7 *)_this)->_710_8_9_19_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 22: // STATE 52 - modemanager.pml:9 - [((transition_id==0))] (95:0:3 - 1)
+	case 31: // STATE 72 - actuator.pml:9 - [((transition_id==0))] (95:0:3 - 1)
 		IfNotBlocked
-		reached[7][52] = 1;
+		reached[7][72] = 1;
 		if (!((((P7 *)_this)->_710_8_9_19_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _710_8_9_19_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		/* dead 1: _710_8_9_19_transition_id */  (trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_710_8_9_19_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
 #endif
 			((P7 *)_this)->_710_8_9_19_transition_id = 0;
-		/* merge: transition_id = -(1)(95, 53, 95) */
-		reached[7][53] = 1;
+		/* merge: transition_id = -(1)(95, 73, 95) */
+		reached[7][73] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = ((P7 *)_this)->_710_8_9_19_transition_id;
 		((P7 *)_this)->_710_8_9_19_transition_id =  -(1);
@@ -418,22 +508,22 @@ S_512_0: /* 1 */
 		logval(":init::transition_id", ((P7 *)_this)->_710_8_9_19_transition_id);
 #endif
 		;
-		/* merge: global_state.modemanager.state = 0(95, 54, 95) */
-		reached[7][54] = 1;
+		/* merge: global_state.actuator.state = 0(95, 74, 95) */
+		reached[7][74] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[2] = now.global_state.modemanager.state;
-		now.global_state.modemanager.state = 0;
+		(trpt+1)->bup.ovals[2] = now.global_state.actuator.state;
+		now.global_state.actuator.state = 0;
 #ifdef VAR_RANGES
-		logval("global_state.modemanager.state", now.global_state.modemanager.state);
+		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 55, 95) */
-		reached[7][55] = 1;
+		/* merge: goto continuous_signals(0, 75, 95) */
+		reached[7][75] = 1;
 		;
 		_m = 3; goto P999; /* 3 */
-	case 23: // STATE 56 - modemanager.pml:13 - [((transition_id==1))] (0:0:1 - 1)
+	case 32: // STATE 76 - actuator.pml:13 - [((transition_id==1))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[7][56] = 1;
+		reached[7][76] = 1;
 		if (!((((P7 *)_this)->_710_8_9_19_transition_id==1)))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -443,196 +533,106 @@ S_512_0: /* 1 */
 #endif
 			((P7 *)_this)->_710_8_9_19_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 24: // STATE 57 - system.pml:68 - [(1)] (95:0:2 - 1)
+	case 33: // STATE 79 - actuator.pml:16 - [(((global_state.actuator.x>10)==1))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[7][57] = 1;
-		if (!(1))
+		reached[7][79] = 1;
+		if (!(((now.global_state.actuator.x>10)==1)))
 			continue;
-		/* merge: transition_id = -(1)(95, 59, 95) */
-		reached[7][59] = 1;
+		_m = 3; goto P999; /* 0 */
+	case 34: // STATE 80 - system.pml:50 - [Modemanager_feedback_channel!global_state.actuator.x] (95:0:2 - 1)
+		IfNotBlocked
+		reached[7][80] = 1;
+		if (q_full(now.Modemanager_feedback_channel))
+			continue;
+		if (TstOnly) return 1; /* T1 */
+#ifdef HAS_CODE
+		if (readtrail && gui) {
+			char simtmp[64];
+			sprintf(simvals, "%d!", now.Modemanager_feedback_channel);
+		sprintf(simtmp, "%d", now.global_state.actuator.x); strcat(simvals, simtmp);		}
+#endif
+		
+		qsend(now.Modemanager_feedback_channel, 0, now.global_state.actuator.x, 0, 0, 1);
+		/* merge: transition_id = -(1)(95, 82, 95) */
+		reached[7][82] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_710_8_9_19_transition_id;
 		((P7 *)_this)->_710_8_9_19_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval(":init::transition_id", ((P7 *)_this)->_710_8_9_19_transition_id);
 #endif
 		;
-		/* merge: global_state.modemanager.state = 1(95, 60, 95) */
-		reached[7][60] = 1;
+		/* merge: global_state.actuator.state = 1(95, 83, 95) */
+		reached[7][83] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.modemanager.state;
-		now.global_state.modemanager.state = 1;
+		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
+		now.global_state.actuator.state = 1;
 #ifdef VAR_RANGES
-		logval("global_state.modemanager.state", now.global_state.modemanager.state);
+		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 61, 95) */
-		reached[7][61] = 1;
+		/* merge: goto continuous_signals(0, 84, 95) */
+		reached[7][84] = 1;
 		;
-		_m = 3; goto P999; /* 3 */
-	case 25: // STATE 62 - modemanager.pml:18 - [((transition_id==2))] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][62] = 1;
-		if (!((((P7 *)_this)->_710_8_9_19_transition_id==2)))
-			continue;
-		if (TstOnly) return 1; /* TT */
-		/* dead 1: _710_8_9_19_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_710_8_9_19_transition_id;
-#ifdef HAS_CODE
-		if (!readtrail)
-#endif
-			((P7 *)_this)->_710_8_9_19_transition_id = 0;
-		_m = 3; goto P999; /* 0 */
-	case 26: // STATE 65 - dataview.pml:5021 - [global_state.modemanager.rprt.reading = global_state.modemanager.xin] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][65] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.reading;
-		now.global_state.modemanager.rprt.reading = now.global_state.modemanager.xin;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.reading", now.global_state.modemanager.rprt.reading);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 27: // STATE 66 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][66] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.reading>=0)&&(now.global_state.modemanager.rprt.reading<=1000000)), "((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 28: // STATE 69 - dataview.pml:5021 - [global_state.modemanager.rprt.ctrl = global_state.modemanager.xout] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][69] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.ctrl;
-		now.global_state.modemanager.rprt.ctrl = now.global_state.modemanager.xout;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.ctrl", now.global_state.modemanager.rprt.ctrl);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 29: // STATE 70 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][70] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.ctrl>=0)&&(now.global_state.modemanager.rprt.ctrl<=1000000)), "((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 30: // STATE 73 - dataview.pml:5021 - [global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][73] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.feedback;
-		now.global_state.modemanager.rprt.feedback = now.global_state.modemanager.xfeedback;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.feedback", now.global_state.modemanager.rprt.feedback);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 31: // STATE 74 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[7][74] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.feedback>=0)&&(now.global_state.modemanager.rprt.feedback<=1000000)), "((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 32: // STATE 78 - system.pml:46 - [Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback] (95:0:1 - 1)
-		IfNotBlocked
-		reached[7][78] = 1;
-		if (q_full(now.Egse_tm_channel))
-			continue;
-		if (TstOnly) return 1; /* T1 */
-#ifdef HAS_CODE
-		if (readtrail && gui) {
-			char simtmp[64];
-			sprintf(simvals, "%d!", now.Egse_tm_channel);
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.feedback); strcat(simvals, simtmp);		}
-#endif
-		
-		qsend(now.Egse_tm_channel, 0, now.global_state.modemanager.rprt.reading, now.global_state.modemanager.rprt.ctrl, now.global_state.modemanager.rprt.feedback, 3);
-		/* merge: transition_id = -(1)(0, 80, 95) */
-		reached[7][80] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = ((P7 *)_this)->_710_8_9_19_transition_id;
-		((P7 *)_this)->_710_8_9_19_transition_id =  -(1);
-#ifdef VAR_RANGES
-		logval(":init::transition_id", ((P7 *)_this)->_710_8_9_19_transition_id);
-#endif
-		;
-		/* merge: goto continuous_signals(0, 81, 95) */
-		reached[7][81] = 1;
-		;
-		_m = 2; goto P999; /* 2 */
-	case 33: // STATE 82 - modemanager.pml:28 - [((transition_id==3))] (0:0:1 - 1)
-		IfNotBlocked
-		reached[7][82] = 1;
-		if (!((((P7 *)_this)->_710_8_9_19_transition_id==3)))
-			continue;
-		if (TstOnly) return 1; /* TT */
-		/* dead 1: _710_8_9_19_transition_id */  (trpt+1)->bup.oval = ((P7 *)_this)->_710_8_9_19_transition_id;
-#ifdef HAS_CODE
-		if (!readtrail)
-#endif
-			((P7 *)_this)->_710_8_9_19_transition_id = 0;
-		_m = 3; goto P999; /* 0 */
-	case 34: // STATE 85 - dataview.pml:5021 - [global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)] (0:0:1 - 1)
+		_m = 2; goto P999; /* 3 */
+	case 35: // STATE 85 - actuator.pml:21 - [(((global_state.actuator.x>10)==0))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[7][85] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.xout;
-		now.global_state.modemanager.xout = ((now.global_state.modemanager.xin*now.global_state.modemanager.cfg.param_a)+now.global_state.modemanager.cfg.param_b);
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.xout", now.global_state.modemanager.xout);
-#endif
-		;
+		if (!(((now.global_state.actuator.x>10)==0)))
+			continue;
 		_m = 3; goto P999; /* 0 */
-	case 35: // STATE 86 - dataview.pml:5026 - [assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))] (0:0:0 - 1)
+	case 36: // STATE 86 - system.pml:50 - [Modemanager_feedback_channel!0] (95:0:2 - 1)
 		IfNotBlocked
 		reached[7][86] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.xout>=0)&&(now.global_state.modemanager.xout<=1000000)), "((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 36: // STATE 89 - system.pml:32 - [Actuator_ctrl_channel!global_state.modemanager.xout] (95:0:1 - 1)
-		IfNotBlocked
-		reached[7][89] = 1;
-		if (q_full(now.Actuator_ctrl_channel))
+		if (q_full(now.Modemanager_feedback_channel))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Actuator_ctrl_channel);
-		sprintf(simtmp, "%d,", now.global_state.modemanager.xout); strcat(simvals, simtmp);		}
+			sprintf(simvals, "%d!", now.Modemanager_feedback_channel);
+		sprintf(simtmp, "%d", 0); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Actuator_ctrl_channel, 0, now.global_state.modemanager.xout, 0, 0, 1);
-		/* merge: transition_id = -(1)(0, 91, 95) */
-		reached[7][91] = 1;
+		qsend(now.Modemanager_feedback_channel, 0, 0, 0, 0, 1);
+		/* merge: transition_id = -(1)(95, 88, 95) */
+		reached[7][88] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = ((P7 *)_this)->_710_8_9_19_transition_id;
+		(trpt+1)->bup.ovals = grab_ints(2);
+		(trpt+1)->bup.ovals[0] = ((P7 *)_this)->_710_8_9_19_transition_id;
 		((P7 *)_this)->_710_8_9_19_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval(":init::transition_id", ((P7 *)_this)->_710_8_9_19_transition_id);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 92, 95) */
-		reached[7][92] = 1;
+		/* merge: global_state.actuator.state = 0(95, 89, 95) */
+		reached[7][89] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
+		now.global_state.actuator.state = 0;
+#ifdef VAR_RANGES
+		logval("global_state.actuator.state", now.global_state.actuator.state);
+#endif
 		;
-		_m = 2; goto P999; /* 2 */
-	case 37: // STATE 101 - system.pml:205 - [Modemanager_lock!1] (104:0:1 - 3)
+		/* merge: goto continuous_signals(0, 90, 95) */
+		reached[7][90] = 1;
+		;
+		_m = 2; goto P999; /* 3 */
+	case 37: // STATE 101 - system.pml:205 - [Actuator_lock!1] (104:0:1 - 3)
 		IfNotBlocked
 		reached[7][101] = 1;
-		if (q_full(now.Modemanager_lock))
+		if (q_full(now.Actuator_lock))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Modemanager_lock);
-		sprintf(simtmp, "%d,", 1); strcat(simvals, simtmp);		}
+			sprintf(simvals, "%d!", now.Actuator_lock);
+		sprintf(simtmp, "%d", 1); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Modemanager_lock, 0, 1, 0, 0, 1);
+		qsend(now.Actuator_lock, 0, 1, 0, 0, 1);
 		/* merge: inited = 1(0, 102, 104) */
 		reached[7][102] = 1;
 		if (TstOnly) return 1; /* T3 */
@@ -662,7 +662,7 @@ S_512_0: /* 1 */
 		IfNotBlocked
 		reached[6][2] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(3);
+		(trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = ((P6 *)_this)->value;
 		((P6 *)_this)->value = 0;
 #ifdef VAR_RANGES
@@ -858,7 +858,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_reading_channel);
-		sprintf(simtmp, "%d,", ((P6 *)_this)->value); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", ((P6 *)_this)->value); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_reading_channel, 0, ((P6 *)_this)->value, 0, 0, 1);
@@ -910,8 +910,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Modemanager_lock);
-			sprintf(simtmp, "%d,", ((int)_)); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", ((int)_)); strcat(simvals, simtmp);		}
 #endif
 		;
 		_m = 4; goto P999; /* 0 */
@@ -927,7 +926,7 @@ S_512_0: /* 1 */
 
 		XX=1;
 		if (TstOnly) return 1 /* T2 */;
-		(trpt+1)->bup.ovals = grab_values(3);
+		(trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = now.Modemanager_tc_signal_parameter.param_a;
 		(trpt+1)->bup.ovals[1] = now.Modemanager_tc_signal_parameter.param_b;
 		;
@@ -946,26 +945,24 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Modemanager_tc_channel);
-			sprintf(simtmp, "%d,", now.Modemanager_tc_signal_parameter.param_a); strcat(simvals, simtmp);
-			strcat(simvals, ",");
-			sprintf(simtmp, "%d,", now.Modemanager_tc_signal_parameter.param_b); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", now.Modemanager_tc_signal_parameter.param_a); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.Modemanager_tc_signal_parameter.param_b); strcat(simvals, simtmp);		}
 #endif
 		;
 		/* merge: Modemanager_tc_channel_used = 1(0, 6, 73) */
 		reached[5][6] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[2] = Modemanager_tc_channel_used;
+		(trpt+1)->bup.ovals[2] = ((int)Modemanager_tc_channel_used);
 		Modemanager_tc_channel_used = 1;
 #ifdef VAR_RANGES
 		logval("Modemanager_tc_channel_used", ((int)Modemanager_tc_channel_used));
 #endif
 		;
 		_m = 4; goto P999; /* 1 */
-	case 60: // STATE 7 - modemanager.pml:66 - [((global_state.modemanager.state==0))] (0:0:0 - 1)
+	case 60: // STATE 7 - modemanager.pml:66 - [((global_state.modemanager.state==1))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[5][7] = 1;
-		if (!((now.global_state.modemanager.state==0)))
+		if (!((now.global_state.modemanager.state==1)))
 			continue;
 		_m = 3; goto P999; /* 0 */
 	case 61: // STATE 8 - dataview.pml:5030 - [global_state.modemanager.cfg.param_a = Modemanager_tc_signal_parameter.param_a] (0:0:1 - 1)
@@ -1006,18 +1003,18 @@ S_512_0: /* 1 */
 		IfNotBlocked
 		reached[5][17] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P5 *)_this)->_708_6_5_12_transition_id;
 		((P5 *)_this)->_708_6_5_12_transition_id = 0;
 #ifdef VAR_RANGES
 		logval("Modemanager_tc:transition_id", ((P5 *)_this)->_708_6_5_12_transition_id);
 #endif
 		;
-		/* merge: transition_id = 1(65, 18, 65) */
+		/* merge: transition_id = 3(65, 18, 65) */
 		reached[5][18] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = ((P5 *)_this)->_708_6_5_12_transition_id;
-		((P5 *)_this)->_708_6_5_12_transition_id = 1;
+		((P5 *)_this)->_708_6_5_12_transition_id = 3;
 #ifdef VAR_RANGES
 		logval("Modemanager_tc:transition_id", ((P5 *)_this)->_708_6_5_12_transition_id);
 #endif
@@ -1044,7 +1041,7 @@ S_512_0: /* 1 */
 		if (!((((P5 *)_this)->_708_6_5_12_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _708_6_5_12_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		/* dead 1: _708_6_5_12_transition_id */  (trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = ((P5 *)_this)->_708_6_5_12_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
@@ -1059,11 +1056,11 @@ S_512_0: /* 1 */
 		logval("Modemanager_tc:transition_id", ((P5 *)_this)->_708_6_5_12_transition_id);
 #endif
 		;
-		/* merge: global_state.modemanager.state = 0(64, 23, 64) */
+		/* merge: global_state.modemanager.state = 1(64, 23, 64) */
 		reached[5][23] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[2] = now.global_state.modemanager.state;
-		now.global_state.modemanager.state = 0;
+		now.global_state.modemanager.state = 1;
 #ifdef VAR_RANGES
 		logval("global_state.modemanager.state", now.global_state.modemanager.state);
 #endif
@@ -1084,37 +1081,89 @@ S_512_0: /* 1 */
 #endif
 			((P5 *)_this)->_708_6_5_12_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 69: // STATE 26 - system.pml:68 - [(1)] (64:0:2 - 1)
+	case 69: // STATE 28 - dataview.pml:5021 - [global_state.modemanager.rprt.reading = global_state.modemanager.xin] (0:0:1 - 1)
 		IfNotBlocked
-		reached[5][26] = 1;
-		if (!(1))
-			continue;
-		/* merge: transition_id = -(1)(64, 28, 64) */
 		reached[5][28] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P5 *)_this)->_708_6_5_12_transition_id;
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.reading;
+		now.global_state.modemanager.rprt.reading = now.global_state.modemanager.xin;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.reading", now.global_state.modemanager.rprt.reading);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 70: // STATE 29 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[5][29] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.reading>=0)&&(now.global_state.modemanager.rprt.reading<=1000000)), "((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 71: // STATE 32 - dataview.pml:5021 - [global_state.modemanager.rprt.ctrl = global_state.modemanager.xout] (0:0:1 - 1)
+		IfNotBlocked
+		reached[5][32] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.ctrl;
+		now.global_state.modemanager.rprt.ctrl = now.global_state.modemanager.xout;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.ctrl", now.global_state.modemanager.rprt.ctrl);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 72: // STATE 33 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[5][33] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.ctrl>=0)&&(now.global_state.modemanager.rprt.ctrl<=1000000)), "((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 73: // STATE 36 - dataview.pml:5021 - [global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback] (0:0:1 - 1)
+		IfNotBlocked
+		reached[5][36] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.feedback;
+		now.global_state.modemanager.rprt.feedback = now.global_state.modemanager.xfeedback;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.feedback", now.global_state.modemanager.rprt.feedback);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 74: // STATE 37 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[5][37] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.feedback>=0)&&(now.global_state.modemanager.rprt.feedback<=1000000)), "((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 75: // STATE 41 - system.pml:46 - [Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback] (64:0:1 - 1)
+		IfNotBlocked
+		reached[5][41] = 1;
+		if (q_full(now.Egse_tm_channel))
+			continue;
+		if (TstOnly) return 1; /* T1 */
+#ifdef HAS_CODE
+		if (readtrail && gui) {
+			char simtmp[64];
+			sprintf(simvals, "%d!", now.Egse_tm_channel);
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.feedback); strcat(simvals, simtmp);		}
+#endif
+		
+		qsend(now.Egse_tm_channel, 0, now.global_state.modemanager.rprt.reading, now.global_state.modemanager.rprt.ctrl, now.global_state.modemanager.rprt.feedback, 3);
+		/* merge: transition_id = -(1)(0, 43, 64) */
+		reached[5][43] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = ((P5 *)_this)->_708_6_5_12_transition_id;
 		((P5 *)_this)->_708_6_5_12_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Modemanager_tc:transition_id", ((P5 *)_this)->_708_6_5_12_transition_id);
 #endif
 		;
-		/* merge: global_state.modemanager.state = 1(64, 29, 64) */
-		reached[5][29] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.modemanager.state;
-		now.global_state.modemanager.state = 1;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.state", now.global_state.modemanager.state);
-#endif
+		/* merge: goto continuous_signals(0, 44, 64) */
+		reached[5][44] = 1;
 		;
-		/* merge: goto continuous_signals(0, 30, 64) */
-		reached[5][30] = 1;
-		;
-		_m = 3; goto P999; /* 3 */
-	case 70: // STATE 31 - modemanager.pml:18 - [((transition_id==2))] (0:0:1 - 1)
+		_m = 2; goto P999; /* 2 */
+	case 76: // STATE 45 - modemanager.pml:23 - [((transition_id==2))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[5][31] = 1;
+		reached[5][45] = 1;
 		if (!((((P5 *)_this)->_708_6_5_12_transition_id==2)))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -1124,75 +1173,39 @@ S_512_0: /* 1 */
 #endif
 			((P5 *)_this)->_708_6_5_12_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 71: // STATE 34 - dataview.pml:5021 - [global_state.modemanager.rprt.reading = global_state.modemanager.xin] (0:0:1 - 1)
+	case 77: // STATE 48 - dataview.pml:5021 - [global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)] (0:0:1 - 1)
 		IfNotBlocked
-		reached[5][34] = 1;
+		reached[5][48] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.reading;
-		now.global_state.modemanager.rprt.reading = now.global_state.modemanager.xin;
+		(trpt+1)->bup.oval = now.global_state.modemanager.xout;
+		now.global_state.modemanager.xout = ((now.global_state.modemanager.xin*now.global_state.modemanager.cfg.param_a)+now.global_state.modemanager.cfg.param_b);
 #ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.reading", now.global_state.modemanager.rprt.reading);
+		logval("global_state.modemanager.xout", now.global_state.modemanager.xout);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 72: // STATE 35 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))] (0:0:0 - 1)
+	case 78: // STATE 49 - dataview.pml:5026 - [assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[5][35] = 1;
+		reached[5][49] = 1;
 		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.reading>=0)&&(now.global_state.modemanager.rprt.reading<=1000000)), "((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000))", II, tt, t);
+		spin_assert(((now.global_state.modemanager.xout>=0)&&(now.global_state.modemanager.xout<=1000000)), "((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 73: // STATE 38 - dataview.pml:5021 - [global_state.modemanager.rprt.ctrl = global_state.modemanager.xout] (0:0:1 - 1)
+	case 79: // STATE 52 - system.pml:32 - [Actuator_ctrl_channel!global_state.modemanager.xout] (64:0:1 - 1)
 		IfNotBlocked
-		reached[5][38] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.ctrl;
-		now.global_state.modemanager.rprt.ctrl = now.global_state.modemanager.xout;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.ctrl", now.global_state.modemanager.rprt.ctrl);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 74: // STATE 39 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[5][39] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.ctrl>=0)&&(now.global_state.modemanager.rprt.ctrl<=1000000)), "((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 75: // STATE 42 - dataview.pml:5021 - [global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback] (0:0:1 - 1)
-		IfNotBlocked
-		reached[5][42] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.feedback;
-		now.global_state.modemanager.rprt.feedback = now.global_state.modemanager.xfeedback;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.feedback", now.global_state.modemanager.rprt.feedback);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 76: // STATE 43 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[5][43] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.feedback>=0)&&(now.global_state.modemanager.rprt.feedback<=1000000)), "((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 77: // STATE 47 - system.pml:46 - [Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback] (64:0:1 - 1)
-		IfNotBlocked
-		reached[5][47] = 1;
-		if (q_full(now.Egse_tm_channel))
+		reached[5][52] = 1;
+		if (q_full(now.Actuator_ctrl_channel))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Egse_tm_channel);
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.feedback); strcat(simvals, simtmp);		}
+			sprintf(simvals, "%d!", now.Actuator_ctrl_channel);
+		sprintf(simtmp, "%d", now.global_state.modemanager.xout); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Egse_tm_channel, 0, now.global_state.modemanager.rprt.reading, now.global_state.modemanager.rprt.ctrl, now.global_state.modemanager.rprt.feedback, 3);
-		/* merge: transition_id = -(1)(0, 49, 64) */
-		reached[5][49] = 1;
+		qsend(now.Actuator_ctrl_channel, 0, now.global_state.modemanager.xout, 0, 0, 1);
+		/* merge: transition_id = -(1)(0, 54, 64) */
+		reached[5][54] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.oval = ((P5 *)_this)->_708_6_5_12_transition_id;
 		((P5 *)_this)->_708_6_5_12_transition_id =  -(1);
@@ -1200,13 +1213,13 @@ S_512_0: /* 1 */
 		logval("Modemanager_tc:transition_id", ((P5 *)_this)->_708_6_5_12_transition_id);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 50, 64) */
-		reached[5][50] = 1;
+		/* merge: goto continuous_signals(0, 55, 64) */
+		reached[5][55] = 1;
 		;
 		_m = 2; goto P999; /* 2 */
-	case 78: // STATE 51 - modemanager.pml:28 - [((transition_id==3))] (0:0:1 - 1)
+	case 80: // STATE 56 - modemanager.pml:29 - [((transition_id==3))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[5][51] = 1;
+		reached[5][56] = 1;
 		if (!((((P5 *)_this)->_708_6_5_12_transition_id==3)))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -1216,50 +1229,34 @@ S_512_0: /* 1 */
 #endif
 			((P5 *)_this)->_708_6_5_12_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 79: // STATE 54 - dataview.pml:5021 - [global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)] (0:0:1 - 1)
+	case 81: // STATE 57 - system.pml:68 - [(1)] (64:0:2 - 1)
 		IfNotBlocked
-		reached[5][54] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.xout;
-		now.global_state.modemanager.xout = ((now.global_state.modemanager.xin*now.global_state.modemanager.cfg.param_a)+now.global_state.modemanager.cfg.param_b);
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.xout", now.global_state.modemanager.xout);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 80: // STATE 55 - dataview.pml:5026 - [assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[5][55] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.xout>=0)&&(now.global_state.modemanager.xout<=1000000)), "((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 81: // STATE 58 - system.pml:32 - [Actuator_ctrl_channel!global_state.modemanager.xout] (64:0:1 - 1)
-		IfNotBlocked
-		reached[5][58] = 1;
-		if (q_full(now.Actuator_ctrl_channel))
+		reached[5][57] = 1;
+		if (!(1))
 			continue;
-		if (TstOnly) return 1; /* T1 */
-#ifdef HAS_CODE
-		if (readtrail && gui) {
-			char simtmp[64];
-			sprintf(simvals, "%d!", now.Actuator_ctrl_channel);
-		sprintf(simtmp, "%d,", now.global_state.modemanager.xout); strcat(simvals, simtmp);		}
-#endif
-		
-		qsend(now.Actuator_ctrl_channel, 0, now.global_state.modemanager.xout, 0, 0, 1);
-		/* merge: transition_id = -(1)(0, 60, 64) */
-		reached[5][60] = 1;
+		/* merge: transition_id = -(1)(64, 59, 64) */
+		reached[5][59] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = ((P5 *)_this)->_708_6_5_12_transition_id;
+		(trpt+1)->bup.ovals = grab_ints(2);
+		(trpt+1)->bup.ovals[0] = ((P5 *)_this)->_708_6_5_12_transition_id;
 		((P5 *)_this)->_708_6_5_12_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Modemanager_tc:transition_id", ((P5 *)_this)->_708_6_5_12_transition_id);
 #endif
 		;
+		/* merge: global_state.modemanager.state = 0(64, 60, 64) */
+		reached[5][60] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[1] = now.global_state.modemanager.state;
+		now.global_state.modemanager.state = 0;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.state", now.global_state.modemanager.state);
+#endif
+		;
 		/* merge: goto continuous_signals(0, 61, 64) */
 		reached[5][61] = 1;
 		;
-		_m = 2; goto P999; /* 2 */
+		_m = 3; goto P999; /* 3 */
 	case 82: // STATE 75 - system.pml:178 - [(empty(Modemanager_tc_channel))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[5][75] = 1;
@@ -1285,7 +1282,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_lock);
-		sprintf(simtmp, "%d,", 1); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", 1); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_lock, 0, 1, 0, 0, 1);
@@ -1325,8 +1322,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Modemanager_lock);
-			sprintf(simtmp, "%d,", ((int)_)); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", ((int)_)); strcat(simvals, simtmp);		}
 #endif
 		;
 		_m = 4; goto P999; /* 0 */
@@ -1342,7 +1338,7 @@ S_512_0: /* 1 */
 
 		XX=1;
 		if (TstOnly) return 1 /* T2 */;
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = now.Modemanager_reading_signal_parameter;
 		;
 		now.Modemanager_reading_signal_parameter = qrecv(now.Modemanager_reading_channel, XX-1, 0, 1);
@@ -1355,24 +1351,23 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Modemanager_reading_channel);
-			sprintf(simtmp, "%d,", now.Modemanager_reading_signal_parameter); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", now.Modemanager_reading_signal_parameter); strcat(simvals, simtmp);		}
 #endif
 		;
 		/* merge: Modemanager_reading_channel_used = 1(0, 6, 68) */
 		reached[4][6] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = Modemanager_reading_channel_used;
+		(trpt+1)->bup.ovals[1] = ((int)Modemanager_reading_channel_used);
 		Modemanager_reading_channel_used = 1;
 #ifdef VAR_RANGES
 		logval("Modemanager_reading_channel_used", ((int)Modemanager_reading_channel_used));
 #endif
 		;
 		_m = 4; goto P999; /* 1 */
-	case 91: // STATE 7 - modemanager.pml:56 - [((global_state.modemanager.state==1))] (0:0:0 - 1)
+	case 91: // STATE 7 - modemanager.pml:56 - [((global_state.modemanager.state==0))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[4][7] = 1;
-		if (!((now.global_state.modemanager.state==1)))
+		if (!((now.global_state.modemanager.state==0)))
 			continue;
 		_m = 3; goto P999; /* 0 */
 	case 92: // STATE 8 - dataview.pml:5021 - [global_state.modemanager.xin = Modemanager_reading_signal_parameter] (0:0:1 - 1)
@@ -1396,18 +1391,18 @@ S_512_0: /* 1 */
 		IfNotBlocked
 		reached[4][12] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P4 *)_this)->_707_5_4_10_transition_id;
 		((P4 *)_this)->_707_5_4_10_transition_id = 0;
 #ifdef VAR_RANGES
 		logval("Modemanager_reading:transition_id", ((P4 *)_this)->_707_5_4_10_transition_id);
 #endif
 		;
-		/* merge: transition_id = 3(60, 13, 60) */
+		/* merge: transition_id = 2(60, 13, 60) */
 		reached[4][13] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = ((P4 *)_this)->_707_5_4_10_transition_id;
-		((P4 *)_this)->_707_5_4_10_transition_id = 3;
+		((P4 *)_this)->_707_5_4_10_transition_id = 2;
 #ifdef VAR_RANGES
 		logval("Modemanager_reading:transition_id", ((P4 *)_this)->_707_5_4_10_transition_id);
 #endif
@@ -1434,7 +1429,7 @@ S_512_0: /* 1 */
 		if (!((((P4 *)_this)->_707_5_4_10_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _707_5_4_10_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		/* dead 1: _707_5_4_10_transition_id */  (trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = ((P4 *)_this)->_707_5_4_10_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
@@ -1449,11 +1444,11 @@ S_512_0: /* 1 */
 		logval("Modemanager_reading:transition_id", ((P4 *)_this)->_707_5_4_10_transition_id);
 #endif
 		;
-		/* merge: global_state.modemanager.state = 0(59, 18, 59) */
+		/* merge: global_state.modemanager.state = 1(59, 18, 59) */
 		reached[4][18] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[2] = now.global_state.modemanager.state;
-		now.global_state.modemanager.state = 0;
+		now.global_state.modemanager.state = 1;
 #ifdef VAR_RANGES
 		logval("global_state.modemanager.state", now.global_state.modemanager.state);
 #endif
@@ -1474,37 +1469,89 @@ S_512_0: /* 1 */
 #endif
 			((P4 *)_this)->_707_5_4_10_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 98: // STATE 21 - system.pml:68 - [(1)] (59:0:2 - 1)
+	case 98: // STATE 23 - dataview.pml:5021 - [global_state.modemanager.rprt.reading = global_state.modemanager.xin] (0:0:1 - 1)
 		IfNotBlocked
-		reached[4][21] = 1;
-		if (!(1))
-			continue;
-		/* merge: transition_id = -(1)(59, 23, 59) */
 		reached[4][23] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P4 *)_this)->_707_5_4_10_transition_id;
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.reading;
+		now.global_state.modemanager.rprt.reading = now.global_state.modemanager.xin;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.reading", now.global_state.modemanager.rprt.reading);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 99: // STATE 24 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[4][24] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.reading>=0)&&(now.global_state.modemanager.rprt.reading<=1000000)), "((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 100: // STATE 27 - dataview.pml:5021 - [global_state.modemanager.rprt.ctrl = global_state.modemanager.xout] (0:0:1 - 1)
+		IfNotBlocked
+		reached[4][27] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.ctrl;
+		now.global_state.modemanager.rprt.ctrl = now.global_state.modemanager.xout;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.ctrl", now.global_state.modemanager.rprt.ctrl);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 101: // STATE 28 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[4][28] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.ctrl>=0)&&(now.global_state.modemanager.rprt.ctrl<=1000000)), "((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 102: // STATE 31 - dataview.pml:5021 - [global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback] (0:0:1 - 1)
+		IfNotBlocked
+		reached[4][31] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.feedback;
+		now.global_state.modemanager.rprt.feedback = now.global_state.modemanager.xfeedback;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.feedback", now.global_state.modemanager.rprt.feedback);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 103: // STATE 32 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[4][32] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.feedback>=0)&&(now.global_state.modemanager.rprt.feedback<=1000000)), "((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 104: // STATE 36 - system.pml:46 - [Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback] (59:0:1 - 1)
+		IfNotBlocked
+		reached[4][36] = 1;
+		if (q_full(now.Egse_tm_channel))
+			continue;
+		if (TstOnly) return 1; /* T1 */
+#ifdef HAS_CODE
+		if (readtrail && gui) {
+			char simtmp[64];
+			sprintf(simvals, "%d!", now.Egse_tm_channel);
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.feedback); strcat(simvals, simtmp);		}
+#endif
+		
+		qsend(now.Egse_tm_channel, 0, now.global_state.modemanager.rprt.reading, now.global_state.modemanager.rprt.ctrl, now.global_state.modemanager.rprt.feedback, 3);
+		/* merge: transition_id = -(1)(0, 38, 59) */
+		reached[4][38] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = ((P4 *)_this)->_707_5_4_10_transition_id;
 		((P4 *)_this)->_707_5_4_10_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Modemanager_reading:transition_id", ((P4 *)_this)->_707_5_4_10_transition_id);
 #endif
 		;
-		/* merge: global_state.modemanager.state = 1(59, 24, 59) */
-		reached[4][24] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.modemanager.state;
-		now.global_state.modemanager.state = 1;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.state", now.global_state.modemanager.state);
-#endif
+		/* merge: goto continuous_signals(0, 39, 59) */
+		reached[4][39] = 1;
 		;
-		/* merge: goto continuous_signals(0, 25, 59) */
-		reached[4][25] = 1;
-		;
-		_m = 3; goto P999; /* 3 */
-	case 99: // STATE 26 - modemanager.pml:18 - [((transition_id==2))] (0:0:1 - 1)
+		_m = 2; goto P999; /* 2 */
+	case 105: // STATE 40 - modemanager.pml:23 - [((transition_id==2))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[4][26] = 1;
+		reached[4][40] = 1;
 		if (!((((P4 *)_this)->_707_5_4_10_transition_id==2)))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -1514,75 +1561,39 @@ S_512_0: /* 1 */
 #endif
 			((P4 *)_this)->_707_5_4_10_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 100: // STATE 29 - dataview.pml:5021 - [global_state.modemanager.rprt.reading = global_state.modemanager.xin] (0:0:1 - 1)
+	case 106: // STATE 43 - dataview.pml:5021 - [global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)] (0:0:1 - 1)
 		IfNotBlocked
-		reached[4][29] = 1;
+		reached[4][43] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.reading;
-		now.global_state.modemanager.rprt.reading = now.global_state.modemanager.xin;
+		(trpt+1)->bup.oval = now.global_state.modemanager.xout;
+		now.global_state.modemanager.xout = ((now.global_state.modemanager.xin*now.global_state.modemanager.cfg.param_a)+now.global_state.modemanager.cfg.param_b);
 #ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.reading", now.global_state.modemanager.rprt.reading);
+		logval("global_state.modemanager.xout", now.global_state.modemanager.xout);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 101: // STATE 30 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))] (0:0:0 - 1)
+	case 107: // STATE 44 - dataview.pml:5026 - [assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[4][30] = 1;
+		reached[4][44] = 1;
 		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.reading>=0)&&(now.global_state.modemanager.rprt.reading<=1000000)), "((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000))", II, tt, t);
+		spin_assert(((now.global_state.modemanager.xout>=0)&&(now.global_state.modemanager.xout<=1000000)), "((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 102: // STATE 33 - dataview.pml:5021 - [global_state.modemanager.rprt.ctrl = global_state.modemanager.xout] (0:0:1 - 1)
+	case 108: // STATE 47 - system.pml:32 - [Actuator_ctrl_channel!global_state.modemanager.xout] (59:0:1 - 1)
 		IfNotBlocked
-		reached[4][33] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.ctrl;
-		now.global_state.modemanager.rprt.ctrl = now.global_state.modemanager.xout;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.ctrl", now.global_state.modemanager.rprt.ctrl);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 103: // STATE 34 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[4][34] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.ctrl>=0)&&(now.global_state.modemanager.rprt.ctrl<=1000000)), "((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 104: // STATE 37 - dataview.pml:5021 - [global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback] (0:0:1 - 1)
-		IfNotBlocked
-		reached[4][37] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.feedback;
-		now.global_state.modemanager.rprt.feedback = now.global_state.modemanager.xfeedback;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.feedback", now.global_state.modemanager.rprt.feedback);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 105: // STATE 38 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[4][38] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.feedback>=0)&&(now.global_state.modemanager.rprt.feedback<=1000000)), "((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 106: // STATE 42 - system.pml:46 - [Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback] (59:0:1 - 1)
-		IfNotBlocked
-		reached[4][42] = 1;
-		if (q_full(now.Egse_tm_channel))
+		reached[4][47] = 1;
+		if (q_full(now.Actuator_ctrl_channel))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Egse_tm_channel);
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.feedback); strcat(simvals, simtmp);		}
+			sprintf(simvals, "%d!", now.Actuator_ctrl_channel);
+		sprintf(simtmp, "%d", now.global_state.modemanager.xout); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Egse_tm_channel, 0, now.global_state.modemanager.rprt.reading, now.global_state.modemanager.rprt.ctrl, now.global_state.modemanager.rprt.feedback, 3);
-		/* merge: transition_id = -(1)(0, 44, 59) */
-		reached[4][44] = 1;
+		qsend(now.Actuator_ctrl_channel, 0, now.global_state.modemanager.xout, 0, 0, 1);
+		/* merge: transition_id = -(1)(0, 49, 59) */
+		reached[4][49] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.oval = ((P4 *)_this)->_707_5_4_10_transition_id;
 		((P4 *)_this)->_707_5_4_10_transition_id =  -(1);
@@ -1590,13 +1601,13 @@ S_512_0: /* 1 */
 		logval("Modemanager_reading:transition_id", ((P4 *)_this)->_707_5_4_10_transition_id);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 45, 59) */
-		reached[4][45] = 1;
+		/* merge: goto continuous_signals(0, 50, 59) */
+		reached[4][50] = 1;
 		;
 		_m = 2; goto P999; /* 2 */
-	case 107: // STATE 46 - modemanager.pml:28 - [((transition_id==3))] (0:0:1 - 1)
+	case 109: // STATE 51 - modemanager.pml:29 - [((transition_id==3))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[4][46] = 1;
+		reached[4][51] = 1;
 		if (!((((P4 *)_this)->_707_5_4_10_transition_id==3)))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -1606,50 +1617,34 @@ S_512_0: /* 1 */
 #endif
 			((P4 *)_this)->_707_5_4_10_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 108: // STATE 49 - dataview.pml:5021 - [global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)] (0:0:1 - 1)
+	case 110: // STATE 52 - system.pml:68 - [(1)] (59:0:2 - 1)
 		IfNotBlocked
-		reached[4][49] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.xout;
-		now.global_state.modemanager.xout = ((now.global_state.modemanager.xin*now.global_state.modemanager.cfg.param_a)+now.global_state.modemanager.cfg.param_b);
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.xout", now.global_state.modemanager.xout);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 109: // STATE 50 - dataview.pml:5026 - [assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[4][50] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.xout>=0)&&(now.global_state.modemanager.xout<=1000000)), "((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 110: // STATE 53 - system.pml:32 - [Actuator_ctrl_channel!global_state.modemanager.xout] (59:0:1 - 1)
-		IfNotBlocked
-		reached[4][53] = 1;
-		if (q_full(now.Actuator_ctrl_channel))
+		reached[4][52] = 1;
+		if (!(1))
 			continue;
-		if (TstOnly) return 1; /* T1 */
-#ifdef HAS_CODE
-		if (readtrail && gui) {
-			char simtmp[64];
-			sprintf(simvals, "%d!", now.Actuator_ctrl_channel);
-		sprintf(simtmp, "%d,", now.global_state.modemanager.xout); strcat(simvals, simtmp);		}
-#endif
-		
-		qsend(now.Actuator_ctrl_channel, 0, now.global_state.modemanager.xout, 0, 0, 1);
-		/* merge: transition_id = -(1)(0, 55, 59) */
-		reached[4][55] = 1;
+		/* merge: transition_id = -(1)(59, 54, 59) */
+		reached[4][54] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = ((P4 *)_this)->_707_5_4_10_transition_id;
+		(trpt+1)->bup.ovals = grab_ints(2);
+		(trpt+1)->bup.ovals[0] = ((P4 *)_this)->_707_5_4_10_transition_id;
 		((P4 *)_this)->_707_5_4_10_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Modemanager_reading:transition_id", ((P4 *)_this)->_707_5_4_10_transition_id);
 #endif
 		;
+		/* merge: global_state.modemanager.state = 0(59, 55, 59) */
+		reached[4][55] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[1] = now.global_state.modemanager.state;
+		now.global_state.modemanager.state = 0;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.state", now.global_state.modemanager.state);
+#endif
+		;
 		/* merge: goto continuous_signals(0, 56, 59) */
 		reached[4][56] = 1;
 		;
-		_m = 2; goto P999; /* 2 */
+		_m = 3; goto P999; /* 3 */
 	case 111: // STATE 70 - system.pml:157 - [(empty(Modemanager_reading_channel))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[4][70] = 1;
@@ -1675,7 +1670,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_lock);
-		sprintf(simtmp, "%d,", 1); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", 1); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_lock, 0, 1, 0, 0, 1);
@@ -1715,8 +1710,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Modemanager_lock);
-			sprintf(simtmp, "%d,", ((int)_)); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", ((int)_)); strcat(simvals, simtmp);		}
 #endif
 		;
 		_m = 4; goto P999; /* 0 */
@@ -1732,7 +1726,7 @@ S_512_0: /* 1 */
 
 		XX=1;
 		if (TstOnly) return 1 /* T2 */;
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = now.Modemanager_feedback_signal_parameter;
 		;
 		now.Modemanager_feedback_signal_parameter = qrecv(now.Modemanager_feedback_channel, XX-1, 0, 1);
@@ -1745,24 +1739,23 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Modemanager_feedback_channel);
-			sprintf(simtmp, "%d,", now.Modemanager_feedback_signal_parameter); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", now.Modemanager_feedback_signal_parameter); strcat(simvals, simtmp);		}
 #endif
 		;
 		/* merge: Modemanager_feedback_channel_used = 1(0, 6, 68) */
 		reached[3][6] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = Modemanager_feedback_channel_used;
+		(trpt+1)->bup.ovals[1] = ((int)Modemanager_feedback_channel_used);
 		Modemanager_feedback_channel_used = 1;
 #ifdef VAR_RANGES
 		logval("Modemanager_feedback_channel_used", ((int)Modemanager_feedback_channel_used));
 #endif
 		;
 		_m = 4; goto P999; /* 1 */
-	case 120: // STATE 7 - modemanager.pml:46 - [((global_state.modemanager.state==1))] (0:0:0 - 1)
+	case 120: // STATE 7 - modemanager.pml:46 - [((global_state.modemanager.state==0))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[3][7] = 1;
-		if (!((now.global_state.modemanager.state==1)))
+		if (!((now.global_state.modemanager.state==0)))
 			continue;
 		_m = 3; goto P999; /* 0 */
 	case 121: // STATE 8 - dataview.pml:5021 - [global_state.modemanager.xfeedback = Modemanager_feedback_signal_parameter] (0:0:1 - 1)
@@ -1786,18 +1779,18 @@ S_512_0: /* 1 */
 		IfNotBlocked
 		reached[3][12] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P3 *)_this)->_706_4_3_8_transition_id;
 		((P3 *)_this)->_706_4_3_8_transition_id = 0;
 #ifdef VAR_RANGES
 		logval("Modemanager_feedback:transition_id", ((P3 *)_this)->_706_4_3_8_transition_id);
 #endif
 		;
-		/* merge: transition_id = 2(60, 13, 60) */
+		/* merge: transition_id = 1(60, 13, 60) */
 		reached[3][13] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = ((P3 *)_this)->_706_4_3_8_transition_id;
-		((P3 *)_this)->_706_4_3_8_transition_id = 2;
+		((P3 *)_this)->_706_4_3_8_transition_id = 1;
 #ifdef VAR_RANGES
 		logval("Modemanager_feedback:transition_id", ((P3 *)_this)->_706_4_3_8_transition_id);
 #endif
@@ -1824,7 +1817,7 @@ S_512_0: /* 1 */
 		if (!((((P3 *)_this)->_706_4_3_8_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _706_4_3_8_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		/* dead 1: _706_4_3_8_transition_id */  (trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = ((P3 *)_this)->_706_4_3_8_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
@@ -1839,11 +1832,11 @@ S_512_0: /* 1 */
 		logval("Modemanager_feedback:transition_id", ((P3 *)_this)->_706_4_3_8_transition_id);
 #endif
 		;
-		/* merge: global_state.modemanager.state = 0(59, 18, 59) */
+		/* merge: global_state.modemanager.state = 1(59, 18, 59) */
 		reached[3][18] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[2] = now.global_state.modemanager.state;
-		now.global_state.modemanager.state = 0;
+		now.global_state.modemanager.state = 1;
 #ifdef VAR_RANGES
 		logval("global_state.modemanager.state", now.global_state.modemanager.state);
 #endif
@@ -1864,37 +1857,89 @@ S_512_0: /* 1 */
 #endif
 			((P3 *)_this)->_706_4_3_8_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 127: // STATE 21 - system.pml:68 - [(1)] (59:0:2 - 1)
+	case 127: // STATE 23 - dataview.pml:5021 - [global_state.modemanager.rprt.reading = global_state.modemanager.xin] (0:0:1 - 1)
 		IfNotBlocked
-		reached[3][21] = 1;
-		if (!(1))
-			continue;
-		/* merge: transition_id = -(1)(59, 23, 59) */
 		reached[3][23] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
-		(trpt+1)->bup.ovals[0] = ((P3 *)_this)->_706_4_3_8_transition_id;
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.reading;
+		now.global_state.modemanager.rprt.reading = now.global_state.modemanager.xin;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.reading", now.global_state.modemanager.rprt.reading);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 128: // STATE 24 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[3][24] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.reading>=0)&&(now.global_state.modemanager.rprt.reading<=1000000)), "((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 129: // STATE 27 - dataview.pml:5021 - [global_state.modemanager.rprt.ctrl = global_state.modemanager.xout] (0:0:1 - 1)
+		IfNotBlocked
+		reached[3][27] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.ctrl;
+		now.global_state.modemanager.rprt.ctrl = now.global_state.modemanager.xout;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.ctrl", now.global_state.modemanager.rprt.ctrl);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 130: // STATE 28 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[3][28] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.ctrl>=0)&&(now.global_state.modemanager.rprt.ctrl<=1000000)), "((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 131: // STATE 31 - dataview.pml:5021 - [global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback] (0:0:1 - 1)
+		IfNotBlocked
+		reached[3][31] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.feedback;
+		now.global_state.modemanager.rprt.feedback = now.global_state.modemanager.xfeedback;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.rprt.feedback", now.global_state.modemanager.rprt.feedback);
+#endif
+		;
+		_m = 3; goto P999; /* 0 */
+	case 132: // STATE 32 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))] (0:0:0 - 1)
+		IfNotBlocked
+		reached[3][32] = 1;
+		if (TstOnly) return 1; /* T7 */
+		spin_assert(((now.global_state.modemanager.rprt.feedback>=0)&&(now.global_state.modemanager.rprt.feedback<=1000000)), "((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000))", II, tt, t);
+		_m = 3; goto P999; /* 0 */
+	case 133: // STATE 36 - system.pml:46 - [Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback] (59:0:1 - 1)
+		IfNotBlocked
+		reached[3][36] = 1;
+		if (q_full(now.Egse_tm_channel))
+			continue;
+		if (TstOnly) return 1; /* T1 */
+#ifdef HAS_CODE
+		if (readtrail && gui) {
+			char simtmp[64];
+			sprintf(simvals, "%d!", now.Egse_tm_channel);
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.global_state.modemanager.rprt.feedback); strcat(simvals, simtmp);		}
+#endif
+		
+		qsend(now.Egse_tm_channel, 0, now.global_state.modemanager.rprt.reading, now.global_state.modemanager.rprt.ctrl, now.global_state.modemanager.rprt.feedback, 3);
+		/* merge: transition_id = -(1)(0, 38, 59) */
+		reached[3][38] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.oval = ((P3 *)_this)->_706_4_3_8_transition_id;
 		((P3 *)_this)->_706_4_3_8_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Modemanager_feedback:transition_id", ((P3 *)_this)->_706_4_3_8_transition_id);
 #endif
 		;
-		/* merge: global_state.modemanager.state = 1(59, 24, 59) */
-		reached[3][24] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = now.global_state.modemanager.state;
-		now.global_state.modemanager.state = 1;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.state", now.global_state.modemanager.state);
-#endif
+		/* merge: goto continuous_signals(0, 39, 59) */
+		reached[3][39] = 1;
 		;
-		/* merge: goto continuous_signals(0, 25, 59) */
-		reached[3][25] = 1;
-		;
-		_m = 3; goto P999; /* 3 */
-	case 128: // STATE 26 - modemanager.pml:18 - [((transition_id==2))] (0:0:1 - 1)
+		_m = 2; goto P999; /* 2 */
+	case 134: // STATE 40 - modemanager.pml:23 - [((transition_id==2))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[3][26] = 1;
+		reached[3][40] = 1;
 		if (!((((P3 *)_this)->_706_4_3_8_transition_id==2)))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -1904,75 +1949,39 @@ S_512_0: /* 1 */
 #endif
 			((P3 *)_this)->_706_4_3_8_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 129: // STATE 29 - dataview.pml:5021 - [global_state.modemanager.rprt.reading = global_state.modemanager.xin] (0:0:1 - 1)
+	case 135: // STATE 43 - dataview.pml:5021 - [global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)] (0:0:1 - 1)
 		IfNotBlocked
-		reached[3][29] = 1;
+		reached[3][43] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.reading;
-		now.global_state.modemanager.rprt.reading = now.global_state.modemanager.xin;
+		(trpt+1)->bup.oval = now.global_state.modemanager.xout;
+		now.global_state.modemanager.xout = ((now.global_state.modemanager.xin*now.global_state.modemanager.cfg.param_a)+now.global_state.modemanager.cfg.param_b);
 #ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.reading", now.global_state.modemanager.rprt.reading);
+		logval("global_state.modemanager.xout", now.global_state.modemanager.xout);
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 130: // STATE 30 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000)))] (0:0:0 - 1)
+	case 136: // STATE 44 - dataview.pml:5026 - [assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))] (0:0:0 - 1)
 		IfNotBlocked
-		reached[3][30] = 1;
+		reached[3][44] = 1;
 		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.reading>=0)&&(now.global_state.modemanager.rprt.reading<=1000000)), "((global_state.modemanager.rprt.reading>=0)&&(global_state.modemanager.rprt.reading<=1000000))", II, tt, t);
+		spin_assert(((now.global_state.modemanager.xout>=0)&&(now.global_state.modemanager.xout<=1000000)), "((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000))", II, tt, t);
 		_m = 3; goto P999; /* 0 */
-	case 131: // STATE 33 - dataview.pml:5021 - [global_state.modemanager.rprt.ctrl = global_state.modemanager.xout] (0:0:1 - 1)
+	case 137: // STATE 47 - system.pml:32 - [Actuator_ctrl_channel!global_state.modemanager.xout] (59:0:1 - 1)
 		IfNotBlocked
-		reached[3][33] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.ctrl;
-		now.global_state.modemanager.rprt.ctrl = now.global_state.modemanager.xout;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.ctrl", now.global_state.modemanager.rprt.ctrl);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 132: // STATE 34 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[3][34] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.ctrl>=0)&&(now.global_state.modemanager.rprt.ctrl<=1000000)), "((global_state.modemanager.rprt.ctrl>=0)&&(global_state.modemanager.rprt.ctrl<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 133: // STATE 37 - dataview.pml:5021 - [global_state.modemanager.rprt.feedback = global_state.modemanager.xfeedback] (0:0:1 - 1)
-		IfNotBlocked
-		reached[3][37] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.rprt.feedback;
-		now.global_state.modemanager.rprt.feedback = now.global_state.modemanager.xfeedback;
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.rprt.feedback", now.global_state.modemanager.rprt.feedback);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 134: // STATE 38 - dataview.pml:5026 - [assert(((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[3][38] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.rprt.feedback>=0)&&(now.global_state.modemanager.rprt.feedback<=1000000)), "((global_state.modemanager.rprt.feedback>=0)&&(global_state.modemanager.rprt.feedback<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 135: // STATE 42 - system.pml:46 - [Egse_tm_channel!global_state.modemanager.rprt.reading,global_state.modemanager.rprt.ctrl,global_state.modemanager.rprt.feedback] (59:0:1 - 1)
-		IfNotBlocked
-		reached[3][42] = 1;
-		if (q_full(now.Egse_tm_channel))
+		reached[3][47] = 1;
+		if (q_full(now.Actuator_ctrl_channel))
 			continue;
 		if (TstOnly) return 1; /* T1 */
 #ifdef HAS_CODE
 		if (readtrail && gui) {
 			char simtmp[64];
-			sprintf(simvals, "%d!", now.Egse_tm_channel);
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", now.global_state.modemanager.rprt.feedback); strcat(simvals, simtmp);		}
+			sprintf(simvals, "%d!", now.Actuator_ctrl_channel);
+		sprintf(simtmp, "%d", now.global_state.modemanager.xout); strcat(simvals, simtmp);		}
 #endif
 		
-		qsend(now.Egse_tm_channel, 0, now.global_state.modemanager.rprt.reading, now.global_state.modemanager.rprt.ctrl, now.global_state.modemanager.rprt.feedback, 3);
-		/* merge: transition_id = -(1)(0, 44, 59) */
-		reached[3][44] = 1;
+		qsend(now.Actuator_ctrl_channel, 0, now.global_state.modemanager.xout, 0, 0, 1);
+		/* merge: transition_id = -(1)(0, 49, 59) */
+		reached[3][49] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.oval = ((P3 *)_this)->_706_4_3_8_transition_id;
 		((P3 *)_this)->_706_4_3_8_transition_id =  -(1);
@@ -1980,13 +1989,13 @@ S_512_0: /* 1 */
 		logval("Modemanager_feedback:transition_id", ((P3 *)_this)->_706_4_3_8_transition_id);
 #endif
 		;
-		/* merge: goto continuous_signals(0, 45, 59) */
-		reached[3][45] = 1;
+		/* merge: goto continuous_signals(0, 50, 59) */
+		reached[3][50] = 1;
 		;
 		_m = 2; goto P999; /* 2 */
-	case 136: // STATE 46 - modemanager.pml:28 - [((transition_id==3))] (0:0:1 - 1)
+	case 138: // STATE 51 - modemanager.pml:29 - [((transition_id==3))] (0:0:1 - 1)
 		IfNotBlocked
-		reached[3][46] = 1;
+		reached[3][51] = 1;
 		if (!((((P3 *)_this)->_706_4_3_8_transition_id==3)))
 			continue;
 		if (TstOnly) return 1; /* TT */
@@ -1996,50 +2005,34 @@ S_512_0: /* 1 */
 #endif
 			((P3 *)_this)->_706_4_3_8_transition_id = 0;
 		_m = 3; goto P999; /* 0 */
-	case 137: // STATE 49 - dataview.pml:5021 - [global_state.modemanager.xout = ((global_state.modemanager.xin*global_state.modemanager.cfg.param_a)+global_state.modemanager.cfg.param_b)] (0:0:1 - 1)
+	case 139: // STATE 52 - system.pml:68 - [(1)] (59:0:2 - 1)
 		IfNotBlocked
-		reached[3][49] = 1;
-		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = now.global_state.modemanager.xout;
-		now.global_state.modemanager.xout = ((now.global_state.modemanager.xin*now.global_state.modemanager.cfg.param_a)+now.global_state.modemanager.cfg.param_b);
-#ifdef VAR_RANGES
-		logval("global_state.modemanager.xout", now.global_state.modemanager.xout);
-#endif
-		;
-		_m = 3; goto P999; /* 0 */
-	case 138: // STATE 50 - dataview.pml:5026 - [assert(((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000)))] (0:0:0 - 1)
-		IfNotBlocked
-		reached[3][50] = 1;
-		if (TstOnly) return 1; /* T7 */
-		spin_assert(((now.global_state.modemanager.xout>=0)&&(now.global_state.modemanager.xout<=1000000)), "((global_state.modemanager.xout>=0)&&(global_state.modemanager.xout<=1000000))", II, tt, t);
-		_m = 3; goto P999; /* 0 */
-	case 139: // STATE 53 - system.pml:32 - [Actuator_ctrl_channel!global_state.modemanager.xout] (59:0:1 - 1)
-		IfNotBlocked
-		reached[3][53] = 1;
-		if (q_full(now.Actuator_ctrl_channel))
+		reached[3][52] = 1;
+		if (!(1))
 			continue;
-		if (TstOnly) return 1; /* T1 */
-#ifdef HAS_CODE
-		if (readtrail && gui) {
-			char simtmp[64];
-			sprintf(simvals, "%d!", now.Actuator_ctrl_channel);
-		sprintf(simtmp, "%d,", now.global_state.modemanager.xout); strcat(simvals, simtmp);		}
-#endif
-		
-		qsend(now.Actuator_ctrl_channel, 0, now.global_state.modemanager.xout, 0, 0, 1);
-		/* merge: transition_id = -(1)(0, 55, 59) */
-		reached[3][55] = 1;
+		/* merge: transition_id = -(1)(59, 54, 59) */
+		reached[3][54] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.oval = ((P3 *)_this)->_706_4_3_8_transition_id;
+		(trpt+1)->bup.ovals = grab_ints(2);
+		(trpt+1)->bup.ovals[0] = ((P3 *)_this)->_706_4_3_8_transition_id;
 		((P3 *)_this)->_706_4_3_8_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Modemanager_feedback:transition_id", ((P3 *)_this)->_706_4_3_8_transition_id);
 #endif
 		;
+		/* merge: global_state.modemanager.state = 0(59, 55, 59) */
+		reached[3][55] = 1;
+		if (TstOnly) return 1; /* T3 */
+		(trpt+1)->bup.ovals[1] = now.global_state.modemanager.state;
+		now.global_state.modemanager.state = 0;
+#ifdef VAR_RANGES
+		logval("global_state.modemanager.state", now.global_state.modemanager.state);
+#endif
+		;
 		/* merge: goto continuous_signals(0, 56, 59) */
 		reached[3][56] = 1;
 		;
-		_m = 2; goto P999; /* 2 */
+		_m = 3; goto P999; /* 3 */
 	case 140: // STATE 70 - system.pml:136 - [(empty(Modemanager_feedback_channel))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[3][70] = 1;
@@ -2065,7 +2058,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_lock);
-		sprintf(simtmp, "%d,", 1); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", 1); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_lock, 0, 1, 0, 0, 1);
@@ -2092,7 +2085,7 @@ S_512_0: /* 1 */
 		/* merge: inputVectorCounter = 0(71, 3, 71) */
 		reached[2][3] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P2 *)_this)->inputVectorCounter;
 		((P2 *)_this)->inputVectorCounter = 0;
 #ifdef VAR_RANGES
@@ -2430,8 +2423,8 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_tc_channel);
-		sprintf(simtmp, "%d,", ((P2 *)_this)->value.param_a); strcat(simvals, simtmp);		strcat(simvals, ",");
-		sprintf(simtmp, "%d,", ((P2 *)_this)->value.param_b); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", ((P2 *)_this)->value.param_a); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", ((P2 *)_this)->value.param_b); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_tc_channel, 0, ((P2 *)_this)->value.param_a, ((P2 *)_this)->value.param_b, 0, 2);
@@ -2481,7 +2474,7 @@ S_512_0: /* 1 */
 
 		XX=1;
 		if (TstOnly) return 1 /* T2 */;
-		(trpt+1)->bup.ovals = grab_values(4);
+		(trpt+1)->bup.ovals = grab_ints(4);
 		(trpt+1)->bup.ovals[0] = now.Egse_tm_signal_parameter.reading;
 		(trpt+1)->bup.ovals[1] = now.Egse_tm_signal_parameter.ctrl;
 		(trpt+1)->bup.ovals[2] = now.Egse_tm_signal_parameter.feedback;
@@ -2506,18 +2499,15 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Egse_tm_channel);
-			sprintf(simtmp, "%d,", now.Egse_tm_signal_parameter.reading); strcat(simvals, simtmp);
-			strcat(simvals, ",");
-			sprintf(simtmp, "%d,", now.Egse_tm_signal_parameter.ctrl); strcat(simvals, simtmp);
-			strcat(simvals, ",");
-			sprintf(simtmp, "%d,", now.Egse_tm_signal_parameter.feedback); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", now.Egse_tm_signal_parameter.reading); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.Egse_tm_signal_parameter.ctrl); strcat(simvals, simtmp);		strcat(simvals, ",");
+		sprintf(simtmp, "%d", now.Egse_tm_signal_parameter.feedback); strcat(simvals, simtmp);		}
 #endif
 		;
 		/* merge: Egse_tm_channel_used = 1(0, 5, 9) */
 		reached[1][5] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[3] = Egse_tm_channel_used;
+		(trpt+1)->bup.ovals[3] = ((int)Egse_tm_channel_used);
 		Egse_tm_channel_used = 1;
 #ifdef VAR_RANGES
 		logval("Egse_tm_channel_used", ((int)Egse_tm_channel_used));
@@ -2580,8 +2570,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Actuator_lock);
-			sprintf(simtmp, "%d,", ((int)_)); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", ((int)_)); strcat(simvals, simtmp);		}
 #endif
 		;
 		_m = 4; goto P999; /* 0 */
@@ -2597,7 +2586,7 @@ S_512_0: /* 1 */
 
 		XX=1;
 		if (TstOnly) return 1 /* T2 */;
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = now.Actuator_ctrl_signal_parameter;
 		;
 		now.Actuator_ctrl_signal_parameter = qrecv(now.Actuator_ctrl_channel, XX-1, 0, 1);
@@ -2610,24 +2599,23 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[32];
 			sprintf(simvals, "%d?", now.Actuator_ctrl_channel);
-			sprintf(simtmp, "%d,", now.Actuator_ctrl_signal_parameter); strcat(simvals, simtmp);
-		}
+		sprintf(simtmp, "%d", now.Actuator_ctrl_signal_parameter); strcat(simvals, simtmp);		}
 #endif
 		;
 		/* merge: Actuator_ctrl_channel_used = 1(0, 6, 85) */
 		reached[0][6] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals[1] = Actuator_ctrl_channel_used;
+		(trpt+1)->bup.ovals[1] = ((int)Actuator_ctrl_channel_used);
 		Actuator_ctrl_channel_used = 1;
 #ifdef VAR_RANGES
 		logval("Actuator_ctrl_channel_used", ((int)Actuator_ctrl_channel_used));
 #endif
 		;
 		_m = 4; goto P999; /* 1 */
-	case 183: // STATE 7 - actuator.pml:39 - [((global_state.actuator.state==1))] (0:0:0 - 1)
+	case 183: // STATE 7 - actuator.pml:39 - [((global_state.actuator.state==0))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[0][7] = 1;
-		if (!((now.global_state.actuator.state==1)))
+		if (!((now.global_state.actuator.state==0)))
 			continue;
 		_m = 3; goto P999; /* 0 */
 	case 184: // STATE 8 - dataview.pml:5021 - [global_state.actuator.x = Actuator_ctrl_signal_parameter] (0:0:1 - 1)
@@ -2651,7 +2639,7 @@ S_512_0: /* 1 */
 		IfNotBlocked
 		reached[0][12] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P0 *)_this)->_703_1_1_2_transition_id;
 		((P0 *)_this)->_703_1_1_2_transition_id = 0;
 #ifdef VAR_RANGES
@@ -2689,7 +2677,7 @@ S_512_0: /* 1 */
 		if (!((((P0 *)_this)->_703_1_1_2_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _703_1_1_2_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		/* dead 1: _703_1_1_2_transition_id */  (trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = ((P0 *)_this)->_703_1_1_2_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
@@ -2704,11 +2692,11 @@ S_512_0: /* 1 */
 		logval("Actuator_ctrl:transition_id", ((P0 *)_this)->_703_1_1_2_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 1(39, 18, 39) */
+		/* merge: global_state.actuator.state = 0(39, 18, 39) */
 		reached[0][18] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[2] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 1;
+		now.global_state.actuator.state = 0;
 #ifdef VAR_RANGES
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
@@ -2745,25 +2733,25 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_feedback_channel);
-		sprintf(simtmp, "%d,", now.global_state.actuator.x); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", now.global_state.actuator.x); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_feedback_channel, 0, now.global_state.actuator.x, 0, 0, 1);
 		/* merge: transition_id = -(1)(39, 26, 39) */
 		reached[0][26] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P0 *)_this)->_703_1_1_2_transition_id;
 		((P0 *)_this)->_703_1_1_2_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Actuator_ctrl:transition_id", ((P0 *)_this)->_703_1_1_2_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 0(39, 27, 39) */
+		/* merge: global_state.actuator.state = 1(39, 27, 39) */
 		reached[0][27] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 0;
+		now.global_state.actuator.state = 1;
 #ifdef VAR_RANGES
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
@@ -2788,25 +2776,25 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_feedback_channel);
-		sprintf(simtmp, "%d,", 0); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", 0); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_feedback_channel, 0, 0, 0, 0, 1);
 		/* merge: transition_id = -(1)(39, 32, 39) */
 		reached[0][32] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P0 *)_this)->_703_1_1_2_transition_id;
 		((P0 *)_this)->_703_1_1_2_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Actuator_ctrl:transition_id", ((P0 *)_this)->_703_1_1_2_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 1(39, 33, 39) */
+		/* merge: global_state.actuator.state = 0(39, 33, 39) */
 		reached[0][33] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 1;
+		now.global_state.actuator.state = 0;
 #ifdef VAR_RANGES
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
@@ -2815,10 +2803,10 @@ S_512_0: /* 1 */
 		reached[0][34] = 1;
 		;
 		_m = 2; goto P999; /* 3 */
-	case 194: // STATE 44 - actuator.pml:42 - [((global_state.actuator.state==0))] (0:0:0 - 1)
+	case 194: // STATE 44 - actuator.pml:42 - [((global_state.actuator.state==1))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[0][44] = 1;
-		if (!((now.global_state.actuator.state==0)))
+		if (!((now.global_state.actuator.state==1)))
 			continue;
 		_m = 3; goto P999; /* 0 */
 	case 195: // STATE 45 - dataview.pml:5021 - [global_state.actuator.x = Actuator_ctrl_signal_parameter] (0:0:1 - 1)
@@ -2842,7 +2830,7 @@ S_512_0: /* 1 */
 		IfNotBlocked
 		reached[0][49] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P0 *)_this)->_703_1_1_4_transition_id;
 		((P0 *)_this)->_703_1_1_4_transition_id = 0;
 #ifdef VAR_RANGES
@@ -2880,7 +2868,7 @@ S_512_0: /* 1 */
 		if (!((((P0 *)_this)->_703_1_1_4_transition_id==0)))
 			continue;
 		if (TstOnly) return 1; /* TT */
-		/* dead 1: _703_1_1_4_transition_id */  (trpt+1)->bup.ovals = grab_values(3);
+		/* dead 1: _703_1_1_4_transition_id */  (trpt+1)->bup.ovals = grab_ints(3);
 		(trpt+1)->bup.ovals[0] = ((P0 *)_this)->_703_1_1_4_transition_id;
 #ifdef HAS_CODE
 		if (!readtrail)
@@ -2895,11 +2883,11 @@ S_512_0: /* 1 */
 		logval("Actuator_ctrl:transition_id", ((P0 *)_this)->_703_1_1_4_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 1(76, 55, 76) */
+		/* merge: global_state.actuator.state = 0(76, 55, 76) */
 		reached[0][55] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[2] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 1;
+		now.global_state.actuator.state = 0;
 #ifdef VAR_RANGES
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
@@ -2936,25 +2924,25 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_feedback_channel);
-		sprintf(simtmp, "%d,", now.global_state.actuator.x); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", now.global_state.actuator.x); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_feedback_channel, 0, now.global_state.actuator.x, 0, 0, 1);
 		/* merge: transition_id = -(1)(76, 63, 76) */
 		reached[0][63] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P0 *)_this)->_703_1_1_4_transition_id;
 		((P0 *)_this)->_703_1_1_4_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Actuator_ctrl:transition_id", ((P0 *)_this)->_703_1_1_4_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 0(76, 64, 76) */
+		/* merge: global_state.actuator.state = 1(76, 64, 76) */
 		reached[0][64] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 0;
+		now.global_state.actuator.state = 1;
 #ifdef VAR_RANGES
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
@@ -2979,25 +2967,25 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Modemanager_feedback_channel);
-		sprintf(simtmp, "%d,", 0); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", 0); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Modemanager_feedback_channel, 0, 0, 0, 0, 1);
 		/* merge: transition_id = -(1)(76, 69, 76) */
 		reached[0][69] = 1;
 		if (TstOnly) return 1; /* T3 */
-		(trpt+1)->bup.ovals = grab_values(2);
+		(trpt+1)->bup.ovals = grab_ints(2);
 		(trpt+1)->bup.ovals[0] = ((P0 *)_this)->_703_1_1_4_transition_id;
 		((P0 *)_this)->_703_1_1_4_transition_id =  -(1);
 #ifdef VAR_RANGES
 		logval("Actuator_ctrl:transition_id", ((P0 *)_this)->_703_1_1_4_transition_id);
 #endif
 		;
-		/* merge: global_state.actuator.state = 1(76, 70, 76) */
+		/* merge: global_state.actuator.state = 0(76, 70, 76) */
 		reached[0][70] = 1;
 		if (TstOnly) return 1; /* T3 */
 		(trpt+1)->bup.ovals[1] = now.global_state.actuator.state;
-		now.global_state.actuator.state = 1;
+		now.global_state.actuator.state = 0;
 #ifdef VAR_RANGES
 		logval("global_state.actuator.state", now.global_state.actuator.state);
 #endif
@@ -3031,7 +3019,7 @@ S_512_0: /* 1 */
 		if (readtrail && gui) {
 			char simtmp[64];
 			sprintf(simvals, "%d!", now.Actuator_lock);
-		sprintf(simtmp, "%d,", 1); strcat(simvals, simtmp);		}
+		sprintf(simtmp, "%d", 1); strcat(simvals, simtmp);		}
 #endif
 		
 		qsend(now.Actuator_lock, 0, 1, 0, 0, 1);

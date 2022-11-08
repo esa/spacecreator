@@ -53,7 +53,7 @@ divert(20)
 m4_sporadic_itf_handler(
     actuator,
     ctrl,
-    T_Integer,
+    TInteger,
      0,
      1)
 
@@ -65,18 +65,18 @@ include(actuator.if)
 m4_sporadic_itf_gui_handler(
     egse,
     tm,
-    `T_Report',
+    `TReport',
 )
 
 
 m4_sporadic_itf_gui_provider(
     egse,
     tc,
-    `T_Config',
+    `TConfig',
     `Egse_tc_cfg',
 )
 divert(5)
-    T_Config cast_Egse_tc_cfg_to_T_Config(Egse_tc_cfg);
+    TConfig cast_Egse_tc_cfg_to_TConfig(Egse_tc_cfg);
 divert(10)
 
 
@@ -85,21 +85,21 @@ m4_gui_handler(egse)
 m4_sporadic_itf_handler(
     modemanager,
     feedback,
-    T_Integer,
+    TInteger,
      0,
      1)
 
 m4_sporadic_itf_handler(
     modemanager,
     reading,
-    T_Integer,
+    TInteger,
      0,
      1)
 
 m4_sporadic_itf_handler(
     modemanager,
     tc,
-    T_Config,
+    TConfig,
      0,
      1)
 
@@ -113,11 +113,11 @@ include(modemanager.if)
 m4_sporadic_itf_gui_provider(
     sensor,
     reading,
-    `T_Integer',
+    `TInteger',
     `Sensor_reading_x',
 )
 divert(5)
-    T_Integer cast_Sensor_reading_x_to_T_Integer(Sensor_reading_x);
+    TInteger cast_Sensor_reading_x_to_TInteger(Sensor_reading_x);
 divert(10)
 
 

@@ -1,8 +1,8 @@
 ASN.1 File : ../BasicCdrDemo.asn
   |_Module : BASICCDRDEMO_DATAVIEW
-    |_Type : T-Config
-    |_Type : T-Integer
-    |_Type : T-Report
+    |_Type : TConfig
+    |_Type : TInteger
+    |_Type : TReport
 ASN.1 File : ${TOOL_INST}/share/taste-types/taste-types.asn
   |_Module : TASTE_BasicTypes
     |_Type : T-Boolean

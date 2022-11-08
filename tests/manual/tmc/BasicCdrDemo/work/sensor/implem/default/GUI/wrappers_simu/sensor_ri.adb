@@ -6,7 +6,7 @@ with System_Dataview;      use System_Dataview;
 package body Sensor_RI is
 
    procedure Reading
-      (X : in out asn1SccT_Integer;
+      (X : in out asn1SccTinteger;
        Dest_PID : asn1sccPID := asn1sccEnv) is
       --  Generate an event to the simulator for the output
       Event_Out_Modemanager : asn1SccObservable_Event (Kind => Output_Event_PRESENT);

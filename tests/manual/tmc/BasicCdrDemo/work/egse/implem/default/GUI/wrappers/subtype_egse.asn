@@ -1,22 +1,22 @@
 EGSE-SUBTYPE DEFINITIONS ::=
 BEGIN
 
-IMPORTS T-Report FROM BASICCDRDEMO-DATAVIEW
+IMPORTS TReport FROM BASICCDRDEMO-DATAVIEW
 
 
-T-Config FROM BASICCDRDEMO-DATAVIEW
+TConfig FROM BASICCDRDEMO-DATAVIEW
 
  ;
 
 
 
 
-Egse-tm-reprt ::= T-Report
+Egse-tm-reprt ::= TReport
 
 
 
 
-Egse-tc-cfg ::= T-Config
+Egse-tc-cfg ::= TConfig
 
 
 

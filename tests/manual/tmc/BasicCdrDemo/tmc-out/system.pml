@@ -9,24 +9,24 @@ typedef system_state {
 }
 
 int inited;
-chan Actuator_ctrl_channel = [1] of {T_Integer};
-T_Integer Actuator_ctrl_signal_parameter;
+chan Actuator_ctrl_channel = [1] of {TInteger};
+TInteger Actuator_ctrl_signal_parameter;
 bool Actuator_ctrl_channel_used = 0;
-chan Egse_tm_channel = [1] of {T_Report};
-T_Report Egse_tm_signal_parameter;
+chan Egse_tm_channel = [1] of {TReport};
+TReport Egse_tm_signal_parameter;
 bool Egse_tm_channel_used = 0;
-chan Modemanager_feedback_channel = [1] of {T_Integer};
-T_Integer Modemanager_feedback_signal_parameter;
+chan Modemanager_feedback_channel = [1] of {TInteger};
+TInteger Modemanager_feedback_signal_parameter;
 bool Modemanager_feedback_channel_used = 0;
-chan Modemanager_reading_channel = [1] of {T_Integer};
-T_Integer Modemanager_reading_signal_parameter;
+chan Modemanager_reading_channel = [1] of {TInteger};
+TInteger Modemanager_reading_signal_parameter;
 bool Modemanager_reading_channel_used = 0;
-chan Modemanager_tc_channel = [1] of {T_Config};
-T_Config Modemanager_tc_signal_parameter;
+chan Modemanager_tc_channel = [1] of {TConfig};
+TConfig Modemanager_tc_signal_parameter;
 bool Modemanager_tc_channel_used = 0;
 system_state global_state;
-chan Actuator_lock = [1] of {int};
 chan Modemanager_lock = [1] of {int};
+chan Actuator_lock = [1] of {int};
 inline Modemanager_0_RI_0_ctrl(Actuator_ctrl_x)
 {
     Actuator_ctrl_channel!Actuator_ctrl_x;
@@ -109,7 +109,7 @@ Egse_tm_loop:
 active proctype Egse_tc() priority 1
 {
     inited;
-    T_Config value;
+    TConfig value;
     int inputVectorCounter;
     for(inputVectorCounter : 0 .. 3)
     {
@@ -185,7 +185,7 @@ Modemanager_tc_loop:
 active proctype Sensor_reading() priority 1
 {
     inited;
-    T_Integer value;
+    TInteger value;
     int inputVectorCounter;
     for(inputVectorCounter : 0 .. 3)
     {
@@ -199,10 +199,10 @@ init
 {
     atomic {
         global_dataview_init();
-        Actuator_0_init();
-        Actuator_lock!1;
         Modemanager_0_init();
         Modemanager_lock!1;
+        Actuator_0_init();
+        Actuator_lock!1;
         inited = 1;
     }
 }

@@ -4,19 +4,19 @@ BEGIN
 IMPORTS
    Actuator-States, Actuator-Context FROM Actuator-Datamodel
    Modemanager-States, Modemanager-Context FROM Modemanager-Datamodel
-   T-Integer, T-Config, T-Report FROM BASICCDRDEMO-DATAVIEW
+   TInteger, TConfig, TReport FROM BASICCDRDEMO-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview
    Actuator-Event, Egse-Event, Modemanager-Event, Sensor-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Observerdemo-States ::= ENUMERATED {incorrectvalue, checking, idle}
+Observerdemo-States ::= ENUMERATED {checking, idle, incorrectvalue}
 
 Observerdemo-Context ::= SEQUENCE {
    state Observerdemo-States,
    init-done BOOLEAN,
    sender PID,
-   reference T-Integer
+   reference TInteger
 }
 
 Observerdemo-Actuator-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), ctrl-present(2)}

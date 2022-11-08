@@ -1,97 +1,97 @@
+ 14:	proc  7 (:init::1) system.pml:250 Send 1	-> queue 1 (Controlsystem_lock)
+ 23:	proc  7 (:init::1) system.pml:252 Send 1	-> queue 2 (Actuator_lock)
                                   set_timer Sensor trigger 1000
- 11:	proc  7 (:init::1) system.pml:250 Send 1	-> queue 1 (Sensor_lock)
- 20:	proc  7 (:init::1) system.pml:252 Send 1	-> queue 2 (Actuator_lock)
- 33:	proc  7 (:init::1) system.pml:254 Send 1	-> queue 3 (Controlsystem_lock)
+ 33:	proc  7 (:init::1) system.pml:254 Send 1	-> queue 3 (Sensor_lock)
  44:	proc  7 (:init::1) system.pml:60 Send 1.300000,3.200000,2.100000	-> queue 4 (Controlsystem_configuration_channel)
  47:	proc  7 (:init::1) system.pml:256 Send 1	-> queue 5 (Host_lock)
- 55:	proc  2 (Controlsystem_configuration:1) system.pml:149 Recv 1	<- queue 3 (Controlsystem_lock)
+ 55:	proc  2 (Controlsystem_configuration:1) system.pml:149 Recv 1	<- queue 1 (Controlsystem_lock)
  57:	proc  2 (Controlsystem_configuration:1) system.pml:153 Recv 1.300000,3.200000,2.100000	<- queue 4 (Controlsystem_configuration_channel)
- 72:	proc  2 (Controlsystem_configuration:1) system.pml:160 Send 1	-> queue 3 (Controlsystem_lock)
+ 72:	proc  2 (Controlsystem_configuration:1) system.pml:160 Send 1	-> queue 1 (Controlsystem_lock)
  77:	proc  0 (timer_manager_proc:1) system.pml:114 Send 0	-> queue 6 (Sensor_trigger_channel)
- 79:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 1 (Sensor_lock)
+ 79:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 3 (Sensor_lock)
  81:	proc  6 (Sensor_trigger:1) system.pml:235 Recv 0	<- queue 6 (Sensor_trigger_channel)
  88:	proc  6 (Sensor_trigger:1) system.pml:64 Send 2.000000	-> queue 7 (Controlsystem_reading_channel)
                               set_timer Sensor trigger 1000
- 94:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 1 (Sensor_lock)
- 96:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 3 (Controlsystem_lock)
+ 94:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 3 (Sensor_lock)
+ 96:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 1 (Controlsystem_lock)
  98:	proc  3 (Controlsystem_reading:1) system.pml:174 Recv 2.000000	<- queue 7 (Controlsystem_reading_channel)
 113:	proc  3 (Controlsystem_reading:1) system.pml:46 Send 13.200000	-> queue 8 (Actuator_controlSignal_channel)
-118:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 3 (Controlsystem_lock)
+118:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 1 (Controlsystem_lock)
 120:	proc  1 (Actuator_controlSignal:1) system.pml:128 Recv 1	<- queue 2 (Actuator_lock)
 122:	proc  1 (Actuator_controlSignal:1) system.pml:132 Recv 13.200000	<- queue 8 (Actuator_controlSignal_channel)
 136:	proc  1 (Actuator_controlSignal:1) system.pml:139 Send 1	-> queue 2 (Actuator_lock)
 139:	proc  0 (timer_manager_proc:1) system.pml:114 Send 0	-> queue 6 (Sensor_trigger_channel)
-141:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 1 (Sensor_lock)
+141:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 3 (Sensor_lock)
 143:	proc  6 (Sensor_trigger:1) system.pml:235 Recv 0	<- queue 6 (Sensor_trigger_channel)
 150:	proc  6 (Sensor_trigger:1) system.pml:64 Send 4.000000	-> queue 7 (Controlsystem_reading_channel)
                               set_timer Sensor trigger 1000
-156:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 1 (Sensor_lock)
-158:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 3 (Controlsystem_lock)
+156:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 3 (Sensor_lock)
+158:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 1 (Controlsystem_lock)
 160:	proc  3 (Controlsystem_reading:1) system.pml:174 Recv 4.000000	<- queue 7 (Controlsystem_reading_channel)
 175:	proc  3 (Controlsystem_reading:1) system.pml:46 Send 28.600002	-> queue 8 (Actuator_controlSignal_channel)
-180:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 3 (Controlsystem_lock)
+180:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 1 (Controlsystem_lock)
 182:	proc  1 (Actuator_controlSignal:1) system.pml:128 Recv 1	<- queue 2 (Actuator_lock)
 184:	proc  1 (Actuator_controlSignal:1) system.pml:132 Recv 28.600002	<- queue 8 (Actuator_controlSignal_channel)
 198:	proc  1 (Actuator_controlSignal:1) system.pml:139 Send 1	-> queue 2 (Actuator_lock)
 201:	proc  0 (timer_manager_proc:1) system.pml:114 Send 0	-> queue 6 (Sensor_trigger_channel)
-203:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 1 (Sensor_lock)
+203:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 3 (Sensor_lock)
 205:	proc  6 (Sensor_trigger:1) system.pml:235 Recv 0	<- queue 6 (Sensor_trigger_channel)
 212:	proc  6 (Sensor_trigger:1) system.pml:64 Send 8.000000	-> queue 7 (Controlsystem_reading_channel)
                               set_timer Sensor trigger 1000
-218:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 1 (Sensor_lock)
-220:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 3 (Controlsystem_lock)
+218:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 3 (Sensor_lock)
+220:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 1 (Controlsystem_lock)
 222:	proc  3 (Controlsystem_reading:1) system.pml:174 Recv 8.000000	<- queue 7 (Controlsystem_reading_channel)
 237:	proc  3 (Controlsystem_reading:1) system.pml:46 Send 63.599998	-> queue 8 (Actuator_controlSignal_channel)
-242:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 3 (Controlsystem_lock)
+242:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 1 (Controlsystem_lock)
 244:	proc  1 (Actuator_controlSignal:1) system.pml:128 Recv 1	<- queue 2 (Actuator_lock)
 246:	proc  1 (Actuator_controlSignal:1) system.pml:132 Recv 63.599998	<- queue 8 (Actuator_controlSignal_channel)
 260:	proc  1 (Actuator_controlSignal:1) system.pml:139 Send 1	-> queue 2 (Actuator_lock)
 263:	proc  0 (timer_manager_proc:1) system.pml:114 Send 0	-> queue 6 (Sensor_trigger_channel)
-265:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 1 (Sensor_lock)
+265:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 3 (Sensor_lock)
 267:	proc  6 (Sensor_trigger:1) system.pml:235 Recv 0	<- queue 6 (Sensor_trigger_channel)
 274:	proc  6 (Sensor_trigger:1) system.pml:64 Send 16.000000	-> queue 7 (Controlsystem_reading_channel)
                               set_timer Sensor trigger 1000
-280:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 1 (Sensor_lock)
-282:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 3 (Controlsystem_lock)
+280:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 3 (Sensor_lock)
+282:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 1 (Controlsystem_lock)
 284:	proc  3 (Controlsystem_reading:1) system.pml:174 Recv 16.000000	<- queue 7 (Controlsystem_reading_channel)
 299:	proc  3 (Controlsystem_reading:1) system.pml:46 Send 133.600006	-> queue 8 (Actuator_controlSignal_channel)
-304:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 3 (Controlsystem_lock)
+304:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 1 (Controlsystem_lock)
 306:	proc  1 (Actuator_controlSignal:1) system.pml:128 Recv 1	<- queue 2 (Actuator_lock)
 308:	proc  1 (Actuator_controlSignal:1) system.pml:132 Recv 133.600006	<- queue 8 (Actuator_controlSignal_channel)
 322:	proc  1 (Actuator_controlSignal:1) system.pml:139 Send 1	-> queue 2 (Actuator_lock)
 325:	proc  0 (timer_manager_proc:1) system.pml:114 Send 0	-> queue 6 (Sensor_trigger_channel)
-327:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 1 (Sensor_lock)
+327:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 3 (Sensor_lock)
 329:	proc  6 (Sensor_trigger:1) system.pml:235 Recv 0	<- queue 6 (Sensor_trigger_channel)
 336:	proc  6 (Sensor_trigger:1) system.pml:64 Send 32.000000	-> queue 7 (Controlsystem_reading_channel)
                               set_timer Sensor trigger 1000
-342:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 1 (Sensor_lock)
-344:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 3 (Controlsystem_lock)
+342:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 3 (Sensor_lock)
+344:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 1 (Controlsystem_lock)
 346:	proc  3 (Controlsystem_reading:1) system.pml:174 Recv 32.000000	<- queue 7 (Controlsystem_reading_channel)
 361:	proc  3 (Controlsystem_reading:1) system.pml:46 Send 273.600006	-> queue 8 (Actuator_controlSignal_channel)
-366:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 3 (Controlsystem_lock)
+366:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 1 (Controlsystem_lock)
 368:	proc  1 (Actuator_controlSignal:1) system.pml:128 Recv 1	<- queue 2 (Actuator_lock)
 370:	proc  1 (Actuator_controlSignal:1) system.pml:132 Recv 273.600006	<- queue 8 (Actuator_controlSignal_channel)
 384:	proc  1 (Actuator_controlSignal:1) system.pml:139 Send 1	-> queue 2 (Actuator_lock)
 387:	proc  0 (timer_manager_proc:1) system.pml:114 Send 0	-> queue 6 (Sensor_trigger_channel)
-389:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 1 (Sensor_lock)
+389:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 3 (Sensor_lock)
 391:	proc  6 (Sensor_trigger:1) system.pml:235 Recv 0	<- queue 6 (Sensor_trigger_channel)
 398:	proc  6 (Sensor_trigger:1) system.pml:64 Send 64.000000	-> queue 7 (Controlsystem_reading_channel)
                               set_timer Sensor trigger 1000
-404:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 1 (Sensor_lock)
-406:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 3 (Controlsystem_lock)
+404:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 3 (Sensor_lock)
+406:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 1 (Controlsystem_lock)
 408:	proc  3 (Controlsystem_reading:1) system.pml:174 Recv 64.000000	<- queue 7 (Controlsystem_reading_channel)
 423:	proc  3 (Controlsystem_reading:1) system.pml:46 Send 553.600037	-> queue 8 (Actuator_controlSignal_channel)
-428:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 3 (Controlsystem_lock)
+428:	proc  3 (Controlsystem_reading:1) system.pml:181 Send 1	-> queue 1 (Controlsystem_lock)
 430:	proc  1 (Actuator_controlSignal:1) system.pml:128 Recv 1	<- queue 2 (Actuator_lock)
 432:	proc  1 (Actuator_controlSignal:1) system.pml:132 Recv 553.600037	<- queue 8 (Actuator_controlSignal_channel)
 446:	proc  1 (Actuator_controlSignal:1) system.pml:139 Send 1	-> queue 2 (Actuator_lock)
 449:	proc  0 (timer_manager_proc:1) system.pml:114 Send 0	-> queue 6 (Sensor_trigger_channel)
-451:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 1 (Sensor_lock)
+451:	proc  6 (Sensor_trigger:1) system.pml:231 Recv 1	<- queue 3 (Sensor_lock)
 453:	proc  6 (Sensor_trigger:1) system.pml:235 Recv 0	<- queue 6 (Sensor_trigger_channel)
 460:	proc  6 (Sensor_trigger:1) system.pml:64 Send 128.000000	-> queue 7 (Controlsystem_reading_channel)
                               set_timer Sensor trigger 1000
-466:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 1 (Sensor_lock)
-468:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 3 (Controlsystem_lock)
+466:	proc  6 (Sensor_trigger:1) system.pml:241 Send 1	-> queue 3 (Sensor_lock)
+468:	proc  3 (Controlsystem_reading:1) system.pml:170 Recv 1	<- queue 1 (Controlsystem_lock)
 470:	proc  3 (Controlsystem_reading:1) system.pml:174 Recv 128.000000	<- queue 7 (Controlsystem_reading_channel)
 spin: dataview.pml:8501, Error: assertion violated
 spin: text of failed assertion: assert(((global_state.controlsystem.outputvalue>=-(1000))&&(global_state.controlsystem.outputvalue<=1000)))
@@ -238,21 +238,16 @@ spin: trail ends after 484 steps
 		Controlsystem_reading_signal_parameter = 128.000000
 		Controlsystem_reading_channel_used = 1
 		queue 6 (Sensor_trigger_channel): 
-		global_state.actuator.state = 1
-		global_state.actuator.init_done = 0
-		global_state.actuator.sender = 4
-		global_state.actuator.setting = 830.400024
-		global_state.actuator.inputcontrol = 553.600037
+		global_state.sensor.state = 0
+		global_state.sensor.init_done = 0
+		global_state.sensor.sender = 4
+		global_state.sensor.x = 128.000000
 		global_state.host.state = 0
 		global_state.host.init_done = 0
 		global_state.host.sender = 4
 		global_state.host.cfg.kp = 1.300000
 		global_state.host.cfg.ki = 3.200000
 		global_state.host.cfg.kd = 2.100000
-		global_state.sensor.state = 0
-		global_state.sensor.init_done = 0
-		global_state.sensor.sender = 4
-		global_state.sensor.x = 128.000000
 		global_state.controlsystem.state = 0
 		global_state.controlsystem.init_done = 0
 		global_state.controlsystem.sender = 4
@@ -264,15 +259,20 @@ spin: trail ends after 484 steps
 		global_state.controlsystem.i = 254.000000
 		global_state.controlsystem.d = 64.000000
 		global_state.controlsystem.previous = 128.000000
+		global_state.actuator.state = 1
+		global_state.actuator.init_done = 0
+		global_state.actuator.sender = 4
+		global_state.actuator.setting = 830.400024
+		global_state.actuator.inputcontrol = 553.600037
 		global_state.timers.actuator.dummy = 0
 		global_state.timers.controlsystem.dummy = 0
 		global_state.timers.host.dummy = 0
 		global_state.timers.sensor.trigger.timer_enabled = 1
 		global_state.timers.sensor.trigger.interval = 1000
 		global_state.timers.dummy_entry.dummy = 0
-		queue 1 (Sensor_lock): [1]
+		queue 1 (Controlsystem_lock): 
 		queue 2 (Actuator_lock): [1]
-		queue 3 (Controlsystem_lock): 
+		queue 3 (Sensor_lock): [1]
 		queue 5 (Host_lock): [1]
 484:	proc  6 (Sensor_trigger:1) system.pml:228 (state 58)
 484:	proc  5 (Sensor_tc:1) system.pml:208 (state 18)

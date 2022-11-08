@@ -22,17 +22,17 @@ struct GenericLinuxAllParametersStub
 #define GENERIC_PARTITION_BUFFER_SIZE (((sizeof(struct GenericLinuxAllParametersStub) + 1) / 2) * 2)
 
 
-#define ACTUATOR_CTRL_REQUEST_SIZE (sizeof (asn1SccT_Integer))
+#define ACTUATOR_CTRL_REQUEST_SIZE (sizeof (asn1SccTInteger))
 
 #define EGSE_POLL_REQUEST_SIZE (1)
 
-#define EGSE_TM_REQUEST_SIZE (sizeof (asn1SccT_Report))
+#define EGSE_TM_REQUEST_SIZE (sizeof (asn1SccTReport))
 
-#define MODEMANAGER_FEEDBACK_REQUEST_SIZE (sizeof (asn1SccT_Integer))
+#define MODEMANAGER_FEEDBACK_REQUEST_SIZE (sizeof (asn1SccTInteger))
 
-#define MODEMANAGER_READING_REQUEST_SIZE (sizeof (asn1SccT_Integer))
+#define MODEMANAGER_READING_REQUEST_SIZE (sizeof (asn1SccTInteger))
 
-#define MODEMANAGER_TC_REQUEST_SIZE (sizeof (asn1SccT_Config))
+#define MODEMANAGER_TC_REQUEST_SIZE (sizeof (asn1SccTConfig))
 
 #define SENSOR_POLL_REQUEST_SIZE (1)
 

@@ -15,7 +15,7 @@ END SP_Poll.GUI_PI;
 
 SUBPROGRAM SP_reading
 FEATURES
-   x : OUT PARAMETER DataView::T_Integer {encoding=>NATIVE;};
+   x : OUT PARAMETER DataView::TInteger {encoding=>NATIVE;};
 
 END SP_reading;
 

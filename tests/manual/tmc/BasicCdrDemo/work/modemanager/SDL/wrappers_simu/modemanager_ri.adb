@@ -6,7 +6,7 @@ with System_Dataview;      use System_Dataview;
 package body Modemanager_RI is
 
    procedure Ctrl
-      (X : in out asn1SccT_Integer;
+      (X : in out asn1SccTinteger;
        Dest_PID : asn1sccPID := asn1sccEnv) is
       --  Generate an event to the simulator for the output
       Event_Out_Actuator : asn1SccObservable_Event (Kind => Output_Event_PRESENT);
@@ -30,7 +30,7 @@ package body Modemanager_RI is
    
    
    procedure Tm
-      (Reprt : in out asn1SccT_Report;
+      (Reprt : in out asn1SccTreport;
        Dest_PID : asn1sccPID := asn1sccEnv) is
       --  Generate an event to the simulator for the output
       Event_Out_Egse : asn1SccObservable_Event (Kind => Output_Event_PRESENT);

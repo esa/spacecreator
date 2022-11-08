@@ -2,32 +2,29 @@ mscdocument mscdemo /* MSC AND */;
     language ASN.1;
     data dataview-uniq.asn;
 /* CIF MSCDOCUMENT (0, 0) (4112, 1757) */
-mscdocument Untitled_Leaf /* MSC LEAF */;
+mscdocument mscdemoleaf /* MSC LEAF */;
     language ASN.1;
     data dataview-uniq.asn;
-msc Untitled_MSC;
+msc mscdemoleaf;
 /* CIF TEXT (1392, 214) (979, 749) */
+/* CIF INSTANCE (0, 61) (273, 87) (800, 1585) */
 /* CIF INSTANCE (0, 61) (273, 87) (800, 1585) */
 instance ModeManager;
 /* CIF CONDITION (0, 196) (974, 66) */
-condition when shared all;
+condition never shared all;
 /* CIF MESSAGE (138, 331) (884, 331) */
-out ctrl to Actuator;
-/* CIF CONDITION (0, 400) (974, 66) */
-condition then shared all;
-/* CIF MESSAGE (884, 534) (138, 534) */
-in feedback from Actuator;
+out ctrl(*) to Actuator;
+/* CIF MESSAGE (884, 437) (138, 437) */
+in feedback(0) from Actuator;
 endinstance;
 /* CIF INSTANCE (791, 61) (183, 87) (800, 1585) */
 instance Actuator;
 /* CIF CONDITION (0, 196) (974, 66) */
-condition when shared all;
+condition never shared all;
 /* CIF MESSAGE (138, 331) (884, 331) */
-in ctrl from ModeManager;
-/* CIF CONDITION (0, 400) (974, 66) */
-condition then shared all;
-/* CIF MESSAGE (884, 534) (138, 534) */
-out feedback to ModeManager;
+in ctrl(*) from ModeManager;
+/* CIF MESSAGE (884, 437) (138, 437) */
+out feedback(0) to ModeManager;
 endinstance;
 endmsc;
 endmscdocument;

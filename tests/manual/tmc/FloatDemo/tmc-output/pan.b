@@ -9,176 +9,13 @@
 
 	case 4: // STATE 15
 		;
-		now.global_state.sensor.sender = trpt->bup.oval;
-		;
-		goto R999;
-;
-		;
-		
-	case 6: // STATE 20
-		;
-		((P7 *)_this)->_1211_8_8_12_transition_id = trpt->bup.ovals[1];
-		((P7 *)_this)->_1211_8_8_12_transition_id = trpt->bup.ovals[0];
-		;
-		ungrab_values(trpt->bup.ovals, 2);
-		goto R999;
-
-	case 7: // STATE 21
-		;
-	/* 0 */	((P7 *)_this)->_1211_8_8_12_transition_id = trpt->bup.oval;
-		;
-		;
-		goto R999;
-
-	case 8: // STATE 23
-		;
-	/* 0 */	((P7 *)_this)->_1211_8_8_12_transition_id = trpt->bup.oval;
-		;
-		;
-		goto R999;
-
-	case 9: // STATE 24
-		;
-		now.global_state.sensor.x = trpt->bup.oval;
-		;
-		goto R999;
-;
-		;
-		
-	case 11: // STATE 33
-		;
-		now.global_state.sensor.state = trpt->bup.ovals[3];
-		((P7 *)_this)->_1211_8_8_12_transition_id = trpt->bup.ovals[2];
-		now.global_state.timers.sensor.trigger.timer_enabled = trpt->bup.ovals[1];
-		now.global_state.timers.sensor.trigger.interval = trpt->bup.ovals[0];
-		;
-		ungrab_values(trpt->bup.ovals, 4);
-		goto R999;
-
-	case 12: // STATE 35
-		;
-	/* 0 */	((P7 *)_this)->_1211_8_8_12_transition_id = trpt->bup.oval;
-		;
-		;
-		goto R999;
-
-	case 13: // STATE 38
-		;
-		now.global_state.sensor.x = trpt->bup.oval;
-		;
-		goto R999;
-;
-		;
-		
-	case 15: // STATE 42
-		;
-		_m = unsend(now.Controlsystem_reading_channel);
-		;
-		goto R999;
-
-	case 16: // STATE 49
-		;
-		now.global_state.sensor.state = trpt->bup.ovals[3];
-		((P7 *)_this)->_1211_8_8_12_transition_id = trpt->bup.ovals[2];
-		now.global_state.timers.sensor.trigger.timer_enabled = trpt->bup.ovals[1];
-		now.global_state.timers.sensor.trigger.interval = trpt->bup.ovals[0];
-		;
-		ungrab_values(trpt->bup.ovals, 4);
-		goto R999;
-
-	case 17: // STATE 59
-		;
-		_m = unsend(now.Sensor_lock);
-		;
-		goto R999;
-
-	case 18: // STATE 60
-		;
-		now.global_state.actuator.sender = trpt->bup.oval;
-		;
-		goto R999;
-;
-		;
-		
-	case 20: // STATE 64
-		;
-		now.global_state.actuator.setting = trpt->bup.oval;
-		;
-		goto R999;
-;
-		;
-		
-	case 22: // STATE 69
-		;
-		((P7 *)_this)->_1211_8_9_15_transition_id = trpt->bup.ovals[1];
-		((P7 *)_this)->_1211_8_9_15_transition_id = trpt->bup.ovals[0];
-		;
-		ungrab_values(trpt->bup.ovals, 2);
-		goto R999;
-
-	case 23: // STATE 70
-		;
-	/* 0 */	((P7 *)_this)->_1211_8_9_15_transition_id = trpt->bup.oval;
-		;
-		;
-		goto R999;
-
-	case 24: // STATE 74
-		;
-		now.global_state.actuator.state = trpt->bup.ovals[2];
-		((P7 *)_this)->_1211_8_9_15_transition_id = trpt->bup.ovals[1];
-	/* 0 */	((P7 *)_this)->_1211_8_9_15_transition_id = trpt->bup.ovals[0];
-		;
-		;
-		ungrab_values(trpt->bup.ovals, 3);
-		goto R999;
-
-	case 25: // STATE 76
-		;
-	/* 0 */	((P7 *)_this)->_1211_8_9_15_transition_id = trpt->bup.oval;
-		;
-		;
-		goto R999;
-
-	case 26: // STATE 79
-		;
-		now.global_state.actuator.setting = trpt->bup.oval;
-		;
-		goto R999;
-;
-		;
-		
-	case 28: // STATE 85
-		;
-		now.global_state.actuator.state = trpt->bup.ovals[1];
-		((P7 *)_this)->_1211_8_9_15_transition_id = trpt->bup.ovals[0];
-		;
-		ungrab_values(trpt->bup.ovals, 2);
-		goto R999;
-
-	case 29: // STATE 89
-		;
-		now.global_state.actuator.state = trpt->bup.ovals[1];
-		((P7 *)_this)->_1211_8_9_15_transition_id = trpt->bup.ovals[0];
-		;
-		ungrab_values(trpt->bup.ovals, 2);
-		goto R999;
-
-	case 30: // STATE 101
-		;
-		_m = unsend(now.Actuator_lock);
-		;
-		goto R999;
-
-	case 31: // STATE 102
-		;
 		now.global_state.controlsystem.sender = trpt->bup.oval;
 		;
 		goto R999;
 ;
 		;
 		
-	case 33: // STATE 106
+	case 6: // STATE 19
 		;
 		now.global_state.controlsystem.i = trpt->bup.oval;
 		;
@@ -186,7 +23,7 @@
 ;
 		;
 		
-	case 35: // STATE 110
+	case 8: // STATE 23
 		;
 		now.global_state.controlsystem.d = trpt->bup.oval;
 		;
@@ -194,7 +31,7 @@
 ;
 		;
 		
-	case 37: // STATE 114
+	case 10: // STATE 27
 		;
 		now.global_state.controlsystem.previous = trpt->bup.oval;
 		;
@@ -202,54 +39,54 @@
 ;
 		;
 		
-	case 39: // STATE 119
+	case 12: // STATE 32
 		;
-		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[1];
-		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[0];
+		((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.ovals[1];
+		((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.ovals[0];
 		;
 		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
-	case 40: // STATE 120
+	case 13: // STATE 33
 		;
-	/* 0 */	((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.oval;
+	/* 0 */	((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.oval;
 		;
 		;
 		goto R999;
 
-	case 41: // STATE 124
+	case 14: // STATE 37
 		;
 		now.global_state.controlsystem.state = trpt->bup.ovals[2];
-		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[1];
-	/* 0 */	((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[0];
+		((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.ovals[1];
+	/* 0 */	((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.ovals[0];
 		;
 		;
 		ungrab_values(trpt->bup.ovals, 3);
 		goto R999;
 
-	case 42: // STATE 126
+	case 15: // STATE 39
 		;
-	/* 0 */	((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.oval;
+	/* 0 */	((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.oval;
 		;
 		;
 		goto R999;
 
-	case 43: // STATE 130
+	case 16: // STATE 43
 		;
 		now.global_state.controlsystem.state = trpt->bup.ovals[1];
-		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[0];
+		((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.ovals[0];
 		;
 		ungrab_values(trpt->bup.ovals, 2);
 		goto R999;
 
-	case 44: // STATE 132
+	case 17: // STATE 45
 		;
-	/* 0 */	((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.oval;
+	/* 0 */	((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.oval;
 		;
 		;
 		goto R999;
 
-	case 45: // STATE 135
+	case 18: // STATE 48
 		;
 		now.global_state.controlsystem.i = trpt->bup.oval;
 		;
@@ -257,7 +94,7 @@
 ;
 		;
 		
-	case 47: // STATE 139
+	case 20: // STATE 52
 		;
 		now.global_state.controlsystem.d = trpt->bup.oval;
 		;
@@ -265,7 +102,7 @@
 ;
 		;
 		
-	case 49: // STATE 143
+	case 22: // STATE 56
 		;
 		now.global_state.controlsystem.previous = trpt->bup.oval;
 		;
@@ -273,7 +110,7 @@
 ;
 		;
 		
-	case 51: // STATE 148
+	case 24: // STATE 61
 		;
 		now.global_state.controlsystem.outputvalue = trpt->bup.oval;
 		;
@@ -281,16 +118,179 @@
 ;
 		;
 		
-	case 53: // STATE 154
+	case 26: // STATE 67
 		;
-		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.oval;
+		((P7 *)_this)->_1211_8_8_15_transition_id = trpt->bup.oval;
 		_m = unsend(now.Actuator_controlSignal_channel);
 		;
 		goto R999;
 
-	case 54: // STATE 164
+	case 27: // STATE 77
 		;
 		_m = unsend(now.Controlsystem_lock);
+		;
+		goto R999;
+
+	case 28: // STATE 78
+		;
+		now.global_state.actuator.sender = trpt->bup.oval;
+		;
+		goto R999;
+;
+		;
+		
+	case 30: // STATE 82
+		;
+		now.global_state.actuator.setting = trpt->bup.oval;
+		;
+		goto R999;
+;
+		;
+		
+	case 32: // STATE 87
+		;
+		((P7 *)_this)->_1211_8_9_18_transition_id = trpt->bup.ovals[1];
+		((P7 *)_this)->_1211_8_9_18_transition_id = trpt->bup.ovals[0];
+		;
+		ungrab_values(trpt->bup.ovals, 2);
+		goto R999;
+
+	case 33: // STATE 88
+		;
+	/* 0 */	((P7 *)_this)->_1211_8_9_18_transition_id = trpt->bup.oval;
+		;
+		;
+		goto R999;
+
+	case 34: // STATE 92
+		;
+		now.global_state.actuator.state = trpt->bup.ovals[2];
+		((P7 *)_this)->_1211_8_9_18_transition_id = trpt->bup.ovals[1];
+	/* 0 */	((P7 *)_this)->_1211_8_9_18_transition_id = trpt->bup.ovals[0];
+		;
+		;
+		ungrab_values(trpt->bup.ovals, 3);
+		goto R999;
+
+	case 35: // STATE 94
+		;
+	/* 0 */	((P7 *)_this)->_1211_8_9_18_transition_id = trpt->bup.oval;
+		;
+		;
+		goto R999;
+
+	case 36: // STATE 97
+		;
+		now.global_state.actuator.setting = trpt->bup.oval;
+		;
+		goto R999;
+;
+		;
+		
+	case 38: // STATE 103
+		;
+		now.global_state.actuator.state = trpt->bup.ovals[1];
+		((P7 *)_this)->_1211_8_9_18_transition_id = trpt->bup.ovals[0];
+		;
+		ungrab_values(trpt->bup.ovals, 2);
+		goto R999;
+
+	case 39: // STATE 107
+		;
+		now.global_state.actuator.state = trpt->bup.ovals[1];
+		((P7 *)_this)->_1211_8_9_18_transition_id = trpt->bup.ovals[0];
+		;
+		ungrab_values(trpt->bup.ovals, 2);
+		goto R999;
+
+	case 40: // STATE 119
+		;
+		_m = unsend(now.Actuator_lock);
+		;
+		goto R999;
+
+	case 41: // STATE 120
+		;
+		now.global_state.sensor.sender = trpt->bup.oval;
+		;
+		goto R999;
+;
+		;
+		
+	case 43: // STATE 125
+		;
+		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[1];
+		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[0];
+		;
+		ungrab_values(trpt->bup.ovals, 2);
+		goto R999;
+
+	case 44: // STATE 126
+		;
+	/* 0 */	((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.oval;
+		;
+		;
+		goto R999;
+
+	case 45: // STATE 128
+		;
+	/* 0 */	((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.oval;
+		;
+		;
+		goto R999;
+
+	case 46: // STATE 129
+		;
+		now.global_state.sensor.x = trpt->bup.oval;
+		;
+		goto R999;
+;
+		;
+		
+	case 48: // STATE 138
+		;
+		now.global_state.sensor.state = trpt->bup.ovals[3];
+		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[2];
+		now.global_state.timers.sensor.trigger.timer_enabled = trpt->bup.ovals[1];
+		now.global_state.timers.sensor.trigger.interval = trpt->bup.ovals[0];
+		;
+		ungrab_values(trpt->bup.ovals, 4);
+		goto R999;
+
+	case 49: // STATE 140
+		;
+	/* 0 */	((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.oval;
+		;
+		;
+		goto R999;
+
+	case 50: // STATE 143
+		;
+		now.global_state.sensor.x = trpt->bup.oval;
+		;
+		goto R999;
+;
+		;
+		
+	case 52: // STATE 147
+		;
+		_m = unsend(now.Controlsystem_reading_channel);
+		;
+		goto R999;
+
+	case 53: // STATE 154
+		;
+		now.global_state.sensor.state = trpt->bup.ovals[3];
+		((P7 *)_this)->_1211_8_10_20_transition_id = trpt->bup.ovals[2];
+		now.global_state.timers.sensor.trigger.timer_enabled = trpt->bup.ovals[1];
+		now.global_state.timers.sensor.trigger.interval = trpt->bup.ovals[0];
+		;
+		ungrab_values(trpt->bup.ovals, 4);
+		goto R999;
+
+	case 54: // STATE 164
+		;
+		_m = unsend(now.Sensor_lock);
 		;
 		goto R999;
 

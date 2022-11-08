@@ -19,7 +19,7 @@ Function Actuator in context _Root
 │     ├─ Queue Size  :  1
 │     ├─ Parameters  :
 │     │  ├─ Name            : x
-│     │  │  ├─ Type         : T-Integer
+│     │  │  ├─ Type         : TInteger
 │     │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
 │     │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
 │     │  │  ├─ Basic type   : ASN1_INTEGER
@@ -35,7 +35,7 @@ Function Actuator in context _Root
       ├─ Queue Size  :  1
       ├─ Parameters  :
       │  ├─ Name            : x
-      │  │  ├─ Type         : T-Integer
+      │  │  ├─ Type         : TInteger
       │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
       │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
       │  │  ├─ Basic type   : ASN1_INTEGER
@@ -65,7 +65,7 @@ Function EGSE in context _Root
 │     ├─ Queue Size  :  1
 │     ├─ Parameters  :
 │     │  ├─ Name            : reprt
-│     │  │  ├─ Type         : T-Report
+│     │  │  ├─ Type         : TReport
 │     │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
 │     │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
 │     │  │  ├─ Basic type   : ASN1_SEQUENCE
@@ -81,7 +81,7 @@ Function EGSE in context _Root
       ├─ Queue Size  :  1
       ├─ Parameters  :
       │  ├─ Name            : cfg
-      │  │  ├─ Type         : T-Config
+      │  │  ├─ Type         : TConfig
       │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
       │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
       │  │  ├─ Basic type   : ASN1_SEQUENCE
@@ -111,7 +111,7 @@ Function ModeManager in context _Root
 │  │  ├─ Queue Size  :  1
 │  │  ├─ Parameters  :
 │  │  │  ├─ Name            : x
-│  │  │  │  ├─ Type         : T-Integer
+│  │  │  │  ├─ Type         : TInteger
 │  │  │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
 │  │  │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
 │  │  │  │  ├─ Basic type   : ASN1_INTEGER
@@ -126,7 +126,7 @@ Function ModeManager in context _Root
 │  │  ├─ Queue Size  :  1
 │  │  ├─ Parameters  :
 │  │  │  ├─ Name            : x
-│  │  │  │  ├─ Type         : T-Integer
+│  │  │  │  ├─ Type         : TInteger
 │  │  │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
 │  │  │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
 │  │  │  │  ├─ Basic type   : ASN1_INTEGER
@@ -141,7 +141,7 @@ Function ModeManager in context _Root
 │     ├─ Queue Size  :  1
 │     ├─ Parameters  :
 │     │  ├─ Name            : cfg
-│     │  │  ├─ Type         : T-Config
+│     │  │  ├─ Type         : TConfig
 │     │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
 │     │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
 │     │  │  ├─ Basic type   : ASN1_SEQUENCE
@@ -157,7 +157,7 @@ Function ModeManager in context _Root
    │  ├─ Queue Size  :  1
    │  ├─ Parameters  :
    │  │  ├─ Name            : x
-   │  │  │  ├─ Type         : T-Integer
+   │  │  │  ├─ Type         : TInteger
    │  │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
    │  │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
    │  │  │  ├─ Basic type   : ASN1_INTEGER
@@ -172,7 +172,7 @@ Function ModeManager in context _Root
       ├─ Queue Size  :  1
       ├─ Parameters  :
       │  ├─ Name            : reprt
-      │  │  ├─ Type         : T-Report
+      │  │  ├─ Type         : TReport
       │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
       │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
       │  │  ├─ Basic type   : ASN1_SEQUENCE
@@ -203,7 +203,7 @@ Function Sensor in context _Root
       ├─ Queue Size  :  1
       ├─ Parameters  :
       │  ├─ Name            : x
-      │  │  ├─ Type         : T-Integer
+      │  │  ├─ Type         : TInteger
       │  │  ├─ ASN.1 Module : BASICCDRDEMO_DATAVIEW
       │  │  ├─ ASN.1 File   : BasicCdrDemo.asn
       │  │  ├─ Basic type   : ASN1_INTEGER

@@ -80,7 +80,7 @@ package body Sensor_Events is
             case Event.Msg_Out.Kind is
                 when Reading_PRESENT =>
                  Put ("Sensor: OUTPUT Reading");
-                  Put_Line (" (" & T_Integer_Pkg.Image (Event.Msg_Out.Reading.X) & ")");
+                  Put_Line (" (" & Tinteger_Pkg.Image (Event.Msg_Out.Reading.X) & ")");
             end case;
       end case;
    end Print_Event;
@@ -99,8 +99,8 @@ package body Sensor_Events is
        Callback     : access procedure (Event         : asn1SccObservable_Event;
                                         Limit_Reached : out Boolean))
    is
-       Iterator     : T_Integer_Pkg.Instance;
-       Param        : asn1SccT_Integer;
+       Iterator     : Tinteger_Pkg.Instance;
+       Param        : asn1SccTinteger;
        Original_State : constant asn1SccSystem_State := Global_State;
        Event          : asn1SccObservable_Event
                          (Kind => Output_Event_PRESENT);
@@ -118,7 +118,7 @@ package body Sensor_Events is
 
       for Each of Iterator loop
          --  Iterate exhaustively over the interface parameter
-         Param := T_Integer_Pkg.To_ASN1 (Each);
+         Param := Tinteger_Pkg.To_ASN1 (Each);
          Event.Output_Event.Event.Sensor.Msg_Out.Reading.x := Param;
          --  the Callback will call the observers, then execute the event
          --  (which may have been altered by the observers), and then
