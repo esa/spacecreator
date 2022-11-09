@@ -104,7 +104,7 @@ will create a folder (~/project/spacecreatorenv6) containing (among other) the f
 Running the following command will build the SpaceCreator plugin:
 ```commandline
 ~/project/spacecreator$ python3 ./scripts/build_spacecreator.py
---project_dir $HOME/project/
+--project_dir $HOME/project/spacecreator/
 --app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
 --env_dir $HOME/project/spacecreatorenv6 
 --build_dir $HOME/project/spacecreator_build 
