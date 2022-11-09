@@ -5,6 +5,11 @@ SPACECREATOR?=spacecreator.AppImage
 DISTFILES=$(shell qmake %{ProFile} -o /tmp/null 2>&1)
 ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
 
+# Explicit configuration support
+ASN1_DRV_CONFIG=projectconfiguration.asn
+ASN1_DRV_PRIVATE=projectprivatedata.asn
+ASN1_DRIVER_EXPLICIT_CONFIG=$(ASN1_DRV_CONFIG) $(ASN1_DRV_PRIVATE)
+
 all:	release
 
 release:	work/glue_release
@@ -48,7 +53,7 @@ Default_Deployment.aadl:	interfaceview.xml
 
 DeploymentView.aadl:	Default_Deployment.aadl
 
-DataView.aadl: ${ASN1_FILES}
+DataView.aadl: ${ASN1_FILES} $(ASN1_DRIVER_EXPLICIT_CONFIG)
 	taste-update-data-view $^
 
 clean:
