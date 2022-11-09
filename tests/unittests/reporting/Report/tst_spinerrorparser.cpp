@@ -139,7 +139,7 @@ void tst_SpinErrorParser::testNumberParentheses()
     QVERIFY(errorDetails.constraints
             == QList<QString>() << ">="
                                 << "<=");
-    QVERIFY(errorDetails.boundingValues == QList<QVariant>() << QVariant(-200.0) << QVariant(-100.0));
+    QVERIFY(errorDetails.boundingValues == QList<QVariant>() << QVariant(-200) << QVariant(-100.0));
 }
 
 QString tst_SpinErrorParser::readFile(const QString &filepath)

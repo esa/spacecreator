@@ -100,7 +100,7 @@
 543:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
 547:	proc  2 (Asw_tc:1) system.pml:71 Recv 6	<- queue 2 (Asw_tc_channel)
 spin: dataview.pml:1983, Error: assertion violated
-spin: text of failed assertion: assert(((global_state.asw.tmp>=0)&&(global_state.asw.tmp<=10)))
+spin: text of failed assertion: assert(((global_state.asw.tmp>=-(200))&&(global_state.asw.tmp<=(-100.0))))
 spin: trail ends after 554 steps
 #processes: 3
 		nothing.data.no_event.dummy = 0
