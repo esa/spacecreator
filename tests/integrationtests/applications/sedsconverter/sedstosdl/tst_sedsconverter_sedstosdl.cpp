@@ -37,7 +37,7 @@ private Q_SLOTS:
     void testComplexGuard();
     void testTimers();
     void testParameterMap();
-    void testParameterActivityMap();
+    void testParameterActivityMapSync();
     void testSyncCommand();
     void testAsyncCommand();
     void testIndexing();
@@ -234,9 +234,9 @@ void tst_SedsConverter_SedsToSdl::testParameterMap()
 /// \SRS  ETB-FUN-2250
 /// \SRS  ETB-FUN-2550
 /// \SRS  ETB-FUN-2600
-void tst_SedsConverter_SedsToSdl::testParameterActivityMap()
+void tst_SedsConverter_SedsToSdl::testParameterActivityMapSync()
 {
-    const int result = system("./test_parameter_activity_map.sh");
+    const int result = system("./test_parameter_activity_map_sync.sh");
     QCOMPARE(result, 0);
 }
 
