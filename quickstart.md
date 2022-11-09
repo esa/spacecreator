@@ -32,6 +32,9 @@ and some libraries to compile against.
 **Apt**<br>
 Install tools by typing: <br>
 `$ apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect`
+> Note: If the above line fails type <br> 
+> `$ sudo apt-get install python3-dev python3-wheel `<br>
+> and try again.
 
 **CMake** <br>
 Because Qt 6 requires CMake 3.16 or later, we need to install a backport when running Debian 10 (buster). 
