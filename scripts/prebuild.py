@@ -193,7 +193,7 @@ def install_grantlee(env_dir: str, app_dir: str) -> None:
 
     spacecreator_qt_lib_dir = join_dir(app_dir, 'lib', 'Qt', 'lib')
     templates_lib_dir = join_dir(cmake_build_dir, 'templates', 'lib')
-    pattern = join_dir(templates_lib_dir, 'libGrantlee_Templates.so*')
+    pattern = join_dir(templates_lib_dir, 'libGrantlee_*.so*')
     copy_file_pattern_to_dir(pattern, spacecreator_qt_lib_dir)
 
 
@@ -395,7 +395,7 @@ if __name__ == '__main__':
 
     # Copy syntax highlighter files from asn1plugin
     generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
-    generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter', 'syntax')
+    generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
     copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
     # Copy snippets from asn1plugin
     snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
