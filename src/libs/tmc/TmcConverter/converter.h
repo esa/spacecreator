@@ -154,7 +154,7 @@ public:
      *
      * @param   delta Value of the interval
      */
-    void setDelta(std::optional<float> value);
+    void setDelta(std::optional<QString> value);
     /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
@@ -223,8 +223,7 @@ Q_SIGNALS:
 
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
-            const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options,
-            const std::optional<float> &delta);
+            const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options);
 
     void integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
             std::map<QString, ProcessMetadata> &allSdlFiles);
@@ -287,7 +286,7 @@ private:
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
     std::optional<QString> m_processesBasePriority;
-    std::optional<int> m_delta;
+    std::optional<QString> m_delta;
     bool m_isRealTypeEnabled;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;

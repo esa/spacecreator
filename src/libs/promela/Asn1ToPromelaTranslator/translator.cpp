@@ -50,13 +50,16 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
     const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
+    const QString deltaStr = options.value(PromelaOptions::realGeneratorDelta).value_or("");
+    const std::optional<float> delta = deltaStr.isEmpty() ? std::nullopt : std::optional(std::abs(deltaStr.toFloat()));
+
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
     const auto *ivModel = getModel<IVModel>(sourceModels);
 
     if (asn1ValueGeneration) {
         QStringList typeNames;
         std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
-        return generateValueGenerationInlines(asn1Model, ivModel, typeNames, options);
+        return generateValueGenerationInlines(asn1Model, ivModel, typeNames, options, delta);
     } else {
         return translateAsn1Model(asn1Model, enhancedSpinSupport);
     }
@@ -100,7 +103,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
 
 std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generateValueGenerationInlines(
         const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel, const QStringList &typeNames,
-        const Options &options) const
+        const Options &options, const std::optional<float> &delta) const
 {
     const auto subtypesFilepaths = options.values(PromelaOptions::subtypesFilepath);
 
@@ -110,10 +113,10 @@ std::vector<std::unique_ptr<conversion::Model>> Asn1ToPromelaTranslator::generat
                 [&](const auto &filepath) { return filepath == file->name(); });
 
         if (subtypesFilepathFound == subtypesFilepaths.end()) {
-            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, typeNames);
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, typeNames, delta);
             visitor.visit(*file);
         } else {
-            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, asn1Model, ivModel);
+            Asn1NodeValueGeneratorVisitor visitor(*promelaModel, asn1Model, ivModel, delta);
             visitor.visit(*file);
         }
     }

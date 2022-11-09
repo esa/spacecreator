@@ -284,7 +284,7 @@ void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
     m_processesBasePriority = std::move(value);
 }
 
-void TmcConverter::setDelta(std::optional<float> value)
+void TmcConverter::setDelta(std::optional<QString> value)
 {
     m_delta = std::move(value);
 }
@@ -416,7 +416,7 @@ size_t TmcConverter::getNumberOfProctypes() const
 
 bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceModelTypes,
         conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxilaryModelTypes,
-        conversion::Options options, const std::optional<float> &delta)
+        conversion::Options options)
 {
     try {
         Converter converter(m_registry, std::move(options));
@@ -503,6 +503,7 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     if (m_isRealTypeEnabled) {
         options.add(PromelaOptions::enhancedSpinSupport);
+        options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
     }
     options.add(IvOptions::inputFilepath, inputFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
@@ -576,6 +577,7 @@ bool TmcConverter::convertDataview(
 
     if (m_isRealTypeEnabled) {
         options.add(PromelaOptions::enhancedSpinSupport);
+        options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
     }
 
     options.add(IvOptions::inputFilepath, ivFilepath);
@@ -602,6 +604,7 @@ bool TmcConverter::convertMscObservers(const QString &ivFilePath)
         Options options;
         if (m_isRealTypeEnabled) {
             options.add(PromelaOptions::enhancedSpinSupport);
+            options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
         }
         options.add(MscOptions::inputFilepath, mscFilePath);
         options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());

@@ -44,21 +44,24 @@ using promela::model::PromelaModel;
 
 namespace promela::translator {
 
-Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(
-        PromelaModel &promelaModel, const Asn1Model *asn1Model, const IVModel *ivModel)
+Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel, const Asn1Model *asn1Model,
+        const IVModel *ivModel, const std::optional<float> &delta)
     : m_promelaModel(promelaModel)
     , m_asn1Model(asn1Model)
     , m_ivModel(ivModel)
     , m_generateSubtypes(true)
+    , m_delta(delta)
 {
 }
 
-Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(PromelaModel &promelaModel, QStringList typeNames)
+Asn1NodeValueGeneratorVisitor::Asn1NodeValueGeneratorVisitor(
+        PromelaModel &promelaModel, QStringList typeNames, const std::optional<float> &delta)
     : m_promelaModel(promelaModel)
     , m_asn1Model(nullptr)
     , m_ivModel(nullptr)
     , m_typeNames(std::move(typeNames))
     , m_generateSubtypes(false)
+    , m_delta(delta)
 {
 }
 
@@ -81,10 +84,10 @@ void Asn1NodeValueGeneratorVisitor::visit(const TypeAssignment &type)
     if (m_generateSubtypes) {
         const auto overridenType = findOverridenType(type.name());
 
-        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), overridenType);
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), overridenType, m_delta);
         type.type()->accept(typeVisitor);
     } else if (m_typeNames.contains(type.name())) {
-        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), nullptr);
+        Asn1TypeValueGeneratorVisitor typeVisitor(m_promelaModel, type.name(), nullptr, m_delta);
         type.type()->accept(typeVisitor);
     }
 }

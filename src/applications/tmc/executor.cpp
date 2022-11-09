@@ -80,7 +80,7 @@ void TmcExecutor::execute()
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
     std::optional<QString> processesBasePriority;
     std::vector<QString> subtypesFilepaths;
-    std::optional<float> delta;
+    std::optional<QString> delta;
     bool isRealTypeEnabled = false;
     bool verify = false;
 
@@ -230,7 +230,7 @@ void TmcExecutor::execute()
                 exit(EXIT_FAILURE);
             }
 
-            delta = std::abs(args[i].toFloat());
+            delta = args[i];
         } else if (arg == "-enable-reals") {
             ++i;
             isRealTypeEnabled = true;

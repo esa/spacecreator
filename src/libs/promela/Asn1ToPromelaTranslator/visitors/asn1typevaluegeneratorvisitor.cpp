@@ -103,11 +103,12 @@ const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::lengthMemberName = 
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::octetGeneratorName = "OctetStringElement_generate_value";
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::ia5StringGeneratorName = "IA5StringElement_generate_value";
 
-Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(
-        PromelaModel &promelaModel, QString name, const Asn1Acn::Types::Type *overridenType)
+Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name,
+        const Asn1Acn::Types::Type *overridenType, const std::optional<float> delta = std::nullopt)
     : m_promelaModel(promelaModel)
     , m_name(std::move(name))
     , m_overridenType(overridenType)
+    , m_delta(delta)
 {
 }
 
@@ -466,7 +467,6 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
 {
-    float delta = 5; // TODO: Load from front
     RealRangeConstraintVisitor constraintVisitor;
     type.constraints().accept(constraintVisitor);
 
@@ -481,7 +481,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
     }
 
     Conditional conditional;
-    RealGenerator generator(realSubset.value(), delta);
+    RealGenerator generator(realSubset.value(), m_delta);
 
     while (generator.has_next()) {
         auto element = generator.next();

@@ -120,7 +120,7 @@ void TmcVerifier::setRealTypeEnabled(bool isRealTypeEnabled)
     m_converter->setRealTypeEnabled(isRealTypeEnabled);
 }
 
-void TmcVerifier::setDelta(std::optional<float> value)
+void TmcVerifier::setDelta(std::optional<QString> value)
 {
     m_converter->setDelta(std::move(value));
 }
