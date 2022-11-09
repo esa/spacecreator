@@ -1,0 +1,42 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Modemanager;
+    /* CIF TEXT (806, 52), (170, 140) */
+    DCL cfg TConfig;
+    DCL xin TInteger;
+    DCL xout TInteger;
+    DCL xfeedback TInteger;
+    DCL rprt TReport;
+    /* CIF ENDTEXT */
+    /* CIF START (91, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (77, 60), (96, 35) */
+        NEXTSTATE Uninitialized;
+    /* CIF state (573, 10), (89, 35) */
+    state Configured;
+        /* CIF input (556, 65), (146, 35) */
+        input feedback(xfeedback);
+            /* CIF task (539, 120), (181, 53) */
+            task rprt.reading := xin,
+rprt.ctrl := xout,
+rprt.feedback := xfeedback;
+            /* CIF output (594, 193), (70, 35) */
+            output tm(rprt);
+            /* CIF NEXTSTATE (595, 248), (70, 35) */
+            NEXTSTATE -;
+        /* CIF input (354, 65), (93, 35) */
+        input reading(xin);
+            /* CIF task (274, 120), (254, 35) */
+            task xout := xin * cfg.param_a + cfg.param_b;
+            /* CIF output (362, 175), (77, 35) */
+            output ctrl(xout);
+            /* CIF NEXTSTATE (366, 230), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+    /* CIF state (166, 10), (96, 35) */
+    state Uninitialized;
+        /* CIF input (181, 65), (70, 35) */
+        input tc(cfg);
+            /* CIF NEXTSTATE (171, 120), (89, 35) */
+            NEXTSTATE Configured;
+    endstate;
+endprocess Modemanager;

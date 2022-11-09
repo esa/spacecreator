@@ -60,6 +60,8 @@ private:
 
     QString getItemValue(const QStandardItem *item, const QString &separator = "") const;
 
+    int ensureValueInRange(int value, const QStandardItem *valueItem);
+
 private:
     using ItemModelPtr = QSharedPointer<Asn1ItemModel>;
 

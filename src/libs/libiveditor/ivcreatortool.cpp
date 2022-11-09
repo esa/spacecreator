@@ -725,7 +725,6 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
         ifaceCommons.type =
                 info.isToOrFromNested ? info.startIface->direction() : ivm::IVInterface::InterfaceType::Provided;
         ifaceCommons.id = info.endIfaceId;
-        ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
@@ -735,7 +734,6 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
         ifaceCommons.type =
                 info.isToOrFromNested ? info.endIface->direction() : ivm::IVInterface::InterfaceType::Required;
         ifaceCommons.id = info.startIfaceId;
-        ifaceCommons.resetKind();
 
         if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
             return;
