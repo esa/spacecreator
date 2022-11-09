@@ -36,11 +36,6 @@ void tst_HtmlReportBuilder::testNoError()
     auto html = htmlBuilder.parseAndBuildHtmlReport({}, {}, {}, QStringList(), htmlTemplatePath);
     const auto htmlResult = readFile(htmlResultPath);
 
-    QFile file("/home/taste/empty_result.html");
-    file.open(QFile::WriteOnly);
-    file.write(html.toUtf8());
-    file.close();
-
     QVERIFY(html == htmlResult);
 }
 
@@ -61,6 +56,11 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
     auto html = htmlBuilder.parseAndBuildHtmlReport(
             { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
     const auto htmlResult = readFile(htmlResultPath);
+
+    QFile file("/home/taste/dcv_result.html");
+    file.open(QFile::WriteOnly);
+    file.write(html.toUtf8());
+    file.close();
 
     QVERIFY(html == htmlResult);
 }
