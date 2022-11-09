@@ -61,7 +61,7 @@ private:
     auto searchAndCheckMatLabModelWorkspaceFile(const QString& inputFilePath) -> std::optional<QFileInfo>;
     auto printInfoAboutInputs(const QString& inputFilePath, const QString& functionBlockName, const QString& inputWorkspaceFilePath = QString()) -> void;
 
-    auto generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString;
+    auto generateMatLabCallParams(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString;
     auto generateWorkspaceLoadCallFunction(QFileInfo &workspaceFileInfo) -> QString;
     auto generateTasteExporterCallFunction(const QString& inputFilePath) -> QString;
     auto getWorkspaceLoadFunctionNameForWorkspaceFileExtension(const QString &workspaceFileExtension) -> QString;
@@ -113,8 +113,8 @@ private:
     const QMap<QString, QString> m_workspaceLoadFunctionsMap = {{"m", "run"}, {"mat", "load"}};
 
     const QString m_workspaceLoadCallFunctionTemplate = "%1('%2')";
-    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2; exit;\"";
-    const QString m_matlabCommandWithWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2; %3; exit;\"";
+    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "cd %1; %2; exit;";
+    const QString m_matlabCommandWithWorkspaceLoadTemplate = "cd %1; %2; %3; exit;";
     const QString m_tasteExporterCallFunctionTemplate = "taste_export('%1', '%2')";
     const QString m_functionBlockInWorkDirectoryPathTemplate = "%1/work/%2/%3/src";
 
