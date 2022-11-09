@@ -199,8 +199,12 @@ private:
 
     static auto createParameterActivityGetAsyncPi(Context &context, ivm::IVInterface *interface,
             const seds::model::ParameterActivityMap &map, const Options &options) -> void;
+    static auto createParameterActivitySetAsyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map, const Options &options) -> void;
 
     static auto createParameterActivityGetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
+            const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *;
+    static auto createParameterActivitySetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
             const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *;
 
     static auto translateParameter(Context &context, const seds::model::ParameterMap &map,

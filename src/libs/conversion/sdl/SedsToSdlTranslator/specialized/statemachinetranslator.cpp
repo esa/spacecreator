@@ -1137,7 +1137,115 @@ auto StateMachineTranslator::createParameterActivityGetAsyncPi(Context &context,
     }
 }
 
+auto StateMachineTranslator::createParameterActivitySetAsyncPi(Context &context, ivm::IVInterface *ivInterface,
+        const ::seds::model::ParameterActivityMap &map, const Options &options) -> void
+{
+    auto stateMachine = context.sdlStateMachine();
+
+    for (const auto &state : stateMachine->states()) {
+        const auto &existingInput = getInputOfName(state.get(), ivInterface->title());
+        if (existingInput != nullptr) {
+            // Setter was already generated for the given state
+            continue;
+        }
+
+        auto input = std::make_unique<::sdl::Input>();
+        input->setName(ivInterface->title());
+        const auto variableName = ioVariableName(input->name());
+        input->addParameter(std::make_unique<::sdl::VariableReference>(variableName));
+
+        auto transition = std::make_unique<::sdl::Transition>();
+
+        auto procedure = createParameterActivitySetAsyncProcedure(context, ivInterface, map, options);
+
+        // Call parameter activity
+        auto parameterActivityCall = std::make_unique<::sdl::ProcedureCall>();
+        parameterActivityCall->setProcedure(procedure);
+        parameterActivityCall->addArgument(std::make_unique<::sdl::VariableReference>(variableName));
+        transition->addAction(std::move(parameterActivityCall));
+
+        // Stay in the same state
+        transition->addAction(std::make_unique<::sdl::NextState>("", state.get()));
+
+        input->setTransition(transition.get());
+        stateMachine->addTransition(std::move(transition));
+        state->addInput(std::move(input));
+    }
+}
+
 auto StateMachineTranslator::createParameterActivityGetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
+        const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *
+{
+    const auto &parameter = ivInterface->params().front();
+    const auto parameterName = Escaper::escapeSdlVariableName(parameter.name());
+    const auto parameterTypeName = Escaper::escapeSdlName(parameter.paramTypeName());
+    const auto parameterDirection = QString("in");
+
+    const auto &sdlProcedures = context.sdlProcess()->procedures();
+
+    const auto procedureName = QString("%1_Activity").arg(ivInterface->title());
+
+    auto foundProcedure = std::find_if(
+            sdlProcedures.begin(), sdlProcedures.end(), [&](const auto &p) { return p->name() == procedureName; });
+    if (foundProcedure != sdlProcedures.end()) {
+        return (*foundProcedure).get();
+    }
+
+    auto procedure = std::make_unique<::sdl::Procedure>(procedureName);
+
+    auto procedureParameter =
+            std::make_unique<::sdl::ProcedureParameter>(parameterName, parameterTypeName, parameterDirection);
+    procedure->addParameter(std::move(procedureParameter));
+
+    // Create variable for provided interface param
+    const auto &providedInterfaceVariableName = Escaper::escapeSdlVariableName(map.provided().name().value());
+    auto providedInterfaceVariable =
+            std::make_unique<::sdl::VariableDeclaration>(providedInterfaceVariableName, parameterTypeName);
+    procedure->addVariable(std::move(providedInterfaceVariable));
+
+    // Create variable for required interface param
+    const auto &requiredInterfaceVariableName = Escaper::escapeSdlVariableName(map.required().name().value());
+    auto requiredInterfaceVariable =
+            std::make_unique<::sdl::VariableDeclaration>(requiredInterfaceVariableName, parameterTypeName);
+    procedure->addVariable(std::move(requiredInterfaceVariable));
+
+    auto transition = std::make_unique<::sdl::Transition>();
+
+    // Assign parameter to required interface variable
+    transition->addAction(
+            std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(requiredInterfaceVariableName, parameterName)));
+
+    // Translate GetActivity body
+    StatementTranslatorVisitor::StatementContext statementContext(context, context.sdlProcess(), procedure.get());
+    StatementTranslatorVisitor visitor(statementContext, transition.get(), options);
+    for (const auto &statement : map.getActivity()->statements()) {
+        std::visit(visitor, statement);
+    }
+
+    // Call `get` from the provided interface
+    const auto &providedInterfaceData = map.provided();
+    const auto &providedInterfaceName = providedInterfaceData.interface().value();
+    const auto &providedInterfaceParameterName = providedInterfaceData.parameter().value();
+
+    const auto providedParameterInterfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
+            providedInterfaceName, providedInterfaceParameterName,
+            InterfaceTranslatorHelper::InterfaceParameterType::Getter, ivm::IVInterface::InterfaceType::Required);
+
+    auto providedInterfaceOutput = std::make_unique<::sdl::Output>();
+    providedInterfaceOutput->setName(providedParameterInterfaceName);
+    providedInterfaceOutput->setParameter(std::make_unique<::sdl::VariableReference>(providedInterfaceVariableName));
+
+    transition->addAction(std::move(providedInterfaceOutput));
+
+    procedure->setTransition(std::move(transition));
+
+    const auto procedurePtr = procedure.get();
+    context.sdlProcess()->addProcedure(std::move(procedure));
+
+    return procedurePtr;
+}
+
+auto StateMachineTranslator::createParameterActivitySetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
         const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *
 {
     const auto &parameter = ivInterface->params().front();
@@ -1177,29 +1285,29 @@ auto StateMachineTranslator::createParameterActivityGetAsyncProcedure(Context &c
 
     // Assign parameter to provided interface variable
     transition->addAction(
-            std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(requiredInterfaceVariableName, parameterName)));
+            std::make_unique<::sdl::Task>("", QString("%1 := %2").arg(providedInterfaceVariableName, parameterName)));
 
-    // Translate GetActivity body
+    // Translate SetActivity body
     StatementTranslatorVisitor::StatementContext statementContext(context, context.sdlProcess(), procedure.get());
     StatementTranslatorVisitor visitor(statementContext, transition.get(), options);
-    for (const auto &statement : map.getActivity()->statements()) {
+    for (const auto &statement : map.setActivity()->statements()) {
         std::visit(visitor, statement);
     }
 
-    // Call `get` from the provided interface
-    const auto &providedInterfaceData = map.provided();
-    const auto &providedInterfaceName = providedInterfaceData.interface().value();
-    const auto &providedInterfaceParameterName = providedInterfaceData.parameter().value();
+    // Call `set` from the required interface
+    const auto &requiredInterfaceData = map.required();
+    const auto &requiredInterfaceName = requiredInterfaceData.interface().value();
+    const auto &requiredInterfaceParameterName = requiredInterfaceData.parameter().value();
 
-    const auto providedParameterInterfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
-            providedInterfaceName, providedInterfaceParameterName,
-            InterfaceTranslatorHelper::InterfaceParameterType::Getter, ivm::IVInterface::InterfaceType::Required);
+    const auto requiredParameterInterfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
+            requiredInterfaceName, requiredInterfaceParameterName,
+            InterfaceTranslatorHelper::InterfaceParameterType::Setter, ivm::IVInterface::InterfaceType::Required);
 
-    auto providedInterfaceOutput = std::make_unique<::sdl::Output>();
-    providedInterfaceOutput->setName(providedParameterInterfaceName);
-    providedInterfaceOutput->setParameter(std::make_unique<::sdl::VariableReference>(providedInterfaceVariableName));
+    auto requiredInterfaceOutput = std::make_unique<::sdl::Output>();
+    requiredInterfaceOutput->setName(requiredParameterInterfaceName);
+    requiredInterfaceOutput->setParameter(std::make_unique<::sdl::VariableReference>(requiredInterfaceVariableName));
 
-    transition->addAction(std::move(providedInterfaceOutput));
+    transition->addAction(std::move(requiredInterfaceOutput));
 
     procedure->setTransition(std::move(transition));
 
@@ -1255,7 +1363,7 @@ auto StateMachineTranslator::translateParameter(Context &context, const ::seds::
         const ::seds::model::StateMachine &sedsStateMachine, const Options &options) -> void
 {
     handleParameterActivityMapGetActivity(context, map, sedsStateMachine, options);
-    /* handleParameterActivityMapSetActivity(context, map, sedsStateMachine, options); */
+    handleParameterActivityMapSetActivity(context, map, sedsStateMachine, options);
 }
 
 auto StateMachineTranslator::handleParameterActivityMapGetActivity(Context &context,
@@ -1312,29 +1420,32 @@ auto StateMachineTranslator::handleParameterActivityMapSetActivity(Context &cont
         return;
     }
 
-    const auto &firstInterfaceData = map.provided();
-    const auto &firstInterfaceName = firstInterfaceData.interface().value();
-    const auto &firstParameterName = firstInterfaceData.parameter().value();
+    const auto &providedInterfaceData = map.provided();
+    const auto &providedInterfaceName = providedInterfaceData.interface().value();
+    const auto &providedParameterName = providedInterfaceData.parameter().value();
 
-    // Check if provided setter interface for this parameter exists (parameter is sync)
+    // Check if provided setter interface for this parameter exists
     const auto providedParameterInterfaceName = InterfaceTranslatorHelper::buildParameterInterfaceName(
-            firstInterfaceName, firstParameterName, InterfaceTranslatorHelper::InterfaceParameterType::Setter,
+            providedInterfaceName, providedParameterName, InterfaceTranslatorHelper::InterfaceParameterType::Setter,
             ivm::IVInterface::InterfaceType::Provided);
     auto providedParameterInterface = getInterfaceByName(context.ivFunction(), providedParameterInterfaceName);
 
-    if (providedParameterInterface != nullptr) {
+    if (providedParameterInterface == nullptr) {
+        auto errorMessage = QString("Failed to find interface '%1' for parameter activity maps")
+                                    .arg(providedParameterInterfaceName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    if (providedParameterInterface->kind() == ivm::IVInterface::OperationKind::Sporadic) { // Parameter is async
+        createParameterActivitySetAsyncPi(context, providedParameterInterface, map, options);
+    } else { // Parameter is sync
         const auto sedsTransitions = getTransitionsForParameter(
-                sedsStateMachine, firstInterfaceName, firstParameterName, ::seds::model::ParameterOperation::Set);
+                sedsStateMachine, providedInterfaceName, providedParameterName, ::seds::model::ParameterOperation::Set);
 
         auto procedure =
                 createParameterActivitySetSyncPi(context, providedParameterInterface, map, sedsTransitions, options);
         context.sdlProcess()->addProcedure(std::move(procedure));
-
-        // Parameter can't be required if it's provided, so early return here
-        return;
     }
-
-    // TODO: Check if required setter interface for this parameter exists (parameter is async)
 }
 
 auto StateMachineTranslator::translateParameterMaps(Context &context,
@@ -1598,14 +1709,33 @@ auto StateMachineTranslator::handleAsyncParameterMaps(Context &context,
             throw TranslationException(std::move(errorMessage));
         }
 
-        auto procedure =
-                createParameterActivityGetAsyncProcedure(context, parameterInterface, *parameterActivityMap, options);
+        if (parameter.operation() == ::seds::model::ParameterOperation::Get) {
+            const auto hasGetActivity = (parameterActivityMap->getActivity() != nullptr);
+            if (!hasGetActivity) {
+                throw TranslationException("Get activity is required for parameter activity map");
+            }
 
-        auto parameterActivityCall = std::make_unique<::sdl::ProcedureCall>();
-        parameterActivityCall->setProcedure(procedure);
-        parameterActivityCall->addArgument(std::make_unique<::sdl::VariableReference>(variableName));
+            auto procedure = createParameterActivityGetAsyncProcedure(
+                    context, parameterInterface, *parameterActivityMap, options);
 
-        unpackingActions.push_back(std::move(parameterActivityCall));
+            auto parameterActivityCall = std::make_unique<::sdl::ProcedureCall>();
+            parameterActivityCall->setProcedure(procedure);
+            parameterActivityCall->addArgument(std::make_unique<::sdl::VariableReference>(variableName));
+
+            unpackingActions.push_back(std::move(parameterActivityCall));
+        } else if (parameter.operation() == ::seds::model::ParameterOperation::Set) {
+            const auto hasSetActivity = (parameterActivityMap->getActivity() != nullptr);
+            if (hasSetActivity) {
+                auto procedure = createParameterActivitySetAsyncProcedure(
+                        context, parameterInterface, *parameterActivityMap, options);
+
+                auto parameterActivityCall = std::make_unique<::sdl::ProcedureCall>();
+                parameterActivityCall->setProcedure(procedure);
+                parameterActivityCall->addArgument(std::make_unique<::sdl::VariableReference>(variableName));
+
+                unpackingActions.push_back(std::move(parameterActivityCall));
+            }
+        }
     }
 }
 
