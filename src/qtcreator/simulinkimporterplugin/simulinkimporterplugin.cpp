@@ -160,7 +160,11 @@ auto SimulinkImporterPlugin::createActionContainerInTools(const QString &title) 
 void SimulinkImporterPlugin::onActiveProjectChanged(ProjectExplorer::Project *project)
 {
     m_currentProject = project;
-    m_currentProjectDirectoryPath = project->projectDirectory().toString();
+    if (m_currentProject != nullptr) {
+        m_currentProjectDirectoryPath = project->projectDirectory().toString();
+    } else {
+        m_currentProjectDirectoryPath.clear();
+    }
 
     m_simulinkMenu->setEnabled(project != nullptr);
 }
