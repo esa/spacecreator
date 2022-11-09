@@ -268,20 +268,12 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::MathOperation &
     const auto isSwap = isSwapOperator(firstElement);
 
     if (isSwap) {
-        const auto swapOperations = MathOperationTranslator::translateSwapOperation(operation);
+        const auto swapOperation = MathOperationTranslator::translateSwapOperation(operation);
 
-        bool first = true;
+        auto sdlTask = std::make_unique<::sdl::Task>("", swapOperation);
+        DescriptionTranslator::translate(operation, sdlTask.get());
 
-        for (const auto &swapOperation : swapOperations) {
-            auto sdlTask = std::make_unique<::sdl::Task>("", swapOperation);
-
-            if (first) {
-                DescriptionTranslator::translate(operation, sdlTask.get());
-                first = false;
-            }
-
-            m_sdlTransition->addAction(std::move(sdlTask));
-        }
+        m_sdlTransition->addAction(std::move(sdlTask));
     } else {
         const auto targetName = translateVariableReference(operation.outputVariableRef().value().value());
         const auto value = MathOperationTranslator::translateOperation(operation.elements());

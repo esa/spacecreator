@@ -21,14 +21,10 @@ process Calculator;
             /* CIF Task (0, 937), (100, 50) */
             task R := (X1 + X2) + 2;
             /* CIF Task (0, 1012), (100, 50) */
-            task Tmp := R;
+            task Tmp := R, R := Result, Result := Tmp;
             /* CIF Task (0, 1087), (100, 50) */
-            task R := Result;
-            /* CIF Task (0, 1162), (100, 50) */
-            task Result := Tmp;
-            /* CIF Task (0, 1237), (100, 50) */
             task Io_asynccalculator_add_ri.Result := Result;
-            /* CIF Output (0, 1312), (200, 50) */
+            /* CIF Output (0, 1162), (200, 50) */
             output AsyncCalculator_Add_Ri(Io_asynccalculator_add_ri);
         return;
     endprocedure;
