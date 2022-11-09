@@ -1,0 +1,7 @@
+all:
+	mkdir -p code
+	cd code && opengeode --toAda /home/taste/spacecreator/tests/manual/tmc/BasicCdrDemo/work/modelchecking/properties/observerdemo/observerdemo.pr 
+	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada observer.asn code/observerdemo_datamodel.asn
+	cd code && gnat make observerdemo
+clean:
+	rm -rf code

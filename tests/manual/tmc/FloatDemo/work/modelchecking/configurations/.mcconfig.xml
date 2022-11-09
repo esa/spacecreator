@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xmel>
+<xmel version="1.0">
+    <ModelCheckingWindow name=".mcconfig.xml">
+        <Configuration>
+            <Properties/>
+            <Submodel>
+                <Function name="Actuator"/>
+                <Function name="Sensor"/>
+                <Function name="Host"/>
+                <Function name="ControlSystem"/>
+            </Submodel>
+        </Configuration>
+        <NativeModelChecker/>
+        <IFModelChecker maxscenarios="5" errorscenarios="true" successscenarios="true" timelimit="120" maxenvironmentcalls="" explorationalgorithm="dfs" maxstates=""/>
+        <SPINModelChecker errorlimit="1" explorationmode="DepthFirst" inputvectorgenerationlimit="4" ifacegenerationlimits="" memorylimitmb="2048" numberofcores="1" rawcommandline="" searchshortestpath="0" searchstatelimit="1000000" timelimitseconds="300" usebithashing="0" usefairscheduling="0" supportReal="1" deltaValue=""/>
+    </ModelCheckingWindow>
+</xmel>
