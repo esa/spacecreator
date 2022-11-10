@@ -6,8 +6,8 @@ DISTFILES=$(shell qmake %{ProFile} -o /tmp/null 2>&1)
 ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
 
 # Explicit configuration support
-ASN1_DRV_CONFIG=projectconfiguration.asn
-ASN1_DRV_PRIVATE=projectprivatedata.asn
+ASN1_DRV_CONFIG=%{ProjectName}configuration.asn
+ASN1_DRV_PRIVATE=%{ProjectName}privatedata.asn
 ASN1_DRIVER_EXPLICIT_CONFIG=$(ASN1_DRV_CONFIG) $(ASN1_DRV_PRIVATE)
 
 all:	release

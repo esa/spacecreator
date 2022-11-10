@@ -1,9 +1,9 @@
 -- DRIVER CONFIGURATION MODEL [user-editable]
 -- Shall contain definition of Driver Configuration.
 -- This file will be used by ocarina-components.aadl and Board1.xml.
-DRIVER-CONFIGURATION DEFINITIONS ::= BEGIN
+%{ProjectNameUpperCase}-DRIVER-CONFIGURATION DEFINITIONS ::= BEGIN
     
-    %{DVPartiton}-Conf-T ::= SEQUENCE {
+    %{ProjectNameUpperCase}-Conf-T ::= SEQUENCE {
         -- might require example field to compile (ex. InputDataPtr)
     }
 

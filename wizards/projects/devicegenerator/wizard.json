@@ -29,30 +29,26 @@
         },
         {
             "key": "AsnConfigFile",
-            "value": "%{JS: Util.fileName('projectconfiguration', 'asn')}"
+            "value": "%{JS: Util.fileName('%{ProjectName}configuration', 'asn')}"
         },
         {
             "key": "AcnConfigFile",
-            "value": "%{JS: Util.fileName('projectconfiguration', 'acn')}"
+            "value": "%{JS: Util.fileName('%{ProjectName}configuration', 'acn')}"
         },
         {
             "key": "AsnPrivateDataFile",
-            "value": "%{JS: Util.fileName('projectprivatedata', 'asn')}"
+            "value": "%{JS: Util.fileName('%{ProjectName}privatedata', 'asn')}"
         },
         {
             "key": "AcnPrivateDataFile",
-            "value": "%{JS: Util.fileName('projectprivatedata', 'acn')}"
+            "value": "%{JS: Util.fileName('%{ProjectName}privatedata', 'acn')}"
         },
         {
             "key": "IVFile",
             "value": "interfaceview.xml"
         },
         {
-            "key": "Model",
-            "value": "%{JS: '%{ProjectName}'.toUpperCase()}"
-        },
-        {
-            "key": "DVPartiton",
+            "key": "ProjectNameUpperCase",
             "value": "%{JS: '%{ProjectName}'.toUpperCase()}"
         },
         {
