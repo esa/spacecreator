@@ -199,11 +199,11 @@ auto SimulinkImporterPlugin::importSlx() -> void
 
     moveToProjectDirectoryAndPrepareTemporaryWorkingDirectory(m_matlabTemporaryWorkingDirectory);
 
-    const QString matlabCallParams = generateMatLabCallParams(*workspaceFileInfo, *inputFilePath);
+    const QStringList matlabCallArguments = generateMatLabCallArguments(*workspaceFileInfo, *inputFilePath);
 
-    printInfoInGeneralMessages(GenMsg::executingMatlabCommand.arg(matlabCallParams));
+    printMatLabCommand(matlabCallArguments);
 
-    if(QProcess().execute("matlab", {"-batch", matlabCallParams}) != 0) {
+    if(QProcess().execute(m_matlabAppName, matlabCallArguments) != 0) {
         printErrorInGeneralMessages(GenMsg::matlabCommandHasFailed);
 
         removeMatLabTemporaryWorkingDirectory();
@@ -308,21 +308,25 @@ auto SimulinkImporterPlugin::printInfoAboutInputs(const QString& inputFilePath, 
     }
 }
 
-auto SimulinkImporterPlugin::generateMatLabCallParams(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString
+auto SimulinkImporterPlugin::generateMatLabCallArguments(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QStringList
 {
     const QString workspaceLoadFunction = generateWorkspaceLoadCallFunction(workspaceFileInfo);
     const QString tasteExporterFunction = generateTasteExporterCallFunction(inputFilePath);
 
+    QString matlabBatchArgument;
+
     if(workspaceLoadFunction.isEmpty()) {
-        return m_matlabCommandWithoutWorkspaceLoadTemplate
-                .arg(m_matlabTemporaryWorkingDirectory)
-                .arg(tasteExporterFunction);
+        matlabBatchArgument = m_matlabCommandWithoutWorkspaceLoadTemplate
+                                .arg(m_matlabTemporaryWorkingDirectory)
+                                .arg(tasteExporterFunction);
     } else {
-        return m_matlabCommandWithWorkspaceLoadTemplate
-                .arg(m_matlabTemporaryWorkingDirectory)
-                .arg(workspaceLoadFunction)
-                .arg(tasteExporterFunction);
+        matlabBatchArgument = m_matlabCommandWithWorkspaceLoadTemplate
+                                .arg(m_matlabTemporaryWorkingDirectory)
+                                .arg(workspaceLoadFunction)
+                                .arg(tasteExporterFunction);
     }
+
+    return {"-batch", matlabBatchArgument};
 }
 
 auto SimulinkImporterPlugin::generateWorkspaceLoadCallFunction(QFileInfo &workspaceFileInfo) -> QString
@@ -729,6 +733,15 @@ auto SimulinkImporterPlugin::printPluginSelfIntroductionInGeneralMessages() -> v
     
     MessageManager::write("");
     MessageManager::write(completeMessage);
+}
+
+auto SimulinkImporterPlugin::printMatLabCommand(const QStringList& matlabCallArguments) -> void
+{
+    const QString matlabCommand = QString("%1 %2")
+                                    .arg(m_matlabAppName)
+                                    .arg(matlabCallArguments.join(' '));
+
+    printInfoInGeneralMessages(GenMsg::executingMatlabCommand.arg(matlabCommand));
 }
 
 auto SimulinkImporterPlugin::printInfoInGeneralMessages(const QString &message) -> void
