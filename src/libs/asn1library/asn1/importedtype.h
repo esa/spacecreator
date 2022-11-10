@@ -59,10 +59,7 @@ namespace std {
 
 template<>
 struct hash<Asn1Acn::ImportedType> {
-    std::size_t operator()(const Asn1Acn::ImportedType &it) const noexcept
-    {
-        return static_cast<size_t>(qHash(it.fullPath()));
-    }
+    std::size_t operator()(const Asn1Acn::ImportedType &it) const noexcept { return qHash(it.fullPath()); }
 };
 
 } // namespace std

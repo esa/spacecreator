@@ -16,7 +16,9 @@ target_link_libraries(tmc
     PRIVATE    Tmc::Verifier
 	           CommonProjectWarnings)
 
-set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_autogen/mocs_compilation.cpp PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_autogen/mocs_compilation.cpp PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
+endif()
 add_format_target(tmc)
 
 set_target_properties(tmc PROPERTIES

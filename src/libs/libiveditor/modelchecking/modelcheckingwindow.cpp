@@ -36,6 +36,13 @@
 #include <QThread>
 #include <conversion/common/escaper/escaper.h>
 
+
+namespace {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using Qt::endl;
+#endif
+}
+
 namespace ive {
 
 struct ModelCheckingWindow::ModelCheckingWindowPrivate {
@@ -1158,7 +1165,12 @@ void ModelCheckingWindow::addSubtypes()
 
         // ADD NEW TREE NODE
         QStringList fileColumn;
-        QFileInfo fileInfo = filePath;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+QFileInfo fileInfo = filePath;
+#else
+QFileInfo fileInfo = QFileInfo(filePath);
+#endif
+
         fileColumn.append(fileInfo.fileName());
         fileColumn.append(fileInfo.filePath());
         QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);

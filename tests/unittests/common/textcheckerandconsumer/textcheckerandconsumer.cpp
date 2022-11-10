@@ -28,9 +28,9 @@
 namespace tests::common {
 
 void TextCheckerAndConsumer::checkSequenceAndConsume(
-        const std::vector<QString> &expectedOutput, QTextStream &actualConsumableOutput)
+        const QStringList &expectedOutput, QTextStream &actualConsumableOutput)
 {
-    for (unsigned int i = 0; i < expectedOutput.size(); i++) {
+    for (int i = 0; i < expectedOutput.size(); i++) {
         const auto &expectedLine = expectedOutput.at(i);
         if (doesStreamContainRequested(actualConsumableOutput, expectedLine)) {
             continue;
@@ -42,7 +42,7 @@ void TextCheckerAndConsumer::checkSequenceAndConsume(
     }
 }
 
-std::vector<QString> TextCheckerAndConsumer::readLinesFromFile(const QString &filename)
+const QStringList TextCheckerAndConsumer::readLinesFromFile(const QString &filename)
 {
     QFile expectedOutFile(filename);
     if (!expectedOutFile.open(QIODevice::ReadOnly)) {
@@ -52,15 +52,12 @@ std::vector<QString> TextCheckerAndConsumer::readLinesFromFile(const QString &fi
 
     const QByteArray expectedData = expectedOutFile.readAll();
     const QString expectedText = QString::fromStdString(expectedData.toStdString());
-    const QStringList expectedStringList = expectedText.split("\n");
-    const QVector<QString> expectedStringVector = expectedStringList.toVector();
-    std::vector<QString> expectedOutput = expectedStringVector.toStdVector();
+    QStringList expectedStringList = expectedText.split("\n");
 
-    for (auto &out : expectedOutput) {
+    for (auto &out : expectedStringList) {
         out = out.trimmed();
     }
-
-    return expectedOutput;
+    return expectedStringList;
 }
 
 bool TextCheckerAndConsumer::doesStreamContainRequested(QTextStream &streamToVerify, const QString &requestedString)

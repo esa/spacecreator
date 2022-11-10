@@ -507,7 +507,7 @@ void TmcVerifier::generateReport()
 
     QString report = builder.parseAndBuildHtmlReport(spinMessages, sclFiles, rawErrorItems, QStringList());
 
-    QFileInfo reportFilepath = m_outputDirectory + QDir::separator() + "report.html";
+    QFileInfo reportFilepath = QFileInfo(m_outputDirectory + QDir::separator() + "report.html");
     saveReport(reportFilepath, report);
     if (m_executeMode == ExecuteMode::ConvertAndVerify) {
         presentReport(reportFilepath);

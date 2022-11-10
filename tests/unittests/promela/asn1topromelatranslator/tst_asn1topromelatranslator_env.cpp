@@ -493,7 +493,7 @@ void compareTextFiles(const QString &actualOutputFilename, const QString &expect
 
     const QString expectedFilepath = QString("resources%1%2").arg(QDir::separator()).arg(expectedOutputFilename);
     try {
-        const std::vector<QString> expectedOutput = TextCheckerAndConsumer::readLinesFromFile(expectedFilepath);
+        const QStringList expectedOutput = TextCheckerAndConsumer::readLinesFromFile(expectedFilepath);
         TextCheckerAndConsumer::checkSequenceAndConsume(expectedOutput, consumableOutput);
     } catch (const std::exception &e) {
         QFAIL(e.what());

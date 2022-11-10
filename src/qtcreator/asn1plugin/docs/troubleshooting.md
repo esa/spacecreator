@@ -5,7 +5,7 @@ The plugin is strongly bonded with ASN1SCC compiler, as its functionality relies
 ## How-tos
 
 ### How to change service settings?
-See [Configuration](configuration.html).
+See [Configuration](configuration.md).
 
 ### How to know something is wrong?
 The issues with service configuration can be observed inside widgets which present data structures: ASN.1 Types View and Outline. The widgets should show populated tree of a data structures defined inside the project loaded in IDE. If loaded project is valid and contains the data to be shown, but the widgets are still empty (Outline) or contain only project name (ASN.1 Types View), this is a sign of issues in service communication.

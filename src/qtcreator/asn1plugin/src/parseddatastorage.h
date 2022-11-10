@@ -33,6 +33,8 @@
 
 #include <utils/fileutils.h>
 
+#if QTC_VERSION == 408
+
 #include "asn1/file.h"
 #include "asn1/root.h"
 
@@ -90,6 +92,72 @@ private:
     std::unique_ptr<Asn1Acn::Root> m_root;
     mutable QMutex m_documentsMutex;
 };
+
+#endif
+
+#if QTC_VERSION == 800
+
+#include <utils/filepath.h>
+
+#include "asn1/file.h"
+#include "asn1/root.h"
+
+namespace Asn1Acn {
+namespace Internal {
+
+class ParsedDataStorage : public QObject
+{
+    Q_OBJECT
+
+public:
+    ParsedDataStorage();
+    ~ParsedDataStorage() = default;
+
+    static ParsedDataStorage *instance();
+
+    const Asn1Acn::Root *root() const { return m_root.get(); }
+
+    void addProject(const QString &projectName);
+    void removeProject(const QString &projectName);
+
+    void addFileToProject(const QString &projectName, std::unique_ptr<Asn1Acn::File> file);
+    void removeFileFromProject(const QString &projectName, const Utils::FilePath &filePath);
+
+    Asn1Acn::File *getAnyFileForPath(const Utils::FilePath &filePath) const;
+    Asn1Acn::File *getFileForPathFromProject(const QString &project, const Utils::FilePath &path);
+
+    const QStringList getProjectsForFile(const Utils::FilePath &filePath) const;
+    const Utils::FilePaths getFilesPathsFromProject(const QString &project) const;
+
+    Asn1Acn::SourceLocation getDefinitionLocation(const Utils::FilePath &path,
+                                                  const QString &typeAssignmentName,
+                                                  const QString &definitionsName) const;
+    const Asn1Acn::TypeAssignment *getTypeAssignment(const Utils::FilePath &path,
+                                                     const QString &typeAssignmentName,
+                                                     const QString &definitionsName) const;
+
+    int getProjectBuildersCount(const QString &projectName) const;
+    void setProjectBuildersCount(const QString &projectName, const int version) const;
+    void resetProjectBuildersCount();
+
+    int getProjectsCount();
+    int getDocumentsCount();
+
+private:
+    const QStringList getProjectsForFileInternal(const Utils::FilePath &filePath) const;
+    const Utils::FilePaths getFilesPathsFromProjectInternal(const QString &projectName) const;
+    void removeFileFromProjectInternal(const QString &projectName, const Utils::FilePath &filePath);
+
+    Asn1Acn::File *getFileForPathInternal(const Utils::FilePath &filePath) const;
+
+    Asn1Acn::SourceLocation getLocationFromModule(const Asn1Acn::Definitions &moduleDefinition,
+                                                  const QString &typeAssignmentName) const;
+
+    std::unique_ptr<Asn1Acn::Root> m_root;
+    mutable QMutex m_documentsMutex;
+};
+
+#endif
 
 } // namespace Internal
 } // namespace Asn1Acn

@@ -69,6 +69,7 @@ protected:
 
     QPointF cursorInScene() const;
     QPointF cursorInScene(const QPoint &screenPos) const;
+    QPointF cursorInScene(const QMouseEvent *e) const;
 
     bool eventFilter(QObject *watched, QEvent *event) override;
 

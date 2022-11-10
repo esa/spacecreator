@@ -20,7 +20,9 @@ target_link_libraries(TmcVerifier
                ${QT_CORE}
     PRIVATE    CommonProjectWarnings)
 
-set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_autogen/mocs_compilation.cpp PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_autogen/mocs_compilation.cpp PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
+endif()
 
 add_format_target(TmcVerifier)
 add_tidy_target(TmcVerifier)
