@@ -603,9 +603,12 @@ void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
     }
 
     // build and run the interactive simulator
-    QString callSimCmd = "xterm -hold -e make simu";
-    if (QProcess::execute(callSimCmd) != 0) {
-        QMessageBox::warning(this, tr("Interactive Simulator"), "Error executing: " + callSimCmd);
+    QString xterm_cmd = "xterm";
+    QStringList arguments;
+    arguments << "-hold" << "-e" << "make" << "simu";
+    QString full_cmd = xterm_cmd + " " + arguments.join(" ");
+    if (QProcess::execute(xterm_cmd, arguments) != 0) {
+        QMessageBox::warning(this, tr("Interactive Simulator"), "Error executing: " + full_cmd);
     }
 }
 
@@ -621,8 +624,12 @@ void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
 
     // build and run the exhaustive simulator
     QString callSimCmd = "xterm -hold -e make native_modelchecker";
-    if (QProcess::execute(callSimCmd) != 0) {
-        QMessageBox::warning(this, tr("Exhaustive Simulator"), "Error executing: " + callSimCmd);
+    QString xterm_cmd = "xterm";
+    QStringList arguments;
+    arguments << "-hold" << "-e" << "make" << "native_modelchecker";
+    QString full_cmd = xterm_cmd + " " + arguments.join(" ");
+    if (QProcess::execute(xterm_cmd, arguments) != 0) {
+        QMessageBox::warning(this, tr("Exhaustive Simulator"), "Error executing: " + full_cmd);
     }
 }
 
@@ -649,9 +656,13 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QDir::setCurrent(this->projectDir + "/");
 
     // REMOVE statusfile, callif.sh
-    QString rmFilesCmd = "rm -f statusfile callif.sh";
-    if (QProcess::execute(rmFilesCmd) != 0) {
-        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + rmFilesCmd);
+    QString rm_cmd = "rm";
+    QStringList arguments;
+    arguments << "-f" << "statusfile" << "callif.sh";
+    QString full_cmd = rm_cmd + " " + arguments.join(" ");
+
+    if (QProcess::execute(rm_cmd, arguments) != 0) {
+        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + full_cmd);
     }
 
     // REMOVE output dir, if existing
@@ -678,9 +689,13 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     }
 
     // CALL IF make rule via terminal, saving make return in statusfile
-    QString callIFCmd = "xterm -hold -e sh callif.sh";
-    if (QProcess::execute(callIFCmd) != 0) {
-        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + callIFCmd);
+    QString xterm_cmd = "xterm";
+    QStringList callif_arguments;
+    callif_arguments << "-hold" << "-e" << "sh" << "callif.sh";
+    QString full_callif_cmd = xterm_cmd + " " + callif_arguments.join(" ");
+
+    if (QProcess::execute(xterm_cmd, callif_arguments) != 0) {
+        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + full_callif_cmd);
     }
 
     // READ statusfile with make return value
@@ -961,14 +976,13 @@ bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &pro
 {
     const QProcess *const makeCommandProcess = new QProcess(this);
     const QString makeCommand = "make";
-
     QStringList arguments;
+    QString full_cmd = makeCommand + " " + arguments.join(" ");
     arguments << makeRule << "NAME=" + propertyName;
     if (makeCommandProcess->execute(makeCommand, arguments)) {
-        QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(makeCommand));
+        QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(full_cmd));
         return false;
     }
-
     return true;
 }
 
@@ -1179,17 +1193,17 @@ void ModelCheckingWindow::addSubtypes()
 
         // CALL MAKE RULE
         // first set path to project dir
-        QString qDirAppPath = QDir::currentPath();
-        QDir::setCurrent(this->projectDir + "/");
-        if (QProcess::execute("make create-subtype NAME=" + subtypingFileName) != 0) {
+        auto process = new QProcess(this);
+        process->setWorkingDirectory(this->projectDir);
+        QString make_cmd = "make";
+        QStringList arguments;
+        arguments << "create-subtype" << "NAME=" + subtypingFileName;
+        if (process->execute(make_cmd, arguments) != 0) {
             QMessageBox::warning(this, tr("Add subtypes"),
                     tr("Error executing 'make create-subtype NAME=%1'").arg(subtypingFileName));
-            // reset path
-            QDir::setCurrent(qDirAppPath);
+
             return;
         }
-        // reset path
-        QDir::setCurrent(qDirAppPath);
 
         // ADD NEW TREE NODE
         QStringList fileColumn;
@@ -1258,18 +1272,22 @@ void ModelCheckingWindow::deleteProperty()
             "Do you confirm you want to delete property " + fileOrDir + " " + fileInfo.fileName() + "?",
             QMessageBox::Yes | QMessageBox::No);
 
+    QStringList args;
     if (ret == QMessageBox::Yes) {
         if (fileOrDir == "folder") { // is directory
-            if (QProcess::execute("rm -r " + this->propertiesPath + "/" + fileInfo.fileName()) != 0) {
+            args << "-r" << this->propertiesPath + "/" + fileInfo.fileName();
+            if (QProcess::execute("rm", args) != 0) {
                 QMessageBox::warning(this, tr("Delete property"), "Error rm command");
                 return;
             }
         } else { // is file
-            if (QProcess::execute("rm " + this->propertiesPath + "/" + parent + "/" + fileInfo.fileName()) != 0) {
+            args << this->propertiesPath + "/" + parent + "/" + fileInfo.fileName();
+            if (QProcess::execute("rm", args) != 0) {
                 QMessageBox::warning(this, tr("Delete property"), "Error rm command");
                 return;
             }
         }
+
         // delete tree node
         d->ui->treeWidget_properties->currentItem()->parent()->removeChild(d->ui->treeWidget_properties->currentItem());
 
