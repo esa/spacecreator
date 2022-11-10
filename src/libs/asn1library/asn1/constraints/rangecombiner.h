@@ -38,12 +38,14 @@ template<typename ValueType>
 class RangeCombiner final
 {
 public:
-    static std::optional<Range<typename ValueType::Type>> combineRanges(const ConstraintList<ValueType> *constraintList);
+    static std::optional<Range<typename ValueType::Type>> combineRanges(
+            const ConstraintList<ValueType> *constraintList);
     static std::optional<Range<typename ValueType::Type>> combineRange(const Constraint<ValueType> *constraint);
 };
 
 template<typename ValueType>
-std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combineRanges(const ConstraintList<ValueType> *constraintList)
+std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combineRanges(
+        const ConstraintList<ValueType> *constraintList)
 {
     const auto &constraints = constraintList->constraints();
 
@@ -51,8 +53,8 @@ std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combine
         return std::nullopt;
     }
 
-    return std::accumulate(std::next(constraints.begin()), constraints.end(),
-            combineRange(constraints[0].get()), [&](const auto &range, const auto &constraint) {
+    return std::accumulate(std::next(constraints.begin()), constraints.end(), combineRange(constraints[0].get()),
+            [&](const auto &range, const auto &constraint) {
                 auto combinedRange = combineRange(constraint.get());
 
                 if (!combinedRange) {
@@ -66,7 +68,8 @@ std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combine
 }
 
 template<typename ValueType>
-std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combineRange(const Constraint<ValueType> *constraint)
+std::optional<Range<typename ValueType::Type>> RangeCombiner<ValueType>::combineRange(
+        const Constraint<ValueType> *constraint)
 {
     if (!constraint) {
         return std::nullopt;

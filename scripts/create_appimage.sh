@@ -68,6 +68,7 @@ cp ${BUILD_DIR}/lib/qtcreator/plugins/* ${APP_DIR}/lib/qtcreator/plugins
 cp ${BUILD_DIR}/asn1scc_bin/* ${APP_DIR} -r
 cp ${PROJECT_ROOT}/wizards/files/* ${APP_DIR}/share/qtcreator/templates/wizards/files -r
 cp ${PROJECT_ROOT}/wizards/projects/* ${APP_DIR}/share/qtcreator/templates/wizards/projects -r
+cp ${PROJECT_ROOT}/src/qtcreator/spacecreatorplugin/scl/generic-highlighter/scl.xml ${APP_DIR}/share/qtcreator/generic-highlighter
 cp ${PROJECT_ROOT}/src/qtcreator/asn1plugin/generic-highlighter/syntax/* ${APP_DIR}/share/qtcreator/generic-highlighter
 cp ${PROJECT_ROOT}/src/qtcreator/asn1plugin/snippets ${APP_DIR}/share/qtcreator -r
 cp ${BUILD_DIR}/grantlee/build/templates/lib/libGrantlee_Templates.* ${APP_DIR}/lib/Qt/lib

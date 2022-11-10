@@ -34,6 +34,8 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QStandardPaths>
+#include <QDir>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <editormanager/editormanager.h>
 #include <libiveditor/interfacedocument.h>

@@ -33,6 +33,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Generated files should be in the include path
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# Set up Qt stuff:
+
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Concurrent Core Gui Network Svg Test Widgets Xml REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Concurrent Core Gui Network Svg Test WebSockets Widgets Xml REQUIRED)
 
@@ -40,7 +42,6 @@ if(${QT_VERSION_MAJOR} STREQUAL "6")
     find_package(Qt6 COMPONENTS Core5Compat SvgWidgets REQUIRED)
 endif()
 
-# Set up Qt stuff:
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -66,17 +67,14 @@ if (WIN32)
     get_target_property(QtCore_location ${QT_CORE} LOCATION)
     get_filename_component(QT_DIR ${QtCore_location} DIRECTORY)
     get_filename_component(QT_DIR ${QT_DIR} DIRECTORY)
-    set(Grantlee5_DIR "${QT_DIR}/lib/cmake/Grantlee5")
-    # message("Grantlee cmake dir: ${Grantlee5_DIR}")
 endif()
-find_package(Grantlee5 REQUIRED)
+
+find_package(Grantlee5 CONFIG REQUIRED)
 
 include(QtCreatorCheck)
 if (${QTC_FOUND})
     add_definitions(-DQTC_VERSION=${QTC_VERSION})
-    if (QTC_VERSION EQUAL 408)
-        message(STATUS "ASN.1 plugin is build")
-    endif()
+    message(STATUS "QtCreator version is ${QTC_VERSION}")
     include(QtCreatorIDEBranding)
     include(QtCreatorAPI)
 endif()
@@ -129,15 +127,13 @@ if(UNIX)
 # ASN1 compiler
 add_subdirectory(asn1scc)
 
-# install grantlee
-install(FILES /usr/lib/libGrantlee_Templates.so /usr/lib/libGrantlee_Templates.so.5 /usr/lib/libGrantlee_Templates.so.5.2.0 DESTINATION /usr/lib)
-install(DIRECTORY /usr/lib/grantlee DESTINATION /usr/lib)
 
+# Packaging
 set (CPACK_PACKAGE_NAME "${SC_NAME}")
 set (CPACK_PACKAGE_VENDOR "European Space Agency")
 set (CPACK_PACKAGE_HOMEPAGE_URL "https://taste.tools/")
 set (CPACK_PACKAGE_CONTACT "Maxime Perrotin")
-set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "QtCrator plugins for the TASTE project.")
+set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "QtCreator plugins for the TASTE project.")
 set (CPACK_PACKAGE_VERSION_MAJOR "${SC_VERSION_MAJOR}")
 set (CPACK_PACKAGE_VERSION_MINOR "${SC_VERSION_MINOR}")
 set (CPACK_PACKAGE_VERSION_MINOR "${SC_VERSION_PATCH}")

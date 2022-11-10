@@ -61,7 +61,7 @@ void DimensionTranslator::translateSizeDimension(
         dimensionSize = *m_threshold;
     }
 
-    if (dimensionSize > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+    if (dimensionSize > static_cast<::seds::model::PositiveLong::Value>(std::numeric_limits<Asn1Acn::IntegerValue::Type>::max())) {
         const auto message = QString("Dimension size (%1) overflows ASN.1 range").arg(dimensionSize);
         throw TranslationException(message);
     }
