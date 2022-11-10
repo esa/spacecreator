@@ -201,7 +201,6 @@ ModelCheckingWindow::~ModelCheckingWindow()
 /*!
  * \brief ModelCheckingWindow::callTasteGens Calls any needed TASTE generators.
  */
-
 void ModelCheckingWindow::callTasteGens(bool toggled)
 {
     if (!toggled) {
@@ -237,7 +236,6 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
     }
 }
-
 
 /*!
  * \brief ModelCheckingWindow::listProperties Recursive function creating a tree of QTreeWidgetItem reflecting the
