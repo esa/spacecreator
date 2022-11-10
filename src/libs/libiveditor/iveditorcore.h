@@ -118,7 +118,7 @@ private:
 
     QPointer<ivm::AbstractSystemChecks> m_checks;
 
-    IVAppWidget *m_mainWidget = nullptr;
+    QPointer<IVAppWidget> m_mainWidget;
 };
 
 }

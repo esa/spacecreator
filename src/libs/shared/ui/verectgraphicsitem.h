@@ -72,6 +72,7 @@ private Q_SLOTS:
     void onGeometryChanged();
 
 private:
+    bool m_overridingCursor = false;
     QSet<VEInteractiveObject *> m_collidedItems;
 };
 

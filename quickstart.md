@@ -32,6 +32,9 @@ and some libraries to compile against.
 **Apt**<br>
 Install tools by typing: <br>
 `$ apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect`
+> Note: If the above line fails type <br> 
+> `$ sudo apt-get install python3-dev python3-wheel `<br>
+> and try again.
 
 **CMake** <br>
 Because Qt 6 requires CMake 3.16 or later, we need to install a backport when running Debian 10 (buster). 
@@ -101,11 +104,13 @@ will create a folder (~/project/spacecreatorenv6) containing (among other) the f
 Running the following command will build the SpaceCreator plugin:
 ```commandline
 ~/project/spacecreator$ python3 ./scripts/build_spacecreator.py
---build_dir $HOME/project/spacecreator_build
---build_type Release
---env_dir $HOME/project/spacecreatorenv6
+--project_dir $HOME/project/spacecreator/
+--app_dir $HOME/project/spacecreatorenv6/spacecreator.AppDir 
+--env_dir $HOME/project/spacecreatorenv6 
+--build_dir $HOME/project/spacecreator_build 
+--build_type Release 
+--no_build_asn1plugin
 ```
-
 
 This will build the plugin in `$HOME/project/spacecreator_build` which is outside the source tree
 
@@ -155,7 +160,7 @@ We need to have QtCreator run the postbuild.py script after the build stop, so w
 `python3` and the arguments are:
 
 `%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=/home/taste/project/spacecreatorenv6/spacecreator.AppDir`
-
+%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=$HOME/project/spacecreatorenv6/spacecreator.AppDir
 This will call the correct **postbuild.py** script and tell it where the plugins were build and where to put them.<br>
 The variables `%{ActiveProject:Path}` and `%{buildDir}` are substituted by QtCreator.
 

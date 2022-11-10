@@ -61,7 +61,6 @@ private:
     auto searchAndCheckMatLabModelWorkspaceFile(const QString& inputFilePath) -> std::optional<QFileInfo>;
     auto printInfoAboutInputs(const QString& inputFilePath, const QString& functionBlockName, const QString& inputWorkspaceFilePath = QString()) -> void;
 
-    auto prepareMatLabTemporaryWorkingDirectory() -> void;
     auto generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString;
     auto generateWorkspaceLoadCallFunction(QFileInfo &workspaceFileInfo) -> QString;
     auto generateTasteExporterCallFunction(const QString& inputFilePath) -> QString;
@@ -88,8 +87,10 @@ private:
     auto addGeneratedAsn1FilesToCurrentProject(const QStringList &generatedAsn1FileNames) -> void;
     auto isFileIsOneOfMatLabStandardDataTypesFiles(const QString &fileName) -> bool;
 
-    auto removeConvertersTemporaries(const QStringList &generatedAsn1FileNames) -> void;
-    auto removeMatLabCommandTemporaries() -> void;
+    auto moveToProjectDirectoryAndPrepareTemporaryWorkingDirectory(const QString& temporaryWorkingDirectoryName) -> void;
+
+    auto moveToProjectDirectoryAndRemoveConvertersTemporaryWorkingDirectory() -> void;
+    auto removeMatLabTemporaryWorkingDirectory() -> void;
 
     auto checkIfFileExistsAndRemoveIt(const QString &filePath) -> void;
 
@@ -102,6 +103,7 @@ private:
 
     const QString m_temporaryIvFileName = "tmp-interfaceview.xml";
     const QString m_functionBlockDefaultImplementation = "QGenC";
+    const QString m_convertersTemporaryWorkingDirectory = "converters_temporary_working_directory";
     const QString m_matlabTemporaryWorkingDirectory = "matlab_temporary_working_directory";
     const QString m_tasteExporterOutputDirectory = "exported";
     const QString m_defaultFunctionBlockName = "simulink";
@@ -120,5 +122,6 @@ private:
 
     QMenu *m_simulinkMenu = nullptr;
     ProjectExplorer::Project *m_currentProject = nullptr;
+    QString m_currentProjectDirectoryPath;
 };
 }

@@ -33,7 +33,10 @@ BaseTool::BaseTool(QGraphicsView *view, QObject *parent)
 
 BaseTool::~BaseTool()
 {
-    setActive(false); // uninstall view's eventFilter
+    removePreviewItem();
+    if (m_view && m_view->viewport()) {
+        m_view->viewport()->removeEventFilter(this);
+    }
 }
 
 bool BaseTool::isActive() const

@@ -311,10 +311,16 @@ void VERectGraphicsItem::onGeometryChanged()
     m_collidedItems = items;
 
     if (m_collidedItems.isEmpty()) {
-        qApp->restoreOverrideCursor();
+        if (m_overridingCursor) {
+            qApp->restoreOverrideCursor();
+            m_overridingCursor = false;
+        }
         clearHighlight();
     } else {
-        qApp->setOverrideCursor(Qt::ForbiddenCursor);
+        if (!m_overridingCursor) {
+            qApp->setOverrideCursor(Qt::ForbiddenCursor);
+            m_overridingCursor = true;
+        }
     }
 }
 

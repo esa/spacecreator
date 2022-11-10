@@ -1,0 +1,18 @@
+BASICCDRDEMO-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   TInteger ::= INTEGER (0 .. 1000000)
+
+   TConfig ::= SEQUENCE {
+       param-a TInteger,
+       param-b TInteger
+   }
+
+   TReport ::= SEQUENCE {
+       reading TInteger,
+       ctrl TInteger,
+       feedback TInteger
+   }
+
+END
+
