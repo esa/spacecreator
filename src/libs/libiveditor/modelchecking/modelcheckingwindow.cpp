@@ -529,11 +529,10 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
         arguments << item->text(1);
     }
 
-    QString cmd = program + " " + arguments.join(" ");
-
-    QProcess *p = new QProcess();
+    auto p = new QProcess(this);
     p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
+        QString cmd = program + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Open property"), tr("Error when calling '%1'.").arg(cmd));
         return;
     }
@@ -554,10 +553,10 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetI
     QString program = "spacecreator.AppImage";
     QStringList arguments;
     arguments << "-client" << item->text(1);
-    QString cmd = program + " " + arguments.join(" ");
-    QProcess *p = new QProcess();
+    auto p = new QProcess(this);
     p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
+        QString cmd = program + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Open subtyping"), tr("Error when calling '%1'.").arg(cmd));
         return;
     }
@@ -606,8 +605,8 @@ void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
     QString xterm_cmd = "xterm";
     QStringList arguments;
     arguments << "-hold" << "-e" << "make" << "simu";
-    QString full_cmd = xterm_cmd + " " + arguments.join(" ");
     if (QProcess::execute(xterm_cmd, arguments) != 0) {
+        QString full_cmd = xterm_cmd + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Interactive Simulator"), "Error executing: " + full_cmd);
     }
 }
@@ -627,8 +626,8 @@ void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
     QString xterm_cmd = "xterm";
     QStringList arguments;
     arguments << "-hold" << "-e" << "make" << "native_modelchecker";
-    QString full_cmd = xterm_cmd + " " + arguments.join(" ");
     if (QProcess::execute(xterm_cmd, arguments) != 0) {
+        QString full_cmd = xterm_cmd + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Exhaustive Simulator"), "Error executing: " + full_cmd);
     }
 }
@@ -659,9 +658,10 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QString rm_cmd = "rm";
     QStringList arguments;
     arguments << "-f" << "statusfile" << "callif.sh";
-    QString full_cmd = rm_cmd + " " + arguments.join(" ");
+
 
     if (QProcess::execute(rm_cmd, arguments) != 0) {
+        QString full_cmd = rm_cmd + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Call IF"), "Error executing: " + full_cmd);
     }
 
@@ -692,9 +692,9 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QString xterm_cmd = "xterm";
     QStringList callif_arguments;
     callif_arguments << "-hold" << "-e" << "sh" << "callif.sh";
-    QString full_callif_cmd = xterm_cmd + " " + callif_arguments.join(" ");
 
     if (QProcess::execute(xterm_cmd, callif_arguments) != 0) {
+        QString full_callif_cmd = xterm_cmd + " " + callif_arguments.join(" ");
         QMessageBox::warning(this, tr("Call IF"), "Error executing: " + full_callif_cmd);
     }
 
@@ -786,7 +786,7 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
         arguments << item->text(1);
     }
 
-    QProcess *p = new QProcess();
+    auto p = new QProcess();
     p->start(program, arguments);
 
     if (!p->waitForStarted(10000)) {
@@ -974,12 +974,12 @@ QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyT
 
 bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &propertyName)
 {
-    const QProcess *const makeCommandProcess = new QProcess(this);
+    auto makeCommandProcess = new QProcess(this);
     const QString makeCommand = "make";
     QStringList arguments;
-    QString full_cmd = makeCommand + " " + arguments.join(" ");
     arguments << makeRule << "NAME=" + propertyName;
     if (makeCommandProcess->execute(makeCommand, arguments)) {
+        QString full_cmd = makeCommand + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(full_cmd));
         return false;
     }
@@ -1040,7 +1040,7 @@ bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(
         return false;
     }
 
-    const QProcess *const sedCommandProcess = new QProcess(this);
+    auto sedCommandProcess = new QProcess(this);
     const QString sedCommand = sedCommandForWhenThenPropertyTemplate.arg(propertyName).arg(newPropertyFilePath);
 
     if (sedCommandProcess->execute(sedCommand)) {
