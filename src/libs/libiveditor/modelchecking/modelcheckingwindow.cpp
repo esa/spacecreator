@@ -656,7 +656,6 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QStringList arguments;
     arguments << "-f" << "statusfile" << "callif.sh";
 
-
     if (QProcess::execute(rmCmd, arguments) != 0) {
         QString fullCmd = rmCmd + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Call IF"), "Error executing: " + fullCmd);
