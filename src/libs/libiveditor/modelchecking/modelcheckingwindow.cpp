@@ -209,43 +209,33 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     }
 
     // CALL MAKE SKELETONS
-    QString makeSkeletonsCall = "make skeletons";
-    QProcess *makeSkeletonsCallerProcess = new QProcess(this);
+    auto makeSkeletonsCallerProcess = new QProcess(this);
     makeSkeletonsCallerProcess->setWorkingDirectory(this->projectDir + "/");
-    QString program = "make";
+    QString make_cmd = "make";
     QStringList arguments;
     arguments << "skeletons";
-    // set path to project dir
-    QDir::setCurrent(this->projectDir + "/");
-    if (makeSkeletonsCallerProcess->execute(program, arguments) != 0) {
+    if (makeSkeletonsCallerProcess->execute(make_cmd, arguments) != 0) {
         QMessageBox::warning(this, tr("Make skeletons call"), "Error when making skeletons!");
     }
 
     // CALL MAKE DEPLOYMENT
-    QString makeDeploymentCall = "make DeploymentView.aadl";
-    QProcess *makeDeploymentCallerProcess = new QProcess(this);
-    // set path to project dir
-    QString qDirAppPath = QDir::currentPath();
-    QDir::setCurrent(this->projectDir + "/");
-
-    if (makeDeploymentCallerProcess->execute(makeDeploymentCall) != 0) {
+    auto makeDeploymentCallerProcess = new QProcess(this);
+    QStringList deploy_arguments;
+    deploy_arguments << "DeploymentView.aadl";
+    makeSkeletonsCallerProcess->setWorkingDirectory(this->projectDir + "/");
+    if (makeDeploymentCallerProcess->execute(make_cmd, deploy_arguments) != 0) {
         QMessageBox::warning(this, tr("Make deployment call"), "Error when making deployment view!");
     }
-    // reset path
-    QDir::setCurrent(qDirAppPath);
-
-    // set path to project dir
-    qDirAppPath = QDir::currentPath();
-    QDir::setCurrent(this->projectDir + "/");
 
     // CALL KAZOO
-    QString kazooCall = "kazoo -gw --glue -t MOCHECK";
-    QProcess *kazooCallerProcess = new QProcess(this);
-    if (kazooCallerProcess->execute(kazooCall) != 0) {
+    QString kazoo_cmd = "kazoo";
+    QStringList kazoo_arguments;
+    kazoo_arguments << "-gw" << "--glue" << "-t" << "MOCHECK";
+    auto kazooCallerProcess = new QProcess(this);
+    kazooCallerProcess->setWorkingDirectory(this->projectDir + "/");
+    if (kazooCallerProcess->execute(kazoo_cmd, kazoo_arguments) != 0) {
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
     }
-    // reset path
-    QDir::setCurrent(qDirAppPath);
 }
 
 
