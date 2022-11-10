@@ -239,7 +239,7 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
 
     // CALL KAZOO
     QString kazooCall = "kazoo -gw --glue -t MOCHECK";
-
+    QProcess *kazooCallerProcess = new QProcess(this);
     if (kazooCallerProcess->execute(kazooCall) != 0) {
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
     }
