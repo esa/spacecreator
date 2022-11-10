@@ -201,6 +201,7 @@ ModelCheckingWindow::~ModelCheckingWindow()
 /*!
  * \brief ModelCheckingWindow::callTasteGens Calls any needed TASTE generators.
  */
+#if (QT_VERSION <= QT_VERSION_CHECK(5, 13, 0))
 void ModelCheckingWindow::callTasteGens(bool toggled)
 {
     if (!toggled) {
@@ -225,24 +226,78 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     // set path to project dir
     qDirAppPath = QDir::currentPath();
     QDir::setCurrent(this->projectDir + "/");
+
     if (makeDeploymentCallerProcess->execute(makeDeploymentCall) != 0) {
         QMessageBox::warning(this, tr("Make deployment call"), "Error when making deployment view!");
     }
     // reset path
     QDir::setCurrent(qDirAppPath);
 
-    // CALL KAZOO
-    QString kazooCall = "kazoo -gw --glue -t MOCHECK";
-    QProcess *kazooCallerProcess = new QProcess(this);
     // set path to project dir
     qDirAppPath = QDir::currentPath();
     QDir::setCurrent(this->projectDir + "/");
+
+    // CALL KAZOO
+    QString kazooCall = "kazoo -gw --glue -t MOCHECK";
+
     if (kazooCallerProcess->execute(kazooCall) != 0) {
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
     }
     // reset path
     QDir::setCurrent(qDirAppPath);
 }
+#else
+void ModelCheckingWindow::callTasteGens(bool toggled)
+{
+    if (!toggled) {
+        return;
+    }
+
+    // CALL MAKE SKELETONS
+    QString makeSkeletonsCall = "make skeletons";
+    QProcess *makeSleletonsCallerProcess = new QProcess(this);
+    // set path to project dir
+    QString qDirAppPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir + "/");
+    if (makeSleletonsCallerProcess->execute(makeSkeletonsCall) != 0) {
+        QMessageBox::warning(this, tr("Make skeletons call"), "Error when making skeletons!");
+    }
+    // reset path
+    QDir::setCurrent(qDirAppPath);
+
+    // CALL MAKE DEPLOYMENT
+    QString makeDeploymentCall = "make DeploymentView.aadl";
+    QProcess *makeDeploymentCallerProcess = new QProcess(this);
+    // set path to project dir
+    qDirAppPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir + "/");
+
+    if (makeDeploymentCallerProcess->execute(makeDeploymentCall) != 0) {
+        QMessageBox::warning(this, tr("Make deployment call"), "Error when making deployment view!");
+    }
+    // reset path
+    QDir::setCurrent(qDirAppPath);
+
+    // set path to project dir
+    qDirAppPath = QDir::currentPath();
+    QDir::setCurrent(this->projectDir + "/");
+
+    // CALL KAZOO
+    QString kazooCall = "kazoo -gw --glue -t MOCHECK";
+    QString kazooProgram = "kazoo";
+    QStringList kazooArguments = {"-gw", "--glue", "-t", "MOCHECK"};
+    QProcess *kazooCallerProcess = new QProcess(this);
+
+    kazooCallerProcess->setProgram("kazoo");
+    kazooCallerProcess->setArguments(kazooArguments);
+    if (kazooCallerProcess->execute(kazooCall) != 0) {
+        QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
+    }
+    // reset path
+    QDir::setCurrent(qDirAppPath);
+}
+#endif
+
 
 /*!
  * \brief ModelCheckingWindow::listProperties Recursive function creating a tree of QTreeWidgetItem reflecting the
