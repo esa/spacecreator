@@ -783,7 +783,7 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
         arguments << item->text(1);
     }
 
-    auto p = new QProcess();
+    auto p = new QProcess(this);
     p->start(program, arguments);
 
     if (!p->waitForStarted(10000)) {
