@@ -571,9 +571,7 @@ void IvToPromelaTranslator::generateProctype(
 
     // process sdl process
     {
-        qDebug() << "generate proctype  " << functionName << "::" << proctypeInfo.m_interfaceName;
         const QString currentChannelName = proctypeInfo.m_queueName;
-        qDebug() << "currentChannelName " << currentChannelName;
 
         const QString piName = environment
                 ? QString()
@@ -604,9 +602,7 @@ void IvToPromelaTranslator::generateProctype(
 
     // process all observers
     for (auto iter = proctypeInfo.m_observers.begin(); iter != proctypeInfo.m_observers.end(); ++iter) {
-        qDebug() << "Observer " << (*iter)->m_observerName << " " << (*iter)->m_observerInterface;
         const QString currentChannelName = (*iter)->m_observerQueue;
-        qDebug() << "currentChannelName " << currentChannelName;
 
         loopSequence->appendElement(generateProcessMessageBlock((*iter)->m_observerName, currentChannelName,
                 observerInputSignalName(**iter), proctypeInfo.m_parameterTypeName, signalParameterName, mainLoopLabel,
