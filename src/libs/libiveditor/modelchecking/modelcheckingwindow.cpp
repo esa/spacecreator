@@ -211,29 +211,29 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     // CALL MAKE SKELETONS
     auto makeSkeletonsCallerProcess = new QProcess(this);
     makeSkeletonsCallerProcess->setWorkingDirectory(this->projectDir + "/");
-    QString make_cmd = "make";
+    QString makeCmd = "make";
     QStringList arguments;
     arguments << "skeletons";
-    if (makeSkeletonsCallerProcess->execute(make_cmd, arguments) != 0) {
+    if (makeSkeletonsCallerProcess->execute(makeCmd, arguments) != 0) {
         QMessageBox::warning(this, tr("Make skeletons call"), "Error when making skeletons!");
     }
 
     // CALL MAKE DEPLOYMENT
     auto makeDeploymentCallerProcess = new QProcess(this);
-    QStringList deploy_arguments;
-    deploy_arguments << "DeploymentView.aadl";
+    QStringList deployArguments;
+    deployArguments << "DeploymentView.aadl";
     makeSkeletonsCallerProcess->setWorkingDirectory(this->projectDir + "/");
-    if (makeDeploymentCallerProcess->execute(make_cmd, deploy_arguments) != 0) {
+    if (makeDeploymentCallerProcess->execute(makeCmd, deployArguments) != 0) {
         QMessageBox::warning(this, tr("Make deployment call"), "Error when making deployment view!");
     }
 
     // CALL KAZOO
-    QString kazoo_cmd = "kazoo";
-    QStringList kazoo_arguments;
-    kazoo_arguments << "-gw" << "--glue" << "-t" << "MOCHECK";
+    QString kazooCmd = "kazoo";
+    QStringList kazooArgument;
+    kazooArguments << "-gw" << "--glue" << "-t" << "MOCHECK";
     auto kazooCallerProcess = new QProcess(this);
     kazooCallerProcess->setWorkingDirectory(this->projectDir + "/");
-    if (kazooCallerProcess->execute(kazoo_cmd, kazoo_arguments) != 0) {
+    if (kazooCallerProcess->execute(kazooCmd, kazooArguments) != 0) {
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
     }
 }
@@ -602,12 +602,12 @@ void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
     }
 
     // build and run the interactive simulator
-    QString xterm_cmd = "xterm";
+    QString xtermCmd = "xterm";
     QStringList arguments;
     arguments << "-hold" << "-e" << "make" << "simu";
-    if (QProcess::execute(xterm_cmd, arguments) != 0) {
-        QString full_cmd = xterm_cmd + " " + arguments.join(" ");
-        QMessageBox::warning(this, tr("Interactive Simulator"), "Error executing: " + full_cmd);
+    if (QProcess::execute(xtermCmd, arguments) != 0) {
+        QString fullCmd = xtermCmd + " " + arguments.join(" ");
+        QMessageBox::warning(this, tr("Interactive Simulator"), "Error executing: " + fullCmd);
     }
 }
 
@@ -623,12 +623,12 @@ void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
 
     // build and run the exhaustive simulator
     QString callSimCmd = "xterm -hold -e make native_modelchecker";
-    QString xterm_cmd = "xterm";
+    QString xtermCmd = "xterm";
     QStringList arguments;
     arguments << "-hold" << "-e" << "make" << "native_modelchecker";
-    if (QProcess::execute(xterm_cmd, arguments) != 0) {
-        QString full_cmd = xterm_cmd + " " + arguments.join(" ");
-        QMessageBox::warning(this, tr("Exhaustive Simulator"), "Error executing: " + full_cmd);
+    if (QProcess::execute(xtermCmd, arguments) != 0) {
+        QString fullCmd = xtermCmd + " " + arguments.join(" ");
+        QMessageBox::warning(this, tr("Exhaustive Simulator"), "Error executing: " + fullCmd);
     }
 }
 
@@ -655,14 +655,14 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QDir::setCurrent(this->projectDir + "/");
 
     // REMOVE statusfile, callif.sh
-    QString rm_cmd = "rm";
+    QString rmCmd = "rm";
     QStringList arguments;
     arguments << "-f" << "statusfile" << "callif.sh";
 
 
-    if (QProcess::execute(rm_cmd, arguments) != 0) {
-        QString full_cmd = rm_cmd + " " + arguments.join(" ");
-        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + full_cmd);
+    if (QProcess::execute(rmCmd, arguments) != 0) {
+        QString fullCmd = rmCmd + " " + arguments.join(" ");
+        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + fullCmd);
     }
 
     // REMOVE output dir, if existing
@@ -689,12 +689,12 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     }
 
     // CALL IF make rule via terminal, saving make return in statusfile
-    QString xterm_cmd = "xterm";
+    QString xtermCmd = "xterm";
     QStringList callif_arguments;
     callif_arguments << "-hold" << "-e" << "sh" << "callif.sh";
 
-    if (QProcess::execute(xterm_cmd, callif_arguments) != 0) {
-        QString full_callif_cmd = xterm_cmd + " " + callif_arguments.join(" ");
+    if (QProcess::execute(xtermCmd, callif_arguments) != 0) {
+        QString full_callif_cmd = xtermCmd + " " + callif_arguments.join(" ");
         QMessageBox::warning(this, tr("Call IF"), "Error executing: " + full_callif_cmd);
     }
 
