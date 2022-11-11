@@ -8,17 +8,17 @@ stages:
 default:
   before_script:
     # dependencies
-    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect 
+    - time apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect
     # install OpenGEODE dependencies
     # *Python (both for OpenGEODE and sdl2promela)
-    - pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
+    - time pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
     # install newest OpenGEODE (must be installed in the same directory, removal is more robust than git clean/checkout/force)
-    - pushd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; make install; popd
+    - time pushd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; make install; popd
     # install newest version of Spin model checker
-    - pushd $HOME/tool-src; rm -rf Spin ; git clone https://github.com/n7space/Spin.git ; cd Spin ; make; popd ; mv $HOME/tool-src/Spin/Src/spin $HOME/.local/bin/n7s-spin
+    - time pushd $HOME/tool-src; rm -rf Spin ; git clone https://github.com/n7space/Spin.git ; cd Spin ; make; popd ; mv $HOME/tool-src/Spin/Src/spin $HOME/.local/bin/n7s-spin
     # install sdl2promela
-    - git clone https://github.com/n7space/sdl2promela.git
-    - pushd sdl2promela ; make install ; popd
+    - time git clone https://github.com/n7space/sdl2promela.git
+    - time pushd sdl2promela ; make install ; popd
     # setup PATH
     - export PATH=$PATH:${ENV_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
@@ -116,7 +116,7 @@ spacecreator-qt5-feature:
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # unit tests
     - cd ${CI_PROJECT_DIR}
-    - ./scripts/run_tests.sh ${BUILD_DIR}
+    - time ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
     key: asn1scc
     paths:

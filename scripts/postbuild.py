@@ -5,6 +5,7 @@ import os.path
 import subprocess
 import utils
 from utils import join_dir, copy_content_of_dir_to_other_dir, print_cmd
+from utils import start_time, delta_time
 
 """
 When the spacecreator plugin has been build, it needs to be copied to the plugin folder of the
@@ -78,6 +79,7 @@ def copy_asn1acn(build_dir: str, app_dir: str) -> None:
 
 
 if __name__ == '__main__':
+    start_time = start_time()
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
 
@@ -121,6 +123,7 @@ if __name__ == '__main__':
     copy_ans1scc_fuzzer(build_dir, app_dir)
     copy_asn1acn(build_dir, app_dir)
 
+    print("post_build.py: Total time was: {}".format(delta_time(start_time)))
 
 
 

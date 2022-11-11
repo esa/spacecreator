@@ -4,7 +4,7 @@ import subprocess
 import shutil
 import re
 import glob
-
+import time
 
 def join_dir(*subdir):
     return os.path.abspath(os.path.join(*subdir))
@@ -101,6 +101,14 @@ def read_version_from_file(version_file: str, ci_build_id: str) -> []:
     if not completed_process.returncode == 0:
         print("Could not read ", version_file)
         exit(1)
+
+
+def start_time() -> float:
+    return time.time()
+
+
+def delta_time(start_time: float) -> str:
+    return "{}".format(time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)))
 
 
 def qt_dir_from_env_dir(env_dir: str):

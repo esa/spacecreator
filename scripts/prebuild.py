@@ -8,7 +8,8 @@ import tarfile
 import py7zr
 import shutil
 
-from utils import join_dir, print_cmd, ensure_dir, check_cmake_version, copy_content_of_dir_to_other_dir, copy_file_pattern_to_dir
+from utils import join_dir, print_cmd, ensure_dir, check_cmake_version, copy_content_of_dir_to_other_dir
+from utils import copy_file_pattern_to_dir, start_time, delta_time
 from git.repo import Repo
 
 '''
@@ -317,6 +318,7 @@ def copy_qhelpgenerator(qhelpgenerator_dir: str, target_libexec_dir: str) -> Non
 
 
 if __name__ == '__main__':
+    start_time = start_time()
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
 
@@ -408,3 +410,5 @@ if __name__ == '__main__':
     else:
         qhelpgenerator_dir = paths.env_qt_bin_dir
     copy_qhelpgenerator(qhelpgenerator_dir, join_dir(app_dir, 'libexec'))
+
+    print("prebuild.py: Total time was: {}".format(delta_time(start_time)))

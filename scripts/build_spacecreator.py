@@ -5,6 +5,7 @@ import os.path
 import subprocess
 
 from utils import join_dir, print_cmd, exit_if_not_exists, check_cmake_version, qt_dir_from_env_dir
+from utils import start_time, delta_time
 
 """
 Builds the SpaceCreator Project.
@@ -63,6 +64,7 @@ def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_typ
 
 
 if __name__ == '__main__':
+    start_time = start_time()
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
 
@@ -121,3 +123,4 @@ if __name__ == '__main__':
 
     check_cmake_version(3, 16, 0)
     build_spacecreator(project_dir, build_dir, app_dir, build_type, env_dir, build_asn1plugin)
+    print("build_spacecreator.py: Total time was: {}".format(delta_time(start_time)))
