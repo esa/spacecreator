@@ -229,7 +229,7 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
 
     // CALL KAZOO
     QString kazooCmd = "kazoo";
-    QStringList kazooArgument;
+    QStringList kazooArguments;
     kazooArguments << "-gw" << "--glue" << "-t" << "MOCHECK";
     auto kazooCallerProcess = new QProcess(this);
     kazooCallerProcess->setWorkingDirectory(this->projectDir + "/");
@@ -622,7 +622,6 @@ void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
     }
 
     // build and run the exhaustive simulator
-    QString callSimCmd = "xterm -hold -e make native_modelchecker";
     QString xtermCmd = "xterm";
     QStringList arguments;
     arguments << "-hold" << "-e" << "make" << "native_modelchecker";
@@ -690,12 +689,12 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
 
     // CALL IF make rule via terminal, saving make return in statusfile
     QString xtermCmd = "xterm";
-    QStringList callif_arguments;
-    callif_arguments << "-hold" << "-e" << "sh" << "callif.sh";
+    QStringList callifArguments;
+    callifArguments << "-hold" << "-e" << "sh" << "callif.sh";
 
-    if (QProcess::execute(xtermCmd, callif_arguments) != 0) {
-        QString full_callif_cmd = xtermCmd + " " + callif_arguments.join(" ");
-        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + full_callif_cmd);
+    if (QProcess::execute(xtermCmd, callifArguments) != 0) {
+        QString fullCallifCmd = xtermCmd + " " + callifArguments.join(" ");
+        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + fullCallifCmd);
     }
 
     // READ statusfile with make return value
@@ -979,8 +978,8 @@ bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &pro
     QStringList arguments;
     arguments << makeRule << "NAME=" + propertyName;
     if (makeCommandProcess->execute(makeCommand, arguments)) {
-        QString full_cmd = makeCommand + " " + arguments.join(" ");
-        QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(full_cmd));
+        QString fullCmd = makeCommand + " " + arguments.join(" ");
+        QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(fullCmd));
         return false;
     }
     return true;
@@ -1195,10 +1194,10 @@ void ModelCheckingWindow::addSubtypes()
         // first set path to project dir
         auto process = new QProcess(this);
         process->setWorkingDirectory(this->projectDir);
-        QString make_cmd = "make";
+        QString makeCmd = "make";
         QStringList arguments;
         arguments << "create-subtype" << "NAME=" + subtypingFileName;
-        if (process->execute(make_cmd, arguments) != 0) {
+        if (process->execute(makeCmd, arguments) != 0) {
             QMessageBox::warning(this, tr("Add subtypes"),
                     tr("Error executing 'make create-subtype NAME=%1'").arg(subtypingFileName));
 
