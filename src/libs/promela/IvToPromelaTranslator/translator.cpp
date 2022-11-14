@@ -567,7 +567,7 @@ void IvToPromelaTranslator::generateProctype(
     // the incoming message is processed by output observers first
     // and then by sdl process
     // however, code of message processing is generated in reverse order
-    // first the process, and then the observers
+    // first the process, and then the observers in reverse order, i.e. lower priority first
 
     // process sdl process
     {
@@ -601,7 +601,7 @@ void IvToPromelaTranslator::generateProctype(
     }
 
     // process all observers
-    for (auto iter = proctypeInfo.m_observers.begin(); iter != proctypeInfo.m_observers.end(); ++iter) {
+    for (auto iter = proctypeInfo.m_observers.rbegin(); iter != proctypeInfo.m_observers.rend(); ++iter) {
         const QString currentChannelName = (*iter)->m_observerQueue;
 
         loopSequence->appendElement(generateProcessMessageBlock((*iter)->m_observerName, currentChannelName,
@@ -1548,6 +1548,9 @@ IvToPromelaTranslator::ObserverAttachments IvToPromelaTranslator::getObserverAtt
         }
     }
 
+    std::sort(result.begin(), result.end(),
+            [](const auto &a, const auto &b) -> bool { return a.priority() > b.priority(); });
+
     return result;
 }
 
@@ -1665,7 +1668,8 @@ std::unique_ptr<IvToPromelaTranslator::ProctypeInfo> IvToPromelaTranslator::prep
     proctypeInfo->m_isTimer = false;
 
     QString currentQueueName = constructChannelName(functionName, interfaceName);
-    for (const ObserverAttachment &attachment : outputObservers) {
+    for (auto iter = outputObservers.begin(); iter != outputObservers.end(); ++iter) {
+        const ObserverAttachment &attachment = *iter;
         const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
         const QString &channelName = observerChannelName(attachment, toFunction);
 
