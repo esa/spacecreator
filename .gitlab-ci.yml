@@ -19,11 +19,11 @@ default:
     # install newest version of Spin model checker
     - pushd $HOME/tool-src; rm -rf Spin ; git clone https://github.com/n7space/Spin.git ; cd Spin ; make; popd ; mv $HOME/tool-src/Spin/Src/spin $HOME/.local/bin/n7s-spin
     # install sdl2promela
-    - git clone https://github.com/n7space/sdl2promela.git
-    - pushd sdl2promela ; make install ; popd
+    - git clone https://github.com/n7space/sdl2promela.git; pushd sdl2promela ; make install ; popd
     # setup PATH
-    - export PATH=$PATH:${ENV_DIR}/asn1scc
-    - export PATH=$PATH:/root/.local/bin
+    - export PATH=$PATH:${ENV_DIR}/asn1scc ; export PATH=$PATH:/root/.local/bin
+    # CCache Config
+    - mkdir -p ccache ; export CCACHE_BASEDIR=${PWD} ; export CCACHE_DIR=${PWD}/ccache
     - echo "Timestamp: $(date) - before_script done"
 
 
@@ -44,6 +44,8 @@ spacecreator-qt5-master:
     - echo "Timestamp: $(date) - prebuild done"
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --patch_version $CI_BUILD_ID
+    # show caching statistics
+    - ccache -s
     - echo "Timestamp: $(date) - SpaceCreator build done"
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
@@ -60,7 +62,8 @@ spacecreator-qt5-master:
   cache:
     key: asn1scc
     paths:
-      - ${BUILD_DIR}/asn1scc_bin
+    - ${BUILD_DIR}/asn1scc_bin
+    - ${CCACHE_DIR}
   artifacts:
     reports:
       junit: ${BUILD_DIR}/tst_*-result.xml
@@ -88,6 +91,8 @@ spacecreator-qt6-master:
     - echo "Timestamp: $(date) - prebuild done"
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin --patch_version $CI_BUILD_ID
+    # show caching statistics
+    - ccache -s
     - echo "Timestamp: $(date) - SpaceCreator build done"
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
@@ -101,6 +106,7 @@ spacecreator-qt6-master:
     key: asn1scc
     paths:
       - ${BUILD_DIR}/asn1scc_bin
+      - ${CCACHE_DIR}
   artifacts:
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
@@ -126,6 +132,8 @@ spacecreator-qt5-feature:
     - echo "Timestamp: $(date) - prebuild done"
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --patch_version $CI_BUILD_ID
+    # show caching statistics
+    - ccache -s
     - echo "Timestamp: $(date) - SpaceCreator build done"
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
@@ -138,6 +146,7 @@ spacecreator-qt5-feature:
     key: asn1scc
     paths:
       - ${BUILD_DIR}/asn1scc_bin
+      - ${CCACHE_DIR}
   artifacts:
     reports:
       junit: ${BUILD_DIR}/tst_*-result.xml
@@ -164,14 +173,19 @@ spacecreator-qt6-feature:
     - echo "Timestamp: $(date) - prebuild done"
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin --patch_version $CI_BUILD_ID
+    # show caching statistics
+    - ccache -s
     - echo "Timestamp: $(date) - SpaceCreator build done"
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # show caching statistics
+    - ccache -s
     - echo "Timestamp: $(date) - postbuild done"
   cache:
     key: asn1scc
     paths:
       - ${BUILD_DIR}/asn1scc_bin
+      - ${CCACHE_DIR}
   rules:
     # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
