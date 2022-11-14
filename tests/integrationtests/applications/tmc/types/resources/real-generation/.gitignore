@@ -8,14 +8,14 @@
 
 **/wrappers/*
 **/cache/*
-**/controller/**/*.ad*
-**/controller/**/*.md5
-**/controller/**/Makefile
-**/controller/**/*.pro
-**/host/**/*.ad*
-**/host/**/*.md5
-**/host/**/Makefile
-**/host/**/*.pro
+**/sdlmodel/**/*.ad*
+**/sdlmodel/**/*.md5
+**/sdlmodel/**/Makefile
+**/sdlmodel/**/*.pro
+**/environment/**/*.ad*
+**/environment/**/*.md5
+**/environment/**/Makefile
+**/environment/**/*.pro
 **/modelchecking/**/*.adb
 **/modelchecking/**/*.ads
 work/**/GUI/src
@@ -47,6 +47,5 @@ work/simulation/*.ui
 work/simulation/*.cfg
 work/simulation/*.sqlite
 
-real-constraints.msc
-work/controller/implem/default/SDL/src/
-work/controller/SDL/src/Controller.cfg
+work/sdlmodel/implem/default/SDL/src/
+work/sdlmodel/SDL/src/sdlmodel.cfg

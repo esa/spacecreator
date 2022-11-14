@@ -73,7 +73,7 @@ public:
     inline static const QString observerFunctionName = "Promela_Convert_ObserverFunction";
 
     /** @brief Space between two consecutive generated real numbers for real generator */
-    inline static const QString realGeneratorDelta = "Promela_Real_Generator_Delta";
+    inline static const QString realGeneratorDelta = "Promela_RealGeneratorDelta";
 };
 
 }

@@ -775,6 +775,7 @@ bool TmcConverter::createEnvGenerationInlines(const QFileInfo &inputDataView, co
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
     options.add(PromelaOptions::asn1ValueGeneration);
+    options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
 
     for (const QString &datatype : envDatatypes) {
         options.add(PromelaOptions::asn1ValueGenerationForType, datatype);

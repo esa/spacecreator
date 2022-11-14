@@ -79,7 +79,11 @@ void SpinRunWorker::run()
 
     if (m_spinConfig.supportReal) {
         m_verifier->setRealTypeEnabled(true);
-        m_verifier->setDelta(m_spinConfig.deltaValue);
+        if (m_spinConfig.deltaValue.has_value()) {
+            m_verifier->setDelta(QString::number(m_spinConfig.deltaValue.value()));
+        } else {
+            m_verifier->setDelta("");
+        }
     } else {
         m_verifier->setRealTypeEnabled(false);
     }

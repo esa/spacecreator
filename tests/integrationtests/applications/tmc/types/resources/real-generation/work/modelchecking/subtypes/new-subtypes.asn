@@ -1,0 +1,21 @@
+ENVIRONMENT-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyReal FROM REALLYGUIPROJECT-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Environment-pi-1-param ::= MyReal
+
+
+
+
+END

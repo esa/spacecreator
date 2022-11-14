@@ -23,6 +23,7 @@
 #include "visitors/asn1nodevaluegeneratorvisitor.h"
 #include "visitors/asn1nodevisitor.h"
 
+#include <QDebug>
 #include <algorithm>
 #include <asn1library/asn1/asn1model.h>
 #include <promela/PromelaOptions/options.h>
@@ -50,15 +51,17 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
     const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
-    const QString deltaStr = options.value(PromelaOptions::realGeneratorDelta).value_or("");
-    const std::optional<float> delta = deltaStr.isEmpty() ? std::nullopt : std::optional(std::abs(deltaStr.toFloat()));
-
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
     const auto *ivModel = getModel<IVModel>(sourceModels);
 
     if (asn1ValueGeneration) {
         QStringList typeNames;
         std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
+
+        const QString deltaStr = options.value(PromelaOptions::realGeneratorDelta).value_or("");
+        const std::optional<float> delta =
+                deltaStr.isEmpty() ? std::nullopt : std::optional(std::abs(deltaStr.toFloat()));
+
         return generateValueGenerationInlines(asn1Model, ivModel, typeNames, options, delta);
     } else {
         return translateAsn1Model(asn1Model, enhancedSpinSupport);
