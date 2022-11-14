@@ -93,6 +93,7 @@ void tst_SedsConverter_SedsToSdl::testLedDemo()
 /// \SRS  ETB-FUN-2170
 /// \SRS  ETB-FUN-2210
 /// \SRS  ETB-FUN-2220
+/// \SRS  ETB-FUN-2320
 /// \SRS  ETB-FUN-2490
 /// \SRS  ETB-FUN-2500
 /// \SRS  ETB-FUN-2520

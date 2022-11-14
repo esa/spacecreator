@@ -160,7 +160,11 @@ auto SimulinkImporterPlugin::createActionContainerInTools(const QString &title) 
 void SimulinkImporterPlugin::onActiveProjectChanged(ProjectExplorer::Project *project)
 {
     m_currentProject = project;
-    m_currentProjectDirectoryPath = project->projectDirectory().toString();
+    if (m_currentProject != nullptr) {
+        m_currentProjectDirectoryPath = project->projectDirectory().toString();
+    } else {
+        m_currentProjectDirectoryPath.clear();
+    }
 
     m_simulinkMenu->setEnabled(project != nullptr);
 }
@@ -195,11 +199,11 @@ auto SimulinkImporterPlugin::importSlx() -> void
 
     moveToProjectDirectoryAndPrepareTemporaryWorkingDirectory(m_matlabTemporaryWorkingDirectory);
 
-    const QString matlabCommand = generateMatLabCommand(*workspaceFileInfo, *inputFilePath);
+    const QStringList matlabCallArguments = generateMatLabCallArguments(*workspaceFileInfo, *inputFilePath);
 
-    printInfoInGeneralMessages(GenMsg::executingMatlabCommand.arg(matlabCommand));
+    printMatLabCommand(matlabCallArguments);
 
-    if(QProcess::execute(matlabCommand) != 0) {
+    if(QProcess().execute(m_matlabAppName, matlabCallArguments) != 0) {
         printErrorInGeneralMessages(GenMsg::matlabCommandHasFailed);
 
         removeMatLabTemporaryWorkingDirectory();
@@ -304,21 +308,25 @@ auto SimulinkImporterPlugin::printInfoAboutInputs(const QString& inputFilePath, 
     }
 }
 
-auto SimulinkImporterPlugin::generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString
+auto SimulinkImporterPlugin::generateMatLabCallArguments(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QStringList
 {
     const QString workspaceLoadFunction = generateWorkspaceLoadCallFunction(workspaceFileInfo);
     const QString tasteExporterFunction = generateTasteExporterCallFunction(inputFilePath);
 
+    QString matlabBatchArgument;
+
     if(workspaceLoadFunction.isEmpty()) {
-        return m_matlabCommandWithoutWorkspaceLoadTemplate
-                .arg(m_matlabTemporaryWorkingDirectory)
-                .arg(tasteExporterFunction);
+        matlabBatchArgument = m_matlabCommandWithoutWorkspaceLoadTemplate
+                                .arg(m_matlabTemporaryWorkingDirectory)
+                                .arg(tasteExporterFunction);
     } else {
-        return m_matlabCommandWithWorkspaceLoadTemplate
-                .arg(m_matlabTemporaryWorkingDirectory)
-                .arg(workspaceLoadFunction)
-                .arg(tasteExporterFunction);
+        matlabBatchArgument = m_matlabCommandWithWorkspaceLoadTemplate
+                                .arg(m_matlabTemporaryWorkingDirectory)
+                                .arg(workspaceLoadFunction)
+                                .arg(tasteExporterFunction);
     }
+
+    return {"-batch", matlabBatchArgument};
 }
 
 auto SimulinkImporterPlugin::generateWorkspaceLoadCallFunction(QFileInfo &workspaceFileInfo) -> QString
@@ -617,7 +625,11 @@ auto SimulinkImporterPlugin::addIvFunctionToIvModel(ivm::IVFunction *const sourc
 
 auto SimulinkImporterPlugin::addGeneratedAsn1FilesToCurrentProject(const QStringList &generatedAsn1FileNames) -> void
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QStringList asn1FilePathsToBeAddedToProject;
+#else
+    QList<Utils::FilePath> asn1FilePathsToBeAddedToProject;
+#endif
 
     for(auto &asn1FileName : generatedAsn1FileNames) {
         QString destinationAsn1FilePath = QString("%1/%2").arg(m_currentProjectDirectoryPath).arg(asn1FileName);
@@ -643,7 +655,12 @@ auto SimulinkImporterPlugin::addGeneratedAsn1FilesToCurrentProject(const QString
 
             QFile(asn1FileName).copy(destinationAsn1FilePath);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             asn1FilePathsToBeAddedToProject.append(destinationAsn1FilePath);
+#else
+            Utils::FilePath destinationAsn1UtilsFilePath = Utils::FilePath::fromString(destinationAsn1FilePath);
+            asn1FilePathsToBeAddedToProject.append(destinationAsn1UtilsFilePath);
+#endif
         } else {
             printInfoInGeneralMessages(GenMsg::fileHasNotBeenOverridden.arg(asn1FileName));
         }
@@ -716,6 +733,15 @@ auto SimulinkImporterPlugin::printPluginSelfIntroductionInGeneralMessages() -> v
     
     MessageManager::write("");
     MessageManager::write(completeMessage);
+}
+
+auto SimulinkImporterPlugin::printMatLabCommand(const QStringList& matlabCallArguments) -> void
+{
+    const QString matlabCommand = QString("%1 %2")
+                                    .arg(m_matlabAppName)
+                                    .arg(matlabCallArguments.join(' '));
+
+    printInfoInGeneralMessages(GenMsg::executingMatlabCommand.arg(matlabCommand));
 }
 
 auto SimulinkImporterPlugin::printInfoInGeneralMessages(const QString &message) -> void

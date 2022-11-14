@@ -41,7 +41,6 @@ def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_typ
                  '-DBUILD_PATCH_NUMBER=0',
                  '-DCMAKE_PREFIX_PATH=' + cmake_prefix_path,
                  '-DQT_QMAKE_EXECUTABLE:STRING=' + env_qmake_bin,
-                 '-DENABLE_FORMAT_CHECK=OFF',
                  '-DQTC_INSTALL=' + qtc_install,
                  '-DQTC_SOURCE=' + qtc_install,
                  '-DBUILD_PLUGIN_ASN1=' + ('True' if build_asn1plugin else 'False')
