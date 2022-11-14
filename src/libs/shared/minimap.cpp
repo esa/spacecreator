@@ -132,7 +132,7 @@ void MiniMap::adjustGeometry()
         const auto parentRect = widget->rect();
         const QSize sceneSize = scene()->sceneRect().size().toSize();
         QRect currentRect { QPoint(0, 0),
-            sceneSize.scaled(parentRect.width() / kDefaultScaleFactor, parentRect.height(), Qt::KeepAspectRatio) };
+            sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatio) };
         currentRect.moveTopRight(parentRect.topRight());
         setGeometry(currentRect);
     }
