@@ -41,6 +41,36 @@ auto MathOperationTranslator::translateOperation(const seds::model::MathOperatio
     return translateMutableExpression(mutableExpression, unused);
 }
 
+auto MathOperationTranslator::translateSwapOperation(const seds::model::MathOperation &operation) -> QString
+{
+    const auto &elements = operation.elements();
+
+    if (elements.size() != 3) {
+        throw TranslationException("Swap operation needs exactly two arguments");
+    }
+
+    const auto &firstArgument = elements.at(1);
+    const auto &secondArgument = elements.at(2);
+
+    if (std::holds_alternative<seds::model::ValueOperand>(firstArgument)
+            && std::holds_alternative<seds::model::Operator>(firstArgument)) {
+        throw TranslationException("First argument of the swap operation is not a VariableRef");
+    }
+
+    if (std::holds_alternative<seds::model::ValueOperand>(secondArgument)
+            && std::holds_alternative<seds::model::Operator>(secondArgument)) {
+        throw TranslationException("Second argument of the swap operation is not a VariableRef");
+    }
+
+    const auto &firstVariableName =
+            Escaper::escapeSdlVariableName(std::get<seds::model::VariableRef>(firstArgument).nameStr());
+    const auto &secondVariableName =
+            Escaper::escapeSdlVariableName(std::get<seds::model::VariableRef>(secondArgument).nameStr());
+    const auto &tmpVariableName = Escaper::escapeSdlVariableName(operation.outputVariableRef().nameStr());
+
+    return QString("%1 := %2, %2 := %3, %3 := %1").arg(tmpVariableName, firstVariableName, secondVariableName);
+}
+
 auto MathOperationTranslator::extractMutableExpression(const seds::model::MathOperation::Elements &elements)
         -> Expression
 {

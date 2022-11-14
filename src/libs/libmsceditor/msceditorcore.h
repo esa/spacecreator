@@ -118,7 +118,7 @@ private:
 
     bool m_connectionsDone = false;
 
-    MscAppWidget *m_mainWidget = nullptr;
+    QPointer<MscAppWidget> m_mainWidget;
 };
 
 }

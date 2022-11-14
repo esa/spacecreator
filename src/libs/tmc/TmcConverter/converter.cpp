@@ -364,12 +364,10 @@ bool TmcConverter::convertTrace(const QString &inputFile, const QString &outputF
     options.add(IvOptions::inputFilepath, m_outputOptimizedIvFileName);
     options.add(PromelaOptions::outputFilepath, outputSystemFile.absoluteFilePath());
 
-    assert(!m_modelFunctions.isEmpty());
     for (const QString &function : m_modelFunctions) {
         options.add(PromelaOptions::modelFunctionName, function);
     }
 
-    assert(!m_finalEnvironmentFunctions.empty());
     for (const QString &function : m_finalEnvironmentFunctions) {
         options.add(PromelaOptions::environmentFunctionName, function);
     }
