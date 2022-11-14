@@ -80,8 +80,9 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
         reportItem.parsedErrorDetails = report;
         return reportItem;
     }
-    // out of two remaining error types, observer failure (entering success state)
-    // can be detected by finding an acceptance cycle in the report
+    // an observer failure (entering success state) can be detected
+    // by finding an acceptance cycle in the report, but it can also
+    // indicate another stop condition violation with an eventually clause
     auto observerFailureSuccessStateMatch = matchObserverFailureSuccessState(spinTraces);
     if (observerFailureSuccessStateMatch.hasMatch()) {
         // found observer failure (success state)
