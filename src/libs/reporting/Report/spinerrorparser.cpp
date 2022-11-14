@@ -40,6 +40,10 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(
         // read traces and scenario
         const auto spinTrace = readFile(error.spinTraceFile);
         const auto scenario = readFile(error.scenarioFile);
+        // check for spin trace file indication (no error if not present)
+        if (spinTrace.isEmpty() || spinTrace.trimmed() == m_spinNoTrailFileMessage) {
+            continue;
+        }
 
         SpinErrorReportItem newReportItem = parseTrace(spinTrace, sclFiles);
         newReportItem.errorNumber = errorIndex++;
