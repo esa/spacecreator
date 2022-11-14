@@ -323,6 +323,8 @@ private:
     auto handleTransaction(const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call,
             ivm::IVInterface *ivInterface) const -> void;
 
+    auto isSwapOperator(const ::seds::model::MathOperation::Element &element) -> bool;
+
     friend class ExpressionTranslatorVisitor;
 };
 

@@ -19,10 +19,10 @@
 
 #include <QCache>
 #include <QObject>
+#include <QPair>
 #include <QStringList>
 #include <QVector>
 #include <memory>
-#include <QPair>
 
 class QFileInfo;
 
