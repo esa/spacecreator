@@ -7,10 +7,9 @@ stages:
 
 default:
   before_script:
+    - source scripts/timepstamp.sh
     # dependencies
-    - echo "Timestamp: $(date) - Staring"
     - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect 
-    - echo "Timestamp: $(date) - packages installed"
     # install OpenGEODE dependencies
     # *Python (both for OpenGEODE and sdl2promela)
     - pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
@@ -19,12 +18,15 @@ default:
     # install newest version of Spin model checker
     - pushd $HOME/tool-src; rm -rf Spin ; git clone https://github.com/n7space/Spin.git ; cd Spin ; make; popd ; mv $HOME/tool-src/Spin/Src/spin $HOME/.local/bin/n7s-spin
     # install sdl2promela
-    - git clone https://github.com/n7space/sdl2promela.git; pushd sdl2promela ; make install ; popd
+    - git clone https://github.com/n7space/sdl2promela.git
+    - pushd sdl2promela ; make install ; popd
     # setup PATH
-    - export PATH=$PATH:${ENV_DIR}/asn1scc ; export PATH=$PATH:/root/.local/bin
+    - export PATH=$PATH:${ENV_DIR}/asn1scc
+    - export PATH=$PATH:/root/.local/bin
     # CCache Config
-    - mkdir -p ccache ; export CCACHE_BASEDIR=${PWD} ; export CCACHE_DIR=${PWD}/ccache
-    - echo "Timestamp: $(date) - before_script done"
+    - mkdir -p ccache
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache
 
 
 spacecreator-qt5-master:
@@ -38,32 +40,26 @@ spacecreator-qt5-master:
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt5
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
   script:
-    - echo "Timestamp: $(date) - preparing build"
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
     - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
-    - echo "Timestamp: $(date) - prebuild done"
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --patch_version $CI_BUILD_ID
     # show caching statistics
     - ccache -s
-    - echo "Timestamp: $(date) - SpaceCreator build done"
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
-    - echo "Timestamp: $(date) - postbuild done"
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # unit tests
     - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
-    - echo "Timestamp: $(date) - Tests done"
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
-    - echo "Timestamp: $(date) - AppImage created"
   cache:
     key: asn1scc
     paths:
-    - ${BUILD_DIR}/asn1scc_bin
-    - ${CCACHE_DIR}
+      - ${BUILD_DIR}/asn1scc_bin
+      - ${CCACHE_DIR}
   artifacts:
     reports:
       junit: ${BUILD_DIR}/tst_*-result.xml
@@ -85,23 +81,18 @@ spacecreator-qt6-master:
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt6
   script:
-    - echo "Timestamp: $(date) - preparing build"
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
     - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
-    - echo "Timestamp: $(date) - prebuild done"
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin --patch_version $CI_BUILD_ID
     # show caching statistics
     - ccache -s
-    - echo "Timestamp: $(date) - SpaceCreator build done"
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
-    - echo "Timestamp: $(date) - postbuild done"
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
-    - echo "Timestamp: $(date) - AppImage created"
   cache:
     key: asn1scc
     paths:
@@ -126,22 +117,17 @@ spacecreator-qt5-feature:
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt5
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
   script:
-    - echo "Timestamp: $(date) - preparing build"
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
     - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
-    - echo "Timestamp: $(date) - prebuild done"
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --patch_version $CI_BUILD_ID
     # show caching statistics
     - ccache -s
-    - echo "Timestamp: $(date) - SpaceCreator build done"
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
-    - echo "Timestamp: $(date) - postbuild done"
     # unit tests
     - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
-    - echo "Timestamp: $(date) - Tests done"
   cache:
     key: asn1scc
     paths:
@@ -167,20 +153,16 @@ spacecreator-qt6-feature:
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
     BUILD_DIR: ${CI_PROJECT_DIR}/spacecreator_build_qt6
   script:
-    - echo "Timestamp: $(date) - preparing build"
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
     - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
-    - echo "Timestamp: $(date) - prebuild done"
     # build space creator
     - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin --patch_version $CI_BUILD_ID
     # show caching statistics
     - ccache -s
-    - echo "Timestamp: $(date) - SpaceCreator build done"
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # show caching statistics
     - ccache -s
-    - echo "Timestamp: $(date) - postbuild done"
   cache:
     key: asn1scc
     paths:
