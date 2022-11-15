@@ -1155,7 +1155,6 @@ void tst_IvToPromelaTranslator::testOutputObservers()
             QCOMPARE(queueCheck->getName(), "nempty");
             QCOMPARE(queueCheck->getArguments().size(), 1);
             QVERIFY(std::holds_alternative<VariableRef>(queueCheck->getArguments().front()));
-            // asdf
             QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().size(), 1);
             QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().front().m_name,
                     "Actuator_f2_channel");

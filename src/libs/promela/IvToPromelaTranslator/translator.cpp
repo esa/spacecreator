@@ -862,7 +862,6 @@ void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslato
     const auto sourceInterfaceName = getInterfaceName(requiredInterface);
     const auto sourceFunctionName = getInterfaceFunctionName(requiredInterface);
 
-    // const auto queueSize = getInterfaceQueueSize(providedInterface);
     const auto &[parameterName, parameterType] = getInterfaceParameter(providedInterface);
 
     generateSendInline(context, functionName, interfaceName, parameterName, parameterType, sourceFunctionName,
