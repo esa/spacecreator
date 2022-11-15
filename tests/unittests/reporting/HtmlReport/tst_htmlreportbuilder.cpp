@@ -57,11 +57,6 @@ void tst_HtmlReportBuilder::testDataConstraintViolation()
             { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
     const auto htmlResult = readFile(htmlResultPath);
 
-    QFile file("/home/taste/dcv_result.html");
-    file.open(QFile::WriteOnly);
-    file.write(html.toUtf8());
-    file.close();
-
     QVERIFY(html == htmlResult);
 }
 
