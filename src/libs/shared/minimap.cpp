@@ -209,7 +209,7 @@ void MiniMap::processMouseInput()
 void MiniMap::drawItems(QPainter *painter, int numItems, QGraphicsItem **items, const QStyleOptionGraphicsItem *options)
 {
     for (int idx = 0; idx < numItems; ++idx) {
-        if (items[idx]->type() == GripPoint::Type)
+        if (items[idx]->type() == GripPoint::Type || !items[idx]->isVisible())
             continue;
 
         painter->save();
