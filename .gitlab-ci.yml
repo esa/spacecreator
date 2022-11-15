@@ -69,7 +69,8 @@ spacecreator-qt5-master:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
   rules:
-    - if: "$CI_COMMIT_BRANCH == 'master'"
+    # - if: "$CI_COMMIT_BRANCH == 'master'"
+    - when: never
 
 
 spacecreator-qt6-master:
@@ -93,6 +94,9 @@ spacecreator-qt6-master:
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # unit tests
+    - cd ${CI_PROJECT_DIR}
+    - ./scripts/run_tests.sh ${BUILD_DIR}
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # Create an AppImage from the app_dir and place it in the build dir
@@ -145,7 +149,8 @@ spacecreator-qt5-feature:
     expire_in: 2 days
   rules:
     # For pipelines created when a merge request is created or updated
-    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
+    # - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
+    - when: never
 
 
 spacecreator-qt6-feature:
@@ -169,6 +174,11 @@ spacecreator-qt6-feature:
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # read the version numbers
+    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
+    # unit tests
+    - cd ${CI_PROJECT_DIR}
+    - ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
     key: spacecreator_cache
     paths:
