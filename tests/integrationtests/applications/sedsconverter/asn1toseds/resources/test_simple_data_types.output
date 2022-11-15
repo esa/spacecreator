@@ -11,6 +11,9 @@
    <BooleanDataType name="MyNotInvertedBoolean">
     <BooleanDataEncoding sizeInBits="3" falseValue="zeroIsFalse"/>
    </BooleanDataType>
+   <BooleanDataType name="MyNoSizeBoolean">
+    <BooleanDataEncoding sizeInBits="1" falseValue="zeroIsFalse"/>
+   </BooleanDataType>
    <IntegerDataType name="MyInteger">
     <Range>
      <MinMaxRange min="0" max="20" rangeType="inclusiveMinInclusiveMax"/>

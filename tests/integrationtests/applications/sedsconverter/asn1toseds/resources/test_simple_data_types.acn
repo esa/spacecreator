@@ -6,6 +6,8 @@ SimpleDataTypes DEFINITIONS ::= BEGIN
 
     MyNotInvertedBoolean [size 3, false-value '000'B]
 
+    MyNoSizeBoolean []
+
     MyInteger []
 
     MyIntegerWithEncoding [size 32, encoding pos-int, endianness big]

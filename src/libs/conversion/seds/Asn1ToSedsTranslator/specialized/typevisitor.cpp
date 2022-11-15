@@ -189,7 +189,12 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
     ::seds::model::BooleanDataType sedsType;
 
     ::seds::model::BooleanDataEncoding encoding;
-    encoding.setBits(static_cast<::seds::model::PositiveLong::Value>(type.acnSize()));
+
+    if (type.acnSize() == 0) {
+        encoding.setBits(1);
+    } else {
+        encoding.setBits(static_cast<::seds::model::PositiveLong::Value>(type.acnSize()));
+    }
 
     if (type.trueValue() != "") {
         encoding.setFalseValue(isZero(type.trueValue()) ? ::seds::model::FalseValue::NonZeroIsFalse
