@@ -190,21 +190,19 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Boolean &type)
 
     ::seds::model::BooleanDataEncoding encoding;
 
-    if (type.acnSize() == 0) {
-        encoding.setBits(1);
-    } else {
+    if (type.acnSize() != 0) {
         encoding.setBits(static_cast<::seds::model::PositiveLong::Value>(type.acnSize()));
-    }
 
-    if (type.trueValue() != "") {
-        encoding.setFalseValue(isZero(type.trueValue()) ? ::seds::model::FalseValue::NonZeroIsFalse
-                                                        : ::seds::model::FalseValue::ZeroIsFalse);
-    } else if (type.falseValue() != "") {
-        encoding.setFalseValue(isZero(type.falseValue()) ? ::seds::model::FalseValue::ZeroIsFalse
-                                                         : ::seds::model::FalseValue::NonZeroIsFalse);
-    }
+        if (type.trueValue() != "") {
+            encoding.setFalseValue(isZero(type.trueValue()) ? ::seds::model::FalseValue::NonZeroIsFalse
+                                                            : ::seds::model::FalseValue::ZeroIsFalse);
+        } else if (type.falseValue() != "") {
+            encoding.setFalseValue(isZero(type.falseValue()) ? ::seds::model::FalseValue::ZeroIsFalse
+                                                             : ::seds::model::FalseValue::NonZeroIsFalse);
+        }
 
-    sedsType.setEncoding(std::move(encoding));
+        sedsType.setEncoding(std::move(encoding));
+    }
 
     sedsType.setName(m_context.name());
     m_context.package()->addDataType(std::move(sedsType));
