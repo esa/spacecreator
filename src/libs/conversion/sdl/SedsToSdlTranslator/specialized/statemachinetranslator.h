@@ -223,7 +223,7 @@ private:
 
     static auto createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 
-    static auto translateGuard(::sdl::Process *sdlProcess, const ::sdl::State *fromState,
+    static auto translateGuard(Context &context, ::sdl::Process *sdlProcess, const ::sdl::State *fromState,
             ::sdl::Transition *currentTransitionPtr, const seds::model::BooleanExpression &guard)
             -> ::sdl::Transition *;
 

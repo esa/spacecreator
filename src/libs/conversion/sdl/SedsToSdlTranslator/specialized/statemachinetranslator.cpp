@@ -1413,7 +1413,7 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
     }
 
     if (sedsTransition->guard().has_value()) {
-        sdlTransition = translateGuard(context.sdlProcess(), sdlFromState, sdlTransition, *sedsTransition->guard());
+        sdlTransition = translateGuard(context, context.sdlProcess(), sdlFromState, sdlTransition, *sedsTransition->guard());
     }
 
     const auto stateChange = sdlFromState->name() != sdlToState->name();
@@ -1477,10 +1477,10 @@ auto StateMachineTranslator::createExternalProcedure(ivm::IVInterface const *int
     sdlProcess->addProcedure(std::move(procedure));
 }
 
-auto StateMachineTranslator::translateGuard(::sdl::Process *sdlProcess, const ::sdl::State *fromState,
+auto StateMachineTranslator::translateGuard(Context &context, ::sdl::Process *sdlProcess, const ::sdl::State *fromState,
         ::sdl::Transition *currentTransitionPtr, const ::seds::model::BooleanExpression &guard) -> ::sdl::Transition *
 {
-    auto decision = StatementTranslatorVisitor::translateBooleanExpression(sdlProcess, nullptr, guard);
+    auto decision = StatementTranslatorVisitor::translateBooleanExpression(context, sdlProcess, nullptr, guard);
 
     auto falseTransition = std::make_unique<::sdl::Transition>();
     // Abort the transition
