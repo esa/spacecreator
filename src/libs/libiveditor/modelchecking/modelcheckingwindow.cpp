@@ -782,11 +782,17 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
         arguments << item->text(1);
     }
 
-    auto p = new QProcess(this);
-    p->start(program, arguments);
+    auto p = new QProcess();
+    connect(p, &QProcess::stateChanged, [p](QProcess::ProcessState newState){
+        if (newState == QProcess::NotRunning) {
+            p->deleteLater();
+        }
+    });
 
+    p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
         QMessageBox::warning(this, tr("Open scenario"), tr("Error when calling '%1 %2' .").arg(program, arguments.join(" ")));
+        delete p;
         return;
     }
 
