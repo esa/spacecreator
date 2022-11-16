@@ -224,7 +224,7 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &parse
 QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &parsedErrorToken) const
 {
     StopConditionViolationReport violationReport;
-    violationReport.violationType = StopConditionViolationReport::UnknownType;
+    violationReport.violationType = StopConditionViolationReport::UndefinedType;
 
     const QString sanitized = cleanUpSclComments(parsedErrorToken);
     const QRegularExpression regex = buildStopConditionViolationRegex();
@@ -239,7 +239,7 @@ QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &
                 m_stopConditionViolationClauses.value(clause, StopConditionViolationReport::UnknownClause);
         // check violation type can be matched in current expression
         const auto currentViolationType = resolveViolationType(expressions);
-        if (currentViolationType != reporting::StopConditionViolationReport::UnknownType) {
+        if (currentViolationType != reporting::StopConditionViolationReport::UndefinedType) {
             violationReport.violationType = currentViolationType;
             break;
         }
@@ -343,7 +343,7 @@ reporting::StopConditionViolationReport::ViolationType reporting::SpinErrorParse
         // most nested violation type
         return foundViolationTypes.last();
     }
-    return reporting::StopConditionViolationReport::UnknownType;
+    return reporting::StopConditionViolationReport::UndefinedType;
 }
 
 QStringList reporting::SpinErrorParser::splitExpression(const QString &expression)
