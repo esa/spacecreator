@@ -127,7 +127,7 @@ spacecreator-qt5-feature:
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
     - cd ${CI_PROJECT_DIR}
-    - time ./scripts/run_tests.sh ${BUILD_DIR}
+    - ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
     key: asn1scc
     paths:
