@@ -327,7 +327,7 @@ QString reporting::SpinErrorParser::cleanUpSclComments(const QString &scl)
 reporting::StopConditionViolationReport::ViolationType reporting::SpinErrorParser::resolveViolationType(
         const QStringList &expressions)
 {
-    QStringList identifiers;
+    QList<reporting::StopConditionViolationReport::ViolationType> foundViolationTypes;
     QRegularExpression regex("([a-z0-9_]+)\\s*\\(", QRegularExpression::CaseInsensitiveOption);
     for (const auto &expression : expressions) {
         auto matches = regex.globalMatch(expression);
@@ -335,9 +335,13 @@ reporting::StopConditionViolationReport::ViolationType reporting::SpinErrorParse
             const auto match = matches.next();
             const auto identifier = (match.captured(IdentifierParseTokens::IdentifierName));
             if (m_stopConditionViolationTypes.contains(identifier)) {
-                return m_stopConditionViolationTypes.value(identifier);
+                foundViolationTypes.append(m_stopConditionViolationTypes.value(identifier));
             }
         }
+    }
+    if (!foundViolationTypes.isEmpty()) {
+        // most nested violation type
+        return foundViolationTypes.last();
     }
     return reporting::StopConditionViolationReport::UnknownType;
 }
