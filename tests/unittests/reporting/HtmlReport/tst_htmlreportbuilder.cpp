@@ -81,7 +81,7 @@ void tst_HtmlReportBuilder::testDataConstraintViolationNested()
     QVERIFY(html == htmlResult);
 }
 
-void tst_HtmlReportBuilder::testStopConditionViolation()
+void tst_HtmlReportBuilder::testStopConditionAlwaysEmpty()
 {
     const QString spinMessagePath("resources/stop_condition_empty_msg.txt");
     const QString spinTracesPath("resources/stop_condition_empty_spin.txt");
@@ -89,6 +89,48 @@ void tst_HtmlReportBuilder::testStopConditionViolation()
     const QString scenarioPath("resources/scenario.sim");
     const QString htmlTemplatePath("resources/template.html");
     const QString htmlResultPath("resources/stop_condition_empty_result.html");
+
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
+
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
+
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testStopConditionEventually()
+{
+    const QString spinMessagePath("resources/stop_condition_eventually_msg.txt");
+    const QString spinTracesPath("resources/stop_condition_eventually_spin.txt");
+    const QString sclPath("resources/stop_condition_eventually_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/stop_condition_eventually_result.html");
+
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
+
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
+
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testStopConditionNever()
+{
+    const QString spinMessagePath("resources/stop_condition_never_msg.txt");
+    const QString spinTracesPath("resources/stop_condition_never_spin.txt");
+    const QString sclPath("resources/stop_condition_never_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/stop_condition_never_result.html");
 
     RawErrorItem rawError;
     rawError.spinTraceFile = spinTracesPath;

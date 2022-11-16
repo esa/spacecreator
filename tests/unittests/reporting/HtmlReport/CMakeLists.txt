@@ -34,6 +34,16 @@ configure_file(resources/stop_condition_empty_spin.txt resources/stop_condition_
 configure_file(resources/stop_condition_empty_scl.txt resources/stop_condition_empty_scl.txt COPYONLY)
 configure_file(resources/stop_condition_empty_result.html resources/stop_condition_empty_result.html COPYONLY)
 
+configure_file(resources/stop_condition_eventually_msg.txt resources/stop_condition_eventually_msg.txt COPYONLY)
+configure_file(resources/stop_condition_eventually_spin.txt resources/stop_condition_eventually_spin.txt COPYONLY)
+configure_file(resources/stop_condition_eventually_scl.txt resources/stop_condition_eventually_scl.txt COPYONLY)
+configure_file(resources/stop_condition_eventually_result.html resources/stop_condition_eventually_result.html COPYONLY)
+
+configure_file(resources/stop_condition_never_msg.txt resources/stop_condition_never_msg.txt COPYONLY)
+configure_file(resources/stop_condition_never_spin.txt resources/stop_condition_never_spin.txt COPYONLY)
+configure_file(resources/stop_condition_never_scl.txt resources/stop_condition_never_scl.txt COPYONLY)
+configure_file(resources/stop_condition_never_result.html resources/stop_condition_never_result.html COPYONLY)
+
 configure_file(resources/data_constraint_msg.txt resources/data_constraint_msg.txt COPYONLY)
 configure_file(resources/data_constraint_spin.txt resources/data_constraint_spin.txt COPYONLY)
 configure_file(resources/data_constraint_scl.txt resources/data_constraint_scl.txt COPYONLY)
