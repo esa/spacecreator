@@ -4,7 +4,7 @@
 %{ProjectNameUpperCase}-DRIVER-CONFIGURATION DEFINITIONS ::= BEGIN
     
     %{ProjectNameUpperCase}-Conf-T ::= SEQUENCE {
-        -- might require example field to compile (ex. InputDataPtr)
+        -- Driver Configuration
     }
 
     -- ASN.1 Type definitions must start with an uppercase

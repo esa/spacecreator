@@ -4,7 +4,7 @@
 %{ProjectNameUpperCase}-DRIVER-PRIVATE-DATAVIEW DEFINITIONS ::= BEGIN
 
     %{ProjectNameUpperCase}-Private-Data ::= SEQUENCE {
-        -- might require example field to compile (ex. InputDataPtr)
+        -- Driver private Data structure
     }
 
     -- ASN.1 Type definitions must start with an uppercase
