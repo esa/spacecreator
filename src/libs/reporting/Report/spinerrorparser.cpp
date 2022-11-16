@@ -174,7 +174,6 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &parse
     QRegularExpressionMatchIterator matches = regex.globalMatch(parsedErrorToken);
     while (matches.hasNext()) {
         const QRegularExpressionMatch matchedError = matches.next();
-
         parseVariableName(matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName),
                 violationReport);
         violationReport.constraints.append(
@@ -184,13 +183,15 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &parse
         // depending on whether the "." character exists in the matched token
         const QString boundingValueToken =
                 matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationBoundingValue);
+        const QString boundingValueTokenClean = removeParentheses(boundingValueToken);
         if (boundingValueToken.contains(QChar('.'))) {
-            boundingValue.setValue(boundingValueToken.toFloat());
+            boundingValue.setValue(boundingValueTokenClean.toFloat());
         } else {
-            boundingValue.setValue(boundingValueToken.toInt());
+            boundingValue.setValue(boundingValueTokenClean.toInt());
         }
         violationReport.boundingValues.append(boundingValue);
     }
+
     QVariant variableViolation;
     variableViolation.setValue(violationReport);
     return variableViolation;
@@ -265,8 +266,8 @@ QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex
     pattern += QStringLiteral("([a-z_][\\w\\.]+)");
     // operator
     pattern += QStringLiteral("(.+?)");
-    // bounding value
-    pattern += QStringLiteral("([\\d\\.]+)");
+    // bounding value (number) - accounts for parentheses
+    pattern += QStringLiteral("([-\\d\\.\\(\\)]+)");
     // closing parenthesis
     pattern += QStringLiteral("\\)");
     return QRegularExpression(pattern);
@@ -279,6 +280,14 @@ QRegularExpression reporting::SpinErrorParser::buildStopConditionViolationRegex(
     // conditions
     pattern += QStringLiteral("(.+?);");
     return QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption);
+}
+
+QString reporting::SpinErrorParser::removeParentheses(const QString &numberToken)
+{
+    QString numberTokenClean = numberToken;
+    numberTokenClean.replace(QString("("), QString());
+    numberTokenClean.replace(QString(")"), QString());
+    return numberTokenClean;
 }
 
 QString reporting::SpinErrorParser::cleanUpSclComments(const QString &scl)

@@ -396,9 +396,13 @@ if __name__ == '__main__':
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)
 
     # Copy syntax highlighter files from asn1plugin
-    generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
+    if is_qt6:
+        generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter')
+    else:
+        generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
     generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
     copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
+
     # Copy snippets from asn1plugin
     snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
     snippets_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'snippets')

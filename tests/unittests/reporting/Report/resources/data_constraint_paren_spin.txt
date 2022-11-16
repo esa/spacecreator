@@ -1,0 +1,167 @@
+  6:	proc  3 (:init::1) system.pml:87 Send 1	-> queue 1 (Asw_lock)
+ 14:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+ 16:	proc  2 (Asw_tc:1) system.pml:67 Recv 1	<- queue 1 (Asw_lock)
+ 18:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+ 26:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+ 31:	proc  2 (Asw_tc:1) system.pml:78 Send 1	-> queue 1 (Asw_lock)
+ 35:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+ 37:	proc  2 (Asw_tc:1) system.pml:67 Recv 1	<- queue 1 (Asw_lock)
+ 39:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+ 50:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+ 57:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+ 60:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+ 64:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+ 72:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+ 79:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+ 82:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+ 86:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+ 94:	proc  1 (Egse_tc:1) system.pml:24 Send 1	-> queue 2 (Asw_tc_channel)
+100:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+103:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+107:	proc  2 (Asw_tc:1) system.pml:71 Recv 1	<- queue 2 (Asw_tc_channel)
+115:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+121:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+124:	proc  2 (Asw_tc:1) system.pml:20 Send 2	-> queue 3 (Egse_tm_channel)
+128:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+136:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+142:	proc  0 (Egse_tm:1) system.pml:41 Recv 2	<- queue 3 (Egse_tm_channel)
+145:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+149:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+157:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+165:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+168:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+172:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+180:	proc  1 (Egse_tc:1) system.pml:24 Send 2	-> queue 2 (Asw_tc_channel)
+186:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+189:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+193:	proc  2 (Asw_tc:1) system.pml:71 Recv 2	<- queue 2 (Asw_tc_channel)
+201:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+207:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+210:	proc  2 (Asw_tc:1) system.pml:20 Send 4	-> queue 3 (Egse_tm_channel)
+214:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+222:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+228:	proc  0 (Egse_tm:1) system.pml:41 Recv 4	<- queue 3 (Egse_tm_channel)
+231:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+235:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+243:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+252:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+255:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+259:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+267:	proc  1 (Egse_tc:1) system.pml:24 Send 3	-> queue 2 (Asw_tc_channel)
+273:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+276:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+280:	proc  2 (Asw_tc:1) system.pml:71 Recv 3	<- queue 2 (Asw_tc_channel)
+288:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+294:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+297:	proc  2 (Asw_tc:1) system.pml:20 Send 6	-> queue 3 (Egse_tm_channel)
+301:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+309:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+315:	proc  0 (Egse_tm:1) system.pml:41 Recv 6	<- queue 3 (Egse_tm_channel)
+318:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+322:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+330:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+340:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+343:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+347:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+355:	proc  1 (Egse_tc:1) system.pml:24 Send 4	-> queue 2 (Asw_tc_channel)
+361:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+364:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+368:	proc  2 (Asw_tc:1) system.pml:71 Recv 4	<- queue 2 (Asw_tc_channel)
+376:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+382:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+385:	proc  2 (Asw_tc:1) system.pml:20 Send 8	-> queue 3 (Egse_tm_channel)
+389:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+397:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+403:	proc  0 (Egse_tm:1) system.pml:41 Recv 8	<- queue 3 (Egse_tm_channel)
+406:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+410:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+418:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+429:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+432:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+436:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+444:	proc  1 (Egse_tc:1) system.pml:24 Send 5	-> queue 2 (Asw_tc_channel)
+450:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+453:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+457:	proc  2 (Asw_tc:1) system.pml:71 Recv 5	<- queue 2 (Asw_tc_channel)
+465:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+471:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+474:	proc  2 (Asw_tc:1) system.pml:20 Send 10	-> queue 3 (Egse_tm_channel)
+478:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+486:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+492:	proc  0 (Egse_tm:1) system.pml:41 Recv 10	<- queue 3 (Egse_tm_channel)
+495:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+499:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+507:	proc  1 (Egse_tc:1) system.pml:24 Send 0	-> queue 2 (Asw_tc_channel)
+519:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+522:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+526:	proc  2 (Asw_tc:1) system.pml:71 Recv 0	<- queue 2 (Asw_tc_channel)
+534:	proc  1 (Egse_tc:1) system.pml:24 Send 6	-> queue 2 (Asw_tc_channel)
+540:	proc  0 (Egse_tm:1) system.pml:41 Recv 0	<- queue 3 (Egse_tm_channel)
+543:	proc  2 (Asw_tc:1) system.pml:20 Send 0	-> queue 3 (Egse_tm_channel)
+547:	proc  2 (Asw_tc:1) system.pml:71 Recv 6	<- queue 2 (Asw_tc_channel)
+spin: dataview.pml:1983, Error: assertion violated
+spin: text of failed assertion: assert(((global_state.asw.tmp>=-(200))&&(global_state.asw.tmp<=(-100.0))))
+spin: trail ends after 554 steps
+#processes: 3
+		nothing.data.no_event.dummy = 0
+		nothing.data.system_startup.dummy = 0
+		nothing.data.input_event.source = 0
+		nothing.data.input_event.dest = 0
+		nothing.data.input_event.event.data.asw.data.msg_in.data.input_none.dummy = 0
+		nothing.data.input_event.event.data.asw.data.msg_in.data.tc.x = 0
+		nothing.data.input_event.event.data.asw.data.msg_in.selection = 0
+		nothing.data.input_event.event.data.asw.data.msg_out.data.tm.x = 0
+		nothing.data.input_event.event.data.asw.data.msg_out.selection = 0
+		nothing.data.input_event.event.data.asw.selection = 0
+		nothing.data.input_event.event.data.egse.data.msg_in.data.tm.x = 0
+		nothing.data.input_event.event.data.egse.data.msg_in.selection = 0
+		nothing.data.input_event.event.data.egse.data.msg_out.data.tc.x = 0
+		nothing.data.input_event.event.data.egse.data.msg_out.selection = 0
+		nothing.data.input_event.event.data.egse.selection = 0
+		nothing.data.input_event.event.selection = 0
+		nothing.data.output_event.source = 0
+		nothing.data.output_event.dest = 0
+		nothing.data.output_event.event.data.asw.data.msg_in.data.input_none.dummy = 0
+		nothing.data.output_event.event.data.asw.data.msg_in.data.tc.x = 0
+		nothing.data.output_event.event.data.asw.data.msg_in.selection = 0
+		nothing.data.output_event.event.data.asw.data.msg_out.data.tm.x = 0
+		nothing.data.output_event.event.data.asw.data.msg_out.selection = 0
+		nothing.data.output_event.event.data.asw.selection = 0
+		nothing.data.output_event.event.data.egse.data.msg_in.data.tm.x = 0
+		nothing.data.output_event.event.data.egse.data.msg_in.selection = 0
+		nothing.data.output_event.event.data.egse.data.msg_out.data.tc.x = 0
+		nothing.data.output_event.event.data.egse.data.msg_out.selection = 0
+		nothing.data.output_event.event.data.egse.selection = 0
+		nothing.data.output_event.event.selection = 0
+		nothing.data.unhandled_input.source = 0
+		nothing.data.unhandled_input.dest = 0
+		nothing.data.unhandled_input.event.data.asw.data.msg_in.data.input_none.dummy = 0
+		nothing.data.unhandled_input.event.data.asw.data.msg_in.data.tc.x = 0
+		nothing.data.unhandled_input.event.data.asw.data.msg_in.selection = 0
+		nothing.data.unhandled_input.event.data.asw.data.msg_out.data.tm.x = 0
+		nothing.data.unhandled_input.event.data.asw.data.msg_out.selection = 0
+		nothing.data.unhandled_input.event.data.asw.selection = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_in.data.tm.x = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_in.selection = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_out.data.tc.x = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_out.selection = 0
+		nothing.data.unhandled_input.event.data.egse.selection = 0
+		nothing.data.unhandled_input.event.selection = 0
+		nothing.selection = 1
+		inited = 1
+		queue 3 (Egse_tm_channel): [0]
+		Egse_tm_signal_parameter = 0
+		Egse_tm_channel_used = 1
+		queue 2 (Asw_tc_channel): 
+		Asw_tc_signal_parameter = 6
+		Asw_tc_channel_used = 1
+		global_state.asw.state = 0
+		global_state.asw.init_done = 0
+		global_state.asw.tmp = 12
+		global_state.timers.asw.dummy = 0
+		global_state.timers.dummy_entry.dummy = 0
+		queue 1 (Asw_lock): 
+554:	proc  2 (Asw_tc:1) system.pml:19 (state 26)
+554:	proc  1 (Egse_tc:1) system.pml:23 (state 17)
+554:	proc  0 (Egse_tm:1) system.pml:35 (state 12)
+4 processes created

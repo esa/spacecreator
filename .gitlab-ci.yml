@@ -7,6 +7,7 @@ stages:
 
 default:
   before_script:
+    - source ${CI_PROJECT_DIR}/scripts/timestamp.sh
     # dependencies
     - time apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect
     # install OpenGEODE dependencies
@@ -22,6 +23,10 @@ default:
     # setup PATH
     - export PATH=$PATH:${ENV_DIR}/asn1scc
     - export PATH=$PATH:/root/.local/bin
+    # CCache Config
+    - mkdir -p ccache
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache
 
 
 spacecreator-qt5-master:
@@ -38,7 +43,9 @@ spacecreator-qt5-master:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
     - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
-    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release
+    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --patch_version $CI_BUILD_ID
+    # show caching statistics
+    - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # read the version numbers
@@ -52,6 +59,7 @@ spacecreator-qt5-master:
     key: asn1scc
     paths:
       - ${BUILD_DIR}/asn1scc_bin
+      - ${CCACHE_DIR}
   artifacts:
     reports:
       junit: ${BUILD_DIR}/tst_*-result.xml
@@ -76,7 +84,9 @@ spacecreator-qt6-master:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
     - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
-    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin
+    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin --patch_version $CI_BUILD_ID
+    # show caching statistics
+    - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # read the version numbers
@@ -87,6 +97,7 @@ spacecreator-qt6-master:
     key: asn1scc
     paths:
       - ${BUILD_DIR}/asn1scc_bin
+      - ${CCACHE_DIR}
   artifacts:
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
@@ -109,11 +120,11 @@ spacecreator-qt5-feature:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
     - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
-    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release
+    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --patch_version $CI_BUILD_ID
+    # show caching statistics
+    - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
-    # read the version numbers
-    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # unit tests
     - cd ${CI_PROJECT_DIR}
     - time ./scripts/run_tests.sh ${BUILD_DIR}
@@ -121,6 +132,7 @@ spacecreator-qt5-feature:
     key: asn1scc
     paths:
       - ${BUILD_DIR}/asn1scc_bin
+      - ${CCACHE_DIR}
   artifacts:
     reports:
       junit: ${BUILD_DIR}/tst_*-result.xml
@@ -144,15 +156,18 @@ spacecreator-qt6-feature:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
     - python3 ${CI_PROJECT_DIR}/scripts/prebuild.py --output_dir ${ENV_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --qt_version ${ENV_QT_VERSION} --qtcreator_version ${ENV_QTC_VERSION}
     # build space creator
-    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin
+    - python3 ${CI_PROJECT_DIR}/scripts/build_spacecreator.py --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --build_dir ${BUILD_DIR} --build_type Release --no_build_asn1plugin --patch_version $CI_BUILD_ID
+    # show caching statistics
+    - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
-    # read the version numbers
-    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
+    # show caching statistics
+    - ccache -s
   cache:
     key: asn1scc
     paths:
       - ${BUILD_DIR}/asn1scc_bin
+      - ${CCACHE_DIR}
   rules:
     # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"

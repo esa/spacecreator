@@ -20,7 +20,7 @@ python3 ./scripts/build_spacecreator.py
 """
 
 
-def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_type: str, env_dir: str, build_asn1plugin: bool) -> None:
+def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_type: str, env_dir: str, build_asn1plugin: bool, patch_version: int) -> None:
     env_qt_dir = qt_dir_from_env_dir(env_dir)
     env_qmake_bin = join_dir(env_qt_dir, 'bin', 'qmake')
     qtc_install = app_dir
@@ -39,7 +39,7 @@ def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_typ
                  '-S', project_dir,
                  '-B', build_dir,
                  '-DCMAKE_BUILD_TYPE=' + build_type,
-                 '-DBUILD_PATCH_NUMBER=0',
+                 '-DBUILD_PATCH_NUMBER=' + str(patch_version),
                  '-DCMAKE_PREFIX_PATH=' + cmake_prefix_path,
                  '-DQT_QMAKE_EXECUTABLE:STRING=' + env_qmake_bin,
                  '-DQTC_INSTALL=' + qtc_install,
@@ -82,6 +82,8 @@ if __name__ == '__main__':
     parser.add_argument('--env_dir', dest='env_dir', type=str, required=True,
                         help='Path to the build environment dir created by prebuild.py')
     parser.add_argument('--no_build_asn1plugin', dest='no_build_asn1plugin', action='store_true')
+    parser.add_argument('--patch_version', dest='patch_version', type=int, required=False,
+                        help='Version number after major and minor version')
 
     args = parser.parse_args()
 
@@ -121,6 +123,14 @@ if __name__ == '__main__':
         build_asn1plugin = True
         print("build_spacecreator.py:  Building ASN1Plugin")
 
+    if args.patch_version:
+        patch_version = args.patch_version
+        print("build_spacecreator.py: Patch version is {}".format(patch_version))
+    else:
+        patch_version = 0
+        print("build_spacecreator.py: Defaulting patch version {}".format(patch_version))
+
     check_cmake_version(3, 16, 0)
-    build_spacecreator(project_dir, build_dir, app_dir, build_type, env_dir, build_asn1plugin)
+
+    build_spacecreator(project_dir, build_dir, app_dir, build_type, env_dir, build_asn1plugin, patch_version)
     print("build_spacecreator.py: Total time was: {}".format(delta_time(start_time)))

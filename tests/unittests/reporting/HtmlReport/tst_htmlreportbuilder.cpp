@@ -36,11 +36,6 @@ void tst_HtmlReportBuilder::testNoError()
     auto html = htmlBuilder.parseAndBuildHtmlReport({}, {}, {}, QStringList(), htmlTemplatePath);
     const auto htmlResult = readFile(htmlResultPath);
 
-    QFile file("/home/taste/empty_result.html");
-    file.open(QFile::WriteOnly);
-    file.write(html.toUtf8());
-    file.close();
-
     QVERIFY(html == htmlResult);
 }
 

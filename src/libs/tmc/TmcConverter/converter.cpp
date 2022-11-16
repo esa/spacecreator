@@ -343,7 +343,7 @@ bool TmcConverter::convertTrace(const QString &inputFile, const QString &outputF
         if (infoFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&infoFile);
             while (!in.atEnd()) {
-                m_observerAttachmentInfos.append(in.readLine() + ":" + QString::number(info.priority()));
+                m_observerAttachmentInfos.append(in.readLine() + ":p" + QString::number(info.priority()));
             }
             infoFile.close();
         } else {
@@ -928,7 +928,7 @@ void TmcConverter::attachNextObserver()
     if (infoFile.open(QIODevice::ReadOnly)) {
         QTextStream in(&infoFile);
         while (!in.atEnd()) {
-            m_observerAttachmentInfos.append(in.readLine() + ":" + QString::number(info.priority()));
+            m_observerAttachmentInfos.append(in.readLine() + ":p" + QString::number(info.priority()));
         }
         infoFile.close();
     } else {

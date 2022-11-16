@@ -8,7 +8,9 @@
   </head>
   <body>
     <h1>Spin Error Report</h1>
-  
+    {% if report|length == 0 %}
+      <i>No errors found.</i>
+    {% endif %}
     {% for reportItem in report %}
       <table>
         <tr>
