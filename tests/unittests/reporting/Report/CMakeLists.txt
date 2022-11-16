@@ -34,6 +34,10 @@ configure_file(resources/data_constraint_nested_msg.txt resources/data_constrain
 configure_file(resources/data_constraint_nested_spin.txt resources/data_constraint_nested_spin.txt COPYONLY)
 configure_file(resources/data_constraint_nested_scl.txt resources/data_constraint_nested_scl.txt COPYONLY)
 
+configure_file(resources/data_constraint_paren_msg.txt resources/data_constraint_paren_msg.txt COPYONLY)
+configure_file(resources/data_constraint_paren_spin.txt resources/data_constraint_paren_spin.txt COPYONLY)
+configure_file(resources/data_constraint_paren_scl.txt resources/data_constraint_paren_scl.txt COPYONLY)
+
 configure_file(resources/scenario.sim resources/scenario.sim COPYONLY)
 
                 

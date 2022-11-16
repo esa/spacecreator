@@ -25,7 +25,7 @@ endif()
 if(QTC_INSTALL)
     message("QtCreatorCheck: Found QTC_INSTALL: " ${QTC_INSTALL})
 else()
-    message(FATAL_ERROR "QtCreatorCheck: QTC_INSTALL was NOT set.")
+    message("QtCreatorCheck: QTC_INSTALL was NOT set.")
 endif()
 
 # Verify QTC_SOURCE is available as input
@@ -36,7 +36,7 @@ endif()
 if(QTC_SOURCE)
         message("QtCreatorCheck: Found QTC_SOURCE: " ${QTC_SOURCE})
 else()
-    message(FATAL_ERROR "QtCreatorCheck: QTC_SOURCE was NOT set.")
+    message("QtCreatorCheck: QTC_SOURCE was NOT set.")
 endif()
 
 # Find QTC_LIB_DIR from QTC_INSTALL

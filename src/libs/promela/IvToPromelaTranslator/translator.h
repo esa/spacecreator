@@ -424,12 +424,13 @@ private:
     auto initializeFunction(model::Sequence &sequence, const QString &functionName) const -> void;
     auto addChannelAndLock(IvToPromelaTranslator::Context &context, const QString &functionName) const -> void;
     auto observerInputSignalName(const IvToPromelaTranslator::ObserverAttachment &attachment) const -> QString;
+    auto observerInputSignalName(const ObserverInfo &observerInfo) const -> QString;
     auto attachInputObservers(IvToPromelaTranslator::Context &context, const QString &functionName,
             const QString &interfaceName, const QString &parameterName, const QString &parameterType) const
             -> std::list<std::unique_ptr<promela::model::ProctypeElement>>;
     auto generateInitProctype(Context &context) const -> void;
-    auto generateProctype(Context &context, const QString &functionName, const QString &interfaceName,
-            const QString &parameterType, size_t queueSize, size_t priority, bool environment) const -> void;
+    auto generateProctype(Context &context, const QString &functionName, bool environment,
+            const ProctypeInfo &proctypeInfo) const -> void;
     auto generateProcessMessageBlock(const QString &functionName, const QString &channelName, const QString &inlineName,
             const QString &parameterType, const QString &parameterName, const QString &exitLabel, bool lock,
             std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements,
@@ -445,7 +446,7 @@ private:
     auto generateProctypeForTimer(Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName,
             const QString &interfaceName, const ProctypeInfo &proctypeInfo) const -> void;
     auto createPromelaObjectsForAsyncPis(Context &context, const ivm::IVInterface *providedInterface,
-            const QString &functionName, const QString &interfaceName, const std::size_t priority) const -> void;
+            const QString &functionName, const ProctypeInfo &proctypeInfo) const -> void;
     auto createPromelaObjectsForSyncRis(
             Context &context, const ivm::IVInterface *requiredInterface, const QString &functionName) const -> void;
     auto createPromelaObjectsForEnvironment(Context &context, const ivm::IVFunction *ivFunction,

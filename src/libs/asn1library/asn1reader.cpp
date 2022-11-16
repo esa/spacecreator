@@ -35,7 +35,7 @@ namespace Asn1Acn {
 
 QCache<QString, QString> Asn1Reader::m_cache {};
 
-static const QStringList defaultParameter{"--field-prefix", "AUTO", "--xml-ast"};
+static const QStringList defaultParameter { "--field-prefix", "AUTO", "--xml-ast" };
 
 Asn1Reader::Asn1Reader(QObject *parent)
     : QObject(parent)
@@ -158,7 +158,6 @@ std::map<QString, std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1Files(
     for (const QFileInfo &fileInfo : fileInfos) {
         absoluteFilePaths.append(fileInfo.absoluteFilePath());
     }
-
 
     const QByteArray asn1FileHash = fileHash(absoluteFilePaths);
 
@@ -349,7 +348,6 @@ QStringList Asn1Reader::defaultParameter() const
     return Asn1Acn::defaultParameter;
 }
 
-
 int Asn1Reader::lineNumberFromError(const QString &error) const
 {
     QStringList tokens = error.split(':');
@@ -384,20 +382,19 @@ QPair<QString, QStringList> Asn1Reader::asn1CompilerCommand() const
     }
     if (asn1Compiler.isEmpty()) {
         qWarning() << "No asn1scc compiler found";
-        return {{}, {}};
+        return { {}, {} };
     }
 
     // Parameters to compiler. Use parameters set by user or use the default ones
     QStringList paramsList;
     if (parameter.isEmpty()) {
         paramsList = defaultParameter();
-    }
-    else {
+    } else {
 #if QTC_VERSION == 408
-    QStringList paramsList = parameter.split(' ', QString::SkipEmptyParts);
+        QStringList paramsList = parameter.split(' ', QString::SkipEmptyParts);
 #endif
 #if QTC_VERSION == 800
-    QStringList paramsList = parameter.split(' ', Qt::SkipEmptyParts);
+        QStringList paramsList = parameter.split(' ', Qt::SkipEmptyParts);
 #endif
     }
 
@@ -408,7 +405,7 @@ QPair<QString, QStringList> Asn1Reader::asn1CompilerCommand() const
         paramsList[pos] = asnFile.path();
     }
 
-    return {asn1Compiler, paramsList};
+    return { asn1Compiler, paramsList };
 }
 
 QString Asn1Reader::temporaryFileName(const QString &basename, const QString &suffix) const

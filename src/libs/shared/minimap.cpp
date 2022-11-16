@@ -132,7 +132,7 @@ void MiniMap::adjustGeometry()
         const auto parentRect = widget->rect();
         const QSize sceneSize = scene()->sceneRect().size().toSize();
         QRect currentRect { QPoint(0, 0),
-            sceneSize.scaled(parentRect.width() / kDefaultScaleFactor, parentRect.height(), Qt::KeepAspectRatio) };
+            sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatio) };
         currentRect.moveTopRight(parentRect.topRight());
         setGeometry(currentRect);
     }
@@ -209,7 +209,7 @@ void MiniMap::processMouseInput()
 void MiniMap::drawItems(QPainter *painter, int numItems, QGraphicsItem **items, const QStyleOptionGraphicsItem *options)
 {
     for (int idx = 0; idx < numItems; ++idx) {
-        if (items[idx]->type() == GripPoint::Type)
+        if (items[idx]->type() == GripPoint::Type || !items[idx]->isVisible())
             continue;
 
         painter->save();

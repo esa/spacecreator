@@ -1,0 +1,97 @@
+																origin										build-script												Deploy
+
+spacecreator.AppDir/																						.gitlab-ci.yml
+	bin/														qtcreator-4.8.2.7z							downloade_qtcreator.sh
+		aadlconverter											build_dir/bin/								src/applications/aadlconverter/CMakeListstxt				postbuild.py
+		dvconverter												build_dir/bin/								CMakeList.txt												postbuild.py
+		DVeditor												build_dir/bin/								CMakeList.txt												postbuild.py
+		IVeditor												build_dir/bin/								CMakeList.txt												postbuild.py
+		mscconverter											build_dir/bin/								CMakeList.txt												postbuild.py
+		msceditor												build_dir/bin/								CMakeList.txt												postbuild.py
+		mscstreaming											build_dir/bin/								CMakeList.txt												postbuild.py
+		msctosdlconverter										build_dir/bin/								CMakeList.txt												postbuild.py
+		sedsconverter											build_dir/bin/								CMakeList.txt												postbuild.py
+		tmc														build_dir/bin/								CMakeList.txt												postbuild.py
+		tmcivoptimizer											build_dir/bin/								CMakeList.txt												postbuild.py
+		xmlvalidator											build_dir/bin/								CMakeList.txt												postbuild.py
+	doc/														qtcreator-4.8.2_dev.7z						downloade_qtcreator.sh
+	src/														qtcreator-4.8.2_dev.7z						downloade_qtcreator.sh
+	lib/														qtcreator-4.8.2.7z							downloade_qtcreator.sh
+		Qt/														qtcreator-4.8.2.7z							downloade_qtcreator.sh
+			lib/												qtcreator-4.8.2.7z							downloade_qtcreator.sh
+				libGrantlee_Templates.so						build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
+				libGrantlee_Templates.so.5						build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
+				libGrantlee_Templates.so.5.2.0					build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
+				libGrantlee_TextDocument.so						build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
+				libGrantlee_TextDocument.so.5                	build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
+				libGrantlee_TextDocument.so.5.2.0      			build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
+				libQt5WebSockets.la								/Qt/x.y.z/gcc_64/lib/						Installed with Qt											prebuild.py
+				libQt5WebSockets.prl							/Qt/x.y.z/gcc_64/lib/						Installed with Qt											prebuild.py
+				libQt5WebSockets.so.5.12.1						/Qt/x.y.z/gcc_64/lib/						Installed with Qt											prebuild.py
+			plugins/											qtcreator-4.8.2.7z							downloade_qtcreator.sh
+				grantlee/										build_dir/grantlee/build/grantlee			build_grantlee.sh											prebuild.py
+					5.2/										build_dir/grantlee/build/grantlee			build_grantlee.sh											prebuild.py
+						grantlee_defaultfilters.so				build_dir/grantlee/build/grantlee			build_grantlee.sh											prebuild.py
+						grantlee_defaulttags.so					build_dir/grantlee/build/grantlee			build_grantlee.sh											prebuild.py
+						grantlee_i18ntags.so					build_dir/grantlee/build/grantlee			build_grantlee.sh											prebuild.py
+						grantlee_loadertags.so					build_dir/grantlee/build/grantlee			build_grantlee.sh											prebuild.py
+		qtcreator/												qtcreator-4.8.2.7z							downloade_qtcreator.sh
+			plugins/											qtcreator-4.8.2.7z							downloade_qtcreator.sh
+				libAsn1Acn.so									build_dir/lib/qtcreator/plugins				src/qtcreator/asn1plugin/CMakeLists.txt						postbuild.py
+				libSpaceCreatorPlugin.so						build_dir/lib/qtcreator/plugins				src/qtcreator/spacecreatorplugin/CMakeLists.txt				postbuild.py
+				libFunctionTesterPlugin.so						build_dir/lib/qtcreator/plugins				src/qtcreator/functiontesterplugin/CMakeLists.txt			postbuild.py
+				libSedsPlugin.so								build_dir/lib/qtcreator/plugins				src/qtcreator/sedsplugin/CMakeLists.txt						postbuild.py
+		x86-64-linux-gnu/										/install/libzxb-util.tar.gz					source
+			libxcb-util.so.1*									/install/libzxb-util.tar.gz					source														prebuild.py
+			libxcb-util.so.1.0.0								/install/libzxb-util.tar.gz					source														prebuild.py
+	libexec/													qtcreator-4.8.2.7z							download_qtcreator.sh
+		qtcreator/												qtcreator-4.8.2.7z							download_qtcreator.sh
+			asn1scc-Fuzzer/										asn1scc-Fuzzer-0.9-linux-x64.tar.gz 		/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
+				lib/											asn1scc-Fuzzer-0.9-linux-x64.tar.gz			/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
+					libicudata.so.52							asn1scc-Fuzzer-0.9-linux-x64.tar.gz			/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
+					libicui18n.so.52							asn1scc-Fuzzer-0.9-linux-x64.tar.gz			/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
+					libicuuc.so.52								asn1scc-Fuzzer-0.9-linux-x64.tar.gz			/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
+					libQt5Core.so.5								asn1scc-Fuzzer-0.9-linux-x64.tar.gz			/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
+				asn1scc-fuzzer									asn1scc-Fuzzer-0.9-linux-x64.tar.gz			/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
+	share/														qtcreator-4.8.2.7z							download_qtcreator.sh
+		qtcreator/												qtcreator-4.8.2.7z							download_qtcreator.sh
+			asn1acn/											Asn1Acn-PusC-Library-1.1.0.7z				/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh
+				libs/											Asn1Acn-PusC-Library-1.1.0.7z				/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh
+					PUS-C/										Asn1Acn-PusC-Library-1.1.0.7z				/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh
+						lots_of_folders							Asn1Acn-PusC-Library-1.1.0.7z				/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
+			generic-highlighter/
+				acn.xml											/src/qtcreator/asn1plugin/generic-highlighter/syntax	source											prebuild.py
+				asn1.xml										/src/qtcreator/asn1plugin/generic-highlighter/syntax	source											prebuild.py
+			snippets/
+				acn.xml											/src/qtcreator/asn1plugin/snippets			source														prebuild.py
+				asn1.xml										/src/qtcreator/asn1plugin/snippets			source														prebuild.py
+			templates/											qtcreator-4.8.2.7z							download_qtcreator.sh
+				wizards/										qtcreator-4.8.2.7z							download_qtcreator.sh
+					files/										qtcreator-4.8.2.7z							download_qtcreator.sh
+						acn/									/wizards/files/								source
+							template.acn						/wizards/files/								source														prebuild.py
+							wizard.json							/wizards/files/								source														prebuild.py
+						asn1/									/wizards/files/								source
+							template.asn						/wizards/files/								source														prebuild.py
+							wizard.json							/wizards/files/								source														prebuild.py
+						asn1acn/								/wizards/files/								source
+							template.acn						/wizards/files/								source														prebuild.py
+							template.asn						/wizards/files/								source														prebuild.py
+							wizard.json							/wizards/files/								source														prebuild.py
+						interfaceview/							/wizards/files/								source
+							icon.png							/wizards/files/								source														prebuild.py
+							icon@2x.png							/wizards/files/								source														prebuild.py
+							interfaceview.xml					/wizards/files/								source														prebuild.py
+							wizard.json							/wizards/files/								source														prebuild.py
+					projects/									qtcreator-4.8.2.7z
+						asn1acn/								/wizards/projects/							source
+							lots_of_files						/wizards/projects/							source														prebuild.py
+	.DirIcon*													genereated by appimage tool					NA
+	AppRun.sh													/install/appimage							source														prebuild.py
+	SpaceCreator.desktop										/install/appimage							source														prebuild.py
+	docs.pri													qtcreator-4.8.2_dev.7z						downloade_qtcreator.sh
+	HACKING.txt													qtcreator-4.8.2_dev.7z						downloade_qtcreator.sh
+	LICENSE.GPL3-EXCEPT											qtcreator-4.8.2_dev.7z						downloade_qtcreator.sh
+	qtcreator.pri												qtcreator-4.8.2_dev.7z						downloade_qtcreator.sh
+	qtcreatordata.pri											qtcreator-4.8.2_dev.7z						downloade_qtcreator.sh
+	README.md													qtcreator-4.8.2_dev.7z						downloade_qtcreator.sh

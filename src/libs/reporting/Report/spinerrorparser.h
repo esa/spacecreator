@@ -124,6 +124,7 @@ private:
     static QRegularExpression buildStopConditionViolationRegex();
     static QRegularExpression buildStopConditionExpressionRegex();
 
+    static QString removeParentheses(const QString &numberToken);
     static QString cleanUpSclComments(const QString &scl);
     static QStringList splitExpression(const QString &expression);
     static StopConditionViolationReport::ViolationType resolveViolationType(const QStringList &expressions);
