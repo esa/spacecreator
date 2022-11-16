@@ -625,11 +625,8 @@ auto SimulinkImporterPlugin::addIvFunctionToIvModel(ivm::IVFunction *const sourc
 
 auto SimulinkImporterPlugin::addGeneratedAsn1FilesToCurrentProject(const QStringList &generatedAsn1FileNames) -> void
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QStringList asn1FilePathsToBeAddedToProject;
-#else
-    QList<Utils::FilePath> asn1FilePathsToBeAddedToProject;
-#endif
+    const Utils::FilePaths currentProjectFiles = m_currentProject->files(ProjectExplorer::Project::SourceFiles);
+    Utils::FilePaths asn1FilePathsToBeAddedToProject;
 
     for(auto &asn1FileName : generatedAsn1FileNames) {
         QString destinationAsn1FilePath = QString("%1/%2").arg(m_currentProjectDirectoryPath).arg(asn1FileName);
@@ -655,18 +652,17 @@ auto SimulinkImporterPlugin::addGeneratedAsn1FilesToCurrentProject(const QString
 
             QFile(asn1FileName).copy(destinationAsn1FilePath);
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            asn1FilePathsToBeAddedToProject.append(destinationAsn1FilePath);
-#else
             Utils::FilePath destinationAsn1UtilsFilePath = Utils::FilePath::fromString(destinationAsn1FilePath);
-            asn1FilePathsToBeAddedToProject.append(destinationAsn1UtilsFilePath);
-#endif
+
+            if (!currentProjectFiles.contains(destinationAsn1UtilsFilePath)) {
+                printInfoInGeneralMessages(GenMsg::fileHasBeenAddedToProject.arg(destinationAsn1FilePath));
+                asn1FilePathsToBeAddedToProject.append(destinationAsn1UtilsFilePath);
+            }
         } else {
             printInfoInGeneralMessages(GenMsg::fileHasNotBeenOverridden.arg(asn1FileName));
         }
     }
 
-    m_currentProject->rootProjectNode()->removeFiles(asn1FilePathsToBeAddedToProject); // dont want to duplicate files in .pro file
     m_currentProject->rootProjectNode()->addFiles(asn1FilePathsToBeAddedToProject);
 }
 
