@@ -26,15 +26,19 @@ namespace conversion::exporter {
 void ModelExporter::writeAndCommit(QSaveFile &outputFile, const QString &data) const
 {
     if (!outputFile.open(QIODevice::WriteOnly)) {
-        throw ExportException(QString("Failed to open a file %1").arg(outputFile.fileName()));
+        throw ExportException(
+                QString("Failed to open a file %1 %2").arg(outputFile.fileName()).arg(outputFile.errorString()));
     }
 
     if (outputFile.write(data.toUtf8()) == -1) {
-        throw ExportException(QString("Failed to write a file %1").arg(outputFile.fileName()));
+        throw ExportException(
+                QString("Failed to write a file %1 %2").arg(outputFile.fileName()).arg(outputFile.errorString()));
     }
 
     if (!outputFile.commit()) {
-        throw ExportException(QString("Failed to commit a transaction in %1").arg(outputFile.fileName()));
+        throw ExportException(QString("Failed to commit a transaction in %1 %2")
+                                      .arg(outputFile.fileName())
+                                      .arg(outputFile.errorString()));
     }
 }
 

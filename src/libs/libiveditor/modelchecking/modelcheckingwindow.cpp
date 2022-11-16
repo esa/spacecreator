@@ -201,7 +201,6 @@ ModelCheckingWindow::~ModelCheckingWindow()
 /*!
  * \brief ModelCheckingWindow::callTasteGens Calls any needed TASTE generators.
  */
-
 void ModelCheckingWindow::callTasteGens(bool toggled)
 {
     if (!toggled) {
@@ -237,7 +236,6 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
     }
 }
-
 
 /*!
  * \brief ModelCheckingWindow::listProperties Recursive function creating a tree of QTreeWidgetItem reflecting the
@@ -658,7 +656,6 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     QStringList arguments;
     arguments << "-f" << "statusfile" << "callif.sh";
 
-
     if (QProcess::execute(rmCmd, arguments) != 0) {
         QString fullCmd = rmCmd + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Call IF"), "Error executing: " + fullCmd);
@@ -786,10 +783,16 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
     }
 
     auto p = new QProcess();
-    p->start(program, arguments);
+    connect(p, &QProcess::stateChanged, [p](QProcess::ProcessState newState){
+        if (newState == QProcess::NotRunning) {
+            p->deleteLater();
+        }
+    });
 
+    p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
         QMessageBox::warning(this, tr("Open scenario"), tr("Error when calling '%1 %2' .").arg(program, arguments.join(" ")));
+        delete p;
         return;
     }
 

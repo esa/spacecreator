@@ -11,7 +11,7 @@ export GSETTINGS_SCHEMA_DIR="${HERE}/usr/share/glib-2.0/schemas/${GSETTINGS_SCHE
 usage()
 {
    cat <<EOF
-Usage: qtcreator [OPTIONS]
+Usage: spaceCreator [OPTIONS]
 Options:
         No option:
             Start space creator
@@ -57,44 +57,56 @@ libexecdir=${HERE}/libexec
 LD_LIBRARY_PATH=$libdir:$libdir/qtcreator$qtlibpath${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 
+TOOL=$1
 
-case $1 in
+case $TOOL in
 --help|-h)
     usage 1>&2
     exit 1
     ;;
 --aadlconverter)
-    exec "$bindir/aadlconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    shift
+    exec "$bindir/aadlconverter" $@
     ;;
 --dvconverter)
-    exec "$bindir/dvconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    shift
+    exec "$bindir/dvconverter" $@
     ;;
 --mscconverter)
-    exec "$bindir/mscconverter" "$2" "$3" "$4" "$5" "$6" "$7"
+    shift
+    exec "$bindir/mscconverter" $@
     ;;
 --sedsconverter)
-    exec "$bindir/sedsconverter" "${@:2}"
+    shift
+    exec "$bindir/sedsconverter" $@
     ;;
 --tmcconverter)
-    exec "$bindir/tmc" "${@:2}"
+    shift
+    exec "$bindir/tmc" $@
     ;;
 --tmcivoptimizer)
-    exec "$bindir/tmcivoptimizer" "${@:2}"
+    shift
+    exec "$bindir/tmcivoptimizer" $@
     ;;
 --mscstreaming)
-    exec "$bindir/mscstreaming" "$2" "$3" "$4" "$5" "$6" "$7"
+    shift
+    exec "$bindir/mscstreaming" $@
     ;;
 --DVeditor)
-    exec "$bindir/DVeditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    shift
+    exec "$bindir/DVeditor" $@
     ;;
 --IVeditor)
-    exec "$bindir/IVeditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    shift
+    exec "$bindir/IVeditor" $@
     ;;
 --MSCeditor)
-    exec "$bindir/msceditor" "$2" "$3" "$4" "$5" "$6" "$7"
+    shift
+    exec "$bindir/msceditor" $@
     ;;
 --qhelpgenerator)
-    exec "$libexecdir/qhelpgenerator" "$2" "$3" "$4" "$5" "$6" "$7"
+    shift
+    exec "$libexecdir/qhelpgenerator" $@
     ;;
 --version|-version)
     "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" "-version"
