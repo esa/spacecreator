@@ -187,6 +187,3 @@ spacecreator-qt6-feature:
   rules:
     # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
-
-
-
