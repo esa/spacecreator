@@ -45,7 +45,7 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(
             continue;
         }
 
-        SpinErrorReportItem newReportItem = parseTrace(spinTrace, sclFiles);
+        SpinErrorReportItem newReportItem = parseTrace(spinTrace, sclConditions);
         newReportItem.errorNumber = errorIndex++;
         newReportItem.scenario = scenario;
         report.append(newReportItem);
@@ -55,9 +55,41 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(
 }
 
 reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
-        const QString &spinTraces, const QStringList &) const
+        const QString &spinTraces, const QStringList &sclConditions) const
 {
     SpinErrorReportItem reportItem;
+    // an observer failure (entering success state) can be detected
+    // by finding an acceptance cycle in the report, but it can also
+    // indicate another stop condition violation with an "eventually" clause
+    auto observerFailureSuccessStateMatch = matchObserverFailureSuccessState(spinTraces);
+    if (observerFailureSuccessStateMatch.hasMatch()) {
+        // try matching for "eventually" clause in scl
+        const QString sclSanitized = cleanUpSclComments(sclConditions.join(QChar('\n')));
+        const QRegularExpression sclRegex = buildStopConditionViolationRegex();
+        auto sclMatches = sclRegex.globalMatch(sclSanitized);
+        while (sclMatches.hasNext()) {
+            auto sclMatch = sclMatches.next();
+            auto clause = sclMatch.captured(StopConditionParseTokens::StopConditionClause);
+            if (m_stopConditionViolationClauses.value(clause, reporting::StopConditionViolationReport::UnknownClause)
+                    == reporting::StopConditionViolationReport::Eventually) {
+                // eventually clause found in scl
+                auto violationString = sclMatch.captured();
+                auto report = parseStopConditionViolation(violationString);
+                reportItem.errorDepth = 0;
+                reportItem.errorType = SpinErrorReportItem::StopConditionViolation;
+                reportItem.rawErrorDetails = violationString;
+                reportItem.parsedErrorDetails = report;
+                return reportItem;
+            }
+        }
+        // no "eventually" clause found observer failure (interpreting as observer success state violation)
+        auto report = parseObserverFailureSuccessState(QString());
+        reportItem.errorDepth = 0;
+        reportItem.errorType = SpinErrorReportItem::ObserverFailure;
+        reportItem.rawErrorDetails = observerFailureSuccessStateMatch.captured(RawErrorMatch).trimmed();
+        reportItem.parsedErrorDetails = report;
+        return reportItem;
+    }
     auto stopConditionMatch = matchStopCondition(spinTraces);
     if (stopConditionMatch.hasMatch()) {
         auto violationString = stopConditionMatch.captured(ErrorDetailsMatch);
@@ -77,19 +109,6 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
         reportItem.errorDepth = 0;
         reportItem.errorType = SpinErrorReportItem::ObserverFailure;
         reportItem.rawErrorDetails = observerFailureErrorStateMatch.captured(RawErrorMatch).trimmed();
-        reportItem.parsedErrorDetails = report;
-        return reportItem;
-    }
-    // an observer failure (entering success state) can be detected
-    // by finding an acceptance cycle in the report, but it can also
-    // indicate another stop condition violation with an eventually clause
-    auto observerFailureSuccessStateMatch = matchObserverFailureSuccessState(spinTraces);
-    if (observerFailureSuccessStateMatch.hasMatch()) {
-        // found observer failure (success state)
-        auto report = parseObserverFailureSuccessState(QString());
-        reportItem.errorDepth = 0;
-        reportItem.errorType = SpinErrorReportItem::ObserverFailure;
-        reportItem.rawErrorDetails = observerFailureSuccessStateMatch.captured(RawErrorMatch).trimmed();
         reportItem.parsedErrorDetails = report;
         return reportItem;
     }
