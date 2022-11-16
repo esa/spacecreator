@@ -32,7 +32,9 @@ private Q_SLOTS:
     void testNoError();
     void testDataConstraintViolation();
     void testDataConstraintViolationNested();
-    void testStopConditionViolation();
+    void testStopConditionAlwaysEmpty();
+    void testStopConditionEventually();
+    void testStopConditionNever();
     void testObserverFailureErrorState();
     void testObserverFailureSuccessState();
 
