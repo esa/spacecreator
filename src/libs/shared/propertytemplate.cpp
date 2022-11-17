@@ -40,6 +40,7 @@ struct PropertyTemplate::PropertyTemplatePrivate {
     bool m_isEditable = true;
     bool m_isSystem = false;
     bool m_isOptional = false;
+    QMap<QString, QMap<QString, QString>> m_enumData;
 };
 
 PropertyTemplate::PropertyTemplate()
@@ -179,6 +180,14 @@ void PropertyTemplate::setAttrValidatorPattern(const QMultiMap<int, QPair<QStrin
     d->m_rxAttrValidatorPattern = pattern;
 }
 
+QMap<QString, QString> PropertyTemplate::enumData(const QString &enumValue) const
+{
+    if (!d->m_enumData.contains(enumValue)) {
+        return {};
+    }
+    return d->m_enumData.value(enumValue);
+}
+
 QDomElement PropertyTemplate::toXml(QDomDocument *doc) const
 {
     QDomElement attrElement = doc->createElement(kAttributeTagName);
@@ -285,6 +294,7 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
                 while (!typeEntryElement.isNull()) {
                     const QVariant enumValue = typeEntryElement.attribute(QLatin1String("value"));
                     values.append(enumValue);
+                    addEnumData(typeEntryElement);
                     typeEntryElement = typeEntryElement.nextSiblingElement(typeEntryElement.tagName());
                 }
                 value = values;
@@ -332,6 +342,22 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     setEditable(isEditable);
     setOptional(isOptional);
 }
+
+void PropertyTemplate::addEnumData(const QDomElement &typeEntryElement)
+{
+    const QString valueKey {"value"};
+    const QString enumValue = typeEntryElement.attribute(valueKey);
+    QMap<QString, QString> data;
+    QDomNamedNodeMap attributes = typeEntryElement.attributes();
+    for (int i = 0; i< attributes.count(); ++i) {
+        QDomAttr attr = attributes.item(i).toAttr();
+        if (attr.name() != valueKey) {
+            data[attr.name()] = attr.value();
+        }
+    }
+
+    d->m_enumData[enumValue] = data;
+};
 
 QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::Type type)
 {
