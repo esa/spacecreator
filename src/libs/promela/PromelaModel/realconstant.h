@@ -29,14 +29,14 @@ public:
     /**
      * @brief Constructor
      *
-     * @param value value of the variable
+     * @param value value of the constant
      */
     RealConstant(float value);
 
     /**
-     * @brief Getter for value of real variable
+     * @brief Getter for value of real constant
      *
-     * @return value of the real variable
+     * @return value of the constant
      */
     float getValue() const noexcept;
 

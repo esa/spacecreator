@@ -489,7 +489,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
         const auto rangeMin = range.first;
         const auto rangeMax = range.second;
 
-        int diff = rangeMax - rangeMin;
+        float diff = rangeMax - rangeMin;
         int steps = diff / delta;
 
         auto basePtr = std::make_unique<Expression>(Constant(range.first));
