@@ -29,6 +29,7 @@ set(SOURCES
   promeladatamodel.cpp
   promelamodel.cpp
   promelasystemmodel.cpp
+  realconstant.cpp
   select.cpp
   sequence.cpp
   stringconstant.cpp
@@ -70,6 +71,7 @@ set(INCLUDES
   promeladatamodel.h
   promelamodel.h
   promelasystemmodel.h
+  realconstant.h
   select.h
   sequence.h
   skip.h

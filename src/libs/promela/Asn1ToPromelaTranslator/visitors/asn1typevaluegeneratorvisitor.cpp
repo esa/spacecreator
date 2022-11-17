@@ -52,10 +52,10 @@
 #include <promela/PromelaModel/binaryexpression.h>
 #include <promela/PromelaModel/conditional.h>
 #include <promela/PromelaModel/constant.h>
-#include <promela/PromelaModel/forloop.h>
 #include <promela/PromelaModel/inlinecall.h>
 #include <promela/PromelaModel/inlinedef.h>
 #include <promela/PromelaModel/proctypeelement.h>
+#include <promela/PromelaModel/realconstant.h>
 #include <promela/PromelaModel/sequence.h>
 #include <promela/PromelaModel/valuedefinition.h>
 #include <promela/PromelaModel/variableref.h>
@@ -82,6 +82,7 @@ using Asn1Acn::Types::UserdefinedType;
 using conversion::Escaper;
 using conversion::translator::TranslationException;
 using promela::model::Assignment;
+using promela::model::BinaryExpression;
 using promela::model::Conditional;
 using promela::model::Constant;
 using promela::model::DoLoop;
@@ -92,6 +93,7 @@ using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
+using promela::model::RealConstant;
 using promela::model::Select;
 using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
@@ -481,22 +483,32 @@ void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
     }
 
     Conditional conditional;
-    RealGenerator generator(realSubset.value(), m_delta);
+    float delta = m_delta.value_or(1.f);
 
-    while (generator.has_next()) {
-        auto element = generator.next();
+    for (const auto &range : realSubset.value().getRanges()) {
+        const auto rangeMin = range.first;
+        const auto rangeMax = range.second;
+
+        int diff = rangeMax - rangeMin;
+        int steps = diff / delta;
+
+        auto basePtr = std::make_unique<Expression>(Constant(range.first));
+        auto multiplicationPtr = std::make_unique<Expression>(BinaryExpression(BinaryExpression::Operator::MULTIPLY,
+                std::make_unique<Expression>(VariableRef(tempName)),
+                std::make_unique<Expression>(RealConstant(delta))));
+        auto additionPtr = std::make_unique<Expression>(BinaryExpression(BinaryExpression::Operator::ADD,
+                std::make_unique<Expression>(Constant(range.first)), std::move(multiplicationPtr)));
 
         std::unique_ptr<model::Sequence> nestedSequence =
-                std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
-
-        nestedSequence->appendElement(Expression(VariableRef("true")));
+                std::make_unique<model::Sequence>(model::Sequence::Type::ATOMIC);
         nestedSequence->appendElement(
-                Assignment(VariableRef(valueVariableName), Expression(VariableRef(QString::number(element)))));
-
+                Select(VariableRef(tempName), Expression(Constant(0)), Expression(Constant(steps))));
+        nestedSequence->appendElement(Assignment(VariableRef(valueVariableName), *additionPtr));
         conditional.appendAlternative(std::move(nestedSequence));
     }
 
     model::Sequence sequence(model::Sequence::Type::NORMAL);
+    sequence.appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, tempName));
     sequence.appendElement(std::move(conditional));
 
     createValueGenerationInline(std::move(sequence));
