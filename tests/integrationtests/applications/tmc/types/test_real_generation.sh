@@ -20,7 +20,7 @@ mkdir $TEST_OUTPUT_DIR
 # Translate
 $TMC -iv $RESOURCE_DIR/interfaceview.xml \
     -o $TEST_OUTPUT_DIR \
-    -delta 0.5 \
+    -delta 1.4 \
     -enable-reals
 
 cd $TEST_OUTPUT_DIR \
@@ -28,7 +28,8 @@ cd $TEST_OUTPUT_DIR \
     && $CC -o system.out pan.c \
     && ./system.out -m1000000 -a -n > system.output \
     && grep -q "errors: 0" system.output \
-    && grep -q "MyReal_gv = -8.5;" env_inlines.pml \
+    && grep -q "select (MyReal_tmp : 0 .. 14);" env_inlines.pml \
+    && grep -q "MyReal_gv = (-10 + (MyReal_tmp * 1.4));" env_inlines.pml \
     && cd .. \
     && rm -rf $TEST_OUTPUT_DIR
 
