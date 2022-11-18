@@ -27,6 +27,8 @@ default:
     - mkdir -p ccache
     - export CCACHE_BASEDIR=${CI_PROJECT_DIR}
     - export CCACHE_DIR=${CI_PROJECT_DIR}/ccache
+    # Qt tests
+    - export QT_QPA_PLATFORM=offscreen
 
 
 spacecreator-qt5-master:
@@ -63,7 +65,7 @@ spacecreator-qt5-master:
       - ccache
   artifacts:
     reports:
-      junit: ${BUILD_DIR}/tst_*-result.xml
+      junit: ${BUILD_DIR}/test_result.xml
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
@@ -136,7 +138,6 @@ spacecreator-qt5-feature:
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
-    - ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
     key: spacecreator_cache
     paths:
@@ -144,7 +145,7 @@ spacecreator-qt5-feature:
       - ccache
   artifacts:
     reports:
-      junit: ${BUILD_DIR}/tst_*-result.xml
+      junit: ${BUILD_DIR}/test_result.xml
     expire_in: 2 days
   rules:
     # For pipelines created when a merge request is created or updated
