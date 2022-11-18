@@ -50,11 +50,10 @@ spacecreator-qt5-master:
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # unit tests
+    - ./scripts/run_tests.sh ${BUILD_DIR}
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
-    # unit tests
-    - cd ${CI_PROJECT_DIR}
-    - ./scripts/run_tests.sh ${BUILD_DIR}
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
   cache:
@@ -95,7 +94,6 @@ spacecreator-qt6-master:
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
-    - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
@@ -136,7 +134,6 @@ spacecreator-qt5-feature:
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
-    - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
     key: spacecreator_cache
@@ -177,7 +174,6 @@ spacecreator-qt6-feature:
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # unit tests
-    - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
     key: spacecreator_cache
