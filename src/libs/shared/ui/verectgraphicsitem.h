@@ -55,13 +55,14 @@ protected:
     void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     /**
-     * @brief transformedRect takes a GripPoint, the point is was moved from and a point it was moved to, and returns the
-     * rectangle that represents that movement with the restraints on that particular GripPoint applied. For instance, the corner GripPoints
-     * can move on both axis while the GripPoints on the horizontal lines can only move on the Y-axia.
-     * @param grip
-     * @param from
-     * @param to
-     * @return a constrained rectangle
+     * @brief transformedRect takes a GripPoint sitting on this VERectGraphicsItem and two QPointFs representing the movement of the GripPoint and returns
+     * QRectF representing the new sceneBoundingRect of this VERectGraphicsItem based on the allowed movement of that particular handle.
+     * A corner GripPoint can move freely. A GripPoint on a horizontal line can only move
+     * up or down. A GripPoint on a vertical line can only move left or right.
+     * @param grip a GripPoint
+     * @param from a QPointF the GripPoint was moved from
+     * @param to a QPointF the GripPoint was moved to
+     * @return a QRect representing the new sceneBoundingRect of this VERectGraphicsItem
      */
     QRectF transformedRect(GripPoint *grip, const QPointF &from, const QPointF &to);
 
