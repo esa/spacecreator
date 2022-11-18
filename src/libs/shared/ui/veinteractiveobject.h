@@ -85,6 +85,10 @@ protected:
 
     virtual TextItem *initTextItem();
     virtual void updateTextPosition();
+
+    /**
+     * @brief updateText from model object
+     */
     void updateText();
 
 protected:
