@@ -22,6 +22,7 @@
 #include "itemeditor/ivinterfacegraphicsitem.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
+#include "ivconnection.h"
 
 #include <QGraphicsView>
 #include <QLabel>

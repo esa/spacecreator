@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "ivconnectiongraphicsitem.h"
+
 #include "ivfunction.h"
 #include "ivfunctiontypegraphicsitem.h"
 
