@@ -60,7 +60,7 @@ void DVNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->restore();
 }
 
-QSizeF DVNodeGraphicsItem::minimalSize() const
+QSizeF DVNodeGraphicsItem::minimumSize() const
 {
     return shared::graphicsviewutils::kDefaultNodeGraphicsItemSize;
 }

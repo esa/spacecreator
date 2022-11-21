@@ -43,7 +43,7 @@ public:
     };
 
     dvm::DVNode *entity() const override;
-    QSizeF minimalSize() const override;
+    QSizeF minimumSize() const override;
 
     int type() const override { return Type; }
     int itemLevel(bool isSelected) const override;

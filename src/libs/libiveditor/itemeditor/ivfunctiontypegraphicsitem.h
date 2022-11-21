@@ -40,7 +40,7 @@ public:
 
     void enableEditMode() override;
 
-    QSizeF minimalSize() const override;
+    QSizeF minimumSize() const override;
 
     QString prepareTooltip() const override;
 

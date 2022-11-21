@@ -113,7 +113,7 @@ void IVFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGrap
     painter->restore();
 }
 
-QSizeF IVFunctionTypeGraphicsItem::minimalSize() const
+QSizeF IVFunctionTypeGraphicsItem::minimumSize() const
 {
     const QSizeF textSize = m_textItem->boundingRect().size();
     return { qMax(textSize.width(), shared::graphicsviewutils::kDefaultGraphicsItemSize.width()),

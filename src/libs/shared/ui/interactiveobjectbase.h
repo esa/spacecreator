@@ -97,6 +97,13 @@ protected:
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
+    /**
+     * @brief minimumSize
+     * The minimum size this object can have and still have its content be readable. Should be overridden by subclasses.
+     * Minimum size for interactiveobject is minSize for its GripPointsHandler
+     */
+    virtual QSizeF minimumSize() const;
+
 protected Q_SLOTS:
     virtual void rebuildLayout();
 

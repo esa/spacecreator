@@ -37,10 +37,6 @@ VERectGraphicsItem::VERectGraphicsItem(VEObject *entity, QGraphicsItem *parentGr
     setHighlightable(true);
 }
 
-QSizeF VERectGraphicsItem::minimalSize() const
-{
-    return QSizeF();
-}
 
 bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
 {
@@ -137,19 +133,13 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
 void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     if (from == to)
+    {
         return;
+    }
 
     // calculate new rect for this item, given that 'grip' was moved as descriped by 'from' and 'to'
     QRectF newRect = transformedRect(grip, from, to);
     // Enforce minimal size
-    if (newRect.height() < minimalSize().height())
-    {
-        newRect.setHeight(minimalSize().height());
-    }
-    if (newRect.width() < minimalSize().width())
-    {
-        newRect.setWidth(minimalSize().width());
-    }
     setGeometry(newRect);
 
     const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
@@ -235,14 +225,31 @@ QRectF VERectGraphicsItem::transformedRect(GripPoint *grip, const QPointF &from,
     if (shift.isNull()) {
         return rect;
     }
-    if (!grip) {
+    if (!grip) // A move operation
+    {
         return rect.translated(shift);
     }
 
+    if (!grip->isUnderMouse())
+    {
+        return rect;
+    }
+
+    QSizeF minSize = minimumSize();
+
     switch (grip->location()) {
-    case GripPoint::Left: {
-        const qreal left = rect.left() + shift.x();
-        rect.setLeft(left);
+    case GripPoint::Left:
+    {
+        auto newRect = rect.adjusted(shift.x(), 0, 0, 0);
+        if (newRect.width() < minSize.width())
+        {
+            rect.setWidth(minSize.width());
+        }
+        else
+        {
+            rect = newRect;
+        }
+
     } break;
     case GripPoint::Top: {
         const qreal top = rect.top() + shift.y();
@@ -279,6 +286,71 @@ QRectF VERectGraphicsItem::transformedRect(GripPoint *grip, const QPointF &from,
         qWarning() << "Update grip point handling";
         break;
     }
+
+    return rect.normalized();
+}
+
+QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
+{
+    const QPointF shift = QPointF(to - from);
+    QRectF rect = sceneBoundingRect();
+    if (shift.isNull()) {
+        return rect;
+    }
+
+    QSizeF minSize = minimumSize();
+
+    switch (grip->location()) {
+    case GripPoint::Left:
+    {
+        auto newRect = rect.adjusted(shift.x(), 0, 0, 0);
+        if (newRect.width() < minSize.width())
+        {
+            rect.setWidth(minSize.width());
+        }
+        else
+        {
+            rect = newRect;
+        }
+
+    } break;
+    case GripPoint::Top: {
+        const qreal top = rect.top() + shift.y();
+        rect.setTop(top);
+    } break;
+    case GripPoint::Right: {
+        const qreal right = rect.right() + shift.x();
+        rect.setRight(right);
+    } break;
+    case GripPoint::Bottom: {
+        const qreal bottom = rect.bottom() + shift.y();
+        rect.setBottom(bottom);
+    } break;
+    case GripPoint::TopLeft: {
+        const QPointF topLeft = rect.topLeft() + shift;
+        rect.setTopLeft(topLeft);
+    } break;
+    case GripPoint::TopRight: {
+        const QPointF topRight = rect.topRight() + shift;
+        rect.setTopRight(topRight);
+    } break;
+    case GripPoint::BottomLeft: {
+        const QPointF bottomLeft = rect.bottomLeft() + shift;
+        rect.setBottomLeft(bottomLeft);
+    } break;
+    case GripPoint::BottomRight: {
+        const QPointF bottomRight = rect.bottomRight() + shift;
+        rect.setBottomRight(bottomRight);
+    } break;
+    case GripPoint::Center: {
+        rect.translate(shift);
+    } break;
+    default:
+        qWarning() << "Update grip point handling";
+        break;
+    }
+
+    // Check rect for collisions
 
     return rect.normalized();
 }
@@ -352,7 +424,7 @@ bool VERectGraphicsItem::doLayout()
             margins = graphicsviewutils::kRootMargins;
         }
 
-        QRectF itemRect = QRectF(QPointF(0, 0), minimalSize());
+        QRectF itemRect = QRectF(QPointF(0, 0), minimumSize());
         itemRect.moveTopLeft(boundedRect.topLeft());
 
         graphicsviewutils::findGeometryForRect(itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), margins);
