@@ -195,6 +195,9 @@ def install_grantlee(env_dir: str, app_dir: str) -> None:
     templates_lib_dir = join_dir(cmake_build_dir, 'templates', 'lib')
     pattern = join_dir(templates_lib_dir, 'libGrantlee_*.so*')
     copy_file_pattern_to_dir(pattern, spacecreator_qt_lib_dir)
+    textdocument_lib_dir = join_dir(cmake_build_dir, 'textdocument', 'lib')
+    pattern = join_dir(textdocument_lib_dir, 'libGrantlee_*.so*')
+    copy_file_pattern_to_dir(pattern, spacecreator_qt_lib_dir)
 
 
 def download_asn1scc(env_dir: str) -> None:
