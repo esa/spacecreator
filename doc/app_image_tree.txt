@@ -19,12 +19,12 @@ spacecreator.AppDir/																						.gitlab-ci.yml
 	lib/														qtcreator-4.8.2.7z							downloade_qtcreator.sh
 		Qt/														qtcreator-4.8.2.7z							downloade_qtcreator.sh
 			lib/												qtcreator-4.8.2.7z							downloade_qtcreator.sh
-				libGrantlee_Templates.so						build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
-				libGrantlee_Templates.so.5						build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
-				libGrantlee_Templates.so.5.2.0					build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
-				libGrantlee_TextDocument.so						build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
-				libGrantlee_TextDocument.so.5                	build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
-				libGrantlee_TextDocument.so.5.2.0      			build_dir/grantlee/build/templates/lib/		build_grantlee.sh											prebuild.py
+				libGrantlee_Templates.so						build_dir/templates/lib/					prebuild.py													prebuild.py
+				libGrantlee_Templates.so.5						build_dir/templates/lib/					prebuild.py													prebuild.py
+				libGrantlee_Templates.so.5.2.0					build_dir/templates/lib/					prebuild.py													prebuild.py
+				libGrantlee_TextDocument.so						build_dir/textdocument/lib/					prebuild.py													prebuild.py
+				libGrantlee_TextDocument.so.5                	build_dir/textdocument/lib/					prebuild.py													prebuild.py
+				libGrantlee_TextDocument.so.5.2.0      			build_dir/textdocument/lib/					prebuild.py													prebuild.py
 				libQt5WebSockets.la								/Qt/x.y.z/gcc_64/lib/						Installed with Qt											prebuild.py
 				libQt5WebSockets.prl							/Qt/x.y.z/gcc_64/lib/						Installed with Qt											prebuild.py
 				libQt5WebSockets.so.5.12.1						/Qt/x.y.z/gcc_64/lib/						Installed with Qt											prebuild.py
