@@ -47,6 +47,7 @@ private:
             Kind_Input, //< Input signal interception, after processing by the recipient
             Kind_Output, //< Ouput signal interception, before processing by the recipient
             Kind_Continuous_Signal, //< Continuous signal in observer
+            Kind_Unhandled_Input, //< Unhandled input (signal loss)
         };
 
         /**
@@ -174,6 +175,9 @@ private:
 
         auto getObserverAttachments(const ObserverAttachment::Kind kind) -> const ObserverAttachments;
 
+        auto getUnhandledInputObserversForFunction(const QString &function, const QString &interface) const
+                -> ObserverAttachments;
+
         /**
          * Getter for the Promela model that is being created
          *
@@ -248,6 +252,7 @@ private:
         std::map<QString, std::map<QString, ObserverAttachments>> m_fromObserverAttachments;
         std::map<QString, std::map<QString, ObserverAttachments>> m_toObserverAttachments;
         std::vector<QString> m_observersWithContinuousSignals;
+        std::map<QString, std::map<QString, ObserverAttachments>> m_unhandledInputObserverAttachments;
     };
 
 public:
@@ -441,6 +446,8 @@ private:
     auto generateSendInline(Context &context, const QString &functionName, const QString &interfaceName,
             const QString &parameterName, const QString &parameterType, const QString &sourceFunctionName,
             const QString &sourceInterfaceName) const -> void;
+    auto generateUnhandledInputInline(
+            Context &context, const QString &functionName, const ProctypeInfo &proctypeInfo) const -> void;
     auto createPromelaObjectsForFunction(Context &context, const ::ivm::IVFunction *ivFunction,
             const QString &functionName, const FunctionInfo &functionInfo) const -> void;
     auto generateProctypeForTimer(Context &context, const ::ivm::IVFunction *ivFunction, const QString &functionName,
