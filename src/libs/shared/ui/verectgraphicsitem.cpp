@@ -118,7 +118,7 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
     if (pressedAt == releasedAt)
         return;
 
-    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
+    const QRectF rect = movedRect(pressedAt, releasedAt);
     if (QGraphicsItem *parentObj = parentItem()) {
         const QRectF parentRect =
                 parentObj->sceneBoundingRect().marginsRemoved(shared::graphicsviewutils::kContentMargins);
@@ -138,7 +138,7 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
     }
 
     // calculate new rect for this item, given that 'grip' was moved as descriped by 'from' and 'to'
-    QRectF newRect = transformedRect(grip, from, to);
+    QRectF newRect = resizedRect(grip, from, to);
     // Enforce minimal size
     setGeometry(newRect);
 
@@ -187,19 +187,13 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pr
     const QRectF rect = sceneBoundingRect();
     bool isBounded = shared::graphicsviewutils::isBounded(this, rect);
     bool noCollision = !shared::graphicsviewutils::isCollided(this, rect);
-    if (isBounded && noCollision) {
+    if (isBounded && noCollision)
+    {
         layoutInterfaces();
         layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
-    } else { // Fallback to previous geometry in case colliding with items at the same level
-        updateFromEntity();
-        for (auto child : childItems()) {
-            if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
-                iface->updateFromEntity();
-            }
-        }
-        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
+    layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
 }
 
 void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
@@ -218,133 +212,66 @@ void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pres
     }
 }
 
-QRectF VERectGraphicsItem::transformedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
-{
-    const QPointF shift = QPointF(to - from);
-    QRectF rect = sceneBoundingRect();
-    if (shift.isNull()) {
-        return rect;
-    }
-    if (!grip) // A move operation
-    {
-        return rect.translated(shift);
-    }
-
-    if (!grip->isUnderMouse())
-    {
-        return rect;
-    }
-
-    QSizeF minSize = minimumSize();
-
-    switch (grip->location()) {
-    case GripPoint::Left:
-    {
-        auto newRect = rect.adjusted(shift.x(), 0, 0, 0);
-        if (newRect.width() < minSize.width())
-        {
-            rect.setWidth(minSize.width());
-        }
-        else
-        {
-            rect = newRect;
-        }
-
-    } break;
-    case GripPoint::Top: {
-        const qreal top = rect.top() + shift.y();
-        rect.setTop(top);
-    } break;
-    case GripPoint::Right: {
-        const qreal right = rect.right() + shift.x();
-        rect.setRight(right);
-    } break;
-    case GripPoint::Bottom: {
-        const qreal bottom = rect.bottom() + shift.y();
-        rect.setBottom(bottom);
-    } break;
-    case GripPoint::TopLeft: {
-        const QPointF topLeft = rect.topLeft() + shift;
-        rect.setTopLeft(topLeft);
-    } break;
-    case GripPoint::TopRight: {
-        const QPointF topRight = rect.topRight() + shift;
-        rect.setTopRight(topRight);
-    } break;
-    case GripPoint::BottomLeft: {
-        const QPointF bottomLeft = rect.bottomLeft() + shift;
-        rect.setBottomLeft(bottomLeft);
-    } break;
-    case GripPoint::BottomRight: {
-        const QPointF bottomRight = rect.bottomRight() + shift;
-        rect.setBottomRight(bottomRight);
-    } break;
-    case GripPoint::Center: {
-        rect.translate(shift);
-    } break;
-    default:
-        qWarning() << "Update grip point handling";
-        break;
-    }
-
-    return rect.normalized();
-}
 
 QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    const QPointF shift = QPointF(to - from);
-    QRectF rect = sceneBoundingRect();
-    if (shift.isNull()) {
-        return rect;
-    }
+    QRectF boundingRect = sceneBoundingRect();
 
     QSizeF minSize = minimumSize();
 
     switch (grip->location()) {
     case GripPoint::Left:
     {
-        auto newRect = rect.adjusted(shift.x(), 0, 0, 0);
-        if (newRect.width() < minSize.width())
-        {
-            rect.setWidth(minSize.width());
-        }
-        else
-        {
-            rect = newRect;
-        }
-
-    } break;
-    case GripPoint::Top: {
-        const qreal top = rect.top() + shift.y();
-        rect.setTop(top);
-    } break;
-    case GripPoint::Right: {
-        const qreal right = rect.right() + shift.x();
-        rect.setRight(right);
-    } break;
-    case GripPoint::Bottom: {
-        const qreal bottom = rect.bottom() + shift.y();
-        rect.setBottom(bottom);
-    } break;
-    case GripPoint::TopLeft: {
-        const QPointF topLeft = rect.topLeft() + shift;
-        rect.setTopLeft(topLeft);
-    } break;
-    case GripPoint::TopRight: {
-        const QPointF topRight = rect.topRight() + shift;
-        rect.setTopRight(topRight);
-    } break;
-    case GripPoint::BottomLeft: {
-        const QPointF bottomLeft = rect.bottomLeft() + shift;
-        rect.setBottomLeft(bottomLeft);
-    } break;
-    case GripPoint::BottomRight: {
-        const QPointF bottomRight = rect.bottomRight() + shift;
-        rect.setBottomRight(bottomRight);
-    } break;
-    case GripPoint::Center: {
-        rect.translate(shift);
-    } break;
+        auto xMax = boundingRect.right() - minSize.width();
+        boundingRect.setLeft(qMin(to.x(), xMax));
+        break;
+    }
+    case GripPoint::Right:
+    {
+        auto xMin = boundingRect.left() + minSize.width();
+        boundingRect.setRight(qMax(to.x(), xMin));
+        break;
+    }
+    case GripPoint::Top:
+    {
+        auto yMax = boundingRect.bottom() - minSize.height();
+        boundingRect.setTop(qMin(to.y(), yMax));
+        break;
+    }
+    case GripPoint::Bottom:
+    {
+        auto yMin = boundingRect.top() + minSize.height();
+        boundingRect.setBottom(qMax(to.y(), yMin));
+        break;
+    }
+    case GripPoint::TopLeft:
+    {
+        auto yMax = boundingRect.bottom() - minSize.height();
+        auto xMax = boundingRect.right() - minSize.width();
+        boundingRect.setTopLeft(QPoint(qMin(to.x(), xMax), qMin(to.y(), yMax)));
+        break;
+    }
+    case GripPoint::TopRight:
+    {
+        auto yMax = boundingRect.bottom() - minSize.height();
+        auto xMin = boundingRect.left() + minSize.width();
+        boundingRect.setTopRight(QPoint(qMax(to.x(), xMin), qMin(to.y(), yMax)));
+        break;
+    }
+    case GripPoint::BottomLeft:
+    {
+        auto yMin = boundingRect.top() + minSize.height();
+        auto xMax = boundingRect.right() - minSize.width();
+        boundingRect.setBottomLeft(QPoint(qMin(to.x(), xMax), qMax(to.y(), yMin)));
+        break;
+    }
+    case GripPoint::BottomRight:
+    {
+        auto yMin = boundingRect.top() + minSize.height();
+        auto xMin = boundingRect.left() + minSize.width();
+        boundingRect.setBottomRight(QPoint(qMax(to.x(), xMin), qMax(to.y(), yMin)));
+        break;
+    }
     default:
         qWarning() << "Update grip point handling";
         break;
@@ -352,7 +279,15 @@ QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, con
 
     // Check rect for collisions
 
-    return rect.normalized();
+    return boundingRect;
+}
+
+QRectF VERectGraphicsItem::movedRect(const QPointF &from, const QPointF &to)
+{
+    auto deltaPoint = to - from;
+    QRectF boundingRect = sceneBoundingRect();
+    boundingRect.translate(deltaPoint);
+    return boundingRect;
 }
 
 QRectF VERectGraphicsItem::nestedItemsSceneBoundingRect() const
