@@ -26,8 +26,8 @@
 
 namespace reports {
 
-static const char *defaultHost = "https://git.vikingsoftware.com";
-static const int defaultProjectID = 60;
+static const char *defaultHost = "https://gitrepos.estec.esa.int";
+static const int defaultProjectID = 328;
 
 struct BugreportDialog::BugreportDialogPrivate {
     explicit BugreportDialogPrivate(BugreportDialog *dialog, const QString &logPath, const QList<QPixmap> &images)

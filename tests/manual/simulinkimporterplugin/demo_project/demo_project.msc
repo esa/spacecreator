@@ -1,0 +1,12 @@
+mscdocument demo_project /* MSC AND */;
+    language ASN.1;
+    data demo_project.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc demo_project;
+endmsc;
+endmscdocument;
+endmscdocument;

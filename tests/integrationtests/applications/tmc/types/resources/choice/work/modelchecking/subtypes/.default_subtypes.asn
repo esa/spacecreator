@@ -1,0 +1,21 @@
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyBetterChoice FROM USERDEFINED-TYPES-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-choiceinterface-choiceArg ::= MyBetterChoice
+
+
+
+
+END

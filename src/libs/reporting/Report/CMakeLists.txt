@@ -2,13 +2,19 @@ project(Report VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
     dataconstraintviolationreport.cpp
+    observerfailurereport.cpp
+    rawerroritem.cpp
     spinerrorparser.cpp
-    spinerrorreportitem.cpp)
+    spinerrorreportitem.cpp
+    stopconditionviolationreport.cpp)
 
 set(INCLUDES
     dataconstraintviolationreport.h
+    observerfailurereport.h
+    rawerroritem.h
     spinerrorparser.h
-    spinerrorreportitem.h)
+    spinerrorreportitem.h
+    stopconditionviolationreport.h)
 
 add_library(Report STATIC)
 target_sources(Report

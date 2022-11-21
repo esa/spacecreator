@@ -5,7 +5,7 @@ option(OPTIONS_NO_DEPRECATED
        "Disable deprecation warnings"
        TRUE)
 
-set(CLANG_WARNINGS -Wall
+set(COMMON_WARNINGS -Wall
                    -Wextra
                    -Wpedantic
                    -Wshadow
@@ -18,23 +18,31 @@ set(CLANG_WARNINGS -Wall
                    -Wnull-dereference
                    -Wdouble-promotion
                    -Wformat=2
-                   -Wno-c99-extensions
-                   -Wno-deprecated-volatile)
+)
 
 if(OPTIONS_WARNINGS_AS_ERRORS)
-    set(CLANG_WARNINGS ${CLANG_WARNINGS} -Werror)
+    set(COMMON_WARNINGS ${COMMON_WARNINGS} -Werror)
 endif()
 
 if(OPTIONS_NO_DEPRECATED)
-    set(CLANG_WARNINGS ${CLANG_WARNINGS} -Wno-deprecated -Wno-deprecated-declarations)
+    set(COMMON_WARNINGS ${COMMON_WARNINGS} -Wno-deprecated -Wno-deprecated-declarations)
 endif()
 
-set(GCC_WARNINGS ${CLANG_WARNINGS}
+
+set(CLANG_WARNINGS ${COMMON_WARNINGS}
+                   -Wno-c99-extensions
+                   -Wno-deprecated-volatile
+)
+
+set(GCC_WARNINGS ${COMMON_WARNINGS}
                  -Wmisleading-indentation
                  -Wduplicated-cond
                  -Wduplicated-branches
                  -Wlogical-op
-                 -Wuseless-cast)
+                 -Wuseless-cast
+                 -Wno-unused-result
+                 -Wno-pessimizing-move
+             )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(PROJECT_WARNINGS ${CLANG_WARNINGS})

@@ -3,13 +3,15 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM MSCOBSERVER-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview;
 
-Ponger-States ::= ENUMERATED {ready, wait}
+Ponger-States ::= ENUMERATED {wait, ready}
 
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
-   init-done BOOLEAN
+   init-done BOOLEAN,
+   sender PID
 }
 
 END

@@ -32,7 +32,8 @@ Asn1SccOptionWidget::Asn1SccOptionWidget(QWidget *parent)
 
     Asn1Acn::Asn1Reader reader;
     ui->compilerLineEdit->setPlaceholderText(reader.checkforCompiler());
-    ui->parameterLineEdit->setPlaceholderText(reader.defaultParameter());
+    QString defaultParameters = reader.defaultParameter().join(" ");
+    ui->parameterLineEdit->setPlaceholderText(defaultParameters);
     connect(ui->pathButton, &QPushButton::clicked, this, [this]() {
         QFileInfo fi(compiler());
         QString exec = QFileDialog::getOpenFileName(this, tr("Select asn1.scc.exe compiler"), fi.absolutePath());

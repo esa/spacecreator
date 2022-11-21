@@ -33,6 +33,7 @@
 #include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
 #include <asn1library/asn1/types/octetstring.h>
+#include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
@@ -49,6 +50,7 @@ using Asn1Acn::EnumValue;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::OctetStringValue;
 using Asn1Acn::Range;
+using Asn1Acn::RealValue;
 using Asn1Acn::SourceLocation;
 using Asn1Acn::StringValue;
 using Asn1Acn::TypeAssignment;
@@ -62,6 +64,7 @@ using Asn1Acn::Types::EnumeratedItem;
 using Asn1Acn::Types::IA5String;
 using Asn1Acn::Types::Integer;
 using Asn1Acn::Types::OctetString;
+using Asn1Acn::Types::Real;
 using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::Type;
@@ -108,6 +111,7 @@ void tst_Asn1ToPromelaTranslator::testBasicTypes()
 
     {
         auto realType = TypeFactory::createBuiltinType("REAL");
+        dynamic_cast<Real *>(realType.get())->constraints().append(RangeConstraint<RealValue>::create({ 1, 5 }));
         auto myRealAssignment = std::make_unique<TypeAssignment>(
                 QStringLiteral("MyReal"), QStringLiteral("MyRealT"), SourceLocation(), std::move(realType));
         model->addType(std::move(myRealAssignment));
@@ -752,9 +756,10 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     type->addComponent(std::make_unique<ChoiceAlternative>(QStringLiteral("ch1"), QStringLiteral(""),
             QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(), std::move(ch1Type)));
 
+    auto ch2Type = TypeFactory::createBuiltinType(QStringLiteral("REAL"));
+    dynamic_cast<Real *>(ch2Type.get())->constraints().append(RangeConstraint<RealValue>::create({ 1, 5 }));
     type->addComponent(std::make_unique<ChoiceAlternative>(QStringLiteral("ch2"), QStringLiteral(""),
-            QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("REAL"))));
+            QStringLiteral(""), QStringLiteral(""), QStringLiteral(""), SourceLocation(), std::move(ch2Type)));
 
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
@@ -867,9 +872,12 @@ void tst_Asn1ToPromelaTranslator::testSequence()
             std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             std::move(field1Type));
     type->addComponent(std::move(component1));
+
+    auto field2Type = TypeFactory::createBuiltinType(QStringLiteral("REAL"));
+    dynamic_cast<Real *>(field2Type.get())->constraints().append(RangeConstraint<RealValue>::create({ 1, 5 }));
     auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"), false,
             std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("REAL")));
+            std::move(field2Type));
     type->addComponent(std::move(component2));
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
@@ -951,16 +959,21 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
 {
     auto model = createModel();
     auto type = std::make_unique<Sequence>();
+
     auto field1Type = TypeFactory::createBuiltinType(QStringLiteral("INTEGER"));
     dynamic_cast<Integer *>(field1Type.get())->constraints().append(RangeConstraint<IntegerValue>::create({ 1, 5 }));
     auto component1 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field1"), QStringLiteral("field1"), true,
             std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
             std::move(field1Type));
     type->addComponent(std::move(component1));
+
+    auto field2Type = TypeFactory::createBuiltinType(QStringLiteral("REAL"));
+    dynamic_cast<Real *>(field2Type.get())->constraints().append(RangeConstraint<RealValue>::create({ 1, 5 }));
     auto component2 = std::make_unique<AsnSequenceComponent>(QStringLiteral("field2"), QStringLiteral("field2"), true,
             std::nullopt, QStringLiteral(""), AsnSequenceComponent::Presence::NotSpecified, SourceLocation(),
-            TypeFactory::createBuiltinType(QStringLiteral("REAL")));
+            std::move(field2Type));
     type->addComponent(std::move(component2));
+
     auto typeAssignment = std::make_unique<TypeAssignment>(
             QStringLiteral("MyType"), QStringLiteral("MyTypeT"), SourceLocation(), std::move(type));
     model->addType(std::move(typeAssignment));

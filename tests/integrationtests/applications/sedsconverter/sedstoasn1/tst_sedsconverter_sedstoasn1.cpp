@@ -93,6 +93,7 @@ void tst_SedsConverter_SedsToAsn1::testArrays()
 /// \SRS  ETB-FUN-220
 /// \SRS  ETB-IF-10
 /// \SRS  ETB-IF-120
+/// \SRS  ETB-IF-200
 void tst_SedsConverter_SedsToAsn1::testArraySizeThreshold()
 {
     const int result = system("./test_array_size_threshold.sh");

@@ -40,7 +40,7 @@ CmdFunctionImplementationRemove::CmdFunctionImplementationRemove(
     }
 }
 
-CmdFunctionImplementationRemove::~CmdFunctionImplementationRemove() {}
+CmdFunctionImplementationRemove::~CmdFunctionImplementationRemove() { }
 
 void CmdFunctionImplementationRemove::redo()
 {
@@ -49,8 +49,9 @@ void CmdFunctionImplementationRemove::redo()
         m_tempDir.reset(new QTemporaryDir);
         if (m_tempDir->isValid()) {
             QDir dir = implementationDir();
-            shared::copyDir(dir.path(), m_tempDir->path(), shared::FileCopyingMode::Overwrite);
-            dir.removeRecursively();
+            if (!shared::moveDir(dir.path(), m_tempDir->path(), shared::FileCopyingMode::Overwrite)) {
+                /// TODO: ROLLBACK
+            }
             Q_EMIT implementationListChanged(m_function.data());
         }
     }

@@ -20,33 +20,184 @@
 #include "spinerrorparser.h"
 
 #include <QDebug>
+#include <QFile>
 #include <QRegularExpression>
 
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QString &spinMessage) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(
+        const QStringList &, const QStringList &sclFiles, const QList<RawErrorItem> &errors, const QStringList &) const
 {
-    QRegularExpressionMatchIterator matches = matchSpinErrors(spinMessage);
     reporting::SpinErrorReport report;
-    while (matches.hasNext()) {
-        auto reportItem = buildReportItem(matches.next());
-        report.append(reportItem);
+
+    // read scl files
+    QStringList sclConditions;
+    for (auto sclFile : sclFiles) {
+        sclConditions.append(readFile(sclFile));
     }
+
+    // number of errors is equal to the number of separate spin traces
+    uint32_t errorIndex = 0;
+    for (auto error : errors) {
+        // read traces and scenario
+        const auto spinTrace = readFile(error.spinTraceFile);
+        const auto scenario = readFile(error.scenarioFile);
+        // check for spin trace file indication (no error if not present)
+        if (spinTrace.isEmpty() || spinTrace.trimmed() == m_spinNoTrailFileMessage) {
+            continue;
+        }
+
+        SpinErrorReportItem newReportItem = parseTrace(spinTrace, sclConditions);
+        newReportItem.errorNumber = errorIndex++;
+        newReportItem.scenario = scenario;
+        report.append(newReportItem);
+    }
+
     return report;
 }
 
-QRegularExpressionMatchIterator reporting::SpinErrorParser::matchSpinErrors(const QString &spinMessage) const
+reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
+        const QString &spinTraces, const QStringList &sclConditions) const
 {
-    const QRegularExpression regex = buildSpinErrorRegex();
-    return regex.globalMatch(spinMessage);
+    SpinErrorReportItem reportItem;
+    // an observer failure (entering success state) can be detected
+    // by finding an acceptance cycle in the report, but it can also
+    // indicate another stop condition violation with an "eventually" clause
+    auto observerFailureSuccessStateMatch = matchObserverFailureSuccessState(spinTraces);
+    if (observerFailureSuccessStateMatch.hasMatch()) {
+        // try matching for "eventually" clause in scl
+        const QString sclSanitized = cleanUpSclComments(sclConditions.join(QChar('\n')));
+        const QRegularExpression sclRegex = buildStopConditionViolationRegex();
+        auto sclMatches = sclRegex.globalMatch(sclSanitized);
+        while (sclMatches.hasNext()) {
+            auto sclMatch = sclMatches.next();
+            auto clause = sclMatch.captured(StopConditionParseTokens::StopConditionClause);
+            if (m_stopConditionViolationClauses.value(clause, reporting::StopConditionViolationReport::UnknownClause)
+                    == reporting::StopConditionViolationReport::Eventually) {
+                // eventually clause found in scl
+                auto violationString = sclMatch.captured();
+                auto report = parseStopConditionViolation(violationString);
+                reportItem.errorDepth = 0;
+                reportItem.errorType = SpinErrorReportItem::StopConditionViolation;
+                reportItem.rawErrorDetails = violationString;
+                reportItem.parsedErrorDetails = report;
+                return reportItem;
+            }
+        }
+        // no "eventually" clause found observer failure (interpreting as observer success state violation)
+        auto report = parseObserverFailureSuccessState(QString());
+        reportItem.errorDepth = 0;
+        reportItem.errorType = SpinErrorReportItem::ObserverFailure;
+        reportItem.rawErrorDetails = observerFailureSuccessStateMatch.captured(RawErrorMatch).trimmed();
+        reportItem.parsedErrorDetails = report;
+        return reportItem;
+    }
+    auto stopConditionMatch = matchStopCondition(spinTraces);
+    if (stopConditionMatch.hasMatch()) {
+        auto violationString = stopConditionMatch.captured(ErrorDetailsMatch);
+        auto report = parseStopConditionViolation(violationString);
+        reportItem.errorDepth = 0;
+        reportItem.errorType = SpinErrorReportItem::StopConditionViolation;
+        reportItem.rawErrorDetails = stopConditionMatch.captured(RawErrorMatch).trimmed();
+        reportItem.parsedErrorDetails = report;
+        // found stop condition violation
+        return reportItem;
+    }
+    auto observerFailureErrorStateMatch = matchObserverFailureErrorState(spinTraces);
+    if (observerFailureErrorStateMatch.hasMatch()) {
+        // found observer failure (error state)
+        auto observerName = observerFailureErrorStateMatch.captured(ErrorDetailsMatch);
+        auto report = parseObserverFailureErrorState(observerName);
+        reportItem.errorDepth = 0;
+        reportItem.errorType = SpinErrorReportItem::ObserverFailure;
+        reportItem.rawErrorDetails = observerFailureErrorStateMatch.captured(RawErrorMatch).trimmed();
+        reportItem.parsedErrorDetails = report;
+        return reportItem;
+    }
+    auto variableViolationMatch = matchVariableViolation(spinTraces);
+    if (variableViolationMatch.hasMatch()) {
+        // found variable violation
+        auto violationString = variableViolationMatch.captured(ErrorDetailsMatch);
+        auto report = parseVariableViolation(violationString);
+        reportItem.errorDepth = 0;
+        reportItem.errorType = SpinErrorReportItem::DataConstraintViolation;
+        reportItem.rawErrorDetails = variableViolationMatch.captured(RawErrorMatch).trimmed();
+        reportItem.parsedErrorDetails = report;
+        return reportItem;
+    }
+    // no error found - return unknown error
+    return reportItem;
 }
 
-QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawError) const
+QRegularExpressionMatch reporting::SpinErrorParser::matchStopCondition(const QString &spinTraces) const
+{
+    // identification prefix
+    QString pattern("SCL violation:\\s*");
+    // stop condition match
+    pattern += QString("(.+)\\n");
+
+    const QRegularExpression regex(pattern);
+    return regex.match(spinTraces);
+}
+
+QRegularExpressionMatch reporting::SpinErrorParser::matchObserverFailureErrorState(const QString &spinTraces) const
+{
+    // identification prefix
+    QString pattern("Observer entered errorstate:\\s*");
+    // observer failure match
+    pattern += QString("(.+)\\n");
+
+    const QRegularExpression regex(pattern);
+    return regex.match(spinTraces);
+}
+
+QRegularExpressionMatch reporting::SpinErrorParser::matchObserverFailureSuccessState(const QString &spinTraces) const
+{
+    // identification string
+    const QRegularExpression regex(QStringLiteral("<<<<<START OF CYCLE>>>>>"));
+    return regex.match(spinTraces);
+}
+
+QRegularExpressionMatch reporting::SpinErrorParser::matchVariableViolation(const QString &spinTraces) const
+{
+    // identification prefix
+    QString pattern("spin: text of failed assertion: ");
+    // variable violation match
+    pattern += QString("assert\\((.+)\\)\\n");
+
+    const QRegularExpression regex(pattern);
+    return regex.match(spinTraces);
+}
+
+reporting::SpinErrorReportItem reporting::SpinErrorParser::buildDataConstraintViolationReportItem(
+        const QRegularExpressionMatch &matchedError) const
+{
+    SpinErrorReportItem reportItem;
+    reportItem.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
+    reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
+    reportItem.errorType = SpinErrorReportItem::DataConstraintViolation;
+    reportItem.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
+    reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
+    return reportItem;
+}
+
+reporting::SpinErrorReportItem reporting::SpinErrorParser::buildStopConditionViolationReportItem(
+        const QString &conditions) const
+{
+    SpinErrorReportItem reportItem;
+    reportItem.errorNumber = 0;
+    reportItem.errorType = SpinErrorReportItem::StopConditionViolation;
+    reportItem.errorDepth = 0;
+    reportItem.rawErrorDetails = conditions;
+    reportItem.parsedErrorDetails = parseStopConditionViolation(conditions);
+    return reportItem;
+}
+
+QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &parsedErrorToken) const
 {
     DataConstraintViolationReport violationReport;
     const QRegularExpression regex = buildDataConstraintViolationRegex();
-    QRegularExpressionMatchIterator matches = regex.globalMatch(rawError);
+    QRegularExpressionMatchIterator matches = regex.globalMatch(parsedErrorToken);
     while (matches.hasNext()) {
         const QRegularExpressionMatch matchedError = matches.next();
-
         parseVariableName(matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationVariableName),
                 violationReport);
         violationReport.constraints.append(
@@ -56,48 +207,79 @@ QVariant reporting::SpinErrorParser::parseVariableViolation(const QString &rawEr
         // depending on whether the "." character exists in the matched token
         const QString boundingValueToken =
                 matchedError.captured(ConstraintViolationParseTokens::ConstraintViolationBoundingValue);
+        const QString boundingValueTokenClean = removeParentheses(boundingValueToken);
         if (boundingValueToken.contains(QChar('.'))) {
-            boundingValue.setValue(boundingValueToken.toFloat());
+            boundingValue.setValue(boundingValueTokenClean.toFloat());
         } else {
-            boundingValue.setValue(boundingValueToken.toInt());
+            boundingValue.setValue(boundingValueTokenClean.toInt());
         }
         violationReport.boundingValues.append(boundingValue);
     }
+
     QVariant variableViolation;
     variableViolation.setValue(violationReport);
     return variableViolation;
 }
 
-reporting::SpinErrorReportItem reporting::SpinErrorParser::buildReportItem(
-        const QRegularExpressionMatch &matchedError) const
+QVariant reporting::SpinErrorParser::parseStopConditionViolation(const QString &parsedErrorToken) const
 {
-    SpinErrorReportItem reportItem;
-    reportItem.errorNumber = matchedError.captured(ReportItemParseTokens::ErrorNumber).toUInt();
-    reportItem.errorDepth = matchedError.captured(ReportItemParseTokens::ErrorDepth).toUInt();
-    reportItem.errorType = SpinErrorReportItem::DataConstraintViolation;
-    reportItem.rawErrorDetails = matchedError.captured(ReportItemParseTokens::ErrorDetails);
-    // for now, only parse data constraint violation
-    switch (reportItem.errorType) {
-    case SpinErrorReportItem::DataConstraintViolation:
-        reportItem.parsedErrorDetails = parseVariableViolation(reportItem.rawErrorDetails);
-        break;
-    default:
-        break;
+    StopConditionViolationReport violationReport;
+    violationReport.violationType = StopConditionViolationReport::UndefinedType;
+
+    const QString sanitized = cleanUpSclComments(parsedErrorToken);
+    const QRegularExpression regex = buildStopConditionViolationRegex();
+    auto matches = regex.globalMatch(sanitized);
+    while (matches.hasNext()) {
+        // parse clause and expressions
+        const auto match = matches.next();
+        const auto clause = match.captured(StopConditionParseTokens::StopConditionClause);
+        const auto expressions = splitExpression(match.captured(StopConditionParseTokens::StopConditionExpression));
+        // resolve violation clause
+        violationReport.violationClause =
+                m_stopConditionViolationClauses.value(clause, StopConditionViolationReport::UnknownClause);
+        // check violation type can be matched in current expression
+        const auto currentViolationType = resolveViolationType(expressions);
+        if (currentViolationType != reporting::StopConditionViolationReport::UndefinedType) {
+            violationReport.violationType = currentViolationType;
+            break;
+        }
     }
-    return reportItem;
+
+    QVariant stopConditionViolation;
+    stopConditionViolation.setValue(violationReport);
+    return stopConditionViolation;
 }
 
-QRegularExpression reporting::SpinErrorParser::buildSpinErrorRegex()
+QVariant reporting::SpinErrorParser::parseObserverFailureErrorState(const QString &parsedErrorToken) const
 {
-    // error number
-    QString pattern = QStringLiteral("pan:(\\d+):\\s+");
-    // error type
-    pattern += QStringLiteral("(.+?)\\s+");
-    // error details
-    pattern += QStringLiteral("\\((.+?)\\)\\s+");
-    // error depth
-    pattern += QStringLiteral("\\(at depth (\\d+)\\)");
-    return QRegularExpression(pattern);
+    ObserverFailureReport violationReport;
+    violationReport.observerState = ObserverFailureReport::ErrorState;
+    violationReport.observerName = parsedErrorToken;
+
+    QVariant observerFailure;
+    observerFailure.setValue(violationReport);
+    return observerFailure;
+}
+
+QVariant reporting::SpinErrorParser::parseObserverFailureSuccessState(const QString &) const
+{
+    ObserverFailureReport violationReport;
+    violationReport.observerState = ObserverFailureReport::SuccessState;
+    // observer name is currently not parsed in success states
+    violationReport.observerName = QString();
+
+    QVariant observerFailure;
+    observerFailure.setValue(violationReport);
+    return observerFailure;
+}
+
+QString reporting::SpinErrorParser::readFile(const QString &filePath)
+{
+    QFile file(filePath);
+    if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
+        return QString(file.readAll());
+    }
+    return QString();
 }
 
 QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex()
@@ -108,11 +290,65 @@ QRegularExpression reporting::SpinErrorParser::buildDataConstraintViolationRegex
     pattern += QStringLiteral("([a-z_][\\w\\.]+)");
     // operator
     pattern += QStringLiteral("(.+?)");
-    // bounding value
-    pattern += QStringLiteral("([\\d\\.]+)");
+    // bounding value (number) - accounts for parentheses
+    pattern += QStringLiteral("([-\\d\\.\\(\\)]+)");
     // closing parenthesis
     pattern += QStringLiteral("\\)");
     return QRegularExpression(pattern);
+}
+
+QRegularExpression reporting::SpinErrorParser::buildStopConditionViolationRegex()
+{
+    // clause
+    QString pattern = QStringLiteral("(never|always|eventually|filter_out)\\s+");
+    // conditions
+    pattern += QStringLiteral("(.+?);");
+    return QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption);
+}
+
+QString reporting::SpinErrorParser::removeParentheses(const QString &numberToken)
+{
+    QString numberTokenClean = numberToken;
+    numberTokenClean.replace(QString("("), QString());
+    numberTokenClean.replace(QString(")"), QString());
+    return numberTokenClean;
+}
+
+QString reporting::SpinErrorParser::cleanUpSclComments(const QString &scl)
+{
+    QString sanitized;
+    const auto lines = scl.split(QChar('\n'));
+    for (auto line : lines) {
+        sanitized.append(line.mid(0, line.indexOf(QStringLiteral("--"))) + " ");
+    }
+    return sanitized;
+}
+
+reporting::StopConditionViolationReport::ViolationType reporting::SpinErrorParser::resolveViolationType(
+        const QStringList &expressions)
+{
+    QList<reporting::StopConditionViolationReport::ViolationType> foundViolationTypes;
+    QRegularExpression regex("([a-z0-9_]+)\\s*\\(", QRegularExpression::CaseInsensitiveOption);
+    for (const auto &expression : expressions) {
+        auto matches = regex.globalMatch(expression);
+        while (matches.hasNext()) {
+            const auto match = matches.next();
+            const auto identifier = (match.captured(IdentifierParseTokens::IdentifierName));
+            if (m_stopConditionViolationTypes.contains(identifier)) {
+                foundViolationTypes.append(m_stopConditionViolationTypes.value(identifier));
+            }
+        }
+    }
+    if (!foundViolationTypes.isEmpty()) {
+        // most nested violation type
+        return foundViolationTypes.last();
+    }
+    return reporting::StopConditionViolationReport::UndefinedType;
+}
+
+QStringList reporting::SpinErrorParser::splitExpression(const QString &expression)
+{
+    return expression.split(QRegularExpression("\\s+(?:or|xor|and)\\s+", QRegularExpression::CaseInsensitiveOption));
 }
 
 void reporting::SpinErrorParser::parseVariableName(
@@ -132,3 +368,24 @@ void reporting::SpinErrorParser::parseVariableName(
         violationReport.nestedStateName = QString();
     }
 }
+
+const QString reporting::SpinErrorParser::m_spinNoTrailFileMessage = QStringLiteral("spin: cannot find trail file");
+
+const QHash<QString, reporting::StopConditionViolationReport::ViolationClause>
+        reporting::SpinErrorParser::m_stopConditionViolationClauses = {
+            { "never", reporting::StopConditionViolationReport::Never },
+            { "always", reporting::StopConditionViolationReport::Always },
+            { "eventually", reporting::StopConditionViolationReport::Eventually },
+            { "filter_out", reporting::StopConditionViolationReport::FilterOut },
+        };
+
+const QHash<QString, reporting::StopConditionViolationReport::ViolationType>
+        reporting::SpinErrorParser::m_stopConditionViolationTypes = {
+            { "empty", reporting::StopConditionViolationReport::Empty },
+            { "exist", reporting::StopConditionViolationReport::Exist },
+            { "get_state", reporting::StopConditionViolationReport::GetState },
+            { "length", reporting::StopConditionViolationReport::Length },
+            { "queue_last", reporting::StopConditionViolationReport::QueueLast },
+            { "queue_length", reporting::StopConditionViolationReport::QueueLength },
+            { "present", reporting::StopConditionViolationReport::Present },
+        };

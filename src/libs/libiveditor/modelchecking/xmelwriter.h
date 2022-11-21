@@ -27,7 +27,7 @@ class XmelWriter
 {
 public:
     explicit XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected,
-            QStringList ifConfiguration, SpinConfigData spinConfiguration);
+                        QStringList ifConfiguration, ive::SpinConfigData spinConfiguration);
     bool writeFile(QIODevice *device, QString fileName);
 
 private:
@@ -40,7 +40,7 @@ private:
 
     struct IFConfig;
     IFConfig *ifConfig;
-    SpinConfigData spinConfigData;
+    ive::SpinConfigData spinConfigData;
 };
 
 #endif // XMELWRITER_H

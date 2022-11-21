@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    SmallInteger, BigInteger, SeqOfSmall, SeqOfBig, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Pinger-States ::= ENUMERATED {wait, ok2, ok3, ok1}
+Pinger-States ::= ENUMERATED {ok3, ok2, ok1, wait}
 
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
+   sender PID,
    value1 MySequence,
    value2 MySequence
 }
@@ -22,15 +23,16 @@ Ponger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   SmallInteger, BigInteger, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
+   SmallInteger, BigInteger, SeqOfSmall, SeqOfBig, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
 Ponger-States ::= ENUMERATED {wait}
 
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
+   sender PID,
    pingarg MySequence
 }
 
@@ -116,14 +118,17 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    clk,
-    pinger,
-    ponger,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..3)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       clk,
+       pinger,
+       ponger,
+       
+       env
+   }
 
 END
 

@@ -72,7 +72,7 @@ void tst_AttributesConfigure::tst_loadImpl()
     ivm::IVPropertyTemplate dp;
     dp.setName(QLatin1String("test_name"));
     dp.setInfo(ivm::IVPropertyTemplate::Info::Property);
-    dp.setType(ivm::IVPropertyTemplate::Type::Enumeration);
+    dp.setType(shared::PropertyTemplate::Type::Enumeration);
     const auto scope = int(ivm::IVPropertyTemplate::Scope::Provided_Interface);
     dp.setScopes(scope);
     dp.setVisible(false);
@@ -110,7 +110,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
     if (it != sysAttrs.cend()) {
         QVERIFY((*it)->scopes() == 0);
         QVERIFY((*it)->info() == ivm::IVPropertyTemplate::Info::Attribute);
-        QVERIFY((*it)->type() == ivm::IVPropertyTemplate::Type::String);
+        QVERIFY((*it)->type() == shared::PropertyTemplate::Type::String);
         const QRegularExpression rx((*it)->valueValidatorPattern());
         QString title = QLatin1String("name-1");
         QRegularExpressionMatch match = rx.match(title);
@@ -141,7 +141,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
         QVERIFY(int((*it)->scopes())
                 == int(ivm::IVPropertyTemplate::Scope::Provided_Interface
                         | ivm::IVPropertyTemplate::Scope::Required_Interface));
-        QVERIFY((*it)->type() == ivm::IVPropertyTemplate::Type::Enumeration);
+        QVERIFY((*it)->type() == shared::PropertyTemplate::Type::Enumeration);
         QVERIFY((*it)->info() == ivm::IVPropertyTemplate::Info::Attribute);
 
         const QMetaEnum &me = QMetaEnum::fromType<ivm::IVInterface::OperationKind>();
@@ -157,7 +157,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
     if (it != sysAttrs.cend()) {
         QVERIFY(int((*it)->scopes()) == int(ivm::IVPropertyTemplate::Scope::Function));
         QVERIFY((*it)->info() == ivm::IVPropertyTemplate::Info::Attribute);
-        QVERIFY((*it)->type() == ivm::IVPropertyTemplate::Type::String);
+        QVERIFY((*it)->type() == shared::PropertyTemplate::Type::String);
         const QRegularExpression rx((*it)->valueValidatorPattern());
         QString title = QLatin1String("name-1");
         QRegularExpressionMatch match = rx.match(title);
@@ -187,7 +187,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
                     const shared::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
     if (it != sysAttrs.cend()) {
         QVERIFY(int((*it)->scopes()) == int(ivm::IVPropertyTemplate::Scope::Function));
-        QVERIFY((*it)->type() == ivm::IVPropertyTemplate::Type::Enumeration);
+        QVERIFY((*it)->type() == shared::PropertyTemplate::Type::Enumeration);
         QVERIFY((*it)->info() == ivm::IVPropertyTemplate::Info::Attribute);
         QVERIFY((*it)->value().toList().contains(QLatin1String("YES"))
                 && (*it)->value().toList().contains(QLatin1String("NO")));
@@ -198,7 +198,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
                     const shared::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
     if (it != sysAttrs.cend()) {
         QVERIFY(int((*it)->scopes()) == int(ivm::IVPropertyTemplate::Scope::Required_Interface));
-        QVERIFY((*it)->type() == ivm::IVPropertyTemplate::Type::Boolean);
+        QVERIFY((*it)->type() == shared::PropertyTemplate::Type::Boolean);
         QVERIFY((*it)->info() == ivm::IVPropertyTemplate::Info::Property);
     }
 
@@ -207,7 +207,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
                     const shared::PropertyTemplate *namePropTemplate) { return namePropTemplate->name() == title; });
     if (it != sysAttrs.cend()) {
         QVERIFY(int((*it)->scopes()) == int(ivm::IVPropertyTemplate::Scope::Required_Interface));
-        QVERIFY((*it)->type() == ivm::IVPropertyTemplate::Type::Boolean);
+        QVERIFY((*it)->type() == shared::PropertyTemplate::Type::Boolean);
         QVERIFY((*it)->info() == ivm::IVPropertyTemplate::Info::Property);
     }
 
@@ -218,7 +218,7 @@ void tst_AttributesConfigure::tst_systemAttrs()
     if (it != sysAttrs.cend()) {
         QVERIFY(int((*it)->scopes()) == 0);
         QVERIFY((*it)->info() == ivm::IVPropertyTemplate::Info::Property);
-        QVERIFY((*it)->type() == ivm::IVPropertyTemplate::Type::String);
+        QVERIFY((*it)->type() == shared::PropertyTemplate::Type::String);
         const QRegularExpression rx((*it)->valueValidatorPattern());
         QString coordinates = QLatin1String("123 456 789 000");
         QRegularExpressionMatch match = rx.match(coordinates);

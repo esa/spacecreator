@@ -40,7 +40,9 @@ enum class ModelType
     PromelaSystem,
     Sdl,
     Seds,
-    Simulink
+    Simulink,
+    SpinTrail,
+    SimulatorTrail,
 };
 
 /**
@@ -186,6 +188,28 @@ struct ModelTypeProperties<ModelType::Simulink> {
     static inline const QString name = "SIMULINK";
     /// @brief  Model extension
     static inline const QStringList extensions = { ".xml" };
+};
+
+/**
+ * @brief   Specialization for SPINTRAIL model type
+ */
+template<>
+struct ModelTypeProperties<ModelType::SpinTrail> {
+    /// @brief  Model name
+    static inline const QString name = "SPINTRAIL";
+    /// @brief  Model extension
+    static inline const QStringList extensions = { ".spt" };
+};
+
+/**
+ * @brief   Specialization for SIMULATORTRAIL model type
+ */
+template<>
+struct ModelTypeProperties<ModelType::SimulatorTrail> {
+    /// @brief  Model name
+    static inline const QString name = "SIMULATORTRAIL";
+    /// @brief  Model extension
+    static inline const QStringList extensions = { ".sim" };
 };
 
 } // namespace conversion

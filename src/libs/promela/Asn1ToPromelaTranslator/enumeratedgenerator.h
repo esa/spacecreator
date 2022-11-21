@@ -59,6 +59,12 @@ public:
      * @return true if generator can generate next value, otherwise false
      */
     bool has_next() const;
+    /**
+     * @brief Get enum name for given integer value.
+     *
+     * @return name of the enum if exist, otherwise empty string.
+     */
+    QString getNameForValue(int32_t value) const;
 
 private:
     const QString m_typeName;

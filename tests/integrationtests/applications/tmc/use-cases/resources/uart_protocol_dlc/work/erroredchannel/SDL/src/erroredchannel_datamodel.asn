@@ -7,13 +7,14 @@ IMPORTS
    T-UART-DLC-FrameBuffer, T-UART-DLC-Header, T-UART-DLC-FrameCRC, T-UART-DLC-SDU, T-UART-DLC-PDU, T-UART-DLC-RxErrorCode, T-RMAPCRCTable FROM UART-DLC
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Erroredchannel-States ::= ENUMERATED {corrupt, idle, drop}
+Erroredchannel-States ::= ENUMERATED {drop, idle, corrupt}
 
 Erroredchannel-Context ::= SEQUENCE {
    state Erroredchannel-States,
    init-done BOOLEAN,
+   sender PID,
    corruption UINT8,
    txchar UINT8
 }

@@ -162,7 +162,8 @@ void ValueAssignmentVisitor::visit(const Choice &type)
     dataMember.appendElement("data");
     dataMember.appendElement(escapedSelectionName);
 
-    const auto selectionValue = Expression(QString("%1_%2_PRESENT").arg(escapedTypeName).arg(escapedSelectionName));
+    const auto selectionValue =
+            Expression(VariableRef(QString("%1_%2_PRESENT").arg(escapedTypeName).arg(escapedSelectionName)));
 
     m_sequence.appendElement(Assignment(selectionMember, selectionValue));
 

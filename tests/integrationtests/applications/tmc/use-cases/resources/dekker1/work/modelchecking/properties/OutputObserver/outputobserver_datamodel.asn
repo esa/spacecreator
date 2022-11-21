@@ -6,7 +6,7 @@ IMPORTS
    Sharedmemory-States, Sharedmemory-Context FROM Sharedmemory-Datamodel
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview
+   PID-Range, PID FROM System-Dataview
    Locka-Event, Lockb-Event, Sharedmemory-Event, Testgui-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
@@ -14,7 +14,8 @@ Outputobserver-States ::= ENUMERATED {wantstoenter, wait}
 
 Outputobserver-Context ::= SEQUENCE {
    state Outputobserver-States,
-   init-done BOOLEAN
+   init-done BOOLEAN,
+   sender PID
 }
 
 Outputobserver-Testgui-Event-Msg-In-Selection  ::= ENUMERATED {writeacka-present(1), writeackb-present(2)}

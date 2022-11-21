@@ -123,6 +123,10 @@ target_sources(${LIB_NAME} PRIVATE
     modelchecking/xmelwriter.cpp
     modelchecking/xmelreader.h
     modelchecking/xmelreader.cpp
+    modelchecking/spinrundialog.h
+    modelchecking/spinrundialog.cpp
+    modelchecking/spinrunworker.h
+    modelchecking/spinrunworker.cpp
     endtoend/end2endfunctiongraphicsitem.cpp
     endtoend/end2endfunctiongraphicsitem.h
     interfacedocument.cpp
@@ -227,6 +231,7 @@ if(${QT_VERSION_MAJOR} STREQUAL "6")
     set(QT_SVGWIDGETS Qt6::SvgWidgets)
 endif()
 target_link_libraries(${LIB_NAME}
+	Tmc::Verifier
     ivcore
     asn1library
     shared

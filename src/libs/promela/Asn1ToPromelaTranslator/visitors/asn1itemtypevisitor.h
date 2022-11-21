@@ -20,6 +20,7 @@
 #pragma once
 
 #include "integersubset.h"
+#include "realsubset.h"
 
 #include <asn1library/asn1/types/typereadingvisitor.h>
 #include <optional>
@@ -161,6 +162,7 @@ private:
     void addBoolRangeCheckInline(const Asn1Acn::Types::Boolean &type, const QString &typeName);
     void addEnumRangeCheckInline(const QString &typeName, const std::vector<QString> &allowedValues);
     void addIntegerRangeCheckInline(const QString &typeName, const IntegerSubset &rangeSubsets);
+    void addRealRangeCheckInline(const QString &typeName, const RealSubset &rangeSubsets);
     void addRangeCheckInline(const model::Expression &type, const QString &typeName);
     void addSizeCheckInline(const std::size_t minValue, const std::size_t maxValue, const QString &typeName);
     QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;

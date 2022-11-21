@@ -29,11 +29,18 @@ class tsti_InputVectorLimit : public QObject
 
 private Q_SLOTS:
     void test_inputVectorLimit();
+    void test_inputVectorLimitZero();
 };
 
 void tsti_InputVectorLimit::test_inputVectorLimit()
 {
     const int result = system("./test_input_vector_limit.sh");
+    QCOMPARE(result, 0);
+}
+
+void tsti_InputVectorLimit::test_inputVectorLimitZero()
+{
+    const int result = system("./test_input_vector_limit_zero.sh");
     QCOMPARE(result, 0);
 }
 

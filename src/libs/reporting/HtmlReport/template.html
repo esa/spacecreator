@@ -8,7 +8,9 @@
   </head>
   <body>
     <h1>Spin Error Report</h1>
-  
+    {% if report|length == 0 %}
+      <i>No errors found.</i>
+    {% endif %}
     {% for reportItem in report %}
       <table>
         <tr>
@@ -20,37 +22,54 @@
           <td><tt>{{ reportItem.errorNumber }}</tt></td>
         </tr>
         <tr>
-          <td>Error Depth</td>
-          <td><tt>{{ reportItem.errorDepth }}</tt></td>
-        </tr>
-        <tr>
           <td>Error Details</td>
-          <td>
-            <i>Function Name:</i> <tt>{{ reportItem.errorDetails.functionName }}</tt><br>
-            <i>Variable Name:</i> <tt>{{ reportItem.errorDetails.variableName }}</tt><br>
-            {% if reportItem.errorDetails.nestedStateName|length > 0 %}
-              <i>Nested State Name:</i> <tt>{{ reportItem.errorDetails.nestedStateName }}</tt><br>
-            {% endif %}
-            <i>Constraint Details:</i><br>
-            <table>
-              <tr>
-                <td>Constraint</td>
-                {% for constraint in reportItem.errorDetails.constraints %}
-                  <td><tt>{{ constraint }}</tt></td>
-                {% endfor %}
-              </tr>
-              <tr>
-                <td>Bounding Value</td>
-                {% for boundingValue in reportItem.errorDetails.boundingValues %}
-                  <td><tt>{{ boundingValue }}</tt></td>
-                {% endfor %}
-              </tr>
-            </table>
-          </td>
+          {# Check for data constraint violation #}
+          {% if reportItem.errorCode == 0 %}
+            <td>
+              <i>Function Name:</i> <tt>{{ reportItem.errorDetails.functionName }}</tt><br>
+              <i>Variable Name:</i> <tt>{{ reportItem.errorDetails.variableName }}</tt><br>
+              {% if reportItem.errorDetails.nestedStateName|length > 0 %}
+                <i>Nested State Name:</i> <tt>{{ reportItem.errorDetails.nestedStateName }}</tt><br>
+              {% endif %}
+              <i>Constraint Details:</i><br>
+              <table>
+                <tr>
+                  <td>Constraint</td>
+                  {% for constraint in reportItem.errorDetails.constraints %}
+                    <td><tt>{{ constraint }}</tt></td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <td>Bounding Value</td>
+                  {% for boundingValue in reportItem.errorDetails.boundingValues %}
+                    <td><tt>{{ boundingValue }}</tt></td>
+                  {% endfor %}
+                </tr>
+              </table>
+            </td>
+          {# Check for stop condition violation #}
+          {% elif reportItem.errorCode == 1 %}
+            <td>
+              <i>Violation Clause:</i> <tt>{{ reportItem.errorDetails.violationClause }}</tt><br>
+              <i>Violation Type:</i> <tt>{{ reportItem.errorDetails.violationType }}</tt>
+            </td>
+          {# Check for observer failure #}
+          {% elif reportItem.errorCode == 2 %}
+            <td>
+              <i>Observer Name:</i> <tt>{{ reportItem.errorDetails.observerName }}</tt><br>
+              <i>Observer State:</i> <tt>{{ reportItem.errorDetails.observerState }}</tt>
+            </td>
+          {# Unknown error type #}
+          {% else %}
+            <td></td>
+          {% endif %}
+          
         </tr>
       </table>
       <i>Parsed from:</i><br>
       <tt>{{ reportItem.rawErrorDetails }}</tt><br><br>
+      <i>Trails:</i><br>
+      <span style="white-space: pre-wrap;"><tt>{{ reportItem.scenario }}</tt></span><br><br>
     {% endfor %}
   </body>
 </html>

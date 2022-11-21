@@ -27,6 +27,8 @@ using promela::model::BooleanConstant;
 using promela::model::Constant;
 using promela::model::Expression;
 using promela::model::InlineCall;
+using promela::model::RealConstant;
+using promela::model::StringConstant;
 using promela::model::VariableRef;
 
 namespace promela::exporter {
@@ -47,6 +49,11 @@ void ExpressionVisitor::operator()(const VariableRef &variableRef)
 }
 
 void ExpressionVisitor::operator()(const Constant &constant)
+{
+    m_stream << constant.getValue();
+}
+
+void ExpressionVisitor::operator()(const RealConstant &constant)
 {
     m_stream << constant.getValue();
 }
@@ -122,5 +129,10 @@ void ExpressionVisitor::operator()(const BooleanConstant &constant)
     } else {
         m_stream << "false";
     }
+}
+
+void ExpressionVisitor::operator()(const StringConstant &constant)
+{
+    m_stream << '"' << constant.getValue() << '"';
 }
 }

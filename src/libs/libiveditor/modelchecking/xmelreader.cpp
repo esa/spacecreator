@@ -237,7 +237,7 @@ QStringList XmelReader::getIfConfig()
     return res;
 }
 
-SpinConfigData XmelReader::getSpinConfig()
+ive::SpinConfigData XmelReader::getSpinConfig()
 {
     return spinConfigSaver.getConfigData();
 }

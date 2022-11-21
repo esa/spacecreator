@@ -8,9 +8,10 @@
 # IDE files
 CMakeLists.txt.user
 *.pro.user
+.idea/
 
 # System files
-.directory
+.directory/
 
 # Example files to be used locally
 examples/*.local.msc
@@ -20,7 +21,7 @@ doc/doxygen
 doc-tests/doxygen
 
 # VS Code directory
-.vscode
+.vscode/
 
 # Temporary test outputs
 tests/**/output/*
@@ -32,4 +33,20 @@ tests/unittests/sdl/SdlExporter/references/*/*.user
 tests/unittests/sdl/SdlExporter/references/*/*.msc
 tests/unittests/sdl/SdlExporter/references/*/work/binaries/*
 tests/unittests/sdl/SdlExporter/references/*/work/*
+
+/build/
+/spacecreator.AppDir/
+*.log
+
+# precompiles python files
+*.pyc
+
+# ccls-cache
+.ccls-cache/
+
+# cmake filebased api
+.cmake/
+
+# autosave files
+*.autosave
 

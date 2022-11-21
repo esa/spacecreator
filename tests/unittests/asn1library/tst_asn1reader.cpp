@@ -17,12 +17,12 @@
 
 #include "asn1const.h"
 #include "asn1reader.h"
+#include "asnsequencecomponent.h"
 #include "definitions.h"
 #include "file.h"
 #include "typeassignment.h"
 #include "types/choice.h"
 #include "types/sequence.h"
-#include "asnsequencecomponent.h"
 
 #include <QSignalSpy>
 #include <QtTest>
@@ -127,22 +127,22 @@ void tst_Asn1Reader::testOptional()
     auto sequence = dynamic_cast<const Asn1Acn::Types::Sequence *>(typeAssign1->type());
     QCOMPARE(sequence->components().size(), 8);
 
-    const auto *sequence1 = dynamic_cast<Asn1Acn::AsnSequenceComponent*>(sequence->components().at(0).get());
+    const auto *sequence1 = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(sequence->components().at(0).get());
     QCOMPARE(sequence1->name(), QString("devname"));
     QCOMPARE(sequence1->type()->typeName(), QString("IA5String"));
     QVERIFY(!sequence1->isOptional());
 
-    const auto &sequence2 = dynamic_cast<Asn1Acn::AsnSequenceComponent*>(sequence->components().at(1).get());
+    const auto &sequence2 = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(sequence->components().at(1).get());
     QCOMPARE(sequence2->name(), QString("address"));
     QCOMPARE(sequence2->type()->typeName(), QString("IA5String"));
     QVERIFY(!sequence2->isOptional());
 
-    const auto &sequence3 = dynamic_cast<Asn1Acn::AsnSequenceComponent*>(sequence->components().at(2).get());
+    const auto &sequence3 = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(sequence->components().at(2).get());
     QCOMPARE(sequence3->name(), QString("broadcast"));
     QCOMPARE(sequence3->type()->typeName(), QString("IA5String"));
     QVERIFY(sequence3->isOptional());
 
-    const auto &sequence4 = dynamic_cast<Asn1Acn::AsnSequenceComponent*>(sequence->components().at(7).get());
+    const auto &sequence4 = dynamic_cast<Asn1Acn::AsnSequenceComponent *>(sequence->components().at(7).get());
     QCOMPARE(sequence4->name(), QString("port"));
     QCOMPARE(sequence4->type()->typeName(), QString("Port-T"));
     QVERIFY(!sequence4->isOptional());

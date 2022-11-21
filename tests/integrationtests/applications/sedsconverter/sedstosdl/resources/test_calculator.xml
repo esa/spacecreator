@@ -36,6 +36,8 @@
           <VariableSet>
             <Variable name="x" type="Number"></Variable>
             <Variable name="y" type="Number" />
+            <Variable name="r" type="Number" />
+            <Variable name="result" type="Number" />
             <Variable name="tmp" type="Number" />
           </VariableSet>
           <ActivitySet>
@@ -43,16 +45,21 @@
               <Argument name="x1" type="Number" />
               <Argument name="x2" type="Number"></Argument>
               <Body>
-                <MathOperation outputVariableRef="tmp">
+                <MathOperation outputVariableRef="r">
                   <Operator operator="add" />
                   <Operator operator="add" />
                   <VariableRef variableRef="x1" />
                   <VariableRef variableRef="x2" />
                   <Value value="2" />
                 </MathOperation>
+                <MathOperation outputVariableRef="tmp">
+                  <Operator operator="swap" />
+                  <VariableRef variableRef="r" />
+                  <VariableRef variableRef="result" />
+                </MathOperation>
                 <SendCommandPrimitive interface="AsyncCalculator" command="Add">
                   <ArgumentValue name="result">
-                    <VariableRef variableRef="tmp" />
+                    <VariableRef variableRef="result" />
                   </ArgumentValue>
                 </SendCommandPrimitive>
               </Body>

@@ -23,6 +23,8 @@
 #include "booleanconstant.h"
 #include "constant.h"
 #include "inlinecall.h"
+#include "realconstant.h"
+#include "stringconstant.h"
 #include "variableref.h"
 
 #include <QString>
@@ -38,7 +40,8 @@ public:
     /**
      * @brief Variant to represent alternatives of expression
      */
-    using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall, BooleanConstant>;
+    using Value = std::variant<VariableRef, Constant, BinaryExpression, InlineCall, BooleanConstant, StringConstant,
+            RealConstant>;
 
     /**
      * @brief Constructor.
@@ -46,6 +49,7 @@ public:
      * @param content expression content
      */
     Expression(Value content);
+
     /**
      * @brief Constructor.
      *

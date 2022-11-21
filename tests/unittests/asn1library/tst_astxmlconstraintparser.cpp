@@ -25,16 +25,17 @@
 ****************************************************************************/
 #include "tst_astxmlconstraintparser.h"
 
-#include <QtTest>
-
 #include "constraints/printingvisitor.h"
+
+#include <QtTest>
 
 using namespace Asn1Acn::Tests;
 using namespace Asn1Acn;
 
 AstXmlConstraintParserTests::AstXmlConstraintParserTests(QObject *parent)
     : QObject(parent)
-{}
+{
+}
 
 void AstXmlConstraintParserTests::test_emptyXml()
 {

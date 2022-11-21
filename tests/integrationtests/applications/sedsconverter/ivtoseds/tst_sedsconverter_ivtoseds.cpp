@@ -41,6 +41,7 @@ private Q_SLOTS:
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4060
 /// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-190
 void tst_SedsConverter_IvToSeds::testSporadicInterface()
 {
     const int result = system("./test_sporadic_interface.sh");
@@ -51,6 +52,7 @@ void tst_SedsConverter_IvToSeds::testSporadicInterface()
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4070
 /// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-190
 void tst_SedsConverter_IvToSeds::testProtectedInterface()
 {
     const int result = system("./test_protected_interface.sh");
@@ -61,6 +63,7 @@ void tst_SedsConverter_IvToSeds::testProtectedInterface()
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4080
 /// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-190
 void tst_SedsConverter_IvToSeds::testUnprotectedInterface()
 {
     const int result = system("./test_unprotected_interface.sh");
@@ -71,6 +74,7 @@ void tst_SedsConverter_IvToSeds::testUnprotectedInterface()
 /// \SRS  ETB-FUN-4040
 /// \SRS  ETB-FUN-4090
 /// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-190
 void tst_SedsConverter_IvToSeds::testCyclicInterface()
 {
     const int result = system("./test_cyclic_interface.sh");
@@ -82,6 +86,7 @@ void tst_SedsConverter_IvToSeds::testCyclicInterface()
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4060
 /// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-190
 void tst_SedsConverter_IvToSeds::testPinger()
 {
     const int result = system("./test_pinger.sh");
@@ -92,6 +97,7 @@ void tst_SedsConverter_IvToSeds::testPinger()
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4060
 /// \SRS  ETB-IF-150
+/// \SRS  ETB-IF-190
 void tst_SedsConverter_IvToSeds::testRepeatedInterfaceName()
 {
     const int result = system("./test_repeated_interface_name.sh");

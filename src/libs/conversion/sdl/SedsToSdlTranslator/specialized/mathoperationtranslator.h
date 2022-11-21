@@ -41,6 +41,7 @@ public:
      * @returns Text contents of the SDL task
      */
     static auto translateOperation(const seds::model::MathOperation::Elements &elements) -> QString;
+    static auto translateSwapOperation(const seds::model::MathOperation &operation) -> QString;
 
 private:
     using Expression = std::queue<const seds::model::MathOperation::Element *>;

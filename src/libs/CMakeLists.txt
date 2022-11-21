@@ -36,6 +36,8 @@ add_subdirectory(seds)
 add_subdirectory(simulink)
 add_subdirectory(promela)
 add_subdirectory(tmc)
+add_subdirectory(spintrail)
+add_subdirectory(simulatortrail)
 
 # Total SpaceCreator system
 add_subdirectory(spacecreatorsystem)

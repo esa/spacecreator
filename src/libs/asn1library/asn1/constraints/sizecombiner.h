@@ -45,8 +45,8 @@ std::optional<Range<int64_t>> SizeCombiner<ValueType>::combineSizes(const Constr
         return std::nullopt;
     }
 
-    return std::accumulate(std::next(constraints.begin()), constraints.end(),
-            combineSize(constraints[0].get()), [&](const auto &range, const auto &constraint) {
+    return std::accumulate(std::next(constraints.begin()), constraints.end(), combineSize(constraints[0].get()),
+            [&](const auto &range, const auto &constraint) {
                 auto combinedRange = combineSize(constraint.get());
 
                 if (!combinedRange) {
@@ -58,7 +58,6 @@ std::optional<Range<int64_t>> SizeCombiner<ValueType>::combineSizes(const Constr
                 }
             });
 }
-
 
 template<typename ValueType>
 std::optional<Range<int64_t>> SizeCombiner<ValueType>::combineSize(const Constraint<ValueType> *constraint)

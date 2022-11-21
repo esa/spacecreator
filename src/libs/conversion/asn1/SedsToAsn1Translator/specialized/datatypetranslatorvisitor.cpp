@@ -167,7 +167,8 @@ void DataTypeTranslatorVisitor::operator()(const ::seds::model::SubRangeDataType
 void DataTypeTranslatorVisitor::translateBitStringLength(
         const BinaryDataType &sedsType, Asn1Acn::Types::BitString *asn1Type) const
 {
-    if (sedsType.bits() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+    if (sedsType.bits() > static_cast<::seds::model::PositiveLong::Value>(
+                                  std::numeric_limits<Asn1Acn::IntegerValue::Type>::max())) {
         throw TranslationException("Bit string length size overflows ASN.1 range");
     }
 
@@ -189,7 +190,8 @@ void DataTypeTranslatorVisitor::translateBitStringLength(
 void DataTypeTranslatorVisitor::translateStringLength(
         const StringDataType &sedsType, Asn1Acn::Types::IA5String *asn1Type) const
 {
-    if (sedsType.length() > std::numeric_limits<Asn1Acn::IntegerValue::Type>::max()) {
+    if (sedsType.length() > static_cast<::seds::model::PositiveLong::Value>(
+                                    std::numeric_limits<Asn1Acn::IntegerValue::Type>::max())) {
         throw TranslationException("String length size overflows ASN.1 range");
     }
 

@@ -172,7 +172,10 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
 {
     const QStandardItem *childItem = rootItem->child(childIndex, MODEL_TYPE_INDEX);
     const QString asnType = childItem ? rootItem->child(childIndex, MODEL_TYPE_INDEX)->text() : "";
-    auto *child = rootItem->child(childIndex, MODEL_VALUE_INDEX);
+    QStandardItem *child = rootItem->child(childIndex, MODEL_VALUE_INDEX);
+    if (!child) {
+        return;
+    }
     const QString defaultValue = child->data(DEFAULT_ROLE).toString();
 
     if (asnType.startsWith("integer", Qt::CaseInsensitive) || asnType.startsWith("double", Qt::CaseInsensitive)
@@ -188,6 +191,7 @@ void Asn1TreeView::setChildRowValue(const QStandardItem *rootItem, int childInde
     } else if (asnType.startsWith("sequenceOf", Qt::CaseInsensitive)
             || asnType.startsWith("sequence of", Qt::CaseInsensitive)) {
         int seqOfSize = asn1Value.toMap()["seqofvalue"].toList().count();
+        seqOfSize = ensureValueInRange(seqOfSize, child);
         child->setText(QString::number(seqOfSize));
         setChildValue(rootItem->child(childIndex), asn1Value.toMap()["seqofvalue"], seqOfSize);
     } else if (asnType.startsWith("sequence", Qt::CaseInsensitive)) {
@@ -371,6 +375,28 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
     }
 
     return itemValue;
+}
+
+/*!
+ * Returns \p value if within the given range. If value is samller, the range minimum is returned. If larger than max,
+ * the range maximum is returned.
+ * \param value The input value
+ * \param valueItem The QStandardItem holds the min and max values. Accesible via the roles MIN_RANGE_ROLE and
+ *  MAX_RANGE_ROLE
+ * \return The value to be surely within the range
+ */
+int Asn1TreeView::ensureValueInRange(int value, const QStandardItem *valueItem)
+{
+    bool ok;
+    const int min = valueItem->data(asn1::MIN_RANGE_ROLE).toInt(&ok);
+    if (ok) {
+        value = std::max(value, min);
+    }
+    const int max = valueItem->data(asn1::MAX_RANGE_ROLE).toInt(&ok);
+    if (ok) {
+        value = std::min(value, max);
+    }
+    return value;
 }
 
 } // namespace asn1

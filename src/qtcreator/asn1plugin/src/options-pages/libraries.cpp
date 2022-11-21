@@ -25,6 +25,7 @@
 #include "libraries.h"
 
 #include <QWidget>
+#include <QRegularExpression>
 
 #include <asn1acnconstants.h>
 #include <tr.h>
@@ -48,6 +49,7 @@ Libraries::Libraries(Settings::LibrariesPtr settings)
                     Utils::Icon::Tint));
 }
 
+#if (QT_VERSION <= QT_VERSION_CHECK(6, 0, 0))
 bool Libraries::matches(const QString &searchKeyWord) const
 {
     const QStringList keywords{"asn1", "asn.1", "acn", "libraries", "components"};
@@ -56,6 +58,16 @@ bool Libraries::matches(const QString &searchKeyWord) const
             return true;
     return Core::IOptionsPage::matches(searchKeyWord);
 }
+#else
+bool Libraries::matches(const QString &searchKeyWord) const
+{
+    const QStringList keywords{"asn1", "asn.1", "acn", "libraries", "components"};
+    for (const auto &keyword : keywords)
+        if (keyword.contains(searchKeyWord, Qt::CaseInsensitive))
+            return true;
+    return Core::IOptionsPage::matches(QRegularExpression(searchKeyWord));
+}
+#endif
 
 QWidget *Libraries::widget()
 {

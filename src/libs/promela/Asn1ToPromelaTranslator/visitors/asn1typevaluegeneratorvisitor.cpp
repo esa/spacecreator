@@ -20,6 +20,7 @@
 #include "asn1typevaluegeneratorvisitor.h"
 
 #include "visitors/integerrangeconstraintvisitor.h"
+#include "visitors/realrangeconstraintvisitor.h"
 #include "visitors/sizeconstraintvisitor.h"
 
 #include <QList>
@@ -46,14 +47,15 @@
 #include <promela/Asn1ToPromelaTranslator/integergenerator.h>
 #include <promela/Asn1ToPromelaTranslator/integersubset.h>
 #include <promela/Asn1ToPromelaTranslator/proctypemaker.h>
+#include <promela/Asn1ToPromelaTranslator/realgenerator.h>
 #include <promela/PromelaModel/basictypes.h>
 #include <promela/PromelaModel/binaryexpression.h>
 #include <promela/PromelaModel/conditional.h>
 #include <promela/PromelaModel/constant.h>
-#include <promela/PromelaModel/forloop.h>
 #include <promela/PromelaModel/inlinecall.h>
 #include <promela/PromelaModel/inlinedef.h>
 #include <promela/PromelaModel/proctypeelement.h>
+#include <promela/PromelaModel/realconstant.h>
 #include <promela/PromelaModel/sequence.h>
 #include <promela/PromelaModel/valuedefinition.h>
 #include <promela/PromelaModel/variableref.h>
@@ -80,6 +82,7 @@ using Asn1Acn::Types::UserdefinedType;
 using conversion::Escaper;
 using conversion::translator::TranslationException;
 using promela::model::Assignment;
+using promela::model::BinaryExpression;
 using promela::model::Conditional;
 using promela::model::Constant;
 using promela::model::DoLoop;
@@ -90,6 +93,7 @@ using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
+using promela::model::RealConstant;
 using promela::model::Select;
 using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
@@ -101,11 +105,12 @@ const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::lengthMemberName = 
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::octetGeneratorName = "OctetStringElement_generate_value";
 const QString Asn1TypeValueGeneratorVisitor::InlineDefAdder::ia5StringGeneratorName = "IA5StringElement_generate_value";
 
-Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(
-        PromelaModel &promelaModel, QString name, const Asn1Acn::Types::Type *overridenType)
+Asn1TypeValueGeneratorVisitor::Asn1TypeValueGeneratorVisitor(PromelaModel &promelaModel, QString name,
+        const Asn1Acn::Types::Type *overridenType, const std::optional<float> delta = std::nullopt)
     : m_promelaModel(promelaModel)
     , m_name(std::move(name))
     , m_overridenType(overridenType)
+    , m_delta(delta)
 {
 }
 
@@ -352,7 +357,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
         alternative->appendElement(ProctypeMaker::makeInlineCall(inlineTypeGeneratorName,
                 QString("%1.data.%2").arg(valueVariableName).arg(Escaper::escapePromelaName(componentName))));
         alternative->appendElement(ProctypeMaker::makeAssignmentProctypeElement(
-                QString("%1.selection").arg(valueVariableName), thisComponentSelected));
+                QString("%1.selection").arg(valueVariableName), VariableRef(thisComponentSelected)));
 
         conditional->appendAlternative(std::move(alternative));
     }
@@ -464,11 +469,49 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
 
 void Asn1TypeValueGeneratorVisitor::visit(const Real &type)
 {
-    Q_UNUSED(type);
-    const QString message = QString("Real ASN.1 type's translation to Promela is not implemented yet (%1, %2)")
-                                    .arg(__FILE__)
-                                    .arg(__LINE__);
-    throw std::logic_error(message.toStdString().c_str());
+    RealRangeConstraintVisitor constraintVisitor;
+    type.constraints().accept(constraintVisitor);
+
+    const auto valueVariableName = getInlineArgumentName();
+    const auto tempName = Escaper::escapePromelaName(QString("%1_tmp").arg(m_name));
+    std::optional<RealSubset> realSubset = constraintVisitor.getResultSubset();
+
+    if (!realSubset.has_value()) {
+        auto message =
+                QString("Unable to generate values for type %1: unable to determine available subset").arg(m_name);
+        throw TranslationException(message);
+    }
+
+    Conditional conditional;
+    float delta = m_delta.value_or(1.f);
+
+    for (const auto &range : realSubset.value().getRanges()) {
+        const auto rangeMin = range.first;
+        const auto rangeMax = range.second;
+
+        float diff = rangeMax - rangeMin;
+        int steps = diff / delta;
+
+        auto basePtr = std::make_unique<Expression>(Constant(range.first));
+        auto multiplicationPtr = std::make_unique<Expression>(BinaryExpression(BinaryExpression::Operator::MULTIPLY,
+                std::make_unique<Expression>(VariableRef(tempName)),
+                std::make_unique<Expression>(RealConstant(delta))));
+        auto additionPtr = std::make_unique<Expression>(BinaryExpression(BinaryExpression::Operator::ADD,
+                std::make_unique<Expression>(Constant(range.first)), std::move(multiplicationPtr)));
+
+        std::unique_ptr<model::Sequence> nestedSequence =
+                std::make_unique<model::Sequence>(model::Sequence::Type::ATOMIC);
+        nestedSequence->appendElement(
+                Select(VariableRef(tempName), Expression(Constant(0)), Expression(Constant(steps))));
+        nestedSequence->appendElement(Assignment(VariableRef(valueVariableName), *additionPtr));
+        conditional.appendAlternative(std::move(nestedSequence));
+    }
+
+    model::Sequence sequence(model::Sequence::Type::NORMAL);
+    sequence.appendElement(ProctypeMaker::makeVariableDeclaration(model::BasicType::INT, tempName));
+    sequence.appendElement(std::move(conditional));
+
+    createValueGenerationInline(std::move(sequence));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const LabelType &type)
