@@ -54,5 +54,4 @@ protected:
 } // namespace ivm
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ivm::IVPropertyTemplate::Scopes)
-Q_DECLARE_METATYPE(ivm::IVPropertyTemplate::Type)
 Q_DECLARE_METATYPE(ivm::IVPropertyTemplate::Scopes)

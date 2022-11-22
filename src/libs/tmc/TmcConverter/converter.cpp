@@ -284,7 +284,7 @@ void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
     m_processesBasePriority = std::move(value);
 }
 
-void TmcConverter::setDelta(std::optional<float> value)
+void TmcConverter::setDelta(std::optional<QString> value)
 {
     m_delta = std::move(value);
 }
@@ -503,6 +503,7 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     if (m_isRealTypeEnabled) {
         options.add(PromelaOptions::enhancedSpinSupport);
+        options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
     }
     options.add(IvOptions::inputFilepath, inputFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
@@ -576,6 +577,7 @@ bool TmcConverter::convertDataview(
 
     if (m_isRealTypeEnabled) {
         options.add(PromelaOptions::enhancedSpinSupport);
+        options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
     }
 
     options.add(IvOptions::inputFilepath, ivFilepath);
@@ -602,6 +604,7 @@ bool TmcConverter::convertMscObservers(const QString &ivFilePath)
         Options options;
         if (m_isRealTypeEnabled) {
             options.add(PromelaOptions::enhancedSpinSupport);
+            options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
         }
         options.add(MscOptions::inputFilepath, mscFilePath);
         options.add(Asn1Options::inputFilepath, simuDataViewLocation().absoluteFilePath());
@@ -772,6 +775,7 @@ bool TmcConverter::createEnvGenerationInlines(const QFileInfo &inputDataView, co
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
     options.add(PromelaOptions::asn1ValueGeneration);
+    options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
 
     for (const QString &datatype : envDatatypes) {
         options.add(PromelaOptions::asn1ValueGenerationForType, datatype);

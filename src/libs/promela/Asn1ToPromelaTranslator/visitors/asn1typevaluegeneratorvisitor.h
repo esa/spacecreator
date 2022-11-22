@@ -49,9 +49,10 @@ public:
      * @param   promelaModel    target promela model
      * @param   name            name of ASN.1 type
      * @param   overridenType   ASN.1 type that this type overrides by subtyping
+     * @param   delta           delta for real values generation
      */
-    Asn1TypeValueGeneratorVisitor(
-            model::PromelaModel &promelaModel, QString name, const Asn1Acn::Types::Type *overridenType);
+    Asn1TypeValueGeneratorVisitor(model::PromelaModel &promelaModel, QString name,
+            const Asn1Acn::Types::Type *overridenType, const std::optional<float> delta);
 
     /**
      * @brief Visit Asn1Acn::Types::Boolean
@@ -177,6 +178,7 @@ private:
     model::PromelaModel &m_promelaModel;
     QString m_name;
     const Asn1Acn::Types::Type *m_overridenType;
+    const std::optional<float> m_delta;
 };
 
 } // namespace promela::translator

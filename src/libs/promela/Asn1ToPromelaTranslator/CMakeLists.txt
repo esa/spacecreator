@@ -4,6 +4,7 @@ set(SOURCES
   enumeratedgenerator.cpp
   integergenerator.cpp
   integersubset.cpp
+  realgenerator.cpp
   realsubset.cpp
   proctypemaker.cpp
   promelatypesorter.cpp
@@ -25,6 +26,7 @@ set(INCLUDES
   integersubset.h
   proctypemaker.h
   promelatypesorter.h
+  realgenerator.h
   realsubset.h
   translator.h
   visitors/asn1itemtypevisitor.h

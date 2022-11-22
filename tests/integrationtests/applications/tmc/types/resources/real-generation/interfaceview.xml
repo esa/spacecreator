@@ -1,0 +1,36 @@
+<InterfaceView asn1file="ReallyGuiProject.acn">
+<Function name="SdlModel" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="21100 29400 41100 37400"/>
+<Provided_Interface name="PI_1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" stack_size="1024" wcet="0" miat="0" priority="1">
+    <Input_Parameter name="param" type="MyReal" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="41100 31000"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function name="Environment" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+    <Property name="Taste::coordinates" value="64400 28800 84400 36800"/>
+<Required_Interface name="PI_1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" stack_size="1024" wcet="0" miat="0" priority="1">
+    <Input_Parameter name="param" type="MyReal" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="64400 30500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Environment" ri_name="PI_1"/>
+    <Target func_name="SdlModel" pi_name="PI_1"/>
+    <Property name="Taste::coordinates" value="63800 30500 41400 31000"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>

@@ -129,3 +129,5 @@ private:
 };
 
 } // namespace shared
+
+Q_DECLARE_METATYPE(shared::PropertyTemplate::Type);

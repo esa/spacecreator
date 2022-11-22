@@ -267,7 +267,7 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     const QDomElement typeElement = element.firstChildElement(typeMeta.name());
     PropertyTemplate::Type t = PropertyTemplate::Type::Unknown;
 
-    QVariant defaultValue { QVariant::String };
+    QVariant defaultValue;
     QVariant value;
     QString typeValidator;
     if (!typeElement.isNull()) {
@@ -344,27 +344,27 @@ QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::
             typedValue = false;
         } else if (trueValue) {
             typedValue = true;
-        } else {
-            return QVariant(QVariant::Bool);
         }
     } break;
     case PropertyTemplate::Type::Integer: {
         bool ok;
         typedValue = value.toString().toInt(&ok);
         if (!ok)
-            return QVariant(QVariant::Int);
+            return QVariant();
     } break;
     case PropertyTemplate::Type::Real: {
         bool ok;
         typedValue = value.toString().toDouble(&ok);
         if (!ok)
-            return QVariant(QVariant::Double);
+            return QVariant();
     } break;
     case PropertyTemplate::Type::String: {
-        if (value.isValid())
-            typedValue = value.toString();
-        else
-            typedValue = QVariant(QVariant::String);
+        if (value.isValid()) {
+            QString stringValue = value.toString();
+            if (!stringValue.isEmpty()) {
+                typedValue = stringValue;
+            }
+        }
     } break;
     case PropertyTemplate::Type::Enumeration: {
         if (value.isValid()) {
@@ -372,9 +372,9 @@ QVariant PropertyTemplate::convertData(const QVariant &value, PropertyTemplate::
             for (const auto &dataItem : value.toList()) {
                 typedList.append(dataItem.toString());
             }
-            typedValue = typedList;
-        } else {
-            typedValue = QVariant(QVariant::StringList);
+            if (!typedList.isEmpty()) {
+                typedValue = typedList;
+            }
         }
     } break;
     default:
