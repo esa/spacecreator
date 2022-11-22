@@ -241,7 +241,7 @@ void tst_IvToPromelaTranslator::testSimple()
         verifyProctypeSimple(proctype, "Controller", "fail", 0);
     }
 
-    QCOMPARE(promelaModel->getInlineDefs().size(), 7);
+    QCOMPARE(promelaModel->getInlineDefs().size(), 10);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test");
@@ -293,6 +293,29 @@ void tst_IvToPromelaTranslator::testSimple()
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef =
+                findInline(promelaModel->getInlineDefs(), "Controller_0_PI_0_success_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef =
+                findInline(promelaModel->getInlineDefs(), "Controller_0_PI_0_fail_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_PI_0_test_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
@@ -466,7 +489,7 @@ void tst_IvToPromelaTranslator::testParameters()
         verifyProctypeSimple(proctype, "Controller", "error", 0);
     }
 
-    QCOMPARE(promelaModel->getInlineDefs().size(), 7);
+    QCOMPARE(promelaModel->getInlineDefs().size(), 10);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_work");
@@ -516,6 +539,29 @@ void tst_IvToPromelaTranslator::testParameters()
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef =
+                findInline(promelaModel->getInlineDefs(), "Controller_0_PI_0_result_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef =
+                findInline(promelaModel->getInlineDefs(), "Controller_0_PI_0_error_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_PI_0_work_unhandled_input");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
@@ -799,7 +845,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
         verifyProctypeSimple(proctype, "Down", "check", 1);
     }
 
-    QCOMPARE(promelaModel->getInlineDefs().size(), 11);
+    QCOMPARE(promelaModel->getInlineDefs().size(), 16);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Env_0_RI_0_test");
@@ -879,6 +925,44 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     }
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef =
+                findInline(promelaModel->getInlineDefs(), "Controller_0_PI_0_test_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef =
+                findInline(promelaModel->getInlineDefs(), "Controller_0_PI_0_up_result_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef =
+                findInline(promelaModel->getInlineDefs(), "Controller_0_PI_0_down_result_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Up_0_PI_0_check_unhandled_input");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Down_0_PI_0_check_unhandled_input");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
