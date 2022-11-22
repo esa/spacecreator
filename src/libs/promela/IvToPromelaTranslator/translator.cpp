@@ -848,8 +848,6 @@ void IvToPromelaTranslator::generateUnhandledInputInline(
 
     Sequence sequence(Sequence::Type::NORMAL);
 
-    sequence.appendElement(Skip());
-
     QList<QString> arguments;
 
     if (!proctypeInfo.m_parameterTypeName.isEmpty()) {
@@ -859,16 +857,20 @@ void IvToPromelaTranslator::generateUnhandledInputInline(
     ObserverAttachments attachments =
             context.getUnhandledInputObserversForFunction(functionName, proctypeInfo.m_interfaceName);
 
-    for (const ObserverAttachment &attachment : attachments) {
-        sequence.appendElement(createLockAcquireStatement(attachment.observer()));
+    if (attachments.empty()) {
+        sequence.appendElement(Skip());
+    } else {
+        for (const ObserverAttachment &attachment : attachments) {
+            sequence.appendElement(createLockAcquireStatement(attachment.observer()));
 
-        QList<InlineCall::Argument> callArguments;
-        if (!attachment.interface().isEmpty()) {
-            callArguments.append(VariableRef(proctypeInfo.m_parameterName));
+            QList<InlineCall::Argument> callArguments;
+            if (!attachment.interface().isEmpty()) {
+                callArguments.append(VariableRef(proctypeInfo.m_parameterName));
+            }
+            sequence.appendElement(InlineCall(observerInputSignalName(attachment), callArguments));
+
+            sequence.appendElement(createLockReleaseStatement(attachment.observer()));
         }
-        sequence.appendElement(InlineCall(observerInputSignalName(attachment), callArguments));
-
-        sequence.appendElement(createLockReleaseStatement(attachment.observer()));
     }
 
     context.model()->addInlineDef(std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence)));

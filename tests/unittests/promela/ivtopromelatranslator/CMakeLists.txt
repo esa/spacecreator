@@ -19,5 +19,6 @@ configure_file(resources/interface_params.xml interface_params.xml COPYONLY)
 configure_file(resources/function_types.xml function_types.xml COPYONLY)
 configure_file(resources/proctype_priority.xml proctype_priority.xml COPYONLY)
 configure_file(resources/output_observers.xml output_observers.xml COPYONLY)
+configure_file(resources/unhandled_input_observers.xml unhandled_input_observers.xml COPYONLY)
 
 add_format_target(${TEST_NAME})
