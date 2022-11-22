@@ -68,6 +68,9 @@ void TmcOptions::apply()
     QSettings settings;
     settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_EXE_KEY, m_widget->getSpinExecutable());
     settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, m_widget->getDefaultOutputDirectory());
+    // automatically make destination directory
+    QDir defaultOutputDirectory(m_widget->getDefaultOutputDirectory());
+    defaultOutputDirectory.mkpath(QStringLiteral("."));
 }
 
 void TmcOptions::finish()
