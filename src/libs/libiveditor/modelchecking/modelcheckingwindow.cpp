@@ -1673,9 +1673,9 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
 {
     QString outputDirectoryFilepath;
     {
-        QSettings settings;
 
         QFileDialog fileDialog;
+        QSettings settings;
         QVariant defaultOutputDirectory = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY);
         if (defaultOutputDirectory.isValid()) {
             fileDialog.setDirectory(defaultOutputDirectory.toString());
@@ -1696,7 +1696,10 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
         } else {
             return;
         }
+        // save output directory
+        settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, outputDirectoryFilepath);
     }
+
 
     QFileInfo outputDirectory(outputDirectoryFilepath);
 
