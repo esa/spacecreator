@@ -26,5 +26,6 @@ class TmcConstants
 {
 public:
     inline static const QString SETTINGS_TMC_SPIN_EXE_KEY = "SpaceCreator/tmcSpinExe";
+    inline static const QString SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY = "SpaceCreator/tmcSpinOutputDir";
 };
 }
