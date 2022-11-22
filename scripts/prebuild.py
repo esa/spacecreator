@@ -396,13 +396,18 @@ if __name__ == '__main__':
     # AppImage files SpaceCreator.desktop and AppRun
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)
 
-    # Copy syntax highlighter files from asn1plugin
+    # Copy syntax highlighter files from asn1plugin and spacecreatorplugin
     if is_qt6:
-        generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter')
+        asn1plugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter')
+        scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'spacecreatorplugin', 'scl', 'generic-highlighter')
     else:
-        generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
+        asn1plugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
+        scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'spacecreatorplugin', 'scl', 'generic-highlighter', 'syntax')
+
     generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
-    copy_highlighter_files(generic_highlighter_dir, generic_highlighter_install_dir)
+    
+    copy_highlighter_files(asn1plugin_generic_highlighter_dir, generic_highlighter_install_dir)
+    copy_highlighter_files(scl_files_spacecreatorplugin_generic_highlighter_dir, generic_highlighter_install_dir)
 
     # Copy snippets from asn1plugin
     snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
