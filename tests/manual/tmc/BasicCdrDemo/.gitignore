@@ -1,0 +1,27 @@
+# locally generated files for BasicCdrDemo
+*.aadl
+work/actuator/actuator.pro
+work/actuator/SDL/code
+work/actuator/SDL/Makefile
+work/actuator/SDL/src/dataview-uniq.asn
+work/actuator/SDL/src/dataview.md5
+work/actuator/SDL/src/system_structure.pr
+work/actuator/SDL/wrappers
+work/actuator/SDL/wrappers_simu
+work/build
+work/dataview
+work/Debug
+work/Dump
+work/egse
+work/Makefile
+work/modemanager/SDL/Makefile
+work/modemanager/SDL/code
+work/modemanager/SDL/src/dataview-uniq.asn
+work/modemanager/SDL/src/dataview.md5
+work/modemanager/SDL/src/system_structure.pr
+work/modemanager/SDL/wrappers
+work/modemanager/SDL/wrappers_simu
+work/modemanager/modemanager.pro
+work/sensor
+work/skeletons_built
+work/taste.pro
