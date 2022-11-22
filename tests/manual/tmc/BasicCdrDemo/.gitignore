@@ -23,5 +23,6 @@ work/modemanager/SDL/wrappers
 work/modemanager/SDL/wrappers_simu
 work/modemanager/modemanager.pro
 work/sensor
+work/simulation
 work/skeletons_built
 work/taste.pro
