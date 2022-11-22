@@ -19,6 +19,7 @@
 #include "cmdfunctionimplementationremove.h"
 
 #include "commandids.h"
+#include "implementationshandler.h"
 #include "ivfunction.h"
 
 #include <QTemporaryDir>
@@ -48,8 +49,8 @@ void CmdFunctionImplementationRemove::redo()
         m_function->removeImplementation(m_idx);
         m_tempDir.reset(new QTemporaryDir);
         if (m_tempDir->isValid()) {
-            QDir dir = implementationDir();
-            if (!shared::moveDir(dir.path(), m_tempDir->path(), shared::FileCopyingMode::Overwrite)) {
+            ImplementationsHandler handler(m_projectPath, m_function);
+            if (!shared::moveDir(handler.implementationBasePath(m_value.name()), m_tempDir->path(), shared::FileCopyingMode::Overwrite)) {
                 /// TODO: ROLLBACK
             }
             Q_EMIT implementationListChanged(m_function.data());
@@ -62,7 +63,8 @@ void CmdFunctionImplementationRemove::undo()
     if (m_function) {
         m_function->insertImplementation(m_idx, m_value);
         if (m_tempDir && m_tempDir->isValid()) {
-            QDir dir = implementationDir();
+            ImplementationsHandler handler(m_projectPath, m_function);
+            QDir dir = handler.implementationBasePath(m_value.name());
             dir.removeRecursively();
             shared::copyDir(m_tempDir->path(), dir.path(), shared::FileCopyingMode::Overwrite);
             m_tempDir.reset();
@@ -74,13 +76,6 @@ void CmdFunctionImplementationRemove::undo()
 int CmdFunctionImplementationRemove::id() const
 {
     return RemoveFunctionImplementation;
-}
-
-QDir CmdFunctionImplementationRemove::implementationDir() const
-{
-    return QStringList { m_projectPath, shared::kRootImplementationPath, m_function->title().toLower(),
-        shared::kNonCurrentImplementationPath, m_value.name() }
-            .join(QDir::separator());
 }
 
 } // namespace cmd

@@ -19,6 +19,7 @@
 #pragma once
 
 #include "entityattribute.h"
+#include "implementationshandler.h"
 
 #include <QPointer>
 #include <undocommand.h>
@@ -46,15 +47,16 @@ Q_SIGNALS:
             ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
 
 private:
-    void moveDirectories(const QString &currentImplName, const QString &nextImplName);
-    void updateSymLink(const EntityAttribute &oldValue, const EntityAttribute &newValue, bool isDefault);
+    QString newImplementationName() const;
+    QString newLanguage() const;
+    QString oldImplementationName() const;
+    QString oldLanguage() const;
 
-private:
     QPointer<ivm::IVFunction> m_function;
     const int m_idx = -1;
     const EntityAttribute m_oldValues;
     const EntityAttribute m_newValues;
-    const QString m_projectPath;
+    ImplementationsHandler m_implHandler;
 };
 
 } // namespace cmd

@@ -17,7 +17,6 @@
 
 #include "interfacedocument.h"
 
-#include "actionsbar.h"
 #include "archetypes/archetypelibrary.h"
 #include "archetypes/archetypemodel.h"
 #include "archetypes/archetypeobject.h"
@@ -27,19 +26,15 @@
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
 #include "commands/cmdconnectionlayermanage.h"
+#include "commands/implementationshandler.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
 #include "interface/objectstreeview.h"
-#include "itemeditor/common/ivutils.h"
-#include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivarchetypelibraryreference.h"
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
@@ -842,7 +837,7 @@ static inline void copyImplementation(
 {
     for (shared::VEObject *object : objects) {
         if (auto fn = object->as<ivm::IVFunctionType *>()) {
-            const QString subPath = shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
+            const QString subPath = ive::kRootImplementationPath + QDir::separator() + object->title().toLower();
             shared::copyDir(projectDir.filePath(subPath), targetDir.filePath(subPath));
             copyImplementation(projectDir, targetDir, fn->children());
         }

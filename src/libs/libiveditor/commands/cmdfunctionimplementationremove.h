@@ -49,9 +49,6 @@ Q_SIGNALS:
     void implementationListChanged(ivm::IVFunction *entity);
 
 private:
-    QDir implementationDir() const;
-
-private:
     QPointer<ivm::IVFunction> m_function;
     EntityAttribute m_value;
     const int m_idx = -1;

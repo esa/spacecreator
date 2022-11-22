@@ -33,9 +33,6 @@ static const QString kStringDelemiter = QStringLiteral("::");
 
 static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
 
-static const QString kNonCurrentImplementationPath { "implem" };
-static const QString kRootImplementationPath { "work" };
-
 Id createId();
 
 namespace env {
@@ -191,9 +188,6 @@ QString uniteNames(const QVector<Type> &collection, const QString &prefix)
     const QString line = joinNonEmpty(result, QStringLiteral(", "));
     return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
 }
-
-bool moveDefaultDirectories(const QString &currentImplName, const QString &projectPath, const QString &functionName,
-        const QString &language);
 
 }
 
