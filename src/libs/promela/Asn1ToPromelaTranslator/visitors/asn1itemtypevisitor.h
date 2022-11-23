@@ -47,7 +47,7 @@ public:
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
      */
     Asn1ItemTypeVisitor(model::PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name,
-            bool generateInits, bool enhancedSpinSupport);
+            bool generateInits, bool enhancedSpinSupport, int nestedIndexCounter);
 
     /**
      * @brief Getter for result promela data type
@@ -167,6 +167,7 @@ private:
     void addSizeCheckInline(const std::size_t minValue, const std::size_t maxValue, const QString &typeName);
     QString getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const;
     QString buildCheckArgumentName(const QString &typeName, const QString &postfix) const;
+    QString getIndexVariableName() const;
 
     model::ForLoop createSequenceOfDataLoop(const QString &utypeName, const model::Expression loopRangeEnd) const;
     model::ForLoop createStringDataLoop(const model::Expression loopRangeEnd) const;
@@ -180,5 +181,6 @@ private:
     bool m_generateInits;
     bool m_enhancedSpinSupport;
     std::optional<model::DataType> m_resultDataType;
+    int m_nestedIndexCounter;
 };
 }
