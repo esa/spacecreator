@@ -17,7 +17,6 @@
 
 #include "positionlookuphelper.h"
 
-#include "common.h"
 #include "graphicsviewutils.h"
 
 #include <QtMath>
@@ -27,15 +26,26 @@ namespace gu = shared::graphicsviewutils;
 static const QMarginsF kMargins { gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset,
     gu::kInterfaceLayoutOffset };
 
-void alignPosWithinRect(const QRectF &rect, Qt::Alignment alignment, QPointF &pos, const QMarginsF &margins)
+void alignPosWithinRect(const QRectF &rect, Qt::Alignment alignment, QPointF &pos, QMarginsF margins)
 {
+    if (margins.top() + margins.bottom() > rect.height()) {
+        const qreal margin = std::floor(rect.height() / 2.);
+        margins.setTop(margin);
+        margins.setBottom(margin);
+    }
+    if (margins.left() + margins.right() > rect.width()) {
+        const qreal margin = std::floor(rect.width() / 2.);
+        margins.setLeft(margin);
+        margins.setRight(margin);
+    }
+
     switch (alignment) {
     case Qt::AlignLeft:
         pos.setX(rect.left());
         pos.setY(qBound(rect.top() + margins.top(), pos.y(), rect.bottom() - margins.bottom()));
         break;
     case Qt::AlignTop:
-        pos.setX(qBound(rect.left() + kMargins.left(), pos.x(), rect.right() - kMargins.right()));
+        pos.setX(qBound(rect.left() + margins.left(), pos.x(), rect.right() - margins.right()));
         pos.setY(rect.top());
         break;
     case Qt::AlignRight:
@@ -43,7 +53,7 @@ void alignPosWithinRect(const QRectF &rect, Qt::Alignment alignment, QPointF &po
         pos.setY(qBound(rect.top() + margins.top(), pos.y(), rect.bottom() - margins.bottom()));
         break;
     case Qt::AlignBottom:
-        pos.setX(qBound(rect.left() + kMargins.left(), pos.x(), rect.right() - kMargins.right()));
+        pos.setX(qBound(rect.left() + margins.left(), pos.x(), rect.right() - margins.right()));
         pos.setY(rect.bottom());
         break;
     }
