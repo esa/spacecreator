@@ -21,7 +21,11 @@
 
 #include <QSharedPointer>
 #include <QString>
+#include <reporting/Report/observerfailurereport.h>
+#include <reporting/Report/rawerroritem.h>
+#include <reporting/Report/spinerrorparser.h>
 #include <reporting/Report/spinerrorreportitem.h>
+#include <reporting/Report/stopconditionviolationreport.h>
 
 namespace Grantlee {
 class Engine;
@@ -42,7 +46,31 @@ public:
     HtmlReportBuilder();
 
     /**
-     * @brief   Build spin error report
+     * @brief   Builds HTML report from multiple string lists and a default template
+     *
+     * @param   spinMessages     Spin command outputs
+     * @param   sclFiles         SCL condition files
+     * @param   errors           Raw error data
+     * @param   observerNames    Observer names
+     * @param   template         HTML template file, uses default if empty
+     *
+     * @return  HTML-formatted error report string
+     */
+    QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &sclFiles,
+            const QList<RawErrorItem> &errors, const QStringList &observerNames,
+            const QString &templateFile = QString()) const;
+
+    /**
+     * @brief   Build spin error report using a default template file embedded into the library
+     *
+     * @param   spinErrorReport      Parsed error report from spin
+     *
+     * @return  Error report in an HTML document format
+     */
+    QString buildHtmlReport(const SpinErrorReport &spinErrorReport) const;
+
+    /**
+     * @brief   Build spin error report using a custom template file
      *
      * @param   spinErrorReport      Parsed error report from spin
      * @param   templateFile         Path to the HTML template file
@@ -55,12 +83,29 @@ private:
     Grantlee::Engine *m_engine = nullptr;
     QSharedPointer<Grantlee::FileSystemTemplateLoader> m_fileLoader;
 
+    QString loadTemplateFile(const QString &path) const;
+
+    static const QString m_defaultTemplateFile;
     static const QHash<reporting::SpinErrorReportItem::ErrorType, QString> m_errorTypeNames;
+    static const QHash<reporting::StopConditionViolationReport::ViolationClause, QString>
+            m_stopConditionViolationClauseNames;
+    static const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
+            m_stopConditionViolationTypeNames;
+    static const QHash<reporting::ObserverFailureReport::ObserverState, QString> m_observerFailureObserverStateNames;
 
     static QVariantList buildReportVariant(const SpinErrorReport &spinErrorReport);
     static QVariantHash buildReportItemVariant(const SpinErrorReportItem &spinErrorReportItem);
 
     static QVariantHash buildDataConstraintViolationVariant(const QVariant &errorDetails);
+    static QVariantHash buildStopConditionViolationVariant(const QVariant &errorDetails);
+    static QVariantHash buildObserverFailureVariant(const QVariant &errorDetails);
 };
 
+}
+
+// This function is required by Qt outside the reporting namespace,
+// in order to initialize resource files associated with the library
+inline void initResource()
+{
+    Q_INIT_RESOURCE(htmlreportbuilder);
 }

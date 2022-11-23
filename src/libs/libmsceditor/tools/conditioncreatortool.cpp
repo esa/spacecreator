@@ -71,7 +71,7 @@ void ConditionCreatorTool::commitPreviewItem()
         return;
     }
 
-    auto condition = qobject_cast<msc::MscCondition *>(m_previewEntity.take());
+    auto condition = qobject_cast<msc::MscCondition *>(m_previewEntity.release());
     condition->setShared(m_shared);
     startWaitForModelLayoutComplete(condition);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());

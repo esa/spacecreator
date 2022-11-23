@@ -24,4 +24,8 @@ configure_file(resources/seds-extension-semantics.xsd seds-extension-semantics.x
 configure_file(resources/seds.xsd seds.xsd COPYONLY)
 configure_file(resources/xml.xsd xml.xsd COPYONLY)
 
+configure_file(resources/test_external_references.sh test_external_references.sh COPYONLY)
+configure_file(resources/external_references.xml external_references.xml COPYONLY)
+configure_file(resources/test_external_references.output test_external_references.output COPYONLY)
+
 add_format_target(${TEST_NAME})

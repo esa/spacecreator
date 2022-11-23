@@ -26,6 +26,7 @@
 #include "specialized/statemachinetranslator.h"
 
 #include <algorithm>
+#include <conversion/asn1/SedsToAsn1Translator/constants.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/options.h>
 #include <conversion/common/overloaded.h>
@@ -38,6 +39,7 @@
 
 using conversion::Escaper;
 using conversion::iv::translator::seds::InterfaceTranslatorHelper;
+using conversion::seds::SedsOptions;
 using conversion::translator::TranslationException;
 using ::seds::model::CoreMathOperator;
 using ::seds::model::Polynomial;
@@ -256,22 +258,32 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::Iteration &iter
 
 auto StatementTranslatorVisitor::operator()(const ::seds::model::MathOperation &operation) -> void
 {
-    if (!operation.elements().empty() && std::holds_alternative<::seds::model::Operator>(operation.elements()[0])) {
-        // Check for a special case of the swap operator
-        const auto &op = std::get<::seds::model::Operator>(operation.elements()[0]);
-        if (std::get<CoreMathOperator>(op.mathOperator()) == CoreMathOperator::Swap) {
-            // TODO This needs proper knowledge of types
-            throw TranslationException("Swap operator is not implemented");
-        }
+    if (operation.elements().empty()) {
+        throw TranslationException("Empty MathOperation");
     }
-    const auto targetName = translateVariableReference(operation.outputVariableRef().value().value());
-    const auto value = MathOperationTranslator::translateOperation(operation.elements());
-    const auto action = QString("%1 := %2").arg(targetName, value);
 
-    auto sdlTask = std::make_unique<::sdl::Task>("", action);
-    DescriptionTranslator::translate(operation, sdlTask.get());
+    const auto &elements = operation.elements();
+    const auto &firstElement = elements.front();
 
-    m_sdlTransition->addAction(std::move(sdlTask));
+    const auto isSwap = isSwapOperator(firstElement);
+
+    if (isSwap) {
+        const auto swapOperation = MathOperationTranslator::translateSwapOperation(operation);
+
+        auto sdlTask = std::make_unique<::sdl::Task>("", swapOperation);
+        DescriptionTranslator::translate(operation, sdlTask.get());
+
+        m_sdlTransition->addAction(std::move(sdlTask));
+    } else {
+        const auto targetName = translateVariableReference(operation.outputVariableRef().value().value());
+        const auto value = MathOperationTranslator::translateOperation(operation.elements());
+        const auto action = QString("%1 := %2").arg(targetName, value);
+
+        auto sdlTask = std::make_unique<::sdl::Task>("", action);
+        DescriptionTranslator::translate(operation, sdlTask.get());
+
+        m_sdlTransition->addAction(std::move(sdlTask));
+    }
 }
 
 auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrimitive &sendCommand) -> void
@@ -279,10 +291,16 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
     const auto commandName = sendCommand.command().value();
     const auto interfaceName = sendCommand.interface().value();
 
+    const auto command = m_context.getCommand(interfaceName, commandName);
+    if (command == nullptr) {
+        auto errorMessage = QString("Command '%1' of interface '%2' not found").arg(commandName, interfaceName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto isReturnCall = command->interfaceType() == CommandInfo::HostInterfaceType::Provided;
+
     // Check, if this is a sync return call
-    const auto &command = m_context.getCommand(interfaceName, commandName);
-    if (command != nullptr && command->interfaceType() == CommandInfo::HostInterfaceType::Provided
-            && command->definition()->mode() == ::seds::model::InterfaceCommandMode::Sync) {
+    if (isReturnCall && command->definition()->mode() == ::seds::model::InterfaceCommandMode::Sync) {
         // Registered and provided sync command
         // SendCommandPrimitive is basically a return statement
         ActivityInfo info(m_context.sdlProcedure()->name());
@@ -297,7 +315,22 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
                         std::get<std::unique_ptr<::sdl::VariableLiteral>>(argumentValue)->value()));
             }
         }
+
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            const auto &failureParameterName = asn1::translator::seds::Constants::failureParamName;
+            const auto &failureVariableName = asn1::translator::seds::Constants::failureReturnVariableName;
+            const auto failureValue = sendCommand.isFailed() ? "true" : "false";
+
+            const auto failureVariableAssignment = QString("%1 := %2").arg(failureVariableName).arg(failureValue);
+            auto failureVariableAssignmentTask = std::make_unique<::sdl::Task>("", failureVariableAssignment);
+            m_sdlTransition->addAction(std::move(failureVariableAssignmentTask));
+
+            auto failureAssignmentInfo = AssignmentInfo(failureParameterName, failureVariableName);
+            info.addAssignment(std::move(failureAssignmentInfo));
+        }
+
         m_context.addActivityInfo(info.name(), info);
+
         return;
     }
 
@@ -305,15 +338,24 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendCommandPrim
             interfaceName, commandName, ivm::IVInterface::InterfaceType::Required, m_options);
 
     // Process name carries iv-escaped component name
-    const auto interface = findIvInterface(m_context.ivFunction(), callName);
-    if (interface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
-        auto outputActions = translateOutput(callName, sendCommand, m_options);
+    const auto ivInterface = findIvInterface(m_context.ivFunction(), callName);
+    if (ivInterface->kind() == ivm::IVInterface::OperationKind::Sporadic) {
+        auto outputActions = translateOutput(callName, sendCommand, ivInterface, isReturnCall, m_options);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
         }
-    } else if (interface->kind() == ivm::IVInterface::OperationKind::Protected
-            || interface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
-        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand, interface, m_options);
+    } else if (ivInterface->kind() == ivm::IVInterface::OperationKind::Protected
+            || ivInterface->kind() == ivm::IVInterface::OperationKind::Unprotected) {
+        auto call = translateCall(m_context.sdlProcess(), callName, sendCommand);
+
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            handleFailureReporting(call.get());
+        }
+
+        if (sendCommand.transaction()) {
+            handleTransaction(*sendCommand.transaction(), call.get(), ivInterface);
+        }
+
         m_sdlTransition->addAction(std::move(call));
     }
 }
@@ -334,6 +376,11 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPr
 
     switch (ivInterface->kind()) {
     case ivm::IVInterface::OperationKind::Sporadic: {
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            auto errorMessage = QString("Async parameters are not allowed when using SEDS failure reporting mechanism");
+            throw TranslationException(std::move(errorMessage));
+        }
+
         auto outputActions = translateOutput(callName, sendParameter);
         for (auto &action : outputActions) {
             m_sdlTransition->addAction(std::move(action));
@@ -342,7 +389,16 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::SendParameterPr
     }
     case ivm::IVInterface::OperationKind::Protected:
     case ivm::IVInterface::OperationKind::Unprotected: {
-        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter, ivInterface, m_options);
+        auto call = translateCall(m_context.sdlProcess(), callName, sendParameter);
+
+        if (m_options.isSet(SedsOptions::enableFailureReporting)) {
+            handleFailureReporting(call.get());
+        }
+
+        if (sendParameter.transaction()) {
+            handleTransaction(*sendParameter.transaction(), call.get(), ivInterface);
+        }
+
         m_sdlTransition->addAction(std::move(call));
         return;
     }
@@ -459,8 +515,7 @@ auto StatementTranslatorVisitor::translatePolynomial(
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendCommandPrimitive &sendCommand, ivm::IVInterface *ivInterface, const Options &options)
-        -> std::unique_ptr<::sdl::ProcedureCall>
+        const ::seds::model::SendCommandPrimitive &sendCommand) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -478,16 +533,11 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
         call->addArgument(translateArgument(argument));
     }
 
-    if (sendCommand.transaction()) {
-        handleTransaction(*sendCommand.transaction(), call.get(), ivInterface, options);
-    }
-
     return call;
 }
 
 auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, const QString callName,
-        const ::seds::model::SendParameterPrimitive &sendParameter, ivm::IVInterface *ivInterface,
-        const Options &options) -> std::unique_ptr<::sdl::ProcedureCall>
+        const ::seds::model::SendParameterPrimitive &sendParameter) -> std::unique_ptr<::sdl::ProcedureCall>
 {
     auto call = std::make_unique<::sdl::ProcedureCall>();
 
@@ -515,63 +565,79 @@ auto StatementTranslatorVisitor::translateCall(::sdl::Process *hostProcess, cons
     }, value);
     // clang-format on
 
-    if (sendParameter.transaction()) {
-        handleTransaction(*sendParameter.transaction(), call.get(), ivInterface, options);
-    }
-
     return call;
 }
 
-auto StatementTranslatorVisitor::translateOutput(
-        const QString &callName, const ::seds::model::SendCommandPrimitive &sendCommand, const Options &options)
-        -> std::vector<std::unique_ptr<::sdl::Action>>
+auto StatementTranslatorVisitor::translateOutput(const QString &callName,
+        const ::seds::model::SendCommandPrimitive &sendCommand, const ivm::IVInterface *ivInterface,
+        const bool isReturnCall, const Options &options) -> std::vector<std::unique_ptr<::sdl::Action>>
 {
     std::vector<std::unique_ptr<::sdl::Action>> result;
 
     auto output = std::make_unique<::sdl::Output>();
+    DescriptionTranslator::translate(sendCommand, output.get());
     output->setName(callName);
-    if (!sendCommand.argumentValues().empty()) {
 
-        //--taste translation
-        if (options.isSet(conversion::seds::SedsOptions::tasteTranslation)) {
-            if (sendCommand.argumentValues().size() != 1) {
-                throw TranslationException(
-                        QString("More than one(%1) command.argumentValue is not allowed for --taste translation option")
-                                .arg(sendCommand.argumentValues().size()));
-            }
+    const auto paramsCount = ivInterface->params().size();
 
-            const auto &argument = sendCommand.argumentValues().at(0);
-            const auto source = std::visit(
-                    overloaded { [](const ::seds::model::ValueOperand &operand) { return operand.value().value(); },
-                            [](const ::seds::model::VariableRefOperand &operand) {
-                                return translateVariableReference(operand.variableRef().value().value());
-                            } },
-                    argument.value());
-            output->setParameter(std::make_unique<::sdl::VariableReference>(source));
-            DescriptionTranslator::translate(sendCommand, output.get());
-            result.emplace_back(std::move(output));
-            return result;
-        }
-
-        const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
-        output->setParameter(std::make_unique<::sdl::VariableReference>(ioVariable));
-        DescriptionTranslator::translate(sendCommand, output.get());
-        for (const auto &argument : sendCommand.argumentValues()) {
-            const auto fieldName = translateVariableReference(argument.name().value());
-            const auto source = std::visit(
-                    overloaded { [](const ::seds::model::ValueOperand &operand) { return operand.value().value(); },
-                            [](const ::seds::model::VariableRefOperand &operand) {
-                                return translateVariableReference(operand.variableRef().value().value());
-                            } },
-                    argument.value());
-            auto assignment =
-                    std::make_unique<::sdl::Task>("", QString("%1.%2 := %3").arg(ioVariable, fieldName, source));
-            result.emplace_back(std::move(assignment));
-        }
+    if (paramsCount == 0) {
+        result.push_back(std::move(output));
+        return result;
     }
 
-    result.emplace_back(std::move(output));
+    // clang-format off
+    auto operandValueVisitor = overloaded {
+        [](const ::seds::model::ValueOperand &operand) {
+            return operand.value().value(); },
+        [](const ::seds::model::VariableRefOperand &operand) {
+            return translateVariableReference(operand.variableRef().value().value());
+        }
+    };
+    // clang-format on
 
+    //--taste translation
+    if (options.isSet(SedsOptions::tasteTranslation)) {
+        if (paramsCount != 1) {
+            auto errorMessage =
+                    QString("More than one(%1) IV interface parameter is not allowed for --taste translation option")
+                            .arg(paramsCount);
+            throw TranslationException(std::move(errorMessage));
+        }
+
+        const auto &argument = sendCommand.argumentValues().front();
+
+        const auto source = std::visit(operandValueVisitor, argument.value());
+        output->setParameter(std::make_unique<::sdl::VariableReference>(source));
+
+        result.push_back(std::move(output));
+        return result;
+    }
+
+    const auto ioVariable = StateMachineTranslator::ioVariableName(callName);
+    output->setParameter(std::make_unique<::sdl::VariableReference>(ioVariable));
+
+    for (const auto &argument : sendCommand.argumentValues()) {
+        const auto fieldName = translateVariableReference(argument.name().value());
+
+        const auto source = std::visit(operandValueVisitor, argument.value());
+
+        auto assignment = QString("%1.%2 := %3").arg(ioVariable, fieldName, source);
+        auto assignmentTask = std::make_unique<::sdl::Task>("", assignment);
+
+        result.push_back(std::move(assignmentTask));
+    }
+
+    if (isReturnCall && options.isSet(SedsOptions::enableFailureReporting)) {
+        const auto failureFieldName = asn1::translator::seds::Constants::failureParamName;
+        const auto failureValue = sendCommand.isFailed() ? "true" : "false";
+
+        auto assignment = QString("%1.%2 := %3").arg(ioVariable, failureFieldName, failureValue);
+        auto assignmentTask = std::make_unique<::sdl::Task>("", assignment);
+
+        result.push_back(std::move(assignmentTask));
+    }
+
+    result.push_back(std::move(output));
     return result;
 }
 
@@ -656,14 +722,17 @@ auto StatementTranslatorVisitor::translateBooleanExpression(::sdl::Process *host
 auto StatementTranslatorVisitor::translateComparison(const ::seds::model::Comparison &comparison) -> QString
 {
     const auto left = translateVariableReference(comparison.firstOperand().variableRef().value().value());
+    // clang-format off
     const auto &right = std::visit(
-            overloaded {
-                    [](const ::seds::model::VariableRefOperand &reference) {
-                        return translateVariableReference(reference.variableRef().value().value());
-                    },
-                    [](const ::seds::model::ValueOperand &value) { return value.value().value(); },
+        overloaded {
+            [](const ::seds::model::VariableRefOperand &reference) {
+                return translateVariableReference(reference.variableRef().value().value());
             },
-            comparison.secondOperand());
+            [](const ::seds::model::ValueOperand &value) {
+                return value.value().value();
+            }
+        }, comparison.secondOperand());
+    // clang-format on
     const auto op = comparisonOperatorToString(comparison.comparisonOperator());
     return QString("%1 %2 %3").arg(left, op, right);
 }
@@ -797,16 +866,30 @@ auto StatementTranslatorVisitor::generateLoopEnd(
     transition->addAction(std::move(loopBackJoin));
 }
 
-auto StatementTranslatorVisitor::handleTransaction(const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call,
-        ivm::IVInterface *ivInterface, const Options &options) -> void
+auto StatementTranslatorVisitor::handleFailureReporting(::sdl::ProcedureCall *call) const -> void
 {
-    if (!options.isSet(conversion::seds::SedsOptions::transactionNameType)) {
+    const auto &failureVariableName = asn1::translator::seds::Constants::failureVariableName;
+
+    // Reset failure variable value
+    const auto failureVariableAssignment = QString("%1 := false").arg(failureVariableName);
+    auto failureVariableAssignmentTask = std::make_unique<::sdl::Task>("", failureVariableAssignment);
+    m_sdlTransition->addAction(std::move(failureVariableAssignmentTask));
+
+    // Add failure variable to the call
+    auto failureLiteral = std::make_unique<::sdl::VariableLiteral>(failureVariableName);
+    call->addArgument(std::move(failureLiteral));
+}
+
+auto StatementTranslatorVisitor::handleTransaction(
+        const ::seds::model::Name &transaction, ::sdl::ProcedureCall *call, ivm::IVInterface *ivInterface) const -> void
+{
+    if (!m_options.isSet(SedsOptions::transactionNameType)) {
         throw TranslationException(
                 "SEDS transaction feature was used but no ASN.1 type for transaction name was specified");
     }
 
     const auto &transactionName = QString("\"%1\"").arg(transaction.value());
-    const auto transactionParamTypeName = options.value(conversion::seds::SedsOptions::transactionNameType).value();
+    const auto transactionParamTypeName = m_options.value(SedsOptions::transactionNameType).value();
 
     auto transactionNameLiteral = std::make_unique<::sdl::VariableLiteral>(transactionName);
     call->addArgument(std::move(transactionNameLiteral));
@@ -814,6 +897,21 @@ auto StatementTranslatorVisitor::handleTransaction(const ::seds::model::Name &tr
     auto ivParameter = shared::InterfaceParameter(
             Constants::transactionParamName, shared::BasicParameter::Type::Other, transactionParamTypeName);
     ivInterface->addParam(ivParameter);
+}
+
+auto StatementTranslatorVisitor::isSwapOperator(const ::seds::model::MathOperation::Element &element) -> bool
+{
+    const auto op = std::get_if<::seds::model::Operator>(&element);
+    if (op == nullptr) {
+        return false;
+    }
+
+    const auto mathOp = std::get_if<::seds::model::CoreMathOperator>(&op->mathOperator());
+    if (mathOp == nullptr) {
+        return false;
+    }
+
+    return *mathOp == CoreMathOperator::Swap;
 }
 
 }

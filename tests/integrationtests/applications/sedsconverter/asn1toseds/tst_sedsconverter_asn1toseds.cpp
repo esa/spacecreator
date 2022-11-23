@@ -44,8 +44,11 @@ private Q_SLOTS:
 /// \SRS  ETB-FUN-3060
 /// \SRS  ETB-FUN-3070
 /// \SRS  ETB-FUN-3120
+/// \SRS  ETB-FUN-3140
 /// \SRS  ETB-FUN-3160
 /// \SRS  ETB-FUN-3170
+/// \SRS  ETB-FUN-3180
+/// \SRS  ETB-FUN-3190
 /// \SRS  ETB-FUN-3130
 /// \SRS  ETB-IF-160
 /// \SRS  ETB-IF-170
@@ -59,6 +62,7 @@ void tst_SedsConverter_Asn1ToSeds::testSimpleDataTypes()
 /// \SRS  ETB-FUN-3010
 /// \SRS  ETB-FUN-3090
 /// \SRS  ETB-FUN-3092
+/// \SRS  ETB-FUN-3140
 /// \SRS  ETB-FUN-3200
 /// \SRS  ETB-IF-160
 /// \SRS  ETB-IF-170
@@ -71,6 +75,7 @@ void tst_SedsConverter_Asn1ToSeds::testSequences()
 
 /// \SRS  ETB-FUN-3100
 /// \SRS  ETB-FUN-3110
+/// \SRS  ETB-FUN-3140
 /// \SRS  ETB-FUN-3150
 /// \SRS  ETB-IF-160
 /// \SRS  ETB-IF-170
@@ -82,6 +87,7 @@ void tst_SedsConverter_Asn1ToSeds::testSequencesOf()
 }
 
 /// \SRS  ETB-FUN-3100
+/// \SRS  ETB-FUN-3140
 /// \SRS  ETB-FUN-3080
 /// \SRS  ETB-IF-160
 /// \SRS  ETB-IF-170
@@ -107,6 +113,7 @@ void tst_SedsConverter_Asn1ToSeds::testWithComponents()
 }
 
 /// \ETD  ETD-18
+//  \SRS  ETB-FUN-3020
 void tst_SedsConverter_Asn1ToSeds::testMultipleAsnModels()
 {
     const int result = system("./test_multiple_asn_models.sh");

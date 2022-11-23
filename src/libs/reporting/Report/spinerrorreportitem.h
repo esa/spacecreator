@@ -33,7 +33,7 @@ struct SpinErrorReportItem {
     /** Error types */
     enum ErrorType
     {
-        DataConstraintViolation,
+        DataConstraintViolation = 0,
         StopConditionViolation,
         ObserverFailure,
         OtherError
@@ -47,6 +47,8 @@ struct SpinErrorReportItem {
     ErrorType errorType;
     /** Raw error details reported by the message */
     QString rawErrorDetails;
+    /** Raw trails attached to the report */
+    QString scenario;
     /** Parsed error details */
     QVariant parsedErrorDetails;
 };

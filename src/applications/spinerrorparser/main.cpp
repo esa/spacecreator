@@ -30,6 +30,7 @@
 #include <optional>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
 #include <reporting/Report/dataconstraintviolationreport.h>
+#include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorparser.h>
 #include <string.h>
 
@@ -43,7 +44,10 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(spaceCreatorVersion);
     app.setApplicationName(QObject::tr("Spin Error Parser"));
 
-    std::optional<QString> spinMessage;
+    QStringList spinMessages;
+    QStringList spinTraceFiles;
+    QStringList sclConditionFiles;
+    QStringList scenarioFiles;
     std::optional<QString> templateFile;
     std::optional<QString> targetFile;
 
@@ -55,12 +59,29 @@ int main(int argc, char *argv[])
                 qCritical("Missing error message after -im");
                 exit(EXIT_FAILURE);
             }
-            if (spinMessage.has_value()) {
-                qCritical("Duplicated -im argument");
+            ++i;
+            spinMessages.append(args[i]);
+        } else if (arg == "-is") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing spin traces after -is");
                 exit(EXIT_FAILURE);
             }
             ++i;
-            spinMessage = args[i];
+            spinTraceFiles.append(args[i]);
+        } else if (arg == "-scl") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing scl condition after -scl");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            sclConditionFiles.append(args[i]);
+        } else if (arg == "-ir") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing trail file after -ir");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+            scenarioFiles.append(args[i]);
         } else if (arg == "-it") {
             if (i + 1 == args.size()) {
                 qCritical("Missing template file after -it");
@@ -88,8 +109,11 @@ int main(int argc, char *argv[])
         else if (arg == "-h" || arg == "--help") {
             qInfo("spinerrorparser: Spin Error Parser");
             qInfo("Usage: spinerrorparser [OPTIONS]");
-            qInfo("  -im <message>          Message from spin");
-            qInfo("  -it <filename>         HTML template file name");
+            qInfo("  -im <message>          Message from spin (can be repeated)");
+            qInfo("  -is <message>          Spin traces (can be repeated)");
+            qInfo("  -scl <condition>       Condition from scl.txt (can be repeated)");
+            qInfo("  -ir <filename>         Trail files (can be repeated)");
+            qInfo("  -it <filename>         HTML template file name (optional)");
             qInfo("  -of <filename>         Target file name");
             qInfo("  -h, --help             Print this message and exit");
             exit(EXIT_SUCCESS);
@@ -99,13 +123,18 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!spinMessage.has_value()) {
+    if (spinMessages.isEmpty()) {
         qCritical("Missing mandatory argument: -im spinMessage");
         exit(EXIT_FAILURE);
     }
 
-    if (!templateFile.has_value()) {
-        qCritical("Missing mandatory argument: -it templateFile");
+    if (spinTraceFiles.isEmpty()) {
+        qCritical("Missing mandatory argument: -is spinTraces");
+        exit(EXIT_FAILURE);
+    }
+
+    if (sclConditionFiles.isEmpty()) {
+        qCritical("Missing mandatory argument: -ic sclCondition");
         exit(EXIT_FAILURE);
     }
 
@@ -114,30 +143,61 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // build error structure
+    QList<reporting::RawErrorItem> rawErrorItems;
+    const int traceCount = spinTraceFiles.size();
+    for (int i = 0; i < traceCount; ++i) {
+        reporting::RawErrorItem rawErrorItem;
+        rawErrorItem.spinTraceFile = spinTraceFiles[i];
+        rawErrorItem.scenarioFile = scenarioFiles[i];
+        rawErrorItem.possibleCycleSource = std::make_pair(QString(), 0);
+        rawErrorItems.append(rawErrorItem);
+    };
+
     // parse message
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessage.value());
+    auto reports = parser.parse(spinMessages, sclConditionFiles, rawErrorItems, QStringList());
     for (auto report : reports) {
         qDebug() << "----- Report -----";
         qDebug() << "Error number:" << report.errorNumber;
         qDebug() << "Error type:" << report.errorType;
         qDebug() << "Error depth:" << report.errorDepth;
         qDebug() << "Error details (raw):" << report.rawErrorDetails;
-        const DataConstraintViolationReport dataConstraintViolationReport =
-                qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
-        qDebug() << "Function name:" << dataConstraintViolationReport.functionName;
-        qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
-        qDebug() << "Nested state:" << dataConstraintViolationReport.nestedStateName;
-        for (auto constraint : dataConstraintViolationReport.constraints) {
-            qDebug() << "    Constraint:" << constraint;
-        }
-        for (auto boundingValue : dataConstraintViolationReport.boundingValues) {
-            qDebug() << "    Bounding value:" << boundingValue;
+
+        switch (report.errorType) {
+        case SpinErrorReportItem::DataConstraintViolation: {
+            const DataConstraintViolationReport dataConstraintViolationReport =
+                    qvariant_cast<DataConstraintViolationReport>(report.parsedErrorDetails);
+            qDebug() << "Function name:" << dataConstraintViolationReport.functionName;
+            qDebug() << "Variable name:" << dataConstraintViolationReport.variableName;
+            qDebug() << "Nested state:" << dataConstraintViolationReport.nestedStateName;
+            for (auto constraint : dataConstraintViolationReport.constraints) {
+                qDebug() << "    Constraint:" << constraint;
+            }
+            for (auto boundingValue : dataConstraintViolationReport.boundingValues) {
+                qDebug() << "    Bounding value:" << boundingValue;
+            }
+        } break;
+        case SpinErrorReportItem::StopConditionViolation: {
+            const StopConditionViolationReport stopConditionViolationReport =
+                    qvariant_cast<StopConditionViolationReport>(report.parsedErrorDetails);
+            qDebug() << "Violation type:" << stopConditionViolationReport.violationType;
+        } break;
+        case SpinErrorReportItem::ObserverFailure:
+            break;
+        default:
+            qDebug() << "unknown error";
+            break;
         }
     }
 
+    QString htmlReport;
     const HtmlReportBuilder htmlReportBuilder;
-    const auto htmlReport = htmlReportBuilder.buildHtmlReport(reports, templateFile.value());
+    if (templateFile.has_value()) {
+        htmlReport = htmlReportBuilder.buildHtmlReport(reports, templateFile.value());
+    } else {
+        htmlReport = htmlReportBuilder.buildHtmlReport(reports);
+    }
 
     QFile file(targetFile.value());
     if (file.open(QFile::WriteOnly)) {

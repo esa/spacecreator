@@ -15,7 +15,7 @@
         <LongDescription>Interface containing parameters</LongDescription>
         <ParameterSet>
           <Parameter name="SyncParam" mode="sync" type="Number" />
-          <Parameter name="AsyncParam" mode="async" type="Number"></Parameter>
+          <Parameter name="AsyncParam" mode="async" type="Number" />
           <Parameter name="SyncRoParam" type="Number" mode="sync" readOnly="true" />
           <Parameter name="AsyncRoParam" type="Number" mode="async" readOnly="true" />
         </ParameterSet>
@@ -25,11 +25,12 @@
       <Component name="ParameterMapHostProvider">
         <LongDescription></LongDescription>
         <ProvidedInterfaceSet>
-          <Interface name="IF" type="IFType"></Interface>
+          <Interface name="IF" type="IFType" />
         </ProvidedInterfaceSet>
         <Implementation>
           <VariableSet>
-            <Variable name="x" type="Number"></Variable>
+            <Variable name="x" type="Number" />
+            <Variable name="value" type="Number" />
           </VariableSet>
           <ParameterMapSet>
             <ParameterMap variableRef="x" interface="IF" parameter="SyncParam" />
@@ -56,7 +57,9 @@
                 <OnParameterPrimitive interface="IF" parameter="SyncParam" operation="set" />
               </Transition>
               <Transition fromState="s" toState="s" name="t2">
-                <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="set" />
+                <OnParameterPrimitive interface="IF" parameter="AsyncParam" operation="set">
+                  <VariableRef variableRef="value" />
+                </OnParameterPrimitive>
               </Transition>
             </StateMachine>
           </StateMachineSet>

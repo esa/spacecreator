@@ -19,19 +19,19 @@
 
 #pragma once
 
-#include "processmetadata.h"
-
 #include <QDir>
 #include <QFileInfo>
 #include <QList>
 #include <QProcess>
 #include <QStringList>
+#include <QTimer>
 #include <conversion/common/modeltype.h>
 #include <conversion/registry/registry.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <map>
 #include <memory>
+#include <tmc/SdlToPromelaConverter/converter.h>
 #include <tmc/SdlToPromelaConverter/processmetadata.h>
 #include <unordered_map>
 
@@ -39,8 +39,9 @@ namespace tmc::converter {
 /**
  * @brief Main class used to convert TASTE project to format ready for formal model verification.
  */
-class TmcConverter
+class TmcConverter final : public QObject
 {
+    Q_OBJECT
 public:
     /**
      * @brief Attached observer information
@@ -79,16 +80,31 @@ public:
      * @param   inputIvFilepath         Path to XML interface view.
      * @param   outputDirectory         Path to output directory for conversion results.
      */
-    TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory);
+    TmcConverter(const QString &inputIvFilepath, const QString &outputDirectory, QObject *parent = nullptr);
+
+    /**
+     * @brief Destructor.
+     */
+    ~TmcConverter();
+
+    /**
+     * @brief Prepare system system conversion.
+     *
+     * This method shall be called after converter setup, but always before
+     * calling convert or convertTrace.
+     * This method reads input interface view and prepares everything what is
+     * necessary to process actual conversion.
+     *
+     * @return true if preparation succeed, otherwise false.
+     */
+    bool prepare();
 
     /**
      * @brief Process system conversion.
      *
      * This method converts interface view, data view and SDL into promela files.
-     *
-     * @return true if conversion succeed, otherwise false.
      */
-    bool convert();
+    void convert();
     /**
      * @brief   Set paths to MSC files to be converted to observers
      *
@@ -128,6 +144,18 @@ public:
      */
     void setProcessesBasePriority(std::optional<QString> value);
     /**
+     * @brief   Enable or disable Real ASN.1 type
+     *
+     * @param   isRealTypeEnabled True if Real type should be enabled
+     */
+    void setRealTypeEnabled(bool isRealTypeEnabled);
+    /**
+     * @brief   Set delta (interval) for Real values generation
+     *
+     * @param   delta Value of the interval
+     */
+    void setDelta(std::optional<QString> value);
+    /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
      * @param   filepaths   Paths to the files
@@ -144,6 +172,13 @@ public:
     bool addStopConditionFiles(const QStringList &files);
 
     /**
+     * @brief Getter for stop condition files.
+     *
+     * @return list of stop condition files.
+     */
+    const QStringList &getStopConditionFiles() const;
+
+    /**
      * @brief Attach an Observer
      *
      * @param observerPath Path to the observer process file
@@ -152,13 +187,46 @@ public:
      */
     auto attachObserver(const QString &observerPath, const uint32_t priority) -> bool;
 
+    /**
+     * @brief Process trace conversion
+     *
+     * This method converts Spin Trail into Simulator Trail
+     *
+     * @param inputFile input spin trail filepath
+     * @param outputFile output simulator trail filepath
+     * @return true if conversion succeed, otherwise false.
+     */
+    bool convertTrace(const QString &inputFile, const QString &outputFile);
+
+    /**
+     * @brief Return number of proctypes in converted system.
+     *
+     * This doesn't include init proctype
+     *
+     * @return Number of proctypes
+     */
+    size_t getNumberOfProctypes() const;
+
+Q_SIGNALS:
+    /**
+     * @brief Conversion message.
+     *
+     * @param text message text.
+     */
+    void message(QString text);
+    /**
+     * @brief Conversion was finished.
+     *
+     * @param success true if conversion was successful, otherwise false.
+     */
+    void conversionFinished(bool success);
+
 private:
     bool convertModel(const std::set<conversion::ModelType> &sourceModelTypes, conversion::ModelType targetModelType,
-            const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options) const;
+            const std::set<conversion::ModelType> &auxilaryModelTypes, conversion::Options options);
 
-    auto integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
-            std::map<QString, ProcessMetadata> &allSdlFiles, QStringList &attachmentInfos);
-    bool convertSystem(std::map<QString, ProcessMetadata> &allSdlFiles);
+    void integrateObserver(const ObserverInfo &info, QStringList &observerNames, QStringList &asn1Files,
+            std::map<QString, ProcessMetadata> &allSdlFiles);
 
     bool convertStopConditions(const std::map<QString, ProcessMetadata> &allSdlFiles);
 
@@ -169,7 +237,7 @@ private:
             const QList<QString> &inputFilepathList, const QString &ivFilepath, const QString &outputFilepath);
 
     bool convertMscObservers(const QString &ivFilePath);
-    bool generateObserverDatamodel(QProcess &process, const QString &sdlFileName);
+    void generateObserverDatamodel(QProcess &process, const QString &sdlFileName);
 
     std::unique_ptr<ivm::IVModel> readInterfaceView(const QString &filepath);
     void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString outputFilePath);
@@ -190,6 +258,21 @@ private:
     QFileInfo sdlFunctionDatamodelLocation(const QString &functionName, const QString &functionTypeName) const;
     QFileInfo sdlFunctionContextLocation(const QString &functionName) const;
     QFileInfo outputFilepath(const QString &name);
+    void convertNextFunction();
+    void convertNextMscObserver();
+    void convertNextObserver();
+    void attachNextObserver();
+
+private Q_SLOTS:
+    void finishConversion();
+    void processStderrReady();
+    void processStdoutReady();
+    void processStarted();
+    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void timeout();
+    void functionConversionFinished(bool success);
+    void observerConversionFinished(bool success);
+    void stopConditionConversionFinished(bool success);
 
 private:
     const QString m_inputIvFilepath;
@@ -203,6 +286,8 @@ private:
     std::vector<QString> m_keepFunctions;
     std::optional<QString> m_globalInputVectorLengthLimit;
     std::optional<QString> m_processesBasePriority;
+    std::optional<QString> m_delta;
+    bool m_isRealTypeEnabled;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;
@@ -212,7 +297,26 @@ private:
 
     conversion::Registry m_registry;
 
+    QString m_outputOptimizedIvFileName;
+    QStringList m_modelFunctions;
+    QStringList m_finalEnvironmentFunctions;
+    QStringList m_environmentDatatypes;
+    std::map<QString, ProcessMetadata> m_allSdlFiles;
+    QStringList m_asn1Files;
+    size_t m_numberOfProctypes;
+
+    std::list<ProcessMetadata> m_functionsToConvert;
+    std::list<QString> m_mscObserversToConvert;
+    std::list<ObserverInfo> m_observersToConvert;
+
+    QProcess *m_process;
+    QTimer *m_timer;
+    SdlToPromelaConverter *m_sdlToPromelaConverter;
+
+    QMetaObject::Connection m_conversionFinishedConnection;
+
     inline static const QString m_opengeodeCommand = "opengeode";
+    constexpr static int m_commandStartTimeout = 12000;
     constexpr static int m_commandTimeout = 12000;
 };
 }

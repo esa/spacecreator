@@ -4,7 +4,7 @@ BEGIN
 IMPORTS
    MyInteger FROM ENVIRONMENT-SELECTOR-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview
+   PID-Range, PID FROM System-Dataview
    Context-ponger FROM Context-ponger;
 
 Ponger-States ::= ENUMERATED {wait}
@@ -12,6 +12,7 @@ Ponger-States ::= ENUMERATED {wait}
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
+   sender PID,
    pingarg MyInteger
 }
 

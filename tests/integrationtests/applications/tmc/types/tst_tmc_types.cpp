@@ -30,6 +30,9 @@ class tst_Tmc_Types : public QObject
 private Q_SLOTS:
     void test_bool();
     void test_integer();
+    void test_real();
+    void test_real_constraints();
+    void test_real_generation();
     void test_octet();
     void test_ia5string();
     void test_enum();
@@ -47,6 +50,24 @@ void tst_Tmc_Types::test_bool()
 void tst_Tmc_Types::test_integer()
 {
     const int result = system("./test_integer.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Types::test_real()
+{
+    const int result = system("./test_real.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Types::test_real_constraints()
+{
+    const int result = system("./test_real_constraints.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Types::test_real_generation()
+{
+    const int result = system("./test_real_generation.sh");
     QCOMPARE(result, 0);
 }
 

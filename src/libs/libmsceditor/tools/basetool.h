@@ -96,6 +96,7 @@ protected:
 
     QPointF cursorInScene() const;
     QPointF cursorInScene(const QPoint &screenPos) const;
+    QPointF cursorInScene(const QMouseEvent *e) const;
 };
 
 } // ns msc

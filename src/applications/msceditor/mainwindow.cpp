@@ -375,7 +375,7 @@ void MainWindow::initMenus()
     menu->addAction(tr("Open IV file ..."), this, &MainWindow::openIVFile);
     menu->addSeparator();
     menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")), tr("Save Screenshot..."), this,
-            &MainWindow::saveScreenshot, QKeySequence(Qt::ALT + Qt::Key_S));
+            &MainWindow::saveScreenshot, QKeySequence(Qt::ALT | Qt::Key_S));
     menu->addSeparator();
     menu->addAction(d->m_core->actionQuit());
 

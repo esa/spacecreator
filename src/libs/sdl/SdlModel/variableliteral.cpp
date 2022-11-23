@@ -39,4 +39,14 @@ void VariableLiteral::setValue(QString value)
     m_value = std::move(value);
 }
 
+bool operator==(const VariableLiteral &lhs, const VariableLiteral &rhs)
+{
+    return lhs.m_value == rhs.m_value;
+}
+
+bool operator!=(const VariableLiteral &lhs, const VariableLiteral &rhs)
+{
+    return !(lhs == rhs);
+}
+
 } // namespace sdl

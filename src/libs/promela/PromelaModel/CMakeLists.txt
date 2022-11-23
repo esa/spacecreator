@@ -23,13 +23,16 @@ set(SOURCES
   label.cpp
   mtyperef.cpp
   namedmtype.cpp
+  printfstatement.cpp
   proctype.cpp
   proctypeelement.cpp
   promeladatamodel.cpp
   promelamodel.cpp
   promelasystemmodel.cpp
+  realconstant.cpp
   select.cpp
   sequence.cpp
+  stringconstant.cpp
   typealias.cpp
   utype.cpp
   utyperef.cpp
@@ -62,14 +65,17 @@ set(INCLUDES
   label.h
   mtyperef.h
   namedmtype.h
+  printfstatement.h
   proctype.h
   proctypeelement.h
   promeladatamodel.h
   promelamodel.h
   promelasystemmodel.h
+  realconstant.h
   select.h
   sequence.h
   skip.h
+  stringconstant.h
   typealias.h
   unsigneddatatype.h
   utype.h

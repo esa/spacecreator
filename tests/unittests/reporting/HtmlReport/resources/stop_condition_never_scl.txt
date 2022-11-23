@@ -1,0 +1,19 @@
+never{
+  start: 
+  do
+  ::inited->
+    break;
+  ::else->
+    goto start;
+  od;
+  system_inited: 
+  do
+  :: atomic {
+    (global_state.controller.my > 20)->
+      printf("SCL violation: never controller.my > 20;\n");
+      assert((! (global_state.controller.my > 20)));
+    }
+  ::else->
+    goto system_inited;
+  od;
+}

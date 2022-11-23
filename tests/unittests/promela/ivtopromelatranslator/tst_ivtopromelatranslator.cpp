@@ -49,7 +49,9 @@ using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::Sequence;
+using promela::model::Skip;
 using promela::model::Utype;
+using promela::model::VariableRef;
 using promela::translator::IvToPromelaTranslator;
 
 namespace tmc::test {
@@ -66,6 +68,7 @@ private Q_SLOTS:
     void testFunctionTypes();
     void testProctypePriority();
     void testSimpleObservers();
+    void testOutputObservers();
 
 private:
     template<typename T>
@@ -238,7 +241,7 @@ void tst_IvToPromelaTranslator::testSimple()
         verifyProctypeSimple(proctype, "Controller", "fail", 0);
     }
 
-    QCOMPARE(promelaModel->getInlineDefs().size(), 5);
+    QCOMPARE(promelaModel->getInlineDefs().size(), 7);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test");
@@ -278,6 +281,20 @@ void tst_IvToPromelaTranslator::testSimple()
         QCOMPARE(inlineDef->getArguments().size(), 0);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
 }
 
@@ -449,7 +466,7 @@ void tst_IvToPromelaTranslator::testParameters()
         verifyProctypeSimple(proctype, "Controller", "error", 0);
     }
 
-    QCOMPARE(promelaModel->getInlineDefs().size(), 5);
+    QCOMPARE(promelaModel->getInlineDefs().size(), 7);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_work");
@@ -489,6 +506,20 @@ void tst_IvToPromelaTranslator::testParameters()
         QCOMPARE(inlineDef->getArguments().size(), 0);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
 }
 
@@ -768,7 +799,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
         verifyProctypeSimple(proctype, "Down", "check", 1);
     }
 
-    QCOMPARE(promelaModel->getInlineDefs().size(), 8);
+    QCOMPARE(promelaModel->getInlineDefs().size(), 11);
 
     {
         const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Env_0_RI_0_test");
@@ -831,6 +862,27 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
         QCOMPARE(inlineDef->getArguments().size(), 0);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Up_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Down_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
+    }
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
+        QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
 }
 
@@ -928,6 +980,187 @@ void tst_IvToPromelaTranslator::testSimpleObservers()
         QVERIFY(observerProcessingBlock);
 
         const ChannelSend *functionUnlockStatement = findProctypeElement<ChannelSend>(mainSequence, 5);
+        QVERIFY(functionUnlockStatement);
+    }
+}
+
+void tst_IvToPromelaTranslator::testOutputObservers()
+{
+    // this test check if in case of multiple output observers attached to the one interface
+    // the generated code is valid, i.e.
+    // First observer with higher priority is executed using message from main proctype channel
+    // then observer with lower priority is executed using message from previous observer
+    // finally, the process is executed using message from observer with lower priority
+    // in the generated code the order is reversed, i.e.
+    // first the channel from observer with lower priority is checked and eventually the process is executed
+    // then the channel from observer with higher priority is checked and eventually the observer with lower priority is
+    // executed in the last step, the main proctype channel is checked and eventually the observer with higher priority
+    // is executed.
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("output_observers.xml");
+    QVERIFY(ivModel);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+    options.add(PromelaOptions::environmentFunctionName, "environ");
+
+    options.add(PromelaOptions::observerAttachment,
+            "change_observer:ObservedSignalKind.OUTPUT:f2_in:f2:<controller:>actuator:p1");
+    options.add(PromelaOptions::observerAttachment,
+            "change_observer:ObservedSignalKind.OUTPUT:f1_in:f1:<controller:>actuator:p1");
+    options.add(PromelaOptions::observerAttachment,
+            "zero_observer:ObservedSignalKind.OUTPUT:f2_in:f2:<controller:>actuator:p2");
+    options.add(PromelaOptions::observerAttachment,
+            "zero_observer:ObservedSignalKind.OUTPUT:f1_in:f1:<controller:>actuator:p2");
+    options.add(PromelaOptions::observerFunctionName, "Change_observer");
+    options.add(PromelaOptions::observerFunctionName, "Zero_observer");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
+    QVERIFY(promelaModel);
+
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Actuator_f1");
+        QVERIFY(proctype != nullptr);
+        QVERIFY(proctype->isActive());
+        QCOMPARE(proctype->getInstancesCount(), 1);
+
+        const Sequence &main = proctype->getSequence();
+
+        const DoLoop *mainLoop = findProctypeElement<DoLoop>(main, 1);
+        QVERIFY(mainLoop);
+
+        QVERIFY(mainLoop->getSequences().size() > 0);
+
+        const Sequence &mainSequence = *mainLoop->getSequences().front();
+
+        const Expression *queueCheckExpression = findProctypeElement<Expression>(mainSequence, 0);
+        QVERIFY(queueCheckExpression);
+
+        const ChannelRecv *functionLockStatement = findProctypeElement<ChannelRecv>(mainSequence, 1);
+        QVERIFY(functionLockStatement);
+
+        const Label *loopLabel = findProctypeElement<Label>(mainSequence, 2);
+        QVERIFY(loopLabel);
+
+        {
+            const Conditional *sdlProcessingBlock = findProctypeElement<Conditional>(mainSequence, 3);
+            QVERIFY(sdlProcessingBlock);
+            QCOMPARE(sdlProcessingBlock->getAlternatives().size(), 2);
+            const InlineCall *queueCheck =
+                    findProctypeElement<InlineCall>(*sdlProcessingBlock->getAlternatives().front(), 0);
+            QVERIFY(queueCheck);
+            QCOMPARE(queueCheck->getName(), "nempty");
+            QCOMPARE(queueCheck->getArguments().size(), 1);
+            QVERIFY(std::holds_alternative<VariableRef>(queueCheck->getArguments().front()));
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().size(), 1);
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().front().m_name,
+                    "Actuator_change_observer_f1_channel");
+        }
+
+        {
+            const Conditional *changeObserverProcessingBlock = findProctypeElement<Conditional>(mainSequence, 4);
+            QVERIFY(changeObserverProcessingBlock);
+            QCOMPARE(changeObserverProcessingBlock->getAlternatives().size(), 2);
+            const InlineCall *queueCheck =
+                    findProctypeElement<InlineCall>(*changeObserverProcessingBlock->getAlternatives().front(), 0);
+            QVERIFY(queueCheck);
+            QCOMPARE(queueCheck->getName(), "nempty");
+            QCOMPARE(queueCheck->getArguments().size(), 1);
+            QVERIFY(std::holds_alternative<VariableRef>(queueCheck->getArguments().front()));
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().size(), 1);
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().front().m_name,
+                    "Actuator_zero_observer_f1_channel");
+        }
+
+        {
+            const Conditional *zeroObserverProcessingBlock = findProctypeElement<Conditional>(mainSequence, 5);
+            QVERIFY(zeroObserverProcessingBlock);
+            QCOMPARE(zeroObserverProcessingBlock->getAlternatives().size(), 2);
+            const InlineCall *queueCheck =
+                    findProctypeElement<InlineCall>(*zeroObserverProcessingBlock->getAlternatives().front(), 0);
+            QVERIFY(queueCheck);
+            QCOMPARE(queueCheck->getName(), "nempty");
+            QCOMPARE(queueCheck->getArguments().size(), 1);
+            QVERIFY(std::holds_alternative<VariableRef>(queueCheck->getArguments().front()));
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().size(), 1);
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().front().m_name,
+                    "Actuator_f1_channel");
+        }
+
+        const ChannelSend *functionUnlockStatement = findProctypeElement<ChannelSend>(mainSequence, 6);
+        QVERIFY(functionUnlockStatement);
+    }
+
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Actuator_f2");
+        QVERIFY(proctype != nullptr);
+        QVERIFY(proctype->isActive());
+        QCOMPARE(proctype->getInstancesCount(), 1);
+
+        const Sequence &main = proctype->getSequence();
+
+        const DoLoop *mainLoop = findProctypeElement<DoLoop>(main, 1);
+        QVERIFY(mainLoop);
+
+        QVERIFY(mainLoop->getSequences().size() > 0);
+
+        const Sequence &mainSequence = *mainLoop->getSequences().front();
+
+        const Expression *queueCheckExpression = findProctypeElement<Expression>(mainSequence, 0);
+        QVERIFY(queueCheckExpression);
+
+        const ChannelRecv *functionLockStatement = findProctypeElement<ChannelRecv>(mainSequence, 1);
+        QVERIFY(functionLockStatement);
+
+        const Label *loopLabel = findProctypeElement<Label>(mainSequence, 2);
+        QVERIFY(loopLabel);
+
+        {
+            const Conditional *sdlProcessingBlock = findProctypeElement<Conditional>(mainSequence, 3);
+            QVERIFY(sdlProcessingBlock);
+            QCOMPARE(sdlProcessingBlock->getAlternatives().size(), 2);
+            const InlineCall *queueCheck =
+                    findProctypeElement<InlineCall>(*sdlProcessingBlock->getAlternatives().front(), 0);
+            QVERIFY(queueCheck);
+            QCOMPARE(queueCheck->getName(), "nempty");
+            QCOMPARE(queueCheck->getArguments().size(), 1);
+            QVERIFY(std::holds_alternative<VariableRef>(queueCheck->getArguments().front()));
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().size(), 1);
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().front().m_name,
+                    "Actuator_change_observer_f2_channel");
+        }
+
+        {
+            const Conditional *changeObserverProcessingBlock = findProctypeElement<Conditional>(mainSequence, 4);
+            QVERIFY(changeObserverProcessingBlock);
+            QCOMPARE(changeObserverProcessingBlock->getAlternatives().size(), 2);
+            const InlineCall *queueCheck =
+                    findProctypeElement<InlineCall>(*changeObserverProcessingBlock->getAlternatives().front(), 0);
+            QVERIFY(queueCheck);
+            QCOMPARE(queueCheck->getName(), "nempty");
+            QCOMPARE(queueCheck->getArguments().size(), 1);
+            QVERIFY(std::holds_alternative<VariableRef>(queueCheck->getArguments().front()));
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().size(), 1);
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().front().m_name,
+                    "Actuator_zero_observer_f2_channel");
+        }
+
+        {
+            const Conditional *zeroObserverProcessingBlock = findProctypeElement<Conditional>(mainSequence, 5);
+            QVERIFY(zeroObserverProcessingBlock);
+            QCOMPARE(zeroObserverProcessingBlock->getAlternatives().size(), 2);
+            const InlineCall *queueCheck =
+                    findProctypeElement<InlineCall>(*zeroObserverProcessingBlock->getAlternatives().front(), 0);
+            QVERIFY(queueCheck);
+            QCOMPARE(queueCheck->getName(), "nempty");
+            QCOMPARE(queueCheck->getArguments().size(), 1);
+            QVERIFY(std::holds_alternative<VariableRef>(queueCheck->getArguments().front()));
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().size(), 1);
+            QCOMPARE(std::get<VariableRef>(queueCheck->getArguments().front()).getElements().front().m_name,
+                    "Actuator_f2_channel");
+        }
+
+        const ChannelSend *functionUnlockStatement = findProctypeElement<ChannelSend>(mainSequence, 6);
         QVERIFY(functionUnlockStatement);
     }
 }

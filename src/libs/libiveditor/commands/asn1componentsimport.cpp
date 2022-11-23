@@ -70,23 +70,31 @@ void ASN1ComponentsImport::undoSourceCloning(const ivm::IVObject *object)
     const QString subPath = relativePathForObject(object);
     const QString destPath = m_tempDir->path() + QDir::separator() + subPath;
     const QString sourcePath { m_destPath + QDir::separator() + subPath };
-    shared::copyDir(sourcePath, destPath);
-    QDir sourceDir(sourcePath);
-    sourceDir.removeRecursively();
+    if (!shared::moveDir(sourcePath, destPath)) {
+        /// TODO: ROLLBACK
+    }
 }
 
 static inline bool isSame(const QString &filePath1, const QString &filePath2)
 {
     QFile file1(filePath1);
+    QFile file2(filePath2);
+
+    if (file1.size() != file2.size())
+        return false;
+
     if (!file1.open(QIODevice::ReadOnly)) {
         qWarning() << file1.fileName() << file1.errorString();
         return false;
     }
-    QFile file2(filePath2);
     if (!file2.open(QIODevice::ReadOnly)) {
         qWarning() << file2.fileName() << file2.errorString();
         return false;
     }
+
+    /// TODO: Implement additional instance for ASN1 specific needs
+    /// with loading ASN1 model and comparing objects instead
+    /// For other types add functionality to skip spaces/empty lines/etc
     while (!file1.atEnd() && !file2.atEnd()) {
         if (file1.readLine() != file2.readLine())
             return false;

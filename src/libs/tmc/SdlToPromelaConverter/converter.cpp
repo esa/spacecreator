@@ -20,33 +20,59 @@
 #include "converter.h"
 
 #include <QDebug>
-#include <QProcess>
 
 namespace tmc::converter {
 
 const QString SdlToPromelaConverter::m_sdl2PromelaCommand = QStringLiteral("sdl2promela");
 
+SdlToPromelaConverter::SdlToPromelaConverter(QObject *parent)
+    : QObject(parent)
+    , m_timer(new QTimer(this))
+    , m_process(new QProcess(this))
+{
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
+    connect(m_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
+    connect(m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
+    connect(m_process, SIGNAL(started()), this, SLOT(processStarted()));
+    connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(processFinished(int, QProcess::ExitStatus)));
+}
+
+SdlToPromelaConverter::~SdlToPromelaConverter()
+{
+    m_timer->stop();
+    if (m_process->state() != QProcess::ProcessState::NotRunning) {
+        m_process->kill();
+        m_process->waitForFinished();
+    }
+}
+
 bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, const QFileInfo &outputFile)
 {
     if (processMetadata.getSystemStructure().has_value() && !processMetadata.getSystemStructure().value().exists()) {
-        qCritical() << "File " << processMetadata.getSystemStructure().value().absoluteFilePath() << " does not exist.";
+        QString text = QString("File %1 does not exist.\n")
+                               .arg(processMetadata.getSystemStructure().value().absoluteFilePath());
+        Q_EMIT message(text);
         return false;
     }
 
     if (!processMetadata.getProcess().exists()) {
-        qCritical() << "File " << processMetadata.getProcess().absoluteFilePath() << " does not exist.";
+        QString text = QString("File %1 does not exist.\n").arg(processMetadata.getProcess().absoluteFilePath());
+        Q_EMIT message(text);
         return false;
     }
 
-    qDebug() << "Converting SDL files:";
+    Q_EMIT message(QString("Converting SDL files:\n"));
+
     if (processMetadata.getSystemStructure().has_value()) {
-        qDebug() << "    " << processMetadata.getSystemStructure().value().absoluteFilePath();
+        QString text = QString("    %1\n").arg(processMetadata.getSystemStructure().value().absoluteFilePath());
+        Q_EMIT message(text);
     }
 
-    qDebug() << "    " << processMetadata.getProcess().absoluteFilePath();
+    Q_EMIT message(QString("    %1\n").arg(processMetadata.getProcess().absoluteFilePath()));
 
-    qDebug() << "  to:";
-    qDebug() << "    " << outputFile.absoluteFilePath();
+    Q_EMIT message(QString("  to:\n"));
+    Q_EMIT message(QString("    %1\n").arg(outputFile.absoluteFilePath()));
 
     QStringList arguments = QStringList();
     arguments.append("--sdl");
@@ -61,36 +87,37 @@ bool SdlToPromelaConverter::convertSdl(const ProcessMetadata &processMetadata, c
 
     arguments.append(m_sdl2PromelaArgs);
 
-    QProcess process = QProcess();
+    startSdl2PromelaProcess(*m_process, arguments);
 
-    if (!startSdl2PromelaProcess(process, arguments)) {
-        return false;
-    }
-
-    return waitForSdl2PromelaProcess(process);
+    return true;
 }
 
 bool SdlToPromelaConverter::convertObserverSdl(
         const ProcessMetadata &processMetadata, const QFileInfo &outputFile, const QFileInfo &outputInfoFile)
 {
     if (processMetadata.getSystemStructure().has_value() && !processMetadata.getSystemStructure().value().exists()) {
-        qCritical() << "File " << processMetadata.getSystemStructure().value().absoluteFilePath() << " does not exist.";
+        QString text = QString("File %1 does not exist.\n")
+                               .arg(processMetadata.getSystemStructure().value().absoluteFilePath());
+        Q_EMIT message(text);
         return false;
     }
 
     if (!processMetadata.getProcess().exists()) {
-        qCritical() << "File " << processMetadata.getProcess().absoluteFilePath() << " does not exist.";
+        QString text = QString("File %1 does not exist.\n").arg(processMetadata.getProcess().absoluteFilePath());
+        Q_EMIT message(text);
         return false;
     }
 
-    qDebug() << "Converting SDL files:";
+    Q_EMIT message(QString("Converting SDL files:\n"));
     if (processMetadata.getSystemStructure().has_value()) {
-        qDebug() << "    " << processMetadata.getSystemStructure().value().absoluteFilePath();
+        QString text = QString("    %1\n").arg(processMetadata.getSystemStructure().value().absoluteFilePath());
+        Q_EMIT message(text);
     }
-    qDebug() << "    " << processMetadata.getProcess().absoluteFilePath();
 
-    qDebug() << "  to:";
-    qDebug() << "    " << outputFile.absoluteFilePath();
+    Q_EMIT message(QString("    %1\n").arg(processMetadata.getProcess().absoluteFilePath()));
+
+    Q_EMIT message(QString("  to:\n"));
+    Q_EMIT message(QString("    %1\n").arg(outputFile.absoluteFilePath()));
 
     QStringList arguments = QStringList();
     arguments.append("--sdl");
@@ -108,13 +135,9 @@ bool SdlToPromelaConverter::convertObserverSdl(
 
     arguments.append(m_sdl2PromelaArgs);
 
-    QProcess process = QProcess();
+    startSdl2PromelaProcess(*m_process, arguments);
 
-    if (!startSdl2PromelaProcess(process, arguments)) {
-        return false;
-    }
-
-    return waitForSdl2PromelaProcess(process);
+    return true;
 }
 
 bool SdlToPromelaConverter::convertStopConditions(const QList<QFileInfo> &inputFiles, const QFileInfo &outputFile,
@@ -122,8 +145,10 @@ bool SdlToPromelaConverter::convertStopConditions(const QList<QFileInfo> &inputF
 {
     QStringList arguments;
     for (const auto &inputFile : inputFiles) {
-        qDebug() << "Converting Stop Conditions file: " << inputFile.absoluteFilePath() << " to "
-                 << outputFile.absoluteFilePath();
+        QString text = QString("Converting Stop Conditions file: %1 to %2\n")
+                               .arg(inputFile.absoluteFilePath())
+                               .arg(outputFile.absoluteFilePath());
+        Q_EMIT message(text);
         arguments << "--scl" << inputFile.absoluteFilePath();
     }
 
@@ -143,54 +168,73 @@ bool SdlToPromelaConverter::convertStopConditions(const QList<QFileInfo> &inputF
 
     arguments.append(m_sdl2PromelaArgs);
 
-    QProcess process = QProcess();
+    startSdl2PromelaProcess(*m_process, arguments);
 
-    if (!startSdl2PromelaProcess(process, arguments)) {
-        return false;
-    }
-
-    return waitForSdl2PromelaProcess(process);
+    return true;
 }
 
-bool SdlToPromelaConverter::startSdl2PromelaProcess(QProcess &process, const QStringList &arguments)
+void SdlToPromelaConverter::startSdl2PromelaProcess(QProcess &process, const QStringList &arguments)
 {
-    qDebug() << "Executing: " << m_sdl2PromelaCommand << " with args:";
+    Q_EMIT message(QString("Executing: %1 with args:\n").arg(m_sdl2PromelaCommand));
     for (const QString &arg : arguments) {
-        qDebug() << "    " << arg;
+        Q_EMIT message(QString("    %1\n").arg(arg));
     }
 
+    m_startPoint = std::chrono::high_resolution_clock::now();
+
+    m_timer->setSingleShot(true);
+    m_timer->start(m_externalCommandStartTimeout);
     process.start(m_sdl2PromelaCommand, arguments);
-
-    if (!process.waitForStarted()) {
-        qCritical("Cannot start process.");
-        QByteArray standardError = process.readAllStandardError();
-        QByteArray standardOutput = process.readAllStandardOutput();
-
-        QString str = QString(standardError);
-        qCritical() << "Stderr: " << str;
-        str = QString(standardOutput);
-        qCritical() << "Stdout: " << str;
-
-        process.terminate();
-        return false;
-    }
-
-    return true;
 }
 
-bool SdlToPromelaConverter::waitForSdl2PromelaProcess(QProcess &process)
+void SdlToPromelaConverter::processStderrReady()
 {
-    if (!process.waitForFinished(m_externalCommandTimeout)) {
-        qCritical() << "Timeot while waiting for external process.";
-        process.terminate();
-        return false;
+    if (m_process != nullptr) {
+        QByteArray buffer = m_process->readAllStandardError();
+        QString text = QString(buffer);
+        Q_EMIT message(text);
     }
+}
 
-    if (process.exitCode() != EXIT_SUCCESS) {
-        qCritical() << "External process finished with code: " << process.exitCode();
-        return false;
+void SdlToPromelaConverter::processStdoutReady()
+{
+    if (m_process != nullptr) {
+        QByteArray buffer = m_process->readAllStandardOutput();
+        QString text = QString(buffer);
+        Q_EMIT message(text);
     }
+}
 
-    return true;
+void SdlToPromelaConverter::processStarted()
+{
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - m_startPoint).count();
+    Q_EMIT message(QString("Elapsed time: %1ms\n").arg(elapsed));
+
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(m_externalCommandFinishTimeout);
+}
+
+void SdlToPromelaConverter::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - m_startPoint).count();
+    Q_EMIT message(QString("Process was working for: %1ms\n").arg(elapsed));
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    if (exitCode != EXIT_SUCCESS) {
+        Q_EMIT message(QString("%1 finished with code %2\n").arg(m_sdl2PromelaCommand).arg(exitCode));
+        Q_EMIT conversionFinished(false);
+        return;
+    }
+    Q_EMIT conversionFinished(true);
+}
+
+void SdlToPromelaConverter::timeout()
+{
+    m_process->terminate();
+    Q_EMIT message(QString("Timeout.\n"));
+    Q_EMIT conversionFinished(false);
 }
 }

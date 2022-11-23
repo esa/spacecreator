@@ -1,9 +1,10 @@
-if (QTC_VERSION EQUAL 408)
+if (BUILD_PLUGIN_ASN1)
     add_subdirectory(asn1plugin)
 endif()
 
 add_subdirectory(spacecreatorplugin)
 add_subdirectory(sedsplugin)
 add_subdirectory(simulinkimporterplugin)
+
 add_subdirectory(functiontesterplugin)
 add_subdirectory(devicegeneratorplugin)

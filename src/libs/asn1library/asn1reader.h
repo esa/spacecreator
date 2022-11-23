@@ -19,6 +19,7 @@
 
 #include <QCache>
 #include <QObject>
+#include <QPair>
 #include <QStringList>
 #include <QVector>
 #include <memory>
@@ -58,7 +59,7 @@ public:
 
     QString checkforCompiler() const;
 
-    QString defaultParameter() const;
+    QStringList defaultParameter() const;
 
     int lineNumberFromError(const QString &error) const;
     QString fileNameFromError(const QString &error) const;
@@ -67,12 +68,11 @@ Q_SIGNALS:
     void parseError(const QString &error);
 
 private:
-    QString asn1CompilerCommand() const;
+    QPair<QString, QStringList> asn1CompilerCommand() const;
     QString temporaryFileName(const QString &basename, const QString &suffix) const;
 
     QByteArray fileHash(const QStringList &fileNames) const;
     bool convertToXML(const QStringList &asn1FileNames, const QString &xmlFilename, QStringList *errorMessages) const;
-    QString createFilenameParameter(const QStringList &asn1FileNames) const;
     void parseAsn1SccErrors(QString errorString, QStringList *errorMessages) const;
     std::map<QString, std::unique_ptr<Asn1Acn::File>> parseAsn1XmlFileImpl(const QString &fileName);
 

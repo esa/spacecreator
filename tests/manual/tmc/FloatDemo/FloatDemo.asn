@@ -1,0 +1,21 @@
+FLOATDEMO-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   INumber ::= INTEGER (-1000 .. 1000)
+
+   IPidConfig ::= SEQUENCE {
+       kp INumber,
+       ki INumber,
+       kd INumber
+   }
+
+   Number ::= REAL (-1000.0 .. 1000.0)
+
+   PidConfig ::= SEQUENCE {
+       kp Number,
+       ki Number,
+       kd Number
+   }
+
+END
+

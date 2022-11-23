@@ -1,0 +1,21 @@
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyBetterInteger FROM USERDEFINED-TYPES-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-integerinterface-integerArg ::= MyBetterInteger
+
+
+
+
+END

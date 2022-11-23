@@ -26,16 +26,19 @@ namespace Constants {
 const char DV_MIMETYPE[] = "application/dvxml";
 const char IV_MIMETYPE[] = "application/xml";
 const char MSC_MIMETYPE[] = "text/vnd.msc";
+const char SCL_MIMETYPE[] = "text/x-scl";
 
 const char INFO_READ_ONLY[] = "SpaceCreator.ReadOnly";
 
 const char K_DV_EDITOR_ID[] = "SpaceCreator.DVEditor";
 const char K_IV_EDITOR_ID[] = "SpaceCreator.IVEditor";
 const char K_MSC_EDITOR_ID[] = "SpaceCreator.MscEditor";
+const char K_SCL_EDITOR_ID[] = "SpaceCreator.SclEditor";
 
 const char C_DVEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "DV Editor");
 const char C_IVEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "IV Editor");
 const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
+const char C_SCLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Scl Editor");
 
 // Menu
 const char MENU_ID[] = "SpaceCreator.Menu";
@@ -66,9 +69,13 @@ const char SETTINGS_IV_ACTIONS_ID[] = "C.SpaceCreator.IVActions";
 const char SETTINGS_IV_PROPERTIES_ID[] = "D.SpaceCreator.IVProperties";
 const char SETTINGS_DV_HW_LIBRARY_ID[] = "E.SpaceCreator.HWLibrary";
 const char SETTINGS_IV_LIBRARY_ID[] = "F.SpaceCreator.IVLibrary";
+const char SETTINGS_TMC_ID[] = "G.SpaceCreator.TMC";
 const char SETTINGS_CATEGORY[] = "K.SpaceCreator";
 const QString SETTINGS_ASN_COMPILER_KEY = { "SpaceCreator/asn1compiler" };
 const QString SETTINGS_ASN_COMPILER_PARAMETER_KEY = { "SpaceCreator/asn1compilerparameter" };
+
+// Context
+const char SCL_BASE_CONTEXT[] = "Scl.BaseContext";
 
 }
 }

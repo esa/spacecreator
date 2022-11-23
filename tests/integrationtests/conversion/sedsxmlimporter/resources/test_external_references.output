@@ -1,0 +1,7 @@
+COM-N7SPACE-REFERENCES DEFINITIONS ::= BEGIN
+-- A simple 8-bit unsigned integer
+UnsignedInteger8 ::= INTEGER(0 .. 255)
+-- A simple 16-bit signed integer
+SignedInteger16 ::= INTEGER(-32768 .. 32767)
+END
+

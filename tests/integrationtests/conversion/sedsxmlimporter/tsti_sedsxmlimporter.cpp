@@ -41,6 +41,7 @@ public:
 
 private Q_SLOTS:
     void testValid();
+    void testExternalReferences();
 };
 
 /// \SRS  ETB-FUN-40
@@ -70,6 +71,15 @@ void tsti_SedsXmlImporter::testValid()
 
     QFileInfo preprocessedFileInfo("preprocessed.xml");
     QVERIFY(!preprocessedFileInfo.exists());
+}
+
+/// \SRS  ETB-FUN-40
+/// \SRS  ETB-IF-90
+/// \SRS  ETB-IF-100
+void tsti_SedsXmlImporter::testExternalReferences()
+{
+    const int result = system("./test_external_references.sh");
+    QCOMPARE(result, 0);
 }
 
 } // namespace seds::test

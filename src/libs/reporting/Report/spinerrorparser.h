@@ -20,7 +20,10 @@
 #pragma once
 
 #include "dataconstraintviolationreport.h"
+#include "observerfailurereport.h"
+#include "rawerroritem.h"
 #include "spinerrorreportitem.h"
+#include "stopconditionviolationreport.h"
 
 class QRegularExpressionMatch;
 class QRegularExpressionMatchIterator;
@@ -33,6 +36,12 @@ namespace reporting {
 class SpinErrorParser
 {
 public:
+    enum ViolationTypeParseTokens
+    {
+        RawErrorMatch = 0,
+        ErrorDetailsMatch = 1
+    };
+
     /// @brief  Regex match tokens for constraint violation parsing
     enum ConstraintViolationParseTokens
     {
@@ -50,11 +59,25 @@ public:
         ErrorDepth
     };
 
+    /// @brief  Match tokens for nested variable name parsing
     enum VariableParseTokens
     {
         VariableGlobalState = 0,
         VariableFunction,
         VariableName
+    };
+
+    /// @brief  Regex match tokens for stop condition parsing
+    enum StopConditionParseTokens
+    {
+        StopConditionClause = 1,
+        StopConditionExpression
+    };
+
+    /// @brief  Regex match token for identifier parsing within stop condition
+    enum IdentifierParseTokens
+    {
+        IdentifierName = 1
     };
 
     /**
@@ -63,22 +86,48 @@ public:
     SpinErrorParser() = default;
 
     /**
-     * @brief   Parse spin message
+     * @brief   Parse from multiple spin errors
      *
-     * @param   spinMessage      Spin command output
+     * @param   spinMessages     Spin command outputs
+     * @param   sclFiles         SCL condition files
+     * @param   errors           Raw error data
+     * @param   observerNames    Observer names
      *
      * @return  List of spin errors
      */
-    SpinErrorReport parse(const QString &spinMessage) const;
+    SpinErrorReport parse(const QStringList &spinMessages, const QStringList &sclFiles,
+            const QList<RawErrorItem> &errors, const QStringList &observerNames) const;
 
 private:
-    QRegularExpressionMatchIterator matchSpinErrors(const QString &spinMessage) const;
-    QVariant parseVariableViolation(const QString &rawError) const;
+    static const QString m_spinNoTrailFileMessage;
+    static const QHash<QString, StopConditionViolationReport::ViolationClause> m_stopConditionViolationClauses;
+    static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationTypes;
 
-    SpinErrorReportItem buildReportItem(const QRegularExpressionMatch &matchedError) const;
+    SpinErrorReportItem parseTrace(const QString &spinTraces, const QStringList &sclConditions) const;
 
-    static QRegularExpression buildSpinErrorRegex();
+    QRegularExpressionMatch matchStopCondition(const QString &spinTraces) const;
+    QRegularExpressionMatch matchObserverFailureErrorState(const QString &spinTraces) const;
+    QRegularExpressionMatch matchObserverFailureSuccessState(const QString &spinTraces) const;
+    QRegularExpressionMatch matchVariableViolation(const QString &spinTraces) const;
+
+    SpinErrorReportItem buildDataConstraintViolationReportItem(const QRegularExpressionMatch &matchedError) const;
+    SpinErrorReportItem buildStopConditionViolationReportItem(const QString &conditions) const;
+
+    QVariant parseVariableViolation(const QString &parsedErrorToken) const;
+    QVariant parseStopConditionViolation(const QString &parsedErrorToken) const;
+    QVariant parseObserverFailureErrorState(const QString &parsedErrorToken) const;
+    QVariant parseObserverFailureSuccessState(const QString &parsedErrorToken) const;
+
+    static QString readFile(const QString &filePath);
+
     static QRegularExpression buildDataConstraintViolationRegex();
+    static QRegularExpression buildStopConditionViolationRegex();
+    static QRegularExpression buildStopConditionExpressionRegex();
+
+    static QString removeParentheses(const QString &numberToken);
+    static QString cleanUpSclComments(const QString &scl);
+    static QStringList splitExpression(const QString &expression);
+    static StopConditionViolationReport::ViolationType resolveViolationType(const QStringList &expressions);
 
     static void parseVariableName(const QString &variable, DataConstraintViolationReport &violationReport);
 };

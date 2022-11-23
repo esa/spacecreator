@@ -63,7 +63,7 @@ void ActionCreatorTool::commitPreviewItem()
         return;
     }
 
-    auto action = qobject_cast<msc::MscAction *>(m_previewEntity.take());
+    auto action = qobject_cast<msc::MscAction *>(m_previewEntity.release());
     startWaitForModelLayoutComplete(action);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventInstanceIndex(m_previewItem->pos(), instance);

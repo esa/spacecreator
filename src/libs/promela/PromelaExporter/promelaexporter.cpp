@@ -46,7 +46,7 @@ void PromelaExporter::exportModel(const Model *model, const Options &options) co
 
     const auto *const promelaModel = dynamic_cast<const PromelaModel *>(model);
     if (promelaModel == nullptr) {
-        throw IncorrectModelException(ModelType::Asn1, model->modelType());
+        throw IncorrectModelException(ModelType::Promela, model->modelType());
     }
 
     QString output;

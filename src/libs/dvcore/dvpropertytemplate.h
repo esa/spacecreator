@@ -54,5 +54,4 @@ protected:
 } // namespace dvm
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(dvm::DVPropertyTemplate::Scopes)
-Q_DECLARE_METATYPE(dvm::DVPropertyTemplate::Type)
 Q_DECLARE_METATYPE(dvm::DVPropertyTemplate::Scopes)

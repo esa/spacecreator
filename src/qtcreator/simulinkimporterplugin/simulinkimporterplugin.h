@@ -61,8 +61,7 @@ private:
     auto searchAndCheckMatLabModelWorkspaceFile(const QString& inputFilePath) -> std::optional<QFileInfo>;
     auto printInfoAboutInputs(const QString& inputFilePath, const QString& functionBlockName, const QString& inputWorkspaceFilePath = QString()) -> void;
 
-    auto prepareMatLabTemporaryWorkingDirectory() -> void;
-    auto generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString;
+    auto generateMatLabCallArguments(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QStringList;
     auto generateWorkspaceLoadCallFunction(QFileInfo &workspaceFileInfo) -> QString;
     auto generateTasteExporterCallFunction(const QString& inputFilePath) -> QString;
     auto getWorkspaceLoadFunctionNameForWorkspaceFileExtension(const QString &workspaceFileExtension) -> QString;
@@ -88,12 +87,15 @@ private:
     auto addGeneratedAsn1FilesToCurrentProject(const QStringList &generatedAsn1FileNames) -> void;
     auto isFileIsOneOfMatLabStandardDataTypesFiles(const QString &fileName) -> bool;
 
-    auto removeConvertersTemporaries(const QStringList &generatedAsn1FileNames) -> void;
-    auto removeMatLabCommandTemporaries() -> void;
+    auto moveToProjectDirectoryAndPrepareTemporaryWorkingDirectory(const QString& temporaryWorkingDirectoryName) -> void;
+
+    auto moveToProjectDirectoryAndRemoveConvertersTemporaryWorkingDirectory() -> void;
+    auto removeMatLabTemporaryWorkingDirectory() -> void;
 
     auto checkIfFileExistsAndRemoveIt(const QString &filePath) -> void;
 
     auto printPluginSelfIntroductionInGeneralMessages() -> void;
+    auto printMatLabCommand(const QStringList& matlabCallArguments) -> void;
     auto printInfoInGeneralMessages(const QString &message) -> void;
     auto printErrorInGeneralMessages(const QString &message) -> void;
 
@@ -102,6 +104,7 @@ private:
 
     const QString m_temporaryIvFileName = "tmp-interfaceview.xml";
     const QString m_functionBlockDefaultImplementation = "QGenC";
+    const QString m_convertersTemporaryWorkingDirectory = "converters_temporary_working_directory";
     const QString m_matlabTemporaryWorkingDirectory = "matlab_temporary_working_directory";
     const QString m_tasteExporterOutputDirectory = "exported";
     const QString m_defaultFunctionBlockName = "simulink";
@@ -110,9 +113,10 @@ private:
     const QStringList m_workspaceFilesExtensionsFilter = { "*.m", "*.mat" };
     const QMap<QString, QString> m_workspaceLoadFunctionsMap = {{"m", "run"}, {"mat", "load"}};
 
+    const QString m_matlabAppName = "matlab";
     const QString m_workspaceLoadCallFunctionTemplate = "%1('%2')";
-    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2; exit;\"";
-    const QString m_matlabCommandWithWorkspaceLoadTemplate = "matlab -batch \"cd %1; %2; %3; exit;\"";
+    const QString m_matlabCommandWithoutWorkspaceLoadTemplate = "\"cd %1; %2; exit;\"";
+    const QString m_matlabCommandWithWorkspaceLoadTemplate = "\"cd %1; %2; %3; exit;\"";
     const QString m_tasteExporterCallFunctionTemplate = "taste_export('%1', '%2')";
     const QString m_functionBlockInWorkDirectoryPathTemplate = "%1/work/%2/%3/src";
 
@@ -120,5 +124,6 @@ private:
 
     QMenu *m_simulinkMenu = nullptr;
     ProjectExplorer::Project *m_currentProject = nullptr;
+    QString m_currentProjectDirectoryPath;
 };
 }

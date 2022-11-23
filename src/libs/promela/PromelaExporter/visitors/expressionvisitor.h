@@ -56,6 +56,12 @@ public:
      */
     void operator()(const model::Constant &constant);
     /**
+     * @brief Handle Real Constant
+     *
+     * @param constant constant to export
+     */
+    void operator()(const model::RealConstant &constant);
+    /**
      * @brief Handle Binary Expression
      *
      * @param expression expression to export
@@ -73,6 +79,12 @@ public:
      * @param constant BooleanConstant to export
      */
     void operator()(const model::BooleanConstant &constant);
+    /**
+     * @brief Handle String Constant
+     *
+     * @param constant StringConstant to export
+     */
+    void operator()(const model::StringConstant &constant);
 
 private:
     QTextStream &m_stream;

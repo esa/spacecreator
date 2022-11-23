@@ -17,7 +17,6 @@
 
 #include "asn1reader.h"
 
-#include "asn1const.h"
 #include "astxmlparser.h"
 #include "errorhub.h"
 #include "file.h"
@@ -36,7 +35,7 @@ namespace Asn1Acn {
 
 QCache<QString, QString> Asn1Reader::m_cache {};
 
-static const QString defaultParameter("--field-prefix AUTO --xml-ast ");
+static const QStringList defaultParameter { "--field-prefix", "AUTO", "--xml-ast" };
 
 Asn1Reader::Asn1Reader(QObject *parent)
     : QObject(parent)
@@ -310,7 +309,7 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
 
 /*!
    Does search in the system path for asn1scc and returns the full file path.
-   An empty string is retunred if asn1scc was not found.
+   An empty string is returned if asn1scc was not found.
  */
 QString Asn1Reader::checkforCompiler() const
 {
@@ -344,7 +343,7 @@ QString Asn1Reader::checkforCompiler() const
 #endif
 }
 
-QString Asn1Reader::defaultParameter() const
+QStringList Asn1Reader::defaultParameter() const
 {
     return Asn1Acn::defaultParameter;
 }
@@ -371,28 +370,42 @@ QString Asn1Reader::fileNameFromError(const QString &error) const
     return tokens.first();
 }
 
-QString Asn1Reader::asn1CompilerCommand() const
+QPair<QString, QStringList> Asn1Reader::asn1CompilerCommand() const
 {
     QSettings settings;
     QString asn1Compiler = settings.value("SpaceCreator/asn1compiler").toString();
     QString parameter = settings.value("SpaceCreator/asn1compilerparameter").toString();
 
+    // Compiler. Use compiler set by user or see if it is installed on the system
     if (asn1Compiler.isEmpty() || !QFile::exists(asn1Compiler)) {
         asn1Compiler = checkforCompiler();
     }
-
-    if (parameter.isEmpty()) {
-        parameter = defaultParameter();
-    }
-
-    if (!asn1Compiler.isEmpty()) {
-        QFileInfo asnFile(asn1Compiler);
-        const QString param = parameter.contains("%1") ? parameter.arg(asnFile.path()) : parameter;
-        return QString("%1 %2").arg(asn1Compiler, param);
-    } else {
+    if (asn1Compiler.isEmpty()) {
         qWarning() << "No asn1scc compiler found";
-        return {};
+        return { {}, {} };
     }
+
+    // Parameters to compiler. Use parameters set by user or use the default ones
+    QStringList paramsList;
+    if (parameter.isEmpty()) {
+        paramsList = defaultParameter();
+    } else {
+#if QTC_VERSION == 408
+        QStringList paramsList = parameter.split(' ', QString::SkipEmptyParts);
+#endif
+#if QTC_VERSION == 800
+        QStringList paramsList = parameter.split(' ', Qt::SkipEmptyParts);
+#endif
+    }
+
+    // replace %1 in users parameters with path to the asn1 compiler.
+    QFileInfo asnFile(asn1Compiler);
+    if (paramsList.contains("%1")) {
+        int pos = paramsList.indexOf("%1");
+        paramsList[pos] = asnFile.path();
+    }
+
+    return { asn1Compiler, paramsList };
 }
 
 QString Asn1Reader::temporaryFileName(const QString &basename, const QString &suffix) const
@@ -414,7 +427,7 @@ QByteArray Asn1Reader::fileHash(const QStringList &fileNames) const
          * The cache xml file contains original locations
          * of input ASN.1 files, what was origin of at least one bug.
          */
-        content.append(fileName);
+        content.append(fileName.toUtf8());
         QFile file(fileName);
         if (file.open(QIODevice::ReadOnly)) {
             content.append(file.readAll());
@@ -428,8 +441,13 @@ QByteArray Asn1Reader::fileHash(const QStringList &fileNames) const
 bool Asn1Reader::convertToXML(
         const QStringList &asn1FileNames, const QString &xmlFilename, QStringList *errorMessages) const
 {
-    QString cmd = asn1CompilerCommand();
-    if (cmd.isEmpty()) {
+    QPair<QString, QStringList> cmd = asn1CompilerCommand();
+    auto asn1Compiler = cmd.first;
+    QStringList parameters;
+    parameters.append(cmd.second);
+
+    // Check the compiler exists
+    if (asn1Compiler.isEmpty()) {
         QString msg = tr("ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc");
         if (errorMessages)
             errorMessages->append(msg);
@@ -438,11 +456,15 @@ bool Asn1Reader::convertToXML(
         }
         return false;
     }
-    QString asn1Command = cmd + "%1 %2";
 
-    QString asn1FileNamesParameter = createFilenameParameter(asn1FileNames);
+    // Add parameters for output xml file
     QString asn1XMLFileName = temporaryFileName("asn1", "xml");
+    parameters << asn1XMLFileName;
 
+    // Add parameters for asn1 input files
+    parameters << asn1FileNames;
+
+    // Setup the process
     QProcess asn1Process;
     connect(&asn1Process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             [&](int, QProcess::ExitStatus exitStatus) {
@@ -453,13 +475,14 @@ bool Asn1Reader::convertToXML(
                     }
                 }
             });
-
     connect(&asn1Process, &QProcess::errorOccurred,
             [&](QProcess::ProcessError) { parseAsn1SccErrors(asn1Process.errorString(), errorMessages); });
 
     asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
     asn1Process.setProcessChannelMode(QProcess::MergedChannels);
-    asn1Process.start(QString(asn1Command).arg(asn1XMLFileName, asn1FileNamesParameter));
+    asn1Process.setProgram(asn1Compiler);
+    asn1Process.setArguments(parameters);
+    asn1Process.start();
     asn1Process.waitForFinished();
 
     auto error = asn1Process.readAll();
@@ -474,16 +497,6 @@ bool Asn1Reader::convertToXML(
     QFile::rename(asn1XMLFileName, xmlFilename);
 
     return QFile::exists(xmlFilename);
-}
-
-QString Asn1Reader::createFilenameParameter(const QStringList &asn1FileNames) const
-{
-    QStringList result;
-
-    std::transform(asn1FileNames.begin(), asn1FileNames.end(), std::back_inserter(result),
-            [](const QString &file) { return QString("\"%1\"").arg(file); });
-
-    return result.join(QChar(' '));
 }
 
 void Asn1Reader::parseAsn1SccErrors(QString errorString, QStringList *errorMessages) const

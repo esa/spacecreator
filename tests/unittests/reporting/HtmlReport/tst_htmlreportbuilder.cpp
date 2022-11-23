@@ -17,75 +17,172 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include <QtTest>
+#include "tst_htmlreportbuilder.h"
+
 #include <reporting/HtmlReport/htmlreportbuilder.h>
+#include <reporting/Report/rawerroritem.h>
 #include <reporting/Report/spinerrorparser.h>
 
 using namespace reporting;
 
 namespace Report::test {
 
-class tst_HtmlReportBuilder : public QObject
-{
-    Q_OBJECT
-
-private Q_SLOTS:
-    void testNoError();
-    void testDataConstraintViolation();
-    void testDataConstraintViolationNested();
-
-private:
-    QString readFile(const QString &filepath);
-};
-
 void tst_HtmlReportBuilder::testNoError()
 {
-    const QString spinMessagePath("resources/spin_no_error_output.txt");
     const QString htmlTemplatePath("resources/template.html");
-    const QString htmlResultPath("resources/result_empty.html");
+    const QString htmlResultPath("resources/empty_result.html");
 
-    const QString spinMessage = readFile(spinMessagePath);
-    const QString htmlResult = readFile(htmlResultPath);
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport({}, {}, {}, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
 
-    const SpinErrorParser parser;
-    auto reports = parser.parse(spinMessage);
-
-    const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
     QVERIFY(html == htmlResult);
 }
 
 void tst_HtmlReportBuilder::testDataConstraintViolation()
 {
-    const QString spinMessagePath("resources/spin_error_output.txt");
+    const QString spinMessagePath("resources/data_constraint_msg.txt");
+    const QString spinTracesPath("resources/data_constraint_spin.txt");
+    const QString sclPath("resources/data_constraint_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
     const QString htmlTemplatePath("resources/template.html");
-    const QString htmlResultPath("resources/result_error.html");
+    const QString htmlResultPath("resources/data_constraint_result.html");
 
-    const QString spinMessage = readFile(spinMessagePath);
-    const QString htmlResult = readFile(htmlResultPath);
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
 
-    const SpinErrorParser parser;
-    auto reports = parser.parse(spinMessage);
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
 
-    const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
     QVERIFY(html == htmlResult);
 }
 
 void tst_HtmlReportBuilder::testDataConstraintViolationNested()
 {
-    const QString spinMessagePath("resources/spin_nested_error_output.txt");
+    const QString spinMessagePath("resources/data_constraint_nested_msg.txt");
+    const QString spinTracesPath("resources/data_constraint_nested_spin.txt");
+    const QString sclPath("resources/data_constraint_nested_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
     const QString htmlTemplatePath("resources/template.html");
-    const QString htmlResultPath("resources/result_nested.html");
+    const QString htmlResultPath("resources/data_constraint_nested_result.html");
 
-    const QString spinMessage = readFile(spinMessagePath);
-    const QString htmlResult = readFile(htmlResultPath);
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
 
-    const SpinErrorParser parser;
-    auto reports = parser.parse(spinMessage);
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
 
-    const HtmlReportBuilder htmlReportBuilder;
-    const auto html = htmlReportBuilder.buildHtmlReport(reports, htmlTemplatePath);
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testStopConditionAlwaysEmpty()
+{
+    const QString spinMessagePath("resources/stop_condition_empty_msg.txt");
+    const QString spinTracesPath("resources/stop_condition_empty_spin.txt");
+    const QString sclPath("resources/stop_condition_empty_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/stop_condition_empty_result.html");
+
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
+
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
+
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testStopConditionEventually()
+{
+    const QString spinMessagePath("resources/stop_condition_eventually_msg.txt");
+    const QString spinTracesPath("resources/stop_condition_eventually_spin.txt");
+    const QString sclPath("resources/stop_condition_eventually_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/stop_condition_eventually_result.html");
+
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
+
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
+
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testStopConditionNever()
+{
+    const QString spinMessagePath("resources/stop_condition_never_msg.txt");
+    const QString spinTracesPath("resources/stop_condition_never_spin.txt");
+    const QString sclPath("resources/stop_condition_never_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/stop_condition_never_result.html");
+
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
+
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
+
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testObserverFailureErrorState()
+{
+    const QString spinMessagePath("resources/obs_failure_error_state_msg.txt");
+    const QString spinTracesPath("resources/obs_failure_error_state_spin.txt");
+    const QString sclPath("resources/obs_failure_error_state_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/obs_failure_error_state_result.html");
+
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
+
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
+
+    QVERIFY(html == htmlResult);
+}
+
+void tst_HtmlReportBuilder::testObserverFailureSuccessState()
+{
+    const QString spinMessagePath("resources/obs_failure_success_state_msg.txt");
+    const QString spinTracesPath("resources/obs_failure_success_state_spin.txt");
+    const QString sclPath("resources/obs_failure_success_state_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/obs_failure_success_state_result.html");
+
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
+
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, QStringList(), htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
+
     QVERIFY(html == htmlResult);
 }
 
@@ -100,8 +197,4 @@ QString tst_HtmlReportBuilder::readFile(const QString &filepath)
     return QString();
 }
 
-} // namespace tmc::test
-
-QTEST_MAIN(Report::test::tst_HtmlReportBuilder)
-
-#include "tst_htmlreportbuilder.moc"
+} // namespace Report::test

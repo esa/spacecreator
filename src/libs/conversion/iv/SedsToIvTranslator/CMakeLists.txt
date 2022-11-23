@@ -7,6 +7,7 @@ set(SOURCES     context.cpp
                 specialized/asyncinterfacecommandtranslator.cpp
                 specialized/componentstranslator.cpp
                 specialized/descriptiontranslator.cpp
+                specialized/devicetranslator.cpp
                 specialized/interfaceparametertranslator.cpp
                 specialized/syncinterfacecommandtranslator.cpp)
 set(INCLUDES    context.h
@@ -16,6 +17,7 @@ set(INCLUDES    context.h
                 specialized/asyncinterfacecommandtranslator.h
                 specialized/componentstranslator.h
                 specialized/descriptiontranslator.h
+                specialized/devicetranslator.h
                 specialized/interfaceparametertranslator.h
                 specialized/syncinterfacecommandtranslator.h)
 

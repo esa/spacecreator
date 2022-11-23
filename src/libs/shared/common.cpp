@@ -158,17 +158,18 @@ bool ensureFileExists(const QString &filePath, const QString &defaultFilePath)
     return true;
 }
 
-void copyDir(const QString &source, const QString &dest, FileCopyingMode replaceMode)
+bool copyDir(const QString &source, const QString &dest, FileCopyingMode replaceMode)
 {
     static const QDir::Filters filters = QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files;
     QDir sourceExportDir { source };
     if (sourceExportDir.isEmpty(filters)) {
-        return;
+        return true;
     }
     sourceExportDir.setFilter(filters);
     const QDir targetExportDir { dest };
     targetExportDir.mkpath(QLatin1String("."));
     QDirIterator it { sourceExportDir, QDirIterator::Subdirectories };
+    bool success = true;
     while (it.hasNext()) {
         const QString filePath = it.next();
         const QFileInfo fileInfo = it.fileInfo();
@@ -180,8 +181,12 @@ void copyDir(const QString &source, const QString &dest, FileCopyingMode replace
                 qWarning() << "Error during symlink copying:" << filePath << fileInfo.symLinkTarget()
                            << targetExportDir.absoluteFilePath(relPath);
             }
+            success &= result;
         } else if (fileInfo.isDir()) {
-            targetExportDir.mkpath(relPath);
+            if (!QDir(targetExportDir.filePath(relPath)).exists()) {
+                const bool result = targetExportDir.mkpath(relPath);
+                success &= result;
+            }
         } else {
             const bool result =
                     copyFile(fileInfo.absoluteFilePath(), targetExportDir.absoluteFilePath(relPath), replaceMode);
@@ -189,11 +194,14 @@ void copyDir(const QString &source, const QString &dest, FileCopyingMode replace
                 qWarning() << "Error during source file copying:" << filePath
                            << targetExportDir.absoluteFilePath(relPath);
             }
+            success &= result;
         }
     }
+    return success;
 }
 
-QString archetypesFileStartingString() {
+QString archetypesFileStartingString()
+{
     static const QString kArchetypesStartingString = QString("archetype_library_");
     return kArchetypesStartingString;
 }
@@ -311,9 +319,11 @@ bool moveDefaultDirectories(const QString &currentImplName, const QString &proje
         for (const QString &dirName : subfolders) {
             if (dirName != shared::kNonCurrentImplementationPath) {
                 const QString subfolderPath = dir.filePath(dirName);
-                shared::copyDir(subfolderPath, commonImplPath + QDir::separator() + dirName,
-                        shared::FileCopyingMode::Overwrite);
-                result &= QDir(subfolderPath).removeRecursively();
+                const QString destPath = commonImplPath + QDir::separator() + dirName;
+                const bool res = shared::copyDir(subfolderPath, destPath, shared::FileCopyingMode::Overwrite);
+                result &= res;
+                if (res)
+                    result &= QDir(subfolderPath).removeRecursively();
             }
         }
     }
@@ -326,6 +336,14 @@ bool moveDefaultDirectories(const QString &currentImplName, const QString &proje
         result &= QFile::link(link.dir().relativeFilePath(linkTargetPath), link.absoluteFilePath());
     }
     return result;
+}
+
+bool moveDir(const QString &source, const QString &dest, FileCopyingMode replaceMode)
+{
+    if (copyDir(source, dest, replaceMode))
+        return QDir(source).removeRecursively();
+
+    return false;
 }
 
 }

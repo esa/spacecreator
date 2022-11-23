@@ -2,6 +2,7 @@
 process ParameterMapHostProvider;
     /* CIF Text (0, 150), (400, 500) */
     dcl X Number;
+    dcl Value Number;
     dcl Io_set_if_asyncparam_pi Number;
     dcl Io_get_if_asyncparam_ri Number;
     dcl Io_get_if_asyncroparam_ri Number;
@@ -71,7 +72,9 @@ process ParameterMapHostProvider;
         input Set_IF_AsyncParam_Pi(Io_set_if_asyncparam_pi);
             /* CIF Task (600, 1537), (100, 50) */
             task X := Io_set_if_asyncparam_pi;
-            /* CIF NextState (600, 1612), (200, 50) */
+            /* CIF Task (600, 1612), (100, 50) */
+            task Value := Io_set_if_asyncparam_pi;
+            /* CIF NextState (600, 1687), (200, 50) */
             NEXTSTATE s;
         /* CIF Input (900, 1462), (200, 50) */
         input Set_IF_SyncParam_Pi;

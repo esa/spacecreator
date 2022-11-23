@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AstRoot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Asn1Schema.xsd" rename_policy="SelectiveEnumerants">
+  <Asn1File FileName="/home/schwann/work/ESA/BugProjects/DV/dv.asn">
+    <Modules>
+      <Module Name="DV" Line="1" CharPositionInLine="0">
+        <ExportedTypes>
+          <ExportedType Name="A" />
+          <ExportedType Name="B" />
+          <ExportedType Name="Seq1" />
+          <ExportedType Name="Seq2" />
+        </ExportedTypes>
+        <ExportedValues />
+        <ImportedModules />
+        <TypeAssignments>
+          <TypeAssignment Name="A" CName="A" AdaName="A" Line="4" CharPositionInLine="0">
+            <Asn1Type id="DV.A" Line="4" CharPositionInLine="6" ParameterizedTypeInstance="false">
+              <SEQUENCE_OF acnMaxSizeInBits="3" acnMinSizeInBits="3" uperMaxSizeInBits="3" uperMinSizeInBits="3">
+                <Constraints>
+                  <SIZE>
+                    <IntegerValue>3</IntegerValue>
+                  </SIZE>
+                </Constraints>
+                <WithComponentConstraints />
+                <Asn1Type id="DV.A.#" Line="4" CharPositionInLine="29" ParameterizedTypeInstance="false">
+                  <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                    <Constraints />
+                    <WithComponentConstraints />
+                  </BOOLEAN>
+                </Asn1Type>
+              </SEQUENCE_OF>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="B" CName="B" AdaName="B" Line="5" CharPositionInLine="0">
+            <Asn1Type id="DV.B" Line="5" CharPositionInLine="6" ParameterizedTypeInstance="false">
+              <REFERENCE_TYPE Module="DV" TypeAssignment="A">
+                <Asn1Type id="DV.B" Line="4" CharPositionInLine="6" ParameterizedTypeInstance="false" tasInfoModule="DV" tasInfoName="A">
+                  <SEQUENCE_OF acnMaxSizeInBits="3" acnMinSizeInBits="3" uperMaxSizeInBits="3" uperMinSizeInBits="3">
+                    <Constraints>
+                      <SIZE>
+                        <IntegerValue>3</IntegerValue>
+                      </SIZE>
+                    </Constraints>
+                    <WithComponentConstraints />
+                    <Asn1Type id="DV.B.#" Line="4" CharPositionInLine="29" ParameterizedTypeInstance="false">
+                      <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                        <Constraints />
+                        <WithComponentConstraints />
+                      </BOOLEAN>
+                    </Asn1Type>
+                  </SEQUENCE_OF>
+                </Asn1Type>
+              </REFERENCE_TYPE>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Seq1" CName="Seq1" AdaName="Seq1" Line="7" CharPositionInLine="0">
+            <Asn1Type id="DV.Seq1" Line="7" CharPositionInLine="9" ParameterizedTypeInstance="false">
+              <SEQUENCE acnMaxSizeInBits="4" acnMinSizeInBits="4" uperMaxSizeInBits="4" uperMinSizeInBits="4">
+                <SEQUENCE_COMPONENT Name="f1" Line="8" CharPositionInLine="3" AdaName="f1" CName="f1">
+                  <Asn1Type id="DV.Seq1.f1" Line="8" CharPositionInLine="6" ParameterizedTypeInstance="false">
+                    <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                      <Constraints />
+                      <WithComponentConstraints />
+                    </BOOLEAN>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <SEQUENCE_COMPONENT Name="f2" Line="9" CharPositionInLine="3" AdaName="f2" CName="f2">
+                  <Asn1Type id="DV.Seq1.f2" Line="9" CharPositionInLine="6" ParameterizedTypeInstance="false">
+                    <REFERENCE_TYPE Module="DV" TypeAssignment="A">
+                      <Asn1Type id="DV.Seq1.f2" Line="4" CharPositionInLine="6" ParameterizedTypeInstance="false" tasInfoModule="DV" tasInfoName="A">
+                        <SEQUENCE_OF acnMaxSizeInBits="3" acnMinSizeInBits="3" uperMaxSizeInBits="3" uperMinSizeInBits="3">
+                          <Constraints>
+                            <SIZE>
+                              <IntegerValue>3</IntegerValue>
+                            </SIZE>
+                          </Constraints>
+                          <WithComponentConstraints />
+                          <Asn1Type id="DV.Seq1.f2.#" Line="4" CharPositionInLine="29" ParameterizedTypeInstance="false">
+                            <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                              <Constraints />
+                              <WithComponentConstraints />
+                            </BOOLEAN>
+                          </Asn1Type>
+                        </SEQUENCE_OF>
+                      </Asn1Type>
+                    </REFERENCE_TYPE>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <Constraints />
+                <WithComponentConstraints />
+              </SEQUENCE>
+            </Asn1Type>
+          </TypeAssignment>
+          <TypeAssignment Name="Seq2" CName="Seq2" AdaName="Seq2" Line="12" CharPositionInLine="0">
+            <Asn1Type id="DV.Seq2" Line="12" CharPositionInLine="9" ParameterizedTypeInstance="false">
+              <SEQUENCE acnMaxSizeInBits="4" acnMinSizeInBits="4" uperMaxSizeInBits="4" uperMinSizeInBits="4">
+                <SEQUENCE_COMPONENT Name="f1" Line="13" CharPositionInLine="3" AdaName="f1" CName="f1">
+                  <Asn1Type id="DV.Seq2.f1" Line="13" CharPositionInLine="6" ParameterizedTypeInstance="false">
+                    <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                      <Constraints />
+                      <WithComponentConstraints />
+                    </BOOLEAN>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <SEQUENCE_COMPONENT Name="f2" Line="14" CharPositionInLine="3" AdaName="f2" CName="f2">
+                  <Asn1Type id="DV.Seq2.f2" Line="14" CharPositionInLine="6" ParameterizedTypeInstance="false">
+                    <REFERENCE_TYPE Module="DV" TypeAssignment="B">
+                      <Asn1Type id="DV.Seq2.f2" Line="5" CharPositionInLine="6" ParameterizedTypeInstance="false" tasInfoModule="DV" tasInfoName="B">
+                        <REFERENCE_TYPE Module="DV" TypeAssignment="A">
+                          <Asn1Type id="DV.Seq2.f2" Line="4" CharPositionInLine="6" ParameterizedTypeInstance="false" tasInfoModule="DV" tasInfoName="A">
+                            <SEQUENCE_OF acnMaxSizeInBits="3" acnMinSizeInBits="3" uperMaxSizeInBits="3" uperMinSizeInBits="3">
+                              <Constraints>
+                                <SIZE>
+                                  <IntegerValue>3</IntegerValue>
+                                </SIZE>
+                              </Constraints>
+                              <WithComponentConstraints />
+                              <Asn1Type id="DV.Seq2.f2.#" Line="4" CharPositionInLine="29" ParameterizedTypeInstance="false">
+                                <BOOLEAN acnMaxSizeInBits="1" acnMinSizeInBits="1" uperMaxSizeInBits="1" uperMinSizeInBits="1">
+                                  <Constraints />
+                                  <WithComponentConstraints />
+                                </BOOLEAN>
+                              </Asn1Type>
+                            </SEQUENCE_OF>
+                          </Asn1Type>
+                        </REFERENCE_TYPE>
+                      </Asn1Type>
+                    </REFERENCE_TYPE>
+                  </Asn1Type>
+                </SEQUENCE_COMPONENT>
+                <Constraints />
+                <WithComponentConstraints />
+              </SEQUENCE>
+            </Asn1Type>
+          </TypeAssignment>
+        </TypeAssignments>
+        <ValueAssignments />
+      </Module>
+    </Modules>
+  </Asn1File>
+  <AcnDependencies />
+</AstRoot>

@@ -39,6 +39,7 @@ private Q_SLOTS:
     void testSetSequenceWithStringValue();
     void testSetSequenceInSequenceValue();
     void testSetStringValue();
+    void testSetIncompleteSequenceOfValue();
 
 private:
     Asn1TreeView *m_treeView = nullptr;
@@ -66,7 +67,7 @@ void tst_Asn1TreeView::testSetAsn1Value()
 
     m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("DataView.xml"));
 
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
         QFAIL(errors.join("\n").toStdString().c_str());
     }
 
@@ -127,7 +128,6 @@ void tst_Asn1TreeView::testSetSequenceValue()
     QCOMPARE(m_treeView->getAsn1Value(), value);
 }
 
-
 void tst_Asn1TreeView::testSetSequenceWithStringValue()
 {
     m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("string.xml"));
@@ -140,12 +140,13 @@ void tst_Asn1TreeView::testSetSequenceWithStringValue()
     QVariantMap valueMap = m_valueParser.parseAsn1Value(assignment.get(), value);
     QCOMPARE(valueMap.size(), 2);
     m_treeView->setAsn1Value(valueMap);
-    QCOMPARE(m_treeView->getAsn1Value(), QString("{ strVal  \"potatoes\", numVal  \"3141592\", bitVal  \"ABCD\", octVal  \"AF45\" }"));
+    QCOMPARE(m_treeView->getAsn1Value(),
+            QString("{ strVal  \"potatoes\", numVal  \"3141592\", bitVal  \"ABCD\", octVal  \"AF45\" }"));
 }
 
 void tst_Asn1TreeView::testSetSequenceInSequenceValue()
 {
-    m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("tetris_dataview.xml")); 
+    m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("tetris_dataview.xml"));
     m_definitions = m_types->definitions("TETRIS-DATAVIEW");
     QVERIFY(m_definitions != nullptr);
     QCOMPARE(m_definitions->types().size(), 10);
@@ -171,6 +172,20 @@ void tst_Asn1TreeView::testSetStringValue()
     QVariantMap valueMap = m_valueParser.parseAsn1Value(stringType.get(), value);
     m_treeView->setAsn1Value(valueMap);
     QCOMPARE(m_treeView->getAsn1Value(), QString("\"TestString\""));
+}
+
+void tst_Asn1TreeView::testSetIncompleteSequenceOfValue()
+{
+    m_types = m_parser.parseAsn1XmlFile(QFINDTESTDATA("dv.xml"));
+    m_definitions = m_types->definitions("DV");
+    const std::unique_ptr<Asn1Acn::TypeAssignment> &assignment = m_definitions->types().at(2);
+    m_treeView->setAsn1Model(assignment);
+    const QString inputValue = "{f1  FALSE,}"; // this misses the "sequence of" items completely
+    QVariantMap valueMap = m_valueParser.parseAsn1Value(assignment.get(), inputValue);
+    QCOMPARE(valueMap.size(), 2);
+    m_treeView->setAsn1Value(valueMap);
+    const QString expectedValue = "{ f1  FALSE, f2  { FALSE, FALSE, FALSE } }"; // default items added
+    QCOMPARE(m_treeView->getAsn1Value(), expectedValue);
 }
 
 QTEST_MAIN(tst_Asn1TreeView)

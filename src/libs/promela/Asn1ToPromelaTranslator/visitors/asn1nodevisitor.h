@@ -68,5 +68,6 @@ private:
     model::PromelaModel &m_promelaModel;
     const bool m_enhancedSpinSupport;
     QVector<QString> m_initInlines;
+    float m_delta;
 };
 }

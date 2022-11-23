@@ -160,6 +160,11 @@ auto SimulinkImporterPlugin::createActionContainerInTools(const QString &title) 
 void SimulinkImporterPlugin::onActiveProjectChanged(ProjectExplorer::Project *project)
 {
     m_currentProject = project;
+    if (m_currentProject != nullptr) {
+        m_currentProjectDirectoryPath = project->projectDirectory().toString();
+    } else {
+        m_currentProjectDirectoryPath.clear();
+    }
 
     m_simulinkMenu->setEnabled(project != nullptr);
 }
@@ -192,29 +197,29 @@ auto SimulinkImporterPlugin::importSlx() -> void
 
     printInfoAboutInputs(*inputFilePath, *functionBlockName, workspaceFileInfo->absoluteFilePath());
 
-    prepareMatLabTemporaryWorkingDirectory();
+    moveToProjectDirectoryAndPrepareTemporaryWorkingDirectory(m_matlabTemporaryWorkingDirectory);
 
-    const QString matlabCommand = generateMatLabCommand(*workspaceFileInfo, *inputFilePath);
+    const QStringList matlabCallArguments = generateMatLabCallArguments(*workspaceFileInfo, *inputFilePath);
 
-    printInfoInGeneralMessages(GenMsg::executingMatlabCommand.arg(matlabCommand));
+    printMatLabCommand(matlabCallArguments);
 
-    if(QProcess::execute(matlabCommand) != 0) {
+    if(QProcess().execute(m_matlabAppName, matlabCallArguments) != 0) {
         printErrorInGeneralMessages(GenMsg::matlabCommandHasFailed);
 
-        removeMatLabCommandTemporaries();
+        removeMatLabTemporaryWorkingDirectory();
         return;
     }
 
     printInfoInGeneralMessages(GenMsg::matlabCommandHasExecuted);
 
     if(!importXmlFileAndRemoveTemporaries(generateExportedXmlFilePath(*inputFilePath), *functionBlockName)) {
-        removeMatLabCommandTemporaries();
+        removeMatLabTemporaryWorkingDirectory();
         return;
     }
 
     copyInputSlxFileToWorkDirectory(*inputFilePath, *functionBlockName);
 
-    removeMatLabCommandTemporaries();
+    removeMatLabTemporaryWorkingDirectory();
 }
 
 auto SimulinkImporterPlugin::importXml() -> void
@@ -243,8 +248,7 @@ auto SimulinkImporterPlugin::importXml() -> void
 
 auto SimulinkImporterPlugin::askAboutAndCheckFilePath(const QString &caption, const QString &filter) -> std::optional<QString>
 {
-    const QString currentProjectDirectory = m_currentProject->projectDirectory().toString();
-    const QString temporaryFilePath = QFileDialog::getOpenFileName(nullptr, caption, currentProjectDirectory, filter);
+    const QString temporaryFilePath = QFileDialog::getOpenFileName(nullptr, caption, m_currentProjectDirectoryPath, filter);
 
     if(temporaryFilePath.isEmpty()) {
         return std::nullopt;
@@ -304,32 +308,25 @@ auto SimulinkImporterPlugin::printInfoAboutInputs(const QString& inputFilePath, 
     }
 }
 
-auto SimulinkImporterPlugin::prepareMatLabTemporaryWorkingDirectory() -> void
-{
-    const bool isMatLabTemporaryWorkingDirectoryExists = QDir().exists(m_matlabTemporaryWorkingDirectory);
-
-    if(isMatLabTemporaryWorkingDirectoryExists) { 
-        QDir(m_matlabTemporaryWorkingDirectory).removeRecursively();
-    }
-
-    QDir().mkdir(m_matlabTemporaryWorkingDirectory);
-}
-
-auto SimulinkImporterPlugin::generateMatLabCommand(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QString
+auto SimulinkImporterPlugin::generateMatLabCallArguments(QFileInfo &workspaceFileInfo, const QString& inputFilePath) -> QStringList
 {
     const QString workspaceLoadFunction = generateWorkspaceLoadCallFunction(workspaceFileInfo);
     const QString tasteExporterFunction = generateTasteExporterCallFunction(inputFilePath);
 
+    QString matlabBatchArgument;
+
     if(workspaceLoadFunction.isEmpty()) {
-        return m_matlabCommandWithoutWorkspaceLoadTemplate
-                .arg(m_matlabTemporaryWorkingDirectory)
-                .arg(tasteExporterFunction);
+        matlabBatchArgument = m_matlabCommandWithoutWorkspaceLoadTemplate
+                                .arg(m_matlabTemporaryWorkingDirectory)
+                                .arg(tasteExporterFunction);
     } else {
-        return m_matlabCommandWithWorkspaceLoadTemplate
-                .arg(m_matlabTemporaryWorkingDirectory)
-                .arg(workspaceLoadFunction)
-                .arg(tasteExporterFunction);
+        matlabBatchArgument = m_matlabCommandWithWorkspaceLoadTemplate
+                                .arg(m_matlabTemporaryWorkingDirectory)
+                                .arg(workspaceLoadFunction)
+                                .arg(tasteExporterFunction);
     }
+
+    return {"-batch", matlabBatchArgument};
 }
 
 auto SimulinkImporterPlugin::generateWorkspaceLoadCallFunction(QFileInfo &workspaceFileInfo) -> QString
@@ -360,10 +357,9 @@ auto SimulinkImporterPlugin::getWorkspaceLoadFunctionNameForWorkspaceFileExtensi
 
 auto SimulinkImporterPlugin::copyInputSlxFileToWorkDirectory(const QString &inputFilePath, const QString &functionBlockName) -> void
 {
-    const QString currentProjectDirectory = m_currentProject->projectDirectory().toString();
     const QString escapedFunctionBlockName = functionBlockName.toLower();
     const QString functionBlockInWorkDirectoryPath = m_functionBlockInWorkDirectoryPathTemplate
-                                                    .arg(currentProjectDirectory)
+                                                    .arg(m_currentProjectDirectoryPath)
                                                     .arg(escapedFunctionBlockName)
                                                     .arg(m_functionBlockDefaultImplementation);
 
@@ -385,7 +381,8 @@ auto SimulinkImporterPlugin::generateExportedXmlFilePath(const QString& inputFil
 {
     const QFileInfo inputFileInfo(inputFilePath);
 
-    return QString("%1/%2/%3.xml")
+    return QString("%1/%2/%3/%4.xml")
+            .arg(m_currentProjectDirectoryPath)
             .arg(m_matlabTemporaryWorkingDirectory)
             .arg(m_tasteExporterOutputDirectory)
             .arg(inputFileInfo.baseName());
@@ -395,6 +392,9 @@ auto SimulinkImporterPlugin::importXmlFileAndRemoveTemporaries(const QString &in
 {
     const QString ivConfig = shared::interfaceCustomAttributesFilePath();
 
+    moveToProjectDirectoryAndPrepareTemporaryWorkingDirectory(m_convertersTemporaryWorkingDirectory);
+    QDir::setCurrent(m_convertersTemporaryWorkingDirectory);
+
     const QStringList generatedAsn1FileNames = convertXmlFileToAsn1(inputFilePath);
 
     if(generatedAsn1FileNames.isEmpty()) {
@@ -402,18 +402,18 @@ auto SimulinkImporterPlugin::importXmlFileAndRemoveTemporaries(const QString &in
     }
 
     if(!convertXmlFileToIv(inputFilePath, functionBlockName, ivConfig)) {
-        removeConvertersTemporaries(generatedAsn1FileNames);
+        moveToProjectDirectoryAndRemoveConvertersTemporaryWorkingDirectory();
         return false;
     }
 
     if(!addIvToCurrentProject(ivConfig)) {
-        removeConvertersTemporaries(generatedAsn1FileNames);
+        moveToProjectDirectoryAndRemoveConvertersTemporaryWorkingDirectory();
         return false;
     }
 
     addGeneratedAsn1FilesToCurrentProject(generatedAsn1FileNames);
 
-    removeConvertersTemporaries(generatedAsn1FileNames);
+    moveToProjectDirectoryAndRemoveConvertersTemporaryWorkingDirectory();
 
     printInfoInGeneralMessages(GenMsg::filesImported);
 
@@ -625,11 +625,16 @@ auto SimulinkImporterPlugin::addIvFunctionToIvModel(ivm::IVFunction *const sourc
 
 auto SimulinkImporterPlugin::addGeneratedAsn1FilesToCurrentProject(const QStringList &generatedAsn1FileNames) -> void
 {
-    const QString currentProjectDirectory = m_currentProject->projectDirectory().toString();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    const Utils::FileNameList currentProjectFiles = m_currentProject->files(ProjectExplorer::Project::SourceFiles);
     QStringList asn1FilePathsToBeAddedToProject;
+#else
+    const Utils::FilePaths currentProjectFiles = m_currentProject->files(ProjectExplorer::Project::SourceFiles);
+    Utils::FilePaths asn1FilePathsToBeAddedToProject;
+#endif
 
     for(auto &asn1FileName : generatedAsn1FileNames) {
-        QString destinationAsn1FilePath = QString("%1/%2").arg(currentProjectDirectory).arg(asn1FileName);
+        QString destinationAsn1FilePath = QString("%1/%2").arg(m_currentProjectDirectoryPath).arg(asn1FileName);
 
         QMessageBox::StandardButton messageBoxQuestionAnswer = QMessageBox::StandardButton::Yes;
         bool isFileExists = false;
@@ -652,13 +657,26 @@ auto SimulinkImporterPlugin::addGeneratedAsn1FilesToCurrentProject(const QString
 
             QFile(asn1FileName).copy(destinationAsn1FilePath);
 
-            asn1FilePathsToBeAddedToProject.append(destinationAsn1FilePath);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            Utils::FileName destinationAsn1UtilsFileName = Utils::FileName::fromString(destinationAsn1FilePath);
+
+            if (!currentProjectFiles.contains(destinationAsn1UtilsFileName)) {
+                printInfoInGeneralMessages(GenMsg::fileHasBeenAddedToProject.arg(destinationAsn1FilePath));
+                asn1FilePathsToBeAddedToProject.append(destinationAsn1FilePath);
+            }
+#else
+            Utils::FilePath destinationAsn1UtilsFilePath = Utils::FilePath::fromString(destinationAsn1FilePath);
+
+            if (!currentProjectFiles.contains(destinationAsn1UtilsFilePath)) {
+                printInfoInGeneralMessages(GenMsg::fileHasBeenAddedToProject.arg(destinationAsn1FilePath));
+                asn1FilePathsToBeAddedToProject.append(destinationAsn1UtilsFilePath);
+            }
+#endif
         } else {
             printInfoInGeneralMessages(GenMsg::fileHasNotBeenOverridden.arg(asn1FileName));
         }
     }
 
-    m_currentProject->rootProjectNode()->removeFiles(asn1FilePathsToBeAddedToProject); // dont want to duplicate files in .pro file
     m_currentProject->rootProjectNode()->addFiles(asn1FilePathsToBeAddedToProject);
 }
 
@@ -675,16 +693,31 @@ auto SimulinkImporterPlugin::isFileIsOneOfMatLabStandardDataTypesFiles(const QSt
     return false;
 }
 
-auto SimulinkImporterPlugin::removeConvertersTemporaries(const QStringList &generatedAsn1FileNames) -> void
+auto SimulinkImporterPlugin::moveToProjectDirectoryAndPrepareTemporaryWorkingDirectory(const QString& temporaryWorkingDirectoryName) -> void
 {
-    checkIfFileExistsAndRemoveIt(m_temporaryIvFileName);
+    QDir::setCurrent(m_currentProjectDirectoryPath);
+
+    const bool isTemporaryWorkingDirectoryExists = QDir().exists(temporaryWorkingDirectoryName);
+
+    if(isTemporaryWorkingDirectoryExists) { 
+        QDir(temporaryWorkingDirectoryName).removeRecursively();
+    }
+
+    QDir().mkdir(temporaryWorkingDirectoryName);
+}
+
+auto SimulinkImporterPlugin::moveToProjectDirectoryAndRemoveConvertersTemporaryWorkingDirectory() -> void
+{
+    QDir::setCurrent(m_currentProjectDirectoryPath);
+
+    QDir convertersTemporaryWorkingDirectory(m_convertersTemporaryWorkingDirectory);
     
-    for(const QString &asn1FileName : generatedAsn1FileNames) {
-        checkIfFileExistsAndRemoveIt(asn1FileName);
+    if(convertersTemporaryWorkingDirectory.exists()) {
+        convertersTemporaryWorkingDirectory.removeRecursively();
     }
 }
 
-auto SimulinkImporterPlugin::removeMatLabCommandTemporaries() -> void
+auto SimulinkImporterPlugin::removeMatLabTemporaryWorkingDirectory() -> void
 {
     QDir matlabTemporaryWorkingDirectory(m_matlabTemporaryWorkingDirectory);
     
@@ -710,6 +743,15 @@ auto SimulinkImporterPlugin::printPluginSelfIntroductionInGeneralMessages() -> v
     
     MessageManager::write("");
     MessageManager::write(completeMessage);
+}
+
+auto SimulinkImporterPlugin::printMatLabCommand(const QStringList& matlabCallArguments) -> void
+{
+    const QString matlabCommand = QString("%1 %2")
+                                    .arg(m_matlabAppName)
+                                    .arg(matlabCallArguments.join(' '));
+
+    printInfoInGeneralMessages(GenMsg::executingMatlabCommand.arg(matlabCommand));
 }
 
 auto SimulinkImporterPlugin::printInfoInGeneralMessages(const QString &message) -> void

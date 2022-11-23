@@ -1090,7 +1090,7 @@ void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal 
     const qreal maxY = rect.height() - margin;
     const QFontMetricsF fm(painter->font());
     bool complete = false;
-    for (auto line : text.split(QLatin1Char('\n'))) {
+    for (const auto &line : text.split(QLatin1Char('\n'))) {
         QTextLayout textLayout(line);
         textLayout.setFont(painter->font());
         textLayout.beginLayout();

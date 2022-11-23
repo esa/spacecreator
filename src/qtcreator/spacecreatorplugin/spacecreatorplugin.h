@@ -23,6 +23,7 @@
 #include "options/hwlibraryoption.h"
 #include "options/ivlibraryoption.h"
 #include "options/propertyoptions.h"
+#include "options/tmcoptions.h"
 #include "spacecreatorplugin_global.h"
 
 #include <QSharedPointer>
@@ -49,6 +50,7 @@ class EditorCore;
 
 namespace spctr {
 
+class SclEditorFactory;
 class IVEditorFactory;
 class DVEditorFactory;
 class MscEditorFactory;
@@ -70,6 +72,7 @@ public:
 private:
     void addHelp();
 
+    SclEditorFactory *m_sclFactory = nullptr;
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;
     DVEditorFactory *m_dvFactory = nullptr;
@@ -81,6 +84,7 @@ private:
     PropertyOptions m_propertyOptions;
     HwLibraryOption m_hwLibraryOptions;
     IVLibraryOption m_ivLibraryOptions;
+    TmcOptions m_tmcOptions;
 };
 
 }

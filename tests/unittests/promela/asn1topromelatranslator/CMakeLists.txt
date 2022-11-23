@@ -8,6 +8,8 @@ target_sources(${TEST_NAME}
     PRIVATE     tst_asn1topromelatranslator.cpp
                 tst_integersubset.cpp
                 tst_integergenerator.cpp
+                tst_realsubset.cpp
+                tst_realgenerator.cpp
                 tst_asn1topromelatranslator_env.cpp
                 tst_asn1topromelatranslator_rangechecks.cpp
                 tst_asn1topromelatranslator_values.cpp
@@ -15,6 +17,8 @@ target_sources(${TEST_NAME}
                 tst_asn1topromelatranslator.h
                 tst_integersubset.h
                 tst_integergenerator.h
+                tst_realsubset.h
+                tst_realgenerator.h
                 tst_asn1topromelatranslator_env.h
                 tst_asn1topromelatranslator_rangechecks.h
                 tst_asn1topromelatranslator_values.h)

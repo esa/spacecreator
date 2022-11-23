@@ -1,0 +1,14 @@
+SUBTYPE DEFINITIONS ::=
+BEGIN
+
+
+T-SmallInteger ::= INTEGER(0 | 4 | 10)
+
+Egse-tc-cfg ::= SEQUENCE {
+    param-a T-SmallInteger,
+    param-b T-SmallInteger
+}
+
+Sensor-reading-x ::= T-SmallInteger
+
+END

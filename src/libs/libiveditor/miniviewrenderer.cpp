@@ -21,8 +21,10 @@
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
 #include "ivmodel.h"
+#include "ivnamevalidator.h"
 
 #include <QGraphicsView>
+#include <QLabel>
 #include <QPainter>
 #include <QtDebug>
 #include <QtGlobal>
@@ -37,7 +39,7 @@ MiniViewRenderer::MiniViewRenderer(const IVFunctionGraphicsItem *item)
 {
 }
 
-MiniViewRenderer::~MiniViewRenderer() {}
+MiniViewRenderer::~MiniViewRenderer() { }
 
 void MiniViewRenderer::render(QPainter *painter)
 {
@@ -61,7 +63,11 @@ void MiniViewRenderer::render(QPainter *painter)
     for (auto it = d->rects.cbegin(); it != d->rects.cend(); ++it) {
         painter->drawRect(it.value());
 
-        const QString text = d->item->entity()->model()->getObject(it.key())->titleUI();
+        const ivm::IVObject *obj = d->item->entity()->model()->getObject(it.key());
+        if (!obj)
+            continue;
+
+        const QString text = ivm::IVNameValidator::decodeName(obj->type(), obj->title());
         static const qreal margin = 8;
         shared::graphicsviewutils::drawText(
                 painter, it.value().adjusted(margin, margin, -margin, -margin), text, margin);
