@@ -204,6 +204,14 @@
                 {
                     "source": "deploymentview.dv.xml",
                     "target": "%{ProjectDirectory}/deploymentview.dv.xml"
+                },
+                {
+                    "source": "snippet_ocarina_components.aadl",
+                    "target": "%{ProjectDirectory}/snippets/ocarina_components.aadl"
+                },
+                {
+                    "source": "snippet_Board1.xml",
+                    "target": "%{ProjectDirectory}/snippets/Board1.xml"
                 }
             ]
         }
