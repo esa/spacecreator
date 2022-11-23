@@ -83,7 +83,7 @@ void tst_CmdFunctionImplementationDefaultChange::test_switchDefaultImplementatio
     QFileInfo linkInfo(m_handler->functionBasePath() + "/Ada");
 
     QCOMPARE(linkInfo.exists(), true);
-    QCOMPARE(linkInfo.isSymbolicLink(), true);
+    QCOMPARE(linkInfo.isSymLink(), true);
     QCOMPARE(linkInfo.symLinkTarget(), defaultTarget);
 
     m_cmd->redo();
@@ -94,7 +94,7 @@ void tst_CmdFunctionImplementationDefaultChange::test_switchDefaultImplementatio
     //new is set up
     QFileInfo linkInfo2(m_handler->functionBasePath() + "/SDL");
     QCOMPARE(linkInfo2.exists(), true);
-    QCOMPARE(linkInfo2.isSymbolicLink(), true);
+    QCOMPARE(linkInfo2.isSymLink(), true);
     const QString newTarget = m_handler->implementationPath("SimpleCode", "SDL");
     QCOMPARE(linkInfo2.symLinkTarget(), newTarget);
 }
@@ -108,7 +108,7 @@ void tst_CmdFunctionImplementationDefaultChange::test_undoDefaultImplementation(
     const QString defaultTarget = m_handler->implementationPath("MyCode", "Ada");
     QFileInfo linkInfo(m_handler->functionBasePath() + "/Ada");
     QCOMPARE(linkInfo.exists(), true);
-    QCOMPARE(linkInfo.isSymbolicLink(), true);
+    QCOMPARE(linkInfo.isSymLink(), true);
     QCOMPARE(linkInfo.symLinkTarget(), defaultTarget);
     // old link is gone
     QFileInfo linkInfo2(m_handler->functionBasePath() + "/SDL");

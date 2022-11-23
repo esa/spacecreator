@@ -145,7 +145,7 @@ void tst_CmdFunctionImplementationUpdate::test_changeDefaultImplementationLangua
     // The default implementation link is "Ada" and points to "..../impl/MyCode/Ada"
     QFileInfo oldLinkInfo(m_handler->functionBasePath() + "/Ada");
     QCOMPARE(oldLinkInfo.exists(), true);
-    QCOMPARE(oldLinkInfo.isSymbolicLink(), true);
+    QCOMPARE(oldLinkInfo.isSymLink(), true);
     QCOMPARE(oldLinkInfo.symLinkTarget(), oldPath);
 
     m_cmd->redo();
@@ -163,7 +163,7 @@ void tst_CmdFunctionImplementationUpdate::test_changeDefaultImplementationLangua
     QCOMPARE(oldLinkInfo.exists(), false);
     QFileInfo newLinkInfo(m_handler->functionBasePath() + "/SDL");
     QCOMPARE(newLinkInfo.exists(), true);
-    QCOMPARE(newLinkInfo.isSymbolicLink(), true);
+    QCOMPARE(newLinkInfo.isSymLink(), true);
     QCOMPARE(newLinkInfo.symLinkTarget(), m_handler->implementationPath("NewCode", "SDL"));
 }
 

@@ -20,6 +20,8 @@
 #include "ivpropertytemplate.h"
 #include "ivcommonprops.h"
 
+#include <QDebug>
+
 namespace ivm {
 
 const static QString kSysAttrsConfigFilePath = QLatin1String(":/defaults/resources/iv_system_attributes.xml");
