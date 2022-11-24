@@ -19,11 +19,15 @@
 
 #include "iveditordata.h"
 #include "spacecreatorpluginconstants.h"
-#include "spacecreatorproject.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QGuiApplication>
+
+#if QTC_VERSION < 9
 #include <coreplugin/fileiconprovider.h>
+#else
+#include <utils/fsengine/fileiconprovider.h>
+#endif
 
 namespace spctr {
 
@@ -38,7 +42,11 @@ IVEditorFactory::IVEditorFactory(SpaceCreatorProjectManager *projectManager, QOb
 #if QTC_VERSION > 414
     setEditorCreator(std::bind(&IVEditorFactory::createIVEditor, this));
 #endif
+#if QTC_VERSION < 9
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
+#else
+    Utils::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
+#endif
 }
 
 Core::IEditor *IVEditorFactory::createIVEditor()

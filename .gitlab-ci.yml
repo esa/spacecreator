@@ -76,8 +76,8 @@ spacecreator-qt6-master:
   stage: build-test-bundle
   variables:
     PROJECT_DIR: ${CI_PROJECT_DIR}
-    ENV_QT_VERSION: 6.3.1
-    ENV_QTC_VERSION: 8.0.1
+    ENV_QT_VERSION: 6.4.1
+    ENV_QTC_VERSION: 9.0.0
     ENV_DIR: /opt/spacecreator6
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
@@ -152,8 +152,8 @@ spacecreator-qt6-feature:
   stage: build-test
   variables:
     PROJECT_DIR: ${CI_PROJECT_DIR}
-    ENV_QT_VERSION: 6.3.1
-    ENV_QTC_VERSION: 8.0.1
+    ENV_QT_VERSION: 6.4.1
+    ENV_QTC_VERSION: 9.0.0
     ENV_DIR: /opt/spacecreator6
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
