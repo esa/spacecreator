@@ -23,7 +23,7 @@
 
 #include <QGuiApplication>
 
-#if QTC_VERSION < 9
+#if QTC_VERSION < 900
 #include <coreplugin/fileiconprovider.h>
 #else
 #include <utils/fsengine/fileiconprovider.h>
@@ -42,7 +42,7 @@ IVEditorFactory::IVEditorFactory(SpaceCreatorProjectManager *projectManager, QOb
 #if QTC_VERSION > 414
     setEditorCreator(std::bind(&IVEditorFactory::createIVEditor, this));
 #endif
-#if QTC_VERSION < 9
+#if QTC_VERSION < 900
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
 #else
     Utils::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");

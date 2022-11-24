@@ -23,7 +23,7 @@
 
 #include <QGuiApplication>
 
-#if QTC_VERSION < 9
+#if QTC_VERSION < 900
 #include <coreplugin/fileiconprovider.h>
 #else
 #include <utils/fsengine/fileiconprovider.h>
@@ -43,7 +43,7 @@ MscEditorFactory::MscEditorFactory(SpaceCreatorProjectManager *projectManager, Q
     setEditorCreator(std::bind(&MscEditorFactory::createMSCEditor, this));
 #endif
 
-#if QTC_VERSION < 9
+#if QTC_VERSION < 900
     Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
 #else
     Utils::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
