@@ -31,7 +31,12 @@ class MscDocument;
 class MscReader
 {
 public:
-    MscReader();
+    enum class NOTIFY {
+        USE_ERROR_HUB,
+        NO_HUB
+    };
+
+    MscReader(NOTIFY notifyErrorHub);
 
     MscModel *parseFile(const QString &filename, QStringList *errorMessages = nullptr);
     MscModel *parseText(const QString &text, QStringList *errorMessages = nullptr);
@@ -43,6 +48,7 @@ private:
     void checkDocumentHierarchy(MscDocument *doc);
 
     QStringList m_errorMessages;
+    NOTIFY m_notifyErrorHub = NOTIFY::NO_HUB;
 };
 
 }

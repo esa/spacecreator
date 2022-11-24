@@ -464,7 +464,7 @@ void EndToEndView::setMscFile(const QString &fileName)
 
     d->model = d->mscModelFetcher(fileName);
     if (d->model == nullptr) {
-        msc::MscReader reader;
+        msc::MscReader reader(msc::MscReader::NOTIFY::NO_HUB);
         try {
             d->model = reader.parseFile(fileName);
             d->model->setParent(this);
