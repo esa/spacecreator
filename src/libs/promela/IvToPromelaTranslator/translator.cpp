@@ -499,11 +499,15 @@ void IvToPromelaTranslator::generateInitProctype(Context &context) const
 
     sequence.appendElement(InlineCall("global_dataview_init", {}));
 
-    for (const QString &functionName : context.modelFunctions()) {
+    std::vector<QString> modelFunctions = context.modelFunctions();
+    std::sort(modelFunctions.begin(), modelFunctions.end());
+    for (const QString &functionName : modelFunctions) {
         initializeFunction(sequence, functionName);
     }
 
-    for (const QString &observer : context.observerNames()) {
+    std::vector<QString> observerNames = context.observerNames();
+    std::sort(observerNames.begin(), observerNames.end());
+    for (const QString &observer : observerNames) {
         initializeFunction(sequence, observer);
     }
 
@@ -1095,17 +1099,13 @@ void IvToPromelaTranslator::createSystemState(Context &context) const
 
     Utype systemState("system_state");
 
-    for (const auto &observer : context.observerNames()) {
-        QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(observer));
-        QString fieldName = Escaper::escapePromelaField(observer);
-        systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
-    }
-
-    const auto &modelFunctions = context.modelFunctions();
-    for (IVFunction *ivFunction : ivFunctionList) {
-        const QString functionName = ivFunction->property("name").toString();
-        if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) == modelFunctions.end()) {
-            continue;
+    std::vector<QString> modelFunctions = context.modelFunctions();
+    std::sort(modelFunctions.begin(), modelFunctions.end());
+    for (const QString &functionName : modelFunctions) {
+        const IVFunction *ivFunction = context.ivModel()->getFunction(functionName, Qt::CaseInsensitive);
+        if (ivFunction == nullptr) {
+            throw TranslationException(
+                    QString("Function with name '%1' does not exist in InterfaceView").arg(functionName));
         }
         if (ivFunction->instanceOf() != nullptr) {
             const QString functionTypeName = ivFunction->instanceOf()->property("name").toString();
@@ -1117,6 +1117,14 @@ void IvToPromelaTranslator::createSystemState(Context &context) const
             QString fieldName = Escaper::escapePromelaField(functionName);
             systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
         }
+    }
+
+    std::vector<QString> observerNames = context.observerNames();
+    std::sort(observerNames.begin(), observerNames.end());
+    for (const auto &observer : observerNames) {
+        QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(observer));
+        QString fieldName = Escaper::escapePromelaField(observer);
+        systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
     }
 
     systemState.addField(Declaration(DataType(UtypeRef("AggregateTimerData")), "timers"));
