@@ -1666,7 +1666,7 @@ void IvToPromelaTranslator::prepareFunctionInfo(Context &context, const ::ivm::I
             const QString parameterType = QString();
             const QString parameterName = QString();
             const ObserverAttachments outputObservers =
-                    context.getObserverAttachments(functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
+                    getObserverAttachments(context, functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
             std::unique_ptr<ProctypeInfo> proctypeInfo = std::make_unique<ProctypeInfo>();
 
             proctypeInfo->m_proctypeName = proctypeName;
