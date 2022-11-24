@@ -29,13 +29,6 @@ TmcOptionsWidget::TmcOptionsWidget(QWidget *parent)
     , m_ui(new Ui::TmcOptionsWidget())
 {
     m_ui->setupUi(this);
-
-    connect(m_ui->pathButton, &QPushButton::clicked, this, [this]() {
-        QString exec = QFileDialog::getExistingDirectory(this, tr("Select default output directory"), getDefaultOutputDirectory());
-        if(!exec.isEmpty()) {
-            m_ui->outputDirectoryLineEdit->setText(exec);
-        }
-    });
 }
 
 TmcOptionsWidget::~TmcOptionsWidget()

@@ -1673,16 +1673,14 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
 {
     QString outputDirectoryFilepath;
     {
+        // ensure the default output directory exists
+        QSettings settings;
+        QVariant defaultOutputDirectory = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, QString());
+        QString defaultOutputFullPath = QStringLiteral ("%1/%2").arg (projectDir, defaultOutputDirectory.toString());
+        QDir (defaultOutputFullPath).mkpath(QStringLiteral("."));
 
         QFileDialog fileDialog;
-        QSettings settings;
-        QVariant defaultOutputDirectory = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY);
-        if (defaultOutputDirectory.isValid()) {
-            fileDialog.setDirectory(defaultOutputDirectory.toString());
-        } else {
-            fileDialog.setDirectory(projectDir);
-        }
-
+        fileDialog.setDirectory(defaultOutputFullPath);
         fileDialog.setFileMode(QFileDialog::FileMode::Directory);
         fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
         fileDialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
@@ -1696,13 +1694,12 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
         } else {
             return;
         }
-        // save output directory
-        settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, outputDirectoryFilepath);
+        // save relative output path
+        const QString relativeOutputDirectory = QDir(projectDir).relativeFilePath(outputDirectoryFilepath);
+        settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, relativeOutputDirectory);
     }
 
-
     QFileInfo outputDirectory(outputDirectoryFilepath);
-
     if (outputDirectory.exists()) {
         if (!outputDirectory.isDir()) {
             QMessageBox::warning(this, tr("Call Spin"), tr("Selected output is not directory!"), QMessageBox::Cancel);
