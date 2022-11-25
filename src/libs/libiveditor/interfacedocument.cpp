@@ -186,9 +186,16 @@ bool InterfaceDocument::load(const QString &path)
     return loaded;
 }
 
+/**
+ * Does load the imported and shared components.
+ * If they are loaded already, nothing is done.
+ */
 bool InterfaceDocument::loadAvailableComponents()
 {
-    return reloadComponentModel() && reloadSharedTypeModel();
+    if (d->importModel->isEmpty() && d->sharedModel->isEmpty()) {
+        return reloadComponentModel() && reloadSharedTypeModel();
+    }
+    return false;
 }
 
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
@@ -896,6 +903,8 @@ bool InterfaceDocument::loadImpl(const QString &path)
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
         return false;
     }
+
+    loadAvailableComponents();
 
     shared::ErrorHub::setCurrentFile(path);
     ivm::IVXMLReader parser;
