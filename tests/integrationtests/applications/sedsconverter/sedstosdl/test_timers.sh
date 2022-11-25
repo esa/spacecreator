@@ -9,6 +9,7 @@ OPENGEODE=$HOME/.local/bin/opengeode
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
+XMLDIFF="xmldiff"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"
@@ -30,7 +31,7 @@ cd $TEST_OUTPUT_DIR
 # Compare output against reference, and compile to make sure the reference is valid
 # Clean (rm) only if all steps pass
 $DIFF component.pr ../resources/test_timers.output \
-  && $DIFF interfaceview.xml ../resources/test_timers.interfaceview \
+  && $XMLDIFF interfaceview.xml ../resources/test_timers.interfaceview \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t ../resources/xml2iv/interfaceview.tmplt \
   -x InterfaceView.aadl \

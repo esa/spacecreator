@@ -301,7 +301,7 @@ QStringList SedsConverterCLI::getInputFilepaths(conversion::ModelType modelType)
     for (const auto &extension : extensions) {
         const auto extensionString = extension.toStdString();
         const auto range = m_inputFilepaths.equal_range(extensionString);
-        std::for_each(range.first, range.second, [&result](auto &&filepath) { result << std::move(filepath.second); });
+        std::for_each(range.first, range.second, [&result](const auto &filepath) { result << filepath.second; });
     }
 
     return result;
