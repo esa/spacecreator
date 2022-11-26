@@ -141,12 +141,14 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
     QRectF newRect = resizedRect(grip, from, to);
     setGeometry(newRect);
 
+    // Update positions of interface attachment points (iface)
     const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
     for (auto child : childItems())
     {
         auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
         if (iface)
         {
+            // Read the stored coordinates
             const VEObject *obj = iface->entity();
             Q_ASSERT(obj);
             if (!obj) {
@@ -154,12 +156,13 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
             }
 
             const QPointF storedPos = graphicsviewutils::pos(obj->coordinates());
-            if (storedPos.isNull() || !grip) // how can grip be null? move
+            if (storedPos.isNull())
             {
                 iface->instantLayoutUpdate();
                 continue;
             }
 
+            // Calculate the new postion of the iface.
             const Qt::Alignment side = graphicsviewutils::getNearestSide(entityRect, storedPos);
             const QRectF sceneRect = sceneBoundingRect();
             const QPointF pos = graphicsviewutils::getSidePosition(sceneRect, storedPos, side);

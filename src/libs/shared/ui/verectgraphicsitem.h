@@ -55,10 +55,11 @@ protected:
 
     /**
      * @brief resizedRect takes a GripPoint sitting on this VERectGraphicsItem and two QPointFs representing the movement of the GripPoint and returns
-     * QRectF representing the new sceneBoundingRect of this VERectGraphicsItem based on the allowed movement of that particular handle.
+     * a QRectF representing the new sceneBoundingRect of this VERectGraphicsItem based on the allowed movement of that particular handle.
      * A corner GripPoint can move freely. A GripPoint on a horizontal line can only move
-     * up or down. A GripPoint on a vertical line can only move left or right. If a transformation is illegal, the existing QRect of
-     * this VERectGraphicsItem is returned. The value of minimalSize is respected.
+     * up or down. A GripPoint on a vertical line can only move left or right.
+     * If a transformation is illegal, the existing QRect of this VERectGraphicsItem is returned.
+     * The value of minimalSize is respected and interface attachment points are not moved.
      * @param grip a GripPoint
      * @param from a QPointF the GripPoint was moved from
      * @param to a QPointF the GripPoint was moved to
