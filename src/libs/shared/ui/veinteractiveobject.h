@@ -63,6 +63,8 @@ public:
     virtual void enableEditMode() {};
     virtual void childBoundingBoxChanged();
 
+    QString toString() const;
+
 Q_SIGNALS:
     void clicked(const QPointF &scenePos);
     void doubleClicked();
@@ -90,6 +92,11 @@ protected:
      * @brief updateText from model object
      */
     void updateText();
+
+    /**
+     * @brief minimumSize for VEinteractiveObject garanties that the text is visible
+     */
+    QSizeF minimumSize() const override;
 
 protected:
     const QPointer<VEObject> m_dataObject;

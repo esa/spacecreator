@@ -20,18 +20,14 @@
 #include "colors/colormanager.h"
 #include "commands/cmdentityattributeschange.h"
 #include "commands/cmdfunctionattrchange.h"
-#include "commandsstack.h"
+#include "commandsstackbase.h"
 #include "common.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcommonprops.h"
-#include "ivconnection.h"
-#include "ivconnectiongraphicsitem.h"
 #include "ivfunction.h"
-#include "ivfunctiongraphicsitem.h"
 #include "ivfunctionnamegraphicsitem.h"
-#include "ivinterfacegraphicsitem.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
@@ -113,12 +109,6 @@ void IVFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGrap
     painter->restore();
 }
 
-QSizeF IVFunctionTypeGraphicsItem::minimumSize() const
-{
-    const QSizeF textSize = m_textItem->boundingRect().size();
-    return { qMax(textSize.width(), shared::graphicsviewutils::kDefaultGraphicsItemSize.width()),
-        qMax(textSize.height(), shared::graphicsviewutils::kDefaultGraphicsItemSize.height()) };
-}
 
 QString IVFunctionTypeGraphicsItem::prepareTooltip() const
 {
@@ -210,6 +200,7 @@ void IVFunctionTypeGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF 
 {
     textRect.moveTopLeft(targetTextRect.topLeft());
 }
+
 
 shared::ui::TextItem *IVFunctionTypeGraphicsItem::initTextItem()
 {

@@ -73,6 +73,33 @@ void VEInteractiveObject::childBoundingBoxChanged()
     scheduleLayoutUpdate();
 }
 
+QString VEInteractiveObject::toString() const
+{
+    QString typeName = QString("VEInteractiveObject: ");
+    if (m_textItem == nullptr)
+    {
+        return typeName;
+    }
+
+    QString name;
+    if (m_textItem->textIsValid())
+    {
+        name = m_textItem->toPlainText();
+    }
+    else
+    {
+        name = "NoName";
+    }
+
+    auto br = sceneBoundingRect();
+    auto x = br.x();
+    auto y = br.y();
+    auto w = br.width();
+    auto h = br.height();
+    auto result = QString(typeName + name + " rect: %1,%2, (%3,%4)").arg(x).arg(y).arg(w).arg(h);
+    return result;
+}
+
 void VEInteractiveObject::mergeGeometry()
 {
 #ifdef __NONE__
@@ -209,7 +236,7 @@ TextItem *VEInteractiveObject::initTextItem()
     textItem->setEditable(true);
     textItem->setFont(font());
     textItem->setBackground(Qt::transparent);
-    textItem->setTextWrapMode(QTextOption::WrapAnywhere);
+    textItem->setTextWrapMode(QTextOption::NoWrap);
     textItem->setTextInteractionFlags(Qt::TextBrowserInteraction);
     textItem->setOpenExternalLinks(true);
     return textItem;
@@ -234,7 +261,8 @@ QString VEInteractiveObject::prepareTooltip() const
 
 void VEInteractiveObject::updateText()
 {
-    if (!m_textItem) {
+    if (!m_textItem)
+    {
         return;
     }
 
@@ -247,6 +275,13 @@ void VEInteractiveObject::updateText()
         m_textItem->setPlainText(entity()->titleUI());
     }
     updateTextPosition();
+}
+
+QSizeF VEInteractiveObject::minimumSize() const
+{
+    auto textSize = m_textItem->boundingRect().size();
+    textSize.rwidth() += 5.0;
+    return textSize.grownBy(shared::graphicsviewutils::kTextMargins);
 }
 
 } // namespace ui

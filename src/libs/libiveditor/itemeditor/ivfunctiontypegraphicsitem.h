@@ -40,8 +40,6 @@ public:
 
     void enableEditMode() override;
 
-    QSizeF minimumSize() const override;
-
     QString prepareTooltip() const override;
 
     bool isRootItem() const;
@@ -62,6 +60,7 @@ protected:
     void updateTextPosition() override;
 
     virtual void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const;
+
 
     shared::ui::TextItem *initTextItem() override;
 };
