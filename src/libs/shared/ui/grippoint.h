@@ -44,7 +44,7 @@ public:
         BottomLeft,
         TopRight,
         BottomRight,
-        Absolute
+        Absolute // Used for connection endpoints where only one GripPoint is needed.
     };
     Q_ENUM(Location)
     typedef QSet<GripPoint::Location> Locations;

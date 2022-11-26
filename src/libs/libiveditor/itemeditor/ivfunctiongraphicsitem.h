@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "ivconnectiongraphicsitem.h"
 #include "ivfunction.h"
 #include "ivfunctiontypegraphicsitem.h"
 
@@ -74,6 +73,5 @@ protected:
 
 private:
     static QPointer<QSvgRenderer> m_svgRenderer;
-    QList<IVInterfaceGraphicsItem *> m_interfaces;
 };
 }
