@@ -164,13 +164,18 @@ QPainterPath VEConnectionEndPointGraphicsItem::ifaceShape() const
     return mapToScene(shape());
 }
 
+Qt::Alignment VEConnectionEndPointGraphicsItem::alignment() const
+{
+    return m_alignment;
+}
+
 void VEConnectionEndPointGraphicsItem::rebuildLayout()
 {
     const QPointF entityPos = scenePos();
     const QRectF parentRect = targetItem()->sceneBoundingRect();
-    const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, entityPos);
-    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, entityPos, side);
-    updateInternalItems(side);
+    m_alignment = shared::graphicsviewutils::getNearestSide(parentRect, entityPos);
+    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, entityPos, m_alignment);
+    updateInternalItems(m_alignment);
     setPos(targetItem()->mapFromScene(stickyPos));
 }
 

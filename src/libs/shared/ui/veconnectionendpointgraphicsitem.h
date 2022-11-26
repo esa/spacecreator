@@ -52,6 +52,8 @@ public:
     bool doLayout() override;
     virtual QPainterPath ifaceShape() const;
 
+    Qt::Alignment alignment() const;
+
 protected:
     void rebuildLayout() override;
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -66,6 +68,7 @@ protected:
 protected:
     QList<QPointer<VEConnectionGraphicsItem>> m_connections;
     shared::graphicsviewutils::LookupDirection m_adjustDirection = graphicsviewutils::LookupDirection::Bidirectional;
+    Qt::Alignment m_alignment;
 };
 
 } // namespace ui
