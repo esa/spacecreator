@@ -35,7 +35,7 @@ IVFunctionNameGraphicsItem::IVFunctionNameGraphicsItem(QGraphicsItem *parent)
     setFont(QFont(qApp->font().family(), 11));
     setBackground(Qt::transparent);
     setFlags(QGraphicsItem::ItemIsSelectable);
-    setTextWrapMode(QTextOption::WrapAnywhere);
+    setTextWrapMode(QTextOption::NoWrap);
     setTextInteractionFlags(Qt::TextBrowserInteraction);
     setOpenExternalLinks(true);
 
