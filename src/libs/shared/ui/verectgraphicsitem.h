@@ -54,7 +54,7 @@ protected:
     void onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
     /**
-     * @brief transformedRect takes a GripPoint sitting on this VERectGraphicsItem and two QPointFs representing the movement of the GripPoint and returns
+     * @brief resizedRect takes a GripPoint sitting on this VERectGraphicsItem and two QPointFs representing the movement of the GripPoint and returns
      * QRectF representing the new sceneBoundingRect of this VERectGraphicsItem based on the allowed movement of that particular handle.
      * A corner GripPoint can move freely. A GripPoint on a horizontal line can only move
      * up or down. A GripPoint on a vertical line can only move left or right. If a transformation is illegal, the existing QRect of
@@ -64,10 +64,7 @@ protected:
      * @param to a QPointF the GripPoint was moved to
      * @return a QRect representing the new sceneBoundingRect of this VERectGraphicsItem
      */
-    QRectF transformedRect(GripPoint *grip, const QPointF &from, const QPointF &to);
-
     QRectF resizedRect(GripPoint *grip, const QPointF &from, const QPointF &to);
-    QRectF movedRect(const QPointF &from, const QPointF &to);
 
     bool setGeometry(const QRectF &sceneGeometry);
     void layoutInterfaces();
@@ -76,6 +73,10 @@ private Q_SLOTS:
     void onGeometryChanged();
 
 private:
+    QRectF checkMinimumSize(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect);
+    QRectF checkConnectionEndpoints(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect);
+    QRectF movedRect(const QPointF &from, const QPointF &to);
+
     bool m_overridingCursor = false;
     QSet<VEInteractiveObject *> m_collidedItems;
 };

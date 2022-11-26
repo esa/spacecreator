@@ -137,9 +137,8 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
         return;
     }
 
-    // calculate new rect for this item, given that 'grip' was moved as descriped by 'from' and 'to'
+    // Calculate new rect for this item, given that 'grip' was moved as descriped by 'from' and 'to'
     QRectF newRect = resizedRect(grip, from, to);
-    // Enforce minimal size
     setGeometry(newRect);
 
     const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
@@ -155,7 +154,7 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
             }
 
             const QPointF storedPos = graphicsviewutils::pos(obj->coordinates());
-            if (storedPos.isNull() || !grip) // how can grip be null?
+            if (storedPos.isNull() || !grip) // how can grip be null? move
             {
                 iface->instantLayoutUpdate();
                 continue;
@@ -215,61 +214,155 @@ void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pres
 
 QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    QRectF boundingRect = sceneBoundingRect();
+    QRectF sBoundingRect = sceneBoundingRect();
+    QRectF rectWithRespectToMinimum = checkMinimumSize(grip, to, sBoundingRect);
+    QRectF rectWithRespectToConnections = checkConnectionEndpoints(grip, to, sBoundingRect);
+    QRectF resultRect = rectWithRespectToMinimum.united(rectWithRespectToConnections);
+    return resultRect;
+}
 
+QRectF VERectGraphicsItem::checkMinimumSize(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
+{
+    QRectF result = sceneBoundingRect;
     QSizeF minSize = minimumSize();
+
+    // The minimum x-value the right side of this rect can have and not violate minimum size
+    auto xMin = sceneBoundingRect.left() + minSize.width();
+    // The maximum x-value the left side of this rect can have and not violate minimum size
+    auto xMax = sceneBoundingRect.right() - minSize.width();
+    // The minimum y-value the top side of this rect can have and not violate minimum size
+    auto yMin = sceneBoundingRect.top() + minSize.height();
+    // The maximum y-value the buttom side of this rect can have and not violate minimum size
+    auto yMax = sceneBoundingRect.bottom() - minSize.height();
 
     switch (grip->location()) {
     case GripPoint::Left:
     {
-        auto xMax = boundingRect.right() - minSize.width();
-        boundingRect.setLeft(qMin(to.x(), xMax));
+        result.setLeft(qMin(to.x(), xMax));
         break;
     }
     case GripPoint::Right:
     {
-        auto xMin = boundingRect.left() + minSize.width();
-        boundingRect.setRight(qMax(to.x(), xMin));
+        result.setRight(qMax(to.x(), xMin));
         break;
     }
     case GripPoint::Top:
     {
-        auto yMax = boundingRect.bottom() - minSize.height();
-        boundingRect.setTop(qMin(to.y(), yMax));
+        result.setTop(qMin(to.y(), yMax));
         break;
     }
     case GripPoint::Bottom:
     {
-        auto yMin = boundingRect.top() + minSize.height();
-        boundingRect.setBottom(qMax(to.y(), yMin));
+        result.setBottom(qMax(to.y(), yMin));
         break;
     }
     case GripPoint::TopLeft:
     {
-        auto yMax = boundingRect.bottom() - minSize.height();
-        auto xMax = boundingRect.right() - minSize.width();
-        boundingRect.setTopLeft(QPoint(qMin(to.x(), xMax), qMin(to.y(), yMax)));
+        result.setTopLeft(QPoint(qMin(to.x(), xMax), qMin(to.y(), yMax)));
         break;
     }
     case GripPoint::TopRight:
     {
-        auto yMax = boundingRect.bottom() - minSize.height();
-        auto xMin = boundingRect.left() + minSize.width();
-        boundingRect.setTopRight(QPoint(qMax(to.x(), xMin), qMin(to.y(), yMax)));
+        result.setTopRight(QPoint(qMax(to.x(), xMin), qMin(to.y(), yMax)));
         break;
     }
     case GripPoint::BottomLeft:
     {
-        auto yMin = boundingRect.top() + minSize.height();
-        auto xMax = boundingRect.right() - minSize.width();
-        boundingRect.setBottomLeft(QPoint(qMin(to.x(), xMax), qMax(to.y(), yMin)));
+        result.setBottomLeft(QPoint(qMin(to.x(), xMax), qMax(to.y(), yMin)));
         break;
     }
     case GripPoint::BottomRight:
     {
-        auto yMin = boundingRect.top() + minSize.height();
-        auto xMin = boundingRect.left() + minSize.width();
-        boundingRect.setBottomRight(QPoint(qMax(to.x(), xMin), qMax(to.y(), yMin)));
+        result.setBottomRight(QPoint(qMax(to.x(), xMin), qMax(to.y(), yMin)));
+        break;
+    }
+    default:
+        qWarning() << "Update grip point handling";
+        break;
+    }
+    return result;
+}
+
+QRectF VERectGraphicsItem::checkConnectionEndpoints(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
+{
+    QRectF result = sceneBoundingRect;
+    // Initialize limits so they will always loose any qMin or qMax comparison.
+    // Note: In QGraphicsView the Y-axis grows downwards. https://doc.qt.io/qt-6/graphicsview.html#the-graphics-view-coordinate-system
+    qreal qINFINITY = std::numeric_limits<qreal>::infinity();
+    qreal leftMost = qINFINITY;
+    qreal rightMost = -qINFINITY;
+    qreal topMost = qINFINITY;
+    qreal bottomMost = -qINFINITY;
+    for (auto const &child: childItems())
+    {
+        auto endPoint = qobject_cast<ui::VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
+        if (endPoint == nullptr)
+        {
+            continue;
+        }
+
+        auto alignment = endPoint->alignment();
+        bool endPointIsHorizonal = alignment == Qt::AlignTop || alignment == Qt::AlignBottom;
+        bool endPointIsVertical =  alignment == Qt::AlignLeft || alignment == Qt::AlignRight;
+
+        auto childSceneBoundingRect = endPoint->sceneBoundingRect();
+        if (endPointIsHorizonal)
+        {
+            auto left = childSceneBoundingRect.left();
+            leftMost = qMin(leftMost, left);
+
+            auto right = childSceneBoundingRect.right();
+            rightMost = qMax(rightMost, right);
+        }
+        if (endPointIsVertical)
+        {
+            auto top = childSceneBoundingRect.top();
+            topMost = qMin(topMost, top);
+
+            auto bottom = childSceneBoundingRect.bottom();
+            bottomMost = qMax(bottomMost, bottom);
+        }
+    }
+
+    switch (grip->location()) {
+    case GripPoint::Left:
+    {
+        result.setLeft(qMin(to.x(), leftMost));
+        break;
+    }
+    case GripPoint::Right:
+    {
+        result.setRight(qMax(to.x(), rightMost));
+        break;
+    }
+    case GripPoint::Top:
+    {
+        result.setTop(qMin(to.y(), topMost));
+        break;
+    }
+    case GripPoint::Bottom:
+    {
+        result.setBottom(qMax(to.y(), bottomMost));
+        break;
+    }
+    case GripPoint::TopLeft:
+    {
+        result.setTopLeft(QPoint(qMin(to.x(), leftMost), qMin(to.y(), topMost)));
+        break;
+    }
+    case GripPoint::TopRight:
+    {
+        result.setTopRight(QPoint(qMax(to.x(), rightMost), qMin(to.y(), topMost)));
+        break;
+    }
+    case GripPoint::BottomLeft:
+    {
+        result.setBottomLeft(QPoint(qMin(to.x(), leftMost), qMax(to.y(), bottomMost)));
+        break;
+    }
+    case GripPoint::BottomRight:
+    {
+        result.setBottomRight(QPoint(qMax(to.x(), rightMost), qMax(to.y(), bottomMost)));
         break;
     }
     default:
@@ -277,9 +370,7 @@ QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, con
         break;
     }
 
-    // Check rect for collisions
-
-    return boundingRect;
+    return result;
 }
 
 QRectF VERectGraphicsItem::movedRect(const QPointF &from, const QPointF &to)
