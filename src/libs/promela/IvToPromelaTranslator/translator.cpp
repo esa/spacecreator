@@ -397,7 +397,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         }
     }
 
-    for (const auto &observerName : observerNames) {
+    for (const QString &observerName : systemInfo->m_observers) {
         promelaModel->addInclude(QString("%1.pml").arg(observerName));
     }
 
@@ -405,11 +405,13 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
     createSystemState(context);
 
-    for (const QString &function : modelFunctions) {
-        addChannelAndLock(context, function);
+    for (auto iter = systemInfo->m_functions.begin(); iter != systemInfo->m_functions.end(); ++iter) {
+        if (!iter->second->m_isEnvironment) {
+            addChannelAndLock(context, iter->first);
+        }
     }
 
-    for (const auto &observer : observerNames) {
+    for (const QString &observer : systemInfo->m_observers) {
         addChannelAndLock(context, observer);
     }
 
@@ -477,6 +479,8 @@ std::unique_ptr<IvToPromelaTranslator::SystemInfo> IvToPromelaTranslator::prepar
             result->m_functions.emplace(functionName, std::move(functionInfo));
         }
     }
+
+    result->m_observers = std::set<QString>(observerNames.begin(), observerNames.end());
 
     return result;
 }

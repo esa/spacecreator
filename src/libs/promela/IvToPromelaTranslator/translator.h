@@ -409,6 +409,11 @@ public:
          * This includes environment functions. The key in the map is name of the function.
          */
         std::map<QString, std::unique_ptr<FunctionInfo>> m_functions;
+
+        /**
+         * @brief all observers that are part of promela system.
+         */
+        std::set<QString> m_observers;
     };
 
     /**
