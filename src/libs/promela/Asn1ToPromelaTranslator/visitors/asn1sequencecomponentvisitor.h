@@ -39,6 +39,7 @@ public:
      * @param promelaModel target promela model
      * @param baseTypeName base name for nested types
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
+     * @param nestedIndexCounter parameter used to construct Asn1ItemTypeVisitor if required.
      */
     Asn1SequenceComponentVisitor(
             model::PromelaModel &promelaModel, QString baseTypeName, bool enhancedSpinSupport, int nestedIndexCounter);

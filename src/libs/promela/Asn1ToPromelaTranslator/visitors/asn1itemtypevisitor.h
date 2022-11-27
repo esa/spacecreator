@@ -45,6 +45,8 @@ public:
      * @param name name for new types
      * @param generateInits if true, then generate initialization inlines
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
+     * @param nestedIndexCounter an integer, which will be used as a suffix for index varialbes
+     * in loops, in case if nested loop will be required, then couter will be incremented
      */
     Asn1ItemTypeVisitor(model::PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name,
             bool generateInits, bool enhancedSpinSupport, int nestedIndexCounter);
