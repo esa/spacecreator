@@ -139,7 +139,6 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
 
     // Calculate new rect for this item, given that 'grip' was moved as descriped by 'from' and 'to'
     QRectF newRect = resizedRect(grip, from, to);
-    qDebug() << "newRect:" << newRect << Qt::endl;
     setGeometry(newRect);
 
     // Update positions of interface attachment points (iface)
@@ -222,16 +221,7 @@ QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, con
     QRectF rectWithRespectToMinimum = checkMinimumSize(grip, to, sBoundingRect);
     QRectF rectWithRespectToConnections = checkConnectionEndpoints(grip, to, sBoundingRect);
     QRectF resultRect = rectWithRespectToMinimum.united(rectWithRespectToConnections);
-    qDebug() << "sceneBoundingRect:" << sBoundingRect
-             << "To:" << to
-             << "Minimum:" << rectWithRespectToMinimum
-             << "Connections:"
-             << rectWithRespectToConnections
-             << "Result:" << resultRect
-             << Qt::endl;
     return resultRect;
-   // return rectWithRespectToMinimum;
-    //return rectWithRespectToConnections;
 }
 
 QRectF VERectGraphicsItem::checkMinimumSize(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
