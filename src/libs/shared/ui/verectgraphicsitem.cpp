@@ -139,6 +139,7 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
 
     // Calculate new rect for this item, given that 'grip' was moved as descriped by 'from' and 'to'
     QRectF newRect = resizedRect(grip, from, to);
+    qDebug() << "newRect:" << newRect << Qt::endl;
     setGeometry(newRect);
 
     // Update positions of interface attachment points (iface)
@@ -221,7 +222,16 @@ QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, con
     QRectF rectWithRespectToMinimum = checkMinimumSize(grip, to, sBoundingRect);
     QRectF rectWithRespectToConnections = checkConnectionEndpoints(grip, to, sBoundingRect);
     QRectF resultRect = rectWithRespectToMinimum.united(rectWithRespectToConnections);
+    qDebug() << "sceneBoundingRect:" << sBoundingRect
+             << "To:" << to
+             << "Minimum:" << rectWithRespectToMinimum
+             << "Connections:"
+             << rectWithRespectToConnections
+             << "Result:" << resultRect
+             << Qt::endl;
     return resultRect;
+   // return rectWithRespectToMinimum;
+    //return rectWithRespectToConnections;
 }
 
 QRectF VERectGraphicsItem::checkMinimumSize(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
@@ -289,13 +299,12 @@ QRectF VERectGraphicsItem::checkMinimumSize(GripPoint *grip, const QPointF &to, 
 QRectF VERectGraphicsItem::checkConnectionEndpoints(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
 {
     QRectF result = sceneBoundingRect;
-    // Initialize limits so they will always loose any qMin or qMax comparison.
     // Note: In QGraphicsView the Y-axis grows downwards. https://doc.qt.io/qt-6/graphicsview.html#the-graphics-view-coordinate-system
-    qreal qINFINITY = std::numeric_limits<qreal>::infinity();
-    qreal leftMost = qINFINITY;
-    qreal rightMost = -qINFINITY;
-    qreal topMost = qINFINITY;
-    qreal bottomMost = -qINFINITY;
+    qreal leftMost = result.right(); // The furthest to the left, the right-grip can go is the right side of the rect.
+    qreal rightMost = result.left(); // The furthes to the right, the left-grip can go is the left side of the rect.
+    qreal topMost = result.bottom(); // The deepest the top-grip can go, is the bottom of the rect.
+    qreal bottomMost = result.top(); // The highest the bottom-grip can go, is the top of the rect.
+
     for (auto const &child: childItems())
     {
         auto endPoint = qobject_cast<ui::VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
