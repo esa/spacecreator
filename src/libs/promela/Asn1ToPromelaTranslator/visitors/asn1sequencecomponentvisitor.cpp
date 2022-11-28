@@ -36,17 +36,19 @@ using promela::model::Utype;
 
 namespace promela::translator {
 Asn1SequenceComponentVisitor::Asn1SequenceComponentVisitor(
-        PromelaModel &promelaModel, QString baseTypeName, bool enhancedSpinSupport)
+        PromelaModel &promelaModel, QString baseTypeName, bool enhancedSpinSupport, int nestedIndexCounter)
     : m_promelaModel(promelaModel)
     , m_baseTypeName(std::move(baseTypeName))
     , m_enhancedSpinSupport(enhancedSpinSupport)
     , m_optionalComponent(false)
+    , m_nestedIndexCounter(nestedIndexCounter)
 {
 }
 
 void Asn1SequenceComponentVisitor::visit(const AsnSequenceComponent &component)
 {
-    Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, component.name(), false, m_enhancedSpinSupport);
+    Asn1ItemTypeVisitor visitor(
+            m_promelaModel, m_baseTypeName, component.name(), false, m_enhancedSpinSupport, m_nestedIndexCounter);
     component.type()->accept(visitor);
     m_componentName = Escaper::escapePromelaName(component.name());
     m_componentType = visitor.getResultDataType();
