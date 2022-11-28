@@ -31,7 +31,7 @@
 #include "asn1/project.h"
 
 using namespace Asn1Acn::Internal;
-#if (QT_VERSION <= QT_VERSION_CHECK(5, 13, 0))
+#if QTC_VERSION == 408
 ParsedDataStorage::ParsedDataStorage()
     : m_root(std::make_unique<Asn1Acn::Root>())
 {}
