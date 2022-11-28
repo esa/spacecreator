@@ -615,7 +615,12 @@ auto StateMachineTranslator::translateVariables(Context &context,
     for (const auto &variable : variables) {
         const auto variableName = Escaper::escapeSdlVariableName(variable.nameStr());
         const auto variableType = variable.type();
-        const auto variableTypeName = Escaper::escapeAsn1TypeName(variableType.nameStr());
+        auto variableTypeName = Escaper::escapeAsn1TypeName(variableType.nameStr());
+
+        const auto &arrayDimensions = variable.arrayDimensions();
+        if (!arrayDimensions.empty()) {
+            variableTypeName = handleVariableArrayDimensions(context, variableName, variableTypeName, arrayDimensions);
+        }
 
         auto sdlVariable =
                 std::make_unique<::sdl::VariableDeclaration>(variableName, Escaper::escapeSdlName(variableTypeName));
@@ -1528,6 +1533,83 @@ auto StateMachineTranslator::createTimerSetCall(QString timerName, const uint64_
             std::make_unique<::sdl::VariableLiteral>(QString::number(nanosecondsToMiliseconds(callTimeInNanoseconds))));
     call->addArgument(std::make_unique<::sdl::VariableLiteral>(std::move(timerName)));
     return call;
+}
+
+auto StateMachineTranslator::handleVariableArrayDimensions(Context &context, const QString &variableName,
+        const QString &variableTypeName, const std::vector<::seds::model::DimensionSize> &arrayDimensions) -> QString
+{
+    auto lastName = variableName;
+    auto lastIndexingTypeName = QString("%1_Index").arg(variableName);
+    auto lastElementTypeName = variableTypeName;
+
+    QString baseIndexingTypeName("MyIndexType");
+
+    for (auto it = arrayDimensions.rbegin(); it != arrayDimensions.rend(); ++it) {
+        const auto &arrayDimension = *it;
+
+        if (arrayDimension.size()) {
+            const auto &dimensionSize = arrayDimension.size()->value();
+
+            auto indexingType =
+                    createVariableSizeDimensionIndexingType(dimensionSize, lastIndexingTypeName, baseIndexingTypeName);
+            auto arrayType =
+                    createVariableSizeDimensionType(dimensionSize, lastName, indexingType.name(), lastElementTypeName);
+
+            lastName = arrayType.name();
+            lastIndexingTypeName = indexingType.name();
+            lastElementTypeName = arrayType.name();
+
+            context.sdlProcess()->addSyntype(std::move(indexingType));
+            context.sdlProcess()->addNewtype(std::move(arrayType));
+        } else if (arrayDimension.indexTypeRef()) {
+            const auto &dimensionTypeName = arrayDimension.indexTypeRef()->nameStr();
+
+            auto arrayType = createVariableTypeDimensionType(
+                    dimensionTypeName, lastName, dimensionTypeName, lastElementTypeName);
+
+            lastName = arrayType.name();
+            lastIndexingTypeName = QString("%1_%2").arg(lastIndexingTypeName).arg(dimensionTypeName);
+            lastElementTypeName = arrayType.name();
+
+            context.sdlProcess()->addNewtype(std::move(arrayType));
+        } else {
+            auto errorMessage = QString("Found variable array dimension without size nor indexTypeRef");
+            throw TranslationException(std::move(errorMessage));
+        }
+    }
+
+    return lastElementTypeName;
+}
+
+auto StateMachineTranslator::createVariableSizeDimensionIndexingType(
+        const uint64_t size, const QString &variableName, const QString &baseTypeName) -> ::sdl::Syntype
+{
+    auto indexTypeName = QString("%1_%2").arg(variableName).arg(size);
+
+    ::sdl::Syntype indexType(indexTypeName, baseTypeName);
+    indexType.addValueConstant(size);
+
+    return indexType;
+}
+
+auto StateMachineTranslator::createVariableSizeDimensionType(const uint64_t size, const QString &variableName,
+        const QString &indexingTypeName, const QString &elementTypeName) -> ::sdl::Newtype
+{
+    auto indexTypeName = QString("%1_%2").arg(variableName).arg(size);
+
+    ::sdl::Newtype arrayType(indexTypeName, indexingTypeName, elementTypeName);
+
+    return arrayType;
+}
+
+auto StateMachineTranslator::createVariableTypeDimensionType(const QString &typeName, const QString &variableName,
+        const QString &indexingTypeName, const QString &elementTypeName) -> ::sdl::Newtype
+{
+    auto indexTypeName = QString("%1_%2").arg(variableName).arg(typeName);
+
+    ::sdl::Newtype arrayType(indexTypeName, indexingTypeName, elementTypeName);
+
+    return arrayType;
 }
 
 auto StateMachineTranslator::getSdlState(const ::seds::model::StateRef &sedsState,
