@@ -331,19 +331,24 @@ void SdlVisitor::visit(const Process &process)
     m_writer.pushIndent(INDENT);
 
     const auto hasVariables = !process.variables().empty();
+    const auto hasSyntypes = !process.syntypes().empty();
     const auto hasNewtypes = !process.newtypes().empty();
     const auto hasTimers = !process.timerNames().empty();
     const auto hasSuccessStates = !process.successStates().empty();
     const auto hasErrorStates = !process.errorStates().empty();
     const auto hasProcedures = !process.procedures().empty();
 
-    if (hasVariables || hasNewtypes || hasTimers || hasSuccessStates || hasErrorStates) {
+    if (hasVariables || hasSyntypes || hasNewtypes || hasTimers || hasSuccessStates || hasErrorStates) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
 
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
             m_writer.writeLine("Timer " + timer + ";");
+        }
+
+        for (const auto &syntype : process.syntypes()) {
+            syntype.accept(*this);
         }
 
         for (const auto &newtype : process.newtypes()) {
@@ -573,6 +578,33 @@ void SdlVisitor::visit(const VariableDeclaration &declaration)
 
     m_writer.write(QString("%1 %2").arg(declaration.name()).arg(declaration.type()));
     m_writer.endLine(";");
+}
+
+void SdlVisitor::visit(const Syntype &syntype)
+{
+    if (syntype.name().isEmpty()) {
+        throw ExportException("Syntype shall have a name but it doesn't");
+    }
+
+    if (syntype.baseTypeName().isEmpty()) {
+        throw ExportException("Syntype shall have a base type name but it doesn't");
+    }
+
+    m_writer.writeComment(syntype.comment());
+
+    m_writer.beginLine(QString("syntype %1 = %2 ").arg(syntype.name(), syntype.baseTypeName()));
+
+    const auto &constants = syntype.constants();
+
+    if (constants.empty()) {
+        throw ExportException("Syntype shall have at least one constant, but it doesn't");
+    }
+
+    const auto constantsList = std::accumulate(std::next(constants.begin()), constants.end(), constants.front(),
+            [&](const auto &acc, const QString &constant) { return acc + ", " + constant; });
+    m_writer.write(QString("constants %1").arg(constantsList));
+
+    m_writer.endLine(" endsyntype;");
 }
 
 void SdlVisitor::visit(const Newtype &newtype)

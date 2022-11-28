@@ -306,6 +306,12 @@ public:
      */
     virtual auto visit(const VariableDeclaration &declaration) -> void override;
     /**
+     * @brief   Syntype visitor
+     *
+     * @param   syntype     Syntype to be serialized
+     */
+    virtual auto visit(const Syntype &syntype) -> void override;
+    /**
      * @brief   Newtype visitor
      *
      * @param   newtype     Newtype to be serialized

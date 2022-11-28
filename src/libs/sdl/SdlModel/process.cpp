@@ -65,6 +65,16 @@ void Process::addVariable(std::unique_ptr<VariableDeclaration> variable)
     m_variables.push_back(std::move(variable));
 }
 
+const std::vector<Syntype> &Process::syntypes() const
+{
+    return m_syntypes;
+}
+
+void Process::addSyntype(Syntype syntype)
+{
+    m_syntypes.push_back(std::move(syntype));
+}
+
 const std::vector<Newtype> &Process::newtypes() const
 {
     return m_newtypes;

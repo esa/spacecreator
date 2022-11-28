@@ -29,6 +29,7 @@ set(SOURCES     action.cpp
                 signalroute.cpp
                 state.cpp
                 statemachine.cpp
+                syntype.cpp
                 system.cpp
                 task.cpp
                 transition.cpp
@@ -61,6 +62,7 @@ set(INCLUDES    action.h
                 signalroute.h
                 state.h
                 statemachine.h
+                syntype.h
                 system.h
                 task.h
                 transition.h

@@ -23,6 +23,7 @@
 #include "node.h"
 #include "procedure.h"
 #include "statemachine.h"
+#include "syntype.h"
 #include "variabledeclaration.h"
 
 #include <QString>
@@ -114,6 +115,19 @@ public:
     auto addVariable(std::unique_ptr<VariableDeclaration> variable) -> void;
 
     /**
+     * @brief   Getter for the syntypes declared in this process
+     *
+     * @return  a const reference to a vector of syntypes declarations
+     */
+    auto syntypes() const -> const std::vector<Syntype> &;
+    /**
+     * @brief   Add a syntype declaration
+     *
+     * @param   syntype a syntype declaration
+     */
+    auto addSyntype(Syntype syntype) -> void;
+
+    /**
      * @brief   Getter for the newtypes declared in this process
      *
      * @return  a const reference to a vector of newtypes declarations
@@ -185,6 +199,7 @@ private:
     std::unique_ptr<Transition> m_startTransition;
     std::unique_ptr<StateMachine> m_stateMachine;
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
+    std::vector<Syntype> m_syntypes;
     std::vector<Newtype> m_newtypes;
     std::vector<std::unique_ptr<Procedure>> m_procedures;
     std::vector<QString> m_timerNames;
