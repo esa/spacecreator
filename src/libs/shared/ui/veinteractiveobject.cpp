@@ -279,9 +279,11 @@ void VEInteractiveObject::updateText()
 
 QSizeF VEInteractiveObject::minimumSize() const
 {
-    auto textSize = m_textItem->boundingRect().size();
-    textSize.rwidth() += 5.0;
-    return textSize.grownBy(shared::graphicsviewutils::kTextMargins);
+    QRectF boundingRect = m_textItem->boundingRect();
+    boundingRect = boundingRect.marginsAdded(shared::graphicsviewutils::kTextMargins);
+    QSizeF textSize = boundingRect.size();
+    textSize.rwidth() += 5.0; // A little extra space is needed, otherwise the text item moves about ever so sligtly.
+    return textSize;
 }
 
 } // namespace ui
