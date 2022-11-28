@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "newtype.h"
 #include "node.h"
 #include "procedure.h"
 #include "statemachine.h"
@@ -113,6 +114,19 @@ public:
     auto addVariable(std::unique_ptr<VariableDeclaration> variable) -> void;
 
     /**
+     * @brief   Getter for the newtypes declared in this process
+     *
+     * @return  a const reference to a vector of newtypes declarations
+     */
+    auto newtypes() const -> const std::vector<Newtype> &;
+    /**
+     * @brief   Add a newtype declaration
+     *
+     * @param   newtype a newtype declaration
+     */
+    auto addNewtype(Newtype newtype) -> void;
+
+    /**
      * @brief   Getter for the procedures declared in this process
      *
      * @return  a const reference to a vector of pointers to procedure
@@ -171,6 +185,7 @@ private:
     std::unique_ptr<Transition> m_startTransition;
     std::unique_ptr<StateMachine> m_stateMachine;
     std::vector<std::unique_ptr<VariableDeclaration>> m_variables;
+    std::vector<Newtype> m_newtypes;
     std::vector<std::unique_ptr<Procedure>> m_procedures;
     std::vector<QString> m_timerNames;
     QStringList m_successStates;

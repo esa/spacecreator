@@ -331,18 +331,23 @@ void SdlVisitor::visit(const Process &process)
     m_writer.pushIndent(INDENT);
 
     const auto hasVariables = !process.variables().empty();
+    const auto hasNewtypes = !process.newtypes().empty();
     const auto hasTimers = !process.timerNames().empty();
     const auto hasSuccessStates = !process.successStates().empty();
     const auto hasErrorStates = !process.errorStates().empty();
     const auto hasProcedures = !process.procedures().empty();
 
-    if (hasVariables || hasTimers || hasSuccessStates || hasErrorStates) {
+    if (hasVariables || hasNewtypes || hasTimers || hasSuccessStates || hasErrorStates) {
         m_writer.writeLine(m_layouter.getPositionString(Layouter::ElementType::Text));
         m_layouter.moveDown(Layouter::ElementType::Text);
 
         // Timers are just names, a dedicated visitor does not add any benfits
         for (const auto &timer : process.timerNames()) {
             m_writer.writeLine("Timer " + timer + ";");
+        }
+
+        for (const auto &newtype : process.newtypes()) {
+            newtype.accept(*this);
         }
 
         exportCollection(process.variables());
@@ -568,6 +573,26 @@ void SdlVisitor::visit(const VariableDeclaration &declaration)
 
     m_writer.write(QString("%1 %2").arg(declaration.name()).arg(declaration.type()));
     m_writer.endLine(";");
+}
+
+void SdlVisitor::visit(const Newtype &newtype)
+{
+    if (newtype.name().isEmpty()) {
+        throw ExportException("Newtype shall have a name but it doesn't");
+    }
+
+    if (newtype.indexingTypeName().isEmpty()) {
+        throw ExportException("Newtype shall have an indexing type but it doesn't");
+    }
+
+    if (newtype.elementTypeName().isEmpty()) {
+        throw ExportException("Newtype shall have an element type but it doesn't");
+    }
+
+    m_writer.writeComment(newtype.comment());
+
+    m_writer.writeLine(QString("newtype %1 Array(%2, %3) endnewtype;")
+                               .arg(newtype.name(), newtype.indexingTypeName(), newtype.elementTypeName()));
 }
 
 void SdlVisitor::visit(const Label &label)

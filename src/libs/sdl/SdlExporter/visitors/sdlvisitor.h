@@ -306,6 +306,12 @@ public:
      */
     virtual auto visit(const VariableDeclaration &declaration) -> void override;
     /**
+     * @brief   Newtype visitor
+     *
+     * @param   newtype     Newtype to be serialized
+     */
+    virtual auto visit(const Newtype &netype) -> void override;
+    /**
      * @brief   Label visitor
      *
      * @param   label   label to be serialized

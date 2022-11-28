@@ -65,6 +65,16 @@ void Process::addVariable(std::unique_ptr<VariableDeclaration> variable)
     m_variables.push_back(std::move(variable));
 }
 
+const std::vector<Newtype> &Process::newtypes() const
+{
+    return m_newtypes;
+}
+
+void Process::addNewtype(Newtype newtype)
+{
+    m_newtypes.push_back(std::move(newtype));
+}
+
 const std::vector<std::unique_ptr<Procedure>> &Process::procedures() const
 {
     return m_procedures;

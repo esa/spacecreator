@@ -13,6 +13,7 @@ set(SOURCES     action.cpp
                 input.cpp
                 join.cpp
                 label.cpp
+                newtype.cpp
                 nextstate.cpp
                 node.cpp
                 output.cpp
@@ -44,6 +45,7 @@ set(INCLUDES    action.h
                 input.h
                 join.h
                 label.h
+                newtype.h
                 nextstate.h
                 node.h
                 output.h

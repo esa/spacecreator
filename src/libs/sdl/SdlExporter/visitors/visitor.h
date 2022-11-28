@@ -26,6 +26,7 @@
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/join.h>
 #include <sdl/SdlModel/label.h>
+#include <sdl/SdlModel/newtype.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/procedure.h>
@@ -166,6 +167,12 @@ public:
      * @param   declaration   declaration to be visited
      */
     virtual auto visit(const VariableDeclaration &declaration) -> void = 0;
+    /**
+     * @brief   Newtype visitor
+     *
+     * @param   newtype     Newtype to be visited
+     */
+    virtual auto visit(const Newtype &newtype) -> void = 0;
     /**
      * @brief   Label visitor
      *
