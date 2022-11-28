@@ -81,7 +81,10 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     this->subtypesPath = projectDir + "/work/modelchecking/subtypes";
     this->configurationsPath = projectDir + "/work/modelchecking/configurations";
     this->outputPath = projectDir + "/work/build/modelchecking/output";
-    this->spinOutputPath = "";
+
+    QSettings settings;
+    this->spinOutputPath =
+            settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, QString()).toString();
 
     // CHECK project dir structure, create directories where necessary
     // check if properties dir exists and create it otherwise
@@ -1746,9 +1749,10 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
     {
         // ensure the default output directory exists
         QSettings settings;
-        QVariant defaultOutputDirectory = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, QString());
-        QString defaultOutputFullPath = QStringLiteral ("%1/%2").arg (projectDir, defaultOutputDirectory.toString());
-        QDir (defaultOutputFullPath).mkpath(QStringLiteral("."));
+        QVariant defaultOutputDirectory =
+                settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, QString());
+        QString defaultOutputFullPath = QStringLiteral("%1/%2").arg(projectDir, defaultOutputDirectory.toString());
+        QDir(defaultOutputFullPath).mkpath(QStringLiteral("."));
 
         QFileDialog fileDialog;
         fileDialog.setDirectory(defaultOutputFullPath);
