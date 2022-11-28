@@ -44,7 +44,10 @@ namespace msc {
 /*!
   \brief MscReader::MscReader
 */
-MscReader::MscReader() { }
+MscReader::MscReader(NOTIFY notifyErrorHub)
+    : m_notifyErrorHub(notifyErrorHub)
+{
+}
 
 /*!
   \fn MscReader::parseFile(const QString &filename)
@@ -85,7 +88,7 @@ const QStringList &MscReader::getErrorMessages() const
 
 MscModel *MscReader::parse(ANTLRInputStream &input, QStringList *errorMessages)
 {
-    MscErrorListener errorListener;
+    MscErrorListener errorListener(m_notifyErrorHub == NOTIFY::USE_ERROR_HUB);
 
     MscLexer lexer(&input);
     lexer.removeErrorListeners();

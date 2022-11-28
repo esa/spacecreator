@@ -22,6 +22,7 @@
 #include "spacecreatorpluginconstants.h"
 #include "tmcoptionswidget.h"
 
+#include <QDir>
 #include <QSettings>
 #include <tmc/TmcConfig/constants.h>
 
@@ -48,6 +49,12 @@ QWidget *TmcOptions::widget()
             spinExecutable = QString("spin");
         }
         m_widget->setSpinExecutable(spinExecutable.toString());
+
+        QVariant defaultOutputDirectory = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY);
+        if(!defaultOutputDirectory.isValid()) {
+            defaultOutputDirectory = QString("tmc-output");
+        }
+        m_widget->setDefaultOutputDirectory(defaultOutputDirectory.toString());
     }
     return m_widget;
 }
@@ -60,6 +67,7 @@ void TmcOptions::apply()
 
     QSettings settings;
     settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_EXE_KEY, m_widget->getSpinExecutable());
+    settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, m_widget->getDefaultOutputDirectory());
 }
 
 void TmcOptions::finish()

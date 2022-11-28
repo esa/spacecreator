@@ -17,6 +17,7 @@
 
 #include "ivcreatortool.h"
 
+#include "abstractvisualizationmodel.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
 #include "commands/cmdconnectionitemcreate.h"
@@ -81,64 +82,66 @@ IVCreatorTool::~IVCreatorTool() {}
 
 void IVCreatorTool::removeSelectedItems()
 {
-    if (!m_view)
+    if (!m_doc || !m_doc->objectsSelectionModel()->hasSelection()) {
         return;
+    }
 
-    if (auto scene = m_view->scene()) {
-        QStringList clonedIfaces;
-        QStringList nonRemovableEntities;
-        QList<QPointer<ivm::IVObject>> entities;
-        clearPreviewItem();
-        while (!scene->selectedItems().isEmpty()) {
-            QGraphicsItem *item = scene->selectedItems().first();
-            item->setSelected(false);
+    QStringList clonedIfaces;
+    QStringList nonRemovableEntities;
+    QList<QPointer<ivm::IVObject>> entities;
+    clearPreviewItem();
+    QItemSelectionModel *selection = m_doc->objectsSelectionModel();
+    for (const QModelIndex &index : selection->selectedIndexes()) {
+        const int role = static_cast<int>(shared::AbstractVisualizationModel::IdRole);
+        if (ivm::IVObject *entity = m_doc->objectsModel()->getObject(index.data(role).toUuid())) {
 
-            if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
-                if (auto entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
-                    if (entity->isRootObject()) {
+            if (entity->isRootObject()) {
+                continue;
+            }
+            if (entity->isFixedSystemElement()) {
+                nonRemovableEntities.append(entity->title());
+                continue;
+            }
+            if (entity->isInterface()) {
+                if (auto iface = entity->as<const ivm::IVInterface *>()) {
+                    if (iface->isRequiredSystemElement()) {
+                        nonRemovableEntities.append(iface->title());
                         continue;
                     }
-                    if (entity->isFixedSystemElement()) {
-                        nonRemovableEntities.append(entity->title());
+                    if (auto srcIface = iface->cloneOf()) {
+                        clonedIfaces.append(QStringLiteral("%1's %2 is from %3")
+                                                    .arg(iface->parentObject()->title(), iface->title(),
+                                                            srcIface->parentObject()->title()));
                         continue;
                     }
-                    if (entity->isInterface()) {
-                        if (auto iface = entity->as<const ivm::IVInterface *>()) {
-                            if (iface->isRequiredSystemElement()) {
-                                nonRemovableEntities.append(iface->title());
-                                continue;
-                            }
-                            if (auto srcIface = iface->cloneOf()) {
-                                clonedIfaces.append(QStringLiteral("%1's %2 is from %3")
-                                                            .arg(iface->parentObject()->title(), iface->title(),
-                                                                    srcIface->parentObject()->title()));
-                                continue;
-                            }
-                        }
-                    }
-                    entities.append(entity);
                 }
             }
+            entities.append(entity);
         }
+    }
+    selection->clearSelection();
+
+    if (!entities.isEmpty()) {
         auto cmdRm = new cmd::CmdEntitiesRemove(entities, model()->objectsModel());
         cmdRm->setText(tr("Remove selected item(s)"));
         m_doc->commandsStack()->push(cmdRm);
+    }
 
-        if (!nonRemovableEntities.isEmpty()) {
-            const QString names = nonRemovableEntities.join(QStringLiteral("<br>"));
-            const QString msg = tr("The following entities are marked as non-removable:<br><br>"
-                                   "<b>%1</b>").arg(names);
-            Q_EMIT informUser(tr("Entity removal"), msg);
-        }
+    if (!nonRemovableEntities.isEmpty()) {
+        const QString names = nonRemovableEntities.join(QStringLiteral("<br>"));
+        const QString msg = tr("The following entities are marked as non-removable:<br><br>"
+                               "<b>%1</b>")
+                                    .arg(names);
+        Q_EMIT informUser(tr("Entity removal"), msg);
+    }
 
-        if (!clonedIfaces.isEmpty()) {
-            const QString names = clonedIfaces.join(QStringLiteral("<br>"));
-            const QString msg = tr("The following interfaces can not be removed directly:<br><br>"
-                                   "<b>%1</b><br><br>"
-                                   "Please edit the related FunctionType.")
-                                        .arg(names);
-            Q_EMIT informUser(tr("Interface removal"), msg);
-        }
+    if (!clonedIfaces.isEmpty()) {
+        const QString names = clonedIfaces.join(QStringLiteral("<br>"));
+        const QString msg = tr("The following interfaces can not be removed directly:<br><br>"
+                               "<b>%1</b><br><br>"
+                               "Please edit the related FunctionType.")
+                                    .arg(names);
+        Q_EMIT informUser(tr("Interface removal"), msg);
     }
 }
 

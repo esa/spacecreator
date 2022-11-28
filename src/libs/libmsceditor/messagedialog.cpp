@@ -335,7 +335,7 @@ void MessageDialog::checkTextValidity()
     text.remove("\n");
 
     try {
-        msc::MscReader reader;
+        msc::MscReader reader(msc::MscReader::NOTIFY::NO_HUB);
         const QString mscText = QString("msc chart; instance %1; %2 endinstance; endmsc;").arg(instance->name(), text);
         QScopedPointer<msc::MscModel> model(reader.parseText(mscText));
         m_isValid = true;

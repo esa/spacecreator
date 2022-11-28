@@ -34,7 +34,7 @@ CmdPasteChart::CmdPasteChart(msc::MscDocument *document, const QString &copyChar
 
     setText(QObject::tr("Paste chart"));
 
-    m_copyModel = MscReader().parseText(copyChartText);
+    m_copyModel = MscReader(MscReader::NOTIFY::NO_HUB).parseText(copyChartText);
 
     if (m_document && m_document->charts().size() == 1) {
         m_chart = m_document->charts()[0];

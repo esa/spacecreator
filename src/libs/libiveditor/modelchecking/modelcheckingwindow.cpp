@@ -34,8 +34,10 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QProcess>
+#include <QSettings>
 #include <QThread>
 #include <conversion/common/escaper/escaper.h>
+#include <tmc/TmcConfig/constants.h>
 
 namespace {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -1742,8 +1744,14 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
 {
     QString outputDirectoryFilepath;
     {
+        // ensure the default output directory exists
+        QSettings settings;
+        QVariant defaultOutputDirectory = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, QString());
+        QString defaultOutputFullPath = QStringLiteral ("%1/%2").arg (projectDir, defaultOutputDirectory.toString());
+        QDir (defaultOutputFullPath).mkpath(QStringLiteral("."));
+
         QFileDialog fileDialog;
-        fileDialog.setDirectory(projectDir);
+        fileDialog.setDirectory(defaultOutputFullPath);
         fileDialog.setFileMode(QFileDialog::FileMode::Directory);
         fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
         fileDialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
@@ -1757,6 +1765,9 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
         } else {
             return;
         }
+        // save relative output path
+        const QString relativeOutputDirectory = QDir(projectDir).relativeFilePath(outputDirectoryFilepath);
+        settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, relativeOutputDirectory);
     }
 
     // DESTROY tree except root

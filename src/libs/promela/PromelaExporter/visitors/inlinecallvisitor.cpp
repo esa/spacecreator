@@ -23,6 +23,7 @@
 
 using promela::model::Constant;
 using promela::model::InlineCall;
+using promela::model::RealConstant;
 using promela::model::VariableRef;
 
 namespace promela::exporter {
@@ -47,6 +48,8 @@ void InlineCallVisitor::visit(const InlineCall &inlineCall)
             variableRefVisitor.visit(std::get<VariableRef>(argument));
         } else if (std::holds_alternative<Constant>(argument)) {
             m_stream << std::get<Constant>(argument).getValue();
+        } else if (std::holds_alternative<RealConstant>(argument)) {
+            m_stream << std::get<RealConstant>(argument).getValue();
         }
     }
     m_stream << ")";

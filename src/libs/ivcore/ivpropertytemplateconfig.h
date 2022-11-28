@@ -25,8 +25,12 @@ class IVPropertyTemplateConfig : public shared::PropertyTemplateConfig
 {
 public:
     static IVPropertyTemplateConfig *instance();
+    static void cleanup();
+
     QString title() const override;
     shared::PropertyTemplate *createPropertyTemplate() const override;
+
+    QString languageDirectory(const QString& language) const;
 
 protected:
     IVPropertyTemplateConfig();

@@ -76,7 +76,9 @@ QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes() const
     return sysAttrs;
 }
 
-PropertyTemplateConfig::~PropertyTemplateConfig() { }
+PropertyTemplateConfig::~PropertyTemplateConfig() {
+    qDeleteAll(d->m_attrTemplates);
+}
 
 void PropertyTemplateConfig::init(const QString &configPath)
 {
@@ -115,6 +117,16 @@ void PropertyTemplateConfig::init(const QString &configPath)
     d->m_attrTemplates = attributes;
 }
 
+/**
+ * Load all property data from the given XML data.
+ * Replaces all data loaded before.
+ */
+void PropertyTemplateConfig::initFromData(const QString &xmlData)
+{
+    qDeleteAll(d->m_attrTemplates);
+    d->m_attrTemplates = parseAttributesList(xmlData);
+}
+
 bool PropertyTemplateConfig::hasPropertyTemplateForObject(const VEObject *obj, const QString &name) const
 {
     return propertyTemplateForObject(obj, name) != nullptr;
@@ -149,8 +161,17 @@ QList<PropertyTemplate *> PropertyTemplateConfig::parseAttributesList(
     return attrs;
 }
 
+/**
+ * Returns all property templates for the given object type.
+ * In case a nullptr is given, all properties are returned
+ * @param obj object defining the type
+ */
 QList<PropertyTemplate *> PropertyTemplateConfig::propertyTemplatesForObject(const VEObject *obj) const
 {
+    if (obj == nullptr) {
+        return d->m_attrTemplates;
+    }
+
     QList<PropertyTemplate *> attrs;
     std::copy_if(d->m_attrTemplates.cbegin(), d->m_attrTemplates.cend(), std::back_inserter(attrs),
             [obj](PropertyTemplate *attrTemplate) {

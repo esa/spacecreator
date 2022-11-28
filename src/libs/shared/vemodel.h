@@ -34,6 +34,8 @@ public:
     explicit VEModel(QObject *parent = nullptr);
     ~VEModel() override;
 
+    bool isEmpty() const;
+
     virtual bool addObject(VEObject *obj);
     virtual bool removeObject(VEObject *obj);
     virtual VEObject *getObject(const shared::Id &id) const;
