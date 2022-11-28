@@ -49,6 +49,7 @@ private Q_SLOTS:
     void testTransaction();
     void testFailureReportingSync();
     void testFailureReportingAsync();
+    void testVariableWithArrayDimensions();
 };
 
 /// \SRS  ETB-FUN-10
@@ -337,6 +338,14 @@ void tst_SedsConverter_SedsToSdl::testFailureReportingSync()
 void tst_SedsConverter_SedsToSdl::testFailureReportingAsync()
 {
     const int result = system("./test_failure_reporting_async.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2030
+void tst_SedsConverter_SedsToSdl::testVariableWithArrayDimensions()
+{
+    const int result = system("./test_variable_with_array_dimensions.sh");
     QCOMPARE(result, 0);
 }
 

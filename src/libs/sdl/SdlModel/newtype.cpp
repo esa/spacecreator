@@ -56,4 +56,3 @@ void Newtype::accept(Visitor &visitor) const
 }
 
 } // namespace sdl
-

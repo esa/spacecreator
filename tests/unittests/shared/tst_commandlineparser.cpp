@@ -696,7 +696,7 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterFailureReportingType()
     QCOMPARE(value, failureReportingType);
 }
 
-void tst_CommandLineParser::testCmdArgumentSedsConverterArrayDimensionBaseIndexingType()
+void tst_CommandLineParser::testCmdArgiumentSedsConverterArrayDimensionBaseIndexingType()
 {
     const QCommandLineOption cmdArrayDimensionIndexType =
             CommandLineParser::positionalArg(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
