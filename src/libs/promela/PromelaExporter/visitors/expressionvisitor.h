@@ -56,6 +56,12 @@ public:
      */
     void operator()(const model::Constant &constant);
     /**
+     * @brief Handle Real Constant
+     *
+     * @param constant constant to export
+     */
+    void operator()(const model::RealConstant &constant);
+    /**
      * @brief Handle Binary Expression
      *
      * @param expression expression to export

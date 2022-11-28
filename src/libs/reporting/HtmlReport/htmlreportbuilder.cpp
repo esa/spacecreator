@@ -177,7 +177,7 @@ QVariantHash reporting::HtmlReportBuilder::buildStopConditionViolationVariant(co
     // resolve violation type as string
     variantHash.insert("violationType",
             m_stopConditionViolationTypeNames.value(report.violationType,
-                    m_stopConditionViolationTypeNames[reporting::StopConditionViolationReport::UnknownType]));
+                    m_stopConditionViolationTypeNames[reporting::StopConditionViolationReport::UndefinedType]));
 
     return variantHash;
 }
@@ -222,7 +222,7 @@ const QHash<reporting::StopConditionViolationReport::ViolationType, QString>
             { reporting::StopConditionViolationReport::QueueLast, "Queue Last" },
             { reporting::StopConditionViolationReport::QueueLength, "Queue Length" },
             { reporting::StopConditionViolationReport::Present, "Present" },
-            { reporting::StopConditionViolationReport::UnknownType, "Unknown Type" },
+            { reporting::StopConditionViolationReport::UndefinedType, "Undefined Type" },
         };
 
 const QHash<reporting::ObserverFailureReport::ObserverState, QString>

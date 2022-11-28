@@ -119,9 +119,9 @@ public:
     /**
      * @brief   Set delta (interval) for Real values generation
      *
-     * @param   delta Value of the interval
+     * @param   delta Value of the interval between generated floats
      */
-    void setDelta(std::optional<float> delta);
+    void setDelta(std::optional<QString> delta);
     /**
      * @brief Add Stop Condition files to verifier.
      *

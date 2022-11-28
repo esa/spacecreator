@@ -20,6 +20,7 @@
 #include "translator.h"
 
 #include "specialized/componentstranslator.h"
+#include "specialized/devicetranslator.h"
 
 #include <QFileInfo>
 #include <asn1library/asn1/asn1model.h>
@@ -28,6 +29,7 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
+#include <ivcore/ivcomment.h>
 #include <ivcore/ivcommonprops.h>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
@@ -98,7 +100,12 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
         const auto &sedsPackage = std::get<::seds::model::PackageFile>(sedsModelData).package();
         translatePackage(sedsPackage, ivModel.get(), {}, generateFunctionsForPackages, options);
     } else if (std::holds_alternative<::seds::model::DataSheet>(sedsModelData)) {
-        const auto &sedsPackages = std::get<::seds::model::DataSheet>(sedsModelData).packages();
+        const auto &sedsDataSheet = std::get<::seds::model::DataSheet>(sedsModelData);
+
+        const auto &sedsDevice = sedsDataSheet.device();
+        translateDevice(sedsDevice, ivModel.get());
+
+        const auto &sedsPackages = sedsDataSheet.packages();
         for (const auto &sedsPackage : sedsPackages) {
             translatePackage(sedsPackage, ivModel.get(), sedsPackages, generateFunctionsForPackages, options);
         }
@@ -110,6 +117,17 @@ std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
     resultModels.push_back(std::move(ivModel));
 
     return resultModels;
+}
+
+void SedsToIvTranslator::translateDevice(const ::seds::model::Device &sedsDevice, IVModel *ivModel) const
+{
+    DeviceTranslator deviceTranslator(sedsDevice);
+
+    auto ivMetadataComment = deviceTranslator.translateMetadata();
+
+    if (ivMetadataComment != nullptr) {
+        ivModel->addObject(ivMetadataComment);
+    }
 }
 
 void SedsToIvTranslator::translatePackage(const ::seds::model::Package &sedsPackage, IVModel *ivModel,

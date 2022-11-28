@@ -84,6 +84,7 @@ public:
 
     void visit(Types::Boolean &type) override
     {
+        type.setAcnSize(m_attributes.value(QStringLiteral("acnMaxSizeInBits")).toInt());
         type.setTrueValue(m_attributes.value(QLatin1String("true-value")).toString());
         type.setFalseValue(m_attributes.value(QLatin1String("false-value")).toString());
     }

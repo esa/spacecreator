@@ -40,16 +40,19 @@ public:
      * @param   promelaModel    Target promela model
      * @param   asn1Model       ASN.1 model
      * @param   ivModel         Interface View model
+     * @param   delta           Space between generated floats
      */
-    Asn1NodeValueGeneratorVisitor(
-            model::PromelaModel &promelaModel, const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel);
+    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, const Asn1Acn::Asn1Model *asn1Model,
+            const ivm::IVModel *ivModel, const std::optional<float> &delta = std::nullopt);
     /**
      * @brief Constructor.
      *
      * @param   promelaModel    Target promela model
      * @param   typeNames       List of top-level type names to generate value generation inlines
+     * @param   delta           Space between generated floats
      */
-    Asn1NodeValueGeneratorVisitor(model::PromelaModel &promelaModel, QStringList typeNames);
+    Asn1NodeValueGeneratorVisitor(
+            model::PromelaModel &promelaModel, QStringList typeNames, const std::optional<float> &delta = std::nullopt);
 
     /// @brief Visit Asn1Acn::Definitions
     void visit(const Asn1Acn::Definitions &defs) override;
@@ -73,5 +76,6 @@ private:
     const ivm::IVModel *m_ivModel;
     QStringList m_typeNames;
     bool m_generateSubtypes;
+    std::optional<float> m_delta;
 };
 }

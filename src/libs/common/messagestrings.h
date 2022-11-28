@@ -26,6 +26,7 @@ const QString msgWarning = "WARNING: %1";
 const QString msgError = "ERROR: %1";
 const QString pluginSelfIntroduction = "%1 starts working";
 const QString fileToImportNotSelected = "File to import not selected";
+const QString fileHasBeenAddedToProject = "%1 file has been added to project";
 const QString fileHasBeenOverridden = "\"%1\" file has been overridden";
 const QString fileHasNotBeenOverridden = "\"%1\" file has not been overridden";
 const QString inputFileWasChosen = "\"%1\" file was chosen";

@@ -17,4 +17,7 @@
     </Implementations>
 </Function>
 
+<Comment name="DateValue: 2021-06-07\nFloatValue: 3.14\nIntegerValue: 42\nStringValue: Important String\n* RootCategory *\nRootCategoryValue1: 1\nRootCategoryValue2: 2\n** SubCategory **\nSubCategoryValue1: 1.1\nSubCategoryValue2: 2.2\n* OtherCategory *\nOtherCategoryValue1: 3\nOtherCategoryValue2: 4">
+</Comment>
+
 </InterfaceView>

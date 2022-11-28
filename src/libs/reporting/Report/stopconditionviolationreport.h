@@ -48,7 +48,7 @@ struct StopConditionViolationReport {
         QueueLast,
         QueueLength,
         Present,
-        UnknownType
+        UndefinedType
     };
 
     /** Violation clause */

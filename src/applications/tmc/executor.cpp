@@ -80,7 +80,7 @@ void TmcExecutor::execute()
     std::unordered_map<QString, QString> interfaceInputVectorLengthLimits;
     std::optional<QString> processesBasePriority;
     std::vector<QString> subtypesFilepaths;
-    std::optional<float> delta;
+    std::optional<QString> delta;
     bool isRealTypeEnabled = false;
     bool verify = false;
 
@@ -230,7 +230,7 @@ void TmcExecutor::execute()
                 exit(EXIT_FAILURE);
             }
 
-            delta = std::abs(args[i].toFloat());
+            delta = args[i];
         } else if (arg == "-enable-reals") {
             ++i;
             isRealTypeEnabled = true;
@@ -301,10 +301,13 @@ void TmcExecutor::execute()
     m_verifier->setRealTypeEnabled(isRealTypeEnabled);
 
     if (!m_verifier->addStopConditionFiles(stopConditionFiles)) {
+        qCritical() << "Cannot attach stop condition file";
         QCoreApplication::exit(EXIT_FAILURE);
+        return;
     }
     for (const auto &info : observerInfos) {
         if (!m_verifier->attachObserver(extractObserverPath(info), extractObserverPriority(info))) {
+            qCritical() << "Cannot attach observer " << info;
             QCoreApplication::exit(EXIT_FAILURE);
             return;
         }
@@ -314,6 +317,7 @@ void TmcExecutor::execute()
                 verify ? TmcVerifier::ExecuteMode::ConvertAndVerify : TmcVerifier::ExecuteMode::ConvertOnly)) {
         return;
     } else {
+        qCritical() << "Cannot start verifier";
         QCoreApplication::exit(EXIT_FAILURE);
         return;
     }

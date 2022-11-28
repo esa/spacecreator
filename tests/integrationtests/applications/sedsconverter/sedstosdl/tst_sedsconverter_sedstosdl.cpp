@@ -215,6 +215,7 @@ void tst_SedsConverter_SedsToSdl::testTimers()
 /// \SRS  ETB-FUN-2110
 /// \SRS  ETB-FUN-2550
 /// \SRS  ETB-FUN-2600
+/// \SRS  ETB-FUN-2610
 void tst_SedsConverter_SedsToSdl::testParameterMap()
 {
     const int result = system("./test_parameter_map.sh");

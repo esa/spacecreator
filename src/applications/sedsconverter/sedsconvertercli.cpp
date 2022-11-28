@@ -236,7 +236,7 @@ void SedsConverterCLI::addSedsInputOptions(Options &options)
 
     if (m_arguments.contains(CommandArg::SedsConverterSedsExtRef)) {
         for (auto value : m_parser.value(CommandArg::SedsConverterSedsExtRef).split(",")) {
-            options.add(SedsOptions::externalRefFilepath, value);
+            options.add(SedsOptions::externalRef, value);
         }
     }
 

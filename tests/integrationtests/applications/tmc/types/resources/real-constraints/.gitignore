@@ -47,6 +47,6 @@ work/simulation/*.ui
 work/simulation/*.cfg
 work/simulation/*.sqlite
 
-reals.msc
+real-constraints.msc
 work/controller/implem/default/SDL/src/
 work/controller/SDL/src/Controller.cfg

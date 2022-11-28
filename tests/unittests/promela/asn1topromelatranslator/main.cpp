@@ -23,6 +23,8 @@
 #include "tst_asn1topromelatranslator_values.h"
 #include "tst_integergenerator.h"
 #include "tst_integersubset.h"
+#include "tst_realgenerator.h"
+#include "tst_realsubset.h"
 
 #include <QTest>
 
@@ -39,6 +41,14 @@ int main(int argc, char *argv[])
     }
     {
         tmc::test::tst_IntegerGenerator test;
+        status |= QTest::qExec(&test, argc, argv);
+    }
+    {
+        tmc::test::tst_RealSubset test;
+        status |= QTest::qExec(&test, argc, argv);
+    }
+    {
+        tmc::test::tst_RealGenerator test;
         status |= QTest::qExec(&test, argc, argv);
     }
     {
