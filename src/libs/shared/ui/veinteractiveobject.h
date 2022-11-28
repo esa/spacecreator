@@ -107,6 +107,8 @@ protected:
     QPen m_pen;
     QFont m_font;
 };
+QDebug operator<<(QDebug debug, const shared::ui::VEInteractiveObject &veobj);
+
 
 } // namespace ui
 } // namespace shared

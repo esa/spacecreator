@@ -18,7 +18,6 @@
 
 #include "veinteractiveobject.h"
 
-#include "commands/cmdentityautolayout.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commandsstackbase.h"
 #include "graphicsviewutils.h"
@@ -34,6 +33,7 @@ namespace shared {
 namespace ui {
 
 static const qreal kClickTreshold = 5;
+static const qreal extraSpace = 5.0;
 
 VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent)
     : ui::InteractiveObjectBase(parent)
@@ -282,9 +282,14 @@ QSizeF VEInteractiveObject::minimumSize() const
     QRectF boundingRect = m_textItem->boundingRect();
     boundingRect = boundingRect.marginsAdded(shared::graphicsviewutils::kTextMargins);
     QSizeF textSize = boundingRect.size();
-    textSize.rwidth() += 5.0; // A little extra space is needed, otherwise the text item moves about ever so sligtly.
+    textSize.rwidth() += extraSpace; // A little extra space is needed, otherwise the text item moves about ever so sligtly.
     return textSize;
 }
 
+QDebug operator<<(QDebug debug, const shared::ui::VEInteractiveObject &veobj)
+{
+    debug << veobj.toString();
+    return debug;
+}
 } // namespace ui
 } // namespace shared
