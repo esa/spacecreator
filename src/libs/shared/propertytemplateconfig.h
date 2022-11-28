@@ -41,6 +41,7 @@ public:
             int *errorLine = nullptr, int *errorColumn = nullptr) const;
     QList<PropertyTemplate *> systemAttributes() const;
     void init(const QString &configPath);
+    void initFromData(const QString &xmlData);
 
     virtual QString title() const = 0;
     virtual PropertyTemplate *createPropertyTemplate() const = 0;

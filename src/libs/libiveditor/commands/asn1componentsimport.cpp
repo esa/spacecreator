@@ -20,6 +20,7 @@
 #include "asn1reader.h"
 #include "asn1systemchecks.h"
 #include "errorhub.h"
+#include "implementationshandler.h"
 #include "ivobject.h"
 
 #include <QApplication>
@@ -215,7 +216,7 @@ void ASN1ComponentsImport::undoAsnFileImport()
 
 QString ASN1ComponentsImport::relativePathForObject(const ivm::IVObject *object) const
 {
-    return shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
+    return ive::kRootImplementationPath + QDir::separator() + object->title().toLower();
 }
 
 } // namespace ive

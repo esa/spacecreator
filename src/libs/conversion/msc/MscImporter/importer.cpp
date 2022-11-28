@@ -49,7 +49,7 @@ std::unique_ptr<conversion::Model> MscImporter::importModel(const Options &optio
         throw conversion::FileNotFoundException(*inputFilepath, "while importing MSC");
     }
 
-    MscReader mscReader;
+    MscReader mscReader(MscReader::NOTIFY::NO_HUB);
     MscModel *mscModel = nullptr;
 
     try {

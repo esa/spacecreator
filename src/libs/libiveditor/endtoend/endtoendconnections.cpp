@@ -146,7 +146,7 @@ EndToEndConnections::Dataflow EndToEndConnections::readDataFlowFromDocument(msc:
 //! If file is the contents of the file, isFile should be false
 EndToEndConnections::Dataflow EndToEndConnections::readDataflow(const QString &file, bool isFile)
 {
-    msc::MscReader reader;
+    msc::MscReader reader(msc::MscReader::NOTIFY::NO_HUB);
     std::unique_ptr<msc::MscModel> model(isFile ? reader.parseFile(file) : reader.parseText(file));
 
     // We assume to work on the first leaf with a chart that has messages (at least for now)

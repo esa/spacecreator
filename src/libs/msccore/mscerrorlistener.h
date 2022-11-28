@@ -26,6 +26,8 @@ namespace msc {
 class MscErrorListener : public antlr4::BaseErrorListener
 {
 public:
+    MscErrorListener(bool notifyErrorHub);
+
     QStringList getErrorMessages() const;
 
 private:
@@ -34,6 +36,7 @@ private:
 
 private:
     QStringList m_errorMessages;
+    bool m_notifyErrorHub = false;
 };
 
 } // namespace msc

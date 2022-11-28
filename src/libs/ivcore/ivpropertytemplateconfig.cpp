@@ -18,6 +18,9 @@
 #include "ivpropertytemplateconfig.h"
 
 #include "ivpropertytemplate.h"
+#include "ivcommonprops.h"
+
+#include <QDebug>
 
 namespace ivm {
 
@@ -34,6 +37,12 @@ IVPropertyTemplateConfig *IVPropertyTemplateConfig::instance()
     return m_instance;
 }
 
+void IVPropertyTemplateConfig::cleanup()
+{
+    delete m_instance;
+    m_instance = nullptr;
+}
+
 QString IVPropertyTemplateConfig::title() const
 {
     return QObject::tr("InterfaceView");
@@ -42,6 +51,34 @@ QString IVPropertyTemplateConfig::title() const
 shared::PropertyTemplate *IVPropertyTemplateConfig::createPropertyTemplate() const
 {
     return new IVPropertyTemplate();
+}
+
+/**
+ * Returns the name for the implementation of a programming language
+ * An example is "Simulink" -> "SIMULINK"
+ * @param language The programming name
+ */
+QString IVPropertyTemplateConfig::languageDirectory(const QString &language) const
+{
+    const QString languageKey = meta::Props::token(meta::Props::Token::language);
+    const shared::PropertyTemplate *property = propertyTemplateForObject(nullptr, languageKey);
+    if (property) {
+        QMap<QString, QString> data = property->enumData(language);
+        if (data.isEmpty()) {
+            qWarning() << QString("No language '%1' configured. Using the language name.").arg(language);
+            return language;
+        }
+        const QString folderKey = "folder_name";
+        if (data.contains(folderKey)) {
+            return data[folderKey];
+        } else {
+            qWarning() << QString("No folder name set for language '%1'. Using the language name .").arg(language);
+        }
+        return language;
+    }
+
+    qWarning() << QString("No property 'language' in attributes. Using the language name '%1'").arg(language);
+    return language;
 }
 
 IVPropertyTemplateConfig::IVPropertyTemplateConfig()

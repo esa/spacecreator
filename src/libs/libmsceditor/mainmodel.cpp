@@ -309,7 +309,7 @@ bool MainModel::loadFile(const QString &filename)
     if (!d->m_currentFilePath.isEmpty()) {
         shared::ErrorHub::clearFileErrors(d->m_currentFilePath);
     }
-    msc::MscReader reader;
+    msc::MscReader reader(msc::MscReader::NOTIFY::USE_ERROR_HUB);
     msc::MscModel *model = nullptr;
 
     shared::ErrorHub::setCurrentFile(filename);

@@ -25,6 +25,12 @@
 
 namespace msc {
 
+MscErrorListener::MscErrorListener(bool notifyErrorHub)
+    : antlr4::BaseErrorListener()
+    , m_notifyErrorHub(notifyErrorHub)
+{
+}
+
 void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer, antlr4::Token *offendingSymbol, size_t line,
         size_t charPositionInLine, const std::string &msg, std::exception_ptr /*e*/)
 {
@@ -58,7 +64,9 @@ void MscErrorListener::syntaxError(antlr4::Recognizer *recognizer, antlr4::Token
                                        .arg(lineOfError, positionInLine, errorMessage, stack));
     }
 
-    shared::ErrorHub::addError(shared::ErrorItem::Error, errorMessage, "", line);
+    if (m_notifyErrorHub) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, errorMessage, "", line);
+    }
 }
 
 QStringList MscErrorListener::getErrorMessages() const

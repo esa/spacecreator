@@ -34,6 +34,14 @@ VEModel::VEModel(QObject *parent)
 
 VEModel::~VEModel() { }
 
+/**
+ * Returns true, if the is no object in this model
+ */
+bool VEModel::isEmpty() const
+{
+    return d->m_objects.isEmpty();
+}
+
 bool VEModel::addObject(VEObject *obj)
 {
     if (addObjectImpl(obj)) {

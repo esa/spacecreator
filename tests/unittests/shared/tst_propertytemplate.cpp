@@ -19,6 +19,22 @@
 
 #include <QtTest>
 
+class TestPropertyTemplate : public shared::PropertyTemplate {
+public:
+
+    // PropertyTemplate interface
+public:
+    QMetaEnum scopeMetaEnum() const override
+    {
+        return QMetaEnum();
+    }
+    int objectScope(const shared::VEObject *obj) const override
+    {
+        Q_UNUSED(obj);
+        return 0;
+    }
+};
+
 class tst_PropertyTemplate : public QObject
 {
     Q_OBJECT
@@ -26,6 +42,7 @@ class tst_PropertyTemplate : public QObject
 private Q_SLOTS:
     void testDataConversion_data();
     void testDataConversion();
+    void testEnumDataFromXML();
 };
 
 void tst_PropertyTemplate::testDataConversion_data()
@@ -74,6 +91,38 @@ void tst_PropertyTemplate::testDataConversion()
 
     QVariant data = shared::PropertyTemplate::convertData(value, type);
     QCOMPARE(data, result);
+}
+
+void tst_PropertyTemplate::testEnumDataFromXML()
+{
+    QDomDocument xmlDoc;
+    QByteArray xmlContent = R"(<Attrs>
+    <Attr label="Language" name="language" visible="false">
+        <Type>
+            <Enumeration defaultValue="SDL">
+                <Entry value="Ada" folder_name="Ada_impl"/>
+                <Entry value="CPP" folder_name="CPP"/>
+                <Entry value="Simulink" folder_name="SIMULINK" dummy="foo"/>
+            </Enumeration>
+        </Type>
+    </Attr></Attrs>)";
+    xmlDoc.setContent(xmlContent);
+    QDomElement element = xmlDoc.firstChildElement().firstChildElement();
+    auto property = shared::PropertyTemplate::createFromXml<TestPropertyTemplate>(element);
+    QVERIFY(property !=nullptr);
+
+    QCOMPARE(property->name(), "language");
+    QCOMPARE(property->type(), shared::PropertyTemplate::Type::Enumeration);
+    QVariantList value {"Ada", "CPP", "Simulink"};
+    QCOMPARE(property->value(), QVariant::fromValue(value));
+
+    QMap<QString, QString> enumData = property->enumData("Ada");
+    QCOMPARE(enumData.size(), 1); // containing the folder info
+    QCOMPARE(enumData.value("folder_name"), QVariant::fromValue(QString("Ada_impl")));
+
+    enumData = property->enumData("Simulink");
+    QCOMPARE(enumData.size(), 2);
+    QCOMPARE(enumData.value("folder_name"), QVariant::fromValue(QString("SIMULINK")));
 }
 
 QTEST_MAIN(tst_PropertyTemplate)
