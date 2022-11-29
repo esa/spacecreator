@@ -1712,6 +1712,7 @@ void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
             SpinConfigData::optionalIntToString(spinConfig.globalInputVectorGenerationLimit));
     d->ui->lineEdit_rawCommandLine->setText(spinConfig.rawCommandLine);
     d->ui->lineEdit_deltaValue->setText(SpinConfigData::optionalFloatToString(spinConfig.deltaValue));
+    d->ui->lineEdit_vectorszValue->setText(SpinConfigData::optionalIntToString(spinConfig.vectorszValue));
 
     spinConfig.explorationMode == ExplorationMode::BreadthFirst
             ? d->ui->comboBox_spinExpAlgorithm->setCurrentText("Breadth First Search")
@@ -1858,6 +1859,7 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
     spinConfigData.searchStateLimit = SpinConfigData::optionalIntFromString(d->ui->lineEdit_searchStateLimit->text());
     spinConfigData.timeLimitSeconds = SpinConfigData::optionalIntFromString(d->ui->lineEdit_spinTimeLimit->text());
     spinConfigData.deltaValue = SpinConfigData::optionalFloatFromString(d->ui->lineEdit_deltaValue->text());
+    spinConfigData.vectorszValue = SpinConfigData::optionalIntFromString(d->ui->lineEdit_vectorszValue->text());
 
     spinConfigData.searchShortestPath = (d->ui->checkBox_searchShortestPath->checkState() == Qt::Checked);
     spinConfigData.useFairScheduling = (d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked);

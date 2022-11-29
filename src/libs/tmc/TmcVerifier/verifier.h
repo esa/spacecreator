@@ -197,6 +197,12 @@ public:
      */
     void setMemoryLimit(int memoryLimit);
     /**
+     * @brief Setter for VECTORSZ value.
+     *
+     * @param spinExecutable VECTORSZ value.
+     */
+    void setVectorszValue(int vectorszValue);
+    /**
      * @brief Setter for raw commandline for pan executable.
      *
      * If raw commandline is not empty, then the other parameters
@@ -284,6 +290,7 @@ private:
     std::optional<int> m_searchStateLimit;
     std::optional<int> m_errorLimit;
     std::optional<int> m_memoryLimit;
+    std::optional<int> m_vectorszValue;
     QString m_rawCommandline;
     QString m_spinExecutable;
 

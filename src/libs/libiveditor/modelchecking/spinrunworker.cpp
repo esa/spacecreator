@@ -106,6 +106,9 @@ void SpinRunWorker::run()
     if (m_spinConfig.memoryLimitMB.has_value()) {
         m_verifier->setMemoryLimit(m_spinConfig.memoryLimitMB.value());
     }
+    if (m_spinConfig.vectorszValue.has_value()) {
+        m_verifier->setVectorszValue(m_spinConfig.vectorszValue.value());
+    }
     if (!m_spinConfig.rawCommandLine.isEmpty()) {
         m_verifier->setRawCommandline(m_spinConfig.rawCommandLine);
     }

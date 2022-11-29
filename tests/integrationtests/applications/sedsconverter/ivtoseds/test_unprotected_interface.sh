@@ -6,7 +6,7 @@ SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 XML_VALIDATOR=$SPACECREATOR_BUILD_DIR/bin/xmlvalidator
 
 # diff ignoring white space and blank lines
-DIFF="diff -w -B"
+XMLDIFF="xmldiff"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"
@@ -23,6 +23,6 @@ cd $TEST_OUTPUT_DIR
 
 cp ../resources/*.xsd . \
   && $XML_VALIDATOR test_unprotected_interface.xml \
-  && $DIFF test_unprotected_interface.xml ../resources/test_unprotected_interface.output \
+  && $XMLDIFF test_unprotected_interface.xml ../resources/test_unprotected_interface.output \
   && cd .. \
   && rm -r -f $TEST_OUTPUT_DIR

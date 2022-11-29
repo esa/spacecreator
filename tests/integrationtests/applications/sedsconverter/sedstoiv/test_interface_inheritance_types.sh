@@ -7,6 +7,7 @@ AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
 UPDATE_DATAVIEW="asn2aadlPlus -f dataview-uniq.asn DataView.aadl -aadlv2"
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
+XMLDIFF="xmldiff"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"
@@ -29,7 +30,7 @@ sed -e '$s/$/\n/' -s COM-N7SPACE-INTERFACEINHERITANCE1.asn \
 sed -e '$s/$/\n/' -s COM-N7SPACE-INTERFACEINHERITANCE1.acn \
                      COM-N7SPACE-INTERFACEINHERITANCE2.acn COM-N7SPACE-INTERFACEINHERITANCE2-COMPONENT.acn> dataview-uniq.acn
 
-$DIFF interfaceview.xml ../resources/test_interface_inheritance_types.output \
+$XMLDIFF interfaceview.xml ../resources/test_interface_inheritance_types.output \
     && $UPDATE_DATAVIEW \
     && $AADL_CONVERTER -o interfaceview.xml \
     -t ../resources/xml2dv/interfaceview.tmplt \
