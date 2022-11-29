@@ -20,6 +20,8 @@ export SPACECREATOR_BUILD_DIR=$BUILD_DIR
 cd $BUILD_DIR
 BASE_DIR=`pwd`
 
+FAILED_TESTS=" "
+
 EXIT_CODE=0
 TESTS=`find . -name "tst*_*" -type f -executable`
 for TEST in $TESTS
@@ -34,10 +36,20 @@ do
     LAST_EXIT=$?
     if [ $LAST_EXIT -ne 0 ] ; then
         EXIT_CODE=1
+        FAILED_TESTS="$FAILED_TESTS,$TEST_NAME"
         # Run failing test again, to print the output in stdout as well
         echo "Test '$TEST_NAME' FAILED. Running it again for the std output."
         ./$TEST_NAME
+    else
+        echo "Test '$TEST_NAME' did pass."
     fi
 done
+
+if [ $EXIT_CODE -ne 0 ] ; then
+    echo "List of failed tests: $FAILED_TESTS"
+fi
+
+echo "Testing finished"
+echo "Tests exit code is: $EXIT_CODE"
 
 exit $EXIT_CODE
