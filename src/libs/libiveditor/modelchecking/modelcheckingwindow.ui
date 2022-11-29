@@ -735,7 +735,7 @@
           </property>
          </widget>
         </item>
-        <item row="13" column="0" colspan="6">
+        <item row="14" column="0" colspan="6">
          <widget class="QTableWidget" name="tableWidget_generationLimits">
           <column>
            <property name="text">
@@ -749,7 +749,7 @@
           </column>
          </widget>
         </item>
-        <item row="14" column="0" colspan="6">
+        <item row="15" column="0" colspan="6">
          <widget class="QPushButton" name="tableAddButton">
           <property name="font">
            <font>
@@ -761,7 +761,7 @@
           </property>
          </widget>
         </item>
-        <item row="15" column="0" colspan="6">
+        <item row="16" column="0" colspan="6">
          <widget class="QPushButton" name="tableDeleteButton">
           <property name="font">
            <font>
@@ -813,7 +813,7 @@
           </property>
          </widget>
         </item>
-        <item row="12" column="0" colspan="3">
+        <item row="13" column="0" colspan="3">
          <widget class="QLabel" name="label_ifaceGenerationLimits">
           <property name="text">
            <string>Interface generation limits:</string>
@@ -847,14 +847,14 @@
           </property>
          </widget>
         </item>
-        <item row="16" column="0" colspan="3">
+        <item row="17" column="0" colspan="3">
          <widget class="QLabel" name="label_rawCommandLine">
           <property name="text">
            <string>Raw command line (for developers):</string>
           </property>
          </widget>
         </item>
-        <item row="16" column="3" colspan="3">
+        <item row="17" column="3" colspan="3">
          <widget class="QLineEdit" name="lineEdit_rawCommandLine">
           <property name="text">
            <string/>
@@ -913,7 +913,7 @@
           </property>
          </widget>
         </item>
-        <item row="17" column="0">
+        <item row="18" column="0">
          <widget class="QPushButton" name="pushButton_callSpin">
           <property name="font">
            <font>
@@ -969,6 +969,9 @@
         <item row="11" column="3">
          <widget class="QLineEdit" name="lineEdit_deltaValue"/>
         </item>
+        <item row="12" column="3">
+         <widget class="QLineEdit" name="lineEdit_vectorszValue"/>
+        </item>
         <item row="11" column="5">
          <widget class="QLabel" name="label_26">
           <property name="font">
@@ -985,6 +988,13 @@
          <widget class="QLabel" name="label_8">
           <property name="text">
            <string>Delta value for ASN.1 REAL value generation:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0" colspan="3">
+         <widget class="QLabel" name="label_vectorsz">
+          <property name="text">
+           <string>VECTORSZ value:</string>
           </property>
          </widget>
         </item>

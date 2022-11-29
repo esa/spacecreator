@@ -82,12 +82,15 @@ IvToPromelaTranslator::ObserverAttachment::Kind IvToPromelaTranslator::ObserverA
     const auto kindIn = QString("ObservedSignalKind.INPUT");
     const auto kindOut = QString("ObservedSignalKind.OUTPUT");
     const auto kindContinuousSignal = QString("ObservedSignalKind.CONTINUOUS_SIGNAL");
+    const auto kindUnhandledInput = QString("ObservedSignalKind.UNHANDLED_INPUT");
     if (kind == kindIn) {
         return ObserverAttachment::Kind::Kind_Input;
     } else if (kind == kindOut) {
         return ObserverAttachment::Kind::Kind_Output;
     } else if (kind == kindContinuousSignal) {
         return ObserverAttachment::Kind::Kind_Continuous_Signal;
+    } else if (kind == kindUnhandledInput) {
+        return ObserverAttachment::Kind::Kind_Unhandled_Input;
     } else {
         const auto message = QString("Observer kind %1 is unknown").arg(kind);
         throw TranslationException(message);
@@ -133,7 +136,7 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(const QString &spe
         }
     }
 
-    if (m_interfaceName.isEmpty() && m_kind != Kind::Kind_Continuous_Signal) {
+    if (m_interfaceName.isEmpty() && m_kind != Kind::Kind_Continuous_Signal && m_kind != Kind::Kind_Unhandled_Input) {
         const auto message = QString("Observed interface name is empty in observer %1 ").arg(m_observerName);
         throw TranslationException(message);
     }
@@ -189,14 +192,20 @@ IvToPromelaTranslator::Context::Context(model::PromelaSystemModel *promelaModel,
 
 void IvToPromelaTranslator::Context::addObserverAttachment(const IvToPromelaTranslator::ObserverAttachment &attachment)
 {
-    if (attachment.fromFunction().has_value()) {
-        m_fromObserverAttachments[*attachment.fromFunction()][attachment.interface()].push_back(attachment);
-    }
-    if (attachment.toFunction().has_value()) {
-        m_toObserverAttachments[*attachment.toFunction()][attachment.interface()].push_back(attachment);
-    }
-    if (attachment.kind() == ObserverAttachment::Kind::Kind_Continuous_Signal) {
-        m_observersWithContinuousSignals.push_back(attachment.observer());
+    if (attachment.kind() == ObserverAttachment::Kind::Kind_Unhandled_Input) {
+        const QString toFunction = attachment.toFunction().has_value() ? attachment.toFunction().value() : QString();
+
+        m_unhandledInputObserverAttachments[toFunction][attachment.interface()].push_back(attachment);
+    } else {
+        if (attachment.fromFunction().has_value()) {
+            m_fromObserverAttachments[*attachment.fromFunction()][attachment.interface()].push_back(attachment);
+        }
+        if (attachment.toFunction().has_value()) {
+            m_toObserverAttachments[*attachment.toFunction()][attachment.interface()].push_back(attachment);
+        }
+        if (attachment.kind() == ObserverAttachment::Kind::Kind_Continuous_Signal) {
+            m_observersWithContinuousSignals.push_back(attachment.observer());
+        }
     }
 }
 
@@ -250,6 +259,42 @@ auto IvToPromelaTranslator::Context::getObserverAttachments(const ObserverAttach
             }
         }
     }
+    return result;
+}
+
+auto IvToPromelaTranslator::Context::getUnhandledInputObserversForFunction(
+        const QString &function, const QString &interface) const -> ObserverAttachments
+{
+    ObserverAttachments result;
+
+    if (m_unhandledInputObserverAttachments.count(function) > 0) {
+        if (m_unhandledInputObserverAttachments.at(function).count(interface) > 0) {
+            std::copy_if(m_unhandledInputObserverAttachments.at(function).at(interface).begin(),
+                    m_unhandledInputObserverAttachments.at(function).at(interface).end(), std::back_inserter(result),
+                    [](const ObserverAttachment &attachment) {
+                        return attachment.kind() == ObserverAttachment::Kind::Kind_Unhandled_Input;
+                    });
+        }
+        if (m_unhandledInputObserverAttachments.at(function).count("") > 0) {
+            std::copy_if(m_unhandledInputObserverAttachments.at(function).at("").begin(),
+                    m_unhandledInputObserverAttachments.at(function).at("").end(), std::back_inserter(result),
+                    [](const ObserverAttachment &attachment) {
+                        return attachment.kind() == ObserverAttachment::Kind::Kind_Unhandled_Input;
+                    });
+        }
+    }
+    if (m_unhandledInputObserverAttachments.count("") > 0) {
+        if (m_unhandledInputObserverAttachments.at("").count("") > 0) {
+            std::copy_if(m_unhandledInputObserverAttachments.at("").at("").begin(),
+                    m_unhandledInputObserverAttachments.at("").at("").end(), std::back_inserter(result),
+                    [](const ObserverAttachment &attachment) {
+                        return attachment.kind() == ObserverAttachment::Kind::Kind_Unhandled_Input;
+                    });
+        }
+    }
+
+    std::sort(result.begin(), result.end(),
+            [](const auto &a, const auto &b) -> bool { return a.priority() > b.priority(); });
     return result;
 }
 
@@ -352,7 +397,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         }
     }
 
-    for (const auto &observerName : observerNames) {
+    for (const QString &observerName : systemInfo->m_observers) {
         promelaModel->addInclude(QString("%1.pml").arg(observerName));
     }
 
@@ -360,11 +405,13 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
 
     createSystemState(context);
 
-    for (const QString &function : modelFunctions) {
-        addChannelAndLock(context, function);
+    for (auto iter = systemInfo->m_functions.begin(); iter != systemInfo->m_functions.end(); ++iter) {
+        if (!iter->second->m_isEnvironment) {
+            addChannelAndLock(context, iter->first);
+        }
     }
 
-    for (const auto &observer : observerNames) {
+    for (const QString &observer : systemInfo->m_observers) {
         addChannelAndLock(context, observer);
     }
 
@@ -433,6 +480,8 @@ std::unique_ptr<IvToPromelaTranslator::SystemInfo> IvToPromelaTranslator::prepar
         }
     }
 
+    result->m_observers = std::set<QString>(observerNames.begin(), observerNames.end());
+
     return result;
 }
 
@@ -454,11 +503,15 @@ void IvToPromelaTranslator::generateInitProctype(Context &context) const
 
     sequence.appendElement(InlineCall("global_dataview_init", {}));
 
-    for (const QString &functionName : context.modelFunctions()) {
+    std::vector<QString> modelFunctions = context.modelFunctions();
+    std::sort(modelFunctions.begin(), modelFunctions.end());
+    for (const QString &functionName : modelFunctions) {
         initializeFunction(sequence, functionName);
     }
 
-    for (const QString &observer : context.observerNames()) {
+    std::vector<QString> observerNames = context.observerNames();
+    std::sort(observerNames.begin(), observerNames.end());
+    for (const QString &observer : observerNames) {
         initializeFunction(sequence, observer);
     }
 
@@ -794,6 +847,43 @@ void IvToPromelaTranslator::generateSendInline(Context &context, const QString &
     context.model()->addInlineDef(std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence)));
 }
 
+void IvToPromelaTranslator::generateUnhandledInputInline(
+        Context &context, const QString &functionName, const ProctypeInfo &proctypeInfo) const
+{
+    QString inlineName = QString("%1_0_PI_0_%2_unhandled_input")
+                                 .arg(Escaper::escapePromelaIV(functionName))
+                                 .arg(proctypeInfo.m_interfaceName);
+
+    Sequence sequence(Sequence::Type::NORMAL);
+
+    QList<QString> arguments;
+
+    if (!proctypeInfo.m_parameterTypeName.isEmpty()) {
+        arguments.push_back(proctypeInfo.m_parameterName);
+    }
+
+    ObserverAttachments attachments =
+            context.getUnhandledInputObserversForFunction(functionName, proctypeInfo.m_interfaceName);
+
+    if (attachments.empty()) {
+        sequence.appendElement(Skip());
+    } else {
+        for (const ObserverAttachment &attachment : attachments) {
+            sequence.appendElement(createLockAcquireStatement(attachment.observer()));
+
+            QList<InlineCall::Argument> callArguments;
+            if (!attachment.interface().isEmpty()) {
+                callArguments.append(VariableRef(proctypeInfo.m_parameterName));
+            }
+            sequence.appendElement(InlineCall(observerInputSignalName(attachment), callArguments));
+
+            sequence.appendElement(createLockReleaseStatement(attachment.observer()));
+        }
+    }
+
+    context.model()->addInlineDef(std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence)));
+}
+
 void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslator::Context &context,
         const IVFunction *ivFunction, const QString &functionName, const FunctionInfo &functionInfo) const
 {
@@ -849,6 +939,9 @@ void IvToPromelaTranslator::generateProctypeForTimer(IvToPromelaTranslator::Cont
         auto message = QString("Cannot find interface for timer with name %1").arg(interfaceName);
         throw TranslationException(message);
     }
+
+    generateUnhandledInputInline(context, functionName, proctypeInfo);
+
     generateProctype(context, functionName, false, proctypeInfo);
 }
 
@@ -866,6 +959,8 @@ void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslato
 
     generateSendInline(context, functionName, interfaceName, parameterName, parameterType, sourceFunctionName,
             sourceInterfaceName);
+
+    generateUnhandledInputInline(context, functionName, proctypeInfo);
 
     generateProctype(context, functionName, false, proctypeInfo);
 }
@@ -1008,17 +1103,13 @@ void IvToPromelaTranslator::createSystemState(Context &context) const
 
     Utype systemState("system_state");
 
-    for (const auto &observer : context.observerNames()) {
-        QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(observer));
-        QString fieldName = Escaper::escapePromelaField(observer);
-        systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
-    }
-
-    const auto &modelFunctions = context.modelFunctions();
-    for (IVFunction *ivFunction : ivFunctionList) {
-        const QString functionName = ivFunction->property("name").toString();
-        if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) == modelFunctions.end()) {
-            continue;
+    std::vector<QString> modelFunctions = context.modelFunctions();
+    std::sort(modelFunctions.begin(), modelFunctions.end());
+    for (const QString &functionName : modelFunctions) {
+        const IVFunction *ivFunction = context.ivModel()->getFunction(functionName, Qt::CaseInsensitive);
+        if (ivFunction == nullptr) {
+            throw TranslationException(
+                    QString("Function with name '%1' does not exist in InterfaceView").arg(functionName));
         }
         if (ivFunction->instanceOf() != nullptr) {
             const QString functionTypeName = ivFunction->instanceOf()->property("name").toString();
@@ -1030,6 +1121,14 @@ void IvToPromelaTranslator::createSystemState(Context &context) const
             QString fieldName = Escaper::escapePromelaField(functionName);
             systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
         }
+    }
+
+    std::vector<QString> observerNames = context.observerNames();
+    std::sort(observerNames.begin(), observerNames.end());
+    for (const auto &observer : observerNames) {
+        QString dataType = QString("%1_Context").arg(Escaper::escapePromelaIV(observer));
+        QString fieldName = Escaper::escapePromelaField(observer);
+        systemState.addField(Declaration(DataType(UtypeRef(dataType)), fieldName));
     }
 
     systemState.addField(Declaration(DataType(UtypeRef("AggregateTimerData")), "timers"));
@@ -1579,7 +1678,7 @@ void IvToPromelaTranslator::prepareFunctionInfo(Context &context, const ::ivm::I
             const QString parameterType = QString();
             const QString parameterName = QString();
             const ObserverAttachments outputObservers =
-                    context.getObserverAttachments(functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
+                    getObserverAttachments(context, functionName, interfaceName, ObserverAttachment::Kind::Kind_Output);
             std::unique_ptr<ProctypeInfo> proctypeInfo = std::make_unique<ProctypeInfo>();
 
             proctypeInfo->m_proctypeName = proctypeName;
