@@ -30,7 +30,10 @@
 #include <conversion/common/translation/exceptions.h>
 #include <conversion/converter/exceptions.h>
 #include <conversion/iv/IvOptions/options.h>
+#include <ivcore/ivlibrary.h>
+#include <libiveditor/iveditor.h>
 #include <seds/SedsOptions/options.h>
+#include <sharedlibrary.h>
 
 using conversion::ConversionException;
 using conversion::ConverterException;
@@ -45,6 +48,10 @@ using conversion::translator::TranslationException;
 
 int main(int argc, char **argv)
 {
+    shared::initSharedLibrary();
+    ivm::initIVLibrary();
+    ive::initIVEditor();
+
     QCoreApplication a(argc, argv);
     Options options;
     sedsconverter::SedsConverter sedsConverter;
