@@ -105,6 +105,8 @@ spacecreator-qt6-master:
       - ${BUILD_DIR}/asn1scc_bin
       - ccache
   artifacts:
+    reports:
+      junit: ${BUILD_DIR}/tst_*-result.xml
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
@@ -180,6 +182,10 @@ spacecreator-qt6-feature:
     paths:
       - ${BUILD_DIR}/asn1scc_bin
       - ccache
+  artifacts:
+    reports:
+      junit: ${BUILD_DIR}/tst_*-result.xml
+    expire_in: 2 days
   rules:
     # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
