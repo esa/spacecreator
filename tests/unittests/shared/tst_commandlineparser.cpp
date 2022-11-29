@@ -82,7 +82,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterTransactionNameType();
     void testCmdArgumentSedsEnableFailureReporting();
     void testCmdArgumentSedsConverterFailureReportingType();
-    void testCmdArgiumentSedsConverterArrayDimensionBaseIndexingType();
+    void testCmdArgumentSedsConverterArrayDimensionBaseIndexingType();
 
     void initTestCase();
     void testCoverage();
@@ -696,7 +696,7 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterFailureReportingType()
     QCOMPARE(value, failureReportingType);
 }
 
-void tst_CommandLineParser::testCmdArgiumentSedsConverterArrayDimensionBaseIndexingType()
+void tst_CommandLineParser::testCmdArgumentSedsConverterArrayDimensionBaseIndexingType()
 {
     const QCommandLineOption cmdArrayDimensionIndexType =
             CommandLineParser::positionalArg(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
