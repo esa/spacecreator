@@ -619,7 +619,8 @@ auto StateMachineTranslator::translateVariables(Context &context,
 
         const auto &arrayDimensions = variable.arrayDimensions();
         if (!arrayDimensions.empty()) {
-            variableTypeName = handleVariableArrayDimensions(context, variableName, variableTypeName, arrayDimensions);
+            variableTypeName =
+                    handleVariableArrayDimensions(context, variableName, variableTypeName, arrayDimensions, options);
         }
 
         auto sdlVariable =
@@ -1536,13 +1537,19 @@ auto StateMachineTranslator::createTimerSetCall(QString timerName, const uint64_
 }
 
 auto StateMachineTranslator::handleVariableArrayDimensions(Context &context, const QString &variableName,
-        const QString &variableTypeName, const std::vector<::seds::model::DimensionSize> &arrayDimensions) -> QString
+        const QString &variableTypeName, const std::vector<::seds::model::DimensionSize> &arrayDimensions,
+        const Options &options) -> QString
 {
     auto lastName = variableName;
     auto lastIndexingTypeName = QString("%1_Index").arg(variableName);
     auto lastElementTypeName = variableTypeName;
 
-    QString baseIndexingTypeName("MyIndexType");
+    const auto baseIndexingTypeName = options.value(SedsOptions::arrayDimensionBaseIndexingType);
+    if (!baseIndexingTypeName) {
+        auto errorMessage = QString("Variable '%1' uses ArrayDimensions but no base indexing type name was provided")
+                                    .arg(variableName);
+        throw TranslationException(std::move(errorMessage));
+    }
 
     for (auto it = arrayDimensions.rbegin(); it != arrayDimensions.rend(); ++it) {
         const auto &arrayDimension = *it;
@@ -1551,7 +1558,7 @@ auto StateMachineTranslator::handleVariableArrayDimensions(Context &context, con
             const auto &dimensionSize = arrayDimension.size()->value();
 
             auto indexingType =
-                    createVariableSizeDimensionIndexingType(dimensionSize, lastIndexingTypeName, baseIndexingTypeName);
+                    createVariableSizeDimensionIndexingType(dimensionSize, lastIndexingTypeName, *baseIndexingTypeName);
             auto arrayType =
                     createVariableSizeDimensionType(dimensionSize, lastName, indexingType.name(), lastElementTypeName);
 

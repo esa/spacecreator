@@ -234,8 +234,8 @@ private:
             -> std::unique_ptr<::sdl::ProcedureCall>;
 
     static auto handleVariableArrayDimensions(Context &context, const QString &variableName,
-            const QString &variableTypeName, const std::vector<::seds::model::DimensionSize> &arrayDimensions)
-            -> QString;
+            const QString &variableTypeName, const std::vector<::seds::model::DimensionSize> &arrayDimensions,
+            const Options &options) -> QString;
     static auto createVariableSizeDimensionIndexingType(
             const uint64_t size, const QString &variableName, const QString &baseTypeName) -> ::sdl::Syntype;
     static auto createVariableSizeDimensionType(const uint64_t size, const QString &variableName,

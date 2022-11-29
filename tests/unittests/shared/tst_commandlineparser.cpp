@@ -82,6 +82,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterTransactionNameType();
     void testCmdArgumentSedsEnableFailureReporting();
     void testCmdArgumentSedsConverterFailureReportingType();
+    void testCmdArgiumentSedsConverterArrayDimensionBaseIndexingType();
 
     void initTestCase();
     void testCoverage();
@@ -693,6 +694,25 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterFailureReportingType()
 
     const QString value = parser.value(CommandArg::SedsConverterFailureReportingType);
     QCOMPARE(value, failureReportingType);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterArrayDimensionBaseIndexingType()
+{
+    const QCommandLineOption cmdArrayDimensionIndexType =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
+    const QString arrayDimensionIndexingType("MyIndexingType");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdArrayDimensionIndexType.names().first(), arrayDimensionIndexingType) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterArrayDimensionBaseIndexingType));
+
+    const QString value = parser.value(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
+    QCOMPARE(value, arrayDimensionIndexingType);
 }
 
 void tst_CommandLineParser::initTestCase()
