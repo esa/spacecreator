@@ -1413,7 +1413,8 @@ auto StateMachineTranslator::translateTransition(Context &context, const ::seds:
     }
 
     if (sedsTransition->guard().has_value()) {
-        sdlTransition = translateGuard(context, context.sdlProcess(), sdlFromState, sdlTransition, *sedsTransition->guard());
+        sdlTransition =
+                translateGuard(context, context.sdlProcess(), sdlFromState, sdlTransition, *sedsTransition->guard());
     }
 
     const auto stateChange = sdlFromState->name() != sdlToState->name();
