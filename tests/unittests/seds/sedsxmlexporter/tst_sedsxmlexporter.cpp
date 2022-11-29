@@ -60,7 +60,11 @@ void tst_SedsXmlExporter::testExportsInteger()
         QFAIL(ex.what());
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCOMPARE(getFileContents("testExportsInteger.xml"), getFileContents("resources/testExportsInteger.xml"));
+#else
+    QCOMPARE(getFileContents("testExportsInteger.xml"), getFileContents("resources/testExportsIntegerQt6.xml"));
+#endif
 }
 
 void tst_SedsXmlExporter::testExportsEnum()
@@ -75,7 +79,11 @@ void tst_SedsXmlExporter::testExportsEnum()
         QFAIL(ex.what());
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCOMPARE(getFileContents("testExportsEnum.xml"), getFileContents("resources/testExportsEnum.xml"));
+#else
+    QCOMPARE(getFileContents("testExportsEnum.xml"), getFileContents("resources/testExportsEnumQt6.xml"));
+#endif
 }
 
 void tst_SedsXmlExporter::testExportsFloat()
@@ -90,7 +98,11 @@ void tst_SedsXmlExporter::testExportsFloat()
         QFAIL(ex.what());
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCOMPARE(getFileContents("testExportsFloat.xml"), getFileContents("resources/testExportsFloat.xml"));
+#else
+    QCOMPARE(getFileContents("testExportsFloat.xml"), getFileContents("resources/testExportsFloatQt6.xml"));
+#endif
 }
 
 void tst_SedsXmlExporter::testExportsString()
@@ -105,7 +117,11 @@ void tst_SedsXmlExporter::testExportsString()
         QFAIL(ex.what());
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCOMPARE(getFileContents("testExportsString.xml"), getFileContents("resources/testExportsString.xml"));
+#else
+    QCOMPARE(getFileContents("testExportsString.xml"), getFileContents("resources/testExportsStringQt6.xml"));
+#endif
 }
 
 } // namespace seds::test

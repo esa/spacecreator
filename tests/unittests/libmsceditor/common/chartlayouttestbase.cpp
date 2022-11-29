@@ -32,7 +32,7 @@ void ChartLayoutTestBase::initBase()
     m_chartModel.reset(new ChartLayoutManager(m_undoStack.get()));
     m_view = std::make_unique<QGraphicsView>();
     m_view->setScene(m_chartModel->graphicsScene());
-    m_reader = std::make_unique<MscReader>();
+    m_reader = std::make_unique<MscReader>(MscReader::NOTIFY::NO_HUB);
 
     CoordinatesConverter::instance()->setScene(m_chartModel->graphicsScene());
     const QPointF dpi1to1(CoordinatesConverter::Dpi1To1, CoordinatesConverter::Dpi1To1);

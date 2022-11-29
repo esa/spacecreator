@@ -36,7 +36,11 @@ public:
     void setSpinExecutable(const QString &spinExecutable);
     QString getSpinExecutable();
 
+    void setDefaultOutputDirectory(const QString &defaultOutputDirectory);
+    QString getDefaultOutputDirectory();
+
 private:
     Ui::TmcOptionsWidget *m_ui;
 };
+
 }

@@ -21,6 +21,8 @@
 
 #include "ui_tmcoptionswidget.h"
 
+#include <QFileDialog>
+
 namespace spctr {
 TmcOptionsWidget::TmcOptionsWidget(QWidget *parent)
     : QWidget(parent)
@@ -43,4 +45,15 @@ QString TmcOptionsWidget::getSpinExecutable()
 {
     return m_ui->spinExecutableLineEdit->text();
 }
+
+void TmcOptionsWidget::setDefaultOutputDirectory(const QString &defaultOutputDirectory)
+{
+    m_ui->outputDirectoryLineEdit->setText(defaultOutputDirectory);
+}
+
+QString TmcOptionsWidget::getDefaultOutputDirectory()
+{
+    return m_ui->outputDirectoryLineEdit->text();
+}
+
 }

@@ -106,5 +106,3 @@ target_include_directories(${PLUGIN_NAME}
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
 source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")
-
-install(FILES scl/generic-highlighter/scl.xml DESTINATION ${IDE_DATA_PATH}/generic-highlighter)

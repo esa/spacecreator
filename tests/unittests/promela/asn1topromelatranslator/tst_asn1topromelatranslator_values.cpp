@@ -31,6 +31,7 @@
 #include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/enumerated.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/typefactory.h>
@@ -45,6 +46,7 @@ using Asn1Acn::EnumValue;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::MultipleValue;
 using Asn1Acn::NamedValue;
+using Asn1Acn::RealValue;
 using Asn1Acn::SingleValue;
 using Asn1Acn::SourceLocation;
 using Asn1Acn::TypeAssignment;
@@ -57,6 +59,7 @@ using Asn1Acn::Types::ChoiceAlternative;
 using Asn1Acn::Types::Enumerated;
 using Asn1Acn::Types::EnumeratedItem;
 using Asn1Acn::Types::Integer;
+using Asn1Acn::Types::Real;
 using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::TypeFactory;
@@ -66,6 +69,7 @@ using promela::model::Constant;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::PromelaModel;
+using promela::model::RealConstant;
 using promela::model::VariableRef;
 using promela::translator::Asn1NodeVisitor;
 
@@ -245,6 +249,54 @@ void tst_Asn1ToPromelaTranslator_Values::testInteger() const
         QCOMPARE(std::get<VariableRef>(call->getArguments().at(0)).getElements().front().m_name, "myValue");
         QVERIFY(std::holds_alternative<Constant>(call->getArguments().at(1)));
         QCOMPARE(std::get<Constant>(call->getArguments().at(1)).getValue(), 2);
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_Values::testReal() const
+{
+    auto asn1Model = createModel();
+    {
+        auto realType = std::make_unique<Real>();
+        dynamic_cast<Real *>(realType.get())->constraints().append(RangeConstraint<RealValue>::create({ -10.0, 10.0 }));
+        auto myRealAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyReal"), QStringLiteral("MyReal"), SourceLocation(), realType->clone());
+
+        asn1Model->addType(std::move(myRealAssignment));
+
+        auto realReference = std::make_unique<UserdefinedType>("MyReal", "myModule");
+        realReference->setType(realType->clone());
+
+        auto myValueAssignment = std::make_unique<ValueAssignment>(QStringLiteral("myValue"), SourceLocation(),
+                std::move(realReference), std::make_unique<SingleValue>("2.71"));
+        asn1Model->addValue(std::move(myValueAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*asn1Model);
+
+    QCOMPARE(promelaModel.getDeclarations().size(), 1);
+
+    QCOMPARE(promelaModel.getDeclarations().at(0).getName(), "myValue");
+    QVERIFY(promelaModel.getDeclarations().at(0).getType().isUtypeReference());
+    QCOMPARE(promelaModel.getDeclarations().at(0).getType().getUtypeReference().getName(), "MyReal");
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 3);
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "myValue_init");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+        const InlineCall *call = findProctypeElement<InlineCall>(inlineDef->getSequence(), 0);
+        QVERIFY(call != 0);
+        QCOMPARE(call->getName(), "MyReal_assign_value");
+        QCOMPARE(call->getArguments().size(), 2);
+        QVERIFY(std::holds_alternative<VariableRef>(call->getArguments().at(0)));
+        QCOMPARE(std::get<VariableRef>(call->getArguments().at(0)).getElements().size(), 1);
+        QCOMPARE(std::get<VariableRef>(call->getArguments().at(0)).getElements().front().m_name, "myValue");
+        QVERIFY(std::holds_alternative<RealConstant>(call->getArguments().at(1)));
+        // this uses qFuzzyCompare
+        QCOMPARE(std::get<RealConstant>(call->getArguments().at(1)).getValue(), 2.71f);
     }
 }
 

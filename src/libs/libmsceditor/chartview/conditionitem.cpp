@@ -47,7 +47,7 @@ public:
 protected:
     bool validateText(const QString &text) const override
     {
-        MscReader reader;
+        MscReader reader(MscReader::NOTIFY::NO_HUB);
         QStringList errors;
         // test plain informal condition, or data statements
         QString testDoc = QString("msc c1;instance i1;condition %1;endinstance;endmsc;").arg(text);

@@ -9,7 +9,7 @@ default:
   before_script:
     - source ${CI_PROJECT_DIR}/scripts/timestamp.sh
     # dependencies
-    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect 
+    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect xmldiff
     # install OpenGEODE dependencies
     # *Python (both for OpenGEODE and sdl2promela)
     - pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
@@ -76,8 +76,8 @@ spacecreator-qt6-master:
   stage: build-test-bundle
   variables:
     PROJECT_DIR: ${CI_PROJECT_DIR}
-    ENV_QT_VERSION: 6.3.1
-    ENV_QTC_VERSION: 8.0.1
+    ENV_QT_VERSION: 6.4.1
+    ENV_QTC_VERSION: 9.0.0
     ENV_DIR: /opt/spacecreator6
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
@@ -152,8 +152,8 @@ spacecreator-qt6-feature:
   stage: build-test
   variables:
     PROJECT_DIR: ${CI_PROJECT_DIR}
-    ENV_QT_VERSION: 6.3.1
-    ENV_QTC_VERSION: 8.0.1
+    ENV_QT_VERSION: 6.4.1
+    ENV_QTC_VERSION: 9.0.0
     ENV_DIR: /opt/spacecreator6
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64

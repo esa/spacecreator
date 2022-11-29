@@ -185,6 +185,11 @@ void TmcVerifier::setMemoryLimit(int memoryLimit)
     m_memoryLimit = memoryLimit;
 }
 
+void TmcVerifier::setVectorszValue(int vectorValue)
+{
+    m_vectorszValue = vectorValue;
+}
+
 void TmcVerifier::setRawCommandline(QString rawCommandline)
 {
     m_rawCommandline = std::move(rawCommandline);
@@ -365,8 +370,10 @@ void TmcVerifier::executeCC()
     arguments.append("-o");
     arguments.append(outputFile);
 
-    // This is a temporary sane default, TODO - make it configurable
-    arguments.append("-DVECTORSZ=65535");
+    constexpr int VECTORSZ_DEFAULT_VALUE = 65535;
+    int vectorszValue = m_vectorszValue.value_or(VECTORSZ_DEFAULT_VALUE);
+    arguments.append("-DVECTORSZ=" + QString::number(vectorszValue));
+    qDebug() << "VECTORSZ: " << vectorszValue;
 
     if (m_useBitHashing) {
         arguments.append("-DBITSTATE");

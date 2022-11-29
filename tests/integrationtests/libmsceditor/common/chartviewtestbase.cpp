@@ -41,7 +41,7 @@ void ChartViewTestBase::initBase()
     m_chartModel.reset(new ChartLayoutManager(m_undoStack.data()));
     m_view.reset(new QGraphicsView());
     m_view->setScene(m_chartModel->graphicsScene());
-    m_reader.reset(new MscReader);
+    m_reader.reset(new MscReader(MscReader::NOTIFY::NO_HUB));
 }
 
 void ChartViewTestBase::cleanupBase()

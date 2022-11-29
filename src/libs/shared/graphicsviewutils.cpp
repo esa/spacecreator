@@ -835,7 +835,7 @@ QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDir
                 return {};
 
             const QLineF prevDirection { path.value(path.size() - 2), path.value(path.size() - 1) };
-            auto shortPath = findPath(existingRects, prevDirection, endDirection, &intersectedRect);
+            QVector<QPointF> shortPath = findPath(existingRects, prevDirection, endDirection, &intersectedRect);
             if (!shortPath.isEmpty()) {
                 QVector<QPointF> result;
                 result.append(startDirection.p1());
@@ -845,7 +845,7 @@ QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDir
                 results.append(result);
                 continue;
             }
-            const auto subPaths = findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
+            const QList<QVector<QPointF>> subPaths = findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
             for (auto subPath : subPaths) {
                 if (subPath.isEmpty()) {
                     continue;
@@ -891,7 +891,11 @@ QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const 
     if (endDirection.isNull())
         return {};
 
-    const auto points = path(existingRects, startDirection, endDirection);
+    QVector<QPointF> points = path(existingRects, startDirection, endDirection);
+    if (points.size() < 2) {
+        // if no path was found, fall back to start/end directly
+        return  {startIfacePos, endIfacePos};
+    }
     return simplifyPoints(points);
 }
 

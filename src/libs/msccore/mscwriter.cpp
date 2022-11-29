@@ -571,7 +571,7 @@ bool MscWriter::convertMscFile(const QString &inputFile, const QString &template
         return false;
     }
 
-    msc::MscReader reader;
+    msc::MscReader reader(msc::MscReader::NOTIFY::NO_HUB);
     QStringList errors;
     QScopedPointer<msc::MscModel> mscModel(reader.parseFile(inputFile, &errors));
     if (!errors.isEmpty() || mscModel.isNull()) {

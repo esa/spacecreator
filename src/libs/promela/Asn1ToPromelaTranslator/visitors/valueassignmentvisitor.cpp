@@ -65,6 +65,7 @@ using promela::model::Constant;
 using promela::model::Expression;
 using promela::model::InlineCall;
 using promela::model::ProctypeElement;
+using promela::model::RealConstant;
 using promela::model::VariableRef;
 
 namespace promela::translator {
@@ -219,7 +220,19 @@ void ValueAssignmentVisitor::visit(const SequenceOf &type)
 void ValueAssignmentVisitor::visit(const Real &type)
 {
     Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for REAL datatype");
+
+    if (m_value->typeEnum() != Value::SINGLE_VALUE) {
+        throw ConverterException("Invalid value for REAL datatype");
+    }
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
+    double value = singleValue->value().toDouble();
+
+    const QString inlineCallName = QString("%1_assign_value").arg(Escaper::escapePromelaName(m_typeName));
+
+    QList<InlineCall::Argument> inlineArguments;
+    inlineArguments.append(m_target);
+    inlineArguments.append(RealConstant(value));
+    m_sequence.appendElement(InlineCall(inlineCallName, inlineArguments));
 }
 
 void ValueAssignmentVisitor::visit(const LabelType &type)

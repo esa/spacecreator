@@ -304,40 +304,6 @@ QString joinNonEmpty(const QStringList &values, const QString &lineBreak)
     return filtered.join(lineBreak);
 }
 
-bool moveDefaultDirectories(const QString &currentImplName, const QString &projectPath, const QString &functionName,
-        const QString &language)
-{
-    const QString defaultImplPath { projectPath + QDir::separator() + shared::kRootImplementationPath
-        + QDir::separator() + functionName };
-    const QString commonImplPath { defaultImplPath + QDir::separator() + shared::kNonCurrentImplementationPath
-        + QDir::separator() + currentImplName };
-
-    bool result = true;
-    if (shared::ensureDirExists(commonImplPath)) {
-        QDir dir { defaultImplPath };
-        const QStringList subfolders = dir.entryList(QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-        for (const QString &dirName : subfolders) {
-            if (dirName != shared::kNonCurrentImplementationPath) {
-                const QString subfolderPath = dir.filePath(dirName);
-                const QString destPath = commonImplPath + QDir::separator() + dirName;
-                const bool res = shared::copyDir(subfolderPath, destPath, shared::FileCopyingMode::Overwrite);
-                result &= res;
-                if (res)
-                    result &= QDir(subfolderPath).removeRecursively();
-            }
-        }
-    }
-    const QFileInfo link { defaultImplPath + QDir::separator() + language };
-    const QString linkTargetPath = commonImplPath + QDir::separator() + language;
-    ensureDirExists(linkTargetPath);
-    if (link.isSymLink()) {
-        result &= link.symLinkTarget() == linkTargetPath;
-    } else {
-        result &= QFile::link(link.dir().relativeFilePath(linkTargetPath), link.absoluteFilePath());
-    }
-    return result;
-}
-
 bool moveDir(const QString &source, const QString &dest, FileCopyingMode replaceMode)
 {
     if (copyDir(source, dest, replaceMode))

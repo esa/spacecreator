@@ -33,9 +33,10 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QProcess>
+#include <QSettings>
 #include <QThread>
 #include <conversion/common/escaper/escaper.h>
-
+#include <tmc/TmcConfig/constants.h>
 
 namespace {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -1637,6 +1638,7 @@ void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
             SpinConfigData::optionalIntToString(spinConfig.globalInputVectorGenerationLimit));
     d->ui->lineEdit_rawCommandLine->setText(spinConfig.rawCommandLine);
     d->ui->lineEdit_deltaValue->setText(SpinConfigData::optionalFloatToString(spinConfig.deltaValue));
+    d->ui->lineEdit_vectorszValue->setText(SpinConfigData::optionalIntToString(spinConfig.vectorszValue));
 
     spinConfig.explorationMode == ExplorationMode::BreadthFirst
             ? d->ui->comboBox_spinExpAlgorithm->setCurrentText("Breadth First Search")
@@ -1672,8 +1674,14 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
 {
     QString outputDirectoryFilepath;
     {
+        // ensure the default output directory exists
+        QSettings settings;
+        QVariant defaultOutputDirectory = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, QString());
+        QString defaultOutputFullPath = QStringLiteral ("%1/%2").arg (projectDir, defaultOutputDirectory.toString());
+        QDir (defaultOutputFullPath).mkpath(QStringLiteral("."));
+
         QFileDialog fileDialog;
-        fileDialog.setDirectory(projectDir);
+        fileDialog.setDirectory(defaultOutputFullPath);
         fileDialog.setFileMode(QFileDialog::FileMode::Directory);
         fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
         fileDialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
@@ -1687,10 +1695,12 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
         } else {
             return;
         }
+        // save relative output path
+        const QString relativeOutputDirectory = QDir(projectDir).relativeFilePath(outputDirectoryFilepath);
+        settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, relativeOutputDirectory);
     }
 
     QFileInfo outputDirectory(outputDirectoryFilepath);
-
     if (outputDirectory.exists()) {
         if (!outputDirectory.isDir()) {
             QMessageBox::warning(this, tr("Call Spin"), tr("Selected output is not directory!"), QMessageBox::Cancel);
@@ -1763,6 +1773,7 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
     spinConfigData.searchStateLimit = SpinConfigData::optionalIntFromString(d->ui->lineEdit_searchStateLimit->text());
     spinConfigData.timeLimitSeconds = SpinConfigData::optionalIntFromString(d->ui->lineEdit_spinTimeLimit->text());
     spinConfigData.deltaValue = SpinConfigData::optionalFloatFromString(d->ui->lineEdit_deltaValue->text());
+    spinConfigData.vectorszValue = SpinConfigData::optionalIntFromString(d->ui->lineEdit_vectorszValue->text());
 
     spinConfigData.searchShortestPath = (d->ui->checkBox_searchShortestPath->checkState() == Qt::Checked);
     spinConfigData.useFairScheduling = (d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked);

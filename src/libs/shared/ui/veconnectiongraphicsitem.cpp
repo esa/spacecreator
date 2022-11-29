@@ -592,41 +592,46 @@ void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGra
 
     if (m_points.size() > 2) {
         QVector<QPointF> initialPoints = graphicsviewutils::polygon(entity()->coordinates());
-        const QRectF currentRect = QRectF(initialPoints.first(), initialPoints.last());
-        QRectF newRect;
-        if (endPoint == startItem()) {
-            newRect = QRectF(endPointPos, m_points.last());
-        } else if (endPoint == endItem()) {
-            newRect = QRectF(m_points.first(), endPointPos);
+        if (initialPoints.size() < 2) {
+            initialPoints.append(m_points.first());
+            initialPoints.append(m_points.last());
         } else {
-            qWarning() << "Attempt to update from an unknown interface";
-            return;
-        }
-
-        const qreal xScale = newRect.width() / currentRect.width();
-        const qreal yScale = newRect.height() / currentRect.height();
-        if (qFuzzyCompare(xScale, 1.0) && qFuzzyCompare(yScale, 1.0)) {
-            return;
-        }
-        for (auto it = std::next(initialPoints.begin()); it != std::prev(initialPoints.end()); ++it) {
-            qreal x = 0, y = 0;
-            if (it->x() <= currentRect.left() && it->x() < currentRect.right()) {
-                x = it->x() - currentRect.left() + newRect.left();
-            } else if (it->x() >= currentRect.right() && it->x() > currentRect.left()) {
-                x = it->x() - currentRect.right() + newRect.right();
+            const QRectF currentRect = QRectF(initialPoints.first(), initialPoints.last());
+            QRectF newRect;
+            if (endPoint == startItem()) {
+                newRect = QRectF(endPointPos, m_points.last());
+            } else if (endPoint == endItem()) {
+                newRect = QRectF(m_points.first(), endPointPos);
             } else {
-                x = (it->x() - currentRect.left()) * xScale + newRect.left();
+                qWarning() << "Attempt to update from an unknown interface";
+                return;
             }
 
-            if (it->y() <= currentRect.top() && it->y() < currentRect.bottom()) {
-                y = it->y() - currentRect.top() + newRect.top();
-            } else if (it->y() >= currentRect.bottom() && it->y() > currentRect.top()) {
-                y = it->y() - currentRect.bottom() + newRect.bottom();
-            } else {
-                y = (it->y() - currentRect.top()) * yScale + newRect.top();
+            const qreal xScale = newRect.width() / currentRect.width();
+            const qreal yScale = newRect.height() / currentRect.height();
+            if (qFuzzyCompare(xScale, 1.0) && qFuzzyCompare(yScale, 1.0)) {
+                return;
             }
+            for (auto it = std::next(initialPoints.begin()); it != std::prev(initialPoints.end()); ++it) {
+                qreal x = 0, y = 0;
+                if (it->x() <= currentRect.left() && it->x() < currentRect.right()) {
+                    x = it->x() - currentRect.left() + newRect.left();
+                } else if (it->x() >= currentRect.right() && it->x() > currentRect.left()) {
+                    x = it->x() - currentRect.right() + newRect.right();
+                } else {
+                    x = (it->x() - currentRect.left()) * xScale + newRect.left();
+                }
 
-            *it = { x, y };
+                if (it->y() <= currentRect.top() && it->y() < currentRect.bottom()) {
+                    y = it->y() - currentRect.top() + newRect.top();
+                } else if (it->y() >= currentRect.bottom() && it->y() > currentRect.top()) {
+                    y = it->y() - currentRect.bottom() + newRect.bottom();
+                } else {
+                    y = (it->y() - currentRect.top()) * yScale + newRect.top();
+                }
+
+                *it = { x, y };
+            }
         }
         m_points = initialPoints;
     }
