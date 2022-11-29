@@ -50,6 +50,8 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterModelTo);
     m_parser.handlePositional(CommandArg::SedsConverterModelsAux);
     m_parser.handlePositional(CommandArg::SedsConverterIvConfig);
+    m_parser.handlePositional(CommandArg::SedsConverterIvGenerateParentFunctions);
+    m_parser.handlePositional(CommandArg::SedsConverterIvDataTypesSedsFilepath);
     m_parser.handlePositional(CommandArg::SedsConverterSedsSchemaFilepath);
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRef);
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRefFilepath);
@@ -194,6 +196,10 @@ void SedsConverterCLI::addIvTranslationOptions(Options &options)
 {
     if (m_arguments.contains(CommandArg::SedsConverterIvGenerateParentFunctions)) {
         options.add(IvOptions::generateFunctionsForPackages);
+    }
+
+    if (m_arguments.contains(CommandArg::SedsConverterIvDataTypesSedsFilepath)) {
+        options.add(IvOptions::dataTypesSedsFilepath, m_parser.value(CommandArg::SedsConverterIvDataTypesSedsFilepath));
     }
 }
 

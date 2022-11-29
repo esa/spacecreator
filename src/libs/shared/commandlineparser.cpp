@@ -206,6 +206,12 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description =
                 QCoreApplication::translate("CommandLineParser", "Generate parent functions for each SEDS package");
     } break;
+    case CommandLineParser::Positional::SedsConverterIvDataTypesSedsFilepath: {
+        names << "iv-data-types-seds-filepath";
+        description =
+                QCoreApplication::translate("CommandLineParser", "Path to the SEDS file containing data types used in output IV");
+        valueName = QCoreApplication::translate("CommandLineParaer", "filepath");
+    } break;
     case CommandLineParser::Positional::SedsConverterSedsPreprocessedFilepath: {
         names << "seds-preprocessed-filepath";
         description = QCoreApplication::translate(
