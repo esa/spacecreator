@@ -89,7 +89,7 @@
                 <Guard>
                   <TypeCondition>
                     <FirstOperand variableRef="containerVar" />
-                    <TypeOperand>ParentContainer</TypeOperand>
+                    <TypeOperand>ChildContainerA</TypeOperand>
                   </TypeCondition>
                 </Guard>
                 <Do activity="CheckActivity" />

@@ -49,7 +49,7 @@ process CoolComponent;
             /* CIF Task (0, 1312), (100, 50) */
             task Containervar := Io_clkif_tick_pi.Tickarg;
             /* CIF Decision (0, 1312), (400, 50) */
-            decision present(containerVar.realization) = realizationParentContainer;
+            decision present(containerVar.realization.realizationParentContainer.realization) = realizationChildContainerA;
                 /* CIF Answer (0, 1387), (400, 50) */
                 (True):
                     /* CIF ProcedureCall (0, 1462), (100, 50) */
