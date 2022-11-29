@@ -24,7 +24,7 @@ EXIT_CODE=0
 TESTS=`find . -name "tst*_*" -type f -executable`
 for TEST in $TESTS
 do
-    echo $TEST
+    echo "Running test: $TEST"
     TEST_NAME=$(basename $TEST)
     TEST_DIR=$(dirname $TEST)
     ARGS="-o $BASE_DIR/$TEST_NAME-result.xml,junitxml"
@@ -35,6 +35,7 @@ do
     if [ $LAST_EXIT -ne 0 ] ; then
         EXIT_CODE=1
         # Run failing test again, to print the output in stdout as well
+        echo "Test '$TEST_NAME' FAILED. Running it again for the std output."
         ./$TEST_NAME
     fi
 done
