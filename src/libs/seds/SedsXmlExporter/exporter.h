@@ -20,6 +20,7 @@
 #pragma once
 
 #include <conversion/common/export/modelexporter.h>
+#include <seds/SedsModel/xincludeinfo.h>
 
 class QDomDocument;
 class QDomElement;
@@ -70,11 +71,14 @@ private:
     static auto exportPackage(const model::Package &package, QDomElement &parentElement, QDomDocument &sedsDocument)
             -> void;
 
+    static auto exportXIncludes(const std::vector<model::XIncludeInfo> &xIncludes, QDomElement &packageElement, QDomDocument &sedsDocument) -> void;
+
     static auto createSedsXmlDocument() -> QDomDocument;
     static auto createRootElement(const QString &rootElementName, QDomDocument &sedsDocument) -> QDomElement;
 
 private:
     static const QString m_schemaNsUri;
+    static const QString m_schemaIncludeNsUri;
     static const QString m_schemaInstanceNsUri;
     static const QString m_schemaLocation;
 };

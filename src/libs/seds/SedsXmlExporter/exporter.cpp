@@ -42,6 +42,7 @@ namespace seds::exporter {
 
 const QString SedsXmlExporter::m_schemaNsUri = R"(http://www.ccsds.org/schema/sois/seds)";
 const QString SedsXmlExporter::m_schemaInstanceNsUri = R"(http://www.w3.org/2001/XMLSchema-instance)";
+const QString SedsXmlExporter::m_schemaIncludeNsUri = R"(http://www.w3.org/2001/XInclude)";
 const QString SedsXmlExporter::m_schemaLocation = R"(http://www.ccsds.org/schema/sois/seds seds.xsd)";
 
 void SedsXmlExporter::exportModel(const Model *const model, const Options &options) const
@@ -106,6 +107,10 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
     const auto &packageName = package.nameStr();
     packageElement.setAttribute(QStringLiteral("name"), packageName);
 
+    if (!package.xIncludes().empty()) {
+        exportXIncludes(package.xIncludes(), packageElement, sedsDocument);
+    }
+
     if (!package.dataTypes().empty()) {
         auto dataTypeSet = sedsDocument.createElement(QStringLiteral("DataTypeSet"));
         for (const auto &dataType : package.dataTypes()) {
@@ -119,6 +124,18 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
     }
 
     parentElement.appendChild(packageElement);
+}
+
+void SedsXmlExporter::exportXIncludes(const std::vector<XIncludeInfo> &xIncludes, QDomElement &packageElement, QDomDocument &sedsDocument)
+{
+    for(const auto &xInclude : xIncludes) {
+        auto xIncludeElement = sedsDocument.createElement(QStringLiteral("xi:include"));
+
+        xIncludeElement.setAttribute(QStringLiteral("href"), xInclude.filepath);
+        xIncludeElement.setAttribute(QStringLiteral("xpointer"), xInclude.xPointer);
+
+        packageElement.appendChild(xIncludeElement);
+    }
 }
 
 QDomDocument SedsXmlExporter::createSedsXmlDocument()
@@ -136,6 +153,7 @@ QDomElement SedsXmlExporter::createRootElement(const QString &rootElementName, Q
 {
     auto rootElement = sedsDocument.createElement(rootElementName);
     rootElement.setAttribute("xmlns", m_schemaNsUri);
+    rootElement.setAttribute("xmlns:xi", m_schemaIncludeNsUri);
     rootElement.setAttribute("xmlns:xsi", m_schemaInstanceNsUri);
     rootElement.setAttribute("xsi:schemaLocation", m_schemaLocation);
 

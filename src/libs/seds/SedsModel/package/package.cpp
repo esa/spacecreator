@@ -31,6 +31,16 @@ void Package::setName(common::String name)
     m_qualifiedName = std::move(name);
 }
 
+const std::vector<XIncludeInfo> &Package::xIncludes() const
+{
+    return m_xIncludes;
+}
+
+void Package::addXInclude(XIncludeInfo info)
+{
+    m_xIncludes.push_back(std::move(info));
+}
+
 const DataType *Package::dataType(const common::String &name) const
 {
     auto result = std::find_if(m_dataTypes.begin(), m_dataTypes.end(),
