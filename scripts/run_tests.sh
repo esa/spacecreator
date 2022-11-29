@@ -28,7 +28,7 @@ do
     echo $TEST
     TEST_NAME=$(basename $TEST)
     TEST_DIR=$(dirname $TEST)
-    ARGS="-xunitxml -o $BASE_DIR/$TEST_NAME-result.xml"
+    ARGS="-o $BASE_DIR/$TEST_NAME-result.xml,junitxml"
     cd $BASE_DIR
     cd $TEST_DIR
     ./$TEST_NAME $ARGS
