@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd" xmlns="http://www.ccsds.org/schema/sois/seds">
+ <Package name="InterfaceView">
+  <xi:include xpointer="element(/1/1/1)" href="datatypes.xml"/>
+  <ComponentSet>
+   <Component name="SporadicFunction">
+    <ProvidedInterfaceSet>
+     <Interface name="SporadicInterfacePi" type="SporadicFunctionSporadicInterfacePi"/>
+    </ProvidedInterfaceSet>
+    <DeclaredInterfaceSet>
+     <Interface name="SporadicFunctionSporadicInterfacePi">
+      <CommandSet>
+       <Command mode="async" name="SporadicInterfacePi">
+        <Argument mode="in" name="SporadicArg" type="MyInteger"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+    </DeclaredInterfaceSet>
+   </Component>
+  </ComponentSet>
+ </Package>
+</PackageFile>
