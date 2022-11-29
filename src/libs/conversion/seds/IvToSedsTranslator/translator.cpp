@@ -66,6 +66,11 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
     ::seds::model::Package sedsPackage;
     sedsPackage.setName("InterfaceView");
 
+    const auto dataTypeSedsFilepath = options.value(iv::IvOptions::dataTypesSedsFilepath);
+    if(dataTypeSedsFilepath) {
+        sedsPackage.addXInclude({ *dataTypeSedsFilepath, m_dataTypesSetXPointer });
+    }
+
     auto ivFunctions = ivModel->allObjectsByType<ivm::IVFunction>();
 
     // IV model stores functions in UUID->Function map, which makes translation undeterministic
