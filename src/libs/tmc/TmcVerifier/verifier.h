@@ -256,6 +256,8 @@ private:
     void saveReport(const QFileInfo &reportFilepath, const QString &data);
     void presentReport(const QFileInfo &reportFilepath);
 
+    static void dbg(const QString &message);
+
 private Q_SLOTS:
     void processStderrReady();
     void processStdoutReady();
@@ -305,6 +307,7 @@ private:
     QStringList m_spinTraceFiles;
     QStringList m_traceFiles;
     QString m_currentTraceFile;
+    QStringList m_mscObserverFiles;
 
     QMetaObject::Connection m_processStartedConnection;
     QMetaObject::Connection m_processFinishedConnection;

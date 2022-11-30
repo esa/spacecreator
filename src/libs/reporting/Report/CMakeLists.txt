@@ -2,6 +2,7 @@ project(Report VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
     dataconstraintviolationreport.cpp
+    mscfailurereport.cpp
     observerfailurereport.cpp
     rawerroritem.cpp
     spinerrorparser.cpp
@@ -10,6 +11,7 @@ set(SOURCES
 
 set(INCLUDES
     dataconstraintviolationreport.h
+    mscfailurereport.h
     observerfailurereport.h
     rawerroritem.h
     spinerrorparser.h

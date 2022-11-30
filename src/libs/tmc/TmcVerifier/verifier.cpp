@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <QDirIterator>
+#include <QMessageBox>
 #include <QRegularExpression>
 #include <QTimer>
 #include <reporting/HtmlReport/htmlreportbuilder.h>
@@ -88,6 +89,7 @@ TmcVerifier::~TmcVerifier()
 void TmcVerifier::setMscObserverFiles(const QStringList &mscObserverFiles)
 {
     m_converter->setMscObserverFiles(mscObserverFiles);
+    m_mscObserverFiles = mscObserverFiles;
 }
 
 void TmcVerifier::setEnvironmentFunctions(const std::vector<QString> &environmentFunctions)
@@ -512,9 +514,9 @@ void TmcVerifier::generateReport()
         rawErrorItems.append(rawErrorItem);
     };
 
-    QString report = builder.parseAndBuildHtmlReport(spinMessages, sclFiles, rawErrorItems, QStringList());
-
+    QString report = builder.parseAndBuildHtmlReport(spinMessages, sclFiles, rawErrorItems, m_mscObserverFiles);
     QFileInfo reportFilepath = QFileInfo(m_outputDirectory + QDir::separator() + "report.html");
+
     saveReport(reportFilepath, report);
     if (m_executeMode == ExecuteMode::ConvertAndVerify) {
         presentReport(reportFilepath);
@@ -526,6 +528,14 @@ void TmcVerifier::generateReport()
 void TmcVerifier::presentReport(const QFileInfo &reportFilepath)
 {
     HtmlReportPresenter::present(reportFilepath.absoluteFilePath());
+}
+
+void TmcVerifier::dbg(const QString &message)
+{
+    QFile file("/home/taste/out.html");
+    file.open(QFile::ReadOnly);
+    file.write(message.toUtf8());
+    file.close();
 }
 
 void TmcVerifier::saveReport(const QFileInfo &reportFilepath, const QString &data)

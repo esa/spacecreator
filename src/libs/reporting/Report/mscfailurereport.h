@@ -19,44 +19,20 @@
 
 #pragma once
 
-#include <QList>
 #include <QMetaType>
 #include <QString>
-#include <QVariant>
 
 namespace reporting {
 
 /**
- * @brief   Structure to hold parsed spin report data.
+ * @brief   Contains parsed information from an error identified as an MSC failure.
  */
-struct SpinErrorReportItem {
-    /** Error types */
-    enum ErrorType
-    {
-        DataConstraintViolation = 0,
-        StopConditionViolation,
-        ObserverFailure,
-        MscFailure,
-        OtherError
-    };
-
-    /** Spin error number, counted from 1 up */
-    uint32_t errorNumber;
-    /** Error depth reported by spin */
-    uint32_t errorDepth;
-    /** Error type reported by the message */
-    ErrorType errorType;
-    /** Raw error details reported by the message */
-    QString rawErrorDetails;
-    /** Raw trails attached to the report */
-    QString scenario;
-    /** Parsed error details */
-    QVariant parsedErrorDetails;
+struct MscFailureReport {
+    /** Observer name */
+    QString observerName;
 };
-
-typedef QList<SpinErrorReportItem> SpinErrorReport;
 
 }
 
-// Add meta type for QVariant compability
-Q_DECLARE_METATYPE(reporting::SpinErrorReportItem)
+// Add meta type for QVariant compatibility
+Q_DECLARE_METATYPE(reporting::MscFailureReport)
