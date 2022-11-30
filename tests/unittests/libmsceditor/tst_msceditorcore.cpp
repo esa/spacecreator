@@ -25,6 +25,7 @@
 #include "mscinstance.h"
 #include "mscmodel.h"
 #include "sharedlibrary.h"
+#include "standardpaths.h"
 #include "systemchecks.h"
 
 #include <QPointer>
@@ -67,7 +68,7 @@ public:
 
 void tst_MSCEditorCore::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     shared::initSharedLibrary();
 }
 

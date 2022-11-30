@@ -58,7 +58,6 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSplitter>
-#include <QStandardPaths>
 #include <QUndoStack>
 #include <QVBoxLayout>
 #include <algorithm>
@@ -874,7 +873,8 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         (*it)->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), targetDir.dirName());
     }
 
-    if (!exportObjects(exporter(), objects, d->archetypesModel, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
+    if (!exportObjects(
+                exporter(), objects, d->archetypesModel, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
         return false;
     }
 

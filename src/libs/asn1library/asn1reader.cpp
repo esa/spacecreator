@@ -20,6 +20,7 @@
 #include "astxmlparser.h"
 #include "errorhub.h"
 #include "file.h"
+#include "standardpaths.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
@@ -28,7 +29,6 @@
 #include <QProcess>
 #include <QRandomGenerator>
 #include <QSettings>
-#include <QStandardPaths>
 #include <QTemporaryDir>
 
 namespace Asn1Acn {
@@ -79,7 +79,7 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
     const QByteArray asn1FileHash = fileHash(QStringList(fullFilePath));
 
     const QString asnCacheFile =
-            QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
+            shared::StandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
 
     if (!QFile::exists(asnCacheFile)) {
         if (!convertToXML(QStringList(fullFilePath), asnCacheFile, errorMessages)) {
@@ -162,7 +162,7 @@ std::map<QString, std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1Files(
     const QByteArray asn1FileHash = fileHash(absoluteFilePaths);
 
     const QString asnCacheFile =
-            QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
+            shared::StandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
 
     if (!QFile::exists(asnCacheFile)) {
         if (!convertToXML(absoluteFilePaths, asnCacheFile, errorMessages)) {
@@ -332,7 +332,7 @@ QString Asn1Reader::checkforCompiler() const
     QString asn1Exec = process.readAll();
     asn1Exec.remove('\n');
     if (asn1Exec.isEmpty()) {
-        asn1Exec = QStandardPaths::writableLocation(QStandardPaths::HomeLocation)
+        asn1Exec = shared::StandardPaths::writableLocation(QStandardPaths::HomeLocation)
                 + QLatin1String("/tool-inst/share/asn1scc/asn1scc");
         if (!QFileInfo::exists(asn1Exec)) {
             qWarning() << tr("Unable to find the asn1scc compiler");

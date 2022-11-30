@@ -17,12 +17,13 @@
 
 #include "settingsmanager.h"
 
+#include "standardpaths.h"
+
 #include <QDebug>
-#include <QStandardPaths>
 
 static QString path()
 {
-    return QString("%1/settings.conf").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
+    return QString("%1/settings.conf").arg(shared::StandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
 }
 
 namespace shared {

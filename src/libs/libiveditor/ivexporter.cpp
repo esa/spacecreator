@@ -22,16 +22,7 @@
 #include "common.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
-#include "ivfunction.h"
-#include "stringtemplate.h"
-#include "templateeditor.h"
-#include "templating/exportableivconnection.h"
-#include "templating/exportableivconnectiongroup.h"
-#include "templating/exportableivfunction.h"
-#include "templating/exportableivinterface.h"
+#include "ivobject.h"
 #include "templating/exportableivobject.h"
 
 #include <QBuffer>
@@ -40,7 +31,6 @@
 #include <QMetaEnum>
 #include <QObject>
 #include <QScopedPointer>
-#include <QStandardPaths>
 #include <QtDebug>
 
 namespace ive {

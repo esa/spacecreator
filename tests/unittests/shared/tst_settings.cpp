@@ -16,6 +16,7 @@
 */
 
 #include "settingsmanager.h"
+#include "standardpaths.h"
 
 #include <QMainWindow>
 #include <QtTest>
@@ -36,7 +37,7 @@ private:
 
 void tst_Settings::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
 
     mainwindow = new QMainWindow;
     mainwindow->setGeometry(100, 100, 640, 480);

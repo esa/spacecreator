@@ -17,9 +17,6 @@
 
 #include "ivutils.h"
 
-#include <QDir>
-#include <QStandardPaths>
-
 namespace ive {
 
 } // namespace ive

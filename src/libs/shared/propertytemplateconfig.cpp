@@ -32,7 +32,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QRegularExpression>
-#include <QStandardPaths>
 
 namespace shared {
 
@@ -76,7 +75,8 @@ QList<PropertyTemplate *> PropertyTemplateConfig::systemAttributes() const
     return sysAttrs;
 }
 
-PropertyTemplateConfig::~PropertyTemplateConfig() {
+PropertyTemplateConfig::~PropertyTemplateConfig()
+{
     qDeleteAll(d->m_attrTemplates);
 }
 

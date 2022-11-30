@@ -22,10 +22,10 @@
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "ivpropertytemplateconfig.h"
+#include "standardpaths.h"
 
 #include <QDir>
 #include <QObject>
-#include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QtTest>
 
@@ -51,7 +51,7 @@ private:
 
 void tst_CmdFunctionImplementationUpdate::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
     auto dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
@@ -75,7 +75,8 @@ void tst_CmdFunctionImplementationUpdate::init()
 void tst_CmdFunctionImplementationUpdate::test_changeImplementationName()
 {
     EntityAttribute value("NewCode", "Ada", EntityAttribute::Type::Attribute);
-    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationUpdate>(m_projectDir->path(), m_function.get(), 0, value);
+    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationUpdate>(
+            m_projectDir->path(), m_function.get(), 0, value);
 
     QFileInfo oldDir(m_handler->implementationBasePath("MyCode"));
     QCOMPARE(oldDir.exists(), true);
@@ -94,7 +95,8 @@ void tst_CmdFunctionImplementationUpdate::test_changeImplementationName()
 void tst_CmdFunctionImplementationUpdate::test_undoImplementationName()
 {
     EntityAttribute value("NewCode", "Ada", EntityAttribute::Type::Attribute);
-    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationUpdate>(m_projectDir->path(), m_function.get(), 0, value);
+    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationUpdate>(
+            m_projectDir->path(), m_function.get(), 0, value);
 
     QFileInfo oldDir(m_handler->implementationBasePath("MyCode"));
     m_cmd->redo();
@@ -114,7 +116,8 @@ void tst_CmdFunctionImplementationUpdate::test_undoImplementationName()
 void tst_CmdFunctionImplementationUpdate::test_changeImplementationLanguage()
 {
     EntityAttribute value("MyCode", "SDL", EntityAttribute::Type::Attribute);
-    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationUpdate>(m_projectDir->path(), m_function.get(), 0, value);
+    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationUpdate>(
+            m_projectDir->path(), m_function.get(), 0, value);
 
     QFileInfo oldDir(m_handler->implementationPath("MyCode", "Ada"));
     QCOMPARE(oldDir.exists(), true);
@@ -135,9 +138,10 @@ void tst_CmdFunctionImplementationUpdate::test_changeDefaultImplementationLangua
     const QString oldPath = m_handler->implementationPath("MyCode", "Ada");
     QDir dir;
     dir.mkpath(oldPath);
-    QFile::link(m_handler->functionBasePath()+"/Ada", dir.absolutePath());
+    QFile::link(m_handler->functionBasePath() + "/Ada", dir.absolutePath());
     EntityAttribute value("NewCode", "SDL", EntityAttribute::Type::Attribute);
-    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationUpdate>(m_projectDir->path(), m_function.get(), 0, value);
+    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationUpdate>(
+            m_projectDir->path(), m_function.get(), 0, value);
 
     QFileInfo oldDir(m_handler->implementationBasePath("MyCode"));
     QCOMPARE(oldDir.exists(), true);

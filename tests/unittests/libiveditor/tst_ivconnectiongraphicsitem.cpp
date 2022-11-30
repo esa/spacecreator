@@ -23,9 +23,10 @@
 #include "itemeditor/ivfunctiontypegraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
 #include "iveditor.h"
-#include "sharedlibrary.h"
-#include "ivpropertytemplateconfig.h"
 #include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
+#include "sharedlibrary.h"
+#include "standardpaths.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -48,7 +49,7 @@ void tst_IVConnectionGraphicsItem::initTestCase()
 {
     ive::initIVEditor();
     shared::initSharedLibrary();
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void tst_IVConnectionGraphicsItem::tst_Overlapping()
@@ -83,7 +84,8 @@ void tst_IVConnectionGraphicsItem::tst_Overlapping()
     ifaceItem2->setBoundingRect(QRectF(0, 0, 10, 10));
     ifaceItem2->setPos(parentFunc2->mapFromScene(QPointF(500, 0)));
 
-    auto connection = new ive::IVConnectionGraphicsItem(new ivm::IVConnection(ifaceItem1->entity(), ifaceItem2->entity()), ifaceItem1, ifaceItem2);
+    auto connection = new ive::IVConnectionGraphicsItem(
+            new ivm::IVConnection(ifaceItem1->entity(), ifaceItem2->entity()), ifaceItem1, ifaceItem2);
     scene.addItem(connection);
     connection->init();
     ifaceItem1->addConnection(connection);

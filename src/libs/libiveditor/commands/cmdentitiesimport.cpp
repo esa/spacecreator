@@ -25,6 +25,7 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivxmlreader.h"
+#include "standardpaths.h"
 
 #include <QApplication>
 #include <QBuffer>
@@ -32,7 +33,6 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPointF>
-#include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QtDebug>
 
@@ -194,7 +194,7 @@ void CmdEntitiesImport::redo()
 
 void CmdEntitiesImport::undo()
 {
-    m_tempDir.reset(new QTemporaryDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
+    m_tempDir.reset(new QTemporaryDir(shared::StandardPaths::writableLocation(QStandardPaths::CacheLocation)
             + QDir::separator() + QLatin1String("import")));
 
     for (auto it = m_importedEntities.crbegin(); it != m_importedEntities.crend(); ++it) {

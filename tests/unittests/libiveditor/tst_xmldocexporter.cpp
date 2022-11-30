@@ -28,11 +28,12 @@
 #include "ivlibrary.h"
 #include "ivtestutils.h"
 #include "parameter.h"
+#include "standardpaths.h"
 
 #include <QObject>
 #include <QtTest>
 
-static QString testFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tst_xmldocex.xml";
+static QString testFilePath = shared::StandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tst_xmldocex.xml";
 
 class tst_XmlDocExporter : public QObject
 {

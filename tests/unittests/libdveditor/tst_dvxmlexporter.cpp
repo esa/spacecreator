@@ -25,12 +25,13 @@
 #include "dvnode.h"
 #include "dvpartition.h"
 #include "dvxmlreader.h"
+#include "standardpaths.h"
 
 #include <QFile>
 #include <QObject>
 #include <QtTest>
 
-static QString testFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tst_dvxmldocex.xml";
+static QString testFilePath = shared::StandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tst_dvxmldocex.xml";
 
 class tst_DVXmlExporter : public QObject
 {

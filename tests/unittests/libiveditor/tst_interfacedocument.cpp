@@ -25,6 +25,7 @@
 #include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivtestutils.h"
+#include "standardpaths.h"
 
 #include <QObject>
 #include <QtTest>
@@ -66,7 +67,7 @@ void tst_InterfaceDocument::initTestCase()
 {
     ivm::initIVLibrary();
     ive::initIVEditor();
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void tst_InterfaceDocument::init()

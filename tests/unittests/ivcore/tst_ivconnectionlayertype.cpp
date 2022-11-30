@@ -24,8 +24,8 @@
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
+#include "standardpaths.h"
 
-#include <QStandardPaths>
 #include <QTest>
 
 class tst_IVConnectionLayerType : public QObject
@@ -40,7 +40,7 @@ private Q_SLOTS:
 
 void tst_IVConnectionLayerType::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
 }
 

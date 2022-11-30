@@ -22,10 +22,10 @@
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "ivpropertytemplateconfig.h"
+#include "standardpaths.h"
 
 #include <QDir>
 #include <QObject>
-#include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QtTest>
 
@@ -50,7 +50,7 @@ private:
 
 void tst_CmdFunctionImplementationDefaultChange::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
     auto dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
@@ -72,9 +72,10 @@ void tst_CmdFunctionImplementationDefaultChange::init()
 
     QDir dir;
     dir.mkpath(m_handler->implementationPath("MyCode", "Ada"));
-    QFile::link(m_handler->functionBasePath()+"/Ada", dir.absolutePath());
+    QFile::link(m_handler->functionBasePath() + "/Ada", dir.absolutePath());
 
-    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationDefaultChange>(m_projectDir->path(), m_function.get(), "SimpleCode", "SDL");
+    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationDefaultChange>(
+            m_projectDir->path(), m_function.get(), "SimpleCode", "SDL");
 }
 
 void tst_CmdFunctionImplementationDefaultChange::test_switchDefaultImplementation()
@@ -91,7 +92,7 @@ void tst_CmdFunctionImplementationDefaultChange::test_switchDefaultImplementatio
     // old is gone
     linkInfo.refresh();
     QCOMPARE(linkInfo.exists(), false);
-    //new is set up
+    // new is set up
     QFileInfo linkInfo2(m_handler->functionBasePath() + "/SDL");
     QCOMPARE(linkInfo2.exists(), true);
     QCOMPARE(linkInfo2.isSymLink(), true);
@@ -117,7 +118,8 @@ void tst_CmdFunctionImplementationDefaultChange::test_undoDefaultImplementation(
 
 void tst_CmdFunctionImplementationDefaultChange::test_resetDefaultImplementation()
 {
-    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationDefaultChange>(m_projectDir->path(), m_function.get(), "MyCode", "Ada");
+    m_cmd = std::make_unique<ive::cmd::CmdFunctionImplementationDefaultChange>(
+            m_projectDir->path(), m_function.get(), "MyCode", "Ada");
     QCOMPARE(m_cmd->isObsolete(), true);
 }
 

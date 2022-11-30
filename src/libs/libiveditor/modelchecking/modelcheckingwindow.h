@@ -18,12 +18,12 @@
 #pragma once
 
 #include "spinconfigsaver.h"
+#include "standardpaths.h"
 
 #include <QCheckBox>
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QMainWindow>
-#include <QStandardPaths>
 #include <QTreeWidgetItem>
 #include <functional>
 
@@ -133,7 +133,7 @@ private:
 
     const QString defaultMessageSequenceChartWhenThenMscTemplateName = "when-then-property-tmpl.msc";
     const QString defaultMessageSequenceChartWhenThenMscTemplatePath =
-            QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/model-checker/"
+            shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/model-checker/"
             + defaultMessageSequenceChartWhenThenMscTemplateName;
     const QString sedCommandForWhenThenPropertyTemplate = "sed -i \"s/Untitled_Document/%1/g\" %2";
 
