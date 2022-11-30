@@ -26,6 +26,7 @@
 #include <sdl/SdlModel/input.h>
 #include <sdl/SdlModel/join.h>
 #include <sdl/SdlModel/label.h>
+#include <sdl/SdlModel/newtype.h>
 #include <sdl/SdlModel/nextstate.h>
 #include <sdl/SdlModel/output.h>
 #include <sdl/SdlModel/procedure.h>
@@ -36,6 +37,7 @@
 #include <sdl/SdlModel/sdlmodel.h>
 #include <sdl/SdlModel/signal.h>
 #include <sdl/SdlModel/state.h>
+#include <sdl/SdlModel/syntype.h>
 #include <sdl/SdlModel/system.h>
 #include <sdl/SdlModel/task.h>
 #include <sdl/SdlModel/transition.h>
@@ -166,6 +168,18 @@ public:
      * @param   declaration   declaration to be visited
      */
     virtual auto visit(const VariableDeclaration &declaration) -> void = 0;
+    /**
+     * @brief   Syntype visitor
+     *
+     * @param   syntype     Syntype to be visited
+     */
+    virtual auto visit(const Syntype &syntype) -> void = 0;
+    /**
+     * @brief   Newtype visitor
+     *
+     * @param   newtype     Newtype to be visited
+     */
+    virtual auto visit(const Newtype &newtype) -> void = 0;
     /**
      * @brief   Label visitor
      *
