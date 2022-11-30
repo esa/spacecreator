@@ -2,7 +2,7 @@ set(TEST_NAME tst_tmc_observers)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME})
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+add_testXML(${TEST_NAME})
 
 target_sources(${TEST_NAME}
     PRIVATE     ${TEST_NAME}.cpp)

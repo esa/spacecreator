@@ -2,7 +2,8 @@ set(TEST_NAME tst_asn1exporter)
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME})
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+add_testXML(${TEST_NAME})
+
 
 target_sources(${TEST_NAME}
     PRIVATE     tst_acnnodereconstructingvisitor.cpp
