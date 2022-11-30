@@ -211,4 +211,39 @@ Asn1Acn::Definitions *Context::getAsn1Definitions(const QString &definitionsName
     return asn1Definitions;
 }
 
+const ::seds::model::Package *Context::getSedsPackage(const QString &packageName) const
+{
+    const auto sedsPackage = std::find_if(m_sedsPackages.begin(), m_sedsPackages.end(),
+            [&](const auto &package) { return package.nameStr() == packageName; });
+
+    if (sedsPackage != m_sedsPackages.end()) {
+        return &(*sedsPackage);
+    }
+
+    return nullptr;
+}
+
+const ::seds::model::DataType *Context::findSedsType(const ::seds::model::DataTypeRef &typeRef) const
+{
+    const auto package = typeRef.packageStr() ? getSedsPackage(*typeRef.packageStr()) : &m_sedsPackage;
+    if (package != nullptr) {
+        return package->dataType(typeRef.nameStr());
+    }
+
+    return nullptr;
+}
+
+const ::seds::model::Variable *Context::findSedsVariable(const QString &variableName) const
+{
+    const auto &variables = m_sedsComponent.implementation().variables();
+    auto foundVariable = std::find_if(variables.begin(), variables.end(),
+            [&](const auto &var) { return QString::compare(var.nameStr(), variableName, Qt::CaseInsensitive) == 0; });
+
+    if (foundVariable != variables.end()) {
+        return &(*foundVariable);
+    }
+
+    return nullptr;
+}
+
 }

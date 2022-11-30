@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="TYPECONDITIONS">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+      <ContainerDataType name="ChildContainerA" baseType="ParentContainer">
+        <EntryList>
+          <Entry name="ChildEntryA" type="Number" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ChildContainerB" baseType="ParentContainer">
+        <EntryList>
+          <Entry name="ChildEntryB" type="Number" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="ParentContainer" baseType="MegaContainer">
+        <EntryList>
+          <Entry name="ParentEntry" type="Number" />
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="MegaContainer">
+        <EntryList>
+          <Entry name="MegaEntry" type="Number" />
+        </EntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="ClkIFType">
+        <CommandSet>
+          <Command name="Tick" mode="async">
+            <Argument name="tickArg" type="MegaContainer" mode="in" />
+          </Command>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="CoolComponent">
+        <ProvidedInterfaceSet>
+          <Interface name="ClkIF" type="ClkIFType"></Interface>
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="containerVar" type="MegaContainer" />
+            <Variable name="childAVar" type="ChildContainerA" />
+            <Variable name="num" type="Number" />
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="CheckActivity">
+              <Body>
+                <Conditional>
+                  <Condition>
+                    <TypeCondition>
+                      <FirstOperand variableRef="containerVar" />
+                      <TypeOperand>ParentContainer</TypeOperand>
+                    </TypeCondition>
+                  </Condition>
+                  <OnConditionTrue>
+                  </OnConditionTrue>
+                  <OnConditionFalse>
+                    <Conditional>
+                      <Condition>
+                        <TypeCondition>
+                          <FirstOperand variableRef="containerVar" />
+                          <TypeOperand>ChildContainerB</TypeOperand>
+                        </TypeCondition>
+                      </Condition>
+                      <OnConditionTrue>
+                      </OnConditionTrue>
+                      <OnConditionFalse>
+                      </OnConditionFalse>
+                    </Conditional>
+                  </OnConditionFalse>
+                </Conditional>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="Comparator">
+              <EntryState name="s0" />
+              <Transition fromState="s0" toState="s0" name="t1">
+                <OnCommandPrimitive command="Tick" interface="ClkIF">
+                  <ArgumentValue name="tickArg" outputVariableRef="containerVar" />
+                </OnCommandPrimitive>
+                <Guard>
+                  <TypeCondition>
+                    <FirstOperand variableRef="containerVar" />
+                    <TypeOperand>ChildContainerA</TypeOperand>
+                  </TypeCondition>
+                </Guard>
+                <Do activity="CheckActivity" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

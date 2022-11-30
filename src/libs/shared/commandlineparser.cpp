@@ -293,19 +293,24 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
     } break;
     case CommandLineParser::Positional::SedsConverterTransactionNameType: {
         names << "seds-transaction-name-type";
-        description =
-                QCoreApplication::translate("CommandLineParser", "Specify which ASN.1 <type> should be used for SEDS transaction name");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Specify which ASN.1 <type> should be used for SEDS transaction name");
         valueName = QCoreApplication::translate("CommandLineParser", "type");
     } break;
     case CommandLineParser::Positional::SedsConverterEnableFailureReporting: {
         names << "seds-enable-failure-reporting";
-        description =
-                QCoreApplication::translate("CommandLineParser", "Enable SEDS failure reporting");
+        description = QCoreApplication::translate("CommandLineParser", "Enable SEDS failure reporting");
     } break;
     case CommandLineParser::Positional::SedsConverterFailureReportingType: {
         names << "seds-failure-reporting-type";
-        description =
-                QCoreApplication::translate("CommandLineParser", "Specify which ASN.1 <type> should be used for SEDS failure reporting");
+        description = QCoreApplication::translate(
+                "CommandLineParser", "Specify which ASN.1 <type> should be used for SEDS failure reporting");
+        valueName = QCoreApplication::translate("CommandLineParser", "type");
+    } break;
+    case CommandLineParser::Positional::SedsConverterArrayDimensionBaseIndexingType: {
+        names << "seds-array-dimension-indexing-type";
+        description = QCoreApplication::translate("CommandLineParser",
+                "Specify which ASN.1 <type> should be used for creating index type in SEDS ArrayDimension");
         valueName = QCoreApplication::translate("CommandLineParser", "type");
     } break;
     default:

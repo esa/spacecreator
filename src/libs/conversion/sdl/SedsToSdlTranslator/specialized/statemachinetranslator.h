@@ -24,8 +24,10 @@
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivmodel.h>
 #include <map>
+#include <sdl/SdlModel/newtype.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/sdlmodel.h>
+#include <sdl/SdlModel/syntype.h>
 #include <seds/SedsModel/components/states/entrystate.h>
 #include <seds/SedsModel/components/states/exitstate.h>
 #include <seds/SedsModel/sedsmodel.h>
@@ -221,7 +223,7 @@ private:
 
     static auto createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 
-    static auto translateGuard(::sdl::Process *sdlProcess, const ::sdl::State *fromState,
+    static auto translateGuard(Context &context, ::sdl::Process *sdlProcess, const ::sdl::State *fromState,
             ::sdl::Transition *currentTransitionPtr, const seds::model::BooleanExpression &guard)
             -> ::sdl::Transition *;
 
@@ -230,6 +232,16 @@ private:
 
     static auto createTimerSetCall(QString timerName, const uint64_t callTimeInNanoseconds)
             -> std::unique_ptr<::sdl::ProcedureCall>;
+
+    static auto handleVariableArrayDimensions(Context &context, const QString &variableName,
+            const QString &variableTypeName, const std::vector<::seds::model::DimensionSize> &arrayDimensions,
+            const Options &options) -> QString;
+    static auto createVariableSizeDimensionIndexingType(
+            const uint64_t size, const QString &variableName, const QString &baseTypeName) -> ::sdl::Syntype;
+    static auto createVariableSizeDimensionType(const uint64_t size, const QString &variableName,
+            const QString &indexingTypeName, const QString &elementTypeName) -> ::sdl::Newtype;
+    static auto createVariableTypeDimensionType(const QString &typeName, const QString &variableName,
+            const QString &indexingTypeName, const QString &elementTypeName) -> ::sdl::Newtype;
 
     static auto getSdlState(const ::seds::model::StateRef &sedsState,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> ::sdl::State *;
