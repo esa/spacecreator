@@ -360,6 +360,8 @@ void tst_SedsConverter_SedsToSdl::testTransaction()
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2130
 /// \SRS  ETB-FUN-2190
+/// \SRS  ETB-FUN-2590
+/// \SRS  ETB-FUN-2630
 void tst_SedsConverter_SedsToSdl::testFailureReportingSync()
 {
     const int result = system("./test_failure_reporting_sync.sh");
@@ -368,6 +370,7 @@ void tst_SedsConverter_SedsToSdl::testFailureReportingSync()
 
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2130
+/// \SRS  ETB-FUN-2590
 void tst_SedsConverter_SedsToSdl::testFailureReportingAsync()
 {
     const int result = system("./test_failure_reporting_async.sh");
