@@ -186,6 +186,33 @@ void tst_HtmlReportBuilder::testObserverFailureSuccessState()
     QVERIFY(html == htmlResult);
 }
 
+void tst_HtmlReportBuilder::testMscFailure()
+{
+    const QString spinMessagePath("resources/msc_failure_msg.txt");
+    const QString spinTracesPath("resources/msc_failure_spin.txt");
+    const QString sclPath("resources/msc_failure_scl.txt");
+    const QString scenarioPath("resources/scenario.sim");
+    const QString mscPath("resources/msc_failure_mscdemo.msc");
+    const QString htmlTemplatePath("resources/template.html");
+    const QString htmlResultPath("resources/msc_failure_result.html");
+
+    RawErrorItem rawError;
+    rawError.spinTraceFile = spinTracesPath;
+    rawError.scenarioFile = scenarioPath;
+
+    const HtmlReportBuilder htmlBuilder;
+    auto html = htmlBuilder.parseAndBuildHtmlReport(
+            { spinMessagePath }, { sclPath }, { rawError }, { mscPath }, htmlTemplatePath);
+    const auto htmlResult = readFile(htmlResultPath);
+
+    QFile f("/home/taste/msc_failure_result.html");
+    f.open(QFile::WriteOnly);
+    f.write(html.toUtf8());
+    f.close();
+
+    QVERIFY(html == htmlResult);
+}
+
 QString tst_HtmlReportBuilder::readFile(const QString &filepath)
 {
     QFile file(filepath);

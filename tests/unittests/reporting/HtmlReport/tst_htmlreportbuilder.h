@@ -37,6 +37,7 @@ private Q_SLOTS:
     void testStopConditionNever();
     void testObserverFailureErrorState();
     void testObserverFailureSuccessState();
+    void testMscFailure();
 
 private:
     QString readFile(const QString &filepath);
