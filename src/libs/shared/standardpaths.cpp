@@ -40,7 +40,7 @@ QString StandardPaths::writableLocation(QStandardPaths::StandardLocation type)
     }
 
     // Fallback
-    return shared::StandardPaths::writableLocation(type);
+    return QStandardPaths::writableLocation(type);
 }
 
 /**
