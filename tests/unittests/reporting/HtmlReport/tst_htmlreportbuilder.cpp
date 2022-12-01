@@ -205,11 +205,6 @@ void tst_HtmlReportBuilder::testMscFailure()
             { spinMessagePath }, { sclPath }, { rawError }, { mscPath }, htmlTemplatePath);
     const auto htmlResult = readFile(htmlResultPath);
 
-    QFile f("/home/taste/msc_failure_result.html");
-    f.open(QFile::WriteOnly);
-    f.write(html.toUtf8());
-    f.close();
-
     QVERIFY(html == htmlResult);
 }
 
