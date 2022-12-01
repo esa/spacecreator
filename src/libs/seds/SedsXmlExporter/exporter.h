@@ -71,7 +71,8 @@ private:
     static auto exportPackage(const model::Package &package, QDomElement &parentElement, QDomDocument &sedsDocument)
             -> void;
 
-    static auto exportXIncludes(const std::vector<model::XIncludeInfo> &xIncludes, QDomElement &packageElement, QDomDocument &sedsDocument) -> void;
+    static auto exportXIncludes(const std::vector<model::XIncludeInfo> &xIncludes, QDomElement &packageElement,
+            QDomDocument &sedsDocument) -> void;
 
     static auto createSedsXmlDocument() -> QDomDocument;
     static auto createRootElement(const QString &rootElementName, QDomDocument &sedsDocument) -> QDomElement;

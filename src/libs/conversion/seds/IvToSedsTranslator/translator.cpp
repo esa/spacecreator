@@ -67,7 +67,7 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
     sedsPackage.setName("InterfaceView");
 
     const auto dataTypeSedsFilepath = options.value(iv::IvOptions::dataTypesSedsFilepath);
-    if(dataTypeSedsFilepath) {
+    if (dataTypeSedsFilepath) {
         sedsPackage.addXInclude({ *dataTypeSedsFilepath, m_dataTypesSetXPointer });
     }
 

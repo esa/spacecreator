@@ -126,9 +126,10 @@ void SedsXmlExporter::exportPackage(const Package &package, QDomElement &parentE
     parentElement.appendChild(packageElement);
 }
 
-void SedsXmlExporter::exportXIncludes(const std::vector<XIncludeInfo> &xIncludes, QDomElement &packageElement, QDomDocument &sedsDocument)
+void SedsXmlExporter::exportXIncludes(
+        const std::vector<XIncludeInfo> &xIncludes, QDomElement &packageElement, QDomDocument &sedsDocument)
 {
-    for(const auto &xInclude : xIncludes) {
+    for (const auto &xInclude : xIncludes) {
         auto xIncludeElement = sedsDocument.createElement(QStringLiteral("xi:include"));
 
         xIncludeElement.setAttribute(QStringLiteral("href"), xInclude.filepath);

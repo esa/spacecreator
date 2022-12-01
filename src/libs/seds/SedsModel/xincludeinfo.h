@@ -24,8 +24,7 @@ namespace seds::model {
 /**
  * @brief   XInclude info for SEDS models
  */
-struct XIncludeInfo
-{
+struct XIncludeInfo {
     /// @brief  File to include
     QString filepath;
     /// @brief  XPointer
