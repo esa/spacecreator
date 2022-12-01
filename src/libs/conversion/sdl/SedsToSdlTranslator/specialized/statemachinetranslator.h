@@ -124,6 +124,18 @@ public:
             const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
 
     /**
+     * @brief  Translate parameter activity maps into getter/setter procedures or input/output signals
+     *
+     * @param context                   Translation context
+     * @param parameterActivityMaps     Parameter activity maps
+     * @param stateMachine              SEDS state machine
+     * @param options                   Conversion options
+     */
+    static auto translateParameterActivityMaps(Context &context,
+            const seds::model::ComponentImplementation::ParameterActivityMapSet &parameterActivityMaps,
+            const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
+
+    /**
      * @brief   Build mapping of names to command declarations
      *
      * @param context   Translation context which contains both the source component and the target map
@@ -176,8 +188,24 @@ private:
     static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
             ::sdl::StateMachine *stateMachine) -> void;
 
+    static auto createParameterActivityGetSyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map,
+            const std::vector<const ::seds::model::Transition *> &sedsTransitions, const Options &options)
+            -> std::unique_ptr<::sdl::Procedure>;
+    static auto createParameterActivitySetSyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map,
+            const std::vector<const ::seds::model::Transition *> &sedsTransitions, const Options &options)
+            -> std::unique_ptr<::sdl::Procedure>;
+
     static auto translateParameter(Context &context, const seds::model::ParameterMap &map,
             const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
+    static auto translateParameter(Context &context, const seds::model::ParameterActivityMap &map,
+            const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
+
+    static auto handleParameterActivityMapGetActivity(Context &context, const ::seds::model::ParameterActivityMap &map,
+            const ::seds::model::StateMachine &sedsStateMachine, const Options &options) -> void;
+    static auto handleParameterActivityMapSetActivity(Context &context, const ::seds::model::ParameterActivityMap &map,
+            const ::seds::model::StateMachine &sedsStateMachine, const Options &options) -> void;
 
     static auto createStartTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;

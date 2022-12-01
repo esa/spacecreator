@@ -148,6 +148,8 @@ auto SedsToSdlTranslator::translateComponent(const ::seds::model::Package &sedsP
             StateMachineTranslator::translateStateMachine(context, sedsStateMachine, options);
             StateMachineTranslator::translateParameterMaps(
                     context, implementation.parameterMaps(), sedsStateMachine, options);
+            StateMachineTranslator::translateParameterActivityMaps(
+                    context, implementation.parameterActivityMaps(), sedsStateMachine, options);
         }
         StateMachineTranslator::ensureMinimalStateMachineExists(context);
 
