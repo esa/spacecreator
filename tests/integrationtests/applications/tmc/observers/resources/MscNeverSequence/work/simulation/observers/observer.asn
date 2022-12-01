@@ -2,7 +2,7 @@ Helper-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger FROM MSCOBSERVER-DATAVIEW
+   My-Integer FROM MSCOBSERVER-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -20,7 +20,7 @@ Pinger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger FROM MSCOBSERVER-DATAVIEW
+   My-Integer FROM MSCOBSERVER-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -38,7 +38,7 @@ Ponger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger FROM MSCOBSERVER-DATAVIEW
+   My-Integer FROM MSCOBSERVER-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -55,7 +55,7 @@ END
 MSCOBSERVER-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10000)
+   My-Integer ::= INTEGER (0 .. 10000)
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
@@ -67,7 +67,7 @@ BEGIN
 -- Simple types:
 
 -- TASTE-Boolean ::= BOOLEAN
--- MyInteger   ::= INTEGER (0..255)
+-- My-Integer   ::= INTEGER (0..255)
 -- MyReal      ::= REAL (0.0 .. 1000.0)
 -- MyBool      ::= BOOLEAN
 -- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
@@ -75,8 +75,8 @@ BEGIN
 -- Complex types:
 
 --  MySeq       ::= SEQUENCE {
---      input-data  MyInteger,
---      output-data MyInteger,
+--      input-data  My-Integer,
+--      output-data My-Integer,
 --      validity    ENUMERATED { valid, invalid }
 --  }
 --

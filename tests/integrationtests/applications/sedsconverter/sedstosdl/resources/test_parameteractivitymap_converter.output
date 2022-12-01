@@ -1,0 +1,53 @@
+/* CIF Process (0, 0), (800, 100) */
+process Converter;
+    /* CIF Procedure (0, 150), (800, 50) */
+    procedure Get_CelciusTemperatureIF_CelciusTemperature_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        dcl Celciusvalue Number;
+        dcl Rawvalue Number;
+        fpar
+            in/out Param Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF ProcedureCall (0, 937), (100, 50) */
+            call Get_RawTemperatureIF_RawTemperature_Ri(Rawvalue);
+            /* CIF Task (0, 1012), (100, 50) */
+            task Celciusvalue := Rawvalue / 50;
+            /* CIF Task (0, 1087), (100, 50) */
+            task Param := Celciusvalue;
+    return;
+    endprocedure;
+    /* CIF Procedure (0, 225), (800, 50) */
+    procedure Set_CelciusTemperatureIF_CelciusTemperature_Pi;
+        /* CIF Text (0, 0), (400, 500) */
+        dcl Celciusvalue Number;
+        dcl Rawvalue Number;
+        fpar
+            in Param Number;
+        /* CIF ENDTEXT */
+        /* CIF Start (0, 750), (200, 75) */
+        START;
+            /* CIF Task (0, 937), (100, 50) */
+            task Celciusvalue := Param;
+            /* CIF Task (0, 1012), (100, 50) */
+            task Rawvalue := Celciusvalue * 50;
+            /* CIF ProcedureCall (0, 1087), (100, 50) */
+            call Set_RawTemperatureIF_RawTemperature_Ri(Rawvalue);
+    return;
+    endprocedure;
+    /* CIF Start (0, 300), (200, 75) */
+    START;
+        /* CIF NextState (0, 487), (200, 50) */
+        NEXTSTATE s0;
+    /* CIF State (0, 562), (200, 50) */
+    state s0;
+        /* CIF Input (0, 562), (200, 50) */
+        input Get_CelciusTemperatureIF_CelciusTemperature_Pi;
+            /* CIF NextState (0, 637), (200, 50) */
+            NEXTSTATE s1;
+    endstate;
+    /* CIF State (600, 562), (200, 50) */
+    state s1;
+    endstate;
+endprocess Converter;

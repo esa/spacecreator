@@ -259,6 +259,8 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
         itemAtScenePos = itemAtScenePos->parentItem();
     }
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    if (!parentObject && m_document->objectsModel() && m_document->objectsModel()->rootObject())
+        parentObject = qobject_cast<ivm::IVFunctionType *>(m_document->objectsModel()->rootObject());
     auto cmdImport = new cmd::CmdEntitiesImport(data, parentObject, m_document->objectsModel(), m_document->asn1Check(),
             sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
     m_document->commandsStack()->push(cmdImport);

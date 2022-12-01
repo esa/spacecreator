@@ -23,9 +23,5 @@ configure_file(resources/testExportsInteger.xml resources/testExportsInteger.xml
 configure_file(resources/testExportsEnum.xml resources/testExportsEnum.xml COPYONLY)
 configure_file(resources/testExportsFloat.xml resources/testExportsFloat.xml COPYONLY)
 configure_file(resources/testExportsString.xml resources/testExportsString.xml COPYONLY)
-configure_file(resources/testExportsIntegerQt6.xml resources/testExportsIntegerQt6.xml COPYONLY)
-configure_file(resources/testExportsEnumQt6.xml resources/testExportsEnumQt6.xml COPYONLY)
-configure_file(resources/testExportsFloatQt6.xml resources/testExportsFloatQt6.xml COPYONLY)
-configure_file(resources/testExportsStringQt6.xml resources/testExportsStringQt6.xml COPYONLY)
 
 add_format_target(${TEST_NAME})
