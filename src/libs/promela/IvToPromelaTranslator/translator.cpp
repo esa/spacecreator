@@ -829,14 +829,13 @@ void IvToPromelaTranslator::generateSendInline(Context &context, const QString &
 
     Sequence sequence(Sequence::Type::NORMAL);
 
-    const auto argumentName =
-            handleSendInlineArgument(parameterType, functionName, interfaceName, parameterName, sequence);
+    const auto argumentName = handleSendInlineArgument(parameterType, functionName, interfaceName, parameterName);
 
     QList<QString> arguments;
     QList<Expression> params;
 
     if (argumentName.isEmpty()) {
-        params.append(Expression(VariableRef(m_dummyParamName)));
+        params.append(Expression(Constant(0)));
     } else {
         params.append(Expression(VariableRef(argumentName)));
         arguments.push_back(argumentName);
@@ -914,14 +913,17 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
         }
     }
 
+    for (auto iter = functionInfo.m_synchronousCalls.begin(); iter != functionInfo.m_synchronousCalls.end(); ++iter) {
+        createPromelaObjectsForSyncRis(context, *iter->second);
+    }
+
+    for (auto iter = functionInfo.m_environmentSynchronousCalls.begin();
+            iter != functionInfo.m_environmentSynchronousCalls.end(); ++iter) {
+        createPromelaObjectsForEnvironmentSyncRis(context, *iter->second);
+    }
+
     createCheckQueueInline(context.model(), functionName, channelNames);
     createGetSenderInline(context.model(), functionName);
-    for (const auto requiredInterface : ivFunction->ris()) {
-        if (requiredInterface->kind() == IVInterface::OperationKind::Protected
-                || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
-            createPromelaObjectsForSyncRis(context, requiredInterface, functionName);
-        }
-    }
 }
 
 void IvToPromelaTranslator::generateProctypeForTimer(IvToPromelaTranslator::Context &context,
@@ -965,30 +967,53 @@ void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslato
     generateProctype(context, functionName, false, proctypeInfo);
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForSyncRis(IvToPromelaTranslator::Context &context,
-        const IVInterface *requiredInterface, const QString &functionName) const
+void IvToPromelaTranslator::createPromelaObjectsForSyncRis(Context &context, const SynchronousCallInfo &info) const
 {
     Sequence sequence(Sequence::Type::NORMAL);
 
     QList<QString> arguments;
-    for (const auto &interfaceParam : requiredInterface->params()) {
-        const auto &paramName = interfaceParam.name();
-        const auto &paramTypeName = interfaceParam.paramTypeName();
+    QList<InlineCall::Argument> callArguments;
 
-        arguments.append(paramName);
+    for (const QString &param : info.m_parameters) {
+        arguments.append(param);
+        callArguments.append(param);
+    }
 
-        if (interfaceParam.isInDirection()) {
+    if (info.m_isProtected) {
+        sequence.appendElement(createLockAcquireStatement(info.m_targetFunctionName));
+    }
+
+    sequence.appendElement(InlineCall(info.m_providedInlineName, callArguments));
+
+    if (info.m_isProtected) {
+        sequence.appendElement(createLockReleaseStatement(info.m_targetFunctionName));
+    }
+
+    std::unique_ptr<InlineDef> inlineDef = std::make_unique<InlineDef>(info.m_name, arguments, std::move(sequence));
+    context.model()->addInlineDef(std::move(inlineDef));
+}
+
+void IvToPromelaTranslator::createPromelaObjectsForEnvironmentSyncRis(
+        Context &context, const EnvSynchronousCallInfo &info) const
+{
+    Sequence sequence(Sequence::Type::NORMAL);
+
+    QList<QString> arguments;
+    for (const EnvSynchronousCallInfo::ParameterInfo &parameterInfo : info.m_parameters) {
+
+        arguments.append(parameterInfo.m_parameterName);
+
+        if (!parameterInfo.m_generateValue) {
             continue;
         }
 
-        const auto generateValueInlineName = QString("%1_generate_value").arg(paramTypeName);
-        const QList<InlineCall::Argument> generateValueInlineArgs({ paramName });
+        const auto generateValueInlineName = QString("%1_generate_value").arg(parameterInfo.m_parameterType);
+        const QList<InlineCall::Argument> generateValueInlineArgs({ parameterInfo.m_parameterName });
         InlineCall generateValueInlineCall(generateValueInlineName, generateValueInlineArgs);
         sequence.appendElement(std::move(generateValueInlineCall));
     }
 
-    const auto inlineName = QString("%1_0_%2").arg(functionName).arg(requiredInterface->title());
-    auto inlineDef = std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence));
+    auto inlineDef = std::make_unique<InlineDef>(info.m_name, arguments, std::move(sequence));
     context.model()->addInlineDef(std::move(inlineDef));
 }
 
@@ -1093,7 +1118,7 @@ void IvToPromelaTranslator::createGetSenderInline(
     QList<QString> arguments;
     arguments.append(QString("%1_sender_arg").arg(Escaper::escapePromelaIV(functionName)));
 
-    const QString checkQueueInlineName = QString("%1_0_get_sender").arg(Escaper::escapePromelaIV(functionName));
+    const QString checkQueueInlineName = QString("%1_0_RI_0_get_sender").arg(Escaper::escapePromelaIV(functionName));
     promelaModel->addInlineDef(std::make_unique<InlineDef>(checkQueueInlineName, arguments, std::move(sequence)));
 }
 
@@ -1435,33 +1460,13 @@ QString IvToPromelaTranslator::handleParameterSubtype(Context &context, const QS
 }
 
 QString IvToPromelaTranslator::handleSendInlineArgument(const QString &parameterType, const QString &functionName,
-        const QString &interfaceName, const QString parameterName, Sequence &sequence) const
+        const QString &interfaceName, const QString parameterName) const
 {
     if (parameterType.isEmpty()) {
-        sequence.appendElement(Declaration(DataType(BasicType::INT), m_dummyParamName));
-
         return "";
     } else {
         return QString("%1_%2_%3").arg(functionName).arg(interfaceName).arg(parameterName);
     }
-}
-
-Expression IvToPromelaTranslator::handleSendInlineParameter(
-        const QString &argumentName, const QString &parameterType, Sequence &sequence) const
-{
-    const auto parameterName = QString("%1_value").arg(argumentName);
-
-    auto parameterDecl = Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), parameterName);
-    sequence.appendElement(std::move(parameterDecl));
-
-    const auto inlineCallName = QString("%1_assign_value").arg(Escaper::escapePromelaName(parameterType));
-    QList<InlineCall::Argument> inlineArguments;
-    inlineArguments.append(VariableRef(parameterName));
-    inlineArguments.append(VariableRef(argumentName));
-    auto inlineCall = InlineCall(inlineCallName, inlineArguments);
-    sequence.appendElement(std::move(inlineCall));
-
-    return Expression(VariableRef(parameterName));
 }
 
 QString IvToPromelaTranslator::buildParameterSubtypeName(
@@ -1660,6 +1665,21 @@ void IvToPromelaTranslator::prepareFunctionInfo(Context &context, const ::ivm::I
             std::unique_ptr<ProctypeInfo> proctypeInfo = prepareProctypeInfo(context, providedInterface, functionName);
             const QString proctypeName = proctypeInfo->m_proctypeName;
             functionInfo.m_proctypes.emplace(proctypeName, std::move(proctypeInfo));
+        } else if (providedInterface->kind() == IVInterface::OperationKind::Protected
+                || providedInterface->kind() == IVInterface::OperationKind::Unprotected) {
+            // skip
+        } else {
+            auto message = QString("Unallowed interface kind in function %1, only sporadic interfaces are allowed")
+                                   .arg(functionName);
+            throw TranslationException(message);
+        }
+    }
+    for (const IVInterface *requiredInterface : ivFunction->ris()) {
+        if (requiredInterface->kind() == IVInterface::OperationKind::Sporadic) {
+            // skip
+        } else if (requiredInterface->kind() == IVInterface::OperationKind::Protected
+                || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
+            prepareSynchronousCallInfo(context, functionName, requiredInterface, functionInfo);
         } else {
             auto message = QString("Unallowed interface kind in function %1, only sporadic interfaces are allowed")
                                    .arg(functionName);
@@ -1801,4 +1821,54 @@ std::unique_ptr<IvToPromelaTranslator::EnvProctypeInfo> IvToPromelaTranslator::p
     return proctypeInfo;
 }
 
+void IvToPromelaTranslator::prepareSynchronousCallInfo(Context &context, const QString &functionName,
+        const ivm::IVInterface *requiredInterface, FunctionInfo &functionInfo) const
+{
+    const IVInterface *sourceInterface =
+            findProvidedInterface(context.ivModel(), functionName, requiredInterface->title());
+
+    const QString targetFunctionName = getInterfaceFunctionName(sourceInterface);
+    const QString targetInterfaceName = getInterfaceName(sourceInterface);
+
+    if (std::find_if(context.modelFunctions().begin(), context.modelFunctions().end(),
+                [targetFunctionName](const QString &function) {
+                    return function.compare(targetFunctionName, Qt::CaseInsensitive) == 0;
+                })
+            == context.modelFunctions().end()) {
+        std::unique_ptr<EnvSynchronousCallInfo> info = std::make_unique<EnvSynchronousCallInfo>();
+
+        QString inlineName =
+                QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
+
+        info->m_name = inlineName;
+
+        for (const InterfaceParameter &interfaceParam : requiredInterface->params()) {
+            EnvSynchronousCallInfo::ParameterInfo parameterInfo;
+            parameterInfo.m_parameterType = interfaceParam.paramTypeName();
+            parameterInfo.m_parameterName = interfaceParam.name();
+            parameterInfo.m_generateValue = interfaceParam.isOutDirection();
+
+            info->m_parameters.append(parameterInfo);
+        }
+
+        functionInfo.m_environmentSynchronousCalls.emplace(inlineName, std::move(info));
+    } else {
+        std::unique_ptr<SynchronousCallInfo> info = std::make_unique<SynchronousCallInfo>();
+        QString inlineName =
+                QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
+
+        info->m_name = inlineName;
+
+        info->m_providedInlineName =
+                QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(targetInterfaceName);
+        info->m_targetFunctionName = targetFunctionName;
+        info->m_isProtected = requiredInterface->kind() == IVInterface::OperationKind::Protected;
+
+        for (const InterfaceParameter &param : requiredInterface->params()) {
+            info->m_parameters.append(param.name());
+        }
+
+        functionInfo.m_synchronousCalls.emplace(inlineName, std::move(info));
+    }
+}
 }

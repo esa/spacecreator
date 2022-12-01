@@ -284,14 +284,14 @@ void tst_IvToPromelaTranslator::testSimple()
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
@@ -532,14 +532,14 @@ void tst_IvToPromelaTranslator::testParameters()
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
@@ -911,21 +911,21 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Up_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Up_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Down_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Down_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
