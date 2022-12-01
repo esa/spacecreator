@@ -160,7 +160,6 @@ We need to have QtCreator run the postbuild.py script after the build stop, so w
 `python3` and the arguments are:
 
 `%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=/home/taste/project/spacecreatorenv6/spacecreator.AppDir`
-%{ActiveProject:Path}/scripts/postbuild.py --build_dir=%{buildDir} --app_dir=$HOME/project/spacecreatorenv6/spacecreator.AppDir
 This will call the correct **postbuild.py** script and tell it where the plugins were build and where to put them.<br>
 The variables `%{ActiveProject:Path}` and `%{buildDir}` are substituted by QtCreator.
 

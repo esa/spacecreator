@@ -93,6 +93,7 @@ add_custom_target(DocuFiles SOURCES
     doc/mainpage.md
     doc/msc_conversion_template.md
     doc/msc_remote_handler.md
+    doc/quickstart.md
 )
 
 add_custom_target(BuildFiles SOURCES
