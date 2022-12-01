@@ -161,20 +161,30 @@ void VEInteractiveObject::setPen(const QPen &pen)
     m_pen = pen;
 }
 
-void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    QGraphicsObject::mouseMoveEvent(event);
-    onManualMoveProgress(gripPointItem(shared::ui::GripPoint::Center), event->lastScenePos(), event->scenePos());
-}
-
 void VEInteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    s_mouseReleased = false;
     QGraphicsObject::mousePressEvent(event);
     onManualMoveStart(gripPointItem(shared::ui::GripPoint::Center), event->scenePos());
 }
 
+void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    // We keep track of whether the mouse has been released already or not. If
+    // the release happens at an edge, and it causes resizing the canvas,
+    // sometimes it makes the scrollbar of the canvas resize and move, which
+    // makes the graphics scene send an additional mouse move even that we want
+    // to discard, or the element ends out of the screen.
+    if (s_mouseReleased) {
+        return;
+    }
+    QGraphicsObject::mouseMoveEvent(event);
+    onManualMoveProgress(gripPointItem(shared::ui::GripPoint::Center), event->lastScenePos(), event->scenePos());
+}
+
 void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    s_mouseReleased = true;
     onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()),
             event->scenePos());
 
