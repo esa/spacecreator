@@ -847,7 +847,6 @@
           </property>
          </widget>
         </item>
-<<<<<<< HEAD
         <item row="16" column="0" colspan="6">
          <widget class="QTreeWidget" name="treeWidget_spinResults">
           <attribute name="headerDefaultSectionSize">
@@ -866,8 +865,6 @@
           </column>
          </widget>
         </item>
-=======
->>>>>>> master
         <item row="17" column="0" colspan="3">
          <widget class="QLabel" name="label_rawCommandLine">
           <property name="text">
