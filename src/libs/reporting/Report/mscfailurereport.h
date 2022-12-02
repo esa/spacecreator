@@ -30,6 +30,8 @@ namespace reporting {
 struct MscFailureReport {
     /** Observer name */
     QString observerName;
+    /** MSC file name */
+    QString mscFileName;
 };
 
 }

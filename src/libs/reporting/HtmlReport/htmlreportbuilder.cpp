@@ -203,6 +203,7 @@ QVariantHash reporting::HtmlReportBuilder::buildMscFailureVariant(const QVariant
     reporting::MscFailureReport report = qvariant_cast<reporting::MscFailureReport>(errorDetails);
     QVariantHash variantHash;
     variantHash.insert("observerName", report.observerName);
+    variantHash.insert("mscFileName", report.mscFileName);
     return variantHash;
 }
 

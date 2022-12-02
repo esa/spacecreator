@@ -110,8 +110,8 @@ private:
     static const QHash<QString, StopConditionViolationReport::ViolationClause> m_stopConditionViolationClauses;
     static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationTypes;
 
-    SpinErrorReportItem parseTrace(
-            const QString &spinTraces, const QStringList &sclConditions, const QStringList &mscObservers) const;
+    SpinErrorReportItem parseTrace(const QString &spinTraces, const QStringList &sclConditions,
+            const QHash<QString, QString> &mscObservers) const;
 
     QRegularExpressionMatch matchStopCondition(const QString &spinTraces) const;
     QRegularExpressionMatch matchObserverFailureErrorState(const QString &spinTraces) const;
@@ -125,7 +125,7 @@ private:
     QVariant parseStopConditionViolation(const QString &parsedErrorToken) const;
     QVariant parseObserverFailureErrorState(const QString &parsedErrorToken) const;
     QVariant parseObserverFailureSuccessState(const QString &parsedErrorToken) const;
-    QVariant parseMscFailure(const QString &parsedErrorToken) const;
+    QVariant parseMscFailure(const QString &parsedErrorToken, const QString &mscFileName) const;
 
     static QString readFile(const QString &filePath);
 

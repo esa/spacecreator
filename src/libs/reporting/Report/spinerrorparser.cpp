@@ -29,10 +29,12 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &
     reporting::SpinErrorReport report;
 
     // read msc files
-    QStringList mscObservers;
+    QHash<QString, QString> mscObservers;
     for (auto mscObserverFile : mscObserverFiles) {
         const auto mscFileText = readFile(mscObserverFile);
-        mscObservers.append(parseMscObserver(mscFileText));
+        for (auto mscObserverName : parseMscObserver(mscFileText)) {
+            mscObservers.insert(mscObserverName, mscObserverFile);
+        }
     }
 
     // read scl files
@@ -62,7 +64,7 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &
 }
 
 reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
-        const QString &spinTraces, const QStringList &sclConditions, const QStringList &mscObservers) const
+        const QString &spinTraces, const QStringList &sclConditions, const QHash<QString, QString> &mscObservers) const
 {
     SpinErrorReportItem reportItem;
     // an observer failure (entering success state) can be detected
@@ -114,7 +116,7 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
         auto observerName = observerFailureErrorStateMatch.captured(ErrorDetailsMatch);
         // check for MSC observer
         if (mscObservers.contains(observerName)) {
-            auto report = parseMscFailure(observerName);
+            auto report = parseMscFailure(observerName, mscObservers.value(observerName));
             reportItem.errorDepth = 0;
             reportItem.errorType = SpinErrorReportItem::MscFailure;
             reportItem.rawErrorDetails = observerFailureErrorStateMatch.captured(RawErrorMatch).trimmed();
@@ -289,10 +291,11 @@ QVariant reporting::SpinErrorParser::parseObserverFailureSuccessState(const QStr
     return observerFailure;
 }
 
-QVariant reporting::SpinErrorParser::parseMscFailure(const QString &parsedErrorToken) const
+QVariant reporting::SpinErrorParser::parseMscFailure(const QString &parsedErrorToken, const QString &mscFileName) const
 {
     MscFailureReport violationReport;
     violationReport.observerName = parsedErrorToken;
+    violationReport.mscFileName = mscFileName;
 
     QVariant mscFailure;
     mscFailure.setValue(violationReport);
