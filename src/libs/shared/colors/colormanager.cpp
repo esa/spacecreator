@@ -39,7 +39,6 @@ ColorManager::ColorManager(QObject *parent)
     : QObject(parent)
 {
     setSourceFile(defaultColorsResourceFile());
-    Q_ASSERT(m_colors.size() == QMetaEnum::fromType<shared::ColorManager::HandledColors>().keyCount() - 1);
 
     const QString sourcePath = shared::SettingsManager::load<QString>(
             shared::SettingsManager::Common::ColorSchemeFile, prepareDefaultSource());

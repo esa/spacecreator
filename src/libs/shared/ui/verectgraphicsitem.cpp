@@ -75,7 +75,9 @@ bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
 void VERectGraphicsItem::setRect(const QRectF &geometry)
 {
     if (setGeometry(geometry))
+    {
         instantLayoutUpdate();
+    }
 }
 
 void VERectGraphicsItem::initGripPoints()
