@@ -8,7 +8,7 @@ SPIN=spin
 CC=gcc
 
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_trailgen_continuous_signals
 RESOURCE_DIR=resources
 PROPERTIES_DIR=$RESOURCE_DIR
 

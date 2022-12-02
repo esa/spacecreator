@@ -8,7 +8,7 @@ CC=gcc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output_dekker_io
+TEST_OUTPUT_DIR=output_test_dekkerRunningWithInputObserver
 RESOURCE_DIR=resources/dekker1
 SUBTYPES_DIR=${RESOURCE_DIR}/work/modelchecking/subtypes
 OBSERVERS_DIR=${RESOURCE_DIR}/work/modelchecking/properties/observers

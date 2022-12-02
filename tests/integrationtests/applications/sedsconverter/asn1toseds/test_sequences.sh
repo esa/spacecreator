@@ -5,7 +5,7 @@ set -euo pipefail
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 # diff ignoring white space and blank lines
 XMLDIFF="xmldiff"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_sequences
 
 echo "Running SedsConverter test: ${0##*/}'"
 

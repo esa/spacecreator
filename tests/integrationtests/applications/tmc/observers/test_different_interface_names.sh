@@ -8,7 +8,7 @@ CC=gcc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_different_interface_names
 RESOURCE_DIR=resources/DifferentInterfaceNames
 PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 

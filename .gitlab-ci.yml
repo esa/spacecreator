@@ -29,6 +29,7 @@ default:
     - export CCACHE_DIR=${CI_PROJECT_DIR}/ccache
     # Qt tests
     - export QT_QPA_PLATFORM=offscreen
+    - export CTEST_ARGUMENTS="-j 6 --output-on-failure -V"
 
 
 spacecreator-qt5-master:
@@ -56,7 +57,6 @@ spacecreator-qt5-master:
     - ./scripts/run_tests.sh ${BUILD_DIR}
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
-    # unit tests
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
   cache:
@@ -98,7 +98,7 @@ spacecreator-qt6-master:
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
     - export SPACECREATOR_BUILD_DIR=$BUILD_DIR
-    - cd ${BUILD_DIR} ; ctest -j 2 --output-on-failure -V
+    - cd ${BUILD_DIR} ; ctest $CTEST_ARGUMENTS
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # Create an AppImage from the app_dir and place it in the build dir
@@ -110,7 +110,7 @@ spacecreator-qt6-master:
       - ccache
   artifacts:
     reports:
-      junit: ${BUILD_DIR}/tst_*-result.xml
+      junit: ${BUILD_DIR}/*.xml
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
@@ -139,7 +139,6 @@ spacecreator-qt5-feature:
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
-    # unit tests
   cache:
     key: spacecreator_cache
     paths:
@@ -180,7 +179,7 @@ spacecreator-qt6-feature:
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # unit tests
     - export SPACECREATOR_BUILD_DIR=$BUILD_DIR
-    - cd ${BUILD_DIR} ; ctest -j 2 --output-on-failure -V
+    - cd ${BUILD_DIR} ; ctest $CTEST_ARGUMENTS
   cache:
     key: spacecreator_cache
     paths:
@@ -188,7 +187,7 @@ spacecreator-qt6-feature:
       - ccache
   artifacts:
     reports:
-      junit: ${BUILD_DIR}/tst_*-result.xml
+      junit: ${BUILD_DIR}/*.xml
     expire_in: 2 days
   rules:
     # For pipelines created when a merge request is created or updated

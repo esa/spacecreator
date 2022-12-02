@@ -6,7 +6,7 @@ TMC=$SPACECREATOR_BUILD_DIR/bin/tmc
 SPIN=spin
 CC=gcc
 
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_external_procedures
 RESOURCE_DIR=resources
 PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 

@@ -8,7 +8,7 @@ CC=gcc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_input_monitoring
 RESOURCE_DIR=resources/InputMonitoring
 PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 

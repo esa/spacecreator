@@ -6,7 +6,7 @@ SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_cross_reference
 
 echo "Running SedsConverter test: ${0##*/}'"
 

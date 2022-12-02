@@ -8,7 +8,7 @@ CC=gcc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_msc_never_sequence_failure
 RESOURCE_DIR=resources/MscNeverSequenceFailure
 PROPERTIES_DIR=$RESOURCE_DIR/work/modelchecking/properties
 

@@ -10,7 +10,7 @@ OPENGEODE=$HOME/.local/bin/opengeode
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
 XMLDIFF="xmldiff"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_timers
 
 echo "Running SedsConverter test: ${0##*/}'"
 

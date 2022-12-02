@@ -8,7 +8,7 @@ CC=gcc
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-TEST_OUTPUT_DIR=output_uart_oo
+TEST_OUTPUT_DIR=output_test_uartRunningWithOutputObserver
 RESOURCE_DIR=resources/uart_protocol_dlc
 SUBTYPES_DIR=${RESOURCE_DIR}/work/modelchecking/subtypes
 OBSERVERS_DIR=${RESOURCE_DIR}/work/modelchecking/properties/observers

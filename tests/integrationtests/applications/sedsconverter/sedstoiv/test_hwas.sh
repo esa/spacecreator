@@ -8,7 +8,7 @@ UPDATE_DATAVIEW="asn2aadlPlus -f dataview-uniq.asn DataView.aadl -aadlv2"
 # diff ignoring white space and blank lines
 DIFF="xmldiff"
 XMLDIFF="xmldiff"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_hwas
 
 echo "Running SedsConverter test: ${0##*/}'"
 

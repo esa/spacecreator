@@ -7,7 +7,7 @@ SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 GREP="grep -w -q"
 PI_1="PI_1"
 PI_2="PI_2"
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_no_mangling
 
 echo "Running SedsConverter test: ${0##*/}'"
 

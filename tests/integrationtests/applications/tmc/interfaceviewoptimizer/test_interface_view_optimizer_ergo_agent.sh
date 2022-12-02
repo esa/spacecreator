@@ -6,7 +6,7 @@ OPTIMIZER=$SPACECREATOR_BUILD_DIR/bin/tmcivoptimizer
 SPIN=spin
 CC=gcc
 
-TEST_OUTPUT_DIR=output
+TEST_OUTPUT_DIR=output_test_interface_view_optimizer_ergo_agent
 RESOURCE_DIR=resources
 
 echo "Running TMC test: ${0##*/}'"
