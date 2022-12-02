@@ -197,6 +197,16 @@ private:
             const std::vector<const ::seds::model::Transition *> &sedsTransitions, const Options &options)
             -> std::unique_ptr<::sdl::Procedure>;
 
+    static auto createParameterActivityGetAsyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map, const Options &options) -> void;
+    static auto createParameterActivitySetAsyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map, const Options &options) -> void;
+
+    static auto createParameterActivityGetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
+            const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *;
+    static auto createParameterActivitySetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
+            const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *;
+
     static auto translateParameter(Context &context, const seds::model::ParameterMap &map,
             const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
     static auto translateParameter(Context &context, const seds::model::ParameterActivityMap &map,
@@ -226,6 +236,10 @@ private:
             const seds::model::Transition::Primitive &primitive, const Options &options) -> InputHandler;
 
     static auto translatePrimitive(::sdl::State *sdlFromState) -> InputHandler;
+
+    static auto handleAsyncParameterMaps(Context &context, const ::seds::model::OnParameterPrimitive &parameter,
+            const QString &variableName, std::vector<std::unique_ptr<::sdl::Action>> &unpackingActions,
+            const Options &options) -> void;
 
     static auto translateTransitions(Context &context,
             const std::vector<const ::seds::model::Transition *> sedsTransitions,

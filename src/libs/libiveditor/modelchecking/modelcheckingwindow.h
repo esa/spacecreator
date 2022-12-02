@@ -20,12 +20,12 @@
 #include "spinconfigsaver.h"
 
 #include <QCheckBox>
+#include <QFileInfo>
 #include <QInputDialog>
 #include <QMainWindow>
-#include <QFileInfo>
+#include <QStandardPaths>
 #include <QTreeWidgetItem>
 #include <functional>
-#include <QStandardPaths>
 
 namespace ive {
 
@@ -50,7 +50,8 @@ Q_SIGNALS:
     void visibleChanged(bool visible);
 
 private Q_SLOTS:
-    Qt::CheckState listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection, QStringList expanded, int recLevel);
+    Qt::CheckState listProperties(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent, QStringList preSelection,
+            QStringList expanded, int recLevel);
     QStringList getPropertiesSelection(QTreeWidgetItem *propertyWidgetItem, QStringList selections);
     QStringList getExpandedNodes(QTreeWidgetItem *propertyWidgetItem, QStringList expanded);
     bool isExpanded(QStringList expanded, QString dirName);
@@ -60,6 +61,7 @@ private Q_SLOTS:
     void listModelFunctions(QTreeWidgetItem *parentWidgetItem, QStringList preSelection);
     QStringList getFunctionsSelection();
     void listResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
+    void listSpinResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
     void on_treeWidget_properties_itemChanged(QTreeWidgetItem *item, int column);
     void updateParentItem(QTreeWidgetItem *item);
     void on_treeWidget_properties_itemDoubleClicked(QTreeWidgetItem *item, int column);
@@ -95,17 +97,18 @@ private:
     QString subtypesPath;
     QString configurationsPath;
     QString outputPath;
+    QString spinOutputPath;
     QString projectDir;
 
-    QMenu* contextMenuPropertiesTop;
-    QMenu* contextMenuProperties;
-    QMenu* contextMenuPropertiesBSC;
-    QMenu* contextMenuPropertiesMSC;
-    QMenu* contextMenuPropertiesOBS;
-    QMenu* contextMenuPropertiesFile;
-    QMenu* contextMenuPropertiesMSCFile;
-    QMenu* contextMenuSubtypes;
-    QMenu* contextMenuSubtypesFile;
+    QMenu *contextMenuPropertiesTop;
+    QMenu *contextMenuProperties;
+    QMenu *contextMenuPropertiesBSC;
+    QMenu *contextMenuPropertiesMSC;
+    QMenu *contextMenuPropertiesOBS;
+    QMenu *contextMenuPropertiesFile;
+    QMenu *contextMenuPropertiesMSCFile;
+    QMenu *contextMenuSubtypes;
+    QMenu *contextMenuSubtypesFile;
 
     struct ModelCheckingWindowPrivate;
     ModelCheckingWindowPrivate *d;
@@ -114,6 +117,7 @@ private:
     QTreeWidgetItem *subtypesTopDirWidgetItem;
     QTreeWidgetItem *functionsTopNodeWidgetItem;
     QTreeWidgetItem *resultsTopDirWidgetItem;
+    QTreeWidgetItem *spinResultsTopDirWidgetItem;
 
     const QString booleanStopConditionLTL = "Boolean Stop Condition - LTL";
     const QString booleanStopConditionObserver = "Boolean Stop Condition - Observer";
@@ -121,29 +125,16 @@ private:
     const QString messageSequenceChartWhenThen = "Message Sequence Chart When/Then";
     const QString observer = "Observer";
 
-    const QStringList availablePropertyTypes
-    {
-        booleanStopConditionLTL,
-        booleanStopConditionObserver,
-        messageSequenceChartSearchVerify,
-        messageSequenceChartWhenThen,
-        observer
-    };
+    const QStringList availablePropertyTypes { booleanStopConditionLTL, booleanStopConditionObserver,
+        messageSequenceChartSearchVerify, messageSequenceChartWhenThen, observer };
 
-    const QStringList supportedPropertyTypes
-    {
-        booleanStopConditionLTL,
-        booleanStopConditionObserver,
-        messageSequenceChartSearchVerify,
-        messageSequenceChartWhenThen,
-        observer
-    };
+    const QStringList supportedPropertyTypes { booleanStopConditionLTL, booleanStopConditionObserver,
+        messageSequenceChartSearchVerify, messageSequenceChartWhenThen, observer };
 
     const QString defaultMessageSequenceChartWhenThenMscTemplateName = "when-then-property-tmpl.msc";
-    const QString defaultMessageSequenceChartWhenThenMscTemplatePath = 
-                    QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) +
-                    "/model-checker/" +
-                    defaultMessageSequenceChartWhenThenMscTemplateName;
+    const QString defaultMessageSequenceChartWhenThenMscTemplatePath =
+            QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/model-checker/"
+            + defaultMessageSequenceChartWhenThenMscTemplateName;
     const QString sedCommandForWhenThenPropertyTemplate = "sed -i \"s/Untitled_Document/%1/g\" %2";
 
     QString askAboutNewPropertyType();
