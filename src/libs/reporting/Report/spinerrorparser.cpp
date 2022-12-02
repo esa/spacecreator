@@ -332,6 +332,17 @@ QRegularExpression reporting::SpinErrorParser::buildStopConditionViolationRegex(
     return QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption);
 }
 
+QRegularExpression reporting::SpinErrorParser::buildStripCommentsRegex()
+{
+    // match multi-line comments (/* ... */): opening token, comment text, closing token
+    QString pattern = QStringLiteral("(?:\\/\\*");
+    pattern += QStringLiteral("(?:[^\\*]|\\**[^\\*\\/])*");
+    pattern += QStringLiteral("\\*+\\/)");
+    // match single line comments
+    pattern += QStringLiteral("|(?:\\/\\/[\\S ]*)");
+    return QRegularExpression(pattern, QRegularExpression::MultilineOption);
+}
+
 QString reporting::SpinErrorParser::removeParentheses(const QString &numberToken)
 {
     QString numberTokenClean = numberToken;
@@ -381,9 +392,8 @@ QStringList reporting::SpinErrorParser::parseMscObserver(const QString &mscFileT
 {
     // strip comments from a msc file
     QString mscFileTextStrip = mscFileText;
-    const QRegularExpression regex(
-            "(?:\\/\\*(?:[^\\*]|\\**[^\\*\\/])*\\*+\\/)|(?:\\/\\/[\\S ]*)", QRegularExpression::MultilineOption);
-    mscFileTextStrip.replace(regex, QString());
+    const auto stringCommentsRegex = buildStripCommentsRegex();
+    mscFileTextStrip.replace(stringCommentsRegex, QString());
     // match msc observer names in a file
     const QRegularExpression mscMatch("msc\\s+([a-zA-Z_][a-zA-Z0-9_]+)\\s*;", QRegularExpression::MultilineOption);
     auto matches = mscMatch.globalMatch(mscFileTextStrip);

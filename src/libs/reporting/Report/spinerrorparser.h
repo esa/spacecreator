@@ -132,6 +132,7 @@ private:
     static QRegularExpression buildDataConstraintViolationRegex();
     static QRegularExpression buildStopConditionViolationRegex();
     static QRegularExpression buildStopConditionExpressionRegex();
+    static QRegularExpression buildStripCommentsRegex();
 
     static QString removeParentheses(const QString &numberToken);
     static QString cleanUpSclComments(const QString &scl);
