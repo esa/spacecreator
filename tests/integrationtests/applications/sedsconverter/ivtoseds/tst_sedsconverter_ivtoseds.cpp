@@ -37,6 +37,7 @@ private Q_SLOTS:
     void testPinger();
 };
 
+/// \SRS  ETB-FUN-4010
 /// \SRS  ETB-FUN-4020
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4060
@@ -48,6 +49,7 @@ void tst_SedsConverter_IvToSeds::testSporadicInterface()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-4010
 /// \SRS  ETB-FUN-4020
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4070
@@ -59,6 +61,7 @@ void tst_SedsConverter_IvToSeds::testProtectedInterface()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-4010
 /// \SRS  ETB-FUN-4020
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4080
@@ -70,6 +73,7 @@ void tst_SedsConverter_IvToSeds::testUnprotectedInterface()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-4010
 /// \SRS  ETB-FUN-4020
 /// \SRS  ETB-FUN-4040
 /// \SRS  ETB-FUN-4090
@@ -81,6 +85,7 @@ void tst_SedsConverter_IvToSeds::testCyclicInterface()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-4010
 /// \SRS  ETB-FUN-4020
 /// \SRS  ETB-FUN-4030
 /// \SRS  ETB-FUN-4050
@@ -93,6 +98,7 @@ void tst_SedsConverter_IvToSeds::testPinger()
     QCOMPARE(result, 0);
 }
 
+/// \SRS  ETB-FUN-4010
 /// \SRS  ETB-FUN-4020
 /// \SRS  ETB-FUN-4050
 /// \SRS  ETB-FUN-4060
