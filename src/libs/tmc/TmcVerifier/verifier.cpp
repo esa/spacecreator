@@ -530,14 +530,6 @@ void TmcVerifier::presentReport(const QFileInfo &reportFilepath)
     HtmlReportPresenter::present(reportFilepath.absoluteFilePath());
 }
 
-void TmcVerifier::dbg(const QString &message)
-{
-    QFile file("/home/taste/out.html");
-    file.open(QFile::ReadOnly);
-    file.write(message.toUtf8());
-    file.close();
-}
-
 void TmcVerifier::saveReport(const QFileInfo &reportFilepath, const QString &data)
 {
     Q_EMIT verifierMessage(QString("Generated %1 chars\n").arg(data.length()));

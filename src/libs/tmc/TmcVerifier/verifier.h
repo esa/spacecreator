@@ -256,8 +256,6 @@ private:
     void saveReport(const QFileInfo &reportFilepath, const QString &data);
     void presentReport(const QFileInfo &reportFilepath);
 
-    static void dbg(const QString &message);
-
 private Q_SLOTS:
     void processStderrReady();
     void processStdoutReady();
