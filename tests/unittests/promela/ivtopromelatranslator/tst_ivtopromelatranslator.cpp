@@ -70,6 +70,7 @@ private Q_SLOTS:
     void testSimpleObservers();
     void testOutputObservers();
     void testUnhandledInputObservers();
+    void testSynchronousInterfaces();
 
 private:
     template<typename T>
@@ -1398,6 +1399,57 @@ void tst_IvToPromelaTranslator::testUnhandledInputObservers()
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().size(), 1);
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().front().m_name, "Second_observer_lock");
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().front().m_index.get(), nullptr);
+    }
+}
+
+void tst_IvToPromelaTranslator::testSynchronousInterfaces()
+{
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("synchronous_interfaces.xml");
+    QVERIFY(ivModel);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
+    QVERIFY(promelaModel);
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test_protected");
+        QVERIFY(inlineDef);
+        QCOMPARE(inlineDef->getArguments().size(), 3);
+        const Sequence &content = inlineDef->getSequence();
+        QCOMPARE(content.getContent().size(), 3);
+
+        const ChannelRecv *functionLock = findProctypeElement<ChannelRecv>(content, 0);
+        QVERIFY(functionLock);
+        QCOMPARE(functionLock->getChannelRef().getElements().size(), 1);
+        QCOMPARE(functionLock->getChannelRef().getElements().front().m_name, "Actuator_lock");
+        QCOMPARE(functionLock->getChannelRef().getElements().front().m_index.get(), nullptr);
+
+        const InlineCall *functionCall = findProctypeElement<InlineCall>(content, 1);
+        QVERIFY(functionCall);
+        QCOMPARE(functionCall->getName(), "Actuator_0_PI_0_test_protected");
+        QCOMPARE(functionCall->getArguments().size(), 3);
+
+        const ChannelSend *functionUnlock = findProctypeElement<ChannelSend>(content, 2);
+        QVERIFY(functionUnlock);
+        QCOMPARE(functionUnlock->getChannelRef().getElements().size(), 1);
+        QCOMPARE(functionUnlock->getChannelRef().getElements().front().m_name, "Actuator_lock");
+        QCOMPARE(functionUnlock->getChannelRef().getElements().front().m_index.get(), nullptr);
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test_unprotected");
+        QVERIFY(inlineDef);
+        QCOMPARE(inlineDef->getArguments().size(), 3);
+        const Sequence &content = inlineDef->getSequence();
+        QCOMPARE(content.getContent().size(), 1);
+
+        const InlineCall *functionCall = findProctypeElement<InlineCall>(content, 0);
+        QVERIFY(functionCall);
+        QCOMPARE(functionCall->getName(), "Actuator_0_PI_0_test_unprotected");
+        QCOMPARE(functionCall->getArguments().size(), 3);
     }
 }
 

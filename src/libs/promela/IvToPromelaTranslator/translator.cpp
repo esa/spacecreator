@@ -1842,10 +1842,12 @@ void IvToPromelaTranslator::prepareSynchronousCallInfo(Context &context, const Q
 
         info->m_name = inlineName;
 
+        const QString parameterNamePrefix =
+                QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
         for (const InterfaceParameter &interfaceParam : requiredInterface->params()) {
             EnvSynchronousCallInfo::ParameterInfo parameterInfo;
             parameterInfo.m_parameterType = interfaceParam.paramTypeName();
-            parameterInfo.m_parameterName = interfaceParam.name();
+            parameterInfo.m_parameterName = QString("%1_%2").arg(parameterNamePrefix).arg(interfaceParam.name());
             parameterInfo.m_generateValue = interfaceParam.isOutDirection();
 
             info->m_parameters.append(parameterInfo);
@@ -1864,8 +1866,10 @@ void IvToPromelaTranslator::prepareSynchronousCallInfo(Context &context, const Q
         info->m_targetFunctionName = targetFunctionName;
         info->m_isProtected = requiredInterface->kind() == IVInterface::OperationKind::Protected;
 
+        const QString parameterNamePrefix =
+                QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
         for (const InterfaceParameter &param : requiredInterface->params()) {
-            info->m_parameters.append(param.name());
+            info->m_parameters.append(QString("%1_%2").arg(parameterNamePrefix).arg(param.name()));
         }
 
         functionInfo.m_synchronousCalls.emplace(inlineName, std::move(info));
