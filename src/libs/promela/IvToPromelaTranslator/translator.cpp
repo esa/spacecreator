@@ -1669,7 +1669,8 @@ void IvToPromelaTranslator::prepareFunctionInfo(Context &context, const ::ivm::I
                 || providedInterface->kind() == IVInterface::OperationKind::Unprotected) {
             // skip
         } else {
-            auto message = QString("Unallowed interface kind in function %1, only sporadic interfaces are allowed")
+            auto message = QString("Unallowed interface kind in function %1, only sporadic, protected and unprotected "
+                                   "interfaces are allowed")
                                    .arg(functionName);
             throw TranslationException(message);
         }
@@ -1681,7 +1682,8 @@ void IvToPromelaTranslator::prepareFunctionInfo(Context &context, const ::ivm::I
                 || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
             prepareSynchronousCallInfo(context, functionName, requiredInterface, functionInfo);
         } else {
-            auto message = QString("Unallowed interface kind in function %1, only sporadic interfaces are allowed")
+            auto message = QString("Unallowed interface kind in function %1, only sporadic, protected and unprotected "
+                                   "interfaces are allowed")
                                    .arg(functionName);
             throw TranslationException(message);
         }
@@ -1747,10 +1749,13 @@ void IvToPromelaTranslator::prepareEnvironmentFunctionInfo(Context &context, con
                     prepareEnvProctypeInfo(context, requiredInterface, functionName);
             const QString proctypeName = proctypeInfo->m_proctypeName;
             functionInfo.m_environmentSourceProctypes.emplace(proctypeName, std::move(proctypeInfo));
+        } else if (requiredInterface->kind() == IVInterface::OperationKind::Protected
+                || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
+            // skip
         } else {
-            auto message =
-                    QString("Unallowed interface kind in function %1, only sporadic required interfaces are allowed")
-                            .arg(functionName);
+            auto message = QString("Unallowed interface kind in function %1, only sporadic, protected and unprotected "
+                                   "required interfaces are allowed")
+                                   .arg(functionName);
             throw TranslationException(message);
         }
     }
