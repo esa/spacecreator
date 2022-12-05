@@ -50,9 +50,9 @@ private:
 
 void tst_AttributesConfigure::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
-    shared::StandardPaths::setTestModeEnabled(true);
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     m_dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 }

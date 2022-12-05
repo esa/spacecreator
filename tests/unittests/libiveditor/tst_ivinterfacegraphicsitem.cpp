@@ -40,9 +40,9 @@ private Q_SLOTS:
 
 void tst_IVInterfaceGraphicsItem::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ive::initIVEditor();
     shared::initSharedLibrary();
-    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void tst_IVInterfaceGraphicsItem::testMaxWidth()

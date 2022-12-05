@@ -53,9 +53,9 @@ private:
 
 void tst_IVEditorCore::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ive::initIVEditor();
     shared::initSharedLibrary();
-    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void tst_IVEditorCore::init()

@@ -65,9 +65,9 @@ private:
 
 void tst_InterfaceDocument::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
-    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void tst_InterfaceDocument::init()

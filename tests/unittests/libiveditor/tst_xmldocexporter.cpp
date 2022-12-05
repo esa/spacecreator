@@ -16,7 +16,6 @@
 */
 
 #include "../common/xmldatahelper.h"
-#include "asn1modelstorage.h"
 #include "interfacedocument.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivarchetypereference.h"
@@ -31,9 +30,8 @@
 #include "standardpaths.h"
 
 #include <QObject>
+#include <QTemporaryDir>
 #include <QtTest>
-
-static QString testFilePath = shared::StandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tst_xmldocex.xml";
 
 class tst_XmlDocExporter : public QObject
 {
@@ -42,6 +40,8 @@ class tst_XmlDocExporter : public QObject
 private:
     QByteArray testFileContent() const;
     std::unique_ptr<ive::InterfaceDocument> m_doc;
+    QTemporaryDir m_testPath;
+    QString m_testFilePath;
 
 private Q_SLOTS:
     void initTestCase();
@@ -62,7 +62,7 @@ private Q_SLOTS:
 
 QByteArray tst_XmlDocExporter::testFileContent() const
 {
-    QFile file(testFilePath);
+    QFile file(m_testFilePath);
     if (file.open(QIODevice::ReadOnly)) {
         return file.readAll();
     }
@@ -72,28 +72,30 @@ QByteArray tst_XmlDocExporter::testFileContent() const
 
 void tst_XmlDocExporter::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
+    m_testFilePath = m_testPath.filePath("tst_xmldocex.xml");
 }
 
 void tst_XmlDocExporter::init()
 {
     m_doc = std::make_unique<ive::InterfaceDocument>(this);
-    if (QFile::exists(testFilePath)) {
-        QFile::remove(testFilePath);
+    if (QFile::exists(m_testFilePath)) {
+        QFile::remove(m_testFilePath);
     }
 }
 
 void tst_XmlDocExporter::cleanup()
 {
-    if (QFile::exists(testFilePath)) {
-        QFile::remove(testFilePath);
+    if (QFile::exists(m_testFilePath)) {
+        QFile::remove(m_testFilePath);
     }
 }
 
 void tst_XmlDocExporter::testExportEmptyDoc()
 {
-    m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath);
+    m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath);
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
     QVERIFY(XmlData(expected) == XmlData(text));
@@ -112,7 +114,7 @@ void tst_XmlDocExporter::testExportFunctions()
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 
-    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\" "
@@ -137,7 +139,7 @@ void tst_XmlDocExporter::testExportComment()
     objects.append(testcomment1);
     m_doc->setObjects(objects);
 
-    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Comment name=\"TestComment1\" foo=\"11\"/>\n"
@@ -156,7 +158,7 @@ void tst_XmlDocExporter::testExportNestedComment()
     objects.append(testfunc1);
     m_doc->setObjects(objects);
 
-    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Function name=\"TestFunc1\" is_type=\"NO\" instance_of=\"\" language=\"SDL\" "
@@ -179,7 +181,7 @@ void tst_XmlDocExporter::testExportLayer()
     objects.append(testLayer);
     m_doc->setObjects(objects);
 
-    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = R"(<?xml version="1.0"?>
                                    <InterfaceView>
@@ -198,7 +200,7 @@ void tst_XmlDocExporter::testExportArchetypeLibraryReference()
     objects.append(testReference);
     m_doc->setObjects(objects);
 
-    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = R"(<?xml version="1.0"?>
                                    <InterfaceView>
@@ -220,7 +222,7 @@ void tst_XmlDocExporter::testExportArchetypeReferenceInFunction()
     objects.append(testfunc);
     m_doc->setObjects(objects);
 
-    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = R"(<?xml version="1.0"?>
                                    <InterfaceView>
@@ -246,7 +248,7 @@ void tst_XmlDocExporter::testExportArchetypeReferenceInFunctionType()
     objects.append(testfunc);
     m_doc->setObjects(objects);
 
-    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = R"(<?xml version="1.0"?>
                                    <InterfaceView>
@@ -260,7 +262,7 @@ void tst_XmlDocExporter::testExportArchetypeReferenceInFunctionType()
 void tst_XmlDocExporter::testExportAsn1File()
 {
     m_doc->setAsn1FileName("fake.asn");
-    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), testFilePath));
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
     QVERIFY(XmlData(expected) == XmlData(text));

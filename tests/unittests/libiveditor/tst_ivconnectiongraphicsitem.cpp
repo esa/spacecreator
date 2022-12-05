@@ -47,9 +47,9 @@ private:
 
 void tst_IVConnectionGraphicsItem::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ive::initIVEditor();
     shared::initSharedLibrary();
-    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void tst_IVConnectionGraphicsItem::tst_Overlapping()

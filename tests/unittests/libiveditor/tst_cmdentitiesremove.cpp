@@ -50,9 +50,9 @@ private:
 
 void tst_CmdEntitiesRemove::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ive::initIVEditor();
     shared::initSharedLibrary();
-    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void tst_CmdEntitiesRemove::init()
