@@ -34,6 +34,7 @@
 #include "types/rootdatatype.h"
 #include "types/stringdatatype.h"
 #include "types/subrangedatatype.h"
+#include "xincludeinfo.h"
 
 #include <memory>
 #include <seds/SedsCommon/basetypesmappings.h>
@@ -56,6 +57,9 @@ public:
     auto qualifiedName() const -> const QualifiedName &;
     auto setName(common::String name) -> void;
 
+    auto xIncludes() const -> const std::vector<XIncludeInfo> &;
+    auto addXInclude(XIncludeInfo info) -> void;
+
     auto dataType(const common::String &name) const -> const DataType *;
     auto dataTypes() const -> const DataTypeSet &;
     auto addDataType(DataType dataType) -> void;
@@ -76,6 +80,8 @@ public:
 
 private:
     QualifiedName m_qualifiedName;
+
+    std::vector<XIncludeInfo> m_xIncludes;
 
     DataTypeSet m_dataTypes;
     DeclaredInterfaceSet m_declaredInterfaces;

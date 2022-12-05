@@ -43,3 +43,9 @@ configure_file(resources/test_repeated_interface_name.xml resources/test_repeate
 configure_file(test_pinger.sh test_pinger.sh COPYONLY)
 configure_file(resources/test_pinger.output resources/test_pinger.output COPYONLY)
 configure_file(resources/test_pinger.xml resources/test_pinger.xml COPYONLY)
+
+configure_file(test_with_data_types.sh test_with_data_types.sh COPYONLY)
+configure_file(resources/test_with_data_types.xml resources/test_with_data_types.xml COPYONLY)
+configure_file(resources/test_with_data_types.output resources/test_with_data_types.output COPYONLY)
+configure_file(resources/test_with_data_types.asn resources/test_with_data_types.asn COPYONLY)
+configure_file(resources/test_with_data_types.acn resources/test_with_data_types.acn COPYONLY)

@@ -33,6 +33,7 @@ private Q_SLOTS:
     void testUnprotectedInterface();
     void testCyclicInterface();
     void testRepeatedInterfaceName();
+    void testWithDataTypes();
 
     void testPinger();
 };
@@ -107,6 +108,14 @@ void tst_SedsConverter_IvToSeds::testPinger()
 void tst_SedsConverter_IvToSeds::testRepeatedInterfaceName()
 {
     const int result = system("./test_repeated_interface_name.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-4020
+/// \SRS  ETB-FUN-4100
+void tst_SedsConverter_IvToSeds::testWithDataTypes()
+{
+    const int result = system("./test_with_data_types.sh");
     QCOMPARE(result, 0);
 }
 
