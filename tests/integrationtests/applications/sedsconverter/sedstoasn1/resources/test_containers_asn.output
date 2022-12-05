@@ -6,12 +6,12 @@ DataItemB ::= INTEGER(0 .. 255)
 -- Type used for array length specification
 LengthType ::= INTEGER(0 .. 65535)
 -- A simple array type
-ArrayType ::= SEQUENCE (SIZE(15)) OF DataItemA(0 .. 255)
+ArrayType ::= SEQUENCE (SIZE(15)) OF DataItemA
 -- A basic container data type
 BasicContainer ::= SEQUENCE
 {
-    fieldA DataItemA(0 .. 255),
-    fieldB DataItemB(0 .. 255)
+    fieldA DataItemA,
+    fieldB DataItemB
 }
 BinaryPattern ::= BIT STRING(SIZE(0 .. 8))
 -- Packet ID to distinguish between packets
@@ -38,12 +38,12 @@ PayloadBase ::= SEQUENCE
 -- Payload A for a data packet
 PayloadA ::= SEQUENCE
 {
-    data DataItemA(0 .. 255)
+    data DataItemA
 }
 -- Payload B for a data packet
 PayloadB ::= SEQUENCE
 {
-    data DataItemB(0 .. 255)
+    data DataItemB
 }
 -- A data packet
 DataPacket ::= SEQUENCE

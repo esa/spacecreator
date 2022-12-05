@@ -9,15 +9,15 @@ PackageContainer ::= SEQUENCE
     {
         realizationPackageContainer SEQUENCE
         {
-            fieldA DataItemA(0 .. 255),
-            fieldB DataItemB(0 .. 255)
+            fieldA DataItemA,
+            fieldB DataItemB
         } ,
         realizationPackageChildContainer PackageChildContainer
     }
 }
 PackageChildContainer ::= SEQUENCE
 {
-    fieldA DataItemA(0 .. 255) (0),
-    fieldB DataItemB(0 .. 255)
+    fieldA DataItemA(0),
+    fieldB DataItemB
 }
 END

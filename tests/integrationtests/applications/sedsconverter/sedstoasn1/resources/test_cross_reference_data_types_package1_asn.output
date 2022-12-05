@@ -5,28 +5,28 @@ FieldItem FROM COM-N7SPACE-PACKAGE2
 LengthItem FROM COM-N7SPACE-PACKAGE2
 ListItem FROM COM-N7SPACE-PACKAGE2
 ;
-BasicArray1D ::= SEQUENCE (SIZE(15)) OF ArrayItem(0 .. 255)
-ArrayWithIndexDataRef ::= SEQUENCE (SIZE(16)) OF ArrayItem(0 .. 255)
+BasicArray1D ::= SEQUENCE (SIZE(15)) OF ArrayItem
+ArrayWithIndexDataRef ::= SEQUENCE (SIZE(16)) OF ArrayItem
 BasicContainer ::= SEQUENCE
 {
     realization CHOICE
     {
         realizationBasicContainer SEQUENCE
         {
-            fieldA FieldItem(0 .. 255),
-            fieldB FieldItem(0 .. 255),
-            fieldC FieldItem(0 .. 255),
-            listEntry SEQUENCE (SIZE(0 .. 10)) OF ListItem(0 .. 255)
+            fieldA FieldItem,
+            fieldB FieldItem,
+            fieldC FieldItem,
+            listEntry SEQUENCE (SIZE(0 .. 10)) OF ListItem
         } ,
         realizationChildContainer ChildContainer
     }
 }
 ChildContainer ::= SEQUENCE
 {
-    fieldA FieldItem(0 .. 255) (0 .. 10),
-    fieldB FieldItem(0 .. 255),
-    fieldC FieldItem(0 .. 255),
-    listEntry SEQUENCE (SIZE(0 .. 10)) OF ListItem(0 .. 255)
+    fieldA FieldItem(0 .. 10),
+    fieldB FieldItem,
+    fieldC FieldItem,
+    listEntry SEQUENCE (SIZE(0 .. 10)) OF ListItem
 }
 SubRangeData ::= INTEGER(10 .. 255)
 END

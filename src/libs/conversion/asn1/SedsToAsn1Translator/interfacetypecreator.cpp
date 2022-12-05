@@ -258,10 +258,13 @@ bool InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const ::seds::
     if (isTypeGeneric) {
         auto &typeContext = typeCreatorContext.mainContext();
 
-        const auto argumentType = typeContext.findAsn1Type(*argumentConcreteTypeRef);
+        auto argumentType = typeContext.findAsn1Type(*argumentConcreteTypeRef)->clone();
+        const auto isArgumentChoice = argumentType->typeEnum() == Asn1Acn::Types::Type::ASN1Type::CHOICE;
+
+        DataTypeTranslationHelper::removeConstraints(argumentType.get());
 
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), "");
-        sequenceComponentType->setType(argumentType->clone());
+        sequenceComponentType->setType(std::move(argumentType));
 
         if (argumentName == determinantArgumentName) {
             auto sequenceComponent = std::make_unique<Asn1Acn::AcnSequenceComponent>(
@@ -273,8 +276,7 @@ bool InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const ::seds::
                     std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),
                     std::move(sequenceComponentType));
 
-            if (determinantArgumentName.has_value()
-                    && argumentType->typeEnum() == Asn1Acn::Types::Type::ASN1Type::CHOICE) {
+            if (determinantArgumentName.has_value() && isArgumentChoice) {
                 sequenceComponent->addAcnParameter(*determinantArgumentName);
             }
 
@@ -283,11 +285,13 @@ bool InterfaceTypeCreator::createAsyncCommandBundledTypeComponent(const ::seds::
     } else {
         auto &typeContext = typeCreatorContext.interfaceContext();
 
-        const auto argumentType = typeContext.findAsn1Type(*argumentConcreteTypeRef);
+        auto argumentType = typeContext.findAsn1Type(*argumentConcreteTypeRef)->clone();
         bundledTypeContext.importType(typeContext.definitionsName(), argumentType->identifier());
 
+        DataTypeTranslationHelper::removeConstraints(argumentType.get());
+
         auto sequenceComponentType = std::make_unique<Asn1Acn::Types::UserdefinedType>(argumentType->identifier(), "");
-        sequenceComponentType->setType(argumentType->clone());
+        sequenceComponentType->setType(std::move(argumentType));
 
         auto sequenceComponent = std::make_unique<Asn1Acn::AsnSequenceComponent>(argumentName, argumentName, false,
                 std::nullopt, "", Asn1Acn::AsnSequenceComponent::Presence::NotSpecified, Asn1Acn::SourceLocation(),

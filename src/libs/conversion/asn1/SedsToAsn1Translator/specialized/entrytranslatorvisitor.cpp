@@ -19,6 +19,7 @@
 
 #include "specialized/entrytranslatorvisitor.h"
 
+#include "datatypetranslationhelper.h"
 #include "specialized/rangetranslatorvisitor.h"
 #include "specialized/sizetranslatorvisitor.h"
 
@@ -124,11 +125,13 @@ void EntryTranslatorVisitor::operator()(const ::seds::model::PaddingEntry &sedsE
 std::unique_ptr<Asn1Acn::Types::UserdefinedType> EntryTranslatorVisitor::translateEntryType(
         const ::seds::model::DataTypeRef &sedsTypeRef)
 {
-    const auto asn1ReferencedType = m_context.findAsn1Type(sedsTypeRef);
+    auto asn1ReferencedType = m_context.findAsn1Type(sedsTypeRef)->clone();
+
+    DataTypeTranslationHelper::removeConstraints(asn1ReferencedType.get());
 
     auto asn1EntryType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
             asn1ReferencedType->identifier(), m_context.definitionsName());
-    asn1EntryType->setType(asn1ReferencedType->clone());
+    asn1EntryType->setType(std::move(asn1ReferencedType));
 
     return asn1EntryType;
 }

@@ -1,27 +1,27 @@
 COM-N7SPACE-INTERFACEDECLARATIONS DEFINITIONS ::= BEGIN
 PackageInteger ::= INTEGER(0 .. 255)
 DeterminantType ::= INTEGER(0 .. 1)
-PackageIntegerArray-12 ::= SEQUENCE (SIZE(12)) OF PackageInteger(0 .. 255)
-PackageIntegerArray-3x3x3 ::= SEQUENCE (SIZE(3)) OF SEQUENCE (SIZE(3)) OF SEQUENCE (SIZE(3)) OF PackageInteger(0 .. 255)
+PackageIntegerArray-12 ::= SEQUENCE (SIZE(12)) OF PackageInteger
+PackageIntegerArray-3x3x3 ::= SEQUENCE (SIZE(3)) OF SEQUENCE (SIZE(3)) OF SEQUENCE (SIZE(3)) OF PackageInteger
 PackageInterfaceDecl-InArgsOnly-Type ::= SEQUENCE
 {
-    argA PackageInteger(0 .. 255),
-    argB PackageInteger(0 .. 255),
-    arrayArg PackageIntegerArray-3x3x3(SIZE(3))
+    argA PackageInteger,
+    argB PackageInteger,
+    arrayArg PackageIntegerArray-3x3x3
 }
 PackageInterfaceDecl-OutArgsOnly-Type ::= SEQUENCE
 {
-    argA PackageInteger(0 .. 255),
-    argB PackageInteger(0 .. 255),
-    arrayArg PackageIntegerArray-3x3x3(SIZE(3))
+    argA PackageInteger,
+    argB PackageInteger,
+    arrayArg PackageIntegerArray-3x3x3
 }
 PackageInterfaceDecl-InAndNotify-Type ::= SEQUENCE
 {
-    inputArg PackageInteger(0 .. 255)
+    inputArg PackageInteger
 }
 PackageInterfaceDecl-InAndNotify-TypeNotify ::= SEQUENCE
 {
-    notifyArg PackageInteger(0 .. 255)
+    notifyArg PackageInteger
 }
-PackageIntegerArray-2 ::= SEQUENCE (SIZE(2)) OF PackageInteger(0 .. 255)
+PackageIntegerArray-2 ::= SEQUENCE (SIZE(2)) OF PackageInteger
 END
