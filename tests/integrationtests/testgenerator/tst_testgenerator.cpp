@@ -22,6 +22,7 @@
 #include <ivtools.h>
 #include <modelloader.h>
 #include <qtestcase.h>
+#include <standardpaths.h>
 #include <testgenerator.h>
 
 using plugincommon::IvTools;
@@ -39,12 +40,19 @@ class tst_testgenerator : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
+
     void testPrepareTestHarness();
     void testResultHtmlFile();
     void testResultHtmlData();
     void testParsingBoardSettings();
     void testStoringBoardsConfig();
 };
+
+void tst_testgenerator::initTestCase()
+{
+    shared::StandardPaths::setTestModeEnabled(true);
+}
 
 void tst_testgenerator::testPrepareTestHarness()
 {
