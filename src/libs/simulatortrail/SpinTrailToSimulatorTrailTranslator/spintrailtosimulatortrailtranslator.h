@@ -29,6 +29,7 @@
 #include <spintrail/SpinTrailModel/resettimerevent.h>
 #include <spintrail/SpinTrailModel/settimerevent.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
+#include <spintrail/SpinTrailModel/unhandledinputevent.h>
 
 namespace simulatortrail::translator {
 /**
@@ -69,6 +70,12 @@ public:
 
 private:
     struct ChannelInfo {
+        ChannelInfo();
+        ChannelInfo(const ChannelInfo &other);
+        ChannelInfo(ChannelInfo &&other);
+        ChannelInfo &operator=(const ChannelInfo &rhs);
+        ChannelInfo &operator=(ChannelInfo &&rhs);
+
         QString m_functionName;
         QString m_interfaceName;
         QString m_parameterName;
@@ -78,6 +85,7 @@ private:
         size_t m_channelSize;
         bool m_isTimer;
         QStringList m_senders;
+        Asn1Acn::ValuePtr m_lastReceivedValue;
     };
 
 private:
@@ -109,7 +117,9 @@ private:
             simulatortrail::model::SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const;
     void processSpinTrailEvent(const spintrail::model::SetTimerEvent *event) const;
     void processSpinTrailEvent(const spintrail::model::ResetTimerEvent *event) const;
-    Asn1Acn::ValuePtr getMessageValue(const QString &source, const QString &target, const ChannelInfo &info,
+    void processSpinTrailEvent(simulatortrail::model::SimulatorTrailModel &result,
+            const spintrail::model::UnhandledInputEvent *event, const QMap<QString, ChannelInfo> &channels) const;
+    Asn1Acn::ValuePtr getMessageValue(const QString &source, const QString &target, ChannelInfo &info,
             const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters, bool isInput) const;
 
     bool isFunctionLockChannel(const QString &channelName) const;

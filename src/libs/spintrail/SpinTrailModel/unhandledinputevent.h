@@ -19,35 +19,47 @@
 
 #pragma once
 
+#include "trailevent.h"
+
+#include <QString>
+
 namespace spintrail::model {
 /**
- * @brief Base class for all Spin Trail events
+ * @brief Representation of unhandled input in Spin Trail
  */
-class TrailEvent
+class UnhandledInputEvent : public TrailEvent
 {
 public:
     /**
-     * @brief Type of Spin Trail event
+     * @brief Constructor.
+     *
+     * @param functionName name of the function
+     * @param interfaceName name of the interface
      */
-    enum class EventType
-    {
-        CHANNEL_EVENT,
-        CONTINUOUS_SIGNAL,
-        SET_TIMER_EVENT,
-        RESET_TIMER_EVENT,
-        UNHANDLED_INPUT_EVENT,
-    };
+    UnhandledInputEvent(QString functionName, QString interfaceName);
 
     /**
-     * @brief default destructor
+     * @brief Getter for function name
+     *
+     * @return name of the function
      */
-    virtual ~TrailEvent() = default;
+    const QString &getFunctionName() const;
+    /**
+     * @brief Getter for name of the timer
+     *
+     * @return name of the timer.
+     */
+    const QString &getInterfaceName() const;
 
     /**
      * @brief Getter for event type
      *
      * @return Type of event
      */
-    virtual EventType getEventType() const = 0;
+    EventType getEventType() const override;
+
+private:
+    QString m_functionName;
+    QString m_interfaceName;
 };
 }

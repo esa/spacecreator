@@ -57,6 +57,7 @@ using spintrail::model::ResetTimerEvent;
 using spintrail::model::SetTimerEvent;
 using spintrail::model::SpinTrailModel;
 using spintrail::model::TrailEvent;
+using spintrail::model::UnhandledInputEvent;
 
 namespace simulatortrail::translator {
 
@@ -105,6 +106,75 @@ void showEnvironmentProctype(const QString &name, const IvToPromelaTranslator::E
     qDebug() << "        interfaceName " << info.m_interfaceName;
     qDebug() << "        priority " << info.m_priority;
 }
+}
+
+SpinTrailToSimulatorTrailTranslator::ChannelInfo::ChannelInfo()
+    : m_parameterType(nullptr)
+    , m_channelSize(0)
+    , m_isTimer(false)
+{
+}
+
+SpinTrailToSimulatorTrailTranslator::ChannelInfo::ChannelInfo(const ChannelInfo &other)
+    : m_functionName(other.m_functionName)
+    , m_interfaceName(other.m_interfaceName)
+    , m_parameterName(other.m_parameterName)
+    , m_parameterTypeName(other.m_parameterTypeName)
+    , m_parameterType(other.m_parameterType)
+    , m_possibleSenders(other.m_possibleSenders)
+    , m_channelSize(other.m_channelSize)
+    , m_isTimer(other.m_isTimer)
+    , m_senders(other.m_senders)
+    , m_lastReceivedValue(other.m_lastReceivedValue != nullptr ? other.m_lastReceivedValue->clone() : nullptr)
+{
+}
+
+SpinTrailToSimulatorTrailTranslator::ChannelInfo::ChannelInfo(ChannelInfo &&other)
+    : m_functionName(std::move(other.m_functionName))
+    , m_interfaceName(std::move(other.m_interfaceName))
+    , m_parameterName(std::move(other.m_parameterName))
+    , m_parameterTypeName(std::move(other.m_parameterTypeName))
+    , m_parameterType(other.m_parameterType)
+    , m_possibleSenders(std::move(other.m_possibleSenders))
+    , m_channelSize(other.m_channelSize)
+    , m_isTimer(other.m_isTimer)
+    , m_senders(std::move(other.m_senders))
+    , m_lastReceivedValue(std::move(other.m_lastReceivedValue))
+{
+}
+
+SpinTrailToSimulatorTrailTranslator::ChannelInfo &SpinTrailToSimulatorTrailTranslator::ChannelInfo::operator=(
+        const ChannelInfo &rhs)
+{
+    m_functionName = rhs.m_functionName;
+    m_interfaceName = rhs.m_interfaceName;
+    m_parameterName = rhs.m_parameterName;
+    m_parameterTypeName = rhs.m_parameterTypeName;
+    m_parameterType = rhs.m_parameterType;
+    m_possibleSenders = rhs.m_possibleSenders;
+    m_channelSize = rhs.m_channelSize;
+    m_isTimer = rhs.m_isTimer;
+    m_senders = rhs.m_senders;
+    m_lastReceivedValue = rhs.m_lastReceivedValue != nullptr ? rhs.m_lastReceivedValue->clone() : nullptr;
+
+    return *this;
+}
+
+SpinTrailToSimulatorTrailTranslator::ChannelInfo &SpinTrailToSimulatorTrailTranslator::ChannelInfo::operator=(
+        ChannelInfo &&rhs)
+{
+    m_functionName = std::move(rhs.m_functionName);
+    m_interfaceName = std::move(rhs.m_interfaceName);
+    m_parameterName = std::move(rhs.m_parameterName);
+    m_parameterTypeName = std::move(rhs.m_parameterTypeName);
+    m_parameterType = rhs.m_parameterType;
+    m_possibleSenders = std::move(rhs.m_possibleSenders);
+    m_channelSize = rhs.m_channelSize;
+    m_isTimer = rhs.m_isTimer;
+    m_senders = std::move(rhs.m_senders);
+    m_lastReceivedValue = std::move(rhs.m_lastReceivedValue);
+
+    return *this;
 }
 
 std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTranslator::translateModels(
@@ -278,7 +348,7 @@ void SpinTrailToSimulatorTrailTranslator::findProctypes(
     }
 }
 
-void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::SimulatorTrailModel &result,
+void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
         const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
         const Asn1Acn::Types::Type *observableEvent) const
@@ -303,11 +373,15 @@ void SpinTrailToSimulatorTrailTranslator::translate(simulatortrail::model::Simul
             const ResetTimerEvent *event = dynamic_cast<const ResetTimerEvent *>(trailEvent.get());
             processSpinTrailEvent(event);
         } break;
+        case TrailEvent::EventType::UNHANDLED_INPUT_EVENT: {
+            const UnhandledInputEvent *event = dynamic_cast<const UnhandledInputEvent *>(trailEvent.get());
+            processSpinTrailEvent(result, event, channels);
+        } break;
         }
     }
 }
 
-void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(simulatortrail::model::SimulatorTrailModel &result,
+void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
         const Asn1Acn::Types::Type *observableEvent) const
@@ -323,7 +397,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(simulatortrail::
     }
 }
 
-void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(simulatortrail::model::SimulatorTrailModel &result,
+void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels,
         const Asn1Acn::Types::Type *observableEvent) const
@@ -379,7 +453,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(simulatortra
     }
 }
 
-void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(simulatortrail::model::SimulatorTrailModel &result,
+void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
         const Asn1Acn::Types::Type *observableEvent) const
@@ -420,7 +494,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(simulatortra
 }
 
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(
-        simulatortrail::model::SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const
+        SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const
 {
     std::unique_ptr<ChoiceValue> inputNone =
             std::make_unique<ChoiceValue>("input-none", std::make_unique<NamedValue>());
@@ -445,8 +519,47 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(const ResetTimer
     qDebug() << event->getFunctionName() << " calls reset_timer(" << event->getTimerName() << ")";
 }
 
+void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(
+        SimulatorTrailModel &result, const UnhandledInputEvent *event, const QMap<QString, ChannelInfo> &channels) const
+{
+    QString source;
+    ValuePtr interfaceParamValue;
+
+    for (auto iter = channels.begin(); iter != channels.end(); ++iter) {
+        if (iter.value().m_functionName.compare(event->getFunctionName(), Qt::CaseInsensitive) == 0
+                && iter.value().m_interfaceName.compare(event->getInterfaceName(), Qt::CaseInsensitive) == 0) {
+            source = iter->m_possibleSenders.begin().key();
+            interfaceParamValue = iter->m_lastReceivedValue->clone();
+            break;
+        }
+    }
+
+    if (source.isEmpty()) {
+        qCritical() << "Cannot find interface, function: " << event->getFunctionName()
+                    << " interface: " << event->getInterfaceName();
+        throw TranslationException("Cannot process trail event");
+    }
+
+    const QString interfaceName = event->getInterfaceName();
+    std::unique_ptr<ChoiceValue> interfaceValue =
+            std::make_unique<ChoiceValue>(Escaper::escapeAsn1FieldName(interfaceName), std::move(interfaceParamValue));
+
+    std::unique_ptr<ChoiceValue> msgValue = std::make_unique<ChoiceValue>(QString("msg-in"), std::move(interfaceValue));
+
+    std::unique_ptr<ChoiceValue> functionEvent =
+            std::make_unique<ChoiceValue>(Escaper::escapeAsn1FieldName(event->getFunctionName()), std::move(msgValue));
+
+    std::unique_ptr<NamedValue> interfaceEventValue = std::make_unique<NamedValue>();
+    interfaceEventValue->addValue("source", std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(source)));
+    interfaceEventValue->addValue(
+            "dest", std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(event->getFunctionName())));
+    interfaceEventValue->addValue("event", std::move(functionEvent));
+
+    result.appendValue(std::make_unique<ChoiceValue>("unhandled-input", std::move(interfaceEventValue)));
+}
+
 Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getMessageValue(const QString &source, const QString &target,
-        const ChannelInfo &info, const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters,
+        ChannelInfo &info, const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters,
         bool isInput) const
 {
     if (observableEvent->typeEnum() != Asn1Acn::Types::Type::CHOICE) {
@@ -471,7 +584,10 @@ Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getMessageValue(const QSt
         ValuePtr parameterValue = info.m_parameterTypeName.isEmpty()
                 ? std::make_unique<NamedValue>()
                 : valueParser.parseValue(parameters, info.m_parameterType);
+        info.m_lastReceivedValue = parameterValue->clone();
         interfaceParamValue->addValue(Escaper::escapeAsn1FieldName(info.m_parameterName), std::move(parameterValue));
+    } else {
+        info.m_lastReceivedValue.reset();
     }
 
     const QString interfaceName = isInput ? info.m_interfaceName : info.m_possibleSenders.value(source);

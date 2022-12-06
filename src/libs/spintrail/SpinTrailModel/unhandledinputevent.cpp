@@ -17,27 +17,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "resettimerevent.h"
+#include "unhandledinputevent.h"
 
 namespace spintrail::model {
-ResetTimerEvent::ResetTimerEvent(QString functionName, QString timerName)
+UnhandledInputEvent::UnhandledInputEvent(QString functionName, QString interfaceName)
     : m_functionName(std::move(functionName))
-    , m_timerName(std::move(timerName))
+
+    , m_interfaceName(std::move(interfaceName))
 {
 }
 
-const QString &ResetTimerEvent::getFunctionName() const
+const QString &UnhandledInputEvent::getFunctionName() const
 {
     return m_functionName;
 }
 
-const QString &ResetTimerEvent::getTimerName() const
+const QString &UnhandledInputEvent::getInterfaceName() const
 {
-    return m_timerName;
+    return m_interfaceName;
 }
 
-TrailEvent::EventType ResetTimerEvent::getEventType() const
+TrailEvent::EventType UnhandledInputEvent::getEventType() const
 {
-    return TrailEvent::EventType::RESET_TIMER_EVENT;
+    return TrailEvent::EventType::UNHANDLED_INPUT_EVENT;
 }
 }

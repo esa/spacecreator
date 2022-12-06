@@ -57,6 +57,8 @@ private:
     constexpr static inline size_t CHANNEL_EVENT_VALIDATION_PART = 0;
     constexpr static inline size_t CHANNEL_EVENT_COMMAND_PART = 1;
     constexpr static inline size_t CHANNEL_EVENT_CHANNEL_PART = 2;
+    constexpr static inline size_t UNHANDLED_INPUT_EVENT_FUNCTION_NAME = 1;
+    constexpr static inline size_t UNHANDLED_INPUT_EVENT_INTERFACE_NAME = 2;
 
 private:
     void processLine(spintrail::model::SpinTrailModel &model, const QString &line) const;

@@ -855,6 +855,11 @@ void IvToPromelaTranslator::generateUnhandledInputInline(
 
     Sequence sequence(Sequence::Type::NORMAL);
 
+    QString message = QString("unhandled_input %1 %2\\n").arg(functionName).arg(proctypeInfo.m_interfaceName);
+    QList<Expression> messageArgs;
+    messageArgs.append(Expression(StringConstant(message)));
+    sequence.appendElement(PrintfStatement(messageArgs));
+
     QList<QString> arguments;
 
     if (!proctypeInfo.m_parameterTypeName.isEmpty()) {
