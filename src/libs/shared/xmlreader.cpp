@@ -80,6 +80,9 @@ EntityAttributes XmlReader::attributes(const QXmlStreamAttributes &xmlAttrs)
 
 bool XmlReader::readFile(const QString &file)
 {
+    d->m_metaData.clear();
+    d->m_metaData["version"] = "1.0"; // if there is no version in the vile, fall back to 1.0
+
     d->m_file = file;
     QFile in(file);
     if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text)) {

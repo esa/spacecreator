@@ -73,7 +73,7 @@ bus.devices                :    |_ List of devices connected to this bus
 device                     :       |_ Instance of bus.devices (same properties as in node.devices)
 ====================================
 {% endcomment %}
-<DeploymentView>
+<DeploymentView version="1.0">
 {% for node in Nodes %}
     <Node{% for attr in node.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
     {% for prop in node.properties %}
