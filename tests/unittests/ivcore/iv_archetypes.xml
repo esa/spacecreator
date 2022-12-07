@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
     <Function name="Function_Type_1" is_type="YES" FPGA_Configurations="" type_language="SDL">
         <Property name="Taste::coordinates" value="55500 35600 75500 43600"/>
     <Provided_Interface name="Interface1" kind="Unprotected" layer="default" wcet="0">

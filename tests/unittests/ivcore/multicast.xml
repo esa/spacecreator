@@ -1,4 +1,4 @@
-<InterfaceView asn1file="one2m.acn">
+<InterfaceView version="1.0" asn1file="one2m.acn">
 <Function name="dstA" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="104000 33500 129600 49700"/>
 <Provided_Interface name="pi_a" kind="Sporadic" enable_multicast="true" layer="default" queue_size="1" priority="1" wcet="0" miat="0" stack_size="1024">

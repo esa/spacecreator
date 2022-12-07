@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<InterfaceView>
+<InterfaceView version="1.0">
     <Function name="BlockA" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="9200 8000 52600 50200"/>
         <Required_Interface name="RI_1" kind="SPORADIC_OPERATION" period="" wcet="" queue_size="">

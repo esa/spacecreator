@@ -1,4 +1,4 @@
-<InterfaceView asn1file="dataview-uniq.asn">
+<InterfaceView version="1.0" asn1file="dataview-uniq.asn">
 <Function name="ProtectedFunction" is_type="NO" language="SDL" default_implementation="default">
     <Property name="Taste::coordinates" value="45100 55200 82700 77200"/>
 <Provided_Interface name="ProtectedInterface" kind="Protected">

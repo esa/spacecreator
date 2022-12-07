@@ -1,4 +1,4 @@
-<InterfaceView asn1file="Taste07.asn">
+<InterfaceView version="1.0" asn1file="Taste07.asn">
 <Function name="Function_33" language="" is_type="NO" instance_of="">
     <Property name="Taste::coordinates" value="53200 69500 104800 102700"/>
 <Provided_Interface name="init" kind="Protected" period="" wcet="" queue_size="">

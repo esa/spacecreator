@@ -1,4 +1,4 @@
-<InterfaceView asn1file="testgenerator.acn">
+<InterfaceView version="1.0" asn1file="testgenerator.acn">
 <Function name="FunctionUnderTest" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="48200 29800 68200 37800"/>
 <Provided_Interface name="InterfaceUnderTest" kind="Protected" layer="default" wcet="0">

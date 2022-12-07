@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="Provider" comment="Host for provided interfaces" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="InterfaceWithSynchronousCommandsInstance_ExecuteSynchronousAction_Pi" comment="Execute a synchronous action with arguments" kind="Protected" layer="default">
     <Input_Parameter name="InputArg" type="DataItem" encoding="ACN"/>

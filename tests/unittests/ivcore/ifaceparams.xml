@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
     <Function name="Function_1" language="" is_type="NO" instance_of="">
         <Property name="Taste::coordinates" value="600 -500 20600 7500"/>
         <Required_Interface name="RI_1" kind="Sporadic" period="" wcet="" queue_size="">

@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="Component" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="InterfaceImplementation_Sync1_Pi" kind="Protected" layer="default">
     <Input_Parameter name="Arg1" type="PackageInteger" encoding="ACN"/>

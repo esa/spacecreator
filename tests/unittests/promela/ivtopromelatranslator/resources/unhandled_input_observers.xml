@@ -1,4 +1,4 @@
-<InterfaceView asn1file="test_unhandled_input.acn">
+<InterfaceView version="1.0" asn1file="test_unhandled_input.acn">
 <Function name="environ" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="-48100 -36200 -15500 -13800"/>
 <Required_Interface name="test" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" queue_size="1" stack_size="1024" wcet="0" priority="1" miat="0">

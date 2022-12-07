@@ -1,4 +1,4 @@
-<InterfaceView asn1file="sync_interfaces.acn">
+<InterfaceView version="1.0" asn1file="sync_interfaces.acn">
 <Function name="controller" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="-79700 -25600 -41100 22600"/>
 <Provided_Interface name="pong" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" queue_size="1" priority="1">
