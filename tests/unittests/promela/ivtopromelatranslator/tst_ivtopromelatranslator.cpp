@@ -71,6 +71,7 @@ private Q_SLOTS:
     void testOutputObservers();
     void testUnhandledInputObservers();
     void testSynchronousInterfaces();
+    void testChannelNames();
 
 private:
     template<typename T>
@@ -1450,6 +1451,45 @@ void tst_IvToPromelaTranslator::testSynchronousInterfaces()
         QVERIFY(functionCall);
         QCOMPARE(functionCall->getName(), "Actuator_0_PI_0_test_unprotected");
         QCOMPARE(functionCall->getArguments().size(), 3);
+    }
+}
+
+void tst_IvToPromelaTranslator::testChannelNames()
+{
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("channel_names.xml");
+    QVERIFY(ivModel);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
+    QVERIFY(promelaModel);
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Actuator_testsignal_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Actuator_ping_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_pong_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
     }
 }
 

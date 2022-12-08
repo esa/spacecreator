@@ -21,5 +21,6 @@ configure_file(resources/proctype_priority.xml proctype_priority.xml COPYONLY)
 configure_file(resources/output_observers.xml output_observers.xml COPYONLY)
 configure_file(resources/unhandled_input_observers.xml unhandled_input_observers.xml COPYONLY)
 configure_file(resources/synchronous_interfaces.xml synchronous_interfaces.xml COPYONLY)
+configure_file(resources/channel_names.xml channel_names.xml COPYONLY)
 
 add_format_target(${TEST_NAME})

@@ -1348,7 +1348,7 @@ void IvToPromelaTranslator::createPromelaObjectsForObservers(Context &context) c
 
 QString IvToPromelaTranslator::constructChannelName(const QString &functionName, const QString &interfaceName) const
 {
-    return QString("%1_%2_channel").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
+    return QString("%1_%2_channel").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName.toLower());
 }
 
 std::vector<const Asn1Acn::Definitions *> IvToPromelaTranslator::getSubtypesDefinitions(
