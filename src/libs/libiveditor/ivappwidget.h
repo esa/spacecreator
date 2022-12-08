@@ -21,9 +21,13 @@
 
 #include <QAction>
 #include <QPointer>
+#include <QStandardItem>
 #include <QVector>
 #include <QWidget>
-#include <QStandardItem>
+
+namespace shared {
+class BreadcrumbWidget;
+}
 
 namespace Ui {
 class IVAppWidget;
@@ -80,6 +84,7 @@ private:
     QVector<QAction *> initViewActions();
 
     Ui::IVAppWidget *ui = nullptr;
+    shared::BreadcrumbWidget *m_breadCrumb = nullptr;
     IVCreatorTool *m_tool { nullptr };
     QAction *m_actCreateConnectionGroup { nullptr };
     QAction *m_actRemove { nullptr };

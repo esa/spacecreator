@@ -14,6 +14,8 @@ target_sources(${LIB_NAME} PRIVATE
     addpropertytemplatedialog.ui
     animation.cpp
     animation.h
+    breadcrumbwidget.cpp
+    breadcrumbwidget.h
     colors/colorhandler.cpp
     colors/colorhandler.h
     colors/colorhandlereditor.cpp

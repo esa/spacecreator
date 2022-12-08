@@ -18,6 +18,7 @@
 #include "ivappwidget.h"
 
 #include "archetypesmanagerdialog.h"
+#include "breadcrumbwidget.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
@@ -59,6 +60,8 @@ IVAppWidget::IVAppWidget(IVEditorCore *core, QWidget *parent)
     , m_document(core->document())
 {
     ui->setupUi(this);
+    m_breadCrumb = new shared::BreadcrumbWidget(ui->graphicsView);
+    m_breadCrumb->raise();
 
     ui->splitter->setStretchFactor(0, 0);
     ui->splitter->setStretchFactor(1, 1);
@@ -70,6 +73,10 @@ IVAppWidget::IVAppWidget(IVEditorCore *core, QWidget *parent)
     initLayerView();
 
     connect(m_document->itemsModel(), &IVItemModel::itemDoubleClicked, this, &IVAppWidget::onItemDoubleClicked);
+    connect(m_breadCrumb, &shared::BreadcrumbWidget::levelClicked, this, [this](const QString &level) {
+        const shared::Id id = shared::Id::fromString(level);
+        m_document->itemsModel()->changeRootItem(id);
+    });
 
     QTimer::singleShot(0, this, [&]() {
         for (QAction *action : initActions()) {
@@ -620,7 +627,19 @@ QVector<QAction *> IVAppWidget::initActions()
         m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent, m_actEnterNestedView, m_actShrinkScene };
 
     connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
-        Q_UNUSED(rootId)
+        QList<shared::BreadcrumbWidget::Level> levels;
+        if (ivm::IVObject *object = m_document->objectsModel()->getObject(rootId)) {
+            Q_ASSERT(object->isFunction());
+            auto function = object->as<const ivm::IVFunctionType *>();
+            if (!function)
+                return;
+            levels.append({ function->id().toString(), function->titleUI() });
+            while ((function = function->parentObject()->as<const ivm::IVFunctionType *>())) {
+                levels.prepend({ function->id().toString(), function->titleUI() });
+            }
+        }
+        m_breadCrumb->setLevels(levels);
+
         if (m_actExitToRoot) {
             m_actExitToRoot->setEnabled(nullptr != m_document->objectsModel()->rootObject());
         }
