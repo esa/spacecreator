@@ -103,6 +103,16 @@ public:
      * \SRS  ETB-DAT-10
      */
     auto test_SourceSedsValidationSchemaFromSanaRegistry() {}
+
+    /**
+     * Date: 2022.12.09
+     * Result: STBSW is a part of the SpaceCreator and so no separate installation script is needed. SpaceCreator
+     * installation script is provided in the ESA’s TASTE repository under the following address:
+     * https://gitrepos.estec.esa.int/taste/taste-setup/-/blob/feature_buster/install/88_spaceCreator.sh
+     *
+     * \SRS  ETB-INST-10
+     */
+    auto test_SedsTasteBridgeImporterExporterInstallationScript() {}
 };
 
 } // namespace seds::test
