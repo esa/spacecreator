@@ -135,7 +135,9 @@ private:
     const QString defaultMessageSequenceChartWhenThenMscTemplatePath =
             shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/model-checker/"
             + defaultMessageSequenceChartWhenThenMscTemplateName;
-    const QString sedCommandForWhenThenPropertyTemplate = "sed -i \"s/Untitled_Document/%1/g\" %2";
+    const QString sedCommand = "sed";
+    const QString sedParameterForInplaceEdit = "-i";
+    const QString sedParameterForWhenThenPropertyTemplate = "s/Untitled_Document/%1/";
 
     QString askAboutNewPropertyType();
     bool isPropertyTypeSupported(const QString &propertyType);

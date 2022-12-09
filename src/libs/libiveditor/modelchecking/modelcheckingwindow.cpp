@@ -1116,11 +1116,14 @@ bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(
         return false;
     }
 
-    auto sedCommandProcess = new QProcess(this);
-    const QString sedCommand = sedCommandForWhenThenPropertyTemplate.arg(propertyName).arg(newPropertyFilePath);
+    QProcess sedCommandProcess;
+    const QString sedParameter = sedParameterForWhenThenPropertyTemplate.arg(propertyName);
+    const QStringList sedParameters = { sedParameterForInplaceEdit, sedParameter, newPropertyFilePath };
 
-    if (sedCommandProcess->execute(sedCommand)) {
-        QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(sedCommand));
+    if (sedCommandProcess.execute(sedCommand, sedParameters) != 0) {
+
+        QMessageBox::warning(this, tr("Add new property"),
+                tr("%1 %2 command can not be executed.").arg(sedCommand).arg(sedParameters.join(" ")));
         return false;
     }
 
