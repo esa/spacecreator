@@ -414,6 +414,14 @@ public:
          * @brief name of the inline
          */
         QString m_name;
+        /**
+         * @brief name of the function
+         */
+        QString m_functionName;
+        /**
+         * @brief name of the interface
+         */
+        QString m_interfaceName;
 
         /**
          * @brief Information about parameter.

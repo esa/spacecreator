@@ -19,7 +19,6 @@
 
 #include "translator.h"
 
-#include <QDebug>
 #include <conversion/common/escaper/escaper.h>
 #include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
@@ -1012,7 +1011,11 @@ void IvToPromelaTranslator::createPromelaObjectsForEnvironmentSyncRis(
             continue;
         }
 
-        const auto generateValueInlineName = QString("%1_generate_value").arg(parameterInfo.m_parameterType);
+        const auto parameterSubtype =
+                handleParameterSubtype(context, Escaper::escapePromelaName(parameterInfo.m_parameterType),
+                        parameterInfo.m_parameterName, info.m_interfaceName, info.m_functionName);
+
+        const auto generateValueInlineName = QString("%1_generate_value").arg(parameterSubtype);
         const QList<InlineCall::Argument> generateValueInlineArgs({ parameterInfo.m_parameterName });
         InlineCall generateValueInlineCall(generateValueInlineName, generateValueInlineArgs);
         sequence.appendElement(std::move(generateValueInlineCall));
@@ -1851,6 +1854,8 @@ void IvToPromelaTranslator::prepareSynchronousCallInfo(Context &context, const Q
                 QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
 
         info->m_name = inlineName;
+        info->m_functionName = functionName;
+        info->m_interfaceName = requiredInterface->title();
 
         const QString parameterNamePrefix =
                 QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
@@ -1858,6 +1863,7 @@ void IvToPromelaTranslator::prepareSynchronousCallInfo(Context &context, const Q
             EnvSynchronousCallInfo::ParameterInfo parameterInfo;
             parameterInfo.m_parameterType = interfaceParam.paramTypeName();
             parameterInfo.m_parameterName = QString("%1_%2").arg(parameterNamePrefix).arg(interfaceParam.name());
+
             parameterInfo.m_generateValue = interfaceParam.isOutDirection();
 
             info->m_parameters.append(parameterInfo);
