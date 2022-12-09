@@ -18,6 +18,7 @@ target_link_libraries(${TEST_NAME}
 
 configure_file(resources/external_references.toml external_references.toml COPYONLY)
 configure_file(resources/seds.xml seds.xml COPYONLY)
+configure_file(resources/valid.xml valid.xml COPYONLY)
 configure_file(resources/some_data.xml some_data.xml COPYONLY)
 configure_file(resources/seds-core-semantics.xsd seds-core-semantics.xsd COPYONLY)
 configure_file(resources/seds-extension-semantics.xsd seds-extension-semantics.xsd COPYONLY)

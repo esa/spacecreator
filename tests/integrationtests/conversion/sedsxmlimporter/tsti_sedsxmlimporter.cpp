@@ -42,10 +42,10 @@ public:
 private Q_SLOTS:
     void testValid();
     void testExternalReferences();
+    void testSchemaPresent();
 };
 
 /// \SRS  ETB-FUN-40
-/// \SRS  ETB-DAT-20
 void tsti_SedsXmlImporter::testValid()
 {
     Options options;
@@ -72,6 +72,33 @@ void tsti_SedsXmlImporter::testValid()
 
     QFileInfo preprocessedFileInfo("preprocessed.xml");
     QVERIFY(!preprocessedFileInfo.exists());
+}
+
+/// \SRS  ETB-DAT-20
+void tsti_SedsXmlImporter::testSchemaPresent()
+{
+    Options options;
+    options.add(SedsOptions::inputFilepath, "valid.xml");
+    options.add(SedsOptions::schemaFilepath, "seds.xsd");
+
+    SedsXmlImporter sedsImporter;
+
+    try {
+        const auto model = sedsImporter.importModel(options);
+        const auto sedsModel = dynamic_cast<seds::model::SedsModel *>(model.get());
+        QVERIFY(sedsModel != nullptr);
+    } catch (const std::exception &ex) {
+        QFAIL(ex.what());
+    }
+
+    QFileInfo schemaFileInfo("seds.xsd");
+    QVERIFY(schemaFileInfo.exists());
+
+    QFileInfo schemaCoreSemanticsFileInfo("seds-core-semantics.xsd");
+    QVERIFY(schemaCoreSemanticsFileInfo.exists());
+
+    QFileInfo schemaExtensionSemanticsFileInfo("seds-extension-semantics.xsd");
+    QVERIFY(schemaExtensionSemanticsFileInfo.exists());
 }
 
 /// \SRS  ETB-FUN-40
