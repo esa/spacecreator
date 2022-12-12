@@ -352,6 +352,7 @@ void DataTypeTranslatorVisitor::translateEnumSubRangeDataType(
     auto asn1Type = std::make_unique<Asn1Acn::Types::Enumerated>(asn1TypeName);
 
     translateIntegerEncoding(sedsBaseType.encoding(), asn1Type.get());
+    asn1Type->setEncodeValues(true);
 
     const auto &enumRange = std::get<EnumeratedDataTypeRange>(sedsType.range());
     const auto &items = sedsBaseType.enumerationList();
