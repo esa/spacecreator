@@ -51,7 +51,7 @@ spacecreator-qt5-master:
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
-    - ./scripts/run_tests.sh ${BUILD_DIR}
+    - ctest -R tst_tmc_subtyping -V
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # Create an AppImage from the app_dir and place it in the build dir
@@ -94,7 +94,7 @@ spacecreator-qt6-master:
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
-    - ./scripts/run_tests.sh ${BUILD_DIR}
+    - ctest -R tst_tmc_subtyping -V
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # Create an AppImage from the app_dir and place it in the build dir
@@ -136,7 +136,7 @@ spacecreator-qt5-feature:
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
-    - ./scripts/run_tests.sh ${BUILD_DIR}
+    - ctest -R tst_tmc_subtyping -V
   cache:
     key: spacecreator_cache
     paths:
@@ -176,7 +176,7 @@ spacecreator-qt6-feature:
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # unit tests
-    - ./scripts/run_tests.sh ${BUILD_DIR}
+    - ctest -R tst_tmc_subtyping -V
   cache:
     key: spacecreator_cache
     paths:
