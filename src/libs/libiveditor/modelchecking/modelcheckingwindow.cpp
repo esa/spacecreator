@@ -1877,10 +1877,15 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
 
     const auto tableWidget = d->ui->tableWidget_generationLimits;
     spinConfigData.ifaceGenerationLimits.clear();
+
     for (int i = 0; i < tableWidget->rowCount(); i++) {
-        QString ifaceName = tableWidget->item(i, 0)->text();
-        int ifaceGenerationLimit = tableWidget->item(i, 1)->text().toInt();
-        spinConfigData.ifaceGenerationLimits.append({ ifaceName, ifaceGenerationLimit });
+        QTableWidgetItem *ifaceNameItem = tableWidget->item(i, 0);
+        QTableWidgetItem *generationLimitItem = tableWidget->item(i, 1);
+        if (ifaceNameItem && generationLimitItem) {
+            QString ifaceName = ifaceNameItem->text();
+            int ifaceGenerationLimit = generationLimitItem->text().toInt();
+            spinConfigData.ifaceGenerationLimits.append({ ifaceName, ifaceGenerationLimit });
+        }
     }
 
     return spinConfigData;
