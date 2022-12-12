@@ -40,8 +40,13 @@ private Q_SLOTS:
     void testFileOpenError();
     void testInvalidXMLFormat();
     void testEmptyFile();
-    void testLineNumber_data();
-    void testLineNumber();
+    void testErrortype();
+    void testErrorLineNumber_data();
+    void testErrorLineNumber();
+    void testWarningLineNumber_data();
+    void testWarningLineNumber();
+    void testWarningFilename_data();
+    void testWarningFilename();
     void testOptional();
 
 private:
@@ -95,7 +100,17 @@ void tst_Asn1Reader::testEmptyFile()
     QCOMPARE(asn1Types->definitionsList().at(0)->types().size(), 0);
 }
 
-void tst_Asn1Reader::testLineNumber_data()
+void tst_Asn1Reader::testErrortype()
+{
+    QString input("/tmp/Taste07.asn: error: no viable alternative at input 'INTEGER'\n");
+    QCOMPARE(xmlParser->errorType(input), shared::ErrorItem::Error);
+
+    input = "Warning:-1: warning: Warning: Value c-MISSION-ObjectDictionary defined in File:mission-od.asn, Line:46 "
+            "does not conform to its type constraints.";
+    QCOMPARE(xmlParser->errorType(input), shared::ErrorItem::Warning);
+}
+
+void tst_Asn1Reader::testErrorLineNumber_data()
 {
     QTest::addColumn<QString>("input");
     QTest::addColumn<int>("result");
@@ -106,11 +121,57 @@ void tst_Asn1Reader::testLineNumber_data()
     QTest::newRow("correct") << "/tmp/Taste07.asn:3:10: error: no viable alternative at input 'INTEGER'\n" << 3;
 }
 
-void tst_Asn1Reader::testLineNumber()
+void tst_Asn1Reader::testErrorLineNumber()
 {
     QFETCH(QString, input);
     QFETCH(int, result);
     QCOMPARE(xmlParser->lineNumberFromError(input), result);
+}
+
+void tst_Asn1Reader::testWarningLineNumber_data()
+{
+    QTest::addColumn<QString>("input");
+    QTest::addColumn<int>("result");
+
+    QTest::newRow("empty") << "" << -1;
+    QTest::newRow("nonsense") << "nonsense" << -1;
+    QTest::newRow("missing line") << "Warning:-1: warning: Warning: Value c-ObjectD defined in File:mission-od.asn, "
+                                     "does not conform to its type constraints."
+                                  << -1;
+    QTest::newRow("correct") << "Warning:-1: warning: Warning: Value c-Object defined in File:mission-od.asn, Line:46 "
+                                "does not conform to its type constraints."
+                             << 46;
+}
+
+void tst_Asn1Reader::testWarningLineNumber()
+{
+    QFETCH(QString, input);
+    QFETCH(int, result);
+    QCOMPARE(xmlParser->lineNumberFromWarning(input), result);
+}
+
+void tst_Asn1Reader::testWarningFilename_data()
+{
+    QTest::addColumn<QString>("input");
+    QTest::addColumn<QString>("result");
+
+    QTest::newRow("empty") << ""
+                           << "";
+    QTest::newRow("nonsense") << "nonsense"
+                              << "";
+    QTest::newRow("missing file") << "Warning:-1: warning: Warning: Value c-ObjectD defined in Line:46 "
+                                     "does not conform to its type constraints."
+                                  << "";
+    QTest::newRow("correct") << "Warning:-1: warning: Warning: Value c-Object defined in File:mission-od.asn, Line:46 "
+                                "does not conform to its type constraints."
+                             << "mission-od.asn";
+}
+
+void tst_Asn1Reader::testWarningFilename()
+{
+    QFETCH(QString, input);
+    QFETCH(QString, result);
+    QCOMPARE(xmlParser->fileNameFromWarning(input), result);
 }
 
 void tst_Asn1Reader::testOptional()

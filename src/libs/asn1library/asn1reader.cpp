@@ -18,7 +18,6 @@
 #include "asn1reader.h"
 
 #include "astxmlparser.h"
-#include "errorhub.h"
 #include "file.h"
 #include "standardpaths.h"
 
@@ -51,7 +50,11 @@ Asn1Reader::Asn1Reader(QObject *parent)
  */
 std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(const QFileInfo &fileInfo, QStringList *errorMessages)
 {
-    return parseAsn1File(fileInfo.dir().absolutePath(), fileInfo.fileName(), errorMessages);
+    std::map<QString, std::unique_ptr<Asn1Acn::File>> data = parseAsn1Files({ fileInfo }, errorMessages);
+    if (data.empty()) {
+        return {};
+    }
+    return std::move(data.begin()->second);
 }
 
 /*!
@@ -65,31 +68,7 @@ std::unique_ptr<Asn1Acn::File> Asn1Reader::parseAsn1File(
         const QString &filePath, const QString &fileName, QStringList *errorMessages)
 {
     const QFileInfo asn1File(QDir(filePath), fileName);
-    shared::ErrorHub::clearFileErrors(asn1File.absoluteFilePath());
-
-    if (!asn1File.exists()) {
-        QString msg = tr("ASN.1 file %1 does not exist").arg(asn1File.absoluteFilePath());
-        errorMessages->append(msg);
-        shared::ErrorHub::addError(shared::ErrorItem::Error, msg, asn1File.absoluteFilePath());
-
-        return {};
-    }
-
-    const QString fullFilePath = asn1File.absoluteFilePath();
-    const QByteArray asn1FileHash = fileHash(QStringList(fullFilePath));
-
-    const QString asnCacheFile =
-            shared::StandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
-
-    if (!QFile::exists(asnCacheFile)) {
-        if (!convertToXML(QStringList(fullFilePath), asnCacheFile, errorMessages)) {
-            return {};
-        }
-    }
-
-    std::unique_ptr<Asn1Acn::File> asn1TypesData = parseAsn1XmlFile(asnCacheFile);
-
-    return asn1TypesData;
+    return parseAsn1File(asn1File, errorMessages);
 }
 
 /*!
@@ -164,13 +143,27 @@ std::map<QString, std::unique_ptr<Asn1Acn::File>> Asn1Reader::parseAsn1Files(
     const QString asnCacheFile =
             shared::StandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/asn/" + asn1FileHash + ".xml";
 
-    if (!QFile::exists(asnCacheFile)) {
-        if (!convertToXML(absoluteFilePaths, asnCacheFile, errorMessages)) {
+    QFileInfo cacheInfo(asnCacheFile);
+    static int MAX_CACHE_AGE = 1; // cache file are refreshed after 1 day - to force refreshes from ttime to time
+    if (cacheInfo.exists() && cacheInfo.lastModified().daysTo(QDateTime::currentDateTime()) >= MAX_CACHE_AGE) {
+
+        cacheInfo.refresh();
+    }
+
+    if (!cacheInfo.exists()) {
+        if (!convertToXML(QStringList(absoluteFilePaths), asnCacheFile, errorMessages)) {
             return {};
         }
     }
 
-    return parseAsn1XmlFileImpl(asnCacheFile);
+    std::map<QString, std::unique_ptr<Asn1Acn::File>> asn1TypesData = parseAsn1XmlFileImpl(asnCacheFile);
+
+    if (errorMessages && !errorMessages->isEmpty()) {
+        // In case of warning, force a re-parsing every time
+        QFile::remove(asnCacheFile);
+    }
+
+    return asn1TypesData;
 }
 
 /*!
@@ -348,6 +341,16 @@ QStringList Asn1Reader::defaultParameter() const
     return Asn1Acn::defaultParameter;
 }
 
+shared::ErrorItem::TaskType Asn1Reader::errorType(const QString &error) const
+{
+    if (error.contains("warning:", Qt::CaseInsensitive)) {
+        return shared::ErrorItem::Warning;
+    }
+
+    // All other cases than warnings are treated errors
+    return shared::ErrorItem::Error;
+}
+
 int Asn1Reader::lineNumberFromError(const QString &error) const
 {
     QStringList tokens = error.split(':');
@@ -368,6 +371,39 @@ QString Asn1Reader::fileNameFromError(const QString &error) const
     }
 
     return tokens.first();
+}
+
+int Asn1Reader::lineNumberFromWarning(const QString &error) const
+{
+    int start = error.indexOf("Line:");
+    if (start < 0) {
+        return -1;
+    }
+
+    start += 5;
+    int end = error.indexOf(" ", start);
+    if (end < 0) {
+        return -1;
+    }
+
+    QString line = error.mid(start, end - start);
+    return line.toInt();
+}
+
+QString Asn1Reader::fileNameFromWarning(const QString &error) const
+{
+    int start = error.indexOf("File:");
+    if (start < 0) {
+        return {};
+    }
+
+    start += 5;
+    int end = error.indexOf(",", start);
+    if (end < 0) {
+        return {};
+    }
+
+    return error.mid(start, end - start);
 }
 
 QPair<QString, QStringList> Asn1Reader::asn1CompilerCommand() const
@@ -475,7 +511,7 @@ bool Asn1Reader::convertToXML(
                     }
                 }
             });
-    connect(&asn1Process, &QProcess::errorOccurred,
+    connect(&asn1Process, &QProcess::errorOccurred, this,
             [&](QProcess::ProcessError) { parseAsn1SccErrors(asn1Process.errorString(), errorMessages); });
 
     asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
@@ -485,11 +521,16 @@ bool Asn1Reader::convertToXML(
     asn1Process.start();
     asn1Process.waitForFinished();
 
-    auto error = asn1Process.readAll();
-    if (!error.isEmpty()) {
+    int exitCode = asn1Process.exitCode();
+    QByteArray error = asn1Process.readAll();
+    if (exitCode != 0) {
         parseAsn1SccErrors(error, errorMessages);
         QFile::remove(asn1XMLFileName);
         return false;
+    } else {
+        if (!error.isEmpty()) {
+            parseAsn1SccErrors(error, errorMessages);
+        }
     }
 
     QDir createpath;
@@ -505,9 +546,17 @@ void Asn1Reader::parseAsn1SccErrors(QString errorString, QStringList *errorMessa
 
     QString line;
     while (stream.readLineInto(&line)) {
-        const int lineNumber = lineNumberFromError(line);
-        const QString fileName = fileNameFromError(line);
-        shared::ErrorHub::addError(shared::ErrorItem::Error, line, fileName, lineNumber);
+        shared::ErrorItem::TaskType type = errorType(errorString);
+        int lineNumber = -1;
+        QString fileName;
+        if (type == shared::ErrorItem::Warning) {
+            lineNumber = lineNumberFromWarning(line);
+            fileName = fileNameFromWarning(line);
+        } else {
+            lineNumber = lineNumberFromError(line);
+            fileName = fileNameFromError(line);
+        }
+        shared::ErrorHub::addError(type, line, fileName, lineNumber);
         if (errorMessages) {
             errorMessages->append(line);
         }
