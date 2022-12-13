@@ -24,8 +24,11 @@ $TMC -iv $RESOURCES_DIR/interfaceview.xml \
     -sub $SUBTYPES_DIR/subtyping.asn \
     -scl $PROPERTIES_DIR/properties/properties.scl
 
-cd $TEST_OUTPUT_DIR \
-    && ( $SPIN -a -run -bfspar -n system.pml > system.output; echo "spin error code: $?" ) \
-    && ( grep -q "errors: 0" system.output; echo "grep error code: $?" ) \
-    && cd .. \
-    && rm -r $TEST_OUTPUT_DIR
+cd $TEST_OUTPUT_DIR
+$SPIN -a -run -bfspar -n system.pml > system.output
+echo "spin error code: $?"
+grep -q "errors: 0" system.output
+echo "grep error code: $?"
+cd ..
+rm -r $TEST_OUTPUT_DIR
+
