@@ -1,4 +1,4 @@
 add_subdirectory(applications)
-# add_subdirectory(conversion)
-# add_subdirectory(libmsceditor)
+add_subdirectory(conversion)
+add_subdirectory(libmsceditor)
 add_subdirectory(testgenerator)
