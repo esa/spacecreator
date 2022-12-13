@@ -9,6 +9,7 @@ import py7zr
 import shutil
 
 from utils import join_dir, print_cmd, ensure_dir, check_cmake_version, copy_content_of_dir_to_other_dir, copy_file_pattern_to_dir
+from git import Git
 from git.repo import Repo
 
 '''
@@ -119,29 +120,13 @@ def download_grantlee(env_dir: str) -> None:
     """
     Clone grantlees template library
     """
-    # gitlab_url = "https://gitrepos.estec.esa.int/taste/grantlee.git"
-    # target_dir = join_dir(env_dir, 'grantlee')
-    # print('Cloning grantlee from {}'.format(gitlab_url))
-    # repository = Repo.clone_from(gitlab_url, target_dir)
-
-    """
-    Download grantlees template library
-    """
-    grantlee_url = "https://github.com/steveire/grantlee/releases/download/v5.3.1/grantlee-5.3.1.tar.gz"
-    grantlee_targz = join_dir(env_dir, 'grantlee-5.3.1.tar.gz')
-    print('prebuild.py: Downloading {} to {}'.format(grantlee_url, grantlee_targz))
-    try:
-        urllib.request.urlretrieve(grantlee_url, grantlee_targz)  # download grantlee-5.3.1.tar.gz to the root of the env folder
-    except:
-        print("prebuild.py: Could not download grantlee from {}".format(grantlee_url))
-        exit(4)
-    print('prebuild.py: Extracting {} to {}'.format(grantlee_targz, env_dir))
-    with tarfile.open(grantlee_targz, 'r:gz') as grantlee_targz_file:
-        grantlee_targz_file.extractall(env_dir)
-    # use generic "grantlee" as source directoy
-    garantlee_version_dir = join_dir(env_dir, 'grantlee-5.3.1')
-    grantlee_dir = join_dir(env_dir, 'grantlee')
-    os.rename(garantlee_version_dir, grantlee_dir)
+    gitlab_url = "https://gitrepos.estec.esa.int/taste/grantlee.git"
+    target_dir = join_dir(env_dir, 'grantlee')
+    grantlee_tag = "v5.3.1"
+    print('Cloning grantlee from {} the tag {}'.format(gitlab_url, grantlee_tag))
+    repository = Repo.clone_from(gitlab_url, target_dir)
+    repo = Git(target_dir)
+    repo.checkout(grantlee_tag)
 
 
 def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
@@ -424,7 +409,7 @@ if __name__ == '__main__':
         scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'spacecreatorplugin', 'scl', 'generic-highlighter', 'syntax')
 
     generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
-    
+
     copy_highlighter_files(asn1plugin_generic_highlighter_dir, generic_highlighter_install_dir)
     copy_highlighter_files(scl_files_spacecreatorplugin_generic_highlighter_dir, generic_highlighter_install_dir)
 
