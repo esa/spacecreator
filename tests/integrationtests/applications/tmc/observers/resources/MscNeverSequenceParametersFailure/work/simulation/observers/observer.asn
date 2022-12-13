@@ -2,18 +2,18 @@ Pinger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   SmallInteger, BigInteger, SeqOfSmall, SeqOfBig, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
+   SmallInteger, BigInteger, SeqOfSmall, SeqOfBig, MyChoice, My-Sequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Pinger-States ::= ENUMERATED {ok3, ok2, ok1, wait}
+Pinger-States ::= ENUMERATED {wait, ok3, ok2, ok1}
 
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
    sender PID,
-   value1 MySequence,
-   value2 MySequence
+   value1 My-Sequence,
+   value2 My-Sequence
 }
 
 Pinger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
@@ -23,7 +23,7 @@ Ponger-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   SmallInteger, BigInteger, SeqOfSmall, SeqOfBig, MyChoice, MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
+   SmallInteger, BigInteger, SeqOfSmall, SeqOfBig, MyChoice, My-Sequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -33,7 +33,7 @@ Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
    sender PID,
-   pingarg MySequence
+   pingarg My-Sequence
 }
 
 Ponger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
@@ -50,45 +50,10 @@ BEGIN
        small SeqOfSmall,
        big SeqOfBig
     }
-    MySequence ::= SEQUENCE {
+    My-Sequence ::= SEQUENCE {
        value SmallInteger,
        version MyChoice
     }
-
--- ASN.1 Type definitions must start with an uppercase
--- Field names in records (SEQUENCE) must start with a lowercase
--- Underscores are not allowed: use dash (hyphen) 
--- For integers do not assume that small ranges will be translated to small
--- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
--- for the range in Ada)
-
--- Simple types:
-
--- TASTE-Boolean ::= BOOLEAN
--- MyInteger   ::= INTEGER (0..255)
--- MyReal      ::= REAL (0.0 .. 1000.0)
--- MyBool      ::= BOOLEAN
--- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
-
--- Complex types:
-
---  MySeq       ::= SEQUENCE {
---      input-data  MyInteger,
---      output-data MyInteger,
---      validity    ENUMERATED { valid, invalid }
---  }
---
---  MyChoice    ::= CHOICE {
---      a BOOLEAN,
---      b MySeq
---  }
---
---  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
---
---  MyOctStr    ::= OCTET STRING (SIZE (3))
---
---  -- You can also declare constants
---  myVar       MySeqOf     ::= { hello, world }
 
 END
 
@@ -159,7 +124,7 @@ BEGIN
       
       
       --  ASN.1 modules used by thread ponger_Ping
-      MySequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
+      My-Sequence FROM MSCNEVERSEQUENCEPARAMETERSFAILURE-DATAVIEW
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
@@ -197,14 +162,14 @@ BEGIN
          pong SEQUENCE {  }
       },
       msg-out CHOICE {
-         ping SEQUENCE { pingarg MySequence }
+         ping SEQUENCE { pingarg My-Sequence }
       }
    }
    
    Ponger-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         ping SEQUENCE { pingarg MySequence}
+         ping SEQUENCE { pingarg My-Sequence}
       },
       msg-out CHOICE {
          pong SEQUENCE {   }
