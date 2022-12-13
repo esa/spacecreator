@@ -1,6 +1,7 @@
 addQtTest(tst_colorhandler shared)
 addQtTest(tst_commandlineparser "shared;libmsceditor;libiveditor")
 addQtTest(tst_drawrectinfo shared)
+addQtTest(tst_functiontypegraphicsitem "shared;libiveditor")
 addQtTest(tst_geometry shared)
 addQtTest(tst_grippoint shared)
 addQtTest(tst_grippointshandler shared)

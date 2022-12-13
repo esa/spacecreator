@@ -19,6 +19,7 @@
 
 #include "graphicsviewutils.h"
 #include "grippointshandler.h"
+#include "ui/textitem.h"
 #include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
 #include "verectgraphicsitem.h"
@@ -638,6 +639,14 @@ void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGra
 
     updateEndPoint(endPoint);
 }
+
+void VEConnectionGraphicsItem::updateTextPosition()
+{
+    if (m_textItem) {
+        m_textItem->setExplicitSize(boundingRect().size());
+    }
+}
+
 
 void VEConnectionGraphicsItem::updateEndPoint(const VEConnectionEndPointGraphicsItem *endPoint)
 {

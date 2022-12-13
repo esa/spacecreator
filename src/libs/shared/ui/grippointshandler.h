@@ -46,6 +46,10 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QList<GripPoint *> gripPoints() const;
+
+    /**
+     * @brief updates the position of each grip point and sets the mouse-icon
+     */
     void updateLayout();
 
     QSizeF minSize() const;

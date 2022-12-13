@@ -52,6 +52,12 @@ public:
     bool framed() const;
     void setFramed(bool to);
 
+    /**
+     * @brief paint paints a border around the text if so configured.
+     * @param painter
+     * @param option
+     * @param widget
+     */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     bool isEditing() const;

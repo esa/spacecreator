@@ -58,7 +58,7 @@ protected:
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
 
-    void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const override;
+    virtual void alignTextItem() const override;
 
     virtual shared::ColorManager::HandledColors handledColorType() const override;
     shared::ui::TextItem *initTextItem() override;

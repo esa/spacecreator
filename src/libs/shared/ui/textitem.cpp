@@ -134,6 +134,7 @@ void TextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     painter->restore();
 
+    // Paint the text
     QGraphicsTextItem::paint(painter, option, widget);
 }
 
@@ -442,21 +443,29 @@ void TextItem::updateCompleterText()
 
 void TextItem::setExplicitSize(const QSizeF &size)
 {
-    if (m_explicitSize != size) {
-        m_explicitSize = size;
-        if (!m_explicitSize.isEmpty()) {
-            setTextMargin(textMargin());
-            setTextWidth(m_explicitSize.width());
-        } else {
-            adjustSize();
-        }
-        update();
+    if (m_explicitSize == size)
+    {
+        return;
     }
+
+    m_explicitSize = size;
+    if (m_explicitSize.isEmpty())
+    {
+        adjustSize(); //Adjust the text item to a reasonable size.
+    }
+    else
+    {
+        setTextMargin(textMargin()); // ??
+        setTextWidth(m_explicitSize.width()); //Sets the preferred width for the item's text.
+    }
+    update(); // Schedules a redraw
+
 }
 
 QRectF TextItem::boundingRect() const
 {
-    return m_explicitSize.isEmpty() ? QGraphicsTextItem::boundingRect() : QRectF(QPointF(0., 0.), m_explicitSize);
+    QRectF br = QGraphicsTextItem::boundingRect();
+    return m_explicitSize.isEmpty() ? br : QRectF(QPointF(0., 0.), m_explicitSize);
 }
 
 /*!

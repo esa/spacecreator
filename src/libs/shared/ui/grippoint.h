@@ -87,10 +87,14 @@ public:
     void setIsUsed(bool used);
 
     Location location() const { return m_location; }
+
+    /**
+     * @brief updateLayout updates position and cursor-icon
+     */
     void updateLayout();
 
 protected:
-    GripPointsHandler *const m_listener;
+    GripPointsHandler *const m_gripPointsHandler;
     Location m_location;
 
     const QRectF m_boundRect;

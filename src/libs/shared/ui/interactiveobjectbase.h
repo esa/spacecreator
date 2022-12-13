@@ -45,7 +45,15 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    /**
+     * @brief boundingRect Any child of QGraphicsItem must implement this method.
+     */
     QRectF boundingRect() const override;
+
+    /**
+     * @brief setBoundingRect sets the geometry of this item. Position of gribpoint-handles are updated an 'boundingboxChanged' is emitted.
+     * @param newRect
+     */
     void setBoundingRect(const QRectF &newRect);
 
     GripPointsHandler *gripPointsHandler() const;
@@ -96,13 +104,6 @@ protected:
     virtual void hideGripPoints();
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-
-    /**
-     * @brief minimumSize
-     * The minimum size this object can have and still have its content be readable. Should be overridden by subclasses.
-     * Minimum size for interactiveobject is minSize for its GripPointsHandler
-     */
-    virtual QSizeF minimumSize() const;
 
 protected Q_SLOTS:
     virtual void rebuildLayout();

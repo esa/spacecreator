@@ -120,9 +120,13 @@ void IVFunctionGraphicsItem::onManualMoveFinish(
     IVFunctionTypeGraphicsItem::onManualMoveFinish(grip, pressedAt, releasedAt);
 }
 
-void IVFunctionGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const
+void IVFunctionGraphicsItem::alignTextItem() const
 {
-    textRect.moveCenter(targetTextRect.center());
+    auto myRectWithoutMargins = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
+    auto myCenter = myRectWithoutMargins.center();
+    QRectF textRect = m_textItem->boundingRect();
+    textRect.moveCenter(myCenter);
+    m_textItem->setPos(textRect.topLeft());
 }
 
 shared::ColorManager::HandledColors IVFunctionGraphicsItem::handledColorType() const

@@ -19,6 +19,7 @@
 
 #include "graphicsviewutils.h"
 #include "ui/grippointshandler.h"
+#include "ui/textitem.h"
 #include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
 
@@ -183,6 +184,15 @@ void VERectGraphicsItem::layoutInterfaces()
     }
 }
 
+void VERectGraphicsItem::updateTextPosition()
+{
+    if (m_textItem)
+    {
+        m_textItem->setExplicitSize(boundingRect().size());
+    }
+}
+
+
 void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
@@ -216,77 +226,21 @@ void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pres
     }
 }
 
+QSizeF VERectGraphicsItem::minimumSize() const
+{
+    // This very naive minimum size will at least keep the children from becoming invalid. Children should
+    // provide their own implementation.
+    return QSizeF(100, 50);
+}
+
 
 QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     QRectF sBoundingRect = sceneBoundingRect();
-    QRectF rectWithRespectToMinimum = checkMinimumSize(grip, to, sBoundingRect);
     QRectF rectWithRespectToConnections = checkConnectionEndpoints(grip, to, sBoundingRect);
-    QRectF resultRect = rectWithRespectToMinimum.united(rectWithRespectToConnections);
-    return resultRect;
+    return rectWithRespectToConnections;
 }
 
-QRectF VERectGraphicsItem::checkMinimumSize(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
-{
-    QRectF result = sceneBoundingRect;
-    QSizeF minSize = minimumSize();
-
-    // The minimum x-value the right side of this rect can have and not violate minimum size
-    auto xMin = sceneBoundingRect.left() + minSize.width();
-    // The maximum x-value the left side of this rect can have and not violate minimum size
-    auto xMax = sceneBoundingRect.right() - minSize.width();
-    // The minimum y-value the top side of this rect can have and not violate minimum size
-    auto yMin = sceneBoundingRect.top() + minSize.height();
-    // The maximum y-value the buttom side of this rect can have and not violate minimum size
-    auto yMax = sceneBoundingRect.bottom() - minSize.height();
-
-    switch (grip->location()) {
-    case GripPoint::Left:
-    {
-        result.setLeft(qMin(to.x(), xMax));
-        break;
-    }
-    case GripPoint::Right:
-    {
-        result.setRight(qMax(to.x(), xMin));
-        break;
-    }
-    case GripPoint::Top:
-    {
-        result.setTop(qMin(to.y(), yMax));
-        break;
-    }
-    case GripPoint::Bottom:
-    {
-        result.setBottom(qMax(to.y(), yMin));
-        break;
-    }
-    case GripPoint::TopLeft:
-    {
-        result.setTopLeft(QPoint(qMin(to.x(), xMax), qMin(to.y(), yMax)));
-        break;
-    }
-    case GripPoint::TopRight:
-    {
-        result.setTopRight(QPoint(qMax(to.x(), xMin), qMin(to.y(), yMax)));
-        break;
-    }
-    case GripPoint::BottomLeft:
-    {
-        result.setBottomLeft(QPoint(qMin(to.x(), xMax), qMax(to.y(), yMin)));
-        break;
-    }
-    case GripPoint::BottomRight:
-    {
-        result.setBottomRight(QPoint(qMax(to.x(), xMin), qMax(to.y(), yMin)));
-        break;
-    }
-    default:
-        qWarning() << "Update grip point handling";
-        break;
-    }
-    return result;
-}
 
 QRectF VERectGraphicsItem::checkConnectionEndpoints(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
 {
@@ -471,9 +425,14 @@ bool VERectGraphicsItem::layoutShouldBeChanged() const
 {
     const QRectF currentRect = sceneBoundingRect();
     if (!currentRect.isValid())
+    {
         return true;
+    }
 
-    return graphicsviewutils::isCollided(this, currentRect) || !graphicsviewutils::isBounded(this, currentRect);
+    bool collidesWithOther = graphicsviewutils::isCollided(this, currentRect);
+
+
+    return collidesWithOther || !graphicsviewutils::isBounded(this, currentRect);
 }
 
 void VERectGraphicsItem::layoutConnectionsOnResize(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)

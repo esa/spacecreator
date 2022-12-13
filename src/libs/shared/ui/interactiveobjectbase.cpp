@@ -288,10 +288,6 @@ void InteractiveObjectBase::hideGripPoints()
         d->gripPointsHandler->hideAnimated();
 }
 
-QSizeF InteractiveObjectBase::minimumSize() const
-{
-    return d->gripPointsHandler->minSize();
-}
 
 QVariant InteractiveObjectBase::itemChange(GraphicsItemChange change, const QVariant &value)
 {

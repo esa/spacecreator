@@ -34,6 +34,7 @@
 #include "ivpropertytemplateconfig.h"
 #include "parameter.h"
 #include "ui/textitem.h"
+#include "ui/grippoint.h"
 #include "veobject.h"
 #include "ivcoreutils.h"
 
@@ -48,6 +49,8 @@
 static const qreal kBorderWidth = 2;
 
 namespace ive {
+
+using shared::ui::GripPoint;
 
 IVFunctionTypeGraphicsItem::IVFunctionTypeGraphicsItem(ivm::IVFunctionType *entity, QGraphicsItem *parent)
     : shared::ui::VERectGraphicsItem(entity, parent)
@@ -123,24 +126,29 @@ QString IVFunctionTypeGraphicsItem::prepareTooltip() const
 
 void IVFunctionTypeGraphicsItem::updateTextPosition()
 {
+    // To an IVFunctionTypeGraphicsItem an m_textItem is the name label in the center of the box
+
     if (!m_textItem) {
         return;
     }
 
     const QRectF targetTextRect = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
 
+    // reset m_textItems's size
     m_textItem->setExplicitSize(QSizeF());
     m_textItem->setTextWidth(-1);
 
+    // Set text width so that it does not exeed the boundaries of the this instance's bounding box
     const QSizeF maxTxtSize = targetTextRect.size();
     const QSizeF txtSize = m_textItem->document()->size();
-    if (txtSize.width() > maxTxtSize.width() || txtSize.height() > maxTxtSize.height()) {
+    bool labelBiggerThanBox = txtSize.width() > maxTxtSize.width() || txtSize.height() > maxTxtSize.height();
+    if (labelBiggerThanBox)
+    {
         m_textItem->setExplicitSize(maxTxtSize);
     }
 
-    QRectF textRect = m_textItem->boundingRect();
-    prepareTextRect(textRect, targetTextRect);
-    m_textItem->setPos(textRect.topLeft());
+    // place the text item at top-left of this instance's bounding box
+    alignTextItem();
 }
 
 shared::ColorManager::HandledColors IVFunctionTypeGraphicsItem::handledColorType() const
@@ -191,31 +199,126 @@ void IVFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
     m_commandsStack->push(attributesCmd);
 }
 
+QRectF IVFunctionTypeGraphicsItem::resizedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to)
+{
+    // The parent class VERectGraphicsItem calculates resized rect to respect the interfaces
+    QRectF interfaceRect = shared::ui::VERectGraphicsItem::resizedRect(grip, from, to);
+
+    // This class has a label in the center of the rectangle that should always be readable.
+    QRectF textLabelRect = resizedRectForTextLabel(grip, from, to);
+
+    auto unionRect = interfaceRect.united(textLabelRect);
+    return unionRect;
+}
+
+QRectF IVFunctionTypeGraphicsItem::resizedRectForTextLabel(GripPoint *grip, const QPointF &from, const QPointF &to) const
+{
+    QRectF result = sceneBoundingRect();
+    QRectF textLabelRect = m_textItem->boundingRect();
+    auto text = m_textItem->toPlainText();
+    textLabelRect = textLabelRect.marginsAdded(shared::graphicsviewutils::kTextMargins);
+    textLabelRect.setWidth(textLabelRect.width() + 5.0); // A little extra space is needed, otherwise the text item moves about ever so sligtly.
+    QSizeF minSize = textLabelRect.size();
+
+    // The minimum x-value the right side of this rect can have and not violate minimum size
+    auto xMin = result.left() + minSize.width();
+    // The maximum x-value the left side of this rect can have and not violate minimum size
+    auto xMax = result.right() - minSize.width();
+    // The minimum y-value the top side of this rect can have and not violate minimum size
+    auto yMin = result.top() + minSize.height();
+    // The maximum y-value the buttom side of this rect can have and not violate minimum size
+    auto yMax = result.bottom() - minSize.height();
+
+    switch (grip->location()) {
+    case GripPoint::Left:
+    {
+        result.setLeft(qMin(to.x(), xMax));
+        break;
+    }
+    case GripPoint::Right:
+    {
+        result.setRight(qMax(to.x(), xMin));
+        break;
+    }
+    case GripPoint::Top:
+    {
+        result.setTop(qMin(to.y(), yMax));
+        break;
+    }
+    case GripPoint::Bottom:
+    {
+        result.setBottom(qMax(to.y(), yMin));
+        break;
+    }
+    case GripPoint::TopLeft:
+    {
+        result.setTopLeft(QPoint(qMin(to.x(), xMax), qMin(to.y(), yMax)));
+        break;
+    }
+    case GripPoint::TopRight:
+    {
+        result.setTopRight(QPoint(qMax(to.x(), xMin), qMin(to.y(), yMax)));
+        break;
+    }
+    case GripPoint::BottomLeft:
+    {
+        result.setBottomLeft(QPoint(qMin(to.x(), xMax), qMax(to.y(), yMin)));
+        break;
+    }
+    case GripPoint::BottomRight:
+    {
+        result.setBottomRight(QPoint(qMax(to.x(), xMin), qMax(to.y(), yMin)));
+        break;
+    }
+    default:
+        qWarning() << "Update grip point handling";
+        break;
+    }
+    return result;
+}
+
+
 bool IVFunctionTypeGraphicsItem::isRootItem() const
 {
     return !parentItem() && entity() && entity()->isRootObject();
 }
 
-void IVFunctionTypeGraphicsItem::prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const
+void IVFunctionTypeGraphicsItem::alignTextItem() const
 {
-    textRect.moveTopLeft(targetTextRect.topLeft());
+    auto myRectWithoutMargins = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
+    auto myTopLeft = myRectWithoutMargins.topLeft();
+    QRectF textRect = m_textItem->boundingRect();
+    textRect.moveTopLeft(myTopLeft);
+    m_textItem->setPos(textRect.topLeft());
 }
 
 
 shared::ui::TextItem *IVFunctionTypeGraphicsItem::initTextItem()
 {
     shared::ui::TextItem *textItem = new IVFunctionNameGraphicsItem(this);
-    connect(this, &IVFunctionTypeGraphicsItem::clicked, textItem, [this, textItem](const QPointF &scenePos){
-        if (scene()->items(scenePos).contains(textItem))
-            textItem->enableEditMode();
-    });
+
+    // Connect 'clicked' with 'enableEditMode' on clicked text item.
+    connect(this, &IVFunctionTypeGraphicsItem::clicked, textItem,
+            [this, textItem](const QPointF &scenePos)
+            {
+                if (scene()->items(scenePos).contains(textItem))
+                    textItem->enableEditMode();
+            });
+
+    // Connect 'edited' with 'updateNameFromUi' to keep model updated when UI changes.
     connect(textItem, &shared::ui::TextItem::edited, this, &IVFunctionTypeGraphicsItem::updateNameFromUi);
-    connect(entity(), &ivm::IVFunction::attributeChanged, this, [this](const QString &token) {
-        const ivm::meta::Props::Token attr = ivm::meta::Props::token(token);
-        if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url) {
-            updateText();
-        }
-    });
+
+    // Connect 'attributeChanged' with 'updateText' to keep UI updated when model changes.
+    connect(entity(), &ivm::IVFunction::attributeChanged, this,
+            [this](const QString &token)
+            {
+                const ivm::meta::Props::Token attr = ivm::meta::Props::token(token);
+                if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url)
+                {
+                    updateText();
+                }
+            });
+
     textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     textItem->setFont(font());
     return textItem;

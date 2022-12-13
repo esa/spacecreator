@@ -50,10 +50,35 @@ public:
 
     void setCommandsStack(cmd::CommandsStackBase *commandsStack);
 
+    QString toString() const;
+
+public:
+    /**
+     * @brief updateText from model object and updates the text position
+     * by calling 'updateTextPosition'
+     */
+    void updateText();
+
+public:
+    // Methods for children to implement
+
     virtual int itemLevel(bool isSelected) const = 0;
     virtual VEObject *entity() const;
+
+    /**
+     * @brief init initializes InteractiveObject's TextItem and applys Color Scheme
+     */
     virtual void init();
+
+
+    /**
+     * @brief updateEntity pushes command on command stack
+     */
     virtual void updateEntity();
+
+    /**
+     * @brief updateFromEntity
+     */
     virtual void updateFromEntity() = 0;
     virtual bool doLayout() = 0;
     virtual void rebuildLayout() override;
@@ -63,7 +88,7 @@ public:
     virtual void enableEditMode() {};
     virtual void childBoundingBoxChanged();
 
-    QString toString() const;
+
 
 Q_SIGNALS:
     void clicked(const QPointF &scenePos);
@@ -73,30 +98,48 @@ public Q_SLOTS:
     virtual void applyColorScheme() = 0;
 
 protected:
+    // Methods to be implemented by child classes
+
+    /**
+     * @brief initTextItem sets up a basic (non-interactive) text item.
+     * Children classes can overload this method to set up the text item specific for their role.
+     * Called by init()
+     * @return a TextItem
+     */
+    virtual TextItem *initTextItem();
+
+    /**
+     * @brief updateTextPosition
+     * Called when boundingBoxChanged is emitted and when the text item is updated from the model.
+     * Children classes can overload this method to set up the text item specific for their role. This could be name label for a
+     * function name, or an interface name next to the interface.
+     */
+    virtual void updateTextPosition() = 0;
+
+    /**
+     * @brief handledColorType
+     * Each child of of this class must be able to return its type as denoted by the enum ColorManager::HandledColors
+     * @return ColorManager::HandledColors
+     */
+    virtual ColorManager::HandledColors handledColorType() const = 0;
+
+    /**
+     * @brief colorHandler
+     * The default implementation of colorHandler uses 'handledColorType' to instantiate a ColorHandler
+     * @return a ColorHandler
+     */
+    virtual ColorHandler colorHandler() const;
+
+protected:
+    // Callbacks for receiving events
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
-
     void onSelectionChanged(bool isSelected) override;
 
     void mergeGeometry();
 
-    virtual ColorManager::HandledColors handledColorType() const = 0;
-    virtual ColorHandler colorHandler() const;
-
-    virtual TextItem *initTextItem();
-    virtual void updateTextPosition();
-
-    /**
-     * @brief updateText from model object
-     */
-    void updateText();
-
-    /**
-     * @brief minimumSize for VEinteractiveObject garanties that the text is visible
-     */
-    QSizeF minimumSize() const override;
 
 protected:
     const QPointer<VEObject> m_dataObject;
