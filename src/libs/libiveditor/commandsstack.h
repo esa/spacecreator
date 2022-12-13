@@ -24,6 +24,10 @@
 class QUndoCommand;
 class QUndoStack;
 
+namespace Asn1Acn {
+class Asn1SystemChecks;
+}
+
 namespace ivm {
 class IVFunction;
 class IVObject;
@@ -43,6 +47,7 @@ class CommandsStack : public shared::cmd::CommandsStackBase
 public:
     CommandsStack(QObject *parent = nullptr);
 
+    void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
     bool push(QUndoCommand *command) override;
 
 Q_SIGNALS:
@@ -55,6 +60,9 @@ Q_SIGNALS:
     void attributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
     void asn1FilesImported(const QStringList &files);
     void asn1FileRemoved(const QStringList &files);
+
+private:
+    Asn1Acn::Asn1SystemChecks *m_check;
 };
 
 }

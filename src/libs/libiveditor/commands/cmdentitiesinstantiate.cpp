@@ -112,7 +112,6 @@ void CmdEntitiesInstantiate::redo()
         if (!m_tempDir.isNull()) {
             m_tempDir.reset();
         }
-        Q_EMIT asn1FilesImported(m_importedAsnFiles);
     }
 }
 

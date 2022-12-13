@@ -55,6 +55,11 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
 
 SpaceCreatorProject::~SpaceCreatorProject() {}
 
+QString SpaceCreatorProject::projectPath() const
+{
+    return QFileInfo(ivCore()->document()->path()).absolutePath();
+}
+
 /*!
    Returns the DVEditorCore object for the given file
    If the object does not exist yet, one will be created and the data be loaded

@@ -610,6 +610,7 @@ void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
     }
 
     d->asnCheck = check;
+    d->commandsStack->setAsn1Check(check);
 
     connect(d->asnCheck->asn1Storage(), &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this,
             &ive::InterfaceDocument::checkAllInterfacesForAsn1Compliance, Qt::QueuedConnection);

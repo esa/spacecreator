@@ -41,11 +41,14 @@ public:
             Asn1Acn::Asn1SystemChecks *asn1Checks, const QString &srcPath, const QString &destPath);
     ~ASN1ComponentsImport() override;
 
+public:
+    void setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Checks);
+
 Q_SIGNALS:
     void asn1FilesImported(const QStringList &files);
-    void asn1FileRemoved(const QStringList &files);
+    void asn1FilesRemoved(const QStringList &files);
 
-protected:
+public:
     void redoSourceCloning(const ivm::IVObject *object);
     void undoSourceCloning(const ivm::IVObject *object);
     void redoAsnFileImport(const ivm::IVObject *object);

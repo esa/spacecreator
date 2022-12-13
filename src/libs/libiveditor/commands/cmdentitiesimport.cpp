@@ -188,8 +188,6 @@ void CmdEntitiesImport::redo()
     }
     ivm::IVObject::sortObjectList(entities);
     m_model->addObjects(entities);
-
-    Q_EMIT asn1FilesImported(m_importedAsnFiles);
 }
 
 void CmdEntitiesImport::undo()

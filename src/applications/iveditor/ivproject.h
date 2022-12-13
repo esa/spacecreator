@@ -32,6 +32,8 @@ public:
 
     void setModel(InterfaceDocument *model);
 
+    QString projectPath() const override;
+
     QStringList allDVFiles() const override;
     QStringList allIVFiles() const override;
     QStringList allMscFiles() const override;
