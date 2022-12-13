@@ -24,6 +24,7 @@
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QMainWindow>
+#include <QProcess>
 #include <QTreeWidgetItem>
 #include <functional>
 
@@ -91,6 +92,9 @@ private Q_SLOTS:
     void addGenerationLimitsTableRow();
     void removeGenerationLimitsTableRow();
     void on_pushButton_callSpin_clicked();
+    void processFinished(int, QProcess::ExitStatus);
+    void processStderr();
+    void processStdout();
 
 private:
     QString propertiesPath;
@@ -155,6 +159,8 @@ private:
 
     void setCheckBoxState(QCheckBox *checkBox, bool isChecked);
     SpinConfigData readSpinConfigFromUI();
+
+    QProcess *remove_me;
 };
 
 }

@@ -589,14 +589,40 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     }
 
     auto p = new QProcess(this);
+    remove_me = p;
     p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
         QString cmd = program + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Open property"), tr("Error when calling '%1'.").arg(cmd));
         return;
     }
+    connect(p, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
+    connect(p, SIGNAL(readyReadStandardError()), this, SLOT(processStderr()));
+    connect(p, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdout()));
 
     statusBar()->showMessage("File open.", 6000);
+}
+
+void ModelCheckingWindow::processFinished(int code, QProcess::ExitStatus st)
+{
+    qDebug() << "process finished with code " << code;
+    if (st == QProcess::ExitStatus::CrashExit) {
+        qDebug() << "CRASH";
+    }
+}
+
+void ModelCheckingWindow::processStderr()
+{
+    QByteArray buffer = remove_me->readAllStandardError();
+    QString text = QString(buffer);
+    qDebug() << "process: " << text;
+}
+
+void ModelCheckingWindow::processStdout()
+{
+    QByteArray buffer = remove_me->readAllStandardOutput();
+    QString text = QString(buffer);
+    qDebug() << "process: " << text;
 }
 
 /*!
