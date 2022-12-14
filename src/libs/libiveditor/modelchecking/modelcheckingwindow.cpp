@@ -589,7 +589,7 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     }
 
     auto p = new QProcess(this);
-    remove_me = p;
+    observedProcess = p;
     p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
         QString cmd = program + " " + arguments.join(" ");
@@ -613,14 +613,14 @@ void ModelCheckingWindow::processFinished(int code, QProcess::ExitStatus st)
 
 void ModelCheckingWindow::processStderr()
 {
-    QByteArray buffer = remove_me->readAllStandardError();
+    QByteArray buffer = observedProcess->readAllStandardError();
     QString text = QString(buffer);
     qDebug() << "process: " << text;
 }
 
 void ModelCheckingWindow::processStdout()
 {
-    QByteArray buffer = remove_me->readAllStandardOutput();
+    QByteArray buffer = observedProcess->readAllStandardOutput();
     QString text = QString(buffer);
     qDebug() << "process: " << text;
 }

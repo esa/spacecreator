@@ -160,7 +160,7 @@ private:
     void setCheckBoxState(QCheckBox *checkBox, bool isChecked);
     SpinConfigData readSpinConfigFromUI();
 
-    QProcess *remove_me;
+    QProcess *observedProcess;
 };
 
 }
