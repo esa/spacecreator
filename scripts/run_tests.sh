@@ -23,7 +23,7 @@ BASE_DIR=`pwd`
 FAILED_TESTS=" "
 
 EXIT_CODE=0
-TESTS=`find . -name "tst_tmc_subtyping" -type f -executable`
+TESTS=`find . -name "tst*_*" -type f -executable`
 for TEST in $TESTS
 do
     echo "Running test: $TEST"
