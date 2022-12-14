@@ -1,49 +1,36 @@
-*.o
 *.aadl
-*.autosave
-*.ini
-*.gpr
-*.md5
-*.msc
-.default_subtypes.asn
+.cache/
+*.pro.user
 
-**/wrappers/*
-**/cache/*
-**/clk/**/*.ad*
-**/clk/**/*.md5
-**/clk/**/Makefile
-**/clk/**/*.pro
-**/thething/**/*.ad*
-**/thething/**/*.md5
-**/thething/**/Makefile
-**/thething/**/*.pro
-**/modelchecking/**/*.adb
-**/modelchecking/**/*.ads
-work/**/GUI/src
-work/**/SDL/**/Makefile.*
+# Ignore whole work directory
+work/*
 
-work/binaries
-work/build
-work/dataview
-work/Debug
-work/Dump
-work/sql_db
-work/glue_simu
-work/glue_debug
-work/Makefile
-work/skeletons_built
-work/taste.pro
-work/mmi
-work/simulation/cache
-work/simulation/include
-work/simulation/lib
-work/simulation/mcsrc
-work/simulation/obj
-work/simulation/observers/*.ad*
-work/simulation/python
-work/simulation/share
-work/simulation/*.ali
-work/simulation/*.so
-work/simulation/*.ui
-work/simulation/*.cfg
-work/simulation/*.sqlite
+# Except observer.asn
+!work/simulation/
+work/simulation/*
+!work/simulation/observers/
+work/simulation/observers/*
+!work/simulation/observers/observer.asn
+
+# Except controller source
+!work/controller/
+work/controller/*
+!work/controller/SDL
+work/controller/SDL/*
+!work/controller/SDL/src
+work/controller/SDL/src/*
+!work/controller/SDL/src/controller.pr
+!work/controller/SDL/src/system_structure.pr
+!work/controller/SDL/src/dataview-uniq.asn
+
+# Except actuator source
+!work/actuator/
+work/actuator/*
+!work/actuator/C
+work/actuator/C/*
+!work/actuator/C/src
+work/actuator/C/src/*
+!work/actuator/C/src/actuator.c
+
+# Except modelchecking
+!work/modelchecking/

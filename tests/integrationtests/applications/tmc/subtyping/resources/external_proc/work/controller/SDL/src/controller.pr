@@ -1,6 +1,6 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Controller;
-    /* CIF TEXT (434, 131), (267, 140) */
+    /* CIF TEXT (446, 149), (267, 140) */
     -- Text area for declarations and comments
     
     dcl param_protected_x MyInteger;
@@ -8,9 +8,9 @@ process Controller;
     dcl param_unprotected_x MyInteger;
     dcl param_unprotected_y MyInteger;
     /* CIF ENDTEXT */
-    /* CIF START (320, 10), (70, 35) */
+    /* CIF START (329, 21), (70, 35) */
     START;
-        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        /* CIF NEXTSTATE (329, 71), (70, 35) */
         NEXTSTATE Wait;
     /* CIF state (983, 14), (70, 35) */
     state Wait;
@@ -35,7 +35,7 @@ param_unprotected_y := 104;
                     NEXTSTATE Error;
             enddecision;
     endstate;
-    /* CIF state (1411, 17), (106, 35) */
+    /* CIF state (1409, 17), (106, 35) */
     state TestProtected;
         /* CIF input (1430, 72), (70, 35) */
         input test;
@@ -49,14 +49,14 @@ param_unprotected_y := 104;
                     NEXTSTATE Error;
                 /* CIF ANSWER (1385, 252), (70, 23) */
                 (true):
-                    /* CIF NEXTSTATE (1384, 295), (72, 35) */
+                    /* CIF NEXTSTATE (1383, 295), (72, 35) */
                     NEXTSTATE Finished;
             enddecision;
     endstate;
     /* CIF state (413, 324), (70, 35) */
     state Error;
     endstate;
-    /* CIF state (314, 323), (72, 35) */
+    /* CIF state (312, 323), (72, 35) */
     state Finished;
     endstate;
 endprocess Controller;

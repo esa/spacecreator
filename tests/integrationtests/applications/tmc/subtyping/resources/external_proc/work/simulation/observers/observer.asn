@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    MyInteger FROM EXTERNALPROC-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {wait, testprotected, error, finished}
+Controller-States ::= ENUMERATED {testprotected, finished, error, wait}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
+   sender PID,
    param-protected-x MyInteger,
    param-protected-y MyInteger,
    param-unprotected-x MyInteger,
