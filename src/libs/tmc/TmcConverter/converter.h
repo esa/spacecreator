@@ -156,6 +156,12 @@ public:
      */
     void setDelta(std::optional<QString> value);
     /**
+     * @brief   Set timeout for external sdl2promela process.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setSdl2PromelaTimeout(int timeout);
+    /**
      * @brief   Set path to the ASN.1 containing subtypes
      *
      * @param   filepaths   Paths to the files

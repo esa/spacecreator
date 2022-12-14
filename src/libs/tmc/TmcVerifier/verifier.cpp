@@ -40,6 +40,7 @@ TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDi
     , m_searchShortestPath(false)
     , m_useFairScheduling(false)
     , m_useBitHashing(false)
+    , m_additionalCompilerFlags("-O2")
     , m_executeMode(ExecuteMode::ConvertAndVerify)
     , m_process(new QProcess(this))
     , m_verifierProcess(new QProcess(this))
@@ -125,6 +126,26 @@ void TmcVerifier::setRealTypeEnabled(bool isRealTypeEnabled)
 void TmcVerifier::setDelta(std::optional<QString> value)
 {
     m_converter->setDelta(std::move(value));
+}
+
+void TmcVerifier::setSdl2PromelaTimeout(int timeout)
+{
+    m_converter->setSdl2PromelaTimeout(timeout);
+}
+
+void TmcVerifier::setCCompilerTimeout(int timeout)
+{
+    m_ccompilerTimeout = timeout;
+}
+
+void TmcVerifier::setExternalCommandTimeout(int timeout)
+{
+    m_externalCommandTimeout = timeout;
+}
+
+void TmcVerifier::setAdditionalCompilerFlags(QString compilerFlags)
+{
+    m_additionalCompilerFlags = std::move(compilerFlags);
 }
 
 void TmcVerifier::setSubtypesFilepaths(const std::vector<QString> &filepaths)
@@ -356,8 +377,6 @@ void TmcVerifier::executeCC()
     const QString inputFile = "pan.c";
     const QString outputFile = "pan";
     const QString compilerExe = "gcc";
-    QStringList standardArguments;
-    standardArguments.append("-O2");
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
@@ -367,7 +386,7 @@ void TmcVerifier::executeCC()
     disconnect(m_processStartedConnection);
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
 
-    QStringList arguments = standardArguments;
+    QStringList arguments = m_additionalCompilerFlags.split(" ");
 
     arguments.append("-o");
     arguments.append(outputFile);
@@ -628,7 +647,9 @@ void TmcVerifier::makeStarted()
 {
     m_timer->stop();
     m_timer->setSingleShot(true);
-    m_timer->start(m_commandTimeout);
+    int timeoutValue = m_externalCommandTimeout.has_value() ? m_externalCommandTimeout.value() * 1000
+                                                            : m_defaultExternalCommandTimeout;
+    m_timer->start(timeoutValue);
 }
 
 void TmcVerifier::makeFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -654,7 +675,9 @@ void TmcVerifier::spinStarted()
 {
     m_timer->stop();
     m_timer->setSingleShot(true);
-    m_timer->start(m_commandTimeout);
+    int timeoutValue = m_externalCommandTimeout.has_value() ? m_externalCommandTimeout.value() * 1000
+                                                            : m_defaultExternalCommandTimeout;
+    m_timer->start(timeoutValue);
 }
 
 void TmcVerifier::spinFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -675,7 +698,9 @@ void TmcVerifier::ccStarted()
 {
     m_timer->stop();
     m_timer->setSingleShot(true);
-    m_timer->start(m_commandTimeout);
+    int timeoutValue =
+            m_ccompilerTimeout.has_value() ? m_ccompilerTimeout.value() * 1000 : m_defaultExternalCommandTimeout;
+    m_timer->start(timeoutValue);
 }
 
 void TmcVerifier::ccFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -721,7 +746,9 @@ void TmcVerifier::traceGeneratorStarted()
 {
     m_timer->stop();
     m_timer->setSingleShot(true);
-    m_timer->start(5000);
+    int timeoutValue = m_externalCommandTimeout.has_value() ? m_externalCommandTimeout.value() * 1000
+                                                            : m_defaultExternalCommandTimeout;
+    m_timer->start(timeoutValue);
 }
 
 void TmcVerifier::traceGeneratorFinished(int exitCode, QProcess::ExitStatus exitStatus)

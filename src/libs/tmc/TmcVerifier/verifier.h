@@ -122,6 +122,32 @@ public:
      * @param   delta Value of the interval between generated floats
      */
     void setDelta(std::optional<QString> delta);
+
+    /**
+     * @brief   Set timeout for external sdl2promela process.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setSdl2PromelaTimeout(int timeout);
+    /**
+     * @brief   Set timeout for external c compiler process.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setCCompilerTimeout(int timeout);
+    /**
+     * @brief   Set timeout for external commands except sdl2promela, gcc and verifier.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setExternalCommandTimeout(int timeout);
+    /**
+     * @brief   Set additional flags for gcc.
+     *
+     * @param   compilerFlags Flags for gcc.
+     */
+    void setAdditionalCompilerFlags(QString compilerFlags);
+
     /**
      * @brief Add Stop Condition files to verifier.
      *
@@ -293,6 +319,9 @@ private:
     std::optional<int> m_vectorszValue;
     QString m_rawCommandline;
     QString m_spinExecutable;
+    std::optional<int> m_ccompilerTimeout;
+    std::optional<int> m_externalCommandTimeout;
+    QString m_additionalCompilerFlags;
 
     ExecuteMode m_executeMode;
     QProcess *m_process;
@@ -312,7 +341,7 @@ private:
     QMetaObject::Connection m_conversionFinishedConnection;
 
     constexpr static int m_startTimeout = 30000;
-    constexpr static int m_commandTimeout = 60000;
+    constexpr static int m_defaultExternalCommandTimeout = 60000;
     constexpr static int m_verifierDefaultTimeout = 360000;
 };
 }
