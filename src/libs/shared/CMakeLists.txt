@@ -68,8 +68,12 @@ target_sources(${LIB_NAME} PRIVATE
     interface/comboboxdelegate.h
     interface/creatortool.cpp
     interface/creatortool.h
+    interface/existingfilevalidator.cpp
+    interface/existingfilevalidator.h
     interface/objectstreeview.cpp
     interface/objectstreeview.h
+    interface/parameternamedelegate.cpp
+    interface/parameternamedelegate.h
     interface/veitemmodel.cpp
     interface/veitemmodel.h
     minimap.cpp
@@ -113,6 +117,8 @@ target_sources(${LIB_NAME} PRIVATE
     stringref.h
     ui/drawrectinfo.cpp
     ui/drawrectinfo.h
+    ui/errorindicatinglineedit.cpp
+    ui/errorindicatinglineedit.h
     ui/graphicsscenebase.cpp
     ui/graphicsscenebase.h
     ui/graphicsviewbase.cpp

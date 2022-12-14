@@ -19,38 +19,62 @@
 
 #include "asn1/file.h"
 #include "asn1editor.h"
-#include "asn1modelstorage.h"
 #include "asn1reader.h"
 #include "asn1systemchecks.h"
 #include "dvcommonprops.h"
+#include "dvobject.h"
+#include "interface/existingfilevalidator.h"
 #include "propertieslistmodel.h"
+#include "qdvnamevalidator.h"
 
 #include <QEvent>
+#include <QFileInfo>
 #include <QLabel>
+#include <QLineEdit>
 #include <QtDebug>
 
 static const char *MODEL_INDEX_PROPERTY = "modelIndex";
 
 namespace dve {
 
-DVAttributeDelegate::DVAttributeDelegate(Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent)
+DVAttributeDelegate::DVAttributeDelegate(dvm::DVObject *object, Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent)
     : shared::AttributeDelegate(parent)
     , m_asn1Checks(asn1Checks)
+    , m_object(object)
 {
 }
 
 QWidget *DVAttributeDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    const QString tockenName = shared::PropertiesListModel::tokenNameFromIndex(index);
     if (index.isValid()) {
-        const QString name = shared::PropertiesListModel::tokenNameFromIndex(index);
-        if (name == dvm::meta::Props::token(dvm::meta::Props::Token::config)) {
+        if (tockenName == dvm::meta::Props::token(dvm::meta::Props::Token::config)) {
             auto *proxy = new QLabel(parent);
             proxy->installEventFilter(const_cast<DVAttributeDelegate *>(this));
             return proxy;
         }
     }
-    return shared::AttributeDelegate::createEditor(parent, option, index);
+    QWidget *editor = shared::AttributeDelegate::createEditor(parent, option, index);
+
+    if (tockenName == dvm::meta::Props::token(dvm::meta::Props::Token::name)) {
+        if (auto lineEdit = dynamic_cast<QLineEdit *>(editor)) {
+            auto validator = new dve::QDVNameValidator(m_object, lineEdit);
+            if (m_object->type() != dvm::DVObject::Type::Node) { // Node names have no character restriction
+                validator->setSecondValidator(lineEdit->validator());
+            }
+            lineEdit->setValidator(validator);
+        }
+    }
+    if (tockenName == dvm::meta::Props::token(dvm::meta::Props::Token::asn1file)) {
+        // Node names have no restrictions
+        if (auto lineEdit = dynamic_cast<QLineEdit *>(editor)) {
+            auto validator = new shared::ExistingFileValidator(lineEdit);
+            lineEdit->setValidator(validator);
+        }
+    }
+
+    return editor;
 }
 
 void DVAttributeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const

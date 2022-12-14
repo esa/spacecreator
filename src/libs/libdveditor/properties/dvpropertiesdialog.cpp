@@ -110,7 +110,7 @@ void DVPropertiesDialog::initAttributesView()
     modelAttrs->setDataObject(dataObject());
 
     shared::AttributesView *viewAttrs = new shared::AttributesView(this);
-    QStyledItemDelegate *attrDelegate = new DVAttributeDelegate(m_asn1Checks, viewAttrs->tableView());
+    QStyledItemDelegate *attrDelegate = new DVAttributeDelegate(dataObject(), m_asn1Checks, viewAttrs->tableView());
 
     viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
@@ -142,8 +142,8 @@ void DVPropertiesDialog::done(int r)
 
             if (sourcePacketizer != targetPacketizer) {
                 shared::ErrorHub::addError(shared::ErrorItem::Warning,
-                        QStringLiteral("Source (%1) and target (%2) packetizers are different: %3 <-> %4").arg(
-                        sourceName, targetName, sourcePacketizer, targetPacketizer));
+                        QStringLiteral("Source (%1) and target (%2) packetizers are different: %3 <-> %4")
+                                .arg(sourceName, targetName, sourcePacketizer, targetPacketizer));
             }
         }
     }

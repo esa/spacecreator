@@ -17,8 +17,10 @@
 
 #include "dvtreewidget.h"
 
+#include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "dvfunction.h"
+#include "dvobjectnamedelegate.h"
 #include "dvtreesortproxymodel.h"
 #include "dvtreeviewmodel.h"
 #include "implementationdelegate.h"
@@ -51,8 +53,12 @@ void DVTreeWidget::setDVCore(DVEditorCore *core)
 {
     m_dvCore = core;
 
-    auto delegate = new ImplementationDelegate(m_dvCore->commandsStack(), m_treeView);
-    m_treeView->setItemDelegateForColumn(1, delegate);
+    dvm::DVModel *objectsModel = m_dvCore->appModel()->objectsModel();
+    auto nameDelegate = new DVObjectNameDelegate(objectsModel, m_treeView);
+    m_treeView->setItemDelegateForColumn(0, nameDelegate);
+
+    auto implDelegate = new ImplementationDelegate(m_dvCore->commandsStack(), m_treeView);
+    m_treeView->setItemDelegateForColumn(1, implDelegate);
 
     m_dvTreeSortModel->setSourceModel(m_dvCore->itemTreeModel());
     m_selectionModel->setModel(m_dvTreeSortModel);

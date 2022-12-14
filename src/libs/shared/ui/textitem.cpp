@@ -18,6 +18,8 @@
 
 #include "textitem.h"
 
+#include "common.h"
+
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QCompleter>
@@ -32,8 +34,6 @@
 
 namespace shared {
 namespace ui {
-
-static const QColor ERROR_BACKGROUND_COLOR(255, 128, 128);
 
 /*!
   \class shared::ui::TextItem
