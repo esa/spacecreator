@@ -9,7 +9,7 @@ IMPORTS
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Erroredchannel-States ::= ENUMERATED {drop, corrupt, idle}
+Erroredchannel-States ::= ENUMERATED {idle, corrupt, drop}
 
 Erroredchannel-Context ::= SEQUENCE {
    state Erroredchannel-States,

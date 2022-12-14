@@ -6,7 +6,7 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Lock-States ::= ENUMERATED {writing, idle, wait-turn, wait-nocontention}
+Lock-States ::= ENUMERATED {wait-nocontention, wait-turn, writing, idle}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,
@@ -110,38 +110,6 @@ BEGIN
        
        env
    }
-
-END
-
-TESTGUI-SUBTYPE DEFINITIONS ::=
-BEGIN
-
-IMPORTS 
-
-T-WriteRequest FROM DEKKER1-DATAVIEW
-
-
-
-
-T-WriteRequest FROM DEKKER1-DATAVIEW
-
- ;
-
-
-
-
-
-
-
-Testgui-writerequesta-p1 ::= T-WriteRequest
-
-
-
-
-Testgui-writerequestb-p1 ::= T-WriteRequest
-
-
-
 
 END
 
