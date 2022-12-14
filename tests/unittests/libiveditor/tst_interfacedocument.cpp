@@ -39,6 +39,8 @@ public:
     {
     }
 
+    QString projectPath() const override { return QString(EXAMPLES_DIR); }
+
     QStringList allDVFiles() const override { return {}; }
     QStringList allIVFiles() const override { return {}; }
     QStringList allMscFiles() const override { return {}; }
