@@ -9,7 +9,7 @@ IMPORTS
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Bcdlct-States ::= ENUMERATED {transmitting, idle}
+Bcdlct-States ::= ENUMERATED {idle, transmitting}
 
 Bcdlct-Context ::= SEQUENCE {
    state Bcdlct-States,
@@ -46,7 +46,7 @@ IMPORTS
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Erroredchannel-States ::= ENUMERATED {drop, idle, corrupt}
+Erroredchannel-States ::= ENUMERATED {drop, corrupt, idle}
 
 Erroredchannel-Context ::= SEQUENCE {
    state Erroredchannel-States,
@@ -319,6 +319,79 @@ BEGIN
        
        env
    }
+
+END
+
+BCAPP-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+T-UART-DLC-SDU FROM UART-DLC
+
+ ;
+
+
+
+
+
+
+
+Bcapp-dlctxsdu-p1 ::= T-UART-DLC-SDU
+
+
+
+
+END
+RTAPP-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS T-UART-DLC-RxErrorCode FROM UART-DLC
+
+
+
+
+T-UART-DLC-SDU FROM UART-DLC
+
+
+ ;
+
+
+
+
+Rtapp-dlcrxerror-p1 ::= T-UART-DLC-RxErrorCode
+
+
+
+
+Rtapp-dlcrxsdu-p1 ::= T-UART-DLC-SDU
+
+
+
+
+
+
+
+END
+CHANNELEFFECTS-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+UINT8 FROM Basic-Types
+
+ ;
+
+
+
+
+
+
+
+Channeleffects-corruptchar-p1 ::= UINT8
+
+
+
 
 END
 

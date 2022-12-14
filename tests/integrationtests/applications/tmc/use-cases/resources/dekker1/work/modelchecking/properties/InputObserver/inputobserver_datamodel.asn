@@ -7,10 +7,11 @@ IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview
+   Testgui-writerequesta-p1, Testgui-writerequestb-p1 FROM TESTGUI-SUBTYPE
    Locka-Event, Lockb-Event, Sharedmemory-Event, Testgui-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Inputobserver-States ::= ENUMERATED {wait, zerowrite}
+Inputobserver-States ::= ENUMERATED {zerowrite, wait}
 
 Inputobserver-Context ::= SEQUENCE {
    state Inputobserver-States,

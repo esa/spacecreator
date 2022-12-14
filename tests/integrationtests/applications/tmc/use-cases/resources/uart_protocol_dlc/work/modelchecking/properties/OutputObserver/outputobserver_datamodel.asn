@@ -12,10 +12,13 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID-Range, PID FROM System-Dataview
+   Bcapp-dlctxsdu-p1 FROM BCAPP-SUBTYPE
+   Rtapp-dlcrxerror-p1, Rtapp-dlcrxsdu-p1 FROM RTAPP-SUBTYPE
+   Channeleffects-corruptchar-p1 FROM CHANNELEFFECTS-SUBTYPE
    Bcapp-Event, Bcdlct-Event, Channeleffects-Event, Demo-Timer-Manager-Event, Demo-Timer-Manager-Periodic-Events, Erroredchannel-Event, Rtapp-Event, Rtdlcr-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Outputobserver-States ::= ENUMERATED {wait, error}
+Outputobserver-States ::= ENUMERATED {error, wait}
 
 Outputobserver-Context ::= SEQUENCE {
    state Outputobserver-States,
