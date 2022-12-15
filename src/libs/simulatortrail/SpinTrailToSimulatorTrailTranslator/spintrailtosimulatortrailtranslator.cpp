@@ -529,7 +529,11 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(
         if (iter.value().m_functionName.compare(event->getFunctionName(), Qt::CaseInsensitive) == 0
                 && iter.value().m_interfaceName.compare(event->getInterfaceName(), Qt::CaseInsensitive) == 0) {
             source = iter->m_possibleSenders.begin().key();
-            interfaceParamValue = iter->m_lastReceivedValue->clone();
+            if (iter->m_lastReceivedValue) {
+                interfaceParamValue = iter->m_lastReceivedValue->clone();
+            } else {
+                interfaceParamValue = std::make_unique<NamedValue>();
+            }
             break;
         }
     }
