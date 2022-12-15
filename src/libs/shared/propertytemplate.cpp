@@ -436,7 +436,7 @@ bool PropertyTemplate::validate(const VEObject *object) const
                 const QRegularExpressionMatch match = rx.match(value);
                 return match.capturedLength() == value.length();
             }
-            return true;
+            return false;
         };
         if (checkPattern(object->entityAttributes(), it->first, it->second))
             return true;

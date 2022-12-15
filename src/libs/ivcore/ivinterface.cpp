@@ -422,6 +422,17 @@ IVInterface *IVInterface::createIface(const CreationInfo &descr)
     iface->setKind(descr.kind);
     iface->setTitle(descr.name);
     iface->setLayerName(descr.layer != nullptr ? descr.layer->title() : IVConnectionLayerType::DefaultLayerName);
+
+    IVFunction* function = descr.function->as<IVFunction*>();
+    if(function != nullptr)
+    {
+        if(function->entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString() == 
+            meta::Props::token(meta::Props::Token::QGenC))
+        {
+            iface->setEntityAttribute(meta::Props::token(meta::Props::Token::is_qgen_interface), true);
+        }
+    }
+
     return iface;
 }
 
