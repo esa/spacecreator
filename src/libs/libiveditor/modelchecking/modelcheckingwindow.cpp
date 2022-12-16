@@ -579,6 +579,8 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     QString program;
     QStringList arguments;
 
+    auto p = new QProcess(this);
+
     if (fileSuffix == "msc" || fileSuffix == "scl") {
         program = "spacecreator.AppImage";
         arguments << "-client" << item->text(1);
@@ -586,9 +588,20 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     } else { // then has to be a .pr file
         program = "opengeode";
         arguments << item->text(1);
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        const QString libPathKey { "LD_LIBRARY_PATH" };
+        const QString userLibPathKey { "_ORIGINAL_LD_LIBRARY_PATH" };
+        if (env.keys().contains(userLibPathKey)) {
+            QString path = env.value(userLibPathKey);
+            if (path.isEmpty()) {
+                env.remove(libPathKey);
+            } else {
+                env.insert(libPathKey, path);
+            }
+            p->setProcessEnvironment(env);
+        }
     }
 
-    auto p = new QProcess(this);
     observedProcess = p;
     p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
