@@ -87,6 +87,8 @@ private:
     shared::BreadcrumbWidget *m_breadCrumb = nullptr;
     IVCreatorTool *m_tool { nullptr };
     QAction *m_actCreateConnectionGroup { nullptr };
+    QAction *m_actUngroupConnection { nullptr };
+    QAction *m_actDeleteConnectionGroup { nullptr };
     QAction *m_actRemove { nullptr };
     QAction *m_actZoomIn { nullptr };
     QAction *m_actZoomOut { nullptr };

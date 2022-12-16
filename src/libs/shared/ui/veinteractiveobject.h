@@ -86,6 +86,8 @@ protected:
     virtual TextItem *initTextItem();
     virtual void updateTextPosition();
     void updateText();
+    void updateVisibility();
+    virtual bool isItemVisible() const;
 
 protected:
     const QPointer<VEObject> m_dataObject;

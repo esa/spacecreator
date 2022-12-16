@@ -54,6 +54,7 @@ public:
     };
 
     void removeSelectedItems() override;
+    void ungroupConnectedItems();
     void groupSelectedItems();
 
 Q_SIGNALS:

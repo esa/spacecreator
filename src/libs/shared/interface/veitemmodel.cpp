@@ -244,8 +244,16 @@ void VEItemModel::updateItem(VEInteractiveObject *item)
 void VEItemModel::removeItemForObject(shared::Id objectId)
 {
     if (auto item = m_items.take(objectId)) {
+        for (auto child: item->childItems()) {
+            if (auto childItem = qobject_cast<VEInteractiveObject *>(child->toGraphicsObject())) {
+                if (auto entity = childItem->entity())
+                    m_items.remove(entity->id());
+            }
+        }
+
         m_graphicsScene->removeItem(item);
         delete item;
+
         updateSceneRect();
     }
 }

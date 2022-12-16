@@ -225,7 +225,7 @@ void IVItemModel::scheduleInterfaceTextUpdate()
  */
 void IVItemModel::updateInterfaceTexts()
 {
-    for (QGraphicsItem *item : m_items) {
+    for (QGraphicsItem *item : qAsConst(m_items)) {
         if (auto interfaceItem = dynamic_cast<ive::IVInterfaceGraphicsItem *>(item)) {
             interfaceItem->updateLabel();
         }
@@ -693,7 +693,7 @@ void IVItemModel::initItem(shared::ui::VEInteractiveObject *item)
         return;
     }
 
-    connect(object, &shared::VEObject::attributeChanged, this, &IVItemModel::scheduleInterfaceTextUpdate);
+    connect(object, &shared::VEObject::attributeChanged, this, &IVItemModel::scheduleInterfaceTextUpdate); // Check only name attr?
 
     if (const auto connectionGroupObject = qobject_cast<ivm::IVConnectionGroup *>(object)) {
         connect(connectionGroupObject, &ivm::IVConnectionGroup::connectionAdded, this,

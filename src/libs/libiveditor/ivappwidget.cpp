@@ -561,6 +561,13 @@ QVector<QAction *> IVAppWidget::initActions()
     connect(m_actCreateConnectionGroup, &QAction::triggered, this, [this]() { m_tool->groupSelectedItems(); });
     m_actCreateConnectionGroup->setIcon(QIcon(":/toolbar/icns/connection_group.svg"));
 
+    m_actUngroupConnection = new QAction(tr("Ungroup selected connection(s)"));
+    ActionsManager::registerAction(
+            Q_FUNC_INFO, m_actUngroupConnection, "Ungroup Connections", "Ungroup connections");
+    m_actUngroupConnection->setActionGroup(actionGroup);
+    connect(m_actUngroupConnection, &QAction::triggered, this, [this]() { m_tool->ungroupConnectedItems(); });
+    m_actUngroupConnection->setIcon(QIcon(":/toolbar/icns/ungroup_connections.svg"));
+
     m_actRemove = new QAction(tr("Remove"));
     ActionsManager::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
     m_actRemove->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
@@ -623,7 +630,7 @@ QVector<QAction *> IVAppWidget::initActions()
     });
 
     m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
-        actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup, m_actRemove,
+        actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup, m_actUngroupConnection, m_actRemove,
         m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent, m_actEnterNestedView, m_actShrinkScene };
 
     connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
@@ -657,6 +664,12 @@ QVector<QAction *> IVAppWidget::initActions()
                             == static_cast<int>(ivm::IVObject::Type::Connection);
                 });
                 m_actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
+
+                it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
+                    return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
+                            == static_cast<int>(ivm::IVObject::Type::ConnectionGroup);
+                });
+                m_actUngroupConnection->setEnabled(it != std::cend(idxs));
 
                 const auto count = std::count_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
                     return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()

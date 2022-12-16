@@ -20,8 +20,8 @@
 #include "abstractvisualizationmodel.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
+#include "commands/cmdconnectiongroupitemchange.h"
 #include "commands/cmdconnectionitemcreate.h"
-#include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -37,6 +37,7 @@
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivcommentgraphicsitem.h"
 #include "itemeditor/ivconnectiongraphicsitem.h"
+#include "itemeditor/ivconnectiongroupgraphicsitem.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivfunctiontypegraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
@@ -47,7 +48,6 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
-#include "ui/grippointshandler.h"
 
 #include <QAction>
 #include <QApplication>
@@ -142,6 +142,43 @@ void IVCreatorTool::removeSelectedItems()
                                "Please edit the related FunctionType.")
                                     .arg(names);
         Q_EMIT informUser(tr("Interface removal"), msg);
+    }
+}
+
+void IVCreatorTool::ungroupConnectedItems()
+{
+    if (!m_view)
+        return;
+
+    if (auto scene = m_view->scene()) {
+        clearPreviewItem();
+
+        cmd::CommandsStack::Macro cmdMacro(m_doc->commandsStack(), tr("Ungroup selected connection(s)"));
+        QList<QPointer<ivm::IVObject>> entities;
+        for (const auto item : m_view->scene()->selectedItems()) {
+            if (item->type() == IVConnectionGroupGraphicsItem::Type) {
+                if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
+                    if (!iObj->entity())
+                        continue;
+
+                    if (auto entity = iObj->entity()->as<ivm::IVConnectionGroup *>()) {
+                        if (!entity->isFixedSystemElement()) {
+                            entities.append(entity);
+                        }
+                        for (const auto &conn: entity->groupedConnections()) {
+                            auto cmdUngroup = new cmd::CmdConnectionGroupItemChange(entity, conn, false);
+                            cmdMacro.push(cmdUngroup);
+                        }
+                    }
+                }
+            }
+        }
+        if (!entities.isEmpty()) {
+            auto cmdRm = new cmd::CmdEntitiesRemove(entities, model()->objectsModel());
+            cmdMacro.push(cmdRm);
+
+            cmdMacro.setComplete(true);
+        }
     }
 }
 
@@ -448,8 +485,14 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
                 this, [this]() { groupSelectedItems(); });
 
         const auto selectedItems = m_previewItem->scene()->selectedItems();
-        const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
+        auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
+        action->setEnabled(it != selectedItems.cend());
+
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/delete.svg")), tr("Ungroup connections"),
+                                 this, [this]() { ungroupConnectedItems(); });
+        it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
+                          [](const QGraphicsItem *item) { return item->type() == IVConnectionGroupGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
     }
 }

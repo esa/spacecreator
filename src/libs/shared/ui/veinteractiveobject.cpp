@@ -73,6 +73,16 @@ void VEInteractiveObject::childBoundingBoxChanged()
     scheduleLayoutUpdate();
 }
 
+void VEInteractiveObject::updateVisibility()
+{
+    setVisible(isItemVisible());
+}
+
+bool VEInteractiveObject::isItemVisible() const
+{
+    return true;
+}
+
 void VEInteractiveObject::mergeGeometry()
 {
 #ifdef __NONE__

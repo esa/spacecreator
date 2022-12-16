@@ -49,6 +49,8 @@ public:
 
     QString prepareTooltip() const override;
 
+    bool isItemVisible() const override;
+
     int itemLevel(bool isSelected) const override;
 
 protected:
