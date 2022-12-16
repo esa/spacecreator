@@ -50,6 +50,8 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterModelTo);
     m_parser.handlePositional(CommandArg::SedsConverterModelsAux);
     m_parser.handlePositional(CommandArg::SedsConverterIvConfig);
+    m_parser.handlePositional(CommandArg::SedsConverterIvGenerateParentFunctions);
+    m_parser.handlePositional(CommandArg::SedsConverterIvDataTypesSedsFilepath);
     m_parser.handlePositional(CommandArg::SedsConverterSedsSchemaFilepath);
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRef);
     m_parser.handlePositional(CommandArg::SedsConverterSedsExtRefFilepath);
@@ -68,6 +70,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterTransactionNameType);
     m_parser.handlePositional(CommandArg::SedsConverterEnableFailureReporting);
     m_parser.handlePositional(CommandArg::SedsConverterFailureReportingType);
+    m_parser.handlePositional(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
 
     m_parser.process(arguments);
     m_arguments = m_parser.positionalsSet();
@@ -194,6 +197,10 @@ void SedsConverterCLI::addIvTranslationOptions(Options &options)
     if (m_arguments.contains(CommandArg::SedsConverterIvGenerateParentFunctions)) {
         options.add(IvOptions::generateFunctionsForPackages);
     }
+
+    if (m_arguments.contains(CommandArg::SedsConverterIvDataTypesSedsFilepath)) {
+        options.add(IvOptions::dataTypesSedsFilepath, m_parser.value(CommandArg::SedsConverterIvDataTypesSedsFilepath));
+    }
 }
 
 void SedsConverterCLI::addIvOutputOptions(Options &options)
@@ -282,6 +289,11 @@ void SedsConverterCLI::addSedsTranslationOptions(Options &options)
     if (m_arguments.contains(CommandArg::SedsConverterFailureReportingType)) {
         options.add(SedsOptions::failureReportingType, m_parser.value(CommandArg::SedsConverterFailureReportingType));
     }
+
+    if (m_arguments.contains(CommandArg::SedsConverterArrayDimensionBaseIndexingType)) {
+        options.add(SedsOptions::arrayDimensionBaseIndexingType,
+                m_parser.value(CommandArg::SedsConverterArrayDimensionBaseIndexingType));
+    }
 }
 
 void SedsConverterCLI::addSedsOutputOptions(Options &options)
@@ -301,7 +313,7 @@ QStringList SedsConverterCLI::getInputFilepaths(conversion::ModelType modelType)
     for (const auto &extension : extensions) {
         const auto extensionString = extension.toStdString();
         const auto range = m_inputFilepaths.equal_range(extensionString);
-        std::for_each(range.first, range.second, [&result](auto &&filepath) { result << std::move(filepath.second); });
+        std::for_each(range.first, range.second, [&result](const auto &filepath) { result << filepath.second; });
     }
 
     return result;

@@ -101,6 +101,7 @@ void DataTypeTranslatorVisitor::operator()(const ::seds::model::EnumeratedDataTy
 {
     const auto asn1TypeName = Escaper::escapeAsn1TypeName(sedsType.nameStr());
     auto asn1Type = std::make_unique<Asn1Acn::Types::Enumerated>(asn1TypeName);
+    asn1Type->setEncodeValues(true);
 
     translateIntegerEncoding(sedsType.encoding(), asn1Type.get());
     translateEnumerationList(sedsType, asn1Type.get());
@@ -351,6 +352,7 @@ void DataTypeTranslatorVisitor::translateEnumSubRangeDataType(
     auto asn1Type = std::make_unique<Asn1Acn::Types::Enumerated>(asn1TypeName);
 
     translateIntegerEncoding(sedsBaseType.encoding(), asn1Type.get());
+    asn1Type->setEncodeValues(true);
 
     const auto &enumRange = std::get<EnumeratedDataTypeRange>(sedsType.range());
     const auto &items = sedsBaseType.enumerationList();

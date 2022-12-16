@@ -9,12 +9,12 @@ ChecksumPattern ::= BIT STRING(SIZE(32))
 ChecksumLongitudinalPattern ::= BIT STRING(SIZE(8))
 PacketHeader ::= SEQUENCE
 {
-    version IntegerData(0 .. 255),
-    release IntegerData(0 .. 255)
+    version IntegerData,
+    release IntegerData
 }
 PacketBody ::= SEQUENCE
 {
-    data IntegerData(0 .. 255)
+    data IntegerData
 }
 Crc8-Packet ::= SEQUENCE
 {

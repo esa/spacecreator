@@ -10,7 +10,7 @@ IMPORTS
    Mmi-Event, Model-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Inputobserver-States ::= ENUMERATED {waitfortrigger, done, waitforaction}
+Inputobserver-States ::= ENUMERATED {waitforaction, done, waitfortrigger}
 
 Inputobserver-Context ::= SEQUENCE {
    state Inputobserver-States,

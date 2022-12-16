@@ -24,6 +24,8 @@ func.comments               :   |_ List of all nested comments of function
 comm                        :       |_ Instance of nested comment
 func.connections            :   |_ List of all nested connections of function
 conn                        :       |_ Instance of nested connections
+func.connectionGroups       :   |_ List of all nested connection groups of function
+conngroups                  :       |_ Instance of nested connection groups
 func.connectedFunctions     :   |_ List of connected functions
 connectedFunc               :       |_ List of parent Functions names
 func.implementations        :   |_ List of all inmplementations languages for this function
@@ -53,9 +55,11 @@ reference.archetypeFunction :           |_ Value of name of the programming lang
     {% include "comment.tmplt" %}
 {% endfor %}
 {% for conn in func.connections %}
-    {% include "connection.tmplt" %}
+    {% if not conn.groupName %}
+        {% include "connection.tmplt" %}
+    {% endif %}
 {% endfor %}
-{% for conn in func.connectiongroups %}
+{% for conngroups in func.connectionGroups %}
     {% include "connectiongroup.tmplt" %}
 {% endfor %}
 {% if func.implementations %}

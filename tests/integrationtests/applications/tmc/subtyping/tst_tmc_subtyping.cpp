@@ -28,6 +28,7 @@ class tst_Tmc_Subtyping : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void test_external_proc();
     void test_subtyping();
     void test_same_size();
     void test_sequenceof_fixed_size();
@@ -36,6 +37,12 @@ private Q_SLOTS:
     void test_octetstring();
     void test_octetstring_sequenceof();
 };
+
+void tst_Tmc_Subtyping::test_external_proc()
+{
+    const int result = system("./test_external_proc.sh");
+    QCOMPARE(result, 0);
+}
 
 void tst_Tmc_Subtyping::test_subtyping()
 {

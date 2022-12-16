@@ -5,6 +5,7 @@ set -euo pipefail
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
+XMLDIFF="xmldiff"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"
@@ -20,7 +21,7 @@ cd $TEST_OUTPUT_DIR
 
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
-$DIFF interfaceview.xml ../resources/test_generic_type_mapping.output \
+$XMLDIFF interfaceview.xml ../resources/test_generic_type_mapping.output \
   && $DIFF TYPEMAPPING.asn ../resources/test_generic_type_mapping_asn.output \
   && $DIFF TYPEMAPPING.acn ../resources/test_generic_type_mapping_acn.output \
   && $DIFF TYPEMAPPING-MEGACOMPONENT.asn ../resources/test_generic_type_mapping_component_asn.output \

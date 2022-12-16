@@ -3,15 +3,15 @@ IntegerData ::= INTEGER(0 .. 255)
 BinaryData ::= BIT STRING(SIZE(0 .. 8))
 BasicEntryContainer ::= SEQUENCE
 {
-    basicEntry IntegerData(0 .. 255)
+    basicEntry IntegerData
 }
 FixedValueEntryContainer ::= SEQUENCE
 {
-    fixedValueEntry BinaryData(SIZE(0 .. 8)) ('00110011'B)
+    fixedValueEntry BinaryData('00110011'B)
 }
 ListEntryContainer ::= SEQUENCE
 {
-    listEntry SEQUENCE (SIZE(0 .. 255)) OF BinaryData(SIZE(0 .. 8))
+    listEntry SEQUENCE (SIZE(0 .. 255)) OF BinaryData
 }
 END
 

@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="Component" is_type="NO" language="SDL" default_implementation="default">
     <ContextParameter name="timer_StateA" type="Timer" value=""/>
     <ContextParameter name="timer_StateB" type="Timer" value=""/>

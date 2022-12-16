@@ -125,6 +125,7 @@ void SpinConfigSaver::saveSpinConfig(const SpinConfigData &configData, QXmlStrea
     xml.writeAttribute("usefairscheduling", QString::number(configData.useFairScheduling));
     xml.writeAttribute("supportReal", QString::number(configData.supportReal));
     xml.writeAttribute("deltaValue", SpinConfigData::optionalFloatToString(configData.deltaValue));
+    xml.writeAttribute("vectorszValue", SpinConfigData::optionalIntToString(configData.vectorszValue));
 
     xml.writeEndElement();
 }
@@ -146,6 +147,7 @@ bool SpinConfigSaver::readSpinConfig(QXmlStreamReader &xml)
     configData.useFairScheduling = readAttribute("usefairscheduling", xml).toInt();
     configData.supportReal = readAttribute("supportReal", xml).toInt();
     configData.deltaValue = SpinConfigData::optionalFloatFromString(readAttribute("deltaValue", xml));
+    configData.vectorszValue = SpinConfigData::optionalIntFromString(readAttribute("vectorszValue", xml));
 
     xml.skipCurrentElement();
     return true;

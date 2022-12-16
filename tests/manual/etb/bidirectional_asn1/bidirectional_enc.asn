@@ -1,0 +1,22 @@
+Bidirectional DEFINITIONS ::= BEGIN
+MyIntegerEnc ::= INTEGER(0 .. 20)
+MyFloatEnc ::= REAL(-3.14 .. 2.72)
+MyBoolEnc ::= BOOLEAN
+MyEnumEnc ::= ENUMERATED
+{
+    aEnc(300),
+    bEnc(20),
+    cEnc(5)
+}
+TC1TypeEnc ::= SEQUENCE
+{
+    a MyIntegerEnc,
+    b MyFloatEnc
+}
+TC2TypeEnc ::= SEQUENCE
+{
+    c MyBoolEnc,
+    d MyEnumEnc
+}
+TC1sEnc ::= SEQUENCE (SIZE(0..5)) OF TC1TypeEnc
+END

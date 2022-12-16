@@ -116,7 +116,7 @@ void TextViewDialog::updateText()
     d->textView->setTextColor(Qt::black);
     try {
         // Test if we can parse the file
-        msc::MscReader reader;
+        msc::MscReader reader(msc::MscReader::NOTIFY::NO_HUB);
         QScopedPointer<msc::MscModel> model(reader.parseText(mscText));
     } catch (...) {
         // our own msc file is corrupt - write output in red

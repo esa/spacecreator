@@ -55,6 +55,8 @@ public:
     SpaceCreatorProject(QObject *parent = nullptr);
     virtual ~SpaceCreatorProject();
 
+    QString projectPath() const override;
+
     // Load / access functions
     DVEditorCorePtr dvData(const QString &fileName) const;
     IVEditorCorePtr ivData(const QString &fileName) const;

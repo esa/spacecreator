@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU Library General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
+
 #include "resettimerevent.h"
 
 namespace spintrail::model {
 ResetTimerEvent::ResetTimerEvent(QString functionName, QString timerName)
     : m_functionName(std::move(functionName))
-
     , m_timerName(std::move(timerName))
 {
 }
@@ -30,6 +30,7 @@ const QString &ResetTimerEvent::getFunctionName() const
 {
     return m_functionName;
 }
+
 const QString &ResetTimerEvent::getTimerName() const
 {
     return m_timerName;

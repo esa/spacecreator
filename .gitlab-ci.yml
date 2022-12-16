@@ -9,7 +9,7 @@ default:
   before_script:
     - source ${CI_PROJECT_DIR}/scripts/timestamp.sh
     # dependencies
-    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect 
+    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect xmldiff
     # install OpenGEODE dependencies
     # *Python (both for OpenGEODE and sdl2promela)
     - pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
@@ -50,11 +50,10 @@ spacecreator-qt5-master:
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # unit tests
+    - ./scripts/run_tests.sh ${BUILD_DIR}
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
-    # unit tests
-    - cd ${CI_PROJECT_DIR}
-    - ./scripts/run_tests.sh ${BUILD_DIR}
     # Create an AppImage from the app_dir and place it in the build dir
     - python3 ${CI_PROJECT_DIR}/scripts/create_appimage.py --output_dir ${BUILD_DIR} --project_dir ${PROJECT_DIR} --app_dir ${APP_DIR} --env_dir ${ENV_DIR} --project_version ${SC_VERSION}
   cache:
@@ -69,15 +68,16 @@ spacecreator-qt5-master:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
   rules:
-    - if: "$CI_COMMIT_BRANCH == 'master'"
+    # - if: "$CI_COMMIT_BRANCH == 'master'"
+    - when: never
 
 
 spacecreator-qt6-master:
   stage: build-test-bundle
   variables:
     PROJECT_DIR: ${CI_PROJECT_DIR}
-    ENV_QT_VERSION: 6.3.1
-    ENV_QTC_VERSION: 8.0.1
+    ENV_QT_VERSION: 6.4.1
+    ENV_QTC_VERSION: 9.0.0
     ENV_DIR: /opt/spacecreator6
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
@@ -93,6 +93,8 @@ spacecreator-qt6-master:
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # unit tests
+    - ./scripts/run_tests.sh ${BUILD_DIR}
     # read the version numbers
     - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
     # Create an AppImage from the app_dir and place it in the build dir
@@ -103,6 +105,8 @@ spacecreator-qt6-master:
       - ${BUILD_DIR}/asn1scc_bin
       - ccache
   artifacts:
+    reports:
+      junit: ${BUILD_DIR}/tst_*-result.xml
     paths:
       - "${BUILD_DIR}/spacecreator*.AppImage"
     expire_in: 2 days
@@ -132,7 +136,6 @@ spacecreator-qt5-feature:
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
     # unit tests
-    - cd ${CI_PROJECT_DIR}
     - ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
     key: spacecreator_cache
@@ -145,15 +148,16 @@ spacecreator-qt5-feature:
     expire_in: 2 days
   rules:
     # For pipelines created when a merge request is created or updated
-    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
+    # - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
+    - when: never
 
 
 spacecreator-qt6-feature:
   stage: build-test
   variables:
     PROJECT_DIR: ${CI_PROJECT_DIR}
-    ENV_QT_VERSION: 6.3.1
-    ENV_QTC_VERSION: 8.0.1
+    ENV_QT_VERSION: 6.4.1
+    ENV_QTC_VERSION: 9.0.0
     ENV_DIR: /opt/spacecreator6
     APP_DIR: ${ENV_DIR}/spacecreator.AppDir
     ENV_QT_BASE_DIR: ${ENV_DIR}/Qt/${ENV_QT_VERSION}/gcc_64
@@ -169,14 +173,19 @@ spacecreator-qt6-feature:
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 ${CI_PROJECT_DIR}/scripts/postbuild.py --project_dir {$PROJECT_DIR} --app_dir ${APP_DIR} --build_dir ${BUILD_DIR}
+    # read the version numbers
+    - source ./VERSION # set ${SC_VERSION}. The version of the project is stored the shell script VERSION
+    # unit tests
+    - ./scripts/run_tests.sh ${BUILD_DIR}
   cache:
     key: spacecreator_cache
     paths:
       - ${BUILD_DIR}/asn1scc_bin
       - ccache
+  artifacts:
+    reports:
+      junit: ${BUILD_DIR}/tst_*-result.xml
+    expire_in: 2 days
   rules:
     # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
-
-
-

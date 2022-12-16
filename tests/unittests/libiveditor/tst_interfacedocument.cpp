@@ -25,6 +25,7 @@
 #include "ivlibrary.h"
 #include "ivmodel.h"
 #include "ivtestutils.h"
+#include "standardpaths.h"
 
 #include <QObject>
 #include <QtTest>
@@ -37,6 +38,8 @@ public:
         : shared::AbstractProject(parent)
     {
     }
+
+    QString projectPath() const override { return QString(EXAMPLES_DIR); }
 
     QStringList allDVFiles() const override { return {}; }
     QStringList allIVFiles() const override { return {}; }
@@ -64,9 +67,9 @@ private:
 
 void tst_InterfaceDocument::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
-    QStandardPaths::setTestModeEnabled(true);
 }
 
 void tst_InterfaceDocument::init()

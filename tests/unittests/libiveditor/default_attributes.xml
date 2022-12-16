@@ -17,9 +17,9 @@
         </Scopes>
         <Type>
             <Enumeration>
-                <Entry value="C"/>
-                <Entry value="ADA"/>
-                <Entry value="SDL"/>
+                <Entry value="C" folder_name="C"/>
+                <Entry value="Ada" folder_name="Ada"/>
+                <Entry value="SDL" folder_name="SDL"/>
             </Enumeration>
         </Type>
     </Attr>

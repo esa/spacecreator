@@ -15,6 +15,7 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
+configure_file(test_external_proc.sh test_external_proc.sh COPYONLY)
 configure_file(test_subtyping.sh test_subtyping.sh COPYONLY)
 configure_file(test_same_size.sh test_same_size.sh COPYONLY)
 configure_file(test_sequenceof_fixed_size.sh test_sequenceof_fixed_size.sh COPYONLY)

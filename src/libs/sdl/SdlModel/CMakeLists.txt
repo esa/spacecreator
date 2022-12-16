@@ -13,6 +13,7 @@ set(SOURCES     action.cpp
                 input.cpp
                 join.cpp
                 label.cpp
+                newtype.cpp
                 nextstate.cpp
                 node.cpp
                 output.cpp
@@ -28,6 +29,7 @@ set(SOURCES     action.cpp
                 signalroute.cpp
                 state.cpp
                 statemachine.cpp
+                syntype.cpp
                 system.cpp
                 task.cpp
                 transition.cpp
@@ -44,6 +46,7 @@ set(INCLUDES    action.h
                 input.h
                 join.h
                 label.h
+                newtype.h
                 nextstate.h
                 node.h
                 output.h
@@ -59,6 +62,7 @@ set(INCLUDES    action.h
                 signalroute.h
                 state.h
                 statemachine.h
+                syntype.h
                 system.h
                 task.h
                 transition.h

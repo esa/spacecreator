@@ -46,6 +46,11 @@ QString ExportableIVObject::name() const
     return exportedObject<ivm::IVObject>()->title();
 }
 
+QString ExportableIVObject::groupName() const
+{
+    return exportedObject<ivm::IVObject>()->groupName();
+}
+
 /**
  * @brief ExportableIVObject::createFrom creates appropriate exported class and casts to QVariant
  * @param ivObject exported object

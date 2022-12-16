@@ -6,7 +6,8 @@ SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
 UPDATE_DATAVIEW="asn2aadlPlus -f dataview-uniq.asn DataView.aadl -aadlv2"
 # diff ignoring white space and blank lines
-DIFF="diff -w -B"
+DIFF="xmldiff"
+XMLDIFF="xmldiff"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"
@@ -26,7 +27,7 @@ sed -e '$s/$/\n/' -s COM-N7SPACE-HWAS.acn COM-N7SPACE-HWAS-HWAS.acn > dataview-u
 
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
-$DIFF interfaceview.xml ../resources/test_hwas.interfaceview \
+$XMLDIFF interfaceview.xml ../resources/test_hwas.interfaceview \
   && $UPDATE_DATAVIEW \
   && $AADL_CONVERTER -o interfaceview.xml \
   -t ../resources/xml2dv/interfaceview.tmplt \

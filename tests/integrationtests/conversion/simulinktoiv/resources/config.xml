@@ -1,4 +1,4 @@
-<Attrs>
+<Attrs version="1.0">
     <Attr label="Language" name="language">
         <Scopes>
             <Function>

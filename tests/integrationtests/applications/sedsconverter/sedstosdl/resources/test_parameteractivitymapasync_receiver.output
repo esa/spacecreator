@@ -1,0 +1,22 @@
+/* CIF Process (0, 0), (800, 100) */
+process Receiver;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl Receivedtemperature Number;
+    dcl Io_get_celciustemperatureif_celciustemperature_pi Number;
+    dcl Io_set_celciustemperatureif_celciustemperature_ri Number;
+    /* CIF ENDTEXT */
+    /* CIF Start (0, 900), (200, 75) */
+    START;
+        /* CIF NextState (0, 1087), (200, 50) */
+        NEXTSTATE s0;
+    /* CIF State (0, 1162), (200, 50) */
+    state s0;
+        /* CIF Input (0, 1162), (200, 50) */
+        input Get_CelciusTemperatureIF_CelciusTemperature_Pi(Io_get_celciustemperatureif_celciustemperature_pi);
+            /* CIF NextState (0, 1237), (200, 50) */
+            NEXTSTATE s1;
+    endstate;
+    /* CIF State (600, 1162), (200, 50) */
+    state s1;
+    endstate;
+endprocess Receiver;

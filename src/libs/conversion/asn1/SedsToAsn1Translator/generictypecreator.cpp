@@ -92,11 +92,13 @@ QString GenericTypeCreator::createConcreteTypeAlias(
         return concreteTypeName;
     }
 
-    const auto concreteType = concreteMapping.type;
+    auto concreteType = concreteMapping.type->clone();
+
+    DataTypeTranslationHelper::removeConstraints(concreteType.get());
 
     auto aliasType =
             std::make_unique<Asn1Acn::Types::UserdefinedType>(concreteType->identifier(), m_context.definitionsName());
-    aliasType->setType(concreteType->clone());
+    aliasType->setType(std::move(concreteType));
 
     auto aliasTypeAssignment = std::make_unique<Asn1Acn::TypeAssignment>(
             concreteTypeName, concreteTypeName, Asn1Acn::SourceLocation(), std::move(aliasType));
@@ -138,8 +140,9 @@ void GenericTypeCreator::createConcreteChoiceAlternative(
 {
     const auto concreteType = concreteMapping.type;
 
-    const auto choiceAlternativeName = QString("concrete%1").arg(count);
     auto choiceAlternativeType = concreteType->clone();
+
+    DataTypeTranslationHelper::removeConstraints(choiceAlternativeType.get());
 
     if (concreteMapping.fixedValue) {
         handleFixedValue(choiceAlternativeType.get(), *concreteMapping.fixedValue);
@@ -151,6 +154,7 @@ void GenericTypeCreator::createConcreteChoiceAlternative(
             choiceAlternativeType->identifier(), m_context.definitionsName());
     choiceAlternativeUserType->setType(std::move(choiceAlternativeType));
 
+    const auto choiceAlternativeName = QString("concrete%1").arg(count);
     auto choiceAlternative = std::make_unique<Asn1Acn::Types::ChoiceAlternative>(choiceAlternativeName,
             choiceAlternativeName, choiceAlternativeName, choiceAlternativeName, presentWhen, Asn1Acn::SourceLocation(),
             std::move(choiceAlternativeUserType));

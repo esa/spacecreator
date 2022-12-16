@@ -1,0 +1,7 @@
+SUBTYPING DEFINITIONS ::=
+BEGIN
+IMPORTS MyInteger FROM EXTERNALPROC-DATAVIEW;
+TestInteger ::= MyInteger(0..2)
+Controller-testprotected-controller-testprotected-y ::= TestInteger
+Controller-testunprotected-controller-testunprotected-y ::= TestInteger
+END

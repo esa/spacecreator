@@ -301,15 +301,10 @@ void MscAppWidget::initConnections()
     // ASN1 view
     connect(mainModel(), &MainModel::currentFilePathChanged, this, [&](const QString &filename) {
         QFileInfo fileInfo(filename);
-        if (ui->asn1View->isVisible()) {
-            ui->asn1View->setDirectory(fileInfo.absolutePath());
-        }
+        ui->asn1View->setDirectory(fileInfo.absolutePath());
     });
-    connect(mainModel(), &msc::MainModel::asn1FileNameChanged, this, [&](const QString &asnFilename) {
-        if (ui->asn1View->isVisible()) {
-            ui->asn1View->setFileName(asnFilename);
-        }
-    });
+    connect(mainModel(), &msc::MainModel::asn1FileNameChanged, this,
+            [&](const QString &asnFilename) { ui->asn1View->setFileName(asnFilename); });
     connect(ui->asn1View, &asn1::ASN1FileView::asn1Selected, this, [this]() {
         msc::MscModel *model = mainModel()->mscModel();
         if (model->dataDefinitionString() != ui->asn1View->fileName()) {
@@ -362,6 +357,7 @@ BaseTool *MscAppWidget::activeTool() const
 void MscAppWidget::showAsn1View(bool show)
 {
     ui->asn1View->setVisible(show);
+    ui->asn1View->fillPreview();
     ui->asn1Widget->setVisible(!show);
     ui->ivSwitch->setVisible(!show);
 }

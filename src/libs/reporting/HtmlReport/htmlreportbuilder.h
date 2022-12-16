@@ -51,13 +51,13 @@ public:
      * @param   spinMessages     Spin command outputs
      * @param   sclFiles         SCL condition files
      * @param   errors           Raw error data
-     * @param   observerNames    Observer names
-     * @param   template         HTML template file, uses default if empty
+     * @param   mscObserverFiles MSC observer files
+     * @param   templateFile     HTML template file, uses default if empty
      *
      * @return  HTML-formatted error report string
      */
     QString parseAndBuildHtmlReport(const QStringList &spinMessages, const QStringList &sclFiles,
-            const QList<RawErrorItem> &errors, const QStringList &observerNames,
+            const QList<RawErrorItem> &errors, const QStringList &mscObserverFiles,
             const QString &templateFile = QString()) const;
 
     /**
@@ -99,6 +99,7 @@ private:
     static QVariantHash buildDataConstraintViolationVariant(const QVariant &errorDetails);
     static QVariantHash buildStopConditionViolationVariant(const QVariant &errorDetails);
     static QVariantHash buildObserverFailureVariant(const QVariant &errorDetails);
+    static QVariantHash buildMscFailureVariant(const QVariant &errorDetails);
 };
 
 }

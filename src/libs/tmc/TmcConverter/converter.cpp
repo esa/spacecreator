@@ -289,6 +289,11 @@ void TmcConverter::setDelta(std::optional<QString> value)
     m_delta = std::move(value);
 }
 
+void TmcConverter::setSdl2PromelaTimeout(int timeout)
+{
+    m_sdlToPromelaConverter->setSdl2PromelaTimeout(timeout);
+}
+
 void TmcConverter::setRealTypeEnabled(bool isRealTypeEnabled)
 {
     m_isRealTypeEnabled = isRealTypeEnabled;

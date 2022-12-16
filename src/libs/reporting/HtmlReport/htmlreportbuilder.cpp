@@ -38,11 +38,11 @@ reporting::HtmlReportBuilder::HtmlReportBuilder()
 }
 
 QString reporting::HtmlReportBuilder::parseAndBuildHtmlReport(const QStringList &spinMessages,
-        const QStringList &sclFiles, const QList<RawErrorItem> &errors, const QStringList &observerNames,
+        const QStringList &sclFiles, const QList<RawErrorItem> &errors, const QStringList &mscObserverFiles,
         const QString &templateFile) const
 {
     SpinErrorParser parser;
-    auto reports = parser.parse(spinMessages, sclFiles, errors, observerNames);
+    auto reports = parser.parse(spinMessages, sclFiles, errors, mscObserverFiles);
     if (templateFile.isEmpty()) {
         initResource();
         return buildHtmlReport(reports, m_defaultTemplateFile);
@@ -130,6 +130,9 @@ QVariantHash reporting::HtmlReportBuilder::buildReportItemVariant(
     case reporting::SpinErrorReportItem::ObserverFailure:
         variantErrorDetails = buildObserverFailureVariant(spinErrorReportItem.parsedErrorDetails);
         break;
+    case reporting::SpinErrorReportItem::MscFailure:
+        variantErrorDetails = buildMscFailureVariant(spinErrorReportItem.parsedErrorDetails);
+        break;
     default:
         break;
     }
@@ -195,12 +198,22 @@ QVariantHash reporting::HtmlReportBuilder::buildObserverFailureVariant(const QVa
     return variantHash;
 }
 
+QVariantHash reporting::HtmlReportBuilder::buildMscFailureVariant(const QVariant &errorDetails)
+{
+    reporting::MscFailureReport report = qvariant_cast<reporting::MscFailureReport>(errorDetails);
+    QVariantHash variantHash;
+    variantHash.insert("observerName", report.observerName);
+    variantHash.insert("mscFileName", report.mscFileName);
+    return variantHash;
+}
+
 const QString reporting::HtmlReportBuilder::m_defaultTemplateFile = QStringLiteral(":/template.html");
 
 const QHash<reporting::SpinErrorReportItem::ErrorType, QString> reporting::HtmlReportBuilder::m_errorTypeNames = {
     { reporting::SpinErrorReportItem::DataConstraintViolation, "Data Constraint Violation" },
     { reporting::SpinErrorReportItem::StopConditionViolation, "Stop Condition Violation" },
     { reporting::SpinErrorReportItem::ObserverFailure, "Observer Failure" },
+    { reporting::SpinErrorReportItem::MscFailure, "MSC Failure" },
     { reporting::SpinErrorReportItem::OtherError, "Unknown Error" }
 };
 

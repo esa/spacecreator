@@ -22,6 +22,7 @@
 #include "datareconstructor/datareconstructor.h"
 #include "gdbconnector/gdbconnector.h"
 #include "gdbconnector/process.h"
+#include "standardpaths.h"
 
 #include <QBuffer>
 #include <QDebug>
@@ -37,7 +38,6 @@
 #include <libdveditor/dvexporter.h>
 #include <libiveditor/ivexporter.h>
 #include <modelloader.h>
-#include <qstandardpaths.h>
 #include <shared/ui/veinteractiveobject.h>
 
 using dve::DVExporter;

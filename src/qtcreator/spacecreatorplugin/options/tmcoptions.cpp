@@ -22,6 +22,7 @@
 #include "spacecreatorpluginconstants.h"
 #include "tmcoptionswidget.h"
 
+#include <QDir>
 #include <QSettings>
 #include <tmc/TmcConfig/constants.h>
 
@@ -48,7 +49,38 @@ QWidget *TmcOptions::widget()
             spinExecutable = QString("spin");
         }
         m_widget->setSpinExecutable(spinExecutable.toString());
+
+        QVariant defaultOutputDirectory = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY);
+        if (!defaultOutputDirectory.isValid()) {
+            defaultOutputDirectory = QString("tmc-output");
+        }
+        m_widget->setDefaultOutputDirectory(defaultOutputDirectory.toString());
+
+        QVariant sdl2PromelaTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_SDL2PROMELA_TIMEOUT);
+        if (!sdl2PromelaTimeout.isValid()) {
+            sdl2PromelaTimeout = 60;
+        }
+        m_widget->setSdl2PromelaTimeout(sdl2PromelaTimeout.toInt());
+
+        QVariant ccompilerTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_CCOMPILER_TIMEOUT);
+        if (!ccompilerTimeout.isValid()) {
+            ccompilerTimeout = 60;
+        }
+        m_widget->setCCompilerTimeout(ccompilerTimeout.toInt());
+
+        QVariant externalCommandTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_EXTERNAL_COMMAND_TIMEOUT);
+        if (!externalCommandTimeout.isValid()) {
+            externalCommandTimeout = 60;
+        }
+        m_widget->setExternalCommandTimeout(externalCommandTimeout.toInt());
+
+        QVariant compilerFlags = settings.value(tmc::TmcConstants::SETTINGS_TMC_COMPILER_FLAGS);
+        if (!compilerFlags.isValid()) {
+            compilerFlags = QString("-O2");
+        }
+        m_widget->setCompilerFlags(compilerFlags.toString());
     }
+
     return m_widget;
 }
 
@@ -60,6 +92,12 @@ void TmcOptions::apply()
 
     QSettings settings;
     settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_EXE_KEY, m_widget->getSpinExecutable());
+    settings.setValue(
+            tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, m_widget->getDefaultOutputDirectory());
+    settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SDL2PROMELA_TIMEOUT, m_widget->getSdl2PromelaTimeout());
+    settings.setValue(tmc::TmcConstants::SETTINGS_TMC_CCOMPILER_TIMEOUT, m_widget->getCCompilerTimeout());
+    settings.setValue(tmc::TmcConstants::SETTINGS_TMC_EXTERNAL_COMMAND_TIMEOUT, m_widget->getExternalCommandTimeout());
+    settings.setValue(tmc::TmcConstants::SETTINGS_TMC_COMPILER_FLAGS, m_widget->getCompilerFlags());
 }
 
 void TmcOptions::finish()

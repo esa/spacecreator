@@ -19,6 +19,7 @@
 #pragma once
 
 #include "cmdfunctionattrchange.h"
+#include "implementationshandler.h"
 
 #include <QPointer>
 
@@ -52,7 +53,7 @@ private:
     QString oldImplementationPath() const;
 
 private:
-    const QString m_projectPath;
+    ImplementationsHandler m_implHandler;
 };
 
 } // namespace cmd

@@ -57,6 +57,7 @@ public:
         SedsConverterModelsAux,
         SedsConverterIvConfig,
         SedsConverterIvGenerateParentFunctions,
+        SedsConverterIvDataTypesSedsFilepath,
         SedsConverterSedsPreprocessedFilepath,
         SedsConverterSedsSchemaFilepath,
         SedsConverterSedsExtRef,
@@ -76,6 +77,7 @@ public:
         SedsConverterTransactionNameType,
         SedsConverterEnableFailureReporting,
         SedsConverterFailureReportingType,
+        SedsConverterArrayDimensionBaseIndexingType,
 
         Unknown
     };

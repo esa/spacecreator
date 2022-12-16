@@ -18,13 +18,13 @@
 #include "objectsexporter.h"
 
 #include "common.h"
+#include "standardpaths.h"
 #include "stringtemplate.h"
 #include "templateeditor.h"
 
 #include <QFileDialog>
 #include <QIODevice>
 #include <QPointer>
-#include <QStandardPaths>
 
 namespace templating {
 
@@ -37,7 +37,7 @@ ObjectsExporter::ObjectsExporter(QObject *parent)
 
 QString ObjectsExporter::templatesPath()
 {
-    return QString("%1/export_templates").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    return QString("%1/export_templates").arg(shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 }
 
 QString ObjectsExporter::templateFileExtension()

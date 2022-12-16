@@ -34,6 +34,15 @@ DVBoard::DVBoard(DVObject *parent)
 
 DVBoard::~DVBoard() { }
 
+/**
+ * Returns the board's tile/name for UI purposes
+ * @note Titles of boards have no restrictions.
+ */
+QString DVBoard::titleUI() const
+{
+    return title();
+}
+
 void DVBoard::addPort(DVPort *port)
 {
     if (d->ports.contains(port))

@@ -36,7 +36,7 @@ namespace ive {
  */
 
 ExtProcMonitor::ExtProcMonitor(QWidget *parent)
-    : QWidget(parent, Qt::Dialog)
+    : QWidget(parent, Qt::Window)
     , m_display(new QTextBrowser(this))
     , m_process(new QProcess(this))
 {

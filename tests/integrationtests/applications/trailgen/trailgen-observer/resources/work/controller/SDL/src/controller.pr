@@ -10,11 +10,24 @@ process Controller;
     START;
         /* CIF NEXTSTATE (752, 273), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (1351, 326), (83, 35) */
+    /* CIF state (1083, 334), (70, 35) */
+    state Wait;
+        /* CIF input (1052, 389), (121, 35) */
+        input test(test_param);
+            /* CIF output (1078, 444), (70, 35) */
+            output reset;
+            /* CIF task (1072, 499), (81, 35) */
+            task myval := 0;
+            /* CIF output (1065, 549), (95, 35) */
+            output work(myval);
+            /* CIF NEXTSTATE (1071, 599), (83, 35) */
+            NEXTSTATE Operation;
+    endstate;
+    /* CIF state (1348, 326), (83, 35) */
     state Operation;
-        /* CIF input (1345, 381), (95, 35) */
+        /* CIF input (1342, 381), (95, 35) */
         input done(myval);
-            /* CIF decision (1311, 436), (164, 50) */
+            /* CIF decision (1308, 436), (164, 50) */
             decision myval > test_param * 10;
                 /* CIF ANSWER (1277, 506), (70, 23) */
                 (true):
@@ -31,18 +44,5 @@ process Controller;
                     /* CIF NEXTSTATE (1398, 659), (83, 35) */
                     NEXTSTATE Operation;
             enddecision;
-    endstate;
-    /* CIF state (1083, 334), (70, 35) */
-    state Wait;
-        /* CIF input (1055, 389), (121, 35) */
-        input test(test_param);
-            /* CIF output (1081, 444), (70, 35) */
-            output reset;
-            /* CIF task (1075, 499), (81, 35) */
-            task myval := 0;
-            /* CIF output (1068, 549), (95, 35) */
-            output work(myval);
-            /* CIF NEXTSTATE (1074, 599), (83, 35) */
-            NEXTSTATE Operation;
     endstate;
 endprocess Controller;

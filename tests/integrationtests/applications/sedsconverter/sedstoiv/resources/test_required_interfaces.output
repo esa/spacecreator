@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="Requirer" comment="Host for required interfaces" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="InterfaceWithAsynchronousCommandsInstance_ExecuteAsynchronousActionWithOutArgs_Pi" comment="Execute an asynchronous action with output arguments" layer="default">
     <Input_Parameter name="InputParam" type="InterfaceWithAsynchronousCommands-ExecuteAsynchronousActionWithOutArgs-Type" encoding="ACN"/>

@@ -3,7 +3,7 @@ process Ponger;
     /* CIF TEXT (907, 193), (267, 140) */
     -- Text area for declarations and comments
     
-    dcl pingArg MySequence;
+    dcl pingArg My_Sequence;
     /* CIF ENDTEXT */
     /* CIF START (320, 10), (70, 35) */
     START;
@@ -11,11 +11,11 @@ process Ponger;
         NEXTSTATE Wait;
     /* CIF state (450, 10), (70, 35) */
     state Wait;
-        /* CIF input (430, 65), (104, 35) */
+        /* CIF input (429, 65), (104, 35) */
         input Ping(pingArg);
-            /* CIF output (448, 120), (70, 35) */
+            /* CIF output (447, 120), (70, 35) */
             output Pong;
-            /* CIF NEXTSTATE (448, 175), (70, 35) */
+            /* CIF NEXTSTATE (447, 175), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Ponger;

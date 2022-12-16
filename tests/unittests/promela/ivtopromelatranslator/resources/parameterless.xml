@@ -1,4 +1,4 @@
-<InterfaceView asn1file="mcheck_parameterless.asn">
+<InterfaceView version="1.0" asn1file="mcheck_parameterless.asn">
 <Function name="actuator" is_type="NO" language="SDL" default_implementation="default">
     <Property name="Taste::coordinates" value="66500 15800 103800 67800"/>
 <Provided_Interface name="test" kind="Sporadic" wcet="0" stack_size="5000" priority="1" miat="0" queue_size="1">

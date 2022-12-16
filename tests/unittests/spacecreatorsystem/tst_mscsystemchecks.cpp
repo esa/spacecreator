@@ -20,6 +20,7 @@
 #include "mscsystemchecks.h"
 #include "sharedlibrary.h"
 #include "spacecreatorproject.h"
+#include "standardpaths.h"
 
 #include <QtTest>
 
@@ -45,7 +46,7 @@ private:
 
 void tst_MscSystemChecks::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     msc::initMscEditor();
     shared::initSharedLibrary();
     auto converter = msc::CoordinatesConverter::instance();

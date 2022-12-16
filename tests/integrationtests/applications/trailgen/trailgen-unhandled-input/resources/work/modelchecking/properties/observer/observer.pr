@@ -1,0 +1,37 @@
+system observer;
+    /* CIF TEXT (144, 214), (305, 140) */
+    use datamodel comment 'observer.asn';
+    
+    signal loss_detected renames unhandled input;
+    /* CIF ENDTEXT */
+    channel c
+        from env to observer with loss_detected;
+    endchannel;
+    block observer;
+        signalroute r
+            from env to observer with loss_detected;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process observer;
+            /* CIF TEXT (0, 57), (222, 140) */
+            
+            monitor event Observable_Event;
+            errorstates error;
+            /* CIF ENDTEXT */
+            /* CIF START (478, 194), (70, 35) */
+            START;
+                /* CIF NEXTSTATE (478, 249), (70, 35) */
+                NEXTSTATE Idle;
+            /* CIF state (291, 191), (70, 35) */
+            state Idle;
+                /* CIF input (273, 246), (105, 35) */
+                input loss_detected;
+                    /* CIF NEXTSTATE (291, 301), (70, 35) */
+                    NEXTSTATE error;
+            endstate;
+            /* CIF state (677, 69), (70, 35) */
+            state error;
+            endstate;
+        endprocess observer;
+    endblock;
+endsystem;

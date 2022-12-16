@@ -1,0 +1,196 @@
+starting claim 8
+Never claim moves to line 6	[else]
+  7:	proc  7 (:init::1) system.pml:228 Send 1	-> queue 1 (Actuator_lock)
+ 12:	proc  7 (:init::1) system.pml:230 Send 1	-> queue 2 (Modemanager_lock)
+ 17:	proc  7 (:init::1) system.pml:232 Send 1	-> queue 3 (Mscdemoleaf_lock)
+Never claim moves to line 4	[(inited)]
+Never claim moves to line 16	[else]
+ 36:	proc  6 (Sensor_reading:1) system.pml:65 Send 0	-> queue 4 (Modemanager_reading_channel)
+ 49:	proc  4 (Modemanager_reading:1) system.pml:174 Recv 1	<- queue 2 (Modemanager_lock)
+ 51:	proc  4 (Modemanager_reading:1) system.pml:178 Recv 0	<- queue 4 (Modemanager_reading_channel)
+ 56:	proc  4 (Modemanager_reading:1) system.pml:185 Send 1	-> queue 2 (Modemanager_lock)
+ 58:	proc  6 (Sensor_reading:1) system.pml:65 Send 0	-> queue 4 (Modemanager_reading_channel)
+ 67:	proc  4 (Modemanager_reading:1) system.pml:174 Recv 1	<- queue 2 (Modemanager_lock)
+ 69:	proc  4 (Modemanager_reading:1) system.pml:178 Recv 0	<- queue 4 (Modemanager_reading_channel)
+ 74:	proc  4 (Modemanager_reading:1) system.pml:185 Send 1	-> queue 2 (Modemanager_lock)
+ 76:	proc  6 (Sensor_reading:1) system.pml:65 Send 0	-> queue 4 (Modemanager_reading_channel)
+ 85:	proc  4 (Modemanager_reading:1) system.pml:174 Recv 1	<- queue 2 (Modemanager_lock)
+ 87:	proc  4 (Modemanager_reading:1) system.pml:178 Recv 0	<- queue 4 (Modemanager_reading_channel)
+ 92:	proc  4 (Modemanager_reading:1) system.pml:185 Send 1	-> queue 2 (Modemanager_lock)
+ 94:	proc  6 (Sensor_reading:1) system.pml:65 Send 0	-> queue 4 (Modemanager_reading_channel)
+112:	proc  2 (Egse_tc:1) system.pml:73 Send 0,0	-> queue 5 (Modemanager_tc_channel)
+115:	proc  5 (Modemanager_tc:1) system.pml:195 Recv 1	<- queue 2 (Modemanager_lock)
+117:	proc  5 (Modemanager_tc:1) system.pml:199 Recv 0,0	<- queue 5 (Modemanager_tc_channel)
+129:	proc  5 (Modemanager_tc:1) system.pml:206 Send 1	-> queue 2 (Modemanager_lock)
+132:	proc  4 (Modemanager_reading:1) system.pml:174 Recv 1	<- queue 2 (Modemanager_lock)
+134:	proc  4 (Modemanager_reading:1) system.pml:178 Recv 0	<- queue 4 (Modemanager_reading_channel)
+142:	proc  4 (Modemanager_reading:1) system.pml:35 Send 0	-> queue 6 (Actuator_ctrl_channel)
+145:	proc  0 (Actuator_ctrl:2) system.pml:95 Recv 1	<- queue 1 (Actuator_lock)
+147:	proc  0 (Actuator_ctrl:2) system.pml:99 Recv 0	<- queue 6 (Actuator_ctrl_channel)
+154:	proc  0 (Actuator_ctrl:2) system.pml:57 Send 0	-> queue 7 (Modemanager_feedback_channel)
+160:	proc  0 (Actuator_ctrl:2) system.pml:102 Recv 1	<- queue 3 (Mscdemoleaf_lock)
+168:	proc  0 (Actuator_ctrl:2) system.pml:104 Send 1	-> queue 3 (Mscdemoleaf_lock)
+171:	proc  0 (Actuator_ctrl:2) system.pml:109 Send 1	-> queue 1 (Actuator_lock)
+177:	proc  4 (Modemanager_reading:1) system.pml:185 Send 1	-> queue 2 (Modemanager_lock)
+179:	proc  3 (Modemanager_feedback:3) system.pml:150 Recv 1	<- queue 2 (Modemanager_lock)
+181:	proc  3 (Modemanager_feedback:3) system.pml:154 Recv 0	<- queue 7 (Modemanager_feedback_channel)
+193:	proc  3 (Modemanager_feedback:3) system.pml:53 Send 0,0,0	-> queue 8 (Egse_tm_channel)
+197:	proc  1 (Egse_tm:4) system.pml:122 Recv 0,0,0	<- queue 8 (Egse_tm_channel)
+203:	proc  3 (Modemanager_feedback:3) system.pml:157 Recv 1	<- queue 3 (Mscdemoleaf_lock)
+212:	proc  3 (Modemanager_feedback:3) system.pml:159 Send 1	-> queue 3 (Mscdemoleaf_lock)
+215:	proc  3 (Modemanager_feedback:3) system.pml:164 Send 1	-> queue 2 (Modemanager_lock)
+      Observer entered errorstate: mscdemoleaf
+spin: scl.pml:14, Error: assertion violated
+spin: text of failed assertion: assert(!((global_state.mscdemoleaf.state==1)))
+Never claim moves to line 14	[assert(!((global_state.mscdemoleaf.state==1)))]
+spin: trail ends after 216 steps
+#processes: 6
+		nothing.data.no_event.dummy = 0
+		nothing.data.system_startup.dummy = 0
+		nothing.data.input_event.source = 0
+		nothing.data.input_event.dest = 0
+		nothing.data.input_event.event.data.actuator.data.msg_in.data.input_none.dummy = 0
+		nothing.data.input_event.event.data.actuator.data.msg_in.data.ctrl.x = 0
+		nothing.data.input_event.event.data.actuator.data.msg_in.selection = 0
+		nothing.data.input_event.event.data.actuator.data.msg_out.data.feedback.x = 0
+		nothing.data.input_event.event.data.actuator.data.msg_out.selection = 0
+		nothing.data.input_event.event.data.actuator.selection = 0
+		nothing.data.input_event.event.data.egse.data.msg_in.data.tm.reprt.reading = 0
+		nothing.data.input_event.event.data.egse.data.msg_in.data.tm.reprt.ctrl = 0
+		nothing.data.input_event.event.data.egse.data.msg_in.data.tm.reprt.feedback = 0
+		nothing.data.input_event.event.data.egse.data.msg_in.selection = 0
+		nothing.data.input_event.event.data.egse.data.msg_out.data.tc.cfg.param_a = 0
+		nothing.data.input_event.event.data.egse.data.msg_out.data.tc.cfg.param_b = 0
+		nothing.data.input_event.event.data.egse.data.msg_out.selection = 0
+		nothing.data.input_event.event.data.egse.selection = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_in.data.input_none.dummy = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_in.data.feedback.x = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_in.data.reading.x = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_in.data.tc.cfg.param_a = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_in.data.tc.cfg.param_b = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_in.selection = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_out.data.ctrl.x = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_out.data.tm.reprt.reading = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_out.data.tm.reprt.ctrl = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_out.data.tm.reprt.feedback = 0
+		nothing.data.input_event.event.data.modemanager.data.msg_out.selection = 0
+		nothing.data.input_event.event.data.modemanager.selection = 0
+		nothing.data.input_event.event.data.sensor.data.msg_out.data.reading.x = 0
+		nothing.data.input_event.event.data.sensor.data.msg_out.selection = 0
+		nothing.data.input_event.event.data.sensor.selection = 0
+		nothing.data.input_event.event.selection = 0
+		nothing.data.output_event.source = 0
+		nothing.data.output_event.dest = 0
+		nothing.data.output_event.event.data.actuator.data.msg_in.data.input_none.dummy = 0
+		nothing.data.output_event.event.data.actuator.data.msg_in.data.ctrl.x = 0
+		nothing.data.output_event.event.data.actuator.data.msg_in.selection = 0
+		nothing.data.output_event.event.data.actuator.data.msg_out.data.feedback.x = 0
+		nothing.data.output_event.event.data.actuator.data.msg_out.selection = 0
+		nothing.data.output_event.event.data.actuator.selection = 0
+		nothing.data.output_event.event.data.egse.data.msg_in.data.tm.reprt.reading = 0
+		nothing.data.output_event.event.data.egse.data.msg_in.data.tm.reprt.ctrl = 0
+		nothing.data.output_event.event.data.egse.data.msg_in.data.tm.reprt.feedback = 0
+		nothing.data.output_event.event.data.egse.data.msg_in.selection = 0
+		nothing.data.output_event.event.data.egse.data.msg_out.data.tc.cfg.param_a = 0
+		nothing.data.output_event.event.data.egse.data.msg_out.data.tc.cfg.param_b = 0
+		nothing.data.output_event.event.data.egse.data.msg_out.selection = 0
+		nothing.data.output_event.event.data.egse.selection = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_in.data.input_none.dummy = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_in.data.feedback.x = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_in.data.reading.x = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_in.data.tc.cfg.param_a = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_in.data.tc.cfg.param_b = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_in.selection = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_out.data.ctrl.x = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_out.data.tm.reprt.reading = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_out.data.tm.reprt.ctrl = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_out.data.tm.reprt.feedback = 0
+		nothing.data.output_event.event.data.modemanager.data.msg_out.selection = 0
+		nothing.data.output_event.event.data.modemanager.selection = 0
+		nothing.data.output_event.event.data.sensor.data.msg_out.data.reading.x = 0
+		nothing.data.output_event.event.data.sensor.data.msg_out.selection = 0
+		nothing.data.output_event.event.data.sensor.selection = 0
+		nothing.data.output_event.event.selection = 0
+		nothing.data.unhandled_input.source = 0
+		nothing.data.unhandled_input.dest = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_in.data.input_none.dummy = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_in.data.ctrl.x = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_in.selection = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_out.data.feedback.x = 0
+		nothing.data.unhandled_input.event.data.actuator.data.msg_out.selection = 0
+		nothing.data.unhandled_input.event.data.actuator.selection = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_in.data.tm.reprt.reading = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_in.data.tm.reprt.ctrl = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_in.data.tm.reprt.feedback = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_in.selection = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_out.data.tc.cfg.param_a = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_out.data.tc.cfg.param_b = 0
+		nothing.data.unhandled_input.event.data.egse.data.msg_out.selection = 0
+		nothing.data.unhandled_input.event.data.egse.selection = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_in.data.input_none.dummy = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_in.data.feedback.x = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_in.data.reading.x = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_in.data.tc.cfg.param_a = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_in.data.tc.cfg.param_b = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_in.selection = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_out.data.ctrl.x = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_out.data.tm.reprt.reading = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_out.data.tm.reprt.ctrl = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_out.data.tm.reprt.feedback = 0
+		nothing.data.unhandled_input.event.data.modemanager.data.msg_out.selection = 0
+		nothing.data.unhandled_input.event.data.modemanager.selection = 0
+		nothing.data.unhandled_input.event.data.sensor.data.msg_out.data.reading.x = 0
+		nothing.data.unhandled_input.event.data.sensor.data.msg_out.selection = 0
+		nothing.data.unhandled_input.event.data.sensor.selection = 0
+		nothing.data.unhandled_input.event.selection = 0
+		nothing.selection = 1
+		mscdemoleaf_0_sig1_param0 = 0
+		mscdemoleaf_0_sig0_param0 = 0
+		inited = 1
+		queue 6 (Actuator_ctrl_channel): 
+		Actuator_ctrl_signal_parameter = 0
+		Actuator_ctrl_channel_used = 1
+		queue 8 (Egse_tm_channel): 
+		Egse_tm_signal_parameter.reading = 0
+		Egse_tm_signal_parameter.ctrl = 0
+		Egse_tm_signal_parameter.feedback = 0
+		Egse_tm_channel_used = 1
+		queue 7 (Modemanager_feedback_channel): 
+		Modemanager_feedback_signal_parameter = 0
+		Modemanager_feedback_channel_used = 1
+		queue 4 (Modemanager_reading_channel): 
+		Modemanager_reading_signal_parameter = 0
+		Modemanager_reading_channel_used = 1
+		queue 5 (Modemanager_tc_channel): 
+		Modemanager_tc_signal_parameter.param_a = 0
+		Modemanager_tc_signal_parameter.param_b = 0
+		Modemanager_tc_channel_used = 1
+		global_state.actuator.state = 0
+		global_state.actuator.init_done = 0
+		global_state.actuator.x = 0
+		global_state.modemanager.state = 1
+		global_state.modemanager.init_done = 0
+		global_state.modemanager.cfg.param_a = 0
+		global_state.modemanager.cfg.param_b = 0
+		global_state.modemanager.xin = 0
+		global_state.modemanager.xout = 0
+		global_state.modemanager.xfeedback = 0
+		global_state.modemanager.rprt.reading = 0
+		global_state.modemanager.rprt.ctrl = 0
+		global_state.modemanager.rprt.feedback = 0
+		global_state.mscdemoleaf.state = 1
+		global_state.mscdemoleaf.init_done = 0
+		global_state.timers.actuator.dummy = 0
+		global_state.timers.modemanager.dummy = 0
+		global_state.timers.dummy_entry.dummy = 0
+		queue 1 (Actuator_lock): [1]
+		queue 2 (Modemanager_lock): [1]
+		queue 3 (Mscdemoleaf_lock): [1]
+216:	proc  5 (Modemanager_tc:1) system.pml:192 (state 75)
+216:	proc  4 (Modemanager_reading:1) system.pml:171 (state 70)
+216:	proc  3 (Modemanager_feedback:3) system.pml:147 (state 169)
+216:	proc  2 (Egse_tc:1) system.pml:142 (state 71)
+216:	proc  1 (Egse_tm:4) system.pml:116 (state 12)
+216:	proc  0 (Actuator_ctrl:2) system.pml:92 (state 192)
+216:	proc  - (never_0:1) scl.pml:10 (state 14)
+8 processes created

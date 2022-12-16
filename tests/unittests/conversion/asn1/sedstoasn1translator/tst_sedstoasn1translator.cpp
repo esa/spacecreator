@@ -581,9 +581,9 @@ void tst_SedsToAsn1Translator::testTranslateContainerSimpleWithFixedValueEntry()
     QCOMPARE(entryComponentTypeInteger->typeName(), "INTEGER");
 
     const auto &entryComponentTypeConstraints = entryComponentTypeInteger->constraints();
-    QCOMPARE(entryComponentTypeConstraints.constraints().size(), 2);
+    QCOMPARE(entryComponentTypeConstraints.constraints().size(), 1);
 
-    const auto &entryComponentTypeValueConstraint = entryComponentTypeConstraints.constraints().at(1);
+    const auto &entryComponentTypeValueConstraint = entryComponentTypeConstraints.constraints().at(0);
     QVERIFY(entryComponentTypeValueConstraint);
 
     const auto &entryComponentTypeValueRangeConstraint =

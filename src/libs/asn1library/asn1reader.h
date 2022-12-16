@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "errorhub.h"
+
 #include <QCache>
 #include <QObject>
 #include <QPair>
@@ -61,8 +63,11 @@ public:
 
     QStringList defaultParameter() const;
 
+    shared::ErrorItem::TaskType errorType(const QString &error) const;
     int lineNumberFromError(const QString &error) const;
     QString fileNameFromError(const QString &error) const;
+    int lineNumberFromWarning(const QString &error) const;
+    QString fileNameFromWarning(const QString &error) const;
 
 Q_SIGNALS:
     void parseError(const QString &error);

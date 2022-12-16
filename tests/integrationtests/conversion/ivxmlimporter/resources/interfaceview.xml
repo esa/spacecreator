@@ -1,4 +1,4 @@
-<InterfaceView asn1file="ivtest.asn">
+<InterfaceView version="1.0" asn1file="ivtest.asn">
 <Function name="Pinger" is_type="NO" language="SDL">
     <Property name="Taste::coordinates" value="15200 21200 35200 29200"/>
     <ContextParameter name="pinger_val" type="MyInteger" value="314"/>

@@ -3,9 +3,9 @@ COM-N7SPACE-ARRAYSIZETHRESHOLD DEFINITIONS ::= BEGIN
 DataItem ::= INTEGER(0 .. 255)
 IndexItem ::= INTEGER(0 .. 16)
 -- A 1-D array with maximum size
-BasicArray1D ::= SEQUENCE (SIZE(2)) OF DataItem(0 .. 255)
+BasicArray1D ::= SEQUENCE (SIZE(2)) OF DataItem
 -- A 2D array
-Matrix4x4 ::= SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF DataItem(0 .. 255)
-ArrayWithIndexDataRef ::= SEQUENCE (SIZE(2)) OF DataItem(0 .. 255)
+Matrix4x4 ::= SEQUENCE (SIZE(2)) OF SEQUENCE (SIZE(2)) OF DataItem
+ArrayWithIndexDataRef ::= SEQUENCE (SIZE(2)) OF DataItem
 END
 

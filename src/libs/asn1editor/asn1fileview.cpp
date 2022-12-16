@@ -146,7 +146,7 @@ void ASN1FileView::selectFile()
  */
 void ASN1FileView::fillPreview()
 {
-    if (!fileContentVisible()) {
+    if (!fileContentVisible() && isVisible()) {
         return;
     }
 

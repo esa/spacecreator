@@ -71,8 +71,8 @@ public Q_SLOTS:
     virtual void applyColorScheme() = 0;
 
 protected:
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -86,6 +86,8 @@ protected:
     virtual TextItem *initTextItem();
     virtual void updateTextPosition();
     void updateText();
+    void updateVisibility();
+    virtual bool isItemVisible() const;
 
 protected:
     const QPointer<VEObject> m_dataObject;
@@ -95,6 +97,8 @@ protected:
     QBrush m_brush;
     QPen m_pen;
     QFont m_font;
+
+    inline static bool s_mouseReleased = false;
 };
 
 } // namespace ui

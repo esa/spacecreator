@@ -23,10 +23,19 @@
 #include <QFile>
 #include <QRegularExpression>
 
-reporting::SpinErrorReport reporting::SpinErrorParser::parse(
-        const QStringList &, const QStringList &sclFiles, const QList<RawErrorItem> &errors, const QStringList &) const
+reporting::SpinErrorReport reporting::SpinErrorParser::parse(const QStringList &, const QStringList &sclFiles,
+        const QList<RawErrorItem> &errors, const QStringList &mscObserverFiles) const
 {
     reporting::SpinErrorReport report;
+
+    // read msc files
+    QHash<QString, QString> mscObservers;
+    for (auto mscObserverFile : mscObserverFiles) {
+        const auto mscFileText = readFile(mscObserverFile);
+        for (auto mscObserverName : parseMscObserver(mscFileText)) {
+            mscObservers.insert(mscObserverName, mscObserverFile);
+        }
+    }
 
     // read scl files
     QStringList sclConditions;
@@ -45,7 +54,7 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(
             continue;
         }
 
-        SpinErrorReportItem newReportItem = parseTrace(spinTrace, sclConditions);
+        SpinErrorReportItem newReportItem = parseTrace(spinTrace, sclConditions, mscObservers);
         newReportItem.errorNumber = errorIndex++;
         newReportItem.scenario = scenario;
         report.append(newReportItem);
@@ -55,7 +64,7 @@ reporting::SpinErrorReport reporting::SpinErrorParser::parse(
 }
 
 reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
-        const QString &spinTraces, const QStringList &sclConditions) const
+        const QString &spinTraces, const QStringList &sclConditions, const QHash<QString, QString> &mscObservers) const
 {
     SpinErrorReportItem reportItem;
     // an observer failure (entering success state) can be detected
@@ -105,6 +114,15 @@ reporting::SpinErrorReportItem reporting::SpinErrorParser::parseTrace(
     if (observerFailureErrorStateMatch.hasMatch()) {
         // found observer failure (error state)
         auto observerName = observerFailureErrorStateMatch.captured(ErrorDetailsMatch);
+        // check for MSC observer
+        if (mscObservers.contains(observerName)) {
+            auto report = parseMscFailure(observerName, mscObservers.value(observerName));
+            reportItem.errorDepth = 0;
+            reportItem.errorType = SpinErrorReportItem::MscFailure;
+            reportItem.rawErrorDetails = observerFailureErrorStateMatch.captured(RawErrorMatch).trimmed();
+            reportItem.parsedErrorDetails = report;
+            return reportItem;
+        }
         auto report = parseObserverFailureErrorState(observerName);
         reportItem.errorDepth = 0;
         reportItem.errorType = SpinErrorReportItem::ObserverFailure;
@@ -273,6 +291,17 @@ QVariant reporting::SpinErrorParser::parseObserverFailureSuccessState(const QStr
     return observerFailure;
 }
 
+QVariant reporting::SpinErrorParser::parseMscFailure(const QString &parsedErrorToken, const QString &mscFileName) const
+{
+    MscFailureReport violationReport;
+    violationReport.observerName = parsedErrorToken;
+    violationReport.mscFileName = mscFileName;
+
+    QVariant mscFailure;
+    mscFailure.setValue(violationReport);
+    return mscFailure;
+}
+
 QString reporting::SpinErrorParser::readFile(const QString &filePath)
 {
     QFile file(filePath);
@@ -304,6 +333,17 @@ QRegularExpression reporting::SpinErrorParser::buildStopConditionViolationRegex(
     // conditions
     pattern += QStringLiteral("(.+?);");
     return QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption);
+}
+
+QRegularExpression reporting::SpinErrorParser::buildStripCommentsRegex()
+{
+    // match multi-line comments (/* ... */): opening token, comment text, closing token
+    QString pattern = QStringLiteral("(?:\\/\\*");
+    pattern += QStringLiteral("(?:[^\\*]|\\**[^\\*\\/])*");
+    pattern += QStringLiteral("\\*+\\/)");
+    // match single line comments
+    pattern += QStringLiteral("|(?:\\/\\/[\\S ]*)");
+    return QRegularExpression(pattern, QRegularExpression::MultilineOption);
 }
 
 QString reporting::SpinErrorParser::removeParentheses(const QString &numberToken)
@@ -349,6 +389,23 @@ reporting::StopConditionViolationReport::ViolationType reporting::SpinErrorParse
 QStringList reporting::SpinErrorParser::splitExpression(const QString &expression)
 {
     return expression.split(QRegularExpression("\\s+(?:or|xor|and)\\s+", QRegularExpression::CaseInsensitiveOption));
+}
+
+QStringList reporting::SpinErrorParser::parseMscObserver(const QString &mscFileText)
+{
+    // strip comments from a msc file
+    QString mscFileTextStrip = mscFileText;
+    const auto stringCommentsRegex = buildStripCommentsRegex();
+    mscFileTextStrip.replace(stringCommentsRegex, QString());
+    // match msc observer names in a file
+    const QRegularExpression mscMatch("msc\\s+([a-zA-Z_][a-zA-Z0-9_]+)\\s*;", QRegularExpression::MultilineOption);
+    auto matches = mscMatch.globalMatch(mscFileTextStrip);
+    QStringList foundMscObservers;
+    while (matches.hasNext()) {
+        const auto match = matches.next();
+        foundMscObservers.append(match.captured(MscObserverParseTokens::ObserverName));
+    }
+    return foundMscObservers;
 }
 
 void reporting::SpinErrorParser::parseVariableName(

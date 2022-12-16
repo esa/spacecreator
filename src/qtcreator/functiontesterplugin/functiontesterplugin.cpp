@@ -21,11 +21,13 @@
 
 #include "dvcore/dvhwlibraryreader.h"
 #include "pluginconstants.h"
+#include "standardpaths.h"
 
 #include <QApplication>
 #include <QBoxLayout>
 #include <QComboBox>
 #include <QDesktopServices>
+#include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QFormLayout>
@@ -34,8 +36,6 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QStandardPaths>
-#include <QDir>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <editormanager/editormanager.h>
 #include <libiveditor/interfacedocument.h>
@@ -57,7 +57,7 @@ namespace spctr {
 const QString boardsConfigFileName = "boards_config.txt";
 
 FunctionTesterPlugin::FunctionTesterPlugin()
-    : boardsConfigLoader(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + QDir::separator()
+    : boardsConfigLoader(shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + QDir::separator()
             + boardsConfigFileName)
 {
 }
@@ -412,7 +412,7 @@ auto FunctionTesterPlugin::boardOptionsDialog(QWidget *parent, const QString &bo
 auto FunctionTesterPlugin::selectScriptDialog(QWidget *parent, const QString &boardName, QLineEdit *scriptPathEdit)
         -> void
 {
-    QString defaultDirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    QString defaultDirPath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     QString selectedScriptPath = QFileDialog::getOpenFileName(
             parent, tr("Select GDB script for running tests..."), defaultDirPath, tr("*.gdb"));
     if (!selectedScriptPath.isEmpty()) {

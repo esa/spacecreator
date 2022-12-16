@@ -10,7 +10,7 @@ IMPORTS
    Locka-Event, Lockb-Event, Sharedmemory-Event, Testgui-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Outputobserver-States ::= ENUMERATED {wantstoenter, wait}
+Outputobserver-States ::= ENUMERATED {wait, wantstoenter}
 
 Outputobserver-Context ::= SEQUENCE {
    state Outputobserver-States,

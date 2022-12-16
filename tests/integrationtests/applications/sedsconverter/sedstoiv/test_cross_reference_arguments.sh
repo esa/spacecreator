@@ -7,6 +7,7 @@ AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
 UPDATE_DATAVIEW="asn2aadlPlus -f dataview-uniq.asn DataView.aadl -aadlv2"
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
+XMLDIFF="xmldiff"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"
@@ -34,7 +35,7 @@ sed -e '$s/$/\n/' -s package1.acn package1-component.acn package2.acn > dataview
 
 # Execute commands in chain to make sure that the generated interface view matches
 # the reference and allows to succesfully generate derived artefacts
-$DIFF interfaceview.xml ../resources/test_cross_reference_arguments.output \
+$XMLDIFF interfaceview.xml ../resources/test_cross_reference_arguments.output \
   && $DIFF package1.asn ../resources/test_cross_reference_arguments_package1_asn.output \
   && $DIFF package1.acn ../resources/test_cross_reference_arguments_package1_acn.output \
   && $DIFF package1-component.asn ../resources/test_cross_reference_arguments_package1_component_asn.output \

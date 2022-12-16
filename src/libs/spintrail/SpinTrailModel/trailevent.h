@@ -35,6 +35,7 @@ public:
         CONTINUOUS_SIGNAL,
         SET_TIMER_EVENT,
         RESET_TIMER_EVENT,
+        UNHANDLED_INPUT_EVENT,
     };
 
     /**

@@ -36,6 +36,8 @@ public:
     explicit DVBoard(DVObject *parent = nullptr);
     ~DVBoard() override;
 
+    virtual QString titleUI() const override;
+
     void addPort(DVPort *port);
 
     QList<DVPort *> ports() const;

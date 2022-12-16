@@ -36,6 +36,7 @@ struct SpinErrorReportItem {
         DataConstraintViolation = 0,
         StopConditionViolation,
         ObserverFailure,
+        MscFailure,
         OtherError
     };
 

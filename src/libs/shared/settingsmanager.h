@@ -85,9 +85,10 @@ public:
     {
         QString key = keyString<T>(type);
         QVariant v = QVariant::fromValue<V>(value);
-        instance()->storage()->setValue(key, v);
-        instance()->storage()->sync();
-        Q_EMIT instance()->settingChanged(key, v);
+        SettingsManager *settings = instance();
+        settings->storage()->setValue(key, v);
+        settings->storage()->sync();
+        Q_EMIT settings->settingChanged(key, v);
     }
 
     template<typename T>

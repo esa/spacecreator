@@ -6,7 +6,7 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Lock-States ::= ENUMERATED {idle, wait-nocontention, wait-turn, writing}
+Lock-States ::= ENUMERATED {wait-nocontention, wait-turn, writing, idle}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,

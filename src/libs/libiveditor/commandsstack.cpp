@@ -35,7 +35,13 @@ namespace cmd {
 
 CommandsStack::CommandsStack(QObject *parent)
     : shared::cmd::CommandsStackBase(parent)
+    , m_check(nullptr)
 {
+}
+
+void CommandsStack::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
+{
+    m_check = check;
 }
 
 bool CommandsStack::push(QUndoCommand *command)
@@ -44,10 +50,15 @@ bool CommandsStack::push(QUndoCommand *command)
         return false;
     }
 
-    if (auto nameCommand = dynamic_cast<CmdFunctionAttrChange *>(command)) {
-        connect(nameCommand, &CmdFunctionAttrChange::nameChanged, this, &CommandsStack::nameChanged,
+    if (auto fnCommand = dynamic_cast<CmdFunctionAttrChange *>(command)) {
+        fnCommand->setAsn1SystemChecks(m_check);
+        connect(fnCommand, &CmdFunctionAttrChange::asn1FilesImported, this, &CommandsStack::asn1FilesImported,
                 Qt::UniqueConnection);
-        connect(nameCommand, &CmdFunctionAttrChange::defaultImplementationChanged, this,
+        connect(fnCommand, &CmdFunctionAttrChange::asn1FilesRemoved, this, &CommandsStack::asn1FileRemoved,
+                Qt::UniqueConnection);
+        connect(fnCommand, &CmdFunctionAttrChange::nameChanged, this, &CommandsStack::nameChanged,
+                Qt::UniqueConnection);
+        connect(fnCommand, &CmdFunctionAttrChange::defaultImplementationChanged, this,
                 &CommandsStack::defaultImplementationChanged, Qt::UniqueConnection);
     }
     if (auto nameCommand = dynamic_cast<CmdIfaceAttrChange *>(command)) {
@@ -76,7 +87,7 @@ bool CommandsStack::push(QUndoCommand *command)
     if (auto importCommand = dynamic_cast<ASN1ComponentsImport *>(command)) {
         connect(importCommand, &ASN1ComponentsImport::asn1FilesImported, this, &CommandsStack::asn1FilesImported,
                 Qt::UniqueConnection);
-        connect(importCommand, &ASN1ComponentsImport::asn1FileRemoved, this, &CommandsStack::asn1FileRemoved,
+        connect(importCommand, &ASN1ComponentsImport::asn1FilesRemoved, this, &CommandsStack::asn1FileRemoved,
                 Qt::UniqueConnection);
     }
     m_undoStack->push(command);

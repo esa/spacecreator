@@ -17,7 +17,6 @@
 
 #include "interfacedocument.h"
 
-#include "actionsbar.h"
 #include "archetypes/archetypelibrary.h"
 #include "archetypes/archetypemodel.h"
 #include "archetypes/archetypeobject.h"
@@ -27,19 +26,14 @@
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
 #include "commands/cmdconnectionlayermanage.h"
+#include "commands/implementationshandler.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
-#include "interface/objectstreeview.h"
-#include "itemeditor/common/ivutils.h"
-#include "itemeditor/graphicsitemhelpers.h"
-#include "itemeditor/ivfunctiongraphicsitem.h"
+#include "ivcoreutils.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivarchetypelibraryreference.h"
-#include "ivcomment.h"
-#include "ivconnection.h"
-#include "ivconnectiongroup.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
@@ -49,6 +43,7 @@
 #include "ivxmlreader.h"
 #include "propertytemplatemanager.h"
 #include "propertytemplatewidget.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QAction>
 #include <QBuffer>
@@ -63,8 +58,8 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSplitter>
-#include <QStandardPaths>
 #include <QUndoStack>
+#include <QItemSelectionModel>
 #include <QVBoxLayout>
 #include <algorithm>
 #include <filesystem>
@@ -191,9 +186,16 @@ bool InterfaceDocument::load(const QString &path)
     return loaded;
 }
 
+/**
+ * Does load the imported and shared components.
+ * If they are loaded already, nothing is done.
+ */
 bool InterfaceDocument::loadAvailableComponents()
 {
-    return reloadComponentModel() && reloadSharedTypeModel();
+    if (d->importModel->isEmpty() && d->sharedModel->isEmpty()) {
+        return reloadComponentModel() && reloadSharedTypeModel();
+    }
+    return false;
 }
 
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
@@ -609,6 +611,7 @@ void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
     }
 
     d->asnCheck = check;
+    d->commandsStack->setAsn1Check(check);
 
     connect(d->asnCheck->asn1Storage(), &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this,
             &ive::InterfaceDocument::checkAllInterfacesForAsn1Compliance, Qt::QueuedConnection);
@@ -842,7 +845,7 @@ static inline void copyImplementation(
 {
     for (shared::VEObject *object : objects) {
         if (auto fn = object->as<ivm::IVFunctionType *>()) {
-            const QString subPath = shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
+            const QString subPath = ive::kRootImplementationPath + QDir::separator() + object->title().toLower();
             shared::copyDir(projectDir.filePath(subPath), targetDir.filePath(subPath));
             copyImplementation(projectDir, targetDir, fn->children());
         }
@@ -872,7 +875,8 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         (*it)->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), targetDir.dirName());
     }
 
-    if (!exportObjects(exporter(), objects, d->archetypesModel, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
+    if (!exportObjects(
+                exporter(), objects, d->archetypesModel, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
         return false;
     }
 
@@ -902,6 +906,8 @@ bool InterfaceDocument::loadImpl(const QString &path)
         return false;
     }
 
+    loadAvailableComponents();
+
     shared::ErrorHub::setCurrentFile(path);
     ivm::IVXMLReader parser;
     if (!parser.readFile(path)) {
@@ -910,7 +916,9 @@ bool InterfaceDocument::loadImpl(const QString &path)
         return false;
     }
 
-    setObjects(parser.parsedObjects());
+    QVector<ivm::IVObject *> parsedObjects = parser.parsedObjects();
+    ivm::IVObject::sortObjectList(parsedObjects);
+    setObjects(parsedObjects);
 
     auto layers = parser.parsedLayers();
     ivm::IVObject::sortObjectListByTitle(layers);

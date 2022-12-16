@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="Controller" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="18400 36600 38400 44600"/>
 <Provided_Interface name="Trigger" kind="Cyclic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" dispatch_offset="0" period="1000" priority="1">

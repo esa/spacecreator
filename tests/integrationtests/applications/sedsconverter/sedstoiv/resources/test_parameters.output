@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="MegaComponent" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="Get_ProvidedInterface_ReadOnlySync_Pi" kind="Protected" layer="default">
     <Output_Parameter name="Param" type="MyInteger" encoding="ACN"/>

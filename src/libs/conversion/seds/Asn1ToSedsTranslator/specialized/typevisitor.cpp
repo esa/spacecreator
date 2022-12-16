@@ -47,7 +47,6 @@
 #include <seds/SedsModel/types/booleandatatype.h>
 #include <seds/SedsModel/types/compositedatatype.h>
 #include <seds/SedsModel/types/containerdatatype.h>
-#include <seds/SedsModel/types/datatype.h>
 #include <seds/SedsModel/types/encodings/coreintegerencoding.h>
 #include <seds/SedsModel/types/encodings/falsevalue.h>
 #include <seds/SedsModel/types/enumerateddatatype.h>
@@ -102,11 +101,13 @@ static const QString BYTE_TYPE_NAME = "Byte";
 namespace conversion::seds::translator {
 
 TypeVisitor::Context::Context(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions,
-        QString name, ::seds::model::Package *sedsPackage, const Options &options)
+        QString name, ::seds::model::Package *sedsPackage, const std::vector<::seds::model::DataType> &sedsDataTypes,
+        const Options &options)
     : m_asn1Model(asn1Model)
     , m_definitions(definitions)
     , m_name(std::move(name))
     , m_sedsPackage(sedsPackage)
+    , m_sedsDataTypes(sedsDataTypes)
     , m_options(options)
 {
 }
@@ -133,6 +134,23 @@ auto TypeVisitor::Context::package() -> ::seds::model::Package *
 auto TypeVisitor::Context::options() -> const Options &
 {
     return m_options;
+}
+
+auto TypeVisitor::Context::sedsDataTypes() -> const std::vector<::seds::model::DataType> &
+{
+    return m_sedsDataTypes;
+}
+
+auto TypeVisitor::Context::findDataType(const QString &typeName) -> const ::seds::model::DataType *
+{
+    auto result = std::find_if(m_sedsDataTypes.begin(), m_sedsDataTypes.end(),
+            [&](const auto &dataType) { return dataTypeNameStr(dataType) == typeName; });
+
+    if (result != m_sedsDataTypes.end()) {
+        return &(*result);
+    } else {
+        return nullptr;
+    }
 }
 
 TypeVisitor::TypeVisitor(Context &context)
@@ -342,17 +360,6 @@ static inline auto isTypePresentInPackage(::seds::model::Package *package, const
             [&name](const auto &type) { return getTypeName(type) == name; });
 }
 
-static inline auto retrieveTypeFromPackage(::seds::model::Package *package, const QString &name)
-        -> const ::seds::model::DataType &
-{
-    for (const auto &type : package->dataTypes()) {
-        if (getTypeName(type) == name) {
-            return type;
-        }
-    }
-    throw TranslationException("Referenced type not found");
-}
-
 template<typename TypeName>
 static bool typeEncodingMatches(TypeName &type1, TypeName &type2);
 
@@ -489,15 +496,24 @@ static inline auto expectedTypeMatchesExistingOne(TypeVisitor::Context &context,
         -> bool
 {
     const auto typeName = type->typeName();
-    const auto &referencedType = retrieveTypeFromPackage(context.package(), typeName);
+    const auto referencedType = context.findDataType(typeName);
+    if (referencedType == nullptr) {
+        auto errorMessage = QString("Unable to find referenced type '%1'").arg(typeName);
+        throw TranslationException(std::move(errorMessage));
+    }
     // Create temporary package to perform "look-ahead" translation into SEDS
     // It is much easier to verify encoding in SEDS than ASN.1/ACN
     ::seds::model::Package tempPackage;
-    TypeVisitor::Context tempContext(context.model(), context.definitions(), typeName, &tempPackage, context.options());
+    TypeVisitor::Context tempContext(
+            context.model(), context.definitions(), typeName, &tempPackage, context.sedsDataTypes(), context.options());
     TypeVisitor visitor(tempContext);
     type->accept(visitor);
-    const auto &expectedType = retrieveTypeFromPackage(&tempPackage, typeName);
-    return typeEncodingMatches(referencedType, expectedType);
+    const auto expectedType = tempPackage.dataType(typeName);
+    if (expectedType == nullptr) {
+        auto errorMessage = QString("Unable to find expected type '%1'").arg(typeName);
+        throw TranslationException(std::move(errorMessage));
+    }
+    return typeEncodingMatches(*referencedType, *expectedType);
 }
 
 static inline auto addOptionalIndicators(TypeVisitor::Context &context, const ::Asn1Acn::Types::Sequence &type,
@@ -614,7 +630,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
             }
         }
         const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
-        Context context(m_context.model(), m_context.definitions(), typeName, m_context.package(), m_context.options());
+        Context context(m_context.model(), m_context.definitions(), typeName, m_context.package(),
+                m_context.sedsDataTypes(), m_context.options());
         TypeVisitor visitor(context);
         component->type()->accept(visitor);
         addEntry(EntryType::Entry, typeName, component->name(), sedsType);
@@ -630,8 +647,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Sequence &type)
     m_context.package()->addDataType(std::move(sedsType));
 }
 
-static inline auto createChoiceIndexType(
-        QString name, const ::Asn1Acn::Types::Choice &type, ::seds::model::Package *const package) -> void
+static inline auto createChoiceIndexType(QString name, const ::Asn1Acn::Types::Choice &type)
+        -> ::seds::model::EnumeratedDataType
 {
     ::seds::model::EnumeratedDataType sedsType;
 
@@ -651,13 +668,14 @@ static inline auto createChoiceIndexType(
     }
 
     sedsType.setName(std::move(name));
-    package->addDataType(std::move(sedsType));
+
+    return sedsType;
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
 {
     const auto indexTypeName = CHOICE_INDEX_TYPE_NAME_PATTERN.arg(m_context.name());
-    createChoiceIndexType(indexTypeName, type, m_context.package());
+    auto indexType = createChoiceIndexType(indexTypeName, type);
 
     ::seds::model::ContainerDataType parentSedsType;
     parentSedsType.setAbstract(true);
@@ -668,7 +686,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
     const auto &withComponentConstraints = type.withComponentConstraints();
     const auto hasConstraints = !withComponentConstraints.empty();
 
-    int computedValue = 0;
+    std::size_t computedValue = 0;
     for (const auto &component : type.components()) {
         if (hasConstraints && withComponentConstraints.count(component->name()) == 0) {
             continue;
@@ -680,7 +698,7 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
         ::seds::model::ContainerValueConstraint constraint;
         ::seds::model::EntryRef entryReference(CHOICE_INDEX_MEMBER_NAME);
         constraint.setEntry(std::move(entryReference));
-        constraint.setValue(QString::number(computedValue++));
+        constraint.setValue(indexType.enumerationList().at(computedValue++).nameStr());
         innerSedsType.addConstraint(std::move(constraint));
 
         if (component->type()->typeEnum() == Asn1Acn::Types::Type::NULLTYPE) {
@@ -691,8 +709,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
             addEntry(EntryType::Entry, component->type()->typeName(), CHOICE_ELEMENT_MEMBER_NAME, innerSedsType);
         } else {
             const auto typeName = MEMBER_TYPE_NAME_PATTERN.arg(m_context.name(), component->name());
-            Context context(
-                    m_context.model(), m_context.definitions(), typeName, m_context.package(), m_context.options());
+            Context context(m_context.model(), m_context.definitions(), typeName, m_context.package(),
+                    m_context.sedsDataTypes(), m_context.options());
             TypeVisitor visitor(context);
             component->type()->accept(visitor);
             addEntry(EntryType::Entry, typeName, CHOICE_ELEMENT_MEMBER_NAME, innerSedsType);
@@ -701,6 +719,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Choice &type)
         innerSedsType.setName(CHOICE_ELEMENT_TYPE_NAME_PATTERN.arg(m_context.name(), component->name()));
         m_context.package()->addDataType(std::move(innerSedsType));
     }
+
+    m_context.package()->addDataType(std::move(indexType));
 }
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
@@ -719,8 +739,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::SequenceOf &type)
 
     } else {
         itemTypeName = ITEM_TYPE_NAME_PATTERN.arg(m_context.name());
-        Context context(
-                m_context.model(), m_context.definitions(), itemTypeName, m_context.package(), m_context.options());
+        Context context(m_context.model(), m_context.definitions(), itemTypeName, m_context.package(),
+                m_context.sedsDataTypes(), m_context.options());
         TypeVisitor visitor(context);
         type.itemsType()->accept(visitor);
     }
@@ -897,8 +917,8 @@ void TypeVisitor::visit(const ::Asn1Acn::Types::Integer &type)
 
 void TypeVisitor::visit(const ::Asn1Acn::Types::UserdefinedType &type)
 {
-    Context context(
-            m_context.model(), m_context.definitions(), m_context.name(), m_context.package(), m_context.options());
+    Context context(m_context.model(), m_context.definitions(), m_context.name(), m_context.package(),
+            m_context.sedsDataTypes(), m_context.options());
     type.type()->accept(*this);
 }
 

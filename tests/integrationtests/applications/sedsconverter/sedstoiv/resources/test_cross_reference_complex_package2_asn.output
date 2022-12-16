@@ -5,7 +5,7 @@ Integer3 FROM PACKAGE3
 Integer2 ::= INTEGER(0 .. 255)
 Interface2-Interface2Command-Type ::= SEQUENCE
 {
-    arg1 Integer2(0 .. 255),
-    arg2 Integer3(0 .. 255)
+    arg1 Integer2,
+    arg2 Integer3
 }
 END

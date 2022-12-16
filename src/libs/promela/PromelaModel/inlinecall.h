@@ -20,6 +20,7 @@
 #pragma once
 
 #include "constant.h"
+#include "realconstant.h"
 #include "variableref.h"
 
 #include <QList>
@@ -36,7 +37,7 @@ public:
     /**
      * @brief Argument type definition.
      */
-    using Argument = std::variant<VariableRef, Constant>;
+    using Argument = std::variant<VariableRef, Constant, RealConstant>;
 
     /**
      * @brief Constructor

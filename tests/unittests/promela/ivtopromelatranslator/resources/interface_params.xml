@@ -1,4 +1,4 @@
-<InterfaceView asn1file="mcheck.asn">
+<InterfaceView version="1.0" asn1file="mcheck.asn">
 <Function name="controller" is_type="NO" language="SDL" default_implementation="default">
     <Property name="Taste::coordinates" value="43000 34200 65200 59200"/>
 <Provided_Interface name="result" kind="Sporadic" miat="0" queue_size="2" priority="2" stack_size="5000">

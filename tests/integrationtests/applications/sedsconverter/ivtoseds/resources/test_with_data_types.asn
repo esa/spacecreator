@@ -1,0 +1,5 @@
+Pinger DEFINITIONS ::= BEGIN
+
+MyInteger ::= INTEGER(0..20)
+
+END

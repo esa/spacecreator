@@ -1,4 +1,4 @@
-<Attrs>
+<Attrs version="1.0">
     <Attr label="Language" name="language" visible="false">
         <Scopes>
             <Function>
@@ -7,16 +7,16 @@
         </Scopes>
         <Type>
             <Enumeration defaultValue="SDL">
-                <Entry value="Ada"/>
-                <Entry value="CPP"/>
-                <Entry value="C"/>
-                <Entry value="GUI"/>
-                <Entry value="SDL"/>
-                <Entry value="Simulink"/>
-                <Entry value="QGenC"/>
-                <Entry value="Blackbox_Device"/>
-                <Entry value="VHDL"/>
-                <Entry value="Pseudo function"/>
+                <Entry value="Ada" folder_name="Ada"/>
+                <Entry value="CPP" folder_name="CPP"/>
+                <Entry value="C" folder_name="C"/>
+                <Entry value="GUI" folder_name="GUI"/>
+                <Entry value="SDL" folder_name="SDL"/>
+                <Entry value="Simulink" folder_name="SIMULINK"/>
+                <Entry value="QGenC" folder_name="QGenC"/>
+                <Entry value="Blackbox_Device" folder_name="Blackbox_C"/>
+                <Entry value="VHDL" folder_name="VHDL"/>
+                <Entry value="Pseudo function" folder_name=""/>
             </Enumeration>
         </Type>
     </Attr>
@@ -58,9 +58,9 @@
         </Scopes>
         <Type>
             <Enumeration defaultValue="SDL">
-                <Entry value="Ada"/>
-                <Entry value="CPP"/>
-                <Entry value="SDL"/>
+                <Entry value="Ada" folder_name="Ada"/>
+                <Entry value="CPP" folder_name="CPP"/>
+                <Entry value="SDL" folder_name="SDL"/>
             </Enumeration>
         </Type>
     </Attr>

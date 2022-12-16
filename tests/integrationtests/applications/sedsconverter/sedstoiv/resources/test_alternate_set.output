@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="MegaComponent" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="ProvidedInterface_AsyncWithGenericTypes_Pi" layer="default">
     <Input_Parameter name="InputParam" type="MegaComponent-ProvidedInterface-AsyncWithGenericTypes-Type" encoding="ACN"/>

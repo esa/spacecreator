@@ -35,6 +35,8 @@ public:
     inline static const QString configFilepath = "Iv_Import_ConfigFilename";
     /** @brief  Use functions instead of a flat structure */
     inline static const QString generateFunctionsForPackages = "Iv_Translation_GenerateFunctionsForPackages";
+    /** @brief  Filepath of SEDS file that contains data types used in interfaces */
+    inline static const QString dataTypesSedsFilepath = "Iv_Translation_DataTypesSedsFilepath";
     /** @biref  Filepath of output file */
     inline static const QString outputFilepath = "Iv_Export_OutputFilepath";
     /** @biref  Name of a function to convert */

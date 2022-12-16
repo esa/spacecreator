@@ -37,6 +37,8 @@ Options:
             Run the MSC editor
         [--qhelpgenerator [--help]]
             Run the QHelpGenerator
+        [--trailgen [--help]]
+            Run the trailgen
         [--help]
             Output this message
         [--version]
@@ -107,6 +109,10 @@ case $TOOL in
 --qhelpgenerator)
     shift
     exec "$libexecdir/qhelpgenerator" $@
+    ;;
+--trailgen)
+    shift
+    exec "$bindir/trailgen" $@
     ;;
 --version|-version)
     "$bindir/qtcreator" -user-library-path "$_ORIGINAL_LD_LIBRARY_PATH" "-version"
