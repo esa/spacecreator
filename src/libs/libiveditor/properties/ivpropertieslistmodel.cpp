@@ -27,7 +27,6 @@
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
 
-#include <QDebug>
 #include <QApplication>
 #include <QMessageBox>
 #include <QRegularExpression>

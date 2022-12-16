@@ -1,0 +1,212 @@
+<InterfaceView version="1.0" asn1file="QgenC.acn">
+<Function name="simulink" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="58800 30100 78800 75300"/>
+    <Property name="Taste::RootCoordinates" value="0 0 117500 79200"/>
+<Provided_Interface name="interfaceBasic" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="MatLab-Double" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="MatLab-Single" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="MatLab-Int8" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="MatLab-Uint8" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="MatLab-Int16" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="MatLab-Uint16" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="MatLab-Int32" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="MatLab-Uint32" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="MatLab-Double" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="MatLab-Single" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="MatLab-Int8" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="MatLab-Uint8" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="MatLab-Int16" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="MatLab-Uint16" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="MatLab-Int32" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="MatLab-Uint32" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="58800 32300"/>
+    <Property name="Taste::RootCoordinates" value="0 6400"/>
+</Provided_Interface>
+
+<Provided_Interface name="interfaceBasicPartIn" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_in" qgen_full_interface_ref="interfaceBasic" wcet="0">
+    <Input_Parameter name="i2" type="MatLab-Single" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="MatLab-Int16" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="58800 37700"/>
+    <Property name="Taste::RootCoordinates" value="0 24500"/>
+</Provided_Interface>
+
+<Provided_Interface name="interfaceBasicPartOut" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_out" qgen_full_interface_ref="interfaceBasic" wcet="0">
+    <Output_Parameter name="o2" type="MatLab-Single" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="MatLab-Int16" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="58800 43500"/>
+    <Property name="Taste::RootCoordinates" value="0 45600"/>
+</Provided_Interface>
+
+<Provided_Interface name="interfaceBasicStp" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Step" qgen_full_interface_ref="interfaceBasic" wcet="0">
+    <Property name="Taste::coordinates" value="58800 48400"/>
+    <Property name="Taste::RootCoordinates" value="0 65200"/>
+</Provided_Interface>
+
+<Provided_Interface name="secondBasicFull" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Full" wcet="0">
+    <Input_Parameter name="i2" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Input_Parameter name="i1" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="78800 33300"/>
+    <Property name="Taste::RootCoordinates" value="24100 0"/>
+</Provided_Interface>
+
+<Provided_Interface name="thirdBasicFull" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="58800 57400"/>
+</Provided_Interface>
+
+<Provided_Interface name="secondBasicPartIn" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_in" qgen_full_interface_ref="secondBasicFull" wcet="0">
+    <Input_Parameter name="i1" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="78800 37700"/>
+</Provided_Interface>
+
+<Provided_Interface name="thirdBasicPartOut" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_out" qgen_full_interface_ref="thirdBasicFull" wcet="0">
+    <Output_Parameter name="o2" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="58800 62900"/>
+</Provided_Interface>
+
+<Provided_Interface name="ThirdBasicStp" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Step" qgen_full_interface_ref="thirdBasicFull" wcet="0">
+    <Property name="Taste::coordinates" value="58800 68000"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Function name="Controller" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="6900 28100 26900 73000"/>
+<Provided_Interface name="trigger" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="false" priority="1" wcet="0" stack_size="1024" dispatch_offset="0" period="1000">
+    <Property name="Taste::coordinates" value="18400 28100"/>
+</Provided_Interface>
+
+<Required_Interface name="interfaceBasic" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="MatLab-Double" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="MatLab-Single" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="MatLab-Int8" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="MatLab-Uint8" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="MatLab-Int16" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="MatLab-Uint16" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="MatLab-Int32" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="MatLab-Uint32" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="MatLab-Double" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="MatLab-Single" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="MatLab-Int8" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="MatLab-Uint8" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="MatLab-Int16" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="MatLab-Uint16" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="MatLab-Int32" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="MatLab-Uint32" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 32300"/>
+    <Property name="Taste::RootCoordinates" value="0 6400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="interfaceBasicPartIn" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_in" qgen_full_interface_ref="interfaceBasic" wcet="0">
+    <Input_Parameter name="i2" type="MatLab-Single" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="MatLab-Int16" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 37800"/>
+    <Property name="Taste::RootCoordinates" value="0 24500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="interfaceBasicPartOut" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_out" qgen_full_interface_ref="interfaceBasic" wcet="0">
+    <Output_Parameter name="o2" type="MatLab-Single" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="MatLab-Int16" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 43400"/>
+    <Property name="Taste::RootCoordinates" value="0 45600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="interfaceBasicStp" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Step" qgen_full_interface_ref="interfaceBasic" wcet="0">
+    <Property name="Taste::coordinates" value="26900 48300"/>
+    <Property name="Taste::RootCoordinates" value="0 65200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="thirdBasicFull" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 57200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="thirdBasicPartOut" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_out" qgen_full_interface_ref="thirdBasicFull" wcet="0">
+    <Output_Parameter name="o2" type="MatLab-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="26900 62900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="ThirdBasicStp" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Step" qgen_full_interface_ref="thirdBasicFull" wcet="0">
+    <Property name="Taste::coordinates" value="26900 67900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="thirdBasicFull"/>
+    <Target func_name="simulink" pi_name="thirdBasicFull"/>
+    <Property name="Taste::coordinates" value="27500 57200 43000 57200 58500 57400"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="interfaceBasicPartIn"/>
+    <Target func_name="simulink" pi_name="interfaceBasicPartIn"/>
+    <Property name="Taste::coordinates" value="27500 37800 43000 37800 58500 37700"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="interfaceBasicPartOut"/>
+    <Target func_name="simulink" pi_name="interfaceBasicPartOut"/>
+    <Property name="Taste::coordinates" value="27500 43400 43000 43400 58500 43500"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="interfaceBasicStp"/>
+    <Target func_name="simulink" pi_name="interfaceBasicStp"/>
+    <Property name="Taste::coordinates" value="27500 48300 43000 48300 58500 48400"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="ThirdBasicStp"/>
+    <Target func_name="simulink" pi_name="ThirdBasicStp"/>
+    <Property name="Taste::coordinates" value="27500 67900 43000 67900 58500 68000"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="interfaceBasic"/>
+    <Target func_name="simulink" pi_name="interfaceBasic"/>
+    <Property name="Taste::coordinates" value="27500 32300 58500 32300"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="thirdBasicPartOut"/>
+    <Target func_name="simulink" pi_name="thirdBasicPartOut"/>
+    <Property name="Taste::coordinates" value="27500 62900 58500 62900"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>
