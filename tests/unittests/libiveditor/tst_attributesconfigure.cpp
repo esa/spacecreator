@@ -349,7 +349,7 @@ void tst_AttributesConfigure::tst_attrValidators()
     attrTemplate.setAttrValidatorPattern(validators);
 
     attrTemplate.setScopes(int(ivm::IVPropertyTemplate::Scope::Function));
-    QVERIFY(attrTemplate.validate(&fn));
+    QVERIFY(!attrTemplate.validate(&fn));
     fn.setTitle(QLatin1String("function 1"));
     QVERIFY(!attrTemplate.validate(&fn));
     fn.setTitle(QLatin1String("1 function"));
@@ -367,7 +367,7 @@ void tst_AttributesConfigure::tst_attrValidators()
     QVERIFY(attrTemplate.validate(&provIface));
 
     attrTemplate.setScopes(int(ivm::IVPropertyTemplate::Scope::Required_Interface));
-    QVERIFY(attrTemplate.validate(&reqIface));
+    QVERIFY(!attrTemplate.validate(&reqIface));
     reqIface.setKind(ivm::IVInterface::OperationKind::Cyclic);
     QVERIFY(!attrTemplate.validate(&reqIface));
     reqIface.setKind(ivm::IVInterface::OperationKind::Any);
@@ -381,7 +381,7 @@ void tst_AttributesConfigure::tst_attrValidators()
     QVERIFY(attrTemplate.validate(&comment));
 
     attrTemplate.setScopes(int(ivm::IVPropertyTemplate::Scope::Connection));
-    QVERIFY(attrTemplate.validate(&connection));
+    QVERIFY(!attrTemplate.validate(&connection));
     connection.setEntityAttribute(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("23663457"));
     QVERIFY(attrTemplate.validate(&connection));
     connection.setEntityAttribute(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("dfzdf bxdbfSFB 457"));
