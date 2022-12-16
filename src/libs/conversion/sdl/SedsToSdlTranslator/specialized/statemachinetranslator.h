@@ -24,8 +24,10 @@
 #include <asn1library/asn1/asn1model.h>
 #include <ivcore/ivmodel.h>
 #include <map>
+#include <sdl/SdlModel/newtype.h>
 #include <sdl/SdlModel/procedurecall.h>
 #include <sdl/SdlModel/sdlmodel.h>
+#include <sdl/SdlModel/syntype.h>
 #include <seds/SedsModel/components/states/entrystate.h>
 #include <seds/SedsModel/components/states/exitstate.h>
 #include <seds/SedsModel/sedsmodel.h>
@@ -122,6 +124,18 @@ public:
             const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
 
     /**
+     * @brief  Translate parameter activity maps into getter/setter procedures or input/output signals
+     *
+     * @param context                   Translation context
+     * @param parameterActivityMaps     Parameter activity maps
+     * @param stateMachine              SEDS state machine
+     * @param options                   Conversion options
+     */
+    static auto translateParameterActivityMaps(Context &context,
+            const seds::model::ComponentImplementation::ParameterActivityMapSet &parameterActivityMaps,
+            const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
+
+    /**
      * @brief   Build mapping of names to command declarations
      *
      * @param context   Translation context which contains both the source component and the target map
@@ -174,8 +188,34 @@ private:
     static auto createParameterAsyncPi(ivm::IVInterface *interface, const seds::model::ParameterMap &map,
             ::sdl::StateMachine *stateMachine) -> void;
 
+    static auto createParameterActivityGetSyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map,
+            const std::vector<const ::seds::model::Transition *> &sedsTransitions, const Options &options)
+            -> std::unique_ptr<::sdl::Procedure>;
+    static auto createParameterActivitySetSyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map,
+            const std::vector<const ::seds::model::Transition *> &sedsTransitions, const Options &options)
+            -> std::unique_ptr<::sdl::Procedure>;
+
+    static auto createParameterActivityGetAsyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map, const Options &options) -> void;
+    static auto createParameterActivitySetAsyncPi(Context &context, ivm::IVInterface *interface,
+            const seds::model::ParameterActivityMap &map, const Options &options) -> void;
+
+    static auto createParameterActivityGetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
+            const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *;
+    static auto createParameterActivitySetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
+            const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *;
+
     static auto translateParameter(Context &context, const seds::model::ParameterMap &map,
             const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
+    static auto translateParameter(Context &context, const seds::model::ParameterActivityMap &map,
+            const ::seds::model::StateMachine &stateMachine, const Options &options) -> void;
+
+    static auto handleParameterActivityMapGetActivity(Context &context, const ::seds::model::ParameterActivityMap &map,
+            const ::seds::model::StateMachine &sedsStateMachine, const Options &options) -> void;
+    static auto handleParameterActivityMapSetActivity(Context &context, const ::seds::model::ParameterActivityMap &map,
+            const ::seds::model::StateMachine &sedsStateMachine, const Options &options) -> void;
 
     static auto createStartTransition(Context &context, const seds::model::StateMachine &sedsStateMachine,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> void;
@@ -196,6 +236,10 @@ private:
             const seds::model::Transition::Primitive &primitive, const Options &options) -> InputHandler;
 
     static auto translatePrimitive(::sdl::State *sdlFromState) -> InputHandler;
+
+    static auto handleAsyncParameterMaps(Context &context, const ::seds::model::OnParameterPrimitive &parameter,
+            const QString &variableName, std::vector<std::unique_ptr<::sdl::Action>> &unpackingActions,
+            const Options &options) -> void;
 
     static auto translateTransitions(Context &context,
             const std::vector<const ::seds::model::Transition *> sedsTransitions,
@@ -221,7 +265,7 @@ private:
 
     static auto createExternalProcedure(ivm::IVInterface const *interface, ::sdl::Process *sdlProcess) -> void;
 
-    static auto translateGuard(::sdl::Process *sdlProcess, const ::sdl::State *fromState,
+    static auto translateGuard(Context &context, ::sdl::Process *sdlProcess, const ::sdl::State *fromState,
             ::sdl::Transition *currentTransitionPtr, const seds::model::BooleanExpression &guard)
             -> ::sdl::Transition *;
 
@@ -230,6 +274,16 @@ private:
 
     static auto createTimerSetCall(QString timerName, const uint64_t callTimeInNanoseconds)
             -> std::unique_ptr<::sdl::ProcedureCall>;
+
+    static auto handleVariableArrayDimensions(Context &context, const QString &variableName,
+            const QString &variableTypeName, const std::vector<::seds::model::DimensionSize> &arrayDimensions,
+            const Options &options) -> QString;
+    static auto createVariableSizeDimensionIndexingType(
+            const uint64_t size, const QString &variableName, const QString &baseTypeName) -> ::sdl::Syntype;
+    static auto createVariableSizeDimensionType(const uint64_t size, const QString &variableName,
+            const QString &indexingTypeName, const QString &elementTypeName) -> ::sdl::Newtype;
+    static auto createVariableTypeDimensionType(const QString &typeName, const QString &variableName,
+            const QString &indexingTypeName, const QString &elementTypeName) -> ::sdl::Newtype;
 
     static auto getSdlState(const ::seds::model::StateRef &sedsState,
             std::map<QString, std::unique_ptr<::sdl::State>> &stateMap) -> ::sdl::State *;

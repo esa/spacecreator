@@ -17,10 +17,11 @@
 
 #include "ivcreatortool.h"
 
+#include "abstractvisualizationmodel.h"
 #include "commands/cmdcommentitemcreate.h"
 #include "commands/cmdconnectiongroupitemcreate.h"
+#include "commands/cmdconnectiongroupitemchange.h"
 #include "commands/cmdconnectionitemcreate.h"
-#include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commands/cmdfunctionitemcreate.h"
@@ -36,6 +37,7 @@
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivcommentgraphicsitem.h"
 #include "itemeditor/ivconnectiongraphicsitem.h"
+#include "itemeditor/ivconnectiongroupgraphicsitem.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivfunctiontypegraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
@@ -46,7 +48,6 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
-#include "ui/grippointshandler.h"
 
 #include <QAction>
 #include <QApplication>
@@ -81,63 +82,102 @@ IVCreatorTool::~IVCreatorTool() {}
 
 void IVCreatorTool::removeSelectedItems()
 {
+    if (!m_doc || !m_doc->objectsSelectionModel()->hasSelection()) {
+        return;
+    }
+
+    QStringList clonedIfaces;
+    QStringList nonRemovableEntities;
+    QList<QPointer<ivm::IVObject>> entities;
+    clearPreviewItem();
+    QItemSelectionModel *selection = m_doc->objectsSelectionModel();
+    for (const QModelIndex &index : selection->selectedIndexes()) {
+        const int role = static_cast<int>(shared::AbstractVisualizationModel::IdRole);
+        if (ivm::IVObject *entity = m_doc->objectsModel()->getObject(index.data(role).toUuid())) {
+
+            if (entity->isRootObject()) {
+                continue;
+            }
+            if (entity->isFixedSystemElement()) {
+                nonRemovableEntities.append(entity->title());
+                continue;
+            }
+            if (entity->isInterface()) {
+                if (auto iface = entity->as<const ivm::IVInterface *>()) {
+                    if (iface->isRequiredSystemElement()) {
+                        nonRemovableEntities.append(iface->title());
+                        continue;
+                    }
+                    if (auto srcIface = iface->cloneOf()) {
+                        clonedIfaces.append(QStringLiteral("%1's %2 is from %3")
+                                                    .arg(iface->parentObject()->title(), iface->title(),
+                                                            srcIface->parentObject()->title()));
+                        continue;
+                    }
+                }
+            }
+            entities.append(entity);
+        }
+    }
+    selection->clearSelection();
+
+    if (!entities.isEmpty()) {
+        auto cmdRm = new cmd::CmdEntitiesRemove(entities, model()->objectsModel());
+        cmdRm->setText(tr("Remove selected item(s)"));
+        m_doc->commandsStack()->push(cmdRm);
+    }
+
+    if (!nonRemovableEntities.isEmpty()) {
+        const QString names = nonRemovableEntities.join(QStringLiteral("<br>"));
+        const QString msg = tr("The following entities are marked as non-removable:<br><br>"
+                               "<b>%1</b>")
+                                    .arg(names);
+        Q_EMIT informUser(tr("Entity removal"), msg);
+    }
+
+    if (!clonedIfaces.isEmpty()) {
+        const QString names = clonedIfaces.join(QStringLiteral("<br>"));
+        const QString msg = tr("The following interfaces can not be removed directly:<br><br>"
+                               "<b>%1</b><br><br>"
+                               "Please edit the related FunctionType.")
+                                    .arg(names);
+        Q_EMIT informUser(tr("Interface removal"), msg);
+    }
+}
+
+void IVCreatorTool::ungroupConnectedItems()
+{
     if (!m_view)
         return;
 
     if (auto scene = m_view->scene()) {
-        QStringList clonedIfaces;
-        QStringList nonRemovableEntities;
-        QList<QPointer<ivm::IVObject>> entities;
         clearPreviewItem();
-        while (!scene->selectedItems().isEmpty()) {
-            QGraphicsItem *item = scene->selectedItems().first();
-            item->setSelected(false);
 
-            if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
-                if (auto entity = iObj->entity() ? iObj->entity()->as<ivm::IVObject *>() : nullptr) {
-                    if (entity->isRootObject()) {
+        cmd::CommandsStack::Macro cmdMacro(m_doc->commandsStack(), tr("Ungroup selected connection(s)"));
+        QList<QPointer<ivm::IVObject>> entities;
+        for (const auto item : m_view->scene()->selectedItems()) {
+            if (item->type() == IVConnectionGroupGraphicsItem::Type) {
+                if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {
+                    if (!iObj->entity())
                         continue;
-                    }
-                    if (entity->isFixedSystemElement()) {
-                        nonRemovableEntities.append(entity->title());
-                        continue;
-                    }
-                    if (entity->isInterface()) {
-                        if (auto iface = entity->as<const ivm::IVInterface *>()) {
-                            if (iface->isRequiredSystemElement()) {
-                                nonRemovableEntities.append(iface->title());
-                                continue;
-                            }
-                            if (auto srcIface = iface->cloneOf()) {
-                                clonedIfaces.append(QStringLiteral("%1's %2 is from %3")
-                                                            .arg(iface->parentObject()->title(), iface->title(),
-                                                                    srcIface->parentObject()->title()));
-                                continue;
-                            }
+
+                    if (auto entity = iObj->entity()->as<ivm::IVConnectionGroup *>()) {
+                        if (!entity->isFixedSystemElement()) {
+                            entities.append(entity);
+                        }
+                        for (const auto &conn: entity->groupedConnections()) {
+                            auto cmdUngroup = new cmd::CmdConnectionGroupItemChange(entity, conn, false);
+                            cmdMacro.push(cmdUngroup);
                         }
                     }
-                    entities.append(entity);
                 }
             }
         }
-        auto cmdRm = new cmd::CmdEntitiesRemove(entities, model()->objectsModel());
-        cmdRm->setText(tr("Remove selected item(s)"));
-        m_doc->commandsStack()->push(cmdRm);
+        if (!entities.isEmpty()) {
+            auto cmdRm = new cmd::CmdEntitiesRemove(entities, model()->objectsModel());
+            cmdMacro.push(cmdRm);
 
-        if (!nonRemovableEntities.isEmpty()) {
-            const QString names = nonRemovableEntities.join(QStringLiteral("<br>"));
-            const QString msg = tr("The following entities are marked as non-removable:<br><br>"
-                                   "<b>%1</b>").arg(names);
-            Q_EMIT informUser(tr("Entity removal"), msg);
-        }
-
-        if (!clonedIfaces.isEmpty()) {
-            const QString names = clonedIfaces.join(QStringLiteral("<br>"));
-            const QString msg = tr("The following interfaces can not be removed directly:<br><br>"
-                                   "<b>%1</b><br><br>"
-                                   "Please edit the related FunctionType.")
-                                        .arg(names);
-            Q_EMIT informUser(tr("Interface removal"), msg);
+            cmdMacro.setComplete(true);
         }
     }
 }
@@ -445,8 +485,14 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
                 this, [this]() { groupSelectedItems(); });
 
         const auto selectedItems = m_previewItem->scene()->selectedItems();
-        const auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
+        auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
+        action->setEnabled(it != selectedItems.cend());
+
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/delete.svg")), tr("Ungroup connections"),
+                                 this, [this]() { ungroupConnectedItems(); });
+        it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
+                          [](const QGraphicsItem *item) { return item->type() == IVConnectionGroupGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
     }
 }

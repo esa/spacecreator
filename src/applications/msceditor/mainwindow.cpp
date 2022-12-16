@@ -504,8 +504,10 @@ void MainWindow::loadSettings()
 {
     using namespace shared;
 
-    restoreGeometry(SettingsManager::load<QByteArray>(SettingsManager::Common::Geometry));
-    restoreState(SettingsManager::load<QByteArray>(SettingsManager::Common::State));
+    // Use the application settings, and not the common SpaceCreator settings
+    QSettings settings;
+    restoreGeometry(settings.value("Common/Geometry").toByteArray());
+    restoreState(settings.value("Common/State").toByteArray());
 
     // the toolbar might be hidden from a streaming tool session
     d->m_core->mainToolBar()->show();
@@ -523,18 +525,21 @@ void MainWindow::loadSettings()
 void MainWindow::saveSettings()
 {
     using namespace shared;
-    SettingsManager::store<QByteArray>(SettingsManager::Common::Geometry, saveGeometry());
-    SettingsManager::store<QByteArray>(SettingsManager::Common::State, saveState());
-    SettingsManager::store<bool>(SettingsManager::MSC::DocViewMode, d->m_mainWidget->centerView()->currentIndex() == 0);
-    const QString path = d->m_core->mainModel()->currentFilePath();
+    // Use the application settings, and not the common SpaceCreator settings
+    QSettings settings;
+    settings.setValue("Common/State", saveState());
+    settings.setValue("Common/Geometry", saveGeometry());
 
-    auto files = SettingsManager::load<QStringList>(SettingsManager::MSC::RecentFiles);
+    SettingsManager::store<bool>(SettingsManager::MSC::DocViewMode, d->m_mainWidget->centerView()->currentIndex() == 0);
+
+    const QString path = d->m_core->mainModel()->currentFilePath();
+    QStringList files = settings.value("MSC/RecentFiles").toStringList();
     files.removeAll(path);
     files.prepend(path);
     while (files.size() > 10) {
         files.removeLast();
     }
-    SettingsManager::store<QStringList>(SettingsManager::MSC::RecentFiles, files);
+    settings.setValue("MSC/RecentFiles", files);
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

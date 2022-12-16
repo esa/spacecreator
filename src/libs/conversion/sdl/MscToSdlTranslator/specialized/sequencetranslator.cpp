@@ -299,7 +299,7 @@ QStringList SequenceTranslator::getArgumentsTypes(const QString &ivFunctionName,
 
     const auto ivInterface = findIvInterface(ivFunctionName, ivInterfaceName);
     for (const auto &param : ivInterface->params()) {
-        types << param.paramTypeName();
+        types << Escaper::escapeSdlName(param.paramTypeName());
     }
 
     return types;

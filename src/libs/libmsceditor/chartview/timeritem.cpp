@@ -47,7 +47,7 @@ public:
 protected:
     bool validateText(const QString &text) const override
     {
-        MscReader reader;
+        MscReader reader(MscReader::NOTIFY::NO_HUB);
         QStringList errors;
         // test plain informal timer, or data statements
         QString testDoc = QString("msc c1;instance i1;starttimer %1;endinstance;endmsc;").arg(text);

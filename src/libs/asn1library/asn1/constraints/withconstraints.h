@@ -43,6 +43,7 @@ public:
 
     const Constraints &constraints() const { return m_constraints; }
     Constraints &constraints() { return m_constraints; }
+    void removeConstraints() { m_constraints.clear(); }
 
 private:
     Constraints m_constraints;

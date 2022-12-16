@@ -80,6 +80,11 @@ auto StatementTranslatorVisitor::StatementContext::uniqueCalibratedSplinePointsV
     return QString("CalibratedSplinePoints%1").arg(++m_calibratedSplinePointsVariableCount);
 }
 
+auto StatementTranslatorVisitor::StatementContext::masterContext() -> Context &
+{
+    return m_masterContext;
+}
+
 auto StatementTranslatorVisitor::StatementContext::sedsPackage() -> const ::seds::model::Package &
 {
     return m_masterContext.sedsPackage();
@@ -201,8 +206,8 @@ auto StatementTranslatorVisitor::operator()(const ::seds::model::Calibration &ca
 
 auto StatementTranslatorVisitor::operator()(const ::seds::model::Conditional &conditional) -> void
 {
-    auto decision =
-            translateBooleanExpression(m_context.sdlProcess(), m_context.sdlProcedure(), conditional.condition());
+    auto decision = translateBooleanExpression(
+            m_context.masterContext(), m_context.sdlProcess(), m_context.sdlProcedure(), conditional.condition());
     auto label = std::make_unique<::sdl::Label>(m_context.uniqueLabelName(CONDITION_END_LABEL_PREFIX));
 
     auto trueAnswer = translateAnswer(m_context, label.get(), TRUE_LITERAL, conditional.onConditionTrue(), m_options);
@@ -679,8 +684,9 @@ auto StatementTranslatorVisitor::translateOutput(const QString &callName,
 class ExpressionTranslatorVisitor
 {
 public:
-    ExpressionTranslatorVisitor(::sdl::Process *process, ::sdl::Procedure *procedure)
-        : m_process(process)
+    ExpressionTranslatorVisitor(Context &context, ::sdl::Process *process, ::sdl::Procedure *procedure)
+        : m_context(context)
+        , m_process(process)
         , m_procedure(procedure)
     {
     }
@@ -691,29 +697,30 @@ public:
     }
     auto operator()(const std::unique_ptr<::seds::model::AndedConditions> &conditions) -> QString
     {
-        return StatementTranslatorVisitor::translateAndedConditions(m_process, m_procedure, *conditions);
+        return StatementTranslatorVisitor::translateAndedConditions(m_context, m_process, m_procedure, *conditions);
     }
     auto operator()(const std::unique_ptr<::seds::model::OredConditions> &conditions) -> QString
     {
-        return StatementTranslatorVisitor::translateOredConditions(m_process, m_procedure, *conditions);
+        return StatementTranslatorVisitor::translateOredConditions(m_context, m_process, m_procedure, *conditions);
     }
     auto operator()(const ::seds::model::TypeCheck &check) -> QString
     {
-        return StatementTranslatorVisitor::translateTypeCheck(m_process, m_procedure, check);
+        return StatementTranslatorVisitor::translateTypeCheck(m_context, check);
     }
 
 private:
+    Context &m_context;
     ::sdl::Process *m_process;
     ::sdl::Procedure *m_procedure;
 };
 
-auto StatementTranslatorVisitor::translateBooleanExpression(::sdl::Process *hostProcess,
+auto StatementTranslatorVisitor::translateBooleanExpression(Context &context, ::sdl::Process *hostProcess,
         ::sdl::Procedure *hostProcedure, const ::seds::model::BooleanExpression &expression)
         -> std::unique_ptr<::sdl::Decision>
 {
     auto decision = std::make_unique<::sdl::Decision>();
     const auto &condition = expression.condition();
-    const auto expressionText = std::visit(ExpressionTranslatorVisitor(hostProcess, hostProcedure), condition);
+    const auto expressionText = std::visit(ExpressionTranslatorVisitor(context, hostProcess, hostProcedure), condition);
     auto expressionAction = std::make_unique<::sdl::Expression>(expressionText);
     decision->setExpression(std::move(expressionAction));
     return decision;
@@ -737,36 +744,72 @@ auto StatementTranslatorVisitor::translateComparison(const ::seds::model::Compar
     return QString("%1 %2 %3").arg(left, op, right);
 }
 
-auto StatementTranslatorVisitor::translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const ::seds::model::AndedConditions &conditions) -> QString
+auto StatementTranslatorVisitor::translateAndedConditions(Context &context, ::sdl::Process *hostProcess,
+        ::sdl::Procedure *hostProcedure, const ::seds::model::AndedConditions &conditions) -> QString
 {
     return std::accumulate(conditions.conditions().begin(), conditions.conditions().end(), QString(""),
-            [&hostProcess, &hostProcedure](const auto &accumulator, const auto &element) {
-                const auto expression = std::visit(ExpressionTranslatorVisitor(hostProcess, hostProcedure), element);
+            [&](const auto &accumulator, const auto &element) {
+                const auto expression =
+                        std::visit(ExpressionTranslatorVisitor(context, hostProcess, hostProcedure), element);
                 return accumulator.size() == 0 ? QString("(%1)").arg(expression)
                                                : QString(accumulator + " and " + QString("(%1)").arg(expression));
             });
 }
 
-auto StatementTranslatorVisitor::translateOredConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-        const ::seds::model::OredConditions &conditions) -> QString
+auto StatementTranslatorVisitor::translateOredConditions(Context &context, ::sdl::Process *hostProcess,
+        ::sdl::Procedure *hostProcedure, const ::seds::model::OredConditions &conditions) -> QString
 {
     return std::accumulate(conditions.conditions().begin(), conditions.conditions().end(), QString(""),
-            [&hostProcess, &hostProcedure](const auto &accumulator, const auto &element) {
-                const auto expression = std::visit(ExpressionTranslatorVisitor(hostProcess, hostProcedure), element);
+            [&](const auto &accumulator, const auto &element) {
+                const auto expression =
+                        std::visit(ExpressionTranslatorVisitor(context, hostProcess, hostProcedure), element);
                 return accumulator.size() == 0 ? QString("(%1)").arg(expression)
                                                : QString(accumulator + " or " + QString("(%1)").arg(expression));
             });
 }
 
-auto StatementTranslatorVisitor::translateTypeCheck(
-        ::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure, const ::seds::model::TypeCheck &check) -> QString
+auto StatementTranslatorVisitor::translateTypeCheck(Context &context, const ::seds::model::TypeCheck &check) -> QString
 {
-    Q_UNUSED(hostProcess);
-    Q_UNUSED(hostProcedure);
-    Q_UNUSED(check);
-    throw TranslationException("Expression not implemented");
-    return "";
+    const auto variableName = check.firstOperand().variableRef().nameStr();
+    const auto typeRef = check.typeOperand();
+
+    // Get type of the TypeOperand
+    const auto targetType = context.findSedsType(typeRef);
+    if (targetType == nullptr) {
+        auto errorMessage = QString("Unable to find type '%1' referenced in the TypeCondition").arg(typeRef.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto targetContainerType = std::get_if<::seds::model::ContainerDataType>(targetType);
+    if (targetContainerType == nullptr) {
+        auto errorMessage =
+                QString("Type '%1' referenced in the TypeCondition is not a ContainerDataType").arg(typeRef.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    // Get type of the FirstOperand
+    const auto variable = context.findSedsVariable(variableName);
+    if (variable == nullptr) {
+        auto errorMessage = QString("Unable to find variable '%1' referenced in the TypeCondition").arg(variableName);
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto variableTypeRef = variable->type();
+
+    // Only container types are supported
+    // We need to find a path to realization to create an SDL condition whether this field is present
+    const auto pathToRealization = getPathToRealization(context, variableTypeRef, targetContainerType);
+    if (!pathToRealization) {
+        auto errorMessage = QString(
+                "Type '%1' of variable '%2' is not a parent of type '%3' so they cannot be used in the TypeCondition")
+                                    .arg(variableTypeRef.nameStr(), variableName, typeRef.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto choiceName = pathToRealization->section('.', 0, -2);
+    const auto choiceFieldName = pathToRealization->section('.', -1);
+
+    return QString("present(%1.%2) = %3").arg(variableName, choiceName, choiceFieldName);
 }
 
 auto StatementTranslatorVisitor::comparisonOperatorToString(const ::seds::model::ComparisonOperator op) -> QString
@@ -912,6 +955,39 @@ auto StatementTranslatorVisitor::isSwapOperator(const ::seds::model::MathOperati
     }
 
     return *mathOp == CoreMathOperator::Swap;
+}
+
+auto StatementTranslatorVisitor::getPathToRealization(Context &context, const ::seds::model::DataTypeRef &parentTypeRef,
+        const ::seds::model::ContainerDataType *childType) -> std::optional<QString>
+{
+    if (!childType->baseType()) {
+        return std::nullopt;
+    }
+
+    const auto &baseTypeRef = childType->baseType().value();
+
+    if (baseTypeRef == parentTypeRef) {
+        return QString("realization.realization%1").arg(childType->nameStr());
+    }
+
+    const auto baseType = context.findSedsType(baseTypeRef);
+    if (baseType == nullptr) {
+        auto errorMessage = QString("Unable to find SEDS type '%1'").arg(baseTypeRef.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto baseContainerType = std::get_if<::seds::model::ContainerDataType>(baseType);
+    if (baseContainerType == nullptr) {
+        auto errorMessage = QString("Type '%1' is not a ContainerDataType").arg(baseTypeRef.nameStr());
+        throw TranslationException(std::move(errorMessage));
+    }
+
+    const auto basePathToRealization = getPathToRealization(context, parentTypeRef, baseContainerType);
+    if (!basePathToRealization) {
+        return std::nullopt;
+    }
+
+    return QString("%1.realization.realization%2").arg(*basePathToRealization).arg(childType->nameStr());
 }
 
 }

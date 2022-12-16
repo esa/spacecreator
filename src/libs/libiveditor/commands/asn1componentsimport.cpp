@@ -20,6 +20,7 @@
 #include "asn1reader.h"
 #include "asn1systemchecks.h"
 #include "errorhub.h"
+#include "implementationshandler.h"
 #include "ivobject.h"
 
 #include <QApplication>
@@ -42,6 +43,12 @@ ASN1ComponentsImport::ASN1ComponentsImport(
 
 ASN1ComponentsImport::~ASN1ComponentsImport() { }
 
+void ASN1ComponentsImport::setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Checks)
+{
+    m_asn1Checks = asn1Checks;
+    m_destPath = m_asn1Checks->projectPath();
+}
+
 void ASN1ComponentsImport::redoSourceCloning(const ivm::IVObject *object)
 {
     if (!object
@@ -56,7 +63,10 @@ void ASN1ComponentsImport::redoSourceCloning(const ivm::IVObject *object)
     const QString sourcePath = m_tempDir.isNull() ? m_srcPath + QDir::separator() + rootName : m_tempDir->path();
     const QDir sourceDir { sourcePath };
     const QDir targetDir { m_destPath };
-    shared::copyDir(sourceDir.filePath(subPath), targetDir.filePath(subPath));
+    if (!shared::copyDir(sourceDir.filePath(subPath), targetDir.filePath(subPath))) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Implementations import"),
+                tr("Critical issues during implementations import for object: %1").arg(object->titleUI()));
+    }
 }
 
 void ASN1ComponentsImport::undoSourceCloning(const ivm::IVObject *object)
@@ -67,11 +77,19 @@ void ASN1ComponentsImport::undoSourceCloning(const ivm::IVObject *object)
         return;
     }
 
+    const auto res = QMessageBox::question(qApp->activeWindow(), tr("Implementations import undo"),
+            tr("Do you want to remove implementations files for object %1?")
+                    .arg(object->titleUI()));
+    if (res == QMessageBox::No) {
+        return;
+    }
+
     const QString subPath = relativePathForObject(object);
     const QString destPath = m_tempDir->path() + QDir::separator() + subPath;
     const QString sourcePath { m_destPath + QDir::separator() + subPath };
     if (!shared::moveDir(sourcePath, destPath)) {
-        /// TODO: ROLLBACK
+        QMessageBox::critical(qApp->activeWindow(), tr("Implementations import undo"),
+                tr("Critical issues during implementations import undo for object: %1").arg(object->titleUI()));
     }
 }
 
@@ -181,6 +199,7 @@ void ASN1ComponentsImport::redoAsnFileImport(const ivm::IVObject *object)
         }
     }
 
+    QStringList importedAsnFiles;
     for (const QFileInfo &file : qAsConst(fileInfos)) {
         QString destFilePath { targetDir.filePath(file.fileName()) };
         if (QFile::exists(destFilePath)) {
@@ -197,25 +216,38 @@ void ASN1ComponentsImport::redoAsnFileImport(const ivm::IVObject *object)
                 destFilePath = targetDir.filePath(text);
         }
         if (shared::copyFile(file.absoluteFilePath(), destFilePath)) {
-            m_importedAsnFiles.append(destFilePath);
+            importedAsnFiles.append(destFilePath);
         } else {
+            if (QFile::exists(destFilePath))
+                importedAsnFiles.append(destFilePath);
             shared::ErrorHub::addError(shared::ErrorItem::Error, tr("%1 wasn't imported").arg(file.fileName()));
         }
     }
+    if (!importedAsnFiles.isEmpty())
+        m_importedAsnFiles << importedAsnFiles;
+
+    Q_EMIT asn1FilesImported(importedAsnFiles);
 }
 
 void ASN1ComponentsImport::undoAsnFileImport()
 {
+    const auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files undo"),
+            tr("Do you want to remove ASN1 files: %1?")
+                    .arg(m_importedAsnFiles.join(QLatin1String(", "))));
+    if (res == QMessageBox::No) {
+        return;
+    }
+
     for (const QString &filePath : qAsConst(m_importedAsnFiles)) {
         QFile::remove(filePath);
     }
 
-    Q_EMIT asn1FileRemoved(m_importedAsnFiles);
+    Q_EMIT asn1FilesRemoved(m_importedAsnFiles);
 }
 
 QString ASN1ComponentsImport::relativePathForObject(const ivm::IVObject *object) const
 {
-    return shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
+    return ive::kRootImplementationPath + QDir::separator() + object->title().toLower();
 }
 
 } // namespace ive

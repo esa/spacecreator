@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+<PackageFile xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
  <Package name="WithComponents">
   <DataTypeSet>
    <BooleanDataType name="IsPresent"/>
@@ -43,13 +43,6 @@
      <Entry type="Type_ConcreteSequence_secondEntry" name="secondEntry"/>
     </EntryList>
    </ContainerDataType>
-   <EnumeratedDataType name="Index_MyChoice">
-    <EnumerationList>
-     <Enumeration value="0" label="firstOption"/>
-     <Enumeration value="1" label="secondOption"/>
-     <Enumeration value="2" label="thirdOption"/>
-    </EnumerationList>
-   </EnumeratedDataType>
    <ContainerDataType name="MyChoice" abstract="true">
     <EntryList>
      <Entry type="Index_MyChoice" name="index"/>
@@ -62,7 +55,7 @@
    </IntegerDataType>
    <ContainerDataType baseType="MyChoice" name="MyChoice_firstOption">
     <ConstraintSet>
-     <ValueConstraint value="0" entry="index"/>
+     <ValueConstraint value="firstOption" entry="index"/>
     </ConstraintSet>
     <EntryList>
      <Entry type="Type_MyChoice_firstOption" name="element"/>
@@ -75,7 +68,7 @@
    </IntegerDataType>
    <ContainerDataType baseType="MyChoice" name="MyChoice_secondOption">
     <ConstraintSet>
-     <ValueConstraint value="1" entry="index"/>
+     <ValueConstraint value="secondOption" entry="index"/>
     </ConstraintSet>
     <EntryList>
      <Entry type="Type_MyChoice_secondOption" name="element"/>
@@ -88,16 +81,17 @@
    </IntegerDataType>
    <ContainerDataType baseType="MyChoice" name="MyChoice_thirdOption">
     <ConstraintSet>
-     <ValueConstraint value="2" entry="index"/>
+     <ValueConstraint value="thirdOption" entry="index"/>
     </ConstraintSet>
     <EntryList>
      <Entry type="Type_MyChoice_thirdOption" name="element"/>
     </EntryList>
    </ContainerDataType>
-   <EnumeratedDataType name="Index_ConcreteChoice">
+   <EnumeratedDataType name="Index_MyChoice">
     <EnumerationList>
-     <Enumeration value="0" label="firstOption"/>
-     <Enumeration value="1" label="thirdOption"/>
+     <Enumeration label="firstOption" value="0"/>
+     <Enumeration label="secondOption" value="1"/>
+     <Enumeration label="thirdOption" value="2"/>
     </EnumerationList>
    </EnumeratedDataType>
    <ContainerDataType name="ConcreteChoice" abstract="true">
@@ -112,7 +106,7 @@
    </IntegerDataType>
    <ContainerDataType baseType="ConcreteChoice" name="ConcreteChoice_firstOption">
     <ConstraintSet>
-     <ValueConstraint value="0" entry="index"/>
+     <ValueConstraint value="firstOption" entry="index"/>
     </ConstraintSet>
     <EntryList>
      <Entry type="Type_ConcreteChoice_firstOption" name="element"/>
@@ -125,12 +119,18 @@
    </IntegerDataType>
    <ContainerDataType baseType="ConcreteChoice" name="ConcreteChoice_thirdOption">
     <ConstraintSet>
-     <ValueConstraint value="1" entry="index"/>
+     <ValueConstraint value="thirdOption" entry="index"/>
     </ConstraintSet>
     <EntryList>
      <Entry type="Type_ConcreteChoice_thirdOption" name="element"/>
     </EntryList>
    </ContainerDataType>
+   <EnumeratedDataType name="Index_ConcreteChoice">
+    <EnumerationList>
+     <Enumeration label="firstOption" value="0"/>
+     <Enumeration label="thirdOption" value="1"/>
+    </EnumerationList>
+   </EnumeratedDataType>
   </DataTypeSet>
  </Package>
 </PackageFile>

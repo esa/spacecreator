@@ -23,6 +23,7 @@
 #include <asn1library/asn1/types/typereadingvisitor.h>
 #include <optional>
 #include <seds/SedsModel/sedsmodel.h>
+#include <seds/SedsModel/types/datatype.h>
 
 namespace conversion {
 class Options;
@@ -45,14 +46,16 @@ public:
         /**
          * @brief   Constructor
          *
-         * @param   asn1Model   Parent ASN.1/ACN model
-         * @param   definitions Parent ASN.1/ACN definitions group
-         * @param   name        Target type name
-         * @param   sedsPackage Target package to add the type to
-         * @param   options     Options
+         * @param   asn1Model       Parent ASN.1/ACN model
+         * @param   definitions     Parent ASN.1/ACN definitions group
+         * @param   name            Target type name
+         * @param   sedsPackage     Target package to add the type to
+         * @param   sedsDataTypes   Visible SEDS data types
+         * @param   options         Options
          */
         Context(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions, QString name,
-                ::seds::model::Package *sedsPackage, const Options &options);
+                ::seds::model::Package *sedsPackage, const std::vector<::seds::model::DataType> &sedsDataTypes,
+                const Options &options);
 
         /**
          * @brief Parent ASN.1 model accessor
@@ -84,12 +87,16 @@ public:
          * @returns conversion Options
          */
         auto options() -> const Options &;
+        auto sedsDataTypes() -> const std::vector<::seds::model::DataType> &;
+
+        auto findDataType(const QString &typeName) -> const ::seds::model::DataType *;
 
     private:
         const Asn1Acn::Asn1Model *m_asn1Model;
         const Asn1Acn::Definitions *m_definitions;
         const QString m_name;
         ::seds::model::Package *m_sedsPackage;
+        const std::vector<::seds::model::DataType> &m_sedsDataTypes;
         const Options &m_options;
     };
 

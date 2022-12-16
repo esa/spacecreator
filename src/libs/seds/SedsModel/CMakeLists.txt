@@ -135,6 +135,7 @@ set(INCLUDES
     sedsmodel.h
     datasheet.h
     packagefile.h
+    xincludeinfo.h
     base/description.h
     base/fieldref.h
     base/literalvalue.h

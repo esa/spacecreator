@@ -9,7 +9,7 @@ BasicContainer []
     fieldB []
 }
 BinaryPattern []
-PacketId [size 8, encoding pos-int, endianness big]
+PacketId [size 8, encoding pos-int, endianness big, encode-values]
 EmptyContainer []
 EmptyAbstractContainer[]
 PayloadBase []

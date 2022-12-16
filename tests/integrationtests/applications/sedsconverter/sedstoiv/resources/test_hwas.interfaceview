@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="HWAS" comment="Facade for the underlying microprocessor/microcontroller system." is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="InterruptSubscriptionManagement_SubscribeToInterrupt_Pi" comment="Subscribe to a hardware interrupt" kind="Protected" layer="default">
     <Input_Parameter name="interrupt" type="InterruptNumber" encoding="ACN"/>

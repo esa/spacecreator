@@ -69,6 +69,9 @@ public:
 private:
     auto translateIvModel(const ivm::IVModel *ivModel, const Options &options) const
             -> std::vector<std::unique_ptr<Model>>;
+
+private:
+    static inline const QString m_dataTypesSetXPointer = "element(/1/1/1)";
 };
 
 } // namespace conversion::iv::translator

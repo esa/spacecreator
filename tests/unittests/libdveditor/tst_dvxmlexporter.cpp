@@ -25,12 +25,12 @@
 #include "dvnode.h"
 #include "dvpartition.h"
 #include "dvxmlreader.h"
+#include "standardpaths.h"
 
 #include <QFile>
 #include <QObject>
+#include <QTemporaryDir>
 #include <QtTest>
-
-static QString testFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tst_dvxmldocex.xml";
 
 class tst_DVXmlExporter : public QObject
 {
@@ -58,11 +58,13 @@ private Q_SLOTS:
 
 private:
     std::unique_ptr<dve::DVExporter> m_exporter;
+    QTemporaryDir m_testPath;
+    QString m_testFilePath;
 };
 
 QByteArray tst_DVXmlExporter::testFileContent() const
 {
-    QFile file(testFilePath);
+    QFile file(m_testFilePath);
     if (file.open(QIODevice::ReadOnly)) {
         return file.readAll();
     }
@@ -72,29 +74,31 @@ QByteArray tst_DVXmlExporter::testFileContent() const
 
 void tst_DVXmlExporter::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     dve::initDvEditor();
+    m_testFilePath = m_testPath.filePath("tst_dvxmldocex.xml");
 }
 
 void tst_DVXmlExporter::init()
 {
     m_exporter = std::make_unique<dve::DVExporter>();
-    if (QFile::exists(testFilePath)) {
-        QFile::remove(testFilePath);
+    if (QFile::exists(m_testFilePath)) {
+        QFile::remove(m_testFilePath);
     }
 }
 
 void tst_DVXmlExporter::cleanup()
 {
-    if (QFile::exists(testFilePath)) {
-        QFile::remove(testFilePath);
+    if (QFile::exists(m_testFilePath)) {
+        QFile::remove(m_testFilePath);
     }
 }
 
 void tst_DVXmlExporter::testExportEmptyDoc()
 {
-    m_exporter->exportObjectsSilently({}, testFilePath);
+    m_exporter->exportObjectsSilently({}, m_testFilePath);
     const QByteArray text = testFileContent();
-    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView/>";
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\"/>";
     QVERIFY(XmlData(expected) == XmlData(text));
 }
 
@@ -108,9 +112,9 @@ void tst_DVXmlExporter::testExportNode()
     QList<shared::VEObject *> objects;
     objects.append(node);
 
-    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
-    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView>\n"
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
                                 "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\" />\n"
                                 "</DeploymentView>";
     QVERIFY(XmlData(expected) == XmlData(text));
@@ -137,10 +141,10 @@ void tst_DVXmlExporter::testExportDevice()
     objects.append(node.get());
     objects.append(device);
 
-    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected =
-            "<?xml version=\"1.0\"?>\n<DeploymentView>\n"
+            "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
             "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\">\n"
             "       <Device name=\"TestDevice\" attr1=\"33\" attr2=\"\" attr3=\"bar\" config=\"{devname "
             "&quot;eth0&quot;, address &quot;127.0.0.1&quot;, version ipv4, port 5116}\"/>\n"
@@ -170,10 +174,10 @@ void tst_DVXmlExporter::testExportConnection()
     objects.append(node.get());
     objects.append(connection.get());
 
-    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected =
-            "<?xml version=\"1.0\"?>\n<DeploymentView>\n"
+            "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
             "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\" />\n"
             "    <Connection name=\"TestConnection\" from_node=\"Node_From\" from_port=\"Port_From\" to_bus=\"Bus_To\" "
             "to_node=\"Node_To\" to_port=\"Port_To\" />\n"
@@ -210,9 +214,9 @@ void tst_DVXmlExporter::testExportPartitionAndDevice()
     objects.append(partition);
     objects.append(device);
 
-    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
-    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView>\n"
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
                                 "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\">\n"
                                 "       <Partition name=\"TestPartition\" attr1=\"22\" attr2=\"\" attr3=\"foo\"/>\n"
                                 "       <Device name=\"TestDevice\" attr1=\"33\" attr2=\"\" attr3=\"bar\"/>\n"
@@ -254,9 +258,9 @@ void tst_DVXmlExporter::testExportFunctions()
     objects.append(function2);
     objects.append(function3);
 
-    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
-    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView>\n"
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
                                 "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\">\n"
                                 "       <Partition name=\"TestPartition\" attr1=\"22\" attr2=\"\" attr3=\"foo\">\n"
                                 "           <Function name=\"Function_1\"/>"
@@ -287,9 +291,9 @@ void tst_DVXmlExporter::testExportPartition()
     objects.append(node.get());
     objects.append(partition);
 
-    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
-    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView>\n"
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
                                 "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\">\n"
                                 "       <Partition name=\"TestPartition\" attr1=\"22\" attr2=\"\" attr3=\"foo\"/>\n"
                                 "    </Node>\n"
@@ -339,9 +343,9 @@ void tst_DVXmlExporter::testExportFunctionsAndDevice()
     objects.append(function3);
     objects.append(device);
 
-    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
-    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView>\n"
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
                                 "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\">\n"
                                 "       <Partition name=\"TestPartition\" attr1=\"22\" attr2=\"\" attr3=\"foo\">\n"
                                 "           <Function name=\"Function_1\"/>"
@@ -358,7 +362,7 @@ void tst_DVXmlExporter::testExportFunctionsAndDevice()
 void tst_DVXmlExporter::testExportMessage()
 {
     const QByteArray source =
-            "<DeploymentView>"
+            "<DeploymentView version=\"1.0\">"
             "    <Node name=\"node_linux\">"
             "        <Partition ada_runtime=\"\""
             "             coverage=\"FALSE\" cpu=\"x86_linux\" cpu_classifier=\"ocarina_processors_x86::x86.linux\""
@@ -400,7 +404,7 @@ void tst_DVXmlExporter::testExportMessage()
     for (dvm::DVObject *obj : reader.parsedObjects()) {
         objects.append(obj);
     }
-    QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+    QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
     QVERIFY(XmlData(source) == XmlData(text));
 }
@@ -462,9 +466,9 @@ void tst_DVXmlExporter::testAll()
         objects.append(device);
         objects.append(connection.get());
 
-        QVERIFY(m_exporter->exportObjectsSilently(objects, testFilePath));
+        QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
         const QByteArray text = testFileContent();
-        const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView>\n"
+        const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
                                     "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\">\n"
                                     "       <Partition name=\"TestPartition\" attr1=\"22\" attr2=\"\" attr3=\"foo\">\n"
                                     "           <Function name=\"Function_1\"/>"
@@ -486,7 +490,7 @@ void tst_DVXmlExporter::testExportToBuffer()
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     m_exporter->exportObjects({}, &buffer);
-    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView/>";
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\"/>";
     QVERIFY(XmlData(expected) == XmlData(buffer.data()));
 }
 

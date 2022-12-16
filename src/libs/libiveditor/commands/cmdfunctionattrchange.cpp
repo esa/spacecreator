@@ -21,6 +21,7 @@
 #include "cmdentitiesremove.h"
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
+#include "asn1componentsimport.h"
 
 #include <QDebug>
 #include <ivcoreutils.h>
@@ -49,14 +50,16 @@ static inline QVariantHash convertAttributes(const QList<EntityAttribute> &attrs
     return result;
 }
 
-CmdFunctionAttrChange::CmdFunctionAttrChange(
-        shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs)
+CmdFunctionAttrChange::CmdFunctionAttrChange(shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs)
     : shared::cmd::CmdEntityAttributesChange(config, entity, attrs)
+    , m_asn1Importer(new ASN1ComponentsImport(nullptr, shared::sharedTypesPath(), QString()))
     , m_entity(entity)
     , m_newAttrs(convertAttributes(attrs))
     , m_oldAttrs(getCurrentAttributes(entity, attrs))
 {
     setText(QObject::tr("Change Attribute"));
+    connect(m_asn1Importer, &ASN1ComponentsImport::asn1FilesImported, this, &CmdFunctionAttrChange::asn1FilesImported);
+    connect(m_asn1Importer, &ASN1ComponentsImport::asn1FilesRemoved, this, &CmdFunctionAttrChange::asn1FilesRemoved);
 }
 
 CmdFunctionAttrChange::~CmdFunctionAttrChange()
@@ -68,6 +71,11 @@ CmdFunctionAttrChange::~CmdFunctionAttrChange()
 
     for (const auto &cmds : m_cmdUnset)
         qDeleteAll(cmds);
+}
+
+void CmdFunctionAttrChange::setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Checks)
+{
+    m_asn1Importer->setAsn1SystemChecks(asn1Checks);
 }
 
 void CmdFunctionAttrChange::redo()
@@ -154,11 +162,18 @@ void CmdFunctionAttrChange::handleFunctionInstanceOf(const QVariant &attr, bool 
         }
     };
 
-    if (oldInstanceOf)
+    if (oldInstanceOf) {
         performCommands(commandsUnsetPrevFunctionType(oldInstanceOf));
+    }
 
-    if (newInstanceOf)
+    if (newInstanceOf) {
         performCommands(commandsSetNewFunctionType(newInstanceOf));
+        if (isRedo)
+            m_asn1Importer->redoAsnFileImport(newInstanceOf);
+        else
+            m_asn1Importer->undoAsnFileImport();
+
+    }
 
     m_entity->setInstanceOf(newInstanceOf);
 }

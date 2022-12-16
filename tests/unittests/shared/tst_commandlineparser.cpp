@@ -63,6 +63,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterModelsAux();
     void testCmdArgumentSedsConverterIvConfig();
     void testCmdArgumentSedsConverterIvGenerateParentFunctions();
+    void testCmdArgumentSedsConverterIvDataTypesSedsFilepath();
     void testCmdArgumentSedsConverterSedsPreprocessedFilepath();
     void testCmdArgumentSedsConverterSedsSchemaFilepath();
     void testCmdArgumentSedsConverterSedsExtRef();
@@ -82,6 +83,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterTransactionNameType();
     void testCmdArgumentSedsEnableFailureReporting();
     void testCmdArgumentSedsConverterFailureReportingType();
+    void testCmdArgumentSedsConverterArrayDimensionBaseIndexingType();
 
     void initTestCase();
     void testCoverage();
@@ -361,6 +363,25 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterIvGenerateParentFunction
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterIvGenerateParentFunctions));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterIvDataTypesSedsFilepath()
+{
+    const QCommandLineOption cmdIvDataTypesSedsFilepath =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterIvDataTypesSedsFilepath);
+    const QString fileName("datatypes.xml");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdIvDataTypesSedsFilepath.names().first(), fileName) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterIvDataTypesSedsFilepath);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterIvDataTypesSedsFilepath));
+
+    const QString value = parser.value(CommandArg::SedsConverterIvDataTypesSedsFilepath);
+    QCOMPARE(value, fileName);
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterSedsPreprocessedFilepath()
@@ -693,6 +714,25 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterFailureReportingType()
 
     const QString value = parser.value(CommandArg::SedsConverterFailureReportingType);
     QCOMPARE(value, failureReportingType);
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterArrayDimensionBaseIndexingType()
+{
+    const QCommandLineOption cmdArrayDimensionIndexType =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
+    const QString arrayDimensionIndexingType("MyIndexingType");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdArrayDimensionIndexType.names().first(), arrayDimensionIndexingType) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterArrayDimensionBaseIndexingType));
+
+    const QString value = parser.value(CommandArg::SedsConverterArrayDimensionBaseIndexingType);
+    QCOMPARE(value, arrayDimensionIndexingType);
 }
 
 void tst_CommandLineParser::initTestCase()

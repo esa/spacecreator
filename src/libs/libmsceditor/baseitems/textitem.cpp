@@ -33,7 +33,7 @@ bool TextItem::validateText(const QString &text) const
         return true;
     }
 
-    MscReader reader;
+    MscReader reader(MscReader::NOTIFY::NO_HUB);
     QStringList errors;
     QString testDoc = m_mscValidationTest.arg(text);
     try {

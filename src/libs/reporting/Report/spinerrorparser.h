@@ -20,6 +20,7 @@
 #pragma once
 
 #include "dataconstraintviolationreport.h"
+#include "mscfailurereport.h"
 #include "observerfailurereport.h"
 #include "rawerroritem.h"
 #include "spinerrorreportitem.h"
@@ -80,6 +81,12 @@ public:
         IdentifierName = 1
     };
 
+    /// @brief  Regex match token for MSC observer parsing
+    enum MscObserverParseTokens
+    {
+        ObserverName = 1
+    };
+
     /**
      * @brief   Constructor
      */
@@ -91,19 +98,20 @@ public:
      * @param   spinMessages     Spin command outputs
      * @param   sclFiles         SCL condition files
      * @param   errors           Raw error data
-     * @param   observerNames    Observer names
+     * @param   mscObserverFiles MSC observer files
      *
      * @return  List of spin errors
      */
     SpinErrorReport parse(const QStringList &spinMessages, const QStringList &sclFiles,
-            const QList<RawErrorItem> &errors, const QStringList &observerNames) const;
+            const QList<RawErrorItem> &errors, const QStringList &mscObserverFiles) const;
 
 private:
     static const QString m_spinNoTrailFileMessage;
     static const QHash<QString, StopConditionViolationReport::ViolationClause> m_stopConditionViolationClauses;
     static const QHash<QString, StopConditionViolationReport::ViolationType> m_stopConditionViolationTypes;
 
-    SpinErrorReportItem parseTrace(const QString &spinTraces, const QStringList &sclConditions) const;
+    SpinErrorReportItem parseTrace(const QString &spinTraces, const QStringList &sclConditions,
+            const QHash<QString, QString> &mscObservers) const;
 
     QRegularExpressionMatch matchStopCondition(const QString &spinTraces) const;
     QRegularExpressionMatch matchObserverFailureErrorState(const QString &spinTraces) const;
@@ -117,12 +125,14 @@ private:
     QVariant parseStopConditionViolation(const QString &parsedErrorToken) const;
     QVariant parseObserverFailureErrorState(const QString &parsedErrorToken) const;
     QVariant parseObserverFailureSuccessState(const QString &parsedErrorToken) const;
+    QVariant parseMscFailure(const QString &parsedErrorToken, const QString &mscFileName) const;
 
     static QString readFile(const QString &filePath);
 
     static QRegularExpression buildDataConstraintViolationRegex();
     static QRegularExpression buildStopConditionViolationRegex();
     static QRegularExpression buildStopConditionExpressionRegex();
+    static QRegularExpression buildStripCommentsRegex();
 
     static QString removeParentheses(const QString &numberToken);
     static QString cleanUpSclComments(const QString &scl);
@@ -130,6 +140,7 @@ private:
     static StopConditionViolationReport::ViolationType resolveViolationType(const QStringList &expressions);
 
     static void parseVariableName(const QString &variable, DataConstraintViolationReport &violationReport);
+    static QStringList parseMscObserver(const QString &mscFileText);
 };
 
 }

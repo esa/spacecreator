@@ -19,6 +19,7 @@
 
 #include <QDir>
 #include <QObject>
+#include <QProcess>
 #include <QtTest>
 #include <seds/SedsModel/sedsmodel.h>
 #include <seds/SedsOptions/options.h>
@@ -41,18 +42,31 @@ private Q_SLOTS:
     void testExportsString();
 };
 
-QString getFileContents(const QString &filename)
+void compareResults(const QString &filename)
 {
-    QFile file(filename);
-    file.open(QIODevice::ReadOnly);
-    return file.readAll().simplified().trimmed();
+    QProcess diffProcess;
+
+    QStringList args;
+    args << filename << QString("resources/%1").arg(filename);
+
+    diffProcess.start("xmldiff", args);
+    diffProcess.waitForFinished();
+
+    if (diffProcess.exitCode() != 0) {
+        QString diffOutput(diffProcess.readAllStandardOutput());
+        QFAIL(diffOutput.toStdString().c_str());
+    }
 }
 
 void tst_SedsXmlExporter::testExportsInteger()
 {
     const auto model = SedsModelBuilder("Model").withIntegerDataType("TestInteger").build();
+
+    const QString filename("testExportsInteger.xml");
+
     conversion::Options options;
-    options.add(SedsOptions::outputFilepath, "testExportsInteger.xml");
+    options.add(SedsOptions::outputFilepath, filename);
+
     SedsXmlExporter exporter;
     try {
         exporter.exportModel(model.get(), options);
@@ -60,14 +74,18 @@ void tst_SedsXmlExporter::testExportsInteger()
         QFAIL(ex.what());
     }
 
-    QCOMPARE(getFileContents("testExportsInteger.xml"), getFileContents("resources/testExportsInteger.xml"));
+    compareResults(filename);
 }
 
 void tst_SedsXmlExporter::testExportsEnum()
 {
     const auto model = SedsModelBuilder("Model").withEnumeratedDataType("TestEnum", { "a", "b", "c" }).build();
+
+    const QString filename("testExportsEnum.xml");
+
     conversion::Options options;
-    options.add(SedsOptions::outputFilepath, "testExportsEnum.xml");
+    options.add(SedsOptions::outputFilepath, filename);
+
     SedsXmlExporter exporter;
     try {
         exporter.exportModel(model.get(), options);
@@ -75,14 +93,18 @@ void tst_SedsXmlExporter::testExportsEnum()
         QFAIL(ex.what());
     }
 
-    QCOMPARE(getFileContents("testExportsEnum.xml"), getFileContents("resources/testExportsEnum.xml"));
+    compareResults(filename);
 }
 
 void tst_SedsXmlExporter::testExportsFloat()
 {
     const auto model = SedsModelBuilder("Model").withFloatDataType("TestFloat").build();
+
+    const QString filename("testExportsFloat.xml");
+
     conversion::Options options;
-    options.add(SedsOptions::outputFilepath, "testExportsFloat.xml");
+    options.add(SedsOptions::outputFilepath, filename);
+
     SedsXmlExporter exporter;
     try {
         exporter.exportModel(model.get(), options);
@@ -90,14 +112,18 @@ void tst_SedsXmlExporter::testExportsFloat()
         QFAIL(ex.what());
     }
 
-    QCOMPARE(getFileContents("testExportsFloat.xml"), getFileContents("resources/testExportsFloat.xml"));
+    compareResults(filename);
 }
 
 void tst_SedsXmlExporter::testExportsString()
 {
     const auto model = SedsModelBuilder("Model").withStringDataType("TestString").build();
+
+    const QString filename("testExportsString.xml");
+
     conversion::Options options;
-    options.add(SedsOptions::outputFilepath, "testExportsString.xml");
+    options.add(SedsOptions::outputFilepath, filename);
+
     SedsXmlExporter exporter;
     try {
         exporter.exportModel(model.get(), options);
@@ -105,7 +131,7 @@ void tst_SedsXmlExporter::testExportsString()
         QFAIL(ex.what());
     }
 
-    QCOMPARE(getFileContents("testExportsString.xml"), getFileContents("resources/testExportsString.xml"));
+    compareResults(filename);
 }
 
 } // namespace seds::test

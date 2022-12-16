@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="VariableWithArrayDimensions">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-256" max="255" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="MyIndexType">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="10" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="VariableGoodForBeingUsedAsDimension">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="2" max="2" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="PingerType">
+        <CommandSet>
+          <Command name="Ping" mode="async"/>
+        </CommandSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Component">
+        <ProvidedInterfaceSet>
+          <Interface name="PingerIF" type="PingerType" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="coolVariable" type="Number">
+              <ArrayDimensions>
+                <Dimension size="1"/>
+                <Dimension indexTypeRef="VariableGoodForBeingUsedAsDimension"/>
+                <Dimension size="3"/>
+              </ArrayDimensions>
+            </Variable>
+          </VariableSet>
+          <ActivitySet>
+            <Activity name="SetActivity">
+              <Body>
+                <Assignment outputVariableRef="coolVariable[0][1][2]">
+                  <Value value="64" />
+                </Assignment>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s1" />
+              <Transition fromState="s1" toState="s1" name="t1">
+                <OnCommandPrimitive command="Ping" interface="PingerIF" />
+                <Do activity="SetActivity" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

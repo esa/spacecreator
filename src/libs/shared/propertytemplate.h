@@ -19,7 +19,9 @@
 
 #include <QDomElement>
 #include <QMetaEnum>
+#include <QMultiMap>
 #include <QObject>
+#include <QPair>
 #include <QVariant>
 #include <QVector>
 #include <memory>
@@ -98,6 +100,8 @@ public:
     QMultiMap<int, QPair<QString, QString> > attrValidatorPatterns() const;
     void setAttrValidatorPattern(const QMultiMap<int, QPair<QString, QString> > &pattern);
 
+    QMap<QString, QString> enumData(const QString& enumValue) const;
+
     QDomElement toXml(QDomDocument *domDoc) const;
 
     bool validate(const VEObject *object) const;
@@ -122,6 +126,7 @@ public:
 
 protected:
     void initFromXml(const QDomElement &element);
+    void addEnumData(const QDomElement &typeEntryElement);
 
 private:
     struct PropertyTemplatePrivate;

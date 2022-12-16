@@ -26,6 +26,7 @@
 #include "ivmodel.h"
 #include "ivtestutils.h"
 #include "sharedlibrary.h"
+#include "standardpaths.h"
 
 #include <QObject>
 #include <QtTest>
@@ -49,9 +50,9 @@ private:
 
 void tst_CmdEntitiesRemove::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ive::initIVEditor();
     shared::initSharedLibrary();
-    QStandardPaths::setTestModeEnabled(true);
 }
 
 void tst_CmdEntitiesRemove::init()

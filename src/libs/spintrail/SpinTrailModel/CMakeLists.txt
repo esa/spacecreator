@@ -5,13 +5,15 @@ set(SOURCES spintrailmodel.h
     channelevent.h
     continuoussignal.h
     settimerevent.h
-    resettimerevent.h)
+    resettimerevent.h
+    unhandledinputevent.h)
 
 set(INCLUDES spintrailmodel.cpp
     channelevent.cpp
     continuoussignal.cpp
     settimerevent.cpp
-    resettimerevent.cpp)
+    resettimerevent.cpp
+    unhandledinputevent.cpp)
 
 add_library(SpinTrailModel STATIC)
 target_sources(SpinTrailModel

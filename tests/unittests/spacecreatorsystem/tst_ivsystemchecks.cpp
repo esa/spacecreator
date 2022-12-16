@@ -33,6 +33,7 @@
 #include "mscmessage.h"
 #include "mscmodel.h"
 #include "sharedlibrary.h"
+#include "standardpaths.h"
 
 #include <QGraphicsScene>
 #include <QUndoCommand>
@@ -71,7 +72,7 @@ private:
 
 void tst_IvSystemChecks::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     ive::initIVEditor();
     shared::initSharedLibrary();
     auto converter = msc::CoordinatesConverter::instance();

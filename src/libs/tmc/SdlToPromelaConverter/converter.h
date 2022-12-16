@@ -83,6 +83,13 @@ public:
     bool convertStopConditions(const QList<QFileInfo> &inputFiles, const QFileInfo &outputFile,
             const std::map<QString, ProcessMetadata> &inputSdlFiles, bool includeObservers);
 
+    /**
+     * @brief   Set timeout for external sdl2promela process.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setSdl2PromelaTimeout(int timeout);
+
 Q_SIGNALS:
     /**
      * @brief Conversion message.
@@ -111,6 +118,7 @@ private:
     QStringList m_sdl2PromelaArgs;
     QTimer *m_timer;
     QProcess *m_process;
+    std::optional<int> m_sdl2PromelaTimeout;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_startPoint;
 
     const static QString m_sdl2PromelaCommand;

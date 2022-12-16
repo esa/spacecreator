@@ -36,7 +36,23 @@ public:
     void setSpinExecutable(const QString &spinExecutable);
     QString getSpinExecutable();
 
+    void setDefaultOutputDirectory(const QString &defaultOutputDirectory);
+    QString getDefaultOutputDirectory();
+
+    void setSdl2PromelaTimeout(int timeout);
+    int getSdl2PromelaTimeout();
+
+    void setCCompilerTimeout(int timeout);
+    int getCCompilerTimeout();
+
+    void setExternalCommandTimeout(int timeout);
+    int getExternalCommandTimeout();
+
+    void setCompilerFlags(const QString &compilerFlags);
+    QString getCompilerFlags();
+
 private:
     Ui::TmcOptionsWidget *m_ui;
 };
+
 }

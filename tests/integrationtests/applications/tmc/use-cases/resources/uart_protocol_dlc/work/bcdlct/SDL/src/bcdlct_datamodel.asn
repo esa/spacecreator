@@ -9,7 +9,7 @@ IMPORTS
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Bcdlct-States ::= ENUMERATED {transmitting, idle}
+Bcdlct-States ::= ENUMERATED {idle, transmitting}
 
 Bcdlct-Context ::= SEQUENCE {
    state Bcdlct-States,

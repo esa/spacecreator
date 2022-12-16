@@ -1,0 +1,65 @@
+/* CIF Process (0, 0), (800, 100) */
+process CoolComponent;
+    /* CIF Text (0, 150), (400, 500) */
+    dcl Containervar MegaContainer;
+    dcl Childavar ChildContainerA;
+    dcl Num Number;
+    dcl Io_clkif_tick_pi ClkIFType_Tick_Type;
+    /* CIF ENDTEXT */
+    /* CIF Procedure (0, 900), (800, 50) */
+    procedure CheckActivity;
+        /* CIF Start (0, 0), (200, 75) */
+        START;
+            /* CIF Decision (0, 112), (400, 50) */
+            decision present(containerVar.realization) = realizationParentContainer;
+                /* CIF Answer (0, 187), (400, 50) */
+                (True):
+                    /* CIF Join (0, 262), (100, 50) */
+                    join condition_1;
+                /* CIF Answer (600, 187), (400, 50) */
+                (False):
+                    /* CIF Decision (600, 187), (400, 50) */
+                    decision present(containerVar.realization.realizationParentContainer.realization) = realizationChildContainerB;
+                        /* CIF Answer (600, 262), (400, 50) */
+                        (True):
+                            /* CIF Join (600, 337), (100, 50) */
+                            join condition_2;
+                        /* CIF Answer (1200, 262), (400, 50) */
+                        (False):
+                            /* CIF Join (1200, 337), (100, 50) */
+                            join condition_2;
+                    enddecision;
+                    /* CIF Label (1800, 337), (100, 50) */
+                    condition_2:
+                    /* CIF Join (1800, 412), (100, 50) */
+                    join condition_1;
+            enddecision;
+            /* CIF Label (2400, 262), (100, 50) */
+            condition_1:
+    return;
+    endprocedure;
+    /* CIF Start (0, 975), (200, 75) */
+    START;
+        /* CIF NextState (0, 1162), (200, 50) */
+        NEXTSTATE s0;
+    /* CIF State (0, 1237), (200, 50) */
+    state s0;
+        /* CIF Input (0, 1237), (200, 50) */
+        input ClkIF_Tick_Pi(Io_clkif_tick_pi);
+            /* CIF Task (0, 1312), (100, 50) */
+            task Containervar := Io_clkif_tick_pi.Tickarg;
+            /* CIF Decision (0, 1312), (400, 50) */
+            decision present(containerVar.realization.realizationParentContainer.realization) = realizationChildContainerA;
+                /* CIF Answer (0, 1387), (400, 50) */
+                (True):
+                    /* CIF ProcedureCall (0, 1462), (100, 50) */
+                    call CheckActivity;
+                    /* CIF NextState (0, 1537), (200, 50) */
+                    NEXTSTATE s0;
+                /* CIF Answer (3000, 1387), (400, 50) */
+                (False):
+                    /* CIF NextState (3000, 1462), (200, 50) */
+                    NEXTSTATE s0;
+            enddecision;
+    endstate;
+endprocess CoolComponent;

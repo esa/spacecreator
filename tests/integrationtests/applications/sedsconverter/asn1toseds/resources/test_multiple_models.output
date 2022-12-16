@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+<DataSheet xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
 	<Package name="ModelOne">
 		<DataTypeSet>
 			<IntegerDataType name="TypeOne1">
@@ -14,12 +14,6 @@
 					<MinMaxRange min="50" max="100" rangeType="inclusiveMinInclusiveMax" />
 				</Range>
 			</IntegerDataType>
-			<EnumeratedDataType name="Index_SimpleChoiceOne">
-				<EnumerationList>
-					<Enumeration value="0" label="altOne1" />
-					<Enumeration value="1" label="altOne2" />
-				</EnumerationList>
-			</EnumeratedDataType>
 			<ContainerDataType name="SimpleChoiceOne" abstract="true">
 				<EntryList>
 					<Entry type="Index_SimpleChoiceOne" name="index" />
@@ -27,7 +21,7 @@
 			</ContainerDataType>
 			<ContainerDataType baseType="SimpleChoiceOne" name="SimpleChoiceOne_altOne1">
 				<ConstraintSet>
-					<ValueConstraint value="0" entry="index" />
+					<ValueConstraint value="altOne1" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="TypeOne1" name="element" />
@@ -35,18 +29,18 @@
 			</ContainerDataType>
 			<ContainerDataType baseType="SimpleChoiceOne" name="SimpleChoiceOne_altOne2">
 				<ConstraintSet>
-					<ValueConstraint value="1" entry="index" />
+					<ValueConstraint value="altOne2" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="TypeOne2" name="element" />
 				</EntryList>
 			</ContainerDataType>
-			<EnumeratedDataType name="Index_SimpleChoiceWithAnonymousTypesOne">
-				<EnumerationList>
-					<Enumeration value="0" label="altOne1" />
-					<Enumeration value="1" label="altOne2" />
-				</EnumerationList>
-			</EnumeratedDataType>
+            <EnumeratedDataType name="Index_SimpleChoiceOne">
+                <EnumerationList>
+                    <Enumeration label="altOne1" value="0"/>
+                    <Enumeration label="altOne2" value="1"/>
+                </EnumerationList>
+                </EnumeratedDataType>
 			<ContainerDataType name="SimpleChoiceWithAnonymousTypesOne" abstract="true">
 				<EntryList>
 					<Entry type="Index_SimpleChoiceWithAnonymousTypesOne" name="index" />
@@ -60,7 +54,7 @@
 			</IntegerDataType>
 			<ContainerDataType baseType="SimpleChoiceWithAnonymousTypesOne" name="SimpleChoiceWithAnonymousTypesOne_altOne1">
 				<ConstraintSet>
-					<ValueConstraint value="0" entry="index" />
+					<ValueConstraint value="altOne1" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="Type_SimpleChoiceWithAnonymousTypesOne_altOne1" name="element" />
@@ -74,18 +68,18 @@
 			</IntegerDataType>
 			<ContainerDataType baseType="SimpleChoiceWithAnonymousTypesOne" name="SimpleChoiceWithAnonymousTypesOne_altOne2">
 				<ConstraintSet>
-					<ValueConstraint value="1" entry="index" />
+					<ValueConstraint value="altOne2" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="Type_SimpleChoiceWithAnonymousTypesOne_altOne2" name="element" />
 				</EntryList>
 			</ContainerDataType>
-			<EnumeratedDataType name="Index_SimpleChoiceWithEncodingOverrideOne">
-				<EnumerationList>
-					<Enumeration value="0" label="altOne1" />
-					<Enumeration value="1" label="altOne2" />
-				</EnumerationList>
-			</EnumeratedDataType>
+            <EnumeratedDataType name="Index_SimpleChoiceWithAnonymousTypesOne">
+                <EnumerationList>
+                    <Enumeration label="altOne1" value="0"/>
+                    <Enumeration label="altOne2" value="1"/>
+                </EnumerationList>
+            </EnumeratedDataType>
 			<ContainerDataType name="SimpleChoiceWithEncodingOverrideOne" abstract="true">
 				<EntryList>
 					<Entry type="Index_SimpleChoiceWithEncodingOverrideOne" name="index" />
@@ -99,7 +93,7 @@
 			</IntegerDataType>
 			<ContainerDataType baseType="SimpleChoiceWithEncodingOverrideOne" name="SimpleChoiceWithEncodingOverrideOne_altOne1">
 				<ConstraintSet>
-					<ValueConstraint value="0" entry="index" />
+					<ValueConstraint value="altOne1" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="Type_SimpleChoiceWithEncodingOverrideOne_altOne1" name="element" />
@@ -113,12 +107,18 @@
 			</IntegerDataType>
 			<ContainerDataType baseType="SimpleChoiceWithEncodingOverrideOne" name="SimpleChoiceWithEncodingOverrideOne_altOne2">
 				<ConstraintSet>
-					<ValueConstraint value="1" entry="index" />
+					<ValueConstraint value="altOne2" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="Type_SimpleChoiceWithEncodingOverrideOne_altOne2" name="element" />
 				</EntryList>
 			</ContainerDataType>
+            <EnumeratedDataType name="Index_SimpleChoiceWithEncodingOverrideOne">
+                <EnumerationList>
+                    <Enumeration label="altOne1" value="0"/>
+                    <Enumeration label="altOne2" value="1"/>
+                </EnumerationList>
+            </EnumeratedDataType>
 		</DataTypeSet>
 	</Package>
 	<Package name="ModelTwo">
@@ -135,12 +135,6 @@
 					<MinMaxRange min="50" max="100" rangeType="inclusiveMinInclusiveMax" />
 				</Range>
 			</IntegerDataType>
-			<EnumeratedDataType name="Index_SimpleChoiceTwo">
-				<EnumerationList>
-					<Enumeration value="0" label="altTwo1" />
-					<Enumeration value="1" label="altTwo2" />
-				</EnumerationList>
-			</EnumeratedDataType>
 			<ContainerDataType name="SimpleChoiceTwo" abstract="true">
 				<EntryList>
 					<Entry type="Index_SimpleChoiceTwo" name="index" />
@@ -148,7 +142,7 @@
 			</ContainerDataType>
 			<ContainerDataType baseType="SimpleChoiceTwo" name="SimpleChoiceTwo_altTwo1">
 				<ConstraintSet>
-					<ValueConstraint value="0" entry="index" />
+					<ValueConstraint value="altTwo1" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="TypeTwo1" name="element" />
@@ -156,18 +150,18 @@
 			</ContainerDataType>
 			<ContainerDataType baseType="SimpleChoiceTwo" name="SimpleChoiceTwo_altTwo2">
 				<ConstraintSet>
-					<ValueConstraint value="1" entry="index" />
+					<ValueConstraint value="altTwo2" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="TypeTwo2" name="element" />
 				</EntryList>
 			</ContainerDataType>
-			<EnumeratedDataType name="Index_SimpleChoiceWithAnonymousTypesTwo">
-				<EnumerationList>
-					<Enumeration value="0" label="altTwo1" />
-					<Enumeration value="1" label="altTwo2" />
-				</EnumerationList>
-			</EnumeratedDataType>
+            <EnumeratedDataType name="Index_SimpleChoiceTwo">
+                <EnumerationList>
+                    <Enumeration label="altTwo1" value="0"/>
+                    <Enumeration label="altTwo2" value="1"/>
+                </EnumerationList>
+            </EnumeratedDataType>
 			<ContainerDataType name="SimpleChoiceWithAnonymousTypesTwo" abstract="true">
 				<EntryList>
 					<Entry type="Index_SimpleChoiceWithAnonymousTypesTwo" name="index" />
@@ -181,7 +175,7 @@
 			</IntegerDataType>
 			<ContainerDataType baseType="SimpleChoiceWithAnonymousTypesTwo" name="SimpleChoiceWithAnonymousTypesTwo_altTwo1">
 				<ConstraintSet>
-					<ValueConstraint value="0" entry="index" />
+					<ValueConstraint value="altTwo1" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="Type_SimpleChoiceWithAnonymousTypesTwo_altTwo1" name="element" />
@@ -195,18 +189,18 @@
 			</IntegerDataType>
 			<ContainerDataType baseType="SimpleChoiceWithAnonymousTypesTwo" name="SimpleChoiceWithAnonymousTypesTwo_altTwo2">
 				<ConstraintSet>
-					<ValueConstraint value="1" entry="index" />
+					<ValueConstraint value="altTwo2" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="Type_SimpleChoiceWithAnonymousTypesTwo_altTwo2" name="element" />
 				</EntryList>
 			</ContainerDataType>
-			<EnumeratedDataType name="Index_SimpleChoiceWithEncodingOverrideTwo">
-				<EnumerationList>
-					<Enumeration value="0" label="altTwo1" />
-					<Enumeration value="1" label="altTwo2" />
-				</EnumerationList>
-			</EnumeratedDataType>
+            <EnumeratedDataType name="Index_SimpleChoiceWithAnonymousTypesTwo">
+                <EnumerationList>
+                    <Enumeration label="altTwo1" value="0"/>
+                    <Enumeration label="altTwo2" value="1"/>
+                </EnumerationList>
+                </EnumeratedDataType>
 			<ContainerDataType name="SimpleChoiceWithEncodingOverrideTwo" abstract="true">
 				<EntryList>
 					<Entry type="Index_SimpleChoiceWithEncodingOverrideTwo" name="index" />
@@ -220,7 +214,7 @@
 			</IntegerDataType>
 			<ContainerDataType baseType="SimpleChoiceWithEncodingOverrideTwo" name="SimpleChoiceWithEncodingOverrideTwo_altTwo1">
 				<ConstraintSet>
-					<ValueConstraint value="0" entry="index" />
+					<ValueConstraint value="altTwo1" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="Type_SimpleChoiceWithEncodingOverrideTwo_altTwo1" name="element" />
@@ -234,12 +228,18 @@
 			</IntegerDataType>
 			<ContainerDataType baseType="SimpleChoiceWithEncodingOverrideTwo" name="SimpleChoiceWithEncodingOverrideTwo_altTwo2">
 				<ConstraintSet>
-					<ValueConstraint value="1" entry="index" />
+					<ValueConstraint value="altTwo2" entry="index" />
 				</ConstraintSet>
 				<EntryList>
 					<Entry type="Type_SimpleChoiceWithEncodingOverrideTwo_altTwo2" name="element" />
 				</EntryList>
 			</ContainerDataType>
+            <EnumeratedDataType name="Index_SimpleChoiceWithEncodingOverrideTwo">
+                <EnumerationList>
+                    <Enumeration label="altTwo1" value="0"/>
+                    <Enumeration label="altTwo2" value="1"/>
+                </EnumerationList>
+            </EnumeratedDataType>
 		</DataTypeSet>
 	</Package>
 </DataSheet>

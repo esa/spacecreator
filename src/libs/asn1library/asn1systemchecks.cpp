@@ -62,6 +62,11 @@ QStringList Asn1SystemChecks::allTypeNames() const
     return typeNames;
 }
 
+QString Asn1SystemChecks::projectPath() const
+{
+    return m_project ? m_project->projectPath() : QString();
+}
+
 /*!
    All ASN1 definitions of all files in one vector
  */

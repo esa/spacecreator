@@ -26,6 +26,7 @@
 #include "xmelwriter.h"
 
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -33,9 +34,10 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QProcess>
+#include <QSettings>
 #include <QThread>
 #include <conversion/common/escaper/escaper.h>
-
+#include <tmc/TmcConfig/constants.h>
 
 namespace {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -79,6 +81,10 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     this->subtypesPath = projectDir + "/work/modelchecking/subtypes";
     this->configurationsPath = projectDir + "/work/modelchecking/configurations";
     this->outputPath = projectDir + "/work/build/modelchecking/output";
+
+    QSettings settings;
+    this->spinOutputPath =
+            settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, QString()).toString();
 
     // CHECK project dir structure, create directories where necessary
     // check if properties dir exists and create it otherwise
@@ -125,11 +131,16 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     connect(d->ui->tableDeleteButton, &QPushButton::clicked, this,
             &ModelCheckingWindow::removeGenerationLimitsTableRow);
 
+    connect(d->ui->treeWidget_spinResults, &QTreeWidget::itemDoubleClicked, [&](QTreeWidgetItem *item, int column) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(this->spinOutputPath + "/" + item->text(column)));
+    });
+
     // Make tree views show horizontal scroll bars
     d->ui->treeWidget_properties->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     d->ui->treeWidget_subtyping->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     d->ui->treeWidget_submodel->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     d->ui->treeWidget_results->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    d->ui->treeWidget_spinResults->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // Build properties tree view
     QFileInfo propertiesFileInfo(this->propertiesPath);
@@ -158,7 +169,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     d->ui->treeWidget_submodel->addTopLevelItem(functionsTopNodeWidgetItem);
     listModelFunctions(functionsTopNodeWidgetItem, {});
 
-    // Build results tree view
+    // Build results tree view for if model checker
     QFileInfo resultsFileInfo(this->outputPath);
     QStringList fileColumnResuls;
     fileColumnResuls.append(resultsFileInfo.fileName());
@@ -166,6 +177,15 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     resultsTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
     d->ui->treeWidget_results->addTopLevelItem(resultsTopDirWidgetItem);
     listResults(resultsTopDirWidgetItem, resultsFileInfo);
+
+    // Build results tree view for spin model checker
+    QFileInfo spinResultsFileInfo(this->spinOutputPath);
+    QStringList fileColumnSpinResults;
+    fileColumnSpinResults.append(spinResultsFileInfo.fileName());
+    spinResultsTopDirWidgetItem = new QTreeWidgetItem(fileColumnSpinResults);
+    spinResultsTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
+    d->ui->treeWidget_spinResults->addTopLevelItem(spinResultsTopDirWidgetItem);
+    listSpinResults(spinResultsTopDirWidgetItem, spinResultsFileInfo);
 
     // Set validators on MC options value fileds
     d->ui->lineEdit_maxNumEnvRICalls->setValidator(new QIntValidator(0, 1000000, this));
@@ -229,7 +249,10 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     // CALL KAZOO
     QString kazooCmd = "kazoo";
     QStringList kazooArguments;
-    kazooArguments << "-gw" << "--glue" << "-t" << "MOCHECK";
+    kazooArguments << "-gw"
+                   << "--glue"
+                   << "-t"
+                   << "MOCHECK";
     auto kazooCallerProcess = new QProcess(this);
     kazooCallerProcess->setWorkingDirectory(this->projectDir + "/");
     if (kazooCallerProcess->execute(kazooCmd, kazooArguments) != 0) {
@@ -444,6 +467,44 @@ void ModelCheckingWindow::listResults(QTreeWidgetItem *parentWidgetItem, QFileIn
 }
 
 /*!
+ * \brief ModelCheckingWindow::listModelFunctions Function creating a tree of QTreeWidgetItem reflecting the
+ * results/output directory.
+ */
+void ModelCheckingWindow::listSpinResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent)
+{
+    QDir dir;
+    dir.setPath(parent.filePath());
+    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks);
+    dir.setSorting(QDir::DirsFirst | QDir::Name);
+
+    const QFileInfoList fileList = dir.entryInfoList();
+
+    for (int i = 0; i < fileList.size(); i++) {
+        QFileInfo fileInfo = fileList.at(i);
+        QStringList fileColumn;
+        fileColumn.append(fileInfo.fileName());
+        if (fileInfo.fileName() == "." || fileInfo.fileName() == "..")
+            ; // nothing
+        else if (fileInfo.isDir()) { // is directory
+            continue;
+        } else { // is file
+            if (fileInfo.suffix() == "html") {
+                fileColumn.append(fileInfo.filePath());
+                QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
+                child->setIcon(0, this->style()->standardIcon(QStyle::SP_MediaPlay));
+                parentWidgetItem->addChild(child);
+            }
+            if (fileInfo.suffix() == "sim") {
+                fileColumn.append(fileInfo.filePath());
+                QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
+                child->setIcon(0, this->style()->standardIcon(QStyle::SP_FileIcon));
+                parentWidgetItem->addChild(child);
+            }
+        }
+    }
+}
+
+/*!
  * \brief ModelCheckingWindow::on_treeWidget_properties_itemChanged Checks or unchecks child tree nodes as per parent
  * resulting check state upon change.
  */
@@ -528,14 +589,40 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     }
 
     auto p = new QProcess(this);
+    observedProcess = p;
     p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
         QString cmd = program + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Open property"), tr("Error when calling '%1'.").arg(cmd));
         return;
     }
+    connect(p, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
+    connect(p, SIGNAL(readyReadStandardError()), this, SLOT(processStderr()));
+    connect(p, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdout()));
 
     statusBar()->showMessage("File open.", 6000);
+}
+
+void ModelCheckingWindow::processFinished(int code, QProcess::ExitStatus st)
+{
+    qDebug() << "process finished with code " << code;
+    if (st == QProcess::ExitStatus::CrashExit) {
+        qDebug() << "CRASH";
+    }
+}
+
+void ModelCheckingWindow::processStderr()
+{
+    QByteArray buffer = observedProcess->readAllStandardError();
+    QString text = QString(buffer);
+    qDebug() << "process: " << text;
+}
+
+void ModelCheckingWindow::processStdout()
+{
+    QByteArray buffer = observedProcess->readAllStandardOutput();
+    QString text = QString(buffer);
+    qDebug() << "process: " << text;
 }
 
 /*!
@@ -602,7 +689,10 @@ void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
     // build and run the interactive simulator
     QString xtermCmd = "xterm";
     QStringList arguments;
-    arguments << "-hold" << "-e" << "make" << "simu";
+    arguments << "-hold"
+              << "-e"
+              << "make"
+              << "simu";
     if (QProcess::execute(xtermCmd, arguments) != 0) {
         QString fullCmd = xtermCmd + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Interactive Simulator"), "Error executing: " + fullCmd);
@@ -622,7 +712,10 @@ void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
     // build and run the exhaustive simulator
     QString xtermCmd = "xterm";
     QStringList arguments;
-    arguments << "-hold" << "-e" << "make" << "native_modelchecker";
+    arguments << "-hold"
+              << "-e"
+              << "make"
+              << "native_modelchecker";
     if (QProcess::execute(xtermCmd, arguments) != 0) {
         QString fullCmd = xtermCmd + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Exhaustive Simulator"), "Error executing: " + fullCmd);
@@ -654,7 +747,9 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     // REMOVE statusfile, callif.sh
     QString rmCmd = "rm";
     QStringList arguments;
-    arguments << "-f" << "statusfile" << "callif.sh";
+    arguments << "-f"
+              << "statusfile"
+              << "callif.sh";
 
     if (QProcess::execute(rmCmd, arguments) != 0) {
         QString fullCmd = rmCmd + " " + arguments.join(" ");
@@ -687,7 +782,10 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     // CALL IF make rule via terminal, saving make return in statusfile
     QString xtermCmd = "xterm";
     QStringList callifArguments;
-    callifArguments << "-hold" << "-e" << "sh" << "callif.sh";
+    callifArguments << "-hold"
+                    << "-e"
+                    << "sh"
+                    << "callif.sh";
 
     if (QProcess::execute(xtermCmd, callifArguments) != 0) {
         QString fullCallifCmd = xtermCmd + " " + callifArguments.join(" ");
@@ -743,7 +841,8 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
             // copy output directory
             QString program = "cp";
             QStringList arguments;
-            arguments << "-r" << "." << saveDirectoryName;
+            arguments << "-r"
+                      << "." << saveDirectoryName;
             if (QProcess::execute(program, arguments) != 0) {
                 QMessageBox::warning(this, tr("Call IF"), "Error copying output folder to: " + saveDirectoryName);
             }
@@ -783,7 +882,7 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
     }
 
     auto p = new QProcess();
-    connect(p, &QProcess::stateChanged, [p](QProcess::ProcessState newState){
+    connect(p, &QProcess::stateChanged, [p](QProcess::ProcessState newState) {
         if (newState == QProcess::NotRunning) {
             p->deleteLater();
         }
@@ -791,7 +890,8 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
 
     p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
-        QMessageBox::warning(this, tr("Open scenario"), tr("Error when calling '%1 %2' .").arg(program, arguments.join(" ")));
+        QMessageBox::warning(
+                this, tr("Open scenario"), tr("Error when calling '%1 %2' .").arg(program, arguments.join(" ")));
         delete p;
         return;
     }
@@ -1042,11 +1142,14 @@ bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(
         return false;
     }
 
-    auto sedCommandProcess = new QProcess(this);
-    const QString sedCommand = sedCommandForWhenThenPropertyTemplate.arg(propertyName).arg(newPropertyFilePath);
+    QProcess sedCommandProcess;
+    const QString sedParameter = sedParameterForWhenThenPropertyTemplate.arg(propertyName);
+    const QStringList sedParameters = { sedParameterForInplaceEdit, sedParameter, newPropertyFilePath };
 
-    if (sedCommandProcess->execute(sedCommand)) {
-        QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(sedCommand));
+    if (sedCommandProcess.execute(sedCommand, sedParameters) != 0) {
+
+        QMessageBox::warning(this, tr("Add new property"),
+                tr("%1 %2 command can not be executed.").arg(sedCommand).arg(sedParameters.join(" ")));
         return false;
     }
 
@@ -1199,7 +1302,8 @@ void ModelCheckingWindow::addSubtypes()
         process->setWorkingDirectory(this->projectDir);
         QString makeCmd = "make";
         QStringList arguments;
-        arguments << "create-subtype" << "NAME=" + subtypingFileName;
+        arguments << "create-subtype"
+                  << "NAME=" + subtypingFileName;
         if (process->execute(makeCmd, arguments) != 0) {
             QMessageBox::warning(this, tr("Add subtypes"),
                     tr("Error executing 'make create-subtype NAME=%1'").arg(subtypingFileName));
@@ -1210,9 +1314,9 @@ void ModelCheckingWindow::addSubtypes()
         // ADD NEW TREE NODE
         QStringList fileColumn;
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-QFileInfo fileInfo = filePath;
+        QFileInfo fileInfo = filePath;
 #else
-QFileInfo fileInfo = QFileInfo(filePath);
+        QFileInfo fileInfo = QFileInfo(filePath);
 #endif
 
         fileColumn.append(fileInfo.fileName());
@@ -1637,6 +1741,7 @@ void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
             SpinConfigData::optionalIntToString(spinConfig.globalInputVectorGenerationLimit));
     d->ui->lineEdit_rawCommandLine->setText(spinConfig.rawCommandLine);
     d->ui->lineEdit_deltaValue->setText(SpinConfigData::optionalFloatToString(spinConfig.deltaValue));
+    d->ui->lineEdit_vectorszValue->setText(SpinConfigData::optionalIntToString(spinConfig.vectorszValue));
 
     spinConfig.explorationMode == ExplorationMode::BreadthFirst
             ? d->ui->comboBox_spinExpAlgorithm->setCurrentText("Breadth First Search")
@@ -1672,8 +1777,15 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
 {
     QString outputDirectoryFilepath;
     {
+        // ensure the default output directory exists
+        QSettings settings;
+        QVariant defaultOutputDirectory =
+                settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, QString());
+        QString defaultOutputFullPath = QStringLiteral("%1/%2").arg(projectDir, defaultOutputDirectory.toString());
+        QDir(defaultOutputFullPath).mkpath(QStringLiteral("."));
+
         QFileDialog fileDialog;
-        fileDialog.setDirectory(projectDir);
+        fileDialog.setDirectory(defaultOutputFullPath);
         fileDialog.setFileMode(QFileDialog::FileMode::Directory);
         fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
         fileDialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
@@ -1687,9 +1799,19 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
         } else {
             return;
         }
+        // save relative output path
+        const QString relativeOutputDirectory = QDir(projectDir).relativeFilePath(outputDirectoryFilepath);
+        settings.setValue(tmc::TmcConstants::SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY, relativeOutputDirectory);
+    }
+
+    // DESTROY tree except root
+    QTreeWidgetItem *spinTreeRoot = this->spinResultsTopDirWidgetItem;
+    for (int i = spinTreeRoot->childCount(); i > 0; i--) {
+        spinTreeRoot->removeChild(spinTreeRoot->child(i - 1));
     }
 
     QFileInfo outputDirectory(outputDirectoryFilepath);
+    this->spinOutputPath = outputDirectoryFilepath;
 
     if (outputDirectory.exists()) {
         if (!outputDirectory.isDir()) {
@@ -1745,6 +1867,9 @@ void ModelCheckingWindow::on_pushButton_callSpin_clicked()
     dialog.setOutputDirectory(outputDirectoryFilepath);
 
     dialog.exec();
+
+    QFileInfo resultsFileInfo(outputDirectory);
+    listSpinResults(spinResultsTopDirWidgetItem, resultsFileInfo);
 }
 
 void ModelCheckingWindow::setCheckBoxState(QCheckBox *checkBox, bool isChecked)
@@ -1763,6 +1888,7 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
     spinConfigData.searchStateLimit = SpinConfigData::optionalIntFromString(d->ui->lineEdit_searchStateLimit->text());
     spinConfigData.timeLimitSeconds = SpinConfigData::optionalIntFromString(d->ui->lineEdit_spinTimeLimit->text());
     spinConfigData.deltaValue = SpinConfigData::optionalFloatFromString(d->ui->lineEdit_deltaValue->text());
+    spinConfigData.vectorszValue = SpinConfigData::optionalIntFromString(d->ui->lineEdit_vectorszValue->text());
 
     spinConfigData.searchShortestPath = (d->ui->checkBox_searchShortestPath->checkState() == Qt::Checked);
     spinConfigData.useFairScheduling = (d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked);
@@ -1777,10 +1903,15 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
 
     const auto tableWidget = d->ui->tableWidget_generationLimits;
     spinConfigData.ifaceGenerationLimits.clear();
+
     for (int i = 0; i < tableWidget->rowCount(); i++) {
-        QString ifaceName = tableWidget->item(i, 0)->text();
-        int ifaceGenerationLimit = tableWidget->item(i, 1)->text().toInt();
-        spinConfigData.ifaceGenerationLimits.append({ ifaceName, ifaceGenerationLimit });
+        QTableWidgetItem *ifaceNameItem = tableWidget->item(i, 0);
+        QTableWidgetItem *generationLimitItem = tableWidget->item(i, 1);
+        if (ifaceNameItem && generationLimitItem) {
+            QString ifaceName = ifaceNameItem->text();
+            int ifaceGenerationLimit = generationLimitItem->text().toInt();
+            spinConfigData.ifaceGenerationLimits.append({ ifaceName, ifaceGenerationLimit });
+        }
     }
 
     return spinConfigData;

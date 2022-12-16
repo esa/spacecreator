@@ -44,6 +44,8 @@ public:
 
     QStringList allTypeNames() const;
 
+    QString projectPath() const;
+
     std::vector<Definitions *> definitionsList() const;
 
     virtual bool checkAsn1Compliance(const QString &parameter, const QString &typeName) const;

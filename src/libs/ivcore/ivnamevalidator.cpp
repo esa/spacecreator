@@ -28,7 +28,6 @@
 #include <QDebug>
 #include <QDir>
 #include <QRegularExpression>
-#include <QStandardPaths>
 
 namespace ivm {
 
@@ -535,7 +534,7 @@ bool IVNameValidator::isConnectionLayerNameUsed(const QString &name, const IVObj
     for (const auto modelObject : layer->model()->objects()) {
         if (auto modelLayer = qobject_cast<ivm::IVConnectionLayerType *>(modelObject)) {
             if (modelLayer->title() == name) {
-                    return true;
+                return true;
             }
         }
     }

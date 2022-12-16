@@ -97,6 +97,13 @@ public:
             const std::vector<::seds::model::DimensionSize> &dimensions) -> Asn1Acn::Types::Type *;
 
     /**
+     * @brief   Remove constraints from given ASN.1 type
+     *
+     * @param   asn1Type    Type to has its constraints removed
+     */
+    static auto removeConstraints(Asn1Acn::Types::Type *asn1Type) -> void;
+
+    /**
      * @brief   Check if given type is a generic type
      *
      * @param   typeRef         Type to check

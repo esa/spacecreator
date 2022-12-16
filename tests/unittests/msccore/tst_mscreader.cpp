@@ -35,7 +35,7 @@ using namespace msc;
 
 void tst_MscReader::init()
 {
-    m_reader = new MscReader;
+    m_reader = new MscReader(MscReader::NOTIFY::NO_HUB);
 }
 
 void tst_MscReader::cleanup()

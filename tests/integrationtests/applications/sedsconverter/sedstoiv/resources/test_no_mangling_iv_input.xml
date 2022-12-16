@@ -1,4 +1,4 @@
-<InterfaceView asn1file="sedstestpro3.acn">
+<InterfaceView version="1.0" asn1file="sedstestpro3.acn">
 	<Function name="Function_1" is_type="NO" language="SEDS" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
 		<Property name="Taste::coordinates" value="25100 30900 45100 38900" />
 		<Provided_Interface name="PI_2" kind="Sporadic" layer="default" required_system_element="NO" priority="1" stack_size="1024" miat="0" wcet="0" queue_size="1">

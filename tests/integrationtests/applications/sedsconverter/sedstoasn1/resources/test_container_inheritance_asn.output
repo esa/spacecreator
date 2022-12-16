@@ -6,7 +6,7 @@ GigaContainer ::= SEQUENCE
     {
         realizationGigaContainer SEQUENCE
         {
-            gigaEntry DataType(0 .. 10)
+            gigaEntry DataType
         } ,
         realizationMegaContainer MegaContainer
     }
@@ -24,10 +24,10 @@ ParentContainer ::= SEQUENCE
     {
         realizationParentContainer SEQUENCE
         {
-            gigaEntry DataType(0 .. 10),
-            megaEntry DataType(0 .. 10),
-            parentEntry DataType(0 .. 10),
-            megaTrailerEntry DataType(0 .. 10)
+            gigaEntry DataType,
+            megaEntry DataType,
+            parentEntry DataType,
+            megaTrailerEntry DataType
         } ,
         realizationChildContainer1 ChildContainer1,
         realizationChildContainer2 ChildContainer2
@@ -35,19 +35,19 @@ ParentContainer ::= SEQUENCE
 }
 ChildContainer1 ::= SEQUENCE
 {
-    gigaEntry DataType(0 .. 10),
-    megaEntry DataType(0 .. 10),
-    parentEntry DataType(0 .. 10),
-    childEntry1 DataType(0 .. 10),
-    megaTrailerEntry DataType(0 .. 10)
+    gigaEntry DataType,
+    megaEntry DataType,
+    parentEntry DataType,
+    childEntry1 DataType,
+    megaTrailerEntry DataType
 }
 ChildContainer2 ::= SEQUENCE
 {
-    gigaEntry DataType(0 .. 10),
-    megaEntry DataType(0 .. 10),
-    parentEntry DataType(0 .. 10),
-    childEntry2 DataType(0 .. 10),
-    megaTrailerEntry DataType(0 .. 10)
+    gigaEntry DataType,
+    megaEntry DataType,
+    parentEntry DataType,
+    childEntry2 DataType,
+    megaTrailerEntry DataType
 }
 END
 

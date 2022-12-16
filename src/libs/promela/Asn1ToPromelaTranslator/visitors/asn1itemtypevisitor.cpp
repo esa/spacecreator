@@ -91,12 +91,13 @@ using promela::model::VariableRef;
 
 namespace promela::translator {
 Asn1ItemTypeVisitor::Asn1ItemTypeVisitor(PromelaModel &promelaModel, std::optional<QString> baseTypeName, QString name,
-        bool generateInits, bool enhancedSpinSupport)
+        bool generateInits, bool enhancedSpinSupport, int nestedIndexCounter)
     : m_promelaModel(promelaModel)
     , m_baseTypeName(std::move(baseTypeName))
     , m_name(std::move(name))
     , m_generateInits(generateInits)
     , m_enhancedSpinSupport(enhancedSpinSupport)
+    , m_nestedIndexCounter(nestedIndexCounter)
 {
 }
 
@@ -299,7 +300,8 @@ void Asn1ItemTypeVisitor::visit(const Choice &type)
     model::Conditional assignConditional;
     int32_t index = 1;
     for (const std::unique_ptr<Asn1Acn::Types::ChoiceAlternative> &component : type.components()) {
-        Asn1ItemTypeVisitor nestedVisitor(m_promelaModel, utypeName, component->name(), false, m_enhancedSpinSupport);
+        Asn1ItemTypeVisitor nestedVisitor(
+                m_promelaModel, utypeName, component->name(), false, m_enhancedSpinSupport, m_nestedIndexCounter + 1);
         component->type()->accept(nestedVisitor);
         std::optional<DataType> nestedDataType = nestedVisitor.getResultDataType();
 
@@ -376,7 +378,8 @@ void Asn1ItemTypeVisitor::visit(const Sequence &type)
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
     for (const std::unique_ptr<Asn1Acn::SequenceComponent> &component : type.components()) {
-        Asn1SequenceComponentVisitor componentVisitor(m_promelaModel, nestedUtypeName, m_enhancedSpinSupport);
+        Asn1SequenceComponentVisitor componentVisitor(
+                m_promelaModel, nestedUtypeName, m_enhancedSpinSupport, m_nestedIndexCounter + 1);
         component->accept(componentVisitor);
 
         if (componentVisitor.wasComponentVisited()) {
@@ -446,7 +449,8 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
-    Asn1ItemTypeVisitor itemTypeVisitor(m_promelaModel, utypeName, "elem", true, m_enhancedSpinSupport);
+    Asn1ItemTypeVisitor itemTypeVisitor(
+            m_promelaModel, utypeName, "elem", true, m_enhancedSpinSupport, m_nestedIndexCounter + 1);
     type.itemsType()->accept(itemTypeVisitor);
     DataType dataType = itemTypeVisitor.getResultDataType().value();
 
@@ -466,7 +470,7 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
 
     model::Sequence sequence(model::Sequence::Type::NORMAL);
 
-    sequence.appendElement(Declaration(DataType(BasicType::INT), "i"));
+    sequence.appendElement(Declaration(DataType(BasicType::INT), getIndexVariableName()));
 
     if (isConstSize) {
         auto loopRangeEnd = Constant(constraintVisitor.getMaxSize() - 1);
@@ -574,7 +578,8 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 {
     if (type.type()) {
         const auto name = m_name.isEmpty() ? type.typeName() : m_name;
-        Asn1ItemTypeVisitor visitor(m_promelaModel, m_baseTypeName, name, m_generateInits, m_enhancedSpinSupport);
+        Asn1ItemTypeVisitor visitor(
+                m_promelaModel, m_baseTypeName, name, m_generateInits, m_enhancedSpinSupport, m_nestedIndexCounter);
         type.type()->accept(visitor);
 
         m_resultDataType = visitor.getResultDataType();
@@ -623,7 +628,7 @@ void Asn1ItemTypeVisitor::addSimpleArrayAssignInlineValue(const QString &typeNam
         sequence.appendElement(std::move(sizeCheckCall));
     }
 
-    sequence.appendElement(Declaration(DataType(BasicType::INT), "i"));
+    sequence.appendElement(Declaration(DataType(BasicType::INT), getIndexVariableName()));
 
     if (isConstSize) {
         auto loopRangeEnd = Constant(length - 1);
@@ -857,14 +862,19 @@ QString Asn1ItemTypeVisitor::buildCheckArgumentName(const QString &typeName, con
     return QString("%1_%2c").arg(typeName).arg(postfix);
 }
 
+QString Asn1ItemTypeVisitor::getIndexVariableName() const
+{
+    return QString("i_%1").arg(m_nestedIndexCounter);
+}
+
 ForLoop Asn1ItemTypeVisitor::createSequenceOfDataLoop(const QString &utypeName, Expression loopRangeEnd) const
 {
     auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef(getIndexVariableName())));
     VariableRef src("src");
-    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    src.appendElement("data", std::make_unique<Expression>(VariableRef(getIndexVariableName())));
 
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(dst);
@@ -874,7 +884,7 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfDataLoop(const QString &utypeName, 
     auto inlineCall = InlineCall(inlineName, inlineArguments);
     loopSequence->appendElement(std::move(inlineCall));
 
-    auto forLoop = ForLoop(VariableRef("i"), 0, std::move(loopRangeEnd), std::move(loopSequence));
+    auto forLoop = ForLoop(VariableRef(getIndexVariableName()), 0, std::move(loopRangeEnd), std::move(loopSequence));
 
     return forLoop;
 }
@@ -884,13 +894,13 @@ ForLoop Asn1ItemTypeVisitor::createStringDataLoop(Expression loopRangeEnd) const
     auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef(getIndexVariableName())));
     VariableRef src("src");
-    src.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    src.appendElement("data", std::make_unique<Expression>(VariableRef(getIndexVariableName())));
 
     loopSequence->appendElement(Assignment(dst, Expression(src)));
 
-    auto forLoop = ForLoop(VariableRef("i"), 0, std::move(loopRangeEnd), std::move(loopSequence));
+    auto forLoop = ForLoop(VariableRef(getIndexVariableName()), 0, std::move(loopRangeEnd), std::move(loopSequence));
 
     return forLoop;
 }
@@ -900,7 +910,7 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfInitLoop(const QString &utypeName, 
     auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef(getIndexVariableName())));
     VariableRef srcLength = VariableRef("src");
     srcLength.appendElement("length");
 
@@ -911,7 +921,8 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfInitLoop(const QString &utypeName, 
     auto inlineCall = InlineCall(inlineName, inlineArguments);
     loopSequence->appendElement(std::move(inlineCall));
 
-    auto forLoop = ForLoop(VariableRef("i"), Expression(srcLength), loopRangeEnd, std::move(loopSequence));
+    auto forLoop =
+            ForLoop(VariableRef(getIndexVariableName()), Expression(srcLength), loopRangeEnd, std::move(loopSequence));
 
     return forLoop;
 }
@@ -921,13 +932,14 @@ ForLoop Asn1ItemTypeVisitor::createStringInitLoop(const std::size_t loopRangeEnd
     auto loopSequence = std::make_unique<model::Sequence>(model::Sequence::Type::NORMAL);
 
     VariableRef dst("dst");
-    dst.appendElement("data", std::make_unique<Expression>(VariableRef("i")));
+    dst.appendElement("data", std::make_unique<Expression>(VariableRef(getIndexVariableName())));
     VariableRef srcLength = VariableRef("src");
     srcLength.appendElement("length");
 
     loopSequence->appendElement(Assignment(dst, Expression(Constant(0))));
 
-    auto forLoop = ForLoop(VariableRef("i"), Expression(srcLength), loopRangeEnd, std::move(loopSequence));
+    auto forLoop =
+            ForLoop(VariableRef(getIndexVariableName()), Expression(srcLength), loopRangeEnd, std::move(loopSequence));
 
     return forLoop;
 }

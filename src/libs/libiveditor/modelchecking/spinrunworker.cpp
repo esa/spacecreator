@@ -106,6 +106,9 @@ void SpinRunWorker::run()
     if (m_spinConfig.memoryLimitMB.has_value()) {
         m_verifier->setMemoryLimit(m_spinConfig.memoryLimitMB.value());
     }
+    if (m_spinConfig.vectorszValue.has_value()) {
+        m_verifier->setVectorszValue(m_spinConfig.vectorszValue.value());
+    }
     if (!m_spinConfig.rawCommandLine.isEmpty()) {
         m_verifier->setRawCommandline(m_spinConfig.rawCommandLine);
     }
@@ -114,6 +117,22 @@ void SpinRunWorker::run()
     QVariant spinExecutable = settings.value(tmc::TmcConstants::SETTINGS_TMC_SPIN_EXE_KEY);
     if (spinExecutable.isValid()) {
         m_verifier->setSpinExecutable(spinExecutable.toString());
+    }
+    QVariant sdl2PromelaTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_SDL2PROMELA_TIMEOUT);
+    if (sdl2PromelaTimeout.isValid()) {
+        m_verifier->setSdl2PromelaTimeout(sdl2PromelaTimeout.toInt());
+    }
+    QVariant ccompilerTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_CCOMPILER_TIMEOUT);
+    if (ccompilerTimeout.isValid()) {
+        m_verifier->setCCompilerTimeout(ccompilerTimeout.toInt());
+    }
+    QVariant externalCommandTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_EXTERNAL_COMMAND_TIMEOUT);
+    if (externalCommandTimeout.isValid()) {
+        m_verifier->setExternalCommandTimeout(externalCommandTimeout.toInt());
+    }
+    QVariant additionalCompilerFlags = settings.value(tmc::TmcConstants::SETTINGS_TMC_COMPILER_FLAGS);
+    if (additionalCompilerFlags.isValid()) {
+        m_verifier->setAdditionalCompilerFlags(additionalCompilerFlags.toString());
     }
 
     if (m_spinConfig.globalInputVectorGenerationLimit.has_value()) {

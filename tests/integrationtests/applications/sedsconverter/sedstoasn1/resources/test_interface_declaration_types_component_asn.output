@@ -5,52 +5,52 @@ PackageInteger FROM COM-N7SPACE-INTERFACEDECLARATIONS
 PackageIntegerArray-3x3x3 FROM COM-N7SPACE-INTERFACEDECLARATIONS
 ;
 ComponentInteger ::= INTEGER(0 .. 255)
-PackageIntegerArray-13 ::= SEQUENCE (SIZE(13)) OF PackageInteger(0 .. 255)
-PackageIntegerArray-3 ::= SEQUENCE (SIZE(3)) OF PackageInteger(0 .. 255)
+PackageIntegerArray-13 ::= SEQUENCE (SIZE(13)) OF PackageInteger
+PackageIntegerArray-3 ::= SEQUENCE (SIZE(3)) OF PackageInteger
 ComponentInterfaceDecl-InArgsOnly-Type ::= SEQUENCE
 {
-    argA PackageIntegerArray-3(SIZE(3)),
-    argB ComponentInteger(0 .. 255),
-    arrayArg PackageIntegerArray-3x3x3(SIZE(3))
+    argA PackageIntegerArray-3,
+    argB ComponentInteger,
+    arrayArg PackageIntegerArray-3x3x3
 }
-PackageIntegerArray-10 ::= SEQUENCE (SIZE(10)) OF PackageInteger(0 .. 255)
+PackageIntegerArray-10 ::= SEQUENCE (SIZE(10)) OF PackageInteger
 ComponentInterfaceDecl-OutArgsOnly-Type ::= SEQUENCE
 {
-    argA PackageInteger(0 .. 255),
-    argB ComponentInteger(0 .. 255),
-    arrayArg PackageIntegerArray-10(SIZE(10))
+    argA PackageInteger,
+    argB ComponentInteger,
+    arrayArg PackageIntegerArray-10
 }
 ComponentInterfaceDecl-InAndNotify-Type ::= SEQUENCE
 {
-    inputArg PackageInteger(0 .. 255)
+    inputArg PackageInteger
 }
 ComponentInterfaceDecl-InAndNotify-TypeNotify ::= SEQUENCE
 {
-    notifyArg ComponentInteger(0 .. 255)
+    notifyArg ComponentInteger
 }
-Component-GenericInterfaceImpl-Generic1 ::= PackageInteger(0 .. 255)
+Component-GenericInterfaceImpl-Generic1 ::= PackageInteger
 Component-GenericInterfaceImpl-Generic2 ::= CHOICE
 {
-    concrete0 ComponentInteger(0 .. 255) (12),
-    concrete1 PackageInteger(0 .. 255) (42)
+    concrete0 ComponentInteger (12),
+    concrete1 PackageInteger (42)
 }
-Component-GenericInterfaceImpl-GenericDeterminant ::= DeterminantType(0 .. 1)
+Component-GenericInterfaceImpl-GenericDeterminant ::= DeterminantType
 Component-GenericInterfaceImpl-Generic3::= CHOICE
 {
-    concrete0 PackageInteger(0 .. 255),
-    concrete1 ComponentInteger(0 .. 255)
+    concrete0 PackageInteger,
+    concrete1 ComponentInteger
 }
 Component-GenericInterfaceImpl-InArgsOnly-Type ::= SEQUENCE
 {
-    argX PackageInteger(0 .. 255),
-    argA Component-GenericInterfaceImpl-Generic1(0 .. 255),
+    argX PackageInteger,
+    argA Component-GenericInterfaceImpl-Generic1,
     argB Component-GenericInterfaceImpl-Generic2,
     argC Component-GenericInterfaceImpl-Generic3
 }
 Component-GenericInterfaceImpl-OutArgsOnly-Type ::= SEQUENCE
 {
-    argX PackageInteger(0 .. 255),
-    argA Component-GenericInterfaceImpl-Generic1(0 .. 255),
+    argX PackageInteger,
+    argA Component-GenericInterfaceImpl-Generic1,
     argB Component-GenericInterfaceImpl-Generic2,
     argC Component-GenericInterfaceImpl-Generic3
 }

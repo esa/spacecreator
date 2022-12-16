@@ -113,7 +113,7 @@ void tst_SedsConverter_Asn1ToSeds::testWithComponents()
 }
 
 /// \ETD  ETD-18
-//  \SRS  ETB-FUN-3020
+/// \SRS  ETB-FUN-3020
 void tst_SedsConverter_Asn1ToSeds::testMultipleAsnModels()
 {
     const int result = system("./test_multiple_asn_models.sh");

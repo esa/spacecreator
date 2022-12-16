@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
     <Function name="GlobalFnType" language="" is_type="YES">
         <Property name="Taste::coordinates" value="-110000 -29900 -90000 -21900"/>
         <Required_Interface name="GlobalFnType_RI" kind="Sporadic">

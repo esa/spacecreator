@@ -305,6 +305,31 @@ public:
      */
     auto getAsn1Definitions(const QString &definitionsName) const -> Asn1Acn::Definitions *;
 
+    /**
+     * @brief   Getter for SEDS package with given name
+     *
+     * @param   packageName     Name of the package to find
+     *
+     * @return  Pointer to the found package, nullptr otherwise
+     */
+    auto getSedsPackage(const QString &packageName) const -> const ::seds::model::Package *;
+    /**
+     * @brief   Find SEDS data type by SEDS type reference
+     *
+     * @param   typeRef     SEDS type ref
+     *
+     * @return  Pointer to the found type, nullptr otherwise
+     */
+    auto findSedsType(const ::seds::model::DataTypeRef &typeRef) const -> const ::seds::model::DataType *;
+    /**
+     * @brief   Find SEDS variable by name
+     *
+     * @param   variableName    SEDS variable name
+     *
+     * @return  Pointer to the found variable, nullptr otherwise
+     */
+    auto findSedsVariable(const QString &variableName) const -> const ::seds::model::Variable *;
+
 private:
     const seds::model::Package &m_sedsPackage;
     const std::vector<seds::model::Package> &m_sedsPackages;

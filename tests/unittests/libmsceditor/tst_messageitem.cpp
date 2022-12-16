@@ -93,7 +93,7 @@ void tst_MessageItem::enterText(const QString &text)
 
 void tst_MessageItem::parseMsc(const QString &mscText)
 {
-    MscReader mscReader;
+    MscReader mscReader(MscReader::NOTIFY::NO_HUB);
     m_mscModel = mscReader.parseText(mscText);
 
     QVERIFY(!m_mscModel->documents().isEmpty());

@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="ModelHost" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="46200 10600 66200 18600"/>
 <Provided_Interface name="Calculate" kind="Protected" layer="default" wcet="0">

@@ -17,21 +17,20 @@
 
 #include "chartviewtestbase.h"
 
-#include "exceptions.h"
 #include "mscdocument.h"
+#include "standardpaths.h"
 #include "syntheticinteraction.h"
 
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QGraphicsView>
-#include <QStandardPaths>
 #include <QTest>
 
 namespace msc {
 
 void ChartViewTestBase::initTestCaseBase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void ChartViewTestBase::initBase()
@@ -41,7 +40,7 @@ void ChartViewTestBase::initBase()
     m_chartModel.reset(new ChartLayoutManager(m_undoStack.data()));
     m_view.reset(new QGraphicsView());
     m_view->setScene(m_chartModel->graphicsScene());
-    m_reader.reset(new MscReader);
+    m_reader.reset(new MscReader(MscReader::NOTIFY::NO_HUB));
 }
 
 void ChartViewTestBase::cleanupBase()

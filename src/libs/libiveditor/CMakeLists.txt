@@ -73,6 +73,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/asn1componentsimport.cpp
     commands/asn1componentsimport.h
     commands/commandids.h
+    commands/implementationshandler.cpp
+    commands/implementationshandler.h
     commandsstack.cpp
     commandsstack.h
     context/action/action.cpp

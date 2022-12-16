@@ -1,8 +1,11 @@
 #!/bin/sh
 
 cd `git rev-parse --show-toplevel`
-cd doc
-doxygen Doxygen
 
-cd ../doc-tests
+pushd doc > /dev/null
 doxygen Doxygen
+popd > /dev/null
+
+pushd doc-tests > /dev/null
+doxygen Doxygen
+popd > /dev/null

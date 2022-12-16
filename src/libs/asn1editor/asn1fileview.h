@@ -47,6 +47,7 @@ public Q_SLOTS:
     void setDirectory(const QString &directory);
     void setFileName(const QString &fileName);
     void setFile(const QFileInfo &file);
+    void fillPreview();
 
     void setFileContentVisible(bool fileContentVisible);
 
@@ -56,7 +57,6 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void selectFile();
-    void fillPreview();
 
 private:
     Ui::ASN1FileView *ui;

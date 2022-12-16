@@ -1,0 +1,5 @@
+Pinger DEFINITIONS ::= BEGIN
+
+MyInteger [size 32, encoding pos-int, endianness big]
+
+END

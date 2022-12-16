@@ -31,6 +31,7 @@
 #include <spintrail/SpinTrailModel/resettimerevent.h>
 #include <spintrail/SpinTrailModel/settimerevent.h>
 #include <spintrail/SpinTrailModel/spintrailmodel.h>
+#include <spintrail/SpinTrailModel/unhandledinputevent.h>
 #include <spintrail/SpinTrailOptions/options.h>
 
 using namespace conversion::spintrail;
@@ -42,6 +43,7 @@ using spintrail::model::ContinuousSignal;
 using spintrail::model::ResetTimerEvent;
 using spintrail::model::SetTimerEvent;
 using spintrail::model::SpinTrailModel;
+using spintrail::model::UnhandledInputEvent;
 
 namespace spintrail::importer {
 std::unique_ptr<conversion::Model> SpinTrailImporter::importModel(const conversion::Options &options) const
@@ -99,6 +101,14 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
         const QString functionName = match.captured(RESET_TIMER_EVENT_FUNCTION_NAME);
         const QString interfaceName = match.captured(RESET_TIMER_EVENT_INTERFACE_NAME);
         model.appendEvent(std::make_unique<ResetTimerEvent>(functionName, interfaceName));
+        return;
+    }
+    QRegularExpression unhandledInputEventValidation(R"( *unhandled_input (\w+) (\w+))");
+    match = unhandledInputEventValidation.match(line);
+    if (match.hasMatch()) {
+        const QString functionName = match.captured(UNHANDLED_INPUT_EVENT_FUNCTION_NAME);
+        const QString interfaceName = match.captured(UNHANDLED_INPUT_EVENT_INTERFACE_NAME);
+        model.appendEvent(std::make_unique<UnhandledInputEvent>(functionName, interfaceName));
         return;
     }
     // example input line:

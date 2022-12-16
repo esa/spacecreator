@@ -122,6 +122,32 @@ public:
      * @param   delta Value of the interval between generated floats
      */
     void setDelta(std::optional<QString> delta);
+
+    /**
+     * @brief   Set timeout for external sdl2promela process.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setSdl2PromelaTimeout(int timeout);
+    /**
+     * @brief   Set timeout for external c compiler process.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setCCompilerTimeout(int timeout);
+    /**
+     * @brief   Set timeout for external commands except sdl2promela, gcc and verifier.
+     *
+     * @param   timeout Timeout value.
+     */
+    void setExternalCommandTimeout(int timeout);
+    /**
+     * @brief   Set additional flags for gcc.
+     *
+     * @param   compilerFlags Flags for gcc.
+     */
+    void setAdditionalCompilerFlags(QString compilerFlags);
+
     /**
      * @brief Add Stop Condition files to verifier.
      *
@@ -196,6 +222,12 @@ public:
      * @param memoryLimit memory limit in mega bytes.
      */
     void setMemoryLimit(int memoryLimit);
+    /**
+     * @brief Setter for VECTORSZ value.
+     *
+     * @param spinExecutable VECTORSZ value.
+     */
+    void setVectorszValue(int vectorszValue);
     /**
      * @brief Setter for raw commandline for pan executable.
      *
@@ -284,8 +316,12 @@ private:
     std::optional<int> m_searchStateLimit;
     std::optional<int> m_errorLimit;
     std::optional<int> m_memoryLimit;
+    std::optional<int> m_vectorszValue;
     QString m_rawCommandline;
     QString m_spinExecutable;
+    std::optional<int> m_ccompilerTimeout;
+    std::optional<int> m_externalCommandTimeout;
+    QString m_additionalCompilerFlags;
 
     ExecuteMode m_executeMode;
     QProcess *m_process;
@@ -298,13 +334,14 @@ private:
     QStringList m_spinTraceFiles;
     QStringList m_traceFiles;
     QString m_currentTraceFile;
+    QStringList m_mscObserverFiles;
 
     QMetaObject::Connection m_processStartedConnection;
     QMetaObject::Connection m_processFinishedConnection;
     QMetaObject::Connection m_conversionFinishedConnection;
 
     constexpr static int m_startTimeout = 30000;
-    constexpr static int m_commandTimeout = 60000;
+    constexpr static int m_defaultExternalCommandTimeout = 60000;
     constexpr static int m_verifierDefaultTimeout = 360000;
 };
 }

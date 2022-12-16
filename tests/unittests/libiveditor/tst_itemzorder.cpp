@@ -23,8 +23,8 @@
 #include "itemeditor/ivfunctiontypegraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
 #include "itemeditor/ivinterfacegroupgraphicsitem.h"
-#include "ivarchetypereference.h"
 #include "ivarchetypelibraryreference.h"
+#include "ivarchetypereference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -35,6 +35,7 @@
 #include "ivobject.h"
 #include "ivtestutils.h"
 #include "sharedlibrary.h"
+#include "standardpaths.h"
 #include "ui/veinteractiveobject.h"
 
 #include <QMetaEnum>
@@ -71,14 +72,14 @@ private:
 
 void tst_ItemZOrder::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     shared::initSharedLibrary();
     m_itemTypesTested = 0;
 }
 
 void tst_ItemZOrder::cleanupTestCase()
 {
-    QStandardPaths::setTestModeEnabled(false);
+    shared::StandardPaths::setTestModeEnabled(false);
 }
 
 void tst_ItemZOrder::checkItem(shared::ui::VEInteractiveObject *item, const qreal expectedZ)

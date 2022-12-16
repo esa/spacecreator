@@ -19,6 +19,12 @@ target_link_libraries(${TEST_NAME}
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
 
+configure_file(resources/msc_failure_mscdemo.msc resources/msc_failure_mscdemo.msc COPYONLY)
+configure_file(resources/msc_failure_msg.txt resources/msc_failure_msg.txt COPYONLY)
+configure_file(resources/msc_failure_spin.txt resources/msc_failure_spin.txt COPYONLY)
+configure_file(resources/msc_failure_scl.txt resources/msc_failure_scl.txt COPYONLY)
+configure_file(resources/msc_failure_result.html resources/msc_failure_result.html COPYONLY)
+                
 configure_file(resources/obs_failure_error_state_msg.txt resources/obs_failure_error_state_msg.txt COPYONLY)
 configure_file(resources/obs_failure_error_state_spin.txt resources/obs_failure_error_state_spin.txt COPYONLY)
 configure_file(resources/obs_failure_error_state_scl.txt resources/obs_failure_error_state_scl.txt COPYONLY)

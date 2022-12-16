@@ -12,20 +12,20 @@ process Controller;
         NEXTSTATE Wait;
     /* CIF state (903, 252), (70, 35) */
     state Wait;
-        /* CIF input (876, 307), (121, 35) */
+        /* CIF input (874, 307), (121, 35) */
         input test(test_param);
-            /* CIF output (873, 362), (127, 35) */
+            /* CIF output (871, 362), (127, 35) */
             output work(test_param);
-            /* CIF NEXTSTATE (901, 417), (72, 35) */
+            /* CIF NEXTSTATE (899, 417), (72, 35) */
             NEXTSTATE Working;
     endstate;
-    /* CIF state (1223, 247), (72, 35) */
+    /* CIF state (1221, 247), (72, 35) */
     state Working;
-        /* CIF input (1198, 302), (122, 35) */
+        /* CIF input (1196, 302), (122, 35) */
         input response(param);
-            /* CIF output (1206, 357), (106, 35) */
+            /* CIF output (1204, 357), (106, 35) */
             output report(param);
-            /* CIF NEXTSTATE (1225, 412), (70, 35) */
+            /* CIF NEXTSTATE (1223, 412), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Controller;

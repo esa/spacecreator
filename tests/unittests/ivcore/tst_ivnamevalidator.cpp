@@ -19,8 +19,8 @@
 #include "ivlibrary.h"
 #include "ivnamevalidator.h"
 #include "sharedlibrary.h"
+#include "standardpaths.h"
 
-#include <QStandardPaths>
 #include <QTest>
 
 class tst_IVNameValidator : public QObject
@@ -35,7 +35,7 @@ private Q_SLOTS:
 
 void tst_IVNameValidator::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     shared::initSharedLibrary();
     ivm::initIVLibrary();
 }

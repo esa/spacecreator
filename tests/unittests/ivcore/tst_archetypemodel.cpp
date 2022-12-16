@@ -23,7 +23,6 @@
 #include "ivtestutils.h"
 
 #include <QPointer>
-#include <QStandardPaths>
 #include <QTest>
 
 class tst_ArchtypeModel : public QObject

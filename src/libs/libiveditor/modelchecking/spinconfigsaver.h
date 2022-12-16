@@ -50,6 +50,7 @@ struct SpinConfigData {
     std::optional<int> errorLimit = 1;
     std::optional<int> memoryLimitMB = 2048;
     std::optional<int> globalInputVectorGenerationLimit = 4;
+    std::optional<int> vectorszValue = 65535;
     std::optional<float> deltaValue;
     QList<QPair<QString, int>> ifaceGenerationLimits;
     QString rawCommandLine; // if non-empty, overrides other configuration settings

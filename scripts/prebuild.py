@@ -9,6 +9,7 @@ import py7zr
 import shutil
 
 from utils import join_dir, print_cmd, ensure_dir, check_cmake_version, copy_content_of_dir_to_other_dir, copy_file_pattern_to_dir
+from git import Git
 from git.repo import Repo
 
 '''
@@ -24,8 +25,8 @@ Requires aqt to be installed. (pip3 install aqtinstall).
 Installing Qt 5.12.12 with QtCreator 4.8.2:
 python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv5 --qt_version=5.12.12 --qtcreator_version=4.8.2
 
-Installing Qt 6.3.1 with QtCreator 8.0.1:
-python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6.3.1 --qtcreator_version=8.0.1
+Installing Qt 6.4.1 with QtCreator 9.0.0:
+python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6.4.1 --qtcreator_version=9.0.0
 
 
 '''
@@ -121,8 +122,11 @@ def download_grantlee(env_dir: str) -> None:
     """
     gitlab_url = "https://gitrepos.estec.esa.int/taste/grantlee.git"
     target_dir = join_dir(env_dir, 'grantlee')
-    print('Cloning grantlee from {}'.format(gitlab_url))
+    grantlee_tag = "v5.3.1"
+    print('Cloning grantlee from {} the tag {}'.format(gitlab_url, grantlee_tag))
     repository = Repo.clone_from(gitlab_url, target_dir)
+    repo = Git(target_dir)
+    repo.checkout(grantlee_tag)
 
 
 def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
@@ -405,7 +409,7 @@ if __name__ == '__main__':
         scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'spacecreatorplugin', 'scl', 'generic-highlighter', 'syntax')
 
     generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
-    
+
     copy_highlighter_files(asn1plugin_generic_highlighter_dir, generic_highlighter_install_dir)
     copy_highlighter_files(scl_files_spacecreatorplugin_generic_highlighter_dir, generic_highlighter_install_dir)
 

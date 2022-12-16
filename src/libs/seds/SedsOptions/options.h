@@ -57,6 +57,8 @@ public:
     inline static const QString enableFailureReporting = "Seds_Translation_EnableFailureReporting";
     /** @brief  Name of the type to use for SEDS failure reporting */
     inline static const QString failureReportingType = "Seds_Translation_FailureReportingType";
+    /** @brief  Name of the type to use for creating array dimensions indexing syntype  */
+    inline static const QString arrayDimensionBaseIndexingType = "Seds_Translation_ArrayDimensionBaseIndexingType";
     /** @brief  Filepath of output file */
     inline static const QString outputFilepath = "Seds_Export_OutputFilepath";
 

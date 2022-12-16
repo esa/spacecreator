@@ -17,7 +17,6 @@
 
 #include "cmdentitiesremove.h"
 
-#include "cmdconnectiongroupitemchange.h"
 #include "commandids.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -128,7 +127,7 @@ void CmdEntitiesRemove::undo()
         return;
 
     auto restoreIVObjects = [this](const QVector<QPointer<ivm::IVObject>> &collection) {
-        for (auto it = collection.crbegin(); it != collection.crend(); ++it) {
+        for (auto it = collection.cbegin(); it != collection.cend(); ++it) {
             if (!it->isNull() && (*it)->type() == ivm::IVObject::Type::Connection) {
                 if (auto *connection = qobject_cast<ivm::IVConnection *>(*it)) {
                     connection->setInheritPI();
@@ -168,6 +167,11 @@ void CmdEntitiesRemove::collectRelatedItems(ivm::IVObject *toBeRemoved)
         if (auto connection = qobject_cast<ivm::IVConnectionGroup *>(toBeRemoved)) {
             storeLinkedEntity(connection->sourceInterface());
             storeLinkedEntity(connection->targetInterface());
+            for (auto conn : connection->groupedConnections()) {
+                if (conn) {
+                    storeLinkedEntity(conn);
+                }
+            }
         }
         break;
     case ivm::IVObject::Type::InterfaceGroup:
@@ -180,7 +184,6 @@ void CmdEntitiesRemove::collectRelatedItems(ivm::IVObject *toBeRemoved)
             for (const auto &connection : m_model->getConnectionsForIface(iface->id())) {
                 if (connection->type() == ivm::IVObject::Type::ConnectionGroup) {
                     collectRelatedItems(connection);
-
                 } else {
                     storeLinkedEntity(connection);
                 }
@@ -218,18 +221,7 @@ void CmdEntitiesRemove::storeLinkedEntity(ivm::IVObject *linkedEntity)
 
     QVector<QPointer<ivm::IVObject>> *pCollection { nullptr };
     switch (linkedEntity->type()) {
-    case ivm::IVObject::Type::ConnectionGroup: {
-        if (linkedEntity->type() == ivm::IVObject::Type::ConnectionGroup) {
-            auto group = qobject_cast<ivm::IVConnectionGroup *>(linkedEntity);
-            for (auto conn : group->groupedConnections()) {
-                if (conn) {
-                    m_subCommands.append(new CmdConnectionGroupItemChange(group, conn, false));
-                }
-            }
-        }
-        pCollection = &m_relatedConnections;
-        break;
-    }
+    case ivm::IVObject::Type::ConnectionGroup:
     case ivm::IVObject::Type::Connection:
         pCollection = &m_relatedConnections;
         break;

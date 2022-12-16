@@ -6,23 +6,23 @@ DeterminantItem FROM COM-N7SPACE-PACKAGE2
 MappedAsyncItem FROM COM-N7SPACE-PACKAGE2
 MappedSyncItem FROM COM-N7SPACE-PACKAGE2
 ;
-MegaComponent-ProvidedInterface-SyncGenericType ::= MappedSyncItem(0 .. 255)
-MegaComponent-ProvidedInterface-SyncGenericTypeArray-10 ::= SEQUENCE (SIZE(10)) OF MegaComponent-ProvidedInterface-SyncGenericType(0 .. 255)
-MegaComponent-ProvidedInterface-AsyncGenericType ::= MappedAsyncItem(0 .. 255)
+MegaComponent-ProvidedInterface-SyncGenericType ::= MappedSyncItem
+MegaComponent-ProvidedInterface-SyncGenericTypeArray-10 ::= SEQUENCE (SIZE(10)) OF MegaComponent-ProvidedInterface-SyncGenericType
+MegaComponent-ProvidedInterface-AsyncGenericType ::= MappedAsyncItem
 MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type ::= SEQUENCE
 {
-    argumentSimpleMapping MegaComponent-ProvidedInterface-AsyncGenericType(0 ..  255)
+    argumentSimpleMapping MegaComponent-ProvidedInterface-AsyncGenericType
 }
-MegaComponent-ProvidedInterface-AsyncGenericTypeArray-10 ::= SEQUENCE (SIZE(10)) OF MegaComponent-ProvidedInterface-AsyncGenericType(0 .. 255)
+MegaComponent-ProvidedInterface-AsyncGenericTypeArray-10 ::= SEQUENCE (SIZE(10)) OF MegaComponent-ProvidedInterface-AsyncGenericType
 MegaComponent-ProvidedInterface-AsyncCommandSimpleMappingArray-Type ::= SEQUENCE
 {
-    arrayArgumentSimpleMapping MegaComponent-ProvidedInterface-AsyncGenericTypeArray-10(SIZE(10))
+    arrayArgumentSimpleMapping MegaComponent-ProvidedInterface-AsyncGenericTypeArray-10
 }
-MegaComponent-ProvidedInterface-DeterminantGenericType ::= DeterminantItem(0 ..  1)
+MegaComponent-ProvidedInterface-DeterminantGenericType ::= DeterminantItem
 MegaComponent-ProvidedInterface-AlternateGenericType ::= CHOICE
 {
-    concrete0 AlternateItem1(0 .. 255),
-    concrete1 AlternateItem2(0 .. 255)
+    concrete0 AlternateItem1,
+    concrete1 AlternateItem2
 }
 MegaComponent-ProvidedInterface-AsyncCommandAlternateMapping-Type ::= SEQUENCE
 {
@@ -31,6 +31,6 @@ MegaComponent-ProvidedInterface-AsyncCommandAlternateMapping-Type ::= SEQUENCE
 MegaComponent-ProvidedInterface-AlternateGenericTypeArray-10 ::= SEQUENCE (SIZE(10)) OF MegaComponent-ProvidedInterface-AlternateGenericType
 MegaComponent-ProvidedInterface-AsyncCommandAlternateMappingArray-Type ::= SEQUENCE
 {
-    genericArgument2 MegaComponent-ProvidedInterface-AlternateGenericTypeArray-10(SIZE(10))
+    genericArgument2 MegaComponent-ProvidedInterface-AlternateGenericTypeArray-10
 }
 END

@@ -92,6 +92,13 @@ public:
         auto uniqueCalibratedSplinePointsVariableName() -> QString;
 
         /**
+         * @brief   Getter for master context
+         *
+         * @return  Master context
+         */
+        auto masterContext() -> Context &;
+
+        /**
          * @brief SEDS Package accessor
          *
          * @returns SEDS Package
@@ -248,14 +255,16 @@ public:
     /**
      * @brief   Translates SEDS BooleanExpression into SDL decision
      *
+     * @param context           Translation context
      * @param sdlProcess        Host SDL process
      * @param sdlProcedure      Host SDL procedure
      * @param expression        Expression to be translated
      *
      * @returns SDL decision
      */
-    static auto translateBooleanExpression(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::BooleanExpression &expression) -> std::unique_ptr<::sdl::Decision>;
+    static auto translateBooleanExpression(Context &context, ::sdl::Process *hostProcess,
+            ::sdl::Procedure *hostProcedure, const seds::model::BooleanExpression &expression)
+            -> std::unique_ptr<::sdl::Decision>;
 
     /**
      * @brief Translate SEDS variable reference to an SDL one
@@ -292,14 +301,13 @@ private:
 
     static auto translateComparison(const seds::model::Comparison &comparison) -> QString;
 
-    static auto translateAndedConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+    static auto translateAndedConditions(Context &context, ::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::AndedConditions &conditions) -> QString;
 
-    static auto translateOredConditions(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
+    static auto translateOredConditions(Context &context, ::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
             const seds::model::OredConditions &conditions) -> QString;
 
-    static auto translateTypeCheck(::sdl::Process *hostProcess, ::sdl::Procedure *hostProcedure,
-            const seds::model::TypeCheck &check) -> QString;
+    static auto translateTypeCheck(Context &context, const seds::model::TypeCheck &check) -> QString;
 
     static auto translateAnswer(StatementContext &context, ::sdl::Label *joinLabel, const QString &value,
             const seds::model::Body *body, const Options &options) -> std::unique_ptr<::sdl::Answer>;
@@ -324,6 +332,9 @@ private:
             ivm::IVInterface *ivInterface) const -> void;
 
     auto isSwapOperator(const ::seds::model::MathOperation::Element &element) -> bool;
+
+    static auto getPathToRealization(Context &context, const ::seds::model::DataTypeRef &parentTypeRef,
+            const ::seds::model::ContainerDataType *childType) -> std::optional<QString>;
 
     friend class ExpressionTranslatorVisitor;
 };

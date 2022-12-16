@@ -1,7 +1,7 @@
 MSCOBSERVER-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10000)
+   My-Integer ::= INTEGER (0 .. 10000)
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
@@ -13,7 +13,7 @@ BEGIN
 -- Simple types:
 
 -- TASTE-Boolean ::= BOOLEAN
--- MyInteger   ::= INTEGER (0..255)
+-- My-Integer   ::= INTEGER (0..255)
 -- MyReal      ::= REAL (0.0 .. 1000.0)
 -- MyBool      ::= BOOLEAN
 -- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
@@ -21,8 +21,8 @@ BEGIN
 -- Complex types:
 
 --  MySeq       ::= SEQUENCE {
---      input-data  MyInteger,
---      output-data MyInteger,
+--      input-data  My-Integer,
+--      output-data My-Integer,
 --      validity    ENUMERATED { valid, invalid }
 --  }
 --

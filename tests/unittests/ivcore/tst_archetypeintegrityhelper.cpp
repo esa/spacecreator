@@ -30,7 +30,6 @@
 #include "ivxmlreader.h"
 
 #include <QPointer>
-#include <QStandardPaths>
 #include <QTest>
 
 class tst_ArchtypeIntegrityHelper : public QObject

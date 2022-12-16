@@ -20,9 +20,9 @@
 #include "gdbconnector.h"
 
 #include "process.h"
+#include "standardpaths.h"
 
 #include <QMap>
-#include <QStandardPaths>
 #include <QThread>
 #include <cstdio>
 #include <filesystem>
@@ -46,7 +46,7 @@ QByteArray GdbConnector::getRawTestResults(const QString &binaryUnderTestDir, co
     }
 
     const QString errorLogFilename = "gdbclient-errors.log";
-    const QString outputFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    const QString outputFilePath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + "gdboutput.txt";
     qDebug() << "Output file path: " << outputFilePath;
 
