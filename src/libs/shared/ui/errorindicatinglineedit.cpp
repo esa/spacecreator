@@ -22,7 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 namespace shared {
 
 ErrorIndicatingLineEdit::ErrorIndicatingLineEdit(QWidget *parent)
-    : ErrorIndicatingLineEdit("", parent)
+    : ErrorIndicatingLineEdit(QString(), parent)
 {
 }
 

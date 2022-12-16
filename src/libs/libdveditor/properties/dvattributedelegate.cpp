@@ -47,9 +47,9 @@ DVAttributeDelegate::DVAttributeDelegate(dvm::DVObject *object, Asn1Acn::Asn1Sys
 QWidget *DVAttributeDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    const QString tockenName = shared::PropertiesListModel::tokenNameFromIndex(index);
+    const QString tokenName = shared::PropertiesListModel::tokenNameFromIndex(index);
     if (index.isValid()) {
-        if (tockenName == dvm::meta::Props::token(dvm::meta::Props::Token::config)) {
+        if (tokenName == dvm::meta::Props::token(dvm::meta::Props::Token::config)) {
             auto *proxy = new QLabel(parent);
             proxy->installEventFilter(const_cast<DVAttributeDelegate *>(this));
             return proxy;
@@ -57,7 +57,7 @@ QWidget *DVAttributeDelegate::createEditor(
     }
     QWidget *editor = shared::AttributeDelegate::createEditor(parent, option, index);
 
-    if (tockenName == dvm::meta::Props::token(dvm::meta::Props::Token::name)) {
+    if (tokenName == dvm::meta::Props::token(dvm::meta::Props::Token::name)) {
         if (auto lineEdit = dynamic_cast<QLineEdit *>(editor)) {
             auto validator = new dve::QDVNameValidator(m_object, lineEdit);
             if (m_object->type() != dvm::DVObject::Type::Node) { // Node names have no character restriction
@@ -66,7 +66,7 @@ QWidget *DVAttributeDelegate::createEditor(
             lineEdit->setValidator(validator);
         }
     }
-    if (tockenName == dvm::meta::Props::token(dvm::meta::Props::Token::asn1file)) {
+    if (tokenName == dvm::meta::Props::token(dvm::meta::Props::Token::asn1file)) {
         // Node names have no restrictions
         if (auto lineEdit = dynamic_cast<QLineEdit *>(editor)) {
             auto validator = new shared::ExistingFileValidator(lineEdit);
