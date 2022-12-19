@@ -32,6 +32,7 @@ public:
         EditRole,
         ValidatorRole,
         InfoRole,
+        TokenRole,
     };
 
     explicit PropertiesModelBase(QObject *parent = nullptr);
@@ -47,8 +48,8 @@ public:
 
     virtual VEObject *entity() const;
 
-    bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
-            const QModelIndex &destinationParent, int destinationChild) override;
+    bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent,
+            int destinationChild) override;
 
 protected:
     VEObject *m_dataObject { nullptr };

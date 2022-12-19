@@ -28,7 +28,7 @@
 #include "ifaceparametersmodel.h"
 #include "implementationswidget.h"
 #include "interface/attributedelegate.h"
-#include "itemeditor/common/ivutils.h"
+#include "interface/parameternamedelegate.h"
 #include "ivcomment.h"
 #include "ivconnectiongroup.h"
 #include "ivconnectiongroupmodel.h"
@@ -39,6 +39,7 @@
 #include "ivpropertieslistmodel.h"
 #include "ivpropertiesview.h"
 #include "ivpropertytemplateconfig.h"
+#include "properties/delegates/ivattributedelegate.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 
@@ -77,7 +78,7 @@ IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVProper
     }
 }
 
-IVPropertiesDialog::~IVPropertiesDialog() {}
+IVPropertiesDialog::~IVPropertiesDialog() { }
 
 QString IVPropertiesDialog::objectTypeName() const
 {
@@ -162,7 +163,7 @@ void IVPropertiesDialog::initAttributesView()
 {
     auto viewAttrs = new shared::AttributesView(this);
     shared::PropertiesListModel *modelAttrs { nullptr };
-    QStyledItemDelegate *attrDelegate = new shared::AttributeDelegate(viewAttrs->tableView());
+    QStyledItemDelegate *attrDelegate = new IVAttributeDelegate(dataObject(), viewAttrs->tableView());
 
     switch (dataObject()->type()) {
     case ivm::IVObject::Type::FunctionType:
@@ -212,6 +213,8 @@ void IVPropertiesDialog::initContextParams()
 
     shared::PropertiesViewBase *viewAttrs = new ContextParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
+            IfaceParametersModel::Column::Name, new shared::ParameterNameDelegate(viewAttrs->tableView()));
+    viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
             ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_asn1Checks, viewAttrs->tableView()));
@@ -231,6 +234,8 @@ void IVPropertiesDialog::initIfaceParams()
     modelIfaceParams->setDataObject(dataObject());
 
     shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
+    viewAttrs->tableView()->setItemDelegateForColumn(
+            IfaceParametersModel::Column::Name, new shared::ParameterNameDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
             IfaceParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(

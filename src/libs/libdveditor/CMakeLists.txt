@@ -39,6 +39,8 @@ target_sources(${LIB_NAME} PRIVATE
     dveditorresources.qrc
     dvexporter.cpp
     dvexporter.h
+    dvtree/dvobjectnamedelegate.cpp
+    dvtree/dvobjectnamedelegate.h
     dvtree/dvtreesortproxymodel.cpp
     dvtree/dvtreesortproxymodel.h
     dvtree/dvtreeviewmodel.cpp
@@ -69,6 +71,8 @@ target_sources(${LIB_NAME} PRIVATE
     properties/dvmessagebindingswidget.h
     properties/dvpropertiesdialog.cpp
     properties/dvpropertiesdialog.h
+    properties/qdvnamevalidator.cpp
+    properties/qdvnamevalidator.h
     templating/exportabledvbus.cpp
     templating/exportabledvbus.h
     templating/exportabledvconnection.cpp

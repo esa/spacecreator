@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QColor>
 #include <QMetaEnum>
 #include <QMetaType>
 #include <QMimeData>
@@ -32,6 +33,8 @@ static const Id InvalidId = Id();
 static const QString kStringDelemiter = QStringLiteral("::");
 
 static const QString namePatternUI("^[a-zA-Z][\\w ]*(?(?<=_)[a-zA-Z0-9])$");
+
+static const QColor ERROR_BACKGROUND_COLOR(255, 128, 128);
 
 Id createId();
 

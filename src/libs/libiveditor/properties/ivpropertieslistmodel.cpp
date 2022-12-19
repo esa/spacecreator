@@ -93,7 +93,16 @@ IVPropertiesListModel::IVPropertiesListModel(
 {
 }
 
-IVPropertiesListModel::~IVPropertiesListModel() {}
+IVPropertiesListModel::~IVPropertiesListModel() { }
+
+QVariant IVPropertiesListModel::data(const QModelIndex &index, int role) const
+{
+    if (role == TokenRole) {
+        return QVariant::fromValue(tokenFromIndex(index));
+    }
+
+    return PropertiesListModel::data(index, role);
+}
 
 bool IVPropertiesListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
@@ -148,7 +157,7 @@ QVariant FunctionPropertiesListModel::data(const QModelIndex &index, int role) c
         return availableFnTypes;
     }
 
-    return PropertiesListModel::data(index, role);
+    return IVPropertiesListModel::data(index, role);
 }
 
 bool FunctionPropertiesListModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -240,7 +249,7 @@ QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) 
             return entity()->as<ivm::IVInterfaceRequired *>()->ifaceLabel();
         }
     }
-    return PropertiesListModel::data(index, role);
+    return IVPropertiesListModel::data(index, role);
 }
 
 static inline bool hasOutParameter(const QVector<shared::InterfaceParameter> &paramsList)
