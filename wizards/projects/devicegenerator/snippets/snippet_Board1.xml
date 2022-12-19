@@ -13,7 +13,7 @@ Generated XML element <Port> shall be put into <Board> named %{CommDevName%{CDBo
 <Boards>
     <!-- Merge into Board named "%{CommDevName%{CDBoard}}" -->
     <Board name="%{CommDevName%{CDBoard}}" type=" ... " namespace=" ... ">
-        <!-- You are allowed to customize name of the port. -->
+        <!-- You are allowed to customize the name of the port. -->
         <!-- COPY FROM HERE -->
         <Port name="port_%{ProjectName}"
               namespace="ocarina_drivers"
