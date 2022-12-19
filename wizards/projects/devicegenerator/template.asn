@@ -11,8 +11,6 @@
 
     InputDataPtr ::= PlatformSpecificPointer
 
-    OutputDataPtr ::= PlatformSpecificPointer -- TODO consider romoval
-
     DataLength ::= INTEGER (0 .. 4294967295) -- (Broker/Packetizer)const size_t dataSize/Length
 
     PacketType ::= INTEGER (0 .. 255) -- (Broker/Packetizer)const Packetizer_PacketType packetType
