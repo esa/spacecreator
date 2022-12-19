@@ -18,7 +18,6 @@
 #include "mscmodel.h"
 
 #include "asn1systemchecks.h"
-#include "asn1valueparser.h"
 #include "errorhub.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -38,7 +37,6 @@ MscModel::~MscModel()
 {
     clear();
 }
-
 
 conversion::ModelType MscModel::modelType() const
 {

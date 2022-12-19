@@ -62,7 +62,7 @@ protected:
     cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
     virtual cif::CifLine::CifType mainCifType() const;
 
-    bool cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> newCif);
+    bool cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> &newCif);
 
     QRectF getChartContentBox() const;
     QRectF getChartBox() const;

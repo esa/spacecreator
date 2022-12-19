@@ -112,7 +112,7 @@ public:
     virtual QVariantList generateProperties(bool isProperty) const = 0;
 
     // Perform updates/actions directly before the data is saved
-    virtual void updateForExport() {}
+    virtual void updateForExport() { }
 
     void setAttributeExportable(const QString &attrName, bool isExportable);
 
@@ -134,7 +134,7 @@ Q_SIGNALS:
     void attributeChanged(const QString &name);
 
 public Q_SLOTS:
-    bool setParentObject(VEObject *parentObject);
+    bool setParentObject(shared::VEObject *parentObject);
 
 protected:
     virtual QList<EntityAttribute> sortedAttributesValues(const EntityAttributes &attrs);

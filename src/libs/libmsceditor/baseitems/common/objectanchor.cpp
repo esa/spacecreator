@@ -16,7 +16,6 @@
 */
 #include "objectanchor.h"
 
-#include "baseitems/common/mscutils.h"
 #include "baseitems/interactiveobject.h"
 
 namespace msc {
@@ -111,7 +110,7 @@ bool ObjectAnchor::setPoint(const QPointF &scenePoint, ObjectAnchor::Snap snap)
     return true;
 }
 
-void ObjectAnchor::notifyChanged() const
+void ObjectAnchor::notifyChanged()
 {
     Q_EMIT anchorChanged(m_anchorObject, m_scenePoint);
 }

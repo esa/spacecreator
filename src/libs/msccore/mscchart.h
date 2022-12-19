@@ -127,7 +127,8 @@ Q_SIGNALS:
     void globalCommentRectChanged(const QRect rect, const QString &hash);
 
 private Q_SLOTS:
-    void eventInstanceChange(MscInstanceEvent *event, MscInstance *addedInstance, MscInstance *removedInstance);
+    void eventInstanceChange(
+            msc::MscInstanceEvent *event, msc::MscInstance *addedInstance, msc::MscInstance *removedInstance);
 
 private:
     /*!
@@ -137,7 +138,7 @@ private:
     QVector<T *> allEventsOfType() const
     {
         QVector<T *> typeEvents;
-        for (auto events : m_events) {
+        for (const auto &events : m_events) {
             for (auto ev : events) {
                 if (auto obj = qobject_cast<T *>(ev)) {
                     if (!typeEvents.contains(obj)) {

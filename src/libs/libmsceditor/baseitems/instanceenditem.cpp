@@ -18,7 +18,6 @@
 #include "instanceenditem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/mscutils.h"
 #include "colors/colormanager.h"
 
 #include <QBrush>

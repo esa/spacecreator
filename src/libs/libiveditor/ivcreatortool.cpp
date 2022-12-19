@@ -19,8 +19,8 @@
 
 #include "abstractvisualizationmodel.h"
 #include "commands/cmdcommentitemcreate.h"
-#include "commands/cmdconnectiongroupitemcreate.h"
 #include "commands/cmdconnectiongroupitemchange.h"
+#include "commands/cmdconnectiongroupitemcreate.h"
 #include "commands/cmdconnectionitemcreate.h"
 #include "commands/cmdentitiesremove.h"
 #include "commands/cmdentitygeometrychange.h"
@@ -78,7 +78,7 @@ IVCreatorTool::IVCreatorTool(QGraphicsView *view, InterfaceDocument *doc)
 {
 }
 
-IVCreatorTool::~IVCreatorTool() {}
+IVCreatorTool::~IVCreatorTool() { }
 
 void IVCreatorTool::removeSelectedItems()
 {
@@ -165,7 +165,7 @@ void IVCreatorTool::ungroupConnectedItems()
                         if (!entity->isFixedSystemElement()) {
                             entities.append(entity);
                         }
-                        for (const auto &conn: entity->groupedConnections()) {
+                        for (const auto &conn : entity->groupedConnections()) {
                             auto cmdUngroup = new cmd::CmdConnectionGroupItemChange(entity, conn, false);
                             cmdMacro.push(cmdUngroup);
                         }
@@ -415,7 +415,7 @@ bool IVCreatorTool::onMouseMove(QMouseEvent *e)
 
                     if (item->parentItem() == m_previewItem->parentItem()
                             || (m_previewItem->parentItem() == item
-                                       && !item->sceneBoundingRect().contains(expandedGeometry))) {
+                                    && !item->sceneBoundingRect().contains(expandedGeometry))) {
                         items.insert(iObjItem);
                     }
                 });
@@ -489,10 +489,10 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
 
-        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/delete.svg")), tr("Ungroup connections"),
-                                 this, [this]() { ungroupConnectedItems(); });
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/delete.svg")), tr("Ungroup connections"), this,
+                [this]() { ungroupConnectedItems(); });
         it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
-                          [](const QGraphicsItem *item) { return item->type() == IVConnectionGroupGraphicsItem::Type; });
+                [](const QGraphicsItem *item) { return item->type() == IVConnectionGroupGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
     }
 }
@@ -504,18 +504,16 @@ void IVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
     if (!scene)
         return;
 
-
-    QGraphicsItem *gi = shared::graphicsviewutils::nearestItem(scene, scenePos, kContextMenuItemTolerance, { IVFunctionGraphicsItem::Type });
+    QGraphicsItem *gi = shared::graphicsviewutils::nearestItem(
+            scene, scenePos, kContextMenuItemTolerance, { IVFunctionGraphicsItem::Type });
     if (!gi) {
         return;
     }
 
     if (auto fnItem = qobject_cast<IVFunctionGraphicsItem *>(gi->toGraphicsObject())) {
         if (fnItem->entity()) {
-            menu->addAction(QIcon(QLatin1String(":/toolbar/icns/nested_view.svg")), tr("Enter nested view"),
-                            this, [this, id = fnItem->entity()->id()]() {
-                Q_EMIT nestedViewRequest(id);
-            });
+            menu->addAction(QIcon(QLatin1String(":/toolbar/icns/nested_view.svg")), tr("Enter nested view"), this,
+                    [this, id = fnItem->entity()->id()]() { Q_EMIT nestedViewRequest(id); });
         }
     }
 }
@@ -753,7 +751,7 @@ static inline QVector<QPointF> generateConnectionPoints(IVItemModel *model, shar
             endItem->connectionEndPoint(isEndEndpointNested), endItem->targetItem()->sceneBoundingRect());
 }
 
-void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) const
+void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints)
 {
     const auto info = ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, graphicPoints);
     if (info.failed())
@@ -901,8 +899,8 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints) cons
 
             ifaceCommons.type = info.endIface ? info.endIface->direction()
                                               : (graphicPoints.last() == info.connectionPoints.first()
-                                                                ? ivm::IVInterface::InterfaceType::Required
-                                                                : ivm::IVInterface::InterfaceType::Provided);
+                                                              ? ivm::IVInterface::InterfaceType::Required
+                                                              : ivm::IVInterface::InterfaceType::Provided);
 
             if (!cmdMacro.push(createInterfaceCommand(ifaceCommons)))
                 return;
@@ -1007,7 +1005,7 @@ bool IVCreatorTool::warnConnectionPreview(const QPointF &pos)
     return warn;
 }
 
-QUndoCommand *IVCreatorTool::createInterfaceCommand(const ivm::IVInterface::CreationInfo &info) const
+QUndoCommand *IVCreatorTool::createInterfaceCommand(const ivm::IVInterface::CreationInfo &info)
 {
     if (!info.function)
         return nullptr;

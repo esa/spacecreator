@@ -40,7 +40,7 @@ public:
     int id() const override;
 
 Q_SIGNALS:
-    void attributeChanged(VEObject *entity, const QString &attrName, const QVariant &oldValue);
+    void attributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
 
 private:
     shared::PropertyTemplateConfig *m_config;

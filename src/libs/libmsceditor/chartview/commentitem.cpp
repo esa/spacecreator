@@ -19,13 +19,9 @@
 #include "commentitem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/objectslink.h"
-#include "baseitems/objectslinkitem.h"
 #include "baseitems/textitem.h"
 #include "chartlayoutmanager.h"
-#include "cif/cifblockfactory.h"
 #include "cif/cifline.h"
-#include "cif/ciflines.h"
 #include "colors/colormanager.h"
 #include "commands/cmdcommentitemchangegeometry.h"
 #include "commands/cmdentitycommentchange.h"
@@ -193,10 +189,10 @@ void CommentItem::initGripPoints()
     InteractiveObjectBase::initGripPoints();
     gripPointsHandler()->setUsedPoints(isGlobal()
                     ? shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Top,
-                              shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Bottom,
-                              shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::TopLeft,
-                              shared::ui::GripPoint::Location::BottomLeft, shared::ui::GripPoint::Location::TopRight,
-                              shared::ui::GripPoint::Location::BottomRight, shared::ui::GripPoint::Location::Center }
+                            shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Bottom,
+                            shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::TopLeft,
+                            shared::ui::GripPoint::Location::BottomLeft, shared::ui::GripPoint::Location::TopRight,
+                            shared::ui::GripPoint::Location::BottomRight, shared::ui::GripPoint::Location::Center }
                     : shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Center });
 }
 

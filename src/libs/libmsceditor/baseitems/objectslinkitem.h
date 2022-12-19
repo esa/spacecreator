@@ -19,7 +19,6 @@
 #pragma once
 
 #include "common/mscutils.h"
-#include "interactiveobject.h"
 
 #include <QBrush>
 #include <QGraphicsItem>

@@ -148,7 +148,6 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
     const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
     setGeometry(rect);
     const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
-    const QPointF delta = releasedAt - pressedAt;
     for (auto child : childItems()) {
         if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
             const VEObject *obj = iface->entity();

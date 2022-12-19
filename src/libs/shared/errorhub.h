@@ -60,7 +60,7 @@ public:
     static void clearCurrentFile();
 
 Q_SIGNALS:
-    void errorAdded(const ErrorItem &error);
+    void errorAdded(const shared::ErrorItem &error);
     void cleared();
     void clearedFile(const QString &fileName);
 

@@ -8,7 +8,6 @@
 #include "mscinstance.h"
 #include "mscinstanceevent.h"
 #include "mscmessagedeclaration.h"
-#include "mscmodel.h"
 
 static void init_msc_library()
 {

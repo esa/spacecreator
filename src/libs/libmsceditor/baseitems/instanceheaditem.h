@@ -34,7 +34,7 @@ class InstanceHeadItem : public QGraphicsObject
     Q_PROPERTY(QString kind READ kind WRITE setKind NOTIFY kindEdited)
 
 public:
-    InstanceHeadItem(MscChart *chart, QGraphicsItem *parent = nullptr);
+    explicit InstanceHeadItem(MscChart *chart, QGraphicsItem *parent = nullptr);
 
     QString name() const;
     QString kind() const;
