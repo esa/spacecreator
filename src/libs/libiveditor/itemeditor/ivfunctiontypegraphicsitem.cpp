@@ -47,6 +47,7 @@
 #include <QtDebug>
 
 static const qreal kBorderWidth = 2;
+static const qreal extraSpace = 5.0;
 
 namespace ive {
 
@@ -217,7 +218,7 @@ QRectF IVFunctionTypeGraphicsItem::resizedRectForTextLabel(GripPoint *grip, cons
     QRectF textLabelRect = m_textItem->boundingRect();
     auto text = m_textItem->toPlainText();
     textLabelRect = textLabelRect.marginsAdded(shared::graphicsviewutils::kTextMargins);
-    textLabelRect.setWidth(textLabelRect.width() + 5.0); // A little extra space is needed, otherwise the text item moves about ever so sligtly.
+    textLabelRect.setWidth(textLabelRect.width() + extraSpace); // A little extra space is needed, otherwise the text item moves about ever so sligtly.
     QSizeF minSize = textLabelRect.size();
 
     // The minimum x-value the right side of this rect can have and not violate minimum size

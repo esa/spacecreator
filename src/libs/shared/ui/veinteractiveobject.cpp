@@ -33,7 +33,6 @@ namespace shared {
 namespace ui {
 
 static const qreal kClickTreshold = 5;
-static const qreal extraSpace = 5.0;
 
 VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent)
     : ui::InteractiveObjectBase(parent)
