@@ -34,6 +34,11 @@ void MscProject::setModel(MainModel *model)
     m_model = model;
 }
 
+QString MscProject::projectPath() const
+{
+    return QFileInfo(m_model->currentFilePath()).absolutePath();
+}
+
 QStringList MscProject::allAsn1Files() const
 {
     QStringList result;

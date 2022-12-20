@@ -106,7 +106,7 @@ void IVXMLReader::test_allItems()
 
 void IVXMLReader::test_readMetaData()
 {
-    QByteArray xml("<InterfaceView asn1file=\"dataview.asn\" mscfile=\"newfile.msc\"/>");
+    QByteArray xml("<InterfaceView version=\"1.99\" asn1file=\"dataview.asn\" mscfile=\"newfile.msc\"/>");
 
     QBuffer buffer(&xml);
     buffer.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -116,6 +116,8 @@ void IVXMLReader::test_readMetaData()
     QVERIFY(ok);
 
     const QVariantMap metadata = reader.metaData();
+    QCOMPARE(metadata.size(), 3);
+    QCOMPARE(metadata["version"].toString(), QString("1.99"));
     QCOMPARE(metadata["asn1file"].toString(), QString("dataview.asn"));
     QCOMPARE(metadata["mscfile"].toString(), QString("newfile.msc"));
 }

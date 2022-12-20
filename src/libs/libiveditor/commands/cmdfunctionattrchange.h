@@ -23,6 +23,10 @@
 
 #include <QPointer>
 
+namespace Asn1Acn {
+class Asn1SystemChecks;
+}
+
 namespace ivm {
 class IVObject;
 class IVFunction;
@@ -31,14 +35,16 @@ class IVFunctionType;
 
 namespace ive {
 namespace cmd {
+class ASN1ComponentsImport;
 
 class CmdFunctionAttrChange : public shared::cmd::CmdEntityAttributesChange
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionAttrChange(
-            shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs);
+    explicit CmdFunctionAttrChange(shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs);
     ~CmdFunctionAttrChange() override;
+
+    void setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Checks);
 
     void redo() override;
     void undo() override;
@@ -47,6 +53,8 @@ public:
 Q_SIGNALS:
     void nameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
     void defaultImplementationChanged(ivm::IVFunction *entity);
+    void asn1FilesImported(const QStringList &files);
+    void asn1FilesRemoved(const QStringList &files);
 
 protected:
     QPointer<ivm::IVFunction> m_entity;
@@ -54,6 +62,7 @@ protected:
     const QVariantHash m_oldAttrs;
 
 private:
+    ASN1ComponentsImport *m_asn1Importer;
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdSet;
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdUnset;
 
@@ -68,5 +77,5 @@ private:
     void prepareSetFunctionTypeCommands(const ivm::IVFunctionType *fnType);
 };
 
-} // namespace cmd
 } // namespace ive
+} // namespace cmd

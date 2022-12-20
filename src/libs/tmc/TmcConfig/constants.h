@@ -27,5 +27,9 @@ class TmcConstants
 public:
     inline static const QString SETTINGS_TMC_SPIN_EXE_KEY = "SpaceCreator/tmcSpinExe";
     inline static const QString SETTINGS_TMC_SPIN_DEFAULT_OUTPUT_DIRECTORY = "SpaceCreator/tmcSpinOutputDir";
+    inline static const QString SETTINGS_TMC_SDL2PROMELA_TIMEOUT = "SpaceCreator/tmcSdl2PromelaTimeout";
+    inline static const QString SETTINGS_TMC_CCOMPILER_TIMEOUT = "SpaceCreator/tmcCCompilerTimeout";
+    inline static const QString SETTINGS_TMC_EXTERNAL_COMMAND_TIMEOUT = "SpaceCreator/tmcExternalCommandTimeout";
+    inline static const QString SETTINGS_TMC_COMPILER_FLAGS = "SpaceCreator/tmcCompilerFlags";
 };
 }

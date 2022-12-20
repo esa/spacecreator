@@ -18,6 +18,7 @@
 #include "attributedelegate.h"
 
 #include "propertieslistmodel.h"
+#include "ui/errorindicatinglineedit.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -111,7 +112,7 @@ static QWidget *createConfiguredEditor(QAbstractItemDelegate *context, const QSt
         break;
     }
     case QVariant::String: {
-        auto lineEdit = new QLineEdit(parent);
+        auto lineEdit = new ErrorIndicatingLineEdit(parent);
         connectCommitData(lineEdit, context);
         QRegularExpression re;
         if (!validator.isNull() && validator.canConvert<QString>()) {

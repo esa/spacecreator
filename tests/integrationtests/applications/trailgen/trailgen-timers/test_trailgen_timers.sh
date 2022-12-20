@@ -27,5 +27,5 @@ cd $TEST_OUTPUT_DIR \
 	&& spin -t -r -s system.pml > scenario.spt \
 	&& cd .. \
 	&& $TRAILGEN -iv $RESOURCE_DIR/interfaceview.xml -o $TEST_OUTPUT_DIR -ot $TEST_OUTPUT_DIR/scenario.sim $TEST_OUTPUT_DIR/scenario.spt \
-	&& $DIFF $TEST_OUTPUT_DIR/scenario.sim $RESOURCE_DIR/scenario.sim \
+	&& grep -v  'unhandled-input' $TEST_OUTPUT_DIR/scenario.sim | $DIFF - $RESOURCE_DIR/scenario.sim \
 	&& rm -r $TEST_OUTPUT_DIR

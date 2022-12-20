@@ -21,9 +21,13 @@
 
 #include "specialized/datatypetranslatorvisitor.h"
 
+#include <asn1library/asn1/constraints/withconstraints.h>
+#include <asn1library/asn1/types/userdefinedtype.h>
+#include <asn1library/asn1/values.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 
+using Asn1Acn::Constraints::WithConstraints;
 using conversion::translator::MissingAsn1TypeDefinitionException;
 
 namespace conversion::asn1::translator::seds {
@@ -99,6 +103,54 @@ Asn1Acn::Types::Type *DataTypeTranslationHelper::handleArrayType(Context &contex
     } else {
         const auto name = createArrayType(context, typeRef, dimensions);
         return context.findAsn1Type(name);
+    }
+}
+
+void DataTypeTranslationHelper::removeConstraints(Asn1Acn::Types::Type *asn1Type)
+{
+    switch (asn1Type->typeEnum()) {
+    case Asn1Acn::Types::Type::ASN1Type::INTEGER: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::IntegerValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::REAL: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::RealValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::BOOLEAN: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::BooleanValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::SEQUENCEOF: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::IntegerValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::ENUMERATED: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::EnumValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::IA5STRING: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::StringValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::NUMERICSTRING: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::StringValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::BITSTRING: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::BitStringValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING: {
+        auto asn1WithConstraints = dynamic_cast<WithConstraints<Asn1Acn::OctetStringValue> *>(asn1Type);
+        asn1WithConstraints->removeConstraints();
+    } break;
+    case Asn1Acn::Types::Type::ASN1Type::USERDEFINED: {
+        auto asn1UserdefinedType = dynamic_cast<Asn1Acn::Types::UserdefinedType *>(asn1Type);
+        removeConstraints(asn1UserdefinedType->type());
+    } break;
+    default:
+        break;
     }
 }
 

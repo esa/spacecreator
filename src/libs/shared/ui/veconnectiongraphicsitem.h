@@ -79,6 +79,8 @@ public:
 
     void updateOverlappedSections();
 
+    bool isItemVisible() const override;
+
 protected:
     void onManualMoveStart(GripPoint *gp, const QPointF &at) override;
     void onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to) override;

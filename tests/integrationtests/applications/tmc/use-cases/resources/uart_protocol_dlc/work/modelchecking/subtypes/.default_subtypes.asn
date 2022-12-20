@@ -19,27 +19,6 @@ Bcapp-dlctxsdu-p1 ::= T-UART-DLC-SDU
 
 
 END
-CHANNELEFFECTS-SUBTYPE DEFINITIONS ::=
-BEGIN
-
-IMPORTS 
-
-UINT8 FROM Basic-Types
-
- ;
-
-
-
-
-
-
-
-Channeleffects-corruptchar-p1 ::= UINT8
-
-
-
-
-END
 RTAPP-SUBTYPE DEFINITIONS ::=
 BEGIN
 
@@ -65,6 +44,27 @@ Rtapp-dlcrxsdu-p1 ::= T-UART-DLC-SDU
 
 
 
+
+
+
+
+END
+CHANNELEFFECTS-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+UINT8 FROM Basic-Types
+
+ ;
+
+
+
+
+
+
+
+Channeleffects-corruptchar-p1 ::= UINT8
 
 
 

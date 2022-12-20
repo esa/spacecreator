@@ -173,6 +173,11 @@ bool SdlToPromelaConverter::convertStopConditions(const QList<QFileInfo> &inputF
     return true;
 }
 
+void SdlToPromelaConverter::setSdl2PromelaTimeout(int timeout)
+{
+    m_sdl2PromelaTimeout = timeout;
+}
+
 void SdlToPromelaConverter::startSdl2PromelaProcess(QProcess &process, const QStringList &arguments)
 {
     Q_EMIT message(QString("Executing: %1 with args:\n").arg(m_sdl2PromelaCommand));
@@ -213,7 +218,9 @@ void SdlToPromelaConverter::processStarted()
 
     m_timer->stop();
     m_timer->setSingleShot(true);
-    m_timer->start(m_externalCommandFinishTimeout);
+    int timeoutValue =
+            m_sdl2PromelaTimeout.has_value() ? 1000 * m_sdl2PromelaTimeout.value() : m_externalCommandFinishTimeout;
+    m_timer->start(timeoutValue);
 }
 
 void SdlToPromelaConverter::processFinished(int exitCode, QProcess::ExitStatus exitStatus)

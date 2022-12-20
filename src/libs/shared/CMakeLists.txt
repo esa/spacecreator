@@ -14,6 +14,8 @@ target_sources(${LIB_NAME} PRIVATE
     addpropertytemplatedialog.ui
     animation.cpp
     animation.h
+    breadcrumbwidget.cpp
+    breadcrumbwidget.h
     colors/colorhandler.cpp
     colors/colorhandler.h
     colors/colorhandlereditor.cpp
@@ -66,8 +68,12 @@ target_sources(${LIB_NAME} PRIVATE
     interface/comboboxdelegate.h
     interface/creatortool.cpp
     interface/creatortool.h
+    interface/existingfilevalidator.cpp
+    interface/existingfilevalidator.h
     interface/objectstreeview.cpp
     interface/objectstreeview.h
+    interface/parameternamedelegate.cpp
+    interface/parameternamedelegate.h
     interface/veitemmodel.cpp
     interface/veitemmodel.h
     minimap.cpp
@@ -106,9 +112,13 @@ target_sources(${LIB_NAME} PRIVATE
     sharedlibrary.h
     sharedresources/colors/default_colors.json
     sharedresources/sharedresources.qrc
+    standardpaths.cpp
+    standardpaths.h
     stringref.h
     ui/drawrectinfo.cpp
     ui/drawrectinfo.h
+    ui/errorindicatinglineedit.cpp
+    ui/errorindicatinglineedit.h
     ui/graphicsscenebase.cpp
     ui/graphicsscenebase.h
     ui/graphicsviewbase.cpp

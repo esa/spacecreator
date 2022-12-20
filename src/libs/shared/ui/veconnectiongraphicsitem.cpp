@@ -207,6 +207,7 @@ void VEConnectionGraphicsItem::updateFromEntity()
         return;
 
     setPoints(graphicsviewutils::polygon(entity()->coordinates()));
+    updateVisibility();
 }
 
 void VEConnectionGraphicsItem::init()
@@ -405,6 +406,12 @@ void VEConnectionGraphicsItem::updateOverlappedSections()
     updateBoundingRect();
 }
 
+bool VEConnectionGraphicsItem::isItemVisible() const
+{
+    return !(m_points.size() < 2 || !m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()
+            || !entity());
+}
+
 void VEConnectionGraphicsItem::onManualMoveStart(GripPoint *gp, const QPointF &at)
 {
     if (gripPointsHandler() == nullptr)
@@ -537,7 +544,7 @@ void VEConnectionGraphicsItem::rebuildLayout()
     }
 
     updateBoundingRect();
-    setVisible(true);
+    updateVisibility();
 }
 
 void VEConnectionGraphicsItem::onSelectionChanged(bool isSelected)

@@ -19,10 +19,10 @@
 #include "ivinterface.h"
 #include "ivlibrary.h"
 #include "ivtestutils.h"
+#include "standardpaths.h"
 
 #include <QCryptographicHash>
 #include <QDirIterator>
-#include <QStandardPaths>
 #include <QTest>
 
 class tst_IVUtils : public QObject
@@ -40,7 +40,7 @@ private Q_SLOTS:
 
 void tst_IVUtils::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
 }
 

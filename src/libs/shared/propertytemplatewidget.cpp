@@ -35,7 +35,6 @@
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
-#include <QStandardPaths>
 
 namespace shared {
 

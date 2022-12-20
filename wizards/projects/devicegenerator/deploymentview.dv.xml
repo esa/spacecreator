@@ -1,8 +1,8 @@
 <DeploymentView>
-    <Node name="%{CommDevName%{CDBoard}}" type="%{CommDevType%{CDBoard}}" node_label="Node_1" namespace="%{CommDevNamespace%{CDBoard}}">
-        <Property name="Taste::coordinates" value="11100 8700 27100 24700"/>
-        <Partition name="Partition_1">
-            <Property name="Taste::coordinates" value="15500 13100 23500 21100"/>
-        </Partition>
-    </Node>
+	<Node name="%{CommDevName%{CDBoard}}" type="%{CommDevType%{CDBoard}}" node_label="Node_1" namespace="%{CommDevNamespace%{CDBoard}}">
+		<Property name="Taste::coordinates" value="11100 8700 27100 24700" />
+		<Partition name="%{ProjectNameUpperCase}">
+			<Property name="Taste::coordinates" value="15500 13100 23500 21100" />
+		</Partition>
+	</Node>
 </DeploymentView>

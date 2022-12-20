@@ -37,7 +37,8 @@ private Q_SLOTS:
     void testComplexGuard();
     void testTimers();
     void testParameterMap();
-    void testParameterActivityMap();
+    void testParameterActivityMapSync();
+    void testParameterActivityMapAsync();
     void testSyncCommand();
     void testAsyncCommand();
     void testIndexing();
@@ -234,9 +235,24 @@ void tst_SedsConverter_SedsToSdl::testParameterMap()
 /// \SRS  ETB-FUN-2250
 /// \SRS  ETB-FUN-2550
 /// \SRS  ETB-FUN-2600
-void tst_SedsConverter_SedsToSdl::testParameterActivityMap()
+void tst_SedsConverter_SedsToSdl::testParameterActivityMapSync()
 {
-    const int result = system("./test_parameter_activity_map.sh");
+    const int result = system("./test_parameter_activity_map_sync.sh");
+    QCOMPARE(result, 0);
+}
+
+/// \SRS  ETB-FUN-10
+/// \SRS  ETB-FUN-2040
+/// \SRS  ETB-FUN-2050
+/// \SRS  ETB-FUN-2080
+/// \SRS  ETB-FUN-2210
+/// \SRS  ETB-FUN-2240
+/// \SRS  ETB-FUN-2250
+/// \SRS  ETB-FUN-2550
+/// \SRS  ETB-FUN-2600
+void tst_SedsConverter_SedsToSdl::testParameterActivityMapAsync()
+{
+    const int result = system("./test_parameter_activity_map_async.sh");
     QCOMPARE(result, 0);
 }
 
@@ -344,6 +360,8 @@ void tst_SedsConverter_SedsToSdl::testTransaction()
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2130
 /// \SRS  ETB-FUN-2190
+/// \SRS  ETB-FUN-2590
+/// \SRS  ETB-FUN-2630
 void tst_SedsConverter_SedsToSdl::testFailureReportingSync()
 {
     const int result = system("./test_failure_reporting_sync.sh");
@@ -352,6 +370,7 @@ void tst_SedsConverter_SedsToSdl::testFailureReportingSync()
 
 /// \SRS  ETB-FUN-10
 /// \SRS  ETB-FUN-2130
+/// \SRS  ETB-FUN-2590
 void tst_SedsConverter_SedsToSdl::testFailureReportingAsync()
 {
     const int result = system("./test_failure_reporting_async.sh");

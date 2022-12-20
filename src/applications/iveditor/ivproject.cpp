@@ -34,6 +34,11 @@ void IvProject::setModel(InterfaceDocument *model)
     m_model = model;
 }
 
+QString IvProject::projectPath() const
+{
+    return QFileInfo(m_model->path()).absolutePath();
+}
+
 QStringList IvProject::allAsn1Files() const
 {
     return m_model->asn1FilesPaths();

@@ -22,16 +22,16 @@ PayloadBase ::= SEQUENCE
 }
 PayloadA ::= SEQUENCE
 {
-    intDataRange IntegerData(0 .. 255) (5 .. 255),
-    intDataNoEncodingRange IntegerDataNoEncoding(0 .. 255) (5 .. 9223372036854775807),
-    floatDataRange RealData(0 .. 255) (-3.40282e+38 .. 3.14),
+    intDataRange IntegerData(5 .. 255),
+    intDataNoEncodingRange IntegerDataNoEncoding(5 .. 9223372036854775807),
+    floatDataRange RealData(-3.40282e+38 .. 3.14),
     enumDataRange EnumData(((value1 | value3) | value4)),
-    intDataType IntegerDataBigger(0 .. 65535) (0 .. 255),
-    intDataValue IntegerData(0 .. 255) (42),
-    floatDataValue RealData(0 .. 255) (3.14),
+    intDataType IntegerDataBigger(0 .. 255),
+    intDataValue IntegerData(42),
+    floatDataValue RealData(3.14),
     enumDataValue EnumData(value2),
-    bitStringDataValue BitStringData(SIZE(4)) ('0110'B),
-    stringDataValue StringData(SIZE(0 .. 32)) ("GuruMeditation")
+    bitStringDataValue BitStringData('0110'B),
+    stringDataValue StringData("GuruMeditation")
 }
 END
 

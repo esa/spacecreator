@@ -22,10 +22,10 @@
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "ivpropertytemplateconfig.h"
+#include "standardpaths.h"
 
 #include <QDir>
 #include <QObject>
-#include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QtTest>
 
@@ -50,7 +50,7 @@ private:
 
 void tst_CmdFunctionImplementationRemove::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
     auto dynPropConfig = ivm::IVPropertyTemplateConfig::instance();

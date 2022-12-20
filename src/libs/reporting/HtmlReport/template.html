@@ -59,6 +59,12 @@
               <i>Observer Name:</i> <tt>{{ reportItem.errorDetails.observerName }}</tt><br>
               <i>Observer State:</i> <tt>{{ reportItem.errorDetails.observerState }}</tt>
             </td>
+          {# Check for MSC violation #}
+          {% elif reportItem.errorCode == 3 %}
+            <td>
+              <i>Observer Name:</i> <tt>{{ reportItem.errorDetails.observerName }}</tt><br>
+              <i>File Name:</i> <tt>{{ reportItem.errorDetails.mscFileName }}</tt>
+            </td>
           {# Unknown error type #}
           {% else %}
             <td></td>

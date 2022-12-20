@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
+#include "../../../unittests/common/xmldatahelper.h"
+
 #include <QObject>
 #include <QtTest>
 #include <conversion/converter/converter.h>
@@ -99,13 +101,6 @@ const QString tsti_SimulinkToIV::m_currentIVFileName = "interface_view.xml";
 
 // clang-format on
 
-QString getFileContents(const QString &filename)
-{
-    QFile file(filename);
-    file.open(QIODevice::ReadOnly);
-    return file.readAll();
-}
-
 void tsti_SimulinkToIV::initTestCase()
 {
     IvRegistrar ivRegistrar;
@@ -138,7 +133,7 @@ void tsti_SimulinkToIV::testComparingIVTranslationResultWithExpectedResult()
             Converter converter(m_registry, std::move(options));
             converter.convert({ ModelType::Simulink }, ModelType::InterfaceView, {});
 
-            QVERIFY(getFileContents(m_currentIVFileName) == getFileContents(expectedIVFilePath));
+            QVERIFY(XmlData(m_currentIVFileName) == XmlData(expectedIVFilePath));
         } catch (const std::exception &ex) {
             QFAIL(ex.what());
         }

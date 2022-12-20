@@ -19,7 +19,6 @@
 
 #include <QDirIterator>
 #include <QObject>
-#include <QStandardPaths>
 #include <QTest>
 #include <QtTest/qtestcase.h>
 #include <conversion/common/model.h>

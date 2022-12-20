@@ -26,8 +26,8 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
+#include "standardpaths.h"
 
-#include <QStandardPaths>
 #include <QTemporaryDir>
 
 static inline void shiftObjects(const QVector<ivm::IVObject *> &objects, const QPointF &offset)
@@ -112,13 +112,12 @@ void CmdEntitiesInstantiate::redo()
         if (!m_tempDir.isNull()) {
             m_tempDir.reset();
         }
-        Q_EMIT asn1FilesImported(m_importedAsnFiles);
     }
 }
 
 void CmdEntitiesInstantiate::undo()
 {
-    m_tempDir.reset(new QTemporaryDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
+    m_tempDir.reset(new QTemporaryDir(shared::StandardPaths::writableLocation(QStandardPaths::CacheLocation)
             + QDir::separator() + QLatin1String("import")));
 
     if (!m_instantiatedEntity.isNull()) {

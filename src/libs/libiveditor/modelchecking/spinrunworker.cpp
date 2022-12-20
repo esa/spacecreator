@@ -118,6 +118,22 @@ void SpinRunWorker::run()
     if (spinExecutable.isValid()) {
         m_verifier->setSpinExecutable(spinExecutable.toString());
     }
+    QVariant sdl2PromelaTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_SDL2PROMELA_TIMEOUT);
+    if (sdl2PromelaTimeout.isValid()) {
+        m_verifier->setSdl2PromelaTimeout(sdl2PromelaTimeout.toInt());
+    }
+    QVariant ccompilerTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_CCOMPILER_TIMEOUT);
+    if (ccompilerTimeout.isValid()) {
+        m_verifier->setCCompilerTimeout(ccompilerTimeout.toInt());
+    }
+    QVariant externalCommandTimeout = settings.value(tmc::TmcConstants::SETTINGS_TMC_EXTERNAL_COMMAND_TIMEOUT);
+    if (externalCommandTimeout.isValid()) {
+        m_verifier->setExternalCommandTimeout(externalCommandTimeout.toInt());
+    }
+    QVariant additionalCompilerFlags = settings.value(tmc::TmcConstants::SETTINGS_TMC_COMPILER_FLAGS);
+    if (additionalCompilerFlags.isValid()) {
+        m_verifier->setAdditionalCompilerFlags(additionalCompilerFlags.toString());
+    }
 
     if (m_spinConfig.globalInputVectorGenerationLimit.has_value()) {
         m_verifier->setGlobalInputVectorLengthLimit(

@@ -25,6 +25,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivobject.h"
+#include "standardpaths.h"
 
 #include <QAction>
 #include <QApplication>
@@ -41,7 +42,6 @@
 #include <QMetaObject>
 #include <QObject>
 #include <QProcess>
-#include <QStandardPaths>
 #include <QUndoStack>
 #include <QVersionNumber>
 
@@ -95,7 +95,7 @@ ActionsManager *ActionsManager::m_instance = nullptr;
  */
 QString ActionsManager::storagePath()
 {
-    return QString("%1/contextMenu/").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    return QString("%1/contextMenu/").arg(shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 }
 
 /*!

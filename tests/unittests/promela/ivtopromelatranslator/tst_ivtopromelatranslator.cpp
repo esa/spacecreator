@@ -45,11 +45,13 @@ using promela::model::GoTo;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
 using promela::model::Label;
+using promela::model::PrintfStatement;
 using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::Sequence;
 using promela::model::Skip;
+using promela::model::StringConstant;
 using promela::model::Utype;
 using promela::model::VariableRef;
 using promela::translator::IvToPromelaTranslator;
@@ -70,6 +72,8 @@ private Q_SLOTS:
     void testSimpleObservers();
     void testOutputObservers();
     void testUnhandledInputObservers();
+    void testSynchronousInterfaces();
+    void testChannelNames();
 
 private:
     template<typename T>
@@ -284,14 +288,14 @@ void tst_IvToPromelaTranslator::testSimple()
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
@@ -532,14 +536,14 @@ void tst_IvToPromelaTranslator::testParameters()
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Actuator_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
@@ -911,21 +915,21 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
         QVERIFY(std::holds_alternative<Expression>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Up_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Up_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Down_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Down_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
         QVERIFY(std::holds_alternative<Skip>(content.back()->getValue()));
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_get_sender");
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_get_sender");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const std::list<std::unique_ptr<ProctypeElement>> &content = inlineDef->getSequence().getContent();
@@ -1278,37 +1282,45 @@ void tst_IvToPromelaTranslator::testUnhandledInputObservers()
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const Sequence &content = inlineDef->getSequence();
 
-        QCOMPARE(content.getContent().size(), 6);
+        QCOMPARE(content.getContent().size(), 7);
 
-        const ChannelRecv *firstObserverLock = findProctypeElement<ChannelRecv>(content, 0);
+        const PrintfStatement *printfStatement = findProctypeElement<PrintfStatement>(content, 0);
+        QVERIFY(printfStatement);
+        QCOMPARE(printfStatement->getArguments().size(), 1);
+        printfStatement->getArguments().front().getContent();
+        QVERIFY(std::holds_alternative<StringConstant>(printfStatement->getArguments().front().getContent()));
+        QCOMPARE(std::get<StringConstant>(printfStatement->getArguments().front().getContent()).getValue(),
+                "unhandled_input controller test\\n");
+
+        const ChannelRecv *firstObserverLock = findProctypeElement<ChannelRecv>(content, 1);
         QVERIFY(firstObserverLock);
         QCOMPARE(firstObserverLock->getChannelRef().getElements().size(), 1);
         QCOMPARE(firstObserverLock->getChannelRef().getElements().front().m_name, "First_observer_lock");
         QCOMPARE(firstObserverLock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const InlineCall *firstObserverCall = findProctypeElement<InlineCall>(content, 1);
+        const InlineCall *firstObserverCall = findProctypeElement<InlineCall>(content, 2);
         QVERIFY(firstObserverCall);
         QCOMPARE(firstObserverCall->getName(), "First_observer_0_PI_0_uh_controller");
         QCOMPARE(firstObserverCall->getArguments().size(), 0);
 
-        const ChannelSend *firstObserverUnlock = findProctypeElement<ChannelSend>(content, 2);
+        const ChannelSend *firstObserverUnlock = findProctypeElement<ChannelSend>(content, 3);
         QVERIFY(firstObserverUnlock);
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().size(), 1);
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().front().m_name, "First_observer_lock");
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const ChannelRecv *secondObserverLock = findProctypeElement<ChannelRecv>(content, 3);
+        const ChannelRecv *secondObserverLock = findProctypeElement<ChannelRecv>(content, 4);
         QVERIFY(secondObserverLock);
         QCOMPARE(secondObserverLock->getChannelRef().getElements().size(), 1);
         QCOMPARE(secondObserverLock->getChannelRef().getElements().front().m_name, "Second_observer_lock");
         QCOMPARE(secondObserverLock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const InlineCall *secondObserverCall = findProctypeElement<InlineCall>(content, 4);
+        const InlineCall *secondObserverCall = findProctypeElement<InlineCall>(content, 5);
         QVERIFY(secondObserverCall);
         QCOMPARE(secondObserverCall->getName(), "Second_observer_0_PI_0_uh_global");
         QCOMPARE(secondObserverCall->getArguments().size(), 0);
 
-        const ChannelSend *secondObserverUnlock = findProctypeElement<ChannelSend>(content, 5);
+        const ChannelSend *secondObserverUnlock = findProctypeElement<ChannelSend>(content, 6);
         QVERIFY(secondObserverUnlock);
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().size(), 1);
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().front().m_name, "Second_observer_lock");
@@ -1321,37 +1333,45 @@ void tst_IvToPromelaTranslator::testUnhandledInputObservers()
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const Sequence &content = inlineDef->getSequence();
 
-        QCOMPARE(content.getContent().size(), 6);
+        QCOMPARE(content.getContent().size(), 7);
 
-        const ChannelRecv *firstObserverLock = findProctypeElement<ChannelRecv>(content, 0);
+        const PrintfStatement *printfStatement = findProctypeElement<PrintfStatement>(content, 0);
+        QVERIFY(printfStatement);
+        QCOMPARE(printfStatement->getArguments().size(), 1);
+        printfStatement->getArguments().front().getContent();
+        QVERIFY(std::holds_alternative<StringConstant>(printfStatement->getArguments().front().getContent()));
+        QCOMPARE(std::get<StringConstant>(printfStatement->getArguments().front().getContent()).getValue(),
+                "unhandled_input controller pong\\n");
+
+        const ChannelRecv *firstObserverLock = findProctypeElement<ChannelRecv>(content, 1);
         QVERIFY(firstObserverLock);
         QCOMPARE(firstObserverLock->getChannelRef().getElements().size(), 1);
         QCOMPARE(firstObserverLock->getChannelRef().getElements().front().m_name, "First_observer_lock");
         QCOMPARE(firstObserverLock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const InlineCall *firstObserverCall = findProctypeElement<InlineCall>(content, 1);
+        const InlineCall *firstObserverCall = findProctypeElement<InlineCall>(content, 2);
         QVERIFY(firstObserverCall);
         QCOMPARE(firstObserverCall->getName(), "First_observer_0_PI_0_uh_controller");
         QCOMPARE(firstObserverCall->getArguments().size(), 0);
 
-        const ChannelSend *firstObserverUnlock = findProctypeElement<ChannelSend>(content, 2);
+        const ChannelSend *firstObserverUnlock = findProctypeElement<ChannelSend>(content, 3);
         QVERIFY(firstObserverUnlock);
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().size(), 1);
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().front().m_name, "First_observer_lock");
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const ChannelRecv *secondObserverLock = findProctypeElement<ChannelRecv>(content, 3);
+        const ChannelRecv *secondObserverLock = findProctypeElement<ChannelRecv>(content, 4);
         QVERIFY(secondObserverLock);
         QCOMPARE(secondObserverLock->getChannelRef().getElements().size(), 1);
         QCOMPARE(secondObserverLock->getChannelRef().getElements().front().m_name, "Second_observer_lock");
         QCOMPARE(secondObserverLock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const InlineCall *secondObserverCall = findProctypeElement<InlineCall>(content, 4);
+        const InlineCall *secondObserverCall = findProctypeElement<InlineCall>(content, 5);
         QVERIFY(secondObserverCall);
         QCOMPARE(secondObserverCall->getName(), "Second_observer_0_PI_0_uh_global");
         QCOMPARE(secondObserverCall->getArguments().size(), 0);
 
-        const ChannelSend *secondObserverUnlock = findProctypeElement<ChannelSend>(content, 5);
+        const ChannelSend *secondObserverUnlock = findProctypeElement<ChannelSend>(content, 6);
         QVERIFY(secondObserverUnlock);
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().size(), 1);
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().front().m_name, "Second_observer_lock");
@@ -1363,41 +1383,139 @@ void tst_IvToPromelaTranslator::testUnhandledInputObservers()
         QCOMPARE(inlineDef->getArguments().size(), 1);
         const Sequence &content = inlineDef->getSequence();
 
-        QCOMPARE(content.getContent().size(), 6);
+        QCOMPARE(content.getContent().size(), 7);
 
-        const ChannelRecv *firstObserverLock = findProctypeElement<ChannelRecv>(content, 0);
+        const PrintfStatement *printfStatement = findProctypeElement<PrintfStatement>(content, 0);
+        QVERIFY(printfStatement);
+        QCOMPARE(printfStatement->getArguments().size(), 1);
+        printfStatement->getArguments().front().getContent();
+        QVERIFY(std::holds_alternative<StringConstant>(printfStatement->getArguments().front().getContent()));
+        QCOMPARE(std::get<StringConstant>(printfStatement->getArguments().front().getContent()).getValue(),
+                "unhandled_input actuator ping\\n");
+
+        const ChannelRecv *firstObserverLock = findProctypeElement<ChannelRecv>(content, 1);
         QVERIFY(firstObserverLock);
         QCOMPARE(firstObserverLock->getChannelRef().getElements().size(), 1);
         QCOMPARE(firstObserverLock->getChannelRef().getElements().front().m_name, "First_observer_lock");
         QCOMPARE(firstObserverLock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const InlineCall *firstObserverCall = findProctypeElement<InlineCall>(content, 1);
+        const InlineCall *firstObserverCall = findProctypeElement<InlineCall>(content, 2);
         QVERIFY(firstObserverCall);
         QCOMPARE(firstObserverCall->getName(), "First_observer_0_PI_0_uh_ping");
         QCOMPARE(firstObserverCall->getArguments().size(), 1);
 
-        const ChannelSend *firstObserverUnlock = findProctypeElement<ChannelSend>(content, 2);
+        const ChannelSend *firstObserverUnlock = findProctypeElement<ChannelSend>(content, 3);
         QVERIFY(firstObserverUnlock);
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().size(), 1);
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().front().m_name, "First_observer_lock");
         QCOMPARE(firstObserverUnlock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const ChannelRecv *secondObserverLock = findProctypeElement<ChannelRecv>(content, 3);
+        const ChannelRecv *secondObserverLock = findProctypeElement<ChannelRecv>(content, 4);
         QVERIFY(secondObserverLock);
         QCOMPARE(secondObserverLock->getChannelRef().getElements().size(), 1);
         QCOMPARE(secondObserverLock->getChannelRef().getElements().front().m_name, "Second_observer_lock");
         QCOMPARE(secondObserverLock->getChannelRef().getElements().front().m_index.get(), nullptr);
 
-        const InlineCall *secondObserverCall = findProctypeElement<InlineCall>(content, 4);
+        const InlineCall *secondObserverCall = findProctypeElement<InlineCall>(content, 5);
         QVERIFY(secondObserverCall);
         QCOMPARE(secondObserverCall->getName(), "Second_observer_0_PI_0_uh_global");
         QCOMPARE(secondObserverCall->getArguments().size(), 0);
 
-        const ChannelSend *secondObserverUnlock = findProctypeElement<ChannelSend>(content, 5);
+        const ChannelSend *secondObserverUnlock = findProctypeElement<ChannelSend>(content, 6);
         QVERIFY(secondObserverUnlock);
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().size(), 1);
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().front().m_name, "Second_observer_lock");
         QCOMPARE(secondObserverUnlock->getChannelRef().getElements().front().m_index.get(), nullptr);
+    }
+}
+
+void tst_IvToPromelaTranslator::testSynchronousInterfaces()
+{
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("synchronous_interfaces.xml");
+    QVERIFY(ivModel);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
+    QVERIFY(promelaModel);
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test_protected");
+        QVERIFY(inlineDef);
+        QCOMPARE(inlineDef->getArguments().size(), 3);
+        const Sequence &content = inlineDef->getSequence();
+        QCOMPARE(content.getContent().size(), 3);
+
+        const ChannelRecv *functionLock = findProctypeElement<ChannelRecv>(content, 0);
+        QVERIFY(functionLock);
+        QCOMPARE(functionLock->getChannelRef().getElements().size(), 1);
+        QCOMPARE(functionLock->getChannelRef().getElements().front().m_name, "Actuator_lock");
+        QCOMPARE(functionLock->getChannelRef().getElements().front().m_index.get(), nullptr);
+
+        const InlineCall *functionCall = findProctypeElement<InlineCall>(content, 1);
+        QVERIFY(functionCall);
+        QCOMPARE(functionCall->getName(), "Actuator_0_PI_0_test_protected");
+        QCOMPARE(functionCall->getArguments().size(), 3);
+
+        const ChannelSend *functionUnlock = findProctypeElement<ChannelSend>(content, 2);
+        QVERIFY(functionUnlock);
+        QCOMPARE(functionUnlock->getChannelRef().getElements().size(), 1);
+        QCOMPARE(functionUnlock->getChannelRef().getElements().front().m_name, "Actuator_lock");
+        QCOMPARE(functionUnlock->getChannelRef().getElements().front().m_index.get(), nullptr);
+    }
+
+    {
+        const InlineDef *inlineDef = findInline(promelaModel->getInlineDefs(), "Controller_0_RI_0_test_unprotected");
+        QVERIFY(inlineDef);
+        QCOMPARE(inlineDef->getArguments().size(), 3);
+        const Sequence &content = inlineDef->getSequence();
+        QCOMPARE(content.getContent().size(), 1);
+
+        const InlineCall *functionCall = findProctypeElement<InlineCall>(content, 0);
+        QVERIFY(functionCall);
+        QCOMPARE(functionCall->getName(), "Actuator_0_PI_0_test_unprotected");
+        QCOMPARE(functionCall->getArguments().size(), 3);
+    }
+}
+
+void tst_IvToPromelaTranslator::testChannelNames()
+{
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("channel_names.xml");
+    QVERIFY(ivModel);
+
+    conversion::Options options;
+    options.add(PromelaOptions::modelFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
+    QVERIFY(promelaModel);
+
+    {
+        const Declaration *declaration =
+                findDeclaration(promelaModel->getDeclarations(), "Actuator_testsignal_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Actuator_ping_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
+    }
+    {
+        const Declaration *declaration = findDeclaration(promelaModel->getDeclarations(), "Controller_pong_channel");
+        QVERIFY(declaration != nullptr);
+        QVERIFY(declaration->getType().isBasicType());
+        QCOMPARE(declaration->getType().getBasicType(), BasicType::CHAN);
+        QCOMPARE(declaration->getVisibility(), Declaration::Visibility::NORMAL);
+        QVERIFY(declaration->hasInit());
     }
 }
 

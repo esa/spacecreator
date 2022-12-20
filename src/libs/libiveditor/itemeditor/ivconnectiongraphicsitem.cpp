@@ -73,9 +73,7 @@ int IVConnectionGraphicsItem::itemLevel(bool isSelected) const
 
 void IVConnectionGraphicsItem::rebuildLayout()
 {
-    if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible() || !entity()
-            || !entity()->isVisible()
-            || (ivm::utils::nestingLevel(entity()) < gi::kNestingVisibilityLevel && !entity()->isRootObject())) {
+    if (!isItemVisible()) {
         setVisible(false);
         return;
     }
@@ -112,6 +110,16 @@ QString IVConnectionGraphicsItem::prepareTooltip() const
     const QString tooltip =
             QString("%1.%2 %3 %4.%5").arg(sourceName, sourceInterfaceName, sign, targetName, targetInterfaceName);
     return tooltip;
+}
+
+bool IVConnectionGraphicsItem::isItemVisible() const
+{
+    if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible() || !entity()
+            || !entity()->isVisible()
+            || (ivm::utils::nestingLevel(entity()) < gi::kNestingVisibilityLevel && !entity()->isRootObject())) {
+        return false;
+    }
+    return VEConnectionGraphicsItem::isItemVisible();
 }
 
 } // namespace ive

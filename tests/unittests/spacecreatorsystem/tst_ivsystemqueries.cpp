@@ -23,6 +23,7 @@
 #include "ivsystemchecks.h"
 #include "ivsystemqueries.h"
 #include "sharedlibrary.h"
+#include "standardpaths.h"
 
 #include <QSharedPointer>
 #include <QtTest>
@@ -49,7 +50,7 @@ private:
 
 void tst_IvSystemQueries::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     shared::initSharedLibrary();
     ivm::initIVLibrary();
     ive::initIVEditor();

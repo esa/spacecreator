@@ -24,6 +24,7 @@
 #include "mscsystemchecks.h"
 #include "sharedlibrary.h"
 #include "spacecreatorproject.h"
+#include "standardpaths.h"
 
 #include <QGraphicsScene>
 #include <QUndoCommand>
@@ -52,7 +53,7 @@ private:
 
 void tst_SpaceCreatorProject::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
     shared::initSharedLibrary();

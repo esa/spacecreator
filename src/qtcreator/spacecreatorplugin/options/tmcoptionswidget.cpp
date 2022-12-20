@@ -56,4 +56,43 @@ QString TmcOptionsWidget::getDefaultOutputDirectory()
     return m_ui->outputDirectoryLineEdit->text();
 }
 
+void TmcOptionsWidget::setSdl2PromelaTimeout(int timeout)
+{
+    m_ui->sdl2promelaTimeoutLineEdit->setValue(timeout);
+}
+
+int TmcOptionsWidget::getSdl2PromelaTimeout()
+{
+    return m_ui->sdl2promelaTimeoutLineEdit->value();
+}
+
+void TmcOptionsWidget::setCCompilerTimeout(int timeout)
+{
+    m_ui->ccompilerTimeoutLineEdit->setValue(timeout);
+}
+
+int TmcOptionsWidget::getCCompilerTimeout()
+{
+    return m_ui->ccompilerTimeoutLineEdit->value();
+}
+
+void TmcOptionsWidget::setExternalCommandTimeout(int timeout)
+{
+    m_ui->externalCommandTimeoutLineEdit->setValue(timeout);
+}
+
+int TmcOptionsWidget::getExternalCommandTimeout()
+{
+    return m_ui->externalCommandTimeoutLineEdit->value();
+}
+
+void TmcOptionsWidget::setCompilerFlags(const QString &compilerFlags)
+{
+    m_ui->compilerFlagsLineEdit->setText(compilerFlags);
+}
+
+QString TmcOptionsWidget::getCompilerFlags()
+{
+    return m_ui->compilerFlagsLineEdit->text();
+}
 }

@@ -2,14 +2,14 @@ TYPEMAPPING-MEGACOMPONENT DEFINITIONS ::= BEGIN
 IMPORTS
 MyInteger FROM TYPEMAPPING
 ;
-MegaComponent-ProvidedInterface-GenericType ::= MyInteger(0 .. 255)
-MegaComponent-ProvidedInterface-GenericTypeArray-10 ::= SEQUENCE (SIZE(10)) OF MegaComponent-ProvidedInterface-GenericType(0 .. 255)
+MegaComponent-ProvidedInterface-GenericType ::= MyInteger
+MegaComponent-ProvidedInterface-GenericTypeArray-10 ::= SEQUENCE (SIZE(10)) OF MegaComponent-ProvidedInterface-GenericType
 MegaComponent-ProvidedInterface-AsyncCommandSimpleMapping-Type ::= SEQUENCE
 {
-    argumentSimpleMapping MegaComponent-ProvidedInterface-GenericType(0 .. 255)
+    argumentSimpleMapping MegaComponent-ProvidedInterface-GenericType
 }
 MegaComponent-ProvidedInterface-AsyncCommandSimpleMappingArray-Type ::= SEQUENCE
 {
-    arrayArgumentSimpleMapping MegaComponent-ProvidedInterface-GenericTypeArray-10(SIZE(10))
+    arrayArgumentSimpleMapping MegaComponent-ProvidedInterface-GenericTypeArray-10
 }
 END

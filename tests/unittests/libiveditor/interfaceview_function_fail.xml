@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="Battery_1" url="https://taste.tools" is_type="NO" instance_of="battery_see_name" language="SDL">
     <Property name="Taste::coordinates" value="124900 42600 157300 64700"/>
     <ContextParameter name="p1" type="MyInteger" value="5"/>

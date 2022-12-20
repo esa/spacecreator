@@ -85,7 +85,7 @@ if(QTC_SOURCE)
     message("QtCreatorCheck: Looked for QTC_SOURCE_DIR. Found " ${QTC_SOURCE_DIR})
 endif()
 
-if (EXISTS ${QTC_SOURCE_DIR} AND EXISTS ${QTC_LIB_DIR})
+if (EXISTS "${QTC_SOURCE_DIR}" AND EXISTS "${QTC_LIB_DIR}")
     set(QTC_FOUND TRUE)
     message(STATUS "QtCreatorCheck: QtCreator sources in ${QTC_SOURCE_DIR}")
     message(STATUS "QtCreatorCheck: QtCreator libraries in ${QTC_LIB_DIR}")

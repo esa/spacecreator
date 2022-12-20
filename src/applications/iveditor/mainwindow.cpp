@@ -24,7 +24,6 @@
 #include "config/ivlibrarydialog.h"
 #include "context/action/actionsmanager.h"
 #include "endtoend/endtoendview.h"
-#include "modelchecking/modelcheckingwindow.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "itemeditor/common/ivutils.h"
@@ -34,6 +33,7 @@
 #include "ivexporter.h"
 #include "ivfunctiontype.h"
 #include "minimap.h"
+#include "modelchecking/modelcheckingwindow.h"
 #include "reports/bugreportdialog.h"
 #include "settingsmanager.h"
 #include "ui_mainwindow.h"
@@ -121,8 +121,10 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     auto modelCheckingWindow = new ModelCheckingWindow(m_core->document(), "", this);
     modelCheckingWindow->hide();
     connect(core->actionLaunchModelCheckingWindow(), &QAction::toggled, modelCheckingWindow, &QWidget::setVisible);
-    connect(core->actionLaunchModelCheckingWindow(), &QAction::toggled, modelCheckingWindow, &ModelCheckingWindow::callTasteGens);
-    connect(modelCheckingWindow, &ModelCheckingWindow::visibleChanged, core->actionLaunchModelCheckingWindow(), &QAction::setChecked);
+    connect(core->actionLaunchModelCheckingWindow(), &QAction::toggled, modelCheckingWindow,
+            &ModelCheckingWindow::callTasteGens);
+    connect(modelCheckingWindow, &ModelCheckingWindow::visibleChanged, core->actionLaunchModelCheckingWindow(),
+            &QAction::setChecked);
     modelCheckingWindow->setVisible(core->actionLaunchModelCheckingWindow()->isChecked());
 
     connect(shared::ErrorHub::instance(), &shared::ErrorHub::errorAdded, this, [this](const shared::ErrorItem &error) {
@@ -237,8 +239,10 @@ void MainWindow::onReportRequested()
 
 void MainWindow::initSettings()
 {
-    restoreGeometry(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::Geometry));
-    restoreState(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::State));
+    // Use the application settings, and not the common SpaceCreator settings
+    QSettings settings;
+    restoreGeometry(settings.value("Common/Geometry").toByteArray());
+    restoreState(settings.value("Common/State").toByteArray());
 
     const bool showMinimap = shared::SettingsManager::load<bool>(shared::SettingsManager::Common::ShowMinimap, true);
     m_core->actionToggleMinimap()->setChecked(showMinimap);
@@ -445,8 +449,10 @@ bool MainWindow::prepareQuit()
         return false;
     }
 
-    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::State, saveState());
-    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::Geometry, saveGeometry());
+    // Use the application settings, and not the common SpaceCreator settings
+    QSettings settings;
+    settings.setValue("Common/State", saveState());
+    settings.setValue("Common/Geometry", saveGeometry());
 
     return true;
 }

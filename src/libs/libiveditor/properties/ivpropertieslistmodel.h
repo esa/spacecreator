@@ -38,6 +38,7 @@ public:
             cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
     ~IVPropertiesListModel() override;
 
+    QVariant data(const QModelIndex &index, int role) const override;
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = DataRole) override;
 
@@ -66,8 +67,8 @@ protected:
 class InterfacePropertiesListModel : public IVPropertiesListModel
 {
 public:
-    explicit InterfacePropertiesListModel(
-            cmd::CommandsStack::Macro *macro, shared::PropertyTemplateConfig *dynPropConfig, ivm::IVModel *layersModel, QObject *parent = nullptr);
+    explicit InterfacePropertiesListModel(cmd::CommandsStack::Macro *macro,
+            shared::PropertyTemplateConfig *dynPropConfig, ivm::IVModel *layersModel, QObject *parent = nullptr);
 
     void setDataObject(shared::VEObject *obj) override;
     QVariant data(const QModelIndex &index, int role) const override;

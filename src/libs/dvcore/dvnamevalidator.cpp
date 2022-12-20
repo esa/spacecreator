@@ -18,7 +18,9 @@
 #include "dvnamevalidator.h"
 
 #include "common.h"
+#include "dvdevice.h"
 #include "dvmodel.h"
+#include "dvnode.h"
 #include "dvobject.h"
 
 namespace dvm {
@@ -41,7 +43,9 @@ QString DVNameValidator::nameForObject(const DVObject *object, DVModel *model, c
 
 QString DVNameValidator::encodeName(const DVObject::Type t, const QString &name)
 {
-    Q_UNUSED(t)
+    if (t == DVObject::Type::Node) {
+        return name;
+    }
 
     QString result;
     std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
@@ -51,7 +55,9 @@ QString DVNameValidator::encodeName(const DVObject::Type t, const QString &name)
 
 QString DVNameValidator::decodeName(const DVObject::Type t, const QString &name)
 {
-    Q_UNUSED(t)
+    if (t == DVObject::Type::Node) {
+        return name;
+    }
 
     QString result;
     std::transform(name.cbegin(), name.cend(), std::back_inserter(result),
@@ -59,13 +65,41 @@ QString DVNameValidator::decodeName(const DVObject::Type t, const QString &name)
     return result;
 }
 
-bool DVNameValidator::isAcceptableName(const DVObject *object, const QString &name, DVModel *model)
+bool DVNameValidator::isAcceptableName(const DVObject *object, const QString &name)
 {
-    DVModel *dvModel = model ? model : object->model();
-    if (!dvModel) {
-        return shared::isValidName(name);
+    if (!object) {
+        return false;
     }
-    return dvModel->getObjectByName(name, object->type(), Qt::CaseInsensitive) == nullptr;
+    if (object->type() != DVObject::Type::Node && !shared::isValidName(name)) {
+        return false;
+    }
+
+    DVModel *dvModel = object->model();
+    if (!dvModel) {
+        return true;
+    }
+
+    if (object->type() == DVObject::Type::Device) {
+        // Devices are special, as devices of different nodes can have the same name
+        auto device = dynamic_cast<const DVDevice *>(object);
+        if (!device) {
+            return true;
+        }
+        DVNode *node = device->node();
+        if (!node) {
+            return true;
+        }
+
+        for (const DVDevice *dev : node->devices()) {
+            if (dev != device && dev->title().compare(name, Qt::CaseInsensitive) == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    DVObject *obj = dvModel->getObjectByName(name, object->type(), Qt::CaseInsensitive);
+    return (!obj || obj == object); // no device of this name exists already, or is the object itself
 }
 
 } // namespace dvm

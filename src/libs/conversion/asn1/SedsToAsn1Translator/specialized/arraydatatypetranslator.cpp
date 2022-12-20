@@ -19,6 +19,8 @@
 
 #include "specialized/arraydatatypetranslator.h"
 
+#include "datatypetranslationhelper.h"
+
 #include <asn1library/asn1/types/userdefinedtype.h>
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
@@ -77,11 +79,13 @@ void ArrayDataTypeTranslator::translate(const ::seds::model::ArrayDataType &seds
 void ArrayDataTypeTranslator::translateArrayType(
         const ::seds::model::DataTypeRef &sedsTypeRef, Asn1Acn::Types::SequenceOf *asn1Type) const
 {
-    const auto *asn1ReferencedType = m_context.findAsn1Type(sedsTypeRef);
+    auto asn1ReferencedType = m_context.findAsn1Type(sedsTypeRef)->clone();
+
+    DataTypeTranslationHelper::removeConstraints(asn1ReferencedType.get());
 
     auto asn1ItemType = std::make_unique<Asn1Acn::Types::UserdefinedType>(
             asn1ReferencedType->identifier(), m_context.definitionsName());
-    asn1ItemType->setType(asn1ReferencedType->clone());
+    asn1ItemType->setType(std::move(asn1ReferencedType));
 
     asn1Type->setItemsType(std::move(asn1ItemType));
 }

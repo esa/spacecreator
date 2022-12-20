@@ -1,4 +1,4 @@
-<InterfaceView asn1file="INTERFACES.acn">
+<InterfaceView version="1.0" asn1file="INTERFACES.acn">
 <Function name="FunctionUnderTest" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
     <Property name="Taste::coordinates" value="46200 10600 66200 18600"/>
 <Provided_Interface name="PI_0" kind="Protected" layer="default" wcet="0">

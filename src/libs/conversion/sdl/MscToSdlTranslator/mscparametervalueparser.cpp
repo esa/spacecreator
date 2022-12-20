@@ -19,6 +19,7 @@
 
 #include "mscparametervalueparser.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivfunction.h>
 #include <shared/qstringhash.h>
@@ -89,7 +90,7 @@ MscParameterValueParser::ParametersRequirements MscParameterValueParser::parseSi
 QVariantMap MscParameterValueParser::parseParameter(const QString &ivParameterTypeName,
         const MscParameter &mscParameter, const QString &ivInterfaceName, const int parameterIndex) const
 {
-    const auto ivParameterType = m_asn1File->typeFromName(ivParameterTypeName);
+    const auto ivParameterType = m_asn1File->typeFromName(Escaper::escapeAsn1TypeName(ivParameterTypeName));
 
     if (ivParameterType == nullptr) {
         auto errorMessage = QString("Unable to find ASN.1 type %1 for IV parameter #%2 of interface %3")

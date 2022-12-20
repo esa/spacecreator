@@ -1,0 +1,11 @@
+output-event:{source controller, dest actuator, event controller:msg-out:ping:{p1 2}}
+input-event:{source controller, dest actuator, event actuator:msg-in:ping:{p1 2}}
+output-event:{source actuator, dest controller, event actuator:msg-out:pong:{p1 0}}
+input-event:{source actuator, dest controller, event controller:msg-in:pong:{p1 0}}
+output-event:{source controller, dest actuator, event controller:msg-out:ping:{p1 3}}
+input-event:{source controller, dest actuator, event actuator:msg-in:ping:{p1 3}}
+output-event:{source actuator, dest controller, event actuator:msg-out:pong:{p1 3}}
+input-event:{source actuator, dest controller, event controller:msg-in:pong:{p1 3}}
+output-event:{source controller, dest actuator, event controller:msg-out:ping:{p1 1}}
+input-event:{source controller, dest actuator, event actuator:msg-in:ping:{p1 1}}
+unhandled-input:{source controller, dest actuator, event actuator:msg-in:ping:1}

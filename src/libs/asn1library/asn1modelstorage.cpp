@@ -25,7 +25,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFileSystemWatcher>
-#include <QStandardPaths>
 #include <QTextStream>
 
 namespace Asn1Acn {

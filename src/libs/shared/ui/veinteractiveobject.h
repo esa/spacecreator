@@ -130,6 +130,8 @@ protected:
      */
     virtual ColorHandler colorHandler() const;
 
+ 	virtual bool isItemVisible() const;
+    
 protected:
     // Callbacks for receiving events
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -139,7 +141,7 @@ protected:
     void onSelectionChanged(bool isSelected) override;
 
     void mergeGeometry();
-
+	void updateVisibility();
 
 protected:
     const QPointer<VEObject> m_dataObject;
@@ -149,6 +151,8 @@ protected:
     QBrush m_brush;
     QPen m_pen;
     QFont m_font;
+
+    inline static bool s_mouseReleased = false;
 };
 QDebug operator<<(QDebug debug, const shared::ui::VEInteractiveObject &veobj);
 

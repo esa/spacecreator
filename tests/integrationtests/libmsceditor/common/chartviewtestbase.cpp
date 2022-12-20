@@ -17,21 +17,20 @@
 
 #include "chartviewtestbase.h"
 
-#include "exceptions.h"
 #include "mscdocument.h"
+#include "standardpaths.h"
 #include "syntheticinteraction.h"
 
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QGraphicsView>
-#include <QStandardPaths>
 #include <QTest>
 
 namespace msc {
 
 void ChartViewTestBase::initTestCaseBase()
 {
-    QStandardPaths::setTestModeEnabled(true);
+    shared::StandardPaths::setTestModeEnabled(true);
 }
 
 void ChartViewTestBase::initBase()

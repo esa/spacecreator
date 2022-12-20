@@ -25,13 +25,18 @@ namespace Asn1Acn {
 class Asn1SystemChecks;
 }
 
+namespace dvm {
+class DVObject;
+}
+
 namespace dve {
 
 class DVAttributeDelegate : public shared::AttributeDelegate
 {
     Q_OBJECT
 public:
-    explicit DVAttributeDelegate(Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent = nullptr);
+    explicit DVAttributeDelegate(
+            dvm::DVObject *object, Asn1Acn::Asn1SystemChecks *asn1Checks, QObject *parent = nullptr);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
@@ -41,6 +46,7 @@ protected:
 
 private:
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
+    QPointer<dvm::DVObject> m_object;
 };
 
 } // namespace dve

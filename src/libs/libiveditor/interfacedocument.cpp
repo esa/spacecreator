@@ -31,8 +31,7 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
-#include "interface/objectstreeview.h"
-#include "itemeditor/ivfunctiongraphicsitem.h"
+#include "ivcoreutils.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivcore/abstractsystemchecks.h"
@@ -44,6 +43,7 @@
 #include "ivxmlreader.h"
 #include "propertytemplatemanager.h"
 #include "propertytemplatewidget.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QAction>
 #include <QBuffer>
@@ -58,8 +58,8 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSplitter>
-#include <QStandardPaths>
 #include <QUndoStack>
+#include <QItemSelectionModel>
 #include <QVBoxLayout>
 #include <algorithm>
 #include <filesystem>
@@ -611,6 +611,7 @@ void InterfaceDocument::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
     }
 
     d->asnCheck = check;
+    d->commandsStack->setAsn1Check(check);
 
     connect(d->asnCheck->asn1Storage(), &Asn1Acn::Asn1ModelStorage::dataTypesChanged, this,
             &ive::InterfaceDocument::checkAllInterfacesForAsn1Compliance, Qt::QueuedConnection);
@@ -874,7 +875,8 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         (*it)->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), targetDir.dirName());
     }
 
-    if (!exportObjects(exporter(), objects, d->archetypesModel, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
+    if (!exportObjects(
+                exporter(), objects, d->archetypesModel, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
         return false;
     }
 
@@ -914,7 +916,9 @@ bool InterfaceDocument::loadImpl(const QString &path)
         return false;
     }
 
-    setObjects(parser.parsedObjects());
+    QVector<ivm::IVObject *> parsedObjects = parser.parsedObjects();
+    ivm::IVObject::sortObjectList(parsedObjects);
+    setObjects(parsedObjects);
 
     auto layers = parser.parsedLayers();
     ivm::IVObject::sortObjectListByTitle(layers);

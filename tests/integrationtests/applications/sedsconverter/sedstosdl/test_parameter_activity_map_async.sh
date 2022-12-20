@@ -15,14 +15,14 @@ echo "Running SedsConverter test: ${0##*/}'"
 rm -r -f $TEST_OUTPUT_DIR
 mkdir -p $TEST_OUTPUT_DIR
 # Translate
-$SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1,InterfaceView --skip-validation -i resources/test_parameter_activity_map.xml \
+$SEDS_CONVERTER --from SEDS --to SDL --aux-models ASN.1,InterfaceView --skip-validation -i resources/test_parameter_activity_map_async.xml \
   --iv-config resources/config.xml --asn1-filepath-prefix $TEST_OUTPUT_DIR/ --acn-filepath-prefix $TEST_OUTPUT_DIR/ \
   --sdl-filepath-prefix $TEST_OUTPUT_DIR/ --out $TEST_OUTPUT_DIR/interfaceview.xml
 
 # Setup additional data
-cp resources/test_parameteractivitymap_receiver.system_structure output/receiver_system_structure.pr
-cp resources/test_parameteractivitymap_converter.system_structure output/converter_system_structure.pr
-cp resources/test_parameteractivitymap_thermometer.system_structure output/thermometer_system_structure.pr
+cp resources/test_parameteractivitymapasync_receiver.system_structure output/receiver_system_structure.pr
+cp resources/test_parameteractivitymapasync_converter.system_structure output/converter_system_structure.pr
+cp resources/test_parameteractivitymapasync_thermometer.system_structure output/thermometer_system_structure.pr
 cp resources/test_parametermaphostrequirer.system_structure output/requirer_system_structure.pr
 cp $TEST_OUTPUT_DIR/PARAMETERS.asn $TEST_OUTPUT_DIR/dataview-uniq.asn
 
@@ -32,9 +32,9 @@ cd $TEST_OUTPUT_DIR
 
 # # Compare output against reference, and compile to make sure the reference is valid
 # # Clean (rm) only if all steps pass
-$DIFF receiver.pr ../resources/test_parameteractivitymap_receiver.output \
-  && $DIFF converter.pr ../resources/test_parameteractivitymap_converter.output \
-  && $DIFF thermometer.pr ../resources/test_parameteractivitymap_thermometer.output \
+$DIFF receiver.pr ../resources/test_parameteractivitymapasync_receiver.output \
+  && $DIFF converter.pr ../resources/test_parameteractivitymapasync_converter.output \
+  && $DIFF thermometer.pr ../resources/test_parameteractivitymapasync_thermometer.output \
   && $OPENGEODE --toAda receiver_system_structure.pr receiver.pr \
   && $OPENGEODE --toAda converter_system_structure.pr converter.pr \
   && $OPENGEODE --toAda thermometer_system_structure.pr thermometer.pr \

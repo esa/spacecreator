@@ -22,14 +22,12 @@
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "errorhub.h"
-#include "itemeditor/graphicsview.h"
 #include "settingsmanager.h"
 #include "ui_mainwindow.h"
 
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QStandardPaths>
 
 namespace dve {
 
@@ -165,8 +163,10 @@ void MainWindow::onQuitRequested()
 
 void MainWindow::initSettings()
 {
-    restoreGeometry(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::Geometry));
-    restoreState(shared::SettingsManager::load<QByteArray>(shared::SettingsManager::Common::State));
+    // Use the application settings, and not the common SpaceCreator settings
+    QSettings settings;
+    restoreGeometry(settings.value("Common/Geometry").toByteArray());
+    restoreState(settings.value("Common/State").toByteArray());
 }
 
 bool MainWindow::closeFile()
@@ -210,8 +210,11 @@ bool MainWindow::prepareQuit()
     if (!closeFile()) {
         return false;
     }
-    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::State, saveState());
-    shared::SettingsManager::store<QByteArray>(shared::SettingsManager::Common::Geometry, saveGeometry());
+
+    // Use the application settings, and not the common SpaceCreator settings
+    QSettings settings;
+    settings.setValue("Common/State", saveState());
+    settings.setValue("Common/Geometry", saveGeometry());
 
     return true;
 }

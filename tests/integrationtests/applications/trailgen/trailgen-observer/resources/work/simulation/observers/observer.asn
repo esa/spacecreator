@@ -26,7 +26,7 @@ IMPORTS
    MyInteger, MyTestInteger FROM TEST-SIMU-OBSERVER-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {operation, wait}
+Controller-States ::= ENUMERATED {wait, operation}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,

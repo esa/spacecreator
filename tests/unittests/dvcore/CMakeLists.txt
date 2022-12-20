@@ -1,5 +1,6 @@
 addQtTest(tst_dvboardreader dvcore "dvboardreaderhelpers.h")
 addQtTest(tst_dvconnectionutils dvcore)
 addQtTest(tst_dvmodel dvcore "ghost_messages.dv.xml;rsc.qrc")
+addQtTest(tst_dvnamevalidator dvcore)
 addQtTest(tst_dvnode dvcore)
 addQtTest(tst_dvxmlreader dvcore "dvxmlreaderhelpers.h")

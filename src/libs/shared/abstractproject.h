@@ -27,6 +27,8 @@ class AbstractProject : public QObject
 public:
     explicit AbstractProject(QObject *parent = nullptr);
 
+    virtual QString projectPath() const = 0;
+
     virtual QStringList allDVFiles() const = 0;
     virtual QStringList allIVFiles() const = 0;
     virtual QStringList allMscFiles() const = 0;

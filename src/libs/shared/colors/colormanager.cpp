@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "settingsmanager.h"
+#include "standardpaths.h"
 
 #include <QDebug>
 #include <QFile>
@@ -26,7 +27,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMetaEnum>
-#include <QStandardPaths>
 #include <QUrl>
 #include <QVersionNumber>
 
@@ -247,7 +247,7 @@ QList<ColorManager::HandledColors> ColorManager::handledColors() const
 QString ColorManager::prepareDefaultSource() const
 {
     const QString targetDir =
-            QString("%1/colors").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+            QString("%1/colors").arg(shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 
     shared::ensureDirExists(targetDir);
 

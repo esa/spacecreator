@@ -30,7 +30,7 @@ public:
     static QString nameForObject(const DVObject *object, dvm::DVModel *model = nullptr, const QString &nameBase = {});
     static QString encodeName(const DVObject::Type t, const QString &name);
     static QString decodeName(const DVObject::Type t, const QString &name);
-    static bool isAcceptableName(const DVObject *object, const QString &name, dvm::DVModel *model = nullptr);
+    static bool isAcceptableName(const DVObject *object, const QString &name);
 };
 
 } // namespace dvm

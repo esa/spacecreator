@@ -36,7 +36,7 @@ private Q_SLOTS:
 };
 
 /// \SRS  ETB-FUN-20
-//  \SRS  ETB-IF-30
+/// \SRS  ETB-IF-30
 void tst_SedsConverter_Validation::testInvalidFails()
 {
     const int result = system("./test_invalid_fails.sh");
@@ -45,7 +45,7 @@ void tst_SedsConverter_Validation::testInvalidFails()
 
 /// \SRS  ETB-FUN-20
 /// \SRS  ETB-DAT-20
-//  \SRS  ETB-IF-30
+/// \SRS  ETB-IF-30
 /// \SRS  ETB-IF-40
 void tst_SedsConverter_Validation::testMissingCoreSemanticsFails()
 {
@@ -55,7 +55,7 @@ void tst_SedsConverter_Validation::testMissingCoreSemanticsFails()
 
 /// \SRS  ETB-FUN-20
 /// \SRS  ETB-DAT-20
-//  \SRS  ETB-IF-30
+/// \SRS  ETB-IF-30
 /// \SRS  ETB-IF-40
 void tst_SedsConverter_Validation::testMissingExtensionSemanticsFails()
 {
@@ -65,7 +65,7 @@ void tst_SedsConverter_Validation::testMissingExtensionSemanticsFails()
 
 /// \SRS  ETB-FUN-20
 /// \SRS  ETB-DAT-20
-//  \SRS  ETB-IF-20
+/// \SRS  ETB-IF-20
 /// \SRS  ETB-IF-40
 void tst_SedsConverter_Validation::testValidPasses()
 {

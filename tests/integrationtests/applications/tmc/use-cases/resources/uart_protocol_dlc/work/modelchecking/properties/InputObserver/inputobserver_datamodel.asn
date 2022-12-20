@@ -15,7 +15,7 @@ IMPORTS
    Bcapp-Event, Bcdlct-Event, Channeleffects-Event, Demo-Timer-Manager-Event, Demo-Timer-Manager-Periodic-Events, Erroredchannel-Event, Rtapp-Event, Rtdlcr-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Inputobserver-States ::= ENUMERATED {error, wait}
+Inputobserver-States ::= ENUMERATED {wait, error}
 
 Inputobserver-Context ::= SEQUENCE {
    state Inputobserver-States,

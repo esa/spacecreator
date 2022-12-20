@@ -23,6 +23,7 @@
 #include "ivmodel.h"
 #include "ivpropertytemplateconfig.h"
 #include "sharedlibrary.h"
+#include "standardpaths.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -39,9 +40,9 @@ private Q_SLOTS:
 
 void tst_IVInterfaceGraphicsItem::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ive::initIVEditor();
     shared::initSharedLibrary();
-    QStandardPaths::setTestModeEnabled(true);
 }
 
 void tst_IVInterfaceGraphicsItem::testMaxWidth()

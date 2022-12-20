@@ -18,6 +18,7 @@
 #include "common.h"
 
 #include "settingsmanager.h"
+#include "standardpaths.h"
 
 #include <QDebug>
 #include <QDir>
@@ -26,7 +27,6 @@
 #include <QFileInfo>
 #include <QPalette>
 #include <QRegularExpressionMatch>
-#include <QStandardPaths>
 #include <QWidget>
 
 #ifdef Q_OS_WIN
@@ -208,7 +208,7 @@ QString archetypesFileStartingString()
 
 QString interfaceCustomArchetypesDirectoryPath()
 {
-    static const QString kArchetypesPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    static const QString kArchetypesPath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("archetypes");
 
     return kArchetypesPath;
@@ -216,7 +216,7 @@ QString interfaceCustomArchetypesDirectoryPath()
 
 QString interfaceCustomAttributesFilePath()
 {
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    static const QString kDefaultPath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("default_attributes.xml");
 
     return qEnvironmentVariable(env::kInterfaceAttrs, kDefaultPath);
@@ -224,7 +224,7 @@ QString interfaceCustomAttributesFilePath()
 
 QString componentsLibraryPath()
 {
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    static const QString kDefaultPath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("components_library") + QDir::separator();
     const QString componentsFile =
             shared::SettingsManager::load<QString>(shared::SettingsManager::IVE::ComponentsPath, kDefaultPath);
@@ -234,7 +234,7 @@ QString componentsLibraryPath()
 
 QString sharedTypesPath()
 {
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    static const QString kDefaultPath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("shared_types") + QDir::separator();
     const QString sharedTypesFile =
             shared::SettingsManager::load<QString>(shared::SettingsManager::IVE::SharedTypesPath, kDefaultPath);
@@ -244,7 +244,7 @@ QString sharedTypesPath()
 
 QString deploymentCustomAttributesFilePath()
 {
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    static const QString kDefaultPath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("deployment_attributes.xml");
 
     return qEnvironmentVariable(env::kDeploymentAttrs, kDefaultPath);
@@ -252,7 +252,7 @@ QString deploymentCustomAttributesFilePath()
 
 QString hwLibraryPath()
 {
-    static const QString kDefaultPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    static const QString kDefaultPath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("HWlibrary");
     QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, kDefaultPath);
 
@@ -261,7 +261,7 @@ QString hwLibraryPath()
 
 QSet<QString> forbiddenNamesSet()
 {
-    static const QString kFilePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    static const QString kFilePath = shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
             + QDir::separator() + QLatin1String("forbidden_names.txt");
     static const QString kDefaultPath = QLatin1String(":/defaults/forbidden_names.txt");
     if (shared::ensureFileExists(kFilePath, kDefaultPath)) {

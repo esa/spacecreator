@@ -57,7 +57,7 @@ protected Q_SLOTS:
     void updateItem();
 
 private Q_SLOTS:
-    void addItem(VEObject *obj);
+    void addItem(shared::VEObject *obj);
     void addItems(const QVector<shared::Id> &objectsIds);
     void removeItem(shared::Id objId);
 

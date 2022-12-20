@@ -26,6 +26,7 @@
 #include "ivlibrary.h"
 #include "ivpropertytemplate.h"
 #include "ivpropertytemplateconfig.h"
+#include "standardpaths.h"
 
 #include <QDomDocument>
 #include <QMetaEnum>
@@ -49,9 +50,9 @@ private:
 
 void tst_AttributesConfigure::initTestCase()
 {
+    shared::StandardPaths::setTestModeEnabled(true);
     ivm::initIVLibrary();
     ive::initIVEditor();
-    QStandardPaths::setTestModeEnabled(true);
     m_dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     m_dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 }

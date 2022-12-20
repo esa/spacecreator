@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  <Package name="Parameters">
+    <DataTypeSet>
+      <IntegerDataType name="Number">
+        <IntegerDataEncoding encoding="twosComplement" sizeInBits="32" byteOrder="littleEndian" />
+        <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="-1000000" max="1000000" />
+        </Range>
+      </IntegerDataType>
+    </DataTypeSet>
+    <DeclaredInterfaceSet>
+      <Interface name="ClockInterfaceType">
+        <CommandSet>
+          <Command name="Tick" mode="async"/>
+        </CommandSet>
+      </Interface>
+      <Interface name="RawTemperatureInterfaceType">
+        <ParameterSet>
+          <Parameter name="RawTemperature" mode="async" type="Number" />
+        </ParameterSet>
+      </Interface>
+      <Interface name="CelciusTemperatureInterfaceType">
+        <ParameterSet>
+          <Parameter name="CelciusTemperature" mode="async" type="Number" />
+        </ParameterSet>
+      </Interface>
+    </DeclaredInterfaceSet>
+    <ComponentSet>
+      <Component name="Receiver">
+        <RequiredInterfaceSet>
+          <Interface name="CelciusTemperatureIF" type="CelciusTemperatureInterfaceType" />
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="receivedTemperature" type="Number" />
+          </VariableSet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s0" />
+              <State name="s1" />
+              <Transition fromState="s0" toState="s1" name="t1">
+                <OnParameterPrimitive parameter="CelciusTemperature" interface="CelciusTemperatureIF" operation="get" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+      <Component name="Converter">
+        <ProvidedInterfaceSet>
+          <Interface name="CelciusTemperatureIF" type="CelciusTemperatureInterfaceType" />
+        </ProvidedInterfaceSet>
+        <RequiredInterfaceSet>
+          <Interface name="RawTemperatureIF" type="RawTemperatureInterfaceType" />
+        </RequiredInterfaceSet>
+        <Implementation>
+          <ParameterActivityMapSet>
+            <ParameterActivityMap>
+              <Provided name="celciusValue" parameter="CelciusTemperature" interface="CelciusTemperatureIF" />
+              <Required name="rawValue" parameter="RawTemperature" interface="RawTemperatureIF" />
+              <GetActivity>
+                <MathOperation outputVariableRef="celciusValue">
+                  <Operator operator="divide" />
+                  <VariableRef variableRef="rawValue" />
+                  <Value value="50" />
+                </MathOperation>
+              </GetActivity>
+              <SetActivity>
+                <MathOperation outputVariableRef="rawValue">
+                  <Operator operator="multiply" />
+                  <VariableRef variableRef="celciusValue" />
+                  <Value value="50" />
+                </MathOperation>
+              </SetActivity>
+            </ParameterActivityMap>
+          </ParameterActivityMapSet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s0" />
+              <State name="s1" />
+              <Transition fromState="s0" toState="s1" name="t1">
+                <OnParameterPrimitive parameter="RawTemperature" interface="RawTemperatureIF" operation="get" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+      <Component name="Thermometer">
+        <ProvidedInterfaceSet>
+          <Interface name="ClkIF" type="ClockInterfaceType" />
+          <Interface name="RawTemperatureIF" type="RawTemperatureInterfaceType" />
+        </ProvidedInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable name="rawTemperatureValue" type="Number" initialValue="2500" />
+          </VariableSet>
+          <ParameterMapSet>
+            <ParameterMap variableRef="rawTemperatureValue" interface="RawTemperatureIF" parameter="RawTemperature" />
+          </ParameterMapSet>
+          <ActivitySet>
+            <Activity name="GiveRawTemperature">
+              <Body>
+                <SendParameterPrimitive interface="RawTemperatureIF" parameter="RawTemperature" operation="get">
+                  <ArgumentValue>
+                    <VariableRef variableRef="rawTemperatureValue" />
+                  </ArgumentValue>
+                </SendParameterPrimitive>
+              </Body>
+            </Activity>
+          </ActivitySet>
+          <StateMachineSet>
+            <StateMachine name="SM">
+              <EntryState name="s0" />
+              <State name="s1" />
+              <Transition fromState="s0" toState="s1" name="t1">
+                <OnCommandPrimitive command="Tick" interface="ClkIF" />
+                <Do activity="GiveRawTemperature" />
+              </Transition>
+            </StateMachine>
+          </StateMachineSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+  </Package>
+</PackageFile>

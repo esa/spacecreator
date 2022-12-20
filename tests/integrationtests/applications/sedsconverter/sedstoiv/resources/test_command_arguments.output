@@ -1,4 +1,4 @@
-<InterfaceView>
+<InterfaceView version="1.0">
 <Function name="Component" is_type="NO" language="SDL" default_implementation="default">
 <Provided_Interface name="AsyncInterfacePI_AsyncInCommand_Pi" layer="default">
     <Input_Parameter name="InputParam" type="AsyncInterface-AsyncInCommand-Type" encoding="ACN"/>

@@ -1,5 +1,5 @@
 system observer;
-    /* CIF TEXT (144, 214), (481, 140) */
+    /* CIF TEXT (144, 214), (482, 140) */
     use datamodel comment 'observer.asn';
     
     signal do_work(MyInteger) renames output work from controller to actuator;
@@ -15,7 +15,7 @@ system observer;
         connect c and r;
         /* CIF PROCESS (259, 87), (150, 75) */
         process observer;
-            /* CIF TEXT (8, 67), (222, 140) */
+            /* CIF TEXT (15, 77), (222, 140) */
             monitor st System_State;
             
             monitor event Observable_Event;
@@ -26,6 +26,9 @@ system observer;
             START;
                 /* CIF NEXTSTATE (363, 129), (70, 35) */
                 NEXTSTATE Wait;
+            /* CIF state (614, 98), (70, 35) */
+            state error;
+            endstate;
             /* CIF state (593, 235), (70, 35) */
             state Wait;
                 /* CIF input (559, 290), (137, 35) */
@@ -43,9 +46,6 @@ system observer;
                             /* CIF NEXTSTATE (638, 513), (70, 35) */
                             NEXTSTATE Wait;
                     enddecision;
-            endstate;
-            /* CIF state (614, 98), (70, 35) */
-            state error;
             endstate;
         endprocess observer;
     endblock;

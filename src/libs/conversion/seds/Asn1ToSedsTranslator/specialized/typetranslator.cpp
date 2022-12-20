@@ -31,7 +31,8 @@ auto TypeTranslator::translateType(const Asn1Acn::Asn1Model *asn1Model, const As
         const Asn1Acn::TypeAssignment *type, ::seds::model::Package *sedsPackage, const Options &options) -> void
 {
     const auto typeNameEscaped = Escaper::escapeIvName(type->name());
-    TypeVisitor::Context context(asn1Model, definitions, typeNameEscaped, sedsPackage, options);
+    TypeVisitor::Context context(
+            asn1Model, definitions, typeNameEscaped, sedsPackage, sedsPackage->dataTypes(), options);
     TypeVisitor visitor(context);
 
     type->type()->accept(visitor);

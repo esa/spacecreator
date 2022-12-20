@@ -6,7 +6,7 @@ IMPORTS
    MyInteger, MyTestInteger FROM TEST-SIMU-CS-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Actuator-States ::= ENUMERATED {work, wait}
+Actuator-States ::= ENUMERATED {wait, work}
 
 Actuator-Context ::= SEQUENCE {
    state Actuator-States,
@@ -26,7 +26,7 @@ IMPORTS
    MyInteger, MyTestInteger FROM TEST-SIMU-CS-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {calculate, wait}
+Controller-States ::= ENUMERATED {wait, calculate}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
