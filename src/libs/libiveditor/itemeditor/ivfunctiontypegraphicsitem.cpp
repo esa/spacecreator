@@ -26,6 +26,7 @@
 #include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcommonprops.h"
+#include "ivcoreutils.h"
 #include "ivfunction.h"
 #include "ivfunctionnamegraphicsitem.h"
 #include "ivmodel.h"
@@ -33,10 +34,9 @@
 #include "ivobject.h"
 #include "ivpropertytemplateconfig.h"
 #include "parameter.h"
-#include "ui/textitem.h"
 #include "ui/grippoint.h"
+#include "ui/textitem.h"
 #include "veobject.h"
-#include "ivcoreutils.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -73,7 +73,8 @@ void IVFunctionTypeGraphicsItem::enableEditMode()
 void IVFunctionTypeGraphicsItem::rebuildLayout()
 {
     shared::ui::VERectGraphicsItem::rebuildLayout();
-    setVisible(entity() && (ivm::utils::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
+    setVisible(entity()
+            && (ivm::utils::nestingLevel(entity()) >= gi::kNestingVisibilityLevel || entity()->isRootObject())
             && entity()->isVisible());
 
     updateTextPosition();
@@ -113,7 +114,6 @@ void IVFunctionTypeGraphicsItem::paint(QPainter *painter, const QStyleOptionGrap
     painter->restore();
 }
 
-
 QString IVFunctionTypeGraphicsItem::prepareTooltip() const
 {
     const QString title = shared::uniteNames<ivm::IVFunctionType *>({ entity() }, QString());
@@ -143,8 +143,7 @@ void IVFunctionTypeGraphicsItem::updateTextPosition()
     const QSizeF maxTxtSize = targetTextRect.size();
     const QSizeF txtSize = m_textItem->document()->size();
     bool labelBiggerThanBox = txtSize.width() > maxTxtSize.width() || txtSize.height() > maxTxtSize.height();
-    if (labelBiggerThanBox)
-    {
+    if (labelBiggerThanBox) {
         m_textItem->setExplicitSize(maxTxtSize);
     }
 
@@ -212,12 +211,14 @@ QRectF IVFunctionTypeGraphicsItem::resizedRect(shared::ui::GripPoint *grip, cons
     return unionRect;
 }
 
-QRectF IVFunctionTypeGraphicsItem::resizedRectForTextLabel(GripPoint *grip, const QPointF &from, const QPointF &to) const
+QRectF IVFunctionTypeGraphicsItem::resizedRectForTextLabel(
+        GripPoint *grip, const QPointF &from, const QPointF &to) const
 {
     QRectF result = sceneBoundingRect();
     QRectF textLabelRect = m_textItem->boundingRect();
     textLabelRect = textLabelRect.marginsAdded(shared::graphicsviewutils::kTextMargins);
-    textLabelRect.setWidth(textLabelRect.width() + extraSpace); // A little extra space is needed, otherwise the text item moves about ever so sligtly.
+    textLabelRect.setWidth(textLabelRect.width()
+            + extraSpace); // A little extra space is needed, otherwise the text item moves about ever so sligtly.
     QSizeF minSize = textLabelRect.size();
 
     // The minimum x-value the right side of this rect can have and not violate minimum size
@@ -230,43 +231,35 @@ QRectF IVFunctionTypeGraphicsItem::resizedRectForTextLabel(GripPoint *grip, cons
     auto yMax = result.bottom() - minSize.height();
 
     switch (grip->location()) {
-    case GripPoint::Left:
-    {
+    case GripPoint::Left: {
         result.setLeft(qMin(to.x(), xMax));
         break;
     }
-    case GripPoint::Right:
-    {
+    case GripPoint::Right: {
         result.setRight(qMax(to.x(), xMin));
         break;
     }
-    case GripPoint::Top:
-    {
+    case GripPoint::Top: {
         result.setTop(qMin(to.y(), yMax));
         break;
     }
-    case GripPoint::Bottom:
-    {
+    case GripPoint::Bottom: {
         result.setBottom(qMax(to.y(), yMin));
         break;
     }
-    case GripPoint::TopLeft:
-    {
+    case GripPoint::TopLeft: {
         result.setTopLeft(QPoint(qMin(to.x(), xMax), qMin(to.y(), yMax)));
         break;
     }
-    case GripPoint::TopRight:
-    {
+    case GripPoint::TopRight: {
         result.setTopRight(QPoint(qMax(to.x(), xMin), qMin(to.y(), yMax)));
         break;
     }
-    case GripPoint::BottomLeft:
-    {
+    case GripPoint::BottomLeft: {
         result.setBottomLeft(QPoint(qMin(to.x(), xMax), qMax(to.y(), yMin)));
         break;
     }
-    case GripPoint::BottomRight:
-    {
+    case GripPoint::BottomRight: {
         result.setBottomRight(QPoint(qMax(to.x(), xMin), qMax(to.y(), yMin)));
         break;
     }
@@ -276,7 +269,6 @@ QRectF IVFunctionTypeGraphicsItem::resizedRectForTextLabel(GripPoint *grip, cons
     }
     return result;
 }
-
 
 bool IVFunctionTypeGraphicsItem::isRootItem() const
 {
@@ -292,32 +284,26 @@ void IVFunctionTypeGraphicsItem::alignTextItem() const
     m_textItem->setPos(textRect.topLeft());
 }
 
-
 shared::ui::TextItem *IVFunctionTypeGraphicsItem::initTextItem()
 {
     shared::ui::TextItem *textItem = new IVFunctionNameGraphicsItem(this);
 
     // Connect 'clicked' with 'enableEditMode' on clicked text item.
-    connect(this, &IVFunctionTypeGraphicsItem::clicked, textItem,
-            [this, textItem](const QPointF &scenePos)
-            {
-                if (scene()->items(scenePos).contains(textItem))
-                    textItem->enableEditMode();
-            });
+    connect(this, &IVFunctionTypeGraphicsItem::clicked, textItem, [this, textItem](const QPointF &scenePos) {
+        if (scene()->items(scenePos).contains(textItem))
+            textItem->enableEditMode();
+    });
 
     // Connect 'edited' with 'updateNameFromUi' to keep model updated when UI changes.
     connect(textItem, &shared::ui::TextItem::edited, this, &IVFunctionTypeGraphicsItem::updateNameFromUi);
 
     // Connect 'attributeChanged' with 'updateText' to keep UI updated when model changes.
-    connect(entity(), &ivm::IVFunction::attributeChanged, this,
-            [this](const QString &token)
-            {
-                const ivm::meta::Props::Token attr = ivm::meta::Props::token(token);
-                if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url)
-                {
-                    updateText();
-                }
-            });
+    connect(entity(), &ivm::IVFunction::attributeChanged, this, [this](const QString &token) {
+        const ivm::meta::Props::Token attr = ivm::meta::Props::token(token);
+        if (attr == ivm::meta::Props::Token::name || attr == ivm::meta::Props::Token::url) {
+            updateText();
+        }
+    });
 
     textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     textItem->setFont(font());

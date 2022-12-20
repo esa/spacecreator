@@ -84,9 +84,7 @@ void VEConnectionEndPointGraphicsItem::updateFromEntity()
         doLayout();
     } else {
         setPos(parentItem()->mapFromScene(coordinates));
-        if (doLayout()) {
-            mergeGeometry();
-        }
+        doLayout();
     }
 }
 

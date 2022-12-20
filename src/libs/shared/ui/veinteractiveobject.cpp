@@ -40,17 +40,15 @@ VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent
     , m_textItem(nullptr)
 {
     setAcceptHoverEvents(true);
-    setFlags(QGraphicsItem::ItemSendsGeometryChanges |
-             QGraphicsItem::ItemSendsScenePositionChanges |
-             QGraphicsItem::ItemIsSelectable);
+    setFlags(QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemSendsScenePositionChanges
+            | QGraphicsItem::ItemIsSelectable);
 
     setCursor(Qt::ArrowCursor);
 
-    connect(shared::ColorManager::instance(), &shared::ColorManager::colorsUpdated,
-            this, &VEInteractiveObject::applyColorScheme);
+    connect(shared::ColorManager::instance(), &shared::ColorManager::colorsUpdated, this,
+            &VEInteractiveObject::applyColorScheme);
 
-    connect(this, &VEInteractiveObject::boundingBoxChanged,
-            this, &VEInteractiveObject::updateTextPosition);
+    connect(this, &VEInteractiveObject::boundingBoxChanged, this, &VEInteractiveObject::updateTextPosition);
 }
 
 void VEInteractiveObject::init()
@@ -89,20 +87,16 @@ void VEInteractiveObject::updateEntity()
 
 void VEInteractiveObject::updateText()
 {
-    if (!m_textItem)
-    {
+    if (!m_textItem) {
         return;
     }
 
     const QString text = entity()->titleUI();
-    if (Qt::mightBeRichText(text))
-    {
+    if (Qt::mightBeRichText(text)) {
         if (text != m_textItem->toHtml()) {
             m_textItem->setHtml(text);
         }
-    }
-    else if (text != m_textItem->toPlainText())
-    {
+    } else if (text != m_textItem->toPlainText()) {
         m_textItem->setPlainText(text);
     }
 
@@ -131,7 +125,6 @@ void VEInteractiveObject::rebuildLayout()
 {
     updateGripPoints();
     applyColorScheme();
-
 }
 
 void VEInteractiveObject::updateVisibility()
@@ -143,27 +136,6 @@ bool VEInteractiveObject::isItemVisible() const
 {
     return true;
 }
-
-void VEInteractiveObject::mergeGeometry()
-{
-#ifdef __NONE__
-    if (!m_commandsStack) {
-        qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
-        return;
-    }
-
-    const QList<QPair<shared::VEObject *, QVector<QPointF>>> geometryData = prepareChangeCoordinatesCommandParams();
-    const QUndoCommand *cmd = m_commandsStack->command(m_commandsStack->index() - 1);
-    if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd)) {
-        auto mutCmd = const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd);
-        if (mutCmd->mergeGeometryData(geometryData)) {
-            return;
-        }
-    }
-    m_commandsStack->push(new cmd::CmdEntityAutoLayout(geometryData));
-#endif
-}
-
 
 QList<QPair<shared::VEObject *, QVector<QPointF>>> VEInteractiveObject::prepareChangeCoordinatesCommandParams() const
 {
@@ -180,7 +152,6 @@ QList<QPair<shared::VEObject *, QVector<QPointF>>> VEInteractiveObject::prepareC
     return params;
 }
 
-
 void VEInteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     s_mouseReleased = false;
@@ -195,8 +166,7 @@ void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     // sometimes it makes the scrollbar of the canvas resize and move, which
     // makes the graphics scene send an additional mouse move even that we want
     // to discard, or the element ends out of the screen.
-    if (s_mouseReleased)
-    {
+    if (s_mouseReleased) {
         return;
     }
     QGraphicsObject::mouseMoveEvent(event);
@@ -209,7 +179,8 @@ void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()),
             event->scenePos());
 
-    const qreal distance = graphicsviewutils::distanceLine(event->buttonDownScenePos(event->button()), event->scenePos());
+    const qreal distance =
+            graphicsviewutils::distanceLine(event->buttonDownScenePos(event->button()), event->scenePos());
     if (distance <= kClickTreshold)
         Q_EMIT clicked(event->scenePos());
     QGraphicsObject::mouseReleaseEvent(event);
@@ -226,8 +197,7 @@ shared::ColorHandler VEInteractiveObject::colorHandler() const
     // Get colorHandler for the type of this instance type
     shared::ColorHandler h = shared::ColorManager::instance()->colorsForItem(handledColorType());
     // Read color from entity (the model) and set it on the colorhandler
-    if (auto ivObj = entity())
-    {
+    if (auto ivObj = entity()) {
         if (ivObj->hasEntityAttribute(QLatin1String("color"))) { // keep single custom color
             h.setFillType(shared::ColorHandler::Color);
             h.setBrushColor0(QColor(ivObj->entityAttributeValue<QString>(QLatin1String("color"))));
@@ -280,18 +250,14 @@ void VEInteractiveObject::setPen(const QPen &pen)
 QString VEInteractiveObject::toString() const
 {
     QString typeName = QString("VEInteractiveObject: ");
-    if (m_textItem == nullptr)
-    {
+    if (m_textItem == nullptr) {
         return typeName;
     }
 
     QString name;
-    if (m_textItem->textIsValid())
-    {
+    if (m_textItem->textIsValid()) {
         name = m_textItem->toPlainText();
-    }
-    else
-    {
+    } else {
         name = "NoName";
     }
 

@@ -70,7 +70,6 @@ public:
      */
     virtual void init();
 
-
     /**
      * @brief updateEntity pushes command on command stack
      */
@@ -87,8 +86,6 @@ public:
     virtual QString prepareTooltip() const;
     virtual void enableEditMode() {};
     virtual void childBoundingBoxChanged();
-
-
 
 Q_SIGNALS:
     void clicked(const QPointF &scenePos);
@@ -111,8 +108,8 @@ protected:
     /**
      * @brief updateTextPosition
      * Called when boundingBoxChanged is emitted and when the text item is updated from the model.
-     * Children classes can overload this method to set up the text item specific for their role. This could be name label for a
-     * function name, or an interface name next to the interface.
+     * Children classes can overload this method to set up the text item specific for their role. This could be name
+     * label for a function name, or an interface name next to the interface.
      */
     virtual void updateTextPosition() = 0;
 
@@ -130,8 +127,8 @@ protected:
      */
     virtual ColorHandler colorHandler() const;
 
- 	virtual bool isItemVisible() const;
-    
+    virtual bool isItemVisible() const;
+
 protected:
     // Callbacks for receiving events
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -141,7 +138,7 @@ protected:
     void onSelectionChanged(bool isSelected) override;
 
     void mergeGeometry();
-	void updateVisibility();
+    void updateVisibility();
 
 protected:
     const QPointer<VEObject> m_dataObject;
@@ -155,7 +152,6 @@ protected:
     inline static bool s_mouseReleased = false;
 };
 QDebug operator<<(QDebug debug, const shared::ui::VEInteractiveObject &veobj);
-
 
 } // namespace ui
 } // namespace shared

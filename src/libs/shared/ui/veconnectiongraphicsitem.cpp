@@ -538,9 +538,7 @@ void VEConnectionGraphicsItem::rebuildLayout()
     }
 
     if (pathObsolete) {
-        if (doLayout()) {
-            mergeGeometry();
-        }
+        doLayout();
     }
 
     updateBoundingRect();
@@ -653,7 +651,6 @@ void VEConnectionGraphicsItem::updateTextPosition()
         m_textItem->setExplicitSize(boundingRect().size());
     }
 }
-
 
 void VEConnectionGraphicsItem::updateEndPoint(const VEConnectionEndPointGraphicsItem *endPoint)
 {

@@ -101,9 +101,7 @@ void VERectGraphicsItem::updateFromEntity()
         doLayout();
     } else {
         setRect(itemSceneRect);
-        if (layoutShouldBeChanged() && doLayout()) {
-            mergeGeometry();
-        }
+        doLayout();
     }
 }
 
