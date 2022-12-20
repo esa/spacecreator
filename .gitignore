@@ -50,3 +50,4 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 # autosave files
 *.autosave
 
+*.txt.user.*

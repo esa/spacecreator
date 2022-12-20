@@ -169,6 +169,11 @@ Qt::Alignment VEConnectionEndPointGraphicsItem::alignment() const
     return m_alignment;
 }
 
+void VEConnectionEndPointGraphicsItem::setAlignment(Qt::Alignment alignment)
+{
+    m_alignment = alignment;
+}
+
 void VEConnectionEndPointGraphicsItem::rebuildLayout()
 {
     const QPointF entityPos = scenePos();

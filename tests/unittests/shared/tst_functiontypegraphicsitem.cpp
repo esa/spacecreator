@@ -16,8 +16,8 @@
 */
 
 #include "itemeditor/ivfunctiontypegraphicsitem.h"
+#include "itemeditor/ivinterfacegraphicsitem.h"
 #include "ivfunctiontype.h"
-
 #include "ui/textitem.h"
 
 #include <QtTest>
@@ -44,6 +44,7 @@ public:
         }
         setFont(QFont(QLatin1String("Ubuntu"), 8));
         m_textItem = initTextItem(); // Sets font on the textItem
+        m_textItem->setObjectName("textItem");
     }
 
     QString getText()
@@ -66,8 +67,10 @@ class FunctionTypeMock : public ivm::IVFunctionType
 {
 public:
 
-    FunctionTypeMock(QString titleUI)
-        : m_mockTitleUI(titleUI) {}
+    virtual void setTitleUI(QString titleUI)
+    {
+        m_mockTitleUI = titleUI;
+    }
 
     virtual QString titleUI() const override
     {
@@ -78,7 +81,7 @@ private:
     QString m_mockTitleUI;
 };
 
-// Test class
+// Test class with some fixture
 class tst_FunctionTypeGraphicsItem : public QObject
 {
     Q_OBJECT
@@ -86,10 +89,8 @@ class tst_FunctionTypeGraphicsItem : public QObject
 public:
     tst_FunctionTypeGraphicsItem()
     : m_scene(QGraphicsScene(0,0, 800, 600))
-    , m_entity(FunctionTypeMock("Gutterdammerung"))
+    , m_entity(FunctionTypeMock())
     , m_rectangularGraphicsItem(new FunctionTypeGraphicsItem(&m_entity))
-
-
     {
         m_scene.addItem(m_rectangularGraphicsItem);
     }
@@ -100,24 +101,80 @@ private Q_SLOTS:
     void testMovingRightGripTooFarLeft();
     void testMovingLeftGripRight();
     void testMovingLeftGripTooFarRight();
+    void testMovingTopGripDown();
+    void testMovingTopGripTooFarDown();
+    void testMovingBottomGripUp();
+    void testMovingBottomGripTooFarUp();
+
+    void testMovingTopLeftGripDownAndRight();
+    void testMovingTopLeftGripTooFarDownAndRight();
+    void testMovingTopRightGripDownAndLeft();
+    void testMovingTopRightGripTooFarDownAndLeft();
+    void testMovingBottomRightGripUpAndLeft();
+    void testMovingBottomRightGripTooFarUpAndLeft();
+    void testMovingBottomLeftGripUpAndRight();
+    void testMovingBottomLeftGripTooFarUpAndRight();
+
+    void testMovingLeftGripPastInterface();
+    void testMovingRightGripPastInterface();
+    void testMovingTopGripPastInterface();
+    void testMovingBottomGripPastInterface();
+
+    void testMovingTopLeftGripPastInterface();
+    void testMovingTopRightGripPastInterface();
+    void testMovingBottomLeftGripPastInterface();
+    void testMovingBottomRightGripPastInterface();
+
+    // Called after each test function
+    void cleanup()
+    {
+        removeInterfaces();
+    }
 
 private:
     QGraphicsScene m_scene;
     FunctionTypeMock m_entity;
     FunctionTypeGraphicsItem *m_rectangularGraphicsItem;
 
+private:
+    void setup_FunctionType_with_title(QString titleUI)
+    {
+        m_entity.setTitleUI(titleUI);
+        m_rectangularGraphicsItem->updateText();
+        m_rectangularGraphicsItem->setRect(QRectF(QPointF(50, 50), QPointF(400, 400)));
+    }
+
+    void add_interface_to_FunctionType(QRect interface, Qt::Alignment alignment)
+    {
+        IVInterfaceGraphicsItem *endpoint = new IVInterfaceGraphicsItem(nullptr, m_rectangularGraphicsItem);
+        endpoint->setBoundingRect(interface);
+        endpoint->setAlignment(alignment);
+        endpoint->setObjectName("interface");
+    }
+
+    void removeInterfaces()
+    {
+        QList<QGraphicsItem *> children = m_rectangularGraphicsItem->childItems();
+        for (QGraphicsItem *child : children)
+        {
+            auto *endpoint = qobject_cast<IVInterfaceGraphicsItem *>(child->toGraphicsObject());
+            if (endpoint)
+            {
+                child->setParentItem(nullptr);
+                delete child;
+            }
+        }
+    }
 };
 
 
 void tst_FunctionTypeGraphicsItem::testEntityTextIsRendered()
 {
-    QGraphicsScene scene(0,0, 800, 600); // The GraphicsItems need a scene to handle changes to geometry
-    FunctionTypeMock entity("Gutterdammerung");
-    FunctionTypeGraphicsItem *rectangularGraphicsItem = new FunctionTypeGraphicsItem(&entity);
-    scene.addItem(rectangularGraphicsItem);
-    rectangularGraphicsItem->updateText();
-    rectangularGraphicsItem->setRect(QRectF(QPointF(50, 50), QPointF(400, 400)));
-    QCOMPARE(rectangularGraphicsItem->getText(), QString("Gutterdammerung"));
+    // Setup
+    setup_FunctionType_with_title("Gutterdammerung");
+
+    // Execution and Inspection
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("Gutterdammerung"));
 }
 
 /**
@@ -126,18 +183,18 @@ void tst_FunctionTypeGraphicsItem::testEntityTextIsRendered()
  */
 void tst_FunctionTypeGraphicsItem::testMovingRightGripLeft()
 {
-    QGraphicsScene scene(0,0, 800, 600); // The GraphicsItems need a scene to handle changes to geometry
-    FunctionTypeMock entity("i");
-    FunctionTypeGraphicsItem *rectangularGraphicsItem = new FunctionTypeGraphicsItem(&entity);
-    scene.addItem(rectangularGraphicsItem);
-    rectangularGraphicsItem->updateText();
-    rectangularGraphicsItem->setRect(QRectF(QPointF(50, 50), QPointF(400, 400)));
+    // Setup
+    setup_FunctionType_with_title("i");
     GripPoint grip(GripPoint::Location::Right);
     QPointF from; // stub
-    QPointF to(380, 250); // Where the user moved the right grip 10 to the left
-    QRectF actualRect = rectangularGraphicsItem->callResizedRect(&grip, from, to);
+    QPointF to(380, 250); // Move the RIGH grip-point 20 to the LEFT
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
     QRectF expectedRect(QPointF(50, 50), QPointF(380, 400));
-    QCOMPARE(rectangularGraphicsItem->getText(), QString("i"));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("i"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -148,18 +205,18 @@ void tst_FunctionTypeGraphicsItem::testMovingRightGripLeft()
  */
 void tst_FunctionTypeGraphicsItem::testMovingRightGripTooFarLeft()
 {
-    QGraphicsScene scene(0,0, 800, 600); // The GraphicsItems need a scene to handle changes to geometry
-    FunctionTypeMock entity("Hozenblobbets");
-    FunctionTypeGraphicsItem *rectangularGraphicsItem = new FunctionTypeGraphicsItem(&entity);
-    scene.addItem(rectangularGraphicsItem);
-    rectangularGraphicsItem->updateText();
-    rectangularGraphicsItem->setRect(QRectF(QPointF(50, 50), QPointF(300, 300)));
+    // Setup
+    setup_FunctionType_with_title("Hozenblobbets");
     GripPoint grip(GripPoint::Location::Right);
     QPointF from; // stub
-    QPointF to(150, 200); // Where the user moved grip to
-    QRectF actualRect = rectangularGraphicsItem->callResizedRect(&grip, from, to);
-    QRectF unrestrainedRect(QPointF(50, 50), QPointF(150, 300));
-    QCOMPARE(rectangularGraphicsItem->getText(), QString("Hozenblobbets"));
+    QPointF to(150, 200); // Move the RIGH grip-point 250 to the LEFT
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF unrestrainedRect(QPointF(50, 50), QPointF(150, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("Hozenblobbets"));
     QVERIFY(actualRect.right() > unrestrainedRect.right());
 }
 
@@ -169,18 +226,18 @@ void tst_FunctionTypeGraphicsItem::testMovingRightGripTooFarLeft()
  */
 void tst_FunctionTypeGraphicsItem::testMovingLeftGripRight()
 {
-    QGraphicsScene scene(0,0, 800, 600); // The GraphicsItems need a scene to handle changes to geometry
-    FunctionTypeMock entity("i");
-    FunctionTypeGraphicsItem *rectangularGraphicsItem = new FunctionTypeGraphicsItem(&entity);
-    scene.addItem(rectangularGraphicsItem);
-    rectangularGraphicsItem->updateText();
-    rectangularGraphicsItem->setRect(QRectF(QPointF(50, 50), QPointF(400, 400)));
+    // Setup
+    setup_FunctionType_with_title("i");
     GripPoint grip(GripPoint::Location::Left);
     QPointF from; // stub
-    QPointF to(100, 250); // Where the user moved the right grip 10 to the left
-    QRectF actualRect = rectangularGraphicsItem->callResizedRect(&grip, from, to);
-    QRectF expectedRect(QPointF(100, 50), QPointF(400, 400));
-    QCOMPARE(rectangularGraphicsItem->getText(), QString("i"));
+    QPointF to(300, 200); // Move the LEFT grip 20 to the RIGHT
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(300, 50), QPointF(400, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("i"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -191,21 +248,462 @@ void tst_FunctionTypeGraphicsItem::testMovingLeftGripRight()
  */
 void tst_FunctionTypeGraphicsItem::testMovingLeftGripTooFarRight()
 {
-    QGraphicsScene scene(0,0, 800, 600); // The GraphicsItems need a scene to handle changes to geometry
-    FunctionTypeMock entity("Hozenblobbets");
-    FunctionTypeGraphicsItem *rectangularGraphicsItem = new FunctionTypeGraphicsItem(&entity);
-    scene.addItem(rectangularGraphicsItem);
-    rectangularGraphicsItem->updateText();
-    rectangularGraphicsItem->setRect(QRectF(QPointF(50, 50), QPointF(300, 300)));
+    // Setup
+    setup_FunctionType_with_title("Hozenblobbets");
     GripPoint grip(GripPoint::Location::Left);
     QPointF from; // stub
-    QPointF to(150, 200); // Where the user moved grip to
-    QRectF actualRect = rectangularGraphicsItem->callResizedRect(&grip, from, to);
-    QRectF unrestrainedRect(QPointF(50, 50), QPointF(150, 300));
-    QCOMPARE(rectangularGraphicsItem->getText(), QString("Hozenblobbets"));
+    QPointF to(300, 200); // Move the LEFT grip 250 to the RIGHT
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF unrestrainedRect(QPointF(300, 50), QPointF(400, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("Hozenblobbets"));
+    QVERIFY(actualRect.left() < unrestrainedRect.left());
+}
+
+/**
+ * @brief The top grip is moved a little down without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The top side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopGripDown()
+{
+    // Setup
+    setup_FunctionType_with_title("i");
+    GripPoint grip(GripPoint::Location::Top);
+    QPointF from; // stub
+    QPointF to(200, 100); // Move the Top grip 20 Down
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 100), QPointF(400, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("i"));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The Top grip is moved too far down exeeding the limits of the text. No interface points are present.
+ * Expected result: The top side of the item does not go as far down as the movement of the grip-point would indicate, had it
+ * not been for the text blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopGripTooFarDown()
+{
+    // Setup
+    setup_FunctionType_with_title("L");
+    GripPoint grip(GripPoint::Location::Top);
+    QPointF from; // stub
+    QPointF to(200, 350); // Move the TOP grip 300 DOWN
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF unrestrainedRect(QPointF(50, 350), QPointF(400, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("L"));
+    QVERIFY(actualRect.top() < unrestrainedRect.top());
+}
+
+/**
+ * @brief The Bottom grip is moved a little Up without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The b side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomGripUp()
+{
+    // Setup
+    setup_FunctionType_with_title("P");
+    GripPoint grip(GripPoint::Location::Bottom);
+    QPointF from; // stub
+    QPointF to(200, 380); // Move the Bottom grip 20 Up
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 50), QPointF(400, 380));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("P"));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The Bottom grip is moved too far Up exeeding the limits of the text. No interface points are present.
+ * Expected result: The top side of the item does not go as far down as the movement of the grip-point would indicate, had it
+ * not been for the text blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomGripTooFarUp()
+{
+    // Setup
+    setup_FunctionType_with_title("L");
+    GripPoint grip(GripPoint::Location::Bottom);
+    QPointF from; // stub
+    QPointF to(200, 70); // Move the Bottom grip 300 Up
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF unrestrainedRect(QPointF(50, 50), QPointF(400, 70));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("L"));
+    QVERIFY(actualRect.bottom() > unrestrainedRect.bottom());
+}
+
+/**
+ * @brief The TopLeft grip is moved a little Down and to the Right without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The top side and the left side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopLeftGripDownAndRight()
+{
+    // Setup
+    setup_FunctionType_with_title("0");
+    GripPoint grip(GripPoint::Location::TopLeft);
+    QPointF from; // stub
+    QPointF to(70, 70); // Move the TopLeft grip 20 Down and to the Right
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(70, 70), QPointF(400, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The TopLeft grip is moved a little Down and to the Right without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The top side and the left side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopLeftGripTooFarDownAndRight()
+{
+    // Setup
+    setup_FunctionType_with_title("0");
+    GripPoint grip(GripPoint::Location::TopLeft);
+    QPointF from; // stub
+    QPointF to(380, 380); // Move the TopLeft grip 20 Down and to the Right
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF unrestrainedRect(QPointF(380, 380), QPointF(400, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
+    QVERIFY(actualRect.top() < unrestrainedRect.top());
+    QVERIFY(actualRect.left() < unrestrainedRect.left());
+}
+
+
+/**
+ * @brief The TopRight grip is moved a little Down and to the Left without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The top side and the right side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopRightGripDownAndLeft()
+{
+    // Setup
+    setup_FunctionType_with_title("0");
+    GripPoint grip(GripPoint::Location::TopRight);
+    QPointF from; // stub
+    QPointF to(380, 70); // Move the TopLeft grip 20 Down and to the Right
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 70), QPointF(380, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The TopRight grip is moved a little Down and to the Left without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The top side and the right side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopRightGripTooFarDownAndLeft()
+{
+    // Setup
+    setup_FunctionType_with_title("SprinkleWidget");
+    GripPoint grip(GripPoint::Location::TopRight);
+    QPointF from; // stub
+    QPointF to(70, 380); // Move the TopLeft grip 20 Down and to the Right
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF unrestrainedRect(QPointF(50, 380), QPointF(70, 400));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("SprinkleWidget"));
+    QVERIFY(actualRect.top() < unrestrainedRect.top());
     QVERIFY(actualRect.right() > unrestrainedRect.right());
 }
 
+/**
+ * @brief The BottomRight grip is moved a little Up and to the Left without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The top side and the right side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomRightGripUpAndLeft()
+{
+    // Setup
+    setup_FunctionType_with_title("0");
+    GripPoint grip(GripPoint::Location::BottomRight);
+    QPointF from; // stub
+    QPointF to(380, 380); // Move the TopLeft grip 20 Down and to the Right
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 50), QPointF(380, 380));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The BottomRight grip is moved a little Up and to the Left without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The top side and the right side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomRightGripTooFarUpAndLeft()
+{
+    // Setup
+    setup_FunctionType_with_title("SprinkleWidget");
+    GripPoint grip(GripPoint::Location::BottomRight);
+    QPointF from; // stub
+    QPointF to(100, 100); // Move the BottomRight grip 50 Up and to the Left
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF unrestrainedRect(QPointF(50, 50), QPointF(100, 100));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("SprinkleWidget"));
+    QVERIFY(actualRect.bottom() > unrestrainedRect.bottom());
+    QVERIFY(actualRect.right() > unrestrainedRect.right());
+}
+
+/**
+ * @brief The BottomLeft grip is moved a little Up and to the Right without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The Bottom side and the Left side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomLeftGripUpAndRight()
+{
+    // Setup
+    setup_FunctionType_with_title("0");
+    GripPoint grip(GripPoint::Location::BottomLeft);
+    QPointF from; // stub
+    QPointF to(80, 380); // Move the BottomLeft grip 20 Up and to the Left
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(80, 50), QPointF(400, 380));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The BottomLeft grip is moved a little Up and to the Right without exeeding any limits. No interface points are present. Text does not interfere.
+ * Expected result: The top side and the right side of the item has been moved according to the movement of the grip-point.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomLeftGripTooFarUpAndRight()
+{
+    // Setup
+    setup_FunctionType_with_title("SprinkleWidget");
+    GripPoint grip(GripPoint::Location::BottomLeft);
+    QPointF from; // stub
+    QPointF to(100, 100); // Move the BottomRight grip 50 Up and to the Left
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF unrestrainedRect(QPointF(50, 50), QPointF(100, 100));
+    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("SprinkleWidget"));
+    QVERIFY(actualRect.bottom() > unrestrainedRect.bottom());
+    QVERIFY(actualRect.right() > unrestrainedRect.right());
+}
+
+// ========================================================================================================================================
+/**
+ * @brief The left grip is moved to the right going past an interface.
+ * Expected result: The left side of the item does not go as far right as the movement of the grip-point would indicate, had it
+ * not been for the interface blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingLeftGripPastInterface()
+{
+    // Setup
+    setup_FunctionType_with_title("o");
+    add_interface_to_FunctionType(QRect(20, 0, 10, 10), Qt::AlignTop);
+    GripPoint grip(GripPoint::Location::Left);
+    QPointF from; // stub
+    QPointF to(100, 200); // Move the Left grip-point 50 to the Right
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(70, 50), QPointF(400, 400));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+
+/**
+ * @brief The right grip is moved to the left going past an interface.
+ * Expected result: The right side of the item does not go as far left as the movement of the grip-point would indicate, had it
+ * not been for the interface blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingRightGripPastInterface()
+{
+    // Setup
+    setup_FunctionType_with_title("o");
+    add_interface_to_FunctionType(QRect(300, 0, 10, 10), Qt::AlignTop);
+    GripPoint grip(GripPoint::Location::Right);
+    QPointF from; // stub
+    QPointF to(200, 200); // Move the RIGH grip-point 50 to the LEFT
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 50), QPointF(360, 400));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+
+/**
+ * @brief The top grip is moved doen going past an interface.
+ * Expected result: The top side of the item does not go as far down as the movement of the grip-point would indicate, had it
+ * not been for the interface blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopGripPastInterface()
+{
+    // Setup
+    setup_FunctionType_with_title("o");
+    add_interface_to_FunctionType(QRect(0, 20, 10, 10), Qt::AlignLeft);
+    GripPoint grip(GripPoint::Location::Top);
+    QPointF from; // stub
+    QPointF to(200, 100); // Move the top grip-point 50 down
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 70), QPointF(400, 400));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+
+/**
+ * @brief The bottom grip is moved doen going past an interface.
+ * Expected result: The bottom side of the item does not go as far up as the movement of the grip-point would indicate, had it
+ * not been for the interface blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomGripPastInterface()
+{
+    // Setup
+    setup_FunctionType_with_title("o");
+    add_interface_to_FunctionType(QRect(0, 330, 10, 10), Qt::AlignLeft);
+    GripPoint grip(GripPoint::Location::Bottom);
+    QPointF from; // stub
+    QPointF to(200, 200); // Move the bottom grip-point 50 up
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 50), QPointF(400, 390));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The bottom grip is moved doen going past an interface.
+ * Expected result: The bottom side of the item does not go as far up as the movement of the grip-point would indicate, had it
+ * not been for the interface blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopLeftGripPastInterface()
+{
+    // Setup
+    setup_FunctionType_with_title("o");
+    add_interface_to_FunctionType(QRect(20, 0, 10, 10), Qt::AlignTop);
+    add_interface_to_FunctionType(QRect(0, 20, 10, 10), Qt::AlignLeft);
+    GripPoint grip(GripPoint::Location::TopLeft);
+    QPointF from; // stub
+    QPointF to(200, 200); // Move the grip-point torwards center
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(70, 70), QPointF(400, 400));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The bottom grip is moved doen going past an interface.
+ * Expected result: The bottom side of the item does not go as far up as the movement of the grip-point would indicate, had it
+ * not been for the interface blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingTopRightGripPastInterface()
+{
+    // Setup
+    setup_FunctionType_with_title("o");
+    add_interface_to_FunctionType(QRect(330, 0, 10, 10), Qt::AlignTop);
+    add_interface_to_FunctionType(QRect(350, 20, 10, 10), Qt::AlignRight);
+    GripPoint grip(GripPoint::Location::TopRight);
+    QPointF from; // stub
+    QPointF to(200, 200); // Move the grip-point torwards center
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 70), QPointF(390, 400));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The bottom grip is moved doen going past an interface.
+ * Expected result: The bottom side of the item does not go as far up as the movement of the grip-point would indicate, had it
+ * not been for the interface blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomRightGripPastInterface()
+{
+    // Setup
+    setup_FunctionType_with_title("o");
+    add_interface_to_FunctionType(QRect(350, 330, 10, 10), Qt::AlignRight);
+    add_interface_to_FunctionType(QRect(330, 350, 10, 10), Qt::AlignBottom);
+    GripPoint grip(GripPoint::Location::BottomRight);
+    QPointF from; // stub
+    QPointF to(200, 200); // Move the grip-point torwards center
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(50, 50), QPointF(390, 390));
+    QCOMPARE(actualRect, expectedRect);
+}
+
+/**
+ * @brief The bottom grip is moved doen going past an interface.
+ * Expected result: The bottom side of the item does not go as far up as the movement of the grip-point would indicate, had it
+ * not been for the interface blocking the resizing.
+ */
+void tst_FunctionTypeGraphicsItem::testMovingBottomLeftGripPastInterface()
+{
+    // Setup
+    setup_FunctionType_with_title("o");
+    add_interface_to_FunctionType(QRect(20, 350, 10, 10), Qt::AlignBottom);
+    add_interface_to_FunctionType(QRect(0, 330, 10, 10), Qt::AlignLeft);
+    GripPoint grip(GripPoint::Location::BottomLeft);
+    QPointF from; // stub
+    QPointF to(200, 200); // Move the grip-point torwards center
+
+    // Execution
+    QRectF actualRect = m_rectangularGraphicsItem->callResizedRect(&grip, from, to);
+
+    // Inspection
+    QRectF expectedRect(QPointF(70, 50), QPointF(400, 390));
+    QCOMPARE(actualRect, expectedRect);
+}
 
 QTEST_MAIN(tst_FunctionTypeGraphicsItem)
 

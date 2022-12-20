@@ -251,7 +251,7 @@ QRectF VERectGraphicsItem::checkConnectionEndpoints(GripPoint *grip, const QPoin
     qreal topMost = result.bottom(); // The deepest the top-grip can go, is the bottom of the rect.
     qreal bottomMost = result.top(); // The highest the bottom-grip can go, is the top of the rect.
 
-    for (auto const &child: childItems())
+    for (auto child: childItems())
     {
         auto endPoint = qobject_cast<ui::VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
         if (endPoint == nullptr)
@@ -262,7 +262,7 @@ QRectF VERectGraphicsItem::checkConnectionEndpoints(GripPoint *grip, const QPoin
         auto alignment = endPoint->alignment();
         bool endPointIsHorizonal = alignment == Qt::AlignTop || alignment == Qt::AlignBottom;
         bool endPointIsVertical =  alignment == Qt::AlignLeft || alignment == Qt::AlignRight;
-
+        Q_ASSERT(endPointIsHorizonal || endPointIsVertical);
         auto childSceneBoundingRect = endPoint->sceneBoundingRect();
         if (endPointIsHorizonal)
         {
