@@ -42,15 +42,15 @@ public:
     ObjectAnchor *target() const;
 
 Q_SIGNALS:
-    void sourceAnchorChanged(const QPointF &scenePoint) const;
-    void targetAnchorChanged(const QPointF &scenePoint) const;
+    void sourceAnchorChanged(const QPointF &scenePoint);
+    void targetAnchorChanged(const QPointF &scenePoint);
 
 protected:
     ObjectAnchor *m_anchorStart, *m_anchorEnd;
 
     bool replaceObj(ObjectAnchor *anchor, InteractiveObject *toObject, const QPointF &toPoint, ObjectAnchor::Snap snap);
 
-    void notifyChanged(ObjectAnchor *anchor) const;
+    void notifyChanged(ObjectAnchor *anchor);
 };
 
 } // ns msc

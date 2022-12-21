@@ -81,11 +81,11 @@ private:
     bool handleConnectionCreate(const QPointF &pos);
     void handleDirectConnection(const QPointF &pos);
     void handleConnectionReCreate(const QVector<QPointF> &graphicPoints);
-    void handleConnection(const QVector<QPointF> &graphicPoints) const;
+    void handleConnection(const QVector<QPointF> &graphicPoints);
 
     bool warnConnectionPreview(const QPointF &pos) override;
 
-    QUndoCommand *createInterfaceCommand(const ivm::IVInterface::CreationInfo &info) const;
+    QUndoCommand *createInterfaceCommand(const ivm::IVInterface::CreationInfo &info);
 
 private:
     InterfaceDocument *m_doc { nullptr };

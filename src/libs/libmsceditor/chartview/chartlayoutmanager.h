@@ -138,14 +138,14 @@ public Q_SLOTS:
     void updateContentToChartbox(const QRectF &chartBox);
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
-    void syncItemsPosToInstance(const InstanceItem *instanceItem);
+    void syncItemsPosToInstance(const msc::InstanceItem *instanceItem);
 
 Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
     void layoutComplete();
     void cifDataChanged();
     void instancesRectChanged(const QRectF &rect);
-    void initialNameAccepted(MscEntity *entity);
+    void initialNameAccepted(msc::MscEntity *entity);
     void systemCheckerChanged(msc::SystemChecks *checker);
 
 private Q_SLOTS:

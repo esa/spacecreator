@@ -23,9 +23,12 @@
 #include <QPointer>
 #include <QVariantMap>
 
+class QUndoStack;
+
 namespace msc {
+
+class MscModel;
 class ChartLayoutManager;
-class MainModel;
 
 class RemoteControlHandler : public QObject
 {
@@ -33,7 +36,9 @@ class RemoteControlHandler : public QObject
 public:
     explicit RemoteControlHandler(QObject *parent = nullptr);
 
-    void setModel(msc::MainModel *model);
+    void setMscModel(MscModel *model);
+    void setUndoStack(QUndoStack *undoStack);
+    void setLayoutManager(ChartLayoutManager *layoutManager);
 
 public Q_SLOTS:
     void handleRemoteCommand(
@@ -52,9 +57,11 @@ private:
     bool handleConditionCommand(const QVariantMap &params, QString *errorString);
     bool handleMessageDeclarationCommand(const QVariantMap &params, QString *errorString);
 
-    msc::ChartLayoutManager *chartViewModel() const;
+    bool saveMsc(const QString &fileName, const QString &asn1FileName);
 
-    QPointer<msc::MainModel> m_model;
+    QPointer<MscModel> m_mscModel;
+    QPointer<ChartLayoutManager> m_layoutManager;
+    QPointer<QUndoStack> m_undoStack;
 };
 
 }

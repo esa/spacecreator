@@ -19,7 +19,6 @@
 #include "grippoint.h"
 
 #include "grippointshandler.h"
-#include "interactiveobjectbase.h"
 
 #include <QColor>
 #include <QCursor>

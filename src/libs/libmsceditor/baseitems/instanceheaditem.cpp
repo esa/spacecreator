@@ -18,7 +18,6 @@
 #include "instanceheaditem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
 #include "colors/colormanager.h"
 #include "mscchart.h"

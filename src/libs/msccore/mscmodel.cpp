@@ -18,7 +18,6 @@
 #include "mscmodel.h"
 
 #include "asn1systemchecks.h"
-#include "asn1valueparser.h"
 #include "errorhub.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -39,13 +38,29 @@ MscModel::~MscModel()
     clear();
 }
 
+std::unique_ptr<MscModel> MscModel::defaultModel()
+{
+    auto model = std::make_unique<MscModel>();
+    auto doc = new MscDocument(tr("Untitled_Document"));
+    doc->setHierarchyType(MscDocument::HierarchyAnd);
+
+    // leaf type document
+    auto leafDoc = new MscDocument(tr("Untitled_Leaf"));
+    leafDoc->setHierarchyType(MscDocument::HierarchyLeaf);
+    leafDoc->addChart(new MscChart(tr("Untitled_MSC")));
+
+    doc->addDocument(leafDoc);
+    model->addDocument(doc);
+
+    return model;
+}
 
 conversion::ModelType MscModel::modelType() const
 {
     return conversion::ModelProperties<MscModel>::type;
 }
 
-void MscModel::setFilename(const QString filename)
+void MscModel::setFilename(const QString &filename)
 {
     if (filename == m_filename) {
         return;
@@ -122,6 +137,19 @@ void MscModel::addChart(MscChart *chart)
     connect(chart, &MscChart::dataChanged, this, &MscModel::dataChanged);
     Q_EMIT chartAdded(chart);
     Q_EMIT dataChanged();
+}
+
+/*!
+ * \brief MainModel::firstChart Get the first chart
+ * \return First chart pointer or null
+ */
+MscChart *MscModel::firstChart() const
+{
+    if (!m_charts.empty()) {
+        return m_charts.at(0);
+    }
+
+    return firstChart(m_documents);
 }
 
 void addChildDocuments(msc::MscDocument *doc, QVector<MscDocument *> &allDocs)
@@ -333,6 +361,24 @@ void MscModel::appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> 
     for (msc::MscChart *childChart : doc->charts()) {
         messages.append(childChart->messages());
     }
+}
+
+/*!
+ * \brief MainModel::firstChart Get the first chart of the \a docs
+ * \return The first chart or null
+ */
+MscChart *MscModel::firstChart(const QVector<MscDocument *> &docs) const
+{
+    for (MscDocument *doc : docs) {
+        if (!doc->charts().isEmpty()) {
+            return doc->charts().at(0);
+        }
+        auto ret = firstChart(doc->documents());
+        if (ret != nullptr) {
+            return ret;
+        }
+    }
+    return nullptr;
 }
 
 } // namespace msc

@@ -99,7 +99,7 @@ public Q_SLOTS:
     void syncHeightToChartBox();
 
 Q_SIGNALS:
-    void initialNameAccepted(MscEntity *entity);
+    void initialNameAccepted(msc::MscEntity *entity);
 
 protected:
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
