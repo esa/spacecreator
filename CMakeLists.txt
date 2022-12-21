@@ -118,6 +118,7 @@ add_subdirectory(src)
 add_subdirectory(wizards)
 
 # Testing
+option(DISABLE_SLOW_TESTS "Do not include really slow tests" OFF)
 option(ENABLE_TESTS "Build the tests" ON)
 if(ENABLE_TESTS)
     include(TestUtils)
