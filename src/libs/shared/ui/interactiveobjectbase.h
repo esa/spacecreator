@@ -51,7 +51,7 @@ public:
     QRectF boundingRect() const override;
 
     /**
-     * @brief setBoundingRect sets the geometry of this item. Position of gribpoint-handles are updated an 'boundingboxChanged' is emitted.
+     * @brief setBoundingRect sets the geometry of this item. Position of grippoint-handles are updated an 'boundingboxChanged' is emitted.
      * @param newRect
      */
     void setBoundingRect(const QRectF &newRect);

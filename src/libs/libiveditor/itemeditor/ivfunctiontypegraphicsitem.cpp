@@ -216,7 +216,6 @@ QRectF IVFunctionTypeGraphicsItem::resizedRectForTextLabel(GripPoint *grip, cons
 {
     QRectF result = sceneBoundingRect();
     QRectF textLabelRect = m_textItem->boundingRect();
-    auto text = m_textItem->toPlainText();
     textLabelRect = textLabelRect.marginsAdded(shared::graphicsviewutils::kTextMargins);
     textLabelRect.setWidth(textLabelRect.width() + extraSpace); // A little extra space is needed, otherwise the text item moves about ever so sligtly.
     QSizeF minSize = textLabelRect.size();

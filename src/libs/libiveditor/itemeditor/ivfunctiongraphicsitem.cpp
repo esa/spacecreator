@@ -122,8 +122,7 @@ void IVFunctionGraphicsItem::onManualMoveFinish(
 
 void IVFunctionGraphicsItem::alignTextItem() const
 {
-    auto myRectWithoutMargins = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
-    auto myCenter = myRectWithoutMargins.center();
+    QPointF myCenter = boundingRect().center();
     QRectF textRect = m_textItem->boundingRect();
     textRect.moveCenter(myCenter);
     m_textItem->setPos(textRect.topLeft());

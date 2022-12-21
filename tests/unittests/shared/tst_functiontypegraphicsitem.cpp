@@ -194,7 +194,6 @@ void tst_FunctionTypeGraphicsItem::testMovingRightGripLeft()
 
     // Inspection
     QRectF expectedRect(QPointF(50, 50), QPointF(380, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("i"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -216,7 +215,6 @@ void tst_FunctionTypeGraphicsItem::testMovingRightGripTooFarLeft()
 
     // Inspection
     QRectF unrestrainedRect(QPointF(50, 50), QPointF(150, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("Hozenblobbets"));
     QVERIFY(actualRect.right() > unrestrainedRect.right());
 }
 
@@ -237,7 +235,6 @@ void tst_FunctionTypeGraphicsItem::testMovingLeftGripRight()
 
     // Inspection
     QRectF expectedRect(QPointF(300, 50), QPointF(400, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("i"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -259,7 +256,6 @@ void tst_FunctionTypeGraphicsItem::testMovingLeftGripTooFarRight()
 
     // Inspection
     QRectF unrestrainedRect(QPointF(300, 50), QPointF(400, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("Hozenblobbets"));
     QVERIFY(actualRect.left() < unrestrainedRect.left());
 }
 
@@ -280,7 +276,6 @@ void tst_FunctionTypeGraphicsItem::testMovingTopGripDown()
 
     // Inspection
     QRectF expectedRect(QPointF(50, 100), QPointF(400, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("i"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -302,7 +297,6 @@ void tst_FunctionTypeGraphicsItem::testMovingTopGripTooFarDown()
 
     // Inspection
     QRectF unrestrainedRect(QPointF(50, 350), QPointF(400, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("L"));
     QVERIFY(actualRect.top() < unrestrainedRect.top());
 }
 
@@ -323,7 +317,6 @@ void tst_FunctionTypeGraphicsItem::testMovingBottomGripUp()
 
     // Inspection
     QRectF expectedRect(QPointF(50, 50), QPointF(400, 380));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("P"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -345,7 +338,6 @@ void tst_FunctionTypeGraphicsItem::testMovingBottomGripTooFarUp()
 
     // Inspection
     QRectF unrestrainedRect(QPointF(50, 50), QPointF(400, 70));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("L"));
     QVERIFY(actualRect.bottom() > unrestrainedRect.bottom());
 }
 
@@ -366,7 +358,6 @@ void tst_FunctionTypeGraphicsItem::testMovingTopLeftGripDownAndRight()
 
     // Inspection
     QRectF expectedRect(QPointF(70, 70), QPointF(400, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -387,7 +378,6 @@ void tst_FunctionTypeGraphicsItem::testMovingTopLeftGripTooFarDownAndRight()
 
     // Inspection
     QRectF unrestrainedRect(QPointF(380, 380), QPointF(400, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
     QVERIFY(actualRect.top() < unrestrainedRect.top());
     QVERIFY(actualRect.left() < unrestrainedRect.left());
 }
@@ -410,7 +400,6 @@ void tst_FunctionTypeGraphicsItem::testMovingTopRightGripDownAndLeft()
 
     // Inspection
     QRectF expectedRect(QPointF(50, 70), QPointF(380, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -431,7 +420,6 @@ void tst_FunctionTypeGraphicsItem::testMovingTopRightGripTooFarDownAndLeft()
 
     // Inspection
     QRectF unrestrainedRect(QPointF(50, 380), QPointF(70, 400));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("SprinkleWidget"));
     QVERIFY(actualRect.top() < unrestrainedRect.top());
     QVERIFY(actualRect.right() > unrestrainedRect.right());
 }
@@ -453,7 +441,6 @@ void tst_FunctionTypeGraphicsItem::testMovingBottomRightGripUpAndLeft()
 
     // Inspection
     QRectF expectedRect(QPointF(50, 50), QPointF(380, 380));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -474,7 +461,6 @@ void tst_FunctionTypeGraphicsItem::testMovingBottomRightGripTooFarUpAndLeft()
 
     // Inspection
     QRectF unrestrainedRect(QPointF(50, 50), QPointF(100, 100));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("SprinkleWidget"));
     QVERIFY(actualRect.bottom() > unrestrainedRect.bottom());
     QVERIFY(actualRect.right() > unrestrainedRect.right());
 }
@@ -496,7 +482,6 @@ void tst_FunctionTypeGraphicsItem::testMovingBottomLeftGripUpAndRight()
 
     // Inspection
     QRectF expectedRect(QPointF(80, 50), QPointF(400, 380));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("0"));
     QCOMPARE(actualRect, expectedRect);
 }
 
@@ -517,7 +502,6 @@ void tst_FunctionTypeGraphicsItem::testMovingBottomLeftGripTooFarUpAndRight()
 
     // Inspection
     QRectF unrestrainedRect(QPointF(50, 50), QPointF(100, 100));
-    QCOMPARE(m_rectangularGraphicsItem->getText(), QString("SprinkleWidget"));
     QVERIFY(actualRect.bottom() > unrestrainedRect.bottom());
     QVERIFY(actualRect.right() > unrestrainedRect.right());
 }

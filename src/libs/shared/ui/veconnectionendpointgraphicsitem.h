@@ -41,7 +41,6 @@ public:
 
     VERectGraphicsItem *targetItem() const;
 
-
     void updateFromEntity() override;
     QList<QPair<shared::VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
@@ -49,7 +48,10 @@ public:
 
     bool doLayout() override;
 
+    // Gets the alignment of this connection endpoint.
     Qt::Alignment alignment() const;
+
+    // Sets the alignment of this connection endpoint. Used for testing.
     void setAlignment(Qt::Alignment alignment);
 
 public:

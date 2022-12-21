@@ -70,14 +70,18 @@ protected:
      * QPointFs representing the movement of the GripPoint and returns
      * a QRectF representing the new sceneBoundingRect of this VERectGraphicsItem based on
      * the allowed movement of that particular handle.
+     *
      * A corner GripPoint can move freely. A GripPoint on a horizontal line can only move
      * up or down. A GripPoint on a vertical line can only move left or right.
+     *
      * If a transformation is illegal, a QRectF is calculated that performs as much as possible of the
      * transformation as is legal.
+     *
      * Limits of movement: VERectGraphicsItem has interfaces (depicted by small triangles) on the edges of the
      * rectangle. A VERectGraphicsItem can not be shrunk to a size smaller than what the location of the interfaces allow.
      * A child class overloading this method will need to call this implementation of resizedRect to calculate the smallest
      * valid rectangle allowed by interfaces and calculate any restrictions of its own.
+     *
      * @param grip a GripPoint
      * @param from a QPointF the GripPoint was moved from
      * @param to a QPointF the GripPoint was moved to

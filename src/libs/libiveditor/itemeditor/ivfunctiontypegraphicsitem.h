@@ -69,19 +69,23 @@ protected:
      * If a transformation is illegal, a QRectF is calculated that performs as much as possible of the
      * transformation as is legal.
      *
+     * Limits of movement: An IVFunctionTypeGraphicsItem inherits its resizedRect from VERectGraphicsItem which
+     * limits the resizing with respect to interfaces (aka connection endpoints). FunctionTypeGraphicsItem adds
+     * respect to the Text displaying the FunctionName, so that the FunctionName is always visible.
+     *
      * @param grip a GripPoint
      * @param from a QPointF the GripPoint was moved from
      * @param to a QPointF the GripPoint was moved to
-     * @return a QRect representing the new sceneBoundingRect of this VERectGraphicsItem
+     * @return a QRect representing the new sceneBoundingRect of this IVFunctionTypeGraphicsItem
      */
     virtual QRectF resizedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
 
     /**
-     * @brief resizedRectForTextLabel
-     * @param grip
-     * @param from
-     * @param to
-     * @return
+     * @brief resizedRectForTextLabel implements respect for the FunctionName of this IVFunctionTypeGraphicsItem
+     * @param grip a GripPoint
+     * @param from a QPointF the GripPoint was moved from
+     * @param to a QPointF the GripPoint was moved to
+     * @return a QRect representing the new sceneBoundingRect of this IVFunctionTypeGraphicsItem
      */
     virtual QRectF resizedRectForTextLabel(GripPoint *grip, const QPointF &from, const QPointF &to) const;
 
