@@ -196,7 +196,9 @@ void VERectGraphicsItem::updateTextPosition()
 void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
+    {
         return;
+    }
 
     const QRectF rect = sceneBoundingRect();
     bool isBounded = shared::graphicsviewutils::isBounded(this, rect);
@@ -208,6 +210,21 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pr
         updateEntity();
     }
     layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+
+    // If a collision takes place, reread all positions from the model
+    if (shared::graphicsviewutils::isCollided(this, rect))
+    {
+        updateFromEntity();
+        // Make children update from entity also
+        for (auto child : childItems())
+        {
+            if (auto connectionEndPoint = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject()))
+            {
+                connectionEndPoint->updateFromEntity();
+            }
+        }
+        layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+    }
 }
 
 void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
