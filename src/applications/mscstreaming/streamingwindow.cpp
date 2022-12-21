@@ -93,7 +93,9 @@ bool StreamingWindow::startRemoteControl(quint16 port)
     if (!d->m_remoteControlWebServer) {
         d->m_remoteControlWebServer = new msc::RemoteControlWebServer(this);
         d->m_remoteControlHandler = new msc::RemoteControlHandler(this);
-        d->m_remoteControlHandler->setModel(d->m_plugin->mainModel());
+        d->m_remoteControlHandler->setMscModel(d->m_plugin->mainModel()->mscModel());
+        d->m_remoteControlHandler->setUndoStack(d->m_plugin->undoStack());
+        d->m_remoteControlHandler->setLayoutManager(&(d->m_plugin->mainModel()->chartViewModel()));
 
         connect(d->m_remoteControlWebServer, &msc::RemoteControlWebServer::executeCommand, d->m_remoteControlHandler,
                 &msc::RemoteControlHandler::handleRemoteCommand);

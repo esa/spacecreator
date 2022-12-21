@@ -23,15 +23,11 @@
 #include "commands/cmdactionitemcreate.h"
 #include "commands/cmdchangeinstanceposition.h"
 #include "commands/cmdconditionitemcreate.h"
-#include "commands/cmdcoregionitemcreate.h"
-#include "commands/cmddocumentcreate.h"
 #include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstancestopchange.h"
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdtimeritemcreate.h"
-#include "instanceitem.h"
-#include "mainmodel.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
@@ -43,6 +39,7 @@
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
+#include "mscwriter.h"
 
 #include <QMetaEnum>
 
@@ -58,9 +55,19 @@ RemoteControlHandler::RemoteControlHandler(QObject *parent)
 {
 }
 
-void RemoteControlHandler::setModel(msc::MainModel *model)
+void RemoteControlHandler::setMscModel(MscModel *model)
 {
-    m_model = model;
+    m_mscModel = model;
+}
+
+void RemoteControlHandler::setUndoStack(QUndoStack *undoStack)
+{
+    m_undoStack = undoStack;
+}
+
+void RemoteControlHandler::setLayoutManager(ChartLayoutManager *layoutManager)
+{
+    m_layoutManager = layoutManager;
 }
 
 /*!
@@ -74,11 +81,11 @@ void RemoteControlHandler::setModel(msc::MainModel *model)
 void RemoteControlHandler::handleRemoteCommand(
         RemoteControlWebServer::CommandType commandType, const QVariantMap &params, const QString &peerName)
 {
-    if (!m_model) {
+    if (!m_mscModel) {
         Q_EMIT commandDone(commandType, false, peerName, QLatin1String("Empty model"));
         return;
     }
-    msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
+    msc::MscChart *mscChart = m_layoutManager->currentChart();
     bool result = false;
     if (!mscChart) {
         Q_EMIT commandDone(commandType, result, peerName, QLatin1String("Empty document"));
@@ -109,39 +116,31 @@ void RemoteControlHandler::handleRemoteCommand(
         result = handleMessageDeclarationCommand(params, &errorString);
         break;
     case RemoteControlWebServer::CommandType::Undo:
-        result = m_model->undoStack()->canUndo();
+        result = m_undoStack->canUndo();
         if (result)
-            m_model->undoStack()->undo();
+            m_undoStack->undo();
         else
             errorString = tr("Nothing to Undo");
         break;
     case RemoteControlWebServer::CommandType::Redo:
-        result = m_model->undoStack()->canRedo();
+        result = m_undoStack->canRedo();
         if (result)
-            m_model->undoStack()->redo();
+            m_undoStack->redo();
         else
             errorString = tr("Nothing to Redo");
         break;
     case RemoteControlWebServer::CommandType::Save: {
-        m_model->setCurrentFilePath(params.value(QLatin1String("fileName"), m_model->currentFilePath()).toString());
-        msc::MscModel *mscModel = m_model->mscModel();
-        const QString asnKey("asn1File");
-        if (params.contains(asnKey)) {
-            mscModel->setDataLanguage("ASN.1");
-            mscModel->setDataDefinitionString(params.value(asnKey).toString());
-        }
-        result = !m_model->currentFilePath().isEmpty();
-        if (result)
-            m_model->saveMsc(m_model->currentFilePath());
-        else
+        result = saveMsc(params.value("fileName").toString(), params.value("asn1File").toString());
+        if (result) {
             errorString = tr("Empty filename");
+        }
     } break;
     case RemoteControlWebServer::CommandType::VisibleItemLimit: {
         const int number = params.value(QLatin1String("number")).toInt(&result);
         if (!result)
             errorString = tr("Wrong limit number for items visibility");
         else
-            m_model->chartViewModel().setVisibleItemLimit(number);
+            m_layoutManager->setVisibleItemLimit(number);
     } break;
     default:
         qWarning() << "Unknown command:" << commandType;
@@ -149,7 +148,7 @@ void RemoteControlHandler::handleRemoteCommand(
         break;
     }
     if (result)
-        m_model->chartViewModel().updateLayout();
+        m_layoutManager->updateLayout();
 
     Q_EMIT commandDone(commandType, result, peerName, errorString);
 }
@@ -162,7 +161,7 @@ void RemoteControlHandler::handleRemoteCommand(
  */
 bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
+    msc::MscChart *mscChart = m_layoutManager->currentChart();
     int instanceIdx = mscChart->instances().size();
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Instance_%1").arg(instanceIdx)).toString();
     if (mscChart->instanceByName(name)) {
@@ -172,7 +171,7 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
     if (pos >= 0) {
         instanceIdx = 0;
-        for (const msc::InstanceItem *instanceItem : m_model->chartViewModel().instanceItems()) {
+        for (const msc::InstanceItem *instanceItem : m_layoutManager->instanceItems()) {
             if (pos > instanceItem->sceneBoundingRect().x()) {
                 ++instanceIdx;
             }
@@ -184,22 +183,22 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     msc::MscInstance *mscInstance = new msc::MscInstance(name, mscChart);
     mscInstance->setKind(params.value(QLatin1String("kind")).toString());
 
-    m_model->undoStack()->beginMacro("Add instance");
-    m_model->undoStack()->push(new msc::cmd::CmdInstanceItemCreate(mscInstance, instanceIdx, chartViewModel()));
+    m_undoStack->beginMacro("Add instance");
+    m_undoStack->push(new msc::cmd::CmdInstanceItemCreate(mscInstance, instanceIdx, m_layoutManager));
 
     if (pos >= 0) {
-        m_model->chartViewModel().doLayout(); // makes sure to have cif geometry
+        m_layoutManager->doLayout(); // makes sure to have cif geometry
         QVector<QPoint> geometryCif = mscInstance->cifGeometry();
         if (!geometryCif.isEmpty()) {
             QPoint posCif = msc::CoordinatesConverter::sceneToCif(QPointF(pos, 10.));
             posCif.setY(geometryCif.at(0).y());
             geometryCif[0] = posCif;
         }
-        m_model->undoStack()->push(new msc::cmd::CmdChangeInstancePosition(mscInstance, geometryCif));
-        m_model->chartViewModel().doLayout();
+        m_undoStack->push(new msc::cmd::CmdChangeInstancePosition(mscInstance, geometryCif));
+        m_layoutManager->doLayout();
     }
 
-    m_model->undoStack()->endMacro();
+    m_undoStack->endMacro();
 
     return true;
 }
@@ -212,7 +211,7 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
  */
 bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
+    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString name = params.value(QLatin1String("name")).toString();
     msc::MscInstance *mscInstance = mscChart->instanceByName(name);
     if (!mscInstance) {
@@ -221,8 +220,7 @@ bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, 
     }
     mscInstance->setExplicitStop(true);
 
-    m_model->undoStack()->push(
-            new msc::cmd::CmdInstanceStopChange(mscInstance, mscInstance->explicitStop(), chartViewModel()));
+    m_undoStack->push(new msc::cmd::CmdInstanceStopChange(mscInstance, mscInstance->explicitStop(), m_layoutManager));
 
     return true;
 }
@@ -235,7 +233,7 @@ bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, 
  */
 bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
+    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString sourceInstanceName = params.value(QLatin1String("srcName")).toString();
     msc::MscInstance *mscSourceInstance = mscChart->instanceByName(sourceInstanceName);
     if (!mscSourceInstance && !sourceInstanceName.isEmpty()) {
@@ -286,7 +284,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
         instanceIndexes.set(message->targetInstance(), -1);
     }
 
-    m_model->undoStack()->push(new msc::cmd::CmdMessageItemCreate(message, instanceIndexes, chartViewModel()));
+    m_undoStack->push(new msc::cmd::CmdMessageItemCreate(message, instanceIndexes, m_layoutManager));
 
     return true;
 }
@@ -299,7 +297,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
  */
 bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
+    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString instanceName = params.value(QLatin1String("instanceName")).toString();
     msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
     if (!mscInstance) {
@@ -324,8 +322,7 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
     msc::MscTimer *mscTimer = new msc::MscTimer(name, timerType, mscChart);
     mscTimer->setInstance(mscInstance);
 
-    m_model->undoStack()->push(
-            new msc::cmd::CmdTimerItemCreate(mscTimer, timerType, mscInstance, pos, chartViewModel()));
+    m_undoStack->push(new msc::cmd::CmdTimerItemCreate(mscTimer, timerType, mscInstance, pos, m_layoutManager));
     return true;
 }
 
@@ -337,7 +334,7 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
  */
 bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
+    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString instanceName = params.value(QLatin1String("instanceName")).toString();
     msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
     if (!mscInstance) {
@@ -353,7 +350,7 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
     mscAction->setInformalAction(name);
     mscAction->setInstance(mscInstance);
 
-    m_model->undoStack()->push(new msc::cmd::CmdActionItemCreate(mscAction, mscInstance, pos, chartViewModel()));
+    m_undoStack->push(new msc::cmd::CmdActionItemCreate(mscAction, mscInstance, pos, m_layoutManager));
 
     return true;
 }
@@ -366,7 +363,7 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
  */
 bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_model->chartViewModel().currentChart();
+    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString instanceName = params.value(QLatin1String("instanceName")).toString();
     msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
     if (!mscInstance) {
@@ -391,8 +388,8 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
         instanceIndexes.set(mscInstance, pos);
     }
 
-    m_model->undoStack()->push(
-            new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, instanceIndexes, chartViewModel()));
+    m_undoStack->push(
+            new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, instanceIndexes, m_layoutManager));
 
     return true;
 }
@@ -409,7 +406,7 @@ bool RemoteControlHandler::handleMessageDeclarationCommand(const QVariantMap &pa
         *errorString = tr("Parameter 'names' for the declaration is missing");
         return false;
     }
-    QVector<msc::MscDocument *> docs = m_model->mscModel()->documents();
+    QVector<msc::MscDocument *> docs = m_mscModel->documents();
     if (docs.isEmpty()) {
         *errorString = tr("No document in the MSC model");
         return false;
@@ -431,13 +428,24 @@ bool RemoteControlHandler::handleMessageDeclarationCommand(const QVariantMap &pa
     declaration->setTypeRefList(typeRefList);
     declarations->append(declaration);
 
-    m_model->undoStack()->push(new msc::cmd::CmdSetMessageDeclarations(docs.at(0), declarations.get()));
+    m_undoStack->push(new msc::cmd::CmdSetMessageDeclarations(docs.at(0), declarations.get()));
     return true;
 }
 
-ChartLayoutManager *RemoteControlHandler::chartViewModel() const
+bool RemoteControlHandler::saveMsc(const QString &fileName, const QString &asn1FileName)
 {
-    return &(m_model->chartViewModel());
+    if (!asn1FileName.isEmpty()) {
+        m_mscModel->setDataLanguage("ASN.1");
+        m_mscModel->setDataDefinitionString(asn1FileName);
+    }
+    if (fileName.isEmpty()) {
+        return false;
+    }
+
+    m_undoStack->setClean();
+
+    MscWriter mscWriter;
+    return mscWriter.saveModel(m_mscModel, fileName);
 }
 
 }
