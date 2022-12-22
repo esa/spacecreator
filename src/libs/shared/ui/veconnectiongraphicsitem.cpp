@@ -613,8 +613,8 @@ void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGra
                 return;
             }
 
-            const qreal xScale = newRect.width() / currentRect.width();
-            const qreal yScale = newRect.height() / currentRect.height();
+            const qreal xScale = newRect.width() / (qFuzzyIsNull(currentRect.width()) ? 1 : currentRect.width());
+            const qreal yScale = newRect.height() / (qFuzzyIsNull(currentRect.height()) ? 1 : currentRect.height());
             if (qFuzzyCompare(xScale, 1.0) && qFuzzyCompare(yScale, 1.0)) {
                 return;
             }
