@@ -156,6 +156,11 @@ bool IVInterface::postInit()
     if (!model() || !function()) {
         return false;
     }
+
+    if (entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::is_qgen_interface)) == false) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::qgen_full_interface_ref));
+    }
+
     if (!function()->isFunction()) {
         return IVObject::postInit();
     }

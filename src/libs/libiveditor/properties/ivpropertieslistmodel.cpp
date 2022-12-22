@@ -246,36 +246,48 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
         return;
     }
 
-    if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_qgen_interface)) == false)
+    if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_qgen_interface)) == true)
     {
-        return;
-    }
-
-    ivm::IVFunction* function = interface->function()->as<ivm::IVFunction*>();
-    if(function == nullptr)
-    {
-        return;
-    }
-
-    QStringList interfacesTitles;
-    auto interfaces = function->interfaces();
-    for (auto *const interface : interfaces) {
-        if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_qgen_interface)) == true &&
-            interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::qgen_interface_type)).toString() ==
-             ivm::meta::Props::token(ivm::meta::Props::Token::Full))
+        ivm::IVFunction* function = interface->function()->as<ivm::IVFunction*>();
+        if(function == nullptr)
         {
-            interfacesTitles.append(QString(interface->title()));
+            return;
+        }
+
+        QStringList interfacesTitles;
+        auto interfaces = function->interfaces();
+        for (auto *const interface : interfaces) {
+            if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_qgen_interface)) == true &&
+                interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::qgen_interface_type)).toString() ==
+                ivm::meta::Props::token(ivm::meta::Props::Token::Full))
+            {
+                interfacesTitles.append(QString(interface->title()));
+            }
+        }
+
+        for (int i = 0; i < rowCount(); i++) {
+            QStandardItem *titleItem = item(i, Column::Name);
+
+            if (titleItem->data(Roles::DataRole) == ivm::meta::Props::token(ivm::meta::Props::Token::qgen_full_interface_ref)) {
+                QStandardItem *itemObj = item(i, Column::Value);
+                itemObj->setData(QVariant(interfacesTitles), Roles::EditRole);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < rowCount(); i++) {
+            QStandardItem *titleItem = item(i, Column::Name);
+            QString qgenFullRefAttrName = ivm::meta::Props::token(ivm::meta::Props::Token::qgen_full_interface_ref);
+
+            if (titleItem->data(Roles::DataRole) == qgenFullRefAttrName) {
+                removeRow(i);
+                m_names.removeOne(qgenFullRefAttrName);
+            }
         }
     }
 
-    for (int i = 0; i < rowCount(); i++) {
-        QStandardItem *titleItem = item(i, Column::Name);
 
-        if (titleItem->data(Roles::DataRole) == ivm::meta::Props::token(ivm::meta::Props::Token::qgen_full_interface_ref)) {
-            QStandardItem *itemObj = item(i, Column::Value);
-            itemObj->setData(QVariant(interfacesTitles), Roles::EditRole);
-        }
-    }
 }
 
 QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) const

@@ -1,6 +1,6 @@
 <InterfaceView version="1.0">
 <Function name="simulink" is_type="NO" language="QGenC" default_implementation="default">
-<Provided_Interface name="interface" kind="Protected" layer="default">
+<Provided_Interface name="interface" kind="Protected" layer="default" is_qgen_interface="true">
     <Input_Parameter name="i1" type="BusDef" encoding="NATIVE"/>
     <Output_Parameter name="o1" type="BusDef" encoding="NATIVE"/>
 </Provided_Interface>
