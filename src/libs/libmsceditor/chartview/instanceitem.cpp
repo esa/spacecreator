@@ -316,15 +316,14 @@ void InstanceItem::onNameEdited(const QString &newName)
         m_headSymbol->setName(m_instance->name());
 
     } else {
-        m_chartLayoutManager->undoStack()->push(
-                new cmd::CmdEntityNameChange(modelEntity(), newName, m_chartLayoutManager));
+        m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(modelEntity(), newName));
         checkIVFunction();
     }
 }
 
 void InstanceItem::onKindEdited(const QString &newKind)
 {
-    m_chartLayoutManager->undoStack()->push(new cmd::CmdInstanceKindChange(m_instance, newKind, m_chartLayoutManager));
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdInstanceKindChange(m_instance, newKind));
     // Update to have the bold text correct
     m_headSymbol->setKind(m_instance->denominatorAndKind());
 }
@@ -470,7 +469,8 @@ void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &fr
             }
 
             if (oldIdx != newIdx) {
-                undoStack->push(new cmd::CmdChangeInstanceOrder(m_instance, newIdx, m_chartLayoutManager));
+                undoStack->push(
+                        new cmd::CmdChangeInstanceOrder(m_instance, newIdx, m_chartLayoutManager->currentChart()));
             }
         }
         undoStack->push(new cmd::CmdChangeInstancePosition(m_instance, points));

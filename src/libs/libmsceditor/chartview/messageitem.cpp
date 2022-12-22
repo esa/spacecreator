@@ -686,14 +686,14 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
         const int newIdx = instance ? m_chartLayoutManager->eventInstanceIndex(tail(), instance, m_message) : -1;
         ChartIndex newChartIndex(instance, newIdx);
         undoStack->push(new cmd::CmdMessageItemResize(
-                m_message, newChartIndex, MscMessage::EndType::SOURCE_TAIL, m_chartLayoutManager));
+                m_message, newChartIndex, MscMessage::EndType::SOURCE_TAIL, m_chartLayoutManager->currentChart()));
     }
     if (targetChanged) {
         MscInstance *instance = targetInstanceItem() ? targetInstanceItem()->modelItem() : nullptr;
         const int newIdx = instance ? m_chartLayoutManager->eventInstanceIndex(head(), instance, m_message) : -1;
         ChartIndex newChartIndex(instance, newIdx);
         undoStack->push(new cmd::CmdMessageItemResize(
-                m_message, newChartIndex, MscMessage::EndType::TARGET_HEAD, m_chartLayoutManager));
+                m_message, newChartIndex, MscMessage::EndType::TARGET_HEAD, m_chartLayoutManager->currentChart()));
     }
 
     ChartIndexList indices;
@@ -805,7 +805,7 @@ void MessageItem::onRenamed(const QString &title)
     MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
     undoStack->beginMacro(tr("Set message identification"));
     undoStack->push(new cmd::CmdSetParameterList(m_message, parameters));
-    undoStack->push(new cmd::CmdEntityNameChange(m_message, name, m_chartLayoutManager));
+    undoStack->push(new cmd::CmdEntityNameChange(m_message, name));
     undoStack->endMacro();
     connect(m_message, &msc::MscMessage::dataChanged, this, &msc::MessageItem::updateDisplayText);
 

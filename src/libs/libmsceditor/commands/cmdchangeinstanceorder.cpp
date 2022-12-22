@@ -25,8 +25,8 @@
 namespace msc {
 namespace cmd {
 
-CmdChangeInstanceOrder::CmdChangeInstanceOrder(msc::MscInstance *instance, int pos, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(instance, layoutManager)
+CmdChangeInstanceOrder::CmdChangeInstanceOrder(msc::MscInstance *instance, int pos, MscChart *chart)
+    : ChartBaseCommand(instance, chart)
     , m_instance(instance)
     , m_posFrom(m_chart->instances().indexOf(m_instance))
     , m_posTo(pos)

@@ -350,8 +350,8 @@ void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     QRectF rect { newPos, boundingRect().size() };
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(rect, newRect)) {
-        m_chartLayoutManager->undoStack()->push(
-                new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
+        m_chartLayoutManager->undoStack()->push(new cmd::CmdCommentItemChangeGeometry(
+                oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager->currentChart()));
 
         rebuildLayout();
         updateGripPoints();
@@ -406,8 +406,8 @@ void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
 
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(rect, newRect)) {
-        m_chartLayoutManager->undoStack()->push(
-                new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
+        m_chartLayoutManager->undoStack()->push(new cmd::CmdCommentItemChangeGeometry(oldRect, newRect,
+                m_iObj->modelEntity(), m_chartLayoutManager ? m_chartLayoutManager->currentChart() : nullptr));
 
         rebuildLayout();
         updateGripPoints();
@@ -437,9 +437,10 @@ void CommentItem::textEdited(const QString &text)
         if (oldRect != newRect || oldText != text) {
             MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
             undoStack->beginMacro(tr("Change comment"));
-            undoStack->push(new cmd::CmdCommentItemChangeGeometry(
-                    oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
-            undoStack->push(new cmd::CmdEntityCommentChange(m_iObj->modelEntity(), text, m_chartLayoutManager));
+            undoStack->push(new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(),
+                    m_chartLayoutManager ? m_chartLayoutManager->currentChart() : nullptr));
+            undoStack->push(new cmd::CmdEntityCommentChange(m_iObj->modelEntity(), text,
+                    m_chartLayoutManager ? m_chartLayoutManager->currentChart() : nullptr));
             undoStack->endMacro();
         }
     }

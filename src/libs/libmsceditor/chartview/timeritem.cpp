@@ -218,8 +218,7 @@ void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         auto timer = qobject_cast<msc::MscTimer *>(instanceEvent);
         if (timer) {
             if (canConnectTimers(timer, event->scenePos())) {
-                m_chartLayoutManager->undoStack()->push(
-                        new cmd::CmdEntityNameChange(timer, m_timer->name(), m_chartLayoutManager));
+                m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(timer, m_timer->name()));
             }
         }
     }
@@ -264,7 +263,7 @@ void TimerItem::onTextEdited(const QString &text)
         return;
     }
 
-    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(m_timer, text, m_chartLayoutManager));
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(m_timer, text));
 }
 
 void TimerItem::rebuildLayout()

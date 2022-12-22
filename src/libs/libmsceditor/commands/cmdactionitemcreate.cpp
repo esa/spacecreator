@@ -25,9 +25,8 @@
 namespace msc {
 namespace cmd {
 
-CmdActionItemCreate::CmdActionItemCreate(
-        MscAction *action, msc::MscInstance *instance, int eventIndex, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(action, layoutManager)
+CmdActionItemCreate::CmdActionItemCreate(MscAction *action, msc::MscInstance *instance, int eventIndex, MscChart *chart)
+    : ChartBaseCommand(action, chart)
     , m_action(action)
     , m_instance(instance)
     , m_eventIndex(eventIndex)

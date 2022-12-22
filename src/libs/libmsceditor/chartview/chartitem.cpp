@@ -77,7 +77,7 @@ void ChartItem::onNameEdited(const QString &text)
     if (!m_entity)
         return;
 
-    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(m_entity, text, m_chartLayoutManager));
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(m_entity, text));
 }
 
 QRectF ChartItem::boundingRect() const
@@ -173,7 +173,7 @@ void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint *, const QP
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << chartBox;
 
     m_chartLayoutManager->undoStack()->push(
-            new cmd::CmdChartItemChangeGeometry(cifRectPrev, cifRectCurr, m_chartLayoutManager));
+            new cmd::CmdChartItemChangeGeometry(cifRectPrev, cifRectCurr, m_chartLayoutManager->currentChart()));
     m_prevContentRect = QRectF();
 }
 

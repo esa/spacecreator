@@ -43,10 +43,11 @@ CmdMessageItemCreate::InstanceGeometry CmdMessageItemCreate::initGeometryHolder(
 
 CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, const ChartIndexList &instanceIndexes,
         ChartLayoutManager *layoutManager, const QVector<QPoint> &points)
-    : ChartBaseCommand(message, layoutManager)
+    : ChartBaseCommand(message, layoutManager ? layoutManager->currentChart() : nullptr)
     , m_message(message)
     , m_instanceIndexes(instanceIndexes)
     , m_msgPoints(points)
+    , m_layoutManager(layoutManager)
     , m_sourceGeometryPrev(initGeometryHolder(
               (layoutManager && m_message) ? layoutManager->itemForInstance(m_message->sourceInstance()) : nullptr))
     , m_targetGeometryPrev(initGeometryHolder(

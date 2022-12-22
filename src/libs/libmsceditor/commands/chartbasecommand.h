@@ -20,24 +20,20 @@
 #include "basecommand.h"
 
 #include <QPointer>
-#include <QVector>
 
 namespace msc {
 
-class ChartLayoutManager;
 class MscChart;
-class MscInstanceEvent;
 
 namespace cmd {
 
 class ChartBaseCommand : public BaseCommand
 {
 public:
-    ChartBaseCommand(MscEntity *item, ChartLayoutManager *layoutManager, QUndoCommand *parent = nullptr);
+    ChartBaseCommand(MscEntity *item, msc::MscChart *chart, QUndoCommand *parent = nullptr);
 
 protected:
     QPointer<msc::MscChart> m_chart;
-    QPointer<msc::ChartLayoutManager> m_layoutManager;
 };
 
 } // namespace cmd

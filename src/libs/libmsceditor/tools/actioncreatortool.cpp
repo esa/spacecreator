@@ -67,7 +67,7 @@ void ActionCreatorTool::commitPreviewItem()
     startWaitForModelLayoutComplete(action);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventInstanceIndex(m_previewItem->pos(), instance);
-    m_model->undoStack()->push(new cmd::CmdActionItemCreate(action, instance, eventIndex, m_model));
+    m_model->undoStack()->push(new cmd::CmdActionItemCreate(action, instance, eventIndex, m_model->currentChart()));
 
     removePreviewItem();
 

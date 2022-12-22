@@ -131,7 +131,7 @@ void MessageDialog::accept()
 {
     msc::MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
     undoStack->beginMacro("Edit message");
-    undoStack->push(new msc::cmd::CmdEntityNameChange(m_message, ui->nameLineEdit->text(), m_chartLayoutManager));
+    undoStack->push(new msc::cmd::CmdEntityNameChange(m_message, ui->nameLineEdit->text()));
 
     msc::MscParameterList parameters;
     for (int i = 0; i < ui->parameterTable->rowCount(); ++i) {

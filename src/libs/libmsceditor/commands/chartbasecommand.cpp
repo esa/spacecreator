@@ -17,17 +17,14 @@
 
 #include "chartbasecommand.h"
 
-#include "chartlayoutmanager.h"
 #include "mscchart.h"
-#include "mscinstanceevent.h"
 
 namespace msc {
 namespace cmd {
 
-ChartBaseCommand::ChartBaseCommand(MscEntity *item, ChartLayoutManager *layoutManager, QUndoCommand *parent)
+ChartBaseCommand::ChartBaseCommand(MscEntity *item, MscChart *chart, QUndoCommand *parent)
     : BaseCommand(item, parent)
-    , m_chart(layoutManager ? layoutManager->currentChart() : nullptr)
-    , m_layoutManager(layoutManager)
+    , m_chart(chart)
 {
 }
 

@@ -31,7 +31,7 @@ namespace cmd {
 class CmdInstanceItemCreate : public ChartBaseCommand
 {
 public:
-    CmdInstanceItemCreate(msc::MscInstance *instance, int orderId, ChartLayoutManager *layoutManager);
+    CmdInstanceItemCreate(msc::MscInstance *instance, int orderId, msc::MscChart *chart);
 
     void redo() override;
     void undo() override;

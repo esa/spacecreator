@@ -30,7 +30,7 @@ class CmdEntityNameChange : public ChartBaseCommand
     Q_OBJECT
 
 public:
-    CmdEntityNameChange(MscEntity *item, const QString &newName, ChartLayoutManager *layoutManager);
+    CmdEntityNameChange(MscEntity *item, const QString &newName);
 
     void redo() override;
     void undo() override;

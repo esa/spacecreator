@@ -123,7 +123,7 @@ void tsti_Chartitem::testItemLimit()
     auto action2 = new msc::MscAction();
     action2->setInformalAction("Action03");
     action2->setInstance(instanceA);
-    auto addCommand = new cmd::CmdActionItemCreate(action2, instanceA, -1, m_chartModel.data());
+    auto addCommand = new cmd::CmdActionItemCreate(action2, instanceA, -1, m_chartModel->currentChart());
     m_undoStack->push(addCommand);
     waitForLayoutUpdate();
     QCOMPARE(m_chart->totalEventNumber(), 4);
@@ -140,7 +140,7 @@ void tsti_Chartitem::testItemLimit()
     auto action4 = new msc::MscAction();
     action4->setInformalAction("Action04");
     action4->setInstance(instanceA);
-    addCommand = new cmd::CmdActionItemCreate(action4, instanceA, -1, m_chartModel.data());
+    addCommand = new cmd::CmdActionItemCreate(action4, instanceA, -1, m_chartModel->currentChart());
     m_undoStack->push(addCommand);
     waitForLayoutUpdate();
     QCOMPARE(m_chart->totalEventNumber(), 5);

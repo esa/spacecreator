@@ -1663,7 +1663,8 @@ void ChartLayoutManager::onMessageRetargeted(MessageItem *item, const QPointF &p
         } else {
             item->updateCif();
         }
-        d->m_undoStack->push(new cmd::CmdMessageItemResize(message, ChartIndex(newInstance, newIdx), endType, this));
+        d->m_undoStack->push(
+                new cmd::CmdMessageItemResize(message, ChartIndex(newInstance, newIdx), endType, d->m_currentChart));
     } else {
         if (item->geometryManagedByCif())
             item->applyCif();

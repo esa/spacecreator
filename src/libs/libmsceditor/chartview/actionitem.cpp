@@ -193,8 +193,8 @@ void ActionItem::onTextEdited(const QString &text)
         return;
     }
 
-    m_chartLayoutManager->undoStack()->push(
-            new cmd::CmdActionInformalText(this->modelItem(), text, m_chartLayoutManager));
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdActionInformalText(
+            this->modelItem(), text, m_chartLayoutManager ? m_chartLayoutManager->currentChart() : nullptr));
 }
 
 void ActionItem::rebuildLayout()

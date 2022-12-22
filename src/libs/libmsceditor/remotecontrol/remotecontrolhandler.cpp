@@ -131,7 +131,7 @@ void RemoteControlHandler::handleRemoteCommand(
         break;
     case RemoteControlWebServer::CommandType::Save: {
         result = saveMsc(params.value("fileName").toString(), params.value("asn1File").toString());
-        if (result) {
+        if (!result) {
             errorString = tr("Empty filename");
         }
     } break;
@@ -184,7 +184,7 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     mscInstance->setKind(params.value(QLatin1String("kind")).toString());
 
     m_undoStack->beginMacro("Add instance");
-    m_undoStack->push(new msc::cmd::CmdInstanceItemCreate(mscInstance, instanceIdx, m_layoutManager));
+    m_undoStack->push(new msc::cmd::CmdInstanceItemCreate(mscInstance, instanceIdx, mscChart));
 
     if (pos >= 0) {
         m_layoutManager->doLayout(); // makes sure to have cif geometry
@@ -220,7 +220,7 @@ bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, 
     }
     mscInstance->setExplicitStop(true);
 
-    m_undoStack->push(new msc::cmd::CmdInstanceStopChange(mscInstance, mscInstance->explicitStop(), m_layoutManager));
+    m_undoStack->push(new msc::cmd::CmdInstanceStopChange(mscInstance, mscInstance->explicitStop()));
 
     return true;
 }
@@ -322,7 +322,7 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
     msc::MscTimer *mscTimer = new msc::MscTimer(name, timerType, mscChart);
     mscTimer->setInstance(mscInstance);
 
-    m_undoStack->push(new msc::cmd::CmdTimerItemCreate(mscTimer, timerType, mscInstance, pos, m_layoutManager));
+    m_undoStack->push(new msc::cmd::CmdTimerItemCreate(mscTimer, timerType, mscInstance, pos, mscChart));
     return true;
 }
 
@@ -350,7 +350,7 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
     mscAction->setInformalAction(name);
     mscAction->setInstance(mscInstance);
 
-    m_undoStack->push(new msc::cmd::CmdActionItemCreate(mscAction, mscInstance, pos, m_layoutManager));
+    m_undoStack->push(new msc::cmd::CmdActionItemCreate(mscAction, mscInstance, pos, mscChart));
 
     return true;
 }
@@ -388,8 +388,7 @@ bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QSt
         instanceIndexes.set(mscInstance, pos);
     }
 
-    m_undoStack->push(
-            new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, instanceIndexes, m_layoutManager));
+    m_undoStack->push(new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, instanceIndexes, mscChart));
 
     return true;
 }

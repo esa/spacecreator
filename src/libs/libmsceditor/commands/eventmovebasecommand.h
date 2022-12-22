@@ -23,6 +23,8 @@
 #include <QPointer>
 
 namespace msc {
+
+class ChartLayoutManager;
 class MscEntity;
 class MscInstanceEvent;
 
@@ -42,6 +44,7 @@ protected:
     QPointer<MscInstanceEvent> m_event;
     QHash<MscEntity *, QString> m_eventGeometries;
     QString m_newCif;
+    QPointer<msc::ChartLayoutManager> m_layoutManager;
 };
 
 } // namespace cmd

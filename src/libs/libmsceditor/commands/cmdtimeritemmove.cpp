@@ -20,7 +20,6 @@
 
 #include "commandids.h"
 #include "mscchart.h"
-#include "mscinstance.h"
 #include "msctimer.h"
 
 namespace msc {

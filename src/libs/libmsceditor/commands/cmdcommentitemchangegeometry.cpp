@@ -17,9 +17,6 @@
 
 #include "cmdcommentitemchangegeometry.h"
 
-#include "cif/cifblockfactory.h"
-#include "cif/cifline.h"
-#include "cif/ciflines.h"
 #include "commandids.h"
 #include "mscchart.h"
 #include "msccomment.h"
@@ -28,8 +25,8 @@ namespace msc {
 namespace cmd {
 
 CmdCommentItemChangeGeometry::CmdCommentItemChangeGeometry(
-        const QRect &oldRect, const QRect &newRect, MscEntity *entity, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(entity, layoutManager)
+        const QRect &oldRect, const QRect &newRect, MscEntity *entity, MscChart *chart)
+    : ChartBaseCommand(entity, chart)
     , m_oldRect(oldRect)
     , m_newRect(newRect)
 {

@@ -27,8 +27,9 @@ namespace cmd {
 
 EventMoveBaseCommand::EventMoveBaseCommand(
         MscInstanceEvent *event, ChartLayoutManager *layoutManager, QUndoCommand *parent)
-    : ChartBaseCommand(event, layoutManager, parent)
+    : ChartBaseCommand(event, layoutManager ? layoutManager->currentChart() : nullptr, parent)
     , m_event(event)
+    , m_layoutManager(layoutManager)
 {
 }
 

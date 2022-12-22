@@ -244,7 +244,7 @@ void ConditionItem::onNameEdited(const QString &name)
         return;
     }
 
-    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(modelItem(), name, m_chartLayoutManager));
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(modelItem(), name));
 }
 
 void ConditionItem::rebuildLayout()

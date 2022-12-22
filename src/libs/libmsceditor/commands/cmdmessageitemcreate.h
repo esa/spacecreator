@@ -50,6 +50,7 @@ private:
     MscMessage *m_message = nullptr;
     ChartIndexList m_instanceIndexes;
     QVector<QPoint> m_msgPoints;
+    QPointer<msc::ChartLayoutManager> m_layoutManager;
 
     struct InstanceGeometry {
         QVector<QPoint> m_cif;

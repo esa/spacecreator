@@ -215,8 +215,6 @@ void MscModel::setDataDefinitionString(const QString &dataString)
 
     Q_EMIT dataDefinitionStringChanged(m_dataDefinitionString);
     Q_EMIT dataChanged();
-
-    checkAllMessages();
 }
 
 void msc::MscModel::checkAllMessages()
