@@ -70,6 +70,11 @@ void RemoteControlHandler::setLayoutManager(ChartLayoutManager *layoutManager)
     m_layoutManager = layoutManager;
 }
 
+void RemoteControlHandler::setChart(MscChart *mscChart)
+{
+    m_mscChart = mscChart;
+}
+
 /*!
  * \brief RemoteControlHandler::handleRemoteCommand Perform a remote command
  * \param commandType The type of the command to perform
@@ -85,9 +90,8 @@ void RemoteControlHandler::handleRemoteCommand(
         Q_EMIT commandDone(commandType, false, peerName, QLatin1String("Empty model"));
         return;
     }
-    msc::MscChart *mscChart = m_layoutManager->currentChart();
     bool result = false;
-    if (!mscChart) {
+    if (!m_mscChart) {
         Q_EMIT commandDone(commandType, result, peerName, QLatin1String("Empty document"));
         return;
     }
@@ -161,10 +165,9 @@ void RemoteControlHandler::handleRemoteCommand(
  */
 bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_layoutManager->currentChart();
-    int instanceIdx = mscChart->instances().size();
+    int instanceIdx = m_mscChart->instances().size();
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Instance_%1").arg(instanceIdx)).toString();
-    if (mscChart->instanceByName(name)) {
+    if (m_mscChart->instanceByName(name)) {
         *errorString = tr("Chart already has instance with the name: %1").arg(name);
         return false;
     }
@@ -180,11 +183,11 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
         instanceIdx = -1;
     }
 
-    msc::MscInstance *mscInstance = new msc::MscInstance(name, mscChart);
+    msc::MscInstance *mscInstance = new msc::MscInstance(name, m_mscChart);
     mscInstance->setKind(params.value(QLatin1String("kind")).toString());
 
     m_undoStack->beginMacro("Add instance");
-    m_undoStack->push(new msc::cmd::CmdInstanceItemCreate(mscInstance, instanceIdx, mscChart));
+    m_undoStack->push(new msc::cmd::CmdInstanceItemCreate(mscInstance, instanceIdx, m_mscChart));
 
     if (pos >= 0) {
         m_layoutManager->doLayout(); // makes sure to have cif geometry
@@ -211,9 +214,8 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
  */
 bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString name = params.value(QLatin1String("name")).toString();
-    msc::MscInstance *mscInstance = mscChart->instanceByName(name);
+    msc::MscInstance *mscInstance = m_mscChart->instanceByName(name);
     if (!mscInstance) {
         *errorString = tr("There is no Instance with the name: %1").arg(name);
         return false;
@@ -233,16 +235,15 @@ bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, 
  */
 bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString sourceInstanceName = params.value(QLatin1String("srcName")).toString();
-    msc::MscInstance *mscSourceInstance = mscChart->instanceByName(sourceInstanceName);
+    msc::MscInstance *mscSourceInstance = m_mscChart->instanceByName(sourceInstanceName);
     if (!mscSourceInstance && !sourceInstanceName.isEmpty()) {
         *errorString = tr("Source instance with name %1 doesn't exist").arg(sourceInstanceName);
         return false;
     }
 
     const QString targetInstanceName = params.value(QLatin1String("dstName")).toString();
-    msc::MscInstance *mscTargetInstance = mscChart->instanceByName(targetInstanceName);
+    msc::MscInstance *mscTargetInstance = m_mscChart->instanceByName(targetInstanceName);
     if (!mscTargetInstance && !targetInstanceName.isEmpty()) {
         *errorString = tr("Target instance with name %1 doesn't exist").arg(targetInstanceName);
         return false;
@@ -258,7 +259,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     const int msgTypeInt = qtEnum.keyToValue(msgTypeStr.toLocal8Bit().constData());
     const msc::MscMessage::MessageType messageType = static_cast<msc::MscMessage::MessageType>(msgTypeInt);
 
-    const int messageIdx = mscChart->totalEventNumber();
+    const int messageIdx = m_mscChart->totalEventNumber();
     const QString name = params.value(QLatin1String("name"),
                                        messageType == msc::MscMessage::MessageType::Message
                                                ? QStringLiteral("Message_%1").arg(messageIdx)
@@ -268,8 +269,8 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
         *errorString = tr("Can't create Message with type Create without target Instance");
         return false;
     }
-    msc::MscMessage *message = messageType == msc::MscMessage::MessageType::Message ? new msc::MscMessage(mscChart)
-                                                                                    : new msc::MscCreate(mscChart);
+    msc::MscMessage *message = messageType == msc::MscMessage::MessageType::Message ? new msc::MscMessage(m_mscChart)
+                                                                                    : new msc::MscCreate(m_mscChart);
     message->setName(name);
     if (messageType == msc::MscMessage::MessageType::Create && mscTargetInstance)
         mscTargetInstance->setExplicitCreator(mscSourceInstance);
@@ -297,9 +298,8 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
  */
 bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString instanceName = params.value(QLatin1String("instanceName")).toString();
-    msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
+    msc::MscInstance *mscInstance = m_mscChart->instanceByName(instanceName);
     if (!mscInstance) {
         *errorString = tr("Instance with name='%1' doesn't exist").arg(instanceName);
         return false;
@@ -316,13 +316,13 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
         return false;
     }
 
-    const int timerIdx = mscChart->totalEventNumber();
+    const int timerIdx = m_mscChart->totalEventNumber();
     const msc::MscTimer::TimerType timerType = static_cast<msc::MscTimer::TimerType>(timerTypeInt);
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Timer_%1").arg(timerIdx)).toString();
-    msc::MscTimer *mscTimer = new msc::MscTimer(name, timerType, mscChart);
+    msc::MscTimer *mscTimer = new msc::MscTimer(name, timerType, m_mscChart);
     mscTimer->setInstance(mscInstance);
 
-    m_undoStack->push(new msc::cmd::CmdTimerItemCreate(mscTimer, timerType, mscInstance, pos, mscChart));
+    m_undoStack->push(new msc::cmd::CmdTimerItemCreate(mscTimer, timerType, mscInstance, pos, m_mscChart));
     return true;
 }
 
@@ -334,9 +334,8 @@ bool RemoteControlHandler::handleTimerCommand(const QVariantMap &params, QString
  */
 bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString instanceName = params.value(QLatin1String("instanceName")).toString();
-    msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
+    msc::MscInstance *mscInstance = m_mscChart->instanceByName(instanceName);
     if (!mscInstance) {
         *errorString = tr("Instance with name='%1' doesn't exist").arg(instanceName);
         return false;
@@ -344,13 +343,13 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
 
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
 
-    msc::MscAction *mscAction = new msc::MscAction(mscChart);
-    const int actionIdx = mscChart->totalEventNumber();
+    msc::MscAction *mscAction = new msc::MscAction(m_mscChart);
+    const int actionIdx = m_mscChart->totalEventNumber();
     const QString name = params.value(QLatin1String("name"), QStringLiteral("Action_%1").arg(actionIdx)).toString();
     mscAction->setInformalAction(name);
     mscAction->setInstance(mscInstance);
 
-    m_undoStack->push(new msc::cmd::CmdActionItemCreate(mscAction, mscInstance, pos, mscChart));
+    m_undoStack->push(new msc::cmd::CmdActionItemCreate(mscAction, mscInstance, pos, m_mscChart));
 
     return true;
 }
@@ -363,32 +362,31 @@ bool RemoteControlHandler::handleActionCommand(const QVariantMap &params, QStrin
  */
 bool RemoteControlHandler::handleConditionCommand(const QVariantMap &params, QString *errorString)
 {
-    msc::MscChart *mscChart = m_layoutManager->currentChart();
     const QString instanceName = params.value(QLatin1String("instanceName")).toString();
-    msc::MscInstance *mscInstance = mscChart->instanceByName(instanceName);
+    msc::MscInstance *mscInstance = m_mscChart->instanceByName(instanceName);
     if (!mscInstance) {
         *errorString = tr("Instance with name='%1' doesn't exist").arg(instanceName);
         return false;
     }
 
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
-    const int conditionIdx = mscChart->totalEventNumber();
+    const int conditionIdx = m_mscChart->totalEventNumber();
     const QString name =
             params.value(QLatin1String("name"), QStringLiteral("Condition_%1").arg(conditionIdx)).toString();
-    msc::MscCondition *mscCondition = new msc::MscCondition(name, mscChart);
+    msc::MscCondition *mscCondition = new msc::MscCondition(name, m_mscChart);
     mscCondition->setInstance(mscInstance);
     mscCondition->setShared(params.value(QLatin1String("shared")).toBool());
 
     msc::ChartIndexList instanceIndexes;
     if (mscCondition->shared()) {
-        for (msc::MscInstance *instance : mscChart->instances()) {
-            instanceIndexes.set(instance, mscChart->eventsForInstance(instance).size());
+        for (msc::MscInstance *instance : m_mscChart->instances()) {
+            instanceIndexes.set(instance, m_mscChart->eventsForInstance(instance).size());
         }
     } else {
         instanceIndexes.set(mscInstance, pos);
     }
 
-    m_undoStack->push(new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, instanceIndexes, mscChart));
+    m_undoStack->push(new msc::cmd::CmdConditionItemCreate(mscCondition, mscInstance, instanceIndexes, m_mscChart));
 
     return true;
 }

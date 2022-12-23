@@ -21,6 +21,7 @@
 #include "chartlayoutmanager.h"
 #include "geometry.h"
 #include "mainmodel.h"
+#include "mscmodel.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
 #include "ui_streamingwindow.h"
@@ -91,6 +92,7 @@ bool StreamingWindow::startRemoteControl(quint16 port)
         d->m_remoteControlHandler->setMscModel(d->m_mainModel.mscModel());
         d->m_remoteControlHandler->setUndoStack(d->m_mainModel.undoStack());
         d->m_remoteControlHandler->setLayoutManager(&(d->m_mainModel.chartViewModel()));
+        d->m_remoteControlHandler->setChart(d->m_mainModel.mscModel()->firstChart());
 
         connect(d->m_remoteControlWebServer, &msc::RemoteControlWebServer::executeCommand, d->m_remoteControlHandler,
                 &msc::RemoteControlHandler::handleRemoteCommand);
