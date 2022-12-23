@@ -151,8 +151,6 @@ void RemoteControlHandler::handleRemoteCommand(
         errorString = tr("Unknown command");
         break;
     }
-    if (result)
-        m_layoutManager->updateLayout();
 
     Q_EMIT commandDone(commandType, result, peerName, errorString);
 }
