@@ -19,6 +19,7 @@
 
 #include "vemodel.h"
 
+#include <QScopedValueRollback>
 #include <QVector>
 
 namespace shared {
@@ -262,6 +263,36 @@ VEModel *VEObject::model() const
 QString toString(VEObject *object)
 {
     return object->titleUI();
+}
+
+QDebug operator<<(QDebug debug, VEObject *object)
+{
+    QDebugStateSaver saver(debug);
+    if (!object) {
+        debug << "shared::VEObject(nullptr)";
+    } else {
+        debug << *object;
+    }
+    return debug;
+}
+
+QDebug operator<<(QDebug debug, const VEObject &object)
+{
+    static bool recursing = false;
+
+    QDebugStateSaver saver(debug);
+    auto metaType = object.metaObject()->metaType();
+
+    if (recursing || metaType == QMetaType::fromType<VEObject>()) {
+        debug.nospace() << metaType.name() << "(" << static_cast<const void*>(&object) << ", title=" << object.titleUI() << ")";
+    } else if (metaType.hasRegisteredDebugStreamOperator()) {
+        // Guard for recursion. If a type derived from VEObject doesn't have a
+        // debug operator, the meta type will still report that there is one,
+        // but it will be the one for VEObject, and we will recurse infinitely.
+        QScopedValueRollback guard(recursing, true);
+        metaType.debugStream(debug, &object);
+    }
+    return debug;
 }
 
 }
