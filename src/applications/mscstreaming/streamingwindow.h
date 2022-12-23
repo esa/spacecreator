@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "commandlineparser.h"
-
 #include <QMainWindow>
 #include <memory>
 
@@ -37,7 +35,7 @@ class StreamingWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit StreamingWindow(msc::MSCEditorCore *plugin, QWidget *parent = nullptr);
+    explicit StreamingWindow(QWidget *parent = nullptr);
     ~StreamingWindow();
 
     bool startRemoteControl(quint16 port);
