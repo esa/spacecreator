@@ -1,0 +1,37 @@
+*.aadl
+.cache/
+*.pro.user
+*.pro.user.*
+
+# Ignore whole work directory
+work/*
+
+# Except observer.asn
+!work/simulation/
+work/simulation/*
+!work/simulation/observers/
+work/simulation/observers/*
+!work/simulation/observers/observer.asn
+
+# Except controller source
+!work/controller/
+work/controller/*
+!work/controller/SDL
+work/controller/SDL/*
+!work/controller/SDL/src
+work/controller/SDL/src/*
+!work/controller/SDL/src/controller.pr
+!work/controller/SDL/src/system_structure.pr
+!work/controller/SDL/src/dataview-uniq.asn
+
+# Except actuator source
+!work/actuator/
+work/actuator/*
+!work/actuator/C
+work/actuator/C/*
+!work/actuator/C/src
+work/actuator/C/src/*
+!work/actuator/C/src/actuator.c
+
+# Except modelchecking
+!work/modelchecking/
