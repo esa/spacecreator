@@ -1,0 +1,12 @@
+mscdocument basic /* MSC AND */;
+    language ASN.1;
+    data basic.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc basic;
+endmsc;
+endmscdocument;
+endmscdocument;
