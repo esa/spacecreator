@@ -99,4 +99,6 @@ private:
     void checkDefaultFunctionImplementation();
 };
 
+QDebug operator<<(QDebug debug, const IVFunction &function);
+
 }

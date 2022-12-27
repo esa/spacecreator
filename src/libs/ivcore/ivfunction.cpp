@@ -292,4 +292,18 @@ void IVFunction::checkDefaultFunctionImplementation()
     setDefaultImplementation(implementations().at(0).name());
 }
 
+QDebug operator<<(QDebug debug, const IVFunction &function)
+{
+    QDebugStateSaver saver(debug);
+    const auto separator1 = debug.verbosity() > 2 ? '\t' : ' ';
+    const auto separator2 = debug.verbosity() > 2 ? '\n' : ' ';
+    debug.nospace() << "IVFunction(id=" << function.id() << ", title=" << function.titleUI() << ", attributes={" << separator2;
+    for (auto attribute : function.entityAttributes()) {
+        debug << separator1 << attribute.name() << "=" << attribute.value() << " " << (int)attribute.type() << separator2;
+    }
+    debug << "})";
+
+    return debug;
+}
+
 }

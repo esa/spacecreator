@@ -147,6 +147,9 @@ private:
 
 QString toString(VEObject *object);
 
+QDebug operator<<(QDebug debug, VEObject *object);
+QDebug operator<<(QDebug debug, const VEObject &object);
+
 }
 
 Q_DECLARE_METATYPE(shared::VEObject *)
