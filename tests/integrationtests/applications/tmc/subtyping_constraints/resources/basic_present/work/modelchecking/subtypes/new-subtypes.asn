@@ -11,7 +11,7 @@ MyChoice FROM BASIC-PRESENT-DATAVIEW
 
 
 
-Function-1-pi-2-p1 ::= MySeq(WITH COMPONENTS(inputdata PRESENT))
+Function-1-pi-2-p1 ::= MySeq (WITH COMPONENTS { inputdata PRESENT })
 
 
 
