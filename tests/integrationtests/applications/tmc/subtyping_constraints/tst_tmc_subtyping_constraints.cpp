@@ -29,11 +29,25 @@ class tst_Tmc_Subtyping_Constraints : public QObject
 
 private Q_SLOTS:
     void test_basic();
+    void test_basic_absent();
+    void test_basic_present();
 };
 
 void tst_Tmc_Subtyping_Constraints::test_basic()
 {
     const int result = system("./test_basic.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping_Constraints::test_basic_absent()
+{
+    const int result = system("./test_basic_absent.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping_Constraints::test_basic_present()
+{
+    const int result = system("./test_basic_present.sh");
     QCOMPARE(result, 0);
 }
 
