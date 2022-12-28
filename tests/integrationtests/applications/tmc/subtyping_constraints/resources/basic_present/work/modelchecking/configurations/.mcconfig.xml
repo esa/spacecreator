@@ -5,8 +5,8 @@
         <Configuration>
             <Properties/>
             <Submodel>
-                <Function name="Function_1"/>
                 <Function name="Function_2"/>
+                <Function name="Function_1"/>
             </Submodel>
         </Configuration>
         <NativeModelChecker/>
