@@ -1,0 +1,24 @@
+FUNCTION-1-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MySeq FROM BASIC-PRESENT-DATAVIEW
+
+
+MyChoice FROM BASIC-PRESENT-DATAVIEW
+
+ ;
+
+
+
+
+Function-1-pi-2-p1 ::= MySeq(WITH COMPONENTS(inputdata PRESENT))
+
+
+
+
+Function-1-pi-1-p1 ::= MyChoice
+
+
+
+
+END
