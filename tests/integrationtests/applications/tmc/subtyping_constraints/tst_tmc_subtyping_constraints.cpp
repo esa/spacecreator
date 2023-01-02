@@ -31,6 +31,9 @@ private Q_SLOTS:
     void test_basic();
     void test_basic_absent();
     void test_basic_present();
+    void test_composite();
+    void test_constrained_basic();
+    void test_constrained_composite();
 };
 
 void tst_Tmc_Subtyping_Constraints::test_basic()
@@ -48,6 +51,24 @@ void tst_Tmc_Subtyping_Constraints::test_basic_absent()
 void tst_Tmc_Subtyping_Constraints::test_basic_present()
 {
     const int result = system("./test_basic_present.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping_Constraints::test_composite()
+{
+    const int result = system("./test_composite.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping_Constraints::test_constrained_basic()
+{
+    const int result = system("./test_constrained_basic.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping_Constraints::test_constrained_composite()
+{
+    const int result = system("./test_constrained_composite.sh");
     QCOMPARE(result, 0);
 }
 
