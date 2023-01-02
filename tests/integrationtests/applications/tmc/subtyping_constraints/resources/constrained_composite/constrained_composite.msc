@@ -1,0 +1,12 @@
+mscdocument constrained_composite /* MSC AND */;
+    language ASN.1;
+    data constrained_composite.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc constrained_composite;
+endmsc;
+endmscdocument;
+endmscdocument;
