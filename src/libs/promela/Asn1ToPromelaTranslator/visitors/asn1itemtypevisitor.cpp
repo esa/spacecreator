@@ -263,7 +263,8 @@ void Asn1ItemTypeVisitor::visit(const Enumerated &type)
     addEnumRangeCheckInline(typeName, allowedValues);
 
     if (m_generateInits) {
-        addSimpleValueInitializationInline(typeName, VariableRef(allowedValues.front()));
+        const auto enumValueName = QString("%1_%2").arg(typeName, Escaper::escapePromelaName(allowedValues.front()));
+        addSimpleValueInitializationInline(typeName, VariableRef(enumValueName));
     }
 
     m_resultDataType = DataType(UtypeRef(typeName));
