@@ -3,7 +3,10 @@
 <xmel version="1.0">
     <ModelCheckingWindow name=".mcconfig.xml">
         <Configuration>
-            <Properties/>
+            <Properties>
+                <Property path="scl/scl.scl"/>
+            </Properties>
+            <Subtyping name="new-subtypes.asn"/>
             <Submodel>
                 <Function name="Function_2"/>
                 <Function name="Function_1"/>

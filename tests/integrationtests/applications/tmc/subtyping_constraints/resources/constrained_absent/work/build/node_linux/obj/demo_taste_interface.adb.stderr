@@ -1,0 +1,9 @@
+demo_taste_interface.adb:1:06: file "polyorb_hi.ads" not found
+demo_taste_interface.adb:3:06: file "polyorb_hi_generated.ads" not found
+demo_taste_interface.adb:4:06: file "polyorb_hi.ads" not found
+demo_taste_interface.ads:2:06: file "polyorb_hi_generated.ads" not found
+demo_taste_interface.ads:2:06: "Demo_Taste_Interface (body)" depends on "Demo_Taste_Interface (spec)"
+demo_taste_interface.ads:2:06: "Demo_Taste_Interface (spec)" depends on "Polyorb_Hi_Generated (spec)"
+demo_taste_interface.ads:4:06: file "polyorb_hi_generated.ads" not found
+demo_taste_interface.ads:4:06: "Demo_Taste_Interface (body)" depends on "Demo_Taste_Interface (spec)"
+demo_taste_interface.ads:4:06: "Demo_Taste_Interface (spec)" depends on "Polyorb_Hi_Generated (spec)"

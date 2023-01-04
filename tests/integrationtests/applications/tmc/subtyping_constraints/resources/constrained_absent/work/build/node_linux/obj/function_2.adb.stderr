@@ -1,0 +1,16 @@
+function_2.adb:3:06: warning: "System.IO" is an internal GNAT unit
+function_2.adb:3:06: warning: use of this unit is non-portable and version-dependent
+function_2.adb:3:12: warning: no entities of "System.IO" are referenced
+function_2.adb:4:01: warning: use clause for package "IO" has no effect
+function_2.adb:7:18: warning: unit "Ada.Numerics.Generic_Elementary_Functions" is not referenced
+function_2.adb:10:19: warning: formal parameter "p1" is not referenced
+function_2.adb:36:15: warning: label "Next_Transition" is not referenced
+function_2.ads:5:20: warning: no entities of "Ada.Characters.Handling" are referenced
+function_2.ads:7:01: warning: use clause for package "Handling" has no effect
+function_2.ads:7:01: warning: use clause for package "Interfaces" has no effect
+function_2.ads:13:06: warning: no entities of "TASTE_BasicTypes" are referenced
+function_2.ads:14:01: warning: use clause for package "TASTE_BasicTypes" has no effect
+function_2.ads:15:06: warning: no entities of "System_Dataview" are referenced
+function_2.ads:16:01: warning: use clause for package "System_Dataview" has no effect
+function_2.ads:17:06: warning: no entities of "adaasn1rtl" are referenced
+function_2.ads:18:01: warning: use clause for package "adaasn1rtl" has no effect

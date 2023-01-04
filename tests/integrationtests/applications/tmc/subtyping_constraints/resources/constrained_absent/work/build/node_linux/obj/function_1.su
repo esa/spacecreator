@@ -1,0 +1,5 @@
+function_1.c:34:6:function_1_startup	176	static
+function_1.c:91:6:function_1_PI_Poll	256	static
+function_1.c:121:6:function_1_PI_PI_2	32	static
+function_1.c:136:1:_GLOBAL__sub_D_00099_0_function_1_startup	16	static
+function_1.c:136:1:_GLOBAL__sub_I_00099_1_function_1_startup	16	static

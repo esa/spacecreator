@@ -1,0 +1,24 @@
+FUNCTION-1-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyChoice FROM CONSTRAINED-ABSENT-DATAVIEW
+
+
+MySeqOf FROM CONSTRAINED-ABSENT-DATAVIEW
+
+ ;
+
+MySeqOfSub ::= MySeqOf (SIZE (0..5))
+
+
+Function-1-pi-2-p1 ::= MyChoice
+
+
+
+
+Function-1-pi-1-p1 ::= MySeqOfSub
+
+
+
+
+END

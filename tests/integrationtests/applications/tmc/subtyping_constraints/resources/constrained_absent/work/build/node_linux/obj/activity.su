@@ -1,0 +1,9 @@
+activity.c:43:6:function_1_pi_2_deliver	32	static
+activity.c:76:7:function_1_pi_2_job	208	static
+activity.c:161:7:function_1_poll_job	144	static
+activity.c:219:6:function_2_pi_1_deliver	32	static
+activity.c:252:7:function_2_pi_1_job	208	static
+activity.c:320:6:__po_hi_main_deliver	48	static
+activity.c:347:6:__po_hi_main_initialize	80	dynamic,bounded
+activity.c:353:1:_GLOBAL__sub_D_00099_0___po_hi_function_1_pi_2_outport_function_2_pi_1_local_destinations	16	static
+activity.c:353:1:_GLOBAL__sub_I_00099_1___po_hi_function_1_pi_2_outport_function_2_pi_1_local_destinations	16	static
