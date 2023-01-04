@@ -1,0 +1,12 @@
+mscdocument constrained_absent /* MSC AND */;
+    language ASN.1;
+    data constrained_absent.asn;
+
+/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */
+
+mscdocument Nominal /* MSC LEAF */;
+
+msc constrained_absent;
+endmsc;
+endmscdocument;
+endmscdocument;

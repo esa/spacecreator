@@ -6,11 +6,12 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID FROM System-Dataview;
 
-Function-2-States ::= ENUMERATED {wait}
+Function-2-States ::= ENUMERATED {wait, incorrect}
 
 Function-2-Context ::= SEQUENCE {
    state Function-2-States,
-   init-done BOOLEAN
+   init-done BOOLEAN,
+   myvar MySeq
 }
 
 Function-2-Mychoice-Selection  ::= ENUMERATED {a-present(1), b-present(2)}
@@ -19,7 +20,7 @@ END
 BASIC-ABSENT-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10000)
+   MyInteger ::= INTEGER (0 .. 10)
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
@@ -100,11 +101,11 @@ BEGIN
    IMPORTS
       
       --  ASN.1 modules used by thread function_1_PI_2
-      MySeq FROM BASIC-ABSENT-DATAVIEW
+      MyChoice FROM BASIC-ABSENT-DATAVIEW
       
       
       --  ASN.1 modules used by thread function_2_PI_1
-      MyChoice FROM BASIC-ABSENT-DATAVIEW
+      MySeq FROM BASIC-ABSENT-DATAVIEW
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
@@ -130,20 +131,20 @@ BEGIN
    
    Function-1-Event ::= CHOICE {
       msg-in CHOICE {
-         pi-2 SEQUENCE { p1 MySeq}
+         pi-2 SEQUENCE { p1 MyChoice}
       },
       msg-out CHOICE {
-         pi-1 SEQUENCE { p1 MyChoice }
+         pi-1 SEQUENCE { p1 MySeq }
       }
    }
    
    Function-2-Event ::= CHOICE {
       msg-in CHOICE {
          input-none SEQUENCE {},
-         pi-1 SEQUENCE { p1 MyChoice}
+         pi-1 SEQUENCE { p1 MySeq}
       },
       msg-out CHOICE {
-         pi-2 SEQUENCE { p1 MySeq }
+         pi-2 SEQUENCE { p1 MyChoice }
       }
    }
    

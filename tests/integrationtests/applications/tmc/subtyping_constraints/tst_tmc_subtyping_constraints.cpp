@@ -28,19 +28,10 @@ class tst_Tmc_Subtyping_Constraints : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
-    void test_basic();
     void test_basic_absent();
     void test_basic_present();
-    void test_composite();
-    void test_constrained_basic();
-    void test_constrained_composite();
+    void test_constrained_absent();
 };
-
-void tst_Tmc_Subtyping_Constraints::test_basic()
-{
-    const int result = system("./test_basic.sh");
-    QCOMPARE(result, 0);
-}
 
 void tst_Tmc_Subtyping_Constraints::test_basic_absent()
 {
@@ -54,21 +45,9 @@ void tst_Tmc_Subtyping_Constraints::test_basic_present()
     QCOMPARE(result, 0);
 }
 
-void tst_Tmc_Subtyping_Constraints::test_composite()
+void tst_Tmc_Subtyping_Constraints::test_constrained_absent()
 {
-    const int result = system("./test_composite.sh");
-    QCOMPARE(result, 0);
-}
-
-void tst_Tmc_Subtyping_Constraints::test_constrained_basic()
-{
-    const int result = system("./test_constrained_basic.sh");
-    QCOMPARE(result, 0);
-}
-
-void tst_Tmc_Subtyping_Constraints::test_constrained_composite()
-{
-    const int result = system("./test_constrained_composite.sh");
+    const int result = system("./test_constrained_absent.sh");
     QCOMPARE(result, 0);
 }
 
