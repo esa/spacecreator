@@ -15,12 +15,9 @@ target_link_libraries(${TEST_NAME}
 
 add_format_target(${TEST_NAME})
 
-configure_file(test_basic.sh test_basic.sh COPYONLY)
 configure_file(test_basic_absent.sh test_basic_absent.sh COPYONLY)
 configure_file(test_basic_present.sh test_basic_present.sh COPYONLY)
-configure_file(test_composite.sh test_composite.sh COPYONLY)
-configure_file(test_constrained_basic.sh test_constrained_basic.sh COPYONLY)
-configure_file(test_constrained_composite.sh test_constrained_composite.sh COPYONLY)
+configure_file(test_constrained_absent.sh test_constrained_absent.sh COPYONLY)
 
 add_custom_target(${TEST_NAME}_copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources

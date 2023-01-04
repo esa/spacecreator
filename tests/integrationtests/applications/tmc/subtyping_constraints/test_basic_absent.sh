@@ -21,12 +21,12 @@ mkdir $TEST_OUTPUT_DIR
 # Translate
 $TMC -iv $RESOURCES_DIR/interfaceview.xml \
     -o $TEST_OUTPUT_DIR \
-    -sub $SUBTYPES_DIR/new-subtypes.asn
+    -sub $SUBTYPES_DIR/new-subtypes.asn \
+    -scl $PROPERTIES_DIR/scl/scl.scl
 
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a -run -bfspar -n system.pml > system.output \
     && grep -q "errors: 0" system.output \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR
-
-
+    

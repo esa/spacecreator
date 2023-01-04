@@ -1,0 +1,18 @@
+CONSTRAINED-ABSENT-DATAVIEW DEFINITIONS ::= BEGIN
+    MyInteger[]
+    MyEnum[]
+    MySeq[]
+    MyChoice[]
+    MySeqOf[]
+END
+TASTE-BasicTypes DEFINITIONS ::= BEGIN
+    T-Int32[]
+    T-UInt32[]
+    T-Int8[]
+    T-UInt8[]
+    T-Boolean[]
+    T-Null-Record[]
+END
+System-Dataview DEFINITIONS ::= BEGIN
+    PID[]
+END

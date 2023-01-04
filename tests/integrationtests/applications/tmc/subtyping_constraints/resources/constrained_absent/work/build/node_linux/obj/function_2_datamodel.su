@@ -1,0 +1,11 @@
+function_2_datamodel.ads:43:6:Asn1sccfunction_2_Contextip	16	static
+function_2_datamodel.ads:58:6:Asn1sccfunction_2_Mychoice_Selectionrp	32	static
+function_2_datamodel.adb:14:1:Asn1sccfunction_2_States_Equal	16	static
+function_2_datamodel.adb:22:1:Asn1sccfunction_2_States_Isconstraintvalid	16	static
+function_2_datamodel.adb:33:1:Asn1sccfunction_2_States_Init	16	static
+function_2_datamodel.adb:45:1:Asn1sccfunction_2_Context_Equal	16	static
+function_2_datamodel.adb:62:1:Asn1sccfunction_2_Context_Isconstraintvalid	48	static
+function_2_datamodel.adb:72:1:Asn1sccfunction_2_Context_Init	32	static
+function_2_datamodel.adb:88:1:Asn1sccfunction_2_Mychoice_Selection_Equal	16	static
+function_2_datamodel.adb:96:1:Asn1sccfunction_2_Mychoice_Selection_Isconstraintvalid	16	static
+function_2_datamodel.adb:107:1:Asn1sccfunction_2_Mychoice_Selection_Init	16	static
