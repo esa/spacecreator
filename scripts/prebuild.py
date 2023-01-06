@@ -437,7 +437,7 @@ if __name__ == '__main__':
     download_asn_fuzzer(env_dir, app_dir)
     download_pus_c(env_dir, app_dir)
 
-    # AppImage files SpaceCreator.desktop and AppRun
+    # AppImage files SpaceCreator.desktop, AppRun and TasteLanguageClients.ini
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)
 
     # Copy syntax highlighter files from asn1plugin and spacecreatorplugin

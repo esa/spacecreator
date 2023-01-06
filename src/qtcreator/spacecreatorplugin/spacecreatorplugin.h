@@ -71,6 +71,7 @@ public:
 
 private:
     void addHelp();
+    void setupTasteLanguageClients();
 
     SclEditorFactory *m_sclFactory = nullptr;
     MscEditorFactory *m_mscFactory = nullptr;

@@ -75,6 +75,7 @@ set(SC_QTC_LIBRARIES
     Aggregation
     ExtensionSystem
     Utils
+    LanguageClient
 )
 set(SC_QTC_PLUGINS
     Core
@@ -97,11 +98,13 @@ target_include_directories(${PLUGIN_NAME}
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/aggregation
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/extensionsystem
     PRIVATE ${QTC_SOURCE_DIR}/src/libs/utils
+    PRIVATE ${QTC_SOURCE_DIR}/src/libs/utils/mimetypes2
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/coreplugin
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/projectexplorer
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/qtsupport
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/texteditor
+    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/languageclient
 )
 
 source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
