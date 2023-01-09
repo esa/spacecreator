@@ -79,6 +79,7 @@ private Q_SLOTS:
         m_handler->setMscModel(m_model->mscModel());
         m_handler->setUndoStack(m_model->undoStack());
         m_handler->setLayoutManager(&(m_model->chartViewModel()));
+        m_handler->setChart(m_model->mscModel()->firstChart());
 
         m_textMessageReceived.clear();
         m_socketError.clear();
