@@ -18,6 +18,7 @@
  */
 
 #include <QObject>
+#include <QProcess>
 #include <QtTest>
 #include <stdlib.h>
 
@@ -35,19 +36,19 @@ private Q_SLOTS:
 
 void tst_Tmc_Subtyping_Constraints::test_basic_absent()
 {
-    const int result = system("./test_basic_absent.sh");
+    const int result = system("timeout 30s ./test_basic_absent.sh");
     QCOMPARE(result, 0);
 }
 
 void tst_Tmc_Subtyping_Constraints::test_basic_present()
 {
-    const int result = system("./test_basic_present.sh");
+    const int result = system("timeout 30s ./test_basic_present.sh");
     QCOMPARE(result, 0);
 }
 
 void tst_Tmc_Subtyping_Constraints::test_constrained_absent()
 {
-    const int result = system("./test_constrained_absent.sh");
+    const int result = system("timeout 30s ./test_constrained_absent.sh");
     QCOMPARE(result, 0);
 }
 
