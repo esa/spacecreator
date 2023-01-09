@@ -25,8 +25,9 @@ $TMC -iv $RESOURCES_DIR/interfaceview.xml \
     -scl $PROPERTIES_DIR/scl/scl.scl
 
 cd $TEST_OUTPUT_DIR \
-    && $SPIN -a -run -bfspar -n system.pml > system.output \
+    && $SPIN -a system.pml \
+	&& $CC -DVECTORSZ=2048 -o system.out pan.c \
+	&& ./system.out -a -m2000000 > system.output \
     && grep -q "errors: 0" system.output \
-    && cd .. \
-    && rm -r $TEST_OUTPUT_DIR
+    && cd ..
     
