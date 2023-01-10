@@ -27,19 +27,17 @@
 
 namespace msc {
 
-class ChartLayoutManager;
 class MscChart;
 class MscInstance;
 class MscMessage;
-class InstanceItem;
 
 namespace cmd {
 
 class CmdMessageItemCreate : public ChartBaseCommand
 {
 public:
-    CmdMessageItemCreate(msc::MscMessage *message, const ChartIndexList &instanceIndexes,
-            ChartLayoutManager *layoutManager, const QVector<QPoint> &points = QVector<QPoint>());
+    CmdMessageItemCreate(msc::MscMessage *message, const ChartIndexList &instanceIndexes, MscChart *chart,
+            const QVector<QPoint> &points = QVector<QPoint>());
 
     void redo() override;
     void undo() override;
@@ -50,18 +48,15 @@ private:
     MscMessage *m_message = nullptr;
     ChartIndexList m_instanceIndexes;
     QVector<QPoint> m_msgPoints;
-    QPointer<msc::ChartLayoutManager> m_layoutManager;
 
     struct InstanceGeometry {
         QVector<QPoint> m_cif;
-        QPointF m_pos;
-        qreal m_axis = 0.;
     };
 
     const InstanceGeometry m_sourceGeometryPrev;
     const InstanceGeometry m_targetGeometryPrev;
 
-    static InstanceGeometry initGeometryHolder(msc::InstanceItem *from);
+    static InstanceGeometry initGeometryHolder(msc::MscInstance *from);
 };
 
 } // ns cmd

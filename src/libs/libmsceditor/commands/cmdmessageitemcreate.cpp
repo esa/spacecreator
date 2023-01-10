@@ -17,11 +17,9 @@
 
 #include "cmdmessageitemcreate.h"
 
-#include "chartlayoutmanager.h"
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
 #include "commandids.h"
-#include "instanceitem.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -29,29 +27,24 @@
 namespace msc {
 namespace cmd {
 
-CmdMessageItemCreate::InstanceGeometry CmdMessageItemCreate::initGeometryHolder(msc::InstanceItem *from)
+CmdMessageItemCreate::InstanceGeometry CmdMessageItemCreate::initGeometryHolder(msc::MscInstance *from)
 {
     InstanceGeometry geometry;
     if (from) {
-        geometry.m_pos = from->scenePos();
-        geometry.m_cif = from->modelItem()->cifGeometry();
-        geometry.m_axis = from->axisHeight();
+        geometry.m_cif = from->cifGeometry();
     }
 
     return geometry;
 }
 
-CmdMessageItemCreate::CmdMessageItemCreate(msc::MscMessage *message, const ChartIndexList &instanceIndexes,
-        ChartLayoutManager *layoutManager, const QVector<QPoint> &points)
-    : ChartBaseCommand(message, layoutManager ? layoutManager->currentChart() : nullptr)
+CmdMessageItemCreate::CmdMessageItemCreate(
+        msc::MscMessage *message, const ChartIndexList &instanceIndexes, MscChart *chart, const QVector<QPoint> &points)
+    : ChartBaseCommand(message, chart)
     , m_message(message)
     , m_instanceIndexes(instanceIndexes)
     , m_msgPoints(points)
-    , m_layoutManager(layoutManager)
-    , m_sourceGeometryPrev(initGeometryHolder(
-              (layoutManager && m_message) ? layoutManager->itemForInstance(m_message->sourceInstance()) : nullptr))
-    , m_targetGeometryPrev(initGeometryHolder(
-              (layoutManager && m_message) ? layoutManager->itemForInstance(m_message->targetInstance()) : nullptr))
+    , m_sourceGeometryPrev(initGeometryHolder(m_message ? m_message->sourceInstance() : nullptr))
+    , m_targetGeometryPrev(initGeometryHolder(m_message ? m_message->targetInstance() : nullptr))
 {
     Q_ASSERT(m_message);
     Q_ASSERT(m_chart.data());
@@ -82,18 +75,13 @@ void CmdMessageItemCreate::undo()
     Q_ASSERT(m_chart.data());
 
     auto restoreInstanceGeometry = [this](MscInstance *instance, const InstanceGeometry &geometry) {
-        if (!instance || !m_layoutManager)
+        if (!instance) {
             return;
+        }
 
-        if (InstanceItem *item = m_layoutManager->itemForInstance(instance)) {
-            QSignalBlocker silently(instance);
-            if (!geometry.m_cif.isEmpty()) {
-                instance->setCifGeometry(geometry.m_cif);
-            } else {
-                const QPointF &shift = geometry.m_pos - item->scenePos();
-                item->moveSilentlyBy(shift);
-                item->setAxisHeight(geometry.m_axis);
-            }
+        QSignalBlocker silently(instance);
+        if (!geometry.m_cif.isEmpty()) {
+            instance->setCifGeometry(geometry.m_cif);
         }
     };
 

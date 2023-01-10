@@ -283,7 +283,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
         instanceIndexes.set(message->targetInstance(), -1);
     }
 
-    m_undoStack->push(new msc::cmd::CmdMessageItemCreate(message, instanceIndexes, m_layoutManager));
+    m_undoStack->push(new msc::cmd::CmdMessageItemCreate(message, instanceIndexes, m_mscChart));
 
     return true;
 }

@@ -161,7 +161,8 @@ void MessageCreatorTool::commitPreviewItem()
 
                 const QVector<QPoint> &points =
                         cmdParams.size() == 3 ? cmdParams.at(2).value<QVector<QPoint>>() : QVector<QPoint>();
-                m_model->undoStack()->push(new cmd::CmdMessageItemCreate(m_message, instanceIndexes, m_model, points));
+                m_model->undoStack()->push(
+                        new cmd::CmdMessageItemCreate(m_message, instanceIndexes, m_model->currentChart(), points));
 
                 Q_EMIT created(); // to deactivate toobar's item
                 m_message.clear();
