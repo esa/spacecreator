@@ -27,7 +27,7 @@ $TMC -iv $RESOURCES_DIR/interfaceview.xml \
 cd $TEST_OUTPUT_DIR \
     && $SPIN -a system.pml \
 	&& $CC -DVECTORSZ=2048 -o system.out pan.c \
-	&& ./system.out -a -m2000000 > system.output \
+	&& ./system.out -E -n -a -e -c1 -m1000000 > system.output \
     && grep -q "errors: 0" system.output \
     && cd ..
     
