@@ -3,7 +3,7 @@
 --------------------------------------------------------
 --! MadeInFastMode:True:
 --! InputASN1FileChecksum:0f8cd901516f7337cea452f200300eb8:constrained_absent.acn:
---! InputASN1FileChecksum:7484f18574f3bcb312d0c1474707c483:constrained_absent.asn:
+--! InputASN1FileChecksum:4ae21b5f27beb8f15a2558f1c63975c0:constrained_absent.asn:
 --! InputASN1FileChecksum:ff35cd78b1e82f09b63b209ab7cf7c34:/home/taste/tool-inst/share/taste-types/taste-types.asn:
 --------------------------------------------------------
 
@@ -63,7 +63,7 @@ PROPERTIES
     Source_Language => (ASN1);
     -- name of the corresponding data type in the source file:
     Type_Source_Name => "MyChoice";
-    TASTE::Position_In_File => [ line => 29 ; column => 1 ; ];
+    TASTE::Position_In_File => [ line => 14 ; column => 1 ; ];
     -- what kind of type is this?
     TASTE::ASN1_Basic_Type =>aCHOICE;
 END MyChoice;
@@ -103,7 +103,7 @@ PROPERTIES
     Source_Language => (ASN1);
     -- name of the corresponding data type in the source file:
     Type_Source_Name => "MyEnum";
-    TASTE::Position_In_File => [ line => 19 ; column => 1 ; ];
+    TASTE::Position_In_File => [ line => 6 ; column => 1 ; ];
     -- what kind of type is this?
     TASTE::ASN1_Basic_Type =>aENUMERATED;
 END MyEnum;
@@ -183,7 +183,7 @@ PROPERTIES
     Source_Language => (ASN1);
     -- name of the corresponding data type in the source file:
     Type_Source_Name => "MySeq";
-    TASTE::Position_In_File => [ line => 23 ; column => 1 ; ];
+    TASTE::Position_In_File => [ line => 8 ; column => 1 ; ];
     -- what kind of type is this?
     TASTE::ASN1_Basic_Type =>aSEQUENCE;
 END MySeq;
@@ -223,7 +223,7 @@ PROPERTIES
     Source_Language => (ASN1);
     -- name of the corresponding data type in the source file:
     Type_Source_Name => "MySeqOf";
-    TASTE::Position_In_File => [ line => 34 ; column => 1 ; ];
+    TASTE::Position_In_File => [ line => 19 ; column => 1 ; ];
     -- what kind of type is this?
     TASTE::ASN1_Basic_Type =>aSEQUENCEOF;
 END MySeqOf;

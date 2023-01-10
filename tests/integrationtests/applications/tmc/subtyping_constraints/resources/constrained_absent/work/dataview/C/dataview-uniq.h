@@ -17,14 +17,14 @@ typedef asn1SccUint asn1SccMyInteger;
 
 flag asn1SccMyInteger_Equal(const asn1SccMyInteger* pVal1, const asn1SccMyInteger* pVal2);
 
-#define ERR_MYINTEGER		1  /*(0 .. 10)*/
+#define ERR_MYINTEGER		1  /*(0 .. 4)*/
 flag asn1SccMyInteger_IsConstraintValid(const asn1SccMyInteger* pVal, int* pErrCode);
 
 void asn1SccMyInteger_Initialize(asn1SccMyInteger* pVal);
 
 #define ERR_UPER_ENCODE_MYINTEGER		2  /**/
 #define asn1SccMyInteger_REQUIRED_BYTES_FOR_ENCODING       1 
-#define asn1SccMyInteger_REQUIRED_BITS_FOR_ENCODING        4
+#define asn1SccMyInteger_REQUIRED_BITS_FOR_ENCODING        3
 
 flag asn1SccMyInteger_Encode(const asn1SccMyInteger* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -33,7 +33,7 @@ flag asn1SccMyInteger_Decode(asn1SccMyInteger* pVal, BitStream* pBitStrm, int* p
 
 #define ERR_ACN_ENCODE_MYINTEGER		4  /**/
 #define asn1SccMyInteger_REQUIRED_BYTES_FOR_ACN_ENCODING       1 
-#define asn1SccMyInteger_REQUIRED_BITS_FOR_ACN_ENCODING        4
+#define asn1SccMyInteger_REQUIRED_BITS_FOR_ACN_ENCODING        3
 
 flag asn1SccMyInteger_ACN_Encode(const asn1SccMyInteger* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -74,8 +74,8 @@ void asn1SccMySeq_Initialize(asn1SccMySeq* pVal);
 #define ERR_UPER_ENCODE_MYSEQ_INPUTDATA_2		17  /**/
 #define ERR_UPER_ENCODE_MYSEQ_OUTPUTDATA_2		27  /**/
 #define ERR_UPER_ENCODE_MYSEQ_VALIDITY		32  /**/
-#define asn1SccMySeq_REQUIRED_BYTES_FOR_ENCODING       2 
-#define asn1SccMySeq_REQUIRED_BITS_FOR_ENCODING        9
+#define asn1SccMySeq_REQUIRED_BYTES_FOR_ENCODING       1 
+#define asn1SccMySeq_REQUIRED_BITS_FOR_ENCODING        7
 
 flag asn1SccMySeq_Encode(const asn1SccMySeq* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -89,8 +89,8 @@ flag asn1SccMySeq_Decode(asn1SccMySeq* pVal, BitStream* pBitStrm, int* pErrCode)
 #define ERR_ACN_ENCODE_MYSEQ_INPUTDATA_2		19  /**/
 #define ERR_ACN_ENCODE_MYSEQ_OUTPUTDATA_2		29  /**/
 #define ERR_ACN_ENCODE_MYSEQ_VALIDITY		34  /**/
-#define asn1SccMySeq_REQUIRED_BYTES_FOR_ACN_ENCODING       2 
-#define asn1SccMySeq_REQUIRED_BITS_FOR_ACN_ENCODING        9
+#define asn1SccMySeq_REQUIRED_BYTES_FOR_ACN_ENCODING       1 
+#define asn1SccMySeq_REQUIRED_BITS_FOR_ACN_ENCODING        7
 
 flag asn1SccMySeq_ACN_Encode(const asn1SccMySeq* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -129,8 +129,8 @@ void asn1SccMyChoice_Initialize(asn1SccMyChoice* pVal);
 #define ERR_UPER_ENCODE_MYCHOICE		82  /**/
 #define ERR_UPER_ENCODE_MYCHOICE_A		42  /**/
 #define ERR_UPER_ENCODE_MYCHOICE_B_2		77  /**/
-#define asn1SccMyChoice_REQUIRED_BYTES_FOR_ENCODING       2 
-#define asn1SccMyChoice_REQUIRED_BITS_FOR_ENCODING        10
+#define asn1SccMyChoice_REQUIRED_BYTES_FOR_ENCODING       1 
+#define asn1SccMyChoice_REQUIRED_BITS_FOR_ENCODING        8
 
 flag asn1SccMyChoice_Encode(const asn1SccMyChoice* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 
@@ -142,8 +142,8 @@ flag asn1SccMyChoice_Decode(asn1SccMyChoice* pVal, BitStream* pBitStrm, int* pEr
 #define ERR_ACN_ENCODE_MYCHOICE		84  /**/
 #define ERR_ACN_ENCODE_MYCHOICE_A		44  /**/
 #define ERR_ACN_ENCODE_MYCHOICE_B_2		79  /**/
-#define asn1SccMyChoice_REQUIRED_BYTES_FOR_ACN_ENCODING       2 
-#define asn1SccMyChoice_REQUIRED_BITS_FOR_ACN_ENCODING        10
+#define asn1SccMyChoice_REQUIRED_BYTES_FOR_ACN_ENCODING       1 
+#define asn1SccMyChoice_REQUIRED_BITS_FOR_ACN_ENCODING        8
 
 flag asn1SccMyChoice_ACN_Encode(const asn1SccMyChoice* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 

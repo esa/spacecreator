@@ -23,7 +23,7 @@ flag asn1SccMyInteger_Equal(const asn1SccMyInteger* pVal1, const asn1SccMyIntege
 flag asn1SccMyInteger_IsConstraintValid(const asn1SccMyInteger* pVal, int* pErrCode)
 {
     flag ret = TRUE;
-    ret = ((*(pVal)) <= 10UL);
+    ret = ((*(pVal)) <= 4UL);
     *pErrCode = ret ? 0 :  ERR_MYINTEGER; 
 
 	return ret;
@@ -45,7 +45,7 @@ flag asn1SccMyInteger_Encode(const asn1SccMyInteger* pVal, BitStream* pBitStrm, 
 	*pErrCode = 0;
 	ret = bCheckConstraints ? asn1SccMyInteger_IsConstraintValid(pVal, pErrCode) : TRUE ;
 	if (ret && *pErrCode == 0) {
-	    BitStream_EncodeConstraintPosWholeNumber(pBitStrm, (*(pVal)), 0, 10);
+	    BitStream_EncodeConstraintPosWholeNumber(pBitStrm, (*(pVal)), 0, 4);
     } /*COVERAGE_IGNORE*/
 
 	
@@ -58,7 +58,7 @@ flag asn1SccMyInteger_Decode(asn1SccMyInteger* pVal, BitStream* pBitStrm, int* p
 	*pErrCode = 0;
 
 
-	ret = BitStream_DecodeConstraintPosWholeNumber(pBitStrm, pVal, 0, 10);
+	ret = BitStream_DecodeConstraintPosWholeNumber(pBitStrm, pVal, 0, 4);
 	*pErrCode = ret ? 0 : ERR_UPER_DECODE_MYINTEGER;
 
 	return ret  && asn1SccMyInteger_IsConstraintValid(pVal, pErrCode);
@@ -71,7 +71,7 @@ flag asn1SccMyInteger_ACN_Encode(const asn1SccMyInteger* pVal, BitStream* pBitSt
     *pErrCode = 0;
 	ret = bCheckConstraints ? asn1SccMyInteger_IsConstraintValid(pVal, pErrCode) : TRUE ;
 	if (ret && *pErrCode == 0) {
-	    BitStream_EncodeConstraintPosWholeNumber(pBitStrm, (*(pVal)), 0, 10);
+	    BitStream_EncodeConstraintPosWholeNumber(pBitStrm, (*(pVal)), 0, 4);
     } /*COVERAGE_IGNORE*/
 
 	
@@ -84,7 +84,7 @@ flag asn1SccMyInteger_ACN_Decode(asn1SccMyInteger* pVal, BitStream* pBitStrm, in
 	*pErrCode = 0;
 
 
-	ret = BitStream_DecodeConstraintPosWholeNumber(pBitStrm, pVal, 0, 10);
+	ret = BitStream_DecodeConstraintPosWholeNumber(pBitStrm, pVal, 0, 4);
 	*pErrCode = ret ? 0 : ERR_ACN_DECODE_MYINTEGER;
 
     return ret && asn1SccMyInteger_IsConstraintValid(pVal, pErrCode);
