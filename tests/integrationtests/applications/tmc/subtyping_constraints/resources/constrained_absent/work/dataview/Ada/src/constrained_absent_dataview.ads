@@ -27,12 +27,12 @@ package CONSTRAINED_ABSENT_DATAVIEW with SPARK_Mode
 is
 
 
-subtype asn1SccMyInteger is adaasn1rtl.Asn1UInt range 0 .. 10;
+subtype asn1SccMyInteger is adaasn1rtl.Asn1UInt range 0 .. 4;
 
 
 function asn1SccMyInteger_Equal(val1, val2 : asn1SccMyInteger) return Boolean;
 
-ERR_MYINTEGER:constant Integer := 31; -- (0 .. 10)
+ERR_MYINTEGER:constant Integer := 1; -- (0 .. 4)
 function asn1SccMyInteger_IsConstraintValid(val : asn1SccMyInteger) return adaasn1rtl.ASN1_RESULT;
 
 function asn1SccMyInteger_Init return asn1SccMyInteger;
@@ -53,12 +53,12 @@ function asn1SccMySeq_validity_Equal(val1, val2 : asn1SccMySeq_validity) return 
 
 function asn1SccMySeq_Equal(val1, val2 : asn1SccMySeq) return Boolean;
 
-ERR_MYSEQ_VALIDITY:constant Integer := 61; -- valid | invalid
+ERR_MYSEQ_VALIDITY:constant Integer := 31; -- valid | invalid
 function asn1SccMySeq_validity_IsConstraintValid(val : asn1SccMySeq_validity) return adaasn1rtl.ASN1_RESULT;
 
-ERR_MYSEQ:constant Integer := 66; -- 
-ERR_MYSEQ_INPUTDATA_2:constant Integer := 46; -- 
-ERR_MYSEQ_OUTPUTDATA_2:constant Integer := 56; -- 
+ERR_MYSEQ:constant Integer := 36; -- 
+ERR_MYSEQ_INPUTDATA_2:constant Integer := 16; -- 
+ERR_MYSEQ_OUTPUTDATA_2:constant Integer := 26; -- 
 function asn1SccMySeq_IsConstraintValid(val : asn1SccMySeq) return adaasn1rtl.ASN1_RESULT;
 
 function asn1SccMySeq_validity_Init return asn1SccMySeq_validity;
@@ -89,9 +89,9 @@ end record;
 
 function asn1SccMyChoice_Equal(val1, val2 : asn1SccMyChoice) return Boolean;
 
-ERR_MYCHOICE:constant Integer := 111; -- 
-ERR_MYCHOICE_A:constant Integer := 71; -- 
-ERR_MYCHOICE_B_2:constant Integer := 106; -- 
+ERR_MYCHOICE:constant Integer := 81; -- 
+ERR_MYCHOICE_A:constant Integer := 41; -- 
+ERR_MYCHOICE_B_2:constant Integer := 76; -- 
 function asn1SccMyChoice_IsConstraintValid(val : asn1SccMyChoice) return adaasn1rtl.ASN1_RESULT;
 
 function asn1SccMyChoice_Init return asn1SccMyChoice;
@@ -102,7 +102,7 @@ for asn1SccMyEnum use
 
 function asn1SccMyEnum_Equal(val1, val2 : asn1SccMyEnum) return Boolean;
 
-ERR_MYENUM:constant Integer := 36; -- hello | world | howareyou
+ERR_MYENUM:constant Integer := 6; -- hello | world | howareyou
 function asn1SccMyEnum_IsConstraintValid(val : asn1SccMyEnum) return adaasn1rtl.ASN1_RESULT;
 
 function asn1SccMyEnum_Init return asn1SccMyEnum;
@@ -119,8 +119,8 @@ end record;
 
 function asn1SccMySeqOf_Equal(val1, val2 : asn1SccMySeqOf) return Boolean;
 
-ERR_MYSEQOF:constant Integer := 126; -- (SIZE (0..10))
-ERR_MYSEQOF_ELM_2:constant Integer := 121; -- 
+ERR_MYSEQOF:constant Integer := 96; -- (SIZE (0..10))
+ERR_MYSEQOF_ELM_2:constant Integer := 91; -- 
 function asn1SccMySeqOf_IsConstraintValid(val : asn1SccMySeqOf) return adaasn1rtl.ASN1_RESULT;
 
 function asn1SccMySeqOf_Init return asn1SccMySeqOf;
