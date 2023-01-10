@@ -34,7 +34,7 @@ for asn1SccPID use
 
 function asn1SccPID_Equal(val1, val2 : asn1SccPID) return Boolean;
 
-ERR_PID:constant Integer := 161; -- function-1 | function-2 | env
+ERR_PID:constant Integer := 131; -- function-1 | function-2 | env
 function asn1SccPID_IsConstraintValid(val : asn1SccPID) return adaasn1rtl.ASN1_RESULT;
 
 function asn1SccPID_Init return asn1SccPID;

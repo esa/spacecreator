@@ -1,6 +1,6 @@
 all:
 	mkdir -p code
-	cd code && opengeode --toAda /home/taste/subtyping-projects-final/constrained_absent/work/function_2/SDL/src/function_2.pr 
+	cd code && opengeode --toAda /home/taste/spacecreator/tests/integrationtests/applications/tmc/subtyping_constraints/resources/constrained_absent/work/function_2/SDL/src/function_2.pr "../system_structure.pr"
 	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada dataview-uniq.asn code/function_2_datamodel.asn
 	cd code && gnat make function_2
 clean:

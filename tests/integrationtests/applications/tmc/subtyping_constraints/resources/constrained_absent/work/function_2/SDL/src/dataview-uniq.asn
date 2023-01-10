@@ -1,24 +1,9 @@
 CONSTRAINED-ABSENT-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10)
+ MyInteger ::= INTEGER (0 .. 4)
 
--- ASN.1 Type definitions must start with an uppercase
--- Field names in records (SEQUENCE) must start with a lowercase
--- Underscores are not allowed: use dash (hyphen) 
--- For integers do not assume that small ranges will be translated to small
--- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
--- for the range in Ada)
-
--- Simple types:
-
--- TASTE-Boolean ::= BOOLEAN
--- MyInteger   ::= INTEGER (0..255)
--- MyReal      ::= REAL (0.0 .. 1000.0)
--- MyBool      ::= BOOLEAN
  MyEnum      ::= ENUMERATED { hello, world, howareyou }
-
--- Complex types:
 
   MySeq       ::= SEQUENCE {
       inputdata   MyInteger,
@@ -32,11 +17,6 @@ BEGIN
   }
 
   MySeqOf     ::= SEQUENCE (SIZE (0..10)) OF MyEnum
---
---  MyOctStr    ::= OCTET STRING (SIZE (3))
---
---  -- You can also declare constants
---  myVar       MySeqOf     ::= { hello, world }
 
 END
 

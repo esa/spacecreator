@@ -45,11 +45,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
       Taste::Associated_Queue_Size   => 1;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::Interface_Priority      => 1;      
    };
    RI_PI_1 : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Function_2:: PI_PI_1.others {
       Taste::labelInheritance        => "true";
@@ -58,11 +58,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
       Taste::Associated_Queue_Size   => 1;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::Interface_Priority      => 1;      
    };
 PROPERTIES
    -- ignored property: name = Function_1
@@ -121,11 +121,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
       Taste::Associated_Queue_Size   => 1;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::Interface_Priority      => 1;      
    };
    RI_PI_2 : REQUIRES SUBPROGRAM ACCESS interfaceview::IV:: Function_1:: PI_PI_2.others {
       Taste::labelInheritance        => "true";
@@ -134,11 +134,11 @@ FEATURES
       -- Unrecognized property: enable_multicast => false      
       -- Unrecognized property: layer => default      
       -- Unrecognized property: required_system_element => NO      
+      Taste::Interface_Priority      => 1;      
+      Taste::Interface_Stack_Size    => 1024;      
       Taste::RCMperiod               => 0 ms;      
       Taste::Associated_Queue_Size   => 1;      
       Compute_Execution_Time => 0 ms .. 0 ms;      
-      Taste::Interface_Stack_Size    => 1024;      
-      Taste::Interface_Priority      => 1;      
    };
 PROPERTIES
    -- ignored property: name = Function_2
