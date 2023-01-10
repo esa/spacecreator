@@ -20,7 +20,7 @@ END
 BASIC-PRESENT-DATAVIEW DEFINITIONS ::=
 BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10)
+   MyInteger ::= INTEGER (0 .. 4)
 
 -- ASN.1 Type definitions must start with an uppercase
 -- Field names in records (SEQUENCE) must start with a lowercase
