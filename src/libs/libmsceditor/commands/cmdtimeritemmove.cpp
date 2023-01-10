@@ -25,9 +25,8 @@
 namespace msc {
 namespace cmd {
 
-CmdTimerItemMove::CmdTimerItemMove(
-        msc::MscTimer *timer, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager)
-    : EventMoveBaseCommand(timer, layoutManager)
+CmdTimerItemMove::CmdTimerItemMove(msc::MscTimer *timer, const ChartIndex &newChartIndex, MscChart *chart)
+    : EventMoveBaseCommand(timer, chart)
     , m_timer(timer)
     , m_newIndex(newChartIndex)
 {

@@ -24,7 +24,7 @@
 
 namespace msc {
 
-class ChartLayoutManager;
+class MscChart;
 class MscEntity;
 class MscInstanceEvent;
 
@@ -33,7 +33,7 @@ namespace cmd {
 class EventMoveBaseCommand : public ChartBaseCommand
 {
 public:
-    EventMoveBaseCommand(MscInstanceEvent *event, ChartLayoutManager *layoutManager, QUndoCommand *parent = nullptr);
+    EventMoveBaseCommand(MscInstanceEvent *event, MscChart *chart, QUndoCommand *parent = nullptr);
 
 protected:
     void storeGeometries();
@@ -44,7 +44,6 @@ protected:
     QPointer<MscInstanceEvent> m_event;
     QHash<MscEntity *, QString> m_eventGeometries;
     QString m_newCif;
-    QPointer<msc::ChartLayoutManager> m_layoutManager;
 };
 
 } // namespace cmd

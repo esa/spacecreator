@@ -705,8 +705,8 @@ void MessageItem::onManualGeometryChangeFinished(shared::ui::GripPoint *gp, cons
         indices.set(m_message->targetInstance(),
                 m_chartLayoutManager->eventInstanceIndex(head(), m_message->targetInstance(), m_message));
     }
-    undoStack->push(
-            new cmd::CmdMessagePointsEdit(m_message, oldPointsCif, newPointsCif, indices, m_chartLayoutManager));
+    undoStack->push(new cmd::CmdMessagePointsEdit(
+            m_message, oldPointsCif, newPointsCif, indices, m_chartLayoutManager->currentChart()));
     undoStack->endMacro();
 
     if (auto item = m_chartLayoutManager->itemForComment(m_message->comment())) {

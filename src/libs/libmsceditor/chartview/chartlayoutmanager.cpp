@@ -1594,12 +1594,16 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
 {
     updateLayout();
 
+    if (auto activeItem = qobject_cast<InteractiveObject *>(item)) {
+        activeItem->updateCif();
+    }
+
     if (auto actionItem = qobject_cast<ActionItem *>(item)) {
         MscAction *action = actionItem->modelItem();
         MscInstance *newInstance = nearestInstance(actionItem->sceneBoundingRect().center());
         const int newIdx = eventInstanceIndex(item->pos(), newInstance, action);
         ChartIndex newChartIdx(newInstance, newIdx);
-        d->m_undoStack->push(new cmd::CmdActionItemMove(actionItem->modelItem(), newChartIdx, this));
+        d->m_undoStack->push(new cmd::CmdActionItemMove(actionItem->modelItem(), newChartIdx, currentChart()));
         return;
     }
 
@@ -1611,7 +1615,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         }
         const int newIdx = eventInstanceIndex(item->pos(), newInstance, condition);
         ChartIndex newChartIdx(newInstance, newIdx);
-        d->m_undoStack->push(new cmd::CmdConditionItemMove(conditionItem->modelItem(), newChartIdx, this));
+        d->m_undoStack->push(new cmd::CmdConditionItemMove(conditionItem->modelItem(), newChartIdx, currentChart()));
         return;
     }
 
@@ -1621,7 +1625,7 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         MscInstance *newInstance = nearestInstance(QPointF(itemRect.left(), itemRect.center().y()));
         const int newIdx = eventInstanceIndex(item->pos(), newInstance, timer);
         ChartIndex newChartIdx(newInstance, newIdx);
-        d->m_undoStack->push(new cmd::CmdTimerItemMove(timerItem->modelItem(), newChartIdx, this));
+        d->m_undoStack->push(new cmd::CmdTimerItemMove(timerItem->modelItem(), newChartIdx, currentChart()));
         return;
     }
 
@@ -1631,7 +1635,8 @@ void ChartLayoutManager::onInstanceEventItemMoved(shared::ui::InteractiveObjectB
         MscCoregion *end = coregionItem->end();
         const int newIdxBegin = eventInstanceIndex(item->sceneBoundingRect().topLeft(), newInstance, begin);
         const int newIdxEnd = eventInstanceIndex(item->sceneBoundingRect().bottomLeft(), newInstance, end);
-        d->m_undoStack->push(new cmd::CmdCoRegionItemMove(begin, end, newIdxBegin, newIdxEnd, newInstance, this));
+        d->m_undoStack->push(
+                new cmd::CmdCoRegionItemMove(begin, end, newIdxBegin, newIdxEnd, newInstance, currentChart()));
         return;
     }
 }

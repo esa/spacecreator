@@ -33,7 +33,7 @@ namespace cmd {
 class CmdConditionItemMove : public EventMoveBaseCommand
 {
 public:
-    CmdConditionItemMove(MscCondition *condition, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager);
+    CmdConditionItemMove(MscCondition *condition, const ChartIndex &newChartIndex, MscChart *chart);
 
     void redo() override;
     void undo() override;

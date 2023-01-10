@@ -37,7 +37,7 @@ class CmdMessagePointsEdit : public EventMoveBaseCommand
 {
 public:
     CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld, const QVector<QPoint> &cifPointsNew,
-            ChartIndexList indices, ChartLayoutManager *layoutManager);
+            ChartIndexList indices, MscChart *chart);
 
     void redo() override;
     void undo() override;
@@ -46,8 +46,8 @@ public:
 
 private:
     QPointer<MscMessage> m_message;
-    QVector<QPoint> m_newCif;
-    const QVector<QPoint> m_oldCif;
+    QVector<QPoint> m_newCifData;
+    const QVector<QPoint> m_oldCifData;
     const ChartIndexList m_newIndexes;
     const ChartIndexList m_oldIndexes;
 };
