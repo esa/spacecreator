@@ -383,7 +383,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
             const QString componentTypeName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
             const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
             if (asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
-                // exist flag to 0, initialize value
+                // exist flag to 0, don't generate value
                 auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
                 auto assignment = Assignment(VariableRef(variableName), Expression(0));
                 sequence.appendElement(assignment);
@@ -392,10 +392,6 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
                     Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
                     asnSequenceComponentType->accept(visitor);
                 }
-
-                auto asnSequenceComponentInlineCall =
-                        generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
-                sequence.appendElement(std::move(asnSequenceComponentInlineCall));
             } else if (asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysPresent) {
                 // exist flag to 1, generate value
                 auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
