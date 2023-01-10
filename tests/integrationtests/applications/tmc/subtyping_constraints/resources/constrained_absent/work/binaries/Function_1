@@ -1,1 +1,0 @@
-cd function_1_GUI && cp -fu ../../function_1/GUI/src/* . && taste-gui

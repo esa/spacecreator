@@ -1,5 +1,0 @@
-C_ASN1_Types.c:253:5:Encode_NATIVE_MyChoice	48	static
-C_ASN1_Types.c:306:5:Decode_NATIVE_MyChoice	48	static
-C_ASN1_Types.c:457:5:Encode_NATIVE_MySeqOf	48	static
-C_ASN1_Types.c:510:5:Decode_NATIVE_MySeqOf	64	static
-C_ASN1_Types.c:517:1:_GLOBAL__sub_I_00099_0_Encode_NATIVE_MyChoice	16	static
