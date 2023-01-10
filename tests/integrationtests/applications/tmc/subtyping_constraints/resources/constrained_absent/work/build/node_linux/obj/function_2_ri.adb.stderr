@@ -1,4 +1,0 @@
-function_2_ri.ads:5:06: warning: no entities of "Taste_Basictypes" are referenced
-function_2_ri.ads:5:35: warning: use clause for package "TASTE_BasicTypes" has no effect
-function_2_ri.ads:13:27: warning: "Check_Queue.Res" is an 8-bit Ada Boolean
-function_2_ri.ads:13:27: warning: use appropriate corresponding type in C (e.g. char)
