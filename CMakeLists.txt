@@ -128,10 +128,6 @@ endif()
 
 # Installer data
 if(UNIX)
-# ASN1 compiler
-add_subdirectory(asn1scc)
-
-
 # Packaging
 set (CPACK_PACKAGE_NAME "${SC_NAME}")
 set (CPACK_PACKAGE_VENDOR "European Space Agency")
