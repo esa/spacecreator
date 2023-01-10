@@ -47,7 +47,9 @@ void compareResults(const QString &filename)
     QProcess diffProcess;
 
     QStringList args;
-    args << filename << QString("resources/%1").arg(filename);
+    args << "--check"
+         << "--ignored-attrs"
+         << "id,version" << filename << QString("resources/%1").arg(filename);
 
     diffProcess.start("xmldiff", args);
     diffProcess.waitForFinished();

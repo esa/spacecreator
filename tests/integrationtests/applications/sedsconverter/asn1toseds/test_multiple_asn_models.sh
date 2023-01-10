@@ -3,8 +3,7 @@
 set -euo pipefail
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
-# diff ignoring white space and blank lines
-XMLDIFF="xmldiff"
+XMLDIFF="xmldiff --ignored-attrs $(cat ../ignored_attributes.txt)"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"

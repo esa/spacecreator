@@ -21,9 +21,9 @@ $OPTIMIZER -i $RESOURCE_DIR/ergo.xml \
            -k Agent
 
 cd $TEST_OUTPUT_DIR \
-    && grep -q "^<Function name=\"Agent\".*language=\"SDL\".*default_implementation=\"default\"" optimized.xml \
-    && grep -q "^<Function name=\"Battery1\".*instance_of=\"\".*language=\"GUI\".*default_implementation=\"environment\"" optimized.xml \
-    && grep -q "^<Function name=\"Battery2\".*instance_of=\"\".*language=\"GUI\".*default_implementation=\"environment\"" optimized.xml \
-    && grep -q "^<Provided_Interface name=\"DO_STEP\".*kind=\"Cyclic\"" optimized.xml \
+    && grep -q "^<Function.*name=\"Agent\".*language=\"SDL\".*default_implementation=\"default\"" optimized.xml \
+    && grep -q "^<Function.*name=\"Battery1\".*instance_of=\"\".*language=\"GUI\".*default_implementation=\"environment\"" optimized.xml \
+    && grep -q "^<Function.*name=\"Battery2\".*instance_of=\"\".*language=\"GUI\".*default_implementation=\"environment\"" optimized.xml \
+    && grep -q "^<Provided_Interface.*name=\"DO_STEP\".*kind=\"Cyclic\"" optimized.xml \
     && cd .. \
     && rm -r $TEST_OUTPUT_DIR

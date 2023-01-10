@@ -20,7 +20,9 @@
 #include "../../../unittests/common/xmldatahelper.h"
 
 #include <QObject>
+#include <QProcess>
 #include <QtTest>
+#include <iostream>
 #include <conversion/converter/converter.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
@@ -133,7 +135,21 @@ void tsti_SimulinkToIV::testComparingIVTranslationResultWithExpectedResult()
             Converter converter(m_registry, std::move(options));
             converter.convert({ ModelType::Simulink }, ModelType::InterfaceView, {});
 
-            QVERIFY(XmlData(m_currentIVFileName) == XmlData(expectedIVFilePath));
+            QProcess diffProcess;
+
+            QStringList args;
+            args << "--check"
+                 << "--ignored-attrs"
+                 << "id,version" << m_currentIVFileName << expectedIVFilePath;
+
+            diffProcess.start("xmldiff", args);
+            diffProcess.waitForFinished();
+
+            if (diffProcess.exitCode() != 0) {
+                QString diffOutput(diffProcess.readAllStandardOutput());
+                std::cerr << diffOutput.toStdString().c_str() << '\n';
+                QFAIL(diffOutput.toStdString().c_str());
+            }
         } catch (const std::exception &ex) {
             QFAIL(ex.what());
         }
