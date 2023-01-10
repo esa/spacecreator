@@ -1,7 +1,0 @@
-demo_polyorb_interface.c:7:6:vm_function_1_pi_1	64	static
-demo_polyorb_interface.c:46:6:vm_function_2_pi_2	48	static
-demo_polyorb_interface.c:68:6:function_2_check_queue	32	static
-demo_polyorb_interface.c:83:6:call_function_1_pi_2	32	static
-demo_polyorb_interface.c:95:6:call_function_1_poll	32	static
-demo_polyorb_interface.c:107:6:call_function_2_pi_1	32	static
-demo_polyorb_interface.c:112:1:_GLOBAL__sub_I_00099_0_vm_function_1_pi_1	16	static
