@@ -383,23 +383,45 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
             const QString componentTypeName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
             const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
             if (asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
+                // exist flag to 0, initialize value
                 auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
                 auto assignment = Assignment(VariableRef(variableName), Expression(0));
                 sequence.appendElement(assignment);
+                if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
+                    auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+                    Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
+                    asnSequenceComponentType->accept(visitor);
+                }
+
+                auto asnSequenceComponentInlineCall =
+                        generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
+                sequence.appendElement(std::move(asnSequenceComponentInlineCall));
             } else if (asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysPresent) {
+                // exist flag to 1, generate value
                 auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
                 auto assignment = Assignment(VariableRef(variableName), Expression(1));
                 sequence.appendElement(assignment);
-            }
-            if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
-                auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
-                Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
-                asnSequenceComponentType->accept(visitor);
-            }
+                if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
+                    auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+                    Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
+                    asnSequenceComponentType->accept(visitor);
+                }
 
-            auto asnSequenceComponentInlineCall =
-                    generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
-            sequence.appendElement(std::move(asnSequenceComponentInlineCall));
+                auto asnSequenceComponentInlineCall =
+                        generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
+                sequence.appendElement(std::move(asnSequenceComponentInlineCall));
+            } else {
+                // no exist flag, generate value
+                if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
+                    auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+                    Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
+                    asnSequenceComponentType->accept(visitor);
+                }
+
+                auto asnSequenceComponentInlineCall =
+                        generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
+                sequence.appendElement(std::move(asnSequenceComponentInlineCall));
+            }
         }
     }
 
@@ -647,6 +669,11 @@ QString Asn1TypeValueGeneratorVisitor::getChoiceComponentTypeName(
     } else {
         return type.typeName();
     }
+}
+
+QString Asn1TypeValueGeneratorVisitor::getInlineInitName(const QString &typeName)
+{
+    return QString("%1_init_value").arg(Escaper::escapePromelaName(typeName));
 }
 
 QString Asn1TypeValueGeneratorVisitor::getInlineGeneratorName(const QString &typeName)

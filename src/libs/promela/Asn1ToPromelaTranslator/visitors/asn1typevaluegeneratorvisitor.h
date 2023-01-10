@@ -165,6 +165,7 @@ private:
             const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
     auto modelContainsInlineGenerator(const QString &inlineGeneratorName) -> bool;
     auto isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool;
+    auto getInlineInitName(const QString &typeName) -> QString;
     auto getInlineGeneratorName(const QString &typeName) -> QString;
     auto getInlineArgumentName() -> QString;
 
