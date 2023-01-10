@@ -17,7 +17,6 @@
 
 #include "commandlineparser.h"
 #include "msceditor.h"
-#include "msceditorcore.h"
 #include "msclibrary.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
@@ -45,8 +44,6 @@ int main(int argc, char *argv[])
         QFontDatabase::addApplicationFont(dirIt.next());
     a.setFont(QFont(QLatin1String("Ubuntu"), 10));
 
-    msc::MSCEditorCore plugin;
-
     shared::CommandLineParser cmdParser;
     cmdParser.handlePositional(shared::CommandLineParser::Positional::StartRemoteControl);
     cmdParser.process(a.arguments());
@@ -57,7 +54,7 @@ int main(int argc, char *argv[])
         port = 34622;
     }
 
-    msc::StreamingWindow window(&plugin);
+    msc::StreamingWindow window;
     if (!window.startRemoteControl(port)) {
         return -1;
     }

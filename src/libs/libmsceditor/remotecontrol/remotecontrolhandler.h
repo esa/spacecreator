@@ -27,6 +27,7 @@ class QUndoStack;
 
 namespace msc {
 
+class MscChart;
 class MscModel;
 class ChartLayoutManager;
 
@@ -39,6 +40,7 @@ public:
     void setMscModel(MscModel *model);
     void setUndoStack(QUndoStack *undoStack);
     void setLayoutManager(ChartLayoutManager *layoutManager);
+    void setChart(msc::MscChart *mscChart);
 
 public Q_SLOTS:
     void handleRemoteCommand(
@@ -62,6 +64,7 @@ private:
     QPointer<MscModel> m_mscModel;
     QPointer<ChartLayoutManager> m_layoutManager;
     QPointer<QUndoStack> m_undoStack;
+    QPointer<msc::MscChart> m_mscChart;
 };
 
 }
