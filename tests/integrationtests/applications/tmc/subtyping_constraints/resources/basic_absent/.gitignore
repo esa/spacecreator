@@ -23,15 +23,7 @@ work/function_2/SDL/src/*
 !work/function_2/SDL/src/function_2.pr
 !work/function_2/SDL/src/system_structure.pr
 !work/function_2/SDL/src/dataview-uniq.asn
-
-# Except function_1 source
-!work/function_1/
-work/function_1/*
-!work/actuator/GUI
-work/function_1/GUI/*
-!work/function_1/GUI/src
-work/function_1/GUI/src/*
-!work/function_1/GUI/src/function_1.c
+!work/function_2/SDL/src/function_2_datamodel.asn
 
 # Except modelchecking
 !work/modelchecking/

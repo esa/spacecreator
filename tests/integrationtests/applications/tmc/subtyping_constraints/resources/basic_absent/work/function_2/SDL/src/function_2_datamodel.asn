@@ -1,0 +1,18 @@
+Function-2-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   MyInteger, MySeq, MyChoice FROM BASIC-ABSENT-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID FROM System-Dataview;
+
+Function-2-States ::= ENUMERATED {wait, incorrect}
+
+Function-2-Context ::= SEQUENCE {
+   state Function-2-States,
+   init-done BOOLEAN,
+   myvar MySeq
+}
+
+Function-2-Mychoice-Selection  ::= ENUMERATED {a-present(1), b-present(2)}
+END
