@@ -237,4 +237,12 @@ QVector<MscInstanceEvent *> MscInstance::events() const
     return {};
 }
 
+/**
+ * Returns the chart this instance belongs to
+ */
+MscChart *MscInstance::chart() const
+{
+    return qobject_cast<MscChart *>(parent());
+}
+
 } // namespace msc

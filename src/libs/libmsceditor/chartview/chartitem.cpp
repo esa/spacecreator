@@ -20,7 +20,7 @@
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "colors/colormanager.h"
 #include "commands/cmdchartitemchangegeometry.h"
 #include "commands/cmdentitynamechange.h"
@@ -46,7 +46,7 @@ QPointF ChartItem::m_margin = { CHART_BOX_ARGIN, CHART_BOX_ARGIN };
  *
  * This class represents an entire chart. The contents with be children of this item
  */
-ChartItem::ChartItem(MscChart *chart, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+ChartItem::ChartItem(MscChart *chart, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : InteractiveObject(chart, chartLayoutManager, parent)
     , m_rectItem(new QGraphicsRectItem(this))
     , m_contentArea(new QGraphicsRectItem(this))
@@ -172,8 +172,7 @@ void ChartItem::onManualGeometryChangeFinished(shared::ui::GripPoint *, const QP
     if (!CoordinatesConverter::sceneToCif(chartBox, cifRectCurr))
         qWarning() << "ChartItem: Coordinates conversion (scene->mm) failed" << chartBox;
 
-    m_chartLayoutManager->undoStack()->push(
-            new cmd::CmdChartItemChangeGeometry(cifRectPrev, cifRectCurr, m_chartLayoutManager->currentChart()));
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdChartItemChangeGeometry(cifRectPrev, cifRectCurr, chart()));
     m_prevContentRect = QRectF();
 }
 

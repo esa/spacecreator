@@ -21,7 +21,7 @@
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "baseitems/objectslinkitem.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "cif/cifblockfactory.h"
 #include "cif/cifblocks.h"
 #include "cif/ciflines.h"
@@ -54,7 +54,7 @@
 namespace msc {
 
 InstanceItem::InstanceItem(
-        msc::MscInstance *instance, ChartLayoutManager *chartLayoutManager, MscChart *chart, QGraphicsItem *parent)
+        msc::MscInstance *instance, ChartLayoutManagerBase *chartLayoutManager, MscChart *chart, QGraphicsItem *parent)
     : InteractiveObject(instance, chartLayoutManager, parent)
     , m_instance(instance)
     , m_chart(chart)
@@ -92,7 +92,7 @@ InstanceItem::InstanceItem(
 
     if (m_chartLayoutManager) {
         updateSystemChecker(m_chartLayoutManager->systemChecker());
-        connect(m_chartLayoutManager, &ChartLayoutManager::systemCheckerChanged, this,
+        connect(m_chartLayoutManager, &ChartLayoutManagerBase::systemCheckerChanged, this,
                 &InstanceItem::updateSystemChecker);
     }
 
@@ -260,18 +260,18 @@ void InstanceItem::setGeometry(const QRectF &geometry)
  */
 QRectF InstanceItem::extendedSceneBoundingRect() const
 {
-    if (!m_instance || !m_instance->explicitStop() || !m_chartLayoutManager || !m_chartLayoutManager->chartItem()) {
+    if (!m_instance || !m_instance->explicitStop() || !m_chartLayoutManager || !m_chartLayoutManager->itemForChart()) {
         return sceneBoundingRect();
     }
 
-    const qreal chartbottom = m_chartLayoutManager->chartItem()->contentRect().bottom();
+    const qreal chartbottom = m_chartLayoutManager->itemForChart()->contentRect().bottom();
     QRectF box = sceneBoundingRect();
     box.setBottom(chartbottom);
     return box;
 }
 
 InstanceItem *InstanceItem::createDefaultItem(
-        ChartLayoutManager *model, MscInstance *instance, MscChart *chart, const QPointF &pos)
+        ChartLayoutManagerBase *model, MscInstance *instance, MscChart *chart, const QPointF &pos)
 {
     InstanceItem *instanceItem = new InstanceItem(instance, model, chart);
     instanceItem->setPos(pos);
@@ -456,7 +456,7 @@ void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &fr
 
         undoStack->beginMacro(QStringLiteral("Change Instance geometry"));
         if (!geometryManagedByCif() && m_chartLayoutManager) {
-            const QVector<MscInstance *> instances = m_chartLayoutManager->currentChart()->instances();
+            const QVector<MscInstance *> instances = m_instance->chart()->instances();
             const int oldIdx = instances.indexOf(m_instance);
             int newIdx = 0;
             for (MscInstance *instance : instances) {
@@ -469,8 +469,7 @@ void InstanceItem::onManualMoveFinish(shared::ui::GripPoint *, const QPointF &fr
             }
 
             if (oldIdx != newIdx) {
-                undoStack->push(
-                        new cmd::CmdChangeInstanceOrder(m_instance, newIdx, m_chartLayoutManager->currentChart()));
+                undoStack->push(new cmd::CmdChangeInstanceOrder(m_instance, newIdx, m_instance->chart()));
             }
         }
         undoStack->push(new cmd::CmdChangeInstancePosition(m_instance, points));

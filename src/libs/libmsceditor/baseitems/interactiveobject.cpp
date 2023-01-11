@@ -20,7 +20,7 @@
 
 #include "baseitems/textitem.h"
 #include "chartitem.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "mscentity.h"
 
 #include <QBrush>
@@ -32,7 +32,7 @@
 namespace msc {
 
 InteractiveObject::InteractiveObject(
-        msc::MscEntity *entity, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+        msc::MscEntity *entity, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : shared::ui::InteractiveObjectBase(parent)
     , m_entity(entity)
     , m_chartLayoutManager(chartLayoutManager)

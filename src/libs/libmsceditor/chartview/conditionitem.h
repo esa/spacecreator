@@ -34,7 +34,7 @@ class ConditionItem : public EventItem
 
 public:
     explicit ConditionItem(
-            MscCondition *condition, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
+            MscCondition *condition, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     MscCondition *modelItem() const;
 
@@ -43,7 +43,7 @@ public:
     QPainterPath shape() const override;
 
     static ConditionItem *createDefaultItem(
-            MscCondition *condition, ChartLayoutManager *chartLayoutManager, const QPointF &pos);
+            MscCondition *condition, ChartLayoutManagerBase *chartLayoutManager, const QPointF &pos);
 
     void applyCif() override;
     void updateCif() override;
