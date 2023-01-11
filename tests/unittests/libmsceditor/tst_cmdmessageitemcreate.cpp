@@ -86,7 +86,7 @@ void tst_CmdMessageItemCreate::testCreate()
 {
     for (int i = 0; i < CommandsCount; ++i) {
         auto message = new MscMessage(QString("M%").arg(i), m_instance, nullptr, nullptr);
-        auto cmd = new msc::cmd::CmdMessageItemCreate(message, { { m_instance, -1 } }, m_chartModel.data());
+        auto cmd = new msc::cmd::CmdMessageItemCreate(message, { { m_instance, -1 } }, m_chart);
         m_undoStack->push(cmd);
     }
 
@@ -137,7 +137,7 @@ void tst_CmdMessageItemCreate::testInsertingOrder()
 
     for (const QString &name : names) {
         auto cmd = new msc::cmd::CmdMessageItemCreate(
-                new msc::MscMessage(name, m_instance, nullptr, nullptr), { { m_instance, 0 } }, m_chartModel.data());
+                new msc::MscMessage(name, m_instance, nullptr, nullptr), { { m_instance, 0 } }, m_chart);
         m_undoStack->push(cmd);
     }
 

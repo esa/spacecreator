@@ -19,17 +19,14 @@
 #include "cmdconditionitemmove.h"
 
 #include "commandids.h"
-#include "conditionitem.h"
 #include "mscchart.h"
 #include "msccondition.h"
-#include "mscinstance.h"
 
 namespace msc {
 namespace cmd {
 
-CmdConditionItemMove::CmdConditionItemMove(
-        MscCondition *condition, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager)
-    : EventMoveBaseCommand(condition, layoutManager)
+CmdConditionItemMove::CmdConditionItemMove(MscCondition *condition, const ChartIndex &newChartIndex, MscChart *chart)
+    : EventMoveBaseCommand(condition, chart)
     , m_condition(condition)
     , m_newIndex(newChartIndex)
 {

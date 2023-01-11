@@ -25,7 +25,6 @@
 
 namespace msc {
 
-class ChartLayoutManager;
 class MscAction;
 class MscChart;
 class MscInstance;
@@ -35,7 +34,7 @@ namespace cmd {
 class CmdActionItemMove : public EventMoveBaseCommand
 {
 public:
-    CmdActionItemMove(msc::MscAction *action, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager);
+    CmdActionItemMove(msc::MscAction *action, const ChartIndex &newChartIndex, MscChart *chart);
 
     void redo() override;
     void undo() override;
