@@ -29,3 +29,7 @@ work/function_2/SDL/src/*
 
 # Except modelchecking
 !work/modelchecking/
+work/modelchecking/configurations/*
+
+.qtc_clangd/*
+t6/*
