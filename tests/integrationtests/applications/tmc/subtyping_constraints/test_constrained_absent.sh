@@ -29,5 +29,6 @@ cd $TEST_OUTPUT_DIR \
 	&& $CC -DVECTORSZ=65536 -o system.out pan.c \
 	&& ./system.out -E -n -a -e -c1 -m1000000 > system.output \
     && grep -q "errors: 0" system.output \
-    && cd ..
+    && cd .. \
+    && rm -r $TEST_OUTPUT_DIR
     
