@@ -3,7 +3,7 @@ MAKEFILE_PATH   := $(lastword $(MAKEFILE_LIST))
 TOOL_INST       := $(shell taste-config --prefix)
 OUTDIR          := $(dir $(MAKEFILE_PATH))
 TASTE_SHARED_TYPES?=${HOME}/.local/share/QtProject/QtCreator/shared_types
-ASN1_FILES      := ../constrained_absent.asn ${TOOL_INST}/share/taste-types/taste-types.asn dataview/system.asn
+ASN1_FILES      := ../constrained_absent.asn ${TOOL_INST}/share/taste-types/taste-types.asn system.asn
 CP_FILES        :=       # Context parameters
 DATAVIEW_PATH   := ${OUTDIR}/dataview
 DATAVIEW_UNIQ   := ${DATAVIEW_PATH}/dataview-uniq.asn
@@ -14,7 +14,7 @@ DATAVIEW_AADLV2 := ${DATAVIEW_PATH}/dataview_aadlv2.aadl
 
 # Project cache folder is used to speed up all ASN.1-related processing
 export PROJECT_CACHE=${HOME}/.taste_AST_cache
-
+export IV_FILE=$(shell readlink -f ../interfaceview.xml)
 
 
 # Extract the list of properties from the current model checking configuration

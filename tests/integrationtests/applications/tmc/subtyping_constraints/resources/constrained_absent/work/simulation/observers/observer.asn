@@ -4,13 +4,14 @@ BEGIN
 IMPORTS
    MyInteger, MyEnum, MySeq, MyChoice, MySeqOf FROM CONSTRAINED-ABSENT-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Function-2-States ::= ENUMERATED {incorrect, wait}
+Function-2-States ::= ENUMERATED {wait, incorrect}
 
 Function-2-Context ::= SEQUENCE {
    state Function-2-States,
    init-done BOOLEAN,
+   sender PID,
    myvar MySeqOf
 }
 
@@ -35,7 +36,7 @@ BEGIN
       b MySeq
   }
 
-  MySeqOf     ::= SEQUENCE (SIZE (0..10)) OF MyEnum
+  MySeqOf     ::= SEQUENCE (SIZE (0..3)) OF MyEnum
 
 END
 
@@ -65,13 +66,16 @@ END
 System-Dataview DEFINITIONS ::=
 BEGIN
 
--- List of functions (instances) present in the system
-PID ::= ENUMERATED {
-    function-1,
-    function-2,
-    
-    env
-}
+   -- Range of PID - type can be used to size arrays of PID type
+   PID-Range ::= INTEGER(0..2)
+
+   -- List of functions (instances) present in the system
+   PID ::= ENUMERATED {
+       function-1,
+       function-2,
+       
+       env
+   }
 
 END
 
