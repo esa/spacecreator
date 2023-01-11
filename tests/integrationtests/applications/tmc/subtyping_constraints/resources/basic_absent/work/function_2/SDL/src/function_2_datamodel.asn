@@ -11,6 +11,7 @@ Function-2-States ::= ENUMERATED {wait, incorrect}
 Function-2-Context ::= SEQUENCE {
    state Function-2-States,
    init-done BOOLEAN,
+   sender PID,
    myvar MySeq
 }
 

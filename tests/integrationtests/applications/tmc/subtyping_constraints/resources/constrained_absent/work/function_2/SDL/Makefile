@@ -1,4 +1,3 @@
-# SDL
 #Taste::Startup_Priority 1
 SEDS_CONVERTER?=spacecreator.AppImage --sedsconverter
 OPENGEODE?=opengeode
@@ -19,7 +18,7 @@ sdl-to-if:
 # Ada
 generate-code:
 	mkdir -p code && cd code && \
-	   $(OPENGEODE) --taste --toAda ../src/function_2.pr ../src/system_structure.pr && \
+	   $(OPENGEODE) --taste --simu --toAda ../src/function_2.pr ../src/system_structure.pr && \
 	   mv *.gpr ..
 
 compile-linux: generate-code
