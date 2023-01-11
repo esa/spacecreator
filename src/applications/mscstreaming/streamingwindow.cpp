@@ -20,7 +20,7 @@
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
 #include "geometry.h"
-#include "mainmodel.h"
+#include "msccommandsstack.h"
 #include "mscmodel.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
@@ -29,12 +29,17 @@
 #include <QApplication>
 #include <QDebug>
 #include <QScreen>
+#include <QUndoStack>
+#include <memory>
 
 namespace msc {
 
 struct StreamingWindow::StreamingWindowPrivate {
     explicit StreamingWindowPrivate()
         : ui(new Ui::StreamingWindow)
+        , m_dataModel(std::move(MscModel::defaultModel()))
+        , m_undoStack(new MscCommandsStack)
+        , m_layoutManager(new ChartLayoutManager(m_undoStack.get()))
     {
     }
 
@@ -42,7 +47,9 @@ struct StreamingWindow::StreamingWindowPrivate {
 
     Ui::StreamingWindow *ui = nullptr;
 
-    msc::MainModel m_mainModel;
+    std::unique_ptr<MscModel> m_dataModel;
+    std::unique_ptr<MscCommandsStack> m_undoStack;
+    std::unique_ptr<ChartLayoutManager> m_layoutManager;
 
     msc::RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     msc::RemoteControlHandler *m_remoteControlHandler = nullptr;
@@ -66,14 +73,15 @@ StreamingWindow::StreamingWindow(QWidget *parent)
     , d(new StreamingWindowPrivate)
 {
     d->ui->setupUi(this);
-    d->ui->graphicsView->setScene(d->m_mainModel.graphicsScene());
+    d->m_layoutManager->setCurrentChart(d->m_dataModel->firstChart());
+
+    d->ui->graphicsView->setScene(d->m_layoutManager->graphicsScene());
 
     static constexpr qreal padding = 120.;
     const QSizeF defaultSize(this->size() - QSizeF(padding, padding));
-    d->m_mainModel.chartViewModel().setPreferredChartBoxSize(defaultSize);
-    d->m_mainModel.initialModel();
+    d->m_layoutManager->setPreferredChartBoxSize(defaultSize);
 
-    connect(d->m_mainModel.graphicsScene(), &QGraphicsScene::sceneRectChanged, this,
+    connect(d->m_layoutManager->graphicsScene(), &QGraphicsScene::sceneRectChanged, this,
             &StreamingWindow::adaptWindowSizeToChart);
 }
 
@@ -89,10 +97,10 @@ bool StreamingWindow::startRemoteControl(quint16 port)
     if (!d->m_remoteControlWebServer) {
         d->m_remoteControlWebServer = new msc::RemoteControlWebServer(this);
         d->m_remoteControlHandler = new msc::RemoteControlHandler(this);
-        d->m_remoteControlHandler->setMscModel(d->m_mainModel.mscModel());
-        d->m_remoteControlHandler->setUndoStack(d->m_mainModel.undoStack());
-        d->m_remoteControlHandler->setLayoutManager(&(d->m_mainModel.chartViewModel()));
-        d->m_remoteControlHandler->setChart(d->m_mainModel.mscModel()->firstChart());
+        d->m_remoteControlHandler->setMscModel(d->m_dataModel.get());
+        d->m_remoteControlHandler->setUndoStack(d->m_undoStack->undoStack());
+        d->m_remoteControlHandler->setLayoutManager(d->m_layoutManager.get());
+        d->m_remoteControlHandler->setChart(d->m_dataModel->firstChart());
 
         connect(d->m_remoteControlWebServer, &msc::RemoteControlWebServer::executeCommand, d->m_remoteControlHandler,
                 &msc::RemoteControlHandler::handleRemoteCommand);
