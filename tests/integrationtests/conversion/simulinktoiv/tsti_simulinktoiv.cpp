@@ -22,13 +22,13 @@
 #include <QObject>
 #include <QProcess>
 #include <QtTest>
-#include <iostream>
 #include <conversion/converter/converter.h>
 #include <conversion/iv/IvOptions/options.h>
 #include <conversion/iv/IvRegistrar/registrar.h>
 #include <conversion/iv/SimulinkToIvTranslator/options.h>
 #include <conversion/registry/registry.h>
 #include <conversion/simulink/SimulinkRegistrar/registrar.h>
+#include <iostream>
 #include <simulink/SimulinkOptions/options.h>
 
 using conversion::Registry;
@@ -55,6 +55,8 @@ private:
 
     static const QString m_expectedIVFileSubPath;
     static const QString m_currentIVFileName;
+
+    static inline const QString m_ignoredAttrs = "id,version";
 
 private:
     Registry m_registry;
@@ -139,8 +141,7 @@ void tsti_SimulinkToIV::testComparingIVTranslationResultWithExpectedResult()
 
             QStringList args;
             args << "--check"
-                 << "--ignored-attrs"
-                 << "id,version" << m_currentIVFileName << expectedIVFilePath;
+                 << "--ignored-attrs" << m_ignoredAttrs << m_currentIVFileName << expectedIVFilePath;
 
             diffProcess.start("xmldiff", args);
             diffProcess.waitForFinished();

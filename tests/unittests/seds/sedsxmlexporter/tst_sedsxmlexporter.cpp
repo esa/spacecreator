@@ -40,16 +40,20 @@ private Q_SLOTS:
     void testExportsEnum();
     void testExportsFloat();
     void testExportsString();
+
+private:
+    void compareResults(const QString &filename);
+
+    static inline const QString m_ignoredAttrs = "id,version";
 };
 
-void compareResults(const QString &filename)
+void tst::SedsXmlExporter::compareResults(const QString &filename)
 {
     QProcess diffProcess;
 
     QStringList args;
     args << "--check"
-         << "--ignored-attrs"
-         << "id,version" << filename << QString("resources/%1").arg(filename);
+         << "--ignored-attrs" << m_ignoredAttrs << filename << QString("resources/%1").arg(filename);
 
     diffProcess.start("xmldiff", args);
     diffProcess.waitForFinished();
