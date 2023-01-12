@@ -61,53 +61,6 @@ using spintrail::model::UnhandledInputEvent;
 
 namespace simulatortrail::translator {
 
-namespace {
-void showPossibleSenders(const QMap<QString, QString> &data)
-{
-    qDebug() << "        possibleSenders ";
-    for (auto iter = data.begin(); iter != data.end(); ++iter) {
-        qDebug() << "            " << iter.key() << " " << iter.value();
-    }
-}
-
-void showObservers(const std::list<std::unique_ptr<IvToPromelaTranslator::ObserverInfo>> &data)
-{
-    qDebug() << "        observers ";
-    for (auto iter = data.begin(); iter != data.end(); ++iter) {
-        qDebug() << "            observerName " << (*iter)->m_observerName;
-        qDebug() << "            observerInterface " << (*iter)->m_observerInterface;
-        qDebug() << "            observerQueue " << (*iter)->m_observerQueue;
-    }
-}
-
-void showProctype(const QString &name, const IvToPromelaTranslator::ProctypeInfo &info, bool isEnv)
-{
-    if (isEnv) {
-        qDebug() << "    Environment proctype " << name;
-    } else {
-        qDebug() << "    Proctype " << name;
-    }
-    qDebug() << "        interfaceName " << info.m_interfaceName;
-    qDebug() << "        queueName " << info.m_queueName;
-    qDebug() << "        queueSize " << info.m_queueSize;
-    qDebug() << "        priority " << info.m_priority;
-    if (!info.m_parameterTypeName.isEmpty()) {
-        qDebug() << "        parameterName " << info.m_parameterName;
-        qDebug() << "        parameterType " << info.m_parameterTypeName;
-    }
-    qDebug() << "        isTimer " << info.m_isTimer;
-    showPossibleSenders(info.m_possibleSenders);
-    showObservers(info.m_observers);
-}
-
-void showEnvironmentProctype(const QString &name, const IvToPromelaTranslator::EnvProctypeInfo &info)
-{
-    qDebug() << "    Value generation proctype " << name;
-    qDebug() << "        interfaceName " << info.m_interfaceName;
-    qDebug() << "        priority " << info.m_priority;
-}
-}
-
 SpinTrailToSimulatorTrailTranslator::ChannelInfo::ChannelInfo()
     : m_parameterType(nullptr)
     , m_channelSize(0)
@@ -197,23 +150,6 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
     IvToPromelaTranslator translator;
 
     std::unique_ptr<IvToPromelaTranslator::SystemInfo> systemInfo = translator.prepareSystemInfo(ivModel, options);
-
-    qDebug() << "SystemInfo";
-    for (auto iter = systemInfo->m_functions.begin(); iter != systemInfo->m_functions.end(); ++iter) {
-        qDebug() << "Function " << iter->first << " env " << iter->second->m_isEnvironment;
-        for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
-                ++proctypeIter) {
-            showProctype(proctypeIter->first, *proctypeIter->second, false);
-        }
-        for (auto proctypeIter = iter->second->m_environmentSourceProctypes.begin();
-                proctypeIter != iter->second->m_environmentSourceProctypes.end(); ++proctypeIter) {
-            showEnvironmentProctype(proctypeIter->first, *proctypeIter->second);
-        }
-        for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
-                proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
-            showProctype(proctypeIter->first, *proctypeIter->second, true);
-        }
-    }
 
     QMap<QString, ChannelInfo> channels;
     QMap<QString, std::pair<ChannelInfo, bool>> observerChannels;

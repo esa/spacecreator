@@ -59,8 +59,11 @@ public:
     /** @brief Base priority for non-environment processes */
     inline static const QString processesBasePriority = "Promela_Convert_ProcessesBasePriority";
 
-    /** @brief  Filepath of the ASN.1 file containing subtypes */
+    /** @brief Filepath of the ASN.1 file containing subtypes */
     inline static const QString subtypesFilepath = "Promela_Convert_SubtypesFilepath";
+
+    /** @brief Generate promela code with support for multicast in source InterfaceView */
+    inline static const QString supportMulticast = "Promela_Convert_SupportMulticast";
 
     /**
      *  @brief Specification of an observer attachment

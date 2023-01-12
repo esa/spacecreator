@@ -75,6 +75,68 @@ using shared::VEObject;
 
 namespace promela::translator {
 
+namespace {
+void showPossibleSenders(const QMap<QString, QString> &data)
+{
+    qDebug() << "        possibleSenders ";
+    for (auto iter = data.begin(); iter != data.end(); ++iter) {
+        qDebug() << "            " << iter.key() << " " << iter.value();
+    }
+}
+
+void showObservers(const std::list<std::unique_ptr<IvToPromelaTranslator::ObserverInfo>> &data)
+{
+    qDebug() << "        observers ";
+    for (auto iter = data.begin(); iter != data.end(); ++iter) {
+        qDebug() << "            observerName " << (*iter)->m_observerName;
+        qDebug() << "            observerInterface " << (*iter)->m_observerInterface;
+        qDebug() << "            observerQueue " << (*iter)->m_observerQueue;
+    }
+}
+
+void showProctype(const QString &name, const IvToPromelaTranslator::ProctypeInfo &info, bool isEnv)
+{
+    if (isEnv) {
+        qDebug() << "    Environment proctype " << name;
+    } else {
+        qDebug() << "    Proctype " << name;
+    }
+    qDebug() << "        interfaceName " << info.m_interfaceName;
+    qDebug() << "        queueName " << info.m_queueName;
+    qDebug() << "        queueSize " << info.m_queueSize;
+    qDebug() << "        priority " << info.m_priority;
+    if (!info.m_parameterTypeName.isEmpty()) {
+        qDebug() << "        parameterName " << info.m_parameterName;
+        qDebug() << "        parameterType " << info.m_parameterTypeName;
+    }
+    qDebug() << "        isTimer " << info.m_isTimer;
+    showPossibleSenders(info.m_possibleSenders);
+    showObservers(info.m_observers);
+}
+
+void showEnvironmentProctype(const QString &name, const IvToPromelaTranslator::EnvProctypeInfo &info)
+{
+    qDebug() << "    Value generation proctype " << name;
+    qDebug() << "        interfaceName " << info.m_interfaceName;
+    qDebug() << "        priority " << info.m_priority;
+}
+
+void showSynchronousCallInfo(const QString &name, const IvToPromelaTranslator::SynchronousCallInfo &info)
+{
+    qDebug() << "    Synchronous call " << name;
+    qDebug() << "        target functions";
+    for (const auto &target : info.m_targets) {
+        qDebug() << "            " << target.m_targetFunctionName << " " << target.m_providedInlineName << " (env "
+                 << target.m_isEnvironment << ")";
+    }
+    qDebug() << "        protected " << info.m_isProtected;
+    for (const auto &param : info.m_parameters) {
+        qDebug() << "            " << param.m_parameterName << " " << param.m_parameterType << "  (output "
+                 << param.m_isOutput << ")";
+    }
+}
+}
+
 IvToPromelaTranslator::ObserverAttachment::Kind IvToPromelaTranslator::ObserverAttachment::stringToKind(
         const QString &kind)
 {
@@ -182,6 +244,7 @@ IvToPromelaTranslator::Context::Context(model::PromelaSystemModel *promelaModel,
     , m_modelFunctions(modelFunctions)
     , m_observerNames(observerNames)
     , m_baseProctypePriority(0)
+    , m_supportMulticast(options.isSet(PromelaOptions::supportMulticast))
 {
 }
 
@@ -333,6 +396,11 @@ uint32_t IvToPromelaTranslator::Context::getBaseProctypePriority() const
     return m_baseProctypePriority;
 }
 
+bool IvToPromelaTranslator::Context::isMulticastSupported() const
+{
+    return m_supportMulticast;
+}
+
 const std::vector<QString> &IvToPromelaTranslator::Context::getObserversWithContinuousSignals() const
 {
     return m_observersWithContinuousSignals;
@@ -372,6 +440,27 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     }
 
     std::unique_ptr<SystemInfo> systemInfo = prepareSystemInfo(ivModel, options);
+
+    qDebug() << "SystemInfo";
+    for (auto iter = systemInfo->m_functions.begin(); iter != systemInfo->m_functions.end(); ++iter) {
+        qDebug() << "Function " << iter->first << " env " << iter->second->m_isEnvironment;
+        for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
+                ++proctypeIter) {
+            showProctype(proctypeIter->first, *proctypeIter->second, false);
+        }
+        for (auto proctypeIter = iter->second->m_environmentSourceProctypes.begin();
+                proctypeIter != iter->second->m_environmentSourceProctypes.end(); ++proctypeIter) {
+            showEnvironmentProctype(proctypeIter->first, *proctypeIter->second);
+        }
+        for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
+                proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
+            showProctype(proctypeIter->first, *proctypeIter->second, true);
+        }
+        for (auto synchronousCallIter = iter->second->m_synchronousCalls.begin();
+                synchronousCallIter != iter->second->m_synchronousCalls.end(); ++synchronousCallIter) {
+            showSynchronousCallInfo(synchronousCallIter->first, *synchronousCallIter->second);
+        }
+    }
 
     promelaModel->addInclude("dataview.pml");
 
@@ -914,12 +1003,7 @@ void IvToPromelaTranslator::createPromelaObjectsForFunction(IvToPromelaTranslato
     }
 
     for (auto iter = functionInfo.m_synchronousCalls.begin(); iter != functionInfo.m_synchronousCalls.end(); ++iter) {
-        createPromelaObjectsForSyncRis(context, *iter->second);
-    }
-
-    for (auto iter = functionInfo.m_environmentSynchronousCalls.begin();
-            iter != functionInfo.m_environmentSynchronousCalls.end(); ++iter) {
-        createPromelaObjectsForEnvironmentSyncRis(context, *iter->second);
+        createPromelaObjectsForSyncRis(context, functionName, *iter->second);
     }
 
     createCheckQueueInline(context.model(), functionName, channelNames);
@@ -967,57 +1051,46 @@ void IvToPromelaTranslator::createPromelaObjectsForAsyncPis(IvToPromelaTranslato
     generateProctype(context, functionName, false, proctypeInfo);
 }
 
-void IvToPromelaTranslator::createPromelaObjectsForSyncRis(Context &context, const SynchronousCallInfo &info) const
+void IvToPromelaTranslator::createPromelaObjectsForSyncRis(
+        Context &context, const QString &functionName, const SynchronousCallInfo &info) const
 {
-    Sequence sequence(Sequence::Type::NORMAL);
-
     QList<QString> arguments;
     QList<InlineCall::Argument> callArguments;
-
-    for (const QString &param : info.m_parameters) {
-        arguments.append(param);
-        callArguments.append(param);
+    for (const SynchronousCallInfo::ParameterInfo &parameterInfo : info.m_parameters) {
+        arguments.append(parameterInfo.m_parameterName);
+        callArguments.append(parameterInfo.m_parameterName);
     }
 
-    if (info.m_isProtected) {
-        sequence.appendElement(createLockAcquireStatement(info.m_targetFunctionName));
-    }
+    Sequence sequence(Sequence::Type::NORMAL);
 
-    sequence.appendElement(InlineCall(info.m_providedInlineName, callArguments));
+    for (const SynchronousCallInfo::TargetInfo &targetInfo : info.m_targets) {
+        if (targetInfo.m_isEnvironment) {
+            for (const SynchronousCallInfo::ParameterInfo &parameterInfo : info.m_parameters) {
+                if (!parameterInfo.m_isOutput) {
+                    continue;
+                }
+                const auto parameterSubtype =
+                        handleParameterSubtype(context, Escaper::escapePromelaName(parameterInfo.m_parameterType),
+                                parameterInfo.m_parameterName, info.m_interfaceName, functionName);
 
-    if (info.m_isProtected) {
-        sequence.appendElement(createLockReleaseStatement(info.m_targetFunctionName));
+                const auto generateValueInlineName = QString("%1_generate_value").arg(parameterSubtype);
+                const QList<InlineCall::Argument> generateValueInlineArgs({ parameterInfo.m_parameterName });
+                InlineCall generateValueInlineCall(generateValueInlineName, generateValueInlineArgs);
+                sequence.appendElement(std::move(generateValueInlineCall));
+            }
+        } else {
+            if (info.m_isProtected) {
+                sequence.appendElement(createLockAcquireStatement(targetInfo.m_targetFunctionName));
+            }
+            sequence.appendElement(InlineCall(targetInfo.m_providedInlineName, callArguments));
+
+            if (info.m_isProtected) {
+                sequence.appendElement(createLockReleaseStatement(targetInfo.m_targetFunctionName));
+            }
+        }
     }
 
     std::unique_ptr<InlineDef> inlineDef = std::make_unique<InlineDef>(info.m_name, arguments, std::move(sequence));
-    context.model()->addInlineDef(std::move(inlineDef));
-}
-
-void IvToPromelaTranslator::createPromelaObjectsForEnvironmentSyncRis(
-        Context &context, const EnvSynchronousCallInfo &info) const
-{
-    Sequence sequence(Sequence::Type::NORMAL);
-
-    QList<QString> arguments;
-    for (const EnvSynchronousCallInfo::ParameterInfo &parameterInfo : info.m_parameters) {
-
-        arguments.append(parameterInfo.m_parameterName);
-
-        if (!parameterInfo.m_generateValue) {
-            continue;
-        }
-
-        const auto parameterSubtype =
-                handleParameterSubtype(context, Escaper::escapePromelaName(parameterInfo.m_parameterType),
-                        parameterInfo.m_parameterName, info.m_interfaceName, info.m_functionName);
-
-        const auto generateValueInlineName = QString("%1_generate_value").arg(parameterSubtype);
-        const QList<InlineCall::Argument> generateValueInlineArgs({ parameterInfo.m_parameterName });
-        InlineCall generateValueInlineCall(generateValueInlineName, generateValueInlineArgs);
-        sequence.appendElement(std::move(generateValueInlineCall));
-    }
-
-    auto inlineDef = std::make_unique<InlineDef>(info.m_name, arguments, std::move(sequence));
     context.model()->addInlineDef(std::move(inlineDef));
 }
 
@@ -1780,10 +1853,26 @@ std::unique_ptr<IvToPromelaTranslator::ProctypeInfo> IvToPromelaTranslator::prep
 
     std::unique_ptr<ProctypeInfo> proctypeInfo = std::make_unique<ProctypeInfo>();
 
-    const IVConnection *connection = context.ivModel()->getConnectionForIface(providedInterface->id());
-    const IVInterface *requiredInterface = connection->sourceInterface();
-    const QString sourceFunctionName = requiredInterface->function()->property("name").toString();
-    const QString sourceInterfaceName = requiredInterface->property("name").toString();
+    const QVector<IVConnection *> connections = context.ivModel()->getConnectionsForIface(providedInterface->id());
+
+    if (connections.empty()) {
+        auto message = QString("No connections to interface %1 in function %2")
+                               .arg(getInterfaceName(providedInterface))
+                               .arg(functionName);
+        throw TranslationException(message);
+    }
+
+    if (!context.isMulticastSupported() && connections.size() > 1) {
+        auto message = QString("Support for multicast is disabled.");
+        throw TranslationException(message);
+    }
+
+    for (const IVConnection *connection : connections) {
+        const IVInterface *requiredInterface = connection->sourceInterface();
+        const QString sourceFunctionName = requiredInterface->function()->property("name").toString();
+        const QString sourceInterfaceName = getInterfaceName(requiredInterface);
+        proctypeInfo->m_possibleSenders.insert(sourceFunctionName, sourceInterfaceName);
+    }
 
     proctypeInfo->m_proctypeName = proctypeName;
     proctypeInfo->m_interfaceName = interfaceName;
@@ -1791,7 +1880,6 @@ std::unique_ptr<IvToPromelaTranslator::ProctypeInfo> IvToPromelaTranslator::prep
     proctypeInfo->m_priority = priority;
     proctypeInfo->m_parameterTypeName = parameterType;
     proctypeInfo->m_parameterName = parameterName;
-    proctypeInfo->m_possibleSenders.insert(sourceFunctionName, sourceInterfaceName);
     proctypeInfo->m_isTimer = false;
 
     QString currentQueueName = constructChannelName(functionName, interfaceName);
@@ -1833,58 +1921,61 @@ std::unique_ptr<IvToPromelaTranslator::EnvProctypeInfo> IvToPromelaTranslator::p
 void IvToPromelaTranslator::prepareSynchronousCallInfo(Context &context, const QString &functionName,
         const ivm::IVInterface *requiredInterface, FunctionInfo &functionInfo) const
 {
-    const IVInterface *sourceInterface =
-            findProvidedInterface(context.ivModel(), functionName, requiredInterface->title());
+    std::unique_ptr<SynchronousCallInfo> info = std::make_unique<SynchronousCallInfo>();
+    QString inlineName =
+            QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
+    info->m_name = inlineName;
+    info->m_interfaceName = getInterfaceName(requiredInterface);
 
-    const QString targetFunctionName = getInterfaceFunctionName(sourceInterface);
-    const QString targetInterfaceName = getInterfaceName(sourceInterface);
+    const QString parameterNamePrefix =
+            QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
+    for (const InterfaceParameter &interfaceParam : requiredInterface->params()) {
+        SynchronousCallInfo::ParameterInfo parameterInfo;
+        parameterInfo.m_parameterType = interfaceParam.paramTypeName();
+        parameterInfo.m_parameterName = QString("%1_%2").arg(parameterNamePrefix).arg(interfaceParam.name());
 
-    if (std::find_if(context.modelFunctions().begin(), context.modelFunctions().end(),
-                [targetFunctionName](const QString &function) {
-                    return function.compare(targetFunctionName, Qt::CaseInsensitive) == 0;
-                })
-            == context.modelFunctions().end()) {
-        std::unique_ptr<EnvSynchronousCallInfo> info = std::make_unique<EnvSynchronousCallInfo>();
+        parameterInfo.m_isOutput = interfaceParam.isOutDirection();
 
-        QString inlineName =
-                QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
-
-        info->m_name = inlineName;
-        info->m_functionName = functionName;
-        info->m_interfaceName = requiredInterface->title();
-
-        const QString parameterNamePrefix =
-                QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
-        for (const InterfaceParameter &interfaceParam : requiredInterface->params()) {
-            EnvSynchronousCallInfo::ParameterInfo parameterInfo;
-            parameterInfo.m_parameterType = interfaceParam.paramTypeName();
-            parameterInfo.m_parameterName = QString("%1_%2").arg(parameterNamePrefix).arg(interfaceParam.name());
-
-            parameterInfo.m_generateValue = interfaceParam.isOutDirection();
-
-            info->m_parameters.append(parameterInfo);
-        }
-
-        functionInfo.m_environmentSynchronousCalls.emplace(inlineName, std::move(info));
-    } else {
-        std::unique_ptr<SynchronousCallInfo> info = std::make_unique<SynchronousCallInfo>();
-        QString inlineName =
-                QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
-
-        info->m_name = inlineName;
-
-        info->m_providedInlineName =
-                QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(targetInterfaceName);
-        info->m_targetFunctionName = targetFunctionName;
-        info->m_isProtected = requiredInterface->kind() == IVInterface::OperationKind::Protected;
-
-        const QString parameterNamePrefix =
-                QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
-        for (const InterfaceParameter &param : requiredInterface->params()) {
-            info->m_parameters.append(QString("%1_%2").arg(parameterNamePrefix).arg(param.name()));
-        }
-
-        functionInfo.m_synchronousCalls.emplace(inlineName, std::move(info));
+        info->m_parameters.append(parameterInfo);
     }
+
+    info->m_isProtected = requiredInterface->kind() == IVInterface::OperationKind::Protected;
+
+    const QVector<IVConnection *> connections = context.ivModel()->getConnectionsForIface(requiredInterface->id());
+
+    if (connections.empty()) {
+        auto message = QString("No connections from interface %1 in function %2")
+                               .arg(getInterfaceName(requiredInterface))
+                               .arg(functionName);
+        throw TranslationException(message);
+    }
+
+    if (!context.isMulticastSupported() && connections.size() > 1) {
+        auto message = QString("Support for multicast is disabled.");
+        throw TranslationException(message);
+    }
+
+    for (const IVConnection *connection : connections) {
+        const IVInterface *sourceInterface = connection->targetInterface();
+        const QString targetFunctionName = getInterfaceFunctionName(sourceInterface);
+
+        SynchronousCallInfo::TargetInfo targetInfo;
+        targetInfo.m_targetFunctionName = targetFunctionName;
+
+        if (std::find_if(context.modelFunctions().begin(), context.modelFunctions().end(),
+                    [targetFunctionName](const QString &function) {
+                        return function.compare(targetFunctionName, Qt::CaseInsensitive) == 0;
+                    })
+                == context.modelFunctions().end()) {
+            targetInfo.m_isEnvironment = true;
+            targetInfo.m_providedInlineName = QString();
+        } else {
+            const QString targetInterfaceName = getInterfaceName(sourceInterface);
+            targetInfo.m_providedInlineName =
+                    QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(targetInterfaceName);
+        }
+    }
+
+    functionInfo.m_synchronousCalls.emplace(inlineName, std::move(info));
 }
 }
