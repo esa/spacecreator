@@ -151,45 +151,6 @@ void SpaceCreatorPlugin::addHelp()
     actions->addAction(showIveHelp);
 }
 
-QDir parentDir(const QDir &dir)
-{
-    QDir parentdir(dir.filePath(QStringLiteral("..")));
-    return parentdir;
-}
-
-QDir findAppImageDir()
-{
-    QDir binDir = QDir(QCoreApplication::applicationDirPath());
-    QDir appImageDir = parentDir(binDir);
-    return appImageDir;
-}
-
-QString findInitFileForTasteLanguageClients()
-{
-    QDir appImageDir = findAppImageDir();
-    QString iniFilePath = appImageDir.filePath("TasteLanguageClients.ini");
-    QFileInfo iniFileInfo(iniFilePath);
-    QString result = iniFileInfo.canonicalFilePath();
-    if (result.isEmpty())
-    {
-        qWarning() << "Could not find" << QDir::cleanPath(iniFilePath);
-    }
-    return result;
-}
-
-bool ignoreTasteLanguageClients()
-{
-    const QString IGNORETASTELANUAGECLIENTS = "IgnoreTasteLanuageClients";
-    QSettings qSettings;
-    qSettings.beginGroup("TasteLanguageClients");
-    bool ignore = qSettings.value(IGNORETASTELANUAGECLIENTS, false).toBool();
-    if (ignore == false)
-    {
-        qSettings.setValue(IGNORETASTELANUAGECLIENTS, true);
-    }
-    return ignore;
-}
-
 void SpaceCreatorPlugin::setupTasteLanguageClients()
 {
     if (ignoreTasteLanguageClients())
@@ -221,8 +182,45 @@ void SpaceCreatorPlugin::setupTasteLanguageClients()
         LanguageClient::LanguageClientManager::enableClientSettings(stdIOSettings->m_id, stdIOSettings->m_enabled);
     }
     qSettings.endArray();
+}
 
+bool SpaceCreatorPlugin::ignoreTasteLanguageClients() const
+{
+    const QString IGNORETASTELANUAGECLIENTS = "IgnoreTasteLanuageClients";
+    QSettings qSettings;
+    qSettings.beginGroup("TasteLanguageClients");
+    bool ignore = qSettings.value(IGNORETASTELANUAGECLIENTS, false).toBool();
+    if (ignore == false)
+    {
+        qSettings.setValue(IGNORETASTELANUAGECLIENTS, true);
+    }
+    return ignore;
+}
 
+QString SpaceCreatorPlugin::findInitFileForTasteLanguageClients() const
+{
+    QDir appImageDir = findAppImageDir();
+    QString iniFilePath = appImageDir.filePath("TasteLanguageClients.ini");
+    QFileInfo iniFileInfo(iniFilePath);
+    QString result = iniFileInfo.canonicalFilePath();
+    if (result.isEmpty())
+    {
+        qWarning() << "Could not find" << QDir::cleanPath(iniFilePath);
+    }
+    return result;
+}
+
+QDir SpaceCreatorPlugin::findAppImageDir() const
+{
+    QDir binDir = QDir(QCoreApplication::applicationDirPath());
+    QDir appImageDir = parentDir(binDir);
+    return appImageDir;
+}
+
+QDir SpaceCreatorPlugin::parentDir(const QDir &dir) const
+{
+    QDir parentdir(dir.filePath(QStringLiteral("..")));
+    return parentdir;
 }
 
 }
