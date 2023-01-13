@@ -212,15 +212,9 @@ QString SpaceCreatorPlugin::findInitFileForTasteLanguageClients() const
 
 QDir SpaceCreatorPlugin::findAppImageDir() const
 {
-    QDir binDir = QDir(QCoreApplication::applicationDirPath());
-    QDir appImageDir = parentDir(binDir);
-    return appImageDir;
-}
-
-QDir SpaceCreatorPlugin::parentDir(const QDir &dir) const
-{
-    QDir parentdir(dir.filePath(QStringLiteral("..")));
-    return parentdir;
+    QDir dir = QDir(QCoreApplication::applicationDirPath());
+    dir.cdUp(); // dir is now the AppImageDir - the parent of the bin dir
+    return dir;
 }
 
 }

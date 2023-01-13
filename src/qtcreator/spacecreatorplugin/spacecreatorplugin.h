@@ -72,7 +72,6 @@ public:
 private:
     void addHelp();
     void setupTasteLanguageClients();
-    QDir parentDir(const QDir &dir) const;
     QDir findAppImageDir() const;
     QString findInitFileForTasteLanguageClients() const;
     bool ignoreTasteLanguageClients() const;
