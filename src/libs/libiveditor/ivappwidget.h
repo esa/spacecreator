@@ -68,6 +68,7 @@ private Q_SLOTS:
     void pasteItems();
     void pasteItems(const QPointF &sceneDropPoint);
     void showPropertyEditor(const shared::Id &id);
+    void showEditAttributesDialog();
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
@@ -93,6 +94,7 @@ private:
     QAction *m_actCreateConnectionGroup { nullptr };
     QAction *m_actUngroupConnection { nullptr };
     QAction *m_actDeleteConnectionGroup { nullptr };
+    QAction *m_actEditAttributes { nullptr };
     QAction *m_actRemove { nullptr };
     QAction *m_actZoomIn { nullptr };
     QAction *m_actZoomOut { nullptr };

@@ -32,6 +32,8 @@
 #include "itemeditor/ivitemmodel.h"
 #include "ivconnectionlayertype.h"
 #include "ivcreatortool.h"
+#include "iveditattributesdialog.h"
+#include "iveditattributesmodel.h"
 #include "iveditorcore.h"
 #include "ivexporter.h"
 #include "ivnamevalidator.h"
@@ -292,6 +294,14 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
             m_document->layersModel(), m_document->archetypesModel(), m_document->ivCheck(), m_document->asn1Check(),
             m_document->commandsStack(), graphicsView());
     dialog.init();
+    dialog.exec();
+}
+
+void IVAppWidget::showEditAttributesDialog()
+{
+    IVEditAttributesModel functionsModel(m_document->objectsModel(), IVEditAttributesModel::Function);
+    IVEditAttributesModel interfacesModel(m_document->objectsModel(), IVEditAttributesModel::Interface);
+    IVEditAttributesDialog dialog(&functionsModel, &interfacesModel, graphicsView());
     dialog.exec();
 }
 
@@ -617,6 +627,12 @@ QVector<QAction *> IVAppWidget::initActions()
     connect(m_actUngroupConnection, &QAction::triggered, this, [this]() { m_tool->ungroupConnectedItems(); });
     m_actUngroupConnection->setIcon(QIcon(":/toolbar/icns/ungroup_connections.svg"));
 
+    m_actEditAttributes = new QAction(tr("Edit Attributes"));
+    ActionsManager::registerAction(Q_FUNC_INFO, m_actEditAttributes, "Edit", "Edit Attributes");
+    m_actCreateConnectionGroup->setActionGroup(actionGroup);
+    m_actEditAttributes->setIcon(QIcon(QLatin1String(":/toolbar/icns/edit.svg")));
+    connect(m_actEditAttributes, &QAction::triggered, this, [this]() { showEditAttributesDialog(); });
+
     m_actRemove = new QAction(tr("Remove"));
     ActionsManager::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
     m_actRemove->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
@@ -679,7 +695,7 @@ QVector<QAction *> IVAppWidget::initActions()
 
     m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
         actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup,
-        m_actUngroupConnection, m_actRemove, m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent,
+        m_actUngroupConnection, m_actEditAttributes, m_actRemove, m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent,
         m_actEnterNestedView, m_actShrinkScene };
 
     connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, &IVAppWidget::onRootObjectChanged);

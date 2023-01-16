@@ -168,6 +168,10 @@ target_sources(${LIB_NAME} PRIVATE
     ivconnectiongroupmodel.h
     ivcreatortool.cpp
     ivcreatortool.h
+    iveditattributesdialog.cpp
+    iveditattributesdialog.h
+    iveditattributesmodel.cpp
+    iveditattributesmodel.h
     iveditor.cpp
     iveditor.h
     iveditorcore.cpp
