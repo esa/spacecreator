@@ -20,7 +20,7 @@
 #include "asn1editor.h"
 #include "asn1systemchecks.h"
 #include "asn1valueparser.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
@@ -54,7 +54,7 @@
    But the parameters a only checked after editing using the msc parser, as the parameters can be
    quite complex. See paramaterDefn in the msc.g4 grammar file.
  */
-MessageDialog::MessageDialog(msc::MscMessage *message, msc::ChartLayoutManager *charlayoutManager, QWidget *parent)
+MessageDialog::MessageDialog(msc::MscMessage *message, msc::ChartLayoutManagerBase *charlayoutManager, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MessageDialog)
     , m_message(message)

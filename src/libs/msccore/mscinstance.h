@@ -26,6 +26,8 @@
 
 namespace msc {
 
+class MscChart;
+
 class MscInstance : public MscEntity
 {
     Q_OBJECT
@@ -69,6 +71,8 @@ public:
     QVector<QPoint> cifGeometry() const;
 
     QVector<MscInstanceEvent *> events() const;
+
+    MscChart *chart() const;
 
 Q_SIGNALS:
     void denominatorChanged(const QString &denominator);

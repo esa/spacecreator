@@ -402,7 +402,7 @@ if __name__ == '__main__':
     print('prebuild.py: qt_version was {}. Building with qt6 is {}'.format(qt_version, is_qt6))
     print("prebuild.py: qtcreator_version is {}".format(qtcreator_version))
 
-    check_cmake_version(3, 16, 0)
+    check_cmake_version(3, 18, 0)
 
     # Ensure dirs
     ensure_dir(paths.env_dir)
@@ -435,7 +435,7 @@ if __name__ == '__main__':
     download_asn1scc(env_dir)
 
     download_asn_fuzzer(env_dir, app_dir)
-    download_pus_c(env_dir,app_dir )
+    download_pus_c(env_dir, app_dir)
 
     # AppImage files SpaceCreator.desktop and AppRun
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)

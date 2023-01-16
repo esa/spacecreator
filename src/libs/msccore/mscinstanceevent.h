@@ -23,6 +23,7 @@
 
 namespace msc {
 
+class MscChart;
 class MscInstance;
 
 class MscInstanceEvent : public MscEntity
@@ -35,6 +36,8 @@ public:
     ~MscInstanceEvent() override;
 
     virtual bool relatesTo(const MscInstance *instance) const = 0;
+
+    MscChart *chart() const;
 
 Q_SIGNALS:
     void instanceRelationChanged(msc::MscInstance *addedInstance, msc::MscInstance *removedInstance);

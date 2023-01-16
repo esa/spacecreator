@@ -19,7 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
 #include "colors/colormanager.h"
@@ -66,7 +66,7 @@ protected:
     }
 };
 
-ConditionItem::ConditionItem(MscCondition *condition, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+ConditionItem::ConditionItem(MscCondition *condition, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(condition, chartLayoutManager, parent)
     , m_condition(condition)
     , m_polygonItem(new QGraphicsPolygonItem(this))
@@ -126,7 +126,7 @@ void ConditionItem::setInstancesRect(const QRectF &instancesRect)
 }
 
 ConditionItem *ConditionItem::createDefaultItem(
-        MscCondition *condition, ChartLayoutManager *chartLayoutManager, const QPointF &pos)
+        MscCondition *condition, ChartLayoutManagerBase *chartLayoutManager, const QPointF &pos)
 {
     ConditionItem *item = new ConditionItem(condition, chartLayoutManager);
     item->setPos(pos);

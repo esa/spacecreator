@@ -19,7 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "chartview/mscchartviewconstants.h"
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
@@ -72,7 +72,7 @@ protected:
    \see msc::MscTimer
  */
 
-TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(timer, chartLayoutManager, parent)
     , m_timer(timer)
     , m_textItem(new TimerTextItem(this))

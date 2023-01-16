@@ -317,7 +317,7 @@ void tst_MessageItem::testFirstMessagePosition()
     MscMessage *message = qobject_cast<MscMessage *>(m_chart->eventsForInstance(instance1).at(0));
     MessageItem *messageItem = m_chartModel->itemForMessage(message);
     QVERIFY(messageItem != nullptr);
-    ChartItem *chartItem = m_chartModel->chartItem();
+    ChartItem *chartItem = m_chartModel->itemForChart();
     QVERIFY(chartItem != nullptr);
 
     // the first message has to start at the left chart

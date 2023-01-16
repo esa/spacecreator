@@ -22,7 +22,7 @@
 #include <QStringList>
 
 namespace msc {
-class ChartLayoutManager;
+class ChartLayoutManagerBase;
 class MscMessage;
 class MscMessageDeclaration;
 class MscMessageDeclarationList;
@@ -42,7 +42,7 @@ class MessageDialog : public QDialog
 
 public:
     explicit MessageDialog(
-            msc::MscMessage *message, msc::ChartLayoutManager *charlayoutManager, QWidget *parent = nullptr);
+            msc::MscMessage *message, msc::ChartLayoutManagerBase *charlayoutManager, QWidget *parent = nullptr);
     ~MessageDialog();
 
     void setIVConnectionNames(const QStringList &names);
@@ -80,5 +80,5 @@ private:
     bool m_isValid = true;
     QStringList m_connectionNames;
     QPointer<msc::SystemChecks> m_checker;
-    QPointer<msc::ChartLayoutManager> m_chartLayoutManager;
+    QPointer<msc::ChartLayoutManagerBase> m_chartLayoutManager;
 };

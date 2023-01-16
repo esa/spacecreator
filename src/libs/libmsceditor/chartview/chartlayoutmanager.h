@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "chartlayoutmanagerbase.h"
 #include "instanceitem.h"
 #include "mscchart.h"
 #include "mscentity.h"
@@ -58,12 +59,11 @@ class MscTimer;
 
 struct ChartLayoutManagerPrivate;
 
-class ChartLayoutManager : public QObject
+class ChartLayoutManager : public ChartLayoutManagerBase
 {
     Q_OBJECT
     Q_PROPERTY(msc::MscChart *currentChart READ currentChart WRITE setCurrentChart NOTIFY currentChartChanged)
     Q_PROPERTY(QRectF instanceRect READ instancesRect NOTIFY instancesRectChanged)
-    Q_PROPERTY(msc::SystemChecks *systeckchecker READ systemChecker WRITE setSystemChecker NOTIFY systemCheckerChanged)
 
 public:
     explicit ChartLayoutManager(MscCommandsStack *undoStack, QObject *parent = nullptr);
@@ -83,21 +83,21 @@ public:
             msc::MscMessage *orphanMessage = nullptr, const QPointF &pos = QPointF());
     bool removeMessageItem(msc::MessageItem *item);
 
-    ChartItem *itemForChart() const;
-    CommentItem *itemForComment(msc::MscComment *comment) const;
-    InstanceItem *itemForInstance(msc::MscInstance *instance) const;
-    MessageItem *itemForMessage(MscMessage *message) const;
-    ConditionItem *itemForCondition(MscCondition *condition) const;
-    ActionItem *itemForAction(MscAction *action) const;
-    TimerItem *itemForTimer(MscTimer *timer) const;
-    CoregionItem *itemForCoregion(MscCoregion *coregion) const;
-    InteractiveObject *itemForEntity(MscEntity *entity) const;
+    ChartItem *itemForChart() const override;
+    CommentItem *itemForComment(msc::MscComment *comment) const override;
+    InstanceItem *itemForInstance(msc::MscInstance *instance) const override;
+    MessageItem *itemForMessage(MscMessage *message) const override;
+    ConditionItem *itemForCondition(MscCondition *condition) const override;
+    ActionItem *itemForAction(MscAction *action) const override;
+    TimerItem *itemForTimer(MscTimer *timer) const override;
+    CoregionItem *itemForCoregion(MscCoregion *coregion) const override;
+    InteractiveObject *itemForEntity(MscEntity *entity) const override;
 
     msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEvent = nullptr);
-    int eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr);
-    msc::MscInstanceEvent *eventAtPosition(const QPointF &pos);
+    int eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr) override;
+    msc::MscInstanceEvent *eventAtPosition(const QPointF &pos) override;
 
     QSizeF preferredChartBoxSize() const;
     void setPreferredChartBoxSize(const QSizeF &size);
@@ -105,9 +105,8 @@ public:
     void setVisibleItemLimit(int number);
     bool isStreamingModeEnabled() const;
 
-    const QPointer<ChartItem> chartItem() const;
-    QRectF minimalContentRect() const;
-    QRectF actualContentRect() const;
+    QRectF minimalContentRect() const override;
+    QRectF actualContentRect() const override;
 
     const QVector<msc::InstanceItem *> &instanceItems() const;
 
@@ -119,12 +118,7 @@ public:
 
     const QRectF &instancesRect() const;
 
-    void setSystemChecker(msc::SystemChecks *checker);
-    msc::SystemChecks *systemChecker() const;
-
     bool layoutUpdatePending() const;
-
-    MscCommandsStack *undoStack() const;
 
     qreal interMessageSpan() const;
     msc::InteractiveObject *eventItem(const QUuid &id);
@@ -146,7 +140,6 @@ Q_SIGNALS:
     void cifDataChanged();
     void instancesRectChanged(const QRectF &rect);
     void initialNameAccepted(msc::MscEntity *entity);
-    void systemCheckerChanged(msc::SystemChecks *checker);
 
 private Q_SLOTS:
     void onInstanceGeometryChanged();

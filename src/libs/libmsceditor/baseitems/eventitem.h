@@ -31,8 +31,8 @@ class EventItem : public InteractiveObject
 {
     Q_OBJECT
 public:
-    EventItem(
-            msc::MscInstanceEvent *event, msc::ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
+    EventItem(msc::MscInstanceEvent *event, msc::ChartLayoutManagerBase *chartLayoutManager,
+            QGraphicsItem *parent = nullptr);
 
     void setTargetHCenter(qreal x);
     void centerOnTargetH();
