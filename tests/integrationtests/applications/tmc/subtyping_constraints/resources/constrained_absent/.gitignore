@@ -25,8 +25,6 @@ work/function_2/SDL/src/*
 !work/function_2/SDL/src/dataview-uniq.asn
 !work/function_2/SDL/src/function_2_datamodel.asn
 
-
-
 # Except modelchecking
 !work/modelchecking/
 work/modelchecking/configurations/*

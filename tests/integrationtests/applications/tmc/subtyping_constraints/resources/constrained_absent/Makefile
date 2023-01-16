@@ -130,4 +130,3 @@ clean:
 	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || : 
 
 .PHONY: clean release debug coverage skeletons simu run
-
