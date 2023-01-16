@@ -10,15 +10,7 @@ MySeqOf FROM CONSTRAINED-ABSENT-DATAVIEW
 
 MySeqOfSub ::= MySeqOf (SIZE (0..2))
 
-
-Function-1-pi-2-p1 ::= MyChoice
-
-
-
-
 Function-1-pi-1-p1 ::= MySeqOfSub
-
-
 
 
 END
