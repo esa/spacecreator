@@ -47,7 +47,7 @@ private:
     static inline const QString m_ignoredAttrs = "id,version";
 };
 
-void tst::SedsXmlExporter::compareResults(const QString &filename)
+void tst_SedsXmlExporter::compareResults(const QString &filename)
 {
     QProcess diffProcess;
 
