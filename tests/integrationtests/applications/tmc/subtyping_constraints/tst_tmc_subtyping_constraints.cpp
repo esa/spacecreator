@@ -31,6 +31,8 @@ class tst_Tmc_Subtyping_Constraints : public QObject
 private Q_SLOTS:
     void test_basic_absent();
     void test_basic_present();
+    void test_choice_absent();
+    void test_choice_present();
     void test_constrained_absent();
 };
 
@@ -43,6 +45,18 @@ void tst_Tmc_Subtyping_Constraints::test_basic_absent()
 void tst_Tmc_Subtyping_Constraints::test_basic_present()
 {
     const int result = system("timeout 30s ./test_basic_present.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping_Constraints::test_choice_absent()
+{
+    const int result = system("timeout 30s ./test_choice_absent.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Subtyping_Constraints::test_choice_present()
+{
+    const int result = system("timeout 30s ./test_choice_present.sh");
     QCOMPARE(result, 0);
 }
 
