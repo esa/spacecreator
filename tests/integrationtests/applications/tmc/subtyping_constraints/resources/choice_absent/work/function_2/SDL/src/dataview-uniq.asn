@@ -1,18 +1,19 @@
-BASIC-ABSENT-DATAVIEW DEFINITIONS ::=
+CHOICE-ABSENT-DATAVIEW DEFINITIONS ::=
 BEGIN
 
   MyInteger ::= INTEGER (0 .. 4)
 
+  MyChoice    ::= CHOICE {
+      a MyInteger,
+      b BOOLEAN
+  }
+
   MySeq       ::= SEQUENCE {
-      inputdata   MyInteger OPTIONAL,
+      inputdata   MyChoice OPTIONAL,
       outputdata  MyInteger,
       validity    ENUMERATED { valid, invalid }
   }
 
-  MyChoice    ::= CHOICE {
-      a BOOLEAN,
-      b MySeq
-  }
 
 END
 
