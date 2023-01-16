@@ -9,12 +9,15 @@ process Function_2;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
+    /* CIF state (591, 21), (76, 35) */
+    state Incorrect;
+    endstate;
     /* CIF state (450, 10), (70, 35) */
     state Wait;
-        /* CIF input (436, 65), (93, 35) */
+        /* CIF input (434, 65), (93, 35) */
         input PI_1(myVar);
-            /* CIF decision (417, 120), (131, 50) */
-            decision length(myVar)<=5;
+            /* CIF decision (415, 120), (131, 50) */
+            decision length(myVar)<=2;
                 /* CIF ANSWER (405, 190), (70, 23) */
                 (true):
                     /* CIF NEXTSTATE (405, 233), (70, 35) */
@@ -24,8 +27,5 @@ process Function_2;
                     /* CIF NEXTSTATE (485, 234), (76, 35) */
                     NEXTSTATE Incorrect;
             enddecision;
-    endstate;
-    /* CIF state (591, 21), (76, 35) */
-    state Incorrect;
     endstate;
 endprocess Function_2;
