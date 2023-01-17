@@ -71,6 +71,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterSkipValidation();
     void testCmdArgumentSedsConverterNoManglig();
     void testCmdArgumentSedsConverterMultipleAsnModels();
+    void testCmdArgumentSedsConverterFunctionToConvert();
     void testCmdArgumentSkipEmptySequences();
     void testCmdArgumentTasteTranslation();
     void testCmdArgumentSedsConverterKeepIntermediateFiles();
@@ -487,6 +488,25 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterNoManglig()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterNoMangling));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterFunctionToConvert()
+{
+    const QCommandLineOption cmdFunctionToConvert =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterFunctionToConvert);
+    const QString function("dummyFunction");
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1=%2").arg(cmdFunctionToConvert.names().first(), function) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterFunctionToConvert);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterFunctionToConvert));
+
+    const QString value = parser.value(CommandArg::SedsConverterFunctionToConvert);
+    QCOMPARE(value, function);
 }
 
 void tst_CommandLineParser::testCmdArgumentSedsConverterMultipleAsnModels()

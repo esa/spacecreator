@@ -61,8 +61,6 @@ std::set<ModelType> IvToSedsTranslator::getDependencies() const
 std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
         const IVModel *ivModel, const Options &options) const
 {
-    Q_UNUSED(options);
-
     ::seds::model::Package sedsPackage;
     sedsPackage.setName("InterfaceView");
 
@@ -80,6 +78,7 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
     std::sort(std::begin(ivFunctions), std::end(ivFunctions), comparator);
 
     if (options.isSet(iv::IvOptions::functionToConvert)) {
+
         std::vector<QString> functionsToConvert = options.values(iv::IvOptions::functionToConvert);
         for (const auto &ivFunction : ivFunctions) {
             const QString &ivFunctionName = ivFunction->title();

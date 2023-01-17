@@ -72,6 +72,7 @@ public:
         SedsConverterSdlFilepathPrefix,
         SedsConverterNoMangling,
         SedsConverterMultipleAsnModels,
+        SedsConverterFunctionToConvert,
         SedsConverterSkipEmptySequences,
         SedsConverterTasteTranslation,
         SedsConverterTransactionNameType,
