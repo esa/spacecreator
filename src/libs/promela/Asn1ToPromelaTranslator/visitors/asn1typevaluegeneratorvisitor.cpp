@@ -333,15 +333,15 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
     int selectorVal = 1;
 
     for (auto &component : type.components()) {
-        if (hasConstraints && withComponentConstraints.count(component->name()) == 0) {
-            continue;
-        }
-
-        qDebug() << component->name();
         const QString &componentName = component->name();
+
         const QString thisComponentSelected =
                 Escaper::escapePromelaName(QString("%1_%2_PRESENT").arg(m_name).arg(componentName));
         m_promelaModel.addValueDefinition(ValueDefinition(thisComponentSelected, selectorVal++));
+
+        if (hasConstraints && withComponentConstraints.count(componentName) != 0) {
+            continue;
+        }
 
         auto *const choiceComponent = component.get();
         const QString componentTypeName =
