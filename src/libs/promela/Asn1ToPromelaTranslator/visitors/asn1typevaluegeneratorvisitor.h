@@ -180,6 +180,12 @@ private:
     QString m_name;
     const Asn1Acn::Types::Type *m_overridenType;
     const std::optional<float> m_delta;
+
+    enum PresenceFlag
+    {
+        Absent = 0,
+        Present = 1
+    };
 };
 
 } // namespace promela::translator

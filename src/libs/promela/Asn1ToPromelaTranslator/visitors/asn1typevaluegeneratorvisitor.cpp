@@ -337,8 +337,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
             continue;
         }
 
-        qDebug() << "choice component:" << component->presentWhen() << component->presentWhenName();
-
+        qDebug() << component->name();
         const QString &componentName = component->name();
         const QString thisComponentSelected =
                 Escaper::escapePromelaName(QString("%1_%2_PRESENT").arg(m_name).arg(componentName));
@@ -364,6 +363,11 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
         conditional->appendAlternative(std::move(alternative));
     }
     sequence->appendElement(std::move(*conditional));
+
+    const QString choiceGeneratorInlineName = Escaper::escapePromelaName(QString("%1_generate_value").arg(m_name));
+    auto inlineDef = std::make_unique<InlineDef>(choiceGeneratorInlineName, inlineArguments, std::move(*sequence));
+
+    m_promelaModel.addInlineDef(std::move(inlineDef));
 }
 
 void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
@@ -380,28 +384,25 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
             const QString componentTypeName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
             const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
 
-            if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
-                auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
-                Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
-                asnSequenceComponentType->accept(visitor);
+            if (asnSequenceComponent->presence() != Asn1Acn::AsnSequenceComponent::Presence::NotSpecified) {
+                // presence is either absent or present, need to generate exist flag
+                auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
+                auto presenceFlag =
+                        asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent
+                        ? PresenceFlag::Absent
+                        : PresenceFlag::Present;
+                auto assignment = Assignment(VariableRef(variableName), Expression(presenceFlag));
+                sequence.appendElement(assignment);
             }
 
-            if (asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
-                // exist flag to 0, don't generate value
-                auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
-                auto assignment = Assignment(VariableRef(variableName), Expression(0));
-                sequence.appendElement(assignment);
-            } else if (asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysPresent) {
-                // exist flag to 1, generate value
-                auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
-                auto assignment = Assignment(VariableRef(variableName), Expression(1));
-                sequence.appendElement(assignment);
+            if (asnSequenceComponent->presence() != Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
+                // presence is either not specified or present, need to generate value
+                if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
+                    auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+                    Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
+                    asnSequenceComponentType->accept(visitor);
+                }
 
-                auto asnSequenceComponentInlineCall =
-                        generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
-                sequence.appendElement(std::move(asnSequenceComponentInlineCall));
-            } else {
-                // no exist flag, generate value
                 auto asnSequenceComponentInlineCall =
                         generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
                 sequence.appendElement(std::move(asnSequenceComponentInlineCall));

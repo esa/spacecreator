@@ -1,35 +1,20 @@
-CHOICE-ABSENT-DATAVIEW DEFINITIONS ::=
-BEGIN
-
-  MyInteger ::= INTEGER (0 .. 4)
-
-  MyChoice    ::= CHOICE {
-      a MyInteger,
-      b BOOLEAN
-  }
-
-  MySeq       ::= SEQUENCE {
-      inputdata   MyChoice OPTIONAL,
-      outputdata  MyInteger,
-      validity    ENUMERATED { valid, invalid }
-  }
-
-
-END
-
-
-
 FUNCTION-1-SUBTYPE DEFINITIONS ::=
 BEGIN
 
 IMPORTS MyChoice FROM CHOICE-ABSENT-DATAVIEW
 
-
 MySeq FROM CHOICE-ABSENT-DATAVIEW
+MyInteger FROM CHOICE-ABSENT-DATAVIEW
 
  ;
 
-MySeqSub ::= MySeq (WITH COMPONENTS { inputdata ABSENT })
+MyChoiceSub ::= MyChoice (WITH COMPONENTS { a ABSENT })
+
+MySeqSub    ::= SEQUENCE {
+    inputdata   MyChoiceSub,
+    outputdata  MyInteger,
+    validity    ENUMERATED { valid, invalid }
+}
 
 Function-1-pi-1-p1 ::= MySeqSub
 
