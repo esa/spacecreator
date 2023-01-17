@@ -1,31 +1,31 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Function_2;
-    /* CIF TEXT (621, 130), (267, 140) */
+    /* CIF TEXT (660, 160), (267, 140) */
     -- Text area for declarations and comments
     
-    dcl myVar MySeq;
+    dcl myVar MySeqOf;
     /* CIF ENDTEXT */
     /* CIF START (320, 10), (70, 35) */
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (595, 14), (76, 35) */
-    state Incorrect;
-    endstate;
     /* CIF state (450, 10), (70, 35) */
     state Wait;
-        /* CIF input (437, 65), (93, 35) */
+        /* CIF input (433, 65), (93, 35) */
         input PI_1(myVar);
-            /* CIF decision (406, 120), (156, 50) */
-            decision exist(myVar.inputdata);
-                /* CIF ANSWER (495, 190), (70, 23) */
-                (false):
-                    /* CIF NEXTSTATE (492, 233), (76, 35) */
-                    NEXTSTATE Incorrect;
+            /* CIF decision (414, 120), (131, 50) */
+            decision length(myVar)<=2;
                 /* CIF ANSWER (405, 190), (70, 23) */
                 (true):
                     /* CIF NEXTSTATE (405, 233), (70, 35) */
                     NEXTSTATE Wait;
+                /* CIF ANSWER (488, 191), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (485, 234), (76, 35) */
+                    NEXTSTATE Incorrect;
             enddecision;
+    endstate;
+    /* CIF state (591, 21), (76, 35) */
+    state Incorrect;
     endstate;
 endprocess Function_2;
