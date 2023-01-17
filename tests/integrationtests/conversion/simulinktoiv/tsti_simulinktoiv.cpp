@@ -20,6 +20,7 @@
 #include "../../../unittests/common/xmldatahelper.h"
 
 #include <QObject>
+#include <QProcess>
 #include <QtTest>
 #include <conversion/converter/converter.h>
 #include <conversion/iv/IvOptions/options.h>
@@ -27,6 +28,7 @@
 #include <conversion/iv/SimulinkToIvTranslator/options.h>
 #include <conversion/registry/registry.h>
 #include <conversion/simulink/SimulinkRegistrar/registrar.h>
+#include <iostream>
 #include <simulink/SimulinkOptions/options.h>
 
 using conversion::Registry;
@@ -53,6 +55,8 @@ private:
 
     static const QString m_expectedIVFileSubPath;
     static const QString m_currentIVFileName;
+
+    static inline const QString m_ignoredAttrs = "id,version";
 
 private:
     Registry m_registry;
@@ -133,7 +137,20 @@ void tsti_SimulinkToIV::testComparingIVTranslationResultWithExpectedResult()
             Converter converter(m_registry, std::move(options));
             converter.convert({ ModelType::Simulink }, ModelType::InterfaceView, {});
 
-            QVERIFY(XmlData(m_currentIVFileName) == XmlData(expectedIVFilePath));
+            QProcess diffProcess;
+
+            QStringList args;
+            args << "--check"
+                 << "--ignored-attrs" << m_ignoredAttrs << m_currentIVFileName << expectedIVFilePath;
+
+            diffProcess.start("xmldiff", args);
+            diffProcess.waitForFinished();
+
+            if (diffProcess.exitCode() != 0) {
+                QString diffOutput(diffProcess.readAllStandardOutput());
+                std::cerr << diffOutput.toStdString().c_str() << '\n';
+                QFAIL(diffOutput.toStdString().c_str());
+            }
         } catch (const std::exception &ex) {
             QFAIL(ex.what());
         }

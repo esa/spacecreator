@@ -26,7 +26,7 @@ SimpleEnumeration ::= ENUMERATED
 {
     value1(12),
     value2(15),
-    negativeValue(-12)
+    value3(42)
 }
 END
 

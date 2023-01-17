@@ -71,7 +71,12 @@ public:
 
 private:
     void addHelp();
+    void setupTasteLanguageClients();
+    QDir findAppImageDir() const;
+    QString findInitFileForTasteLanguageClients() const;
+    bool ignoreTasteLanguageClients() const;
 
+private:
     SclEditorFactory *m_sclFactory = nullptr;
     MscEditorFactory *m_mscFactory = nullptr;
     IVEditorFactory *m_ivFactory = nullptr;
