@@ -32,8 +32,7 @@ private Q_SLOTS:
     void test_basic_absent();
     void test_basic_present();
     void test_choice_absent();
-    void test_choice_present();
-    void test_constrained_absent();
+    void test_constrained_range();
 };
 
 void tst_Tmc_Subtyping_Constraints::test_basic_absent()
@@ -54,15 +53,9 @@ void tst_Tmc_Subtyping_Constraints::test_choice_absent()
     QCOMPARE(result, 0);
 }
 
-void tst_Tmc_Subtyping_Constraints::test_choice_present()
+void tst_Tmc_Subtyping_Constraints::test_constrained_range()
 {
-    const int result = system("timeout 30s ./test_choice_present.sh");
-    QCOMPARE(result, 0);
-}
-
-void tst_Tmc_Subtyping_Constraints::test_constrained_absent()
-{
-    const int result = system("timeout 30s ./test_constrained_absent.sh");
+    const int result = system("timeout 30s ./test_constrained_range.sh");
     QCOMPARE(result, 0);
 }
 

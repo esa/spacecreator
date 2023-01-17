@@ -1,4 +1,4 @@
-<InterfaceView asn1file="constrained_absent.acn">
+<InterfaceView asn1file="constrained_range.acn">
 <Function name="Function_2" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="38900 10000 58900 18000"/>
 <Provided_Interface name="PI_1" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" queue_size="1" miat="0" wcet="0" priority="1">

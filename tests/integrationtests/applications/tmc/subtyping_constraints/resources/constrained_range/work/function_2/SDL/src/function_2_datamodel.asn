@@ -2,7 +2,7 @@ Function-2-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyEnum, MySeq, MyChoice, MySeqOf FROM CONSTRAINED-ABSENT-DATAVIEW
+   MyInteger, MyEnum, MySeq, MyChoice, MySeqOf FROM CONSTRAINED-RANGE-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 

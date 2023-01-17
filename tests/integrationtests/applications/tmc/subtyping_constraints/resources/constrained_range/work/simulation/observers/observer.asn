@@ -2,7 +2,7 @@ Function-2-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyEnum, MySeq, MyChoice, MySeqOf FROM CONSTRAINED-ABSENT-DATAVIEW
+   MyInteger, MyEnum, MySeq, MyChoice, MySeqOf FROM CONSTRAINED-RANGE-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -18,7 +18,7 @@ Function-2-Context ::= SEQUENCE {
 Function-2-Mychoice-Selection  ::= ENUMERATED {a-present(1), b-present(2)}
 END
 
-CONSTRAINED-ABSENT-DATAVIEW DEFINITIONS ::=
+CONSTRAINED-RANGE-DATAVIEW DEFINITIONS ::=
 BEGIN
 
  MyInteger ::= INTEGER (0 .. 4)
@@ -85,11 +85,11 @@ BEGIN
    IMPORTS
       
       --  ASN.1 modules used by thread function_1_PI_2
-      MyChoice FROM CONSTRAINED-ABSENT-DATAVIEW
+      MyChoice FROM CONSTRAINED-RANGE-DATAVIEW
       
       
       --  ASN.1 modules used by thread function_2_PI_1
-      MySeqOf FROM CONSTRAINED-ABSENT-DATAVIEW
+      MySeqOf FROM CONSTRAINED-RANGE-DATAVIEW
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
