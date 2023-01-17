@@ -32,7 +32,8 @@ class IVConnection : public IVObject
     Q_OBJECT
 
 public:
-    explicit IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent = nullptr);
+    explicit IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget,
+            QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~IVConnection() override;
 
     QString sourceName() const;
@@ -108,7 +109,7 @@ public:
 
 protected:
     explicit IVConnection(
-            const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent = nullptr);
+            const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     bool lookupEndpointsPostponed();
     bool needPostponedInit() const;
 

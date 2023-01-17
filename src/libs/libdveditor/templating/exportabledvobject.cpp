@@ -41,6 +41,11 @@ ExportableDVObject::ExportableDVObject(const dvm::DVObject *dvObject)
 {
 }
 
+QString ExportableDVObject::id() const
+{
+    return exportedObject<dvm::DVObject>()->id().toString();
+}
+
 QString ExportableDVObject::name() const
 {
     return exportedObject<dvm::DVObject>()->title();

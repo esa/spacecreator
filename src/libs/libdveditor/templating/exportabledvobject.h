@@ -34,6 +34,7 @@ namespace dve {
 class ExportableDVObject : public templating::AbstractExportableObject
 {
     Q_GADGET
+    Q_PROPERTY(QString id READ id)
     Q_PROPERTY(QString name READ name)
     Q_PROPERTY(QVariantList attributes READ attributes)
     Q_PROPERTY(QVariantList properties READ properties)
@@ -41,6 +42,7 @@ class ExportableDVObject : public templating::AbstractExportableObject
 public:
     explicit ExportableDVObject(const dvm::DVObject *dvObject = nullptr);
 
+    QString id() const;
     QString name() const;
 
     QVariantList attributes() const;
