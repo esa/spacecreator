@@ -18,7 +18,7 @@ SPACECREATOR?=spacecreator.AppImage
 export NO_PROGRESS_BAR=1
 
 # Get the list of ASN.1 files from Space Creator project file:
-DISTFILES=$(shell qmake choice_present.pro -o /tmp/null 2>&1)
+DISTFILES=$(shell qmake constrained_range.pro -o /tmp/null 2>&1)
 ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
 
 all:	release
@@ -130,4 +130,3 @@ clean:
 	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || : 
 
 .PHONY: clean release debug coverage skeletons simu run
-
