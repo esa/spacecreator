@@ -29,7 +29,7 @@ BEGIN
   }
 
   MySeq       ::= SEQUENCE {
-      inputdata   MyChoice OPTIONAL,
+      inputdata   MyChoice,
       outputdata  MyInteger,
       validity    ENUMERATED { valid, invalid }
   }
