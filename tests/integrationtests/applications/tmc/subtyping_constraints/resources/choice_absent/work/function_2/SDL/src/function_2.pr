@@ -11,16 +11,16 @@ process Function_2;
         NEXTSTATE Wait;
     /* CIF state (450, 10), (70, 35) */
     state Wait;
-        /* CIF input (437, 65), (93, 35) */
+        /* CIF input (433, 65), (93, 35) */
         input PI_1(myVar);
-            /* CIF decision (406, 120), (156, 50) */
-            decision exist(myVar.inputdata);
+            /* CIF decision (392, 120), (176, 50) */
+            decision present(myVar.inputdata);
                 /* CIF ANSWER (495, 190), (70, 23) */
-                (false):
+                (b):
                     /* CIF NEXTSTATE (495, 233), (70, 35) */
                     NEXTSTATE Wait;
                 /* CIF ANSWER (405, 190), (70, 23) */
-                (true):
+                (a):
                     /* CIF NEXTSTATE (402, 233), (76, 35) */
                     NEXTSTATE Incorrect;
             enddecision;
