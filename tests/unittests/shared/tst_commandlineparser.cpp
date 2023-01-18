@@ -71,6 +71,7 @@ private Q_SLOTS:
     void testCmdArgumentSedsConverterSkipValidation();
     void testCmdArgumentSedsConverterNoManglig();
     void testCmdArgumentSedsConverterMultipleAsnModels();
+    void testCmdArgumentSedsConverterFlatPackage();
     void testCmdArgumentSedsConverterFunctionToConvert();
     void testCmdArgumentSkipEmptySequences();
     void testCmdArgumentTasteTranslation();
@@ -522,6 +523,21 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterMultipleAsnModels()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterMultipleAsnModels));
+}
+
+void tst_CommandLineParser::testCmdArgumentSedsConverterFlatPackage()
+{
+    const QCommandLineOption cmdFlatPackage =
+            CommandLineParser::positionalArg(CommandArg::SedsConverterFlatPackage);
+    const QStringList args = { QApplication::instance()->applicationFilePath(),
+        QString("--%1").arg(cmdFlatPackage.names().first()) };
+
+    CommandLineParser parser;
+    parser.handlePositional(CommandArg::SedsConverterFlatPackage);
+    parser.process(args);
+
+    QVERIFY(!parser.isSet(CommandArg::Unknown));
+    QVERIFY(parser.isSet(CommandArg::SedsConverterFlatPackage));
 }
 
 void tst_CommandLineParser::testCmdArgumentSkipEmptySequences()
