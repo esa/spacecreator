@@ -327,19 +327,24 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
     auto sequence = ProctypeMaker::makeNormalSequence();
 
     const auto &withComponentConstraints = type.withComponentConstraints();
+    const auto &withComponentAbsentConstraints = type.withComponentAbsentConstraints();
     const auto hasConstraints = !withComponentConstraints.empty();
+    const auto hasAbsentConstraints = !withComponentAbsentConstraints.empty();
 
     auto conditional = std::make_unique<Conditional>();
     int selectorVal = 1;
 
     for (auto &component : type.components()) {
         const QString &componentName = component->name();
+        if (hasConstraints && withComponentConstraints.count(componentName) == 0) {
+            continue;
+        }
 
         const QString thisComponentSelected =
                 Escaper::escapePromelaName(QString("%1_%2_PRESENT").arg(m_name).arg(componentName));
         m_promelaModel.addValueDefinition(ValueDefinition(thisComponentSelected, selectorVal++));
 
-        if (hasConstraints && withComponentConstraints.count(componentName) != 0) {
+        if (hasAbsentConstraints && withComponentAbsentConstraints.count(componentName) != 0) {
             continue;
         }
 
