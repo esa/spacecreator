@@ -28,7 +28,7 @@ class IVConnectionGroup : public IVConnection
     Q_OBJECT
 public:
     explicit IVConnectionGroup(const QString &name, IVInterfaceGroup *ifaceSource, IVInterfaceGroup *ifaceTarget,
-            const QList<QPointer<IVConnection>> &connections = {}, QObject *parent = nullptr);
+            const QList<QPointer<IVConnection>> &connections = {}, QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
     struct CreationInfo {
         QPointer<IVModel> model;

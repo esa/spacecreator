@@ -182,8 +182,8 @@ IVConnection::EndPointInfo addConnectionPart(const EntityAttributes &otherAttrs)
 void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
-    const EntityAttributes attrs = attributes(xml.attributes());
-    //    const XmlAttribute &nameAttr = attrs.take(attrName);
+    EntityAttributes attrs = attributes(xml.attributes());
+    const EntityAttribute &idAttr = attrs.take(QLatin1String("id"));
 
     IVObject *obj { nullptr };
     const Props::Token t = Props::token(tagName);
@@ -192,14 +192,14 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         const bool isFunctionType =
                 attrValue(attrs, Props::Token::is_type, QStringLiteral("no")).toLower() == QStringLiteral("yes");
 
-        obj = addFunction(isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
+        obj = addFunction(idAttr.value<QUuid>(), isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
         break;
     }
     case Props::Token::Provided_Interface:
     case Props::Token::Required_Interface: {
         Q_ASSERT(d->m_currentObject.function() != nullptr);
 
-        const auto iface = addIface(Props::Token::Required_Interface == t);
+        const auto iface = addIface(idAttr.value<QUuid>(), Props::Token::Required_Interface == t);
         const QString groupName = attrValue(attrs, Props::Token::group_name);
         if (!groupName.isEmpty())
             d->m_connectionGroups[groupName].m_interfaces.append(iface);
@@ -217,11 +217,11 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::ConnectionGroup: {
-        obj = addConnectionGroup(attrValue(attrs, Props::Token::name));
+        obj = addConnectionGroup(idAttr.value<QUuid>(), attrValue(attrs, Props::Token::name));
         break;
     }
     case Props::Token::Connection: {
-        obj = addConnection();
+        obj = addConnection(idAttr.value<QUuid>());
         const QString groupName = attrValue(attrs, Props::Token::group_name);
         if (!groupName.isEmpty())
             d->m_connectionGroups[groupName].m_connectionIds.append(obj->id());
@@ -244,7 +244,7 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::Comment: {
-        obj = addComment();
+        obj = addComment(idAttr.value<QUuid>());
         break;
     }
     case Props::Token::Property: {
@@ -333,12 +333,12 @@ QString IVXMLReader::rootElementName() const
     return Props::token(Props::Token::InterfaceView);
 }
 
-IVFunctionType *IVXMLReader::addFunction(IVObject::Type fnType)
+IVFunctionType *IVXMLReader::addFunction(const shared::Id &id, IVObject::Type fnType)
 {
     const bool isFunctionType = fnType == IVObject::Type::FunctionType;
 
     IVFunctionType *fn =
-            isFunctionType ? new IVFunctionType(d->m_currentObject.get()) : new IVFunction(d->m_currentObject.get());
+            isFunctionType ? new IVFunctionType(d->m_currentObject.get(), id) : new IVFunction(d->m_currentObject.get(), id);
 
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(fn);
@@ -346,13 +346,14 @@ IVFunctionType *IVXMLReader::addFunction(IVObject::Type fnType)
     return fn;
 }
 
-IVInterface *IVXMLReader::addIface(bool isRI)
+IVInterface *IVXMLReader::addIface(const shared::Id &id, bool isRI)
 {
     Q_ASSERT(d->m_currentObject.function() != nullptr);
 
     IVInterface *iface { nullptr };
     if (d->m_currentObject.function()) {
         IVInterface::CreationInfo ci;
+        ci.id = id;
         ci.function = d->m_currentObject.function();
         ci.type = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
         iface = IVInterface::createIface(ci);
@@ -361,18 +362,18 @@ IVInterface *IVXMLReader::addIface(bool isRI)
     return iface;
 }
 
-IVComment *IVXMLReader::addComment()
+IVComment *IVXMLReader::addComment(const shared::Id &id)
 {
-    IVComment *comment = new IVComment(d->m_currentObject.get());
+    IVComment *comment = new IVComment(d->m_currentObject.get(), id);
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(comment);
 
     return comment;
 }
 
-IVConnection *IVXMLReader::addConnection()
+IVConnection *IVXMLReader::addConnection(const shared::Id &id)
 {
-    IVConnection *connection = new IVConnection(nullptr, nullptr, d->m_currentObject.get());
+    IVConnection *connection = new IVConnection(nullptr, nullptr, d->m_currentObject.get(), id);
     if (d->m_currentObject.function()) {
         d->m_currentObject.function()->addChild(connection);
     }
@@ -383,7 +384,7 @@ IVConnection *IVXMLReader::addConnection()
     return connection;
 }
 
-IVConnectionGroup *IVXMLReader::addConnectionGroup(const QString &groupName)
+IVConnectionGroup *IVXMLReader::addConnectionGroup(const shared::Id &id, const QString &groupName)
 {
     QHash<shared::Id, IVInterfaceGroup *> mappings;
     for (const auto iface : d->m_connectionGroups.value(groupName).m_interfaces) {
@@ -392,7 +393,9 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const QString &groupName)
         if (it != mappings.end()) {
             it.value()->addEntity(iface);
         } else {
-            auto ifaceGroup = new IVInterfaceGroup({});
+            IVInterface::CreationInfo ci;
+            ci.id = id;
+            auto ifaceGroup = new IVInterfaceGroup(ci);
             if (iface->parentObject()->type() == IVObject::Type::Function) {
                 auto fn = qobject_cast<IVFunction *>(iface->parentObject());
                 fn->addChild(ifaceGroup);
@@ -414,7 +417,7 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const QString &groupName)
     d->m_allObjects.append(targetIfaceGroup);
 
     IVConnectionGroup *connection =
-            new IVConnectionGroup(groupName, sourceIfaceGroup, targetIfaceGroup, {}, d->m_currentObject.get());
+            new IVConnectionGroup(groupName, sourceIfaceGroup, targetIfaceGroup, {}, d->m_currentObject.get(), id);
     connection->initConnections(d->m_connectionGroups.value(groupName).m_connectionIds);
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(connection);

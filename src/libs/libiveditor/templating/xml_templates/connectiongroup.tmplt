@@ -2,6 +2,7 @@
 Template for generation of XML scheme of connection group.
 The following tags are available in this sub-template:
 conngroups              : Instance of connection (provided by a top level template)
+conngroups.id           :   |_ Connection group id
 conngroups.name         :   |_ Connection group name
 conngroups.attributes   :   |_ List of all attributes of connection group
 attr                    :       |_ Instance of attriubute
@@ -13,7 +14,7 @@ prop.name               :          |_ Name of property
 prop.value              :          |_ Value of property
 conngroups.connections  :   |_ List of all nested connections of connection group
 {% endcomment %}
-<ConnectionGroup{% for attr in conngroups.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+<ConnectionGroup id="{{ conngroups.id }}"{% for attr in conngroups.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
     {% for prop in conngroups.properties %}
     <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
     {% endfor %}

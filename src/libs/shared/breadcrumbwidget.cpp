@@ -33,8 +33,8 @@ void BreadcrumbWidget::setLevels(const QList<Level> &levels)
         return;
     }
 
-    static const QString entry = u"<a href='%1'>%2</a>"_qs;
-    static const QString separator = u" &gt; "_qs;
+    static const QString entry = QString::fromLatin1("<a href='%1'>%2</a>");
+    static const QString separator = QString::fromLatin1(" &gt; ");
 
     // Without some link text it won't become clickable, so '/' it is.
     QString text = entry.arg(QLatin1String("/"), tr("Root"));

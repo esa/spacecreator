@@ -26,8 +26,8 @@
 namespace ivm {
 
 IVConnectionGroup::IVConnectionGroup(const QString &name, IVInterfaceGroup *ifaceSource, IVInterfaceGroup *ifaceTarget,
-        const QList<QPointer<IVConnection>> &connections, QObject *parent)
-    : IVConnection(IVObject::Type::ConnectionGroup, ifaceSource, ifaceTarget, parent)
+        const QList<QPointer<IVConnection>> &connections, QObject *parent, const shared::Id &id)
+    : IVConnection(IVObject::Type::ConnectionGroup, ifaceSource, ifaceTarget, parent, id)
 {
     setTitle(name);
     ifaceSource->setGroupName(name);

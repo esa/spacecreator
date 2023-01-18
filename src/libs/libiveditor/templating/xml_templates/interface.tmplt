@@ -1,6 +1,7 @@
 {% comment %}
 The following tags are available in this sub-template:
 iface                       : Instance of interface (provided by a top level template)
+iface.id                    :   |_ ID of interface object
 iface.name                  :   |_ Interface name
 iface.isProvided            :   |_ Whether interface is provided
 iface.isRequired            :   |_ Whether interface is required
@@ -24,9 +25,9 @@ prop.name                   :           |_ Name of property
 prop.value                  :           |_ Value of property
 {% endcomment %}
 {% if iface.isProvided %}
-<Provided_Interface{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+<Provided_Interface id="{{ iface.id }}"{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
 {% else %}
-<Required_Interface{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+<Required_Interface id="{{ iface.id }}"{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
 {% endif %}
 {% for param in iface.params %}
 {% if param.isIn %}

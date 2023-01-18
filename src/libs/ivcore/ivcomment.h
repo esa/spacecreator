@@ -25,7 +25,7 @@ class IVComment : public IVObject
 {
     Q_OBJECT
 public:
-    explicit IVComment(QObject *parent = nullptr);
+    explicit IVComment(QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~IVComment() override;
 };
 

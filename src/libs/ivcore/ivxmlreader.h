@@ -55,11 +55,11 @@ protected:
 private:
     const std::unique_ptr<IVXMLReaderPrivate> d;
 
-    IVFunctionType *addFunction(IVObject::Type fnType);
-    IVInterface *addIface(bool isRI);
-    IVComment *addComment();
-    IVConnection *addConnection();
-    IVConnectionGroup *addConnectionGroup(const QString &groupName);
+    IVFunctionType *addFunction(const shared::Id &id, IVObject::Type fnType);
+    IVInterface *addIface(const shared::Id &id, bool isRI);
+    IVComment *addComment(const shared::Id &id);
+    IVConnection *addConnection(const shared::Id &id);
+    IVConnectionGroup *addConnectionGroup(const shared::Id &id, const QString &groupName);
     IVArchetypeReference *addArchetypeReference(const QString &archetypeLibrary, const QString &archetypeFunction);
 };
 
