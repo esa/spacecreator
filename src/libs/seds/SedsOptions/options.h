@@ -47,6 +47,8 @@ public:
     inline static const QString noMangling = "Seds_Translation_NoMangling";
     /** @brief Enable translation of single asn file with multiple models */
     inline static const QString multipleAsnModels = "Seds_Translation_MultipleAsnModels";
+    /** @brief Enable translation of single asn file with multiple models to single flat package */
+    inline static const QString flatPackage = "Seds_Translation_FlatPackage";
     /** @brief Enable skipping of empty ASN.1 sequences during ASN.1 to SEDS translation */
     inline static const QString skipEmptySequences = "Seds_Translation_SkipEmptySequences";
     /** @brief  Taste translation option */

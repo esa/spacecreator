@@ -249,6 +249,11 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         description = QCoreApplication::translate("CommandLineParser",
                 "Enable translation of single asn file with multiple asn models - DataSheet as an output");
     } break;
+    case CommandLineParser::Positional::SedsConverterFlatPackage: {
+        names << "flat-package";
+        description = QCoreApplication::translate("CommandLineParser",
+                "Enable translation of single asn file with multiple models to single flat package");
+    } break;
     case CommandLineParser::Positional::SedsConverterSkipEmptySequences: {
         names << "skip-empty-sequences";
         description = QCoreApplication::translate(
