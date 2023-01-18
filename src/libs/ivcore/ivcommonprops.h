@@ -76,9 +76,9 @@ public:
         path,
         fixed_system_element,
         required_system_element,
-        is_qgen_interface,
-        qgen_interface_type,
-        qgen_full_interface_ref,
+        is_simulink_interface,
+        simulink_interface_type,
+        simulink_full_interface_ref,
 
         // properties values
         QGenC,

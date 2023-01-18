@@ -41,9 +41,6 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "Layer", Token::Layer },
     { "ArchetypeReference", Token::ArchetypeReference },
     { "ArchetypeLibraryReference", Token::ArchetypeLibraryReference },
-    { "is_qgen_interface", Token::is_qgen_interface },
-    { "qgen_interface_type", Token::qgen_interface_type },
-    { "qgen_full_interface_ref", Token::qgen_full_interface_ref },
 
     // properties values
     { "QGenC", Token::QGenC },
@@ -74,6 +71,9 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "path", Token::path },
     { "fixed_system_element", Token::fixed_system_element },
     { "required_system_element", Token::required_system_element },
+    { "is_simulink_interface", Token::is_simulink_interface },
+    { "simulink_interface_type", Token::simulink_interface_type },
+    { "simulink_full_interface_ref", Token::simulink_full_interface_ref },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },

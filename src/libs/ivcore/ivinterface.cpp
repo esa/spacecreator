@@ -157,8 +157,8 @@ bool IVInterface::postInit()
         return false;
     }
 
-    if (entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::is_qgen_interface)) == false) {
-        removeEntityAttribute(meta::Props::token(meta::Props::Token::qgen_full_interface_ref));
+    if (entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::is_simulink_interface)) == false) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::simulink_full_interface_ref));
     }
 
     if (!function()->isFunction()) {
@@ -434,7 +434,7 @@ IVInterface *IVInterface::createIface(const CreationInfo &descr)
         if(function->entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString() == 
             meta::Props::token(meta::Props::Token::QGenC))
         {
-            iface->setEntityAttribute(meta::Props::token(meta::Props::Token::is_qgen_interface), true);
+            iface->setEntityAttribute(meta::Props::token(meta::Props::Token::is_simulink_interface), true);
         }
     }
 

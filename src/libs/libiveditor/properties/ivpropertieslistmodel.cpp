@@ -246,7 +246,7 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
         return;
     }
 
-    if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_qgen_interface)) == true)
+    if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_simulink_interface)) == true)
     {
         ivm::IVFunction* function = interface->function()->as<ivm::IVFunction*>();
         if(function == nullptr)
@@ -257,8 +257,8 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
         QStringList interfacesTitles;
         auto interfaces = function->interfaces();
         for (auto *const interface : interfaces) {
-            if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_qgen_interface)) == true &&
-                interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::qgen_interface_type)).toString() ==
+            if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_simulink_interface)) == true &&
+                interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::simulink_interface_type)).toString() ==
                 ivm::meta::Props::token(ivm::meta::Props::Token::Full))
             {
                 interfacesTitles.append(QString(interface->title()));
@@ -268,7 +268,7 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
         for (int i = 0; i < rowCount(); i++) {
             QStandardItem *titleItem = item(i, Column::Name);
 
-            if (titleItem->data(Roles::DataRole) == ivm::meta::Props::token(ivm::meta::Props::Token::qgen_full_interface_ref)) {
+            if (titleItem->data(Roles::DataRole) == ivm::meta::Props::token(ivm::meta::Props::Token::simulink_full_interface_ref)) {
                 QStandardItem *itemObj = item(i, Column::Value);
                 itemObj->setData(QVariant(interfacesTitles), Roles::EditRole);
             }
@@ -278,11 +278,11 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
     {
         for (int i = 0; i < rowCount(); i++) {
             QStandardItem *titleItem = item(i, Column::Name);
-            QString qgenFullRefAttrName = ivm::meta::Props::token(ivm::meta::Props::Token::qgen_full_interface_ref);
+            QString simulinkFullRefAttrName = ivm::meta::Props::token(ivm::meta::Props::Token::simulink_full_interface_ref);
 
-            if (titleItem->data(Roles::DataRole) == qgenFullRefAttrName) {
+            if (titleItem->data(Roles::DataRole) == simulinkFullRefAttrName) {
                 removeRow(i);
-                m_names.removeOne(qgenFullRefAttrName);
+                m_names.removeOne(simulinkFullRefAttrName);
             }
         }
     }

@@ -1,11 +1,11 @@
-<InterfaceView version="1.0" asn1file="MATLAB-STANDARD-DATATYPES.acn">
-<Function name="Controller" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+<InterfaceView version="1.0" asn1file="QgenC.acn">
+<Function name="Controller" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="6900 28100 26900 55300"/>
-<Provided_Interface name="trigger" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="false" period="1000" priority="1" dispatch_offset="0" wcet="0" stack_size="1024">
+<Provided_Interface name="trigger" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" period="1000" priority="1" dispatch_offset="0" stack_size="1024">
     <Property name="Taste::coordinates" value="18400 28100"/>
 </Provided_Interface>
 
-<Required_Interface name="interfaceBasic" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Full" wcet="0">
+<Required_Interface name="interfaceBasic" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
     <Input_Parameter name="i1" type="MatLab-Double" encoding="NATIVE"/>
     <Input_Parameter name="i2" type="MatLab-Single" encoding="NATIVE"/>
     <Input_Parameter name="i3" type="MatLab-Int8" encoding="NATIVE"/>
@@ -30,7 +30,7 @@
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
 
-<Required_Interface name="interfaceBasicPartIn" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_in" qgen_full_interface_ref="interfaceBasic" wcet="0">
+<Required_Interface name="interfaceBasicPartIn" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Partial_in" simulink_full_interface_ref="interfaceBasic" wcet="0">
     <Input_Parameter name="i2" type="MatLab-Single" encoding="NATIVE"/>
     <Input_Parameter name="i5" type="MatLab-Int16" encoding="NATIVE"/>
     <Input_Parameter name="i9" type="MatLab-Boolean" encoding="NATIVE"/>
@@ -40,7 +40,7 @@
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
 
-<Required_Interface name="interfaceBasicPartOut" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_out" qgen_full_interface_ref="interfaceBasic" wcet="0">
+<Required_Interface name="interfaceBasicPartOut" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Partial_out" simulink_full_interface_ref="interfaceBasic" wcet="0">
     <Output_Parameter name="o2" type="MatLab-Single" encoding="NATIVE"/>
     <Output_Parameter name="o5" type="MatLab-Int16" encoding="NATIVE"/>
     <Output_Parameter name="o9" type="MatLab-Boolean" encoding="NATIVE"/>
@@ -50,7 +50,7 @@
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
 
-<Required_Interface name="interfaceBasicStp" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Step" qgen_full_interface_ref="interfaceBasic" wcet="0">
+<Required_Interface name="interfaceBasicStp" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Step" simulink_full_interface_ref="interfaceBasic" wcet="0">
     <Property name="Taste::coordinates" value="26900 48300"/>
     <Property name="Taste::RootCoordinates" value="0 65200"/>
     <Property name="Taste::InheritPI" value="true"/>
@@ -62,10 +62,10 @@
     </Implementations>
 </Function>
 
-<Function name="simulink" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+<Function name="simulink" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="58800 30100 78800 56200"/>
     <Property name="Taste::RootCoordinates" value="0 0 117500 79200"/>
-<Provided_Interface name="interfaceBasic" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Full" wcet="0">
+<Provided_Interface name="interfaceBasic" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
     <Input_Parameter name="i1" type="MatLab-Double" encoding="NATIVE"/>
     <Input_Parameter name="i2" type="MatLab-Single" encoding="NATIVE"/>
     <Input_Parameter name="i3" type="MatLab-Int8" encoding="NATIVE"/>
@@ -88,7 +88,7 @@
     <Property name="Taste::RootCoordinates" value="0 6400"/>
 </Provided_Interface>
 
-<Provided_Interface name="interfaceBasicPartIn" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_in" qgen_full_interface_ref="interfaceBasic" wcet="0">
+<Provided_Interface name="interfaceBasicPartIn" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Partial_in" simulink_full_interface_ref="interfaceBasic" wcet="0">
     <Input_Parameter name="i2" type="MatLab-Single" encoding="NATIVE"/>
     <Input_Parameter name="i5" type="MatLab-Int16" encoding="NATIVE"/>
     <Input_Parameter name="i9" type="MatLab-Boolean" encoding="NATIVE"/>
@@ -96,7 +96,7 @@
     <Property name="Taste::RootCoordinates" value="0 24500"/>
 </Provided_Interface>
 
-<Provided_Interface name="interfaceBasicPartOut" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Partial_out" qgen_full_interface_ref="interfaceBasic" wcet="0">
+<Provided_Interface name="interfaceBasicPartOut" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Partial_out" simulink_full_interface_ref="interfaceBasic" wcet="0">
     <Output_Parameter name="o2" type="MatLab-Single" encoding="NATIVE"/>
     <Output_Parameter name="o5" type="MatLab-Int16" encoding="NATIVE"/>
     <Output_Parameter name="o9" type="MatLab-Boolean" encoding="NATIVE"/>
@@ -104,7 +104,7 @@
     <Property name="Taste::RootCoordinates" value="0 45600"/>
 </Provided_Interface>
 
-<Provided_Interface name="interfaceBasicStp" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_qgen_interface="true" qgen_interface_type="Step" qgen_full_interface_ref="interfaceBasic" wcet="0">
+<Provided_Interface name="interfaceBasicStp" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Step" simulink_full_interface_ref="interfaceBasic" wcet="0">
     <Property name="Taste::coordinates" value="58800 48400"/>
     <Property name="Taste::RootCoordinates" value="0 65200"/>
 </Provided_Interface>
@@ -115,15 +115,15 @@
 </Function>
 
 <Connection  required_system_element="NO">
-    <Source func_name="Controller" ri_name="interfaceBasicPartIn"/>
-    <Target func_name="simulink" pi_name="interfaceBasicPartIn"/>
-    <Property name="Taste::coordinates" value="27500 37800 58500 37700"/>
-</Connection>
-
-<Connection  required_system_element="NO">
     <Source func_name="Controller" ri_name="interfaceBasicPartOut"/>
     <Target func_name="simulink" pi_name="interfaceBasicPartOut"/>
     <Property name="Taste::coordinates" value="27500 43400 58500 43500"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="interfaceBasicStp"/>
+    <Target func_name="simulink" pi_name="interfaceBasicStp"/>
+    <Property name="Taste::coordinates" value="27500 48300 58500 48400"/>
 </Connection>
 
 <Connection  required_system_element="NO">
@@ -133,9 +133,9 @@
 </Connection>
 
 <Connection  required_system_element="NO">
-    <Source func_name="Controller" ri_name="interfaceBasicStp"/>
-    <Target func_name="simulink" pi_name="interfaceBasicStp"/>
-    <Property name="Taste::coordinates" value="27500 48300 58500 48400"/>
+    <Source func_name="Controller" ri_name="interfaceBasicPartIn"/>
+    <Target func_name="simulink" pi_name="interfaceBasicPartIn"/>
+    <Property name="Taste::coordinates" value="27500 37800 58500 37700"/>
 </Connection>
 
 <Layer name="default"/>
