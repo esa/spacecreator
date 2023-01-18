@@ -22,7 +22,6 @@
 #include "mscchart.h"
 #include "mscentity.h"
 #include "mscmessage.h"
-#include "systemchecks.h"
 
 #include <QObject>
 #include <QPointF>
@@ -108,7 +107,7 @@ public:
     QRectF minimalContentRect() const override;
     QRectF actualContentRect() const override;
 
-    const QVector<msc::InstanceItem *> &instanceItems() const;
+    const QVector<msc::InstanceItem *> &instanceItems() const override;
 
     const QVector<msc::InteractiveObject *> &instanceEventItems() const;
 
@@ -118,7 +117,7 @@ public:
 
     const QRectF &instancesRect() const;
 
-    bool layoutUpdatePending() const;
+    bool layoutUpdatePending() const override;
 
     qreal interMessageSpan() const;
     msc::InteractiveObject *eventItem(const QUuid &id);
