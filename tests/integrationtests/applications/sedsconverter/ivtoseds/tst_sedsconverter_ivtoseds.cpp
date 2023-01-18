@@ -34,7 +34,7 @@ private Q_SLOTS:
     void testCyclicInterface();
     void testRepeatedInterfaceName();
     void testWithDataTypes();
-
+    void testFunctionToConvert();
     void testPinger();
 };
 
@@ -116,6 +116,12 @@ void tst_SedsConverter_IvToSeds::testRepeatedInterfaceName()
 void tst_SedsConverter_IvToSeds::testWithDataTypes()
 {
     const int result = system("./test_with_data_types.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_SedsConverter_IvToSeds::testFunctionToConvert()
+{
+    const int result = system("./test_function_to_convert.sh");
     QCOMPARE(result, 0);
 }
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2001/XInclude" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd" xmlns="http://www.ccsds.org/schema/sois/seds">
+ <Package name="InterfaceView">
+  <ComponentSet>
+   <Component name="Function_1">
+    <ProvidedInterfaceSet>
+     <Interface name="PI_2Pi" type="Function_1PI_2Pi"/>
+    </ProvidedInterfaceSet>
+    <RequiredInterfaceSet>
+     <Interface name="PI_1Ri" type="Function_1PI_1Ri"/>
+    </RequiredInterfaceSet>
+    <DeclaredInterfaceSet>
+     <Interface name="Function_1PI_2Pi">
+      <CommandSet>
+       <Command mode="async" name="PI_2Pi">
+        <Argument mode="in" name="testArg" type="T_Int32"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+     <Interface name="Function_1PI_1Ri">
+      <CommandSet>
+       <Command mode="async" name="PI_1Ri">
+        <Argument mode="in" name="testArg2" type="T_Int32"/>
+       </Command>
+      </CommandSet>
+     </Interface>
+    </DeclaredInterfaceSet>
+   </Component>
+  </ComponentSet>
+ </Package>
+</PackageFile>

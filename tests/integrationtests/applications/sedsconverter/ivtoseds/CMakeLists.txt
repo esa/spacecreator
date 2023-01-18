@@ -49,3 +49,7 @@ configure_file(resources/test_with_data_types.xml resources/test_with_data_types
 configure_file(resources/test_with_data_types.output resources/test_with_data_types.output COPYONLY)
 configure_file(resources/test_with_data_types.asn resources/test_with_data_types.asn COPYONLY)
 configure_file(resources/test_with_data_types.acn resources/test_with_data_types.acn COPYONLY)
+
+configure_file(test_function_to_convert.sh test_function_to_convert.sh COPYONLY)
+configure_file(resources/test_function_to_convert.output resources/test_function_to_convert.output COPYONLY)
+configure_file(resources/test_function_to_convert_interfaceview.xml resources/test_function_to_convert_interfaceview.xml COPYONLY)
