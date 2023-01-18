@@ -41,31 +41,44 @@ public:
 
     VERectGraphicsItem *targetItem() const;
 
-    virtual QPointF connectionEndPoint(const bool innerConnection) const;
-    virtual QPointF connectionEndPoint(VEConnectionGraphicsItem *connection = nullptr) const;
-
     void updateFromEntity() override;
     QList<QPair<shared::VEObject *, QVector<QPointF>>> prepareChangeCoordinatesCommandParams() const override;
 
     void adjustItem();
 
     bool doLayout() override;
+
+    // Gets the alignment of this connection endpoint.
+    Qt::Alignment alignment() const;
+
+    // Sets the alignment of this connection endpoint. Used for testing.
+    void setAlignment(Qt::Alignment alignment);
+
+public:
+    // Methods for children to override
+    virtual QPointF connectionEndPoint(const bool innerConnection) const;
+    virtual QPointF connectionEndPoint(VEConnectionGraphicsItem *connection = nullptr) const;
     virtual QPainterPath ifaceShape() const;
 
 protected:
     void rebuildLayout() override;
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
     void onManualMoveProgress(GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(GripPoint *grip, const QPointF &from, const QPointF &to) override;
+
     virtual void updateInternalItems(Qt::Alignment alignment);
     virtual QPainterPath itemPath(Qt::Alignment alignment) const;
+
     virtual QList<QPair<Qt::Alignment, QPainterPath>> sidePaths() const;
     virtual shared::graphicsviewutils::LookupDirection lookupType() const;
+
     void updateTextPosition() override;
 
 protected:
     QList<QPointer<VEConnectionGraphicsItem>> m_connections;
     shared::graphicsviewutils::LookupDirection m_adjustDirection = graphicsviewutils::LookupDirection::Bidirectional;
+    Qt::Alignment m_alignment;
 };
 
 } // namespace ui

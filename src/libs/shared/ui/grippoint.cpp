@@ -19,7 +19,6 @@
 #include "grippoint.h"
 
 #include "grippointshandler.h"
-#include "interactiveobjectbase.h"
 
 #include <QColor>
 #include <QCursor>
@@ -34,7 +33,7 @@ namespace ui {
 
 GripPoint::GripPoint(Location pos, GripPointsHandler *parent)
     : QGraphicsItem(parent)
-    , m_listener(parent)
+    , m_gripPointsHandler(parent)
     , m_location(pos)
     , m_boundRect(
               QPointF(-::uiDescr.rectSize().width() / 2., -::uiDescr.rectSize().height() / 2.), ::uiDescr.rectSize())
@@ -135,7 +134,7 @@ void GripPoint::updateLayout()
 {
     QCursor c;
 
-    const QRectF targetRect = m_listener->targetBoundingRect();
+    const QRectF targetRect = m_gripPointsHandler->targetBoundingRect();
     QPointF destination;
     switch (m_location) {
     case TopLeft:
@@ -189,8 +188,8 @@ void GripPoint::updateLayout()
 
 void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (m_listener) {
-        Q_EMIT m_listener->manualGeometryChangeProgress(this, event->lastScenePos(), event->scenePos());
+    if (m_gripPointsHandler) {
+        Q_EMIT m_gripPointsHandler->manualGeometryChangeProgress(this, event->lastScenePos(), event->scenePos());
         event->accept();
     }
 }
@@ -198,8 +197,8 @@ void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        if (m_listener) {
-            Q_EMIT m_listener->manualGeometryChangeStart(this, event->scenePos());
+        if (m_gripPointsHandler) {
+            Q_EMIT m_gripPointsHandler->manualGeometryChangeStart(this, event->scenePos());
         }
         event->accept();
     } else {
@@ -209,8 +208,8 @@ void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (m_listener) {
-        Q_EMIT m_listener->manualGeometryChangeFinish(
+    if (m_gripPointsHandler) {
+        Q_EMIT m_gripPointsHandler->manualGeometryChangeFinish(
                 this, event->buttonDownScenePos(event->button()), event->scenePos());
         event->accept();
     }

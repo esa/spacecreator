@@ -85,7 +85,8 @@ void ConditionCreatorTool::commitPreviewItem()
         instanceIndexes.set(instance, m_model->eventInstanceIndex(m_previewItem->pos(), instance));
     }
 
-    m_model->undoStack()->push(new cmd::CmdConditionItemCreate(condition, instance, instanceIndexes, m_model));
+    m_model->undoStack()->push(
+            new cmd::CmdConditionItemCreate(condition, instance, instanceIndexes, m_model->currentChart()));
 
     removePreviewItem();
 

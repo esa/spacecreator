@@ -65,7 +65,7 @@
         <EnumerationList>
           <Enumeration value="12" label="Value1" />
           <Enumeration value="15" label="Value2" />
-          <Enumeration value="-12" label="NegativeValue" />
+          <Enumeration value="42" label="Value3" />
         </EnumerationList>
       </EnumeratedDataType>
     </DataTypeSet>

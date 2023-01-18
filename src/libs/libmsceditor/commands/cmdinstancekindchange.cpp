@@ -23,9 +23,8 @@
 namespace msc {
 namespace cmd {
 
-CmdInstanceKindChange::CmdInstanceKindChange(
-        MscInstance *item, const QString &newKind, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(item, layoutManager)
+CmdInstanceKindChange::CmdInstanceKindChange(MscInstance *item, const QString &newKind)
+    : ChartBaseCommand(item, nullptr)
     , m_instance(item)
     , m_oldValue(item->denominatorAndKind())
     , m_newValue(newKind)

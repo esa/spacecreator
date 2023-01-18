@@ -77,7 +77,8 @@ void InstanceCreatorTool::onActionTriggered(bool activated)
     startWaitForModelLayoutComplete(instance);
 
     static constexpr int pos { -1 };
-    m_model->undoStack()->push(new cmd::CmdInstanceItemCreate(instance, pos, m_model));
+    m_model->undoStack()->push(
+            new cmd::CmdInstanceItemCreate(instance, pos, m_model ? m_model->currentChart() : nullptr));
     Q_EMIT created();
 }
 

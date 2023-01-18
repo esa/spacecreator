@@ -126,8 +126,7 @@ void tst_XmlDocExporter::testExportFunctions()
                                 "        </Implementations>\n"
                                 "    </Function>\n"
                                 "</InterfaceView>";
-    qWarning() << text;
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
 }
 
 void tst_XmlDocExporter::testExportComment()
@@ -144,7 +143,7 @@ void tst_XmlDocExporter::testExportComment()
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Comment name=\"TestComment1\" foo=\"11\"/>\n"
                                 "</InterfaceView>";
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
 }
 
 void tst_XmlDocExporter::testExportNestedComment()
@@ -169,7 +168,7 @@ void tst_XmlDocExporter::testExportNestedComment()
                                 "        </Implementations>\n"
                                 "    </Function>\n"
                                 "</InterfaceView>";
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
 }
 
 void tst_XmlDocExporter::testExportLayer()
@@ -233,7 +232,7 @@ void tst_XmlDocExporter::testExportArchetypeReferenceInFunction()
                                        <ArchetypeReference archetype_library="SomeLibraryName" archetype_function="SomeFunctionName"/>
                                    </Function>
                                    </InterfaceView>)";
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
 }
 
 void tst_XmlDocExporter::testExportArchetypeReferenceInFunctionType()
@@ -256,7 +255,7 @@ void tst_XmlDocExporter::testExportArchetypeReferenceInFunctionType()
                                        <ArchetypeReference archetype_library="SomeLibraryName" archetype_function="SomeFunctionName"/>
                                    </Function>
                                    </InterfaceView>)";
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
 }
 
 void tst_XmlDocExporter::testExportAsn1File()

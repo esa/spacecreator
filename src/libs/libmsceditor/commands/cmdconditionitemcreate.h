@@ -35,7 +35,7 @@ class CmdConditionItemCreate : public ChartBaseCommand
 {
 public:
     CmdConditionItemCreate(msc::MscCondition *condition, msc::MscInstance *instance,
-            const ChartIndexList &instanceIndexes, ChartLayoutManager *layoutManager);
+            const ChartIndexList &instanceIndexes, msc::MscChart *chart);
 
     void redo() override;
     void undo() override;

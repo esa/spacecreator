@@ -46,8 +46,7 @@ void CoordinatesConverter::init(QGraphicsScene *scene, ChartItem *chartItem)
 
 void CoordinatesConverter::setScene(QGraphicsScene *scene)
 {
-    if (m_scene != scene)
-        m_scene = scene;
+    m_scene = scene;
 
     if (!m_scene)
         return;

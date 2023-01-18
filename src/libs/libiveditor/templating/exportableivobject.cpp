@@ -25,7 +25,6 @@
 #include "exportableivconnectionlayertype.h"
 #include "exportableivarchetypereference.h"
 #include "exportableivarchetypelibraryreference.h"
-#include "exportableproperty.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
@@ -39,6 +38,11 @@ namespace ive {
 ExportableIVObject::ExportableIVObject(const ivm::IVObject *ivObject)
     : AbstractExportableObject(ivObject)
 {
+}
+
+QString ExportableIVObject::id() const
+{
+    return exportedObject<ivm::IVObject>()->id().toString();
 }
 
 QString ExportableIVObject::name() const

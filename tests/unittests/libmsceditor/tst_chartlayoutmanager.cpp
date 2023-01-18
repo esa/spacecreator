@@ -227,7 +227,7 @@ void tst_ChartLayoutManager::testDefaultChartSize()
                   endmscdocument;";
     parseMsc(mscText);
 
-    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    QPointer<ChartItem> chartItem = m_chartModel->itemForChart();
     // content area is forced to default minimum size
     QVERIFY(qFuzzyCompare(chartItem->contentRect().width(), defaultSize.width()));
     QVERIFY(qFuzzyCompare(chartItem->contentRect().height(), defaultSize.height()));
@@ -251,7 +251,7 @@ void tst_ChartLayoutManager::testInstanceCifExtendedChartWidth()
 
     parseMsc(mscText);
 
-    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    QPointer<ChartItem> chartItem = m_chartModel->itemForChart();
     // content area width and height are stretched accordingly to the instance1's CIF
     const QRectF &inst2Rect = m_instanceItems[1]->sceneBoundingRect();
 
@@ -471,7 +471,7 @@ void tst_ChartLayoutManager::testShiftHorizontalIfNeeded()
                   endmscdocument;";
     parseMsc(mscText);
 
-    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    QPointer<ChartItem> chartItem = m_chartModel->itemForChart();
     msc::InstanceItem *instanceItem = m_chartModel->instanceItems().at(0);
 
     // Blank instance item is at the total left
@@ -555,7 +555,7 @@ void tst_ChartLayoutManager::testShiftVerticalIfNeeded()
                   endmscdocument;";
     parseMsc(mscText);
 
-    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    QPointer<ChartItem> chartItem = m_chartModel->itemForChart();
     msc::InstanceItem *instanceItem1 = m_chartModel->instanceItems().at(0);
     msc::InstanceItem *instanceItem2 = m_chartModel->instanceItems().at(1);
 
@@ -654,7 +654,7 @@ void tst_ChartLayoutManager::testCrossingMessages()
                   endmscdocument;";
     parseMsc(mscText);
 
-    QPointer<ChartItem> chartItem = m_chartModel->chartItem();
+    QPointer<ChartItem> chartItem = m_chartModel->itemForChart();
     msc::InstanceItem *instanceItem1 = m_chartModel->instanceItems().at(0);
     msc::InstanceItem *instanceItem2 = m_chartModel->instanceItems().at(1);
     auto messageA = qobject_cast<msc::MscMessage *>(m_chart->eventsForInstance(instanceItem1->modelItem()).at(0));

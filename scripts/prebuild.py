@@ -222,6 +222,43 @@ def download_asn1scc(env_dir: str) -> None:
         asn_tarbz2_file.extractall(env_dir)
 
 
+def download_asn_fuzzer(env_dir: str, app_dir: str) -> None:
+    """
+    Downloads the asn fuzzer
+    """
+    fuzzer_url = "https://github.com/n7space/asn1scc.Fuzzer/releases/download/0.9/asn1scc-Fuzzer-0.9-linux-x64.tar.gz"
+    fuzzer_targz = join_dir(env_dir, 'asn1scc-Fuzzer-0.9-linux-x64.tar.gz')
+    print('prebuild.py: Downloading {} to {}'.format(fuzzer_url, fuzzer_targz))
+    try:
+        urllib.request.urlretrieve(fuzzer_url, fuzzer_targz)
+    except:
+        print("prebuild.py: Could not download asn fuzzer from {}".format(fuzzer_url))
+        exit(4)
+    fuzzer_target = join_dir(app_dir, "libexec", "qtcreator")
+    print('prebuild.py: Extracting {} to {}'.format(fuzzer_targz, fuzzer_target))
+    with tarfile.open(fuzzer_targz, 'r:gz') as fuzzer_targz_file:
+        fuzzer_targz_file.extractall(fuzzer_target)
+
+
+def download_pus_c(env_dir: str, app_dir: str) -> None:
+    """
+    Downloads pus-C library
+    """
+    pusc_url = "https://github.com/n7space/asn1-pusc-lib/releases/download/1.1.0/Asn1Acn-PusC-Library-1.1.0.7z"
+    pusc_7z = join_dir(env_dir, 'Asn1Acn-PusC-Library-1.1.0.7z')
+    print('prebuild.py: Downloading {} to {}'.format(pusc_url, pusc_7z))
+    try:
+        urllib.request.urlretrieve(pusc_url, pusc_7z)
+    except:
+        print("prebuild.py: Could not download asn fuzzer from {}".format(pusc_url))
+        exit(4)
+    pusc_target = join_dir(app_dir, "share", "qtcreator", "asn1acn", "libs", "PUS-C")
+    ensure_dir(pusc_target)
+    print('prebuild.py: Extracting {} to {}'.format(pusc_7z, pusc_target))
+    with py7zr.SevenZipFile(pusc_7z, mode='r') as z:
+        z.extractall(pusc_target)
+
+
 def build_asn1scc_language_server(env_dir: str) -> None:
     makefile = join_dir(env_dir, 'Makefile.debian')
     if not os.path.exists(makefile):
@@ -365,7 +402,7 @@ if __name__ == '__main__':
     print('prebuild.py: qt_version was {}. Building with qt6 is {}'.format(qt_version, is_qt6))
     print("prebuild.py: qtcreator_version is {}".format(qtcreator_version))
 
-    check_cmake_version(3, 16, 0)
+    check_cmake_version(3, 18, 0)
 
     # Ensure dirs
     ensure_dir(paths.env_dir)
@@ -397,7 +434,10 @@ if __name__ == '__main__':
     # Abstract Syntax Notation
     download_asn1scc(env_dir)
 
-    # AppImage files SpaceCreator.desktop and AppRun
+    download_asn_fuzzer(env_dir, app_dir)
+    download_pus_c(env_dir, app_dir)
+
+    # AppImage files SpaceCreator.desktop, AppRun and TasteLanguageClients.ini
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)
 
     # Copy syntax highlighter files from asn1plugin and spacecreatorplugin

@@ -20,8 +20,8 @@
 #include "chartitem.h"
 #include "chartlayoutmanager.h"
 #include "geometry.h"
-#include "mainmodel.h"
-#include "msceditorcore.h"
+#include "msccommandsstack.h"
+#include "mscmodel.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
 #include "ui_streamingwindow.h"
@@ -29,13 +29,17 @@
 #include <QApplication>
 #include <QDebug>
 #include <QScreen>
+#include <QUndoStack>
+#include <memory>
 
 namespace msc {
 
 struct StreamingWindow::StreamingWindowPrivate {
-    explicit StreamingWindowPrivate(msc::MSCEditorCore *plugin)
+    explicit StreamingWindowPrivate()
         : ui(new Ui::StreamingWindow)
-        , m_plugin(plugin)
+        , m_dataModel(std::move(MscModel::defaultModel()))
+        , m_undoStack(new MscCommandsStack)
+        , m_layoutManager(new ChartLayoutManager(m_undoStack.get()))
     {
     }
 
@@ -43,7 +47,9 @@ struct StreamingWindow::StreamingWindowPrivate {
 
     Ui::StreamingWindow *ui = nullptr;
 
-    msc::MSCEditorCore *m_plugin;
+    std::unique_ptr<MscModel> m_dataModel;
+    std::unique_ptr<MscCommandsStack> m_undoStack;
+    std::unique_ptr<ChartLayoutManager> m_layoutManager;
 
     msc::RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     msc::RemoteControlHandler *m_remoteControlHandler = nullptr;
@@ -62,26 +68,24 @@ struct StreamingWindow::StreamingWindowPrivate {
  * \param plugin hosts most code of the code for the MSC UI of type \ref msc::MSCEditorCore
  * \param parent
  */
-StreamingWindow::StreamingWindow(msc::MSCEditorCore *plugin, QWidget *parent)
+StreamingWindow::StreamingWindow(QWidget *parent)
     : QMainWindow(parent)
-    , d(new StreamingWindowPrivate(plugin))
+    , d(new StreamingWindowPrivate)
 {
     d->ui->setupUi(this);
-    d->ui->graphicsView->setScene(d->m_plugin->mainModel()->graphicsScene());
+    d->m_layoutManager->setCurrentChart(d->m_dataModel->firstChart());
+
+    d->ui->graphicsView->setScene(d->m_layoutManager->graphicsScene());
 
     static constexpr qreal padding = 120.;
     const QSizeF defaultSize(this->size() - QSizeF(padding, padding));
-    d->m_plugin->mainModel()->chartViewModel().setPreferredChartBoxSize(defaultSize);
-    d->m_plugin->mainModel()->initialModel();
+    d->m_layoutManager->setPreferredChartBoxSize(defaultSize);
 
-    connect(d->m_plugin->mainModel()->graphicsScene(), &QGraphicsScene::sceneRectChanged, this,
+    connect(d->m_layoutManager->graphicsScene(), &QGraphicsScene::sceneRectChanged, this,
             &StreamingWindow::adaptWindowSizeToChart);
 }
 
-StreamingWindow::~StreamingWindow()
-{
-    disconnect(&(d->m_plugin->mainModel()->chartViewModel()), nullptr, this, nullptr);
-}
+StreamingWindow::~StreamingWindow() { }
 
 /*!
  * \brief StreamingWindow::startRemoteControl Start the remote app controller
@@ -93,7 +97,10 @@ bool StreamingWindow::startRemoteControl(quint16 port)
     if (!d->m_remoteControlWebServer) {
         d->m_remoteControlWebServer = new msc::RemoteControlWebServer(this);
         d->m_remoteControlHandler = new msc::RemoteControlHandler(this);
-        d->m_remoteControlHandler->setModel(d->m_plugin->mainModel());
+        d->m_remoteControlHandler->setMscModel(d->m_dataModel.get());
+        d->m_remoteControlHandler->setUndoStack(d->m_undoStack->undoStack());
+        d->m_remoteControlHandler->setLayoutManager(d->m_layoutManager.get());
+        d->m_remoteControlHandler->setChart(d->m_dataModel->firstChart());
 
         connect(d->m_remoteControlWebServer, &msc::RemoteControlWebServer::executeCommand, d->m_remoteControlHandler,
                 &msc::RemoteControlHandler::handleRemoteCommand);

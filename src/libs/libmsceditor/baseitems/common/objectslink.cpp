@@ -18,7 +18,6 @@
 #include "objectslink.h"
 
 #include "baseitems/interactiveobject.h"
-#include "mscutils.h"
 
 namespace msc {
 
@@ -88,7 +87,7 @@ bool ObjectsLink::replaceObj(
     return anchor->replace(toObject, toPoint, snap);
 }
 
-void ObjectsLink::notifyChanged(ObjectAnchor *anchor) const
+void ObjectsLink::notifyChanged(ObjectAnchor *anchor)
 {
     const bool isStart = anchor == m_anchorStart;
 

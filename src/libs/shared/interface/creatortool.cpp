@@ -268,7 +268,7 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu)
         QAction *action = menu->addAction(tr("Properties"));
         action->setEnabled(true);
 
-        connect(action, &QAction::triggered,
+        connect(action, &QAction::triggered, this,
                 [this, veIObj]() { Q_EMIT propertyEditorRequest(veIObj->entity()->id()); });
     }
 }

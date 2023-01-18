@@ -19,6 +19,7 @@
 
 #include "graphicsviewutils.h"
 #include "grippointshandler.h"
+#include "ui/textitem.h"
 #include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
 #include "verectgraphicsitem.h"
@@ -537,9 +538,7 @@ void VEConnectionGraphicsItem::rebuildLayout()
     }
 
     if (pathObsolete) {
-        if (doLayout()) {
-            mergeGeometry();
-        }
+        doLayout();
     }
 
     updateBoundingRect();
@@ -614,8 +613,8 @@ void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGra
                 return;
             }
 
-            const qreal xScale = newRect.width() / currentRect.width();
-            const qreal yScale = newRect.height() / currentRect.height();
+            const qreal xScale = newRect.width() / (qFuzzyIsNull(currentRect.width()) ? 1 : currentRect.width());
+            const qreal yScale = newRect.height() / (qFuzzyIsNull(currentRect.height()) ? 1 : currentRect.height());
             if (qFuzzyCompare(xScale, 1.0) && qFuzzyCompare(yScale, 1.0)) {
                 return;
             }
@@ -644,6 +643,13 @@ void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGra
     }
 
     updateEndPoint(endPoint);
+}
+
+void VEConnectionGraphicsItem::updateTextPosition()
+{
+    if (m_textItem) {
+        m_textItem->setExplicitSize(boundingRect().size());
+    }
 }
 
 void VEConnectionGraphicsItem::updateEndPoint(const VEConnectionEndPointGraphicsItem *endPoint)

@@ -124,6 +124,7 @@ MSCEditorCorePtr SpaceCreatorProject::mscData(const QString &fileName) const
         }
         if (data->mainModel()->mscModel() && data->mainModel()->mscModel()->dataDefinitionString().isEmpty()) {
             data->mainModel()->mscModel()->setDataDefinitionString(GLOBAL_ASN_FILE);
+            data->mainModel()->mscModel()->checkAllMessages();
         }
         const_cast<SpaceCreatorProject *>(this)->setMscData(fileName, data);
         return data;

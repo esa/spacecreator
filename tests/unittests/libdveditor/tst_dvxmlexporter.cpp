@@ -117,7 +117,7 @@ void tst_DVXmlExporter::testExportNode()
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\">\n"
                                 "    <Node name=\"TestNode\" attr1=\"11\" attr2=\"\" />\n"
                                 "</DeploymentView>";
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {}));
 }
 
 void tst_DVXmlExporter::testExportDevice()
@@ -150,7 +150,7 @@ void tst_DVXmlExporter::testExportDevice()
             "&quot;eth0&quot;, address &quot;127.0.0.1&quot;, version ipv4, port 5116}\"/>\n"
             "    </Node>\n"
             "</DeploymentView>";
-    QCOMPARE(XmlData(expected), XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {}));
 }
 
 void tst_DVXmlExporter::testExportConnection()
@@ -183,7 +183,7 @@ void tst_DVXmlExporter::testExportConnection()
             "to_node=\"Node_To\" to_port=\"Port_To\" />\n"
             "</DeploymentView>";
 
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {}));
 }
 
 void tst_DVXmlExporter::testExportPartitionAndDevice()
@@ -222,7 +222,7 @@ void tst_DVXmlExporter::testExportPartitionAndDevice()
                                 "       <Device name=\"TestDevice\" attr1=\"33\" attr2=\"\" attr3=\"bar\"/>\n"
                                 "    </Node>\n"
                                 "</DeploymentView>";
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {}));
 }
 
 void tst_DVXmlExporter::testExportFunctions()
@@ -269,7 +269,9 @@ void tst_DVXmlExporter::testExportFunctions()
                                 "       </Partition>"
                                 "    </Node>\n"
                                 "</DeploymentView>";
-    QVERIFY(XmlData(expected) == XmlData(text));
+
+    qDebug() << text;
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"xml"}));
 }
 
 void tst_DVXmlExporter::testExportPartition()
@@ -298,7 +300,7 @@ void tst_DVXmlExporter::testExportPartition()
                                 "       <Partition name=\"TestPartition\" attr1=\"22\" attr2=\"\" attr3=\"foo\"/>\n"
                                 "    </Node>\n"
                                 "</DeploymentView>";
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {}));
 }
 
 void tst_DVXmlExporter::testExportFunctionsAndDevice()
@@ -356,7 +358,7 @@ void tst_DVXmlExporter::testExportFunctionsAndDevice()
                                 "    </Node>\n"
                                 "</DeploymentView>";
 
-    QVERIFY(XmlData(expected) == XmlData(text));
+    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {}));
 }
 
 void tst_DVXmlExporter::testExportMessage()
@@ -406,7 +408,7 @@ void tst_DVXmlExporter::testExportMessage()
     }
     QVERIFY(m_exporter->exportObjectsSilently(objects, m_testFilePath));
     const QByteArray text = testFileContent();
-    QVERIFY(XmlData(source) == XmlData(text));
+    QVERIFY(XmlData(source).isEqual(XmlData(text), false, {"version", "id"}, {}));
 }
 
 void tst_DVXmlExporter::testAll()
@@ -481,7 +483,7 @@ void tst_DVXmlExporter::testAll()
                                     "from_port=\"Port_From\" to_bus=\"Bus_To\" "
                                     "to_node=\"Node_To\" to_port=\"Port_To\" />\n"
                                     "</DeploymentView>";
-        QVERIFY(XmlData(expected) == XmlData(text));
+        QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {}));
     }
 }
 

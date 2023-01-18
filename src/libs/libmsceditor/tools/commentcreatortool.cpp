@@ -99,13 +99,14 @@ void CommentCreatorTool::commitPreviewItem()
             MscCommandsStack *undoStack = m_model->undoStack();
             undoStack->beginMacro(tr("Create comment"));
             undoStack->push(new cmd::CmdCommentItemChangeGeometry(
-                    m_model->currentChart()->cifRect(), newRect, m_model->currentChart(), m_model));
-            undoStack->push(new cmd::CmdEntityCommentChange(m_model->currentChart(), itemComment, m_model));
+                    m_model->currentChart()->cifRect(), newRect, m_model->currentChart(), m_model->currentChart()));
+            undoStack->push(
+                    new cmd::CmdEntityCommentChange(m_model->currentChart(), itemComment, m_model->currentChart()));
             undoStack->endMacro();
         }
     } else {
         MscEntity *targetEntity = m_model->nearestEntity(m_previewItem->sceneBoundingRect().center());
-        m_model->undoStack()->push(new cmd::CmdEntityCommentChange(targetEntity, itemComment, m_model));
+        m_model->undoStack()->push(new cmd::CmdEntityCommentChange(targetEntity, itemComment, m_model->currentChart()));
     }
 
     m_model->updateLayout();

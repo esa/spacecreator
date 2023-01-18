@@ -19,7 +19,6 @@
 
 #include "cif/ciflines.h"
 #include "cifblockfactory.h"
-#include "exceptions.h"
 
 #include <QDebug>
 

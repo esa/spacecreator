@@ -18,18 +18,15 @@
 
 #include "cmdactionitemmove.h"
 
-#include "actionitem.h"
 #include "commandids.h"
 #include "mscaction.h"
 #include "mscchart.h"
-#include "mscinstance.h"
 
 namespace msc {
 namespace cmd {
 
-CmdActionItemMove::CmdActionItemMove(
-        MscAction *action, const ChartIndex &newChartIndex, ChartLayoutManager *layoutManager)
-    : EventMoveBaseCommand(action, layoutManager)
+CmdActionItemMove::CmdActionItemMove(MscAction *action, const ChartIndex &newChartIndex, MscChart *chart)
+    : EventMoveBaseCommand(action, chart)
     , m_action(action)
     , m_newIndex(newChartIndex)
 {

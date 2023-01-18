@@ -76,7 +76,7 @@ void CmdEntityAttributesChange::undo()
 
     m_entity->setEntityAttributes(attrs);
 
-    for (const EntityAttribute &attr : oldAttrs) {
+    for (const EntityAttribute &attr : qAsConst(oldAttrs)) {
         const QString name = attr.name();
         Q_EMIT attributeChanged(m_entity, name, oldAttrs[name].value());
     }

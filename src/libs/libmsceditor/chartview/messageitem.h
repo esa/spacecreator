@@ -19,7 +19,6 @@
 
 #include "baseitems/common/objectanchor.h"
 #include "baseitems/eventitem.h"
-#include "chartlayoutmanager.h"
 #include "instanceitem.h"
 #include "mscmessage.h"
 #include "systemchecks.h"
@@ -46,8 +45,8 @@ public:
         GeometryNotificationBlocker &operator=(const GeometryNotificationBlocker &) = delete;
     };
 
-    explicit MessageItem(MscMessage *message, ChartLayoutManager *chartLayoutManager, InstanceItem *source = nullptr,
-            InstanceItem *target = nullptr, QGraphicsItem *parent = nullptr);
+    explicit MessageItem(MscMessage *message, ChartLayoutManagerBase *chartLayoutManager,
+            InstanceItem *source = nullptr, InstanceItem *target = nullptr, QGraphicsItem *parent = nullptr);
 
     MscMessage *modelItem() const;
 
@@ -80,7 +79,7 @@ public:
     void setAutoResizable(bool resizable);
 
     static MessageItem *createDefaultItem(
-            MscMessage *message, ChartLayoutManager *chartLayoutManager, const QPointF &pos);
+            MscMessage *message, ChartLayoutManagerBase *chartLayoutManager, const QPointF &pos);
 
     void performSnap();
 

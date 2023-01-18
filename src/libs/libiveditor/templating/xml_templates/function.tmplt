@@ -2,6 +2,7 @@
 Template for generation of XML scheme of function.
 The following tags are available in this sub-template:
 func                        : Instance of function (provided by a top level template)
+func.id                     :   |_ Function object ID
 func.name                   :   |_ Function name
 func.attributes             :   |_ List of all attributes of function
 attr                        :       |_ Instance of attriubute
@@ -38,7 +39,7 @@ reference.archetypeLibrary  :           |_ Name for this implementation
 reference.archetypeFunction :           |_ Value of name of the programming language
 
 {% endcomment %}
-<Function{% for attr in func.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+<Function id="{{ func.id }}"{% for attr in func.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
 {% for prop in func.properties %}
     <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
 {% endfor %}

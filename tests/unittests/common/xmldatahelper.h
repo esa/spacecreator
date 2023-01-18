@@ -27,14 +27,54 @@ public:
             }
             return ok;
         }
+
+        bool compare(const Node &n, bool strict, const QStringList &excludedAttrs, const QStringList &excludedProperties) const
+        {
+            if (strict)
+                return *this == n;
+
+            if (type != n.type)
+                return false;
+
+            if (data != n.data)
+                return false;
+
+            for (auto it = attrs.cbegin(); it != attrs.cend(); ++it) {
+                if (excludedAttrs.contains(it.key()))
+                    continue;
+
+                auto nIt = n.attrs.constFind(it.key());
+                if (nIt == n.attrs.cend())
+                    return false;
+
+                if (nIt.value() != it.value())
+                    return false;
+            }
+
+            for (auto it = children.cbegin(); it != children.cend(); ++it) {
+                if (excludedProperties.contains(it->type))
+                    continue;
+
+                auto nIt = std::find_if(n.children.cbegin(), n.children.cend(), [&](const Node& node){
+                    return it->compare(node, strict, excludedAttrs, excludedProperties);
+                });
+
+                if (nIt == n.children.cend())
+                    return false;
+            }
+
+            return true;
+        }
     };
 
-    explicit XmlData(const QByteArray &data)
+    explicit XmlData(const QByteArray &data, const QStringList &excludedAttrs = {}, const QStringList &excludedProperties = {})
+//        : excludedAttrs(excludedAttrs), excludedProperties(excludedProperties)
     {
         QXmlStreamReader xml(data);
         processXml(xml);
     }
-    explicit XmlData(const QString &path)
+    explicit XmlData(const QString &path, const QStringList &excludedAttrs = {}, const QStringList &excludedProperties = {})
+//        : excludedAttrs(excludedAttrs), excludedProperties(excludedProperties)
     {
         QFile file(path);
         if (!file.open(QIODevice::ReadOnly)) {
@@ -44,6 +84,25 @@ public:
 
         QXmlStreamReader xml(&file);
         processXml(xml);
+    }
+
+    bool isEqual(const XmlData &xmlData, bool strictComparision, const QStringList &excludedAttrs, const QStringList &excludedProperties) const
+    {
+        for (const Node &n: qAsConst(nodes)) {
+            if (excludedProperties.contains(n.type))
+                continue;
+
+            auto it = std::find_if(xmlData.nodes.cbegin(), xmlData.nodes.cend(), [&](const Node& node){
+                return n.compare(node, strictComparision, excludedAttrs, excludedProperties);
+            });
+
+            if (it == xmlData.nodes.cend()) {
+                qDebug() << "Matching node '" << n.type << "' isn't found";
+                return false;
+            }
+        }
+
+        return true;
     }
 
 private:
@@ -78,6 +137,8 @@ private:
 
 private:
     QList<Node> nodes;
+//    const QStringList excludedAttrs;
+//    const QStringList excludedProperties;
 };
 
 bool operator==(const XmlData &lhs, const XmlData &rhs)

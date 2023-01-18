@@ -18,7 +18,6 @@
 #pragma once
 
 #include "abstractexportableobject.h"
-#include "entityattribute.h"
 
 #include <QVariant>
 
@@ -34,6 +33,7 @@ namespace ive {
 class ExportableIVObject : public templating::AbstractExportableObject
 {
     Q_GADGET
+    Q_PROPERTY(QString id READ id)
     Q_PROPERTY(QString name READ name)
     Q_PROPERTY(QString groupName READ groupName)
     Q_PROPERTY(QVariantList attributes READ attributes)
@@ -43,6 +43,7 @@ class ExportableIVObject : public templating::AbstractExportableObject
 public:
     explicit ExportableIVObject(const ivm::IVObject *ivObject = nullptr);
 
+    QString id() const;
     QString name() const;
     QString groupName() const;
 

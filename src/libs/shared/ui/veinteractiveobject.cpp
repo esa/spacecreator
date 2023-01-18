@@ -18,7 +18,6 @@
 
 #include "veinteractiveobject.h"
 
-#include "commands/cmdentityautolayout.h"
 #include "commands/cmdentitygeometrychange.h"
 #include "commandsstackbase.h"
 #include "graphicsviewutils.h"
@@ -52,9 +51,58 @@ VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent
     connect(this, &VEInteractiveObject::boundingBoxChanged, this, &VEInteractiveObject::updateTextPosition);
 }
 
+void VEInteractiveObject::init()
+{
+    m_textItem = initTextItem();
+    applyColorScheme();
+}
+
+TextItem *VEInteractiveObject::initTextItem()
+{
+    auto textItem = new TextItem(this);
+    textItem->setEditable(true);
+    textItem->setFont(font());
+    textItem->setBackground(Qt::transparent);
+    textItem->setTextWrapMode(QTextOption::NoWrap);
+    textItem->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    textItem->setOpenExternalLinks(true);
+    return textItem;
+}
+
 shared::VEObject *VEInteractiveObject::entity() const
 {
     return m_dataObject;
+}
+
+void VEInteractiveObject::updateEntity()
+{
+    if (!m_commandsStack) {
+        qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
+        return;
+    }
+
+    const auto changeGeometryCmd = new cmd::CmdEntityGeometryChange(prepareChangeCoordinatesCommandParams());
+    m_commandsStack->push(changeGeometryCmd);
+}
+
+void VEInteractiveObject::updateText()
+{
+    if (!m_textItem) {
+        return;
+    }
+
+    const QString text = entity()->titleUI();
+    if (Qt::mightBeRichText(text)) {
+        if (text != m_textItem->toHtml()) {
+            m_textItem->setHtml(text);
+        }
+    } else if (text != m_textItem->toPlainText()) {
+        m_textItem->setPlainText(text);
+    }
+
+    // This class cannot know what kind of text is being rendered, so
+    // positioning is left to the children through a pure virtual method
+    updateTextPosition();
 }
 
 void VEInteractiveObject::onSelectionChanged(bool isSelected)
@@ -73,6 +121,12 @@ void VEInteractiveObject::childBoundingBoxChanged()
     scheduleLayoutUpdate();
 }
 
+void VEInteractiveObject::rebuildLayout()
+{
+    updateGripPoints();
+    applyColorScheme();
+}
+
 void VEInteractiveObject::updateVisibility()
 {
     setVisible(isItemVisible());
@@ -81,59 +135,6 @@ void VEInteractiveObject::updateVisibility()
 bool VEInteractiveObject::isItemVisible() const
 {
     return true;
-}
-
-void VEInteractiveObject::mergeGeometry()
-{
-#ifdef __NONE__
-    if (!m_commandsStack) {
-        qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
-        return;
-    }
-
-    const QList<QPair<shared::VEObject *, QVector<QPointF>>> geometryData = prepareChangeCoordinatesCommandParams();
-    const QUndoCommand *cmd = m_commandsStack->command(m_commandsStack->index() - 1);
-    if (auto prevGeometryBasedCmd = dynamic_cast<const cmd::CmdEntityGeometryChange *>(cmd)) {
-        auto mutCmd = const_cast<cmd::CmdEntityGeometryChange *>(prevGeometryBasedCmd);
-        if (mutCmd->mergeGeometryData(geometryData)) {
-            return;
-        }
-    }
-    m_commandsStack->push(new cmd::CmdEntityAutoLayout(geometryData));
-#endif
-}
-
-QFont VEInteractiveObject::font() const
-{
-    return m_font;
-}
-
-void VEInteractiveObject::setFont(const QFont &font)
-{
-    m_font = font;
-}
-
-void VEInteractiveObject::init()
-{
-    m_textItem = initTextItem();
-    applyColorScheme();
-}
-
-void VEInteractiveObject::updateEntity()
-{
-    if (!m_commandsStack) {
-        qWarning() << Q_FUNC_INFO << "No command stack set in shared::ui::VEInteractiveObject";
-        return;
-    }
-
-    const auto changeGeometryCmd = new cmd::CmdEntityGeometryChange(prepareChangeCoordinatesCommandParams());
-    m_commandsStack->push(changeGeometryCmd);
-}
-
-void VEInteractiveObject::rebuildLayout()
-{
-    updateGripPoints();
-    applyColorScheme();
 }
 
 QList<QPair<shared::VEObject *, QVector<QPointF>>> VEInteractiveObject::prepareChangeCoordinatesCommandParams() const
@@ -149,26 +150,6 @@ QList<QPair<shared::VEObject *, QVector<QPointF>>> VEInteractiveObject::prepareC
     }
     params.erase(std::unique(params.begin(), params.end()), params.end());
     return params;
-}
-
-QBrush VEInteractiveObject::brush() const
-{
-    return m_brush;
-}
-
-void VEInteractiveObject::setBrush(const QBrush &brush)
-{
-    m_brush = brush;
-}
-
-QPen VEInteractiveObject::pen() const
-{
-    return m_pen;
-}
-
-void VEInteractiveObject::setPen(const QPen &pen)
-{
-    m_pen = pen;
 }
 
 void VEInteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -198,7 +179,8 @@ void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()),
             event->scenePos());
 
-    const qreal distance = graphicsviewutils::distanceLine(event->buttonDownScenePos(event->button()), event->scenePos());
+    const qreal distance =
+            graphicsviewutils::distanceLine(event->buttonDownScenePos(event->button()), event->scenePos());
     if (distance <= kClickTreshold)
         Q_EMIT clicked(event->scenePos());
     QGraphicsObject::mouseReleaseEvent(event);
@@ -212,7 +194,9 @@ void VEInteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 shared::ColorHandler VEInteractiveObject::colorHandler() const
 {
+    // Get colorHandler for the type of this instance type
     shared::ColorHandler h = shared::ColorManager::instance()->colorsForItem(handledColorType());
+    // Read color from entity (the model) and set it on the colorhandler
     if (auto ivObj = entity()) {
         if (ivObj->hasEntityAttribute(QLatin1String("color"))) { // keep single custom color
             h.setFillType(shared::ColorHandler::Color);
@@ -221,25 +205,6 @@ shared::ColorHandler VEInteractiveObject::colorHandler() const
     }
 
     return h;
-}
-
-TextItem *VEInteractiveObject::initTextItem()
-{
-    auto textItem = new TextItem(this);
-    textItem->setEditable(true);
-    textItem->setFont(font());
-    textItem->setBackground(Qt::transparent);
-    textItem->setTextWrapMode(QTextOption::WrapAnywhere);
-    textItem->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    textItem->setOpenExternalLinks(true);
-    return textItem;
-}
-
-void VEInteractiveObject::updateTextPosition()
-{
-    if (m_textItem) {
-        m_textItem->setExplicitSize(boundingRect().size());
-    }
 }
 
 void VEInteractiveObject::setCommandsStack(cmd::CommandsStackBase *commandsStack)
@@ -252,22 +217,63 @@ QString VEInteractiveObject::prepareTooltip() const
     return entity() ? entity()->titleUI() : QString();
 }
 
-void VEInteractiveObject::updateText()
+QFont VEInteractiveObject::font() const
 {
-    if (!m_textItem) {
-        return;
-    }
-
-    const QString text = entity()->titleUI();
-    if (Qt::mightBeRichText(text)) {
-        if (text != m_textItem->toHtml()) {
-            m_textItem->setHtml(text);
-        }
-    } else if (text != m_textItem->toPlainText()) {
-        m_textItem->setPlainText(entity()->titleUI());
-    }
-    updateTextPosition();
+    return m_font;
 }
 
+void VEInteractiveObject::setFont(const QFont &font)
+{
+    m_font = font;
+}
+
+QBrush VEInteractiveObject::brush() const
+{
+    return m_brush;
+}
+
+void VEInteractiveObject::setBrush(const QBrush &brush)
+{
+    m_brush = brush;
+}
+
+QPen VEInteractiveObject::pen() const
+{
+    return m_pen;
+}
+
+void VEInteractiveObject::setPen(const QPen &pen)
+{
+    m_pen = pen;
+}
+
+QString VEInteractiveObject::toString() const
+{
+    QString typeName = QString("VEInteractiveObject: ");
+    if (m_textItem == nullptr) {
+        return typeName;
+    }
+
+    QString name;
+    if (m_textItem->textIsValid()) {
+        name = m_textItem->toPlainText();
+    } else {
+        name = "NoName";
+    }
+
+    auto br = sceneBoundingRect();
+    auto x = br.x();
+    auto y = br.y();
+    auto w = br.width();
+    auto h = br.height();
+    auto result = QString(typeName + name + " rect: %1,%2, (%3,%4)").arg(x).arg(y).arg(w).arg(h);
+    return result;
+}
+
+QDebug operator<<(QDebug debug, const shared::ui::VEInteractiveObject &veobj)
+{
+    debug << veobj.toString();
+    return debug;
+}
 } // namespace ui
 } // namespace shared

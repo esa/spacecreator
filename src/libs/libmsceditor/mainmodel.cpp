@@ -17,23 +17,16 @@
 
 #include "mainmodel.h"
 
-#include "asn1modelstorage.h"
-#include "asn1reader.h"
 #include "asn1systemchecks.h"
-#include "astxmlparser.h"
 #include "chartlayoutmanager.h"
 #include "commands/cmdpastechart.h"
 #include "documentitemmodel.h"
 #include "errorhub.h"
 #include "exceptions.h"
 #include "hierarchyviewmodel.h"
-#include "instanceitem.h"
-#include "messageitem.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "mscdocument.h"
-#include "mscinstance.h"
-#include "mscmessage.h"
 #include "mscmodel.h"
 #include "mscreader.h"
 #include "mscwriter.h"
@@ -121,18 +114,7 @@ MainModel::~MainModel()
  */
 void MainModel::initialModel()
 {
-    auto model = new MscModel();
-    auto doc = new MscDocument(tr("Untitled_Document"));
-    doc->setHierarchyType(MscDocument::HierarchyAnd);
-
-    // leaf type document
-    auto leafDoc = new MscDocument(tr("Untitled_Leaf"));
-    leafDoc->setHierarchyType(MscDocument::HierarchyLeaf);
-    leafDoc->addChart(new MscChart(tr("Untitled_MSC")));
-
-    doc->addDocument(leafDoc);
-    model->addDocument(doc);
-    setNewModel(model);
+    setNewModel(MscModel::defaultModel().release());
 
     setCurrentFilePath("");
     d->m_undoStack.clear();
@@ -296,7 +278,7 @@ bool MainModel::needSave() const
  */
 void MainModel::showFirstChart()
 {
-    d->m_chartLayoutManager.setCurrentChart(firstChart());
+    d->m_chartLayoutManager.setCurrentChart(d->m_mscModel ? d->m_mscModel->firstChart() : nullptr);
 }
 
 /*!
@@ -423,41 +405,6 @@ void MainModel::showChartFromDocument(MscDocument *document)
 
     d->m_chartLayoutManager.setCurrentChart(document->charts().at(0));
     Q_EMIT showChartVew();
-}
-
-/*!
- * \brief MainModel::firstChart Get the first chart
- * \return First chart pointer or null
- */
-MscChart *MainModel::firstChart() const
-{
-    if (d->m_mscModel == nullptr) {
-        return nullptr;
-    }
-
-    if (!d->m_mscModel->charts().empty()) {
-        return d->m_mscModel->charts().at(0);
-    }
-
-    return firstChart(d->m_mscModel->documents());
-}
-
-/*!
- * \brief MainModel::firstChart Get the first chart of the \a docs
- * \return The first chart or null
- */
-MscChart *MainModel::firstChart(const QVector<MscDocument *> &docs) const
-{
-    for (MscDocument *doc : docs) {
-        if (!doc->charts().isEmpty()) {
-            return doc->charts().at(0);
-        }
-        auto ret = firstChart(doc->documents());
-        if (ret != nullptr) {
-            return ret;
-        }
-    }
-    return nullptr;
 }
 
 /*!

@@ -104,7 +104,7 @@ void InstanceStopTool::setExplicitStop()
     const bool newValue = !instance->explicitStop();
     instance->setExplicitStop(newValue);
 
-    m_model->undoStack()->push(new cmd::CmdInstanceStopChange(instance, newValue, m_model));
+    m_model->undoStack()->push(new cmd::CmdInstanceStopChange(instance, newValue));
 }
 
 void InstanceStopTool::updateEnabledState()

@@ -23,14 +23,13 @@
 
 namespace msc {
 class MscCoregion;
-class ChartLayoutManager;
 class InstanceItem;
 
 class CoregionItem : public EventItem
 {
     Q_OBJECT
 public:
-    explicit CoregionItem(ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
+    explicit CoregionItem(ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     void setBegin(MscCoregion *begin);
     MscCoregion *begin() const { return m_begin; }

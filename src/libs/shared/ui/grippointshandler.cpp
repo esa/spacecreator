@@ -91,7 +91,7 @@ void GripPointsHandler::setUsedPoints(GripPoint::Locations points)
         return;
 
     m_usedPoints = points;
-    for (auto location : points)
+    for (auto location : qAsConst(points))
         createGripPoint(location);
 
     updateLayout();

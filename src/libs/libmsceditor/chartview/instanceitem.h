@@ -36,7 +36,6 @@ class GripPoint;
 class MscInstance;
 class MscChart;
 
-class ChartLayoutManager;
 class InstanceHeadItem;
 class InstanceEndItem;
 class MessageItem;
@@ -53,7 +52,7 @@ class InstanceItem : public InteractiveObject
     Q_OBJECT
 
 public:
-    explicit InstanceItem(MscInstance *instance, ChartLayoutManager *chartLayoutManager, MscChart *chart = nullptr,
+    explicit InstanceItem(MscInstance *instance, ChartLayoutManagerBase *chartLayoutManager, MscChart *chart = nullptr,
             QGraphicsItem *parent = nullptr);
 
     MscInstance *modelItem() const;
@@ -72,7 +71,7 @@ public:
     QRectF extendedSceneBoundingRect() const;
 
     static InstanceItem *createDefaultItem(
-            ChartLayoutManager *model, MscInstance *instance, MscChart *chart, const QPointF &pos);
+            ChartLayoutManagerBase *model, MscInstance *instance, MscChart *chart, const QPointF &pos);
 
     QPair<QPointF, bool> commentPoint() const override;
 
@@ -99,7 +98,7 @@ public Q_SLOTS:
     void syncHeightToChartBox();
 
 Q_SIGNALS:
-    void initialNameAccepted(MscEntity *entity);
+    void initialNameAccepted(msc::MscEntity *entity);
 
 protected:
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;

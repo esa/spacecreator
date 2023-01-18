@@ -1,5 +1,7 @@
 #include "mscinstanceevent.h"
 
+#include "mscchart.h"
+
 namespace msc {
 
 /*!
@@ -19,5 +21,13 @@ MscInstanceEvent::MscInstanceEvent(const QString &name, QObject *parent)
 }
 
 MscInstanceEvent::~MscInstanceEvent() { }
+
+/**
+ * Returns the chart this event belongs to
+ */
+MscChart *MscInstanceEvent::chart() const
+{
+    return qobject_cast<MscChart *>(parent());
+}
 
 }

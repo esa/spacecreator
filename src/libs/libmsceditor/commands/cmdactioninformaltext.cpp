@@ -23,9 +23,8 @@
 namespace msc {
 namespace cmd {
 
-CmdActionInformalText::CmdActionInformalText(
-        MscAction *action, const QString &newText, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(action, layoutManager)
+CmdActionInformalText::CmdActionInformalText(MscAction *action, const QString &newText, MscChart *chart)
+    : ChartBaseCommand(action, chart)
     , m_action(action)
     , m_oldText(action->informalAction())
     , m_newText(newText)

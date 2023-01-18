@@ -27,7 +27,7 @@
 namespace msc {
 
 class ChartItem;
-class ChartLayoutManager;
+class ChartLayoutManagerBase;
 class MscEntity;
 
 class InteractiveObject : public shared::ui::InteractiveObjectBase
@@ -36,7 +36,7 @@ class InteractiveObject : public shared::ui::InteractiveObjectBase
 
 public:
     explicit InteractiveObject(
-            msc::MscEntity *entity, msc::ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
+            msc::MscEntity *entity, msc::ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     msc::MscEntity *modelEntity() const;
 
@@ -62,13 +62,13 @@ protected:
     cif::CifBlockShared cifBlockByType(cif::CifLine::CifType type) const;
     virtual cif::CifLine::CifType mainCifType() const;
 
-    bool cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> newCif);
+    bool cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> &newCif);
 
     QRectF getChartContentBox() const;
     QRectF getChartBox() const;
 
     QPointer<msc::MscEntity> m_entity;
-    QPointer<ChartLayoutManager> m_chartLayoutManager;
+    QPointer<ChartLayoutManagerBase> m_chartLayoutManager;
     mutable QPointer<msc::ChartItem> m_chartItem;
 
     bool m_hovered = false;

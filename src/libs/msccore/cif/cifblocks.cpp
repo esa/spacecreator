@@ -17,8 +17,6 @@
 
 #include "cifblocks.h"
 
-#include "ciflines.h"
-
 namespace msc {
 namespace cif {
 

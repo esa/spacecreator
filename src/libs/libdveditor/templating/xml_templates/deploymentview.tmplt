@@ -13,19 +13,22 @@ properties.value  :  |_ Value of that property
 The following tags are available in this template:
 Nodes                      : List of all available Nodes (Boards)
 node                       : |_ Instance of node (see "for node in Nodes")
+node.id                    :    |_ ID of the object
 node.nodeLabel             :    |_ Unique label of this node
 node.partitions            :    |_ List of partitions (binary) in that node
 partition                  :    |  |_ Instance of node.partition (see "for partition in node.partitions")
-partitions.functions       :    |     |_ List of functions in that partition
+partition.id	           :    |     |_ ID of the object
+partition.functions        :    |     |_ List of functions in that partition
 function                   :    |        |_ Instance of partitions.function (see "for function in function in partition.functions")
 function.usedImplementation:    |            |_ The implementation used for this functions
 function.implementation    :    |            |_ Implementation chosen excpilictly by the user (empty if default is used)
 function.path              :    |            |_ List of all parent function names and this one as last element (use for example {{ function.path|join:"::" }})
 node.devices               :    |_ List of devices (ports) in that node
 device                     :    |  |_ Instance of node.device
-device.fullName            :    |  |_ Full name of the device, consisting of name and port
-device.name                :    |  |_ Name of the device
-device.portName            :    |  |_ Name of the port
+device.id 	           :    | 	 |_ ID of the object
+device.fullName            :    | 	 |_ Full name of the device, consisting of name and port
+device.name                :    | 	 |_ Name of the device
+device.portName            :    | 	 |_ Name of the port
 device.qualifier           :    |  |_ Qualifier of the bus (see bus.qualifier)
 device.nodeName            :    |  |_ Name of the node, this device belongs to
 device.nodeLabel           :    |  |_ Label of the node, this device belongs to
@@ -33,8 +36,10 @@ node.requiredBusAccesses   :    |_ List of devices in the node that are actually
 device                     :    |  |_ Instance of node.requiredBusAccesses (same properties as in node.devices)
 node.systemFunctions       :    |_ List of functions provided by the system/board
 function                   :       |_ Instance of node.systemFunctions
+function.id                :          |_ ID of the object
 function.interfaces        :          |_ List of functions provided by the system/board
 interface                  :             |_ Instance of function.interfaces
+interface.id       	   :                |_ ID of the object
 interface.isProvided       :                |_ Is true if the interface type is "provided"
 interface.isRequired       :                |_ Is true if the interface type is "required"
 interface.params           :                |_ List of interface parameters
@@ -49,6 +54,7 @@ param.encoding             :                      |_ Encoding of param
 
 Connections                : List of all available Connections between devices
 connection                 : |_ Instance of connection (see "for connection in Connections")
+connection.id    	   :    |_ ID of the object
 connection.fromNode        :    |_ The source node of this connection
 connection.fromDevice      :    |_ The source device of this connection
 connection.fromPort        :    |_ The source port of this connection
@@ -58,6 +64,7 @@ connection.toPort          :    |_ The target port of this connection
 connection.busName         :    |_ Name of the bus used by this connection (same as Buses.bus.name)
 connection.messages        :    |_ List of message binding of that connection
 message                    :       |_ Instance of message/binding (see "for message in connection.messages")
+message.id      	   :          |_ ID of the object
 message.fromFunction       :          |_ Name of the connected source function
 message.fromInterface      :          |_ Name of the connected source interface
 message.fromFunctionPath   :          |_ List of all parent function names of and including the from function one as last element (use for example {{ function.path|join:"::" }})
@@ -73,39 +80,39 @@ bus.devices                :    |_ List of devices connected to this bus
 device                     :       |_ Instance of bus.devices (same properties as in node.devices)
 ====================================
 {% endcomment %}
-<DeploymentView version="1.0">
+<DeploymentView version="1.1">
 {% for node in Nodes %}
-    <Node{% for attr in node.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+    <Node id="{{ node.id }}"{% for attr in node.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
     {% for prop in node.properties %}
         <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
     {% endfor %}
     {% for partition in node.partitions %}
-        <Partition{% for attr in partition.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        <Partition id="{{ partition.id }}"{% for attr in partition.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
         {% for prop in partition.properties %}
             <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
         {% endfor %}
         {% for function in partition.functions %}
-            <Function{% for attr in function.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+            <Function id="{{ function.id }}"{% for attr in function.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
         {% endfor %}
         </Partition>
     {% endfor %}
     {% for device in node.devices %}
-        <Device{% for attr in device.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        <Device id="{{ device.id }}"{% for attr in device.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
         {% for prop in device.properties %}
             <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
         {% endfor %}
         </Device>
     {% endfor %}
     {% for function in node.systemFunctions %}
-        <System_Function{% for attr in function.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+        <System_Function id="{{ function.id }}"{% for attr in function.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
         {% for prop in function.properties %}
             <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
         {% endfor %}
         {% for iface in function.interfaces %}
         {% if iface.isProvided %}
-            <Provided_Interface{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+            <Provided_Interface id="{{ iface.id }}"{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
             {% else %}
-            <Required_Interface{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+            <Required_Interface id="{{ iface.id }}"{% for attr in iface.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
             {% endif %}
             {% for param in iface.params %}
             {% if param.isIn %}
@@ -128,12 +135,12 @@ device                     :       |_ Instance of bus.devices (same properties a
     </Node>
 {% endfor %}
 {% for connection in Connections %}
-    <Connection{% for attr in connection.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+    <Connection id="{{ connection.id }}"{% for attr in connection.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
         {% for prop in connection.properties %}
             <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
         {% endfor %}
         {% for message in connection.messages %}
-            <Message{% for attr in message.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
+            <Message id="{{ message.id }}"{% for attr in message.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}/>
         {% endfor %}
     </Connection>
 {% endfor %}

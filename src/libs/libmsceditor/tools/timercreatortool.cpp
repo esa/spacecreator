@@ -88,7 +88,8 @@ void TimerCreatorTool::commitPreviewItem()
     startWaitForModelLayoutComplete(timer);
     auto instance = m_model->nearestInstance(m_previewItem->sceneBoundingRect().center());
     const int eventIndex = m_model->eventInstanceIndex(m_previewItem->pos(), instance);
-    m_model->undoStack()->push(new cmd::CmdTimerItemCreate(timer, m_timerType, instance, eventIndex, m_model));
+    m_model->undoStack()->push(
+            new cmd::CmdTimerItemCreate(timer, m_timerType, instance, eventIndex, m_model->currentChart()));
 
     removePreviewItem();
 

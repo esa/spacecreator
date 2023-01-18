@@ -45,7 +45,15 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    /**
+     * @brief boundingRect Any child of QGraphicsItem must implement this method.
+     */
     QRectF boundingRect() const override;
+
+    /**
+     * @brief setBoundingRect sets the geometry of this item. Position of grippoint-handles are updated an 'boundingboxChanged' is emitted.
+     * @param newRect
+     */
     void setBoundingRect(const QRectF &newRect);
 
     GripPointsHandler *gripPointsHandler() const;

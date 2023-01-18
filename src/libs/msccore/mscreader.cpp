@@ -17,7 +17,6 @@
 
 #include "mscreader.h"
 
-#include "MscBaseVisitor.h"
 #include "MscLexer.h"
 #include "MscParser.h"
 #include "exceptions.h"

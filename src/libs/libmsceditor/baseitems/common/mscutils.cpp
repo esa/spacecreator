@@ -16,8 +16,6 @@
 */
 #include "mscutils.h"
 
-#include "baseitems/interactiveobject.h"
-#include "chartitem.h"
 #include "instanceitem.h"
 #include "mscinstance.h"
 

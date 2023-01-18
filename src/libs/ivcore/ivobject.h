@@ -59,7 +59,7 @@ public:
     virtual ~IVObject() override;
 
     QString title() const override;
-    QString titleUI() const override;
+    virtual QString titleUI() const override;
 
     IVObject::Type type() const;
 

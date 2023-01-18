@@ -49,7 +49,7 @@ public:
 
     void init() override;
     ivm::IVComment *entity() const override;
-    QSizeF minimalSize() const override;
+    QSizeF minimumSize() const override;
     int itemLevel(bool isSelected) const override;
 
 protected Q_SLOTS:

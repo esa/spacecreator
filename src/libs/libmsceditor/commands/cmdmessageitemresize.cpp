@@ -25,8 +25,8 @@ namespace msc {
 namespace cmd {
 
 CmdMessageItemResize::CmdMessageItemResize(MscMessage *message, const ChartIndex &newChartIndex,
-        MscMessage::EndType endType, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(message, layoutManager)
+        MscMessage::EndType endType, MscChart *chart)
+    : ChartBaseCommand(message, chart)
     , m_message(message)
     , m_newIndex(newChartIndex)
     , m_endType(endType)

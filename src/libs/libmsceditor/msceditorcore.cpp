@@ -260,7 +260,7 @@ void MSCEditorCore::changeMscInstanceName(const QString &oldName, const QString 
         for (msc::MscInstance *instance : chart->instances()) {
             if (instance->name() == oldName) {
                 msc::MscCommandsStack *undo = commandsStack();
-                auto cmd = new msc::cmd::CmdEntityNameChange(instance, name, nullptr);
+                auto cmd = new msc::cmd::CmdEntityNameChange(instance, name);
                 undo->push(cmd);
                 updated = true;
             }
@@ -286,7 +286,7 @@ void MSCEditorCore::changeMscMessageName(
                 const QString messageTarget = message->targetInstance() ? message->targetInstance()->name() : "";
                 if (messageSource == sourceName && messageTarget == targetName) {
                     msc::MscCommandsStack *undo = commandsStack();
-                    auto cmd = new msc::cmd::CmdEntityNameChange(message, newName, nullptr);
+                    auto cmd = new msc::cmd::CmdEntityNameChange(message, newName);
                     undo->push(cmd);
                     updated = true;
                 }

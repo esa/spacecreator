@@ -17,10 +17,8 @@
 
 #include "cmdmessagepointsedit.h"
 
-#include "chartlayoutmanager.h"
 #include "commandids.h"
 #include "mscchart.h"
-#include "mscinstance.h"
 #include "mscmessage.h"
 
 #include <QDebug>
@@ -29,11 +27,11 @@ namespace msc {
 namespace cmd {
 
 CmdMessagePointsEdit::CmdMessagePointsEdit(MscMessage *message, const QVector<QPoint> &cifPointsOld,
-        const QVector<QPoint> &cifPointsNew, ChartIndexList indices, ChartLayoutManager *layoutManager)
-    : EventMoveBaseCommand(message, layoutManager)
+        const QVector<QPoint> &cifPointsNew, ChartIndexList indices, MscChart *chart)
+    : EventMoveBaseCommand(message, chart)
     , m_message(message)
-    , m_newCif(cifPointsNew)
-    , m_oldCif(cifPointsOld)
+    , m_newCifData(cifPointsNew)
+    , m_oldCifData(cifPointsOld)
     , m_newIndexes(indices)
     , m_oldIndexes(m_chart->indicesOfEvent(m_message))
 {
@@ -48,7 +46,7 @@ void CmdMessagePointsEdit::redo()
 
     storeGeometries();
     if (m_message) {
-        m_message->setCifPoints(m_newCif);
+        m_message->setCifPoints(m_newCifData);
     }
 }
 
@@ -60,7 +58,7 @@ void CmdMessagePointsEdit::undo()
 
     restoreGeometries();
     if (m_message) {
-        m_message->setCifPoints(m_oldCif);
+        m_message->setCifPoints(m_oldCifData);
     }
 }
 
