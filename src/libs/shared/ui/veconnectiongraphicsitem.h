@@ -88,6 +88,8 @@ protected:
 
     virtual void updateBoundingRect();
 
+    virtual void updateTextPosition() override;
+
 protected Q_SLOTS:
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;

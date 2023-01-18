@@ -65,8 +65,6 @@ private Q_SLOTS:
         auto converter = msc::CoordinatesConverter::instance();
         converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
 
-        m_model->initialModel();
-        m_handler->setModel(m_model);
         connect(m_server, &msc::RemoteControlWebServer::executeCommand, m_handler,
                 &msc::RemoteControlHandler::handleRemoteCommand);
         connect(m_handler, &msc::RemoteControlHandler::commandDone, m_server,
@@ -77,6 +75,12 @@ private Q_SLOTS:
 
     void init()
     {
+        m_model->initialModel();
+        m_handler->setMscModel(m_model->mscModel());
+        m_handler->setUndoStack(m_model->undoStack());
+        m_handler->setLayoutManager(&(m_model->chartViewModel()));
+        m_handler->setChart(m_model->mscModel()->firstChart());
+
         m_textMessageReceived.clear();
         m_socketError.clear();
 
@@ -84,11 +88,7 @@ private Q_SLOTS:
         QTRY_COMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
     }
 
-    void cleanup()
-    {
-        m_socket->close();
-        m_model->initialModel();
-    }
+    void cleanup() { m_socket->close(); }
 
     void testInstanceCommand()
     {

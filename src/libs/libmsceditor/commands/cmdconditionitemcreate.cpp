@@ -26,8 +26,8 @@ namespace msc {
 namespace cmd {
 
 CmdConditionItemCreate::CmdConditionItemCreate(MscCondition *condition, msc::MscInstance *instance,
-        const ChartIndexList &instanceIndexes, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(condition, layoutManager)
+        const ChartIndexList &instanceIndexes, MscChart *chart)
+    : ChartBaseCommand(condition, chart)
     , m_condition(condition)
     , m_instance(instance)
     , m_instanceIndexes(instanceIndexes)

@@ -20,11 +20,14 @@
 #include "ivfunctiontype.h"
 #include "ivobject.h"
 #include "ui/verectgraphicsitem.h"
-#include "veobject.h"
+namespace shared::ui{
+class GripPoint;
+}
 
 namespace ive {
 
 class IVFunctionNameGraphicsItem;
+using shared::ui::GripPoint;
 
 class IVFunctionTypeGraphicsItem : public shared::ui::VERectGraphicsItem
 {
@@ -41,8 +44,6 @@ public:
 
     void enableEditMode() override;
 
-    QSizeF minimalSize() const override;
-
     QString prepareTooltip() const override;
 
     bool isRootItem() const;
@@ -56,13 +57,58 @@ protected Q_SLOTS:
     void updateNameFromUi(const QString &name);
 
 protected:
+    /**
+     * @brief resizedRect takes a GripPoint sitting on this VERectGraphicsItem and two
+     * QPointFs representing the movement of the GripPoint and returns
+     * a QRectF representing the new sceneBoundingRect of this VERectGraphicsItem based on
+     * the allowed movement of that particular grip point.
+     *
+     * A corner GripPoint can move freely. A GripPoint on a horizontal line can only move
+     * up or down. A GripPoint on a vertical line can only move left or right.
+     *
+     * If a transformation is illegal, a QRectF is calculated that performs as much as possible of the
+     * transformation as is legal.
+     *
+     * Limits of movement: An IVFunctionTypeGraphicsItem inherits its resizedRect from VERectGraphicsItem which
+     * limits the resizing with respect to interfaces (aka connection endpoints). FunctionTypeGraphicsItem adds
+     * respect to the Text displaying the FunctionName, so that the FunctionName is always visible.
+     *
+     * @param grip a GripPoint
+     * @param from a QPointF the GripPoint was moved from
+     * @param to a QPointF the GripPoint was moved to
+     * @return a QRect representing the new sceneBoundingRect of this IVFunctionTypeGraphicsItem
+     */
+    virtual QRectF resizedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
+
+    /**
+     * @brief resizedRectForTextLabel implements respect for the FunctionName of this IVFunctionTypeGraphicsItem
+     * @param grip a GripPoint
+     * @param from a QPointF the GripPoint was moved from
+     * @param to a QPointF the GripPoint was moved to
+     * @return a QRect representing the new sceneBoundingRect of this IVFunctionTypeGraphicsItem
+     */
+    virtual QRectF resizedRectForTextLabel(GripPoint *grip, const QPointF &from, const QPointF &to) const;
+
     void rebuildLayout() override;
+
+    /**
+     * @brief paint Paints the rectangle with the rounded corners and double borders that is a functiontype. The text is not paintet
+     * by this class but handled by TextItem which is a child of this GraphicsItem.
+     * @param painter
+     * @param option
+     * @param widget
+     */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
 
     void updateTextPosition() override;
 
-    virtual void prepareTextRect(QRectF &textRect, const QRectF &targetTextRect) const;
+    /**
+     * @brief alignTextItem Places the text-item within the boundingbox of this FunctionTypeGraphicsItem's bounding box.
+     * For a IVFunctionTypeGraphicsItem this means the top-left of the text is aligned with the top-left of the IVFunctionTypeGraphicsItem's bounding box.
+     * Child classes can override this to make their text align differently, like in the center of the bounding box.
+     */
+    virtual void alignTextItem() const;
 
     shared::ui::TextItem *initTextItem() override;
 };

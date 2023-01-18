@@ -17,31 +17,28 @@
 
 #include "eventmovebasecommand.h"
 
-#include "baseitems/interactiveobject.h"
-#include "chartlayoutmanager.h"
 #include "cif/cifparser.h"
+#include "mscchart.h"
 #include "mscinstanceevent.h"
 
 namespace msc {
 namespace cmd {
 
-EventMoveBaseCommand::EventMoveBaseCommand(
-        MscInstanceEvent *event, ChartLayoutManager *layoutManager, QUndoCommand *parent)
-    : ChartBaseCommand(event, layoutManager, parent)
+EventMoveBaseCommand::EventMoveBaseCommand(MscInstanceEvent *event, MscChart *chart, QUndoCommand *parent)
+    : ChartBaseCommand(event, chart, parent)
     , m_event(event)
 {
 }
 
 void EventMoveBaseCommand::storeGeometries()
 {
-    if (m_layoutManager.isNull()) {
+    if (m_chart.isNull()) {
         return;
     }
 
     m_eventGeometries.clear();
-    for (InteractiveObject *item : m_layoutManager->instanceEventItems()) {
-        MscEntity *entity = item->modelEntity();
-        m_eventGeometries.insert(entity, entity->cifText());
+    for (MscInstanceEvent *event : m_chart->instanceEvents()) {
+        m_eventGeometries.insert(event, event->cifText());
     }
 }
 
@@ -55,8 +52,6 @@ void EventMoveBaseCommand::restoreGeometries()
 void EventMoveBaseCommand::applyNewPos()
 {
     if (m_newCif.isEmpty()) {
-        InteractiveObject *item = m_layoutManager->itemForEntity(m_event);
-        item->updateCif();
         m_newCif = m_event->cifText();
     } else {
         restoreCif(m_event, m_newCif);

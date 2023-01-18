@@ -19,38 +19,34 @@
 
 #include "context/action/actionsmanager.h"
 #include "dv/dveditorfactory.h"
-#include "dv/dvqtceditor.h"
 #include "dveditor.h"
 #include "dvlibrary.h"
-#include "dvsystemchecks.h"
-#include "interfacedocument.h"
-#include "iv/iveditordata.h"
 #include "iv/iveditorfactory.h"
 #include "iv/ivqtceditor.h"
 #include "iveditor.h"
 #include "iveditorcore.h"
 #include "ivlibrary.h"
-#include "msc/msceditordata.h"
 #include "msc/msceditorfactory.h"
-#include "msc/mscqtceditor.h"
-#include "scl/scleditorfactory.h"
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msclibrary.h"
-#include "mscsystemchecks.h"
+#include "scl/scleditorfactory.h"
 #include "sharedlibrary.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 
-#include <QAction>
-#include <QMenu>
-#include <QMessageBox>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
+#include <languageclient/languageclientsettings.h>
+#include <languageclient/languageclientmanager.h>
+
+#include <QAction>
+#include <QMenu>
+#include <QMessageBox>
 
 void initSpaceCreatorResources()
 {
@@ -111,6 +107,7 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     addHelp();
 
+
     return true;
 }
 
@@ -119,6 +116,7 @@ void SpaceCreatorPlugin::extensionsInitialized()
     // Retrieve objects from the plugin manager's object pool
     // In the extensionsInitialized function, a plugin can be sure that all
     // plugins that depend on it are completely initialized.
+    setupTasteLanguageClients();
 }
 
 ExtensionSystem::IPlugin::ShutdownFlag SpaceCreatorPlugin::aboutToShutdown()
@@ -151,6 +149,72 @@ void SpaceCreatorPlugin::addHelp()
     });
     Core::Command *showIveHelp = Core::ActionManager::registerAction(iveHelpAction, Constants::IV_HELP_ID, allContexts);
     actions->addAction(showIveHelp);
+}
+
+void SpaceCreatorPlugin::setupTasteLanguageClients()
+{
+    if (ignoreTasteLanguageClients())
+    {
+        return;
+    }
+
+    QString iniFilePath = findInitFileForTasteLanguageClients();
+    QSettings qSettings(iniFilePath, QSettings::IniFormat);
+
+    int size = qSettings.beginReadArray("LanguageClient");
+    for (int i = 0; i < size; ++i)
+    {
+        qSettings.setArrayIndex(i);
+        auto *stdIOSettings = new LanguageClient::StdIOSettings();
+        stdIOSettings->m_name = qSettings.value("Name").toString();
+        int startBehaviorInt = qSettings.value("StartBehavior").toInt();
+        stdIOSettings->m_startBehavior = LanguageClient::BaseSettings::StartBehavior(startBehaviorInt);
+        stdIOSettings->m_executable = Utils::FilePath::fromVariant(qSettings.value("Executable"));
+        LanguageClient::LanguageFilter languageFilter;
+        languageFilter.mimeTypes = qSettings.value("MimeTypes").toString().split(' ');
+        languageFilter.filePattern = qSettings.value("FilePattern").toString().split(' ');
+        stdIOSettings->m_languageFilter = languageFilter;
+        stdIOSettings->m_enabled = qSettings.value("Enabled").toBool();
+        stdIOSettings->m_initializationOptions = qSettings.value("InitializationOptions").toString();
+        stdIOSettings->m_arguments = qSettings.value("Arguments").toString();
+
+        LanguageClient::LanguageClientManager::registerClientSettings(stdIOSettings);
+        LanguageClient::LanguageClientManager::enableClientSettings(stdIOSettings->m_id, stdIOSettings->m_enabled);
+    }
+    qSettings.endArray();
+}
+
+bool SpaceCreatorPlugin::ignoreTasteLanguageClients() const
+{
+    const QString IGNORETASTELANUAGECLIENTS = "IgnoreTasteLanuageClients";
+    QSettings qSettings;
+    qSettings.beginGroup("TasteLanguageClients");
+    bool ignore = qSettings.value(IGNORETASTELANUAGECLIENTS, false).toBool();
+    if (ignore == false)
+    {
+        qSettings.setValue(IGNORETASTELANUAGECLIENTS, true);
+    }
+    return ignore;
+}
+
+QString SpaceCreatorPlugin::findInitFileForTasteLanguageClients() const
+{
+    QDir appImageDir = findAppImageDir();
+    QString iniFilePath = appImageDir.filePath("TasteLanguageClients.ini");
+    QFileInfo iniFileInfo(iniFilePath);
+    QString result = iniFileInfo.canonicalFilePath();
+    if (result.isEmpty())
+    {
+        qWarning() << "Could not find" << QDir::cleanPath(iniFilePath);
+    }
+    return result;
+}
+
+QDir SpaceCreatorPlugin::findAppImageDir() const
+{
+    QDir dir = QDir(QCoreApplication::applicationDirPath());
+    dir.cdUp(); // dir is now the AppImageDir - the parent of the bin dir
+    return dir;
 }
 
 }

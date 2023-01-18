@@ -37,7 +37,8 @@ class TimerItem : public EventItem
 {
     Q_OBJECT
 public:
-    explicit TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
+    explicit TimerItem(
+            msc::MscTimer *timer, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     MscTimer *modelItem() const;
 

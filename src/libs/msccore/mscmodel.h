@@ -21,8 +21,8 @@
 #include <QPointer>
 #include <QStringList>
 #include <QVector>
-#include <memory>
 #include <conversion/common/model.h>
+#include <memory>
 
 namespace Asn1Acn {
 class Asn1SystemChecks;
@@ -47,9 +47,11 @@ public:
     explicit MscModel(QObject *parent = nullptr);
     ~MscModel();
 
+    static std::unique_ptr<MscModel> defaultModel();
+
     virtual conversion::ModelType modelType() const override;
 
-    void setFilename(const QString filename);
+    void setFilename(const QString &filename);
     const QString filename() const;
 
     const QVector<MscDocument *> &documents() const;
@@ -58,6 +60,8 @@ public:
 
     const QVector<MscChart *> &charts() const;
     void addChart(MscChart *chart);
+
+    msc::MscChart *firstChart() const;
 
     QVector<MscDocument *> allDocuments() const;
     QVector<MscChart *> allCharts() const;
@@ -94,6 +98,7 @@ Q_SIGNALS:
 
 private:
     void appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> &messages) const;
+    msc::MscChart *firstChart(const QVector<msc::MscDocument *> &docs) const;
 
     QVector<MscDocument *> m_documents;
     QVector<MscChart *> m_charts;
@@ -104,7 +109,6 @@ private:
 };
 
 } // namespace msc
-
 
 namespace conversion {
 

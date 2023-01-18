@@ -19,7 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/common/mscutils.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
 #include "colors/colormanager.h"
@@ -39,7 +39,7 @@ namespace msc {
 static const qreal kCoregionWidth = 50;
 static const qreal kDefaultHeight = 40;
 
-CoregionItem::CoregionItem(ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+CoregionItem::CoregionItem(ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(nullptr, chartLayoutManager, parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);

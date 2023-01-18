@@ -17,8 +17,6 @@
 
 #include "cmdchangeinstanceposition.h"
 
-#include "cif/cifblockfactory.h"
-#include "cif/cifparser.h"
 #include "commandids.h"
 #include "mscinstance.h"
 

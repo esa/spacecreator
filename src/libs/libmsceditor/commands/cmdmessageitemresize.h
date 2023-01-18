@@ -34,7 +34,7 @@ class CmdMessageItemResize : public ChartBaseCommand
 {
 public:
     CmdMessageItemResize(MscMessage *message, const ChartIndex &newChartIndex, msc::MscMessage::EndType endType,
-            ChartLayoutManager *layoutManager);
+            msc::MscChart *chart);
 
     void redo() override;
     void undo() override;

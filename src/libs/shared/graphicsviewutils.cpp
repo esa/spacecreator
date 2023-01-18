@@ -1077,10 +1077,12 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
     }
 
     if (auto rectItem = qobject_cast<const ui::VERectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
+        // Is this item contained by its parent
         if (auto parentObj = rectItem->parentItem()) {
             const QRectF outerRect = parentObj->sceneBoundingRect().marginsRemoved(kContentMargins);
             return isRectBounded(outerRect, upcomingItemRect);
         }
+        // Are all my children contained in me
         return isRectBounded(
                 upcomingItemRect.marginsRemoved(kContentMargins), rectItem->nestedItemsSceneBoundingRect());
     }

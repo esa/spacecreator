@@ -26,8 +26,8 @@ namespace msc {
 namespace cmd {
 
 CmdCoRegionItemMove::CmdCoRegionItemMove(MscCoregion *coregionBegin, MscCoregion *coregionEnd, int newBeginPos,
-        int newEndPos, MscInstance *newInsance, ChartLayoutManager *layoutManager)
-    : EventMoveBaseCommand(coregionBegin, layoutManager)
+        int newEndPos, MscInstance *newInsance, MscChart *chart)
+    : EventMoveBaseCommand(coregionBegin, chart)
     , m_coregionBegin(coregionBegin)
     , m_coregionEnd(coregionEnd)
     , m_oldBeginIndex(m_chart->indexofEventAtInstance(coregionBegin, coregionBegin->instance()))

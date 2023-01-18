@@ -28,7 +28,7 @@ namespace cmd {
 class CmdInstanceKindChange : public ChartBaseCommand
 {
 public:
-    CmdInstanceKindChange(MscInstance *item, const QString &newKind, ChartLayoutManager *layoutManager);
+    CmdInstanceKindChange(MscInstance *item, const QString &newKind);
 
     void redo() override;
     void undo() override;

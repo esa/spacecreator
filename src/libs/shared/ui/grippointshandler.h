@@ -46,6 +46,10 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QList<GripPoint *> gripPoints() const;
+
+    /**
+     * @brief updates the position of each grip point and sets the mouse-icon
+     */
     void updateLayout();
 
     QSizeF minSize() const;
@@ -67,9 +71,10 @@ protected Q_SLOTS:
     void opacityAnimationFinished();
 
 Q_SIGNALS:
-    void manualGeometryChangeStart(GripPoint *gripPoint, const QPointF &at);
-    void manualGeometryChangeProgress(GripPoint *gripPoint, const QPointF &from, const QPointF &to);
-    void manualGeometryChangeFinish(GripPoint *gripPoint, const QPointF &startedAt, const QPointF &releasedAt);
+    void manualGeometryChangeStart(shared::ui::GripPoint *gripPoint, const QPointF &at);
+    void manualGeometryChangeProgress(shared::ui::GripPoint *gripPoint, const QPointF &from, const QPointF &to);
+    void manualGeometryChangeFinish(
+            shared::ui::GripPoint *gripPoint, const QPointF &startedAt, const QPointF &releasedAt);
 
 private:
     void changeVisibilityAnimated(bool appear);

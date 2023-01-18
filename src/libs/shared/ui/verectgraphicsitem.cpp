@@ -19,6 +19,7 @@
 
 #include "graphicsviewutils.h"
 #include "ui/grippointshandler.h"
+#include "ui/textitem.h"
 #include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
 
@@ -37,22 +38,6 @@ VERectGraphicsItem::VERectGraphicsItem(VEObject *entity, QGraphicsItem *parentGr
     setHighlightable(true);
 }
 
-QSizeF VERectGraphicsItem::minimalSize() const
-{
-    return QSizeF();
-}
-
-static QPointF shiftChildren(const QRectF &sourceRect, const QRectF &destRect)
-{
-    if (!sourceRect.isValid() || !destRect.isValid())
-        return {};
-
-    const QPointF shift = sourceRect.topLeft() - destRect.topLeft();
-    if (destRect.translated(shift) == sourceRect)
-        return {};
-
-    return shift;
-}
 
 bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
 {
@@ -60,12 +45,18 @@ bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
         return false;
 
     /// Silent geometry change without relayouting
-    const QPointF shift = shiftChildren(sceneBoundingRect(), sceneGeometry);
+    bool sceneGeometryIsResize = sceneBoundingRect().size() != sceneGeometry.size();
+    const QPointF shift = sceneBoundingRect().topLeft() - sceneGeometry.topLeft();
     setPos(mapToParent(mapFromScene(sceneGeometry.topLeft())));
-    if (!shift.isNull()) {
-        for (QGraphicsItem *child : childItems()) {
-            if (auto iObj = qobject_cast<VERectGraphicsItem *>(child->toGraphicsObject()))
+    if (sceneGeometryIsResize)
+    {
+        for (QGraphicsItem *child : childItems())
+        {
+            auto iObj = qobject_cast<VERectGraphicsItem *>(child->toGraphicsObject());
+            if (iObj)
+            {
                 iObj->moveBy(shift.x(), shift.y());
+            }
         }
     }
 
@@ -85,7 +76,9 @@ bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
 void VERectGraphicsItem::setRect(const QRectF &geometry)
 {
     if (setGeometry(geometry))
+    {
         instantLayoutUpdate();
+    }
 }
 
 void VERectGraphicsItem::initGripPoints()
@@ -108,9 +101,7 @@ void VERectGraphicsItem::updateFromEntity()
         doLayout();
     } else {
         setRect(itemSceneRect);
-        if (layoutShouldBeChanged() && doLayout()) {
-            mergeGeometry();
-        }
+        doLayout();
     }
 }
 
@@ -128,7 +119,7 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
     if (pressedAt == releasedAt)
         return;
 
-    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
+    const QRectF rect = movedRect(pressedAt, releasedAt);
     if (QGraphicsItem *parentObj = parentItem()) {
         const QRectF parentRect =
                 parentObj->sceneBoundingRect().marginsRemoved(shared::graphicsviewutils::kContentMargins);
@@ -140,17 +131,25 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
     layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
 }
 
-void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
+void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    if (pressedAt == releasedAt)
+    if (from == to)
+    {
         return;
+    }
 
-    const QRectF rect = transformedRect(grip, pressedAt, releasedAt);
-    setGeometry(rect);
+    // Calculate new rect for this item, given that 'grip' was moved as descriped by 'from' and 'to'
+    QRectF newRect = resizedRect(grip, from, to);
+    setGeometry(newRect);
+
+    // Update positions of interface attachment points (iface)
     const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
-    const QPointF delta = releasedAt - pressedAt;
-    for (auto child : childItems()) {
-        if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
+    for (auto child : childItems())
+    {
+        auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
+        if (iface)
+        {
+            // Read the stored coordinates
             const VEObject *obj = iface->entity();
             Q_ASSERT(obj);
             if (!obj) {
@@ -158,11 +157,13 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
             }
 
             const QPointF storedPos = graphicsviewutils::pos(obj->coordinates());
-            if (storedPos.isNull() || !grip) {
+            if (storedPos.isNull())
+            {
                 iface->instantLayoutUpdate();
                 continue;
             }
 
+            // Calculate the new postion of the iface.
             const Qt::Alignment side = graphicsviewutils::getNearestSide(entityRect, storedPos);
             const QRectF sceneRect = sceneBoundingRect();
             const QPointF pos = graphicsviewutils::getSidePosition(sceneRect, storedPos, side);
@@ -181,22 +182,43 @@ void VERectGraphicsItem::layoutInterfaces()
     }
 }
 
+void VERectGraphicsItem::updateTextPosition()
+{
+    if (m_textItem)
+    {
+        m_textItem->setExplicitSize(boundingRect().size());
+    }
+}
+
+
 void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt)
+    {
         return;
+    }
 
     const QRectF rect = sceneBoundingRect();
-    if (rect.width() >= minimalSize().width() && rect.height() >= minimalSize().height()
-            && shared::graphicsviewutils::isBounded(this, rect) && !shared::graphicsviewutils::isCollided(this, rect)) {
+    bool isBounded = shared::graphicsviewutils::isBounded(this, rect);
+    bool noCollision = !shared::graphicsviewutils::isCollided(this, rect);
+    if (isBounded && noCollision)
+    {
         layoutInterfaces();
         layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
-    } else { // Fallback to previous geometry in case colliding with items at the same level
+    }
+    layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
+
+    // If a collision takes place, reread all positions from the model
+    if (shared::graphicsviewutils::isCollided(this, rect))
+    {
         updateFromEntity();
-        for (auto child : childItems()) {
-            if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
-                iface->updateFromEntity();
+        // Make children update from entity also
+        for (auto child : childItems())
+        {
+            if (auto connectionEndPoint = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject()))
+            {
+                connectionEndPoint->updateFromEntity();
             }
         }
         layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
@@ -208,9 +230,9 @@ void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pres
     if (pressedAt == releasedAt)
         return;
 
-    if (boundingRect().width() >= minimalSize().width() && boundingRect().height() >= minimalSize().height()
-            && shared::graphicsviewutils::isBounded(this, sceneBoundingRect())
-            && !shared::graphicsviewutils::isCollided(this, sceneBoundingRect())) {
+    bool isBounded = shared::graphicsviewutils::isBounded(this, sceneBoundingRect());
+    bool noCollision = !shared::graphicsviewutils::isCollided(this, sceneBoundingRect());
+    if (isBounded && noCollision) {
         layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
     } else { // Fallback to previous geometry in case colliding with items at the same level
@@ -219,59 +241,117 @@ void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pres
     }
 }
 
-QRectF VERectGraphicsItem::transformedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
+QSizeF VERectGraphicsItem::minimumSize() const
 {
-    const QPointF shift = QPointF(to - from);
-    QRectF rect = sceneBoundingRect();
-    if (shift.isNull()) {
-        return rect;
-    }
-    if (!grip) {
-        return rect.translated(shift);
+    // This very naive minimum size will at least keep the children from becoming invalid. Children should
+    // provide their own implementation.
+    return QSizeF(100, 50);
+}
+
+
+QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
+{
+    QRectF sBoundingRect = sceneBoundingRect();
+    QRectF rectWithRespectToConnections = checkConnectionEndpoints(grip, to, sBoundingRect);
+    return rectWithRespectToConnections;
+}
+
+
+QRectF VERectGraphicsItem::checkConnectionEndpoints(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
+{
+    QRectF result = sceneBoundingRect;
+    // Note: In QGraphicsView the Y-axis grows downwards. https://doc.qt.io/qt-6/graphicsview.html#the-graphics-view-coordinate-system
+    qreal leftMost = result.right(); // The furthest to the left, the right-grip can go is the right side of the rect.
+    qreal rightMost = result.left(); // The furthes to the right, the left-grip can go is the left side of the rect.
+    qreal topMost = result.bottom(); // The deepest the top-grip can go, is the bottom of the rect.
+    qreal bottomMost = result.top(); // The highest the bottom-grip can go, is the top of the rect.
+
+    for (auto child: childItems())
+    {
+        auto endPoint = qobject_cast<ui::VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
+        if (endPoint == nullptr)
+        {
+            continue;
+        }
+
+        auto alignment = endPoint->alignment();
+        bool endPointIsHorizonal = alignment == Qt::AlignTop || alignment == Qt::AlignBottom;
+        bool endPointIsVertical =  alignment == Qt::AlignLeft || alignment == Qt::AlignRight;
+        Q_ASSERT(endPointIsHorizonal || endPointIsVertical);
+        auto childSceneBoundingRect = endPoint->sceneBoundingRect();
+        if (endPointIsHorizonal)
+        {
+            auto left = childSceneBoundingRect.left();
+            leftMost = qMin(leftMost, left);
+
+            auto right = childSceneBoundingRect.right();
+            rightMost = qMax(rightMost, right);
+        }
+        if (endPointIsVertical)
+        {
+            auto top = childSceneBoundingRect.top();
+            topMost = qMin(topMost, top);
+
+            auto bottom = childSceneBoundingRect.bottom();
+            bottomMost = qMax(bottomMost, bottom);
+        }
     }
 
     switch (grip->location()) {
-    case GripPoint::Left: {
-        const qreal left = rect.left() + shift.x();
-        rect.setLeft(left);
-    } break;
-    case GripPoint::Top: {
-        const qreal top = rect.top() + shift.y();
-        rect.setTop(top);
-    } break;
-    case GripPoint::Right: {
-        const qreal right = rect.right() + shift.x();
-        rect.setRight(right);
-    } break;
-    case GripPoint::Bottom: {
-        const qreal bottom = rect.bottom() + shift.y();
-        rect.setBottom(bottom);
-    } break;
-    case GripPoint::TopLeft: {
-        const QPointF topLeft = rect.topLeft() + shift;
-        rect.setTopLeft(topLeft);
-    } break;
-    case GripPoint::TopRight: {
-        const QPointF topRight = rect.topRight() + shift;
-        rect.setTopRight(topRight);
-    } break;
-    case GripPoint::BottomLeft: {
-        const QPointF bottomLeft = rect.bottomLeft() + shift;
-        rect.setBottomLeft(bottomLeft);
-    } break;
-    case GripPoint::BottomRight: {
-        const QPointF bottomRight = rect.bottomRight() + shift;
-        rect.setBottomRight(bottomRight);
-    } break;
-    case GripPoint::Center: {
-        rect.translate(shift);
-    } break;
+    case GripPoint::Left:
+    {
+        result.setLeft(qMin(to.x(), leftMost));
+        break;
+    }
+    case GripPoint::Right:
+    {
+        result.setRight(qMax(to.x(), rightMost));
+        break;
+    }
+    case GripPoint::Top:
+    {
+        result.setTop(qMin(to.y(), topMost));
+        break;
+    }
+    case GripPoint::Bottom:
+    {
+        result.setBottom(qMax(to.y(), bottomMost));
+        break;
+    }
+    case GripPoint::TopLeft:
+    {
+        result.setTopLeft(QPoint(qMin(to.x(), leftMost), qMin(to.y(), topMost)));
+        break;
+    }
+    case GripPoint::TopRight:
+    {
+        result.setTopRight(QPoint(qMax(to.x(), rightMost), qMin(to.y(), topMost)));
+        break;
+    }
+    case GripPoint::BottomLeft:
+    {
+        result.setBottomLeft(QPoint(qMin(to.x(), leftMost), qMax(to.y(), bottomMost)));
+        break;
+    }
+    case GripPoint::BottomRight:
+    {
+        result.setBottomRight(QPoint(qMax(to.x(), rightMost), qMax(to.y(), bottomMost)));
+        break;
+    }
     default:
         qWarning() << "Update grip point handling";
         break;
     }
 
-    return rect.normalized();
+    return result;
+}
+
+QRectF VERectGraphicsItem::movedRect(const QPointF &from, const QPointF &to)
+{
+    auto deltaPoint = to - from;
+    QRectF boundingRect = sceneBoundingRect();
+    boundingRect.translate(deltaPoint);
+    return boundingRect;
 }
 
 QRectF VERectGraphicsItem::nestedItemsSceneBoundingRect() const
@@ -326,15 +406,29 @@ void VERectGraphicsItem::onGeometryChanged()
 
 bool VERectGraphicsItem::doLayout()
 {
-    if (layoutShouldBeChanged()) {
+    if (layoutShouldBeChanged())
+    {
         const auto parentFunction = qobject_cast<VERectGraphicsItem *>(parentObject());
-        QRectF boundedRect =
-                QRectF(parentFunction ? parentFunction->sceneBoundingRect() : scene()->itemsBoundingRect());
-        QRectF itemRect = QRectF(QPointF(0, 0), minimalSize());
+
+        QRectF boundedRect;
+        QMarginsF margins;
+        if (parentFunction)
+        {
+            boundedRect = parentFunction->sceneBoundingRect();
+            margins = graphicsviewutils::kContentMargins;
+        }
+        else
+        {
+            boundedRect = scene()->itemsBoundingRect();
+            margins = graphicsviewutils::kRootMargins;
+        }
+
+        QRectF itemRect = QRectF(QPointF(0, 0), minimumSize());
         itemRect.moveTopLeft(boundedRect.topLeft());
-        graphicsviewutils::findGeometryForRect(itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this),
-                parentFunction == nullptr ? graphicsviewutils::kRootMargins : graphicsviewutils::kContentMargins);
-        if (itemRect != sceneBoundingRect()) {
+
+        graphicsviewutils::findGeometryForRect(itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), margins);
+        if (itemRect != sceneBoundingRect())
+        {
             setRect(itemRect);
             return true;
         }
@@ -346,9 +440,14 @@ bool VERectGraphicsItem::layoutShouldBeChanged() const
 {
     const QRectF currentRect = sceneBoundingRect();
     if (!currentRect.isValid())
+    {
         return true;
+    }
 
-    return graphicsviewutils::isCollided(this, currentRect) || !graphicsviewutils::isBounded(this, currentRect);
+    bool collidesWithOther = graphicsviewutils::isCollided(this, currentRect);
+
+
+    return collidesWithOther || !graphicsviewutils::isBounded(this, currentRect);
 }
 
 void VERectGraphicsItem::layoutConnectionsOnResize(VEConnectionGraphicsItem::CollisionsPolicy collisionsPolicy)

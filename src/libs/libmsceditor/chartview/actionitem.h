@@ -30,8 +30,7 @@ class ActionItem : public EventItem
 {
     Q_OBJECT
 public:
-    explicit ActionItem(
-            msc::MscAction *action, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent = nullptr);
+    explicit ActionItem(msc::MscAction *action, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     MscAction *modelItem() const;
 

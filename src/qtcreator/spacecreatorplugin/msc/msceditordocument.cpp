@@ -182,6 +182,7 @@ bool MscEditorDocument::reload(QString *errorString, ReloadFlag flag, ChangeType
     bool success = false;
     if (m_plugin) {
         success = m_plugin->mainModel()->loadFile(filePath().toString());
+        m_plugin->mainModel()->mscModel()->checkAllMessages();
     }
     Q_EMIT reloadFinished(success);
     return success;

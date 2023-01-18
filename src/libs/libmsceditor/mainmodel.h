@@ -106,8 +106,6 @@ private Q_SLOTS:
     void showChartFromDocument(msc::MscDocument *document);
 
 private:
-    msc::MscChart *firstChart() const;
-    msc::MscChart *firstChart(const QVector<msc::MscDocument *> &docs) const;
     void clearMscModel();
     void setNewModel(msc::MscModel *model);
 

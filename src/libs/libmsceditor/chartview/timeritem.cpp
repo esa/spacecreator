@@ -19,7 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "chartview/mscchartviewconstants.h"
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
@@ -72,7 +72,7 @@ protected:
    \see msc::MscTimer
  */
 
-TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+TimerItem::TimerItem(msc::MscTimer *timer, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(timer, chartLayoutManager, parent)
     , m_timer(timer)
     , m_textItem(new TimerTextItem(this))
@@ -218,8 +218,7 @@ void TimerItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         auto timer = qobject_cast<msc::MscTimer *>(instanceEvent);
         if (timer) {
             if (canConnectTimers(timer, event->scenePos())) {
-                m_chartLayoutManager->undoStack()->push(
-                        new cmd::CmdEntityNameChange(timer, m_timer->name(), m_chartLayoutManager));
+                m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(timer, m_timer->name()));
             }
         }
     }
@@ -264,7 +263,7 @@ void TimerItem::onTextEdited(const QString &text)
         return;
     }
 
-    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(m_timer, text, m_chartLayoutManager));
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdEntityNameChange(m_timer, text));
 }
 
 void TimerItem::rebuildLayout()

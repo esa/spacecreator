@@ -47,7 +47,7 @@ dvm::DVPartition *DVPartitionGraphicsItem::entity() const
     return m_dataObject.isNull() ? nullptr : m_dataObject->as<dvm::DVPartition *>();
 }
 
-QSizeF DVPartitionGraphicsItem::minimalSize() const
+QSizeF DVPartitionGraphicsItem::minimumSize() const
 {
     return QSizeF(80, 80);
 }

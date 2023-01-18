@@ -25,7 +25,6 @@
 #include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivcoreutils.h"
-#include "ivfunctiongraphicsitem.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
 #include "ui/textitem.h"
@@ -101,7 +100,7 @@ void IVCommentGraphicsItem::rebuildLayout()
     update();
 }
 
-QSizeF IVCommentGraphicsItem::minimalSize() const
+QSizeF IVCommentGraphicsItem::minimumSize() const
 {
     return shared::graphicsviewutils::kDefaultGraphicsItemSize;
 }

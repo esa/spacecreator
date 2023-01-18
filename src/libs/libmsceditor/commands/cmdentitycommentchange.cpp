@@ -24,9 +24,8 @@
 namespace msc {
 namespace cmd {
 
-CmdEntityCommentChange::CmdEntityCommentChange(
-        MscEntity *item, const QString &newComment, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(item, layoutManager)
+CmdEntityCommentChange::CmdEntityCommentChange(MscEntity *item, const QString &newComment, MscChart *chart)
+    : ChartBaseCommand(item, chart)
     , m_oldComment(item && item->comment() ? item->comment()->text() : QString())
     , m_newComment(newComment)
 {

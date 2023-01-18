@@ -19,13 +19,9 @@
 #include "commentitem.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/objectslink.h"
-#include "baseitems/objectslinkitem.h"
 #include "baseitems/textitem.h"
-#include "chartlayoutmanager.h"
-#include "cif/cifblockfactory.h"
+#include "chartlayoutmanagerbase.h"
 #include "cif/cifline.h"
-#include "cif/ciflines.h"
 #include "colors/colormanager.h"
 #include "commands/cmdcommentitemchangegeometry.h"
 #include "commands/cmdentitycommentchange.h"
@@ -48,7 +44,7 @@ namespace msc {
  * Comment box item.
  */
 
-CommentItem::CommentItem(MscChart *chart, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+CommentItem::CommentItem(MscChart *chart, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : InteractiveObject(nullptr, chartLayoutManager, parent)
     , m_textItem(new TextItem(this))
     , m_linkItem(new QGraphicsPathItem)
@@ -193,10 +189,10 @@ void CommentItem::initGripPoints()
     InteractiveObjectBase::initGripPoints();
     gripPointsHandler()->setUsedPoints(isGlobal()
                     ? shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Top,
-                              shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Bottom,
-                              shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::TopLeft,
-                              shared::ui::GripPoint::Location::BottomLeft, shared::ui::GripPoint::Location::TopRight,
-                              shared::ui::GripPoint::Location::BottomRight, shared::ui::GripPoint::Location::Center }
+                            shared::ui::GripPoint::Location::Left, shared::ui::GripPoint::Location::Bottom,
+                            shared::ui::GripPoint::Location::Right, shared::ui::GripPoint::Location::TopLeft,
+                            shared::ui::GripPoint::Location::BottomLeft, shared::ui::GripPoint::Location::TopRight,
+                            shared::ui::GripPoint::Location::BottomRight, shared::ui::GripPoint::Location::Center }
                     : shared::ui::GripPoint::Locations { shared::ui::GripPoint::Location::Center });
 }
 
@@ -355,7 +351,7 @@ void CommentItem::onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF 
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(rect, newRect)) {
         m_chartLayoutManager->undoStack()->push(
-                new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
+                new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chart));
 
         rebuildLayout();
         updateGripPoints();
@@ -411,7 +407,7 @@ void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
     QRect newRect;
     if (CoordinatesConverter::sceneToCif(rect, newRect)) {
         m_chartLayoutManager->undoStack()->push(
-                new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
+                new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chart));
 
         rebuildLayout();
         updateGripPoints();
@@ -441,9 +437,8 @@ void CommentItem::textEdited(const QString &text)
         if (oldRect != newRect || oldText != text) {
             MscCommandsStack *undoStack = m_chartLayoutManager->undoStack();
             undoStack->beginMacro(tr("Change comment"));
-            undoStack->push(new cmd::CmdCommentItemChangeGeometry(
-                    oldRect, newRect, m_iObj->modelEntity(), m_chartLayoutManager));
-            undoStack->push(new cmd::CmdEntityCommentChange(m_iObj->modelEntity(), text, m_chartLayoutManager));
+            undoStack->push(new cmd::CmdCommentItemChangeGeometry(oldRect, newRect, m_iObj->modelEntity(), m_chart));
+            undoStack->push(new cmd::CmdEntityCommentChange(m_iObj->modelEntity(), text, m_chart));
             undoStack->endMacro();
         }
     }

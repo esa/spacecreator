@@ -17,7 +17,7 @@
 
 #include "eventitem.h"
 
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "mscinstanceevent.h"
@@ -26,7 +26,7 @@
 
 namespace msc {
 
-EventItem::EventItem(msc::MscInstanceEvent *entity, msc::ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+EventItem::EventItem(msc::MscInstanceEvent *entity, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : InteractiveObject(entity, chartLayoutManager, parent)
     , m_event(entity)
 {
@@ -103,7 +103,12 @@ MscInstanceEvent *EventItem::eventEntity() const
 QHash<MscInstance *, int> EventItem::visualIndices() const
 {
     QHash<MscInstance *, int> result;
-    QVector<MscInstance *> instances = m_chartLayoutManager->currentChart()->relatedInstances(m_event);
+
+    MscChart *chart = m_event->chart();
+    if (!chart) {
+        return result;
+    }
+    QVector<MscInstance *> instances = chart->relatedInstances(m_event);
     for (MscInstance *instance : instances) {
         const int idx = m_chartLayoutManager->eventInstanceIndex(sceneBoundingRect().topLeft(), instance, m_event);
         if (idx >= 0) {

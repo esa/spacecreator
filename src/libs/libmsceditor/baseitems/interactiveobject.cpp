@@ -18,10 +18,9 @@
 
 #include "interactiveobject.h"
 
-#include "baseitems/common/mscutils.h"
 #include "baseitems/textitem.h"
 #include "chartitem.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "mscentity.h"
 
 #include <QBrush>
@@ -33,7 +32,7 @@
 namespace msc {
 
 InteractiveObject::InteractiveObject(
-        msc::MscEntity *entity, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+        msc::MscEntity *entity, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : shared::ui::InteractiveObjectBase(parent)
     , m_entity(entity)
     , m_chartLayoutManager(chartLayoutManager)
@@ -127,7 +126,7 @@ cif::CifLine::CifType InteractiveObject::mainCifType() const
 /*!
    Retusn true if any changes between the given position vector is above a threshold
  */
-bool InteractiveObject::cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> newCif)
+bool InteractiveObject::cifChangedEnough(const QVector<QPoint> &storedCif, const QVector<QPoint> &newCif)
 {
     if (storedCif.size() != newCif.size())
         return true;
@@ -151,7 +150,7 @@ void InteractiveObject::moveSilentlyBy(const QPointF &shift)
     moveBy(shift.x(), shift.y());
 }
 
-void InteractiveObject::setChartItem(ChartItem* item)
+void InteractiveObject::setChartItem(ChartItem *item)
 {
     m_chartItem = item;
 }

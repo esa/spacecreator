@@ -19,8 +19,6 @@
 
 #include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
-#include "dvconnectiongraphicsitem.h"
-#include "dvdevicegraphicsitem.h"
 #include "dvnamevalidator.h"
 #include "dvpropertytemplateconfig.h"
 #include "graphicsviewutils.h"
@@ -60,7 +58,7 @@ void DVNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->restore();
 }
 
-QSizeF DVNodeGraphicsItem::minimalSize() const
+QSizeF DVNodeGraphicsItem::minimumSize() const
 {
     return shared::graphicsviewutils::kDefaultNodeGraphicsItemSize;
 }
@@ -91,7 +89,6 @@ void DVNodeGraphicsItem::rebuildLayout()
             const QRectF upcomingRect = sceneBoundingRect() | contentRect;
             if (!shared::graphicsviewutils::isCollided(this, upcomingRect)) {
                 setRect(upcomingRect);
-                mergeGeometry();
             }
         }
     }

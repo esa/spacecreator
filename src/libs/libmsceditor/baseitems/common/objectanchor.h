@@ -53,7 +53,7 @@ public:
     bool operator==(const ObjectAnchor &other) const;
 
 Q_SIGNALS:
-    void anchorChanged(msc::InteractiveObject *object, const QPointF &scenePoint) const;
+    void anchorChanged(msc::InteractiveObject *object, const QPointF &scenePoint);
 
 private:
     ObjectAnchor &operator=(const ObjectAnchor &other) = delete;
@@ -62,7 +62,7 @@ private:
     QPointF m_scenePoint;
     QGraphicsItem::GraphicsItemFlags m_storedFlags;
 
-    void notifyChanged() const;
+    void notifyChanged();
     void connectObject();
     void disconnectObject();
 };

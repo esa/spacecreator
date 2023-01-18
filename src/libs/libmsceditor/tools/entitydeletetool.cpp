@@ -140,9 +140,13 @@ void EntityDeleteTool::deleteSelectedItems()
     MscCommandsStack *undoStack = m_model->undoStack();
     undoStack->beginMacro(tr("Removing Entities"));
     for (msc::MscEntity *entity : comments) {
-        m_model->undoStack()->push(new cmd::CmdEntityCommentChange(entity, QString(), m_model));
+        m_model->undoStack()->push(new cmd::CmdEntityCommentChange(entity, QString(), m_model->currentChart()));
     }
-    m_model->undoStack()->push(new cmd::CmdDeleteEntity(items, parentDocument, m_model));
+    if (parentDocument) {
+        m_model->undoStack()->push(new cmd::CmdDeleteEntity(items, parentDocument));
+    } else {
+        m_model->undoStack()->push(new cmd::CmdDeleteEntity(items, m_model->currentChart()));
+    }
     undoStack->endMacro();
 }
 

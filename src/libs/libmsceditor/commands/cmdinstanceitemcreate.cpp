@@ -24,8 +24,8 @@
 namespace msc {
 namespace cmd {
 
-CmdInstanceItemCreate::CmdInstanceItemCreate(msc::MscInstance *instance, int orderId, ChartLayoutManager *layoutManager)
-    : ChartBaseCommand(instance, layoutManager)
+CmdInstanceItemCreate::CmdInstanceItemCreate(msc::MscInstance *instance, int orderId, MscChart *chart)
+    : ChartBaseCommand(instance, chart)
     , m_instance(instance)
     , m_instanceOrderNum(orderId)
 {

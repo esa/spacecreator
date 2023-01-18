@@ -78,13 +78,13 @@ private:
     QPointer<IVInterface> m_ifaceTarget { nullptr };
 };
 
-IVConnection::IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent)
-    : IVConnection(IVObject::Type::Connection, ifaceSource, ifaceTarget, parent)
+IVConnection::IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent, const shared::Id &id)
+    : IVConnection(IVObject::Type::Connection, ifaceSource, ifaceTarget, parent, id)
 {
 }
 
-IVConnection::IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent)
-    : IVObject(t, parent)
+IVConnection::IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent, const shared::Id &id)
+    : IVObject(t, parent, id)
     , d(new IVConnectionPrivate { ifaceSource, ifaceTarget })
 {
 }

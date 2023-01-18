@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.18)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -93,6 +93,7 @@ add_custom_target(DocuFiles SOURCES
     doc/mainpage.md
     doc/msc_conversion_template.md
     doc/msc_remote_handler.md
+    doc/quickstart.md
 )
 
 add_custom_target(BuildFiles SOURCES
@@ -117,6 +118,7 @@ add_subdirectory(src)
 add_subdirectory(wizards)
 
 # Testing
+option(DISABLE_SLOW_TESTS "Do not include really slow tests" OFF)
 option(ENABLE_TESTS "Build the tests" ON)
 if(ENABLE_TESTS)
     include(TestUtils)
@@ -126,10 +128,6 @@ endif()
 
 # Installer data
 if(UNIX)
-# ASN1 compiler
-add_subdirectory(asn1scc)
-
-
 # Packaging
 set (CPACK_PACKAGE_NAME "${SC_NAME}")
 set (CPACK_PACKAGE_VENDOR "European Space Agency")

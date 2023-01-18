@@ -20,6 +20,7 @@
 #include "graphicsviewutils.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
+#include "ivconnection.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 

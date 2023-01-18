@@ -30,7 +30,7 @@ namespace cmd {
 class CmdActionInformalText : public ChartBaseCommand
 {
 public:
-    CmdActionInformalText(MscAction *action, const QString &newText, ChartLayoutManager *layoutManager);
+    CmdActionInformalText(MscAction *action, const QString &newText, msc::MscChart *chart);
 
     void redo() override;
     void undo() override;

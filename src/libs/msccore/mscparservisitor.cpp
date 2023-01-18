@@ -31,7 +31,6 @@
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "msctimer.h"
-#include "parserdebughelper_p.h"
 
 #include <QDebug>
 #include <QRegularExpression>
@@ -60,7 +59,8 @@ static QString treeNodeToString(T *node)
         QString text = QString::fromStdString(node->getText());
 
         // filtering hyperlinks: `oid`1`351`enterAmount`
-        if (text.indexOf(QRegularExpression("^`oid`\\d{1}`\\d{1,}`\\w+`$")) == 0) {
+        static const QRegularExpression filter("^`oid`\\d{1}`\\d{1,}`\\w+`$");
+        if (text.indexOf(filter) == 0) {
             text.chop(1);
             text = text.mid(text.lastIndexOf("`") + 1);
         }

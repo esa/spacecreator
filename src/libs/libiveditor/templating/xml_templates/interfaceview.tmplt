@@ -14,7 +14,7 @@ layer                         :   |_ Instance of layer
 ArchetypeLibraryReferences    : List of all available NON-nested archetypeLibraryReferences (provided by application)
 archetypeLibraryReference     :   |_ Instance of archetypeLibraryReference
 {% endcomment %}
-<InterfaceView version="1.0"{% if Asn1FileName %} asn1file="{{ Asn1FileName }}"{% endif %}{% if MscFileName %} mscfile="{{ MscFileName }}"{% endif %}>
+<InterfaceView version="1.1"{% if Asn1FileName %} asn1file="{{ Asn1FileName }}"{% endif %}{% if MscFileName %} mscfile="{{ MscFileName }}"{% endif %}>
 {% for func in Functions %}
     {% include "function.tmplt" %}
 {% endfor %}

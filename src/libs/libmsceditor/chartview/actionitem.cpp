@@ -19,7 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/textitem.h"
-#include "chartlayoutmanager.h"
+#include "chartlayoutmanagerbase.h"
 #include "cif/cifblockfactory.h"
 #include "cif/ciflines.h"
 #include "colors/colormanager.h"
@@ -27,7 +27,6 @@
 #include "datastatement.h"
 #include "mscaction.h"
 #include "mscchartviewconstants.h"
-#include "msccommandsstack.h"
 #include "mscreader.h"
 #include "ui/grippointshandler.h"
 
@@ -73,7 +72,7 @@ protected:
  *
  * This class shows an action
  */
-ActionItem::ActionItem(msc::MscAction *action, ChartLayoutManager *chartLayoutManager, QGraphicsItem *parent)
+ActionItem::ActionItem(msc::MscAction *action, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent)
     : EventItem(action, chartLayoutManager, parent)
     , m_action(action)
     , m_textItem(new ActionTextItem(this))
@@ -193,8 +192,7 @@ void ActionItem::onTextEdited(const QString &text)
         return;
     }
 
-    m_chartLayoutManager->undoStack()->push(
-            new cmd::CmdActionInformalText(this->modelItem(), text, m_chartLayoutManager));
+    m_chartLayoutManager->undoStack()->push(new cmd::CmdActionInformalText(this->modelItem(), text, m_action->chart()));
 }
 
 void ActionItem::rebuildLayout()

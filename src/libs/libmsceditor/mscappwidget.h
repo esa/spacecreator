@@ -80,7 +80,7 @@ public:
     void showAsn1View(bool show);
 
 public Q_SLOTS:
-    void setViewMode(ViewMode mode);
+    void setViewMode(msc::MscAppWidget::ViewMode mode);
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
     void activateDefaultTool();
@@ -89,7 +89,7 @@ public Q_SLOTS:
     void checkMessages();
 
 Q_SIGNALS:
-    void viewModeChanged(ViewMode);
+    void viewModeChanged(msc::MscAppWidget::ViewMode);
     void showAsn1File(const QString &asnFilename);
     void selectAsn1();
     void showInterfaceView();

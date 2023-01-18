@@ -304,7 +304,7 @@ bool DocumentItemModel::setData(const QModelIndex &index, const QVariant &value,
         QVariant item;
         item = QVariant::fromValue(document);
 
-        m_undoStack->push(new cmd::CmdEntityNameChange(document, value.toString(), nullptr));
+        m_undoStack->push(new cmd::CmdEntityNameChange(document, value.toString()));
     }
 
     return true;

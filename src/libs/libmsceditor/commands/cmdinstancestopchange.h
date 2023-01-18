@@ -27,7 +27,7 @@ namespace cmd {
 class CmdInstanceStopChange : public ChartBaseCommand
 {
 public:
-    explicit CmdInstanceStopChange(MscInstance *item, bool newValue, ChartLayoutManager *layoutManager);
+    explicit CmdInstanceStopChange(MscInstance *item, bool newValue);
 
     void redo() override;
     void undo() override;
