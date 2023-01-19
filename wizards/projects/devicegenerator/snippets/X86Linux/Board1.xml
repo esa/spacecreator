@@ -13,13 +13,13 @@ Generated XML element <Port> shall be put into <Board> named %{CommDevName%{CDBo
 <Boards>
     <!-- Merge into Board named "%{CommDevName%{CDBoard}}" -->
     <Board name="%{CommDevName%{CDBoard}}" type=" ... " namespace=" ... ">
-        <!-- You are allowed to customize name of the port. -->
+        <!-- You are allowed to customize the name of the port. -->
         <!-- COPY FROM HERE -->
         <Port name="port_%{ProjectName}"
               namespace="ocarina_drivers"
               bus_namespace="ocarina_buses"
-              extends="ocarina_drivers::ip_socket_%{ProjectName}"
-              impl_extends="ocarina_drivers::ip_socket_%{ProjectName}.linux"
+              extends="ocarina_drivers::socket_%{ProjectName}"
+              impl_extends="ocarina_drivers::socket_%{ProjectName}.linux"
               asn1file="%{ProjectDirectory}/%{AsnConfigFile}"
               asn1module="%{ProjectNameUpperCase}-DRIVER-CONFIGURATION"
               asn1type="%{ProjectNameUpperCase}-Conf-T"
