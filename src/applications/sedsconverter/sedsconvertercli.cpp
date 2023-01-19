@@ -273,7 +273,7 @@ void SedsConverterCLI::addSedsTranslationOptions(Options &options)
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterFlatPackage)) {
-        options.add(SedsOptions::flatPackage);
+        options.add(SedsOptions::flatPackage, m_parser.value(CommandArg::SedsConverterFlatPackage));
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterFunctionToConvert)) {

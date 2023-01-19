@@ -59,9 +59,14 @@ std::vector<std::unique_ptr<Model>> Asn1ToSedsTranslator::translateAsn1Model(
         const Asn1Model *asn1Model, const Options &options)
 {
     std::vector<std::unique_ptr<Model>> resultModels;
+    auto isFlatPackage = options.isSet(conversion::seds::SedsOptions::flatPackage);
 
-    if (options.isSet(conversion::seds::SedsOptions::multipleAsnModels)) {
-        translateAsn1ModelMultipleAsnModels(asn1Model, resultModels, options);
+    if (options.isSet(conversion::seds::SedsOptions::multipleAsnModels) || isFlatPackage) {
+        if (isFlatPackage) {
+            translateAsn1ModelFlatPackage(asn1Model, resultModels, options);
+        } else {
+            translateAsn1ModelMultipleAsnModels(asn1Model, resultModels, options);
+        }
         return resultModels;
     }
 
@@ -84,6 +89,30 @@ void Asn1ToSedsTranslator::translateAsn1ModelOneAsnModel(
             resultModels.push_back(std::move(sedsModel));
         }
     }
+}
+
+void Asn1ToSedsTranslator::translateAsn1ModelFlatPackage(
+        const Asn1Acn::Asn1Model *asn1Model, std::vector<std::unique_ptr<Model>> &resultModels, const Options &options)
+{
+    ::seds::model::DataSheet sedsDataSheet;
+    ::seds::model::Package flatPackage;
+    const auto packageName = QString("%1").arg(options.value(conversion::seds::SedsOptions::flatPackage).value_or(""));
+    flatPackage.setName(Escaper::escapeIvName(packageName));
+
+    for (const auto &file : asn1Model->data()) {
+        for (const auto &definitions : file->definitionsList()) {
+            if (definitions->types().empty()) {
+                continue;
+            }
+            for (const auto &type : definitions->types()) {
+                TypeTranslator::translateType(asn1Model, definitions.get(), type.get(), &flatPackage, options);
+            }
+        }
+    }
+
+    sedsDataSheet.addPackage(std::move(flatPackage));
+    auto sedsModel = std::make_unique<SedsModel>(std::move(sedsDataSheet));
+    resultModels.push_back(std::move(sedsModel));
 }
 
 void Asn1ToSedsTranslator::translateAsn1ModelMultipleAsnModels(

@@ -70,6 +70,9 @@ private:
     static void translateAsn1ModelMultipleAsnModels(const Asn1Acn::Asn1Model *asn1Model,
             std::vector<std::unique_ptr<Model>> &resultModels, const Options &options);
 
+    static void translateAsn1ModelFlatPackage(const Asn1Acn::Asn1Model *asn1Model,
+            std::vector<std::unique_ptr<Model>> &resultModels, const Options &options);
+
     static auto translateAsn1Definitions(const Asn1Acn::Asn1Model *asn1Model, const Asn1Acn::Definitions *definitions,
             const Options &options) -> ::seds::model::Package;
 };

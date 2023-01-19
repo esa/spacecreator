@@ -253,6 +253,7 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
         names << "flat-package";
         description = QCoreApplication::translate("CommandLineParser",
                 "Enable translation of single asn file with multiple models to single flat package");
+        valueName = QCoreApplication::translate("CommandLineParser", "packagename");
     } break;
     case CommandLineParser::Positional::SedsConverterFunctionToConvert: {
         names << "function-to-convert";

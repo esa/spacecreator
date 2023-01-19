@@ -48,3 +48,6 @@ configure_file(test_skip_empty_sequences.sh test_skip_empty_sequences.sh COPYONL
 configure_file(resources/test_skip_empty_sequences.output resources/test_skip_empty_sequences.output COPYONLY)
 configure_file(resources/test_skip_empty_sequences.asn resources/test_skip_empty_sequences.asn COPYONLY)
 configure_file(resources/test_skip_empty_sequences.acn resources/test_skip_empty_sequences.acn COPYONLY)
+
+configure_file(test_flat_package.sh test_flat_package.sh COPYONLY)
+configure_file(resources/test_flat_package.output resources/test_flat_package.output COPYONLY)
