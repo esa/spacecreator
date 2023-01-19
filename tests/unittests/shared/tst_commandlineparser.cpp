@@ -509,8 +509,9 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterFlatPackage()
 {
     const QCommandLineOption cmdFlatPackage =
             CommandLineParser::positionalArg(CommandArg::SedsConverterFlatPackage);
+    const QString packageName("dummyPackage");
     const QStringList args = { QApplication::instance()->applicationFilePath(),
-        QString("--%1").arg(cmdFlatPackage.names().first()) };
+        QString("--%1=%2").arg(cmdFlatPackage.names().first(), packageName) };
 
     CommandLineParser parser;
     parser.handlePositional(CommandArg::SedsConverterFlatPackage);
@@ -518,6 +519,9 @@ void tst_CommandLineParser::testCmdArgumentSedsConverterFlatPackage()
 
     QVERIFY(!parser.isSet(CommandArg::Unknown));
     QVERIFY(parser.isSet(CommandArg::SedsConverterFlatPackage));
+
+    const QString value = parser.value(CommandArg::SedsConverterFlatPackage);
+    QCOMPARE(value, packageName);
 }
 
 void tst_CommandLineParser::testCmdArgumentSkipEmptySequences()
