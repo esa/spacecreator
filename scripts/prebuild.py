@@ -125,7 +125,7 @@ def download_grantlee(env_dir: str) -> None:
     repo.checkout(grantlee_tag)
 
 
-def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
+def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
 
     cmake_build_dir = join_dir(env_dir, 'build')
     cmake_source_dir = join_dir(env_dir, 'grantlee')
