@@ -141,7 +141,8 @@ def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
                  '-DCMAKE_INSTALL_PREFIX=' + env_qt_dir,
                  '-B', cmake_build_dir,
                  '-S', cmake_source_dir,
-                 '-DGRANTLEE_BUILD_WITH_QT6=ON']
+                 '-DGRANTLEE_BUILD_WITH_QT6=ON',
+                 '-Wmaybe-uninitialized']
 
     print_cmd(ninja_cmd)
     completed_process = subprocess.run(ninja_cmd)
