@@ -11,9 +11,9 @@ process Function_2;
         NEXTSTATE Wait;
     /* CIF state (450, 10), (70, 35) */
     state Wait;
-        /* CIF input (436, 65), (93, 35) */
+        /* CIF input (434, 65), (93, 35) */
         input PI_1(myVar);
-            /* CIF decision (405, 120), (156, 50) */
+            /* CIF decision (403, 120), (156, 50) */
             decision exist(myVar.inputdata);
                 /* CIF ANSWER (495, 190), (70, 23) */
                 (false):

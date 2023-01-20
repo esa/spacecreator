@@ -22,6 +22,7 @@
 #include "asn1itemtypevisitor.h"
 #include "valueassignmentvisitor.h"
 
+#include <QDebug>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
 #include <asn1library/asn1/types/type.h>
@@ -44,9 +45,10 @@ using promela::model::UtypeRef;
 using promela::model::VariableRef;
 
 namespace promela::translator {
-Asn1NodeVisitor::Asn1NodeVisitor(PromelaModel &promelaModel, bool enhancedSpinSupport)
+Asn1NodeVisitor::Asn1NodeVisitor(PromelaModel &promelaModel, bool enhancedSpinSupport, bool ignoreSimulation)
     : m_promelaModel(promelaModel)
     , m_enhancedSpinSupport(enhancedSpinSupport)
+    , m_ignoreSimulation(ignoreSimulation)
 {
 }
 
@@ -69,6 +71,9 @@ void Asn1NodeVisitor::visit(const Definitions &defs)
 void Asn1NodeVisitor::visit(const File &file)
 {
     for (const std::unique_ptr<Definitions> &def : file.definitionsList()) {
+        if (m_ignoreSimulation && def->name() == QStringLiteral("Simulation-DataView")) {
+            continue;
+        }
         def->accept(*this);
     }
 }

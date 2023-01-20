@@ -48,6 +48,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     checkSourceModelCount(sourceModels);
 
     const bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
+    const bool ignoreSimulation = true;
     const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
     const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
@@ -64,7 +65,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
 
         return generateValueGenerationInlines(asn1Model, ivModel, typeNames, options, delta);
     } else {
-        return translateAsn1Model(asn1Model, enhancedSpinSupport);
+        return translateAsn1Model(asn1Model, enhancedSpinSupport, ignoreSimulation);
     }
 }
 
@@ -84,12 +85,12 @@ std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
 }
 
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
-        const Asn1Model *model, bool enhancedSpinSupport) const
+        const Asn1Model *model, bool enhancedSpinSupport, bool ignoreSimulation) const
 {
     QVector<QString> initInlineNames;
     auto promelaModel = std::make_unique<PromelaDataModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        Asn1NodeVisitor visitor(*promelaModel, enhancedSpinSupport);
+        Asn1NodeVisitor visitor(*promelaModel, enhancedSpinSupport, ignoreSimulation);
         visitor.visit(*file);
         initInlineNames.append(visitor.getInitInlineNames());
     }

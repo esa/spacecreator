@@ -68,7 +68,7 @@ public:
     auto getDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
-    auto translateAsn1Model(const Asn1Acn::Asn1Model *model, bool enhancedSpinSupport) const
+    auto translateAsn1Model(const Asn1Acn::Asn1Model *model, bool enhancedSpinSupport, bool ignoreSimulation) const
             -> std::vector<std::unique_ptr<conversion::Model>>;
     auto generateValueGenerationInlines(const Asn1Acn::Asn1Model *asn1Model, const ivm::IVModel *ivModel,
             const QStringList &typeNames, const conversion::Options &options, const std::optional<float> &delta) const
