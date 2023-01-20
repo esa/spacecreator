@@ -330,7 +330,7 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
 
 def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
     if not os.path.exists(generic_highlighter_dir):
-        print("prebuild.py: Could not find wizards dir: {}".format(wizards_dir))
+        print("prebuild.py: Could not find wizards dir: {}".format(generic_highlighter_dir))
         exit(1)
     print("prebuild.py: Copying generic highlighter files from {} to {}".format(generic_highlighter_dir, generic_highlighter_install_dir))
     copy_content_of_dir_to_other_dir(generic_highlighter_dir, generic_highlighter_install_dir)
