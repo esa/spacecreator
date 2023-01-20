@@ -43,7 +43,8 @@ def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_typ
                  '-DQT_QMAKE_EXECUTABLE:STRING=' + env_qmake_bin,
                  '-DQTC_INSTALL=' + qtc_install,
                  '-DQTC_SOURCE=' + qtc_install,
-                 '-DBUILD_PLUGIN_ASN1=' + ('True' if build_asn1plugin else 'False')
+                 '-DBUILD_PLUGIN_ASN1=' + ('True' if build_asn1plugin else 'False'),
+                 '-DENABLE_FORMAT_CHECK:BOOL=' + 'OFF'
                  ]
     print_cmd(ninja_cmd)
     completed_process = subprocess.run(ninja_cmd)

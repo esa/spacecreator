@@ -48,6 +48,22 @@ def copy_plugins(build_plugins_dir: str, app_dir_plugins_dir: str) -> None:
     print("postbuild.py: Copying plugins from {} to {}".format(build_plugins_dir, app_dir_plugins_dir))
     utils.copy_content_of_dir_to_other_dir(build_plugins_dir, app_dir_plugins_dir)
 
+def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
+    if not os.path.exists(wizards_dir):
+        print("prebuild.py: Could not find wizards dir: {}". format(wizards_dir))
+        exit(1)
+
+    # File wizards
+    files_dir = join_dir(wizards_dir, 'files')
+    files_install_dir = join_dir(wizards_install_dir, 'files')
+
+    copy_content_of_dir_to_other_dir(files_dir, files_install_dir)
+
+    # Projects wizards
+    projects_dir = join_dir(wizards_dir, 'projects')
+    projects_install_dir = join_dir(wizards_install_dir, 'projects')
+    print("prebuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
+    copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
 
 
 if __name__ == '__main__':
@@ -89,3 +105,8 @@ if __name__ == '__main__':
     build_plugins_dir = join_dir(build_dir, 'lib', 'qtcreator', 'plugins')
     app_dir_plugins_dir = join_dir(app_dir, 'lib', 'qtcreator', 'plugins')
     copy_plugins(build_plugins_dir, app_dir_plugins_dir)
+
+    # Copy the wizards from source tree to AppDir tree
+    wizards_dir = join_dir(project_dir, 'wizards')
+    wizards_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'templates', 'wizards')
+    copy_wizards(wizards_dir, wizards_install_dir)
