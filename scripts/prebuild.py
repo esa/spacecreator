@@ -120,7 +120,7 @@ def download_grantlee(env_dir: str) -> None:
     target_dir = join_dir(env_dir, 'grantlee')
     grantlee_tag = "v5.3.1"
     print('Cloning grantlee from {} the tag {}'.format(gitlab_url, grantlee_tag))
-    repository = Repo.clone_from(gitlab_url, target_dir)
+    Repo.clone_from(gitlab_url, target_dir)
     repo = Git(target_dir)
     repo.checkout(grantlee_tag)
 
@@ -167,7 +167,7 @@ def install_grantlee(env_dir: str, app_dir: str) -> None:
     run time (~/opt/spacecreatorenv6/spacecreator.AppDir/Qt)
 
     Grantlee is traditionally installed on top of a Qt installation instead of adding the location of
-    grantlee to CMAKE_PREFIX_PATH so we do that as well.
+    grantlee to CMAKE_PREFIX_PATH, so we do that as well.
 
     :param env_dir: path to the build environment (i.e ~/opt/spacecreatorenv6)
     """
@@ -274,7 +274,7 @@ def build_asn1scc_language_server(env_dir: str) -> None:
         exit(7)
 
 
-def download_asn1scc_language_server() -> None:
+def download_asn1scc_language_server(env_dir: str) -> None:
     url = "https://github.com/ttsiodras/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
     asn1cc_lsp_tarbz2 = join_dir(env_dir, 'asn1scc-lsp.tar.bz2')
     print('prebuild.py: Downloading {} to {}'.format(url, asn1cc_lsp_tarbz2))
@@ -355,7 +355,7 @@ def copy_qhelpgenerator(qhelpgenerator_dir: str, target_libexec_dir: str) -> Non
     shutil.copy2(qhelpgenerator, target_libexec_dir)
 
 
-if __name__ == '__main__':
+def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
 
@@ -408,7 +408,7 @@ if __name__ == '__main__':
     download_qtcreator(env_dir, qtcreator_version, app_dir)
     copy_additional_qt_modules(paths.env_qt_dir, app_dir)
 
-    download_asn1scc_language_server()
+    download_asn1scc_language_server(env_dir)
 
     # Grant Lee Template Library
     download_grantlee(env_dir)
@@ -429,8 +429,11 @@ if __name__ == '__main__':
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)
 
     # Copy syntax highlighter files from asn1plugin and spacecreatorplugin
-    asn1plugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter')
-    scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'spacecreatorplugin', 'scl', 'generic-highlighter')
+    asn1plugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin',
+                                                  'generic-highlighter')
+    scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator',
+                                                                    'spacecreatorplugin', 'scl',
+                                                                    'generic-highlighter')
     generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
     copy_highlighter_files(asn1plugin_generic_highlighter_dir, generic_highlighter_install_dir)
     copy_highlighter_files(scl_files_spacecreatorplugin_generic_highlighter_dir, generic_highlighter_install_dir)
@@ -443,3 +446,7 @@ if __name__ == '__main__':
     # Copy qhelpgenerator
     qhelpgenerator_dir = paths.env_qt_libexec_dir
     copy_qhelpgenerator(qhelpgenerator_dir, join_dir(app_dir, 'libexec'))
+
+
+if __name__ == '__main__':
+    main()

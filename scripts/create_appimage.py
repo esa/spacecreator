@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 import subprocess
-import tarfile
 import os
 import re
 import platform
 import urllib.request
 
-from utils import join_dir, print_cmd, copy_content_of_dir_to_other_dir, ensure_dir, copy_file_pattern_to_dir
+from utils import join_dir, print_cmd
 
 
 def download_app_image_tool(env_dir: str) -> None:
@@ -57,7 +56,7 @@ def create_app_image(appimagetool_dir: str, app_dir: str, output_dir: str, versi
         exit(1)
 
 
-if __name__ == '__main__':
+def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
 
@@ -81,13 +80,6 @@ if __name__ == '__main__':
     else:
         project_dir = default_project_dir
         print("Defaulting to project dir {}".format(project_dir))
-    if args.app_dir:
-        app_dir = args.app_dir
-        print("App dir is {}".format(app_dir))
-    else:
-        project_dir = default_project_dir
-        print("Defaulting to project dir {}".format(project_dir))
-    env_dir = args.env_dir
 
     if args.version:
         version = args.version
@@ -103,5 +95,12 @@ if __name__ == '__main__':
         output_dir = join_dir(project_dir, '..')
         print("Defaulting to output dir {}".format(output_dir))
 
+    app_dir = args.app_dir
+    env_dir = args.env_dir
+
     download_app_image_tool(env_dir)
     create_app_image(env_dir, app_dir, output_dir, version)
+
+
+if __name__ == '__main__':
+    main()

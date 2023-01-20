@@ -2,9 +2,8 @@
 
 import argparse
 import os.path
-import subprocess
 import utils
-from utils import join_dir, copy_content_of_dir_to_other_dir, print_cmd
+from utils import join_dir, copy_content_of_dir_to_other_dir
 
 """
 When the spacecreator plugin has been build, it needs to be copied to the plugin folder of the
@@ -48,6 +47,7 @@ def copy_plugins(build_plugins_dir: str, app_dir_plugins_dir: str) -> None:
     print("postbuild.py: Copying plugins from {} to {}".format(build_plugins_dir, app_dir_plugins_dir))
     utils.copy_content_of_dir_to_other_dir(build_plugins_dir, app_dir_plugins_dir)
 
+
 def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     if not os.path.exists(wizards_dir):
         print("prebuild.py: Could not find wizards dir: {}". format(wizards_dir))
@@ -66,7 +66,7 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
 
 
-if __name__ == '__main__':
+def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
 
@@ -110,3 +110,7 @@ if __name__ == '__main__':
     wizards_dir = join_dir(project_dir, 'wizards')
     wizards_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'templates', 'wizards')
     copy_wizards(wizards_dir, wizards_install_dir)
+
+
+if __name__ == '__main__':
+    main()

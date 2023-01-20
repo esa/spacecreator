@@ -19,7 +19,13 @@ python3 ./scripts/build_spacecreator.py
 """
 
 
-def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_type: str, env_dir: str, build_asn1plugin: bool, patch_version: int) -> None:
+def build_spacecreator(project_dir: str,
+                       build_dir: str,
+                       app_dir: str,
+                       build_type: str,
+                       env_dir: str,
+                       build_asn1plugin: bool,
+                       patch_version: int) -> None:
     env_qt_dir = qt_dir_from_env_dir(env_dir)
     env_qmake_bin = join_dir(env_qt_dir, 'bin', 'qmake')
     qtc_install = app_dir
@@ -63,7 +69,7 @@ def build_spacecreator(project_dir: str, build_dir: str, app_dir: str, build_typ
         exit(2)
 
 
-if __name__ == '__main__':
+def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
 
@@ -131,3 +137,7 @@ if __name__ == '__main__':
 
     check_cmake_version(3, 16, 0)
     build_spacecreator(project_dir, build_dir, app_dir, build_type, env_dir, build_asn1plugin, patch_version)
+
+
+if __name__ == '__main__':
+    main()
