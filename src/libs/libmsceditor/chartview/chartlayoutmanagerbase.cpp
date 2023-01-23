@@ -49,12 +49,20 @@ void ChartLayoutManagerBase::setSystemChecker(SystemChecks *checker)
     Q_EMIT systemCheckerChanged(m_systemChecker);
 }
 
-/**`
+/**
    Returns the object to check if msc entities correspond to the iv model
  */
 SystemChecks *ChartLayoutManagerBase::systemChecker() const
 {
     return m_systemChecker;
+}
+
+/**
+ * Returns if an update/recalculation is pending
+ */
+bool ChartLayoutManagerBase::layoutUpdatePending() const
+{
+    return false;
 }
 
 } // namespace msc

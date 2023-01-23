@@ -4,9 +4,9 @@ BEGIN
 IMPORTS
    MyInteger, MySeq, MyChoice FROM BASIC-ABSENT-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID-Range, PID FROM System-Dataview;
+   PID FROM System-Dataview;
 
-Function-2-States ::= ENUMERATED {incorrect, wait}
+Function-2-States ::= ENUMERATED {wait, incorrect}
 
 Function-2-Context ::= SEQUENCE {
    state Function-2-States,
