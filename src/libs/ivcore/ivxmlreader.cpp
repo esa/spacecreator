@@ -154,7 +154,7 @@ IVXMLReader::IVXMLReader(QObject *parent)
 {
 }
 
-IVXMLReader::~IVXMLReader() {}
+IVXMLReader::~IVXMLReader() { }
 
 QVector<IVObject *> IVXMLReader::parsedObjects() const
 {
@@ -192,7 +192,8 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         const bool isFunctionType =
                 attrValue(attrs, Props::Token::is_type, QStringLiteral("no")).toLower() == QStringLiteral("yes");
 
-        obj = addFunction(idAttr.value<QUuid>(), isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
+        obj = addFunction(
+                idAttr.value<QUuid>(), isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
         break;
     }
     case Props::Token::Provided_Interface:
@@ -337,8 +338,8 @@ IVFunctionType *IVXMLReader::addFunction(const shared::Id &id, IVObject::Type fn
 {
     const bool isFunctionType = fnType == IVObject::Type::FunctionType;
 
-    IVFunctionType *fn =
-            isFunctionType ? new IVFunctionType(d->m_currentObject.get(), id) : new IVFunction(d->m_currentObject.get(), id);
+    IVFunctionType *fn = isFunctionType ? new IVFunctionType(d->m_currentObject.get(), id)
+                                        : new IVFunction(d->m_currentObject.get(), id);
 
     if (d->m_currentObject.function())
         d->m_currentObject.function()->addChild(fn);
@@ -394,7 +395,7 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const shared::Id &id, const Q
             it.value()->addEntity(iface);
         } else {
             IVInterface::CreationInfo ci;
-            ci.id = id;
+            ci.id = QUuid::createUuid();
             auto ifaceGroup = new IVInterfaceGroup(ci);
             if (iface->parentObject()->type() == IVObject::Type::Function) {
                 auto fn = qobject_cast<IVFunction *>(iface->parentObject());

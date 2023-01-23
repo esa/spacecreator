@@ -52,6 +52,8 @@ private Q_SLOTS:
     void test_multicast();
 
 private:
+    void checkIdsAreUnique(const QVector<ivm::IVObject *> &objectsList) const;
+
     ivm::IVPropertyTemplateConfig *conf { nullptr };
 };
 
@@ -153,6 +155,8 @@ void IVXMLReader::test_readFunction()
     shared::ContextParameter param2 = function->contextParam("trigger");
     QVERIFY(!param2.isNull());
     QCOMPARE(param2.paramType(), shared::BasicParameter::Type::Timer);
+
+    checkIdsAreUnique(objectsList);
 }
 
 void IVXMLReader::test_readFunctionLanguages()
@@ -185,6 +189,8 @@ void IVXMLReader::test_readFunctionLanguages()
     const EntityAttribute &lang2 = function->implementations().at(1);
     QCOMPARE(lang2.name(), "secondary");
     QCOMPARE(lang2.value(), "SDL");
+
+    checkIdsAreUnique(objectsList);
 }
 
 void IVXMLReader::test_connectionGroup()
@@ -203,6 +209,8 @@ void IVXMLReader::test_connectionGroup()
 
     QList<QPointer<ivm::IVConnection>> groupedConnection = cgroup->groupedConnections();
     QCOMPARE(groupedConnection.size(), 2);
+
+    checkIdsAreUnique(objectsList);
 }
 
 void IVXMLReader::test_readLayer()
@@ -321,6 +329,17 @@ void IVXMLReader::test_multicast()
     QCOMPARE(connection2->targetName(), "dstB");
     QCOMPARE(connection2->sourceInterfaceName(), "pi_a");
     QCOMPARE(connection2->targetInterfaceName(), "pi_b");
+
+    checkIdsAreUnique(objectsList);
+}
+
+void IVXMLReader::checkIdsAreUnique(const QVector<ivm::IVObject *> &objectsList) const
+{
+    for (auto it = objectsList.begin(); it != objectsList.end(); ++it) {
+        for (auto jt = it + 1; jt != objectsList.end(); ++jt) {
+            QCOMPARE_NE((*it)->id(), (*jt)->id());
+        }
+    }
 }
 
 QTEST_APPLESS_MAIN(IVXMLReader)
