@@ -50,7 +50,7 @@ def copy_plugins(build_plugins_dir: str, app_dir_plugins_dir: str) -> None:
 
 def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     if not os.path.exists(wizards_dir):
-        print("prebuild.py: Could not find wizards dir: {}". format(wizards_dir))
+        print("postbuild.py: Could not find wizards dir: {}". format(wizards_dir))
         exit(1)
 
     # File wizards
@@ -62,7 +62,7 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     # Projects wizards
     projects_dir = join_dir(wizards_dir, 'projects')
     projects_install_dir = join_dir(wizards_install_dir, 'projects')
-    print("prebuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
+    print("postbuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
     copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
 
 
@@ -84,17 +84,17 @@ def main():
 
     if args.project_dir:
         project_dir = args.project_dir
-        print("Project dir is {}".format(project_dir))
+        print("postbuild.py: Project dir is {}".format(project_dir))
     else:
         project_dir = default_project_dir
-        print("Defaulting to project dir {}".format(project_dir))
+        print("postbuild.py: Defaulting to project dir {}".format(project_dir))
 
     if args.build_dir:
         build_dir = args.build_dir
-        print("build dir is {}".format(build_dir))
+        print("postbuild.py: build dir is {}".format(build_dir))
     else:
         build_dir = join_dir(project_dir, 'build')
-        print("Defaulting to build dir {}".format(build_dir))
+        print("postbuild.py: Defaulting to build dir {}".format(build_dir))
 
     app_dir = args.app_dir
 

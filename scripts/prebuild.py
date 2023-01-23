@@ -311,24 +311,6 @@ def extract_libzxb_util(install_dir: str, lib_dir: str) -> None:
         archive.extractall(lib_dir)
 
 
-def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
-    if not os.path.exists(wizards_dir):
-        print("prebuild.py: Could not find wizards dir: {}". format(wizards_dir))
-        exit(1)
-
-    # File wizards
-    files_dir = join_dir(wizards_dir, 'files')
-    files_install_dir = join_dir(wizards_install_dir, 'files')
-
-    copy_content_of_dir_to_other_dir(files_dir, files_install_dir)
-
-    # Projects wizards
-    projects_dir = join_dir(wizards_dir, 'projects')
-    projects_install_dir = join_dir(wizards_install_dir, 'projects')
-    print("prebuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
-    copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
-
-
 def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
     if not os.path.exists(generic_highlighter_dir):
         print("prebuild.py: Could not find wizards dir: {}".format(generic_highlighter_dir))

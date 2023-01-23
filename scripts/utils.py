@@ -42,10 +42,13 @@ def copy_content_of_dir_to_other_dir(src_dir: str, dst_dir: str) -> None:
     Copy all files and dirs in src_dir to dst_dir. Creates dirs in dst_dir if need be.
     :param src_dir: source dir
     :param dst_dir: destination dir
+    :returns: 0 for success
     """
     def ensure_dst_dir(path: str) -> None:
         if not os.path.exists(path):
             os.makedirs(path)
+
+    exit_if_not_exists(src_dir)
 
     for item_name in os.listdir(src_dir):
         item = join_dir(src_dir, item_name)
@@ -90,7 +93,8 @@ def check_cmake_version(min_major: int, min_minor: int, min_patch: int) -> None:
     actual_version = "{}.{}.{}".format(major, minor, patch)
     actual_version_to_small = min_major > major or min_minor > minor or min_patch > patch
     if actual_version_to_small:
-        print("build_spacecreator.py: Found CMake version is {} but minimum required version is {}. Consult quickstart.md for how to upgrade CMake".format(actual_version, minimum_version_required))
+        print("build_spacecreator.py: Found CMake version is {} but minimum required version is {}. "
+              "Consult quickstart.md for how to upgrade CMake".format(actual_version, minimum_version_required))
         exit(4)
 
 
