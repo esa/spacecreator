@@ -53,7 +53,6 @@
 #include "asn1const.h"
 #include "astxmlconstraintparser.h"
 
-#include <QDebug>
 #include <iostream>
 
 using namespace Asn1Acn;
