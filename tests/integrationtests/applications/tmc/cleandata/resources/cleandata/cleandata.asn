@@ -1,0 +1,7 @@
+CLEANDATA-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 2)
+
+END
+

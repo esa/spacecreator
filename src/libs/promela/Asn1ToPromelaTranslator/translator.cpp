@@ -48,7 +48,6 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     checkSourceModelCount(sourceModels);
 
     const bool enhancedSpinSupport = options.isSet(PromelaOptions::enhancedSpinSupport);
-    const bool ignoreSimulation = true;
     const bool asn1ValueGeneration = options.isSet(PromelaOptions::asn1ValueGeneration);
     const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
@@ -65,7 +64,7 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
 
         return generateValueGenerationInlines(asn1Model, ivModel, typeNames, options, delta);
     } else {
-        return translateAsn1Model(asn1Model, enhancedSpinSupport, ignoreSimulation);
+        return translateAsn1Model(asn1Model, enhancedSpinSupport);
     }
 }
 
