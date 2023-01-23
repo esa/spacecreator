@@ -1,3 +1,4 @@
+add_subdirectory(cleandata)
 add_subdirectory(externalprocedures)
 add_subdirectory(inputvectorlimit)
 add_subdirectory(interfaceviewoptimizer)
