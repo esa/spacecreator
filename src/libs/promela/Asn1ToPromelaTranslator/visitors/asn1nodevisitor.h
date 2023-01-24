@@ -37,7 +37,7 @@ public:
      *
      * @param promelaModel         target promela model
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
-     * @param ignoreSimulation     don't put Simulation-Dataview module
+     * @param ignoreSimulation     don't include Simulation-Dataview module
      */
     Asn1NodeVisitor(model::PromelaModel &promelaModel, bool enhancedSpinSupport, bool ignoreSimulation = true);
 
