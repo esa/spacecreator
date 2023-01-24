@@ -22,7 +22,6 @@
 #include "asn1itemtypevisitor.h"
 #include "valueassignmentvisitor.h"
 
-#include <QDebug>
 #include <asn1library/asn1/definitions.h>
 #include <asn1library/asn1/file.h>
 #include <asn1library/asn1/types/type.h>
