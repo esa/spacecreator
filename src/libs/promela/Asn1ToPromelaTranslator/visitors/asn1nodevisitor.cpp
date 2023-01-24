@@ -45,6 +45,9 @@ using promela::model::UtypeRef;
 using promela::model::VariableRef;
 
 namespace promela::translator {
+
+static const QString simulationDataViewSection = "Simulation-DataView";
+
 Asn1NodeVisitor::Asn1NodeVisitor(PromelaModel &promelaModel, bool enhancedSpinSupport, bool ignoreSimulation)
     : m_promelaModel(promelaModel)
     , m_enhancedSpinSupport(enhancedSpinSupport)
@@ -71,7 +74,7 @@ void Asn1NodeVisitor::visit(const Definitions &defs)
 void Asn1NodeVisitor::visit(const File &file)
 {
     for (const std::unique_ptr<Definitions> &def : file.definitionsList()) {
-        if (m_ignoreSimulation && def->name() == QStringLiteral("Simulation-DataView")) {
+        if (m_ignoreSimulation && def->name() == simulationDataViewSection) {
             continue;
         }
         def->accept(*this);
