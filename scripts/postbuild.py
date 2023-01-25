@@ -66,6 +66,22 @@ def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
     copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
 
 
+def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
+    if not os.path.exists(generic_highlighter_dir):
+        print("prebuild.py: Could not find wizards dir: {}".format(generic_highlighter_dir))
+        exit(1)
+    print("prebuild.py: Copying generic highlighter files from {} to {}".format(generic_highlighter_dir, generic_highlighter_install_dir))
+    copy_content_of_dir_to_other_dir(generic_highlighter_dir, generic_highlighter_install_dir)
+
+
+def copy_snippets(snippets_dir: str, snippets_install_dir: str) -> None:
+    if not os.path.exists(snippets_dir):
+        print("prebuild.py: Could not find snippets dir {}".format(snippets_dir))
+        exit(1)
+    print("prebuild.py: Copying snippets from {} to {}".format(snippets_dir, snippets_install_dir))
+    copy_content_of_dir_to_other_dir(snippets_dir, snippets_install_dir)
+
+
 def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
@@ -110,6 +126,21 @@ def main():
     wizards_dir = join_dir(project_dir, 'wizards')
     wizards_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'templates', 'wizards')
     copy_wizards(wizards_dir, wizards_install_dir)
+
+    # Copy syntax highlighter files from asn1plugin and spacecreatorplugin
+    asn1plugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin',
+                                                  'generic-highlighter')
+    scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator',
+                                                                    'spacecreatorplugin', 'scl',
+                                                                    'generic-highlighter')
+    generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
+    copy_highlighter_files(asn1plugin_generic_highlighter_dir, generic_highlighter_install_dir)
+    copy_highlighter_files(scl_files_spacecreatorplugin_generic_highlighter_dir, generic_highlighter_install_dir)
+
+    # Copy snippets from asn1plugin
+    snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
+    snippets_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'snippets')
+    copy_snippets(snippets_dir, snippets_install_dir)
 
 
 if __name__ == '__main__':

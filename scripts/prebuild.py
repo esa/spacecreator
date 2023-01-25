@@ -411,21 +411,6 @@ def main():
     # AppImage files SpaceCreator.desktop, AppRun and TasteLanguageClients.ini
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)
 
-    # Copy syntax highlighter files from asn1plugin and spacecreatorplugin
-    asn1plugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin',
-                                                  'generic-highlighter')
-    scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator',
-                                                                    'spacecreatorplugin', 'scl',
-                                                                    'generic-highlighter')
-    generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
-    copy_highlighter_files(asn1plugin_generic_highlighter_dir, generic_highlighter_install_dir)
-    copy_highlighter_files(scl_files_spacecreatorplugin_generic_highlighter_dir, generic_highlighter_install_dir)
-
-    # Copy snippets from asn1plugin
-    snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
-    snippets_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'snippets')
-    copy_snippets(snippets_dir, snippets_install_dir)
-
     # Copy qhelpgenerator
     qhelpgenerator_dir = paths.env_qt_libexec_dir
     copy_qhelpgenerator(qhelpgenerator_dir, join_dir(app_dir, 'libexec'))
