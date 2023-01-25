@@ -6,7 +6,7 @@ SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 XML_VALIDATOR=$SPACECREATOR_BUILD_DIR/bin/xmlvalidator
 
 # diff ignoring white space and blank lines
-XMLDIFF="xmldiff"
+XMLDIFF="xmldiff --check"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"

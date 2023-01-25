@@ -78,7 +78,6 @@ std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
     std::sort(std::begin(ivFunctions), std::end(ivFunctions), comparator);
 
     if (options.isSet(iv::IvOptions::functionToConvert)) {
-
         std::vector<QString> functionsToConvert = options.values(iv::IvOptions::functionToConvert);
         for (const auto &ivFunction : ivFunctions) {
             const QString &ivFunctionName = ivFunction->title();
