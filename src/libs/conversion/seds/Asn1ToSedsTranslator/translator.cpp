@@ -97,6 +97,9 @@ void Asn1ToSedsTranslator::translateAsn1ModelFlatPackage(
     ::seds::model::DataSheet sedsDataSheet;
     ::seds::model::Package flatPackage;
     const auto packageName = QString("%1").arg(options.value(conversion::seds::SedsOptions::flatPackage).value_or(""));
+    if (packageName.isEmpty()) {
+        throw TranslationException("Can't have empty package name for FlatPackage translation option.");
+    }
     flatPackage.setName(Escaper::escapeIvName(packageName));
 
     for (const auto &file : asn1Model->data()) {
