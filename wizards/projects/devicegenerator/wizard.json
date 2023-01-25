@@ -82,6 +82,10 @@
         {
             "key": "CommDevNamespaceSAMV71",
             "value": "ocarina_processors_arm"
+        },
+        {
+            "key": "ReqBusAccess",
+            "value": "%{JS: value('ReqBusAccessCombo') === '' ? '%{ReqBusAccessCustom}' : '%{ReqBusAccessCombo}'}"
         }
     ],
     "pages": [
@@ -130,6 +134,39 @@
                                 "value": "SAMV71"
                             }
                         ]
+                    }
+                },
+                {
+                    "name": "ReqBusAccessCombo",
+                    "trDisplayName": "Required bus access:",
+                    "type": "ComboBox",
+                    "data": {
+                        "index": 0,
+                        "items": [
+                            {
+                                "trKey": "ocarina_buses::ip.generic",
+                                "value": "ocarina_buses::ip.generic"
+                            },
+                            {
+                                "trKey": "ocarina_buses::serial.ccsds",
+                                "value": "ocarina_buses::serial.ccsds"
+                            },
+                            {
+                                "trKey": "custom value",
+                                "value": ""
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "ReqBusAccessCustom",
+                    "type": "LineEdit",
+                    "enabled": "%{JS: value('ReqBusAccessCombo') === '' ? 'true' : 'false'}",
+                    "mandatory": false,
+                    "data":
+                    {
+                        "trText": "ocarina_buses::",
+                        "trDisabledText": "ocarina_buses::"
                     }
                 }
             ]

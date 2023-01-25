@@ -22,19 +22,19 @@ end configuration_type_%{ProjectName};
 -- Paste the following code into "Device" section.
 -- ############################################################################
 
-  ------------------------------------
-  -- linux ip socket %{ProjectName} --
-  ------------------------------------
+  ---------------------------
+  -- device %{ProjectName} --
+  ---------------------------
   device device_%{ProjectName}
   features
-    link : requires bus access ocarina_buses::ip.generic;
+    link : requires bus access %{ReqBusAccess};
   end device_%{ProjectName};
 
   device implementation device_%{ProjectName}.linux
   properties
-    Deployment::Driver_Name       => "linux_%{ProjectName}_ip_socket";
-    Device_Driver                 => classifier (ocarina_drivers_%{ProjectName}_ip_socket::ip_socket_%{ProjectName}.linux);
-    Initialize_Entrypoint         => classifier (ocarina_drivers_%{ProjectName}_ip_socket::driver_%{ProjectName}_init);
+    Deployment::Driver_Name       => "driver_%{ProjectName}";
+    Device_Driver                 => classifier (ocarina_drivers_%{ProjectName}::%{ProjectName}.linux);
+    Initialize_Entrypoint         => classifier (ocarina_drivers_%{ProjectName}::driver_%{ProjectName}_init);
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::generic.linux));
   end device_%{ProjectName}.linux;
 
@@ -85,17 +85,17 @@ public
     Dispatch_Protocol => Periodic;
   end driver_%{ProjectName}_poller.impl;
 
-  abstract socket_%{ProjectName}
+  abstract %{ProjectName}
   properties
     Deployment::Version  => "1.0";
     Deployment::Help     => "Write your ASN.1 configuration here";
     Deployment::Configuration_Type => classifier (ocarina_drivers::configuration_type_%{ProjectName});
-  end socket_%{ProjectName};
+  end %{ProjectName};
 
-  abstract implementation socket_%{ProjectName}.linux
+  abstract implementation %{ProjectName}.linux
   subcomponents
     receiver : thread driver_%{ProjectName}_poller.impl;
     sender : subprogram driver_%{ProjectName}_send;
-  end socket_%{ProjectName}.linux;
+  end %{ProjectName}.linux;
 
 end ocarina_drivers_%{ProjectName};

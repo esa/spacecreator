@@ -23,18 +23,18 @@ end configuration_type_%{ProjectName};
 -- ############################################################################
 
   ---------------------------
-  -- serial %{ProjectName} --
+  -- device %{ProjectName} --
   ---------------------------
   device device_%{ProjectName}
   features
-    link : requires bus access ocarina_buses::serial.ccsds;
+    link : requires bus access %{ReqBusAccess};
   end device_%{ProjectName};
 
   device implementation device_%{ProjectName}.samv71
   properties
     Deployment::Driver_Name       => "driver_%{ProjectName}";
-    Device_Driver                 => classifier (ocarina_drivers_serial_%{ProjectName}::serial_%{ProjectName}_samv71.samv71);
-    Initialize_Entrypoint         => classifier (ocarina_drivers_serial_%{ProjectName}::driver_%{ProjectName}_init);
+    Device_Driver                 => classifier (ocarina_drivers_%{ProjectName}::%{ProjectName}_samv71.samv71);
+    Initialize_Entrypoint         => classifier (ocarina_drivers_%{ProjectName}::driver_%{ProjectName}_init);
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::generic.samv71));
   end  device_%{ProjectName}.samv71;
 
@@ -49,7 +49,7 @@ public
   with ocarina_drivers;
 
   -------------------------
-  -- serial %{ProjectName} samv71 --
+  -- driver %{ProjectName} samv71 --
   -------------------------
 
   subprogram driver_%{ProjectName}_poll
@@ -89,17 +89,17 @@ public
     Dispatch_Protocol => Periodic;
   end driver_%{ProjectName}_poller.impl;
 
-  abstract serial_%{ProjectName}_samv71
+  abstract %{ProjectName}_samv71
   properties
     Deployment::Version  => "1.0";
     Deployment::Help     => "Write your ASN.1 configuration here";
     Deployment::Configuration_Type => classifier (ocarina_drivers::configuration_type_%{ProjectName});
-  end serial_%{ProjectName}_samv71;
+  end %{ProjectName}_samv71;
 
-  abstract implementation serial_%{ProjectName}_samv71.samv71
+  abstract implementation %{ProjectName}_samv71.samv71
   subcomponents
     receiver : thread driver_%{ProjectName}_poller.impl;
     sender : subprogram driver_%{ProjectName}_send;
-  end serial_%{ProjectName}_samv71.samv71;
+  end %{ProjectName}_samv71.samv71;
 
 end ocarina_drivers_%{ProjectName};
