@@ -156,6 +156,11 @@ bool IVInterface::postInit()
     if (!model() || !function()) {
         return false;
     }
+
+    if (entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::is_simulink_interface)) == false) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::simulink_full_interface_ref));
+    }
+
     if (!function()->isFunction()) {
         return IVObject::postInit();
     }
@@ -422,6 +427,17 @@ IVInterface *IVInterface::createIface(const CreationInfo &descr)
     iface->setKind(descr.kind);
     iface->setTitle(descr.name);
     iface->setLayerName(descr.layer != nullptr ? descr.layer->title() : IVConnectionLayerType::DefaultLayerName);
+
+    IVFunction* function = descr.function->as<IVFunction*>();
+    if(function != nullptr)
+    {
+        if(function->entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString() == 
+            meta::Props::token(meta::Props::Token::QGenC))
+        {
+            iface->setEntityAttribute(meta::Props::token(meta::Props::Token::is_simulink_interface), true);
+        }
+    }
+
     return iface;
 }
 

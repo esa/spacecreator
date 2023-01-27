@@ -1,0 +1,22 @@
+CONSTRAINED-RANGE-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+ MyInteger ::= INTEGER (0 .. 4)
+
+ MyEnum      ::= ENUMERATED { hello, world, howareyou }
+
+  MySeq       ::= SEQUENCE {
+      inputdata   MyInteger,
+      outputdata  MyInteger,
+      validity    ENUMERATED { valid, invalid }
+  }
+
+  MyChoice    ::= CHOICE {
+      a BOOLEAN,
+      b MySeq
+  }
+
+  MySeqOf     ::= SEQUENCE (SIZE (0..3)) OF MyEnum
+
+END
+

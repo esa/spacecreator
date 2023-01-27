@@ -326,20 +326,26 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
     auto sequence = ProctypeMaker::makeNormalSequence();
 
     const auto &withComponentConstraints = type.withComponentConstraints();
+    const auto &withComponentAbsentConstraints = type.withComponentAbsentConstraints();
     const auto hasConstraints = !withComponentConstraints.empty();
+    const auto hasAbsentConstraints = !withComponentAbsentConstraints.empty();
 
     auto conditional = std::make_unique<Conditional>();
     int selectorVal = 1;
 
     for (auto &component : type.components()) {
-        if (hasConstraints && withComponentConstraints.count(component->name()) == 0) {
+        const QString &componentName = component->name();
+        if (hasConstraints && withComponentConstraints.count(componentName) == 0) {
             continue;
         }
 
-        const QString &componentName = component->name();
         const QString thisComponentSelected =
                 Escaper::escapePromelaName(QString("%1_%2_PRESENT").arg(m_name).arg(componentName));
         m_promelaModel.addValueDefinition(ValueDefinition(thisComponentSelected, selectorVal++));
+
+        if (hasAbsentConstraints && withComponentAbsentConstraints.count(componentName) != 0) {
+            continue;
+        }
 
         auto *const choiceComponent = component.get();
         const QString componentTypeName =
@@ -358,7 +364,6 @@ void Asn1TypeValueGeneratorVisitor::visit(const Choice &type)
                 QString("%1.data.%2").arg(valueVariableName).arg(Escaper::escapePromelaName(componentName))));
         alternative->appendElement(ProctypeMaker::makeAssignmentProctypeElement(
                 QString("%1.selection").arg(valueVariableName), VariableRef(thisComponentSelected)));
-
         conditional->appendAlternative(std::move(alternative));
     }
     sequence->appendElement(std::move(*conditional));
@@ -374,6 +379,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
     const auto valueVariableName = getInlineArgumentName();
 
     const QString inlineSeqGeneratorName = getInlineGeneratorName(m_name);
+
     const QStringList inlineArguments = { valueVariableName };
     promela::model::Sequence sequence(promela::model::Sequence::Type::NORMAL);
     for (auto &sequenceComponent : type.components()) {
@@ -381,15 +387,30 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
         if (asnSequenceComponent != nullptr) {
             const QString componentTypeName = getSequenceComponentTypeName(*asnSequenceComponent, m_name);
             const QString inlineTypeGeneratorName = getInlineGeneratorName(componentTypeName);
-            if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
-                auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
-                Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
-                asnSequenceComponentType->accept(visitor);
+
+            if (asnSequenceComponent->presence() != Asn1Acn::AsnSequenceComponent::Presence::NotSpecified) {
+                // presence is either absent or present, need to generate exist flag
+                auto variableName = QStringLiteral("%1.exist.%2").arg(valueVariableName, asnSequenceComponent->name());
+                auto presenceFlag =
+                        asnSequenceComponent->presence() == Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent
+                        ? PresenceFlag::Absent
+                        : PresenceFlag::Present;
+                auto assignment = Assignment(VariableRef(variableName), Expression(presenceFlag));
+                sequence.appendElement(assignment);
             }
 
-            auto asnSequenceComponentInlineCall =
-                    generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
-            sequence.appendElement(std::move(asnSequenceComponentInlineCall));
+            if (asnSequenceComponent->presence() != Asn1Acn::AsnSequenceComponent::Presence::AlwaysAbsent) {
+                // presence is either not specified or present, need to generate value
+                if (!modelContainsInlineGenerator(inlineTypeGeneratorName)) {
+                    auto *const asnSequenceComponentType = getAsnSequenceComponentType(asnSequenceComponent);
+                    Asn1TypeValueGeneratorVisitor visitor(m_promelaModel, componentTypeName, nullptr);
+                    asnSequenceComponentType->accept(visitor);
+                }
+
+                auto asnSequenceComponentInlineCall =
+                        generateAsnSequenceComponentInlineCall(asnSequenceComponent, valueVariableName);
+                sequence.appendElement(std::move(asnSequenceComponentInlineCall));
+            }
         }
     }
 
@@ -637,6 +658,11 @@ QString Asn1TypeValueGeneratorVisitor::getChoiceComponentTypeName(
     } else {
         return type.typeName();
     }
+}
+
+QString Asn1TypeValueGeneratorVisitor::getInlineInitName(const QString &typeName)
+{
+    return QString("%1_init_value").arg(Escaper::escapePromelaName(typeName));
 }
 
 QString Asn1TypeValueGeneratorVisitor::getInlineGeneratorName(const QString &typeName)

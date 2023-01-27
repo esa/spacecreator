@@ -76,6 +76,13 @@ public:
         path,
         fixed_system_element,
         required_system_element,
+        is_simulink_interface,
+        simulink_interface_type,
+        simulink_full_interface_ref,
+
+        // properties values
+        QGenC,
+        Full,
 
         // KNOWN TASTE props:
         coordinates,

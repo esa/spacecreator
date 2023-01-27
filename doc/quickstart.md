@@ -56,8 +56,8 @@ Running the following command:
 ```commandline
 ~/project/spacecreator$ python3 ./scripts/prebuild.py
  --output_dir $HOME/project/spacecreatorenv6 
- --qt_version 6.3.1 
- --qtcreator_version 8.0.1
+ --qt_version 6.4.1
+ --qtcreator_version 9.0.1
 
 ```
 
@@ -65,7 +65,7 @@ will create a folder (~/project/spacecreatorenv6) containing (among other) the f
 ```
 ├── asn1scc/
 ├── Qt/
-│   └── 6.3.1/
+│   └── 6.4.1/
 │       └── gcc_64/
 └── spacecreator.AppDir/
     ├── bin/

@@ -165,6 +165,7 @@ private:
             const QString &argumentName) -> std::unique_ptr<model::ProctypeElement>;
     auto modelContainsInlineGenerator(const QString &inlineGeneratorName) -> bool;
     auto isEmbeddedType(const Asn1Acn::Types::Type &type) -> bool;
+    auto getInlineInitName(const QString &typeName) -> QString;
     auto getInlineGeneratorName(const QString &typeName) -> QString;
     auto getInlineArgumentName() -> QString;
 
@@ -179,6 +180,12 @@ private:
     QString m_name;
     const Asn1Acn::Types::Type *m_overridenType;
     const std::optional<float> m_delta;
+
+    enum PresenceFlag
+    {
+        Absent = 0,
+        Present = 1
+    };
 };
 
 } // namespace promela::translator

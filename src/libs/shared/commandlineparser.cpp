@@ -255,6 +255,12 @@ QCommandLineOption CommandLineParser::positionalArg(CommandLineParser::Positiona
                 "Enable translation of single IV function in IV to SEDS translation");
         valueName = QCoreApplication::translate("CommandLineParser", "functions");
     } break;
+    case CommandLineParser::Positional::SedsConverterFlatPackage: {
+        names << "flat-package";
+        description = QCoreApplication::translate("CommandLineParser",
+                "Enable translation of single asn file with multiple models to single flat package");
+        valueName = QCoreApplication::translate("CommandLineParser", "packagename");
+    } break;
     case CommandLineParser::Positional::SedsConverterSkipEmptySequences: {
         names << "skip-empty-sequences";
         description = QCoreApplication::translate(

@@ -224,10 +224,10 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
 {
     shared::PropertiesListModel::setDataObject(obj);
 
-    QStringList values;
+    QStringList layerTitles;
     auto layers = m_layersModel->allObjectsByType<ivm::IVConnectionLayerType>();
     for (auto *const layer : layers) {
-        values.append(QString(layer->title()));
+        layerTitles.append(QString(layer->title()));
     }
 
     for (int i = 0; i < rowCount(); i++) {
@@ -235,9 +235,59 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
 
         if (titleItem->data(Roles::DataRole) == ivm::meta::Props::token(ivm::meta::Props::Token::layer)) {
             QStandardItem *itemObj = item(i, Column::Value);
-            itemObj->setData(QVariant(values), Roles::EditRole);
+            itemObj->setData(QVariant(layerTitles), Roles::EditRole);
         }
     }
+
+    ivm::IVInterfaceProvided* interface = obj->as<ivm::IVInterfaceProvided*>();
+
+    if(interface == nullptr)
+    {
+        return;
+    }
+
+    if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_simulink_interface)) == true)
+    {
+        ivm::IVFunction* function = interface->function()->as<ivm::IVFunction*>();
+        if(function == nullptr)
+        {
+            return;
+        }
+
+        QStringList interfacesTitles;
+        auto interfaces = function->interfaces();
+        for (auto *const interface : interfaces) {
+            if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_simulink_interface)) == true &&
+                interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::simulink_interface_type)).toString() ==
+                ivm::meta::Props::token(ivm::meta::Props::Token::Full))
+            {
+                interfacesTitles.append(QString(interface->title()));
+            }
+        }
+
+        for (int i = 0; i < rowCount(); i++) {
+            QStandardItem *titleItem = item(i, Column::Name);
+
+            if (titleItem->data(Roles::DataRole) == ivm::meta::Props::token(ivm::meta::Props::Token::simulink_full_interface_ref)) {
+                QStandardItem *itemObj = item(i, Column::Value);
+                itemObj->setData(QVariant(interfacesTitles), Roles::EditRole);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < rowCount(); i++) {
+            QStandardItem *titleItem = item(i, Column::Name);
+            QString simulinkFullRefAttrName = ivm::meta::Props::token(ivm::meta::Props::Token::simulink_full_interface_ref);
+
+            if (titleItem->data(Roles::DataRole) == simulinkFullRefAttrName) {
+                removeRow(i);
+                m_names.removeOne(simulinkFullRefAttrName);
+            }
+        }
+    }
+
+
 }
 
 QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) const

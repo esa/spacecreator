@@ -72,25 +72,21 @@ def download_qt(env_qt_path: str, env_qt_version: str) -> None:
         exit(1)
 
 
-def download_qtcreator(env_path: str, env_qtc_version: str, env_app_dir, is_qt6: bool) -> None:
+def download_qtcreator(env_path: str, env_qtc_version: str, env_app_dir) -> None:
     """
     Downloads QtCreator in the specified version and the corresponding source files for plugin development
     and place them in the specified folder.
     :param env_path path to folder
     :param env_qtc_version version number in format X.Y.Z
     :param env_app_dir the dir
-    :param is_qt6 is this QtCreator part of Qt6
     """
     # Download the 7z'ed QtCreator in the specified version
     version_list = env_qtc_version.split('.')
     version_short = '.'.join(version_list[:2])  # version_short is now in the format X.Y
 
-    if is_qt6:
-        base_url = 'https://download.qt.io/official_releases/qtcreator/' + \
+    base_url = 'https://download.qt.io/official_releases/qtcreator/' + \
                    version_short + '/' + env_qtc_version + '/installer_source/linux_x64/'
-    else:
-        base_url = 'https://download.qt.io/archive/qtcreator/' + \
-                   version_short + '/' + env_qtc_version + '/installer_source/linux_gcc_64_rhel72/'
+
     bin_url = base_url + 'qtcreator.7z'
     qtcreator7z = join_dir(env_path, 'qtcreator.7z')
     print("Downloading {} to {}".format(bin_url, qtcreator7z))
@@ -124,12 +120,12 @@ def download_grantlee(env_dir: str) -> None:
     target_dir = join_dir(env_dir, 'grantlee')
     grantlee_tag = "v5.3.1"
     print('Cloning grantlee from {} the tag {}'.format(gitlab_url, grantlee_tag))
-    repository = Repo.clone_from(gitlab_url, target_dir)
+    Repo.clone_from(gitlab_url, target_dir)
     repo = Git(target_dir)
     repo.checkout(grantlee_tag)
 
 
-def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
+def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
 
     cmake_build_dir = join_dir(env_dir, 'build')
     cmake_source_dir = join_dir(env_dir, 'grantlee')
@@ -144,9 +140,9 @@ def build_grantlee(env_dir: str, env_qt_dir: str, build_with_qt6: bool) -> None:
                  '-DCMAKE_BUILD_TYPE=Release',
                  '-DCMAKE_INSTALL_PREFIX=' + env_qt_dir,
                  '-B', cmake_build_dir,
-                 '-S', cmake_source_dir]
-    if build_with_qt6:
-        ninja_cmd += ['-DGRANTLEE_BUILD_WITH_QT6=ON']
+                 '-S', cmake_source_dir,
+                 '-DGRANTLEE_BUILD_WITH_QT6=ON',
+                 '-Wmaybe-uninitialized']
 
     print_cmd(ninja_cmd)
     completed_process = subprocess.run(ninja_cmd)
@@ -172,7 +168,7 @@ def install_grantlee(env_dir: str, app_dir: str) -> None:
     run time (~/opt/spacecreatorenv6/spacecreator.AppDir/Qt)
 
     Grantlee is traditionally installed on top of a Qt installation instead of adding the location of
-    grantlee to CMAKE_PREFIX_PATH so we do that as well.
+    grantlee to CMAKE_PREFIX_PATH, so we do that as well.
 
     :param env_dir: path to the build environment (i.e ~/opt/spacecreatorenv6)
     """
@@ -279,7 +275,7 @@ def build_asn1scc_language_server(env_dir: str) -> None:
         exit(7)
 
 
-def download_asn1scc_language_server() -> None:
+def download_asn1scc_language_server(env_dir: str) -> None:
     url = "https://github.com/ttsiodras/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
     asn1cc_lsp_tarbz2 = join_dir(env_dir, 'asn1scc-lsp.tar.bz2')
     print('prebuild.py: Downloading {} to {}'.format(url, asn1cc_lsp_tarbz2))
@@ -315,27 +311,9 @@ def extract_libzxb_util(install_dir: str, lib_dir: str) -> None:
         archive.extractall(lib_dir)
 
 
-def copy_wizards(wizards_dir: str, wizards_install_dir: str) -> None:
-    if not os.path.exists(wizards_dir):
-        print("prebuild.py: Could not find wizards dir: {}". format(wizards_dir))
-        exit(1)
-
-    # File wizards
-    files_dir = join_dir(wizards_dir, 'files')
-    files_install_dir = join_dir(wizards_install_dir, 'files')
-
-    copy_content_of_dir_to_other_dir(files_dir, files_install_dir)
-
-    # Projects wizards
-    projects_dir = join_dir(wizards_dir, 'projects')
-    projects_install_dir = join_dir(wizards_install_dir, 'projects')
-    print("prebuild.py: Copying wizards from {} to {}".format(wizards_dir, wizards_install_dir))
-    copy_content_of_dir_to_other_dir(projects_dir, projects_install_dir)
-
-
 def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
     if not os.path.exists(generic_highlighter_dir):
-        print("prebuild.py: Could not find wizards dir: {}".format(wizards_dir))
+        print("prebuild.py: Could not find wizards dir: {}".format(generic_highlighter_dir))
         exit(1)
     print("prebuild.py: Copying generic highlighter files from {} to {}".format(generic_highlighter_dir, generic_highlighter_install_dir))
     copy_content_of_dir_to_other_dir(generic_highlighter_dir, generic_highlighter_install_dir)
@@ -360,7 +338,7 @@ def copy_qhelpgenerator(qhelpgenerator_dir: str, target_libexec_dir: str) -> Non
     shutil.copy2(qhelpgenerator, target_libexec_dir)
 
 
-if __name__ == '__main__':
+def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     default_project_dir = join_dir(script_dir, '..')
 
@@ -397,9 +375,8 @@ if __name__ == '__main__':
     qtcreator_version = args.qtcreator_version
     paths = build_path_object(project_dir, env_dir, qt_version)
 
-    is_qt6 = qt_version.split('.')[0] == '6'
     print("prebuild.py: env_dir is {}".format(env_dir))
-    print('prebuild.py: qt_version was {}. Building with qt6 is {}'.format(qt_version, is_qt6))
+    print("prebuild.py: qt_version was {}".format(qt_version))
     print("prebuild.py: qtcreator_version is {}".format(qtcreator_version))
 
     check_cmake_version(3, 18, 0)
@@ -411,14 +388,14 @@ if __name__ == '__main__':
 
     # Setup Qt and QtCreator with plugin development files
     download_qt(paths.env_qt_install_dir, qt_version)
-    download_qtcreator(env_dir, qtcreator_version, app_dir, is_qt6)
+    download_qtcreator(env_dir, qtcreator_version, app_dir)
     copy_additional_qt_modules(paths.env_qt_dir, app_dir)
 
-    download_asn1scc_language_server()
+    download_asn1scc_language_server(env_dir)
 
     # Grant Lee Template Library
     download_grantlee(env_dir)
-    build_grantlee(env_dir, paths.env_qt_dir, is_qt6)
+    build_grantlee(env_dir, paths.env_qt_dir)
     install_grantlee(env_dir, app_dir)
 
     # libzxb-util
@@ -426,41 +403,18 @@ if __name__ == '__main__':
     lib_dir = join_dir(app_dir, 'lib')
     extract_libzxb_util(install_dir, lib_dir)
 
-    # Copy the wizards from source tree to AppDir tree
-    wizards_dir = join_dir(project_dir, 'wizards')
-    wizards_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'templates', 'wizards')
-    copy_wizards(wizards_dir, wizards_install_dir)
-
     # Abstract Syntax Notation
     download_asn1scc(env_dir)
-
     download_asn_fuzzer(env_dir, app_dir)
     download_pus_c(env_dir, app_dir)
 
     # AppImage files SpaceCreator.desktop, AppRun and TasteLanguageClients.ini
     copy_content_of_dir_to_other_dir(join_dir(project_dir, 'install', 'appimage'), app_dir)
 
-    # Copy syntax highlighter files from asn1plugin and spacecreatorplugin
-    if is_qt6:
-        asn1plugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter')
-        scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'spacecreatorplugin', 'scl', 'generic-highlighter')
-    else:
-        asn1plugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'generic-highlighter', 'syntax')
-        scl_files_spacecreatorplugin_generic_highlighter_dir = join_dir(project_dir, 'src', 'qtcreator', 'spacecreatorplugin', 'scl', 'generic-highlighter', 'syntax')
-
-    generic_highlighter_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'generic-highlighter')
-
-    copy_highlighter_files(asn1plugin_generic_highlighter_dir, generic_highlighter_install_dir)
-    copy_highlighter_files(scl_files_spacecreatorplugin_generic_highlighter_dir, generic_highlighter_install_dir)
-
-    # Copy snippets from asn1plugin
-    snippets_dir = join_dir(project_dir, 'src', 'qtcreator', 'asn1plugin', 'snippets')
-    snippets_install_dir = join_dir(app_dir, 'share', 'qtcreator', 'snippets')
-    copy_snippets(snippets_dir, snippets_install_dir)
-
     # Copy qhelpgenerator
-    if is_qt6:
-        qhelpgenerator_dir = paths.env_qt_libexec_dir
-    else:
-        qhelpgenerator_dir = paths.env_qt_bin_dir
+    qhelpgenerator_dir = paths.env_qt_libexec_dir
     copy_qhelpgenerator(qhelpgenerator_dir, join_dir(app_dir, 'libexec'))
+
+
+if __name__ == '__main__':
+    main()

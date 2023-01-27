@@ -73,6 +73,7 @@ public:
         SedsConverterNoMangling,
         SedsConverterMultipleAsnModels,
         SedsConverterFunctionToConvert,
+        SedsConverterFlatPackage,
         SedsConverterSkipEmptySequences,
         SedsConverterTasteTranslation,
         SedsConverterTransactionNameType,

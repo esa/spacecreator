@@ -43,7 +43,7 @@
     <Property name="Taste::coordinates" value="47400 37400 60800 37400 74200 36800"/>
 </Connection>
 
-<ConnectionGroup name="CGroup">
+<ConnectionGroup name="CGroup" id="{7dc86425-34e8-40b5-8fcc-d9fe52136e03}">
     <Property name="Taste::coordinates" value="47400 33700 60700 33700 60700 26900 73900 26900"/>
 <Connection  group_name="CGroup">
     <Source func_name="Function_1" ri_name="PI_2"/>

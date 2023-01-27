@@ -22,7 +22,7 @@ def clang_format(root_dir: str) -> None:
         exit(1)
 
 
-if __name__ == '__main__':
+def main():
     # Parse arguments
     parser = argparse.ArgumentParser(prog='clangformat')
     parser.add_argument('root_dir', type=str)
@@ -33,3 +33,6 @@ if __name__ == '__main__':
     print("Root dir is ", root_dir)
     clang_format(root_dir)
 
+
+if __name__ == '__main__':
+    main()

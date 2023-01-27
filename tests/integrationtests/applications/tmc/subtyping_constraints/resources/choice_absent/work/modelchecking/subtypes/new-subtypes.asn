@@ -1,0 +1,21 @@
+FUNCTION-1-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyChoice FROM CHOICE-ABSENT-DATAVIEW
+
+MySeq FROM CHOICE-ABSENT-DATAVIEW
+MyInteger FROM CHOICE-ABSENT-DATAVIEW
+
+ ;
+
+MyChoiceSub ::= MyChoice (WITH COMPONENTS { a ABSENT })
+
+MySeqSub    ::= SEQUENCE {
+    inputdata   MyChoiceSub,
+    outputdata  MyInteger,
+    validity    ENUMERATED { valid, invalid }
+}
+
+Function-1-pi-1-p1 ::= MySeqSub
+
+END

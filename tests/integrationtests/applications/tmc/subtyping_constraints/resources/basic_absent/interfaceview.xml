@@ -1,0 +1,54 @@
+<InterfaceView version="1.0" asn1file="taste-types.asn">
+<Function name="Function_1" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="10800 14800 30800 22800"/>
+<Provided_Interface name="PI_2" kind="Sporadic" layer="default" required_system_element="NO" priority="1" stack_size="1024" miat="0" wcet="0" queue_size="1">
+    <Input_Parameter name="p1" type="MyChoice" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="30800 19800"/>
+</Provided_Interface>
+
+<Required_Interface name="PI_1" kind="Sporadic" layer="default" required_system_element="NO" priority="1" stack_size="1024" miat="0" wcet="0" queue_size="1">
+    <Input_Parameter name="p1" type="MySeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="30800 15900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function name="Function_2" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="44400 15300 64400 23300"/>
+<Provided_Interface name="PI_1" kind="Sporadic" layer="default" required_system_element="NO" priority="1" stack_size="1024" miat="0" wcet="0" queue_size="1">
+    <Input_Parameter name="p1" type="MySeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="44400 16800"/>
+</Provided_Interface>
+
+<Required_Interface name="PI_2" kind="Sporadic" layer="default" required_system_element="NO" priority="1" stack_size="1024" miat="0" wcet="0" queue_size="1">
+    <Input_Parameter name="p1" type="MyChoice" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="44400 19900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Function_1" ri_name="PI_1"/>
+    <Target func_name="Function_2" pi_name="PI_1"/>
+    <Property name="Taste::coordinates" value="31400 15900 37700 15900 42500 16800 44100 16800"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Function_2" ri_name="PI_2"/>
+    <Target func_name="Function_1" pi_name="PI_2"/>
+    <Property name="Taste::coordinates" value="43800 19900 37500 19900 31100 19800"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>

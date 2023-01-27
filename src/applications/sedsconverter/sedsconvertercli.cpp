@@ -59,6 +59,7 @@ void SedsConverterCLI::parseArguments(const QStringList &arguments)
     m_parser.handlePositional(CommandArg::SedsConverterNoMangling);
     m_parser.handlePositional(CommandArg::SedsConverterMultipleAsnModels);
     m_parser.handlePositional(CommandArg::SedsConverterFunctionToConvert);
+    m_parser.handlePositional(CommandArg::SedsConverterFlatPackage);
     m_parser.handlePositional(CommandArg::SedsConverterSkipEmptySequences);
     m_parser.handlePositional(CommandArg::SedsConverterKeepIntermediateFiles);
     m_parser.handlePositional(CommandArg::SedsConverterAcnFilepathPrefix);
@@ -273,6 +274,10 @@ void SedsConverterCLI::addSedsTranslationOptions(Options &options)
 
     if (m_arguments.contains(CommandArg::SedsConverterFunctionToConvert)) {
         options.add(IvOptions::functionToConvert, m_parser.value(CommandArg::SedsConverterFunctionToConvert));
+    }
+    
+    if (m_arguments.contains(CommandArg::SedsConverterFlatPackage)) {
+        options.add(SedsOptions::flatPackage, m_parser.value(CommandArg::SedsConverterFlatPackage));
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterSkipEmptySequences)) {

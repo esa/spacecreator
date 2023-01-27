@@ -1,0 +1,18 @@
+FUNCTION-1-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MySeq FROM BASIC-ABSENT-DATAVIEW
+
+
+MyChoice FROM BASIC-ABSENT-DATAVIEW
+
+ ;
+
+MySeqSub ::= MySeq (WITH COMPONENTS { inputdata ABSENT })
+
+Function-1-pi-1-p1 ::= MySeqSub
+
+
+
+
+END

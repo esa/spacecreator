@@ -1125,7 +1125,12 @@ private:
         while (m_xmlReader.readNextStartElement()) {
             if (m_xmlReader.name() == QStringLiteral("WithComponent")) {
                 auto name = m_xmlReader.attributes().value(QStringLiteral("Name")).toString();
-                choice.addWithComponentConstraint(std::move(name));
+                auto present = m_xmlReader.attributes().value(QStringLiteral("present")).toString();
+                if (present.isEmpty()) {
+                    choice.addWithComponentConstraint(std::move(name));
+                } else {
+                    choice.addWithComponentAbsentConstraint(std::move(name));
+                }
                 m_xmlReader.skipCurrentElement();
             } else {
                 m_xmlReader.skipCurrentElement();

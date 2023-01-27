@@ -1,0 +1,18 @@
+BASIC-PRESENT-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+  MyInteger ::= INTEGER (0 .. 4)
+
+  MySeq       ::= SEQUENCE {
+      inputdata   MyInteger OPTIONAL,
+      outputdata  MyInteger,
+      validity    ENUMERATED { valid, invalid }
+  }
+
+  MyChoice    ::= CHOICE {
+      a BOOLEAN,
+      b MySeq
+  }
+
+END
+

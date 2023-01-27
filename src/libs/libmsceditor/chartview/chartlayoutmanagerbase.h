@@ -57,6 +57,8 @@ public:
     void setSystemChecker(SystemChecks *checker);
     SystemChecks *systemChecker() const;
 
+    virtual bool layoutUpdatePending() const;
+
     virtual ChartItem *itemForChart() const = 0;
     virtual CommentItem *itemForComment(MscComment *comment) const = 0;
     virtual InstanceItem *itemForInstance(MscInstance *instance) const = 0;
@@ -73,6 +75,8 @@ public:
 
     virtual QRectF minimalContentRect() const = 0;
     virtual QRectF actualContentRect() const = 0;
+
+    virtual const QVector<msc::InstanceItem *> &instanceItems() const = 0;
 
 Q_SIGNALS:
     void systemCheckerChanged(msc::SystemChecks *checker);

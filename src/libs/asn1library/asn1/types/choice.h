@@ -91,9 +91,13 @@ public:
     void addWithComponentConstraint(QString name) { m_withComponentConstraints.insert(std::move(name)); }
     std::set<QString> withComponentConstraints() const { return m_withComponentConstraints; }
 
+    void addWithComponentAbsentConstraint(QString name) { m_withComponentAbsentConstraints.insert(std::move(name)); }
+    std::set<QString> withComponentAbsentConstraints() const { return m_withComponentAbsentConstraints; }
+
 private:
     QString m_determinant;
     std::set<QString> m_withComponentConstraints;
+    std::set<QString> m_withComponentAbsentConstraints;
 };
 
 }

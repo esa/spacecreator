@@ -84,12 +84,12 @@ std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
 }
 
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
-        const Asn1Model *model, bool enhancedSpinSupport) const
+        const Asn1Model *model, bool enhancedSpinSupport, bool ignoreSimulation) const
 {
     QVector<QString> initInlineNames;
     auto promelaModel = std::make_unique<PromelaDataModel>();
     for (const std::unique_ptr<File> &file : model->data()) {
-        Asn1NodeVisitor visitor(*promelaModel, enhancedSpinSupport);
+        Asn1NodeVisitor visitor(*promelaModel, enhancedSpinSupport, ignoreSimulation);
         visitor.visit(*file);
         initInlineNames.append(visitor.getInitInlineNames());
     }

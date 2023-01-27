@@ -37,8 +37,9 @@ public:
      *
      * @param promelaModel         target promela model
      * @param enhancedSpinSupport  if true, then generate model for enhanced spin
+     * @param ignoreSimulation     don't include Simulation-Dataview module
      */
-    Asn1NodeVisitor(model::PromelaModel &promelaModel, bool enhancedSpinSupport);
+    Asn1NodeVisitor(model::PromelaModel &promelaModel, bool enhancedSpinSupport, bool ignoreSimulation = true);
 
     /**
      * @brief Getter for init inline names.
@@ -67,6 +68,7 @@ public:
 private:
     model::PromelaModel &m_promelaModel;
     const bool m_enhancedSpinSupport;
+    const bool m_ignoreSimulation;
     QVector<QString> m_initInlines;
     float m_delta;
 };
