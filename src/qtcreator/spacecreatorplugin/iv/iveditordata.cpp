@@ -18,7 +18,6 @@
 #include "iveditordata.h"
 
 #include "ivqtceditor.h"
-#include "msc/msccontext.h"
 #include "spacecreatorpluginconstants.h"
 
 #include <QMenu>
@@ -56,8 +55,6 @@ IVEditorData::IVEditorData(QObject *parent)
     Core::ActionManager::registerAction(undoAction, Core::Constants::UNDO, contexts);
     Core::ActionManager::registerAction(redoAction, Core::Constants::REDO, contexts);
 
-    contexts.add(Core::Constants::C_EDITORMANAGER);
-
     auto interfaceViewMenu = Core::ActionManager::createMenu(Constants::IV_MENU_ID);
     auto action = new QAction(tr("Manage Archetypes"), this);
     auto command = Core::ActionManager::registerAction(action, Constants::IV_MANAGE_ARCHETYPES_ID, contexts);
@@ -68,24 +65,12 @@ IVEditorData::IVEditorData(QObject *parent)
     menu->setTitle(tr("Interface view"));
     menu->setEnabled(true);
     toolsMenu->addMenu(interfaceViewMenu);
-
-    m_context = new MscContext(contexts, nullptr, this);
-    Core::ICore::addContextObject(m_context);
-}
-
-IVEditorData::~IVEditorData()
-{
-    if (m_context) {
-        Core::ICore::removeContextObject(m_context);
-    }
 }
 
 void IVEditorData::onCurrentEditorChanged(Core::IEditor *editor)
 {
     if (auto ivEditor = qobject_cast<IVQtCEditor *>(editor)) {
         m_undoGroup->setActiveStack(ivEditor->ivPlugin()->undoStack());
-    } else {
-        m_undoGroup->setActiveStack(nullptr);
     }
 }
 

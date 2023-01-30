@@ -18,6 +18,7 @@
 #include "dveditorfactory.h"
 
 #include "dveditordata.h"
+#include "dvqtceditor.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
 
@@ -28,7 +29,8 @@ namespace spctr {
 
 DVEditorFactory::DVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new DVEditorData(projectManager))
+    , m_editorData(new DVEditorData(this))
+    , m_projectManager(projectManager)
 {
     setId(spctr::Constants::K_DV_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("DV Editor", spctr::Constants::C_DVEDITOR_DISPLAY_NAME));
@@ -39,7 +41,7 @@ DVEditorFactory::DVEditorFactory(SpaceCreatorProjectManager *projectManager, QOb
 
 Core::IEditor *DVEditorFactory::createDVEditor()
 {
-    return m_editorData->createEditor();
+    return new DVQtCEditor(m_projectManager);
 }
 
 } // namespace spctr

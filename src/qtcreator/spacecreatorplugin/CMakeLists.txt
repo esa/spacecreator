@@ -24,8 +24,6 @@ set(SC_PLUGIN_SOURCES
     iv/ivmainwidget.h
     iv/ivqtceditor.cpp
     iv/ivqtceditor.h
-    msc/msccontext.cpp
-    msc/msccontext.h
     msc/msceditordata.cpp
     msc/msceditordata.h
     msc/msceditordocument.cpp

@@ -34,15 +34,11 @@ class IEditor;
 
 namespace spctr {
 
-class MscContext;
-class SpaceCreatorProjectManager;
-
 class MscEditorData : public QObject
 {
     Q_OBJECT
 public:
-    explicit MscEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
-    ~MscEditorData() override;
+    explicit MscEditorData(QObject *parent = nullptr);
 
     Core::IEditor *createEditor();
 
@@ -50,10 +46,7 @@ private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);
 
 private:
-    MscContext *m_context = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
-
-    QPointer<SpaceCreatorProjectManager> m_projectManager;
 };
 
 }

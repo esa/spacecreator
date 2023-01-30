@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QList>
+#include <QPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
 #include <memory>
 
@@ -44,6 +45,7 @@ public:
 
 private:
     std::unique_ptr<MscEditorData> m_editorData;
+    QPointer<SpaceCreatorProjectManager> m_projectManager;
 };
 
 }

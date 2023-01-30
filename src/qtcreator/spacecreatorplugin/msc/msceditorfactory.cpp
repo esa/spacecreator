@@ -18,6 +18,7 @@
 #include "msceditorfactory.h"
 
 #include "msceditordata.h"
+#include "mscqtceditor.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
 
@@ -28,7 +29,8 @@ namespace spctr {
 
 MscEditorFactory::MscEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new MscEditorData(projectManager))
+    , m_editorData(new MscEditorData(this))
+    , m_projectManager(projectManager)
 {
     setId(Constants::K_MSC_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
@@ -40,7 +42,7 @@ MscEditorFactory::MscEditorFactory(SpaceCreatorProjectManager *projectManager, Q
 
 Core::IEditor *MscEditorFactory::createMSCEditor()
 {
-    return m_editorData->createEditor();
+    return new MscQtCEditor(m_projectManager);
 }
 
 MscEditorData *MscEditorFactory::editorData() const

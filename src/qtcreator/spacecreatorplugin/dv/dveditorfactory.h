@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include "dveditorcore.h"
-
 #include <QList>
+#include <QPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
 #include <memory>
 
@@ -39,6 +38,7 @@ public:
 
 private:
     std::unique_ptr<DVEditorData> m_editorData;
+    QPointer<SpaceCreatorProjectManager> m_projectManager;
 };
 
 } // namespace spctr

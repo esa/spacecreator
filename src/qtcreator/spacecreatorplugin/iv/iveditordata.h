@@ -30,14 +30,12 @@ class IEditor;
 }
 
 namespace spctr {
-class MscContext;
 
 class IVEditorData : public QObject
 {
     Q_OBJECT
 public:
     explicit IVEditorData(QObject *parent = nullptr);
-    ~IVEditorData() override;
 
     IVEditorCorePtr ivPlugin(const QString &fileName);
 
@@ -45,7 +43,6 @@ private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);
 
 private:
-    MscContext *m_context = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
 };
 

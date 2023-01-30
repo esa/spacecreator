@@ -18,11 +18,8 @@
 #include "dveditordata.h"
 
 #include "dveditorcore.h"
-#include "dveditordocument.h"
 #include "dvqtceditor.h"
-#include "msc/msccontext.h"
 #include "spacecreatorpluginconstants.h"
-#include "spacecreatorprojectmanager.h"
 
 #include <QAction>
 #include <QUndoGroup>
@@ -37,10 +34,9 @@
 
 namespace spctr {
 
-DVEditorData::DVEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent)
+DVEditorData::DVEditorData(QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
-    , m_projectManager(projectManager)
 {
     Core::Context contexts;
     contexts.add(spctr::Constants::K_DV_EDITOR_ID);
@@ -58,27 +54,6 @@ DVEditorData::DVEditorData(SpaceCreatorProjectManager *projectManager, QObject *
 
     Core::ActionManager::registerAction(undoAction, Core::Constants::UNDO, contexts);
     Core::ActionManager::registerAction(redoAction, Core::Constants::REDO, contexts);
-
-    contexts.add(Core::Constants::C_EDITORMANAGER);
-    m_context = new MscContext(contexts, nullptr, this);
-    Core::ICore::addContextObject(m_context);
-}
-
-DVEditorData::~DVEditorData()
-{
-    if (m_context) {
-        Core::ICore::removeContextObject(m_context);
-    }
-}
-
-Core::IEditor *DVEditorData::createEditor()
-{
-    auto *dvEditor = new DVQtCEditor(m_projectManager);
-
-    connect(dvEditor->dvDocument(), &spctr::DVEditorDocument::dvDataLoaded, this,
-            [this](const QString &fileName, DVEditorCorePtr data) { m_undoGroup->addStack(data->undoStack()); });
-
-    return dvEditor;
 }
 
 void DVEditorData::onCurrentEditorChanged(Core::IEditor *editor)

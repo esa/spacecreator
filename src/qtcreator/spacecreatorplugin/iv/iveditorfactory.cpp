@@ -29,7 +29,7 @@ namespace spctr {
 
 IVEditorFactory::IVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new IVEditorData(projectManager))
+    , m_editorData(new IVEditorData(this))
     , m_projectManager(projectManager)
 {
     setId(spctr::Constants::K_IV_EDITOR_ID);

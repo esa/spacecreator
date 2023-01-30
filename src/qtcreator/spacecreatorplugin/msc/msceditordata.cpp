@@ -17,12 +17,9 @@
 
 #include "msceditordata.h"
 
-#include "msccontext.h"
 #include "msceditorcore.h"
-#include "msceditordocument.h"
 #include "mscqtceditor.h"
 #include "spacecreatorpluginconstants.h"
-#include "spacecreatorprojectmanager.h"
 
 #include <QUndoGroup>
 #include <QUndoStack>
@@ -36,10 +33,9 @@
 
 namespace spctr {
 
-MscEditorData::MscEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent)
+MscEditorData::MscEditorData(QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
-    , m_projectManager(projectManager)
 {
     Core::Context contexts;
     contexts.add(spctr::Constants::K_MSC_EDITOR_ID);
@@ -57,27 +53,6 @@ MscEditorData::MscEditorData(SpaceCreatorProjectManager *projectManager, QObject
 
     Core::ActionManager::registerAction(undoAction, Core::Constants::UNDO, contexts);
     Core::ActionManager::registerAction(redoAction, Core::Constants::REDO, contexts);
-
-    contexts.add(Core::Constants::C_EDITORMANAGER);
-    m_context = new MscContext(contexts, nullptr, this);
-    Core::ICore::addContextObject(m_context);
-}
-
-MscEditorData::~MscEditorData()
-{
-    if (m_context) {
-        Core::ICore::removeContextObject(m_context);
-    }
-}
-
-Core::IEditor *MscEditorData::createEditor()
-{
-    auto *mscEditor = new MscQtCEditor(m_projectManager);
-
-    connect(mscEditor->mscDocument(), &spctr::MscEditorDocument::mscDataLoaded, this,
-            [this](const QString &fileName, MSCEditorCorePtr data) { m_undoGroup->addStack(data->undoStack()); });
-
-    return mscEditor;
 }
 
 void MscEditorData::onCurrentEditorChanged(Core::IEditor *editor)
