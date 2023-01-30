@@ -22,12 +22,7 @@
 #include "spacecreatorprojectmanager.h"
 
 #include <QGuiApplication>
-
-#if QTC_VERSION < 900
-#include <coreplugin/fileiconprovider.h>
-#else
 #include <utils/fsengine/fileiconprovider.h>
-#endif
 
 namespace spctr {
 
@@ -39,15 +34,8 @@ MscEditorFactory::MscEditorFactory(SpaceCreatorProjectManager *projectManager, Q
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::MSC_MIMETYPE);
 
-#if QTC_VERSION > 414
     setEditorCreator(std::bind(&MscEditorFactory::createMSCEditor, this));
-#endif
-
-#if QTC_VERSION < 900
-    Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
-#else
     Utils::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
-#endif
 }
 
 Core::IEditor *MscEditorFactory::createMSCEditor()

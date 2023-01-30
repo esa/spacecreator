@@ -37,7 +37,7 @@ class MscQtCEditor : public Core::IEditor
     Q_OBJECT
 
 public:
-    MscQtCEditor(SpaceCreatorProjectManager *projectManager);
+    explicit MscQtCEditor(SpaceCreatorProjectManager *projectManager);
     ~MscQtCEditor();
 
     Core::IDocument *document() const override;

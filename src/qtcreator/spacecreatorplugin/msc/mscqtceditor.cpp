@@ -17,12 +17,10 @@
 
 #include "mscqtceditor.h"
 
-#include "mscappwidget.h"
 #include "msceditordocument.h"
 #include "mscmainwidget.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
-#include "tools/entitydeletetool.h"
 
 #include <QDebug>
 #include <QToolBar>

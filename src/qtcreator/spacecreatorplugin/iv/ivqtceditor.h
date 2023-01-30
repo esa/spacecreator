@@ -43,7 +43,7 @@ class IVQtCEditor : public Core::IEditor
     Q_OBJECT
 
 public:
-    IVQtCEditor(SpaceCreatorProjectManager *projectManager);
+    explicit IVQtCEditor(SpaceCreatorProjectManager *projectManager);
     ~IVQtCEditor();
 
     Core::IDocument *document() const override;

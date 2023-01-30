@@ -41,7 +41,7 @@ class MscEditorData : public QObject
 {
     Q_OBJECT
 public:
-    MscEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
+    explicit MscEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
     ~MscEditorData() override;
 
     Core::IEditor *createEditor();

@@ -17,11 +17,9 @@
 
 #include "iveditordata.h"
 
-#include "iveditordocument.h"
 #include "ivqtceditor.h"
 #include "msc/msccontext.h"
 #include "spacecreatorpluginconstants.h"
-#include "spacecreatorprojectmanager.h"
 
 #include <QMenu>
 #include <QUndoGroup>
@@ -37,10 +35,9 @@
 
 namespace spctr {
 
-IVEditorData::IVEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent)
+IVEditorData::IVEditorData(QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
-    , m_projectManager(projectManager)
 {
     Core::Context contexts;
     contexts.add(spctr::Constants::K_IV_EDITOR_ID);
@@ -81,12 +78,6 @@ IVEditorData::~IVEditorData()
     if (m_context) {
         Core::ICore::removeContextObject(m_context);
     }
-}
-
-Core::IEditor *IVEditorData::createEditor()
-{
-    auto *ivEditor = new IVQtCEditor(m_projectManager);
-    return ivEditor;
 }
 
 void IVEditorData::onCurrentEditorChanged(Core::IEditor *editor)

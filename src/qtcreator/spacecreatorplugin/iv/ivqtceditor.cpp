@@ -17,8 +17,6 @@
 
 #include "ivqtceditor.h"
 
-#include "commands/cmdchangeasn1file.h"
-#include "commandsstack.h"
 #include "endtoend/endtoendview.h"
 #include "interfacedocument.h"
 #include "ivappwidget.h"
@@ -59,7 +57,8 @@ IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager)
         auto command = Core::ActionManager::command(Constants::IV_MANAGE_ARCHETYPES_ID);
         IVEditorCorePtr plugin = m_editorWidget->ivPlugin();
         auto ivWidget = qobject_cast<ive::IVAppWidget *>(plugin->mainwidget());
-        connect(command->action(), &QAction::triggered, ivWidget, &ive::IVAppWidget::showArchetypeManager, Qt::UniqueConnection);
+        connect(command->action(), &QAction::triggered, ivWidget, &ive::IVAppWidget::showArchetypeManager,
+                Qt::UniqueConnection);
     });
     connect(m_editorWidget, &IVMainWidget::requestE2EDataflow, this, &IVQtCEditor::showCurrentE2EDataflow);
     connect(m_editorWidget, &IVMainWidget::requestModelCheckingWindow, this,

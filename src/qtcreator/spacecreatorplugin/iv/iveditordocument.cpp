@@ -21,7 +21,6 @@
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "ivexporter.h"
-#include "ivmainwidget.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorproject.h"
 #include "spacecreatorprojectimpl.h"
@@ -48,17 +47,10 @@ IVEditorDocument::IVEditorDocument(SpaceCreatorProjectManager *projectManager, Q
     setId(Id(spctr::Constants::K_IV_EDITOR_ID));
 }
 
-#if QTC_VERSION < 500
-Core::IDocument::OpenResult IVEditorDocument::open(
-        QString *errorString, const QString &fileName, const QString &realFileName)
-{
-    const QFileInfo fi(fileName);
-#else
 Core::IDocument::OpenResult IVEditorDocument::open(
         QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName)
 {
     const QFileInfo fi = fileName.toFileInfo();
-#endif
     Q_UNUSED(errorString)
     Q_UNUSED(realFileName)
 
@@ -84,11 +76,7 @@ Core::IDocument::OpenResult IVEditorDocument::open(
                 project->project()->rootProjectNode()->removeFiles(toProjectsFiles(asn1FilesRemoved));
             });
 
-#if QTC_VERSION < 409
-    setFilePath(Utils::FileName::fromString(absfileName));
-#else
     setFilePath(Utils::FilePath::fromString(absfileName));
-#endif
 
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT ivDataLoaded(absfileName, m_plugin);
@@ -97,26 +85,13 @@ Core::IDocument::OpenResult IVEditorDocument::open(
     return OpenResult::Success;
 }
 
-#if QTC_VERSION < 500
-bool IVEditorDocument::save(QString *errorString, const QString &name, bool autoSave)
-{
-#else
 bool IVEditorDocument::save(QString *errorString, const Utils::FilePath &name, bool autoSave)
 {
-#endif
     Q_UNUSED(errorString)
     if (m_plugin.isNull()) {
         return false;
     }
-#if QTC_VERSION < 500
-#if QTC_VERSION < 409
-    const FileName newName = Utils::FileName::fromString(name);
-#else
-    const FilePath newName = Utils::FilePath::fromString(name);
-#endif
-#else
     const FilePath newName = name;
-#endif
 
     const auto oldFileName = filePath();
     const auto actualName = name.isEmpty() ? oldFileName : newName;
@@ -150,17 +125,10 @@ bool IVEditorDocument::save(QString *errorString, const Utils::FilePath &name, b
     return true;
 }
 
-#if QTC_VERSION < 409
-void IVEditorDocument::setFilePath(const FileName &newName)
-{
-    IDocument::setFilePath(newName);
-}
-#else
 void IVEditorDocument::setFilePath(const FilePath &newName)
 {
     IDocument::setFilePath(newName);
 }
-#endif
 
 bool IVEditorDocument::shouldAutoSave() const
 {

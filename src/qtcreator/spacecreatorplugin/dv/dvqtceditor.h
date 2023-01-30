@@ -40,7 +40,7 @@ class DVQtCEditor : public Core::IEditor
     Q_OBJECT
 
 public:
-    DVQtCEditor(SpaceCreatorProjectManager *projectManager);
+    explicit DVQtCEditor(SpaceCreatorProjectManager *projectManager);
     ~DVQtCEditor();
 
     Core::IDocument *document() const override;

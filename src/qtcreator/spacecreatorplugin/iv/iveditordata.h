@@ -30,17 +30,14 @@ class IEditor;
 }
 
 namespace spctr {
-class SpaceCreatorProjectManager;
 class MscContext;
 
 class IVEditorData : public QObject
 {
     Q_OBJECT
 public:
-    IVEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
+    explicit IVEditorData(QObject *parent = nullptr);
     ~IVEditorData() override;
-
-    Core::IEditor *createEditor();
 
     IVEditorCorePtr ivPlugin(const QString &fileName);
 
@@ -50,8 +47,6 @@ private Q_SLOTS:
 private:
     MscContext *m_context = nullptr;
     QUndoGroup *m_undoGroup = nullptr;
-
-    QPointer<SpaceCreatorProjectManager> m_projectManager;
 };
 
 }
