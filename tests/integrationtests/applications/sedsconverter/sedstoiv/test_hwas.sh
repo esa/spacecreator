@@ -5,7 +5,7 @@ set -euo pipefail
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
 UPDATE_DATAVIEW="asn2aadlPlus -f dataview-uniq.asn DataView.aadl -aadlv2"
-XMLDIFF="xmldiff --check --ignored-attrs $(cat ../ignored_attributes.txt)"
+XMLDIFF="xmldiff --check --ignored-attributes $(cat ../ignored_attributes.txt)"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"

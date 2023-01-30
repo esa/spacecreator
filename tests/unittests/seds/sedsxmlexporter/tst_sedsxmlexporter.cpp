@@ -53,7 +53,7 @@ void tst_SedsXmlExporter::compareResults(const QString &filename)
 
     QStringList args;
     args << "--check"
-         << "--ignored-attrs" << m_ignoredAttrs << filename << QString("resources/%1").arg(filename);
+         << "--ignored-attributes" << m_ignoredAttrs << filename << QString("resources/%1").arg(filename);
 
     diffProcess.start("xmldiff", args);
     diffProcess.waitForFinished();

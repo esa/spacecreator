@@ -141,7 +141,7 @@ void tsti_SimulinkToIV::testComparingIVTranslationResultWithExpectedResult()
 
             QStringList args;
             args << "--check"
-                 << "--ignored-attrs" << m_ignoredAttrs << m_currentIVFileName << expectedIVFilePath;
+                 << "--ignored-attributes" << m_ignoredAttrs << m_currentIVFileName << expectedIVFilePath;
 
             diffProcess.start("xmldiff", args);
             diffProcess.waitForFinished();

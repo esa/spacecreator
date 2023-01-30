@@ -9,7 +9,7 @@ OPENGEODE=$HOME/.local/bin/opengeode
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
-XMLDIFF="xmldiff --check --ignored-attrs $(cat ../ignored_attributes.txt)"
+XMLDIFF="xmldiff --check --ignored-attributes $(cat ../ignored_attributes.txt)"
 TEST_OUTPUT_DIR=output
 
 echo "Running SedsConverter test: ${0##*/}'"
