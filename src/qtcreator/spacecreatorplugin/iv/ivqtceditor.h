@@ -17,19 +17,17 @@
 
 #pragma once
 
+#include "common/qtceditor.h"
 #include "iveditorcore.h"
 
 #include <QPointer>
-#include <QSharedPointer>
 #include <editormanager/ieditor.h>
 
 class QToolBar;
 
 namespace ive {
-
 class ModelCheckingWindow;
 class EndToEndView;
-
 }
 
 namespace spctr {
@@ -38,7 +36,7 @@ class IVEditorDocument;
 class IVMainWidget;
 class SpaceCreatorProjectManager;
 
-class IVQtCEditor : public Core::IEditor
+class IVQtCEditor : public QtCEditor
 {
     Q_OBJECT
 
@@ -51,6 +49,8 @@ public:
     IVEditorCorePtr ivPlugin() const;
 
     QWidget *toolBar() override;
+
+    shared::EditorCore *editorCore() const override;
 
 public Q_SLOTS:
     void showCurrentE2EDataflow();

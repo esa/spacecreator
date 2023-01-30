@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2023 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,13 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dveditordata.h"
+#include "actionhandler.h"
 
-#include "dveditorcore.h"
-#include "dvqtceditor.h"
-#include "spacecreatorpluginconstants.h"
+#include "qtceditor.h"
 
-#include <QAction>
 #include <QUndoGroup>
 #include <QUndoStack>
 #include <coreplugin/actionmanager/actionmanager.h>
@@ -34,15 +31,18 @@
 
 namespace spctr {
 
-DVEditorData::DVEditorData(QObject *parent)
+/**
+ * @param id the ID of the editor type
+ */
+ActionHandler::ActionHandler(const Utils::Id &id, QObject *parent)
     : QObject(parent)
     , m_undoGroup(new QUndoGroup(this))
 {
     Core::Context contexts;
-    contexts.add(spctr::Constants::K_DV_EDITOR_ID);
+    contexts.add(id);
 
     QObject::connect(Core::EditorManager::instance(), &Core::EditorManager::currentEditorChanged, this,
-            &spctr::DVEditorData::onCurrentEditorChanged);
+            &spctr::ActionHandler::onCurrentEditorChanged);
 
     QAction *undoAction = m_undoGroup->createUndoAction(this);
     undoAction->setIcon(Utils::Icons::UNDO_TOOLBAR.icon());
@@ -56,11 +56,11 @@ DVEditorData::DVEditorData(QObject *parent)
     Core::ActionManager::registerAction(redoAction, Core::Constants::REDO, contexts);
 }
 
-void DVEditorData::onCurrentEditorChanged(Core::IEditor *editor)
+void ActionHandler::onCurrentEditorChanged(Core::IEditor *editor)
 {
-    if (auto dvEditor = qobject_cast<DVQtCEditor *>(editor)) {
-        m_undoGroup->setActiveStack(dvEditor->dvPlugin()->undoStack());
+    if (auto qtEditor = qobject_cast<QtCEditor *>(editor)) {
+        m_undoGroup->setActiveStack(qtEditor->undoStack());
     }
 }
 
-} // namespace spctr
+}

@@ -17,7 +17,7 @@
 
 #include "iveditorfactory.h"
 
-#include "iveditordata.h"
+#include "ivactionhandler.h"
 #include "ivqtceditor.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
@@ -29,7 +29,7 @@ namespace spctr {
 
 IVEditorFactory::IVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new IVEditorData(this))
+    , m_actionHandler(new IVActionHandler(this))
     , m_projectManager(projectManager)
 {
     setId(spctr::Constants::K_IV_EDITOR_ID);

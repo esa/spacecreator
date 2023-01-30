@@ -2,10 +2,12 @@ set(PLUGIN_NAME SpaceCreatorPlugin)
 
 set(SC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
+    common/actionhandler.cpp
+    common/actionhandler.h
     common/messagemanager.cpp
     common/messagemanager.h
-    dv/dveditordata.cpp
-    dv/dveditordata.h
+    common/qtceditor.cpp
+    common/qtceditor.h
     dv/dveditordocument.cpp
     dv/dveditordocument.h
     dv/dveditorfactory.cpp
@@ -14,8 +16,8 @@ set(SC_PLUGIN_SOURCES
     dv/dvmainwidget.h
     dv/dvqtceditor.cpp
     dv/dvqtceditor.h
-    iv/iveditordata.cpp
-    iv/iveditordata.h
+    iv/ivactionhandler.cpp
+    iv/ivactionhandler.h
     iv/iveditordocument.cpp
     iv/iveditordocument.h
     iv/iveditorfactory.cpp
@@ -24,8 +26,6 @@ set(SC_PLUGIN_SOURCES
     iv/ivmainwidget.h
     iv/ivqtceditor.cpp
     iv/ivqtceditor.h
-    msc/msceditordata.cpp
-    msc/msceditordata.h
     msc/msceditordocument.cpp
     msc/msceditordocument.h
     msc/msceditorfactory.cpp

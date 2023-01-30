@@ -17,20 +17,13 @@
 
 #pragma once
 
-#include <QList>
 #include <QPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
 #include <memory>
 
-class QAction;
-
-namespace msc {
-class MSCEditorCore;
-}
-
 namespace spctr {
+class ActionHandler;
 class SpaceCreatorProjectManager;
-class MscEditorData;
 
 class MscEditorFactory : public Core::IEditorFactory
 {
@@ -41,10 +34,8 @@ public:
 
     Core::IEditor *createMSCEditor();
 
-    MscEditorData *editorData() const;
-
 private:
-    std::unique_ptr<MscEditorData> m_editorData;
+    std::unique_ptr<ActionHandler> m_actionHandler;
     QPointer<SpaceCreatorProjectManager> m_projectManager;
 };
 

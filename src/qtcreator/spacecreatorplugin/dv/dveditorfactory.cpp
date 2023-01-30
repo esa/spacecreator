@@ -17,7 +17,7 @@
 
 #include "dveditorfactory.h"
 
-#include "dveditordata.h"
+#include "common/actionhandler.h"
 #include "dvqtceditor.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
@@ -29,7 +29,7 @@ namespace spctr {
 
 DVEditorFactory::DVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new DVEditorData(this))
+    , m_actionHandler(new ActionHandler(spctr::Constants::K_DV_EDITOR_ID, this))
     , m_projectManager(projectManager)
 {
     setId(spctr::Constants::K_DV_EDITOR_ID);

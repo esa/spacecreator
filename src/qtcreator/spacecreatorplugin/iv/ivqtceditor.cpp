@@ -29,9 +29,7 @@
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 
-#include <QFileInfo>
 #include <QToolBar>
-#include <QUndoCommand>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/actionmanager/command.h>
@@ -39,12 +37,11 @@
 #include <editormanager/editormanager.h>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projecttree.h>
-#include <utils/qtcassert.h>
 
 namespace spctr {
 
 IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager)
-    : Core::IEditor()
+    : QtCEditor()
     , m_document(new IVEditorDocument(projectManager, this))
     , m_editorWidget(new IVMainWidget)
     , m_projectManager(projectManager)
@@ -95,6 +92,11 @@ QWidget *IVQtCEditor::toolBar()
     }
 
     return m_toolbar;
+}
+
+shared::EditorCore *IVQtCEditor::editorCore() const
+{
+    return m_document->ivEditorCore().get();
 }
 
 void IVQtCEditor::showCurrentModelCheckingWindow()

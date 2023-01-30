@@ -17,6 +17,7 @@
 
 #include "mscqtceditor.h"
 
+#include "msceditorcore.h"
 #include "msceditordocument.h"
 #include "mscmainwidget.h"
 #include "spacecreatorpluginconstants.h"
@@ -28,7 +29,7 @@
 namespace spctr {
 
 MscQtCEditor::MscQtCEditor(SpaceCreatorProjectManager *projectManager)
-    : Core::IEditor()
+    : QtCEditor()
     , m_document(new MscEditorDocument(projectManager, this))
     , m_editorWidget(new MscMainWidget)
 {
@@ -71,6 +72,11 @@ QWidget *MscQtCEditor::toolBar()
     }
 
     return m_toolbar;
+}
+
+shared::EditorCore *MscQtCEditor::editorCore() const
+{
+    return m_document->mscEditorCore().get();
 }
 
 }

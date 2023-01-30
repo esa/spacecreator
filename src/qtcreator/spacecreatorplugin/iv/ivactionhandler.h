@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,33 +17,15 @@
 
 #pragma once
 
-#include <QList>
-#include <QObject>
-#include <QPointer>
-
-class QAction;
-class QUndoGroup;
-
-namespace dve {
-class DVEditorCore;
-}
-
-namespace Core {
-class IEditor;
-}
+#include "common/actionhandler.h"
 
 namespace spctr {
-class DVEditorData : public QObject
+
+class IVActionHandler : public ActionHandler
 {
     Q_OBJECT
 public:
-    explicit DVEditorData(QObject *parent = nullptr);
-
-private Q_SLOTS:
-    void onCurrentEditorChanged(Core::IEditor *editor);
-
-private:
-    QUndoGroup *m_undoGroup = nullptr;
+    explicit IVActionHandler(QObject *parent = nullptr);
 };
 
-} // namespace spctr
+}

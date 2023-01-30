@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018 - 2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2023 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,15 +18,9 @@
 #pragma once
 
 #include <QObject>
-#include <QPointer>
-#include <QSharedPointer>
+#include <id.h>
 
-class QAction;
 class QUndoGroup;
-
-namespace msc {
-class MSCEditorCore;
-}
 
 namespace Core {
 class IEditor;
@@ -34,13 +28,14 @@ class IEditor;
 
 namespace spctr {
 
-class MscEditorData : public QObject
+/**
+ * Class do handle undo/redo and similar actions for the different editors/documents inside QtCreator
+ */
+class ActionHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit MscEditorData(QObject *parent = nullptr);
-
-    Core::IEditor *createEditor();
+    explicit ActionHandler(const Utils::Id &id, QObject *parent = nullptr);
 
 private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);

@@ -76,10 +76,7 @@
 #include <shared/entityattribute.h>
 #include <shared/graphicsviewutils.h>
 #include <shared/sharedlibrary.h>
-#include <spacecreatorplugin/iv/iveditordata.h>
 #include <spacecreatorplugin/iv/iveditordocument.h>
-#include <spacecreatorplugin/iv/iveditorfactory.h>
-#include <spacecreatorplugin/iv/ivqtceditor.h>
 #include <utils/fileutils.h>
 
 using namespace Core;
