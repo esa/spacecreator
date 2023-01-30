@@ -1,6 +1,6 @@
 <InterfaceView version="1.0">
 <Function name="simulink" is_type="NO" language="QGenC" default_implementation="default">
-<Provided_Interface name="interface" kind="Protected" layer="default" is_simulink_interface="true">
+<Provided_Interface name="interface" kind="Protected" layer="default">
     <Input_Parameter name="i1" type="AliasDouble" encoding="NATIVE"/>
     <Input_Parameter name="i2" type="AliasSingle" encoding="NATIVE"/>
     <Input_Parameter name="i3" type="AliasInt8" encoding="NATIVE"/>
