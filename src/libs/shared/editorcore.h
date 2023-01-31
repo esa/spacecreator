@@ -58,6 +58,7 @@ public:
     QAction *actionUndo();
     QAction *actionRedo();
     QAction *actionToggleMinimap();
+    virtual QAction *actionDelete() const = 0;
 
     // Populate a CommandLineParser with the arguments this application can handle
     virtual void populateCommandLineArguments(CommandLineParser *parser) const = 0;

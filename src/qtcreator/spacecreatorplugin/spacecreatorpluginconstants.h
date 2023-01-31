@@ -40,6 +40,9 @@ const char C_IVEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "I
 const char C_MSCEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Msc Editor");
 const char C_SCLEDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Scl Editor");
 
+// Actions
+const char REMOVE_SELECTED_ELEMENTS[] = "SpaceCreator.RemoveSelectedElements";
+
 // Menu
 const char MENU_ID[] = "SpaceCreator.Menu";
 const char SHOW_MINIMAP_ID[] = "SpaceCreator.Minimap";

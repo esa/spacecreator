@@ -78,6 +78,8 @@ public:
     QAction *actionCheckInstances();
     QAction *actionCheckMessages();
 
+    QAction *actionDelete() const override;
+
     void setSystemChecker(msc::SystemChecks *checker);
     msc::SystemChecks *systemChecker() const;
 

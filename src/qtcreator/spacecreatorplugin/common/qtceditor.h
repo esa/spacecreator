@@ -19,6 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include <editormanager/ieditor.h>
 
+class QAction;
 class QUndoStack;
 
 namespace shared {

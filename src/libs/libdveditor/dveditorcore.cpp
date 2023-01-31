@@ -95,6 +95,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1SystemChecks;
 
     QPointer<QToolBar> m_toolBar;
+    QAction *m_deleteAction = nullptr;
     QVector<QAction *> m_actions;
     QAction *m_actionCheckFunctions { nullptr };
     QAction *m_actionCheckMessages { nullptr };
@@ -237,12 +238,11 @@ QVector<QAction *> DVEditorCore::initActions()
             [this]() { d->m_creatorTool->setCurrentToolType(DVCreatorTool::ToolType::MultiPointConnection); });
     d->m_actions.append(actCreateConnection);
 
-    auto actRemove = new QAction(tr("Remove"));
-    actRemove->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
-    actRemove->setEnabled(false);
-    actRemove->setShortcut(QKeySequence::Delete);
-    connect(actRemove, &QAction::triggered, this, [this]() { d->m_creatorTool->removeSelectedItems(); });
-    d->m_actions.append(actRemove);
+    d->m_deleteAction = new QAction(tr("Remove"));
+    d->m_deleteAction->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
+    d->m_deleteAction->setEnabled(false);
+    connect(d->m_deleteAction, &QAction::triggered, this, [this]() { d->m_creatorTool->removeSelectedItems(); });
+    d->m_actions.append(d->m_deleteAction);
 
     auto actZoomIn = new QAction(tr("Zoom In"));
     actZoomIn->setIcon(QIcon(QLatin1String(":/toolbar/icns/zoom_in.svg")));
@@ -263,8 +263,8 @@ QVector<QAction *> DVEditorCore::initActions()
     d->m_actions.append(actZoomOut);
 
     connect(d->m_mainWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-            [this, actRemove](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
-                actRemove->setEnabled(!selected.isEmpty());
+            [this](const QItemSelection &selected, const QItemSelection & /*deselected*/) {
+                d->m_deleteAction->setEnabled(!selected.isEmpty());
             });
 
     return d->m_actions;
@@ -276,6 +276,11 @@ QVector<QAction *> DVEditorCore::initViewActions()
     actions.append(actionCheckFunctions());
     actions.append(actionCheckMessages());
     return actions;
+}
+
+QAction *DVEditorCore::actionDelete() const
+{
+    return d->m_deleteAction;
 }
 
 QUndoStack *DVEditorCore::undoStack() const

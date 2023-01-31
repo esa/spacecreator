@@ -70,6 +70,7 @@ public:
     QAction *actionExportType();
     QAction *actionToggleE2EView();
     QAction *actionLaunchModelCheckingWindow();
+    QAction *actionDelete() const override;
 
     ivm::IVFunction *addFunction(const QString &name, ivm::IVFunction *parent = nullptr);
     bool addConnection(QString name, const QString &fromInstanceName, const QString &toInstanceName);

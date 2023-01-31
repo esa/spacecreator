@@ -44,6 +44,7 @@ MainWindow::MainWindow(dve::DVEditorCore *core, QWidget *parent)
 
     setCentralWidget(core->mainwidget());
     addToolBar(core->toolBar());
+    core->actionDelete()->setShortcut(QKeySequence::Delete);
 
     QString hwFile = shared::SettingsManager::load<QString>(shared::SettingsManager::DVE::HwLibraryFile, "");
     m_core->loadHWLibrary(hwFile);

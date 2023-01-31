@@ -54,6 +54,8 @@ public:
 
     void centerView();
 
+    QAction *actionDelete() const;
+
 public Q_SLOTS:
     void showArchetypeManager();
 

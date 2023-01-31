@@ -88,6 +88,7 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionOpenFile(), "Open file", "Show Open File dialog");
     ActionsManager::registerAction(Q_FUNC_INFO, m_core->actionQuit(), "Quit", "Quit the application");
     m_core->registerBasicActions();
+    m_core->actionDelete()->setShortcut(QKeySequence::Delete);
 
     connect(m_core->document(), &InterfaceDocument::dirtyChanged, this, &MainWindow::onDocDirtyChanged);
 

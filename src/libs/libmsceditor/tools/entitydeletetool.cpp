@@ -48,7 +48,6 @@ EntityDeleteTool::EntityDeleteTool(ChartLayoutManager *model, QGraphicsView *vie
 
     setAction(new QAction(m_icon, m_title, this));
     m_action->setToolTip(m_description);
-    m_action->setShortcut(QKeySequence::Delete);
     connect(m_action, &QAction::triggered, this, &EntityDeleteTool::deleteSelectedItems);
 
     if (m_view) {

@@ -78,7 +78,7 @@ IVEditorCore::IVEditorCore(QObject *parent)
     }
 }
 
-IVEditorCore::~IVEditorCore() {}
+IVEditorCore::~IVEditorCore() { }
 
 /*!
    Returns the interface document
@@ -164,6 +164,11 @@ QAction *IVEditorCore::actionLaunchModelCheckingWindow()
         m_actionLaunchModelCheckingWindow->setCheckable(true);
     }
     return m_actionLaunchModelCheckingWindow;
+}
+
+QAction *IVEditorCore::actionDelete() const
+{
+    return m_mainWidget->actionDelete();
 }
 
 /*!

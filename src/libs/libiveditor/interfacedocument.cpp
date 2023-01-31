@@ -31,7 +31,6 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
-#include "ivcoreutils.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivcore/abstractsystemchecks.h"
@@ -53,13 +52,13 @@
 #include <QDirIterator>
 #include <QGraphicsScene>
 #include <QInputDialog>
+#include <QItemSelectionModel>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QSplitter>
 #include <QUndoStack>
-#include <QItemSelectionModel>
 #include <QVBoxLayout>
 #include <algorithm>
 #include <filesystem>

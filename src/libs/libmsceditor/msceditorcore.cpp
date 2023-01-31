@@ -37,6 +37,7 @@
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "systemchecks.h"
+#include "tools/entitydeletetool.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QActionGroup>
@@ -194,6 +195,11 @@ QAction *MSCEditorCore::actionCheckMessages()
         m_actionCheckMessages = new QAction(QIcon(":/sharedresources/check_blue.svg"), tr("Check MSC messages"), this);
     }
     return m_actionCheckMessages;
+}
+
+QAction *MSCEditorCore::actionDelete() const
+{
+    return m_mainWidget->deleteTool()->action();
 }
 
 /*!

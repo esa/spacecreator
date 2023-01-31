@@ -18,29 +18,17 @@
 #include "mainwindow.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "chartitem.h"
 #include "chartlayoutmanager.h"
 #include "colors/colormanagerdialog.h"
 #include "commandlineparser.h"
-#include "commands/cmdsetasn1file.h"
-#include "documentitemmodel.h"
-#include "errorhub.h"
-#include "geometry.h"
 #include "graphicsview.h"
 #include "interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivsystemchecks.h"
 #include "mainmodel.h"
-#include "minimap.h"
-#include "mscaction.h"
 #include "mscappwidget.h"
 #include "mscchart.h"
-#include "msccommandsstack.h"
-#include "msccondition.h"
-#include "msccreate.h"
-#include "mscdocument.h"
 #include "msceditorcore.h"
-#include "mscmessage.h"
 #include "mscmodel.h"
 #include "settingsmanager.h"
 #include "textviewdialog.h"
@@ -361,6 +349,8 @@ void MainWindow::initActions()
             QApplication::quit();
         }
     });
+
+    d->m_core->actionDelete()->setShortcut(QKeySequence::Delete);
 }
 
 void MainWindow::initMenus()
@@ -374,8 +364,8 @@ void MainWindow::initMenus()
     menu->addSeparator();
     menu->addAction(tr("Open IV file ..."), this, &MainWindow::openIVFile);
     menu->addSeparator();
-    menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")), tr("Save Screenshot..."), this, &MainWindow::saveScreenshot,
-            QKeySequence(Qt::ALT | Qt::Key_S));
+    menu->addAction(QIcon(QLatin1String(":/sharedresources/icons/save.svg")), tr("Save Screenshot..."),
+            QKeySequence(Qt::ALT | Qt::Key_S), this, &MainWindow::saveScreenshot);
     menu->addSeparator();
     menu->addAction(d->m_core->actionQuit());
 
@@ -397,8 +387,8 @@ void MainWindow::initMenus()
     menu = menuBar()->addMenu(tr("&View"));
     menu->addAction(d->m_core->actionToggleMinimap());
     menu->addSeparator();
-    d->m_actionShowDocument = menu->addAction(tr("Show &Document"), this, &MainWindow::showDocumentView, tr("F8"));
-    d->m_actionShowHierarchy = menu->addAction(tr("Show &Hierarchy"), this, &MainWindow::showHierarchyView, tr("F9"));
+    d->m_actionShowDocument = menu->addAction(tr("Show &Document"), tr("F8"), this, &MainWindow::showDocumentView);
+    d->m_actionShowHierarchy = menu->addAction(tr("Show &Hierarchy"), tr("F9"), this, &MainWindow::showHierarchyView);
     d->m_actionShowDocument->setCheckable(true);
     d->m_actionShowHierarchy->setCheckable(true);
     auto group = new QActionGroup(menu);

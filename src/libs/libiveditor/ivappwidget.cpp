@@ -78,15 +78,13 @@ IVAppWidget::IVAppWidget(IVEditorCore *core, QWidget *parent)
         m_document->itemsModel()->changeRootItem(id);
     });
 
-    QTimer::singleShot(0, this, [&]() {
-        for (QAction *action : initActions()) {
-            ui->toolBar->addAction(action);
-        }
-        ui->toolBar->addSeparator();
-        for (QAction *action : initViewActions()) {
-            ui->toolBar->addAction(action);
-        }
-    });
+    for (QAction *action : initActions()) {
+        ui->toolBar->addAction(action);
+    }
+    ui->toolBar->addSeparator();
+    for (QAction *action : initViewActions()) {
+        ui->toolBar->addAction(action);
+    }
 }
 
 IVAppWidget::~IVAppWidget()
@@ -114,6 +112,11 @@ void IVAppWidget::centerView()
         }
         graphicsView()->centerOn(rect.center());
     }
+}
+
+QAction *IVAppWidget::actionDelete() const
+{
+    return m_actRemove;
 }
 
 void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
@@ -562,8 +565,7 @@ QVector<QAction *> IVAppWidget::initActions()
     m_actCreateConnectionGroup->setIcon(QIcon(":/toolbar/icns/connection_group.svg"));
 
     m_actUngroupConnection = new QAction(tr("Ungroup selected connection(s)"));
-    ActionsManager::registerAction(
-            Q_FUNC_INFO, m_actUngroupConnection, "Ungroup Connections", "Ungroup connections");
+    ActionsManager::registerAction(Q_FUNC_INFO, m_actUngroupConnection, "Ungroup Connections", "Ungroup connections");
     m_actUngroupConnection->setActionGroup(actionGroup);
     connect(m_actUngroupConnection, &QAction::triggered, this, [this]() { m_tool->ungroupConnectedItems(); });
     m_actUngroupConnection->setIcon(QIcon(":/toolbar/icns/ungroup_connections.svg"));
@@ -572,7 +574,6 @@ QVector<QAction *> IVAppWidget::initActions()
     ActionsManager::registerAction(Q_FUNC_INFO, m_actRemove, "Remove", "Remove selected object");
     m_actRemove->setIcon(QIcon(QLatin1String(":/toolbar/icns/delete.svg")));
     m_actRemove->setEnabled(false);
-    m_actRemove->setShortcut(QKeySequence::Delete);
     connect(m_actRemove, &QAction::triggered, this, [this]() { m_tool->removeSelectedItems(); });
 
     m_actZoomIn = new QAction(tr("Zoom In"));
@@ -630,8 +631,9 @@ QVector<QAction *> IVAppWidget::initActions()
     });
 
     m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
-        actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup, m_actUngroupConnection, m_actRemove,
-        m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent, m_actEnterNestedView, m_actShrinkScene };
+        actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup,
+        m_actUngroupConnection, m_actRemove, m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent,
+        m_actEnterNestedView, m_actShrinkScene };
 
     connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
         QList<shared::BreadcrumbWidget::Level> levels;

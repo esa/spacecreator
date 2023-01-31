@@ -20,6 +20,7 @@
 #include <QObject>
 #include <id.h>
 
+class QAction;
 class QUndoGroup;
 
 namespace Core {
@@ -41,7 +42,11 @@ private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);
 
 private:
+    void syncActions(QAction *qtcAction, QAction *editorAction);
+
+    Utils::Id m_contextId;
     QUndoGroup *m_undoGroup = nullptr;
+    QAction *m_deleteAction = nullptr;
 };
 
 }

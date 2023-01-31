@@ -78,6 +78,8 @@ public:
     QVector<QAction *> initActions();
     QVector<QAction *> initViewActions();
 
+    QAction *actionDelete() const override;
+
     QUndoStack *undoStack() const override;
     shared::cmd::CommandsStackBase *commandsStack() const;
 
