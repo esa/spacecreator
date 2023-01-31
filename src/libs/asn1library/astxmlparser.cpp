@@ -26,6 +26,7 @@
 
 #include "astxmlparser.h"
 
+#include "asn1/acnsequencecomponent.h"
 #include "asn1/asnsequencecomponent.h"
 #include "asn1/choicevalue.h"
 #include "asn1/multiplevalue.h"
@@ -48,9 +49,7 @@
 #include "asn1/types/sequenceof.h"
 #include "asn1/types/typefactory.h"
 #include "asn1/types/typemutatingvisitor.h"
-#include "asn1/types/typevisitorwithvalue.h"
 #include "asn1/types/userdefinedtype.h"
-#include "asn1const.h"
 #include "astxmlconstraintparser.h"
 
 #include <iostream>
@@ -80,7 +79,7 @@ public:
     {
     }
 
-    ~TypeAttributesAssigningVisitor() override {}
+    ~TypeAttributesAssigningVisitor() override { }
 
     void visit(Types::Boolean &type) override
     {
@@ -179,7 +178,7 @@ public:
     {
     }
 
-    ~ChildItemAddingVisitor() override {}
+    ~ChildItemAddingVisitor() override { }
 
     void visit(Types::Boolean &type) override { Q_UNUSED(type); }
     void visit(Types::Null &type) override { Q_UNUSED(type); }
@@ -297,7 +296,7 @@ public:
     {
     }
 
-    ~AcnDefinedItemsAddingVisitor() override {}
+    ~AcnDefinedItemsAddingVisitor() override { }
 
     void visit(Types::Boolean &type) override { Q_UNUSED(type); }
     void visit(Types::Null &type) override { Q_UNUSED(type); }
@@ -487,7 +486,7 @@ ValuePtr AstXmlParser::findAndReadValueAssignmentValue()
     return val;
 }
 
-static bool isSingleValueName(const StringRef &name)
+static bool isSingleValueName(const QStringView &name)
 {
     // clang-format off
     return name == QStringLiteral("IntegerValue")
@@ -500,22 +499,22 @@ static bool isSingleValueName(const StringRef &name)
     // clang-format on
 }
 
-static bool isMultipleValueName(const StringRef &name)
+static bool isMultipleValueName(const QStringView &name)
 {
     return name == QStringLiteral("SequenceOfValue");
 }
 
-static bool isSequenceValue(const StringRef &name)
+static bool isSequenceValue(const QStringView &name)
 {
     return name == QStringLiteral("SequenceValue");
 }
 
-static bool isChoiceValue(const StringRef &name)
+static bool isChoiceValue(const QStringView &name)
 {
     return name == QStringLiteral("ChoiceValue");
 }
 
-static bool isNullValue(const StringRef &name)
+static bool isNullValue(const QStringView &name)
 {
     return name == QStringLiteral("NullValue");
 }
@@ -544,7 +543,7 @@ ValuePtr AstXmlParser::readValueAssignmentValue()
     return value;
 }
 
-ValuePtr AstXmlParser::readSimpleValue(const StringRef &name)
+ValuePtr AstXmlParser::readSimpleValue(const QStringView &name)
 {
     return std::make_unique<SingleValue>(m_xmlReader.readElementText(), getPrinterFunction(name.toString()));
 }

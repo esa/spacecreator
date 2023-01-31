@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<CoreStringEncoding>
+auto enumFromString(const QStringView &enumStr) -> std::optional<CoreStringEncoding>
 {
     if (enumStr.compare(QStringLiteral("ascii"), Qt::CaseInsensitive) == 0) {
         return CoreStringEncoding::Ascii;

@@ -30,6 +30,6 @@ enum class FalseValue
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<FalseValue>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<FalseValue>;
 
 } // namespace seds::model

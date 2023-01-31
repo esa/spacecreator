@@ -50,7 +50,7 @@ public:
      * @param   encounteredType     Type of the encountered element
      * @param   elementType         Type of the element in which unhandled element was encountered in
      */
-    UnhandledElement(const StringRef &encounteredType, const common::String &elementType);
+    UnhandledElement(const QStringView &encounteredType, const common::String &elementType);
 };
 
 /**
@@ -65,7 +65,7 @@ public:
      * @param   attributeName   Encountered attribute
      * @param   elementType     Type of the element in which unhandled attribute was encountered in
      */
-    UnhandledAttribute(const StringRef &attributeName, const StringRef &elementType);
+    UnhandledAttribute(const QStringView &attributeName, const QStringView &elementType);
 };
 
 /**
@@ -79,7 +79,7 @@ public:
      *
      * @param   elementType     Type of the element in which EOF was encountered in
      */
-    UnexpectedEof(const StringRef &elementType);
+    UnexpectedEof(const QStringView &elementType);
 };
 
 } // namespace simulink::importer

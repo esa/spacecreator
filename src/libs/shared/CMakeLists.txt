@@ -114,7 +114,6 @@ target_sources(${LIB_NAME} PRIVATE
     sharedresources/sharedresources.qrc
     standardpaths.cpp
     standardpaths.h
-    stringref.h
     ui/drawrectinfo.cpp
     ui/drawrectinfo.h
     ui/errorindicatinglineedit.cpp

@@ -32,7 +32,7 @@ enum class CommandArgumentMode : uint8_t
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<CommandArgumentMode>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<CommandArgumentMode>;
 
 template<>
 auto stringFromEnum(CommandArgumentMode mode) -> const QString &;

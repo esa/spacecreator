@@ -47,7 +47,7 @@ VEObject::VEObject(const shared::Id &id, QObject *parent)
         setModel(model);
 }
 
-VEObject::~VEObject() {}
+VEObject::~VEObject() { }
 
 shared::Id VEObject::id() const
 {
@@ -169,11 +169,7 @@ QVector<qint32> VEObject::coordinatesFromString(const QString &strCoordinates)
     if (strCoordinates.isEmpty())
         return {};
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-    const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), QString::SkipEmptyParts);
-#else
     const QStringList &strCoords = strCoordinates.split(QLatin1Char(' '), Qt::SkipEmptyParts);
-#endif
     const int coordsCount = strCoords.size();
     QVector<qint32> coords(coordsCount);
     for (int i = 0; i < coordsCount; ++i)
@@ -284,7 +280,8 @@ QDebug operator<<(QDebug debug, const VEObject &object)
     auto metaType = object.metaObject()->metaType();
 
     if (recursing || metaType == QMetaType::fromType<VEObject>()) {
-        debug.nospace() << metaType.name() << "(" << static_cast<const void*>(&object) << ", title=" << object.titleUI() << ")";
+        debug.nospace() << metaType.name() << "(" << static_cast<const void *>(&object)
+                        << ", title=" << object.titleUI() << ")";
     } else if (metaType.hasRegisteredDebugStreamOperator()) {
         // Guard for recursion. If a type derived from VEObject doesn't have a
         // debug operator, the meta type will still report that there is one,

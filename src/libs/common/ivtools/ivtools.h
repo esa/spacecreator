@@ -40,12 +40,7 @@ public:
      *
      * @return functions stored in the given model
      */
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    static auto getFunctions(ivm::IVModel *model) -> std::vector<ivm::IVFunction *>;
-
-#else
     static auto getFunctions(ivm::IVModel *model) -> QList<ivm::IVFunction *>;
-#endif
 
     /**
      * @brief Get the requested interface from IVModel

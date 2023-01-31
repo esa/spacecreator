@@ -113,7 +113,7 @@ private:
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseParameterOperation(const StringRef &valueStr) -> model::ParameterOperation;
+    static auto parseParameterOperation(const QStringView &valueStr) -> model::ParameterOperation;
 
     /**
      * @brief   Processes attribute for CommandRefAttributes

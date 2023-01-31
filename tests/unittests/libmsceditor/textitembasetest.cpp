@@ -142,7 +142,6 @@ void TextItemBaseTest::testMixedInputImpl()
 
 void TextItemBaseTest::testSelectAllImpl()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     const QString &allowed = allowedText();
 
     m_item->setPlainText(allowed + allowed);
@@ -153,14 +152,10 @@ void TextItemBaseTest::testSelectAllImpl()
     QTest::keyClicks(m_view->viewport(), allowed);
 
     QCOMPARE(m_item->toPlainText(), allowed);
-#else
-    QSKIP(qPrintable(QString("Qt version 5.10 or newer required for this test.")));
-#endif
 }
 
 void TextItemBaseTest::testUndoRedoImpl()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     const QString &allowed = allowedText();
 
     typeText(allowed);
@@ -173,14 +168,10 @@ void TextItemBaseTest::testUndoRedoImpl()
     QVERIFY(m_item->document()->isRedoAvailable());
     QTest::keySequence(m_view->viewport(), QKeySequence::Redo);
     QCOMPARE(m_item->toPlainText(), allowed);
-#else
-    QSKIP(qPrintable(QString("Qt version 5.10 or newer required for this test.")));
-#endif
 }
 
 void TextItemBaseTest::testCutPasteImpl()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     const QString &allowed = allowedText();
 
     typeText(allowed);
@@ -192,14 +183,10 @@ void TextItemBaseTest::testCutPasteImpl()
 
     QTest::keySequence(m_view->viewport(), QKeySequence::Paste);
     QCOMPARE(m_item->toPlainText(), allowed);
-#else
-    QSKIP(qPrintable(QString("Qt version 5.10 or newer required for this test.")));
-#endif
 }
 
 void TextItemBaseTest::testPasteInStartImpl()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     QTest::mouseMove(m_view->viewport());
     QTest::mouseDClick(m_view->viewport(), Qt::LeftButton, Qt::NoModifier);
 
@@ -216,15 +203,10 @@ void TextItemBaseTest::testPasteInStartImpl()
     QTest::keySequence(m_view, QKeySequence::Paste);
 
     QCOMPARE(m_item->toPlainText(), allowed + allowed);
-
-#else
-    QSKIP(qPrintable(QString("Qt version 5.10 or newer required for this test.")));
-#endif
 }
 
 void TextItemBaseTest::testPasteInMiddleImpl()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     QTest::mouseMove(m_view->viewport());
     QTest::mouseDClick(m_view->viewport(), Qt::LeftButton, Qt::NoModifier);
 
@@ -243,15 +225,10 @@ void TextItemBaseTest::testPasteInMiddleImpl()
 
     QCOMPARE(m_item->toPlainText(),
             allowed.left(allowedMiddle) + allowed + allowed.right(allowed.length() - allowedMiddle));
-
-#else
-    QSKIP(qPrintable(QString("Qt version 5.10 or newer required for this test.")));
-#endif
 }
 
 void TextItemBaseTest::testPasteInEndImpl()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     QTest::mouseMove(m_view->viewport());
     QTest::mouseDClick(m_view->viewport(), Qt::LeftButton, Qt::NoModifier);
 
@@ -269,15 +246,10 @@ void TextItemBaseTest::testPasteInEndImpl()
     QTest::keySequence(m_view, QKeySequence::Paste);
 
     QCOMPARE(m_item->toPlainText(), allowed + allowed);
-
-#else
-    QSKIP(qPrintable(QString("Qt version 5.10 or newer required for this test.")));
-#endif
 }
 
 void TextItemBaseTest::testPasteOverSelectionImpl()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     QTest::mouseMove(m_view->viewport());
     QTest::mouseDClick(m_view->viewport(), Qt::LeftButton, Qt::NoModifier);
 
@@ -296,8 +268,4 @@ void TextItemBaseTest::testPasteOverSelectionImpl()
     QTest::keySequence(m_view, QKeySequence::Paste);
 
     QCOMPARE(m_item->toPlainText(), allowed.left(allowedEnd - 1) + allowed + allowed.right(1));
-
-#else
-    QSKIP(qPrintable(QString("Qt version 5.10 or newer required for this test.")));
-#endif
 }

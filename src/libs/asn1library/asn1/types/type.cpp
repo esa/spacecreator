@@ -58,7 +58,7 @@ void Type::setIdentifier(QString name)
     m_identifier = std::move(name);
 }
 
-AlignToNext Type::mapAlignToNext(StringRef in)
+AlignToNext Type::mapAlignToNext(QStringView in)
 {
     if (in == QLatin1String("byte"))
         return AlignToNext::byte;
@@ -69,7 +69,7 @@ AlignToNext Type::mapAlignToNext(StringRef in)
     return AlignToNext::unspecified;
 }
 
-Endianness Type::mapEndianess(StringRef in)
+Endianness Type::mapEndianess(QStringView in)
 {
     if (in == QLatin1String("big"))
         return Endianness::big;

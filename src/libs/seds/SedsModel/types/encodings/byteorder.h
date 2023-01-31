@@ -30,6 +30,6 @@ enum class ByteOrder
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<ByteOrder>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<ByteOrder>;
 
 } // namespace seds::model

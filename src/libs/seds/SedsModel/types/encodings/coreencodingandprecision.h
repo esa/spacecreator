@@ -33,6 +33,6 @@ enum class CoreEncodingAndPrecision
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<CoreEncodingAndPrecision>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<CoreEncodingAndPrecision>;
 
 } // namespace seds::model

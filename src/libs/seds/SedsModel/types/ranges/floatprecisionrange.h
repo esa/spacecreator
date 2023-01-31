@@ -31,6 +31,6 @@ enum class FloatPrecisionRange
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<FloatPrecisionRange>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<FloatPrecisionRange>;
 
 } // namespace seds::model

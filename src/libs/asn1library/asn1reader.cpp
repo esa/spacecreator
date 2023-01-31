@@ -427,12 +427,7 @@ QPair<QString, QStringList> Asn1Reader::asn1CompilerCommand() const
     if (parameter.isEmpty()) {
         paramsList = defaultParameter();
     } else {
-#if QTC_VERSION == 408
-        QStringList paramsList = parameter.split(' ', QString::SkipEmptyParts);
-#endif
-#if QTC_VERSION == 800
         QStringList paramsList = parameter.split(' ', Qt::SkipEmptyParts);
-#endif
     }
 
     // replace %1 in users parameters with path to the asn1 compiler.

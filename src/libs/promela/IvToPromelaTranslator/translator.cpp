@@ -103,11 +103,7 @@ IvToPromelaTranslator::ObserverAttachment::ObserverAttachment(const QString &spe
     const auto senderPrefix = QString("<");
     const auto priorityPrefix = QString("p");
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    const auto elements = specification.split(separator, QString::KeepEmptyParts);
-#else
     const auto elements = specification.split(separator, Qt::KeepEmptyParts);
-#endif
     if (elements.size() < 4) {
         const auto message =
                 QString("Observer attachment specification <%1> contains too few elements").arg(specification);

@@ -26,5 +26,3 @@ namespace simulink::common {
 using String = QString;
 
 } // namespace simulink::common
-
-#include "stringref.h"

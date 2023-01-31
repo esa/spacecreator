@@ -40,9 +40,7 @@
 #include <tmc/TmcConfig/constants.h>
 
 namespace {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 using Qt::endl;
-#endif
 }
 
 namespace ive {
@@ -1326,11 +1324,7 @@ void ModelCheckingWindow::addSubtypes()
 
         // ADD NEW TREE NODE
         QStringList fileColumn;
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        QFileInfo fileInfo = filePath;
-#else
         QFileInfo fileInfo = QFileInfo(filePath);
-#endif
 
         fileColumn.append(fileInfo.fileName());
         fileColumn.append(fileInfo.filePath());

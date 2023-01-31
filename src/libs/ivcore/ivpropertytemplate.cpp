@@ -29,11 +29,7 @@ IVPropertyTemplate::IVPropertyTemplate() { }
 
 QMetaEnum IVPropertyTemplate::scopeMetaEnum() const
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     static const QMetaEnum scopeMeta = QMetaEnum::fromType<IVPropertyTemplate::Scopes>();
-#else
-    static const QMetaEnum scopeMeta = QMetaEnum::fromType<IVPropertyTemplate::Scope>();
-#endif
     return scopeMeta;
 }
 

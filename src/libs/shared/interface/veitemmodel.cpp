@@ -37,11 +37,7 @@ VEItemModel::VEItemModel(VEModel *model, cmd::CommandsStackBase *commandsStack, 
     , m_model(model)
     , m_commandsStack(commandsStack)
     , m_graphicsScene(new GraphicsSceneBase(this))
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     , m_mutex(new QMutex())
-#else
-    , m_mutex(new QMutex(QMutex::NonRecursive))
-#endif
 {
     Q_ASSERT(!m_commandsStack.isNull());
 
@@ -98,13 +94,13 @@ void VEItemModel::clearScene()
 void VEItemModel::shrinkScene()
 {
     const QList<QGraphicsItem *> items = m_graphicsScene->items();
-    const QRectF rect = std::accumulate(items.cbegin(), items.cend(), QRectF(),
-                                        [](const QRectF &rect, const QGraphicsItem *item) -> QRectF{
-        if (!item->parentItem() && item->type() > QGraphicsItem::UserType)
-            return rect.united(item->sceneBoundingRect());
+    const QRectF rect = std::accumulate(
+            items.cbegin(), items.cend(), QRectF(), [](const QRectF &rect, const QGraphicsItem *item) -> QRectF {
+                if (!item->parentItem() && item->type() > QGraphicsItem::UserType)
+                    return rect.united(item->sceneBoundingRect());
 
-        return rect;
-    });
+                return rect;
+            });
     m_graphicsScene->setSceneRect(rect.marginsAdded(shared::graphicsviewutils::kContentMargins));
 }
 
@@ -244,7 +240,7 @@ void VEItemModel::updateItem(VEInteractiveObject *item)
 void VEItemModel::removeItemForObject(shared::Id objectId)
 {
     if (auto item = m_items.take(objectId)) {
-        for (auto child: item->childItems()) {
+        for (auto child : item->childItems()) {
             if (auto childItem = qobject_cast<VEInteractiveObject *>(child->toGraphicsObject())) {
                 if (auto entity = childItem->entity())
                     m_items.remove(entity->id());

@@ -61,12 +61,8 @@ public:
     void setEndianness(const Endianness endianness) { m_endianness = endianness; }
     Endianness endianness() const { return m_endianness; }
 
-    static IntegerEncoding mapEncoding(StringRef in);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    static IntegerEncoding mapEncoding(const QString &in) { return mapEncoding(StringRef(in)); }
-#else
-    static IntegerEncoding mapEncoding(const QString &in) { return mapEncoding(&in); }
-#endif
+    static IntegerEncoding mapEncoding(QStringView in);
+    static IntegerEncoding mapEncoding(const QString &in) { return mapEncoding(QStringView(in)); }
     static QString encodingToString(IntegerEncoding encoding);
 
 private:

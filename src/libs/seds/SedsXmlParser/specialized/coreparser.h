@@ -53,49 +53,49 @@ public:
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseBool(const StringRef &valueStr) -> bool;
+    static auto parseBool(const QStringView &valueStr) -> bool;
     /**
      * @brief   Parses given string as a 8-bit unsigned integer
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseUInt8(const StringRef &valueStr) -> uint8_t;
+    static auto parseUInt8(const QStringView &valueStr) -> uint8_t;
     /**
      * @brief   Parses given string as a 32-bit integer
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseInt32(const StringRef &valueStr) -> int32_t;
+    static auto parseInt32(const QStringView &valueStr) -> int32_t;
     /**
      * @brief   Parses given string as a 64-bit integer
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseInt64(const StringRef &valueStr) -> int64_t;
+    static auto parseInt64(const QStringView &valueStr) -> int64_t;
     /**
      * @brief   Parses given string as a 64-bit unsigned integer
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseUInt64(const StringRef &valueStr) -> uint64_t;
+    static auto parseUInt64(const QStringView &valueStr) -> uint64_t;
     /**
      * @brief   Parses given string as a 64-bit floating point
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parseDouble(const StringRef &valueStr) -> double;
+    static auto parseDouble(const QStringView &valueStr) -> double;
     /**
      * @brief   Parses given string as a PositiveLong
      * @param   valueStr        String to parse
      * @return  Corresponding value
      * @throws  ParserException
      */
-    static auto parsePositiveLong(const StringRef &valueStr) -> model::PositiveLong::Value;
+    static auto parsePositiveLong(const QStringView &valueStr) -> model::PositiveLong::Value;
 
     /**
      * @brief   Processes attribute for Description

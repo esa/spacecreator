@@ -30,6 +30,6 @@ enum class InterfaceParameterMode
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<InterfaceParameterMode>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<InterfaceParameterMode>;
 
 } // namespace seds::model

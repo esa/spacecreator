@@ -38,12 +38,6 @@ using conversion::FileNotFoundException;
 using conversion::Options;
 using conversion::importer::ImportException;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-#define SEDS_SPLIT_BEHAVIOR QString::SkipEmptyParts
-#else
-#define SEDS_SPLIT_BEHAVIOR Qt::SkipEmptyParts
-#endif
-
 namespace seds::importer {
 
 using conversion::seds::SedsOptions;
@@ -87,7 +81,7 @@ SymbolDefinitionReader::ExternalReferencesMap SedsXmlImporter::readExternalRefer
 
     // External references can be also be declared via options
     for (const auto &externalReferenceDeclaration : options.values(SedsOptions::externalRef)) {
-        const auto externalReference = externalReferenceDeclaration.split(':', SEDS_SPLIT_BEHAVIOR);
+        const auto externalReference = externalReferenceDeclaration.split(':', Qt::SkipEmptyParts);
         externalReferences.insert({ externalReference[0], externalReference[1] });
     }
 

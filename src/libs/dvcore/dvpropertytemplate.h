@@ -36,11 +36,7 @@ public:
     };
 
     Q_ENUM(Scope)
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     Q_DECLARE_FLAGS(Scopes, Scope)
-#else
-    Q_DECLARE_FLAGS(Scopes, dvm::DVPropertyTemplate::Scope)
-#endif
     Q_FLAG(Scopes)
 
     DVPropertyTemplate();

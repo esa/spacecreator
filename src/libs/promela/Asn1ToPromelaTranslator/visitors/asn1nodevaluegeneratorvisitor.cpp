@@ -109,11 +109,7 @@ void Asn1NodeValueGeneratorVisitor::visit(const Root &root)
 
 const Type *Asn1NodeValueGeneratorVisitor::findOverridenType(const QString &subtypeName) const
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
     const auto splittedSubtypeName = subtypeName.split('-', Qt::SkipEmptyParts);
-#else
-    const auto splittedSubtypeName = subtypeName.split('-', QString::SkipEmptyParts);
-#endif
 
     // Subtype name should be fit in a template <function_name>-<interface_name>-<argument_name>
     // So if splitting name by '-' doesn't return 3 strings then the type is not a subtype

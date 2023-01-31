@@ -248,7 +248,7 @@ model::SinkArgumentValue ComponentPrimitivesParser::readSinkArgumentValue(QXmlSt
     return value;
 }
 
-model::ParameterOperation ComponentPrimitivesParser::parseParameterOperation(const StringRef &valueStr)
+model::ParameterOperation ComponentPrimitivesParser::parseParameterOperation(const QStringView &valueStr)
 {
     auto parameterOperation = model::enumFromString<model::ParameterOperation>(valueStr);
     if (parameterOperation) {

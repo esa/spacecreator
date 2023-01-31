@@ -25,11 +25,7 @@ namespace spctr {
 
 void MessageManager::write(const QString &message)
 {
-#if QTC_VERSION > 414
     Core::MessageManager::writeDisrupting(message);
-#else
-    Core::MessageManager::write(message);
-#endif
 }
 
 } // namespace spctr

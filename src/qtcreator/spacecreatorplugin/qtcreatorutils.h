@@ -5,12 +5,6 @@
 
 namespace spctr {
 
-#if QTC_VERSION < 500
-QStringList toProjectsFiles(const QStringList &list)
-{
-    return list;
-}
-#else
 Utils::FilePaths toProjectsFiles(const QStringList &list)
 {
     Utils::FilePaths paths;
@@ -19,6 +13,5 @@ Utils::FilePaths toProjectsFiles(const QStringList &list)
     }
     return paths;
 }
-#endif
 
 }
