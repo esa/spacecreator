@@ -76,10 +76,7 @@
 #include <shared/entityattribute.h>
 #include <shared/graphicsviewutils.h>
 #include <shared/sharedlibrary.h>
-#include <spacecreatorplugin/iv/iveditordata.h>
 #include <spacecreatorplugin/iv/iveditordocument.h>
-#include <spacecreatorplugin/iv/iveditorfactory.h>
-#include <spacecreatorplugin/iv/ivqtceditor.h>
 #include <utils/fileutils.h>
 
 using namespace Core;
@@ -603,13 +600,6 @@ auto SedsPlugin::addFunctionToModel(ivm::IVFunction *const srcFun, ivm::IVModel 
 
 auto SedsPlugin::addFilesToCurrentProject(QStringList filenames, const QString &path) -> void
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    for (auto &filename : filenames) {
-        filename = QString("%1%2%3").arg(path).arg(QDir::separator()).arg(filename);
-    };
-    ProjectExplorer::Project *const project = ProjectExplorer::ProjectTree::currentProject();
-    project->rootProjectNode()->addFiles(filenames);
-#else
     QList<Utils::FilePath> filePathList;
     for (auto &filename : filenames) {
         filename = QString("%1%2%3").arg(path).arg(QDir::separator()).arg(filename);
@@ -618,7 +608,6 @@ auto SedsPlugin::addFilesToCurrentProject(QStringList filenames, const QString &
     };
     ProjectExplorer::Project *const project = ProjectExplorer::ProjectTree::currentProject();
     project->rootProjectNode()->addFiles(filePathList);
-#endif
 }
 
 auto SedsPlugin::getAsnModelFilenames(const std::vector<std::unique_ptr<conversion::Model>> &models) -> QStringList

@@ -17,41 +17,15 @@
 
 #pragma once
 
-#include "iveditorcore.h"
-
-#include <QList>
-#include <QPointer>
-
-class QAction;
-class QUndoGroup;
-
-namespace Core {
-class IEditor;
-}
+#include "common/actionhandler.h"
 
 namespace spctr {
-class SpaceCreatorProjectManager;
-class MscContext;
 
-class IVEditorData : public QObject
+class IVActionHandler : public ActionHandler
 {
     Q_OBJECT
 public:
-    IVEditorData(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
-    ~IVEditorData() override;
-
-    Core::IEditor *createEditor();
-
-    IVEditorCorePtr ivPlugin(const QString &fileName);
-
-private Q_SLOTS:
-    void onCurrentEditorChanged(Core::IEditor *editor);
-
-private:
-    MscContext *m_context = nullptr;
-    QUndoGroup *m_undoGroup = nullptr;
-
-    QPointer<SpaceCreatorProjectManager> m_projectManager;
+    explicit IVActionHandler(QObject *parent = nullptr);
 };
 
 }

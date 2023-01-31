@@ -17,8 +17,6 @@
 
 #include "ivqtceditor.h"
 
-#include "commands/cmdchangeasn1file.h"
-#include "commandsstack.h"
 #include "endtoend/endtoendview.h"
 #include "interfacedocument.h"
 #include "ivappwidget.h"
@@ -31,9 +29,7 @@
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 
-#include <QFileInfo>
 #include <QToolBar>
-#include <QUndoCommand>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/actionmanager/command.h>
@@ -41,12 +37,11 @@
 #include <editormanager/editormanager.h>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projecttree.h>
-#include <utils/qtcassert.h>
 
 namespace spctr {
 
 IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager)
-    : Core::IEditor()
+    : QtCEditor()
     , m_document(new IVEditorDocument(projectManager, this))
     , m_editorWidget(new IVMainWidget)
     , m_projectManager(projectManager)
@@ -59,7 +54,8 @@ IVQtCEditor::IVQtCEditor(SpaceCreatorProjectManager *projectManager)
         auto command = Core::ActionManager::command(Constants::IV_MANAGE_ARCHETYPES_ID);
         IVEditorCorePtr plugin = m_editorWidget->ivPlugin();
         auto ivWidget = qobject_cast<ive::IVAppWidget *>(plugin->mainwidget());
-        connect(command->action(), &QAction::triggered, ivWidget, &ive::IVAppWidget::showArchetypeManager, Qt::UniqueConnection);
+        connect(command->action(), &QAction::triggered, ivWidget, &ive::IVAppWidget::showArchetypeManager,
+                Qt::UniqueConnection);
     });
     connect(m_editorWidget, &IVMainWidget::requestE2EDataflow, this, &IVQtCEditor::showCurrentE2EDataflow);
     connect(m_editorWidget, &IVMainWidget::requestModelCheckingWindow, this,
@@ -96,6 +92,11 @@ QWidget *IVQtCEditor::toolBar()
     }
 
     return m_toolbar;
+}
+
+shared::EditorCore *IVQtCEditor::editorCore() const
+{
+    return m_document->ivEditorCore().get();
 }
 
 void IVQtCEditor::showCurrentModelCheckingWindow()

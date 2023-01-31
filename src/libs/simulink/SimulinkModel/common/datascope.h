@@ -31,7 +31,7 @@ enum class DataScope
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<DataScope>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<DataScope>;
 template<>
 auto stringFromEnum(DataScope enumType) -> const QString &;
 

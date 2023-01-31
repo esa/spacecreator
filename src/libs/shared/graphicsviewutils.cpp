@@ -1,9 +1,7 @@
 #include "graphicsviewutils.h"
 
 #include "positionlookuphelper.h"
-#include "ui/veinteractiveobject.h"
 #include "ui/verectgraphicsitem.h"
-#include "veobject.h"
 
 #include <QFontMetricsF>
 #include <QPainter>
@@ -79,11 +77,7 @@ bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
     };
 
     for (const QLineF &rectLine : rectLines) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         if (rectLine.intersects(line, intersectPos) == QLineF::BoundedIntersection)
-#else
-        if (rectLine.intersect(line, intersectPos) == QLineF::BoundedIntersection)
-#endif
             return true;
     }
 
@@ -128,11 +122,7 @@ QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon
     for (int idx = 1; idx < polygon.size(); ++idx) {
         const QLineF line = { polygon.value(idx - 1), polygon.value(idx) };
         for (const QLineF &rectLine : rectLines) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
             if (rectLine.intersects(line, &intersectPos) == QLineF::BoundedIntersection)
-#else
-            if (rectLine.intersect(line, &intersectPos) == QLineF::BoundedIntersection)
-#endif
                 points.append(intersectPos);
         }
     }
@@ -248,11 +238,7 @@ Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
         auto it = std::find_if(
                 rectLines.constBegin(), rectLines.constEnd(), [line](const QPair<QLineF, Qt::Alignment> &rectSide) {
                     QPointF dummyPoint;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
                     return line.intersects(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
-#else
-                                   return line.intersect(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
-#endif
                 });
         if (it != rectLines.constEnd())
             side = it->second;
@@ -623,27 +609,15 @@ QVector<QPointF> generateSegments(const QLineF &startDirection, const QLineF &en
         midLine.setAngle(startDirection.angle() - 90);
 
         QPointF startLastPoint;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         midLine.intersects(startDirection, &startLastPoint);
-#else
-        midLine.intersect(startDirection, &startLastPoint);
-#endif
         connectionPoints.insert(connectionPoints.size() - 1, startLastPoint);
 
         QPointF endLastPoint;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         midLine.intersects(endDirection, &endLastPoint);
-#else
-        midLine.intersect(endDirection, &endLastPoint);
-#endif
         connectionPoints.insert(connectionPoints.size() - 1, endLastPoint);
     } else { // |_, \_, /_, etc
         QPointF mid;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         startDirection.intersects(endDirection, &mid);
-#else
-        startDirection.intersect(endDirection, &mid);
-#endif
         connectionPoints.insert(connectionPoints.size() - 1, mid);
     }
     return connectionPoints;
@@ -845,7 +819,8 @@ QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDir
                 results.append(result);
                 continue;
             }
-            const QList<QVector<QPointF>> subPaths = findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
+            const QList<QVector<QPointF>> subPaths =
+                    findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
             for (auto subPath : subPaths) {
                 if (subPath.isEmpty()) {
                     continue;
@@ -894,7 +869,7 @@ QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const 
     QVector<QPointF> points = path(existingRects, startDirection, endDirection);
     if (points.size() < 2) {
         // if no path was found, fall back to start/end directly
-        return  {startIfacePos, endIfacePos};
+        return { startIfacePos, endIfacePos };
     }
     return simplifyPoints(points);
 }

@@ -29,11 +29,7 @@ DVPropertyTemplate::DVPropertyTemplate() { }
 
 QMetaEnum DVPropertyTemplate::scopeMetaEnum() const
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     static const QMetaEnum scopeMeta = QMetaEnum::fromType<DVPropertyTemplate::Scopes>();
-#else
-    static const QMetaEnum scopeMeta = QMetaEnum::fromType<DVPropertyTemplate::Scope>();
-#endif
     return scopeMeta;
 }
 

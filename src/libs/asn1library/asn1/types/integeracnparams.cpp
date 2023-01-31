@@ -36,7 +36,7 @@ IntegerAcnParameters::IntegerAcnParameters()
 {
 }
 
-IntegerEncoding IntegerAcnParameters::mapEncoding(StringRef in)
+IntegerEncoding IntegerAcnParameters::mapEncoding(QStringView in)
 {
     if (in == QLatin1String("pos-int"))
         return IntegerEncoding::pos_int;

@@ -17,45 +17,32 @@
 
 #include "iveditorfactory.h"
 
-#include "iveditordata.h"
+#include "ivactionhandler.h"
+#include "ivqtceditor.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QGuiApplication>
-
-#if QTC_VERSION < 900
-#include <coreplugin/fileiconprovider.h>
-#else
 #include <utils/fsengine/fileiconprovider.h>
-#endif
 
 namespace spctr {
 
 IVEditorFactory::IVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new IVEditorData(projectManager))
+    , m_actionHandler(new IVActionHandler(this))
+    , m_projectManager(projectManager)
 {
     setId(spctr::Constants::K_IV_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("IV Editor", spctr::Constants::C_IVEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::IV_MIMETYPE);
 
-#if QTC_VERSION > 414
     setEditorCreator(std::bind(&IVEditorFactory::createIVEditor, this));
-#endif
-#if QTC_VERSION < 900
-    Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
-#else
     Utils::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
-#endif
 }
 
 Core::IEditor *IVEditorFactory::createIVEditor()
 {
-    return m_editorData->createEditor();
+    return new IVQtCEditor(m_projectManager);
 }
 
-IVEditorData *IVEditorFactory::editorData() const
-{
-    return m_editorData.get();
-}
 }

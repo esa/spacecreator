@@ -17,16 +17,12 @@
 
 #pragma once
 
-#include "iveditorcore.h"
-
-#include <QList>
+#include <QPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
 #include <memory>
 
-class QAction;
-
 namespace spctr {
-class IVEditorData;
+class IVActionHandler;
 class SpaceCreatorProjectManager;
 
 class IVEditorFactory : public Core::IEditorFactory
@@ -36,15 +32,11 @@ class IVEditorFactory : public Core::IEditorFactory
 public:
     explicit IVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent);
 
-#if QTC_VERSION == 408
-    Core::IEditor *createEditor() override { return createIVEditor(); }
-#endif
     Core::IEditor *createIVEditor();
 
-    IVEditorData *editorData() const;
-
 private:
-    std::unique_ptr<IVEditorData> m_editorData;
+    std::unique_ptr<IVActionHandler> m_actionHandler;
+    QPointer<SpaceCreatorProjectManager> m_projectManager;
 };
 
 }

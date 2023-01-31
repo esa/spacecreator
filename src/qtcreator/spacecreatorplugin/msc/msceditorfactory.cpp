@@ -17,47 +17,32 @@
 
 #include "msceditorfactory.h"
 
-#include "msceditordata.h"
+#include "common/actionhandler.h"
+#include "mscqtceditor.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QGuiApplication>
-
-#if QTC_VERSION < 900
-#include <coreplugin/fileiconprovider.h>
-#else
 #include <utils/fsengine/fileiconprovider.h>
-#endif
 
 namespace spctr {
 
 MscEditorFactory::MscEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new MscEditorData(projectManager))
+    , m_actionHandler(new ActionHandler(spctr::Constants::K_MSC_EDITOR_ID, this))
+    , m_projectManager(projectManager)
 {
     setId(Constants::K_MSC_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("MscEditor", Constants::C_MSCEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::MSC_MIMETYPE);
 
-#if QTC_VERSION > 414
     setEditorCreator(std::bind(&MscEditorFactory::createMSCEditor, this));
-#endif
-
-#if QTC_VERSION < 900
-    Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
-#else
     Utils::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "msc");
-#endif
 }
 
 Core::IEditor *MscEditorFactory::createMSCEditor()
 {
-    return m_editorData->createEditor();
-}
-
-MscEditorData *MscEditorFactory::editorData() const
-{
-    return m_editorData.get();
+    return new MscQtCEditor(m_projectManager);
 }
 
 }

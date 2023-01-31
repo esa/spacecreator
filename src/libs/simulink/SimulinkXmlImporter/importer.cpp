@@ -42,13 +42,6 @@ using conversion::simulink::SimulinkOptions;
 using simulink::model::Dimensions;
 using simulink::model::VectorDimensions;
 
-namespace {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-auto SkipEmptyParts = QString::SkipEmptyParts;
-#else
-auto SkipEmptyParts = Qt::SkipEmptyParts;
-#endif
-}
 namespace simulink::importer {
 
 std::unique_ptr<conversion::Model> SimulinkXmlImporter::importModel(const Options &options) const
@@ -430,12 +423,12 @@ model::Outport SimulinkXmlImporter::readOutport(QXmlStreamReader &xmlReader)
     return outport;
 }
 
-bool SimulinkXmlImporter::parseBool(const StringRef &valueStr)
+bool SimulinkXmlImporter::parseBool(const QStringView &valueStr)
 {
     return QVariant(valueStr.toString()).toBool();
 }
 
-int64_t SimulinkXmlImporter::parseInt64(const StringRef &valueStr)
+int64_t SimulinkXmlImporter::parseInt64(const QStringView &valueStr)
 {
     bool ok = false;
     const auto value = valueStr.toLong(&ok);
@@ -458,7 +451,7 @@ bool SimulinkXmlImporter::processForNamedEntity(model::NamedEntity &namedEntity,
     return true;
 }
 
-model::DataScope SimulinkXmlImporter::parseDataScope(const StringRef &dataScopeStr)
+model::DataScope SimulinkXmlImporter::parseDataScope(const QStringView &dataScopeStr)
 {
     auto dataScope = model::enumFromString<model::DataScope>(dataScopeStr);
 
@@ -469,7 +462,7 @@ model::DataScope SimulinkXmlImporter::parseDataScope(const StringRef &dataScopeS
     }
 }
 
-model::Complexity SimulinkXmlImporter::parseComplexity(const StringRef &complexityStr)
+model::Complexity SimulinkXmlImporter::parseComplexity(const QStringView &complexityStr)
 {
     auto complexity = model::enumFromString<model::Complexity>(complexityStr);
 
@@ -480,7 +473,7 @@ model::Complexity SimulinkXmlImporter::parseComplexity(const StringRef &complexi
     }
 }
 
-model::Dimensions SimulinkXmlImporter::parseDimensions(const StringRef &dimensionsStr)
+model::Dimensions SimulinkXmlImporter::parseDimensions(const QStringView &dimensionsStr)
 {
     if (dimensionsStr.isEmpty())
         throw ParserException(QString("Dimensions is empty"));
@@ -504,7 +497,7 @@ model::Dimensions SimulinkXmlImporter::parseDimensions(const StringRef &dimensio
                                          .remove(0, 1) // removing '['
                                          .replace(QChar(';'), QChar(' '), Qt::CaseSensitive); // replacing ';' to ' '
 
-        const auto splitBySpacesStrList = preparedStr.split(' ', SkipEmptyParts, Qt::CaseSensitive);
+        const auto splitBySpacesStrList = preparedStr.split(' ', Qt::SkipEmptyParts, Qt::CaseSensitive);
         const auto splitBySpacesStrListSize = splitBySpacesStrList.size();
 
         if (splitBySpacesStrListSize == 0) {
@@ -546,7 +539,7 @@ model::Dimensions SimulinkXmlImporter::parseDimensions(const StringRef &dimensio
     return model::Dimensions();
 }
 
-model::DimensionsMode SimulinkXmlImporter::parseDimensionsMode(const StringRef &dimensionsModeStr)
+model::DimensionsMode SimulinkXmlImporter::parseDimensionsMode(const QStringView &dimensionsModeStr)
 {
     auto dimensionsMode = model::enumFromString<model::DimensionsMode>(dimensionsModeStr);
 
@@ -557,12 +550,12 @@ model::DimensionsMode SimulinkXmlImporter::parseDimensionsMode(const StringRef &
     }
 }
 
-model::PortDimension SimulinkXmlImporter::parsePortDimension(const StringRef &portDimensionStr)
+model::PortDimension SimulinkXmlImporter::parsePortDimension(const QStringView &portDimensionStr)
 {
     return parseDimensions(portDimensionStr);
 }
 
-model::SignalType SimulinkXmlImporter::parseSignalType(const StringRef &signalTypeStr)
+model::SignalType SimulinkXmlImporter::parseSignalType(const QStringView &signalTypeStr)
 {
     auto signalType = model::enumFromString<model::SignalType>(signalTypeStr);
 

@@ -17,11 +17,7 @@
 
 #include "ivmainwidget.h"
 
-#include "actionsbar.h"
-#include "commandsstack.h"
-#include "errorhub.h"
 #include "interfacedocument.h"
-#include "ivappwidget.h"
 
 #include <QHBoxLayout>
 #include <QMessageBox>
@@ -74,7 +70,8 @@ void IVMainWidget::init()
 
     layout->addWidget(m_plugin->mainwidget());
     connect(m_plugin->actionToggleE2EView(), &QAction::triggered, this, &IVMainWidget::requestE2EDataflow);
-    connect(m_plugin->actionLaunchModelCheckingWindow(), &QAction::triggered, this, &IVMainWidget::requestModelCheckingWindow);
+    connect(m_plugin->actionLaunchModelCheckingWindow(), &QAction::triggered, this,
+            &IVMainWidget::requestModelCheckingWindow);
 
     m_plugin->setupMiniMap();
 }

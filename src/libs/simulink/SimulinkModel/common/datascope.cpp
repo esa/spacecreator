@@ -22,7 +22,7 @@
 namespace simulink::model {
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<DataScope>
+auto enumFromString(const QStringView &enumStr) -> std::optional<DataScope>
 {
     if (enumStr.compare(QStringLiteral("Auto"), Qt::CaseInsensitive) == 0) {
         return DataScope::Auto;

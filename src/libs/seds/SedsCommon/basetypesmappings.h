@@ -26,5 +26,3 @@ namespace seds::common {
 using String = QString;
 
 } // namespace seds::common
-
-#include "stringref.h"

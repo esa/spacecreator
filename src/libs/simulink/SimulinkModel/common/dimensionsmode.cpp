@@ -22,7 +22,7 @@
 namespace simulink::model {
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<DimensionsMode>
+auto enumFromString(const QStringView &enumStr) -> std::optional<DimensionsMode>
 {
     if (enumStr.compare(QStringLiteral("Fixed"), Qt::CaseInsensitive) == 0) {
         return DimensionsMode::Fixed;

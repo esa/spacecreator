@@ -27,10 +27,8 @@
 
 #include "asn1/acnargument.h"
 #include "asn1/acnparameter.h"
-#include "asn1/acnsequencecomponent.h"
 #include "asn1/definitions.h"
 #include "asn1/file.h"
-#include "asn1/namedvalue.h"
 #include "asn1/types/type.h"
 #include "asn1/value.h"
 
@@ -86,7 +84,7 @@ private:
     ValuePtr findAndReadValueAssignmentValue();
     ValuePtr readValueAssignmentValue();
 
-    ValuePtr readSimpleValue(const StringRef &name);
+    ValuePtr readSimpleValue(const QStringView &name);
     ValuePtr readMultipleValue();
     ValuePtr readSequenceValues();
     std::pair<QString, ValuePtr> readNamedValue();

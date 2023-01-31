@@ -31,7 +31,7 @@ enum class SignalType
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<SignalType>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<SignalType>;
 template<>
 auto stringFromEnum(SignalType enumType) -> const QString &;
 

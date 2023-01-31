@@ -34,6 +34,6 @@ enum class CoreIntegerEncoding
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<CoreIntegerEncoding>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<CoreIntegerEncoding>;
 
 } // namespace seds::model

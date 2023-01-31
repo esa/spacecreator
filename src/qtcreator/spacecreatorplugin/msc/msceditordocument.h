@@ -34,20 +34,11 @@ public:
     explicit MscEditorDocument(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 
     // IDocument
-#if QTC_VERSION < 500
-    OpenResult open(QString *errorString, const QString &fileName, const QString &realFileName) override;
-    bool save(QString *errorString, const QString &fileName, bool autoSave) override;
-#else
     OpenResult open(
             QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName) override;
     bool save(QString *errorString, const Utils::FilePath &fileName, bool autoSave) override;
-#endif
 
-#if QTC_VERSION < 409
-    void setFilePath(const Utils::FileName &) override;
-#else
     void setFilePath(const Utils::FilePath &) override;
-#endif
     bool shouldAutoSave() const override;
     bool isSaveAsAllowed() const override;
     bool isModified() const override;

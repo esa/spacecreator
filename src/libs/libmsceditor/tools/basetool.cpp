@@ -194,11 +194,7 @@ QPointF BaseTool::cursorInScene(const QPoint &globalPos) const
 
 QPointF BaseTool::cursorInScene(const QMouseEvent *e) const
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    return cursorInScene(e->globalPos());
-#else
     return cursorInScene(e->globalPosition().toPoint());
-#endif
 }
 
 } // ns msc

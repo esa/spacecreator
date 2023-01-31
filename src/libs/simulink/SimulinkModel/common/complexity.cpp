@@ -22,7 +22,7 @@
 namespace simulink::model {
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<Complexity>
+auto enumFromString(const QStringView &enumStr) -> std::optional<Complexity>
 {
     if (enumStr.compare(QStringLiteral("real"), Qt::CaseInsensitive) == 0) {
         return Complexity::Real;

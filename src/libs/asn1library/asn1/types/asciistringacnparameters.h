@@ -48,12 +48,8 @@ public:
     void setTerminationPattern(const QString &pattern) { m_terminationPattern = pattern; }
     const QString &terminationPattern() const { return m_terminationPattern; }
 
-    static AsciiStringEncoding mapEncoding(StringRef in);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    static AsciiStringEncoding mapEncoding(const QString &in) { return mapEncoding(StringRef(in)); }
-#else
-    static AsciiStringEncoding mapEncoding(const QString &in) { return mapEncoding(&in); }
-#endif
+    static AsciiStringEncoding mapEncoding(QStringView in);
+    static AsciiStringEncoding mapEncoding(const QString &in) { return mapEncoding(QStringView(in)); }
     static QString encodingToString(AsciiStringEncoding encoding);
 
 private:

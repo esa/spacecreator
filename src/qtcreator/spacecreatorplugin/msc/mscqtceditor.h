@@ -17,13 +17,11 @@
 
 #pragma once
 
+#include "common/qtceditor.h"
 #include "msceditorcore.h"
 
 #include <QPointer>
-#include <QSharedPointer>
-#include <editormanager/ieditor.h>
 
-class QAction;
 class QToolBar;
 
 namespace spctr {
@@ -32,12 +30,12 @@ class MscEditorDocument;
 class MscMainWidget;
 class SpaceCreatorProjectManager;
 
-class MscQtCEditor : public Core::IEditor
+class MscQtCEditor : public QtCEditor
 {
     Q_OBJECT
 
 public:
-    MscQtCEditor(SpaceCreatorProjectManager *projectManager);
+    explicit MscQtCEditor(SpaceCreatorProjectManager *projectManager);
     ~MscQtCEditor();
 
     Core::IDocument *document() const override;
@@ -45,6 +43,8 @@ public:
     MSCEditorCorePtr mscEditorCore() const;
 
     QWidget *toolBar() override;
+
+    shared::EditorCore *editorCore() const override;
 
 private:
     MscEditorDocument *m_document = nullptr;

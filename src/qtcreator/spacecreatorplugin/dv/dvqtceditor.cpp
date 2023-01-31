@@ -17,24 +17,17 @@
 
 #include "dvqtceditor.h"
 
-#include "commandsstack.h"
 #include "dveditordocument.h"
 #include "dvmainwidget.h"
-#include "mainmodel.h"
-#include "msceditorcore.h"
 #include "spacecreatorpluginconstants.h"
-#include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 
-#include <QFileInfo>
 #include <QToolBar>
-#include <QUndoCommand>
-#include <utils/qtcassert.h>
 
 namespace spctr {
 
 DVQtCEditor::DVQtCEditor(SpaceCreatorProjectManager *projectManager)
-    : Core::IEditor()
+    : QtCEditor()
     , m_document(new DVEditorDocument(projectManager, this))
     , m_editorWidget(new DVMainWidget(projectManager))
     , m_projectManager(projectManager)
@@ -76,6 +69,11 @@ QWidget *DVQtCEditor::toolBar()
     }
 
     return m_toolbar;
+}
+
+shared::EditorCore *DVQtCEditor::editorCore() const
+{
+    return m_document->dvEditorCore().get();
 }
 
 }

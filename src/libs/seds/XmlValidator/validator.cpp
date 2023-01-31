@@ -30,12 +30,6 @@
 
 using conversion::FileNotFoundException;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-#define SEDS_SPLIT_BEHAVIOR QString::SkipEmptyParts
-#else
-#define SEDS_SPLIT_BEHAVIOR Qt::SkipEmptyParts
-#endif
-
 namespace seds::validator {
 
 void XmlValidator::validate(const QString &inputFilepath)
@@ -129,7 +123,7 @@ std::optional<QString> XmlValidator::getSchemaFilepath(const QString &filepath)
         return std::nullopt;
     }
     // xmi:schemaLocation contains url and schema filename separated by space
-    const auto schemaLocation = found->value().toString().split(" ", SEDS_SPLIT_BEHAVIOR);
+    const auto schemaLocation = found->value().toString().split(" ", Qt::SkipEmptyParts);
 
     if (schemaLocation.size() != 2) {
         return std::nullopt;

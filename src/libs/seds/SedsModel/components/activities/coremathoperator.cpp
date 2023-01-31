@@ -23,7 +23,7 @@ namespace seds::model {
 
 template<>
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-auto enumFromString(const StringRef &enumStr) -> std::optional<CoreMathOperator>
+auto enumFromString(const QStringView &enumStr) -> std::optional<CoreMathOperator>
 {
     if (enumStr.compare(QStringLiteral("abs"), Qt::CaseInsensitive) == 0) {
         return CoreMathOperator::Abs;

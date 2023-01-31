@@ -22,7 +22,7 @@
 namespace seds::model {
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<InterfaceLevel>
+auto enumFromString(const QStringView &enumStr) -> std::optional<InterfaceLevel>
 {
     if (enumStr.compare(QStringLiteral("application"), Qt::CaseInsensitive) == 0) {
         return InterfaceLevel::APPLICATION;

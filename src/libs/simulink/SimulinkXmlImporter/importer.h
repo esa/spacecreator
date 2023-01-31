@@ -86,16 +86,16 @@ private:
     static auto readOutports(QXmlStreamReader &xmlReader, std::unique_ptr<model::SimulinkModel> &simulinkModel) -> void;
     static auto readOutport(QXmlStreamReader &xmlReader) -> model::Outport;
 
-    static auto parseBool(const StringRef &valueStr) -> bool;
-    static auto parseInt64(const StringRef &valueStr) -> int64_t;
+    static auto parseBool(const QStringView &valueStr) -> bool;
+    static auto parseInt64(const QStringView &valueStr) -> int64_t;
     static auto processForNamedEntity(model::NamedEntity &namedEntity, const QXmlStreamAttribute &attribute) -> bool;
 
-    static auto parseDataScope(const StringRef &dataScopeStr) -> model::DataScope;
-    static auto parseComplexity(const StringRef &complexityStr) -> model::Complexity;
-    static auto parseDimensions(const StringRef &dimensionsStr) -> model::Dimensions;
-    static auto parseDimensionsMode(const StringRef &dimensionsModeStr) -> model::DimensionsMode;
-    static auto parsePortDimension(const StringRef &portDimensionStr) -> model::PortDimension;
-    static auto parseSignalType(const StringRef &signalTypeStr) -> model::SignalType;
+    static auto parseDataScope(const QStringView &dataScopeStr) -> model::DataScope;
+    static auto parseComplexity(const QStringView &complexityStr) -> model::Complexity;
+    static auto parseDimensions(const QStringView &dimensionsStr) -> model::Dimensions;
+    static auto parseDimensionsMode(const QStringView &dimensionsModeStr) -> model::DimensionsMode;
+    static auto parsePortDimension(const QStringView &portDimensionStr) -> model::PortDimension;
+    static auto parseSignalType(const QStringView &signalTypeStr) -> model::SignalType;
 };
 
 } // namespace seds::importer

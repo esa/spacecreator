@@ -30,7 +30,7 @@ enum class DimensionsMode
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<DimensionsMode>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<DimensionsMode>;
 template<>
 auto stringFromEnum(DimensionsMode enumType) -> const QString &;
 

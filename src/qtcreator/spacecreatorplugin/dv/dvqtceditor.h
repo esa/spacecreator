@@ -17,17 +17,12 @@
 
 #pragma once
 
+#include "common/qtceditor.h"
 #include "dveditorcore.h"
 
 #include <QPointer>
-#include <QSharedPointer>
-#include <editormanager/ieditor.h>
 
 class QToolBar;
-
-namespace dve {
-class DVEditorCore;
-}
 
 namespace spctr {
 
@@ -35,12 +30,12 @@ class DVEditorDocument;
 class DVMainWidget;
 class SpaceCreatorProjectManager;
 
-class DVQtCEditor : public Core::IEditor
+class DVQtCEditor : public QtCEditor
 {
     Q_OBJECT
 
 public:
-    DVQtCEditor(SpaceCreatorProjectManager *projectManager);
+    explicit DVQtCEditor(SpaceCreatorProjectManager *projectManager);
     ~DVQtCEditor();
 
     Core::IDocument *document() const override;
@@ -48,6 +43,8 @@ public:
     DVEditorCorePtr dvPlugin() const;
 
     QWidget *toolBar() override;
+
+    shared::EditorCore *editorCore() const override;
 
 private:
     DVEditorDocument *m_document = nullptr;

@@ -17,40 +17,31 @@
 
 #include "dveditorfactory.h"
 
-#include "dveditordata.h"
+#include "common/actionhandler.h"
+#include "dvqtceditor.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectmanager.h"
 
 #include <QGuiApplication>
-
-#if QTC_VERSION < 900
-#include <coreplugin/fileiconprovider.h>
-#else
 #include <utils/fsengine/fileiconprovider.h>
-#endif
 
 namespace spctr {
 
 DVEditorFactory::DVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_editorData(new DVEditorData(projectManager))
+    , m_actionHandler(new ActionHandler(spctr::Constants::K_DV_EDITOR_ID, this))
+    , m_projectManager(projectManager)
 {
     setId(spctr::Constants::K_DV_EDITOR_ID);
     setDisplayName(QCoreApplication::translate("DV Editor", spctr::Constants::C_DVEDITOR_DISPLAY_NAME));
     addMimeType(spctr::Constants::DV_MIMETYPE);
-#if QTC_VERSION > 414
     setEditorCreator(std::bind(&DVEditorFactory::createDVEditor, this));
-#endif
-#if QTC_VERSION < 900
-    Core::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
-#else
     Utils::FileIconProvider::registerIconOverlayForSuffix(":/projectexplorer/images/fileoverlay_scxml.png", "xml");
-#endif
 }
 
 Core::IEditor *DVEditorFactory::createDVEditor()
 {
-    return m_editorData->createEditor();
+    return new DVQtCEditor(m_projectManager);
 }
 
 } // namespace spctr

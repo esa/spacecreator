@@ -30,7 +30,7 @@ enum class Complexity
 };
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<Complexity>;
+auto enumFromString(const QStringView &enumStr) -> std::optional<Complexity>;
 template<>
 auto stringFromEnum(Complexity enumType) -> const QString &;
 

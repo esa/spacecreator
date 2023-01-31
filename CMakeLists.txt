@@ -34,14 +34,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Set up Qt stuff:
-
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Concurrent Core Gui Network Svg Test Widgets Xml REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Concurrent Core Gui Network Svg Test WebSockets Widgets Xml REQUIRED)
-
-if(${QT_VERSION_MAJOR} STREQUAL "6")
-    find_package(Qt6 COMPONENTS Core5Compat SvgWidgets REQUIRED)
-endif()
-
+find_package(Qt6 COMPONENTS Concurrent Core Core5Compat Gui Network Svg SvgWidgets Test WebSockets Widgets Xml REQUIRED)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -51,6 +44,7 @@ set(QT_CORE Qt${QT_VERSION_MAJOR}::Core)
 set(QT_GUI Qt${QT_VERSION_MAJOR}::Gui)
 set(QT_NETWORK Qt${QT_VERSION_MAJOR}::Network)
 set(QT_SVG Qt${QT_VERSION_MAJOR}::Svg)
+set(QT_SVGWIDGETS Qt6::SvgWidgets)
 set(QT_TEST Qt${QT_VERSION_MAJOR}::Test)
 set(QT_WEBSOCKETS Qt${QT_VERSION_MAJOR}::WebSockets)
 set(QT_WIDGETS Qt${QT_VERSION_MAJOR}::Widgets)

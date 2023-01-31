@@ -22,7 +22,7 @@
 namespace simulink::model {
 
 template<>
-auto enumFromString(const StringRef &enumStr) -> std::optional<SignalType>
+auto enumFromString(const QStringView &enumStr) -> std::optional<SignalType>
 {
     if (enumStr.compare(QStringLiteral("auto"), Qt::CaseInsensitive) == 0) {
         return SignalType::Auto;

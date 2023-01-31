@@ -544,11 +544,7 @@ model::MinMaxRange DataTypesParser::readMinMaxRange(QXmlStreamReader &xmlReader)
 model::FloatPrecisionRange DataTypesParser::readFloatPrecisionRange(QXmlStreamReader &xmlReader)
 {
     auto rangeStr = xmlReader.readElementText();
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    auto range = model::enumFromString<model::FloatPrecisionRange>(StringRef(rangeStr));
-#else
-    auto range = model::enumFromString<model::FloatPrecisionRange>(&rangeStr);
-#endif
+    auto range = model::enumFromString<model::FloatPrecisionRange>(QStringView(rangeStr));
 
     if (range) {
         return *range;
@@ -943,7 +939,7 @@ model::ContainerValueConstraint DataTypesParser::readValueConstraint(QXmlStreamR
     return constraint;
 }
 
-model::FloatDataEncoding::Encoding DataTypesParser::parseFloatEncoding(const StringRef &encodingStr)
+model::FloatDataEncoding::Encoding DataTypesParser::parseFloatEncoding(const QStringView &encodingStr)
 {
     auto coreFloatEncoding = model::enumFromString<model::CoreEncodingAndPrecision>(encodingStr);
 
@@ -954,7 +950,7 @@ model::FloatDataEncoding::Encoding DataTypesParser::parseFloatEncoding(const Str
     }
 }
 
-model::IntegerDataEncoding::Encoding DataTypesParser::parseIntegerEncoding(const StringRef &encodingStr)
+model::IntegerDataEncoding::Encoding DataTypesParser::parseIntegerEncoding(const QStringView &encodingStr)
 {
     auto coreIntegerEncoding = model::enumFromString<model::CoreIntegerEncoding>(encodingStr);
 
@@ -965,7 +961,7 @@ model::IntegerDataEncoding::Encoding DataTypesParser::parseIntegerEncoding(const
     }
 }
 
-model::StringDataEncoding::Encoding DataTypesParser::parseStringEncoding(const StringRef &encodingStr)
+model::StringDataEncoding::Encoding DataTypesParser::parseStringEncoding(const QStringView &encodingStr)
 {
     auto coreStringEncoding = model::enumFromString<model::CoreStringEncoding>(encodingStr);
 
@@ -976,7 +972,7 @@ model::StringDataEncoding::Encoding DataTypesParser::parseStringEncoding(const S
     }
 }
 
-model::ByteOrder DataTypesParser::parseByteOrder(const StringRef &byteOrderStr)
+model::ByteOrder DataTypesParser::parseByteOrder(const QStringView &byteOrderStr)
 {
     auto byteOrder = model::enumFromString<model::ByteOrder>(byteOrderStr);
 
@@ -987,7 +983,7 @@ model::ByteOrder DataTypesParser::parseByteOrder(const StringRef &byteOrderStr)
     }
 }
 
-model::ErrorControlEntry::ErrorControl DataTypesParser::parseErrorControl(const StringRef &errorControlStr)
+model::ErrorControlEntry::ErrorControl DataTypesParser::parseErrorControl(const QStringView &errorControlStr)
 {
     auto coreErrorControl = model::enumFromString<model::CoreErrorControl>(errorControlStr);
 
@@ -998,7 +994,7 @@ model::ErrorControlEntry::ErrorControl DataTypesParser::parseErrorControl(const 
     }
 }
 
-model::FalseValue DataTypesParser::parseFalseValue(const StringRef &falseValueStr)
+model::FalseValue DataTypesParser::parseFalseValue(const QStringView &falseValueStr)
 {
     auto falseValue = model::enumFromString<model::FalseValue>(falseValueStr);
 
@@ -1009,7 +1005,7 @@ model::FalseValue DataTypesParser::parseFalseValue(const StringRef &falseValueSt
     }
 }
 
-model::RangeType DataTypesParser::parseRangeType(const StringRef &rangeTypeStr)
+model::RangeType DataTypesParser::parseRangeType(const QStringView &rangeTypeStr)
 {
     auto rangeType = model::enumFromString<model::RangeType>(rangeTypeStr);
 

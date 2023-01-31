@@ -19,8 +19,6 @@
 
 #include "dvappmodel.h"
 #include "dveditorcore.h"
-#include "dvmainwidget.h"
-#include "dvmodel.h"
 #include "dvsystemchecks.h"
 #include "errorhub.h"
 #include "spacecreatorpluginconstants.h"
@@ -46,17 +44,10 @@ DVEditorDocument::DVEditorDocument(SpaceCreatorProjectManager *projectManager, Q
     setId(Id(spctr::Constants::K_DV_EDITOR_ID));
 }
 
-#if QTC_VERSION < 500
-Core::IDocument::OpenResult DVEditorDocument::open(
-        QString *errorString, const QString &fileName, const QString &realFileName)
-{
-    const QFileInfo fi(fileName);
-#else
 Core::IDocument::OpenResult DVEditorDocument::open(
         QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName)
 {
     const QFileInfo fi = fileName.toFileInfo();
-#endif
     Q_UNUSED(errorString)
     Q_UNUSED(realFileName)
 
@@ -73,11 +64,7 @@ Core::IDocument::OpenResult DVEditorDocument::open(
         return OpenResult::ReadError;
     }
 
-#if QTC_VERSION < 409
-    setFilePath(Utils::FileName::fromString(absfileName));
-#else
     setFilePath(Utils::FilePath::fromString(absfileName));
-#endif
     connect(m_plugin->undoStack(), &QUndoStack::cleanChanged, this, [this](bool) { Q_EMIT changed(); });
     Q_EMIT dvDataLoaded(absfileName, m_plugin);
     m_plugin->centerOnView();
@@ -87,27 +74,14 @@ Core::IDocument::OpenResult DVEditorDocument::open(
     return OpenResult::Success;
 }
 
-#if QTC_VERSION < 500
-bool DVEditorDocument::save(QString *errorString, const QString &name, bool autoSave)
-{
-#else
 bool DVEditorDocument::save(QString *errorString, const Utils::FilePath &name, bool autoSave)
 {
-#endif
     Q_UNUSED(errorString)
     if (m_plugin.isNull()) {
         return false;
     }
 
-#if QTC_VERSION < 500
-#if QTC_VERSION < 409
-    const FileName newName = Utils::FileName::fromString(name);
-#else
-    const FilePath newName = Utils::FilePath::fromString(name);
-#endif
-#else
     const FilePath newName = name;
-#endif
 
     const auto oldFileName = filePath();
     const auto actualName = name.isEmpty() ? oldFileName : newName;
@@ -141,17 +115,10 @@ bool DVEditorDocument::save(QString *errorString, const Utils::FilePath &name, b
     return true;
 }
 
-#if QTC_VERSION < 409
-void DVEditorDocument::setFilePath(const FileName &newName)
-{
-    IDocument::setFilePath(newName);
-}
-#else
 void DVEditorDocument::setFilePath(const FilePath &newName)
 {
     IDocument::setFilePath(newName);
 }
-#endif
 
 bool DVEditorDocument::shouldAutoSave() const
 {
@@ -192,7 +159,7 @@ DVEditorCorePtr DVEditorDocument::dvEditorCore() const
 
 void DVEditorDocument::checkForErrors()
 {
-    if (!m_projectManager | !m_plugin) {
+    if (!m_projectManager || !m_plugin) {
         return;
     }
 
