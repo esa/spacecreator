@@ -1,0 +1,18 @@
+P-1PI-0RI-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+    MyInteger   ::= INTEGER (0..255)
+    MyReal      ::= REAL (0.0 .. 1000.0)
+    MyBool      ::= BOOLEAN
+    MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyInteger
+
+    MySeq ::= SEQUENCE
+    {
+        myInteger MyInteger,
+        myReal    MyReal,
+        myBool    MyBool,
+        mySeqOfVar MySeqOf
+    }
+
+END
+

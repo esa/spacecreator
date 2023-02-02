@@ -1,0 +1,191 @@
+<InterfaceView version="1.1" asn1file="P_2PI_2RI.asn">
+<Function id="{c5be891b-56f7-4490-a37c-c6ce52c31914}" name="controller1" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="Taste::coordinates" value="17400 30600 40300 39100"/>
+<Provided_Interface id="{e4b4bc7b-ed98-4637-bd8e-1fc310755f85}" name="trigger1" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" dispatch_offset="0" wcet="0" priority="1" period="1000">
+    <Property name="Taste::coordinates" value="29100 30600"/>
+</Provided_Interface>
+
+<Required_Interface id="{665f24e0-a480-4a3f-8530-1821825d1411}" name="iface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="ifacein1" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="ifacein2" type="MyReal" encoding="NATIVE"/>
+    <Input_Parameter name="ifacein3" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="ifacein4" type="MySeqOf" encoding="NATIVE"/>
+    <Input_Parameter name="ifacein5" type="MySeq" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout1" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout2" type="MyReal" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout3" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout4" type="MySeqOf" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout5" type="MySeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="40300 34800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{4b423136-88e7-402b-92ac-08311da203b8}" name="utils" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="Taste::coordinates" value="83700 35000 103700 43000"/>
+<Provided_Interface id="{15d4f6ed-7204-4a26-84e0-1cd9474b23a1}" name="calc" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="calcin1" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="calcin2" type="MyReal" encoding="NATIVE"/>
+    <Input_Parameter name="calcin3" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="calcin4" type="MySeqOf" encoding="NATIVE"/>
+    <Input_Parameter name="calcin5" type="MySeq" encoding="NATIVE"/>
+    <Output_Parameter name="calcout1" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="calcout2" type="MyReal" encoding="NATIVE"/>
+    <Output_Parameter name="calcout3" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="calcout4" type="MySeqOf" encoding="NATIVE"/>
+    <Output_Parameter name="calcout5" type="MySeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="83700 38400"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{19b71d91-1c56-4989-9860-5070eb7ca045}" name="controller2" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="Taste::coordinates" value="18300 46800 39500 54800"/>
+<Provided_Interface id="{5ab4292e-33fb-4a7c-8676-6865ae582e4d}" name="trigger2" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" dispatch_offset="500" wcet="0" priority="1" period="1000">
+    <Property name="Taste::coordinates" value="25000 46800"/>
+</Provided_Interface>
+
+<Required_Interface id="{9c7a18ca-1e54-4c68-8db8-670992adb980}" name="iface2" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="iface2in1" type="MyInteger2" encoding="NATIVE"/>
+    <Input_Parameter name="iface2in2" type="MyReal2" encoding="NATIVE"/>
+    <Input_Parameter name="iface2in3" type="MyBool2" encoding="NATIVE"/>
+    <Input_Parameter name="iface2in4" type="MySeqOf2" encoding="NATIVE"/>
+    <Input_Parameter name="iface2in5" type="MySeq2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out1" type="MyInteger2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out2" type="MyReal2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out3" type="MyBool2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out4" type="MySeqOf2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out5" type="MySeq2" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="39500 49800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{60aaf604-c0aa-4b9a-874c-cad6513a2788}" name="simulink" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="Taste::coordinates" value="52900 38200 72900 47600"/>
+<Provided_Interface id="{3f0853e1-db39-414b-932f-5ffeb0624c66}" name="iface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="ifacein1" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="ifacein2" type="MyReal" encoding="NATIVE"/>
+    <Input_Parameter name="ifacein3" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="ifacein4" type="MySeqOf" encoding="NATIVE"/>
+    <Input_Parameter name="ifacein5" type="MySeq" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout1" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout2" type="MyReal" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout3" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout4" type="MySeqOf" encoding="NATIVE"/>
+    <Output_Parameter name="ifaceout5" type="MySeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="52900 40600"/>
+</Provided_Interface>
+
+<Provided_Interface id="{2d7691a9-300f-45c4-897c-709d5c48eb62}" name="iface2" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="iface2in1" type="MyInteger2" encoding="NATIVE"/>
+    <Input_Parameter name="iface2in2" type="MyReal2" encoding="NATIVE"/>
+    <Input_Parameter name="iface2in3" type="MyBool2" encoding="NATIVE"/>
+    <Input_Parameter name="iface2in4" type="MySeqOf2" encoding="NATIVE"/>
+    <Input_Parameter name="iface2in5" type="MySeq2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out1" type="MyInteger2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out2" type="MyReal2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out3" type="MyBool2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out4" type="MySeqOf2" encoding="NATIVE"/>
+    <Output_Parameter name="iface2out5" type="MySeq2" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="52900 44700"/>
+</Provided_Interface>
+
+<Required_Interface id="{ef127c4f-a986-4981-b84f-23090775eaf8}" name="calc" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="calcin1" type="MyInteger" encoding="NATIVE"/>
+    <Input_Parameter name="calcin2" type="MyReal" encoding="NATIVE"/>
+    <Input_Parameter name="calcin3" type="MyBool" encoding="NATIVE"/>
+    <Input_Parameter name="calcin4" type="MySeqOf" encoding="NATIVE"/>
+    <Input_Parameter name="calcin5" type="MySeq" encoding="NATIVE"/>
+    <Output_Parameter name="calcout1" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="calcout2" type="MyReal" encoding="NATIVE"/>
+    <Output_Parameter name="calcout3" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="calcout4" type="MySeqOf" encoding="NATIVE"/>
+    <Output_Parameter name="calcout5" type="MySeq" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="72900 41900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{9e9216a1-9e07-440a-9df6-3f57c70a7dde}" name="calc2" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="calc2in1" type="MyInteger2" encoding="NATIVE"/>
+    <Input_Parameter name="calc2in2" type="MyReal2" encoding="NATIVE"/>
+    <Input_Parameter name="calc2in3" type="MyBool2" encoding="NATIVE"/>
+    <Input_Parameter name="calc2in4" type="MySeqOf2" encoding="NATIVE"/>
+    <Input_Parameter name="calc2in5" type="MySeq2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out1" type="MyInteger2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out2" type="MyReal2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out3" type="MyBool2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out4" type="MySeqOf2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out5" type="MySeq2" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="72900 46300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Function id="{57572738-b4ae-422f-b264-cf48bf032526}" name="utils2" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="Taste::coordinates" value="84300 46800 104300 54800"/>
+<Provided_Interface id="{6afd1841-7839-4099-93a5-f377ea2fb6f5}" name="calc2" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="calc2in1" type="MyInteger2" encoding="NATIVE"/>
+    <Input_Parameter name="calc2in2" type="MyReal2" encoding="NATIVE"/>
+    <Input_Parameter name="calc2in3" type="MyBool2" encoding="NATIVE"/>
+    <Input_Parameter name="calc2in4" type="MySeqOf2" encoding="NATIVE"/>
+    <Input_Parameter name="calc2in5" type="MySeq2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out1" type="MyInteger2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out2" type="MyReal2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out3" type="MyBool2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out4" type="MySeqOf2" encoding="NATIVE"/>
+    <Output_Parameter name="calc2out5" type="MySeq2" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="84300 49300"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection id="{0f813585-795f-4d61-9d95-424d4e2c8613}" required_system_element="NO">
+    <Source func_name="simulink" ri_name="calc2"/>
+    <Target func_name="utils2" pi_name="calc2"/>
+    <Property name="Taste::coordinates" value="73500 46300 78700 46300 78700 49300 84000 49300"/>
+</Connection>
+
+<Connection id="{82775cdb-dbe0-463d-96a9-4bc606090675}" required_system_element="NO">
+    <Source func_name="controller1" ri_name="iface"/>
+    <Target func_name="simulink" pi_name="iface"/>
+    <Property name="Taste::coordinates" value="40900 34800 46700 34800 46700 40600 52600 40600"/>
+</Connection>
+
+<Connection id="{7c749aae-35d9-4dea-b31f-66334732919e}" required_system_element="NO">
+    <Source func_name="controller2" ri_name="iface2"/>
+    <Target func_name="simulink" pi_name="iface2"/>
+    <Property name="Taste::coordinates" value="40100 49800 46300 49800 46300 44700 52600 44700"/>
+</Connection>
+
+<Connection id="{03442177-b8c5-4d96-b3bd-d0f1436591af}" required_system_element="NO">
+    <Source func_name="simulink" ri_name="calc"/>
+    <Target func_name="utils" pi_name="calc"/>
+    <Property name="Taste::coordinates" value="73500 41900 78400 41900 78400 38400 83400 38400"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>
