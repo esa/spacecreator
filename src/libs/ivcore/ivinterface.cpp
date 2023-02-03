@@ -307,7 +307,7 @@ IVInterface::OperationKind IVInterface::kind() const
 
 bool IVInterface::setKind(IVInterface::OperationKind k)
 {
-    if (this->kind() != k) {
+    if (this->kind() != k || !hasEntityAttribute(meta::Props::token(meta::Props::Token::kind))) {
         setEntityAttribute(meta::Props::token(meta::Props::Token::kind), kindToString(k));
         return true;
     }

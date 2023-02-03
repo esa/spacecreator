@@ -322,6 +322,7 @@ void tst_AttributesConfigure::tst_attrValidators()
 
     ivm::IVFunctionType fnType;
     ivm::IVFunction fn;
+    fn.postInit();
 
     ivm::IVInterface::CreationInfo ci;
     ci.function = &fn;
@@ -330,14 +331,16 @@ void tst_AttributesConfigure::tst_attrValidators()
     ci.name = QLatin1String("reqIface");
     ci.kind = ivm::IVInterface::OperationKind::Any;
     ivm::IVInterfaceRequired reqIface(ci);
+    reqIface.postInit();
 
     ci.type = ivm::IVInterface::InterfaceType::Provided;
     ci.name = QLatin1String("provIface");
     ci.kind = ivm::IVInterface::OperationKind::Cyclic;
     ivm::IVInterfaceProvided provIface(ci);
+    provIface.postInit();
 
     ivm::IVConnection connection(&reqIface, &provIface);
-    comment.setEntityAttribute(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("0123456789"));
+    connection.setEntityAttribute(QLatin1String("Custom_Connection_Attribute"), QStringLiteral("0123456789"));
 
     const QMultiMap<int, QPair<QString, QString>> validators {
         { int(ivm::IVPropertyTemplate::Scope::Function), { "name", "[a-zA-Z_]+[\\d\\w]*" } },
