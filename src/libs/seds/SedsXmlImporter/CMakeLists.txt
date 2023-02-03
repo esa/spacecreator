@@ -11,17 +11,23 @@ target_sources(SedsXmlImporter
 target_include_directories(SedsXmlImporter
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
+
+set (PRIVATE_LIBS SEDS::XmlParser
+    SEDS::XmlPreprocessor
+    SEDS::XmlValidator
+    Qt${QT_VERSION_MAJOR}::Xml
+    CommonProjectWarnings
+)
+
+if(NOT APPLE)
+    set (PRIVATE_LIBS ${PRIVATE_LIBS} "stdc++fs")
+endif()
+
 target_link_libraries(SedsXmlImporter
     PUBLIC      Conversion::Common
                 SEDS::SymbolDefinitionReader
-if(NOT APPLE)
-                "stdc++fs"
-endif()
-    PRIVATE     SEDS::XmlParser
-                SEDS::XmlPreprocessor
-                SEDS::XmlValidator
-                Qt${QT_VERSION_MAJOR}::Xml
-                CommonProjectWarnings)
+    PRIVATE     ${PRIVATE_LIBS}
+)
 
 add_format_target(SedsXmlImporter)
 add_tidy_target(SedsXmlImporter)

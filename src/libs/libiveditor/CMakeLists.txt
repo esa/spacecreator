@@ -233,8 +233,7 @@ target_sources(${LIB_NAME} PRIVATE
     config/ivlibrarydialog.h
     )
 
-target_link_libraries(${LIB_NAME}
-    Tmc::Verifier
+set (LIBS Tmc::Verifier
     ivcore
     asn1library
     shared
@@ -246,10 +245,13 @@ target_link_libraries(${LIB_NAME}
     ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
+)
+
 if(NOT APPLE)
-    "stdc++fs"
+    set (LIBS ${LIBS} "stdc++fs")
 endif()
-    )
+
+target_link_libraries(${LIB_NAME} ${LIBS})
 
 target_include_directories(${LIB_NAME} PUBLIC .)
 

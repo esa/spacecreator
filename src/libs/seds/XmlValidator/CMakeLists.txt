@@ -12,15 +12,20 @@ target_sources(SedsXmlValidator
 target_include_directories(SedsXmlValidator
     PUBLIC      .
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
+
+set (PRIVATE_LIBS LibXml2::LibXml2
+    CommonProjectWarnings
+)
+
+if(NOT APPLE)
+    set (PRIVATE_LIBS ${PRIVATE_LIBS} "stdc++fs")
+endif()
+
 target_link_libraries(SedsXmlValidator
     PUBLIC      Conversion::Converter
                 Qt${QT_VERSION_MAJOR}::Core
-    PRIVATE     LibXml2::LibXml2
-                CommonProjectWarnings
-if(NOT APPLE)
-                "stdc++fs"
-endif()
-                )
+    PRIVATE     ${PRIVATE_LIBS}
+)
 
 add_format_target(SedsXmlValidator)
 add_tidy_target(SedsXmlValidator)
