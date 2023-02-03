@@ -428,7 +428,7 @@ bool PropertyTemplate::validate(const VEObject *object) const
     auto it = d->m_rxAttrValidatorPattern.lowerBound(objScope);
     const auto upperBound = d->m_rxAttrValidatorPattern.upperBound(objScope);
     while (it != upperBound) {
-        auto checkPattern = [](const EntityAttributes &data, const QString &name, const QString &pattern) {
+        auto checkPattern = [](const EntityAttributes &data, const QString &name, const QString &pattern) -> std::optional<bool> {
             auto objAttrIter = data.constFind(name);
             if (objAttrIter != data.constEnd()) {
                 const QRegularExpression rx(pattern);
@@ -436,10 +436,11 @@ bool PropertyTemplate::validate(const VEObject *object) const
                 const QRegularExpressionMatch match = rx.match(value);
                 return match.capturedLength() == value.length();
             }
-            return true;
+            return std::nullopt;
         };
-        if (checkPattern(object->entityAttributes(), it->first, it->second))
-            return true;
+        auto res = checkPattern(object->entityAttributes(), it->first, it->second);
+        if (res.has_value())
+            return res.value();
         ++it;
     }
     return false;

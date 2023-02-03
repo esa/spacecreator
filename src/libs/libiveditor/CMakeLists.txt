@@ -234,7 +234,7 @@ target_sources(${LIB_NAME} PRIVATE
     )
 
 target_link_libraries(${LIB_NAME}
-	Tmc::Verifier
+    Tmc::Verifier
     ivcore
     asn1library
     shared
@@ -246,7 +246,9 @@ target_link_libraries(${LIB_NAME}
     ${QT_SVGWIDGETS}
     ${QT_WIDGETS}
     ${QT_XML}
+if(NOT APPLE)
     "stdc++fs"
+endif()
     )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

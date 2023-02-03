@@ -9,6 +9,8 @@ set(FT_PLUGIN_SOURCES
 set(FT_QTC_LIBRARIES
     -L"${QTC_LIB_DIR}"
     -L"${QTC_PLUGINS_DIR}"
+    ExtensionSystem
+    Utils
 )
 
 set(FT_QTC_PLUGINS

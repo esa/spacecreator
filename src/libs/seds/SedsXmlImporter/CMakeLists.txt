@@ -14,7 +14,9 @@ target_include_directories(SedsXmlImporter
 target_link_libraries(SedsXmlImporter
     PUBLIC      Conversion::Common
                 SEDS::SymbolDefinitionReader
+if(NOT APPLE)
                 "stdc++fs"
+endif()
     PRIVATE     SEDS::XmlParser
                 SEDS::XmlPreprocessor
                 SEDS::XmlValidator

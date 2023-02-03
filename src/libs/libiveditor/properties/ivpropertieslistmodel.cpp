@@ -205,8 +205,6 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
         break;
     }
     default:
-        if (auto fn = entity()->as<const ivm::IVFunction *>())
-            editable = !fn->inheritsFunctionType();
         break;
     }
 
