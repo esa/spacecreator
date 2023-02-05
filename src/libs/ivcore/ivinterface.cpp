@@ -161,12 +161,12 @@ bool IVInterface::postInit()
     }
 
     if (!function()->isFunction()) {
-        return false;
+        return true;
     }
 
     IVFunction *fn = function()->as<IVFunction *>();
     if (!fn) {
-        return false;
+        return true;
     }
 
     if (fn->entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString()
