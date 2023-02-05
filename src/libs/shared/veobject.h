@@ -25,6 +25,7 @@
 
 namespace shared {
 class VEModel;
+class PropertyTemplateConfig;
 
 struct VEObjectPrivate;
 class VEObject : public QObject
@@ -89,7 +90,9 @@ public:
     }
 
     VEModel *model() const;
-    virtual bool postInit() = 0;
+
+    virtual PropertyTemplateConfig *propertyTemplaceConfig() const { return nullptr; };
+    virtual bool postInit();
     virtual bool aboutToBeRemoved() = 0;
 
     template<class T>

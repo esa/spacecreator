@@ -28,7 +28,7 @@ public:
     QString titleUI() const override { return {}; }
     QVector<qint32> coordinates() const override { return {}; }
     void setCoordinates(const QVector<qint32> &coordinates) override { Q_UNUSED(coordinates) }
-    bool postInit() override { return false; }
+    bool postInit() override { return shared::VEObject::postInit(); }
     bool aboutToBeRemoved() override { return false; }
     QVariantList generateProperties(bool isProperty) const override
     {
@@ -48,6 +48,8 @@ private Q_SLOTS:
 void tst_VEObject::testSetAttributeImpl()
 {
     XEObject obj;
+    obj.postInit();
+
     const QString attrName = "foo";
     obj.setEntityAttribute(attrName, QVariant(42));
     QCOMPARE(obj.entityAttribute(attrName).isExportable(), true);

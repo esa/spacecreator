@@ -42,10 +42,14 @@ IVFunction::IVFunction(QObject *parent, const shared::Id &id)
 {
 }
 
-IVFunction::~IVFunction() {}
+IVFunction::~IVFunction() { }
 
 bool IVFunction::postInit()
 {
+    if (!IVObject::postInit()) {
+        return false;
+    }
+
     if (auto objModel = model()) {
         const QString typeName =
                 entityAttributeValue(meta::Props::token(meta::Props::Token::instance_of)).value<QString>();
@@ -61,7 +65,7 @@ bool IVFunction::postInit()
         checkDefaultFunctionImplementation();
     }
 
-    return IVObject::postInit();
+    return true;
 }
 
 void IVFunction::setInstanceOf(IVFunctionType *fnType)
@@ -105,7 +109,7 @@ void IVFunction::restoreInternals()
         d->m_fnType->forgetInstance(this);
 
     if (m_originalFields.collected()) {
-        for (const EntityAttribute &attr: qAsConst(d->m_implementations))
+        for (const EntityAttribute &attr : qAsConst(d->m_implementations))
             addImplementation(attr.name(), attr.value<QString>());
         setDefaultImplementation(m_originalFields.defaultImplementation);
         reflectAttrs(m_originalFields.attrs);
@@ -199,7 +203,7 @@ void IVFunction::reflectAttrs(const EntityAttributes &attributes)
     setEntityAttributes(prepared);
     if (attributes.contains(meta::Props::token(meta::Props::Token::type_language))) {
         setEntityAttribute(meta::Props::token(meta::Props::Token::language),
-                           attributes.value(meta::Props::token(meta::Props::Token::type_language)).value());
+                attributes.value(meta::Props::token(meta::Props::Token::type_language)).value());
     }
 }
 
@@ -297,9 +301,11 @@ QDebug operator<<(QDebug debug, const IVFunction &function)
     QDebugStateSaver saver(debug);
     const auto separator1 = debug.verbosity() > 2 ? '\t' : ' ';
     const auto separator2 = debug.verbosity() > 2 ? '\n' : ' ';
-    debug.nospace() << "IVFunction(id=" << function.id() << ", title=" << function.titleUI() << ", attributes={" << separator2;
+    debug.nospace() << "IVFunction(id=" << function.id() << ", title=" << function.titleUI() << ", attributes={"
+                    << separator2;
     for (auto attribute : function.entityAttributes()) {
-        debug << separator1 << attribute.name() << "=" << attribute.value() << " " << (int)attribute.type() << separator2;
+        debug << separator1 << attribute.name() << "=" << attribute.value() << " " << (int)attribute.type()
+              << separator2;
     }
     debug << "})";
 

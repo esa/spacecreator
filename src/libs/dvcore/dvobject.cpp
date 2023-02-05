@@ -19,6 +19,7 @@
 
 #include "dvmodel.h"
 #include "dvnamevalidator.h"
+#include "dvpropertytemplateconfig.h"
 #include "exportableproperty.h"
 
 #include <QVector>
@@ -41,7 +42,7 @@ DVObject::DVObject(const DVObject::Type t, const QString &title, QObject *parent
     setEntityAttribute(meta::Props::token(meta::Props::Token::name), title);
 }
 
-DVObject::~DVObject() {}
+DVObject::~DVObject() { }
 
 QString DVObject::title() const
 {
@@ -141,7 +142,7 @@ DVModel *DVObject::model() const
 
 bool DVObject::postInit()
 {
-    return true;
+    return shared::VEObject::postInit();
 }
 
 bool DVObject::aboutToBeRemoved()
@@ -170,6 +171,11 @@ QVariantList DVObject::attributes() const
 QVariantList DVObject::properties() const
 {
     return generateProperties(true);
+}
+
+shared::PropertyTemplateConfig *DVObject::propertyTemplaceConfig() const
+{
+    return DVPropertyTemplateConfig::instance();
 }
 
 /**

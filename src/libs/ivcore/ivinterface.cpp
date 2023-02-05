@@ -152,17 +152,21 @@ void IVInterface::setDirection(IVInterface::InterfaceType type) const
 
 bool IVInterface::postInit()
 {
+    if (!IVObject::postInit()) {
+        return false;
+    }
+
     if (!model() || !function()) {
         return false;
     }
 
     if (!function()->isFunction()) {
-        return IVObject::postInit();
+        return false;
     }
 
     IVFunction *fn = function()->as<IVFunction *>();
     if (!fn) {
-        return IVObject::postInit();
+        return false;
     }
 
     if (fn->entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString()
@@ -210,7 +214,7 @@ bool IVInterface::postInit()
         }
     }
 
-    return IVObject::postInit();
+    return true;
 }
 
 bool IVInterface::isProvided() const

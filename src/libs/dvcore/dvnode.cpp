@@ -48,8 +48,11 @@ DVNode::~DVNode() { }
 
 bool DVNode::postInit()
 {
-    QString label = nodeLabel();
+    if (!DVObject::postInit()) {
+        return false;
+    }
 
+    const QString label = nodeLabel();
     if (label.isEmpty() || nodeLabelCount(label) > 1) {
         setEntityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::node_label), uniqueLabelName());
     }

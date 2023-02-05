@@ -28,8 +28,11 @@
 #include <memory>
 
 namespace ivm {
+class IVPropertyTemplateConfig;
 class IVModel;
+
 struct IVObjectPrivate;
+
 class IVObject : public shared::VEObject
 {
     Q_OBJECT
@@ -99,6 +102,7 @@ public:
     void setVisible(bool isVisible);
     bool isVisible() const;
 
+    shared::PropertyTemplateConfig *propertyTemplaceConfig() const override;
     bool postInit() override;
     bool aboutToBeRemoved() override;
 

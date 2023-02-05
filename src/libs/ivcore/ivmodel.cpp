@@ -56,24 +56,6 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
     if (ivm::IVObject *ivObj = obj->as<ivm::IVObject *>()) {
         if (shared::VEModel::addObjectImpl(obj)) {
             d->m_visibleObjects.append(ivObj);
-
-            for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(ivObj)) {
-                if (attr->validate(ivObj) && !attr->isOptional() && !obj->hasEntityAttribute(attr->name())) {
-                    const QVariant &defaultValue = attr->defaultValue();
-                    if (!defaultValue.isNull()) {
-                        if (attr->info() == ivm::IVPropertyTemplate::Info::Attribute) {
-                            obj->setEntityAttribute(attr->name(), defaultValue);
-                        } else if (attr->info() == ivm::IVPropertyTemplate::Info::Property) {
-                            obj->setEntityProperty(attr->name(), defaultValue);
-                        } else {
-                            QMetaEnum metaEnum = QMetaEnum::fromType<shared::PropertyTemplate::Info>();
-                            shared::ErrorHub::addError(shared::ErrorItem::Warning,
-                                    tr("Unknown dynamic property info: %1")
-                                            .arg(metaEnum.valueToKey(int(attr->info()))));
-                        }
-                    }
-                }
-            }
             return true;
         }
     }

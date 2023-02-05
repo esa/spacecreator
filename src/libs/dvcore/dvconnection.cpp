@@ -56,6 +56,10 @@ DVConnection::~DVConnection() { }
 
 bool DVConnection::postInit()
 {
+    if (!DVObject::postInit()) {
+        return false;
+    }
+
     if (!model()) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Connection can't init without model set"));
         return false;

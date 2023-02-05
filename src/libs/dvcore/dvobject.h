@@ -82,6 +82,7 @@ public:
     QVariantList properties() const;
 
     QVariantList generateProperties(bool isProperty) const override;
+    shared::PropertyTemplateConfig *propertyTemplaceConfig() const override;
 
 Q_SIGNALS:
     void urlChanged(const QString &title);

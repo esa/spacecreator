@@ -53,15 +53,21 @@ QString ArchetypeObject::title() const
 
 QString ArchetypeObject::titleUI() const
 {
-    QString text;
-    std::transform(title().cbegin(), title().cend(), std::back_inserter(text),
-            [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char(' '); });
+    QString text { title() };
+    std::for_each(text.begin(), text.end(), [](QChar &ch) {
+        if (!ch.isLetterOrNumber())
+            ch = QLatin1Char(' ');
+    });
 
     return text;
 }
 
 bool ArchetypeObject::postInit()
 {
+    if (!shared::VEObject::postInit()) {
+        return false;
+    }
+
     if (title().isEmpty()) {
         resetTitle();
     }
@@ -103,7 +109,7 @@ QVector<qint32> ArchetypeObject::coordinates() const
     return QVector<qint32>();
 }
 
-void ArchetypeObject::setCoordinates(const QVector<qint32> &coordinates) {}
+void ArchetypeObject::setCoordinates(const QVector<qint32> &coordinates) { }
 
 ArchetypeObject *ArchetypeObject::parentObject() const
 {

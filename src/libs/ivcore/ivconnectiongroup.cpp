@@ -40,6 +40,9 @@ IVConnectionGroup::IVConnectionGroup(const QString &name, IVInterfaceGroup *ifac
 
 bool IVConnectionGroup::postInit()
 {
+    if (!shared::VEObject::postInit())
+        return false;
+
     if (m_initConnections.isEmpty()) {
         return true;
     }

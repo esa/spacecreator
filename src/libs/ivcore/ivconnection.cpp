@@ -38,7 +38,7 @@ struct ConnectionHolder {
 };
 
 struct IVConnectionPrivate {
-    IVConnectionPrivate() {}
+    IVConnectionPrivate() { }
     IVConnectionPrivate(IVInterface *ifaceSource, IVInterface *ifaceTarget) { setData(ifaceSource, ifaceTarget); }
 
     void setData(IVInterface *ifaceSource, IVInterface *ifaceTarget)
@@ -83,7 +83,8 @@ IVConnection::IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget, Q
 {
 }
 
-IVConnection::IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent, const shared::Id &id)
+IVConnection::IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent,
+        const shared::Id &id)
     : IVObject(t, parent, id)
     , d(new IVConnectionPrivate { ifaceSource, ifaceTarget })
 {
@@ -354,6 +355,10 @@ void IVConnection::clearPostponedEndpoints()
 
 bool IVConnection::postInit()
 {
+    if (!shared::VEObject::postInit()) {
+        return false;
+    }
+
     if (needPostponedInit() && !lookupEndpointsPostponed()) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("Postponed Connection initialization failed"), "");
         return false;

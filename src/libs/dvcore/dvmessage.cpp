@@ -36,6 +36,10 @@ DVMessage::DVMessage(QObject *parent)
 
 bool DVMessage::postInit()
 {
+    if (!DVObject::postInit()) {
+        return false;
+    }
+
     DVNode *node1 = fromNode();
     if (!node1) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Message %1 has invalid node").arg(title()));

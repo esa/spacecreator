@@ -75,9 +75,14 @@ QString IVObject::titleUI() const
 
 bool IVObject::postInit()
 {
+    if (!shared::VEObject::postInit()) {
+        return false;
+    }
+
     if (title().isEmpty()) {
         resetTitle();
     }
+
     return true;
 }
 
@@ -412,6 +417,11 @@ void IVObject::setVisible(bool isVisible)
 bool IVObject::isVisible() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::is_visible), true);
+}
+
+shared::PropertyTemplateConfig *IVObject::propertyTemplaceConfig() const
+{
+    return IVPropertyTemplateConfig::instance();
 }
 
 bool IVObject::isFixedSystemElement() const

@@ -370,7 +370,7 @@ void tst_AttributesConfigure::tst_attrValidators()
     QVERIFY(attrTemplate.validate(&provIface));
 
     attrTemplate.setScopes(int(ivm::IVPropertyTemplate::Scope::Required_Interface));
-    QVERIFY(attrTemplate.validate(&reqIface));
+    QVERIFY(!attrTemplate.validate(&reqIface));
     reqIface.setKind(ivm::IVInterface::OperationKind::Cyclic);
     QVERIFY(!attrTemplate.validate(&reqIface));
     reqIface.setKind(ivm::IVInterface::OperationKind::Any);

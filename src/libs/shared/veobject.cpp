@@ -17,6 +17,9 @@
 
 #include "veobject.h"
 
+#include "errorhub.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
 #include "vemodel.h"
 
 #include <QScopedValueRollback>
@@ -265,6 +268,29 @@ void VEObject::setModel(VEModel *model)
 VEModel *VEObject::model() const
 {
     return d->m_model;
+}
+
+bool VEObject::postInit()
+{
+    if (auto dynPropConfig = propertyTemplaceConfig()) {
+        for (const auto attr : dynPropConfig->propertyTemplatesForObject(this)) {
+            if (attr->validate(this) && !attr->isOptional() && !hasEntityAttribute(attr->name())) {
+                const QVariant &defaultValue = attr->defaultValue();
+                if (!defaultValue.isNull()) {
+                    if (attr->info() == PropertyTemplate::Info::Attribute) {
+                        setEntityAttribute(attr->name(), defaultValue);
+                    } else if (attr->info() == PropertyTemplate::Info::Property) {
+                        setEntityProperty(attr->name(), defaultValue);
+                    } else {
+                        QMetaEnum metaEnum = QMetaEnum::fromType<shared::PropertyTemplate::Info>();
+                        ErrorHub::addError(ErrorItem::Warning,
+                                tr("Unknown dynamic property info: %1").arg(metaEnum.valueToKey(int(attr->info()))));
+                    }
+                }
+            }
+        }
+    }
+    return true;
 }
 
 QString toString(VEObject *object)
