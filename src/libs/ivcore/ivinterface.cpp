@@ -120,10 +120,9 @@ struct IVInterfacePrivate {
 
 IVInterface::IVInterface(IVObject::Type ifaceType, const CreationInfo &ci)
     : IVObject(ifaceType, ci.function, ci.toBeCloned ? shared::createId() : ci.id)
-    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType
-                      ? ci.type
-                      : Type::RequiredInterface == ifaceType ? IVInterface::InterfaceType::Required
-                                                             : IVInterface::InterfaceType::Provided))
+    , d(new IVInterfacePrivate(Type::InterfaceGroup == ifaceType ? ci.type
+                      : Type::RequiredInterface == ifaceType     ? IVInterface::InterfaceType::Required
+                                                                 : IVInterface::InterfaceType::Provided))
 {
     setKind(ci.kind);
     setLayerName(ci.layer != nullptr ? ci.layer->title() : IVConnectionLayerType::DefaultLayerName);
@@ -166,35 +165,30 @@ bool IVInterface::postInit()
         return IVObject::postInit();
     }
 
-    if(fn->entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString() == 
-        meta::Props::token(meta::Props::Token::QGenC))
-    {
+    if (fn->entityAttributeValue(meta::Props::token(meta::Props::Token::language)).toString()
+            == meta::Props::token(meta::Props::Token::QGenC)) {
         setEntityAttribute(meta::Props::token(meta::Props::Token::is_simulink_interface), true);
     }
 
     bool isSimulinkInterfaceTypeAttrPresent = false;
-    for(QString key : entityAttributes().keys())
-    {
-        if(key == meta::Props::token(meta::Props::Token::simulink_interface_type))
-        {
+    for (QString key : entityAttributes().keys()) {
+        if (key == meta::Props::token(meta::Props::Token::simulink_interface_type)) {
             isSimulinkInterfaceTypeAttrPresent = true;
             break;
         }
     }
 
-    if (entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::is_simulink_interface)) == false ||
-        !isSimulinkInterfaceTypeAttrPresent ||
-        entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::simulink_interface_type)) ==
-            meta::Props::token(meta::Props::Token::Full))
-    {
+    if (entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::is_simulink_interface)) == false
+            || !isSimulinkInterfaceTypeAttrPresent
+            || entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::simulink_interface_type))
+                    == meta::Props::token(meta::Props::Token::Full)) {
         removeEntityAttribute(meta::Props::token(meta::Props::Token::simulink_full_interface_ref));
     }
 
-    if(entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::is_simulink_interface)) == true &&
-       !isSimulinkInterfaceTypeAttrPresent)
-    {
+    if (entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::is_simulink_interface)) == true
+            && !isSimulinkInterfaceTypeAttrPresent) {
         setEntityAttribute(meta::Props::token(meta::Props::Token::simulink_interface_type),
-                           QVariant(meta::Props::token(meta::Props::Token::Full)));
+                QVariant(meta::Props::token(meta::Props::Token::Full)));
     }
 
     const QString prototypeName =
@@ -307,7 +301,7 @@ IVInterface::OperationKind IVInterface::kind() const
 
 bool IVInterface::setKind(IVInterface::OperationKind k)
 {
-    if (this->kind() != k || !hasEntityAttribute(meta::Props::token(meta::Props::Token::kind))) {
+    if (this->kind() != k) {
         setEntityAttribute(meta::Props::token(meta::Props::Token::kind), kindToString(k));
         return true;
     }

@@ -95,7 +95,18 @@ EntityAttribute VEObject::entityAttribute(const QString &name) const
 QVariant VEObject::entityAttributeValue(const QString &name, const QVariant &defaultValue) const
 {
     const EntityAttribute attr = entityAttribute(name);
-    return attr.isNull() ? defaultValue : attr.value();
+    if (!attr.isNull())
+        return attr.value();
+
+    if (!defaultValue.isNull())
+        return defaultValue;
+
+    return defaultEntityAttributeValue(name);
+}
+
+QVariant VEObject::defaultEntityAttributeValue(const QString &name) const
+{
+    return {};
 }
 
 void VEObject::removeEntityAttribute(const QString &attributeName)

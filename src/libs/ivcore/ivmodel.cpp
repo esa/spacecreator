@@ -19,11 +19,11 @@
 
 #include "common.h"
 #include "errorhub.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
-#include "ivarchetypelibraryreference.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 
@@ -49,7 +49,7 @@ IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedM
     d->m_layersModel = nullptr;
 }
 
-IVModel::~IVModel() {}
+IVModel::~IVModel() { }
 
 bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
@@ -58,21 +58,18 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
             d->m_visibleObjects.append(ivObj);
 
             for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(ivObj)) {
-                if (attr->validate(ivObj) && !attr->isOptional()) {
-                    const QVariant &currentValue = obj->entityAttributeValue(attr->name());
-                    if (currentValue.isNull()) {
-                        const QVariant &defaultValue = attr->defaultValue();
-                        if (!defaultValue.isNull()) {
-                            if (attr->info() == ivm::IVPropertyTemplate::Info::Attribute) {
-                                obj->setEntityAttribute(attr->name(), defaultValue);
-                            } else if (attr->info() == ivm::IVPropertyTemplate::Info::Property) {
-                                obj->setEntityProperty(attr->name(), defaultValue);
-                            } else {
-                                QMetaEnum metaEnum = QMetaEnum::fromType<shared::PropertyTemplate::Info>();
-                                shared::ErrorHub::addError(shared::ErrorItem::Warning,
-                                        tr("Unknown dynamic property info: %1")
-                                                .arg(metaEnum.valueToKey(int(attr->info()))));
-                            }
+                if (attr->validate(ivObj) && !attr->isOptional() && !obj->hasEntityAttribute(attr->name())) {
+                    const QVariant &defaultValue = attr->defaultValue();
+                    if (!defaultValue.isNull()) {
+                        if (attr->info() == ivm::IVPropertyTemplate::Info::Attribute) {
+                            obj->setEntityAttribute(attr->name(), defaultValue);
+                        } else if (attr->info() == ivm::IVPropertyTemplate::Info::Property) {
+                            obj->setEntityProperty(attr->name(), defaultValue);
+                        } else {
+                            QMetaEnum metaEnum = QMetaEnum::fromType<shared::PropertyTemplate::Info>();
+                            shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                                    tr("Unknown dynamic property info: %1")
+                                            .arg(metaEnum.valueToKey(int(attr->info()))));
                         }
                     }
                 }
@@ -228,8 +225,8 @@ IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
 
 IVFunctionType *IVModel::getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(d->m_sharedTypesModel->getObjectByName(
-                                           name, IVObject::Type::FunctionType, caseSensitivity))
+    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(
+                   d->m_sharedTypesModel->getObjectByName(name, IVObject::Type::FunctionType, caseSensitivity))
                                  : nullptr;
 }
 

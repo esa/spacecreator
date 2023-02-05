@@ -21,6 +21,8 @@
 #include "ivcoreutils.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
+#include "ivpropertytemplate.h"
+#include "ivpropertytemplateconfig.h"
 
 #include <QPointer>
 #include <QVector>
@@ -166,6 +168,15 @@ QVariantList IVObject::generateProperties(bool isProperty) const
     });
 
     return result;
+}
+
+QVariant IVObject::defaultEntityAttributeValue(const QString &name) const
+{
+    if (const shared::PropertyTemplate *propTemplate =
+                    IVPropertyTemplateConfig::instance()->propertyTemplateForObject(this, name)) {
+        return propTemplate->defaultValue();
+    }
+    return {};
 }
 
 IVObject::Type IVObject::type() const

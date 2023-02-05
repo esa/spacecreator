@@ -113,6 +113,8 @@ public:
 
     QVariantList generateProperties(bool isProperty) const override;
 
+    QVariant defaultEntityAttributeValue(const QString &name) const override;
+
 Q_SIGNALS:
     void urlChanged(const QString &url);
     void titleChanged(const QString &title);

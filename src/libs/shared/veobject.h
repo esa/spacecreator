@@ -65,6 +65,7 @@ public:
     }
 
     QVariant entityAttributeValue(const QString &name, const QVariant &defaultValue = QVariant()) const;
+    virtual QVariant defaultEntityAttributeValue(const QString &name) const;
 
     void removeEntityAttribute(const QString &attributeName);
     bool hasEntityAttribute(const QString &attributeName, const QVariant &value = QVariant()) const;
