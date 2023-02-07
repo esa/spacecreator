@@ -205,8 +205,6 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
         break;
     }
     default:
-        if (auto fn = entity()->as<const ivm::IVFunction *>())
-            editable = !fn->inheritsFunctionType();
         break;
     }
 
@@ -239,28 +237,28 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
         }
     }
 
-    ivm::IVInterfaceProvided* interface = obj->as<ivm::IVInterfaceProvided*>();
+    ivm::IVInterfaceProvided *interface = obj->as<ivm::IVInterfaceProvided *>();
 
-    if(interface == nullptr)
-    {
+    if (interface == nullptr) {
         return;
     }
 
-    if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_simulink_interface)) == true)
-    {
-        ivm::IVFunction* function = interface->function()->as<ivm::IVFunction*>();
-        if(function == nullptr)
-        {
+    if (interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_simulink_interface))
+            == true) {
+        ivm::IVFunction *function = interface->function()->as<ivm::IVFunction *>();
+        if (function == nullptr) {
             return;
         }
 
         QStringList interfacesTitles;
         auto interfaces = function->interfaces();
         for (auto *const interface : interfaces) {
-            if(interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_simulink_interface)) == true &&
-                interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::simulink_interface_type)).toString() ==
-                ivm::meta::Props::token(ivm::meta::Props::Token::Full))
-            {
+            if (interface->entityAttributeValue(ivm::meta::Props::token(ivm::meta::Props::Token::is_simulink_interface))
+                            == true
+                    && interface->entityAttributeValue(
+                                        ivm::meta::Props::token(ivm::meta::Props::Token::simulink_interface_type))
+                                    .toString()
+                            == ivm::meta::Props::token(ivm::meta::Props::Token::Full)) {
                 interfacesTitles.append(QString(interface->title()));
             }
         }
@@ -268,17 +266,17 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
         for (int i = 0; i < rowCount(); i++) {
             QStandardItem *titleItem = item(i, Column::Name);
 
-            if (titleItem->data(Roles::DataRole) == ivm::meta::Props::token(ivm::meta::Props::Token::simulink_full_interface_ref)) {
+            if (titleItem->data(Roles::DataRole)
+                    == ivm::meta::Props::token(ivm::meta::Props::Token::simulink_full_interface_ref)) {
                 QStandardItem *itemObj = item(i, Column::Value);
                 itemObj->setData(QVariant(interfacesTitles), Roles::EditRole);
             }
         }
-    }
-    else
-    {
+    } else {
         for (int i = 0; i < rowCount(); i++) {
             QStandardItem *titleItem = item(i, Column::Name);
-            QString simulinkFullRefAttrName = ivm::meta::Props::token(ivm::meta::Props::Token::simulink_full_interface_ref);
+            QString simulinkFullRefAttrName =
+                    ivm::meta::Props::token(ivm::meta::Props::Token::simulink_full_interface_ref);
 
             if (titleItem->data(Roles::DataRole) == simulinkFullRefAttrName) {
                 removeRow(i);
@@ -286,8 +284,6 @@ void InterfacePropertiesListModel::setDataObject(shared::VEObject *obj)
             }
         }
     }
-
-
 }
 
 QVariant InterfacePropertiesListModel::data(const QModelIndex &index, int role) const
