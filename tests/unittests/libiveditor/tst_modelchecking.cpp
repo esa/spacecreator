@@ -61,7 +61,7 @@ void tst_ModelChecking::tst_spinConfigReadWrite()
     spinConfigInput.supportReal = true;
     spinConfigInput.deltaValue = 0.1;
 
-    XmelWriter writer({}, {}, { "DummyFunction" }, {}, spinConfigInput);
+    XmelWriter writer({}, {}, { "DummyFunction" }, { "DummyFunction" }, {}, spinConfigInput);
     Q_ASSERT(writer.writeFile(&configFile, configFilePath));
     configFile.close();
 
@@ -110,7 +110,7 @@ void tst_ModelChecking::tst_spinConfigEmptyFields()
     spinConfigInput.deltaValue = std::nullopt;
     spinConfigInput.supportReal = false;
 
-    XmelWriter writer({}, {}, { "DummyFunction" }, {}, spinConfigInput);
+    XmelWriter writer({}, {}, { "DummyFunction" }, { "DummyFunction" }, {}, spinConfigInput);
     Q_ASSERT(writer.writeFile(&configFile, configFilePath));
     configFile.close();
 

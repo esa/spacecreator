@@ -61,6 +61,7 @@ private Q_SLOTS:
     QStringList getSubtypesSelection();
     void listModelFunctions(QTreeWidgetItem *parentWidgetItem, QStringList preSelection);
     QStringList getFunctionsSelection();
+    QStringList getAllFunctions();
     void listResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
     void listSpinResults(QTreeWidgetItem *parentWidgetItem, QFileInfo &parent);
     void on_treeWidget_properties_itemChanged(QTreeWidgetItem *item, int column);

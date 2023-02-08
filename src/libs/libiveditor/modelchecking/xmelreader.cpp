@@ -29,6 +29,7 @@ struct XmelReader::IFConfig {
     QString timeLimit { "" };
     QString maxEnvironmentCalls { "" };
     QString explorationAlgorithm { "" };
+    QString timeRepresentation { "" };
     QString maxStates { "" };
 };
 
@@ -154,20 +155,22 @@ bool XmelReader::readSubtyping()
 
 bool XmelReader::readSubmodel()
 {
-    Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("Submodel"));
-
-    functionsSelected.clear();
-
     bool hasFunction = false;
 
     while (xml.readNextStartElement()) {
-        if (xml.name() == QLatin1String("Function")) {
-            Q_ASSERT(xml.attributes().hasAttribute("name"));
-            functionsSelected.append(xml.attributes().value("name").toString());
-            hasFunction = true;
-            xml.skipCurrentElement();
-        } else {
-            xml.skipCurrentElement();
+        Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("Functions_Kept"));
+
+        functionsSelected.clear();
+
+        while (xml.readNextStartElement()) {
+            if (xml.name() == QLatin1String("FunctionKept")){
+                Q_ASSERT(xml.attributes().hasAttribute("name"));
+                functionsSelected.append(xml.attributes().value("name").toString());
+                hasFunction = true;
+                xml.skipCurrentElement();
+            } else {
+                xml.skipCurrentElement();
+            }
         }
     }
 
@@ -192,6 +195,7 @@ bool XmelReader::readIfModelChecker()
     Q_ASSERT(xml.attributes().hasAttribute("timelimit"));
     Q_ASSERT(xml.attributes().hasAttribute("maxenvironmentcalls"));
     Q_ASSERT(xml.attributes().hasAttribute("explorationalgorithm"));
+    Q_ASSERT(xml.attributes().hasAttribute("timerepresentation"));
     Q_ASSERT(xml.attributes().hasAttribute("maxstates"));
     ifConfig->maxScenarios = xml.attributes().value("maxscenarios").toString();
     ifConfig->errorScenarios = xml.attributes().value("errorscenarios").toString();
@@ -199,6 +203,7 @@ bool XmelReader::readIfModelChecker()
     ifConfig->timeLimit = xml.attributes().value("timelimit").toString();
     ifConfig->maxEnvironmentCalls = xml.attributes().value("maxenvironmentcalls").toString();
     ifConfig->explorationAlgorithm = xml.attributes().value("explorationalgorithm").toString();
+    ifConfig->timeRepresentation = xml.attributes().value("timerepresentation").toString();
     ifConfig->maxStates = xml.attributes().value("maxstates").toString();
 
     xml.skipCurrentElement();
@@ -232,6 +237,7 @@ QStringList XmelReader::getIfConfig()
     res.append(ifConfig->timeLimit);
     res.append(ifConfig->maxEnvironmentCalls);
     res.append(ifConfig->explorationAlgorithm);
+    res.append(ifConfig->timeRepresentation);
     res.append(ifConfig->maxStates);
 
     return res;

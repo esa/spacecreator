@@ -26,8 +26,9 @@
 class XmelWriter
 {
 public:
-    explicit XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected,
-                        QStringList ifConfiguration, ive::SpinConfigData spinConfiguration);
+    explicit XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList allFunctions, 
+                        QStringList functionsSelected,  QStringList ifConfiguration, ive::SpinConfigData spinConfiguration);
+
     bool writeFile(QIODevice *device, QString fileName);
 
 private:
@@ -37,6 +38,7 @@ private:
     QStringList propertiesSelected;
     QStringList subtypesSelected;
     QStringList functionsSelected;
+    QStringList allFunctions;
 
     struct IFConfig;
     IFConfig *ifConfig;

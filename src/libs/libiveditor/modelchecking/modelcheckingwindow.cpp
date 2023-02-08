@@ -255,6 +255,7 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     kazooCallerProcess->setWorkingDirectory(this->projectDir + "/");
     if (kazooCallerProcess->execute(kazooCmd, kazooArguments) != 0) {
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
+
     }
 }
 
@@ -1285,6 +1286,20 @@ QStringList ModelCheckingWindow::getFunctionsSelection()
 }
 
 /*!
+ * \brief ModelCheckingWindow::getAllFunctions Saves all model Functions.
+ * \return The list 'functions' with the names of the Functions.
+*/
+QStringList ModelCheckingWindow::getAllFunctions(){
+    QStringList functions = {};
+    for (int i = 0; i < this->functionsTopNodeWidgetItem->childCount(); i++)
+    {
+        QTreeWidgetItem *child = this->functionsTopNodeWidgetItem->child(i);
+        functions.append(child->text(0));
+    }
+    return functions;
+}
+
+/*!
  * \brief ModelCheckingWindow::addSubtypes Presents the user with a dialog to provide a new subtyping file name,
  * generates the subtyping file and then adds its node to the subtypes tree.
  */
@@ -1501,6 +1516,7 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     QStringList propsSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
     QStringList subtypesSelection = getSubtypesSelection();
     QStringList functionSelection = getFunctionsSelection();
+    QStringList allFunctions = getAllFunctions();
 
     // check if current configuration is valid
     QString warningMsg = "Current invalid configuration.";
@@ -1532,12 +1548,13 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     ifOptions.append(d->ui->lineEdit_timeLimit->text());
     ifOptions.append(d->ui->lineEdit_maxNumEnvRICalls->text());
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
+    ifOptions.append(d->ui->comboBox_timerepresentation->currentText() == "Discrete" ? "discrete" : "dense");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
 
     SpinConfigData spinConfigData = readSpinConfigFromUI();
-
-    XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions, spinConfigData);
-    if (writer.writeFile(&configFile, configurationFileName)) {
+    
+    XmelWriter writer(propsSelection, subtypesSelection, allFunctions, functionSelection, ifOptions, spinConfigData);
+    if (writer.writeFile(&configFile, configurationFileName)){
         statusBar()->showMessage("Configuration file saved as " + configurationFileName, 6000);
     } else {
         QMessageBox::warning(this, tr("Save configuration"), "Error when writing to file.");
@@ -1567,6 +1584,7 @@ bool ModelCheckingWindow::saveConfiguration()
     QStringList propsSelection = getPropertiesSelection(this->propertiesTopDirWidgetItem, {});
     QStringList subtypesSelection = getSubtypesSelection();
     QStringList functionSelection = getFunctionsSelection();
+    QStringList allFunctions = getAllFunctions();
 
     // check if current configuration is valid
     QString warningMsg = "Current invalid configuration.";
@@ -1598,12 +1616,13 @@ bool ModelCheckingWindow::saveConfiguration()
     ifOptions.append(d->ui->lineEdit_timeLimit->text());
     ifOptions.append(d->ui->lineEdit_maxNumEnvRICalls->text());
     ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
+    ifOptions.append(d->ui->comboBox_timerepresentation->currentText() == "Discrete" ? "discrete" : "dense");
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
 
     SpinConfigData spinConfigData = readSpinConfigFromUI();
 
-    XmelWriter writer(propsSelection, subtypesSelection, functionSelection, ifOptions, spinConfigData);
-    if (writer.writeFile(&file, fileName + ".xml")) {
+    XmelWriter writer(propsSelection, subtypesSelection, allFunctions, functionSelection, ifOptions, spinConfigData);
+    if (writer.writeFile(&file, fileName + ".xml")){
         return true;
     } else {
         QMessageBox::warning(this, tr("Save configuration"), "Error when writing to file.");
@@ -1664,14 +1683,17 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
 
     // set IF config params
     d->ui->lineEdit_maxNumScenarios->setText(reader.getIfConfig().at(0));
+    
     reader.getIfConfig().at(1) == "true" ? d->ui->checkBox_errorScenarios->setCheckState(Qt::Checked)
                                          : d->ui->checkBox_errorScenarios->setCheckState(Qt::Unchecked);
     reader.getIfConfig().at(2) == "true" ? d->ui->checkBox_successScenarios->setCheckState(Qt::Checked)
                                          : d->ui->checkBox_successScenarios->setCheckState(Qt::Unchecked);
     d->ui->lineEdit_timeLimit->setText(reader.getIfConfig().at(3));
     d->ui->lineEdit_maxNumEnvRICalls->setText(reader.getIfConfig().at(4));
-    reader.getIfConfig().at(5) == "dfs" ? d->ui->comboBox_expAlgorithm->setCurrentIndex(0)
+    reader.getIfConfig().at(5) == "dfs" ? d->ui->comboBox_expAlgorithm->setCurrentIndex(0) 
                                         : d->ui->comboBox_expAlgorithm->setCurrentIndex(1);
+    reader.getIfConfig().at(7) == "discrete" ? d->ui->comboBox_timerepresentation->setCurrentIndex(0) 
+                                             : d->ui->comboBox_timerepresentation->setCurrentIndex(1);
     d->ui->lineEdit_maxNumStates->setText(reader.getIfConfig().at(6));
 
     setSpinConfigParams(reader.getSpinConfig());

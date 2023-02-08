@@ -25,20 +25,23 @@ struct XmelWriter::IFConfig {
     QString timeLimit { "" };
     QString maxEnvironmentCalls { "" };
     QString explorationAlgorithm { "" };
+    QString timeRepresentation { "" };
     QString maxStates { "" };
 };
 
-XmelWriter::XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList functionsSelected,
+
+XmelWriter::XmelWriter(QStringList propertiesSelected, QStringList subtypesSelected, QStringList allFunctions, QStringList functionsSelected,
                        QStringList ifConfiguration, ive::SpinConfigData spinConfiguration)
     : propertiesSelected(propertiesSelected)
     , subtypesSelected(subtypesSelected)
+    , allFunctions(allFunctions)
     , functionsSelected(functionsSelected)
     , ifConfig(new IFConfig)
     , spinConfigData(spinConfiguration)
 {
     xml.setAutoFormatting(true);
 
-    constexpr int IFCONFIG_SIZE = 6;
+    constexpr int IFCONFIG_SIZE = 7;
     if (ifConfiguration.length() > IFCONFIG_SIZE) {
         ifConfig->maxScenarios = ifConfiguration.at(0);
         ifConfig->errorScenarios = ifConfiguration.at(1);
@@ -46,7 +49,8 @@ XmelWriter::XmelWriter(QStringList propertiesSelected, QStringList subtypesSelec
         ifConfig->timeLimit = ifConfiguration.at(3);
         ifConfig->maxEnvironmentCalls = ifConfiguration.at(4);
         ifConfig->explorationAlgorithm = ifConfiguration.at(5);
-        ifConfig->maxStates = ifConfiguration.at(6);
+        ifConfig->timeRepresentation = ifConfiguration.at(6);
+        ifConfig->maxStates = ifConfiguration.at(7);
     }
 }
 
@@ -78,9 +82,15 @@ bool XmelWriter::writeFile(QIODevice *device, QString fileName)
     //}
 
     xml.writeStartElement("Submodel");
-    for (int i = 0; i < functionsSelected.size(); ++i) {
-        writeItem(functionsSelected.at(i), "Function");
+
+    for (int i = 0; i < allFunctions.size(); ++i){
+            writeItem(allFunctions.at(i), "Function");
     }
+    xml.writeStartElement("Kept_Functions");
+    for (int i = 0; i < functionsSelected.size(); ++i){
+            writeItem(functionsSelected.at(i), "FunctionKept");
+    }
+    xml.writeEndElement();
     xml.writeEndElement();
 
     // closing Configuration
@@ -98,6 +108,7 @@ bool XmelWriter::writeFile(QIODevice *device, QString fileName)
     xml.writeAttribute("timelimit", ifConfig->timeLimit);
     xml.writeAttribute("maxenvironmentcalls", ifConfig->maxEnvironmentCalls);
     xml.writeAttribute("explorationalgorithm", ifConfig->explorationAlgorithm);
+    xml.writeAttribute("timerepresentation", ifConfig->timeRepresentation);
     xml.writeAttribute("maxstates", ifConfig->maxStates);
     xml.writeEndElement();
 
@@ -123,6 +134,8 @@ void XmelWriter::writeItem(QString str, QString type)
         xml.writeAttribute("name", str);
     } else if (type == "Function") {
         xml.writeAttribute("name", str);
+    } else if (type == "FunctionKept"){
+            xml.writeAttribute("name", str);
     }
     xml.writeEndElement();
 }
