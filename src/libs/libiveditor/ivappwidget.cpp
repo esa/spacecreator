@@ -400,6 +400,53 @@ void IVAppWidget::onItemCreated(const shared::Id &id)
     showPropertyEditor(id);
 }
 
+void IVAppWidget::onRootObjectChanged(const shared::Id &rootId)
+{
+    QList<shared::BreadcrumbWidget::Level> levels;
+    if (ivm::IVObject *object = m_document->objectsModel()->getObject(rootId)) {
+        Q_ASSERT(object->isFunction());
+        auto function = object->as<const ivm::IVFunctionType *>();
+        if (!function)
+            return;
+        levels.append({ function->id().toString(), function->titleUI() });
+        while ((function = function->parentObject()->as<const ivm::IVFunctionType *>())) {
+            levels.prepend({ function->id().toString(), function->titleUI() });
+        }
+    }
+    m_breadCrumb->setLevels(levels);
+
+    if (m_actExitToRoot) {
+        m_actExitToRoot->setEnabled(nullptr != m_document->objectsModel()->rootObject());
+    }
+    if (m_actExitToParent) {
+        m_actExitToParent->setEnabled(nullptr != m_document->objectsModel()->rootObject());
+    }
+    centerView();
+}
+
+void IVAppWidget::checkActionsFromSelection()
+{
+    const QModelIndexList idxs = m_document->objectsSelectionModel()->selectedIndexes();
+    m_actRemove->setEnabled(!idxs.isEmpty());
+    auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
+        return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
+                == static_cast<int>(ivm::IVObject::Type::Connection);
+    });
+    m_actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
+
+    it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
+        return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
+                == static_cast<int>(ivm::IVObject::Type::ConnectionGroup);
+    });
+    m_actUngroupConnection->setEnabled(it != std::cend(idxs));
+
+    const auto count = std::count_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
+        return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
+                == static_cast<int>(ivm::IVObject::Type::Function);
+    });
+    m_actEnterNestedView->setEnabled(count == 1);
+}
+
 void IVAppWidget::pasteItems()
 {
     const QPoint viewportCursorPos = graphicsView()->viewport()->mapFromGlobal(QCursor::pos());
@@ -635,50 +682,11 @@ QVector<QAction *> IVAppWidget::initActions()
         m_actUngroupConnection, m_actRemove, m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent,
         m_actEnterNestedView, m_actShrinkScene };
 
-    connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, [this](const shared::Id &rootId) {
-        QList<shared::BreadcrumbWidget::Level> levels;
-        if (ivm::IVObject *object = m_document->objectsModel()->getObject(rootId)) {
-            Q_ASSERT(object->isFunction());
-            auto function = object->as<const ivm::IVFunctionType *>();
-            if (!function)
-                return;
-            levels.append({ function->id().toString(), function->titleUI() });
-            while ((function = function->parentObject()->as<const ivm::IVFunctionType *>())) {
-                levels.prepend({ function->id().toString(), function->titleUI() });
-            }
-        }
-        m_breadCrumb->setLevels(levels);
-
-        if (m_actExitToRoot) {
-            m_actExitToRoot->setEnabled(nullptr != m_document->objectsModel()->rootObject());
-        }
-        if (m_actExitToParent) {
-            m_actExitToParent->setEnabled(nullptr != m_document->objectsModel()->rootObject());
-        }
-        centerView();
-    });
+    connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, &IVAppWidget::onRootObjectChanged);
     connect(m_document->objectsSelectionModel(), &QItemSelectionModel::selectionChanged, this,
-            [this](const QItemSelection &selected, const QItemSelection &deselected) {
-                const QModelIndexList idxs = m_document->objectsSelectionModel()->selectedIndexes();
-                m_actRemove->setEnabled(!idxs.isEmpty());
-                auto it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
-                    return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
-                            == static_cast<int>(ivm::IVObject::Type::Connection);
-                });
-                m_actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
+            &IVAppWidget::checkActionsFromSelection);
+    checkActionsFromSelection();
 
-                it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
-                    return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
-                            == static_cast<int>(ivm::IVObject::Type::ConnectionGroup);
-                });
-                m_actUngroupConnection->setEnabled(it != std::cend(idxs));
-
-                const auto count = std::count_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
-                    return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
-                            == static_cast<int>(ivm::IVObject::Type::Function);
-                });
-                m_actEnterNestedView->setEnabled(count == 1);
-            });
     return m_toolbarActions;
 }
 

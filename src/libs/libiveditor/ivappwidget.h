@@ -74,6 +74,8 @@ private Q_SLOTS:
     void enterNestedView(const shared::Id &id);
     void onItemDoubleClicked(const shared::Id &id);
     void onItemCreated(const shared::Id &id);
+    void onRootObjectChanged(const shared::Id &rootId);
+    void checkActionsFromSelection();
 
 private:
     void initGraphicsView();
