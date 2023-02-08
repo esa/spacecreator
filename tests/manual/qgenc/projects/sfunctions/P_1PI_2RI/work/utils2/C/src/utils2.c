@@ -7,15 +7,12 @@
     !! the procedures corresponding to the provided interfaces in this  !!
     !! file. The up-to-date signatures can be found in the .ads file.   !!
 */
-#include "utils2.h"
-//#include <stdio.h>
 
+#include "utils2.h"
 
 void utils2_startup(void)
 {
-   // Write your initialisation code
-   // You may call sporadic required interfaces and start timers
-   // puts ("[utils2] Startup");
+
 }
 
 void utils2_PI_calc2
@@ -37,5 +34,3 @@ void utils2_PI_calc2
     *OUT_cala2out4 = (*IN_calc2in4);
     *OUT_cala2out5 = (*IN_calc2in5);
 }
-
-

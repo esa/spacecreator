@@ -7,14 +7,12 @@
     !! the procedures corresponding to the provided interfaces in this  !!
     !! file. The up-to-date signatures can be found in the .ads file.   !!
 */
+
 #include "utils.h"
-//#include <stdio.h>
 
 void utils_startup(void)
 {
-   // Write your initialisation code
-   // You may call sporadic required interfaces and start timers
-   // puts ("[utils] Startup");
+
 }
 
 void utils_PI_calc

@@ -7,14 +7,13 @@
     !! the procedures corresponding to the provided interfaces in this  !!
     !! file. The up-to-date signatures can be found in the .ads file.   !!
 */
+
 #include "controller2.h"
 #include <stdio.h>
 
 void controller2_startup(void)
 {
-   // Write your initialisation code
-   // You may call sporadic required interfaces and start timers
-   // puts ("[controller2] Startup");
+
 }
 
 void controller2_PI_trigger2(void)
@@ -56,5 +55,3 @@ void controller2_PI_trigger2(void)
         printf("FAILED !");
     }
 }
-
-

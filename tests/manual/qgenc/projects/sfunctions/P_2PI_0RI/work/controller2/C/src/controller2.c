@@ -7,14 +7,13 @@
     !! the procedures corresponding to the provided interfaces in this  !!
     !! file. The up-to-date signatures can be found in the .ads file.   !!
 */
+
 #include "controller2.h"
 #include <stdio.h>
 
 void controller2_startup(void)
 {
-   // Write your initialisation code
-   // You may call sporadic required interfaces and start timers
-   // puts ("[controller2] Startup");
+
 }
 
 void controller2_PI_trigger2(void)
@@ -32,7 +31,7 @@ void controller2_PI_trigger2(void)
     asn1SccMySeq2     out5;
 
     controller2_RI_iface2( &in1, &in2, &in3, &in4, &in5,
-                         &out1, &out2, &out3, &out4, &out5);
+                           &out1, &out2, &out3, &out4, &out5);
 
     printf("controller2 out1 : %lu\n", out1);
     printf("controller2 out2 : %f\n", out2);
@@ -56,5 +55,3 @@ void controller2_PI_trigger2(void)
         printf("FAILED !");
     }
 }
-
-
