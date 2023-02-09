@@ -29,7 +29,7 @@ namespace msc {
 
 class MscChart;
 class MscModel;
-class ChartLayoutManager;
+class StreamingLayoutManager;
 
 class RemoteControlHandler : public QObject
 {
@@ -39,7 +39,7 @@ public:
 
     void setMscModel(MscModel *model);
     void setUndoStack(QUndoStack *undoStack);
-    void setLayoutManager(ChartLayoutManager *layoutManager);
+    void setLayoutManager(StreamingLayoutManager *layoutManager);
     void setChart(msc::MscChart *mscChart);
 
 public Q_SLOTS:
@@ -62,7 +62,7 @@ private:
     bool saveMsc(const QString &fileName, const QString &asn1FileName);
 
     QPointer<MscModel> m_mscModel;
-    QPointer<ChartLayoutManager> m_layoutManager;
+    QPointer<StreamingLayoutManager> m_layoutManager;
     QPointer<QUndoStack> m_undoStack;
     QPointer<msc::MscChart> m_mscChart;
 };

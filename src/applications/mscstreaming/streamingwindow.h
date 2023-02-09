@@ -42,10 +42,14 @@ public:
 
 private Q_SLOTS:
     void adaptWindowSizeToChart(const QRectF &rect);
+    void syncInstances();
+    void checkInstancesVisibility();
 
 private:
     QScreen *screen() const;
     void closeEvent(QCloseEvent *e) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
+    void scrollToBottom();
 
     struct StreamingWindowPrivate;
     std::unique_ptr<StreamingWindowPrivate> const d;

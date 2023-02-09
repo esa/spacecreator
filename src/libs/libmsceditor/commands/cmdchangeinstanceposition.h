@@ -32,6 +32,7 @@ class CmdChangeInstancePosition : public BaseCommand
 {
     Q_OBJECT
 public:
+    explicit CmdChangeInstancePosition(MscInstance *instance, const QRectF &newBox);
     explicit CmdChangeInstancePosition(MscInstance *instance, const QVector<QPoint> &newCif);
 
     void redo() override;

@@ -39,7 +39,7 @@
 
 namespace msc {
 
-QPointF ChartItem::m_margin = { CHART_BOX_ARGIN, CHART_BOX_ARGIN };
+QPointF ChartItem::m_margin = { CHART_BOX_MARGIN, CHART_BOX_MARGIN };
 
 /*!
  * \class msc::ChartItem
@@ -199,6 +199,11 @@ QRectF ChartItem::contentRect() const
     return m_contentArea->sceneBoundingRect();
 }
 
+/**
+ * Sets the size of the chart
+ * @param r the content rect in scene coordinates
+ * @param cifUpdate Controls if the cif data is stored to the model
+ */
 QPointF ChartItem::setContentRect(const QRectF &r, CifUpdatePolicy cifUpdate)
 {
     const QRectF &currContentRect = contentRect();

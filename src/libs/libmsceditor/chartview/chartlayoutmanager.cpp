@@ -70,7 +70,6 @@ struct ChartViewLayoutInfo {
         m_dynamicInstanceMarkers.clear();
         m_dynamicInstances.clear();
         m_pos = { 0., 0. };
-        m_instancesRect = QRectF();
 
         if (m_chartItem) {
             removeSceneItem(m_chartItem);
@@ -83,7 +82,6 @@ struct ChartViewLayoutInfo {
 
     QMap<MscInstance *, MessageItem *> m_dynamicInstances;
     QMap<MscInstance *, MessageItem *> m_dynamicInstanceMarkers;
-    QRectF m_instancesRect;
     QSizeF m_preferredBox;
     QPointF m_pos;
     qreal m_instancesCommonAxisOffset = 0.;
@@ -94,8 +92,12 @@ private:
 };
 
 struct ChartLayoutManagerPrivate {
-    ChartLayoutManagerPrivate() { }
+    explicit ChartLayoutManagerPrivate(ChartLayoutManager *manager)
+        : q(manager)
+    {
+    }
 
+    ChartLayoutManager *q;
     shared::ui::GraphicsSceneBase m_scene;
     QHash<QUuid, msc::InstanceItem *> m_instanceItems;
     QVector<msc::InstanceItem *> m_instanceItemsSorted;
@@ -103,25 +105,6 @@ struct ChartLayoutManagerPrivate {
     QVector<msc::InteractiveObject *> m_instanceEventItemsSorted;
 
     QPointer<msc::MscChart> m_currentChart = nullptr;
-    static qreal interMessageSpan()
-    {
-        static constexpr int interMessageSpanCIF { 40 };
-        static qreal interMessageSpanScene { 0. };
-        if (qFuzzyIsNull(interMessageSpanScene)) {
-            interMessageSpanScene = CoordinatesConverter::heightInScene(interMessageSpanCIF);
-        }
-        return interMessageSpanScene;
-    }
-
-    static qreal interInstanceSpan()
-    {
-        static constexpr int interInstanceSpanCIF { 500 };
-        static qreal interInstanceSpanScene { 0. };
-        if (qFuzzyIsNull(interInstanceSpanScene)) {
-            interInstanceSpanScene = CoordinatesConverter::heightInScene(interInstanceSpanCIF);
-        }
-        return interInstanceSpanScene;
-    }
 
     int m_visibleItemLimit = -1;
     QTimer m_layoutUpdateTimer;
@@ -136,7 +119,7 @@ struct ChartLayoutManagerPrivate {
             const int eventsCount = qMax(1,
                     m_visibleItemLimit == -1 ? m_currentChart->totalEventNumber()
                                              : qMin(m_visibleItemLimit, m_instanceEventItems.size()));
-            return eventsCount * (oneMessageHeight + interMessageSpan());
+            return eventsCount * (oneMessageHeight + q->interMessageSpan());
         }
 
         qreal height(0);
@@ -164,11 +147,14 @@ struct ChartLayoutManagerPrivate {
 
         return items;
     }
+
+private:
+    ChartLayoutManagerPrivate() { }
 };
 
 ChartLayoutManager::ChartLayoutManager(MscCommandsStack *undoStack, QObject *parent)
     : ChartLayoutManagerBase(undoStack, parent)
-    , d(new ChartLayoutManagerPrivate())
+    , d(new ChartLayoutManagerPrivate(this))
 {
     d->m_layoutUpdateTimer.setInterval(1);
     d->m_layoutUpdateTimer.setSingleShot(true);
@@ -254,6 +240,7 @@ void ChartLayoutManager::clearScene()
     setInstancesRect(QRectF());
 
     d->m_layoutInfo.clear();
+    setInstancesRect(QRectF());
 
     d->m_scene.clear();
 }
@@ -359,7 +346,7 @@ void ChartLayoutManager::doLayout()
     checkVerticalConstraints();
 
     qreal lastY = eventsBottom();
-    actualizeInstancesHeights(lastY + d->interMessageSpan());
+    actualizeInstancesHeights(lastY + interMessageSpan());
     updateChartboxToContent();
     connectItems();
 
@@ -392,7 +379,7 @@ void ChartLayoutManager::addInstanceItems()
         if (!item) {
             item = createDefaultInstanceItem(instance);
             if (lastItem) {
-                item->setPos(lastItem->sceneBoundingRect().topRight() + QPointF(d->interInstanceSpan(), 0.0));
+                item->setPos(lastItem->sceneBoundingRect().topRight() + QPointF(interInstanceSpan(), 0.0));
             }
             storeEntityItem(item);
 
@@ -487,7 +474,7 @@ void ChartLayoutManager::addInstanceEventItems()
             break;
         }
         case MscEntity::EntityType::Condition: {
-            addConditionItem(static_cast<MscCondition *>(instanceEvent), d->m_layoutInfo.m_instancesRect);
+            addConditionItem(static_cast<MscCondition *>(instanceEvent));
             break;
         }
         case MscEntity::EntityType::Comment: {
@@ -603,8 +590,8 @@ QRectF ChartLayoutManager::minimalContentRect() const
         return totalRect;
     };
 
-    const QRectF &events = effectiveRectEvents(d->m_instanceEventItemsSorted)
-                                   .adjusted(0, d->interMessageSpan(), 0, d->interMessageSpan());
+    const QRectF &events =
+            effectiveRectEvents(d->m_instanceEventItemsSorted).adjusted(0, interMessageSpan(), 0, interMessageSpan());
     QRectF instances = effectiveRectInstances(d->m_instanceItemsSorted);
     if (events.isNull()) {
         instances.setHeight(minHeight);
@@ -659,7 +646,7 @@ const QVector<InstanceItem *> &ChartLayoutManager::instanceItems() const
    Returns all instance event items
    \note The sorting is not necessarily in the correct (vertical) order
  */
-const QVector<InteractiveObject *> &ChartLayoutManager::instanceEventItems() const
+const QVector<InteractiveObject *> &ChartLayoutManager::allEventItems() const
 {
     return d->m_instanceEventItemsSorted;
 }
@@ -896,7 +883,7 @@ void ChartLayoutManager::updateCreatedInstanceHeight(InstanceItem *instanceItem,
     const qreal deltaY = createItem->head().y() - currentTargetY;
     instanceItem->moveSilentlyBy(QPointF(0.0, deltaY));
     const qreal height =
-            std::max(totalH - instanceItem->headerItem()->sceneBoundingRect().bottom(), d->interMessageSpan());
+            std::max(totalH - instanceItem->headerItem()->sceneBoundingRect().bottom(), interMessageSpan());
     instanceItem->setAxisHeight(height);
 }
 
@@ -1062,7 +1049,8 @@ int ChartLayoutManager::eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEv
    Returns the index of event for the given \p instance for the given position \pt.
    It checks the existing the event items along the
  */
-int ChartLayoutManager::eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent)
+int ChartLayoutManager::eventInstanceIndex(
+        const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent) const
 {
     int idx = 0;
     for (msc::InteractiveObject *item : qAsConst(d->m_instanceEventItemsSorted)) {
@@ -1092,65 +1080,13 @@ int ChartLayoutManager::eventInstanceIndex(const QPointF &pt, MscInstance *insta
     return idx;
 }
 
-MscInstanceEvent *ChartLayoutManager::eventAtPosition(const QPointF &scenePos)
+MscInstanceEvent *ChartLayoutManager::eventAtPosition(const QPointF &scenePos) const
 {
     for (auto eventItem : qAsConst(d->m_instanceEventItems)) {
         if (eventItem->sceneBoundingRect().contains(scenePos))
             return qobject_cast<MscInstanceEvent *>(eventItem->modelEntity());
     }
     return nullptr;
-}
-
-QVector<InteractiveObject *> ChartLayoutManager::instanceEventItems(MscInstance *instance) const
-{
-    if (!d->m_currentChart) {
-        return {};
-    }
-
-    QVector<InteractiveObject *> res;
-
-    const QVector<MscInstanceEvent *> events = currentChart()->eventsForInstance(instance);
-    for (MscInstanceEvent *event : events) {
-        switch (event->entityType()) {
-        case MscEntity::EntityType::Create:
-        case MscEntity::EntityType::Message: {
-            if (auto item = itemForMessage(static_cast<MscMessage *>(event))) {
-                res.append(item);
-            }
-            break;
-        }
-        case MscEntity::EntityType::Condition: {
-            if (auto item = itemForCondition(static_cast<MscCondition *>(event))) {
-                res.append(item);
-            }
-            break;
-        }
-        case MscEntity::EntityType::Action: {
-            if (auto item = itemForAction(static_cast<MscAction *>(event))) {
-                res.append(item);
-            }
-            break;
-        }
-        case MscEntity::EntityType::Timer: {
-            if (auto item = itemForTimer(static_cast<MscTimer *>(event))) {
-                res.append(item);
-            }
-            break;
-        }
-        case MscEntity::EntityType::Coregion: {
-            if (auto item = itemForCoregion(static_cast<MscCoregion *>(event))) {
-                res.append(item);
-            }
-            break;
-        }
-        default: {
-            qWarning() << Q_FUNC_INFO << "ignored entity of type:" << event->entityType();
-            break;
-        }
-        }
-    }
-
-    return res;
 }
 
 InstanceItem *ChartLayoutManager::createDefaultInstanceItem(MscInstance *orphanInstance, const QPointF &pos)
@@ -1246,80 +1182,6 @@ void ChartLayoutManager::removeEventItem(MscInstanceEvent *event)
     }
 }
 
-/*!
-   Horizontally aligns all events related to the instance \p instanceItem
- */
-void ChartLayoutManager::syncItemsPosToInstance(const InstanceItem *instanceItem)
-{
-    if (!instanceItem) {
-        return;
-    }
-
-    const qreal instanceCenter = instanceItem->centerInScene().x();
-
-    QVector<InteractiveObject *> events = instanceEventItems(instanceItem->modelItem());
-    for (InteractiveObject *item : qAsConst(events)) {
-        EventItem *eventItem = qobject_cast<EventItem *>(item);
-        switch (item->modelEntity()->entityType()) {
-        case MscEntity::EntityType::Action:
-        case MscEntity::EntityType::Coregion: {
-            eventItem->setTargetHCenter(instanceCenter);
-            break;
-        }
-        case MscEntity::EntityType::Condition: {
-            auto condition = static_cast<MscCondition *>(item->modelEntity());
-            if (!condition->shared()) {
-                eventItem->setTargetHCenter(instanceCenter);
-            }
-            break;
-        }
-        case MscEntity::EntityType::Message: {
-            auto messageItem = static_cast<MessageItem *>(item);
-            auto message = static_cast<MscMessage *>(item->modelEntity());
-            if (message->sourceInstance() == instanceItem->modelItem()) {
-                QPointF sourcePt = messageItem->tail();
-                sourcePt.setX(instanceCenter);
-                messageItem->setTailPosition(sourcePt);
-            }
-            if (message->targetInstance() == instanceItem->modelItem()) {
-                QPointF targetPt = messageItem->head();
-                targetPt.setX(instanceCenter);
-                messageItem->setHeadPosition(targetPt);
-            }
-            break;
-        }
-        case MscEntity::EntityType::Create: {
-            auto messageItem = static_cast<MessageItem *>(item);
-            auto message = static_cast<MscMessage *>(item->modelEntity());
-            if (message->sourceInstance() == instanceItem->modelItem()) {
-                QPointF sourcePt = messageItem->tail();
-                sourcePt.setX(instanceCenter);
-                messageItem->setTailPosition(sourcePt);
-            }
-            if (messageItem->targetInstanceItem() && messageItem->sourceInstanceItem()) {
-                QPointF targetPt = messageItem->head();
-                InstanceItem *targetItem = messageItem->targetInstanceItem();
-                const qreal targetCenter = targetItem->centerInScene().x();
-                const qreal sourceX = messageItem->sourceInstanceItem()->centerInScene().x();
-                if (sourceX < targetCenter) {
-                    targetPt.setX(targetItem->sceneBoundingRect().left());
-                } else {
-                    targetPt.setX(targetItem->sceneBoundingRect().right());
-                }
-                messageItem->setHeadPosition(targetPt);
-            }
-            break;
-        }
-        case MscEntity::EntityType::Timer: {
-            item->setX(instanceCenter);
-            break;
-        }
-        default:
-            break;
-        }
-    }
-}
-
 void ChartLayoutManager::ensureInstanceCreationAdded(MscMessage *msgCreate, MscInstance *dynamicInstance)
 {
     if (!d->m_layoutInfo.m_dynamicInstances.contains(dynamicInstance)) {
@@ -1411,12 +1273,12 @@ ActionItem *ChartLayoutManager::addActionItem(MscAction *action)
     return item;
 }
 
-ConditionItem *ChartLayoutManager::addConditionItem(MscCondition *condition, const QRectF &instancesRect)
+ConditionItem *ChartLayoutManager::addConditionItem(MscCondition *condition)
 {
     auto *item = itemForCondition(condition);
     if (!item) {
         item = new ConditionItem(condition, this);
-        connect(this, &msc::ChartLayoutManager::instancesRectChanged, item, &msc::ConditionItem::setInstancesRect);
+        connect(this, &msc::ChartLayoutManagerBase::instancesRectChanged, item, &msc::ConditionItem::setInstancesRect);
         storeEntityItem(item);
         if (item->geometryManagedByCif()) {
             item->applyCif();
@@ -1425,7 +1287,7 @@ ConditionItem *ChartLayoutManager::addConditionItem(MscCondition *condition, con
                 syncItemsPosToInstance(instItem);
             }
         }
-        item->setInstancesRect(instancesRect);
+        item->setInstancesRect(instancesRect());
         item->instantLayoutUpdate();
     }
 
@@ -1465,23 +1327,8 @@ CoregionItem *ChartLayoutManager::addCoregionItem(MscCoregion *coregion)
     if (coregion->type() == MscCoregion::Type::Begin) {
         item = itemForCoregion(coregion);
     } else {
-        auto isCoregionBegin = [coregion](MscInstanceEvent *event) {
-            if (event->entityType() != MscEntity::EntityType::Coregion)
-                return false;
-
-            if (!event->relatesTo(coregion->instance()))
-                return false;
-
-            return static_cast<MscCoregion *>(event)->type() == MscCoregion::Type::Begin;
-        };
-
-        const QVector<MscCoregion *> events = currentChart()->coregions();
-        auto it = std::find(events.rbegin(), events.rend(), coregion);
-        auto res = std::find_if(it, events.rend(), isCoregionBegin);
-        if (res == events.rend())
-            return nullptr;
-
-        item = itemForCoregion(qobject_cast<MscCoregion *>(*res));
+        MscCoregion *begin = currentChart()->lastBeginCoregion(coregion->instance());
+        item = itemForCoregion(begin);
     }
 
     if (!item) {
@@ -1824,14 +1671,6 @@ void ChartLayoutManager::forceCifForAll()
     d->m_layoutInfo.m_chartItem->updateCif();
 }
 
-/*!
-    Returns the bounding box of all instances
- */
-const QRectF &ChartLayoutManager::instancesRect() const
-{
-    return d->m_layoutInfo.m_instancesRect;
-}
-
 void insertEntity(QMap<int, msc::MscInstanceEvent *> &events, int key, msc::MscInstanceEvent *value,
         const QVector<MscInstanceEvent *> &originalEvents)
 {
@@ -1857,24 +1696,9 @@ bool ChartLayoutManager::layoutUpdatePending() const
     return d->m_layoutUpdateTimer.isActive();
 }
 
-qreal ChartLayoutManager::interMessageSpan() const
-{
-    return d->interMessageSpan();
-}
-
 InteractiveObject *ChartLayoutManager::eventItem(const QUuid &id)
 {
     return d->m_instanceEventItems.value(id);
-}
-
-void ChartLayoutManager::setInstancesRect(const QRectF &rect)
-{
-    if (rect == d->m_layoutInfo.m_instancesRect) {
-        return;
-    }
-
-    d->m_layoutInfo.m_instancesRect = rect;
-    Q_EMIT instancesRectChanged(d->m_layoutInfo.m_instancesRect);
 }
 
 /*!

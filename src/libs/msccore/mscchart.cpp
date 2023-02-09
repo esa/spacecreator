@@ -539,6 +539,30 @@ QVector<MscCoregion *> MscChart::coregions() const
     return allEventsOfType<msc::MscCoregion>();
 }
 
+/**
+ * Returns the last coregion that is of type Begin of the \p instance
+ */
+MscCoregion *MscChart::lastBeginCoregion(MscInstance *instance) const
+{
+    auto isCoregionBegin = [instance](MscInstanceEvent *event) {
+        if (event->entityType() != MscEntity::EntityType::Coregion)
+            return false;
+
+        if (!event->relatesTo(instance))
+            return false;
+
+        return static_cast<MscCoregion *>(event)->type() == MscCoregion::Type::Begin;
+    };
+
+    const QVector<MscCoregion *> events = coregions();
+    auto res = std::find_if(events.rbegin(), events.rend(), isCoregionBegin);
+    if (res == events.rend()) {
+        return nullptr;
+    }
+
+    return *res;
+}
+
 /*!
    Returns true if the given message crosses (overtakes or is overtaken) by at least one other message.
  */

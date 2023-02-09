@@ -288,7 +288,6 @@ void InteractiveObjectBase::hideGripPoints()
         d->gripPointsHandler->hideAnimated();
 }
 
-
 QVariant InteractiveObjectBase::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {

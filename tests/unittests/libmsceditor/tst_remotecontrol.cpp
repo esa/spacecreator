@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
-#include "chartlayoutmanager.h"
 #include "instanceitem.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
@@ -29,6 +28,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
 #include "sharedlibrary.h"
+#include "streaminglayoutmanager.h"
 
 #include <QCoreApplication>
 #include <QGraphicsScene>
@@ -78,8 +78,7 @@ private Q_SLOTS:
     {
         m_dataModel = msc::MscModel::defaultModel();
         m_undoStack = std::make_unique<msc::MscCommandsStack>();
-        m_layoutManager = std::make_unique<msc::ChartLayoutManager>(m_undoStack.get());
-        m_layoutManager->setCurrentChart(m_dataModel->firstChart());
+        m_layoutManager = std::make_unique<msc::StreamingLayoutManager>(m_undoStack.get());
         m_handler->setMscModel(m_dataModel.get());
         m_handler->setUndoStack(m_undoStack->undoStack());
         m_handler->setLayoutManager(m_layoutManager.get());
@@ -87,8 +86,7 @@ private Q_SLOTS:
 
         m_view.setScene(m_layoutManager->graphicsScene());
         msc::CoordinatesConverter::init(m_layoutManager->graphicsScene(), &m_chartItem);
-        auto converter = msc::CoordinatesConverter::instance();
-        converter->setDPI(QPointF(109., 109.), QPointF(96., 96.));
+        m_layoutManager->setCurrentChart(m_dataModel->firstChart());
 
         m_textMessageReceived.clear();
         m_socketError.clear();
@@ -149,21 +147,29 @@ private Q_SLOTS:
         params.insert(QLatin1String("name"), QLatin1String("MSG"));
         obj.insert(QLatin1String("Parameters"), params);
         sendCommand(obj, SendResult::EXPECT_FAIL);
+        QVector<msc::MscInstanceEvent *> events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 0);
 
         // Adding at least one instanceName (source) to make it valid
         params.insert(QLatin1String("srcName"), QLatin1String("A"));
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 1);
 
         // Adding nonexistent instanceName to make command invalid
         params.insert(QLatin1String("dstName"), QLatin1String("XY"));
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj, SendResult::EXPECT_FAIL);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 1);
 
         // Adding target instanceName to make command valid
         params.insert(QLatin1String("dstName"), QLatin1String("B"));
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 2);
     }
 
     void testCreateCommand()
@@ -179,6 +185,8 @@ private Q_SLOTS:
         params.insert(QLatin1String("dstName"), QLatin1String("B"));
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj);
+        QVector<msc::MscInstanceEvent *> events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 1);
     }
 
     void testTimerCommand()
@@ -192,38 +200,51 @@ private Q_SLOTS:
         params.insert(QLatin1String("name"), QLatin1String("Timer"));
         obj.insert(QLatin1String("Parameters"), params);
         sendCommand(obj, SendResult::EXPECT_FAIL);
+        QVector<msc::MscInstanceEvent *> events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 0);
 
         // Adding nonexistent instanceName to make command invalid
         params.insert(QLatin1String("instanceName"), QLatin1String("C"));
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj, SendResult::EXPECT_FAIL);
+        QCOMPARE(events.size(), 0);
 
         // Adding valid instanceName but without setting any Timer Type
         // it should fallback to msc::MscTimer::TimerType::Unknown and fail
         params[QLatin1String("instanceName")] = QLatin1String("A");
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj, SendResult::EXPECT_FAIL);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 0);
 
         // Various Timer types
         // msc::MscTimer::TimerType::Start
         params[QLatin1String("TimerType")] = QLatin1String("Start");
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 1);
 
         // msc::MscTimer::TimerType::Stop
         params[QLatin1String("TimerType")] = QLatin1String("Stop");
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 2);
 
         // msc::MscTimer::TimerType::Timeout
         params[QLatin1String("TimerType")] = QLatin1String("Timeout");
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 3);
 
         // msc::MscTimer::TimerType::Unknown
         params[QLatin1String("TimerType")] = QLatin1String("NonExistantType");
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj, SendResult::EXPECT_FAIL);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 3);
     }
 
     void testActionCommand()
@@ -248,6 +269,8 @@ private Q_SLOTS:
         params[QLatin1String("instanceName")] = QLatin1String("B");
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj);
+        QVector<msc::MscInstanceEvent *> events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 1);
     }
 
     void testConditionCommand()
@@ -261,16 +284,22 @@ private Q_SLOTS:
         params.insert(QLatin1String("name"), QLatin1String("Condition"));
         obj.insert(QLatin1String("Parameters"), params);
         sendCommand(obj, SendResult::EXPECT_FAIL);
+        QVector<msc::MscInstanceEvent *> events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 0);
 
         // Adding nonexistent instanceName to make command invalid
         params.insert(QLatin1String("instanceName"), QLatin1String("XY"));
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj, SendResult::EXPECT_FAIL);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 0);
 
         // Adding valid instanceName to make command successful
         params[QLatin1String("instanceName")] = QLatin1String("B");
         obj[QLatin1String("Parameters")] = params;
         sendCommand(obj);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 1);
     }
 
     void testMessageDeclarationCommand()
@@ -297,6 +326,37 @@ private Q_SLOTS:
         QCOMPARE(declaration->names(), expectedNames);
         const QStringList expectedTypes = { "Int32", "UInt16" };
         QCOMPARE(declaration->typeRefList(), expectedTypes);
+    }
+
+    void testUndoInstanceAddCommand()
+    {
+        QCOMPARE(m_socket->state(), QAbstractSocket::ConnectedState);
+
+        sendInstance("A");
+        QCOMPARE(m_layoutManager->instanceItems().size(), 1);
+        sendInstance("B");
+        // Adding "C" before B
+        QVector<msc::InstanceItem *> instanceItems = m_layoutManager->instanceItems();
+        QCOMPARE(instanceItems.size(), 2);
+        const QRect originalBRect = instanceItems.at(1)->sceneBoundingRect().toRect();
+        const int positionC = instanceItems.at(1)->sceneBoundingRect().toRect().x() - 1;
+        sendInstance("C", "", positionC);
+
+        // Check positions of all 3 instances (A -> C -> B)
+        instanceItems = m_layoutManager->instanceItems();
+        QCOMPARE(instanceItems.size(), 3);
+        const QRect lastARect = instanceItems.at(0)->sceneBoundingRect().toRect();
+        const QRect lastBRect = instanceItems.at(2)->sceneBoundingRect().toRect();
+        const QRect lastCRect = instanceItems.at(1)->sceneBoundingRect().toRect();
+        QVERIFY(lastARect.right() < lastCRect.left());
+        QVERIFY(lastCRect.right() < lastBRect.left());
+
+        // Undo adding C
+        sendUndo();
+        instanceItems = m_layoutManager->instanceItems();
+        QCOMPARE(instanceItems.size(), 2);
+        const QRect undoBRect = instanceItems.at(1)->sceneBoundingRect().toRect();
+        QCOMPARE(undoBRect.topLeft(), originalBRect.topLeft()); // B is back to the position before C was added
     }
 
     void testUndoRedoCommand()
@@ -428,7 +488,7 @@ private:
     msc::RemoteControlHandler *m_handler = nullptr;
     std::unique_ptr<msc::MscModel> m_dataModel;
     std::unique_ptr<msc::MscCommandsStack> m_undoStack;
-    std::unique_ptr<msc::ChartLayoutManager> m_layoutManager;
+    std::unique_ptr<msc::StreamingLayoutManager> m_layoutManager;
     QWebSocket *m_socket = nullptr;
     QSignalSpy m_textMessageReceived;
     QSignalSpy m_socketError;

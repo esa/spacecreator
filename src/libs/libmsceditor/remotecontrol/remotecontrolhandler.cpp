@@ -19,7 +19,6 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartindex.h"
-#include "chartlayoutmanager.h"
 #include "commands/cmdactionitemcreate.h"
 #include "commands/cmdchangeinstanceposition.h"
 #include "commands/cmdconditionitemcreate.h"
@@ -28,6 +27,7 @@
 #include "commands/cmdmessageitemcreate.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdtimeritemcreate.h"
+#include "instanceitem.h"
 #include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
@@ -40,6 +40,7 @@
 #include "mscmodel.h"
 #include "msctimer.h"
 #include "mscwriter.h"
+#include "streaminglayoutmanager.h"
 
 #include <QMetaEnum>
 
@@ -65,7 +66,7 @@ void RemoteControlHandler::setUndoStack(QUndoStack *undoStack)
     m_undoStack = undoStack;
 }
 
-void RemoteControlHandler::setLayoutManager(ChartLayoutManager *layoutManager)
+void RemoteControlHandler::setLayoutManager(StreamingLayoutManager *layoutManager)
 {
     m_layoutManager = layoutManager;
 }
@@ -172,14 +173,17 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     const int pos = params.value(QLatin1String("pos"), -1).toInt();
     if (pos >= 0) {
         instanceIdx = 0;
-        for (const msc::InstanceItem *instanceItem : m_layoutManager->instanceItems()) {
-            if (pos > instanceItem->sceneBoundingRect().x()) {
+        for (const MscInstance *instance : m_mscChart->instances()) {
+            const QRect cifRect = instance->cifRect();
+            QRectF sceneRect;
+            CoordinatesConverter::cifToScene(cifRect, sceneRect);
+            if (pos > sceneRect.x()) {
                 ++instanceIdx;
             }
         }
-    } else {
-        instanceIdx = -1;
     }
+
+    QPointF itemPos = m_layoutManager->instanceIndexToPosition(instanceIdx);
 
     msc::MscInstance *mscInstance = new msc::MscInstance(name, m_mscChart);
     mscInstance->setKind(params.value(QLatin1String("kind")).toString());
@@ -188,15 +192,23 @@ bool RemoteControlHandler::handleInstanceCommand(const QVariantMap &params, QStr
     m_undoStack->push(new msc::cmd::CmdInstanceItemCreate(mscInstance, instanceIdx, m_mscChart));
 
     if (pos >= 0) {
-        m_layoutManager->doLayout(); // makes sure to have cif geometry
-        QVector<QPoint> geometryCif = mscInstance->cifGeometry();
-        if (!geometryCif.isEmpty()) {
-            QPoint posCif = msc::CoordinatesConverter::sceneToCif(QPointF(pos, 10.));
-            posCif.setY(geometryCif.at(0).y());
-            geometryCif[0] = posCif;
+        itemPos.setX(pos);
+    }
+    InstanceItem *item = m_layoutManager->instanceItems().at(instanceIdx);
+    item->instantLayoutUpdate();
+    QRectF box = item->sceneBoundingRect();
+    box.moveTopLeft(itemPos);
+    m_undoStack->push(new msc::cmd::CmdChangeInstancePosition(mscInstance, box));
+
+    // check if instances on the right need to be moved
+    for (int idx = instanceIdx + 1; idx < m_layoutManager->instanceItems().size(); ++idx) {
+        QPointF itemPos = m_layoutManager->instanceIndexToPosition(idx);
+        InstanceItem *checkItem = m_layoutManager->instanceItems().at(idx);
+        if (checkItem->sceneBoundingRect().x() < itemPos.x()) {
+            QRectF newBox = checkItem->sceneBoundingRect();
+            newBox.moveLeft(itemPos.x());
+            m_undoStack->push(new msc::cmd::CmdChangeInstancePosition(checkItem->modelItem(), newBox));
         }
-        m_undoStack->push(new msc::cmd::CmdChangeInstancePosition(mscInstance, geometryCif));
-        m_layoutManager->doLayout();
     }
 
     m_undoStack->endMacro();

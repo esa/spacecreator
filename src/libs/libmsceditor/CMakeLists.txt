@@ -53,6 +53,8 @@ target_sources(${LIB_NAME} PRIVATE
     chartview/messageitem.cpp
     chartview/messageitem.h
     chartview/mscchartviewconstants.h
+    chartview/streaminglayoutmanager.cpp
+    chartview/streaminglayoutmanager.h
     chartview/timeritem.cpp
     chartview/timeritem.h
     commands/basecommand.cpp

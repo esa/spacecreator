@@ -17,11 +17,29 @@
 
 #include "cmdchangeinstanceposition.h"
 
+#include "baseitems/common/coordinatesconverter.h"
 #include "commandids.h"
 #include "mscinstance.h"
 
 namespace msc {
 namespace cmd {
+
+CmdChangeInstancePosition::CmdChangeInstancePosition(MscInstance *instance, const QRectF &newBox)
+    : BaseCommand(instance)
+    , m_instance(instance)
+    , m_oldCif(instance->cifGeometry())
+{
+    const QVector<QPoint> cifData = instance->cifGeometry();
+    bool ok;
+    QVector<QPointF> sceneData = CoordinatesConverter::cifToScene(cifData, &ok);
+    while (sceneData.size() < 3) {
+        sceneData.append(QPointF());
+    }
+    sceneData[0] = newBox.topLeft();
+    sceneData[1].setX(newBox.width());
+    sceneData[2].setX(newBox.height());
+    m_newCif = CoordinatesConverter::sceneToCif(sceneData);
+}
 
 CmdChangeInstancePosition::CmdChangeInstancePosition(MscInstance *instance, const QVector<QPoint> &newCif)
     : BaseCommand(instance)
@@ -29,6 +47,7 @@ CmdChangeInstancePosition::CmdChangeInstancePosition(MscInstance *instance, cons
     , m_oldCif(instance->cifGeometry())
     , m_newCif(newCif)
 {
+    Q_ASSERT(m_newCif.size() == 3);
 }
 
 void CmdChangeInstancePosition::redo()

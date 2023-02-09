@@ -62,7 +62,6 @@ class ChartLayoutManager : public ChartLayoutManagerBase
 {
     Q_OBJECT
     Q_PROPERTY(msc::MscChart *currentChart READ currentChart WRITE setCurrentChart NOTIFY currentChartChanged)
-    Q_PROPERTY(QRectF instanceRect READ instancesRect NOTIFY instancesRectChanged)
 
 public:
     explicit ChartLayoutManager(MscCommandsStack *undoStack, QObject *parent = nullptr);
@@ -71,7 +70,7 @@ public:
     QGraphicsScene *graphicsScene() const;
 
     void setCurrentChart(msc::MscChart *chart);
-    msc::MscChart *currentChart() const;
+    msc::MscChart *currentChart() const override;
 
     void clearScene();
 
@@ -95,8 +94,8 @@ public:
     msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEvent = nullptr);
-    int eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr) override;
-    msc::MscInstanceEvent *eventAtPosition(const QPointF &pos) override;
+    int eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr) const override;
+    msc::MscInstanceEvent *eventAtPosition(const QPointF &scenePos) const override;
 
     QSizeF preferredChartBoxSize() const;
     void setPreferredChartBoxSize(const QSizeF &size);
@@ -109,17 +108,14 @@ public:
 
     const QVector<msc::InstanceItem *> &instanceItems() const override;
 
-    const QVector<msc::InteractiveObject *> &instanceEventItems() const;
+    const QVector<msc::InteractiveObject *> &allEventItems() const;
 
     const QVector<msc::ActionItem *> actionsOfInstance(const MscInstance *instance) const;
     const QVector<msc::ConditionItem *> conditionsOfInstance(const MscInstance *instance) const;
     const QVector<msc::TimerItem *> timersOfInstance(const MscInstance *instance) const;
 
-    const QRectF &instancesRect() const;
-
     bool layoutUpdatePending() const override;
 
-    qreal interMessageSpan() const;
     msc::InteractiveObject *eventItem(const QUuid &id);
 
     QVector<MscInstanceEvent *> visibleEvents() const;
@@ -131,13 +127,11 @@ public Q_SLOTS:
     void updateContentToChartbox(const QRectF &chartBox);
     void removeInstanceItem(msc::MscInstance *instance);
     void removeEventItem(msc::MscInstanceEvent *event);
-    void syncItemsPosToInstance(const msc::InstanceItem *instanceItem);
 
 Q_SIGNALS:
     void currentChartChanged(msc::MscChart *chart);
     void layoutComplete();
     void cifDataChanged();
-    void instancesRectChanged(const QRectF &rect);
     void initialNameAccepted(msc::MscEntity *entity);
 
 private Q_SLOTS:
@@ -148,8 +142,6 @@ private Q_SLOTS:
 
 private:
     std::unique_ptr<ChartLayoutManagerPrivate> const d;
-
-    QVector<InteractiveObject *> instanceEventItems(MscInstance *instance) const;
 
     void checkHorizontalConstraints();
     void checkVerticalConstraints();
@@ -165,7 +157,7 @@ private:
     CommentItem *addCommentItem(MscComment *comment);
     MessageItem *addMessageItem(MscMessage *message);
     ActionItem *addActionItem(MscAction *action);
-    ConditionItem *addConditionItem(MscCondition *condition, const QRectF &instancesRect);
+    ConditionItem *addConditionItem(MscCondition *condition);
     TimerItem *addTimerItem(MscTimer *timer);
     CoregionItem *addCoregionItem(MscCoregion *coregion);
 
@@ -190,8 +182,6 @@ private:
     QVariantList prepareChangeOrderCommand(MscInstance *instance) const;
 
     void forceCifForAll();
-
-    void setInstancesRect(const QRectF &rect);
 
     qreal eventsBottom() const;
 };

@@ -75,6 +75,7 @@ public:
     QVector<MscMessage *> messages() const;
     QVector<MscMessage *> messages(MscInstance *source, MscInstance *target) const;
     QVector<MscCoregion *> coregions() const;
+    MscCoregion *lastBeginCoregion(MscInstance *instance) const;
 
     bool isCrossingMessage(MscMessage *message) const;
     QVector<MscMessage *> crossingMessages(MscMessage *message) const;
@@ -115,8 +116,8 @@ Q_SIGNALS:
     void instanceAdded(msc::MscInstance *instance, int pos);
     void instanceRemoved(msc::MscInstance *instance);
     void instanceOrderChanged(msc::MscInstance *instance, int from, int to);
-    void instanceEventAdded(msc::MscInstanceEvent *message);
-    void instanceEventRemoved(msc::MscInstanceEvent *message);
+    void instanceEventAdded(msc::MscInstanceEvent *event);
+    void instanceEventRemoved(msc::MscInstanceEvent *event);
     void instanceEventsChanged();
     void eventMoved();
     void messageRetargeted();

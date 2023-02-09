@@ -34,7 +34,16 @@
         {
             "CommandType": "Message",
             "Parameters": {
-                "name": "Message_A-B",
+                "name": "Create_C",
+                "srcName": "Instance_A",
+                "dstName": "Instance_C",
+                "MessageType" : "Create"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "Message_A_B",
                 "srcName": "Instance_A",
                 "dstName": "Instance_B"
             }
@@ -65,7 +74,7 @@
         {
             "CommandType": "Message",
             "Parameters": {
-                "name": "Message_C-A",
+                "name": "Message_C_A",
                 "srcName": "Instance_C",
                 "dstName": "Instance_A"
             }
@@ -119,7 +128,7 @@
         {
             "CommandType": "Message",
             "Parameters": {
-                "name": "Message_A-B",
+                "name": "Message_A_B",
                 "srcName": "Instance_A",
                 "dstName": "Instance_B"
             }
@@ -150,7 +159,7 @@
         {
             "CommandType": "Message",
             "Parameters": {
-                "name": "Message_C-A",
+                "name": "Message_C_A",
                 "srcName": "Instance_C",
                 "dstName": "Instance_A"
             }
@@ -190,7 +199,7 @@
         {
             "CommandType": "Message",
             "Parameters": {
-                "name": "Message_A-B",
+                "name": "Message_A_B",
                 "srcName": "Instance_A",
                 "dstName": "Instance_B"
             }
@@ -221,7 +230,7 @@
         {
             "CommandType": "Message",
             "Parameters": {
-                "name": "Message_C-A",
+                "name": "Message_C_A",
                 "srcName": "Instance_C",
                 "dstName": "Instance_A"
             }

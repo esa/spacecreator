@@ -21,6 +21,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include <QObject>
 #include <QPointer>
+#include <QRectF>
+#include <QVector>
 
 namespace msc {
 
@@ -29,11 +31,13 @@ class ChartItem;
 class CommentItem;
 class ConditionItem;
 class CoregionItem;
+class EventItem;
 class InstanceItem;
 class InteractiveObject;
 class MessageItem;
 class TimerItem;
 
+class MscChart;
 class MscCommandsStack;
 class MscComment;
 class MscAction;
@@ -48,6 +52,7 @@ class ChartLayoutManagerBase : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(msc::SystemChecks *systeckchecker READ systemChecker WRITE setSystemChecker NOTIFY systemCheckerChanged)
+    Q_PROPERTY(QRectF instanceRect READ instancesRect NOTIFY instancesRectChanged)
 
 public:
     explicit ChartLayoutManagerBase(MscCommandsStack *undoStack, QObject *parent = nullptr);
@@ -56,6 +61,8 @@ public:
 
     void setSystemChecker(SystemChecks *checker);
     SystemChecks *systemChecker() const;
+
+    virtual msc::MscChart *currentChart() const = 0;
 
     virtual bool layoutUpdatePending() const;
 
@@ -70,20 +77,36 @@ public:
     virtual InteractiveObject *itemForEntity(MscEntity *entity) const = 0;
 
     virtual int eventInstanceIndex(
-            const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr) = 0;
-    virtual msc::MscInstanceEvent *eventAtPosition(const QPointF &pos) = 0;
+            const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr) const = 0;
+    virtual msc::MscInstanceEvent *eventAtPosition(const QPointF &scenePos) const = 0;
 
     virtual QRectF minimalContentRect() const = 0;
     virtual QRectF actualContentRect() const = 0;
 
     virtual const QVector<msc::InstanceItem *> &instanceItems() const = 0;
 
+    const QRectF &instancesRect() const;
+
+    static qreal interInstanceSpan();
+    static qreal interMessageSpan();
+
+public Q_SLOTS:
+    void syncItemsPosToInstance(const msc::InstanceItem *instanceItem);
+
 Q_SIGNALS:
     void systemCheckerChanged(msc::SystemChecks *checker);
+    void instancesRectChanged(const QRectF &rect);
+
+protected:
+    void syncItemPosToInstance(EventItem *eventItem, const msc::InstanceItem *instanceItem);
+    QVector<InteractiveObject *> instanceEventItems(MscInstance *instance) const;
+
+    void setInstancesRect(const QRectF &rect);
 
 private:
     QPointer<MscCommandsStack> m_undoStack;
     QPointer<SystemChecks> m_systemChecker;
+    QRectF m_instancesRect;
 };
 
 } // namespace msc

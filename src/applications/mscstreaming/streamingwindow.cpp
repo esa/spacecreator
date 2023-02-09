@@ -17,18 +17,24 @@
 
 #include "streamingwindow.h"
 
+#include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
-#include "chartlayoutmanager.h"
 #include "geometry.h"
+#include "instanceitem.h"
+#include "mscchartviewconstants.h"
 #include "msccommandsstack.h"
 #include "mscmodel.h"
 #include "remotecontrolhandler.h"
 #include "remotecontrolwebserver.h"
+#include "streaminglayoutmanager.h"
 #include "ui_streamingwindow.h"
 
 #include <QApplication>
 #include <QDebug>
+#include <QRect>
 #include <QScreen>
+#include <QScrollBar>
+#include <QStyle>
 #include <QUndoStack>
 #include <memory>
 
@@ -39,7 +45,7 @@ struct StreamingWindow::StreamingWindowPrivate {
         : ui(new Ui::StreamingWindow)
         , m_dataModel(std::move(MscModel::defaultModel()))
         , m_undoStack(new MscCommandsStack)
-        , m_layoutManager(new ChartLayoutManager(m_undoStack.get()))
+        , m_layoutManager(new StreamingLayoutManager(m_undoStack.get()))
     {
     }
 
@@ -49,7 +55,8 @@ struct StreamingWindow::StreamingWindowPrivate {
 
     std::unique_ptr<MscModel> m_dataModel;
     std::unique_ptr<MscCommandsStack> m_undoStack;
-    std::unique_ptr<ChartLayoutManager> m_layoutManager;
+    std::unique_ptr<StreamingLayoutManager> m_layoutManager;
+    std::unique_ptr<QGraphicsScene> m_overlayScene;
 
     msc::RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     msc::RemoteControlHandler *m_remoteControlHandler = nullptr;
@@ -73,16 +80,25 @@ StreamingWindow::StreamingWindow(QWidget *parent)
     , d(new StreamingWindowPrivate)
 {
     d->ui->setupUi(this);
-    d->m_layoutManager->setCurrentChart(d->m_dataModel->firstChart());
-
     d->ui->graphicsView->setScene(d->m_layoutManager->graphicsScene());
+    d->m_layoutManager->setCurrentChart(d->m_dataModel->firstChart());
 
     static constexpr qreal padding = 120.;
     const QSizeF defaultSize(this->size() - QSizeF(padding, padding));
-    d->m_layoutManager->setPreferredChartBoxSize(defaultSize);
 
     connect(d->m_layoutManager->graphicsScene(), &QGraphicsScene::sceneRectChanged, this,
             &StreamingWindow::adaptWindowSizeToChart);
+
+    d->m_overlayScene = std::make_unique<QGraphicsScene>();
+    d->ui->instanceGraphicsView->setScene(d->m_overlayScene.get());
+    syncInstances();
+    checkInstancesVisibility();
+    d->ui->graphicsView->installEventFilter(this);
+    connect(d->m_layoutManager.get(), &StreamingLayoutManager::instanceItemsChanged, this,
+            &StreamingWindow::syncInstances, Qt::QueuedConnection);
+
+    connect(d->ui->graphicsView->verticalScrollBar(), &QScrollBar::valueChanged, this,
+            &StreamingWindow::checkInstancesVisibility, Qt::QueuedConnection);
 }
 
 StreamingWindow::~StreamingWindow() { }
@@ -123,16 +139,65 @@ bool StreamingWindow::startRemoteControl(quint16 port)
 void StreamingWindow::adaptWindowSizeToChart(const QRectF &rect)
 {
     QRect windowRect = geometry();
-    QRect widgetRect = d->ui->graphicsView->geometry();
-    const QSize extraMargin(5, 5);
-    const QSize offsets(windowRect.width() - widgetRect.width(), windowRect.height() - widgetRect.height());
-    widgetRect = rect.marginsAdded(msc::ChartItem::chartMargins()).toRect();
-    windowRect.setSize(rect.size().toSize() + offsets + extraMargin);
+    const QRect widgetRect = d->ui->graphicsView->geometry();
+    const int extraMargin = 5;
+
+    QRect newWidgetRect = rect.marginsAdded(msc::ChartItem::chartMargins()).toRect();
+    bool scroll = false;
+    if (newWidgetRect.height() > widgetRect.height()) {
+        scroll = true;
+        // add space for the scrollbar
+        newWidgetRect.setWidth(newWidgetRect.width() + qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent));
+    }
+    const int newWidth = newWidgetRect.width() + extraMargin;
+    if (newWidth > windowRect.width()) {
+        windowRect.setWidth(newWidth);
+    }
 
     const QRect availableRect = screen()->availableGeometry();
     windowRect = shared::rectInRect(windowRect, availableRect);
 
     setGeometry(windowRect);
+
+    if (d->m_overlayScene->width() != d->m_layoutManager->graphicsScene()->width()) {
+        QRectF rect = d->m_overlayScene->sceneRect();
+        rect.setWidth(d->m_layoutManager->graphicsScene()->width());
+        d->m_overlayScene->setSceneRect(rect);
+        syncInstances();
+    }
+
+    if (scroll) {
+        scrollToBottom();
+    }
+}
+
+void StreamingWindow::syncInstances()
+{
+    d->m_overlayScene->clear();
+
+    qreal height = 0;
+
+    for (InstanceItem *item : d->m_layoutManager->instanceItems()) {
+        auto header = new InstanceHeadItem(d->m_layoutManager->currentChart());
+        header->setName(item->name());
+        header->setX(item->x() + CHART_BOX_MARGIN + 12); /// @todo - why?!?
+        header->setY(-30); /// @todo - why?!?
+        d->m_overlayScene->addItem(header);
+        height = std::max(height, header->boundingRect().height() + 10);
+    }
+
+    d->ui->instanceGraphicsView->setMaximumHeight(height);
+    d->ui->instanceGraphicsView->setMinimumHeight(height);
+}
+
+void StreamingWindow::checkInstancesVisibility()
+{
+    QScrollBar *bar = d->ui->graphicsView->verticalScrollBar();
+    if (bar && bar->isVisible() && bar->value() > 0) {
+        d->ui->instanceGraphicsView->setVisible(true);
+        return;
+    }
+    d->ui->instanceGraphicsView->setVisible(false);
 }
 
 /**
@@ -151,6 +216,30 @@ void StreamingWindow::closeEvent(QCloseEvent *e)
 {
     QMainWindow::closeEvent(e);
     QApplication::quit();
+}
+
+bool StreamingWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    bool result = QMainWindow::eventFilter(obj, event);
+
+    if (event->type() == QEvent::Resize && obj == d->ui->graphicsView) {
+        const qreal sceneWidth = d->m_layoutManager->graphicsScene()->sceneRect().width();
+        QRectF rect = d->ui->instanceGraphicsView->sceneRect();
+
+        rect.setWidth(sceneWidth);
+        if (d->m_overlayScene->sceneRect().width() != rect.width()) {
+            d->m_overlayScene->setSceneRect(rect);
+            syncInstances();
+        }
+    }
+
+    return result;
+}
+
+void StreamingWindow::scrollToBottom()
+{
+    QRectF sceneRect = d->m_layoutManager->graphicsScene()->sceneRect();
+    d->ui->graphicsView->ensureVisible(sceneRect.center().x(), sceneRect.bottom() + 1, 1, 1);
 }
 
 }

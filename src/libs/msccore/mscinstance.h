@@ -43,7 +43,7 @@ class MscInstance : public MscEntity
 
 public:
     explicit MscInstance(QObject *parent = nullptr);
-    MscInstance(const QString &name, QObject *parent = nullptr);
+    explicit MscInstance(const QString &name, QObject *parent = nullptr);
 
     const QString &denominator() const;
     void setDenominator(const QString &denominator);
@@ -69,6 +69,10 @@ public:
 
     void setCifGeometry(const QVector<QPoint> &cifGeometry);
     QVector<QPoint> cifGeometry() const;
+    /**
+     * Returns the bounding box in CIF coordinates
+     */
+    QRect cifRect() const;
 
     QVector<MscInstanceEvent *> events() const;
 

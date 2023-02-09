@@ -22,7 +22,7 @@
 
 namespace msc {
 
-static const qreal CHART_BOX_ARGIN = 20.0;
+static const qreal CHART_BOX_MARGIN = 20.0;
 
 static const qreal COMMENT_MARGIN = 6;
 static const qreal COMMENT_LINE_LENGTH = 20;

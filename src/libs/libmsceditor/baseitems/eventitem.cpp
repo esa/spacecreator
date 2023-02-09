@@ -37,6 +37,10 @@ EventItem::EventItem(msc::MscInstanceEvent *entity, ChartLayoutManagerBase *char
  */
 void EventItem::setTargetHCenter(qreal x)
 {
+    if (qFuzzyCompare(m_targetHCenter, x)) {
+        return;
+    }
+
     m_targetHCenter = x;
     centerOnTargetH();
 }

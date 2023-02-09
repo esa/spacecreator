@@ -224,6 +224,19 @@ QVector<QPoint> MscInstance::cifGeometry() const
     return QVector<QPoint>();
 }
 
+/**
+ * Returns the bounding box in CIF coordinates
+ */
+QRect MscInstance::cifRect() const
+{
+    QVector<QPoint> data = cifGeometry();
+    if (data.size() != 3) {
+        return QRect();
+    }
+
+    return QRect(data[0], QSize(data[1].x(), data[2].y()));
+}
+
 /*!
    If being part of a MscChart, it returnes all events belonging to this instance
  */

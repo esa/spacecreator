@@ -108,7 +108,7 @@ void tsti_Chartitem::testItemLimit()
     auto instanceA = qobject_cast<msc::MscInstance *>(m_chart->instances().at(0));
     auto instanceB = qobject_cast<msc::MscInstance *>(m_chart->instances().at(1));
     QCOMPARE(m_chart->totalEventNumber(), 3);
-    QCOMPARE(m_chartModel->instanceEventItems().size(), 3);
+    QCOMPARE(m_chartModel->allEventItems().size(), 3);
     InteractiveObject *actionItem0 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(0));
     QVERIFY(actionItem0 != nullptr);
     MscEntity *action0 = actionItem0->modelEntity();
@@ -127,7 +127,7 @@ void tsti_Chartitem::testItemLimit()
     m_undoStack->push(addCommand);
     waitForLayoutUpdate();
     QCOMPARE(m_chart->totalEventNumber(), 4);
-    const QVector<InteractiveObject *> &items = m_chartModel->instanceEventItems();
+    const QVector<InteractiveObject *> &items = m_chartModel->allEventItems();
     QCOMPARE(items.size(), 3);
     QVERIFY(!m_chartModel->itemForEntity(action0)); // action0 is not shown anymore
     QVERIFY(m_chartModel->itemForEntity(action1));

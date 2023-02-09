@@ -21,5 +21,6 @@ addQtTest(tst_nameitem "libmsceditor;commontestlib" "textitembasetest.cpp;textit
 addQtTest(tst_objectanchor libmsceditor)
 addQtTest(tst_objectslink libmsceditor)
 addQtTest(tst_remotecontrol libmsceditor)
+addQtTest(tst_streaminglayoutmanager libmsceditor)
 addQtTest(tst_textitem "libmsceditor;commontestlib" "textitembasetest.cpp;textitembasetest.h")
 addQtTest(tst_timeritem libmsceditor)
