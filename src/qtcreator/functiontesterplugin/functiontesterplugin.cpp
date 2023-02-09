@@ -244,7 +244,12 @@ auto FunctionTesterPlugin::selectBoardDialog() -> void
     int wndWidth = 800;
     int wndHeight = 400;
 
-    boardsConfiguration = boardsConfigLoader.loadConfig().value();
+    auto boardsConfigurationOptional = boardsConfigLoader.loadConfig();
+    if (!boardsConfigurationOptional.has_value()) {
+        MessageManager::write(GenMsg::msgError.arg("Could not find file with boards configuration"));
+        return;
+    }
+    boardsConfiguration = boardsConfigurationOptional.value();
 
     QWidget *chooseBoardWindow = new QWidget;
     chooseBoardWindow->resize(wndWidth, wndHeight);
