@@ -106,7 +106,6 @@ struct ChartLayoutManagerPrivate {
 
     QPointer<msc::MscChart> m_currentChart = nullptr;
 
-    int m_visibleItemLimit = -1;
     QTimer m_layoutUpdateTimer;
 
     ChartViewLayoutInfo m_layoutInfo;
@@ -116,9 +115,7 @@ struct ChartLayoutManagerPrivate {
     {
         if (m_instanceItems.isEmpty()) {
             static const qreal oneMessageHeight = CoordinatesConverter::heightInScene(100);
-            const int eventsCount = qMax(1,
-                    m_visibleItemLimit == -1 ? m_currentChart->totalEventNumber()
-                                             : qMin(m_visibleItemLimit, m_instanceEventItems.size()));
+            const int eventsCount = qMax(1, m_currentChart->totalEventNumber());
             return eventsCount * (oneMessageHeight + q->interMessageSpan());
         }
 
@@ -401,23 +398,6 @@ void ChartLayoutManager::addInstanceItems()
 
         newInstancesRect |= item->sceneBoundingRect();
 
-        if (isStreamingModeEnabled() && instance->explicitStop()) {
-            const QVector<MscInstanceEvent *> instanceEvents = d->m_currentChart->eventsForInstance(instance);
-            const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->chronologicalEvents();
-            auto chartEvItEnd = chartEvents.crbegin();
-            std::advance(chartEvItEnd, qMin(d->m_visibleItemLimit, chartEvents.size()));
-            auto instEvItEnd = instanceEvents.crbegin();
-            std::advance(instEvItEnd, qMin(d->m_visibleItemLimit, instanceEvents.size()));
-            for (auto chartEvIt = chartEvents.crbegin(); chartEvIt != chartEvItEnd; ++chartEvIt) {
-                auto it = std::find(instanceEvents.crbegin(), instEvItEnd, *chartEvIt);
-                if (it != instEvItEnd) {
-                    item->setVisible(true);
-                    return;
-                }
-            }
-            item->setVisible(false);
-        }
-
         if (!instance->explicitCreator()) {
             const qreal headBottom = item->axis().y1();
             d->m_layoutInfo.m_pos.setY(std::max(d->m_layoutInfo.m_pos.y(), headBottom));
@@ -453,17 +433,8 @@ void ChartLayoutManager::addInstanceEventItems()
         return;
     }
 
-    const QVector<MscInstanceEvent *> chartEvents =
-            isStreamingModeEnabled() ? d->m_currentChart->chronologicalEvents() : d->m_currentChart->instanceEvents();
+    const QVector<MscInstanceEvent *> chartEvents = d->m_currentChart->instanceEvents();
     auto it = chartEvents.begin();
-    if (isStreamingModeEnabled()) {
-        for (; it != chartEvents.end(); ++it) {
-            if (std::distance(it, chartEvents.end()) <= d->m_visibleItemLimit) {
-                break;
-            }
-            removeEventItem(*it);
-        }
-    }
     for (; it != chartEvents.end(); ++it) {
         MscInstanceEvent *instanceEvent = *it;
         Q_ASSERT(instanceEvent);
@@ -831,11 +802,7 @@ void ChartLayoutManager::checkVerticalConstraints()
     }
 
     d->m_verticalCheck.reset(this, d->m_currentChart);
-    if (isStreamingModeEnabled()) {
-        d->m_verticalCheck.checkStreamingVerticalConstraints();
-    } else {
-        d->m_verticalCheck.checkVerticalConstraints();
-    }
+    d->m_verticalCheck.checkVerticalConstraints();
 }
 
 void ChartLayoutManager::actualizeInstancesHeights(qreal height) const
@@ -1531,20 +1498,6 @@ void ChartLayoutManager::setPreferredChartBoxSize(const QSizeF &size)
     d->m_layoutInfo.m_preferredBox = size;
 }
 
-void ChartLayoutManager::setVisibleItemLimit(int number)
-{
-    d->m_visibleItemLimit = number;
-    updateLayout();
-}
-
-/**
-   Returns true if the number of visible items is restricted. That's used for the "streaming mode".
- */
-bool ChartLayoutManager::isStreamingModeEnabled() const
-{
-    return d->m_visibleItemLimit > 0;
-}
-
 void ChartLayoutManager::storeEntityItem(InteractiveObject *item)
 {
     if (!item)
@@ -1656,10 +1609,6 @@ void ChartLayoutManager::onInstanceCreatorChanged(MscInstance *newCreator)
 
 void ChartLayoutManager::forceCifForAll()
 {
-    if (isStreamingModeEnabled()) {
-        return;
-    }
-
     for (InteractiveObject *item : d->allItems()) {
         if (!item->geometryManagedByCif()) {
             QSignalBlocker suppressItemCifAdded(item->modelEntity());
@@ -1711,20 +1660,7 @@ QVector<MscInstanceEvent *> ChartLayoutManager::visibleEvents() const
         return {};
     }
 
-    const QVector<MscInstanceEvent *> allEvents = d->m_currentChart->chronologicalEvents();
-
-    if (d->m_visibleItemLimit <= 0 || allEvents.size() <= d->m_visibleItemLimit) {
-        return allEvents;
-    }
-
-    QVector<MscInstanceEvent *> lastEvents;
-    lastEvents.reserve(allEvents.size());
-    auto it = allEvents.begin();
-    it += allEvents.size() - d->m_visibleItemLimit;
-    for (; it < allEvents.end(); ++it) {
-        lastEvents.push_back(*it);
-    }
-    return lastEvents;
+    return d->m_currentChart->chronologicalEvents();
 }
 
 qreal ChartLayoutManager::eventsBottom() const

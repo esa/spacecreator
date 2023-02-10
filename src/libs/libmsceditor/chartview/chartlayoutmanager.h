@@ -94,14 +94,12 @@ public:
     msc::MscEntity *nearestEntity(const QPointF &pos);
     msc::MscInstance *nearestInstance(const QPointF &pos);
     int eventIndex(const QPointF &pt, MscInstanceEvent *ignoreEvent = nullptr);
-    int eventInstanceIndex(const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr) const override;
+    int eventInstanceIndex(
+            const QPointF &pt, MscInstance *instance, MscInstanceEvent *ignoreEvent = nullptr) const override;
     msc::MscInstanceEvent *eventAtPosition(const QPointF &scenePos) const override;
 
     QSizeF preferredChartBoxSize() const;
     void setPreferredChartBoxSize(const QSizeF &size);
-
-    void setVisibleItemLimit(int number);
-    bool isStreamingModeEnabled() const;
 
     QRectF minimalContentRect() const override;
     QRectF actualContentRect() const override;

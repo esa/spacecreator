@@ -17,7 +17,6 @@
 
 #include "actionitem.h"
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/mscutils.h"
 #include "baseitems/instanceenditem.h"
 #include "baseitems/instanceheaditem.h"
 #include "chartitem.h"
@@ -30,11 +29,8 @@
 #include "mscchart.h"
 #include "msccoregion.h"
 #include "msccreate.h"
-#include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
-#include "mscmodel.h"
-#include "mscreader.h"
 #include "msctimer.h"
 #include "sharedlibrary.h"
 #include "timeritem.h"
@@ -64,7 +60,6 @@ private Q_SLOTS:
     void testDefaultChartSize();
     void testInstanceCifExtendedChartWidth();
     void testAddTwoMessages();
-    void testMaxVisibleItems();
 
     void testCreateSetsInstanceY();
     void testCreateSetsYOfStoppedInstance();
@@ -304,61 +299,6 @@ void tst_ChartLayoutManager::testAddTwoMessages()
 
     const qreal delta = 1.;
     QVERIFY2(std::abs(message1Rect2.top() - message1Rect2.top()) < delta, "The message Y moved");
-}
-
-void tst_ChartLayoutManager::testMaxVisibleItems()
-{
-    m_chartModel->setVisibleItemLimit(2);
-
-    QString mscText = "mscdocument Untitled_Document /* MSC AND */;\
-                      mscdocument Untitled_Leaf /* MSC LEAF */;\
-                          msc Untitled_MSC;\
-                              instance Instance_A;\
-                              endinstance;\
-                              instance Instance_B;\
-                              endinstance;\
-                          endmsc;\
-                      endmscdocument;\
-                  endmscdocument;";
-    parseMsc(mscText);
-
-    const QVector<MscInstance *> &instances = m_chart->instances();
-    MscInstance *instanceA = instances.at(0);
-    MscInstance *instanceB = instances.at(1);
-
-    auto message1 = new MscMessage("Msg1");
-    message1->setSourceInstance(instanceA);
-    message1->setTargetInstance(instanceB);
-    m_chart->addInstanceEvent(message1, { { instanceA, -1 }, { instanceB, -1 } });
-    waitForLayoutUpdate();
-
-    auto message2 = new MscMessage("Msg2");
-    message2->setSourceInstance(instanceA);
-    message2->setTargetInstance(instanceB);
-    m_chart->addInstanceEvent(message2, { { instanceA, -1 }, { instanceB, -1 } });
-    waitForLayoutUpdate();
-
-    MessageItem *msgItem1 = m_chartModel->itemForMessage(message1);
-    MessageItem *msgItem2 = m_chartModel->itemForMessage(message2);
-    const int msg1Y = msgItem1->sceneBoundingRect().top();
-    const int msg2Y = msgItem2->sceneBoundingRect().top();
-
-    // The 3rd messages starts a "scroll"
-    auto message3 = new MscMessage("Msg3");
-    message3->setSourceInstance(instanceA);
-    message3->setTargetInstance(instanceB);
-    m_chart->addInstanceEvent(message3, { { instanceA, -1 }, { instanceB, -1 } });
-    waitForLayoutUpdate();
-
-    msgItem1 = m_chartModel->itemForMessage(message1);
-    QCOMPARE(msgItem1, nullptr); // as only 2 events are visible, the first was removed
-
-    msgItem2 = m_chartModel->itemForMessage(message2);
-    MessageItem *msgItem3 = m_chartModel->itemForMessage(message3);
-    const int msg2YScrolled = msgItem2->sceneBoundingRect().top();
-    const int msg3YScrolled = msgItem3->sceneBoundingRect().top();
-    QCOMPARE(msg2YScrolled, msg1Y); // Now message 2 is at the former position of message 1
-    QCOMPARE(msg3YScrolled, msg2Y); // Message 3 is now at position of message 2
 }
 
 void tst_ChartLayoutManager::testCreateSetsInstanceY()

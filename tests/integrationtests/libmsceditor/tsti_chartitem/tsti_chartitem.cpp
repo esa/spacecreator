@@ -15,13 +15,10 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "actionitem.h"
 #include "chartitem.h"
 #include "chartviewtestbase.h"
-#include "commands/cmdactionitemcreate.h"
 #include "instanceitem.h"
 #include "messageitem.h"
-#include "mscaction.h"
 #include "mscchart.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -46,7 +43,6 @@ private Q_SLOTS:
     void cleanup() { cleanupBase(); }
 
     void testKeepSpaceAtBottom();
-    void testItemLimit();
 };
 
 void tsti_Chartitem::testKeepSpaceAtBottom()
@@ -86,70 +82,6 @@ void tsti_Chartitem::testKeepSpaceAtBottom()
 
     // The chart increases it's height, so a new item can be added easily (space at the bottom)
     QVERIFY(newRect.height() > oldRect.height());
-}
-
-void tsti_Chartitem::testItemLimit()
-{
-    const QString msc("MSCDOCUMENT doc1; \
-                         MSC msc1; \
-                             INSTANCE A; \
-                                 ACTION 'a0';\
-                                 OUT m2 TO B; \
-                             ENDINSTANCE; \
-                             INSTANCE B; \
-                                 ACTION 'a1';\
-                                 IN m2 FROM A; \
-                             ENDINSTANCE; \
-                         ENDMSC; \
-                     ENDMSCDOCUMENT;");
-    m_chartModel->setVisibleItemLimit(3);
-    loadView(msc);
-
-    auto instanceA = qobject_cast<msc::MscInstance *>(m_chart->instances().at(0));
-    auto instanceB = qobject_cast<msc::MscInstance *>(m_chart->instances().at(1));
-    QCOMPARE(m_chart->totalEventNumber(), 3);
-    QCOMPARE(m_chartModel->allEventItems().size(), 3);
-    InteractiveObject *actionItem0 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(0));
-    QVERIFY(actionItem0 != nullptr);
-    MscEntity *action0 = actionItem0->modelEntity();
-    InteractiveObject *actionItem1 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceB).at(0));
-    QVERIFY(actionItem1 != nullptr);
-    MscEntity *action1 = actionItem1->modelEntity();
-    InteractiveObject *messageItem2 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(1));
-    QVERIFY(messageItem2 != nullptr);
-    MscEntity *message2 = messageItem2->modelEntity();
-
-    // append one action
-    auto action2 = new msc::MscAction();
-    action2->setInformalAction("Action03");
-    action2->setInstance(instanceA);
-    auto addCommand = new cmd::CmdActionItemCreate(action2, instanceA, -1, m_chartModel->currentChart());
-    m_undoStack->push(addCommand);
-    waitForLayoutUpdate();
-    QCOMPARE(m_chart->totalEventNumber(), 4);
-    const QVector<InteractiveObject *> &items = m_chartModel->allEventItems();
-    QCOMPARE(items.size(), 3);
-    QVERIFY(!m_chartModel->itemForEntity(action0)); // action0 is not shown anymore
-    QVERIFY(m_chartModel->itemForEntity(action1));
-    QVERIFY(m_chartModel->itemForEntity(message2));
-    InteractiveObject *actionItem3 = m_chartModel->itemForEntity(m_chart->eventsForInstance(instanceA).at(1));
-    QVERIFY(actionItem3 != nullptr);
-    MscEntity *action3 = actionItem3->modelEntity();
-
-    // append one more action, pushing the message to the top
-    auto action4 = new msc::MscAction();
-    action4->setInformalAction("Action04");
-    action4->setInstance(instanceA);
-    addCommand = new cmd::CmdActionItemCreate(action4, instanceA, -1, m_chartModel->currentChart());
-    m_undoStack->push(addCommand);
-    waitForLayoutUpdate();
-    QCOMPARE(m_chart->totalEventNumber(), 5);
-    QCOMPARE(items.size(), 3);
-    QVERIFY(!m_chartModel->itemForEntity(action0)); // action0 is not shown anymore
-    QVERIFY(!m_chartModel->itemForEntity(action1)); // action1 is not shown anymore
-    QVERIFY(m_chartModel->itemForEntity(message2));
-    QVERIFY(m_chartModel->itemForEntity(action3));
-    QVERIFY(m_chartModel->itemForEntity(action4));
 }
 
 QTEST_MAIN(tsti_Chartitem)
