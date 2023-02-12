@@ -17,6 +17,9 @@
 
 #include "vemodel.h"
 
+#include "errorhub.h"
+#include "propertytemplate.h"
+#include "propertytemplateconfig.h"
 #include "veobject.h"
 
 namespace shared {
@@ -129,6 +132,24 @@ bool VEModel::addObjectImpl(VEObject *obj)
     }
 
     obj->setModel(this);
+
+    if (auto dynPropConfig = obj->propertyTemplaceConfig()) {
+        for (const auto attr : dynPropConfig->propertyTemplatesForObject(obj)) {
+            const QVariant &defaultValue = attr->defaultValue();
+            if (attr->validate(obj) && !obj->hasEntityAttribute(attr->name())
+                    && (!attr->isOptional() || !defaultValue.isNull())) {
+                if (attr->info() == PropertyTemplate::Info::Attribute) {
+                    obj->setEntityAttribute(attr->name(), defaultValue);
+                } else if (attr->info() == PropertyTemplate::Info::Property) {
+                    obj->setEntityProperty(attr->name(), defaultValue);
+                } else {
+                    QMetaEnum metaEnum = QMetaEnum::fromType<shared::PropertyTemplate::Info>();
+                    ErrorHub::addError(ErrorItem::Warning,
+                            tr("Unknown dynamic property info: %1").arg(metaEnum.valueToKey(int(attr->info()))));
+                }
+            }
+        }
+    }
 
     d->m_objects.insert(id, obj);
     d->m_objectsOrder.append(id);

@@ -272,24 +272,6 @@ VEModel *VEObject::model() const
 
 bool VEObject::postInit()
 {
-    if (auto dynPropConfig = propertyTemplaceConfig()) {
-        for (const auto attr : dynPropConfig->propertyTemplatesForObject(this)) {
-            if (attr->validate(this) && !attr->isOptional() && !hasEntityAttribute(attr->name())) {
-                const QVariant &defaultValue = attr->defaultValue();
-                if (!defaultValue.isNull()) {
-                    if (attr->info() == PropertyTemplate::Info::Attribute) {
-                        setEntityAttribute(attr->name(), defaultValue);
-                    } else if (attr->info() == PropertyTemplate::Info::Property) {
-                        setEntityProperty(attr->name(), defaultValue);
-                    } else {
-                        QMetaEnum metaEnum = QMetaEnum::fromType<shared::PropertyTemplate::Info>();
-                        ErrorHub::addError(ErrorItem::Warning,
-                                tr("Unknown dynamic property info: %1").arg(metaEnum.valueToKey(int(attr->info()))));
-                    }
-                }
-            }
-        }
-    }
     return true;
 }
 
