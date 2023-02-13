@@ -196,6 +196,14 @@ QPointF StreamingLayoutManager::instanceIndexToPosition(int index) const
     return previousBox.topRight() + QPointF(interInstanceSpan(), 0.);
 }
 
+qreal StreamingLayoutManager::nextEventYPosition(MscInstance *instance) const
+{
+    if (m_nextYperInstance.contains(instance)) {
+        return m_nextYperInstance[instance];
+    }
+    return 0.0;
+}
+
 void StreamingLayoutManager::instanceAdded(MscInstance *instance, int index)
 {
     auto item = new InstanceItem(instance, this, m_chart.get(), m_chartItem.get());
@@ -265,6 +273,30 @@ void StreamingLayoutManager::eventAdded(MscInstanceEvent *event)
     }
 }
 
+void StreamingLayoutManager::updateMessagePosition()
+{
+    auto message = dynamic_cast<MscMessage *>(sender());
+    if (!message) {
+        return;
+    }
+
+    MessageItem *item = itemForMessage(message);
+    if (!item) {
+        return;
+    }
+
+    if (message->sourceInstance()) {
+        m_nextYperInstance[message->sourceInstance()] = item->tail().y() + interMessageSpan();
+    }
+    if (message->targetInstance()) {
+        m_nextYperInstance[message->targetInstance()] = item->head().y() + interMessageSpan();
+    }
+
+    checkChartSize(item);
+
+    item->updateCif();
+}
+
 void StreamingLayoutManager::addAction(MscAction *action)
 {
     Q_ASSERT(action->instance());
@@ -284,6 +316,8 @@ void StreamingLayoutManager::addAction(MscAction *action)
     item->instantLayoutUpdate();
 
     checkChartSize(item);
+
+    item->updateCif();
 }
 
 void StreamingLayoutManager::addCondition(MscCondition *condition)
@@ -320,6 +354,8 @@ void StreamingLayoutManager::addCondition(MscCondition *condition)
     }
 
     checkChartSize(item);
+
+    item->updateCif();
 }
 
 void StreamingLayoutManager::addCreateMessage(MscCreate *message)
@@ -362,6 +398,8 @@ void StreamingLayoutManager::addCreateMessage(MscCreate *message)
     item->instantLayoutUpdate();
 
     checkChartSize(item);
+
+    item->updateCif();
 }
 
 void StreamingLayoutManager::addMessage(MscMessage *message)
@@ -381,12 +419,11 @@ void StreamingLayoutManager::addMessage(MscMessage *message)
         y = std::max(y, m_nextYperInstance[message->targetInstance()]);
     }
     item->setY(y + interMessageSpan() * 0.5);
-    qreal nextY = item->sceneBoundingRect().bottom() + interMessageSpan() * 0.5;
     if (message->sourceInstance()) {
-        m_nextYperInstance[message->sourceInstance()] = nextY;
+        m_nextYperInstance[message->sourceInstance()] = item->tail().y() + interMessageSpan();
     }
     if (message->targetInstance()) {
-        m_nextYperInstance[message->targetInstance()] = nextY;
+        m_nextYperInstance[message->targetInstance()] = item->head().y() + interMessageSpan();
     }
 
     // set X
@@ -396,6 +433,9 @@ void StreamingLayoutManager::addMessage(MscMessage *message)
     item->instantLayoutUpdate();
 
     checkChartSize(item);
+
+    connect(message, &MscMessage::cifPointsChanged, this, &StreamingLayoutManager::updateMessagePosition);
+    item->updateCif();
 }
 
 void StreamingLayoutManager::addTimer(MscTimer *timer)
@@ -416,6 +456,8 @@ void StreamingLayoutManager::addTimer(MscTimer *timer)
     item->instantLayoutUpdate();
 
     checkChartSize(item);
+
+    item->updateCif();
 }
 
 void StreamingLayoutManager::updateInstancesRect()

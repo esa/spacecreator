@@ -77,6 +77,8 @@ public:
     //
     QPointF instanceIndexToPosition(int index) const;
 
+    qreal nextEventYPosition(MscInstance *instance) const;
+
 Q_SIGNALS:
     void instanceItemsChanged();
 
@@ -85,6 +87,7 @@ private Q_SLOTS:
     void instanceRemoved(msc::MscInstance *instance);
     void updateContentsRect();
     void eventAdded(msc::MscInstanceEvent *event);
+    void updateMessagePosition();
 
 private:
     void addAction(msc::MscAction *action);

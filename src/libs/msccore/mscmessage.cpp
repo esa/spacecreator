@@ -228,6 +228,10 @@ void MscMessage::setCifPoints(const QVector<QPoint> &points)
 {
     using namespace cif;
 
+    if (points == cifPoints()) {
+        return;
+    }
+
     if (points.isEmpty()) {
         clearCifs();
         Q_EMIT cifPointsChanged();

@@ -64,6 +64,9 @@ Implemented commands and parameters list:
     + **MessageType** - type of **Message**, optional
         + **Message** - default
         + **Create**
+    + **Async** - indicates if the messages is async **Message**, optional (if not set, the message is sync)
+        + **sent**
+        + **received**
 - **Timer** - creating new Timer
     + **name** - Timer's Name, optional
     + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory

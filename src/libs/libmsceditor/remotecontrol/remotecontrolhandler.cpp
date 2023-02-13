@@ -25,6 +25,7 @@
 #include "commands/cmdinstanceitemcreate.h"
 #include "commands/cmdinstancestopchange.h"
 #include "commands/cmdmessageitemcreate.h"
+#include "commands/cmdmessagepointsedit.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdtimeritemcreate.h"
 #include "instanceitem.h"
@@ -245,6 +246,7 @@ bool RemoteControlHandler::handleInstanceStopCommand(const QVariantMap &params, 
  */
 bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QString *errorString)
 {
+
     const QString sourceInstanceName = params.value(QLatin1String("srcName")).toString();
     msc::MscInstance *mscSourceInstance = m_mscChart->instanceByName(sourceInstanceName);
     if (!mscSourceInstance && !sourceInstanceName.isEmpty()) {
@@ -263,6 +265,7 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
         *errorString = tr("Can't create Message without source or target Instances");
         return false;
     }
+
     const QMetaEnum qtEnum = QMetaEnum::fromType<msc::MscMessage::MessageType>();
     static const int defaultValue = static_cast<int>(msc::MscMessage::MessageType::Message);
     const QString msgTypeStr = params.value(qtEnum.name(), qtEnum.valueToKey(defaultValue)).toString();
@@ -279,6 +282,11 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
         *errorString = tr("Can't create Message with type Create without target Instance");
         return false;
     }
+
+    if (params.value("Async").toString() == "received") {
+        return handleIncomingAsyncMessage(name, mscSourceInstance, mscTargetInstance, errorString);
+    }
+
     msc::MscMessage *message = messageType == msc::MscMessage::MessageType::Message ? new msc::MscMessage(m_mscChart)
                                                                                     : new msc::MscCreate(m_mscChart);
     message->setName(name);
@@ -296,6 +304,36 @@ bool RemoteControlHandler::handleMessageCommand(const QVariantMap &params, QStri
     }
 
     m_undoStack->push(new msc::cmd::CmdMessageItemCreate(message, instanceIndexes, m_mscChart));
+
+    return true;
+}
+
+bool RemoteControlHandler::handleIncomingAsyncMessage(
+        const QString &name, MscInstance *source, MscInstance *target, QString *errorString)
+{
+    // find message
+    const QVector<MscMessage *> messages = m_mscChart->messages(source, target);
+    auto it =
+            std::find_if(messages.rbegin(), messages.rend(), [&name](MscMessage *msg) { return msg->name() == name; });
+    if (it == messages.rend()) {
+        if (errorString) {
+            *errorString = tr("Aaync message %1 not sent before received.").arg(name);
+        }
+        return false;
+    }
+    MscMessage *message = *it;
+
+    // find new head position
+    const QVector<QPoint> oldPoints = message->cifPoints();
+    QVector<QPoint> newPoints = oldPoints;
+    qreal newY = m_layoutManager->nextEventYPosition(message->targetInstance());
+    QPoint pt = CoordinatesConverter::sceneToCif((QPointF(oldPoints.last().x(), newY)));
+    newPoints.last().setY(pt.y());
+    // set position via command
+    ChartIndexList indices = m_mscChart->indicesOfEvent(message);
+    indices.set(target, source->events().size() - 1);
+    auto cmd = new msc::cmd::CmdMessagePointsEdit(message, oldPoints, newPoints, indices, m_mscChart);
+    m_undoStack->push(cmd);
 
     return true;
 }

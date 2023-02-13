@@ -15,9 +15,12 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "actionitem.h"
 #include "baseitems/common/coordinatesconverter.h"
 #include "chartitem.h"
 #include "instanceitem.h"
+#include "messageitem.h"
+#include "mscaction.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
 #include "mscdocument.h"
@@ -411,6 +414,56 @@ private Q_SLOTS:
         QCOMPARE(m_textMessageReceived.count(), 1);
         resultObj = takeFirstResultMessage();
         QVERIFY(resultObj.value(QLatin1String("result")).toBool());
+    }
+
+    void testAsyncMessageCommand()
+    {
+        addTestInstances();
+
+        // Add Message
+        QJsonObject objMessage;
+        objMessage.insert(QLatin1String("CommandType"), QLatin1String("Message"));
+        QJsonObject paramsMessage;
+        paramsMessage.insert(QLatin1String("name"), QLatin1String("MSG"));
+        paramsMessage.insert(QLatin1String("srcName"), QLatin1String("A"));
+        paramsMessage.insert(QLatin1String("dstName"), QLatin1String("B"));
+        objMessage[QLatin1String("Parameters")] = paramsMessage;
+        sendCommand(objMessage);
+        QVector<msc::MscInstanceEvent *> events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 1);
+
+        // addAction
+        QJsonObject objAction;
+        objAction.insert(QLatin1String("CommandType"), QLatin1String("Action"));
+        QJsonObject paramsAction;
+        paramsAction.insert(QLatin1String("name"), QLatin1String("Action"));
+        paramsAction[QLatin1String("instanceName")] = QLatin1String("B");
+        objAction[QLatin1String("Parameters")] = paramsAction;
+        sendCommand(objAction);
+        events = m_dataModel->firstChart()->instanceEvents();
+        QCOMPARE(events.size(), 2);
+
+        // Set message to receive now
+        QJsonObject objMessageMove;
+        objMessageMove.insert(QLatin1String("CommandType"), QLatin1String("Message"));
+        QJsonObject paramsMove;
+        paramsMove.insert(QLatin1String("name"), QLatin1String("MSG"));
+        paramsMove.insert(QLatin1String("srcName"), QLatin1String("A"));
+        paramsMove.insert(QLatin1String("dstName"), QLatin1String("B"));
+        paramsMove.insert(QLatin1String("Async"), QLatin1String("received"));
+        objMessageMove[QLatin1String("Parameters")] = paramsMove;
+        sendCommand(objMessageMove);
+
+        // Get message item
+        auto message = qobject_cast<msc::MscMessage *>(events.at(0));
+        msc::MessageItem *messageItem = m_layoutManager->itemForMessage(message);
+        QCOMPARE_NE(messageItem, nullptr);
+        // Get ation item
+        auto action = qobject_cast<msc::MscAction *>(events.at(1));
+        msc::ActionItem *actionItem = m_layoutManager->itemForAction(action);
+        QCOMPARE_NE(actionItem, nullptr);
+        // message head is below action
+        QCOMPARE_GT(messageItem->head().y(), actionItem->sceneBoundingRect().bottom());
     }
 
 private:

@@ -28,6 +28,7 @@ class QUndoStack;
 namespace msc {
 
 class MscChart;
+class MscInstance;
 class MscModel;
 class StreamingLayoutManager;
 
@@ -54,6 +55,8 @@ private:
     bool handleInstanceCommand(const QVariantMap &params, QString *errorString);
     bool handleInstanceStopCommand(const QVariantMap &params, QString *errorString);
     bool handleMessageCommand(const QVariantMap &params, QString *errorString);
+    bool handleIncomingAsyncMessage(
+            const QString &name, msc::MscInstance *source, msc::MscInstance *target, QString *errorString);
     bool handleTimerCommand(const QVariantMap &params, QString *errorString);
     bool handleActionCommand(const QVariantMap &params, QString *errorString);
     bool handleConditionCommand(const QVariantMap &params, QString *errorString);

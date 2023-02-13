@@ -64,6 +64,15 @@
             }
         },
         {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "Message_A_B",
+                "srcName": "Instance_A",
+                "dstName": "Instance_B",
+                "Async" : "received"
+            }
+        },
+        {
             "CommandType": "Condition",
             "Parameters": {
                 "name": "Condition_shared_1",
