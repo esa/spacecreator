@@ -26,8 +26,8 @@ struct DVBoardPrivate {
     QList<DVPort *> ports;
 };
 
-DVBoard::DVBoard(DVObject *parent)
-    : DVObject(DVObject::Type::Board, {}, parent)
+DVBoard::DVBoard(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Board, {}, parent, id)
     , d(std::make_unique<DVBoardPrivate>())
 {
 }

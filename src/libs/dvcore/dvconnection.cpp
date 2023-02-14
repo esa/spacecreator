@@ -30,8 +30,8 @@ struct DVConnectionPrivate {
     QPointer<DVDevice> targetDevice;
 };
 
-DVConnection::DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *parent)
-    : DVConnection(parent)
+DVConnection::DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *parent, const shared::Id &id)
+    : DVConnection(parent, id)
 {
     if (sourceDev && sourceDev->node()) {
         setEntityAttribute(meta::Props::token(meta::Props::Token::from_node), sourceDev->node()->title());
@@ -46,8 +46,8 @@ DVConnection::DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *p
     }
 }
 
-DVConnection::DVConnection(DVObject *parent)
-    : DVObject(DVObject::Type::Connection, {}, parent)
+DVConnection::DVConnection(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Connection, {}, parent, id)
     , d(std::make_unique<DVConnectionPrivate>())
 {
 }

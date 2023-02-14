@@ -39,8 +39,9 @@ public:
     };
     Q_ENUM(InterfaceType)
 
-    explicit DVSystemInterface(const DVSystemInterface &copy, DVObject *parent = nullptr);
-    explicit DVSystemInterface(DVObject *parent = nullptr);
+    explicit DVSystemInterface(
+            const DVSystemInterface &copy, DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
+    explicit DVSystemInterface(DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
     void setInterfaceType(InterfaceType type);
     InterfaceType interfaceType() const;

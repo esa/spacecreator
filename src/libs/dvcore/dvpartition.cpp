@@ -28,8 +28,8 @@ struct DVPartitionPrivate {
     QList<DVFunction *> functions;
 };
 
-DVPartition::DVPartition(DVObject *parent)
-    : DVObject(DVObject::Type::Partition, {}, parent)
+DVPartition::DVPartition(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Partition, {}, parent, id)
     , d(new DVPartitionPrivate)
 {
 }

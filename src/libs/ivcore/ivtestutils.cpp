@@ -1,11 +1,11 @@
 #include "ivtestutils.h"
 
+#include "ivarchetypelibraryreference.h"
+#include "ivarchetypereference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
-#include "ivarchetypereference.h"
-#include "ivarchetypelibraryreference.h"
 #include "ivmodel.h"
 
 #include <algorithm>
@@ -13,10 +13,12 @@
 namespace ivm {
 namespace testutils {
 
-IVInterface::CreationInfo init(IVInterface::InterfaceType t, IVFunctionType *fn, const QString &name)
+IVInterface::CreationInfo init(
+        IVInterface::InterfaceType t, IVFunctionType *fn, const QString &name, const shared::Id &id)
 {
     IVInterface::CreationInfo ci;
     ci.kind = IVInterface::OperationKind::Protected;
+    ci.id = id;
     ci.type = t;
     ci.function = fn;
     ci.name = name;
@@ -30,18 +32,19 @@ IVInterface::CreationInfo init(IVInterface::InterfaceType t, IVFunctionType *fn,
     return ci;
 }
 
-IVInterface *createIface(IVFunctionType *fn, IVInterface::InterfaceType t, const QString &name)
+IVInterface *createIface(IVFunctionType *fn, IVInterface::InterfaceType t, const QString &name, const shared::Id &id)
 {
-    IVInterface *interface = IVInterface::createIface(init(t, fn, name));
+    IVInterface *interface = IVInterface::createIface(init(t, fn, name, id));
     if (fn->model()) {
         fn->model()->addObject(interface);
     }
     return interface;
 }
 
-IVConnection *createConnection(IVFunctionType *source, IVFunctionType *target, const QString &name)
+IVConnection *createConnection(
+        IVFunctionType *source, IVFunctionType *target, const QString &name, const shared::Id &id)
 {
-    const QVector<IVInterface *> requiredInterfaces = target->ris();
+    const QVector<IVInterface *> requiredInterfaces = source->ris();
     auto it = std::find_if(requiredInterfaces.begin(), requiredInterfaces.end(),
             [&name](IVInterface *interface) { return interface->title() == name; });
     ivm::IVInterface *sourceIf = it != requiredInterfaces.end()
@@ -55,7 +58,7 @@ IVConnection *createConnection(IVFunctionType *source, IVFunctionType *target, c
             ? *it
             : ivm::testutils::createIface(target, ivm::IVInterface::InterfaceType::Provided, name);
 
-    auto connection = new ivm::IVConnection(targetIf, sourceIf);
+    auto connection = new ivm::IVConnection(targetIf, sourceIf, nullptr, id);
     ivm::IVModel *ivModel = source ? source->model() : target->model();
     if (ivModel) {
         ivModel->addObject(connection);
@@ -63,33 +66,33 @@ IVConnection *createConnection(IVFunctionType *source, IVFunctionType *target, c
     return connection;
 }
 
-IVInterfaceRequired *createRequiredIface(IVFunctionType *fn, const QString &name)
+IVInterfaceRequired *createRequiredIface(IVFunctionType *fn, const QString &name, const shared::Id &id)
 {
-    return createIface(fn, ivm::IVInterface::InterfaceType::Required, name)->as<IVInterfaceRequired *>();
+    return createIface(fn, ivm::IVInterface::InterfaceType::Required, name, id)->as<IVInterfaceRequired *>();
 }
 
-IVInterfaceProvided *createProvidedIface(IVFunctionType *fn, const QString &name)
+IVInterfaceProvided *createProvidedIface(IVFunctionType *fn, const QString &name, const shared::Id &id)
 {
-    return createIface(fn, ivm::IVInterface::InterfaceType::Provided, name)->as<IVInterfaceProvided *>();
+    return createIface(fn, ivm::IVInterface::InterfaceType::Provided, name, id)->as<IVInterfaceProvided *>();
 }
 
-IVFunction *createFunction(const QString &name, QObject *parent)
+IVFunction *createFunction(const QString &name, QObject *parent, const shared::Id &id)
 {
-    auto fn = new IVFunction(parent);
+    auto fn = new IVFunction(parent, id);
     fn->setTitle(name);
     return fn;
 }
 
-IVFunctionType *createFunctionType(const QString &name, QObject *parent)
+IVFunctionType *createFunctionType(const QString &name, QObject *parent, const shared::Id &id)
 {
-    auto fnt = new IVFunctionType(parent);
+    auto fnt = new IVFunctionType(parent, id);
     fnt->setTitle(name);
     return fnt;
 }
 
-IVComment *createComment(const QString &name, QObject *parent)
+IVComment *createComment(const QString &name, QObject *parent, const shared::Id &id)
 {
-    auto comment = new IVComment(parent);
+    auto comment = new IVComment(parent, id);
     comment->setTitle(name);
     return comment;
 }
@@ -111,7 +114,8 @@ IVArchetypeReference *createArchetypeReference(
 IVArchetypeLibraryReference *createArchetypeLibraryReference(
         const QString &archetypeLibraryName, const QString &archetypeLibraryPath, QObject *parent)
 {
-    auto archetypeLibraryReference = new IVArchetypeLibraryReference(archetypeLibraryName, archetypeLibraryPath, parent);
+    auto archetypeLibraryReference =
+            new IVArchetypeLibraryReference(archetypeLibraryName, archetypeLibraryPath, parent);
     return archetypeLibraryReference;
 }
 

@@ -24,8 +24,8 @@
 
 namespace dvm {
 
-DVBus::DVBus(DVObject *parent)
-    : DVObject(DVObject::Type::Bus, {}, parent)
+DVBus::DVBus(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Bus, {}, parent, id)
 {
 }
 

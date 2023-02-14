@@ -37,8 +37,8 @@ class DVNode : public DVObject
     Q_PROPERTY(QString nodeLabel READ nodeLabel)
 
 public:
-    explicit DVNode(const DVBoard &board, DVObject *parent = nullptr);
-    explicit DVNode(DVObject *parent = nullptr);
+    explicit DVNode(const DVBoard &board, DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
+    explicit DVNode(DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~DVNode() override;
 
     bool postInit() override;

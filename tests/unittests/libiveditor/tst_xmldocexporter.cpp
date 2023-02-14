@@ -20,11 +20,14 @@
 #include "ivarchetypelibraryreference.h"
 #include "ivarchetypereference.h"
 #include "ivcomment.h"
+#include "ivconnection.h"
 #include "iveditor.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivlibrary.h"
+#include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
 #include "parameter.h"
 #include "standardpaths.h"
@@ -58,6 +61,7 @@ private Q_SLOTS:
     void testExportArchetypeReferenceInFunctionType();
     void testExportAsn1File();
     void testExportToBuffer();
+    void testExportID();
 };
 
 QByteArray tst_XmlDocExporter::testFileContent() const
@@ -72,9 +76,11 @@ QByteArray tst_XmlDocExporter::testFileContent() const
 
 void tst_XmlDocExporter::initTestCase()
 {
-    shared::StandardPaths::setTestModeEnabled(true);
-    ivm::initIVLibrary();
     ive::initIVEditor();
+    ivm::initIVLibrary();
+    auto conf = ivm::IVPropertyTemplateConfig::instance();
+    conf->init(QLatin1String("default_attrinbutes.xml"));
+
     m_testFilePath = m_testPath.filePath("tst_xmldocex.xml");
 }
 
@@ -126,7 +132,8 @@ void tst_XmlDocExporter::testExportFunctions()
                                 "        </Implementations>\n"
                                 "    </Function>\n"
                                 "</InterfaceView>";
-    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
+    QVERIFY(XmlData(expected).isEqual(
+            XmlData(text), false, { "version", "id" }, { "Taste::coordinates", "Taste::InnerCoordinates" }));
 }
 
 void tst_XmlDocExporter::testExportComment()
@@ -143,7 +150,8 @@ void tst_XmlDocExporter::testExportComment()
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView>\n"
                                 "    <Comment name=\"TestComment1\" foo=\"11\"/>\n"
                                 "</InterfaceView>";
-    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
+    QVERIFY(XmlData(expected).isEqual(
+            XmlData(text), false, { "version", "id" }, { "Taste::coordinates", "Taste::InnerCoordinates" }));
 }
 
 void tst_XmlDocExporter::testExportNestedComment()
@@ -168,7 +176,8 @@ void tst_XmlDocExporter::testExportNestedComment()
                                 "        </Implementations>\n"
                                 "    </Function>\n"
                                 "</InterfaceView>";
-    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
+    QVERIFY(XmlData(expected).isEqual(
+            XmlData(text), false, { "version", "id" }, { "Taste::coordinates", "Taste::InnerCoordinates" }));
 }
 
 void tst_XmlDocExporter::testExportLayer()
@@ -232,7 +241,8 @@ void tst_XmlDocExporter::testExportArchetypeReferenceInFunction()
                                        <ArchetypeReference archetype_library="SomeLibraryName" archetype_function="SomeFunctionName"/>
                                    </Function>
                                    </InterfaceView>)";
-    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
+    QVERIFY(XmlData(expected).isEqual(
+            XmlData(text), false, { "version", "id" }, { "Taste::coordinates", "Taste::InnerCoordinates" }));
 }
 
 void tst_XmlDocExporter::testExportArchetypeReferenceInFunctionType()
@@ -255,7 +265,8 @@ void tst_XmlDocExporter::testExportArchetypeReferenceInFunctionType()
                                        <ArchetypeReference archetype_library="SomeLibraryName" archetype_function="SomeFunctionName"/>
                                    </Function>
                                    </InterfaceView>)";
-    QVERIFY(XmlData(expected).isEqual(XmlData(text), false, {"version", "id"}, {"Taste::coordinates", "Taste::InnerCoordinates"}));
+    QVERIFY(XmlData(expected).isEqual(
+            XmlData(text), false, { "version", "id" }, { "Taste::coordinates", "Taste::InnerCoordinates" }));
 }
 
 void tst_XmlDocExporter::testExportAsn1File()
@@ -274,6 +285,57 @@ void tst_XmlDocExporter::testExportToBuffer()
     m_doc->exporter()->exportObjects(m_doc->objects().values(), &buffer);
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView/>";
     QVERIFY(XmlData(expected) == XmlData(buffer.data()));
+}
+
+void tst_XmlDocExporter::testExportID()
+{
+    auto testfunc1 = ivm::testutils::createFunction("Function_1", m_doc.get());
+    m_doc->objectsModel()->addObject(testfunc1);
+    auto reqIface = ivm::testutils::createRequiredIface(testfunc1, "PI_1");
+    testfunc1->addChild(reqIface);
+    m_doc->objectsModel()->addObject(reqIface);
+
+    auto testfunc2 = ivm::testutils::createFunction("Function_2", m_doc.get());
+    m_doc->objectsModel()->addObject(testfunc2);
+    auto provIface = ivm::testutils::createProvidedIface(testfunc2, "PI_1");
+    testfunc2->addChild(provIface);
+    m_doc->objectsModel()->addObject(provIface);
+
+    auto connection = ivm::testutils::createConnection(testfunc1, testfunc2, "PI_1");
+
+    QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
+    const QByteArray text = testFileContent();
+    const QString expectedStr = R"(
+        <InterfaceView version="1.1">
+            <Function default_implementation="default" fixed_system_element="NO" id="%2" is_type="NO" language="SDL" name="Function_2" required_system_element="NO" startup_priority="1">
+                <Provided_Interface enable_multicast="true" id="%4" kind="Protected" layer="default" name="PI_1" required_system_element="NO" wcet="0"/>
+                <Implementations>
+                    <Implementation language="SDL" name="default"/>
+                </Implementations>
+            </Function>
+            <Function default_implementation="default" fixed_system_element="NO" id="%1" is_type="NO" language="SDL" name="Function_1" required_system_element="NO" startup_priority="1">
+                <Required_Interface enable_multicast="true" id="%3" kind="Protected" layer="default" name="PI_1" required_system_element="NO" wcet="0">
+                    <Property name="Taste::InheritPI" value="true"/>
+                    <Property name="Taste::Autonamed" value="true"/>
+                </Required_Interface>
+                <Implementations>
+                    <Implementation language="SDL" name="default"/>
+                </Implementations>
+            </Function>
+            <Connection id="%5" required_system_element="NO">
+                <Source func_name="Function_1" ri_name="PI_1"/>
+                <Target func_name="Function_2" pi_name="PI_1"/>
+            </Connection>
+        </InterfaceView>
+    )";
+    const QByteArray expected =
+            expectedStr
+                    .arg(testfunc1->id().toString(), testfunc2->id().toString(),
+                            connection->sourceInterface()->id().toString(),
+                            connection->targetInterface()->id().toString(), connection->id().toString())
+                    .toUtf8();
+    QVERIFY(XmlData(expected).isEqual(
+            XmlData(text), false, { "version" }, { "Taste::coordinates", "Taste::InnerCoordinates" }));
 }
 
 QTEST_MAIN(tst_XmlDocExporter)

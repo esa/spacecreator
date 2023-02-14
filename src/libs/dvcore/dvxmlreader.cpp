@@ -67,31 +67,32 @@ QVector<DVObject *> DVXMLReader::parsedObjects() const
 void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
-    const QXmlStreamAttributes attrs = xml.attributes();
+    EntityAttributes attrs = attributes(xml.attributes());
+    const EntityAttribute &idAttr = attrs.take(QLatin1String("id"));
 
     DVObject *obj { nullptr };
     const meta::Props::Token t = meta::Props::token(tagName);
     switch (t) {
     case meta::Props::Token::Partition: {
         if (auto node = qobject_cast<dvm::DVNode *>(d->m_currentObject)) {
-            auto partition = new dvm::DVPartition(node);
+            auto partition = new dvm::DVPartition(node, idAttr.value<QUuid>());
             node->addPartition(partition);
             obj = partition;
         }
     } break;
     case meta::Props::Token::Node: {
-        obj = new dvm::DVNode(d->m_currentObject);
+        obj = new dvm::DVNode(d->m_currentObject, idAttr.value<QUuid>());
     } break;
     case meta::Props::Token::Device: {
         if (auto node = qobject_cast<DVNode *>(d->m_currentObject)) {
-            auto dev = new dvm::DVDevice(d->m_currentObject);
+            auto dev = new dvm::DVDevice(d->m_currentObject, idAttr.value<QUuid>());
             node->addDevice(dev);
             obj = dev;
         }
     } break;
     case meta::Props::Token::Function: {
         if (auto partition = qobject_cast<dvm::DVPartition *>(d->m_currentObject)) {
-            auto fn = new dvm::DVFunction(d->m_currentObject);
+            auto fn = new dvm::DVFunction(d->m_currentObject, idAttr.value<QUuid>());
             if (tagName == "function") {
                 // old version
                 fn->setTitle(xml.readElementText());
@@ -101,29 +102,30 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
         }
     } break;
     case meta::Props::Token::Connection: {
-        obj = new dvm::DVConnection(d->m_currentObject);
+        obj = new dvm::DVConnection(d->m_currentObject, idAttr.value<QUuid>());
     } break;
     case meta::Props::Token::Message: {
-        obj = new dvm::DVMessage(d->m_currentObject);
+        obj = new dvm::DVMessage(d->m_currentObject, idAttr.value<QUuid>());
     } break;
     case meta::Props::Token::Property: {
         if (d->m_currentObject) {
-            d->m_currentObject->setEntityProperty(attrs.value(meta::Props::token(meta::Props::Token::name)).toString(),
-                    attrs.value(meta::Props::token(meta::Props::Token::value)).toString());
+            d->m_currentObject->setEntityProperty(
+                    attrs.value(meta::Props::token(meta::Props::Token::name)).value<QString>(),
+                    attrs.value(meta::Props::token(meta::Props::Token::value)).value());
         }
         break;
     }
     case meta::Props::Token::System_Function: {
         Q_ASSERT(d->m_currentObject != nullptr);
         if (qobject_cast<DVNode *>(d->m_currentObject)) {
-            obj = new dvm::DVSystemFunction(d->m_currentObject);
+            obj = new dvm::DVSystemFunction(d->m_currentObject, idAttr.value<QUuid>());
         }
     } break;
     case meta::Props::Token::Provided_Interface:
     case meta::Props::Token::Required_Interface: {
         Q_ASSERT(d->m_currentObject != nullptr);
         if (qobject_cast<DVSystemFunction *>(d->m_currentObject)) {
-            auto interface = new dvm::DVSystemInterface(d->m_currentObject);
+            auto interface = new dvm::DVSystemInterface(d->m_currentObject, idAttr.value<QUuid>());
             obj = interface;
             interface->setInterfaceType(t == meta::Props::Token::Provided_Interface
                             ? dvm::DVSystemInterface::InterfaceType::Provided
@@ -153,8 +155,8 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
 
     if (obj) {
-        for (const QXmlStreamAttribute &xmlAttr : attrs) {
-            obj->setEntityAttribute(xmlAttr.name().toString(), QVariant::fromValue(xmlAttr.value().toString()));
+        for (const EntityAttribute &attr : qAsConst(attrs)) {
+            obj->setEntityAttribute(attr);
         }
         d->addObject(obj);
         d->m_currentObject = obj;

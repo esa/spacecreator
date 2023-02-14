@@ -22,15 +22,15 @@ namespace dvm {
 /**
    Constructore that copies all attributes and parameters from \p copy
  */
-DVSystemInterface::DVSystemInterface(const DVSystemInterface &copy, DVObject *parent)
-    : DVSystemInterface(parent)
+DVSystemInterface::DVSystemInterface(const DVSystemInterface &copy, DVObject *parent, const shared::Id &id)
+    : DVSystemInterface(parent, id)
 {
     setEntityAttributes(copy.entityAttributes());
     setParams(copy.params());
 }
 
-DVSystemInterface::DVSystemInterface(DVObject *parent)
-    : DVObject(DVObject::Type::SystemInterface, {}, parent)
+DVSystemInterface::DVSystemInterface(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::SystemInterface, {}, parent, id)
 {
 }
 

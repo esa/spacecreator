@@ -35,7 +35,7 @@ class DVPartition : public DVObject
     Q_PROPERTY(dvm::DVObject *node READ node)
 
 public:
-    explicit DVPartition(DVObject *parent = nullptr);
+    explicit DVPartition(DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~DVPartition() override;
 
     void addFunction(DVFunction *function);

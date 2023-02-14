@@ -32,7 +32,7 @@ class DVBus : public DVObject
     Q_PROPERTY(QString qualifier READ qualifier)
 
 public:
-    explicit DVBus(DVObject *parent = nullptr);
+    explicit DVBus(DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
     void setConnections(const QList<DVConnection *> &connections);
 

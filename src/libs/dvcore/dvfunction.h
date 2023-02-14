@@ -30,7 +30,7 @@ class DVFunction : public DVObject
     Q_PROPERTY(QStringList path READ path NOTIFY pathChanged)
 
 public:
-    explicit DVFunction(DVObject *parent = nullptr);
+    explicit DVFunction(DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     DVPartition *partition() const;
 
     QString usedImplementation() const;

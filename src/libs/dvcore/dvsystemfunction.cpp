@@ -22,14 +22,14 @@ namespace dvm {
 /**
    Constructore that copies all attributes and parameters from \p copy
  */
-DVSystemFunction::DVSystemFunction(const DVSystemFunction &copy, DVObject *parent)
-    : DVSystemFunction(parent)
+DVSystemFunction::DVSystemFunction(const DVSystemFunction &copy, DVObject *parent, const shared::Id &id)
+    : DVSystemFunction(parent, id)
 {
     setEntityAttributes(copy.entityAttributes());
 }
 
-DVSystemFunction::DVSystemFunction(DVObject *parent)
-    : DVObject(DVObject::Type::SystemFunction, {}, parent)
+DVSystemFunction::DVSystemFunction(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::SystemFunction, {}, parent, id)
 {
 }
 

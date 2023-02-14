@@ -22,8 +22,8 @@
 
 namespace dvm {
 
-DVPort::DVPort(QObject *parent)
-    : DVObject(DVObject::Type::Port, {}, parent)
+DVPort::DVPort(QObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Port, {}, parent, id)
 {
 }
 

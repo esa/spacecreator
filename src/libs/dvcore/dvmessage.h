@@ -42,7 +42,7 @@ class DVMessage : public DVObject
     Q_PROPERTY(QString resolvedTargetInterface READ resolvedTargetInterface)
 
 public:
-    explicit DVMessage(QObject *parent = nullptr);
+    explicit DVMessage(QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
     bool postInit() override;
 

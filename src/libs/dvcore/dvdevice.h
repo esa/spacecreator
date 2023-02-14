@@ -31,8 +31,8 @@ class DVDevice : public DVObject
     Q_PROPERTY(dvm::DVObject *node READ node)
 
 public:
-    explicit DVDevice(const DVPort &port, DVObject *parent = nullptr);
-    explicit DVDevice(DVObject *parent = nullptr);
+    explicit DVDevice(const DVPort &port, DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
+    explicit DVDevice(DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
     DVNode *node() const;
 

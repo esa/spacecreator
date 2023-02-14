@@ -33,7 +33,7 @@ class DVBoard : public DVObject
     Q_PROPERTY(QList<dvm::DVPort *> ports READ ports)
 
 public:
-    explicit DVBoard(DVObject *parent = nullptr);
+    explicit DVBoard(DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     ~DVBoard() override;
 
     virtual QString titleUI() const override;

@@ -305,7 +305,9 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
 
     if (obj) {
-        obj->setEntityAttributes(attrs);
+        for (const EntityAttribute &attr : qAsConst(attrs)) {
+            obj->setEntityAttribute(attr);
+        }
         d->setCurrentObject(obj);
     }
 }

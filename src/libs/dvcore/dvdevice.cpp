@@ -23,8 +23,8 @@
 
 namespace dvm {
 
-DVDevice::DVDevice(const DVPort &port, DVObject *parent)
-    : DVDevice(parent)
+DVDevice::DVDevice(const DVPort &port, DVObject *parent, const shared::Id &id)
+    : DVDevice(parent, id)
 {
     EntityAttributes attrs = port.entityAttributes();
     EntityAttribute entityAttr = attrs.take(meta::Props::token(meta::Props::Token::name));
@@ -41,8 +41,8 @@ DVDevice::DVDevice(const DVPort &port, DVObject *parent)
     }
 }
 
-DVDevice::DVDevice(DVObject *parent)
-    : DVObject(DVObject::Type::Device, {}, parent)
+DVDevice::DVDevice(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Device, {}, parent, id)
 {
     connect(this, &shared::VEObject::attributeChanged, this, [this](const QString &name) {
         if (name == meta::Props::token(meta::Props::Token::port)) {

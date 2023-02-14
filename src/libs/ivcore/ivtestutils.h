@@ -14,22 +14,29 @@ class IVArchetypeLibraryReference;
 
 namespace testutils {
 
-IVInterface::CreationInfo init(IVInterface::InterfaceType t, IVFunctionType *fn, const QString &name = QString());
+IVInterface::CreationInfo init(IVInterface::InterfaceType t, IVFunctionType *fn, const QString &name = QString(),
+        const shared::Id &id = shared::InvalidId);
 
-IVInterfaceRequired *createRequiredIface(IVFunctionType *fn, const QString &name = QString());
+IVInterfaceRequired *createRequiredIface(
+        IVFunctionType *fn, const QString &name = QString(), const shared::Id &id = shared::InvalidId);
 
-IVInterfaceProvided *createProvidedIface(IVFunctionType *fn, const QString &name = QString());
+IVInterfaceProvided *createProvidedIface(
+        IVFunctionType *fn, const QString &name = QString(), const shared::Id &id = shared::InvalidId);
 
 IVInterface *createIface(IVFunctionType *fn, IVInterface::InterfaceType t = IVInterface::InterfaceType::Provided,
-        const QString &name = QString());
+        const QString &name = QString(), const shared::Id &id = shared::InvalidId);
 
-IVConnection *createConnection(IVFunctionType *source, IVFunctionType *target, const QString &name);
+IVConnection *createConnection(
+        IVFunctionType *source, IVFunctionType *target, const QString &name, const shared::Id &id = shared::InvalidId);
 
-IVFunction *createFunction(const QString &name = QString(), QObject *parent = nullptr);
+IVFunction *createFunction(
+        const QString &name = QString(), QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
-IVFunctionType *createFunctionType(const QString &name = QString(), QObject *parent = nullptr);
+IVFunctionType *createFunctionType(
+        const QString &name = QString(), QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
-IVComment *createComment(const QString &name = QString(), QObject *parent = nullptr);
+IVComment *createComment(
+        const QString &name = QString(), QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
 IVConnectionLayerType *createConnectionLayer(QObject *parent = nullptr);
 

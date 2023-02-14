@@ -25,8 +25,8 @@
 
 namespace dvm {
 
-DVFunction::DVFunction(DVObject *parent)
-    : DVObject(DVObject::Type::Function, {}, parent)
+DVFunction::DVFunction(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Function, {}, parent, id)
 {
 }
 

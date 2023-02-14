@@ -29,7 +29,7 @@ class DVPort : public DVObject
     Q_PROPERTY(QString busName READ busName)
 
 public:
-    explicit DVPort(QObject *parent = nullptr);
+    explicit DVPort(QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 
     QString title() const override;
     DVBoard *board() const;

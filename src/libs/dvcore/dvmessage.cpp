@@ -29,8 +29,8 @@
 
 namespace dvm {
 
-DVMessage::DVMessage(QObject *parent)
-    : DVObject(DVObject::Type::Message, {}, parent)
+DVMessage::DVMessage(QObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Message, {}, parent, id)
 {
 }
 

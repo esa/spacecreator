@@ -39,8 +39,9 @@ class DVConnection : public DVObject
     Q_PROPERTY(QList<dvm::DVMessage *> messages READ messages)
 
 public:
-    explicit DVConnection(DVObject *parent = nullptr);
-    explicit DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *parent = nullptr);
+    explicit DVConnection(DVObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
+    explicit DVConnection(DVDevice *sourceDev, DVDevice *targetDev, DVObject *parent = nullptr,
+            const shared::Id &id = shared::InvalidId);
     ~DVConnection() override;
 
     bool postInit() override;

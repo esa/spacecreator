@@ -32,14 +32,14 @@ struct DVNodePrivate {
     QList<DVDevice *> devices;
 };
 
-DVNode::DVNode(const DVBoard &board, DVObject *parent)
-    : DVNode(parent)
+DVNode::DVNode(const DVBoard &board, DVObject *parent, const shared::Id &id)
+    : DVNode(parent, id)
 {
     setEntityAttributes(board.entityAttributes());
 }
 
-DVNode::DVNode(DVObject *parent)
-    : DVObject(DVObject::Type::Node, {}, parent)
+DVNode::DVNode(DVObject *parent, const shared::Id &id)
+    : DVObject(DVObject::Type::Node, {}, parent, id)
     , d(std::make_unique<DVNodePrivate>())
 {
 }
