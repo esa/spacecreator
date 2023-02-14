@@ -372,6 +372,7 @@ void StreamingLayoutManager::addCreateMessage(MscCreate *message)
     }
 
     auto item = new MessageItem(message, this, sourceItem, targetItem, m_chartItem.get());
+    item->disableSyntaxChecking();
     item->setChartItem(m_chartItem.get());
     m_eventItems[message->internalId()] = item;
 
@@ -407,6 +408,7 @@ void StreamingLayoutManager::addMessage(MscMessage *message)
     InstanceItem *sourceItem = itemForInstance(message->sourceInstance());
     InstanceItem *targetItem = itemForInstance(message->targetInstance());
     auto item = new MessageItem(message, this, sourceItem, targetItem, m_chartItem.get());
+    item->disableSyntaxChecking();
     item->setChartItem(m_chartItem.get());
     m_eventItems[message->internalId()] = item;
 

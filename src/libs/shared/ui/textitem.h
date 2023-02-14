@@ -92,6 +92,8 @@ public:
     void setMultilineEnabled(bool value);
     bool isMultilineEnabled() const;
 
+    void checkTextValidity();
+
 Q_SIGNALS:
     void edited(const QString &newText);
     void textChanged();
@@ -118,8 +120,6 @@ protected:
     virtual bool validateText(const QString &text) const;
 
     QPair<int, int> prepareSelectionRange(int desiredFrom, int desiredTo) const;
-
-    void checkTextValidity();
 
 protected:
     QBrush m_background = QBrush(Qt::white);

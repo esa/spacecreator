@@ -1084,6 +1084,15 @@ QHash<MscInstance *, int> MessageItem::visualIndices() const
     return result;
 }
 
+/**
+ * Turn off checks of the name/text for validity
+ */
+void MessageItem::disableSyntaxChecking()
+{
+    m_arrowItem->identificationItem()->setMscValidationTest("");
+    m_arrowItem->identificationItem()->checkTextValidity();
+}
+
 /*
  * Almost the same as MscMessage::isGlobal, but the check is based on existence
  * of InstanceItems instead of MscInstances.

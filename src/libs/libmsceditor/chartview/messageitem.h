@@ -101,6 +101,8 @@ public:
 
     QHash<msc::MscInstance *, int> visualIndices() const override;
 
+    void disableSyntaxChecking();
+
 Q_SIGNALS:
     void retargeted(msc::MessageItem *, const QPointF &pos, msc::MscMessage::EndType endType);
 
