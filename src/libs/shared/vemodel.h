@@ -18,6 +18,7 @@
 #pragma once
 
 #include "common.h"
+#include "../common/exceptions/inconsistentmodelexception.h"
 
 #include <QObject>
 #include <QVector>

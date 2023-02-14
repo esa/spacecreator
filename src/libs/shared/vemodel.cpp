@@ -121,7 +121,7 @@ bool VEModel::addObjectImpl(VEObject *obj)
 
     const shared::Id &id = obj->id();
     if (getObject(id)) {
-        return false;
+        throw InconsistentModelException();
     }
 
     if (!obj->parent()) {
@@ -132,6 +132,7 @@ bool VEModel::addObjectImpl(VEObject *obj)
 
     d->m_objects.insert(id, obj);
     d->m_objectsOrder.append(id);
+
     return true;
 }
 

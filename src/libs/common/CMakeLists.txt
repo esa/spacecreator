@@ -7,12 +7,14 @@ target_sources(CommonTools
                 modelloader/modelloader.h
                 ivtools/ivtools.cpp
                 ivtools/ivtools.h
+                exceptions/inconsistentmodelexception.h
 )
 
 target_include_directories(CommonTools
     PUBLIC      .
                 ${CMAKE_SOURCE_DIR}/src/libs/common/modelloader
                 ${CMAKE_SOURCE_DIR}/src/libs/common/ivtools
+                ${CMAKE_SOURCE_DIR}/src/libs/common/exceptions
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs
 )
 

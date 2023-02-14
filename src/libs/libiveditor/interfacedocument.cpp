@@ -28,6 +28,7 @@
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/implementationshandler.h"
 #include "commandsstack.h"
+#include "../common/exceptions/inconsistentmodelexception.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
@@ -174,12 +175,17 @@ bool InterfaceDocument::load(const QString &path)
     const QString oldPath = d->filePath;
     setPath(path);
 
-    const bool loaded = loadImpl(path);
-
-    if (loaded) {
-        d->commandsStack->clear();
-    } else {
-        setPath(oldPath);
+    bool loaded = false;
+    try {
+        loaded = loadImpl(path);
+        if (loaded) {
+            d->commandsStack->clear();
+        } else {
+            setPath(oldPath);
+        }
+    } catch (InconsistentModelException &e) {
+        qDebug() << e.what();
+        return false;
     }
 
     return loaded;
