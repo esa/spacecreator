@@ -18,7 +18,6 @@
 #include "exceptions.h"
 #include "mscchart.h"
 #include "msccondition.h"
-#include "msccreate.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
@@ -194,6 +193,31 @@ void tst_MscReader::testMultiParameters()
     QCOMPARE(parameters.size(), 2);
     QCOMPARE(parameters.at(0).expression(), QString("b:   FALSE"));
     QCOMPARE(parameters.at(1).pattern(), QString("11"));
+}
+
+void tst_MscReader::testStringParameter()
+{
+    QString msc = "msc Untitled_1; \
+            instance Inst_1; \
+            out hello(b: \"monkey\") to Inst_2; \
+            endinstance; \
+            instance Inst_2; \
+            in hello(b: \"monkey\") from Inst_1; \
+            endinstance; \
+            endmsc;";
+
+    QScopedPointer<MscModel> model(m_reader->parseText(msc));
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 2);
+    MscInstance *instance1 = chart->instances().at(0);
+    QCOMPARE(chart->totalEventNumber(), 1);
+    auto *message = static_cast<MscMessage *>(chart->eventsForInstance(instance1).at(0));
+    QCOMPARE(message->name(), QString("hello"));
+    MscParameterList parameters = message->parameters();
+    QCOMPARE(parameters.size(), 1);
+    QCOMPARE(parameters.at(0).expression(), QString("b: \"monkey\""));
 }
 
 void tst_MscReader::testMessageParametersCurlyBraces()

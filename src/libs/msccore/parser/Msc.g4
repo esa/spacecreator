@@ -461,11 +461,11 @@ pattern
     ;
 
 wildcard
-    : . | CHARACTERSTRING // TODO not correct ?
+    : . | CHARACTERSTRING | STRING // TODO not correct ?
     | name LEFTOPEN name (LEFTOPEN name RIGHTOPEN)? RIGHTOPEN // extending the spec
     | functionText // extending the spec
     | LEFTCURLYBRACKET functionText RIGHTCURLYBRACKET // extending the spec
-    | LEFTCURLYBRACKET (NAME | CHARACTERSTRING | variableString | sdlText)+ (COMMA (NAME | CHARACTERSTRING | variableString | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
+    | LEFTCURLYBRACKET (NAME | CHARACTERSTRING | STRING | variableString | sdlText)+ (COMMA (NAME | CHARACTERSTRING | STRING | variableString | sdlText)+)* RIGHTCURLYBRACKET // extending the spec
     | asnValue
     ;
 
@@ -485,6 +485,7 @@ expressionString
     : name COLON NAME // TODO not correct ?
     | LEFTCURLYBRACKET name COLON NAME (COMMA name COLON NAME)* RIGHTCURLYBRACKET // TODO not correct ?
     | name COLON CHARACTERSTRING // extending the spec here ?
+    | name COLON STRING // extending the spec here ?
     | name COLON LEFTCURLYBRACKET NAME asnSequence RIGHTCURLYBRACKET // extending the spec here
     | name COLON asnSequence // extending the spec here
     ;

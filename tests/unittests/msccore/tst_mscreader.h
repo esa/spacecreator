@@ -74,6 +74,7 @@ private Q_SLOTS:
     void testMessageParameterWildcard();
     void testMessageParameterExpression();
     void testMultiParameters();
+    void testStringParameter();
     void testMessageParametersCurlyBraces();
     void testMessageChoiceParameter();
     void testMessageComplexParameter();
