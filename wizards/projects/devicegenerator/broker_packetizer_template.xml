@@ -53,7 +53,7 @@
     <Property name="Taste::coordinates" value="26700 53800"/>
 </Required_Interface>
 
-<Provided_Interface name="Trigger" kind="Cyclic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" priority="1">
+<Provided_Interface name="Trigger" kind="Cyclic" layer="default" is_visible="false" required_system_element="NO" stack_size="1024" wcet="0" priority="1">
     <Property name="Taste::coordinates" value="21500 55500"/>
 </Provided_Interface>
 
