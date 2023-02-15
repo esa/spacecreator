@@ -42,7 +42,7 @@ public:
     Asn1Acn::Asn1ModelStorage *asn1Storage() const;
     void setProject(shared::AbstractProject *project);
 
-    QStringList allTypeNames() const;
+    QStringList allTypeNames(bool onlyPrimary = false) const;
 
     QString projectPath() const;
 
