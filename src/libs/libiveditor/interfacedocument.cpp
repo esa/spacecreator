@@ -979,6 +979,9 @@ void InterfaceDocument::showNIYGUI(const QString &title)
 
 void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)
 {
+    if (!d->objectsVisualizationModel || !d->objectsSelectionModel) {
+        return;
+    }
     QItemSelection itemSelection;
     for (auto id : selectedObjects) {
         const QModelIndex idx = d->objectsVisualizationModel->indexFromItem(d->objectsVisualizationModel->getItem(id));

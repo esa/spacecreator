@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2023 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -16,34 +16,23 @@
 */
 
 #include "commandlineparser.h"
-#include "msceditor.h"
-#include "msclibrary.h"
+#include "iveditor.h"
+#include "ivstreamingwindow.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
-#include "streamingwindow.h"
 
 #include <QApplication>
-#include <QDebug>
-#include <QDirIterator>
-#include <QFontDatabase>
 
 int main(int argc, char *argv[])
 {
-    Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
-    msc::initMscLibrary();
-    msc::initMscEditor();
+    ive::initIVEditor();
 
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
     a.setApplicationVersion(spaceCreatorVersion);
-    a.setApplicationName(QObject::tr("MSC Streaming"));
-
-    QDirIterator dirIt(":/fonts");
-    while (dirIt.hasNext())
-        QFontDatabase::addApplicationFont(dirIt.next());
-    a.setFont(QFont(QLatin1String("Ubuntu"), 10));
+    a.setApplicationName(QObject::tr("IV Streaming"));
 
     shared::CommandLineParser cmdParser;
     cmdParser.handlePositional(shared::CommandLineParser::Positional::StartRemoteControl);
@@ -52,11 +41,11 @@ int main(int argc, char *argv[])
     const QString portString = cmdParser.value(shared::CommandLineParser::Positional::StartRemoteControl);
     quint16 port = portString.toUShort();
     if (port <= 1000) {
-        port = 34622;
+        port = 34633;
         qDebug() << "Using default port" << port;
     }
 
-    msc::StreamingWindow window;
+    iv::IVStreamingWindow window;
     if (!window.startRemoteControl(port)) {
         return -1;
     }

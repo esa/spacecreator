@@ -33,6 +33,7 @@ struct GraphicsViewBase::GraphicsViewBasePrivate {
 
     bool panning = false;
     QPointF lastMousePosition;
+    bool interactive = true;
 };
 
 GraphicsViewBase::GraphicsViewBase(QGraphicsScene *scene, QWidget *parent)
@@ -84,6 +85,15 @@ qreal GraphicsViewBase::zoomStepPercent() const
     return d->zoomStepPercent;
 }
 
+/**
+ * Enables/disables mouse and key interaction (selection, editing, ...). Navigation (millde mouse button) is still
+ * always possible.
+ */
+void GraphicsViewBase::setInteractive(bool on)
+{
+    d->interactive = on;
+}
+
 /*!
  * \brief GraphicsViewBase::setZoom Set the current zoom percentage and update the view
  * \a percent
@@ -128,6 +138,12 @@ void GraphicsViewBase::mousePressEvent(QMouseEvent *event)
     if (event->buttons() == Qt::MiddleButton) {
         d->panning = true;
         d->lastMousePosition = event->localPos();
+        event->accept();
+        return;
+    }
+
+    if (!d->interactive) {
+        return;
     }
 
     QGraphicsView::mousePressEvent(event);
@@ -140,6 +156,7 @@ void GraphicsViewBase::mouseMoveEvent(QMouseEvent *event)
         QPointF translation = event->localPos() - d->lastMousePosition;
         translate(translation.x(), translation.y());
         d->lastMousePosition = event->localPos();
+        event->accept();
     }
 
     // Show the coordinates list in the statusbar
@@ -162,12 +179,20 @@ void GraphicsViewBase::mouseMoveEvent(QMouseEvent *event)
 
     Q_EMIT mouseMoved(info);
 
+    if (!d->interactive) {
+        return;
+    }
+
     QGraphicsView::mouseMoveEvent(event);
 }
 
 void GraphicsViewBase::mouseReleaseEvent(QMouseEvent *event)
 {
     d->panning = false;
+    if (!d->interactive) {
+        return;
+    }
+
     QGraphicsView::mouseReleaseEvent(event);
 }
 
@@ -189,6 +214,10 @@ void GraphicsViewBase::wheelEvent(QWheelEvent *event)
 
 void GraphicsViewBase::keyPressEvent(QKeyEvent *event)
 {
+    if (!d->interactive) {
+        return;
+    }
+
     if (event->modifiers() & Qt::ControlModifier && (event->key() == Qt::Key_Plus || event->key() == Qt::Key_Minus)) {
         setZoom(d->zoomPercent + (event->key() == Qt::Key_Plus ? zoomStepPercent() : -zoomStepPercent()));
         event->accept();
@@ -234,16 +263,28 @@ void GraphicsViewBase::drawBackground(QPainter *painter, const QRectF &rect)
 
 void GraphicsViewBase::dragEnterEvent(QDragEnterEvent *event)
 {
+    if (!d->interactive) {
+        return;
+    }
+
     event->acceptProposedAction();
 }
 
 void GraphicsViewBase::dragMoveEvent(QDragMoveEvent *event)
 {
+    if (!d->interactive) {
+        return;
+    }
+
     event->acceptProposedAction();
 }
 
 void GraphicsViewBase::dropEvent(QDropEvent *event)
 {
+    if (!d->interactive) {
+        return;
+    }
+
     if (auto mimeData = qobject_cast<const DropData *>(event->mimeData())) {
         if (mimeData->dropType == DropData::Type::ImportableType) {
             Q_EMIT importEntity(mimeData->entityId, mapToScene(event->pos()));

@@ -43,6 +43,8 @@ public:
     qreal maxZoomPercent() const;
     qreal zoomStepPercent() const;
 
+    void setInteractive(bool on);
+
 Q_SIGNALS:
     void mouseMoved(const QString &coordsInfo);
     void zoomChanged(qreal percent);
