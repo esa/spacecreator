@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "remotecontrolwebserver.h"
-
+#include <QJsonObject>
 #include <QObject>
 #include <QPointer>
 #include <QVariantMap>
@@ -36,6 +35,22 @@ class RemoteControlHandler : public QObject
 {
     Q_OBJECT
 public:
+    enum class CommandType
+    {
+        Instance,
+        StopInstance,
+        Message,
+        Timer,
+        Action,
+        Condition,
+        MessageDeclaration,
+        Undo,
+        Redo,
+        Save,
+        VisibleItemLimit,
+    };
+    Q_ENUM(CommandType)
+
     explicit RemoteControlHandler(QObject *parent = nullptr);
 
     void setMscModel(MscModel *model);
@@ -44,12 +59,12 @@ public:
     void setChart(msc::MscChart *mscChart);
 
 public Q_SLOTS:
+    void handleMessage(const QJsonObject &obj, const QString &peerName);
     void handleRemoteCommand(
-            RemoteControlWebServer::CommandType commandType, const QVariantMap &params, const QString &peerName);
+            msc::RemoteControlHandler::CommandType commandType, const QVariantMap &params, const QString &peerName);
 
 Q_SIGNALS:
-    void commandDone(RemoteControlWebServer::CommandType commandType, bool result, const QString &peerName,
-            const QString &errorString);
+    void commandDone(bool result, const QString &peerName, const QString &errorString);
 
 private:
     bool handleInstanceCommand(const QVariantMap &params, QString *errorString);

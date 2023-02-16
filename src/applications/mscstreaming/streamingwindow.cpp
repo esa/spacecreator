@@ -24,8 +24,8 @@
 #include "mscchartviewconstants.h"
 #include "msccommandsstack.h"
 #include "mscmodel.h"
+#include "remotecontrol/remotecontrolwebserver.h"
 #include "remotecontrolhandler.h"
-#include "remotecontrolwebserver.h"
 #include "streaminglayoutmanager.h"
 #include "ui_streamingwindow.h"
 
@@ -58,7 +58,7 @@ struct StreamingWindow::StreamingWindowPrivate {
     std::unique_ptr<StreamingLayoutManager> m_layoutManager;
     std::unique_ptr<QGraphicsScene> m_overlayScene;
 
-    msc::RemoteControlWebServer *m_remoteControlWebServer = nullptr;
+    shared::RemoteControlWebServer *m_remoteControlWebServer = nullptr;
     msc::RemoteControlHandler *m_remoteControlHandler = nullptr;
 
     Q_DISABLE_COPY(StreamingWindowPrivate);
@@ -111,17 +111,17 @@ StreamingWindow::~StreamingWindow() { }
 bool StreamingWindow::startRemoteControl(quint16 port)
 {
     if (!d->m_remoteControlWebServer) {
-        d->m_remoteControlWebServer = new msc::RemoteControlWebServer(this);
+        d->m_remoteControlWebServer = new shared::RemoteControlWebServer(this);
         d->m_remoteControlHandler = new msc::RemoteControlHandler(this);
         d->m_remoteControlHandler->setMscModel(d->m_dataModel.get());
         d->m_remoteControlHandler->setUndoStack(d->m_undoStack->undoStack());
         d->m_remoteControlHandler->setLayoutManager(d->m_layoutManager.get());
         d->m_remoteControlHandler->setChart(d->m_dataModel->firstChart());
 
-        connect(d->m_remoteControlWebServer, &msc::RemoteControlWebServer::executeCommand, d->m_remoteControlHandler,
-                &msc::RemoteControlHandler::handleRemoteCommand);
+        connect(d->m_remoteControlWebServer, &shared::RemoteControlWebServer::commandReceived,
+                d->m_remoteControlHandler, &msc::RemoteControlHandler::handleMessage);
         connect(d->m_remoteControlHandler, &msc::RemoteControlHandler::commandDone, d->m_remoteControlWebServer,
-                &msc::RemoteControlWebServer::commandDone);
+                &shared::RemoteControlWebServer::commandDone);
     }
     if (d->m_remoteControlWebServer->start(port)) {
         return true;

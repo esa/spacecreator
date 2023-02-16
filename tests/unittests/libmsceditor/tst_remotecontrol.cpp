@@ -28,8 +28,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "msclibrary.h"
 #include "mscmessagedeclaration.h"
 #include "mscmodel.h"
+#include "remotecontrol/remotecontrolwebserver.h"
 #include "remotecontrolhandler.h"
-#include "remotecontrolwebserver.h"
 #include "sharedlibrary.h"
 #include "streaminglayoutmanager.h"
 
@@ -53,7 +53,7 @@ public:
     };
 
     tst_RemoteControl()
-        : m_server(new msc::RemoteControlWebServer(this))
+        : m_server(new shared::RemoteControlWebServer(this))
         , m_handler(new msc::RemoteControlHandler(this))
         , m_socket(new QWebSocket(QString(), QWebSocketProtocol::Version::VersionLatest, this))
         , m_textMessageReceived(m_socket, SIGNAL(textMessageReceived(QString)))
@@ -69,10 +69,10 @@ private Q_SLOTS:
     {
         shared::initSharedLibrary();
 
-        connect(m_server, &msc::RemoteControlWebServer::executeCommand, m_handler,
-                &msc::RemoteControlHandler::handleRemoteCommand);
+        connect(m_server, &shared::RemoteControlWebServer::commandReceived, m_handler,
+                &msc::RemoteControlHandler::handleMessage);
         connect(m_handler, &msc::RemoteControlHandler::commandDone, m_server,
-                &msc::RemoteControlWebServer::commandDone);
+                &shared::RemoteControlWebServer::commandDone);
 
         m_server->start(kPort);
     }
@@ -537,7 +537,7 @@ private:
         }
     }
 
-    msc::RemoteControlWebServer *m_server = nullptr;
+    shared::RemoteControlWebServer *m_server = nullptr;
     msc::RemoteControlHandler *m_handler = nullptr;
     std::unique_ptr<msc::MscModel> m_dataModel;
     std::unique_ptr<msc::MscCommandsStack> m_undoStack;

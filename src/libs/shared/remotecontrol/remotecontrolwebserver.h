@@ -18,34 +18,19 @@
 #pragma once
 
 #include <QAbstractSocket>
+#include <QJsonObject>
 #include <QObject>
 #include <QVariantMap>
 
 class QWebSocketServer;
 class QWebSocket;
 
-namespace msc {
+namespace shared {
 
 class RemoteControlWebServer : public QObject
 {
     Q_OBJECT
 public:
-    enum class CommandType
-    {
-        Instance,
-        StopInstance,
-        Message,
-        Timer,
-        Action,
-        Condition,
-        MessageDeclaration,
-        Undo,
-        Redo,
-        Save,
-        VisibleItemLimit,
-    };
-    Q_ENUM(CommandType)
-
     explicit RemoteControlWebServer(QObject *parent = nullptr);
     ~RemoteControlWebServer() override;
 
@@ -58,12 +43,10 @@ public Q_SLOTS:
     void socketDisconnected();
     void error(QAbstractSocket::SocketError error);
 
-    void commandDone(RemoteControlWebServer::CommandType commandType, bool result, const QString &peerName,
-            const QString &errorString);
+    void commandDone(bool result, const QString &peerName, const QString &errorString);
 
 Q_SIGNALS:
-    void executeCommand(
-            RemoteControlWebServer::CommandType commandType, const QVariantMap &params, const QString &peerName);
+    void commandReceived(const QJsonObject &, const QString &);
 
 private:
     QWebSocketServer *m_webSocketServer = nullptr;

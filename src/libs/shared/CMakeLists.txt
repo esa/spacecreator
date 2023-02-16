@@ -101,6 +101,8 @@ target_sources(${LIB_NAME} PRIVATE
     propertytemplatemanager.ui
     propertytemplatewidget.cpp
     propertytemplatewidget.h
+    remotecontrol/remotecontrolwebserver.cpp
+    remotecontrol/remotecontrolwebserver.h
     reports/bugreportdialog.cpp
     reports/bugreportdialog.h
     reports/bugreportdialog.ui
@@ -157,12 +159,13 @@ target_sources(${LIB_NAME} PRIVATE
 target_include_directories(${LIB_NAME} PUBLIC .)
 
 target_link_libraries(${LIB_NAME}
+    ${QT_CONCURRENT}
     ${QT_CORE}
     ${QT_GUI}
-    ${QT_XML}
-    ${QT_WIDGETS}
     ${QT_NETWORK}
-    ${QT_CONCURRENT}
+    ${QT_WEBSOCKETS}
+    ${QT_WIDGETS}
+    ${QT_XML}
 )
 
 if(OPTIONS_NO_DEPRECATED)

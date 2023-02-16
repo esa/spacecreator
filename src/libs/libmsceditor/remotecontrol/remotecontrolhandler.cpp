@@ -48,9 +48,64 @@
 namespace msc {
 
 /*!
- * \class msc::RemoteControlHandler
- *
- * Handles the remote control of the view.
+  \class msc::RemoteControlHandler Handles the commands sent via the shared::RemoteControlWebServer
+
+JSON structure:
+
+ {
+     "CommandType": "command",
+     "Parameters": {
+         "parameter1": "parameter1Value",
+         "parameter2": "parameter2Value",
+         "parameter3": "parameter3Value",
+         ...
+     }
+ }
+
+Implemented commands and parameters list:
+
+- **Instance** - creating new Instance
+ + **name** - Instance's Name, command fails if Chart already has Instance with this name, optional
+ + **kind** - Instance's Kind, optional - MSC uses the name if no kind is set.
+ + **pos** - Instance's X position in pixel. Default is '-1' which means append at the right. Optional parameter.
+ + **exStop** - Explicit stop {True, False=default}, optional
+- **Message** - creating new Message, command fails if neither **srcName** nor **dstName** parameter set.
+ + **name** - Message's Name, optional
+ + **srcName** - source Instance's Name, command fails if Chart doesn't have Instance with this name
+ + **dstName** - target Instance's Name, command fails if Chart doesn't have Instance with this name
+ + **MessageType** - type of **Message**, optional
+     + **Message** - default
+     + **Create**
+ + **Async** - indicates if the messages is async **Message**, optional (if not set, the message is sync)
+     + **sent**
+     + **received**
+- **Timer** - creating new Timer
+ + **name** - Timer's Name, optional
+ + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
+ + **TimerType** - type of **Timer**, optional
+     + **Start**
+     + **Stop**
+     + **Timeout**
+     + **Unknown**
+- **Action** - creating new Action
++ **name** - Action's Name, optional
++ **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
+- **Condition** - creating new Condition
+ + **name** - Condition's Name, optional
+ + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name,mandatory
+ + **shared** - is it shared Condition, optional, default No
+- **MessageDeclaration** - Adds a message declaration
+ + **names** Names of the message declaration separated by commas ","
+ + **typeRefList** String representation of the (ASN.1)types of each parameters, separated by commas ","
+- **Undo** - revert the last command
+- **Redo** - Redo the last reverted command
+- **Save** - save the current chart to a file
+ + **fileName** - name of the file to save to
+ + **asn1File** - name of the file that is having the asn data. This is the file name only. So not including a the
+path. The file is expected to be in the same directory as the msc file. This parameter is optional
+- **VisibleItemLimit** - limit visible events in the scene
++ **number** - count of visible items, -1 if all of them should be visible
+
  */
 RemoteControlHandler::RemoteControlHandler(QObject *parent)
     : QObject(parent)
@@ -77,6 +132,19 @@ void RemoteControlHandler::setChart(MscChart *mscChart)
     m_mscChart = mscChart;
 }
 
+/**
+ * Processes a command defined in the object \p obj received from peer \p peerName
+ */
+void RemoteControlHandler::handleMessage(const QJsonObject &obj, const QString &peerName)
+{
+    const QMetaEnum qtEnum = QMetaEnum::fromType<RemoteControlHandler::CommandType>();
+    const QString commandTypeStr = obj.value(qtEnum.name()).toString();
+    const int commandTypeInt = qtEnum.keyToValue(commandTypeStr.toLocal8Bit().constData());
+
+    handleRemoteCommand(static_cast<RemoteControlHandler::CommandType>(commandTypeInt),
+            obj.value(QLatin1String("Parameters")).toObject().toVariantMap(), peerName);
+}
+
 /*!
  * \brief RemoteControlHandler::handleRemoteCommand Perform a remote command
  * \param commandType The type of the command to perform
@@ -86,62 +154,62 @@ void RemoteControlHandler::setChart(MscChart *mscChart)
  * This is the main function. Call this to perform a command.
  */
 void RemoteControlHandler::handleRemoteCommand(
-        RemoteControlWebServer::CommandType commandType, const QVariantMap &params, const QString &peerName)
+        RemoteControlHandler::CommandType commandType, const QVariantMap &params, const QString &peerName)
 {
     if (!m_mscModel) {
-        Q_EMIT commandDone(commandType, false, peerName, QLatin1String("Empty model"));
+        Q_EMIT commandDone(false, peerName, QLatin1String("Empty model"));
         return;
     }
     bool result = false;
     if (!m_mscChart) {
-        Q_EMIT commandDone(commandType, result, peerName, QLatin1String("Empty document"));
+        Q_EMIT commandDone(result, peerName, QLatin1String("Empty document"));
         return;
     }
 
     QString errorString;
     switch (commandType) {
-    case RemoteControlWebServer::CommandType::Instance:
+    case RemoteControlHandler::CommandType::Instance:
         result = handleInstanceCommand(params, &errorString);
         break;
-    case RemoteControlWebServer::CommandType::StopInstance:
+    case RemoteControlHandler::CommandType::StopInstance:
         result = handleInstanceStopCommand(params, &errorString);
         break;
-    case RemoteControlWebServer::CommandType::Message:
+    case RemoteControlHandler::CommandType::Message:
         result = handleMessageCommand(params, &errorString);
         break;
-    case RemoteControlWebServer::CommandType::Timer:
+    case RemoteControlHandler::CommandType::Timer:
         result = handleTimerCommand(params, &errorString);
         break;
-    case RemoteControlWebServer::CommandType::Action:
+    case RemoteControlHandler::CommandType::Action:
         result = handleActionCommand(params, &errorString);
         break;
-    case RemoteControlWebServer::CommandType::Condition:
+    case RemoteControlHandler::CommandType::Condition:
         result = handleConditionCommand(params, &errorString);
         break;
-    case RemoteControlWebServer::CommandType::MessageDeclaration:
+    case RemoteControlHandler::CommandType::MessageDeclaration:
         result = handleMessageDeclarationCommand(params, &errorString);
         break;
-    case RemoteControlWebServer::CommandType::Undo:
+    case RemoteControlHandler::CommandType::Undo:
         result = m_undoStack->canUndo();
         if (result)
             m_undoStack->undo();
         else
             errorString = tr("Nothing to Undo");
         break;
-    case RemoteControlWebServer::CommandType::Redo:
+    case RemoteControlHandler::CommandType::Redo:
         result = m_undoStack->canRedo();
         if (result)
             m_undoStack->redo();
         else
             errorString = tr("Nothing to Redo");
         break;
-    case RemoteControlWebServer::CommandType::Save: {
+    case RemoteControlHandler::CommandType::Save: {
         result = saveMsc(params.value("fileName").toString(), params.value("asn1File").toString());
         if (!result) {
             errorString = tr("Empty filename");
         }
     } break;
-    case RemoteControlWebServer::CommandType::VisibleItemLimit: {
+    case RemoteControlHandler::CommandType::VisibleItemLimit: {
         const int number = params.value(QLatin1String("number")).toInt(&result);
         if (!result)
             errorString = tr("Wrong limit number for items visibility");
@@ -154,7 +222,7 @@ void RemoteControlHandler::handleRemoteCommand(
         break;
     }
 
-    Q_EMIT commandDone(commandType, result, peerName, errorString);
+    Q_EMIT commandDone(result, peerName, errorString);
 }
 
 /*!

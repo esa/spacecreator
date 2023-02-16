@@ -25,7 +25,7 @@
 #include <QtWebSockets/QWebSocket>
 #include <QtWebSockets/QWebSocketServer>
 
-namespace msc {
+namespace shared {
 
 static inline QByteArray generateResponse(bool result, const QString &errorString = QString())
 {
@@ -37,62 +37,8 @@ static inline QByteArray generateResponse(bool result, const QString &errorStrin
 }
 
 /*!
-\class msc::RemoteControlWebServer
-\brief Handles remote control commands and arguments compounded in json packet using websocket. JSON structure:
-
-    {
-        "CommandType": "command",
-        "Parameters": {
-            "parameter1": "parameter1Value",
-            "parameter2": "parameter2Value",
-            "parameter3": "parameter3Value",
-            ...
-        }
-    }
-
-Implemented commands and parameters list:
-
-- **Instance** - creating new Instance
-    + **name** - Instance's Name, command fails if Chart already has Instance with this name, optional
-    + **kind** - Instance's Kind, optional - MSC uses the name if no kind is set.
-    + **pos** - Instance's X position in pixel. Default is '-1' which means append at the right. Optional parameter.
-    + **exStop** - Explicit stop {True, False=default}, optional
-- **Message** - creating new Message, command fails if neither **srcName** nor **dstName** parameter set.
-    + **name** - Message's Name, optional
-    + **srcName** - source Instance's Name, command fails if Chart doesn't have Instance with this name
-    + **dstName** - target Instance's Name, command fails if Chart doesn't have Instance with this name
-    + **MessageType** - type of **Message**, optional
-        + **Message** - default
-        + **Create**
-    + **Async** - indicates if the messages is async **Message**, optional (if not set, the message is sync)
-        + **sent**
-        + **received**
-- **Timer** - creating new Timer
-    + **name** - Timer's Name, optional
-    + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
-    + **TimerType** - type of **Timer**, optional
-        + **Start**
-        + **Stop**
-        + **Timeout**
-        + **Unknown**
-- **Action** - creating new Action
-   + **name** - Action's Name, optional
-   + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name, mandatory
-- **Condition** - creating new Condition
-    + **name** - Condition's Name, optional
-    + **instanceName** - linked Instance's Name, command fails if Chart doesn't have Instance with this name,mandatory
-    + **shared** - is it shared Condition, optional, default No
-- **MessageDeclaration** - Adds a message declaration
-    + **names** Names of the message declaration separated by commas ","
-    + **typeRefList** String representation of the (ASN.1)types of each parameters, separated by commas ","
-- **Undo** - revert the last command
-- **Redo** - Redo the last reverted command
-- **Save** - save the current chart to a file
-    + **fileName** - name of the file to save to
-    + **asn1File** - name of the file that is having the asn data. This is the file name only. So not including a the
-path. The file is expected to be in the same directory as the msc file. This parameter is optional
-- **VisibleItemLimit** - limit visible events in the scene
-   + **number** - count of visible items, -1 if all of them should be visible
+\class shared::RemoteControlWebServer
+\brief Handles remote control commands and arguments compounded in json packet using websocket.
 
 After command processing returns JSON packet:
 
@@ -101,7 +47,6 @@ After command processing returns JSON packet:
         "errorString": "Short error description"
     }
 
-\ingroup MscEditor
  */
 
 RemoteControlWebServer::RemoteControlWebServer(QObject *parent)
@@ -173,12 +118,7 @@ void RemoteControlWebServer::processTextMessage(const QString &message)
         return;
     }
     const QJsonObject obj = doc.object();
-    const QMetaEnum qtEnum = QMetaEnum::fromType<RemoteControlWebServer::CommandType>();
-    const QString commandTypeStr = obj.value(qtEnum.name()).toString();
-    const int commandTypeInt = qtEnum.keyToValue(commandTypeStr.toLocal8Bit().constData());
-    Q_EMIT executeCommand(static_cast<RemoteControlWebServer::CommandType>(commandTypeInt),
-            obj.value(QLatin1String("Parameters")).toObject().toVariantMap(),
-            pClient ? pClient->peerName() : QString());
+    Q_EMIT commandReceived(obj, pClient ? pClient->peerName() : QString());
 }
 
 /*!
@@ -216,15 +156,12 @@ void RemoteControlWebServer::error(QAbstractSocket::SocketError error)
 
 /*!
  * \brief RemoteControlWebServer::commandDone Generate a response after a remote command has been handled
- * \param commandType
  * \param result
  * \param peerName
  * \param errorString
  */
-void RemoteControlWebServer::commandDone(RemoteControlWebServer::CommandType commandType, bool result,
-        const QString &peerName, const QString &errorString)
+void RemoteControlWebServer::commandDone(bool result, const QString &peerName, const QString &errorString)
 {
-    Q_UNUSED(commandType)
     auto it = std::find_if(m_clients.constBegin(), m_clients.constEnd(),
             [peerName](const QWebSocket *socket) { return socket->peerName() == peerName; });
     if (it == m_clients.constEnd())

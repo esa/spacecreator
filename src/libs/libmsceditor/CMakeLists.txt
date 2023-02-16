@@ -152,8 +152,6 @@ target_sources(${LIB_NAME} PRIVATE
     msceditorresources.qrc
     remotecontrol/remotecontrolhandler.cpp
     remotecontrol/remotecontrolhandler.h
-    remotecontrol/remotecontrolwebserver.cpp
-    remotecontrol/remotecontrolwebserver.h
     systemchecks.cpp
     systemchecks.h
     textviewdialog.cpp
