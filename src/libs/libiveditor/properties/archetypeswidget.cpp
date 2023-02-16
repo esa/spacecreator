@@ -108,11 +108,44 @@ void ArchetypesWidget::applyArchetypes()
         return;
     }
 
-    auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());
-    m_cmdMacro->push(command);
-
     const auto allTypeNames = m_asn1Checks->allTypeNames(true);
     QStringList missingTypeNames;
+
+    // check for missing types
+    for (int i = 0; i < m_model->getArchetypeReferences().size(); i++) {
+        ivm::ArchetypeObject *archetypeObject = m_archetypeModel->getObjectByName(
+                m_model->getArchetypeReferences()[i]->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
+        ivm::FunctionArchetype *functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>();
+
+        if (functionArchetype == nullptr || !m_model->isReferenceNew(i)) {
+            continue;
+        }
+
+        for (auto interface : functionArchetype->getInterfaces()) {
+            // compare with ASN for missing types
+            const auto parameters = interface->getParameters();
+            for (auto parameter : parameters) {
+                const auto type = parameter-> getType();
+                if (!allTypeNames.contains(type)) {
+                    missingTypeNames.append(type);
+                }
+            }
+        }
+    }
+
+    if (!missingTypeNames.isEmpty()) {
+        const auto missingTypesString = missingTypeNames.join(QChar('\n'));
+        const auto reply = QMessageBox::question(qApp->activeWindow(), tr("Missing types"),
+                tr("Archetypes contain missing ASN.1 type names:\n\n%1\nWould you like to continue with default types?").arg(missingTypesString),
+                QMessageBox::Yes | QMessageBox::Cancel);
+
+        if (reply == QMessageBox::Cancel) {
+            return;
+        }
+    }
+
+    auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());
+    m_cmdMacro->push(command);
 
     for (int i = 0; i < m_model->getArchetypeReferences().size(); i++) {
         ivm::ArchetypeObject *archetypeObject = m_archetypeModel->getObjectByName(
@@ -132,15 +165,6 @@ void ArchetypesWidget::applyArchetypes()
                 continue;
             }
 
-            // compare with ASN for missing types
-            const auto parameters = interface->getParameters();
-            for (auto parameter : parameters) {
-                const auto type = parameter-> getType();
-                if (!allTypeNames.contains(type)) {
-                    missingTypeNames.append(type);
-                }
-            }
-
             ivm::IVInterface::CreationInfo creationInfo = generateCreationInfo(interface);
 
             auto command = new cmd::CmdInterfaceItemCreate(creationInfo);
@@ -148,12 +172,6 @@ void ArchetypesWidget::applyArchetypes()
 
             m_model->setReferenceNotNew(i);
         }
-    }
-
-    if (!missingTypeNames.isEmpty()) {
-        const auto missingTypesString = missingTypeNames.join(QChar('\n'));
-        QMessageBox::warning(qApp->activeWindow(), tr("Missing types"),
-                tr("Missing type names in archetypes:\n\n%1").arg(missingTypesString));
     }
 }
 
