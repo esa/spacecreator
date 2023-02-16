@@ -43,6 +43,7 @@ public:
     void setProject(shared::AbstractProject *project);
 
     QStringList allTypeNames(bool onlyPrimary = false) const;
+    QString primaryFileName() const;
 
     QString projectPath() const;
 

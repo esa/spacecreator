@@ -25,7 +25,9 @@
 #include "archetypes/interfacearchetype.h"
 #include "archetypes/parameterarchetype.h"
 #include "archetypeswidgetmodel.h"
+#include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
+#include "asn1/types/integer.h"
 #include "commands/cmdfunctionarchetypesapply.h"
 #include "commands/cmdinterfaceitemcreate.h"
 #include "delegates/comboboxdelegate.h"
@@ -136,12 +138,25 @@ void ArchetypesWidget::applyArchetypes()
     if (!missingTypeNames.isEmpty()) {
         const auto missingTypesString = missingTypeNames.join(QChar('\n'));
         const auto reply = QMessageBox::question(qApp->activeWindow(), tr("Missing types"),
-                tr("Archetypes contain missing ASN.1 type names:\n\n%1\nWould you like to continue with default types?").arg(missingTypesString),
+                tr("Archetypes contain missing ASN.1 type names:\n\n%1\n\nWould you like to continue with default types?").arg(missingTypesString),
                 QMessageBox::Yes | QMessageBox::Cancel);
 
         if (reply == QMessageBox::Cancel) {
             return;
         }
+
+        Asn1Acn::Asn1ModelStorage* asn1Storage = m_asn1Checks->asn1Storage();
+        Asn1Acn::File* asn1DataTypes = asn1Storage-> asn1DataTypes(m_asn1Checks->primaryFileName());
+        std::unique_ptr<Asn1Acn::Definitions> definitions (new Asn1Acn::Definitions ("DefStub", Asn1Acn::SourceLocation()));
+        // definitions->addType()
+
+        for (const auto missingTypeName : missingTypeNames) {
+            std::unique_ptr<Asn1Acn::TypeAssignment> type (new Asn1Acn::TypeAssignment (
+                        missingTypeName, missingTypeName, Asn1Acn::SourceLocation(),
+                        std::unique_ptr<Asn1Acn::Types::Type>(new Asn1Acn::Types::Integer)));
+            definitions->addType(std::move(type));
+        }
+        asn1DataTypes->add(std::move(definitions));
     }
 
     auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());

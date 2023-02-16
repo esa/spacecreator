@@ -69,9 +69,22 @@ QStringList Asn1SystemChecks::allTypeNames(bool onlyPrimary) const
                 }
             }
         }
-        qDebug() << "allTypeNames" << fileName << typeNames;
     }
     return typeNames;
+}
+
+QString Asn1SystemChecks::primaryFileName() const
+{
+    if (!m_project || !m_storage) {
+        return QString();
+    }
+
+    const auto allAsn1Files = m_project->allAsn1Files();
+    if (allAsn1Files.isEmpty()) {
+        return QString();
+    }
+
+    return allAsn1Files.first();
 }
 
 QString Asn1SystemChecks::projectPath() const
