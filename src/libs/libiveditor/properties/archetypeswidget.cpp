@@ -25,6 +25,7 @@
 #include "archetypes/interfacearchetype.h"
 #include "archetypes/parameterarchetype.h"
 #include "archetypeswidgetmodel.h"
+#include "asn1systemchecks.h"
 #include "commands/cmdfunctionarchetypesapply.h"
 #include "commands/cmdinterfaceitemcreate.h"
 #include "delegates/comboboxdelegate.h"
@@ -45,11 +46,13 @@
 namespace ive {
 
 ArchetypesWidget::ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVModel *layersModel,
-        ivm::IVFunctionType *function, shared::cmd::CommandsStackBase::Macro *macro, QWidget *parent)
+        QPointer<Asn1Acn::Asn1SystemChecks> asn1Checks, ivm::IVFunctionType *function, shared::cmd::CommandsStackBase::Macro *macro,
+        QWidget *parent)
     : QWidget(parent)
     , m_ui(std::make_unique<Ui::ArchetypesWidget>())
     , m_archetypeModel(archetypeModel)
     , m_layersModel(layersModel)
+    , m_asn1Checks(asn1Checks)
     , m_cmdMacro(macro)
 {
     Q_ASSERT(function && function->model());
@@ -108,8 +111,10 @@ void ArchetypesWidget::applyArchetypes()
     auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());
     m_cmdMacro->push(command);
 
-    for (int i = 0; i < m_model->getArchetypeReferences().size(); i++) {
+    const auto allTypeNames = m_asn1Checks->allTypeNames(true);
+    QStringList missingTypeNames;
 
+    for (int i = 0; i < m_model->getArchetypeReferences().size(); i++) {
         ivm::ArchetypeObject *archetypeObject = m_archetypeModel->getObjectByName(
                 m_model->getArchetypeReferences()[i]->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
         ivm::FunctionArchetype *functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>();
@@ -127,6 +132,15 @@ void ArchetypesWidget::applyArchetypes()
                 continue;
             }
 
+            // compare with ASN for missing types
+            const auto parameters = interface->getParameters();
+            for (auto parameter : parameters) {
+                const auto type = parameter-> getType();
+                if (!allTypeNames.contains(type)) {
+                    missingTypeNames.append(type);
+                }
+            }
+
             ivm::IVInterface::CreationInfo creationInfo = generateCreationInfo(interface);
 
             auto command = new cmd::CmdInterfaceItemCreate(creationInfo);
@@ -134,6 +148,12 @@ void ArchetypesWidget::applyArchetypes()
 
             m_model->setReferenceNotNew(i);
         }
+    }
+
+    if (!missingTypeNames.isEmpty()) {
+        const auto missingTypesString = missingTypeNames.join(QChar('\n'));
+        QMessageBox::warning(qApp->activeWindow(), tr("Missing types"),
+                tr("Missing type names in archetypes:\n\n%1").arg(missingTypesString));
     }
 }
 

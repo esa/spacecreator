@@ -298,7 +298,7 @@ void IVPropertiesDialog::initArchetypeView()
     if (function == nullptr) {
         return;
     }
-    auto archetypesWidget = new ive::ArchetypesWidget(m_archetypesModel, m_layersModel, function, commandMacro(), this);
+    auto archetypesWidget = new ive::ArchetypesWidget(m_archetypesModel, m_layersModel, m_asn1Checks, function, commandMacro(), this);
 
     connect(propertiesDialogUi()->buttonBox, &QDialogButtonBox::accepted, archetypesWidget,
             &ive::ArchetypesWidget::applyArchetypes);

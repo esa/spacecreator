@@ -50,7 +50,7 @@ class ArchetypesWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVModel *layersModel,
+    explicit ArchetypesWidget(ivm::ArchetypeModel *archetypeModel, ivm::IVModel *layersModel, QPointer<Asn1Acn::Asn1SystemChecks> asn1Checks,
             ivm::IVFunctionType *function, cmd::CommandsStack::Macro *macro, QWidget *parent = nullptr);
     ~ArchetypesWidget();
 
@@ -67,6 +67,7 @@ private:
 private:
     std::unique_ptr<Ui::ArchetypesWidget> m_ui;
     QPointer<ivm::IVModel> m_layersModel;
+    QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
     QPointer<ArchetypesWidgetModel> m_model;
     QPointer<ivm::ArchetypeModel> m_archetypeModel;
     shared::cmd::CommandsStackBase::Macro *m_cmdMacro = nullptr;
