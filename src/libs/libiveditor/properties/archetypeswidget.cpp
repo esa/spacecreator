@@ -27,7 +27,7 @@
 #include "archetypeswidgetmodel.h"
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
-#include "asn1/types/integer.h"
+#include "asn1/types/boolean.h"
 #include "commands/cmdfunctionarchetypesapply.h"
 #include "commands/cmdinterfaceitemcreate.h"
 #include "delegates/comboboxdelegate.h"
@@ -134,6 +134,7 @@ void ArchetypesWidget::applyArchetypes()
             }
         }
     }
+    missingTypeNames.removeDuplicates();
 
     if (!missingTypeNames.isEmpty()) {
         const auto missingTypesString = missingTypeNames.join(QChar('\n'));
@@ -145,18 +146,47 @@ void ArchetypesWidget::applyArchetypes()
             return;
         }
 
+
+
         Asn1Acn::Asn1ModelStorage* asn1Storage = m_asn1Checks->asn1Storage();
         Asn1Acn::File* asn1DataTypes = asn1Storage-> asn1DataTypes(m_asn1Checks->primaryFileName());
-        std::unique_ptr<Asn1Acn::Definitions> definitions (new Asn1Acn::Definitions ("DefStub", Asn1Acn::SourceLocation()));
-        // definitions->addType()
 
+        QStringList definitionsNames;
+        for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : asn1DataTypes->definitionsList()) {
+            definitionsNames.append(definitions->name());
+        }
+
+        // generate an unique name for new definitions
+        int nameSuffix = 1;
+        QString newName;
+        while (true) {
+            newName = QStringLiteral("DefStub%1").arg (QString::number(nameSuffix++));
+            if (!definitionsNames.contains(newName)) {
+                break;
+            }
+        }
+
+        // generate
+        std::unique_ptr<Asn1Acn::Definitions> definitions (new Asn1Acn::Definitions (newName, Asn1Acn::SourceLocation()));
+        QString definitionsString = QStringLiteral("%1 DEFINITIONS ::=\nBEGIN\n\n").arg(newName);
         for (const auto missingTypeName : missingTypeNames) {
             std::unique_ptr<Asn1Acn::TypeAssignment> type (new Asn1Acn::TypeAssignment (
                         missingTypeName, missingTypeName, Asn1Acn::SourceLocation(),
-                        std::unique_ptr<Asn1Acn::Types::Type>(new Asn1Acn::Types::Integer)));
+                        std::unique_ptr<Asn1Acn::Types::Type>(new Asn1Acn::Types::Boolean)));
             definitions->addType(std::move(type));
+            definitionsString.append(QStringLiteral("  %1 ::= BOOLEAN\n").arg (missingTypeName));
         }
         asn1DataTypes->add(std::move(definitions));
+        definitionsString.append(QStringLiteral("\nEND\n"));
+
+        QFile asnFile(m_asn1Checks->primaryFileName());
+        if (asnFile.open(QFile::WriteOnly | QFile::Append)) {
+            asnFile.write(definitionsString.toUtf8());
+            asnFile.close();
+        } else {
+            QMessageBox::critical(qApp->activeWindow(), tr("Write error"), tr("Unable to write types into the ASN file."));
+            return;
+        }
     }
 
     auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());
