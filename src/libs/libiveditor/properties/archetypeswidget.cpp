@@ -317,9 +317,52 @@ QString ArchetypesWidget::buildDefinitionsString(const QStringList& missingTypeN
 bool ArchetypesWidget::writeDefinitions(const QString &fileName, const QString& definitionsString)
 {
     QFile asnFile(m_asn1Checks->primaryFileName());
-    if (asnFile.open(QFile::WriteOnly | QFile::Append)) {
-        asnFile.write(definitionsString.toUtf8());
-        asnFile.close();
+    if (asnFile.open(QFile::ReadWrite)) {
+        QString asnFileContent = asnFile.readAll();
+        QRegularExpression regex("^(?:(?:(.*)(--.*?))|(.*))$");
+        regex.setPatternOptions(QRegularExpression::MultilineOption);
+
+        // write matches to list, so we can iterate over them in reverse
+        auto matches = regex.globalMatch(asnFileContent);
+        QList<QRegularExpressionMatch> matchesList;
+        while (matches.hasNext()) {
+            matchesList.append(matches.next());
+        }
+
+        bool endFound = false;
+        QStringList lines;
+        for (auto iterator = matchesList.rbegin(); iterator != matchesList.rend(); ++iterator) {
+            if (endFound) {
+                lines.append(iterator->captured(0));
+            } else {
+                if (iterator->lastCapturedIndex() == 2) {
+                    // line contains a comment
+                    if (iterator->captured(1).contains(QStringLiteral("END"))) {
+                        endFound = true;
+                        auto lineReplaced = iterator->captured(1);
+                        lineReplaced.replace(QStringLiteral("END"), definitionsString);
+                        lineReplaced.append(iterator->captured(2));
+                        lines.append(lineReplaced);
+                    } else {
+                        lines.append(iterator->captured(0));
+                    }
+                } else {
+                    // line doesn't contain comment
+                    if (iterator->captured(3).contains(QStringLiteral("END"))) {
+                        endFound = true;
+                        auto lineReplaced = iterator->captured(3);
+                        lineReplaced.replace(QStringLiteral("END"), definitionsString);
+                        lines.append(lineReplaced);
+                    } else {
+                        lines.append(iterator->captured(0));
+                    }
+                }
+            }
+        }
+        std::reverse(lines.begin(), lines.end());
+
+        asnFile.resize(0);
+        asnFile.write(lines.join(QChar('\n')).toUtf8());
         return true;
     }
     return false;
