@@ -110,83 +110,8 @@ void ArchetypesWidget::applyArchetypes()
         return;
     }
 
-    const auto allTypeNames = m_asn1Checks->allTypeNames();
-    QStringList missingTypeNames;
-
-    // check for missing types
-    for (int i = 0; i < m_model->getArchetypeReferences().size(); i++) {
-        ivm::ArchetypeObject *archetypeObject = m_archetypeModel->getObjectByName(
-                m_model->getArchetypeReferences()[i]->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
-        ivm::FunctionArchetype *functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>();
-
-        if (functionArchetype == nullptr || !m_model->isReferenceNew(i)) {
-            continue;
-        }
-
-        for (auto interface : functionArchetype->getInterfaces()) {
-            // compare with ASN for missing types
-            const auto parameters = interface->getParameters();
-            for (auto parameter : parameters) {
-                const auto type = parameter-> getType();
-                if (!allTypeNames.contains(type)) {
-                    missingTypeNames.append(type);
-                }
-            }
-        }
-    }
-    missingTypeNames.removeDuplicates();
-
-    if (!missingTypeNames.isEmpty()) {
-        const auto missingTypesString = missingTypeNames.join(QChar('\n'));
-        const auto reply = QMessageBox::question(qApp->activeWindow(), tr("Missing types"),
-                tr("Archetypes contain missing ASN.1 type names:\n\n%1\n\nWould you like add type stubs to the project\'s ASN file and continue?").arg(missingTypesString),
-                QMessageBox::Yes | QMessageBox::Cancel);
-
-        if (reply == QMessageBox::Cancel) {
-            return;
-        }
-
-
-
-        Asn1Acn::Asn1ModelStorage* asn1Storage = m_asn1Checks->asn1Storage();
-        Asn1Acn::File* asn1DataTypes = asn1Storage-> asn1DataTypes(m_asn1Checks->primaryFileName());
-
-        QStringList definitionsNames;
-        for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : asn1DataTypes->definitionsList()) {
-            definitionsNames.append(definitions->name());
-        }
-
-        // generate an unique name for new definitions
-        int nameSuffix = 1;
-        QString newName;
-        while (true) {
-            newName = QStringLiteral("DefStub%1").arg (QString::number(nameSuffix++));
-            if (!definitionsNames.contains(newName)) {
-                break;
-            }
-        }
-
-        // generate
-        std::unique_ptr<Asn1Acn::Definitions> definitions (new Asn1Acn::Definitions (newName, Asn1Acn::SourceLocation()));
-        QString definitionsString = QStringLiteral("%1 DEFINITIONS ::=\nBEGIN\n\n").arg(newName);
-        for (const auto missingTypeName : missingTypeNames) {
-            std::unique_ptr<Asn1Acn::TypeAssignment> type (new Asn1Acn::TypeAssignment (
-                        missingTypeName, missingTypeName, Asn1Acn::SourceLocation(),
-                        std::unique_ptr<Asn1Acn::Types::Type>(new Asn1Acn::Types::Boolean)));
-            definitions->addType(std::move(type));
-            definitionsString.append(QStringLiteral("  %1 ::= BOOLEAN\n").arg (missingTypeName));
-        }
-        asn1DataTypes->add(std::move(definitions));
-        definitionsString.append(QStringLiteral("\nEND\n"));
-
-        QFile asnFile(m_asn1Checks->primaryFileName());
-        if (asnFile.open(QFile::WriteOnly | QFile::Append)) {
-            asnFile.write(definitionsString.toUtf8());
-            asnFile.close();
-        } else {
-            QMessageBox::critical(qApp->activeWindow(), tr("Write error"), tr("Unable to write types into the ASN file."));
-            return;
-        }
+    if (!handleMissingTypeNames()) {
+        return;
     }
 
     auto command = new cmd::CmdFunctionArchetypesApply(m_model->getFunction(), m_model->getArchetypeReferences());
@@ -321,6 +246,83 @@ void ArchetypesWidget::rowsInserted(const QModelIndex &parent, int first, int la
             m_ui->tableView->openPersistentEditor(functionIndex);
         }
     }
+}
+
+bool ArchetypesWidget::handleMissingTypeNames()
+{
+    const auto missingTypeNames = findMissingTypeNames();
+    if (!missingTypeNames.isEmpty()) {
+        const auto missingTypesString = missingTypeNames.join(QChar('\n'));
+        const auto reply = QMessageBox::question(qApp->activeWindow(), tr("Missing types"),
+                tr("Archetypes contain missing ASN.1 type names:\n\n%1\n\nWould you like add type stubs to the project\'s ASN file and continue?").arg(missingTypesString),
+                QMessageBox::Yes | QMessageBox::Cancel);
+
+        if (reply == QMessageBox::Cancel) {
+            return false;
+        }
+
+        Asn1Acn::Asn1ModelStorage* asn1Storage = m_asn1Checks->asn1Storage();
+        Asn1Acn::File* asn1DataTypes = asn1Storage-> asn1DataTypes(m_asn1Checks->primaryFileName());
+
+        QString definitionsString = buildDefinitionsString(missingTypeNames);
+        bool success = writeDefinitions(m_asn1Checks->primaryFileName(), definitionsString);
+        if (!success) {
+            QMessageBox::critical(qApp->activeWindow(), tr("Write error"), tr("Unable to write types into the ASN file."));
+            return false;
+        }
+    }
+    return true;
+}
+
+QStringList ArchetypesWidget::findMissingTypeNames()
+{
+     const auto allTypeNames = m_asn1Checks->allTypeNames();
+     QStringList missingTypeNames;
+
+     // check for missing types
+     for (int i = 0; i < m_model->getArchetypeReferences().size(); i++) {
+         ivm::ArchetypeObject *archetypeObject = m_archetypeModel->getObjectByName(
+                 m_model->getArchetypeReferences()[i]->getFunctionName(), ivm::ArchetypeObject::Type::FunctionArchetype);
+         ivm::FunctionArchetype *functionArchetype = archetypeObject->as<ivm::FunctionArchetype *>();
+
+         if (functionArchetype == nullptr || !m_model->isReferenceNew(i)) {
+             continue;
+         }
+
+         for (auto interface : functionArchetype->getInterfaces()) {
+             // compare with ASN for missing types
+             const auto parameters = interface->getParameters();
+             for (auto parameter : parameters) {
+                 const auto type = parameter-> getType();
+                 if (!allTypeNames.contains(type)) {
+                     missingTypeNames.append(type);
+                 }
+             }
+         }
+     }
+     missingTypeNames.removeDuplicates();
+     return missingTypeNames;
+}
+
+QString ArchetypesWidget::buildDefinitionsString(const QStringList& missingTypeNames)
+{
+    QString definitionsString;
+    for (const auto missingTypeName : missingTypeNames) {
+        definitionsString.append(QStringLiteral("  %1 ::= BOOLEAN\n").arg (missingTypeName));
+    }
+    definitionsString.append(QStringLiteral("\nEND\n"));
+    return definitionsString;
+}
+
+bool ArchetypesWidget::writeDefinitions(const QString &fileName, const QString& definitionsString)
+{
+    QFile asnFile(m_asn1Checks->primaryFileName());
+    if (asnFile.open(QFile::WriteOnly | QFile::Append)) {
+        asnFile.write(definitionsString.toUtf8());
+        asnFile.close();
+        return true;
+    }
+    return false;
 }
 
 } // namespace ive

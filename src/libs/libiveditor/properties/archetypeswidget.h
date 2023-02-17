@@ -64,6 +64,11 @@ private:
     QVector<shared::InterfaceParameter> generateInterfaceParameters(QVector<ivm::ParameterArchetype *> parameters);
     void rowsInserted(const QModelIndex &parent, int first, int last);
 
+    bool handleMissingTypeNames();
+    QStringList findMissingTypeNames();
+    QString buildDefinitionsString(const QStringList& missingTypeNames);
+    bool writeDefinitions(const QString& fileName, const QString& definitionsString);
+
 private:
     std::unique_ptr<Ui::ArchetypesWidget> m_ui;
     QPointer<ivm::IVModel> m_layersModel;
