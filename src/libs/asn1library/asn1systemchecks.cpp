@@ -45,22 +45,14 @@ void Asn1SystemChecks::setProject(shared::AbstractProject *project)
     m_project = project;
 }
 
-QStringList Asn1SystemChecks::allTypeNames(bool onlyPrimary) const
+QStringList Asn1SystemChecks::allTypeNames() const
 {
     if (!m_project || !m_storage) {
         return {};
     }
 
-    const auto allAsn1Files = m_project->allAsn1Files();
-    QStringList asn1Files;
-    if (onlyPrimary && !allAsn1Files.isEmpty()) {
-        // only read from the first asn1 file, which is always the one associated with the project
-        asn1Files.append(allAsn1Files.first());
-    } else {
-        asn1Files = allAsn1Files;
-    }
-
     QStringList typeNames;
+    const auto asn1Files = m_project->allAsn1Files();
     for (const QString &fileName : asn1Files) {
         if (const Asn1Acn::File *asn1File = m_storage->asn1DataTypes(fileName)) {
             for (const std::unique_ptr<Asn1Acn::Definitions> &definitions : asn1File->definitionsList()) {

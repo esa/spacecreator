@@ -110,7 +110,7 @@ void ArchetypesWidget::applyArchetypes()
         return;
     }
 
-    const auto allTypeNames = m_asn1Checks->allTypeNames(true);
+    const auto allTypeNames = m_asn1Checks->allTypeNames();
     QStringList missingTypeNames;
 
     // check for missing types
