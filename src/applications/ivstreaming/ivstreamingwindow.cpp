@@ -18,6 +18,8 @@
 #include "ivstreamingwindow.h"
 
 #include "interfacedocument.h"
+#include "remotecontrol/remotecontrolhandler.h"
+#include "remotecontrol/remotecontrolwebserver.h"
 #include "ui_ivstreamingwindow.h"
 
 #include <QApplication>
@@ -32,7 +34,6 @@ IVStreamingWindow::IVStreamingWindow(QWidget *parent)
     ui->setupUi(this);
     ui->graphicsView->setInteractive(false);
     ui->graphicsView->setScene(m_document->scene());
-    m_document->load("./interfaceview.xml");
 }
 
 IVStreamingWindow::~IVStreamingWindow()
@@ -46,7 +47,27 @@ IVStreamingWindow::~IVStreamingWindow()
  */
 bool IVStreamingWindow::startRemoteControl(quint16 port)
 {
-    return true;
+    if (!m_remoteControlWebServer) {
+        m_remoteControlWebServer = new shared::RemoteControlWebServer(this);
+        m_remoteControlHandler = new ive::RemoteControlHandler(this);
+        m_remoteControlHandler->setIvDocument(m_document);
+
+        connect(m_remoteControlWebServer, &shared::RemoteControlWebServer::commandReceived, m_remoteControlHandler,
+                &ive::RemoteControlHandler::handleMessage);
+        connect(m_remoteControlHandler, &ive::RemoteControlHandler::commandDone, m_remoteControlWebServer,
+                &shared::RemoteControlWebServer::commandDone);
+    }
+    if (m_remoteControlWebServer->start(port)) {
+        return true;
+    }
+
+    qCritical() << "Unable to start server on port " << port;
+
+    m_remoteControlWebServer->deleteLater();
+    m_remoteControlWebServer = nullptr;
+    m_remoteControlHandler->deleteLater();
+    m_remoteControlHandler = nullptr;
+    return false;
 }
 
 void IVStreamingWindow::closeEvent(QCloseEvent *e)

@@ -22,6 +22,11 @@
 
 namespace ive {
 class InterfaceDocument;
+class RemoteControlHandler;
+}
+
+namespace shared {
+class RemoteControlWebServer;
 }
 
 namespace Ui {
@@ -49,6 +54,8 @@ private:
 
     Ui::IVStreamingWindow *ui = nullptr;
     ive::InterfaceDocument *m_document = nullptr;
+    shared::RemoteControlWebServer *m_remoteControlWebServer = nullptr;
+    ive::RemoteControlHandler *m_remoteControlHandler = nullptr;
 };
 
 }

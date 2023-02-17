@@ -159,6 +159,8 @@ target_sources(${LIB_NAME} PRIVATE
     itemeditor/ivinterfacegroupgraphicsitem.h
     itemeditor/ivitemmodel.cpp
     itemeditor/ivitemmodel.h
+    remotecontrol/remotecontrolhandler.cpp
+    remotecontrol/remotecontrolhandler.h
     ivappwidget.cpp
     ivappwidget.h
     ivappwidget.ui

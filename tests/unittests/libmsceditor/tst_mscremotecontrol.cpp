@@ -42,7 +42,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 static const int kPort = 34622;
 
-class tst_RemoteControl : public QObject
+class tst_MscRemoteControl : public QObject
 {
     Q_OBJECT
 public:
@@ -52,7 +52,7 @@ public:
         EXPECT_FAIL = 1
     };
 
-    tst_RemoteControl()
+    tst_MscRemoteControl()
         : m_server(new shared::RemoteControlWebServer(this))
         , m_handler(new msc::RemoteControlHandler(this))
         , m_socket(new QWebSocket(QString(), QWebSocketProtocol::Version::VersionLatest, this))
@@ -549,6 +549,6 @@ private:
     msc::ChartItem m_chartItem;
 };
 
-QTEST_MAIN(tst_RemoteControl)
+QTEST_MAIN(tst_MscRemoteControl)
 
-#include "tst_remotecontrol.moc"
+#include "tst_mscremotecontrol.moc"
