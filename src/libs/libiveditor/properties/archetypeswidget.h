@@ -59,6 +59,14 @@ public:
     void applyArchetypes();
 
 private:
+    enum AsnCommentParseTokens
+    {
+        AsnParseFullLine = 0,
+        AsnParsePreComment,
+        AsnParsePostComment,
+        AsnParseNoComment
+    };
+
     bool checkReferences();
     ivm::IVInterface::CreationInfo generateCreationInfo(ivm::InterfaceArchetype *interfaceArchetype);
     QVector<shared::InterfaceParameter> generateInterfaceParameters(QVector<ivm::ParameterArchetype *> parameters);

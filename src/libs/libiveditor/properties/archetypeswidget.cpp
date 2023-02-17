@@ -329,32 +329,33 @@ bool ArchetypesWidget::writeDefinitions(const QString &fileName, const QString& 
             matchesList.append(matches.next());
         }
 
+        // look for the last occurence of "END" in a file that is not a comment
         bool endFound = false;
         QStringList lines;
         for (auto iterator = matchesList.rbegin(); iterator != matchesList.rend(); ++iterator) {
             if (endFound) {
-                lines.append(iterator->captured(0));
+                lines.append(iterator->captured(AsnParseFullLine));
             } else {
-                if (iterator->lastCapturedIndex() == 2) {
+                if (iterator->lastCapturedIndex() == AsnParsePostComment) {
                     // line contains a comment
                     if (iterator->captured(1).contains(QStringLiteral("END"))) {
                         endFound = true;
-                        auto lineReplaced = iterator->captured(1);
+                        auto lineReplaced = iterator->captured(AsnParsePreComment);
                         lineReplaced.replace(QStringLiteral("END"), definitionsString);
-                        lineReplaced.append(iterator->captured(2));
+                        lineReplaced.append(iterator->captured(AsnParsePostComment));
                         lines.append(lineReplaced);
                     } else {
-                        lines.append(iterator->captured(0));
+                        lines.append(iterator->captured(AsnParseFullLine));
                     }
                 } else {
                     // line doesn't contain comment
-                    if (iterator->captured(3).contains(QStringLiteral("END"))) {
+                    if (iterator->captured(AsnParseNoComment).contains(QStringLiteral("END"))) {
                         endFound = true;
-                        auto lineReplaced = iterator->captured(3);
+                        auto lineReplaced = iterator->captured(AsnParseNoComment);
                         lineReplaced.replace(QStringLiteral("END"), definitionsString);
                         lines.append(lineReplaced);
                     } else {
-                        lines.append(iterator->captured(0));
+                        lines.append(iterator->captured(AsnParseFullLine));
                     }
                 }
             }
