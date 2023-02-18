@@ -319,56 +319,57 @@ QString ArchetypesWidget::buildDefinitionsString(const QStringList& missingTypeN
 bool ArchetypesWidget::writeDefinitions(const QString &fileName, const QString& definitionsString)
 {
     QFile asnFile(m_asn1Checks->primaryFileName());
-    if (asnFile.open(QFile::ReadWrite)) {
-        QString asnFileContent = asnFile.readAll();
-        QRegularExpression regex("^(?:(?:(.*)(--.*?))|(.*))$");
-        regex.setPatternOptions(QRegularExpression::MultilineOption);
+    if (!asnFile.open(QFile::ReadWrite)) {
+        return false;
+    }
 
-        // write matches to list, so we can iterate over them in reverse
-        auto matches = regex.globalMatch(asnFileContent);
-        QList<QRegularExpressionMatch> matchesList;
-        while (matches.hasNext()) {
-            matchesList.append(matches.next());
-        }
+    QString asnFileContent = asnFile.readAll();
+    QRegularExpression regex("^(?:(?:(.*)(--.*?))|(.*))$");
+    regex.setPatternOptions(QRegularExpression::MultilineOption);
 
-        // look for the last occurence of "END" in a file that is not a comment
-        bool endFound = false;
-        QStringList lines;
-        for (auto iterator = matchesList.rbegin(); iterator != matchesList.rend(); ++iterator) {
-            if (endFound) {
-                lines.append(iterator->captured(AsnParseFullLine));
-            } else {
-                if (iterator->lastCapturedIndex() == AsnParsePostComment) {
-                    // line contains a comment
-                    if (iterator->captured(1).contains(QStringLiteral("END"))) {
-                        endFound = true;
-                        auto lineReplaced = iterator->captured(AsnParsePreComment);
-                        lineReplaced.replace(QStringLiteral("END"), definitionsString);
-                        lineReplaced.append(iterator->captured(AsnParsePostComment));
-                        lines.append(lineReplaced);
-                    } else {
-                        lines.append(iterator->captured(AsnParseFullLine));
-                    }
+    // write matches to list, so we can iterate over them in reverse
+    auto matches = regex.globalMatch(asnFileContent);
+    QList<QRegularExpressionMatch> matchesList;
+    while (matches.hasNext()) {
+        matchesList.append(matches.next());
+    }
+
+    // look for the last occurence of "END" in a file that is not a comment
+    bool endFound = false;
+    QStringList lines;
+    for (auto iterator = matchesList.rbegin(); iterator != matchesList.rend(); ++iterator) {
+        if (endFound) {
+            lines.append(iterator->captured(AsnParseFullLine));
+        } else {
+            if (iterator->lastCapturedIndex() == AsnParsePostComment) {
+                // line contains a comment
+                if (iterator->captured(1).contains(QStringLiteral("END"))) {
+                    endFound = true;
+                    auto lineReplaced = iterator->captured(AsnParsePreComment);
+                    lineReplaced.replace(QStringLiteral("END"), definitionsString);
+                    lineReplaced.append(iterator->captured(AsnParsePostComment));
+                    lines.append(lineReplaced);
                 } else {
-                    // line doesn't contain comment
-                    if (iterator->captured(AsnParseNoComment).contains(QStringLiteral("END"))) {
-                        endFound = true;
-                        auto lineReplaced = iterator->captured(AsnParseNoComment);
-                        lineReplaced.replace(QStringLiteral("END"), definitionsString);
-                        lines.append(lineReplaced);
-                    } else {
-                        lines.append(iterator->captured(AsnParseFullLine));
-                    }
+                    lines.append(iterator->captured(AsnParseFullLine));
+                }
+            } else {
+                // line doesn't contain comment
+                if (iterator->captured(AsnParseNoComment).contains(QStringLiteral("END"))) {
+                    endFound = true;
+                    auto lineReplaced = iterator->captured(AsnParseNoComment);
+                    lineReplaced.replace(QStringLiteral("END"), definitionsString);
+                    lines.append(lineReplaced);
+                } else {
+                    lines.append(iterator->captured(AsnParseFullLine));
                 }
             }
         }
-        std::reverse(lines.begin(), lines.end());
-
-        asnFile.resize(0);
-        asnFile.write(lines.join(QChar('\n')).toUtf8());
-        return true;
     }
-    return false;
+    std::reverse(lines.begin(), lines.end());
+
+    asnFile.resize(0);
+    asnFile.write(lines.join(QChar('\n')).toUtf8());
+    return true;
 }
 
 } // namespace ive
