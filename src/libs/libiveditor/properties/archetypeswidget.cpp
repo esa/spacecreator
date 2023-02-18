@@ -323,52 +323,39 @@ bool ArchetypesWidget::writeDefinitions(const QString &fileName, const QString& 
         return false;
     }
 
-    QString asnFileContent = asnFile.readAll();
-    QRegularExpression regex("^(?:(?:(.*)(--.*?))|(.*))$");
-    regex.setPatternOptions(QRegularExpression::MultilineOption);
+    const auto asnFileContent = QString(asnFile.readAll());
+    QString regexString;
+    // END immediately follows newline
+    regexString.append("(?:\\n(END))");
+    // alternative
+    regexString.append("|");
+    // newline and a group of any characters, but without a comment token (--)
+    regexString.append("(?:\\n(?:(?!--).)*");
+    // at least one white space character excluding newlines,
+    // to ensure that END is not a substring in another keyword
+    regexString.append("[^\\S\\r\\n]+");
+    // END keyword
+    regexString.append("(END))");
+    QRegularExpression regex(regexString);
 
-    // write matches to list, so we can iterate over them in reverse
+    // QRegularExpressionMatchIterator can only iterate forward - looping over until the last match
     auto matches = regex.globalMatch(asnFileContent);
-    QList<QRegularExpressionMatch> matchesList;
+    QRegularExpressionMatch match;
     while (matches.hasNext()) {
-        matchesList.append(matches.next());
+        match = matches.next();
     }
 
-    // look for the last occurence of "END" in a file that is not a comment
-    bool endFound = false;
-    QStringList lines;
-    for (auto iterator = matchesList.rbegin(); iterator != matchesList.rend(); ++iterator) {
-        if (endFound) {
-            lines.append(iterator->captured(AsnParseFullLine));
-        } else {
-            if (iterator->lastCapturedIndex() == AsnParsePostComment) {
-                // line contains a comment
-                if (iterator->captured(1).contains(QStringLiteral("END"))) {
-                    endFound = true;
-                    auto lineReplaced = iterator->captured(AsnParsePreComment);
-                    lineReplaced.replace(QStringLiteral("END"), definitionsString);
-                    lineReplaced.append(iterator->captured(AsnParsePostComment));
-                    lines.append(lineReplaced);
-                } else {
-                    lines.append(iterator->captured(AsnParseFullLine));
-                }
-            } else {
-                // line doesn't contain comment
-                if (iterator->captured(AsnParseNoComment).contains(QStringLiteral("END"))) {
-                    endFound = true;
-                    auto lineReplaced = iterator->captured(AsnParseNoComment);
-                    lineReplaced.replace(QStringLiteral("END"), definitionsString);
-                    lines.append(lineReplaced);
-                } else {
-                    lines.append(iterator->captured(AsnParseFullLine));
-                }
-            }
-        }
+    if (!match.isValid()) {
+        return true;
     }
-    std::reverse(lines.begin(), lines.end());
 
+    // rebuild and rewrite file content
+    const auto lastCapturedIndex = match.lastCapturedIndex();
+    QString newAsnFileContent = QStringLiteral("%1%2%3").arg(
+            asnFileContent.mid(0, match.capturedStart(lastCapturedIndex)), definitionsString,
+            asnFileContent.mid(match.capturedEnd(lastCapturedIndex)));
     asnFile.resize(0);
-    asnFile.write(lines.join(QChar('\n')).toUtf8());
+    asnFile.write(newAsnFileContent.toUtf8());
     return true;
 }
 
