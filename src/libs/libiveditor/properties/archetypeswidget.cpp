@@ -270,7 +270,7 @@ bool ArchetypesWidget::handleMissingTypeNames()
     QString definitionsString = buildDefinitionsString(missingTypeNames);
     bool success = writeDefinitions(m_asn1Checks->primaryFileName(), definitionsString);
     if (!success) {
-        QMessageBox::critical(qApp->activeWindow(), tr("Write error"), tr("Unable to write types into the ASN file."));
+        QMessageBox::critical(qApp->activeWindow(), tr("Write error"), tr("Unable to write types into the ASN.1 file."));
         return false;
     }
     return true;
