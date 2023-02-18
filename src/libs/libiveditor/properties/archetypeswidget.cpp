@@ -257,7 +257,7 @@ bool ArchetypesWidget::handleMissingTypeNames()
 
     const auto missingTypesString = missingTypeNames.join(QChar('\n'));
     const auto reply = QMessageBox::question(qApp->activeWindow(), tr("Missing types"),
-            tr("Archetypes contain missing ASN.1 type names:\n\n%1\n\nWould you like add type stubs to the project\'s ASN file and continue?").arg(missingTypesString),
+            tr("Archetypes contain missing type names:\n\n%1\n\nWould you like add type stubs to the project and continue?").arg(missingTypesString),
             QMessageBox::Yes | QMessageBox::Cancel);
 
     if (reply == QMessageBox::Cancel) {
