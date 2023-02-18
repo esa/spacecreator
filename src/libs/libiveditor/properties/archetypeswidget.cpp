@@ -251,25 +251,27 @@ void ArchetypesWidget::rowsInserted(const QModelIndex &parent, int first, int la
 bool ArchetypesWidget::handleMissingTypeNames()
 {
     const auto missingTypeNames = findMissingTypeNames();
-    if (!missingTypeNames.isEmpty()) {
-        const auto missingTypesString = missingTypeNames.join(QChar('\n'));
-        const auto reply = QMessageBox::question(qApp->activeWindow(), tr("Missing types"),
-                tr("Archetypes contain missing ASN.1 type names:\n\n%1\n\nWould you like add type stubs to the project\'s ASN file and continue?").arg(missingTypesString),
-                QMessageBox::Yes | QMessageBox::Cancel);
+    if (missingTypeNames.isEmpty()) {
+        return true;
+    }
 
-        if (reply == QMessageBox::Cancel) {
-            return false;
-        }
+    const auto missingTypesString = missingTypeNames.join(QChar('\n'));
+    const auto reply = QMessageBox::question(qApp->activeWindow(), tr("Missing types"),
+            tr("Archetypes contain missing ASN.1 type names:\n\n%1\n\nWould you like add type stubs to the project\'s ASN file and continue?").arg(missingTypesString),
+            QMessageBox::Yes | QMessageBox::Cancel);
 
-        Asn1Acn::Asn1ModelStorage* asn1Storage = m_asn1Checks->asn1Storage();
-        Asn1Acn::File* asn1DataTypes = asn1Storage-> asn1DataTypes(m_asn1Checks->primaryFileName());
+    if (reply == QMessageBox::Cancel) {
+        return false;
+    }
 
-        QString definitionsString = buildDefinitionsString(missingTypeNames);
-        bool success = writeDefinitions(m_asn1Checks->primaryFileName(), definitionsString);
-        if (!success) {
-            QMessageBox::critical(qApp->activeWindow(), tr("Write error"), tr("Unable to write types into the ASN file."));
-            return false;
-        }
+    Asn1Acn::Asn1ModelStorage* asn1Storage = m_asn1Checks->asn1Storage();
+    Asn1Acn::File* asn1DataTypes = asn1Storage-> asn1DataTypes(m_asn1Checks->primaryFileName());
+
+    QString definitionsString = buildDefinitionsString(missingTypeNames);
+    bool success = writeDefinitions(m_asn1Checks->primaryFileName(), definitionsString);
+    if (!success) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Write error"), tr("Unable to write types into the ASN file."));
+        return false;
     }
     return true;
 }
