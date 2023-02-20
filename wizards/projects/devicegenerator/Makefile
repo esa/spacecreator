@@ -48,7 +48,7 @@ InterfaceView.aadl:	interfaceview.xml
 
 Default_Deployment.aadl:	interfaceview.xml
 	# Create/update a default deployment view for Linux target, if none other is provided
-	$(SPACECREATOR) --aadlconverter  -o $^ -t $(shell taste-config --prefix)/share/xml2dv/interfaceview.tmplt -x $@ || exit 1
+	$(SPACECREATOR) --aadlconverter  -o $^ -t $(shell taste-config --prefix)/share/xml2dv/interfaceview-%{CDBoard}.tmplt -x $@ || exit 1
 	rsync --checksum $@ DeploymentView.aadl
 
 DeploymentView.aadl:	Default_Deployment.aadl

@@ -243,10 +243,6 @@
                     "target": "%{ProjectDirectory}/Makefile"
                 },
                 {
-                    "source": "deploymentview.dv.xml",
-                    "target": "%{ProjectDirectory}/deploymentview.dv.xml"
-                },
-                {
                     "source": "snippets/%{CDBoard}/ocarina_components.aadl",
                     "target": "%{ProjectDirectory}/snippets/ocarina_components.aadl"
                 },
