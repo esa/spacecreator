@@ -1090,6 +1090,11 @@ void IvToPromelaTranslator::createPromelaObjectsForSyncRis(
         }
     }
 
+    if (sequence.getContent().size() == 0) {
+        auto message = QString("Empty content of inline %1").arg(info.m_name);
+        throw TranslationException(message);
+    }
+
     std::unique_ptr<InlineDef> inlineDef = std::make_unique<InlineDef>(info.m_name, arguments, std::move(sequence));
     context.model()->addInlineDef(std::move(inlineDef));
 }
@@ -1974,6 +1979,7 @@ void IvToPromelaTranslator::prepareSynchronousCallInfo(Context &context, const Q
             targetInfo.m_providedInlineName =
                     QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(targetInterfaceName);
         }
+        info->m_targets.append(targetInfo);
     }
 
     functionInfo.m_synchronousCalls.emplace(inlineName, std::move(info));
