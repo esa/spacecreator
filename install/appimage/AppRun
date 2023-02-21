@@ -27,6 +27,8 @@ Options:
             Run the TMC converter
         [--tmcivoptimizer [--help]]
             Run the TMC Interface View optimizer
+        [--ivstreaming [--help]]
+            Run the InterfaceView UI streaming client
         [--mscstreaming [--help]]
             Run the mscstreaming
         [--DVeditor [--help]]
@@ -89,6 +91,10 @@ case $TOOL in
 --tmcivoptimizer)
     shift
     exec "$bindir/tmcivoptimizer" $@
+    ;;
+--ivstreaming)
+    shift
+    exec "$bindir/ivstreaming" $@
     ;;
 --mscstreaming)
     shift
