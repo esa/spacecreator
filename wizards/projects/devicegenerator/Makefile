@@ -10,6 +10,9 @@ ASN1_DRV_CONFIG=%{ProjectName}configuration.asn
 ASN1_DRV_PRIVATE=%{ProjectName}privatedata.asn
 ASN1_DRIVER_EXPLICIT_CONFIG=$(ASN1_DRV_CONFIG) $(ASN1_DRV_PRIVATE)
 
+SNIPPETS_INTALLATION_DIRECTORY=$(shell taste-config --prefix)/share/communication_device/%{CDBoard}/port_%{ProjectNameLowerCase}
+SNIPPETS_INTALLATOR=$(shell taste-config --prefix)/bin/install_communication_devices.py
+
 all:	release
 
 release:	work/glue_release
@@ -26,6 +29,10 @@ debug:	work/glue_debug
 
 run:
 	@echo "run Hello World!"
+
+install:
+	mkdir -p $(SNIPPETS_INTALLATION_DIRECTORY) && cp -r snippets/. $(SNIPPETS_INTALLATION_DIRECTORY)
+	python3 $(SNIPPETS_INTALLATOR)
 
 work/glue_release:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	sed -i 's/CoverageEnabled => true/CoverageEnabled => false/g' DeploymentView.aadl || :
