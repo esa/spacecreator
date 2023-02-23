@@ -50,6 +50,8 @@ using ivm::IVFunction;
 using ivm::IVInterface;
 using ivm::IVModel;
 using promela::translator::IvToPromelaTranslator;
+using promela::translator::ObserverInfo;
+using promela::translator::SystemInfo;
 using shared::InterfaceParameter;
 using spintrail::model::ChannelEvent;
 using spintrail::model::ContinuousSignal;
@@ -149,7 +151,7 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
 
     IvToPromelaTranslator translator;
 
-    std::unique_ptr<IvToPromelaTranslator::SystemInfo> systemInfo = translator.prepareSystemInfo(ivModel, options);
+    std::unique_ptr<SystemInfo> systemInfo = translator.prepareSystemInfo(ivModel, options);
 
     QMap<QString, ChannelInfo> channels;
     QMap<QString, std::pair<ChannelInfo, bool>> observerChannels;
@@ -192,7 +194,7 @@ std::set<conversion::ModelType> SpinTrailToSimulatorTrailTranslator::getDependen
     return dependencies;
 }
 
-void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTranslator::SystemInfo &systemInfo,
+void SpinTrailToSimulatorTrailTranslator::findChannelNames(const SystemInfo &systemInfo,
         const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const
 {
@@ -224,8 +226,7 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTran
             channels.insert(proctypeIter->second->m_queueName, info);
 
             bool first = true;
-            for (const std::unique_ptr<IvToPromelaTranslator::ObserverInfo> &observerInfo :
-                    proctypeIter->second->m_observers) {
+            for (const std::unique_ptr<ObserverInfo> &observerInfo : proctypeIter->second->m_observers) {
                 observerChannels.insert(observerInfo->m_observerQueue, std::make_pair(info, first));
                 first = false;
             }
@@ -256,8 +257,7 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTran
 
             channels.insert(proctypeIter->second->m_queueName, info);
             bool first = true;
-            for (const std::unique_ptr<IvToPromelaTranslator::ObserverInfo> &observerInfo :
-                    proctypeIter->second->m_observers) {
+            for (const std::unique_ptr<ObserverInfo> &observerInfo : proctypeIter->second->m_observers) {
                 observerChannels.insert(observerInfo->m_observerQueue, std::make_pair(info, first));
                 first = false;
             }
@@ -266,7 +266,7 @@ void SpinTrailToSimulatorTrailTranslator::findChannelNames(const IvToPromelaTran
 }
 
 void SpinTrailToSimulatorTrailTranslator::findProctypes(
-        const IvToPromelaTranslator::SystemInfo &systemInfo, QMap<QString, QString> &proctypes) const
+        const SystemInfo &systemInfo, QMap<QString, QString> &proctypes) const
 {
     for (auto iter = systemInfo.m_functions.begin(); iter != systemInfo.m_functions.end(); ++iter) {
         for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();

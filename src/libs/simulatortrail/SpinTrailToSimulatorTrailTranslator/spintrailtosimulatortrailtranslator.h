@@ -92,11 +92,9 @@ private:
     inline static const QString m_environmentName = "env";
 
 private:
-    void findChannelNames(const promela::translator::IvToPromelaTranslator::SystemInfo &systemInfo,
-            const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channel,
-            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const;
-    void findProctypes(const promela::translator::IvToPromelaTranslator::SystemInfo &systemInfo,
-            QMap<QString, QString> &proctypes) const;
+    void findChannelNames(const promela::translator::SystemInfo &systemInfo, const Asn1Acn::Asn1Model &asn1Model,
+            QMap<QString, ChannelInfo> &channel, QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const;
+    void findProctypes(const promela::translator::SystemInfo &systemInfo, QMap<QString, QString> &proctypes) const;
     void translate(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
