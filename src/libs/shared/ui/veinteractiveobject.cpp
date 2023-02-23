@@ -47,6 +47,7 @@ VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent
 
     connect(shared::ColorManager::instance(), &shared::ColorManager::colorsUpdated, this,
             &VEInteractiveObject::applyColorScheme);
+    connect(m_dataObject, &VEObject::markerChanged, this, &VEInteractiveObject::applyColorScheme);
 
     connect(this, &VEInteractiveObject::boundingBoxChanged, this, &VEInteractiveObject::updateTextPosition);
 }

@@ -52,6 +52,9 @@ public:
 
     QPainterPath shape() const override;
 
+public Q_SLOTS:
+    void applyColorScheme() override;
+
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -63,11 +66,8 @@ protected:
     virtual shared::ColorManager::HandledColors handledColorType() const override;
     shared::ui::TextItem *initTextItem() override;
 
-protected Q_SLOTS:
-    void applyColorScheme() override;
-
-protected:
-    explicit IVFunctionGraphicsItem(ivm::IVFunction *entity, std::unique_ptr<MiniViewRenderer> renderer, QGraphicsItem *parent = nullptr);
+    explicit IVFunctionGraphicsItem(
+            ivm::IVFunction *entity, std::unique_ptr<MiniViewRenderer> renderer, QGraphicsItem *parent = nullptr);
 
     std::unique_ptr<MiniViewRenderer> m_miniViewDrawer;
 

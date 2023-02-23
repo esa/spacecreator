@@ -35,6 +35,7 @@ struct VEObjectPrivate {
     const shared::Id m_id;
     EntityAttributes m_attrs;
     VEModel *m_model;
+    bool m_marked = false;
 };
 
 VEObject::VEObject(const shared::Id &id, QObject *parent)
@@ -224,6 +225,27 @@ void VEObject::setAttributeExportable(const QString &attrName, bool isExportable
     if (it != d->m_attrs.end()) {
         it->setExportable(isExportable);
     }
+}
+
+/*!
+ * A marked object might be drawn differently
+ */
+void VEObject::setMarked(bool mark)
+{
+    if (mark == d->m_marked) {
+        return;
+    }
+
+    d->m_marked = mark;
+    Q_EMIT markerChanged();
+}
+
+/*!
+ * Retruns if the object is set ti be marked
+ */
+bool VEObject::isMarked() const
+{
+    return d->m_marked;
 }
 
 VEObject *VEObject::parentObject() const

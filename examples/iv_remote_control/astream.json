@@ -1,0 +1,46 @@
+{
+    "actions": [
+        {
+            "CommandType": "Load",
+            "Parameters": {
+                "filename": "/home/schwann/work/ESA/spacecreator/examples/iv_remote_control/interfaceview.xml"
+            }
+        },
+        {
+            "CommandType": "HighlightFunction",
+            "Parameters": {
+                "name": "Manager"
+            }
+        },
+        {
+            "CommandType": "HighlightFunction",
+            "Parameters": {
+                "name": "Worker"
+            }
+        },
+        {
+            "CommandType": "HighlightFunction",
+            "Parameters": {
+                "name": "Contractor"
+            }
+        },
+        {
+            "CommandType": "HighlightFunction",
+            "Parameters": {
+                "name": "PowerGenerator"
+            }
+        },
+        {
+            "CommandType": "UnHighlightFunction",
+            "Parameters": {
+                "name": "Worker"
+            }
+        },
+        {
+            "CommandType": "dummy",
+            "Parameters": {
+            }
+        }
+
+    ]
+}

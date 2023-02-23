@@ -159,7 +159,13 @@ shared::ColorManager::HandledColors IVFunctionTypeGraphicsItem::handledColorType
 void IVFunctionTypeGraphicsItem::applyColorScheme()
 {
     const shared::ColorHandler &h = colorHandler();
-    setPen(h.pen());
+    if (entity()->isMarked()) {
+        const shared::ColorHandler ch =
+                shared::ColorManager::instance()->colorsForItem(shared::ColorManager::ConnectionFlow);
+        setPen(QPen(ch.penColor(), ch.penWidth()));
+    } else {
+        setPen(h.pen());
+    }
     setBrush(h.brush());
     update();
 }

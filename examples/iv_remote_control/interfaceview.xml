@@ -1,0 +1,114 @@
+<InterfaceView version="1.1">
+<Function id="{b031f7dd-d402-4800-a118-247906de49ca}" name="Worker" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="55300 9000 87800 28700"/>
+    <Property name="Taste::RootCoordinates" value="-118300 -38500 29700 48200"/>
+<Provided_Interface id="{8b384cdc-df17-48cf-a89c-441d86cb6934}" name="doWork" kind="Sporadic" enable_multicast="false" layer="default" wcet="0" stack_size="50" miat="0" queue_size="1" priority="1">
+    <Property name="Taste::coordinates" value="55300 11400"/>
+    <Property name="Taste::RootCoordinates" value="-74000 -28100"/>
+</Provided_Interface>
+
+<Required_Interface id="{e873045a-6443-4951-a9b3-06e6882f525f}" name="Inform" kind="Sporadic" enable_multicast="false" layer="default" wcet="0" stack_size="50" miat="0" queue_size="1" priority="1">
+    <Property name="Taste::coordinates" value="65200 28700"/>
+    <Property name="Taste::RootCoordinates" value="-35400 43300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Function id="{3fd31144-05af-4b11-ba8e-f35b651ea5b7}" name="Contractor" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="-64000 -33300 -44000 -25300"/>
+    <Property name="Taste::RootCoordinates" value="-1500 -46700 42000 2700"/>
+<Provided_Interface id="{e59d405c-2ad9-47cc-a75f-8c21d3edb5c4}" name="doWork" kind="Sporadic" enable_multicast="false" layer="default" wcet="0" stack_size="50" miat="0" queue_size="1" priority="1">
+    <Property name="Taste::coordinates" value="-64000 -28000"/>
+    <Property name="Taste::RootCoordinates" value="-1500 -41700"/>
+</Provided_Interface>
+
+<Required_Interface id="{c6172390-f055-4224-b31c-d6980ffe290e}" name="inform" kind="Sporadic" enable_multicast="false" layer="default">
+    <Property name="Taste::coordinates" value="-48000 -25300"/>
+    <Property name="Taste::RootCoordinates" value="-1500 -45000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Function id="{4c6345dd-4033-4d9e-9645-5456f11b8ca4}" name="PowerGenerator" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="2900 -42300 17900 -33400"/>
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{91388768-387c-40d3-a972-2575c927844c}" name="PowerController" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="3500 -28000 18700 -20300"/>
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{fa8d60a7-247c-4960-85a0-7bb446740188}" name="Dummy" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="-35200 -33100 -15200 -25100"/>
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection id="{e9c822cf-1cc4-46e9-86a1-d33ab25997ab}">
+    <Source func_name="Worker" pi_name="doWork"/>
+    <Target func_name="Contractor" pi_name="doWork"/>
+    <Property name="Taste::coordinates" value="-73400 -28100 -68900 -28100 -64300 -28000"/>
+</Connection>
+
+<Connection id="{ffbea01b-8b43-46af-bc3e-452e07a550ff}">
+    <Source func_name="Contractor" ri_name="inform"/>
+    <Target func_name="Worker" ri_name="Inform"/>
+    <Property name="Taste::coordinates" value="-48000 -24700 -48000 9100 -35400 9100 -35400 43000"/>
+</Connection>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{1dfa7f88-a0a3-428c-8915-006e17e6fdc3}" name="Logger" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="56300 38100 87600 57000"/>
+<Provided_Interface id="{da28ef7a-1de0-4e0b-9ca4-f03408d3f59d}" name="inform" kind="Sporadic" enable_multicast="false" layer="default" wcet="0" stack_size="50" miat="0" queue_size="1" priority="1">
+    <Property name="Taste::coordinates" value="70100 38100"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{cf2f6f85-0583-4628-9bea-e570512876f4}" name="Manager" is_type="NO" language="SDL" default_implementation="default">
+    <Property name="Taste::coordinates" value="12400 8600 35000 23400"/>
+<Required_Interface id="{82107914-2160-4705-bc54-c13771ddfb8c}" name="doWork" kind="Sporadic" enable_multicast="false" layer="default" wcet="0" stack_size="50" miat="0" queue_size="1" priority="1">
+    <Property name="Taste::coordinates" value="35000 11300"/>
+    <Property name="Taste::RootCoordinates" value="-74000 -28100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection id="{5d8dce56-8ec1-4dc6-bd75-190485a9b69c}">
+    <Source func_name="Worker" ri_name="Inform"/>
+    <Target func_name="Logger" pi_name="inform"/>
+    <Property name="Taste::coordinates" value="65200 29300 65200 33500 70100 33500 70100 37800"/>
+</Connection>
+
+<Connection id="{ac33e665-c3e4-49f7-9aa2-154ee13df770}">
+    <Source func_name="Manager" ri_name="doWork"/>
+    <Target func_name="Worker" pi_name="doWork"/>
+    <Property name="Taste::coordinates" value="35600 11300 55000 11400"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>

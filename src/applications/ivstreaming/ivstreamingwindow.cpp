@@ -56,6 +56,8 @@ bool IVStreamingWindow::startRemoteControl(quint16 port)
                 &ive::RemoteControlHandler::handleMessage);
         connect(m_remoteControlHandler, &ive::RemoteControlHandler::commandDone, m_remoteControlWebServer,
                 &shared::RemoteControlWebServer::commandDone);
+        connect(m_remoteControlHandler, &ive::RemoteControlHandler::commandDone, this,
+                [this]() { ui->graphicsView->update(); });
     }
     if (m_remoteControlWebServer->start(port)) {
         return true;

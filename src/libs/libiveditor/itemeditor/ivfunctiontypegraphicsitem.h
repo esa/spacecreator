@@ -20,7 +20,7 @@
 #include "ivfunctiontype.h"
 #include "ivobject.h"
 #include "ui/verectgraphicsitem.h"
-namespace shared::ui{
+namespace shared::ui {
 class GripPoint;
 }
 
@@ -52,8 +52,10 @@ public:
 
     void init() override;
 
-protected Q_SLOTS:
+public Q_SLOTS:
     void applyColorScheme() override;
+
+protected Q_SLOTS:
     void updateNameFromUi(const QString &name);
 
 protected:
@@ -92,8 +94,8 @@ protected:
     void rebuildLayout() override;
 
     /**
-     * @brief paint Paints the rectangle with the rounded corners and double borders that is a functiontype. The text is not paintet
-     * by this class but handled by TextItem which is a child of this GraphicsItem.
+     * @brief paint Paints the rectangle with the rounded corners and double borders that is a functiontype. The text is
+     * not paintet by this class but handled by TextItem which is a child of this GraphicsItem.
      * @param painter
      * @param option
      * @param widget
@@ -105,8 +107,9 @@ protected:
 
     /**
      * @brief alignTextItem Places the text-item within the boundingbox of this FunctionTypeGraphicsItem's bounding box.
-     * For a IVFunctionTypeGraphicsItem this means the top-left of the text is aligned with the top-left of the IVFunctionTypeGraphicsItem's bounding box.
-     * Child classes can override this to make their text align differently, like in the center of the bounding box.
+     * For a IVFunctionTypeGraphicsItem this means the top-left of the text is aligned with the top-left of the
+     * IVFunctionTypeGraphicsItem's bounding box. Child classes can override this to make their text align differently,
+     * like in the center of the bounding box.
      */
     virtual void alignTextItem() const;
 

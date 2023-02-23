@@ -22,6 +22,11 @@
 #include <QPointer>
 #include <QVariantMap>
 
+namespace ivm {
+class IVFunction;
+class IVObject;
+}
+
 namespace ive {
 
 class InterfaceDocument;
@@ -33,9 +38,10 @@ public:
     enum class CommandType
     {
         Load,
-        HighlightX,
-        HighlightY,
-        HighlightZ,
+        HighlightFunction,
+        UnHighlightFunction,
+        HighlightConnection,
+        UnHighlightConnection,
     };
     Q_ENUM(CommandType)
 
@@ -53,6 +59,10 @@ Q_SIGNALS:
 
 private:
     bool handleLoad(const QVariantMap &params, QString *errorString);
+    bool highlightFunction(const QVariantMap &params, QString *errorString);
+    bool unhighlightFunction(const QVariantMap &params, QString *errorString);
+    ivm::IVFunction *getFunction(const QVariantMap &params, QString *errorString) const;
+    void updateParentItem(ivm::IVObject *obj) const;
 
     QPointer<ive::InterfaceDocument> m_document;
     QString m_lastErrorMessage;

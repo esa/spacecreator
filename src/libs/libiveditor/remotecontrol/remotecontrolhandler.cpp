@@ -19,6 +19,10 @@
 
 #include "errorhub.h"
 #include "interfacedocument.h"
+#include "itemeditor/ivfunctiongraphicsitem.h"
+#include "itemeditor/ivitemmodel.h"
+#include "ivfunction.h"
+#include "ivmodel.h"
 
 #include <QMetaEnum>
 
@@ -43,6 +47,12 @@ Implemented commands and parameters list:
 
 - **Load** - Load an existing interface view file
  + **filename** - Filename with full path to the file
+
+- **HighlightFunction** - Highlights a function
++ **name** - Name of the function to show highlighted
+
+- **UnHighlightFunction** - Shows a function normal
++ **name** - Name of the function to show un-highlighted
 
  */
 RemoteControlHandler::RemoteControlHandler(QObject *parent)
@@ -94,6 +104,12 @@ void RemoteControlHandler::handleRemoteCommand(
     case RemoteControlHandler::CommandType::Load:
         result = handleLoad(params, &errorString);
         break;
+    case RemoteControlHandler::CommandType::HighlightFunction:
+        result = highlightFunction(params, &errorString);
+        break;
+    case RemoteControlHandler::CommandType::UnHighlightFunction:
+        result = unhighlightFunction(params, &errorString);
+        break;
     default:
         qWarning() << "Unknown command:" << commandType;
         errorString = tr("Unknown command");
@@ -117,6 +133,67 @@ bool RemoteControlHandler::handleLoad(const QVariantMap &params, QString *errorS
         *errorString = m_lastErrorMessage;
     }
     return result;
+}
+
+bool RemoteControlHandler::highlightFunction(const QVariantMap &params, QString *errorString)
+{
+    ivm::IVFunction *func = getFunction(params, errorString);
+    if (!func) {
+        return false;
+    }
+
+    func->setMarked(true);
+    updateParentItem(func);
+
+    return true;
+}
+
+bool RemoteControlHandler::unhighlightFunction(const QVariantMap &params, QString *errorString)
+{
+    ivm::IVFunction *func = getFunction(params, errorString);
+    if (!func) {
+        return false;
+    }
+
+    func->setMarked(false);
+    updateParentItem(func);
+
+    return true;
+}
+
+ivm::IVFunction *RemoteControlHandler::getFunction(const QVariantMap &params, QString *errorString) const
+{
+    const QString name = params.value("name").toString();
+    if (name.isEmpty()) {
+        if (errorString) {
+            *errorString = QString("No valid function parameter 'name'");
+        }
+        return nullptr;
+    }
+
+    ivm::IVModel *model = m_document->objectsModel();
+    ivm::IVFunction *func = model->getFunction(name, Qt::CaseInsensitive);
+    if (!func) {
+        if (errorString) {
+            *errorString = QString("No function '%1' in the model").arg(name);
+        }
+        return nullptr;
+    }
+
+    return func;
+}
+
+void RemoteControlHandler::updateParentItem(ivm::IVObject *obj) const
+{
+    if (!obj->parentObject() || !m_document->itemsModel()) {
+        return;
+    }
+
+    IVItemModel *itemsModel = m_document->itemsModel();
+    ive::IVFunctionGraphicsItem *item = itemsModel->getItem<ive::IVFunctionGraphicsItem *>(obj->parentObject()->id());
+    if (item) {
+        item->update();
+    }
 }
 
 }

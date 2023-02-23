@@ -55,16 +55,27 @@ void MiniViewRenderer::render(QPainter *painter)
     const shared::ColorHandler ch =
             shared::ColorManager::instance()->colorsForItem(shared::ColorManager::FunctionScale);
     painter->setBrush(ch.brush());
-    painter->setPen(QPen(ch.penColor(), ch.penWidth()));
+    QPen pen(ch.penColor(), ch.penWidth());
+    painter->setPen(pen);
+
+    const shared::ColorHandler highlightColor =
+            shared::ColorManager::instance()->colorsForItem(shared::ColorManager::ConnectionFlow);
+    QPen highlightPen(highlightColor.penColor(), highlightColor.penWidth());
 
     QFont painterFont = painter->font();
     painterFont.setItalic(true);
     painterFont.setPointSize(painterFont.pointSize() - 1);
     painter->setFont(painterFont);
     for (auto it = d->rects.cbegin(); it != d->rects.cend(); ++it) {
+        const ivm::IVObject *obj = d->item->entity()->model()->getObject(it.key());
+        if (obj && obj->isMarked()) {
+            painter->setPen(highlightPen);
+        }
+
         painter->drawRect(it.value());
 
-        const ivm::IVObject *obj = d->item->entity()->model()->getObject(it.key());
+        painter->setPen(pen);
+
         if (!obj)
             continue;
 

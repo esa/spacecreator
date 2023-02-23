@@ -49,7 +49,7 @@ IVFunctionGraphicsItem::IVFunctionGraphicsItem(ivm::IVFunction *entity, QGraphic
         m_svgRenderer = new QSvgRenderer(QLatin1String(":/toolbar/icns/change_root.svg"));
 }
 
-IVFunctionGraphicsItem::~IVFunctionGraphicsItem() {}
+IVFunctionGraphicsItem::~IVFunctionGraphicsItem() { }
 
 void IVFunctionGraphicsItem::init()
 {
@@ -163,6 +163,12 @@ void IVFunctionGraphicsItem::applyColorScheme()
             b.setColor(parentFunction->brush().color().darker(125));
             p.setColor(parentFunction->pen().color().darker(125));
         }
+    }
+
+    if (entity()->isMarked()) {
+        const shared::ColorHandler ch =
+                shared::ColorManager::instance()->colorsForItem(shared::ColorManager::ConnectionFlow);
+        p = QPen(ch.penColor(), ch.penWidth());
     }
 
     if (pen() == p && brush() == b)

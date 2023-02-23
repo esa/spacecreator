@@ -32,6 +32,7 @@ class VEObject : public QObject
     Q_OBJECT
     Q_PROPERTY(shared::Id id READ id CONSTANT)
     Q_PROPERTY(QString name READ title)
+    Q_PROPERTY(bool marked READ isMarked WRITE setMarked NOTIFY markerChanged)
 
 public:
     explicit VEObject(const shared::Id &id = shared::InvalidId, QObject *parent = nullptr);
@@ -130,8 +131,12 @@ public:
         return false;
     }
 
+    void setMarked(bool mark);
+    bool isMarked() const;
+
 Q_SIGNALS:
     void attributeChanged(const QString &name);
+    void markerChanged();
 
 public Q_SLOTS:
     bool setParentObject(shared::VEObject *parentObject);

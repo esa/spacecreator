@@ -45,13 +45,6 @@ private:
     void drawData(QPainter *painter);
 
 protected:
-    //    struct ConnectionData {
-    //        QPointF outerMappedScenePos;
-    //        QPointF innerScenePos;
-    //        shared::Id innerFunctionId;
-    //        shared::Id connectionId;
-    //    };
-
     struct MiniViewRendererPrivate {
         explicit MiniViewRendererPrivate(const IVFunctionGraphicsItem *item)
             : item(item)
