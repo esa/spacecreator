@@ -493,10 +493,6 @@ void IvToPromelaTranslator::prepareFunctionInfo(IvToPromelaTranslatorContext &co
                 observerInfo->m_nextQueue = channelName;
                 observerInfo->m_toFunction = toFunction;
 
-                if (observerInfo->m_nextQueue.isEmpty()) {
-                    throw TranslationException("No i dupa");
-                }
-
                 proctypeInfo->m_observers.push_back(std::move(observerInfo));
 
                 currentQueueName = channelName;
