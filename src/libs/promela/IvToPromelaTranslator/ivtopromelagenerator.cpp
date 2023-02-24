@@ -21,8 +21,6 @@
 
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
-#include <ivcore/ivconnection.h>
-#include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <promela/PromelaOptions/options.h>
 
@@ -55,8 +53,6 @@ using promela::model::Proctype;
 using promela::model::ProctypeElement;
 using promela::model::PromelaSystemModel;
 using promela::model::Sequence;
-using promela::model::VariableRef;
-
 using promela::model::Skip;
 using promela::model::StringConstant;
 using promela::model::Utype;

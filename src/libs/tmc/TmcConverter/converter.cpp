@@ -106,6 +106,8 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     , m_outputDirectoryFilepath(outputDirectory)
     , m_ivBaseDirectory(QFileInfo(m_inputIvFilepath).dir())
     , m_outputDirectory(outputDirectory)
+    , m_isRealTypeEnabled(false)
+    , m_isMulticastEnabled(false)
     , m_numberOfProctypes(0)
     , m_process(new QProcess(this))
     , m_timer(new QTimer(this))
@@ -287,6 +289,11 @@ void TmcConverter::setProcessesBasePriority(std::optional<QString> value)
 void TmcConverter::setDelta(std::optional<QString> value)
 {
     m_delta = std::move(value);
+}
+
+void TmcConverter::setMulticastEnabled(bool isMulticastEnabled)
+{
+    m_isMulticastEnabled = isMulticastEnabled;
 }
 
 void TmcConverter::setSdl2PromelaTimeout(int timeout)
@@ -509,6 +516,9 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
     if (m_isRealTypeEnabled) {
         options.add(PromelaOptions::enhancedSpinSupport);
         options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
+    }
+    if (m_isMulticastEnabled) {
+        options.add(PromelaOptions::supportMulticast);
     }
     options.add(IvOptions::inputFilepath, inputFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());

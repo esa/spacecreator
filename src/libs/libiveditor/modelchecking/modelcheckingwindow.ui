@@ -49,7 +49,7 @@
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -673,89 +673,6 @@
         <string>SPIN model-checker</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="6" column="0" colspan="3">
-         <widget class="QLabel" name="label_spinExpAlgorithm">
-          <property name="text">
-           <string>Exploration mode:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="3">
-         <widget class="QLineEdit" name="lineEdit_errorLimit">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="3" colspan="2">
-         <widget class="QComboBox" name="comboBox_spinExpAlgorithm">
-          <item>
-           <property name="text">
-            <string>Depth First Search</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Breadth First Search</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="4">
-         <widget class="QLabel" name="label_timeLimit">
-          <property name="text">
-           <string>Time limit (sec) for exploration:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="3">
-         <widget class="QLineEdit" name="lineEdit_spinTimeLimit">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="5">
-         <widget class="QLabel" name="label_optionalField">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>(optional field)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="3">
-         <widget class="QLineEdit" name="lineEdit_searchStateLimit">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="5">
-         <widget class="QLabel" name="label_recommendedField2">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>(recommended field)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3">
-         <widget class="QLineEdit" name="lineEdit_numberOfCores">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="maxLength">
-           <number>32767</number>
-          </property>
-         </widget>
-        </item>
         <item row="14" column="0" colspan="6">
          <widget class="QTableWidget" name="tableWidget_generationLimits">
           <column>
@@ -770,101 +687,49 @@
           </column>
          </widget>
         </item>
-        <item row="15" column="0" colspan="6">
-         <widget class="QPushButton" name="tableAddButton">
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="checkBox_useBitHashing">
+          <property name="text">
+           <string>Use bit hashing</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QCheckBox" name="checkBox_useReal">
+          <property name="text">
+           <string>Support ASN.1 REAL</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="0" colspan="3">
+         <widget class="QLabel" name="label_rawCommandLine">
+          <property name="text">
+           <string>Raw command line (for developers):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout"/>
+        </item>
+        <item row="6" column="0" colspan="3">
+         <widget class="QLabel" name="label_spinExpAlgorithm">
+          <property name="text">
+           <string>Exploration mode:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="5">
+         <widget class="QLabel" name="label_optionalField3">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
            </font>
           </property>
           <property name="text">
-           <string>Add row</string>
-          </property>
-         </widget>
-        </item>
-        <item row="16" column="0" colspan="6">
-         <widget class="QPushButton" name="tableDeleteButton">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Delete row</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="3">
-         <widget class="QLabel" name="label_numberOfCores">
-          <property name="text">
-           <string>Number of cores:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="5">
-         <widget class="QLabel" name="label_recommendedField">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>(recommended field)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="3">
-         <widget class="QLabel" name="label_searchStateLimit">
-          <property name="text">
-           <string>Search state limit:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0" colspan="3">
-         <widget class="QLabel" name="label_errorLimit">
-          <property name="text">
-           <string>Error limit:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0" colspan="3">
-         <widget class="QLabel" name="label_memoryLimit">
-          <property name="text">
-           <string>Memory limit [MB]:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="13" column="0" colspan="3">
-         <widget class="QLabel" name="label_ifaceGenerationLimits">
-          <property name="text">
-           <string>Interface generation limits:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="3">
-         <widget class="QLineEdit" name="lineEdit_memoryLimit">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="maxLength">
-           <number>32767</number>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0" colspan="3">
-         <widget class="QLabel" name="label_generationLimit">
-          <property name="text">
-           <string>Global input vector generation limit:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="3">
-         <widget class="QLineEdit" name="lineEdit_generationLimit">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="maxLength">
-           <number>32767</number>
+           <string>(optional field)</string>
           </property>
          </widget>
         </item>
@@ -886,10 +751,57 @@
           </column>
          </widget>
         </item>
-        <item row="17" column="0" colspan="3">
-         <widget class="QLabel" name="label_rawCommandLine">
+        <item row="18" column="0">
+         <widget class="QPushButton" name="pushButton_callSpin">
+          <property name="font">
+           <font>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="text">
-           <string>Raw command line (for developers):</string>
+           <string>Call Spin</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="3">
+         <widget class="QLineEdit" name="lineEdit_vectorszValue"/>
+        </item>
+        <item row="2" column="2">
+         <widget class="QCheckBox" name="checkBox_useFairScheduling">
+          <property name="text">
+           <string>Use fair scheduling</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0" colspan="3">
+         <widget class="QLabel" name="label_vectorsz">
+          <property name="text">
+           <string>VECTORSZ value:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="5">
+         <widget class="QLabel" name="label_26">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>(optional field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="3">
+         <widget class="QLineEdit" name="lineEdit_memoryLimit">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="maxLength">
+           <number>32767</number>
           </property>
          </widget>
         </item>
@@ -903,39 +815,55 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="5">
-         <widget class="QLabel" name="label_optionalField2">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
+        <item row="9" column="0" colspan="3">
+         <widget class="QLabel" name="label_memoryLimit">
           <property name="text">
-           <string>(optional field)</string>
+           <string>Memory limit [MB]:</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="5">
-         <widget class="QLabel" name="label_optionalField3">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
+        <item row="2" column="1">
+         <widget class="QCheckBox" name="checkBox_searchShortestPath">
           <property name="text">
-           <string>(optional field)</string>
+           <string>Search shortest path</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="10" column="5">
-         <widget class="QLabel" name="label_optionalField4">
+        <item row="4" column="3">
+         <widget class="QLineEdit" name="lineEdit_numberOfCores">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="maxLength">
+           <number>32767</number>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="3">
+         <widget class="QLineEdit" name="lineEdit_deltaValue"/>
+        </item>
+        <item row="4" column="5">
+         <widget class="QLabel" name="label_recommendedField2">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
            </font>
           </property>
           <property name="text">
-           <string>(optional field)</string>
+           <string>(recommended field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="3">
+         <widget class="QLineEdit" name="lineEdit_generationLimit">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="maxLength">
+           <number>32767</number>
           </property>
          </widget>
         </item>
@@ -951,66 +879,114 @@
           </property>
          </widget>
         </item>
-        <item row="18" column="0">
-         <widget class="QPushButton" name="pushButton_callSpin">
+        <item row="8" column="3">
+         <widget class="QLineEdit" name="lineEdit_errorLimit">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="5">
+         <widget class="QLabel" name="label_recommendedField">
           <property name="font">
            <font>
-            <bold>true</bold>
+            <pointsize>8</pointsize>
            </font>
           </property>
           <property name="text">
-           <string>Call Spin</string>
+           <string>(recommended field)</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QCheckBox" name="checkBox_useBitHashing">
+        <item row="4" column="0" colspan="3">
+         <widget class="QLabel" name="label_numberOfCores">
           <property name="text">
-           <string>Use bit hashing</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+           <string>Number of cores:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QCheckBox" name="checkBox_searchShortestPath">
+        <item row="13" column="0" colspan="3">
+         <widget class="QLabel" name="label_ifaceGenerationLimits">
           <property name="text">
-           <string>Search shortest path</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+           <string>Interface generation limits:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QCheckBox" name="checkBox_useFairScheduling">
+        <item row="5" column="3">
+         <widget class="QLineEdit" name="lineEdit_spinTimeLimit">
           <property name="text">
-           <string>Use fair scheduling</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+           <string/>
           </property>
          </widget>
         </item>
-        <item row="2" column="3">
-         <widget class="QCheckBox" name="checkBox_useReal">
+        <item row="16" column="0" colspan="6">
+         <widget class="QPushButton" name="tableDeleteButton">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
           <property name="text">
-           <string>Support ASN.1 REAL</string>
+           <string>Delete row</string>
           </property>
          </widget>
         </item>
-        <item row="11" column="3">
-         <widget class="QLineEdit" name="lineEdit_deltaValue"/>
+        <item row="7" column="3">
+         <widget class="QLineEdit" name="lineEdit_searchStateLimit">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
         </item>
-        <item row="12" column="3">
-         <widget class="QLineEdit" name="lineEdit_vectorszValue"/>
+        <item row="15" column="0" colspan="6">
+         <widget class="QPushButton" name="tableAddButton">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Add row</string>
+          </property>
+         </widget>
         </item>
-        <item row="11" column="5">
-         <widget class="QLabel" name="label_26">
+        <item row="8" column="0" colspan="3">
+         <widget class="QLabel" name="label_errorLimit">
+          <property name="text">
+           <string>Error limit:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="3" colspan="2">
+         <widget class="QComboBox" name="comboBox_spinExpAlgorithm">
+          <item>
+           <property name="text">
+            <string>Depth First Search</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Breadth First Search</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="11" column="0" colspan="3">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Delta value for ASN.1 REAL value generation:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0" colspan="3">
+         <widget class="QLabel" name="label_generationLimit">
+          <property name="text">
+           <string>Global input vector generation limit:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="5">
+         <widget class="QLabel" name="label_optionalField4">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -1021,17 +997,48 @@
           </property>
          </widget>
         </item>
-        <item row="11" column="0" colspan="3">
-         <widget class="QLabel" name="label_8">
+        <item row="5" column="0" colspan="4">
+         <widget class="QLabel" name="label_timeLimit">
           <property name="text">
-           <string>Delta value for ASN.1 REAL value generation:</string>
+           <string>Time limit (sec) for exploration:</string>
           </property>
          </widget>
         </item>
-        <item row="12" column="0" colspan="3">
-         <widget class="QLabel" name="label_vectorsz">
+        <item row="7" column="5">
+         <widget class="QLabel" name="label_optionalField2">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
           <property name="text">
-           <string>VECTORSZ value:</string>
+           <string>(optional field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" colspan="3">
+         <widget class="QLabel" name="label_searchStateLimit">
+          <property name="text">
+           <string>Search state limit:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="5">
+         <widget class="QLabel" name="label_optionalField">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>(optional field)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QCheckBox" name="checkBox_useMulticast">
+          <property name="text">
+           <string>Support multicast</string>
           </property>
          </widget>
         </item>

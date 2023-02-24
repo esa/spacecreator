@@ -128,6 +128,11 @@ void TmcVerifier::setDelta(std::optional<QString> value)
     m_converter->setDelta(std::move(value));
 }
 
+void TmcVerifier::setMulticastEnabled(bool isMulticastEnabled)
+{
+    m_converter->setMulticastEnabled(isMulticastEnabled);
+}
+
 void TmcVerifier::setSdl2PromelaTimeout(int timeout)
 {
     m_converter->setSdl2PromelaTimeout(timeout);

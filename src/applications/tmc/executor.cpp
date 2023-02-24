@@ -74,6 +74,7 @@ void TmcExecutor::execute()
     std::vector<QString> subtypesFilepaths;
     std::optional<QString> delta;
     bool isRealTypeEnabled = false;
+    bool isMulticastEnabled = false;
     bool verify = false;
 
     const QStringList args = QCoreApplication::arguments();
@@ -226,6 +227,9 @@ void TmcExecutor::execute()
         } else if (arg == "-enable-reals") {
             ++i;
             isRealTypeEnabled = true;
+        } else if (arg == "-multicast") {
+            ++i;
+            isMulticastEnabled = true;
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Checker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -250,6 +254,7 @@ void TmcExecutor::execute()
             qInfo("  -sub <filepath>        Use <filepath> as an ASN.1 file used for subtyping");
             qInfo("  -enable-reals          Enable support for real type");
             qInfo("  -delta <delta value>   Set delta for reals generation");
+            qInfo("  -multicast             Enable support multicast connections in InterfaceView");
             qInfo("  -verify                Run whole verification process");
             qInfo("  -h, --help             Print this message and exit.");
             QCoreApplication::exit(EXIT_SUCCESS);
@@ -291,6 +296,7 @@ void TmcExecutor::execute()
     m_verifier->setSubtypesFilepaths(subtypesFilepaths);
     m_verifier->setDelta(delta);
     m_verifier->setRealTypeEnabled(isRealTypeEnabled);
+    m_verifier->setMulticastEnabled(isMulticastEnabled);
 
     if (!m_verifier->addStopConditionFiles(stopConditionFiles)) {
         qCritical() << "Cannot attach stop condition file";

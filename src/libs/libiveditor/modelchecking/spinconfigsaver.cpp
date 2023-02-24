@@ -124,6 +124,7 @@ void SpinConfigSaver::saveSpinConfig(const SpinConfigData &configData, QXmlStrea
     xml.writeAttribute("usebithashing", QString::number(configData.useBitHashing));
     xml.writeAttribute("usefairscheduling", QString::number(configData.useFairScheduling));
     xml.writeAttribute("supportReal", QString::number(configData.supportReal));
+    xml.writeAttribute("supportMulticast", QString::number(configData.supportMulticast));
     xml.writeAttribute("deltaValue", SpinConfigData::optionalFloatToString(configData.deltaValue));
     xml.writeAttribute("vectorszValue", SpinConfigData::optionalIntToString(configData.vectorszValue));
 
@@ -146,6 +147,7 @@ bool SpinConfigSaver::readSpinConfig(QXmlStreamReader &xml)
     configData.useBitHashing = readAttribute("usebithashing", xml).toInt();
     configData.useFairScheduling = readAttribute("usefairscheduling", xml).toInt();
     configData.supportReal = readAttribute("supportReal", xml).toInt();
+    configData.supportMulticast = readAttribute("supportMulticast", xml).toInt();
     configData.deltaValue = SpinConfigData::optionalFloatFromString(readAttribute("deltaValue", xml));
     configData.vectorszValue = SpinConfigData::optionalIntFromString(readAttribute("vectorszValue", xml));
 

@@ -122,6 +122,12 @@ public:
      * @param   delta Value of the interval between generated floats
      */
     void setDelta(std::optional<QString> delta);
+    /**
+     * @brief   Set support for multicast in source Interface View
+     *
+     * @param   isMulticastEnabled true is multicast should be enabled
+     */
+    void setMulticastEnabled(bool isMulticastEnabled);
 
     /**
      * @brief   Set timeout for external sdl2promela process.

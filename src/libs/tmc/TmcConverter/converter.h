@@ -156,6 +156,12 @@ public:
      */
     void setDelta(std::optional<QString> value);
     /**
+     * @brief   Set support for multicast in source Interface View
+     *
+     * @param   isMulticastEnabled true is multicast should be enabled
+     */
+    void setMulticastEnabled(bool isMulticastEnabled);
+    /**
      * @brief   Set timeout for external sdl2promela process.
      *
      * @param   timeout Timeout value.
@@ -294,6 +300,7 @@ private:
     std::optional<QString> m_processesBasePriority;
     std::optional<QString> m_delta;
     bool m_isRealTypeEnabled;
+    bool m_isMulticastEnabled;
     std::unordered_map<QString, QString> m_interfaceInputVectorLengthLimits;
     std::vector<QString> m_subtypesFilepaths;
     QStringList m_stopConditionsFiles;

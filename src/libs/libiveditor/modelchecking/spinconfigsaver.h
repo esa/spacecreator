@@ -44,6 +44,7 @@ struct SpinConfigData {
     bool useFairScheduling = false;
     bool useBitHashing = false;
     bool supportReal = false;
+    bool supportMulticast = false;
     std::optional<int> numberOfCores = 1;
     std::optional<int> timeLimitSeconds = 300;
     std::optional<int> searchStateLimit = 1000000;

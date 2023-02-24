@@ -255,7 +255,6 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     kazooCallerProcess->setWorkingDirectory(this->projectDir + "/");
     if (kazooCallerProcess->execute(kazooCmd, kazooArguments) != 0) {
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
-
     }
 }
 
@@ -1288,11 +1287,11 @@ QStringList ModelCheckingWindow::getFunctionsSelection()
 /*!
  * \brief ModelCheckingWindow::getAllFunctions Saves all model Functions.
  * \return The list 'functions' with the names of the Functions.
-*/
-QStringList ModelCheckingWindow::getAllFunctions(){
+ */
+QStringList ModelCheckingWindow::getAllFunctions()
+{
     QStringList functions = {};
-    for (int i = 0; i < this->functionsTopNodeWidgetItem->childCount(); i++)
-    {
+    for (int i = 0; i < this->functionsTopNodeWidgetItem->childCount(); i++) {
         QTreeWidgetItem *child = this->functionsTopNodeWidgetItem->child(i);
         functions.append(child->text(0));
     }
@@ -1552,9 +1551,9 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
     ifOptions.append(d->ui->lineEdit_maxNumStates->text());
 
     SpinConfigData spinConfigData = readSpinConfigFromUI();
-    
+
     XmelWriter writer(propsSelection, subtypesSelection, allFunctions, functionSelection, ifOptions, spinConfigData);
-    if (writer.writeFile(&configFile, configurationFileName)){
+    if (writer.writeFile(&configFile, configurationFileName)) {
         statusBar()->showMessage("Configuration file saved as " + configurationFileName, 6000);
     } else {
         QMessageBox::warning(this, tr("Save configuration"), "Error when writing to file.");
@@ -1622,7 +1621,7 @@ bool ModelCheckingWindow::saveConfiguration()
     SpinConfigData spinConfigData = readSpinConfigFromUI();
 
     XmelWriter writer(propsSelection, subtypesSelection, allFunctions, functionSelection, ifOptions, spinConfigData);
-    if (writer.writeFile(&file, fileName + ".xml")){
+    if (writer.writeFile(&file, fileName + ".xml")) {
         return true;
     } else {
         QMessageBox::warning(this, tr("Save configuration"), "Error when writing to file.");
@@ -1683,16 +1682,16 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
 
     // set IF config params
     d->ui->lineEdit_maxNumScenarios->setText(reader.getIfConfig().at(0));
-    
+
     reader.getIfConfig().at(1) == "true" ? d->ui->checkBox_errorScenarios->setCheckState(Qt::Checked)
                                          : d->ui->checkBox_errorScenarios->setCheckState(Qt::Unchecked);
     reader.getIfConfig().at(2) == "true" ? d->ui->checkBox_successScenarios->setCheckState(Qt::Checked)
                                          : d->ui->checkBox_successScenarios->setCheckState(Qt::Unchecked);
     d->ui->lineEdit_timeLimit->setText(reader.getIfConfig().at(3));
     d->ui->lineEdit_maxNumEnvRICalls->setText(reader.getIfConfig().at(4));
-    reader.getIfConfig().at(5) == "dfs" ? d->ui->comboBox_expAlgorithm->setCurrentIndex(0) 
+    reader.getIfConfig().at(5) == "dfs" ? d->ui->comboBox_expAlgorithm->setCurrentIndex(0)
                                         : d->ui->comboBox_expAlgorithm->setCurrentIndex(1);
-    reader.getIfConfig().at(7) == "discrete" ? d->ui->comboBox_timerepresentation->setCurrentIndex(0) 
+    reader.getIfConfig().at(7) == "discrete" ? d->ui->comboBox_timerepresentation->setCurrentIndex(0)
                                              : d->ui->comboBox_timerepresentation->setCurrentIndex(1);
     d->ui->lineEdit_maxNumStates->setText(reader.getIfConfig().at(6));
 
@@ -1760,6 +1759,7 @@ void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
     setCheckBoxState(d->ui->checkBox_useFairScheduling, spinConfig.useFairScheduling);
     setCheckBoxState(d->ui->checkBox_useBitHashing, spinConfig.useBitHashing);
     setCheckBoxState(d->ui->checkBox_useReal, spinConfig.supportReal);
+    setCheckBoxState(d->ui->checkBox_useMulticast, spinConfig.supportMulticast);
 
     d->ui->lineEdit_numberOfCores->setText(SpinConfigData::optionalIntToString(spinConfig.numberOfCores));
     d->ui->lineEdit_searchStateLimit->setText(SpinConfigData::optionalIntToString(spinConfig.searchStateLimit));
@@ -1923,6 +1923,7 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
     spinConfigData.useFairScheduling = (d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked);
     spinConfigData.useBitHashing = (d->ui->checkBox_useBitHashing->checkState() == Qt::Checked);
     spinConfigData.supportReal = (d->ui->checkBox_useReal->checkState() == Qt::Checked);
+    spinConfigData.supportMulticast = (d->ui->checkBox_useMulticast->checkState() == Qt::Checked);
 
     spinConfigData.rawCommandLine = d->ui->lineEdit_rawCommandLine->text();
 
