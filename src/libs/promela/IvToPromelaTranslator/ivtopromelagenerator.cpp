@@ -442,6 +442,7 @@ void IvToPromelaGenerator::generateSendInline(const QString &functionName, const
         const QString &sourceFunctionName, const QString &sourceInterfaceName, const QString &channelName,
         const QString &parameterType, const QString &parameterName) const
 {
+    // internals
     QString inlineName =
             QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(sourceFunctionName)).arg(sourceInterfaceName);
 
@@ -452,13 +453,21 @@ void IvToPromelaGenerator::generateSendInline(const QString &functionName, const
     QList<QString> arguments;
     QList<Expression> params;
 
-    if (argumentName.isEmpty()) {
-        params.append(Expression(Constant(0)));
+    if (m_context.isMulticastSupported()) {
+        const QString pidName = QString("PID_%1").arg(Escaper::escapePromelaField(functionName));
+        params.append(Expression(VariableRef(pidName)));
+        if (!argumentName.isEmpty()) {
+            params.append(Expression(VariableRef(argumentName)));
+            arguments.push_back(argumentName);
+        }
     } else {
-        params.append(Expression(VariableRef(argumentName)));
-        arguments.push_back(argumentName);
+        if (argumentName.isEmpty()) {
+            params.append(Expression(Constant(0)));
+        } else {
+            params.append(Expression(VariableRef(argumentName)));
+            arguments.push_back(argumentName);
+        }
     }
-
     sequence.appendElement(ChannelSend(VariableRef(channelName), params));
 
     m_context.model()->addInlineDef(std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence)));
@@ -532,6 +541,7 @@ void IvToPromelaGenerator::createPromelaObjectsForFunction(
 
     createCheckQueueInline(m_context.model(), functionName, channelNames);
     createGetSenderInline(m_context.model(), functionName);
+    createSenderPidVariable(m_context.model(), functionName);
 }
 
 void IvToPromelaGenerator::generateProctypeForTimer(const QString &functionName, const ProctypeInfo &proctypeInfo) const
@@ -633,6 +643,8 @@ void IvToPromelaGenerator::createPromelaObjectsForEnvironment(
         const QString sendInlineName = iter->second->m_sendInlineName;
         generateEnvironmentProctype(functionName, interfaceName, parameter, sendInlineName);
     }
+
+    createSenderPidVariable(m_context.model(), functionName);
 }
 
 void IvToPromelaGenerator::createCheckQueueInline(
@@ -693,13 +705,24 @@ void IvToPromelaGenerator::createGetSenderInline(
     // the empty inline with required name is created here.
     Sequence sequence(Sequence::Type::NORMAL);
 
-    sequence.appendElement(Skip());
-
     QList<QString> arguments;
-    arguments.append(QString("%1_sender_arg").arg(Escaper::escapePromelaIV(functionName)));
+    const QString argumentName = QString("%1_sender_arg").arg(Escaper::escapePromelaIV(functionName));
+    arguments.append(argumentName);
+
+    const QString senderVariableName = QString("%1_sender").arg(Escaper::escapePromelaField(functionName));
+
+    sequence.appendElement(Assignment(VariableRef(argumentName), Expression(VariableRef(senderVariableName))));
 
     const QString checkQueueInlineName = QString("%1_0_RI_0_get_sender").arg(Escaper::escapePromelaIV(functionName));
     promelaModel->addInlineDef(std::make_unique<InlineDef>(checkQueueInlineName, arguments, std::move(sequence)));
+}
+
+void IvToPromelaGenerator::createSenderPidVariable(
+        model::PromelaSystemModel *promelaModel, const QString &functionName) const
+{
+    const QString senderVariableName = QString("%1_sender").arg(Escaper::escapePromelaField(functionName));
+
+    promelaModel->addDeclaration(Declaration(DataType(UtypeRef("PID")), senderVariableName));
 }
 
 void IvToPromelaGenerator::createSystemState() const
@@ -873,12 +896,25 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers() const
 
                 QList<QString> arguments;
                 QList<Expression> params;
-                if (!parameterType.isEmpty()) {
-                    const QString name = QString("%1_%2_%3").arg(observerName).arg(toFunction).arg(parameterName);
-                    arguments.append(name);
-                    params.append(Expression(VariableRef(name)));
+                if (m_context.isMulticastSupported()) {
+                    const QString senderVariableName =
+                            QString("%1_sender").arg(Escaper::escapePromelaField(toFunction));
+                    if (!parameterType.isEmpty()) {
+                        const QString name = QString("%1_%2_%3").arg(observerName).arg(toFunction).arg(parameterName);
+                        arguments.append(name);
+                        params.append(Expression(VariableRef(senderVariableName)));
+                        params.append(Expression(VariableRef(name)));
+                    } else {
+                        params.append(Expression(VariableRef(senderVariableName)));
+                    }
                 } else {
-                    params.append(Expression(Constant(1)));
+                    if (!parameterType.isEmpty()) {
+                        const QString name = QString("%1_%2_%3").arg(observerName).arg(toFunction).arg(parameterName);
+                        arguments.append(name);
+                        params.append(Expression(VariableRef(name)));
+                    } else {
+                        params.append(Expression(Constant(1)));
+                    }
                 }
                 Sequence sequence(Sequence::Type::NORMAL);
 
@@ -926,7 +962,15 @@ std::unique_ptr<model::ProctypeElement> IvToPromelaGenerator::createReceiveState
 {
     // channel receive
     QList<VariableRef> receiveParams;
-    receiveParams.append(VariableRef(parameterType.isEmpty() ? QString("_") : parameterName));
+    if (m_context.isMulticastSupported()) {
+        receiveParams.append(VariableRef("_"));
+        if (!parameterType.isEmpty()) {
+            receiveParams.append(VariableRef(parameterName));
+        }
+    } else {
+        receiveParams.append(VariableRef(parameterType.isEmpty() ? QString("_") : parameterName));
+    }
+
     return std::make_unique<ProctypeElement>(ChannelRecv(VariableRef(channelName), receiveParams));
 }
 
@@ -990,8 +1034,16 @@ void IvToPromelaGenerator::createChannel(
         const QString &channelName, const QString &messageType, size_t channelSize) const
 {
     QList<ChannelInit::Type> channelType;
-    channelType.append(messageType.isEmpty() ? ChannelInit::Type(BasicType::INT)
-                                             : ChannelInit::Type(UtypeRef(Escaper::escapePromelaName(messageType))));
+    if (m_context.isMulticastSupported()) {
+        channelType.append(ChannelInit::Type(UtypeRef("PID")));
+        if (!messageType.isEmpty()) {
+            channelType.append(ChannelInit::Type(UtypeRef(Escaper::escapePromelaName(messageType))));
+        }
+    } else {
+        channelType.append(messageType.isEmpty()
+                        ? ChannelInit::Type(BasicType::INT)
+                        : ChannelInit::Type(UtypeRef(Escaper::escapePromelaName(messageType))));
+    }
     ChannelInit channelInit(channelSize, std::move(channelType));
     Declaration declaration(DataType(BasicType::CHAN), channelName);
     declaration.setInit(channelInit);
