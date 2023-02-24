@@ -23,6 +23,8 @@
 #include <QVariantMap>
 
 namespace ivm {
+
+class IVConnection;
 class IVFunction;
 class IVObject;
 }
@@ -63,6 +65,10 @@ private:
     bool unhighlightFunction(const QVariantMap &params, QString *errorString);
     ivm::IVFunction *getFunction(const QVariantMap &params, QString *errorString) const;
     void updateParentItem(ivm::IVObject *obj) const;
+    bool highlightConnection(const QVariantMap &params, QString *errorString);
+    bool unhighlightConnection(const QVariantMap &params, QString *errorString);
+    ivm::IVConnection *getConnection(const QVariantMap &params, QString *errorString) const;
+    void updateItem(ivm::IVObject *obj) const;
 
     QPointer<ive::InterfaceDocument> m_document;
     QString m_lastErrorMessage;

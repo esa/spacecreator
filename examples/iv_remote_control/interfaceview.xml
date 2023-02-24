@@ -7,7 +7,7 @@
     <Property name="Taste::RootCoordinates" value="-74000 -28100"/>
 </Provided_Interface>
 
-<Required_Interface id="{e873045a-6443-4951-a9b3-06e6882f525f}" name="Inform" kind="Sporadic" enable_multicast="false" layer="default" wcet="0" stack_size="50" miat="0" queue_size="1" priority="1">
+<Required_Interface id="{e873045a-6443-4951-a9b3-06e6882f525f}" name="inform" kind="Sporadic" enable_multicast="false" layer="default" wcet="0" stack_size="50" miat="0" queue_size="1" priority="1">
     <Property name="Taste::coordinates" value="65200 28700"/>
     <Property name="Taste::RootCoordinates" value="-35400 43300"/>
     <Property name="Taste::InheritPI" value="true"/>
@@ -63,7 +63,7 @@
 
 <Connection id="{ffbea01b-8b43-46af-bc3e-452e07a550ff}">
     <Source func_name="Contractor" ri_name="inform"/>
-    <Target func_name="Worker" ri_name="Inform"/>
+    <Target func_name="Worker" ri_name="inform"/>
     <Property name="Taste::coordinates" value="-48000 -24700 -48000 9100 -35400 9100 -35400 43000"/>
 </Connection>
 
@@ -98,7 +98,7 @@
 </Function>
 
 <Connection id="{5d8dce56-8ec1-4dc6-bd75-190485a9b69c}">
-    <Source func_name="Worker" ri_name="Inform"/>
+    <Source func_name="Worker" ri_name="inform"/>
     <Target func_name="Logger" pi_name="inform"/>
     <Property name="Taste::coordinates" value="65200 29300 65200 33500 70100 33500 70100 37800"/>
 </Connection>

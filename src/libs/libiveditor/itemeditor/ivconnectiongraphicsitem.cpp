@@ -23,6 +23,7 @@
 #include "itemeditor/graphicsitemhelpers.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
+#include "ivcoreutils.h"
 #include "ivfunction.h"
 #include "ivfunctiongraphicsitem.h"
 #include "ivfunctiontypegraphicsitem.h"
@@ -30,7 +31,6 @@
 #include "ivinterfacegraphicsitem.h"
 #include "ivnamevalidator.h"
 #include "ui/grippointshandler.h"
-#include "ivcoreutils.h"
 #include "ui/textitem.h"
 
 #include <QGuiApplication>
@@ -93,8 +93,13 @@ shared::ui::TextItem *IVConnectionGraphicsItem::initTextItem()
 
 void IVConnectionGraphicsItem::applyColorScheme()
 {
-    const shared::ColorHandler &h = colorHandler();
-    m_item->setPen(h.pen());
+    shared::ColorHandler ch;
+    if (entity()->isMarked()) {
+        ch = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::ConnectionFlow);
+    } else {
+        ch = colorHandler();
+    }
+    m_item->setPen(ch.pen());
     update();
 }
 

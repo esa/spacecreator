@@ -25,6 +25,7 @@
 #include "ivmodel.h"
 
 #include <QMetaEnum>
+#include <ivconnection.h>
 
 namespace ive {
 
@@ -54,6 +55,16 @@ Implemented commands and parameters list:
 - **UnHighlightFunction** - Shows a function normal
 + **name** - Name of the function to show un-highlighted
 
+- **HighlightConnection** - Highlights a connection
++ **fromFunction** - Name of the source function
++ **toFunction** - Name of the target function
++ **riName** - Name of the interface
+
+- **UnHighlightConnection** - Shows a connection normal
++ **fromFunction** - Name of the source function
++ **toFunction** - Name of the target function
++ **riName** - Name of the interface
+
  */
 RemoteControlHandler::RemoteControlHandler(QObject *parent)
     : QObject(parent)
@@ -77,6 +88,12 @@ void RemoteControlHandler::handleMessage(const QJsonObject &obj, const QString &
     const QMetaEnum qtEnum = QMetaEnum::fromType<RemoteControlHandler::CommandType>();
     const QString commandTypeStr = obj.value(qtEnum.name()).toString();
     const int commandTypeInt = qtEnum.keyToValue(commandTypeStr.toLocal8Bit().constData());
+    /**
+     * Loads ain interfaceview.xml file
+     * @param params The key "filename" contains the full file path
+     * @param errorString If not nullptr and in case of an error, an errortext is placed in here
+     * @return True if the file was loaded succefully
+     */
 
     handleRemoteCommand(static_cast<RemoteControlHandler::CommandType>(commandTypeInt),
             obj.value(QLatin1String("Parameters")).toObject().toVariantMap(), peerName);
@@ -110,6 +127,12 @@ void RemoteControlHandler::handleRemoteCommand(
     case RemoteControlHandler::CommandType::UnHighlightFunction:
         result = unhighlightFunction(params, &errorString);
         break;
+    case RemoteControlHandler::CommandType::HighlightConnection:
+        result = highlightConnection(params, &errorString);
+        break;
+    case RemoteControlHandler::CommandType::UnHighlightConnection:
+        result = unhighlightConnection(params, &errorString);
+        break;
     default:
         qWarning() << "Unknown command:" << commandType;
         errorString = tr("Unknown command");
@@ -119,12 +142,6 @@ void RemoteControlHandler::handleRemoteCommand(
     Q_EMIT commandDone(result, peerName, errorString);
 }
 
-/**
- * @brief RemoteControlHandler::handleLoad
- * @param params
- * @param errorString
- * @return
- */
 bool RemoteControlHandler::handleLoad(const QVariantMap &params, QString *errorString)
 {
     const QString fileName = params.value("filename").toString();
@@ -185,12 +202,95 @@ ivm::IVFunction *RemoteControlHandler::getFunction(const QVariantMap &params, QS
 
 void RemoteControlHandler::updateParentItem(ivm::IVObject *obj) const
 {
-    if (!obj->parentObject() || !m_document->itemsModel()) {
+    if (!obj || !obj->parentObject() || !m_document->itemsModel()) {
         return;
     }
 
     IVItemModel *itemsModel = m_document->itemsModel();
     ive::IVFunctionGraphicsItem *item = itemsModel->getItem<ive::IVFunctionGraphicsItem *>(obj->parentObject()->id());
+    if (item) {
+        item->update();
+    }
+}
+
+bool RemoteControlHandler::highlightConnection(const QVariantMap &params, QString *errorString)
+{
+    ivm::IVConnection *connection = getConnection(params, errorString);
+    if (!connection) {
+        return false;
+    }
+
+    connection->setMarked(true);
+
+    updateItem(connection->source());
+    updateParentItem(connection->source());
+    updateItem(connection->target());
+    updateParentItem(connection->target());
+
+    return true;
+}
+
+bool RemoteControlHandler::unhighlightConnection(const QVariantMap &params, QString *errorString)
+{
+    ivm::IVConnection *connection = getConnection(params, errorString);
+    if (!connection) {
+        return false;
+    }
+
+    updateItem(connection->source());
+    updateParentItem(connection->source());
+    updateItem(connection->target());
+    updateParentItem(connection->target());
+
+    connection->setMarked(false);
+
+    return true;
+}
+
+ivm::IVConnection *RemoteControlHandler::getConnection(const QVariantMap &params, QString *errorString) const
+{
+    const QString fromName = params.value("fromFunction").toString();
+    if (fromName.isEmpty()) {
+        if (errorString) {
+            *errorString = QString("No valid function parameter 'fromFunction'");
+        }
+        return nullptr;
+    }
+    const QString toName = params.value("toFunction").toString();
+    if (toName.isEmpty()) {
+        if (errorString) {
+            *errorString = QString("No valid function parameter 'toFunction'");
+        }
+        return nullptr;
+    }
+    const QString riName = params.value("riName").toString();
+    if (riName.isEmpty()) {
+        if (errorString) {
+            *errorString = QString("No valid function parameter 'riName'");
+        }
+        return nullptr;
+    }
+
+    ivm::IVModel *model = m_document->objectsModel();
+    ivm::IVConnection *connection = model->getConnection(riName, fromName, toName, Qt::CaseInsensitive);
+    if (!connection) {
+        if (errorString) {
+            *errorString = QString("No connection '%1' from '%2' to '%3' in the model").arg(riName, fromName, toName);
+        }
+        return nullptr;
+    }
+
+    return connection;
+}
+
+void RemoteControlHandler::updateItem(ivm::IVObject *obj) const
+{
+    if (!obj || !m_document->itemsModel()) {
+        return;
+    }
+
+    IVItemModel *itemsModel = m_document->itemsModel();
+    ive::IVFunctionGraphicsItem *item = itemsModel->getItem<ive::IVFunctionGraphicsItem *>(obj->id());
     if (item) {
         item->update();
     }

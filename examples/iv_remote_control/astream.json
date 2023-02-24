@@ -13,9 +13,25 @@
             }
         },
         {
+            "CommandType": "HighlightConnection",
+            "Parameters": {
+                "fromFunction": "Manager",
+                "toFunction": "Worker",
+                "riName": "doWork"
+            }
+        },
+        {
             "CommandType": "HighlightFunction",
             "Parameters": {
                 "name": "Worker"
+            }
+        },
+        {
+            "CommandType": "HighlightConnection",
+            "Parameters": {
+                "fromFunction": "Worker",
+                "toFunction": "Contractor",
+                "riName": "doWork"
             }
         },
         {
@@ -25,9 +41,41 @@
             }
         },
         {
+            "CommandType": "HighlightConnection",
+            "Parameters": {
+                "fromFunction": "Contractor",
+                "toFunction": "Worker",
+                "riName": "inform"
+            }
+        },
+        {
             "CommandType": "HighlightFunction",
             "Parameters": {
                 "name": "PowerGenerator"
+            }
+        },
+        {
+            "CommandType": "UnHighlightConnection",
+            "Parameters": {
+                "fromFunction": "Contractor",
+                "toFunction": "Worker",
+                "riName": "inform"
+            }
+        },
+        {
+            "CommandType": "UnHighlightConnection",
+            "Parameters": {
+                "fromFunction": "Worker",
+                "toFunction": "Contractor",
+                "riName": "doWork"
+            }
+        },
+        {
+            "CommandType": "UnHighlightConnection",
+            "Parameters": {
+                "fromFunction": "Manager",
+                "toFunction": "Worker",
+                "riName": "doWork"
             }
         },
         {

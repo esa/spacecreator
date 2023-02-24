@@ -66,6 +66,7 @@ void MiniViewRenderer::render(QPainter *painter)
     painterFont.setItalic(true);
     painterFont.setPointSize(painterFont.pointSize() - 1);
     painter->setFont(painterFont);
+    // Paint nested functions
     for (auto it = d->rects.cbegin(); it != d->rects.cend(); ++it) {
         const ivm::IVObject *obj = d->item->entity()->model()->getObject(it.key());
         if (obj && obj->isMarked()) {
@@ -84,7 +85,15 @@ void MiniViewRenderer::render(QPainter *painter)
         shared::graphicsviewutils::drawText(
                 painter, it.value().adjusted(margin, margin, -margin, -margin), text, margin);
     }
+
+    // Paint connections
     for (auto it = d->polygons.cbegin(); it != d->polygons.cend(); ++it) {
+        const ivm::IVObject *obj = d->item->entity()->model()->getObject(it.key());
+        if (obj && obj->isMarked()) {
+            painter->setPen(highlightPen);
+        } else {
+            painter->setPen(pen);
+        }
         painter->drawPolyline(it.value());
     }
     painter->restore();
