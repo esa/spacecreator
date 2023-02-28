@@ -511,7 +511,9 @@ void IvToPromelaGenerator::createPromelaObjectsForFunction(
 
     createCheckQueueInline(m_context.model(), functionName, channelNames);
     createGetSenderInline(m_context.model(), functionName);
-    createSenderPidVariable(m_context.model(), functionName);
+    if (m_context.isMulticastSupported()) {
+        createSenderPidVariable(m_context.model(), functionName);
+    }
 }
 
 void IvToPromelaGenerator::generateProctypeForTimer(const QString &functionName, const ProctypeInfo &proctypeInfo) const
@@ -645,7 +647,9 @@ void IvToPromelaGenerator::createPromelaObjectsForEnvironment(
         createPromelaObjectsForSporadicRis(functionName, *iter->second);
     }
 
-    createSenderPidVariable(m_context.model(), functionName);
+    if (m_context.isMulticastSupported()) {
+        createSenderPidVariable(m_context.model(), functionName);
+    }
 }
 
 void IvToPromelaGenerator::createCheckQueueInline(
@@ -712,7 +716,11 @@ void IvToPromelaGenerator::createGetSenderInline(
 
     const QString senderVariableName = QString("%1_sender").arg(Escaper::escapePromelaField(functionName));
 
-    sequence.appendElement(Assignment(VariableRef(argumentName), Expression(VariableRef(senderVariableName))));
+    if (m_context.isMulticastSupported()) {
+        sequence.appendElement(Assignment(VariableRef(argumentName), Expression(VariableRef(senderVariableName))));
+    } else {
+        sequence.appendElement(Skip());
+    }
 
     const QString checkQueueInlineName = QString("%1_0_RI_0_get_sender").arg(Escaper::escapePromelaIV(functionName));
     promelaModel->addInlineDef(std::make_unique<InlineDef>(checkQueueInlineName, arguments, std::move(sequence)));
