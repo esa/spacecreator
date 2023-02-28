@@ -1,0 +1,1 @@
+eventually actuator1.signal_received > 0 and actuator2.signal_received > 0;

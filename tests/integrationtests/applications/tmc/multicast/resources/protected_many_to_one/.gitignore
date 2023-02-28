@@ -44,3 +44,8 @@ work/actuator2/SDL/src/*
 !work/actuator2/SDL/src/actuator2.pr
 !work/actuator2/SDL/src/system_structure.pr
 !work/actuator2/SDL/src/dataview-uniq.asn
+
+# Except work/modelchecking/properties
+!work/modelchecking/
+work/modelchecking/*
+!work/modelchecking/properties
