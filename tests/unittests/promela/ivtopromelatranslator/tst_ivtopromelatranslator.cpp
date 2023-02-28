@@ -583,6 +583,7 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     options.add(PromelaOptions::modelFunctionName, "controller");
     options.add(PromelaOptions::modelFunctionName, "up");
     options.add(PromelaOptions::modelFunctionName, "down");
+    options.add(PromelaOptions::environmentFunctionName, "env");
 
     std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
     QVERIFY(promelaModel);
@@ -818,8 +819,13 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
 
     QVERIFY(promelaModel->hasInit());
 
-    QCOMPARE(promelaModel->getProctypes().size(), 5);
+    QCOMPARE(promelaModel->getProctypes().size(), 6);
 
+    {
+        const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Env_test");
+        QVERIFY(proctype != nullptr);
+        // environment proctype
+    }
     {
         const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_test");
         QVERIFY(proctype != nullptr);
