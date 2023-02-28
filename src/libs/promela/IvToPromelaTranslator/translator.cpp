@@ -93,9 +93,9 @@ void showEnvironmentProctype(const QString &name, const EnvProctypeInfo &info)
     qDebug() << "        priority " << info.m_priority;
 }
 
-void showSynchronousCallInfo(const QString &name, const SynchronousCallInfo &info)
+void showRequiredCallInfo(const QString &name, const RequiredCallInfo &info)
 {
-    qDebug() << "    Synchronous call " << name;
+    qDebug() << "    Required call " << name;
     qDebug() << "        target functions";
     for (const auto &target : info.m_targets) {
         qDebug() << "            " << target.m_targetFunctionName << " " << target.m_providedInlineName << " (env "
@@ -148,9 +148,13 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
                 proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
             showProctype(proctypeIter->first, *proctypeIter->second, true);
         }
-        for (auto synchronousCallIter = iter->second->m_synchronousCalls.begin();
-                synchronousCallIter != iter->second->m_synchronousCalls.end(); ++synchronousCallIter) {
-            showSynchronousCallInfo(synchronousCallIter->first, *synchronousCallIter->second);
+        for (auto sporadicRequiredCall = iter->second->m_synchronousCalls.begin();
+                sporadicRequiredCall != iter->second->m_synchronousCalls.end(); ++sporadicRequiredCall) {
+            showRequiredCallInfo(sporadicRequiredCall->first, *sporadicRequiredCall->second);
+        }
+        for (auto synchronousRequiredCall = iter->second->m_synchronousCalls.begin();
+                synchronousRequiredCall != iter->second->m_synchronousCalls.end(); ++synchronousRequiredCall) {
+            showRequiredCallInfo(synchronousRequiredCall->first, *synchronousRequiredCall->second);
         }
     }
 
@@ -445,7 +449,7 @@ void IvToPromelaTranslator::prepareFunctionInfo(IvToPromelaTranslatorContext &co
     }
     for (const IVInterface *requiredInterface : ivFunction->ris()) {
         if (requiredInterface->kind() == IVInterface::OperationKind::Sporadic) {
-            // skip
+            prepareSporadicCallInfo(context, functionName, requiredInterface, functionInfo);
         } else if (requiredInterface->kind() == IVInterface::OperationKind::Protected
                 || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
             prepareSynchronousCallInfo(context, functionName, requiredInterface, functionInfo);
@@ -516,6 +520,7 @@ void IvToPromelaTranslator::prepareEnvironmentFunctionInfo(IvToPromelaTranslator
     }
     for (const IVInterface *requiredInterface : ivFunction->ris()) {
         if (requiredInterface->kind() == IVInterface::OperationKind::Sporadic) {
+            prepareSporadicCallInfo(context, functionName, requiredInterface, functionInfo);
             std::unique_ptr<EnvProctypeInfo> proctypeInfo =
                     prepareEnvProctypeInfo(context, requiredInterface, functionName);
             const QString proctypeName = proctypeInfo->m_proctypeName;
@@ -624,25 +629,40 @@ std::unique_ptr<EnvProctypeInfo> IvToPromelaTranslator::prepareEnvProctypeInfo(I
 void IvToPromelaTranslator::prepareSynchronousCallInfo(IvToPromelaTranslatorContext &context,
         const QString &functionName, const ivm::IVInterface *requiredInterface, FunctionInfo &functionInfo) const
 {
-    std::unique_ptr<SynchronousCallInfo> info = std::make_unique<SynchronousCallInfo>();
+    std::unique_ptr<RequiredCallInfo> info = std::make_unique<RequiredCallInfo>();
+    QString inlineName = prepareCallInfo(*info, context, functionName, requiredInterface);
+    functionInfo.m_synchronousCalls.emplace(inlineName, std::move(info));
+}
+
+void IvToPromelaTranslator::prepareSporadicCallInfo(IvToPromelaTranslatorContext &context, const QString &functionName,
+        const ivm::IVInterface *requiredInterface, FunctionInfo &functionInfo) const
+{
+    std::unique_ptr<RequiredCallInfo> info = std::make_unique<RequiredCallInfo>();
+    QString inlineName = prepareCallInfo(*info, context, functionName, requiredInterface);
+    functionInfo.m_sporadicCalls.emplace(inlineName, std::move(info));
+}
+
+QString IvToPromelaTranslator::prepareCallInfo(RequiredCallInfo &info, IvToPromelaTranslatorContext &context,
+        const QString &functionName, const ivm::IVInterface *requiredInterface) const
+{
     QString inlineName =
             QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
-    info->m_name = inlineName;
-    info->m_interfaceName = getInterfaceName(requiredInterface);
+    info.m_name = inlineName;
+    info.m_interfaceName = getInterfaceName(requiredInterface);
 
     const QString parameterNamePrefix =
             QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
     for (const InterfaceParameter &interfaceParam : requiredInterface->params()) {
-        SynchronousCallInfo::ParameterInfo parameterInfo;
+        RequiredCallInfo::ParameterInfo parameterInfo;
         parameterInfo.m_parameterType = interfaceParam.paramTypeName();
         parameterInfo.m_parameterName = QString("%1_%2").arg(parameterNamePrefix).arg(interfaceParam.name());
 
         parameterInfo.m_isOutput = interfaceParam.isOutDirection();
 
-        info->m_parameters.append(parameterInfo);
+        info.m_parameters.append(parameterInfo);
     }
 
-    info->m_isProtected = requiredInterface->kind() == IVInterface::OperationKind::Protected;
+    info.m_isProtected = requiredInterface->kind() == IVInterface::OperationKind::Protected;
 
     const QVector<IVConnection *> connections = context.ivModel()->getConnectionsForIface(requiredInterface->id());
 
@@ -661,10 +681,11 @@ void IvToPromelaTranslator::prepareSynchronousCallInfo(IvToPromelaTranslatorCont
     for (const IVConnection *connection : connections) {
         const IVInterface *sourceInterface = connection->targetInterface();
         const QString targetFunctionName = getInterfaceFunctionName(sourceInterface);
+        const QString targetInterfaceName = getInterfaceName(sourceInterface);
 
-        SynchronousCallInfo::TargetInfo targetInfo;
+        RequiredCallInfo::TargetInfo targetInfo;
         targetInfo.m_targetFunctionName = targetFunctionName;
-
+        targetInfo.m_providedQueueName = constructChannelName(targetFunctionName, targetInterfaceName);
         if (std::find_if(context.modelFunctions().begin(), context.modelFunctions().end(),
                     [targetFunctionName](const QString &function) {
                         return function.compare(targetFunctionName, Qt::CaseInsensitive) == 0;
@@ -673,13 +694,13 @@ void IvToPromelaTranslator::prepareSynchronousCallInfo(IvToPromelaTranslatorCont
             targetInfo.m_isEnvironment = true;
             targetInfo.m_providedInlineName = QString();
         } else {
-            const QString targetInterfaceName = getInterfaceName(sourceInterface);
+            targetInfo.m_isEnvironment = false;
             targetInfo.m_providedInlineName =
                     QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(targetInterfaceName);
         }
-        info->m_targets.append(targetInfo);
+        info.m_targets.append(targetInfo);
     }
 
-    functionInfo.m_synchronousCalls.emplace(inlineName, std::move(info));
+    return inlineName;
 }
 }

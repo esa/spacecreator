@@ -111,5 +111,9 @@ private:
             const QString &functionName) const -> std::unique_ptr<EnvProctypeInfo>;
     auto prepareSynchronousCallInfo(IvToPromelaTranslatorContext &context, const QString &functionName,
             const ivm::IVInterface *requiredInterface, FunctionInfo &functionInfo) const -> void;
+    auto prepareSporadicCallInfo(IvToPromelaTranslatorContext &context, const QString &functionName,
+            const ivm::IVInterface *requiredInterface, FunctionInfo &functionInfo) const -> void;
+    auto prepareCallInfo(RequiredCallInfo &info, IvToPromelaTranslatorContext &context, const QString &functionName,
+            const ivm::IVInterface *requiredInterface) const -> QString;
 };
 }

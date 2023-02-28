@@ -40,8 +40,9 @@ private:
     auto generateInitProctype() const -> void;
     auto generateProctype(const QString &functionName, bool environment, const ProctypeInfo &proctypeInfo) const
             -> void;
-    auto generateProcessMessageBlock(const QString &functionName, const QString &channelName, const QString &inlineName,
-            const QString &parameterType, const QString &parameterName, const QString &exitLabel, bool lock,
+    auto generateProcessMessageBlock(const QString &functionName, const QString &modelFunctionName,
+            const QString &channelName, const QString &inlineName, const QString &parameterType,
+            const QString &parameterName, const QString &exitLabel, bool lock,
             std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements,
             std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements) const
             -> std::unique_ptr<model::ProctypeElement>;
@@ -54,7 +55,8 @@ private:
     auto createPromelaObjectsForFunction(const QString &functionName, const FunctionInfo &functionInfo) const -> void;
     auto generateProctypeForTimer(const QString &functionName, const ProctypeInfo &proctypeInfo) const -> void;
     auto createPromelaObjectsForAsyncPis(const QString &functionName, const ProctypeInfo &proctypeInfo) const -> void;
-    auto createPromelaObjectsForSyncRis(const QString &functionInfo, const SynchronousCallInfo &info) const -> void;
+    auto createPromelaObjectsForSporadicRis(const QString &functionInfo, const RequiredCallInfo &info) const -> void;
+    auto createPromelaObjectsForSyncRis(const QString &functionInfo, const RequiredCallInfo &info) const -> void;
     auto createPromelaObjectsForEnvironment(const QString &functionName, const FunctionInfo &functionInfo) const
             -> void;
     auto createCheckQueueInline(model::PromelaSystemModel *promelaModel, const QString &functionName,
@@ -75,7 +77,7 @@ private:
     auto createLockReleaseStatement(const QString &functionName) const -> std::unique_ptr<model::ProctypeElement>;
     auto createProcessInlineCall(const QString &inlineName, const QString &parameterType,
             const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
-    auto createReceiveStatement(const QString &channelName, const QString &parameterType,
+    auto createReceiveStatement(const QString &functionName, const QString &channelName, const QString &parameterType,
             const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
 
     auto getFunctionLockChannelName(const QString &functionName) const -> QString;

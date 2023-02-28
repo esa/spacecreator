@@ -145,11 +145,11 @@ struct EnvProctypeInfo {
 };
 
 /**
- * @brief Information about required synchronous call.
+ * @brief Information about required call.
  *
  * This is used to call the target functions interface.
  */
-struct SynchronousCallInfo {
+struct RequiredCallInfo {
     /**
      * @brief name of the inline
      */
@@ -173,6 +173,10 @@ struct SynchronousCallInfo {
          * @brief name of the inline to call (provided) or empty in case of environment.
          */
         QString m_providedInlineName;
+        /*
+         *@brief name of the queue to send message (if call is sporadic).
+         */
+        QString m_providedQueueName;
         /**
          * @brief name of the target function.
          */
@@ -248,9 +252,15 @@ struct FunctionInfo {
      * @brief all required synchronous calls.
      *
      * The key is name of the inline for RI.
-     * the value contains all information requires to create body of inline.
+     * the value contains all information required to create body of inline.
      */
-    std::map<QString, std::unique_ptr<SynchronousCallInfo>> m_synchronousCalls;
+    std::map<QString, std::unique_ptr<RequiredCallInfo>> m_synchronousCalls;
+    /**
+     * @brief all required asynchronous calls.
+     * The key is name of the inline for RI.
+     * the vaule contains all information required to create body of inline.
+     */
+    std::map<QString, std::unique_ptr<RequiredCallInfo>> m_sporadicCalls;
 };
 
 /**
