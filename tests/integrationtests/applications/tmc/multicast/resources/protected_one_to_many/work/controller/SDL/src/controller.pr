@@ -1,0 +1,21 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Controller;
+    /* CIF TEXT (382, 298), (172, 140) */
+    dcl my_param MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (734, 181), (70, 35) */
+    state Wait;
+        /* CIF input (722, 236), (93, 35) */
+        input ctrl_dummy;
+            /* CIF task (714, 291), (108, 35) */
+            task my_param := 1;
+            /* CIF PROCEDURECALL (701, 341), (134, 35) */
+            call test_fn(my_param);
+            /* CIF NEXTSTATE (734, 396), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Controller;

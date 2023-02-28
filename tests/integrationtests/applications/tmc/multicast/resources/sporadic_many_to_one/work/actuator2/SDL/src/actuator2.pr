@@ -1,0 +1,25 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Actuator2;
+    /* CIF START (387, 60), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (387, 110), (70, 35) */
+        NEXTSTATE StateA;
+    /* CIF state (701, 53), (70, 35) */
+    state StateA;
+        /* CIF input (699, 108), (71, 35) */
+        input trigger2;
+            /* CIF output (666, 163), (137, 35) */
+            output test_parameterless;
+            /* CIF NEXTSTATE (700, 218), (70, 35) */
+            NEXTSTATE StateB;
+    endstate;
+    /* CIF state (976, 63), (70, 35) */
+    state StateB;
+        /* CIF input (974, 118), (71, 35) */
+        input trigger2;
+            /* CIF output (945, 173), (130, 35) */
+            output test_parameter(3);
+            /* CIF NEXTSTATE (975, 228), (70, 35) */
+            NEXTSTATE StateB;
+    endstate;
+endprocess Actuator2;

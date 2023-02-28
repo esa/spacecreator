@@ -1,0 +1,97 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Controller;
+    /* CIF TEXT (399, 576), (170, 140) */
+    dcl param MyInteger;
+    dcl source PID;
+    /* CIF ENDTEXT */
+    /* CIF START (432, 126), (70, 35) */
+    START;
+        /* CIF output (431, 181), (71, 35) */
+        output trigger1;
+        /* CIF NEXTSTATE (397, 231), (139, 35) */
+        NEXTSTATE Test1Parameterless;
+    /* CIF state (1408, 142), (117, 35) */
+    state Test1Parameter;
+        /* CIF input (1386, 197), (160, 35) */
+        input test_parameter(param);
+            /* CIF PROCEDURECALL (1398, 252), (137, 35) */
+            call get_sender(source);
+            /* CIF decision (1399, 307), (134, 50) */
+            decision source = Actuator1;
+                /* CIF ANSWER (1387, 377), (70, 23) */
+                (true):
+                    /* CIF output (1386, 420), (71, 35) */
+                    output trigger2;
+                    /* CIF NEXTSTATE (1363, 475), (117, 35) */
+                    NEXTSTATE Test2Parameter;
+                /* CIF ANSWER (1491, 377), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (1491, 420), (70, 35) */
+                    NEXTSTATE Error;
+            enddecision;
+    endstate;
+    /* CIF state (1076, 143), (139, 35) */
+    state Test2Parameterless;
+        /* CIF input (1077, 198), (137, 35) */
+        input test_parameterless;
+            /* CIF PROCEDURECALL (1077, 253), (137, 35) */
+            call get_sender(source);
+            /* CIF decision (1078, 308), (134, 50) */
+            decision source = Actuator2;
+                /* CIF ANSWER (1066, 378), (70, 23) */
+                (true):
+                    /* CIF output (1065, 421), (71, 35) */
+                    output trigger1;
+                    /* CIF NEXTSTATE (1042, 476), (117, 35) */
+                    NEXTSTATE Test1Parameter;
+                /* CIF ANSWER (1170, 378), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (1170, 421), (70, 35) */
+                    NEXTSTATE Error;
+            enddecision;
+    endstate;
+    /* CIF state (1802, 144), (117, 35) */
+    state Test2Parameter;
+        /* CIF input (1780, 199), (160, 35) */
+        input test_parameter(param);
+            /* CIF PROCEDURECALL (1792, 254), (137, 35) */
+            call get_sender(source);
+            /* CIF decision (1793, 309), (134, 50) */
+            decision source = Actuator2;
+                /* CIF ANSWER (1781, 379), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (1779, 422), (72, 35) */
+                    NEXTSTATE Finished;
+                /* CIF ANSWER (1871, 379), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (1871, 422), (70, 35) */
+                    NEXTSTATE Error;
+            enddecision;
+    endstate;
+    /* CIF state (769, 136), (139, 35) */
+    state Test1Parameterless;
+        /* CIF input (770, 191), (137, 35) */
+        input test_parameterless;
+            /* CIF PROCEDURECALL (770, 246), (137, 35) */
+            call get_sender(source);
+            /* CIF decision (771, 301), (134, 50) */
+            decision source = Actuator1;
+                /* CIF ANSWER (759, 371), (70, 23) */
+                (true):
+                    /* CIF output (758, 414), (71, 35) */
+                    output trigger2;
+                    /* CIF NEXTSTATE (724, 469), (139, 35) */
+                    NEXTSTATE Test2Parameterless;
+                /* CIF ANSWER (874, 371), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (874, 414), (70, 35) */
+                    NEXTSTATE Error;
+            enddecision;
+    endstate;
+    /* CIF state (471, 443), (72, 35) */
+    state Finished;
+    endstate;
+    /* CIF state (441, 335), (70, 35) */
+    state Error;
+    endstate;
+endprocess Controller;

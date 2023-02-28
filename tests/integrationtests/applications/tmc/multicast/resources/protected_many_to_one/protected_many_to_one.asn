@@ -1,0 +1,9 @@
+PROTECTED-MANY-TO-ONE-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+
+   MyBoolean ::= BOOLEAN
+
+END
+

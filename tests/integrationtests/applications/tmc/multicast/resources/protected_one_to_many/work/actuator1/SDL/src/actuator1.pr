@@ -1,0 +1,30 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Actuator1;
+    /* CIF TEXT (994, 575), (267, 140) */
+    -- Text area for declarations and comments
+    
+    dcl signal_received MyInteger := 0;
+    /* CIF ENDTEXT */
+    /* CIF procedure (662, 615), (70, 35) */
+    procedure test_fn;
+        /* CIF TEXT (63, 209), (170, 140) */
+        fpar in p1 MyInteger;
+        
+        /* CIF ENDTEXT */
+        /* CIF START (500, 147), (70, 35) */
+        START;
+            /* CIF task (466, 202), (137, 35) */
+            task signal_received := 1;
+            /* CIF return (517, 252), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF START (533, 241), (70, 35) */
+    START;
+        /* CIF output (521, 296), (93, 35) */
+        output ctrl_dummy;
+        /* CIF NEXTSTATE (533, 346), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (867, 220), (70, 35) */
+    state Wait;
+    endstate;
+endprocess Actuator1;

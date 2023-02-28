@@ -1,0 +1,136 @@
+<InterfaceView version="1.1" asn1file="protected_many_to_one.asn">
+<Function id="{2dbaab5c-ab1e-4b24-9a98-a37dcfa3d948}" name="actuator1" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="Taste::coordinates" value="13400 24700 46600 59200"/>
+<Provided_Interface id="{71d55395-4740-448a-92a9-71791cb49f61}" name="trigger1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" priority="1" miat="0" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="13400 36800"/>
+</Provided_Interface>
+
+<Required_Interface id="{4c850a0f-dd72-43d1-9265-9604966267cc}" name="test_parameter" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="13400 53800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{67d63096-81cd-464f-8319-b106ec739a9d}" name="test_parameterless" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Property name="Taste::coordinates" value="13400 44400"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{a8dced29-5355-4b47-9be3-68d75666518a}" name="actuator2" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="Taste::coordinates" value="14300 69700 49700 109800"/>
+<Provided_Interface id="{cc34502a-376f-4462-8f66-79ef4d95d290}" name="trigger2" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" priority="1" miat="0" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="14300 98700"/>
+</Provided_Interface>
+
+<Required_Interface id="{fecfba1b-dcd0-41fe-a302-e5f19842bfd8}" name="test_parameter" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="14300 76600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{7d06ad33-3af3-427c-801f-d50600cae49c}" name="test_parameterless" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Property name="Taste::coordinates" value="14300 86300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{0a0f71e6-eefc-4dcc-9bc7-e086694db912}" name="dummy" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" priority="1" miat="0" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="14300 103900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{eed36429-e4a4-4404-b9e7-5e9e9f377d81}" name="controller" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="Taste::coordinates" value="-44400 28000 -5800 83800"/>
+<Provided_Interface id="{fd5b3157-4bd5-4de1-9ee4-c7b6ad080609}" name="test_parameter" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="-5800 59900"/>
+</Provided_Interface>
+
+<Provided_Interface id="{06c351f3-0b3f-46c9-b2ab-24056b741bfe}" name="test_parameterless" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Property name="Taste::coordinates" value="-5800 47100"/>
+</Provided_Interface>
+
+<Provided_Interface id="{107e1704-3b8d-41b2-85da-49d8d41e0362}" name="dummy" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" priority="1" miat="0" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="-28500 83800"/>
+</Provided_Interface>
+
+<Required_Interface id="{cfaa3895-925a-4960-9826-b272599e20b7}" name="trigger1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" priority="1" miat="0" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="-5800 36900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{3732f87e-41e7-4c33-91ca-f3c8ce028c5d}" name="trigger2" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" priority="1" miat="0" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="-8700 83800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection id="{0477f43a-d0ff-486d-8142-2d6f94d6f249}" required_system_element="NO">
+    <Source func_name="actuator2" ri_name="test_parameterless"/>
+    <Target func_name="controller" pi_name="test_parameterless"/>
+    <Property name="Taste::coordinates" value="13700 86300 4100 86300 4100 47100 -5500 47100"/>
+</Connection>
+
+<Connection id="{2a1145fc-e607-4268-a075-364e18c85150}" required_system_element="NO">
+    <Source func_name="actuator1" ri_name="test_parameter"/>
+    <Target func_name="controller" pi_name="test_parameter"/>
+    <Property name="Taste::coordinates" value="12800 53800 3700 53800 3700 59900 -5500 59900"/>
+</Connection>
+
+<Connection id="{c74d8665-27b9-4875-9bb8-e5b1f4ec3bae}" required_system_element="NO">
+    <Source func_name="actuator1" ri_name="test_parameterless"/>
+    <Target func_name="controller" pi_name="test_parameterless"/>
+    <Property name="Taste::coordinates" value="12800 44400 3700 44400 3700 47100 -5500 47100"/>
+</Connection>
+
+<Connection id="{67050baa-8a9e-4d88-8025-ce99cfbe22e4}" required_system_element="NO">
+    <Source func_name="controller" ri_name="trigger1"/>
+    <Target func_name="actuator1" pi_name="trigger1"/>
+    <Property name="Taste::coordinates" value="-5200 36900 3900 36900 13100 36800"/>
+</Connection>
+
+<Connection id="{deffd8d3-0cc0-4d33-b740-bb0ae86c6eb5}" required_system_element="NO">
+    <Source func_name="controller" ri_name="trigger2"/>
+    <Target func_name="actuator2" pi_name="trigger2"/>
+    <Property name="Taste::coordinates" value="-8700 84400 -8700 98700 14000 98700"/>
+</Connection>
+
+<Connection id="{36d67b8f-cf27-4405-a825-31456caa1661}" required_system_element="NO">
+    <Source func_name="actuator2" ri_name="dummy"/>
+    <Target func_name="controller" pi_name="dummy"/>
+    <Property name="Taste::coordinates" value="13700 103900 -28500 103900 -28500 84100"/>
+</Connection>
+
+<Connection id="{d596c4f0-11b3-44b3-8712-36f42574b426}" required_system_element="NO">
+    <Source func_name="actuator2" ri_name="test_parameter"/>
+    <Target func_name="controller" pi_name="test_parameter"/>
+    <Property name="Taste::coordinates" value="13700 76600 4100 76600 4100 59900 -5500 59900"/>
+</Connection>
+
+<Comment id="{febf4961-4aff-4038-b3c2-8f55607b8d9d}" name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3" required_system_element="NO">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+<Layer name="default"/>
+
+</InterfaceView>
