@@ -98,19 +98,22 @@ private:
     void translate(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const;
+            const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
+            bool isMulticastSupported) const;
     void processSpinTrailEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const;
+            const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
+            bool isMulticastSupported) const;
     void processSpinTrailSendEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
-            bool isMulticastSupported) const;
+            const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const;
     void processSpinTrailRecvEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const;
+            const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
+            bool isMulticastSupported) const;
     void processSpinTrailEvent(
             simulatortrail::model::SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const;
     void processSpinTrailEvent(const spintrail::model::SetTimerEvent *event) const;
@@ -121,6 +124,7 @@ private:
             const Asn1Acn::Types::Type *observableEvent, const QStringList &parameters, bool isInput) const;
 
     bool isFunctionLockChannel(const QString &channelName) const;
+    QString parseSender(const QString arg, const Asn1Acn::Types::Enumerated *pid) const;
 
     const Asn1Acn::Types::Type *findType(const Asn1Acn::Asn1Model &asn1Model, const QString &name) const;
 };

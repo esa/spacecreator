@@ -31,6 +31,7 @@
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
+#include <promela/Asn1ToPromelaTranslator/enumeratedgenerator.h>
 #include <promela/PromelaOptions/options.h>
 #include <simulatortrail/SimulatorTrailOptions/options.h>
 
@@ -153,8 +154,6 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
 
     bool isMulticastSupported = options.isSet(PromelaOptions::supportMulticast);
 
-    qDebug() << "Trl " << isMulticastSupported;
-
     IvToPromelaTranslator translator;
 
     std::unique_ptr<SystemInfo> systemInfo = translator.prepareSystemInfo(ivModel, options);
@@ -172,9 +171,21 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
         throw TranslationException("Unable to find ASN.1 type Observable-Event");
     }
 
+    const Asn1Acn::Types::Type *pid = findType(*asn1Model, "PID");
+    if (pid == nullptr) {
+        QString message = QString("Unable to find ASN.1 type PID");
+        throw TranslationException(std::move(message));
+    }
+    if (pid->typeEnum() != Asn1Acn::Types::Type::ENUMERATED) {
+        QString message = QString("Unexpected type PID in DataView.");
+        throw TranslationException(std::move(message));
+    }
+
+    const Asn1Acn::Types::Enumerated *enumerated = dynamic_cast<const Asn1Acn::Types::Enumerated *>(pid);
+
     std::unique_ptr<SimulatorTrailModel> simulatorTrail = std::make_unique<SimulatorTrailModel>();
 
-    translate(*simulatorTrail, *spinTrailModel, channels, observerChannels, proctypes, observableEventType,
+    translate(*simulatorTrail, *spinTrailModel, channels, observerChannels, proctypes, observableEventType, enumerated,
             isMulticastSupported);
 
     std::vector<std::unique_ptr<Model>> result;
@@ -294,7 +305,8 @@ void SpinTrailToSimulatorTrailTranslator::findProctypes(
 void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
         const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const
+        const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
+        bool isMulticastSupported) const
 {
     const std::list<std::unique_ptr<TrailEvent>> &events = spinTrailModel.getEvents();
 
@@ -303,7 +315,7 @@ void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
         case TrailEvent::EventType::CHANNEL_EVENT: {
             const ChannelEvent *event = dynamic_cast<const ChannelEvent *>(trailEvent.get());
             processSpinTrailEvent(
-                    result, event, channels, observerChannels, proctypes, observableEvent, isMulticastSupported);
+                    result, event, channels, observerChannels, proctypes, observableEvent, pid, isMulticastSupported);
         } break;
         case TrailEvent::EventType::CONTINUOUS_SIGNAL: {
             const ContinuousSignal *event = dynamic_cast<const ContinuousSignal *>(trailEvent.get());
@@ -328,24 +340,26 @@ void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const
+        const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
+        bool isMulticastSupported) const
 {
     if (isFunctionLockChannel(event->getChannelName())) {
         return;
     }
     if (event->getType() == ChannelEvent::Type::Send) {
-        processSpinTrailSendEvent(result, event, channels, observerChannels, observableEvent, isMulticastSupported);
+        processSpinTrailSendEvent(
+                result, event, channels, observerChannels, observableEvent, pid, isMulticastSupported);
     }
     if (event->getType() == ChannelEvent::Type::Recv) {
         processSpinTrailRecvEvent(
-                result, event, channels, observerChannels, proctypes, observableEvent, isMulticastSupported);
+                result, event, channels, observerChannels, proctypes, observableEvent, pid, isMulticastSupported);
     }
 }
 
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
-        bool isMulticastSupported) const
+        const Asn1Acn::Types::Enumerated *pid, bool isMulticastSupported) const
 {
     if (channels.contains(event->getChannelName())) {
         ChannelInfo &channelInfo = channels[event->getChannelName()];
@@ -354,9 +368,11 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTra
             // ignore - the receive event shall produce value for simulator
             return;
         }
-        const QString source = channelInfo.m_possibleSenders.firstKey();
-        const QString destination = channelInfo.m_functionName;
         QStringList parameters = event->getParameters();
+
+        const QString source =
+                isMulticastSupported ? parseSender(parameters.first(), pid) : channelInfo.m_possibleSenders.firstKey();
+        const QString destination = channelInfo.m_functionName;
         if (isMulticastSupported) {
             parameters.removeFirst();
         }
@@ -380,7 +396,11 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTra
             // ignore
             return;
         }
-        const QString source = channelInfo.first.m_possibleSenders.firstKey();
+
+        QStringList parameters = event->getParameters();
+
+        const QString source = isMulticastSupported ? parseSender(parameters.first(), pid)
+                                                    : channelInfo.first.m_possibleSenders.firstKey();
         const QString destination = channelInfo.first.m_functionName;
 
         if (channelInfo.first.m_senders.length() < static_cast<int>(channelInfo.first.m_channelSize)) {
@@ -390,7 +410,6 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTra
         }
 
         if (channelInfo.second) {
-            QStringList parameters = event->getParameters();
             if (isMulticastSupported) {
                 parameters.removeFirst();
             }
@@ -408,7 +427,8 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTra
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const
+        const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
+        bool isMulticastSupported) const
 {
     if (channels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
         ChannelInfo &channelInfo = channels[event->getChannelName()];
@@ -429,9 +449,10 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(SimulatorTra
             if (channelInfo.m_senders.isEmpty()) {
                 throw TranslationException("Cannot find sender of message");
             }
-            const QString source = channelInfo.m_senders.front();
-            channelInfo.m_senders.pop_front();
             QStringList parameters = event->getParameters();
+            const QString source =
+                    isMulticastSupported ? parseSender(parameters.first(), pid) : channelInfo.m_senders.front();
+            channelInfo.m_senders.pop_front();
             if (isMulticastSupported) {
                 parameters.removeFirst();
             }
@@ -570,6 +591,21 @@ Asn1Acn::ValuePtr SpinTrailToSimulatorTrailTranslator::getMessageValue(const QSt
 bool SpinTrailToSimulatorTrailTranslator::isFunctionLockChannel(const QString &channelName) const
 {
     return channelName.endsWith("_lock");
+}
+
+QString SpinTrailToSimulatorTrailTranslator::parseSender(const QString arg, const Asn1Acn::Types::Enumerated *pid) const
+{
+    promela::translator::EnumeratedGenerator enumeratedGenerator(pid->typeName(), *pid);
+
+    const int32_t integerValue = arg.toInt();
+    QString value = enumeratedGenerator.getNameForValue(integerValue);
+
+    if (value.isEmpty()) {
+        QString message = QString("Cannot parse PID for value %1").arg(arg);
+        throw TranslationException(std::move(message));
+    }
+
+    return value;
 }
 
 const Asn1Acn::Types::Type *SpinTrailToSimulatorTrailTranslator::findType(
