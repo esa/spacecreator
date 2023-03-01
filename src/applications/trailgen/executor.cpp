@@ -72,6 +72,7 @@ void TrailgenExecutor::execute()
     QStringList mscObserverFiles;
     std::vector<QString> environmentFunctions;
     std::vector<QString> keepFunctions;
+    bool isMulticastEnabled = false;
 
     for (int i = 1; i < args.size(); ++i) {
         const QString &arg = args[i];
@@ -120,6 +121,8 @@ void TrailgenExecutor::execute()
         } else if (arg == "-k" || arg == "--keep") {
             ++i;
             keepFunctions.emplace_back(args[i]);
+        } else if (arg == "-multicast") {
+            isMulticastEnabled = true;
         } else if (arg == "-h" || arg == "--help") {
             qInfo("trailgen: TASTE Model Checker trail generator");
             qInfo("Usage: trailgen [OPTIONS] <input spin trail>");
@@ -135,6 +138,7 @@ void TrailgenExecutor::execute()
             qInfo("  -k, --keepfunc <name>  Use <name> to specify a SDL function that shouldn't be treated as "
                   "environment.");
             qInfo("                         All other functions will be treated as environment");
+            qInfo("  -multicast             Enable support multicast connections in InterfaceView");
             qInfo("  -h, --help             Print this message and exit.");
         } else {
             if (inputSpinTrailFilepath.has_value()) {
@@ -169,6 +173,9 @@ void TrailgenExecutor::execute()
             + "simulation" + QDir::separator() + "observers" + QDir::separator() + "observer.asn";
 
     m_converter = std::make_unique<TmcConverter>(inputIvFilepath.value(), outputDirectory.value());
+    if (isMulticastEnabled) {
+        m_converter->setMulticastEnabled(true);
+    }
     m_converter->setEnvironmentFunctions(environmentFunctions);
     m_converter->setKeepFunctions(keepFunctions);
     m_converter->setMscObserverFiles(mscObserverFiles);

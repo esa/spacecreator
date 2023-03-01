@@ -372,6 +372,9 @@ bool TmcConverter::convertTrace(const QString &inputFile, const QString &outputF
     options.add(SimulatorTrailOptions::outputFilepath, outputFile);
     options.add(SpinTrailOptions::inputFilepath, inputFile);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
+    if (m_isMulticastEnabled) {
+        options.add(PromelaOptions::supportMulticast);
+    }
 
     options.add(IvOptions::inputFilepath, m_outputOptimizedIvFileName);
     options.add(PromelaOptions::outputFilepath, outputSystemFile.absoluteFilePath());

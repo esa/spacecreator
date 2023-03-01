@@ -98,19 +98,19 @@ private:
     void translate(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent) const;
+            const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const;
     void processSpinTrailEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent) const;
+            const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const;
     void processSpinTrailSendEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
-            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels,
-            const Asn1Acn::Types::Type *observableEvent) const;
+            QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
+            bool isMulticastSupported) const;
     void processSpinTrailRecvEvent(simulatortrail::model::SimulatorTrailModel &result,
             const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
             QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-            const Asn1Acn::Types::Type *observableEvent) const;
+            const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const;
     void processSpinTrailEvent(
             simulatortrail::model::SimulatorTrailModel &result, const spintrail::model::ContinuousSignal *event) const;
     void processSpinTrailEvent(const spintrail::model::SetTimerEvent *event) const;

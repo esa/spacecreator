@@ -225,10 +225,8 @@ void TmcExecutor::execute()
 
             delta = args[i];
         } else if (arg == "-enable-reals") {
-            ++i;
             isRealTypeEnabled = true;
         } else if (arg == "-multicast") {
-            ++i;
             isMulticastEnabled = true;
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Checker");

@@ -31,6 +31,7 @@
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivconnection.h>
 #include <ivcore/ivfunction.h>
+#include <promela/PromelaOptions/options.h>
 #include <simulatortrail/SimulatorTrailOptions/options.h>
 
 using namespace simulatortrail::model;
@@ -43,6 +44,7 @@ using Asn1Acn::Types::Type;
 using conversion::Escaper;
 using conversion::Model;
 using conversion::ModelType;
+using conversion::promela::PromelaOptions;
 using conversion::simulatortrail::SimulatorTrailOptions;
 using conversion::translator::TranslationException;
 using ivm::IVConnection;
@@ -149,6 +151,10 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
         throw TranslationException("Missing SpinTrail model.");
     }
 
+    bool isMulticastSupported = options.isSet(PromelaOptions::supportMulticast);
+
+    qDebug() << "Trl " << isMulticastSupported;
+
     IvToPromelaTranslator translator;
 
     std::unique_ptr<SystemInfo> systemInfo = translator.prepareSystemInfo(ivModel, options);
@@ -168,7 +174,8 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
 
     std::unique_ptr<SimulatorTrailModel> simulatorTrail = std::make_unique<SimulatorTrailModel>();
 
-    translate(*simulatorTrail, *spinTrailModel, channels, observerChannels, proctypes, observableEventType);
+    translate(*simulatorTrail, *spinTrailModel, channels, observerChannels, proctypes, observableEventType,
+            isMulticastSupported);
 
     std::vector<std::unique_ptr<Model>> result;
     result.push_back(std::move(simulatorTrail));
@@ -287,7 +294,7 @@ void SpinTrailToSimulatorTrailTranslator::findProctypes(
 void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
         const spintrail::model::SpinTrailModel &spinTrailModel, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent) const
+        const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const
 {
     const std::list<std::unique_ptr<TrailEvent>> &events = spinTrailModel.getEvents();
 
@@ -295,7 +302,8 @@ void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
         switch (trailEvent->getEventType()) {
         case TrailEvent::EventType::CHANNEL_EVENT: {
             const ChannelEvent *event = dynamic_cast<const ChannelEvent *>(trailEvent.get());
-            processSpinTrailEvent(result, event, channels, observerChannels, proctypes, observableEvent);
+            processSpinTrailEvent(
+                    result, event, channels, observerChannels, proctypes, observableEvent, isMulticastSupported);
         } break;
         case TrailEvent::EventType::CONTINUOUS_SIGNAL: {
             const ContinuousSignal *event = dynamic_cast<const ContinuousSignal *>(trailEvent.get());
@@ -320,23 +328,24 @@ void SpinTrailToSimulatorTrailTranslator::translate(SimulatorTrailModel &result,
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent) const
+        const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const
 {
     if (isFunctionLockChannel(event->getChannelName())) {
         return;
     }
     if (event->getType() == ChannelEvent::Type::Send) {
-        processSpinTrailSendEvent(result, event, channels, observerChannels, observableEvent);
+        processSpinTrailSendEvent(result, event, channels, observerChannels, observableEvent, isMulticastSupported);
     }
     if (event->getType() == ChannelEvent::Type::Recv) {
-        processSpinTrailRecvEvent(result, event, channels, observerChannels, proctypes, observableEvent);
+        processSpinTrailRecvEvent(
+                result, event, channels, observerChannels, proctypes, observableEvent, isMulticastSupported);
     }
 }
 
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
-        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels,
-        const Asn1Acn::Types::Type *observableEvent) const
+        QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const Asn1Acn::Types::Type *observableEvent,
+        bool isMulticastSupported) const
 {
     if (channels.contains(event->getChannelName())) {
         ChannelInfo &channelInfo = channels[event->getChannelName()];
@@ -347,8 +356,11 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTra
         }
         const QString source = channelInfo.m_possibleSenders.firstKey();
         const QString destination = channelInfo.m_functionName;
-        ValuePtr message =
-                getMessageValue(source, destination, channelInfo, observableEvent, event->getParameters(), false);
+        QStringList parameters = event->getParameters();
+        if (isMulticastSupported) {
+            parameters.removeFirst();
+        }
+        ValuePtr message = getMessageValue(source, destination, channelInfo, observableEvent, parameters, false);
         result.appendValue(std::move(message));
         if (channelInfo.m_senders.length() < static_cast<int>(channelInfo.m_channelSize)) {
             channelInfo.m_senders.push_back(source);
@@ -378,8 +390,12 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTra
         }
 
         if (channelInfo.second) {
-            ValuePtr message = getMessageValue(
-                    source, destination, channelInfo.first, observableEvent, event->getParameters(), false);
+            QStringList parameters = event->getParameters();
+            if (isMulticastSupported) {
+                parameters.removeFirst();
+            }
+            ValuePtr message =
+                    getMessageValue(source, destination, channelInfo.first, observableEvent, parameters, false);
             result.appendValue(std::move(message));
         }
 
@@ -392,7 +408,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailSendEvent(SimulatorTra
 void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(SimulatorTrailModel &result,
         const spintrail::model::ChannelEvent *event, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels, const QMap<QString, QString> &proctypes,
-        const Asn1Acn::Types::Type *observableEvent) const
+        const Asn1Acn::Types::Type *observableEvent, bool isMulticastSupported) const
 {
     if (channels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
         ChannelInfo &channelInfo = channels[event->getChannelName()];
@@ -415,8 +431,11 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(SimulatorTra
             }
             const QString source = channelInfo.m_senders.front();
             channelInfo.m_senders.pop_front();
-            ValuePtr message =
-                    getMessageValue(source, destination, channelInfo, observableEvent, event->getParameters(), true);
+            QStringList parameters = event->getParameters();
+            if (isMulticastSupported) {
+                parameters.removeFirst();
+            }
+            ValuePtr message = getMessageValue(source, destination, channelInfo, observableEvent, parameters, true);
             result.appendValue(std::move(message));
         }
     } else if (observerChannels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
