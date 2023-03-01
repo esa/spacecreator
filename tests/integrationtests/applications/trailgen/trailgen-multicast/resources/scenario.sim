@@ -1,0 +1,8 @@
+output-event:{source controller, dest actuator1, event controller:msg-out:test-parameter:{p1 10}}
+output-event:{source controller, dest actuator2, event controller:msg-out:test-parameter:{p1 10}}
+input-event:{source controller, dest actuator1, event actuator1:msg-in:test-parameter:{p1 10}}
+output-event:{source actuator1, dest controller, event actuator1:msg-out:result:{p1 20}}
+input-event:{source actuator1, dest controller, event controller:msg-in:result:{p1 20}}
+input-event:{source controller, dest actuator2, event actuator2:msg-in:test-parameter:{p1 10}}
+output-event:{source actuator2, dest controller, event actuator2:msg-out:result:{p1 10}}
+input-event:{source actuator2, dest controller, event controller:msg-in:result:{p1 10}}

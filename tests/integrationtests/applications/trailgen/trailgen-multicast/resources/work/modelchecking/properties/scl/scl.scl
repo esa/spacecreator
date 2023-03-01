@@ -1,0 +1,1 @@
+never controller.act1_received > 0 and controller.act2_received > 0;

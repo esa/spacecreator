@@ -1,0 +1,48 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Controller;
+    /* CIF TEXT (416, 364), (267, 143) */
+    -- Text area for declarations and comments
+    
+    dcl coeff MyInteger;
+    
+    dcl param MyInteger;
+    dcl source PID;
+    
+    dcl act1_received MyInteger := 0;
+    dcl act2_received MyInteger := 0;
+    /* CIF ENDTEXT */
+    /* CIF START (860, 405), (70, 35) */
+    START;
+        /* CIF task (852, 460), (85, 35) */
+        task coeff := 10;
+        /* CIF output (817, 515), (154, 35) */
+        output test_parameter(coeff);
+        /* CIF NEXTSTATE (860, 565), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (1251, 398), (70, 35) */
+    state Wait;
+        /* CIF input (1234, 453), (102, 35) */
+        input result(param);
+            /* CIF PROCEDURECALL (1217, 508), (137, 35) */
+            call get_sender(source);
+            /* CIF decision (1251, 563), (70, 50) */
+            decision source;
+                /* CIF ANSWER (1131, 633), (81, 23) */
+                (Actuator1):
+                    /* CIF task (1108, 676), (128, 35) */
+                    task act1_received := 1;
+                    /* CIF NEXTSTATE (1137, 731), (70, 35) */
+                    NEXTSTATE Wait;
+                /* CIF ANSWER (1271, 633), (81, 23) */
+                (Actuator2):
+                    /* CIF task (1247, 676), (128, 35) */
+                    task act2_received := 2;
+                    /* CIF NEXTSTATE (1277, 726), (70, 35) */
+                    NEXTSTATE Wait;
+                /* CIF ANSWER (1387, 633), (70, 23) */
+                else:
+                    /* CIF NEXTSTATE (1387, 676), (70, 35) */
+                    NEXTSTATE Wait;
+            enddecision;
+    endstate;
+endprocess Controller;
