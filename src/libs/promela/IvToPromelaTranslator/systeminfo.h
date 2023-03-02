@@ -191,7 +191,7 @@ struct RequiredCallInfo {
     /**
      * @brief List of targets
      */
-    QList<TargetInfo> m_targets;
+    std::map<QString, TargetInfo> m_targets;
 
     /**
      * @brief Information about parameter.

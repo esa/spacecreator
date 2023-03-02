@@ -698,7 +698,7 @@ QString IvToPromelaTranslator::prepareCallInfo(RequiredCallInfo &info, IvToProme
             targetInfo.m_providedInlineName =
                     QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(targetInterfaceName);
         }
-        info.m_targets.append(targetInfo);
+        info.m_targets.emplace(targetFunctionName, targetInfo);
     }
 
     return inlineName;

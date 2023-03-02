@@ -543,7 +543,8 @@ void IvToPromelaGenerator::createPromelaObjectsForSyncRis(
 
     Sequence sequence(Sequence::Type::NORMAL);
 
-    for (const RequiredCallInfo::TargetInfo &targetInfo : info.m_targets) {
+    for (auto targetIter = info.m_targets.begin(); targetIter != info.m_targets.end(); ++targetIter) {
+        const RequiredCallInfo::TargetInfo &targetInfo = targetIter->second;
         if (targetInfo.m_isEnvironment) {
             for (const RequiredCallInfo::ParameterInfo &parameterInfo : info.m_parameters) {
                 if (!parameterInfo.m_isOutput) {
@@ -606,7 +607,8 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(
 
     Sequence sequence(Sequence::Type::NORMAL);
 
-    for (const RequiredCallInfo::TargetInfo &targetInfo : info.m_targets) {
+    for (auto targetIter = info.m_targets.begin(); targetIter != info.m_targets.end(); ++targetIter) {
+        const RequiredCallInfo::TargetInfo &targetInfo = targetIter->second;
         const QString channelName = targetInfo.m_providedQueueName;
         sequence.appendElement(ChannelSend(VariableRef(channelName), sendArguments));
     }
