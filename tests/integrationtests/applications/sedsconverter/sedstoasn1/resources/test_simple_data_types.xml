@@ -61,11 +61,11 @@
       </StringDataType>
       <EnumeratedDataType name="SimpleEnumeration">
         <LongDescription>A simple enumeration</LongDescription>
-        <IntegerDataEncoding encoding="unsigned" byteOrder="bigEndian" sizeInBits="16" />
+        <IntegerDataEncoding encoding="twosComplement" byteOrder="bigEndian" sizeInBits="16" />
         <EnumerationList>
           <Enumeration value="12" label="Value1" />
           <Enumeration value="15" label="Value2" />
-          <Enumeration value="42" label="Value3" />
+          <Enumeration value="-12" label="Value3" />
         </EnumerationList>
       </EnumeratedDataType>
     </DataTypeSet>

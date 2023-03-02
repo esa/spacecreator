@@ -11,6 +11,6 @@ FixedSizeBLOB []
 FixedSizeAsciiString [encoding ASCII]
 CString [encoding ASCII, termination-pattern '0'H]
 ASCIIString [encoding ASCII]
-SimpleEnumeration [size 16, encoding pos-int, endianness big, encode-values]
+SimpleEnumeration [size 16, encoding twos-complement, endianness big, encode-values]
 END
 
