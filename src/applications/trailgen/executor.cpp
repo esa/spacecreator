@@ -173,9 +173,7 @@ void TrailgenExecutor::execute()
             + "simulation" + QDir::separator() + "observers" + QDir::separator() + "observer.asn";
 
     m_converter = std::make_unique<TmcConverter>(inputIvFilepath.value(), outputDirectory.value());
-    if (isMulticastEnabled) {
-        m_converter->setMulticastEnabled(true);
-    }
+    m_converter->setMulticastEnabled(isMulticastEnabled);
     m_converter->setEnvironmentFunctions(environmentFunctions);
     m_converter->setKeepFunctions(keepFunctions);
     m_converter->setMscObserverFiles(mscObserverFiles);

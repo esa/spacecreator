@@ -47,68 +47,6 @@ using shared::VEObject;
 
 namespace promela::translator {
 
-// namespace {
-// void showPossibleSenders(const QMap<QString, QString> &data)
-// {
-//     qDebug() << "        possibleSenders ";
-//     for (auto iter = data.begin(); iter != data.end(); ++iter) {
-//         qDebug() << "            " << iter.key() << " " << iter.value();
-//     }
-// }
-
-// void showObservers(const std::list<std::unique_ptr<ObserverInfo>> &data)
-// {
-//     qDebug() << "        observers ";
-//     for (auto iter = data.begin(); iter != data.end(); ++iter) {
-//         qDebug() << "            observerName " << (*iter)->m_observerName;
-//         qDebug() << "            observerInterface " << (*iter)->m_observerInterface;
-//         qDebug() << "            observerQueue " << (*iter)->m_observerQueue;
-//     }
-// }
-
-// void showProctype(const QString &name, const ProctypeInfo &info, bool isEnv)
-// {
-//     if (isEnv) {
-//         qDebug() << "    Environment proctype " << name;
-//     } else {
-//         qDebug() << "    Proctype " << name;
-//     }
-//     qDebug() << "        interfaceName " << info.m_interfaceName;
-//     qDebug() << "        queueName " << info.m_queueName;
-//     qDebug() << "        queueSize " << info.m_queueSize;
-//     qDebug() << "        priority " << info.m_priority;
-//     if (!info.m_parameterTypeName.isEmpty()) {
-//         qDebug() << "        parameterName " << info.m_parameterName;
-//         qDebug() << "        parameterType " << info.m_parameterTypeName;
-//     }
-//     qDebug() << "        isTimer " << info.m_isTimer;
-//     showPossibleSenders(info.m_possibleSenders);
-//     showObservers(info.m_observers);
-// }
-
-// void showEnvironmentProctype(const QString &name, const EnvProctypeInfo &info)
-// {
-//     qDebug() << "    Value generation proctype " << name;
-//     qDebug() << "        interfaceName " << info.m_interfaceName;
-//     qDebug() << "        priority " << info.m_priority;
-// }
-
-// void showRequiredCallInfo(const QString &name, const RequiredCallInfo &info)
-// {
-//     qDebug() << "    Required call " << name;
-//     qDebug() << "        target functions";
-//     for (const auto &target : info.m_targets) {
-//         qDebug() << "            " << target.m_targetFunctionName << " " << target.m_providedInlineName << " (env "
-//                  << target.m_isEnvironment << ")";
-//     }
-//     qDebug() << "        protected " << info.m_isProtected;
-//     for (const auto &param : info.m_parameters) {
-//         qDebug() << "            " << param.m_parameterName << " " << param.m_parameterType << "  (output "
-//                  << param.m_isOutput << ")";
-//     }
-// }
-// }
-
 std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {
@@ -132,31 +70,6 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     }
 
     std::unique_ptr<SystemInfo> systemInfo = prepareSystemInfo(ivModel, options);
-
-    // qDebug() << "SystemInfo";
-    // for (auto iter = systemInfo->m_functions.begin(); iter != systemInfo->m_functions.end(); ++iter) {
-    //     qDebug() << "Function " << iter->first << " env " << iter->second->m_isEnvironment;
-    //     for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
-    //             ++proctypeIter) {
-    //         showProctype(proctypeIter->first, *proctypeIter->second, false);
-    //     }
-    //     for (auto proctypeIter = iter->second->m_environmentSourceProctypes.begin();
-    //             proctypeIter != iter->second->m_environmentSourceProctypes.end(); ++proctypeIter) {
-    //         showEnvironmentProctype(proctypeIter->first, *proctypeIter->second);
-    //     }
-    //     for (auto proctypeIter = iter->second->m_environmentSinkProctypes.begin();
-    //             proctypeIter != iter->second->m_environmentSinkProctypes.end(); ++proctypeIter) {
-    //         showProctype(proctypeIter->first, *proctypeIter->second, true);
-    //     }
-    //     for (auto sporadicRequiredCall = iter->second->m_synchronousCalls.begin();
-    //             sporadicRequiredCall != iter->second->m_synchronousCalls.end(); ++sporadicRequiredCall) {
-    //         showRequiredCallInfo(sporadicRequiredCall->first, *sporadicRequiredCall->second);
-    //     }
-    //     for (auto synchronousRequiredCall = iter->second->m_synchronousCalls.begin();
-    //             synchronousRequiredCall != iter->second->m_synchronousCalls.end(); ++synchronousRequiredCall) {
-    //         showRequiredCallInfo(synchronousRequiredCall->first, *synchronousRequiredCall->second);
-    //     }
-    // }
 
     IvToPromelaGenerator generator(context, *systemInfo);
     generator.generate();

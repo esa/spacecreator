@@ -706,10 +706,7 @@ std::unique_ptr<Expression> IvToPromelaGenerator::createCheckQueuesExpression(
 void IvToPromelaGenerator::createGetSenderInline(
         model::PromelaSystemModel *promelaModel, const QString &functionName) const
 {
-    // the SDL process required a procedure '_get_sender'
-    // currently this feature is not fully supported in model checking
-    // to ensure that the generated model will be valid
-    // the empty inline with required name is created here.
+    // the SDL process requires a procedure '<processname>_get_sender'
     Sequence sequence(Sequence::Type::NORMAL);
 
     QList<QString> arguments;
