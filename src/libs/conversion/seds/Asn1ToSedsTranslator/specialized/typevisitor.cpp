@@ -495,7 +495,7 @@ bool typeEncodingMatches(const ::seds::model::DataType &type1, const ::seds::mod
 static inline auto expectedTypeMatchesExistingOne(TypeVisitor::Context &context, const Asn1Acn::Types::Type *type)
         -> bool
 {
-    const auto typeName = type->typeName();
+    const auto typeName = Escaper::escapeIvName(type->typeName());
     const auto referencedType = context.findDataType(typeName);
     if (referencedType == nullptr) {
         auto errorMessage = QString("Unable to find referenced type '%1'").arg(typeName);
