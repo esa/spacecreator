@@ -61,7 +61,7 @@
         },
         {
             "key": "CommDevNameX86Linux",
-            "value": "x86 Linux CPP"
+            "value": "x86 Linux C++"
         },
         {
             "key": "CommDevTypeX86Linux",

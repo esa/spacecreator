@@ -10,6 +10,9 @@ ASN1_DRV_CONFIG=%{ProjectName}configuration.asn
 ASN1_DRV_PRIVATE=%{ProjectName}privatedata.asn
 ASN1_DRIVER_EXPLICIT_CONFIG=$(ASN1_DRV_CONFIG) $(ASN1_DRV_PRIVATE)
 
+SNIPPET_INSTALLATION_DIRECTORY=$(COMMUNICATION_DEVICE_PATH)/%{CDBoard}/port_%{ProjectNameLowerCase}
+SNIPPETS_INSTALLATOR=install_communication_devices.py
+
 all:	release
 
 release:	work/glue_release
@@ -26,6 +29,19 @@ debug:	work/glue_debug
 
 run:
 	@echo "run Hello World!"
+
+install:
+	mkdir -p $(SNIPPET_INSTALLATION_DIRECTORY)
+	cp -r snippets/. $(SNIPPET_INSTALLATION_DIRECTORY)
+	$(SNIPPETS_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
+
+uninstall:
+	rm -r $(SNIPPET_INSTALLATION_DIRECTORY)
+	$(SNIPPETS_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
+
+uninstall-all:
+	rm -r $(COMMUNICATION_DEVICE_PATH)/*
+	$(SNIPPETS_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
 
 work/glue_release:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	sed -i 's/CoverageEnabled => true/CoverageEnabled => false/g' DeploymentView.aadl || :
