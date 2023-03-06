@@ -1,0 +1,51 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Controller;
+    /* CIF TEXT (353, 389), (197, 140) */
+    dcl my_value MyInteger := 23;
+    /* CIF ENDTEXT */
+    /* CIF START (409, 79), (70, 35) */
+    START;
+        /* CIF output (354, 134), (178, 35) */
+        output test_parameter(my_value);
+        /* CIF NEXTSTATE (394, 184), (98, 35) */
+        NEXTSTATE WaitForBoth;
+    /* CIF state (691, 328), (76, 35) */
+    state WaitFor2;
+        /* CIF input (689, 383), (80, 35) */
+        input received2;
+            /* CIF task (678, 438), (102, 35) */
+            task my_value := 1;
+            /* CIF output (640, 488), (178, 35) */
+            output test_parameter(my_value);
+            /* CIF NEXTSTATE (693, 543), (72, 35) */
+            NEXTSTATE Finished;
+    endstate;
+    /* CIF state (921, 327), (76, 35) */
+    state WaitFor1;
+        /* CIF input (919, 382), (80, 35) */
+        input received1;
+            /* CIF task (908, 437), (102, 35) */
+            task my_value := 2;
+            /* CIF output (870, 492), (178, 35) */
+            output test_parameter(my_value);
+            /* CIF NEXTSTATE (923, 547), (72, 35) */
+            NEXTSTATE Finished;
+    endstate;
+    /* CIF state (882, 104), (98, 35) */
+    state WaitForBoth;
+        /* CIF input (891, 159), (80, 35) */
+        input received2;
+            /* CIF NEXTSTATE (893, 214), (76, 35) */
+            NEXTSTATE WaitFor1;
+    endstate;
+    /* CIF state (664, 97), (98, 35) */
+    state WaitForBoth;
+        /* CIF input (673, 152), (80, 35) */
+        input received1;
+            /* CIF NEXTSTATE (675, 207), (76, 35) */
+            NEXTSTATE WaitFor2;
+    endstate;
+    /* CIF state (466, 281), (72, 35) */
+    state Finished;
+    endstate;
+endprocess Controller;

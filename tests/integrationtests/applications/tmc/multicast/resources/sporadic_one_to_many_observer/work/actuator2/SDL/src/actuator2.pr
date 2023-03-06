@@ -1,0 +1,19 @@
+/* CIF PROCESS (250, 150), (150, 75) */
+process Actuator2;
+    /* CIF TEXT (362, 326), (170, 140) */
+    dcl param MyInteger;
+    /* CIF ENDTEXT */
+    /* CIF START (320, 10), (70, 35) */
+    START;
+        /* CIF NEXTSTATE (320, 60), (70, 35) */
+        NEXTSTATE Wait;
+    /* CIF state (718, 97), (70, 35) */
+    state Wait;
+        /* CIF input (672, 152), (160, 35) */
+        input test_parameter(param);
+            /* CIF output (712, 207), (80, 35) */
+            output received2;
+            /* CIF NEXTSTATE (718, 262), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+endprocess Actuator2;

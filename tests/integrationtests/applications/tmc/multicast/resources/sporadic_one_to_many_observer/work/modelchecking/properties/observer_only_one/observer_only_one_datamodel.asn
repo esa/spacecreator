@@ -1,0 +1,34 @@
+Observer-only-one-Datamodel DEFINITIONS ::=
+BEGIN
+--  This file was generated automatically by OpenGEODE
+IMPORTS
+   Actuator1-States, Actuator1-Context FROM Actuator1-Datamodel
+   Actuator2-States, Actuator2-Context FROM Actuator2-Datamodel
+   Controller-States, Controller-Context FROM Controller-Datamodel
+   MyInteger FROM SPORADIC-ONE-TO-MANY-OBSERVER-DATAVIEW
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview
+   Actuator1-Event, Actuator2-Event, Controller-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
+   TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
+
+Observer-only-one-States ::= ENUMERATED {wait-for-event, error}
+
+Observer-only-one-Context ::= SEQUENCE {
+   state Observer-only-one-States,
+   init-done BOOLEAN,
+   sender PID,
+   test-out-count MyInteger
+}
+
+Observer-Only-One-Actuator1-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), test-parameter-present(2)}
+Observer-Only-One-Actuator1-Event-Msg-Out-Selection  ::= ENUMERATED {received1-present(1)}
+Observer-Only-One-Actuator1-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observer-Only-One-Actuator2-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), test-parameter-present(2)}
+Observer-Only-One-Actuator2-Event-Msg-Out-Selection  ::= ENUMERATED {received2-present(1)}
+Observer-Only-One-Actuator2-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observer-Only-One-Controller-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), received1-present(2), received2-present(3)}
+Observer-Only-One-Controller-Event-Msg-Out-Selection  ::= ENUMERATED {test-parameter-present(1)}
+Observer-Only-One-Controller-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observer-Only-One-Function-Event-Selection  ::= ENUMERATED {actuator1-present(1), actuator2-present(2), controller-present(3)}
+Observer-Only-One-Observable-Event-Selection  ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
+END

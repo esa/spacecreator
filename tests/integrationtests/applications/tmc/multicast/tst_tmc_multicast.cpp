@@ -30,6 +30,8 @@ class tst_Tmc_Multicast : public QObject
 private Q_SLOTS:
     void test_sporadic_many_to_one();
     void test_sporadic_one_to_many();
+    void test_sporadic_one_to_many_observer();
+    void test_sporadic_one_to_many_one_observer();
 
     void test_protected_many_to_one();
     void test_protected_one_to_many();
@@ -44,6 +46,18 @@ void tst_Tmc_Multicast::test_sporadic_many_to_one()
 void tst_Tmc_Multicast::test_sporadic_one_to_many()
 {
     const int result = system("./test_sporadic_one_to_many.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Multicast::test_sporadic_one_to_many_observer()
+{
+    const int result = system("./test_sporadic_one_to_many_observer.sh");
+    QCOMPARE(result, 0);
+}
+
+void tst_Tmc_Multicast::test_sporadic_one_to_many_one_observer()
+{
+    const int result = system("./test_sporadic_one_to_many_one_observer.sh");
     QCOMPARE(result, 0);
 }
 

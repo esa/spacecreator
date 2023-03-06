@@ -17,6 +17,8 @@ add_format_target(${TEST_NAME})
 
 configure_file(test_sporadic_many_to_one.sh test_sporadic_many_to_one.sh COPYONLY)
 configure_file(test_sporadic_one_to_many.sh test_sporadic_one_to_many.sh COPYONLY)
+configure_file(test_sporadic_one_to_many_observer.sh test_sporadic_one_to_many_observer.sh COPYONLY)
+configure_file(test_sporadic_one_to_many_one_observer.sh test_sporadic_one_to_many_one_observer.sh COPYONLY)
 configure_file(test_protected_many_to_one.sh test_protected_many_to_one.sh COPYONLY)
 configure_file(test_protected_one_to_many.sh test_protected_one_to_many.sh COPYONLY)
 add_custom_target(${TEST_NAME}_copy_files ALL

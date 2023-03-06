@@ -1,0 +1,69 @@
+system observer_only_one;
+    /* CIF TEXT (144, 214), (551, 140) */
+    use datamodel comment 'observer.asn';
+    
+    signal test_out(MyInteger) renames output test_parameter from controller to actuator1;
+    signal test_in(MyInteger) renames input test_parameter to actuator1;
+    /* CIF ENDTEXT */
+    channel c
+        from env to observer_only_one with test_out,
+test_in;
+        from observer_only_one to env with test_out;
+    endchannel;
+    block observer_only_one;
+        signalroute r
+            from env to observer_only_one with test_out,
+test_in;
+            from observer_only_one to env with test_out;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process observer_only_one;
+            /* CIF TEXT (0, 57), (222, 140) */
+            monitor st System_State;
+            
+            monitor event Observable_Event;
+            
+            errorstates error;
+            /* CIF ENDTEXT */
+            /* CIF TEXT (29, 380), (267, 140) */
+            -- Text area for declarations and comments
+            
+            dcl test_out_count MyInteger := 0;
+            /* CIF ENDTEXT */
+            /* CIF START (363, 74), (70, 35) */
+            START;
+                /* CIF NEXTSTATE (340, 129), (115, 35) */
+                NEXTSTATE Wait_For_Event;
+            /* CIF state (614, 98), (70, 35) */
+            state error;
+            endstate;
+            /* CIF state (406, 272), (115, 35) */
+            state Wait_For_Event;
+                /* CIF input (394, 327), (138, 35) */
+                input test_out(outparam);
+                    /* CIF output (394, 382), (138, 35) */
+                    output test_out(outparam);
+                    /* CIF task (343, 437), (240, 35) */
+                    task test_out_count := test_out_count + 1;
+                    /* CIF NEXTSTATE (406, 492), (115, 35) */
+                    NEXTSTATE Wait_For_Event;
+            endstate;
+            /* CIF state (823, 296), (115, 35) */
+            state Wait_For_Event;
+                /* CIF input (821, 351), (119, 35) */
+                input test_in(inparam);
+                    /* CIF decision (824, 406), (113, 50) */
+                    decision test_out_count;
+                        /* CIF ANSWER (788, 476), (70, 23) */
+                        (1):
+                            /* CIF NEXTSTATE (788, 519), (70, 35) */
+                            NEXTSTATE error;
+                        /* CIF ANSWER (892, 476), (70, 23) */
+                        else:
+                            /* CIF NEXTSTATE (869, 519), (115, 35) */
+                            NEXTSTATE Wait_For_Event;
+                    enddecision;
+            endstate;
+        endprocess observer_only_one;
+    endblock;
+endsystem;
