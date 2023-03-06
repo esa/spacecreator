@@ -155,7 +155,8 @@ void MiniViewRenderer::updateData()
             }
         } else if (auto connection = qobject_cast<const ivm::IVConnection *>(child)) {
             if (!connection->source() || !connection->target() || !connection->sourceInterface()
-                    || !connection->targetInterface()) {
+                    || !connection->targetInterface()
+                    || (connection->isGrouped() && connection->type() == ivm::IVObject::Type::Connection)) {
                 continue;
             }
             const QPolygonF itemScenePoints =
