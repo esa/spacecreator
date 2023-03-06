@@ -47,7 +47,10 @@ def create_app_image(appimagetool_dir: str, app_dir: str, output_dir: str, versi
     """
     app_image_tool = join_dir(appimagetool_dir, 'appimagetool')
     app_image = join_dir(output_dir, 'spacecreator-x86_64-{}.AppImage'.format(version))
-    app_image_tool_cmd = [app_image_tool, app_dir, app_image]
+    options = []
+    # This is useful when builing spacecreator in a Dockerfile
+    options.append('--appimage-extract-and-run')
+    app_image_tool_cmd = [app_image_tool, *options, app_dir, app_image]
     print_cmd(app_image_tool_cmd)
 
     completed_process = subprocess.run(app_image_tool_cmd, env={'ARCH': 'x86_64'})

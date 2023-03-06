@@ -1,0 +1,24 @@
+{
+    \"Name\" : \"CompastaPlugin\",
+    \"Version\" : \"$$PLUGIN_VERSION\",
+    \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
+    \"Vendor\" : \"Fondazione Bruno Kessler - FBK\",
+    \"Copyright\" : \"(C) 2022 Fondazione Bruno Kessler - FBK\",
+    \"License\" : \"LGPL 2 or later\",
+    \"Category\" : \"Modeling\",
+    \"Description\" : \"COMPASTA Tools - COMPASS Toolchain for TASTE\",
+    \"Url\" : \"www.fbk.eu\",
+    $$dependencyList,
+
+    \"Mimetypes\" : [
+        \"<?xml version=\'1.0\' encoding=\'UTF-8\'?>\",
+        \"<mime-info xmlns=\'http://www.freedesktop.org/standards/shared-mime-info\'>\",
+        \"    <mime-type type=\'text/x-slim\'>\",
+        \"        <sub-class-of type=\'text/plain\'/>\",
+        \"        <comment>AADL/Slim Specification Format</comment>\",
+        \"        <glob pattern=\'*.slim\'/>\",
+        \"        <glob pattern=\'*.aadl\'/>\",
+        \"    </mime-type>\",
+        \"</mime-info>\"
+    ]
+}
