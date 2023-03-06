@@ -112,7 +112,7 @@ void IvToPromelaGenerator::generate()
     }
 }
 
-void IvToPromelaGenerator::initializeFunction(Sequence &sequence, const QString &functionName) const
+void IvToPromelaGenerator::initializeFunction(Sequence &sequence, const QString &functionName)
 {
     QString initFn = QString("%1_0_init").arg(Escaper::escapePromelaIV(functionName));
     sequence.appendElement(InlineCall(initFn, {}));
@@ -124,7 +124,7 @@ void IvToPromelaGenerator::initializeFunction(Sequence &sequence, const QString 
     sequence.appendElement(ChannelSend(VariableRef(lockChannelName), lockChannelArguments));
 }
 
-void IvToPromelaGenerator::generateInitProctype() const
+void IvToPromelaGenerator::generateInitProctype()
 {
     Sequence sequence(Sequence::Type::ATOMIC);
 
@@ -147,14 +147,14 @@ void IvToPromelaGenerator::generateInitProctype() const
     m_context.model()->setInit(InitProctype(std::move(sequence)));
 }
 
-QString IvToPromelaGenerator::observerInputSignalName(const ObserverAttachment &attachment) const
+QString IvToPromelaGenerator::observerInputSignalName(const ObserverAttachment &attachment)
 {
     return QString("%1_0_PI_0_%2")
             .arg(Escaper::escapePromelaIV(attachment.observer()))
             .arg(Escaper::escapePromelaName(attachment.observerInterface()));
 }
 
-QString IvToPromelaGenerator::observerInputSignalName(const ObserverInfo &observerInfo) const
+QString IvToPromelaGenerator::observerInputSignalName(const ObserverInfo &observerInfo)
 {
     return QString("%1_0_PI_0_%2")
             .arg(Escaper::escapePromelaIV(observerInfo.m_observerName))
@@ -163,7 +163,7 @@ QString IvToPromelaGenerator::observerInputSignalName(const ObserverInfo &observ
 
 std::list<std::unique_ptr<promela::model::ProctypeElement>> IvToPromelaGenerator::attachInputObservers(
         const QString &functionName, const QString &interfaceName, const QString &parameterName,
-        const QString &parameterType) const
+        const QString &parameterType)
 {
     std::list<std::unique_ptr<promela::model::ProctypeElement>> result;
     auto attachments =
@@ -184,7 +184,7 @@ std::list<std::unique_ptr<promela::model::ProctypeElement>> IvToPromelaGenerator
 }
 
 void IvToPromelaGenerator::generateProctype(
-        const QString &functionName, bool environment, const ProctypeInfo &proctypeInfo) const
+        const QString &functionName, bool environment, const ProctypeInfo &proctypeInfo)
 {
     QString channelName = proctypeInfo.m_queueName;
 
@@ -308,7 +308,7 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::generateProcessMessageBlo
         const QString &modelFunctionName, const QString &channelName, const QString &inlineName,
         const QString &parameterType, const QString &parameterName, const QString &exitLabel, bool lock,
         std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements,
-        std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements) const
+        std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements)
 {
     QList<InlineCall::Argument> checkQueueArguments;
     checkQueueArguments.append(VariableRef(channelName));
@@ -359,7 +359,7 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::generateProcessMessageBlo
 }
 
 void IvToPromelaGenerator::generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
-        const std::pair<QString, QString> &interfaceParameter, const QString &sendInline) const
+        const std::pair<QString, QString> &interfaceParameter, const QString &sendInline)
 {
     Sequence sequence(Sequence::Type::NORMAL);
     sequence.appendElement(createWaitForInitStatement());
@@ -434,13 +434,12 @@ void IvToPromelaGenerator::generateEnvironmentProctype(const QString &functionNa
     m_context.model()->addProctype(std::move(proctype));
 }
 
-std::unique_ptr<model::ProctypeElement> IvToPromelaGenerator::createWaitForInitStatement() const
+std::unique_ptr<model::ProctypeElement> IvToPromelaGenerator::createWaitForInitStatement()
 {
     return std::make_unique<ProctypeElement>(Expression(VariableRef(m_systemInitedVariableName)));
 }
 
-void IvToPromelaGenerator::generateUnhandledInputInline(
-        const QString &functionName, const ProctypeInfo &proctypeInfo) const
+void IvToPromelaGenerator::generateUnhandledInputInline(const QString &functionName, const ProctypeInfo &proctypeInfo)
 {
     QString inlineName = QString("%1_0_PI_0_%2_unhandled_input")
                                  .arg(Escaper::escapePromelaIV(functionName))
@@ -482,7 +481,7 @@ void IvToPromelaGenerator::generateUnhandledInputInline(
 }
 
 void IvToPromelaGenerator::createPromelaObjectsForFunction(
-        const QString &functionName, const FunctionInfo &functionInfo) const
+        const QString &functionName, const FunctionInfo &functionInfo)
 {
     QList<QString> channelNames;
 
@@ -516,7 +515,7 @@ void IvToPromelaGenerator::createPromelaObjectsForFunction(
     }
 }
 
-void IvToPromelaGenerator::generateProctypeForTimer(const QString &functionName, const ProctypeInfo &proctypeInfo) const
+void IvToPromelaGenerator::generateProctypeForTimer(const QString &functionName, const ProctypeInfo &proctypeInfo)
 {
     generateUnhandledInputInline(functionName, proctypeInfo);
 
@@ -524,15 +523,14 @@ void IvToPromelaGenerator::generateProctypeForTimer(const QString &functionName,
 }
 
 void IvToPromelaGenerator::createPromelaObjectsForAsyncPis(
-        const QString &functionName, const ProctypeInfo &proctypeInfo) const
+        const QString &functionName, const ProctypeInfo &proctypeInfo)
 {
     generateUnhandledInputInline(functionName, proctypeInfo);
 
     generateProctype(functionName, false, proctypeInfo);
 }
 
-void IvToPromelaGenerator::createPromelaObjectsForSyncRis(
-        const QString &functionName, const RequiredCallInfo &info) const
+void IvToPromelaGenerator::createPromelaObjectsForSyncRis(const QString &functionName, const RequiredCallInfo &info)
 {
     QList<QString> arguments;
     QList<InlineCall::Argument> callArguments;
@@ -587,8 +585,7 @@ void IvToPromelaGenerator::createPromelaObjectsForSyncRis(
     m_context.model()->addInlineDef(std::move(inlineDef));
 }
 
-void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(
-        const QString &functionName, const RequiredCallInfo &info) const
+void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &functionName, const RequiredCallInfo &info)
 {
     QList<QString> arguments;
     QList<Expression> sendArguments;
@@ -623,7 +620,7 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(
 }
 
 void IvToPromelaGenerator::createPromelaObjectsForEnvironment(
-        const QString &functionName, const FunctionInfo &functionInfo) const
+        const QString &functionName, const FunctionInfo &functionInfo)
 {
     for (auto iter = functionInfo.m_environmentSinkProctypes.begin();
             iter != functionInfo.m_environmentSinkProctypes.end(); ++iter) {
@@ -655,7 +652,7 @@ void IvToPromelaGenerator::createPromelaObjectsForEnvironment(
 }
 
 void IvToPromelaGenerator::createCheckQueueInline(
-        PromelaSystemModel *promelaModel, const QString &functionName, const QList<QString> &channelNames) const
+        PromelaSystemModel *promelaModel, const QString &functionName, const QList<QString> &channelNames)
 {
     if (channelNames.empty()) {
         auto message = QString("No sporadic interfaces in function %1").arg(functionName);
@@ -674,7 +671,7 @@ void IvToPromelaGenerator::createCheckQueueInline(
 }
 
 std::unique_ptr<Expression> IvToPromelaGenerator::createCheckQueuesExpression(
-        const QList<QString> &channelNames, bool empty) const
+        const QList<QString> &channelNames, bool empty)
 {
     const BinaryExpression::Operator oper = empty ? BinaryExpression::Operator::AND : BinaryExpression::Operator::OR;
     auto iter = channelNames.rbegin();
@@ -703,8 +700,7 @@ std::unique_ptr<Expression> IvToPromelaGenerator::createCheckQueuesExpression(
     return expr;
 }
 
-void IvToPromelaGenerator::createGetSenderInline(
-        model::PromelaSystemModel *promelaModel, const QString &functionName) const
+void IvToPromelaGenerator::createGetSenderInline(model::PromelaSystemModel *promelaModel, const QString &functionName)
 {
     // the SDL process requires a procedure '<processname>_get_sender'
     Sequence sequence(Sequence::Type::NORMAL);
@@ -725,15 +721,14 @@ void IvToPromelaGenerator::createGetSenderInline(
     promelaModel->addInlineDef(std::make_unique<InlineDef>(checkQueueInlineName, arguments, std::move(sequence)));
 }
 
-void IvToPromelaGenerator::createSenderPidVariable(
-        model::PromelaSystemModel *promelaModel, const QString &functionName) const
+void IvToPromelaGenerator::createSenderPidVariable(model::PromelaSystemModel *promelaModel, const QString &functionName)
 {
     const QString senderVariableName = QString("%1_sender").arg(Escaper::escapePromelaField(functionName));
 
     promelaModel->addDeclaration(Declaration(DataType(UtypeRef("PID")), senderVariableName));
 }
 
-void IvToPromelaGenerator::createSystemState() const
+void IvToPromelaGenerator::createSystemState()
 {
     Utype systemState("system_state");
 
@@ -765,7 +760,7 @@ void IvToPromelaGenerator::createSystemState() const
     m_context.model()->addDeclaration(Declaration(DataType(UtypeRef("system_state")), "global_state"));
 }
 
-void IvToPromelaGenerator::createPromelaObjectsForTimers() const
+void IvToPromelaGenerator::createPromelaObjectsForTimers()
 {
     std::map<QString, VariableRef> timerSignals;
 
@@ -793,7 +788,7 @@ void IvToPromelaGenerator::createPromelaObjectsForTimers() const
 }
 
 void IvToPromelaGenerator::createTimerInlinesForFunction(
-        const QString &functionName, const QString &timerName, const VariableRef &timerData) const
+        const QString &functionName, const QString &timerName, const VariableRef &timerData)
 {
     const QList<InlineCall::Argument> arguments;
 
@@ -836,7 +831,7 @@ void IvToPromelaGenerator::createTimerInlinesForFunction(
             std::make_unique<InlineDef>(resetTimerName, QList<QString>(), std::move(resetTimerSequence)));
 }
 
-void IvToPromelaGenerator::createGlobalTimerObjects(const std::map<QString, VariableRef> &timerSignals) const
+void IvToPromelaGenerator::createGlobalTimerObjects(const std::map<QString, VariableRef> &timerSignals)
 {
     Sequence timerProctypeBody(Sequence::Type::NORMAL);
     timerProctypeBody.appendElement(createWaitForInitStatement());
@@ -884,8 +879,12 @@ void IvToPromelaGenerator::createGlobalTimerObjects(const std::map<QString, Vari
     m_context.model()->addProctype(std::move(timerManagerProctype));
 }
 
-void IvToPromelaGenerator::createPromelaObjectsForObservers() const
+void IvToPromelaGenerator::createPromelaObjectsForObservers()
 {
+    // in case of multicast the definitions may be repeated,
+    // prevent this using the set
+    QSet<std::pair<QString, QString>> visitedObserverInterfaces;
+
     for (auto iter = m_systemInfo.m_functions.begin(); iter != m_systemInfo.m_functions.end(); ++iter) {
         for (auto proctypeIter = iter->second->m_proctypes.begin(); proctypeIter != iter->second->m_proctypes.end();
                 ++proctypeIter) {
@@ -898,6 +897,11 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers() const
                 const QString observerInterface = (*observerIter)->m_observerInterface;
                 const QString toFunction = (*observerIter)->m_toFunction;
 
+                if (visitedObserverInterfaces.contains(std::make_pair(observerName, observerInterface))) {
+                    continue;
+                }
+
+                visitedObserverInterfaces.insert(std::make_pair(observerName, observerInterface));
                 // send inline
                 const QString inlineName =
                         QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(observerName)).arg(observerInterface);
@@ -935,7 +939,7 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers() const
     }
 }
 
-std::unique_ptr<ProctypeElement> IvToPromelaGenerator::createLockAcquireStatement(const QString &functionName) const
+std::unique_ptr<ProctypeElement> IvToPromelaGenerator::createLockAcquireStatement(const QString &functionName)
 {
     const VariableRef lockChannelName = VariableRef(getFunctionLockChannelName(functionName));
     QList<VariableRef> lockChannelArguments;
@@ -944,7 +948,7 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::createLockAcquireStatemen
     return std::make_unique<ProctypeElement>(ChannelRecv(lockChannelName, lockChannelArguments));
 }
 
-std::unique_ptr<ProctypeElement> IvToPromelaGenerator::createLockReleaseStatement(const QString &functionName) const
+std::unique_ptr<ProctypeElement> IvToPromelaGenerator::createLockReleaseStatement(const QString &functionName)
 {
     const VariableRef lockChannelName = VariableRef(getFunctionLockChannelName(functionName));
 
@@ -954,7 +958,7 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::createLockReleaseStatemen
 }
 
 std::unique_ptr<ProctypeElement> IvToPromelaGenerator::createProcessInlineCall(
-        const QString &inlineName, const QString &parameterType, const QString &parameterName) const
+        const QString &inlineName, const QString &parameterType, const QString &parameterName)
 {
     if (parameterType.isEmpty()) {
         return std::make_unique<ProctypeElement>((InlineCall(inlineName, {})));
@@ -966,7 +970,7 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::createProcessInlineCall(
 }
 
 std::unique_ptr<model::ProctypeElement> IvToPromelaGenerator::createReceiveStatement(const QString &functionName,
-        const QString &channelName, const QString &parameterType, const QString &parameterName) const
+        const QString &channelName, const QString &parameterType, const QString &parameterName)
 {
     // channel receive
     QList<VariableRef> receiveParams;
@@ -983,12 +987,12 @@ std::unique_ptr<model::ProctypeElement> IvToPromelaGenerator::createReceiveState
     return std::make_unique<ProctypeElement>(ChannelRecv(VariableRef(channelName), receiveParams));
 }
 
-QString IvToPromelaGenerator::getFunctionLockChannelName(const QString &functionName) const
+QString IvToPromelaGenerator::getFunctionLockChannelName(const QString &functionName)
 {
     return QString("%1_lock").arg(Escaper::escapePromelaIV(functionName));
 }
 
-void IvToPromelaGenerator::addChannelAndLock(const QString &functionName) const
+void IvToPromelaGenerator::addChannelAndLock(const QString &functionName)
 {
     QList<ChannelInit::Type> channelType;
     channelType.append(BasicType::INT);
@@ -999,7 +1003,7 @@ void IvToPromelaGenerator::addChannelAndLock(const QString &functionName) const
 }
 
 QString IvToPromelaGenerator::handleParameterSubtype(const QString &parameterTypeName, const QString &parameterName,
-        const QString &interfaceName, const QString &functionName) const
+        const QString &interfaceName, const QString &functionName)
 {
     if (m_context.subtypesDefinitions().empty()) {
         return parameterTypeName;
@@ -1019,7 +1023,7 @@ QString IvToPromelaGenerator::handleParameterSubtype(const QString &parameterTyp
 }
 
 QString IvToPromelaGenerator::handleSendInlineArgument(const QString &parameterType, const QString &functionName,
-        const QString &interfaceName, const QString parameterName) const
+        const QString &interfaceName, const QString parameterName)
 {
     if (parameterType.isEmpty()) {
         return "";
@@ -1029,7 +1033,7 @@ QString IvToPromelaGenerator::handleSendInlineArgument(const QString &parameterT
 }
 
 QString IvToPromelaGenerator::buildParameterSubtypeName(
-        const QString &functionName, const QString &interfaceName, const QString &parameterName) const
+        const QString &functionName, const QString &interfaceName, const QString &parameterName)
 {
     auto subtypeName = QString("%1-%2-%3").arg(functionName).arg(interfaceName).arg(parameterName);
     subtypeName.replace('_', '-');
@@ -1039,9 +1043,12 @@ QString IvToPromelaGenerator::buildParameterSubtypeName(
     return subtypeName;
 }
 
-void IvToPromelaGenerator::createChannel(
-        const QString &channelName, const QString &messageType, size_t channelSize) const
+void IvToPromelaGenerator::createChannel(const QString &channelName, const QString &messageType, size_t channelSize)
 {
+    if (m_createdChannels.contains(channelName)) {
+        return;
+    }
+    m_createdChannels.insert(channelName);
     QList<ChannelInit::Type> channelType;
     if (m_context.isMulticastSupported()) {
         channelType.append(ChannelInit::Type(UtypeRef("PID")));

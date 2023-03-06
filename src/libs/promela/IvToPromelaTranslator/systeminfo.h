@@ -49,12 +49,6 @@ struct ObserverInfo {
      */
     QString m_nextQueue;
     /**
-     * @brief Name of the function after 'from' or empty
-     *
-     * Name of the sending function.
-     */
-    QString m_fromFunction;
-    /**
      * @brief Name of the function after 'to' or empty
      *
      * Name of the receiving function.

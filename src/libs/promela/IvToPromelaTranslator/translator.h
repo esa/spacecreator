@@ -87,16 +87,13 @@ private:
     auto getInterfaceQueueSize(const ivm::IVInterface *interface) const -> size_t;
     auto getInterfacePriority(const ivm::IVInterface *interface) const -> size_t;
 
-    auto findProvidedInterface(const ivm::IVModel *model, const QString &fromFunction,
-            const QString &interfaceName) const -> const ivm::IVInterface *;
     auto findRequiredInterface(const ivm::IVModel *model, const QString &functionName,
             const QString &interfaceName) const -> const ivm::IVInterface *;
     auto findTimerSignal(const ivm::IVModel *model, const QString &functionName, const QString &signalName) const
             -> QString;
 
     auto observerChannelName(const ObserverAttachment &attachment, const QString &toFunction) const -> QString;
-    auto getAttachmentToFunction(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;
-    auto getAttachmentFromFunction(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QString;
+    auto getAttachmentToFunctions(const ivm::IVModel *model, const ObserverAttachment &attachment) const -> QStringList;
 
     auto getObserverAttachments(IvToPromelaTranslatorContext &context, const QString &function,
             const QString &interface, const ObserverAttachment::Kind kind) const -> ObserverAttachments;

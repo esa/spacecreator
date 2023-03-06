@@ -231,21 +231,6 @@ size_t IvToPromelaTranslator::getInterfacePriority(const IVInterface *interface)
     }
 }
 
-const ::ivm::IVInterface *IvToPromelaTranslator::findProvidedInterface(
-        const ::ivm::IVModel *model, const QString &fromFunction, const QString &interfaceName) const
-{
-    const IVInterface *ri = findRequiredInterface(model, fromFunction, interfaceName);
-    if (ri == nullptr) {
-        return nullptr;
-    }
-    const IVConnection *connection = model->getConnectionForIface(ri->id());
-    if (connection != nullptr) {
-        return connection->targetInterface();
-    } else {
-        return nullptr;
-    }
-}
-
 const ::ivm::IVInterface *IvToPromelaTranslator::findRequiredInterface(
         const ::ivm::IVModel *model, const QString &functionName, const QString &interfaceName) const
 {
@@ -272,27 +257,20 @@ QString IvToPromelaTranslator::observerChannelName(
             .arg(attachment.interface());
 }
 
-QString IvToPromelaTranslator::getAttachmentToFunction(
+QStringList IvToPromelaTranslator::getAttachmentToFunctions(
         const ivm::IVModel *model, const ObserverAttachment &attachment) const
 {
     if (attachment.toFunction().has_value()) {
-        return attachment.toFunction().value();
+        return QStringList(attachment.toFunction().value());
     } else {
         const QString fromFunctionName = attachment.fromFunction().value();
         const IVInterface *ri = findRequiredInterface(model, fromFunctionName, attachment.interface());
-        const IVConnection *conn = model->getConnectionForIface(ri->id());
-        return conn->targetName();
-    }
-}
-
-QString IvToPromelaTranslator::getAttachmentFromFunction(
-        const ivm::IVModel *model, const ObserverAttachment &attachment) const
-{
-    Q_UNUSED(model);
-    if (attachment.fromFunction().has_value()) {
-        return attachment.fromFunction().value();
-    } else {
-        throw TranslationException("getAttachmentFromFunction is not implemented");
+        const QVector<IVConnection *> connections = model->getConnectionsForIface(ri->id());
+        QStringList result;
+        for (const IVConnection *connection : connections) {
+            result.append(connection->targetName());
+        }
+        return result;
     }
 }
 
@@ -304,28 +282,48 @@ ObserverAttachments IvToPromelaTranslator::getObserverAttachments(IvToPromelaTra
 
     if (kind == ObserverAttachment::Kind::Kind_Output) {
         for (const ObserverAttachment &attachment : allAttachments) {
-            const QString fromFunction = getAttachmentFromFunction(context.ivModel(), attachment);
-            const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
-            const IVInterface *i = findProvidedInterface(context.ivModel(), fromFunction, attachment.interface());
-            const IVConnection *connection = i == nullptr ? nullptr : context.ivModel()->getConnectionForIface(i->id());
+            // if attachment is 'OUTPUT' then source ('from') function is mandatory
+            const QString fromFunction = attachment.fromFunction().value();
+            // the target ('to') function is optional
+            QString toFunction;
+            if (attachment.toFunction().has_value()) {
+                toFunction = attachment.toFunction().value();
+            } else {
+                QStringList toFunctions = getAttachmentToFunctions(context.ivModel(), attachment);
+                if (toFunctions.contains(function)) {
+                    toFunction = function;
+                }
+            }
+            if (toFunction.isEmpty()) {
+                continue;
+            }
+            // find provided interfaces
+
+            const IVInterface *i = findRequiredInterface(context.ivModel(), fromFunction, attachment.interface());
+            if (i == nullptr) {
+                throw TranslationException("No inteface");
+            }
+            const QVector<IVConnection *> connections = context.ivModel()->getConnectionsForIface(i->id());
 
             // check possible connection
-            if (connection != nullptr && function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
-                    && interface.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0) {
-                result.push_back(attachment);
-            }
-            // special case for the timers, when the interface name contains both function name and timer name
-            else if (function.compare(toFunction, Qt::CaseInsensitive) == 0
-                    && attachment.interface().compare(
-                               QString("%1_%2").arg(function).arg(interface), Qt::CaseInsensitive)
-                            == 0) {
-                result.push_back(attachment);
+            for (const IVConnection *connection : connections) {
+                if (connection != nullptr && function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
+                        && interface.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0) {
+                    result.push_back(attachment);
+                }
+                // special case for the timers, when the interface name contains both function name and timer name
+                else if (function.compare(toFunction, Qt::CaseInsensitive) == 0
+                        && attachment.interface().compare(
+                                   QString("%1_%2").arg(function).arg(interface), Qt::CaseInsensitive)
+                                == 0) {
+                    result.push_back(attachment);
+                }
             }
         }
     } else if (kind == ObserverAttachment::Kind::Kind_Input) {
         for (const ObserverAttachment &attachment : allAttachments) {
-            const QString fromFunction = getAttachmentFromFunction(context.ivModel(), attachment);
-            if (function.compare(fromFunction, Qt::CaseInsensitive) == 0
+            // if attachment is 'OUTPUT' then source ('from') function is mandatory
+            if (function.compare(function, Qt::CaseInsensitive) == 0
                     && interface.compare(attachment.interface(), Qt::CaseInsensitive) == 0) {
                 result.push_back(attachment);
             }
@@ -399,8 +397,7 @@ void IvToPromelaTranslator::prepareFunctionInfo(IvToPromelaTranslatorContext &co
             QString currentQueueName = constructChannelName(functionName, interfaceName);
 
             for (const ObserverAttachment &attachment : outputObservers) {
-                const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
-                const QString channelName = observerChannelName(attachment, toFunction);
+                const QString channelName = observerChannelName(attachment, functionName);
 
                 std::unique_ptr<ObserverInfo> observerInfo = std::make_unique<ObserverInfo>();
 
@@ -408,7 +405,7 @@ void IvToPromelaTranslator::prepareFunctionInfo(IvToPromelaTranslatorContext &co
                 observerInfo->m_observerInterface = attachment.observerInterface();
                 observerInfo->m_observerQueue = currentQueueName;
                 observerInfo->m_nextQueue = channelName;
-                observerInfo->m_toFunction = toFunction;
+                observerInfo->m_toFunction = functionName;
 
                 proctypeInfo->m_observers.push_back(std::move(observerInfo));
 
@@ -497,17 +494,22 @@ std::unique_ptr<ProctypeInfo> IvToPromelaTranslator::prepareProctypeInfo(IvToPro
     QString currentQueueName = constructChannelName(functionName, interfaceName);
     for (auto iter = outputObservers.begin(); iter != outputObservers.end(); ++iter) {
         const ObserverAttachment &attachment = *iter;
-        const QString toFunction = getAttachmentToFunction(context.ivModel(), attachment);
-        const QString fromFunction = getAttachmentFromFunction(context.ivModel(), attachment);
-        const QString &channelName = observerChannelName(attachment, toFunction);
+        const QStringList toFunctions = getAttachmentToFunctions(context.ivModel(), attachment);
+
+        if (toFunctions.size() != 1 && !context.isMulticastSupported()) {
+            auto message =
+                    QString("Found %1 functions for observer '%2'.").arg(toFunctions.size()).arg(attachment.observer());
+            throw TranslationException(message);
+        }
+
+        const QString &channelName = observerChannelName(attachment, toFunctions.first());
 
         std::unique_ptr<ObserverInfo> observerInfo = std::make_unique<ObserverInfo>();
 
         observerInfo->m_observerName = attachment.observer();
         observerInfo->m_observerInterface = attachment.observerInterface();
         observerInfo->m_observerQueue = currentQueueName;
-        observerInfo->m_fromFunction = fromFunction;
-        observerInfo->m_toFunction = toFunction;
+        observerInfo->m_toFunction = functionName;
         observerInfo->m_nextQueue = channelName;
         proctypeInfo->m_observers.push_back(std::move(observerInfo));
 

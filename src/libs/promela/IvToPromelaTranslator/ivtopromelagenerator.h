@@ -31,64 +31,62 @@ public:
     auto generate() -> void;
 
 private:
-    auto initializeFunction(model::Sequence &sequence, const QString &functionName) const -> void;
-    auto addChannelAndLock(const QString &functionName) const -> void;
-    auto observerInputSignalName(const ObserverAttachment &attachment) const -> QString;
-    auto observerInputSignalName(const ObserverInfo &observerInfo) const -> QString;
+    auto initializeFunction(model::Sequence &sequence, const QString &functionName) -> void;
+    auto addChannelAndLock(const QString &functionName) -> void;
+    auto observerInputSignalName(const ObserverAttachment &attachment) -> QString;
+    auto observerInputSignalName(const ObserverInfo &observerInfo) -> QString;
     auto attachInputObservers(const QString &functionName, const QString &interfaceName, const QString &parameterName,
-            const QString &parameterType) const -> std::list<std::unique_ptr<promela::model::ProctypeElement>>;
-    auto generateInitProctype() const -> void;
-    auto generateProctype(const QString &functionName, bool environment, const ProctypeInfo &proctypeInfo) const
-            -> void;
+            const QString &parameterType) -> std::list<std::unique_ptr<promela::model::ProctypeElement>>;
+    auto generateInitProctype() -> void;
+    auto generateProctype(const QString &functionName, bool environment, const ProctypeInfo &proctypeInfo) -> void;
     auto generateProcessMessageBlock(const QString &functionName, const QString &modelFunctionName,
             const QString &channelName, const QString &inlineName, const QString &parameterType,
             const QString &parameterName, const QString &exitLabel, bool lock,
             std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements,
-            std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements) const
+            std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements)
             -> std::unique_ptr<model::ProctypeElement>;
     auto generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
-            const std::pair<QString, QString> &interfaceParameter, const QString &sendInline) const -> void;
+            const std::pair<QString, QString> &interfaceParameter, const QString &sendInline) -> void;
     auto generateSendInline(const QString &functionName, const QString &interfaceName,
             const QString &sourceFunctionName, const QString &sourceInterfaceName, const QString &channelName,
-            const QString &parameterType, const QString &parameterName) const -> void;
-    auto generateUnhandledInputInline(const QString &functionName, const ProctypeInfo &proctypeInfo) const -> void;
-    auto createPromelaObjectsForFunction(const QString &functionName, const FunctionInfo &functionInfo) const -> void;
-    auto generateProctypeForTimer(const QString &functionName, const ProctypeInfo &proctypeInfo) const -> void;
-    auto createPromelaObjectsForAsyncPis(const QString &functionName, const ProctypeInfo &proctypeInfo) const -> void;
-    auto createPromelaObjectsForSporadicRis(const QString &functionInfo, const RequiredCallInfo &info) const -> void;
-    auto createPromelaObjectsForSyncRis(const QString &functionInfo, const RequiredCallInfo &info) const -> void;
-    auto createPromelaObjectsForEnvironment(const QString &functionName, const FunctionInfo &functionInfo) const
-            -> void;
+            const QString &parameterType, const QString &parameterName) -> void;
+    auto generateUnhandledInputInline(const QString &functionName, const ProctypeInfo &proctypeInfo) -> void;
+    auto createPromelaObjectsForFunction(const QString &functionName, const FunctionInfo &functionInfo) -> void;
+    auto generateProctypeForTimer(const QString &functionName, const ProctypeInfo &proctypeInfo) -> void;
+    auto createPromelaObjectsForAsyncPis(const QString &functionName, const ProctypeInfo &proctypeInfo) -> void;
+    auto createPromelaObjectsForSporadicRis(const QString &functionInfo, const RequiredCallInfo &info) -> void;
+    auto createPromelaObjectsForSyncRis(const QString &functionInfo, const RequiredCallInfo &info) -> void;
+    auto createPromelaObjectsForEnvironment(const QString &functionName, const FunctionInfo &functionInfo) -> void;
     auto createCheckQueueInline(model::PromelaSystemModel *promelaModel, const QString &functionName,
-            const QList<QString> &channelNames) const -> void;
-    auto createCheckQueuesExpression(const QList<QString> &channelNames, bool empty) const
+            const QList<QString> &channelNames) -> void;
+    auto createCheckQueuesExpression(const QList<QString> &channelNames, bool empty)
             -> std::unique_ptr<::promela::model::Expression>;
-    auto createGetSenderInline(model::PromelaSystemModel *promelaModel, const QString &functionName) const -> void;
-    auto createSenderPidVariable(model::PromelaSystemModel *promelaModel, const QString &functionName) const -> void;
-    auto createSystemState() const -> void;
-    auto createPromelaObjectsForTimers() const -> void;
+    auto createGetSenderInline(model::PromelaSystemModel *promelaModel, const QString &functionName) -> void;
+    auto createSenderPidVariable(model::PromelaSystemModel *promelaModel, const QString &functionName) -> void;
+    auto createSystemState() -> void;
+    auto createPromelaObjectsForTimers() -> void;
     auto createTimerInlinesForFunction(const QString &functionName, const QString &timerName,
-            const promela::model::VariableRef &timerData) const -> void;
-    auto createGlobalTimerObjects(const std::map<QString, promela::model::VariableRef> &timerSignals) const -> void;
-    auto createWaitForInitStatement() const -> std::unique_ptr<model::ProctypeElement>;
-    auto createPromelaObjectsForObservers() const -> void;
+            const promela::model::VariableRef &timerData) -> void;
+    auto createGlobalTimerObjects(const std::map<QString, promela::model::VariableRef> &timerSignals) -> void;
+    auto createWaitForInitStatement() -> std::unique_ptr<model::ProctypeElement>;
+    auto createPromelaObjectsForObservers() -> void;
 
-    auto createLockAcquireStatement(const QString &functionName) const -> std::unique_ptr<model::ProctypeElement>;
-    auto createLockReleaseStatement(const QString &functionName) const -> std::unique_ptr<model::ProctypeElement>;
-    auto createProcessInlineCall(const QString &inlineName, const QString &parameterType,
-            const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
+    auto createLockAcquireStatement(const QString &functionName) -> std::unique_ptr<model::ProctypeElement>;
+    auto createLockReleaseStatement(const QString &functionName) -> std::unique_ptr<model::ProctypeElement>;
+    auto createProcessInlineCall(const QString &inlineName, const QString &parameterType, const QString &parameterName)
+            -> std::unique_ptr<model::ProctypeElement>;
     auto createReceiveStatement(const QString &functionName, const QString &channelName, const QString &parameterType,
-            const QString &parameterName) const -> std::unique_ptr<model::ProctypeElement>;
+            const QString &parameterName) -> std::unique_ptr<model::ProctypeElement>;
 
-    auto getFunctionLockChannelName(const QString &functionName) const -> QString;
+    auto getFunctionLockChannelName(const QString &functionName) -> QString;
 
     auto handleParameterSubtype(const QString &parameterTypeName, const QString &parameterName,
-            const QString &interfaceName, const QString &functionName) const -> QString;
+            const QString &interfaceName, const QString &functionName) -> QString;
     auto handleSendInlineArgument(const QString &parameterType, const QString &functionName,
-            const QString &interfaceName, const QString parameterName) const -> QString;
+            const QString &interfaceName, const QString parameterName) -> QString;
     auto buildParameterSubtypeName(
-            const QString &functionName, const QString &interfaceName, const QString &parameterName) const -> QString;
-    auto createChannel(const QString &channelName, const QString &messageType, size_t channelSize) const -> void;
+            const QString &functionName, const QString &interfaceName, const QString &parameterName) -> QString;
+    auto createChannel(const QString &channelName, const QString &messageType, size_t channelSize) -> void;
 
 private:
     inline static const QString m_systemInitedVariableName = "inited";
@@ -97,5 +95,6 @@ private:
 private:
     IvToPromelaTranslatorContext &m_context;
     SystemInfo &m_systemInfo;
+    QSet<QString> m_createdChannels;
 };
 }
