@@ -45,6 +45,9 @@ namespace cmd {
 
 inline bool isRectangularType(ivm::IVObject *obj)
 {
+    if (!obj)
+        return false;
+
     return obj->isComment() || obj->isFunction() || obj->isFunctionType();
 }
 
@@ -361,7 +364,7 @@ QList<QRectF> CmdEntitiesImport::existingModelRects() const
 {
     QList<QRectF> existingRects;
     for (const auto &obj : m_model->allObjectsByType<shared::VEObject>()) {
-        if (obj->parentObject() == m_parent) {
+        if (obj->parentObject() == m_parent && isRectangularType(obj->as<ivm::IVObject *>())) {
             const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
             if (objRect.isValid()) {
                 existingRects.append(objRect);
