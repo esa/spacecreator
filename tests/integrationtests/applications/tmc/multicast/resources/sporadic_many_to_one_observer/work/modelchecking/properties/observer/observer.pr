@@ -1,0 +1,48 @@
+system observer;
+    /* CIF TEXT (144, 214), (531, 140) */
+    use datamodel comment 'observer.asn';
+    
+    signal test_in(MyInteger) renames input test_parameter from actuator1 to controller;
+    /* CIF ENDTEXT */
+    channel c
+        from env to observer with test_in;
+    endchannel;
+    block observer;
+        signalroute r
+            from env to observer with test_in;
+        connect c and r;
+        /* CIF PROCESS (259, 87), (150, 75) */
+        process observer;
+            /* CIF TEXT (0, 57), (222, 140) */
+            monitor st System_State;
+            
+            monitor event Observable_Event;
+            
+            errorstates error;
+            /* CIF ENDTEXT */
+            /* CIF START (363, 74), (70, 35) */
+            START;
+                /* CIF NEXTSTATE (340, 129), (115, 35) */
+                NEXTSTATE Wait_For_Event;
+            /* CIF state (339, 288), (115, 35) */
+            state Wait_For_Event;
+                /* CIF input (343, 343), (106, 35) */
+                input test_in(myval);
+                    /* CIF decision (362, 398), (70, 50) */
+                    decision myval;
+                        /* CIF ANSWER (317, 468), (70, 23) */
+                        (1):
+                            /* CIF NEXTSTATE (294, 511), (115, 35) */
+                            NEXTSTATE Wait_For_Event;
+                        /* CIF ANSWER (420, 468), (70, 23) */
+                        else:
+                            /* CIF NEXTSTATE (420, 511), (70, 35) */
+                            NEXTSTATE error;
+                    enddecision;
+            endstate;
+            /* CIF state (614, 98), (70, 35) */
+            state error;
+            endstate;
+        endprocess observer;
+    endblock;
+endsystem;

@@ -169,15 +169,48 @@ std::list<std::unique_ptr<promela::model::ProctypeElement>> IvToPromelaGenerator
     auto attachments =
             m_context.getObserverAttachments(functionName, interfaceName, ObserverAttachment::Kind::Kind_Input);
     for (const auto &attachment : attachments) {
-        result.push_back(createLockAcquireStatement(attachment.observer()));
+        // if multicast is and observer has explicit 'from' function, then wrap call using alternative
+        if (m_context.isMulticastSupported() && attachment.fromFunction().has_value()) {
+            const QString senderVariableName = QString("%1_sender").arg(Escaper::escapePromelaField(functionName));
+            const QString pidName =
+                    QString("PID_%1").arg(Escaper::escapePromelaField(attachment.fromFunction().value()));
+            Conditional cond;
 
-        QList<InlineCall::Argument> arguments;
-        if (!parameterType.isEmpty()) {
-            arguments.append(VariableRef(parameterName));
+            std::unique_ptr<Sequence> processSeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+            std::unique_ptr<Expression> left = std::make_unique<Expression>(VariableRef(senderVariableName));
+            std::unique_ptr<Expression> right = std::make_unique<Expression>(VariableRef(pidName));
+            processSeq->appendElement(std::make_unique<ProctypeElement>(Expression(
+                    BinaryExpression(BinaryExpression::Operator::EQUAL, std::move(left), std::move(right)))));
+
+            processSeq->appendElement(createLockAcquireStatement(attachment.observer()));
+
+            QList<InlineCall::Argument> arguments;
+            if (!parameterType.isEmpty()) {
+                arguments.append(VariableRef(parameterName));
+            }
+            processSeq->appendElement(
+                    std::make_unique<ProctypeElement>(InlineCall(observerInputSignalName(attachment), arguments)));
+
+            processSeq->appendElement(createLockReleaseStatement(attachment.observer()));
+
+            std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
+            emptySeq->appendElement(ElseStatement());
+            emptySeq->appendElement(Skip());
+            cond.appendAlternative(std::move(emptySeq));
+
+            result.push_back(std::make_unique<ProctypeElement>(std::move(cond)));
+        } else {
+            result.push_back(createLockAcquireStatement(attachment.observer()));
+
+            QList<InlineCall::Argument> arguments;
+            if (!parameterType.isEmpty()) {
+                arguments.append(VariableRef(parameterName));
+            }
+            result.push_back(
+                    std::make_unique<ProctypeElement>(InlineCall(observerInputSignalName(attachment), arguments)));
+
+            result.push_back(createLockReleaseStatement(attachment.observer()));
         }
-        result.push_back(std::make_unique<ProctypeElement>(InlineCall(observerInputSignalName(attachment), arguments)));
-
-        result.push_back(createLockReleaseStatement(attachment.observer()));
     }
 
     return result;

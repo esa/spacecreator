@@ -1,0 +1,92 @@
+<InterfaceView version="1.1" asn1file="sporadic_many_to_one_observer.acn">
+<Function id="{44dfc6e1-e8b7-43ff-8194-9f7bfa8ac5d6}" name="controller" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_min="1" instances_max="1" startup_priority="1">
+    <Property name="Taste::coordinates" value="-20800 1200 13700 61200"/>
+<Provided_Interface id="{227b2253-c67f-46d2-9eb0-c780e471a247}" name="test_parameter" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" priority="1" wcet="0" queue_size="1">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="13700 31000"/>
+</Provided_Interface>
+
+<Required_Interface id="{60c6db25-6a94-4e54-87d2-276ba72445b3}" name="trigger1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" priority="1" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="13700 7100"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{22adbc7c-cd94-4389-af54-57daf8d4d6d3}" name="trigger2" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" priority="1" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="13700 54900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{0ad8f6cd-36d9-487c-a771-9604c1a01555}" name="actuator2" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_min="1" instances_max="1" startup_priority="1">
+    <Property name="Taste::coordinates" value="39200 35700 72300 69300"/>
+<Provided_Interface id="{52466684-72e2-413d-8354-ef73bf42de11}" name="trigger2" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" priority="1" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="39200 56000"/>
+</Provided_Interface>
+
+<Required_Interface id="{019549aa-1c02-4362-8e95-65d34e7dfe92}" name="test_parameter" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" priority="1" wcet="0" queue_size="1">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="39200 45800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{b1102e38-e7e6-4c9f-b371-020d6e9a52f2}" name="actuator1" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_min="1" instances_max="1" startup_priority="1">
+    <Property name="Taste::coordinates" value="38500 -7700 74100 27300"/>
+<Provided_Interface id="{509b9dcd-b8da-4ae2-a097-b100633db8f0}" name="trigger1" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" priority="1" wcet="0" queue_size="1">
+    <Property name="Taste::coordinates" value="38500 7300"/>
+</Provided_Interface>
+
+<Required_Interface id="{8fdf14e2-8c1f-4a47-8e25-d76beb979565}" name="test_parameter" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" stack_size="1024" priority="1" wcet="0" queue_size="1">
+    <Input_Parameter name="p1" type="MyInteger" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="38500 22500"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection id="{45e0180a-6de0-412e-a412-740cf7c10c94}" required_system_element="NO">
+    <Source func_name="actuator1" ri_name="test_parameter"/>
+    <Target func_name="controller" pi_name="test_parameter"/>
+    <Property name="Taste::coordinates" value="37900 22500 26000 22500 26000 31000 14000 31000"/>
+</Connection>
+
+<Connection id="{29030f62-fffa-4925-af72-e1fa8765f98d}" required_system_element="NO">
+    <Source func_name="controller" ri_name="trigger1"/>
+    <Target func_name="actuator1" pi_name="trigger1"/>
+    <Property name="Taste::coordinates" value="14300 7100 38200 7300"/>
+</Connection>
+
+<Connection id="{8f57c06f-9423-4dc0-96d0-aaf5b14739f4}" required_system_element="NO">
+    <Source func_name="actuator2" ri_name="test_parameter"/>
+    <Target func_name="controller" pi_name="test_parameter"/>
+    <Property name="Taste::coordinates" value="38600 45800 26300 45800 26300 31000 14000 31000"/>
+</Connection>
+
+<Connection id="{089b4385-3b4f-4e50-985a-fc0f769624ef}" required_system_element="NO">
+    <Source func_name="controller" ri_name="trigger2"/>
+    <Target func_name="actuator2" pi_name="trigger2"/>
+    <Property name="Taste::coordinates" value="14300 54900 26600 54900 26600 56000 38900 56000"/>
+</Connection>
+
+<Comment id="{28e3afdb-0305-4b2e-b54e-e06d92f28711}" name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3" required_system_element="NO">
+    <Property name="Taste::coordinates" value="-4300 -28400 37000 -12800"/>
+</Comment>
+
+<Layer name="default"/>
+
+</InterfaceView>
