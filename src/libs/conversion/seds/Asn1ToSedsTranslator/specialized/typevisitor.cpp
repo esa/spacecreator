@@ -344,9 +344,9 @@ static inline auto createIntegerType(
 template<typename EntryType>
 static inline auto setEntryNameAndType(EntryType &entry, const QString &typeName, const QString &name) -> void
 {
-    ::seds::model::DataTypeRef reference(typeName);
+    ::seds::model::DataTypeRef reference(Escaper::escapeIvName(typeName));
     entry.setType(std::move(reference));
-    entry.setName(name);
+    entry.setName(Escaper::escapeIvName(name));
 }
 
 static inline auto getTypeName(const ::seds::model::DataType &type) -> QString
