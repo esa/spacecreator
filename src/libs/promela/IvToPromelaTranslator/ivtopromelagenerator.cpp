@@ -193,6 +193,8 @@ std::list<std::unique_ptr<promela::model::ProctypeElement>> IvToPromelaGenerator
 
             processSeq->appendElement(createLockReleaseStatement(attachment.observer()));
 
+            cond.appendAlternative(std::move(processSeq));
+
             std::unique_ptr<Sequence> emptySeq = std::make_unique<Sequence>(Sequence::Type::NORMAL);
             emptySeq->appendElement(ElseStatement());
             emptySeq->appendElement(Skip());
