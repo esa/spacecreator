@@ -49,11 +49,11 @@
         },
         {
             "key": "ProjectNameUpperCase",
-            "value": "%{JS: '%{ProjectName}'.toUpperCase()}"
+            "value": "%{JS: '%{ProjectName}'.toUpperCase().replace('_', '-')}"
         },
         {
             "key": "ProjectNameLowerCase",
-            "value": "%{JS: '%{ProjectName}'.toLowerCase()}"
+            "value": "%{JS: '%{ProjectName}'.toLowerCase().replace('_', '-')}"
         },
         {
             "key": "IVAsnFile",
