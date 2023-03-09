@@ -18,13 +18,11 @@ all:	release
 release:	work/glue_release
 	rm -rf work/glue_debug
 	rm -rf work/glue_coverage
-#	$(MAKE) -C work check_targets
 	$(MAKE) -C work
 
 debug:	work/glue_debug
 	rm -rf work/glue_release
 	rm -rf work/glue_coverage
-#	$(MAKE) -C work check_targets
 	$(MAKE) -C work
 
 run:
@@ -42,6 +40,14 @@ uninstall:
 uninstall-all:
 	rm -r $(COMMUNICATION_DEVICE_PATH)/*
 	$(SNIPPETS_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
+
+skeletons:
+	$(MAKE) work/skeletons_built
+
+work/skeletons_built:	InterfaceView.aadl DataView.aadl
+	$(KAZOO) --gw -o work
+	$(MAKE) -C work dataview
+	touch $@
 
 work/glue_release:	InterfaceView.aadl DeploymentView.aadl DataView.aadl
 	sed -i 's/CoverageEnabled => true/CoverageEnabled => false/g' DeploymentView.aadl || :
@@ -78,7 +84,7 @@ clean:
 	rm -f work/glue_release work/glue_debug work/glue_coverage work/skeletons_built
 	find work -type d -name "wrappers" -exec rm -rf {} + || :
 	find work -type d -name "*_GUI" -exec rm -rf {} + || :
-	find work -type d -path "*/QGenC/xmi" -exec rm -rf {} + || : 
-	find work -type d -path "*/QGenC/src/.qgeninfo" -exec rm -rf {} + || : 
-	find work -type f -path "*/QGenC/src/*.h" -exec rm -f {} + || : 
-	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || : 
+	find work -type d -path "*/QGenC/xmi" -exec rm -rf {} + || :
+	find work -type d -path "*/QGenC/src/.qgeninfo" -exec rm -rf {} + || :
+	find work -type f -path "*/QGenC/src/*.h" -exec rm -f {} + || :
+	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || :
