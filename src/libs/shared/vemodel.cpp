@@ -44,13 +44,17 @@ bool VEModel::isEmpty() const
 
 bool VEModel::addObject(VEObject *obj)
 {
-    if (addObjectImpl(obj)) {
-        if (!obj->postInit()) {
-            removeObject(obj);
-        } else {
-            Q_EMIT objectsAdded({ obj->id() });
-            return true;
+    try {
+        if (addObjectImpl(obj)) {
+            if (!obj->postInit()) {
+                removeObject(obj);
+            } else {
+                Q_EMIT objectsAdded({ obj->id() });
+                return true;
+            }
         }
+    } catch (InconsistentModelException &e) {
+        qDebug() << e.what();
     }
     return false;
 }

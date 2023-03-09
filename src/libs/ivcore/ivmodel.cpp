@@ -80,7 +80,6 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
             return true;
         }
     }
-
     return false;
 }
 

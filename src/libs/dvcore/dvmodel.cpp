@@ -210,15 +210,19 @@ QList<DVFunction *> DVModel::functions(DVNode *node) const
 
 bool DVModel::addObjectImpl(shared::VEObject *obj)
 {
-    if (shared::VEModel::addObjectImpl(obj)) {
-        if (obj->hasEntityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::asn1file))) {
-            const QString asn1file =
-                    obj->entityAttributeValue<QString>(dvm::meta::Props::token(dvm::meta::Props::Token::asn1file));
-            if (!QFile::exists(asn1file)) {
-                shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("ASN1File doesn't exists: %1").arg(asn1file));
+    try {
+        if (shared::VEModel::addObjectImpl(obj)) {
+            if (obj->hasEntityAttribute(dvm::meta::Props::token(dvm::meta::Props::Token::asn1file))) {
+                const QString asn1file =
+                        obj->entityAttributeValue<QString>(dvm::meta::Props::token(dvm::meta::Props::Token::asn1file));
+                if (!QFile::exists(asn1file)) {
+                    shared::ErrorHub::addError(shared::ErrorItem::Warning, tr("ASN1File doesn't exists: %1").arg(asn1file));
+                }
             }
+            return true;
         }
-        return true;
+    } catch (InconsistentModelException &e) {
+        qDebug() << e.what();
     }
     return false;
 }
