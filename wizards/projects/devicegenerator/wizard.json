@@ -49,11 +49,11 @@
         },
         {
             "key": "ProjectNameUpperCase",
-            "value": "%{JS: '%{ProjectName}'.toUpperCase().replace(/[_-]+/g, '-')}"
+            "value": "%{JS: '%{ProjectName}'.toUpperCase().replace(/^[_-]+|[-_]+$/g, '').replace(/[_-]+/g, '-')}"
         },
         {
             "key": "ProjectNameLowerCase",
-            "value": "%{JS: '%{ProjectName}'.toLowerCase().replace(/[_-]+/g, '-')}"
+            "value": "%{JS: '%{ProjectName}'.toLowerCase().replace(/^[_-]+|[-_]+$/g, '').replace(/[_-]+/g, '-')}"
         },
         {
             "key": "IVAsnFile",
