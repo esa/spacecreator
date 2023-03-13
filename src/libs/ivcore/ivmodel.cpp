@@ -19,11 +19,11 @@
 
 #include "common.h"
 #include "errorhub.h"
+#include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
-#include "ivarchetypelibraryreference.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 
@@ -49,7 +49,7 @@ IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedM
     d->m_layersModel = nullptr;
 }
 
-IVModel::~IVModel() {}
+IVModel::~IVModel() { }
 
 bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
@@ -227,8 +227,8 @@ IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
 
 IVFunctionType *IVModel::getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(d->m_sharedTypesModel->getObjectByName(
-                                           name, IVObject::Type::FunctionType, caseSensitivity))
+    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(
+                   d->m_sharedTypesModel->getObjectByName(name, IVObject::Type::FunctionType, caseSensitivity))
                                  : nullptr;
 }
 
@@ -333,6 +333,23 @@ QVector<IVConnection *> IVModel::getConnectionsForIface(const shared::Id &id) co
         }
     }
     return result;
+}
+
+/*!
+ * Returns all connections that start/end at this or any clone of this interface
+ */
+QVector<IVConnection *> IVModel::getRelatedConnections(IVInterface *interface) const
+{
+    QVector<ivm::IVConnection *> affected;
+
+    if (interface && interface->model()) {
+        IVModel *model = interface->model();
+        affected += model->getConnectionsForIface(interface->id());
+        for (const auto &i : interface->clones()) {
+            affected += model->getConnectionsForIface(i->id());
+        }
+    }
+    return affected;
 }
 
 void IVModel::setConnectionLayersModel(IVModel *layersModel)

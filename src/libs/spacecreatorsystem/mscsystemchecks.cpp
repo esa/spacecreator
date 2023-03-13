@@ -17,9 +17,6 @@
 
 #include "mscsystemchecks.h"
 
-#include "chartlayoutmanager.h"
-#include "commands/cmdfunctionattrchange.h"
-#include "commands/cmdifaceattrchange.h"
 #include "commandsstack.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
@@ -29,10 +26,8 @@
 #include "dvsystemchecks.h"
 #include "interfacedocument.h"
 #include "ivconnection.h"
-#include "ivconnectionchain.h"
 #include "iveditorcore.h"
 #include "ivfunction.h"
-#include "ivinterface.h"
 #include "ivmodel.h"
 #include "ivsystemchecks.h"
 #include "mainmodel.h"
@@ -65,10 +60,6 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
     });
 
     connect(m_storage, &scs::SpaceCreatorProject::ivCoreAdded, this, [this](IVEditorCorePtr ivCore) {
-        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::nameChanged, this,
-                &scs::MscSystemChecks::onEntityNameChanged);
-        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entitiesRemoved, this,
-                &scs::MscSystemChecks::onEntitiesRemoved);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::implementationChanged, this,
                 &scs::MscSystemChecks::onImplementationChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::defaultImplementationChanged, this,
@@ -119,16 +110,6 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
 }
 
 /*!
-   Removes all instance that are corresponding to the function \p ivFunction
- */
-void MscSystemChecks::removeMscInstances(ivm::IVFunction *ivFunction)
-{
-    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
-        mscCore->removeMscInstances(ivFunction);
-    }
-}
-
-/*!
    Returns if there is at least one msc instance corresponding to \p ivFunction
  */
 bool MscSystemChecks::hasCorrespondingInstances(ivm::IVFunction *ivFunction) const
@@ -175,16 +156,6 @@ void MscSystemChecks::changeMscMessageName(
 }
 
 /*!
-   Removes all messages that are corresponding to the connection \p ivConnection
- */
-void MscSystemChecks::removeMscMessages(ivm::IVConnection *ivConnection)
-{
-    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
-        mscCore->removeMscMessages(ivConnection);
-    }
-}
-
-/*!
    Returns if there is at least one msc message corresponding to \p ivConnection
  */
 bool MscSystemChecks::hasCorrespondingMessages(ivm::IVConnection *ivConnection) const
@@ -195,6 +166,26 @@ bool MscSystemChecks::hasCorrespondingMessages(ivm::IVConnection *ivConnection) 
         }
     }
     return false;
+}
+
+/*!
+ * Returns all messges that have the names of the message, source and target as in the parameters
+ */
+QList<msc::MscMessage *> MscSystemChecks::allMessages(
+        const QString &messageName, const QString &sourceName, const QString &targetName)
+{
+    QList<msc::MscMessage *> messages;
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
+        for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
+            for (msc::MscMessage *message : chart->messages()) {
+                if (message->name() == messageName && message->sourceName() == sourceName
+                        && message->targetName() == targetName) {
+                    messages.append(message);
+                }
+            }
+        }
+    }
+    return messages;
 }
 
 /*!
@@ -312,16 +303,6 @@ void MscSystemChecks::changeDvFunctionBindingName(const QString &oldName, const 
 }
 
 /*!
-   Removes all function bindings that are corresponding to the function \p ivFunction
- */
-void MscSystemChecks::removeDvFunctionBinding(ivm::IVFunction *ivFunction)
-{
-    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
-        dvCore->removeDvFunctionBinding(ivFunction->title());
-    }
-}
-
-/*!
    Update all DV message bindings interface name, that match the name, source/target function and message side/end
  */
 void MscSystemChecks::changeDvMessageBindingName(const QString &oldName, const QString &name, const QString &sourceName,
@@ -329,96 +310,6 @@ void MscSystemChecks::changeDvMessageBindingName(const QString &oldName, const Q
 {
     for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->changeDvMessageBindingIfName(oldName, name, sourceName, targetName, msgSide);
-    }
-}
-
-/*!
-   Removes all message bindings that are corresponding to the function \p ivFunction
- */
-void MscSystemChecks::removeDvMessageBinding(ivm::IVConnection *ivConnection)
-{
-    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
-        dvCore->removeDvMessageBinding(ivConnection->sourceName(), ivConnection->sourceInterfaceName(),
-                ivConnection->targetName(), ivConnection->targetInterfaceName());
-    }
-}
-
-void MscSystemChecks::onEntityNameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command)
-{
-    if (m_nameUpdateRunning) {
-        return;
-    }
-
-    auto cmdAttribChange = dynamic_cast<ive::cmd::CmdFunctionAttrChange *>(command);
-    if (cmdAttribChange) {
-        if (ivFunctionUsed(oldName)) {
-            if (command->isFirstChange()) {
-                const int result = QMessageBox::question(
-                        nullptr, tr("Update instances"), tr("Do you want to update MSC instances / DV bindings?"));
-                if (result == QMessageBox::Yes) {
-                    m_nameUpdateRunning = true;
-                    changeMscInstanceName(oldName, entity->title());
-                    changeDvFunctionBindingName(oldName, entity->title());
-                    m_nameUpdateRunning = false;
-                }
-            } else {
-                changeMscInstanceName(oldName, entity->title());
-                changeDvFunctionBindingName(oldName, entity->title());
-            }
-        }
-    }
-
-    auto cmdIfaceAttribChange = dynamic_cast<ive::cmd::CmdIfaceAttrChange *>(command);
-    if (cmdIfaceAttribChange) {
-        ivm::IVInterface *interface = cmdIfaceAttribChange->interface();
-        QList<QStringList> messagesData;
-        shared::MessageEnd msgEnd = shared::TARGET;
-        if (interface->direction() == ivm::IVInterface::InterfaceType::Provided) {
-            // Update from connections
-            QVector<ivm::IVConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
-            for (const ivm::IVConnection *connection : qAsConst(connections)) {
-                if (mscMessagesExist(oldName, connection->sourceName(), connection->targetName())
-                        || dvMessagesExist(oldName, connection->sourceName(), connection->targetName(), msgEnd)) {
-                    messagesData << QStringList({ connection->sourceName(), connection->targetName() });
-                }
-            }
-            // Update from cyclic interfaces
-            ivm::IVFunctionType *func = interface->function();
-            if (func && interface->kind() == ivm::IVInterface::OperationKind::Cyclic) {
-                if (mscMessagesExist(oldName, func->title(), "")) {
-                    messagesData << QStringList({ func->title(), "" });
-                }
-                if (mscMessagesExist(oldName, "", func->title())) {
-                    messagesData << QStringList({ "", func->title() });
-                }
-            }
-        } else {
-            msgEnd = shared::SOURCE;
-            QVector<ivm::IVConnection *> connections = cmdIfaceAttribChange->getRelatedConnections();
-            for (const ivm::IVConnection *connection : qAsConst(connections)) {
-                if (dvMessagesExist(oldName, connection->sourceName(), connection->targetName(), msgEnd)) {
-                    messagesData << QStringList({ connection->sourceName(), connection->targetName() });
-                }
-            }
-        }
-
-        if (!messagesData.isEmpty()) {
-            if (command->isFirstChange()) {
-                const int result = QMessageBox::question(
-                        nullptr, tr("Update messages"), tr("Do you want to update MSC messages / DV bindings?"));
-                if (result == QMessageBox::Yes) {
-                    for (const QStringList &data : qAsConst(messagesData)) {
-                        changeMscMessageName(oldName, entity->title(), data[0], data[1]);
-                        changeDvMessageBindingName(oldName, entity->title(), data[0], data[1], msgEnd);
-                    }
-                }
-            } else {
-                for (const QStringList &data : qAsConst(messagesData)) {
-                    changeMscMessageName(oldName, entity->title(), data[0], data[1]);
-                    changeDvMessageBindingName(oldName, entity->title(), data[0], data[1], msgEnd);
-                }
-            }
-        }
     }
 }
 
@@ -544,58 +435,6 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 changeDvMessageBindingName(oldName, message->name(), fromName, toName, shared::TARGET);
                 m_nameUpdateRunning = false;
             }
-        }
-    }
-}
-
-/*!
-   Removes corresponding MSC entities when a IV entity was removed
- */
-void MscSystemChecks::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command)
-{
-    if (entities.isEmpty()) {
-        return;
-    }
-
-    QStringList removedNames;
-    QList<ivm::IVFunction *> removedFunctions;
-    QList<ivm::IVConnection *> removedConnections;
-    for (const QPointer<ivm::IVObject> &entity : entities) {
-        if (!entity) {
-            continue;
-        }
-        if (entity->type() == ivm::IVObject::Type::Function) {
-            removedFunctions.append(qobject_cast<ivm::IVFunction *>(entity));
-        } else if (entity->type() == ivm::IVObject::Type::Connection) {
-            removedConnections.append(qobject_cast<ivm::IVConnection *>(entity));
-        } else {
-            continue;
-        }
-        removedNames.append(entity->title());
-    }
-
-    if (removedNames.isEmpty()) {
-        return;
-    }
-
-    bool doRemove = true;
-    if (command->isFirstChange()) {
-        const int result = QMessageBox::question(nullptr, tr("Remove MSC/DV entities"),
-                tr("The IV entity(ies) %1 was(were) removed."
-                   "\nDo you want to remove the correlating MSC/DV entities?")
-                        .arg(removedNames.join(QLatin1String(", "))));
-        if (result != QMessageBox::Yes) {
-            doRemove = false;
-        }
-    }
-    if (doRemove) {
-        for (auto ivFunction : qAsConst(removedFunctions)) {
-            removeMscInstances(ivFunction);
-            removeDvFunctionBinding(ivFunction);
-        }
-        for (auto ivConnection : qAsConst(removedConnections)) {
-            removeMscMessages(ivConnection);
-            removeDvMessageBinding(ivConnection);
         }
     }
 }

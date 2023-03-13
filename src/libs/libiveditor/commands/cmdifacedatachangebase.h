@@ -42,7 +42,7 @@ class CmdIfaceDataChangeBase : public shared::cmd::CmdEntityAttributesChange
 public:
     ~CmdIfaceDataChangeBase() override;
 
-    virtual QVector<ivm::IVConnection *> getRelatedConnections();
+    QVector<ivm::IVConnection *> getRelatedConnections();
     ivm::IVInterface *interface() const;
 
 Q_SIGNALS:
@@ -63,7 +63,6 @@ protected:
     const QVariant m_oldValue, m_newValue;
     QVector<QUndoCommand *> m_cmdRmConnection;
 
-    virtual QVector<QPointer<ivm::IVInterface>> getRelatedIfaces();
     virtual bool connectionMustDie(const ivm::IVConnection *connection) const = 0;
     static ivm::IVInterface *getConnectionOtherSide(
             const ivm::IVConnection *connection, ivm::IVInterface *changedIface);

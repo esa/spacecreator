@@ -1,0 +1,17 @@
+mscdocument Untitled_Leaf /* MSC LEAF */;
+msc Untitled_MSC;
+instance Function_1;
+  out notch to Function_B;
+  in done from Function_33;
+  in Msg1ABC from env;
+endinstance;
+instance Function_B;
+  in notch from Function_1;
+  out init to Function_33;
+endinstance;
+instance Function_33;
+  in init from Function_B;
+  out done to Function_1;
+endinstance;
+endmsc;
+endmscdocument;

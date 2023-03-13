@@ -80,6 +80,7 @@ public:
 
     IVConnection *getConnectionForIface(const shared::Id &id) const;
     QVector<IVConnection *> getConnectionsForIface(const shared::Id &id) const;
+    QVector<ivm::IVConnection *> getRelatedConnections(IVInterface *interface) const;
 
     QVector<IVConnection *> getConnectionsForFunction(const shared::Id &id) const;
 

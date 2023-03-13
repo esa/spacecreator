@@ -37,10 +37,14 @@ class EditorCore;
 }
 
 namespace scs {
+
+class MSCRefactor;
+class DVRefactor;
 class DvSystemChecks;
+class IVRefactorHandler;
 class IvSystemChecks;
-class MscSystemChecks;
 class IvSystemQueries;
+class MscSystemChecks;
 
 /*!
    \brief Contains all data of project (of all files).
@@ -108,6 +112,9 @@ protected:
     std::unique_ptr<scs::DvSystemChecks> m_dvChecks;
     std::unique_ptr<Asn1Acn::Asn1ModelStorage> m_asn1Storage;
     std::unique_ptr<Asn1Acn::Asn1SystemChecks> m_asnChecks;
+    std::unique_ptr<scs::IVRefactorHandler> m_ivRefactorHandler;
+    std::unique_ptr<scs::MSCRefactor> m_mscRefactor;
+    std::unique_ptr<scs::DVRefactor> m_dvRefactor;
 };
 
 } // namespace scs

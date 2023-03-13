@@ -19,6 +19,7 @@
 
 #include "common.h"
 
+#include <QList>
 #include <QPointer>
 #include <QSharedPointer>
 #include <QVector>
@@ -35,6 +36,7 @@ class IVEditorCore;
 
 namespace msc {
 class MSCEditorCore;
+class MscMessage;
 }
 
 namespace shared {
@@ -61,14 +63,14 @@ public:
     // MSC functions
     bool ivFunctionUsed(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
-    void removeMscInstances(ivm::IVFunction *ivFunction);
     bool hasCorrespondingInstances(ivm::IVFunction *ivFunction) const;
 
     bool mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName);
     void changeMscMessageName(
             const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
-    void removeMscMessages(ivm::IVConnection *ivConnection);
     bool hasCorrespondingMessages(ivm::IVConnection *ivConnection) const;
+    QList<msc::MscMessage *> allMessages(
+            const QString &messageName, const QString &sourceName, const QString &targetName);
 
     void checkInstances();
     void checkMessages();
@@ -77,15 +79,11 @@ public:
     bool dvMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName,
             shared::MessageEnd msgSide);
     void changeDvFunctionBindingName(const QString &oldName, const QString &name);
-    void removeDvFunctionBinding(ivm::IVFunction *ivFunction);
     void changeDvMessageBindingName(const QString &oldName, const QString &name, const QString &sourceName,
             const QString &targetName, shared::MessageEnd msgSide);
-    void removeDvMessageBinding(ivm::IVConnection *ivConnection);
 
 public Q_SLOTS:
-    void onEntityNameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
     void onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command);
     void onImplementationChanged(
             ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
     void onDefaultImplementationChanged();

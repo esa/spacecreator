@@ -45,7 +45,7 @@ static inline EntityAttribute::Type entityType(
 CmdIfaceDataChangeBase::CmdIfaceDataChangeBase(shared::PropertyTemplateConfig *config, ivm::IVInterface *iface,
         const QString &targetName, const QVariant &targetValue, const QVariant &prevValue, QUndoCommand *parent)
     : shared::cmd::CmdEntityAttributesChange(
-              config, iface, { EntityAttribute { targetName, targetValue, entityType(config, iface, targetName) } })
+            config, iface, { EntityAttribute { targetName, targetValue, entityType(config, iface, targetName) } })
     , m_iface(iface)
     , m_model(m_iface ? m_iface->model() : nullptr)
     , m_relatedConnections()
@@ -65,28 +65,13 @@ CmdIfaceDataChangeBase::~CmdIfaceDataChangeBase()
     qDeleteAll(m_cmdRmConnection);
 }
 
-QVector<QPointer<ivm::IVInterface>> CmdIfaceDataChangeBase::getRelatedIfaces()
-{
-    QVector<QPointer<ivm::IVInterface>> ifaces;
-
-    if (m_iface) {
-        ifaces.append(m_iface);
-        for (const auto &clone : m_iface->clones())
-            ifaces.append(clone);
-    }
-
-    return ifaces;
-}
-
 QVector<ivm::IVConnection *> CmdIfaceDataChangeBase::getRelatedConnections()
 {
-    QVector<ivm::IVConnection *> affected;
+    if (!m_model) {
+        return {};
+    }
 
-    if (m_iface && m_model)
-        for (const auto &i : getRelatedIfaces())
-            affected += m_model->getConnectionsForIface(i->id());
-
-    return affected;
+    return m_model->getRelatedConnections(m_iface);
 }
 
 ivm::IVInterface *CmdIfaceDataChangeBase::interface() const

@@ -19,17 +19,21 @@
 
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
+#include "commandsstack.h"
 #include "common.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
+#include "dvrefactor.h"
 #include "dvsystemchecks.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
-#include "itemeditor/common/ivutils.h"
+#include "iveditorcore.h"
+#include "ivrefactorhandler.h"
 #include "ivsystemchecks.h"
 #include "ivsystemqueries.h"
 #include "mainmodel.h"
 #include "mscmodel.h"
+#include "mscrefactor.h"
 #include "mscsystemchecks.h"
 
 #include <QDebug>
@@ -45,15 +49,31 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     , m_dvChecks(new DvSystemChecks)
     , m_asn1Storage(new Asn1Acn::Asn1ModelStorage)
     , m_asnChecks(new Asn1Acn::Asn1SystemChecks)
+    , m_ivRefactorHandler(std::make_unique<scs::IVRefactorHandler>())
+    , m_mscRefactor(std::make_unique<scs::MSCRefactor>())
+    , m_dvRefactor(std::make_unique<scs::DVRefactor>())
 {
     m_mscChecks->setStorage(this);
     m_dvChecks->setStorage(this);
 
     m_asnChecks->setAsn1Storage(m_asn1Storage.get());
     m_asnChecks->setProject(this);
+
+    m_mscRefactor->setStorage(this);
+    m_mscRefactor->setMscChecks(m_mscChecks.get());
+    m_ivRefactorHandler->registerRefactor(m_mscRefactor.get());
+    m_dvRefactor->setStorage(this);
+    m_ivRefactorHandler->registerRefactor(m_dvRefactor.get());
+
+    connect(this, &scs::SpaceCreatorProject::ivCoreAdded, this, [this](IVEditorCorePtr ivCore) {
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::nameChanged, m_ivRefactorHandler.get(),
+                &scs::IVRefactorHandler::onIVEntityNameChanged);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entitiesRemoved, m_ivRefactorHandler.get(),
+                &scs::IVRefactorHandler::onEntitiesRemoved);
+    });
 }
 
-SpaceCreatorProject::~SpaceCreatorProject() {}
+SpaceCreatorProject::~SpaceCreatorProject() { }
 
 QString SpaceCreatorProject::projectPath() const
 {

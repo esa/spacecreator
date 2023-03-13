@@ -98,6 +98,17 @@ void MscMessage::setSourceInstance(MscInstance *source)
     Q_EMIT dataChanged();
 }
 
+/*!
+ * Returns the name of the source instance. If the source does not exist, an empty string is returned.
+ */
+QString MscMessage::sourceName() const
+{
+    if (!m_source) {
+        return {};
+    }
+    return m_source->name();
+}
+
 MscInstance *MscMessage::targetInstance() const
 {
     return m_target;
@@ -114,6 +125,17 @@ void MscMessage::setTargetInstance(MscInstance *target)
     Q_EMIT targetChanged(m_target);
     Q_EMIT instanceRelationChanged(m_target, oldInstance);
     Q_EMIT dataChanged();
+}
+
+/*!
+ * Returns the name of the target instance. If the target does not exist, an empty string is returned.
+ */
+QString MscMessage::targetName() const
+{
+    if (!m_target) {
+        return {};
+    }
+    return m_target->name();
 }
 
 MscEntity::EntityType MscMessage::entityType() const

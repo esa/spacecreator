@@ -1,0 +1,31 @@
+<DeploymentView version="1.1">
+    <Node id="{2ace34f9-6943-4645-9de6-c7847c846bad}" name="x86 (Linux/C++)_2" type="ocarina_processors_x86::x86.linux" node_label="Node_4" namespace="ocarina_processors_x86">
+        <Property name="Taste::coordinates" value="29100 114200 45100 130200"/>
+        <Partition id="{ff9a248c-0888-46cf-9c82-928604e2fb25}" name="Partition_4">
+            <Property name="Taste::coordinates" value="33500 118600 41500 126600"/>
+            <Function id="{0889ca72-7e88-4bca-9bbf-3c5b68dc6b97}" name="Function_B" path="Function_B"/>
+        </Partition>
+        <Device id="{e12cfdd2-cc6a-4f17-887a-3171039298f6}" name="eth0" requires_bus_access="ocarina_buses::ip.i" port="eth0" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1type="IP-Conf-T" asn1module="POHICDRIVER-IP" namespace="ocarina_drivers" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" bus_namespace="ocarina_buses">
+            <Property name="Taste::coordinates" value="29100 115900"/>
+        </Device>
+    </Node>
+    <Node id="{0559267d-7400-4dc9-896d-bba2522852ae}" name="Linux on ARM_2" type="ocarina_processors_arm::aarch64.linux" node_label="Node_6" namespace="ocarina_processors_aarch64">
+        <Property name="Taste::coordinates" value="21700 90000 37700 106000"/>
+        <Partition id="{b80edd45-f18f-439c-820f-fbd22ce7bfd4}" name="Partition_7">
+            <Function id="{28904b41-30a2-4660-b637-2f82c739c7ac}" name="Function_33" path="Function_33"/>
+        </Partition>
+        <Device id="{f4b41367-7ca1-44a4-bfd2-5d1ecdc546f2}" name="eth0" requires_bus_access="ocarina_buses::ip.i" port="eth0" asn1file="/home/taste/tool-inst/include/ocarina/runtime/polyorb-hi-c/src/drivers/configuration/ip.asn" asn1type="IP-Conf-T" asn1module="POHICDRIVER-IP" namespace="ocarina_drivers" extends="ocarina_drivers::generic_sockets_ip" impl_extends="ocarina_drivers::generic_sockets_ip.pohic" bus_namespace="ocarina_buses">
+        </Device>
+        <System_Function id="{5b385d33-d660-4554-92c8-f223a4806e8d}" name="PrecisionTimer">
+            <Provided_Interface id="{38228fe6-f349-4f53-8331-8b9086b688b2}" name="getTime">
+            </Provided_Interface>
+            <Provided_Interface id="{a8c683b5-6665-47a6-82db-ddadb73a4238}" name="ping">
+                <Input_Parameter name="seed" type="MyInt" encoding="NATIVE"/>
+            </Provided_Interface>
+        </System_Function>
+    </Node>
+    <Connection id="{9ada2563-d3bb-4a5e-b840-a2956750283b}" name="Connection_1" from_node="x86 (Linux/C++)_2" from_port="eth0" to_bus="ocarina_buses::ip.i" to_node="Linux on ARM_2" to_port="eth0">
+            <Property name="Taste::coordinates" value="21300 104000 29000 115800"/>
+            <Message id="{a6a31cb0-d8e2-4450-94c8-af907fb3860c}" name="Message_1" from_function="Function_B" from_interface="init" to_function="Function_33" to_interface="init"/>
+    </Connection>
+</DeploymentView>

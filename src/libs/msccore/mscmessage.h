@@ -64,9 +64,11 @@ public:
 
     MscInstance *sourceInstance() const;
     void setSourceInstance(MscInstance *source);
+    QString sourceName() const;
 
     MscInstance *targetInstance() const;
     void setTargetInstance(MscInstance *target);
+    QString targetName() const;
 
     MscEntity::EntityType entityType() const override;
 

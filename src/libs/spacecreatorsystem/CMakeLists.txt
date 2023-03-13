@@ -3,12 +3,20 @@ set(LIB_NAME spacecreatorsystem)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    dvrefactor.cpp
+    dvrefactor.h
     dvsystemchecks.cpp
     dvsystemchecks.h
+    refactorbase.cpp
+    refactorbase.h
+    ivrefactorhandler.cpp
+    ivrefactorhandler.h
     ivsystemchecks.cpp
     ivsystemchecks.h
     ivsystemqueries.cpp
     ivsystemqueries.h
+    mscrefactor.cpp
+    mscrefactor.h
     mscsystemchecks.cpp
     mscsystemchecks.h
     spacecreatorproject.cpp
