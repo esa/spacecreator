@@ -26,13 +26,13 @@
 #include "dvpartition.h"
 #include "dvsystemfunction.h"
 #include "dvsysteminterface.h"
+#include "exportableattribute.h"
 #include "exportabledvbus.h"
 #include "exportabledvconnection.h"
 #include "exportabledvdevice.h"
 #include "exportabledvmessage.h"
 #include "exportabledvnode.h"
 #include "exportabledvpartition.h"
-#include "exportableproperty.h"
 
 namespace dve {
 
@@ -57,7 +57,7 @@ QString ExportableDVObject::name() const
  */
 QVariantList ExportableDVObject::attributes() const
 {
-    return exportedObject<dvm::DVObject>()->generateProperties(false);
+    return exportedObject<dvm::DVObject>()->attributes();
 }
 
 /**
@@ -66,7 +66,7 @@ QVariantList ExportableDVObject::attributes() const
  */
 QVariantList ExportableDVObject::properties() const
 {
-    return exportedObject<dvm::DVObject>()->generateProperties(true);
+    return exportedObject<dvm::DVObject>()->properties();
 }
 
 QVariant ExportableDVObject::createFrom(const dvm::DVObject *dvObject)

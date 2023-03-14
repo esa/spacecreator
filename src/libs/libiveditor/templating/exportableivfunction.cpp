@@ -17,10 +17,9 @@
 
 #include "exportableivfunction.h"
 
-#include "exportableproperty.h"
+#include "exportableattribute.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
-
 
 namespace ive {
 
@@ -38,7 +37,7 @@ QVariantList ExportableIVFunction::implementations() const
 
     QVariantList result;
     for (const auto &implementation : ivFunction->implementations()) {
-        result << QVariant::fromValue(shared::ExportableProperty(implementation.name(), implementation.value()));
+        result << QVariant::fromValue(shared::ExportableAttribute(implementation.name(), implementation.value()));
     }
     return result;
 }

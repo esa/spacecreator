@@ -14,7 +14,12 @@ target_sources(${LIB_NAME} PRIVATE
     templatesyntaxhelpdialog.h
     objectsexporter.cpp
     objectsexporter.h
+    uiexporter.cpp
+    uiexporter.h
+    templatinglibrary.cpp
+    templatinglibrary.h
     template_syntax_help.qrc
+    style.qrc
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

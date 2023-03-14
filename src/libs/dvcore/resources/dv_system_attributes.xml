@@ -51,7 +51,7 @@
         </Type>
         <Scopes/>
     </Attr>
-    <Attr name="Taste::coordinates" type="property" visible="false" editable="false">
+    <Attr name="Taste::coordinates" type="property" visible="false" editable="false" export="UI">
         <Type>
             <String validator="[0-9 ]+"/>
         </Type>

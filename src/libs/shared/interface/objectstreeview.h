@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "common.h"
-
 #include <QTreeView>
 
 namespace shared {

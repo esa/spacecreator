@@ -2,6 +2,7 @@
 Template for generation of XML scheme of the whole deployment view.
 ====================================
 Every instance/object (node, partition, connection, ...) has at least the following properties:
+id              : ID of the object
 name              : Name of the object
 attributes        : List of attributes
 attribute.name    :  |_ Name of that attribute

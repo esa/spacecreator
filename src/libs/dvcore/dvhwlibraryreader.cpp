@@ -19,11 +19,7 @@
 
 #include "dvboard.h"
 #include "dvcommonprops.h"
-#include "dvconnection.h"
-#include "dvdevice.h"
-#include "dvfunction.h"
 #include "dvobject.h"
-#include "dvpartition.h"
 #include "dvport.h"
 #include "dvsystemfunction.h"
 #include "dvsysteminterface.h"
@@ -64,7 +60,7 @@ QVector<DVObject *> DVHWLibraryReader::parsedObjects() const
     return d->m_allObjects;
 }
 
-void DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
+bool DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     const QXmlStreamAttributes attrs = xml.attributes();
@@ -131,12 +127,14 @@ void DVHWLibraryReader::processTagOpen(QXmlStreamReader &xml)
             processTagClose(xml);
         }
     }
+    return true;
 }
 
-void DVHWLibraryReader::processTagClose(QXmlStreamReader &xml)
+bool DVHWLibraryReader::processTagClose(QXmlStreamReader &xml)
 {
     Q_UNUSED(xml)
     d->m_currentObject = d->m_currentObject ? d->m_currentObject->parentObject() : nullptr;
+    return true;
 }
 
 QString DVHWLibraryReader::rootElementName() const

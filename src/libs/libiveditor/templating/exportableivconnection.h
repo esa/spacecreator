@@ -37,6 +37,10 @@ class ExportableIVConnection : public ExportableIVObject
     Q_PROPERTY(QString targetPath READ targetPath)
     Q_PROPERTY(QString siName READ sourceInterfaceName)
     Q_PROPERTY(QString tiName READ targetInterfaceName)
+    Q_PROPERTY(QString sourceIfaceId READ sourceInterfaceId)
+    Q_PROPERTY(QString targetIfaceId READ targetInterfaceId)
+    Q_PROPERTY(QString originSourceIfaceId READ originSourceInterfaceId)
+    Q_PROPERTY(QString originTargetIfaceId READ originTargetInterfaceId)
     Q_PROPERTY(bool siIsRequired READ sourceInterfaceIsRequired)
     Q_PROPERTY(bool siIsProvided READ sourceInterfaceIsProvided)
     Q_PROPERTY(bool tiIsRequired READ targetInterfaceIsRequired)
@@ -51,6 +55,10 @@ public:
     QString targetPath() const;
     QString sourceInterfaceName() const;
     QString targetInterfaceName() const;
+    QString sourceInterfaceId() const;
+    QString targetInterfaceId() const;
+    QString originSourceInterfaceId() const;
+    QString originTargetInterfaceId() const;
     bool sourceInterfaceIsRequired() const;
     bool sourceInterfaceIsProvided() const;
     bool targetInterfaceIsRequired() const;

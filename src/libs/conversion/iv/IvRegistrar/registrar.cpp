@@ -27,6 +27,7 @@
 #include <ivcore/ivlibrary.h>
 #include <libiveditor/iveditor.h>
 #include <memory>
+#include <templating/templatinglibrary.h>
 
 namespace conversion::iv {
 
@@ -39,6 +40,7 @@ bool IvRegistrar::registerCapabilities(conversion::Registry &registry)
 {
     ivm::initIVLibrary();
     ive::initIVEditor();
+    templating::initTemplatingLibrary();
 
     auto ivImporter = std::make_unique<IvXmlImporter>();
     auto result = registry.registerImporter(ModelType::InterfaceView, std::move(ivImporter));

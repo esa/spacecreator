@@ -74,6 +74,10 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "is_simulink_interface", Token::is_simulink_interface },
     { "simulink_interface_type", Token::simulink_interface_type },
     { "simulink_full_interface_ref", Token::simulink_full_interface_ref },
+    { "iface_id", Token::iface_id },
+    { "reference", Token::reference },
+    { "origin", Token::origin },
+    { "origin_iface_id", Token::origin_iface_id },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },

@@ -19,18 +19,16 @@
 
 #pragma once
 
-#include "xmlreader.h"
 #include "archetypeobject.h"
 #include "functionarchetype.h"
 #include "interfacearchetype.h"
 #include "parameterarchetype.h"
-#include "layerarchetype.h"
-#include "archetypecommonprops.h"
+#include "xmlreader.h"
 
 #include <QObject>
+#include <QPointer>
 #include <QVariantMap>
 #include <QVector>
-#include <QPointer>
 #include <memory>
 
 class QIODevice;
@@ -63,8 +61,8 @@ public:
     QVector<ArchetypeObject *> parsedObjects() const;
 
 protected:
-    void processTagOpen(QXmlStreamReader &xml) override;
-    void processTagClose(QXmlStreamReader &xml) override;
+    bool processTagOpen(QXmlStreamReader &xml) override;
+    bool processTagClose(QXmlStreamReader &xml) override;
     QString rootElementName() const override;
 
 private:

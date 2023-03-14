@@ -60,7 +60,7 @@ void SpinRunWorker::stop()
 
 void SpinRunWorker::run()
 {
-    QString interfaceView = m_projectRoot + QDir::separator() + "interfaceview.xml";
+    QString interfaceView = m_projectRoot + QDir::separator() + shared::kDefaultInterfaceViewFileName;
     QDir::setCurrent(m_projectRoot);
     QDir projectRootDir(m_projectRoot);
 

@@ -17,10 +17,12 @@
 
 #include "ivobject.h"
 
-#include "exportableproperty.h"
+#include "exportableattribute.h"
 #include "ivcoreutils.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
+#include "ivpropertytemplateconfig.h"
+#include "propertytemplate.h"
 
 #include <QPointer>
 #include <QVector>
@@ -146,18 +148,20 @@ QVariantList IVObject::generateProperties(bool isProperty) const
     QVariantList result;
     EntityAttributes attributes = entityAttributes();
     for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
-        if (it.value().isExportable() && it.value().isProperty() == isProperty) {
-            result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
+        shared::PropertyTemplate *pt =
+                IVPropertyTemplateConfig::instance()->propertyTemplateForObject(this, it->name());
+        if ((!pt || pt->exportGroupName().isEmpty()) && it.value().isProperty() == isProperty) {
+            result << QVariant::fromValue(shared::ExportableAttribute(it.key(), it.value().value()));
         }
     }
 
     std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
-        const auto &r = right_val.value<shared::ExportableProperty>();
+        const auto &r = right_val.value<shared::ExportableAttribute>();
         const ivm::meta::Props::Token right_token = ivm::meta::Props::token(r.name());
         if (right_token == ivm::meta::Props::Token::Unknown)
             return true;
 
-        const auto &l = left_val.value<shared::ExportableProperty>();
+        const auto &l = left_val.value<shared::ExportableAttribute>();
         const ivm::meta::Props::Token left_token = ivm::meta::Props::token(l.name());
         if (left_token == ivm::meta::Props::Token::Unknown)
             return false;
@@ -297,6 +301,16 @@ bool IVObject::isNestedInFunctionType() const
 bool IVObject::isNested() const
 {
     return isNestedInFunction() || isNestedInFunctionType();
+}
+
+bool IVObject::isReference() const
+{
+    return entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::reference));
+}
+
+shared::Id IVObject::origin() const
+{
+    return entityAttributeValue<QUuid>(meta::Props::token(meta::Props::Token::origin), shared::InvalidId);
 }
 
 QString IVObject::groupName() const

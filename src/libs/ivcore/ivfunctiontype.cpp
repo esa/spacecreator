@@ -17,7 +17,6 @@
 
 #include "ivfunctiontype.h"
 
-#include "archetypes/archetypemodel.h"
 #include "errorhub.h"
 #include "ivarchetypereference.h"
 #include "ivcomment.h"
@@ -27,6 +26,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
+#include "ivmodel.h"
 
 #include <QDebug>
 

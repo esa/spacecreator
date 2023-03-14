@@ -26,7 +26,7 @@
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivmodel.h>
 #include <promela/PromelaOptions/options.h>
-#include <shared/exportableproperty.h>
+#include <shared/exportableattribute.h>
 
 using Asn1Acn::Asn1Model;
 using conversion::Escaper;
@@ -41,7 +41,13 @@ using ivm::IVInterface;
 using ivm::IVInterfaceRequired;
 using ivm::IVModel;
 using promela::model::PromelaSystemModel;
-using shared::ExportableProperty;
+using promela::model::Sequence;
+using promela::model::Skip;
+using promela::model::StringConstant;
+using promela::model::Utype;
+using promela::model::UtypeRef;
+using promela::model::VariableRef;
+using shared::ExportableAttribute;
 using shared::InterfaceParameter;
 using shared::VEObject;
 
@@ -184,8 +190,8 @@ QVariant IvToPromelaTranslator::getInterfaceProperty(const IVInterface *interfac
     const QVariantList attrs = interface->attributes();
     {
         for (const QVariant &attr : qAsConst(attrs)) {
-            if (attr.canConvert<ExportableProperty>()) {
-                ExportableProperty ep = attr.value<ExportableProperty>();
+            if (attr.canConvert<ExportableAttribute>()) {
+                ExportableAttribute ep = attr.value<ExportableAttribute>();
                 if (ep.name() == name) {
                     return ep.value();
                 }

@@ -17,6 +17,7 @@
 
 #include "exportableivconnection.h"
 
+#include "ivcommonprops.h"
 #include "ivconnection.h"
 
 namespace ive {
@@ -36,14 +37,14 @@ QString ExportableIVConnection::targetName() const
     return exportedObject<ivm::IVConnection>()->targetName();
 }
 
-QString ExportableIVConnection::sourcePath() const {
-    return exportedObject<ivm::IVConnection>()->source()->path().join("::");
-
+QString ExportableIVConnection::sourcePath() const
+{
+    return exportedObject<ivm::IVConnection>()->source()->path().join(shared::kStringDelemiter);
 }
 
 QString ExportableIVConnection::targetPath() const
 {
-    return exportedObject<ivm::IVConnection>()->source()->path().join("::");
+    return exportedObject<ivm::IVConnection>()->source()->path().join(shared::kStringDelemiter);
 }
 
 QString ExportableIVConnection::sourceInterfaceName() const
@@ -54,6 +55,34 @@ QString ExportableIVConnection::sourceInterfaceName() const
 QString ExportableIVConnection::targetInterfaceName() const
 {
     return exportedObject<ivm::IVConnection>()->targetInterfaceName();
+}
+
+QString ExportableIVConnection::sourceInterfaceId() const
+{
+    return exportedObject<ivm::IVConnection>()->sourceInterface()->id().toString();
+}
+
+QString ExportableIVConnection::targetInterfaceId() const
+{
+    return exportedObject<ivm::IVConnection>()->targetInterface()->id().toString();
+}
+
+QString ExportableIVConnection::originSourceInterfaceId() const
+{
+    static const QString token = ivm::meta::Props::token(ivm::meta::Props::Token::origin);
+    if (auto iface = exportedObject<ivm::IVConnection>()->sourceInterface())
+        return iface->entityAttributeValue<QString>(token);
+
+    return {};
+}
+
+QString ExportableIVConnection::originTargetInterfaceId() const
+{
+    static const QString token = ivm::meta::Props::token(ivm::meta::Props::Token::origin);
+    if (auto iface = exportedObject<ivm::IVConnection>()->targetInterface())
+        return iface->entityAttributeValue<QString>(token);
+
+    return {};
 }
 
 bool ExportableIVConnection::sourceInterfaceIsRequired() const

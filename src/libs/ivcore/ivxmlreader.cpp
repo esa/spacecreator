@@ -30,8 +30,10 @@
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
 #include "parameter.h"
+#include "uireader.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
@@ -96,6 +98,10 @@ private:
 
 typedef QHash<QString, QHash<QString, IVInterface *>> IfacesByFunction; // { Function[Type]Id, {IfaceName, Iface} }
 struct IVXMLReaderPrivate {
+    IVXMLReaderPrivate()
+        : m_uiReader(new shared::UIReader)
+    {
+    }
     QVector<IVObject *> m_allObjects {};
     QHash<QString, IVObject *> m_layers {};
     QHash<QString, IVFunctionType *> m_functionNames {};
@@ -108,6 +114,7 @@ struct IVXMLReaderPrivate {
     };
 
     QHash<QString, GroupInfo> m_connectionGroups;
+    QScopedPointer<shared::UIReader> m_uiReader { nullptr };
 
     CurrentObjectHolder m_currentObject;
     void setCurrentObject(IVObject *obj)
@@ -166,6 +173,16 @@ QVector<IVObject *> IVXMLReader::parsedLayers() const
     return d->m_layers.values().toVector();
 }
 
+QString IVXMLReader::uiFileNameTag() const
+{
+    return d->m_uiReader ? d->m_uiReader->filePathAttributeName() : QString();
+}
+
+QHash<shared::Id, EntityAttributes> IVXMLReader::externalAttributes() const
+{
+    return d->m_uiReader ? d->m_uiReader->data() : QHash<shared::Id, EntityAttributes>();
+}
+
 IVConnection::EndPointInfo addConnectionPart(const EntityAttributes &otherAttrs)
 {
     const bool isRI = otherAttrs.contains(Props::token(Props::Token::ri_name));
@@ -174,16 +191,28 @@ IVConnection::EndPointInfo addConnectionPart(const EntityAttributes &otherAttrs)
     info.m_functionName = attrValue(otherAttrs, Props::Token::func_name);
     info.m_interfaceName = attrValue(otherAttrs, isRI ? Props::Token::ri_name : Props::Token::pi_name);
     info.m_ifaceDirection = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
+    info.m_ifaceId = QUuid::fromString(attrValue(otherAttrs, Props::Token::iface_id));
+    info.m_originIfaceId = QUuid::fromString(attrValue(otherAttrs, Props::Token::origin_iface_id));
 
     Q_ASSERT(info.isReady());
     return info;
 }
 
-void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
+bool IVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     EntityAttributes attrs = attributes(xml.attributes());
     const EntityAttribute &idAttr = attrs.take(QLatin1String("id"));
+
+    if (d->m_uiReader && d->m_uiReader->rootElementName() == tagName) {
+        auto fileIt = attrs.constFind(d->m_uiReader->filePathAttributeName());
+        if (fileIt != attrs.constEnd()) {
+            processUIFile(fileIt->value<QString>());
+        } else if (d->m_uiReader->readSection(xml)) {
+            processUIData();
+        }
+        return true;
+    }
 
     IVObject *obj { nullptr };
     const Props::Token t = Props::token(tagName);
@@ -310,12 +339,20 @@ void IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         }
         d->setCurrentObject(obj);
     }
+    return true;
 }
 
-void IVXMLReader::processTagClose(QXmlStreamReader &xml)
+bool IVXMLReader::processTagClose(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     switch (Props::token(tagName)) {
+    case Props::Token::InterfaceView: {
+        const QVariantMap &metaInfo = metaData();
+        auto it = metaInfo.constFind(d->m_uiReader->filePathAttributeName());
+        if (it != metaInfo.constEnd()) {
+            processUIFile(it->toString());
+        }
+    } break;
     case Props::Token::Function:
     case Props::Token::Required_Interface:
     case Props::Token::Provided_Interface:
@@ -329,11 +366,35 @@ void IVXMLReader::processTagClose(QXmlStreamReader &xml)
     default:
         break;
     }
+    return true;
 }
 
 QString IVXMLReader::rootElementName() const
 {
     return Props::token(Props::Token::InterfaceView);
+}
+
+void IVXMLReader::processUIFile(const QString &relFileName)
+{
+    const QFileInfo fi(file());
+    const QString uiFile = fi.absoluteDir().filePath(relFileName);
+    if (d->m_uiReader->readFile(uiFile)) {
+        processUIData();
+    }
+}
+
+void IVXMLReader::processUIData()
+{
+    const QHash<shared::Id, EntityAttributes> attrs = d->m_uiReader->data();
+    for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
+        auto objIt = std::find_if(d->m_allObjects.begin(), d->m_allObjects.end(),
+                [id = attrIt.key()](IVObject *obj) { return obj->id() == id; });
+        if (objIt != d->m_allObjects.end()) {
+            for (const EntityAttribute &entityAttr : attrIt.value()) {
+                (*objIt)->setEntityAttribute(entityAttr);
+            }
+        }
+    }
 }
 
 IVFunctionType *IVXMLReader::addFunction(const shared::Id &id, IVObject::Type fnType)
@@ -397,7 +458,7 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const shared::Id &id, const Q
             it.value()->addEntity(iface);
         } else {
             IVInterface::CreationInfo ci;
-            ci.id = QUuid::createUuid();
+            ci.id = shared::createId();
             auto ifaceGroup = new IVInterfaceGroup(ci);
             if (iface->parentObject()->type() == IVObject::Type::Function) {
                 auto fn = qobject_cast<IVFunction *>(iface->parentObject());
@@ -438,5 +499,4 @@ IVArchetypeReference *IVXMLReader::addArchetypeReference(
     }
     return archetypeReference;
 }
-
 }

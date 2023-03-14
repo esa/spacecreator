@@ -33,14 +33,13 @@
 #include <QFileInfo>
 #include <spacecreatorsystem/ivsystemqueries.h>
 
-static const QString INTERFACEVIEW_FILE_NAME("interfaceview.xml");
 
 static void setupIvSystemQueriesIfAvailable(const QString &inputFile, dve::DVEditorCore *dvcore)
 {
     // If available, load Interface View to enable additional queries
     const QFileInfo inputFileInfo(inputFile);
     const QDir modelDirectory = inputFileInfo.dir();
-    const QString interfaceViewFilePath = modelDirectory.filePath(INTERFACEVIEW_FILE_NAME);
+    const QString interfaceViewFilePath = modelDirectory.filePath(shared::kDefaultInterfaceViewFileName);
 
     const QFileInfo interfaceViewFileInfo(interfaceViewFilePath);
     if (interfaceViewFileInfo.exists()) {

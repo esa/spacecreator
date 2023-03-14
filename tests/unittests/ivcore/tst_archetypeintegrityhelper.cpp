@@ -73,7 +73,7 @@ void tst_ArchtypeIntegrityHelper::tst_checkArchetypeIntegrity()
     QPointer<ivm::IVModel> model = new ivm::IVModel(conf);
     ivm::IVXMLReader reader;
     QVERIFY(reader.readFile(QFINDTESTDATA("iv_archetypes.xml")));
-    model->initFromObjects(reader.parsedObjects());
+    model->initFromObjects(reader.parsedObjects(), reader.externalAttributes());
     QCOMPARE(model->objects().size(), 4);
 
     QStringList warningList =
@@ -87,7 +87,7 @@ void tst_ArchtypeIntegrityHelper::tst_checkArchetypeIntegrityWithInterfaceNameEr
     QPointer<ivm::IVModel> model = new ivm::IVModel(conf);
     ivm::IVXMLReader reader;
     QVERIFY(reader.readFile(QFINDTESTDATA("iv_archetypes_with_wrong_interface.xml")));
-    model->initFromObjects(reader.parsedObjects());
+    model->initFromObjects(reader.parsedObjects(), reader.externalAttributes());
     QCOMPARE(model->objects().size(), 4);
 
     QStringList warningList =
@@ -103,7 +103,7 @@ void tst_ArchtypeIntegrityHelper::tst_checkArchetypeIntegrityWithParameterNameEr
     QPointer<ivm::IVModel> model = new ivm::IVModel(conf);
     ivm::IVXMLReader reader;
     QVERIFY(reader.readFile(QFINDTESTDATA("iv_archetypes_with_wrong_parameter.xml")));
-    model->initFromObjects(reader.parsedObjects());
+    model->initFromObjects(reader.parsedObjects(), reader.externalAttributes());
     QCOMPARE(model->objects().size(), 4);
 
     QStringList warningList =

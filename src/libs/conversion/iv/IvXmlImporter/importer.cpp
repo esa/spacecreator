@@ -79,7 +79,7 @@ std::unique_ptr<conversion::Model> IvXmlImporter::parse(const Options &options, 
     }
 
     auto model = std::make_unique<IVModel>(config);
-    model->initFromObjects(parser.parsedObjects());
+    model->initFromObjects(parser.parsedObjects(), parser.externalAttributes());
 
     return model;
 }

@@ -141,8 +141,8 @@ public:
 
     bool isRequiredSystemElement() const;
 
-    auto layer() const ->  IVConnectionLayerType *;
-    auto layerName() const ->  QString;
+    auto layer() const -> IVConnectionLayerType *;
+    auto layerName() const -> QString;
     auto setLayerName(const QString &layerName) -> void;
 
 Q_SIGNALS:

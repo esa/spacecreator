@@ -17,7 +17,7 @@
 
 #include "entityattribute.h"
 
-EntityAttribute::EntityAttribute() {}
+EntityAttribute::EntityAttribute() { }
 
 EntityAttribute::EntityAttribute(const QString &attrName, const QVariant &attrValue, EntityAttribute::Type type)
     : m_name(attrName)
@@ -60,6 +60,11 @@ bool EntityAttribute::isAttribute() const
 EntityAttribute::Type EntityAttribute::type() const
 {
     return m_type;
+}
+
+void EntityAttribute::setType(const EntityAttribute::Type &type)
+{
+    m_type = type;
 }
 
 bool EntityAttribute::isValid() const

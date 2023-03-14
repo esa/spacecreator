@@ -46,15 +46,19 @@ public:
 
     QVector<IVObject *> parsedObjects() const;
     QVector<IVObject *> parsedLayers() const;
+    QString uiFileNameTag() const;
+    QHash<shared::Id, EntityAttributes> externalAttributes() const;
 
 protected:
-    void processTagOpen(QXmlStreamReader &xml) override;
-    void processTagClose(QXmlStreamReader &xml) override;
+    bool processTagOpen(QXmlStreamReader &xml) override;
+    bool processTagClose(QXmlStreamReader &xml) override;
     QString rootElementName() const override;
 
 private:
     const std::unique_ptr<IVXMLReaderPrivate> d;
 
+    void processUIData();
+    void processUIFile(const QString &file);
     IVFunctionType *addFunction(const shared::Id &id, IVObject::Type fnType);
     IVInterface *addIface(const shared::Id &id, bool isRI);
     IVComment *addComment(const shared::Id &id);

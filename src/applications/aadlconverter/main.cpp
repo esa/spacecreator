@@ -22,12 +22,14 @@
 #include "ivlibrary.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
+#include "templatinglibrary.h"
 
 #include <QCoreApplication>
 #include <QDebug>
 
 int main(int argc, char *argv[])
 {
+    templating::initTemplatingLibrary();
     ivm::initIVLibrary();
     ive::initIVEditor();
     shared::initSharedLibrary();

@@ -20,6 +20,7 @@
 #include "entityattribute.h"
 #include "errorhub.h"
 
+#include <QBuffer>
 #include <QFile>
 #include <QXmlStreamAttribute>
 #include <QtDebug>
@@ -42,6 +43,9 @@ XmlReader::~XmlReader() { }
 
 void XmlReader::setMetaData(const QXmlStreamAttributes &attributes)
 {
+    d->m_metaData.clear();
+    d->m_metaData["version"] = "1.0"; // if there is no version in the file, fall back to 1.0
+
     for (const QXmlStreamAttribute &attribute : attributes) {
         d->m_metaData[attribute.name().toString()] = QVariant::fromValue(attribute.value().toString());
     }
@@ -80,9 +84,6 @@ EntityAttributes XmlReader::attributes(const QXmlStreamAttributes &xmlAttrs)
 
 bool XmlReader::readFile(const QString &file)
 {
-    d->m_metaData.clear();
-    d->m_metaData["version"] = "1.0"; // if there is no version in the file, fall back to 1.0
-
     d->m_file = file;
     QFile in(file);
     if (in.exists(file) && in.open(QFile::ReadOnly | QFile::Text)) {
@@ -105,19 +106,12 @@ bool XmlReader::read(QIODevice *openForRead)
 
 bool XmlReader::read(const QByteArray &data)
 {
-    if (data.isEmpty()) {
-        setErrorString(tr("Can't read data"));
-        return false;
+    QBuffer buffer;
+    buffer.setData(data);
+    if (buffer.open(QIODevice::ReadOnly)) {
+        return read(&buffer);
     }
 
-    QXmlStreamReader xml(data);
-    if (xml.readNext() == QXmlStreamReader::StartDocument) {
-        if (xml.readNext() == QXmlStreamReader::StartElement) {
-            if (xml.name().toString() == rootElementName()) {
-                return readView(xml);
-            }
-        }
-    }
     setErrorString(tr("Malformed XML"));
     return false;
 }
@@ -150,8 +144,8 @@ bool XmlReader::readXml(QIODevice *in)
     QXmlStreamReader xml(in);
     if (xml.readNext() == QXmlStreamReader::StartDocument)
         if (xml.readNext() == QXmlStreamReader::StartElement)
-            if (xml.name().toString() == rootElementName())
-                return readView(xml);
+            if (xml.name() == rootElementName())
+                return readSection(xml);
 
     setErrorString(tr("Error parsing XML"));
     return false;
@@ -163,7 +157,7 @@ void XmlReader::setErrorString(const QString &string)
     d->m_errorString = string;
 }
 
-bool XmlReader::readView(QXmlStreamReader &xml)
+bool XmlReader::readSection(QXmlStreamReader &xml)
 {
     setMetaData(xml.attributes());
 
@@ -176,11 +170,14 @@ bool XmlReader::readView(QXmlStreamReader &xml)
 
         switch (xml.readNext()) {
         case QXmlStreamReader::TokenType::StartElement:
-            processTagOpen(xml);
+            if (!processTagOpen(xml))
+                return false;
             break;
         case QXmlStreamReader::TokenType::EndElement:
-            processTagClose(xml);
-            break;
+            if (!processTagClose(xml))
+                return false;
+            if (xml.name() == rootElementName())
+                return true;
         default:
             break;
         }
@@ -191,7 +188,6 @@ bool XmlReader::readView(QXmlStreamReader &xml)
         qDebug() << Q_FUNC_INFO << 2 << xml.errorString();
         return false;
     }
-
     return true;
 }
 

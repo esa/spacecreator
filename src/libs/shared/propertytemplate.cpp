@@ -31,6 +31,7 @@ struct PropertyTemplate::PropertyTemplatePrivate {
     QString m_label;
     PropertyTemplate::Info m_info;
     PropertyTemplate::Type m_type;
+    QString m_exportGroupName;
     QVariant m_value;
     QVariant m_defaultValue;
     QString m_rxValueValidatorPattern;
@@ -138,6 +139,16 @@ bool PropertyTemplate::isOptional() const
 void PropertyTemplate::setOptional(bool value)
 {
     d->m_isOptional = value;
+}
+
+QString PropertyTemplate::exportGroupName() const
+{
+    return d->m_exportGroupName;
+}
+
+void PropertyTemplate::setExportGroupName(const QString &expGroupName)
+{
+    d->m_exportGroupName = expGroupName;
 }
 
 QVariant PropertyTemplate::value() const
@@ -258,6 +269,7 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     const QString attrName = element.attribute(QLatin1String("name"));
     const QString attrLabel = element.attribute(QLatin1String("label"));
     const QString attrType = element.attribute(QLatin1String("type"), QLatin1String("Attribute"));
+    const QString expGroupName = element.attribute(QLatin1String("export") /*, QLatin1String("model")*/);
     const bool isEditable =
             QString::compare(element.attribute(QLatin1String("editable")), QLatin1String("false"), Qt::CaseInsensitive)
             != 0;
@@ -341,15 +353,16 @@ void PropertyTemplate::initFromXml(const QDomElement &element)
     setVisible(isVisible);
     setEditable(isEditable);
     setOptional(isOptional);
+    setExportGroupName(expGroupName);
 }
 
 void PropertyTemplate::addEnumData(const QDomElement &typeEntryElement)
 {
-    const QString valueKey {"value"};
+    const QString valueKey { "value" };
     const QString enumValue = typeEntryElement.attribute(valueKey);
     QMap<QString, QString> data;
     QDomNamedNodeMap attributes = typeEntryElement.attributes();
-    for (int i = 0; i< attributes.count(); ++i) {
+    for (int i = 0; i < attributes.count(); ++i) {
         QDomAttr attr = attributes.item(i).toAttr();
         if (attr.name() != valueKey) {
             data[attr.name()] = attr.value();

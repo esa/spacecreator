@@ -18,6 +18,7 @@
 #pragma once
 
 #include "objectsexporter.h"
+#include "uiexporter.h"
 
 #include <QString>
 #include <QVariantList>
@@ -39,15 +40,19 @@ class InterfaceDocument;
 
 class IVExporter : public templating::ObjectsExporter
 {
+    Q_OBJECT
 public:
     explicit IVExporter(QObject *parent = nullptr);
     QString defaultTemplatePath() const override;
+    static QString templatePath(const QString &templateName);
 
-    bool exportObjects(const QList<shared::VEObject *> &objects, QBuffer *outBuffer,
+    bool exportObjects(const QList<shared::VEObject *> &objects, QIODevice *outBuffer,
+            ivm::ArchetypeModel *archetypesModel = nullptr,
+            const QString &pathToTemplate = templatePath(QLatin1String("interfaceview.ui")));
+
+    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
             ivm::ArchetypeModel *archetypesModel = nullptr, const QString &templatePath = QString());
-
-    bool exportDocSilently(
-            InterfaceDocument *doc, const QString &outPath = QString(), const QString &templatePath = QString());
+    bool exportDocSilently(InterfaceDocument *doc, const QString &outPath, const QString &templatePath = QString());
 
     bool exportDocInteractively(InterfaceDocument *doc, const QString &outPath = QString(),
             const QString &templatePath = QString(), QWidget *root = nullptr);
@@ -63,6 +68,8 @@ private:
 
     QHash<QString, QVariant> collectInterfaceObjects(InterfaceDocument *doc);
     void checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
+
+    templating::UIExporter *m_uiExporter;
 };
 
 }

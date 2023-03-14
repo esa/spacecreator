@@ -25,6 +25,7 @@
 #include <QFileDialog>
 #include <QIODevice>
 #include <QPointer>
+#include <errorhub.h>
 
 namespace templating {
 
@@ -37,7 +38,8 @@ ObjectsExporter::ObjectsExporter(QObject *parent)
 
 QString ObjectsExporter::templatesPath()
 {
-    return QString("%1/export_templates").arg(shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    return QString("%1/export_templates")
+            .arg(shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 }
 
 QString ObjectsExporter::templateFileExtension()
@@ -61,7 +63,7 @@ bool ObjectsExporter::showExportDialog(const QHash<QString, QVariant> &content, 
     if (!previewDialog) {
         previewDialog = new templating::TemplateEditor(outFileName, parentWindow);
         previewDialog->setAttribute(Qt::WA_DeleteOnClose);
-        QObject::connect(previewDialog, &templating::TemplateEditor::fileSaved, this, &ObjectsExporter::exported);
+        connect(previewDialog, &templating::TemplateEditor::fileSaved, this, &ObjectsExporter::exported);
     }
 
     return previewDialog->parseTemplate(content, templateFileName);
@@ -110,6 +112,11 @@ bool ObjectsExporter::exportData(const QHash<QString, QVariant> &data, const QSt
 
     if (InteractionPolicy::Silently == interaction) {
         QFile saveFile(savePath);
+        if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+            qWarning() << "Can't open device for writing:" << saveFile.errorString();
+            shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
+            return false;
+        }
         const bool result = exportData(data, usedTemplate, &saveFile);
         Q_EMIT exported(savePath, result);
         return result;

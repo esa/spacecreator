@@ -35,18 +35,18 @@
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
+#include "templatinglibrary.h"
 
+#include <QAction>
+#include <QMenu>
+#include <QMessageBox>
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <editormanager/editormanager.h>
 #include <editormanager/ieditor.h>
-#include <languageclient/languageclientsettings.h>
 #include <languageclient/languageclientmanager.h>
-
-#include <QAction>
-#include <QMenu>
-#include <QMessageBox>
+#include <languageclient/languageclientsettings.h>
 
 void initSpaceCreatorResources()
 {
@@ -58,6 +58,7 @@ void initSpaceCreatorResources()
     ivm::initIVLibrary();
     dve::initDvEditor();
     dvm::initDVLibrary();
+    templating::initTemplatingLibrary();
 }
 
 using namespace Core;
@@ -107,7 +108,6 @@ bool SpaceCreatorPlugin::initialize(const QStringList &arguments, QString *error
 
     addHelp();
 
-
     return true;
 }
 
@@ -153,8 +153,7 @@ void SpaceCreatorPlugin::addHelp()
 
 void SpaceCreatorPlugin::setupTasteLanguageClients()
 {
-    if (ignoreTasteLanguageClients())
-    {
+    if (ignoreTasteLanguageClients()) {
         return;
     }
 
@@ -162,8 +161,7 @@ void SpaceCreatorPlugin::setupTasteLanguageClients()
     QSettings qSettings(iniFilePath, QSettings::IniFormat);
 
     int size = qSettings.beginReadArray("LanguageClient");
-    for (int i = 0; i < size; ++i)
-    {
+    for (int i = 0; i < size; ++i) {
         qSettings.setArrayIndex(i);
         auto *stdIOSettings = new LanguageClient::StdIOSettings();
         stdIOSettings->m_name = qSettings.value("Name").toString();
@@ -190,8 +188,7 @@ bool SpaceCreatorPlugin::ignoreTasteLanguageClients() const
     QSettings qSettings;
     qSettings.beginGroup("TasteLanguageClients");
     bool ignore = qSettings.value(IGNORETASTELANUAGECLIENTS, false).toBool();
-    if (ignore == false)
-    {
+    if (ignore == false) {
         qSettings.setValue(IGNORETASTELANUAGECLIENTS, true);
     }
     return ignore;
@@ -203,8 +200,7 @@ QString SpaceCreatorPlugin::findInitFileForTasteLanguageClients() const
     QString iniFilePath = appImageDir.filePath("TasteLanguageClients.ini");
     QFileInfo iniFileInfo(iniFilePath);
     QString result = iniFileInfo.canonicalFilePath();
-    if (result.isEmpty())
-    {
+    if (result.isEmpty()) {
         qWarning() << "Could not find" << QDir::cleanPath(iniFilePath);
     }
     return result;

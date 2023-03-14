@@ -671,7 +671,7 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
     const bool ok = reader.readFile(filepath);
     if (ok) {
         auto model = std::make_unique<IVModel>(m_dynPropConfig);
-        model->initFromObjects(reader.parsedObjects());
+        model->initFromObjects(reader.parsedObjects(), reader.externalAttributes());
         return model;
     } else {
         return {};
@@ -682,17 +682,8 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
 
 void TmcConverter::saveOptimizedInterfaceView(const IVModel *ivModel, const QString outputFilePath)
 {
-    QByteArray modelData;
-    QBuffer modelDataBuffer(&modelData);
-    modelDataBuffer.open(QIODevice::WriteOnly);
-
     IVExporter exporter;
-    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
-
-    QSaveFile outputFile(outputFilePath);
-    outputFile.open(QIODevice::WriteOnly);
-    outputFile.write(modelData);
-    outputFile.commit();
+    exporter.exportObjectsSilently(ivModel->objects().values(), outputFilePath);
 }
 
 void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdlFunctions,
@@ -712,7 +703,7 @@ void TmcConverter::findFunctionsToConvert(const IVModel &model, QStringList &sdl
             QList<QFileInfo> contextLocations;
             contextLocations.append(sdlFunctionContextLocation(ivFunctionName));
 
-            if (ivFunction->instanceOf() != nullptr) {
+            if (ivFunction->inheritsFunctionType()) {
                 const QString ivFunctionTypeName = ivFunction->instanceOf()->property("name").toString();
                 contextLocations.append(sdlFunctionContextLocation(ivFunctionTypeName));
                 const QFileInfo sdlProcess = sdlImplementationLocation(ivFunctionTypeName);

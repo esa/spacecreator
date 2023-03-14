@@ -30,6 +30,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdentitiesimport.h
     commands/cmdentitiesinstantiate.cpp
     commands/cmdentitiesinstantiate.h
+    commands/cmdentitiesreference.cpp
+    commands/cmdentitiesreference.h
     commands/cmdentitiesremove.cpp
     commands/cmdentitiesremove.h
     commands/cmdfunctionarchetypesapply.cpp

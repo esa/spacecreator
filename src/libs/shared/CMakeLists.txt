@@ -57,6 +57,8 @@ target_sources(${LIB_NAME} PRIVATE
     entityattribute.h
     errorhub.cpp
     errorhub.h
+    exportableattribute.h
+    exportableproperty.cpp
     exportableproperty.h
     geometry.cpp
     geometry.h
@@ -144,6 +146,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/veinteractiveobject.h
     ui/verectgraphicsitem.cpp
     ui/verectgraphicsitem.h
+    uireader.cpp
+    uireader.h
     undocommand.cpp
     undocommand.h
     vemodel.cpp

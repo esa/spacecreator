@@ -88,6 +88,9 @@ public:
     bool isOptional() const;
     void setOptional(bool value);
 
+    QString exportGroupName() const;
+    void setExportGroupName(const QString &expGroupName);
+
     QVariant value() const;
     void setValue(const QVariant &value);
 
@@ -97,10 +100,10 @@ public:
     QString valueValidatorPattern() const;
     void setValueValidatorPattern(const QString &pattern);
 
-    QMultiMap<int, QPair<QString, QString> > attrValidatorPatterns() const;
-    void setAttrValidatorPattern(const QMultiMap<int, QPair<QString, QString> > &pattern);
+    QMultiMap<int, QPair<QString, QString>> attrValidatorPatterns() const;
+    void setAttrValidatorPattern(const QMultiMap<int, QPair<QString, QString>> &pattern);
 
-    QMap<QString, QString> enumData(const QString& enumValue) const;
+    QMap<QString, QString> enumData(const QString &enumValue) const;
 
     QDomElement toXml(QDomDocument *domDoc) const;
 

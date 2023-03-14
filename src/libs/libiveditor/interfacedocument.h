@@ -18,6 +18,7 @@
 #pragma once
 
 #include "common.h"
+#include "entityattribute.h"
 
 #include <QAction>
 #include <QPointer>
@@ -97,6 +98,9 @@ public:
     QStringList asn1FilesNames() const;
     QStringList asn1FilesPaths() const;
 
+    QString uiFileName() const;
+    void setUIFileName(const QString &filePath);
+
     void setMscFileName(const QString &mscFile);
     const QString &mscFileName() const;
     QString mscFilePath() const;
@@ -143,10 +147,12 @@ Q_SIGNALS:
 
     void asn1FileNameChanged(const QString &asn1FileName);
     void mscFileNameChanged(const QString &mscFileName);
+    void uiFileNameChanged(const QString &uiFileName);
 
 public Q_SLOTS:
     void onSavedExternally(const QString &filePath, bool saved);
-    void setObjects(const QVector<ivm::IVObject *> &objects);
+    void setObjects(
+            const QVector<ivm::IVObject *> &objects, const QHash<shared::Id, EntityAttributes> &externalAttrs = {});
     void setLayers(const QVector<ivm::IVObject *> &layers);
     void onAttributesManagerRequested();
     void onColorSchemeMenuInvoked();
@@ -157,6 +163,7 @@ public Q_SLOTS:
     void showInfoMessage(const QString &title, const QString &message);
 
 private:
+    void checkReferencedASN1Files(ivm::IVObject *object);
     bool exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
@@ -171,8 +178,8 @@ private:
     void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
     void showNIYGUI(const QString &title = QString());
-
-    QWidget *window();
+    void createProFile(const QString &path);
+    void initTASTEEnv(const QString &path);
 
     struct InterfaceDocumentPrivate;
     InterfaceDocumentPrivate *d;

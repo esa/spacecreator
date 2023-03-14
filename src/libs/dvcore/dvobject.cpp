@@ -19,7 +19,7 @@
 
 #include "dvmodel.h"
 #include "dvnamevalidator.h"
-#include "exportableproperty.h"
+#include "exportableattribute.h"
 
 #include <QVector>
 
@@ -41,7 +41,7 @@ DVObject::DVObject(const DVObject::Type t, const QString &title, QObject *parent
     setEntityAttribute(meta::Props::token(meta::Props::Token::name), title);
 }
 
-DVObject::~DVObject() {}
+DVObject::~DVObject() { }
 
 QString DVObject::title() const
 {
@@ -183,17 +183,17 @@ QVariantList DVObject::generateProperties(bool isProperty) const
     EntityAttributes attributes = entityAttributes();
     for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
         if (it.value().isExportable() && it.value().isProperty() == isProperty) {
-            result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
+            result << QVariant::fromValue(shared::ExportableAttribute(it.key(), it.value().value()));
         }
     }
 
     std::sort(result.begin(), result.end(), [](const QVariant &left_val, const QVariant &right_val) {
-        const auto &r = right_val.value<shared::ExportableProperty>();
+        const auto &r = right_val.value<shared::ExportableAttribute>();
         const dvm::meta::Props::Token right_token = dvm::meta::Props::token(r.name());
         if (right_token == dvm::meta::Props::Token::Unknown)
             return true;
 
-        const auto &l = left_val.value<shared::ExportableProperty>();
+        const auto &l = left_val.value<shared::ExportableAttribute>();
         const dvm::meta::Props::Token left_token = dvm::meta::Props::token(l.name());
         if (left_token == dvm::meta::Props::Token::Unknown)
             return false;

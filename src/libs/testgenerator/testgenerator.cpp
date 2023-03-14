@@ -222,36 +222,14 @@ auto TestGenerator::compileSystemUnderTest() -> void
 
 auto TestGenerator::exportIvModel(IVModel *ivModel, const QString &outputFilename) -> bool
 {
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-
     IVExporter exporter;
-    if (!exporter.exportObjects(ivModel->objects().values(), &buffer)) {
-        return false;
-    }
-
-    QSaveFile outputFile(outputFilename);
-    outputFile.open(QIODevice::WriteOnly);
-    outputFile.write(buffer.data());
-    outputFile.commit();
-    return true;
+    return exporter.exportObjectsSilently(ivModel->objects().values(), outputFilename);
 }
 
 auto TestGenerator::exportDvModel(DVModel *dvModel, const QString &outputFilename) -> bool
 {
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-
     DVExporter exporter;
-    if (!exporter.exportObjects(dvModel->objects().values(), &buffer)) {
-        return false;
-    }
-
-    QSaveFile outputFile(outputFilename);
-    outputFile.open(QIODevice::WriteOnly);
-    outputFile.write(buffer.data());
-    outputFile.commit();
-    return true;
+    return exporter.exportObjectsSilently(dvModel->objects().values(), outputFilename);
 }
 
 auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)

@@ -78,8 +78,7 @@ void ASN1ComponentsImport::undoSourceCloning(const ivm::IVObject *object)
     }
 
     const auto res = QMessageBox::question(qApp->activeWindow(), tr("Implementations import undo"),
-            tr("Do you want to remove implementations files for object %1?")
-                    .arg(object->titleUI()));
+            tr("Do you want to remove implementations files for object %1?").arg(object->titleUI()));
     if (res == QMessageBox::No) {
         return;
     }
@@ -91,78 +90,6 @@ void ASN1ComponentsImport::undoSourceCloning(const ivm::IVObject *object)
         QMessageBox::critical(qApp->activeWindow(), tr("Implementations import undo"),
                 tr("Critical issues during implementations import undo for object: %1").arg(object->titleUI()));
     }
-}
-
-static inline bool isSame(const QString &filePath1, const QString &filePath2)
-{
-    QFile file1(filePath1);
-    QFile file2(filePath2);
-
-    if (file1.size() != file2.size())
-        return false;
-
-    if (!file1.open(QIODevice::ReadOnly)) {
-        qWarning() << file1.fileName() << file1.errorString();
-        return false;
-    }
-    if (!file2.open(QIODevice::ReadOnly)) {
-        qWarning() << file2.fileName() << file2.errorString();
-        return false;
-    }
-
-    /// TODO: Implement additional instance for ASN1 specific needs
-    /// with loading ASN1 model and comparing objects instead
-    /// For other types add functionality to skip spaces/empty lines/etc
-    while (!file1.atEnd() && !file2.atEnd()) {
-        if (file1.readLine() != file2.readLine())
-            return false;
-    }
-    return true;
-}
-
-static inline QStringList asn1ModuleDuplication(
-        Asn1Acn::Asn1SystemChecks *asn1Checks, const QVector<QFileInfo> &asn1FileInfos)
-{
-    if (asn1FileInfos.empty()) {
-        return {};
-    }
-    Asn1Acn::Asn1Reader parser;
-    QStringList errorMessages;
-    QStringList modulesNames;
-    const std::map<QString, std::unique_ptr<Asn1Acn::File>> asn1Data =
-            parser.parseAsn1Files(asn1FileInfos, &errorMessages);
-    if (asn1Data.empty()) {
-        QStringList filenames;
-        for (const QFileInfo &fi : qAsConst(asn1FileInfos)) {
-            filenames.append(fi.fileName());
-        }
-        shared::ErrorHub::addError(shared::ErrorItem::Error,
-                QObject::tr("%1 was/were not imported: ").arg(filenames.join(", ")), errorMessages.join(", "));
-        return modulesNames;
-    }
-
-    QStringList projectDefinitionsNames;
-    QStringList projectTypeAssignmentsNames;
-    const std::vector<Asn1Acn::Definitions *> &projectDefinitions = asn1Checks->definitionsList();
-    for_each(projectDefinitions.cbegin(), projectDefinitions.cend(), [&](Asn1Acn::Definitions *defs) {
-        projectDefinitionsNames << defs->name();
-        projectTypeAssignmentsNames << defs->typeAssignmentNames();
-    });
-
-    for (auto it = asn1Data.cbegin(); it != asn1Data.cend(); ++it) {
-        for (const auto &defs : it->second->definitionsList()) {
-            if (projectDefinitionsNames.contains(defs->name())) {
-                modulesNames.append(defs->name());
-            } else {
-                for (const QString &typeAssignment : defs->typeAssignmentNames()) {
-                    if (projectTypeAssignmentsNames.contains(typeAssignment)) {
-                        modulesNames.append(defs->name());
-                    }
-                }
-            }
-        }
-    }
-    return modulesNames;
 }
 
 void ASN1ComponentsImport::redoAsnFileImport(const ivm::IVObject *object)
@@ -185,7 +112,7 @@ void ASN1ComponentsImport::redoAsnFileImport(const ivm::IVObject *object)
     QVector<QFileInfo> fileInfos;
     std::copy_if(asnFiles.begin(), asnFiles.end(), std::back_inserter(fileInfos), [targetDir](const QFileInfo &fi) {
         const QString destFilePath { targetDir.filePath(fi.fileName()) };
-        return !isSame(destFilePath, fi.absoluteFilePath());
+        return !shared::isSame(destFilePath, fi.absoluteFilePath());
     });
 
     auto alreadyExistingModules = asn1ModuleDuplication(m_asn1Checks, fileInfos);
@@ -232,8 +159,7 @@ void ASN1ComponentsImport::redoAsnFileImport(const ivm::IVObject *object)
 void ASN1ComponentsImport::undoAsnFileImport()
 {
     const auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files undo"),
-            tr("Do you want to remove ASN1 files: %1?")
-                    .arg(m_importedAsnFiles.join(QLatin1String(", "))));
+            tr("Do you want to remove ASN1 files: %1?").arg(m_importedAsnFiles.join(QLatin1String(", "))));
     if (res == QMessageBox::No) {
         return;
     }
@@ -248,6 +174,51 @@ void ASN1ComponentsImport::undoAsnFileImport()
 QString ASN1ComponentsImport::relativePathForObject(const ivm::IVObject *object) const
 {
     return ive::kRootImplementationPath + QDir::separator() + object->title().toLower();
+}
+
+QStringList ASN1ComponentsImport::asn1ModuleDuplication(
+        Asn1Acn::Asn1SystemChecks *asn1Checks, const QVector<QFileInfo> &asn1FileInfos)
+{
+    if (asn1FileInfos.empty()) {
+        return {};
+    }
+    Asn1Acn::Asn1Reader parser;
+    QStringList errorMessages;
+    QStringList modulesNames;
+    const std::map<QString, std::unique_ptr<Asn1Acn::File>> asn1Data =
+            parser.parseAsn1Files(asn1FileInfos, &errorMessages);
+    if (asn1Data.empty()) {
+        QStringList filenames;
+        for (const QFileInfo &fi : qAsConst(asn1FileInfos)) {
+            filenames.append(fi.fileName());
+        }
+        shared::ErrorHub::addError(shared::ErrorItem::Error,
+                QObject::tr("%1 was/were not imported: ").arg(filenames.join(", ")), errorMessages.join(", "));
+        return modulesNames;
+    }
+
+    QStringList projectDefinitionsNames;
+    QStringList projectTypeAssignmentsNames;
+    const std::vector<Asn1Acn::Definitions *> &projectDefinitions = asn1Checks->definitionsList();
+    for_each(projectDefinitions.cbegin(), projectDefinitions.cend(), [&](Asn1Acn::Definitions *defs) {
+        projectDefinitionsNames << defs->name();
+        projectTypeAssignmentsNames << defs->typeAssignmentNames();
+    });
+
+    for (auto it = asn1Data.cbegin(); it != asn1Data.cend(); ++it) {
+        for (const auto &defs : it->second->definitionsList()) {
+            if (projectDefinitionsNames.contains(defs->name())) {
+                modulesNames.append(defs->name());
+            } else {
+                for (const QString &typeAssignment : defs->typeAssignmentNames()) {
+                    if (projectTypeAssignmentsNames.contains(typeAssignment)) {
+                        modulesNames.append(defs->name());
+                    }
+                }
+            }
+        }
+    }
+    return modulesNames;
 }
 
 } // namespace ive

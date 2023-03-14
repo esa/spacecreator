@@ -1,0 +1,5 @@
+<{{ entity.name }}{% for attr in entity.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
+    {% for entity in entity.children %}
+        {% include "entityNode.tmplt" %}
+    {% endfor %}
+</{{entity.name}}>

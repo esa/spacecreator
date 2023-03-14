@@ -27,6 +27,7 @@
 #include <memory>
 #include <seds/SedsXmlExporter/exporter.h>
 #include <seds/SedsXmlImporter/importer.h>
+#include <templating/templatinglibrary.h>
 
 using conversion::seds::translator::Asn1ToSedsTranslator;
 using seds::exporter::SedsXmlExporter;
@@ -40,6 +41,7 @@ bool SedsRegistrar::registerCapabilities(conversion::Registry &registry)
 {
     ivm::initIVLibrary();
     ive::initIVEditor();
+    templating::initTemplatingLibrary();
 
     auto sedsImporter = std::make_unique<SedsXmlImporter>();
     auto result = registry.registerImporter(ModelType::Seds, std::move(sedsImporter));

@@ -281,7 +281,7 @@ void IVPropertiesDialog::initCommentView()
 void IVPropertiesDialog::initLanguageView()
 {
     auto fn = qobject_cast<ivm::IVFunction *>(dataObject());
-    if (!fn || fn->instanceOf() != nullptr) {
+    if (!fn || fn->inheritsFunctionType()) {
         return;
     }
     auto languagesWidget = new ive::ImplementationsWidget(m_projectPath, fn, m_ivChecks, commandMacro(), this);

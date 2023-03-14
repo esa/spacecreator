@@ -34,6 +34,7 @@
 #include <sdl/SdlOptions/options.h>
 #include <shared/common.h>
 #include <shared/sharedlibrary.h>
+#include <templating/templatinglibrary.h>
 
 int main(int argc, char **argv)
 {
@@ -47,6 +48,7 @@ int main(int argc, char **argv)
     ivm::initIVLibrary();
     msc::initMscLibrary();
     shared::initSharedLibrary();
+    templating::initTemplatingLibrary();
 
     auto dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
@@ -54,7 +56,7 @@ int main(int argc, char **argv)
     conversion::Options options;
     options.add(conversion::msc::MscOptions::inputFilepath, QString(argv[1]));
     options.add(conversion::asn1::Asn1Options::inputFilepath, "observer.asn");
-    options.add(conversion::iv::IvOptions::inputFilepath, "interfaceview.xml");
+    options.add(conversion::iv::IvOptions::inputFilepath, shared::kDefaultInterfaceViewFileName);
     options.add(conversion::iv::IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
 
     conversion::msc::importer::MscImporter mscImporter;

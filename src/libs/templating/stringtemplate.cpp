@@ -149,14 +149,13 @@ bool StringTemplate::parseFile(
     const QString result = output.trimmed();
 
     const QString formatted = formatText(result);
-    if (!out->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        qWarning() << "Can't open device for writing:" << out->errorString();
+    if (!out->isOpen() || !out->isWritable()) {
+        qWarning() << "Device isn't openedfor writing:" << out->errorString();
         Q_EMIT errorOccurred(out->errorString());
         return false;
     }
 
     out->write(formatted.toUtf8());
-    out->close();
     return true;
 }
 

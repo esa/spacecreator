@@ -98,9 +98,9 @@ QStringList DVFunction::path() const
         path = model()->ivQueries()->functionPath(title());
 
         auto self = const_cast<DVFunction *>(this);
-        self->setEntityAttribute(tokenName, QVariant::fromValue(path.join("::")));
+        self->setEntityAttribute(tokenName, QVariant::fromValue(path.join(shared::kStringDelemiter)));
     } else {
-        path = entityAttributeValue<QString>(tokenName, title()).split("::");
+        path = entityAttributeValue<QString>(tokenName, title()).split(shared::kStringDelemiter);
     }
     return path;
 }

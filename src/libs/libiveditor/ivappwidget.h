@@ -60,6 +60,8 @@ public Q_SLOTS:
     void showArchetypeManager();
 
 private Q_SLOTS:
+    void showContextMenuForSharedTypesView(const QPoint &pos);
+    void showContextMenuForComponentsLibraryView(const QPoint &pos);
     void showContextMenuForIVModel(const QPoint &pos);
     void showAvailableLayers(const QPoint &pos);
     void renameSelectedLayer(QStandardItem *item);
@@ -71,12 +73,14 @@ private Q_SLOTS:
     void showEditAttributesDialog();
     void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
     void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
+    void linkEntity(const shared::Id &id, const QPointF &sceneDropPoint);
 
     void enterNestedView(const shared::Id &id);
     void onItemDoubleClicked(const shared::Id &id);
     void onItemCreated(const shared::Id &id);
     void onRootObjectChanged(const shared::Id &rootId);
     void checkActionsFromSelection();
+    void editExternalEntity(const QString &path, const QString &entityName);
 
 private:
     void initGraphicsView();

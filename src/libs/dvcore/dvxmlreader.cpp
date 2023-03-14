@@ -64,7 +64,7 @@ QVector<DVObject *> DVXMLReader::parsedObjects() const
     return d->m_allObjects;
 }
 
-void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
+bool DVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     EntityAttributes attrs = attributes(xml.attributes());
@@ -164,9 +164,10 @@ void DVXMLReader::processTagOpen(QXmlStreamReader &xml)
             processTagClose(xml);
         }
     }
+    return true;
 }
 
-void DVXMLReader::processTagClose(QXmlStreamReader &xml)
+bool DVXMLReader::processTagClose(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     switch (meta::Props::token(tagName)) {
@@ -185,6 +186,7 @@ void DVXMLReader::processTagClose(QXmlStreamReader &xml)
     default:
         break;
     }
+    return true;
 }
 
 QString DVXMLReader::rootElementName() const

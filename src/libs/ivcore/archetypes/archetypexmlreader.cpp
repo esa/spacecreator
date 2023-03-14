@@ -21,7 +21,7 @@
 
 #include "entityattribute.h"
 #include "errorhub.h"
-#include "parameter.h"
+#include "layerarchetype.h"
 
 #include <QDebug>
 #include <QFile>
@@ -68,7 +68,7 @@ QVector<ArchetypeObject *> ArchetypeXMLReader::parsedObjects() const
     return m_allObjects;
 }
 
-void ArchetypeXMLReader::processTagOpen(QXmlStreamReader &xml)
+bool ArchetypeXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     const EntityAttributes attrs = attributes(xml.attributes());
@@ -113,9 +113,10 @@ void ArchetypeXMLReader::processTagOpen(QXmlStreamReader &xml)
         m_currentObject.set(object);
         addCurrentObject();
     }
+    return true;
 }
 
-void ArchetypeXMLReader::processTagClose(QXmlStreamReader &xml)
+bool ArchetypeXMLReader::processTagClose(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     switch (ArchetypeProps::token(tagName)) {
@@ -128,6 +129,7 @@ void ArchetypeXMLReader::processTagClose(QXmlStreamReader &xml)
     default:
         break;
     }
+    return true;
 }
 
 QString ArchetypeXMLReader::rootElementName() const

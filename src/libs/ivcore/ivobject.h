@@ -84,6 +84,8 @@ public:
     bool isNestedInFunction() const;
     bool isNestedInFunctionType() const;
     bool isNested() const;
+    bool isReference() const;
+    shared::Id origin() const;
 
     QString groupName() const;
     void setGroupName(const QString &groupName);
@@ -111,8 +113,6 @@ public:
     QVariantList attributes() const;
     QVariantList properties() const;
 
-    QVariantList generateProperties(bool isProperty) const override;
-
 Q_SIGNALS:
     void urlChanged(const QString &url);
     void titleChanged(const QString &title);
@@ -124,6 +124,7 @@ public Q_SLOTS:
     bool setTitle(const QString &title);
 
 protected:
+    QVariantList generateProperties(bool isProperty) const override;
     void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
     QList<EntityAttribute> sortedAttributesValues(const EntityAttributes &attributes) override;
 

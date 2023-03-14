@@ -81,8 +81,6 @@ public:
     QVariantList attributes() const;
     QVariantList properties() const;
 
-    QVariantList generateProperties(bool isProperty) const override;
-
 Q_SIGNALS:
     void urlChanged(const QString &title);
     void titleChanged(const QString &title);
@@ -93,6 +91,7 @@ public Q_SLOTS:
     bool setParentObject(DVObject *parentObject);
 
 protected:
+    QVariantList generateProperties(bool isProperty) const override;
     void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type) override;
 
 private:

@@ -31,6 +31,7 @@
 #include <libiveditor/ivexporter.h>
 #include <optional>
 #include <shared/sharedlibrary.h>
+#include <templating/templatinglibrary.h>
 #include <tmc/TmcInterfaceViewOptimizer/interfaceviewoptimizer.h>
 
 using tmc::InterfaceViewOptimizer;
@@ -48,23 +49,14 @@ std::unique_ptr<ivm::IVModel> importIvModel(const QString &filepath)
     dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
     auto model = std::make_unique<ivm::IVModel>(dynPropConfig);
-    model->initFromObjects(reader.parsedObjects());
+    model->initFromObjects(reader.parsedObjects(), reader.externalAttributes());
     return model;
 }
 
 void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString &outputFilePath)
 {
-    QByteArray modelData;
-    QBuffer modelDataBuffer(&modelData);
-    modelDataBuffer.open(QIODevice::WriteOnly);
-
     ive::IVExporter exporter;
-    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
-
-    QSaveFile outputFile(outputFilePath);
-    outputFile.open(QIODevice::WriteOnly);
-    outputFile.write(modelData);
-    outputFile.commit();
+    exporter.exportObjectsSilently(ivModel->objects().values(), outputFilePath);
 }
 
 int main(int argc, char *argv[])
@@ -72,6 +64,7 @@ int main(int argc, char *argv[])
     shared::initSharedLibrary();
     ivm::initIVLibrary();
     ive::initIVEditor();
+    templating::initTemplatingLibrary();
 
     QCoreApplication app(argc, argv);
 

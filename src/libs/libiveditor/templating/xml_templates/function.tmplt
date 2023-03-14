@@ -29,6 +29,8 @@ func.connectionGroups       :   |_ List of all nested connection groups of funct
 conngroups                  :       |_ Instance of nested connection groups
 func.connectedFunctions     :   |_ List of connected functions
 connectedFunc               :       |_ List of parent Functions names
+func.origin                 :   |_ ID of referenced entity from external (shared component) library
+func.isReference            :   |_ if current entity is a reference to unit from external (shared component) library
 func.implementations        :   |_ List of all inmplementations languages for this function
 implementation              :       |_ Instance of language
 implementation.name         :           |_ Name for this implementation
@@ -39,6 +41,9 @@ reference.archetypeLibrary  :           |_ Name for this implementation
 reference.archetypeFunction :           |_ Value of name of the programming language
 
 {% endcomment %}
+{% if func.isReference %}
+<Function id="{{ func.id }}" origin="{{ func.origin }}" />
+{% else %}
 <Function id="{{ func.id }}"{% for attr in func.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
 {% for prop in func.properties %}
     <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
@@ -75,3 +80,4 @@ reference.archetypeFunction :           |_ Value of name of the programming lang
 <ArchetypeReference archetype_library="{{ reference.archetypeLibrary }}" archetype_function="{{ reference.archetypeFunction }}"/>
 {% endfor %}
 </Function>
+{% endif %}

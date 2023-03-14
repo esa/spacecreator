@@ -1,0 +1,7 @@
+<UI version="1.0" {% if UiFile %} UiFile="{{ UiFile }}"{% endif %}>
+{% for entities in Entities %}
+    {% for entity in entities %}
+        {% include "entityNode.tmplt" %}
+    {% endfor %}
+{% endfor %}
+</UI>

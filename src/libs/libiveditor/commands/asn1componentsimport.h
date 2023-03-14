@@ -21,6 +21,7 @@
 #include <QScopedPointer>
 
 class QTemporaryDir;
+class QFileInfo;
 
 namespace ivm {
 class IVObject;
@@ -54,6 +55,9 @@ public:
     void redoAsnFileImport(const ivm::IVObject *object);
     void undoAsnFileImport();
     QString relativePathForObject(const ivm::IVObject *object) const;
+
+    static QStringList asn1ModuleDuplication(
+            Asn1Acn::Asn1SystemChecks *asn1Checks, const QVector<QFileInfo> &asn1FileInfos);
 
 protected:
     Asn1Acn::Asn1SystemChecks *m_asn1Checks;

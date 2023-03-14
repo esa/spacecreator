@@ -435,7 +435,17 @@ QString IVEditorCore::filePath() const
 
 bool IVEditorCore::save()
 {
-    return m_document->exporter()->exportDocSilently(m_document);
+    QString savePath { m_document->path() };
+    if (savePath.isEmpty()) {
+        QFileDialog dialog(m_mainWidget, QObject::tr("Export data to an XML file"));
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setDefaultSuffix(".xml");
+        if (dialog.exec() != QDialog::Accepted) {
+            return false;
+        }
+        savePath = dialog.selectedUrls().value(0).toLocalFile();
+    }
+    return m_document->exporter()->exportDocSilently(m_document, savePath);
 }
 
 QVector<ivm::IVFunction *> IVEditorCore::allIVFunctions() const

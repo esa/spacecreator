@@ -86,10 +86,10 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                 << shared::graphicsviewutils::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
                 || shared::graphicsviewutils::comparePolygones(connection->graphicsPoints(),
-                           shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
+                        shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
-                || shared::graphicsviewutils::comparePolygones(connection->points(),
-                           shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
+                || shared::graphicsviewutils::comparePolygones(
+                        connection->points(), shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
     } else if (auto rectItem = qobject_cast<shared::ui::VERectGraphicsItem *>(item)) {
         qInfo() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:\n"
                 << rectItem->sceneBoundingRect() << "\n";
@@ -125,7 +125,7 @@ IVItemModel::IVItemModel(ivm::IVModel *model, cmd::CommandsStack *commandsStack,
     connect(model, &ivm::IVModel::rootObjectChanged, this, &IVItemModel::onRootObjectChanged);
 }
 
-IVItemModel::~IVItemModel() {}
+IVItemModel::~IVItemModel() { }
 
 void IVItemModel::onObjectAdded(shared::Id objectId)
 {
@@ -693,7 +693,8 @@ void IVItemModel::initItem(shared::ui::VEInteractiveObject *item)
         return;
     }
 
-    connect(object, &shared::VEObject::attributeChanged, this, &IVItemModel::scheduleInterfaceTextUpdate); // Check only name attr?
+    connect(object, &shared::VEObject::attributeChanged, this,
+            &IVItemModel::scheduleInterfaceTextUpdate); // Check only name attr?
 
     if (const auto connectionGroupObject = qobject_cast<ivm::IVConnectionGroup *>(object)) {
         connect(connectionGroupObject, &ivm::IVConnectionGroup::connectionAdded, this,

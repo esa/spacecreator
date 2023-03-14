@@ -76,11 +76,16 @@ CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType
     ivm::IVXMLReader parser;
     if (parser.read(data)) {
         QVector<ivm::IVObject *> objects = parser.parsedObjects();
+        const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
         ivm::IVObject::sortObjectList(objects);
         const QSet<QString> functionNames = m_model->nestedFunctionNames();
         QSet<QString> importingNames = fnTypeNames(objects);
         QRectF importingRect;
         for (ivm::IVObject *obj : qAsConst(objects)) {
+            const EntityAttributes attrs = extAttrs.value(obj->id());
+            for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
+                obj->setEntityAttribute(attrIt.value());
+            }
             obj->setModel(m_model);
             if (isRectangularType(obj) && functionNames.contains(obj->title())) {
                 const QString objName = obj->title();

@@ -17,20 +17,20 @@
 
 #include "exportableivobject.h"
 
+#include "exportableivarchetypelibraryreference.h"
+#include "exportableivarchetypereference.h"
 #include "exportableivconnection.h"
 #include "exportableivconnectiongroup.h"
+#include "exportableivconnectionlayertype.h"
 #include "exportableivfunction.h"
 #include "exportableivfunctiontype.h"
 #include "exportableivinterface.h"
-#include "exportableivconnectionlayertype.h"
-#include "exportableivarchetypereference.h"
-#include "exportableivarchetypelibraryreference.h"
+#include "ivarchetypelibraryreference.h"
+#include "ivarchetypereference.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
-#include "ivarchetypereference.h"
-#include "ivarchetypelibraryreference.h"
 #include "ivobject.h"
 
 namespace ive {
@@ -79,11 +79,14 @@ QVariant ExportableIVObject::createFrom(const ivm::IVObject *ivObject)
     case ivm::IVObject::Type::ConnectionGroup:
         return QVariant::fromValue(ExportableIVConnectionGroup(static_cast<const ivm::IVConnectionGroup *>(ivObject)));
     case ivm::IVObject::Type::ConnectionLayer:
-        return QVariant::fromValue(ExportableIVConnectionLayerType(static_cast<const ivm::IVConnectionLayerType *>(ivObject)));
+        return QVariant::fromValue(
+                ExportableIVConnectionLayerType(static_cast<const ivm::IVConnectionLayerType *>(ivObject)));
     case ivm::IVObject::Type::ArchetypeReference:
-        return QVariant::fromValue(ExportableIVArchetypeReference(static_cast<const ivm::IVArchetypeReference *>(ivObject)));
+        return QVariant::fromValue(
+                ExportableIVArchetypeReference(static_cast<const ivm::IVArchetypeReference *>(ivObject)));
     case ivm::IVObject::Type::ArchetypeLibraryReference:
-        return QVariant::fromValue(ExportableIVArchetypeLibraryReference(static_cast<const ivm::IVArchetypeLibraryReference *>(ivObject)));
+        return QVariant::fromValue(
+                ExportableIVArchetypeLibraryReference(static_cast<const ivm::IVArchetypeLibraryReference *>(ivObject)));
     default:
         Q_UNREACHABLE();
     }
@@ -95,7 +98,7 @@ QVariant ExportableIVObject::createFrom(const ivm::IVObject *ivObject)
  */
 QVariantList ExportableIVObject::attributes() const
 {
-    return exportedObject<ivm::IVObject>()->generateProperties(false);
+    return exportedObject<ivm::IVObject>()->attributes();
 }
 
 /**
@@ -104,12 +107,22 @@ QVariantList ExportableIVObject::attributes() const
  */
 QVariantList ExportableIVObject::properties() const
 {
-    return exportedObject<ivm::IVObject>()->generateProperties(true);
+    return exportedObject<ivm::IVObject>()->properties();
 }
 
 QStringList ExportableIVObject::path() const
 {
     return exportedObject<ivm::IVObject>()->path();
+}
+
+bool ExportableIVObject::isReference() const
+{
+    return exportedObject<ivm::IVObject>()->isReference();
+}
+
+QString ExportableIVObject::origin() const
+{
+    return exportedObject<ivm::IVObject>()->origin().toString();
 }
 
 }

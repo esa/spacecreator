@@ -32,8 +32,8 @@ class IVConnection : public IVObject
     Q_OBJECT
 
 public:
-    explicit IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget,
-            QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
+    explicit IVConnection(IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent = nullptr,
+            const shared::Id &id = shared::InvalidId);
     ~IVConnection() override;
 
     QString sourceName() const;
@@ -79,9 +79,15 @@ public:
         QString m_functionName;
         QString m_interfaceName;
         IVInterface::InterfaceType m_ifaceDirection;
-        inline bool isReady() const { return !m_functionName.isEmpty() && !m_interfaceName.isEmpty(); }
+        shared::Id m_ifaceId;
+        shared::Id m_originIfaceId;
+        inline bool isReady() const
+        {
+            return (!m_functionName.isEmpty() && !m_interfaceName.isEmpty()) || m_ifaceId != shared::InvalidId;
+        }
         inline void reset()
         {
+            m_ifaceId = shared::InvalidId;
             m_functionName.clear();
             m_interfaceName.clear();
         }
@@ -108,8 +114,8 @@ public:
     QVector<shared::InterfaceParameter> params() const;
 
 protected:
-    explicit IVConnection(
-            const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget, QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
+    explicit IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget,
+            QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
     bool lookupEndpointsPostponed();
     bool needPostponedInit() const;
 

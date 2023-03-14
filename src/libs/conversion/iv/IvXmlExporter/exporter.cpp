@@ -60,17 +60,8 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
         throw MissingOutputFilenameException(ModelType::InterfaceView);
     }
 
-    QByteArray modelData;
-    QBuffer modelDataBuffer(&modelData);
-    modelDataBuffer.open(QIODevice::WriteOnly);
-
     IVExporter exporter;
-    exporter.exportObjects(ivModel->objects().values(), &modelDataBuffer);
-
-    QSaveFile outputFile(*outputFilepath);
-    outputFile.open(QIODevice::WriteOnly);
-    outputFile.write(modelData);
-    outputFile.commit();
+    exporter.exportObjectsSilently(ivModel->objects().values(), *outputFilepath);
 }
 
 } // namespace conversion::iv::exporter

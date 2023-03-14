@@ -23,7 +23,6 @@
 #include <QUndoCommand>
 
 namespace ivm {
-class IVObject;
 class IVFunction;
 class IVFunctionType;
 class IVModel;
@@ -35,6 +34,7 @@ class CmdEntityAttributeChange;
 
 class CmdEntitiesInstantiate : public ASN1ComponentsImport, public QUndoCommand
 {
+    Q_OBJECT
 public:
     explicit CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm::IVFunctionType *parent, ivm::IVModel *model,
             Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
@@ -52,5 +52,5 @@ private:
     QList<QUndoCommand *> m_subCmds;
 };
 
-} // namespace ive
 } // namespace cmd
+} // namespace ive

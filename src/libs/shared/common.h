@@ -93,6 +93,8 @@ bool ensureDirExists(const QString &path);
 
 bool ensureFileExists(const QString &filePath, const QString &defaultFilePath);
 
+bool isSame(const QString &filePath1, const QString &filePath2);
+
 template<typename T>
 bool isAncestorOf(const T *const parent, T *object)
 {
@@ -129,6 +131,7 @@ E typeFromName(const QString &name)
 
 //! Default filename for Interface View diagram
 static const QString kDefaultInterfaceViewFileName { QLatin1String("interfaceview.xml") };
+static const QString kDefaultInterfaceViewUIFileName { QLatin1String("interfaceview.ui.xml") };
 
 /*!
  * Returns path to exported components library set in TASTE_COMPONENTS_LIBRARY

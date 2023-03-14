@@ -39,8 +39,8 @@ public:
     QVector<DVObject *> parsedObjects() const;
 
 protected:
-    void processTagOpen(QXmlStreamReader &xml) override;
-    void processTagClose(QXmlStreamReader &xml) override;
+    bool processTagOpen(QXmlStreamReader &xml) override;
+    bool processTagClose(QXmlStreamReader &xml) override;
     QString rootElementName() const override;
 
 private:

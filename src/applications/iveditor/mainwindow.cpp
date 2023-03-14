@@ -193,7 +193,18 @@ void MainWindow::onCreateFileRequested()
  */
 bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 {
-    return m_core->document()->exporter()->exportDocSilently(m_core->document(), savePath, templatePath);
+    QString filePath = savePath;
+    if (filePath.isEmpty()) {
+        filePath = m_core->filePath();
+        QFileDialog dialog(m_core->mainwidget(), QObject::tr("Export data to an XML file"));
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setDefaultSuffix(".xml");
+        if (dialog.exec() == QDialog::Accepted) {
+            filePath = dialog.selectedUrls().value(0).toLocalFile();
+        }
+    }
+
+    return m_core->document()->exporter()->exportDocSilently(m_core->document(), filePath, templatePath);
 }
 
 /*!

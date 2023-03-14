@@ -26,6 +26,7 @@
 #include <ivcore/ivlibrary.h>
 #include <msccore/msclibrary.h>
 #include <shared/sharedlibrary.h>
+#include <templating/templatinglibrary.h>
 
 int main(int argc, char *argv[])
 {
@@ -34,6 +35,7 @@ int main(int argc, char *argv[])
     shared::initSharedLibrary();
     ivm::initIVLibrary();
     msc::initMscLibrary();
+    templating::initTemplatingLibrary();
 
     QCoreApplication app(argc, argv);
 

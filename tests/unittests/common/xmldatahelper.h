@@ -68,13 +68,11 @@ public:
     };
 
     explicit XmlData(const QByteArray &data, const QStringList &excludedAttrs = {}, const QStringList &excludedProperties = {})
-//        : excludedAttrs(excludedAttrs), excludedProperties(excludedProperties)
     {
         QXmlStreamReader xml(data);
         processXml(xml);
     }
     explicit XmlData(const QString &path, const QStringList &excludedAttrs = {}, const QStringList &excludedProperties = {})
-//        : excludedAttrs(excludedAttrs), excludedProperties(excludedProperties)
     {
         QFile file(path);
         if (!file.open(QIODevice::ReadOnly)) {
@@ -88,6 +86,16 @@ public:
 
     bool isEqual(const XmlData &xmlData, bool strictComparision, const QStringList &excludedAttrs, const QStringList &excludedProperties) const
     {
+        for (auto it = attrs.constBegin(); it != attrs.constEnd(); ++it) {
+            if (excludedAttrs.contains(it.key()))
+                continue;
+
+            if (xmlData.attrs.value(it.key()) != it.value()) {
+                qDebug() << "Attribute mismatch'" << it.key() << it.value().toString();
+                return false;
+            }
+        }
+
         for (const Node &n: qAsConst(nodes)) {
             if (excludedProperties.contains(n.type))
                 continue;
@@ -125,6 +133,11 @@ private:
         while (!xml.atEnd() && !xml.hasError()) {
             const QXmlStreamReader::TokenType token = xml.readNext();
             if (token == QXmlStreamReader::StartDocument) {
+                if (xml.readNext() == QXmlStreamReader::StartElement) {
+                    for (const QXmlStreamAttribute &attr : xml.attributes()) {
+                        attrs.insert(attr.name().toString(), attr.value().toString());
+                    }
+                }
                 continue;
             }
             while (xml.readNextStartElement()) {
@@ -136,9 +149,8 @@ private:
     friend bool operator==(const XmlData &lhs, const XmlData &rhs);
 
 private:
+    QVariantHash attrs;
     QList<Node> nodes;
-//    const QStringList excludedAttrs;
-//    const QStringList excludedProperties;
 };
 
 bool operator==(const XmlData &lhs, const XmlData &rhs)

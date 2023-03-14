@@ -20,7 +20,7 @@
 #include "archetypeobject.h"
 
 #include "archetypemodel.h"
-#include "exportableproperty.h"
+#include "exportableattribute.h"
 #include "ivcoreutils.h"
 #include "ivnamevalidator.h"
 
@@ -103,7 +103,7 @@ QVector<qint32> ArchetypeObject::coordinates() const
     return QVector<qint32>();
 }
 
-void ArchetypeObject::setCoordinates(const QVector<qint32> &coordinates) {}
+void ArchetypeObject::setCoordinates(const QVector<qint32> &coordinates) { }
 
 ArchetypeObject *ArchetypeObject::parentObject() const
 {
@@ -151,17 +151,17 @@ QVariantList ArchetypeObject::generateProperties(bool isProperty) const
     EntityAttributes attributes = entityAttributes();
     for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
         if (it.value().isExportable() && it.value().isProperty() == isProperty) {
-            result << QVariant::fromValue(shared::ExportableProperty(it.key(), it.value().value()));
+            result << QVariant::fromValue(shared::ExportableAttribute(it.key(), it.value().value()));
         }
     }
 
     std::sort(result.begin(), result.end(), [](const QVariant &leftVal, const QVariant &rightVal) {
-        const auto &rightExportable = rightVal.value<shared::ExportableProperty>();
+        const auto &rightExportable = rightVal.value<shared::ExportableAttribute>();
         const ivm::meta::ArchetypeProps::Token rightToken = ivm::meta::ArchetypeProps::token(rightExportable.name());
         if (rightToken == ivm::meta::ArchetypeProps::Token::Unknown)
             return true;
 
-        const auto &leftExportable = leftVal.value<shared::ExportableProperty>();
+        const auto &leftExportable = leftVal.value<shared::ExportableAttribute>();
         const ivm::meta::ArchetypeProps::Token leftToken = ivm::meta::ArchetypeProps::token(leftExportable.name());
         if (leftToken == ivm::meta::ArchetypeProps::Token::Unknown)
             return false;

@@ -79,6 +79,10 @@ public:
         is_simulink_interface,
         simulink_interface_type,
         simulink_full_interface_ref,
+        iface_id,
+        reference,
+        origin,
+        origin_iface_id,
 
         // properties values
         QGenC,

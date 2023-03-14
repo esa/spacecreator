@@ -18,7 +18,7 @@
  */
 
 #include "exportableivarchetypelibraryreference.h"
-#include "exportableproperty.h"
+#include "exportableattribute.h"
 #include "ivarchetypelibraryreference.h"
 
 

@@ -22,6 +22,8 @@
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
+#include "commands/cmdentitiesreference.h"
+#include "commands/cmdentitiesremove.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "errorhub.h"
@@ -48,9 +50,14 @@
 #include <QClipboard>
 #include <QDebug>
 #include <QDialog>
+#include <QDir>
 #include <QFileInfo>
 #include <QIcon>
 #include <QMenu>
+#include <QMessageBox>
+#include <QPointer>
+#include <QProcess>
+#include <QStringList>
 #include <QTimer>
 
 namespace ive {
@@ -119,6 +126,116 @@ void IVAppWidget::centerView()
 QAction *IVAppWidget::actionDelete() const
 {
     return m_actRemove;
+}
+
+void IVAppWidget::showContextMenuForSharedTypesView(const QPoint &pos)
+{
+    const QModelIndex idx = ui->sharedView->indexAt(pos);
+    if (!idx.isValid()) {
+        return;
+    }
+
+    const shared::Id id = idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid();
+    const auto obj = m_document->sharedModel()->getObject(id);
+    if (!obj) {
+        return;
+    }
+
+    if (obj->type() != ivm::IVObject::Type::FunctionType) {
+        return;
+    }
+
+    auto menu = new QMenu;
+    QAction *actInstantiateSharedType = menu->addAction(tr("Instantiate entity"));
+    connect(actInstantiateSharedType, &QAction::triggered, this, [this, id]() { instantiateEntity(id, QPointF()); });
+
+    QAction *actImportSharedType = menu->addAction(tr("Import shared type"));
+    connect(actImportSharedType, &QAction::triggered, this,
+            [this, id]() { QMessageBox::warning(this, tr("Import shared type"), tr("Not implemented yet.")); });
+
+    QAction *actEditSharedType = menu->addAction(tr("Edit shared type"));
+    connect(actEditSharedType, &QAction::triggered, this,
+            [this, obj] { editExternalEntity(shared::sharedTypesPath(), obj->title()); });
+
+    QAction *actRemoveSharedType = menu->addAction(tr("Remove shared type"));
+    connect(actRemoveSharedType, &QAction::triggered, this, [this, id]() {
+        if (auto model = m_document->sharedModel()) {
+            if (auto obj = model->getObject(id)) {
+                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model);
+                cmdRm->setText(tr("Remove importable shared type(s)"));
+                m_document->commandsStack()->push(cmdRm);
+            }
+        }
+    });
+
+    menu->exec(ui->sharedView->mapToGlobal(pos));
+}
+
+void IVAppWidget::editExternalEntity(const QString &path, const QString &entityName)
+{
+    const QString proFilePath = path + QDir::separator() + entityName;
+    const QString proFileName = entityName + QLatin1String(".pro");
+
+    const bool ok = QProcess::startDetached(qApp->applicationFilePath(),
+            { QLatin1String("-pid"), QString::number(qApp->applicationPid()),
+                    proFilePath + QDir::separator() + proFileName });
+    if (!ok) {
+        QMessageBox::warning(this, tr("Edit component"), tr("Error during component opening for editing."));
+    } else {
+        QProcess::startDetached(qApp->applicationFilePath(),
+                { QLatin1String("-pid"), QString::number(qApp->applicationPid()),
+                        proFilePath + QDir::separator() + shared::kDefaultInterfaceViewFileName });
+    }
+}
+
+void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
+{
+    const QModelIndex idx = ui->importView->indexAt(pos);
+    if (!idx.isValid()) {
+        return;
+    }
+
+    const shared::Id id = idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid();
+    const auto obj = m_document->importModel()->getObject(id);
+    if (!obj) {
+        return;
+    }
+
+    if (obj->type() != ivm::IVObject::Type::Function && obj->type() != ivm::IVObject::Type::FunctionType) {
+        return;
+    }
+
+    auto menu = new QMenu;
+    QAction *actImportComponent = menu->addAction(tr("Import entity"));
+    connect(actImportComponent, &QAction::triggered, this, [this, id]() { importEntity(id, QPointF()); });
+
+    QAction *actImportAsReference = menu->addAction(tr("Add reference"));
+    connect(actImportAsReference, &QAction::triggered, this, [this, id]() {
+        if (auto model = m_document->importModel()) {
+            if (auto fnt = qobject_cast<ivm::IVFunctionType *>(model->getObject(id))) {
+                auto cmdRm = new cmd::CmdEntitiesReference(fnt, nullptr, m_document->objectsModel(), {});
+                cmdRm->setText(tr("Add reference to component(s)"));
+                m_document->commandsStack()->push(cmdRm);
+            }
+        }
+    });
+
+    QAction *actEditComponent = menu->addAction(tr("Edit component"));
+    connect(actEditComponent, &QAction::triggered, this,
+            [this, obj] { editExternalEntity(shared::componentsLibraryPath(), obj->title()); });
+
+    QAction *actRemoveComponent = menu->addAction(tr("Remove component"));
+    connect(actRemoveComponent, &QAction::triggered, this, [this, id]() {
+        if (auto model = m_document->importModel()) {
+            if (auto obj = model->getObject(id)) {
+                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model);
+                cmdRm->setText(tr("Remove importable component(s)"));
+                m_document->commandsStack()->push(cmdRm);
+            }
+        }
+    });
+
+    menu->exec(ui->importView->mapToGlobal(pos));
 }
 
 void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
@@ -307,6 +424,9 @@ void IVAppWidget::showEditAttributesDialog()
 
 void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
 {
+    /// TODO: find proper place for imporing function in the scene if sceneDropPoint is null (for example action from
+    /// context menu is invoked)
+
     Q_ASSERT(m_document);
     const auto obj = m_document->importModel()->getObject(id);
     if (!obj) {
@@ -353,6 +473,9 @@ void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoi
 
 void IVAppWidget::instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint)
 {
+    /// TODO: find proper place for instantiation in the scene if sceneDropPoint is null (for example action from
+    /// context menu is invoked)
+
     Q_ASSERT(m_document);
     const auto obj = m_document->sharedModel()->getObject(id);
     if (!obj || obj->type() != ivm::IVObject::Type::FunctionType) {
@@ -366,6 +489,26 @@ void IVAppWidget::instantiateEntity(const shared::Id &id, const QPointF &sceneDr
     auto cmdInstantiate =
             new cmd::CmdEntitiesInstantiate(obj->as<ivm::IVFunctionType *>(), parentObject, m_document->objectsModel(),
                     m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+    m_document->commandsStack()->push(cmdInstantiate);
+}
+
+void IVAppWidget::linkEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+{
+    /// TODO: find proper place for imporing as reference in the scene if sceneDropPoint is null (for example action
+    /// from context menu is invoked)
+
+    Q_ASSERT(m_document);
+    const auto obj = m_document->importModel()->getObject(id);
+    if (!obj || obj->type() != ivm::IVObject::Type::Function) {
+        return;
+    }
+    QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
+    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
+        itemAtScenePos = itemAtScenePos->parentItem();
+    }
+    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    auto cmdInstantiate = new cmd::CmdEntitiesReference(
+            obj->as<ivm::IVFunction *>(), parentObject, m_document->objectsModel(), sceneDropPoint);
     m_document->commandsStack()->push(cmdInstantiate);
 }
 
@@ -511,7 +654,10 @@ void IVAppWidget::initImportView()
     ui->importView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     ui->importView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     ui->importView->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    ui->importView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
     ui->importView->setModel(m_document->importVisualisationModel());
+    connect(ui->importView, &QTreeView::customContextMenuRequested, this,
+            &IVAppWidget::showContextMenuForComponentsLibraryView);
 }
 
 void IVAppWidget::initSharedView()
@@ -520,7 +666,10 @@ void IVAppWidget::initSharedView()
     ui->sharedView->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     ui->sharedView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     ui->sharedView->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    ui->sharedView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
     ui->sharedView->setModel(m_document->sharedVisualisationModel());
+    connect(ui->sharedView, &QTreeView::customContextMenuRequested, this,
+            &IVAppWidget::showContextMenuForSharedTypesView);
 }
 
 void IVAppWidget::initLayerView()

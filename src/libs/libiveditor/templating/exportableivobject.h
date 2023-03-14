@@ -39,6 +39,8 @@ class ExportableIVObject : public templating::AbstractExportableObject
     Q_PROPERTY(QVariantList attributes READ attributes)
     Q_PROPERTY(QVariantList properties READ properties)
     Q_PROPERTY(QStringList path READ path)
+    Q_PROPERTY(bool isReference READ isReference)
+    Q_PROPERTY(QString origin READ origin)
 
 public:
     explicit ExportableIVObject(const ivm::IVObject *ivObject = nullptr);
@@ -52,6 +54,9 @@ public:
     QVariantList attributes() const;
     QVariantList properties() const;
     QStringList path() const;
+
+    bool isReference() const;
+    QString origin() const;
 };
 
 }

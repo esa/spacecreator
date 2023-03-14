@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include "common.h"
 #include "../common/exceptions/inconsistentmodelexception.h"
+#include "common.h"
+#include "entityattribute.h"
 
 #include <QObject>
 #include <QVector>
@@ -41,15 +42,25 @@ public:
     virtual bool removeObject(VEObject *obj);
     virtual VEObject *getObject(const shared::Id &id) const;
     virtual void clear();
+    /**
+     * @brief Lookup for an object that has an attribute `attrName` with `value` set
+     */
+    virtual VEObject *getObjectByAttributeValue(const QString &attrName, const QVariant &value) const;
+
 
     const QList<shared::Id> &objectsOrder() const;
     const QHash<shared::Id, VEObject *> &objects() const;
 
+    void setExtAttributes(const QHash<shared::Id, EntityAttributes> &attrs);
+    QHash<shared::Id, EntityAttributes> extAttributes() const;
+    EntityAttributes extEntityAttributes(const shared::Id &id) const;
+
 public:
     template<typename T>
-    void initFromObjects(const QVector<T> &objects)
+    void initFromObjects(const QVector<T> &objects, const QHash<shared::Id, EntityAttributes> &extAttrs = {})
     {
         clear();
+        setExtAttributes(extAttrs);
         addObjects(objects);
     }
 

@@ -25,6 +25,7 @@
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
+#include "commands/asn1componentsimport.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/implementationshandler.h"
 #include "commandsstack.h"
@@ -46,6 +47,7 @@
 #include "ui/veinteractiveobject.h"
 
 #include <QAction>
+#include <QApplication>
 #include <QBuffer>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -58,6 +60,7 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 #include <QSplitter>
 #include <QUndoStack>
 #include <QVBoxLayout>
@@ -88,8 +91,56 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
     QString mscFileName;
+    QString uiFileName { shared::kDefaultInterfaceViewUIFileName };
     QStringList asnFilesNames;
 };
+
+void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
+{
+    if (!object || object->parentObject()
+            || !(object->type() == ivm::IVObject::Type::Function
+                    || object->type() == ivm::IVObject::Type::FunctionType)) {
+        return;
+    }
+
+    const QStringList objPath = ivm::IVObject::path(object);
+    const QString rootName = objPath.isEmpty() ? object->title() : objPath.front();
+    const QString sourcePrefix = shared::componentsLibraryPath();
+    const QDir sourceDir { sourcePrefix + QDir::separator() + rootName };
+    const QDir targetDir { QFileInfo(d->filePath).absolutePath() };
+
+    const QList<QFileInfo> asnFiles = sourceDir.entryInfoList(
+            { QLatin1String("*.asn1"), QLatin1String("*.asn"), QLatin1String("*.acn") }, QDir::Files);
+
+    QVector<QFileInfo> fileInfos;
+    std::copy_if(asnFiles.begin(), asnFiles.end(), std::back_inserter(fileInfos), [targetDir](const QFileInfo &fi) {
+        const QString destFilePath { targetDir.filePath(fi.fileName()) };
+        return !shared::isSame(destFilePath, fi.absoluteFilePath());
+    });
+
+    QStringList newAsnFiles;
+    QStringList importedAsnFiles;
+    for (const QFileInfo &file : qAsConst(fileInfos)) {
+        QString destFilePath { targetDir.filePath(file.fileName()) };
+        const bool isNewFile = !QFile::exists(destFilePath);
+        if (!isNewFile && !QFile::remove(destFilePath)) {
+            importedAsnFiles.append(destFilePath);
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("%1 wasn't imported").arg(file.fileName()));
+            continue;
+        }
+        if (shared::copyFile(file.absoluteFilePath(), destFilePath)) {
+            importedAsnFiles.append(destFilePath);
+            if (isNewFile)
+                newAsnFiles.append(destFilePath);
+        } else {
+            if (QFile::exists(destFilePath))
+                importedAsnFiles.append(destFilePath);
+            shared::ErrorHub::addError(shared::ErrorItem::Error, tr("%1 wasn't imported").arg(file.fileName()));
+        }
+    }
+
+    Q_EMIT d->commandsStack->asn1FilesImported(newAsnFiles);
+}
 
 /*!
 \class ive::InterfaceDocument
@@ -107,11 +158,21 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     d->dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
-    d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
-    d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
-    d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, this);
-    d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, this);
+    d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
+    d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
+    d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, d->importModel, this);
+    d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
     d->archetypesModel = new ivm::ArchetypeModel(this);
+
+    connect(d->objectsModel, &ivm::IVModel::objectsAdded, this, [this](const QVector<shared::Id> &objectsIds) {
+        for (const shared::Id &id : objectsIds) {
+            if (auto obj = d->objectsModel->getObject(id)) {
+                if (obj->isReference()) {
+                    checkReferencedASN1Files(d->objectsModel->getOrigin(obj->origin()));
+                }
+            }
+        }
+    });
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -341,6 +402,7 @@ bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &p
 
     auto objects = parser.parsedObjects();
     ivm::IVObject::sortObjectList(objects);
+    model->setExtAttributes(parser.externalAttributes());
     model->addObjects(objects);
     shared::ErrorHub::clearCurrentFile();
     return true;
@@ -474,6 +536,21 @@ QString InterfaceDocument::mscFilePath() const
     QFileInfo fi(path());
     fi.setFile(fi.absolutePath() + QDir::separator() + d->mscFileName);
     return fi.absoluteFilePath();
+}
+
+QString InterfaceDocument::uiFileName() const
+{
+    return d->uiFileName;
+}
+
+void InterfaceDocument::setUIFileName(const QString &filePath)
+{
+    if (filePath == d->uiFileName) {
+        return;
+    }
+
+    d->uiFileName = filePath;
+    Q_EMIT uiFileNameChanged(filePath);
 }
 
 bool InterfaceDocument::isDirty() const
@@ -705,9 +782,10 @@ void InterfaceDocument::onSavedExternally(const QString &filePath, bool saved)
 /*!
    \brief InterfaceDocument::setObjects
  */
-void InterfaceDocument::setObjects(const QVector<ivm::IVObject *> &objects)
+void InterfaceDocument::setObjects(
+        const QVector<ivm::IVObject *> &objects, const QHash<shared::Id, EntityAttributes> &externalAttrs)
 {
-    d->objectsModel->initFromObjects(objects);
+    d->objectsModel->initFromObjects(objects, externalAttrs);
     d->objectsModel->setRootObject({});
     if (d->itemsModel)
         d->itemsModel->shrinkScene();
@@ -764,32 +842,6 @@ void InterfaceDocument::onDynContextEditorMenuInvoked()
 void InterfaceDocument::showInfoMessage(const QString &title, const QString &message)
 {
     QMessageBox::information(qobject_cast<QWidget *>(parent()), title, message);
-}
-
-static inline bool exportObjects(IVExporter *exporter, const QList<shared::VEObject *> &objects,
-        ivm::ArchetypeModel *archetypesModel, const QString &filePath)
-{
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, QObject::tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
-        return false;
-    }
-    if (!exporter->exportObjects(objects, &buffer, archetypesModel)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, QObject::tr("Error during component export"));
-        return false;
-    }
-    buffer.close();
-
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, QObject::tr("Can't export file: ").arg(file.errorString()));
-        return false;
-    }
-    const qint64 bytesWritten = file.write(buffer.buffer());
-    file.close();
-    return bytesWritten == buffer.size();
 }
 
 static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
@@ -880,8 +932,8 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         (*it)->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), targetDir.dirName());
     }
 
-    if (!exportObjects(
-                exporter(), objects, d->archetypesModel, targetDir.filePath(shared::kDefaultInterfaceViewFileName))) {
+    if (!exporter()->exportObjectsSilently(objects, targetDir.filePath(shared::kDefaultInterfaceViewFileName),
+                d->archetypesModel, exporter()->templatePath(QLatin1String("interfaceview.ui")))) {
         return false;
     }
 
@@ -901,6 +953,8 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         }
     });
     copyImplementation(ivDir, targetDir, children);
+    createProFile(targetPath);
+    initTASTEEnv(targetPath);
     return true;
 }
 
@@ -923,7 +977,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
 
     QVector<ivm::IVObject *> parsedObjects = parser.parsedObjects();
     ivm::IVObject::sortObjectList(parsedObjects);
-    setObjects(parsedObjects);
+    setObjects(parsedObjects, parser.externalAttributes());
 
     auto layers = parser.parsedLayers();
     ivm::IVObject::sortObjectListByTitle(layers);
@@ -938,6 +992,8 @@ bool InterfaceDocument::loadImpl(const QString &path)
         ++i;
     }
     setMscFileName(metadata["mscfile"].toString());
+    if (metadata.contains(parser.uiFileNameTag()))
+        setUIFileName(metadata[parser.uiFileNameTag()].toString());
     shared::ErrorHub::clearCurrentFile();
 
     return true;
@@ -981,6 +1037,50 @@ void InterfaceDocument::showNIYGUI(const QString &title)
 {
     QString header = title.isEmpty() ? "NIY" : title;
     QMessageBox::information(nullptr, header, "Not implemented yet!");
+}
+
+void InterfaceDocument::createProFile(const QString &path)
+{
+    const QDir targetDir(path);
+    if (!targetDir.exists()) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Directory %1 doesn't exist").arg(path));
+        return;
+    }
+
+    const QString proFileName = targetDir.dirName() + QLatin1String(".pro");
+    QFile file(targetDir.filePath(proFileName));
+    if (!file.open(QIODevice::WriteOnly)) {
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, tr("Unable to create pro file for directory %1").arg(path));
+        return;
+    }
+
+    QTextStream stream(&file);
+    stream << "TEMPLATE = lib" << Qt::endl;
+    stream << "CONFIG -= qt" << Qt::endl;
+    stream << "CONFIG += generateC" << Qt::endl << Qt::endl;
+
+    QDirIterator it(path, QDir::Files);
+    while (it.hasNext()) {
+        const QString &filePath = it.next();
+        if (it.fileName() == proFileName)
+            continue;
+
+        stream << "DISTFILES += $$PWD/" << it.fileName() << Qt::endl;
+    }
+    if (targetDir.exists(ive::kRootImplementationPath))
+        stream << Qt::endl
+               << QStringLiteral("include($$PWD/%1/taste.pro)").arg(ive::kRootImplementationPath) << Qt::endl;
+}
+
+void InterfaceDocument::initTASTEEnv(const QString &path)
+{
+    auto initTASTECallerProcess = new QProcess(this);
+    initTASTECallerProcess->setWorkingDirectory(path);
+    if (initTASTECallerProcess->execute(QLatin1String("taste"), { QLatin1String("reset") }) != 0) {
+        QMessageBox::warning(qApp->activeWindow(), tr("Init TASTE environment"),
+                tr("Error during TASTE environment initiation for exported component!"));
+    }
 }
 
 void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)

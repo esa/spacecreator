@@ -24,6 +24,7 @@ namespace shared {
 struct VEModelPrivate {
     QList<shared::Id> m_objectsOrder;
     QHash<shared::Id, VEObject *> m_objects;
+    QHash<shared::Id, EntityAttributes> m_extAttrs;
 };
 
 VEModel::VEModel(QObject *parent)
@@ -73,6 +74,7 @@ bool VEModel::removeObject(VEObject *obj)
 
     d->m_objects.remove(id);
     d->m_objectsOrder.removeAll(id);
+    d->m_extAttrs.remove(id);
 
     Q_EMIT objectRemoved(obj->id());
     return true;
@@ -94,8 +96,17 @@ void VEModel::clear()
     }
     d->m_objects.clear();
     d->m_objectsOrder.clear();
+    d->m_extAttrs.clear();
 
     Q_EMIT modelReset();
+}
+
+VEObject *VEModel::getObjectByAttributeValue(const QString &attrName, const QVariant &value) const
+{
+    auto it = std::find_if(d->m_objects.constBegin(), d->m_objects.constEnd(), [&](VEObject *object){
+        return object->entityAttributeValue(attrName) == value;
+    });
+    return it == d->m_objects.constEnd() ? nullptr : *it;
 }
 
 const QList<Id> &VEModel::objectsOrder() const
@@ -106,6 +117,21 @@ const QList<Id> &VEModel::objectsOrder() const
 const QHash<Id, VEObject *> &VEModel::objects() const
 {
     return d->m_objects;
+}
+
+void VEModel::setExtAttributes(const QHash<Id, EntityAttributes> &attrs)
+{
+    d->m_extAttrs = attrs;
+}
+
+QHash<Id, EntityAttributes> VEModel::extAttributes() const
+{
+    return d->m_extAttrs;
+}
+
+EntityAttributes VEModel::extEntityAttributes(const Id &id) const
+{
+    return d->m_extAttrs.value(id);
 }
 
 VEObject *VEModel::getObject(const Id &id) const

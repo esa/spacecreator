@@ -321,7 +321,7 @@ QString Asn1Reader::checkforCompiler() const
     return asn1Exec;
 #else
     QProcess process;
-    process.start(QString("which asn1scc"));
+    process.start(QString("which"), { QString("asn1scc") });
     process.waitForFinished();
     QString asn1Exec = process.readAll();
     asn1Exec.remove('\n');

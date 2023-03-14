@@ -23,6 +23,7 @@
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "ivobject.h"
+#include "ivpropertytemplateconfig.h"
 #include "templating/exportableivobject.h"
 
 #include <QBuffer>
@@ -30,6 +31,7 @@
 #include <QFileDialog>
 #include <QMetaEnum>
 #include <QObject>
+#include <QSaveFile>
 #include <QScopedPointer>
 #include <QtDebug>
 
@@ -45,6 +47,11 @@ QString IVExporter::defaultTemplatePath() const
     return QString("%1/aadl_xml/interfaceview.%2").arg(templatesPath(), templateFileExtension());
 }
 
+QString IVExporter::templatePath(const QString &templateName)
+{
+    return QString("%1/aadl_xml/%2.%3").arg(templatesPath(), templateName, templateFileExtension());
+}
+
 /**
    @brief XmlDocExporter::exportObjects writes the document as xml to the given buffer
    @param objects the set of IV(AADL) entities
@@ -53,34 +60,122 @@ QString IVExporter::defaultTemplatePath() const
    @param templatePath the grantlee template to use for the export. If empty, the default one is used
    @return true when the export was successful.
  */
-bool IVExporter::exportObjects(const QList<shared::VEObject *> &objects, QBuffer *outBuffer,
-        ivm::ArchetypeModel *archetypesModel, const QString &templatePath)
+bool IVExporter::exportObjects(const QList<shared::VEObject *> &objects, QIODevice *outBuffer,
+        ivm::ArchetypeModel *archetypesModel, const QString &pathToTemplate)
 {
     checkArchetypeIntegrity(objects, archetypesModel);
-    const QHash<QString, QVariant> ivObjects = collectObjects(objects);
-    return exportData(ivObjects, templatePath, outBuffer);
+
+    QHash<QString, QVariant> ivObjects = collectObjects(objects);
+    const QHash<QString, QVariant> uiObjects = m_uiExporter->collectObjects(objects);
+    ivObjects.insert(uiObjects);
+    return exportData(ivObjects, pathToTemplate, outBuffer);
+}
+
+bool IVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
+        ivm::ArchetypeModel *archetypesModel, const QString &templatePath)
+{
+    if (outPath.isEmpty()) {
+        return false;
+    }
+
+    QString usedTemplate(templatePath);
+    if (usedTemplate.isEmpty()) {
+        usedTemplate = defaultTemplatePath();
+    }
+
+    QSaveFile saveFile(outPath);
+    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        qWarning() << "Can't open device for writing:" << saveFile.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
+        return false;
+    }
+    if (exportObjects(objects, &saveFile, archetypesModel, usedTemplate)) {
+        saveFile.commit();
+        Q_EMIT exported(outPath, true);
+        return true;
+    }
+    return false;
 }
 
 bool IVExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPath, const QString &templatePath)
 {
-    checkArchetypeIntegrity(doc->objects().values(), doc->archetypesModel());
-    const QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
-    return exportData(ivObjects, outPath.isEmpty() ? doc->path() : outPath, templatePath, InteractionPolicy::Silently);
+    if (!doc || outPath.isEmpty()) {
+        return false;
+    }
+
+    QString usedTemplate(templatePath);
+    if (usedTemplate.isEmpty()) {
+        usedTemplate = defaultTemplatePath();
+    }
+
+    QSaveFile saveFile(outPath);
+    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        qWarning() << "Can't open device for writing:" << saveFile.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
+        return false;
+    }
+
+    const QList<shared::VEObject *> objects = doc->objects().values();
+
+    checkArchetypeIntegrity(objects, doc->archetypesModel());
+    QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
+    const QHash<QString, QVariant> uiObjects = m_uiExporter->collectObjects(objects);
+    const QString uiFile = doc->uiFileName();
+    if (uiFile.isEmpty()) {
+        ivObjects.insert(uiObjects);
+    }
+    bool result = exportData(ivObjects, usedTemplate, &saveFile);
+    if (!uiFile.isEmpty()) {
+        saveFile.commit();
+        saveFile.setFileName(QFileInfo(outPath).absolutePath() + QDir::separator() + uiFile);
+        if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+            qWarning() << "Can't open device for writing:" << saveFile.errorString();
+            shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
+            return false;
+        }
+        result |= m_uiExporter->exportData(uiObjects, m_uiExporter->defaultTemplatePath(), &saveFile);
+    }
+    saveFile.commit();
+
+    Q_EMIT exported(outPath, result);
+    return result;
 }
 
 bool IVExporter::exportDocInteractively(
         InterfaceDocument *doc, const QString &outPath, const QString &templatePath, QWidget *root)
 {
+    QString usedTemplate(templatePath);
+    if (usedTemplate.isEmpty()) {
+        usedTemplate = QFileDialog::getOpenFileName(root, QObject::tr("Select a template"),
+                QFileInfo(defaultTemplatePath()).path(), QString("*.%1").arg(templateFileExtension()));
+        if (usedTemplate.isEmpty())
+            return false;
+    }
+
+    QString savePath(outPath);
+    if (savePath.isEmpty()) {
+        QFileDialog dialog(root, QObject::tr("Export data to an XML file"));
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setDefaultSuffix(".xml");
+        if (dialog.exec() == QDialog::Accepted) {
+            savePath = dialog.selectedUrls().value(0).toLocalFile();
+        }
+    }
+
     checkArchetypeIntegrity(doc->objects().values(), doc->archetypesModel());
-    const QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
-    return exportData(
-            ivObjects, outPath.isEmpty() ? doc->path() : outPath, templatePath, InteractionPolicy::Interactive, root);
+
+    QHash<QString, QVariant> ivObjects = collectInterfaceObjects(doc);
+    ivObjects.insert(m_uiExporter->collectObjects(doc->objects().values()));
+
+    return showExportDialog(ivObjects, usedTemplate, savePath, root);
 }
 
 IVExporter::IVExporter(QObject *parent)
     : templating::ObjectsExporter(parent)
+    , m_uiExporter(new templating::UIExporter(ivm::IVPropertyTemplateConfig::instance(), this))
 {
     ensureDefaultTemplatesDeployed(QLatin1String(":/defaults/templating/xml_templates"));
+    ensureDefaultTemplatesDeployed(QLatin1String(":/xml_templates"));
 }
 
 QVariant IVExporter::createFrom(const shared::VEObject *object) const
@@ -129,6 +224,10 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
     }
     if (!doc->mscFileName().isEmpty()) {
         grouppedObjects["MscFileName"] = QVariant::fromValue(doc->mscFileName());
+    }
+    const QString uiFilePath = doc->uiFileName();
+    if (!uiFilePath.isEmpty()) {
+        grouppedObjects["UiFile"] = QVariant::fromValue(uiFilePath);
     }
 
     return grouppedObjects;

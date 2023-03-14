@@ -19,7 +19,7 @@
 
 #include "exportableivconnectionlayertype.h"
 
-#include "exportableproperty.h"
+#include "exportableattribute.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"

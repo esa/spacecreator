@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>xml_templates/entityNode.tmplt</file>
+        <file>xml_templates/style.tmplt</file>
+    </qresource>
+</RCC>

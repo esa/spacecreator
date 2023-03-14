@@ -43,8 +43,8 @@ class IVModel : public shared::VEModel, public conversion::Model
 {
     Q_OBJECT
 public:
-    explicit IVModel(
-            shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel = nullptr, QObject *parent = nullptr);
+    explicit IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel = nullptr,
+            IVModel *componentModel = nullptr, QObject *parent = nullptr);
     ~IVModel() override;
 
     bool removeObject(shared::VEObject *obj) override;
@@ -54,6 +54,7 @@ public:
     shared::Id rootObjectId() const;
 
     IVObject *getObject(const shared::Id &id) const override;
+    IVObject *getOrigin(const shared::Id &id) const;
     IVObject *getObjectByName(const QString &name, IVObject::Type type = IVObject::Type::Unknown,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
     IVInterface *getIfaceByName(const QString &name, IVInterface::InterfaceType dir,
@@ -88,6 +89,9 @@ public:
     auto getConnectionLayersModel() const -> IVModel *;
     auto getConnectionLayerByName(const QString &name) const -> IVConnectionLayerType *;
 
+    IVModel *getComponentsModel() const;
+    void setComponentsModel(IVModel *model);
+
     QVector<IVArchetypeLibraryReference *> getArchetypeLibraryReferences();
     void setArchetypeLibraryReferences(QVector<IVArchetypeLibraryReference *> references);
 
@@ -103,6 +107,9 @@ public:
     QString defaultFunctionLanguage() const;
     QStringList availableFunctionLanguages() const;
 
+    void cloneReference(IVObject *origin, IVFunctionType *parent = nullptr, const shared::Id &id = shared::createId(),
+            const QPointF &pos = {});
+
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
 
@@ -113,7 +120,7 @@ private:
     const std::unique_ptr<IVModelPrivate> d;
 };
 
-}
+} // namespace ivm
 
 namespace conversion {
 

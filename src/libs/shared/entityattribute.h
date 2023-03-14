@@ -45,6 +45,7 @@ public:
     bool isProperty() const;
     bool isAttribute() const;
     Type type() const;
+    void setType(const Type &type);
 
     bool isValid() const;
     bool isNull() const;

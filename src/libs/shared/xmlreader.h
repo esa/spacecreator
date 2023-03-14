@@ -17,11 +17,12 @@
 
 #pragma once
 
+#include "entityattribute.h"
 #include "parameter.h"
-#include "veobject.h"
 
 #include <QObject>
 #include <QXmlStreamReader>
+#include <memory>
 
 namespace shared {
 struct XMLReaderPrivate;
@@ -36,6 +37,7 @@ public:
     bool readFile(const QString &file);
     bool read(QIODevice *openForRead);
     bool read(const QByteArray &data);
+    bool readSection(QXmlStreamReader &xml);
 
     QString errorString() const;
     QVariantMap metaData() const;
@@ -43,15 +45,14 @@ public:
     const QString &file() const;
 
 private:
-    bool readView(QXmlStreamReader &xml);
     bool readXml(QIODevice *in);
     void setErrorString(const QString &string);
 
 protected:
     void setMetaData(const QXmlStreamAttributes &attributes);
 
-    virtual void processTagOpen(QXmlStreamReader &xml) = 0;
-    virtual void processTagClose(QXmlStreamReader &xml) = 0;
+    virtual bool processTagOpen(QXmlStreamReader &xml) = 0;
+    virtual bool processTagClose(QXmlStreamReader &xml) = 0;
     virtual QString rootElementName() const = 0;
 
     InterfaceParameter addIfaceParameter(

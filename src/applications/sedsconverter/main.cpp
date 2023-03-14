@@ -34,6 +34,7 @@
 #include <libiveditor/iveditor.h>
 #include <seds/SedsOptions/options.h>
 #include <sharedlibrary.h>
+#include <templating/templatinglibrary.h>
 
 using conversion::ConversionException;
 using conversion::ConverterException;
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
     shared::initSharedLibrary();
     ivm::initIVLibrary();
     ive::initIVEditor();
+    templating::initTemplatingLibrary();
 
     QCoreApplication a(argc, argv);
     Options options;

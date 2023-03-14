@@ -49,7 +49,7 @@ public:
 Q_SIGNALS:
     void exported(const QString &filePath, bool ok);
 
-protected:
+public:
     ObjectsExporter(QObject *parent = nullptr);
     static QString templatesPath();
     static QString templateFileExtension();

@@ -25,6 +25,7 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivobject.h"
+#include "qfiledialog.h"
 #include "standardpaths.h"
 
 #include <QAction>
@@ -95,7 +96,8 @@ ActionsManager *ActionsManager::m_instance = nullptr;
  */
 QString ActionsManager::storagePath()
 {
-    return QString("%1/contextMenu/").arg(shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    return QString("%1/contextMenu/")
+            .arg(shared::StandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 }
 
 /*!
@@ -461,8 +463,16 @@ void ActionsManager::triggerActionExternal(
             auto btn = QMessageBox::question(nullptr, QObject::tr("Document closing"),
                     QObject::tr("There are unsaved changes.\nWould you like to save the document?"), btns);
             if (btn == QMessageBox::Save) {
+                QString savePath;
+                QFileDialog dialog(qApp->activeWindow(), QObject::tr("Export data to an XML file"));
+                dialog.setAcceptMode(QFileDialog::AcceptSave);
+                dialog.setDefaultSuffix(".xml");
+                if (dialog.exec() != QDialog::Accepted) {
+                    return;
+                }
+                savePath = dialog.selectedUrls().value(0).toLocalFile();
                 IVExporter exporter;
-                const bool ok = exporter.exportDocSilently(doc);
+                const bool ok = exporter.exportDocSilently(doc, savePath);
                 if (!ok) {
                     QMessageBox::warning(
                             nullptr, QObject::tr("Save error"), QObject::tr("Unable to save the document.\nAborting"));

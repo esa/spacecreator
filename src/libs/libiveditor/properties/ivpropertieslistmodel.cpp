@@ -71,11 +71,12 @@ QPair<QString, QVariant> IVPropertiesListModel::prepareDataForUpdate(
 
 bool IVPropertiesListModel::isEditable(const QModelIndex &index) const
 {
-    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index))
+    if (!entity() || !index.isValid() || !PropertiesListModel::isEditable(index) || entity()->isReference())
         return false;
 
     bool editable = true;
     switch (tokenFromIndex(index)) {
+    case ivm::meta::Props::Token::origin:
     case ivm::meta::Props::Token::is_type:
     case ivm::meta::Props::Token::fixed_system_element:
     case ivm::meta::Props::Token::required_system_element:
@@ -199,7 +200,7 @@ bool FunctionPropertiesListModel::isEditable(const QModelIndex &index) const
             editable = false;
         else {
             if (auto fn = entity()->as<const ivm::IVFunction *>()) {
-                editable = fn->instanceOf() || fn->interfaces().isEmpty();
+                editable = fn->inheritsFunctionType() || fn->interfaces().isEmpty();
             }
         }
         break;

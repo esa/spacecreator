@@ -26,6 +26,7 @@
 #include "mainwindow.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
+#include "templatinglibrary.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(asn1_resources);
 
+    templating::initTemplatingLibrary();
     shared::initSharedLibrary();
     ive::initIVEditor();
     ivm::initIVLibrary();

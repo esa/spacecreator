@@ -110,15 +110,13 @@ public:
 
     virtual bool isEqual(const VEObject *other) const;
 
-    virtual QVariantList generateProperties(bool isProperty) const = 0;
-
     // Perform updates/actions directly before the data is saved
     virtual void updateForExport() { }
 
     void setAttributeExportable(const QString &attrName, bool isExportable);
 
     template<typename T>
-    static bool hasDuplicates(QVector<T *> &objects)
+    static bool hasDuplicates(const QVector<T *> &objects)
     {
         for (int i = 0; i < objects.size() - 1; ++i) {
             for (int j = i + 1; j < objects.size(); ++j) {
@@ -142,6 +140,7 @@ public Q_SLOTS:
     bool setParentObject(shared::VEObject *parentObject);
 
 protected:
+    virtual QVariantList generateProperties(bool isProperty) const = 0;
     virtual QList<EntityAttribute> sortedAttributesValues(const EntityAttributes &attrs);
     virtual void setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type);
     void clearAttributes();

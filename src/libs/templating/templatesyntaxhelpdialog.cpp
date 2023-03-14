@@ -39,7 +39,7 @@ TemplateSyntaxHelpDialog::TemplateSyntaxHelpDialog(QWidget *parent)
     QTextBrowser *browser = new QTextBrowser();
     browser->setOpenExternalLinks(true);
 
-    QFile helpFile(QStringLiteral("://help/template_help.html"));
+    QFile helpFile(QStringLiteral(":/help/template_help.html"));
     if (helpFile.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&helpFile);
         browser->setText(stream.readAll());
