@@ -311,9 +311,9 @@ void StreamingLayoutManager::addAction(MscAction *action)
 
     // set Y
     item->setY(m_nextYperInstance[action->instance()]);
-    m_nextYperInstance[action->instance()] = item->sceneBoundingRect().bottom() + interMessageSpan();
 
     item->instantLayoutUpdate();
+    m_nextYperInstance[action->instance()] = item->sceneBoundingRect().bottom() + interMessageSpan();
 
     checkChartSize(item);
 
@@ -389,14 +389,13 @@ void StreamingLayoutManager::addCreateMessage(MscCreate *message)
     targetItem->moveSilentlyBy(QPointF(0.0, deltaY));
     targetItem->syncHeightToChartBox();
 
-    m_nextYperInstance[message->targetInstance()] =
-            targetItem->headerItem()->sceneBoundingRect().bottom() + interMessageSpan();
-
     // set X
     syncItemPosToInstance(item, sourceItem);
     syncItemPosToInstance(item, targetItem);
 
     item->instantLayoutUpdate();
+    m_nextYperInstance[message->targetInstance()] =
+            targetItem->headerItem()->sceneBoundingRect().bottom() + interMessageSpan();
 
     checkChartSize(item);
 
@@ -421,18 +420,23 @@ void StreamingLayoutManager::addMessage(MscMessage *message)
         y = std::max(y, m_nextYperInstance[message->targetInstance()]);
     }
     item->setY(y + interMessageSpan() * 0.5);
-    if (message->sourceInstance()) {
-        m_nextYperInstance[message->sourceInstance()] = item->tail().y() + interMessageSpan();
-    }
-    if (message->targetInstance()) {
-        m_nextYperInstance[message->targetInstance()] = item->head().y() + interMessageSpan();
-    }
 
     // set X
     syncItemPosToInstance(item, sourceItem);
     syncItemPosToInstance(item, targetItem);
 
     item->instantLayoutUpdate();
+    if (item->boundingRect().top() < -(interMessageSpan() * 0.5)) {
+        // some messages are multi line, and therfore higher
+        item->setY(item->y() - item->boundingRect().top());
+        item->instantLayoutUpdate();
+    }
+    if (message->sourceInstance()) {
+        m_nextYperInstance[message->sourceInstance()] = item->tail().y() + interMessageSpan();
+    }
+    if (message->targetInstance()) {
+        m_nextYperInstance[message->targetInstance()] = item->head().y() + interMessageSpan();
+    }
 
     checkChartSize(item);
 
@@ -453,9 +457,9 @@ void StreamingLayoutManager::addTimer(MscTimer *timer)
 
     // set Y
     item->setY(m_nextYperInstance[timer->instance()]);
-    m_nextYperInstance[timer->instance()] = item->sceneBoundingRect().bottom() + interMessageSpan();
 
     item->instantLayoutUpdate();
+    m_nextYperInstance[timer->instance()] = item->sceneBoundingRect().bottom() + interMessageSpan();
 
     checkChartSize(item);
 

@@ -385,7 +385,7 @@ bool RemoteControlHandler::handleIncomingAsyncMessage(
             std::find_if(messages.rbegin(), messages.rend(), [&name](MscMessage *msg) { return msg->name() == name; });
     if (it == messages.rend()) {
         if (errorString) {
-            *errorString = tr("Aaync message %1 not sent before received.").arg(name);
+            *errorString = tr("Async message %1 not sent before received.").arg(name);
         }
         return false;
     }
