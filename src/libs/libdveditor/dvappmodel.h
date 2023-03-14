@@ -54,6 +54,9 @@ public:
     QString path() const;
     void setPath(const QString &path);
 
+    QString uiFileName() const;
+    void setUIFileName(const QString &filePath);
+
     dvm::DVModel *objectsModel() const;
 
     bool isDirty() const;

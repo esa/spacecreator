@@ -85,44 +85,4 @@ bool ObjectsExporter::exportData(
     return strTemplate->parseFile(data, usedTemplatePath, outDevice);
 }
 
-bool ObjectsExporter::exportData(const QHash<QString, QVariant> &data, const QString &outPath,
-        const QString &templatePath, InteractionPolicy interaction, QWidget *root)
-{
-    QString usedTemplate(templatePath);
-    if (usedTemplate.isEmpty()) {
-        if (interaction == InteractionPolicy::Interactive) {
-            usedTemplate = QFileDialog::getOpenFileName(root, QObject::tr("Select a template"),
-                    QFileInfo(defaultTemplatePath()).path(), QString("*.%1").arg(templateFileExtension()));
-            if (usedTemplate.isEmpty())
-                return false;
-        } else {
-            usedTemplate = defaultTemplatePath();
-        }
-    }
-
-    QString savePath(outPath);
-    if (savePath.isEmpty()) {
-        QFileDialog dialog(root, QObject::tr("Export data to an XML file"));
-        dialog.setAcceptMode(QFileDialog::AcceptSave);
-        dialog.setDefaultSuffix(".xml");
-        if (dialog.exec() == QDialog::Accepted) {
-            savePath = dialog.selectedUrls().value(0).toLocalFile();
-        }
-    }
-
-    if (InteractionPolicy::Silently == interaction) {
-        QFile saveFile(savePath);
-        if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-            qWarning() << "Can't open device for writing:" << saveFile.errorString();
-            shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
-            return false;
-        }
-        const bool result = exportData(data, usedTemplate, &saveFile);
-        Q_EMIT exported(savePath, result);
-        return result;
-    } else {
-        return showExportDialog(data, usedTemplate, savePath, root);
-    }
-}
-
 } // namespace templating

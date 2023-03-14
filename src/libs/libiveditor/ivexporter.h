@@ -18,7 +18,6 @@
 #pragma once
 
 #include "objectsexporter.h"
-#include "uiexporter.h"
 
 #include <QString>
 #include <QVariantList>
@@ -32,6 +31,10 @@ class VEObject;
 
 namespace ivm {
 class ArchetypeModel;
+}
+
+namespace templating {
+class UIExporter;
 }
 
 namespace ive {

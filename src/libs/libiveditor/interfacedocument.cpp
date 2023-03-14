@@ -17,6 +17,7 @@
 
 #include "interfacedocument.h"
 
+#include "../common/exceptions/inconsistentmodelexception.h"
 #include "archetypes/archetypelibrary.h"
 #include "archetypes/archetypemodel.h"
 #include "archetypes/archetypeobject.h"
@@ -29,7 +30,6 @@
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/implementationshandler.h"
 #include "commandsstack.h"
-#include "../common/exceptions/inconsistentmodelexception.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
@@ -1081,6 +1081,7 @@ void InterfaceDocument::initTASTEEnv(const QString &path)
         QMessageBox::warning(qApp->activeWindow(), tr("Init TASTE environment"),
                 tr("Error during TASTE environment initiation for exported component!"));
     }
+    initTASTECallerProcess->deleteLater();
 }
 
 void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)

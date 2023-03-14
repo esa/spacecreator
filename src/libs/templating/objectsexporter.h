@@ -102,8 +102,6 @@ public:
     virtual QString defaultTemplatePath() const = 0;
 
     bool exportData(const QHash<QString, QVariant> &data, const QString &templatePath, QIODevice *outDevice);
-    bool exportData(const QHash<QString, QVariant> &data, const QString &outPath, const QString &templatePath,
-            InteractionPolicy interaction, QWidget *root = nullptr);
 };
 
 } // namespace templating

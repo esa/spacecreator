@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/defaults">
         <file>templating/xml_templates/deploymentview.tmplt</file>
+        <file>templating/xml_templates/deploymentview.ui.tmplt</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file>icns/asn1.png</file>

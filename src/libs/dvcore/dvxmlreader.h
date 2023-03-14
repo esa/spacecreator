@@ -38,10 +38,17 @@ public:
 
     QVector<DVObject *> parsedObjects() const;
 
+    QString uiFileNameTag() const;
+    QHash<shared::Id, EntityAttributes> externalAttributes() const;
+
 protected:
     bool processTagOpen(QXmlStreamReader &xml) override;
     bool processTagClose(QXmlStreamReader &xml) override;
     QString rootElementName() const override;
+
+private:
+    void processUIData();
+    void processUIFile(const QString &relFileName);
 
 private:
     const std::unique_ptr<DVXMLReaderPrivate> d;

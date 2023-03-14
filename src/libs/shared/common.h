@@ -132,6 +132,7 @@ E typeFromName(const QString &name)
 //! Default filename for Interface View diagram
 static const QString kDefaultInterfaceViewFileName { QLatin1String("interfaceview.xml") };
 static const QString kDefaultInterfaceViewUIFileName { QLatin1String("interfaceview.ui.xml") };
+static const QString kDefaultDeploymentViewUIFileName { QLatin1String("deploymentview.dv.ui.xml") };
 
 /*!
  * Returns path to exported components library set in TASTE_COMPONENTS_LIBRARY

@@ -25,6 +25,10 @@ namespace dvm {
 class DVObject;
 }
 
+namespace templating {
+class UIExporter;
+}
+
 namespace dve {
 
 class DVExporter : public templating::ObjectsExporter
@@ -34,14 +38,16 @@ public:
     explicit DVExporter(QObject *parent = nullptr);
     QString defaultTemplatePath() const override;
 
-    bool exportObjects(
-            const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath = QString());
+    static QString templatePath(const QString &templateName);
+
+    bool exportObjects(const QList<shared::VEObject *> &objects, QIODevice *outBuffer,
+            const QString &pathToTemplate = templatePath(QLatin1String("deploymentview.ui")));
 
     bool exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &outPath = QString(),
-            const QString &templatePath = QString(), QWidget *root = nullptr);
+            const QString &pathToTemplate = QString(), QWidget *root = nullptr);
 
-    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath = QString(),
-            const QString &templatePath = QString());
+    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
+            const QString &pathToTemplate = {}, const QString &uiFile = {});
 
 private:
     /**
@@ -51,6 +57,8 @@ private:
      */
     QVariant createFrom(const shared::VEObject *object) const override;
     QString groupName(const shared::VEObject *object) const override;
+
+    templating::UIExporter *m_uiExporter;
 };
 
 } // namespace dve

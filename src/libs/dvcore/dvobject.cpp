@@ -19,6 +19,8 @@
 
 #include "dvmodel.h"
 #include "dvnamevalidator.h"
+#include "dvpropertytemplate.h"
+#include "dvpropertytemplateconfig.h"
 #include "exportableattribute.h"
 
 #include <QVector>
@@ -180,9 +182,14 @@ QVariantList DVObject::properties() const
 QVariantList DVObject::generateProperties(bool isProperty) const
 {
     QVariantList result;
-    EntityAttributes attributes = entityAttributes();
-    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
-        if (it.value().isExportable() && it.value().isProperty() == isProperty) {
+    const EntityAttributes entityAttrs = entityAttributes();
+    for (auto it = entityAttrs.cbegin(); it != entityAttrs.cend(); ++it) {
+        if (!it.value().isExportable() || it.value().isProperty() != isProperty)
+            continue;
+
+        shared::PropertyTemplate *pt =
+                DVPropertyTemplateConfig::instance()->propertyTemplateForObject(this, it->name());
+        if (!pt || pt->exportGroupName().isEmpty()) {
             result << QVariant::fromValue(shared::ExportableAttribute(it.key(), it.value().value()));
         }
     }

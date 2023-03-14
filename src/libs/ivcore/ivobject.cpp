@@ -146,11 +146,14 @@ QVariantList IVObject::properties() const
 QVariantList IVObject::generateProperties(bool isProperty) const
 {
     QVariantList result;
-    EntityAttributes attributes = entityAttributes();
-    for (auto it = attributes.cbegin(); it != attributes.cend(); ++it) {
+    const EntityAttributes entityAttrs = entityAttributes();
+    for (auto it = entityAttrs.cbegin(); it != entityAttrs.cend(); ++it) {
+        if (!it.value().isExportable() || it.value().isProperty() != isProperty)
+            continue;
+
         shared::PropertyTemplate *pt =
                 IVPropertyTemplateConfig::instance()->propertyTemplateForObject(this, it->name());
-        if ((!pt || pt->exportGroupName().isEmpty()) && it.value().isProperty() == isProperty) {
+        if (!pt || pt->exportGroupName().isEmpty()) {
             result << QVariant::fromValue(shared::ExportableAttribute(it.key(), it.value().value()));
         }
     }

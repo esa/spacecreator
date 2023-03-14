@@ -28,8 +28,10 @@
 #include "dvsystemfunction.h"
 #include "dvsysteminterface.h"
 #include "errorhub.h"
+#include "uireader.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
@@ -41,8 +43,15 @@
 namespace dvm {
 
 struct DVXMLReaderPrivate {
+    DVXMLReaderPrivate()
+        : m_uiReader(new shared::UIReader)
+    {
+    }
+
     QVector<DVObject *> m_allObjects {};
     DVObject *m_currentObject { nullptr };
+    QScopedPointer<shared::UIReader> m_uiReader { nullptr };
+
     void addObject(DVObject *obj)
     {
         if (obj && !m_allObjects.contains(obj)) {
@@ -64,11 +73,31 @@ QVector<DVObject *> DVXMLReader::parsedObjects() const
     return d->m_allObjects;
 }
 
+QString DVXMLReader::uiFileNameTag() const
+{
+    return d->m_uiReader ? d->m_uiReader->filePathAttributeName() : QString();
+}
+
+QHash<shared::Id, EntityAttributes> DVXMLReader::externalAttributes() const
+{
+    return d->m_uiReader ? d->m_uiReader->data() : QHash<shared::Id, EntityAttributes>();
+}
+
 bool DVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     EntityAttributes attrs = attributes(xml.attributes());
     const EntityAttribute &idAttr = attrs.take(QLatin1String("id"));
+
+    if (d->m_uiReader && d->m_uiReader->rootElementName() == tagName) {
+        auto fileIt = attrs.constFind(d->m_uiReader->filePathAttributeName());
+        if (fileIt != attrs.constEnd()) {
+            processUIFile(fileIt->value<QString>());
+        } else if (d->m_uiReader->readSection(xml)) {
+            processUIData();
+        }
+        return true;
+    }
 
     DVObject *obj { nullptr };
     const meta::Props::Token t = meta::Props::token(tagName);
@@ -171,6 +200,13 @@ bool DVXMLReader::processTagClose(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
     switch (meta::Props::token(tagName)) {
+    case meta::Props::Token::DeploymentView: {
+        const QVariantMap &metaInfo = metaData();
+        auto it = metaInfo.constFind(d->m_uiReader->filePathAttributeName());
+        if (it != metaInfo.constEnd()) {
+            processUIFile(it->toString());
+        }
+    } break;
     case meta::Props::Token::Partition:
     case meta::Props::Token::Function:
     case meta::Props::Token::Node:
@@ -192,6 +228,29 @@ bool DVXMLReader::processTagClose(QXmlStreamReader &xml)
 QString DVXMLReader::rootElementName() const
 {
     return meta::Props::token(meta::Props::Token::DeploymentView);
+}
+
+void DVXMLReader::processUIData()
+{
+    const QHash<shared::Id, EntityAttributes> attrs = d->m_uiReader->data();
+    for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
+        auto objIt = std::find_if(d->m_allObjects.begin(), d->m_allObjects.end(),
+                [id = attrIt.key()](DVObject *obj) { return obj->id() == id; });
+        if (objIt != d->m_allObjects.end()) {
+            for (const EntityAttribute &entityAttr : attrIt.value()) {
+                (*objIt)->setEntityAttribute(entityAttr);
+            }
+        }
+    }
+}
+
+void DVXMLReader::processUIFile(const QString &relFileName)
+{
+    const QFileInfo fi(file());
+    const QString uiFile = fi.absoluteDir().filePath(relFileName);
+    if (d->m_uiReader->readFile(uiFile)) {
+        processUIData();
+    }
 }
 
 } // namespace dvm

@@ -25,6 +25,7 @@
 #include "ivobject.h"
 #include "ivpropertytemplateconfig.h"
 #include "templating/exportableivobject.h"
+#include "uiexporter.h"
 
 #include <QBuffer>
 #include <QDebug>
@@ -135,7 +136,7 @@ bool IVExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPat
         }
         result |= m_uiExporter->exportData(uiObjects, m_uiExporter->defaultTemplatePath(), &saveFile);
     }
-    saveFile.commit();
+    result |= saveFile.commit();
 
     Q_EMIT exported(outPath, result);
     return result;
@@ -244,4 +245,5 @@ void IVExporter::checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, iv
         shared::ErrorHub::addError(shared::ErrorItem::Warning, warning);
     }
 }
+
 }

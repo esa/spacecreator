@@ -37,6 +37,7 @@ struct DVAppModel::DVAppModelPrivate {
 
     std::unique_ptr<shared::cmd::CommandsStackBase> commandsStack;
     QString filePath;
+    QString uiFileName { shared::kDefaultDeploymentViewUIFileName };
     std::unique_ptr<dvm::DVModel> objectsModel;
 };
 
@@ -84,6 +85,15 @@ bool DVAppModel::load(const QString &path)
         return false;
     }
 
+    const QVariantMap metadata = reader.metaData();
+    auto it = metadata.constFind(reader.uiFileNameTag());
+    if (it != metadata.constEnd()) {
+        setUIFileName(it->toString());
+    } else {
+        const QFileInfo fi { path };
+        setUIFileName(fi.baseName() + QLatin1String(".ui.xml"));
+    }
+
     d->objectsModel->initFromObjects(reader.parsedObjects());
 
     shared::ErrorHub::clearCurrentFile();
@@ -108,6 +118,16 @@ void DVAppModel::setPath(const QString &path)
         d->filePath = path;
         Q_EMIT titleChanged();
     }
+}
+
+QString DVAppModel::uiFileName() const
+{
+    return d->uiFileName;
+}
+
+void DVAppModel::setUIFileName(const QString &fileName)
+{
+    d->uiFileName = fileName;
 }
 
 /*!

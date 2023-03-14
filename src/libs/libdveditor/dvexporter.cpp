@@ -17,20 +17,15 @@
 
 #include "dvexporter.h"
 
-#include "dvconnection.h"
-#include "dvdevice.h"
-#include "dvmodel.h"
-#include "dvnode.h"
 #include "dvobject.h"
-#include "dvpartition.h"
-#include "templating/exportabledvbus.h"
-#include "templating/exportabledvconnection.h"
-#include "templating/exportabledvdevice.h"
-#include "templating/exportabledvnode.h"
+#include "dvpropertytemplateconfig.h"
+#include "errorhub.h"
 #include "templating/exportabledvobject.h"
-#include "templating/exportabledvpartition.h"
+#include "uiexporter.h"
 
 #include <QBuffer>
+#include <QFileDialog>
+#include <QSaveFile>
 
 namespace dve {
 
@@ -39,8 +34,13 @@ QString DVExporter::defaultTemplatePath() const
     return QString("%1/aadl_xml/deploymentview.%2").arg(templatesPath(), templateFileExtension());
 }
 
+QString DVExporter::templatePath(const QString &templateName)
+{
+    return QString("%1/aadl_xml/%2.%3").arg(templatesPath(), templateName, templateFileExtension());
+}
+
 bool DVExporter::exportObjects(
-        const QList<shared::VEObject *> &objects, QBuffer *outBuffer, const QString &templatePath)
+        const QList<shared::VEObject *> &objects, QIODevice *outBuffer, const QString &templatePath)
 {
     const QHash<QString, QVariant> dvObjects = collectObjects(objects);
     return exportData(dvObjects, templatePath, outBuffer);
@@ -49,19 +49,75 @@ bool DVExporter::exportObjects(
 bool DVExporter::exportObjectsInteractively(
         const QList<shared::VEObject *> &objects, const QString &outPath, const QString &templatePath, QWidget *root)
 {
-    const QHash<QString, QVariant> dvObjects = collectObjects(objects);
-    return exportData(dvObjects, outPath, templatePath, InteractionPolicy::Interactive, root);
+    QString usedTemplate(templatePath);
+    if (usedTemplate.isEmpty()) {
+        usedTemplate = QFileDialog::getOpenFileName(root, QObject::tr("Select a template"),
+                QFileInfo(defaultTemplatePath()).path(), QString("*.%1").arg(templateFileExtension()));
+        if (usedTemplate.isEmpty())
+            return false;
+    }
+
+    QString savePath(outPath);
+    if (savePath.isEmpty()) {
+        QFileDialog dialog(root, QObject::tr("Export data to an XML file"));
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setDefaultSuffix(".xml");
+        if (dialog.exec() == QDialog::Accepted) {
+            savePath = dialog.selectedUrls().value(0).toLocalFile();
+        }
+    }
+
+    QHash<QString, QVariant> dvObjects = collectObjects(objects);
+    dvObjects.insert(m_uiExporter->collectObjects(objects));
+
+    return showExportDialog(dvObjects, usedTemplate, savePath, root);
 }
 
-bool DVExporter::exportObjectsSilently(
-        const QList<shared::VEObject *> &objects, const QString &outPath, const QString &templatePath)
+bool DVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
+        const QString &pathToTemplate, const QString &uiFile)
 {
-    const QHash<QString, QVariant> dvObjects = collectObjects(objects);
-    return exportData(dvObjects, outPath, templatePath, InteractionPolicy::Silently);
+    if (outPath.isEmpty()) {
+        return false;
+    }
+
+    QString usedTemplate(pathToTemplate);
+    if (usedTemplate.isEmpty()) {
+        usedTemplate = defaultTemplatePath();
+    }
+
+    QSaveFile saveFile(outPath);
+    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        qWarning() << "Can't open device for writing:" << saveFile.errorString();
+        shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
+        return false;
+    }
+    QHash<QString, QVariant> dvObjects = collectObjects(objects);
+    const QHash<QString, QVariant> uiObjects = m_uiExporter->collectObjects(objects);
+    if (uiFile.isEmpty()) {
+        dvObjects.insert(uiObjects);
+    } else {
+        dvObjects.insert(QLatin1String("UiFile"), QVariant::fromValue(uiFile));
+    }
+    bool result = exportData(dvObjects, usedTemplate, &saveFile);
+    if (!uiFile.isEmpty()) {
+        saveFile.commit();
+        saveFile.setFileName(QFileInfo(outPath).absolutePath() + QDir::separator() + uiFile);
+        if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+            qWarning() << "Can't open device for writing:" << saveFile.errorString();
+            shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
+            return false;
+        }
+        result |= m_uiExporter->exportData(uiObjects, m_uiExporter->defaultTemplatePath(), &saveFile);
+    }
+    result |= saveFile.commit();
+
+    Q_EMIT exported(outPath, result);
+    return true;
 }
 
 DVExporter::DVExporter(QObject *parent)
     : templating::ObjectsExporter(parent)
+    , m_uiExporter(new templating::UIExporter(dvm::DVPropertyTemplateConfig::instance(), this))
 {
     ensureDefaultTemplatesDeployed(QLatin1String(":/defaults/templating/xml_templates"));
 }
