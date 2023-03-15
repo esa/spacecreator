@@ -61,19 +61,12 @@ public:
     void setStorage(scs::SpaceCreatorProject *storage);
 
     // MSC functions
-    bool ivFunctionUsed(const QString &name);
     void changeMscInstanceName(const QString &oldName, const QString &name);
-    bool hasCorrespondingInstances(ivm::IVFunction *ivFunction) const;
 
-    bool mscMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName);
     void changeMscMessageName(
             const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
-    bool hasCorrespondingMessages(ivm::IVConnection *ivConnection) const;
     QList<msc::MscMessage *> allMessages(
             const QString &messageName, const QString &sourceName, const QString &targetName);
-
-    void checkInstances();
-    void checkMessages();
 
     // DV functions
     bool dvMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName,
