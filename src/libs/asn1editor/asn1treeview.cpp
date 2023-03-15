@@ -361,12 +361,24 @@ QString Asn1TreeView::getItemValue(const QStandardItem *item, const QString &sep
         itemValue += sequenceData(item, asnValue.toInt(), QString());
     } else if (asnType.startsWith("sequence", Qt::CaseInsensitive)) {
         itemValue += sequenceData(item, item->rowCount(), QLatin1String(" "));
-    } else if (asnType.startsWith("string", Qt::CaseInsensitive)
-            || asnType.startsWith("BIT STRING", Qt::CaseInsensitive)
-            || asnType.startsWith("OCTET STRING", Qt::CaseInsensitive)
-            || asnType.startsWith("IA5String", Qt::CaseInsensitive)
+    } else if (asnType.startsWith("string", Qt::CaseInsensitive) || asnType.startsWith("IA5String", Qt::CaseInsensitive)
             || asnType.startsWith("NumericString", Qt::CaseInsensitive)) {
-        itemValue += "\"" + asnValue + "\"";
+        if (!asnValue.startsWith("\"")) {
+            itemValue.append("\"");
+        }
+        itemValue += asnValue;
+        if (!asnValue.endsWith("\"")) {
+            itemValue.append("\"");
+        }
+    } else if (asnType.startsWith("BIT STRING", Qt::CaseInsensitive)
+            || asnType.startsWith("OCTET STRING", Qt::CaseInsensitive)) {
+        if (!asnValue.startsWith("'")) {
+            itemValue.append("'");
+        }
+        itemValue += asnValue;
+        if (!asnValue.endsWith("'H") && !asnValue.endsWith("'B")) {
+            itemValue.append("'H");
+        }
     } else if (item->child(0, 0)) {
         itemValue += getItemValue(item->child(0, 0), " :");
     } else {

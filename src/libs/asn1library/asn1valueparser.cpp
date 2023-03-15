@@ -17,7 +17,6 @@
 
 #include "asn1valueparser.h"
 
-#include "asn1const.h"
 #include "constraints/logicoperators.h"
 #include "constraints/rangeconstraint.h"
 #include "constraints/sizeconstraint.h"
@@ -37,7 +36,7 @@
 #include "values.h"
 
 #include <QVariant>
-
+#include <type_traits>
 namespace Asn1Acn {
 
 /*!
@@ -143,16 +142,13 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
             break;
         }
         case Asn1Acn::Types::Type::BITSTRING: {
+            // bitstring is '..'H or '..'B
+            if (!value.startsWith("'") || !(value.endsWith("'H") || value.endsWith("'B"))) {
+                ok = false;
+                break;
+            }
             const auto *bitStringType = dynamic_cast<const Asn1Acn::Types::BitString *>(type);
-
-            if (value.startsWith("\"")) {
-                value = value.remove(0, 1);
-            }
-            if (value.endsWith("\"")) {
-                value.chop(1);
-            }
-
-            ok = checkStringLength(bitStringType, value);
+            ok = checkBitStringLength(bitStringType, value);
             if (ok) {
                 valueMap["value"] = value;
             }
@@ -191,16 +187,13 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
             break;
         }
         case Asn1Acn::Types::Type::OCTETSTRING: {
+            // bitstring is '..'H or '..'B
+            if (!value.startsWith("'") || !(value.endsWith("'H") || value.endsWith("'B"))) {
+                ok = false;
+                break;
+            }
             const auto *octetString = dynamic_cast<const Asn1Acn::Types::OctetString *>(type);
-
-            if (value.startsWith("\"")) {
-                value = value.remove(0, 1);
-            }
-            if (value.endsWith("\"")) {
-                value.chop(1);
-            }
-
-            ok = checkStringLength(octetString, value);
+            ok = checkBitStringLength(octetString, value);
             if (ok) {
                 valueMap["value"] = value;
             }
@@ -435,6 +428,20 @@ bool Asn1ValueParser::checkStringLength(const Constraints::WithConstraints<Value
     }
     if (value.endsWith("\"")) {
         value.chop(1);
+    }
+
+    return checkSize(asn1Type, value.length());
+}
+
+template<typename ValueType>
+bool Asn1ValueParser::checkBitStringLength(const Constraints::WithConstraints<ValueType> *asn1Type, QString value) const
+{
+    // take string between '...'H or '...'B
+    if (value.startsWith("'")) {
+        value = value.remove(0, 1);
+    }
+    if (value.endsWith("'H") || value.endsWith('B')) {
+        value.chop(2);
     }
 
     return checkSize(asn1Type, value.length());

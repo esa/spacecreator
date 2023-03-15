@@ -136,12 +136,12 @@ void tst_Asn1TreeView::testSetSequenceWithStringValue()
     QCOMPARE(m_definitions->types().size(), 1);
     const auto &assignment = m_definitions->types().at(0);
     m_treeView->setAsn1Model(assignment);
-    const QString value = "{ strVal potatoes, numVal 3141592, bitVal ABCD, octVal AF45 }";
+    const QString value = "{ strVal potatoes, numVal 3141592, bitVal 'ABCD'H, octVal 'AF45'H }";
     QVariantMap valueMap = m_valueParser.parseAsn1Value(assignment.get(), value);
     QCOMPARE(valueMap.size(), 2);
     m_treeView->setAsn1Value(valueMap);
     QCOMPARE(m_treeView->getAsn1Value(),
-            QString("{ strVal  \"potatoes\", numVal  \"3141592\", bitVal  \"ABCD\", octVal  \"AF45\" }"));
+            QString("{ strVal  \"potatoes\", numVal  \"3141592\", bitVal  'ABCD'H, octVal  'AF45'H }"));
 }
 
 void tst_Asn1TreeView::testSetSequenceInSequenceValue()

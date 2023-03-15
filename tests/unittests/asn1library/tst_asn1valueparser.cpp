@@ -20,11 +20,13 @@
 #include "asnsequencecomponent.h"
 #include "sourcelocation.h"
 #include "typeassignment.h"
+#include "types/bitstring.h"
 #include "types/boolean.h"
 #include "types/choice.h"
 #include "types/enumerated.h"
 #include "types/ia5string.h"
 #include "types/integer.h"
+#include "types/octetstring.h"
 #include "types/real.h"
 #include "types/sequence.h"
 #include "types/sequenceof.h"
@@ -56,6 +58,8 @@ private Q_SLOTS:
     void testRealValuesWithRangeError();
     void testBoolValues();
     void testIA5StringValues();
+    void testBitStringValues();
+    void testOctetStringValues();
     void testEnumValues();
     void testBoolValuesError();
     void testEnumValuesError();
@@ -235,6 +239,46 @@ void tst_Asn1ValueParser::testIA5StringValues()
 
     QCOMPARE(valueMap["name"].toString(), QString("MyString"));
     QVERIFY(valueMap["value"].toString() == "TestString");
+}
+
+void tst_Asn1ValueParser::testBitStringValues()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::BitString>();
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyString", "MyString", location, std::move(type));
+    QVariantMap valueMap = valueParser->parseAsn1Value(assignment.get(), "'AA'H");
+    QCOMPARE(valueMap.size(), 2);
+    QCOMPARE(valueMap["name"].toString(), QString("MyString"));
+    QCOMPARE(valueMap["value"].toString(), "'AA'H");
+
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'1001'B");
+    QCOMPARE(valueMap.size(), 2);
+    QCOMPARE(valueMap["name"].toString(), QString("MyString"));
+    QCOMPARE(valueMap["value"].toString(), "'1001'B");
+
+    bool ok;
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "nope", &ok);
+    QVERIFY(!ok);
+}
+
+void tst_Asn1ValueParser::testOctetStringValues()
+{
+    Asn1Acn::SourceLocation location;
+    auto type = std::make_unique<Asn1Acn::Types::OctetString>();
+    auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyString", "MyString", location, std::move(type));
+    QVariantMap valueMap = valueParser->parseAsn1Value(assignment.get(), "'BB'H");
+    QCOMPARE(valueMap.size(), 2);
+    QCOMPARE(valueMap["name"].toString(), QString("MyString"));
+    QCOMPARE(valueMap["value"].toString(), "'BB'H");
+
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'0110'B");
+    QCOMPARE(valueMap.size(), 2);
+    QCOMPARE(valueMap["name"].toString(), QString("MyString"));
+    QCOMPARE(valueMap["value"].toString(), "'0110'B");
+
+    bool ok;
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "nope", &ok);
+    QVERIFY(!ok);
 }
 
 void tst_Asn1ValueParser::testEnumValues()

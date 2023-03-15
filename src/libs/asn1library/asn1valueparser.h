@@ -64,6 +64,8 @@ private:
     bool checkSize(const Constraints::WithConstraints<ValueType> *asn1Type, const int32_t value) const;
     template<typename ValueType>
     bool checkStringLength(const Constraints::WithConstraints<ValueType> *asn1Type, QString value) const;
+    template<typename ValueType>
+    bool checkBitStringLength(const Constraints::WithConstraints<ValueType> *asn1Type, QString value) const;
 
     template<typename ValueType>
     bool checkRangeConstraint(
