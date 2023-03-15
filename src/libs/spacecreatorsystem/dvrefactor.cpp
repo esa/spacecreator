@@ -22,6 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "dvmessage.h"
 #include "dvmodel.h"
 #include "ivconnection.h"
+#include "ivfunction.h"
 #include "ivmodel.h"
 #include "spacecreatorproject.h"
 
@@ -125,6 +126,36 @@ void DVRefactor::onRemovingIVObject(ivm::IVObject *obj) const
         default:
             break;
         }
+    }
+}
+
+/*!
+ * \see RefactorBase::onImplementationChanged
+ */
+void DVRefactor::onImplementationChanged(ivm::IVFunction *entity, const QString &newName, const QString &oldName)
+{
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+        dvCore->changeFunctionImplementationName(entity->title(), newName, oldName);
+    }
+}
+
+/*!
+ * \see RefactorBase::onDefaultImplementationChanged
+ */
+void DVRefactor::onDefaultImplementationChanged()
+{
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+        dvCore->changeDefaultImplementationNames();
+    }
+}
+
+/*!
+ * \see RefactorBase::onImplementationListChanged
+ */
+void DVRefactor::onImplementationListChanged(ivm::IVFunction *ivFunction)
+{
+    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+        dvCore->updateFunctionImplementationList(ivFunction->title());
     }
 }
 

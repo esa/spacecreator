@@ -45,7 +45,16 @@ void MSCRefactor::setMscChecks(MscSystemChecks *mscChecks)
  */
 bool MSCRefactor::isRefactorSupported(RefactorType type) const
 {
-    return true;
+    switch (type) {
+    case RefactorBase::IVFunctionRename:
+    case RefactorBase::IVInterfaceRename:
+    case RefactorBase::IVObjectRemoved:
+        return true;
+    default:
+        break;
+    }
+
+    return false;
 }
 
 /*!

@@ -28,6 +28,7 @@
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "iveditorcore.h"
+#include "ivfunction.h"
 #include "ivrefactorhandler.h"
 #include "ivsystemchecks.h"
 #include "ivsystemqueries.h"
@@ -70,6 +71,12 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
                 &scs::IVRefactorHandler::onIVEntityNameChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::entitiesRemoved, m_ivRefactorHandler.get(),
                 &scs::IVRefactorHandler::onEntitiesRemoved);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::implementationChanged, m_ivRefactorHandler.get(),
+                &scs::IVRefactorHandler::onImplementationChanged);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::defaultImplementationChanged,
+                m_ivRefactorHandler.get(), &scs::IVRefactorHandler::onDefaultImplementationChanged);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::implementationListChanged, m_ivRefactorHandler.get(),
+                &scs::IVRefactorHandler::onImplementationListChanged);
     });
 }
 

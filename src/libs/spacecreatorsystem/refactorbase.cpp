@@ -96,13 +96,47 @@ void RefactorBase::onIVInterfaceRenamed(
     Q_UNUSED(interface);
     Q_UNUSED(oldName);
     Q_UNUSED(newName);
-    return;
 }
 
+/*!
+ * This is called while the IV object \p obj is removed. So corresponding objects are removed as well.
+ */
 void RefactorBase::onRemovingIVObject(ivm::IVObject *obj) const
 {
     Q_UNUSED(obj);
+}
+
+/*!
+ * Updates all implementation names to the new one \see ive::IVFunction::implementations \see
+ * ive::IVFunction::addImplementation
+ *
+ * \param entity The object where one iomplemenation name was changed
+ * \param newName The new name of the implementation
+ * \param oldName The old name of the implementation
+ */
+void RefactorBase::onImplementationChanged(ivm::IVFunction *entity, const QString &newName, const QString &oldName)
+{
+    Q_UNUSED(entity);
+    Q_UNUSED(newName);
+    Q_UNUSED(oldName);
+}
+
+/*!
+ * Updates the default implemenations of all interfaces \see ive::IVFunction::defaultImplementation
+ */
+void RefactorBase::onDefaultImplementationChanged()
+{
     return;
+}
+
+/*!
+ * Updates the whole list of implementations of one IVFunction \see ive::IVFunction::implementations
+ *
+ * \param ivFunction The function to update the implementations from
+ */
+void RefactorBase::onImplementationListChanged(ivm::IVFunction *ivFunction)
+{
+    Q_UNUSED(ivFunction);
 }
 
 } // namespace scs

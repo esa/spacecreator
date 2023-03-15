@@ -121,6 +121,34 @@ void IVRefactorHandler::onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &
     }
 }
 
+void IVRefactorHandler::onImplementationChanged(
+        ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command)
+{
+    for (RefactorBase *refactor : m_refactors) {
+        if (refactor->isRefactorSupported(scs::RefactorBase::IVFunctionImplementationChanged)) {
+            refactor->onImplementationChanged(entity, newName, oldName);
+        }
+    }
+}
+
+void IVRefactorHandler::onDefaultImplementationChanged()
+{
+    for (RefactorBase *refactor : m_refactors) {
+        if (refactor->isRefactorSupported(scs::RefactorBase::IVFunctionImplementationChanged)) {
+            refactor->onDefaultImplementationChanged();
+        }
+    }
+}
+
+void IVRefactorHandler::onImplementationListChanged(ivm::IVFunction *ivFunction)
+{
+    for (RefactorBase *refactor : m_refactors) {
+        if (refactor->isRefactorSupported(scs::RefactorBase::IVFunctionImplementationChanged)) {
+            refactor->onImplementationListChanged(ivFunction);
+        }
+    }
+}
+
 void IVRefactorHandler::onIVFunctionNameChanged(
         ivm::IVFunction *func, const QString &oldName, ive::cmd::CmdFunctionAttrChange *command)
 {

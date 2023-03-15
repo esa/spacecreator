@@ -53,6 +53,10 @@ public:
 public Q_SLOTS:
     void onIVEntityNameChanged(ivm::IVObject *entity, const QString &oldName, shared::UndoCommand *command);
     void onEntitiesRemoved(const QList<QPointer<ivm::IVObject>> &entities, shared::UndoCommand *command);
+    void onImplementationChanged(
+            ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
+    void onDefaultImplementationChanged();
+    void onImplementationListChanged(ivm::IVFunction *ivFunction);
 
 private:
     void onIVFunctionNameChanged(

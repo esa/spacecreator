@@ -48,6 +48,10 @@ public:
             ivm::IVInterface *interface, const QString &oldName, const QString &newName) const override;
     void onRemovingIVObject(ivm::IVObject *obj) const override;
 
+    void onImplementationChanged(ivm::IVFunction *entity, const QString &newName, const QString &oldName) override;
+    void onDefaultImplementationChanged() override;
+    void onImplementationListChanged(ivm::IVFunction *ivFunction) override;
+
 private:
     QList<dvm::DVMessage *> correspondingMessages(ivm::IVInterface *interface, const QString &name) const;
 

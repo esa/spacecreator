@@ -38,8 +38,10 @@ public:
     {
         IVFunctionRename,
         IVInterfaceRename,
-        IVObjectRemoved
-
+        IVObjectRemoved,
+        IVFunctionImplementationChanged,
+        IVDefaultImplementationChanged,
+        IVImplementationListChanged,
     };
 
     virtual bool isRefactorSupported(RefactorType type) const;
@@ -54,6 +56,11 @@ public:
     virtual void onIVInterfaceRenamed(
             ivm::IVInterface *interface, const QString &oldName, const QString &newName) const;
     virtual void onRemovingIVObject(ivm::IVObject *obj) const;
+
+    // Changes regarding implementation (language)
+    virtual void onImplementationChanged(ivm::IVFunction *entity, const QString &newName, const QString &oldName);
+    virtual void onDefaultImplementationChanged();
+    virtual void onImplementationListChanged(ivm::IVFunction *ivFunction);
 };
 
 } // namespace scs
