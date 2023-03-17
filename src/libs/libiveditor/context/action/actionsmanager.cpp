@@ -463,14 +463,16 @@ void ActionsManager::triggerActionExternal(
             auto btn = QMessageBox::question(nullptr, QObject::tr("Document closing"),
                     QObject::tr("There are unsaved changes.\nWould you like to save the document?"), btns);
             if (btn == QMessageBox::Save) {
-                QString savePath;
-                QFileDialog dialog(qApp->activeWindow(), QObject::tr("Export data to an XML file"));
-                dialog.setAcceptMode(QFileDialog::AcceptSave);
-                dialog.setDefaultSuffix(".xml");
-                if (dialog.exec() != QDialog::Accepted) {
-                    return;
+                QString savePath { filepath };
+                if (savePath.isEmpty()) {
+                    QFileDialog dialog(qApp->activeWindow(), QObject::tr("Export data to an XML file"));
+                    dialog.setAcceptMode(QFileDialog::AcceptSave);
+                    dialog.setDefaultSuffix(".xml");
+                    if (dialog.exec() != QDialog::Accepted) {
+                        return;
+                    }
+                    savePath = dialog.selectedUrls().value(0).toLocalFile();
                 }
-                savePath = dialog.selectedUrls().value(0).toLocalFile();
                 IVExporter exporter;
                 const bool ok = exporter.exportDocSilently(doc, savePath);
                 if (!ok) {
