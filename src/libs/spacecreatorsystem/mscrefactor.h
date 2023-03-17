@@ -27,7 +27,6 @@ class MscMessage;
 }
 
 namespace scs {
-class MscSystemChecks;
 class SpaceCreatorProject;
 
 /*!
@@ -37,7 +36,6 @@ class MSCRefactor : public RefactorBase
 {
 public:
     void setStorage(SpaceCreatorProject *storage);
-    void setMscChecks(MscSystemChecks *mscChecks);
 
     bool isRefactorSupported(RefactorType type) const override;
 
@@ -52,9 +50,10 @@ public:
 
 private:
     QList<msc::MscMessage *> correspondingMessages(ivm::IVInterface *interface, const QString &name) const;
+    QList<msc::MscMessage *> allMessages(
+            const QString &messageName, const QString &sourceName, const QString &targetName) const;
 
     QPointer<SpaceCreatorProject> m_storage;
-    QPointer<MscSystemChecks> m_mscChecks;
 };
 
 } // namespace scs

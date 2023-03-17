@@ -26,6 +26,10 @@ class IVInterface;
 class IVObject;
 }
 
+namespace shared {
+class VEObject;
+}
+
 namespace scs {
 
 /**
@@ -42,6 +46,7 @@ public:
         IVFunctionImplementationChanged,
         IVDefaultImplementationChanged,
         IVImplementationListChanged,
+        IVAttributeChanged,
     };
 
     virtual bool isRefactorSupported(RefactorType type) const;
@@ -61,6 +66,8 @@ public:
     virtual void onImplementationChanged(ivm::IVFunction *entity, const QString &newName, const QString &oldName);
     virtual void onDefaultImplementationChanged();
     virtual void onImplementationListChanged(ivm::IVFunction *ivFunction);
+
+    void onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
 };
 
 } // namespace scs

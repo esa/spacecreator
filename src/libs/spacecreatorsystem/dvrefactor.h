@@ -52,6 +52,8 @@ public:
     void onDefaultImplementationChanged() override;
     void onImplementationListChanged(ivm::IVFunction *ivFunction) override;
 
+    void onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
+
 private:
     QList<dvm::DVMessage *> correspondingMessages(ivm::IVInterface *interface, const QString &name) const;
 

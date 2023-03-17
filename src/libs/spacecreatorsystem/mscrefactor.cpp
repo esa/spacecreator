@@ -25,7 +25,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "mscchart.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
-#include "mscsystemchecks.h"
 #include "spacecreatorproject.h"
 
 namespace scs {
@@ -33,11 +32,6 @@ namespace scs {
 void MSCRefactor::setStorage(SpaceCreatorProject *storage)
 {
     m_storage = storage;
-}
-
-void MSCRefactor::setMscChecks(MscSystemChecks *mscChecks)
-{
-    m_mscChecks = mscChecks;
 }
 
 /*!
@@ -82,7 +76,6 @@ bool MSCRefactor::isIVFunctionUsed(ivm::IVFunction *func, const QString &name) c
  */
 bool MSCRefactor::isIVInterfaceUsed(ivm::IVInterface *interface, const QString &name) const
 {
-    Q_ASSERT(!m_mscChecks.isNull());
     if (interface->direction() != ivm::IVInterface::InterfaceType::Provided) {
         return false;
     }
@@ -95,7 +88,6 @@ bool MSCRefactor::isIVInterfaceUsed(ivm::IVInterface *interface, const QString &
  */
 bool MSCRefactor::isIVConnectionUsed(ivm::IVConnection *connection) const
 {
-    Q_ASSERT(!m_mscChecks.isNull());
     ivm::IVInterface *iface = connection->targetInterface();
     return isIVInterfaceUsed(iface, iface->title());
 }
@@ -118,8 +110,6 @@ void MSCRefactor::onIVFunctionRenamed(ivm::IVFunction *func, const QString &oldN
 void MSCRefactor::onIVInterfaceRenamed(
         ivm::IVInterface *interface, const QString &oldName, const QString &newName) const
 {
-    Q_ASSERT(!m_mscChecks.isNull());
-
     QSet<QPair<QString, QString>> sourceTargets;
     QList<msc::MscMessage *> messages = correspondingMessages(interface, oldName);
     for (msc::MscMessage *message : messages) {
@@ -159,7 +149,6 @@ QList<msc::MscMessage *> MSCRefactor::correspondingMessages(ivm::IVInterface *in
 {
     Q_ASSERT(interface != nullptr);
     Q_ASSERT(interface->model() != nullptr);
-    Q_ASSERT(!m_mscChecks.isNull());
     QList<msc::MscMessage *> messages;
 
     if (interface->direction() != ivm::IVInterface::InterfaceType::Provided) {
@@ -168,15 +157,35 @@ QList<msc::MscMessage *> MSCRefactor::correspondingMessages(ivm::IVInterface *in
 
     QVector<ivm::IVConnection *> connections = interface->model()->getRelatedConnections(interface);
     for (const ivm::IVConnection *connection : qAsConst(connections)) {
-        messages.append(m_mscChecks->allMessages(name, connection->sourceName(), connection->targetName()));
+        messages.append(allMessages(name, connection->sourceName(), connection->targetName()));
     }
     // Update from cyclic interfaces
     ivm::IVFunctionType *func = interface->function();
     if (func && interface->kind() == ivm::IVInterface::OperationKind::Cyclic) {
-        messages.append(m_mscChecks->allMessages(name, func->title(), ""));
-        messages.append(m_mscChecks->allMessages(name, "", func->title()));
+        messages.append(allMessages(name, func->title(), ""));
+        messages.append(allMessages(name, "", func->title()));
     }
 
+    return messages;
+}
+
+/*!
+ * Returns all messges that have the names of the message, source and target as in the parameters
+ */
+QList<msc::MscMessage *> MSCRefactor::allMessages(
+        const QString &messageName, const QString &sourceName, const QString &targetName) const
+{
+    QList<msc::MscMessage *> messages;
+    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
+        for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
+            for (msc::MscMessage *message : chart->messages()) {
+                if (message->name() == messageName && message->sourceName() == sourceName
+                        && message->targetName() == targetName) {
+                    messages.append(message);
+                }
+            }
+        }
+    }
     return messages;
 }
 

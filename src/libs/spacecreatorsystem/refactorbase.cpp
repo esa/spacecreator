@@ -139,4 +139,11 @@ void RefactorBase::onImplementationListChanged(ivm::IVFunction *ivFunction)
     Q_UNUSED(ivFunction);
 }
 
+void RefactorBase::onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue)
+{
+    Q_UNUSED(entity);
+    Q_UNUSED(attrName);
+    Q_UNUSED(oldValue);
+}
+
 } // namespace scs

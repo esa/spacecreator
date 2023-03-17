@@ -149,6 +149,15 @@ void IVRefactorHandler::onImplementationListChanged(ivm::IVFunction *ivFunction)
     }
 }
 
+void IVRefactorHandler::onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue)
+{
+    for (RefactorBase *refactor : m_refactors) {
+        if (refactor->isRefactorSupported(scs::RefactorBase::IVAttributeChanged)) {
+            refactor->onAttributeChanged(entity, attrName, oldValue);
+        }
+    }
+}
+
 void IVRefactorHandler::onIVFunctionNameChanged(
         ivm::IVFunction *func, const QString &oldName, ive::cmd::CmdFunctionAttrChange *command)
 {

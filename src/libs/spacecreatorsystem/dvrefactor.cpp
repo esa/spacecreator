@@ -26,6 +26,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "ivmodel.h"
 #include "spacecreatorproject.h"
 
+#include <dvsystemchecks.h>
+
 namespace scs {
 
 void DVRefactor::setStorage(SpaceCreatorProject *storage)
@@ -156,6 +158,24 @@ void DVRefactor::onImplementationListChanged(ivm::IVFunction *ivFunction)
 {
     for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->updateFunctionImplementationList(ivFunction->title());
+    }
+}
+
+/*!
+ * \see RefactorBase::onAttributeChanged
+ */
+void DVRefactor::onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue)
+{
+    Q_UNUSED(oldValue)
+    Q_UNUSED(entity)
+
+    static QString kindTocken = ivm::meta::Props::token(ivm::meta::Props::Token::kind);
+    if (attrName == kindTocken) {
+        DvSystemChecks dvChecks;
+        dvChecks.setStorage(m_storage);
+        for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
+            dvChecks.checkDVFile(dvCore);
+        }
     }
 }
 

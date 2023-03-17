@@ -17,15 +17,11 @@
 
 #include "mscsystemchecks.h"
 
-#include "commandsstack.h"
 #include "dvappmodel.h"
 #include "dveditorcore.h"
-#include "dvfunction.h"
 #include "dvmessage.h"
 #include "dvmodel.h"
-#include "dvsystemchecks.h"
 #include "interfacedocument.h"
-#include "ivconnection.h"
 #include "iveditorcore.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
@@ -58,11 +54,6 @@ void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
     connect(m_storage, &scs::SpaceCreatorProject::mscCoreAdded, this, [=](MSCEditorCorePtr core) {
         connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &scs::MscSystemChecks::onMscEntityNameChanged);
     });
-
-    connect(m_storage, &scs::SpaceCreatorProject::ivCoreAdded, this, [this](IVEditorCorePtr ivCore) {
-        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::attributeChanged, this,
-                &scs::MscSystemChecks::onAttributeChanged);
-    });
 }
 
 /*!
@@ -85,49 +76,6 @@ void MscSystemChecks::changeMscMessageName(
     for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         mscCore->changeMscMessageName(oldName, newName, sourceName, targetName);
     }
-}
-
-/*!
- * Returns all messges that have the names of the message, source and target as in the parameters
- */
-QList<msc::MscMessage *> MscSystemChecks::allMessages(
-        const QString &messageName, const QString &sourceName, const QString &targetName)
-{
-    QList<msc::MscMessage *> messages;
-    for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
-        for (msc::MscChart *chart : mscCore->mainModel()->mscModel()->allCharts()) {
-            for (msc::MscMessage *message : chart->messages()) {
-                if (message->name() == messageName && message->sourceName() == sourceName
-                        && message->targetName() == targetName) {
-                    messages.append(message);
-                }
-            }
-        }
-    }
-    return messages;
-}
-
-/*!
-   Returns if any message binding exists, that has the given source function, target function, and name for the
-   side/end of the message
- */
-bool MscSystemChecks::dvMessagesExist(
-        const QString &messageName, const QString &sourceName, const QString &targetName, shared::MessageEnd msgSide)
-{
-    for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
-        dvm::DVModel *model = dvCore->appModel()->objectsModel();
-        for (const dvm::DVMessage *msg : model->allObjectsByType<dvm::DVMessage>()) {
-            if (msg->fromFunction() == sourceName && msg->toFunction() == targetName) {
-                if ((msgSide == shared::SOURCE || msgSide == shared::BOTH) && msg->fromInterface() == messageName) {
-                    return true;
-                }
-                if ((msgSide == shared::TARGET || msgSide == shared::BOTH) && msg->toInterface() == messageName) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
 }
 
 /*!
@@ -273,23 +221,6 @@ void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &old
                 changeDvMessageBindingName(oldName, message->name(), fromName, toName, shared::TARGET);
                 m_nameUpdateRunning = false;
             }
-        }
-    }
-}
-
-void MscSystemChecks::onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue)
-{
-    Q_UNUSED(oldValue)
-    if (!entity) {
-        return;
-    }
-
-    static QString kindTocken = ivm::meta::Props::token(ivm::meta::Props::Token::kind);
-    if (attrName == kindTocken) {
-        DvSystemChecks dvChecks;
-        dvChecks.setStorage(m_storage);
-        for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
-            dvChecks.checkDVFile(dvCore);
         }
     }
 }

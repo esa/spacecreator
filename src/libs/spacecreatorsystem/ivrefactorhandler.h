@@ -57,6 +57,7 @@ public Q_SLOTS:
             ivm::IVFunction *entity, const QString &newName, const QString &oldName, shared::UndoCommand *command);
     void onDefaultImplementationChanged();
     void onImplementationListChanged(ivm::IVFunction *ivFunction);
+    void onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
 
 private:
     void onIVFunctionNameChanged(

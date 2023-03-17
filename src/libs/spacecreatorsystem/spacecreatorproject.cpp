@@ -61,7 +61,6 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     m_asnChecks->setProject(this);
 
     m_mscRefactor->setStorage(this);
-    m_mscRefactor->setMscChecks(m_mscChecks.get());
     m_ivRefactorHandler->registerRefactor(m_mscRefactor.get());
     m_dvRefactor->setStorage(this);
     m_ivRefactorHandler->registerRefactor(m_dvRefactor.get());
@@ -77,6 +76,8 @@ SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
                 m_ivRefactorHandler.get(), &scs::IVRefactorHandler::onDefaultImplementationChanged);
         connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::implementationListChanged, m_ivRefactorHandler.get(),
                 &scs::IVRefactorHandler::onImplementationListChanged);
+        connect(ivCore->commandsStack(), &ive::cmd::CommandsStack::attributeChanged, m_ivRefactorHandler.get(),
+                &scs::IVRefactorHandler::onAttributeChanged);
     });
 }
 

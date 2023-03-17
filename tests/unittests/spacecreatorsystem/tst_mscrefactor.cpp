@@ -95,7 +95,6 @@ void tst_MSCRefactor::init()
     m_mscChecks->setStorage(m_project.get());
 
     m_mscRefactor->setStorage(m_project.get());
-    m_mscRefactor->setMscChecks(m_mscChecks.get());
 
     m_ivModel = std::make_unique<ivm::IVModel>(ivm::IVPropertyTemplateConfig::instance());
 

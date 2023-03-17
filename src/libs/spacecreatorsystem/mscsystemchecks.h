@@ -57,27 +57,18 @@ class MscSystemChecks : public QObject
 public:
     MscSystemChecks(QObject *parent = nullptr);
 
-    // Setup functions
     void setStorage(scs::SpaceCreatorProject *storage);
 
-    // MSC functions
     void changeMscInstanceName(const QString &oldName, const QString &name);
-
     void changeMscMessageName(
             const QString &oldName, const QString &name, const QString &sourceName, const QString &targetName);
-    QList<msc::MscMessage *> allMessages(
-            const QString &messageName, const QString &sourceName, const QString &targetName);
 
-    // DV functions
-    bool dvMessagesExist(const QString &messageName, const QString &sourceName, const QString &targetName,
-            shared::MessageEnd msgSide);
     void changeDvFunctionBindingName(const QString &oldName, const QString &name);
     void changeDvMessageBindingName(const QString &oldName, const QString &name, const QString &sourceName,
             const QString &targetName, shared::MessageEnd msgSide);
 
 public Q_SLOTS:
     void onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command);
-    void onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
 
 private:
     QPointer<SpaceCreatorProject> m_storage;
