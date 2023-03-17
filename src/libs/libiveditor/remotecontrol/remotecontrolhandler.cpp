@@ -53,7 +53,7 @@ Implemented commands and parameters list:
 + **name** - Name of the function to show highlighted
 
 - **UnHighlightFunction** - Shows a function normal
-+ **name** - Name of the function to show un-highlighted
++ **name** - Name of the function to show un-highlighted. Using "*" unhighlights allfunctions.
 
 - **HighlightConnection** - Highlights a connection
 + **fromFunction** - Name of the source function
@@ -61,9 +61,9 @@ Implemented commands and parameters list:
 + **riName** - Name of the interface
 
 - **UnHighlightConnection** - Shows a connection normal
-+ **fromFunction** - Name of the source function
-+ **toFunction** - Name of the target function
-+ **riName** - Name of the interface
++ **fromFunction** - Name of the source function. Using "*" unhighlights connections of all functions.
++ **toFunction** - Name of the target function. Using "*" unhighlights all connections to any function.
++ **riName** - Name of the interface. Using "*" unhighlights connections connecting the given functions.
 
  */
 RemoteControlHandler::RemoteControlHandler(QObject *parent)
@@ -154,50 +154,66 @@ bool RemoteControlHandler::handleLoad(const QVariantMap &params, QString *errorS
 
 bool RemoteControlHandler::highlightFunction(const QVariantMap &params, QString *errorString)
 {
-    ivm::IVFunction *func = getFunction(params, errorString);
-    if (!func) {
+    QList<ivm::IVFunction *> funcs = getFunction(params, errorString);
+
+    if (funcs.isEmpty()) {
         return false;
     }
 
-    func->setMarked(true);
-    updateParentItem(func);
+    for (ivm::IVFunction *func : funcs) {
+        func->setMarked(true);
+        updateParentItem(func);
+    }
 
     return true;
 }
 
 bool RemoteControlHandler::unhighlightFunction(const QVariantMap &params, QString *errorString)
 {
-    ivm::IVFunction *func = getFunction(params, errorString);
-    if (!func) {
+    QList<ivm::IVFunction *> funcs = getFunction(params, errorString);
+
+    if (funcs.isEmpty()) {
         return false;
     }
 
-    func->setMarked(false);
-    updateParentItem(func);
+    for (ivm::IVFunction *func : funcs) {
+        func->setMarked(false);
+        updateParentItem(func);
+    }
 
     return true;
 }
 
-ivm::IVFunction *RemoteControlHandler::getFunction(const QVariantMap &params, QString *errorString) const
+QList<ivm::IVFunction *> RemoteControlHandler::getFunction(const QVariantMap &params, QString *errorString) const
 {
     const QString name = params.value("name").toString();
     if (name.isEmpty()) {
         if (errorString) {
-            *errorString = QString("No valid function parameter 'name'");
+            *errorString = tr("No valid function parameter 'name'");
         }
-        return nullptr;
+        return {};
     }
 
     ivm::IVModel *model = m_document->objectsModel();
+    if (name == "*") {
+        QList<ivm::IVFunction *> funcs;
+        for (shared::VEObject *obj : model->objects()) {
+            if (auto func = dynamic_cast<ivm::IVFunction *>(obj)) {
+                funcs.append(func);
+            }
+        }
+        return funcs;
+    }
+
     ivm::IVFunction *func = model->getFunction(name, Qt::CaseInsensitive);
     if (!func) {
         if (errorString) {
-            *errorString = QString("No function '%1' in the model").arg(name);
+            *errorString = tr("No function '%1' in the model").arg(name);
         }
-        return nullptr;
+        return {};
     }
 
-    return func;
+    return QList<ivm::IVFunction *> { func };
 }
 
 void RemoteControlHandler::updateParentItem(ivm::IVObject *obj) const
@@ -215,72 +231,89 @@ void RemoteControlHandler::updateParentItem(ivm::IVObject *obj) const
 
 bool RemoteControlHandler::highlightConnection(const QVariantMap &params, QString *errorString)
 {
-    ivm::IVConnection *connection = getConnection(params, errorString);
-    if (!connection) {
+    QList<ivm::IVConnection *> connections = getConnection(params, errorString);
+    if (connections.isEmpty()) {
         return false;
     }
 
-    connection->setMarked(true);
+    for (ivm::IVConnection *connection : connections) {
+        connection->setMarked(true);
 
-    updateItem(connection->source());
-    updateParentItem(connection->source());
-    updateItem(connection->target());
-    updateParentItem(connection->target());
+        updateItem(connection->source());
+        updateParentItem(connection->source());
+        updateItem(connection->target());
+        updateParentItem(connection->target());
+    }
 
     return true;
 }
 
 bool RemoteControlHandler::unhighlightConnection(const QVariantMap &params, QString *errorString)
 {
-    ivm::IVConnection *connection = getConnection(params, errorString);
-    if (!connection) {
+    QList<ivm::IVConnection *> connections = getConnection(params, errorString);
+    if (connections.isEmpty()) {
         return false;
     }
 
-    updateItem(connection->source());
-    updateParentItem(connection->source());
-    updateItem(connection->target());
-    updateParentItem(connection->target());
+    for (ivm::IVConnection *connection : connections) {
+        connection->setMarked(true);
+        updateItem(connection->source());
+        updateParentItem(connection->source());
+        updateItem(connection->target());
+        updateParentItem(connection->target());
 
-    connection->setMarked(false);
+        connection->setMarked(false);
+    }
 
     return true;
 }
 
-ivm::IVConnection *RemoteControlHandler::getConnection(const QVariantMap &params, QString *errorString) const
+QList<ivm::IVConnection *> RemoteControlHandler::getConnection(const QVariantMap &params, QString *errorString) const
 {
     const QString fromName = params.value("fromFunction").toString();
     if (fromName.isEmpty()) {
         if (errorString) {
-            *errorString = QString("No valid function parameter 'fromFunction'");
+            *errorString = tr("No valid function parameter 'fromFunction'");
         }
-        return nullptr;
+        return {};
     }
     const QString toName = params.value("toFunction").toString();
     if (toName.isEmpty()) {
         if (errorString) {
-            *errorString = QString("No valid function parameter 'toFunction'");
+            *errorString = tr("No valid function parameter 'toFunction'");
         }
-        return nullptr;
+        return {};
     }
     const QString riName = params.value("riName").toString();
     if (riName.isEmpty()) {
         if (errorString) {
-            *errorString = QString("No valid function parameter 'riName'");
+            *errorString = tr("No valid function parameter 'riName'");
         }
-        return nullptr;
+        return {};
     }
+
+    QList<ivm::IVConnection *> connections;
 
     ivm::IVModel *model = m_document->objectsModel();
-    ivm::IVConnection *connection = model->getConnection(riName, fromName, toName, Qt::CaseInsensitive);
-    if (!connection) {
-        if (errorString) {
-            *errorString = QString("No connection '%1' from '%2' to '%3' in the model").arg(riName, fromName, toName);
+    for (shared::VEObject *obj : model->objects()) {
+        if (auto connection = dynamic_cast<ivm::IVConnection *>(obj)) {
+            bool fromMatch = fromName.compare(connection->sourceName(), Qt::CaseInsensitive) == 0 || fromName == "*";
+            bool toMatch = toName.compare(connection->targetName(), Qt::CaseInsensitive) == 0 || toName == "*";
+            bool nameMatch =
+                    riName.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0 || riName == "*";
+            if (fromMatch && toMatch && nameMatch) {
+                connections.append(connection);
+            }
         }
-        return nullptr;
     }
 
-    return connection;
+    if (connections.isEmpty()) {
+        if (errorString) {
+            *errorString = tr("No connection '%1' from '%2' to '%3' in the model").arg(riName, fromName, toName);
+        }
+    }
+
+    return connections;
 }
 
 void RemoteControlHandler::updateItem(ivm::IVObject *obj) const

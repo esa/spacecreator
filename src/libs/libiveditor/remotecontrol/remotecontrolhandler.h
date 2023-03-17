@@ -63,11 +63,11 @@ private:
     bool handleLoad(const QVariantMap &params, QString *errorString);
     bool highlightFunction(const QVariantMap &params, QString *errorString);
     bool unhighlightFunction(const QVariantMap &params, QString *errorString);
-    ivm::IVFunction *getFunction(const QVariantMap &params, QString *errorString) const;
+    QList<ivm::IVFunction *> getFunction(const QVariantMap &params, QString *errorString) const;
     void updateParentItem(ivm::IVObject *obj) const;
     bool highlightConnection(const QVariantMap &params, QString *errorString);
     bool unhighlightConnection(const QVariantMap &params, QString *errorString);
-    ivm::IVConnection *getConnection(const QVariantMap &params, QString *errorString) const;
+    QList<ivm::IVConnection *> getConnection(const QVariantMap &params, QString *errorString) const;
     void updateItem(ivm::IVObject *obj) const;
 
     QPointer<ive::InterfaceDocument> m_document;
