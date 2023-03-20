@@ -31,7 +31,7 @@ VEConnectionEndPointGraphicsItem::VEConnectionEndPointGraphicsItem(VEObject *obj
 {
 }
 
-VEConnectionEndPointGraphicsItem::~VEConnectionEndPointGraphicsItem() {}
+VEConnectionEndPointGraphicsItem::~VEConnectionEndPointGraphicsItem() { }
 
 void VEConnectionEndPointGraphicsItem::addConnection(VEConnectionGraphicsItem *item)
 {
@@ -85,6 +85,10 @@ void VEConnectionEndPointGraphicsItem::updateFromEntity()
     } else {
         setPos(parentItem()->mapFromScene(coordinates));
         doLayout();
+    }
+
+    if (parentItem()) {
+        parentItem()->update();
     }
 }
 
@@ -231,9 +235,16 @@ void VEConnectionEndPointGraphicsItem::onManualMoveFinish(GripPoint *grip, const
     VEConnectionGraphicsItem::layoutInterfaceConnections(this, VEConnectionGraphicsItem::LayoutPolicy::Default,
             VEConnectionGraphicsItem::CollisionsPolicy::Rebuild, true);
     updateEntity();
+
+    if (parentItem()) {
+        parentItem()->update();
+    }
 }
 
-void VEConnectionEndPointGraphicsItem::updateInternalItems(Qt::Alignment alignment) { Q_UNUSED(alignment) }
+void VEConnectionEndPointGraphicsItem::updateInternalItems(Qt::Alignment alignment)
+{
+    Q_UNUSED(alignment)
+}
 
 QPainterPath VEConnectionEndPointGraphicsItem::itemPath(Qt::Alignment alignment) const
 {
