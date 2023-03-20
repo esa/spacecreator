@@ -35,8 +35,10 @@
 #include "types/userdefinedtype.h"
 #include "values.h"
 
+#include <QRegularExpression>
 #include <QVariant>
 #include <type_traits>
+
 namespace Asn1Acn {
 
 /*!
@@ -148,7 +150,8 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
                 break;
             }
             const auto *bitStringType = dynamic_cast<const Asn1Acn::Types::BitString *>(type);
-            ok = checkBitStringLength(bitStringType, value);
+            ok = checkBitStringCharacters(value);
+            ok = ok && checkBitStringLength(bitStringType, value);
             if (ok) {
                 valueMap["value"] = value;
             }
@@ -193,7 +196,8 @@ QVariantMap Asn1ValueParser::parseAsn1Value(
                 break;
             }
             const auto *octetString = dynamic_cast<const Asn1Acn::Types::OctetString *>(type);
-            ok = checkBitStringLength(octetString, value);
+            ok = checkBitStringCharacters(value);
+            ok = ok && checkBitStringLength(octetString, value);
             if (ok) {
                 valueMap["value"] = value;
             }
@@ -440,11 +444,48 @@ bool Asn1ValueParser::checkBitStringLength(const Constraints::WithConstraints<Va
     if (value.startsWith("'")) {
         value = value.remove(0, 1);
     }
-    if (value.endsWith("'H") || value.endsWith('B')) {
+
+    int length = value.length();
+
+    if (value.endsWith("'H")) {
         value.chop(2);
+
+        length = value.length();
+        if (std::is_same_v<ValueType, Asn1Acn::OctetStringValue>) {
+            length /= 2; // One octect has 2 hex digits
+        }
+        if (std::is_same_v<ValueType, Asn1Acn::BitStringValue>) {
+            length *= 4; // one hex digit is 4 bits
+        }
+    }
+    if (value.endsWith("'B")) {
+        value.chop(2);
+        length = value.length();
+        if (std::is_same_v<ValueType, Asn1Acn::OctetStringValue>) {
+            length /= 8; // One octect has 8 binary digits
+        }
     }
 
-    return checkSize(asn1Type, value.length());
+    return checkSize(asn1Type, length);
+}
+
+/**
+ * Checks if a 'H string has only 0-9 and A-F characters
+ * And  if a 'B string has only 0/1 characters
+ */
+bool Asn1ValueParser::checkBitStringCharacters(const QString &value) const
+{
+    if (value.endsWith("'H")) {
+        static QRegularExpression regex("'([0-9A-F][0-9A-F])*'H");
+        return regex.match(value).hasMatch();
+    }
+
+    if (value.endsWith("'B")) {
+        static QRegularExpression regex("'(0|1)*'B");
+        return regex.match(value).hasMatch();
+    }
+
+    return false;
 }
 
 template<typename ValueType>
@@ -475,8 +516,7 @@ bool Asn1ValueParser::checkRangeConstraint(
 }
 
 template<typename ValueType>
-bool Asn1ValueParser::checkSizeConstraint(
-        const Constraints::Constraint<ValueType> *constraint, const int32_t value) const
+bool Asn1ValueParser::checkSizeConstraint(const Constraints::Constraint<ValueType> *constraint, int32_t value) const
 {
     if (!constraint) {
         return false;

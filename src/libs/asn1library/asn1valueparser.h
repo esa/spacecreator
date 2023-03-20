@@ -66,12 +66,13 @@ private:
     bool checkStringLength(const Constraints::WithConstraints<ValueType> *asn1Type, QString value) const;
     template<typename ValueType>
     bool checkBitStringLength(const Constraints::WithConstraints<ValueType> *asn1Type, QString value) const;
+    bool checkBitStringCharacters(const QString &value) const;
 
     template<typename ValueType>
     bool checkRangeConstraint(
             const Constraints::Constraint<ValueType> *constraint, const typename ValueType::Type &value) const;
     template<typename ValueType>
-    bool checkSizeConstraint(const Constraints::Constraint<ValueType> *constraint, const int32_t value) const;
+    bool checkSizeConstraint(const Constraints::Constraint<ValueType> *constraint, int32_t value) const;
 
     int nextIndex(const QString &value) const;
 };

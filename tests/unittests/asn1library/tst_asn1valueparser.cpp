@@ -18,6 +18,8 @@
 #include "asn1const.h"
 #include "asn1valueparser.h"
 #include "asnsequencecomponent.h"
+#include "constraints/rangeconstraint.h"
+#include "constraints/sizeconstraint.h"
 #include "sourcelocation.h"
 #include "typeassignment.h"
 #include "types/bitstring.h"
@@ -233,19 +235,37 @@ void tst_Asn1ValueParser::testIA5StringValues()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::IA5String>();
+    auto range = Asn1Acn::Range<int64_t>(3, 10);
+    auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+    auto sizeConstraint =
+            std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>(std::move(rangeConstraint));
+    type->constraints().append(std::move(sizeConstraint));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyString", "MyString", location, std::move(type));
+
     auto valueMap = valueParser->parseAsn1Value(assignment.get(), "TestString");
     QCOMPARE(valueMap.size(), 2);
-
     QCOMPARE(valueMap["name"].toString(), QString("MyString"));
     QVERIFY(valueMap["value"].toString() == "TestString");
+
+    // Test range
+    bool ok;
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "a", &ok);
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "abcdefghijklm", &ok);
+    QVERIFY(!ok);
 }
 
 void tst_Asn1ValueParser::testBitStringValues()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::BitString>();
+    auto range = Asn1Acn::Range<int64_t>(4, 16);
+    auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+    auto sizeConstraint =
+            std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::BitStringValue>>(std::move(rangeConstraint));
+    type->constraints().append(std::move(sizeConstraint));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyString", "MyString", location, std::move(type));
+
     QVariantMap valueMap = valueParser->parseAsn1Value(assignment.get(), "'AA'H");
     QCOMPARE(valueMap.size(), 2);
     QCOMPARE(valueMap["name"].toString(), QString("MyString"));
@@ -259,25 +279,60 @@ void tst_Asn1ValueParser::testBitStringValues()
     bool ok;
     valueMap = valueParser->parseAsn1Value(assignment.get(), "nope", &ok);
     QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'nope'H", &ok);
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'nope'B", &ok);
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'ABAB'B", &ok);
+    QVERIFY(!ok);
+
+    // Test range
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'01'B", &ok);
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'01010101010101010101010101010101'B");
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'AB01CDEF'H");
+    QVERIFY(!ok);
 }
 
 void tst_Asn1ValueParser::testOctetStringValues()
 {
     Asn1Acn::SourceLocation location;
     auto type = std::make_unique<Asn1Acn::Types::OctetString>();
+    auto range = Asn1Acn::Range<int64_t>(2, 3);
+    auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+    auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::OctetStringValue>>(
+            std::move(rangeConstraint));
+    type->constraints().append(std::move(sizeConstraint));
     auto assignment = std::make_unique<Asn1Acn::TypeAssignment>("MyString", "MyString", location, std::move(type));
-    QVariantMap valueMap = valueParser->parseAsn1Value(assignment.get(), "'BB'H");
+    QVariantMap valueMap = valueParser->parseAsn1Value(assignment.get(), "'ABCD'H");
     QCOMPARE(valueMap.size(), 2);
     QCOMPARE(valueMap["name"].toString(), QString("MyString"));
-    QCOMPARE(valueMap["value"].toString(), "'BB'H");
+    QCOMPARE(valueMap["value"].toString(), "'ABCD'H");
 
-    valueMap = valueParser->parseAsn1Value(assignment.get(), "'0110'B");
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'0110011001100110'B"); // 2 byte/octet
     QCOMPARE(valueMap.size(), 2);
     QCOMPARE(valueMap["name"].toString(), QString("MyString"));
-    QCOMPARE(valueMap["value"].toString(), "'0110'B");
+    QCOMPARE(valueMap["value"].toString(), "'0110011001100110'B");
 
     bool ok;
     valueMap = valueParser->parseAsn1Value(assignment.get(), "nope", &ok);
+    QVERIFY(!ok);
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'nope'H", &ok);
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'nope'B", &ok);
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'ABAB'B", &ok);
+    QVERIFY(!ok);
+
+    // Test range
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'01'B", &ok);
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(
+            assignment.get(), "'011001100110011001100110011001100110011001100110'B"); // 6 byte/octet
+    QVERIFY(!ok);
+    valueMap = valueParser->parseAsn1Value(assignment.get(), "'0123ABCDEF'H"); // 8 byte/octet
     QVERIFY(!ok);
 }
 
