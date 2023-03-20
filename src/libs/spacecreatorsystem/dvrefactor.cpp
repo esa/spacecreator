@@ -169,8 +169,8 @@ void DVRefactor::onAttributeChanged(shared::VEObject *entity, const QString &att
     Q_UNUSED(oldValue)
     Q_UNUSED(entity)
 
-    static QString kindTocken = ivm::meta::Props::token(ivm::meta::Props::Token::kind);
-    if (attrName == kindTocken) {
+    static QString kindToken = ivm::meta::Props::token(ivm::meta::Props::Token::kind);
+    if (attrName == kindToken) {
         DvSystemChecks dvChecks;
         dvChecks.setStorage(m_storage);
         for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
