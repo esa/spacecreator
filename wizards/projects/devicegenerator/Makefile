@@ -10,8 +10,16 @@ ASN1_DRV_CONFIG=%{ProjectName}configuration.asn
 ASN1_DRV_PRIVATE=%{ProjectName}privatedata.asn
 ASN1_DRIVER_EXPLICIT_CONFIG=$(ASN1_DRV_CONFIG) $(ASN1_DRV_PRIVATE)
 
+PARTITION_NAME=demo
+
 SNIPPET_INSTALLATION_DIRECTORY=$(COMMUNICATION_DEVICE_PATH)/%{CDBoard}/port_%{ProjectNameLowerCase}
 SNIPPETS_INSTALLATOR=install_communication_devices.py
+TASTE_DRIVER_REPO=$(shell taste-config --prefix)/include/$(subst X86,,TASTE-%{CDBoard}-Drivers)
+SOURCE_INSTALLATION_DIRECTORY=$(shell find $(TASTE_DRIVER_REPO) -name "%{ProjectNameLowerCase}")
+DRIVER_INTERFACE_FILES=$(shell find work/build/**/demo -name "driver_interface.*")
+FUNCTION_NAMES=$(shell xmllint --xpath "//*[local-name()='Function']/@name" interfaceview.xml)
+
+EXCLUDED_DIRS=\\( -not -path "work/build/*" -a -not -path "work/dataview/*" -a -not -path "work/broker/*" -a -not -path "work/packetizer/*" -a -not -path "work/binaries/*" -a -not -path "work/Debug/*" -a -not -path "work/Dump/*" \\)
 
 all:	release
 
@@ -29,12 +37,15 @@ run:
 	@echo "run Hello World!"
 
 install:
-	mkdir -p $(SNIPPET_INSTALLATION_DIRECTORY)
-	cp -r snippets/. $(SNIPPET_INSTALLATION_DIRECTORY)
+	chmod 755 install.sh
+	./install.sh
 	$(SNIPPETS_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
 
 uninstall:
 	rm -r $(SNIPPET_INSTALLATION_DIRECTORY)
+	rm $(TASTE_DRIVER_REPO)/configurations/%{AsnConfigFile}
+	rm $(TASTE_DRIVER_REPO)/configurations/%{AcnConfigFile}
+	rm -r $(SOURCE_INSTALLATION_DIRECTORY)
 	$(SNIPPETS_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
 
 uninstall-all:

@@ -86,6 +86,14 @@
         {
             "key": "ReqBusAccess",
             "value": "%{JS: value('ReqBusAccessCombo') === '' ? '%{ReqBusAccessCustom}' : '%{ReqBusAccessCombo}'}"
+        },
+        {
+            "key": "AsnConfigFileInstallationTargetX86Linux",
+            "value": "/home/taste/tool-inst/include/TASTE-Linux-Drivers/configurations/%{AsnConfigFile}"
+        },
+        {
+            "key": "AsnConfigFileInstallationTargetSAMV71",
+            "value": "/home/taste/tool-inst/include/TASTE-SAMV71-Drivers/configurations/%{AsnConfigFile}"
         }
     ],
     "pages": [
@@ -241,6 +249,10 @@
                 {
                     "source": "Makefile",
                     "target": "%{ProjectDirectory}/Makefile"
+                },
+                {
+                    "source": "install.sh",
+                    "target": "%{ProjectDirectory}/install.sh"
                 },
                 {
                     "source": "snippets/%{CDBoard}/ocarina_components.aadl",

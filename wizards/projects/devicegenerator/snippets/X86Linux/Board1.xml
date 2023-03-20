@@ -18,9 +18,9 @@ Generated XML element <Port> shall be put into <Board> named %{CommDevName%{CDBo
         <Port name="port_%{ProjectNameLowerCase}"
               namespace="ocarina_drivers"
               bus_namespace="ocarina_buses"
-              extends="ocarina_drivers::%{ProjectName}"
-              impl_extends="ocarina_drivers::%{ProjectName}.linux"
-              asn1file="%{ProjectDirectory}/%{AsnConfigFile}"
+              extends="ocarina_drivers::device_%{ProjectName}"
+              impl_extends="ocarina_drivers::device_%{ProjectName}.linux"
+              asn1file="%{AsnConfigFileInstallationTargetX86Linux}"
               asn1module="%{ProjectNameUpperCase}-DRIVER-CONFIGURATION"
               asn1type="%{ProjectNameUpperCase}-Conf-T"
               requiresBusAccess="%{ReqBusAccess}"/>

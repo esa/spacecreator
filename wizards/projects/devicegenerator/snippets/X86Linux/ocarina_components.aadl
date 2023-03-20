@@ -15,7 +15,7 @@ properties
   Type_Source_Name => "%{ProjectNameUpperCase}-Conf-T";
   Deployment::ASN1_Module_Name => "%{ProjectNameUpperCase}-DRIVER-CONFIGURATION";
   Source_Language => (ASN1);
-  Source_Text => ("%{ProjectDirectory}/%{AsnConfigFile}");
+  Source_Text => ("%{AsnConfigFileInstallationTargetX86Linux}");
 end configuration_type_%{ProjectName};
 
 -- ############################################################################
@@ -32,7 +32,7 @@ end configuration_type_%{ProjectName};
 
   device implementation device_%{ProjectName}.linux
   properties
-    Deployment::Driver_Name       => "driver_%{ProjectName}";
+    Deployment::Driver_Name       => "%{ProjectNameLowerCase}";
     Device_Driver                 => classifier (ocarina_drivers_%{ProjectName}::%{ProjectName}.linux);
     Initialize_Entrypoint         => classifier (ocarina_drivers_%{ProjectName}::driver_%{ProjectName}_init);
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::generic.linux));
@@ -51,25 +51,25 @@ public
   subprogram driver_%{ProjectName}_poll
   properties
     Source_Language => (Cpp);
-    Source_Name => "DriverPoll";
-    Source_Text => ("driver_interface.cc",
-                    "driver_interface.h");
+    Source_Name => "%{ProjectNameLowerCase}_DriverPoll";
+    Source_Text => ("%{ProjectNameLowerCase}.cc",
+                    "%{ProjectNameLowerCase}.h");
   end driver_%{ProjectName}_poll;
 
   subprogram driver_%{ProjectName}_send
   properties
     Source_Language => (Cpp);
-    Source_Name => "DriverSend";
-    Source_Text => ("driver_interface.cc",
-                    "driver_interface.h");
+    Source_Name => "%{ProjectNameLowerCase}_DriverSend";
+    Source_Text => ("%{ProjectNameLowerCase}.cc",
+                    "%{ProjectNameLowerCase}.h");
   end driver_%{ProjectName}_send;
 
   subprogram driver_%{ProjectName}_init
   properties
     Source_Language => (Cpp);
-    Source_Name => "DriverInit";
-    Source_Text => ("driver_interface.cc",
-                    "driver_interface.h");
+    Source_Name => "%{ProjectNameLowerCase}_DriverInit";
+    Source_Text => ("%{ProjectNameLowerCase}.cc",
+                    "%{ProjectNameLowerCase}.h");
   end driver_%{ProjectName}_init;
 
   thread driver_%{ProjectName}_poller
