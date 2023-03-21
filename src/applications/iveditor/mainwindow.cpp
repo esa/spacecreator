@@ -20,7 +20,6 @@
 #include "asn1dialog.h"
 #include "commands/cmdchangeasn1file.h"
 #include "commandsstack.h"
-#include "common.h"
 #include "config/ivlibrarydialog.h"
 #include "context/action/actionsmanager.h"
 #include "endtoend/endtoendview.h"
@@ -79,8 +78,8 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     // Connect the actions
     connect(m_core->actionNewFile(), &QAction::triggered, this, &MainWindow::onCreateFileRequested);
     connect(m_core->actionOpenFile(), &QAction::triggered, this, &MainWindow::onOpenFileRequested);
-    connect(m_core->actionSaveFile(), &QAction::triggered, this, [=]() { exportXml(); });
-    connect(m_core->actionSaveFileAs(), &QAction::triggered, this, [=]() { exportXmlAs(); });
+    connect(m_core->actionSaveFile(), &QAction::triggered, m_core, qOverload<>(&IVEditorCore::save));
+    connect(m_core->actionSaveFileAs(), &QAction::triggered, this, [this]() { exportXmlAs(); });
     connect(m_core->actionQuit(), &QAction::triggered, this, &MainWindow::onQuitRequested);
 
     // Register the actions to the action manager
@@ -193,18 +192,7 @@ void MainWindow::onCreateFileRequested()
  */
 bool MainWindow::exportXml(const QString &savePath, const QString &templatePath)
 {
-    QString filePath = savePath;
-    if (filePath.isEmpty()) {
-        filePath = m_core->filePath();
-        QFileDialog dialog(m_core->mainwidget(), QObject::tr("Export data to an XML file"));
-        dialog.setAcceptMode(QFileDialog::AcceptSave);
-        dialog.setDefaultSuffix(".xml");
-        if (dialog.exec() == QDialog::Accepted) {
-            filePath = dialog.selectedUrls().value(0).toLocalFile();
-        }
-    }
-
-    return m_core->document()->exporter()->exportDocSilently(m_core->document(), filePath, templatePath);
+    return m_core->save(savePath, templatePath);
 }
 
 /*!
@@ -438,7 +426,7 @@ bool MainWindow::closeFile()
         auto btn = QMessageBox::question(this, tr("Document closing"),
                 tr("There are unsaved changes.\nWould you like to save the document?"), btns);
         if (btn == QMessageBox::Save) {
-            if (!exportXml()) {
+            if (!m_core->save()) {
                 return false;
             }
         } else if (btn == QMessageBox::Cancel) {

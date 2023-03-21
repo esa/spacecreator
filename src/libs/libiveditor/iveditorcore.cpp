@@ -20,22 +20,18 @@
 #include "commandlineparser.h"
 #include "commands/cmdchangeasn1file.h"
 #include "commands/cmdconnectionitemcreate.h"
-#include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentityattributeschange.h"
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/cmdifaceattrchange.h"
 #include "commands/cmdinterfaceitemcreate.h"
 #include "commandsstack.h"
-#include "connectioncreationvalidator.h"
 #include "context/action/actionsmanager.h"
 #include "graphicsviewutils.h"
 #include "interfacedocument.h"
-#include "itemeditor/common/ivutils.h"
 #include "itemeditor/graphicsview.h"
 #include "ivappwidget.h"
 #include "ivconnection.h"
 #include "ivcore/abstractsystemchecks.h"
-#include "ivcreatortool.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
@@ -435,7 +431,12 @@ QString IVEditorCore::filePath() const
 
 bool IVEditorCore::save()
 {
-    QString savePath { m_document->path() };
+    return save(m_document->path(), QString());
+}
+
+bool IVEditorCore::save(const QString &filePath, const QString &templatePath)
+{
+    QString savePath { filePath };
     if (savePath.isEmpty()) {
         QFileDialog dialog(m_mainWidget, QObject::tr("Export data to an XML file"));
         dialog.setAcceptMode(QFileDialog::AcceptSave);

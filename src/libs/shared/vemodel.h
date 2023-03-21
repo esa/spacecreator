@@ -74,7 +74,6 @@ public:
             }
         }
 
-        bool added = false;
         QVector<shared::Id> ids;
         auto it = addedObjects.begin();
         while (it != addedObjects.end()) {
@@ -96,13 +95,12 @@ public:
                     }
                 } else {
                     ids.append(obj->id());
-                    added = true;
                 }
             }
             ++it;
         }
 
-        if (added) {
+        if (!ids.isEmpty()) {
             Q_EMIT objectsAdded(ids);
         }
     }

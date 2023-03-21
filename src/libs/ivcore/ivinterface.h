@@ -126,6 +126,7 @@ public:
     bool isClone() const;
     bool isCloned() const;
     bool isMulticastEnabled() const;
+    bool isAutoNamed() const;
     QVector<QPointer<IVInterface>> clones() const;
 
     static IVInterface *createIface(const CreationInfo &descr);

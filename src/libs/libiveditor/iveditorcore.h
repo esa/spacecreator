@@ -63,6 +63,7 @@ public:
 
     QString filePath() const override;
     bool save() override;
+    bool save(const QString &filePath, const QString &templatePath);
 
     void registerBasicActions();
 

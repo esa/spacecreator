@@ -286,6 +286,23 @@ void IVInterface::setLayerName(const QString &layerName)
     Q_EMIT attributeChanged(meta::Props::token(meta::Props::Token::layer));
 }
 
+/*! If interface was named explicitly and has name fixed returns `false` */
+bool IVInterface::isAutoNamed() const
+{
+    static const QString autonamedProp = meta::Props::token(meta::Props::Token::Autonamed);
+
+    if (!m_originalFields.collected()) {
+        return entityAttributeValue(autonamedProp, true);
+    }
+
+    auto it = m_originalFields.attrs.constFind(autonamedProp);
+    if (it != m_originalFields.attrs.constEnd()) {
+        return it->value<bool>();
+    }
+
+    return true;
+}
+
 bool IVInterface::isRequiredSystemElement() const
 {
     return entityAttributeValue(meta::Props::token(meta::Props::Token::required_system_element)) == "YES";
@@ -553,11 +570,7 @@ void IVInterface::reflectAttrs(const IVInterface *from)
     EntityAttributes newAttrs = from->entityAttributes();
 
     const bool isFunctionTypeInherited = from->isNestedInFunctionType();
-    static const QString autonamedProp = meta::Props::token(meta::Props::Token::Autonamed);
-    const bool isCustomName =
-            !(m_originalFields.collected() ? m_originalFields.attrs.value(autonamedProp).value().value<bool>()
-                                           : entityAttributeValue(autonamedProp, true));
-    const bool keepName = isFunctionTypeInherited || isCustomName;
+    const bool keepName = !isFunctionTypeInherited && !isAutoNamed();
     // This logic requires refinement, as it can - unexpectedly for the user - remame
     // an interface during load, breaking a connection. The problematic behaviour
     // was encountered with multicast, where a single required interface
