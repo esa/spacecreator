@@ -34,7 +34,6 @@
 #include <QObject>
 #include <QSaveFile>
 #include <QScopedPointer>
-#include <QtDebug>
 
 namespace ive {
 
@@ -220,6 +219,9 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
     grouppedObjects.insert(grouppedLayers);
 
     // Add meta-data
+    if (!doc->projectName().isEmpty()) {
+        grouppedObjects["ProjectName"] = QVariant::fromValue(doc->projectName());
+    }
     for (const QString &asnFileName : doc->asn1FilesNames()) {
         grouppedObjects["Asn1FileName"] = QVariant::fromValue(asnFileName);
     }

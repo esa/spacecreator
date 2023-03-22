@@ -94,6 +94,9 @@ public:
     QString path() const;
     void setPath(const QString &path);
 
+    void setProjectName(const QString &projectName);
+    const QString &projectName() const;
+
     void setAsn1FileName(const QString &newAsnfile, const QString &oldAsnfile = {});
     QStringList asn1FilesNames() const;
     QStringList asn1FilesPaths() const;

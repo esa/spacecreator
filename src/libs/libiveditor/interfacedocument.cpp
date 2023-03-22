@@ -90,6 +90,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
+    QString projectName;
     QString mscFileName;
     QString uiFileName { shared::kDefaultInterfaceViewUIFileName };
     QStringList asnFilesNames;
@@ -451,6 +452,26 @@ void InterfaceDocument::setPath(const QString &path)
         d->filePath = path;
         Q_EMIT titleChanged();
     }
+}
+
+/*!
+   Sets the name of the project.
+ */
+void InterfaceDocument::setProjectName(const QString &projectName)
+{
+    if (projectName == d->projectName) {
+        return;
+    }
+
+    d->projectName = projectName;
+}
+
+/*!
+   Returns the name of the project
+ */
+const QString &InterfaceDocument::projectName() const
+{
+    return d->projectName;
 }
 
 /*!
@@ -986,10 +1007,12 @@ bool InterfaceDocument::loadImpl(const QString &path)
     loadArchetypes();
 
     const QVariantMap metadata = parser.metaData();
-    QVariantMap::const_iterator i = metadata.constFind("asn1file");
-    while (i != metadata.end() && i.key() == "asn1file") {
-        setAsn1FileName(i.value().toString());
-        ++i;
+
+    if (metadata.contains("projectName")) {
+        setProjectName(metadata["projectName"].toString());
+    }
+    if (metadata.contains("asn1file")) {
+        setAsn1FileName(metadata["asn1file"].toString());
     }
     setMscFileName(metadata["mscfile"].toString());
     if (metadata.contains(parser.uiFileNameTag()))
