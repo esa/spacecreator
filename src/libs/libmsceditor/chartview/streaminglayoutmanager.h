@@ -87,6 +87,7 @@ private Q_SLOTS:
     void instanceRemoved(msc::MscInstance *instance);
     void updateContentsRect();
     void eventAdded(msc::MscInstanceEvent *event);
+    void eventRemoved(msc::MscInstanceEvent *event);
     void updateMessagePosition();
 
 private:

@@ -19,11 +19,23 @@
             }
         },
         {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
             "CommandType": "Action",
             "Parameters": {
                 "name": "Action_0",
                 "instanceName": "Instance_B"
             }
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Redo"
         },
         {
             "CommandType": "Instance",
@@ -81,12 +93,24 @@
             }
         },
         {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
             "CommandType": "Message",
             "Parameters": {
                 "name": "Message_C_A",
                 "srcName": "Instance_C",
                 "dstName": "Instance_A"
             }
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Redo"
         },
         {
             "CommandType": "Action",

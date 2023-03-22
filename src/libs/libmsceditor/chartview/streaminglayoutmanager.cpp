@@ -73,6 +73,7 @@ void StreamingLayoutManager::setCurrentChart(MscChart *chart)
     connect(m_chart.get(), &MscChart::instanceAdded, this, &StreamingLayoutManager::instanceAdded);
     connect(m_chart.get(), &MscChart::instanceRemoved, this, &StreamingLayoutManager::instanceRemoved);
     connect(m_chart.get(), &MscChart::instanceEventAdded, this, &StreamingLayoutManager::eventAdded);
+    connect(m_chart.get(), &MscChart::instanceEventRemoved, this, &StreamingLayoutManager::eventRemoved);
 }
 
 MscChart *StreamingLayoutManager::currentChart() const
@@ -271,6 +272,27 @@ void StreamingLayoutManager::eventAdded(MscInstanceEvent *event)
         qFatal("Not supported");
         break;
     }
+}
+
+void StreamingLayoutManager::eventRemoved(MscInstanceEvent *event)
+{
+    for (auto it = m_nextYperInstance.begin(); it != m_nextYperInstance.end(); ++it) {
+        if (event->relatesTo(it.key())) {
+            InteractiveObject *item = itemForEntity(event);
+            if (item) {
+                it.value() = it.value() - (item->boundingRect().height() + interMessageSpan());
+            }
+        }
+    }
+
+    m_eventItems.removeIf([event](std::pair<QUuid, msc::InteractiveObject *> ev) {
+        msc::InteractiveObject *evObj = ev.second;
+        if (evObj->modelEntity() == event) {
+            delete (evObj);
+            return true;
+        }
+        return false;
+    });
 }
 
 void StreamingLayoutManager::updateMessagePosition()

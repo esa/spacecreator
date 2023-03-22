@@ -54,6 +54,7 @@ private Q_SLOTS:
     void testGrowInstancesWithEvents();
     void testNotGrowStoppedInstancesWithEvents();
     void testAddAction();
+    void testRemoveAction();
     void testAddCondition();
     void testAddCreateMesage();
     void testAddMessage();
@@ -188,6 +189,29 @@ void tst_StreamingLayoutManager::testAddAction()
     instanceItem = m_layoutManager->itemForInstance(instanceB);
     diff = instanceItem->sceneBoundingRect().center().x() - actionItem->sceneBoundingRect().center().x();
     QCOMPARE_LT(diff, 1.); // less than one pixel
+}
+
+void tst_StreamingLayoutManager::testRemoveAction()
+{
+    msc::MscInstance *instanceA = m_chart->makeInstance("A");
+    MscAction *action = new MscAction("Call me");
+    action->setInstance(instanceA);
+    ChartIndexList instanceIndexes { { instanceA, 0 } };
+    m_chart->addInstanceEvent(action, instanceIndexes);
+    ActionItem *actionItem = m_layoutManager->itemForAction(action);
+    QCOMPARE_NE(actionItem, nullptr);
+    const int y = actionItem->y();
+
+    // Remove the action
+    m_chart->removeInstanceEvent(action);
+    actionItem = m_layoutManager->itemForAction(action);
+    QCOMPARE(actionItem, nullptr);
+
+    // re-adding plces it at the same position
+    m_chart->addInstanceEvent(action, instanceIndexes);
+    actionItem = m_layoutManager->itemForAction(action);
+    QCOMPARE_NE(actionItem, nullptr);
+    QCOMPARE(actionItem->y(), y);
 }
 
 void tst_StreamingLayoutManager::testAddCondition()
