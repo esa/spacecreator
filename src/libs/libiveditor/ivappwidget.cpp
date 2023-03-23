@@ -233,40 +233,134 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
     menu->exec(ui->importView->mapToGlobal(pos));
 }
 
+// IV Structure - context menu
 void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
 {
-    const QModelIndex idx = ui->objectsView->indexAt(pos);
-    if (!idx.isValid()) {
-        return;
+    QList<QAction *> actions; // The actions that will go in the context menu
+
+    // Are there visible or hidden items among the selected item?
+    bool visibleItemSelected = false;
+    bool hiddenItemSelected = false;
+    QTreeView *treeView = ui->objectsView;
+    QAbstractItemModel *treeViewModel = treeView->model();
+    QItemSelectionModel *treeViewSelectionModel = treeView->selectionModel();
+    QModelIndexList selectedRows = treeViewSelectionModel->selectedRows();
+    for (QModelIndex modelIndex : selectedRows)
+    {
+        QVariant checkState = treeViewModel->data(modelIndex, Qt::CheckStateRole);
+        if (checkState == Qt::Checked)
+        {
+            visibleItemSelected = true;
+            break;
+        }
+        if (checkState == Qt::Unchecked)
+        {
+            hiddenItemSelected = true;
+        }
     }
 
+
+
+    // What was clicked
+    const QModelIndex idx = treeView->indexAt(pos);
+    if (!idx.isValid())
+    {
+        // An area not occupied by an entity was clicked
+
+        // Show All Entities
+        QAction *actShowAllEntities = new QAction(tr("Show all"));
+        connect(actShowAllEntities, &QAction::triggered, [treeViewModel](){
+            int rowCount = treeViewModel->rowCount();
+            for (int row = 0; row < rowCount; row++)
+            {
+                QModelIndex index = treeViewModel->index(row, 0);
+                treeViewModel->setData(index, QVariant(Qt::Checked), Qt::CheckStateRole);
+            }
+        });
+        actions.append(actShowAllEntities);
+        ActionsManager::registerAction(
+                    Q_FUNC_INFO, actShowAllEntities, "Show all entities", "All entities that has been hidden becomes visible.");
+    }
+
+    // Find the model object that was clicked
     const auto obj = m_document->objectsModel()->getObject(
             idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
-    if (!obj) {
-        return;
-    }
-    QList<QAction *> actions;
 
-    if (obj->type() == ivm::IVObject::Type::Function || obj->type() == ivm::IVObject::Type::FunctionType) {
-        QAction *actExportSelectedEntities = new QAction(tr("Export selected entities"));
-        connect(actExportSelectedEntities, &QAction::triggered, m_document.data(),
-                &InterfaceDocument::exportSelectedFunctions);
-        actions.append(actExportSelectedEntities);
-        ActionsManager::registerAction(
-                Q_FUNC_INFO, actExportSelectedEntities, "Export selected entities", "Export selected entities");
-    }
+    if (obj)
+    {
+        bool clickedItemTypeIsFunction = obj->type() == ivm::IVObject::Type::Function;
+        bool clickedItemTypeIsFunctionType = obj->type() == ivm::IVObject::Type::FunctionType;
 
-    if (obj->type() == ivm::IVObject::Type::FunctionType) {
-        QAction *actExportSelectedSharedType = new QAction(tr("Export component type"));
-        connect(actExportSelectedSharedType, &QAction::triggered, m_document.data(),
-                &InterfaceDocument::exportSelectedType);
-        actions.append(actExportSelectedSharedType);
-        ActionsManager::registerAction(
-                Q_FUNC_INFO, actExportSelectedSharedType, "Export component type", "Export component type");
+
+        // Export selected entities
+        if (clickedItemTypeIsFunction || clickedItemTypeIsFunctionType) {
+            QAction *actExportSelectedEntities = new QAction(tr("Export selected entities"));
+            connect(actExportSelectedEntities,
+                    &QAction::triggered,
+                    m_document.data(),
+                    &InterfaceDocument::exportSelectedFunctions);
+            actions.append(actExportSelectedEntities);
+            ActionsManager::registerAction(
+                    Q_FUNC_INFO, actExportSelectedEntities, "Export selected entities", "Export selected entities");
+        }
+        // Export component type
+        if (clickedItemTypeIsFunction || clickedItemTypeIsFunctionType) {
+            QAction *actExportSelectedSharedType = new QAction(tr("Export component type"));
+            connect(actExportSelectedSharedType, &QAction::triggered, m_document.data(),
+                    &InterfaceDocument::exportSelectedType);
+            actions.append(actExportSelectedSharedType);
+            ActionsManager::registerAction(
+                    Q_FUNC_INFO, actExportSelectedSharedType, "Export component type", "Export component type");
+        }
+
+        // Show selected entities
+
+        bool makeShowContextMenuItem = (clickedItemTypeIsFunction || clickedItemTypeIsFunctionType) && hiddenItemSelected;
+        if (makeShowContextMenuItem) {
+            QAction *actShowSelectedEntities = new QAction(tr("Show"));
+            connect(actShowSelectedEntities,
+                    &QAction::triggered, [treeViewModel, treeViewSelectionModel](){
+                        int rowCount = treeViewModel->rowCount();
+                        for (int row = 0; row < rowCount; row++)
+                        {
+                            QModelIndex index = treeViewModel->index(row, 0);
+                            bool isSelected = treeViewSelectionModel->isSelected(index);
+                            if (isSelected)
+                            {
+                                treeViewModel->setData(index, QVariant(Qt::Checked), Qt::CheckStateRole);
+                            }
+                        }
+                    });
+            actions.append(actShowSelectedEntities);
+            ActionsManager::registerAction(
+                    Q_FUNC_INFO, actShowSelectedEntities, "Show selected entities", "Show selected entities");
+        }
+
+        // Hide selected entities
+        bool makeHideContextMenuItem = (clickedItemTypeIsFunction || clickedItemTypeIsFunctionType) && visibleItemSelected;
+        if (makeHideContextMenuItem) {
+            QAction *actHideSelectedEntities = new QAction(tr("Hide"));
+            connect(actHideSelectedEntities,
+                    &QAction::triggered, [treeViewModel, treeViewSelectionModel](){
+                        int rowCount = treeViewModel->rowCount();
+                        for (int row = 0; row < rowCount; row++)
+                        {
+                            QModelIndex index = treeViewModel->index(row, 0);
+                            bool isSelected = treeViewSelectionModel->isSelected(index);
+                            if (isSelected)
+                            {
+                                treeViewModel->setData(index, QVariant(Qt::Unchecked), Qt::CheckStateRole);
+                            }
+                        }
+                    });
+            actions.append(actHideSelectedEntities);
+            ActionsManager::registerAction(
+                    Q_FUNC_INFO, actHideSelectedEntities, "Hide selected entities", "Hide selected entities");
+        }
     }
     QMenu *menu = new QMenu;
     menu->addActions(actions);
-    menu->exec(ui->objectsView->mapToGlobal(pos));
+    menu->exec(treeView->mapToGlobal(pos));
 }
 
 void IVAppWidget::showAvailableLayers(const QPoint &pos)
