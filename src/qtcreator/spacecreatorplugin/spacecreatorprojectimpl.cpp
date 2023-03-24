@@ -23,7 +23,7 @@
 #include "errormessageparser.h"
 #include "iveditorcore.h"
 #include "msceditorcore.h"
-#include "mscsystemchecks.h"
+#include "mscrefactorhandler.h"
 
 #include <QDebug>
 #include <QDir>

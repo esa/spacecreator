@@ -44,9 +44,6 @@ class AbstractSystemChecks;
 class DVBoardsModel;
 }
 
-namespace scs {
-class DVSystemChecks;
-}
 namespace Asn1Acn {
 class Asn1SystemChecks;
 }

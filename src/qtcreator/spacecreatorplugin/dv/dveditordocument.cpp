@@ -19,7 +19,7 @@
 
 #include "dvappmodel.h"
 #include "dveditorcore.h"
-#include "dvsystemchecks.h"
+#include "dvsystemqueries.h"
 #include "errorhub.h"
 #include "spacecreatorpluginconstants.h"
 #include "spacecreatorproject.h"

@@ -28,7 +28,7 @@
 #include "mscinstance.h"
 #include "mscmodel.h"
 #include "mscrefactor.h"
-#include "mscsystemchecks.h"
+#include "mscrefactorhandler.h"
 #include "sharedlibrary.h"
 #include "spacecreatorproject.h"
 #include "standardpaths.h"
@@ -60,7 +60,7 @@ private Q_SLOTS:
 private:
     std::unique_ptr<scs::MSCRefactor> m_mscRefactor;
     std::unique_ptr<scs::SpaceCreatorProject> m_project;
-    std::unique_ptr<scs::MscSystemChecks> m_mscChecks;
+    std::unique_ptr<scs::MscRefactorHandler> m_mscChecks;
     std::unique_ptr<ivm::IVModel> m_ivModel;
 };
 
@@ -91,7 +91,7 @@ void tst_MSCRefactor::init()
 {
     m_mscRefactor = std::make_unique<scs::MSCRefactor>();
     m_project = std::make_unique<scs::SpaceCreatorProject>();
-    m_mscChecks = std::make_unique<scs::MscSystemChecks>();
+    m_mscChecks = std::make_unique<scs::MscRefactorHandler>();
     m_mscChecks->setStorage(m_project.get());
 
     m_mscRefactor->setStorage(m_project.get());

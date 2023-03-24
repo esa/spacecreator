@@ -5,8 +5,8 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     dvrefactor.cpp
     dvrefactor.h
-    dvsystemchecks.cpp
-    dvsystemchecks.h
+    dvsystemqueries.cpp
+    dvsystemqueries.h
     refactorbase.cpp
     refactorbase.h
     ivrefactorhandler.cpp
@@ -17,8 +17,8 @@ target_sources(${LIB_NAME} PRIVATE
     ivsystemqueries.h
     mscrefactor.cpp
     mscrefactor.h
-    mscsystemchecks.cpp
-    mscsystemchecks.h
+    mscrefactorhandler.cpp
+    mscrefactorhandler.h
     spacecreatorproject.cpp
     spacecreatorproject.h
 )

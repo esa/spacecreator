@@ -40,11 +40,11 @@ namespace scs {
 
 class MSCRefactor;
 class DVRefactor;
-class DvSystemChecks;
+class DvSystemQueries;
 class IVRefactorHandler;
 class IvSystemChecks;
 class IvSystemQueries;
-class MscSystemChecks;
+class MscRefactorHandler;
 
 /*!
    \brief Contains all data of project (of all files).
@@ -84,12 +84,12 @@ public:
     /*!
        Access to the msc checks done from iv
        */
-    scs::MscSystemChecks *mscChecks() const { return m_mscChecks.get(); }
+    scs::MscRefactorHandler *mscChecks() const { return m_mscChecks.get(); }
     QVector<scs::IvSystemChecks *> ivChecks() const;
     QVector<scs::IvSystemQueries *> ivQueries() const;
     scs::IvSystemQueries *ivQuery() const;
     // Access to check for the DV files
-    scs::DvSystemChecks *dvChecks() const;
+    scs::DvSystemQueries *dvChecks() const;
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
@@ -108,8 +108,8 @@ protected:
     QHash<QString, DVEditorCorePtr> m_dvStore;
     QHash<QString, IVEditorCorePtr> m_ivStore;
     QHash<QString, MSCEditorCorePtr> m_mscStore;
-    std::unique_ptr<scs::MscSystemChecks> m_mscChecks;
-    std::unique_ptr<scs::DvSystemChecks> m_dvChecks;
+    std::unique_ptr<scs::MscRefactorHandler> m_mscChecks;
+    std::unique_ptr<scs::DvSystemQueries> m_dvChecks;
     std::unique_ptr<Asn1Acn::Asn1ModelStorage> m_asn1Storage;
     std::unique_ptr<Asn1Acn::Asn1SystemChecks> m_asnChecks;
     std::unique_ptr<scs::IVRefactorHandler> m_ivRefactorHandler;

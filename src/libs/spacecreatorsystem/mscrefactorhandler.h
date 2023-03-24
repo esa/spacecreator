@@ -22,40 +22,25 @@
 #include <QList>
 #include <QPointer>
 #include <QSharedPointer>
+#include <QString>
 #include <QVector>
-
-namespace ivm {
-class IVObject;
-class IVConnection;
-class IVFunction;
-}
-
-namespace ive {
-class IVEditorCore;
-}
-
-namespace msc {
-class MSCEditorCore;
-class MscMessage;
-}
 
 namespace shared {
 class UndoCommand;
-class VEObject;
 }
 
 namespace scs {
 class SpaceCreatorProject;
 
 /*!
-   Class to perform consistency checks for MSC against a IV model
+ * \brief The MscRefactorHandler class reacts on changes in the MSC model
  */
-class MscSystemChecks : public QObject
+class MscRefactorHandler : public QObject
 {
     Q_OBJECT
 
 public:
-    MscSystemChecks(QObject *parent = nullptr);
+    MscRefactorHandler(QObject *parent = nullptr);
 
     void setStorage(scs::SpaceCreatorProject *storage);
 

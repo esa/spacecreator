@@ -24,7 +24,7 @@
 #include "dvappmodel.h"
 #include "dveditorcore.h"
 #include "dvrefactor.h"
-#include "dvsystemchecks.h"
+#include "dvsystemqueries.h"
 #include "errorhub.h"
 #include "interfacedocument.h"
 #include "iveditorcore.h"
@@ -35,7 +35,7 @@
 #include "mainmodel.h"
 #include "mscmodel.h"
 #include "mscrefactor.h"
-#include "mscsystemchecks.h"
+#include "mscrefactorhandler.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -46,8 +46,8 @@ static const QString GLOBAL_ASN_FILE = { "dataview-uniq.asn" };
 
 SpaceCreatorProject::SpaceCreatorProject(QObject *parent)
     : AbstractProject(parent)
-    , m_mscChecks(new MscSystemChecks)
-    , m_dvChecks(new DvSystemChecks)
+    , m_mscChecks(new MscRefactorHandler)
+    , m_dvChecks(new DvSystemQueries)
     , m_asn1Storage(new Asn1Acn::Asn1ModelStorage)
     , m_asnChecks(new Asn1Acn::Asn1SystemChecks)
     , m_ivRefactorHandler(std::make_unique<scs::IVRefactorHandler>())
@@ -334,7 +334,7 @@ IvSystemQueries *SpaceCreatorProject::ivQuery() const
     return nullptr;
 }
 
-DvSystemChecks *SpaceCreatorProject::dvChecks() const
+DvSystemQueries *SpaceCreatorProject::dvChecks() const
 {
     return m_dvChecks.get();
 }

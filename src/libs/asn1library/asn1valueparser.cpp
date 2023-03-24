@@ -452,7 +452,7 @@ bool Asn1ValueParser::checkBitStringLength(const Constraints::WithConstraints<Va
 
         length = value.length();
         if (std::is_same_v<ValueType, Asn1Acn::OctetStringValue>) {
-            length /= 2; // One octect has 2 hex digits
+            length /= 2; // One octet has 2 hex digits
         }
         if (std::is_same_v<ValueType, Asn1Acn::BitStringValue>) {
             length *= 4; // one hex digit is 4 bits
@@ -462,7 +462,7 @@ bool Asn1ValueParser::checkBitStringLength(const Constraints::WithConstraints<Va
         value.chop(2);
         length = value.length();
         if (std::is_same_v<ValueType, Asn1Acn::OctetStringValue>) {
-            length /= 8; // One octect has 8 binary digits
+            length /= 8; // One octet has 8 binary digits
         }
     }
 

@@ -19,7 +19,7 @@
 
 #include "actionsbar.h"
 #include "commandsstack.h"
-#include "dvsystemchecks.h"
+#include "dvsystemqueries.h"
 #include "spacecreatorprojectimpl.h"
 #include "spacecreatorprojectmanager.h"
 

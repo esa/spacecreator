@@ -15,23 +15,17 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "mscsystemchecks.h"
+#include "mscrefactorhandler.h"
 
-#include "dvappmodel.h"
 #include "dveditorcore.h"
-#include "dvmessage.h"
-#include "dvmodel.h"
 #include "interfacedocument.h"
 #include "iveditorcore.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
 #include "ivsystemchecks.h"
-#include "mainmodel.h"
-#include "mscchart.h"
 #include "msceditorcore.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
-#include "mscmodel.h"
 #include "spacecreatorproject.h"
 #include "undocommand.h"
 
@@ -42,24 +36,24 @@
 
 namespace scs {
 
-MscSystemChecks::MscSystemChecks(QObject *parent)
+MscRefactorHandler::MscRefactorHandler(QObject *parent)
     : QObject(parent)
 {
 }
 
-void MscSystemChecks::setStorage(SpaceCreatorProject *storage)
+void MscRefactorHandler::setStorage(SpaceCreatorProject *storage)
 {
     m_storage = storage;
 
     connect(m_storage, &scs::SpaceCreatorProject::mscCoreAdded, this, [=](MSCEditorCorePtr core) {
-        connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &scs::MscSystemChecks::onMscEntityNameChanged);
+        connect(core.data(), &msc::MSCEditorCore::nameChanged, this, &scs::MscRefactorHandler::onMscEntityNameChanged);
     });
 }
 
 /*!
    Changes all instances that have the name \p oldName to have the new name \p name
  */
-void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QString &name)
+void MscRefactorHandler::changeMscInstanceName(const QString &oldName, const QString &name)
 {
     for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
         mscCore->changeMscInstanceName(oldName, name);
@@ -70,7 +64,7 @@ void MscSystemChecks::changeMscInstanceName(const QString &oldName, const QStrin
    Changes all messages that have the name \p oldName to have the new name \p newName, if the source and target have the
    names \p sourceName and \p targetName
  */
-void MscSystemChecks::changeMscMessageName(
+void MscRefactorHandler::changeMscMessageName(
         const QString &oldName, const QString &newName, const QString &sourceName, const QString &targetName)
 {
     for (MSCEditorCorePtr &mscCore : m_storage->allMscCores()) {
@@ -81,7 +75,7 @@ void MscSystemChecks::changeMscMessageName(
 /*!
    Changes all function bindings that have the name \p oldName to have the new name \p name
  */
-void MscSystemChecks::changeDvFunctionBindingName(const QString &oldName, const QString &name)
+void MscRefactorHandler::changeDvFunctionBindingName(const QString &oldName, const QString &name)
 {
     for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->changeDvFunctionBindingName(oldName, name);
@@ -91,8 +85,8 @@ void MscSystemChecks::changeDvFunctionBindingName(const QString &oldName, const 
 /*!
    Update all DV message bindings interface name, that match the name, source/target function and message side/end
  */
-void MscSystemChecks::changeDvMessageBindingName(const QString &oldName, const QString &name, const QString &sourceName,
-        const QString &targetName, shared::MessageEnd msgSide)
+void MscRefactorHandler::changeDvMessageBindingName(const QString &oldName, const QString &name,
+        const QString &sourceName, const QString &targetName, shared::MessageEnd msgSide)
 {
     for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
         dvCore->changeDvMessageBindingIfName(oldName, name, sourceName, targetName, msgSide);
@@ -102,7 +96,7 @@ void MscSystemChecks::changeDvMessageBindingName(const QString &oldName, const Q
 /*!
    Checks if iv function and connection needs to be updated/added
  */
-void MscSystemChecks::onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command)
+void MscRefactorHandler::onMscEntityNameChanged(QObject *entity, const QString &oldName, shared::UndoCommand *command)
 {
     if (m_nameUpdateRunning) {
         return;

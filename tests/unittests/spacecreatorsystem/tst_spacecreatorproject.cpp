@@ -21,7 +21,7 @@
 #include "ivlibrary.h"
 #include "ivsystemchecks.h"
 #include "msceditorcore.h"
-#include "mscsystemchecks.h"
+#include "mscrefactorhandler.h"
 #include "sharedlibrary.h"
 #include "spacecreatorproject.h"
 #include "standardpaths.h"

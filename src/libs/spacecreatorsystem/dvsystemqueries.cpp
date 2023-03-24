@@ -15,7 +15,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "dvsystemchecks.h"
+#include "dvsystemqueries.h"
 
 #include "dvappmodel.h"
 #include "dveditorcore.h"
@@ -37,12 +37,12 @@
 
 namespace scs {
 
-DvSystemChecks::DvSystemChecks(QObject *parent)
+DvSystemQueries::DvSystemQueries(QObject *parent)
     : ivm::AbstractSystemChecks(parent)
 {
 }
 
-void DvSystemChecks::setStorage(SpaceCreatorProject *storage)
+void DvSystemQueries::setStorage(SpaceCreatorProject *storage)
 {
     m_storage = storage;
 }
@@ -50,7 +50,7 @@ void DvSystemChecks::setStorage(SpaceCreatorProject *storage)
 /*!
    Do all check for the given file
  */
-bool DvSystemChecks::checkDVFile(DVEditorCorePtr dvCore) const
+bool DvSystemQueries::checkDVFile(DVEditorCorePtr dvCore) const
 {
     bool ok = checkFunctionBindings(dvCore);
     ok = ok && checkMessageBindings(dvCore);
@@ -60,7 +60,7 @@ bool DvSystemChecks::checkDVFile(DVEditorCorePtr dvCore) const
 /*!
    Checks if all function bindings in all dv files are valid
  */
-bool DvSystemChecks::checkFunctionBindings() const
+bool DvSystemQueries::checkFunctionBindings() const
 {
     bool ok = true;
     for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
@@ -72,7 +72,7 @@ bool DvSystemChecks::checkFunctionBindings() const
 /*!
    Perform function binding check for one DVfile
  */
-bool DvSystemChecks::checkFunctionBindings(DVEditorCorePtr dvCore) const
+bool DvSystemQueries::checkFunctionBindings(DVEditorCorePtr dvCore) const
 {
     bool ok = true;
     ok = ok && checkFunctionIvValidity(dvCore);
@@ -82,7 +82,7 @@ bool DvSystemChecks::checkFunctionBindings(DVEditorCorePtr dvCore) const
     return ok;
 }
 
-bool DvSystemChecks::checkMessageBindings() const
+bool DvSystemQueries::checkMessageBindings() const
 {
     bool ok = true;
     for (const DVEditorCorePtr &dvCore : m_storage->allDVCores()) {
@@ -91,7 +91,7 @@ bool DvSystemChecks::checkMessageBindings() const
     return ok;
 }
 
-bool DvSystemChecks::checkMessageBindings(DVEditorCorePtr dvCore) const
+bool DvSystemQueries::checkMessageBindings(DVEditorCorePtr dvCore) const
 {
     bool ok = true;
     ok = ok && checkMessageIvValidity(dvCore);
@@ -103,7 +103,7 @@ bool DvSystemChecks::checkMessageBindings(DVEditorCorePtr dvCore) const
    Returns the corresponding IV function for \p dvFunc
    If none is found, nullptr is returned
  */
-ivm::IVFunction *DvSystemChecks::correspondingFunction(dvm::DVFunction *dvFunc) const
+ivm::IVFunction *DvSystemQueries::correspondingFunction(dvm::DVFunction *dvFunc) const
 {
     if (!m_storage && m_storage->ivQuery()) {
         return nullptr;
@@ -118,14 +118,14 @@ ivm::IVFunction *DvSystemChecks::correspondingFunction(dvm::DVFunction *dvFunc) 
    Returns the corresponding DV function for \p ivFunc in the DV editor \p dvCore
    If none is found, nullptr is returned
  */
-dvm::DVFunction *DvSystemChecks::correspondingFunction(ivm::IVFunction *ivFunc, const DVEditorCorePtr &dvCore) const
+dvm::DVFunction *DvSystemQueries::correspondingFunction(ivm::IVFunction *ivFunc, const DVEditorCorePtr &dvCore) const
 {
     dvm::DVModel *model = dvCore->appModel()->objectsModel();
     dvm::DVObject *dvf = model->getObjectByName(ivFunc->title(), dvm::DVObject::Type::Function);
     return qobject_cast<dvm::DVFunction *>(dvf);
 }
 
-bool DvSystemChecks::isImplementationUsed(ivm::IVFunction *ivFunc, const QString &name) const
+bool DvSystemQueries::isImplementationUsed(ivm::IVFunction *ivFunc, const QString &name) const
 {
     if (!m_storage) {
         return false;
@@ -143,7 +143,7 @@ bool DvSystemChecks::isImplementationUsed(ivm::IVFunction *ivFunc, const QString
     return false;
 }
 
-bool DvSystemChecks::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) const
+bool DvSystemQueries::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) const
 {
     if (!m_storage && m_storage->ivQuery()) {
         return true;
@@ -172,7 +172,7 @@ bool DvSystemChecks::checkFunctionIvValidity(const DVEditorCorePtr &dvCore) cons
     return ok;
 }
 
-bool DvSystemChecks::checkUniqueFunctionBindings(const DVEditorCorePtr &dvCore) const
+bool DvSystemQueries::checkUniqueFunctionBindings(const DVEditorCorePtr &dvCore) const
 {
     bool ok = true;
     dvm::DVModel *model = dvCore->appModel()->objectsModel();
@@ -194,7 +194,7 @@ bool DvSystemChecks::checkUniqueFunctionBindings(const DVEditorCorePtr &dvCore) 
     return ok;
 }
 
-bool DvSystemChecks::checkSystemFunctionsAvailable(const DVEditorCorePtr &dvCore) const
+bool DvSystemQueries::checkSystemFunctionsAvailable(const DVEditorCorePtr &dvCore) const
 {
     dvm::DVModel *model = dvCore->appModel()->objectsModel();
     QVector<dvm::DVNode *> nodes = model->allObjectsByType<dvm::DVNode>();
@@ -210,7 +210,7 @@ bool DvSystemChecks::checkSystemFunctionsAvailable(const DVEditorCorePtr &dvCore
    Checks for all bound functions, that are connected to a pseudo function (in IV), if a matching system function is
    available in this node
  */
-bool DvSystemChecks::checkSystemFunctionsAvailable(const dvm::DVNode *node, const DVEditorCorePtr &dvCore) const
+bool DvSystemQueries::checkSystemFunctionsAvailable(const dvm::DVNode *node, const DVEditorCorePtr &dvCore) const
 {
     if (!m_storage && m_storage->ivQuery()) {
         return true;
@@ -272,7 +272,7 @@ bool DvSystemChecks::checkSystemFunctionsAvailable(const dvm::DVNode *node, cons
    Checks that functions that are bound in one partition, that have other functions connected protected interfaces have
    to be in the same partition
  */
-bool DvSystemChecks::checkProtectedFunctions(const DVEditorCorePtr &dvCore) const
+bool DvSystemQueries::checkProtectedFunctions(const DVEditorCorePtr &dvCore) const
 {
     if (!m_storage && m_storage->ivQuery()) {
         return true;
@@ -320,7 +320,7 @@ bool DvSystemChecks::checkProtectedFunctions(const DVEditorCorePtr &dvCore) cons
     return ok;
 }
 
-bool DvSystemChecks::checkMessageIvValidity(const DVEditorCorePtr &dvCore) const
+bool DvSystemQueries::checkMessageIvValidity(const DVEditorCorePtr &dvCore) const
 {
     if (!m_storage && m_storage->ivQuery()) {
         return true;
@@ -344,7 +344,7 @@ bool DvSystemChecks::checkMessageIvValidity(const DVEditorCorePtr &dvCore) const
     return ok;
 }
 
-bool DvSystemChecks::checkUniqueMessages(const DVEditorCorePtr &dvCore) const
+bool DvSystemQueries::checkUniqueMessages(const DVEditorCorePtr &dvCore) const
 {
     bool ok = true;
     dvm::DVModel *model = dvCore->appModel()->objectsModel();

@@ -36,11 +36,14 @@ class IVInterface;
 namespace scs {
 class SpaceCreatorProject;
 
-class DvSystemChecks : public ivm::AbstractSystemChecks
+/*!
+ * \brief The DvSystemQueries class is used to gain information about DV data
+ */
+class DvSystemQueries : public ivm::AbstractSystemChecks
 {
     Q_OBJECT
 public:
-    explicit DvSystemChecks(QObject *parent = nullptr);
+    explicit DvSystemQueries(QObject *parent = nullptr);
 
     // Setup functions
     void setStorage(scs::SpaceCreatorProject *storage);

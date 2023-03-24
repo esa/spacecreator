@@ -546,7 +546,7 @@ sdlText
 
 // ASN.1 value
 asnValue
-    : name | OCTECTSTRING | BITSTRING | BOOLEAN | STRING
+    : name | OCTETSTRING | BITSTRING | BOOLEAN | STRING
     ;
 // ASN1 type choice
 // choice1 : FALSE
@@ -761,11 +761,11 @@ fragment STRINGOTHERCHARACTER : '?' | '%' | '+' | MINUS | '!' | '*' | '=' | '/' 
 STRING : '"' (ALPHANUMERIC | SPECIAL | STRINGOTHERCHARACTER)* '"';
 
 // ASN.1 extensions
-fragment OCTECT
+fragment OCTET
     : ((DECIMALDIGIT | [a-fA-F]) (DECIMALDIGIT | [a-fA-F]))+
     ;
-OCTECTSTRING
-    : APOSTROPHE (OCTECT)+ APOSTROPHE ('H' | 'h')
+OCTETSTRING
+    : APOSTROPHE (OCTET)+ APOSTROPHE ('H' | 'h')
     ;
 BITSTRING
     : APOSTROPHE ('0' | '1')+ APOSTROPHE ('B' | 'b')
