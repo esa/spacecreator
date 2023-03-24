@@ -489,7 +489,7 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
         action->setEnabled(it != selectedItems.cend());
 
-        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/delete.svg")), tr("Ungroup connections"), this,
+        action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/delete.svg")), tr("Ungroup connectionsss"), this,
                 [this]() { ungroupConnectedItems(); });
         it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGroupGraphicsItem::Type; });
@@ -559,6 +559,26 @@ void IVCreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePo
     }
 
     ActionsManager::populateMenu(menu, ivObj, m_doc);
+}
+
+void IVCreatorTool::populateContextMenu_visibility(QMenu *menu, const QPointF &scenePos)
+{
+    QGraphicsScene *scene = m_view->scene();
+    if (!scene)
+    {
+        return;
+    }
+    menu->addAction(tr("Show All"), this, [this, scene]()
+    {
+        qDebug() << "show all";
+        IVItemModel *ivItemsModel = m_doc->itemsModel();
+        QList<QGraphicsItem *> items = scene->items();
+        ivm::IVModel *ivModel = ivItemsModel->objectsModel();
+        for (QGraphicsItem *item : items)
+        {
+
+        }
+    });
 }
 
 bool IVCreatorTool::handleToolType(int type, const QPointF &pos)

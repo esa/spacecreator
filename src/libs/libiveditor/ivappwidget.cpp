@@ -251,15 +251,12 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
         if (checkState == Qt::Checked)
         {
             visibleItemSelected = true;
-            break;
         }
         if (checkState == Qt::Unchecked)
         {
             hiddenItemSelected = true;
         }
     }
-
-
 
     // What was clicked
     const QModelIndex idx = treeView->indexAt(pos);
@@ -285,6 +282,7 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
     // Find the model object that was clicked
     const auto obj = m_document->objectsModel()->getObject(
             idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
+
 
     if (obj)
     {
@@ -797,6 +795,7 @@ void IVAppWidget::initGraphicsView()
     ui->graphicsView->setUpdatesEnabled(true);
 }
 
+// Init modelView aka. IV Structure aka. objectsView
 void IVAppWidget::initModelView()
 {
     ui->objectsView->setObjectName(QLatin1String("IVModelView"));
@@ -847,6 +846,7 @@ void IVAppWidget::initLayerView()
     ui->layerView->setModel(m_document->layerVisualisationModel());
 }
 
+// creates the actions in the top part of the toolbar left of the scene
 QVector<QAction *> IVAppWidget::initActions()
 {
     Q_ASSERT(m_document.data());
@@ -1016,6 +1016,7 @@ QVector<QAction *> IVAppWidget::initActions()
     return m_toolbarActions;
 }
 
+// Creates the actions in the bottom part of the toolbar left of the scene
 QVector<QAction *> IVAppWidget::initViewActions()
 {
     if (!m_viewActions.isEmpty() || !m_ivCore) {

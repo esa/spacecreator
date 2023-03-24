@@ -164,7 +164,7 @@ bool CreatorTool::showContextMenu(const QPoint &globalPos)
     populateContextMenu_commonEdit(menu, scenePos);
     populateContextMenu_propertiesDialog(menu);
     populateContextMenu_user(menu, scenePos);
-
+    populateContextMenu_visibility(menu, scenePos);
     if (menu->isEmpty()) {
         delete menu;
         menu = nullptr;
@@ -272,6 +272,9 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu)
                 [this, veIObj]() { Q_EMIT propertyEditorRequest(veIObj->entity()->id()); });
     }
 }
+
+void CreatorTool::populateContextMenu_visibility(QMenu *menu, const QPointF &scenePos)
+{}
 
 QPointF CreatorTool::cursorInScene() const
 {
