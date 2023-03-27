@@ -380,6 +380,7 @@ bool InterfaceDocument::exportSelectedType()
     }
     QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
     if (exportImpl(path, { rootType })) {
+        d->objectsModel->removeObject(rootType);
         d->objectsSelectionModel->clearSelection();
         return reloadSharedTypeModel();
     }

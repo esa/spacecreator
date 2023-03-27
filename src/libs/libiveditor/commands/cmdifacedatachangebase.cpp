@@ -116,7 +116,7 @@ ivm::IVInterface *CmdIfaceDataChangeBase::getConnectionOtherSide(
 
 void CmdIfaceDataChangeBase::prepareRemoveConnectionCommands()
 {
-    QList<QPointer<ivm::IVObject>> entities;
+    QList<ivm::IVObject *> entities;
     for (const auto &connection : m_relatedConnections) {
         if (connectionMustDie(connection)) {
             entities.append(connection);

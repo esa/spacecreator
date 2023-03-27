@@ -40,7 +40,7 @@ CmdEntitiesReference::~CmdEntitiesReference() { }
 
 void CmdEntitiesReference::redo()
 {
-    m_model->cloneReference(m_referencedEntity, m_parent, m_ref, m_pos);
+    m_model->import(ivm::IVModel::ImportType::Reference, m_referencedEntity, m_parent, m_ref, m_pos);
 }
 
 void CmdEntitiesReference::undo()

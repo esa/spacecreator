@@ -53,12 +53,15 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QIcon>
+#include <QJsonDocument>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPointer>
 #include <QProcess>
 #include <QStringList>
 #include <QTimer>
+
+const char kIVMimeType[] = "application/json";
 
 namespace ive {
 
@@ -210,15 +213,7 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
     connect(actImportComponent, &QAction::triggered, this, [this, id]() { importEntity(id, QPointF()); });
 
     QAction *actImportAsReference = menu->addAction(tr("Add reference"));
-    connect(actImportAsReference, &QAction::triggered, this, [this, id]() {
-        if (auto model = m_document->importModel()) {
-            if (auto fnt = qobject_cast<ivm::IVFunctionType *>(model->getObject(id))) {
-                auto cmdRm = new cmd::CmdEntitiesReference(fnt, nullptr, m_document->objectsModel(), {});
-                cmdRm->setText(tr("Add reference to component(s)"));
-                m_document->commandsStack()->push(cmdRm);
-            }
-        }
-    });
+    connect(actImportAsReference, &QAction::triggered, this, [this, id]() { linkEntity(id, QPointF()); });
 
     QAction *actEditComponent = menu->addAction(tr("Edit component"));
     connect(actEditComponent, &QAction::triggered, this,
@@ -327,8 +322,8 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
 
     if (obj->type() == ivm::IVObject::Type::ConnectionLayer) {
         const auto *layer = qobject_cast<const ivm::IVConnectionLayerType *>(obj);
-        const auto itemText = ivm::IVNameValidator::encodeName(layer->type(), item->text());
         if (layer != nullptr && layer->title().compare(ivm::IVConnectionLayerType::DefaultLayerName) != 0) {
+            const auto itemText = ivm::IVNameValidator::encodeName(layer->type(), item->text());
             disconnect(m_document->layerVisualisationModel(), &IVVisualizationModelBase::itemChanged, this,
                     &IVAppWidget::renameSelectedLayer);
             auto *cmd = new cmd::CmdConnectionLayerRename(
@@ -346,7 +341,44 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
     item->setText(obj->titleUI());
 }
 
+void IVAppWidget::referenceItems()
+{
+    pushToClipboard(Qt::LinkAction);
+}
+
 void IVAppWidget::copyItems()
+{
+    pushToClipboard(Qt::CopyAction);
+}
+
+void IVAppWidget::cutItems()
+{
+    pushToClipboard(Qt::MoveAction);
+    /// TODO: hide items were cut
+}
+
+void IVAppWidget::pushToClipboard(Qt::DropAction action)
+{
+    QJsonArray ids;
+    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
+        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
+        const shared::Id id = index.data(role).toUuid();
+        ids.append(id.toString());
+    }
+
+    QJsonObject obj;
+    obj.insert(QLatin1String("Context"), QLatin1String("InterfaceView"));
+    obj.insert(QLatin1String("Action"), action);
+    obj.insert(QLatin1String("Path"), m_document->path());
+    obj.insert(QLatin1String("UUIDs"), ids);
+
+    auto mimeData = new QMimeData();
+    mimeData->setData(kIVMimeType, QJsonDocument(obj).toJson());
+    exportToClipboard(mimeData);
+    QApplication::clipboard()->setMimeData(mimeData);
+}
+
+void IVAppWidget::exportToClipboard(QMimeData *mimeData)
 {
     QBuffer buffer;
     if (!buffer.open(QIODevice::WriteOnly)) {
@@ -358,7 +390,8 @@ void IVAppWidget::copyItems()
     QList<shared::VEObject *> objects;
     for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
         const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
-        if (ivm::IVObject *object = m_document->objectsModel()->getObject(index.data(role).toUuid())) {
+        const shared::Id id = index.data(role).toUuid();
+        if (ivm::IVObject *object = m_document->objectsModel()->getObject(id)) {
             objects.append(object);
         }
     }
@@ -367,19 +400,21 @@ void IVAppWidget::copyItems()
         return;
     }
     buffer.close();
-    QApplication::clipboard()->setText(QString::fromUtf8(buffer.data()));
-}
 
-void IVAppWidget::cutItems()
-{
-    copyItems();
-    m_tool->removeSelectedItems();
+    const QString text = QString::fromUtf8(buffer.data());
+    if (mimeData)
+        mimeData->setText(text);
+    else
+        qApp->clipboard()->setText(text);
 }
 
 void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
 {
-    const QByteArray data = QApplication::clipboard()->text().toUtf8();
-    if (data.isEmpty()) {
+    auto mimeData = QApplication::clipboard()->mimeData();
+    if (!mimeData) {
+        return;
+    }
+    if (!mimeData->hasFormat(kIVMimeType) && !mimeData->hasText()) {
         return;
     }
 
@@ -388,11 +423,38 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
         itemAtScenePos = itemAtScenePos->parentItem();
     }
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    if (!parentObject && m_document->objectsModel() && m_document->objectsModel()->rootObject())
+    if (!parentObject && m_document->objectsModel() && m_document->objectsModel()->rootObject()) {
         parentObject = qobject_cast<ivm::IVFunctionType *>(m_document->objectsModel()->rootObject());
-    auto cmdImport = new cmd::CmdEntitiesImport(data, parentObject, m_document->objectsModel(), m_document->asn1Check(),
-            sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
-    m_document->commandsStack()->push(cmdImport);
+    }
+
+    if (mimeData->hasFormat(kIVMimeType)) {
+        const QByteArray data = mimeData->data(kIVMimeType);
+        if (!data.isEmpty()) {
+            const QJsonDocument doc = QJsonDocument::fromJson(data);
+            const QJsonObject obj = doc.object();
+
+            QList<ivm::IVObject *> topObjects;
+            for (const QJsonValue &value : obj.value(QLatin1String("UUIDs")).toArray()) {
+                topObjects.append(m_document->objectsModel()->getObject(shared::Id::fromString(value.toString())));
+            }
+            if (!topObjects.isEmpty()) {
+                cmd::CommandsStack::Macro cmdMacro(m_document->commandsStack(), tr("Paste item(s)"));
+                auto cmdImport = new cmd::CmdEntitiesImport(topObjects, parentObject, m_document->objectsModel(),
+                        m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+                m_document->commandsStack()->push(cmdImport);
+
+                auto cmdRemove = new cmd::CmdEntitiesRemove(topObjects, m_document->objectsModel());
+                m_document->commandsStack()->push(cmdRemove);
+
+                cmdMacro.setComplete(true);
+            }
+        }
+    } else if (mimeData->hasText()) {
+        const QByteArray data = mimeData->text().toUtf8();
+        auto cmdImport = new cmd::CmdEntitiesImport(data, parentObject, m_document->objectsModel(),
+                m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+        m_document->commandsStack()->push(cmdImport);
+    }
 }
 
 void IVAppWidget::showPropertyEditor(const shared::Id &id)
@@ -452,21 +514,8 @@ void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoi
         itemAtScenePos = itemAtScenePos->parentItem();
     }
 
-    QBuffer buffer;
-    if (!buffer.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, tr("Can't open buffer for exporting: %1").arg(buffer.errorString()));
-        return;
-    }
-
-    if (!m_document->exporter()->exportObjects({ obj }, &buffer, m_document->archetypesModel())) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
-        return;
-    }
-    buffer.close();
-
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport(buffer.data(), parentObject, m_document->objectsModel(),
+    auto cmdImport = new cmd::CmdEntitiesImport({ obj }, parentObject, m_document->objectsModel(),
             m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
     m_document->commandsStack()->push(cmdImport);
 }
@@ -500,6 +549,23 @@ void IVAppWidget::linkEntity(const shared::Id &id, const QPointF &sceneDropPoint
     Q_ASSERT(m_document);
     const auto obj = m_document->importModel()->getObject(id);
     if (!obj || obj->type() != ivm::IVObject::Type::Function) {
+        return;
+    }
+
+    const auto existingFunctionNames = m_document->objectsModel()->nestedFunctionNames();
+    const auto intersectedNames = m_document->importModel()
+                                          ->nestedFunctionNames(obj->as<const ivm::IVFunctionType *>())
+                                          .intersect(existingFunctionNames);
+    if (!intersectedNames.isEmpty()) {
+        QList<QString> intersectedNamesList;
+        intersectedNamesList.reserve(intersectedNames.size());
+        for (const QString &name : intersectedNames) {
+            intersectedNamesList.append(name);
+        }
+        const QString msg =
+                tr("Chosen entity [%1] couldn't be imported as reference because of Function names conflict(s): %2")
+                        .arg(obj->titleUI(), intersectedNamesList.join(QLatin1Char('\n')));
+        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
         return;
     }
     QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
@@ -844,8 +910,8 @@ QVector<QAction *> IVAppWidget::initActions()
 
     m_toolbarActions = { actCreateFunctionType, actCreateFunction, actCreateProvidedInterface,
         actCreateRequiredInterface, actCreateComment, actCreateConnection, m_actCreateConnectionGroup,
-        m_actUngroupConnection, m_actEditAttributes, m_actRemove, m_actZoomIn, m_actZoomOut, m_actExitToRoot, m_actExitToParent,
-        m_actEnterNestedView, m_actShrinkScene };
+        m_actUngroupConnection, m_actEditAttributes, m_actRemove, m_actZoomIn, m_actZoomOut, m_actExitToRoot,
+        m_actExitToParent, m_actEnterNestedView, m_actShrinkScene };
 
     connect(m_document->objectsModel(), &ivm::IVModel::rootObjectChanged, this, &IVAppWidget::onRootObjectChanged);
     connect(m_document->objectsSelectionModel(), &QItemSelectionModel::selectionChanged, this,

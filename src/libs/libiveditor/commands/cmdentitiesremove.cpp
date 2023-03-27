@@ -29,15 +29,15 @@
 namespace ive {
 namespace cmd {
 
-CmdEntitiesRemove::CmdEntitiesRemove(const QList<QPointer<ivm::IVObject>> &entities, ivm::IVModel *model)
+CmdEntitiesRemove::CmdEntitiesRemove(const QList<ivm::IVObject *> &entities, ivm::IVModel *model)
     : shared::UndoCommand()
     , m_model(model)
-    , m_entities(entities)
 {
     setText(QObject::tr("Remove"));
 
-    for (const QPointer<ivm::IVObject> &entity : entities) {
+    for (ivm::IVObject *entity : entities) {
         collectRelatedItems(entity);
+        m_entities.append(entity);
     }
 }
 

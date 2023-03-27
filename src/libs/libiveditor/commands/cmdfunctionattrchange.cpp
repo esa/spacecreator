@@ -18,10 +18,10 @@
 
 #include "cmdfunctionattrchange.h"
 
+#include "asn1componentsimport.h"
 #include "cmdentitiesremove.h"
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
-#include "asn1componentsimport.h"
 
 #include <QDebug>
 #include <ivcoreutils.h>
@@ -50,7 +50,8 @@ static inline QVariantHash convertAttributes(const QList<EntityAttribute> &attrs
     return result;
 }
 
-CmdFunctionAttrChange::CmdFunctionAttrChange(shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs)
+CmdFunctionAttrChange::CmdFunctionAttrChange(
+        shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs)
     : shared::cmd::CmdEntityAttributesChange(config, entity, attrs)
     , m_asn1Importer(new ASN1ComponentsImport(nullptr, shared::sharedTypesPath(), QString()))
     , m_entity(entity)
@@ -172,7 +173,6 @@ void CmdFunctionAttrChange::handleFunctionInstanceOf(const QVariant &attr, bool 
             m_asn1Importer->redoAsnFileImport(newInstanceOf);
         else
             m_asn1Importer->undoAsnFileImport();
-
     }
 
     m_entity->setInstanceOf(newInstanceOf);
@@ -223,7 +223,7 @@ void CmdFunctionAttrChange::prepareUnsetFunctionTypeCommands(const ivm::IVFuncti
     Commands &cmdStorage = m_cmdUnset[fnTypeId];
     const QVector<ivm::IVInterface *> &fnIfaces = m_entity->interfaces();
     const QVector<ivm::IVInterface *> &fnTypeIfaces = fnType->interfaces();
-    QList<QPointer<ivm::IVObject>> entities;
+    QList<ivm::IVObject *> entities;
     for (auto fnTypeIface : fnTypeIfaces) {
         for (const auto &clone : fnTypeIface->clones()) {
             auto found = std::find_if(fnIfaces.cbegin(), fnIfaces.cend(),

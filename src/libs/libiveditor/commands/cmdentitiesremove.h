@@ -37,7 +37,7 @@ class CmdEntitiesRemove : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdEntitiesRemove(const QList<QPointer<ivm::IVObject>> &entities, ivm::IVModel *model);
+    explicit CmdEntitiesRemove(const QList<ivm::IVObject *> &entities, ivm::IVModel *model);
     ~CmdEntitiesRemove() override;
 
     void redo() override;

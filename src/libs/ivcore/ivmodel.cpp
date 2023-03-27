@@ -60,7 +60,7 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
     if (ivm::IVObject *ivObj = obj->as<ivm::IVObject *>()) {
         if (ivObj->hasEntityAttribute(meta::Props::token(meta::Props::Token::origin)) && !ivObj->isReference()) {
-            cloneReference(getOrigin(ivObj->origin()), nullptr, ivObj->id());
+            import(IVModel::ImportType::Reference, getOrigin(ivObj->origin()), nullptr, ivObj->id());
             return false;
         } else if (shared::VEModel::addObjectImpl(obj)) {
             d->m_visibleObjects.append(ivObj);
@@ -91,13 +91,14 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
     return false;
 }
 
-template<typename T>
-void map(const QVector<T> &c, const std::function<void(const T &)> &f)
+template<class F, class Container>
+constexpr decltype(auto) apply(Container &&c, F &&f)
 {
-    std::for_each(c.begin(), c.end(), [&](const T &t) { f(t); });
+    std::for_each(std::begin(c), std::end(c), [&](const auto &t) { f(t); });
 }
 
-void IVModel::cloneReference(IVObject *origin, IVFunctionType *parent, const shared::Id &id, const QPointF &pos)
+void IVModel::import(
+        IVModel::ImportType type, IVObject *origin, IVFunctionType *parent, const shared::Id &id, const QPointF &pos)
 {
     if (!origin)
         return;
@@ -107,25 +108,27 @@ void IVModel::cloneReference(IVObject *origin, IVFunctionType *parent, const sha
     if (ivClone)
         return;
 
+    const shared::Id objectId = IVModel::ImportType::Move == type ? id : shared::createId();
+
     switch (origin->type()) {
     case IVObject::Type::Comment:
-        ivClone = new IVComment(parent, id);
+        ivClone = new IVComment(parent, objectId);
         break;
     case IVObject::Type::Function:
-        ivClone = new IVFunction(parent, id);
+        ivClone = new IVFunction(parent, objectId);
         break;
     case IVObject::Type::FunctionType:
-        ivClone = new IVFunctionType(parent, id);
+        ivClone = new IVFunctionType(parent, objectId);
         break;
     case IVObject::Type::ProvidedInterface:
     case IVObject::Type::RequiredInterface: {
         IVInterface::CreationInfo ci = IVInterface::CreationInfo::cloneIface(origin->as<IVInterface *>(), parent);
-        ci.id = id;
+        ci.id = objectId;
         ivClone = IVInterface::createIface(ci);
     } break;
     case IVObject::Type::Connection:
         if (auto connection = origin->as<IVConnection *>()) {
-            auto connectionClone = new IVConnection(nullptr, nullptr, parent, id);
+            auto connectionClone = new IVConnection(nullptr, nullptr, parent, objectId);
             connectionClone->setDelayedStart(
                     { connection->sourceInterface()->function()->title(), connection->sourceInterface()->title(),
                             connection->sourceInterface()->direction(), connection->sourceInterface()->id() });
@@ -152,7 +155,7 @@ void IVModel::cloneReference(IVObject *origin, IVFunctionType *parent, const sha
             if (sourceIfaceGroup && targetIfaceGroup) {
                 auto ivConnectionGroup =
                         new IVConnectionGroup(connectionGroup->groupName(), sourceIfaceGroup->as<IVInterfaceGroup *>(),
-                                targetIfaceGroup->as<IVInterfaceGroup *>(), {}, parent, id);
+                                targetIfaceGroup->as<IVInterfaceGroup *>(), {}, parent, objectId);
 
                 QList<shared::Id> connectionIds;
                 for (auto connection : connectionGroup->groupedConnections()) {
@@ -169,7 +172,7 @@ void IVModel::cloneReference(IVObject *origin, IVFunctionType *parent, const sha
     case IVObject::Type::InterfaceGroup:
         if (auto originIfaceGroup = origin->as<IVInterfaceGroup *>()) {
             IVInterface::CreationInfo ci;
-            ci.id = id;
+            ci.id = objectId;
             auto clonedIfaceGroup = new IVInterfaceGroup(ci);
             clonedIfaceGroup->setGroupName(origin->groupName());
             if (parent->type() == IVObject::Type::Function) {
@@ -213,21 +216,23 @@ void IVModel::cloneReference(IVObject *origin, IVFunctionType *parent, const sha
         ivClone->setCoordinates(shared::graphicsviewutils::coordinates(originGeometry));
     }
 
-    ivClone->setEntityAttribute(EntityAttribute {
-            ivm::meta::Props::token(ivm::meta::Props::Token::reference), true, EntityAttribute::Type::Attribute });
-    const EntityAttribute attr = EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::origin),
-        origin->id(), EntityAttribute::Type::Attribute };
-    ivClone->setEntityAttribute(attr);
+    if (type == IVModel::ImportType::Reference) {
+        ivClone->setEntityAttribute(EntityAttribute {
+                ivm::meta::Props::token(ivm::meta::Props::Token::reference), true, EntityAttribute::Type::Attribute });
+        const EntityAttribute attr = EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::origin),
+            origin->id(), EntityAttribute::Type::Attribute };
+        ivClone->setEntityAttribute(attr);
+    }
     addObject(ivClone);
 
     if (auto fn = origin->as<IVFunctionType *>()) {
-        auto f = [&](IVObject *obj) { cloneReference(obj, ivClone->as<IVFunctionType *>()); };
-        map<ivm::IVFunction *>(fn->functions(), f);
-        map<ivm::IVFunctionType *>(fn->functionTypes(), f);
-        map<ivm::IVInterface *>(fn->allInterfaces(), f);
-        map<ivm::IVConnection *>(fn->connections(), f);
-        map<ivm::IVConnectionGroup *>(fn->connectionGroups(), f);
-        map<ivm::IVComment *>(fn->comments(), f);
+        auto f = [&](IVObject *obj) { import(type, obj, ivClone->as<IVFunctionType *>()); };
+        apply(fn->functions(), f);
+        apply(fn->functionTypes(), f);
+        apply(fn->allInterfaces(), f);
+        apply(fn->connectionGroups(), f);
+        apply(fn->connections(), f);
+        apply(fn->comments(), f);
     }
 }
 

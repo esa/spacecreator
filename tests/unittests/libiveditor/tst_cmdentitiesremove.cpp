@@ -71,9 +71,7 @@ void tst_CmdEntitiesRemove::test_removeFunction()
     QPointer<ivm::IVFunction> fn = ivCore->addFunction("f1");
     ivModel->addObject(fn);
 
-    QList<QPointer<ivm::IVObject>> entities;
-    entities.append(fn.data());
-    auto cmdRemove = new ive::cmd::CmdEntitiesRemove(entities, ivModel);
+    auto cmdRemove = new ive::cmd::CmdEntitiesRemove({ fn }, ivModel);
     ivCore->commandsStack()->push(cmdRemove);
     QCOMPARE(fn->parent(), cmdRemove);
 
@@ -90,7 +88,7 @@ void tst_CmdEntitiesRemove::test_removeEntityTwice()
     fn->addChild(pi1);
     ivModel->addObject(pi1);
 
-    QList<QPointer<ivm::IVObject>> entities;
+    QList<ivm::IVObject *> entities;
     entities.append(pi1.data());
     auto cmdRemove1 = new ive::cmd::CmdEntitiesRemove(entities, ivModel);
     ivCore->commandsStack()->push(cmdRemove1);

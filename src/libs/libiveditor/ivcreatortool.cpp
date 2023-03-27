@@ -88,7 +88,7 @@ void IVCreatorTool::removeSelectedItems()
 
     QStringList clonedIfaces;
     QStringList nonRemovableEntities;
-    QList<QPointer<ivm::IVObject>> entities;
+    QList<ivm::IVObject *> entities;
     clearPreviewItem();
     QItemSelectionModel *selection = m_doc->objectsSelectionModel();
     for (const QModelIndex &index : selection->selectedIndexes()) {
@@ -154,7 +154,7 @@ void IVCreatorTool::ungroupConnectedItems()
         clearPreviewItem();
 
         cmd::CommandsStack::Macro cmdMacro(m_doc->commandsStack(), tr("Ungroup selected connection(s)"));
-        QList<QPointer<ivm::IVObject>> entities;
+        QList<ivm::IVObject *> entities;
         for (const auto item : m_view->scene()->selectedItems()) {
             if (item->type() == IVConnectionGroupGraphicsItem::Type) {
                 if (auto iObj = qobject_cast<shared::ui::VEInteractiveObject *>(item->toGraphicsObject())) {

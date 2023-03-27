@@ -43,6 +43,13 @@ class IVModel : public shared::VEModel, public conversion::Model
 {
     Q_OBJECT
 public:
+    enum class ImportType
+    {
+        Copy,
+        Reference,
+        Move,
+    };
+
     explicit IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel = nullptr,
             IVModel *componentModel = nullptr, QObject *parent = nullptr);
     ~IVModel() override;
@@ -107,8 +114,8 @@ public:
     QString defaultFunctionLanguage() const;
     QStringList availableFunctionLanguages() const;
 
-    void cloneReference(IVObject *origin, IVFunctionType *parent = nullptr, const shared::Id &id = shared::createId(),
-            const QPointF &pos = {});
+    void import(ImportType type, IVObject *origin, IVFunctionType *parent = nullptr,
+            const shared::Id &id = shared::createId(), const QPointF &pos = {});
 
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);
