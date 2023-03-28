@@ -570,14 +570,7 @@ void IVCreatorTool::populateContextMenu_visibility(QMenu *menu, const QPointF &s
     }
     menu->addAction(tr("Show All"), this, [this, scene]()
     {
-        qDebug() << "show all";
-        IVItemModel *ivItemsModel = m_doc->itemsModel();
-        QList<QGraphicsItem *> items = scene->items();
-        ivm::IVModel *ivModel = ivItemsModel->objectsModel();
-        for (QGraphicsItem *item : items)
-        {
-
-        }
+        m_doc->showAll();
     });
 }
 

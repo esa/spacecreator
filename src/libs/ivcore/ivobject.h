@@ -98,6 +98,9 @@ public:
 
     bool isFixedSystemElement() const;
 
+    /*
+     * Visibility is controlled by the EntityAttribute is_visible
+     */
     void setVisible(bool isVisible);
     bool isVisible() const;
 

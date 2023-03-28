@@ -25,6 +25,7 @@
 #include <QQueue>
 
 class QGraphicsScene;
+class QGraphicsItem;
 class QItemSelection;
 class QItemSelectionModel;
 class QMenu;
@@ -55,16 +56,16 @@ namespace cmd {
 class CommandsStack;
 }
 
-class InterfaceTabGraphicsScene;
 class IVAppWidget;
+class IVCommentGraphicsItem;
+class IVConnectionGraphicsItem;
 class IVExporter;
 class IVFunctionGraphicsItem;
 class IVFunctionTypeGraphicsItem;
-class IVCommentGraphicsItem;
-class IVConnectionGraphicsItem;
 class IVInterfaceGraphicsItem;
 class IVItemModel;
 class IVVisualizationModelBase;
+class InterfaceTabGraphicsScene;
 
 class InterfaceDocument : public QObject
 {
@@ -91,6 +92,11 @@ public:
     bool exportSelectedType();
     void close();
 
+    /*
+     * All hidden items in the current level becomes visible
+     */
+    void showAll();
+
     QString path() const;
     void setPath(const QString &path);
 
@@ -112,19 +118,45 @@ public:
 
     QList<QAction *> customActions() const;
 
+    // objectsModel
     QHash<shared::Id, shared::VEObject *> objects() const;
     ivm::IVModel *objectsModel() const;
+
+    /*
+     * IVItemsModel is the model that holds the QGraphicsScene which is the main graph area.
+     */
+    IVItemModel *itemsModel() const;
+
     ivm::IVModel *importModel() const;
     ivm::IVModel *sharedModel() const;
-    IVItemModel *itemsModel() const;
+
     ivm::IVModel *layersModel() const;
     QHash<shared::Id, shared::VEObject *> layersObjects() const;
     ivm::ArchetypeModel *archetypesModel() const;
 
+    /*
+     * VisualizationModel for the "IV Structure" window
+     */
     IVVisualizationModelBase *visualisationModel() const;
+
+    /*
+     * SelectionModel for the "IV Structure" window
+     */
     QItemSelectionModel *objectsSelectionModel() const;
+
+    /*
+     * VisualizationModel for the "Import Component" window
+     */
     IVVisualizationModelBase *importVisualisationModel() const;
+
+    /*
+     * VisualizationModel for the "Shared Types" window
+     */
     IVVisualizationModelBase *sharedVisualisationModel() const;
+
+    /*
+     * VisualizationModel for the "Connection Layers" window
+     */
     IVVisualizationModelBase *layerVisualisationModel() const;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
@@ -183,6 +215,7 @@ private:
     void showNIYGUI(const QString &title = QString());
     void createProFile(const QString &path);
     void initTASTEEnv(const QString &path);
+
 
     struct InterfaceDocumentPrivate;
     InterfaceDocumentPrivate *d;

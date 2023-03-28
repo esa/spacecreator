@@ -111,14 +111,24 @@ ive::GraphicsView *IVAppWidget::graphicsView() const
 
 void IVAppWidget::centerView()
 {
-    const QGraphicsItem *item = m_document->itemsModel()->getItem(m_document->objectsModel()->rootObjectId());
-    const QList<QGraphicsItem *> items = item ? item->childItems() : graphicsView()->scene()->items();
-    if (items.isEmpty() && item) {
-        graphicsView()->centerOn(item->sceneBoundingRect().center());
-    } else {
+    // Get the QGraphicsItem that represents the root object. Root object is the object that is currently shown with nested functions in it.
+    auto rootObjectId = m_document->objectsModel()->rootObjectId();
+    const QGraphicsItem *rootItem = m_document->itemsModel()->getItem(rootObjectId);
+    // Get the items of the entire graph or the nested items within the root object
+    const QList<QGraphicsItem *> items = rootItem ? rootItem->childItems() : graphicsView()->scene()->items();
+
+    if (items.isEmpty() && rootItem)
+    {
+        // No root item. Center on the center of the entire graph
+        graphicsView()->centerOn(rootItem->sceneBoundingRect().center());
+    } else
+    {
+        // center on the center of the nested items
         QRectF rect;
-        for (const QGraphicsItem *item : items) {
-            if (item->type() > QGraphicsItem::UserType) {
+        for (const QGraphicsItem *item : items)
+        {
+            if (item->type() > QGraphicsItem::UserType)
+            {
                 rect |= item->sceneBoundingRect();
             }
         }

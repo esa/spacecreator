@@ -241,7 +241,7 @@ void VEObject::setMarked(bool mark)
 }
 
 /*!
- * Retruns if the object is set ti be marked
+ * Retruns if the object is set to be marked
  */
 bool VEObject::isMarked() const
 {

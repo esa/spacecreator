@@ -615,6 +615,48 @@ QList<IVObject *> IVModel::visibleObjects(shared::Id rootId) const
     return visibleObjects;
 }
 
+void IVModel::setNestedObjectsVisible()
+{
+    QList<IVObject *> objectsToShow;
+    IVObject *rootObj = rootObject();
+    if (rootObj)
+    {
+         objectsToShow = visibleObjects(rootObj->id());
+    }
+    else
+    {
+        objectsToShow = visibleObjects();
+    }
+    for (shared::VEObject *veObject : objectsToShow)
+    {
+        auto ivObject = qobject_cast<ivm::IVObject*>(veObject);
+        if (!ivObject)
+        {
+            continue;
+        }
+        ivObject->setVisible(true);
+    }
+}
+
+void IVModel::setNestedObjectsVisible(shared::Id rootId)
+{
+    ivm::IVObject *rootObj = getObject(rootId);
+    if (!rootObj)
+    {
+        return;
+    }
+    QVector<shared::VEObject *> descendants = rootObj->descendants();
+    for (shared::VEObject *veObject : descendants)
+    {
+        auto ivObject = qobject_cast<ivm::IVObject*>(veObject);
+        if (!ivObject)
+        {
+            continue;
+        }
+        ivObject->setVisible(true);
+    }
+}
+
 void IVModel::clear()
 {
     d->m_visibleObjects.clear();

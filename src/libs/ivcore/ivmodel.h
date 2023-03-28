@@ -102,8 +102,22 @@ public:
     QVector<IVArchetypeLibraryReference *> getArchetypeLibraryReferences();
     void setArchetypeLibraryReferences(QVector<IVArchetypeLibraryReference *> references);
 
+    /**
+     * visibleObjects are the object that is visible in the current level, regardless if the user has hidden it.
+     * @return
+     */
     QList<IVObject *> visibleObjects() const;
     QList<IVObject *> visibleObjects(shared::Id rootId) const;
+
+    /*
+     * All children of the current root is set visible
+     */
+    void setNestedObjectsVisible();
+
+    /*
+     * All children of the specified root visible
+     */
+    void setNestedObjectsVisible(shared::Id rootId);
 
     void clear() override;
 

@@ -442,6 +442,15 @@ void InterfaceDocument::close()
     d->commandsStack->clear();
 }
 
+// showAll can be initiated in the main graphics view and means
+// "show all items of current root item"
+void InterfaceDocument::showAll()
+{
+    // Find root item
+    IVItemModel *itemModel = itemsModel();
+    objectsModel()->setNestedObjectsVisible();
+}
+
 QString InterfaceDocument::path() const
 {
     return d->filePath;
@@ -649,7 +658,8 @@ ivm::ArchetypeModel *InterfaceDocument::archetypesModel() const
 
 IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 {
-    if (!d->objectsVisualizationModel) {
+    if (!d->objectsVisualizationModel)
+    {
         d->objectsVisualizationModel =
                 new IVVisualizationModel(d->objectsModel, d->commandsStack, const_cast<InterfaceDocument *>(this));
         auto headerItem = new QStandardItem(tr("IV Structure"));
@@ -662,9 +672,12 @@ IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 
 QItemSelectionModel *InterfaceDocument::objectsSelectionModel() const
 {
-    if (!d->objectsSelectionModel) {
+    if (!d->objectsSelectionModel)
+    {
         d->objectsSelectionModel = new QItemSelectionModel(visualisationModel(), const_cast<InterfaceDocument *>(this));
-        connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
+        connect(d->objectsSelectionModel,
+                &QItemSelectionModel::selectionChanged,
+                this,
                 &InterfaceDocument::onViewSelectionChanged);
     }
     return d->objectsSelectionModel;
