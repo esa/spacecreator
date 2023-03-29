@@ -92,19 +92,9 @@ public:
     bool exportSelectedType();
     void close();
 
-    /*
-     * All hidden items in the current level becomes visible
-     */
     void showAll();
 
-    /**
-     * hasSelectedItems returns true if the user has selected items in the main scene
-     */
     bool hasSelectedItems();
-
-    /**
-     * All selected items in the main scene is hidden
-     */
     void hideSelectedItems();
 
     QString path() const;
@@ -132,9 +122,6 @@ public:
     QHash<shared::Id, shared::VEObject *> objects() const;
     ivm::IVModel *objectsModel() const;
 
-    /*
-     * IVItemsModel is the model that holds the QGraphicsScene which is the main graph area.
-     */
     IVItemModel *itemsModel() const;
 
     ivm::IVModel *importModel() const;
@@ -144,29 +131,13 @@ public:
     QHash<shared::Id, shared::VEObject *> layersObjects() const;
     ivm::ArchetypeModel *archetypesModel() const;
 
-    /*
-     * VisualizationModel for the "IV Structure" window
-     */
     IVVisualizationModelBase *visualisationModel() const;
 
-    /*
-     * SelectionModel for the "IV Structure" window
-     */
     QItemSelectionModel *objectsSelectionModel() const;
 
-    /*
-     * VisualizationModel for the "Import Component" window
-     */
+
     IVVisualizationModelBase *importVisualisationModel() const;
-
-    /*
-     * VisualizationModel for the "Shared Types" window
-     */
     IVVisualizationModelBase *sharedVisualisationModel() const;
-
-    /*
-     * VisualizationModel for the "Connection Layers" window
-     */
     IVVisualizationModelBase *layerVisualisationModel() const;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
@@ -225,7 +196,6 @@ private:
     void showNIYGUI(const QString &title = QString());
     void createProFile(const QString &path);
     void initTASTEEnv(const QString &path);
-
 
     struct InterfaceDocumentPrivate;
     InterfaceDocumentPrivate *d;

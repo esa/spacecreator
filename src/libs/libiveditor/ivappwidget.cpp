@@ -109,6 +109,9 @@ ive::GraphicsView *IVAppWidget::graphicsView() const
     return ui->graphicsView;
 }
 
+/**
+ * Center the view point of the main interfaceview
+ */
 void IVAppWidget::centerView()
 {
     // Get the QGraphicsItem that represents the root object. Root object is the object that is currently shown with nested functions in it.
@@ -243,7 +246,9 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
     menu->exec(ui->importView->mapToGlobal(pos));
 }
 
-// IV Structure - context menu
+/**
+ *  IV Structure - context menu
+ */
 void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
 {
     QList<QAction *> actions; // The actions that will go in the context menu
@@ -804,8 +809,9 @@ void IVAppWidget::initGraphicsView()
     m_document->itemsModel()->updateSceneRect();
     ui->graphicsView->setUpdatesEnabled(true);
 }
-
-// Init modelView aka. IV Structure aka. objectsView
+/**
+ * Init modelView aka. IV Structure aka. objectsView
+ */
 void IVAppWidget::initModelView()
 {
     ui->objectsView->setObjectName(QLatin1String("IVModelView"));
@@ -856,7 +862,9 @@ void IVAppWidget::initLayerView()
     ui->layerView->setModel(m_document->layerVisualisationModel());
 }
 
-// creates the actions in the top part of the toolbar left of the scene
+/**
+ *  creates the actions in the top part of the toolbar left of the scene
+ */
 QVector<QAction *> IVAppWidget::initActions()
 {
     Q_ASSERT(m_document.data());

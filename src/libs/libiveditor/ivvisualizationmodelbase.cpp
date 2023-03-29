@@ -32,7 +32,9 @@
 
 namespace ive {
 
-// Visualization Model Base
+/**
+ *  Visualization Model Base
+ */
 
 IVVisualizationModelBase::IVVisualizationModelBase(
         ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, shared::DropData::Type dropType, QObject *parent)
@@ -184,7 +186,9 @@ void IVVisualizationModelBase::updateConnectionItem(ivm::IVConnection *connectio
     }
 }
 
-// VisualizationModel
+/**
+ * VisualizationModel
+ */
 
 IVVisualizationModel::IVVisualizationModel(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
     : IVVisualizationModelBase(ivModel, commandsStack, shared::DropData::Type::None, parent)
@@ -195,11 +199,9 @@ IVVisualizationModel::IVVisualizationModel(ivm::IVModel *ivModel, cmd::CommandsS
 void IVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject *object)
 {
     ivm::IVObject *obj = qobject_cast<ivm::IVObject *>(object);
-    if (obj)
-    {
+    if (obj) {
         IVVisualizationModelBase::updateItemData(item, obj);
-        if ((item->checkState() == Qt::Checked) != obj->isVisible())
-        {
+        if ((item->checkState() == Qt::Checked) != obj->isVisible()) {
             item->setData(obj->isVisible() ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
         }
     }
@@ -227,23 +229,19 @@ void IVVisualizationModel::onDataChanged(
     const QStandardItem *firstItem = itemFromIndex(topLeft);
     const QStandardItem *lastItem = itemFromIndex(bottomRight);
     Q_ASSERT(firstItem->parent() == lastItem->parent());
-    for (int row = firstItem->row(); row <= lastItem->row(); ++row)
-    {
+    for (int row = firstItem->row(); row <= lastItem->row(); ++row) {
         // QStandardItem to ivm::IVObject
         const QStandardItem *parent = firstItem->parent() ? firstItem->parent() : invisibleRootItem();
         QStandardItem *rowItem = parent->child(row);
-        if (!rowItem)
-        {
+        if (!rowItem) {
             continue;
         }
         ivm::IVObject *ivObject = qStandardItemToIVObject(rowItem); // each row represents an IVObject
-        if (!ivObject)
-        {
+        if (!ivObject) {
             continue;
         }
 
-        if (rowItem->isCheckable() && roles.contains(Qt::CheckStateRole))
-        {
+        if (rowItem->isCheckable() && roles.contains(Qt::CheckStateRole)) {
             // User (un)checked a checkbox. Tell the model object that it is (in)visible.
             ivObject->setVisible(rowItem->checkState() == Qt::Checked);
         }
@@ -253,10 +251,8 @@ void IVVisualizationModel::onDataChanged(
         {
             const QString name = ivm::IVNameValidator::encodeName(ivObject->type(), rowItem->text());
             bool nameHasChanged = name != ivObject->title();
-            if (nameHasChanged)
-            {
-                if (ivm::IVNameValidator::isAcceptableName(ivObject, name))
-                {
+            if (nameHasChanged) {
+                if (ivm::IVNameValidator::isAcceptableName(ivObject, name)) {
                     const QList<EntityAttribute> attributes = { EntityAttribute {
                             ivm::meta::Props::token(ivm::meta::Props::Token::name), name,
                             EntityAttribute::Type::Attribute } };
@@ -275,8 +271,7 @@ ivm::IVObject* IVVisualizationModel::qStandardItemToIVObject(const QStandardItem
 {
     const shared::Id id = standardItem->data(IdRole).toUuid(); // ask QStandardItem for its id
     ivm::IVObject *obj = m_veModel->getObject(id)->as<ivm::IVObject *>(); // find the model object by id
-    if (!obj)
-    {
+    if (!obj) {
         return nullptr;
     }
     return obj;
@@ -286,25 +281,23 @@ void IVVisualizationModel::setAllItemsVisible()
 {
 
     QHash<shared::Id, shared::VEObject *> ivObjects = m_veModel->objects();
-    for (shared::VEObject *veObject : ivObjects)
-    {
+    for (shared::VEObject *veObject : ivObjects) {
         auto ivObject = qobject_cast<ivm::IVObject*>(veObject);
-        if (!ivObject)
-        {
+        if (!ivObject) {
             continue;
         }
         if (ivObject->isFunction() ||
             ivObject->isFunctionType() ||
-            ivObject->isComment())
-        {
+            ivObject->isComment()) {
             ivObject->setVisible(true);
         }
     }
 }
 
 
-// Layer model
-
+/**
+ * Layer model
+ */
 IVLayerVisualizationModel::IVLayerVisualizationModel(
         ivm::IVModel *layerModel, ivm::IVModel *objectsModel, cmd::CommandsStack *commandsStack, QObject *parent)
     : IVVisualizationModelBase(layerModel, commandsStack, shared::DropData::Type::None, parent)

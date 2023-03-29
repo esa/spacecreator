@@ -26,7 +26,6 @@
 #include "asn1modelstorage.h"
 #include "asn1systemchecks.h"
 #include "colors/colormanagerdialog.h"
-#include "commands/asn1componentsimport.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/implementationshandler.h"
 #include "commandsstack.h"
@@ -100,7 +99,8 @@ void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
 {
     if (!object || object->parentObject()
             || !(object->type() == ivm::IVObject::Type::Function
-                    || object->type() == ivm::IVObject::Type::FunctionType)) {
+                    || object->type() == ivm::IVObject::Type::FunctionType))
+    {
         return;
     }
 
@@ -121,7 +121,7 @@ void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
 
     QStringList newAsnFiles;
     QStringList importedAsnFiles;
-    for (const QFileInfo &file : qAsConst(fileInfos)) {
+    for (const QFileInfo &file : qAsConst(fileInfos)){
         QString destFilePath { targetDir.filePath(file.fileName()) };
         const bool isNewFile = !QFile::exists(destFilePath);
         if (!isNewFile && !QFile::remove(destFilePath)) {
@@ -139,7 +139,10 @@ void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
             shared::ErrorHub::addError(shared::ErrorItem::Error, tr("%1 wasn't imported").arg(file.fileName()));
         }
     }
+    if (true)
+    {
 
+    }
     Q_EMIT d->commandsStack->asn1FilesImported(newAsnFiles);
 }
 
@@ -442,32 +445,38 @@ void InterfaceDocument::close()
     d->commandsStack->clear();
 }
 
-// showAll can be initiated in the main graphics view and means
-// "show all items of current root item"
+/**
+ * All hidden items in the current level becomes visible
+ */
 void InterfaceDocument::showAll()
 {
     // Find root item
-    IVItemModel *itemModel = itemsModel();
     objectsModel()->setNestedObjectsVisible();
 }
 
+/**
+ * hasSelectedItems returns true if the user has selected items in the main scene
+ */
 bool InterfaceDocument::hasSelectedItems()
 {
     return objectsSelectionModel()->hasSelection();
 }
 
+
+/**
+ * All selected items in the main scene is hidden
+ */
 void InterfaceDocument::hideSelectedItems()
 {
     QModelIndexList selection = objectsSelectionModel()->selectedIndexes();
-    for (const QModelIndex &idx : selection)
-    {
-       QVariant id = idx.data(IVVisualizationModelBase::IdRole);
-       QUuid uuid = id.toUuid();
-       ivm::IVObject *selectedObject = objectsModel()->getObject(uuid);
-       if (!selectedObject->isRootObject()) // Don't hide root items
-       {
-           selectedObject->setVisible(false);
-       }
+    for (const QModelIndex &idx : selection) {
+        QVariant id = idx.data(IVVisualizationModelBase::IdRole);
+        QUuid uuid = id.toUuid();
+        ivm::IVObject *selectedObject = objectsModel()->getObject(uuid);
+        if (!selectedObject->isRootObject()) // Don't hide root items
+        {
+            selectedObject->setVisible(false);
+        }
     }
 }
 
@@ -676,10 +685,12 @@ ivm::ArchetypeModel *InterfaceDocument::archetypesModel() const
     return d->archetypesModel;
 }
 
+/**
+ * VisualizationModel for the "IV Structure" window
+ */
 IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 {
-    if (!d->objectsVisualizationModel)
-    {
+    if (!d->objectsVisualizationModel) {
         d->objectsVisualizationModel =
                 new IVVisualizationModel(d->objectsModel, d->commandsStack, const_cast<InterfaceDocument *>(this));
         auto headerItem = new QStandardItem(tr("IV Structure"));
@@ -690,19 +701,22 @@ IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
     return d->objectsVisualizationModel;
 }
 
+/**
+ * SelectionModel for the "IV Structure" window
+ */
 QItemSelectionModel *InterfaceDocument::objectsSelectionModel() const
 {
-    if (!d->objectsSelectionModel)
-    {
+    if (!d->objectsSelectionModel) {
         d->objectsSelectionModel = new QItemSelectionModel(visualisationModel(), const_cast<InterfaceDocument *>(this));
-        connect(d->objectsSelectionModel,
-                &QItemSelectionModel::selectionChanged,
-                this,
+        connect(d->objectsSelectionModel, &QItemSelectionModel::selectionChanged, this,
                 &InterfaceDocument::onViewSelectionChanged);
     }
     return d->objectsSelectionModel;
 }
 
+/**
+ * VisualizationModel for the "Import Component" window
+ */
 IVVisualizationModelBase *InterfaceDocument::importVisualisationModel() const
 {
     if (!d->importVisualisationModel) {
@@ -716,6 +730,9 @@ IVVisualizationModelBase *InterfaceDocument::importVisualisationModel() const
     return d->importVisualisationModel;
 }
 
+/**
+ * VisualizationModel for the "Shared Types" window
+ */
 IVVisualizationModelBase *InterfaceDocument::sharedVisualisationModel() const
 {
     if (!d->sharedVisualisationModel) {
@@ -729,6 +746,9 @@ IVVisualizationModelBase *InterfaceDocument::sharedVisualisationModel() const
     return d->sharedVisualisationModel;
 }
 
+/**
+ * VisualizationModel for the "Connection Layers" window
+ */
 IVVisualizationModelBase *InterfaceDocument::layerVisualisationModel() const
 {
     if (d->layerSelect == nullptr) {
@@ -1143,39 +1163,30 @@ void InterfaceDocument::initTASTEEnv(const QString &path)
 
 void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)
 {
-    if (!d->objectsVisualizationModel || !d->objectsSelectionModel)
-    {
+    if (!d->objectsVisualizationModel || !d->objectsSelectionModel) {
         return;
     }
     QItemSelection itemSelection;
-    for (auto id : selectedObjects)
-    {
+    for (auto id : selectedObjects) {
         const QModelIndex idx = d->objectsVisualizationModel->indexFromItem(d->objectsVisualizationModel->getItem(id));
-        if (itemSelection.isEmpty())
-        {
+        if (itemSelection.isEmpty()) {
             itemSelection.select(idx, idx);
-        }
-        else
-        {
+        } else {
             itemSelection.merge(QItemSelection(idx, idx), QItemSelectionModel::SelectCurrent);
         }
     }
-    d->objectsSelectionModel->select(itemSelection, QItemSelectionModel::Rows |
-                                                    QItemSelectionModel::Current |
-                                                    QItemSelectionModel::ClearAndSelect);
+    d->objectsSelectionModel->select(itemSelection,
+            QItemSelectionModel::Rows | QItemSelectionModel::Current | QItemSelectionModel::ClearAndSelect);
 }
 
 void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     // Update the selection state of the QGraphicItems in the scene
-    auto updateSelection = [this](const QItemSelection &selection, bool value)
-    {
-        for (const QModelIndex &idx : selection.indexes())
-        {
+    auto updateSelection = [this](const QItemSelection &selection, bool value) {
+        for (const QModelIndex &idx : selection.indexes()) {
             QVariant id = idx.data(IVVisualizationModelBase::IdRole);
             QUuid uuid = id.toUuid();
-            if (auto graphicsItem = itemsModel()->getItem(uuid))
-            {
+            if (auto graphicsItem = itemsModel()->getItem(uuid)) {
                 graphicsItem->setSelected(value);
             }
         }

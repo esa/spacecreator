@@ -273,8 +273,7 @@ void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu)
     }
 }
 
-void CreatorTool::populateContextMenu_visibility(QMenu *menu, const QPointF &scenePos)
-{}
+void CreatorTool::populateContextMenu_visibility(QMenu *menu, const QPointF &scenePos) { }
 
 QPointF CreatorTool::cursorInScene() const
 {

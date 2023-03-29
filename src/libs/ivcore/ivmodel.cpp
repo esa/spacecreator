@@ -581,6 +581,10 @@ QVector<IVConnection *> IVModel::getConnectionsForFunction(const shared::Id &id)
     return result;
 }
 
+/**
+ * visibleObjects are the object that is visible in the current level, regardless if the user has hidden it.
+ * @return
+ */
 QList<IVObject *> IVModel::visibleObjects() const
 {
     return d->m_visibleObjects;
@@ -619,19 +623,15 @@ void IVModel::setNestedObjectsVisible()
 {
     QList<IVObject *> objectsToShow;
     IVObject *rootObj = rootObject();
-    if (rootObj)
-    {
+    if (rootObj) {
          objectsToShow = visibleObjects(rootObj->id());
     }
-    else
-    {
+    else {
         objectsToShow = visibleObjects();
     }
-    for (shared::VEObject *veObject : objectsToShow)
-    {
+    for (shared::VEObject *veObject : objectsToShow) {
         auto ivObject = qobject_cast<ivm::IVObject*>(veObject);
-        if (!ivObject)
-        {
+        if (!ivObject) {
             continue;
         }
         ivObject->setVisible(true);
@@ -641,16 +641,13 @@ void IVModel::setNestedObjectsVisible()
 void IVModel::setNestedObjectsVisible(shared::Id rootId)
 {
     ivm::IVObject *rootObj = getObject(rootId);
-    if (!rootObj)
-    {
+    if (!rootObj) {
         return;
     }
     QVector<shared::VEObject *> descendants = rootObj->descendants();
-    for (shared::VEObject *veObject : descendants)
-    {
+    for (shared::VEObject *veObject : descendants) {
         auto ivObject = qobject_cast<ivm::IVObject*>(veObject);
-        if (!ivObject)
-        {
+        if (!ivObject) {
             continue;
         }
         ivObject->setVisible(true);

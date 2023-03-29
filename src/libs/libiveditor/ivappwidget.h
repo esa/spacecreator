@@ -52,9 +52,6 @@ public:
 
     GraphicsView *graphicsView() const;
 
-    /*
-     * Center the view point of the main interfaceview
-     */
     void centerView();
 
     QAction *actionDelete() const;

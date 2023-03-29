@@ -45,8 +45,8 @@
 #include <QMutex>
 #include <QScreen>
 #include <QUndoStack>
-#include <QtDebug>
 #include <QVector>
+#include <QtDebug>
 
 #ifdef IV_ITEM_DUMP
 static inline void dumpItem(QObject *obj, bool strict = false)
