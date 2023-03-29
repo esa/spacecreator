@@ -45,12 +45,6 @@ class IVItemModel : public shared::ui::VEItemModel
 {
     Q_OBJECT
 public:
-    enum class Roles
-    {
-        IdRole = Qt::UserRole,
-        ItemVisible,
-    };
-    Q_ENUM(Roles);
 
     explicit IVItemModel(ivm::IVModel *model, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
     ~IVItemModel() override;
