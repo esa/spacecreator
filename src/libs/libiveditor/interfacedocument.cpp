@@ -139,10 +139,7 @@ void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
             shared::ErrorHub::addError(shared::ErrorItem::Error, tr("%1 wasn't imported").arg(file.fileName()));
         }
     }
-    if (true)
-    {
 
-    }
     Q_EMIT d->commandsStack->asn1FilesImported(newAsnFiles);
 }
 
