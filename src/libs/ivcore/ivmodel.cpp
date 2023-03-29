@@ -619,6 +619,9 @@ QList<IVObject *> IVModel::visibleObjects(shared::Id rootId) const
     return visibleObjects;
 }
 
+/**
+ * All children of the current root is set visible
+ */
 void IVModel::setNestedObjectsVisible()
 {
     QList<IVObject *> objectsToShow;
@@ -638,6 +641,9 @@ void IVModel::setNestedObjectsVisible()
     }
 }
 
+/**
+ * All children of the specified root visible
+ */
 void IVModel::setNestedObjectsVisible(shared::Id rootId)
 {
     ivm::IVObject *rootObj = getObject(rootId);
