@@ -451,6 +451,26 @@ void InterfaceDocument::showAll()
     objectsModel()->setNestedObjectsVisible();
 }
 
+bool InterfaceDocument::hasSelectedItems()
+{
+    return objectsSelectionModel()->hasSelection();
+}
+
+void InterfaceDocument::hideSelectedItems()
+{
+    QModelIndexList selection = objectsSelectionModel()->selectedIndexes();
+    for (const QModelIndex &idx : selection)
+    {
+       QVariant id = idx.data(IVVisualizationModelBase::IdRole);
+       QUuid uuid = id.toUuid();
+       ivm::IVObject *selectedObject = objectsModel()->getObject(uuid);
+       if (!selectedObject->isRootObject()) // Don't hide root items
+       {
+           selectedObject->setVisible(false);
+       }
+    }
+}
+
 QString InterfaceDocument::path() const
 {
     return d->filePath;
@@ -1123,27 +1143,39 @@ void InterfaceDocument::initTASTEEnv(const QString &path)
 
 void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)
 {
-    if (!d->objectsVisualizationModel || !d->objectsSelectionModel) {
+    if (!d->objectsVisualizationModel || !d->objectsSelectionModel)
+    {
         return;
     }
     QItemSelection itemSelection;
-    for (auto id : selectedObjects) {
+    for (auto id : selectedObjects)
+    {
         const QModelIndex idx = d->objectsVisualizationModel->indexFromItem(d->objectsVisualizationModel->getItem(id));
-        if (itemSelection.isEmpty()) {
+        if (itemSelection.isEmpty())
+        {
             itemSelection.select(idx, idx);
-        } else {
+        }
+        else
+        {
             itemSelection.merge(QItemSelection(idx, idx), QItemSelectionModel::SelectCurrent);
         }
     }
-    d->objectsSelectionModel->select(itemSelection,
-            QItemSelectionModel::Rows | QItemSelectionModel::Current | QItemSelectionModel::ClearAndSelect);
+    d->objectsSelectionModel->select(itemSelection, QItemSelectionModel::Rows |
+                                                    QItemSelectionModel::Current |
+                                                    QItemSelectionModel::ClearAndSelect);
 }
 
 void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    auto updateSelection = [this](const QItemSelection &selection, bool value) {
-        for (const QModelIndex &idx : selection.indexes()) {
-            if (auto graphicsItem = itemsModel()->getItem(idx.data(IVVisualizationModelBase::IdRole).toUuid())) {
+    // Update the selection state of the QGraphicItems in the scene
+    auto updateSelection = [this](const QItemSelection &selection, bool value)
+    {
+        for (const QModelIndex &idx : selection.indexes())
+        {
+            QVariant id = idx.data(IVVisualizationModelBase::IdRole);
+            QUuid uuid = id.toUuid();
+            if (auto graphicsItem = itemsModel()->getItem(uuid))
+            {
                 graphicsItem->setSelected(value);
             }
         }

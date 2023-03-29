@@ -97,6 +97,16 @@ public:
      */
     void showAll();
 
+    /**
+     * hasSelectedItems returns true if the user has selected items in the main scene
+     */
+    bool hasSelectedItems();
+
+    /**
+     * All selected items in the main scene is hidden
+     */
+    void hideSelectedItems();
+
     QString path() const;
     void setPath(const QString &path);
 
