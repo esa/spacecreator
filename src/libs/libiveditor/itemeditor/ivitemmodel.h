@@ -48,7 +48,7 @@ public:
     enum class Roles
     {
         IdRole = Qt::UserRole,
-        ItemVisible, // Visible in this context means "Item is visible at root level or in a nested function"
+        ItemVisible,
     };
     Q_ENUM(Roles);
 
