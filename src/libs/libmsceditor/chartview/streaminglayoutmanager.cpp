@@ -500,12 +500,12 @@ void StreamingLayoutManager::updateInstancesRect()
 void StreamingLayoutManager::checkChartSize(EventItem *item)
 {
     QRectF chartRect = m_chartItem->contentRect();
-    if (item->sceneBoundingRect().bottom() > chartRect.bottom()) {
+    if (item->sceneBoundingRect().bottom() > (chartRect.bottom() - ChartItem::chartMargins().bottom())) {
         chartRect.setBottom(item->sceneBoundingRect().bottom() + ChartItem::chartMargins().bottom());
         m_chartItem->setContentRect(chartRect);
     }
     chartRect = m_chartItem->contentRect();
-    if (item->sceneBoundingRect().right() > chartRect.right()) {
+    if (item->sceneBoundingRect().right() > (chartRect.right() - ChartItem::chartMargins().right())) {
         chartRect.setRight(item->sceneBoundingRect().right() + ChartItem::chartMargins().right());
         m_chartItem->setContentRect(chartRect);
     }
