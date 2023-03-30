@@ -6,7 +6,7 @@
     "trDescription": "Creates an ASN.1 model.",
     "trDisplayName": "ASN.1 Model",
     "trDisplayCategory": "ASN.1/ACN",
-    "enabled": "%{JS: [ %{Plugins} ].indexOf('ASN.1/ACN') >= 0}",
+    "enabled": "%{JS: [ %{Plugins} ].indexOf('SpaceCreatorPlugin') >= 0}",
 
     "options":
     [
