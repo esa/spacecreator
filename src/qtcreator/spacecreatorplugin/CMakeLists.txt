@@ -56,6 +56,8 @@ set(SC_PLUGIN_SOURCES
     options/tmcoptionswidget.cpp
     options/tmcoptions.h
     options/tmcoptions.cpp
+    pythonrefactor.cpp
+    pythonrefactor.h
     qtcreatorutils.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h

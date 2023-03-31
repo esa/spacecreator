@@ -47,10 +47,10 @@ public:
     void updateDefaultImplementation(const QString &oldName, const QString &oldLanguage, const QString &newName,
             const QString &newLanguage, bool isDefault);
 
-    QString functionBasePath() const;
-    QString functionImplementaionsBasePath() const;
-    QString implementationBasePath(const QString &name) const;
-    QString implementationPath(const QString &name, const QString &language) const;
+    QString functionBasePath(const QString &functionName = "") const;
+    QString functionImplementaionsBasePath(const QString &functionName = "") const;
+    QString implementationBasePath(const QString &name, const QString &functionName = "") const;
+    QString implementationPath(const QString &name, const QString &language, const QString &functionName = "") const;
 
 private:
     bool moveDefaultDirectories(const QString &currentImplName, const QString &language);

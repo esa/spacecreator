@@ -32,6 +32,7 @@ class ErrorItem;
 }
 
 namespace spctr {
+class PythonRefactor;
 
 /*!
    Does contain everything to load/store/validate Space Creator models that belong to once QtCreator project
@@ -59,6 +60,7 @@ private:
     ProjectExplorer::Project *m_project = nullptr;
     QStringList m_asnFiles;
     QVector<ProjectExplorer::Task> m_errors;
+    std::unique_ptr<PythonRefactor> m_pythonRefactor;
 };
 
 } // namespace spctr

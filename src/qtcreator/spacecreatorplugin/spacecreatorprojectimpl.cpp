@@ -20,10 +20,10 @@
 #include "asn1modelstorage.h"
 #include "editorcore.h"
 #include "errorhub.h"
-#include "errormessageparser.h"
 #include "iveditorcore.h"
+#include "ivrefactorhandler.h"
 #include "msceditorcore.h"
-#include "mscrefactorhandler.h"
+#include "pythonrefactor.h"
 
 #include <QDebug>
 #include <QDir>
@@ -39,6 +39,7 @@ const char TASK_CATEGORY_SPACE_CREATOR[] = "Task.Category.SpaceCreator";
 SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent)
     : scs::SpaceCreatorProject(parent)
     , m_project(project)
+    , m_pythonRefactor(std::make_unique<PythonRefactor>())
 {
     Q_ASSERT(m_project);
 
@@ -62,6 +63,9 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     connect(shared::ErrorHub::instance(), &shared::ErrorHub::cleared, this, &SpaceCreatorProjectImpl::clearAllErrors);
     connect(shared::ErrorHub::instance(), &shared::ErrorHub::clearedFile, this,
             &SpaceCreatorProjectImpl::clearTasksForFile);
+
+    m_pythonRefactor->setStorage(this);
+    m_ivRefactorHandler->registerRefactor(m_pythonRefactor.get());
 }
 
 SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }

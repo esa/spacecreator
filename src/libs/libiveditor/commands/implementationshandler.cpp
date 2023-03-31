@@ -22,11 +22,11 @@
 #include "ivfunction.h"
 #include "ivpropertytemplateconfig.h"
 
-#include <algorithm>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QList>
+#include <algorithm>
 
 namespace ive {
 
@@ -68,8 +68,8 @@ void ImplementationsHandler::renameImplementationDirectory(const QString &curren
     dir.rename(currentImplName, nextImplName);
 }
 
-void ImplementationsHandler::updateDefaultImplementation(const QString &oldName, const QString &oldLanguage, const QString &newName,
-        const QString &newLanguage, bool isDefault)
+void ImplementationsHandler::updateDefaultImplementation(const QString &oldName, const QString &oldLanguage,
+        const QString &newName, const QString &newLanguage, bool isDefault)
 {
     const QString currentImplPath = functionBasePath() + QDir::separator();
     const QFileInfo oldFileInfo(currentImplPath + oldLanguage);
@@ -98,10 +98,13 @@ void ImplementationsHandler::updateDefaultImplementation(const QString &oldName,
  * Returns directory path where all implementations of the functions are located.
  * The default implementation is a link. All code is in a subdirectory
  * Example: <project path>/work/<function name>
+ * @param functionName Use this name as function name. If not set or empty, the name of the function entity is used
  */
-QString ImplementationsHandler::functionBasePath() const
+QString ImplementationsHandler::functionBasePath(const QString &functionName) const
 {
-    QStringList pathTemplate { m_projectPath, ive::kRootImplementationPath, m_function->title().toLower() };
+    QString name = functionName.isEmpty() ? m_function->title().toLower() : functionName.toLower();
+    name = name.toLower();
+    QStringList pathTemplate { m_projectPath, ive::kRootImplementationPath, name };
     return pathTemplate.join(QDir::separator());
 }
 
@@ -109,32 +112,36 @@ QString ImplementationsHandler::functionBasePath() const
  * Returns directory path where all implementations of the functions are located.
  * The implementations are in subdiretories of the implementation's names.
  * Example: <project path>/work/<function name>/implem
+ * @param functionName Use this name as function name. If not set or empty, the name of the function entity is used
  */
-QString ImplementationsHandler::functionImplementaionsBasePath() const
+QString ImplementationsHandler::functionImplementaionsBasePath(const QString &functionName) const
 {
-    return functionBasePath() + QDir::separator() + ive::kNonCurrentImplementationPath;
+    return functionBasePath(functionName) + QDir::separator() + ive::kNonCurrentImplementationPath;
 }
 
 /**
  * Returns the directory path of one specific implementation. Not including the source directory.
  * @param name The implementation's name
  * Example: <project path>/work/<function name>/implem/<impl. name>
+ * @param functionName Use this name as function name. If not set or empty, the name of the function entity is used
  */
-QString ImplementationsHandler::implementationBasePath(const QString &name) const
+QString ImplementationsHandler::implementationBasePath(const QString &name, const QString &functionName) const
 {
-    return functionImplementaionsBasePath() + QDir::separator() + name;
+    return functionImplementaionsBasePath(functionName) + QDir::separator() + name;
 }
 
 /**
  * Returns the directory path of one specific implementation.
  * @param name The implementation's name
  * @param language The programming language
+ * @param functionName Use this name as function name. If not set or empty, the name of the function entity is used
  * Example: <project path>/work/<function name>/implem/<impl. name>/<language>
  */
-QString ImplementationsHandler::implementationPath(const QString &name, const QString &language) const
+QString ImplementationsHandler::implementationPath(
+        const QString &name, const QString &language, const QString &functionName) const
 {
     const QString languageDir = ivm::IVPropertyTemplateConfig::instance()->languageDirectory(language);
-    return implementationBasePath(name) + QDir::separator() + languageDir;
+    return implementationBasePath(name, functionName) + QDir::separator() + languageDir;
 }
 
 bool ImplementationsHandler::moveDefaultDirectories(const QString &currentImplName, const QString &language)
