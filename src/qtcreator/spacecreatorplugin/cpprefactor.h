@@ -19,14 +19,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "creatorrefactorbase.h"
 
-class QDir;
+#include <QDir>
 
 namespace spctr {
 
 /*!
  * \brief The PythonRefactor class handles refactorings  affecting python omplementations.
  */
-class PythonRefactor : public spctr::CreatorRefactorBase
+class CppRefactor : public spctr::CreatorRefactorBase
 {
 public:
     bool isRefactorSupported(RefactorType type) const override;
@@ -37,6 +37,9 @@ public:
     void onIVFunctionRenamed(ivm::IVFunction *func, const QString &oldName, const QString &newName) const override;
     void onIVInterfaceRenamed(
             ivm::IVInterface *interface, const QString &oldName, const QString &newName) const override;
+
+private:
+    QString filename(const QString &funcName) const;
 };
 
-} // namespace scs
+} // namespace spctr

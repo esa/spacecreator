@@ -15,7 +15,7 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "pythonrefactor.h"
+#include "cpprefactor.h"
 
 #include "ivfunction.h"
 #include "ivinterface.h"
@@ -24,13 +24,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace spctr {
 
-const QString languageDir = "GUI";
-const QString implementationFile = "/src/UserWidgets.py";
+const QString languageDir = "CPP";
 
 /*!
  * \see RefactorBase::isRefactorSupported
  */
-bool PythonRefactor::isRefactorSupported(RefactorType type) const
+bool CppRefactor::isRefactorSupported(RefactorType type) const
 {
     switch (type) {
     case scs::RefactorBase::IVFunctionRename:
@@ -43,12 +42,18 @@ bool PythonRefactor::isRefactorSupported(RefactorType type) const
     return false;
 }
 
-bool PythonRefactor::isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const
+/*!
+ * \see RefactorBase::isIVFunctionUsed
+ */
+bool CppRefactor::isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const
 {
     return implementationDir(func, name, languageDir).exists();
 }
 
-bool PythonRefactor::isIVInterfaceUsed(ivm::IVInterface *interface, const QString &name) const
+/*!
+ * \see RefactorBase::isIVInterfaceUsed
+ */
+bool CppRefactor::isIVInterfaceUsed(ivm::IVInterface *interface, const QString &name) const
 {
     if (interface->function()->type() == ivm::IVObject::Type::Function) {
         auto func = static_cast<ivm::IVFunction *>(interface->function());
@@ -57,36 +62,47 @@ bool PythonRefactor::isIVInterfaceUsed(ivm::IVInterface *interface, const QStrin
     return false;
 }
 
-void PythonRefactor::onIVFunctionRenamed(ivm::IVFunction *func, const QString &oldName, const QString &newName) const
+/*!
+ * \see RefactorBase::onIVFunctionRenamed
+ */
+void CppRefactor::onIVFunctionRenamed(ivm::IVFunction *func, const QString &oldName, const QString &newName) const
 {
-    const QString filePath = implementationDir(func, oldName, languageDir).absolutePath() + implementationFile;
+    const QString filePath = implementationDir(func, oldName, languageDir).absolutePath() + filename(oldName);
     if (!QFile::exists(filePath)) {
         return;
     }
+
     const QString message =
-            QObject::tr("Don't forget to update the Python implementation (%1 -> %2) in").arg(oldName, newName);
+            QObject::tr("Don't forget to update the C++ implementation (%1 -> %2) in").arg(oldName, newName);
 
     reportWarning(message, filePath);
 }
 
-void PythonRefactor::onIVInterfaceRenamed(
+/*!
+ * \see RefactorBase::onIVInterfaceRenamed
+ */
+void CppRefactor::onIVInterfaceRenamed(
         ivm::IVInterface *interface, const QString &oldName, const QString &newName) const
 {
     if (interface->function()->type() == ivm::IVObject::Type::Function) {
         auto func = static_cast<ivm::IVFunction *>(interface->function());
+        const QString funcName = func->title();
         const QString filePath =
-                implementationDir(func, func->title(), languageDir).absolutePath() + implementationFile;
+                implementationDir(func, func->title(), languageDir).absolutePath() + filename(funcName);
         if (!QFile::exists(filePath)) {
             return;
         }
 
-        const QString funcName = func->title();
-        const QString message = QObject::tr("Don't forget to update the Python implementation (%1.%2 -> %1.%3) in")
+        const QString message = QObject::tr("Don't forget to update the C++ implementation (%1.%2 -> %1.%3) in")
                                         .arg(funcName, oldName, newName);
 
         reportWarning(message, filePath);
     }
 }
 
+QString CppRefactor::filename(const QString &funcName) const
+{
+    return QString("/src/%1.cc").arg(funcName.toLower());
+}
 
 } // namespace spctr

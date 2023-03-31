@@ -56,6 +56,10 @@ set(SC_PLUGIN_SOURCES
     options/tmcoptionswidget.cpp
     options/tmcoptions.h
     options/tmcoptions.cpp
+    cpprefactor.cpp
+    cpprefactor.h
+    creatorrefactorbase.cpp
+    creatorrefactorbase.h
     pythonrefactor.cpp
     pythonrefactor.h
     qtcreatorutils.h

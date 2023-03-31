@@ -18,6 +18,7 @@
 #include "spacecreatorprojectimpl.h"
 
 #include "asn1modelstorage.h"
+#include "cpprefactor.h"
 #include "editorcore.h"
 #include "errorhub.h"
 #include "iveditorcore.h"
@@ -40,6 +41,7 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     : scs::SpaceCreatorProject(parent)
     , m_project(project)
     , m_pythonRefactor(std::make_unique<PythonRefactor>())
+    , m_cppRefactor(std::make_unique<CppRefactor>())
 {
     Q_ASSERT(m_project);
 
@@ -66,6 +68,8 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
 
     m_pythonRefactor->setStorage(this);
     m_ivRefactorHandler->registerRefactor(m_pythonRefactor.get());
+    m_cppRefactor->setStorage(this);
+    m_ivRefactorHandler->registerRefactor(m_cppRefactor.get());
 }
 
 SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }

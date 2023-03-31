@@ -17,26 +17,30 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
-#include "creatorrefactorbase.h"
+#include <QPointer>
+#include <refactorbase.h>
 
 class QDir;
+
+namespace scs {
+class SpaceCreatorProject;
+}
 
 namespace spctr {
 
 /*!
- * \brief The PythonRefactor class handles refactorings  affecting python omplementations.
+ * \brief The CreatorRefactorBase class provide common functionality for refactoring classes based on QtCreator features
  */
-class PythonRefactor : public spctr::CreatorRefactorBase
+class CreatorRefactorBase : public scs::RefactorBase
 {
 public:
-    bool isRefactorSupported(RefactorType type) const override;
+    void setStorage(scs::SpaceCreatorProject *storage);
 
-    bool isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const override;
-    bool isIVInterfaceUsed(ivm::IVInterface *interface, const QString &name) const override;
+protected:
+    QDir implementationDir(ivm::IVFunction *func, const QString &name, const QString &languageDir) const;
+    void reportWarning(const QString &message, const QString &filePath) const;
 
-    void onIVFunctionRenamed(ivm::IVFunction *func, const QString &oldName, const QString &newName) const override;
-    void onIVInterfaceRenamed(
-            ivm::IVInterface *interface, const QString &oldName, const QString &newName) const override;
+    QPointer<scs::SpaceCreatorProject> m_storage;
 };
 
-} // namespace scs
+} // namespace spctr

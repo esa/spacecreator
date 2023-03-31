@@ -175,7 +175,8 @@ void IVRefactorHandler::onIVFunctionNameChanged(
     }
 
     for (RefactorBase *refactor : m_refactors) {
-        if (refactor->isRefactorSupported(scs::RefactorBase::IVFunctionRename)) {
+        if (refactor->isRefactorSupported(scs::RefactorBase::IVFunctionRename)
+                && refactor->isIVFunctionUsed(func, oldName)) {
             refactor->onIVFunctionRenamed(func, oldName, func->title());
         }
     }
@@ -199,7 +200,8 @@ void IVRefactorHandler::onIVInterfaceNameChanged(
     }
 
     for (RefactorBase *refactor : m_refactors) {
-        if (refactor->isRefactorSupported(scs::RefactorBase::IVInterfaceRename)) {
+        if (refactor->isRefactorSupported(scs::RefactorBase::IVInterfaceRename)
+                && refactor->isIVInterfaceUsed(interface, oldName)) {
             refactor->onIVInterfaceRenamed(interface, oldName, interface->title());
         }
     }
