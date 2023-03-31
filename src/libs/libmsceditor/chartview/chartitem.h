@@ -74,6 +74,7 @@ public Q_SLOTS:
 protected:
     void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void initGripPoints() override;
+    shared::ColorManager::HandledColors handledColorType() const override;
 
 private Q_SLOTS:
     void onNameEdited(const QString &text);

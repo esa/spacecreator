@@ -83,24 +83,13 @@ void IVConnectionGraphicsItem::rebuildLayout()
 
 shared::ColorManager::HandledColors IVConnectionGraphicsItem::handledColorType() const
 {
-    return shared::ColorManager::HandledColors::Connection;
+    return entity()->isMarked() ? shared::ColorManager::ConnectionHighlighted
+                                : shared::ColorManager::HandledColors::Connection;
 }
 
 shared::ui::TextItem *IVConnectionGraphicsItem::initTextItem()
 {
     return nullptr;
-}
-
-void IVConnectionGraphicsItem::applyColorScheme()
-{
-    shared::ColorHandler ch;
-    if (entity()->isMarked()) {
-        ch = shared::ColorManager::instance()->colorsForItem(shared::ColorManager::ConnectionFlow);
-    } else {
-        ch = colorHandler();
-    }
-    m_item->setPen(ch.pen());
-    update();
 }
 
 QString IVConnectionGraphicsItem::prepareTooltip() const

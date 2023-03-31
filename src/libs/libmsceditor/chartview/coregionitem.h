@@ -52,6 +52,8 @@ protected:
 
     cif::CifLine::CifType mainCifType() const override;
 
+    shared::ColorManager::HandledColors handledColorType() const override;
+
 private:
     QPointer<InstanceItem> m_instance;
 

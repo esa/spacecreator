@@ -107,6 +107,8 @@ protected:
     void initGripPoints() override;
     cif::CifLine::CifType mainCifType() const override;
 
+    shared::ColorManager::HandledColors handledColorType() const override;
+
 #ifdef QT_DEBUG
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 #endif

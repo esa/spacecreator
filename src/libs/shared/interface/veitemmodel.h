@@ -83,7 +83,7 @@ protected:
 
     virtual void onObjectAdded(shared::Id objectId);
     virtual void onObjectRemoved(shared::Id objectId);
-    virtual void onObjectAttributeChanged();
+    virtual void onObjectAttributeChanged(const QString &attrName);
 
 protected:
     QPointer<VEModel> m_model;

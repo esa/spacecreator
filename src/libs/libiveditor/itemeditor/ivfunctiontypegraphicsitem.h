@@ -52,9 +52,6 @@ public:
 
     void init() override;
 
-public Q_SLOTS:
-    void applyColorScheme() override;
-
 protected Q_SLOTS:
     void updateNameFromUi(const QString &name);
 
@@ -103,15 +100,12 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;
 
-    void updateTextPosition() override;
-
     /**
-     * @brief alignTextItem Places the text-item within the boundingbox of this FunctionTypeGraphicsItem's bounding box.
-     * For a IVFunctionTypeGraphicsItem this means the top-left of the text is aligned with the top-left of the
-     * IVFunctionTypeGraphicsItem's bounding box. Child classes can override this to make their text align differently,
-     * like in the center of the bounding box.
+     * @brief updateTextPosition Places the text-item within the boundingbox of this FunctionTypeGraphicsItem's bounding
+     * box. For a IVFunctionTypeGraphicsItem and inherited types this means the alignment is taken from text item
+     * alignment property. Manual alignment is needed because of https://bugreports.qt.io/browse/QTBUG-13467
      */
-    virtual void alignTextItem() const;
+    void updateTextPosition() override;
 
     shared::ui::TextItem *initTextItem() override;
 };

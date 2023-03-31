@@ -60,6 +60,7 @@ protected:
     void initGripPoints() override;
 
     cif::CifLine::CifType mainCifType() const override;
+    shared::ColorManager::HandledColors handledColorType() const override;
 
 private Q_SLOTS:
     void onTextEdited(const QString &text);

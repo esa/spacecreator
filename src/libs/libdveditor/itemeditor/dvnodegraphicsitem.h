@@ -50,9 +50,6 @@ public:
 
     void childBoundingBoxChanged() override;
 
-protected Q_SLOTS:
-    void applyColorScheme() override;
-
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     shared::ColorManager::HandledColors handledColorType() const override;

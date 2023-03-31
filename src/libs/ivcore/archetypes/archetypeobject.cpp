@@ -53,9 +53,11 @@ QString ArchetypeObject::title() const
 
 QString ArchetypeObject::titleUI() const
 {
-    QString text;
-    std::transform(title().cbegin(), title().cend(), std::back_inserter(text),
-            [](const QChar &ch) { return ch.isLetterOrNumber() ? ch : QLatin1Char(' '); });
+    QString text { title() };
+    std::for_each(text.begin(), text.end(), [](QChar &ch) {
+        if (!ch.isLetterOrNumber())
+            ch = QLatin1Char(' ');
+    });
 
     return text;
 }

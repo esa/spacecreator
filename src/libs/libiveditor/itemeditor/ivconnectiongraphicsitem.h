@@ -58,7 +58,6 @@ protected:
     shared::ui::TextItem *initTextItem() override;
 
 protected Q_SLOTS:
-    void applyColorScheme() override;
     void rebuildLayout() override;
 };
 

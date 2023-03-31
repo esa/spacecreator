@@ -42,6 +42,7 @@
 #include "properties/delegates/ivattributedelegate.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QDebug>
 #include <QHeaderView>
@@ -54,28 +55,18 @@
 namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
-        ivm::IVObject *obj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
+        shared::ui::VEInteractiveObject *uiObj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
         ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
         QWidget *parent)
-    : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
+    : shared::PropertiesDialog(dynPropConfig, uiObj, commandsStack, parent)
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
     , m_projectPath(projectPath)
     , m_layersModel(layersModel)
     , m_archetypesModel(archetypesModel)
-    , m_isFixedSystemElement(obj ? obj->isFixedSystemElement() : false)
+    , m_isFixedSystemElement(false)
     , m_isRequiredSystemElement(false)
 {
-    switch (obj->type()) {
-    case ivm::IVObject::Type::RequiredInterface:
-    case ivm::IVObject::Type::ProvidedInterface: {
-        ivm::IVInterface *iface = qobject_cast<ivm::IVInterface *>(obj);
-        m_isRequiredSystemElement = iface->isRequiredSystemElement();
-        break;
-    }
-    default:
-        break;
-    }
 }
 
 IVPropertiesDialog::~IVPropertiesDialog() { }
@@ -111,6 +102,9 @@ void IVPropertiesDialog::init()
     if (!dataObject())
         return;
 
+    if (auto iface = dataObject()->as<ivm::IVInterface *>())
+        m_isRequiredSystemElement = iface->isRequiredSystemElement();
+
     shared::PropertiesDialog::init();
 
     switch (dataObject()->type()) {
@@ -139,6 +133,7 @@ void IVPropertiesDialog::init()
     default:
         break;
     }
+    initStyleView();
     setCurrentTabIndex(0);
 }
 
@@ -298,7 +293,8 @@ void IVPropertiesDialog::initArchetypeView()
     if (function == nullptr) {
         return;
     }
-    auto archetypesWidget = new ive::ArchetypesWidget(m_archetypesModel, m_layersModel, m_asn1Checks, function, commandMacro(), this);
+    auto archetypesWidget =
+            new ive::ArchetypesWidget(m_archetypesModel, m_layersModel, m_asn1Checks, function, commandMacro(), this);
 
     connect(propertiesDialogUi()->buttonBox, &QDialogButtonBox::accepted, archetypesWidget,
             &ive::ArchetypesWidget::applyArchetypes);

@@ -30,7 +30,8 @@ class ActionItem : public EventItem
 {
     Q_OBJECT
 public:
-    explicit ActionItem(msc::MscAction *action, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent = nullptr);
+    explicit ActionItem(
+            msc::MscAction *action, ChartLayoutManagerBase *chartLayoutManager, QGraphicsItem *parent = nullptr);
 
     MscAction *modelItem() const;
 
@@ -49,6 +50,8 @@ protected:
 
     void initGripPoints() override;
     cif::CifLine::CifType mainCifType() const override;
+
+    shared::ColorManager::HandledColors handledColorType() const override;
 
 private Q_SLOTS:
     void onTextEdited(const QString &text);

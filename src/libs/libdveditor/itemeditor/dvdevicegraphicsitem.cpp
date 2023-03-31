@@ -106,17 +106,6 @@ DVNodeGraphicsItem *DVDeviceGraphicsItem::nodeItem() const
     return qgraphicsitem_cast<DVNodeGraphicsItem *>(targetItem());
 }
 
-void DVDeviceGraphicsItem::applyColorScheme()
-{
-    const shared::ColorHandler &h = colorHandler();
-    QPen pen = h.pen();
-    pen.setCapStyle(Qt::FlatCap);
-    pen.setStyle(Qt::SolidLine);
-    setPen(pen);
-    setBrush(h.brush());
-    update();
-}
-
 void DVDeviceGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)

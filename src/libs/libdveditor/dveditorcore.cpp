@@ -42,6 +42,7 @@
 #include "properties/dvpropertiesdialog.h"
 #include "settingsmanager.h"
 #include "ui/graphicsviewbase.h"
+#include "ui/veinteractiveobject.h"
 
 #include <QActionGroup>
 #include <QBoxLayout>
@@ -557,8 +558,8 @@ void DVEditorCore::centerOnView()
 void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
     if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {
-        dve::DVPropertiesDialog dialog(d->m_dynPropConfig, obj, d->m_systemChecks, d->m_asn1SystemChecks,
-                d->m_appModel->commandsStack(), d->m_mainWidget->window());
+        dve::DVPropertiesDialog dialog(d->m_dynPropConfig, d->m_model->getItem<shared::ui::VEInteractiveObject *>(id),
+                d->m_systemChecks, d->m_asn1SystemChecks, d->m_appModel->commandsStack(), d->m_mainWidget->window());
         dialog.init();
         dialog.exec();
     }

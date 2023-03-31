@@ -57,17 +57,6 @@ int DVPartitionGraphicsItem::itemLevel(bool isSelected) const
     return isSelected ? 1 : 0;
 }
 
-void DVPartitionGraphicsItem::applyColorScheme()
-{
-    const shared::ColorHandler &h = colorHandler();
-    QPen pen = h.pen();
-    pen.setCapStyle(Qt::FlatCap);
-    pen.setStyle(Qt::SolidLine);
-    setPen(pen);
-    setBrush(h.brush());
-    update();
-}
-
 void DVPartitionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)

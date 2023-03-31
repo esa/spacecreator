@@ -52,9 +52,6 @@ public:
     QSizeF minimumSize() const override;
     int itemLevel(bool isSelected) const override;
 
-protected Q_SLOTS:
-    virtual void applyColorScheme() override;
-
 protected:
     void rebuildLayout() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

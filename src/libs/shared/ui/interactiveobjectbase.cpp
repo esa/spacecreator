@@ -353,5 +353,11 @@ HighlightRectItem *InteractiveObjectBase::createHighlighter()
     return highlighter;
 }
 
+shared::ColorHandler InteractiveObjectBase::colorHandler() const
+{
+    // Get colorHandler for the type of this instance type
+    return shared::ColorManager::instance()->colorsForItem(handledColorType());
+}
+
 }
 }

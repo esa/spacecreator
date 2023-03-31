@@ -49,6 +49,11 @@ public:
     }
 
 protected:
+    shared::ColorManager::HandledColors handledColorType() const override
+    {
+        return shared::ColorManager::HandledColors::Unhandled;
+    }
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override
     {
         Q_UNUSED(option);

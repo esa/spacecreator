@@ -26,7 +26,6 @@
 #include "dvmessagebindingswidget.h"
 #include "dvmodel.h"
 #include "errorhub.h"
-#include "interface/attributedelegate.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "propertytemplateconfig.h"
@@ -36,10 +35,10 @@
 
 namespace dve {
 
-DVPropertiesDialog::DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
-        dvm::AbstractSystemChecks *systemChecker, Asn1Acn::Asn1SystemChecks *asn1Checks,
-        shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
-    : shared::PropertiesDialog(dynPropConfig, obj, commandsStack, parent)
+DVPropertiesDialog::DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig,
+        shared::ui::VEInteractiveObject *uiObj, dvm::AbstractSystemChecks *systemChecker,
+        Asn1Acn::Asn1SystemChecks *asn1Checks, shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
+    : shared::PropertiesDialog(dynPropConfig, uiObj, commandsStack, parent)
     , m_dvChecker(systemChecker)
     , m_asn1Checks(asn1Checks)
 {
@@ -100,7 +99,7 @@ void DVPropertiesDialog::init()
     default:
         break;
     }
-
+    initStyleView();
     setCurrentTabIndex(0);
 }
 

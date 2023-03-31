@@ -66,6 +66,7 @@ protected:
 
     void initGripPoints() override;
     cif::CifLine::CifType mainCifType() const override;
+    shared::ColorManager::HandledColors handledColorType() const override;
 
 private:
     MscCondition *m_condition = nullptr;

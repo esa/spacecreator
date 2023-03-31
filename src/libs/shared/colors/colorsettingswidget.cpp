@@ -113,9 +113,9 @@ void ColorSettingsWidget::onColorHandlerSelected(const QModelIndex &id)
     if (id.isValid()) {
         const QString &name = id.data().toString();
         m_color = ColorManager::instance()->colorsForItem(m_colorNames.value(name));
-        ui->colorHandlerEditor->setColorHandler(&m_color);
+        ui->colorHandlerEditor->setColorHandler(m_color);
     } else {
-        ui->colorHandlerEditor->setColorHandler(nullptr);
+        ui->colorHandlerEditor->setColorHandler(std::nullopt);
     }
 }
 
@@ -143,8 +143,11 @@ void ColorSettingsWidget::fillModel()
 {
     QStringList items;
     for (auto it = m_colorNames.begin(); it != m_colorNames.end(); ++it) {
-        ColorHandler color = ColorManager::instance()->colorsForItem(it.value());
-        if (m_filterGroup.isEmpty() || color.group() == m_filterGroup) {
+        std::optional<ColorHandler> color = ColorManager::instance()->colorsForItem(it.value());
+        if (!color.has_value())
+            continue;
+
+        if (m_filterGroup.isEmpty() || color->group() == m_filterGroup) {
             items.append(it.key());
         }
     }

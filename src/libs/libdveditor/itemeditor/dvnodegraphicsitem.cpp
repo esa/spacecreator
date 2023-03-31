@@ -94,17 +94,6 @@ void DVNodeGraphicsItem::rebuildLayout()
     }
 }
 
-void DVNodeGraphicsItem::applyColorScheme()
-{
-    const shared::ColorHandler &h = colorHandler();
-    QPen pen = h.pen();
-    pen.setCapStyle(Qt::FlatCap);
-    pen.setStyle(Qt::SolidLine);
-    setPen(pen);
-    setBrush(h.brush());
-    update();
-}
-
 shared::ui::TextItem *DVNodeGraphicsItem::initTextItem()
 {
     auto textItem = shared::ui::VERectGraphicsItem::initTextItem();

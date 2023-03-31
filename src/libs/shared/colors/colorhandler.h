@@ -20,8 +20,11 @@
 #include <QBrush>
 #include <QColor>
 #include <QExplicitlySharedDataPointer>
+#include <QFont>
+#include <QObject>
 #include <QPen>
 #include <QSharedData>
+#include <QVersionNumber>
 
 class QJsonObject;
 
@@ -31,13 +34,32 @@ struct ColorHandlerData;
 
 class ColorHandler
 {
+    Q_GADGET
 public:
     enum FillType
     {
+        None = -1,
         Color = 0,
         GradientVertical,
         GradientHorizontal,
     };
+    Q_ENUM(FillType);
+
+    enum Alignment
+    {
+        Left = Qt::AlignLeft | Qt::AlignVCenter,
+        TopLeft = Qt::AlignLeft | Qt::AlignTop,
+        Top = Qt::AlignHCenter | Qt::AlignTop,
+        TopRight = Qt::AlignRight | Qt::AlignTop,
+        Right = Qt::AlignRight | Qt::AlignVCenter,
+        BottomRight = Qt::AlignRight | Qt::AlignBottom,
+        Bottom = Qt::AlignHCenter | Qt::AlignBottom,
+        BottomLeft = Qt::AlignLeft | Qt::AlignBottom,
+        Center = Qt::AlignCenter,
+    };
+    Q_ENUM(Alignment);
+
+    static QVersionNumber currentVersion();
 
     ColorHandler();
     ColorHandler(const ColorHandler &other);
@@ -54,6 +76,9 @@ public:
     QColor penColor() const;
     void setPenColor(const QColor &color);
 
+    Qt::PenStyle penStyle() const;
+    void setPenStyle(Qt::PenStyle style);
+
     QColor brushColor0() const;
     void setBrushColor0(const QColor &color);
 
@@ -63,8 +88,23 @@ public:
     QString group() const;
     void setGroup(const QString &group);
 
-    static ColorHandler fromJson(const QJsonObject &jObj);
-    QJsonObject toJson() const;
+    QFont font() const;
+    void setFont(const QFont &font);
+
+    QColor textColor() const;
+    void setTextColor(const QColor &color);
+
+    Alignment textAlignment() const;
+    void setTextAlignment(Alignment alignment);
+
+    static ColorHandler fromJson(const QVersionNumber &version, const QJsonObject &jObj);
+    QJsonObject toJson(const QVersionNumber &version = currentVersion()) const;
+
+    void detach();
+
+private:
+    static void loadFromJson(ColorHandler *h, const QJsonObject &jObj);
+    static QJsonObject storeToJson(const ColorHandler *h);
 
 private:
     QExplicitlySharedDataPointer<ColorHandlerData> d;
@@ -72,10 +112,12 @@ private:
 
 struct ColorHandlerData : public QSharedData {
     ColorHandler::FillType fillType { ColorHandler::FillType::Color };
-    qreal penWidth { 1.0 };
-    QColor penColor { Qt::black };
+    QPen pen;
+    QFont font;
     QColor brushColor0 { Qt::black };
     QColor brushColor1 { Qt::white };
+    QColor textColor { Qt::black };
+    ColorHandler::Alignment alignment;
     QString group { "IVE" };
 };
 

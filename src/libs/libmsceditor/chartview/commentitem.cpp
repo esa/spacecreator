@@ -418,6 +418,11 @@ void CommentItem::onManualResizeProgress(shared::ui::GripPoint *gp, const QPoint
     }
 }
 
+shared::ColorManager::HandledColors CommentItem::handledColorType() const
+{
+    return shared::ColorManager::HandledColors::CommentMsc;
+}
+
 void CommentItem::onLinkedItemMoved(const QPointF &from, const QPointF &to)
 {
     moveBy(to.x() - from.x(), to.y() - from.y());

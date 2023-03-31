@@ -120,14 +120,6 @@ void IVFunctionGraphicsItem::onManualMoveFinish(
     IVFunctionTypeGraphicsItem::onManualMoveFinish(grip, pressedAt, releasedAt);
 }
 
-void IVFunctionGraphicsItem::alignTextItem() const
-{
-    QPointF myCenter = boundingRect().center();
-    QRectF textRect = m_textItem->boundingRect();
-    textRect.moveCenter(myCenter);
-    m_textItem->setPos(textRect.topLeft());
-}
-
 shared::ColorManager::HandledColors IVFunctionGraphicsItem::handledColorType() const
 {
     if (isRootItem())
@@ -147,46 +139,6 @@ shared::ui::TextItem *IVFunctionGraphicsItem::initTextItem()
     textItem->setVisible(!isRootItem());
     textItem->setTextAlignment(Qt::AlignCenter);
     return textItem;
-}
-
-void IVFunctionGraphicsItem::applyColorScheme()
-{
-    const shared::ColorHandler &h = colorHandler();
-    QPen p = h.pen();
-    QBrush b = h.brush();
-
-    if (auto parentFunction = qgraphicsitem_cast<IVFunctionGraphicsItem *>(parentItem())) {
-        if (!parentFunction->entity()->hasEntityAttribute(QLatin1String("color"))
-                && !entity()->hasEntityAttribute(QLatin1String("color"))
-                && parentFunction->handledColorType()
-                        == shared::ColorManager::HandledColors::FunctionRegular) { // [Hm...]
-            b.setColor(parentFunction->brush().color().darker(125));
-            p.setColor(parentFunction->pen().color().darker(125));
-        }
-    }
-
-    if (entity()->isMarked()) {
-        const shared::ColorHandler ch =
-                shared::ColorManager::instance()->colorsForItem(shared::ColorManager::ConnectionFlow);
-        p = QPen(ch.penColor(), ch.penWidth());
-    }
-
-    if (pen() == p && brush() == b)
-        return;
-
-    setPen(p);
-    setBrush(b);
-
-    // During undo, a child can be updated before its parent,
-    // so on the step marked as [Hm...] above, the parent is still of type FunctionPartial and not the
-    // FunctionRegular. Thus, the child gets the "default" colour, instead of "parent.darker". For now, I can't see
-    // a better way but just to update children colours manually:
-    for (auto child : childItems())
-        if (child->type() == IVFunctionGraphicsItem::Type)
-            if (auto nestedFunction = qobject_cast<IVFunctionGraphicsItem *>(child->toGraphicsObject()))
-                nestedFunction->applyColorScheme();
-
-    update();
 }
 
 IVFunctionGraphicsItem::IVFunctionGraphicsItem(

@@ -187,6 +187,11 @@ void ChartItem::initGripPoints()
             &ChartItem::onManualGeometryChangeFinished, Qt::UniqueConnection);
 }
 
+shared::ColorManager::HandledColors ChartItem::handledColorType() const
+{
+    return shared::ColorManager::HandledColors::Chart;
+}
+
 void ChartItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(painter);

@@ -975,6 +975,11 @@ QVariant MessageItem::itemChange(QGraphicsItem::GraphicsItemChange change, const
     return InteractiveObject::itemChange(change, value);
 }
 
+shared::ColorManager::HandledColors MessageItem::handledColorType() const
+{
+    return shared::ColorManager::HandledColors::MessageRegular;
+}
+
 void MessageItem::extendGlobalMessage()
 {
     if (!m_targetInstance && !m_sourceInstance)

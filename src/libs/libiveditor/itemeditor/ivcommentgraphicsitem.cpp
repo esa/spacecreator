@@ -126,17 +126,6 @@ shared::ui::TextItem *IVCommentGraphicsItem::initTextItem()
     return textItem;
 }
 
-void IVCommentGraphicsItem::applyColorScheme()
-{
-    const shared::ColorHandler &h = colorHandler();
-    QPen pen = h.pen();
-    pen.setCapStyle(Qt::FlatCap);
-    pen.setStyle(Qt::SolidLine);
-    setPen(pen);
-    setBrush(h.brush());
-    update();
-}
-
 void IVCommentGraphicsItem::updateEntityTitle(const QString &text)
 {
     const QString newName = ivm::IVNameValidator::encodeName(entity()->type(), text);

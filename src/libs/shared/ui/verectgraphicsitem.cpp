@@ -38,7 +38,6 @@ VERectGraphicsItem::VERectGraphicsItem(VEObject *entity, QGraphicsItem *parentGr
     setHighlightable(true);
 }
 
-
 bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
 {
     if (sceneGeometry == sceneBoundingRect())
@@ -48,13 +47,10 @@ bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
     bool sceneGeometryIsResize = sceneBoundingRect().size() != sceneGeometry.size();
     const QPointF shift = sceneBoundingRect().topLeft() - sceneGeometry.topLeft();
     setPos(mapToParent(mapFromScene(sceneGeometry.topLeft())));
-    if (sceneGeometryIsResize)
-    {
-        for (QGraphicsItem *child : childItems())
-        {
+    if (sceneGeometryIsResize) {
+        for (QGraphicsItem *child : childItems()) {
             auto iObj = qobject_cast<VERectGraphicsItem *>(child->toGraphicsObject());
-            if (iObj)
-            {
+            if (iObj) {
                 iObj->moveBy(shift.x(), shift.y());
             }
         }
@@ -75,8 +71,7 @@ bool VERectGraphicsItem::setGeometry(const QRectF &sceneGeometry)
 
 void VERectGraphicsItem::setRect(const QRectF &geometry)
 {
-    if (setGeometry(geometry))
-    {
+    if (setGeometry(geometry)) {
         instantLayoutUpdate();
     }
 }
@@ -133,8 +128,7 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
 
 void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
-    if (from == to)
-    {
+    if (from == to) {
         return;
     }
 
@@ -144,11 +138,9 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
 
     // Update positions of interface attachment points (iface)
     const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
-    for (auto child : childItems())
-    {
+    for (auto child : childItems()) {
         auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
-        if (iface)
-        {
+        if (iface) {
             // Read the stored coordinates
             const VEObject *obj = iface->entity();
             Q_ASSERT(obj);
@@ -157,8 +149,7 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
             }
 
             const QPointF storedPos = graphicsviewutils::pos(obj->coordinates());
-            if (storedPos.isNull())
-            {
+            if (storedPos.isNull()) {
                 iface->instantLayoutUpdate();
                 continue;
             }
@@ -184,25 +175,21 @@ void VERectGraphicsItem::layoutInterfaces()
 
 void VERectGraphicsItem::updateTextPosition()
 {
-    if (m_textItem)
-    {
+    if (m_textItem) {
         m_textItem->setExplicitSize(boundingRect().size());
     }
 }
 
-
 void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    if (pressedAt == releasedAt)
-    {
+    if (pressedAt == releasedAt) {
         return;
     }
 
     const QRectF rect = sceneBoundingRect();
     bool isBounded = shared::graphicsviewutils::isBounded(this, rect);
     bool noCollision = !shared::graphicsviewutils::isCollided(this, rect);
-    if (isBounded && noCollision)
-    {
+    if (isBounded && noCollision) {
         layoutInterfaces();
         layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::PartialRebuild);
         updateEntity();
@@ -210,14 +197,11 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pr
     layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
 
     // If a collision takes place, reread all positions from the model
-    if (shared::graphicsviewutils::isCollided(this, rect))
-    {
+    if (shared::graphicsviewutils::isCollided(this, rect)) {
         updateFromEntity();
         // Make children update from entity also
-        for (auto child : childItems())
-        {
-            if (auto connectionEndPoint = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject()))
-            {
+        for (auto child : childItems()) {
+            if (auto connectionEndPoint = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject())) {
                 connectionEndPoint->updateFromEntity();
             }
         }
@@ -248,7 +232,6 @@ QSizeF VERectGraphicsItem::minimumSize() const
     return QSizeF(100, 50);
 }
 
-
 QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, const QPointF &to)
 {
     QRectF sBoundingRect = sceneBoundingRect();
@@ -256,39 +239,35 @@ QRectF VERectGraphicsItem::resizedRect(GripPoint *grip, const QPointF &from, con
     return rectWithRespectToConnections;
 }
 
-
 QRectF VERectGraphicsItem::checkConnectionEndpoints(GripPoint *grip, const QPointF &to, const QRectF &sceneBoundingRect)
 {
     QRectF result = sceneBoundingRect;
-    // Note: In QGraphicsView the Y-axis grows downwards. https://doc.qt.io/qt-6/graphicsview.html#the-graphics-view-coordinate-system
+    // Note: In QGraphicsView the Y-axis grows downwards.
+    // https://doc.qt.io/qt-6/graphicsview.html#the-graphics-view-coordinate-system
     qreal leftMost = result.right(); // The furthest to the left, the right-grip can go is the right side of the rect.
     qreal rightMost = result.left(); // The furthes to the right, the left-grip can go is the left side of the rect.
     qreal topMost = result.bottom(); // The deepest the top-grip can go, is the bottom of the rect.
     qreal bottomMost = result.top(); // The highest the bottom-grip can go, is the top of the rect.
 
-    for (auto child: childItems())
-    {
+    for (auto child : childItems()) {
         auto endPoint = qobject_cast<ui::VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
-        if (endPoint == nullptr)
-        {
+        if (endPoint == nullptr) {
             continue;
         }
 
         auto alignment = endPoint->alignment();
         bool endPointIsHorizonal = alignment == Qt::AlignTop || alignment == Qt::AlignBottom;
-        bool endPointIsVertical =  alignment == Qt::AlignLeft || alignment == Qt::AlignRight;
+        bool endPointIsVertical = alignment == Qt::AlignLeft || alignment == Qt::AlignRight;
         Q_ASSERT(endPointIsHorizonal || endPointIsVertical);
         auto childSceneBoundingRect = endPoint->sceneBoundingRect();
-        if (endPointIsHorizonal)
-        {
+        if (endPointIsHorizonal) {
             auto left = childSceneBoundingRect.left();
             leftMost = qMin(leftMost, left);
 
             auto right = childSceneBoundingRect.right();
             rightMost = qMax(rightMost, right);
         }
-        if (endPointIsVertical)
-        {
+        if (endPointIsVertical) {
             auto top = childSceneBoundingRect.top();
             topMost = qMin(topMost, top);
 
@@ -298,43 +277,35 @@ QRectF VERectGraphicsItem::checkConnectionEndpoints(GripPoint *grip, const QPoin
     }
 
     switch (grip->location()) {
-    case GripPoint::Left:
-    {
+    case GripPoint::Left: {
         result.setLeft(qMin(to.x(), leftMost));
         break;
     }
-    case GripPoint::Right:
-    {
+    case GripPoint::Right: {
         result.setRight(qMax(to.x(), rightMost));
         break;
     }
-    case GripPoint::Top:
-    {
+    case GripPoint::Top: {
         result.setTop(qMin(to.y(), topMost));
         break;
     }
-    case GripPoint::Bottom:
-    {
+    case GripPoint::Bottom: {
         result.setBottom(qMax(to.y(), bottomMost));
         break;
     }
-    case GripPoint::TopLeft:
-    {
+    case GripPoint::TopLeft: {
         result.setTopLeft(QPoint(qMin(to.x(), leftMost), qMin(to.y(), topMost)));
         break;
     }
-    case GripPoint::TopRight:
-    {
+    case GripPoint::TopRight: {
         result.setTopRight(QPoint(qMax(to.x(), rightMost), qMin(to.y(), topMost)));
         break;
     }
-    case GripPoint::BottomLeft:
-    {
+    case GripPoint::BottomLeft: {
         result.setBottomLeft(QPoint(qMin(to.x(), leftMost), qMax(to.y(), bottomMost)));
         break;
     }
-    case GripPoint::BottomRight:
-    {
+    case GripPoint::BottomRight: {
         result.setBottomRight(QPoint(qMax(to.x(), rightMost), qMax(to.y(), bottomMost)));
         break;
     }
@@ -406,19 +377,15 @@ void VERectGraphicsItem::onGeometryChanged()
 
 bool VERectGraphicsItem::doLayout()
 {
-    if (layoutShouldBeChanged())
-    {
+    if (layoutShouldBeChanged()) {
         const auto parentFunction = qobject_cast<VERectGraphicsItem *>(parentObject());
 
         QRectF boundedRect;
         QMarginsF margins;
-        if (parentFunction)
-        {
+        if (parentFunction) {
             boundedRect = parentFunction->sceneBoundingRect();
             margins = graphicsviewutils::kContentMargins;
-        }
-        else
-        {
+        } else {
             boundedRect = scene()->itemsBoundingRect();
             margins = graphicsviewutils::kRootMargins;
         }
@@ -426,9 +393,9 @@ bool VERectGraphicsItem::doLayout()
         QRectF itemRect = QRectF(QPointF(0, 0), minimumSize());
         itemRect.moveTopLeft(boundedRect.topLeft());
 
-        graphicsviewutils::findGeometryForRect(itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), margins);
-        if (itemRect != sceneBoundingRect())
-        {
+        graphicsviewutils::findGeometryForRect(
+                itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), margins);
+        if (itemRect != sceneBoundingRect()) {
             setRect(itemRect);
             return true;
         }
@@ -439,13 +406,11 @@ bool VERectGraphicsItem::doLayout()
 bool VERectGraphicsItem::layoutShouldBeChanged() const
 {
     const QRectF currentRect = sceneBoundingRect();
-    if (!currentRect.isValid())
-    {
+    if (!currentRect.isValid()) {
         return true;
     }
 
     bool collidesWithOther = graphicsviewutils::isCollided(this, currentRect);
-
 
     return collidesWithOther || !graphicsviewutils::isBounded(this, currentRect);
 }

@@ -147,6 +147,11 @@ cif::CifLine::CifType CoregionItem::mainCifType() const
     return cif::CifLine::CifType::Concurrent;
 }
 
+shared::ColorManager::HandledColors CoregionItem::handledColorType() const
+{
+    return shared::ColorManager::HandledColors::CoRegion;
+}
+
 void CoregionItem::setInstance(InstanceItem *instance)
 {
     if (instance == m_instance) {

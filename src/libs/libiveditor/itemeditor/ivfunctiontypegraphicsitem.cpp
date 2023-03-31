@@ -43,6 +43,7 @@
 #include <QGraphicsView>
 #include <QMessageBox>
 #include <QPainter>
+#include <QStyle>
 #include <QTextDocument>
 #include <QtDebug>
 
@@ -128,11 +129,9 @@ QString IVFunctionTypeGraphicsItem::prepareTooltip() const
 void IVFunctionTypeGraphicsItem::updateTextPosition()
 {
     // To an IVFunctionTypeGraphicsItem an m_textItem is the name label in the center of the box
-
     if (!m_textItem) {
         return;
     }
-
     const QRectF targetTextRect = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
 
     // reset m_textItems's size
@@ -141,33 +140,23 @@ void IVFunctionTypeGraphicsItem::updateTextPosition()
 
     // Set text width so that it does not exeed the boundaries of the this instance's bounding box
     const QSizeF maxTxtSize = targetTextRect.size();
-    const QSizeF txtSize = m_textItem->document()->size();
+    QSizeF txtSize = m_textItem->document()->size();
     bool labelBiggerThanBox = txtSize.width() > maxTxtSize.width() || txtSize.height() > maxTxtSize.height();
     if (labelBiggerThanBox) {
-        m_textItem->setExplicitSize(maxTxtSize);
+        txtSize = maxTxtSize;
     }
+    m_textItem->setExplicitSize(txtSize);
 
-    // place the text item at top-left of this instance's bounding box
-    alignTextItem();
+    auto itemRect = QStyle::alignedRect(Qt::LayoutDirection::LayoutDirectionAuto, m_textItem->textAlignment(),
+            txtSize.toSize(), targetTextRect.toAlignedRect());
+    m_textItem->setPos(itemRect.topLeft());
 }
 
 shared::ColorManager::HandledColors IVFunctionTypeGraphicsItem::handledColorType() const
 {
-    return shared::ColorManager::HandledColors::FunctionType;
-}
 
-void IVFunctionTypeGraphicsItem::applyColorScheme()
-{
-    const shared::ColorHandler &h = colorHandler();
-    if (entity()->isMarked()) {
-        const shared::ColorHandler ch =
-                shared::ColorManager::instance()->colorsForItem(shared::ColorManager::ConnectionFlow);
-        setPen(QPen(ch.penColor(), ch.penWidth()));
-    } else {
-        setPen(h.pen());
-    }
-    setBrush(h.brush());
-    update();
+    return entity()->isMarked() ? shared::ColorManager::HandledColors::FunctionTypeHighlighted
+                                : shared::ColorManager::HandledColors::FunctionType;
 }
 
 void IVFunctionTypeGraphicsItem::updateNameFromUi(const QString &name)
@@ -279,15 +268,6 @@ QRectF IVFunctionTypeGraphicsItem::resizedRectForTextLabel(
 bool IVFunctionTypeGraphicsItem::isRootItem() const
 {
     return !parentItem() && entity() && entity()->isRootObject();
-}
-
-void IVFunctionTypeGraphicsItem::alignTextItem() const
-{
-    auto myRectWithoutMargins = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
-    auto myTopLeft = myRectWithoutMargins.topLeft();
-    QRectF textRect = m_textItem->boundingRect();
-    textRect.moveTopLeft(myTopLeft);
-    m_textItem->setPos(textRect.topLeft());
 }
 
 shared::ui::TextItem *IVFunctionTypeGraphicsItem::initTextItem()

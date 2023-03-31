@@ -52,16 +52,11 @@ public:
 
     QPainterPath shape() const override;
 
-public Q_SLOTS:
-    void applyColorScheme() override;
-
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void onManualMoveProgress(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
     void onManualMoveFinish(shared::ui::GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt) override;
-
-    virtual void alignTextItem() const override;
 
     virtual shared::ColorManager::HandledColors handledColorType() const override;
     shared::ui::TextItem *initTextItem() override;

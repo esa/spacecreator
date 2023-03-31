@@ -17,15 +17,19 @@
 
 #pragma once
 
-#include "colormanager.h"
+#include "colorhandler.h"
 
 #include <QWidget>
 
 namespace Ui {
 class ColorHandlerEditor;
 }
-
+class EntityAttribute;
 namespace shared {
+class PropertyTemplateConfig;
+namespace ui {
+class VEInteractiveObject;
+}
 
 class ColorHandlerEditor : public QWidget
 {
@@ -35,22 +39,37 @@ public:
     explicit ColorHandlerEditor(QWidget *parent = nullptr);
     ~ColorHandlerEditor();
 
-    void setColorHandler(ColorHandler *h);
-    ColorHandler *colorHandler() const;
+    void setInteractiveObject(ui::VEInteractiveObject *iObject, PropertyTemplateConfig *propertiesConfig);
+    ui::VEInteractiveObject *interactiveObject() const;
+
+    void setColorHandler(const std::optional<ColorHandler> &h);
+    std::optional<ColorHandler> colorHandler() const;
 
 Q_SIGNALS:
     void colorHandlerValueChanged();
+    void entityAttributeChanged(const EntityAttribute &entityAttr);
 
 private Q_SLOTS:
     void on_sbWidth_valueChanged(qreal v);
     void on_btnColorStroke_colorChanged(const QColor &c);
+    void on_comboBoxPenStyle_currentIndexChanged(int idx);
     void on_cbFillType_currentIndexChanged(int id);
     void on_btnColor_colorChanged(const QColor &c);
     void on_btnColorStop_colorChanged(const QColor &c);
+    void on_btnTextColor_colorChanged(const QColor &c);
+    void on_comboBoxTextAlignment_currentIndexChanged(int idx);
+    void on_fontComboBox_currentFontChanged(const QFont &font);
+    void on_doubleSpinBoxFontSize_valueChanged(qreal v);
+    void on_comboBoxFontWeight_currentIndexChanged(int idx);
+    void resetObjectAttributes();
+
+private:
+    void validateControls(PropertyTemplateConfig *propertiesConfig);
 
 private:
     Ui::ColorHandlerEditor *ui;
-    ColorHandler *m_colorHandler { nullptr };
+    std::optional<ColorHandler> m_colorHandler;
+    ui::VEInteractiveObject *m_iObj { nullptr };
 };
 
-}
+} // namespace shared

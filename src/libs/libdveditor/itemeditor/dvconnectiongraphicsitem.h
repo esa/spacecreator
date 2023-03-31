@@ -43,9 +43,6 @@ public:
     int type() const override { return Type; }
     int itemLevel(bool isSelected) const override;
 
-protected Q_SLOTS:
-    void applyColorScheme() override;
-
 protected:
     shared::ColorManager::HandledColors handledColorType() const override;
 };

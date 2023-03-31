@@ -79,7 +79,7 @@ void IVInterfaceGraphicsItem::init()
     updateIface();
     updateKind();
     updateLabel();
-    setInterfaceName(ifaceLabel());
+    instantLayoutUpdate();
 }
 
 void IVInterfaceGraphicsItem::setInterfaceName(const QString &name)
@@ -190,7 +190,7 @@ void IVInterfaceGraphicsItem::updateFromEntity()
 
 void IVInterfaceGraphicsItem::onSelectionChanged(bool isSelected)
 {
-    const shared::ColorHandler &h = colorHandler();
+    const shared::ColorHandler h = colorHandler();
     m_iface->setBrush(isSelected ? kSelectedBackgroundColor : h.brush());
 }
 
@@ -295,12 +295,10 @@ qreal IVInterfaceGraphicsItem::typeIconHeight() const
 
 void IVInterfaceGraphicsItem::applyColorScheme()
 {
-    const shared::ColorHandler &h = colorHandler();
-    QPen pen = h.pen();
-    m_type->setPen(pen);
-    pen.setWidthF(pen.widthF() / 2.);
-    m_iface->setPen(pen);
-    m_iface->setBrush(h.brush());
+    shared::ui::VEConnectionEndPointGraphicsItem::applyColorScheme();
+    m_type->setPen(pen());
+    m_iface->setPen(pen());
+    m_iface->setBrush(brush());
     update();
 }
 

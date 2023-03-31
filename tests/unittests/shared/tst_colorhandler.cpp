@@ -38,9 +38,19 @@ void tst_ColorHandler::testSaveLoad()
     ch.setBrushColor1(QColor(0, 255, 64));
     ch.setGroup("Nexus");
 
-    QJsonObject exported = ch.toJson();
-    shared::ColorHandler ch2 = shared::ColorHandler::fromJson(exported);
+    QJsonObject exported = ch.toJson(QVersionNumber(1, 0));
+    shared::ColorHandler ch2 = shared::ColorHandler::fromJson(QVersionNumber(1, 0), exported);
+    QCOMPARE(ch.pen(), ch2.pen());
+    QCOMPARE(ch.brush(), ch2.brush());
+    QCOMPARE(ch.fillType(), ch2.fillType());
+    QCOMPARE(ch.penWidth(), ch2.penWidth());
+    QCOMPARE(ch.penColor(), ch2.penColor());
+    QCOMPARE(ch.brushColor0(), ch2.brushColor0());
+    QCOMPARE(ch.brushColor1(), ch2.brushColor1());
+    QCOMPARE(ch.group(), ch2.group());
 
+    exported = ch.toJson(shared::ColorHandler::currentVersion());
+    ch2 = shared::ColorHandler::fromJson(shared::ColorHandler::currentVersion(), exported);
     QCOMPARE(ch.pen(), ch2.pen());
     QCOMPARE(ch.brush(), ch2.brush());
     QCOMPARE(ch.fillType(), ch2.fillType());

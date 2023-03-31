@@ -29,13 +29,16 @@ class PropertiesDialog;
 namespace shared {
 class VEObject;
 class PropertyTemplateConfig;
+namespace ui {
+class VEInteractiveObject;
+}
 
 class PropertiesDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit PropertiesDialog(PropertyTemplateConfig *dynPropConfig, VEObject *obj,
+    explicit PropertiesDialog(PropertyTemplateConfig *dynPropConfig, ui::VEInteractiveObject *obj,
             cmd::CommandsStackBase *commandsStack, QWidget *parent = nullptr);
     ~PropertiesDialog() override;
 
@@ -45,6 +48,7 @@ public Q_SLOTS:
 protected:
     void insertTab(QWidget *widget, const QString &tabName, int idx = 0);
     void setCurrentTabIndex(int idx);
+    void initStyleView();
 
     virtual QString objectTypeName() const = 0;
     virtual void init();

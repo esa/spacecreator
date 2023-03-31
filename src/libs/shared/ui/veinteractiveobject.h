@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "colors/colormanager.h"
 #include "ui/interactiveobjectbase.h"
 
 #include <QFont>
@@ -33,7 +32,7 @@ class VEObject;
 namespace ui {
 class TextItem;
 
-class VEInteractiveObject : public ui::InteractiveObjectBase
+class VEInteractiveObject : public InteractiveObjectBase
 {
     Q_OBJECT
 public:
@@ -87,12 +86,19 @@ public:
     virtual void enableEditMode() {};
     virtual void childBoundingBoxChanged();
 
+    /**
+     * @brief colorHandler
+     * The default implementation of colorHandler uses 'handledColorType' to instantiate a ColorHandler
+     * @return a ColorHandler
+     */
+    shared::ColorHandler colorHandler() const override;
+
 Q_SIGNALS:
     void clicked(const QPointF &scenePos);
     void doubleClicked();
 
 public Q_SLOTS:
-    virtual void applyColorScheme() = 0;
+    virtual void applyColorScheme();
 
 protected:
     // Methods to be implemented by child classes
@@ -112,20 +118,6 @@ protected:
      * label for a function name, or an interface name next to the interface.
      */
     virtual void updateTextPosition() = 0;
-
-    /**
-     * @brief handledColorType
-     * Each child of of this class must be able to return its type as denoted by the enum ColorManager::HandledColors
-     * @return ColorManager::HandledColors
-     */
-    virtual ColorManager::HandledColors handledColorType() const = 0;
-
-    /**
-     * @brief colorHandler
-     * The default implementation of colorHandler uses 'handledColorType' to instantiate a ColorHandler
-     * @return a ColorHandler
-     */
-    virtual ColorHandler colorHandler() const;
 
     virtual bool isItemVisible() const;
 

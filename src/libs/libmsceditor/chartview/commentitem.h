@@ -60,6 +60,7 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void onManualMoveProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
     void onManualResizeProgress(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to) override;
+    shared::ColorManager::HandledColors handledColorType() const override;
 
 private Q_SLOTS:
     void onLinkedItemMoved(const QPointF &from, const QPointF &to);

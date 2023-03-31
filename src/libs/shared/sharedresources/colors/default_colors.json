@@ -100,6 +100,33 @@
             "pen_width": 1
         },
         {
+            "brush_color0": "#fffeffbb",
+            "brush_color1": "#ffe8e8aa",
+            "color_type": 11,
+            "fill_type": 1,
+            "group": "IVE",
+            "pen_color": "#ff000000",
+            "pen_width": 3
+        },
+        {
+            "brush_color0": "#fff9e29c",
+            "brush_color1": "#fffeffbb",
+            "color_type": 12,
+            "fill_type": 1,
+            "group": "IVE",
+            "pen_color": "#ff000000",
+            "pen_width": 3
+        },
+        {
+            "brush_color0": "#ff000000",
+            "brush_color1": "#ffffffff",
+            "color_type": 13,
+            "fill_type": 0,
+            "group": "IVE",
+            "pen_color": "#ff000000",
+            "pen_width": 3
+        },
+        {
             "brush_color0": "#ff999999",
             "brush_color1": "#ff999999",
             "color_type": 1001,

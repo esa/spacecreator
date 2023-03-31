@@ -93,6 +93,12 @@ QString ColorManager::handledColorTypeName(HandledColors t)
         return tr("Comment");
     case FunctionScale:
         return tr("Scaled nested content");
+    case FunctionHighlighted:
+        return tr("Highlighted function");
+    case FunctionTypeHighlighted:
+        return tr("Highlighted function type");
+    case ConnectionHighlighted:
+        return tr("Highlighted connection");
 
     case InstanceLine:
         return tr("Instance line");
@@ -140,13 +146,15 @@ bool ColorManager::setSourceFile(const QString &from)
 {
     QVersionNumber version(0, 0);
 
-    auto loadColorHandler = [this](const QJsonObject &jsonObject) {
-        const ColorHandler &ch = ColorHandler::fromJson(jsonObject);
+    auto loadColorHandler = [&](const QJsonObject &jsonObject) {
+        const ColorHandler ch = ColorHandler::fromJson(version, jsonObject);
         const HandledColors colorType = HandledColors(jsonObject["color_type"].toInt(HandledColors::Unhandled));
         switch (colorType) {
         case HandledColors::Unhandled:
             return false;
         default: {
+            /// Override values loaded from default color schema with
+            /// another from external data placed in `from` location
             m_colors[colorType] = ch;
             return true;
         }
@@ -196,6 +204,7 @@ bool ColorManager::setSourceFile(const QString &from)
     }
 
     if (m_colors.size() != QMetaEnum::fromType<shared::ColorManager::HandledColors>().keyCount() - 1) {
+        /// That means even default embedded color schema in resources doesn't cover all types
         return false;
     }
 
@@ -218,13 +227,13 @@ QString ColorManager::sourceFile() const
 bool ColorManager::save(const QString &fileName) const
 {
     QJsonObject jobj;
-    jobj.insert("version", "1.0");
+    jobj.insert("version", ColorHandler::currentVersion().toString());
 
     QJsonArray ja;
     for (const ColorManager::HandledColors &ct : handledColors()) {
-        ColorHandler ch = colorsForItem(ct);
+        const ColorHandler ch = colorsForItem(ct);
         QJsonObject jObj = ch.toJson();
-        jObj["color_type"] = ct;
+        jObj.insert("color_type", ct);
         ja.append(jObj);
     }
     jobj.insert("colors", ja);

@@ -57,4 +57,102 @@
         </Type>
         <Scopes/>
     </Attr>
+    <Attr name="Style::Pen::width" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <Real />
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Pen::color" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <String validator="#[0-9a-fA-F]{8}"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Pen::style" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <Enumeration>
+                <Entry value="NoPen"/>
+                <Entry value="SolidLine"/>
+                <Entry value="DashLine"/>
+                <Entry value="DotLine"/>
+                <Entry value="DashDotLine"/>
+                <Entry value="DashDotDotLine"/>
+            </Enumeration>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Brush::fillType" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <Enumeration>
+                <Entry value="None"/>
+                <Entry value="Color"/>
+                <Entry value="GradientVertical"/>
+                <Entry value="GradientHorizontal"/>
+            </Enumeration>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Brush::color0" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <String validator="#[0-9a-fA-F]{8}"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Brush::color1" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <String validator="#[0-9a-fA-F]{8}"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Text::color" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <String validator="#[0-9a-fA-F]{8}"/>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Text::alignment" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <Enumeration>
+                <Entry value="Center"/>
+                <Entry value="Left"/>
+                <Entry value="TopLeft"/>
+                <Entry value="Top"/>
+                <Entry value="TopRight"/>
+                <Entry value="Right"/>
+                <Entry value="BottomRight"/>
+                <Entry value="Bottom"/>
+                <Entry value="BottomLeft"/>
+            </Enumeration>
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Font::family" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <String />
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Font::pointSize" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <Real />
+        </Type>
+        <Scopes/>
+    </Attr>
+    <Attr name="Style::Font::weight" type="property" visible="false" editable="false" export="UI" optional="true">
+        <Type>
+            <Enumeration>
+                <Entry value="Thin"/>
+                <Entry value="ExtraLight"/>
+                <Entry value="Light"/>
+                <Entry value="Normal"/>
+                <Entry value="Medium"/>
+                <Entry value="DemiBold"/>
+                <Entry value="Bold"/>
+                <Entry value="ExtraBold"/>
+                <Entry value="Black"/>
+            </Enumeration>
+        </Type>
+        <Scopes/>
+    </Attr>
 </Attrs>

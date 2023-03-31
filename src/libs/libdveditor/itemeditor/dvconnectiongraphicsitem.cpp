@@ -49,15 +49,4 @@ shared::ColorManager::HandledColors DVConnectionGraphicsItem::handledColorType()
     return shared::ColorManager::HandledColors::BusConnection;
 }
 
-void DVConnectionGraphicsItem::applyColorScheme()
-{
-    const shared::ColorHandler &h = colorHandler();
-    QPen pen = h.pen();
-    pen.setCapStyle(Qt::FlatCap);
-    pen.setStyle(Qt::SolidLine);
-    setPen(pen);
-    setBrush(h.brush());
-    update();
-}
-
 } // namespace dve

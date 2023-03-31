@@ -288,4 +288,9 @@ cif::CifLine::CifType ConditionItem::mainCifType() const
     return cif::CifLine::CifType::Condition;
 }
 
+shared::ColorManager::HandledColors ConditionItem::handledColorType() const
+{
+    return shared::ColorManager::HandledColors::Condition;
+}
+
 } // namespace msc

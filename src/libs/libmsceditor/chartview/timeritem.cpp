@@ -257,6 +257,11 @@ cif::CifLine::CifType TimerItem::mainCifType() const
     return cif::CifLine::CifType::Timeout;
 }
 
+shared::ColorManager::HandledColors TimerItem::handledColorType() const
+{
+    return shared::ColorManager::HandledColors::Timer;
+}
+
 void TimerItem::onTextEdited(const QString &text)
 {
     if (text.isEmpty()) {

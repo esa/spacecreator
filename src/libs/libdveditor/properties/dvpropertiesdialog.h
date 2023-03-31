@@ -22,6 +22,9 @@
 #include <QPointer>
 
 namespace shared {
+namespace ui {
+class VEInteractiveObject;
+}
 namespace cmd {
 class CommandsStackBase;
 class PropertyTemplateConfig;
@@ -41,7 +44,7 @@ namespace dve {
 class DVPropertiesDialog : public shared::PropertiesDialog
 {
 public:
-    DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, dvm::DVObject *obj,
+    DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, shared::ui::VEInteractiveObject *uiObj,
             dvm::AbstractSystemChecks *systemChecker, Asn1Acn::Asn1SystemChecks *asn1Checks,
             shared::cmd::CommandsStackBase *commandsStack, QWidget *parent = nullptr);
 

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "colors/colormanager.h"
 #include "grippoint.h"
 
 #include <QGraphicsObject>
@@ -105,6 +106,20 @@ protected:
     virtual void hideGripPoints();
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+    /**
+     * @brief handledColorType
+     * Each child of of this class must be able to return its type as denoted by the enum ColorManager::HandledColors
+     * @return ColorManager::HandledColors
+     */
+    virtual shared::ColorManager::HandledColors handledColorType() const = 0;
+
+    /**
+     * @brief colorHandler
+     * The default implementation of colorHandler uses 'handledColorType' to instantiate a ColorHandler
+     * @return a ColorHandler
+     */
+    virtual ColorHandler colorHandler() const;
 
 protected Q_SLOTS:
     virtual void rebuildLayout();

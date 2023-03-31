@@ -35,7 +35,7 @@ namespace ui {
 static const qreal kClickTreshold = 5;
 
 VEInteractiveObject::VEInteractiveObject(VEObject *entity, QGraphicsItem *parent)
-    : ui::InteractiveObjectBase(parent)
+    : InteractiveObjectBase(parent)
     , m_dataObject(entity)
     , m_textItem(nullptr)
 {
@@ -58,6 +58,23 @@ void VEInteractiveObject::init()
     applyColorScheme();
 }
 
+void VEInteractiveObject::applyColorScheme()
+{
+    const shared::ColorHandler h = colorHandler();
+    setPen(h.pen());
+    setFont(h.font());
+    setBrush(h.brush());
+
+    if (m_textItem) {
+        m_textItem->setTextAlignment(static_cast<Qt::Alignment>(h.textAlignment()));
+        m_textItem->setFont(h.font());
+        m_textItem->setDefaultTextColor(h.textColor());
+        updateTextPosition();
+    }
+
+    update();
+}
+
 TextItem *VEInteractiveObject::initTextItem()
 {
     auto textItem = new TextItem(this);
@@ -68,6 +85,95 @@ TextItem *VEInteractiveObject::initTextItem()
     textItem->setTextInteractionFlags(Qt::TextBrowserInteraction);
     textItem->setOpenExternalLinks(true);
     return textItem;
+}
+
+shared::ColorHandler VEInteractiveObject::colorHandler() const
+{
+    using namespace StyleAttribute;
+    shared::ColorHandler h = InteractiveObjectBase::colorHandler();
+    // Read color from entity (the model) and set it on the colorhandler
+    if (auto ivObj = entity()) {
+        if (ivObj->hasEntityAttribute(QLatin1String("color"))) {
+            h.detach();
+        } else {
+            const auto attrs = ivObj->entityAttributes();
+            const bool hasStyleAttr = std::any_of(attrs.cbegin(), attrs.cend(),
+                    [](const auto &attr) { return attr.name().startsWith(QLatin1String("Style::")); });
+            if (hasStyleAttr) {
+                h.detach();
+            }
+        }
+
+        if (ivObj->hasEntityAttribute(QLatin1String("color"))) { // keep single custom color
+            h.setFillType(shared::ColorHandler::FillType::Color);
+            h.setBrushColor0(QColor(ivObj->entityAttributeValue<QString>(QLatin1String("color"))));
+        }
+
+        bool ok;
+        if (ivObj->hasEntityAttribute(kPenWidth)) {
+            const qreal penWidth = ivObj->entityAttributeValue(kPenWidth).toDouble(&ok);
+            if (ok) {
+                h.setPenWidth(penWidth);
+            }
+        }
+        if (ivObj->hasEntityAttribute(kPenColor)) {
+            const QString penColorName = ivObj->entityAttributeValue<QString>(kPenColor);
+            if (QColor::isValidColorName(penColorName)) {
+                h.setPenColor(penColorName);
+            }
+        }
+        if (ivObj->hasEntityAttribute(kPenStyle)) {
+            const QString penStyle = ivObj->entityAttributeValue<QString>(kPenStyle);
+            h.setPenStyle(shared::typeFromName<Qt::PenStyle>(penStyle));
+        }
+
+        if (ivObj->hasEntityAttribute(kBrushFillType)) {
+            const QString brushFillType = ivObj->entityAttributeValue<QString>(kBrushFillType);
+            auto a = shared::typeFromName<ColorHandler::FillType>(brushFillType);
+            h.setFillType(a);
+        }
+        if (ivObj->hasEntityAttribute(kBrushColor0)) {
+            const QString brushColor0Name = ivObj->entityAttributeValue<QString>(kBrushColor0);
+            if (QColor::isValidColorName(brushColor0Name)) {
+                h.setBrushColor0(brushColor0Name);
+            }
+        }
+        if (ivObj->hasEntityAttribute(kBrushColor1)) {
+            const QString brushColor1Name = ivObj->entityAttributeValue<QString>(kBrushColor1);
+            if (QColor::isValidColorName(brushColor1Name)) {
+                h.setBrushColor1(brushColor1Name);
+            }
+        }
+
+        if (ivObj->hasEntityAttribute(kTextColor)) {
+            const QString textColorName = ivObj->entityAttributeValue<QString>(kTextColor);
+            if (QColor::isValidColorName(textColorName)) {
+                h.setTextColor(textColorName);
+            }
+        }
+        if (ivObj->hasEntityAttribute(kTextAlignment)) {
+            const QString textAlignment = ivObj->entityAttributeValue<QString>(kTextAlignment);
+            h.setTextAlignment(shared::typeFromName<ColorHandler::Alignment>(textAlignment));
+        }
+
+        QFont handlerFont = h.font();
+        if (ivObj->hasEntityAttribute(kFontFamily)) {
+            const QString fontFamily = ivObj->entityAttributeValue<QString>(kFontFamily);
+            handlerFont.setFamily(fontFamily);
+        }
+        if (ivObj->hasEntityAttribute(kFontPointSize)) {
+            const qreal fontPointSize = ivObj->entityAttributeValue(kFontPointSize).toDouble(&ok);
+            if (ok) {
+                handlerFont.setPointSizeF(fontPointSize);
+            }
+        }
+        if (ivObj->hasEntityAttribute(kFontWeight)) {
+            const QString fontWeight = ivObj->entityAttributeValue<QString>(kFontWeight);
+            handlerFont.setWeight(shared::typeFromName<QFont::Weight>(fontWeight));
+        }
+        h.setFont(handlerFont);
+    }
+    return h;
 }
 
 shared::VEObject *VEInteractiveObject::entity() const
@@ -191,21 +297,6 @@ void VEInteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_EMIT doubleClicked();
     QGraphicsObject::mouseDoubleClickEvent(event);
-}
-
-shared::ColorHandler VEInteractiveObject::colorHandler() const
-{
-    // Get colorHandler for the type of this instance type
-    shared::ColorHandler h = shared::ColorManager::instance()->colorsForItem(handledColorType());
-    // Read color from entity (the model) and set it on the colorhandler
-    if (auto ivObj = entity()) {
-        if (ivObj->hasEntityAttribute(QLatin1String("color"))) { // keep single custom color
-            h.setFillType(shared::ColorHandler::Color);
-            h.setBrushColor0(QColor(ivObj->entityAttributeValue<QString>(QLatin1String("color"))));
-        }
-    }
-
-    return h;
 }
 
 void VEInteractiveObject::setCommandsStack(cmd::CommandsStackBase *commandsStack)

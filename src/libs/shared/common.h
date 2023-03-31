@@ -46,6 +46,20 @@ extern const char *kDeploymentAttrs;
 extern const char *kDeploymentLibrary;
 }
 
+namespace StyleAttribute {
+static const QString kPenWidth = QLatin1String("Style::Pen::width");
+static const QString kPenColor = QLatin1String("Style::Pen::color");
+static const QString kPenStyle = QLatin1String("Style::Pen::style");
+static const QString kBrushFillType = QLatin1String("Style::Brush::fillType");
+static const QString kBrushColor0 = QLatin1String("Style::Brush::color0");
+static const QString kBrushColor1 = QLatin1String("Style::Brush::color1");
+static const QString kTextColor = QLatin1String("Style::Text::color");
+static const QString kTextAlignment = QLatin1String("Style::Text::alignment");
+static const QString kFontFamily = QLatin1String("Style::Font::family");
+static const QString kFontPointSize = QLatin1String("Style::Font::pointSize");
+static const QString kFontWeight = QLatin1String("Style::Font::weight");
+}
+
 class DropData : public QMimeData
 {
     Q_OBJECT

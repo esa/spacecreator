@@ -157,11 +157,14 @@ void VEItemModel::onObjectRemoved(shared::Id objectId)
     }
 }
 
-void VEItemModel::onObjectAttributeChanged()
+void VEItemModel::onObjectAttributeChanged(const QString &attrName)
 {
     if (auto senderObject = qobject_cast<VEObject *>(sender())) {
         if (auto item = m_items.value(senderObject->id())) {
             updateItem(item);
+            if (attrName.startsWith(QLatin1String("Style::"))) {
+                item->applyColorScheme();
+            }
         }
     }
 }

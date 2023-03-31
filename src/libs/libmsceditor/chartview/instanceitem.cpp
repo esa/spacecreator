@@ -385,6 +385,12 @@ cif::CifLine::CifType InstanceItem::mainCifType() const
     return cif::CifLine::CifType::Instance;
 }
 
+shared::ColorManager::HandledColors InstanceItem::handledColorType() const
+{
+    return ivFunctionOk() ? shared::ColorManager::HandledColors::InstanceLine
+                          : shared::ColorManager::HandledColors::InstanceErrorLine;
+}
+
 /**
     Applies the x-position of the instance if it is stored in the CIF information.
     The y-values are ignored

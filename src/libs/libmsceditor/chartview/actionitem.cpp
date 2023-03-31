@@ -241,4 +241,9 @@ cif::CifLine::CifType ActionItem::mainCifType() const
     return cif::CifLine::CifType::Action;
 }
 
+shared::ColorManager::HandledColors ActionItem::handledColorType() const
+{
+    return shared::ColorManager::HandledColors::Action;
+}
+
 } // namespace msc

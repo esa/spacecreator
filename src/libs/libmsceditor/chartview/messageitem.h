@@ -122,6 +122,8 @@ protected:
 
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
+    shared::ColorManager::HandledColors handledColorType() const override;
+
 private Q_SLOTS:
     void onTextChanged();
     void showMessageDialog();

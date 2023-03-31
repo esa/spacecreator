@@ -44,6 +44,9 @@ public:
         IfaceGroup = 8,
         ConnectionFlow = 9,
         FunctionScale = 10,
+        FunctionHighlighted = 11,
+        ConnectionHighlighted = 12,
+        FunctionTypeHighlighted = 13,
 
         // MSC
         InstanceLine = 1001,
@@ -86,13 +89,13 @@ Q_SIGNALS:
 private:
     static ColorManager *m_instance;
     explicit ColorManager(QObject *parent = nullptr);
-    QString m_filePath;
 
-    QMap<HandledColors, ColorHandler> m_colors;
-
-private:
     static const QString defaultColorschemeFileName;
     QString prepareDefaultSource() const;
+
+private:
+    QString m_filePath;
+    QMap<HandledColors, ColorHandler> m_colors;
 };
 
 }

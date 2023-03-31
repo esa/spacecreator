@@ -17,6 +17,9 @@
 
 #include "propertiesdialog.h"
 
+#include "colors/colorhandlereditor.h"
+#include "commands/cmdentityattributeschange.h"
+#include "ui/veinteractiveobject.h"
 #include "ui_propertiesdialog.h"
 #include "veobject.h"
 
@@ -32,23 +35,24 @@
 namespace shared {
 
 struct PropertiesDialog::PropertiesDialogPrivate {
-    PropertiesDialogPrivate(VEObject *obj, PropertyTemplateConfig *dynPropConfig, cmd::CommandsStackBase *commandsStack)
-        : dataObject(obj)
+    PropertiesDialogPrivate(
+            ui::VEInteractiveObject *obj, PropertyTemplateConfig *dynPropConfig, cmd::CommandsStackBase *commandsStack)
+        : uiObject(obj)
         , commandsStack(commandsStack)
         , dynPropConfig(dynPropConfig)
         , ui(new Ui::PropertiesDialog)
     {
     }
 
-    QPointer<VEObject> dataObject;
+    QPointer<ui::VEInteractiveObject> uiObject;
     QPointer<cmd::CommandsStackBase> commandsStack;
     PropertyTemplateConfig *dynPropConfig;
     std::unique_ptr<Ui::PropertiesDialog> ui;
     std::unique_ptr<cmd::CommandsStackBase::Macro> cmdMacro;
 };
 
-PropertiesDialog::PropertiesDialog(
-        PropertyTemplateConfig *dynPropConfig, VEObject *obj, cmd::CommandsStackBase *commandsStack, QWidget *parent)
+PropertiesDialog::PropertiesDialog(PropertyTemplateConfig *dynPropConfig, ui::VEInteractiveObject *obj,
+        cmd::CommandsStackBase *commandsStack, QWidget *parent)
     : QDialog(parent)
     , d(std::make_unique<PropertiesDialogPrivate>(obj, dynPropConfig, commandsStack))
 {
@@ -58,7 +62,7 @@ PropertiesDialog::PropertiesDialog(
     connect(d->ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
-PropertiesDialog::~PropertiesDialog() {}
+PropertiesDialog::~PropertiesDialog() { }
 
 void PropertiesDialog::insertTab(QWidget *widget, const QString &tabName, int idx)
 {
@@ -68,6 +72,22 @@ void PropertiesDialog::insertTab(QWidget *widget, const QString &tabName, int id
 void PropertiesDialog::setCurrentTabIndex(int idx)
 {
     d->ui->tabWidget->setCurrentIndex(idx);
+}
+
+void PropertiesDialog::initStyleView()
+{
+    if (auto obj = dataObject()) {
+        auto colorHandlerEditor = new ColorHandlerEditor(this);
+        colorHandlerEditor->setInteractiveObject(d->uiObject, propertiesConfig());
+        insertTab(colorHandlerEditor, tr("Style configuration"), getTabCount());
+        connect(colorHandlerEditor, &ColorHandlerEditor::entityAttributeChanged, this,
+                [this](const EntityAttribute &entityAttr) {
+                    auto styleChangeCmd =
+                            new cmd::CmdEntityAttributesChange(propertiesConfig(), dataObject(), { entityAttr });
+                    styleChangeCmd->setText(tr("Entity style configuration"));
+                    commandStack()->push(styleChangeCmd);
+                });
+    }
 }
 
 void PropertiesDialog::done(int r)
@@ -83,7 +103,7 @@ void PropertiesDialog::done(int r)
 
 void PropertiesDialog::init()
 {
-    if (!d->dataObject)
+    if (!dataObject())
         return;
 
     setWindowTitle(tr("Edit %1").arg(objectTypeName()));
@@ -91,13 +111,13 @@ void PropertiesDialog::init()
 
     if (!d->cmdMacro) {
         d->cmdMacro = std::make_unique<cmd::CommandsStackBase::Macro>(
-                d->commandsStack.data(), tr("Edit %1 - %2").arg(objectTypeName(), d->dataObject->titleUI()));
+                d->commandsStack.data(), tr("Edit %1 - %2").arg(objectTypeName(), dataObject()->titleUI()));
     }
 }
 
 VEObject *PropertiesDialog::dataObject() const
 {
-    return d->dataObject;
+    return d->uiObject->entity();
 }
 
 cmd::CommandsStackBase::Macro *PropertiesDialog::commandMacro() const
