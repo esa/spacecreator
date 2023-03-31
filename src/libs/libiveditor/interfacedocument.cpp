@@ -459,20 +459,55 @@ bool InterfaceDocument::hasSelectedItems()
     return objectsSelectionModel()->hasSelection();
 }
 
-
-/**
- * All selected items in the main scene is hidden
- */
-void InterfaceDocument::hideSelectedItems()
+bool InterfaceDocument::hasUnselectedItems()
 {
+    QList<ivm::IVObject *> unselectedObjects = getUnselectedObjects();
+    return !unselectedObjects.isEmpty();
+}
+
+QList<ivm::IVObject *> InterfaceDocument::getSelectedObjects()
+{
+    auto selectedObjects = QList<ivm::IVObject *>();
     QModelIndexList selection = objectsSelectionModel()->selectedIndexes();
     for (const QModelIndex &idx : selection) {
         QVariant id = idx.data(IVVisualizationModelBase::IdRole);
         QUuid uuid = id.toUuid();
         ivm::IVObject *selectedObject = objectsModel()->getObject(uuid);
-        if (!selectedObject->isRootObject()) // Don't hide root items
-        {
-            selectedObject->setVisible(false);
+        if (selectedObject->isComment() || selectedObject->isFunction() || selectedObject->isFunctionType()) {
+            selectedObjects.append(selectedObject);
+        }
+    }
+    return selectedObjects;
+}
+
+QList<ivm::IVObject *> InterfaceDocument::getUnselectedObjects()
+{
+    QList<ivm::IVObject *> selectedObjects = getSelectedObjects();
+    // Find the visible unselected objects
+    shared::Id rootId = objectsModel()->rootObjectId();
+    auto unselectedObjects = QList<ivm::IVObject *>();
+    QList<ivm::IVObject *> visibleObjects = objectsModel()->visibleObjects(rootId); // only objects at the current level
+    for (ivm::IVObject *visibleObject : visibleObjects) {
+        bool objectIsUnselected = !selectedObjects.contains(visibleObject);
+        if (objectIsUnselected) {
+            unselectedObjects.append(visibleObject);
+        }
+    }
+    return unselectedObjects;
+}
+
+/**
+ * All items that are NOT selected in the main scene at its current level is hidden
+ */
+void InterfaceDocument::hideUnselectedItems()
+{
+    QList<ivm::IVObject *> unselectedObjects = getUnselectedObjects();
+    // Hide the unselectedObjects
+    for (ivm::IVObject *unselectedObject : unselectedObjects) {
+        bool objectIsEntity =
+                unselectedObject->isFunction() || unselectedObject->isFunctionType() || unselectedObject->isComment();
+        if (!unselectedObject->isRootObject() && objectIsEntity) { // Don't hide root items
+            unselectedObject->setVisible(false);
         }
     }
 }
@@ -699,7 +734,7 @@ IVVisualizationModelBase *InterfaceDocument::visualisationModel() const
 }
 
 /**
- * SelectionModel for the "IV Structure" window
+ * SelectionModel for the "IV Structure" window and the main graph area
  */
 QItemSelectionModel *InterfaceDocument::objectsSelectionModel() const
 {

@@ -95,7 +95,8 @@ public:
     void showAll();
 
     bool hasSelectedItems();
-    void hideSelectedItems();
+    bool hasUnselectedItems();
+    void hideUnselectedItems();
 
     QString path() const;
     void setPath(const QString &path);
@@ -199,6 +200,8 @@ private:
 
     struct InterfaceDocumentPrivate;
     InterfaceDocumentPrivate *d;
+    QList<ivm::IVObject *> getSelectedObjects();
+    QList<ivm::IVObject *> getUnselectedObjects();
 };
 
 }

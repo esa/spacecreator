@@ -570,7 +570,7 @@ void IVCreatorTool::populateContextMenu_visibility(QMenu *menu, const QPointF &s
     menu->addAction(tr("Show All"), this, [this, scene]() { m_doc->showAll(); });
 
     if (m_doc->hasSelectedItems()) {
-        menu->addAction(tr("Hide selected items"), this, [this, scene]() { m_doc->hideSelectedItems(); });
+        menu->addAction(tr("Hide unselected items"), this, [this, scene]() { m_doc->hideUnselectedItems(); });
     }
 }
 
