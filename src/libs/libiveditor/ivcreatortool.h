@@ -69,7 +69,6 @@ protected:
     void populateContextMenu_commonCreate(QMenu *menu, const QPointF &scenePos) override;
     void populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos) override;
     void populateContextMenu_user(QMenu *menu, const QPointF &scenePos) override;
-    void populateContextMenu_visibility(QMenu *menu, const QPointF &scenePos) override;
     bool handleToolType(int type, const QPointF &pos) override;
 
     IVItemModel *model() const override;

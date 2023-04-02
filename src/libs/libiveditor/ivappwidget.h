@@ -56,6 +56,8 @@ public:
 
     QAction *actionDelete() const;
 
+
+
 public Q_SLOTS:
     void showArchetypeManager();
 
@@ -84,6 +86,10 @@ private Q_SLOTS:
     void onRootObjectChanged(const shared::Id &rootId);
     void checkActionsFromSelection();
     void editExternalEntity(const QString &path, const QString &entityName);
+    void hideSelectedRows();
+    void hideUnselectedRows();
+    void showAllRows();
+    void showSelectedRows();
 
 private:
     void initGraphicsView();

@@ -82,7 +82,6 @@ protected:
     virtual void populateContextMenu_commonEdit(QMenu *menu, const QPointF &scenePos);
     virtual void populateContextMenu_propertiesDialog(QMenu *menu);
     virtual void populateContextMenu_user(QMenu *menu, const QPointF &scenePos) = 0;
-    virtual void populateContextMenu_visibility(QMenu *menu, const QPointF &scenePos);
     virtual bool handleToolType(int type, const QPointF &pos) = 0;
     virtual bool warnConnectionPreview(const QPointF &globalPos) = 0;
 

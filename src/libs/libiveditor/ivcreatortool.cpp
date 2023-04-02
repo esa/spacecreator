@@ -506,16 +506,24 @@ void IVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
 
     QGraphicsItem *gi = shared::graphicsviewutils::nearestItem(
             scene, scenePos, kContextMenuItemTolerance, { IVFunctionGraphicsItem::Type });
-    if (!gi) {
-        return;
-    }
-
-    if (auto fnItem = qobject_cast<IVFunctionGraphicsItem *>(gi->toGraphicsObject())) {
-        if (fnItem->entity()) {
-            menu->addAction(QIcon(QLatin1String(":/toolbar/icns/nested_view.svg")), tr("Enter nested view"), this,
-                    [this, id = fnItem->entity()->id()]() { Q_EMIT nestedViewRequest(id); });
+    if (gi) {
+        if (auto fnItem = qobject_cast<IVFunctionGraphicsItem *>(gi->toGraphicsObject())) {
+            if (fnItem->entity()) {
+                menu->addAction(QIcon(QLatin1String(":/toolbar/icns/nested_view.svg")), tr("Enter nested view"), this,
+                        [this, id = fnItem->entity()->id()]() { Q_EMIT nestedViewRequest(id); });
+            }
         }
     }
+
+    // Hide Unselected
+    if (m_doc->hasSelectedItems()) {
+        menu->addAction(tr("Hide unselected"), this, [this, scene]() { m_doc->hideUnselectedItems(); });
+    }
+
+    // Show All
+    menu->addAction(tr("Show All"), this, [this, scene]() {
+        m_doc->showAll();
+    });
 }
 
 void IVCreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePos)
@@ -559,19 +567,6 @@ void IVCreatorTool::populateContextMenu_user(QMenu *menu, const QPointF &scenePo
     }
 
     ActionsManager::populateMenu(menu, ivObj, m_doc);
-}
-
-void IVCreatorTool::populateContextMenu_visibility(QMenu *menu, const QPointF &scenePos)
-{
-    QGraphicsScene *scene = m_view->scene();
-    if (!scene) {
-        return;
-    }
-    menu->addAction(tr("Show All"), this, [this, scene]() { m_doc->showAll(); });
-
-    if (m_doc->hasSelectedItems()) {
-        menu->addAction(tr("Hide unselected items"), this, [this, scene]() { m_doc->hideUnselectedItems(); });
-    }
 }
 
 bool IVCreatorTool::handleToolType(int type, const QPointF &pos)
