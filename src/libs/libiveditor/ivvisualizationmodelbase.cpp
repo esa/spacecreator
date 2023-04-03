@@ -153,9 +153,16 @@ QList<QStandardItem *> IVVisualizationModelBase::createItems(shared::VEObject *o
     QList<QStandardItem *> items = AbstractVisualizationModel::createItems(obj);
     items[0]->setData(static_cast<int>(obj->type()), TypeRole);
 
-    connect(obj, &ivm::IVObject::titleChanged, this, &IVVisualizationModelBase::updateItem);
-    connect(obj, &ivm::IVObject::visibilityChanged, this, &IVVisualizationModelBase::updateItem);
-    connect(obj, &ivm::IVObject::groupChanged, this, &IVVisualizationModelBase::updateItem);
+    connect(obj, &ivm::IVObject::attributeChanged, this, [this](const QString &name) {
+        static const QStringList monitoredAttributes = {
+            ivm::meta::Props::token(ivm::meta::Props::Token::instance_of),
+            ivm::meta::Props::token(ivm::meta::Props::Token::name),
+            ivm::meta::Props::token(ivm::meta::Props::Token::is_visible),
+            ivm::meta::Props::token(ivm::meta::Props::Token::group_name),
+        };
+        if (monitoredAttributes.contains(name))
+            updateItem();
+    });
 
     if (obj->type() == ivm::IVObject::Type::ConnectionGroup) {
         if (auto connectionGroupObj = obj->as<ivm::IVConnectionGroup *>()) {
@@ -186,6 +193,20 @@ void IVVisualizationModelBase::updateConnectionItem(ivm::IVConnection *connectio
     }
 }
 
+bool IVVisualizationModelBase::isInstanceChild(shared::VEObject *obj) const
+{
+    static const QString instanceAttrName = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of);
+    bool isInstance = false;
+    auto veObj = obj->parentObject();
+    while (veObj) {
+        if (veObj->hasEntityAttribute(instanceAttrName) && veObj->entityAttributeValue<bool>(instanceAttrName)) {
+            return true;
+        }
+        veObj = veObj->parentObject();
+    }
+    return false;
+}
+
 /**
  * VisualizationModel
  */
@@ -201,6 +222,8 @@ void IVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject 
     ivm::IVObject *obj = qobject_cast<ivm::IVObject *>(object);
     if (obj) {
         IVVisualizationModelBase::updateItemData(item, obj);
+        item->setEditable(!isInstanceChild(obj));
+
         if ((item->checkState() == Qt::Checked) != obj->isVisible()) {
             item->setData(obj->isVisible() ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
         }
@@ -211,7 +234,7 @@ QList<QStandardItem *> IVVisualizationModel::createItems(shared::VEObject *obj)
 {
     QList<QStandardItem *> items = IVVisualizationModelBase::createItems(obj);
     if (!items.isEmpty()) {
-        items[0]->setEditable(true);
+        items[0]->setEditable(!isInstanceChild(obj));
         items[0]->setCheckable(true);
         items[0]->setDragEnabled(false);
     }
@@ -247,8 +270,7 @@ void IVVisualizationModel::onDataChanged(
         }
 
         // Validate the name of the given by the user in IV Structure before setting in model
-        if (roles.contains(Qt::DisplayRole))
-        {
+        if (roles.contains(Qt::DisplayRole)) {
             const QString name = ivm::IVNameValidator::encodeName(ivObject->type(), rowItem->text());
             bool nameHasChanged = name != ivObject->title();
             if (nameHasChanged) {
@@ -267,7 +289,7 @@ void IVVisualizationModel::onDataChanged(
     }
 }
 
-ivm::IVObject* IVVisualizationModel::qStandardItemToIVObject(const QStandardItem *standardItem)
+ivm::IVObject *IVVisualizationModel::qStandardItemToIVObject(const QStandardItem *standardItem)
 {
     const shared::Id id = standardItem->data(IdRole).toUuid(); // ask QStandardItem for its id
     ivm::IVObject *obj = m_veModel->getObject(id)->as<ivm::IVObject *>(); // find the model object by id
@@ -282,18 +304,15 @@ void IVVisualizationModel::setAllItemsVisible()
 
     QHash<shared::Id, shared::VEObject *> ivObjects = m_veModel->objects();
     for (shared::VEObject *veObject : ivObjects) {
-        auto ivObject = qobject_cast<ivm::IVObject*>(veObject);
+        auto ivObject = qobject_cast<ivm::IVObject *>(veObject);
         if (!ivObject) {
             continue;
         }
-        if (ivObject->isFunction() ||
-            ivObject->isFunctionType() ||
-            ivObject->isComment()) {
+        if (ivObject->isFunction() || ivObject->isFunctionType() || ivObject->isComment()) {
             ivObject->setVisible(true);
         }
     }
 }
-
 
 /**
  * Layer model

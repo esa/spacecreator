@@ -46,6 +46,7 @@ public:
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
     QList<QStandardItem *> createItems(shared::VEObject *obj) override;
+    bool isInstanceChild(shared::VEObject *obj) const;
 
 private Q_SLOTS:
     void updateConnectionItem(ivm::IVConnection *connection);
@@ -77,14 +78,13 @@ class IVLayerVisualizationModel : public IVVisualizationModelBase
 {
     Q_OBJECT
 public:
-
     /**
-    * @brief Constructor for IVLayerVisualizationModel
-    * Layers are stored in seperate model so we need to give IVLayerVisualizationModel reference
-    * for both layers and the rest of objects
-    */
+     * @brief Constructor for IVLayerVisualizationModel
+     * Layers are stored in seperate model so we need to give IVLayerVisualizationModel reference
+     * for both layers and the rest of objects
+     */
     explicit IVLayerVisualizationModel(ivm::IVModel *layerModel, ivm::IVModel *objectsModel,
-                                       cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
+            cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
 
     QList<QStandardItem *> createItems(shared::VEObject *obj) override;
 

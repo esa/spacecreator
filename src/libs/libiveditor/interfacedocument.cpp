@@ -38,6 +38,7 @@
 #include "ivexporter.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
+#include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
 #include "ivvisualizationmodelbase.h"
 #include "ivxmlreader.h"
@@ -99,8 +100,7 @@ void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
 {
     if (!object || object->parentObject()
             || !(object->type() == ivm::IVObject::Type::Function
-                    || object->type() == ivm::IVObject::Type::FunctionType))
-    {
+                    || object->type() == ivm::IVObject::Type::FunctionType)) {
         return;
     }
 
@@ -121,7 +121,7 @@ void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
 
     QStringList newAsnFiles;
     QStringList importedAsnFiles;
-    for (const QFileInfo &file : qAsConst(fileInfos)){
+    for (const QFileInfo &file : qAsConst(fileInfos)) {
         QString destFilePath { targetDir.filePath(file.fileName()) };
         const bool isNewFile = !QFile::exists(destFilePath);
         if (!isNewFile && !QFile::remove(destFilePath)) {
@@ -304,6 +304,7 @@ QList<shared::VEObject *> InterfaceDocument::prepareSelectedObjectsForExport(QSt
     }
 
     name = silent ? exportNames.join(QLatin1Char('_')) : getComponentName(exportNames);
+    name = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::Function, name);
     if (exportNames.size() > 1) {
         ivm::IVFunction *dummyFunction = new ivm::IVFunction;
         dummyFunction->setTitle(name);
@@ -349,6 +350,7 @@ bool InterfaceDocument::exportSelectedFunctions()
     if (name.isEmpty()) {
         return false;
     }
+
     QString path = shared::componentsLibraryPath() + QDir::separator() + name;
     if (exportImpl(path, objects)) {
         d->objectsSelectionModel->clearSelection();
@@ -390,7 +392,8 @@ bool InterfaceDocument::exportSelectedType()
 bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
+        /// Just skip other folders mught be located in that library not related to component model
+        // shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
         return false;
     }
 
@@ -988,7 +991,7 @@ static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
                 break;
             }
         }
-        targetPath = fi.absoluteDir().filePath(text);
+        targetPath = fi.absoluteDir().filePath(ivm::IVNameValidator::encodeName(ivm::IVObject::Type::Function, text));
         break;
     }
     case QMessageBox::ButtonRole::RejectRole:
