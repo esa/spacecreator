@@ -457,6 +457,10 @@ bool IVNameValidator::isFunctionTypeNameUsed(const QString &name, const IVObject
 
     if (auto model = fnType->model()) {
         IVFunctionType *fn = model->getFunctionType(name, Qt::CaseSensitive);
+        if (fn != fnType && fn != nullptr)
+            return true;
+
+        fn = model->getSharedFunctionType(name, Qt::CaseSensitive);
         return fn != fnType && fn != nullptr;
     }
 
