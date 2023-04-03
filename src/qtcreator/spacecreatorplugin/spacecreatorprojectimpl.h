@@ -34,6 +34,7 @@ class ErrorItem;
 namespace spctr {
 
 class AdaRefactor;
+class CRefactor;
 class CppRefactor;
 class PythonRefactor;
 
@@ -64,6 +65,7 @@ private:
     QStringList m_asnFiles;
     QVector<ProjectExplorer::Task> m_errors;
     std::unique_ptr<AdaRefactor> m_adaRefactor;
+    std::unique_ptr<CRefactor> m_cRefactor;
     std::unique_ptr<CppRefactor> m_cppRefactor;
     std::unique_ptr<PythonRefactor> m_pythonRefactor;
 };

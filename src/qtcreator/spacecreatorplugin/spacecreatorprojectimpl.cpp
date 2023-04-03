@@ -25,6 +25,7 @@
 #include "msceditorcore.h"
 #include "refactor/adarefactor.h"
 #include "refactor/cpprefactor.h"
+#include "refactor/crefactor.h"
 #include "refactor/pythonrefactor.h"
 
 #include <QDebug>
@@ -42,6 +43,7 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     : scs::SpaceCreatorProject(parent)
     , m_project(project)
     , m_adaRefactor(std::make_unique<AdaRefactor>())
+    , m_cRefactor(std::make_unique<CRefactor>())
     , m_cppRefactor(std::make_unique<CppRefactor>())
     , m_pythonRefactor(std::make_unique<PythonRefactor>())
 {
@@ -70,6 +72,8 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
 
     m_adaRefactor->setStorage(this);
     m_ivRefactorHandler->registerRefactor(m_adaRefactor.get());
+    m_cRefactor->setStorage(this);
+    m_ivRefactorHandler->registerRefactor(m_cRefactor.get());
     m_cppRefactor->setStorage(this);
     m_ivRefactorHandler->registerRefactor(m_cppRefactor.get());
     m_pythonRefactor->setStorage(this);

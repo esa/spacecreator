@@ -61,6 +61,8 @@ set(SC_PLUGIN_SOURCES
     refactor/adarefactor.h
     refactor/cpprefactor.cpp
     refactor/cpprefactor.h
+    refactor/crefactor.cpp
+    refactor/crefactor.h
     refactor/creatorrefactorbase.cpp
     refactor/creatorrefactorbase.h
     refactor/pythonrefactor.cpp
