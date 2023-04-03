@@ -114,24 +114,21 @@ ive::GraphicsView *IVAppWidget::graphicsView() const
  */
 void IVAppWidget::centerView()
 {
-    // Get the QGraphicsItem that represents the root object. Root object is the object that is currently shown with nested functions in it.
+    // Get the QGraphicsItem that represents the root object. Root object is the object that is currently shown with
+    // nested functions in it.
     auto rootObjectId = m_document->objectsModel()->rootObjectId();
     const QGraphicsItem *rootItem = m_document->itemsModel()->getItem(rootObjectId);
     // Get the items of the entire graph or the nested items within the root object
     const QList<QGraphicsItem *> items = rootItem ? rootItem->childItems() : graphicsView()->scene()->items();
 
-    if (items.isEmpty() && rootItem)
-    {
+    if (items.isEmpty() && rootItem) {
         // No root item. Center on the center of the entire graph
         graphicsView()->centerOn(rootItem->sceneBoundingRect().center());
-    } else
-    {
+    } else {
         // center on the center of the nested items
         QRectF rect;
-        for (const QGraphicsItem *item : items)
-        {
-            if (item->type() > QGraphicsItem::UserType)
-            {
+        for (const QGraphicsItem *item : items) {
+            if (item->type() > QGraphicsItem::UserType) {
                 rect |= item->sceneBoundingRect();
             }
         }
@@ -177,7 +174,7 @@ void IVAppWidget::showContextMenuForSharedTypesView(const QPoint &pos)
     connect(actRemoveSharedType, &QAction::triggered, this, [this, id]() {
         if (auto model = m_document->sharedModel()) {
             if (auto obj = model->getObject(id)) {
-                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model);
+                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model, shared::sharedTypesPath());
                 cmdRm->setText(tr("Remove importable shared type(s)"));
                 m_document->commandsStack()->push(cmdRm);
             }
@@ -228,13 +225,11 @@ void IVAppWidget::hideUnselectedRows()
     for (int row = 0; row < rowCount; row++) {
         QModelIndex index = treeViewModel->index(row, 0);
         bool isSelected = treeViewSelectionModel->isSelected(index);
-        if (!isSelected)
-        {
+        if (!isSelected) {
             // Uncheck row
             treeViewModel->setData(index, QVariant(Qt::Unchecked), Qt::CheckStateRole);
         }
     }
-
 }
 
 void IVAppWidget::showAllRows()
@@ -242,8 +237,7 @@ void IVAppWidget::showAllRows()
     QTreeView *treeView = ui->objectsView;
     QAbstractItemModel *treeViewModel = treeView->model();
     int rowCount = treeViewModel->rowCount();
-    for (int row = 0; row < rowCount; row++)
-    {
+    for (int row = 0; row < rowCount; row++) {
         QModelIndex index = treeViewModel->index(row, 0);
         treeViewModel->setData(index, QVariant(Qt::Checked), Qt::CheckStateRole);
     }
@@ -255,12 +249,10 @@ void IVAppWidget::showSelectedRows()
     QAbstractItemModel *treeViewModel = treeView->model();
     QItemSelectionModel *treeViewSelectionModel = treeView->selectionModel();
     int rowCount = treeViewModel->rowCount();
-    for (int row = 0; row < rowCount; row++)
-    {
+    for (int row = 0; row < rowCount; row++) {
         QModelIndex index = treeViewModel->index(row, 0);
         bool isSelected = treeViewSelectionModel->isSelected(index);
-        if (isSelected)
-        {
+        if (isSelected) {
             treeViewModel->setData(index, QVariant(Qt::Checked), Qt::CheckStateRole);
         }
     }
@@ -298,7 +290,7 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
     connect(actRemoveComponent, &QAction::triggered, this, [this, id]() {
         if (auto model = m_document->importModel()) {
             if (auto obj = model->getObject(id)) {
-                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model);
+                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model, shared::componentsLibraryPath());
                 cmdRm->setText(tr("Remove importable component(s)"));
                 m_document->commandsStack()->push(cmdRm);
             }
@@ -323,15 +315,12 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
     QItemSelectionModel *treeViewSelectionModel = treeView->selectionModel();
     QModelIndexList selectedRows = treeViewSelectionModel->selectedRows();
 
-    for (QModelIndex modelIndex : selectedRows)
-    {
+    for (QModelIndex modelIndex : selectedRows) {
         QVariant checkState = treeViewModel->data(modelIndex, Qt::CheckStateRole);
-        if (checkState == Qt::Checked )
-        {
+        if (checkState == Qt::Checked) {
             ++visibleItemsSelected;
         }
-        if (checkState == Qt::Unchecked)
-        {
+        if (checkState == Qt::Unchecked) {
             ++hiddenItemsSelected;
         }
     }
@@ -343,8 +332,7 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
     const auto obj = m_document->objectsModel()->getObject(
             idx.data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
 
-    if (obj)
-    {
+    if (obj) {
         // Export selected entities
         if (obj->isFunction() || obj->isFunctionType()) {
             QAction *actExportSelectedEntities = new QAction(tr("Export selected entities"));
@@ -357,8 +345,7 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
         // Export component type
         if (obj->isFunction() || obj->isFunctionType()) {
             QAction *actExportSelectedSharedType = new QAction(tr("Export component type"));
-            connect(actExportSelectedSharedType, &QAction::triggered,
-                    m_document.data(),
+            connect(actExportSelectedSharedType, &QAction::triggered, m_document.data(),
                     &InterfaceDocument::exportSelectedType);
             actions.append(actExportSelectedSharedType);
             ActionsManager::registerAction(
@@ -371,8 +358,7 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
     bool makeShowContextMenuItem = hiddenItemsSelected > 1;
     if (makeShowContextMenuItem) {
         QAction *actShowSelectedEntities = new QAction(tr("Show"));
-        connect(actShowSelectedEntities, &QAction::triggered,
-                this, &IVAppWidget::showSelectedRows);
+        connect(actShowSelectedEntities, &QAction::triggered, this, &IVAppWidget::showSelectedRows);
         actions.append(actShowSelectedEntities);
         ActionsManager::registerAction(
                 Q_FUNC_INFO, actShowSelectedEntities, "Show selected entities", "Show selected entities");
@@ -403,8 +389,8 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
     QAction *actShowAllEntities = new QAction(tr("Show all"));
     connect(actShowAllEntities, &QAction::triggered, this, &IVAppWidget::showAllRows);
     actions.append(actShowAllEntities);
-    ActionsManager::registerAction(Q_FUNC_INFO, actShowAllEntities, "Show all entities",
-            "All entities that has been hidden becomes visible.");
+    ActionsManager::registerAction(
+            Q_FUNC_INFO, actShowAllEntities, "Show all entities", "All entities that has been hidden becomes visible.");
 
     // Setup the context menu
     QMenu *menu = new QMenu;

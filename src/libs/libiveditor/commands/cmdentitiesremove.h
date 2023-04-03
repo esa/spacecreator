@@ -22,8 +22,11 @@
 #include "undocommand.h"
 
 #include <QPointer>
+#include <QScopedPointer>
 #include <QUndoCommand>
 #include <QVector>
+
+class QTemporaryDir;
 
 namespace ivm {
 class IVModel;
@@ -37,7 +40,8 @@ class CmdEntitiesRemove : public shared::UndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdEntitiesRemove(const QList<ivm::IVObject *> &entities, ivm::IVModel *model);
+    explicit CmdEntitiesRemove(
+            const QList<ivm::IVObject *> &entities, ivm::IVModel *model, const QString &pathToLibrary = {});
     ~CmdEntitiesRemove() override;
 
     void redo() override;
@@ -56,6 +60,8 @@ private:
     QVector<QPointer<ivm::IVObject>> m_relatedIfaces;
     QHash<shared::Id, QPointer<ivm::IVFunctionType>> m_parentFunctions;
     QList<QUndoCommand *> m_subCommands;
+    QScopedPointer<QTemporaryDir> m_tempDir;
+    const QString m_libraryPath;
 
     void collectRelatedItems(ivm::IVObject *toBeRemoved);
     void storeLinkedEntity(ivm::IVObject *linkedEntity);

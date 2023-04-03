@@ -26,18 +26,25 @@
 #include "ivmodel.h"
 #include "ivobject.h"
 
+#include <QTemporaryDir>
+
 namespace ive {
 namespace cmd {
 
-CmdEntitiesRemove::CmdEntitiesRemove(const QList<ivm::IVObject *> &entities, ivm::IVModel *model)
+CmdEntitiesRemove::CmdEntitiesRemove(
+        const QList<ivm::IVObject *> &entities, ivm::IVModel *model, const QString &pathToLibrary)
     : shared::UndoCommand()
     , m_model(model)
+    , m_libraryPath(pathToLibrary)
 {
     setText(QObject::tr("Remove"));
 
     for (ivm::IVObject *entity : entities) {
         collectRelatedItems(entity);
         m_entities.append(entity);
+    }
+    if (!pathToLibrary.isEmpty()) {
+        m_tempDir.reset(new QTemporaryDir);
     }
 }
 
@@ -118,6 +125,21 @@ void CmdEntitiesRemove::redo()
     removeIVObjects(m_relatedIfaces);
     removeIVObjects(m_relatedEntities);
 
+    if (!m_tempDir.isNull() && m_tempDir->isValid() && !m_libraryPath.isEmpty()) {
+        const QDir sourceDir(m_libraryPath);
+        for (const ivm::IVObject *entity : qAsConst(m_entities)) {
+            if (!sourceDir.exists(entity->title()))
+                continue;
+
+            QDir destDir(m_tempDir->filePath(entity->title()));
+            if (destDir.exists()) {
+                destDir.removeRecursively();
+            }
+            shared::moveDir(
+                    sourceDir.filePath(entity->title()), destDir.absolutePath(), shared::FileCopyingMode::Overwrite);
+        }
+    }
+
     Q_EMIT entitiesRemoved(m_entities, this);
 }
 
@@ -143,6 +165,21 @@ void CmdEntitiesRemove::undo()
 
     for (auto it = m_subCommands.rbegin(); it != m_subCommands.rend(); ++it) {
         (*it)->undo();
+    }
+
+    if (!m_tempDir.isNull() && m_tempDir->isValid() && !m_libraryPath.isEmpty()) {
+        for (const ivm::IVObject *entity : qAsConst(m_entities)) {
+            const QDir sourceDir(m_tempDir->filePath(entity->title()));
+            if (!sourceDir.exists()) {
+                continue;
+            }
+
+            QDir destDir(m_libraryPath + QDir::separator() + entity->title());
+            if (destDir.exists()) {
+                destDir.removeRecursively();
+            }
+            shared::moveDir(sourceDir.absolutePath(), destDir.absolutePath(), shared::FileCopyingMode::Overwrite);
+        }
     }
 }
 
@@ -236,6 +273,5 @@ void CmdEntitiesRemove::storeLinkedEntity(ivm::IVObject *linkedEntity)
     }
     storeObject(linkedEntity, pCollection);
 }
-
 }
 }
