@@ -24,6 +24,97 @@
 #include <QObject>
 #include <QtTest>
 
+static const QString kAttrTemplate = R"(
+        <Attrs version="1.0">
+            <Attr label="Name" name="name">
+                <Type>
+                    <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
+                </Type>
+            </Attr>
+            <Attr label="Kind" name="kind">
+                <Type>
+                    <Enumeration defaultValue="Sporadic">
+                        <Entry value="Any"/>
+                        <Entry value="Cyclic"/>
+                        <Entry value="Sporadic"/>
+                        <Entry value="Protected"/>
+                        <Entry value="Unprotected"/>
+                    </Enumeration>
+                </Type>
+                <Scopes>
+                    <Required_Interface/>
+                    <Provided_Interface/>
+                </Scopes>
+            </Attr>
+            <Attr name="origin" editable="false" optional="true">
+                <Type>
+                    <String validator="\{?[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\}?"/>
+                </Type>
+            </Attr>
+            <Attr name="is_type">
+                <Type>
+                    <Enumeration defaultValue="NO">
+                        <Entry value="YES"/>
+                        <Entry value="NO"/>
+                    </Enumeration>
+                </Type>
+                <Scopes>
+                    <Function/>
+                </Scopes>
+            </Attr>
+            <Attr label="Instance of" name="instance_of">
+                <Type>
+                    <String validator="[a-zA-Z][a-zA-Z0-9_]*"/>
+                </Type>
+                <Scopes>
+                    <Function>
+                        <AttrValidator name="is_type" value="NO"/>
+                    </Function>
+                </Scopes>
+            </Attr>
+            <Attr label="Inherit from PI" name="Taste::InheritPI" type="property">
+                <Type>
+                    <Boolean defaultValue="True"/>
+                </Type>
+                <Scopes>
+                    <Required_Interface/>
+                </Scopes>
+            </Attr>
+            <Attr name="Taste::coordinates" type="property" visible="false" editable="false" export="UI">
+                <Type>
+                    <String validator="[0-9 ]+"/>
+                </Type>
+                <Scopes/>
+            </Attr>
+            <Attr name="Taste::RootCoordinates" type="property" visible="false" editable="false" export="UI">
+                <Type>
+                    <String validator="[0-9 ]+"/>
+                </Type>
+                <Scopes/>
+            </Attr>
+            <Attr name="Taste::Autonamed" type="property" visible="false">
+                <Type>
+                    <Boolean defaultValue="True"/>
+                </Type>
+                <Scopes>
+                    <Required_Interface/>
+                </Scopes>
+            </Attr>
+            <Attr name="AttrName" export="UI">
+                <Type>
+                    <String/>
+                </Type>
+                <Scopes/>
+            </Attr>
+            <Attr name="Namespace::PropertyName::Type::value" type="property" export="UI">
+                <Type>
+                    <String/>
+                </Type>
+                <Scopes/>
+            </Attr>
+        </Attrs>
+    )";
+
 class tst_IVEditAttributesModel : public QObject
 {
     Q_OBJECT
@@ -32,7 +123,8 @@ private Q_SLOTS:
     void init();
     void cleanupTestCase();
 
-    void testEmpty();
+    void testEmptyFunctions();
+    void testEmptyInterfaces();
     void testReadFunctions();
     void testReadInterfaces();
 
@@ -44,6 +136,7 @@ private:
 void tst_IVEditAttributesModel::initTestCase()
 {
     m_config = ivm::IVPropertyTemplateConfig::instance();
+    m_config->initFromData(kAttrTemplate);
 }
 
 void tst_IVEditAttributesModel::init()
@@ -57,9 +150,17 @@ void tst_IVEditAttributesModel::cleanupTestCase()
     m_ivModel.reset();
 }
 
-void tst_IVEditAttributesModel::testEmpty()
+void tst_IVEditAttributesModel::testEmptyFunctions()
 {
     ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Function);
+    QCOMPARE(model.rowCount(QModelIndex()), 0);
+    QCOMPARE(model.columnCount(QModelIndex()), 0);
+    QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QVariant());
+}
+
+void tst_IVEditAttributesModel::testEmptyInterfaces()
+{
+    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
     QCOMPARE(model.rowCount(QModelIndex()), 0);
     QCOMPARE(model.columnCount(QModelIndex()), 0);
     QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QVariant());
@@ -72,53 +173,38 @@ void tst_IVEditAttributesModel::testReadFunctions()
 
     m_ivModel->addObjects<ivm::IVObject *>({function1, function2});
 
-    {
-        ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Function);
-        QCOMPARE(model.rowCount(QModelIndex()), 2);
-        QCOMPARE(model.columnCount(QModelIndex()), 1); // The name attribute is always there.
+    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Function);
+    QCOMPARE(model.rowCount(QModelIndex()), 2);
+    QCOMPARE(model.columnCount(QModelIndex()), 2);
 
-        QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QString("name"));
-    }
+    QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QLatin1String("Name"));
+    QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole), QLatin1String("Instance of"));
 
-    function1->setEntityAttribute("example", "value 1");
-    function2->setEntityAttribute("example", "value 2");
-
-    {
-        ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Function);
-        QCOMPARE(model.rowCount(QModelIndex()), 2);
-        QCOMPARE(model.columnCount(QModelIndex()), 2); // Name attribute plus the one added.
-
-        QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QString("name"));
-        QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole), QString("example"));
-    }
-
+    // The order of the rows is randomized due to the hash storage, so use a set
+    QSet<QString> obtainedNames;
+    obtainedNames << model.data(model.index(0, 0), Qt::DisplayRole).toString();
+    obtainedNames << model.data(model.index(1, 0), Qt::DisplayRole).toString();
+    QSet<QString> expectedNames({QLatin1String("Function 1"), QLatin1String("Function 2")});
+    QCOMPARE(obtainedNames, expectedNames);
 }
 
 void tst_IVEditAttributesModel::testReadInterfaces()
 {
-    {
-        ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
-        QCOMPARE(model.rowCount(QModelIndex()), 0);
-        QCOMPARE(model.columnCount(QModelIndex()), 0);
-
-        QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QVariant());
-    }
-
-    auto function1 = ivm::testutils::createFunctionType("Function 1");
-    auto function2 = ivm::testutils::createFunctionType("Function 2");
+    auto function1 = ivm::testutils::createFunction("Function 1");
+    auto function2 = ivm::testutils::createFunction("Function 2");
     auto interface1 = ivm::testutils::createRequiredIface(function1, "Interface 1");
     auto interface2 = ivm::testutils::createRequiredIface(function2, "Interface 2");
 
     m_ivModel->addObjects<ivm::IVObject *>({interface1, interface2});
 
-    {
-        ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
-        QCOMPARE(model.rowCount(QModelIndex()), 2);
-        QCOMPARE(model.columnCount(QModelIndex()), 3); // name, layer, kind
+    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
+    QCOMPARE(model.rowCount(QModelIndex()), 2);
 
-        QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QString("name"));
-    }
-
+    QCOMPARE(model.columnCount(QModelIndex()), 4);
+    QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Function"));
+    QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Name"));
+    QCOMPARE(model.headerData(2, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Kind"));
+    QCOMPARE(model.headerData(3, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Inherit from PI"));
 }
 
 
