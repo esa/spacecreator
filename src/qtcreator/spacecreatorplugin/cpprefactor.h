@@ -18,6 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include "creatorrefactorbase.h"
+#include "qcoreapplication.h"
 
 #include <QDir>
 
@@ -28,6 +29,8 @@ namespace spctr {
  */
 class CppRefactor : public spctr::CreatorRefactorBase
 {
+    Q_DECLARE_TR_FUNCTIONS(CppRefactor)
+
 public:
     bool isRefactorSupported(RefactorType type) const override;
 

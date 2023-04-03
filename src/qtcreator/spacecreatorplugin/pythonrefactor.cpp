@@ -63,8 +63,7 @@ void PythonRefactor::onIVFunctionRenamed(ivm::IVFunction *func, const QString &o
     if (!QFile::exists(filePath)) {
         return;
     }
-    const QString message =
-            QObject::tr("Don't forget to update the Python implementation (%1 -> %2) in").arg(oldName, newName);
+    const QString message = tr("Don't forget to update the Python implementation (%1 -> %2) in").arg(oldName, newName);
 
     reportWarning(message, filePath);
 }
@@ -81,7 +80,7 @@ void PythonRefactor::onIVInterfaceRenamed(
         }
 
         const QString funcName = func->title();
-        const QString message = QObject::tr("Don't forget to update the Python implementation (%1.%2 -> %1.%3) in")
+        const QString message = tr("Don't forget to update the Python implementation (%1.%2 -> %1.%3) in")
                                         .arg(funcName, oldName, newName);
 
         reportWarning(message, filePath);
