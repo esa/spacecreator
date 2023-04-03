@@ -56,13 +56,15 @@ set(SC_PLUGIN_SOURCES
     options/tmcoptionswidget.cpp
     options/tmcoptions.h
     options/tmcoptions.cpp
-    cpprefactor.cpp
-    cpprefactor.h
-    creatorrefactorbase.cpp
-    creatorrefactorbase.h
-    pythonrefactor.cpp
-    pythonrefactor.h
     qtcreatorutils.h
+    refactor/adarefactor.cpp
+    refactor/adarefactor.h
+    refactor/cpprefactor.cpp
+    refactor/cpprefactor.h
+    refactor/creatorrefactorbase.cpp
+    refactor/creatorrefactorbase.h
+    refactor/pythonrefactor.cpp
+    refactor/pythonrefactor.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h
     spacecreatorplugin_global.h

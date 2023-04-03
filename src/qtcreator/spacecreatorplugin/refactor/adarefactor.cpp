@@ -15,32 +15,23 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
-
-#include <QPointer>
-#include <refactorbase.h>
-
-class QDir;
-
-namespace scs {
-class SpaceCreatorProject;
-}
+#include "adarefactor.h"
 
 namespace spctr {
 
-/*!
- * \brief The CreatorRefactorBase class provide common functionality for refactoring classes based on QtCreator features
- */
-class CreatorRefactorBase : public scs::RefactorBase
+QString AdaRefactor::language() const
 {
-public:
-    void setStorage(scs::SpaceCreatorProject *storage);
+    return tr("Ada");
+}
 
-protected:
-    QDir implementationDir(ivm::IVFunction *func, const QString &name, const QString &languageDir) const;
-    void reportWarning(const QString &message, const QString &filePath) const;
+QString AdaRefactor::languageDir() const
+{
+    return "Ada";
+}
 
-    QPointer<scs::SpaceCreatorProject> m_storage;
-};
+QString AdaRefactor::filename(const QString &funcName) const
+{
+    return QString("/src/%1.adb").arg(funcName.toLower());
+}
 
 } // namespace spctr

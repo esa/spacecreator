@@ -18,31 +18,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include "creatorrefactorbase.h"
-#include "qcoreapplication.h"
-
-#include <QDir>
 
 namespace spctr {
 
 /*!
- * \brief The PythonRefactor class handles refactorings  affecting python omplementations.
+ * \brief The CppRefactor class handles refactorings  affecting C++ implementations.
  */
 class CppRefactor : public spctr::CreatorRefactorBase
 {
-    Q_DECLARE_TR_FUNCTIONS(CppRefactor)
-
 public:
-    bool isRefactorSupported(RefactorType type) const override;
+    QString language() const override;
 
-    bool isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const override;
-    bool isIVInterfaceUsed(ivm::IVInterface *interface, const QString &name) const override;
-
-    void onIVFunctionRenamed(ivm::IVFunction *func, const QString &oldName, const QString &newName) const override;
-    void onIVInterfaceRenamed(
-            ivm::IVInterface *interface, const QString &oldName, const QString &newName) const override;
-
-private:
-    QString filename(const QString &funcName) const;
+protected:
+    virtual QString languageDir() const override;
+    QString filename(const QString &funcName) const override;
 };
 
 } // namespace spctr

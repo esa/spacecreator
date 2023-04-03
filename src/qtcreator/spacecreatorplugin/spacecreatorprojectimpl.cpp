@@ -18,13 +18,14 @@
 #include "spacecreatorprojectimpl.h"
 
 #include "asn1modelstorage.h"
-#include "cpprefactor.h"
 #include "editorcore.h"
 #include "errorhub.h"
 #include "iveditorcore.h"
 #include "ivrefactorhandler.h"
 #include "msceditorcore.h"
-#include "pythonrefactor.h"
+#include "refactor/adarefactor.h"
+#include "refactor/cpprefactor.h"
+#include "refactor/pythonrefactor.h"
 
 #include <QDebug>
 #include <QDir>
@@ -40,8 +41,9 @@ const char TASK_CATEGORY_SPACE_CREATOR[] = "Task.Category.SpaceCreator";
 SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *project, QObject *parent)
     : scs::SpaceCreatorProject(parent)
     , m_project(project)
-    , m_pythonRefactor(std::make_unique<PythonRefactor>())
+    , m_adaRefactor(std::make_unique<AdaRefactor>())
     , m_cppRefactor(std::make_unique<CppRefactor>())
+    , m_pythonRefactor(std::make_unique<PythonRefactor>())
 {
     Q_ASSERT(m_project);
 
@@ -66,10 +68,12 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     connect(shared::ErrorHub::instance(), &shared::ErrorHub::clearedFile, this,
             &SpaceCreatorProjectImpl::clearTasksForFile);
 
-    m_pythonRefactor->setStorage(this);
-    m_ivRefactorHandler->registerRefactor(m_pythonRefactor.get());
+    m_adaRefactor->setStorage(this);
+    m_ivRefactorHandler->registerRefactor(m_adaRefactor.get());
     m_cppRefactor->setStorage(this);
     m_ivRefactorHandler->registerRefactor(m_cppRefactor.get());
+    m_pythonRefactor->setStorage(this);
+    m_ivRefactorHandler->registerRefactor(m_pythonRefactor.get());
 }
 
 SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }
