@@ -147,11 +147,10 @@ QAction *MSCEditorCore::createActionCopy(QMainWindow *window)
     if (m_actionCopy == nullptr) {
         if (window != nullptr) {
             m_actionCopy = new QAction(tr("Copy:"), this);
+            m_actionCopy->setShortcut(QKeySequence::Copy);
             m_actionCopy->setMenu(new QMenu(window));
-            m_actionCopy->menu()->addAction(
-                    tr("Copy Diagram"), m_model.get(), &msc::MainModel::copyCurrentChart, QKeySequence::Copy);
-            m_actionCopy->menu()->addAction(
-                    tr("Copy as Picture"), m_model.get(), &msc::MainModel::copyCurrentChartAsPicture);
+            m_actionCopy->menu()->addAction(tr("Copy Diagram"), m_model.get(), &msc::MainModel::copyCurrentChart);
+            m_actionCopy->menu()->addAction(tr("Copy as Picture"), m_model.get(), &msc::MainModel::copyCurrentChartAsPicture);
         } else {
             m_actionCopy = new QAction(tr("Copy Diagram"), this);
             m_actionCopy->setShortcut(QKeySequence::Copy);

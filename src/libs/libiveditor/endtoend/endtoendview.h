@@ -36,20 +36,25 @@ class EndToEndView : public QDialog
     Q_OBJECT
 
 public:
-    explicit EndToEndView(InterfaceDocument *document, QWidget *parent = nullptr);
+    explicit EndToEndView(InterfaceDocument *document, QWidget *parent);
+    explicit EndToEndView(InterfaceDocument *document);
     ~EndToEndView() override;
 
     void setVisible(bool visible) override;
     void setMscFiles(const QStringList &files);
     void setMscDataFetcher(std::function<msc::MscModel *(QString)> fetcher);
+    bool exportScene(const QString &outputPath);
+
+    bool refreshView();
+    bool setMscFile(const QString &fileName, QString *errorString = nullptr);
 
 Q_SIGNALS:
     void visibleChanged(bool visible);
 
 private Q_SLOTS:
-    bool refreshView();
-    void exportToPng();
-    void setMscFile(const QString &fileName);
+    bool saveSceneToRaster(const QString &outputPath);
+    bool saveSceneToVector(const QString &outputPath);
+    void callExport();
 
 private:
     struct EndToEndViewPrivate;

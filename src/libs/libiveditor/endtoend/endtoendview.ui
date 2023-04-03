@@ -46,7 +46,7 @@
      <item>
       <widget class="QPushButton" name="exportButton">
        <property name="text">
-        <string>&amp;Save as PNG</string>
+        <string>Save as Image</string>
        </property>
       </widget>
      </item>

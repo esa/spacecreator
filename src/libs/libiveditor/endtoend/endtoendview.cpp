@@ -50,6 +50,7 @@
 #include <QListView>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSvgGenerator>
 #include <memory>
 
 namespace ive {
@@ -102,12 +103,14 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
             }
         }
     });
-    connect(d->ui->fileSelectBox, &QComboBox::currentTextChanged, this, &EndToEndView::setMscFile);
+    connect(d->ui->fileSelectBox, &QComboBox::currentTextChanged, this,
+            [this](const QString &mscFile) { setMscFile(mscFile); });
 
-    connect(d->ui->exportButton, &QPushButton::clicked, this, &EndToEndView::exportToPng);
+    connect(d->ui->exportButton, &QPushButton::clicked, this, &EndToEndView::callExport);
 
     // Listen to path changes from the document
-    connect(d->document, &InterfaceDocument::mscFileNameChanged, this, &EndToEndView::setMscFile);
+    connect(d->document, &InterfaceDocument::mscFileNameChanged, this,
+            [this](const QString &mscFile) { setMscFile(mscFile); });
 
     // Refresh the view
     connect(d->ui->refreshButton, &QPushButton::clicked, this, &EndToEndView::refreshView);
@@ -121,6 +124,21 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
         resize(parent->width() - margin * 2, parent->height() - margin * 2);
         move(parent->x() + margin, parent->y() + margin);
     }
+}
+
+EndToEndView::EndToEndView(InterfaceDocument *document)
+    : d(new EndToEndViewPrivate)
+{
+    d->ui->setupUi(this);
+    setMscFiles({});
+
+    d->ui->view->setInteractive(false);
+    d->scene = new QGraphicsScene(this);
+    d->ui->view->setScene(d->scene);
+    d->document = document;
+
+    d->leafDocuments = new LeafDocumentsModel(this);
+    d->ui->leafDocsView->setModel(d->leafDocuments);
 }
 
 EndToEndView::~EndToEndView()
@@ -206,7 +224,7 @@ bool EndToEndView::refreshView()
         const int objectLevel = ivm::utils::nestingLevel(obj);
         const bool isRootOrRootChild = obj->id() == d->document->objectsModel()->rootObjectId()
                 || (d->document->objectsModel()->rootObject()
-                           && obj->parentObject() == d->document->objectsModel()->rootObject());
+                        && obj->parentObject() == d->document->objectsModel()->rootObject());
         if ((objectLevel < lowestLevel || objectLevel > (lowestLevel + gi::kNestingVisibilityLevel))
                 && !isRootOrRootChild) {
             continue;
@@ -432,36 +450,73 @@ bool EndToEndView::refreshView()
     return foundConnection || !internalConnections.isEmpty();
 }
 
-void EndToEndView::exportToPng()
+bool EndToEndView::saveSceneToRaster(const QString &outputPath)
 {
-    QFileDialog dialog(parentWidget(), tr("Save as PNG"), d->lastExportPath, tr("PNG Images (*.png)"));
+    // Create an image the size of the scene and render the scene into it
+    QPixmap image(d->scene->sceneRect().size().toSize());
+    image.fill(Qt::transparent);
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    d->scene->render(&painter);
+    painter.end();
+    return image.save(outputPath);
+}
+
+bool EndToEndView::saveSceneToVector(const QString &outputPath)
+{
+    QSvgGenerator generator;
+    generator.setFileName(outputPath);
+    generator.setSize(d->scene->sceneRect().size().toSize());
+    generator.setViewBox(QRectF(QPointF(0, 0), d->scene->sceneRect().size()));
+    generator.setTitle(tr("End to end View")); // The title document
+    generator.setDescription(tr("End to end view exported to SVG file"));
+
+    QPainter painter;
+    painter.begin(&generator);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    d->scene->render(&painter);
+    painter.end();
+
+    return true;
+}
+
+bool EndToEndView::exportScene(const QString &outputPath)
+{
+    const QFileInfo fi(outputPath);
+    if (QString::compare(fi.completeSuffix(), QLatin1String("svg"), Qt::CaseInsensitive) == 0) {
+        return saveSceneToVector(outputPath);
+    }
+    return saveSceneToRaster(outputPath);
+}
+
+void EndToEndView::callExport()
+{
+    QFileDialog dialog(parentWidget(), tr("Save as Image"), d->lastExportPath,
+            tr("PNG Image (*.png); JPEG Image (*.jpg); Bitmap Image (*.bmp); SVG Image (*.svg)"));
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix(".png");
     if (dialog.exec() == QDialog::Accepted) {
         const QString path = dialog.selectedUrls().value(0).toLocalFile();
         d->lastExportPath = path;
 
-        // Create an image the size of the scene and render the scene into it
-        QPixmap image(d->scene->sceneRect().size().toSize());
-        image.fill(Qt::transparent);
-        QPainter painter(&image);
-        painter.setRenderHint(QPainter::Antialiasing);
-        painter.setRenderHint(QPainter::TextAntialiasing);
-        d->scene->render(&painter);
-        painter.end();
-        if (!image.save(path)) {
+        bool saveSuccess = exportScene(path);
+
+        if (!saveSuccess) {
             QMessageBox::critical(parentWidget(), tr("Export failed"), tr("Saving to file %1 failed").arg(path));
         }
     }
 }
 
-void EndToEndView::setMscFile(const QString &fileName)
+bool EndToEndView::setMscFile(const QString &fileName, QString *errorString)
 {
     if (d->model && d->model->parent() == this) {
         delete d->model;
         d->model = nullptr;
     }
 
+    // Set model
     d->model = d->mscModelFetcher(fileName);
     if (d->model == nullptr) {
         msc::MscReader reader(msc::MscReader::NOTIFY::NO_HUB);
@@ -469,18 +524,27 @@ void EndToEndView::setMscFile(const QString &fileName)
             d->model = reader.parseFile(fileName);
             d->model->setParent(this);
         } catch (...) {
-            QMessageBox::warning(this, tr("Can't load msc file"),
-                    tr("Can't load the msc file\n%1\n\n%2").arg(fileName, reader.getErrorMessages().join('\n')));
-            return;
+            const QString errStr =
+                    tr("Can't load the msc file\n%1\n\n%2").arg(fileName, reader.getErrorMessages().join('\n'));
+            if (errorString) {
+                *errorString = errStr;
+            } else {
+                QMessageBox::warning(this, tr("Can't load msc file"), errStr);
+            }
+            return false;
         }
     }
-
+    //
     d->document->setMscFileName(fileName);
     d->dataflow.setPath(fileName);
+
+    // Update UI
     QFileInfo info(fileName);
     d->ui->pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
     d->leafDocuments->fillModel(d->model->documents().first());
     d->ui->leafDocsView->setCurrentIndex(d->leafDocuments->index(0, 0));
+
+    return true;
 }
 
 }

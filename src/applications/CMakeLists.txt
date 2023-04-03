@@ -1,6 +1,7 @@
 add_subdirectory(aadlconverter)
 add_subdirectory(dvconverter)
 add_subdirectory(dveditor)
+add_subdirectory(e2eimagesaver)
 add_subdirectory(iveditor)
 add_subdirectory(ivstreaming)
 add_subdirectory(mscconverter)

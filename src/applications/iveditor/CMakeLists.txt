@@ -32,3 +32,4 @@ if (WIN32)
 endif()
 
 install(TARGETS ${APP_NAME} DESTINATION bin)
+

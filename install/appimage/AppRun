@@ -31,6 +31,8 @@ Options:
             Run the InterfaceView UI streaming client
         [--mscstreaming [--help]]
             Run the mscstreaming
+        [--e2eimagesaver [--help]]
+            Run the End-to-End View diagram saver
         [--DVeditor [--help]]
             Run the DVeditor
         [--IVeditor [--help]]
@@ -99,6 +101,10 @@ case $TOOL in
 --mscstreaming)
     shift
     exec "$bindir/mscstreaming" $@
+    ;;
+--e2eimagesaver)
+    shift
+    exec "$bindir/e2eimagesaver" $@
     ;;
 --DVeditor)
     shift
