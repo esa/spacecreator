@@ -127,6 +127,14 @@ void IVConnectionGroup::addGroupedConnection(const QPointer<IVConnection> &conne
     Q_EMIT connectionAdded(connection);
 }
 
+/*!
+ * Returns true, if the given connection is part of this groupd
+ */
+bool IVConnectionGroup::contains(const IVConnection *connection) const
+{
+    return m_connections.contains(connection);
+}
+
 void IVConnectionGroup::addConnection(const QPointer<IVConnection> &connection)
 {
     if (connection.isNull() || !connection->sourceInterface() || !connection->targetInterface()

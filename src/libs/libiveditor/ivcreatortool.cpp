@@ -187,6 +187,10 @@ void IVCreatorTool::groupSelectedItems()
     QList<ivm::IVConnectionGroup::CreationInfo> groupCreationDataList;
 
     auto processConnection = [&](ivm::IVConnection *connection) {
+        if (!connection || !connection->connectionGroups().isEmpty()
+                || connection->type() == ivm::IVObject::Type::ConnectionGroup) {
+            return;
+        }
         auto it = std::find_if(groupCreationDataList.begin(), groupCreationDataList.end(),
                 [connection](const ivm::IVConnectionGroup::CreationInfo &data) {
                     const bool functionMatch = data.sourceObject->id() == connection->source()->id()
@@ -224,6 +228,24 @@ void IVCreatorTool::groupSelectedItems()
         }
     };
 
+    // If 2 functions are selected, gather their connections
+    if (m_view->scene()->selectedItems().size() == 2) {
+        if (m_view->scene()->selectedItems().at(0)->type() == IVFunctionGraphicsItem::Type
+                && m_view->scene()->selectedItems().at(1)->type() == IVFunctionGraphicsItem::Type) {
+            ivm::IVFunction *func1 =
+                    qgraphicsitem_cast<IVFunctionGraphicsItem *>(m_view->scene()->selectedItems().at(0))->entity();
+            ivm::IVFunction *func2 =
+                    qgraphicsitem_cast<IVFunctionGraphicsItem *>(m_view->scene()->selectedItems().at(1))->entity();
+
+            QVector<ivm::IVConnection *> connections =
+                    m_doc->objectsModel()->getConnectionsBetweenFunctions(func1->id(), func2->id());
+            for (ivm::IVConnection *connection : connections) {
+                processConnection(connection);
+            }
+        }
+    }
+
+    // Check for selected connections
     for (const auto item : m_view->scene()->selectedItems()) {
         if (item->type() == IVConnectionGraphicsItem::Type) {
             if (auto connectionItem = qgraphicsitem_cast<IVConnectionGraphicsItem *>(item)) {
@@ -487,7 +509,9 @@ void IVCreatorTool::populateContextMenu_commonCreate(QMenu *menu, const QPointF 
         const auto selectedItems = m_previewItem->scene()->selectedItems();
         auto it = std::find_if(selectedItems.cbegin(), selectedItems.cend(),
                 [](const QGraphicsItem *item) { return item->type() == IVConnectionGraphicsItem::Type; });
-        action->setEnabled(it != selectedItems.cend());
+        const bool functionsOnly = std::all_of(selectedItems.cbegin(), selectedItems.cend(),
+                [](const QGraphicsItem *item) { return item->type() == IVFunctionGraphicsItem::Type; });
+        action->setEnabled((it != selectedItems.cend()) || (functionsOnly && selectedItems.size() == 2));
 
         action = menu->addAction(QIcon(QLatin1String(":/toolbar/icns/delete.svg")), tr("Ungroup connections"), this,
                 [this]() { ungroupConnectedItems(); });

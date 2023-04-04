@@ -40,6 +40,7 @@ private Q_SLOTS:
     void testManageMixed();
     void testConnectionQuery();
     void testAvailableFunctionTypes();
+    void testGetConnectionsBetweenFunctions();
 
 private:
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
@@ -362,6 +363,30 @@ void tst_IVModel::testAvailableFunctionTypes()
     for (auto object : sharedObjects) {
         QVERIFY(availableTypes.contains(object->title()));
     }
+}
+
+void tst_IVModel::testGetConnectionsBetweenFunctions()
+{
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2");
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3");
+
+    ivm::IVConnection *c1 = ivm::testutils::createConnection(fn1, fn2, "C1");
+    ivm::IVConnection *c2 = ivm::testutils::createConnection(fn1, fn2, "C2");
+    ivm::IVConnection *c3 = ivm::testutils::createConnection(fn2, fn1, "C3");
+    ivm::IVConnection *c4 = ivm::testutils::createConnection(fn1, fn3, "C4");
+    ivm::IVConnection *c5 = ivm::testutils::createConnection(fn3, fn2, "C5");
+
+    ivm::IVModel model(m_dynPropConfig, nullptr);
+    const QVector<ivm::IVObject *> objects { fn1, fn2, fn3, c1, c2, c3, c4, c5 };
+    model.addObjects(objects);
+
+    const QVector<ivm::IVConnection *> connections = model.getConnectionsBetweenFunctions(fn1->id(), fn2->id());
+    QVERIFY(connections.contains(c1));
+    QVERIFY(connections.contains(c2));
+    QVERIFY(connections.contains(c3));
+    QVERIFY(!connections.contains(c4));
+    QVERIFY(!connections.contains(c5));
 }
 
 QTEST_APPLESS_MAIN(tst_IVModel)

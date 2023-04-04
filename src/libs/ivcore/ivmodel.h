@@ -91,6 +91,7 @@ public:
     QVector<ivm::IVConnection *> getRelatedConnections(IVInterface *interface) const;
 
     QVector<IVConnection *> getConnectionsForFunction(const shared::Id &id) const;
+    QVector<IVConnection *> getConnectionsBetweenFunctions(const shared::Id &id1, const shared::Id &id2) const;
 
     auto setConnectionLayersModel(IVModel *layersModel) -> void;
     auto getConnectionLayersModel() const -> IVModel *;

@@ -25,6 +25,7 @@
 #include <memory>
 
 namespace ivm {
+class IVConnectionGroup;
 
 struct IVConnectionPrivate;
 class IVConnection : public IVObject
@@ -54,6 +55,8 @@ public:
     IVConnectionLayerType *layer() const;
 
     bool isProtected() const;
+
+    QVector<IVConnectionGroup *> connectionGroups() const;
 
     template<class T>
     static inline T selectIface(IVInterface *a, IVInterface *b)

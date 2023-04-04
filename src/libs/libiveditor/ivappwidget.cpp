@@ -781,7 +781,11 @@ void IVAppWidget::checkActionsFromSelection()
         return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
                 == static_cast<int>(ivm::IVObject::Type::Connection);
     });
-    m_actCreateConnectionGroup->setEnabled(it != std::cend(idxs));
+    const bool functionsOnly = std::all_of(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
+        return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
+                == static_cast<int>(ivm::IVObject::Type::Function);
+    });
+    m_actCreateConnectionGroup->setEnabled((it != std::cend(idxs)) || (functionsOnly && idxs.size() == 2));
 
     it = std::find_if(idxs.cbegin(), idxs.cend(), [](const QModelIndex &index) {
         return index.data(static_cast<int>(ive::IVVisualizationModelBase::TypeRole)).toInt()
@@ -979,7 +983,7 @@ QVector<QAction *> IVAppWidget::initActions()
 
     m_actEditAttributes = new QAction(tr("Edit Attributes"));
     ActionsManager::registerAction(Q_FUNC_INFO, m_actEditAttributes, "Edit", "Edit Attributes");
-    m_actCreateConnectionGroup->setActionGroup(actionGroup);
+    m_actEditAttributes->setActionGroup(actionGroup);
     m_actEditAttributes->setIcon(QIcon(QLatin1String(":/toolbar/icns/edit.svg")));
     connect(m_actEditAttributes, &QAction::triggered, this, [this]() { showEditAttributesDialog(); });
 

@@ -581,6 +581,27 @@ QVector<IVConnection *> IVModel::getConnectionsForFunction(const shared::Id &id)
     return result;
 }
 
+/*!
+ * Returns all connections between the two given functions. Both directions
+ */
+QVector<IVConnection *> IVModel::getConnectionsBetweenFunctions(const shared::Id &id1, const shared::Id &id2) const
+{
+    QVector<IVConnection *> result;
+
+    for (auto obj : objects()) {
+        if (auto connection = qobject_cast<IVConnection *>(obj)) {
+            const bool sourceOk = (connection->source() && connection->source()->id() == id1)
+                    || (connection->source() && connection->source()->id() == id2);
+            const bool targetOk = (connection->target() && connection->target()->id() == id1)
+                    || (connection->target() && connection->target()->id() == id2);
+            if (sourceOk && targetOk) {
+                result.append(connection);
+            }
+        }
+    }
+    return result;
+}
+
 /**
  * visibleObjects are the object that is visible in the current level, regardless if the user has hidden it.
  * @return

@@ -63,6 +63,8 @@ public:
 
     void addGroupedConnection(const QPointer<IVConnection> &connection);
 
+    bool contains(const IVConnection *connection) const;
+
 Q_SIGNALS:
     void connectionAdded(IVConnection *connection);
     void connectionRemoved(IVConnection *connection);

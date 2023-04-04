@@ -19,6 +19,7 @@
 
 #include "connectioncreationvalidator.h"
 #include "errorhub.h"
+#include "ivconnectiongroup.h"
 #include "ivconnectionlayertype.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
@@ -176,6 +177,26 @@ bool IVConnection::isProtected() const
         return true;
     }
     return false;
+}
+
+/*!
+ * Returns the group this connection belongs to.
+ * If it is not part of a group, nullptr is returned
+ */
+QVector<IVConnectionGroup *> IVConnection::connectionGroups() const
+{
+    QVector<IVConnectionGroup *> result;
+    if (!model()) {
+        return result;
+    }
+
+    QVector<IVConnectionGroup *> allGroups = model()->allObjectsByType<IVConnectionGroup>();
+    for (IVConnectionGroup *group : allGroups) {
+        if (group->contains(this)) {
+            result.append(group);
+        }
+    }
+    return result;
 }
 
 void IVConnection::handleInheritPIChange(IVConnection::InheritPIChange inheritance)
