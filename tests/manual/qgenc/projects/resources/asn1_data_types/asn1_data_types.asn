@@ -1,0 +1,318 @@
+ASN1-DATA-TYPES DEFINITIONS ::= BEGIN
+
+    -- QGenCImplAlias
+    BoolAlias                 ::= BOOLEAN
+    IntegerAlias              ::= INTEGER(1 .. 200)
+    RealAlias                 ::= REAL(0.0 .. 1.0)
+    IA5StringFixedSizeAlias   ::= IA5String(SIZE(3))
+    IA5StringVarSizeAlias     ::= IA5String(SIZE(2 .. 3))
+    OctetStringFixedSizeAlias ::= OCTET STRING (SIZE (3))
+    OctetStringVarSizeAlias   ::= OCTET STRING(SIZE(2 .. 3))
+    EnumAlias                 ::= ENUMERATED
+    {
+        zero(0),
+        one(1),
+        two(2)
+    }
+
+    --------------------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------
+
+    -- QGenCImplSeq
+    SeqAliases ::= SEQUENCE
+    {
+        boolAliasMember                 BoolAlias,
+        integerAliasMember              IntegerAlias,
+        realAliasMember                 RealAlias,
+        ia5StringFixedSizeAliasMember   IA5StringFixedSizeAlias,
+        ia5StringVarSizeAliasMember     IA5StringVarSizeAlias,
+        octetStringFixedSizeAliasMember OctetStringFixedSizeAlias,
+        octetStringVarSizeAliasMember   OctetStringVarSizeAlias,
+        enumAliasMember                 EnumAlias
+    }
+
+    SeqBuiltIn ::= SEQUENCE
+    {
+        boolMember                      BOOLEAN,
+        integerMember                   INTEGER(1 .. 200),
+        realMember                      REAL(0.0 .. 1.0),
+        ia5StringFixedSizeMember        IA5String(SIZE(3)),
+        ia5StringVarSizeMember          IA5String(SIZE(2 .. 3)),
+        octetStringFixedSizeMember      OCTET STRING(SIZE(3)),
+        octetStringVarSizeMember        OCTET STRING(SIZE(2 .. 3)),
+        enumMember                      ENUMERATED { zero(0), one(1), two(2) }
+    }
+
+    SeqOfFixedSizeSeqOfsProvidedInterface ::= SEQUENCE
+    {
+        seqOfSeqOfSeqOfFixedSizeBoolAliasMember                 SeqOfSeqOfSeqOfFixedSizeBoolAlias,
+        seqOfSeqOfSeqOfFixedSizeIntegerAliasMember              SeqOfSeqOfSeqOfFixedSizeIntegerAlias,
+        seqOfSeqOfSeqOfFixedSizeRealAliasMember                 SeqOfSeqOfSeqOfFixedSizeRealAlias,
+        seqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAliasMember   SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAliasMember     SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAliasMember SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAliasMember   SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeEnumAliasMember                 SeqOfSeqOfSeqOfFixedSizeEnumAlias,
+        seqOfSeqOfSeqOfFixedSizeSeqAliasesMember                SeqOfSeqOfSeqOfFixedSizeSeqAliases,
+        seqOfSeqOfSeqOfFixedSizeSeqBuiltInMember                SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn,
+        seqOfSeqOfSeqOfFixedSizeChoiceAliasesMember             SeqOfSeqOfSeqOfFixedSizeChoiceAliases,
+        seqOfSeqOfSeqOfFixedSizeChoiceBuiltInMember             SeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn
+    }
+
+    SeqOfVarSizeSeqOfsProvidedInterface ::= SEQUENCE
+    {
+        seqOfSeqOfSeqOfVarSizeBoolAliasMember                   SeqOfSeqOfSeqOfVarSizeBoolAlias,
+        seqOfSeqOfSeqOfVarSizeIntegerAliasMember                SeqOfSeqOfSeqOfVarSizeIntegerAlias,
+        seqOfSeqOfSeqOfVarSizeRealAliasMember                   SeqOfSeqOfSeqOfVarSizeRealAlias,
+        seqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAliasMember     SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias,
+        seqOfSeqOfSeqOfVarSizeIA5StringVarSizeAliasMember       SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias,
+        seqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAliasMember   SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias,
+        seqOfSeqOfSeqOfVarSizeOctetStringVarSizeAliasMember     SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias,
+        seqOfSeqOfSeqOfVarSizeEnumAliasMember                   SeqOfSeqOfSeqOfVarSizeEnumAlias,
+        seqOfSeqOfSeqOfVarSizeSeqAliasesMember                  SeqOfSeqOfSeqOfVarSizeSeqAliases,
+        seqOfSeqOfSeqOfVarSizeSeqBuiltInMember                  SeqOfSeqOfSeqOfVarSizeSeqBuiltIn,
+        seqOfSeqOfSeqOfVarSizeChoiceAliasesMember               SeqOfSeqOfSeqOfVarSizeChoiceAliases,
+        seqOfSeqOfSeqOfVarSizeChoiceBuiltInMember               SeqOfSeqOfSeqOfVarSizeChoiceBuiltIn
+    }
+
+    SeqOfFixedSizeSeqOfsRequiredInterface ::= SEQUENCE
+    {
+        seqOfSeqOfSeqOfFixedSizeBoolAliasMember                 SeqOfSeqOfSeqOfFixedSizeBoolAlias,
+        seqOfSeqOfSeqOfFixedSizeIntegerAliasMember              SeqOfSeqOfSeqOfFixedSizeIntegerAlias,
+        seqOfSeqOfSeqOfFixedSizeRealAliasMember                 SeqOfSeqOfSeqOfFixedSizeRealAlias,
+        seqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAliasMember   SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAliasMember     SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAliasMember SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAliasMember   SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeEnumAliasMember                 SeqOfSeqOfSeqOfFixedSizeEnumAlias,
+        seqOfSeqOfSeqOfFixedSizeSeqAliasesMember                SeqOfSeqOfSeqOfFixedSizeSeqAliases,
+        seqOfSeqOfSeqOfFixedSizeSeqBuiltInMember                SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn
+    }
+
+    SeqOfVarSizeSeqOfsRequiredInterface ::= SEQUENCE
+    {
+        seqOfSeqOfSeqOfVarSizeBoolAliasMember                   SeqOfSeqOfSeqOfVarSizeBoolAlias,
+        seqOfSeqOfSeqOfVarSizeIntegerAliasMember                SeqOfSeqOfSeqOfVarSizeIntegerAlias,
+        seqOfSeqOfSeqOfVarSizeRealAliasMember                   SeqOfSeqOfSeqOfVarSizeRealAlias,
+        seqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAliasMember     SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias,
+        seqOfSeqOfSeqOfVarSizeIA5StringVarSizeAliasMember       SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias,
+        seqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAliasMember   SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias,
+        seqOfSeqOfSeqOfVarSizeOctetStringVarSizeAliasMember     SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias,
+        seqOfSeqOfSeqOfVarSizeEnumAliasMember                   SeqOfSeqOfSeqOfVarSizeEnumAlias,
+        seqOfSeqOfSeqOfVarSizeSeqAliasesMember                  SeqOfSeqOfSeqOfVarSizeSeqAliases,
+        seqOfSeqOfSeqOfVarSizeSeqBuiltInMember                  SeqOfSeqOfSeqOfVarSizeSeqBuiltIn
+    }
+
+    SeqOfSeqsProvidedInterface ::= SEQUENCE
+    {
+        seqAliasesMember               SeqAliases,
+        seqBuiltInMember               SeqBuiltIn,
+        seqOfFixedSizeSeqOfsMember     SeqOfFixedSizeSeqOfsProvidedInterface,
+        seqOfVarSizeSeqOfsMember       SeqOfVarSizeSeqOfsProvidedInterface
+    }
+
+    SeqOfSeqsRequiredInterface ::= SEQUENCE
+    {
+        seqAliasesMember               SeqAliases,
+        seqBuiltInMember               SeqBuiltIn,
+        seqOfFixedSizeSeqOfsMember     SeqOfFixedSizeSeqOfsRequiredInterface,
+        seqOfVarSizeSeqOfsMember       SeqOfVarSizeSeqOfsRequiredInterface
+    }
+
+    SeqOfChoices ::= SEQUENCE
+    {
+        choiceAliasesMember            ChoiceAliases,
+        choiceBuiltInMember            ChoiceBuiltIn,
+        choiceOfFixedSizeSeqOfsMember  ChoiceOfFixedSizeSeqOfs,
+        choiceOfVarSizeSeqOfsMember    ChoiceOfVarSizeSeqOfs
+    }
+
+    --------------------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------
+
+    -- QGenCImplChoice
+    ChoiceAliases ::= CHOICE
+    {
+        boolAliasMember                 [0] BoolAlias,
+        integerAliasMember              [1] IntegerAlias,
+        realAliasMember                 [2] RealAlias,
+        ia5StringFixedSizeAliasMember   [3] IA5StringFixedSizeAlias,
+        ia5StringVarSizeAliasMember     [4] IA5StringVarSizeAlias,
+        octetStringFixedSizeAliasMember [5] OctetStringFixedSizeAlias,
+        octetStringVarSizeAliasMember   [6] OctetStringVarSizeAlias,
+        enumAliasMember                 [7] EnumAlias
+    }
+
+    ChoiceBuiltIn ::= CHOICE
+    {
+        boolMember                      [0] BOOLEAN,
+        integerMember                   [1] INTEGER(1 .. 200),
+        realMember                      [2] REAL(0.0 .. 1.0),
+        ia5StringFixedSizeMember        [3] IA5String(SIZE(3)),
+        ia5StringVarSizeMember          [4] IA5String(SIZE(2 .. 3)),
+        octetStringFixedSizeMember      [5] OCTET STRING(SIZE(3)),
+        octetStringVarSizeMember        [6] OCTET STRING(SIZE(2 .. 3)),
+        enumMember                      [7] ENUMERATED { zero(0), one(1), two(2) }
+    }
+
+    ChoiceOfFixedSizeSeqOfs ::= CHOICE
+    {
+        seqOfSeqOfSeqOfFixedSizeBoolAliasMember                 [0]  SeqOfSeqOfSeqOfFixedSizeBoolAlias,
+        seqOfSeqOfSeqOfFixedSizeIntegerAliasMember              [1]  SeqOfSeqOfSeqOfFixedSizeIntegerAlias,
+        seqOfSeqOfSeqOfFixedSizeRealAliasMember                 [2]  SeqOfSeqOfSeqOfFixedSizeRealAlias,
+        seqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAliasMember   [3]  SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAliasMember     [4]  SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAliasMember [5]  SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAliasMember   [6]  SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias,
+        seqOfSeqOfSeqOfFixedSizeEnumAliasMember                 [7]  SeqOfSeqOfSeqOfFixedSizeEnumAlias,
+        seqOfSeqOfSeqOfFixedSizeSeqAliasesMember                [8]  SeqOfSeqOfSeqOfFixedSizeSeqAliases,
+        seqOfSeqOfSeqOfFixedSizeSeqBuiltInMember                [9]  SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn,
+        seqOfSeqOfSeqOfFixedSizeChoiceAliasesMember             [10] SeqOfSeqOfSeqOfFixedSizeChoiceAliases,
+        seqOfSeqOfSeqOfFixedSizeChoiceBuiltInMember             [11] SeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn
+    }
+
+    ChoiceOfVarSizeSeqOfs ::= CHOICE
+    {
+        seqOfSeqOfSeqOfVarSizeBoolAliasMember                   [0]  SeqOfSeqOfSeqOfVarSizeBoolAlias,
+        seqOfSeqOfSeqOfVarSizeIntegerAliasMember                [1]  SeqOfSeqOfSeqOfVarSizeIntegerAlias,
+        seqOfSeqOfSeqOfVarSizeRealAliasMember                   [2]  SeqOfSeqOfSeqOfVarSizeRealAlias,
+        seqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAliasMember     [3]  SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias,
+        seqOfSeqOfSeqOfVarSizeIA5StringVarSizeAliasMember       [4]  SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias,
+        seqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAliasMember   [5]  SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias,
+        seqOfSeqOfSeqOfVarSizeOctetStringVarSizeAliasMember     [6]  SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias,
+        seqOfSeqOfSeqOfVarSizeEnumAliasMember                   [7]  SeqOfSeqOfSeqOfVarSizeEnumAlias,
+        seqOfSeqOfSeqOfVarSizeSeqAliasesMember                  [8]  SeqOfSeqOfSeqOfVarSizeSeqAliases,
+        seqOfSeqOfSeqOfVarSizeSeqBuiltInMember                  [9]  SeqOfSeqOfSeqOfVarSizeSeqBuiltIn,
+        seqOfSeqOfSeqOfVarSizeChoiceAliasesMember               [10] SeqOfSeqOfSeqOfVarSizeChoiceAliases,
+        seqOfSeqOfSeqOfVarSizeChoiceBuiltInMember               [11] SeqOfSeqOfSeqOfVarSizeChoiceBuiltIn
+    }
+
+    ChoiceOfChoices ::= CHOICE
+    {
+        choiceAliasesMember            [0] ChoiceAliases,
+        choiceBuiltInMember            [1] ChoiceBuiltIn,
+        choiceOfFixedSizeSeqOfsMember  [2] ChoiceOfFixedSizeSeqOfs,
+        choiceOfVarSizeSeqOfsMember    [3] ChoiceOfVarSizeSeqOfs
+    }
+
+    ChoiceOfSeqs ::= CHOICE
+    {
+        seqAliasesMember               [0] SeqAliases,
+        seqBuiltInMember               [1] SeqBuiltIn,
+        seqOfFixedSizeSeqOfsMember     [2] SeqOfFixedSizeSeqOfsProvidedInterface,
+        seqOfVarSizeSeqOfsMember       [3] SeqOfVarSizeSeqOfsProvidedInterface
+    }
+
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+
+    -- QGenCImplSeqOfFixedSize
+    SeqOfFixedSizeBoolAlias                           ::= SEQUENCE (SIZE (3)) OF BoolAlias
+    SeqOfSeqOfFixedSizeBoolAlias                      ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeBoolAlias
+    SeqOfSeqOfSeqOfFixedSizeBoolAlias                 ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeBoolAlias
+
+    SeqOfFixedSizeIntegerAlias                        ::= SEQUENCE (SIZE (3)) OF IntegerAlias
+    SeqOfSeqOfFixedSizeIntegerAlias                   ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeIntegerAlias
+    SeqOfSeqOfSeqOfFixedSizeIntegerAlias              ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeIntegerAlias
+
+    SeqOfFixedSizeRealAlias                           ::= SEQUENCE (SIZE (3)) OF RealAlias
+    SeqOfSeqOfFixedSizeRealAlias                      ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeRealAlias
+    SeqOfSeqOfSeqOfFixedSizeRealAlias                 ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeRealAlias
+
+    SeqOfFixedSizeIA5StringFixedSizeAlias             ::= SEQUENCE (SIZE (3)) OF IA5StringFixedSizeAlias
+    SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias        ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeIA5StringFixedSizeAlias
+    SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias   ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias
+
+    SeqOfFixedSizeIA5StringVarSizeAlias               ::= SEQUENCE (SIZE (3)) OF IA5StringVarSizeAlias
+    SeqOfSeqOfFixedSizeIA5StringVarSizeAlias          ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeIA5StringVarSizeAlias
+    SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias     ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeIA5StringVarSizeAlias
+
+    SeqOfFixedSizeOctetStringFixedSizeAlias           ::= SEQUENCE (SIZE (3)) OF OctetStringFixedSizeAlias
+    SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias      ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeOctetStringFixedSizeAlias
+    SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias
+
+    SeqOfFixedSizeOctetStringVarSizeAlias             ::= SEQUENCE (SIZE (3)) OF OctetStringVarSizeAlias
+    SeqOfSeqOfFixedSizeOctetStringVarSizeAlias        ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeOctetStringVarSizeAlias
+    SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias   ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeOctetStringVarSizeAlias
+
+    SeqOfFixedSizeEnumAlias                           ::= SEQUENCE (SIZE (3)) OF EnumAlias
+    SeqOfSeqOfFixedSizeEnumAlias                      ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeEnumAlias
+    SeqOfSeqOfSeqOfFixedSizeEnumAlias                 ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeEnumAlias
+
+    ------------------------
+
+    SeqOfFixedSizeSeqAliases                          ::= SEQUENCE (SIZE (3)) OF SeqAliases
+    SeqOfSeqOfFixedSizeSeqAliases                     ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeSeqAliases
+    SeqOfSeqOfSeqOfFixedSizeSeqAliases                ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeSeqAliases
+
+    SeqOfFixedSizeSeqBuiltIn                          ::= SEQUENCE (SIZE (3)) OF SeqBuiltIn
+    SeqOfSeqOfFixedSizeSeqBuiltIn                     ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeSeqBuiltIn
+    SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn                ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeSeqBuiltIn
+
+    ------------------------
+
+    SeqOfFixedSizeChoiceAliases                       ::= SEQUENCE (SIZE (3)) OF ChoiceAliases
+    SeqOfSeqOfFixedSizeChoiceAliases                  ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeChoiceAliases
+    SeqOfSeqOfSeqOfFixedSizeChoiceAliases             ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeChoiceAliases
+
+    SeqOfFixedSizeChoiceBuiltIn                       ::= SEQUENCE (SIZE (3)) OF ChoiceBuiltIn
+    SeqOfSeqOfFixedSizeChoiceBuiltIn                  ::= SEQUENCE (SIZE (3)) OF SeqOfFixedSizeChoiceBuiltIn
+    SeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn             ::= SEQUENCE (SIZE (3)) OF SeqOfSeqOfFixedSizeChoiceBuiltIn
+    --------------------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------
+
+    -- QGenCImplSeqOfVariableSize
+    SeqOfVarSizeBoolAlias                             ::= SEQUENCE (SIZE (2 .. 3)) OF BoolAlias
+    SeqOfSeqOfVarSizeBoolAlias                        ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeBoolAlias
+    SeqOfSeqOfSeqOfVarSizeBoolAlias                   ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeBoolAlias
+
+    SeqOfVarSizeIntegerAlias                          ::= SEQUENCE (SIZE (2 .. 3)) OF IntegerAlias
+    SeqOfSeqOfVarSizeIntegerAlias                     ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeIntegerAlias
+    SeqOfSeqOfSeqOfVarSizeIntegerAlias                ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeIntegerAlias
+
+    SeqOfVarSizeRealAlias                             ::= SEQUENCE (SIZE (2 .. 3)) OF RealAlias
+    SeqOfSeqOfVarSizeRealAlias                        ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeRealAlias
+    SeqOfSeqOfSeqOfVarSizeRealAlias                   ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeRealAlias
+
+    SeqOfVarSizeIA5StringFixedSizeAlias               ::= SEQUENCE (SIZE (2 .. 3)) OF IA5StringFixedSizeAlias
+    SeqOfSeqOfVarSizeIA5StringFixedSizeAlias          ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeIA5StringFixedSizeAlias
+    SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias     ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeIA5StringFixedSizeAlias
+
+    SeqOfVarSizeIA5StringVarSizeAlias                 ::= SEQUENCE (SIZE (2 .. 3)) OF IA5StringVarSizeAlias
+    SeqOfSeqOfVarSizeIA5StringVarSizeAlias            ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeIA5StringVarSizeAlias
+    SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias       ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeIA5StringVarSizeAlias
+
+    SeqOfVarSizeOctetStringFixedSizeAlias             ::= SEQUENCE (SIZE (2 .. 3)) OF OctetStringFixedSizeAlias
+    SeqOfSeqOfVarSizeOctetStringFixedSizeAlias        ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeOctetStringFixedSizeAlias
+    SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias   ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeOctetStringFixedSizeAlias
+
+    SeqOfVarSizeOctetStringVarSizeAlias               ::= SEQUENCE (SIZE (2 .. 3)) OF OctetStringVarSizeAlias
+    SeqOfSeqOfVarSizeOctetStringVarSizeAlias          ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeOctetStringVarSizeAlias
+    SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias     ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeOctetStringVarSizeAlias
+
+    SeqOfVarSizeEnumAlias                             ::= SEQUENCE (SIZE (2 .. 3)) OF EnumAlias
+    SeqOfSeqOfVarSizeEnumAlias                        ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeEnumAlias
+    SeqOfSeqOfSeqOfVarSizeEnumAlias                   ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeEnumAlias
+
+    ------------------------
+
+    SeqOfVarSizeSeqAliases                            ::= SEQUENCE (SIZE (2 .. 3)) OF SeqAliases
+    SeqOfSeqOfVarSizeSeqAliases                       ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeSeqAliases
+    SeqOfSeqOfSeqOfVarSizeSeqAliases                  ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeSeqAliases
+
+    SeqOfVarSizeSeqBuiltIn                            ::= SEQUENCE (SIZE (2 .. 3)) OF SeqBuiltIn
+    SeqOfSeqOfVarSizeSeqBuiltIn                       ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeSeqBuiltIn
+    SeqOfSeqOfSeqOfVarSizeSeqBuiltIn                  ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeSeqBuiltIn
+
+    ------------------------
+
+    SeqOfVarSizeChoiceAliases                         ::= SEQUENCE (SIZE (2 .. 3)) OF ChoiceAliases
+    SeqOfSeqOfVarSizeChoiceAliases                    ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeChoiceAliases
+    SeqOfSeqOfSeqOfVarSizeChoiceAliases               ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeChoiceAliases
+
+    SeqOfVarSizeChoiceBuiltIn                         ::= SEQUENCE (SIZE (2 .. 3)) OF ChoiceBuiltIn
+    SeqOfSeqOfVarSizeChoiceBuiltIn                    ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfVarSizeChoiceBuiltIn
+    SeqOfSeqOfSeqOfVarSizeChoiceBuiltIn               ::= SEQUENCE (SIZE (2 .. 3)) OF SeqOfSeqOfVarSizeChoiceBuiltIn
+    --------------------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------
+END

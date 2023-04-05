@@ -1,0 +1,882 @@
+<InterfaceView version="1.1" asn1file="asn1_data_types.asn">
+<Function id="{c5e8e6c1-bfce-4b45-9f48-233f9418dbc8}" name="CImplAlias" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="123700 5100 141300 11300"/>
+<Provided_Interface id="{52c8c3e4-80e2-4bbe-b29f-6d3a26dbe626}" name="ri_aliasIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="i1" type="BoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="IntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="RealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="IA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="IA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="OctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="OctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="EnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="BoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="IntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="RealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="IA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="IA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="OctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="OctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="EnumAlias" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="123700 8500"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{e6136823-dbf7-49f5-bb62-da2eda863f1b}" name="QGenCImplSeqOfFixedSize" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="63700 33500 90100 39800"/>
+<Provided_Interface id="{6a0ee2f4-0cba-4f08-b97f-3c4d17d2eda4}" name="pi_seqOfFixedSizeIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="SeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfSeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfSeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="SeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="SeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="SeqOfSeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i10" type="SeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i11" type="SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i12" type="SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i13" type="SeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i14" type="SeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i15" type="SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i16" type="SeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i17" type="SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i18" type="SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i19" type="SeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i20" type="SeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i21" type="SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i22" type="SeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i23" type="SeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i24" type="SeqOfSeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i25" type="SeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i26" type="SeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i27" type="SeqOfSeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i28" type="SeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i29" type="SeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i30" type="SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i31" type="SeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i32" type="SeqOfSeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i33" type="SeqOfSeqOfSeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i34" type="SeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i35" type="SeqOfSeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i36" type="SeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfSeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfSeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="SeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="SeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="SeqOfSeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o10" type="SeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o11" type="SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o12" type="SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o13" type="SeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o14" type="SeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o15" type="SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o16" type="SeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o17" type="SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o18" type="SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o19" type="SeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o20" type="SeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o21" type="SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o22" type="SeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o23" type="SeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o24" type="SeqOfSeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o25" type="SeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o26" type="SeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o27" type="SeqOfSeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o28" type="SeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o29" type="SeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o30" type="SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o31" type="SeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o32" type="SeqOfSeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o33" type="SeqOfSeqOfSeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o34" type="SeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o35" type="SeqOfSeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o36" type="SeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="63700 36700"/>
+</Provided_Interface>
+
+<Required_Interface id="{a0487199-1b1e-462b-a91d-8f46a6b7f2f9}" name="ri_seqOfFixedSizeIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="i1" type="SeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfSeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfSeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="SeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="SeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="SeqOfSeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i10" type="SeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i11" type="SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i12" type="SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i13" type="SeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i14" type="SeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i15" type="SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i16" type="SeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i17" type="SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i18" type="SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i19" type="SeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i20" type="SeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i21" type="SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i22" type="SeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i23" type="SeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i24" type="SeqOfSeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i25" type="SeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i26" type="SeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i27" type="SeqOfSeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i28" type="SeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i29" type="SeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i30" type="SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfSeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfSeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="SeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="SeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="SeqOfSeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o10" type="SeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o11" type="SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o12" type="SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o13" type="SeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o14" type="SeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o15" type="SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o16" type="SeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o17" type="SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o18" type="SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o19" type="SeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o20" type="SeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o21" type="SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o22" type="SeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o23" type="SeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o24" type="SeqOfSeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o25" type="SeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o26" type="SeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o27" type="SeqOfSeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o28" type="SeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o29" type="SeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o30" type="SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="90100 36900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Function id="{402937f8-e1fe-4804-89f4-b62fe67e2bb9}" name="controller" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="9700 5500 29400 50100"/>
+<Provided_Interface id="{51e8c4d6-0d80-4b2e-be40-37fd1199437d}" name="trigger" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" period="1000" stack_size="1024" priority="1" dispatch_offset="0">
+    <Property name="Taste::coordinates" value="14600 5500"/>
+</Provided_Interface>
+
+<Required_Interface id="{d161d901-3ab6-47bd-9002-a63213485390}" name="pi_aliasIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="BoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="IntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="RealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="IA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="IA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="OctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="OctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="EnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="BoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="IntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="RealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="IA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="IA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="OctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="OctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="EnumAlias" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="29400 8700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{e3b08d98-b57c-45e5-ac4e-e720db6cc7af}" name="pi_seqIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="SeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfFixedSizeSeqOfsProvidedInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfVarSizeSeqOfsProvidedInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqsProvidedInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfChoices" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfFixedSizeSeqOfsProvidedInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfVarSizeSeqOfsProvidedInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqsProvidedInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfChoices" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="29400 18800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{7e2acc0f-8c81-43a8-9dc7-88f129a5f47a}" name="pi_seqOfFixedSizeIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="SeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfSeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfSeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="SeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="SeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="SeqOfSeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i10" type="SeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i11" type="SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i12" type="SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i13" type="SeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i14" type="SeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i15" type="SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i16" type="SeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i17" type="SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i18" type="SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i19" type="SeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i20" type="SeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i21" type="SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i22" type="SeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i23" type="SeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i24" type="SeqOfSeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i25" type="SeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i26" type="SeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i27" type="SeqOfSeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i28" type="SeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i29" type="SeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i30" type="SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i31" type="SeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i32" type="SeqOfSeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i33" type="SeqOfSeqOfSeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i34" type="SeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i35" type="SeqOfSeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i36" type="SeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfSeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfSeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="SeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="SeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="SeqOfSeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o10" type="SeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o11" type="SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o12" type="SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o13" type="SeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o14" type="SeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o15" type="SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o16" type="SeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o17" type="SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o18" type="SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o19" type="SeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o20" type="SeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o21" type="SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o22" type="SeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o23" type="SeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o24" type="SeqOfSeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o25" type="SeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o26" type="SeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o27" type="SeqOfSeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o28" type="SeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o29" type="SeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o30" type="SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o31" type="SeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o32" type="SeqOfSeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o33" type="SeqOfSeqOfSeqOfFixedSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o34" type="SeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o35" type="SeqOfSeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o36" type="SeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="29400 36700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{7e57be5c-473d-462d-b292-abd9fbc01755}" name="pi_seqOfVariableSizeIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="SeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfSeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfSeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="SeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="SeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="SeqOfSeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i10" type="SeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i11" type="SeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i12" type="SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i13" type="SeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i14" type="SeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i15" type="SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i16" type="SeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i17" type="SeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i18" type="SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i19" type="SeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i20" type="SeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i21" type="SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i22" type="SeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i23" type="SeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i24" type="SeqOfSeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i25" type="SeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i26" type="SeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i27" type="SeqOfSeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i28" type="SeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i29" type="SeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i30" type="SeqOfSeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i31" type="SeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i32" type="SeqOfSeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i33" type="SeqOfSeqOfSeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i34" type="SeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i35" type="SeqOfSeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i36" type="SeqOfSeqOfSeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfSeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfSeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="SeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="SeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="SeqOfSeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o10" type="SeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o11" type="SeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o12" type="SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o13" type="SeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o14" type="SeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o15" type="SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o16" type="SeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o17" type="SeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o18" type="SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o19" type="SeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o20" type="SeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o21" type="SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o22" type="SeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o23" type="SeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o24" type="SeqOfSeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o25" type="SeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o26" type="SeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o27" type="SeqOfSeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o28" type="SeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o29" type="SeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o30" type="SeqOfSeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o31" type="SeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o32" type="SeqOfSeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o33" type="SeqOfSeqOfSeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o34" type="SeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o35" type="SeqOfSeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o36" type="SeqOfSeqOfSeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="29400 46000"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{c8b3e9b7-cda6-437a-84e0-2940a61cb38d}" name="pi_choiceIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="ChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="ChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="ChoiceOfFixedSizeSeqOfs" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="ChoiceOfVarSizeSeqOfs" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="ChoiceOfChoices" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="ChoiceOfSeqs" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="ChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="ChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="ChoiceOfFixedSizeSeqOfs" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="ChoiceOfVarSizeSeqOfs" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="ChoiceOfChoices" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="ChoiceOfSeqs" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="29400 27800"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{6be43277-9a41-4da5-941c-756436104053}" name="CImplSeqOfFixedSize" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="124000 34100 142000 40300"/>
+<Provided_Interface id="{ea1354f4-93b0-4c76-9a02-221e72b3a15e}" name="ri_seqOfFixedSizeIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="i1" type="SeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfSeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfSeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="SeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="SeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="SeqOfSeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i10" type="SeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i11" type="SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i12" type="SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i13" type="SeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i14" type="SeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i15" type="SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i16" type="SeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i17" type="SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i18" type="SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i19" type="SeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i20" type="SeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i21" type="SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i22" type="SeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i23" type="SeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i24" type="SeqOfSeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i25" type="SeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i26" type="SeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i27" type="SeqOfSeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i28" type="SeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i29" type="SeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i30" type="SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfSeqOfSeqOfFixedSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfSeqOfSeqOfFixedSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="SeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="SeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="SeqOfSeqOfSeqOfFixedSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o10" type="SeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o11" type="SeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o12" type="SeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o13" type="SeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o14" type="SeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o15" type="SeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o16" type="SeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o17" type="SeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o18" type="SeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o19" type="SeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o20" type="SeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o21" type="SeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o22" type="SeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o23" type="SeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o24" type="SeqOfSeqOfSeqOfFixedSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o25" type="SeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o26" type="SeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o27" type="SeqOfSeqOfSeqOfFixedSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o28" type="SeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o29" type="SeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o30" type="SeqOfSeqOfSeqOfFixedSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="124000 36700"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{0e1d5da2-ca54-4d4d-815a-13ccb0b7a9b5}" name="QGenCImplSeqOfVariableSize" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="63600 42900 90500 50000"/>
+<Provided_Interface id="{342ccbcd-98d7-43b2-9e40-9699d71f4644}" name="pi_seqOfVariableSizeIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="SeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfSeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfSeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="SeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="SeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="SeqOfSeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i10" type="SeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i11" type="SeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i12" type="SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i13" type="SeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i14" type="SeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i15" type="SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i16" type="SeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i17" type="SeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i18" type="SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i19" type="SeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i20" type="SeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i21" type="SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i22" type="SeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i23" type="SeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i24" type="SeqOfSeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i25" type="SeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i26" type="SeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i27" type="SeqOfSeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i28" type="SeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i29" type="SeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i30" type="SeqOfSeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i31" type="SeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i32" type="SeqOfSeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i33" type="SeqOfSeqOfSeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i34" type="SeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i35" type="SeqOfSeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i36" type="SeqOfSeqOfSeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfSeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfSeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="SeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="SeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="SeqOfSeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o10" type="SeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o11" type="SeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o12" type="SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o13" type="SeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o14" type="SeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o15" type="SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o16" type="SeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o17" type="SeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o18" type="SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o19" type="SeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o20" type="SeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o21" type="SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o22" type="SeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o23" type="SeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o24" type="SeqOfSeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o25" type="SeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o26" type="SeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o27" type="SeqOfSeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o28" type="SeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o29" type="SeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o30" type="SeqOfSeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o31" type="SeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o32" type="SeqOfSeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o33" type="SeqOfSeqOfSeqOfVarSizeChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o34" type="SeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o35" type="SeqOfSeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o36" type="SeqOfSeqOfSeqOfVarSizeChoiceBuiltIn" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="63600 45700"/>
+</Provided_Interface>
+
+<Required_Interface id="{2e0bc2e8-7552-4fb0-9460-003cb60321b9}" name="ri_seqOfVariableSizeIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="i1" type="SeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfSeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfSeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="SeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="SeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="SeqOfSeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i10" type="SeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i11" type="SeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i12" type="SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i13" type="SeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i14" type="SeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i15" type="SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i16" type="SeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i17" type="SeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i18" type="SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i19" type="SeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i20" type="SeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i21" type="SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i22" type="SeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i23" type="SeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i24" type="SeqOfSeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i25" type="SeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i26" type="SeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i27" type="SeqOfSeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i28" type="SeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i29" type="SeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i30" type="SeqOfSeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfSeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfSeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="SeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="SeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="SeqOfSeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o10" type="SeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o11" type="SeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o12" type="SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o13" type="SeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o14" type="SeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o15" type="SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o16" type="SeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o17" type="SeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o18" type="SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o19" type="SeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o20" type="SeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o21" type="SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o22" type="SeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o23" type="SeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o24" type="SeqOfSeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o25" type="SeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o26" type="SeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o27" type="SeqOfSeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o28" type="SeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o29" type="SeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o30" type="SeqOfSeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="90500 47200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Function id="{ce080116-f5b2-4f68-bd53-46d1bb6e4747}" name="CImplSeq" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="123800 15900 140600 22100"/>
+<Provided_Interface id="{384061ca-4db5-44b1-9505-cf40a5e75ba8}" name="ri_seqIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="i1" type="SeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfFixedSizeSeqOfsRequiredInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfVarSizeSeqOfsRequiredInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqsRequiredInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfFixedSizeSeqOfsRequiredInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfVarSizeSeqOfsRequiredInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqsRequiredInterface" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="123800 18800"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{4cc0e6f8-e30f-4f79-87e9-bad6f7ad4599}" name="QGenCImplSeq" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="63300 15000 89700 21300"/>
+<Provided_Interface id="{ec546514-168e-405b-bca3-23c08f711008}" name="pi_seqIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="SeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfFixedSizeSeqOfsProvidedInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfVarSizeSeqOfsProvidedInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqsProvidedInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfChoices" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfFixedSizeSeqOfsProvidedInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfVarSizeSeqOfsProvidedInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqsProvidedInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfChoices" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="63300 18500"/>
+</Provided_Interface>
+
+<Required_Interface id="{16f25ebe-a0b8-49ac-ab8d-ed29ae52a826}" name="ri_seqIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="i1" type="SeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfFixedSizeSeqOfsRequiredInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfVarSizeSeqOfsRequiredInterface" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqsRequiredInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfFixedSizeSeqOfsRequiredInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfVarSizeSeqOfsRequiredInterface" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqsRequiredInterface" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="89700 18700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Function id="{73705fab-9613-4d2d-a927-bd9f629ae102}" name="QGenCImplChoice" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="63800 24100 90800 30300"/>
+<Provided_Interface id="{647a6812-4bd3-482e-90ba-ba8a8aba3cef}" name="pi_choiceIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="ChoiceAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="ChoiceBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="ChoiceOfFixedSizeSeqOfs" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="ChoiceOfVarSizeSeqOfs" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="ChoiceOfChoices" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="ChoiceOfSeqs" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="ChoiceAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="ChoiceBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="ChoiceOfFixedSizeSeqOfs" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="ChoiceOfVarSizeSeqOfs" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="ChoiceOfChoices" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="ChoiceOfSeqs" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="63800 27900"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Function id="{8a473599-cc2e-40cb-b1a9-042b159efbbd}" name="QGenCImplAlias" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="63100 4900 89600 11700"/>
+<Provided_Interface id="{585df3a1-26f1-4b7c-a90a-9f6238e4b927}" name="pi_aliasIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="true" simulink_interface_type="Full" wcet="0">
+    <Input_Parameter name="i1" type="BoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="IntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="RealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="IA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="IA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="OctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="OctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="EnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="BoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="IntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="RealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="IA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="IA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="OctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="OctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="EnumAlias" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="63100 9000"/>
+</Provided_Interface>
+
+<Required_Interface id="{b2b2c1e9-047d-4d61-8f92-25200eee736b}" name="ri_aliasIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="i1" type="BoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="IntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="RealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="IA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="IA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="OctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="OctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="EnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="BoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="IntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="RealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="IA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="IA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="OctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="OctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="EnumAlias" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="89600 8200"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Function id="{7cdd9efd-12f5-4760-bed9-290ab93e50aa}" name="CImplSeqOfVariableSize" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" startup_priority="1" instances_min="1">
+    <Property name="Taste::coordinates" value="124300 44200 144000 50400"/>
+<Provided_Interface id="{884ec8e0-7c1e-4ad5-b5d9-70a8eda0a835}" name="ri_seqOfVariableSizeIface" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="i1" type="SeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i2" type="SeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i3" type="SeqOfSeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i4" type="SeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i5" type="SeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i6" type="SeqOfSeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i7" type="SeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i8" type="SeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i9" type="SeqOfSeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i10" type="SeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i11" type="SeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i12" type="SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i13" type="SeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i14" type="SeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i15" type="SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i16" type="SeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i17" type="SeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i18" type="SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i19" type="SeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i20" type="SeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i21" type="SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i22" type="SeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i23" type="SeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i24" type="SeqOfSeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Input_Parameter name="i25" type="SeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i26" type="SeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i27" type="SeqOfSeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Input_Parameter name="i28" type="SeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i29" type="SeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Input_Parameter name="i30" type="SeqOfSeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o1" type="SeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o2" type="SeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o3" type="SeqOfSeqOfSeqOfVarSizeBoolAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o4" type="SeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o5" type="SeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o6" type="SeqOfSeqOfSeqOfVarSizeIntegerAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o7" type="SeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o8" type="SeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o9" type="SeqOfSeqOfSeqOfVarSizeRealAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o10" type="SeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o11" type="SeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o12" type="SeqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o13" type="SeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o14" type="SeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o15" type="SeqOfSeqOfSeqOfVarSizeIA5StringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o16" type="SeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o17" type="SeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o18" type="SeqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o19" type="SeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o20" type="SeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o21" type="SeqOfSeqOfSeqOfVarSizeOctetStringVarSizeAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o22" type="SeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o23" type="SeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o24" type="SeqOfSeqOfSeqOfVarSizeEnumAlias" encoding="NATIVE"/>
+    <Output_Parameter name="o25" type="SeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o26" type="SeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o27" type="SeqOfSeqOfSeqOfVarSizeSeqAliases" encoding="NATIVE"/>
+    <Output_Parameter name="o28" type="SeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o29" type="SeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Output_Parameter name="o30" type="SeqOfSeqOfSeqOfVarSizeSeqBuiltIn" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="124300 47000"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection id="{7b66d396-32ac-4207-b27e-2ca8bbc81640}" required_system_element="NO">
+    <Source func_name="controller" ri_name="pi_seqOfFixedSizeIface"/>
+    <Target func_name="QGenCImplSeqOfFixedSize" pi_name="pi_seqOfFixedSizeIface"/>
+    <Property name="Taste::coordinates" value="30000 36700 63400 36700"/>
+</Connection>
+
+<Connection id="{074e9e6d-3a6c-4b57-b753-abf80ee5a409}" required_system_element="NO">
+    <Source func_name="QGenCImplSeq" ri_name="ri_seqIface"/>
+    <Target func_name="CImplSeq" pi_name="ri_seqIface"/>
+    <Property name="Taste::coordinates" value="90300 18700 123500 18800"/>
+</Connection>
+
+<Connection id="{6f93804a-8238-4344-9708-6da9209a3026}" required_system_element="NO">
+    <Source func_name="controller" ri_name="pi_seqIface"/>
+    <Target func_name="QGenCImplSeq" pi_name="pi_seqIface"/>
+    <Property name="Taste::coordinates" value="30000 18800 63000 18500"/>
+</Connection>
+
+<Connection id="{8a626b1c-be31-4a23-8c79-5321ec6277e2}" required_system_element="NO">
+    <Source func_name="QGenCImplSeqOfFixedSize" ri_name="ri_seqOfFixedSizeIface"/>
+    <Target func_name="CImplSeqOfFixedSize" pi_name="ri_seqOfFixedSizeIface"/>
+    <Property name="Taste::coordinates" value="90700 36900 123700 36700"/>
+</Connection>
+
+<Connection id="{2565bb85-6d9c-4e31-a65c-078ee2303601}" required_system_element="NO">
+    <Source func_name="QGenCImplAlias" ri_name="ri_aliasIface"/>
+    <Target func_name="CImplAlias" pi_name="ri_aliasIface"/>
+    <Property name="Taste::coordinates" value="90200 8200 123400 8500"/>
+</Connection>
+
+<Connection id="{4ea09dc5-8919-40af-b411-f67bd9ac073e}" required_system_element="NO">
+    <Source func_name="controller" ri_name="pi_seqOfVariableSizeIface"/>
+    <Target func_name="QGenCImplSeqOfVariableSize" pi_name="pi_seqOfVariableSizeIface"/>
+    <Property name="Taste::coordinates" value="30000 46000 63300 45700"/>
+</Connection>
+
+<Connection id="{13200ada-5b9e-4634-93c5-5b58efbd9cae}" required_system_element="NO">
+    <Source func_name="controller" ri_name="pi_aliasIface"/>
+    <Target func_name="QGenCImplAlias" pi_name="pi_aliasIface"/>
+    <Property name="Taste::coordinates" value="30000 8700 62800 9000"/>
+</Connection>
+
+<Connection id="{13b1cdbb-35c9-4af7-b94c-99037e2033c3}" required_system_element="NO">
+    <Source func_name="QGenCImplSeqOfVariableSize" ri_name="ri_seqOfVariableSizeIface"/>
+    <Target func_name="CImplSeqOfVariableSize" pi_name="ri_seqOfVariableSizeIface"/>
+    <Property name="Taste::coordinates" value="91100 47200 124000 47000"/>
+</Connection>
+
+<Connection id="{bcce4479-795c-4c39-a49a-6265c8424967}" required_system_element="NO">
+    <Source func_name="controller" ri_name="pi_choiceIface"/>
+    <Target func_name="QGenCImplChoice" pi_name="pi_choiceIface"/>
+    <Property name="Taste::coordinates" value="30000 27800 63500 27900"/>
+</Connection>
+
+<Layer name="default"/>
+
+</InterfaceView>
