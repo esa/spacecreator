@@ -1,8 +1,0 @@
-NESTED-SEQUENCEOFPARAM-DATAVIEW DEFINITIONS ::=
-BEGIN
-
-   MyInteger ::= INTEGER (0 .. 10000)
-   MySimpleSeqOf     ::= SEQUENCE (SIZE (3)) OF MyInteger
-   MyComplexSeqOf    ::= SEQUENCE (SIZE (3)) OF MySimpleSeqOf
-
-END
