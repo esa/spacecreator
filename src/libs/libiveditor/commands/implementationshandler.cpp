@@ -72,7 +72,8 @@ void ImplementationsHandler::updateDefaultImplementation(const QString &oldName,
         const QString &newName, const QString &newLanguage, bool isDefault)
 {
     const QString currentImplPath = functionBasePath() + QDir::separator();
-    const QFileInfo oldFileInfo(currentImplPath + oldLanguage);
+    const QString oldLanguageDir = ivm::IVPropertyTemplateConfig::instance()->languageDirectory(oldLanguage);
+    const QFileInfo oldFileInfo(currentImplPath + oldLanguageDir);
     if (oldFileInfo.isSymLink()) {
         QFile::remove(oldFileInfo.absoluteFilePath());
     } else if (oldFileInfo.exists()) {
@@ -81,8 +82,9 @@ void ImplementationsHandler::updateDefaultImplementation(const QString &oldName,
             /// TODO: ROLLBACK
         }
     }
-    const QFileInfo newFileInfo(currentImplPath + newLanguage);
-    const QString destPath = implementationPath(newName, newLanguage);
+    const QString newLanguageDir = ivm::IVPropertyTemplateConfig::instance()->languageDirectory(newLanguage);
+    const QFileInfo newFileInfo(currentImplPath + newLanguageDir);
+    const QString destPath = implementationPath(newName, newLanguageDir);
     if (newFileInfo.exists() && newFileInfo.isDir()) {
         if (!shared::moveDir(newFileInfo.absoluteFilePath(), destPath, shared::FileCopyingMode::Overwrite)) {
             /// TODO: ROLLBACK
