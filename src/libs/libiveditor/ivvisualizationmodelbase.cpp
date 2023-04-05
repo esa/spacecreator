@@ -170,9 +170,31 @@ QList<QStandardItem *> IVVisualizationModelBase::createItems(shared::VEObject *o
                     &IVVisualizationModelBase::updateConnectionItem, Qt::UniqueConnection);
             connect(connectionGroupObj, &ivm::IVConnectionGroup::connectionRemoved, this,
                     &IVVisualizationModelBase::updateConnectionItem, Qt::UniqueConnection);
-            for (auto connection : connectionGroupObj->groupedConnections()) {
+            for (auto &connection : connectionGroupObj->groupedConnections()) {
                 updateConnectionItem(connection);
             }
+        }
+    }
+
+    if (obj->type() == ivm::IVObject::Type::Connection) {
+        if (auto connectionObj = obj->as<ivm::IVConnection *>()) {
+            auto updateConnectionOnNameChange = [this, obj](ivm::IVObject *ivObj) {
+                if (!ivObj) {
+                    return;
+                }
+                connect(ivObj, &ivm::IVObject::attributeChanged, this, [this, obj](const QString &attrName) {
+                    if (attrName == ivm::meta::Props::token(ivm::meta::Props::Token::name)) {
+                        if (auto item = getItem(obj->id())) {
+                            updateItemData(item, obj);
+                        }
+                    }
+                });
+            };
+
+            updateConnectionOnNameChange(connectionObj->source());
+            updateConnectionOnNameChange(connectionObj->sourceInterface());
+            updateConnectionOnNameChange(connectionObj->target());
+            updateConnectionOnNameChange(connectionObj->targetInterface());
         }
     }
 
