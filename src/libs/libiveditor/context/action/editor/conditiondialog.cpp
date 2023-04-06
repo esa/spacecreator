@@ -32,14 +32,17 @@ ConditionDialog::ConditionDialog(const Condition &cond, const QStringList &itemT
     , ui(new Ui::ConditionDialog)
     , m_condition(cond)
     , m_attrsModel(new AttributesModel(this))
-
 {
     ui->setupUi(this);
     ui->lvAttrs->setModel(m_attrsModel);
     m_attrsModel->setAttributesList(&m_condition.m_attrs);
 
-    ui->cbItemType->addItems(itemTypes); // triggers on_cbItemType_currentIndexChanged
+    ui->cbItemType->addItems(itemTypes);
     ui->cbItemType->setCurrentIndex(itemTypes.indexOf(cond.m_itemType));
+
+    connect(ui->cbItemType, &QComboBox::currentTextChanged, this, &ConditionDialog::setItemType);
+    connect(ui->btnAddAttr, &QPushButton::clicked, this, &ConditionDialog::addAttribute);
+    connect(ui->btnRmAttr, &QPushButton::clicked, this, &ConditionDialog::removeAttribute);
 }
 
 ConditionDialog::~ConditionDialog()
@@ -52,21 +55,22 @@ Condition ConditionDialog::condition() const
     return m_condition;
 }
 
-void ConditionDialog::on_cbItemType_currentIndexChanged(const QString &text)
+void ConditionDialog::setItemType(const QString &text)
 {
     m_condition.m_itemType = text;
 }
 
-void ConditionDialog::on_btnAddAttr_clicked()
+void ConditionDialog::addAttribute()
 {
     m_attrsModel->insertRows(m_attrsModel->rowCount(), 1);
 }
 
-void ConditionDialog::on_btnRmAttr_clicked()
+void ConditionDialog::removeAttribute()
 {
     const QModelIndex &currId = ui->lvAttrs->selectionModel()->currentIndex();
-    if (!currId.isValid())
+    if (!currId.isValid()) {
         return;
+    }
     m_attrsModel->removeRow(currId.row());
 }
 

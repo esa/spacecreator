@@ -39,9 +39,9 @@ public:
     Condition condition() const;
 
 private Q_SLOTS:
-    void on_cbItemType_currentIndexChanged(const QString &text);
-    void on_btnAddAttr_clicked();
-    void on_btnRmAttr_clicked();
+    void setItemType(const QString &text);
+    void addAttribute();
+    void removeAttribute();
 
 private:
     Ui::ConditionDialog *ui;

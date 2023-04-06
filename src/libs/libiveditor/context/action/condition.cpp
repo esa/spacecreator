@@ -38,8 +38,9 @@ static QVector<AttrHandler> attrsFromJson(const QJsonObject &jasonObject)
 {
     QVector<AttrHandler> res;
     const QJsonArray &arr = jasonObject[JSON_FIELD_NAME_Attributes].toArray();
-    for (const auto &obj : arr)
+    for (const auto &obj : arr) {
         res.append(AttrHandler(obj.toObject()));
+    }
     return res;
 }
 
@@ -60,8 +61,9 @@ Condition Condition::createGlobal()
 QJsonObject Condition::toJson() const
 {
     QJsonArray jAttrs;
-    for (const auto &attr : m_attrs)
+    for (const auto &attr : m_attrs) {
         jAttrs.append(attr.toJson());
+    }
 
     return { { JSON_FIELD_NAME_ItemType, m_itemType }, { JSON_FIELD_NAME_Attributes, jAttrs } };
 }
@@ -70,25 +72,31 @@ QStringList Condition::knownTypes()
 {
     QStringList res;
     QMetaEnum me = QMetaEnum::fromType<ivm::IVObject::Type>();
-    for (int i = 0; i < me.keyCount(); ++i)
-        if (ivm::IVObject::Type(me.value(i)) != ivm::IVObject::Type::Unknown)
+    for (int i = 0; i < me.keyCount(); ++i) {
+        if (ivm::IVObject::Type(me.value(i)) != ivm::IVObject::Type::Unknown) {
             res.append(me.key(i));
+        }
+    }
     return res;
 }
 
+/*!
+ * Returns true if the item type (Function, Interfacen, ...) and the attributes do match
+ */
 bool Condition::isAcceptable(ivm::IVObject *obj) const
 {
     if (m_itemType != "*") {
-        static const QStringList &names = knownTypes();
-        const QString name(m_itemType);
-        if (!names.contains(name))
+        if (m_itemType != ivm::IVObject::typeToString(obj->type())) {
             return false;
+        }
     }
 
     for (const AttrHandler &attr : m_attrs) {
-        if (attr.m_value != "*")
-            if (obj && obj->entityAttributeValue<QString>(attr.m_title) != attr.m_value)
+        if (attr.m_value != "*") {
+            if (obj && obj->entityAttributeValue<QString>(attr.m_title) != attr.m_value) {
                 return false;
+            }
+        }
     }
 
     return true;

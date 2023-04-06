@@ -92,6 +92,10 @@ QJsonObject Action::toJson() const
     };
 }
 
+/*!
+ * Returns true if *all* conditions are accepted for the given object \p obj
+ * Returns false if *any* conditions returns false.
+ */
 bool Action::isAcceptable(ivm::IVObject *obj) const
 {
     for (const Condition &condition : m_conditions)
