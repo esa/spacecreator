@@ -43,8 +43,10 @@ class IVModel : public shared::VEModel, public conversion::Model
 {
     Q_OBJECT
 public:
-    enum class ImportType
+    enum class CloneType
     {
+        Unknown,
+        Direct,
         Copy,
         Reference,
         Move,
@@ -103,7 +105,6 @@ public:
     QVector<IVArchetypeLibraryReference *> getArchetypeLibraryReferences();
     void setArchetypeLibraryReferences(QVector<IVArchetypeLibraryReference *> references);
 
-
     QList<IVObject *> visibleObjects() const;
     QList<IVObject *> visibleObjects(shared::Id rootId) const;
 
@@ -119,8 +120,7 @@ public:
     QString defaultFunctionLanguage() const;
     QStringList availableFunctionLanguages() const;
 
-    void import(ImportType type, IVObject *origin, IVFunctionType *parent = nullptr,
-            const shared::Id &id = shared::createId(), const QPointF &pos = {});
+    QList<IVObject *> clone(CloneType type, IVObject *origin, IVFunctionType *parent = nullptr, const QPointF &pos = {});
 
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);

@@ -49,8 +49,16 @@ void ASN1ComponentsImport::setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Ch
     m_destPath = m_asn1Checks->projectPath();
 }
 
+bool ASN1ComponentsImport::isValid() const
+{
+    return m_asn1Checks && !m_srcPath.isEmpty() && !m_destPath.isEmpty();
+}
+
 void ASN1ComponentsImport::redoSourceCloning(const ivm::IVObject *object)
 {
+    if (!isValid())
+        return;
+
     if (!object
             || !(object->type() == ivm::IVObject::Type::Function
                     || object->type() == ivm::IVObject::Type::FunctionType)) {
@@ -71,6 +79,9 @@ void ASN1ComponentsImport::redoSourceCloning(const ivm::IVObject *object)
 
 void ASN1ComponentsImport::undoSourceCloning(const ivm::IVObject *object)
 {
+    if (!isValid())
+        return;
+
     if (!object
             || !(object->type() == ivm::IVObject::Type::Function
                     || object->type() == ivm::IVObject::Type::FunctionType)) {
@@ -94,6 +105,9 @@ void ASN1ComponentsImport::undoSourceCloning(const ivm::IVObject *object)
 
 void ASN1ComponentsImport::redoAsnFileImport(const ivm::IVObject *object)
 {
+    if (!isValid())
+        return;
+
     if (!object
             || !(object->type() == ivm::IVObject::Type::Function
                     || object->type() == ivm::IVObject::Type::FunctionType)) {
@@ -158,6 +172,9 @@ void ASN1ComponentsImport::redoAsnFileImport(const ivm::IVObject *object)
 
 void ASN1ComponentsImport::undoAsnFileImport()
 {
+    if (!isValid())
+        return;
+
     const auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files undo"),
             tr("Do you want to remove ASN1 files: %1?").arg(m_importedAsnFiles.join(QLatin1String(", "))));
     if (res == QMessageBox::No) {

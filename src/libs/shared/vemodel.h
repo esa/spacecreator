@@ -47,7 +47,6 @@ public:
      */
     virtual VEObject *getObjectByAttributeValue(const QString &attrName, const QVariant &value) const;
 
-
     const QList<shared::Id> &objectsOrder() const;
     const QHash<shared::Id, VEObject *> &objects() const;
 
@@ -64,7 +63,8 @@ public:
         addObjects(objects);
     }
 
-    template<typename T>
+    template<typename T,
+            typename = std::enable_if_t<std::is_base_of_v<VEObject, typename std::remove_pointer<T>::type>>>
     void addObjects(const QVector<T> &objects)
     {
         QVector<T> addedObjects;
@@ -81,13 +81,11 @@ public:
                 if (!obj->postInit()) {
                     if (removeObject(obj)) {
                         it = addedObjects.erase(it);
-                        for (VEObject *descant : obj->descendants()) {
-                            if (T descantT = dynamic_cast<T>(descant)) {
-                                removeObject(descantT);
-                                int idx = addedObjects.indexOf(descantT);
-                                if (idx >= 0) {
-                                    addedObjects[idx] = nullptr;
-                                }
+                        for (auto descant : obj->descendants()) {
+                            removeObject(descant);
+                            int idx = addedObjects.indexOf(descant);
+                            if (idx >= 0) {
+                                addedObjects[idx] = nullptr;
                             }
                         }
                         delete (obj); // deletes all descants as well

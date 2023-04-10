@@ -19,6 +19,7 @@
 
 #include "asn1componentsimport.h"
 #include "common.h"
+#include "ivmodel.h"
 
 #include <QPointer>
 #include <QUndoCommand>
@@ -28,7 +29,6 @@ class QTemporaryDir;
 namespace ivm {
 class IVObject;
 class IVFunctionType;
-class IVModel;
 }
 
 namespace ive {
@@ -38,10 +38,11 @@ class CmdEntitiesImport : public ASN1ComponentsImport, public QUndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdEntitiesImport(const QList<ivm::IVObject *> &entities, ivm::IVFunctionType *parent, ivm::IVModel *model,
-            Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
-    explicit CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model,
-            Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
+    explicit CmdEntitiesImport(ivm::IVModel::CloneType type, const QList<ivm::IVObject *> &entities,
+            ivm::IVFunctionType *parent, ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos,
+            const QString &destPath);
+    //    explicit CmdEntitiesImport(
+    //            const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model, const QPointF &pos);
     ~CmdEntitiesImport() override;
 
     void redo() override;
@@ -50,16 +51,16 @@ public:
     int id() const override;
 
 private:
+    bool init(const QVector<ivm::IVObject *> &objects, const QPointF &pos, QString *errorString = nullptr);
     void prepareRectangularType(
             ivm::IVObject *obj, const QPointF &offset, QRectF &parentRect, QList<QRectF> &existingRects);
     void prepareEndPointType(ivm::IVObject *obj, const QPointF &offset);
     void prepareConnectionType(ivm::IVObject *obj, const QVector<ivm::IVObject *> &objects);
     QList<QRectF> existingModelRects() const;
-    bool init(const QVector<ivm::IVObject *> &objects, const QPointF &pos, QString *errorString = nullptr);
 
 private:
+    const ivm::IVModel::CloneType m_type;
     QPointer<ivm::IVModel> m_model;
-    QPointer<ivm::IVModel> m_importModel;
     QPointer<ivm::IVFunctionType> m_parent;
     QVector<QPointer<ivm::IVObject>> m_rootEntities;
     QVector<QPointer<ivm::IVObject>> m_importedEntities;

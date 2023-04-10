@@ -26,7 +26,6 @@
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "ivinterfacegroup.h"
-#include "ivmodel.h"
 
 #include <QDebug>
 
@@ -60,7 +59,7 @@ IVFunctionType::IVFunctionType(const IVObject::Type t, QObject *parent, const sh
 {
 }
 
-IVFunctionType::~IVFunctionType() {}
+IVFunctionType::~IVFunctionType() { }
 
 QVector<IVObject *> IVFunctionType::children() const
 {
@@ -352,7 +351,5 @@ void IVFunctionType::forgetInstance(IVFunction *function)
     if (function)
         d->m_instances.removeAll(function);
 }
-
-
 
 }

@@ -27,6 +27,7 @@
 
 namespace shared {
 class BreadcrumbWidget;
+class VEObject;
 }
 
 namespace Ui {
@@ -56,8 +57,6 @@ public:
 
     QAction *actionDelete() const;
 
-
-
 public Q_SLOTS:
     void showArchetypeManager();
 
@@ -67,11 +66,9 @@ private Q_SLOTS:
     void showContextMenuForIVModel(const QPoint &pos);
     void showAvailableLayers(const QPoint &pos);
     void renameSelectedLayer(QStandardItem *item);
-    void referenceItems();
     void copyItems();
     void cutItems();
-    void pushToClipboard(Qt::DropAction action);
-    void exportToClipboard(QMimeData *mimeData = nullptr);
+    void exportToClipboard(const QList<shared::VEObject *> &objects, QMimeData *mimeData = nullptr);
     void pasteItems();
     void pasteItems(const QPointF &sceneDropPoint);
     void showPropertyEditor(const shared::Id &id);
@@ -100,6 +97,8 @@ private:
 
     QVector<QAction *> initActions();
     QVector<QAction *> initViewActions();
+
+    QList<shared::VEObject *> selectedObjects() const;
 
     Ui::IVAppWidget *ui = nullptr;
     shared::BreadcrumbWidget *m_breadCrumb = nullptr;

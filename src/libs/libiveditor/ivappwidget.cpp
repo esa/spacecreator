@@ -22,7 +22,6 @@
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
-#include "commands/cmdentitiesreference.h"
 #include "commands/cmdentitiesremove.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
@@ -40,6 +39,7 @@
 #include "ivexporter.h"
 #include "ivnamevalidator.h"
 #include "ivvisualizationmodelbase.h"
+#include "ivxmlreader.h"
 #include "properties/ivpropertiesdialog.h"
 #include "ui_ivappwidget.h"
 
@@ -61,7 +61,7 @@
 #include <QStringList>
 #include <QTimer>
 
-const char kIVMimeType[] = "application/json";
+static const QString kActionMimeType = QLatin1String("application/x-action");
 
 namespace ive {
 
@@ -470,44 +470,24 @@ void IVAppWidget::renameSelectedLayer(QStandardItem *item)
     item->setText(obj->titleUI());
 }
 
-void IVAppWidget::referenceItems()
-{
-    pushToClipboard(Qt::LinkAction);
-}
-
 void IVAppWidget::copyItems()
 {
-    pushToClipboard(Qt::CopyAction);
+    auto mimeData = new QMimeData;
+    mimeData->setData(kActionMimeType, shared::typeName(Qt::DropAction::CopyAction).toUtf8());
+    exportToClipboard(selectedObjects(), mimeData);
+    qApp->clipboard()->setMimeData(mimeData);
 }
 
 void IVAppWidget::cutItems()
 {
-    pushToClipboard(Qt::MoveAction);
-    /// TODO: hide items were cut
+    auto mimeData = new QMimeData;
+    mimeData->setData(kActionMimeType, shared::typeName(Qt::DropAction::MoveAction).toUtf8());
+    exportToClipboard(selectedObjects(), mimeData);
+    qApp->clipboard()->setMimeData(mimeData);
+    m_tool->removeSelectedItems();
 }
 
-void IVAppWidget::pushToClipboard(Qt::DropAction action)
-{
-    QJsonArray ids;
-    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
-        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
-        const shared::Id id = index.data(role).toUuid();
-        ids.append(id.toString());
-    }
-
-    QJsonObject obj;
-    obj.insert(QLatin1String("Context"), QLatin1String("InterfaceView"));
-    obj.insert(QLatin1String("Action"), action);
-    obj.insert(QLatin1String("Path"), m_document->path());
-    obj.insert(QLatin1String("UUIDs"), ids);
-
-    auto mimeData = new QMimeData();
-    mimeData->setData(kIVMimeType, QJsonDocument(obj).toJson());
-    exportToClipboard(mimeData);
-    QApplication::clipboard()->setMimeData(mimeData);
-}
-
-void IVAppWidget::exportToClipboard(QMimeData *mimeData)
+void IVAppWidget::exportToClipboard(const QList<shared::VEObject *> &objects, QMimeData *mimeData)
 {
     QBuffer buffer;
     if (!buffer.open(QIODevice::WriteOnly)) {
@@ -516,14 +496,6 @@ void IVAppWidget::exportToClipboard(QMimeData *mimeData)
         return;
     }
 
-    QList<shared::VEObject *> objects;
-    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
-        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
-        const shared::Id id = index.data(role).toUuid();
-        if (ivm::IVObject *object = m_document->objectsModel()->getObject(id)) {
-            objects.append(object);
-        }
-    }
     if (!m_document->exporter()->exportObjects(objects, &buffer, m_document->archetypesModel())) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
         return;
@@ -543,7 +515,7 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
     if (!mimeData) {
         return;
     }
-    if (!mimeData->hasFormat(kIVMimeType) && !mimeData->hasText()) {
+    if (!mimeData->hasText()) {
         return;
     }
 
@@ -556,33 +528,48 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
         parentObject = qobject_cast<ivm::IVFunctionType *>(m_document->objectsModel()->rootObject());
     }
 
-    if (mimeData->hasFormat(kIVMimeType)) {
-        const QByteArray data = mimeData->data(kIVMimeType);
-        if (!data.isEmpty()) {
-            const QJsonDocument doc = QJsonDocument::fromJson(data);
-            const QJsonObject obj = doc.object();
-
-            QList<ivm::IVObject *> topObjects;
-            for (const QJsonValue &value : obj.value(QLatin1String("UUIDs")).toArray()) {
-                topObjects.append(m_document->objectsModel()->getObject(shared::Id::fromString(value.toString())));
-            }
-            if (!topObjects.isEmpty()) {
-                cmd::CommandsStack::Macro cmdMacro(m_document->commandsStack(), tr("Paste item(s)"));
-                auto cmdImport = new cmd::CmdEntitiesImport(topObjects, parentObject, m_document->objectsModel(),
-                        m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
-                m_document->commandsStack()->push(cmdImport);
-
-                auto cmdRemove = new cmd::CmdEntitiesRemove(topObjects, m_document->objectsModel());
-                m_document->commandsStack()->push(cmdRemove);
-
-                cmdMacro.setComplete(true);
+    const QByteArray data = mimeData->text().toUtf8();
+    ivm::IVXMLReader parser;
+    QString errorString;
+    if (parser.read(data)) {
+        QVector<ivm::IVObject *> objects = parser.parsedObjects();
+        const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
+        ivm::IVObject::sortObjectList(objects);
+        for (ivm::IVObject *obj : qAsConst(objects)) {
+            const EntityAttributes attrs = extAttrs.value(obj->id());
+            for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
+                obj->setEntityAttribute(attrIt.value());
             }
         }
-    } else if (mimeData->hasText()) {
-        const QByteArray data = mimeData->text().toUtf8();
-        auto cmdImport = new cmd::CmdEntitiesImport(data, parentObject, m_document->objectsModel(),
-                m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+        ivm::IVModel::CloneType type = ivm::IVModel::CloneType::Unknown;
+        if (mimeData->hasFormat(kActionMimeType)) {
+            const QString actionString = QString::fromUtf8(mimeData->data(kActionMimeType));
+            const auto action = shared::typeFromName<Qt::DropAction>(actionString);
+            switch (action) {
+            case Qt::DropAction::CopyAction:
+                type = ivm::IVModel::CloneType::Copy;
+                break;
+            case Qt::DropAction::MoveAction:
+                type = ivm::IVModel::CloneType::Move;
+                break;
+            case Qt::DropAction::LinkAction:
+                type = ivm::IVModel::CloneType::Reference;
+                break;
+            default:
+                break;
+            }
+        } else {
+            type = ivm::IVModel::CloneType::Direct;
+        }
+        auto cmdImport = new cmd::CmdEntitiesImport(type, objects, parentObject, m_document->objectsModel(),
+                m_document->asn1Check(), sceneDropPoint, {} /*, QFileInfo(m_document->path()).absolutePath()*/);
         m_document->commandsStack()->push(cmdImport);
+        if (type != ivm::IVModel::CloneType::Direct) {
+            for (auto obj : qAsConst(objects)) {
+                if (!obj->parentObject())
+                    obj->deleteLater();
+            }
+        }
     }
 }
 
@@ -616,8 +603,8 @@ void IVAppWidget::showEditAttributesDialog()
 
 void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
 {
-    /// TODO: find proper place for imporing function in the scene if sceneDropPoint is null (for example action from
-    /// context menu is invoked)
+    /// TODO: find proper place for imporing function in the scene if sceneDropPoint is null (for example action
+    /// from context menu is invoked)
 
     Q_ASSERT(m_document);
     const auto obj = m_document->importModel()->getObject(id);
@@ -645,8 +632,9 @@ void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoi
     }
 
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdImport = new cmd::CmdEntitiesImport({ obj }, parentObject, m_document->objectsModel(),
-            m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+    auto cmdImport =
+            new cmd::CmdEntitiesImport(ivm::IVModel::CloneType::Copy, { obj }, parentObject, m_document->objectsModel(),
+                    m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
     m_document->commandsStack()->push(cmdImport);
 }
 
@@ -702,10 +690,12 @@ void IVAppWidget::linkEntity(const shared::Id &id, const QPointF &sceneDropPoint
     while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
         itemAtScenePos = itemAtScenePos->parentItem();
     }
+
     ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    auto cmdInstantiate = new cmd::CmdEntitiesReference(
-            obj->as<ivm::IVFunction *>(), parentObject, m_document->objectsModel(), sceneDropPoint);
-    m_document->commandsStack()->push(cmdInstantiate);
+    auto cmdLink = new cmd::CmdEntitiesImport(ivm::IVModel::CloneType::Reference, { obj->as<ivm::IVFunction *>() },
+            parentObject, m_document->objectsModel(), m_document->asn1Check(), sceneDropPoint,
+            QFileInfo(m_document->path()).absolutePath());
+    m_document->commandsStack()->push(cmdLink);
 }
 
 void IVAppWidget::enterNestedView(const shared::Id &id)
@@ -1081,6 +1071,19 @@ QVector<QAction *> IVAppWidget::initViewActions()
     m_viewActions.append(actionSaveSceneRender);
 
     return m_viewActions;
+}
+
+QList<shared::VEObject *> IVAppWidget::selectedObjects() const
+{
+    QList<shared::VEObject *> objects;
+    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
+        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
+        const shared::Id id = index.data(role).toUuid();
+        if (ivm::IVObject *object = m_document->objectsModel()->getObject(id)) {
+            objects.append(object);
+        }
+    }
+    return objects;
 }
 
 void IVAppWidget::showArchetypeManager()

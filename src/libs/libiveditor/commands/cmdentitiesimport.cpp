@@ -66,48 +66,57 @@ QSet<QString> fnTypeNames(const QVector<ivm::IVObject *> &objects)
     return names;
 }
 
-CmdEntitiesImport::CmdEntitiesImport(const QList<ivm::IVObject *> &objects, ivm::IVFunctionType *parent,
-        ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath)
+CmdEntitiesImport::CmdEntitiesImport(ivm::IVModel::CloneType type, const QList<ivm::IVObject *> &objects,
+        ivm::IVFunctionType *parent, ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos,
+        const QString &destPath)
     : ASN1ComponentsImport(asn1Checks, shared::componentsLibraryPath(), destPath)
     , QUndoCommand()
+    , m_type(type)
     , m_model(model)
     , m_parent(parent)
 {
+    QList<ivm::IVObject *> entities;
+    std::for_each(objects.cbegin(), objects.cend(), [&](ivm::IVObject *p) {
+        if (!objects.contains(p->parentObject())) /// Only root entities should be processed in clone method
+            entities << m_model->clone(type, p, m_parent);
+    });
+
     QString errorString;
-    if (!init(objects, pos, &errorString)) {
+    if (!init(entities, pos, &errorString)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, errorString, "");
         setObsolete(true);
     }
 }
 
-CmdEntitiesImport::CmdEntitiesImport(const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model,
-        Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath)
-    : ASN1ComponentsImport(asn1Checks, shared::componentsLibraryPath(), destPath)
-    , QUndoCommand()
-    , m_model(model)
-    , m_parent(parent)
-{
-    ivm::IVXMLReader parser;
-    QString errorString;
-    if (parser.read(data)) {
-        QVector<ivm::IVObject *> objects = parser.parsedObjects();
-        const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
-        ivm::IVObject::sortObjectList(objects);
-        for (ivm::IVObject *obj : qAsConst(objects)) {
-            const EntityAttributes attrs = extAttrs.value(obj->id());
-            for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
-                obj->setEntityAttribute(attrIt.value());
-            }
-        }
-        if (init(objects, pos, &errorString)) {
-            return;
-        }
-    } else {
-        errorString = parser.errorString();
-    }
-    shared::ErrorHub::addError(shared::ErrorItem::Error, errorString, "");
-    setObsolete(true);
-}
+// CmdEntitiesImport::CmdEntitiesImport(
+//         const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model, const QPointF &pos)
+//     : ASN1ComponentsImport(nullptr, shared::componentsLibraryPath(), QString())
+//     , QUndoCommand()
+//     , m_type(ivm::IVModel::CloneType::Direct)
+//     , m_model(model)
+//     , m_parent(parent)
+//{
+//     ivm::IVXMLReader parser;
+//     QString errorString;
+//     if (parser.read(data)) {
+//         QVector<ivm::IVObject *> objects = parser.parsedObjects();
+//         const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
+//         ivm::IVObject::sortObjectList(objects);
+//         for (ivm::IVObject *obj : qAsConst(objects)) {
+//             const EntityAttributes attrs = extAttrs.value(obj->id());
+//             for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
+//                 obj->setEntityAttribute(attrIt.value());
+//             }
+//         }
+//         if (init(objects, pos, &errorString)) {
+//             return;
+//         }
+//     } else {
+//         errorString = parser.errorString();
+//     }
+//     shared::ErrorHub::addError(shared::ErrorItem::Error, errorString, "");
+//     setObsolete(true);
+// }
 
 bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPointF &pos, QString *errorString)
 {
@@ -122,7 +131,6 @@ bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPoi
     QSet<QString> importingNames = fnTypeNames(objects);
     QRectF importingRect;
     for (ivm::IVObject *obj : qAsConst(objects)) {
-        obj->setModel(m_model);
         if (isRectangularType(obj) && functionNames.contains(obj->title())) {
             const QString objName = obj->title();
             while (functionNames.contains(obj->title())) {
@@ -208,7 +216,8 @@ void CmdEntitiesImport::redo()
         if (m_parent) {
             m_parent->addChild(entity);
         }
-        redoAsnFileImport(entity);
+        if (m_type == ivm::IVModel::CloneType::Copy || m_type == ivm::IVModel::CloneType::Reference)
+            redoAsnFileImport(entity);
     }
 
     for (ivm::IVObject *entity : qAsConst(m_importedEntities)) {
@@ -222,15 +231,15 @@ void CmdEntitiesImport::redo()
             parentFunc->addChild(entity);
         }
         entities.append(entity);
-        redoSourceCloning(entity);
+        if (m_type == ivm::IVModel::CloneType::Copy)
+            redoSourceCloning(entity);
     }
     if (!m_tempDir.isNull()) {
         m_tempDir.reset();
     }
-    std::for_each(m_rootEntities.cbegin(), m_rootEntities.cend(), [this](const QPointer<ivm::IVObject> &p) {
-        if (!p.isNull())
-            m_model->import(ivm::IVModel::ImportType::Copy, p.data(), m_parent);
-    });
+
+    ivm::IVObject::sortObjectList(entities);
+    m_model->addObjects(entities);
 }
 
 void CmdEntitiesImport::undo()
@@ -240,7 +249,8 @@ void CmdEntitiesImport::undo()
 
     for (auto it = m_importedEntities.crbegin(); it != m_importedEntities.crend(); ++it) {
         m_model->removeObject(*it);
-        undoSourceCloning(*it);
+        if (m_type == ivm::IVModel::CloneType::Copy)
+            undoSourceCloning(*it);
     }
     for (auto it = m_rootEntities.crbegin(); it != m_rootEntities.crend(); ++it) {
         if (m_parent) {
@@ -249,7 +259,9 @@ void CmdEntitiesImport::undo()
             (*it)->setParentObject(nullptr);
         }
     }
-    undoAsnFileImport();
+
+    if (m_type == ivm::IVModel::CloneType::Copy || m_type == ivm::IVModel::CloneType::Reference)
+        undoAsnFileImport();
 }
 
 bool CmdEntitiesImport::mergeWith(const QUndoCommand *command)

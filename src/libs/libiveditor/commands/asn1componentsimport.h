@@ -44,6 +44,7 @@ public:
 
 public:
     void setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Checks);
+    bool isValid() const;
 
 Q_SIGNALS:
     void asn1FilesImported(const QStringList &files);
