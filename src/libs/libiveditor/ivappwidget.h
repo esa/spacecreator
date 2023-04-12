@@ -34,6 +34,10 @@ namespace Ui {
 class IVAppWidget;
 }
 
+namespace ivm {
+class IVFunctionType;
+}
+
 namespace ive {
 class GraphicsView;
 class InterfaceDocument;
@@ -73,9 +77,9 @@ private Q_SLOTS:
     void pasteItems(const QPointF &sceneDropPoint);
     void showPropertyEditor(const shared::Id &id);
     void showEditAttributesDialog();
-    void importEntity(const shared::Id &id, const QPointF &sceneDropPoint);
-    void instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint);
-    void linkEntity(const shared::Id &id, const QPointF &sceneDropPoint);
+    void importEntity(const shared::Id &id, QPointF sceneDropPoint);
+    void instantiateEntity(const shared::Id &id, QPointF sceneDropPoint);
+    void linkEntity(const shared::Id &id, QPointF sceneDropPoint);
 
     void enterNestedView(const shared::Id &id);
     void onItemDoubleClicked(const shared::Id &id);
@@ -99,6 +103,8 @@ private:
     QVector<QAction *> initViewActions();
 
     QList<shared::VEObject *> selectedObjects() const;
+
+    ivm::IVFunctionType *functionAtPosition(QPointF &sceneDropPoint);
 
     Ui::IVAppWidget *ui = nullptr;
     shared::BreadcrumbWidget *m_breadCrumb = nullptr;

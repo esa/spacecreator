@@ -17,11 +17,17 @@
 
 #pragma once
 
+#include <QPointF>
+#include <limits>
+
 class QRect;
 
 namespace shared {
 
 QRect rectInRect(const QRect &sourceRect, const QRect &parentRect);
 
-}
+static const QPointF INVALID_POS = QPointF(std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max());
 
+bool isValidPosition(const QPointF &pos);
+
+}

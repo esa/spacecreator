@@ -53,4 +53,13 @@ QRect rectInRect(const QRect &sourceRect, const QRect &parentRect)
     return rect;
 }
 
+/**
+ * Returns if the given point is a valid one. Invalid positions are generated using INVALID_POS
+ * @param pos the point to check
+ */
+bool isValidPosition(const QPointF &pos)
+{
+    return pos != INVALID_POS;
+}
+
 } // namespace shared

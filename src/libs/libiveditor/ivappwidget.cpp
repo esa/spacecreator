@@ -26,6 +26,7 @@
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "errorhub.h"
+#include "geometry.h"
 #include "graphicsviewutils.h"
 #include "interfacedocument.h"
 #include "itemeditor/graphicsitemhelpers.h"
@@ -160,7 +161,8 @@ void IVAppWidget::showContextMenuForSharedTypesView(const QPoint &pos)
 
     auto menu = new QMenu;
     QAction *actInstantiateSharedType = menu->addAction(tr("Instantiate entity"));
-    connect(actInstantiateSharedType, &QAction::triggered, this, [this, id]() { instantiateEntity(id, QPointF()); });
+    connect(actInstantiateSharedType, &QAction::triggered, this,
+            [this, id]() { instantiateEntity(id, shared::INVALID_POS); });
 
     QAction *actImportSharedType = menu->addAction(tr("Import shared type"));
     connect(actImportSharedType, &QAction::triggered, this,
@@ -277,10 +279,10 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
 
     auto menu = new QMenu;
     QAction *actImportComponent = menu->addAction(tr("Import entity"));
-    connect(actImportComponent, &QAction::triggered, this, [this, id]() { importEntity(id, QPointF()); });
+    connect(actImportComponent, &QAction::triggered, this, [this, id]() { importEntity(id, shared::INVALID_POS); });
 
     QAction *actImportAsReference = menu->addAction(tr("Add reference"));
-    connect(actImportAsReference, &QAction::triggered, this, [this, id]() { linkEntity(id, QPointF()); });
+    connect(actImportAsReference, &QAction::triggered, this, [this, id]() { linkEntity(id, shared::INVALID_POS); });
 
     QAction *actEditComponent = menu->addAction(tr("Edit component"));
     connect(actEditComponent, &QAction::triggered, this,
@@ -601,11 +603,8 @@ void IVAppWidget::showEditAttributesDialog()
     dialog.exec();
 }
 
-void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+void IVAppWidget::importEntity(const shared::Id &id, QPointF sceneDropPoint)
 {
-    /// TODO: find proper place for imporing function in the scene if sceneDropPoint is null (for example action
-    /// from context menu is invoked)
-
     Q_ASSERT(m_document);
     const auto obj = m_document->importModel()->getObject(id);
     if (!obj) {
@@ -626,44 +625,32 @@ void IVAppWidget::importEntity(const shared::Id &id, const QPointF &sceneDropPoi
         shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
         return;
     }
-    QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
-        itemAtScenePos = itemAtScenePos->parentItem();
-    }
+    ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
 
-    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
     auto cmdImport =
             new cmd::CmdEntitiesImport(ivm::IVModel::CloneType::Copy, { obj }, parentObject, m_document->objectsModel(),
                     m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
     m_document->commandsStack()->push(cmdImport);
 }
 
-void IVAppWidget::instantiateEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+void IVAppWidget::instantiateEntity(const shared::Id &id, QPointF sceneDropPoint)
 {
-    /// TODO: find proper place for instantiation in the scene if sceneDropPoint is null (for example action from
-    /// context menu is invoked)
-
     Q_ASSERT(m_document);
     const auto obj = m_document->sharedModel()->getObject(id);
     if (!obj || obj->type() != ivm::IVObject::Type::FunctionType) {
         return;
     }
-    QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
-        itemAtScenePos = itemAtScenePos->parentItem();
-    }
-    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+
+    ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
+
     auto cmdInstantiate =
             new cmd::CmdEntitiesInstantiate(obj->as<ivm::IVFunctionType *>(), parentObject, m_document->objectsModel(),
                     m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
     m_document->commandsStack()->push(cmdInstantiate);
 }
 
-void IVAppWidget::linkEntity(const shared::Id &id, const QPointF &sceneDropPoint)
+void IVAppWidget::linkEntity(const shared::Id &id, QPointF sceneDropPoint)
 {
-    /// TODO: find proper place for imporing as reference in the scene if sceneDropPoint is null (for example action
-    /// from context menu is invoked)
-
     Q_ASSERT(m_document);
     const auto obj = m_document->importModel()->getObject(id);
     if (!obj || obj->type() != ivm::IVObject::Type::Function) {
@@ -686,12 +673,9 @@ void IVAppWidget::linkEntity(const shared::Id &id, const QPointF &sceneDropPoint
         shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
         return;
     }
-    QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
-        itemAtScenePos = itemAtScenePos->parentItem();
-    }
 
-    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
+    ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
+
     auto cmdLink = new cmd::CmdEntitiesImport(ivm::IVModel::CloneType::Reference, { obj->as<ivm::IVFunction *>() },
             parentObject, m_document->objectsModel(), m_document->asn1Check(), sceneDropPoint,
             QFileInfo(m_document->path()).absolutePath());
@@ -1095,6 +1079,30 @@ void IVAppWidget::showArchetypeManager()
     ive::ArchetypesManagerDialog dialog(m_document, m_document->objectsModel(), m_document->commandsStack(), this);
     dialog.init();
     dialog.exec();
+}
+
+/*!
+ * Returns the function(type) that is below the given scene position \p screneDropPoint
+ * Does eventually update the scene \p screneDropPoint
+ */
+ivm::IVFunctionType *IVAppWidget::functionAtPosition(QPointF &sceneDropPoint)
+{
+    ivm::IVFunctionType *parentObject = nullptr;
+    if (shared::isValidPosition(sceneDropPoint)) {
+        QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, graphicsView()->transform());
+        while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
+            itemAtScenePos = itemAtScenePos->parentItem();
+        }
+        parentObject = gi::functionObject(itemAtScenePos);
+    } else {
+        parentObject = dynamic_cast<ivm::IVFunctionType *>(m_document->objectsModel()->rootObject());
+
+        /// TODO: find proper place for imporing function in the scene if sceneDropPoint invalid (for example action
+        /// from context menu is invoked)
+        sceneDropPoint = QPoint();
+    }
+
+    return parentObject;
 }
 
 } // namespace ive
