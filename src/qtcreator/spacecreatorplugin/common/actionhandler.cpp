@@ -73,6 +73,7 @@ void ActionHandler::onCurrentEditorChanged(Core::IEditor *editor)
 
     auto qtEditor = qobject_cast<QtCEditor *>(editor);
     if (!qtEditor) {
+        m_undoGroup->setActiveStack(nullptr);
         return;
     }
 
