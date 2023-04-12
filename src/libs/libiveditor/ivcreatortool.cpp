@@ -539,9 +539,11 @@ void IVCreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &s
         }
     }
 
-    // Hide Unselected
-    if (m_doc->hasSelectedItems()) {
-        menu->addAction(tr("Hide unselected"), this, [this, scene]() { m_doc->hideUnselectedItems(); });
+    if (m_doc->hasHideableItems()) {
+        // Hide selected
+        menu->addAction(tr("Hide"), this, [this]() { m_doc->hideSelectedItems(); });
+        // Hide Unselected
+        menu->addAction(tr("Hide unselected"), this, [this]() { m_doc->hideUnselectedItems(); });
     }
 
     // Show All

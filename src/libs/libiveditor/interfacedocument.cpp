@@ -455,19 +455,43 @@ void InterfaceDocument::showAll()
 }
 
 /**
- * hasSelectedItems returns true if the user has selected items in the main scene
+ * hasSelectedItems returns true if the user has selected items in the main scene.
  */
-bool InterfaceDocument::hasSelectedItems()
+bool InterfaceDocument::hasHideableItems()
 {
-    return objectsSelectionModel()->hasSelection();
+    QList<ivm::IVObject *> selectedObjects = getSelectedObjects();
+    for (ivm::IVObject *selectedObject : selectedObjects) {
+        if (selectedObject->isRootObject()) {
+            continue; // root object is not hideable
+        }
+        if (selectedObject->isFunction() || selectedObject->isFunctionType() || selectedObject->isComment()) {
+            return true;
+        }
+    }
+    return false;
 }
 
-bool InterfaceDocument::hasUnselectedItems()
+/**
+ * All items that are NOT selected in the main scene at its current level is hidden
+ */
+void InterfaceDocument::hideSelectedItems()
 {
-    QList<ivm::IVObject *> unselectedObjects = getUnselectedObjects();
-    return !unselectedObjects.isEmpty();
+    QList<ivm::IVObject *> selectedObjects = getSelectedObjects();
+    for (ivm::IVObject *selectedObject : selectedObjects) {
+        if (selectedObject->isRootObject()) {
+            continue; // root object is not hideable
+        }
+        bool hide = selectedObject->isFunction() || selectedObject->isFunctionType() || selectedObject->isComment();
+        if (hide) {
+            selectedObject->setVisible(false);
+        }
+    }
 }
 
+/**
+ * @brief Get all the selected IVObjects, including any root object
+ * @return
+ */
 QList<ivm::IVObject *> InterfaceDocument::getSelectedObjects()
 {
     auto selectedObjects = QList<ivm::IVObject *>();
@@ -476,13 +500,40 @@ QList<ivm::IVObject *> InterfaceDocument::getSelectedObjects()
         QVariant id = idx.data(IVVisualizationModelBase::IdRole);
         QUuid uuid = id.toUuid();
         ivm::IVObject *selectedObject = objectsModel()->getObject(uuid);
-        if (selectedObject->isComment() || selectedObject->isFunction() || selectedObject->isFunctionType()) {
-            selectedObjects.append(selectedObject);
-        }
+        selectedObjects.append(selectedObject);
     }
     return selectedObjects;
 }
 
+/**
+ * @brief InterfaceDocument::hasUnselectedItems
+ * @return
+ */
+bool InterfaceDocument::hasUnselectedItems()
+{
+    QList<ivm::IVObject *> unselectedObjects = getUnselectedObjects();
+    return !unselectedObjects.isEmpty();
+}
+
+/**
+ * All items that are NOT selected in the main scene at its current level is hidden
+ */
+void InterfaceDocument::hideUnselectedItems()
+{
+    QList<ivm::IVObject *> unselectedObjects = getUnselectedObjects();
+    // Hide the unselectedObjects
+    for (ivm::IVObject *unselectedObject : unselectedObjects) {
+        bool hide = unselectedObject->isFunction() || unselectedObject->isFunctionType() || unselectedObject->isComment();
+        if (hide) {
+            unselectedObject->setVisible(false);
+        }
+    }
+}
+
+/**
+ * @brief get the unselected objects at the current level. Does NOT include the root object.
+ * @return
+ */
 QList<ivm::IVObject *> InterfaceDocument::getUnselectedObjects()
 {
     QList<ivm::IVObject *> selectedObjects = getSelectedObjects();
@@ -497,22 +548,6 @@ QList<ivm::IVObject *> InterfaceDocument::getUnselectedObjects()
         }
     }
     return unselectedObjects;
-}
-
-/**
- * All items that are NOT selected in the main scene at its current level is hidden
- */
-void InterfaceDocument::hideUnselectedItems()
-{
-    QList<ivm::IVObject *> unselectedObjects = getUnselectedObjects();
-    // Hide the unselectedObjects
-    for (ivm::IVObject *unselectedObject : unselectedObjects) {
-        bool objectIsEntity =
-                unselectedObject->isFunction() || unselectedObject->isFunctionType() || unselectedObject->isComment();
-        if (!unselectedObject->isRootObject() && objectIsEntity) { // Don't hide root items
-            unselectedObject->setVisible(false);
-        }
-    }
 }
 
 QString InterfaceDocument::path() const

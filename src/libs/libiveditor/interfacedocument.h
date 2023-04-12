@@ -94,7 +94,8 @@ public:
 
     void showAll();
 
-    bool hasSelectedItems();
+    bool hasHideableItems();
+    void hideSelectedItems();
     bool hasUnselectedItems();
     void hideUnselectedItems();
 
