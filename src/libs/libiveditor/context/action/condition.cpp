@@ -85,7 +85,7 @@ QStringList Condition::knownTypes()
  */
 bool Condition::isAcceptable(ivm::IVObject *obj) const
 {
-    if (m_itemType != "*") {
+    if (obj && m_itemType != "*") {
         if (m_itemType != ivm::IVObject::typeToString(obj->type())) {
             return false;
         }
