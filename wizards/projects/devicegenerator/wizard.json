@@ -49,10 +49,18 @@
         },
         {
             "key": "ProjectNameUpperCase",
-            "value": "%{JS: '%{ProjectName}'.toUpperCase().replace(/^[_-]+|[-_]+$/g, '').replace(/[_-]+/g, '-')}"
+            "value": "%{JS: '%{ProjectName}'.toUpperCase()}"
         },
         {
             "key": "ProjectNameLowerCase",
+            "value": "%{JS: '%{ProjectName}'.toLowerCase()}"
+        },
+        {
+            "key": "ProjectNameUpperCaseEscaped",
+            "value": "%{JS: '%{ProjectName}'.toUpperCase().replace(/^[_-]+|[-_]+$/g, '').replace(/[_-]+/g, '-')}"
+        },
+        {
+            "key": "ProjectNameLowerCaseEscaped",
             "value": "%{JS: '%{ProjectName}'.toLowerCase().replace(/^[_-]+|[-_]+$/g, '').replace(/[_-]+/g, '-')}"
         },
         {

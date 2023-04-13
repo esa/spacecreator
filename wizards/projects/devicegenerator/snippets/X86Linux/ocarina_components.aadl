@@ -12,8 +12,8 @@
 
 data configuration_type_%{ProjectName}
 properties
-  Type_Source_Name => "%{ProjectNameUpperCase}-Conf-T";
-  Deployment::ASN1_Module_Name => "%{ProjectNameUpperCase}-DRIVER-CONFIGURATION";
+  Type_Source_Name => "%{ProjectNameUpperCaseEscaped}-Conf-T";
+  Deployment::ASN1_Module_Name => "%{ProjectNameUpperCaseEscaped}-DRIVER-CONFIGURATION";
   Source_Language => (ASN1);
   Source_Text => ("%{AsnConfigFileInstallationTargetX86Linux}");
 end configuration_type_%{ProjectName};
@@ -32,7 +32,7 @@ end configuration_type_%{ProjectName};
 
   device implementation device_%{ProjectName}.linux
   properties
-    Deployment::Driver_Name       => "%{ProjectNameLowerCase}";
+    Deployment::Driver_Name       => "driver_%{ProjectNameLowerCase}";
     Device_Driver                 => classifier (ocarina_drivers_%{ProjectName}::%{ProjectName}.linux);
     Initialize_Entrypoint         => classifier (ocarina_drivers_%{ProjectName}::driver_%{ProjectName}_init);
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::generic.linux));

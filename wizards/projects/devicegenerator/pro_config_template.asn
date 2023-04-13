@@ -1,15 +1,15 @@
 -- DRIVER CONFIGURATION MODEL [user-editable]
 -- Shall contain definition of Driver Configuration.
 -- This file will be used by ocarina-components.aadl and Board1.xml.
-%{ProjectNameUpperCase}-DRIVER-CONFIGURATION DEFINITIONS ::= BEGIN
-    
-    %{ProjectNameUpperCase}-Conf-T ::= SEQUENCE {
+%{ProjectNameUpperCaseEscaped}-DRIVER-CONFIGURATION DEFINITIONS ::= BEGIN
+
+    %{ProjectNameUpperCaseEscaped}-Conf-T ::= SEQUENCE {
         -- Driver Configuration
     }
 
     -- ASN.1 Type definitions must start with an uppercase
     -- Field names in records (SEQUENCE) must start with a lowercase
-    -- Underscores are not allowed: use dash (hyphen) 
+    -- Underscores are not allowed: use dash (hyphen)
     -- For integers do not assume that small ranges will be translated to small
     -- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
     -- for the range in Ada)

@@ -1,4 +1,4 @@
-%{ProjectNameUpperCase}-DATAVIEW DEFINITIONS ::= BEGIN
+%{ProjectNameUpperCaseEscaped}-DATAVIEW DEFINITIONS ::= BEGIN
 
     --  In this ACN model, you can specify custom binary encoding rules for
     --  your data types. For example if you require a specific memory layout
