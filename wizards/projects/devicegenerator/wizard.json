@@ -5,10 +5,10 @@
         "Qt4ProjectManager.Qt4Project"
     ],
     "id": "S.DeviceGenerator Project",
-    "category": "I.Projects",
+    "category": "S.SpaceCreator",
     "trDescription": "Create Communication Device project.",
     "trDisplayName": "Communication Device Project",
-    "trDisplayCategory": "Non-Qt Project",
+    "trDisplayCategory": "SpaceCreator Project",
     "enabled": true,
     "options": [
         {
