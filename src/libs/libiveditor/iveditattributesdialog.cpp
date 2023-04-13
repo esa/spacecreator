@@ -15,12 +15,23 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "interface/attributedelegate.h"
 #include "iveditattributesdialog.h"
 
 #include <QDialogButtonBox>
 #include <QTabWidget>
 #include <QTableView>
 #include <QVBoxLayout>
+
+class AttributeDelegate : public shared::AttributeDelegate {
+public:
+    using shared::AttributeDelegate::AttributeDelegate;
+
+    QString tokenNameFromIndex(const QModelIndex &index) const override
+    {
+        return index.model()->headerData(index.column(), Qt::Horizontal, Qt::UserRole).toString();
+    }
+};
 
 namespace ive
 {
@@ -47,11 +58,14 @@ IVEditAttributesDialog::IVEditAttributesDialog(QAbstractItemModel *functionsMode
     layout->addWidget(buttonBox);
 
     d->functionsTable = new QTableView(d->tabWidget);
+    d->functionsTable->setItemDelegate(new AttributeDelegate(d->functionsTable));
     d->functionsTable->setModel(functionsModel);
-    d->tabWidget->addTab(d->functionsTable, tr("Functions' attributes"));
 
     d->interfacesTable = new QTableView(d->tabWidget);
+    d->interfacesTable->setItemDelegate(new AttributeDelegate(d->interfacesTable));
     d->interfacesTable->setModel(interfacesModel);
+
+    d->tabWidget->addTab(d->functionsTable, tr("Functions' attributes"));
     d->tabWidget->addTab(d->interfacesTable, tr("Interfaces' attributes"));
 
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);

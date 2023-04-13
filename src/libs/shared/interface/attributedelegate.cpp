@@ -160,8 +160,9 @@ QWidget *AttributeDelegate::createEditor(
         QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     if (index.isValid()) {
+        const QString tokenName = tokenNameFromIndex(index);
         QWidget *editor = createConfiguredEditor(const_cast<AttributeDelegate *>(this),
-                PropertiesListModel::tokenNameFromIndex(index), index.data(PropertiesListModel::EditRole),
+                tokenName, index.data(PropertiesListModel::EditRole),
                 index.data(PropertiesListModel::ValidatorRole), parent);
         if (editor) {
             editor->setEnabled(index.flags().testFlag(Qt::ItemIsEnabled));
@@ -170,7 +171,7 @@ QWidget *AttributeDelegate::createEditor(
         /// Workaroung for #699 because of autoselecting data for QLineEdit after editor creation
         /// https://code.qt.io/cgit/qt/qtbase.git/tree/src/widgets/itemviews/qabstractitemview.cpp#n4351
         if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
-            QTimer::singleShot(0, lineEdit, [lineEdit, name = PropertiesListModel::tokenNameFromIndex(index)]() {
+            QTimer::singleShot(0, lineEdit, [lineEdit, name = tokenName]() {
                 if (QString::compare(name, QLatin1String("name"), Qt::CaseInsensitive))
                     lineEdit->deselect();
             });
@@ -234,6 +235,11 @@ void AttributeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     } else {
         QStyledItemDelegate::setModelData(editor, model, index);
     }
+}
+
+QString AttributeDelegate::tokenNameFromIndex(const QModelIndex &index) const
+{
+    return PropertiesListModel::tokenNameFromIndex(index);
 }
 
 } // namespace shared

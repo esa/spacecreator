@@ -127,6 +127,8 @@ private Q_SLOTS:
     void testEmptyInterfaces();
     void testReadFunctions();
     void testReadInterfaces();
+    void testWriteFunctions();
+    void testWriteInterfaces();
 
 private:
     ivm::IVPropertyTemplateConfig *m_config {};
@@ -192,19 +194,54 @@ void tst_IVEditAttributesModel::testReadInterfaces()
 {
     auto function1 = ivm::testutils::createFunction("Function 1");
     auto function2 = ivm::testutils::createFunction("Function 2");
-    auto interface1 = ivm::testutils::createRequiredIface(function1, "Interface 1");
-    auto interface2 = ivm::testutils::createRequiredIface(function2, "Interface 2");
+    auto interface1 = ivm::testutils::createProvidedIface(function1, "Interface 1");
+    auto interface2 = ivm::testutils::createProvidedIface(function2, "Interface 2");
 
     m_ivModel->addObjects<ivm::IVObject *>({interface1, interface2});
 
     ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
     QCOMPARE(model.rowCount(QModelIndex()), 2);
 
-    QCOMPARE(model.columnCount(QModelIndex()), 4);
+    QCOMPARE(model.columnCount(), 3);
     QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Function"));
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Name"));
     QCOMPARE(model.headerData(2, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Kind"));
-    QCOMPARE(model.headerData(3, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Inherit from PI"));
+}
+
+void tst_IVEditAttributesModel::testWriteFunctions()
+{
+    auto function = ivm::testutils::createFunction("Function");
+    auto type = ivm::testutils::createFunctionType("Type");
+
+    m_ivModel->addObjects<ivm::IVObject *>({function, type});
+
+    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Function);
+
+    QVERIFY(model.setData(model.index(0, 0), QVariant("Renamed"), ive::IVEditAttributesModel::EditRole));
+    QCOMPARE(model.data(model.index(0, 0), Qt::DisplayRole).toString(), QLatin1String("Renamed"));
+
+    QVERIFY(model.setData(model.index(0, 1), QVariant("Type"), ive::IVEditAttributesModel::EditRole));
+    QCOMPARE(model.data(model.index(0, 1), Qt::DisplayRole).toString(), QLatin1String("Type"));
+
+    // An invalid option should not come from the delegate, but check that the
+    // model rejects it anyway.
+    QVERIFY(!model.setData(model.index(0, 1), QVariant("Invalid"), ive::IVEditAttributesModel::EditRole));
+    QCOMPARE(model.data(model.index(0, 1), Qt::DisplayRole).toString(), QLatin1String("Type"));
+}
+
+void tst_IVEditAttributesModel::testWriteInterfaces()
+{
+    auto function = ivm::testutils::createFunction("Function 1");
+    auto interface = ivm::testutils::createProvidedIface(function, "Interface 1");
+
+    m_ivModel->addObjects<ivm::IVObject *>({interface});
+
+    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
+
+    QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Name"));
+
+    QVERIFY(model.setData(model.index(0, 1), QVariant("Renamed"), ive::IVEditAttributesModel::EditRole));
+    QCOMPARE(model.data(model.index(0, 1), Qt::DisplayRole).toString(), QLatin1String("Renamed"));
 }
 
 
