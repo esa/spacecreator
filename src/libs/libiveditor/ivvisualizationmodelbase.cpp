@@ -18,6 +18,7 @@
 #include "ivvisualizationmodelbase.h"
 
 #include "commands/cmdentityattributeschange.h"
+#include "commands/cmdchangelayervisibility.h"
 #include "commandsstack.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -335,12 +336,15 @@ IVLayerVisualizationModel::IVLayerVisualizationModel(
 QList<QStandardItem *> IVLayerVisualizationModel::createItems(shared::VEObject *obj)
 {
     QList<QStandardItem *> items = IVVisualizationModelBase::createItems(obj);
+    ivm::IVObject *ivObj = qobject_cast<ivm::IVObject *>(obj);
+
     if (!items.isEmpty()) {
         items[0]->setEditable(true);
         items[0]->setCheckable(true);
         items[0]->setDragEnabled(false);
-        items[0]->setData(Qt::Checked, Qt::CheckStateRole);
+        items[0]->setData(ivObj->isVisible() ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
     }
+
     return items;
 }
 
@@ -348,7 +352,7 @@ void IVLayerVisualizationModel::onDataChanged(
         const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     if (!m_commandsStack) {
-        qWarning() << Q_FUNC_INFO << "No command stack set in VisualizationModel";
+        qWarning() << Q_FUNC_INFO << "No command stack set in IVLayerVisualizationModel";
         return;
     }
 
@@ -361,19 +365,38 @@ void IVLayerVisualizationModel::onDataChanged(
     if (!item) {
         return;
     }
+
     if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
         if (item->isCheckable()) {
-            setObjectsVisibility(item->text(), m_objectsModel, item->checkState() == Qt::Checked);
+            const auto encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, item->text());
+            const auto layerIsChecked = item->checkState() == Qt::Checked;
+
+            setObjectsVisibility(encodedLayerName, layerIsChecked);
+
+            ivm::IVObject *layerObj { nullptr };
+
+            for (auto obj : m_veModel->objects()) {
+                auto ivObj = qobject_cast<ivm::IVObject *>(obj);
+
+                if(ivObj->title() == encodedLayerName) {
+                    layerObj = ivObj;
+                    break;
+                }
+            }
+
+            if(layerObj) {
+                layerObj->setVisible(layerIsChecked);
+                
+                auto command = new ive::cmd::CmdChangeLayerVisibility();
+                m_commandsStack->push(command);
+            }
         }
     }
 }
 
-void IVLayerVisualizationModel::setObjectsVisibility(
-        const QString &layerName, ivm::IVModel *objectsModel, const bool &isVisible)
+void IVLayerVisualizationModel::setObjectsVisibility(const QString &encodedLayerName, const bool &isVisible)
 {
-    const QString encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, layerName);
-
-    for (auto entity : objectsModel->objects()) {
+    for (auto entity : m_objectsModel->objects()) {
         auto ivObject = qobject_cast<ivm::IVObject *>(entity);
 
         switch (ivObject->type()) {

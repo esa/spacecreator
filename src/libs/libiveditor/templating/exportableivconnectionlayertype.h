@@ -34,10 +34,12 @@ class ExportableIVConnectionLayerType : public ExportableIVObject
 {
     Q_GADGET
     Q_PROPERTY(QString name READ connectionLayerName)
+    Q_PROPERTY(bool is_visible READ connectionLayerVisibility)
 
 public:
     explicit ExportableIVConnectionLayerType(const ivm::IVConnectionLayerType *layer = nullptr);
     QString connectionLayerName() const;
+    bool connectionLayerVisibility() const;
 };
 
 }

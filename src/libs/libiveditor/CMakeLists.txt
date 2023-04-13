@@ -8,6 +8,8 @@ target_sources(${LIB_NAME} PRIVATE
     asn1dialog.ui
     commands/cmdchangeasn1file.cpp
     commands/cmdchangeasn1file.h
+    commands/cmdchangelayervisibility.cpp
+    commands/cmdchangelayervisibility.h
     commands/cmdcommentitemcreate.cpp
     commands/cmdcommentitemcreate.h
     commands/cmdconnectiongroupitemchange.cpp

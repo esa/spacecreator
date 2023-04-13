@@ -60,6 +60,8 @@ enum Id
     InstantiateEntities,
     ReferenceEntities,
 
+    ChangeLayerVisibility,
+
     LastId
 };
 
