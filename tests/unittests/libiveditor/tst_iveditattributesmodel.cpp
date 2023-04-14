@@ -154,7 +154,7 @@ void tst_IVEditAttributesModel::cleanupTestCase()
 
 void tst_IVEditAttributesModel::testEmptyFunctions()
 {
-    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Function);
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get());
     QCOMPARE(model.rowCount(QModelIndex()), 0);
     QCOMPARE(model.columnCount(QModelIndex()), 0);
     QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QVariant());
@@ -162,7 +162,7 @@ void tst_IVEditAttributesModel::testEmptyFunctions()
 
 void tst_IVEditAttributesModel::testEmptyInterfaces()
 {
-    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get());
     QCOMPARE(model.rowCount(QModelIndex()), 0);
     QCOMPARE(model.columnCount(QModelIndex()), 0);
     QCOMPARE(model.headerData(0, Qt::Horizontal, Qt::DisplayRole), QVariant());
@@ -175,7 +175,7 @@ void tst_IVEditAttributesModel::testReadFunctions()
 
     m_ivModel->addObjects<ivm::IVObject *>({function1, function2});
 
-    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Function);
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get());
     QCOMPARE(model.rowCount(QModelIndex()), 2);
     QCOMPARE(model.columnCount(QModelIndex()), 2);
 
@@ -199,7 +199,7 @@ void tst_IVEditAttributesModel::testReadInterfaces()
 
     m_ivModel->addObjects<ivm::IVObject *>({interface1, interface2});
 
-    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get());
     QCOMPARE(model.rowCount(QModelIndex()), 2);
 
     QCOMPARE(model.columnCount(), 3);
@@ -215,7 +215,9 @@ void tst_IVEditAttributesModel::testWriteFunctions()
 
     m_ivModel->addObjects<ivm::IVObject *>({function, type});
 
-    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Function);
+    shared::cmd::CommandsStackBase stack;
+    shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get(), &macro);
 
     QVERIFY(model.setData(model.index(0, 0), QVariant("Renamed"), ive::IVEditAttributesModel::EditRole));
     QCOMPARE(model.data(model.index(0, 0), Qt::DisplayRole).toString(), QLatin1String("Renamed"));
@@ -236,7 +238,9 @@ void tst_IVEditAttributesModel::testWriteInterfaces()
 
     m_ivModel->addObjects<ivm::IVObject *>({interface});
 
-    ive::IVEditAttributesModel model(m_ivModel.get(), ive::IVEditAttributesModel::Interface);
+    shared::cmd::CommandsStackBase stack;
+    shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get(), &macro);
 
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::DisplayRole).toString(), QLatin1String("Name"));
 

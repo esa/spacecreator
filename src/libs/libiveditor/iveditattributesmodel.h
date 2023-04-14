@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "commandsstackbase.h" // Can't forward declare nested class Macro
+
 #include <QAbstractTableModel>
 
 namespace ivm { class IVModel; }
@@ -33,7 +35,7 @@ public:
     // Custom roles that the delegate requires us to support.
     enum { DataRole = Qt::UserRole+2, EditRole, ValidatorRole };
 
-    explicit IVEditAttributesModel(ivm::IVModel *model, ObjectType objectType);
+    explicit IVEditAttributesModel(ObjectType objectType, ivm::IVModel *model, shared::cmd::CommandsStackBase::Macro *macro = nullptr);
     ~IVEditAttributesModel();
 
     int rowCount(const QModelIndex &parent) const override;

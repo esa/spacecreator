@@ -597,10 +597,12 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
 
 void IVAppWidget::showEditAttributesDialog()
 {
-    IVEditAttributesModel functionsModel(m_document->objectsModel(), IVEditAttributesModel::Function);
-    IVEditAttributesModel interfacesModel(m_document->objectsModel(), IVEditAttributesModel::Interface);
+    shared::cmd::CommandsStackBase::Macro macro(m_document->commandsStack(), tr("Edit Attributes"));
+    IVEditAttributesModel functionsModel(IVEditAttributesModel::Function, m_document->objectsModel(), &macro);
+    IVEditAttributesModel interfacesModel(IVEditAttributesModel::Interface, m_document->objectsModel(), &macro);
     IVEditAttributesDialog dialog(&functionsModel, &interfacesModel, graphicsView());
-    dialog.exec();
+    const int result = dialog.exec();
+    macro.setComplete(result == QDialog::Accepted);
 }
 
 void IVAppWidget::importEntity(const shared::Id &id, QPointF sceneDropPoint)

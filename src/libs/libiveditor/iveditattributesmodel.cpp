@@ -17,6 +17,9 @@
 
 #include "iveditattributesmodel.h"
 
+#include "commands/cmdfunctionattrchange.h"
+#include "commands/cmdifaceattrchange.h"
+#include "commandsstack.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
 #include "propertytemplate.h"
@@ -39,8 +42,9 @@ namespace ive {
 
 struct IVEditAttributesModel::Private
 {
-    ivm::IVModel *model;
     ObjectType objectType;
+    ivm::IVModel *model = nullptr;
+    cmd::CommandsStack::Macro *macro = nullptr;
     QList<ivm::IVObject*> objects;
     QStringList functionTypeNames = { QString() }; // Add an initial empty string for "no type".
 
@@ -104,11 +108,12 @@ struct IVEditAttributesModel::Private
     }
 };
 
-IVEditAttributesModel::IVEditAttributesModel(ivm::IVModel *model, ObjectType objectType)
+IVEditAttributesModel::IVEditAttributesModel(ObjectType objectType, ivm::IVModel *model, shared::cmd::CommandsStackBase::Macro *macro)
     : d(new Private)
 {
     d->model = model;
     d->objectType = objectType;
+    d->macro = macro;
 
     if (objectType == Interface)
         d->gatherData<ivm::IVInterface>();
@@ -203,8 +208,19 @@ bool IVEditAttributesModel::setData(const QModelIndex &index, const QVariant &va
         entry.values.toStringList().indexOf(value.toString()) == -1)
         return false;
 
-    d->objects.at(index.row())->setEntityAttribute(key, value);
-    return true;
+    auto object = d->objects.at(index.row());
+
+    if (d->objectType == Interface) {
+        auto interface = qobject_cast<ivm::IVInterface*>(object);
+        Q_ASSERT(interface);
+        return d->macro->push(new cmd::CmdIfaceAttrChange(d->model->dynPropConfig(), interface, key, value));
+    }
+    else {
+        auto function = qobject_cast<ivm::IVFunction*>(object);
+        Q_ASSERT(function);
+        return d->macro->push(new cmd::CmdFunctionAttrChange(d->model->dynPropConfig(), function,
+                { EntityAttribute { key, value, EntityAttribute::Type::Attribute } }));
+    }
 }
 
 }
