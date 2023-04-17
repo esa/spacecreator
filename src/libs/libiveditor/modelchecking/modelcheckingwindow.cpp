@@ -46,7 +46,7 @@ using Qt::endl;
 namespace ive {
 
 struct ModelCheckingWindow::ModelCheckingWindowPrivate {
-    Ui::ModelCheckingWindow *ui { new Ui::ModelCheckingWindow };
+    Ui::ModelCheckingWindow ui;
     InterfaceDocument *document { nullptr };
 };
 
@@ -59,7 +59,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     , d(new ModelCheckingWindowPrivate)
 {
     // Set ui and interface document
-    d->ui->setupUi(this);
+    d->ui.setupUi(this);
     d->document = document;
 
     // Set paths for project, properties, subtypes and results/oputputs
@@ -103,14 +103,14 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     }
 
     // Define right-click menus and set menu policy
-    this->contextMenuPropertiesTop = new QMenu(d->ui->treeWidget_properties);
-    this->contextMenuProperties = new QMenu(d->ui->treeWidget_properties);
-    this->contextMenuPropertiesMSCFile = new QMenu(d->ui->treeWidget_properties);
-    this->contextMenuPropertiesFile = new QMenu(d->ui->treeWidget_properties);
-    this->contextMenuSubtypes = new QMenu(d->ui->treeWidget_subtyping);
-    this->contextMenuSubtypesFile = new QMenu(d->ui->treeWidget_subtyping);
-    d->ui->treeWidget_properties->setContextMenuPolicy(Qt::CustomContextMenu);
-    d->ui->treeWidget_subtyping->setContextMenuPolicy(Qt::CustomContextMenu);
+    this->contextMenuPropertiesTop = new QMenu(d->ui.treeWidget_properties);
+    this->contextMenuProperties = new QMenu(d->ui.treeWidget_properties);
+    this->contextMenuPropertiesMSCFile = new QMenu(d->ui.treeWidget_properties);
+    this->contextMenuPropertiesFile = new QMenu(d->ui.treeWidget_properties);
+    this->contextMenuSubtypes = new QMenu(d->ui.treeWidget_subtyping);
+    this->contextMenuSubtypesFile = new QMenu(d->ui.treeWidget_subtyping);
+    d->ui.treeWidget_properties->setContextMenuPolicy(Qt::CustomContextMenu);
+    d->ui.treeWidget_subtyping->setContextMenuPolicy(Qt::CustomContextMenu);
     QAction *newProperty = this->contextMenuPropertiesTop->addAction("New property");
     QAction *deletePropertyDir = this->contextMenuProperties->addAction("Delete property folder");
     QAction *MSC2OBS = this->contextMenuPropertiesMSCFile->addAction("Convert MSC to Observer");
@@ -125,20 +125,20 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     connect(deletePropertyFile, SIGNAL(triggered()), this, SLOT(deleteProperty()));
     connect(newSubtypes, SIGNAL(triggered()), this, SLOT(addSubtypes()));
     connect(deleteSubtypes, SIGNAL(triggered()), this, SLOT(deleteSubtypes()));
-    connect(d->ui->tableAddButton, &QPushButton::clicked, this, &ModelCheckingWindow::addGenerationLimitsTableRow);
-    connect(d->ui->tableDeleteButton, &QPushButton::clicked, this,
+    connect(d->ui.tableAddButton, &QPushButton::clicked, this, &ModelCheckingWindow::addGenerationLimitsTableRow);
+    connect(d->ui.tableDeleteButton, &QPushButton::clicked, this,
             &ModelCheckingWindow::removeGenerationLimitsTableRow);
 
-    connect(d->ui->treeWidget_spinResults, &QTreeWidget::itemDoubleClicked, [&](QTreeWidgetItem *item, int column) {
+    connect(d->ui.treeWidget_spinResults, &QTreeWidget::itemDoubleClicked, [&](QTreeWidgetItem *item, int column) {
         QDesktopServices::openUrl(QUrl::fromLocalFile(this->spinOutputPath + "/" + item->text(column)));
     });
 
     // Make tree views show horizontal scroll bars
-    d->ui->treeWidget_properties->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    d->ui->treeWidget_subtyping->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    d->ui->treeWidget_submodel->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    d->ui->treeWidget_results->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    d->ui->treeWidget_spinResults->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    d->ui.treeWidget_properties->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    d->ui.treeWidget_subtyping->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    d->ui.treeWidget_submodel->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    d->ui.treeWidget_results->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    d->ui.treeWidget_spinResults->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // Build properties tree view
     QFileInfo propertiesFileInfo(this->propertiesPath);
@@ -146,7 +146,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     fileColumnProps.append(propertiesFileInfo.fileName());
     this->propertiesTopDirWidgetItem = new QTreeWidgetItem(fileColumnProps);
     this->propertiesTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    d->ui->treeWidget_properties->addTopLevelItem(this->propertiesTopDirWidgetItem);
+    d->ui.treeWidget_properties->addTopLevelItem(this->propertiesTopDirWidgetItem);
     this->propertiesTopDirWidgetItem->setCheckState(
             0, listProperties(this->propertiesTopDirWidgetItem, propertiesFileInfo, {}, {}, 0));
 
@@ -156,7 +156,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     fileColumnSubtypes.append(subtypesFileInfo.fileName());
     subtypesTopDirWidgetItem = new QTreeWidgetItem(fileColumnSubtypes);
     subtypesTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    d->ui->treeWidget_subtyping->addTopLevelItem(subtypesTopDirWidgetItem);
+    d->ui.treeWidget_subtyping->addTopLevelItem(subtypesTopDirWidgetItem);
     listSubtypes(subtypesTopDirWidgetItem, subtypesFileInfo, {});
 
     // Build submodel tree view
@@ -164,7 +164,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     functionColumnSubmodel.append("Model Functions");
     functionsTopNodeWidgetItem = new QTreeWidgetItem(functionColumnSubmodel);
     functionsTopNodeWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_FileDialogListView));
-    d->ui->treeWidget_submodel->addTopLevelItem(functionsTopNodeWidgetItem);
+    d->ui.treeWidget_submodel->addTopLevelItem(functionsTopNodeWidgetItem);
     listModelFunctions(functionsTopNodeWidgetItem, {});
 
     // Build results tree view for if model checker
@@ -173,7 +173,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     fileColumnResuls.append(resultsFileInfo.fileName());
     resultsTopDirWidgetItem = new QTreeWidgetItem(fileColumnResuls);
     resultsTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    d->ui->treeWidget_results->addTopLevelItem(resultsTopDirWidgetItem);
+    d->ui.treeWidget_results->addTopLevelItem(resultsTopDirWidgetItem);
     listResults(resultsTopDirWidgetItem, resultsFileInfo);
 
     // Build results tree view for spin model checker
@@ -182,24 +182,24 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     fileColumnSpinResults.append(spinResultsFileInfo.fileName());
     spinResultsTopDirWidgetItem = new QTreeWidgetItem(fileColumnSpinResults);
     spinResultsTopDirWidgetItem->setIcon(0, this->style()->standardIcon(QStyle::SP_DirIcon));
-    d->ui->treeWidget_spinResults->addTopLevelItem(spinResultsTopDirWidgetItem);
+    d->ui.treeWidget_spinResults->addTopLevelItem(spinResultsTopDirWidgetItem);
     listSpinResults(spinResultsTopDirWidgetItem, spinResultsFileInfo);
 
     // Set validators on MC options value fileds
-    d->ui->lineEdit_maxNumEnvRICalls->setValidator(new QIntValidator(0, 1000000, this));
-    d->ui->lineEdit_maxNumScenarios->setValidator(new QIntValidator(0, 1000, this));
-    d->ui->lineEdit_maxNumStates->setValidator(new QIntValidator(0, 10000000, this));
-    d->ui->lineEdit_timeLimit->setValidator(new QIntValidator(0, 100000, this));
+    d->ui.lineEdit_maxNumEnvRICalls->setValidator(new QIntValidator(0, 1000000, this));
+    d->ui.lineEdit_maxNumScenarios->setValidator(new QIntValidator(0, 1000, this));
+    d->ui.lineEdit_maxNumStates->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui.lineEdit_timeLimit->setValidator(new QIntValidator(0, 100000, this));
 
-    d->ui->lineEdit_numberOfCores->setValidator(new QIntValidator(0, 1000, this));
-    d->ui->lineEdit_searchStateLimit->setValidator(new QIntValidator(0, 10000000, this));
-    d->ui->lineEdit_errorLimit->setValidator(new QIntValidator(0, 1000000, this));
-    d->ui->lineEdit_memoryLimit->setValidator(new QIntValidator(0, 10000000, this));
-    d->ui->lineEdit_spinTimeLimit->setValidator(new QIntValidator(0, 10000000, this));
-    d->ui->lineEdit_generationLimit->setValidator(new QIntValidator(0, 10000000, this));
-    d->ui->lineEdit_deltaValue->setValidator(new QDoubleValidator(0.0, 100.0, 6, this));
-    d->ui->tableWidget_generationLimits->setSelectionBehavior(QAbstractItemView::SelectRows);
-    d->ui->tableWidget_generationLimits->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    d->ui.lineEdit_numberOfCores->setValidator(new QIntValidator(0, 1000, this));
+    d->ui.lineEdit_searchStateLimit->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui.lineEdit_errorLimit->setValidator(new QIntValidator(0, 1000000, this));
+    d->ui.lineEdit_memoryLimit->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui.lineEdit_spinTimeLimit->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui.lineEdit_generationLimit->setValidator(new QIntValidator(0, 10000000, this));
+    d->ui.lineEdit_deltaValue->setValidator(new QDoubleValidator(0.0, 100.0, 6, this));
+    d->ui.tableWidget_generationLimits->setSelectionBehavior(QAbstractItemView::SelectRows);
+    d->ui.tableWidget_generationLimits->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     SpinConfigData defaultSpinConfig;
     setSpinConfigParams(defaultSpinConfig);
@@ -917,9 +917,9 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
 void ModelCheckingWindow::convertToObs()
 {
     // Get msc property name
-    QFileInfo fileInfo(d->ui->treeWidget_properties->currentItem()->text(0));
+    QFileInfo fileInfo(d->ui.treeWidget_properties->currentItem()->text(0));
     QString fileName = fileInfo.baseName() + ".pr";
-    QString propDirName = d->ui->treeWidget_properties->currentItem()->parent()->text(0);
+    QString propDirName = d->ui.treeWidget_properties->currentItem()->parent()->text(0);
 
     // CALL MAKE RULE
     // set path to property dir
@@ -1345,7 +1345,7 @@ void ModelCheckingWindow::addSubtypes()
         QTreeWidgetItem *child = new QTreeWidgetItem(fileColumn);
         child->setIcon(0, this->style()->standardIcon(QStyle::SP_TitleBarNormalButton));
         child->setCheckState(0, Qt::Unchecked);
-        d->ui->treeWidget_subtyping->topLevelItem(0)->addChild(child);
+        d->ui.treeWidget_subtyping->topLevelItem(0)->addChild(child);
 
         statusBar()->showMessage("Subtyping " + subtypingFileName + " added.", 6000);
     }
@@ -1356,7 +1356,7 @@ void ModelCheckingWindow::addSubtypes()
  */
 void ModelCheckingWindow::deleteSubtypes()
 {
-    QFileInfo fileInfo(d->ui->treeWidget_subtyping->currentItem()->text(0));
+    QFileInfo fileInfo(d->ui.treeWidget_subtyping->currentItem()->text(0));
 
     int ret = QMessageBox::warning(this, tr("Delete subtypes"),
             "Do you confirm you want to delete subtypes file " + fileInfo.fileName() + "?",
@@ -1372,7 +1372,7 @@ void ModelCheckingWindow::deleteSubtypes()
         }
 
         // delete tree node
-        d->ui->treeWidget_subtyping->topLevelItem(0)->removeChild(d->ui->treeWidget_subtyping->currentItem());
+        d->ui.treeWidget_subtyping->topLevelItem(0)->removeChild(d->ui.treeWidget_subtyping->currentItem());
 
         statusBar()->showMessage(tr("Subtyping deleted."), 6000);
     }
@@ -1384,14 +1384,14 @@ void ModelCheckingWindow::deleteSubtypes()
  */
 void ModelCheckingWindow::deleteProperty()
 {
-    QFileInfo fileInfo(d->ui->treeWidget_properties->currentItem()->text(0));
+    QFileInfo fileInfo(d->ui.treeWidget_properties->currentItem()->text(0));
     QString fileOrDir, parent;
     // check if what is to be deleted is a file or a directory/folder
-    if (d->ui->treeWidget_properties->currentItem()->text(1) == "") { // is directory
+    if (d->ui.treeWidget_properties->currentItem()->text(1) == "") { // is directory
         fileOrDir = "folder";
     } else { // if file
         fileOrDir = "file";
-        parent = d->ui->treeWidget_properties->currentItem()->parent()->text(0);
+        parent = d->ui.treeWidget_properties->currentItem()->parent()->text(0);
     }
 
     // confirm deletion with user
@@ -1416,7 +1416,7 @@ void ModelCheckingWindow::deleteProperty()
         }
 
         // delete tree node
-        d->ui->treeWidget_properties->currentItem()->parent()->removeChild(d->ui->treeWidget_properties->currentItem());
+        d->ui.treeWidget_properties->currentItem()->parent()->removeChild(d->ui.treeWidget_properties->currentItem());
 
         statusBar()->showMessage(tr("Property deleted."), 6000);
     }
@@ -1428,20 +1428,20 @@ void ModelCheckingWindow::deleteProperty()
  */
 void ModelCheckingWindow::on_treeWidget_properties_customContextMenuRequested(const QPoint &pos)
 {
-    QModelIndex index = d->ui->treeWidget_properties->indexAt(pos);
+    QModelIndex index = d->ui.treeWidget_properties->indexAt(pos);
     if (index.isValid()) {
-        if (d->ui->treeWidget_properties->currentItem()->text(1) == "") { // is directory
-            QString dirName = d->ui->treeWidget_properties->currentItem()->text(0);
+        if (d->ui.treeWidget_properties->currentItem()->text(1) == "") { // is directory
+            QString dirName = d->ui.treeWidget_properties->currentItem()->text(0);
             if (dirName == "properties") {
-                this->contextMenuPropertiesTop->exec(d->ui->treeWidget_properties->viewport()->mapToGlobal(pos));
+                this->contextMenuPropertiesTop->exec(d->ui.treeWidget_properties->viewport()->mapToGlobal(pos));
             } else {
-                this->contextMenuProperties->exec(d->ui->treeWidget_properties->viewport()->mapToGlobal(pos));
+                this->contextMenuProperties->exec(d->ui.treeWidget_properties->viewport()->mapToGlobal(pos));
             }
         } else { // is file
-            if (d->ui->treeWidget_properties->currentItem()->text(0).right(4) == ".msc") { // is msc file
-                this->contextMenuPropertiesMSCFile->exec(d->ui->treeWidget_properties->viewport()->mapToGlobal(pos));
+            if (d->ui.treeWidget_properties->currentItem()->text(0).right(4) == ".msc") { // is msc file
+                this->contextMenuPropertiesMSCFile->exec(d->ui.treeWidget_properties->viewport()->mapToGlobal(pos));
             } else {
-                this->contextMenuPropertiesFile->exec(d->ui->treeWidget_properties->viewport()->mapToGlobal(pos));
+                this->contextMenuPropertiesFile->exec(d->ui.treeWidget_properties->viewport()->mapToGlobal(pos));
             }
         }
     }
@@ -1453,12 +1453,12 @@ void ModelCheckingWindow::on_treeWidget_properties_customContextMenuRequested(co
  */
 void ModelCheckingWindow::on_treeWidget_subtyping_customContextMenuRequested(const QPoint &pos)
 {
-    QModelIndex index = d->ui->treeWidget_subtyping->indexAt(pos);
+    QModelIndex index = d->ui.treeWidget_subtyping->indexAt(pos);
     if (index.isValid()) {
-        if (d->ui->treeWidget_subtyping->currentItem()->text(1) == "") { // is directory
-            this->contextMenuSubtypes->exec(d->ui->treeWidget_subtyping->viewport()->mapToGlobal(pos));
+        if (d->ui.treeWidget_subtyping->currentItem()->text(1) == "") { // is directory
+            this->contextMenuSubtypes->exec(d->ui.treeWidget_subtyping->viewport()->mapToGlobal(pos));
         } else { // is file
-            this->contextMenuSubtypesFile->exec(d->ui->treeWidget_subtyping->viewport()->mapToGlobal(pos));
+            this->contextMenuSubtypesFile->exec(d->ui.treeWidget_subtyping->viewport()->mapToGlobal(pos));
         }
     }
 }
@@ -1527,7 +1527,7 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
         QMessageBox::warning(this, tr("Save configuration"), warningMsg.append(" Select at least one Function."));
         return;
     }
-    if (d->ui->lineEdit_maxNumEnvRICalls->text().size() > 0 && d->ui->comboBox_expAlgorithm->currentIndex() != 0) {
+    if (d->ui.lineEdit_maxNumEnvRICalls->text().size() > 0 && d->ui.comboBox_expAlgorithm->currentIndex() != 0) {
         QMessageBox::warning(this, tr("Save configuration"),
                 warningMsg.append(" Environment calls constraint requires a DFS exploration!"));
         return;
@@ -1541,14 +1541,14 @@ void ModelCheckingWindow::on_pushButton_saveConfiguration_clicked()
 
     // write to configuration file
     QStringList ifOptions = {};
-    ifOptions.append(d->ui->lineEdit_maxNumScenarios->text());
-    ifOptions.append(d->ui->checkBox_errorScenarios->isChecked() ? "true" : "false");
-    ifOptions.append(d->ui->checkBox_successScenarios->isChecked() ? "true" : "false");
-    ifOptions.append(d->ui->lineEdit_timeLimit->text());
-    ifOptions.append(d->ui->lineEdit_maxNumEnvRICalls->text());
-    ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
-    ifOptions.append(d->ui->comboBox_timerepresentation->currentText() == "Discrete" ? "discrete" : "dense");
-    ifOptions.append(d->ui->lineEdit_maxNumStates->text());
+    ifOptions.append(d->ui.lineEdit_maxNumScenarios->text());
+    ifOptions.append(d->ui.checkBox_errorScenarios->isChecked() ? "true" : "false");
+    ifOptions.append(d->ui.checkBox_successScenarios->isChecked() ? "true" : "false");
+    ifOptions.append(d->ui.lineEdit_timeLimit->text());
+    ifOptions.append(d->ui.lineEdit_maxNumEnvRICalls->text());
+    ifOptions.append(d->ui.comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
+    ifOptions.append(d->ui.comboBox_timerepresentation->currentText() == "Discrete" ? "discrete" : "dense");
+    ifOptions.append(d->ui.lineEdit_maxNumStates->text());
 
     SpinConfigData spinConfigData = readSpinConfigFromUI();
 
@@ -1595,7 +1595,7 @@ bool ModelCheckingWindow::saveConfiguration()
         QMessageBox::warning(this, tr("Save configuration"), warningMsg.append(" Select at least one Function."));
         return false;
     }
-    if (d->ui->lineEdit_maxNumEnvRICalls->text().size() > 0 && d->ui->comboBox_expAlgorithm->currentIndex() != 0) {
+    if (d->ui.lineEdit_maxNumEnvRICalls->text().size() > 0 && d->ui.comboBox_expAlgorithm->currentIndex() != 0) {
         QMessageBox::warning(this, tr("Save configuration"),
                 warningMsg.append(" Environment calls constraint requires a DFS exploration!"));
         return false;
@@ -1609,14 +1609,14 @@ bool ModelCheckingWindow::saveConfiguration()
 
     // write to configuration file
     QStringList ifOptions = {};
-    ifOptions.append(d->ui->lineEdit_maxNumScenarios->text());
-    ifOptions.append(d->ui->checkBox_errorScenarios->isChecked() ? "true" : "false");
-    ifOptions.append(d->ui->checkBox_successScenarios->isChecked() ? "true" : "false");
-    ifOptions.append(d->ui->lineEdit_timeLimit->text());
-    ifOptions.append(d->ui->lineEdit_maxNumEnvRICalls->text());
-    ifOptions.append(d->ui->comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
-    ifOptions.append(d->ui->comboBox_timerepresentation->currentText() == "Discrete" ? "discrete" : "dense");
-    ifOptions.append(d->ui->lineEdit_maxNumStates->text());
+    ifOptions.append(d->ui.lineEdit_maxNumScenarios->text());
+    ifOptions.append(d->ui.checkBox_errorScenarios->isChecked() ? "true" : "false");
+    ifOptions.append(d->ui.checkBox_successScenarios->isChecked() ? "true" : "false");
+    ifOptions.append(d->ui.lineEdit_timeLimit->text());
+    ifOptions.append(d->ui.lineEdit_maxNumEnvRICalls->text());
+    ifOptions.append(d->ui.comboBox_expAlgorithm->currentText().left(3) == "DFS" ? "dfs" : "bfs");
+    ifOptions.append(d->ui.comboBox_timerepresentation->currentText() == "Discrete" ? "discrete" : "dense");
+    ifOptions.append(d->ui.lineEdit_maxNumStates->text());
 
     SpinConfigData spinConfigData = readSpinConfigFromUI();
 
@@ -1681,19 +1681,19 @@ void ModelCheckingWindow::on_pushButton_loadConfiguration_clicked()
     }
 
     // set IF config params
-    d->ui->lineEdit_maxNumScenarios->setText(reader.getIfConfig().at(0));
+    d->ui.lineEdit_maxNumScenarios->setText(reader.getIfConfig().at(0));
 
-    reader.getIfConfig().at(1) == "true" ? d->ui->checkBox_errorScenarios->setCheckState(Qt::Checked)
-                                         : d->ui->checkBox_errorScenarios->setCheckState(Qt::Unchecked);
-    reader.getIfConfig().at(2) == "true" ? d->ui->checkBox_successScenarios->setCheckState(Qt::Checked)
-                                         : d->ui->checkBox_successScenarios->setCheckState(Qt::Unchecked);
-    d->ui->lineEdit_timeLimit->setText(reader.getIfConfig().at(3));
-    d->ui->lineEdit_maxNumEnvRICalls->setText(reader.getIfConfig().at(4));
-    reader.getIfConfig().at(5) == "dfs" ? d->ui->comboBox_expAlgorithm->setCurrentIndex(0)
-                                        : d->ui->comboBox_expAlgorithm->setCurrentIndex(1);
-    reader.getIfConfig().at(7) == "discrete" ? d->ui->comboBox_timerepresentation->setCurrentIndex(0)
-                                             : d->ui->comboBox_timerepresentation->setCurrentIndex(1);
-    d->ui->lineEdit_maxNumStates->setText(reader.getIfConfig().at(6));
+    reader.getIfConfig().at(1) == "true" ? d->ui.checkBox_errorScenarios->setCheckState(Qt::Checked)
+                                         : d->ui.checkBox_errorScenarios->setCheckState(Qt::Unchecked);
+    reader.getIfConfig().at(2) == "true" ? d->ui.checkBox_successScenarios->setCheckState(Qt::Checked)
+                                         : d->ui.checkBox_successScenarios->setCheckState(Qt::Unchecked);
+    d->ui.lineEdit_timeLimit->setText(reader.getIfConfig().at(3));
+    d->ui.lineEdit_maxNumEnvRICalls->setText(reader.getIfConfig().at(4));
+    reader.getIfConfig().at(5) == "dfs" ? d->ui.comboBox_expAlgorithm->setCurrentIndex(0)
+                                        : d->ui.comboBox_expAlgorithm->setCurrentIndex(1);
+    reader.getIfConfig().at(7) == "discrete" ? d->ui.comboBox_timerepresentation->setCurrentIndex(0)
+                                             : d->ui.comboBox_timerepresentation->setCurrentIndex(1);
+    d->ui.lineEdit_maxNumStates->setText(reader.getIfConfig().at(6));
 
     setSpinConfigParams(reader.getSpinConfig());
 
@@ -1755,28 +1755,28 @@ void ModelCheckingWindow::setFunctionsSelection(QStringList functionsSelected)
 
 void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
 {
-    setCheckBoxState(d->ui->checkBox_searchShortestPath, spinConfig.searchShortestPath);
-    setCheckBoxState(d->ui->checkBox_useFairScheduling, spinConfig.useFairScheduling);
-    setCheckBoxState(d->ui->checkBox_useBitHashing, spinConfig.useBitHashing);
-    setCheckBoxState(d->ui->checkBox_useReal, spinConfig.supportReal);
-    setCheckBoxState(d->ui->checkBox_useMulticast, spinConfig.supportMulticast);
+    setCheckBoxState(d->ui.checkBox_searchShortestPath, spinConfig.searchShortestPath);
+    setCheckBoxState(d->ui.checkBox_useFairScheduling, spinConfig.useFairScheduling);
+    setCheckBoxState(d->ui.checkBox_useBitHashing, spinConfig.useBitHashing);
+    setCheckBoxState(d->ui.checkBox_useReal, spinConfig.supportReal);
+    setCheckBoxState(d->ui.checkBox_useMulticast, spinConfig.supportMulticast);
 
-    d->ui->lineEdit_numberOfCores->setText(SpinConfigData::optionalIntToString(spinConfig.numberOfCores));
-    d->ui->lineEdit_searchStateLimit->setText(SpinConfigData::optionalIntToString(spinConfig.searchStateLimit));
-    d->ui->lineEdit_errorLimit->setText(SpinConfigData::optionalIntToString(spinConfig.errorLimit));
-    d->ui->lineEdit_memoryLimit->setText(SpinConfigData::optionalIntToString(spinConfig.memoryLimitMB));
-    d->ui->lineEdit_spinTimeLimit->setText(SpinConfigData::optionalIntToString(spinConfig.timeLimitSeconds));
-    d->ui->lineEdit_generationLimit->setText(
+    d->ui.lineEdit_numberOfCores->setText(SpinConfigData::optionalIntToString(spinConfig.numberOfCores));
+    d->ui.lineEdit_searchStateLimit->setText(SpinConfigData::optionalIntToString(spinConfig.searchStateLimit));
+    d->ui.lineEdit_errorLimit->setText(SpinConfigData::optionalIntToString(spinConfig.errorLimit));
+    d->ui.lineEdit_memoryLimit->setText(SpinConfigData::optionalIntToString(spinConfig.memoryLimitMB));
+    d->ui.lineEdit_spinTimeLimit->setText(SpinConfigData::optionalIntToString(spinConfig.timeLimitSeconds));
+    d->ui.lineEdit_generationLimit->setText(
             SpinConfigData::optionalIntToString(spinConfig.globalInputVectorGenerationLimit));
-    d->ui->lineEdit_rawCommandLine->setText(spinConfig.rawCommandLine);
-    d->ui->lineEdit_deltaValue->setText(SpinConfigData::optionalFloatToString(spinConfig.deltaValue));
-    d->ui->lineEdit_vectorszValue->setText(SpinConfigData::optionalIntToString(spinConfig.vectorszValue));
+    d->ui.lineEdit_rawCommandLine->setText(spinConfig.rawCommandLine);
+    d->ui.lineEdit_deltaValue->setText(SpinConfigData::optionalFloatToString(spinConfig.deltaValue));
+    d->ui.lineEdit_vectorszValue->setText(SpinConfigData::optionalIntToString(spinConfig.vectorszValue));
 
     spinConfig.explorationMode == ExplorationMode::BreadthFirst
-            ? d->ui->comboBox_spinExpAlgorithm->setCurrentText("Breadth First Search")
-            : d->ui->comboBox_spinExpAlgorithm->setCurrentText("Depth First Search");
+            ? d->ui.comboBox_spinExpAlgorithm->setCurrentText("Breadth First Search")
+            : d->ui.comboBox_spinExpAlgorithm->setCurrentText("Depth First Search");
 
-    QTableWidget *tableWidget = d->ui->tableWidget_generationLimits;
+    QTableWidget *tableWidget = d->ui.tableWidget_generationLimits;
     tableWidget->setRowCount(spinConfig.ifaceGenerationLimits.length());
     tableWidget->setColumnCount(tableWidget->horizontalHeader()->count());
 
@@ -1789,13 +1789,13 @@ void ModelCheckingWindow::setSpinConfigParams(SpinConfigData spinConfig)
 
 void ModelCheckingWindow::addGenerationLimitsTableRow()
 {
-    QTableWidget *tableWidget = d->ui->tableWidget_generationLimits;
+    QTableWidget *tableWidget = d->ui.tableWidget_generationLimits;
     tableWidget->insertRow(tableWidget->rowCount());
 }
 
 void ModelCheckingWindow::removeGenerationLimitsTableRow()
 {
-    QTableWidget *tableWidget = d->ui->tableWidget_generationLimits;
+    QTableWidget *tableWidget = d->ui.tableWidget_generationLimits;
     QModelIndexList selection = tableWidget->selectionModel()->selectedRows();
     if (!selection.isEmpty()) {
         tableWidget->removeRow(selection.at(0).row());
@@ -1909,29 +1909,29 @@ void ModelCheckingWindow::setCheckBoxState(QCheckBox *checkBox, bool isChecked)
 SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
 {
     SpinConfigData spinConfigData;
-    spinConfigData.errorLimit = SpinConfigData::optionalIntFromString(d->ui->lineEdit_errorLimit->text());
+    spinConfigData.errorLimit = SpinConfigData::optionalIntFromString(d->ui.lineEdit_errorLimit->text());
     spinConfigData.globalInputVectorGenerationLimit =
-            SpinConfigData::optionalIntFromString(d->ui->lineEdit_generationLimit->text());
-    spinConfigData.memoryLimitMB = SpinConfigData::optionalIntFromString(d->ui->lineEdit_memoryLimit->text());
-    spinConfigData.numberOfCores = SpinConfigData::optionalIntFromString(d->ui->lineEdit_numberOfCores->text());
-    spinConfigData.searchStateLimit = SpinConfigData::optionalIntFromString(d->ui->lineEdit_searchStateLimit->text());
-    spinConfigData.timeLimitSeconds = SpinConfigData::optionalIntFromString(d->ui->lineEdit_spinTimeLimit->text());
-    spinConfigData.deltaValue = SpinConfigData::optionalFloatFromString(d->ui->lineEdit_deltaValue->text());
-    spinConfigData.vectorszValue = SpinConfigData::optionalIntFromString(d->ui->lineEdit_vectorszValue->text());
+            SpinConfigData::optionalIntFromString(d->ui.lineEdit_generationLimit->text());
+    spinConfigData.memoryLimitMB = SpinConfigData::optionalIntFromString(d->ui.lineEdit_memoryLimit->text());
+    spinConfigData.numberOfCores = SpinConfigData::optionalIntFromString(d->ui.lineEdit_numberOfCores->text());
+    spinConfigData.searchStateLimit = SpinConfigData::optionalIntFromString(d->ui.lineEdit_searchStateLimit->text());
+    spinConfigData.timeLimitSeconds = SpinConfigData::optionalIntFromString(d->ui.lineEdit_spinTimeLimit->text());
+    spinConfigData.deltaValue = SpinConfigData::optionalFloatFromString(d->ui.lineEdit_deltaValue->text());
+    spinConfigData.vectorszValue = SpinConfigData::optionalIntFromString(d->ui.lineEdit_vectorszValue->text());
 
-    spinConfigData.searchShortestPath = (d->ui->checkBox_searchShortestPath->checkState() == Qt::Checked);
-    spinConfigData.useFairScheduling = (d->ui->checkBox_useFairScheduling->checkState() == Qt::Checked);
-    spinConfigData.useBitHashing = (d->ui->checkBox_useBitHashing->checkState() == Qt::Checked);
-    spinConfigData.supportReal = (d->ui->checkBox_useReal->checkState() == Qt::Checked);
-    spinConfigData.supportMulticast = (d->ui->checkBox_useMulticast->checkState() == Qt::Checked);
+    spinConfigData.searchShortestPath = (d->ui.checkBox_searchShortestPath->checkState() == Qt::Checked);
+    spinConfigData.useFairScheduling = (d->ui.checkBox_useFairScheduling->checkState() == Qt::Checked);
+    spinConfigData.useBitHashing = (d->ui.checkBox_useBitHashing->checkState() == Qt::Checked);
+    spinConfigData.supportReal = (d->ui.checkBox_useReal->checkState() == Qt::Checked);
+    spinConfigData.supportMulticast = (d->ui.checkBox_useMulticast->checkState() == Qt::Checked);
 
-    spinConfigData.rawCommandLine = d->ui->lineEdit_rawCommandLine->text();
+    spinConfigData.rawCommandLine = d->ui.lineEdit_rawCommandLine->text();
 
-    spinConfigData.explorationMode = d->ui->comboBox_spinExpAlgorithm->currentText() == "Breadth First Search"
+    spinConfigData.explorationMode = d->ui.comboBox_spinExpAlgorithm->currentText() == "Breadth First Search"
             ? ExplorationMode::BreadthFirst
             : ExplorationMode::DepthFirst;
 
-    const auto tableWidget = d->ui->tableWidget_generationLimits;
+    const auto tableWidget = d->ui.tableWidget_generationLimits;
     spinConfigData.ifaceGenerationLimits.clear();
 
     for (int i = 0; i < tableWidget->rowCount(); i++) {
@@ -1953,8 +1953,8 @@ SpinConfigData ModelCheckingWindow::readSpinConfigFromUI()
  */
 void ModelCheckingWindow::on_checkBox_errorScenarios_stateChanged(int arg1)
 {
-    if (!d->ui->checkBox_errorScenarios->isChecked()) {
-        d->ui->checkBox_successScenarios->setCheckState(Qt::CheckState::Checked);
+    if (!d->ui.checkBox_errorScenarios->isChecked()) {
+        d->ui.checkBox_successScenarios->setCheckState(Qt::CheckState::Checked);
     }
 }
 
@@ -1964,8 +1964,8 @@ void ModelCheckingWindow::on_checkBox_errorScenarios_stateChanged(int arg1)
  */
 void ModelCheckingWindow::on_checkBox_successScenarios_stateChanged(int arg1)
 {
-    if (!d->ui->checkBox_successScenarios->isChecked()) {
-        d->ui->checkBox_errorScenarios->setCheckState(Qt::CheckState::Checked);
+    if (!d->ui.checkBox_successScenarios->isChecked()) {
+        d->ui.checkBox_errorScenarios->setCheckState(Qt::CheckState::Checked);
     }
 }
 

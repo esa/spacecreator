@@ -983,13 +983,13 @@ QVector<QAction *> IVAppWidget::initActions()
     connect(m_actZoomOut, &QAction::triggered, this,
             [this]() { graphicsView()->setZoom(graphicsView()->zoom() - graphicsView()->zoomStepPercent()); });
 
-    m_actExitToRoot = new QAction(tr("Exit to root function"));
+    m_actExitToRoot = new QAction(tr("Exit to root function"), this);
     m_actExitToRoot->setActionGroup(actionGroup);
     m_actExitToRoot->setEnabled(false);
     connect(m_actExitToRoot, &QAction::triggered, this, [this]() { m_document->itemsModel()->changeRootItem({}); });
     m_actExitToRoot->setIcon(QIcon(":/toolbar/icns/exit.svg"));
 
-    m_actExitToParent = new QAction(tr("Exit to parent function"));
+    m_actExitToParent = new QAction(tr("Exit to parent function"), this);
     m_actExitToParent->setActionGroup(actionGroup);
     m_actExitToParent->setEnabled(false);
     connect(m_actExitToParent, &QAction::triggered, this, [this]() {
@@ -1000,7 +1000,7 @@ QVector<QAction *> IVAppWidget::initActions()
     });
     m_actExitToParent->setIcon(QIcon(":/toolbar/icns/exit_parent.svg"));
 
-    m_actEnterNestedView = new QAction(tr("Enter function nested view"));
+    m_actEnterNestedView = new QAction(tr("Enter function nested view"), this);
     m_actEnterNestedView->setActionGroup(actionGroup);
     m_actEnterNestedView->setEnabled(false);
     m_actEnterNestedView->setIcon(QIcon(QLatin1String(":/toolbar/icns/nested_view.svg")));
@@ -1014,7 +1014,7 @@ QVector<QAction *> IVAppWidget::initActions()
             enterNestedView(it->data(static_cast<int>(ive::IVVisualizationModelBase::IdRole)).toUuid());
     });
 
-    m_actShrinkScene = new QAction(tr("Shrink scene"));
+    m_actShrinkScene = new QAction(tr("Shrink scene"), this);
     m_actShrinkScene->setActionGroup(actionGroup);
     m_actShrinkScene->setEnabled(true);
     m_actShrinkScene->setIcon(QIcon(QLatin1String(":/toolbar/icns/shrink.svg")));

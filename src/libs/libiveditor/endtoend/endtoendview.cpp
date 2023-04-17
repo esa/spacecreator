@@ -56,7 +56,7 @@
 namespace ive {
 
 struct EndToEndView::EndToEndViewPrivate {
-    Ui::EndToEndView *ui { new Ui::EndToEndView };
+    Ui::EndToEndView ui;
     QGraphicsScene *scene { nullptr };
 
     InterfaceDocument *document { nullptr };
@@ -75,21 +75,21 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
     : QDialog(parent)
     , d(new EndToEndViewPrivate)
 {
-    d->ui->setupUi(this);
+    d->ui.setupUi(this);
     setMscFiles({});
 
     setAttribute(Qt::WA_DeleteOnClose, false);
     setAttribute(Qt::WA_QuitOnClose, false);
 
-    d->ui->view->setInteractive(false);
+    d->ui.view->setInteractive(false);
     d->scene = new QGraphicsScene(this);
-    d->ui->view->setScene(d->scene);
+    d->ui.view->setScene(d->scene);
     d->document = document;
 
     d->leafDocuments = new LeafDocumentsModel(this);
-    d->ui->leafDocsView->setModel(d->leafDocuments);
+    d->ui.leafDocsView->setModel(d->leafDocuments);
 
-    connect(d->ui->pathButton, &QPushButton::clicked, this, [this]() {
+    connect(d->ui.pathButton, &QPushButton::clicked, this, [this]() {
         QFileInfo fi(d->document->mscFileName());
         const QString dir = fi.path();
         const QString path =
@@ -103,19 +103,19 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
             }
         }
     });
-    connect(d->ui->fileSelectBox, &QComboBox::currentTextChanged, this,
+    connect(d->ui.fileSelectBox, &QComboBox::currentTextChanged, this,
             [this](const QString &mscFile) { setMscFile(mscFile); });
 
-    connect(d->ui->exportButton, &QPushButton::clicked, this, &EndToEndView::callExport);
+    connect(d->ui.exportButton, &QPushButton::clicked, this, &EndToEndView::callExport);
 
     // Listen to path changes from the document
     connect(d->document, &InterfaceDocument::mscFileNameChanged, this,
             [this](const QString &mscFile) { setMscFile(mscFile); });
 
     // Refresh the view
-    connect(d->ui->refreshButton, &QPushButton::clicked, this, &EndToEndView::refreshView);
+    connect(d->ui.refreshButton, &QPushButton::clicked, this, &EndToEndView::refreshView);
 
-    connect(d->ui->leafDocsView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+    connect(d->ui.leafDocsView->selectionModel(), &QItemSelectionModel::currentChanged, this,
             &EndToEndView::refreshView);
 
     if (parent != nullptr) {
@@ -129,16 +129,16 @@ EndToEndView::EndToEndView(InterfaceDocument *document, QWidget *parent)
 EndToEndView::EndToEndView(InterfaceDocument *document)
     : d(new EndToEndViewPrivate)
 {
-    d->ui->setupUi(this);
+    d->ui.setupUi(this);
     setMscFiles({});
 
-    d->ui->view->setInteractive(false);
+    d->ui.view->setInteractive(false);
     d->scene = new QGraphicsScene(this);
-    d->ui->view->setScene(d->scene);
+    d->ui.view->setScene(d->scene);
     d->document = document;
 
     d->leafDocuments = new LeafDocumentsModel(this);
-    d->ui->leafDocsView->setModel(d->leafDocuments);
+    d->ui.leafDocsView->setModel(d->leafDocuments);
 }
 
 EndToEndView::~EndToEndView()
@@ -165,12 +165,12 @@ void EndToEndView::setVisible(bool visible)
 
 void EndToEndView::setMscFiles(const QStringList &files)
 {
-    d->ui->fileSelectBox->clear();
-    d->ui->fileSelectBox->addItems(files);
+    d->ui.fileSelectBox->clear();
+    d->ui.fileSelectBox->addItems(files);
 
     const bool showFileButton = files.isEmpty();
-    d->ui->pathButton->setVisible(showFileButton);
-    d->ui->fileSelectBox->setVisible(!showFileButton);
+    d->ui.pathButton->setVisible(showFileButton);
+    d->ui.fileSelectBox->setVisible(!showFileButton);
 }
 
 /*!
@@ -204,8 +204,8 @@ bool EndToEndView::refreshView()
     const QList<ivm::IVConnectionChain *> chains = ivm::IVConnectionChain::build(*d->document->objectsModel());
 
     msc::MscDocument *doc = nullptr;
-    if (d->ui->leafDocsView->currentIndex().isValid()) {
-        QVariant currentData = d->ui->leafDocsView->currentIndex().data(QObjectListModel::ObjectRole);
+    if (d->ui.leafDocsView->currentIndex().isValid()) {
+        QVariant currentData = d->ui.leafDocsView->currentIndex().data(QObjectListModel::ObjectRole);
         doc = currentData.value<msc::MscDocument *>();
     }
     const EndToEndConnections::Dataflow dataflow = doc ? d->dataflow.dataflow(doc) : d->dataflow.dataflow();
@@ -540,9 +540,9 @@ bool EndToEndView::setMscFile(const QString &fileName, QString *errorString)
 
     // Update UI
     QFileInfo info(fileName);
-    d->ui->pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
+    d->ui.pathLabel->setText(tr("MSC file: %1").arg(info.fileName()));
     d->leafDocuments->fillModel(d->model->documents().first());
-    d->ui->leafDocsView->setCurrentIndex(d->leafDocuments->index(0, 0));
+    d->ui.leafDocsView->setCurrentIndex(d->leafDocuments->index(0, 0));
 
     return true;
 }
