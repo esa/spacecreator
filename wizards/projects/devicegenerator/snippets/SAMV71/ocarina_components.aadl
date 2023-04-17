@@ -32,7 +32,7 @@ end configuration_type_%{ProjectName};
 
   device implementation device_%{ProjectName}.samv71
   properties
-    Deployment::Driver_Name       => "driver_%{ProjectNameLowerCase}";
+    Deployment::Driver_Name       => "%{ProjectNameLowerCase}";
     Device_Driver                 => classifier (ocarina_drivers_%{ProjectName}::%{ProjectName}_samv71.samv71);
     Initialize_Entrypoint         => classifier (ocarina_drivers_%{ProjectName}::driver_%{ProjectName}_init);
     Provided_Virtual_Bus_Class    => (classifier (ocarina_buses::generic.samv71));
