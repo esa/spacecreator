@@ -11,6 +11,7 @@ ASN1_DRV_PRIVATE=%{ProjectName}privatedata.asn
 ASN1_DRIVER_EXPLICIT_CONFIG=$(ASN1_DRV_CONFIG) $(ASN1_DRV_PRIVATE)
 
 PARTITION_NAME=demo
+ASN1_POLICY_FLAGS=-typePrefix asn1Scc -renamePolicy 3 -equal -fp AUTO -c
 
 CD_INSTALLATION_DIRECTORY=$(COMMUNICATION_DEVICE_PATH)/%{CDBoard}/port_%{ProjectNameLowerCase}
 COMMUNICATION_DEVICE_INSTALLATOR=install_communication_devices.py
