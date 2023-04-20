@@ -29,11 +29,16 @@ int main(int argc, char **argv)
             QCoreApplication::translate("main", "Path to the file with diagram which should be used to save as image"));
     cmdParser.addPositionalArgument(
             "msc", QCoreApplication::translate("main", "Path to MSC which is used for End to end view"));
+    const QCommandLineOption chartOption(
+            "chart", QCoreApplication::translate("main", "Name of the chart to dump a screenshot"), "chartOption");
+    cmdParser.addOption(chartOption);
     cmdParser.addPositionalArgument("output", QCoreApplication::translate("main", "Path to Output image file"));
     cmdParser.process(app);
     const QStringList args = cmdParser.positionalArguments();
+
     if (args.count() != 3) {
         cmdParser.showHelp(1);
+        return 0;
     }
 
     const QString inputIVFile = args.at(0);
@@ -47,26 +52,34 @@ int main(int argc, char **argv)
     ive::InterfaceDocument *document = new ive::InterfaceDocument();
     document->loadAvailableComponents();
     if (!document->load(inputIVFile)) {
-        qCritical() << "Can't load the interfaceview model:" << inputIVFile;
+        qCritical() << "Error: Can't load the interfaceview model:" << inputIVFile;
         return 2;
     }
 
     auto endToEndView = new ive::EndToEndView(document);
     QString errorString;
     if (!endToEndView->setMscFile(inputMSCFile, &errorString)) {
-        qCritical() << errorString;
+        qCritical() << "Error: " << errorString;
         return 3;
     }
 
+    if (cmdParser.isSet(chartOption)) {
+        const QString chartName = cmdParser.value(chartOption);
+        if (!endToEndView->setMscChart(chartName)) {
+            qCritical() << QCoreApplication::translate("main", "Error: Unable to select the chartname") << chartName;
+            return 4;
+        }
+    }
+
     if (!endToEndView->refreshView()) {
-        qCritical() << "Can't generate end-to-end view from interfaceview: " << inputIVFile
+        qCritical() << "Error: Can't generate end-to-end view from interfaceview: " << inputIVFile
                     << " with msc file:" << inputMSCFile;
-        return 4;
+        return 5;
     }
 
     if (!endToEndView->exportScene(outputFile)) {
-        qCritical() << "Can't export End to end view into::" << outputFile;
-        return 5;
+        qCritical() << "Error: Can't export End to end view into::" << outputFile;
+        return 6;
     }
 
     return 0;

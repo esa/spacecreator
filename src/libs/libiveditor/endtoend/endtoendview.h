@@ -47,6 +47,7 @@ public:
 
     bool refreshView();
     bool setMscFile(const QString &fileName, QString *errorString = nullptr);
+    bool setMscChart(const QString &chartName);
 
 Q_SIGNALS:
     void visibleChanged(bool visible);

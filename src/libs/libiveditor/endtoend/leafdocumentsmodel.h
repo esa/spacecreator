@@ -33,6 +33,8 @@ public:
     void fillModel(msc::MscDocument *rootDoc);
 
     QVariant data(const QModelIndex &index, int role) const override;
+
+    QModelIndex indexOf(const QString &name) const;
 };
 
 }

@@ -45,4 +45,18 @@ QVariant LeafDocumentsModel::data(const QModelIndex &index, int role) const
     return QObjectListModelT::data(index, role);
 }
 
+/**
+ * Returns the model index of the first document matching the \p name
+ */
+QModelIndex LeafDocumentsModel::indexOf(const QString &name) const
+{
+    for (int i = 0; i < rowCount(); ++i) {
+        if (at(i)->name() == name) {
+            return createIndex(i, 0);
+        }
+    }
+
+    return {};
+}
+
 }
