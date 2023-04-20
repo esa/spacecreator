@@ -17,8 +17,13 @@
 
 #include "interface/attributedelegate.h"
 #include "iveditattributesdialog.h"
+#include "iveditattributesmodel.h"
 
 #include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QPushButton>
 #include <QTabWidget>
 #include <QTableView>
 #include <QVBoxLayout>
@@ -55,6 +60,29 @@ IVEditAttributesDialog::IVEditAttributesDialog(QAbstractItemModel *functionsMode
 
     auto buttonBox = new QDialogButtonBox(this);
     buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
+
+    QPushButton* button =  buttonBox->addButton(tr("Save Attributes..."), QDialogButtonBox::ActionRole);
+    connect(button, &QPushButton::clicked, this, [this]{
+        auto dialog = new QFileDialog(this);
+        connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+        connect(dialog, &QFileDialog::fileSelected, this, &IVEditAttributesDialog::saveAttributes);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+        dialog->setNameFilter(tr("JSON files (*.json)"));
+        dialog->setModal(true);
+        dialog->show();
+    });
+
+    button = buttonBox->addButton(tr("Load Attributes..."), QDialogButtonBox::ActionRole);
+    connect(button, &QPushButton::clicked, this, [this]{
+        auto dialog = new QFileDialog(this);
+        connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+        connect(dialog, &QFileDialog::fileSelected, this, &IVEditAttributesDialog::loadAttributes);
+        dialog->setFileMode(QFileDialog::ExistingFile);
+        dialog->setNameFilter(tr("JSON files (*.json)"));
+        dialog->setModal(true);
+        dialog->show();
+    });
+
     layout->addWidget(buttonBox);
 
     d->functionsTable = new QTableView(d->tabWidget);
@@ -76,6 +104,41 @@ IVEditAttributesDialog::~IVEditAttributesDialog()
 {
     delete d;
     d = nullptr;
+}
+
+void IVEditAttributesDialog::saveAttributes(const QString &filePath)
+{
+    QFile file(filePath);
+    file.open(QIODevice::WriteOnly);
+
+    auto functionsModel = static_cast<IVEditAttributesModel*>(d->functionsTable->model());
+    auto interfacesModel = static_cast<IVEditAttributesModel*>(d->interfacesTable->model());
+
+    QJsonObject jsonRoot;
+    jsonRoot.insert("functions", functionsModel->saveAttributes());
+    jsonRoot.insert("interfaces", interfacesModel->saveAttributes());
+
+    const QJsonDocument document(jsonRoot);
+    file.write(document.toJson(QJsonDocument::Indented));
+}
+
+void IVEditAttributesDialog::loadAttributes(const QString &filePath)
+{
+    QFile file(filePath);
+    file.open(QIODevice::ReadOnly);
+
+    const QJsonDocument document = QJsonDocument::fromJson(file.readAll());
+    if (!document.isObject()) {
+        qWarning("Cannot load JSON: root not an object");
+        return;
+    }
+
+    auto functionsModel = static_cast<IVEditAttributesModel*>(d->functionsTable->model());
+    auto interfacesModel = static_cast<IVEditAttributesModel*>(d->interfacesTable->model());
+
+    const QJsonObject root = document.object();
+    functionsModel->loadAttributes(root.value("functions").toArray());
+    interfacesModel->loadAttributes(root.value("interfaces").toArray());
 }
 
 }

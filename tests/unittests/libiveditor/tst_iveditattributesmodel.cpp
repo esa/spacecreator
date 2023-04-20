@@ -130,6 +130,11 @@ private Q_SLOTS:
     void testWriteFunctions();
     void testWriteInterfaces();
 
+    void testSaveFunctions();
+    void testSaveInterfaces();
+    void testLoadFunctions();
+    void testLoadInterfaces();
+
 private:
     ivm::IVPropertyTemplateConfig *m_config {};
     std::unique_ptr<ivm::IVModel> m_ivModel {};
@@ -246,6 +251,104 @@ void tst_IVEditAttributesModel::testWriteInterfaces()
 
     QVERIFY(model.setData(model.index(0, 1), QVariant("Renamed"), ive::IVEditAttributesModel::EditRole));
     QCOMPARE(model.data(model.index(0, 1), Qt::DisplayRole).toString(), QLatin1String("Renamed"));
+}
+
+
+void tst_IVEditAttributesModel::testSaveFunctions()
+{
+    auto function1 = ivm::testutils::createFunction("Function 1");
+    auto function2 = ivm::testutils::createFunction("Function 2");
+
+    m_ivModel->addObjects<ivm::IVObject *>({function1, function2});
+
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get());
+
+    const QJsonArray attributes = model.saveAttributes();
+    QCOMPARE(attributes.count(), 2);
+    QVERIFY(attributes.at(0).isObject());
+    QVERIFY(attributes.at(1).isObject());
+
+    const QJsonObject one = attributes.at(0).toObject();
+    const QJsonObject two = attributes.at(1).toObject();
+
+    // The order of the rows is randomized due to the hash storage, so use a set
+    QSet<QString> obtainedNames;
+    obtainedNames << one.value("name").toString();
+    obtainedNames << two.value("name").toString();
+    QSet<QString> expectedNames({QLatin1String("Function 1"), QLatin1String("Function 2")});
+    QCOMPARE(obtainedNames, expectedNames);
+}
+
+void tst_IVEditAttributesModel::testSaveInterfaces()
+{
+    auto function1 = ivm::testutils::createFunction("Function 1");
+    auto function2 = ivm::testutils::createFunction("Function 2");
+    auto interface1 = ivm::testutils::createProvidedIface(function1, "Interface 1");
+    auto interface2 = ivm::testutils::createProvidedIface(function2, "Interface 2");
+
+    m_ivModel->addObjects<ivm::IVObject *>({interface1, interface2});
+
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get());
+
+    const QJsonArray attributes = model.saveAttributes();
+    QCOMPARE(attributes.count(), 2);
+    QVERIFY(attributes.at(0).isObject());
+    QVERIFY(attributes.at(1).isObject());
+
+    const QJsonObject one = attributes.at(0).toObject();
+    const QJsonObject two = attributes.at(1).toObject();
+    QCOMPARE(one.keys(), QStringList() << "kind" << "name");
+    QCOMPARE(two.keys(), QStringList() << "kind" << "name");
+    QCOMPARE(one.value("kind").toString(), "Protected");
+    QCOMPARE(two.value("kind").toString(), "Protected");
+
+    // The order of the rows is randomized due to the hash storage, so use a set
+    QSet<QString> obtainedNames;
+    obtainedNames << one.value("name").toString();
+    obtainedNames << two.value("name").toString();
+    QSet<QString> expectedNames({QLatin1String("Interface 1"), QLatin1String("Interface 2")});
+    QCOMPARE(obtainedNames, expectedNames);
+}
+
+void tst_IVEditAttributesModel::testLoadFunctions()
+{
+    auto function = ivm::testutils::createFunction("Function");
+    auto type = ivm::testutils::createFunctionType("Type");
+
+    m_ivModel->addObjects<ivm::IVObject *>({function, type});
+
+    shared::cmd::CommandsStackBase stack;
+    shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get(), &macro);
+
+    QJsonArray array;
+    QJsonObject object({ {"name", "Function"}, {"instance_of", "Type"} });
+    array.append(object);
+
+    model.loadAttributes(array);
+
+    QCOMPARE(model.data(model.index(0, 0), Qt::DisplayRole).toString(), QLatin1String("Function"));
+    QCOMPARE(model.data(model.index(0, 1), Qt::DisplayRole).toString(), QLatin1String("Type"));
+}
+
+void tst_IVEditAttributesModel::testLoadInterfaces()
+{
+    auto function = ivm::testutils::createFunction("Function");
+    auto interface = ivm::testutils::createProvidedIface(function, "Interface");
+
+    m_ivModel->addObjects<ivm::IVObject *>({interface});
+
+    shared::cmd::CommandsStackBase stack;
+    shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
+    ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get(), &macro);
+
+    QJsonArray array;
+    QJsonObject object({ {"name", "Interface"}, {"kind", "Unprotected"} });
+    array.append(object);
+
+    model.loadAttributes(array);
+
+    QCOMPARE(model.data(model.index(0, 2), Qt::DisplayRole).toString(), QLatin1String("Unprotected"));
 }
 
 

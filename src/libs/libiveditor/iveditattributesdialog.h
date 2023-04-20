@@ -28,9 +28,15 @@ namespace ive
  * \brief Dialog for editing attributes of functions and interfaces.
  */
 class IVEditAttributesDialog : public QDialog {
+    Q_OBJECT
+
 public:
     explicit IVEditAttributesDialog(QAbstractItemModel* functionsModel, QAbstractItemModel* interfacesModel, QWidget *parent);
     ~IVEditAttributesDialog();
+
+private:
+    void saveAttributes(const QString& filePath);
+    void loadAttributes(const QString& filePath);
 
 private:
     struct Private;

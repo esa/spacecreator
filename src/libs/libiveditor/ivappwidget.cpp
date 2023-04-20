@@ -54,7 +54,6 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QIcon>
-#include <QJsonDocument>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPointer>

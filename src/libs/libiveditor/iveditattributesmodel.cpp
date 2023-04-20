@@ -25,6 +25,8 @@
 #include "propertytemplate.h"
 #include "propertytemplateconfig.h"
 
+#include <QJsonObject>
+
 namespace {
 
 // Stores one entry of the "metadata" needed for each column.
@@ -127,6 +129,64 @@ IVEditAttributesModel::~IVEditAttributesModel()
     d = nullptr;
 }
 
+QJsonArray IVEditAttributesModel::saveAttributes() const
+{
+    QJsonArray result;
+    for (int row = 0, last = d->objects.size(); row != last; ++row) {
+        QJsonObject serialized;
+        for (int column = 0, end = d->entries.size(); column != end; ++column) {
+            const QString& key = d->entries.at(column).property;
+            if (key.isEmpty()) // Skips function name in interfaces.
+                continue;
+            ivm::IVObject* object = d->objects.at(row);
+            const QVariant value = object->entityAttributeValue(key);
+            if (!value.isNull())
+                serialized.insert(key, QJsonValue::fromVariant(value));
+        }
+        result.append(serialized);
+    }
+    return result;
+}
+
+void IVEditAttributesModel::loadAttributes(const QJsonArray& elements)
+{
+    // Make an "index" of keys and object names, to be able to look up row/col.
+    QStringList keys, names;
+    if (d->objectType == Interface)
+        keys.append(QString()); // Interfaces have an extra column for the function where they are.
+    for (const Entry& entry : d->entries) {
+        if (!entry.property.isEmpty())
+            keys.append(entry.property);
+    }
+    for (ivm::IVObject* object : d->objects) {
+        names.append(object->property("name").toString());
+    }
+
+    for (int element = 0, last = elements.count(); element < last; ++element) {
+        const QJsonValue value = elements.at(element);
+        if (!value.isObject()) {
+            qWarning("Cannot load JSON: element is not an object");
+            continue;
+        }
+        const QJsonObject object = value.toObject();
+        const QString objectName = object.value("name").toString();
+        if (objectName.isNull())
+            continue;
+
+        const int row = names.indexOf(objectName);
+        if (row == -1)
+            continue;
+
+        for (auto iterator = object.begin(), end = object.end(); iterator != end; ++iterator) {
+            const int column = keys.indexOf(iterator.key());
+            if (column == -1 || iterator.key().isEmpty())
+                continue;
+
+            setData(index(row, column), iterator.value().toVariant(), ive::IVEditAttributesModel::EditRole);
+        }
+    }
+}
+
 int IVEditAttributesModel::rowCount(const QModelIndex &parent) const
 {
     return d->objects.size();
@@ -199,6 +259,9 @@ bool IVEditAttributesModel::setData(const QModelIndex &index, const QVariant &va
     if (role != DataRole && role != EditRole)
         return false;
 
+    if (data(index, role) == value)
+        return false;
+
     const Entry& entry = d->entries.at(index.column());
     const QString& key = entry.property;
     if (key.isEmpty())
@@ -210,17 +273,20 @@ bool IVEditAttributesModel::setData(const QModelIndex &index, const QVariant &va
 
     auto object = d->objects.at(index.row());
 
+    bool result = true;
     if (d->objectType == Interface) {
         auto interface = qobject_cast<ivm::IVInterface*>(object);
         Q_ASSERT(interface);
-        return d->macro->push(new cmd::CmdIfaceAttrChange(d->model->dynPropConfig(), interface, key, value));
-    }
-    else {
+        result = d->macro->push(new cmd::CmdIfaceAttrChange(d->model->dynPropConfig(), interface, key, value));
+    } else {
         auto function = qobject_cast<ivm::IVFunction*>(object);
         Q_ASSERT(function);
-        return d->macro->push(new cmd::CmdFunctionAttrChange(d->model->dynPropConfig(), function,
+        result = d->macro->push(new cmd::CmdFunctionAttrChange(d->model->dynPropConfig(), function,
                 { EntityAttribute { key, value, EntityAttribute::Type::Attribute } }));
     }
+    if (result)
+        Q_EMIT dataChanged(index, index, {role});
+    return result;
 }
 
 }

@@ -20,6 +20,7 @@
 #include "commandsstackbase.h" // Can't forward declare nested class Macro
 
 #include <QAbstractTableModel>
+#include <QJsonArray>
 
 namespace ivm { class IVModel; }
 
@@ -38,7 +39,12 @@ public:
     explicit IVEditAttributesModel(ObjectType objectType, ivm::IVModel *model, shared::cmd::CommandsStackBase::Macro *macro = nullptr);
     ~IVEditAttributesModel();
 
-    int rowCount(const QModelIndex &parent) const override;
+    /// Serialize the attributes as a JSON array.
+    QJsonArray saveAttributes() const;
+    /// Deserialize the attributes from JSON array.
+    void loadAttributes(const QJsonArray& attributes);
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
