@@ -32,6 +32,9 @@ public:
 
 protected:
     shared::ColorManager::HandledColors handledColorType() const override;
+
+protected Q_SLOTS:
+    void applyColorScheme() override;
 };
 
 }

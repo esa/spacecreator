@@ -83,7 +83,7 @@ void IVConnectionGraphicsItem::rebuildLayout()
 
 shared::ColorManager::HandledColors IVConnectionGraphicsItem::handledColorType() const
 {
-    return entity()->isMarked() ? shared::ColorManager::ConnectionHighlighted
+    return entity()->isMarked() ? shared::ColorManager::ConnectionFlow
                                 : shared::ColorManager::HandledColors::Connection;
 }
 
