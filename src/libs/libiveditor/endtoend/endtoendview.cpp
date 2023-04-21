@@ -551,7 +551,7 @@ bool EndToEndView::setMscChart(const QString &chartName)
 {
     const QModelIndex idx = d->leafDocuments->indexOf(chartName);
     if (idx.isValid()) {
-        d->ui->leafDocsView->setCurrentIndex(idx);
+        d->ui.leafDocsView->setCurrentIndex(idx);
         return true;
     } else {
         return false;
