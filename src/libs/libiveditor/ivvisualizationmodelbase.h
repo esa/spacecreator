@@ -44,7 +44,6 @@ public:
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
     QList<QStandardItem *> createItems(shared::VEObject *obj) override;
-    bool isInstanceChild(shared::VEObject *obj) const;
 
 private Q_SLOTS:
     void updateConnectionItem(ivm::IVConnection *connection);

@@ -316,6 +316,20 @@ shared::Id IVObject::origin() const
     return entityAttributeValue<QUuid>(meta::Props::token(meta::Props::Token::origin), shared::InvalidId);
 }
 
+bool IVObject::isInstanceDescendant() const
+{
+    auto obj = this;
+
+    while (obj) {
+        if (!obj->entityAttributeValue<QString>(ivm::meta::Props::token(ivm::meta::Props::Token::instance_of))
+                        .isEmpty())
+            return true;
+
+        obj = obj->parentObject();
+    }
+    return false;
+}
+
 QString IVObject::groupName() const
 {
     return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::group_name));

@@ -222,20 +222,6 @@ void IVVisualizationModelBase::updateConnectionItem(ivm::IVConnection *connectio
     }
 }
 
-bool IVVisualizationModelBase::isInstanceChild(shared::VEObject *obj) const
-{
-    static const QString instanceAttrName = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of);
-    bool isInstance = false;
-    auto veObj = obj->parentObject();
-    while (veObj) {
-        if (veObj->hasEntityAttribute(instanceAttrName) && veObj->entityAttributeValue<bool>(instanceAttrName)) {
-            return true;
-        }
-        veObj = veObj->parentObject();
-    }
-    return false;
-}
-
 /**
  * VisualizationModel
  */
@@ -251,7 +237,7 @@ void IVVisualizationModel::updateItemData(QStandardItem *item, shared::VEObject 
     ivm::IVObject *obj = qobject_cast<ivm::IVObject *>(object);
     if (obj) {
         IVVisualizationModelBase::updateItemData(item, obj);
-        item->setEditable(!isInstanceChild(obj));
+        item->setEditable(!obj->isReference() && !obj->isInstanceDescendant());
 
         if ((item->checkState() == Qt::Checked) != obj->isVisible()) {
             item->setData(obj->isVisible() ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
@@ -263,9 +249,11 @@ QList<QStandardItem *> IVVisualizationModel::createItems(shared::VEObject *obj)
 {
     QList<QStandardItem *> items = IVVisualizationModelBase::createItems(obj);
     if (!items.isEmpty()) {
-        items[0]->setEditable(!isInstanceChild(obj));
-        items[0]->setCheckable(true);
-        items[0]->setDragEnabled(false);
+        if (auto ivObj = obj->as<ivm::IVObject *>()) {
+            items[0]->setEditable(!ivObj->isReference() && !ivObj->isInstanceDescendant());
+            items[0]->setCheckable(true);
+            items[0]->setDragEnabled(false);
+        }
     }
     return items;
 }

@@ -86,6 +86,7 @@ public:
     bool isNested() const;
     bool isReference() const;
     shared::Id origin() const;
+    bool isInstanceDescendant() const;
 
     QString groupName() const;
     void setGroupName(const QString &groupName);

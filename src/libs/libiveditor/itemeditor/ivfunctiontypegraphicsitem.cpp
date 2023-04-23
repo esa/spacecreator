@@ -293,6 +293,7 @@ shared::ui::TextItem *IVFunctionTypeGraphicsItem::initTextItem()
 
     textItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
     textItem->setFont(font());
+    textItem->setEditable(!entity()->isReference() && !entity()->isInstanceDescendant());
     return textItem;
 }
 
