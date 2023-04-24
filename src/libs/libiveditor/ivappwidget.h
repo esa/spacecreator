@@ -88,7 +88,7 @@ private Q_SLOTS:
     void onItemCreated(const shared::Id &id);
     void onRootObjectChanged(const shared::Id &rootId);
     void checkActionsFromSelection();
-    void editExternalEntity(const QString &path, const QString &entityName);
+    void editExternalEntity(const QString &path);
     void hideSelectedRows();
     void hideUnselectedRows();
     void showAllRows();
@@ -107,8 +107,6 @@ private:
     QList<shared::VEObject *> selectedObjects() const;
 
     ivm::IVFunctionType *functionAtPosition(QPointF &sceneDropPoint);
-    ivm::IVObject *reloadObject(ivm::IVObject *obj, const QString &path);
-
     Ui::IVAppWidget *ui = nullptr;
     shared::BreadcrumbWidget *m_breadCrumb = nullptr;
     IVCreatorTool *m_tool { nullptr };

@@ -32,10 +32,10 @@ namespace ive {
 namespace cmd {
 
 CmdEntitiesRemove::CmdEntitiesRemove(
-        const QList<ivm::IVObject *> &entities, ivm::IVModel *model, const QString &pathToLibrary)
+        const QList<ivm::IVObject *> &entities, ivm::IVModel *model, const QStringList &pathsToComponents)
     : shared::UndoCommand()
     , m_model(model)
-    , m_libraryPath(pathToLibrary)
+    , m_componentsPaths(pathsToComponents)
 {
     setText(QObject::tr("Remove"));
 
@@ -43,7 +43,7 @@ CmdEntitiesRemove::CmdEntitiesRemove(
         collectRelatedItems(entity);
         m_entities.append(entity);
     }
-    if (!pathToLibrary.isEmpty()) {
+    if (!pathsToComponents.isEmpty()) {
         m_tempDir.reset(new QTemporaryDir);
     }
 }
@@ -125,18 +125,17 @@ void CmdEntitiesRemove::redo()
     removeIVObjects(m_relatedIfaces);
     removeIVObjects(m_relatedEntities);
 
-    if (!m_tempDir.isNull() && m_tempDir->isValid() && !m_libraryPath.isEmpty()) {
-        const QDir sourceDir(m_libraryPath);
-        for (const ivm::IVObject *entity : qAsConst(m_entities)) {
-            if (!sourceDir.exists(entity->title()))
+    if (!m_tempDir.isNull() && m_tempDir->isValid() && !m_componentsPaths.isEmpty()) {
+        for (const QString &path : qAsConst(m_componentsPaths)) {
+            const QDir sourceDir(path);
+            if (!sourceDir.exists())
                 continue;
 
-            QDir destDir(m_tempDir->filePath(entity->title()));
+            QDir destDir(m_tempDir->filePath(sourceDir.dirName()));
             if (destDir.exists()) {
                 destDir.removeRecursively();
             }
-            shared::moveDir(
-                    sourceDir.filePath(entity->title()), destDir.absolutePath(), shared::FileCopyingMode::Overwrite);
+            shared::moveDir(path, destDir.absolutePath(), shared::FileCopyingMode::Overwrite);
         }
     }
 
@@ -167,14 +166,14 @@ void CmdEntitiesRemove::undo()
         (*it)->undo();
     }
 
-    if (!m_tempDir.isNull() && m_tempDir->isValid() && !m_libraryPath.isEmpty()) {
-        for (const ivm::IVObject *entity : qAsConst(m_entities)) {
-            const QDir sourceDir(m_tempDir->filePath(entity->title()));
+    if (!m_tempDir.isNull() && m_tempDir->isValid() && !m_componentsPaths.isEmpty()) {
+        for (const QString &path : qAsConst(m_componentsPaths)) {
+            QDir destDir(path);
+            const QString title = destDir.dirName();
+            const QDir sourceDir(m_tempDir->filePath(title));
             if (!sourceDir.exists()) {
                 continue;
             }
-
-            QDir destDir(m_libraryPath + QDir::separator() + entity->title());
             if (destDir.exists()) {
                 destDir.removeRecursively();
             }

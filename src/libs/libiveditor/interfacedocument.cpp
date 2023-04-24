@@ -87,13 +87,14 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     ivm::IVModel *layersModel { nullptr };
     IVVisualizationModelBase *layerSelect { nullptr };
     ivm::ArchetypeModel *archetypesModel { nullptr };
-
     Asn1Acn::Asn1SystemChecks *asnCheck { nullptr };
     ivm::AbstractSystemChecks *ivCheck { nullptr };
     QString projectName;
     QString mscFileName;
     QString uiFileName { shared::kDefaultInterfaceViewUIFileName };
     QStringList asnFilesNames;
+    QHash<shared::Id, QString> componentsPaths;
+    QHash<shared::Id, QString> sharedTypesPaths;
 };
 
 void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
@@ -174,6 +175,11 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
             }
         }
     });
+
+    connect(d->importModel, &ivm::IVModel::objectRemoved, this,
+            [this](const shared::Id &id) { d->componentsPaths.remove(id); });
+    connect(d->sharedModel, &ivm::IVModel::objectRemoved, this,
+            [this](const shared::Id &id) { d->sharedTypesPaths.remove(id); });
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -380,7 +386,7 @@ bool InterfaceDocument::exportSelectedType()
     if (!rootType) {
         return false;
     }
-    QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
+    QString path = sharedTypePath(rootType->id());
     if (exportImpl(path, { rootType })) {
         d->objectsModel->removeObject(rootType);
         d->objectsSelectionModel->clearSelection();
@@ -389,7 +395,8 @@ bool InterfaceDocument::exportSelectedType()
     return false;
 }
 
-bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &path)
+bool InterfaceDocument::loadComponentModel(
+        ivm::IVModel *model, const QString &path, QHash<shared::Id, QString> *pathMappings = nullptr)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
         /// Just skip other folders mught be located in that library not related to component model
@@ -407,6 +414,13 @@ bool InterfaceDocument::loadComponentModel(ivm::IVModel *model, const QString &p
 
     auto objects = parser.parsedObjects();
     ivm::IVObject::sortObjectList(objects);
+    if (pathMappings) {
+        std::for_each(objects.constBegin(), objects.constEnd(), [pathMappings, &path](ivm::IVObject *ivObj) {
+            if (!ivObj->parentObject())
+                pathMappings->insert(ivObj->id(), QFileInfo(path).absolutePath());
+        });
+    }
+
     model->setExtAttributes(parser.externalAttributes());
     model->addObjects(objects);
     shared::ErrorHub::clearCurrentFile();
@@ -417,10 +431,11 @@ bool InterfaceDocument::reloadComponentModel()
 {
     bool result = true;
     d->importModel->clear();
+    d->componentsPaths.clear();
     QDirIterator importableIt(shared::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (importableIt.hasNext()) {
-        result |= loadComponentModel(
-                d->importModel, importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+        result |= loadComponentModel(d->importModel,
+                importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName, &d->componentsPaths);
     }
     return result;
 }
@@ -429,10 +444,12 @@ bool InterfaceDocument::reloadSharedTypeModel()
 {
     bool result = true;
     d->sharedModel->clear();
+    d->sharedTypesPaths.clear();
     QDirIterator instantiatableIt(shared::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (instantiatableIt.hasNext()) {
-        result |= loadComponentModel(
-                d->sharedModel, instantiatableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+        result |= loadComponentModel(d->sharedModel,
+                instantiatableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName,
+                &d->sharedTypesPaths);
     }
     return result;
 }
@@ -523,7 +540,8 @@ void InterfaceDocument::hideUnselectedItems()
     QList<ivm::IVObject *> unselectedObjects = getUnselectedObjects();
     // Hide the unselectedObjects
     for (ivm::IVObject *unselectedObject : unselectedObjects) {
-        bool hide = unselectedObject->isFunction() || unselectedObject->isFunctionType() || unselectedObject->isComment();
+        bool hide =
+                unselectedObject->isFunction() || unselectedObject->isFunctionType() || unselectedObject->isComment();
         if (hide) {
             unselectedObject->setVisible(false);
         }
@@ -1045,7 +1063,7 @@ static inline bool resolveNameConflict(QString &targetPath, QWidget *window)
 static inline void copyImplementation(
         const QDir &projectDir, const QDir &targetDir, const QVector<ivm::IVObject *> &objects)
 {
-    for (shared::VEObject *object : objects) {
+    for (ivm::IVObject *object : objects) {
         if (auto fn = object->as<ivm::IVFunctionType *>()) {
             const QString subPath = ive::kRootImplementationPath + QDir::separator() + object->title().toLower();
             shared::copyDir(projectDir.filePath(subPath), targetDir.filePath(subPath));
@@ -1069,12 +1087,6 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
         } else {
             targetDir.setPath(targetPath);
         }
-    }
-
-    auto it = std::find_if(
-            objects.begin(), objects.end(), [](shared::VEObject *obj) { return obj->parentObject() == nullptr; });
-    if (it != objects.end()) {
-        (*it)->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::name), targetDir.dirName());
     }
 
     if (!exporter()->exportObjectsSilently(objects, targetDir.filePath(shared::kDefaultInterfaceViewFileName),
@@ -1164,6 +1176,51 @@ void InterfaceDocument::loadArchetypes()
 
         d->archetypesModel->addObjects(archetypeObjects);
     }
+}
+
+ivm::IVObject *InterfaceDocument::reloadComponent(ivm::IVObject *obj)
+{
+    if (!obj)
+        return nullptr;
+
+    const shared::Id id = obj->id();
+    if (auto model = obj->model()) {
+        QString path;
+        if (model == d->importModel)
+            path = componentPath(id);
+        else if (model == d->sharedModel)
+            path = sharedTypePath(id);
+
+        if (path.isEmpty())
+            return obj;
+
+        const QVector<shared::VEObject *> children = obj->descendants();
+        QList<ivm::IVObject *> ivChildren;
+        std::for_each(children.cbegin(), children.cend(),
+                [&ivChildren](shared::VEObject *obj) { ivChildren.append(obj->as<ivm::IVObject *>()); });
+        ivm::IVObject::sortObjectList(ivChildren);
+        for (auto it = ivChildren.rbegin(); it != ivChildren.rend(); ++it)
+            model->removeObject(*it);
+        model->removeObject(obj);
+
+        loadComponentModel(
+                qobject_cast<ivm::IVModel *>(model), path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+
+        obj->deleteLater();
+        return model->getObject(id);
+    }
+
+    return obj;
+}
+
+QString InterfaceDocument::componentPath(const shared::Id &id) const
+{
+    return d->componentsPaths.value(id);
+}
+
+QString InterfaceDocument::sharedTypePath(const shared::Id &id) const
+{
+    return d->sharedTypesPaths.value(id);
 }
 
 void InterfaceDocument::generateArchetypeLibrary(

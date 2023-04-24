@@ -41,7 +41,7 @@ class CmdEntitiesRemove : public shared::UndoCommand
     Q_OBJECT
 public:
     explicit CmdEntitiesRemove(
-            const QList<ivm::IVObject *> &entities, ivm::IVModel *model, const QString &pathToLibrary = {});
+            const QList<ivm::IVObject *> &entities, ivm::IVModel *model, const QStringList &pathsToComponents = {});
     ~CmdEntitiesRemove() override;
 
     void redo() override;
@@ -61,7 +61,7 @@ private:
     QHash<shared::Id, QPointer<ivm::IVFunctionType>> m_parentFunctions;
     QList<QUndoCommand *> m_subCommands;
     QScopedPointer<QTemporaryDir> m_tempDir;
-    const QString m_libraryPath;
+    const QStringList m_componentsPaths;
 
     void collectRelatedItems(ivm::IVObject *toBeRemoved);
     void storeLinkedEntity(ivm::IVObject *linkedEntity);

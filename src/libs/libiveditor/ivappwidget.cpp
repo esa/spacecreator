@@ -175,13 +175,13 @@ void IVAppWidget::showContextMenuForSharedTypesView(const QPoint &pos)
 
     QAction *actEditSharedType = menu->addAction(tr("Edit shared type"));
     connect(actEditSharedType, &QAction::triggered, this,
-            [this, obj] { editExternalEntity(shared::sharedTypesPath(), obj->title()); });
+            [this, id] { editExternalEntity(m_document->sharedTypePath(id)); });
 
     QAction *actRemoveSharedType = menu->addAction(tr("Remove shared type"));
     connect(actRemoveSharedType, &QAction::triggered, this, [this, id]() {
         if (auto model = m_document->sharedModel()) {
             if (auto obj = model->getObject(id)) {
-                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model, shared::sharedTypesPath());
+                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model, { m_document->sharedTypePath(id) });
                 cmdRm->setText(tr("Remove importable shared type(s)"));
                 m_document->commandsStack()->push(cmdRm);
             }
@@ -191,14 +191,27 @@ void IVAppWidget::showContextMenuForSharedTypesView(const QPoint &pos)
     menu->exec(ui->sharedView->mapToGlobal(pos));
 }
 
-void IVAppWidget::editExternalEntity(const QString &path, const QString &entityName)
+void IVAppWidget::editExternalEntity(const QString &path)
 {
-    const QString proFilePath = path + QDir::separator() + entityName;
-    const QString proFileName = entityName + QLatin1String(".pro");
-
+    const QDir dir(path);
+    const QString defaultProFile = dir.filePath(dir.dirName() + QLatin1String(".pro"));
+    const QStringList proFiles = dir.entryList({ QLatin1String("*.pro") }, QDir::Filter::Files);
+    QString proFilePath;
+    if (proFiles.isEmpty()) {
+        QMessageBox::warning(this, tr("Edit component"), tr("There is no pro-file in component folder: %1.").arg(path));
+        return;
+    } else if (proFiles.size() > 1) {
+        if (!QFile::exists(defaultProFile)) {
+            QMessageBox::warning(
+                    this, tr("Edit component"), tr("There is no pro-file in component folder: %1.").arg(path));
+            return;
+        }
+        proFilePath = defaultProFile;
+    } else {
+        proFilePath = dir.filePath(proFiles.front());
+    }
     const bool ok = QProcess::startDetached(qApp->applicationFilePath(),
-            { QLatin1String("-pid"), QString::number(qApp->applicationPid()),
-                    proFilePath + QDir::separator() + proFileName });
+            { QLatin1String("-pid"), QString::number(qApp->applicationPid()), proFilePath });
     if (!ok) {
         QMessageBox::warning(this, tr("Edit component"), tr("Error during component opening for editing."));
     } else {
@@ -291,13 +304,13 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
 
     QAction *actEditComponent = menu->addAction(tr("Edit component"));
     connect(actEditComponent, &QAction::triggered, this,
-            [this, obj] { editExternalEntity(shared::componentsLibraryPath(), obj->title()); });
+            [this, id] { editExternalEntity(m_document->componentPath(id)); });
 
     QAction *actRemoveComponent = menu->addAction(tr("Remove component"));
     connect(actRemoveComponent, &QAction::triggered, this, [this, id]() {
         if (auto model = m_document->importModel()) {
             if (auto obj = model->getObject(id)) {
-                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model, shared::componentsLibraryPath());
+                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model, { m_document->componentPath(id) });
                 cmdRm->setText(tr("Remove importable component(s)"));
                 m_document->commandsStack()->push(cmdRm);
             }
@@ -821,32 +834,6 @@ void IVAppWidget::showEditAttributesDialog()
     macro.setComplete(result == QDialog::Accepted);
 }
 
-ivm::IVObject *IVAppWidget::reloadObject(ivm::IVObject *obj, const QString &path)
-{
-    if (!obj)
-        return nullptr;
-
-    const shared::Id id = obj->id();
-    if (auto model = obj->model()) {
-        const QVector<shared::VEObject *> children = obj->descendants();
-        QList<ivm::IVObject *> ivChildren;
-        std::for_each(children.cbegin(), children.cend(),
-                [&ivChildren](shared::VEObject *obj) { ivChildren.append(obj->as<ivm::IVObject *>()); });
-        ivm::IVObject::sortObjectList(ivChildren);
-        for (auto it = ivChildren.rbegin(); it != ivChildren.rend(); ++it)
-            model->removeObject(*it);
-        model->removeObject(obj);
-
-        m_document->loadComponentModel(qobject_cast<ivm::IVModel *>(model),
-                path + QDir::separator() + obj->title() + QDir::separator() + shared::kDefaultInterfaceViewFileName);
-
-        obj->deleteLater();
-        return model->getObject(id);
-    }
-
-    return obj;
-}
-
 void IVAppWidget::importEntity(const shared::Id &id, QPointF sceneDropPoint)
 {
     Q_ASSERT(m_document);
@@ -872,7 +859,7 @@ void IVAppWidget::importEntity(const shared::Id &id, QPointF sceneDropPoint)
     }
     ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
 
-    obj = reloadObject(obj, shared::componentsLibraryPath());
+    obj = m_document->reloadComponent(obj);
     if (!obj) {
         return;
     }
@@ -891,7 +878,7 @@ void IVAppWidget::instantiateEntity(const shared::Id &id, QPointF sceneDropPoint
         return;
     }
 
-    obj = reloadObject(obj, shared::sharedTypesPath());
+    obj = m_document->reloadComponent(obj);
     if (!obj) {
         return;
     }
@@ -929,7 +916,7 @@ void IVAppWidget::linkEntity(const shared::Id &id, QPointF sceneDropPoint)
         return;
     }
 
-    obj = reloadObject(obj, shared::componentsLibraryPath());
+    obj = m_document->reloadComponent(obj);
     if (!obj) {
         return;
     }

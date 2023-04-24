@@ -157,7 +157,10 @@ public:
 
     auto updateLayersModel() const -> void;
     void loadArchetypes();
-    bool loadComponentModel(ivm::IVModel *model, const QString &path);
+    ivm::IVObject *reloadComponent(ivm::IVObject *object);
+
+    QString componentPath(const shared::Id &id) const;
+    QString sharedTypePath(const shared::Id &id) const;
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -185,6 +188,7 @@ private:
     bool exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
+    bool loadComponentModel(ivm::IVModel *model, const QString &path, QHash<shared::Id, QString> *pathMappings);
     void generateArchetypeLibrary(
             QVector<ivm::ArchetypeObject *> &archetypeObjects, const QString &archetypeLibraryName);
 
@@ -198,10 +202,11 @@ private:
     void createProFile(const QString &path);
     void initTASTEEnv(const QString &path);
 
-    struct InterfaceDocumentPrivate;
-    InterfaceDocumentPrivate *d;
     QList<ivm::IVObject *> getSelectedObjects();
     QList<ivm::IVObject *> getUnselectedObjects();
+
+    struct InterfaceDocumentPrivate;
+    InterfaceDocumentPrivate *d;
 };
 
 }
