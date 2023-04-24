@@ -35,6 +35,7 @@ class IVAppWidget;
 }
 
 namespace ivm {
+class IVObject;
 class IVFunctionType;
 }
 
@@ -105,6 +106,7 @@ private:
     QList<shared::VEObject *> selectedObjects() const;
 
     ivm::IVFunctionType *functionAtPosition(QPointF &sceneDropPoint);
+    ivm::IVObject *reloadObject(ivm::IVObject *obj, const QString &path);
 
     Ui::IVAppWidget *ui = nullptr;
     shared::BreadcrumbWidget *m_breadCrumb = nullptr;

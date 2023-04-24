@@ -137,7 +137,6 @@ public:
 
     QItemSelectionModel *objectsSelectionModel() const;
 
-
     IVVisualizationModelBase *importVisualisationModel() const;
     IVVisualizationModelBase *sharedVisualisationModel() const;
     IVVisualizationModelBase *layerVisualisationModel() const;
@@ -158,6 +157,7 @@ public:
 
     auto updateLayersModel() const -> void;
     void loadArchetypes();
+    bool loadComponentModel(ivm::IVModel *model, const QString &path);
 
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
@@ -185,7 +185,6 @@ private:
     bool exportImpl(QString &targetPath, const QList<shared::VEObject *> &objects);
     bool loadImpl(const QString &path);
     QString getComponentName(const QStringList &exportNames);
-    bool loadComponentModel(ivm::IVModel *model, const QString &path);
     void generateArchetypeLibrary(
             QVector<ivm::ArchetypeObject *> &archetypeObjects, const QString &archetypeLibraryName);
 
