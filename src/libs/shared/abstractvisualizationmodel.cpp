@@ -43,6 +43,12 @@ QStandardItem *AbstractVisualizationModel::getItem(const Id id)
     return id.isNull() ? nullptr : m_itemCache.value(id);
 }
 
+shared::VEObject *AbstractVisualizationModel::qStandardItemToIVObject(const QStandardItem *standardItem)
+{
+    const shared::Id id = standardItem->data(IdRole).toUuid(); // ask QStandardItem for its id
+    return m_veModel->getObject(id); // find the model object by id
+}
+
 void AbstractVisualizationModel::updateItemData(QStandardItem *item, VEObject *obj)
 {
     item->setData(obj->titleUI(), Qt::DisplayRole);
@@ -68,6 +74,18 @@ QStandardItem *AbstractVisualizationModel::getParentItem(VEObject *obj)
 QStandardItem *AbstractVisualizationModel::getItem(VEObject *obj)
 {
     return obj ? getItem(obj->id()) : nullptr;
+}
+
+void AbstractVisualizationModel::updateChildItems(QStandardItem *item)
+{
+    if (!item)
+        return;
+
+    for (int idx = 0; idx < item->rowCount(); ++idx) {
+        auto child = item->child(idx);
+        updateItemData(child, qStandardItemToIVObject(child));
+        updateChildItems(child);
+    }
 }
 
 void AbstractVisualizationModel::addItems(const QVector<shared::Id> &objectsIds)

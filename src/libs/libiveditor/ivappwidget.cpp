@@ -54,6 +54,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QIcon>
+#include <QItemSelectionModel>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPointer>

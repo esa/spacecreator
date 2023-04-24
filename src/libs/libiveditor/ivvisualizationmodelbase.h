@@ -38,10 +38,8 @@ class IVVisualizationModelBase : public shared::AbstractVisualizationModel
 {
     Q_OBJECT
 public:
-    explicit IVVisualizationModelBase(ivm::IVModel *ivModel,
-                                      cmd::CommandsStack *commandsStack,
-                                      shared::DropData::Type dropType,
-                                      QObject *parent = nullptr);
+    explicit IVVisualizationModelBase(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack,
+            shared::DropData::Type dropType, QObject *parent = nullptr);
 
 protected:
     void updateItemData(QStandardItem *item, shared::VEObject *obj) override;
@@ -63,7 +61,6 @@ public:
 
     void updateItemData(QStandardItem *item, shared::VEObject *object) override;
     QList<QStandardItem *> createItems(shared::VEObject *obj) override;
-    ivm::IVObject* qStandardItemToIVObject(const QStandardItem *standardItem);
     void setAllItemsVisible();
 
 private Q_SLOTS:

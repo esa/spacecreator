@@ -153,15 +153,22 @@ QList<QStandardItem *> IVVisualizationModelBase::createItems(shared::VEObject *o
     QList<QStandardItem *> items = AbstractVisualizationModel::createItems(obj);
     items[0]->setData(static_cast<int>(obj->type()), TypeRole);
 
-    connect(obj, &ivm::IVObject::attributeChanged, this, [this](const QString &name) {
-        static const QStringList monitoredAttributes = {
-            ivm::meta::Props::token(ivm::meta::Props::Token::instance_of),
-            ivm::meta::Props::token(ivm::meta::Props::Token::name),
-            ivm::meta::Props::token(ivm::meta::Props::Token::is_visible),
-            ivm::meta::Props::token(ivm::meta::Props::Token::group_name),
-        };
-        if (monitoredAttributes.contains(name))
-            updateItem();
+    connect(obj, &ivm::IVObject::attributeChanged, this, [&](const QString &name) {
+        if (auto ivObj = qobject_cast<ivm::IVObject *>(sender())) {
+
+            static const QStringList monitoredAttributes = {
+                ivm::meta::Props::token(ivm::meta::Props::Token::instance_of),
+                ivm::meta::Props::token(ivm::meta::Props::Token::name),
+                ivm::meta::Props::token(ivm::meta::Props::Token::is_visible),
+                ivm::meta::Props::token(ivm::meta::Props::Token::group_name),
+            };
+            if (monitoredAttributes.contains(name)) {
+                updateItem();
+                if (name == ivm::meta::Props::token(ivm::meta::Props::Token::instance_of)) {
+                    updateChildItems(getItem(ivObj->id()));
+                }
+            }
+        }
     });
 
     if (obj->type() == ivm::IVObject::Type::ConnectionGroup) {
@@ -281,7 +288,8 @@ void IVVisualizationModel::onDataChanged(
         if (!rowItem) {
             continue;
         }
-        ivm::IVObject *ivObject = qStandardItemToIVObject(rowItem); // each row represents an IVObject
+        ivm::IVObject *ivObject =
+                qobject_cast<ivm::IVObject *>(qStandardItemToIVObject(rowItem)); // each row represents an IVObject
         if (!ivObject) {
             continue;
         }
@@ -292,7 +300,7 @@ void IVVisualizationModel::onDataChanged(
         }
 
         // Validate the name of the given by the user in IV Structure before setting in model
-        if (roles.contains(Qt::DisplayRole)) {
+        if (roles.contains(Qt::DisplayRole) && rowItem->isEditable()) {
             const QString name = ivm::IVNameValidator::encodeName(ivObject->type(), rowItem->text());
             bool nameHasChanged = name != ivObject->title();
             if (nameHasChanged) {
@@ -311,19 +319,8 @@ void IVVisualizationModel::onDataChanged(
     }
 }
 
-ivm::IVObject *IVVisualizationModel::qStandardItemToIVObject(const QStandardItem *standardItem)
-{
-    const shared::Id id = standardItem->data(IdRole).toUuid(); // ask QStandardItem for its id
-    ivm::IVObject *obj = m_veModel->getObject(id)->as<ivm::IVObject *>(); // find the model object by id
-    if (!obj) {
-        return nullptr;
-    }
-    return obj;
-}
-
 void IVVisualizationModel::setAllItemsVisible()
 {
-
     QHash<shared::Id, shared::VEObject *> ivObjects = m_veModel->objects();
     for (shared::VEObject *veObject : ivObjects) {
         auto ivObject = qobject_cast<ivm::IVObject *>(veObject);

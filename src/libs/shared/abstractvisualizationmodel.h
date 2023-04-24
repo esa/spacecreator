@@ -46,12 +46,14 @@ public:
     };
 
     QStandardItem *getItem(const shared::Id id);
+    shared::VEObject *qStandardItemToIVObject(const QStandardItem *standardItem);
 
 protected:
     virtual void updateItemData(QStandardItem *item, VEObject *obj);
     virtual QList<QStandardItem *> createItems(VEObject *obj);
     QStandardItem *getParentItem(VEObject *obj);
     QStandardItem *getItem(VEObject *obj);
+    void updateChildItems(QStandardItem *item);
 
 protected Q_SLOTS:
     void updateItem();
