@@ -471,7 +471,7 @@ void MscAppWidget::activateDefaultTool()
 
 void MscAppWidget::checkGlobalComment()
 {
-    if (!m_globalCommentCreateTool) {
+    if (!m_globalCommentCreateTool || !m_mscCore) {
         return;
     }
 
@@ -488,6 +488,10 @@ void MscAppWidget::checkGlobalComment()
 
 void MscAppWidget::checkInstances()
 {
+    if (!m_mscCore) {
+        return;
+    }
+
     // Check for names
     QVector<QPair<msc::MscChart *, msc::MscInstance *>> resultNames;
     resultNames += m_mscCore->systemChecker()->checkInstanceNames();
@@ -528,6 +532,10 @@ void MscAppWidget::checkInstances()
 
 void MscAppWidget::checkMessages()
 {
+    if (!m_mscCore) {
+        return;
+    }
+
     // check messages
     QVector<QPair<msc::MscChart *, msc::MscMessage *>> resultNames;
     resultNames += m_mscCore->systemChecker()->checkMessages();
@@ -643,6 +651,9 @@ void MscAppWidget::showSelection(const QModelIndex &current, const QModelIndex &
 
 MainModel *MscAppWidget::mainModel() const
 {
+    if (!m_mscCore) {
+        return nullptr;
+    }
     return m_mscCore->mainModel();
 }
 
