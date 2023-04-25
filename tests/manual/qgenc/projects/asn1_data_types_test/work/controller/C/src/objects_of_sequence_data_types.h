@@ -16,7 +16,7 @@ const asn1SccSeqAliases                               asn1SccSeqAliasesObj =
     "ABC",
     "XY",
     {{'A', 'B', 'C'}},
-    {2, {'X', 'Y'}},
+    {VARIABLE_SIZE_DATA_LENGTH, {'X', 'Y'}},
     EnumAlias_zero
 };
 
@@ -28,7 +28,7 @@ const asn1SccSeqBuiltIn                               asn1SccSeqBuiltInObj =
     "DEF",
     "WZ",
     {{'D', 'E', 'F'}},
-    {2, {'W', 'Z'}},
+    {VARIABLE_SIZE_DATA_LENGTH, {'W', 'Z'}},
     SeqBuiltIn_enumMember_zero
 };
 

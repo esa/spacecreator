@@ -1,5 +1,8 @@
 #pragma once
 
+#include "objects_of_fixed_size_sequence_of_data_types.h"
+#include "objects_of_variable_size_sequence_of_data_types.h"
+
 // ---------------------------------- NCountCompare ----------------------------------
 
 #define NCountCompare(first, second) \
@@ -25,10 +28,10 @@
     if(strcmp(first.ia5StringVarSizeAliasMember, second.ia5StringVarSizeAliasMember) != 0) { \
         reportAndExitFailure(GenerateComparisonFailureMsg(first.ia5StringVarSizeAliasMember, second.ia5StringVarSizeAliasMember)); \
     } \
-    if(memcmp(&first.octetStringFixedSizeAliasMember, &second.octetStringFixedSizeAliasMember, 3) != 0) { \
+    if(memcmp(&first.octetStringFixedSizeAliasMember, &second.octetStringFixedSizeAliasMember, FIXED_SIZE_DATA_LENGTH) != 0) { \
         reportAndExitFailure(GenerateComparisonFailureMsg(first.octetStringFixedSizeAliasMember, second.octetStringFixedSizeAliasMember)); \
     } \
-    if(memcmp(&first.octetStringVarSizeAliasMember, &second.octetStringVarSizeAliasMember, 3) != 0) { \
+    if(memcmp(&first.octetStringVarSizeAliasMember, &second.octetStringVarSizeAliasMember, FIXED_SIZE_DATA_LENGTH) != 0) { \
         reportAndExitFailure(GenerateComparisonFailureMsg(first.octetStringVarSizeAliasMember, second.octetStringVarSizeAliasMember)); \
     } \
     if(first.enumAliasMember != second.enumAliasMember) { \
@@ -51,10 +54,10 @@
     if(strcmp(first.ia5StringVarSizeMember, second.ia5StringVarSizeMember) != 0) { \
         reportAndExitFailure(GenerateComparisonFailureMsg(first.ia5StringVarSizeMember, second.ia5StringVarSizeMember)); \
     } \
-    if(memcmp(&first.octetStringFixedSizeMember, &second.octetStringFixedSizeMember, 3) != 0) { \
+    if(memcmp(&first.octetStringFixedSizeMember, &second.octetStringFixedSizeMember, FIXED_SIZE_DATA_LENGTH) != 0) { \
         reportAndExitFailure(GenerateComparisonFailureMsg(first.octetStringFixedSizeMember, second.octetStringFixedSizeMember)); \
     } \
-    if(memcmp(&first.octetStringVarSizeMember, &second.octetStringVarSizeMember, 3) != 0) { \
+    if(memcmp(&first.octetStringVarSizeMember, &second.octetStringVarSizeMember, FIXED_SIZE_DATA_LENGTH) != 0) { \
         reportAndExitFailure(GenerateComparisonFailureMsg(first.octetStringVarSizeMember, second.octetStringVarSizeMember)); \
     } \
     if(first.enumMember != second.enumMember) { \
@@ -99,12 +102,12 @@
             } \
             break; \
         case ChoiceAliases_octetStringFixedSizeAliasMember_PRESENT: \
-            if(memcmp(&first.u.octetStringFixedSizeAliasMember, &second.u.octetStringFixedSizeAliasMember, 3))  { \
+            if(memcmp(&first.u.octetStringFixedSizeAliasMember, &second.u.octetStringFixedSizeAliasMember, FIXED_SIZE_DATA_LENGTH))  { \
                 reportAndExitFailure(GenerateComparisonFailureMsg(first.u.octetStringFixedSizeAliasMember, second.u.octetStringFixedSizeAliasMember)); \
             } \
             break; \
         case ChoiceAliases_octetStringVarSizeAliasMember_PRESENT: \
-            if(memcmp(&first.u.octetStringVarSizeAliasMember,   &second.u.octetStringVarSizeAliasMember, 3))  { \
+            if(memcmp(&first.u.octetStringVarSizeAliasMember,   &second.u.octetStringVarSizeAliasMember, FIXED_SIZE_DATA_LENGTH))  { \
                 reportAndExitFailure(GenerateComparisonFailureMsg(first.u.octetStringVarSizeAliasMember, second.u.octetStringVarSizeAliasMember)); \
             } \
             break; \
@@ -147,12 +150,12 @@
             } \
             break; \
         case ChoiceBuiltIn_octetStringFixedSizeMember_PRESENT: \
-            if(memcmp(&first.u.octetStringFixedSizeMember, &second.u.octetStringFixedSizeMember, 3)) { \
+            if(memcmp(&first.u.octetStringFixedSizeMember, &second.u.octetStringFixedSizeMember, FIXED_SIZE_DATA_LENGTH)) { \
                 reportAndExitFailure(GenerateComparisonFailureMsg(first.u.octetStringFixedSizeMember, second.u.octetStringFixedSizeMember)); \
             } \
             break; \
         case ChoiceBuiltIn_octetStringVarSizeMember_PRESENT: \
-            if(memcmp(&first.u.octetStringVarSizeMember, &second.u.octetStringVarSizeMember, 3)) { \
+            if(memcmp(&first.u.octetStringVarSizeMember, &second.u.octetStringVarSizeMember, FIXED_SIZE_DATA_LENGTH)) { \
                 reportAndExitFailure(GenerateComparisonFailureMsg(first.u.octetStringVarSizeMember, second.u.octetStringVarSizeMember)); \
             } \
             break; \

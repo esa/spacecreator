@@ -62,7 +62,7 @@ void aliasesTestCase()
     const asn1SccIA5StringFixedSizeAlias   in4 = "ABC";
     const asn1SccIA5StringVarSizeAlias     in5 = "XY";
     const asn1SccOctetStringFixedSizeAlias in6 = {{'A', 'B', 'C'}};
-    const asn1SccOctetStringVarSizeAlias   in7 = {2, {'X', 'Y'}};
+    const asn1SccOctetStringVarSizeAlias   in7 = {VARIABLE_SIZE_DATA_LENGTH, {'X', 'Y'}};
     const asn1SccEnumAlias                 in8 = EnumAlias_zero;
 
     asn1SccBoolAlias                       out1;
@@ -97,11 +97,11 @@ void aliasesTestCase()
         reportAndExitFailure(GenerateComparisonFailureMsg(in5, out5));
     }
 
-    if(memcmp(&in6, &out6, 3) != 0) {
+    if(memcmp(&in6, &out6, FIXED_SIZE_DATA_LENGTH) != 0) {
         reportAndExitFailure(GenerateComparisonFailureMsg(in6, out6));
     }
 
-    if(memcmp(&in7, &out7, 2) != 0) {
+    if(memcmp(&in7, &out7, VARIABLE_SIZE_DATA_LENGTH) != 0) {
         reportAndExitFailure(GenerateComparisonFailureMsg(in7, out7));
     }
 
@@ -156,78 +156,78 @@ void sequencesTestCase()
     BuiltInStructCompare(in2, out2)
 
     // in3, out3
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3,
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeBoolAliasMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeBoolAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3,
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeIntegerAliasMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeIntegerAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfDoubleCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfDoubleCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeRealAliasMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeRealAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAliasMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAliasMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAliasMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAliasMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3,
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeEnumAliasMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeEnumAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfAliasesStructCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfAliasesStructCompare(FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeSeqAliasesMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeSeqAliasesMember)
-    FixedSizeSeqOfSeqOfSeqOfBuiltInStructCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfBuiltInStructCompare(FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeSeqBuiltInMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeSeqBuiltInMember)
-    FixedSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeChoiceAliasesMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeChoiceAliasesMember)
-    FixedSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(FIXED_SIZE_DATA_LENGTH,
                                                  in3.seqOfSeqOfSeqOfFixedSizeChoiceBuiltInMember,
                                                  out3.seqOfSeqOfSeqOfFixedSizeChoiceBuiltInMember)
 
     // in4, out4
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       2,
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeBoolAliasMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeBoolAliasMember)
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       2,
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeIntegerAliasMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeIntegerAliasMember)
-    VarSizeSeqOfSeqOfSeqOfDoubleCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfDoubleCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeRealAliasMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeRealAliasMember)
-    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAliasMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAliasMember)
-    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeIA5StringVarSizeAliasMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeIA5StringVarSizeAliasMember)
-    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAliasMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAliasMember)
-    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeOctetStringVarSizeAliasMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeOctetStringVarSizeAliasMember)
-     VarSizeSeqOfSeqOfSeqOfOperatorCompare(      2,
+     VarSizeSeqOfSeqOfSeqOfOperatorCompare(      VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeEnumAliasMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeEnumAliasMember)
-    VarSizeSeqOfSeqOfSeqOfAliasesStructCompare(  2,
+    VarSizeSeqOfSeqOfSeqOfAliasesStructCompare(  VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeSeqAliasesMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeSeqAliasesMember)
-    VarSizeSeqOfSeqOfSeqOfBuiltInStructCompare(  2,
+    VarSizeSeqOfSeqOfSeqOfBuiltInStructCompare(  VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeSeqBuiltInMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeSeqBuiltInMember)
-    VarSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(  2,
+    VarSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(  VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeChoiceAliasesMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeChoiceAliasesMember)
-    VarSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(  2,
+    VarSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(  VARIABLE_SIZE_DATA_LENGTH,
                                                  in4.seqOfSeqOfSeqOfVarSizeChoiceBuiltInMember,
                                                  out4.seqOfSeqOfSeqOfVarSizeChoiceBuiltInMember)
 
@@ -235,77 +235,77 @@ void sequencesTestCase()
     AliasesStructCompare(in5.seqAliasesMember, out5.seqAliasesMember)
     BuiltInStructCompare(in5.seqBuiltInMember, out5.seqBuiltInMember)
 
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3,
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeBoolAliasMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeBoolAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3,
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeIntegerAliasMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeIntegerAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfDoubleCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfDoubleCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeRealAliasMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeRealAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAliasMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAliasMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAliasMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       3,
+    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAliasMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3,
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeEnumAliasMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeEnumAliasMember)
-    FixedSizeSeqOfSeqOfSeqOfAliasesStructCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfAliasesStructCompare(FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeSeqAliasesMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeSeqAliasesMember)
-    FixedSizeSeqOfSeqOfSeqOfBuiltInStructCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfBuiltInStructCompare(FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeSeqBuiltInMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeSeqBuiltInMember)
-    FixedSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeChoiceAliasesMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeChoiceAliasesMember)
-    FixedSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(FIXED_SIZE_DATA_LENGTH,
                                                  in5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeChoiceBuiltInMember,
                                                  out5.seqOfFixedSizeSeqOfsMember.seqOfSeqOfSeqOfFixedSizeChoiceBuiltInMember)
 
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       2,
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeBoolAliasMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeBoolAliasMember)
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       2,
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeIntegerAliasMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeIntegerAliasMember)
-    VarSizeSeqOfSeqOfSeqOfDoubleCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfDoubleCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeRealAliasMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeRealAliasMember)
-    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAliasMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeIA5StringFixedSizeAliasMember)
-    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeIA5StringVarSizeAliasMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeIA5StringVarSizeAliasMember)
-    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAliasMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeOctetStringFixedSizeAliasMember)
-    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(         2,
+    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(         VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeOctetStringVarSizeAliasMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeOctetStringVarSizeAliasMember)
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       2,
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(       VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeEnumAliasMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeEnumAliasMember)
-    VarSizeSeqOfSeqOfSeqOfAliasesStructCompare(  2,
+    VarSizeSeqOfSeqOfSeqOfAliasesStructCompare(  VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeSeqAliasesMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeSeqAliasesMember)
-    VarSizeSeqOfSeqOfSeqOfBuiltInStructCompare(  2,
+    VarSizeSeqOfSeqOfSeqOfBuiltInStructCompare(  VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeSeqBuiltInMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeSeqBuiltInMember)
-    VarSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(  2,
+    VarSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(  VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeChoiceAliasesMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeChoiceAliasesMember)
-    VarSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(  2,
+    VarSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(  VARIABLE_SIZE_DATA_LENGTH,
                                                  in5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeChoiceBuiltInMember,
                                                  out5.seqOfVarSizeSeqOfsMember.seqOfSeqOfSeqOfVarSizeChoiceBuiltInMember)
 
@@ -314,12 +314,12 @@ void sequencesTestCase()
     BuiltInChoiceCompare(in6.choiceBuiltInMember, out6.choiceBuiltInMember)
 
     KindChoiceCompare(in6.choiceOfFixedSizeSeqOfsMember, out6.choiceOfFixedSizeSeqOfsMember)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(FIXED_SIZE_DATA_LENGTH,
                                             in6.choiceOfFixedSizeSeqOfsMember.u.seqOfSeqOfSeqOfFixedSizeIntegerAliasMember,
                                             out6.choiceOfFixedSizeSeqOfsMember.u.seqOfSeqOfSeqOfFixedSizeIntegerAliasMember)
 
     KindChoiceCompare(in6.choiceOfVarSizeSeqOfsMember, out6.choiceOfVarSizeSeqOfsMember)
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(3,
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(FIXED_SIZE_DATA_LENGTH,
                                           in6.choiceOfVarSizeSeqOfsMember.u.seqOfSeqOfSeqOfVarSizeIntegerAliasMember,
                                           out6.choiceOfVarSizeSeqOfsMember.u.seqOfSeqOfSeqOfVarSizeIntegerAliasMember)
 
@@ -367,13 +367,13 @@ void choicesTestCase()
 
     // in3, out3
     KindChoiceCompare(in3, out3)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(3,
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(FIXED_SIZE_DATA_LENGTH,
                                             in3.u.seqOfSeqOfSeqOfFixedSizeIntegerAliasMember,
                                             out3.u.seqOfSeqOfSeqOfFixedSizeIntegerAliasMember)
 
     // in4, out4
     KindChoiceCompare(in4, out4)
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(2,
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(VARIABLE_SIZE_DATA_LENGTH,
                                           in4.u.seqOfSeqOfSeqOfVarSizeIntegerAliasMember,
                                           out4.u.seqOfSeqOfSeqOfVarSizeIntegerAliasMember)
 
@@ -498,53 +498,53 @@ void sequencesOfFixedSizeTestCase()
                                          &out34, &out35, &out36
                                         );
 
-    FixedSizeSeqOfOperatorCompare(               3, in1,  out1)
-    FixedSizeSeqOfSeqOfOperatorCompare(          3, in2,  out2)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3, in3,  out3)
+    FixedSizeSeqOfOperatorCompare(               FIXED_SIZE_DATA_LENGTH, in1,  out1)
+    FixedSizeSeqOfSeqOfOperatorCompare(          FIXED_SIZE_DATA_LENGTH, in2,  out2)
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH, in3,  out3)
 
-    FixedSizeSeqOfOperatorCompare(               3, in4,  out4)
-    FixedSizeSeqOfSeqOfOperatorCompare(          3, in5,  out5)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3, in6,  out6)
+    FixedSizeSeqOfOperatorCompare(               FIXED_SIZE_DATA_LENGTH, in4,  out4)
+    FixedSizeSeqOfSeqOfOperatorCompare(          FIXED_SIZE_DATA_LENGTH, in5,  out5)
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH, in6,  out6)
 
-    FixedSizeSeqOfDoubleCompare(                 3, in7,  out7)
-    FixedSizeSeqOfSeqOfDoubleCompare(            3, in8,  out8)
-    FixedSizeSeqOfSeqOfSeqOfDoubleCompare(       3, in9,  out9)
+    FixedSizeSeqOfDoubleCompare(                 FIXED_SIZE_DATA_LENGTH, in7,  out7)
+    FixedSizeSeqOfSeqOfDoubleCompare(            FIXED_SIZE_DATA_LENGTH, in8,  out8)
+    FixedSizeSeqOfSeqOfSeqOfDoubleCompare(       FIXED_SIZE_DATA_LENGTH, in9,  out9)
 
-    FixedSizeSeqOfStrCmpCompare(                 3, in10, out10)
-    FixedSizeSeqOfSeqOfStrCmpCompare(            3, in11, out11)
-    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       3, in12, out12)
+    FixedSizeSeqOfStrCmpCompare(                 FIXED_SIZE_DATA_LENGTH, in10, out10)
+    FixedSizeSeqOfSeqOfStrCmpCompare(            FIXED_SIZE_DATA_LENGTH, in11, out11)
+    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       FIXED_SIZE_DATA_LENGTH, in12, out12)
 
-    FixedSizeSeqOfStrCmpCompare(                 3, in13, out13)
-    FixedSizeSeqOfSeqOfStrCmpCompare(            3, in14, out14)
-    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       3, in15, out15)
+    FixedSizeSeqOfStrCmpCompare(                 FIXED_SIZE_DATA_LENGTH, in13, out13)
+    FixedSizeSeqOfSeqOfStrCmpCompare(            FIXED_SIZE_DATA_LENGTH, in14, out14)
+    FixedSizeSeqOfSeqOfSeqOfStrCmpCompare(       FIXED_SIZE_DATA_LENGTH, in15, out15)
 
-    FixedSizeSeqOfMemCmpCompare(                 3, in16, out16)
-    FixedSizeSeqOfSeqOfMemCmpCompare(            3, in17, out17)
-    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       3, in18, out18)
+    FixedSizeSeqOfMemCmpCompare(                 FIXED_SIZE_DATA_LENGTH, in16, out16)
+    FixedSizeSeqOfSeqOfMemCmpCompare(            FIXED_SIZE_DATA_LENGTH, in17, out17)
+    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       FIXED_SIZE_DATA_LENGTH, in18, out18)
 
-    FixedSizeSeqOfMemCmpCompare(                 3, in19, out19)
-    FixedSizeSeqOfSeqOfMemCmpCompare(            3, in20, out20)
-    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       3, in21, out21)
+    FixedSizeSeqOfMemCmpCompare(                 FIXED_SIZE_DATA_LENGTH, in19, out19)
+    FixedSizeSeqOfSeqOfMemCmpCompare(            FIXED_SIZE_DATA_LENGTH, in20, out20)
+    FixedSizeSeqOfSeqOfSeqOfMemCmpCompare(       FIXED_SIZE_DATA_LENGTH, in21, out21)
 
-    FixedSizeSeqOfOperatorCompare(               3, in22, out22)
-    FixedSizeSeqOfSeqOfOperatorCompare(          3, in23, out23)
-    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     3, in24, out24)
+    FixedSizeSeqOfOperatorCompare(               FIXED_SIZE_DATA_LENGTH, in22, out22)
+    FixedSizeSeqOfSeqOfOperatorCompare(          FIXED_SIZE_DATA_LENGTH, in23, out23)
+    FixedSizeSeqOfSeqOfSeqOfOperatorCompare(     FIXED_SIZE_DATA_LENGTH, in24, out24)
 
-    FixedSizeSeqOfAliasesStructCompare(          3, in25, out25)
-    FixedSizeSeqOfSeqOfAliasesStructCompare(     3, in26, out26)
-    FixedSizeSeqOfSeqOfSeqOfAliasesStructCompare(3, in27, out27)
+    FixedSizeSeqOfAliasesStructCompare(          FIXED_SIZE_DATA_LENGTH, in25, out25)
+    FixedSizeSeqOfSeqOfAliasesStructCompare(     FIXED_SIZE_DATA_LENGTH, in26, out26)
+    FixedSizeSeqOfSeqOfSeqOfAliasesStructCompare(FIXED_SIZE_DATA_LENGTH, in27, out27)
 
-    FixedSizeSeqOfBuiltInStructCompare(          3, in28, out28)
-    FixedSizeSeqOfSeqOfBuiltInStructCompare(     3, in29, out29)
-    FixedSizeSeqOfSeqOfSeqOfBuiltInStructCompare(3, in30, out30)
+    FixedSizeSeqOfBuiltInStructCompare(          FIXED_SIZE_DATA_LENGTH, in28, out28)
+    FixedSizeSeqOfSeqOfBuiltInStructCompare(     FIXED_SIZE_DATA_LENGTH, in29, out29)
+    FixedSizeSeqOfSeqOfSeqOfBuiltInStructCompare(FIXED_SIZE_DATA_LENGTH, in30, out30)
 
-    FixedSizeSeqOfAliasesChoiceCompare(          3, in31, out31)
-    FixedSizeSeqOfSeqOfAliasesChoiceCompare(     3, in32, out32)
-    FixedSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(3, in33, out33)
+    FixedSizeSeqOfAliasesChoiceCompare(          FIXED_SIZE_DATA_LENGTH, in31, out31)
+    FixedSizeSeqOfSeqOfAliasesChoiceCompare(     FIXED_SIZE_DATA_LENGTH, in32, out32)
+    FixedSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(FIXED_SIZE_DATA_LENGTH, in33, out33)
 
-    FixedSizeSeqOfBuiltInChoiceCompare(          3, in34, out34)
-    FixedSizeSeqOfSeqOfBuiltInChoiceCompare(     3, in35, out35)
-    FixedSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(3, in36, out36)
+    FixedSizeSeqOfBuiltInChoiceCompare(          FIXED_SIZE_DATA_LENGTH, in34, out34)
+    FixedSizeSeqOfSeqOfBuiltInChoiceCompare(     FIXED_SIZE_DATA_LENGTH, in35, out35)
+    FixedSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(FIXED_SIZE_DATA_LENGTH, in36, out36)
 
     PrintTestPassedSuccessfully()
 }
@@ -659,53 +659,53 @@ void sequencesOfVariableSizeTestCase()
                                             &out34, &out35, &out36
                                            );
 
-    VarSizeSeqOfOperatorCompare(               2, in1,  out1)
-    VarSizeSeqOfSeqOfOperatorCompare(          2, in2,  out2)
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(     2, in3,  out3)
+    VarSizeSeqOfOperatorCompare(               VARIABLE_SIZE_DATA_LENGTH, in1,  out1)
+    VarSizeSeqOfSeqOfOperatorCompare(          VARIABLE_SIZE_DATA_LENGTH, in2,  out2)
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(     VARIABLE_SIZE_DATA_LENGTH, in3,  out3)
 
-    VarSizeSeqOfOperatorCompare(               2, in4,  out4)
-    VarSizeSeqOfSeqOfOperatorCompare(          2, in5,  out5)
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(     2, in6,  out6)
+    VarSizeSeqOfOperatorCompare(               VARIABLE_SIZE_DATA_LENGTH, in4,  out4)
+    VarSizeSeqOfSeqOfOperatorCompare(          VARIABLE_SIZE_DATA_LENGTH, in5,  out5)
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(     VARIABLE_SIZE_DATA_LENGTH, in6,  out6)
 
-    VarSizeSeqOfDoubleCompare(                 2, in7,  out7)
-    VarSizeSeqOfSeqOfDoubleCompare(            2, in8,  out8)
-    VarSizeSeqOfSeqOfSeqOfDoubleCompare(       2, in9,  out9)
+    VarSizeSeqOfDoubleCompare(                 VARIABLE_SIZE_DATA_LENGTH, in7,  out7)
+    VarSizeSeqOfSeqOfDoubleCompare(            VARIABLE_SIZE_DATA_LENGTH, in8,  out8)
+    VarSizeSeqOfSeqOfSeqOfDoubleCompare(       VARIABLE_SIZE_DATA_LENGTH, in9,  out9)
 
-    VarSizeSeqOfStrCmpCompare(                 3, in10, out10)
-    VarSizeSeqOfSeqOfStrCmpCompare(            3, in11, out11)
-    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(       3, in12, out12)
+    VarSizeSeqOfStrCmpCompare(                 FIXED_SIZE_DATA_LENGTH, in10, out10)
+    VarSizeSeqOfSeqOfStrCmpCompare(            FIXED_SIZE_DATA_LENGTH, in11, out11)
+    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(       FIXED_SIZE_DATA_LENGTH, in12, out12)
 
-    VarSizeSeqOfStrCmpCompare(                 2, in13, out13)
-    VarSizeSeqOfSeqOfStrCmpCompare(            2, in14, out14)
-    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(       2, in15, out15)
+    VarSizeSeqOfStrCmpCompare(                 VARIABLE_SIZE_DATA_LENGTH, in13, out13)
+    VarSizeSeqOfSeqOfStrCmpCompare(            VARIABLE_SIZE_DATA_LENGTH, in14, out14)
+    VarSizeSeqOfSeqOfSeqOfStrCmpCompare(       VARIABLE_SIZE_DATA_LENGTH, in15, out15)
 
-    VarSizeSeqOfMemCmpCompare(                 3, in16, out16)
-    VarSizeSeqOfSeqOfMemCmpCompare(            3, in17, out17)
-    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(       3, in18, out18)
+    VarSizeSeqOfMemCmpCompare(                 FIXED_SIZE_DATA_LENGTH, in16, out16)
+    VarSizeSeqOfSeqOfMemCmpCompare(            FIXED_SIZE_DATA_LENGTH, in17, out17)
+    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(       FIXED_SIZE_DATA_LENGTH, in18, out18)
 
-    VarSizeSeqOfMemCmpCompare(                 2, in19, out19)
-    VarSizeSeqOfSeqOfMemCmpCompare(            2, in20, out20)
-    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(       2, in21, out21)
+    VarSizeSeqOfMemCmpCompare(                 VARIABLE_SIZE_DATA_LENGTH, in19, out19)
+    VarSizeSeqOfSeqOfMemCmpCompare(            VARIABLE_SIZE_DATA_LENGTH, in20, out20)
+    VarSizeSeqOfSeqOfSeqOfMemCmpCompare(       VARIABLE_SIZE_DATA_LENGTH, in21, out21)
 
-    VarSizeSeqOfOperatorCompare(               2, in22, out22)
-    VarSizeSeqOfSeqOfOperatorCompare(          2, in23, out23)
-    VarSizeSeqOfSeqOfSeqOfOperatorCompare(     2, in24, out24)
+    VarSizeSeqOfOperatorCompare(               VARIABLE_SIZE_DATA_LENGTH, in22, out22)
+    VarSizeSeqOfSeqOfOperatorCompare(          VARIABLE_SIZE_DATA_LENGTH, in23, out23)
+    VarSizeSeqOfSeqOfSeqOfOperatorCompare(     VARIABLE_SIZE_DATA_LENGTH, in24, out24)
 
-    VarSizeSeqOfAliasesStructCompare(          2, in25, out25)
-    VarSizeSeqOfSeqOfAliasesStructCompare(     2, in26, out26)
-    VarSizeSeqOfSeqOfSeqOfAliasesStructCompare(2, in27, out27)
+    VarSizeSeqOfAliasesStructCompare(          VARIABLE_SIZE_DATA_LENGTH, in25, out25)
+    VarSizeSeqOfSeqOfAliasesStructCompare(     VARIABLE_SIZE_DATA_LENGTH, in26, out26)
+    VarSizeSeqOfSeqOfSeqOfAliasesStructCompare(VARIABLE_SIZE_DATA_LENGTH, in27, out27)
 
-    VarSizeSeqOfBuiltInStructCompare(          2, in28, out28)
-    VarSizeSeqOfSeqOfBuiltInStructCompare(     2, in29, out29)
-    VarSizeSeqOfSeqOfSeqOfBuiltInStructCompare(2, in30, out30)
+    VarSizeSeqOfBuiltInStructCompare(          VARIABLE_SIZE_DATA_LENGTH, in28, out28)
+    VarSizeSeqOfSeqOfBuiltInStructCompare(     VARIABLE_SIZE_DATA_LENGTH, in29, out29)
+    VarSizeSeqOfSeqOfSeqOfBuiltInStructCompare(VARIABLE_SIZE_DATA_LENGTH, in30, out30)
 
-    VarSizeSeqOfAliasesChoiceCompare(          2, in31, out31)
-    VarSizeSeqOfSeqOfAliasesChoiceCompare(     2, in32, out32)
-    VarSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(2, in33, out33)
+    VarSizeSeqOfAliasesChoiceCompare(          VARIABLE_SIZE_DATA_LENGTH, in31, out31)
+    VarSizeSeqOfSeqOfAliasesChoiceCompare(     VARIABLE_SIZE_DATA_LENGTH, in32, out32)
+    VarSizeSeqOfSeqOfSeqOfAliasesChoiceCompare(VARIABLE_SIZE_DATA_LENGTH, in33, out33)
 
-    VarSizeSeqOfBuiltInChoiceCompare(          2, in34, out34)
-    VarSizeSeqOfSeqOfBuiltInChoiceCompare(     2, in35, out35)
-    VarSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(2, in36, out36)
+    VarSizeSeqOfBuiltInChoiceCompare(          VARIABLE_SIZE_DATA_LENGTH, in34, out34)
+    VarSizeSeqOfSeqOfBuiltInChoiceCompare(     VARIABLE_SIZE_DATA_LENGTH, in35, out35)
+    VarSizeSeqOfSeqOfSeqOfBuiltInChoiceCompare(VARIABLE_SIZE_DATA_LENGTH, in36, out36)
 
     PrintTestPassedSuccessfully()
 }

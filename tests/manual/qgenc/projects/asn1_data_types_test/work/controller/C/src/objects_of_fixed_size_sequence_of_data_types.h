@@ -2,6 +2,13 @@
 
 #include "dataview-uniq.h"
 
+#include "objects_of_variable_size_sequence_of_data_types.h"
+
+// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
+
+#define FIXED_SIZE_DATA_LENGTH 3
+
 // ---------------------------------------------------------------------
 // ---------------------------------------------------------------------
 
@@ -152,7 +159,7 @@ const asn1SccSeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias asn1SccSeqOfSeqOf
 const asn1SccSeqOfFixedSizeOctetStringVarSizeAlias asn1SccSeqOfFixedSizeOctetStringVarSizeAliasObj =
 {
     {
-        {2, {'A', 'B'}}, {2, {'C', 'D'}}, {2, {'E', 'F'}}
+        {VARIABLE_SIZE_DATA_LENGTH, {'A', 'B'}}, {VARIABLE_SIZE_DATA_LENGTH, {'C', 'D'}}, {VARIABLE_SIZE_DATA_LENGTH, {'E', 'F'}}
     }
 };
 
@@ -200,9 +207,9 @@ const asn1SccSeqOfSeqOfSeqOfFixedSizeEnumAlias asn1SccSeqOfSeqOfSeqOfFixedSizeEn
 const asn1SccSeqOfFixedSizeSeqAliases asn1SccSeqOfFixedSizeSeqAliasesObj =
 {
     {
-        {true, 10, 0.1,  "ABC", "XY", {{'A', 'B', 'C'}}, {2, {'A', 'B'}}, EnumAlias_zero},
-        {false, 20, 0.2, "DEF", "WZ", {{'D', 'E', 'F'}}, {2, {'C', 'D'}}, EnumAlias_one},
-        {true, 30, 0.3,  "GHI", "TQ", {{'G', 'H', 'I'}}, {2, {'E', 'F'}}, EnumAlias_two}
+        {true, 10, 0.1,  "ABC", "XY", {{'A', 'B', 'C'}}, {VARIABLE_SIZE_DATA_LENGTH, {'A', 'B'}}, EnumAlias_zero},
+        {false, 20, 0.2, "DEF", "WZ", {{'D', 'E', 'F'}}, {VARIABLE_SIZE_DATA_LENGTH, {'C', 'D'}}, EnumAlias_one},
+        {true, 30, 0.3,  "GHI", "TQ", {{'G', 'H', 'I'}}, {VARIABLE_SIZE_DATA_LENGTH, {'E', 'F'}}, EnumAlias_two}
     }
 };
 
@@ -226,9 +233,9 @@ const asn1SccSeqOfSeqOfSeqOfFixedSizeSeqAliases asn1SccSeqOfSeqOfSeqOfFixedSizeS
 const asn1SccSeqOfFixedSizeSeqBuiltIn asn1SccSeqOfFixedSizeSeqBuiltInObj =
 {
     {
-        {false, 70, 0.7, "ABC", "XY", {{'A', 'B', 'C'}}, {2, {'X', 'Y'}}, SeqBuiltIn_enumMember_zero},
-        {true, 80, 0.8, "DEF", "WZ",  {{'D', 'E', 'F'}}, {2, {'W', 'Z'}}, SeqBuiltIn_enumMember_one},
-        {false, 90, 0.9, "GHI", "TQ", {{'G', 'H', 'I'}}, {2, {'T', 'Q'}}, SeqBuiltIn_enumMember_two}
+        {false, 70, 0.7, "ABC", "XY", {{'A', 'B', 'C'}}, {VARIABLE_SIZE_DATA_LENGTH, {'X', 'Y'}}, SeqBuiltIn_enumMember_zero},
+        {true, 80, 0.8, "DEF", "WZ",  {{'D', 'E', 'F'}}, {VARIABLE_SIZE_DATA_LENGTH, {'W', 'Z'}}, SeqBuiltIn_enumMember_one},
+        {false, 90, 0.9, "GHI", "TQ", {{'G', 'H', 'I'}}, {VARIABLE_SIZE_DATA_LENGTH, {'T', 'Q'}}, SeqBuiltIn_enumMember_two}
     }
 };
 
