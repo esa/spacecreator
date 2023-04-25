@@ -66,7 +66,9 @@ void VEInteractiveObject::applyColorScheme()
     setBrush(h.brush());
 
     if (m_textItem) {
-        m_textItem->setTextAlignment(static_cast<Qt::Alignment>(h.textAlignment()));
+        if (h.textAlignment() != ColorHandler::Default) {
+            m_textItem->setTextAlignment(static_cast<Qt::Alignment>(h.textAlignment()));
+        }
         m_textItem->setFont(h.font());
         m_textItem->setDefaultTextColor(h.textColor());
         updateTextPosition();

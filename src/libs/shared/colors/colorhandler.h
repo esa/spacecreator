@@ -47,6 +47,7 @@ public:
 
     enum Alignment
     {
+        Default = 0,
         Left = Qt::AlignLeft | Qt::AlignVCenter,
         TopLeft = Qt::AlignLeft | Qt::AlignTop,
         Top = Qt::AlignHCenter | Qt::AlignTop,
@@ -117,7 +118,7 @@ struct ColorHandlerData : public QSharedData {
     QColor brushColor0 { Qt::black };
     QColor brushColor1 { Qt::white };
     QColor textColor { Qt::black };
-    ColorHandler::Alignment alignment;
+    ColorHandler::Alignment alignment = ColorHandler::Default;
     QString group { "IVE" };
 };
 
