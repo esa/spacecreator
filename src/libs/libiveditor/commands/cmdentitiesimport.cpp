@@ -78,7 +78,7 @@ CmdEntitiesImport::CmdEntitiesImport(ivm::IVModel::CloneType type, const QList<i
     QList<ivm::IVObject *> entities;
     std::for_each(objects.cbegin(), objects.cend(), [&](ivm::IVObject *p) {
         if (!objects.contains(p->parentObject())) /// Only root entities should be processed in clone method
-            entities << m_model->clone(type, p, m_parent);
+            m_model->clone(p, entities, type, m_parent);
     });
 
     QString errorString;

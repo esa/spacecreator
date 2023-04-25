@@ -209,8 +209,10 @@ void IVItemModel::onConnectionRemovedFromGroup(ivm::IVConnection *connection)
         onObjectAdded(connection->sourceInterface()->id());
     onObjectAdded(connection->id());
 
-    updateInterfaceOnConnectionRemove(connection, connectionGroupObject->sourceInterfaceGroup());
-    updateInterfaceOnConnectionRemove(connection, connectionGroupObject->targetInterfaceGroup());
+    if (connectionGroupObject->sourceInterfaceGroup())
+        updateInterfaceOnConnectionRemove(connection, connectionGroupObject->sourceInterfaceGroup());
+    if (connectionGroupObject->targetInterfaceGroup())
+        updateInterfaceOnConnectionRemove(connection, connectionGroupObject->targetInterfaceGroup());
 }
 
 /*!

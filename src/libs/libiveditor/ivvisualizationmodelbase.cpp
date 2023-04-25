@@ -189,10 +189,10 @@ QList<QStandardItem *> IVVisualizationModelBase::createItems(shared::VEObject *o
                 if (!ivObj) {
                     return;
                 }
-                connect(ivObj, &ivm::IVObject::attributeChanged, this, [this, obj](const QString &attrName) {
+                connect(ivObj, &ivm::IVObject::attributeChanged, this, [this, id = obj->id()](const QString &attrName) {
                     if (attrName == ivm::meta::Props::token(ivm::meta::Props::Token::name)) {
-                        if (auto item = getItem(obj->id())) {
-                            updateItemData(item, obj);
+                        if (auto item = getItem(id)) {
+                            updateItemData(item, m_veModel->getObject(id));
                         }
                     }
                 });

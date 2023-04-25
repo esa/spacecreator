@@ -120,8 +120,8 @@ public:
     QString defaultFunctionLanguage() const;
     QStringList availableFunctionLanguages() const;
 
-    QList<IVObject *> clone(
-            CloneType type, IVObject *origin, IVFunctionType *parent = nullptr, const QPointF &pos = {}) const;
+    void clone(IVObject *origin, QList<IVObject *> &importedObjects, CloneType type, IVFunctionType *parent = nullptr,
+            const QPointF &pos = {}) const;
 
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);

@@ -60,7 +60,8 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
     if (ivm::IVObject *ivObj = obj->as<ivm::IVObject *>()) {
         if (ivObj->hasEntityAttribute(meta::Props::token(meta::Props::Token::origin)) && !ivObj->isReference()) {
-            const QList<IVObject *> importedEntities = clone(IVModel::CloneType::Reference, getOrigin(ivObj->origin()));
+            QList<IVObject *> importedEntities;
+            clone(getOrigin(ivObj->origin()), importedEntities, IVModel::CloneType::Reference);
             if (!importedEntities.isEmpty())
                 addObjects(importedEntities);
             return false; // All nested referenced entities are processed separately,
@@ -100,17 +101,29 @@ constexpr decltype(auto) apply(Container &&c, F &&f, Args &&...args)
     std::for_each(std::begin(c), std::end(c), [&](const auto &t) { f(t, args...); });
 }
 
-QList<IVObject *> IVModel::clone(IVModel::CloneType type, IVObject *origin, IVFunctionType *parent, const QPointF &pos) const
+void IVModel::clone(IVObject *origin, QList<IVObject *> &importedObjects, IVModel::CloneType type,
+        IVFunctionType *parent, const QPointF &pos) const
 {
     if (!origin || type == IVModel::CloneType::Unknown)
-        return {};
+        return;
+
+    auto findIface = [](const QList<IVObject *> &importedObjects, const QString &ifaceTitle, const QString &fnTitle,
+                             IVObject::Type type) -> IVInterface * {
+        auto it = std::find_if(importedObjects.constBegin(), importedObjects.constEnd(), [&](IVObject *ivObj) {
+            if (ivObj->isInterface() || ivObj->isInterfaceGroup())
+                return ivObj->title() == ifaceTitle && ivObj->parentObject()->title() == fnTitle
+                        && ivObj->type() == type;
+            return false;
+        });
+        return it == importedObjects.constEnd() ? nullptr : (*it)->as<IVInterface *>();
+    };
 
     IVObject *ivClone = nullptr;
     if (type != IVModel::CloneType::Direct) {
         const shared::Id objectId = IVModel::CloneType::Move == type ? origin->id() : shared::createId();
         ivClone = getObject(objectId);
         if (ivClone)
-            return {};
+            return;
 
         switch (origin->type()) {
         case IVObject::Type::Comment:
@@ -149,9 +162,14 @@ QList<IVObject *> IVModel::clone(IVModel::CloneType type, IVObject *origin, IVFu
 
                 const QString connectionGroupName = connection->groupName();
                 if (!connectionGroupName.isEmpty()) {
-                    if (IVObject *obj = getObjectByName(connectionGroupName, IVObject::Type::ConnectionGroup)) {
-                        if (auto group = obj->as<IVConnectionGroup *>()) {
-                            group->addGroupedConnection(connection);
+                    auto it = std::find_if(
+                            importedObjects.cbegin(), importedObjects.cend(), [&connectionGroupName](IVObject *ivObj) {
+                                return ivObj->title() == connectionGroupName
+                                        && ivObj->type() == IVObject::Type::ConnectionGroup;
+                            });
+                    if (it != importedObjects.cend()) {
+                        if (auto group = (*it)->as<IVConnectionGroup *>()) {
+                            group->addGroupedConnection(connectionClone);
                         }
                     }
                 }
@@ -160,23 +178,16 @@ QList<IVObject *> IVModel::clone(IVModel::CloneType type, IVObject *origin, IVFu
             break;
         case IVObject::Type::ConnectionGroup:
             if (auto connectionGroup = origin->as<IVConnectionGroup *>()) {
-                static const QString token = meta::Props::token(meta::Props::Token::origin);
-                auto sourceIfaceGroup = getObjectByAttributeValue(token, connectionGroup->sourceInterfaceGroup()->id());
-                auto targetIfaceGroup = getObjectByAttributeValue(token, connectionGroup->targetInterfaceGroup()->id());
+                ivm::IVObject *sourceIfaceGroup =
+                        findIface(importedObjects, connectionGroup->sourceInterfaceGroup()->title(),
+                                connectionGroup->sourceName(), connectionGroup->sourceInterfaceGroup()->type());
+                ivm::IVObject *targetIfaceGroup =
+                        findIface(importedObjects, connectionGroup->targetInterfaceGroup()->title(),
+                                connectionGroup->targetName(), connectionGroup->targetInterfaceGroup()->type());
                 if (sourceIfaceGroup && targetIfaceGroup) {
-                    auto ivConnectionGroup = new IVConnectionGroup(connectionGroup->groupName(),
+                    ivClone = new IVConnectionGroup(connectionGroup->groupName(),
                             sourceIfaceGroup->as<IVInterfaceGroup *>(), targetIfaceGroup->as<IVInterfaceGroup *>(), {},
                             parent, objectId);
-
-                    QList<shared::Id> connectionIds;
-                    for (auto connection : connectionGroup->groupedConnections()) {
-                        if (connection) {
-                            connectionIds.append(connection->id());
-                        }
-                    }
-
-                    ivConnectionGroup->initConnections(connectionIds);
-                    ivClone = ivConnectionGroup;
                 }
             }
             break;
@@ -192,24 +203,22 @@ QList<IVObject *> IVModel::clone(IVModel::CloneType type, IVObject *origin, IVFu
                 } else {
                     clonedIfaceGroup->setParentObject(parent);
                 }
-                static const QString token = meta::Props::token(meta::Props::Token::origin);
-
                 for (auto originIface : originIfaceGroup->entities()) {
-                    if (auto clonedObject = getObjectByAttributeValue(token, originIface->id())) {
-                        if (auto clonedIface = clonedObject->as<IVInterfaceGroup *>()) {
-                            clonedIfaceGroup->addEntity(clonedIface);
-                        }
+                    IVInterface *clonedObject = findIface(importedObjects, originIface->title(),
+                            originIface->function()->title(), originIface->type());
+                    if (clonedObject) {
+                        clonedIfaceGroup->addEntity(clonedObject);
                     }
                 }
                 ivClone = clonedIfaceGroup;
             }
             break;
         default:
-            return {};
+            return;
         }
 
         if (!ivClone)
-            return {};
+            return;
 
         if (parent)
             parent->addChild(ivClone);
@@ -237,20 +246,25 @@ QList<IVObject *> IVModel::clone(IVModel::CloneType type, IVObject *origin, IVFu
     } else {
         ivClone = origin;
     }
-    QList<IVObject *> importedObjects { ivClone };
-
+    importedObjects << ivClone;
     if (auto fn = origin->as<IVFunctionType *>()) {
-        auto f = [this](IVObject *obj, IVModel::CloneType type, IVFunctionType *parent,
-                         QList<IVObject *> &importedObjects) { importedObjects << clone(type, obj, parent); };
+        auto f = [this](IVObject *obj, QList<IVObject *> &importedObjects, IVModel::CloneType type,
+                         IVFunctionType *parent) { clone(obj, importedObjects, type, parent); };
 
-        apply(fn->functions(), f, type, ivClone->as<IVFunctionType *>(), importedObjects);
-        apply(fn->functionTypes(), f, type, ivClone->as<IVFunctionType *>(), importedObjects);
-        apply(fn->allInterfaces(), f, type, ivClone->as<IVFunctionType *>(), importedObjects);
-        apply(fn->connectionGroups(), f, type, ivClone->as<IVFunctionType *>(), importedObjects);
-        apply(fn->connections(), f, type, ivClone->as<IVFunctionType *>(), importedObjects);
-        apply(fn->comments(), f, type, ivClone->as<IVFunctionType *>(), importedObjects);
+        auto ivCloneFn = ivClone->as<IVFunctionType *>();
+
+        apply(fn->functions(), f, importedObjects, type, ivCloneFn);
+        apply(fn->functionTypes(), f, importedObjects, type, ivCloneFn);
+        apply(fn->allInterfaces(), f, importedObjects, type, ivCloneFn);
+        apply(fn->connectionGroups(), f, importedObjects, type, ivCloneFn);
+        auto connections { fn->connections() };
+        for (auto group : fn->connectionGroups()) {
+            for (auto connection : group->groupedConnections())
+                connections.append(connection);
+        }
+        apply(connections, f, importedObjects, type, ivCloneFn);
+        apply(fn->comments(), f, importedObjects, type, ivCloneFn);
     }
-    return importedObjects;
 }
 
 bool IVModel::removeObject(shared::VEObject *obj)

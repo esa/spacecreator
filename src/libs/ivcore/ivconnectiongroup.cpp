@@ -63,7 +63,8 @@ bool IVConnectionGroup::aboutToBeRemoved()
     while (!m_connections.isEmpty()) {
         const auto connection = m_connections.takeLast();
         removeConnection(connection);
-        m_initConnections.append(connection->id());
+        if (connection)
+            m_initConnections.append(connection->id());
     }
     return IVObject::aboutToBeRemoved();
 }
@@ -191,10 +192,10 @@ void IVConnectionGroup::removeConnection(const QPointer<IVConnection> &connectio
                     removeTargetIface = false;
                 }
             });
-    if (removeSourceIface) {
+    if (removeSourceIface && sourceInterfaceGroup() && connection->sourceInterface()) {
         sourceInterfaceGroup()->removeEntity(connection->sourceInterface());
     }
-    if (removeTargetIface) {
+    if (removeTargetIface && targetInterfaceGroup() && connection->targetInterface()) {
         targetInterfaceGroup()->removeEntity(connection->targetInterface());
     }
 
