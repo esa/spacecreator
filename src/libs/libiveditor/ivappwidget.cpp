@@ -19,10 +19,13 @@
 
 #include "archetypesmanagerdialog.h"
 #include "breadcrumbwidget.h"
+#include "commands/cmdconnectionitemcreate.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/cmdentitiesimport.h"
 #include "commands/cmdentitiesinstantiate.h"
 #include "commands/cmdentitiesremove.h"
+#include "commands/cmdfunctionitemcreate.h"
+#include "commands/cmdinterfaceitemcreate.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "errorhub.h"
@@ -32,6 +35,7 @@
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivitemmodel.h"
+#include "ivconnection.h"
 #include "ivconnectionlayertype.h"
 #include "ivcreatortool.h"
 #include "iveditattributesdialog.h"
@@ -42,6 +46,7 @@
 #include "ivvisualizationmodelbase.h"
 #include "ivxmlreader.h"
 #include "properties/ivpropertiesdialog.h"
+#include "qitemselectionmodel.h"
 #include "ui_ivappwidget.h"
 
 #include <QAction>
@@ -489,6 +494,218 @@ void IVAppWidget::cutItems()
     m_tool->removeSelectedItems();
 }
 
+void IVAppWidget::wrapItems()
+{
+    m_document->commandsStack()->beginMacro(tr("Wrap selected into Function"));
+
+    /// Prepare items for serialization
+    QBuffer buffer;
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error,
+                tr("Can't open buffer for exporting: %1").arg(buffer.errorString()), QString());
+        return;
+    }
+
+    QList<shared::VEObject *> objects;
+    for (const QModelIndex &index : m_document->objectsSelectionModel()->selection().indexes()) {
+        const int role = static_cast<int>(ive::IVVisualizationModelBase::IdRole);
+        if (ivm::IVObject *object = m_document->objectsModel()->getObject(index.data(role).toUuid())) {
+            objects.append(object);
+        }
+    }
+
+    /// Filter out entities without parent functions selected and standalone connections
+    auto it = std::remove_if(objects.begin(), objects.end(),
+            [&objects, root = m_document->objectsModel()->rootObject()](const shared::VEObject *obj) {
+                if (auto iObj = qobject_cast<const ivm::IVConnection *>(obj)) {
+                    return !objects.contains(iObj->source()) && !objects.contains(iObj->target());
+                }
+
+                return !objects.contains(obj->parentObject()) && obj->parentObject() != root;
+            });
+
+    /// deselect excluded from wrapping items
+    std::for_each(it, objects.end(), [this](const shared::VEObject *obj) {
+        if (auto item = m_document->itemsModel()->getItem(obj->id()))
+            item->setSelected(false);
+    });
+    objects.erase(it, objects.end());
+
+    /// and collect not selected connections to be processed
+    QList<shared::VEObject *> notSelectedConnections;
+    std::for_each(objects.cbegin(), objects.cend(), [&](const shared::VEObject *obj) {
+        if (auto function = obj->as<const ivm::IVFunction *>()) {
+            QVector<ivm::IVConnection *> connections;
+            for (auto iface : function->interfaces())
+                connections << m_document->objectsModel()->getConnectionsForIface(iface->id());
+            std::copy_if(connections.cbegin(), connections.cend(), std::back_inserter(notSelectedConnections),
+                    [&](const ivm::IVConnection *connection) {
+                        return std::find(objects.cbegin(), objects.cend(), connection->target()) != objects.cend()
+                                || std::find(objects.cbegin(), objects.cend(), connection->source()) != objects.cend();
+                    });
+        }
+    });
+    objects << notSelectedConnections;
+
+    /// Calculate rectangle for new function according to selected rectangular items
+    static const QSet<ivm::IVObject::Type> kRectTypes { ivm::IVObject::Type::Function,
+        ivm::IVObject::Type::FunctionType, ivm::IVObject::Type::Comment };
+    QRectF itemSceneRect;
+    for (shared::VEObject *obj : qAsConst(objects)) {
+        if (auto iObj = qobject_cast<ivm::IVObject *>(obj)) {
+            if (kRectTypes.contains(iObj->type())) {
+                itemSceneRect |= shared::graphicsviewutils::rect(iObj->coordinates());
+            }
+        }
+    }
+    /// TODO: check if `itemSceneRect` intersects with some rectangular items in the scene
+    /// then reduce `itemSceneRect` to minimal accepted size and put in the center of wrapped items
+
+    /// Copy connection init info for those which should be splitted
+    const shared::Id wrappingFunctionId = shared::createId();
+    struct ConnectionCreationInfo {
+        shared::Id parentId;
+        shared::Id sourceId;
+        shared::Id targetId;
+    };
+    QList<ivm::IVInterface::CreationInfo> ifacesInfos;
+    QList<ConnectionCreationInfo> connectionsInfos;
+
+    /// Remove duplications
+    for (auto it = objects.begin(); it != objects.end();) {
+        auto dup = std::find(std::next(it), objects.end(), *it);
+        if (dup != objects.end()) {
+            it = objects.erase(it);
+            continue;
+        }
+        ++it;
+    }
+
+    for (auto objIt = objects.begin(); objIt != objects.cend();) {
+        if (auto iObj = qobject_cast<const ivm::IVConnection *>(*objIt)) {
+            if (!objects.contains(iObj->source())) {
+                const QVector<QPointF> intersectionPoints = shared::graphicsviewutils::intersectionPoints(
+                        itemSceneRect, shared::graphicsviewutils::polygon(iObj->coordinates()));
+                ivm::IVInterface::CreationInfo ifaceInfo =
+                        ivm::IVInterface::CreationInfo::fromIface(iObj->targetInterface());
+                if (!intersectionPoints.isEmpty())
+                    ifaceInfo.position = intersectionPoints.front();
+                ifacesInfos.append(ifaceInfo);
+
+                ConnectionCreationInfo outerInfo;
+                outerInfo.sourceId = iObj->sourceInterface()->id();
+                outerInfo.targetId = ifaceInfo.id;
+                outerInfo.parentId = iObj->parentObject() ? iObj->parentObject()->id() : shared::InvalidId;
+                connectionsInfos << outerInfo;
+
+                ConnectionCreationInfo innerInfo;
+                innerInfo.sourceId = ifaceInfo.id;
+                innerInfo.targetId = iObj->targetInterface()->id();
+                innerInfo.parentId = wrappingFunctionId;
+                connectionsInfos << innerInfo;
+
+                objIt = objects.erase(objIt);
+                continue;
+            } else if (!objects.contains(iObj->target())) {
+                const QVector<QPointF> intersectionPoints = shared::graphicsviewutils::intersectionPoints(
+                        itemSceneRect, shared::graphicsviewutils::polygon(iObj->coordinates()));
+                ivm::IVInterface::CreationInfo ifaceInfo =
+                        ivm::IVInterface::CreationInfo::fromIface(iObj->sourceInterface());
+                if (!intersectionPoints.isEmpty())
+                    ifaceInfo.position = intersectionPoints.last();
+                ifacesInfos.append(ifaceInfo);
+
+                ConnectionCreationInfo innerInfo;
+                innerInfo.sourceId = iObj->sourceInterface()->id();
+                innerInfo.targetId = ifaceInfo.id;
+                innerInfo.parentId = wrappingFunctionId;
+                connectionsInfos << innerInfo;
+
+                ConnectionCreationInfo outerInfo;
+                outerInfo.sourceId = ifaceInfo.id;
+                outerInfo.targetId = iObj->targetInterface()->id();
+                outerInfo.parentId = iObj->parentObject() ? iObj->parentObject()->id() : shared::InvalidId;
+                connectionsInfos << outerInfo;
+
+                objIt = objects.erase(objIt);
+                continue;
+            }
+        }
+        ++objIt;
+    }
+    /// Serialize prepared for wrapping items
+    if (!m_document->exporter()->exportObjects(objects, &buffer, m_document->archetypesModel())) {
+        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Error during component export"));
+        return;
+    }
+    buffer.close();
+
+    /// Remove selected items from scene
+    QList<ivm::IVObject *> entities;
+    for (auto ioIt = objects.cbegin(); ioIt != objects.cend(); ++ioIt) {
+        if (auto entity = (*ioIt)->as<ivm::IVObject *>()) {
+            if (entity->isRootObject()) {
+                continue;
+            }
+            if (entity->isFixedSystemElement()) {
+                continue;
+            }
+            if (entity->isInterface()) {
+                if (auto iface = entity->as<const ivm::IVInterface *>()) {
+                    if (iface->isRequiredSystemElement()) {
+                        continue;
+                    }
+                    if (auto srcIface = iface->cloneOf()) {
+                        continue;
+                    }
+                }
+            }
+            entities.append(entity);
+        }
+    }
+    auto cmdRm = new cmd::CmdEntitiesRemove(entities, m_document->objectsModel());
+    cmdRm->setText(tr("Remove selected item(s)"));
+    m_document->commandsStack()->push(cmdRm);
+
+    /// Create Wrapping Function
+    auto root = qobject_cast<ivm::IVFunction *>(m_document->objectsModel()->rootObject());
+    auto cmd = new cmd::CmdFunctionItemCreate(
+            m_document->objectsModel(), root, itemSceneRect, QString(), wrappingFunctionId);
+    if (m_document->commandsStack()->push(cmd)) {
+        /// Inject wrapped items into newly created Function
+        ivm::IVXMLReader parser;
+        if (parser.read(buffer.data())) {
+            QVector<ivm::IVObject *> wrappedObjects = parser.parsedObjects();
+            if (!wrappedObjects.isEmpty()) {
+                ivm::IVObject::sortObjectList(wrappedObjects);
+                auto cmdImport = new cmd::CmdEntitiesImport(ivm::IVModel::CloneType::Direct, wrappedObjects,
+                        m_document->objectsModel()->getFunction(wrappingFunctionId), m_document->objectsModel(),
+                        m_document->asn1Check(), {}, {});
+                if (m_document->commandsStack()->push(cmdImport)) {
+                    auto wrapper = m_document->objectsModel()->getObject(wrappingFunctionId);
+                    Q_ASSERT(wrapper);
+                    std::for_each(ifacesInfos.begin(), ifacesInfos.end(),
+                            [this, fn = wrapper->as<ivm::IVFunctionType *>()](ivm::IVInterface::CreationInfo &info) {
+                                info.function = fn;
+                                auto cmdIfaceCreate = new cmd::CmdInterfaceItemCreate(info);
+                                m_document->commandsStack()->push(cmdIfaceCreate);
+                            });
+
+                    std::for_each(
+                            connectionsInfos.cbegin(), connectionsInfos.cend(), [this](const auto &connectionInfo) {
+                                auto parent = m_document->objectsModel()->getObject(connectionInfo.parentId);
+                                auto cmdConnectionCreate = new cmd::CmdConnectionItemCreate(m_document->objectsModel(),
+                                        qobject_cast<ivm::IVFunction *>(parent), connectionInfo.sourceId,
+                                        connectionInfo.targetId, {});
+                                m_document->commandsStack()->push(cmdConnectionCreate);
+                            });
+                }
+            }
+        }
+    }
+    m_document->commandsStack()->endMacro();
+}
+
 void IVAppWidget::exportToClipboard(const QList<shared::VEObject *> &objects, QMimeData *mimeData)
 {
     QBuffer buffer;
@@ -532,7 +749,6 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
 
     const QByteArray data = mimeData->text().toUtf8();
     ivm::IVXMLReader parser;
-    QString errorString;
     if (parser.read(data)) {
         QVector<ivm::IVObject *> objects = parser.parsedObjects();
         const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
@@ -563,8 +779,8 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
         } else {
             type = ivm::IVModel::CloneType::Direct;
         }
-        auto cmdImport = new cmd::CmdEntitiesImport(type, objects, parentObject, m_document->objectsModel(),
-                m_document->asn1Check(), sceneDropPoint, {} /*, QFileInfo(m_document->path()).absolutePath()*/);
+        auto cmdImport = new cmd::CmdEntitiesImport(
+                type, objects, parentObject, m_document->objectsModel(), m_document->asn1Check(), sceneDropPoint, {});
         m_document->commandsStack()->push(cmdImport);
         if (type != ivm::IVModel::CloneType::Direct) {
             for (auto obj : qAsConst(objects)) {
@@ -583,7 +799,7 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
     }
 
     ivm::IVObject *obj = m_document->objectsModel()->getObject(id);
-    if (!obj || obj->type() == ivm::IVObject::Type::InterfaceGroup || obj->type() == ivm::IVObject::Type::Connection) {
+    if (!obj || obj->isInterfaceGroup() || obj->isConnection()) {
         return;
     }
 
@@ -934,6 +1150,7 @@ QVector<QAction *> IVAppWidget::initActions()
     connect(m_tool, &IVCreatorTool::informUser, m_document.data(), &InterfaceDocument::showInfoMessage);
     connect(m_tool, &IVCreatorTool::copyActionTriggered, this, &IVAppWidget::copyItems);
     connect(m_tool, &IVCreatorTool::cutActionTriggered, this, &IVAppWidget::cutItems);
+    connect(m_tool, &IVCreatorTool::wrapSelectedItemsTriggered, this, &IVAppWidget::wrapItems);
     connect(m_tool, &IVCreatorTool::pasteActionTriggered, this, qOverload<const QPointF &>(&IVAppWidget::pasteItems));
 
     auto actCreateFunctionType = new QAction(tr("Function Type"));

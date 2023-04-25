@@ -88,36 +88,6 @@ CmdEntitiesImport::CmdEntitiesImport(ivm::IVModel::CloneType type, const QList<i
     }
 }
 
-// CmdEntitiesImport::CmdEntitiesImport(
-//         const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model, const QPointF &pos)
-//     : ASN1ComponentsImport(nullptr, shared::componentsLibraryPath(), QString())
-//     , QUndoCommand()
-//     , m_type(ivm::IVModel::CloneType::Direct)
-//     , m_model(model)
-//     , m_parent(parent)
-//{
-//     ivm::IVXMLReader parser;
-//     QString errorString;
-//     if (parser.read(data)) {
-//         QVector<ivm::IVObject *> objects = parser.parsedObjects();
-//         const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
-//         ivm::IVObject::sortObjectList(objects);
-//         for (ivm::IVObject *obj : qAsConst(objects)) {
-//             const EntityAttributes attrs = extAttrs.value(obj->id());
-//             for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
-//                 obj->setEntityAttribute(attrIt.value());
-//             }
-//         }
-//         if (init(objects, pos, &errorString)) {
-//             return;
-//         }
-//     } else {
-//         errorString = parser.errorString();
-//     }
-//     shared::ErrorHub::addError(shared::ErrorItem::Error, errorString, "");
-//     setObsolete(true);
-// }
-
 bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPointF &pos, QString *errorString)
 {
     if (objects.isEmpty()) {

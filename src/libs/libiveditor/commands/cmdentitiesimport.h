@@ -41,8 +41,6 @@ public:
     explicit CmdEntitiesImport(ivm::IVModel::CloneType type, const QList<ivm::IVObject *> &entities,
             ivm::IVFunctionType *parent, ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos,
             const QString &destPath);
-    //    explicit CmdEntitiesImport(
-    //            const QByteArray &data, ivm::IVFunctionType *parent, ivm::IVModel *model, const QPointF &pos);
     ~CmdEntitiesImport() override;
 
     void redo() override;

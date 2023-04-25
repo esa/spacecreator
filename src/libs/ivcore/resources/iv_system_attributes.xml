@@ -158,7 +158,7 @@
     </Attr>
     <Attr name="Style::Text::alignment" type="property" visible="false" editable="false" export="UI" optional="true">
         <Type>
-            <Enumeration>
+            <Enumeration defaultValue="TopLeft">
                 <Entry value="Center"/>
                 <Entry value="Left"/>
                 <Entry value="TopLeft"/>

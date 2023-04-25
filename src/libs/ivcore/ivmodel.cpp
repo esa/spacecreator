@@ -100,7 +100,7 @@ constexpr decltype(auto) apply(Container &&c, F &&f, Args &&...args)
     std::for_each(std::begin(c), std::end(c), [&](const auto &t) { f(t, args...); });
 }
 
-QList<IVObject *> IVModel::clone(IVModel::CloneType type, IVObject *origin, IVFunctionType *parent, const QPointF &pos)
+QList<IVObject *> IVModel::clone(IVModel::CloneType type, IVObject *origin, IVFunctionType *parent, const QPointF &pos) const
 {
     if (!origin || type == IVModel::CloneType::Unknown)
         return {};

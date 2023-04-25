@@ -73,6 +73,7 @@ private Q_SLOTS:
     void renameSelectedLayer(QStandardItem *item);
     void copyItems();
     void cutItems();
+    void wrapItems();
     void exportToClipboard(const QList<shared::VEObject *> &objects, QMimeData *mimeData = nullptr);
     void pasteItems();
     void pasteItems(const QPointF &sceneDropPoint);

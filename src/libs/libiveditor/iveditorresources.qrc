@@ -47,5 +47,6 @@
         <file>icns/nested_view.svg</file>
         <file>icns/shrink.svg</file>
         <file>icns/ungroup_connections.svg</file>
+        <file>icns/wrap_function.svg</file>
     </qresource>
 </RCC>
