@@ -368,27 +368,21 @@ void IVLayerVisualizationModel::onDataChanged(
 
     if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
         if (item->isCheckable()) {
-            const auto encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, item->text());
+
+            const auto rawLayerName = item->text();
+            const auto encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, rawLayerName);
             const auto layerIsChecked = item->checkState() == Qt::Checked;
+            const auto ivModel = qobject_cast<ivm::IVModel *>(m_veModel);
 
             setObjectsVisibility(encodedLayerName, layerIsChecked);
 
-            ivm::IVObject *layerObj { nullptr };
-
-            for (auto obj : m_veModel->objects()) {
-                auto ivObj = qobject_cast<ivm::IVObject *>(obj);
-
-                if(ivObj->title() == encodedLayerName) {
-                    layerObj = ivObj;
-                    break;
-                }
-            }
-
-            if(layerObj) {
+            if(ivm::IVObject *layerObj = ivModel->getObjectByName(encodedLayerName, ivm::IVObject::Type::ConnectionLayer, Qt::CaseSensitivity::CaseSensitive)) {
                 layerObj->setVisible(layerIsChecked);
                 
                 auto command = new ive::cmd::CmdChangeLayerVisibility();
                 m_commandsStack->push(command);
+            } else {
+                qWarning() << "Can't find " << rawLayerName << " layer";
             }
         }
     }

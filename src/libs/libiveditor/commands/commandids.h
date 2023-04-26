@@ -30,6 +30,7 @@ enum Id
     CreateConnectionGroupEntity,
     ChangeConnectionGroupEntity,
     ManageConnectionLayer,
+    ChangeLayerVisibility,
     RemoveEntity,
     ChangeRootEntity,
 
@@ -59,8 +60,6 @@ enum Id
     ImportEntities,
     InstantiateEntities,
     ReferenceEntities,
-
-    ChangeLayerVisibility,
 
     LastId
 };

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2023 European Space Agency - <maxime.perrotin@esa.int>
+ Copyright (C) 2023 N7 Space Sp. z o.o.
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
