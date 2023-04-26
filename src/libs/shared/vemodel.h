@@ -42,6 +42,7 @@ public:
     virtual bool removeObject(VEObject *obj);
     virtual VEObject *getObject(const shared::Id &id) const;
     virtual void clear();
+
     /**
      * @brief Lookup for an object that has an attribute `attrName` with `value` set
      */
@@ -55,17 +56,42 @@ public:
     EntityAttributes extEntityAttributes(const shared::Id &id) const;
 
 public:
-    template<typename T>
-    void initFromObjects(const QVector<T> &objects, const QHash<shared::Id, EntityAttributes> &extAttrs = {})
+    template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,
+            typename = std::enable_if_t<std::is_base_of_v<VEObject, typename std::remove_pointer<T>::type>>>
+    static T getObjectByAttributeValue(const C &objects, const QString &attrName, const QVariant &value)
+    {
+        const auto it = std::find_if(std::cbegin(objects), std::cend(objects),
+                [&](const T &object) { return object->entityAttributeValue(attrName) == value; });
+        if (it != std::cend(objects))
+            return *it;
+
+        return {};
+    }
+
+    template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,
+            typename = std::enable_if_t<std::is_base_of_v<VEObject, typename std::remove_pointer<T>::type>>>
+    static T getObject(const C &objects, const shared::Id &id)
+    {
+        const auto it = std::find_if(
+                std::cbegin(objects), std::cend(objects), [&id](const T &object) { return object->id() == id; });
+        if (it != std::cend(objects))
+            return *it;
+
+        return {};
+    }
+
+    template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,
+            typename = std::enable_if_t<std::is_base_of_v<VEObject, typename std::remove_pointer<T>::type>>>
+    void initFromObjects(const C &objects, const QHash<shared::Id, EntityAttributes> &extAttrs = {})
     {
         clear();
         setExtAttributes(extAttrs);
         addObjects(objects);
     }
 
-    template<typename T,
+    template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,
             typename = std::enable_if_t<std::is_base_of_v<VEObject, typename std::remove_pointer<T>::type>>>
-    void addObjects(const QVector<T> &objects)
+    auto addObjects(const C &objects)
     {
         QVector<T> addedObjects;
         for (auto obj : objects) {

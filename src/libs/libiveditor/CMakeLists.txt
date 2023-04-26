@@ -8,8 +8,6 @@ target_sources(${LIB_NAME} PRIVATE
     asn1dialog.ui
     commands/cmdchangeasn1file.cpp
     commands/cmdchangeasn1file.h
-    commands/cmdchangelayervisibility.cpp
-    commands/cmdchangelayervisibility.h
     commands/cmdcommentitemcreate.cpp
     commands/cmdcommentitemcreate.h
     commands/cmdconnectiongroupitemchange.cpp
@@ -79,6 +77,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/implementationshandler.h
     commandsstack.cpp
     commandsstack.h
+    componentmodel.cpp
+    componentmodel.h
     context/action/action.cpp
     context/action/action.h
     context/action/actionsmanager.cpp

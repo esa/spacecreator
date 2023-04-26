@@ -385,7 +385,7 @@ void CmdEntitiesImport::prepareConnectionType(ivm::IVObject *obj, const QVector<
 QList<QRectF> CmdEntitiesImport::existingModelRects() const
 {
     QList<QRectF> existingRects;
-    for (const auto &obj : m_model->allObjectsByType<shared::VEObject>()) {
+    for (const auto &obj : m_model->objects()) {
         if (obj->parentObject() == m_parent && isRectangularType(obj->as<ivm::IVObject *>())) {
             const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
             if (objRect.isValid()) {

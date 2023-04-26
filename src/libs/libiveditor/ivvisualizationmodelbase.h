@@ -88,7 +88,7 @@ private Q_SLOTS:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
 private:
-    void setObjectsVisibility(const QString &encodedLayerName, const bool &isVisible);
+    void setObjectsVisibility(const QString &layerName, ivm::IVModel *objectsModel, const bool &isVisible);
 
 private:
     ivm::IVModel *m_objectsModel;

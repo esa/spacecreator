@@ -18,7 +18,6 @@
 #include "ivvisualizationmodelbase.h"
 
 #include "commands/cmdentityattributeschange.h"
-#include "commands/cmdchangelayervisibility.h"
 #include "commandsstack.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -336,15 +335,12 @@ IVLayerVisualizationModel::IVLayerVisualizationModel(
 QList<QStandardItem *> IVLayerVisualizationModel::createItems(shared::VEObject *obj)
 {
     QList<QStandardItem *> items = IVVisualizationModelBase::createItems(obj);
-    ivm::IVObject *ivObj = qobject_cast<ivm::IVObject *>(obj);
-
     if (!items.isEmpty()) {
         items[0]->setEditable(true);
         items[0]->setCheckable(true);
         items[0]->setDragEnabled(false);
-        items[0]->setData(ivObj->isVisible() ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+        items[0]->setData(Qt::Checked, Qt::CheckStateRole);
     }
-
     return items;
 }
 
@@ -352,7 +348,7 @@ void IVLayerVisualizationModel::onDataChanged(
         const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     if (!m_commandsStack) {
-        qWarning() << Q_FUNC_INFO << "No command stack set in IVLayerVisualizationModel";
+        qWarning() << Q_FUNC_INFO << "No command stack set in VisualizationModel";
         return;
     }
 
@@ -365,32 +361,19 @@ void IVLayerVisualizationModel::onDataChanged(
     if (!item) {
         return;
     }
-
     if (roles.contains(Qt::CheckStateRole) || roles.contains(Qt::DisplayRole) || roles.isEmpty()) {
         if (item->isCheckable()) {
-
-            const auto rawLayerName = item->text();
-            const auto encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, rawLayerName);
-            const auto layerIsChecked = item->checkState() == Qt::Checked;
-            const auto ivModel = qobject_cast<ivm::IVModel *>(m_veModel);
-
-            setObjectsVisibility(encodedLayerName, layerIsChecked);
-
-            if(ivm::IVObject *layerObj = ivModel->getObjectByName(encodedLayerName, ivm::IVObject::Type::ConnectionLayer, Qt::CaseSensitivity::CaseSensitive)) {
-                layerObj->setVisible(layerIsChecked);
-                
-                auto command = new ive::cmd::CmdChangeLayerVisibility();
-                m_commandsStack->push(command);
-            } else {
-                qWarning() << "Can't find " << rawLayerName << " layer";
-            }
+            setObjectsVisibility(item->text(), m_objectsModel, item->checkState() == Qt::Checked);
         }
     }
 }
 
-void IVLayerVisualizationModel::setObjectsVisibility(const QString &encodedLayerName, const bool &isVisible)
+void IVLayerVisualizationModel::setObjectsVisibility(
+        const QString &layerName, ivm::IVModel *objectsModel, const bool &isVisible)
 {
-    for (auto entity : m_objectsModel->objects()) {
+    const QString encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, layerName);
+
+    for (auto entity : objectsModel->objects()) {
         auto ivObject = qobject_cast<ivm::IVObject *>(entity);
 
         switch (ivObject->type()) {

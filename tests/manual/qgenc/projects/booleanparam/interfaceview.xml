@@ -1,0 +1,44 @@
+<InterfaceView asn1file="booleanparam.acn">
+<Function name="Controller" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" startup_priority="1" required_system_element="NO" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="17500 32500 37500 40500"/>
+<Provided_Interface name="Trigger" kind="Cyclic" layer="default" priority="1" wcet="0" required_system_element="NO" stack_size="1024">
+    <Property name="Taste::coordinates" value="27000 32500"/>
+</Provided_Interface>
+
+<Required_Interface name="Iface" kind="Protected" layer="default" wcet="0" required_system_element="NO">
+    <Input_Parameter name="input" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="output" type="MyBool" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="37500 36700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function name="QGenC" is_type="NO" language="QGenC" default_implementation="default" fixed_system_element="NO" startup_priority="1" required_system_element="NO" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="53400 27900 73400 35900"/>
+<Provided_Interface name="Iface" kind="Protected" layer="default" wcet="0" required_system_element="NO">
+    <Input_Parameter name="input" type="MyBool" encoding="NATIVE"/>
+    <Output_Parameter name="output" type="MyBool" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="53400 30700"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="QGenC"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Controller" ri_name="Iface"/>
+    <Target func_name="QGenC" pi_name="Iface"/>
+    <Property name="Taste::coordinates" value="38100 36700 45600 36700 45600 30700 53100 30700"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3" required_system_element="NO">
+    <Property name="Taste::coordinates" value="4800 5100 46100 20700"/>
+</Comment>
+
+</InterfaceView>

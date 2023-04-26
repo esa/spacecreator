@@ -1,0 +1,8 @@
+REALPARAM-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+   MyInteger ::= INTEGER (0 .. 10000)
+   MyReal      ::= REAL (0.0 .. 1000.0)
+
+END
+

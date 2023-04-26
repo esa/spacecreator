@@ -41,9 +41,4 @@ QString ExportableIVConnectionLayerType::connectionLayerName() const
     return exportedObject<ivm::IVConnectionLayerType>()->title();
 }
 
-bool ExportableIVConnectionLayerType::connectionLayerVisibility() const
-{
-    return exportedObject<ivm::IVConnectionLayerType>()->isVisible();
-}
-
 }

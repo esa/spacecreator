@@ -30,7 +30,6 @@ enum Id
     CreateConnectionGroupEntity,
     ChangeConnectionGroupEntity,
     ManageConnectionLayer,
-    ChangeLayerVisibility,
     RemoveEntity,
     ChangeRootEntity,
 

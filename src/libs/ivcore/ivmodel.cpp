@@ -36,11 +36,11 @@ namespace ivm {
 
 struct IVModelPrivate {
     shared::PropertyTemplateConfig *m_dynPropConfig { nullptr };
-    IVModel *m_componentModel { nullptr };
-    IVModel *m_sharedTypesModel { nullptr };
-    shared::Id m_rootObjectId;
+    IVModel *m_layersModel { nullptr };
+    shared::Id m_rootObjectId { shared::InvalidId };
+    QVector<IVObject *> m_components;
+    QVector<IVObject *> m_sharedTypes;
     QList<IVObject *> m_visibleObjects;
-    IVModel *m_layersModel;
 };
 
 IVModel::IVModel(
@@ -49,9 +49,6 @@ IVModel::IVModel(
     , d(new IVModelPrivate)
 {
     d->m_dynPropConfig = dynPropConfig;
-    d->m_componentModel = componentModel;
-    d->m_sharedTypesModel = sharedModel;
-    d->m_layersModel = nullptr;
 }
 
 IVModel::~IVModel() { }
@@ -321,6 +318,16 @@ shared::Id IVModel::rootObjectId() const
     return d->m_rootObjectId;
 }
 
+QVector<IVObject *> IVModel::externalSharedTypes() const
+{
+    return d->m_sharedTypes;
+}
+
+QVector<IVObject *> IVModel::externalComponents() const
+{
+    return d->m_components;
+}
+
 IVObject *IVModel::getObject(const shared::Id &id) const
 {
     return qobject_cast<IVObject *>(shared::VEModel::getObject(id));
@@ -328,7 +335,9 @@ IVObject *IVModel::getObject(const shared::Id &id) const
 
 IVObject *IVModel::getOrigin(const shared::Id &id) const
 {
-    return d->m_componentModel ? d->m_componentModel->getObject(id) : nullptr;
+    auto it = std::find_if(d->m_components.cbegin(), d->m_components.cend(),
+            [&id](const IVObject *ivObj) { return ivObj->id() == id; });
+    return it == d->m_components.cend() ? nullptr : *it;
 }
 
 IVObject *IVModel::getObjectByName(const QString &name, IVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
@@ -416,14 +425,18 @@ IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
 
 IVFunctionType *IVModel::getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(
-                   d->m_sharedTypesModel->getObjectByName(name, IVObject::Type::FunctionType, caseSensitivity))
-                                 : nullptr;
+    if (auto obj = getObjectByName(d->m_sharedTypes, name, IVObject::Type::FunctionType, caseSensitivity))
+        return obj->as<IVFunctionType *>();
+
+    return nullptr;
 }
 
 IVFunctionType *IVModel::getSharedFunctionType(const shared::Id &id) const
 {
-    return d->m_sharedTypesModel ? qobject_cast<IVFunction *>(d->m_sharedTypesModel->getObject(id)) : nullptr;
+    if (auto obj = VEModel::getObject(d->m_sharedTypes, id))
+        return obj->as<IVFunctionType *>();
+
+    return nullptr;
 }
 
 QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunction *fnObj) const
@@ -455,14 +468,11 @@ QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunc
         }
     }
 
-    if (d->m_sharedTypesModel) {
-        const auto sharedObjects = d->m_sharedTypesModel->objects();
-        for (auto sharedObject : sharedObjects) {
-            if (sharedObject->parentObject() == nullptr) {
-                if (auto fnType = sharedObject->as<IVFunctionType *>()) {
-                    if (fnType->isFunctionType()) {
-                        result[fnType->title()] = fnType;
-                    }
+    for (auto sharedObject : externalSharedTypes()) {
+        if (sharedObject->parentObject() == nullptr) {
+            if (auto fnType = sharedObject->as<IVFunctionType *>()) {
+                if (fnType->isFunctionType()) {
+                    result[fnType->title()] = fnType;
                 }
             }
         }
@@ -561,16 +571,6 @@ IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) co
         }
     }
     return nullptr;
-}
-
-IVModel *IVModel::getComponentsModel() const
-{
-    return d->m_componentModel;
-}
-
-void IVModel::setComponentsModel(IVModel *model)
-{
-    d->m_componentModel = model;
 }
 
 QVector<IVArchetypeLibraryReference *> IVModel::getArchetypeLibraryReferences()

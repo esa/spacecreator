@@ -69,6 +69,9 @@
 
 namespace ive {
 
+struct Library {
+};
+
 struct InterfaceDocument::InterfaceDocumentPrivate {
     cmd::CommandsStack *commandsStack { nullptr };
 
@@ -79,9 +82,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     IVVisualizationModelBase *objectsVisualizationModel { nullptr };
     QItemSelectionModel *objectsSelectionModel { nullptr };
     ivm::IVModel *objectsModel { nullptr };
-    ivm::IVModel *importModel { nullptr };
     IVVisualizationModelBase *importVisualisationModel { nullptr };
-    ivm::IVModel *sharedModel { nullptr };
     IVVisualizationModelBase *sharedVisualisationModel { nullptr };
     IVExporter *exporter { nullptr };
     ivm::IVModel *layersModel { nullptr };
@@ -93,8 +94,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QString mscFileName;
     QString uiFileName { shared::kDefaultInterfaceViewUIFileName };
     QStringList asnFilesNames;
-    QHash<shared::Id, QString> componentsPaths;
-    QHash<shared::Id, QString> sharedTypesPaths;
+    Library componentsLibrary;
+    Library sharedTypesLibrary;
 };
 
 void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
@@ -160,8 +161,6 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     d->dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
-    d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
-    d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, d->importModel, this);
     d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
     d->archetypesModel = new ivm::ArchetypeModel(this);
@@ -1215,12 +1214,12 @@ ivm::IVObject *InterfaceDocument::reloadComponent(ivm::IVObject *obj)
 
 QString InterfaceDocument::componentPath(const shared::Id &id) const
 {
-    return d->componentsPaths.value(id);
+    return d->componentsLibrary.components.value(id).componentPath;
 }
 
 QString InterfaceDocument::sharedTypePath(const shared::Id &id) const
 {
-    return d->sharedTypesPaths.value(id);
+    return d->sharedTypesLibrary.components.value(id).componentPath;
 }
 
 void InterfaceDocument::generateArchetypeLibrary(
