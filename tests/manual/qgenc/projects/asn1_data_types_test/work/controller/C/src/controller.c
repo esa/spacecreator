@@ -139,7 +139,7 @@ void sequencesTestCase()
         asn1SccChoiceOfVarSizeSeqOfsObj
     };
 
-    asn1SccSeqAliases              		               out1;
+    asn1SccSeqAliases                                  out1;
     asn1SccSeqBuiltIn                                  out2;
     asn1SccSeqOfFixedSizeSeqOfsProvidedInterface       out3;
     asn1SccSeqOfVarSizeSeqOfsProvidedInterface         out4;
@@ -433,42 +433,42 @@ void sequencesOfFixedSizeTestCase()
     const asn1SccSeqOfSeqOfFixedSizeChoiceBuiltIn                   in35 = asn1SccSeqOfSeqOfFixedSizeChoiceBuiltInObj;
     const asn1SccSeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn              in36 = asn1SccSeqOfSeqOfSeqOfFixedSizeChoiceBuiltInObj;
 
-    asn1SccSeqOfFixedSizeBoolAlias								    out1;
-    asn1SccSeqOfSeqOfFixedSizeBoolAlias							    out2;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeBoolAlias					    out3;
-    asn1SccSeqOfFixedSizeIntegerAlias							    out4;
-    asn1SccSeqOfSeqOfFixedSizeIntegerAlias						    out5;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeIntegerAlias					    out6;
-    asn1SccSeqOfFixedSizeRealAlias								    out7;
-    asn1SccSeqOfSeqOfFixedSizeRealAlias							    out8;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeRealAlias					    out9;
-    asn1SccSeqOfFixedSizeIA5StringFixedSizeAlias				    out10;
-    asn1SccSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias			    out11;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias		    out12;
-    asn1SccSeqOfFixedSizeIA5StringVarSizeAlias					    out13;
-    asn1SccSeqOfSeqOfFixedSizeIA5StringVarSizeAlias				    out14;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias		    out15;
-    asn1SccSeqOfFixedSizeOctetStringFixedSizeAlias				    out16;
-    asn1SccSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias			    out17;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias	    out18;
-    asn1SccSeqOfFixedSizeOctetStringVarSizeAlias				    out19;
-    asn1SccSeqOfSeqOfFixedSizeOctetStringVarSizeAlias			    out20;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias		    out21;
-    asn1SccSeqOfFixedSizeEnumAlias								    out22;
-    asn1SccSeqOfSeqOfFixedSizeEnumAlias							    out23;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeEnumAlias					    out24;
-    asn1SccSeqOfFixedSizeSeqAliases								    out25;
-    asn1SccSeqOfSeqOfFixedSizeSeqAliases						    out26;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeSeqAliases					    out27;
-    asn1SccSeqOfFixedSizeSeqBuiltIn								    out28;
-    asn1SccSeqOfSeqOfFixedSizeSeqBuiltIn						    out29;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeSeqBuiltIn					    out30;
-    asn1SccSeqOfFixedSizeChoiceAliases							    out31;
-    asn1SccSeqOfSeqOfFixedSizeChoiceAliases						    out32;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeChoiceAliases				    out33;
-    asn1SccSeqOfFixedSizeChoiceBuiltIn							    out34;
-    asn1SccSeqOfSeqOfFixedSizeChoiceBuiltIn						    out35;
-    asn1SccSeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn				    out36;
+    asn1SccSeqOfFixedSizeBoolAlias                                  out1;
+    asn1SccSeqOfSeqOfFixedSizeBoolAlias                             out2;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeBoolAlias                        out3;
+    asn1SccSeqOfFixedSizeIntegerAlias                               out4;
+    asn1SccSeqOfSeqOfFixedSizeIntegerAlias                          out5;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeIntegerAlias                     out6;
+    asn1SccSeqOfFixedSizeRealAlias                                  out7;
+    asn1SccSeqOfSeqOfFixedSizeRealAlias                             out8;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeRealAlias                        out9;
+    asn1SccSeqOfFixedSizeIA5StringFixedSizeAlias                    out10;
+    asn1SccSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias               out11;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeIA5StringFixedSizeAlias          out12;
+    asn1SccSeqOfFixedSizeIA5StringVarSizeAlias                      out13;
+    asn1SccSeqOfSeqOfFixedSizeIA5StringVarSizeAlias                 out14;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeIA5StringVarSizeAlias            out15;
+    asn1SccSeqOfFixedSizeOctetStringFixedSizeAlias                  out16;
+    asn1SccSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias             out17;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeOctetStringFixedSizeAlias        out18;
+    asn1SccSeqOfFixedSizeOctetStringVarSizeAlias                    out19;
+    asn1SccSeqOfSeqOfFixedSizeOctetStringVarSizeAlias               out20;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeOctetStringVarSizeAlias          out21;
+    asn1SccSeqOfFixedSizeEnumAlias                                  out22;
+    asn1SccSeqOfSeqOfFixedSizeEnumAlias                             out23;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeEnumAlias                        out24;
+    asn1SccSeqOfFixedSizeSeqAliases                                 out25;
+    asn1SccSeqOfSeqOfFixedSizeSeqAliases                            out26;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeSeqAliases                       out27;
+    asn1SccSeqOfFixedSizeSeqBuiltIn                                 out28;
+    asn1SccSeqOfSeqOfFixedSizeSeqBuiltIn                            out29;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeSeqBuiltIn                       out30;
+    asn1SccSeqOfFixedSizeChoiceAliases                              out31;
+    asn1SccSeqOfSeqOfFixedSizeChoiceAliases                         out32;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeChoiceAliases                    out33;
+    asn1SccSeqOfFixedSizeChoiceBuiltIn                              out34;
+    asn1SccSeqOfSeqOfFixedSizeChoiceBuiltIn                         out35;
+    asn1SccSeqOfSeqOfSeqOfFixedSizeChoiceBuiltIn                    out36;
 
     controller_RI_pi_seqOfFixedSizeIface(
                                          &in1,   &in2,   &in3,
