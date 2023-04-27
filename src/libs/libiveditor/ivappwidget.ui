@@ -52,8 +52,8 @@
          </property>
          <widget class="QTreeView" name="layerView"/>
          <widget class="QTreeView" name="objectsView"/>
-         <widget class="shared::ui::ObjectsTreeView" name="importView"/>
-         <widget class="shared::ui::ObjectsTreeView" name="sharedView"/>
+         <widget class="shared::ui::ComponentTreeView" name="importView"/>
+         <widget class="shared::ui::ComponentTreeView" name="sharedView"/>
         </widget>
        </item>
       </layout>

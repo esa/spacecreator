@@ -22,19 +22,37 @@
 #include <QStandardItemModel>
 #include <memory>
 
+namespace ivm {
 class IVObject;
+}
 
+namespace ive {
 struct ComponentModelPrivate;
 class ComponentModel : public QStandardItemModel
 {
 public:
-    explicit ComponentModel(QObject *parent = nullptr);
+    enum Roles
+    {
+        IdRole = Qt::UserRole + 1,
+        TypeRole,
+        CursorPixmapRole,
+        DropRole,
+        PathRole,
+    };
+
+    explicit ComponentModel(const QString &modelName, QObject *parent = nullptr);
     ~ComponentModel() override = default;
 
-    IVObject *getObject(const shared::Id &id);
-    bool load(const QString &path);
-    bool loadComponent(const QString &path);
+    QString objectPath(const shared::Id &id) const;
+    QString libraryPath() const;
+    ivm::IVObject *getObject(const shared::Id &id);
+    void load(const QString &path);
+
+private:
+    QStandardItem *loadComponent(const QString &path);
 
 private:
     const std::unique_ptr<ComponentModelPrivate> d;
 };
+
+} // namespace ive

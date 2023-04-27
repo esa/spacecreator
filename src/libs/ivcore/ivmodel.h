@@ -52,8 +52,7 @@ public:
         Move,
     };
 
-    explicit IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel = nullptr,
-            IVModel *componentModel = nullptr, QObject *parent = nullptr);
+    explicit IVModel(shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
     ~IVModel() override;
 
     bool removeObject(shared::VEObject *obj) override;

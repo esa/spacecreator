@@ -22,11 +22,11 @@
 namespace shared {
 namespace ui {
 
-class ObjectsTreeView : public QTreeView
+class ComponentTreeView : public QTreeView
 {
     Q_OBJECT
 public:
-    explicit ObjectsTreeView(QWidget *parent = nullptr);
+    explicit ComponentTreeView(QWidget *parent = nullptr);
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

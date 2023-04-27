@@ -43,8 +43,7 @@ struct IVModelPrivate {
     QList<IVObject *> m_visibleObjects;
 };
 
-IVModel::IVModel(
-        shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel, IVModel *componentModel, QObject *parent)
+IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : shared::VEModel(parent)
     , d(new IVModelPrivate)
 {
