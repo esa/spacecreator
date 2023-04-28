@@ -43,28 +43,17 @@ class IVModel : public shared::VEModel, public conversion::Model
 {
     Q_OBJECT
 public:
-    enum class CloneType
-    {
-        Unknown,
-        Direct,
-        Copy,
-        Reference,
-        Move,
-    };
-
     explicit IVModel(shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
     ~IVModel() override;
 
     bool removeObject(shared::VEObject *obj) override;
+    void setSharedTypeRequester(const std::function<QVector<IVFunctionType *>()> &requester);
 
     void setRootObject(shared::Id rootId);
     IVObject *rootObject() const;
     shared::Id rootObjectId() const;
-    QVector<IVObject *> externalSharedTypes() const;
-    QVector<IVObject *> externalComponents() const;
 
     IVObject *getObject(const shared::Id &id) const override;
-    IVObject *getOrigin(const shared::Id &id) const;
     IVObject *getObjectByName(const QString &name, IVObject::Type type = IVObject::Type::Unknown,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 
@@ -92,7 +81,6 @@ public:
     IVFunctionType *getFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
     IVFunctionType *getFunctionType(const shared::Id &id) const;
     IVFunctionType *getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
-    IVFunctionType *getSharedFunctionType(const shared::Id &id) const;
     QHash<QString, IVFunctionType *> getAvailableFunctionTypes(const IVFunction *fnObj) const;
     IVInterface *getInterface(const shared::Id &id) const;
     IVInterfaceRequired *getRequiredInterface(const shared::Id &id) const;
@@ -134,8 +122,9 @@ public:
     QString defaultFunctionLanguage() const;
     QStringList availableFunctionLanguages() const;
 
-    void clone(IVObject *origin, QList<IVObject *> &importedObjects, CloneType type, IVFunctionType *parent = nullptr,
-            const QPointF &pos = {}) const;
+    //    void clone(IVObject *origin, QList<IVObject *> &importedObjects, CloneType type, IVFunctionType *parent =
+    //    nullptr,
+    //            const QPointF &pos = {}) const;
 
 Q_SIGNALS:
     void rootObjectChanged(shared::Id rootId);

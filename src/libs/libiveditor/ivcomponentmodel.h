@@ -26,12 +26,23 @@ class IVComponentModel : public shared::ComponentModel
 {
     Q_OBJECT
 public:
-    explicit IVComponentModel(const QString &modelName, QObject *parent = nullptr);
+    enum Type
+    {
+        ComponentLibrary,
+        SharedTypesLibrary,
+    };
+    explicit IVComponentModel(Type type, const QString &modelName, QObject *parent = nullptr);
 
     ivm::IVObject *getObject(const shared::Id &id) override;
 
 protected:
     QStandardItem *loadComponent(const QString &path) override;
+
+private:
+    QStandardItem *processObject(ivm::IVObject *ivObject);
+
+private:
+    Type m_type;
 };
 
 } // namespace ive

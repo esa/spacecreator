@@ -59,6 +59,9 @@ public:
     void removeComponent(const shared::Id &id);
     void reloadComponent(const shared::Id &id);
 
+    QList<Id> componentIDs() const;
+    QSharedPointer<Component> component(const shared::Id &id) const;
+
 protected:
     virtual QStandardItem *loadComponent(const QString &path) = 0;
     void addComponent(QSharedPointer<Component> component);

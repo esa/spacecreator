@@ -162,9 +162,19 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     d->dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
-    d->componentsModel = new IVComponentModel(tr("Components"), this);
-    d->sharedTypesModel = new IVComponentModel(tr("Shared Types"), this);
+    d->componentsModel = new IVComponentModel(IVComponentModel::Type::ComponentLibrary, tr("Components"), this);
+    d->sharedTypesModel = new IVComponentModel(IVComponentModel::Type::SharedTypesLibrary, tr("Shared Types"), this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, this);
+    d->objectsModel->setSharedTypeRequester([this]() -> QVector<ivm::IVFunctionType *> {
+        QVector<ivm::IVFunctionType *> fnTypes;
+        for (const shared::Id &id : d->sharedTypesModel->componentIDs()) {
+            for (auto object : qAsConst(d->sharedTypesModel->component(id)->objects)) {
+                if (auto fnType = qobject_cast<ivm::IVFunctionType *>(object))
+                    fnTypes << fnType;
+            }
+        }
+        return fnTypes;
+    });
     d->layersModel = new ivm::IVModel(d->dynPropConfig, this);
     d->archetypesModel = new ivm::ArchetypeModel(this);
 
@@ -172,7 +182,7 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
         for (const shared::Id &id : objectsIds) {
             if (auto obj = d->objectsModel->getObject(id)) {
                 if (obj->isReference()) {
-                    checkReferencedASN1Files(d->objectsModel->getOrigin(obj->origin()));
+                    checkReferencedASN1Files(obj);
                 }
             }
         }
@@ -1155,50 +1165,14 @@ void InterfaceDocument::loadArchetypes()
     }
 }
 
-// ivm::IVObject *InterfaceDocument::reloadComponent(ivm::IVObject *obj)
-//{
-//     if (!obj)
-//         return nullptr;
-
-//    const shared::Id id = obj->id();
-//    if (auto model = obj->model()) {
-//        QString path;
-//        if (model == d->importModel)
-//            path = componentPath(id);
-//        else if (model == d->sharedModel)
-//            path = sharedTypePath(id);
-
-//        if (path.isEmpty())
-//            return obj;
-
-//        const QVector<shared::VEObject *> children = obj->descendants();
-//        QList<ivm::IVObject *> ivChildren;
-//        std::for_each(children.cbegin(), children.cend(),
-//                [&ivChildren](shared::VEObject *obj) { ivChildren.append(obj->as<ivm::IVObject *>()); });
-//        ivm::IVObject::sortObjectList(ivChildren);
-//        for (auto it = ivChildren.rbegin(); it != ivChildren.rend(); ++it)
-//            model->removeObject(*it);
-//        model->removeObject(obj);
-
-//        loadComponentModel(
-//                qobject_cast<ivm::IVModel *>(model), path + QDir::separator() +
-//                shared::kDefaultInterfaceViewFileName);
-
-//        obj->deleteLater();
-//        return model->getObject(id);
-//    }
-
-//    return obj;
-//}
-
 QString InterfaceDocument::componentPath(const shared::Id &id) const
 {
-    //    return d->componentsLibrary.components.value(id).componentPath;
+    return d->componentsModel->componentPath(id);
 }
 
 QString InterfaceDocument::sharedTypePath(const shared::Id &id) const
 {
-    //    return d->sharedTypesLibrary.components.value(id).componentPath;
+    return d->sharedTypesModel->componentPath(id);
 }
 
 void InterfaceDocument::generateArchetypeLibrary(

@@ -39,8 +39,6 @@ class ExportableIVConnection : public ExportableIVObject
     Q_PROPERTY(QString tiName READ targetInterfaceName)
     Q_PROPERTY(QString sourceIfaceId READ sourceInterfaceId)
     Q_PROPERTY(QString targetIfaceId READ targetInterfaceId)
-    Q_PROPERTY(QString originSourceIfaceId READ originSourceInterfaceId)
-    Q_PROPERTY(QString originTargetIfaceId READ originTargetInterfaceId)
     Q_PROPERTY(bool siIsRequired READ sourceInterfaceIsRequired)
     Q_PROPERTY(bool siIsProvided READ sourceInterfaceIsProvided)
     Q_PROPERTY(bool tiIsRequired READ targetInterfaceIsRequired)

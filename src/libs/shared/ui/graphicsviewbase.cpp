@@ -288,14 +288,13 @@ void GraphicsViewBase::dropEvent(QDropEvent *event)
     if (auto mimeData = qobject_cast<const DropData *>(event->mimeData())) {
         if (mimeData->dropType == DropData::Type::ImportableType) {
             Q_EMIT importEntity(mimeData->entityId, mapToScene(event->pos()));
-            event->accept();
+            event->acceptProposedAction();
         } else if (mimeData->dropType == DropData::Type::InstantiatableType) {
             Q_EMIT instantiateEntity(mimeData->entityId, mapToScene(event->pos()));
-            event->accept();
-        } else {
-            event->ignore();
+            event->acceptProposedAction();
         }
     }
+    return;
 }
 
 }

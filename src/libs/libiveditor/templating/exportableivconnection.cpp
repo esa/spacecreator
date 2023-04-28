@@ -67,24 +67,6 @@ QString ExportableIVConnection::targetInterfaceId() const
     return exportedObject<ivm::IVConnection>()->targetInterface()->id().toString();
 }
 
-QString ExportableIVConnection::originSourceInterfaceId() const
-{
-    static const QString token = ivm::meta::Props::token(ivm::meta::Props::Token::origin);
-    if (auto iface = exportedObject<ivm::IVConnection>()->sourceInterface())
-        return iface->entityAttributeValue<QString>(token);
-
-    return {};
-}
-
-QString ExportableIVConnection::originTargetInterfaceId() const
-{
-    static const QString token = ivm::meta::Props::token(ivm::meta::Props::Token::origin);
-    if (auto iface = exportedObject<ivm::IVConnection>()->targetInterface())
-        return iface->entityAttributeValue<QString>(token);
-
-    return {};
-}
-
 bool ExportableIVConnection::sourceInterfaceIsRequired() const
 {
     auto o = exportedObject<ivm::IVConnection>();

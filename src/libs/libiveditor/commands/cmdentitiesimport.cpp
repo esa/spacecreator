@@ -24,7 +24,6 @@
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
-#include "ivxmlreader.h"
 #include "standardpaths.h"
 
 #include <QApplication>
@@ -66,23 +65,15 @@ QSet<QString> fnTypeNames(const QVector<ivm::IVObject *> &objects)
     return names;
 }
 
-CmdEntitiesImport::CmdEntitiesImport(ivm::IVModel::CloneType type, const QList<ivm::IVObject *> &objects,
-        ivm::IVFunctionType *parent, ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos,
-        const QString &destPath)
+CmdEntitiesImport::CmdEntitiesImport(const QList<ivm::IVObject *> &objects, ivm::IVFunctionType *parent,
+        ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath)
     : ASN1ComponentsImport(asn1Checks, shared::componentsLibraryPath(), destPath)
     , QUndoCommand()
-    , m_type(type)
     , m_model(model)
     , m_parent(parent)
 {
-    QList<ivm::IVObject *> entities;
-    std::for_each(objects.cbegin(), objects.cend(), [&](ivm::IVObject *p) {
-        if (!objects.contains(p->parentObject())) /// Only root entities should be processed in clone method
-            m_model->clone(p, entities, type, m_parent);
-    });
-
     QString errorString;
-    if (!init(entities, pos, &errorString)) {
+    if (!init(objects, pos, &errorString)) {
         shared::ErrorHub::addError(shared::ErrorItem::Error, errorString, "");
         setObsolete(true);
     }
@@ -186,8 +177,7 @@ void CmdEntitiesImport::redo()
         if (m_parent) {
             m_parent->addChild(entity);
         }
-        if (m_type == ivm::IVModel::CloneType::Copy || m_type == ivm::IVModel::CloneType::Reference)
-            redoAsnFileImport(entity);
+        redoAsnFileImport(entity);
     }
 
     for (ivm::IVObject *entity : qAsConst(m_importedEntities)) {
@@ -201,7 +191,7 @@ void CmdEntitiesImport::redo()
             parentFunc->addChild(entity);
         }
         entities.append(entity);
-        if (m_type == ivm::IVModel::CloneType::Copy)
+        if (!entity->isReference())
             redoSourceCloning(entity);
     }
     if (!m_tempDir.isNull()) {
@@ -219,7 +209,7 @@ void CmdEntitiesImport::undo()
 
     for (auto it = m_importedEntities.crbegin(); it != m_importedEntities.crend(); ++it) {
         m_model->removeObject(*it);
-        if (m_type == ivm::IVModel::CloneType::Copy)
+        if (!(*it)->isReference())
             undoSourceCloning(*it);
     }
     for (auto it = m_rootEntities.crbegin(); it != m_rootEntities.crend(); ++it) {
@@ -230,8 +220,7 @@ void CmdEntitiesImport::undo()
         }
     }
 
-    if (m_type == ivm::IVModel::CloneType::Copy || m_type == ivm::IVModel::CloneType::Reference)
-        undoAsnFileImport();
+    undoAsnFileImport();
 }
 
 bool CmdEntitiesImport::mergeWith(const QUndoCommand *command)

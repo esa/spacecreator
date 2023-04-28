@@ -87,6 +87,7 @@ ComponentModel::ComponentModel(const QString &modelName, QObject *parent)
             if ((*it)->componentPath == path) {
                 if (auto item = itemById(it.key())) {
                     item->setData(true, UpdateRole);
+                    reloadComponent(it.key()); /// Check: would calling it manually be better?
                 }
                 break;
             }
@@ -136,9 +137,9 @@ void ComponentModel::load(const QString &path)
 {
     clear();
     /// TODO: check
-    d->watcher.removePaths(d->watcher.directories());
-    d->watcher.removePaths(d->watcher.files());
-    d->components.clear();
+    //    d->watcher.removePaths(d->watcher.directories());
+    //    d->watcher.removePaths(d->watcher.files());
+    //    d->components.clear();
     /// end
     d->libraryPath = path;
 
@@ -184,12 +185,22 @@ void ComponentModel::reloadComponent(const Id &id)
     }
 }
 
+QList<Id> ComponentModel::componentIDs() const
+{
+    return d->components.keys();
+}
+
+QSharedPointer<ComponentModel::Component> ComponentModel::component(const Id &id) const
+{
+    return d->components.value(id);
+}
+
 void ComponentModel::addComponent(QSharedPointer<Component> component)
 {
     for (auto id : qAsConst(component->rootIds))
         d->components.insert(id, component);
 
-    d->watcher.addPath(component->componentPath + QDir::separator() + shared::kDefaultInterfaceViewFileName);
+    d->watcher.addPath(component->componentPath);
 }
 
 QStandardItem *ComponentModel::itemById(const Id &id)

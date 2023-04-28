@@ -48,12 +48,7 @@ static inline void processObject(PropertyTemplateConfig *propertyConfig, const V
 
     shared::ExportableProperty uiNode;
     uiNode.setName(QLatin1String("Entity"));
-
-    static const QString refToken = QLatin1String("origin");
-    if (object->hasEntityAttribute(refToken))
-        uiNode.addAttribute(refToken, object->entityAttributeValue<shared::Id>(refToken));
-    else
-        uiNode.addAttribute(QLatin1String("id"), object->id());
+    uiNode.addAttribute(QLatin1String("id"), object->id());
 
     for (const EntityAttribute &attr : object->entityAttributes()) {
         shared::PropertyTemplate *pt = propertyConfig->propertyTemplateForObject(object, attr.name());

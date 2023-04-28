@@ -48,21 +48,20 @@ void ComponentTreeView::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons().testFlag(Qt::LeftButton)) {
         if ((event->pos() - m_dragStartPosition).manhattanLength() > QApplication::startDragDistance()) {
             const QModelIndex index = indexAt(event->pos());
-            if (!index.isValid()) {
+            if (index.isValid()) {
+                event->accept();
+
+                QDrag *drag = new QDrag(this);
+                DropData *mimeData = new DropData;
+                mimeData->entityId = index.data(ComponentModel::IdRole).toUuid();
+                const int dropType = index.data(ComponentModel::DropRole).toInt();
+                mimeData->dropType = static_cast<DropData::Type>(dropType);
+                drag->setMimeData(mimeData);
+                const QPixmap pix = index.data(ComponentModel::CursorPixmapRole).value<QPixmap>();
+                drag->setDragCursor(pix, Qt::DropAction::CopyAction);
+                drag->exec(Qt::DropAction::CopyAction);
                 return;
             }
-
-            QDrag *drag = new QDrag(this);
-            DropData *mimeData = new DropData;
-            mimeData->entityId = index.data(ComponentModel::IdRole).toUuid();
-            const int dropType = index.data(ComponentModel::DropRole).toInt();
-            mimeData->dropType = static_cast<DropData::Type>(dropType);
-            drag->setMimeData(mimeData);
-            const QPixmap pix = index.data(ComponentModel::CursorPixmapRole).value<QPixmap>();
-            drag->setDragCursor(pix, Qt::DropAction::CopyAction);
-            drag->exec(Qt::DropAction::CopyAction);
-            event->accept();
-            return;
         }
     }
     QTreeView::mouseMoveEvent(event);

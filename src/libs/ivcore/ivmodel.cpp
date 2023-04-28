@@ -19,14 +19,11 @@
 
 #include "common.h"
 #include "errorhub.h"
-#include "graphicsviewutils.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
-#include "ivconnectiongroup.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
-#include "ivinterfacegroup.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
 
@@ -38,9 +35,8 @@ struct IVModelPrivate {
     shared::PropertyTemplateConfig *m_dynPropConfig { nullptr };
     IVModel *m_layersModel { nullptr };
     shared::Id m_rootObjectId { shared::InvalidId };
-    QVector<IVObject *> m_components;
-    QVector<IVObject *> m_sharedTypes;
     QList<IVObject *> m_visibleObjects;
+    std::function<QVector<IVFunctionType *>()> m_fnTypeRequester;
 };
 
 IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
@@ -55,14 +51,7 @@ IVModel::~IVModel() { }
 bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
     if (ivm::IVObject *ivObj = obj->as<ivm::IVObject *>()) {
-        if (ivObj->hasEntityAttribute(meta::Props::token(meta::Props::Token::origin)) && !ivObj->isReference()) {
-            QList<IVObject *> importedEntities;
-            clone(getOrigin(ivObj->origin()), importedEntities, IVModel::CloneType::Reference);
-            if (!importedEntities.isEmpty())
-                addObjects(importedEntities);
-            return false; // All nested referenced entities are processed separately,
-                          // current one reference should be dropped out
-        } else if (shared::VEModel::addObjectImpl(obj)) {
+        if (shared::VEModel::addObjectImpl(obj)) {
             d->m_visibleObjects.append(ivObj);
 
             for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(ivObj)) {
@@ -91,177 +80,178 @@ bool IVModel::addObjectImpl(shared::VEObject *obj)
     return false;
 }
 
-template<typename F, typename Container, typename... Args>
-constexpr decltype(auto) apply(Container &&c, F &&f, Args &&...args)
-{
-    std::for_each(std::begin(c), std::end(c), [&](const auto &t) { f(t, args...); });
-}
+// template<typename F, typename Container, typename... Args>
+// constexpr decltype(auto) apply(Container &&c, F &&f, Args &&...args)
+//{
+//     std::for_each(std::begin(c), std::end(c), [&](const auto &t) { f(t, args...); });
+// }
 
-void IVModel::clone(IVObject *origin, QList<IVObject *> &importedObjects, IVModel::CloneType type,
-        IVFunctionType *parent, const QPointF &pos) const
-{
-    if (!origin || type == IVModel::CloneType::Unknown)
-        return;
+// void IVModel::clone(IVObject *origin, QList<IVObject *> &importedObjects, IVModel::CloneType type,
+//         IVFunctionType *parent, const QPointF &pos) const
+//{
+//     if (!origin || type == IVModel::CloneType::Unknown)
+//         return;
 
-    auto findIface = [](const QList<IVObject *> &importedObjects, const QString &ifaceTitle, const QString &fnTitle,
-                             IVObject::Type type) -> IVInterface * {
-        auto it = std::find_if(importedObjects.constBegin(), importedObjects.constEnd(), [&](IVObject *ivObj) {
-            if (ivObj->isInterface() || ivObj->isInterfaceGroup())
-                return ivObj->title() == ifaceTitle && ivObj->parentObject()->title() == fnTitle
-                        && ivObj->type() == type;
-            return false;
-        });
-        return it == importedObjects.constEnd() ? nullptr : (*it)->as<IVInterface *>();
-    };
+//    auto findIface = [](const QList<IVObject *> &importedObjects, const QString &ifaceTitle, const QString &fnTitle,
+//                             IVObject::Type type) -> IVInterface * {
+//        auto it = std::find_if(importedObjects.constBegin(), importedObjects.constEnd(), [&](IVObject *ivObj) {
+//            if (ivObj->isInterface() || ivObj->isInterfaceGroup())
+//                return ivObj->title() == ifaceTitle && ivObj->parentObject()->title() == fnTitle
+//                        && ivObj->type() == type;
+//            return false;
+//        });
+//        return it == importedObjects.constEnd() ? nullptr : (*it)->as<IVInterface *>();
+//    };
 
-    IVObject *ivClone = nullptr;
-    if (type != IVModel::CloneType::Direct) {
-        const shared::Id objectId = IVModel::CloneType::Move == type ? origin->id() : shared::createId();
-        ivClone = getObject(objectId);
-        if (ivClone)
-            return;
+//    IVObject *ivClone = nullptr;
+//    if (type != IVModel::CloneType::Direct) {
+//        const shared::Id objectId = IVModel::CloneType::Move == type ? origin->id() : shared::createId();
+//        ivClone = getObject(objectId);
+//        if (ivClone)
+//            return;
 
-        switch (origin->type()) {
-        case IVObject::Type::Comment:
-            ivClone = new IVComment(parent, objectId);
-            break;
-        case IVObject::Type::Function:
-            ivClone = new IVFunction(parent, objectId);
-            break;
-        case IVObject::Type::FunctionType:
-            ivClone = new IVFunctionType(parent, objectId);
-            break;
-        case IVObject::Type::ProvidedInterface:
-        case IVObject::Type::RequiredInterface: {
-            IVInterface::CreationInfo ci = IVInterface::CreationInfo::cloneIface(origin->as<IVInterface *>(), parent);
-            ci.id = objectId;
-            ivClone = IVInterface::createIface(ci);
-        } break;
-        case IVObject::Type::Connection:
-            if (auto connection = origin->as<IVConnection *>()) {
-                auto connectionClone = new IVConnection(nullptr, nullptr, parent, objectId);
-                if (connection->delayedStart().isReady()) {
-                    connectionClone->setDelayedStart(connection->delayedStart());
-                } else {
-                    connectionClone->setDelayedStart({ connection->sourceInterface()->function()->title(),
-                            connection->sourceInterface()->title(), connection->sourceInterface()->direction(),
-                            connection->sourceInterface()->id() });
-                }
+//        switch (origin->type()) {
+//        case IVObject::Type::Comment:
+//            ivClone = new IVComment(parent, objectId);
+//            break;
+//        case IVObject::Type::Function:
+//            ivClone = new IVFunction(parent, objectId);
+//            break;
+//        case IVObject::Type::FunctionType:
+//            ivClone = new IVFunctionType(parent, objectId);
+//            break;
+//        case IVObject::Type::ProvidedInterface:
+//        case IVObject::Type::RequiredInterface: {
+//            IVInterface::CreationInfo ci = IVInterface::CreationInfo::cloneIface(origin->as<IVInterface *>(), parent);
+//            ci.id = objectId;
+//            ivClone = IVInterface::createIface(ci);
+//        } break;
+//        case IVObject::Type::Connection:
+//            if (auto connection = origin->as<IVConnection *>()) {
+//                auto connectionClone = new IVConnection(nullptr, nullptr, parent, objectId);
+//                if (connection->delayedStart().isReady()) {
+//                    connectionClone->setDelayedStart(connection->delayedStart());
+//                } else {
+//                    connectionClone->setDelayedStart({ connection->sourceInterface()->function()->title(),
+//                            connection->sourceInterface()->title(), connection->sourceInterface()->direction(),
+//                            connection->sourceInterface()->id() });
+//                }
 
-                if (connection->delayedEnd().isReady()) {
-                    connectionClone->setDelayedEnd(connection->delayedEnd());
-                } else {
-                    connectionClone->setDelayedEnd({ connection->targetInterface()->function()->title(),
-                            connection->targetInterface()->title(), connection->targetInterface()->direction(),
-                            connection->targetInterface()->id() });
-                }
+//                if (connection->delayedEnd().isReady()) {
+//                    connectionClone->setDelayedEnd(connection->delayedEnd());
+//                } else {
+//                    connectionClone->setDelayedEnd({ connection->targetInterface()->function()->title(),
+//                            connection->targetInterface()->title(), connection->targetInterface()->direction(),
+//                            connection->targetInterface()->id() });
+//                }
 
-                const QString connectionGroupName = connection->groupName();
-                if (!connectionGroupName.isEmpty()) {
-                    auto it = std::find_if(
-                            importedObjects.cbegin(), importedObjects.cend(), [&connectionGroupName](IVObject *ivObj) {
-                                return ivObj->title() == connectionGroupName
-                                        && ivObj->type() == IVObject::Type::ConnectionGroup;
-                            });
-                    if (it != importedObjects.cend()) {
-                        if (auto group = (*it)->as<IVConnectionGroup *>()) {
-                            group->addGroupedConnection(connectionClone);
-                        }
-                    }
-                }
-                ivClone = connectionClone;
-            }
-            break;
-        case IVObject::Type::ConnectionGroup:
-            if (auto connectionGroup = origin->as<IVConnectionGroup *>()) {
-                ivm::IVObject *sourceIfaceGroup =
-                        findIface(importedObjects, connectionGroup->sourceInterfaceGroup()->title(),
-                                connectionGroup->sourceName(), connectionGroup->sourceInterfaceGroup()->type());
-                ivm::IVObject *targetIfaceGroup =
-                        findIface(importedObjects, connectionGroup->targetInterfaceGroup()->title(),
-                                connectionGroup->targetName(), connectionGroup->targetInterfaceGroup()->type());
-                if (sourceIfaceGroup && targetIfaceGroup) {
-                    ivClone = new IVConnectionGroup(connectionGroup->groupName(),
-                            sourceIfaceGroup->as<IVInterfaceGroup *>(), targetIfaceGroup->as<IVInterfaceGroup *>(), {},
-                            parent, objectId);
-                }
-            }
-            break;
-        case IVObject::Type::InterfaceGroup:
-            if (auto originIfaceGroup = origin->as<IVInterfaceGroup *>()) {
-                IVInterface::CreationInfo ci;
-                ci.id = objectId;
-                auto clonedIfaceGroup = new IVInterfaceGroup(ci);
-                clonedIfaceGroup->setGroupName(origin->groupName());
-                if (parent->type() == IVObject::Type::Function) {
-                    auto fn = qobject_cast<IVFunction *>(parent);
-                    fn->addChild(clonedIfaceGroup);
-                } else {
-                    clonedIfaceGroup->setParentObject(parent);
-                }
-                for (auto originIface : originIfaceGroup->entities()) {
-                    IVInterface *clonedObject = findIface(importedObjects, originIface->title(),
-                            originIface->function()->title(), originIface->type());
-                    if (clonedObject) {
-                        clonedIfaceGroup->addEntity(clonedObject);
-                    }
-                }
-                ivClone = clonedIfaceGroup;
-            }
-            break;
-        default:
-            return;
-        }
+//                const QString connectionGroupName = connection->groupName();
+//                if (!connectionGroupName.isEmpty()) {
+//                    auto it = std::find_if(
+//                            importedObjects.cbegin(), importedObjects.cend(), [&connectionGroupName](IVObject *ivObj)
+//                            {
+//                                return ivObj->title() == connectionGroupName
+//                                        && ivObj->type() == IVObject::Type::ConnectionGroup;
+//                            });
+//                    if (it != importedObjects.cend()) {
+//                        if (auto group = (*it)->as<IVConnectionGroup *>()) {
+//                            group->addGroupedConnection(connectionClone);
+//                        }
+//                    }
+//                }
+//                ivClone = connectionClone;
+//            }
+//            break;
+//        case IVObject::Type::ConnectionGroup:
+//            if (auto connectionGroup = origin->as<IVConnectionGroup *>()) {
+//                ivm::IVObject *sourceIfaceGroup =
+//                        findIface(importedObjects, connectionGroup->sourceInterfaceGroup()->title(),
+//                                connectionGroup->sourceName(), connectionGroup->sourceInterfaceGroup()->type());
+//                ivm::IVObject *targetIfaceGroup =
+//                        findIface(importedObjects, connectionGroup->targetInterfaceGroup()->title(),
+//                                connectionGroup->targetName(), connectionGroup->targetInterfaceGroup()->type());
+//                if (sourceIfaceGroup && targetIfaceGroup) {
+//                    ivClone = new IVConnectionGroup(connectionGroup->groupName(),
+//                            sourceIfaceGroup->as<IVInterfaceGroup *>(), targetIfaceGroup->as<IVInterfaceGroup *>(),
+//                            {}, parent, objectId);
+//                }
+//            }
+//            break;
+//        case IVObject::Type::InterfaceGroup:
+//            if (auto originIfaceGroup = origin->as<IVInterfaceGroup *>()) {
+//                IVInterface::CreationInfo ci;
+//                ci.id = objectId;
+//                auto clonedIfaceGroup = new IVInterfaceGroup(ci);
+//                clonedIfaceGroup->setGroupName(origin->groupName());
+//                if (parent->type() == IVObject::Type::Function) {
+//                    auto fn = qobject_cast<IVFunction *>(parent);
+//                    fn->addChild(clonedIfaceGroup);
+//                } else {
+//                    clonedIfaceGroup->setParentObject(parent);
+//                }
+//                for (auto originIface : originIfaceGroup->entities()) {
+//                    IVInterface *clonedObject = findIface(importedObjects, originIface->title(),
+//                            originIface->function()->title(), originIface->type());
+//                    if (clonedObject) {
+//                        clonedIfaceGroup->addEntity(clonedObject);
+//                    }
+//                }
+//                ivClone = clonedIfaceGroup;
+//            }
+//            break;
+//        default:
+//            return;
+//        }
 
-        if (!ivClone)
-            return;
+//        if (!ivClone)
+//            return;
 
-        if (parent)
-            parent->addChild(ivClone);
+//        if (parent)
+//            parent->addChild(ivClone);
 
-        for (const EntityAttribute &attr : origin->entityAttributes()) {
-            ivClone->setEntityAttribute(attr);
-        }
-        for (const EntityAttribute &attr : extEntityAttributes(origin->id())) {
-            ivClone->setEntityAttribute(attr);
-        }
+//        for (const EntityAttribute &attr : origin->entityAttributes()) {
+//            ivClone->setEntityAttribute(attr);
+//        }
+//        for (const EntityAttribute &attr : extEntityAttributes(origin->id())) {
+//            ivClone->setEntityAttribute(attr);
+//        }
 
-        if (!pos.isNull()) {
-            QRectF originGeometry = shared::graphicsviewutils::rect(origin->coordinates());
-            originGeometry.moveTo(pos);
-            ivClone->setCoordinates(shared::graphicsviewutils::coordinates(originGeometry));
-        }
+//        if (!pos.isNull()) {
+//            QRectF originGeometry = shared::graphicsviewutils::rect(origin->coordinates());
+//            originGeometry.moveTo(pos);
+//            ivClone->setCoordinates(shared::graphicsviewutils::coordinates(originGeometry));
+//        }
 
-        if (type == IVModel::CloneType::Reference) {
-            ivClone->setEntityAttribute(EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::reference),
-                    true, EntityAttribute::Type::Attribute });
-            const EntityAttribute attr = EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::origin),
-                origin->id(), EntityAttribute::Type::Attribute };
-            ivClone->setEntityAttribute(attr);
-        }
-    } else {
-        ivClone = origin;
-    }
-    importedObjects << ivClone;
-    if (auto fn = origin->as<IVFunctionType *>()) {
-        auto f = [this](IVObject *obj, QList<IVObject *> &importedObjects, IVModel::CloneType type,
-                         IVFunctionType *parent) { clone(obj, importedObjects, type, parent); };
+//        if (type == IVModel::CloneType::Reference) {
+//            ivClone->setEntityAttribute(EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::reference),
+//                    true, EntityAttribute::Type::Attribute });
+//            const EntityAttribute attr = EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::origin),
+//                origin->id(), EntityAttribute::Type::Attribute };
+//            ivClone->setEntityAttribute(attr);
+//        }
+//    } else {
+//        ivClone = origin;
+//    }
+//    importedObjects << ivClone;
+//    if (auto fn = origin->as<IVFunctionType *>()) {
+//        auto f = [this](IVObject *obj, QList<IVObject *> &importedObjects, IVModel::CloneType type,
+//                         IVFunctionType *parent) { clone(obj, importedObjects, type, parent); };
 
-        auto ivCloneFn = ivClone->as<IVFunctionType *>();
+//        auto ivCloneFn = ivClone->as<IVFunctionType *>();
 
-        apply(fn->functions(), f, importedObjects, type, ivCloneFn);
-        apply(fn->functionTypes(), f, importedObjects, type, ivCloneFn);
-        apply(fn->allInterfaces(), f, importedObjects, type, ivCloneFn);
-        apply(fn->connectionGroups(), f, importedObjects, type, ivCloneFn);
-        auto connections { fn->connections() };
-        for (auto group : fn->connectionGroups()) {
-            for (auto connection : group->groupedConnections())
-                connections.append(connection);
-        }
-        apply(connections, f, importedObjects, type, ivCloneFn);
-        apply(fn->comments(), f, importedObjects, type, ivCloneFn);
-    }
-}
+//        apply(fn->functions(), f, importedObjects, type, ivCloneFn);
+//        apply(fn->functionTypes(), f, importedObjects, type, ivCloneFn);
+//        apply(fn->allInterfaces(), f, importedObjects, type, ivCloneFn);
+//        apply(fn->connectionGroups(), f, importedObjects, type, ivCloneFn);
+//        auto connections { fn->connections() };
+//        for (auto group : fn->connectionGroups()) {
+//            for (auto connection : group->groupedConnections())
+//                connections.append(connection);
+//        }
+//        apply(connections, f, importedObjects, type, ivCloneFn);
+//        apply(fn->comments(), f, importedObjects, type, ivCloneFn);
+//    }
+//}
 
 bool IVModel::removeObject(shared::VEObject *obj)
 {
@@ -272,6 +262,11 @@ bool IVModel::removeObject(shared::VEObject *obj)
         return true;
     }
     return false;
+}
+
+void IVModel::setSharedTypeRequester(const std::function<QVector<IVFunctionType *>()> &requester)
+{
+    d->m_fnTypeRequester = requester;
 }
 
 void IVModel::setRootObject(shared::Id rootId)
@@ -317,26 +312,9 @@ shared::Id IVModel::rootObjectId() const
     return d->m_rootObjectId;
 }
 
-QVector<IVObject *> IVModel::externalSharedTypes() const
-{
-    return d->m_sharedTypes;
-}
-
-QVector<IVObject *> IVModel::externalComponents() const
-{
-    return d->m_components;
-}
-
 IVObject *IVModel::getObject(const shared::Id &id) const
 {
     return qobject_cast<IVObject *>(shared::VEModel::getObject(id));
-}
-
-IVObject *IVModel::getOrigin(const shared::Id &id) const
-{
-    auto it = std::find_if(d->m_components.cbegin(), d->m_components.cend(),
-            [&id](const IVObject *ivObj) { return ivObj->id() == id; });
-    return it == d->m_components.cend() ? nullptr : *it;
 }
 
 IVObject *IVModel::getObjectByName(const QString &name, IVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
@@ -424,18 +402,8 @@ IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
 
 IVFunctionType *IVModel::getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    if (auto obj = getObjectByName(d->m_sharedTypes, name, IVObject::Type::FunctionType, caseSensitivity))
-        return obj->as<IVFunctionType *>();
-
-    return nullptr;
-}
-
-IVFunctionType *IVModel::getSharedFunctionType(const shared::Id &id) const
-{
-    if (auto obj = VEModel::getObject(d->m_sharedTypes, id))
-        return obj->as<IVFunctionType *>();
-
-    return nullptr;
+    const QVector<IVFunctionType *> externalSharedTypes = d->m_fnTypeRequester();
+    return getObjectByName(externalSharedTypes, name, IVObject::Type::FunctionType, caseSensitivity);
 }
 
 QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunction *fnObj) const
@@ -467,13 +435,9 @@ QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunc
         }
     }
 
-    for (auto sharedObject : externalSharedTypes()) {
+    for (auto sharedObject : d->m_fnTypeRequester()) {
         if (sharedObject->parentObject() == nullptr) {
-            if (auto fnType = sharedObject->as<IVFunctionType *>()) {
-                if (fnType->isFunctionType()) {
-                    result[fnType->title()] = fnType;
-                }
-            }
+            result[sharedObject->title()] = sharedObject;
         }
     }
 

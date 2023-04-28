@@ -288,11 +288,6 @@ bool IVObject::isReference() const
     return entityAttributeValue<bool>(meta::Props::token(meta::Props::Token::reference));
 }
 
-shared::Id IVObject::origin() const
-{
-    return entityAttributeValue<QUuid>(meta::Props::token(meta::Props::Token::origin), shared::InvalidId);
-}
-
 bool IVObject::isInstanceDescendant() const
 {
     auto obj = this;

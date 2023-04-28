@@ -28,8 +28,9 @@
 
 namespace ive {
 
-IVComponentModel::IVComponentModel(const QString &modelName, QObject *parent)
+IVComponentModel::IVComponentModel(Type type, const QString &modelName, QObject *parent)
     : shared::ComponentModel { modelName, parent }
+    , m_type(type)
 {
 }
 
@@ -38,7 +39,7 @@ ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
     return qobject_cast<ivm::IVObject *>(shared::ComponentModel::getObject(id));
 }
 
-static inline QStandardItem *processObject(ivm::IVObject *ivObject)
+QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
 {
     if (!ivObject)
         return nullptr;
@@ -48,6 +49,12 @@ static inline QStandardItem *processObject(ivm::IVObject *ivObject)
     item->setDragEnabled(true);
     item->setData(ivObject->id(), shared::ComponentModel::IdRole);
     item->setData(QVariant::fromValue(ivObject->type()), shared::ComponentModel::TypeRole);
+    if (m_type == IVComponentModel::Type::ComponentLibrary) {
+        item->setData(QVariant::fromValue(shared::DropData::Type::ImportableType), shared::ComponentModel::DropRole);
+    } else if (m_type == IVComponentModel::Type::SharedTypesLibrary) {
+        item->setData(
+                QVariant::fromValue(shared::DropData::Type::InstantiatableType), shared::ComponentModel::DropRole);
+    }
 
     QString title = ivm::IVNameValidator::decodeName(ivObject->type(), ivObject->title());
     QPixmap pix;
@@ -170,13 +177,14 @@ QStandardItem *IVComponentModel::loadComponent(const QString &path)
     });
     ivm::IVObject::sortObjectList(objects);
     QList<QStandardItem *> items;
-    std::for_each(objects.constBegin(), objects.constEnd(), [&items](shared::VEObject *ivObj) {
+    std::for_each(objects.constBegin(), objects.constEnd(), [this, &items](shared::VEObject *ivObj) {
         if (auto item = processObject(ivObj->as<ivm::IVObject *>())) {
             items << item;
         }
     });
     shared::ErrorHub::clearCurrentFile();
     std::for_each(objects.begin(), objects.end(), [&model](shared::VEObject *ivObj) {
+        ivObj->setModel(nullptr);
         if (ivObj->parent() == &model) {
             ivObj->setParent(nullptr);
         }
