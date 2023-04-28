@@ -20,6 +20,7 @@
 #include "common.h"
 #include "entityattribute.h"
 #include "ivcommonprops.h"
+#include "ivcoreutils.h"
 #include "veobject.h"
 
 #include <QObject>
@@ -110,8 +111,33 @@ public:
 
     void resetTitle();
 
-    static void sortObjectList(QVector<ivm::IVObject *> &objects);
-    static void sortObjectListByTitle(QVector<IVObject *> &objects);
+    //! This sorts the objects on type.
+    //! \sa ivm::IVObject::Type
+    template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,
+            typename = std::enable_if_t<std::is_base_of_v<ivm::IVObject, typename std::remove_pointer<T>::type>>>
+    static void sortObjectList(C &objects)
+    {
+        std::stable_sort(std::begin(objects), std::end(objects), [](const T &obj1, const T &obj2) {
+            if (utils::nestingLevel(obj1) == utils::nestingLevel(obj2)) {
+                return obj1->type() < obj2->type();
+            }
+            return utils::nestingLevel(obj1) < utils::nestingLevel(obj2);
+        });
+    }
+
+    //! This sorts the objects on title.
+    template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,
+            typename = std::enable_if_t<std::is_base_of_v<VEObject, typename std::remove_pointer<T>::type>>>
+    static void sortObjectListByTitle(C &objects)
+    {
+        std::stable_sort(std::begin(objects), std::end(objects), [](const T &obj1, const T &obj2) {
+            if (utils::nestingLevel(obj1) == utils::nestingLevel(obj2)) {
+                return obj1->title() < obj2->title();
+            }
+            return utils::nestingLevel(obj1) < utils::nestingLevel(obj2);
+        });
+    }
+
     static QString typeToString(Type t);
 
     QVariantList attributes() const;

@@ -29,12 +29,12 @@
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/implementationshandler.h"
 #include "commandsstack.h"
-#include "componentmodel.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "errorhub.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivarchetypelibraryreference.h"
+#include "ivcomponentmodel.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
@@ -95,8 +95,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QString mscFileName;
     QString uiFileName { shared::kDefaultInterfaceViewUIFileName };
     QStringList asnFilesNames;
-    ComponentModel *componentsModel;
-    ComponentModel *sharedTypesModel;
+    IVComponentModel *componentsModel;
+    IVComponentModel *sharedTypesModel;
 };
 
 void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
@@ -162,8 +162,8 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     d->dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
-    d->componentsModel = new ComponentModel(tr("Components"), this);
-    d->sharedTypesModel = new ComponentModel(tr("Shared Types"), this);
+    d->componentsModel = new IVComponentModel(tr("Components"), this);
+    d->sharedTypesModel = new IVComponentModel(tr("Shared Types"), this);
     d->objectsModel = new ivm::IVModel(d->dynPropConfig, this);
     d->layersModel = new ivm::IVModel(d->dynPropConfig, this);
     d->archetypesModel = new ivm::ArchetypeModel(this);
@@ -715,12 +715,12 @@ ivm::IVModel *InterfaceDocument::objectsModel() const
     return d->objectsModel;
 }
 
-ComponentModel *InterfaceDocument::componentModel() const
+IVComponentModel *InterfaceDocument::componentModel() const
 {
     return d->componentsModel;
 }
 
-ComponentModel *InterfaceDocument::sharedTypesModel() const
+IVComponentModel *InterfaceDocument::sharedTypesModel() const
 {
     return d->sharedTypesModel;
 }

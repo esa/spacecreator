@@ -77,8 +77,6 @@ target_sources(${LIB_NAME} PRIVATE
     commands/implementationshandler.h
     commandsstack.cpp
     commandsstack.h
-    componentmodel.cpp
-    componentmodel.h
     context/action/action.cpp
     context/action/action.h
     context/action/actionsmanager.cpp
@@ -166,6 +164,8 @@ target_sources(${LIB_NAME} PRIVATE
     ivappwidget.cpp
     ivappwidget.h
     ivappwidget.ui
+    ivcomponentmodel.cpp
+    ivcomponentmodel.h
     ivconnectiongroupmodel.cpp
     ivconnectiongroupmodel.h
     ivcreatortool.cpp

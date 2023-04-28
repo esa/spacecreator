@@ -22,15 +22,22 @@
 #include <QStandardItemModel>
 #include <memory>
 
-namespace ivm {
-class IVObject;
-}
+namespace shared {
+class VEObject;
 
-namespace ive {
 struct ComponentModelPrivate;
 class ComponentModel : public QStandardItemModel
 {
+    Q_OBJECT
 public:
+    struct Component {
+        ~Component() { qDeleteAll(objects); }
+
+        QList<shared::Id> rootIds;
+        QString componentPath;
+        QVector<VEObject *> objects;
+    };
+
     enum Roles
     {
         IdRole = Qt::UserRole + 1,
@@ -38,21 +45,29 @@ public:
         CursorPixmapRole,
         DropRole,
         PathRole,
+        UpdateRole,
     };
 
     explicit ComponentModel(const QString &modelName, QObject *parent = nullptr);
-    ~ComponentModel() override = default;
+    ~ComponentModel() override;
 
-    QString objectPath(const shared::Id &id) const;
+    QString componentPath(const shared::Id &id) const;
     QString libraryPath() const;
-    ivm::IVObject *getObject(const shared::Id &id);
+    virtual VEObject *getObject(const shared::Id &id);
     void load(const QString &path);
 
+    void removeComponent(const shared::Id &id);
+    void reloadComponent(const shared::Id &id);
+
+protected:
+    virtual QStandardItem *loadComponent(const QString &path) = 0;
+    void addComponent(QSharedPointer<Component> component);
+
 private:
-    QStandardItem *loadComponent(const QString &path);
+    QStandardItem *itemById(const shared::Id &id);
 
 private:
     const std::unique_ptr<ComponentModelPrivate> d;
 };
 
-} // namespace ive
+} // namespace shared

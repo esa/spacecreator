@@ -91,29 +91,6 @@ void IVObject::resetTitle()
     setEntityAttribute(meta::Props::token(meta::Props::Token::name), {});
 }
 
-//! This sorts the objects on type.
-//! \sa ivm::IVObject::Type
-void IVObject::sortObjectList(QVector<IVObject *> &objects)
-{
-    std::stable_sort(objects.begin(), objects.end(), [](ivm::IVObject *obj1, ivm::IVObject *obj2) {
-        if (utils::nestingLevel(obj1) == utils::nestingLevel(obj2)) {
-            return obj1->type() < obj2->type();
-        }
-        return utils::nestingLevel(obj1) < utils::nestingLevel(obj2);
-    });
-}
-
-//! This sorts the objects on title.
-void IVObject::sortObjectListByTitle(QVector<IVObject *> &objects)
-{
-    std::stable_sort(objects.begin(), objects.end(), [](ivm::IVObject *obj1, ivm::IVObject *obj2) {
-        if (utils::nestingLevel(obj1) == utils::nestingLevel(obj2)) {
-            return obj1->title() < obj2->title();
-        }
-        return utils::nestingLevel(obj1) < utils::nestingLevel(obj2);
-    });
-}
-
 QString IVObject::typeToString(Type t)
 {
     QMetaEnum metaEnum = QMetaEnum::fromType<Type>();

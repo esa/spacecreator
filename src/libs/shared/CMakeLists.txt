@@ -49,6 +49,8 @@ target_sources(${LIB_NAME} PRIVATE
     commandsstackbase.h
     common.cpp
     common.h
+    componentmodel.cpp
+    componentmodel.h
     delayedsignal.cpp
     delayedsignal.h
     editorcore.cpp

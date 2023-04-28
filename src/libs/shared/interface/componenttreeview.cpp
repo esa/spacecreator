@@ -17,7 +17,7 @@
 
 #include "componenttreeview.h"
 
-#include "component"
+#include "componentmodel.h"
 
 #include <QApplication>
 #include <QDrag>

@@ -27,7 +27,6 @@
 #include "commands/cmdfunctionitemcreate.h"
 #include "commands/cmdinterfaceitemcreate.h"
 #include "commandsstack.h"
-#include "componentmodel.h"
 #include "context/action/actionsmanager.h"
 #include "errorhub.h"
 #include "geometry.h"
@@ -36,6 +35,7 @@
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivitemmodel.h"
+#include "ivcomponentmodel.h"
 #include "ivconnection.h"
 #include "ivconnectionlayertype.h"
 #include "ivcreatortool.h"
@@ -170,9 +170,9 @@ void IVAppWidget::showContextMenuForSharedTypesView(const QPoint &pos)
     connect(actInstantiateSharedType, &QAction::triggered, this,
             [this, id]() { instantiateEntity(id, shared::INVALID_POS); });
 
-    QAction *actImportSharedType = menu->addAction(tr("Import shared type"));
-    connect(actImportSharedType, &QAction::triggered, this,
-            [this, id]() { QMessageBox::warning(this, tr("Import shared type"), tr("Not implemented yet.")); });
+    //    QAction *actImportSharedType = menu->addAction(tr("Import shared type"));
+    //    connect(actImportSharedType, &QAction::triggered, this,
+    //            [this, id]() { QMessageBox::warning(this, tr("Import shared type"), tr("Not implemented yet.")); });
 
     QAction *actEditSharedType = menu->addAction(tr("Edit shared type"));
     connect(actEditSharedType, &QAction::triggered, this,
@@ -182,11 +182,11 @@ void IVAppWidget::showContextMenuForSharedTypesView(const QPoint &pos)
     connect(actRemoveSharedType, &QAction::triggered, this, [this, id]() {
         if (auto model = m_document->sharedTypesModel()) {
             if (auto obj = model->getObject(id)) {
-                //                auto cmdRm =
-                //                        new cmd::CmdEntitiesRemove({ obj }, model, {
-                //                        m_document->sharedTypesModel()->objectPath(id) });
-                //                cmdRm->setText(tr("Remove importable shared type(s)"));
-                //                m_document->commandsStack()->push(cmdRm);
+                const QFileInfo fi { model->componentPath(id) };
+                model->removeComponent(id);
+                if (fi.exists()) {
+                    fi.absoluteDir().removeRecursively();
+                }
             }
         }
     });
@@ -313,9 +313,11 @@ void IVAppWidget::showContextMenuForComponentsLibraryView(const QPoint &pos)
     connect(actRemoveComponent, &QAction::triggered, this, [this, id]() {
         if (auto model = m_document->componentModel()) {
             if (auto obj = model->getObject(id)) {
-                //                auto cmdRm = new cmd::CmdEntitiesRemove({ obj }, model, { model->objectPath(id); });
-                //                cmdRm->setText(tr("Remove importable component(s)"));
-                //                m_document->commandsStack()->push(cmdRm);
+                const QFileInfo fi { model->componentPath(id) };
+                model->removeComponent(id);
+                if (fi.exists()) {
+                    fi.absoluteDir().removeRecursively();
+                }
             }
         }
     });

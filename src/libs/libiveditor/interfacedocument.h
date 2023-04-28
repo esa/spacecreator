@@ -56,6 +56,7 @@ namespace cmd {
 class CommandsStack;
 }
 
+class IVComponentModel;
 class IVAppWidget;
 class IVCommentGraphicsItem;
 class IVConnectionGraphicsItem;
@@ -66,7 +67,6 @@ class IVInterfaceGraphicsItem;
 class IVItemModel;
 class IVVisualizationModelBase;
 class InterfaceTabGraphicsScene;
-class ComponentModel;
 
 class InterfaceDocument : public QObject
 {
@@ -127,8 +127,8 @@ public:
 
     IVItemModel *itemsModel() const;
 
-    ComponentModel *componentModel() const;
-    ComponentModel *sharedTypesModel() const;
+    IVComponentModel *componentModel() const;
+    IVComponentModel *sharedTypesModel() const;
 
     ivm::IVModel *layersModel() const;
     QHash<shared::Id, shared::VEObject *> layersObjects() const;
