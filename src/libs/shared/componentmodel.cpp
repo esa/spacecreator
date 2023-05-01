@@ -43,7 +43,7 @@ ComponentModel::ComponentModel(const QString &modelName, QObject *parent)
 
         /// Get all interfaceview paths from fs
         const QDir libDir(d->libraryPath);
-        const QStringList entries = libDir.entryList(QDir::Dirs);
+        const QStringList entries = libDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         QSet<QString> componentsPaths;
         for (const QString &name : qAsConst(entries)) {
             const QString relInterfaceviewPath = name + QDir::separator() + shared::kDefaultInterfaceViewFileName;
@@ -55,12 +55,11 @@ ComponentModel::ComponentModel(const QString &modelName, QObject *parent)
         /// Get all loaded components with removing them in previously loaded paths
         QSet<QString> existingComponents;
         for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
-            existingComponents.insert(it.value()->componentPath);
-            componentsPaths.remove(it.value()->componentPath);
+            if (!componentsPaths.remove(it.value()->componentPath))
+                existingComponents.insert(it.value()->componentPath);
         }
 
         /// Remove from the model non-existing in fs component
-        existingComponents.subtract(componentsPaths);
         QList<Id> idsToRemove;
         for (const QString &path : qAsConst(existingComponents)) {
             for (auto it = d->components.cbegin(); it != d->components.cend(); ++it) {
@@ -136,11 +135,6 @@ VEObject *ComponentModel::getObject(const shared::Id &id)
 void ComponentModel::load(const QString &path)
 {
     clear();
-    /// TODO: check
-    //    d->watcher.removePaths(d->watcher.directories());
-    //    d->watcher.removePaths(d->watcher.files());
-    //    d->components.clear();
-    /// end
     d->libraryPath = path;
 
     auto headerItem = new QStandardItem(d->modelName);
@@ -211,6 +205,14 @@ QStandardItem *ComponentModel::itemById(const Id &id)
         }
     }
     return nullptr;
+}
+
+ComponentModel::Component::~Component()
+{
+    std::for_each(objects.cbegin(), objects.cend(), [](shared::VEObject *obj) {
+        if (!obj->parent())
+            delete obj;
+    });
 }
 
 } // namespace shared

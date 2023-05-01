@@ -17,6 +17,9 @@
 
 #include "ivcomponentmodel.h"
 
+#include "ivconnectiongroup.h"
+#include "ivfunctiontype.h"
+
 #include <QFileInfo>
 #include <QSharedPointer>
 #include <errorhub.h>
@@ -41,7 +44,7 @@ ivm::IVObject *IVComponentModel::getObject(const shared::Id &id)
 
 QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
 {
-    if (!ivObject)
+    if (!ivObject || ivObject->type() == ivm::IVObject::Type::InterfaceGroup)
         return nullptr;
 
     QStandardItem *item = new QStandardItem;
@@ -138,10 +141,19 @@ QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
     item->setData(font, Qt::FontRole);
     item->setData(title, Qt::DisplayRole);
     item->setData(pix, Qt::DecorationRole);
+    item->setSelectable(!ivObject->parentObject());
 
-    for (auto child : ivObject->descendants()) {
-        if (auto childItem = processObject(child->as<ivm::IVObject *>())) {
-            item->appendRow(childItem);
+    if (auto fn = ivObject->as<ivm::IVFunctionType *>()) {
+        for (ivm::IVObject *child : fn->children()) {
+            if (QStandardItem *childItem = processObject(child)) {
+                item->appendRow(childItem);
+            }
+        }
+    } else if (auto conGroup = ivObject->as<ivm::IVConnectionGroup *>()) {
+        for (ivm::IVConnection *connection : conGroup->groupedConnections()) {
+            if (QStandardItem *childItem = processObject(connection)) {
+                item->appendRow(childItem);
+            }
         }
     }
     return item;
@@ -183,22 +195,20 @@ QStandardItem *IVComponentModel::loadComponent(const QString &path)
         }
     });
     shared::ErrorHub::clearCurrentFile();
-    std::for_each(objects.begin(), objects.end(), [&model](shared::VEObject *ivObj) {
-        ivObj->setModel(nullptr);
-        if (ivObj->parent() == &model) {
-            ivObj->setParent(nullptr);
-        }
-    });
-
     if (items.isEmpty())
         return nullptr;
 
     QSharedPointer<shared::ComponentModel::Component> component { new shared::ComponentModel::Component };
     component->componentPath = path;
     component->rootIds = ids;
-    //    std::for_each(objects.cbegin(), objects.cend(), [&](shared::VEObject *obj) { component->objects.append(obj);
-    //    }); component->objects = objects;
-    std::copy(objects.cbegin(), objects.cend(), std::back_inserter(component->objects));
+    std::for_each(objects.begin(), objects.end(), [&model, component](shared::VEObject *obj) {
+        obj->setModel(nullptr);
+        if (obj->parent() == &model) {
+            obj->setParent(nullptr);
+        }
+        component->objects << obj;
+    });
+
     for (auto id : qAsConst(ids))
         addComponent(component);
 

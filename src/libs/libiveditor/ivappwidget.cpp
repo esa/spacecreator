@@ -814,7 +814,7 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
                 intersectedNamesList.append(name);
             }
             const QString msg = tr("Entities couldn't be pasted because of Function names conflict(s): %1")
-                                        .arg(intersectedNamesList.join(QLatin1Char('\n')));
+                                        .arg(intersectedNamesList.join(QLatin1String(", ")));
             shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
             return;
         }
@@ -873,7 +873,7 @@ void IVAppWidget::importEntity(const shared::Id &id, QPointF sceneDropPoint)
             intersectedNamesList.append(name);
         }
         const QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
-                                    .arg(obj->titleUI(), intersectedNamesList.join(QLatin1Char('\n')));
+                                    .arg(obj->titleUI(), intersectedNamesList.join(QLatin1String(", ")));
         shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
         return;
     }
@@ -946,7 +946,7 @@ void IVAppWidget::linkEntity(const shared::Id &id, QPointF sceneDropPoint)
         }
         const QString msg =
                 tr("Chosen entity [%1] couldn't be imported as reference because of Function names conflict(s): %2")
-                        .arg(obj->titleUI(), intersectedNamesList.join(QLatin1Char('\n')));
+                        .arg(obj->titleUI(), intersectedNamesList.join(QLatin1String(", ")));
         shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
         return;
     }

@@ -31,7 +31,7 @@ class ComponentModel : public QStandardItemModel
     Q_OBJECT
 public:
     struct Component {
-        ~Component() { qDeleteAll(objects); }
+        ~Component();
 
         QList<shared::Id> rootIds;
         QString componentPath;
