@@ -36,22 +36,18 @@ namespace ivm {
 
 struct IVModelPrivate {
     shared::PropertyTemplateConfig *m_dynPropConfig { nullptr };
-    IVModel *m_componentModel { nullptr };
-    IVModel *m_sharedTypesModel { nullptr };
-    shared::Id m_rootObjectId;
+    IVModel *m_layersModel { nullptr };
+    shared::Id m_rootObjectId { shared::InvalidId };
     QList<IVObject *> m_visibleObjects;
-    IVModel *m_layersModel;
+    std::function<QVector<IVFunctionType *>()> m_fnTypeRequester;
+    std::function<ivm::IVObject *(const shared::Id &)> m_objectRequester;
 };
 
-IVModel::IVModel(
-        shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel, IVModel *componentModel, QObject *parent)
+IVModel::IVModel(shared::PropertyTemplateConfig *dynPropConfig, QObject *parent)
     : shared::VEModel(parent)
     , d(new IVModelPrivate)
 {
     d->m_dynPropConfig = dynPropConfig;
-    d->m_componentModel = componentModel;
-    d->m_sharedTypesModel = sharedModel;
-    d->m_layersModel = nullptr;
 }
 
 IVModel::~IVModel() { }
@@ -59,14 +55,21 @@ IVModel::~IVModel() { }
 bool IVModel::addObjectImpl(shared::VEObject *obj)
 {
     if (ivm::IVObject *ivObj = obj->as<ivm::IVObject *>()) {
-        if (ivObj->hasEntityAttribute(meta::Props::token(meta::Props::Token::origin)) && !ivObj->isReference()) {
-            QList<IVObject *> importedEntities;
-            clone(getOrigin(ivObj->origin()), importedEntities, IVModel::CloneType::Reference);
-            if (!importedEntities.isEmpty())
-                addObjects(importedEntities);
-            return false; // All nested referenced entities are processed separately,
-                          // current one reference should be dropped out
-        } else if (shared::VEModel::addObjectImpl(obj)) {
+        if (ivObj->isReference()) {
+            if (d->m_objectRequester) {
+                QList<IVObject *> importedObjects;
+                clone(d->m_objectRequester(ivObj->id()), importedObjects, ivm::IVModel::CloneType::Reference,
+                        qobject_cast<ivm::IVFunctionType *>(ivObj->parentObject()));
+                addObjects(importedObjects);
+                for (IVObject *clonedObj : qAsConst(importedObjects)) {
+                    clonedObj->setEntityAttribute(
+                            EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::reference), true,
+                                    EntityAttribute::Type::Attribute });
+                }
+            }
+            return false;
+        }
+        if (shared::VEModel::addObjectImpl(obj)) {
             d->m_visibleObjects.append(ivObj);
 
             for (const auto attr : d->m_dynPropConfig->propertyTemplatesForObject(ivObj)) {
@@ -120,7 +123,7 @@ void IVModel::clone(IVObject *origin, QList<IVObject *> &importedObjects, IVMode
 
     IVObject *ivClone = nullptr;
     if (type != IVModel::CloneType::Direct) {
-        const shared::Id objectId = IVModel::CloneType::Move == type ? origin->id() : shared::createId();
+        const shared::Id objectId = IVModel::CloneType::Copy == type ? shared::createId() : origin->id();
         ivClone = getObject(objectId);
         if (ivClone)
             return;
@@ -235,14 +238,6 @@ void IVModel::clone(IVObject *origin, QList<IVObject *> &importedObjects, IVMode
             originGeometry.moveTo(pos);
             ivClone->setCoordinates(shared::graphicsviewutils::coordinates(originGeometry));
         }
-
-        if (type == IVModel::CloneType::Reference) {
-            ivClone->setEntityAttribute(EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::reference),
-                    true, EntityAttribute::Type::Attribute });
-            const EntityAttribute attr = EntityAttribute { ivm::meta::Props::token(ivm::meta::Props::Token::origin),
-                origin->id(), EntityAttribute::Type::Attribute };
-            ivClone->setEntityAttribute(attr);
-        }
     } else {
         ivClone = origin;
     }
@@ -276,6 +271,16 @@ bool IVModel::removeObject(shared::VEObject *obj)
         return true;
     }
     return false;
+}
+
+void IVModel::setSharedTypeRequester(const std::function<QVector<IVFunctionType *>()> &requester)
+{
+    d->m_fnTypeRequester = requester;
+}
+
+void IVModel::setObjectRequester(const std::function<IVObject *(const shared::Id &)> &requester)
+{
+    d->m_objectRequester = requester;
 }
 
 void IVModel::setRootObject(shared::Id rootId)
@@ -324,11 +329,6 @@ shared::Id IVModel::rootObjectId() const
 IVObject *IVModel::getObject(const shared::Id &id) const
 {
     return qobject_cast<IVObject *>(shared::VEModel::getObject(id));
-}
-
-IVObject *IVModel::getOrigin(const shared::Id &id) const
-{
-    return d->m_componentModel ? d->m_componentModel->getObject(id) : nullptr;
 }
 
 IVObject *IVModel::getObjectByName(const QString &name, IVObject::Type type, Qt::CaseSensitivity caseSensitivity) const
@@ -416,14 +416,11 @@ IVFunctionType *IVModel::getFunctionType(const shared::Id &id) const
 
 IVFunctionType *IVModel::getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const
 {
-    return d->m_sharedTypesModel ? qobject_cast<IVFunctionType *>(
-                   d->m_sharedTypesModel->getObjectByName(name, IVObject::Type::FunctionType, caseSensitivity))
-                                 : nullptr;
-}
+    if (!d->m_fnTypeRequester)
+        return nullptr;
 
-IVFunctionType *IVModel::getSharedFunctionType(const shared::Id &id) const
-{
-    return d->m_sharedTypesModel ? qobject_cast<IVFunction *>(d->m_sharedTypesModel->getObject(id)) : nullptr;
+    const QVector<IVFunctionType *> externalSharedTypes = d->m_fnTypeRequester();
+    return getObjectByName(externalSharedTypes, name, IVObject::Type::FunctionType, caseSensitivity);
 }
 
 QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunction *fnObj) const
@@ -455,15 +452,10 @@ QHash<QString, IVFunctionType *> IVModel::getAvailableFunctionTypes(const IVFunc
         }
     }
 
-    if (d->m_sharedTypesModel) {
-        const auto sharedObjects = d->m_sharedTypesModel->objects();
-        for (auto sharedObject : sharedObjects) {
+    if (d->m_fnTypeRequester) {
+        for (auto sharedObject : d->m_fnTypeRequester()) {
             if (sharedObject->parentObject() == nullptr) {
-                if (auto fnType = sharedObject->as<IVFunctionType *>()) {
-                    if (fnType->isFunctionType()) {
-                        result[fnType->title()] = fnType;
-                    }
-                }
+                result[sharedObject->title()] = sharedObject;
             }
         }
     }
@@ -561,16 +553,6 @@ IVConnectionLayerType *IVModel::getConnectionLayerByName(const QString &name) co
         }
     }
     return nullptr;
-}
-
-IVModel *IVModel::getComponentsModel() const
-{
-    return d->m_componentModel;
-}
-
-void IVModel::setComponentsModel(IVModel *model)
-{
-    d->m_componentModel = model;
 }
 
 QVector<IVArchetypeLibraryReference *> IVModel::getArchetypeLibraryReferences()

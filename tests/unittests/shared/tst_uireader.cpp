@@ -76,7 +76,7 @@ void UIReader::test_ReadEntries()
             <Entity id="{8abfdf98-b52c-490e-a77f-63de5a75fb06}">
                 <Taste coordinates="72100 69400" RootCoordinates="28700 42500"></Taste>
             </Entity>
-            <Entity origin="{48a4b0d8-30a8-41be-9f0e-023c07c451d1}">
+            <Entity id="{48a4b0d8-30a8-41be-9f0e-023c07c451d1}">
                 <Taste coordinates="-32300 -33900 -32300 -38000 -33200 -40600 -33200 -42200"></Taste>
             </Entity>
             <Entity id="{3d106a0b-0039-4a04-887c-c73463c4b7b2}" attr="AttrData">

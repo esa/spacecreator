@@ -52,20 +52,36 @@ public:
         Move,
     };
 
-    explicit IVModel(shared::PropertyTemplateConfig *dynPropConfig, IVModel *sharedModel = nullptr,
-            IVModel *componentModel = nullptr, QObject *parent = nullptr);
+    explicit IVModel(shared::PropertyTemplateConfig *dynPropConfig, QObject *parent = nullptr);
     ~IVModel() override;
 
     bool removeObject(shared::VEObject *obj) override;
+    void setSharedTypeRequester(const std::function<QVector<IVFunctionType *>()> &requester);
+    void setObjectRequester(const std::function<IVObject *(const shared::Id &)> &requester);
 
     void setRootObject(shared::Id rootId);
     IVObject *rootObject() const;
     shared::Id rootObjectId() const;
 
     IVObject *getObject(const shared::Id &id) const override;
-    IVObject *getOrigin(const shared::Id &id) const;
     IVObject *getObjectByName(const QString &name, IVObject::Type type = IVObject::Type::Unknown,
             Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
+
+    template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,
+            typename = std::enable_if_t<std::is_base_of_v<IVObject, typename std::remove_pointer<T>::type>>>
+    static T getObjectByName(const C &objects, const QString &name, IVObject::Type type = IVObject::Type::Unknown,
+            Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive)
+    {
+        const auto it =
+                std::find_if(std::cbegin(objects), std::cend(objects), [&name, type, caseSensitivity](const T &object) {
+                    return object->type() == type && QString::compare(object->title(), name, caseSensitivity) == 0;
+                });
+        if (it != std::cend(objects))
+            return *it;
+
+        return {};
+    }
+
     IVInterface *getIfaceByName(const QString &name, IVInterface::InterfaceType dir,
             const IVFunctionType *parent = nullptr, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
     QList<IVInterface *> getIfacesByName(
@@ -75,7 +91,6 @@ public:
     IVFunctionType *getFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
     IVFunctionType *getFunctionType(const shared::Id &id) const;
     IVFunctionType *getSharedFunctionType(const QString &name, Qt::CaseSensitivity caseSensitivity) const;
-    IVFunctionType *getSharedFunctionType(const shared::Id &id) const;
     QHash<QString, IVFunctionType *> getAvailableFunctionTypes(const IVFunction *fnObj) const;
     IVInterface *getInterface(const shared::Id &id) const;
     IVInterfaceRequired *getRequiredInterface(const shared::Id &id) const;
@@ -98,9 +113,6 @@ public:
     auto setConnectionLayersModel(IVModel *layersModel) -> void;
     auto getConnectionLayersModel() const -> IVModel *;
     auto getConnectionLayerByName(const QString &name) const -> IVConnectionLayerType *;
-
-    IVModel *getComponentsModel() const;
-    void setComponentsModel(IVModel *model);
 
     QVector<IVArchetypeLibraryReference *> getArchetypeLibraryReferences();
     void setArchetypeLibraryReferences(QVector<IVArchetypeLibraryReference *> references);

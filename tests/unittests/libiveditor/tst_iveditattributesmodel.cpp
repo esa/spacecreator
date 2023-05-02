@@ -178,7 +178,7 @@ void tst_IVEditAttributesModel::testReadFunctions()
     auto function1 = ivm::testutils::createFunction("Function 1");
     auto function2 = ivm::testutils::createFunction("Function 2");
 
-    m_ivModel->addObjects<ivm::IVObject *>({function1, function2});
+    m_ivModel->addObjects(QList<ivm::IVObject *> { function1, function2 });
 
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get());
     QCOMPARE(model.rowCount(QModelIndex()), 2);
@@ -191,7 +191,7 @@ void tst_IVEditAttributesModel::testReadFunctions()
     QSet<QString> obtainedNames;
     obtainedNames << model.data(model.index(0, 0), Qt::DisplayRole).toString();
     obtainedNames << model.data(model.index(1, 0), Qt::DisplayRole).toString();
-    QSet<QString> expectedNames({QLatin1String("Function 1"), QLatin1String("Function 2")});
+    QSet<QString> expectedNames({ QLatin1String("Function 1"), QLatin1String("Function 2") });
     QCOMPARE(obtainedNames, expectedNames);
 }
 
@@ -202,7 +202,7 @@ void tst_IVEditAttributesModel::testReadInterfaces()
     auto interface1 = ivm::testutils::createProvidedIface(function1, "Interface 1");
     auto interface2 = ivm::testutils::createProvidedIface(function2, "Interface 2");
 
-    m_ivModel->addObjects<ivm::IVObject *>({interface1, interface2});
+    m_ivModel->addObjects(QList<ivm::IVObject *> { interface1, interface2 });
 
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get());
     QCOMPARE(model.rowCount(QModelIndex()), 2);
@@ -218,7 +218,7 @@ void tst_IVEditAttributesModel::testWriteFunctions()
     auto function = ivm::testutils::createFunction("Function");
     auto type = ivm::testutils::createFunctionType("Type");
 
-    m_ivModel->addObjects<ivm::IVObject *>({function, type});
+    m_ivModel->addObjects(QList<ivm::IVObject *> { function, type });
 
     shared::cmd::CommandsStackBase stack;
     shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
@@ -241,7 +241,7 @@ void tst_IVEditAttributesModel::testWriteInterfaces()
     auto function = ivm::testutils::createFunction("Function 1");
     auto interface = ivm::testutils::createProvidedIface(function, "Interface 1");
 
-    m_ivModel->addObjects<ivm::IVObject *>({interface});
+    m_ivModel->addObjects(QList<ivm::IVObject *> { interface });
 
     shared::cmd::CommandsStackBase stack;
     shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
@@ -253,13 +253,12 @@ void tst_IVEditAttributesModel::testWriteInterfaces()
     QCOMPARE(model.data(model.index(0, 1), Qt::DisplayRole).toString(), QLatin1String("Renamed"));
 }
 
-
 void tst_IVEditAttributesModel::testSaveFunctions()
 {
     auto function1 = ivm::testutils::createFunction("Function 1");
     auto function2 = ivm::testutils::createFunction("Function 2");
 
-    m_ivModel->addObjects<ivm::IVObject *>({function1, function2});
+    m_ivModel->addObjects(QList<ivm::IVObject *> { function1, function2 });
 
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get());
 
@@ -275,7 +274,7 @@ void tst_IVEditAttributesModel::testSaveFunctions()
     QSet<QString> obtainedNames;
     obtainedNames << one.value("name").toString();
     obtainedNames << two.value("name").toString();
-    QSet<QString> expectedNames({QLatin1String("Function 1"), QLatin1String("Function 2")});
+    QSet<QString> expectedNames({ QLatin1String("Function 1"), QLatin1String("Function 2") });
     QCOMPARE(obtainedNames, expectedNames);
 }
 
@@ -286,7 +285,7 @@ void tst_IVEditAttributesModel::testSaveInterfaces()
     auto interface1 = ivm::testutils::createProvidedIface(function1, "Interface 1");
     auto interface2 = ivm::testutils::createProvidedIface(function2, "Interface 2");
 
-    m_ivModel->addObjects<ivm::IVObject *>({interface1, interface2});
+    m_ivModel->addObjects(QList<ivm::IVObject *> { interface1, interface2 });
 
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get());
 
@@ -297,8 +296,12 @@ void tst_IVEditAttributesModel::testSaveInterfaces()
 
     const QJsonObject one = attributes.at(0).toObject();
     const QJsonObject two = attributes.at(1).toObject();
-    QCOMPARE(one.keys(), QStringList() << "kind" << "name");
-    QCOMPARE(two.keys(), QStringList() << "kind" << "name");
+    QCOMPARE(one.keys(),
+            QStringList() << "kind"
+                          << "name");
+    QCOMPARE(two.keys(),
+            QStringList() << "kind"
+                          << "name");
     QCOMPARE(one.value("kind").toString(), "Protected");
     QCOMPARE(two.value("kind").toString(), "Protected");
 
@@ -306,7 +309,7 @@ void tst_IVEditAttributesModel::testSaveInterfaces()
     QSet<QString> obtainedNames;
     obtainedNames << one.value("name").toString();
     obtainedNames << two.value("name").toString();
-    QSet<QString> expectedNames({QLatin1String("Interface 1"), QLatin1String("Interface 2")});
+    QSet<QString> expectedNames({ QLatin1String("Interface 1"), QLatin1String("Interface 2") });
     QCOMPARE(obtainedNames, expectedNames);
 }
 
@@ -315,14 +318,14 @@ void tst_IVEditAttributesModel::testLoadFunctions()
     auto function = ivm::testutils::createFunction("Function");
     auto type = ivm::testutils::createFunctionType("Type");
 
-    m_ivModel->addObjects<ivm::IVObject *>({function, type});
+    m_ivModel->addObjects(QList<ivm::IVObject *> { function, type });
 
     shared::cmd::CommandsStackBase stack;
     shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get(), &macro);
 
     QJsonArray array;
-    QJsonObject object({ {"name", "Function"}, {"instance_of", "Type"} });
+    QJsonObject object({ { "name", "Function" }, { "instance_of", "Type" } });
     array.append(object);
 
     model.loadAttributes(array);
@@ -336,21 +339,20 @@ void tst_IVEditAttributesModel::testLoadInterfaces()
     auto function = ivm::testutils::createFunction("Function");
     auto interface = ivm::testutils::createProvidedIface(function, "Interface");
 
-    m_ivModel->addObjects<ivm::IVObject *>({interface});
+    m_ivModel->addObjects(QList<ivm::IVObject *> { interface });
 
     shared::cmd::CommandsStackBase stack;
     shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get(), &macro);
 
     QJsonArray array;
-    QJsonObject object({ {"name", "Interface"}, {"kind", "Unprotected"} });
+    QJsonObject object({ { "name", "Interface" }, { "kind", "Unprotected" } });
     array.append(object);
 
     model.loadAttributes(array);
 
     QCOMPARE(model.data(model.index(0, 2), Qt::DisplayRole).toString(), QLatin1String("Unprotected"));
 }
-
 
 QTEST_MAIN(tst_IVEditAttributesModel)
 

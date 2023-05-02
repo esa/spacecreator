@@ -17,8 +17,8 @@
 
 #include "ivvisualizationmodelbase.h"
 
-#include "commands/cmdentityattributeschange.h"
 #include "commands/cmdchangelayervisibility.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commandsstack.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
@@ -38,9 +38,8 @@ namespace ive {
  */
 
 IVVisualizationModelBase::IVVisualizationModelBase(
-        ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, shared::DropData::Type dropType, QObject *parent)
+        ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
     : shared::AbstractVisualizationModel(ivModel, commandsStack, parent)
-    , m_dropType(dropType)
 {
 }
 
@@ -130,7 +129,6 @@ void IVVisualizationModelBase::updateItemData(QStandardItem *item, shared::VEObj
     } else {
         color = QColor(Qt::black);
     }
-    item->setData(static_cast<int>(m_dropType), DropRole);
     item->setData(dragPix, CursorPixmapRole);
     item->setData(color, Qt::ForegroundRole);
     item->setData(font, Qt::FontRole);
@@ -228,7 +226,7 @@ void IVVisualizationModelBase::updateConnectionItem(ivm::IVConnection *connectio
  */
 
 IVVisualizationModel::IVVisualizationModel(ivm::IVModel *ivModel, cmd::CommandsStack *commandsStack, QObject *parent)
-    : IVVisualizationModelBase(ivModel, commandsStack, shared::DropData::Type::None, parent)
+    : IVVisualizationModelBase(ivModel, commandsStack, parent)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &IVVisualizationModel::onDataChanged);
 }
@@ -327,7 +325,7 @@ void IVVisualizationModel::setAllItemsVisible()
  */
 IVLayerVisualizationModel::IVLayerVisualizationModel(
         ivm::IVModel *layerModel, ivm::IVModel *objectsModel, cmd::CommandsStack *commandsStack, QObject *parent)
-    : IVVisualizationModelBase(layerModel, commandsStack, shared::DropData::Type::None, parent)
+    : IVVisualizationModelBase(layerModel, commandsStack, parent)
     , m_objectsModel(objectsModel)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &IVLayerVisualizationModel::onDataChanged);
@@ -370,15 +368,17 @@ void IVLayerVisualizationModel::onDataChanged(
         if (item->isCheckable()) {
 
             const auto rawLayerName = item->text();
-            const auto encodedLayerName = ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, rawLayerName);
+            const auto encodedLayerName =
+                    ivm::IVNameValidator::encodeName(ivm::IVObject::Type::ConnectionLayer, rawLayerName);
             const auto layerIsChecked = item->checkState() == Qt::Checked;
             const auto ivModel = qobject_cast<ivm::IVModel *>(m_veModel);
 
             setObjectsVisibility(encodedLayerName, layerIsChecked);
 
-            if(ivm::IVObject *layerObj = ivModel->getObjectByName(encodedLayerName, ivm::IVObject::Type::ConnectionLayer, Qt::CaseSensitivity::CaseSensitive)) {
+            if (ivm::IVObject *layerObj = ivModel->getObjectByName(
+                        encodedLayerName, ivm::IVObject::Type::ConnectionLayer, Qt::CaseSensitivity::CaseSensitive)) {
                 layerObj->setVisible(layerIsChecked);
-                
+
                 auto command = new ive::cmd::CmdChangeLayerVisibility();
                 m_commandsStack->push(command);
             } else {

@@ -68,10 +68,10 @@ void tst_DVModel::testAddObject()
 
 void tst_DVModel::testAddObjects()
 {
-    m_model->addObjects<dvm::DVObject *>({ new dvm::DVNode(), new dvm::DVNode() });
+    m_model->addObjects(QList<dvm::DVObject *> { new dvm::DVNode(), new dvm::DVNode() });
     QCOMPARE(m_model->objects().size(), 2);
 
-    m_model->addObjects<dvm::DVObject *>({ new dvm::DVNode(), new dvm::DVNode(), new dvm::DVNode() });
+    m_model->addObjects(QList<dvm::DVObject *> { new dvm::DVNode(), new dvm::DVNode(), new dvm::DVNode() });
     QCOMPARE(m_model->objects().size(), 5);
 }
 
@@ -105,7 +105,7 @@ void tst_DVModel::testInitFromObjects()
     auto obj = new dvm::DVNode();
     m_model->addObject(obj);
 
-    m_model->initFromObjects<dvm::DVObject *>({ new dvm::DVNode(), new dvm::DVNode() });
+    m_model->initFromObjects(QList<dvm::DVObject *> { new dvm::DVNode(), new dvm::DVNode() });
     QCOMPARE(m_model->objects().size(), 2);
 }
 

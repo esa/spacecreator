@@ -15,9 +15,9 @@
   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "objectstreeview.h"
+#include "componenttreeview.h"
 
-#include "abstractvisualizationmodel.h"
+#include "componentmodel.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -28,14 +28,14 @@
 namespace shared {
 namespace ui {
 
-ObjectsTreeView::ObjectsTreeView(QWidget *parent)
+ComponentTreeView::ComponentTreeView(QWidget *parent)
     : QTreeView(parent)
 {
     setDragEnabled(true);
     setDragDropMode(QAbstractItemView::DragOnly);
 }
 
-void ObjectsTreeView::mousePressEvent(QMouseEvent *event)
+void ComponentTreeView::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         m_dragStartPosition = event->pos();
@@ -43,26 +43,25 @@ void ObjectsTreeView::mousePressEvent(QMouseEvent *event)
     QTreeView::mousePressEvent(event);
 }
 
-void ObjectsTreeView::mouseMoveEvent(QMouseEvent *event)
+void ComponentTreeView::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons().testFlag(Qt::LeftButton)) {
         if ((event->pos() - m_dragStartPosition).manhattanLength() > QApplication::startDragDistance()) {
             const QModelIndex index = indexAt(event->pos());
-            if (!index.isValid()) {
+            if (index.isValid()) {
+                event->accept();
+
+                QDrag *drag = new QDrag(this);
+                DropData *mimeData = new DropData;
+                mimeData->entityId = index.data(ComponentModel::IdRole).toUuid();
+                const int dropType = index.data(ComponentModel::DropRole).toInt();
+                mimeData->dropType = static_cast<DropData::Type>(dropType);
+                drag->setMimeData(mimeData);
+                const QPixmap pix = index.data(ComponentModel::CursorPixmapRole).value<QPixmap>();
+                drag->setDragCursor(pix, Qt::DropAction::CopyAction);
+                drag->exec(Qt::DropAction::CopyAction);
                 return;
             }
-
-            QDrag *drag = new QDrag(this);
-            DropData *mimeData = new DropData;
-            mimeData->entityId = index.data(AbstractVisualizationModel::IdRole).toUuid();
-            const int dropType = index.data(AbstractVisualizationModel::DropRole).toInt();
-            mimeData->dropType = static_cast<DropData::Type>(dropType);
-            drag->setMimeData(mimeData);
-            const QPixmap pix = index.data(AbstractVisualizationModel::CursorPixmapRole).value<QPixmap>();
-            drag->setDragCursor(pix, Qt::DropAction::CopyAction);
-            drag->exec(Qt::DropAction::CopyAction);
-            event->accept();
-            return;
         }
     }
     QTreeView::mouseMoveEvent(event);

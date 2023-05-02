@@ -19,9 +19,9 @@
             <Provided_Interface/>
         </Scopes>
     </Attr>
-    <Attr name="origin" editable="false" optional="true">
+    <Attr name="reference" editable="false" optional="true">
         <Type>
-            <String validator="\{?[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\}?"/>
+            <Boolean />
         </Type>
     </Attr>
     <Attr name="is_type">

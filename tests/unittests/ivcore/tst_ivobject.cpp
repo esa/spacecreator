@@ -145,7 +145,7 @@ void tst_IVObject::test_coordinatesType()
     ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", fn2);
 
     QSignalSpy spy(&model, &ivm::IVModel::objectsAdded);
-    model.addObjects<ivm::IVObject *>({ fn1, fn2, fn3 });
+    model.addObjects(QList<ivm::IVObject *> { fn1, fn2, fn3 });
     QVERIFY(spy.count() == 1);
     QVERIFY(model.objects().size() == 3);
 

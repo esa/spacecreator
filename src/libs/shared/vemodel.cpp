@@ -103,9 +103,8 @@ void VEModel::clear()
 
 VEObject *VEModel::getObjectByAttributeValue(const QString &attrName, const QVariant &value) const
 {
-    auto it = std::find_if(d->m_objects.constBegin(), d->m_objects.constEnd(), [&](VEObject *object){
-        return object->entityAttributeValue(attrName) == value;
-    });
+    auto it = std::find_if(d->m_objects.constBegin(), d->m_objects.constEnd(),
+            [&](VEObject *object) { return object->entityAttributeValue(attrName) == value; });
     return it == d->m_objects.constEnd() ? nullptr : *it;
 }
 
@@ -140,7 +139,7 @@ VEObject *VEModel::getObject(const Id &id) const
         return nullptr;
     }
 
-    return d->m_objects.value(id, nullptr);
+    return getObject(d->m_objects, id);
 }
 
 bool VEModel::addObjectImpl(VEObject *obj)

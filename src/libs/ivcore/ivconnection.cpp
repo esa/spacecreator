@@ -311,15 +311,6 @@ IVInterface *IVConnection::findIface(const EndPointInfo &info, IVObject *parentO
             }
         }
     }
-    if (!ivIface && info.m_originIfaceId != shared::InvalidId && parentObj && parentObj->isReference()) {
-        if (auto iface = model()->getObjectByAttributeValue(
-                    meta::Props::token(meta::Props::Token::origin), info.m_originIfaceId)) {
-            Q_ASSERT(iface->parentObject() == parentObject);
-            if (iface->parentObject() == parentObject) {
-                ivIface = iface->as<IVInterface *>();
-            }
-        }
-    }
 
     if (!ivIface) {
         ivIface = model()->getIfaceByName(info.m_interfaceName, info.m_ifaceDirection, parentObj);

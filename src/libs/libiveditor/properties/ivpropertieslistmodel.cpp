@@ -76,7 +76,7 @@ bool IVPropertiesListModel::isEditable(const QModelIndex &index) const
 
     bool editable = true;
     switch (tokenFromIndex(index)) {
-    case ivm::meta::Props::Token::origin:
+    case ivm::meta::Props::Token::reference:
     case ivm::meta::Props::Token::is_type:
     case ivm::meta::Props::Token::fixed_system_element:
     case ivm::meta::Props::Token::required_system_element:

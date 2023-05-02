@@ -34,6 +34,7 @@
 #include "errorhub.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivarchetypelibraryreference.h"
+#include "ivcomponentmodel.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivexporter.h"
 #include "ivfunction.h"
@@ -79,10 +80,6 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     IVVisualizationModelBase *objectsVisualizationModel { nullptr };
     QItemSelectionModel *objectsSelectionModel { nullptr };
     ivm::IVModel *objectsModel { nullptr };
-    ivm::IVModel *importModel { nullptr };
-    IVVisualizationModelBase *importVisualisationModel { nullptr };
-    ivm::IVModel *sharedModel { nullptr };
-    IVVisualizationModelBase *sharedVisualisationModel { nullptr };
     IVExporter *exporter { nullptr };
     ivm::IVModel *layersModel { nullptr };
     IVVisualizationModelBase *layerSelect { nullptr };
@@ -93,8 +90,8 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     QString mscFileName;
     QString uiFileName { shared::kDefaultInterfaceViewUIFileName };
     QStringList asnFilesNames;
-    QHash<shared::Id, QString> componentsPaths;
-    QHash<shared::Id, QString> sharedTypesPaths;
+    IVComponentModel *componentsModel;
+    IVComponentModel *sharedTypesModel;
 };
 
 void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
@@ -160,26 +157,36 @@ InterfaceDocument::InterfaceDocument(QObject *parent)
     d->dynPropConfig = ivm::IVPropertyTemplateConfig::instance();
     d->dynPropConfig->init(shared::interfaceCustomAttributesFilePath());
 
-    d->importModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
-    d->sharedModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
-    d->objectsModel = new ivm::IVModel(d->dynPropConfig, d->sharedModel, d->importModel, this);
-    d->layersModel = new ivm::IVModel(d->dynPropConfig, nullptr, nullptr, this);
+    d->componentsModel = new IVComponentModel(IVComponentModel::Type::ComponentLibrary, tr("Components"), this);
+    d->sharedTypesModel = new IVComponentModel(IVComponentModel::Type::SharedTypesLibrary, tr("Shared Types"), this);
+    d->objectsModel = new ivm::IVModel(d->dynPropConfig, this);
+    d->objectsModel->setObjectRequester(
+            std::bind(&IVComponentModel::getObject, d->componentsModel, std::placeholders::_1));
+    d->objectsModel->setSharedTypeRequester([this]() -> QVector<ivm::IVFunctionType *> {
+        QVector<ivm::IVFunctionType *> fnTypes;
+        for (const shared::Id &id : d->sharedTypesModel->componentIDs()) {
+            const QHash<shared::Id, shared::VEObject *> objects = d->sharedTypesModel->component(id)->model->objects();
+            for (auto it = objects.constBegin(); it != objects.constEnd(); ++it) {
+                if (auto ivObj = qobject_cast<ivm::IVObject *>(*it)) {
+                    if (ivObj->type() == ivm::IVObject::Type::FunctionType)
+                        fnTypes << ivObj->as<ivm::IVFunctionType *>();
+                }
+            }
+        }
+        return fnTypes;
+    });
+    d->layersModel = new ivm::IVModel(d->dynPropConfig, this);
     d->archetypesModel = new ivm::ArchetypeModel(this);
 
     connect(d->objectsModel, &ivm::IVModel::objectsAdded, this, [this](const QVector<shared::Id> &objectsIds) {
         for (const shared::Id &id : objectsIds) {
             if (auto obj = d->objectsModel->getObject(id)) {
                 if (obj->isReference()) {
-                    checkReferencedASN1Files(d->objectsModel->getOrigin(obj->origin()));
+                    checkReferencedASN1Files(obj);
                 }
             }
         }
     });
-
-    connect(d->importModel, &ivm::IVModel::objectRemoved, this,
-            [this](const shared::Id &id) { d->componentsPaths.remove(id); });
-    connect(d->sharedModel, &ivm::IVModel::objectRemoved, this,
-            [this](const shared::Id &id) { d->sharedTypesPaths.remove(id); });
 }
 
 InterfaceDocument::~InterfaceDocument()
@@ -192,8 +199,8 @@ void InterfaceDocument::init()
     // Create view models, as the can't handle filled models at creations
     itemsModel();
     visualisationModel();
-    importVisualisationModel();
-    sharedVisualisationModel();
+    componentModel();
+    sharedTypesModel();
     layerVisualisationModel();
 
     QTimer::singleShot(0, this, &InterfaceDocument::loadAvailableComponents);
@@ -263,12 +270,12 @@ bool InterfaceDocument::load(const QString &path)
  * Does load the imported and shared components.
  * If they are loaded already, nothing is done.
  */
-bool InterfaceDocument::loadAvailableComponents()
+void InterfaceDocument::loadAvailableComponents()
 {
-    if (d->importModel->isEmpty() && d->sharedModel->isEmpty()) {
-        return reloadComponentModel() && reloadSharedTypeModel();
-    }
-    return false;
+    if (d->componentsModel->libraryPath().isEmpty())
+        d->componentsModel->load(shared::componentsLibraryPath());
+    if (d->sharedTypesModel->libraryPath().isEmpty())
+        d->sharedTypesModel->load(shared::sharedTypesPath());
 }
 
 QString InterfaceDocument::getComponentName(const QStringList &exportNames)
@@ -360,7 +367,7 @@ bool InterfaceDocument::exportSelectedFunctions()
     QString path = shared::componentsLibraryPath() + QDir::separator() + name;
     if (exportImpl(path, objects)) {
         d->objectsSelectionModel->clearSelection();
-        return reloadComponentModel();
+        return true;
     }
     return false;
 }
@@ -390,7 +397,7 @@ bool InterfaceDocument::exportSelectedType()
     if (exportImpl(path, { rootType })) {
         d->objectsModel->removeObject(rootType);
         d->objectsSelectionModel->clearSelection();
-        return reloadSharedTypeModel();
+        return true;
     }
     return false;
 }
@@ -425,33 +432,6 @@ bool InterfaceDocument::loadComponentModel(
     model->addObjects(objects);
     shared::ErrorHub::clearCurrentFile();
     return true;
-}
-
-bool InterfaceDocument::reloadComponentModel()
-{
-    bool result = true;
-    d->importModel->clear();
-    d->componentsPaths.clear();
-    QDirIterator importableIt(shared::componentsLibraryPath(), QDir::Dirs | QDir::NoDotAndDotDot);
-    while (importableIt.hasNext()) {
-        result |= loadComponentModel(d->importModel,
-                importableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName, &d->componentsPaths);
-    }
-    return result;
-}
-
-bool InterfaceDocument::reloadSharedTypeModel()
-{
-    bool result = true;
-    d->sharedModel->clear();
-    d->sharedTypesPaths.clear();
-    QDirIterator instantiatableIt(shared::sharedTypesPath(), QDir::Dirs | QDir::NoDotAndDotDot);
-    while (instantiatableIt.hasNext()) {
-        result |= loadComponentModel(d->sharedModel,
-                instantiatableIt.next() + QDir::separator() + shared::kDefaultInterfaceViewFileName,
-                &d->sharedTypesPaths);
-    }
-    return result;
 }
 
 void InterfaceDocument::close()
@@ -738,14 +718,14 @@ ivm::IVModel *InterfaceDocument::objectsModel() const
     return d->objectsModel;
 }
 
-ivm::IVModel *InterfaceDocument::importModel() const
+IVComponentModel *InterfaceDocument::componentModel() const
 {
-    return d->importModel;
+    return d->componentsModel;
 }
 
-ivm::IVModel *InterfaceDocument::sharedModel() const
+IVComponentModel *InterfaceDocument::sharedTypesModel() const
 {
-    return d->sharedModel;
+    return d->sharedTypesModel;
 }
 
 IVItemModel *InterfaceDocument::itemsModel() const
@@ -800,38 +780,6 @@ QItemSelectionModel *InterfaceDocument::objectsSelectionModel() const
                 &InterfaceDocument::onViewSelectionChanged);
     }
     return d->objectsSelectionModel;
-}
-
-/**
- * VisualizationModel for the "Import Component" window
- */
-IVVisualizationModelBase *InterfaceDocument::importVisualisationModel() const
-{
-    if (!d->importVisualisationModel) {
-        d->importVisualisationModel = new IVVisualizationModelBase(importModel(), d->commandsStack,
-                shared::DropData::Type::ImportableType, const_cast<InterfaceDocument *>(this));
-        auto headerItem = new QStandardItem(tr("Import Component"));
-        headerItem->setTextAlignment(Qt::AlignCenter);
-        d->importVisualisationModel->setHorizontalHeaderItem(0, headerItem);
-    }
-
-    return d->importVisualisationModel;
-}
-
-/**
- * VisualizationModel for the "Shared Types" window
- */
-IVVisualizationModelBase *InterfaceDocument::sharedVisualisationModel() const
-{
-    if (!d->sharedVisualisationModel) {
-        d->sharedVisualisationModel = new IVVisualizationModelBase(sharedModel(), d->commandsStack,
-                shared::DropData::Type::InstantiatableType, const_cast<InterfaceDocument *>(this));
-        auto headerItem = new QStandardItem(tr("Shared Types"));
-        headerItem->setTextAlignment(Qt::AlignCenter);
-        d->sharedVisualisationModel->setHorizontalHeaderItem(0, headerItem);
-    }
-
-    return d->sharedVisualisationModel;
 }
 
 /**
@@ -1178,49 +1126,14 @@ void InterfaceDocument::loadArchetypes()
     }
 }
 
-ivm::IVObject *InterfaceDocument::reloadComponent(ivm::IVObject *obj)
-{
-    if (!obj)
-        return nullptr;
-
-    const shared::Id id = obj->id();
-    if (auto model = obj->model()) {
-        QString path;
-        if (model == d->importModel)
-            path = componentPath(id);
-        else if (model == d->sharedModel)
-            path = sharedTypePath(id);
-
-        if (path.isEmpty())
-            return obj;
-
-        const QVector<shared::VEObject *> children = obj->descendants();
-        QList<ivm::IVObject *> ivChildren;
-        std::for_each(children.cbegin(), children.cend(),
-                [&ivChildren](shared::VEObject *obj) { ivChildren.append(obj->as<ivm::IVObject *>()); });
-        ivm::IVObject::sortObjectList(ivChildren);
-        for (auto it = ivChildren.rbegin(); it != ivChildren.rend(); ++it)
-            model->removeObject(*it);
-        model->removeObject(obj);
-
-        loadComponentModel(
-                qobject_cast<ivm::IVModel *>(model), path + QDir::separator() + shared::kDefaultInterfaceViewFileName);
-
-        obj->deleteLater();
-        return model->getObject(id);
-    }
-
-    return obj;
-}
-
 QString InterfaceDocument::componentPath(const shared::Id &id) const
 {
-    return d->componentsPaths.value(id);
+    return d->componentsModel->componentPath(id);
 }
 
 QString InterfaceDocument::sharedTypePath(const shared::Id &id) const
 {
-    return d->sharedTypesPaths.value(id);
+    return d->sharedTypesModel->componentPath(id);
 }
 
 void InterfaceDocument::generateArchetypeLibrary(
@@ -1322,5 +1235,4 @@ void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected, c
     updateSelection(deselected, false);
     updateSelection(selected, true);
 }
-
 }

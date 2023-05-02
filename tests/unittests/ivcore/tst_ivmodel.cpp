@@ -313,7 +313,7 @@ void tst_IVModel::testConnectionQuery()
     auto fn1 = ivm::testutils::createFunction("Fn1");
     auto fn2 = ivm::testutils::createFunction("Fn2");
     ivm::IVConnection *connect1 = ivm::testutils::createConnection(fn1, fn2, "cnt1");
-    m_model->addObjects<ivm::IVObject *>({ fn1, fn2, connect1 });
+    m_model->addObjects(QList<ivm::IVObject *> { fn1, fn2, connect1 });
 
     const Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
     QCOMPARE(m_model->getConnection("Dummy", "Fn1", "Fn2", m_caseCheck), nullptr);
@@ -335,6 +335,17 @@ void tst_IVModel::testAvailableFunctionTypes()
     QCOMPARE(sharedModel.objects().size(), sharedFunctionTypesCount);
 
     ivm::IVModel model(m_dynPropConfig, &sharedModel);
+    model.setSharedTypeRequester([&]() -> QVector<ivm::IVFunctionType *> {
+        QVector<ivm::IVFunctionType *> fnTypes;
+        const QHash<shared::Id, shared::VEObject *> objects = sharedModel.objects();
+        for (auto it = objects.constBegin(); it != objects.constEnd(); ++it) {
+            if (auto ivObj = qobject_cast<ivm::IVObject *>(*it)) {
+                if (ivObj->type() == ivm::IVObject::Type::FunctionType)
+                    fnTypes << ivObj->as<ivm::IVFunctionType *>();
+            }
+        }
+        return fnTypes;
+    });
 
     ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1");
     ivm::IVFunction *container2 = ivm::testutils::createFunction("Container2", container1);

@@ -120,9 +120,4 @@ bool ExportableIVObject::isReference() const
     return exportedObject<ivm::IVObject>()->isReference();
 }
 
-QString ExportableIVObject::origin() const
-{
-    return exportedObject<ivm::IVObject>()->origin().toString();
-}
-
 }

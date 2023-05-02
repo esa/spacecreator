@@ -52,13 +52,13 @@
          </property>
          <widget class="QTreeView" name="layerView"/>
          <widget class="QTreeView" name="objectsView"/>
-         <widget class="shared::ui::ObjectsTreeView" name="importView"/>
-         <widget class="shared::ui::ObjectsTreeView" name="sharedView"/>
+         <widget class="shared::ui::ComponentTreeView" name="importView" native="true"/>
+         <widget class="shared::ui::ComponentTreeView" name="sharedView" native="true"/>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="shared::ActionsBar" name="toolBar" native="true"/>
@@ -74,11 +74,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>shared::ui::ObjectsTreeView</class>
-   <extends>QTreeView</extends>
-   <header>interface/objectstreeview.h</header>
-  </customwidget>
-  <customwidget>
    <class>shared::ActionsBar</class>
    <extends>QWidget</extends>
    <header>actionsbar.h</header>
@@ -88,6 +83,11 @@
    <class>ive::GraphicsView</class>
    <extends>QGraphicsView</extends>
    <header>itemeditor/graphicsview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>shared::ui::ComponentTreeView</class>
+   <extends>QWidget</extends>
+   <header>interface/componenttreeview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

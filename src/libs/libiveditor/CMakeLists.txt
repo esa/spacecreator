@@ -166,6 +166,8 @@ target_sources(${LIB_NAME} PRIVATE
     ivappwidget.cpp
     ivappwidget.h
     ivappwidget.ui
+    ivcomponentmodel.cpp
+    ivcomponentmodel.h
     ivconnectiongroupmodel.cpp
     ivconnectiongroupmodel.h
     ivcreatortool.cpp

@@ -56,6 +56,7 @@ namespace cmd {
 class CommandsStack;
 }
 
+class IVComponentModel;
 class IVAppWidget;
 class IVCommentGraphicsItem;
 class IVConnectionGraphicsItem;
@@ -87,7 +88,7 @@ public:
 
     bool create(const QString &path = QString());
     bool load(const QString &path);
-    bool loadAvailableComponents();
+    void loadAvailableComponents();
     bool exportSelectedFunctions();
     bool exportSelectedType();
     void close();
@@ -126,8 +127,8 @@ public:
 
     IVItemModel *itemsModel() const;
 
-    ivm::IVModel *importModel() const;
-    ivm::IVModel *sharedModel() const;
+    IVComponentModel *componentModel() const;
+    IVComponentModel *sharedTypesModel() const;
 
     ivm::IVModel *layersModel() const;
     QHash<shared::Id, shared::VEObject *> layersObjects() const;
@@ -137,8 +138,6 @@ public:
 
     QItemSelectionModel *objectsSelectionModel() const;
 
-    IVVisualizationModelBase *importVisualisationModel() const;
-    IVVisualizationModelBase *sharedVisualisationModel() const;
     IVVisualizationModelBase *layerVisualisationModel() const;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
@@ -157,7 +156,6 @@ public:
 
     auto updateLayersModel() const -> void;
     void loadArchetypes();
-    ivm::IVObject *reloadComponent(ivm::IVObject *object);
 
     QString componentPath(const shared::Id &id) const;
     QString sharedTypePath(const shared::Id &id) const;
@@ -191,9 +189,6 @@ private:
     bool loadComponentModel(ivm::IVModel *model, const QString &path, QHash<shared::Id, QString> *pathMappings);
     void generateArchetypeLibrary(
             QVector<ivm::ArchetypeObject *> &archetypeObjects, const QString &archetypeLibraryName);
-
-    bool reloadComponentModel();
-    bool reloadSharedTypeModel();
 
     void onSceneSelectionChanged(const QList<shared::Id> &selectedObjects);
     void onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

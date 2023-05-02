@@ -27,9 +27,6 @@ bool UIReader::processTagOpen(QXmlStreamReader &xml)
     EntityAttributes attrs = attributes(xml.attributes());
     if (tagName == kEntityTagName) {
         m_currentEntityID = attrs.take(QLatin1String("id")).value<QUuid>();
-        const EntityAttribute attr = attrs.take(QLatin1String("origin"));
-        if (attr.isValid())
-            m_currentEntityID = attr.value<QUuid>();
         m_currentEntityAttributes = attrs;
         return true;
     }

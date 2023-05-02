@@ -417,8 +417,8 @@ void tst_XmlDocExporter::testExportID()
                 </Implementations>
             </Function>
             <Connection id="%5">
-                <Source func_name="Function_1" ri_name="PI_1" iface_id="%3"/>
-                <Target func_name="Function_2" pi_name="PI_1" iface_id="%4"/>
+                <Source func_name="Function_1" ri_name="PI_1"/>
+                <Target func_name="Function_2" pi_name="PI_1"/>
             </Connection>
         </InterfaceView>
     )";
@@ -464,8 +464,8 @@ void tst_XmlDocExporter::testExportUI()
                 </Required_Interface>
             </Function>
             <Connection id="%5">
-                <Source func_name="Function_1" ri_name="PI_1" iface_id="%3"/>
-                <Target func_name="Function_2" pi_name="PI_1" iface_id="%4"/>
+                <Source func_name="Function_1" ri_name="PI_1"/>
+                <Target func_name="Function_2" pi_name="PI_1"/>
             </Connection>
         </InterfaceView>
     )";
@@ -501,8 +501,8 @@ void tst_XmlDocExporter::testExportUI()
                 </Required_Interface>
             </Function>
             <Connection id="%5">
-                <Source func_name="Function_1" ri_name="PI_1" iface_id="%3"/>
-                <Target func_name="Function_2" pi_name="PI_1" iface_id="%4"/>
+                <Source func_name="Function_1" ri_name="PI_1"/>
+                <Target func_name="Function_2" pi_name="PI_1"/>
             </Connection>
             <UI>
                 <Entity id="%5" AttrName="AttributeData"></Entity>

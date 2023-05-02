@@ -594,7 +594,7 @@ void IVInterface::reflectAttrs(const IVInterface *from)
     revertAttribute(meta::Props::Token::required_system_element, newAttrs, m_originalFields.attrs);
 
     for (auto t : { meta::Props::Token::InheritPI, meta::Props::Token::coordinates, meta::Props::Token::RootCoordinates,
-                 meta::Props::Token::Autonamed, meta::Props::Token::origin }) {
+                 meta::Props::Token::Autonamed }) {
         const bool isInheritPIFlag = t == meta::Props::Token::InheritPI;
         const bool isInheritedPI = !isFunctionTypeInherited && isRequired() && from->isProvided();
         if (!isInheritPIFlag || isInheritedPI)

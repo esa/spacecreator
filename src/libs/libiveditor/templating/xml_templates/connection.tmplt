@@ -15,8 +15,6 @@ conn.siIsProvided       :   |_ Whether source interface is provided
 conn.tiIsProvided       :   |_ Whether target interface is provided
 conn.sourceIfaceId      :   |_ ID of source interface
 conn.targetIfaceId      :   |_ ID of target interface
-conn.originSourceIfaceId:   |_ ID of origin source interface
-conn.originTargetIfaceId:   |_ ID of origin target interface
 conn.attributes         :   |_ List of all available attributes
 attr                    :      |_ Instance of attribute
 attr.name               :          |_ Name of attribute
@@ -27,8 +25,8 @@ prop.name               :          |_ Name of property
 prop.value              :          |_ Value of property
 {% endcomment %}
 <Connection id="{{ conn.id }}"{% for attr in conn.attributes %}{% if attr.value %} {{ attr.name }}="{{ attr.value }}"{% endif %}{% endfor %}>
-    <Source func_name="{{ conn.source }}" {% if conn.siIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.siName }}" {% if conn.originSourceIfaceId %}origin_iface_id="{{ conn.originSourceIfaceId }}"{% else %}iface_id="{{ conn.sourceIfaceId }}"{% endif %}/>
-    <Target func_name="{{ conn.target }}" {% if conn.tiIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.tiName }}" {% if conn.originTargetIfaceId %}origin_iface_id="{{ conn.originTargetIfaceId }}"{% else %}iface_id="{{ conn.targetIfaceId }}"{% endif %}/>
+    <Source func_name="{{ conn.source }}" {% if conn.siIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.siName }}" />
+    <Target func_name="{{ conn.target }}" {% if conn.tiIsRequired %}ri_name={% else %}pi_name={% endif %}"{{ conn.tiName }}" />
     {% for prop in conn.properties %}
     <Property name="{{ prop.name }}" value="{{ prop.value }}"/>
     {% endfor %}

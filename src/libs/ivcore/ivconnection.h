@@ -83,7 +83,6 @@ public:
         QString m_interfaceName;
         IVInterface::InterfaceType m_ifaceDirection;
         shared::Id m_ifaceId;
-        shared::Id m_originIfaceId;
         inline bool isReady() const
         {
             return (!m_functionName.isEmpty() && !m_interfaceName.isEmpty()) || m_ifaceId != shared::InvalidId;

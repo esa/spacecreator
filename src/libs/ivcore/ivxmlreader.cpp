@@ -192,7 +192,6 @@ IVConnection::EndPointInfo addConnectionPart(const EntityAttributes &otherAttrs)
     info.m_interfaceName = attrValue(otherAttrs, isRI ? Props::Token::ri_name : Props::Token::pi_name);
     info.m_ifaceDirection = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
     info.m_ifaceId = QUuid::fromString(attrValue(otherAttrs, Props::Token::iface_id));
-    info.m_originIfaceId = QUuid::fromString(attrValue(otherAttrs, Props::Token::origin_iface_id));
 
     Q_ASSERT(info.isReady());
     return info;

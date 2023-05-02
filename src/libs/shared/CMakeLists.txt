@@ -49,6 +49,8 @@ target_sources(${LIB_NAME} PRIVATE
     commandsstackbase.h
     common.cpp
     common.h
+    componentmodel.cpp
+    componentmodel.h
     delayedsignal.cpp
     delayedsignal.h
     editorcore.cpp
@@ -72,8 +74,8 @@ target_sources(${LIB_NAME} PRIVATE
     interface/creatortool.h
     interface/existingfilevalidator.cpp
     interface/existingfilevalidator.h
-    interface/objectstreeview.cpp
-    interface/objectstreeview.h
+    interface/componenttreeview.cpp
+    interface/componenttreeview.h
     interface/parameternamedelegate.cpp
     interface/parameternamedelegate.h
     interface/veitemmodel.cpp
@@ -154,6 +156,8 @@ target_sources(${LIB_NAME} PRIVATE
     vemodel.h
     veobject.cpp
     veobject.h
+    vevisualizationmodel.cpp
+    vevisualizationmodel.h
     xmlhighlighter.cpp
     xmlhighlighter.h
     xmlreader.cpp

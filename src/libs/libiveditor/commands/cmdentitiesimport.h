@@ -38,9 +38,8 @@ class CmdEntitiesImport : public ASN1ComponentsImport, public QUndoCommand
 {
     Q_OBJECT
 public:
-    explicit CmdEntitiesImport(ivm::IVModel::CloneType type, const QList<ivm::IVObject *> &entities,
-            ivm::IVFunctionType *parent, ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos,
-            const QString &destPath);
+    explicit CmdEntitiesImport(const QList<ivm::IVObject *> &entities, ivm::IVFunctionType *parent, ivm::IVModel *model,
+            Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
     ~CmdEntitiesImport() override;
 
     void redo() override;
@@ -57,7 +56,6 @@ private:
     QList<QRectF> existingModelRects() const;
 
 private:
-    const ivm::IVModel::CloneType m_type;
     QPointer<ivm::IVModel> m_model;
     QPointer<ivm::IVFunctionType> m_parent;
     QVector<QPointer<ivm::IVObject>> m_rootEntities;
