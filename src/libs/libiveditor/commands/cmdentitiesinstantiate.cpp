@@ -17,6 +17,7 @@
 
 #include "cmdentitiesinstantiate.h"
 
+#include "asn1systemchecks.h"
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
 #include "commands/cmdentityattributeschange.h"
@@ -50,8 +51,9 @@ namespace ive {
 namespace cmd {
 
 CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm::IVFunctionType *parent,
-        ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath)
-    : ASN1ComponentsImport(asn1Checks, shared::sharedTypesPath(), destPath)
+        ivm::IVModel *model, shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks,
+        const QPointF &pos)
+    : ComponentImportHelper(componentModel, asn1Checks)
     , QUndoCommand()
     , m_parent(parent)
     , m_model(model)
@@ -102,8 +104,8 @@ void CmdEntitiesInstantiate::redo()
             m_parent->addChild(m_instantiatedEntity);
         }
         if (m_model->addObject(m_instantiatedEntity)) {
-            redoAsnFileImport(m_instantiatedEntity->instanceOf());
-            redoSourceCloning(m_instantiatedEntity->instanceOf());
+            redoAsnFilesImport(m_instantiatedEntity->instanceOf());
+            redoSourcesCloning(m_instantiatedEntity->instanceOf());
         }
         for (QUndoCommand *cmd : qAsConst(m_subCmds)) {
             cmd->redo();
@@ -131,7 +133,8 @@ void CmdEntitiesInstantiate::undo()
             m_instantiatedEntity->setParentObject(nullptr);
         }
     }
-    undoAsnFileImport();
+    undoSourcesCloning();
+    undoAsnFilesImport();
 }
 
 bool CmdEntitiesInstantiate::mergeWith(const QUndoCommand *command)

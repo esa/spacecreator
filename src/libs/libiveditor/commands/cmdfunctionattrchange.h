@@ -23,6 +23,10 @@
 
 #include <QPointer>
 
+namespace shared {
+class ComponentModel;
+}
+
 namespace Asn1Acn {
 class Asn1SystemChecks;
 }
@@ -35,15 +39,17 @@ class IVFunctionType;
 
 namespace ive {
 namespace cmd {
-class ASN1ComponentsImport;
+class ComponentImportHelper;
 
 class CmdFunctionAttrChange : public shared::cmd::CmdEntityAttributesChange
 {
     Q_OBJECT
 public:
-    explicit CmdFunctionAttrChange(shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs);
+    explicit CmdFunctionAttrChange(
+            shared::PropertyTemplateConfig *config, ivm::IVFunction *entity, const QList<EntityAttribute> &attrs);
     ~CmdFunctionAttrChange() override;
 
+    void setComponentModel(shared::ComponentModel *componentModel);
     void setAsn1SystemChecks(Asn1Acn::Asn1SystemChecks *asn1Checks);
 
     void redo() override;
@@ -62,7 +68,7 @@ protected:
     const QVariantHash m_oldAttrs;
 
 private:
-    ASN1ComponentsImport *m_asn1Importer;
+    ComponentImportHelper *m_asn1Importer;
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdSet;
     QHash<shared::Id, QVector<QUndoCommand *>> m_cmdUnset;
 

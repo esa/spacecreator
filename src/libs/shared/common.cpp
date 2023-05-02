@@ -181,11 +181,11 @@ bool copyDir(const QString &source, const QString &dest, FileCopyingMode replace
                 qWarning() << "Error during symlink copying:" << filePath << fileInfo.symLinkTarget()
                            << targetExportDir.absoluteFilePath(relPath);
             }
-            success &= result;
+            success = success && result;
         } else if (fileInfo.isDir()) {
             if (!QDir(targetExportDir.filePath(relPath)).exists()) {
                 const bool result = targetExportDir.mkpath(relPath);
-                success &= result;
+                success = success && result;
             }
         } else {
             const bool result =
@@ -194,7 +194,7 @@ bool copyDir(const QString &source, const QString &dest, FileCopyingMode replace
                 qWarning() << "Error during source file copying:" << filePath
                            << targetExportDir.absoluteFilePath(relPath);
             }
-            success &= result;
+            success = success && result;
         }
     }
     return success;

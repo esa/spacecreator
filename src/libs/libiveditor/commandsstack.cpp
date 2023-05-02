@@ -36,7 +36,13 @@ namespace cmd {
 CommandsStack::CommandsStack(QObject *parent)
     : shared::cmd::CommandsStackBase(parent)
     , m_check(nullptr)
+    , m_componentModel(nullptr)
 {
+}
+
+void CommandsStack::setComponentModel(shared::ComponentModel *componentModel)
+{
+    m_componentModel = componentModel;
 }
 
 void CommandsStack::setAsn1Check(Asn1Acn::Asn1SystemChecks *check)
@@ -52,6 +58,7 @@ bool CommandsStack::push(QUndoCommand *command)
 
     if (auto fnCommand = dynamic_cast<CmdFunctionAttrChange *>(command)) {
         fnCommand->setAsn1SystemChecks(m_check);
+        fnCommand->setComponentModel(m_componentModel);
         connect(fnCommand, &CmdFunctionAttrChange::asn1FilesImported, this, &CommandsStack::asn1FilesImported,
                 Qt::UniqueConnection);
         connect(fnCommand, &CmdFunctionAttrChange::asn1FilesRemoved, this, &CommandsStack::asn1FileRemoved,
@@ -84,10 +91,10 @@ bool CommandsStack::push(QUndoCommand *command)
         connect(attrCommand, &shared::cmd::CmdEntityAttributesChange::attributeChanged, this,
                 &CommandsStack::attributeChanged, Qt::UniqueConnection);
     }
-    if (auto importCommand = dynamic_cast<ASN1ComponentsImport *>(command)) {
-        connect(importCommand, &ASN1ComponentsImport::asn1FilesImported, this, &CommandsStack::asn1FilesImported,
+    if (auto importCommand = dynamic_cast<ComponentImportHelper *>(command)) {
+        connect(importCommand, &ComponentImportHelper::asn1FilesImported, this, &CommandsStack::asn1FilesImported,
                 Qt::UniqueConnection);
-        connect(importCommand, &ASN1ComponentsImport::asn1FilesRemoved, this, &CommandsStack::asn1FileRemoved,
+        connect(importCommand, &ComponentImportHelper::asn1FilesRemoved, this, &CommandsStack::asn1FileRemoved,
                 Qt::UniqueConnection);
     }
     m_undoStack->push(command);

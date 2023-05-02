@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "asn1componentsimport.h"
+#include "componentimporthelper.h"
 
 #include <QPointer>
 #include <QUndoCommand>
@@ -32,12 +32,12 @@ namespace ive {
 namespace cmd {
 class CmdEntityAttributeChange;
 
-class CmdEntitiesInstantiate : public ASN1ComponentsImport, public QUndoCommand
+class CmdEntitiesInstantiate : public ComponentImportHelper, public QUndoCommand
 {
     Q_OBJECT
 public:
     explicit CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm::IVFunctionType *parent, ivm::IVModel *model,
-            Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
+            shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos);
     ~CmdEntitiesInstantiate() override;
 
     void redo() override;

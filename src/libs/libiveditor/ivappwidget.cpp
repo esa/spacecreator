@@ -725,7 +725,7 @@ void IVAppWidget::wrapItems()
                 ivm::IVObject::sortObjectList(wrappedObjects);
                 auto cmdImport = new cmd::CmdEntitiesImport(wrappedObjects,
                         m_document->objectsModel()->getFunction(wrappingFunctionId), m_document->objectsModel(),
-                        m_document->asn1Check(), {}, {});
+                        m_document->componentModel(), m_document->asn1Check(), shared::INVALID_POS);
                 if (m_document->commandsStack()->push(cmdImport)) {
                     auto wrapper = m_document->objectsModel()->getObject(wrappingFunctionId);
                     Q_ASSERT(wrapper);
@@ -819,8 +819,8 @@ void IVAppWidget::pasteItems(const QPointF &sceneDropPoint)
             return;
         }
 
-        auto cmdImport = new cmd::CmdEntitiesImport(
-                objects, parentObject, m_document->objectsModel(), m_document->asn1Check(), sceneDropPoint, {});
+        auto cmdImport = new cmd::CmdEntitiesImport(objects, parentObject, m_document->objectsModel(),
+                m_document->componentModel(), m_document->asn1Check(), sceneDropPoint);
         m_document->commandsStack()->push(cmdImport);
     }
 }
@@ -898,7 +898,7 @@ void IVAppWidget::importEntity(const shared::Id &id, QPointF sceneDropPoint)
         }
     }
     auto cmdImport = new cmd::CmdEntitiesImport(objects, parentObject, m_document->objectsModel(),
-            m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+            m_document->componentModel(), m_document->asn1Check(), sceneDropPoint);
     m_document->commandsStack()->push(cmdImport);
 }
 
@@ -912,9 +912,8 @@ void IVAppWidget::instantiateEntity(const shared::Id &id, QPointF sceneDropPoint
 
     ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
     /// TODO: check if it's better to load from fs instead
-    auto cmdInstantiate =
-            new cmd::CmdEntitiesInstantiate(obj->as<ivm::IVFunctionType *>(), parentObject, m_document->objectsModel(),
-                    m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+    auto cmdInstantiate = new cmd::CmdEntitiesInstantiate(obj->as<ivm::IVFunctionType *>(), parentObject,
+            m_document->objectsModel(), m_document->sharedTypesModel(), m_document->asn1Check(), sceneDropPoint);
     m_document->commandsStack()->push(cmdInstantiate);
 }
 
@@ -968,7 +967,7 @@ void IVAppWidget::linkEntity(const shared::Id &id, QPointF sceneDropPoint)
     });
 
     auto cmdLink = new cmd::CmdEntitiesImport(objects, parentObject, m_document->objectsModel(),
-            m_document->asn1Check(), sceneDropPoint, QFileInfo(m_document->path()).absolutePath());
+            m_document->componentModel(), m_document->asn1Check(), sceneDropPoint);
     m_document->commandsStack()->push(cmdLink);
 }
 

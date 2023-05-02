@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "asn1componentsimport.h"
 #include "common.h"
+#include "componentimporthelper.h"
 #include "ivmodel.h"
 
 #include <QPointer>
@@ -34,12 +34,13 @@ class IVFunctionType;
 namespace ive {
 namespace cmd {
 
-class CmdEntitiesImport : public ASN1ComponentsImport, public QUndoCommand
+class CmdEntitiesImport : public ComponentImportHelper, public QUndoCommand
 {
     Q_OBJECT
 public:
     explicit CmdEntitiesImport(const QList<ivm::IVObject *> &entities, ivm::IVFunctionType *parent, ivm::IVModel *model,
-            Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath);
+            shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks,
+            const QPointF &pos);
     ~CmdEntitiesImport() override;
 
     void redo() override;

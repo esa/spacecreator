@@ -135,6 +135,18 @@ bool VEObject::hasEntityAttributes(const EntityAttributes &attrs) const
             std::bind(qOverload<const EntityAttribute &>(&VEObject::hasEntityAttribute), this, std::placeholders::_1));
 }
 
+const VEObject *VEObject::rootObject() const
+{
+    VEObject *p = parentObject();
+    if (!p)
+        return this;
+
+    while (p->parentObject()) {
+        p = p->parentObject();
+    }
+    return p;
+}
+
 bool VEObject::setParentObject(VEObject *parentObject)
 {
     if (parent() == parentObject)

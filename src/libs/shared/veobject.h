@@ -72,6 +72,7 @@ public:
     bool hasEntityAttribute(const EntityAttribute &attribute) const;
     bool hasEntityAttributes(const EntityAttributes &attrs) const;
 
+    virtual const VEObject *rootObject() const;
     virtual VEObject *parentObject() const;
     QVector<VEObject *> descendants() const;
 

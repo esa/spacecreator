@@ -17,6 +17,7 @@
 
 #include "cmdentitiesimport.h"
 
+#include "asn1systemchecks.h"
 #include "commandids.h"
 #include "errorhub.h"
 #include "graphicsviewutils.h"
@@ -66,8 +67,9 @@ QSet<QString> fnTypeNames(const QVector<ivm::IVObject *> &objects)
 }
 
 CmdEntitiesImport::CmdEntitiesImport(const QList<ivm::IVObject *> &objects, ivm::IVFunctionType *parent,
-        ivm::IVModel *model, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos, const QString &destPath)
-    : ASN1ComponentsImport(asn1Checks, shared::componentsLibraryPath(), destPath)
+        ivm::IVModel *model, shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks,
+        const QPointF &pos)
+    : ComponentImportHelper(componentModel, asn1Checks)
     , QUndoCommand()
     , m_model(model)
     , m_parent(parent)
@@ -171,15 +173,20 @@ void CmdEntitiesImport::redo()
     }
 
     m_importedAsnFiles.clear();
+    m_importedSources.clear();
+    if (!m_tempDir.isNull()) {
+        m_tempDir.reset();
+    }
 
     QVector<ivm::IVObject *> entities;
     for (ivm::IVObject *entity : qAsConst(m_rootEntities)) {
         if (m_parent) {
             m_parent->addChild(entity);
         }
-        redoAsnFileImport(entity);
+        redoAsnFilesImport(entity);
     }
 
+    QList<ivm::IVObject *> entitiesForSourceImport;
     for (ivm::IVObject *entity : qAsConst(m_importedEntities)) {
         Q_ASSERT(entity);
         if (!entity) {
@@ -192,11 +199,9 @@ void CmdEntitiesImport::redo()
         }
         entities.append(entity);
         if (!entity->isReference())
-            redoSourceCloning(entity);
+            entitiesForSourceImport << entity;
     }
-    if (!m_tempDir.isNull()) {
-        m_tempDir.reset();
-    }
+    redoSourcesCloning(entitiesForSourceImport);
 
     ivm::IVObject::sortObjectList(entities);
     m_model->addObjects(entities);
@@ -209,8 +214,6 @@ void CmdEntitiesImport::undo()
 
     for (auto it = m_importedEntities.crbegin(); it != m_importedEntities.crend(); ++it) {
         m_model->removeObject(*it);
-        if (!(*it)->isReference())
-            undoSourceCloning(*it);
     }
     for (auto it = m_rootEntities.crbegin(); it != m_rootEntities.crend(); ++it) {
         if (m_parent) {
@@ -220,7 +223,8 @@ void CmdEntitiesImport::undo()
         }
     }
 
-    undoAsnFileImport();
+    undoSourcesCloning();
+    undoAsnFilesImport();
 }
 
 bool CmdEntitiesImport::mergeWith(const QUndoCommand *command)

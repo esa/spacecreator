@@ -36,6 +36,7 @@ class IVObject;
 namespace shared {
 class UndoCommand;
 class VEObject;
+class ComponentModel;
 }
 
 namespace ive {
@@ -47,6 +48,7 @@ class CommandsStack : public shared::cmd::CommandsStackBase
 public:
     CommandsStack(QObject *parent = nullptr);
 
+    void setComponentModel(shared::ComponentModel *componentModel);
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
     bool push(QUndoCommand *command) override;
 
@@ -63,6 +65,7 @@ Q_SIGNALS:
 
 private:
     Asn1Acn::Asn1SystemChecks *m_check;
+    shared::ComponentModel *m_componentModel;
 };
 
 }
