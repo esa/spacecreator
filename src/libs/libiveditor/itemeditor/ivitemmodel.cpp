@@ -639,15 +639,15 @@ shared::ui::VEInteractiveObject *IVItemModel::createItem(shared::Id objectId)
             };
 
             const QVector<QPointF> coords = shared::graphicsviewutils::polygon(connection->coordinates());
+            if (connection->sourceInterface())
+                connection->sourceInterface()->setCoordinates(shared::graphicsviewutils::coordinates(coords.front()));
             IVInterfaceGroupGraphicsItem *startItem =
                     connection->sourceInterface() ? ifaceGroupItem(connection->sourceInterface()->id()) : nullptr;
-            if (startItem && startItem->entity())
-                startItem->entity()->setCoordinates(shared::graphicsviewutils::coordinates(coords.front()));
 
+            if (connection->targetInterface())
+                connection->targetInterface()->setCoordinates(shared::graphicsviewutils::coordinates(coords.back()));
             IVInterfaceGroupGraphicsItem *endItem =
                     connection->targetInterface() ? ifaceGroupItem(connection->targetInterface()->id()) : nullptr;
-            if (endItem && endItem->entity())
-                endItem->entity()->setCoordinates(shared::graphicsviewutils::coordinates(coords.back()));
 
             return new IVConnectionGroupGraphicsItem(connection, startItem, endItem, parentItem);
         }

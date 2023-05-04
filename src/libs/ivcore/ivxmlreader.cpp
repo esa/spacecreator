@@ -449,12 +449,15 @@ IVConnection *IVXMLReader::addConnection(const shared::Id &id)
 
 IVConnectionGroup *IVXMLReader::addConnectionGroup(const shared::Id &id, const QString &groupName)
 {
-    QHash<shared::Id, IVInterfaceGroup *> mappings;
+    QList<QPair<shared::Id, IVInterfaceGroup *>> mappings;
     for (const auto iface : d->m_connectionGroups.value(groupName).m_interfaces) {
         Q_ASSERT(iface->parentObject());
-        auto it = mappings.find(iface->parentObject()->id());
+        auto it = std::find_if(mappings.constBegin(), mappings.constEnd(),
+                [id = iface->parentObject()->id()](const QPair<shared::Id, IVInterfaceGroup *> &pair) {
+                    return pair.first == id;
+                }); // mappings.find(iface->parentObject()->id());
         if (it != mappings.end()) {
-            it.value()->addEntity(iface);
+            it->second->addEntity(iface);
         } else {
             IVInterface::CreationInfo ci;
             ci.id = shared::createId();
@@ -467,14 +470,14 @@ IVConnectionGroup *IVXMLReader::addConnectionGroup(const shared::Id &id, const Q
             }
             ifaceGroup->setGroupName(groupName);
             ifaceGroup->addEntity(iface);
-            mappings.insert(iface->parentObject()->id(), ifaceGroup);
+            mappings.append(qMakePair(iface->parentObject()->id(), ifaceGroup));
         }
     }
     if (mappings.size() != 2) {
         return nullptr;
     }
-    auto sourceIfaceGroup = *mappings.begin();
-    auto targetIfaceGroup = *std::next(mappings.begin());
+    auto sourceIfaceGroup = mappings[0].second;
+    auto targetIfaceGroup = mappings[1].second;
 
     d->m_allObjects.append(sourceIfaceGroup);
     d->m_allObjects.append(targetIfaceGroup);
