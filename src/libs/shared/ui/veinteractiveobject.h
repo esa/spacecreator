@@ -38,15 +38,6 @@ class VEInteractiveObject : public InteractiveObjectBase
 public:
     explicit VEInteractiveObject(VEObject *entity, QGraphicsItem *parent = nullptr);
 
-    QPen pen() const;
-    void setPen(const QPen &pen);
-
-    QBrush brush() const;
-    void setBrush(const QBrush &brush);
-
-    QFont font() const;
-    void setFont(const QFont &font);
-
     void setCommandsStack(cmd::CommandsStackBase *commandsStack);
 
     QString toString() const;
@@ -101,7 +92,14 @@ public Q_SLOTS:
     virtual void applyColorScheme();
 
 protected:
-    // Methods to be implemented by child classes
+    QPen pen() const;
+    void setPen(const QPen &pen);
+
+    QBrush brush() const;
+    void setBrush(const QBrush &brush);
+
+    QFont font() const;
+    void setFont(const QFont &font);
 
     /**
      * @brief initTextItem sets up a basic (non-interactive) text item.

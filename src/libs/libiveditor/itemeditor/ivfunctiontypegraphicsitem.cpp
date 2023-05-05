@@ -154,7 +154,6 @@ void IVFunctionTypeGraphicsItem::updateTextPosition()
 
 shared::ColorManager::HandledColors IVFunctionTypeGraphicsItem::handledColorType() const
 {
-
     return entity()->isMarked() ? shared::ColorManager::HandledColors::FunctionTypeHighlighted
                                 : shared::ColorManager::HandledColors::FunctionType;
 }

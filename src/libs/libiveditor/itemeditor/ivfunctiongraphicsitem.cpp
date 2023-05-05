@@ -130,7 +130,8 @@ shared::ColorManager::HandledColors IVFunctionGraphicsItem::handledColorType() c
             && !sceneBoundingRect().contains(nestedRect.marginsAdded(shared::graphicsviewutils::kContentMargins)))
         return shared::ColorManager::HandledColors::FunctionPartial;
 
-    return shared::ColorManager::HandledColors::FunctionRegular;
+    return entity()->isMarked() ? shared::ColorManager::HandledColors::FunctionHighlighted
+                                : shared::ColorManager::HandledColors::FunctionRegular;
 }
 
 shared::ui::TextItem *IVFunctionGraphicsItem::initTextItem()

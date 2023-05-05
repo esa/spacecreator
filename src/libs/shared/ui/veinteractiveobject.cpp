@@ -94,7 +94,8 @@ shared::ColorHandler VEInteractiveObject::colorHandler() const
     using namespace StyleAttribute;
     shared::ColorHandler h = InteractiveObjectBase::colorHandler();
     // Read color from entity (the model) and set it on the colorhandler
-    if (auto ivObj = entity()) {
+    shared::VEObject *ivObj = entity();
+    if (!ivObj->isMarked()) {
         if (ivObj->hasEntityAttribute(QLatin1String("color"))) {
             h.detach();
         } else {

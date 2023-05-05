@@ -93,6 +93,7 @@ protected:
 protected Q_SLOTS:
     void rebuildLayout() override;
     void onSelectionChanged(bool isSelected) override;
+    void applyColorScheme() override;
 
 private:
     bool removeCollidedGrips(GripPoint *gp);

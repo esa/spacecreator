@@ -556,6 +556,14 @@ void VEConnectionGraphicsItem::onSelectionChanged(bool isSelected)
     shared::ui::VEInteractiveObject::onSelectionChanged(isSelected);
 }
 
+void VEConnectionGraphicsItem::applyColorScheme()
+{
+    VEInteractiveObject::applyColorScheme();
+    if (!isSelected()) {
+        m_item->setPen(pen());
+    }
+}
+
 bool VEConnectionGraphicsItem::removeCollidedGrips(GripPoint *gp)
 {
     auto grips = gripPointsHandler()->gripPoints();

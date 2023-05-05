@@ -30,10 +30,4 @@ shared::ColorManager::HandledColors IVFlowConnectionGraphicsItem::handledColorTy
     return shared::ColorManager::HandledColors::ConnectionFlow;
 }
 
-void IVFlowConnectionGraphicsItem::applyColorScheme()
-{
-    shared::ColorHandler ch = colorHandler();
-    m_item->setPen(ch.pen());
-    update();
-}
 }
