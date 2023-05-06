@@ -85,7 +85,7 @@ struct DVEditorCore::DVEditorCorePrivate {
     std::unique_ptr<dve::DVAppModel> m_appModel;
     std::unique_ptr<dve::DVItemModel> m_model;
     std::unique_ptr<dve::DVTreeViewModel> m_visualizationModel;
-    std::unique_ptr<dvm::DVModel> m_hwModel;
+    std::unique_ptr<dvm::DVModel> m_hwModel; /// TODO: replace with (DV)ComponentModel instead
     std::unique_ptr<shared::AbstractVisualizationModel> m_hwVisualizationModel;
     std::unique_ptr<dve::DVCreatorTool> m_creatorTool;
     std::unique_ptr<dve::DVExporter> m_exporter;
