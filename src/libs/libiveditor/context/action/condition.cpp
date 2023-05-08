@@ -91,15 +91,17 @@ bool Condition::isAcceptable(ivm::IVObject *obj) const
         }
     }
 
-    for (const AttrHandler &attr : m_attrs) {
-        if (attr.m_value != "*") {
-            if (obj && obj->entityAttributeValue<QString>(attr.m_title) != attr.m_value) {
-                return false;
+    if (obj) {
+        for (const AttrHandler &attr : m_attrs) {
+            if (attr.m_value != "*") {
+                if (obj->entityAttributeValue<QString>(attr.m_title) != attr.m_value) {
+                    return false;
+                }
             }
         }
     }
 
-    return true;
+    return obj != nullptr;
 }
 
 }
