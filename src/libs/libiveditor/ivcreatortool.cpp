@@ -663,6 +663,9 @@ void IVCreatorTool::handleComment(QGraphicsScene *scene, const QPointF &pos)
         if (!parentObject)
             parentObject = gi::functionTypeObject(m_previewItem->parentItem());
 
+        if (parentObject && parentObject->isReference())
+            return;
+
         QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
                 shared::graphicsviewutils::kDefaultGraphicsItemSize);
         if (auto parentItem = m_previewItem->parentItem()) {
@@ -694,6 +697,9 @@ void IVCreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos
         }
 
         ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
+        if (parentObject && parentObject->isReference())
+            return;
+
         const shared::Id id = shared::createId();
         auto cmd = new cmd::CmdFunctionTypeItemCreate(model()->objectsModel(), parentObject, itemSceneRect, id);
         if (m_doc->commandsStack()->push(cmd)) {
@@ -715,6 +721,9 @@ void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
             return;
 
         ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
+        if (parentObject && parentObject->isReference())
+            return;
+
         if (parentObject && parentObject->id() != model()->objectsModel()->rootObjectId()) {
             itemSceneRect = {};
         }
@@ -732,6 +741,9 @@ void IVCreatorTool::handleInterface(QGraphicsScene *scene, ivm::IVInterface::Int
                 shared::graphicsviewutils::adjustFromPoint(pos, shared::graphicsviewutils::kInterfaceTolerance),
                 kFunctionTypes)) {
         ivm::IVFunctionType *parentObject = gi::functionTypeObject(parentItem);
+        if (parentObject && parentObject->isReference())
+            return;
+
         ivm::IVInterface::CreationInfo ifaceDescr(model()->objectsModel(), parentObject, pos, type, shared::createId());
         ifaceDescr.resetKind();
 

@@ -225,7 +225,8 @@ void IVAppWidget::showContextMenuForSharedTypesView(const QPoint &pos)
 
 void IVAppWidget::editExternalEntity(const QString &path)
 {
-    const QDir dir(path);
+    const QFileInfo fi(path);
+    const QDir dir(fi.absoluteDir());
     const QString defaultProFile = dir.filePath(dir.dirName() + QLatin1String(".pro"));
     const QStringList proFiles = dir.entryList({ QLatin1String("*.pro") }, QDir::Filter::Files);
     QString proFilePath;

@@ -54,11 +54,12 @@ public:
         SameDirectionIfaceWrongParents,
         ToFromNestedDifferentDirection,
         DirectIfaceCreationInInstanceOfFunctionType,
+        DirectIfaceCreationInReference,
     };
     Q_ENUM(FailReason)
 
-    static ConnectionCreationValidator::FailReason canConnect(IVFunction *sourceFunction,
-            IVFunction *targetFunction, IVInterface *sourceIource, IVInterface *targetIface);
+    static ConnectionCreationValidator::FailReason canConnect(IVFunction *sourceFunction, IVFunction *targetFunction,
+            IVInterface *sourceIource, IVInterface *targetIface);
 
 private:
     ConnectionCreationValidator();

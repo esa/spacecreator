@@ -53,7 +53,7 @@ private:
     void prepareRectangularType(
             ivm::IVObject *obj, const QPointF &offset, QRectF &parentRect, QList<QRectF> &existingRects);
     void prepareEndPointType(ivm::IVObject *obj, const QPointF &offset);
-    void prepareConnectionType(ivm::IVObject *obj, const QVector<ivm::IVObject *> &objects);
+    void prepareConnectionType(ivm::IVObject *obj, const QPointF &offset, const QVector<ivm::IVObject *> &objects);
     QList<QRectF> existingModelRects() const;
 
 private:

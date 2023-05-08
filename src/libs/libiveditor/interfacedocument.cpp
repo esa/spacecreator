@@ -71,6 +71,20 @@
 namespace ive {
 
 struct InterfaceDocument::InterfaceDocumentPrivate {
+
+    ~InterfaceDocumentPrivate()
+    {
+        if (itemsModel) {
+            itemsModel->clearScene();
+        }
+        if (objectsModel) {
+            objectsModel->clear();
+        }
+        if (objectsVisualizationModel) {
+            objectsVisualizationModel->clear();
+        }
+    }
+
     cmd::CommandsStack *commandsStack { nullptr };
 
     QString filePath;
@@ -393,7 +407,8 @@ bool InterfaceDocument::exportSelectedType()
     if (!rootType) {
         return false;
     }
-    QString path = sharedTypePath(rootType->id());
+
+    QString path = shared::sharedTypesPath() + QDir::separator() + rootType->title();
     if (exportImpl(path, { rootType })) {
         d->objectsModel->removeObject(rootType);
         d->objectsSelectionModel->clearSelection();

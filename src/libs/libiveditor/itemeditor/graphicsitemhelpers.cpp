@@ -270,21 +270,29 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     }
 
     if (!result.startIface) {
-        if (auto fn = result.startObject->as<const ivm::IVFunction *>())
+        if (auto fn = result.startObject->as<const ivm::IVFunction *>()) {
             if (fn->instanceOf()) {
                 result.setFailed(
                         ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
                 return result;
+            } else if (fn->isReference()) {
+                result.setFailed(ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInReference);
+                return result;
             }
+        }
     }
 
     if (!result.endIface) {
-        if (auto fn = result.endObject->as<const ivm::IVFunction *>())
+        if (auto fn = result.endObject->as<const ivm::IVFunction *>()) {
             if (fn->instanceOf()) {
                 result.setFailed(
                         ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInInstanceOfFunctionType);
                 return result;
+            } else if (fn->isReference()) {
+                result.setFailed(ivm::ConnectionCreationValidator::FailReason::DirectIfaceCreationInReference);
+                return result;
             }
+        }
     }
 
     if (isReversed(result)) {
@@ -336,7 +344,6 @@ qreal itemLevel(const ivm::IVObject *const object, bool itemSelected)
         return ZOrder.Selected;
     }
 }
-
 
 } // namespace gi
 } // namespace ive

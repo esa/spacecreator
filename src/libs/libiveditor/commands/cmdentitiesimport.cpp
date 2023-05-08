@@ -20,8 +20,10 @@
 #include "asn1systemchecks.h"
 #include "commandids.h"
 #include "errorhub.h"
+#include "geometry.h"
 #include "graphicsviewutils.h"
 #include "ivconnection.h"
+#include "ivconnectiongroup.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
@@ -118,7 +120,8 @@ bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPoi
 
             if (isRectangularType(obj)) {
                 const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
-                importingRect |= objRect;
+                if (!objRect.isNull())
+                    importingRect |= objRect;
             }
         }
     }
@@ -128,11 +131,12 @@ bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPoi
         const QString coordStr = m_parent->entityAttributeValue<QString>(coordToken);
         parentRect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
     }
+    const QPointF insertPos = shared::isValidPosition(pos) ? pos : QPointF(0, 0);
     const QPointF basePoint = importingRect.topLeft();
-    importingRect.moveTopLeft(pos);
+    importingRect.moveTopLeft(insertPos);
     QList<QRectF> existingRects = existingModelRects();
     shared::graphicsviewutils::findGeometryForRect(importingRect, parentRect, existingRects);
-    const QPointF offset = pos - basePoint;
+    const QPointF offset = insertPos - basePoint;
 
     for (ivm::IVObject *obj : qAsConst(objects)) {
         switch (obj->type()) {
@@ -148,7 +152,7 @@ bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPoi
             break;
         case ivm::IVObject::Type::Connection:
         case ivm::IVObject::Type::ConnectionGroup:
-            prepareConnectionType(obj, objects);
+            prepareConnectionType(obj, offset, objects);
             break;
         default:
             break;
@@ -298,7 +302,8 @@ void CmdEntitiesImport::prepareEndPointType(ivm::IVObject *obj, const QPointF &o
     }
 }
 
-void CmdEntitiesImport::prepareConnectionType(ivm::IVObject *obj, const QVector<ivm::IVObject *> &objects)
+void CmdEntitiesImport::prepareConnectionType(
+        ivm::IVObject *obj, const QPointF &offset, const QVector<ivm::IVObject *> &objects)
 {
     auto findIface = [](const ivm::IVConnection::EndPointInfo &endPointInfo, const QVector<ivm::IVObject *> &objects) {
         auto it = std::find_if(objects.cbegin(), objects.cend(), [&endPointInfo](ivm::IVObject *obj) {
@@ -368,10 +373,20 @@ void CmdEntitiesImport::prepareConnectionType(ivm::IVObject *obj, const QVector<
         }
     }
 
-    if (!obj->parentObject() && m_parent) {
-        /// Remove coordinates for connections, they should be regenerated
-        /// cause position of interfaces are shifted to new parent sides
-        obj->setCoordinates({});
+    QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
+    if (!coordinates.isEmpty()) {
+        if (!offset.isNull()) {
+            std::for_each(coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
+            obj->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
+        }
+        if (auto connectionGroup = qobject_cast<ivm::IVConnectionGroup *>(obj)) {
+            if (auto iface = findIface(connectionGroup->delayedStart(), objects)) {
+                iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.front()));
+            }
+            if (auto iface = findIface(connectionGroup->delayedEnd(), objects)) {
+                iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.last()));
+            }
+        }
     }
 }
 

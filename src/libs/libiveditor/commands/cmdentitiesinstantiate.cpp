@@ -105,7 +105,6 @@ void CmdEntitiesInstantiate::redo()
         }
         if (m_model->addObject(m_instantiatedEntity)) {
             redoAsnFilesImport(m_instantiatedEntity->instanceOf());
-            redoSourcesCloning(m_instantiatedEntity->instanceOf());
         }
         for (QUndoCommand *cmd : qAsConst(m_subCmds)) {
             cmd->redo();
@@ -133,7 +132,6 @@ void CmdEntitiesInstantiate::undo()
             m_instantiatedEntity->setParentObject(nullptr);
         }
     }
-    undoSourcesCloning();
     undoAsnFilesImport();
 }
 
