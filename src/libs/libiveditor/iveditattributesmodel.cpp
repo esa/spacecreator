@@ -49,6 +49,7 @@ struct IVEditAttributesModel::Private
     cmd::CommandsStack::Macro *macro = nullptr;
     QList<ivm::IVObject*> objects;
     QStringList functionTypeNames = { QString() }; // Add an initial empty string for "no type".
+    QHash<ivm::IVObject*, QStringList> implementationNames;
 
     QVector<Entry> entries;
 
@@ -69,6 +70,13 @@ struct IVEditAttributesModel::Private
                         wanted->function()->type() != ivm::IVObject::Type::Function) {
                         continue;
                     }
+                } else {
+                    const QList<EntityAttribute> implementations = wanted->implementations();
+                    QStringList results;
+                    for (auto implementation : implementations) {
+                        results.append(implementation.name());
+                    }
+                    implementationNames.insert(wanted, results);
                 }
                 objects.append(wanted);
             }
@@ -89,12 +97,18 @@ struct IVEditAttributesModel::Private
                 if (!propertyTemplate->isVisible() || propertyTemplate->label().isEmpty())
                     continue;
 
+                if (propertyTemplate->name() == ivm::meta::Props::token(ivm::meta::Props::Token::type_language)) {
+                    Entry entry { tr("Implementation"), QString() };
+                    entries.append(entry);
+                    continue;
+                }
+
                 Entry entry { propertyTemplate->label(), propertyTemplate->name() };
                 entry.validation = propertyTemplate->valueValidatorPattern();
 
                 const QVariant candidate = propertyTemplate->value();
 
-                if (entry.property == QLatin1String("instance_of"))
+                if (entry.property == ivm::meta::Props::token(ivm::meta::Props::Token::instance_of))
                     entry.values = functionTypeNames;
                 else if (!candidate.isValid())
                     entry.values = QString();
@@ -206,21 +220,34 @@ QVariant IVEditAttributesModel::data(const QModelIndex &index, int role) const
 
     if (role == ValidatorRole)
         return entry.validation;
-    if (role == EditRole)
+
+    ivm::IVObject* object = d->objects.at(index.row());
+
+    if (role == EditRole) {
+        if (d->objectType == Function && entry.property.isEmpty()) {
+            Q_ASSERT(d->implementationNames.contains(object));
+            return d->implementationNames.value(object);
+        }
         return entry.values;
+    }
 
     if (role != Qt::DisplayRole && role != DataRole)
         return QVariant();
 
-    ivm::IVObject* object = d->objects.at(index.row());
     const QString key = entry.property;
 
     // If the key is empty, it's the special case for the interfaces. Return the
     // name of the function where it is attached to.
     if (key.isEmpty()) {
-        auto interface = qobject_cast<ivm::IVInterface*>(object);
-        Q_ASSERT(interface);
-        return interface->function()->entityAttributeValue(QLatin1String("name"));
+        if (d->objectType == Function) {
+            auto function = qobject_cast<ivm::IVFunction*>(object);
+            Q_ASSERT(function);
+            return function->defaultImplementation();
+        } else {
+            auto interface = qobject_cast<ivm::IVInterface*>(object);
+            Q_ASSERT(interface);
+            return interface->function()->entityAttributeValue(QLatin1String("name"));
+        }
     }
 
     return object->entityAttributeValue(key);
@@ -244,9 +271,11 @@ Qt::ItemFlags IVEditAttributesModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags result = QAbstractTableModel::flags(index);
 
-    // If the key is empty, it's the special case for the interfaces. We don't allow to edit this.
+    // If the key is empty and the model is for interfaces, it's the special
+    // case of function names, so we don't allow to edit this. For functions is
+    // a special case as well (implementations), but that's editable.
     const QString& key = d->entries.at(index.column()).property;
-    if (index.isValid() && !key.isEmpty())
+    if (index.isValid() && !(key.isEmpty() && d->objectType == Interface))
         result |= Qt::ItemIsEditable;
     return result;
 }
@@ -264,7 +293,10 @@ bool IVEditAttributesModel::setData(const QModelIndex &index, const QVariant &va
 
     const Entry& entry = d->entries.at(index.column());
     const QString& key = entry.property;
-    if (key.isEmpty())
+
+    // Special case. Interfaces: function, non editable. Functions, the default
+    // implementation to set (done below).
+    if (key.isEmpty() && d->objectType == Interface)
         return false;
 
     if (entry.values.typeId() == QMetaType::QStringList &&
@@ -281,8 +313,9 @@ bool IVEditAttributesModel::setData(const QModelIndex &index, const QVariant &va
     } else {
         auto function = qobject_cast<ivm::IVFunction*>(object);
         Q_ASSERT(function);
+        const QString attrKey = !key.isEmpty() ? key : ivm::meta::Props::token(ivm::meta::Props::Token::default_implementation);
         result = d->macro->push(new cmd::CmdFunctionAttrChange(d->model->dynPropConfig(), function,
-                { EntityAttribute { key, value, EntityAttribute::Type::Attribute } }));
+                { EntityAttribute { attrKey, value, EntityAttribute::Type::Attribute } }));
     }
     if (result)
         Q_EMIT dataChanged(index, index, {role});
