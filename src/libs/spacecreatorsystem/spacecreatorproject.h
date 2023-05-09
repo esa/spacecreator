@@ -56,7 +56,7 @@ class SpaceCreatorProject : public shared::AbstractProject
 {
     Q_OBJECT
 public:
-    SpaceCreatorProject(QObject *parent = nullptr);
+    explicit SpaceCreatorProject(QObject *parent = nullptr);
     virtual ~SpaceCreatorProject();
 
     QString projectPath() const override;

@@ -60,14 +60,16 @@ Asn1Acn::File *Asn1ModelStorage::asn1DataTypes(const QString &fileName)
         return {};
     }
 
-    if (!contains(fileName)) {
-        if (m_asn1Watcher->addPath(fileName)) {
+    const QString canonicalFilename = QFileInfo(fileName).canonicalFilePath();
+
+    if (!contains(canonicalFilename)) {
+        if (m_asn1Watcher->addPath(canonicalFilename)) {
             invalidateStorage();
         } else {
             return {};
         }
     }
-    auto it = m_store.find(fileName);
+    auto it = m_store.find(canonicalFilename);
     if (m_store.cend() != it) {
         return it->second.get();
     }
@@ -79,7 +81,8 @@ Asn1Acn::File *Asn1ModelStorage::asn1DataTypes(const QString &fileName)
  */
 bool Asn1ModelStorage::contains(const QString &fileName) const
 {
-    return m_store.find(fileName) != m_store.cend();
+    const QString canonicalFilename = QFileInfo(fileName).canonicalFilePath();
+    return m_store.find(canonicalFilename) != m_store.cend();
 }
 
 /*!
@@ -101,8 +104,17 @@ void Asn1ModelStorage::watchFiles(const QStringList &fileNames)
         return;
     }
 
-    const QStringList &exludedPaths = m_asn1Watcher->addPaths(fileNames);
-    if (exludedPaths != fileNames) {
+    QStringList canonicalNames;
+    for (const QString &file : fileNames) {
+        QString canonicalFile = QFileInfo(file).canonicalFilePath();
+        if (QFileInfo::exists(canonicalFile)) {
+            canonicalNames.append(canonicalFile);
+        }
+    }
+    canonicalNames.removeDuplicates();
+
+    const QStringList &exludedPaths = m_asn1Watcher->addPaths(canonicalNames);
+    if (exludedPaths != canonicalNames) {
         invalidateStorage();
     }
 }

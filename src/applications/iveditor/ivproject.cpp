@@ -41,7 +41,7 @@ QString IvProject::projectPath() const
 
 QStringList IvProject::allAsn1Files() const
 {
-    return m_model->asn1FilesPaths();
+    return m_model->asn1FilesPaths() + m_model->asn1FilesPathsExternal();
 }
 
 QStringList IvProject::allDVFiles() const

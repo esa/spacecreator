@@ -597,16 +597,35 @@ const QString &InterfaceDocument::projectName() const
 }
 
 /*!
-  Sets the filename of the used asn1 file. This is only the file name without a path. The File is expected to be next
-   to the iv file
+ * Sets the filename of the used asn1 file.
+ * For "internal" (inside the project tree) files, this is only the file name without a path.
  */
-void InterfaceDocument::setAsn1FileName(const QString &newAsnfile, const QString &oldAsnfile)
+void InterfaceDocument::setAsn1FileName(QString newAsnfile, QString oldAsnfile)
 {
+    QDir projectDir(QFileInfo(d->filePath).absolutePath());
+
+    auto correctFile = [this, projectDir](QString &filename) {
+        const QString projectPath = projectDir.absolutePath();
+        if (filename.startsWith(projectPath)) {
+            filename = projectDir.relativeFilePath(filename);
+        } else {
+            filename = QFileInfo(filename).canonicalFilePath();
+        }
+    };
+
+    correctFile(newAsnfile);
+    correctFile(oldAsnfile);
+
     if (d->asnFilesNames.contains(newAsnfile)) {
         return;
     }
     if (!oldAsnfile.isEmpty()) {
         d->asnFilesNames.removeAll(oldAsnfile);
+    }
+
+    if (!QFileInfo::exists(projectDir.absoluteFilePath(newAsnfile))
+        && !QFileInfo::exists(newAsnfile)) {
+        return;
     }
 
     if (!newAsnfile.isEmpty()) {
@@ -626,7 +645,8 @@ void InterfaceDocument::setAsn1FileName(const QString &newAsnfile, const QString
 }
 
 /*!
-   Returns the filenames of the used asn1 files. Result does not contain any path.
+ * Returns the filenames of the used asn1 files.
+ * Result does not contain any path for "internal" asn files. Files referenced from outside are with full path
  */
 QStringList InterfaceDocument::asn1FilesNames() const
 {
@@ -634,17 +654,32 @@ QStringList InterfaceDocument::asn1FilesNames() const
 }
 
 /*!
-   Returns the list of ASN.1 files including full path
+* Returns the list of ASN.1 files that are inside the project (directory tree) including full path
  */
 QStringList InterfaceDocument::asn1FilesPaths() const
 {
     const QDir projectDir = QFileInfo(path()).absoluteDir();
     QStringList paths;
     for (const QString &filename : d->asnFilesNames) {
-        paths.append(projectDir.filePath(filename));
+        if (isProjectAsnFile(filename)) {
+            paths.append(projectDir.filePath(filename));
+        }
     }
-
     return paths;
+}
+
+/*!
+ * Returns all ASN.1 files refereced in the project, that are "extern" (outside the project tree) including the full path
+ */
+QStringList InterfaceDocument::asn1FilesPathsExternal() const
+{
+    QStringList externAsns;
+    for (const QString &filename : d->asnFilesNames) {
+        if (!isProjectAsnFile(filename)) {
+            externAsns.append(filename);
+        }
+    }
+    return externAsns;
 }
 
 /*!
@@ -1060,8 +1095,14 @@ bool InterfaceDocument::exportImpl(QString &targetPath, const QList<shared::VEOb
 
     const QFileInfo ivPath(path());
     const QDir ivDir = ivPath.absoluteDir();
-    for (const QString &asnFile : asn1FilesNames()) {
-        if (!QFile::copy(ivDir.filePath(asnFile), targetDir.filePath(asnFile))) {
+    const QString workDir = QDir(ivDir.canonicalPath() + "/work/").absolutePath();
+    for (const QString &asnFile : asn1FilesPaths()) {
+        if (asnFile.startsWith(workDir)) { // ignore generated .asn file
+            continue;
+        }
+        QFileInfo fi(asnFile);
+        const QString filename = fi.fileName();
+        if (!QFile::copy(ivDir.filePath(filename), targetDir.filePath(filename))) {
             shared::ErrorHub::addError(
                     shared::ErrorItem::Error, tr("Error during ASN.1 file copying: %1").arg(asnFile));
         }
@@ -1201,6 +1242,16 @@ void InterfaceDocument::createProFile(const QString &path)
 
         stream << "DISTFILES += $$PWD/" << it.fileName() << Qt::endl;
     }
+
+    if (!asn1FilesPathsExternal().isEmpty()) {
+        stream << Qt::endl;
+        stream << "# External ASN.1 files" << Qt::endl;
+        for (const QString &asnFile : asn1FilesPathsExternal()) {
+            stream << "DISTFILES += " << asnFile << Qt::endl;
+        }
+        stream << Qt::endl;
+    }
+
     if (targetDir.exists(ive::kRootImplementationPath))
         stream << Qt::endl
                << QStringLiteral("include($$PWD/%1/taste.pro)").arg(ive::kRootImplementationPath) << Qt::endl;
@@ -1217,6 +1268,13 @@ void InterfaceDocument::initTASTEEnv(const QString &path)
     initTASTECallerProcess->deleteLater();
 }
 
+bool InterfaceDocument::isProjectAsnFile(const QString &filename) const
+{
+    QFileInfo fi(filename);
+    QDir projectDir(QFileInfo(d->filePath).absolutePath());
+    return filename.startsWith(projectDir.absolutePath()) || fi.isRelative();
+}
+
 void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selectedObjects)
 {
     if (!d->objectsVisualizationModel || !d->objectsSelectionModel) {
@@ -1224,7 +1282,8 @@ void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selecte
     }
     QItemSelection itemSelection;
     for (auto id : selectedObjects) {
-        const QModelIndex idx = d->objectsVisualizationModel->indexFromItem(d->objectsVisualizationModel->getItem(id));
+        const QModelIndex idx = d->objectsVisualizationModel->indexFromItem(
+            d->objectsVisualizationModel->getItem(id));
         if (itemSelection.isEmpty()) {
             itemSelection.select(idx, idx);
         } else {
@@ -1232,10 +1291,12 @@ void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selecte
         }
     }
     d->objectsSelectionModel->select(itemSelection,
-            QItemSelectionModel::Rows | QItemSelectionModel::Current | QItemSelectionModel::ClearAndSelect);
+                                     QItemSelectionModel::Rows | QItemSelectionModel::Current
+                                         | QItemSelectionModel::ClearAndSelect);
 }
 
-void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected,
+                                               const QItemSelection &deselected)
 {
     // Update the selection state of the QGraphicItems in the scene
     auto updateSelection = [this](const QItemSelection &selection, bool value) {

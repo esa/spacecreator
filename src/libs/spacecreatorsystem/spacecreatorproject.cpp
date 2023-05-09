@@ -125,7 +125,7 @@ IVEditorCorePtr SpaceCreatorProject::ivData(const QString &fileName) const
 
         data->document()->load(fileName);
         for (const QString &asnFileName : allAsn1Files()) {
-            data->document()->setAsn1FileName(QFileInfo(asnFileName).fileName());
+            data->document()->setAsn1FileName(QFileInfo(asnFileName).canonicalFilePath());
         }
         if (data->document()->asn1FilesNames().isEmpty()) {
             data->document()->setAsn1FileName(GLOBAL_ASN_FILE);

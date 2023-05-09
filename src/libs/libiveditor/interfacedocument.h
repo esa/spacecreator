@@ -106,9 +106,10 @@ public:
     void setProjectName(const QString &projectName);
     const QString &projectName() const;
 
-    void setAsn1FileName(const QString &newAsnfile, const QString &oldAsnfile = {});
+    void setAsn1FileName(QString newAsnfile, QString oldAsnfile = {});
     QStringList asn1FilesNames() const;
     QStringList asn1FilesPaths() const;
+    QStringList asn1FilesPathsExternal() const;
 
     QString uiFileName() const;
     void setUIFileName(const QString &filePath);
@@ -196,6 +197,7 @@ private:
     void showNIYGUI(const QString &title = QString());
     void createProFile(const QString &path);
     void initTASTEEnv(const QString &path);
+    bool isProjectAsnFile(const QString &filename) const;
 
     QList<ivm::IVObject *> getSelectedObjects();
     QList<ivm::IVObject *> getUnselectedObjects();

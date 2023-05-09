@@ -31,7 +31,6 @@
 #include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
 #include "parameter.h"
-#include "standardpaths.h"
 
 #include <QObject>
 #include <QTemporaryDir>
@@ -181,6 +180,7 @@ void tst_XmlDocExporter::init()
     if (QFile::exists(m_testFilePath)) {
         QFile::remove(m_testFilePath);
     }
+    m_doc->setPath(m_testFilePath);
 }
 
 void tst_XmlDocExporter::cleanup()
@@ -364,7 +364,11 @@ void tst_XmlDocExporter::testExportArchetypeReferenceInFunctionType()
 
 void tst_XmlDocExporter::testExportAsn1File()
 {
-    m_doc->setAsn1FileName("fake.asn");
+    QFile file(m_testPath.filePath("fake.asn"));
+    file.open(QIODevice::WriteOnly);
+    file.close();
+
+    m_doc->setAsn1FileName(file.fileName());
     QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<InterfaceView asn1file=\"fake.asn\"/>";
