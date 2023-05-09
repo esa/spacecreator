@@ -220,6 +220,7 @@ void IVFunction::reflectAttr(const QString &attrName)
     case meta::Props::Token::RootCoordinates:
     case meta::Props::Token::coordinates:
     case meta::Props::Token::enable_multicast:
+    case meta::Props::Token::is_visible:
         break;
     case meta::Props::Token::name:
         setEntityAttribute(meta::Props::token(meta::Props::Token::instance_of), d->m_fnType->title());
