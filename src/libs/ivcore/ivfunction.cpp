@@ -104,7 +104,8 @@ void IVFunction::restoreInternals()
         d->m_fnType->forgetInstance(this);
 
     if (m_originalFields.collected()) {
-        for (const EntityAttribute &attr : qAsConst(d->m_implementations))
+        d->m_implementations.clear();
+        for (const EntityAttribute &attr : qAsConst(m_originalFields.implementations))
             addImplementation(attr.name(), attr.value<QString>());
         setDefaultImplementation(m_originalFields.defaultImplementation);
         reflectAttrs(m_originalFields.attrs);
