@@ -163,7 +163,7 @@ QStandardItem *IVComponentModel::processObject(ivm::IVObject *ivObject)
 QStandardItem *IVComponentModel::loadComponent(const QString &path)
 {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Invalid path"), path);
+        qDebug() << path << "doesn't exist";
         return nullptr;
     }
 

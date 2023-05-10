@@ -250,7 +250,7 @@ void IVAppWidget::editExternalEntity(const QString &path)
     } else {
         QProcess::startDetached(qApp->applicationFilePath(),
                 { QLatin1String("-pid"), QString::number(qApp->applicationPid()),
-                        proFilePath + QDir::separator() + shared::kDefaultInterfaceViewFileName });
+                        dir.filePath(shared::kDefaultInterfaceViewFileName) });
     }
 }
 
