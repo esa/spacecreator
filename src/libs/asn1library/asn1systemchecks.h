@@ -41,6 +41,7 @@ public:
     void setAsn1Storage(Asn1Acn::Asn1ModelStorage *storage);
     Asn1Acn::Asn1ModelStorage *asn1Storage() const;
     void setProject(shared::AbstractProject *project);
+    shared::AbstractProject *project() const;
 
     QStringList allTypeNames() const;
     QString primaryFileName() const;

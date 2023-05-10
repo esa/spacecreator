@@ -339,4 +339,50 @@ bool isSame(const QString &filePath1, const QString &filePath2)
     return true;
 }
 
+QStringList readFilesList(const QString &path, const QStringList &fileExtentions)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << file.errorString();
+        return {};
+    }
+    QStringList files;
+    QTextStream stream(&file);
+    QString line;
+    bool isMultiLine = false;
+
+    auto parseLine = [&](QString line, bool &isMultiLine) {
+        if (isMultiLine || line.startsWith(QLatin1String("DISTFILES +="))) {
+            line.remove(QLatin1String("DISTFILES +="));
+            if (line.endsWith(QLatin1Char('\\'))) {
+                isMultiLine = true;
+                line.chop(1);
+            } else { // last entry
+                isMultiLine = false;
+            }
+            line = line.trimmed();
+            if (line.isEmpty())
+                return;
+
+            const QStringList lineParts = line.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+            if (lineParts.isEmpty())
+                return;
+
+            for (QString token : qAsConst(lineParts)) {
+                if (fileExtentions.contains(token.section(QLatin1Char('.'), -1))) {
+                    files.append(token.remove(QLatin1String("$$PWD/")));
+                }
+            }
+        }
+    };
+
+    while (stream.readLineInto(&line)) {
+        if (line.isEmpty())
+            continue;
+
+        parseLine(line, isMultiLine);
+    }
+    return files;
+}
+
 }

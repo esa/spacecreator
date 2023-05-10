@@ -74,14 +74,20 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     ~InterfaceDocumentPrivate()
     {
+        if (objectsVisualizationModel) {
+            objectsVisualizationModel->clear();
+        }
+        delete objectsVisualizationModel;
+        objectsVisualizationModel = nullptr;
+
         if (itemsModel) {
             itemsModel->clearScene();
         }
+        delete itemsModel;
+        itemsModel = nullptr;
+
         if (objectsModel) {
             objectsModel->clear();
-        }
-        if (objectsVisualizationModel) {
-            objectsVisualizationModel->clear();
         }
     }
 
@@ -623,8 +629,7 @@ void InterfaceDocument::setAsn1FileName(QString newAsnfile, QString oldAsnfile)
         d->asnFilesNames.removeAll(oldAsnfile);
     }
 
-    if (!QFileInfo::exists(projectDir.absoluteFilePath(newAsnfile))
-        && !QFileInfo::exists(newAsnfile)) {
+    if (!QFileInfo::exists(projectDir.absoluteFilePath(newAsnfile)) && !QFileInfo::exists(newAsnfile)) {
         return;
     }
 
@@ -654,7 +659,7 @@ QStringList InterfaceDocument::asn1FilesNames() const
 }
 
 /*!
-* Returns the list of ASN.1 files that are inside the project (directory tree) including full path
+ * Returns the list of ASN.1 files that are inside the project (directory tree) including full path
  */
 QStringList InterfaceDocument::asn1FilesPaths() const
 {
@@ -669,7 +674,8 @@ QStringList InterfaceDocument::asn1FilesPaths() const
 }
 
 /*!
- * Returns all ASN.1 files refereced in the project, that are "extern" (outside the project tree) including the full path
+ * Returns all ASN.1 files refereced in the project, that are "extern" (outside the project tree) including the full
+ * path
  */
 QStringList InterfaceDocument::asn1FilesPathsExternal() const
 {
@@ -1252,9 +1258,10 @@ void InterfaceDocument::createProFile(const QString &path)
         stream << Qt::endl;
     }
 
-    if (targetDir.exists(ive::kRootImplementationPath))
+    if (targetDir.exists(ive::kRootImplementationPath)) {
         stream << Qt::endl
                << QStringLiteral("include($$PWD/%1/taste.pro)").arg(ive::kRootImplementationPath) << Qt::endl;
+    }
 }
 
 void InterfaceDocument::initTASTEEnv(const QString &path)
@@ -1282,8 +1289,7 @@ void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selecte
     }
     QItemSelection itemSelection;
     for (auto id : selectedObjects) {
-        const QModelIndex idx = d->objectsVisualizationModel->indexFromItem(
-            d->objectsVisualizationModel->getItem(id));
+        const QModelIndex idx = d->objectsVisualizationModel->indexFromItem(d->objectsVisualizationModel->getItem(id));
         if (itemSelection.isEmpty()) {
             itemSelection.select(idx, idx);
         } else {
@@ -1291,12 +1297,10 @@ void InterfaceDocument::onSceneSelectionChanged(const QList<shared::Id> &selecte
         }
     }
     d->objectsSelectionModel->select(itemSelection,
-                                     QItemSelectionModel::Rows | QItemSelectionModel::Current
-                                         | QItemSelectionModel::ClearAndSelect);
+            QItemSelectionModel::Rows | QItemSelectionModel::Current | QItemSelectionModel::ClearAndSelect);
 }
 
-void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected,
-                                               const QItemSelection &deselected)
+void InterfaceDocument::onViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     // Update the selection state of the QGraphicItems in the scene
     auto updateSelection = [this](const QItemSelection &selection, bool value) {

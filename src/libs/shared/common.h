@@ -147,7 +147,6 @@ E typeFromName(const QString &name)
 static const QString kDefaultInterfaceViewFileName { QLatin1String("interfaceview.xml") };
 static const QString kDefaultInterfaceViewUIFileName { QLatin1String("interfaceview.ui.xml") };
 static const QString kDefaultDeploymentViewUIFileName { QLatin1String("deploymentview.dv.ui.xml") };
-
 /*!
  * Returns path to exported components library set in TASTE_COMPONENTS_LIBRARY
  * environment variable otherwise points to default, for ex. ~/.local/share/ESA/IV Editor/components_library
@@ -209,6 +208,12 @@ QString uniteNames(const QVector<Type> &collection, const QString &prefix)
     const QString line = joinNonEmpty(result, QStringLiteral(", "));
     return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
 }
+
+/*!
+   Read from pro-file located at given \p path and returns list of files with
+   given \p extinsions relative to \p path unless it has absolute filesystem path.
+ */
+QStringList readFilesList(const QString &path, const QStringList &fileExtentions);
 
 }
 

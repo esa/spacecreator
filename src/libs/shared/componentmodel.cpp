@@ -107,6 +107,15 @@ ComponentModel::ComponentModel(const QString &modelName, QObject *parent)
 
 ComponentModel::~ComponentModel() { }
 
+QStringList ComponentModel::asn1Files(const Id &id) const
+{
+    auto it = d->components.constFind(id);
+    if (it != d->components.constEnd())
+        return (*it)->asn1Files;
+
+    return {};
+}
+
 QString ComponentModel::componentPath(const shared::Id &id) const
 {
     auto it = d->components.constFind(id);

@@ -20,6 +20,7 @@
 #include "ivconnectiongroup.h"
 #include "ivfunctiontype.h"
 
+#include <QDir>
 #include <QFileInfo>
 #include <QSharedPointer>
 #include <errorhub.h>
@@ -201,6 +202,12 @@ QStandardItem *IVComponentModel::loadComponent(const QString &path)
     component->componentPath = path;
     component->rootIds = ids;
     component->model.swap(model);
+
+    static const QStringList asn1extensions { QLatin1String("asn1"), QLatin1String("asn"), QLatin1String("acn") };
+    const QFileInfo fi(path);
+    const QDir dir = fi.absoluteDir();
+    component->asn1Files =
+            shared::readFilesList(dir.absoluteFilePath(dir.dirName() + QLatin1String(".pro")), asn1extensions);
 
     for (auto id : qAsConst(ids))
         addComponent(component);

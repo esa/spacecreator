@@ -45,6 +45,11 @@ void Asn1SystemChecks::setProject(shared::AbstractProject *project)
     m_project = project;
 }
 
+shared::AbstractProject *Asn1SystemChecks::project() const
+{
+    return m_project;
+}
+
 QStringList Asn1SystemChecks::allTypeNames() const
 {
     if (!m_project || !m_storage) {

@@ -32,6 +32,7 @@ class ComponentModel : public QStandardItemModel
     Q_OBJECT
 public:
     struct Component {
+        QStringList asn1Files;
         QList<shared::Id> rootIds;
         QString componentPath;
         QScopedPointer<VEModel> model;
@@ -50,6 +51,7 @@ public:
     explicit ComponentModel(const QString &modelName, QObject *parent = nullptr);
     ~ComponentModel() override;
 
+    QStringList asn1Files(const shared::Id &id) const;
     QString componentPath(const shared::Id &id) const;
     QString libraryPath() const;
     virtual VEObject *getObject(const shared::Id &id);

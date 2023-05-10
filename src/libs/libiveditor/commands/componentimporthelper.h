@@ -65,8 +65,7 @@ public:
     void undoAsnFilesImport();
     QString relativePathForObject(const ivm::IVObject *object) const;
 
-    static QStringList asn1ModuleDuplication(
-            Asn1Acn::Asn1SystemChecks *asn1Checks, const QVector<QFileInfo> &asn1FileInfos);
+    static QStringList asn1ModuleDuplication(Asn1Acn::Asn1SystemChecks *asn1Checks, QVector<QFileInfo> &asn1FileInfos);
 
 protected:
     shared::ComponentModel *m_model;

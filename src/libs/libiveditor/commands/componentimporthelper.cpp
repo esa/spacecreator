@@ -17,6 +17,8 @@
 
 #include "componentimporthelper.h"
 
+#include "abstractproject.h"
+#include "asn1modelstorage.h"
 #include "asn1reader.h"
 #include "asn1systemchecks.h"
 #include "componentmodel.h"
@@ -28,6 +30,9 @@
 #include <QDebug>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QProcess>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QTemporaryDir>
 
 namespace ive {
@@ -211,26 +216,36 @@ void ComponentImportHelper::redoAsnFilesImport(const ivm::IVObject *object)
     if (object->type() != ivm::IVObject::Type::Function && object->type() != ivm::IVObject::Type::FunctionType)
         return;
 
-    const QString componentPath = m_model->componentPath(object->id());
-    if (componentPath.isEmpty())
+    const QFileInfo componentFileInfo { m_model->componentPath(object->id()) };
+    const QDir componentDir = componentFileInfo.absoluteDir();
+    const QStringList asnFiles = m_model->asn1Files(object->id());
+    if (asnFiles.isEmpty())
         return;
 
-    const QDir srcDir = QFileInfo(componentPath).absoluteDir();
-    if (!srcDir.exists())
-        return;
-
-    const QString sourcePrefix = m_tempDir.isNull()
-            ? srcDir.absolutePath()
-            : m_tempDir->path() + QDir::separator() + QStringLiteral("__ASN1__");
     const QDir targetDir { m_destPath };
-
-    const QList<QFileInfo> asnFiles = srcDir.entryInfoList(
-            { QLatin1String("*.asn1"), QLatin1String("*.asn"), QLatin1String("*.acn") }, QDir::Files);
-
     QVector<QFileInfo> fileInfos;
-    std::copy_if(asnFiles.cbegin(), asnFiles.cend(), std::back_inserter(fileInfos), [targetDir](const QFileInfo &fi) {
+    QHash<QString, QString> fileInfosMapping;
+    const QProcessEnvironment prEnv = QProcessEnvironment::systemEnvironment();
+    std::for_each(asnFiles.cbegin(), asnFiles.cend(), [&](const QString &fileName) {
+        static const QRegularExpression rx { QLatin1String("\\$\\(([a-zA-Z_]{1,}[a-zA-Z0-9_]*)\\)") };
+        QString asn1File(fileName);
+        const QRegularExpressionMatch match = rx.match(asn1File);
+        if (match.hasMatch()) {
+            asn1File.replace(match.captured(0), prEnv.value(match.captured(1)));
+        }
+
+        QFileInfo fi(asn1File);
+        if (!fi.isAbsolute()) {
+            fi.setFile(componentDir.filePath(asn1File));
+        }
+
         const QString destFilePath { targetDir.filePath(fi.fileName()) };
-        return !shared::isSame(destFilePath, fi.absoluteFilePath());
+        if (!shared::isSame(destFilePath, fi.absoluteFilePath()) && !asn1File.startsWith(QLatin1String("work/"))) {
+            fileInfos.append(fi);
+            if (match.hasMatch()) {
+                fileInfosMapping.insert(fi.absoluteFilePath(), fileName);
+            }
+        }
     });
 
     auto alreadyExistingModules = asn1ModuleDuplication(m_asn1Checks, fileInfos);
@@ -246,6 +261,12 @@ void ComponentImportHelper::redoAsnFilesImport(const ivm::IVObject *object)
 
     QStringList importedAsnFiles;
     for (const QFileInfo &file : qAsConst(fileInfos)) {
+        if (!file.absoluteFilePath().startsWith(componentDir.absolutePath())) {
+            /// external ref
+            importedAsnFiles.append(fileInfosMapping.value(file.absoluteFilePath()));
+            continue;
+        }
+
         QString destFilePath { targetDir.filePath(file.fileName()) };
         if (QFile::exists(destFilePath)) {
             auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files"),
@@ -276,7 +297,7 @@ void ComponentImportHelper::redoAsnFilesImport(const ivm::IVObject *object)
 
 void ComponentImportHelper::undoAsnFilesImport()
 {
-    if (!isValid())
+    if (!isValid() || m_importedAsnFiles.isEmpty())
         return;
 
     const auto res = QMessageBox::question(qApp->activeWindow(), tr("Import ASN1 files undo"),
@@ -298,7 +319,7 @@ QString ComponentImportHelper::relativePathForObject(const ivm::IVObject *object
 }
 
 QStringList ComponentImportHelper::asn1ModuleDuplication(
-        Asn1Acn::Asn1SystemChecks *asn1Checks, const QVector<QFileInfo> &asn1FileInfos)
+        Asn1Acn::Asn1SystemChecks *asn1Checks, QVector<QFileInfo> &asn1FileInfos)
 {
     if (asn1FileInfos.empty()) {
         return {};
@@ -325,9 +346,17 @@ QStringList ComponentImportHelper::asn1ModuleDuplication(
         projectDefinitionsNames << defs->name();
         projectTypeAssignmentsNames << defs->typeAssignmentNames();
     });
-
+    const QStringList files = asn1Checks->project() ? asn1Checks->project()->allAsn1Files() : QStringList();
     for (auto it = asn1Data.cbegin(); it != asn1Data.cend(); ++it) {
         for (const auto &defs : it->second->definitionsList()) {
+            if (files.contains(it->first)) {
+                auto infoIt = std::find_if(asn1FileInfos.begin(), asn1FileInfos.end(),
+                        [filePath = it->first](const QFileInfo &fi) { return fi.filePath() == filePath; });
+                if (infoIt != asn1FileInfos.end())
+                    asn1FileInfos.erase(infoIt);
+                continue;
+            }
+
             if (projectDefinitionsNames.contains(defs->name())) {
                 modulesNames.append(defs->name());
             } else {
