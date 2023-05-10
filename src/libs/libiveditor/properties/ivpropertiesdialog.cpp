@@ -181,7 +181,7 @@ void IVPropertiesDialog::initAttributesView()
     viewAttrs->tableView()->setItemDelegateForColumn(shared::PropertiesListModel::Column::Value, attrDelegate);
     viewAttrs->setModel(modelAttrs);
 
-    if (m_isFixedSystemElement && !m_isRequiredSystemElement) {
+    if ((m_isFixedSystemElement && !m_isRequiredSystemElement) || dataObject()->isReference()) {
         viewAttrs->setDisabled(true);
     }
     insertTab(viewAttrs, tr("Attributes"));
@@ -216,7 +216,7 @@ void IVPropertiesDialog::initContextParams()
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
 
-    if (m_isFixedSystemElement) {
+    if (m_isFixedSystemElement || dataObject()->isReference()) {
         viewAttrs->setDisabled(true);
     }
     insertTab(viewAttrs, tr("Context Parameters"));
@@ -240,7 +240,7 @@ void IVPropertiesDialog::initIfaceParams()
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
 
-    if (m_isFixedSystemElement && !m_isRequiredSystemElement) {
+    if ((m_isFixedSystemElement && !m_isRequiredSystemElement) || dataObject()->isReference()) {
         viewAttrs->setDisabled(true);
     }
     insertTab(viewAttrs, tr("Parameters"));
@@ -252,7 +252,7 @@ void IVPropertiesDialog::initCommentView()
         auto commentEdit = new QPlainTextEdit(this);
         commentEdit->setPlainText(comment->titleUI());
 
-        if (m_isFixedSystemElement) {
+        if (m_isFixedSystemElement || comment->isReference()) {
             commentEdit->setDisabled(true);
         }
         insertTab(commentEdit, tr("Comment content"));
@@ -281,7 +281,7 @@ void IVPropertiesDialog::initLanguageView()
     }
     auto languagesWidget = new ive::ImplementationsWidget(m_projectPath, fn, m_ivChecks, commandMacro(), this);
 
-    if (m_isFixedSystemElement) {
+    if (m_isFixedSystemElement || fn->isReference()) {
         languagesWidget->setDisabled(true);
     }
     insertTab(languagesWidget, tr("Implementations"));
