@@ -838,12 +838,20 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
         return;
     }
 
-    ive::IVPropertiesDialog dialog(QFileInfo(m_document->path()).absolutePath(), m_document->dynPropConfig(),
-            m_document->itemsModel()->getItem<shared::ui::VEInteractiveObject *>(id), m_document->layersModel(),
-            m_document->archetypesModel(), m_document->ivCheck(), m_document->asn1Check(), m_document->commandsStack(),
-            graphicsView());
-    dialog.init();
-    dialog.exec();
+    auto dialog = new ive::IVPropertiesDialog(QFileInfo(m_document->path()).absolutePath(),
+                                              m_document->dynPropConfig(),
+                                              m_document->itemsModel()
+                                                  ->getItem<shared::ui::VEInteractiveObject *>(id),
+                                              m_document->layersModel(),
+                                              m_document->archetypesModel(),
+                                              m_document->ivCheck(),
+                                              m_document->asn1Check(),
+                                              m_document->commandsStack(),
+                                              graphicsView());
+    dialog->init();
+    dialog->setModal(true);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }
 
 void IVAppWidget::showEditAttributesDialog()

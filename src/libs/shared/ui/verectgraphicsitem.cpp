@@ -182,7 +182,7 @@ void VERectGraphicsItem::updateTextPosition()
 
 void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    if (pressedAt == releasedAt) {
+    if (pressedAt == releasedAt && !m_overridingCursor) {
         return;
     }
 
@@ -211,8 +211,9 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pr
 
 void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
-    if (pressedAt == releasedAt)
+    if (pressedAt == releasedAt && !m_overridingCursor) {
         return;
+    }
 
     bool isBounded = shared::graphicsviewutils::isBounded(this, sceneBoundingRect());
     bool noCollision = !shared::graphicsviewutils::isCollided(this, sceneBoundingRect());

@@ -214,9 +214,9 @@ void VEItemModel::initItem(VEInteractiveObject *item)
     connect(
             item, &VEInteractiveObject::clicked, this,
             [this, entity = item->entity()]() { Q_EMIT itemClicked(entity->id()); }, Qt::QueuedConnection);
-    connect(
-            item, &VEInteractiveObject::doubleClicked, this,
-            [this, entity = item->entity()]() { Q_EMIT itemDoubleClicked(entity->id()); }, Qt::QueuedConnection);
+    connect(item, &VEInteractiveObject::doubleClicked, this, [this, entity = item->entity()]() {
+        Q_EMIT itemDoubleClicked(entity->id());
+    });
 
     m_items.insert(object->id(), item);
     if (m_graphicsScene != item->scene()) {
