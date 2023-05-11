@@ -533,8 +533,15 @@ void VEConnectionGraphicsItem::rebuildLayout()
 
     bool pathObsolete(true);
     if (m_points.size() > 2) {
-        pathObsolete = (!startItem() || !startItem()->ifaceShape().boundingRect().contains(m_points.first()))
-                || (!endItem() || !endItem()->ifaceShape().boundingRect().contains(m_points.last()));
+        //        qDebug() << m_startItem->pos();
+        //        qDebug() << m_endItem->pos();
+        //        qDebug() << m_startItem->entity()->coordinates();
+        //        qDebug() << m_endItem->entity()->coordinates();
+        //        qDebug() << m_points;
+        //        qDebug() << m_startItem->ifaceShape().boundingRect();
+        //        qDebug() << m_endItem->ifaceShape().boundingRect();
+        pathObsolete = (!m_startItem->ifaceShape().boundingRect().contains(m_points.first()))
+                || (!m_endItem->ifaceShape().boundingRect().contains(m_points.last()));
     }
 
     if (pathObsolete) {

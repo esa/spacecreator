@@ -66,6 +66,7 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm:
             ivm::IVNameValidator::nameForInstance(m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
 
     QRectF typeGeometry = shared::graphicsviewutils::rect(entity->coordinates());
+    const QPointF offset = pos - typeGeometry.topLeft();
     typeGeometry.moveTo(pos);
     m_instantiatedEntity->setCoordinates(shared::graphicsviewutils::coordinates(typeGeometry));
     m_instantiatedEntity->setInstanceOf(entity);
@@ -75,10 +76,9 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm:
                             EntityAttribute::Type::Attribute } }));
 
     for (auto iface : entity->interfaces()) {
-        const ivm::IVInterface::CreationInfo clone =
-                ivm::IVInterface::CreationInfo::cloneIface(iface, m_instantiatedEntity);
-        auto cmdRm = new CmdInterfaceItemCreate(clone);
-        m_subCmds.append(cmdRm);
+        ivm::IVInterface::CreationInfo clone = ivm::IVInterface::CreationInfo::cloneIface(iface, m_instantiatedEntity);
+        clone.position = shared::graphicsviewutils::pos(iface->coordinates()) + offset;
+        m_subCmds.append(new CmdInterfaceItemCreate(clone));
     }
 
     const QString nameKey = ivm::meta::Props::token(ivm::meta::Props::Token::instance_of);
