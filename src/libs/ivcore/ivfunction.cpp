@@ -104,9 +104,11 @@ void IVFunction::restoreInternals()
         d->m_fnType->forgetInstance(this);
 
     if (m_originalFields.collected()) {
-        d->m_implementations.clear();
-        for (const EntityAttribute &attr : qAsConst(m_originalFields.implementations))
-            addImplementation(attr.name(), attr.value<QString>());
+        for (const EntityAttribute &attr : qAsConst(m_originalFields.implementations)) {
+            if (!hasImplementationName(attr.name())) {
+                addImplementation(attr.name(), attr.value<QString>());
+            }
+        }
         setDefaultImplementation(m_originalFields.defaultImplementation);
         reflectAttrs(m_originalFields.attrs);
         reflectContextParams(m_originalFields.params);
@@ -149,6 +151,7 @@ bool IVFunction::hasImplementationName(const QString &name) const
 void IVFunction::addImplementation(const QString &name, const QString &language)
 {
     d->m_implementations.append(EntityAttribute(name, language, EntityAttribute::Type::Attribute));
+    Q_EMIT implemntationListChanged();
 }
 
 /*!
@@ -157,11 +160,13 @@ void IVFunction::addImplementation(const QString &name, const QString &language)
 void IVFunction::insertImplementation(int idx, const EntityAttribute &value)
 {
     d->m_implementations.insert(idx, value);
+    Q_EMIT implemntationListChanged();
 }
 
 void IVFunction::removeImplementation(int idx)
 {
     d->m_implementations.removeAt(idx);
+    Q_EMIT implemntationListChanged();
 }
 
 void IVFunction::setDefaultImplementation(const QString &name)

@@ -48,6 +48,10 @@ void ImplementationsModel::setFunction(ivm::IVFunction *fn)
 {
     beginResetModel();
     m_function = fn;
+    connect(m_function, &ivm::IVFunction::implemntationListChanged, this, [this](){
+        beginResetModel();
+        endResetModel();
+    });
     endResetModel();
 }
 

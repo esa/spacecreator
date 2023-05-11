@@ -54,6 +54,9 @@ public:
 
     bool isPseudoFunction() const;
 
+Q_SIGNALS:
+    void implemntationListChanged();
+
 protected Q_SLOTS:
     void reflectAttr(const QString &attrName);
     void reflectContextParam();
