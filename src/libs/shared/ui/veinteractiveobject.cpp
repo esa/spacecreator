@@ -298,8 +298,8 @@ void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void VEInteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    Q_EMIT doubleClicked();
     QGraphicsObject::mouseDoubleClickEvent(event);
+    Q_EMIT doubleClicked();
 }
 
 void VEInteractiveObject::setCommandsStack(cmd::CommandsStackBase *commandsStack)

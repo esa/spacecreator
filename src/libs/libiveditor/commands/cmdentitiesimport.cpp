@@ -25,6 +25,7 @@
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunctiontype.h"
+#include "ivinterfacegroup.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "standardpaths.h"
@@ -373,18 +374,24 @@ void CmdEntitiesImport::prepareConnectionType(
         }
     }
 
-    QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
-    if (!coordinates.isEmpty()) {
-        if (!offset.isNull()) {
-            std::for_each(coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
-            obj->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
-        }
-        if (auto connectionGroup = qobject_cast<ivm::IVConnectionGroup *>(obj)) {
-            if (auto iface = findIface(connectionGroup->delayedStart(), objects)) {
-                iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.front()));
+    if (!obj->parentObject()) {
+        QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
+        if (!coordinates.isEmpty()) {
+            if (!offset.isNull()) {
+                std::for_each(coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
+                obj->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
             }
-            if (auto iface = findIface(connectionGroup->delayedEnd(), objects)) {
-                iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.last()));
+            if (auto connectionGroup = qobject_cast<ivm::IVConnectionGroup *>(obj)) {
+                if (auto iface = connectionGroup->sourceInterfaceGroup()) {
+                    iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.front()));
+                } else if (auto iface = findIface(connectionGroup->delayedStart(), objects)) {
+                    iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.front()));
+                }
+                if (auto iface = connectionGroup->targetInterfaceGroup()) {
+                    iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.last()));
+                } else if (auto iface = findIface(connectionGroup->delayedEnd(), objects)) {
+                    iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.last()));
+                }
             }
         }
     }

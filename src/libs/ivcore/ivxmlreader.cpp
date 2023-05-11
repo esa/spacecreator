@@ -246,7 +246,10 @@ bool IVXMLReader::processTagOpen(QXmlStreamReader &xml)
         break;
     }
     case Props::Token::ConnectionGroup: {
-        obj = addConnectionGroup(idAttr.value<QUuid>(), attrValue(attrs, Props::Token::name));
+        const EntityAttribute sourceAttr = attrs.take(Props::token(Props::Token::Source));
+        const EntityAttribute targetAttr = attrs.take(Props::token(Props::Token::Target));
+        obj = addConnectionGroup(idAttr.value<QUuid>(), attrValue(attrs, Props::Token::name),
+                sourceAttr.value<QString>(), targetAttr.value<QString>());
         break;
     }
     case Props::Token::Connection: {
@@ -447,37 +450,34 @@ IVConnection *IVXMLReader::addConnection(const shared::Id &id)
     return connection;
 }
 
-IVConnectionGroup *IVXMLReader::addConnectionGroup(const shared::Id &id, const QString &groupName)
+IVConnectionGroup *IVXMLReader::addConnectionGroup(
+        const shared::Id &id, const QString &groupName, const QString &source, const QString &target)
 {
-    QList<QPair<shared::Id, IVInterfaceGroup *>> mappings;
+    QHash<QString, IVInterfaceGroup *> mappings;
     for (const auto iface : d->m_connectionGroups.value(groupName).m_interfaces) {
         Q_ASSERT(iface->parentObject());
-        auto it = std::find_if(mappings.constBegin(), mappings.constEnd(),
-                [id = iface->parentObject()->id()](const QPair<shared::Id, IVInterfaceGroup *> &pair) {
-                    return pair.first == id;
-                }); // mappings.find(iface->parentObject()->id());
+        auto it = mappings.constFind(iface->parentObject()->title());
         if (it != mappings.end()) {
-            it->second->addEntity(iface);
+            it.value()->addEntity(iface);
         } else {
             IVInterface::CreationInfo ci;
             ci.id = shared::createId();
             auto ifaceGroup = new IVInterfaceGroup(ci);
-            if (iface->parentObject()->type() == IVObject::Type::Function) {
-                auto fn = qobject_cast<IVFunction *>(iface->parentObject());
-                fn->addChild(ifaceGroup);
+            if (iface->function()) {
+                iface->function()->addChild(ifaceGroup);
             } else {
                 ifaceGroup->setParentObject(iface->parentObject());
             }
             ifaceGroup->setGroupName(groupName);
             ifaceGroup->addEntity(iface);
-            mappings.append(qMakePair(iface->parentObject()->id(), ifaceGroup));
+            mappings.insert(iface->parentObject()->title(), ifaceGroup);
         }
     }
     if (mappings.size() != 2) {
         return nullptr;
     }
-    auto sourceIfaceGroup = mappings[0].second;
-    auto targetIfaceGroup = mappings[1].second;
+    auto sourceIfaceGroup = source.isEmpty() ? mappings.begin().value() : mappings[source];
+    auto targetIfaceGroup = target.isEmpty() ? std::next(mappings.begin()).value() : mappings[target];
 
     d->m_allObjects.append(sourceIfaceGroup);
     d->m_allObjects.append(targetIfaceGroup);
