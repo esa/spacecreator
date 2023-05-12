@@ -32,11 +32,11 @@ QWidget *ComboBoxDelegate::createEditor(
 {
     if (index.isValid()) {
         auto comboBox = new QComboBox(parent);
-        QObject::connect(comboBox, &QComboBox::currentTextChanged, this,
-                [this, comboBox]() { const_cast<ComboBoxDelegate *>(this)->commitData(comboBox); });
         comboBox->addItems(m_options);
         comboBox->setFocusPolicy(Qt::StrongFocus);
         comboBox->setEnabled(index.flags().testFlag(Qt::ItemIsEnabled));
+        QObject::connect(comboBox, &QComboBox::currentTextChanged, this,
+                [this, comboBox]() { const_cast<ComboBoxDelegate *>(this)->commitData(comboBox); });
         return comboBox;
     }
 

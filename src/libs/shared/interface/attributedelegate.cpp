@@ -41,6 +41,9 @@ static void setConfiguredEditorData(QWidget *editor, const QVariant &displayValu
     if (type == QVariant::Invalid)
         return;
 
+    // Silences some warnings on commitData being called with a widget not belonging to the view.
+    QSignalBlocker blocker(editor);
+
     switch (type) {
     case QVariant::Bool:
         if (auto checkBox = qobject_cast<QCheckBox *>(editor)) {
@@ -102,34 +105,34 @@ static QWidget *createConfiguredEditor(QAbstractItemDelegate *context, const QSt
     switch (editValue.type()) {
     case QVariant::Int: {
         auto spinBox = new QSpinBox(parent);
-        connectCommitData(spinBox, context);
         if (!validator.isNull() && validator.canConvert<QPair<int, int>>()) {
             const auto limits = validator.value<QPair<int, int>>();
             spinBox->setMinimum(limits.first);
             spinBox->setMaximum(limits.second);
         }
+        connectCommitData(spinBox, context);
         editor = spinBox;
         break;
     }
     case QVariant::String: {
         auto lineEdit = new ErrorIndicatingLineEdit(parent);
-        connectCommitData(lineEdit, context);
         QRegularExpression re;
         if (!validator.isNull() && validator.canConvert<QString>()) {
             re.setPattern(validator.toString());
         }
         lineEdit->setValidator(new QRegularExpressionValidator(re, lineEdit));
+        connectCommitData(lineEdit, context);
         editor = lineEdit;
         break;
     }
     case QVariant::Double: {
         auto doubleSpinBox = new QDoubleSpinBox(parent);
-        connectCommitData(doubleSpinBox, context);
         if (!validator.isNull() && validator.canConvert<QPair<qreal, qreal>>()) {
             const auto limits = validator.value<QPair<qreal, qreal>>();
             doubleSpinBox->setMinimum(limits.first);
             doubleSpinBox->setMaximum(limits.second);
         }
+        connectCommitData(doubleSpinBox, context);
         editor = doubleSpinBox;
         break;
     }
@@ -141,8 +144,8 @@ static QWidget *createConfiguredEditor(QAbstractItemDelegate *context, const QSt
     }
     case QVariant::StringList: {
         auto comboBox = new QComboBox(parent);
-        connectCommitData(comboBox, context);
         comboBox->addItems(editValue.toStringList());
+        connectCommitData(comboBox, context);
         editor = comboBox;
         break;
     }
