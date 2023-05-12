@@ -20,6 +20,8 @@
 #include "ivfunctiontype.h"
 #include "ivobject.h"
 #include "ui/verectgraphicsitem.h"
+#include "ui/resizelimits.h"
+
 namespace shared::ui {
 class GripPoint;
 }
@@ -77,16 +79,10 @@ protected:
      * @param to a QPointF the GripPoint was moved to
      * @return a QRect representing the new sceneBoundingRect of this IVFunctionTypeGraphicsItem
      */
-    virtual QRectF resizedRect(shared::ui::GripPoint *grip, const QPointF &from, const QPointF &to) override;
+    virtual QRectF resizedRect(shared::ui::ResizeLimits resizeLimits) override;
+    shared::ui::ResizeLimits resizedRectForTextLabel(shared::ui::ResizeLimits resizeLimits);
+    shared::ui::ResizeLimits resizeLimitsForCollision(shared::ui::ResizeLimits resizeLimits);
 
-    /**
-     * @brief resizedRectForTextLabel implements respect for the FunctionName of this IVFunctionTypeGraphicsItem
-     * @param grip a GripPoint
-     * @param from a QPointF the GripPoint was moved from
-     * @param to a QPointF the GripPoint was moved to
-     * @return a QRect representing the new sceneBoundingRect of this IVFunctionTypeGraphicsItem
-     */
-    virtual QRectF resizedRectForTextLabel(GripPoint *grip, const QPointF &from, const QPointF &to) const;
 
     void rebuildLayout() override;
 
@@ -108,6 +104,7 @@ protected:
     void updateTextPosition() override;
 
     shared::ui::TextItem *initTextItem() override;
+
 };
 
 }

@@ -21,7 +21,9 @@
 #include "graphicsviewutils.h"
 #include "ivfunction.h"
 #include "miniviewrenderer.h"
+#include "ui/minimizelimits.h"
 #include "ui/textitem.h"
+#include "ui/resizelimits.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -60,6 +62,135 @@ void IVFunctionGraphicsItem::init()
     }
 }
 
+shared::ui::ResizeLimits IVFunctionGraphicsItem::resizedRectForNestedFunctions(
+        shared::ui::ResizeLimits resizeLimits) const
+{
+    // Calculate the limits of movement for each grip-point on a rect with no connections
+    QRectF result = sceneBoundingRect();
+    shared::ui::MinimizeLimits::Limits limits;
+    limits.leftGripsRightMostLimit =
+            result.right(); // The furthes to the right, the left-grip can go is the right side of the rect.
+    limits.rightGripsLeftMostLimit =
+            result.left(); // The furthest to the left, the right-grip can go is the left side of the rect.
+    limits.topGripsBottomMostLimit = result.bottom(); // The deepest the top-grip can go, is the bottom of the rect.
+    limits.bottomGripsTopMostLimit = result.top(); // The highest the bottom-grip can go, is the top of the rect.
+
+    // The limits are determined by the bounding rect of the nested functions, so we calculated that
+    QRectF nestedItemsRect = boundingRectForNestedFunctions();
+    if (nestedItemsRect.isValid()) {
+        limits.leftGripsRightMostLimit =
+                nestedItemsRect.left(); // The furthest to the right, the left-grip can go is the left side of the
+                                        // bounding rect for the nested functions.
+        limits.rightGripsLeftMostLimit =
+                nestedItemsRect.right(); // The furthest to the left, the right-grip can go is the right side of the
+                                         // bounding rect for the nested functions.
+        limits.topGripsBottomMostLimit = nestedItemsRect.top(); // The deepest the top-grip can go, is the top of the
+                                                                // bounding rect for the nested functions.
+        limits.bottomGripsTopMostLimit = nestedItemsRect.bottom(); // The highest the bottom-grip can go, is the bottom
+                                                                   // of the bounding rect for the nested functions.
+    }
+
+    if (resizeLimits.isTopEdgeMinimizing()) {
+        if (resizeLimits.isHorizontalLimitSet()) {
+            qreal hLimit = resizeLimits.getHorizontalLimit();
+            hLimit = qMin(hLimit, limits.topGripsBottomMostLimit);
+            resizeLimits.setHorizontalLimit(hLimit);
+        } else {
+            resizeLimits.setHorizontalLimit(limits.topGripsBottomMostLimit);
+        }
+    }
+
+    if (resizeLimits.isBottomEdgeMinimizing()) {
+        if (resizeLimits.isHorizontalLimitSet()) {
+            qreal hLimit = resizeLimits.getHorizontalLimit();
+            hLimit = qMax(hLimit, limits.bottomGripsTopMostLimit);
+            resizeLimits.setHorizontalLimit(hLimit);
+        } else {
+            resizeLimits.setHorizontalLimit(limits.bottomGripsTopMostLimit);
+        }
+    }
+
+    if (resizeLimits.isLeftEdgeMinimizing()) {
+        if (resizeLimits.isVerticalLimitSet()) {
+            qreal vLimit = resizeLimits.getVerticalLimit();
+            vLimit = qMin(vLimit, limits.leftGripsRightMostLimit);
+            resizeLimits.setVerticalLimit(vLimit);
+        } else {
+            resizeLimits.setVerticalLimit(limits.leftGripsRightMostLimit);
+        }
+    }
+
+    if (resizeLimits.isRightEdgeMinimizing()) {
+        if (resizeLimits.isVerticalLimitSet()) {
+            qreal vLimit = resizeLimits.getVerticalLimit();
+            vLimit = qMax(vLimit, limits.rightGripsLeftMostLimit);
+            resizeLimits.setVerticalLimit(vLimit);
+        } else {
+            resizeLimits.setVerticalLimit(limits.rightGripsLeftMostLimit);
+        }
+    }
+
+    return resizeLimits;
+}
+
+//QRectF IVFunctionGraphicsItem::resizedRectForNestedFunctions(GripPoint *grip, const QPointF &from, const QPointF &to, const QRectF &rect) const
+//{
+//    // Calculate the limits of movement for each grip-point on a rect with no connections
+//    QRectF result = rect;
+//    shared::ui::MinimizeLimits::Limits limits;
+//    limits.leftGripsRightMostLimit = result.right();  // The furthes to the right, the left-grip can go is the right side of the rect.
+//    limits.rightGripsLeftMostLimit = result.left();   // The furthest to the left, the right-grip can go is the left side of the rect.
+//    limits.topGripsBottomMostLimit = result.bottom(); // The deepest the top-grip can go, is the bottom of the rect.
+//    limits.bottomGripsTopMostLimit = result.top();    // The highest the bottom-grip can go, is the top of the rect.
+
+//    // The limits are determined by the bounding rect of the nested functions, so we calculated that
+//    QRectF nestedItemsRect = boundingRectForNestedFunctions();
+//    if (nestedItemsRect.isValid())
+//    {
+//        limits.leftGripsRightMostLimit = nestedItemsRect.left(); // The furthest to the right, the left-grip can go is the left side of the bounding rect for the nested functions.
+//        limits.rightGripsLeftMostLimit = nestedItemsRect.right(); // The furthest to the left, the right-grip can go is the right side of the bounding rect for the nested functions.
+//        limits.topGripsBottomMostLimit = nestedItemsRect.top(); // The deepest the top-grip can go, is the top of the bounding rect for the nested functions.
+//        limits.bottomGripsTopMostLimit = nestedItemsRect.bottom(); // The highest the bottom-grip can go, is the bottom of the bounding rect for the nested functions.
+//    }
+//    // Apply the movement described by 'to' while respecting the calculated limits
+//    result = shared::ui::MinimizeLimits::applyTo(result, limits, grip->location(), from, to);
+//    return result;
+//}
+
+QRectF IVFunctionGraphicsItem::boundingRectForNestedFunctions() const
+{
+    QRectF nestedItemsBoundingRect; // Start with empty rectangle
+    for (const QGraphicsItem *item : childItems())
+    {
+        auto rectItem = qobject_cast<const shared::ui::VERectGraphicsItem *>(item->toGraphicsObject());
+        if (rectItem == nullptr)
+        {
+            continue;
+        }
+        const QRectF nestedRect = rectItem->sceneBoundingRect();
+        if (!nestedRect.isValid())
+        {
+            continue;
+        }
+
+        if (nestedItemsBoundingRect.isEmpty())
+        {
+            nestedItemsBoundingRect = nestedRect;
+        }
+        else
+        {
+            nestedItemsBoundingRect = nestedItemsBoundingRect.united(nestedRect);
+        }
+
+    }
+    // If nestedItemsBoundingRect is empty it must stay empty, so don't add margins
+    if (!nestedItemsBoundingRect.isEmpty())
+    {
+        nestedItemsBoundingRect = nestedItemsBoundingRect.marginsAdded(shared::graphicsviewutils::kTextMargins);
+    }
+    return nestedItemsBoundingRect;
+}
+
 ivm::IVFunction *IVFunctionGraphicsItem::entity() const
 {
     return qobject_cast<ivm::IVFunction *>(m_dataObject);
@@ -74,6 +205,18 @@ QPainterPath IVFunctionGraphicsItem::shape() const
     else
         pp.addRoundedRect(br, kRadius, kRadius);
     return pp;
+}
+
+QRectF IVFunctionGraphicsItem::resizedRect(shared::ui::ResizeLimits resizeLimits)
+{
+    if (!isRootItem()) {
+        resizeLimits = resizeLimitsForCollision(resizeLimits);
+    }
+    resizeLimits = resizeRectForConnectionEndpoints(resizeLimits);
+    resizeLimits = resizedRectForTextLabel(resizeLimits);
+    resizeLimits = resizedRectForNestedFunctions(resizeLimits);
+    QRectF limitedRect = resizeLimits.getLimitedRect();
+    return limitedRect;
 }
 
 void IVFunctionGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

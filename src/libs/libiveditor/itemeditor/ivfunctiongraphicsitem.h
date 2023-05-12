@@ -52,6 +52,34 @@ public:
 
     QPainterPath shape() const override;
 
+    /**
+     * @brief resizedRect takes a GripPoint sitting on this VERectGraphicsItem and two
+     * QPointFs representing the movement of the GripPoint and returns
+     * a QRectF representing the new sceneBoundingRect of this VERectGraphicsItem based on
+     * the allowed movement of that particular grip point.
+     *
+     * A corner GripPoint can move freely. A GripPoint on a horizontal line can only move
+     * up or down. A GripPoint on a vertical line can only move left or right.
+     *
+     * If a transformation is illegal, a QRectF is calculated that performs as much as possible of the
+     * transformation as is legal.
+     *
+     * Limits of movement: An IVFunctionGraphicsItem inherits its resizedRect from
+     * IVFunctionTypeGraphicsItem which limits the resizing with respect to
+     * interfaces (aka connection endpoints).
+     *
+     * FunctionTypeGraphicsItem adds respect to the Text displaying the FunctionName, so
+     * that the FunctionName is always visible.
+     *
+     * FunctionGraphicsItem adds respect to the nested FunctionGraphicsItems it can contain.
+     *
+     * @param grip a GripPoint
+     * @param from a QPointF the GripPoint was moved from
+     * @param to a QPointF the GripPoint was moved to
+     * @return a QRect representing the new sceneBoundingRect of this IVFunctionTypeGraphicsItem
+     */
+    virtual QRectF resizedRect(shared::ui::ResizeLimits resizeLimits) override;
+
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -67,6 +95,9 @@ protected:
     std::unique_ptr<MiniViewRenderer> m_miniViewDrawer;
 
 private:
+    shared::ui::ResizeLimits resizedRectForNestedFunctions(shared::ui::ResizeLimits resizeLimits) const;
+    QRectF boundingRectForNestedFunctions() const;
+
     static QPointer<QSvgRenderer> m_svgRenderer;
 };
 }

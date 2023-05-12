@@ -136,8 +136,12 @@ target_sources(${LIB_NAME} PRIVATE
     ui/highlightrectitem.h
     ui/interactiveobjectbase.cpp
     ui/interactiveobjectbase.h
+    ui/resizelimits.cpp
+    ui/resizelimits.h
     ui/listtreedialog.h
     ui/listtreedialog.cpp
+    ui/minimizelimits.h
+    ui/minimizelimits.cpp
     ui/textitem.cpp
     ui/textitem.h
     ui/veconnectionendpointgraphicsitem.cpp
