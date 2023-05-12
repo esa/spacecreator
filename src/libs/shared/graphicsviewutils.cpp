@@ -961,32 +961,43 @@ void findGeometryForRect(
         itemRect = QRectF(QPointF(0, 0), kDefaultGraphicsItemSize);
     }
     QRectF itemGeometry(itemRect.marginsAdded(margins));
-    QRectF contentGeometry;
 
-    if (boundedRect.isValid()) {
-        contentGeometry = boundedRect.marginsRemoved(margins);
-        itemGeometry.moveTopLeft(contentGeometry.topLeft());
-    }
-    contentGeometry |= itemGeometry;
-
-    static const qreal kOffset = 2;
     if (!existingRects.isEmpty()) {
-        QRectF intersectedRect = collidingRect(itemGeometry, existingRects);
-        while (!intersectedRect.isNull()) {
-            if (contentGeometry.right() - intersectedRect.right() > itemGeometry.width()) {
-                itemGeometry.moveLeft(intersectedRect.right() + kOffset);
-            } else if (contentGeometry.bottom() - intersectedRect.bottom() > itemGeometry.height()) {
-                itemGeometry.moveLeft(contentGeometry.left() + kOffset);
-                itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
-            } else if (contentGeometry.width() <= contentGeometry.height()) {
-                itemGeometry.moveLeft(intersectedRect.right() + kOffset);
-                contentGeometry.setRight(itemGeometry.right());
-            } else {
-                itemGeometry.moveLeft(contentGeometry.left() + kOffset);
-                itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
-                contentGeometry.setBottom(itemGeometry.bottom());
+        static const qreal kOffset = 2;
+        if (boundedRect.isValid()) {
+            QRectF contentGeometry = boundedRect.marginsRemoved(margins);
+            itemGeometry.moveTopLeft(contentGeometry.topLeft());
+
+            QRectF intersectedRect = collidingRect(itemGeometry, existingRects);
+            while (!intersectedRect.isNull()) {
+                if (contentGeometry.right() - intersectedRect.right() > itemGeometry.width()) {
+                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
+                } else if (contentGeometry.bottom() - intersectedRect.bottom() > itemGeometry.height()) {
+                    itemGeometry.moveLeft(contentGeometry.left() + kOffset);
+                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
+                } else if (contentGeometry.width() <= contentGeometry.height()) {
+                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
+                    contentGeometry.setRight(itemGeometry.right());
+                } else {
+                    itemGeometry.moveLeft(contentGeometry.left() + kOffset);
+                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
+                    contentGeometry.setBottom(itemGeometry.bottom());
+                }
+                intersectedRect = collidingRect(itemGeometry, existingRects);
             }
-            intersectedRect = collidingRect(itemGeometry, existingRects);
+        } else {
+            QRectF existingRect;
+            std::for_each(existingRects.cbegin(), existingRects.cend(),
+                    [&existingRect](const QRectF &r) { existingRect |= r; });
+            QRectF intersectedRect = collidingRect(itemGeometry, existingRects);
+            while (!intersectedRect.isNull()) {
+                if (existingRect.height() > existingRect.width()) {
+                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
+                } else {
+                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
+                }
+                intersectedRect = collidingRect(itemGeometry, existingRects);
+            }
         }
     }
 
@@ -1124,7 +1135,6 @@ void findGeometryForPoint(
         }
     }
 }
-
 }
 
 }

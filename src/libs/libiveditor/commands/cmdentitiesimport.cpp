@@ -113,16 +113,13 @@ bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPoi
         if (isRectangularType(obj) || obj->parentObject() || m_parent) {
             m_importedEntities.append(obj);
             m_parentChildMappings[obj->id()] = obj->parentObject() ? obj->parentObject() : m_parent;
-            if (obj->parentObject()) {
-                continue;
-            } else {
+            if (!obj->parentObject() || obj->parentObject() == m_parent) {
                 m_rootEntities.append(obj);
-            }
-
-            if (isRectangularType(obj)) {
-                const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
-                if (!objRect.isNull())
-                    importingRect |= objRect;
+                if (isRectangularType(obj)) {
+                    const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
+                    if (!objRect.isNull())
+                        importingRect |= objRect;
+                }
             }
         }
     }
@@ -135,9 +132,9 @@ bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPoi
     const QPointF insertPos = shared::isValidPosition(pos) ? pos : QPointF(0, 0);
     const QPointF basePoint = importingRect.topLeft();
     importingRect.moveTopLeft(insertPos);
-    QList<QRectF> existingRects = existingModelRects();
+    QList<QRectF> existingRects = existingModelRects(m_parent);
     shared::graphicsviewutils::findGeometryForRect(importingRect, parentRect, existingRects);
-    const QPointF offset = insertPos - basePoint;
+    const QPointF offset = importingRect.topLeft() - basePoint;
 
     for (ivm::IVObject *obj : qAsConst(objects)) {
         switch (obj->type()) {
@@ -397,11 +394,11 @@ void CmdEntitiesImport::prepareConnectionType(
     }
 }
 
-QList<QRectF> CmdEntitiesImport::existingModelRects() const
+QList<QRectF> CmdEntitiesImport::existingModelRects(ivm::IVObject *parent) const
 {
     QList<QRectF> existingRects;
     for (const auto &obj : m_model->objects()) {
-        if (obj->parentObject() == m_parent && isRectangularType(obj->as<ivm::IVObject *>())) {
+        if (obj->parentObject() == parent && isRectangularType(obj->as<ivm::IVObject *>())) {
             const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
             if (objRect.isValid()) {
                 existingRects.append(objRect);

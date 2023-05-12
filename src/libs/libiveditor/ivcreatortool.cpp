@@ -686,19 +686,26 @@ void IVCreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos
     Q_UNUSED(pos)
 
     if (m_previewItem) {
+        ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
+        if (parentObject && parentObject->isReference())
+            return;
+
         QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
                 shared::graphicsviewutils::kDefaultGraphicsItemSize);
 
-        if (!shared::graphicsviewutils::isBounded(m_previewItem, itemSceneRect))
+        if (!shared::graphicsviewutils::isBounded(m_previewItem, itemSceneRect)) {
             return;
+        }
 
         if (auto parentItem = m_previewItem->parentItem()) {
             itemSceneRect = {};
         }
 
-        ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
-        if (parentObject && parentObject->isReference())
-            return;
+        if (shared::graphicsviewutils::isCollided(m_previewItem, itemSceneRect)) {
+            QRectF parentRect = m_previewItem->parentItem() ? m_previewItem->parentItem()->boundingRect() : QRectF();
+            shared::graphicsviewutils::findGeometryForRect(
+                    itemSceneRect, parentRect, shared::graphicsviewutils::siblingItemsRects(m_previewItem));
+        }
 
         const shared::Id id = shared::createId();
         auto cmd = new cmd::CmdFunctionTypeItemCreate(model()->objectsModel(), parentObject, itemSceneRect, id);
@@ -714,19 +721,27 @@ void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
     Q_UNUSED(pos)
 
     if (m_previewItem) {
-        QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
-                shared::graphicsviewutils::kDefaultGraphicsItemSize);
-
-        if (!shared::graphicsviewutils::isBounded(m_previewItem, itemSceneRect))
-            return;
-
         ivm::IVFunction *parentObject = gi::functionObject(m_previewItem->parentItem());
         if (parentObject && parentObject->isReference())
             return;
 
+        QRectF itemSceneRect = adjustToSize(m_previewItem->mapRectToScene(m_previewItem->rect()),
+                shared::graphicsviewutils::kDefaultGraphicsItemSize);
+
+        if (!shared::graphicsviewutils::isBounded(m_previewItem, itemSceneRect)) {
+            return;
+        }
+
         if (parentObject && parentObject->id() != model()->objectsModel()->rootObjectId()) {
             itemSceneRect = {};
         }
+
+        if (shared::graphicsviewutils::isCollided(m_previewItem, itemSceneRect)) {
+            QRectF parentRect = m_previewItem->parentItem() ? m_previewItem->parentItem()->boundingRect() : QRectF();
+            shared::graphicsviewutils::findGeometryForRect(
+                    itemSceneRect, parentRect, shared::graphicsviewutils::siblingItemsRects(m_previewItem));
+        }
+
         const shared::Id id = shared::createId();
         auto cmd = new cmd::CmdFunctionItemCreate(model()->objectsModel(), parentObject, itemSceneRect, QString(), id);
         if (m_doc->commandsStack()->push(cmd)) {

@@ -391,7 +391,7 @@ bool VERectGraphicsItem::doLayout()
             margins = graphicsviewutils::kRootMargins;
         }
 
-        QRectF itemRect = QRectF(QPointF(0, 0), minimumSize());
+        QRectF itemRect = this->boundingRect();
         itemRect.moveTopLeft(boundedRect.topLeft());
 
         graphicsviewutils::findGeometryForRect(

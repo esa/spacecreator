@@ -39,8 +39,7 @@ class CmdEntitiesImport : public ComponentImportHelper, public QUndoCommand
     Q_OBJECT
 public:
     explicit CmdEntitiesImport(const QList<ivm::IVObject *> &entities, ivm::IVFunctionType *parent, ivm::IVModel *model,
-            shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks,
-            const QPointF &pos);
+            shared::ComponentModel *componentModel, Asn1Acn::Asn1SystemChecks *asn1Checks, const QPointF &pos);
     ~CmdEntitiesImport() override;
 
     void redo() override;
@@ -54,7 +53,7 @@ private:
             ivm::IVObject *obj, const QPointF &offset, QRectF &parentRect, QList<QRectF> &existingRects);
     void prepareEndPointType(ivm::IVObject *obj, const QPointF &offset);
     void prepareConnectionType(ivm::IVObject *obj, const QPointF &offset, const QVector<ivm::IVObject *> &objects);
-    QList<QRectF> existingModelRects() const;
+    QList<QRectF> existingModelRects(ivm::IVObject *parent) const;
 
 private:
     QPointer<ivm::IVModel> m_model;
