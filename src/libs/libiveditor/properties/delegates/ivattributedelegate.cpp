@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 */
 
 #include "ivattributedelegate.h"
+#include "propertieslistmodel.h"
 
 #include "ivobject.h"
 #include "properties/qivnamevalidator.h"
@@ -37,10 +38,16 @@ QWidget *IVAttributeDelegate::createEditor(
     QWidget *editor = shared::AttributeDelegate::createEditor(parent, option, index);
     if (auto lineEdit = qobject_cast<QLineEdit *>(editor)) {
         if (index.data(shared::PropertiesModelBase::TokenRole).value<ivm::meta::Props::Token>()
-                == ivm::meta::Props::Token::name) {
+            == ivm::meta::Props::Token::name) {
             auto validator = new QIVNameValidator(m_object, editor);
             validator->setSecondValidator(lineEdit->validator());
             lineEdit->setValidator(validator);
+        }
+        // disable validator for name for connection groups
+        /// @todo fix properly #issue 978
+        if (m_object->type() == ivm::IVObject::Type::ConnectionGroup && index.row() == 0
+            && index.column() == shared::PropertiesListModel::Column::Value) {
+            lineEdit->setValidator(nullptr);
         }
     }
     return editor;
