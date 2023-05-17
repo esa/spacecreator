@@ -636,16 +636,6 @@ void InterfaceDocument::setAsn1FileName(QString newAsnfile, QString oldAsnfile)
     if (!newAsnfile.isEmpty()) {
         d->asnFilesNames.append(newAsnfile);
         Q_EMIT asn1FileNameChanged(newAsnfile);
-
-        if (d->asnCheck && d->asnCheck->asn1Storage()) {
-            const QDir projectPath { QFileInfo(path()).absoluteDir() };
-            if (d->asnCheck->asn1Storage()->contains(projectPath.filePath(newAsnfile))) {
-                checkAllInterfacesForAsn1Compliance();
-            } else {
-                // does load the data
-                d->asnCheck->asn1Storage()->asn1DataTypes(projectPath.filePath(newAsnfile));
-            }
-        }
     }
 }
 
