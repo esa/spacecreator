@@ -64,7 +64,11 @@ private:
     IVComment *addComment(const shared::Id &id);
     IVConnection *addConnection(const shared::Id &id);
     IVConnectionGroup *addConnectionGroup(const shared::Id &id, const QString &groupName, const QString &source, const QString &target);
-    IVArchetypeReference *addArchetypeReference(const QString &archetypeLibrary, const QString &archetypeFunction);
+    IVArchetypeReference *addArchetypeReference(const QString &archetypeLibrary,
+                                                const QString &archetypeFunction);
+
+    bool isIdUnique(const QUuid &id) const;
+    QString uniqueName(const QString &name) const;
 };
 
 }

@@ -193,15 +193,36 @@ IVConnection::EndPointInfo addConnectionPart(const EntityAttributes &otherAttrs)
     info.m_ifaceDirection = isRI ? IVInterface::InterfaceType::Required : IVInterface::InterfaceType::Provided;
     info.m_ifaceId = QUuid::fromString(attrValue(otherAttrs, Props::Token::iface_id));
 
-    Q_ASSERT(info.isReady());
+    // Q_ASSERT(info.isReady());
     return info;
 }
 
 bool IVXMLReader::processTagOpen(QXmlStreamReader &xml)
 {
     const QString &tagName = xml.name().toString();
+    const Props::Token t = Props::token(tagName);
+
     EntityAttributes attrs = attributes(xml.attributes());
     const EntityAttribute &idAttr = attrs.take(QLatin1String("id"));
+
+    QUuid id = idAttr.value<QUuid>();
+    if (!isIdUnique(id)) {
+        const QUuid oldId = id;
+        id = QUuid::createUuid();
+
+        EntityAttribute nameAttr = attrs["name"];
+        QString oldName = nameAttr.value().toString();
+        QString name = oldName;
+        if (t == Props::Token::Function) {
+            name = uniqueName(oldName);
+            nameAttr.setValue(name);
+            attrs["name"] = nameAttr;
+        }
+        QString message = QString("Duplicate ID found. Replacing %1/%2 with %3/%4. Line %5")
+                              .arg(oldId.toString(), oldName, id.toString(), name)
+                              .arg(xml.lineNumber());
+        shared::ErrorHub::addError(shared::ErrorItem::Warning, message);
+    }
 
     if (d->m_uiReader && d->m_uiReader->rootElementName() == tagName) {
         auto fileIt = attrs.constFind(d->m_uiReader->filePathAttributeName());
@@ -214,21 +235,20 @@ bool IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     }
 
     IVObject *obj { nullptr };
-    const Props::Token t = Props::token(tagName);
     switch (t) {
     case Props::Token::Function: {
         const bool isFunctionType =
                 attrValue(attrs, Props::Token::is_type, QStringLiteral("no")).toLower() == QStringLiteral("yes");
 
-        obj = addFunction(
-                idAttr.value<QUuid>(), isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
+        obj = addFunction(id,
+                          isFunctionType ? IVObject::Type::FunctionType : IVObject::Type::Function);
         break;
     }
     case Props::Token::Provided_Interface:
     case Props::Token::Required_Interface: {
         Q_ASSERT(d->m_currentObject.function() != nullptr);
 
-        const auto iface = addIface(idAttr.value<QUuid>(), Props::Token::Required_Interface == t);
+        const auto iface = addIface(id, Props::Token::Required_Interface == t);
         const QString groupName = attrValue(attrs, Props::Token::group_name);
         if (!groupName.isEmpty())
             d->m_connectionGroups[groupName].m_interfaces.append(iface);
@@ -248,12 +268,14 @@ bool IVXMLReader::processTagOpen(QXmlStreamReader &xml)
     case Props::Token::ConnectionGroup: {
         const EntityAttribute sourceAttr = attrs.take(Props::token(Props::Token::Source));
         const EntityAttribute targetAttr = attrs.take(Props::token(Props::Token::Target));
-        obj = addConnectionGroup(idAttr.value<QUuid>(), attrValue(attrs, Props::Token::name),
-                sourceAttr.value<QString>(), targetAttr.value<QString>());
+        obj = addConnectionGroup(id,
+                                 attrValue(attrs, Props::Token::name),
+                                 sourceAttr.value<QString>(),
+                                 targetAttr.value<QString>());
         break;
     }
     case Props::Token::Connection: {
-        obj = addConnection(idAttr.value<QUuid>());
+        obj = addConnection(id);
         const QString groupName = attrValue(attrs, Props::Token::group_name);
         if (!groupName.isEmpty())
             d->m_connectionGroups[groupName].m_connectionIds.append(obj->id());
@@ -271,12 +293,16 @@ bool IVXMLReader::processTagOpen(QXmlStreamReader &xml)
                 } else {
                     d->m_currentObject.connection()->setDelayedEnd(info);
                 }
+            } else {
+                shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                                           QString("Invalid connection at line %1")
+                                               .arg(xml.lineNumber()));
             }
         }
         break;
     }
     case Props::Token::Comment: {
-        obj = addComment(idAttr.value<QUuid>());
+        obj = addComment(id);
         break;
     }
     case Props::Token::Property: {
@@ -501,4 +527,30 @@ IVArchetypeReference *IVXMLReader::addArchetypeReference(
     }
     return archetypeReference;
 }
+
+bool IVXMLReader::isIdUnique(const QUuid &id) const
+{
+    return !std::any_of(d->m_allObjects.begin(), d->m_allObjects.end(), [&id](IVObject *obj) {
+        return obj->id() == id;
+    });
 }
+
+QString IVXMLReader::uniqueName(const QString &name) const
+{
+    auto nameExists = [this](const QString &testName) -> bool {
+        return std::any_of(d->m_allObjects.begin(),
+                           d->m_allObjects.end(),
+                           [&testName](IVObject *obj) { return obj->title() == testName; });
+    };
+
+    QString newName = name;
+    int count = 0;
+    while (nameExists(newName)) {
+        ++count;
+        newName = QString("%1_renamed_%2").arg(name).arg(count);
+    }
+
+    return newName;
+}
+
+} // namespace ivm
