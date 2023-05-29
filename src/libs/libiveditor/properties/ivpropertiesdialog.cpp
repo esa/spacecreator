@@ -64,7 +64,7 @@ IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVProper
     , m_projectPath(projectPath)
     , m_layersModel(layersModel)
     , m_archetypesModel(archetypesModel)
-    , m_isFixedSystemElement(false)
+    , m_isFixedSystemElement(dataObject()->isFixedSystemElement())
     , m_isRequiredSystemElement(false)
 {
 }
@@ -295,6 +295,10 @@ void IVPropertiesDialog::initArchetypeView()
     }
     auto archetypesWidget =
             new ive::ArchetypesWidget(m_archetypesModel, m_layersModel, m_asn1Checks, function, commandMacro(), this);
+
+    if (m_isFixedSystemElement || dataObject()->isReference()) {
+        archetypesWidget->setDisabled(true);
+    }
 
     connect(propertiesDialogUi()->buttonBox, &QDialogButtonBox::accepted, archetypesWidget,
             &ive::ArchetypesWidget::applyArchetypes);
