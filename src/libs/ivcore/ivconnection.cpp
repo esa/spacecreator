@@ -282,11 +282,11 @@ IVObject *IVConnection::findFunction(const EndPointInfo &info) const
     if (!info.isReady())
         return nullptr;
 
-    IVObject *ivFunction = model()->getObjectByName(info.m_functionName);
+    IVObject *ivFunction = model()->getObjectByName(info.m_functionName, IVObject::Type::Function);
     if (!ivFunction) {
         // Try with old encoding
-        ivFunction =
-                model()->getObjectByName(IVNameValidator::encodeName(IVObject::Type::Function, info.m_functionName));
+        ivFunction = model()->getObjectByName(
+                IVNameValidator::encodeName(IVObject::Type::Function, info.m_functionName), IVObject::Type::Function);
         if (!ivFunction) {
             shared::ErrorHub::addError(shared::ErrorItem::Warning,
                     tr("Connection removed - Unable to find Fn/FnType %1").arg(info.m_functionName), "");
