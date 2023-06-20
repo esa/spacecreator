@@ -83,7 +83,7 @@ void tst_dvgenerator::testLinuxX86()
     const QString expectedOutputFilename = dvPath.arg("deploymentview-linux-x86");
 
     const std::unique_ptr<dvm::DVModel> generatedModel =
-            DvGenerator::generate(ivFunctionsRaw, "x86 Linux CPP", "x86_Linux_TestRunner", "Node_1", "hostPartition");
+            DvGenerator::generate(ivFunctionsRaw, "x86 Linux C++", "x86_Linux_TestRunner", "Node_1", "hostPartition");
 
     QVERIFY(generatedModel != nullptr);
     const auto generatedDvObjects = dvtools::getDvObjectsFromModel(generatedModel.get());
