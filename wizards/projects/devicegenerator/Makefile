@@ -1,6 +1,8 @@
 KAZOO?=kazoo
 SPACECREATOR?=spacecreator.AppImage
 
+export USER_CFLAGS=-I$(shell pwd)
+
 # Get the list of ASN.1 files from Space Creator project file:
 DISTFILES=$(shell qmake %{ProFile} -o /tmp/null 2>&1)
 ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
@@ -9,8 +11,6 @@ ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
 ASN1_DRV_CONFIG=%{ProjectName}configuration.asn
 ASN1_DRV_PRIVATE=%{ProjectName}privatedata.asn
 ASN1_DRIVER_EXPLICIT_CONFIG=$(ASN1_DRV_CONFIG) $(ASN1_DRV_PRIVATE)
-
-PARTITION_NAME=demo
 
 CD_INSTALLATION_DIRECTORY=$(COMMUNICATION_DEVICE_PATH)/%{CDBoard}/port_%{ProjectNameLowerCase}
 COMMUNICATION_DEVICE_INSTALLATOR=install_communication_devices.py
@@ -35,18 +35,18 @@ run:
 install:
 	chmod 755 install.sh
 	./install.sh
-	$(COMMUNICATION_DEVICE_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
+	$(COMMUNICATION_DEVICE_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH} -b ${BOARD_FILE_PATH} -o ${OCARINA_COMPONENTS_FILE_PATH}
 
 uninstall:
 	rm -r $(CD_INSTALLATION_DIRECTORY)
 	rm $(TASTE_DRIVER_REPO)/configurations/%{AsnConfigFile}
 	rm $(TASTE_DRIVER_REPO)/configurations/%{AcnConfigFile}
 	rm -r $(SOURCE_INSTALLATION_DIRECTORY)
-	$(COMMUNICATION_DEVICE_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
+	$(COMMUNICATION_DEVICE_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH} -b ${BOARD_FILE_PATH} -o ${OCARINA_COMPONENTS_FILE_PATH}
 
 uninstall-all:
 	rm -r $(COMMUNICATION_DEVICE_PATH)/*
-	$(COMMUNICATION_DEVICE_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH}
+	$(COMMUNICATION_DEVICE_INSTALLATOR) -c ${COMMUNICATION_DEVICE_PATH} -b ${BOARD_FILE_PATH} -o ${OCARINA_COMPONENTS_FILE_PATH}
 
 skeletons:
 	$(MAKE) work/skeletons_built

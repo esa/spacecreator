@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <InterfaceView projectName="%{ProjectName}" version="1.0" %{IVAsnFile}>
 
-<Function name="Broker" is_type="NO" instance_of="" language="C" default_implementation="default" fixed_system_element="YES" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
+<Function name="%{ProjectName}_Broker_Adapter" is_type="NO" instance_of="" language="C" default_implementation="default" fixed_system_element="YES" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
     <Property name="Taste::coordinates" value="6600 28800 26600 41100"/>
 <Required_Interface name="Init" kind="Protected" layer="default" required_system_element="NO" wcet="0">
     <Input_Parameter name="initReqSeq" type="InitRequestData" encoding="NATIVE"/>
