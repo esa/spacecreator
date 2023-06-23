@@ -566,13 +566,12 @@ void IvToPromelaTranslator::prepareSporadicCallInfo(IvToPromelaTranslatorContext
 QString IvToPromelaTranslator::prepareCallInfo(RequiredCallInfo &info, IvToPromelaTranslatorContext &context,
         const QString &functionName, const ivm::IVInterface *requiredInterface) const
 {
-    QString inlineName =
-            QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
+    const QString interfaceName = requiredInterface->title().toLower();
+    QString inlineName = QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
     info.m_name = inlineName;
     info.m_interfaceName = getInterfaceName(requiredInterface);
 
-    const QString parameterNamePrefix =
-            QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
+    const QString parameterNamePrefix = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
     for (const InterfaceParameter &interfaceParam : requiredInterface->params()) {
         RequiredCallInfo::ParameterInfo parameterInfo;
         parameterInfo.m_parameterType = interfaceParam.paramTypeName();
@@ -601,8 +600,8 @@ QString IvToPromelaTranslator::prepareCallInfo(RequiredCallInfo &info, IvToProme
 
     for (const IVConnection *connection : connections) {
         const IVInterface *sourceInterface = connection->targetInterface();
-        const QString targetFunctionName = getInterfaceFunctionName(sourceInterface);
-        const QString targetInterfaceName = getInterfaceName(sourceInterface);
+        const QString targetFunctionName = getInterfaceFunctionName(sourceInterface).toLower();
+        const QString targetInterfaceName = getInterfaceName(sourceInterface).toLower();
 
         RequiredCallInfo::TargetInfo targetInfo;
         targetInfo.m_targetFunctionName = targetFunctionName;
