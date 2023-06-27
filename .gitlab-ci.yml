@@ -17,7 +17,7 @@ default:
     - pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
     # install newest OpenGEODE 3.x (must be installed in the same directory, removal is more robust than git clean/checkout/force)
     # NOTE: the used version here is not the latest. But the last one before 'offspring' field was added.
-    - pushd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; git checkout bad808d008c2c3e3e28275528e9fa9512541ed94 ; make install; popd
+    - pushd $HOME/tool-src; rm -r opengeode ; git clone https://gitrepos.estec.esa.int/taste/opengeode.git ; cd opengeode ; make install; popd
     # install newest version of Spin model checker
     - pushd $HOME/tool-src; rm -rf Spin ; git clone https://github.com/n7space/Spin.git ; cd Spin ; make; popd ; mv $HOME/tool-src/Spin/Src/spin $HOME/.local/bin/n7s-spin
     # install sdl2promela
