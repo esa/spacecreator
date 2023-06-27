@@ -13,6 +13,7 @@ Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    pingarg MyInteger
 }
 

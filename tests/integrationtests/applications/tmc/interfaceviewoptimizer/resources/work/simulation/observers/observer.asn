@@ -24,6 +24,7 @@ Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    value MyInteger,
    result MyInteger
 }
@@ -63,6 +64,7 @@ Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    pingarg MyInteger
 }
 
@@ -120,13 +122,18 @@ System-Dataview DEFINITIONS ::=
 BEGIN
 
    -- Range of PID - type can be used to size arrays of PID type
-   PID-Range ::= INTEGER(0..3)
+   PID-Range ::= INTEGER(0..4)
 
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        clock,
+       
        pinger,
+       
        ponger,
+       
+       demo-timer-manager,
+       
        
        env
    }
@@ -196,23 +203,18 @@ BEGIN
    }
    
    Demo-Timer-Manager-Event ::= CHOICE {
-      msg-in CHOICE {
-         input-none SEQUENCE {},
-         tick SEQUENCE {  }
-      },
       msg-out CHOICE {
-         pinger-pingertimer SEQUENCE {   },
-         ponger-pongertimer SEQUENCE {   }
+         pinger-pingertimer       SEQUENCE {   },
+         pinger-pingertimer-reset SEQUENCE {   },
+         pinger-pingertimer-set   SEQUENCE { val T-UInt32 },
+         ponger-pongertimer       SEQUENCE {   },
+         ponger-pongertimer-reset SEQUENCE {   },
+         ponger-pongertimer-set   SEQUENCE { val T-UInt32 }
       }
-   }
-   Demo-Timer-Manager-Periodic-Events ::=
-      Periodic-Events {Demo-Timer-Manager-Event, 1}
-   
-   demo-timer-manager-periodic-events Demo-Timer-Manager-Periodic-Events ::= {
-      { period 10, event msg-in: tick : {} }
    }
    
    Pinger-Event ::= CHOICE {
+      -- Lang: SDL TRUE TRUE
       msg-in CHOICE {
          input-none SEQUENCE {},
          clockinterface        SEQUENCE {  },
@@ -231,6 +233,7 @@ BEGIN
    }
    
    Ponger-Event ::= CHOICE {
+      -- Lang: SDL TRUE TRUE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pinginterface SEQUENCE { arg MyInteger},
@@ -249,10 +252,10 @@ BEGIN
 
    --  Event related to the execution of a PI or call of a RI in the functional code
    Function-Event ::= CHOICE {
-      clock  Clock-Event,
-      env    Demo-Timer-Manager-Event,
-      pinger Pinger-Event,
-      ponger Ponger-Event
+      clock              Clock-Event,
+      demo-timer-manager Demo-Timer-Manager-Event,
+      pinger             Pinger-Event,
+      ponger             Ponger-Event
    }
 
    --  Type used to store events in a database: associate a name to the event
@@ -298,6 +301,11 @@ BEGIN
       demo-timer-manager  Demo-timer-manager-Context,
       pinger              Pinger-Context,
       ponger              Ponger-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      clock
    }
 
 END

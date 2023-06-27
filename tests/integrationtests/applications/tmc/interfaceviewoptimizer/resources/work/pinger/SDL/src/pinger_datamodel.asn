@@ -13,6 +13,7 @@ Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    value MyInteger,
    result MyInteger
 }

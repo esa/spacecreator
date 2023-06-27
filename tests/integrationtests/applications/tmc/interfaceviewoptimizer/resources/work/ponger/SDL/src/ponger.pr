@@ -1,5 +1,6 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Ponger;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (10, 10), (252, 140) */
     -- Timers defined in the interface view
     -- Use SET_TIMER (value, timer name)
@@ -13,10 +14,11 @@ process Ponger;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
     /* CIF state (450, 10), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (405, 65), (157, 35) */
+        /* CIF input (404, 65), (157, 35) */
         input PingInterface(pingArg);
-            /* CIF NEXTSTATE (449, 120), (70, 35) */
+            /* CIF NEXTSTATE (448, 120), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Ponger;
