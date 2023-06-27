@@ -10,6 +10,11 @@ system Thething;
 
    
 
+   -- For internal use, return the PID of the caller
+   procedure get_sender;
+      fpar out sender PID;
+   external;
+
    channel c
       from env to Thething with Tick;
    endchannel;

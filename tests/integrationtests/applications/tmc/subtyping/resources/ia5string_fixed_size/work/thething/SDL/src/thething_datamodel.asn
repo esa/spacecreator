@@ -12,6 +12,7 @@ Thething-Context ::= SEQUENCE {
    state Thething-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    arg MyString,
    result MyString
 }

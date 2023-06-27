@@ -6,12 +6,13 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Receiver-States ::= ENUMERATED {ok, wait}
+Receiver-States ::= ENUMERATED {wait, ok}
 
 Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    pingarg MyBetterInteger,
    pingtmp MyBetterInteger,
    pingbutarrayarg MyArray,
@@ -96,10 +97,44 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        pinger,
+       
        receiver,
+       
        
        env
    }
+
+END
+
+PINGER-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyBetterInteger FROM SUBTYPING-DATAVIEW
+
+
+
+
+MyArray FROM SUBTYPING-DATAVIEW
+
+ ;
+
+
+
+
+
+
+
+Pinger-ping-pingArg ::= MyBetterInteger
+
+
+
+
+Pinger-pingbutarray-pingButArrayArg ::= MyArray
+
+
+
 
 END
 
@@ -139,6 +174,7 @@ BEGIN
    
    
    Pinger-Event ::= CHOICE {
+      -- Lang: GUI TRUE FALSE
       msg-in CHOICE {
          pong SEQUENCE {  }
       },
@@ -149,6 +185,7 @@ BEGIN
    }
    
    Receiver-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          ping         SEQUENCE { pingarg MyBetterInteger},
@@ -213,6 +250,11 @@ BEGIN
       receiver-queue Events-Ty (SIZE (0 .. receiver-queue-size)),
 
       receiver  Receiver-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      pinger
    }
 
 END

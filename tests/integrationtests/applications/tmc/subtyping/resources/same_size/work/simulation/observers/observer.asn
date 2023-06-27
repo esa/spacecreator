@@ -12,7 +12,8 @@ Thething-Context ::= SEQUENCE {
    state Thething-States,
    init-done BOOLEAN,
    sender PID,
-   arg MyOctoString,
+   offspring PID,
+   argx MyOctoString,
    result MyOctoString
 }
 
@@ -92,7 +93,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        clk,
+       
        thething,
+       
        
        env
    }
@@ -137,6 +140,7 @@ BEGIN
    }
    
    Thething-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          tick SEQUENCE { arg MyOctoString}
@@ -197,6 +201,11 @@ BEGIN
       thething-queue Events-Ty (SIZE (0 .. thething-queue-size)),
 
       thething  Thething-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      clk
    }
 
 END

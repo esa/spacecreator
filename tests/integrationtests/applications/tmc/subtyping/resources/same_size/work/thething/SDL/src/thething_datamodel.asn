@@ -12,7 +12,8 @@ Thething-Context ::= SEQUENCE {
    state Thething-States,
    init-done BOOLEAN,
    sender PID,
-   arg MyOctoString,
+   offspring PID,
+   argx MyOctoString,
    result MyOctoString
 }
 
