@@ -38,7 +38,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        mmi,
+       
        model,
+       
        
        env
    }

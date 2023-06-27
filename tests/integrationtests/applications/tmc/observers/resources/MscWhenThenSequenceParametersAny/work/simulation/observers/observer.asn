@@ -11,7 +11,8 @@ Pinger-States ::= ENUMERATED {wait, done}
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
@@ -29,7 +30,8 @@ Ponger-States ::= ENUMERATED {wait}
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
@@ -108,11 +110,32 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        clk,
+       
        pinger,
+       
        ponger,
+       
        
        env
    }
+
+END
+
+CLK-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+ ;
+
+
+
+
+
+
+
+
+
 
 END
 
@@ -157,6 +180,7 @@ BEGIN
    }
    
    Pinger-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pong SEQUENCE { pongarg MyInteger},
@@ -168,6 +192,7 @@ BEGIN
    }
    
    Ponger-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          ping SEQUENCE {  }
@@ -235,6 +260,11 @@ BEGIN
 
       pinger  Pinger-Context,
       ponger  Ponger-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      clk
    }
 
 END

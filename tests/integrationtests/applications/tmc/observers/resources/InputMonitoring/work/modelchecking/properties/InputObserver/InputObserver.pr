@@ -1,5 +1,6 @@
 system InputObserver;
-    /* CIF TEXT (144, 214), (507, 136) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (144, 214), (405, 140) */
     use datamodel comment 'observer.asn';
     
     signal trigger_in (MyInteger) renames input trigger to MODEL;
@@ -16,7 +17,8 @@ action_in;
         connect c and r;
         /* CIF PROCESS (259, 86), (150, 75) */
         process InputObserver;
-            /* CIF TEXT (0, 57), (256, 112) */
+            /* CIF Keep Specific Geode Partition 'default' */
+            /* CIF TEXT (0, 57), (222, 140) */
             monitor st System_State;
             
             monitor event Observable_Event;
@@ -31,26 +33,29 @@ action_in;
 received_trigger := False;
                 /* CIF NEXTSTATE (114, 424), (111, 35) */
                 NEXTSTATE WaitForTrigger;
-            /* CIF state (126, 574), (70, 35) */
-            state Done;
+            /* CIF state (659, 351), (107, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
+            state WaitForAction;
+                /* CIF input (667, 406), (91, 35) */
+                input action_in(y);
+                    /* CIF task (633, 461), (160, 35) */
+                    task received_action := True;
+                    /* CIF NEXTSTATE (678, 516), (70, 35) */
+                    NEXTSTATE Done;
             endstate;
-            /* CIF state (372, 342), (111, 35) */
+            /* CIF state (371, 342), (111, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state WaitForTrigger;
-                /* CIF input (380, 397), (95, 35) */
+                /* CIF input (379, 397), (95, 35) */
                 input trigger_in(x);
-                    /* CIF task (346, 452), (164, 35) */
+                    /* CIF task (345, 452), (164, 35) */
                     task received_trigger := True;
-                    /* CIF NEXTSTATE (374, 507), (107, 35) */
+                    /* CIF NEXTSTATE (373, 507), (107, 35) */
                     NEXTSTATE WaitForAction;
             endstate;
-            /* CIF state (660, 351), (107, 35) */
-            state WaitForAction;
-                /* CIF input (668, 406), (91, 35) */
-                input action_in(y);
-                    /* CIF task (634, 461), (160, 35) */
-                    task received_action := True;
-                    /* CIF NEXTSTATE (679, 516), (70, 35) */
-                    NEXTSTATE Done;
+            /* CIF state (126, 574), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
+            state Done;
             endstate;
         endprocess InputObserver;
     endblock;

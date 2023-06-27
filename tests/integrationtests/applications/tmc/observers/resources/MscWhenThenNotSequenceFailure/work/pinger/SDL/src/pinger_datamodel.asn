@@ -11,7 +11,8 @@ Pinger-States ::= ENUMERATED {help, wait}
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END

@@ -12,8 +12,9 @@ Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    pingarg My-Sequence
 }
 
-Ponger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+Ponger-Mychoice-Selection ::= ENUMERATED {small-present(1), big-present(2)}
 END

@@ -72,9 +72,13 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        clock,
+       
        helper,
+       
        pinger,
+       
        ponger,
+       
        
        env
    }

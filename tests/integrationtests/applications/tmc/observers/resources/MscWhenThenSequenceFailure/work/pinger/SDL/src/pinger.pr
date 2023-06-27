@@ -1,10 +1,21 @@
-/* CIF PROCESS (250, 150), (150, 75) */
+/* CIF PROCESS (264, 170), (150, 75) */
 process Pinger;
     /* CIF START (320, 10), (70, 35) */
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
+    /* CIF state (450, 10), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
+        /* CIF input (450, 65), (70, 35) */
+        input Clk;
+            /* CIF output (450, 120), (70, 35) */
+            output Ping;
+            /* CIF NEXTSTATE (450, 175), (70, 35) */
+            NEXTSTATE Help;
+    endstate;
     /* CIF state (568, 14), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Help;
         /* CIF input (568, 69), (70, 35) */
         input Pong;
@@ -12,14 +23,5 @@ process Pinger;
             output Ack;
             /* CIF NEXTSTATE (568, 179), (70, 35) */
             NEXTSTATE Wait;
-    endstate;
-    /* CIF state (450, 10), (70, 35) */
-    state Wait;
-        /* CIF input (450, 65), (70, 35) */
-        input Clk;
-            /* CIF output (450, 120), (70, 38) */
-            output Ping;
-            /* CIF NEXTSTATE (450, 178), (70, 35) */
-            NEXTSTATE Help;
     endstate;
 endprocess Pinger;

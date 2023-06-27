@@ -4,13 +4,14 @@ process Helper;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (450, 10), (70, 35) */
+    /* CIF state (457, 20), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (450, 65), (70, 35) */
+        /* CIF input (457, 75), (70, 35) */
         input Tick;
-            /* CIF output (450, 120), (70, 35) */
+            /* CIF output (457, 130), (70, 35) */
             output HelpMe;
-            /* CIF NEXTSTATE (450, 175), (70, 38) */
+            /* CIF NEXTSTATE (457, 185), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Helper;

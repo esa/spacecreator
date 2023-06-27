@@ -12,6 +12,7 @@ Model-Context ::= SEQUENCE {
    state Model-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    x MyInteger,
    y MyIntegerBigger
 }
@@ -58,7 +59,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        mmi,
+       
        model,
+       
        
        env
    }
@@ -125,6 +128,7 @@ BEGIN
    
    
    Mmi-Event ::= CHOICE {
+      -- Lang: GUI TRUE FALSE
       msg-in CHOICE {
          action SEQUENCE { y MyIntegerBigger}
       },
@@ -134,6 +138,7 @@ BEGIN
    }
    
    Model-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          trigger SEQUENCE { z MyInteger}
@@ -197,6 +202,11 @@ BEGIN
       model-queue Events-Ty (SIZE (0 .. model-queue-size)),
 
       model  Model-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      mmi
    }
 
 END

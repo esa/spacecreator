@@ -6,17 +6,18 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Pinger-States ::= ENUMERATED {ok2, wait, ok1}
+Pinger-States ::= ENUMERATED {ok1, wait, ok2}
 
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    value1 MySequence,
    value2 MySequence
 }
 
-Pinger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+Pinger-Mychoice-Selection ::= ENUMERATED {small-present(1), big-present(2)}
 END
 
 Ponger-Datamodel DEFINITIONS ::=
@@ -33,10 +34,11 @@ Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    pingarg MySequence
 }
 
-Ponger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+Ponger-Mychoice-Selection ::= ENUMERATED {small-present(1), big-present(2)}
 END
 
 MSCWHENTHENNOTSEQUENCEPARAMETERSFAILURE-DATAVIEW DEFINITIONS ::=
@@ -122,8 +124,11 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        clk,
+       
        pinger,
+       
        ponger,
+       
        
        env
    }
@@ -189,6 +194,7 @@ BEGIN
    }
    
    Pinger-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          clk  SEQUENCE {  },
@@ -200,6 +206,7 @@ BEGIN
    }
    
    Ponger-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          ping SEQUENCE { pingarg MySequence}
@@ -267,6 +274,11 @@ BEGIN
 
       pinger  Pinger-Context,
       ponger  Ponger-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      clk
    }
 
 END

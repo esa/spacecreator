@@ -12,6 +12,7 @@ Model-Context ::= SEQUENCE {
    state Model-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    x MyInteger,
    y MyIntegerBigger
 }

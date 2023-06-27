@@ -1,6 +1,7 @@
-/* CIF PROCESS (250, 150), (150, 75) */
+/* CIF PROCESS (229, 174), (150, 75) */
 process Model;
-    /* CIF TEXT (536, 12), (162, 44) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (544, 18), (170, 140) */
     dcl x MyInteger;
     dcl y MyIntegerBigger;
     /* CIF ENDTEXT */
@@ -9,12 +10,13 @@ process Model;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE S1;
     /* CIF state (451, 25), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state S1;
-        /* CIF input (442, 80), (78, 35) */
+        /* CIF input (440, 80), (78, 35) */
         input trigger(x);
-            /* CIF task (445, 135), (72, 35) */
+            /* CIF task (443, 135), (72, 35) */
             task y := x * 2;
-            /* CIF NEXTSTATE (447, 240), (70, 35) */
+            /* CIF NEXTSTATE (445, 240), (70, 35) */
             NEXTSTATE S1;
     endstate;
 endprocess Model;

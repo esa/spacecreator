@@ -11,7 +11,8 @@ Ponger-States ::= ENUMERATED {help, wait}
 Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
