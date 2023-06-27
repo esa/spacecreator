@@ -4,13 +4,14 @@ process Actuator2;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (616, 110), (70, 35) */
+    /* CIF state (626, 69), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (615, 165), (71, 35) */
+        /* CIF input (623, 124), (71, 35) */
         input trigger2;
-            /* CIF output (585, 220), (130, 35) */
+            /* CIF output (594, 179), (130, 35) */
             output test_parameter(2);
-            /* CIF NEXTSTATE (616, 275), (70, 35) */
+            /* CIF NEXTSTATE (624, 234), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Actuator2;

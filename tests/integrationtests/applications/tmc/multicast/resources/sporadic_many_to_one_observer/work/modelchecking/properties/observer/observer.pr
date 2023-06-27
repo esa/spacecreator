@@ -1,5 +1,6 @@
 system observer;
-    /* CIF TEXT (144, 214), (531, 140) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (144, 214), (530, 140) */
     use datamodel comment 'observer.asn';
     
     signal test_in(MyInteger) renames input test_parameter from actuator1 to controller;
@@ -13,6 +14,7 @@ system observer;
         connect c and r;
         /* CIF PROCESS (259, 87), (150, 75) */
         process observer;
+            /* CIF Keep Specific Geode Partition 'default' */
             /* CIF TEXT (0, 57), (222, 140) */
             monitor st System_State;
             
@@ -20,15 +22,16 @@ system observer;
             
             errorstates error;
             /* CIF ENDTEXT */
-            /* CIF START (363, 74), (70, 35) */
+            /* CIF START (371, 94), (70, 35) */
             START;
-                /* CIF NEXTSTATE (340, 129), (115, 35) */
+                /* CIF NEXTSTATE (348, 149), (115, 35) */
                 NEXTSTATE Wait_For_Event;
-            /* CIF state (339, 288), (115, 35) */
+            /* CIF state (335, 288), (115, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state Wait_For_Event;
-                /* CIF input (343, 343), (106, 35) */
+                /* CIF input (339, 343), (106, 35) */
                 input test_in(myval);
-                    /* CIF decision (362, 398), (70, 50) */
+                    /* CIF decision (358, 398), (70, 50) */
                     decision myval;
                         /* CIF ANSWER (317, 468), (70, 23) */
                         (1):
@@ -41,6 +44,7 @@ system observer;
                     enddecision;
             endstate;
             /* CIF state (614, 98), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state error;
             endstate;
         endprocess observer;

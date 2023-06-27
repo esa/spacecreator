@@ -11,24 +11,25 @@ IMPORTS
    Actuator1-Event, Actuator2-Event, Controller-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
-Observer-States ::= ENUMERATED {error, wait-for-event}
+Observer-States ::= ENUMERATED {wait-for-event, error}
 
 Observer-Context ::= SEQUENCE {
    state Observer-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    test-out-count MyInteger
 }
 
-Observer-Actuator1-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), test-parameter-present(2)}
-Observer-Actuator1-Event-Msg-Out-Selection  ::= ENUMERATED {received1-present(1)}
-Observer-Actuator1-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
-Observer-Actuator2-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), test-parameter-present(2)}
-Observer-Actuator2-Event-Msg-Out-Selection  ::= ENUMERATED {received2-present(1)}
-Observer-Actuator2-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
-Observer-Controller-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), received1-present(2), received2-present(3)}
-Observer-Controller-Event-Msg-Out-Selection  ::= ENUMERATED {test-parameter-present(1)}
-Observer-Controller-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
-Observer-Function-Event-Selection  ::= ENUMERATED {actuator1-present(1), actuator2-present(2), controller-present(3)}
-Observer-Observable-Event-Selection  ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
+Observer-Actuator1-Event-Msg-In-Selection ::= ENUMERATED {input-none-present(1), test-parameter-present(2)}
+Observer-Actuator1-Event-Msg-Out-Selection ::= ENUMERATED {received1-present(1)}
+Observer-Actuator1-Event-Selection ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observer-Actuator2-Event-Msg-In-Selection ::= ENUMERATED {input-none-present(1), test-parameter-present(2)}
+Observer-Actuator2-Event-Msg-Out-Selection ::= ENUMERATED {received2-present(1)}
+Observer-Actuator2-Event-Selection ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observer-Controller-Event-Msg-In-Selection ::= ENUMERATED {input-none-present(1), received1-present(2), received2-present(3)}
+Observer-Controller-Event-Msg-Out-Selection ::= ENUMERATED {test-parameter-present(1)}
+Observer-Controller-Event-Selection ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Observer-Function-Event-Selection ::= ENUMERATED {actuator1-present(1), actuator2-present(2), controller-present(3)}
+Observer-Observable-Event-Selection ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
 END
