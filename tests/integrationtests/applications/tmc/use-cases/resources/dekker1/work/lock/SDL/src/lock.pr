@@ -1,5 +1,6 @@
 /* CIF PROCESS (266, 145), (150, 75) */
 process type lock;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (1596, 174), (267, 203) */
     -- Text area for declarations and comments
     
@@ -15,102 +16,22 @@ process type lock;
     DCL writeRequest T_WriteRequest;
     DCL startAddress T_UInt16;
     /* CIF ENDTEXT */
-    /* CIF START (326, 20), (70, 35) */
+    /* CIF START (323, 45), (70, 35) */
     START;
-        /* CIF task (260, 75), (200, 53) */
+        /* CIF task (257, 100), (200, 53) */
         task remoteWantsToEnter := false,
 turn := 0,
 turnError := false;
-        /* CIF task (262, 148), (196, 35) */
+        /* CIF task (259, 173), (196, 35) */
         task remoteProcID := 1 - myProcID;
-        /* CIF NEXTSTATE (326, 199), (70, 35) */
+        /* CIF NEXTSTATE (323, 224), (70, 35) */
         NEXTSTATE IDLE;
-    /* CIF state (1010, 697), (75, 35) */
-    state WRITING;
-        /* CIF provided (1141, 770), (156, 35) */
-        provided writeCount < writeSize;
-            /* CIF task (1087, 825), (265, 38) */
-            task myWriteValue.write_address := 
-writeRequest.start_address + writeCount;
-            /* CIF task (1025, 883), (389, 35) */
-            task myWriteValue.write_value := writeRequest.values(writeCount);
-            /* CIF output (1131, 938), (176, 35) */
-            output MemWrite(myWriteValue);
-            /* CIF task (1119, 993), (201, 35) */
-            task writeCount := (writeCount + 1);
-            /* CIF NEXTSTATE (1182, 1048), (75, 35) */
-            NEXTSTATE WRITING;
-        /* CIF provided (793, 769), (164, 35) */
-        provided writeCount >= writeSize;
-            /* CIF task (802, 824), (147, 35) */
-            task turn := remoteProcID;
-            /* CIF output (824, 879), (102, 35) */
-            output SetTurn(turn);
-            /* CIF output (806, 934), (139, 35) */
-            output WantToEnter(false);
-            /* CIF output (837, 989), (76, 35) */
-            output WriteAck;
-            /* CIF NEXTSTATE (841, 1039), (70, 35) */
-            NEXTSTATE IDLE;
-    endstate;
-    /* CIF state (513, 275), (70, 35) */
-    state IDLE;
-        /* CIF input (434, 330), (192, 35) */
-        input WriteRequest(writeRequest);
-            /* CIF PROCEDURECALL (395, 385), (270, 35) */
-            call writeln('proc ', myProcID, ' write request');
-            /* CIF task (474, 440), (113, 35) */
-            task writeCount := 0;
-            /* CIF task (399, 495), (262, 35) */
-            task writeSize := length(writeRequest.values);
-            /* CIF output (463, 545), (135, 35) */
-            output WantToEnter(true);
-            /* CIF decision (456, 600), (149, 50) */
-            decision remoteWantsToEnter;
-                /* CIF ANSWER (405, 670), (70, 23) */
-                (true):
-                    /* CIF NEXTSTATE (358, 713), (162, 35) */
-                    NEXTSTATE WAIT_NOCONTENTION;
-                /* CIF ANSWER (592, 670), (70, 23) */
-                (false):
-                    /* CIF NEXTSTATE (589, 713), (75, 35) */
-                    NEXTSTATE WRITING;
-            enddecision;
-    endstate;
-    /* CIF state (990, 62), (70, 35) */
-    state *;
-        /* CIF input (878, 117), (288, 35) */
-        input RemoteWantsToEnter(remoteWantsToEnter);
-            /* CIF NEXTSTATE (988, 172), (70, 35) */
-            NEXTSTATE -;
-    endstate;
-    /* CIF state (205, 808), (162, 35) */
-    state WAIT_NOCONTENTION;
-        /* CIF provided (200, 863), (193, 35) */
-        provided remoteWantsToEnter = false;
-            /* CIF decision (238, 921), (118, 50) */
-            decision turn = myProcID;
-                /* CIF ANSWER (130, 1012), (70, 23) */
-                (true):
-                    /* CIF output (97, 1055), (135, 35) */
-                    output WantToEnter(true);
-                    /* CIF task (108, 1110), (113, 35) */
-                    task writeCount := 0;
-                    /* CIF NEXTSTATE (127, 1160), (75, 35) */
-                    NEXTSTATE WRITING;
-                /* CIF ANSWER (494, 1011), (70, 23) */
-                (false):
-                    /* CIF output (459, 1054), (139, 35) */
-                    output WantToEnter(false);
-                    /* CIF NEXTSTATE (481, 1104), (94, 35) */
-                    NEXTSTATE WAIT_TURN;
-            enddecision;
-    endstate;
-    /* CIF state (974, 276), (94, 35) */
+    /* CIF state (973, 276), (94, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state WAIT_TURN;
-        /* CIF input (944, 331), (154, 35) */
+        /* CIF input (943, 331), (154, 35) */
         input RemoteSetsTurn(turn);
-            /* CIF decision (962, 386), (118, 50) */
+            /* CIF decision (961, 386), (118, 50) */
             decision turn = myProcID;
                 /* CIF ANSWER (859, 456), (70, 23) */
                 (true):
@@ -130,5 +51,90 @@ unreachable';
                     /* CIF NEXTSTATE (1187, 550), (94, 35) */
                     NEXTSTATE WAIT_TURN;
             enddecision;
+    endstate;
+    /* CIF state (204, 808), (162, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state WAIT_NOCONTENTION;
+        /* CIF provided (199, 863), (193, 35) */
+        provided remoteWantsToEnter = false;
+            /* CIF decision (237, 921), (118, 50) */
+            decision turn = myProcID;
+                /* CIF ANSWER (130, 1012), (70, 23) */
+                (true):
+                    /* CIF output (97, 1055), (135, 35) */
+                    output WantToEnter(true);
+                    /* CIF task (108, 1110), (113, 35) */
+                    task writeCount := 0;
+                    /* CIF NEXTSTATE (127, 1160), (75, 35) */
+                    NEXTSTATE WRITING;
+                /* CIF ANSWER (494, 1011), (70, 23) */
+                (false):
+                    /* CIF output (459, 1054), (139, 35) */
+                    output WantToEnter(false);
+                    /* CIF NEXTSTATE (481, 1104), (94, 35) */
+                    NEXTSTATE WAIT_TURN;
+            enddecision;
+    endstate;
+    /* CIF state (990, 62), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state *;
+        /* CIF input (877, 117), (288, 35) */
+        input RemoteWantsToEnter(remoteWantsToEnter);
+            /* CIF NEXTSTATE (987, 172), (70, 35) */
+            NEXTSTATE -;
+    endstate;
+    /* CIF state (513, 275), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state IDLE;
+        /* CIF input (433, 330), (192, 35) */
+        input WriteRequest(writeRequest);
+            /* CIF PROCEDURECALL (394, 385), (270, 35) */
+            call writeln('proc ', myProcID, ' write request');
+            /* CIF task (473, 440), (113, 35) */
+            task writeCount := 0;
+            /* CIF task (398, 495), (262, 35) */
+            task writeSize := length(writeRequest.values);
+            /* CIF output (462, 545), (135, 35) */
+            output WantToEnter(true);
+            /* CIF decision (455, 600), (149, 50) */
+            decision remoteWantsToEnter;
+                /* CIF ANSWER (405, 670), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (358, 713), (162, 35) */
+                    NEXTSTATE WAIT_NOCONTENTION;
+                /* CIF ANSWER (592, 670), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (589, 713), (75, 35) */
+                    NEXTSTATE WRITING;
+            enddecision;
+    endstate;
+    /* CIF state (1009, 697), (75, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state WRITING;
+        /* CIF provided (1140, 770), (156, 35) */
+        provided writeCount < writeSize;
+            /* CIF task (1086, 825), (265, 38) */
+            task myWriteValue.write_address := 
+writeRequest.start_address + writeCount;
+            /* CIF task (1024, 883), (389, 35) */
+            task myWriteValue.write_value := writeRequest.values(writeCount);
+            /* CIF output (1130, 938), (176, 35) */
+            output MemWrite(myWriteValue);
+            /* CIF task (1118, 993), (201, 35) */
+            task writeCount := (writeCount + 1);
+            /* CIF NEXTSTATE (1181, 1048), (75, 35) */
+            NEXTSTATE WRITING;
+        /* CIF provided (792, 769), (164, 35) */
+        provided writeCount >= writeSize;
+            /* CIF task (801, 824), (147, 35) */
+            task turn := remoteProcID;
+            /* CIF output (823, 879), (102, 35) */
+            output SetTurn(turn);
+            /* CIF output (805, 934), (139, 35) */
+            output WantToEnter(false);
+            /* CIF output (836, 989), (76, 35) */
+            output WriteAck;
+            /* CIF NEXTSTATE (840, 1039), (70, 35) */
+            NEXTSTATE IDLE;
     endstate;
 endprocess type lock;

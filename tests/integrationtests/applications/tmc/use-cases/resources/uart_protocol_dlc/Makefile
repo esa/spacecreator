@@ -52,7 +52,7 @@ edit_cv:
 	$(MAKE) -C work run_cv
 
 # Simulation target (experimental - for systems made of SDL functions only)
-simu:	
+simu:
 	if [ -f work/glue_debug ] || [ -f work/glue_release ] || [ -f work/glue_coverage ]; then $(MAKE) clean; fi
 	$(MAKE) interfaceview work/glue_simu
 	$(MAKE) -C work
@@ -72,7 +72,7 @@ skeletons:
 
 work/skeletons_built:	InterfaceView.aadl DataView.aadl
 	$(KAZOO) --gw -o work
-	$(MAKE) -C work dataview
+	$(MAKE) -C work dataview simulink_skeletons
 	touch $@
 
 work/glue_simu:	InterfaceView.aadl DataView.aadl
@@ -124,10 +124,12 @@ clean:
 	rm -f work/glue_release work/glue_debug work/glue_coverage work/skeletons_built
 	find work -type d -name "wrappers" -exec rm -rf {} + || :
 	find work -type d -name "*_GUI" -exec rm -rf {} + || :
-	find work -type d -path "*/QGenC/xmi" -exec rm -rf {} + || : 
-	find work -type d -path "*/QGenC/src/.qgeninfo" -exec rm -rf {} + || : 
-	find work -type f -path "*/QGenC/src/*.h" -exec rm -f {} + || : 
-	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || : 
+	find work -type d -path "*/QGenC/xmi" -exec rm -rf {} + || :
+	find work -type d -path "*/QGenC/src/.qgeninfo" -exec rm -rf {} + || :
+	find work -type d -path "*/QGenC/src/slprj" -exec rm -rf {} + || :
+	find work -type f -path "*/QGenC/src/built" -exec rm -f {} + || :
+	find work -type f -path "*/QGenC/src/*.slxc" -exec rm -f {} + || :
+	find work -type f -path "*/QGenC/src/*.h" -not -name "simulink_definition_of_types.h" -not -name "*_invoke_ri.h" -exec rm -f {} + || :
+	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || :
 
-.PHONY: clean release debug coverage skeletons simu run
-
+.PHONY: clean release debug coverage skeletons simu run simulink_skeletons

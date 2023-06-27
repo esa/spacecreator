@@ -223,11 +223,17 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        bcapp,
+       
        bcdlct,
+       
        channeleffects,
+       
        erroredchannel,
+       
        rtapp,
+       
        rtdlcr,
+       
        
        env
    }

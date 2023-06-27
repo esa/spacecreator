@@ -1,4 +1,6 @@
-# SDL
+#Taste::Instances_Max 1
+#Taste::Instances_Min 1
+#Taste::Startup_Priority 1
 #TASTE_IV_Properties::is_instance_of Lock
 SEDS_CONVERTER?=spacecreator.AppImage --sedsconverter
 OPENGEODE?=opengeode
@@ -19,7 +21,7 @@ sdl-to-if:
 # Ada
 generate-code:
 	mkdir -p code && cd code && \
-	   $(OPENGEODE) --taste --toAda  ../src/system_structure.pr ../../../lock/SDL/src/lock.pr && \
+	   $(OPENGEODE) --taste --simu --toAda  ../src/system_structure.pr ../../../lock/SDL/src/lock.pr && \
 	:
 
 compile-linux: generate-code

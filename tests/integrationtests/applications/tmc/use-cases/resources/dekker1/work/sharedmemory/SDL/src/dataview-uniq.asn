@@ -53,11 +53,15 @@ BEGIN
 
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
-       lock,
+       
        locka,
+       
        lockb,
+       
        sharedmemory,
+       
        testgui,
+       
        
        env
    }

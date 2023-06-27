@@ -15,6 +15,7 @@ Rtdlcr-Context ::= SEQUENCE {
    state Rtdlcr-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    rxchar UINT8,
    rxcount UINT8,
    rxframebuffer T-UART-DLC-FrameBuffer,

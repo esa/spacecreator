@@ -1,5 +1,6 @@
 system OutputObserver;
-    /* CIF TEXT (144, 214), (379, 140) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (144, 214), (377, 140) */
     use datamodel comment 'observer.asn';
     
     signal sig(UINT8) renames output PHYTxChar from BCDLCT;
@@ -15,31 +16,34 @@ system OutputObserver;
         connect c and r;
         /* CIF PROCESS (259, 87), (150, 75) */
         process OutputObserver;
+            /* CIF Keep Specific Geode Partition 'default' */
             /* CIF TEXT (0, 57), (222, 140) */
             monitor st System_State;
             monitor event Observable_Event;
             errorstates error;
             /* CIF ENDTEXT */
-            /* CIF START (363, 74), (70, 35) */
+            /* CIF START (365, 78), (70, 35) */
             START;
-                /* CIF NEXTSTATE (363, 129), (70, 35) */
+                /* CIF NEXTSTATE (365, 133), (70, 35) */
                 NEXTSTATE Wait;
             /* CIF state (614, 98), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state error;
             endstate;
-            /* CIF state (363, 129), (70, 35) */
+            /* CIF state (365, 133), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state Wait;
-                /* CIF input (363, 184), (70, 35) */
+                /* CIF input (365, 188), (70, 35) */
                 input sig(x);
-                    /* CIF decision (363, 239), (70, 50) */
+                    /* CIF decision (365, 243), (70, 50) */
                     decision x;
-                        /* CIF ANSWER (318, 309), (70, 23) */
+                        /* CIF ANSWER (320, 313), (70, 23) */
                         (> 255):
-                            /* CIF NEXTSTATE (318, 352), (70, 35) */
+                            /* CIF NEXTSTATE (320, 356), (70, 35) */
                             NEXTSTATE Wait;
-                        /* CIF ANSWER (408, 309), (70, 23) */
+                        /* CIF ANSWER (410, 313), (70, 23) */
                         else:
-                            /* CIF NEXTSTATE (408, 352), (70, 35) */
+                            /* CIF NEXTSTATE (410, 356), (70, 35) */
                             NEXTSTATE error;
                     enddecision;
             endstate;

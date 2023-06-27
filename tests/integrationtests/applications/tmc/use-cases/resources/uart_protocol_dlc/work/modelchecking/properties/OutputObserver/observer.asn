@@ -15,6 +15,7 @@ Bcdlct-Context ::= SEQUENCE {
    state Bcdlct-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    txsdu T-UART-DLC-SDU,
    txpdu T-UART-DLC-PDU,
    txcount UINT8,
@@ -46,12 +47,13 @@ IMPORTS
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Erroredchannel-States ::= ENUMERATED {idle, corrupt, drop}
+Erroredchannel-States ::= ENUMERATED {idle, drop, corrupt}
 
 Erroredchannel-Context ::= SEQUENCE {
    state Erroredchannel-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    corruption UINT8,
    txchar UINT8
 }
@@ -75,6 +77,7 @@ Rtdlcr-Context ::= SEQUENCE {
    state Rtdlcr-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    rxchar UINT8,
    rxcount UINT8,
    rxframebuffer T-UART-DLC-FrameBuffer,
@@ -306,16 +309,24 @@ System-Dataview DEFINITIONS ::=
 BEGIN
 
    -- Range of PID - type can be used to size arrays of PID type
-   PID-Range ::= INTEGER(0..6)
+   PID-Range ::= INTEGER(0..7)
 
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        bcapp,
+       
        bcdlct,
+       
        channeleffects,
+       
        erroredchannel,
+       
        rtapp,
+       
        rtdlcr,
+       
+       demo-timer-manager,
+       
        
        env
    }
@@ -388,6 +399,7 @@ BEGIN
    }
    
    Bcdlct-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          dlctxreset SEQUENCE {  },
@@ -407,22 +419,15 @@ BEGIN
    }
    
    Demo-Timer-Manager-Event ::= CHOICE {
-      msg-in CHOICE {
-         input-none SEQUENCE {},
-         tick SEQUENCE {  }
-      },
       msg-out CHOICE {
-         rtdlcr-frametimer SEQUENCE {   }
+         rtdlcr-frametimer       SEQUENCE {   },
+         rtdlcr-frametimer-reset SEQUENCE {   },
+         rtdlcr-frametimer-set   SEQUENCE { val T-UInt32 }
       }
-   }
-   Demo-Timer-Manager-Periodic-Events ::=
-      Periodic-Events {Demo-Timer-Manager-Event, 1}
-   
-   demo-timer-manager-periodic-events Demo-Timer-Manager-Periodic-Events ::= {
-      { period 10, event msg-in: tick : {} }
    }
    
    Erroredchannel-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          corruptchar SEQUENCE { p1 UINT8},
@@ -437,6 +442,7 @@ BEGIN
    }
    
    Rtapp-Event ::= CHOICE {
+      -- Lang: GUI TRUE FALSE
       msg-in CHOICE {
          dlcrxerror SEQUENCE { p1 T-UART-DLC-RxErrorCode},
          dlcrxsdu   SEQUENCE { p1 T-UART-DLC-SDU}
@@ -447,6 +453,7 @@ BEGIN
    }
    
    Rtdlcr-Event ::= CHOICE {
+      -- Lang: SDL TRUE TRUE
       msg-in CHOICE {
          input-none SEQUENCE {},
          dlcrxreset SEQUENCE {  },
@@ -471,13 +478,13 @@ BEGIN
 
    --  Event related to the execution of a PI or call of a RI in the functional code
    Function-Event ::= CHOICE {
-      bcapp          Bcapp-Event,
-      bcdlct         Bcdlct-Event,
-      channeleffects Channeleffects-Event,
-      env            Demo-Timer-Manager-Event,
-      erroredchannel Erroredchannel-Event,
-      rtapp          Rtapp-Event,
-      rtdlcr         Rtdlcr-Event
+      bcapp              Bcapp-Event,
+      bcdlct             Bcdlct-Event,
+      channeleffects     Channeleffects-Event,
+      demo-timer-manager Demo-Timer-Manager-Event,
+      erroredchannel     Erroredchannel-Event,
+      rtapp              Rtapp-Event,
+      rtdlcr             Rtdlcr-Event
    }
 
    --  Type used to store events in a database: associate a name to the event
@@ -526,6 +533,13 @@ BEGIN
       demo-timer-manager  Demo-timer-manager-Context,
       erroredchannel      Erroredchannel-Context,
       rtdlcr              Rtdlcr-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      bcapp,
+      channeleffects,
+      rtapp
    }
 
 END

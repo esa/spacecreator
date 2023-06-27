@@ -1,4 +1,5 @@
 system InputObserver;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (144, 214), (501, 140) */
     use datamodel comment 'observer.asn';
     
@@ -13,6 +14,7 @@ system InputObserver;
         connect c and r;
         /* CIF PROCESS (269, 87), (150, 75) */
         process InputObserver;
+            /* CIF Keep Specific Geode Partition 'default' */
             /* CIF TEXT (0, 57), (222, 140) */
             monitor st System_State;
             
@@ -20,15 +22,16 @@ system InputObserver;
             
             errorstates ZeroWrite;
             /* CIF ENDTEXT */
-            /* CIF START (350, 65), (70, 35) */
+            /* CIF START (333, 64), (70, 35) */
             START;
-                /* CIF NEXTSTATE (350, 120), (70, 35) */
+                /* CIF NEXTSTATE (333, 119), (70, 35) */
                 NEXTSTATE Wait;
             /* CIF state (514, 63), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state Wait;
-                /* CIF input (496, 118), (103, 35) */
+                /* CIF input (494, 118), (103, 35) */
                 input writesignal(x);
-                    /* CIF decision (480, 173), (136, 50) */
+                    /* CIF decision (478, 173), (136, 50) */
                     decision x.write_address = 0;
                         /* CIF ANSWER (469, 243), (70, 23) */
                         (true):
@@ -40,7 +43,8 @@ system InputObserver;
                             NEXTSTATE Wait;
                     enddecision;
             endstate;
-            /* CIF state (724, 66), (82, 35) */
+            /* CIF state (722, 66), (82, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state ZeroWrite;
             endstate;
         endprocess InputObserver;
