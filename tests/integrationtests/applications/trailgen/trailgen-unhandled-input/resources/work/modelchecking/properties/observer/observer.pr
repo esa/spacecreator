@@ -1,5 +1,6 @@
 system observer;
-    /* CIF TEXT (144, 214), (305, 140) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (144, 214), (303, 140) */
     use datamodel comment 'observer.asn';
     
     signal loss_detected renames unhandled input;
@@ -13,8 +14,8 @@ system observer;
         connect c and r;
         /* CIF PROCESS (259, 87), (150, 75) */
         process observer;
+            /* CIF Keep Specific Geode Partition 'default' */
             /* CIF TEXT (0, 57), (222, 140) */
-            
             monitor event Observable_Event;
             errorstates error;
             /* CIF ENDTEXT */
@@ -22,15 +23,17 @@ system observer;
             START;
                 /* CIF NEXTSTATE (478, 249), (70, 35) */
                 NEXTSTATE Idle;
-            /* CIF state (291, 191), (70, 35) */
-            state Idle;
-                /* CIF input (273, 246), (105, 35) */
-                input loss_detected;
-                    /* CIF NEXTSTATE (291, 301), (70, 35) */
-                    NEXTSTATE error;
-            endstate;
             /* CIF state (677, 69), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state error;
+            endstate;
+            /* CIF state (304, 190), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
+            state Idle;
+                /* CIF input (285, 245), (105, 35) */
+                input loss_detected;
+                    /* CIF NEXTSTATE (303, 300), (70, 35) */
+                    NEXTSTATE error;
             endstate;
         endprocess observer;
     endblock;

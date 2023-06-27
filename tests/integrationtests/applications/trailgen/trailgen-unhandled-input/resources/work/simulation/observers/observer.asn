@@ -6,12 +6,13 @@ IMPORTS
    MyInteger FROM TRAILGEN-UNHANDLED-INPUT-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Actuator-States ::= ENUMERATED {busy, detected, wait}
+Actuator-States ::= ENUMERATED {busy, wait, detected}
 
 Actuator-Context ::= SEQUENCE {
    state Actuator-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    wrk MyInteger
 }
 
@@ -25,12 +26,13 @@ IMPORTS
    MyInteger FROM TRAILGEN-UNHANDLED-INPUT-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {wait, idle}
+Controller-States ::= ENUMERATED {idle, wait}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    test-param MyInteger,
    result-param MyInteger
 }
@@ -62,41 +64,6 @@ BEGIN
 
    MyInteger ::= INTEGER (0 .. 10000)
 
--- ASN.1 Type definitions must start with an uppercase
--- Field names in records (SEQUENCE) must start with a lowercase
--- Underscores are not allowed: use dash (hyphen) 
--- For integers do not assume that small ranges will be translated to small
--- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
--- for the range in Ada)
-
--- Simple types:
-
--- TASTE-Boolean ::= BOOLEAN
--- MyInteger   ::= INTEGER (0..255)
--- MyReal      ::= REAL (0.0 .. 1000.0)
--- MyBool      ::= BOOLEAN
--- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
-
--- Complex types:
-
---  MySeq       ::= SEQUENCE {
---      input-data  MyInteger,
---      output-data MyInteger,
---      validity    ENUMERATED { valid, invalid }
---  }
---
---  MyChoice    ::= CHOICE {
---      a BOOLEAN,
---      b MySeq
---  }
---
---  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
---
---  MyOctStr    ::= OCTET STRING (SIZE (3))
---
---  -- You can also declare constants
---  myVar       MySeqOf     ::= { hello, world }
-
 END
 
 
@@ -111,7 +78,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        actuator,
+       
        controller,
+       
        
        env
    }
@@ -153,6 +122,7 @@ BEGIN
    
    
    Actuator-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          ping SEQUENCE { p1 MyInteger}
@@ -163,6 +133,7 @@ BEGIN
    }
    
    Controller-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pong SEQUENCE { p1 MyInteger}
@@ -230,6 +201,7 @@ BEGIN
       actuator    Actuator-Context,
       controller  Controller-Context
    }
+
 
 END
 

@@ -1,5 +1,6 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Actuator2;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (419, 350), (170, 140) */
     dcl param MyInteger;
     /* CIF ENDTEXT */
@@ -7,13 +8,14 @@ process Actuator2;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (822, 220), (70, 35) */
+    /* CIF state (829, 204), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (776, 275), (160, 35) */
+        /* CIF input (782, 259), (160, 35) */
         input test_parameter(param);
-            /* CIF output (805, 330), (102, 35) */
+            /* CIF output (811, 314), (102, 35) */
             output result(param);
-            /* CIF NEXTSTATE (822, 385), (70, 35) */
+            /* CIF NEXTSTATE (828, 369), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Actuator2;
