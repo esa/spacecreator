@@ -52,7 +52,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        function-1,
+       
        function-2,
+       
        
        env
    }
