@@ -1,5 +1,6 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Ponger;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (740, 96), (267, 140) */
     -- Text area for declarations and comments
     
@@ -12,16 +13,17 @@ process Ponger;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
     /* CIF state (495, 12), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (461, 67), (137, 36) */
+        /* CIF input (477, 67), (104, 35) */
         input Ping(pingArg);
-            /* CIF task (480, 123), (98, 35) */
+            /* CIF task (480, 122), (98, 35) */
             task pongArg := 0;
-            /* CIF PROCEDURECALL (414, 173), (230, 49) */
+            /* CIF PROCEDURECALL (447, 172), (163, 35) */
             call Stub(pingArg, pongArg);
-            /* CIF task (452, 242), (154, 35) */
+            /* CIF task (453, 227), (151, 35) */
             task argOutVal := pongArg;
-            /* CIF NEXTSTATE (494, 292), (70, 35) */
+            /* CIF NEXTSTATE (494, 277), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Ponger;
