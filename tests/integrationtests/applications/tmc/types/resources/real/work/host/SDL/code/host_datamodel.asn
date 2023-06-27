@@ -4,13 +4,16 @@ BEGIN
 IMPORTS
    MyInteger, MyReal FROM GUIPROJECT-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   Controller-pi-2-p1, Controller-pi-1-p1 FROM CONTROLLER-SUBTYPE;
+   PID-Range, PID FROM System-Dataview;
 
 Host-States ::= ENUMERATED {wait}
 
 Host-Context ::= SEQUENCE {
    state Host-States,
-   init-done BOOLEAN
+   init-done BOOLEAN,
+   sender PID,
+   offspring PID,
+   param MyReal
 }
 
 END

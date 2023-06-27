@@ -1,6 +1,7 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Receiver;
-    /* CIF TEXT (1329, 57), (286, 143) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (1329, 57), (286, 140) */
     -- Text area for declarations and comments
     
     dcl octetArg MyBetterOctetString;
@@ -11,15 +12,16 @@ process Receiver;
     START;
         /* CIF NEXTSTATE (437, 67), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (644, 14), (70, 35) */
+    /* CIF state (656, 15), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (558, 69), (242, 59) */
+        /* CIF input (605, 70), (170, 35) */
         input OctetInterface(octetArg);
-            /* CIF task (600, 148), (156, 35) */
+            /* CIF task (612, 125), (156, 35) */
             task octetValue := octetArg;
-            /* CIF task (605, 203), (146, 35) */
+            /* CIF task (617, 180), (146, 35) */
             task octetHandled := true;
-            /* CIF NEXTSTATE (644, 258), (70, 35) */
+            /* CIF NEXTSTATE (656, 235), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Receiver;

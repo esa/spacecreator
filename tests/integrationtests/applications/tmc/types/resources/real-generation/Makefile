@@ -18,7 +18,7 @@ SPACECREATOR?=spacecreator.AppImage
 export NO_PROGRESS_BAR=1
 
 # Get the list of ASN.1 files from Space Creator project file:
-DISTFILES=$(shell qmake ReallyGuiProject.pro -o /tmp/null 2>&1)
+DISTFILES=$(shell qmake real-generation.pro -o /tmp/null 2>&1)
 ASN1_FILES=$(shell find ${DISTFILES} 2>/dev/null | egrep '\.asn$$|\.asn1$$')
 
 all:	release
@@ -72,7 +72,7 @@ skeletons:
 
 work/skeletons_built:	InterfaceView.aadl DataView.aadl
 	$(KAZOO) --gw -o work
-	$(MAKE) -C work dataview
+	$(MAKE) -C work dataview simulink_skeletons
 	touch $@
 
 work/glue_simu:	InterfaceView.aadl DataView.aadl
@@ -124,10 +124,13 @@ clean:
 	rm -f work/glue_release work/glue_debug work/glue_coverage work/skeletons_built
 	find work -type d -name "wrappers" -exec rm -rf {} + || :
 	find work -type d -name "*_GUI" -exec rm -rf {} + || :
-	find work -type d -path "*/QGenC/xmi" -exec rm -rf {} + || : 
-	find work -type d -path "*/QGenC/src/.qgeninfo" -exec rm -rf {} + || : 
-	find work -type f -path "*/QGenC/src/*.h" -exec rm -f {} + || : 
-	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || : 
+	find work -type d -path "*/QGenC/xmi" -exec rm -rf {} + || :
+	find work -type d -path "*/QGenC/src/.qgeninfo" -exec rm -rf {} + || :
+	find work -type d -path "*/QGenC/src/slprj" -exec rm -rf {} + || :
+	find work -type f -path "*/QGenC/src/built" -exec rm -f {} + || :
+	find work -type f -path "*/QGenC/src/*.slxc" -exec rm -f {} + || :
+	find work -type f -path "*/QGenC/src/*.h" -not -name "simulink_definition_of_types.h" -not -name "*_invoke_ri.h" -exec rm -f {} + || :
+	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || :
 
-.PHONY: clean release debug coverage skeletons simu run
+.PHONY: clean release debug coverage skeletons simu run simulink_skeletons
 

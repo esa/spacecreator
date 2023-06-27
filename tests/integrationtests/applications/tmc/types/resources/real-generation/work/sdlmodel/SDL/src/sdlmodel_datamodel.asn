@@ -2,7 +2,7 @@ Sdlmodel-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyReal FROM REALLYGUIPROJECT-DATAVIEW
+   MyInteger, MyReal FROM REAL-GENERATION
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -12,6 +12,7 @@ Sdlmodel-Context ::= SEQUENCE {
    state Sdlmodel-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyReal,
    received MyInteger
 }

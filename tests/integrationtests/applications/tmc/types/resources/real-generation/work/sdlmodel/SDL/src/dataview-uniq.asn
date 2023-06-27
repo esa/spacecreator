@@ -1,8 +1,7 @@
-REALLYGUIPROJECT-DATAVIEW DEFINITIONS ::=
-BEGIN
+REAL-GENERATION DEFINITIONS ::= BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10000)
-   MyReal ::= REAL (-10.0 .. 10.0)
+MyInteger ::= INTEGER (0 .. 10000)
+MyReal ::= REAL (-10.0 .. 10.0)
 
 END
 
@@ -37,7 +36,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        environment,
+       
        sdlmodel,
+       
        
        env
    }

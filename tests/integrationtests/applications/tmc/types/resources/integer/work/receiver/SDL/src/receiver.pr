@@ -1,6 +1,7 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Receiver;
-    /* CIF TEXT (1334, 60), (267, 143) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (1334, 60), (267, 140) */
     -- Text area for declarations and comments
     
     dcl integerArg MyBetterInteger;
@@ -11,15 +12,16 @@ process Receiver;
     START;
         /* CIF NEXTSTATE (437, 67), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (644, 14), (70, 35) */
+    /* CIF state (647, 22), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (567, 73), (225, 44) */
+        /* CIF input (586, 81), (191, 35) */
         input IntegerInterface(integerArg);
-            /* CIF task (589, 137), (179, 35) */
+            /* CIF task (592, 136), (179, 35) */
             task integerValue := integerArg;
-            /* CIF task (600, 192), (158, 35) */
+            /* CIF task (603, 191), (158, 35) */
             task integerHandled := true;
-            /* CIF NEXTSTATE (644, 242), (70, 38) */
+            /* CIF NEXTSTATE (647, 241), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Receiver;

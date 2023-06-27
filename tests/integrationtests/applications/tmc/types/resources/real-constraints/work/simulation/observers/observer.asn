@@ -2,16 +2,17 @@ Controller-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyReal FROM GUIPROJECT-DATAVIEW
+   MyInteger, MyReal FROM REAL-CONSTRAINTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {overflow, wait}
+Controller-States ::= ENUMERATED {wait, overflow}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyReal
 }
 
@@ -21,7 +22,7 @@ Host-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyReal FROM GUIPROJECT-DATAVIEW
+   MyInteger, MyReal FROM REAL-CONSTRAINTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -31,19 +32,18 @@ Host-Context ::= SEQUENCE {
    state Host-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyReal
 }
 
 END
 
-GUIPROJECT-DATAVIEW DEFINITIONS ::=
-BEGIN
+REAL-CONSTRAINTS DEFINITIONS ::= BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10000)
-   MyReal      ::= REAL (0.0 .. 1000.0)
+MyInteger ::= INTEGER (0 .. 10000)
+MyReal      ::= REAL (0.0 .. 1000.0)
 
 END
-
 
 TASTE-BasicTypes DEFINITIONS ::=
 BEGIN
@@ -76,7 +76,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        controller,
+       
        host,
+       
        
        env
    }
@@ -89,10 +91,10 @@ BEGIN
    IMPORTS
       
       --  ASN.1 modules used by thread controller_Pong
-      MyReal FROM GUIPROJECT-DATAVIEW
+      MyReal FROM REAL-CONSTRAINTS
       
       --  ASN.1 modules used by thread host_Ping
-      MyReal FROM GUIPROJECT-DATAVIEW
+      MyReal FROM REAL-CONSTRAINTS
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
@@ -118,6 +120,7 @@ BEGIN
    
    
    Controller-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pong SEQUENCE { p1 MyReal}
@@ -128,6 +131,7 @@ BEGIN
    }
    
    Host-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          ping SEQUENCE { p1 MyReal}
@@ -195,6 +199,7 @@ BEGIN
       controller  Controller-Context,
       host        Host-Context
    }
+
 
 END
 

@@ -1,6 +1,7 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Receiver;
-    /* CIF TEXT (1038, 53), (267, 140) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (1038, 53), (243, 140) */
     dcl stringArg MyBetterString;
     dcl stringVal MyBetterString := "a";
     dcl stringHandled T_Boolean := false;
@@ -9,15 +10,16 @@ process Receiver;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (539, 45), (70, 35) */
+    /* CIF state (549, 36), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (471, 100), (206, 40) */
+        /* CIF input (496, 91), (175, 35) */
         input StringInterface(stringArg);
-            /* CIF task (500, 160), (147, 35) */
+            /* CIF task (510, 146), (147, 35) */
             task stringVal := stringArg;
-            /* CIF task (499, 215), (149, 35) */
+            /* CIF task (509, 201), (149, 35) */
             task stringHandled := true;
-            /* CIF NEXTSTATE (539, 270), (70, 35) */
+            /* CIF NEXTSTATE (549, 256), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Receiver;

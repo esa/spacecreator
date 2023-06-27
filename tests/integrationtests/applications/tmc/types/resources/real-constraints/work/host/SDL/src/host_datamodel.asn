@@ -2,7 +2,7 @@ Host-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyReal FROM GUIPROJECT-DATAVIEW
+   MyInteger, MyReal FROM REAL-CONSTRAINTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -11,6 +11,8 @@ Host-States ::= ENUMERATED {wait}
 Host-Context ::= SEQUENCE {
    state Host-States,
    init-done BOOLEAN,
+   sender PID,
+   offspring PID,
    param MyReal
 }
 

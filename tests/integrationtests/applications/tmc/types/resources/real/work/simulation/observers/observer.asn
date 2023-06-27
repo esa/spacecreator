@@ -6,12 +6,13 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {failure, finish, wait}
+Controller-States ::= ENUMERATED {wait, finish, failure}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyReal
 }
 
@@ -31,6 +32,7 @@ Host-Context ::= SEQUENCE {
    state Host-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyReal
 }
 
@@ -76,7 +78,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        controller,
+       
        host,
+       
        
        env
    }
@@ -118,6 +122,7 @@ BEGIN
    
    
    Controller-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pong SEQUENCE { p1 MyReal}
@@ -128,6 +133,7 @@ BEGIN
    }
    
    Host-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          ping SEQUENCE { p1 MyReal}
@@ -195,6 +201,7 @@ BEGIN
       controller  Controller-Context,
       host        Host-Context
    }
+
 
 END
 

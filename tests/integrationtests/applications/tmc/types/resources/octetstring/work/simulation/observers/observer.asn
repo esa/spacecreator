@@ -12,6 +12,7 @@ Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    octetarg MyBetterOctetString,
    octetvalue MyBetterOctetString,
    octethandled T-Boolean
@@ -57,7 +58,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        pinger,
+       
        receiver,
+       
        
        env
    }
@@ -124,6 +127,7 @@ BEGIN
    }
    
    Receiver-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          octetinterface SEQUENCE { octetarg MyBetterOctetString}
@@ -184,6 +188,11 @@ BEGIN
       receiver-queue Events-Ty (SIZE (0 .. receiver-queue-size)),
 
       receiver  Receiver-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      pinger
    }
 
 END

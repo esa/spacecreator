@@ -12,6 +12,7 @@ Host-Context ::= SEQUENCE {
    state Host-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyReal
 }
 
