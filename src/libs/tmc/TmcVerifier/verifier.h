@@ -306,6 +306,7 @@ private Q_SLOTS:
     void panFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void traceGeneratorStarted();
     void traceGeneratorFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void processError(QProcess::ProcessError error);
     void timeout();
 
 private:
