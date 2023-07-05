@@ -17,7 +17,7 @@ extern "C" {
 void utils_startup(void);
 
 /* Provided interfaces */
-void utils_PI_Stub( const asn1SccMyInteger *, asn1SccMyInteger * );
+void utils_PI_stub( const asn1SccMyInteger *, asn1SccMyInteger * );
 
 /* Required interfaces */
 

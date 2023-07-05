@@ -8,7 +8,7 @@ system Ponger;
    /* CIF Keep Specific Geode PARAMNAMES pingArg */
    signal Ping (MyInteger);
 
-   procedure Stub;
+   procedure stub;
       fpar
             in     Stubparamin MyInteger,
             in/out Stubparamout MyInteger;

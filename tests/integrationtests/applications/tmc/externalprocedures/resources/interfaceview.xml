@@ -1,9 +1,20 @@
-<InterfaceView asn1file="external-procedures.acn">
-<Function name="Pinger" is_type="NO" language="GUI" default_implementation="default" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="12000 9300 48900 24500"/>
-<Required_Interface name="Ping" kind="Sporadic" layer="default" queue_size="1" priority="1" stack_size="1024" miat="0" wcet="0">
+<InterfaceView version="1.2" asn1file="external-procedures.acn" UiFile="interfaceview.ui.xml">
+<Function id="{529b0ec0-1c6d-4208-9a17-8810b93c6848}" name="Utils" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{cf6fadc7-5fd0-46b2-a65c-0566336ef1ad}" name="stub" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="stubParamIn" type="MyInteger" encoding="NATIVE"/>
+    <Output_Parameter name="stubParamOut" type="MyInteger" encoding="NATIVE"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{190e0d2e-4fd6-483f-b354-5a7408338a5e}" name="Pinger" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Required_Interface id="{5c123efe-6f24-4660-8cf2-bbae6f2914a4}" name="Ping" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" miat="0" priority="1" wcet="0">
     <Input_Parameter name="pingArg" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="20000 24500"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
@@ -13,30 +24,15 @@
     </Implementations>
 </Function>
 
-<Function name="Utils" is_type="NO" language="C" default_implementation="default" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="65000 39800 85000 47800"/>
-<Provided_Interface name="Stub" kind="Protected" layer="default" wcet="0">
-    <Input_Parameter name="stubParamIn" type="MyInteger" encoding="NATIVE"/>
-    <Output_Parameter name="stubParamOut" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="65000 44100"/>
-</Provided_Interface>
-
-    <Implementations>
-        <Implementation name="default" language="C"/>
-    </Implementations>
-</Function>
-
-<Function name="Ponger" is_type="NO" language="SDL" default_implementation="default" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="13100 35100 49400 51800"/>
-<Provided_Interface name="Ping" kind="Sporadic" layer="default" queue_size="1" priority="1" stack_size="1024" miat="0" wcet="0">
+<Function id="{70774746-b041-47fc-b236-8578aad36c6f}" name="Ponger" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{0d39d93d-c66f-4994-b77c-95e39aa85732}" name="Ping" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" miat="0" priority="1" wcet="0">
     <Input_Parameter name="pingArg" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="20000 35100"/>
 </Provided_Interface>
 
-<Required_Interface name="Stub" kind="Protected" layer="default" wcet="0">
+<Required_Interface id="{5a33f336-f906-4bac-a917-ff116171777a}" name="stub" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="stubParamIn" type="MyInteger" encoding="NATIVE"/>
     <Output_Parameter name="stubParamOut" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="49400 44300"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
@@ -46,16 +42,14 @@
     </Implementations>
 </Function>
 
-<Connection >
-    <Source func_name="Ponger" ri_name="Stub"/>
-    <Target func_name="Utils" pi_name="Stub"/>
-    <Property name="Taste::coordinates" value="50000 44300 64700 44100"/>
+<Connection id="{762a0f19-c8ec-4c78-86c6-48acd34cdba7}" name="Ponger_stub____Utils_stub" required_system_element="NO">
+    <Source func_name="Ponger" ri_name="stub" />
+    <Target func_name="Utils" pi_name="stub" />
 </Connection>
 
-<Connection >
-    <Source func_name="Pinger" ri_name="Ping"/>
-    <Target func_name="Ponger" pi_name="Ping"/>
-    <Property name="Taste::coordinates" value="20000 25100 20000 34800"/>
+<Connection id="{148aff49-552a-4734-ba3d-831a6e90b2ff}" required_system_element="NO">
+    <Source func_name="Pinger" ri_name="Ping" />
+    <Target func_name="Ponger" pi_name="Ping" />
 </Connection>
 
 </InterfaceView>
