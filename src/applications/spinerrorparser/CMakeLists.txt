@@ -13,7 +13,6 @@ target_include_directories(spinerrorparser
                ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(spinerrorparser
     PUBLIC      ivcore
-                libiveditor
                 HtmlReport
                 Report
     PRIVATE     CommonProjectWarnings)

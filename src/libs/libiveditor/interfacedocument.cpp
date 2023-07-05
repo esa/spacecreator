@@ -17,35 +17,15 @@
 
 #include "interfacedocument.h"
 
-#include "../common/exceptions/inconsistentmodelexception.h"
-#include "archetypes/archetypelibrary.h"
-#include "archetypes/archetypemodel.h"
-#include "archetypes/archetypeobject.h"
-#include "archetypes/archetypexmlreader.h"
-#include "archetypes/functionarchetype.h"
-#include "asn1modelstorage.h"
-#include "asn1systemchecks.h"
-#include "colors/colormanagerdialog.h"
 #include "commands/cmdconnectionlayermanage.h"
 #include "commands/implementationshandler.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
-#include "errorhub.h"
 #include "itemeditor/ivitemmodel.h"
-#include "ivarchetypelibraryreference.h"
 #include "ivcomponentmodel.h"
-#include "ivcore/abstractsystemchecks.h"
 #include "ivexporter.h"
-#include "ivfunction.h"
-#include "ivmodel.h"
-#include "ivnamevalidator.h"
-#include "ivpropertytemplateconfig.h"
 #include "ivvisualizationmodelbase.h"
-#include "ivxmlreader.h"
-#include "propertytemplatemanager.h"
-#include "propertytemplatewidget.h"
-#include "ui/veinteractiveobject.h"
 
 #include <QAction>
 #include <QApplication>
@@ -66,7 +46,27 @@
 #include <QUndoStack>
 #include <QVBoxLayout>
 #include <algorithm>
+#include <asn1library/asn1modelstorage.h>
+#include <asn1library/asn1systemchecks.h>
+#include <common/exceptions/inconsistentmodelexception.h>
 #include <filesystem>
+#include <ivcore/abstractsystemchecks.h>
+#include <ivcore/archetypes/archetypelibrary.h>
+#include <ivcore/archetypes/archetypemodel.h>
+#include <ivcore/archetypes/archetypeobject.h>
+#include <ivcore/archetypes/archetypexmlreader.h>
+#include <ivcore/archetypes/functionarchetype.h>
+#include <ivcore/ivarchetypelibraryreference.h>
+#include <ivcore/ivfunction.h>
+#include <ivcore/ivmodel.h>
+#include <ivcore/ivnamevalidator.h>
+#include <ivcore/ivpropertytemplateconfig.h>
+#include <ivcore/ivxmlreader.h>
+#include <shared/colors/colormanagerdialog.h>
+#include <shared/errorhub.h>
+#include <shared/propertytemplatemanager.h>
+#include <shared/propertytemplatewidget.h>
+#include <shared/ui/veinteractiveobject.h>
 
 namespace ive {
 
@@ -118,7 +118,7 @@ void InterfaceDocument::checkReferencedASN1Files(ivm::IVObject *object)
 {
     if (!object || object->parentObject()
             || !(object->type() == ivm::IVObject::Type::Function
-                    || object->type() == ivm::IVObject::Type::FunctionType)) {
+                       || object->type() == ivm::IVObject::Type::FunctionType)) {
         return;
     }
 

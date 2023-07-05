@@ -12,7 +12,6 @@ target_include_directories(TmcInterfaceViewOptimizer
     PRIVATE     ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(TmcInterfaceViewOptimizer
     PUBLIC      ivcore
-                libiveditor
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(TmcInterfaceViewOptimizer)

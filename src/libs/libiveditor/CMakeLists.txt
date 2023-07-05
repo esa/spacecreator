@@ -217,24 +217,6 @@ target_sources(${LIB_NAME} PRIVATE
     properties/ivpropertiesview.h
     properties/qivnamevalidator.cpp
     properties/qivnamevalidator.h
-    templating/exportableivconnection.cpp
-    templating/exportableivconnection.h
-    templating/exportableivconnectiongroup.cpp
-    templating/exportableivconnectiongroup.h
-    templating/exportableivfunction.cpp
-    templating/exportableivfunction.h
-    templating/exportableivconnectionlayertype.cpp
-    templating/exportableivconnectionlayertype.h
-    templating/exportableivinterface.cpp
-    templating/exportableivinterface.h
-    templating/exportableivobject.cpp
-    templating/exportableivobject.h
-    templating/exportableivfunctiontype.cpp
-    templating/exportableivfunctiontype.h
-    templating/exportableivarchetypereference.cpp
-    templating/exportableivarchetypereference.h
-    templating/exportableivarchetypelibraryreference.cpp
-    templating/exportableivarchetypelibraryreference.h
     zoomcontroller.cpp
     zoomcontroller.h
     config/ivlibrarywidget.cpp

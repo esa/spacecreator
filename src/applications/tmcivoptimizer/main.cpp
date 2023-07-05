@@ -27,8 +27,7 @@
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
 #include <ivcore/ivxmlreader.h>
-#include <libiveditor/iveditor.h>
-#include <libiveditor/ivexporter.h>
+#include <ivcore/ivxmlwriter.h>
 #include <optional>
 #include <shared/sharedlibrary.h>
 #include <templating/templatinglibrary.h>
@@ -55,7 +54,7 @@ std::unique_ptr<ivm::IVModel> importIvModel(const QString &filepath)
 
 void saveOptimizedInterfaceView(const ivm::IVModel *ivModel, const QString &outputFilePath)
 {
-    ive::IVExporter exporter;
+    ivm::IVXMLWriter exporter;
     exporter.exportObjectsSilently(ivModel->objects().values(), outputFilePath);
 }
 
@@ -63,7 +62,6 @@ int main(int argc, char *argv[])
 {
     shared::initSharedLibrary();
     ivm::initIVLibrary();
-    ive::initIVEditor();
     templating::initTemplatingLibrary();
 
     QCoreApplication app(argc, argv);

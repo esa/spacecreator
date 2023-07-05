@@ -17,15 +17,8 @@
 
 #include "ivexporter.h"
 
-#include "archetypes/archetypeintegrityhelper.h"
-#include "archetypes/archetypemodel.h"
-#include "common.h"
-#include "errorhub.h"
 #include "interfacedocument.h"
-#include "ivobject.h"
-#include "ivpropertytemplateconfig.h"
 #include "templating/exportableivobject.h"
-#include "uiexporter.h"
 
 #include <QBuffer>
 #include <QDebug>
@@ -34,6 +27,13 @@
 #include <QObject>
 #include <QSaveFile>
 #include <QScopedPointer>
+#include <ivcore/archetypes/archetypeintegrityhelper.h>
+#include <ivcore/archetypes/archetypemodel.h>
+#include <ivcore/ivobject.h>
+#include <ivcore/ivpropertytemplateconfig.h>
+#include <shared/common.h>
+#include <shared/errorhub.h>
+#include <templating/uiexporter.h>
 
 namespace ive {
 
@@ -41,61 +41,6 @@ namespace ive {
  * \class ive::XmlDocExporter
  * \brief The helper that incorporates templating::StringTemplate-related stuff.
  */
-
-QString IVExporter::defaultTemplatePath() const
-{
-    return QString("%1/aadl_xml/interfaceview.%2").arg(templatesPath(), templateFileExtension());
-}
-
-QString IVExporter::templatePath(const QString &templateName)
-{
-    return QString("%1/aadl_xml/%2.%3").arg(templatesPath(), templateName, templateFileExtension());
-}
-
-/**
-   @brief XmlDocExporter::exportObjects writes the document as xml to the given buffer
-   @param objects the set of IV(AADL) entities
-   @param outBuffer the buffer that is open and ready to be written to
-   @param archetypesModel model of archetypes for archetypes check, if null then no check
-   @param templatePath the grantlee template to use for the export. If empty, the default one is used
-   @return true when the export was successful.
- */
-bool IVExporter::exportObjects(const QList<shared::VEObject *> &objects, QIODevice *outBuffer,
-        ivm::ArchetypeModel *archetypesModel, const QString &pathToTemplate)
-{
-    checkArchetypeIntegrity(objects, archetypesModel);
-
-    QHash<QString, QVariant> ivObjects = collectObjects(objects);
-    const QHash<QString, QVariant> uiObjects = m_uiExporter->collectObjects(objects);
-    ivObjects.insert(uiObjects);
-    return exportData(ivObjects, pathToTemplate, outBuffer);
-}
-
-bool IVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
-        ivm::ArchetypeModel *archetypesModel, const QString &templatePath)
-{
-    if (outPath.isEmpty()) {
-        return false;
-    }
-
-    QString usedTemplate(templatePath);
-    if (usedTemplate.isEmpty()) {
-        usedTemplate = defaultTemplatePath();
-    }
-
-    QSaveFile saveFile(outPath);
-    if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        qWarning() << "Can't open device for writing:" << saveFile.errorString();
-        shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
-        return false;
-    }
-    if (exportObjects(objects, &saveFile, archetypesModel, usedTemplate)) {
-        saveFile.commit();
-        Q_EMIT exported(outPath, true);
-        return true;
-    }
-    return false;
-}
 
 bool IVExporter::exportDocSilently(InterfaceDocument *doc, const QString &outPath, const QString &templatePath)
 {
@@ -171,45 +116,8 @@ bool IVExporter::exportDocInteractively(
 }
 
 IVExporter::IVExporter(QObject *parent)
-    : templating::ObjectsExporter(parent)
-    , m_uiExporter(new templating::UIExporter(ivm::IVPropertyTemplateConfig::instance(), this))
+    : ivm::IVXMLWriter(parent)
 {
-    ensureDefaultTemplatesDeployed(QLatin1String(":/defaults/templating/xml_templates"));
-    ensureDefaultTemplatesDeployed(QLatin1String(":/xml_templates"));
-}
-
-QVariant IVExporter::createFrom(const shared::VEObject *object) const
-{
-    return ExportableIVObject::createFrom(object->as<const ivm::IVObject *>());
-}
-
-QString IVExporter::groupName(const shared::VEObject *object) const
-{
-    if (auto ivObject = object->as<const ivm::IVObject *>()) {
-        switch (ivObject->type()) {
-        case ivm::IVObject::Type::InterfaceGroup:
-            return {};
-        case ivm::IVObject::Type::Function:
-        case ivm::IVObject::Type::FunctionType:
-            return QStringLiteral("Functions");
-        case ivm::IVObject::Type::RequiredInterface:
-        case ivm::IVObject::Type::ProvidedInterface:
-            return QStringLiteral("Interfaces");
-        case ivm::IVObject::Type::Comment:
-            return QStringLiteral("Comments");
-        case ivm::IVObject::Type::Connection:
-            return QStringLiteral("Connections");
-        case ivm::IVObject::Type::ConnectionGroup:
-            return QStringLiteral("ConnectionGroups");
-        case ivm::IVObject::Type::ConnectionLayer:
-            return QStringLiteral("ConnectionLayers");
-        case ivm::IVObject::Type::ArchetypeLibraryReference:
-            return QStringLiteral("ArchetypeLibraryReferences");
-        default:
-            break;
-        }
-    }
-    return QString();
 }
 
 QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *doc)

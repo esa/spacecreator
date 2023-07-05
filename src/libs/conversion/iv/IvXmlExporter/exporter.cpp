@@ -29,8 +29,7 @@
 #include <conversion/iv/IvOptions/options.h>
 #include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
-#include <libiveditor/iveditor.h>
-#include <libiveditor/ivexporter.h>
+#include <ivcore/ivxmlwriter.h>
 
 using conversion::Options;
 using conversion::exporter::ExportException;
@@ -38,8 +37,8 @@ using conversion::exporter::IncorrectModelException;
 using conversion::exporter::MissingOutputFilenameException;
 using conversion::exporter::NullModelException;
 using conversion::iv::IvOptions;
-using ive::IVExporter;
 using ivm::IVModel;
+using ivm::IVXMLWriter;
 
 namespace conversion::iv::exporter {
 
@@ -60,7 +59,7 @@ void IvXmlExporter::exportModel(const Model *model, const Options &options) cons
         throw MissingOutputFilenameException(ModelType::InterfaceView);
     }
 
-    IVExporter exporter;
+    IVXMLWriter exporter;
     exporter.exportObjectsSilently(ivModel->objects().values(), *outputFilepath);
 }
 

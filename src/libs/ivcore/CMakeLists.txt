@@ -41,6 +41,8 @@ target_sources(${LIB_NAME} PRIVATE
     ivtestutils.h
     ivxmlreader.cpp
     ivxmlreader.h
+	ivxmlwriter.cpp
+	ivxmlwriter.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
     ivpropertytemplate.cpp
@@ -72,7 +74,25 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/archetypexmlreader.cpp
     archetypes/archetypeintegrityhelper.h
     archetypes/archetypeintegrityhelper.cpp
-    )
+	templating/exportableivconnection.cpp
+    templating/exportableivconnection.h
+    templating/exportableivconnectiongroup.cpp
+    templating/exportableivconnectiongroup.h
+    templating/exportableivfunction.cpp
+    templating/exportableivfunction.h
+    templating/exportableivconnectionlayertype.cpp
+    templating/exportableivconnectionlayertype.h
+    templating/exportableivinterface.cpp
+    templating/exportableivinterface.h
+    templating/exportableivobject.cpp
+    templating/exportableivobject.h
+    templating/exportableivfunctiontype.cpp
+    templating/exportableivfunctiontype.h
+    templating/exportableivarchetypereference.cpp
+    templating/exportableivarchetypereference.h
+    templating/exportableivarchetypelibraryreference.cpp
+    templating/exportableivarchetypelibraryreference.h
+)
 
 target_include_directories(${LIB_NAME}
     PUBLIC . ${CMAKE_SOURCE_DIR}/src/libs)
@@ -80,6 +100,7 @@ target_include_directories(${LIB_NAME}
 target_link_libraries(${LIB_NAME}
     asn1library
     shared
+	templating
     Conversion::Common
     ${QT_CORE}
     ${QT_XML}

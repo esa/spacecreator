@@ -44,7 +44,7 @@
 #include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
-#include <libiveditor/ivexporter.h>
+#include <ivcore/ivxmlwriter.h>
 #include <promela/PromelaOptions/options.h>
 #include <sdl/SdlOptions/options.h>
 #include <simulatortrail/SimulatorTrailOptions/options.h>
@@ -74,7 +74,7 @@ using conversion::simulatortrail::SimulatorTrailRegistrar;
 using conversion::spintrail::SpinTrailOptions;
 using conversion::spintrail::SpinTrailRegistrar;
 using conversion::translator::TranslationException;
-using ive::IVExporter;
+using ivm::IVXMLWriter;
 using ivm::IVFunction;
 using ivm::IVFunctionType;
 using ivm::IVInterface;
@@ -683,7 +683,7 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
 
 void TmcConverter::saveOptimizedInterfaceView(const IVModel *ivModel, const QString outputFilePath)
 {
-    IVExporter exporter;
+    IVXMLWriter exporter;
     exporter.exportObjectsSilently(ivModel->objects().values(), outputFilePath);
 }
 

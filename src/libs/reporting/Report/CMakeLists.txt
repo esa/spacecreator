@@ -23,11 +23,15 @@ target_sources(Report
     PRIVATE    "${SOURCES}"
                "${INCLUDES}")
 
+target_include_directories(Report
+    PUBLIC     .
+    PRIVATE    ${CMAKE_SOURCE_DIR}/src/libs)
+
 target_link_libraries(Report
-    PUBLIC      ivcore
-                libiveditor
+    PUBLIC      Qt${QT_VERSION_MAJOR}::Core
     PRIVATE     CommonProjectWarnings)
 
 add_format_target(Report)
 add_tidy_target(Report)
 
+add_library(Tmc::Report ALIAS Report)

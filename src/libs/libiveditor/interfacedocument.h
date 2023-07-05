@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "common.h"
-#include "entityattribute.h"
+#include <shared/common.h>
+#include <shared/entityattribute.h>
 
 #include <QAction>
 #include <QPointer>

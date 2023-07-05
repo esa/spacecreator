@@ -18,13 +18,13 @@
  */
 
 #include "exportableivarchetypelibraryreference.h"
+
 #include "exportableattribute.h"
 #include "ivarchetypelibraryreference.h"
 
-
 namespace ive {
-
-ExportableIVArchetypeLibraryReference::ExportableIVArchetypeLibraryReference(const ivm::IVArchetypeLibraryReference *archetypeLibraryReference)
+ExportableIVArchetypeLibraryReference::ExportableIVArchetypeLibraryReference(
+        const ivm::IVArchetypeLibraryReference *archetypeLibraryReference)
     : ExportableIVObject(archetypeLibraryReference)
 {
 }
@@ -38,5 +38,4 @@ QString ExportableIVArchetypeLibraryReference::archetypeLibraryPath() const
 {
     return exportedObject<ivm::IVArchetypeLibraryReference>()->getLibraryPath();
 }
-
 }

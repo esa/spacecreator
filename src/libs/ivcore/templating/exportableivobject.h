@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "abstractexportableobject.h"
+#include <templating/abstractexportableobject.h>
 
 #include <QVariant>
 
