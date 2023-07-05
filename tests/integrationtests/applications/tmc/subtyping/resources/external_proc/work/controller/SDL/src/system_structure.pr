@@ -7,7 +7,7 @@ system Controller;
 
    signal Test;
 
-   procedure TestProtected;
+   procedure testprotected;
       fpar
             in     X MyInteger,
             in/out Y MyInteger;
@@ -15,7 +15,7 @@ system Controller;
       external;
    
    
-   procedure TestUnprotected;
+   procedure testunprotected;
       fpar
             in     X MyInteger,
             in/out Y MyInteger;

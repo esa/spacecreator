@@ -13,21 +13,13 @@ process Controller;
     START;
         /* CIF NEXTSTATE (344, 73), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (311, 323), (72, 35) */
-    /* CIF Keep Specific Geode Partition 'default' */
-    state Finished;
-    endstate;
-    /* CIF state (413, 324), (70, 35) */
-    /* CIF Keep Specific Geode Partition 'default' */
-    state Error;
-    endstate;
-    /* CIF state (1408, 17), (106, 35) */
+    /* CIF state (1407, 17), (106, 35) */
     /* CIF Keep Specific Geode Partition 'default' */
     state TestProtected;
         /* CIF input (1430, 72), (70, 35) */
         input test;
             /* CIF PROCEDURECALL (1289, 127), (350, 35) */
-            call testProtected(param_protected_x, param_protected_y);
+            call testprotected(param_protected_x, param_protected_y);
             /* CIF decision (1295, 182), (338, 50) */
             decision param_protected_y >= 0 and param_protected_y <= 2;
                 /* CIF ANSWER (1475, 252), (70, 23) */
@@ -50,8 +42,8 @@ process Controller;
 param_protected_y := 102,
 param_unprotected_x := 103,
 param_unprotected_y := 104;
-            /* CIF PROCEDURECALL (819, 212), (396, 35) */
-            call testUnprotected(param_unprotected_x, param_unprotected_y);
+            /* CIF PROCEDURECALL (820, 212), (395, 35) */
+            call testunprotected(param_unprotected_x, param_unprotected_y);
             /* CIF decision (833, 267), (368, 50) */
             decision param_unprotected_y >= 0 and param_unprotected_y <= 2;
                 /* CIF ANSWER (938, 337), (70, 23) */
@@ -63,5 +55,13 @@ param_unprotected_y := 104;
                     /* CIF NEXTSTATE (1028, 380), (70, 35) */
                     NEXTSTATE Error;
             enddecision;
+    endstate;
+    /* CIF state (413, 324), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Error;
+    endstate;
+    /* CIF state (310, 323), (72, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Finished;
     endstate;
 endprocess Controller;
