@@ -90,6 +90,7 @@ private:
 
 private:
     inline static const QString m_environmentName = "env";
+    inline static const QString m_timerManagerName = "timer_manager";
 
 private:
     void findChannelNames(const promela::translator::SystemInfo &systemInfo, const Asn1Acn::Asn1Model &asn1Model,

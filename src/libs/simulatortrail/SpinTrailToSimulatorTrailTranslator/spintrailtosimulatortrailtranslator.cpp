@@ -478,7 +478,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailEvent(
     std::unique_ptr<ChoiceValue> functionEvent = std::make_unique<ChoiceValue>(
             Escaper::escapeAsn1FieldName(event->getFunctionName()), std::move(eventValue));
     std::unique_ptr<NamedValue> inputEvent = std::make_unique<NamedValue>();
-    inputEvent->addValue("source", std::make_unique<SingleValue>(m_environmentName));
+    inputEvent->addValue("source", std::make_unique<SingleValue>(m_timerManagerName));
     inputEvent->addValue("dest", std::make_unique<SingleValue>(Escaper::escapeAsn1FieldName(event->getFunctionName())));
     inputEvent->addValue("event", std::move(functionEvent));
     result.appendValue(std::make_unique<ChoiceValue>("input-event", std::move(inputEvent)));
