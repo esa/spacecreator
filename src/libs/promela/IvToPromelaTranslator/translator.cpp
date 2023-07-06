@@ -307,22 +307,22 @@ ObserverAttachments IvToPromelaTranslator::getObserverAttachments(IvToPromelaTra
 
             const IVInterface *i = findRequiredInterface(context.ivModel(), fromFunction, attachment.interface());
             if (i == nullptr) {
-                throw TranslationException("No inteface");
-            }
-            const QVector<IVConnection *> connections = context.ivModel()->getConnectionsForIface(i->id());
-
-            // check possible connection
-            for (const IVConnection *connection : connections) {
-                if (connection != nullptr && function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
-                        && interface.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0) {
-                    result.push_back(attachment);
-                }
                 // special case for the timers, when the interface name contains both function name and timer name
-                else if (function.compare(toFunction, Qt::CaseInsensitive) == 0
+                if (function.compare(toFunction, Qt::CaseInsensitive) == 0
                         && attachment.interface().compare(
                                    QString("%1_%2").arg(function).arg(interface), Qt::CaseInsensitive)
                                 == 0) {
                     result.push_back(attachment);
+                }
+            } else {
+                const QVector<IVConnection *> connections = context.ivModel()->getConnectionsForIface(i->id());
+
+                // check possible connection
+                for (const IVConnection *connection : connections) {
+                    if (function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
+                            && interface.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0) {
+                        result.push_back(attachment);
+                    }
                 }
             }
         }
