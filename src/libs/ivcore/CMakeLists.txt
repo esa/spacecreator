@@ -41,8 +41,8 @@ target_sources(${LIB_NAME} PRIVATE
     ivtestutils.h
     ivxmlreader.cpp
     ivxmlreader.h
-	ivxmlwriter.cpp
-	ivxmlwriter.h
+    ivxmlwriter.cpp
+    ivxmlwriter.h
     connectioncreationvalidator.cpp
     connectioncreationvalidator.h
     ivpropertytemplate.cpp
@@ -74,7 +74,7 @@ target_sources(${LIB_NAME} PRIVATE
     archetypes/archetypexmlreader.cpp
     archetypes/archetypeintegrityhelper.h
     archetypes/archetypeintegrityhelper.cpp
-	templating/exportableivconnection.cpp
+    templating/exportableivconnection.cpp
     templating/exportableivconnection.h
     templating/exportableivconnectiongroup.cpp
     templating/exportableivconnectiongroup.h
@@ -100,7 +100,7 @@ target_include_directories(${LIB_NAME}
 target_link_libraries(${LIB_NAME}
     asn1library
     shared
-	templating
+    templating
     Conversion::Common
     ${QT_CORE}
     ${QT_XML}

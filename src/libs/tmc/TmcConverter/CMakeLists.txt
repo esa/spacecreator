@@ -25,7 +25,7 @@ target_link_libraries(TmcConverter
                Conversion::SpinTrailRegistrar
                Conversion::SimulatorTrailRegistrar
                Tmc::SdlToPromelaConverter
-			   ivcore
+               ivcore
     PRIVATE    CommonProjectWarnings
                Tmc::InterfaceViewOptimizer)
 

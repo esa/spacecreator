@@ -13,9 +13,9 @@ target_include_directories(tmcivoptimizer
                ${CMAKE_SOURCE_DIR}/src/libs)
 target_link_libraries(tmcivoptimizer
     PRIVATE    Tmc::InterfaceViewOptimizer
-	           ivcore
-	           shared
-	           templating
+               ivcore
+               shared
+               templating
                CommonProjectWarnings)
 
 add_format_target(tmcivoptimizer)
