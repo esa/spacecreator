@@ -158,7 +158,7 @@ bool XmelReader::readSubmodel()
     bool hasFunction = false;
 
     while (xml.readNextStartElement()) {
-        Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("Functions_Kept"));
+        Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("Kept_Functions"));
 
         functionsSelected.clear();
 
