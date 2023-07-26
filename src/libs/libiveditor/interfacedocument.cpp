@@ -1257,8 +1257,12 @@ void InterfaceDocument::createProFile(const QString &path)
 void InterfaceDocument::initTASTEEnv(const QString &path)
 {
     auto initTASTECallerProcess = new QProcess(this);
+    initTASTECallerProcess->setProgram("taste");
+    initTASTECallerProcess->setArguments({ "reset" });
     initTASTECallerProcess->setWorkingDirectory(path);
-    if (initTASTECallerProcess->execute(QLatin1String("taste"), { QLatin1String("reset") }) != 0) {
+    initTASTECallerProcess->start();
+    initTASTECallerProcess->waitForFinished();
+    if (initTASTECallerProcess->exitCode() != 0 || initTASTECallerProcess->exitStatus() != QProcess::NormalExit) {
         QMessageBox::warning(qApp->activeWindow(), tr("Init TASTE environment"),
                 tr("Error during TASTE environment initiation for exported component!"));
     }

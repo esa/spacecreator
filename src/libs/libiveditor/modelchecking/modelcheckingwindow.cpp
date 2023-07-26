@@ -231,7 +231,10 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     QString makeCmd = "make";
     QStringList arguments;
     arguments << "skeletons";
-    if (makeSkeletonsCallerProcess->execute(makeCmd, arguments) != 0) {
+    makeSkeletonsCallerProcess->start(makeCmd, arguments);
+    makeSkeletonsCallerProcess->waitForFinished();
+    if (makeSkeletonsCallerProcess->exitCode() != 0
+            || makeSkeletonsCallerProcess->exitStatus() != QProcess::NormalExit) {
         QMessageBox::warning(this, tr("Make skeletons call"), "Error when making skeletons!");
     }
 
@@ -240,7 +243,10 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     QStringList deployArguments;
     deployArguments << "DeploymentView.aadl";
     makeSkeletonsCallerProcess->setWorkingDirectory(this->projectDir + "/");
-    if (makeDeploymentCallerProcess->execute(makeCmd, deployArguments) != 0) {
+    makeDeploymentCallerProcess->start(makeCmd, deployArguments);
+    makeDeploymentCallerProcess->waitForFinished();
+    if (makeDeploymentCallerProcess->exitCode() != 0
+            || makeDeploymentCallerProcess->exitStatus() != QProcess::NormalExit) {
         QMessageBox::warning(this, tr("Make deployment call"), "Error when making deployment view!");
     }
 
@@ -253,7 +259,9 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
                    << "MOCHECK";
     auto kazooCallerProcess = new QProcess(this);
     kazooCallerProcess->setWorkingDirectory(this->projectDir + "/");
-    if (kazooCallerProcess->execute(kazooCmd, kazooArguments) != 0) {
+    kazooCallerProcess->start(kazooCmd, kazooArguments);
+    kazooCallerProcess->waitForFinished();
+    if (kazooCallerProcess->exitCode() != 0 || kazooCallerProcess->exitStatus() != QProcess::NormalExit) {
         QMessageBox::warning(this, tr("Kazoo call"), "Error when calling kazoo!");
     }
 }
@@ -1329,7 +1337,9 @@ void ModelCheckingWindow::addSubtypes()
         QStringList arguments;
         arguments << "create-subtype"
                   << "NAME=" + subtypingFileName;
-        if (process->execute(makeCmd, arguments) != 0) {
+        process->start(makeCmd, arguments);
+        process->waitForFinished();
+        if (process->exitCode() != 0 || process->exitStatus() != QProcess::NormalExit) {
             QMessageBox::warning(this, tr("Add subtypes"),
                     tr("Error executing 'make create-subtype NAME=%1'").arg(subtypingFileName));
 
