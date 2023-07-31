@@ -637,6 +637,7 @@ void InterfaceDocument::setAsn1FileName(QString newAsnfile, QString oldAsnfile)
         d->asnFilesNames.append(newAsnfile);
         Q_EMIT asn1FileNameChanged(newAsnfile);
     }
+    d->asnFilesNames.removeDuplicates();
 }
 
 /*!
@@ -645,6 +646,7 @@ void InterfaceDocument::setAsn1FileName(QString newAsnfile, QString oldAsnfile)
  */
 QStringList InterfaceDocument::asn1FilesNames() const
 {
+    d->asnFilesNames.removeDuplicates();
     return d->asnFilesNames;
 }
 
@@ -660,6 +662,7 @@ QStringList InterfaceDocument::asn1FilesPaths() const
             paths.append(projectDir.filePath(filename));
         }
     }
+    paths.removeDuplicates();
     return paths;
 }
 
@@ -675,6 +678,7 @@ QStringList InterfaceDocument::asn1FilesPathsExternal() const
             externAsns.append(filename);
         }
     }
+    externAsns.removeDuplicates();
     return externAsns;
 }
 

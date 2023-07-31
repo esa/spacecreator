@@ -99,6 +99,10 @@ spacecreator-feature:
     - source ./VERSION # set $SC_VERSION. The version of the project is stored the shell script VERSION
     # unit tests
     - ./scripts/run_tests.sh $BUILD_DIR
+    # read the version numbers
+    - source ./VERSION # set $SC_VERSION. The version of the project is stored the shell script VERSION
+    # Create an AppImage from the app_dir and place it in the build dir
+    - python3 $CI_PROJECT_DIR/scripts/create_appimage.py --output_dir $BUILD_DIR --project_dir $PROJECT_DIR --app_dir $APP_DIR --env_dir $ENV_DIR --project_version $SC_VERSION
   cache:
     key: spacecreator_cache
     paths:
@@ -107,7 +111,7 @@ spacecreator-feature:
   artifacts:
     reports:
       junit: $BUILD_DIR/tst_*-result.xml
-    expire_in: 2 days
+    expire_in: 1 days
   rules:
     # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
