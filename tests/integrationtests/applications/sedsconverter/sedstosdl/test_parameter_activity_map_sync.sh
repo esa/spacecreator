@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
-OPENGEODE=$HOME/.local/bin/opengeode
+OPENGEODE=opengeode
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"

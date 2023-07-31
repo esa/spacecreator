@@ -5,7 +5,7 @@ set -euo pipefail
 SEDS_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/sedsconverter
 AADL_CONVERTER=$SPACECREATOR_BUILD_DIR/bin/aadlconverter
 UPDATE_DATAVIEW="asn2aadlPlus -f output.asn DataView.aadl -aadlv2"
-OPENGEODE=$HOME/.local/bin/opengeode
+OPENGEODE=opengeode
 
 # diff ignoring white space and blank lines
 DIFF="diff -w -B"
