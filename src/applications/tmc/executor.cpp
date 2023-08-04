@@ -76,6 +76,7 @@ void TmcExecutor::execute()
     bool isRealTypeEnabled = false;
     bool isMulticastEnabled = false;
     bool verify = false;
+    std::optional<int> sdl2promelaTimeout;
 
     const QStringList args = QCoreApplication::arguments();
 
@@ -228,6 +229,26 @@ void TmcExecutor::execute()
             isRealTypeEnabled = true;
         } else if (arg == "-multicast") {
             isMulticastEnabled = true;
+        } else if (arg == "-sdl2promela-timeout") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing value after -sdl2promela-timeout");
+                exit(EXIT_FAILURE);
+            }
+            if (sdl2promelaTimeout.has_value()) {
+                qCritical("Duplicated -sdl2promela-timeout argument");
+                exit(EXIT_FAILURE);
+            }
+            ++i;
+
+            bool valueOk;
+            uint value = args[i].toUInt(&valueOk);
+
+            if (!valueOk) {
+                qCritical("sdl2promela timeout is not an integer");
+                exit(EXIT_FAILURE);
+            }
+
+            sdl2promelaTimeout = value;
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Checker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -307,6 +328,9 @@ void TmcExecutor::execute()
             QCoreApplication::exit(EXIT_FAILURE);
             return;
         }
+    }
+    if (sdl2promelaTimeout.has_value()) {
+        m_verifier->setSdl2PromelaTimeout(sdl2promelaTimeout.value());
     }
 
     if (m_verifier->execute(

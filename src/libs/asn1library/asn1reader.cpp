@@ -515,7 +515,7 @@ bool Asn1Reader::convertToXML(
     asn1Process.setProgram(asn1Compiler);
     asn1Process.setArguments(parameters);
     asn1Process.start();
-    asn1Process.waitForFinished();
+    asn1Process.waitForFinished(60000);
 
     int exitCode = asn1Process.exitCode();
     QByteArray error = asn1Process.readAll();
