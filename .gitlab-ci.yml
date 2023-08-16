@@ -9,7 +9,7 @@ default:
   before_script:
     - source $CI_PROJECT_DIR/scripts/timestamp.sh
     # dependencies
-    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect
+    - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect ansible
     # install modified xmldiff
     - pip3 install git+https://github.com/Shoobx/xmldiff
     # install OpenGEODE dependencies
@@ -42,13 +42,10 @@ spacecreator-master:
     APP_DIR: $ENV_DIR/spacecreator.AppDir
     ENV_QT_BASE_DIR: $ENV_DIR/Qt/$ENV_QT_VERSION/gcc_64
     BUILD_DIR: $CI_PROJECT_DIR/spacecreator_build_qt6
+    DOWNLOAD_DIR: $CI_PROJECT_DIR/downloads
   script:
-    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
-    - python3 $CI_PROJECT_DIR/scripts/prebuild.py --output_dir $ENV_DIR --project_dir $PROJECT_DIR --app_dir $APP_DIR --qt_version $ENV_QT_VERSION --qtcreator_version $ENV_QTC_VERSION
-    # show initial caching statistics
-    - ccache -s
-    # build space creator
-    - python3 $CI_PROJECT_DIR/scripts/build_spacecreator.py --project_dir $PROJECT_DIR --app_dir $APP_DIR --env_dir $ENV_DIR --build_dir $BUILD_DIR --build_type Release --no_build_asn1plugin --patch_version $CI_JOB_ID
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc. and build space creator
+    - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/prebuild.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
     # show caching statistics
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
@@ -63,7 +60,9 @@ spacecreator-master:
     key: spacecreator_cache
     paths:
       - $BUILD_DIR/asn1scc_bin
+      - $DOWNLOAD_DIR
       - ccache
+
   artifacts:
     reports:
       junit: $BUILD_DIR/tst_*-result.xml
@@ -84,14 +83,11 @@ spacecreator-feature:
     APP_DIR: $ENV_DIR/spacecreator.AppDir
     ENV_QT_BASE_DIR: $ENV_DIR/Qt/$ENV_QT_VERSION/gcc_64
     BUILD_DIR: $CI_PROJECT_DIR/spacecreator_build_qt6
+    DOWNLOAD_DIR: $CI_PROJECT_DIR/downloads
   script:
-    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc.
-    - python3 $CI_PROJECT_DIR/scripts/prebuild.py --output_dir $ENV_DIR --project_dir $PROJECT_DIR --app_dir $APP_DIR --qt_version $ENV_QT_VERSION --qtcreator_version $ENV_QTC_VERSION
+    # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc. and build space creator
+    - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/prebuild.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
     # show initial caching statistics
-    - ccache -s
-    # build space creator
-    - python3 $CI_PROJECT_DIR/scripts/build_spacecreator.py --project_dir $PROJECT_DIR --app_dir $APP_DIR --env_dir $ENV_DIR --build_dir $BUILD_DIR --build_type Release --no_build_asn1plugin --patch_version $CI_JOB_ID
-    # show caching statistics
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
     - python3 $CI_PROJECT_DIR/scripts/postbuild.py --project_dir $PROJECT_DIR --app_dir $APP_DIR --build_dir $BUILD_DIR
@@ -107,6 +103,7 @@ spacecreator-feature:
     key: spacecreator_cache
     paths:
       - $BUILD_DIR/asn1scc_bin
+      - $DOWNLOAD_DIR
       - ccache
   artifacts:
     reports:
