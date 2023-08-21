@@ -20,7 +20,11 @@
 #include "spacecreatorprojectimpl.h"
 
 #include <projectexplorer/project.h>
+#if QTC_VERSION >= 1100
+#include <projectexplorer/projectmanager.h>
+#else
 #include <projectexplorer/session.h>
+#endif
 
 namespace spctr {
 
@@ -28,10 +32,17 @@ SpaceCreatorProjectManager::SpaceCreatorProjectManager(QObject *parent)
     : QObject(parent)
     , m_orphanStorage(new scs::SpaceCreatorProject(this))
 {
+#if QTC_VERSION >= 1100
+    connect(ProjectExplorer::ProjectManager::instance(), &ProjectExplorer::ProjectManager::projectAdded, this,
+            &spctr::SpaceCreatorProjectManager::addProject);
+    connect(ProjectExplorer::ProjectManager::instance(), &ProjectExplorer::ProjectManager::aboutToRemoveProject, this,
+            &spctr::SpaceCreatorProjectManager::removeProject);
+#else
     connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::projectAdded, this,
             &spctr::SpaceCreatorProjectManager::addProject);
     connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::aboutToRemoveProject, this,
             &spctr::SpaceCreatorProjectManager::removeProject);
+#endif
 }
 
 SpaceCreatorProjectManager::~SpaceCreatorProjectManager()

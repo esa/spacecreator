@@ -28,16 +28,12 @@ namespace spctr {
 
 class ColorOption : public Core::IOptionsPage
 {
-    Q_OBJECT
-
 public:
     ColorOption(QObject *parent = nullptr);
 
     QWidget *widget() override;
     void apply() override;
     void finish() override;
-
-public Q_SLOTS:
     void restoreDefaults();
 
 private:

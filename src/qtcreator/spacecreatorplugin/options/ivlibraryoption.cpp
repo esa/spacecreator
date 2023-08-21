@@ -25,10 +25,10 @@ namespace spctr {
 IVLibraryOption::IVLibraryOption()
 {
     setId(Constants::SETTINGS_DV_HW_LIBRARY_ID);
-    setDisplayName(tr("Interface View Library"));
+    setDisplayName(QObject::tr("Interface View Library"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
-    setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
+    setDisplayCategory(QObject::tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
 QWidget *IVLibraryOption::widget()

@@ -74,7 +74,11 @@ Core::IDocument::OpenResult DVEditorDocument::open(
     return OpenResult::Success;
 }
 
+#if QTC_VERSION >= 1100
+bool DVEditorDocument::saveImpl(QString *errorString, const Utils::FilePath &name, bool autoSave)
+#else
 bool DVEditorDocument::save(QString *errorString, const Utils::FilePath &name, bool autoSave)
+#endif
 {
     Q_UNUSED(errorString)
     if (m_plugin.isNull()) {

@@ -30,10 +30,10 @@ ColorOption::ColorOption(QObject *parent)
     , m_originalFile(shared::ColorManager::instance()->sourceFile())
 {
     setId(Constants::SETTINGS_IV_COLOR_ID);
-    setDisplayName(tr("Colors"));
+    setDisplayName(QObject::tr("Colors"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
-    setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
+    setDisplayCategory(QObject::tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
 QWidget *ColorOption::widget()
@@ -48,10 +48,10 @@ QWidget *ColorOption::widget()
 
         auto buttonLayout = new QHBoxLayout(m_widget);
         mainLayout->addLayout(buttonLayout);
-        auto restoreButton = new QPushButton(tr("Restore Defaults"), m_widget);
+        auto restoreButton = new QPushButton(QObject::tr("Restore Defaults"), m_widget);
         buttonLayout->addWidget(restoreButton);
         buttonLayout->addStretch(1);
-        connect(restoreButton, &QPushButton::clicked, this, &ColorOption::restoreDefaults);
+        QObject::connect(restoreButton, &QPushButton::clicked, restoreButton, [this]() { restoreDefaults(); });
     }
     return m_widget;
 }

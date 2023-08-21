@@ -29,10 +29,10 @@ namespace spctr {
 PropertyOptions::PropertyOptions()
 {
     setId(Constants::SETTINGS_IV_PROPERTIES_ID);
-    setDisplayName(tr("Properties"));
+    setDisplayName(QObject::tr("Properties"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
-    setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
+    setDisplayCategory(QObject::tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
 QWidget *PropertyOptions::widget()

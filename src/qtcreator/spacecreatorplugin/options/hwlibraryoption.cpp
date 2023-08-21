@@ -25,10 +25,10 @@ namespace spctr {
 HwLibraryOption::HwLibraryOption()
 {
     setId(Constants::SETTINGS_DV_HW_LIBRARY_ID);
-    setDisplayName(tr("Deployment HW Library"));
+    setDisplayName(QObject::tr("Deployment HW Library"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
-    setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
+    setDisplayCategory(QObject::tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
 QWidget *HwLibraryOption::widget()

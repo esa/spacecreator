@@ -85,7 +85,11 @@ Core::IDocument::OpenResult IVEditorDocument::open(
     return OpenResult::Success;
 }
 
+#if QTC_VERSION >= 1100
+bool IVEditorDocument::saveImpl(QString *errorString, const Utils::FilePath &name, bool autoSave)
+#else
 bool IVEditorDocument::save(QString *errorString, const Utils::FilePath &name, bool autoSave)
+#endif
 {
     Q_UNUSED(errorString)
     if (m_plugin.isNull()) {

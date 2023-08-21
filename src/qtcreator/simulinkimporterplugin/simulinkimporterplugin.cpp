@@ -48,8 +48,12 @@
 #include <modelloader.h>
 #include <modeltype.h>
 #include <projectexplorer.h>
+#include <projectexplorer/projectmanager.h>
+#if QTC_VERSION >= 1100
 #include <projectexplorer/projecttree.h>
+#else
 #include <projectexplorer/session.h>
+#endif
 #include <projectnodes.h>
 #include <shared/common.h>
 #include <simulink/SimulinkOptions/options.h>
@@ -144,8 +148,13 @@ auto SimulinkImporterPlugin::createActionContainerInTools(const QString &title) 
     ActionContainer *const tools = ActionManager::actionContainer(Core::Constants::M_TOOLS);
     tools->addMenu(container);
 
+#if QTC_VERSION >= 1100
+    connect(ProjectExplorer::ProjectManager::instance(), &ProjectExplorer::ProjectManager::startupProjectChanged, this,
+            &SimulinkImporterPlugin::onActiveProjectChanged);
+#else
     connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::startupProjectChanged, this,
             &SimulinkImporterPlugin::onActiveProjectChanged);
+#endif
 
     return container;
 }

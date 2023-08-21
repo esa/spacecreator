@@ -26,10 +26,10 @@ namespace spctr {
 DynamicActionOption::DynamicActionOption()
 {
     setId(Constants::SETTINGS_IV_ACTIONS_ID);
-    setDisplayName(tr("Dynamic actions"));
+    setDisplayName(QObject::tr("Dynamic actions"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
-    setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
+    setDisplayCategory(QObject::tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
 QWidget *DynamicActionOption::widget()

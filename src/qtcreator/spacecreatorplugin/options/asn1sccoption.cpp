@@ -28,10 +28,10 @@ Asn1SccOption::Asn1SccOption(QObject *parent)
     : Core::IOptionsPage(parent)
 {
     setId(Constants::SETTINGS_ASN1_ID);
-    setDisplayName(tr("Asn1scc compiler"));
+    setDisplayName(QObject::tr("Asn1scc compiler"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
-    setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
+    setDisplayCategory(QObject::tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
 QWidget *Asn1SccOption::widget()

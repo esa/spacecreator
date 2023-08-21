@@ -36,7 +36,6 @@ public:
     // IDocument
     OpenResult open(
             QString *errorString, const Utils::FilePath &fileName, const Utils::FilePath &realFileName) override;
-    bool save(QString *errorString, const Utils::FilePath &fileName, bool autoSave) override;
 
     void setFilePath(const Utils::FilePath &) override;
     bool shouldAutoSave() const override;
@@ -50,6 +49,15 @@ public:
 Q_SIGNALS:
     void reloadRequested(QString *errorString, const QString &);
     void ivDataLoaded(const QString &fileName, IVEditorCorePtr data);
+
+#if QTC_VERSION >= 1100
+protected:
+    bool saveImpl(
+            QString *errorString, const Utils::FilePath &fileName = Utils::FilePath(), bool autoSave = false) override;
+#else
+public:
+    bool save(QString *errorString, const Utils::FilePath &fileName, bool autoSave) override;
+#endif
 
 private:
     QPointer<SpaceCreatorProjectManager> m_projectManager;

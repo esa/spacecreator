@@ -32,10 +32,10 @@ TmcOptions::TmcOptions(QObject *parent)
     : Core::IOptionsPage(parent)
 {
     setId(Constants::SETTINGS_TMC_ID);
-    setDisplayName(tr("Taste Model Checker settings"));
+    setDisplayName(QObject::tr("Taste Model Checker settings"));
     setCategory(Constants::SETTINGS_CATEGORY);
 
-    setDisplayCategory(tr(Constants::SETTINGS_CATEGORY_DISPLAY));
+    setDisplayCategory(QObject::tr(Constants::SETTINGS_CATEGORY_DISPLAY));
 }
 
 QWidget *TmcOptions::widget()

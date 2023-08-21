@@ -74,7 +74,11 @@ Core::IDocument::OpenResult MscEditorDocument::open(
     return OpenResult::Success;
 }
 
+#if QTC_VERSION >= 1100
+bool MscEditorDocument::saveImpl(QString *errorString, const Utils::FilePath &name, bool autoSave)
+#else
 bool MscEditorDocument::save(QString *errorString, const Utils::FilePath &name, bool autoSave)
+#endif
 {
     if (m_plugin.isNull()) {
         return false;
