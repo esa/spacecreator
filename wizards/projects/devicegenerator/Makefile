@@ -75,6 +75,10 @@ InterfaceView.aadl:	interfaceview.xml
 	if [ $< -nt $@.aadl ]; then 	$(SPACECREATOR) --dvconverter -o $< -t  $(shell taste-config --prefix)/share/dv2aadl/deploymentview.tmplt -x $@.aadl; fi;
 	rsync --checksum $@.aadl DeploymentView.aadl
 
+interfaceview: Default_Deployment.aadl
+	# Build when no deployment view is open - use default
+	rsync --checksum $< DeploymentView.aadl
+
 Default_Deployment.aadl:	interfaceview.xml
 	# Create/update a default deployment view for Linux target, if none other is provided
 	$(SPACECREATOR) --aadlconverter  -o $^ -t $(shell taste-config --prefix)/share/xml2dv/interfaceview-%{CDBoard}.tmplt -x $@ || exit 1
