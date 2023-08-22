@@ -45,7 +45,7 @@ spacecreator-master:
     DOWNLOAD_DIR: $CI_PROJECT_DIR/downloads
   script:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc. and build space creator
-    - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/prebuild.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
+    - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
     # show caching statistics
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
@@ -86,7 +86,7 @@ spacecreator-feature:
     DOWNLOAD_DIR: $CI_PROJECT_DIR/downloads
   script:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc. and build space creator
-    - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/prebuild.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
+    - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
     # show initial caching statistics
     - ccache -s
     # post build: Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.

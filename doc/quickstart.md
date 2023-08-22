@@ -37,12 +37,13 @@ For this we need to install ansible with the following command: <br>
 
 Now we can run the ansible script located in `<project_dir>/scripts/Ansible_scripts/` with the following parameters:
 
-`ansible-playbook prebuild.yml
+`ansible-playbook build.yml
 -e env_dir=/home/taste/envs/projectcreatorenv6
 -e env_qt_version=6.4.1
 -e qtc_version=9.0.1
 -e project_dir=/home/taste/project/spacecreator
 -e patch_version=0
+-e download_dir=/home/taste/Downloads
 `
 
 This will create a folder (~/project/spacecreatorenv6) containing (among other) the files:

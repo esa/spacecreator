@@ -38,11 +38,13 @@
 
         - name: Add backport repository
           become: yes
+          when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "10")
           apt_repository:
             repo: deb http://ftp.debian.org/debian buster-backports main
             state: present
         - name: Update to backported cmake version
           become: yes
+          when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "10")
           apt:
             name: cmake
             state: present
@@ -74,6 +76,7 @@
             env_qt_dir: "{{ env_dir }}/Qt/{{ env_qt_version }}/gcc_64/"
             env_qt_libexec_dir: "{{ env_qt_dir }}/libexec/"
             env_qt_bin_dir: "{{ env_qt_dir }}/bin/"
+            env_qt_lib_dir: "{{ env_qt_dir }}/lib/"
             install_dir: "{{ project_dir }}/install/"
             app_dir: "{{ env_dir }}/spacecreator.AppDir"
 
@@ -146,14 +149,6 @@
               cmd: "{{ p7zip }} -y  x {{ download_dir }}/qtcreator_dev.7z -o{{ app_dir }}"
               creates: "{{ app_dir }}/include"
 
-          - name: Copy additional Qt modules from  "{{ app_lib_dir }}" to "{{ env_qt_dir }}/lib"
-            copy:
-                src: "{{ item }}"
-                dest: "{{ app_lib_dir }}"
-                mode: 0755
-            with_fileglob:
-                - "{{ env_qt_dir }}/lib/libQt*WebSockets*"
-
           - name: Download asn1scc language server
             get_url:
                 url: "https://github.com/ttsiodras/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
@@ -167,25 +162,33 @@
                 dest: "{{ env_dir }}"
                 creates: "{{ env_dir }}/asn1scc_lsp_linux-x64/System.dll"
 
-          - name: Download Grant Lee Template Library
+          - name: Download Grantlee Template Library
             git:
               repo: "https://gitrepos.estec.esa.int/taste/grantlee.git"
               dest: "{{ download_dir }}/grantlee"
               version: "{{ grantlee_tag }}"
 
-          - name: Build Grant Lee Template Library
+          - name: Build Grantlee Template Library
             command:
               cmd: "{{ grantlee_ninja_cmd }}"
               creates: "{{ grantlee_build_dir }}/build.ninja"
 
-          - name: Install Grant Lee Template Library
+          - name: Install Grantlee Template Library
             command:
               cmd: "cmake --build {{ grantlee_build_dir }} --target install"
 
-          - name: Extract libzxb-util to "{{ app_lib_dir }}"
-            unarchive:
-                src: "{{ install_dir }}/libzxb-util.tar.gz"
+          - name: Copy Grantlee libraries to AppImage
+            copy:
+                src: "{{ item }}"
                 dest: "{{ app_lib_dir }}"
+                mode: '0755'
+            with_fileglob:
+                - "{{ env_qt_lib_dir }}/libGrantlee*"
+
+          - name: Copy Grantlee plugins to AppImage
+            copy:
+                src: "{{ env_qt_lib_dir }}/grantlee"
+                dest: "{{ app_dir }}/lib/Qt/plugins"
 
           - name: Download asn1scc
             get_url:
@@ -225,14 +228,6 @@
               cmd: "{{ p7zip }} -y  x {{ download_dir }}/Asn1Acn-PusC-Library-1.1.0.7z -o{{ pusc_target_dir }}"
               creates: "{{ pusc_target_dir }}/ccsds"
 
-          - name: Copy additional Additional AppImage files  "{{ install_dir }}/appimage" to "{{ app_dir }}"
-            copy:
-                src: "{{ item }}"
-                dest: "{{ app_dir }}"
-                mode: 0755
-            with_fileglob:
-                - "{{ install_dir }}/appimage/*"
-
           - name: Check if  "{{ env_qt_libexec_dir }}/qtqhelpgenerator" exists
             stat:
               path: "{{ env_qt_libexec_dir }}/qtqhelpgenerator"
@@ -244,13 +239,3 @@
               dest: "{{ app_dir }}/libexec"
               recursive: yes
             when: src_file.stat.exists
-
-          - name: Config spacecreator in "{{ space_project_build_dir }}"
-            command:
-              cmd: "{{ spacecreator_ninja_config_cmd }}"
-              # creates: "{{ space_project_build_dir }}/build.ninja"
-
-          - name: Build spacecreator in "{{ space_project_build_dir }}"
-            command:
-                cmd: "cmake --build {{ space_project_build_dir }} --target all"
-                creates: "{{ space_project_build_dir }}/bin/IVeditor"
