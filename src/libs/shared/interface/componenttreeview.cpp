@@ -60,6 +60,7 @@ void ComponentTreeView::mouseMoveEvent(QMouseEvent *event)
                 const QPixmap pix = index.data(ComponentModel::CursorPixmapRole).value<QPixmap>();
                 drag->setDragCursor(pix, Qt::DropAction::CopyAction);
                 drag->exec(Qt::DropAction::CopyAction);
+                setState(NoState);
                 return;
             }
         }
