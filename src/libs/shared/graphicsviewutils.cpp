@@ -958,7 +958,9 @@ void findGeometryForRect(
         QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects, const QMarginsF &margins)
 {
     if (!itemRect.isValid()) {
-        itemRect = QRectF(QPointF(0, 0), kDefaultGraphicsItemSize);
+        const QRectF contentRect = boundedRect.marginsRemoved(margins);
+        const QSizeF size = kDefaultGraphicsItemSize.boundedTo(contentRect.size());
+        itemRect = QRectF(contentRect.topLeft(), size);
     }
     QRectF itemGeometry(itemRect.marginsAdded(margins));
 

@@ -225,6 +225,23 @@ void tst_Utils::testFindGeometryForRect()
     shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br != boundingRect);
+
+    // Create a new itemRect
+    itemRect = QRectF();
+    QRectF boundingRectOriginal(100, 50, 300, 200);
+    boundingRect = boundingRectOriginal;
+    shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, {}, QMarginsF(10, 10, 10, 10));
+    QVERIFY(boundingRect.contains(itemRect));
+    QCOMPARE(boundingRect, boundingRectOriginal);
+
+    // Create a new itemRect, restricted to a small boundingRect
+    itemRect = QRectF();
+    boundingRectOriginal = QRectF(100, 50, 150, 50);
+    boundingRect = boundingRectOriginal;
+    shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, {}, QMarginsF(10, 10, 10, 10));
+    QVERIFY(boundingRect.contains(itemRect));
+    QCOMPARE(boundingRect, boundingRectOriginal);
+    QCOMPARE(itemRect, QRectF(110, 60, 130, 30));
 }
 
 QTEST_MAIN(tst_Utils)
