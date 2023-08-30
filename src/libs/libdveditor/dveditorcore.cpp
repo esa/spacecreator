@@ -314,13 +314,15 @@ QString DVEditorCore::filePath() const
 
 bool DVEditorCore::save()
 {
-    return d->m_exporter->exportObjectsSilently(d->m_appModel->objectsModel()->objects().values(), filePath(),
-            d->m_exporter->defaultTemplatePath(), d->m_appModel->uiFileName());
+    return d->m_exporter->exportObjectsSilently(d->m_appModel->objectsModel()->objects().values(),
+            d->m_appModel->creatorGitHash(), filePath(), d->m_exporter->defaultTemplatePath(),
+            d->m_appModel->uiFileName());
 }
 
 bool DVEditorCore::saveAs()
 {
-    return d->m_exporter->exportObjectsInteractively(d->m_appModel->objectsModel()->objects().values(), filePath());
+    return d->m_exporter->exportObjectsInteractively(
+            d->m_appModel->objectsModel()->objects().values(), d->m_appModel->creatorGitHash(), filePath());
 }
 
 DVExporter *DVEditorCore::exporter() const

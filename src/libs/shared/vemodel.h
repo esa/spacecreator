@@ -55,6 +55,9 @@ public:
     QHash<shared::Id, EntityAttributes> extAttributes() const;
     EntityAttributes extEntityAttributes(const shared::Id &id) const;
 
+    void setCreatorGitHash(const QString &hashStr);
+    QString creatorGitHash() const;
+
 public:
     template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,
             typename = std::enable_if_t<std::is_base_of_v<VEObject, typename std::remove_pointer<T>::type>>>

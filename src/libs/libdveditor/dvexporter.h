@@ -43,10 +43,10 @@ public:
     bool exportObjects(const QList<shared::VEObject *> &objects, QIODevice *outBuffer,
             const QString &pathToTemplate = templatePath(QLatin1String("deploymentview.ui")));
 
-    bool exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &outPath = QString(),
+    bool exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &creatorGitHash, const QString &outPath = QString(),
             const QString &pathToTemplate = QString(), QWidget *root = nullptr);
 
-    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
+    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &creatorGitHash, const QString &outPath,
             const QString &pathToTemplate = {}, const QString &uiFile = {});
 
 private:

@@ -22,6 +22,7 @@
 #include "datareconstructor/datareconstructor.h"
 #include "gdbconnector/gdbconnector.h"
 #include "gdbconnector/process.h"
+#include "scversion.h"
 #include "standardpaths.h"
 
 #include <QBuffer>
@@ -229,7 +230,7 @@ auto TestGenerator::exportIvModel(IVModel *ivModel, const QString &outputFilenam
 auto TestGenerator::exportDvModel(DVModel *dvModel, const QString &outputFilename) -> bool
 {
     DVExporter exporter;
-    return exporter.exportObjectsSilently(dvModel->objects().values(), outputFilename);
+    return exporter.exportObjectsSilently(dvModel->objects().values(), spaceCreatorGitHash, outputFilename);
 }
 
 auto TestGenerator::runTests(IVInterface &interface, Asn1Model &asn1Model, const LaunchConfiguration &launchConfig)

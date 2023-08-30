@@ -56,6 +56,6 @@ private:
     QVariant createFrom(const shared::VEObject *object) const override;
     QString groupName(const shared::VEObject *object) const override;
 
-    void checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
+    void checkArchetypeIntegrity(const QList<shared::VEObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel);
 };
 }

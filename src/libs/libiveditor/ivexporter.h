@@ -53,8 +53,7 @@ public:
 
 private:
     QHash<QString, QVariant> collectInterfaceObjects(InterfaceDocument *doc);
-    void checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel);
-
+    void checkArchetypeIntegrity(const QList<shared::VEObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel);
 };
 
 }

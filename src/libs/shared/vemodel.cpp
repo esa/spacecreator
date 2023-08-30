@@ -22,6 +22,7 @@
 namespace shared {
 
 struct VEModelPrivate {
+    QString m_creatorGitHash;
     QList<shared::Id> m_objectsOrder;
     QHash<shared::Id, VEObject *> m_objects;
     QHash<shared::Id, EntityAttributes> m_extAttrs;
@@ -131,6 +132,16 @@ QHash<Id, EntityAttributes> VEModel::extAttributes() const
 EntityAttributes VEModel::extEntityAttributes(const Id &id) const
 {
     return d->m_extAttrs.value(id);
+}
+
+void VEModel::setCreatorGitHash(const QString &hashStr)
+{
+    d->m_creatorGitHash = hashStr;
+}
+
+QString VEModel::creatorGitHash() const
+{
+    return d->m_creatorGitHash;
 }
 
 VEObject *VEModel::getObject(const Id &id) const

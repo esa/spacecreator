@@ -38,6 +38,7 @@ struct DVAppModel::DVAppModelPrivate {
     std::unique_ptr<shared::cmd::CommandsStackBase> commandsStack;
     QString filePath;
     QString uiFileName { shared::kDefaultDeploymentViewUIFileName };
+    QString creatorGitHash;
     std::unique_ptr<dvm::DVModel> objectsModel;
 };
 
@@ -93,7 +94,7 @@ bool DVAppModel::load(const QString &path)
         const QFileInfo fi { path };
         setUIFileName(fi.baseName() + QLatin1String(".ui.xml"));
     }
-
+    setCreatorGitHash(metadata[QLatin1String("creatorHash")].toString());
     d->objectsModel->initFromObjects(reader.parsedObjects());
 
     shared::ErrorHub::clearCurrentFile();
@@ -128,6 +129,17 @@ QString DVAppModel::uiFileName() const
 void DVAppModel::setUIFileName(const QString &fileName)
 {
     d->uiFileName = fileName;
+}
+
+QString DVAppModel::creatorGitHash() const
+{
+    return d->creatorGitHash;
+
+}
+
+void DVAppModel::setCreatorGitHash(const QString &newCreatorGitHash)
+{
+    d->creatorGitHash = newCreatorGitHash;
 }
 
 /*!

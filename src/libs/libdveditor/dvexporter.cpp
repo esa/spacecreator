@@ -20,6 +20,7 @@
 #include "dvobject.h"
 #include "dvpropertytemplateconfig.h"
 #include "errorhub.h"
+#include "scversion.h"
 #include "templating/exportabledvobject.h"
 #include "uiexporter.h"
 
@@ -46,8 +47,8 @@ bool DVExporter::exportObjects(
     return exportData(dvObjects, templatePath, outBuffer);
 }
 
-bool DVExporter::exportObjectsInteractively(
-        const QList<shared::VEObject *> &objects, const QString &outPath, const QString &templatePath, QWidget *root)
+bool DVExporter::exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
+        const QString &outPath, const QString &templatePath, QWidget *root)
 {
     QString usedTemplate(templatePath);
     if (usedTemplate.isEmpty()) {
@@ -69,12 +70,14 @@ bool DVExporter::exportObjectsInteractively(
 
     QHash<QString, QVariant> dvObjects = collectObjects(objects);
     dvObjects.insert(m_uiExporter->collectObjects(objects));
-
+    dvObjects.insert(QLatin1String("creatorHash"),
+            QVariant::fromValue(creatorGitHash.isEmpty() ? spaceCreatorGitHash : creatorGitHash));
+    dvObjects.insert(QLatin1String("modifierHash"), QVariant::fromValue(spaceCreatorGitHash));
     return showExportDialog(dvObjects, usedTemplate, savePath, root);
 }
 
-bool DVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &outPath,
-        const QString &pathToTemplate, const QString &uiFile)
+bool DVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
+        const QString &outPath, const QString &pathToTemplate, const QString &uiFile)
 {
     if (outPath.isEmpty()) {
         return false;
@@ -98,6 +101,10 @@ bool DVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects,
     } else {
         dvObjects.insert(QLatin1String("UiFile"), QVariant::fromValue(uiFile));
     }
+    dvObjects.insert(QLatin1String("creatorHash"),
+            QVariant::fromValue(creatorGitHash.isEmpty() ? spaceCreatorGitHash : creatorGitHash));
+    dvObjects.insert(QLatin1String("modifierHash"), QVariant::fromValue(spaceCreatorGitHash));
+
     bool result = exportData(dvObjects, usedTemplate, &saveFile);
     if (!uiFile.isEmpty()) {
         saveFile.commit();

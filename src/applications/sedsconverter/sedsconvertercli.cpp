@@ -151,7 +151,7 @@ std::set<conversion::ModelType> SedsConverterCLI::getAuxModelTypes()
 void SedsConverterCLI::addAsn1InputOptions(Options &options)
 {
     for (const auto &inputFilepath : getInputFilepaths(ModelType::Asn1)) {
-        options.add(Asn1Options::inputFilepath, std::move(inputFilepath));
+        options.add(Asn1Options::inputFilepath, inputFilepath);
     }
 }
 
@@ -184,7 +184,7 @@ void SedsConverterCLI::addAsn1OutputOptions(Options &options)
 void SedsConverterCLI::addIvInputOptions(Options &options)
 {
     for (const auto &inputFilepath : getInputFilepaths(ModelType::InterfaceView)) {
-        options.add(IvOptions::inputFilepath, std::move(inputFilepath));
+        options.add(IvOptions::inputFilepath, inputFilepath);
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterIvConfig)) {
@@ -217,7 +217,7 @@ void SedsConverterCLI::addIvOutputOptions(Options &options)
 void SedsConverterCLI::addSdlInputOptions(Options &options)
 {
     for (const auto &inputFilepath : getInputFilepaths(ModelType::Sdl)) {
-        options.add(SdlOptions::inputFilepath, std::move(inputFilepath));
+        options.add(SdlOptions::inputFilepath, inputFilepath);
     }
 }
 
@@ -231,7 +231,7 @@ void SedsConverterCLI::addSdlOutputOptions(Options &options)
 void SedsConverterCLI::addSedsInputOptions(Options &options)
 {
     for (const auto &inputFilepath : getInputFilepaths(ModelType::Seds)) {
-        options.add(SedsOptions::inputFilepath, std::move(inputFilepath));
+        options.add(SedsOptions::inputFilepath, inputFilepath);
     }
 
     if (m_arguments.contains(CommandArg::SedsConverterSedsPreprocessedFilepath)) {

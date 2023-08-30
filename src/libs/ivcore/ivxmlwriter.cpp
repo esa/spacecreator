@@ -92,8 +92,6 @@ bool IVXMLWriter::exportObjectsSilently(const QList<shared::VEObject *> &objects
         return true;
     }
     return false;
-
-    return false;
 }
 
 QVariant IVXMLWriter::createFrom(const shared::VEObject *object) const
@@ -130,14 +128,15 @@ QString IVXMLWriter::groupName(const shared::VEObject *object) const
     return QString();
 }
 
-void IVXMLWriter::checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel)
+void IVXMLWriter::checkArchetypeIntegrity(
+        const QList<shared::VEObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel)
 {
     if (archetypesModel == nullptr) {
         return;
     }
 
-    QStringList warningList = ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(ivObjects, archetypesModel);
-    for (QString warning : warningList) {
+    const QStringList warningList = ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(ivObjects, archetypesModel);
+    for (const QString &warning : qAsConst(warningList)) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, warning);
     }
 }

@@ -926,7 +926,7 @@ auto StateMachineTranslator::createParameterActivityGetSyncPi(Context &context, 
         const std::vector<const ::seds::model::Transition *> &sedsTransitions, const Options &options)
         -> std::unique_ptr<::sdl::Procedure>
 {
-    const auto &parameter = ivInterface->params().front();
+    const auto parameter = ivInterface->params().front();
     const auto parameterName = Escaper::escapeSdlVariableName(parameter.name());
     const auto parameterTypeName = Escaper::escapeSdlName(parameter.paramTypeName());
     const auto parameterDirection = QString("in/out");
@@ -1016,7 +1016,7 @@ auto StateMachineTranslator::createParameterActivitySetSyncPi(Context &context, 
         const std::vector<const ::seds::model::Transition *> &sedsTransitions, const Options &options)
         -> std::unique_ptr<::sdl::Procedure>
 {
-    const auto &parameter = ivInterface->params().front();
+    const auto parameter = ivInterface->params().front();
     const auto parameterName = Escaper::escapeSdlVariableName(parameter.name());
     const auto parameterTypeName = Escaper::escapeSdlName(parameter.paramTypeName());
     const auto parameterDirection = QString("in");
@@ -1176,7 +1176,7 @@ auto StateMachineTranslator::createParameterActivitySetAsyncPi(Context &context,
 auto StateMachineTranslator::createParameterActivityGetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
         const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *
 {
-    const auto &parameter = ivInterface->params().front();
+    const auto parameter = ivInterface->params().front();
     const auto parameterName = Escaper::escapeSdlVariableName(parameter.name());
     const auto parameterTypeName = Escaper::escapeSdlName(parameter.paramTypeName());
     const auto parameterDirection = QString("in");
@@ -1248,7 +1248,7 @@ auto StateMachineTranslator::createParameterActivityGetAsyncProcedure(Context &c
 auto StateMachineTranslator::createParameterActivitySetAsyncProcedure(Context &context, ivm::IVInterface *ivInterface,
         const ::seds::model::ParameterActivityMap &map, const Options &options) -> ::sdl::Procedure *
 {
-    const auto &parameter = ivInterface->params().front();
+    const auto parameter = ivInterface->params().front();
     const auto parameterName = Escaper::escapeSdlVariableName(parameter.name());
     const auto parameterTypeName = Escaper::escapeSdlName(parameter.paramTypeName());
     const auto parameterDirection = QString("in");
@@ -2017,7 +2017,7 @@ auto StateMachineTranslator::createIoVariable(ivm::IVInterface const *interface,
         return;
     }
     const auto variableName = ioVariableName(interfaceName);
-    const auto &param = interface->params()[0];
+    const auto param = interface->params()[0];
     sdlProcess->addVariable(
             std::make_unique<::sdl::VariableDeclaration>(variableName, Escaper::escapeSdlName(param.paramTypeName())));
 }

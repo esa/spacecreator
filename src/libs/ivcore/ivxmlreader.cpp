@@ -115,7 +115,7 @@ struct IVXMLReaderPrivate {
 
     QHash<QString, GroupInfo> m_connectionGroups;
     QScopedPointer<shared::UIReader> m_uiReader { nullptr };
-
+    QString m_creatorGitHash;
     CurrentObjectHolder m_currentObject;
     void setCurrentObject(IVObject *obj)
     {

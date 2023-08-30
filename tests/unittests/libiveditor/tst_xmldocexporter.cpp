@@ -31,6 +31,7 @@
 #include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
 #include "parameter.h"
+#include "scversion.h"
 
 #include <QObject>
 #include <QTemporaryDir>
@@ -457,7 +458,7 @@ void tst_XmlDocExporter::testExportUI()
     QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     QByteArray text = testFileContent();
     const QString expectedStr = R"(
-        <InterfaceView version="1.1" UiFile="%6">
+        <InterfaceView version="1.1" UiFile="%6" creatorHash="%7">
             <Function id="%2" name="Function_2">
                 <Provided_Interface id="%4" name="PI_1"/>
             </Function>
@@ -477,11 +478,12 @@ void tst_XmlDocExporter::testExportUI()
                                   .arg(testfunc1->id().toString(), testfunc2->id().toString(),
                                           connection->sourceInterface()->id().toString(),
                                           connection->targetInterface()->id().toString(), connection->id().toString(),
-                                          m_doc->uiFileName())
+                                          m_doc->uiFileName(), spaceCreatorGitHash)
                                   .toUtf8();
 
     QVERIFY(XmlData(text).isEqual(XmlData(expected), false,
-            { "version", "is_type", "kind", "layer", "language", "enable_multicast", "wcet", "default_implementation" },
+            { "modifierHash", "version", "is_type", "kind", "layer", "language", "enable_multicast", "wcet",
+                    "default_implementation" },
             {}));
 
     connection->setEntityAttribute("AttrName", "AttributeData");

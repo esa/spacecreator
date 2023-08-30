@@ -118,6 +118,9 @@ public:
     const QString &mscFileName() const;
     QString mscFilePath() const;
 
+    void setCreatorGitHash(const QString &hashStr);
+    QString creatorGitHash() const;
+
     bool isDirty() const;
 
     QList<QAction *> customActions() const;

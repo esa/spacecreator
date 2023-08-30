@@ -57,6 +57,9 @@ public:
     QString uiFileName() const;
     void setUIFileName(const QString &filePath);
 
+    QString creatorGitHash() const;
+    void setCreatorGitHash(const QString &newCreatorGitHash);
+
     dvm::DVModel *objectsModel() const;
 
     bool isDirty() const;

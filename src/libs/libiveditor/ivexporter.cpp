@@ -18,6 +18,7 @@
 #include "ivexporter.h"
 
 #include "interfacedocument.h"
+#include "scversion.h"
 #include "templating/exportableivobject.h"
 
 #include <QBuffer>
@@ -128,30 +129,35 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
 
     // Add meta-data
     if (!doc->projectName().isEmpty()) {
-        grouppedObjects["ProjectName"] = QVariant::fromValue(doc->projectName());
+        grouppedObjects[QLatin1String("ProjectName")] = QVariant::fromValue(doc->projectName());
     }
     for (const QString &asnFileName : doc->asn1FilesNames()) {
-        grouppedObjects["Asn1FileName"] = QVariant::fromValue(asnFileName);
+        grouppedObjects[QLatin1String("Asn1FileName")] = QVariant::fromValue(asnFileName);
     }
     if (!doc->mscFileName().isEmpty()) {
-        grouppedObjects["MscFileName"] = QVariant::fromValue(doc->mscFileName());
+        grouppedObjects[QLatin1String("MscFileName")] = QVariant::fromValue(doc->mscFileName());
     }
     const QString uiFilePath = doc->uiFileName();
     if (!uiFilePath.isEmpty()) {
-        grouppedObjects["UiFile"] = QVariant::fromValue(uiFilePath);
+        grouppedObjects[QLatin1String("UiFile")] = QVariant::fromValue(uiFilePath);
     }
+    const QString creatorGitHash = doc->creatorGitHash();
+    grouppedObjects[QLatin1String("creatorHash")] =
+            QVariant::fromValue(creatorGitHash.isEmpty() ? spaceCreatorGitHash : creatorGitHash);
+    grouppedObjects[QLatin1String("modifierHash")] = QVariant::fromValue(spaceCreatorGitHash);
 
     return grouppedObjects;
 }
 
-void IVExporter::checkArchetypeIntegrity(QList<shared::VEObject *> ivObjects, ivm::ArchetypeModel *archetypesModel)
+void IVExporter::checkArchetypeIntegrity(
+        const QList<shared::VEObject *> &ivObjects, ivm::ArchetypeModel *archetypesModel)
 {
     if (archetypesModel == nullptr) {
         return;
     }
 
-    QStringList warningList = ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(ivObjects, archetypesModel);
-    for (QString warning : warningList) {
+    const QStringList warningList = ivm::ArchetypeIntegrityHelper::checkArchetypeIntegrity(ivObjects, archetypesModel);
+    for (const QString &warning : qAsConst(warningList)) {
         shared::ErrorHub::addError(shared::ErrorItem::Warning, warning);
     }
 }

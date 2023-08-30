@@ -94,6 +94,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
     cmd::CommandsStack *commandsStack { nullptr };
 
     QString filePath;
+    QString creatorGitHash;
 
     ivm::IVPropertyTemplateConfig *dynPropConfig { nullptr };
     IVItemModel *itemsModel { nullptr };
@@ -716,6 +717,16 @@ QString InterfaceDocument::mscFilePath() const
     return fi.absoluteFilePath();
 }
 
+void InterfaceDocument::setCreatorGitHash(const QString &hashStr)
+{
+    d->creatorGitHash = hashStr;
+}
+
+QString InterfaceDocument::creatorGitHash() const
+{
+    return d->creatorGitHash;
+}
+
 QString InterfaceDocument::uiFileName() const
 {
     return d->uiFileName;
@@ -1158,6 +1169,8 @@ bool InterfaceDocument::loadImpl(const QString &path)
     setMscFileName(metadata["mscfile"].toString());
     if (metadata.contains(parser.uiFileNameTag()))
         setUIFileName(metadata[parser.uiFileNameTag()].toString());
+
+    setCreatorGitHash(metadata["creatorHash"].toString());
     shared::ErrorHub::clearCurrentFile();
 
     return true;

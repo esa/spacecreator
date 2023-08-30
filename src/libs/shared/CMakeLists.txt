@@ -160,8 +160,6 @@ target_sources(${LIB_NAME} PRIVATE
     vemodel.h
     veobject.cpp
     veobject.h
-    vevisualizationmodel.cpp
-    vevisualizationmodel.h
     xmlhighlighter.cpp
     xmlhighlighter.h
     xmlreader.cpp
