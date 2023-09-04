@@ -70,8 +70,7 @@ bool DVExporter::exportObjectsInteractively(const QList<shared::VEObject *> &obj
 
     QHash<QString, QVariant> dvObjects = collectObjects(objects);
     dvObjects.insert(m_uiExporter->collectObjects(objects));
-    dvObjects.insert(QLatin1String("creatorHash"),
-            QVariant::fromValue(creatorGitHash.isEmpty() ? spaceCreatorGitHash : creatorGitHash));
+    dvObjects.insert(QLatin1String("creatorHash"), QVariant::fromValue(creatorGitHash));
     dvObjects.insert(QLatin1String("modifierHash"), QVariant::fromValue(spaceCreatorGitHash));
     return showExportDialog(dvObjects, usedTemplate, savePath, root);
 }

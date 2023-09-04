@@ -142,8 +142,7 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
         grouppedObjects[QLatin1String("UiFile")] = QVariant::fromValue(uiFilePath);
     }
     const QString creatorGitHash = doc->creatorGitHash();
-    grouppedObjects[QLatin1String("creatorHash")] =
-            QVariant::fromValue(creatorGitHash.isEmpty() ? spaceCreatorGitHash : creatorGitHash);
+    grouppedObjects[QLatin1String("creatorHash")] = QVariant::fromValue(creatorGitHash);
     grouppedObjects[QLatin1String("modifierHash")] = QVariant::fromValue(spaceCreatorGitHash);
 
     return grouppedObjects;
