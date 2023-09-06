@@ -18,6 +18,9 @@
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
+#include "ivlibrary.h"
+#include "ivmodel.h"
+#include "ivpropertytemplateconfig.h"
 #include "ivtestutils.h"
 
 #include <QtTest>
@@ -27,10 +30,22 @@ class tst_IVConnection : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void testPostInitEmptyConnection();
     void testCorrectConnectionSourceTarget();
     void testIsProtected();
+    void testMulticastConnectionInit();
+
+private:
+    ivm::IVPropertyTemplateConfig *conf { nullptr };
 };
+
+void tst_IVConnection::initTestCase()
+{
+    ivm::initIVLibrary();
+    conf = ivm::IVPropertyTemplateConfig::instance();
+    conf->init(QLatin1String("default_attrinbutes.xml"));
+}
 
 void tst_IVConnection::testPostInitEmptyConnection()
 {
@@ -119,6 +134,51 @@ void tst_IVConnection::testIsProtected()
     QCOMPARE(c1->isProtected(), true);
     c1->targetInterface()->setKind(ivm::IVInterface::OperationKind::Sporadic);
     QCOMPARE(c1->isProtected(), false);
+}
+
+void tst_IVConnection::testMulticastConnectionInit()
+{
+    ivm::IVModel model(conf);
+
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    QVERIFY(model.addObject(fn1));
+    ivm::IVInterface *pifn1 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "PI1");
+    fn1->addChild(pifn1);
+
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2");
+    QVERIFY(model.addObject(fn2));
+    ivm::IVInterface *pifn2 = ivm::testutils::createIface(fn2, ivm::IVInterface::InterfaceType::Provided, "PI4");
+    fn2->addChild(pifn2);
+
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3");
+    QVERIFY(model.addObject(fn3));
+    ivm::IVInterface *rifn3 = ivm::testutils::createIface(fn3, ivm::IVInterface::InterfaceType::Required, "PI1");
+    fn3->addChild(rifn3);
+
+    ivm::IVConnection *c1 = new ivm::IVConnection(rifn3, pifn1);
+    QVERIFY(model.addObject(c1));
+    ivm::IVConnection *c2 = new ivm::IVConnection(rifn3, pifn2);
+    QVERIFY(model.addObject(c2));
+
+    ivm::IVFunction *fn3Nested = ivm::testutils::createFunction("Fn3Nested", fn3);
+    QVERIFY(model.addObject(fn3Nested));
+    fn3->addChild(fn3Nested);
+    ivm::IVInterface *rifn3Nested =
+            ivm::testutils::createIface(fn3Nested, ivm::IVInterface::InterfaceType::Required, "RI1");
+    fn3Nested->addChild(rifn3Nested);
+
+    ivm::IVConnection *connection = new ivm::IVConnection(nullptr, nullptr);
+    ivm::IVConnection::EndPointInfo startInfo;
+    startInfo.m_functionName = "Fn3Nested";
+    startInfo.m_interfaceName = "RI1";
+    startInfo.m_ifaceDirection = ivm::IVInterface::InterfaceType::Required;
+    ivm::IVConnection::EndPointInfo endInfo;
+    endInfo.m_functionName = "Fn3";
+    endInfo.m_interfaceName = "PI1";
+    endInfo.m_ifaceDirection = ivm::IVInterface::InterfaceType::Required;
+    connection->setDelayedStart(startInfo);
+    connection->setDelayedEnd(endInfo);
+    QVERIFY(model.addObject(connection));
 }
 
 QTEST_APPLESS_MAIN(tst_IVConnection)

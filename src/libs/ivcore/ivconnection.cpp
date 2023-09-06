@@ -315,17 +315,27 @@ IVInterface *IVConnection::findIface(const EndPointInfo &info, IVObject *parentO
     if (!ivIface) {
         ivIface = model()->getIfaceByName(info.m_interfaceName, info.m_ifaceDirection, parentObj);
     }
-    if (!ivIface) {
-        // Try with old encoding
-        const QString encodedName =
-                IVNameValidator::encodeName(IVObject::Type::RequiredInterface, info.m_interfaceName);
-        ivIface = model()->getIfaceByName(encodedName, info.m_ifaceDirection, parentObj);
-        if (!ivIface) {
-            shared::ErrorHub::addError(shared::ErrorItem::Warning,
-                    tr("Connection removed - Unable to find interface %1").arg(info.m_interfaceName), "");
-        }
+    if (ivIface)
+        return ivIface;
+
+    // Try with old encoding
+    const QString encodedName = IVNameValidator::encodeName(IVObject::Type::RequiredInterface, info.m_interfaceName);
+    ivIface = model()->getIfaceByName(encodedName, info.m_ifaceDirection, parentObj);
+    if (ivIface)
+        return ivIface;
+
+    const auto allIfaces = parentObj->allInterfaces();
+    auto it = std::find_if(
+            allIfaces.cbegin(), allIfaces.cend(), [parentObj, ifaceName = info.m_interfaceName](IVInterface *iface) {
+                return iface->originalAttributeValue(meta::Props::token(meta::Props::Token::name)) == ifaceName;
+            });
+
+    if (it == allIfaces.cend()) {
+        shared::ErrorHub::addError(shared::ErrorItem::Warning,
+                tr("Connection removed - Unable to find interface %1").arg(info.m_interfaceName), "");
+        return nullptr;
     }
-    return ivIface;
+    return *it;
 }
 
 bool IVConnection::lookupEndpointsPostponed()
