@@ -109,6 +109,7 @@
               - "{{ app_dir }}"
               - "{{ app_dir }}/libexec"
               - "{{ app_lib_dir }}"
+              - "{{ fuzzer_target_dir }}"
               - "{{ pusc_target_dir }}"
               - "{{ download_dir }}"
 
