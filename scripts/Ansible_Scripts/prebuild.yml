@@ -134,7 +134,7 @@
 
           - name: Extract Qt Creator release version
             command:
-              cmd: "{{ p7zip }} x {{ download_dir }}/qtcreator.7z -o{{ app_dir }}"
+              cmd: "{{ p7zip }} -y x {{ download_dir }}/qtcreator.7z -o{{ app_dir }}"
               creates: "{{ app_dir }}/bin/qtcreator"
 
           - name: Download Qt Creator development version
