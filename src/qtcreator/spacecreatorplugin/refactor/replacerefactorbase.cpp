@@ -33,7 +33,7 @@ bool ReplaceRefactorBase::isIVInterfaceUsed(ivm::IVInterface *interface, const Q
 {
     Q_ASSERT(interface && interface->function());
 
-    QStringList implFiles = implementationFilePaths(interface->function());
+    const QStringList implFiles = implementationFilePaths(interface->function());
     for (const QString &implFile : implFiles) {
         QFileInfo fi(implFile);
         if (fileContent(fi).contains(interfaceCodeName(interface, name))) {
@@ -47,7 +47,7 @@ bool ReplaceRefactorBase::isIVInterfaceUsed(ivm::IVInterface *interface, const Q
 void ReplaceRefactorBase::onIVInterfaceRenamed(
         ivm::IVInterface *interface, const QString &oldName, const QString &newName) const
 {
-    QStringList implFiles = implementationFilePaths(interface->function());
+    const QStringList implFiles = implementationFilePaths(interface->function());
     const QByteArray oldCode = interfaceCodeName(interface, oldName);
     const QByteArray newCode = interfaceCodeName(interface, newName);
 
@@ -65,7 +65,7 @@ QStringList ReplaceRefactorBase::implementationFilePaths(ivm::IVFunctionType *fu
 {
     QStringList implFiles;
 
-    QStringList implementationFiles = implementationFileNames(function);
+    const QStringList implementationFiles = implementationFileNames(function);
     QDirIterator it(m_storage->projectPath() + "/" + ive::kRootImplementationPath, implementationFiles, QDir::Files,
             QDirIterator::Subdirectories);
     while (it.hasNext()) {
@@ -87,8 +87,7 @@ QByteArray ReplaceRefactorBase::fileContent(const QFileInfo &fileinfo) const
     }
 
     QFile file(fileinfo.absoluteFilePath());
-    file.open(QIODevice::ReadOnly);
-    if (file.isOpen()) {
+    if (file.open(QIODevice::ReadOnly)) {
         return file.readAll();
     }
 
@@ -113,8 +112,7 @@ void ReplaceRefactorBase::setFileContent(const QFileInfo &fileinfo, const QByteA
     }
 
     QFile file(fileinfo.absoluteFilePath());
-    file.open(QIODevice::WriteOnly);
-    if (file.isOpen()) {
+    if (file.open(QIODevice::WriteOnly)) {
         file.write(content);
     }
 }

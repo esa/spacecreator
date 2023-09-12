@@ -47,8 +47,7 @@ QByteArray CRefactor::interfaceCodeName(ivm::IVInterface *interface, const QStri
 QStringList CRefactor::implementationFileNames(ivm::IVFunctionType *function) const
 {
     Q_ASSERT(function);
-
-    return { function->title().toLower() + ".c", function->title().toLower() + ".cc",
-        function->title().toLower() + ".h" };
+    const QString fnNameLow(function->title().toLower());
+    return { fnNameLow + ".c", fnNameLow + ".cc", fnNameLow + ".h" };
 }
 }

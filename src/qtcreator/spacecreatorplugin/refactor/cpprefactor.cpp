@@ -40,14 +40,14 @@ QString CppRefactor::filename(const QString &funcName) const
 QByteArray CppRefactor::interfaceCodeName(ivm::IVInterface *interface, const QString &name) const
 {
     Q_ASSERT(interface && interface->function());
-    return (interface->function()->title().toLower() + "::" + interface->title().toLower()).toUtf8();
+    return QString("%1::%2").arg(interface->function()->title(), interface->title()).toLower().toUtf8();
 }
 
 QStringList CppRefactor::implementationFileNames(ivm::IVFunctionType *function) const
 {
     Q_ASSERT(function);
-
-    return { function->title().toLower() + ".cc", function->title().toLower() + ".h" };
+    const QString fnNameLow(function->title().toLower());
+    return { fnNameLow + ".cc", fnNameLow + ".h" };
 }
 
 } // namespace spctr
