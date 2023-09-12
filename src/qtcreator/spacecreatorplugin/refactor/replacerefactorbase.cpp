@@ -107,7 +107,7 @@ void ReplaceRefactorBase::setFileContent(const QFileInfo &fileinfo, const QByteA
 
         if (!modified) {
             QString error;
-            textdoc->save(&error);
+            textdoc->save(&error, textdoc->filePath(), false);
         }
         return;
     }
