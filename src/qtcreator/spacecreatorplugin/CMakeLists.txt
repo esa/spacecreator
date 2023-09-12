@@ -67,6 +67,8 @@ set(SC_PLUGIN_SOURCES
     refactor/creatorrefactorbase.h
     refactor/pythonrefactor.cpp
     refactor/pythonrefactor.h
+    refactor/replacerefactorbase.cpp
+    refactor/replacerefactorbase.h
     spacecreatorplugin.cpp
     spacecreatorplugin.h
     spacecreatorplugin_global.h

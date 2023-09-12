@@ -17,14 +17,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
-#include "creatorrefactorbase.h"
+#include "replacerefactorbase.h"
 
 namespace spctr {
 
 /*!
  * \brief The CppRefactor class handles refactorings  affecting C++ implementations.
  */
-class CppRefactor : public spctr::CreatorRefactorBase
+class CppRefactor : public ReplaceRefactorBase
 {
 public:
     QString language() const override;
@@ -32,6 +32,9 @@ public:
 protected:
     virtual QString languageDir() const override;
     QString filename(const QString &funcName) const override;
+
+    QByteArray interfaceCodeName(ivm::IVInterface *interface, const QString &name) const override;
+    QStringList implementationFileNames(ivm::IVFunctionType *function) const override;
 };
 
 } // namespace spctr

@@ -17,6 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "cpprefactor.h"
 
+#include "ivfunctiontype.h"
+#include "ivinterface.h"
+
 namespace spctr {
 
 QString CppRefactor::language() const
@@ -32,6 +35,19 @@ QString CppRefactor::languageDir() const
 QString CppRefactor::filename(const QString &funcName) const
 {
     return QString("/src/%1.cc").arg(funcName.toLower());
+}
+
+QByteArray CppRefactor::interfaceCodeName(ivm::IVInterface *interface, const QString &name) const
+{
+    Q_ASSERT(interface && interface->function());
+    return (interface->function()->title().toLower() + "::" + interface->title().toLower()).toUtf8();
+}
+
+QStringList CppRefactor::implementationFileNames(ivm::IVFunctionType *function) const
+{
+    Q_ASSERT(function);
+
+    return { function->title().toLower() + ".cc", function->title().toLower() + ".h" };
 }
 
 } // namespace spctr
