@@ -20,6 +20,7 @@
 #include "common.h"
 #include "entityattribute.h"
 #include "ivfunction.h"
+#include "ivfunctiontype.h"
 #include "ivpropertytemplateconfig.h"
 
 #include <QDir>
@@ -30,7 +31,7 @@
 
 namespace ive {
 
-ImplementationsHandler::ImplementationsHandler(const QString &projectPath, ivm::IVFunction *entity)
+ImplementationsHandler::ImplementationsHandler(const QString &projectPath, ivm::IVFunctionType *entity)
     : m_projectPath(projectPath)
     , m_function(entity)
 {
@@ -45,16 +46,18 @@ ImplementationsHandler::ImplementationsHandler(const QString &projectPath, ivm::
  */
 void ImplementationsHandler::checkOldImplementation()
 {
-    if (!m_function) {
+    if (!m_function || m_function->type() != ivm::IVObject::Type::Function) {
         return;
     }
 
-    const QList<EntityAttribute> &impls = m_function->implementations();
-    auto it = std::find_if(impls.cbegin(), impls.cend(),
-            [defaultName = m_function->defaultImplementation()](
-                    const EntityAttribute &impl) { return impl.name() == defaultName; });
+    auto func = static_cast<ivm::IVFunction *>(m_function.data());
+    const QList<EntityAttribute> &impls = func->implementations();
+    auto it = std::find_if(
+            impls.cbegin(), impls.cend(), [defaultName = func->defaultImplementation()](const EntityAttribute &impl) {
+                return impl.name() == defaultName;
+            });
     if (it != impls.cend()) {
-        moveDefaultDirectories(m_function->defaultImplementation(), it->value().toString());
+        moveDefaultDirectories(func->defaultImplementation(), it->value().toString());
     }
 }
 

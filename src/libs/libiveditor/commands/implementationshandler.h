@@ -21,7 +21,7 @@
 #include <QString>
 
 namespace ivm {
-class IVFunction;
+class IVFunctionType;
 }
 
 namespace ive {
@@ -39,7 +39,7 @@ static const QString kRootImplementationPath { "work" };
 class ImplementationsHandler
 {
 public:
-    ImplementationsHandler(const QString &projectPath, ivm::IVFunction *entity);
+    ImplementationsHandler(const QString &projectPath, ivm::IVFunctionType *entity);
 
     void checkOldImplementation();
 
@@ -56,7 +56,7 @@ private:
     bool moveDefaultDirectories(const QString &currentImplName, const QString &language);
 
     QString m_projectPath;
-    QPointer<ivm::IVFunction> m_function;
+    QPointer<ivm::IVFunctionType> m_function;
 };
 
 }
