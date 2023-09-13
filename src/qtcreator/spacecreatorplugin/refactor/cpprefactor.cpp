@@ -37,17 +37,23 @@ QString CppRefactor::filename(const QString &funcName) const
     return QString("/src/%1.cc").arg(funcName.toLower());
 }
 
-QByteArray CppRefactor::interfaceCodeName(ivm::IVInterface *interface, const QString &name) const
+QList<QByteArray> CppRefactor::interfaceCodeNames(ivm::IVInterface *interface, const QString &name) const
 {
     Q_ASSERT(interface && interface->function());
-    return QString("%1::%2").arg(interface->function()->title(), interface->title()).toLower().toUtf8();
+    QList<QByteArray> codes;
+
+    codes << QString("%1::%2").arg(interface->function()->title(), interface->title()).toLower().toUtf8();
+
+    const QString type = interface->isProvided() ? "_PI_" : "_RI_";
+    codes << (interface->function()->title().toLower() + type + name.toLower()).toUtf8();
+
+    return codes;
 }
 
-QStringList CppRefactor::implementationFileNames(ivm::IVFunctionType *function) const
+QStringList CppRefactor::implementationFileNames(const QString &functionName) const
 {
-    Q_ASSERT(function);
-    const QString fnNameLow(function->title().toLower());
-    return { fnNameLow + ".cc", fnNameLow + ".h" };
+    const QString fnNameLow(functionName.toLower());
+    return { fnNameLow + ".cc", fnNameLow + ".h", fnNameLow + "_state.h" };
 }
 
 } // namespace spctr

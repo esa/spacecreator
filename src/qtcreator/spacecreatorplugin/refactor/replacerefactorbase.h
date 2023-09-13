@@ -47,17 +47,17 @@ protected:
      * @param interface The interface
      * @param name the name of the interface. That is used, as the name stored in @p interface might be changed already
      */
-    virtual QByteArray interfaceCodeName(ivm::IVInterface *interface, const QString &name) const = 0;
+    virtual QList<QByteArray> interfaceCodeNames(ivm::IVInterface *interface, const QString &name) const = 0;
 
     /**
      * Returns a list of plain file names (without path) that are used by the generator. Those file might exist or not.
      */
-    virtual QStringList implementationFileNames(ivm::IVFunctionType *function) const = 0;
+    virtual QStringList implementationFileNames(const QString &functionName) const = 0;
 
     /**
-     * Returns the list of existing files of the implementation including their full path
+     * Returns the list of existing code files of the function including their full path
      */
-    virtual QStringList implementationFilePaths(ivm::IVFunctionType *function) const;
+    virtual QStringList codeFilePaths(const QString &functionName) const;
 
     /**
      * Returns the content of the given file.
@@ -71,6 +71,16 @@ protected:
      * If the file is not open, it's written to the disk
      */
     virtual void setFileContent(const QFileInfo &fileinfo, const QByteArray &content) const;
+
+    /**
+     * Returns true if the @p fileInfo contains any of the given @p texts
+     */
+    bool fileContainsText(const QFileInfo &fileInfo, const QList<QByteArray> &texts) const;
+    /**
+     * Replaces all occurances of @p oldText by the \p newTexts in the file @p fileInfo
+     */
+    void updateFileText(
+            const QFileInfo &fileInfo, const QList<QByteArray> &oldTexts, const QList<QByteArray> &newTexts) const;
 };
 
 } // namespace spctr

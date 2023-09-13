@@ -33,10 +33,11 @@ bool ReplaceRefactorBase::isIVInterfaceUsed(ivm::IVInterface *interface, const Q
 {
     Q_ASSERT(interface && interface->function());
 
-    const QStringList implFiles = implementationFilePaths(interface->function());
+    const QStringList implFiles = codeFilePaths(interface->function()->title());
+    const QList<QByteArray> codes = interfaceCodeNames(interface, name);
     for (const QString &implFile : implFiles) {
         QFileInfo fi(implFile);
-        if (fileContent(fi).contains(interfaceCodeName(interface, name))) {
+        if (fileContainsText(fi, codes)) {
             return true;
         }
     }
@@ -47,29 +48,29 @@ bool ReplaceRefactorBase::isIVInterfaceUsed(ivm::IVInterface *interface, const Q
 void ReplaceRefactorBase::onIVInterfaceRenamed(
         ivm::IVInterface *interface, const QString &oldName, const QString &newName) const
 {
-    const QStringList implFiles = implementationFilePaths(interface->function());
-    const QByteArray oldCode = interfaceCodeName(interface, oldName);
-    const QByteArray newCode = interfaceCodeName(interface, newName);
+    Q_ASSERT(interface && interface->function());
+    const QStringList implFiles = codeFilePaths(interface->function()->title());
+    const QList<QByteArray> oldCodes = interfaceCodeNames(interface, oldName);
+    const QList<QByteArray> newCodes = interfaceCodeNames(interface, newName);
 
     for (const QString &implFile : implFiles) {
         QFileInfo fi(implFile);
-        QByteArray fileData = fileContent(fi);
-        if (fileData.contains(oldCode)) {
-            fileData.replace(oldCode, newCode);
-            setFileContent(fi, fileData);
-        }
+        updateFileText(fi, oldCodes, newCodes);
     }
 }
 
-QStringList ReplaceRefactorBase::implementationFilePaths(ivm::IVFunctionType *function) const
+QStringList ReplaceRefactorBase::codeFilePaths(const QString &functionName) const
 {
     QStringList implFiles;
 
-    const QStringList implementationFiles = implementationFileNames(function);
+    const QStringList implementationFiles = implementationFileNames(functionName);
     QDirIterator it(m_storage->projectPath() + "/" + ive::kRootImplementationPath, implementationFiles, QDir::Files,
             QDirIterator::Subdirectories);
     while (it.hasNext()) {
-        implFiles.append(it.next());
+        const QString fileName = it.next();
+        if (fileName.contains("/" + languageDir() + "/")) {
+            implFiles.append(fileName);
+        }
     }
 
     return implFiles;
@@ -114,6 +115,34 @@ void ReplaceRefactorBase::setFileContent(const QFileInfo &fileinfo, const QByteA
     QFile file(fileinfo.absoluteFilePath());
     if (file.open(QIODevice::WriteOnly)) {
         file.write(content);
+    }
+}
+
+bool ReplaceRefactorBase::fileContainsText(const QFileInfo &fileInfo, const QList<QByteArray> &texts) const
+{
+    const QByteArray fileData = fileContent(fileInfo);
+    for (const QByteArray &text : texts) {
+        if (fileData.contains(text)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ReplaceRefactorBase::updateFileText(
+        const QFileInfo &fileInfo, const QList<QByteArray> &oldTexts, const QList<QByteArray> &newTexts) const
+{
+    Q_ASSERT(oldTexts.size() == newTexts.size());
+    QByteArray fileData = fileContent(fileInfo);
+    bool updated = false;
+    for (int i = 0; i < oldTexts.size(); ++i) {
+        if (fileData.contains(oldTexts[i])) {
+            fileData.replace(oldTexts[i], newTexts[i]);
+            updated = true;
+        }
+    }
+    if (updated) {
+        setFileContent(fileInfo, fileData);
     }
 }
 

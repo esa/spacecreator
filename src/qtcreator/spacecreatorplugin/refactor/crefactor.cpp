@@ -24,7 +24,7 @@ namespace spctr {
 
 QString spctr::CRefactor::language() const
 {
-    return tr("C++");
+    return tr("C");
 }
 
 QString spctr::CRefactor::languageDir() const
@@ -37,17 +37,18 @@ QString spctr::CRefactor::filename(const QString &funcName) const
     return QString("/src/%1.c").arg(funcName.toLower());
 }
 
-QByteArray CRefactor::interfaceCodeName(ivm::IVInterface *interface, const QString &name) const
+QList<QByteArray> CRefactor::interfaceCodeNames(ivm::IVInterface *interface, const QString &name) const
 {
     Q_ASSERT(interface && interface->function());
+    QList<QByteArray> codes;
     const QString type = interface->isProvided() ? "_PI_" : "_RI_";
-    return (interface->function()->title().toLower() + type + name.toLower()).toUtf8();
+    codes << (interface->function()->title().toLower() + type + name.toLower()).toUtf8();
+    return codes;
 }
 
-QStringList CRefactor::implementationFileNames(ivm::IVFunctionType *function) const
+QStringList CRefactor::implementationFileNames(const QString &functionName) const
 {
-    Q_ASSERT(function);
-    const QString fnNameLow(function->title().toLower());
-    return { fnNameLow + ".c", fnNameLow + ".cc", fnNameLow + ".h" };
+    const QString fnNameLow(functionName.toLower());
+    return { fnNameLow + ".c", fnNameLow + ".cc", fnNameLow + ".h", fnNameLow + "_state.h" };
 }
 }

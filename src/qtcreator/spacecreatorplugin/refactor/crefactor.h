@@ -30,8 +30,8 @@ protected:
     QString languageDir() const override;
     QString filename(const QString &funcName) const override;
 
-    QByteArray interfaceCodeName(ivm::IVInterface *interface, const QString &name) const override;
-    QStringList implementationFileNames(ivm::IVFunctionType *function) const override;
+    QList<QByteArray> interfaceCodeNames(ivm::IVInterface *interface, const QString &name) const override;
+    QStringList implementationFileNames(const QString &functionName) const override;
 };
 
 } // namespace spctr
