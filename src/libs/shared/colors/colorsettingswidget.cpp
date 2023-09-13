@@ -17,7 +17,7 @@
 
 #include "colorsettingswidget.h"
 
-#include "common.h"
+#include "diskutils.h"
 #include "errorhub.h"
 #include "ui_colorsettingswidget.h"
 

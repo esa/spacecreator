@@ -17,7 +17,7 @@
 
 #include "colormanager.h"
 
-#include "common.h"
+#include "diskutils.h"
 #include "settingsmanager.h"
 #include "standardpaths.h"
 

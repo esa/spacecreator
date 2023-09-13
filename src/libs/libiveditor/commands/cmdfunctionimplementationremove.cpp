@@ -19,6 +19,7 @@
 #include "cmdfunctionimplementationremove.h"
 
 #include "commandids.h"
+#include "diskutils.h"
 #include "implementationshandler.h"
 #include "ivfunction.h"
 

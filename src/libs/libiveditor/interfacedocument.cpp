@@ -22,6 +22,7 @@
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
+#include "diskutils.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivcomponentmodel.h"
 #include "ivexporter.h"

@@ -17,7 +17,7 @@
 
 #include "actionsmanager.h"
 
-#include "common.h"
+#include "diskutils.h"
 #include "errorhub.h"
 #include "extprocmonitor.h"
 #include "interfacedocument.h"

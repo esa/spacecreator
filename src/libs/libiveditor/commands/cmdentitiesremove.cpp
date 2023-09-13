@@ -18,6 +18,7 @@
 #include "cmdentitiesremove.h"
 
 #include "commandids.h"
+#include "diskutils.h"
 #include "ivconnection.h"
 #include "ivconnectiongroup.h"
 #include "ivfunction.h"

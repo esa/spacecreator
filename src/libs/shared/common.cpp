@@ -17,14 +17,12 @@
 
 #include "common.h"
 
+#include "diskutils.h"
 #include "settingsmanager.h"
 #include "standardpaths.h"
 
 #include <QDebug>
 #include <QDir>
-#include <QDirIterator>
-#include <QFile>
-#include <QFileInfo>
 #include <QPalette>
 #include <QRegularExpressionMatch>
 #include <QWidget>
@@ -63,69 +61,6 @@ Id createId()
     return QUuid::createUuid();
 }
 
-/*!
-  \enum shared::FileCopyingMode
-
-  This enum specifies a file overwriting policy:
-    \var Keep
-        Do not overwrite existing file.
-    \var Overwrite
-        Do overwrite existing file.
- */
-
-/*!
- * \brief Copies the \a source file from resources to the \a target file.
-
- * Returns \c true if the \a source file copied successfully and
- * the QFile::WriteUser permission explicitly set for the \a target
- * (otherwise it would be read-only as any file in qrc).
- * If the \a target file already exists, this function will not overwrite
- * and return \c false;
- */
-bool copyFile(const QString &source, const QString &target, FileCopyingMode replaceMode)
-{
-    if (source.isEmpty() || target.isEmpty()) {
-        return false;
-    }
-    if (!QFile::exists(source)) {
-        qWarning() << "Source file " << source << " does not exist";
-    }
-
-    if (QFile::exists(target)) {
-        if (FileCopyingMode::Overwrite == replaceMode) {
-            if (!QFile::remove(target)) {
-                qWarning() << "Unable to remove old file" << target;
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    bool result(false);
-#ifdef Q_OS_WIN
-    qt_ntfs_permission_lookup++;
-#endif
-    try {
-        ensureDirExists(QFileInfo(target).path());
-        if (QFile::copy(source, target)) {
-            QFile storedFile(target);
-            result = storedFile.setPermissions(QFile::WriteUser | QFile::ReadUser);
-            if (!result) {
-                qWarning() << "Unable to set permissions for " << target;
-            }
-        } else {
-            qWarning() << "Can't copy resource file " << source << "-->" << target;
-        }
-    } catch (...) {
-        qWarning() << "Failed to copy resource file " << source << "-->" << target;
-    }
-#ifdef Q_OS_WIN
-    qt_ntfs_permission_lookup--;
-#endif
-    return result;
-}
-
 void setWidgetFontColor(QWidget *widget, const QColor &color)
 {
     if (!widget || !color.isValid())
@@ -134,70 +69,6 @@ void setWidgetFontColor(QWidget *widget, const QColor &color)
     QPalette p(widget->palette());
     p.setColor(QPalette::Text, color);
     widget->setPalette(p);
-}
-
-bool ensureDirExists(const QString &path)
-{
-    QDir dir(path);
-    if (!dir.exists(path)) {
-        if (!dir.mkpath(path)) {
-            qWarning() << "Failed to create path:" << path;
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool ensureFileExists(const QString &filePath, const QString &defaultFilePath)
-{
-    if (!QFileInfo::exists(filePath) && !copyFile(defaultFilePath, filePath)) {
-        qWarning() << "Can't create default file path:" << filePath << "from:" << defaultFilePath;
-        return false;
-    }
-    return true;
-}
-
-bool copyDir(const QString &source, const QString &dest, FileCopyingMode replaceMode)
-{
-    static const QDir::Filters filters = QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files;
-    QDir sourceExportDir { source };
-    if (sourceExportDir.isEmpty(filters)) {
-        return true;
-    }
-    sourceExportDir.setFilter(filters);
-    const QDir targetExportDir { dest };
-    targetExportDir.mkpath(QLatin1String("."));
-    QDirIterator it { sourceExportDir, QDirIterator::Subdirectories };
-    bool success = true;
-    while (it.hasNext()) {
-        const QString filePath = it.next();
-        const QFileInfo fileInfo = it.fileInfo();
-        const QString relPath = sourceExportDir.relativeFilePath(fileInfo.absoluteFilePath());
-        if (fileInfo.isSymLink()) {
-            const QString linkTarget = fileInfo.dir().relativeFilePath(fileInfo.symLinkTarget());
-            const bool result = QFile::link(linkTarget, targetExportDir.absoluteFilePath(relPath));
-            if (!result) {
-                qWarning() << "Error during symlink copying:" << filePath << fileInfo.symLinkTarget()
-                           << targetExportDir.absoluteFilePath(relPath);
-            }
-            success = success && result;
-        } else if (fileInfo.isDir()) {
-            if (!QDir(targetExportDir.filePath(relPath)).exists()) {
-                const bool result = targetExportDir.mkpath(relPath);
-                success = success && result;
-            }
-        } else {
-            const bool result =
-                    copyFile(fileInfo.absoluteFilePath(), targetExportDir.absoluteFilePath(relPath), replaceMode);
-            if (!result) {
-                qWarning() << "Error during source file copying:" << filePath
-                           << targetExportDir.absoluteFilePath(relPath);
-            }
-            success = success && result;
-        }
-    }
-    return success;
 }
 
 QString archetypesFileStartingString()

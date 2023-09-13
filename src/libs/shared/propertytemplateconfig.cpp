@@ -17,7 +17,7 @@
 
 #include "propertytemplateconfig.h"
 
-#include "common.h"
+#include "diskutils.h"
 #include "errorhub.h"
 #include "propertytemplate.h"
 #include "veobject.h"

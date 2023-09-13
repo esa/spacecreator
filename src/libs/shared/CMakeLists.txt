@@ -53,6 +53,8 @@ target_sources(${LIB_NAME} PRIVATE
     componentmodel.h
     delayedsignal.cpp
     delayedsignal.h
+    diskutils.cpp
+    diskutils.h
     editorcore.cpp
     editorcore.h
     entityattribute.cpp

@@ -86,28 +86,7 @@ enum MessageEnd
     BOTH = 3, /// Used to handle both ends
 };
 
-/*!
-   \brief The FileCopyingMode enum
- */
-enum FileCopyingMode
-{
-    Keep,
-    Overwrite
-};
-
-bool moveDir(const QString &source, const QString &dest, FileCopyingMode replaceMode = FileCopyingMode::Keep);
-
-bool copyDir(const QString &source, const QString &dest, FileCopyingMode replaceMode = FileCopyingMode::Keep);
-
-bool copyFile(const QString &source, const QString &target, FileCopyingMode replaceMode = FileCopyingMode::Keep);
-
 void setWidgetFontColor(QWidget *widget, const QColor &color);
-
-bool ensureDirExists(const QString &path);
-
-bool ensureFileExists(const QString &filePath, const QString &defaultFilePath);
-
-bool isSame(const QString &filePath1, const QString &filePath2);
 
 template<typename T>
 bool isAncestorOf(const T *const parent, T *object)

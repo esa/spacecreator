@@ -18,10 +18,10 @@
 #include "componentimporthelper.h"
 
 #include "abstractproject.h"
-#include "asn1modelstorage.h"
 #include "asn1reader.h"
 #include "asn1systemchecks.h"
 #include "componentmodel.h"
+#include "diskutils.h"
 #include "errorhub.h"
 #include "implementationshandler.h"
 #include "ivobject.h"

@@ -19,6 +19,7 @@
 #include "cmdfunctionimplementationdefaultchange.h"
 
 #include "commandids.h"
+#include "diskutils.h"
 #include "entityattribute.h"
 #include "implementationshandler.h"
 #include "ivcommonprops.h"

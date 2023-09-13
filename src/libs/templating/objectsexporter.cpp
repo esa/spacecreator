@@ -17,7 +17,7 @@
 
 #include "objectsexporter.h"
 
-#include "common.h"
+#include "diskutils.h"
 #include "standardpaths.h"
 #include "stringtemplate.h"
 #include "templateeditor.h"

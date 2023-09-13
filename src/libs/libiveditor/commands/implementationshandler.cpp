@@ -17,7 +17,7 @@
 
 #include "implementationshandler.h"
 
-#include "common.h"
+#include "diskutils.h"
 #include "entityattribute.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
