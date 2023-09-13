@@ -37,6 +37,7 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 /build/
 /spacecreator.AppDir/
 *.log
+/spacecreator_build_qt6/
 
 # precompiles python files
 *.pyc
