@@ -103,7 +103,7 @@ if (COVERAGE_ENABLED)
     include(CodeCoverage)
 endif()
 
-option(BUILD_PLUGIN_ASN1 "Build the ASN.1 Plugin" ON)
+option(BUILD_PLUGIN_ASN1 "Build the ASN.1 Plugin" OFF)
 
 # The actual code
 add_subdirectory(src)
