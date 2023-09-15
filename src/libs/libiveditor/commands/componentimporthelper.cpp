@@ -20,10 +20,10 @@
 #include "abstractproject.h"
 #include "asn1reader.h"
 #include "asn1systemchecks.h"
+#include "common.h"
 #include "componentmodel.h"
 #include "diskutils.h"
 #include "errorhub.h"
-#include "implementationshandler.h"
 #include "ivobject.h"
 
 #include <QApplication>
@@ -315,7 +315,7 @@ void ComponentImportHelper::undoAsnFilesImport()
 
 QString ComponentImportHelper::relativePathForObject(const ivm::IVObject *object) const
 {
-    return ive::kRootImplementationPath + QDir::separator() + object->title().toLower();
+    return shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
 }
 
 QStringList ComponentImportHelper::asn1ModuleDuplication(

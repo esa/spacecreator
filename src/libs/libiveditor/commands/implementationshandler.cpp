@@ -109,7 +109,7 @@ QString ImplementationsHandler::functionBasePath(const QString &functionName) co
 {
     QString name = functionName.isEmpty() ? m_function->title().toLower() : functionName.toLower();
     name = name.toLower();
-    QStringList pathTemplate { m_projectPath, ive::kRootImplementationPath, name };
+    QStringList pathTemplate { m_projectPath, shared::kRootImplementationPath, name };
     return pathTemplate.join(QDir::separator());
 }
 
@@ -121,7 +121,7 @@ QString ImplementationsHandler::functionBasePath(const QString &functionName) co
  */
 QString ImplementationsHandler::functionImplementaionsBasePath(const QString &functionName) const
 {
-    return functionBasePath(functionName) + QDir::separator() + ive::kNonCurrentImplementationPath;
+    return functionBasePath(functionName) + QDir::separator() + shared::kNonCurrentImplementationPath;
 }
 
 /**
@@ -159,7 +159,7 @@ bool ImplementationsHandler::moveDefaultDirectories(const QString &currentImplNa
         QDir dir { defaultImplPath };
         const QStringList subfolders = dir.entryList(QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
         for (const QString &dirName : subfolders) {
-            if (dirName != ive::kNonCurrentImplementationPath) {
+            if (dirName != shared::kNonCurrentImplementationPath) {
                 const QString subfolderPath = dir.filePath(dirName);
                 const QString destPath = commonImplPath + QDir::separator() + dirName;
                 const bool res = shared::copyDir(subfolderPath, destPath, shared::FileCopyingMode::Overwrite);

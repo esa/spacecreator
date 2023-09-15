@@ -107,6 +107,8 @@ target_sources(${LIB_NAME} PRIVATE
     propertytemplatemanager.ui
     propertytemplatewidget.cpp
     propertytemplatewidget.h
+    qmakefile.cpp
+    qmakefile.h
     remotecontrol/remotecontrolwebserver.cpp
     remotecontrol/remotecontrolwebserver.h
     reports/bugreportdialog.cpp

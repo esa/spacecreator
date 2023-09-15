@@ -19,6 +19,7 @@
 
 #include "ivconnectiongroup.h"
 #include "ivfunctiontype.h"
+#include "qmakefile.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -206,8 +207,8 @@ QStandardItem *IVComponentModel::loadComponent(const QString &path)
     static const QStringList asn1extensions { QLatin1String("asn1"), QLatin1String("asn"), QLatin1String("acn") };
     const QFileInfo fi(path);
     const QDir dir = fi.absoluteDir();
-    component->asn1Files =
-            shared::readFilesList(dir.absoluteFilePath(dir.dirName() + QLatin1String(".pro")), asn1extensions);
+    component->asn1Files = shared::QMakeFile::readFilesList(
+            dir.absoluteFilePath(dir.dirName() + QLatin1String(".pro")), asn1extensions);
 
     for (auto id : qAsConst(ids))
         addComponent(component);

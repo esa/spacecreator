@@ -60,6 +60,9 @@ static const QString kFontPointSize = QLatin1String("Style::Font::pointSize");
 static const QString kFontWeight = QLatin1String("Style::Font::weight");
 }
 
+static const QString kNonCurrentImplementationPath { "implem" };
+static const QString kRootImplementationPath { "work" };
+
 class DropData : public QMimeData
 {
     Q_OBJECT
@@ -187,12 +190,6 @@ QString uniteNames(const QVector<Type> &collection, const QString &prefix)
     const QString line = joinNonEmpty(result, QStringLiteral(", "));
     return line.isEmpty() ? QString() : QString("<b>%1</b>%2").arg(prefix, line);
 }
-
-/*!
-   Read from pro-file located at given \p path and returns list of files with
-   given \p extinsions relative to \p path unless it has absolute filesystem path.
- */
-QStringList readFilesList(const QString &path, const QStringList &fileExtentions);
 
 }
 

@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "replacerefactorbase.h"
 
-#include "commands/implementationshandler.h"
+#include "common.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "spacecreatorproject.h"
@@ -64,7 +64,7 @@ QStringList ReplaceRefactorBase::codeFilePaths(const QString &functionName) cons
     QStringList implFiles;
 
     const QStringList implementationFiles = implementationFileNames(functionName);
-    QDirIterator it(m_storage->projectPath() + "/" + ive::kRootImplementationPath, implementationFiles, QDir::Files,
+    QDirIterator it(m_storage->projectPath() + "/" + shared::kRootImplementationPath, implementationFiles, QDir::Files,
             QDirIterator::Subdirectories);
     while (it.hasNext()) {
         const QString fileName = it.next();

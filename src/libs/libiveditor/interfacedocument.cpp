@@ -18,8 +18,8 @@
 #include "interfacedocument.h"
 
 #include "commands/cmdconnectionlayermanage.h"
-#include "commands/implementationshandler.h"
 #include "commandsstack.h"
+#include "common.h"
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "diskutils.h"
@@ -27,6 +27,7 @@
 #include "ivcomponentmodel.h"
 #include "ivexporter.h"
 #include "ivvisualizationmodelbase.h"
+#include "qmakefile.h"
 
 #include <QAction>
 #include <QApplication>
@@ -1076,7 +1077,7 @@ static inline void copyImplementation(
 {
     for (ivm::IVObject *object : objects) {
         if (auto fn = object->as<ivm::IVFunctionType *>()) {
-            const QString subPath = ive::kRootImplementationPath + QDir::separator() + object->title().toLower();
+            const QString subPath = shared::kRootImplementationPath + QDir::separator() + object->title().toLower();
             shared::copyDir(projectDir.filePath(subPath), targetDir.filePath(subPath));
             copyImplementation(projectDir, targetDir, fn->children());
         }
@@ -1229,47 +1230,7 @@ void InterfaceDocument::showNIYGUI(const QString &title)
 
 void InterfaceDocument::createProFile(const QString &path)
 {
-    const QDir targetDir(path);
-    if (!targetDir.exists()) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error, tr("Directory %1 doesn't exist").arg(path));
-        return;
-    }
-
-    const QString proFileName = targetDir.dirName() + QLatin1String(".pro");
-    QFile file(targetDir.filePath(proFileName));
-    if (!file.open(QIODevice::WriteOnly)) {
-        shared::ErrorHub::addError(
-                shared::ErrorItem::Error, tr("Unable to create pro file for directory %1").arg(path));
-        return;
-    }
-
-    QTextStream stream(&file);
-    stream << "TEMPLATE = lib" << Qt::endl;
-    stream << "CONFIG -= qt" << Qt::endl;
-    stream << "CONFIG += generateC" << Qt::endl << Qt::endl;
-
-    QDirIterator it(path, QDir::Files);
-    while (it.hasNext()) {
-        const QString &filePath = it.next();
-        if (it.fileName() == proFileName)
-            continue;
-
-        stream << "DISTFILES += $$PWD/" << it.fileName() << Qt::endl;
-    }
-
-    if (!asn1FilesPathsExternal().isEmpty()) {
-        stream << Qt::endl;
-        stream << "# External ASN.1 files" << Qt::endl;
-        for (const QString &asnFile : asn1FilesPathsExternal()) {
-            stream << "DISTFILES += " << asnFile << Qt::endl;
-        }
-        stream << Qt::endl;
-    }
-
-    if (targetDir.exists(ive::kRootImplementationPath)) {
-        stream << Qt::endl
-               << QStringLiteral("include($$PWD/%1/taste.pro)").arg(ive::kRootImplementationPath) << Qt::endl;
-    }
+    shared::QMakeFile::createProFileForDirectory(path, asn1FilesPathsExternal());
 }
 
 void InterfaceDocument::initTASTEEnv(const QString &path)
