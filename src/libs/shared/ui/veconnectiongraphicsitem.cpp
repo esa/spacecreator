@@ -206,8 +206,12 @@ void VEConnectionGraphicsItem::updateFromEntity()
     if (!entity())
         return;
 
+    m_readingEntity = true;
+
     setPoints(graphicsviewutils::polygon(entity()->coordinates()));
     updateVisibility();
+
+    m_readingEntity = false;
 }
 
 void VEConnectionGraphicsItem::init()
@@ -314,6 +318,10 @@ bool VEConnectionGraphicsItem::doLayout()
     }
 
     const QVector<QPointF> oldPoints = m_points;
+    const bool keepOld = m_readingEntity && !oldPoints.isEmpty();
+    if (keepOld)
+        return false;
+
     m_points = generateConnectionPath(this);
     updateBoundingRect();
     return !shared::graphicsviewutils::comparePolygones(oldPoints, m_points);

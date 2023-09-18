@@ -111,6 +111,8 @@ private:
 
     GripPoint *gripPointByPos(const QList<GripPoint *> &grips, const QPointF &pos) const;
 
+    bool m_readingEntity { true };
+
 protected:
     class GraphicsPathItem : public QGraphicsPathItem
     {
