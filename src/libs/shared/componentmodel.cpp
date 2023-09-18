@@ -18,6 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "componentmodel.h"
 
 #include "common.h"
+#include "diskutils.h"
 #include "vemodel.h"
 #include "veobject.h"
 
@@ -144,14 +145,15 @@ VEObject *ComponentModel::getObject(const shared::Id &id)
 void ComponentModel::load(const QString &path)
 {
     clear();
+    if (path.isEmpty())
+        return;
+
     d->libraryPath = path;
+    shared::ensureDirExists(d->libraryPath);
 
     auto headerItem = new QStandardItem(d->modelName);
     headerItem->setTextAlignment(Qt::AlignCenter);
     setHorizontalHeaderItem(0, headerItem);
-
-    if (path.isEmpty() || !QDir(path).exists())
-        return;
 
     QDirIterator importableIt(path, QDir::Dirs | QDir::NoDotAndDotDot);
     while (importableIt.hasNext()) {
