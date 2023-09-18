@@ -69,6 +69,15 @@ void PropertiesDialog::insertTab(QWidget *widget, const QString &tabName, int id
     d->ui->tabWidget->insertTab(idx, widget, tabName);
 }
 
+void PropertiesDialog::removeTab(QWidget *containedWidget)
+{
+    auto index = d->ui->tabWidget->indexOf(containedWidget);
+    if (index > -1)
+    {
+        d->ui->tabWidget->removeTab(index);
+    }
+}
+
 void PropertiesDialog::setCurrentTabIndex(int idx)
 {
     d->ui->tabWidget->setCurrentIndex(idx);

@@ -25,6 +25,9 @@
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
+#include "exportableattribute.h"
+#include "gitlabcredentialsdialog.h"
+#include "gitlabrequests.h"
 #include "ifaceparametersmodel.h"
 #include "implementationswidget.h"
 #include "interface/attributedelegate.h"
@@ -43,11 +46,13 @@
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "ui/veinteractiveobject.h"
+#include "qgitlabapi/qgitlabclient.h"
 
 #include <QDebug>
 #include <QHeaderView>
 #include <QListView>
 #include <QPlainTextEdit>
+#include <QSettings>
 #include <QTableView>
 #include <QTimer>
 #include <QUndoCommand>
@@ -55,9 +60,9 @@
 namespace ive {
 
 IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
-        shared::ui::VEInteractiveObject *uiObj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
-        ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
-        QWidget *parent)
+                                       shared::ui::VEInteractiveObject *uiObj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
+                                       ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
+                                       QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, uiObj, commandsStack, parent)
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
@@ -134,6 +139,8 @@ void IVPropertiesDialog::init()
         break;
     }
     initStyleView();
+    initRequestsView();
+
     setCurrentTabIndex(0);
 }
 
@@ -193,7 +200,7 @@ void IVPropertiesDialog::initAttributesView()
                                                            : InterfacePropertiesListModel::Column::Value;
 
         const QModelIndexList indexes = modelAttrs->match(modelAttrs->index(0, nameColumn),
-                FunctionPropertiesListModel::DataRole, ivm::meta::Props::token(ivm::meta::Props::Token::name));
+                                                          FunctionPropertiesListModel::DataRole, ivm::meta::Props::token(ivm::meta::Props::Token::name));
         if (!indexes.isEmpty()) {
             viewAttrs->tableView()->edit(indexes.front().siblingAtColumn(valueColumn));
         }
@@ -208,11 +215,11 @@ void IVPropertiesDialog::initContextParams()
 
     shared::PropertiesViewBase *viewAttrs = new ContextParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Name, new shared::ParameterNameDelegate(viewAttrs->tableView()));
+                IfaceParametersModel::Column::Name, new shared::ParameterNameDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
+                ContextParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_asn1Checks, viewAttrs->tableView()));
+                ContextParametersModel::Column::Value, new Asn1ValueDelegate(m_asn1Checks, viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelCtxParams);
 
@@ -230,13 +237,13 @@ void IVPropertiesDialog::initIfaceParams()
 
     shared::PropertiesViewBase *viewAttrs = new IfaceParametersView(this);
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Name, new shared::ParameterNameDelegate(viewAttrs->tableView()));
+                IfaceParametersModel::Column::Name, new shared::ParameterNameDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
+                IfaceParametersModel::Column::Type, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Encoding, new shared::AttributeDelegate(viewAttrs->tableView()));
+                IfaceParametersModel::Column::Encoding, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->setItemDelegateForColumn(
-            IfaceParametersModel::Column::Direction, new shared::AttributeDelegate(viewAttrs->tableView()));
+                IfaceParametersModel::Column::Direction, new shared::AttributeDelegate(viewAttrs->tableView()));
     viewAttrs->tableView()->horizontalHeader()->show();
     viewAttrs->setModel(modelIfaceParams);
 
@@ -264,9 +271,9 @@ void IVPropertiesDialog::initCommentView()
 
             const QList<EntityAttribute> textArg { EntityAttribute {
                     ivm::meta::Props::token(ivm::meta::Props::Token::name), encodedText,
-                    EntityAttribute::Type::Attribute } };
+                            EntityAttribute::Type::Attribute } };
             auto commentTextCmd = new shared::cmd::CmdEntityAttributesChange(
-                    ivm::IVPropertyTemplateConfig::instance(), comment, textArg);
+                        ivm::IVPropertyTemplateConfig::instance(), comment, textArg);
             commentTextCmd->setText(tr("Edit Comment"));
             commandStack()->push(commentTextCmd);
         });
@@ -303,6 +310,66 @@ void IVPropertiesDialog::initArchetypeView()
     connect(propertiesDialogUi()->buttonBox, &QDialogButtonBox::accepted, archetypesWidget,
             &ive::ArchetypesWidget::applyArchetypes);
     insertTab(archetypesWidget, tr("Archetypes"), getTabCount());
+}
+
+void IVPropertiesDialog::initRequestsView()
+{
+    QSettings settings;
+    auto ids = getReqIDs();
+    auto gitlabUrl = settings.value("Gitlab/url").toString();
+    auto gitlabToken = settings.value("Gitlab/token").toString();
+
+    if (gitlabUrl.isEmpty() || gitlabToken.isEmpty())
+    {
+        GitlabCredentialsDialog * dialog = new GitlabCredentialsDialog;
+        dialog->setUrl(gitlabUrl);
+        insertTab(dialog, tr("Requests"), getTabCount());
+        connect(dialog, &GitlabCredentialsDialog::buttonClicked, [dialog, ids, this](){
+            auto url = dialog->getUrl();
+            auto token = dialog->getToken();
+            if (url.isEmpty() || token.isEmpty())
+                return;
+            QSettings settings;
+            settings.setValue("Gitlab/url", url);
+            settings.setValue("Gitlab/token", token);
+
+            queryRequests(url,token,ids,dialog);
+        });
+    }
+    queryRequests(gitlabUrl, gitlabToken, ids);
+
+}
+void IVPropertiesDialog::queryRequests(const QString & url, const QString &token,const QString & ids, GitlabCredentialsDialog* dialog)
+{
+    QGitlabClient * gitClient = new QGitlabClient(url, token);
+    static const QString anyAssignee("");
+    static const QString anyAuthor("");
+
+    gitClient->requestIssues(anyAssignee, anyAuthor, ids);
+    connect(gitClient, &QGitlabClient::listOfIssues, [gitClient, dialog, this](QList<Issue> issues){
+        if (dialog)
+        {
+            removeTab(dialog);
+        }
+        GitlabRequests *reqWidget = new GitlabRequests;
+        for (const auto& issue: issues)
+        {
+            reqWidget->addRequest(issue.mIssueID, issue.mDescription);
+        }
+        insertTab(reqWidget, tr("Requests"), getTabCount());
+    });
+}
+QString IVPropertiesDialog::getReqIDs() const
+{
+    for (const auto &attr: dataObject()->attributes())
+    {
+        auto expAttr = attr.value<shared::ExportableAttribute>();
+        if (expAttr.name() == "ReqIDs")
+        {
+            return expAttr.value().toString();
+        }
+    }
+    return QString();
 }
 
 } // namespace ive

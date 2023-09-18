@@ -47,6 +47,7 @@ public Q_SLOTS:
 
 protected:
     void insertTab(QWidget *widget, const QString &tabName, int idx = 0);
+    void removeTab(QWidget *containedWidget);// Remove tab of containedWidget
     void setCurrentTabIndex(int idx);
     void initStyleView();
 

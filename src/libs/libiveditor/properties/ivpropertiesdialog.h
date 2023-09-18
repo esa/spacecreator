@@ -22,6 +22,8 @@
 
 #include <QPointer>
 
+class GitlabCredentialsDialog;
+
 namespace Asn1Acn {
 class Asn1SystemChecks;
 }
@@ -61,7 +63,9 @@ private:
     void initCommentView();
     void initLanguageView();
     void initArchetypeView();
-
+    void initRequestsView();
+    void queryRequests(const QString &url, const QString &token, const QString &ids, GitlabCredentialsDialog *dialog = nullptr);
+    QString getReqIDs() const;
     QPointer<ivm::AbstractSystemChecks> m_ivChecks;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
     const QString m_projectPath;

@@ -44,3 +44,6 @@ add_subdirectory(spacecreatorsystem)
 
 # Reporting
 add_subdirectory(reporting)
+
+# Gitlab api library
+add_subdirectory(qgitlabapi)

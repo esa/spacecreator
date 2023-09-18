@@ -202,6 +202,12 @@ target_sources(${LIB_NAME} PRIVATE
     properties/archetypeswidget.cpp
     properties/archetypeswidget.h
     properties/archetypeswidget.ui
+    properties/gitlabrequests.h
+    properties/gitlabrequests.cpp
+    properties/gitlabrequests.ui
+    properties/gitlabcredentialsdialog.h
+    properties/gitlabcredentialsdialog.cpp
+    properties/gitlabcredentialsdialog.ui
     properties/ifaceparametersmodel.cpp
     properties/ifaceparametersmodel.h
     properties/implementationsmodel.cpp
@@ -232,6 +238,7 @@ target_link_libraries(${LIB_NAME}
     shared
     templating
     msccore
+    QGitlabAPI
     ${QT_CONCURRENT}
     ${QT_NETWORK}
     ${QT_SVG}
