@@ -86,6 +86,20 @@ QString ArchetypeObject::typeToString(Type t)
     return metaEnum.valueToKey(int(t));
 }
 
+QStringList ArchetypeObject::requestsIDs() const
+{
+    return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids)).split(",");
+}
+
+void ArchetypeObject::setRequestsIDs(const QStringList &requestIDs)
+{
+    if (requestIDs.isEmpty()) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids));
+    } else {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids), requestIDs.join(","));
+    }
+}
+
 ArchetypeObject::Type ArchetypeObject::type() const
 {
     return m_type;

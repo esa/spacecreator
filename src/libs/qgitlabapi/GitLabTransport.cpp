@@ -25,7 +25,7 @@ GitLabTransport::GitLabTransport(const QString &url, const QString &token)
 
 void GitLabTransport::RequestListofIssues(const QString &assignee,
                                      const QString &author,
-                                     const QString &iids)
+                                     const QStringList &iids)
 {
     auto reply = SendRequest(GitLabTransport::GET, mUrlComposer.ComposeGetIssuesUrl(assignee, author, iids));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
@@ -52,7 +52,7 @@ void GitLabTransport::RequestIssue(const QString &issueID)
     static const QString anyAssignee("");
     static const QString anyAuthor("");
 
-    RequestListofIssues(anyAssignee, anyAuthor, issueID);
+    RequestListofIssues(anyAssignee, anyAuthor, {issueID});
 }
 
 void GitLabTransport::RequestListofLabels(const QString &projectID, const QString &with_counts, const QString &search)

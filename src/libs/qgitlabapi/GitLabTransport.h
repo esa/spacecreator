@@ -22,7 +22,7 @@ public:
     GitLabTransport(const QString &url, const QString &token);
     void RequestListofIssues(const QString &assignee = QString(),
                              const QString &author = QString(),
-                             const QString &iids = QString());
+                             const QStringList &iids = QStringList());
     void RequestIssue(const QString &issueID);
     void RequestListofLabels(const QString &projectID,
                              const QString &with_counts,

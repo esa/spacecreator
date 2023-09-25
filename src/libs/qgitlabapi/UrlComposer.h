@@ -19,7 +19,7 @@ public:
 
     QUrl ComposeGetIssuesUrl(const QString &assignee,
                              const QString &author,
-                             const QString &iids,
+                             const QStringList &iids,
                              const QString &scope = "all") const;
     QUrl ComposeCreateIssueUrl(const QString &projectID,
                                const QString &title,

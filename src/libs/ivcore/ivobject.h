@@ -88,6 +88,10 @@ public:
     bool isReference() const;
     bool isInstanceDescendant() const;
 
+
+    QStringList requestsIDs() const;
+    void setRequestsIDs(const QStringList &requestIDs);
+
     QString groupName() const;
     void setGroupName(const QString &groupName);
 

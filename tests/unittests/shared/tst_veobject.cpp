@@ -35,6 +35,13 @@ public:
         Q_UNUSED(isProperty)
         return {};
     }
+
+    QStringList requestsIDs() const override { return QStringList(); };
+
+    void setRequestsIDs(const QStringList &requestIDs) override
+    {
+        Q_UNUSED(requestIDs);
+    };
 };
 
 class tst_VEObject : public QObject

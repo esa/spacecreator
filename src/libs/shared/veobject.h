@@ -133,6 +133,10 @@ public:
     void setMarked(bool mark);
     bool isMarked() const;
 
+    virtual QStringList requestsIDs() const = 0;
+
+    virtual void setRequestsIDs(const QStringList &requestIDs) = 0;
+
 Q_SIGNALS:
     void attributeChanged(const QString &name);
     void markerChanged();

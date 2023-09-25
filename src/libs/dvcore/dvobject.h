@@ -81,6 +81,11 @@ public:
     QVariantList attributes() const;
     QVariantList properties() const;
 
+    QStringList requestsIDs() const;
+
+    void setRequestsIDs(const QStringList &requestIDs);
+
+
 Q_SIGNALS:
     void urlChanged(const QString &title);
     void titleChanged(const QString &title);

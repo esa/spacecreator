@@ -57,14 +57,14 @@ QUrlQuery UrlComposer::SetQuery(const QMap<QString, QVariant> data) const
 
 QUrl UrlComposer::ComposeGetIssuesUrl(const QString &assignee,
                                       const QString &author,
-                                      const QString &iids,
+                                      const QStringList &iids,
                                       const QString &scope) const
 {
     QUrl url(ComposeUrl(UrlComposer::UrlTypes::GetIssues));
 
     const QMap<QString, QVariant> data = {
         {"scope", scope},
-        {"iids[]", iids.split(',')},
+        {"iids[]", iids},
         {"assignee_username", assignee},
         {"author_username", author},
     };

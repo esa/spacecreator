@@ -10,7 +10,7 @@ QGitlabClient::QGitlabClient(const QString &url, const QString &token)
 
 void QGitlabClient::requestIssues(const QString &assignee,
                                   const QString &author,
-                                  const QString &iids)
+                                  const QStringList &iids)
 {
     mGitlab->RequestListofIssues(assignee, author, iids);
 }

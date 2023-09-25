@@ -21,6 +21,11 @@
             <Device/>
         </Scopes>
     </Attr>
+    <Attr name="requests_ids" editable="false" optional="true" visible="false">
+        <Type>
+            <String  validator="([0-9],?)*"/>
+        </Type>
+    </Attr>
     <Attr name="asn1file" editable="false">
         <Type>
             <String validator="^/|//|(/[\w-]+)+$"/>

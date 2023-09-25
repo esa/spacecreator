@@ -81,6 +81,7 @@ public:
         simulink_full_interface_ref,
         iface_id,
         reference,
+        requests_ids,
 
         // properties values
         QGenC,

@@ -302,6 +302,20 @@ bool IVObject::isInstanceDescendant() const
     return false;
 }
 
+QStringList IVObject::requestsIDs() const
+{
+    return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids)).split(",");
+}
+
+void IVObject::setRequestsIDs(const QStringList &requestIDs)
+{
+    if (requestIDs.isEmpty()) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids));
+    } else {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids), requestIDs.join(","));
+    }
+}
+
 QString IVObject::groupName() const
 {
     return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::group_name));

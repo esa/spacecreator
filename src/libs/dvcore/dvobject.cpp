@@ -174,6 +174,20 @@ QVariantList DVObject::properties() const
     return generateProperties(true);
 }
 
+QStringList DVObject::requestsIDs() const
+{
+    return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids)).split(",");
+}
+
+void DVObject::setRequestsIDs(const QStringList &requestIDs)
+{
+    if (requestIDs.isEmpty()) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids));
+    } else {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids), requestIDs.join(","));
+    }
+}
+
 /**
  * @brief generateProperties generates a variant list sorted by meta::Props::Token.
  * @param props can be hash of attributes or properties of DVObject.

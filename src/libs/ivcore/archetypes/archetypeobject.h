@@ -101,6 +101,10 @@ public:
 
     static QString typeToString(Type t);
 
+    QStringList requestsIDs() const;
+
+    void setRequestsIDs(const QStringList &requestIDs);
+
 Q_SIGNALS:
     void titleChanged(const QString &title);
 

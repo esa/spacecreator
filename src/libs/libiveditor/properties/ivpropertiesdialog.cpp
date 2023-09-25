@@ -25,7 +25,6 @@
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
-#include "exportableattribute.h"
 #include "gitlabcredentialsdialog.h"
 #include "gitlabrequests.h"
 #include "ifaceparametersmodel.h"
@@ -315,7 +314,7 @@ void IVPropertiesDialog::initArchetypeView()
 void IVPropertiesDialog::initRequestsView()
 {
     QSettings settings;
-    auto ids = getReqIDs();
+    auto ids =  dataObject()->requestsIDs();
     auto gitlabUrl = settings.value("Gitlab/url").toString();
     auto gitlabToken = settings.value("Gitlab/token").toString();
 
@@ -339,7 +338,7 @@ void IVPropertiesDialog::initRequestsView()
     queryRequests(gitlabUrl, gitlabToken, ids);
 
 }
-void IVPropertiesDialog::queryRequests(const QString & url, const QString &token,const QString & ids, GitlabCredentialsDialog* dialog)
+void IVPropertiesDialog::queryRequests(const QString & url, const QString &token,const QStringList & ids, GitlabCredentialsDialog* dialog)
 {
     QGitlabClient * gitClient = new QGitlabClient(url, token);
     static const QString anyAssignee("");
@@ -358,18 +357,6 @@ void IVPropertiesDialog::queryRequests(const QString & url, const QString &token
         }
         insertTab(reqWidget, tr("Requests"), getTabCount());
     });
-}
-QString IVPropertiesDialog::getReqIDs() const
-{
-    for (const auto &attr: dataObject()->attributes())
-    {
-        auto expAttr = attr.value<shared::ExportableAttribute>();
-        if (expAttr.name() == "ReqIDs")
-        {
-            return expAttr.value().toString();
-        }
-    }
-    return QString();
 }
 
 } // namespace ive
