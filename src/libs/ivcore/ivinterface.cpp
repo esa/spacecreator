@@ -653,7 +653,7 @@ void IVInterfaceRequired::setAttributeImpl(
                         autoName = false;
                     }
                     if (!IVNameValidator::isAcceptableName(this, usedName)) {
-                        if (it != m_prototypes.cend()) {
+                        if (it != m_prototypes.cend() && (*it)->function()) {
                             usedName = (*it)->function()->title() + QLatin1Char('_') + (*it)->title();
                             autoName = true;
                         } else {
