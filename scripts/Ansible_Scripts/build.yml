@@ -45,3 +45,10 @@
       command:
         cmd: "cmake --build {{ space_project_build_dir }} --target all"
         creates: "{{ space_project_build_dir }}/bin/IVeditor"
+    - name: "Copy binaries to {{ app_dir }}"
+      copy:
+        src: "{{ item }}"
+        dest: "{{ app_dir }}/bin"
+        mode: 0755
+      with_fileglob:
+            - "{{ space_project_build_dir }}/bin/*"
