@@ -6,7 +6,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 remove_definitions(-DQT_NO_KEYWORDS)
-add_library(QGitlabAPI SHARED
+add_library(QGitlabAPI STATIC
   QGitlabAPI_global.h
   qgitlabclient.cpp
   qgitlabclient.h
