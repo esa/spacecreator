@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_CXX_STANDARD 17)
+
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 remove_definitions(-DQT_NO_KEYWORDS)
 add_library(QGitlabAPI STATIC
@@ -18,8 +18,12 @@ add_library(QGitlabAPI STATIC
   UrlComposer.cpp
   Label.h
   Label.cpp
+  gitlabrequirements.cpp
+  gitlabrequirements.h
+  gitlabrequirements.ui
+
 )
 
-target_link_libraries(QGitlabAPI PRIVATE ${QT_NETWORK} ${QT_CORE})
+target_link_libraries(QGitlabAPI PRIVATE ${QT_NETWORK} ${QT_CORE} ${QT_WIDGETS})
 
 target_compile_definitions(QGitlabAPI PRIVATE QGITLABAPI_LIBRARY QT_DEBUG_OUTPUT)

@@ -25,8 +25,7 @@
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
-#include "gitlabcredentialsdialog.h"
-#include "gitlabrequests.h"
+#include "../../qgitlabapi/gitlabrequirements.h"
 #include "ifaceparametersmodel.h"
 #include "implementationswidget.h"
 #include "interface/attributedelegate.h"
@@ -313,50 +312,9 @@ void IVPropertiesDialog::initArchetypeView()
 
 void IVPropertiesDialog::initRequestsView()
 {
-    QSettings settings;
-    auto ids =  dataObject()->requestsIDs();
-    auto gitlabUrl = settings.value("Gitlab/url").toString();
-    auto gitlabToken = settings.value("Gitlab/token").toString();
-
-    if (gitlabUrl.isEmpty() || gitlabToken.isEmpty())
-    {
-        GitlabCredentialsDialog * dialog = new GitlabCredentialsDialog;
-        dialog->setUrl(gitlabUrl);
-        insertTab(dialog, tr("Requests"), getTabCount());
-        connect(dialog, &GitlabCredentialsDialog::buttonClicked, [dialog, ids, this](){
-            auto url = dialog->getUrl();
-            auto token = dialog->getToken();
-            if (url.isEmpty() || token.isEmpty())
-                return;
-            QSettings settings;
-            settings.setValue("Gitlab/url", url);
-            settings.setValue("Gitlab/token", token);
-
-            queryRequests(url,token,ids,dialog);
-        });
-    }
-    queryRequests(gitlabUrl, gitlabToken, ids);
-
+   GitLabRequirements* requirementsWidget =  new GitLabRequirements(this);
+   insertTab(requirementsWidget, tr("Requests"), getTabCount());
 }
-void IVPropertiesDialog::queryRequests(const QString & url, const QString &token,const QStringList & ids, GitlabCredentialsDialog* dialog)
-{
-    QGitlabClient * gitClient = new QGitlabClient(url, token);
-    static const QString anyAssignee("");
-    static const QString anyAuthor("");
 
-    gitClient->requestIssues(anyAssignee, anyAuthor, ids);
-    connect(gitClient, &QGitlabClient::listOfIssues, [gitClient, dialog, this](QList<Issue> issues){
-        if (dialog)
-        {
-            removeTab(dialog);
-        }
-        GitlabRequests *reqWidget = new GitlabRequests;
-        for (const auto& issue: issues)
-        {
-            reqWidget->addRequest(issue.mIssueID, issue.mDescription);
-        }
-        insertTab(reqWidget, tr("Requests"), getTabCount());
-    });
-}
 
 } // namespace ive
