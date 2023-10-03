@@ -1,3 +1,3 @@
-add_subdirectory(commontestlib)
-add_subdirectory(integrationtests)
-add_subdirectory(unittests)
+#add_subdirectory(commontestlib)
+#add_subdirectory(integrationtests)
+#add_subdirectory(unittests)

@@ -16,6 +16,12 @@ public:
     ~GitLabRequirements();
 
 
+    void setUrl(const QString& url);
+    void setToken(const QString& token);
+
+Q_SIGNALS:
+    void loginUpdate(const QString& url, const QString& token);
+
 private:
     Ui::GitLabRequirements *ui;
 };

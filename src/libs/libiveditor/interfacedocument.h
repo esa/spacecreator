@@ -121,6 +121,9 @@ public:
     void setCreatorGitHash(const QString &hashStr);
     QString creatorGitHash() const;
 
+    bool setRequestURL(const QString &url);
+    QString requestsURL() const;
+
     bool isDirty() const;
 
     QList<QAction *> customActions() const;
@@ -167,7 +170,7 @@ public:
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
     void titleChanged();
-
+    void requestURLChanged(const QString &requestUrl);
     void asn1FileNameChanged(const QString &asn1FileName);
     void mscFileNameChanged(const QString &mscFileName);
     void uiFileNameChanged(const QString &uiFileName);

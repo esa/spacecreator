@@ -97,6 +97,7 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     QString filePath;
     QString creatorGitHash;
+    QString requestsURL;
 
     ivm::IVPropertyTemplateConfig *dynPropConfig { nullptr };
     IVItemModel *itemsModel { nullptr };
@@ -727,6 +728,24 @@ void InterfaceDocument::setCreatorGitHash(const QString &hashStr)
 QString InterfaceDocument::creatorGitHash() const
 {
     return d->creatorGitHash;
+}
+
+bool InterfaceDocument::setRequestURL(const QString &url)
+{
+    if (d->requestsURL != url)
+    {
+        d->requestsURL = url;
+        Q_EMIT requestURLChanged(d->requestsURL);
+        return true;
+    }
+    return false;
+
+
+}
+
+QString InterfaceDocument::requestsURL() const
+{
+    return d->requestsURL;
 }
 
 QString InterfaceDocument::uiFileName() const

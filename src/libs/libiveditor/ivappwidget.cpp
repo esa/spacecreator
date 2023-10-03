@@ -838,7 +838,8 @@ void IVAppWidget::showPropertyEditor(const shared::Id &id)
         return;
     }
 
-    auto dialog = new ive::IVPropertiesDialog(QFileInfo(m_document->path()).absolutePath(),
+    auto dialog = new ive::IVPropertiesDialog(m_document,
+                                              QFileInfo(m_document->path()).absolutePath(),
                                               m_document->dynPropConfig(),
                                               m_document->itemsModel()
                                                   ->getItem<shared::ui::VEInteractiveObject *>(id),

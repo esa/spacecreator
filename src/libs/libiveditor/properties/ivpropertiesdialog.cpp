@@ -25,11 +25,12 @@
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
-#include "../../qgitlabapi/gitlabrequirements.h"
 #include "ifaceparametersmodel.h"
 #include "implementationswidget.h"
 #include "interface/attributedelegate.h"
 #include "interface/parameternamedelegate.h"
+#include "interfacedocument.h"
+#include "ivexporter.h"
 #include "ivcomment.h"
 #include "ivconnectiongroup.h"
 #include "ivconnectiongroupmodel.h"
@@ -45,6 +46,7 @@
 #include "propertiesviewbase.h"
 #include "ui/veinteractiveobject.h"
 #include "qgitlabapi/qgitlabclient.h"
+#include "qgitlabapi/gitlabrequirements.h"
 
 #include <QDebug>
 #include <QHeaderView>
@@ -57,11 +59,12 @@
 
 namespace ive {
 
-IVPropertiesDialog::IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
+IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
                                        shared::ui::VEInteractiveObject *uiObj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
                                        ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
                                        QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, uiObj, commandsStack, parent)
+    , m_document(document)
     , m_ivChecks(checks)
     , m_asn1Checks(asn1Checks)
     , m_projectPath(projectPath)
@@ -314,6 +317,23 @@ void IVPropertiesDialog::initRequestsView()
 {
    GitLabRequirements* requirementsWidget =  new GitLabRequirements(this);
    insertTab(requirementsWidget, tr("Requests"), getTabCount());
+   QSettings settings;
+   auto gitlabToken = settings.value("Requests/token").toString();
+   requirementsWidget->setUrl(m_document->requestsURL());
+   requirementsWidget->setToken(gitlabToken);
+
+   connect(requirementsWidget, &GitLabRequirements::loginUpdate, [this](const QString & requestsURL, const QString & requestToken){
+
+       QSettings settings;
+       auto gitlabToken = settings.value("Gitlab/token").toString();
+       if (gitlabToken != requestToken)
+       {
+           settings.setValue("Requests/token", requestToken);
+       }
+
+       m_document->setRequestURL(requestsURL);
+       m_document->exporter()->exportDocSilently(m_document, m_document->path());
+   });
 }
 
 

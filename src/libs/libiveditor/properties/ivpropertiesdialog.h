@@ -35,6 +35,8 @@ class ArchetypeModel;
 }
 
 namespace ive {
+
+class InterfaceDocument;
 namespace cmd {
 class CommandsStack;
 }
@@ -44,7 +46,7 @@ class IVPropertiesDialog : public shared::PropertiesDialog
     Q_OBJECT
 
 public:
-    explicit IVPropertiesDialog(const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
+    explicit IVPropertiesDialog(QPointer<InterfaceDocument> document, const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
             shared::ui::VEInteractiveObject *uiObj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
             ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
             QWidget *parent = nullptr);
@@ -64,8 +66,7 @@ private:
     void initLanguageView();
     void initArchetypeView();
     void initRequestsView();
-    void queryRequests(const QString & url, const QString &token,const QStringList & ids, GitlabCredentialsDialog* dialog = nullptr);
-    QString getReqIDs() const;
+
     QPointer<ivm::AbstractSystemChecks> m_ivChecks;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
     const QString m_projectPath;
@@ -73,6 +74,8 @@ private:
     ivm::ArchetypeModel *m_archetypesModel;
     bool m_isFixedSystemElement;
     bool m_isRequiredSystemElement;
+
+    QPointer<InterfaceDocument> m_document;
 };
 
 } // namespace ive
