@@ -56,4 +56,15 @@ QStringList CppRefactor::implementationFileNames(const QString &functionName) co
     return { fnNameLow + ".cc", fnNameLow + ".h", fnNameLow + "_state.h" };
 }
 
+QList<QByteArray> CppRefactor::functionsTextsToReplace(const QString &functionName) const
+{
+    const QByteArray fnNameLow = functionName.toLower().toUtf8();
+
+    QList<QByteArray> texts { fnNameLow + ".h", "void " + fnNameLow + "::", "void " + fnNameLow + "_startup",
+        "void " + fnNameLow + "_PI_", "void " + fnNameLow + "_RI_", "ctxt_" + fnNameLow + ";", functionName.toUtf8(),
+        fnNameLow + "_state", "class " + fnNameLow + " {", "  " + fnNameLow + "(" };
+
+    return texts;
+}
+
 } // namespace spctr

@@ -152,4 +152,31 @@ bool copyDir(const QString &source, const QString &dest, FileCopyingMode replace
     return success;
 }
 
+QString joinedPath(const QString &arg1, const QString &arg2)
+{
+    QString plainDirectory = arg1;
+    if (plainDirectory.endsWith(QDir::separator())) {
+        plainDirectory.remove(plainDirectory.size() - 1, 1);
+    }
+    return QString("%1%3%2").arg(plainDirectory, arg2, QDir::separator());
+}
+
+QString joinedPath(const QString &arg1, const QString &arg2, const QString &arg3)
+{
+    return joinedPath(joinedPath(arg1, arg2), arg3);
+}
+
+QString filePath(const QString &directory, const QString &filebasename, const QString &suffix)
+{
+    QString plainSuffix = suffix;
+    if (plainSuffix.startsWith(".")) {
+        plainSuffix = plainSuffix.remove(0, 1);
+    }
+    QString plainDirectory = directory;
+    if (plainDirectory.endsWith(QDir::separator())) {
+        plainDirectory.remove(plainDirectory.size() - 1, 1);
+    }
+    return QString("%1%2%3.%4").arg(plainDirectory, QDir::separator(), filebasename, plainSuffix);
+}
+
 } // namespace shared

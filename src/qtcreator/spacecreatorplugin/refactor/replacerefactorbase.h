@@ -36,8 +36,10 @@ namespace spctr {
 class ReplaceRefactorBase : public CreatorRefactorBase
 {
 public:
+    bool isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const override;
     bool isIVInterfaceUsed(ivm::IVInterface *interface, const QString &name) const override;
 
+    void onIVFunctionRenamed(ivm::IVFunction *func, const QString &oldName, const QString &newName) const override;
     void onIVInterfaceRenamed(
             ivm::IVInterface *interface, const QString &oldName, const QString &newName) const override;
 
@@ -49,6 +51,8 @@ protected:
      */
     virtual QList<QByteArray> interfaceCodeNames(ivm::IVInterface *interface, const QString &name) const = 0;
 
+    virtual QList<QByteArray> functionsTextsToReplace(const QString &name) const = 0;
+
     /**
      * Returns a list of plain file names (without path) that are used by the generator. Those file might exist or not.
      */
@@ -58,6 +62,11 @@ protected:
      * Returns the list of existing code files of the function including their full path
      */
     virtual QStringList codeFilePaths(const QString &functionName) const;
+
+    /**
+     * Returns the list of all files of the function including their full path
+     */
+    virtual QStringList allImplementationFilePaths(const QString &functionName) const;
 
     /**
      * Returns the content of the given file.

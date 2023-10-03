@@ -42,4 +42,15 @@ bool ensureFileExists(const QString &filePath, const QString &defaultFilePath);
 
 bool isSame(const QString &filePath1, const QString &filePath2);
 
+/*!
+ * Returns single string connecting all arguments using the filesystem separator
+ */
+QString joinedPath(const QString &arg1, const QString &arg2);
+QString joinedPath(const QString &arg1, const QString &arg2, const QString &arg3);
+
+/*!
+ * Turns the directory, file basename and the filename suffix into a single file path string
+ */
+QString filePath(const QString &directory, const QString &filebasename, const QString &suffix);
+
 } // namespace shared

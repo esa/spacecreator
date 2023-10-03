@@ -51,4 +51,14 @@ QStringList CRefactor::implementationFileNames(const QString &functionName) cons
     const QString fnNameLow(functionName.toLower());
     return { fnNameLow + ".c", fnNameLow + ".cc", fnNameLow + ".h", fnNameLow + "_state.h" };
 }
+
+QList<QByteArray> CRefactor::functionsTextsToReplace(const QString &functionName) const
+{
+    const QByteArray fnNameLow = functionName.toLower().toUtf8();
+
+    QList<QByteArray> texts { fnNameLow + ".h", fnNameLow + "_state", "void " + fnNameLow + "_", "ctxt_" + fnNameLow,
+        functionName.toUtf8() };
+
+    return texts;
+}
 }

@@ -18,6 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "refactorbase.h"
 
 #include "ivinterface.h"
+#include "spacecreatorproject.h"
 
 #include <ivconnection.h>
 
@@ -26,6 +27,16 @@ namespace scs {
 /*!
  * Returns if the type of refactoring is supported by this class
  */
+void RefactorBase::setStorage(SpaceCreatorProject *storage)
+{
+    m_storage = storage;
+}
+
+SpaceCreatorProject *RefactorBase::storage() const
+{
+    return m_storage;
+}
+
 bool RefactorBase::isRefactorSupported(RefactorType type) const
 {
     Q_UNUSED(type);

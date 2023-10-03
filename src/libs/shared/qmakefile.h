@@ -31,9 +31,14 @@ class QMakeFile : public QObject
     Q_OBJECT
 public:
     /*!
-     * Replaces the \p oldBasename by \p newBasename in the given \p proFilePath .pro file
+     * Replaces the \p oldFileName by \p newFileName in the given \p proFilePath .pro file
      */
-    static bool renameFileBasename(const QString &proFilePath, const QString &oldBasename, const QString &newBasename);
+    static bool renameFileName(const QString &proFilePath, const QString &oldFileName, const QString &newFileName);
+
+    /*!
+     * Rename directory the \p oldDirectory by \p newDirectory in the given \p proFilePath .pro file
+     */
+    static bool renameDirectory(const QString &proFilePath, const QString &oldDirectory, const QString &newDirectory);
 
     /*!
      * Creates a simple .pro file ind the directory set by \p path.
@@ -46,6 +51,10 @@ public:
        given \p extinsions relative to \p path unless it has absolute filesystem path.
      */
     static QStringList readFilesList(const QString &path, const QStringList &fileExtentions);
+
+private:
+    static bool replace(const QString &proFilePath, const QString &oldString, const QString &newString,
+            const QByteArray &allowedCharsBefore, const QByteArray &allowedCharsAfter);
 };
 
 } // namespace shared

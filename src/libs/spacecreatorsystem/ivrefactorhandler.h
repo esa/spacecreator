@@ -65,6 +65,9 @@ private:
     void onIVInterfaceNameChanged(
             ivm::IVInterface *interface, const QString &oldName, ive::cmd::CmdIfaceAttrChange *command);
 
+    void renameImplementationDirectory(const QString &oldName, const QString &newName);
+    QString implementationBasePath() const;
+
     QList<RefactorBase *> m_refactors;
 };
 

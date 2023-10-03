@@ -28,27 +28,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace shared {
 
-bool QMakeFile::renameFileBasename(const QString &proFilePath, const QString &oldBasename, const QString &newBasename)
+bool QMakeFile::renameFileName(const QString &proFilePath, const QString &oldFileName, const QString &newFileName)
 {
-    QFile proFile(proFilePath);
-    if (!proFile.open(QIODevice::ReadOnly)) {
-        ErrorHub::addError(ErrorItem::Error, tr("Unable to read file %1").arg(proFilePath));
-        return false;
-    }
+    static const QByteArray allowedCharsBeforer { " /\\(=" };
+    static const QByteArray allowedCharsAfter { " )\n" };
+    return replace(proFilePath, oldFileName, newFileName, allowedCharsBeforer, allowedCharsAfter);
+}
 
-    QByteArray content = proFile.readAll();
-    proFile.close();
-
-    content.replace(oldBasename.toUtf8(), newBasename.toUtf8());
-
-    if (!proFile.open(QIODevice::WriteOnly)) {
-        ErrorHub::addError(ErrorItem::Error, tr("Unable to write file %1").arg(proFilePath));
-        return false;
-    }
-
-    proFile.write(content);
-
-    return true;
+bool QMakeFile::renameDirectory(const QString &proFilePath, const QString &oldDirectory, const QString &newDirectory)
+{
+    static const QByteArray allowedCharsBeforeDir { " /\\(=" };
+    static const QByteArray allowedCharsAfterDir { " /\\)\n" };
+    return replace(proFilePath, oldDirectory, newDirectory, allowedCharsBeforeDir, allowedCharsAfterDir);
 }
 
 bool QMakeFile::createProFileForDirectory(const QString &path, const QStringList &externalFiles)
@@ -140,6 +131,57 @@ QStringList QMakeFile::readFilesList(const QString &path, const QStringList &fil
         parseLine(line, isMultiLine);
     }
     return files;
+}
+
+bool QMakeFile::replace(const QString &proFilePath, const QString &oldString, const QString &newString,
+        const QByteArray &allowedCharsBefore, const QByteArray &allowedCharsAfter)
+{
+    QFile proFile(proFilePath);
+    if (!proFile.open(QIODevice::ReadOnly)) {
+        ErrorHub::addError(ErrorItem::Error, tr("Unable to read file %1").arg(proFilePath));
+        return false;
+    }
+
+    QList<QByteArray> content;
+    while (!proFile.atEnd()) {
+        content.append(proFile.readLine());
+    }
+    proFile.close();
+
+    const QByteArray oldStr = oldString.toUtf8();
+    int length = oldStr.length();
+    const QByteArray newStr = newString.toUtf8();
+
+    for (QByteArray &line : content) {
+        int idx = 0;
+        while (idx >= 0) {
+            idx = line.indexOf(oldStr, idx);
+            if (idx >= 0) {
+                char charBefore = line[idx - 1];
+                if (allowedCharsBefore.isEmpty() || allowedCharsBefore.contains(charBefore)) {
+                    if (idx + length < line.length()) {
+                        char charAfter = line[idx + length];
+                        if (allowedCharsAfter.isEmpty() || allowedCharsAfter.contains(charAfter)) {
+                            line.replace(idx, length, newStr);
+                        }
+                    }
+                }
+                idx = idx + newStr.length();
+            }
+        }
+    }
+
+    if (!proFile.open(QIODevice::WriteOnly)) {
+        ErrorHub::addError(ErrorItem::Error, tr("Unable to open file %1").arg(proFilePath));
+        return false;
+    }
+
+    if (proFile.write(content.join()) < 0) {
+        ErrorHub::addError(ErrorItem::Error, tr("Unable to write file %1").arg(proFilePath));
+        return false;
+    }
+
+    return false;
 }
 
 } // namespace shared

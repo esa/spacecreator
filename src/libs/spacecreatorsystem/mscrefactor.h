@@ -20,14 +20,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "refactorbase.h"
 
 #include <QList>
-#include <QPointer>
 
 namespace msc {
 class MscMessage;
 }
 
 namespace scs {
-class SpaceCreatorProject;
 
 /*!
  * Performs refactoring actions on MSC data, triggered by other events
@@ -35,8 +33,6 @@ class SpaceCreatorProject;
 class MSCRefactor : public RefactorBase
 {
 public:
-    void setStorage(SpaceCreatorProject *storage);
-
     bool isRefactorSupported(RefactorType type) const override;
 
     bool isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const override;
@@ -52,8 +48,6 @@ private:
     QList<msc::MscMessage *> correspondingMessages(ivm::IVInterface *interface, const QString &name) const;
     QList<msc::MscMessage *> allMessages(
             const QString &messageName, const QString &sourceName, const QString &targetName) const;
-
-    QPointer<SpaceCreatorProject> m_storage;
 };
 
 } // namespace scs

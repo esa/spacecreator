@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
+#include <QPointer>
 #include <QString>
 
 namespace ivm {
@@ -31,6 +32,7 @@ class VEObject;
 }
 
 namespace scs {
+class SpaceCreatorProject;
 
 /**
  * Base class for all classes that implement the refactoring for one specific file type
@@ -48,6 +50,9 @@ public:
         IVImplementationListChanged,
         IVAttributeChanged,
     };
+
+    void setStorage(scs::SpaceCreatorProject *storage);
+    scs::SpaceCreatorProject *storage() const;
 
     virtual bool isRefactorSupported(RefactorType type) const;
 
@@ -68,6 +73,9 @@ public:
     virtual void onImplementationListChanged(ivm::IVFunction *ivFunction);
 
     void onAttributeChanged(shared::VEObject *entity, const QString &attrName, const QVariant &oldValue);
+
+protected:
+    QPointer<scs::SpaceCreatorProject> m_storage;
 };
 
 } // namespace scs

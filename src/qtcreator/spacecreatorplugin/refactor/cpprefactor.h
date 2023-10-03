@@ -35,6 +35,7 @@ protected:
 
     QList<QByteArray> interfaceCodeNames(ivm::IVInterface *interface, const QString &name) const override;
     QStringList implementationFileNames(const QString &functionName) const override;
+    QList<QByteArray> functionsTextsToReplace(const QString &functionName) const override;
 };
 
 } // namespace spctr

@@ -20,14 +20,24 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "common.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
+#include "qmakefile.h"
 #include "spacecreatorproject.h"
 
 #include <QDir>
 #include <QDirIterator>
+#include <coreplugin/fileutils.h>
 #include <editormanager/documentmodel.h>
 #include <texteditor/textdocument.h>
 
 namespace spctr {
+
+bool ReplaceRefactorBase::isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const
+{
+    Q_ASSERT(func);
+
+    const QStringList implFiles = codeFilePaths(name);
+    return !implFiles.isEmpty();
+}
 
 bool ReplaceRefactorBase::isIVInterfaceUsed(ivm::IVInterface *interface, const QString &name) const
 {
@@ -43,6 +53,53 @@ bool ReplaceRefactorBase::isIVInterfaceUsed(ivm::IVInterface *interface, const Q
     }
 
     return false;
+}
+
+void ReplaceRefactorBase::onIVFunctionRenamed(
+        ivm::IVFunction *func, const QString &oldName, const QString &newName) const
+{
+    Q_ASSERT(func);
+
+    // Update file contens
+    const QStringList implFiles = codeFilePaths(oldName);
+    const QList<QByteArray> oldTexts = functionsTextsToReplace(oldName);
+    const QList<QByteArray> newTexts = functionsTextsToReplace(newName);
+
+    for (const QString &implFile : implFiles) {
+        QFileInfo fi(implFile);
+        QByteArray fileData = fileContent(fi);
+        bool updated = false;
+        for (int idx = 0; idx < oldTexts.size(); ++idx) {
+            if (fileData.contains(oldTexts[idx])) {
+                fileData.replace(oldTexts[idx], newTexts[idx]);
+                updated = true;
+            }
+        }
+        if (updated) {
+            setFileContent(fi, fileData);
+        }
+    }
+
+    // rename files
+    for (const QString &implFile : allImplementationFilePaths(oldName)) {
+        QFileInfo fi(implFile);
+        const QString newBasename = fi.baseName().replace(oldName.toLower(), newName.toLower());
+        const QString newFileName = fi.path() + QDir::separator() + newBasename + "." + fi.suffix();
+        Core::FileUtils::renameFile(
+                Utils::FilePath::fromString(fi.absoluteFilePath()), Utils::FilePath::fromString(newFileName));
+    }
+
+    // rename file in .pro file
+    const QString implPath =
+            m_storage->projectPath() + QDir::separator() + shared::kRootImplementationPath + QDir::separator();
+    const QString prFilePath = implPath + oldName.toLower() + QDir::separator() + oldName.toLower() + ".pro";
+    if (QFileInfo::exists(prFilePath)) {
+        const QStringList oldImplFiles = implementationFileNames(oldName);
+        const QStringList newImplFiles = implementationFileNames(newName);
+        for (int i = 0; i < newImplFiles.size(); ++i) {
+            shared::QMakeFile::renameFileName(prFilePath, oldImplFiles[i], newImplFiles[i]);
+        }
+    }
 }
 
 void ReplaceRefactorBase::onIVInterfaceRenamed(
@@ -70,6 +127,27 @@ QStringList ReplaceRefactorBase::codeFilePaths(const QString &functionName) cons
         const QString fileName = it.next();
         if (fileName.contains("/" + languageDir() + "/")) {
             implFiles.append(fileName);
+        }
+    }
+
+    return implFiles;
+}
+
+QStringList ReplaceRefactorBase::allImplementationFilePaths(const QString &functionName) const
+{
+    QStringList implFiles;
+    const QString fnNameLow(functionName.toLower());
+
+    QDirIterator it(m_storage->projectPath() + QDir::separator() + shared::kRootImplementationPath + QDir::separator()
+                    + fnNameLow,
+            QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QString filePath = it.next();
+        if (filePath.contains(QString("/%1/").arg(languageDir()))) {
+            QFileInfo fi(filePath);
+            if (fi.baseName().contains(fnNameLow)) {
+                implFiles.append(filePath);
+            }
         }
     }
 

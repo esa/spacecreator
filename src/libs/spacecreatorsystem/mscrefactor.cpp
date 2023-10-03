@@ -29,11 +29,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace scs {
 
-void MSCRefactor::setStorage(SpaceCreatorProject *storage)
-{
-    m_storage = storage;
-}
-
 /*!
  * \see RefactorBase::isRefactorSupported
  */

@@ -28,7 +28,7 @@ class tst_QMakeFile : public QObject
 private Q_SLOTS:
     void testReadFilesList();
     void testRenameFileBasename();
-    void testRenameFileproject();
+    void testRenameDirectory();
 
 private:
     QString copyFile(const QString &filePath) const;
@@ -52,25 +52,26 @@ void tst_QMakeFile::testRenameFileBasename()
 {
     QString testFile = copyFile(QFINDTESTDATA("batterymngt.pro"));
 
-    shared::QMakeFile::renameFileBasename(testFile, "batterymngt", "battery_management");
+    shared::QMakeFile::renameFileName(testFile, "batterymngt.cc", "battery_management.cc");
+    shared::QMakeFile::renameFileName(testFile, "batterymngt.h", "battery_management.h");
 
     QFile file(testFile);
     file.open(QIODevice::ReadOnly);
     QVERIFY(file.isOpen());
     QList<QByteArray> lines = file.readAll().split('\n');
-    QCOMPARE(lines[0], "SOURCES += work/battery_management/CPP/src/battery_management.cc");
-    QCOMPARE(lines[1], "HEADERS += work/battery_management/CPP/src/battery_management.h");
-    QCOMPARE(lines[2], "SOURCES += work/battery_management/CPP/src/battery_management_state.h");
+    QCOMPARE(lines[0], "SOURCES += work/batterymngt/CPP/src/battery_management.cc");
+    QCOMPARE(lines[1], "HEADERS += work/batterymngt/CPP/src/battery_management.h");
+    QCOMPARE(lines[2], "SOURCES += work/batterymngt/CPP/src/batterymngt_state.h");
 
     file.close();
     file.remove();
 }
 
-void tst_QMakeFile::testRenameFileproject()
+void tst_QMakeFile::testRenameDirectory()
 {
     QString testFile = copyFile(QFINDTESTDATA("taste.pro"));
 
-    shared::QMakeFile::renameFileBasename(testFile, "batterymngt", "battery_management");
+    shared::QMakeFile::renameDirectory(testFile, "batterymngt", "battery_management");
 
     QFile file(testFile);
     file.open(QIODevice::ReadOnly);
@@ -80,7 +81,9 @@ void tst_QMakeFile::testRenameFileproject()
     QCOMPARE(lines[1], "HEADERS += work/dataview/C/dataview-uniq.h");
     QCOMPARE(lines[2], "HEADERS += work/dataview/Ada/src/*.ads");
     QCOMPARE(lines[3], "include(batteryctrl/batteryctrl.pro)");
-    QCOMPARE(lines[4], "include(battery_management/battery_management.pro)");
+    QCOMPARE(lines[4], "include(battery_management/batterymngt.pro)");
+    QCOMPARE(lines[5], "include(batterymngt_a/batterymngt_a.pro)");
+    QCOMPARE(lines[6], "include(b_batterymngt/b_batterymngt.pro)");
 
     file.close();
     file.remove();
@@ -90,7 +93,11 @@ QString tst_QMakeFile::copyFile(const QString &filePath) const
 {
     QFileInfo fi(filePath);
     QString testFile = fi.path() + "test.pro";
-    QFile::copy(filePath, testFile);
+    if (QFile::exists(testFile)) {
+        QFile::remove(testFile);
+    }
+    bool ok = QFile::copy(filePath, testFile);
+    Q_ASSERT(ok);
     return testFile;
 }
 

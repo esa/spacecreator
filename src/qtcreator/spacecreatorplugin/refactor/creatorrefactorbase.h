@@ -18,14 +18,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include <QCoreApplication>
-#include <QPointer>
 #include <refactorbase.h>
 
 class QDir;
-
-namespace scs {
-class SpaceCreatorProject;
-}
 
 namespace spctr {
 
@@ -37,8 +32,6 @@ class CreatorRefactorBase : public scs::RefactorBase
     Q_DECLARE_TR_FUNCTIONS(CreatorRefactorBase)
 
 public:
-    void setStorage(scs::SpaceCreatorProject *storage);
-
     bool isRefactorSupported(RefactorType type) const override;
 
     bool isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const override;
@@ -65,8 +58,6 @@ protected:
      * The filename of the implementation inside the language directory
      */
     virtual QString filename(const QString &funcName) const = 0;
-
-    QPointer<scs::SpaceCreatorProject> m_storage;
 };
 
 } // namespace spctr

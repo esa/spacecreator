@@ -19,14 +19,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "refactorbase.h"
 
-#include <QPointer>
-
 namespace dvm {
 class DVMessage;
 }
 
 namespace scs {
-class SpaceCreatorProject;
 
 /*!
  * Performs refactoring actions on DV data, triggered by other events
@@ -34,9 +31,6 @@ class SpaceCreatorProject;
 class DVRefactor : public RefactorBase
 {
 public:
-    // Setup functions
-    void setStorage(scs::SpaceCreatorProject *storage);
-
     bool isRefactorSupported(RefactorType type) const override;
 
     bool isIVFunctionUsed(ivm::IVFunction *func, const QString &name) const override;
@@ -56,8 +50,6 @@ public:
 
 private:
     QList<dvm::DVMessage *> correspondingMessages(ivm::IVInterface *interface, const QString &name) const;
-
-    QPointer<SpaceCreatorProject> m_storage;
 };
 
 } // namespace scs
