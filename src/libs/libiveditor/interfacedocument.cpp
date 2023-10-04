@@ -1190,7 +1190,9 @@ bool InterfaceDocument::loadImpl(const QString &path)
     setMscFileName(metadata["mscfile"].toString());
     if (metadata.contains(parser.uiFileNameTag()))
         setUIFileName(metadata[parser.uiFileNameTag()].toString());
-
+    if (metadata.contains("requestsURL")){
+        setRequestURL(metadata["requestsURL"].toString());
+    }
     setCreatorGitHash(metadata["creatorHash"].toString());
     shared::ErrorHub::clearCurrentFile();
 

@@ -316,25 +316,45 @@ void IVPropertiesDialog::initArchetypeView()
 
 void IVPropertiesDialog::initRequestsView()
 {
-   GitLabRequirements* requirementsWidget =  new GitLabRequirements(this);
-   insertTab(requirementsWidget, tr("Requests"), getTabCount());
-   QSettings settings;
-   auto gitlabToken = settings.value("Requests/token").toString();
-   requirementsWidget->setUrl(m_document->requestsURL());
-   requirementsWidget->setToken(gitlabToken);
+    GitLabRequirements* requirementsWidget =  new GitLabRequirements(this);
+    insertTab(requirementsWidget, tr("Requests"), getTabCount());
+    QSettings settings;
+    QString gitlabToken;
+    if (!m_document->requestsURL().isEmpty())
+    {
+        gitlabToken = settings.value(m_document->requestsURL() + "__token").toString();
+        requirementsWidget->setUrl(m_document->requestsURL());
+        if (!gitlabToken.isEmpty())
+        {
+            requirementsWidget->setToken(gitlabToken);
+        }
+    }
 
-   connect(requirementsWidget, &GitLabRequirements::loginUpdate, [this](const QString & requestsURL, const QString & requestToken){
+    connect(requirementsWidget, &GitLabRequirements::loginUpdate, [this, requirementsWidget](const QString & requestsURL, const QString & requestToken){
 
-       QSettings settings;
-       auto gitlabToken = settings.value("Gitlab/token").toString();
-       if (gitlabToken != requestToken)
-       {
-           settings.setValue("Requests/token", requestToken);
-       }
+        if (requestToken.isEmpty())
+        {
+            return;
+        }
 
-       m_document->setRequestURL(requestsURL);
-       m_document->exporter()->exportDocSilently(m_document, m_document->path());
-   });
+        QSettings settings;
+        if (!requestsURL.isEmpty())
+        {
+            auto gitlabToken = settings.value(m_document->requestsURL() + "__token").toString();
+            if ((gitlabToken != requestToken) || (requestsURL != m_document->requestsURL()))
+            {
+                settings.remove(m_document->requestsURL() + "__token");
+                settings.setValue(requestsURL + "__token", requestToken);
+            }
+        }
+        else
+        {
+            settings.remove(m_document->requestsURL() + "__token");
+            requirementsWidget->setToken("");
+        }
+        m_document->setRequestURL(requestsURL);
+        m_document->exporter()->exportDocSilently(m_document, m_document->path());
+    });
 }
 
 
