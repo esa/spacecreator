@@ -232,7 +232,7 @@ target_link_libraries(${LIB_NAME}
     shared
     templating
     msccore
-    QGitlabAPI
+    requirements
     ${QT_CONCURRENT}
     ${QT_NETWORK}
     ${QT_SVG}

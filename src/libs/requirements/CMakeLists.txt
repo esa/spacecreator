@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-set(LIB_NAME QGitlabAPI)
+set(LIB_NAME requirements)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -7,20 +7,12 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 remove_definitions(-DQT_NO_KEYWORDS)
 
-add_library(QGitlabAPI STATIC)
+add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
-  QGitlabAPI_global.h
-  qgitlabclient.cpp
-  qgitlabclient.h
-  GitLabTransport.cpp
-  GitLabTransport.h
-  Issue.h
-  Issue.cpp
-  UrlComposer.h
-  UrlComposer.cpp
-  Label.h
-  Label.cpp
+  ui/gitlabrequirements.cpp
+  ui/gitlabrequirements.h
+  ui/gitlabrequirements.ui
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

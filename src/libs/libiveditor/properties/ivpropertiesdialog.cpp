@@ -46,8 +46,7 @@
 #include "propertiesviewbase.h"
 #include "ui/veinteractiveobject.h"
 
-#include <qgitlabclient.h>
-#include <gitlabrequirements.h>
+#include <ui/gitlabrequirements.h>
 
 #include <QDebug>
 #include <QHeaderView>
