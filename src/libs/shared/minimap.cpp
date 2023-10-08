@@ -149,15 +149,12 @@ QRectF MiniMap::mappedViewportOnScene() const
 
 void MiniMap::adjustGeometry()
 {
-    LOG << 1;
     if (auto widget = parentWidget()) {
-        LOG << 2;
         const auto parentRect = widget->rect();
         const QSize sceneSize = scene()->sceneRect().size().toSize();
         QRect currentRect { QPoint(0, 0),
             sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatio) };
         currentRect = stickToEdge(location(), currentRect, MiniMap::Stickiness::Strict);
-        LOG << currentRect << location();
         setGeometry(currentRect);
     }
 }
@@ -223,7 +220,6 @@ void MiniMap::mouseReleaseEvent(QMouseEvent *event)
     adjustGeometry();
 
     if (d->m_relocating) {
-        LOG << "CELANUP";
         qApp->restoreOverrideCursor();
         d->m_relocating = false;
         d->m_opacity->setOpacity(kOpacityRegular);
@@ -302,12 +298,8 @@ MiniMap::Location MiniMap::posToLocation(const QPointF &pos, const QRectF &vpr) 
         { MiniMap::Location::NorthWest, lineLength(vpr.topLeft()) },
     };
 
-    LOG << 1 << distances;
-
     std::sort(std::begin(distances), std::end(distances),
             [](const PosInfo &lhs, const PosInfo &rhs) { return lhs.second < rhs.second; });
-
-    LOG << 2 << distances;
 
     return distances.constFirst().first;
 }
@@ -322,7 +314,6 @@ void MiniMap::followMouse(const QPointF &globalMouse)
 
     const auto newLocation = posToLocation(localMouse, viewportRect);
     setLocation(newLocation);
-    LOG << location();
 
     const QRect &geom = geometry();
     QRect shiftedGeom = stickToEdge(newLocation, geom, MiniMap::Stickiness::Dynamic);
@@ -431,7 +422,6 @@ MiniMap::Location MiniMap::location() const
 void MiniMap::setLocation(MiniMap::Location location)
 {
     if (this->location() != location) {
-        LOG << d->m_location << "--->" << location;
         d->m_location = location;
         shared::SettingsManager::store<int>(
                 shared::SettingsManager::Common::MinimapLocation, static_cast<int>(this->location()));
