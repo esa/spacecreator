@@ -46,7 +46,7 @@ static const QColor kDefaultDimColor { 0x00, 0x00, 0x00, 0x88 };
 static constexpr qreal kDefaultScaleFactor { 6 };
 static const qreal kOpacityRegular { 0.9 };
 static const qreal kOpacityRelocating { 0.5 };
-static const int kRelocatingThreshold { 16 };
+static const int kRelocatingThreshold { 5 };
 static const MiniMap::Location kDefaultLocation { MiniMap::Location::NorthEast };
 
 struct MiniMapPrivate {
@@ -83,7 +83,7 @@ void MiniMap::setupSourceView(QGraphicsView *view)
     Q_ASSERT(view && view->scene());
 
     if (d->m_view) {
-        d->m_view->removeEventFilter(this);
+        d->m_view->viewport()->removeEventFilter(this);
         for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() }) {
             disconnect(scrollBar, &QScrollBar::valueChanged, viewport(), qOverload<>(&QWidget::update));
             disconnect(scrollBar, &QScrollBar::rangeChanged, viewport(), qOverload<>(&QWidget::update));
@@ -95,7 +95,7 @@ void MiniMap::setupSourceView(QGraphicsView *view)
     setParent(view);
 
     if (d->m_view) {
-        d->m_view->installEventFilter(this);
+        d->m_view->viewport()->installEventFilter(this);
         for (auto scrollBar : { d->m_view->verticalScrollBar(), d->m_view->horizontalScrollBar() }) {
             connect(scrollBar, &QScrollBar::valueChanged, viewport(), qOverload<>(&QWidget::update));
             connect(scrollBar, &QScrollBar::rangeChanged, viewport(), qOverload<>(&QWidget::update));
@@ -275,7 +275,7 @@ void MiniMap::drawForeground(QPainter *painter, const QRectF &rect)
 
 bool MiniMap::eventFilter(QObject *object, QEvent *event)
 {
-    if (object == parentWidget() && event->type() == QEvent::Resize) {
+    if (object == d->m_view->viewport() && event->type() == QEvent::Resize) {
         QTimer::singleShot(0, this, &MiniMap::adjustGeometry);
     }
     return QGraphicsView::eventFilter(object, event);
@@ -312,12 +312,12 @@ void MiniMap::followMouse(const QPointF &globalMouse)
     const QPointF &localMouse = viewport->mapFromGlobal(globalMouse);
     const QRectF &viewportRect = viewport->viewport()->rect();
 
-    const auto newLocation = posToLocation(localMouse, viewportRect);
+    const MiniMap::Location &newLocation = posToLocation(localMouse, viewportRect);
     setLocation(newLocation);
 
     const QRect &geom = geometry();
     QRect shiftedGeom = stickToEdge(newLocation, geom, MiniMap::Stickiness::Dynamic);
-    QPoint shiftedCenter = shiftedGeom.center();
+    const QPoint &shiftedCenter = shiftedGeom.center();
     QPoint freeCenter;
 
     switch (location()) {
