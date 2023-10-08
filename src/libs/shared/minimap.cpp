@@ -231,7 +231,7 @@ void MiniMap::drawForeground(QPainter *painter, const QRectF &rect)
 bool MiniMap::eventFilter(QObject *object, QEvent *event)
 {
     if (object == parentWidget() && event->type() == QEvent::Resize) {
-        adjustGeometry();
+        QTimer::singleShot(0, this, &MiniMap::adjustGeometry);
     }
     return QGraphicsView::eventFilter(object, event);
 }
