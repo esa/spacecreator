@@ -36,6 +36,7 @@ public:
         State,
         ColorSchemeFile,
         ShowMinimap,
+        MinimapLocation,
     };
     Q_ENUM(Common)
 

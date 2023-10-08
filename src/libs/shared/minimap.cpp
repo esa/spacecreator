@@ -17,6 +17,7 @@
 
 #include "minimap.h"
 
+#include "settingsmanager.h"
 #include "ui/grippoint.h"
 
 #include <QApplication>
@@ -45,14 +46,15 @@ static const QColor kDefaultDimColor { 0x00, 0x00, 0x00, 0x88 };
 static constexpr qreal kDefaultScaleFactor { 6 };
 static const qreal kOpacityRegular { 0.9 };
 static const qreal kOpacityRelocating { 0.5 };
-static const int kRelocatingThreshold = 16;
+static const int kRelocatingThreshold { 16 };
+static const MiniMap::Location kDefaultLocation { MiniMap::Location::NorthEast };
 
 struct MiniMapPrivate {
     QPointer<QGraphicsView> m_view;
     QColor m_dimColor { kDefaultDimColor };
     QPoint m_mouseStart { kOutOfView };
     QPoint m_mouseFinish { kOutOfView };
-    MiniMap::Location m_location { MiniMap::Location::NorthEast };
+    MiniMap::Location m_location { kDefaultLocation };
     bool m_relocating = false;
     QScopedPointer<QGraphicsOpacityEffect> m_opacity;
 };
@@ -64,6 +66,10 @@ MiniMap::MiniMap(QWidget *parent)
     setOptimizationFlag(QGraphicsView::IndirectPainting);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setMouseTracking(true);
+
+    const int location = shared::SettingsManager::load<int>(
+            shared::SettingsManager::Common::MinimapLocation, static_cast<int>(kDefaultLocation));
+    setLocation(static_cast<MiniMap::Location>(location));
 
     d->m_opacity.reset(new QGraphicsOpacityEffect(this));
     d->m_opacity->setOpacity(kOpacityRegular);
@@ -150,8 +156,8 @@ void MiniMap::adjustGeometry()
         const QSize sceneSize = scene()->sceneRect().size().toSize();
         QRect currentRect { QPoint(0, 0),
             sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatio) };
-        currentRect = stickToEdge(d->m_location, currentRect, MiniMap::Stickiness::Strict);
-        LOG << currentRect << d->m_location;
+        currentRect = stickToEdge(location(), currentRect, MiniMap::Stickiness::Strict);
+        LOG << currentRect << location();
         setGeometry(currentRect);
     }
 }
@@ -314,15 +320,16 @@ void MiniMap::followMouse(const QPointF &globalMouse)
     const QPointF &localMouse = viewport->mapFromGlobal(globalMouse);
     const QRectF &viewportRect = viewport->viewport()->rect();
 
-    d->m_location = posToLocation(localMouse, viewportRect);
-    LOG << d->m_location;
+    const auto newLocation = posToLocation(localMouse, viewportRect);
+    setLocation(newLocation);
+    LOG << location();
 
     const QRect &geom = geometry();
-    QRect shiftedGeom = stickToEdge(d->m_location, geom, MiniMap::Stickiness::Dynamic);
+    QRect shiftedGeom = stickToEdge(newLocation, geom, MiniMap::Stickiness::Dynamic);
     QPoint shiftedCenter = shiftedGeom.center();
     QPoint freeCenter;
 
-    switch (d->m_location) {
+    switch (location()) {
     case MiniMap::Location::North:
     case MiniMap::Location::South: {
         freeCenter = QPoint(localMouse.x(), shiftedCenter.y());
@@ -344,7 +351,7 @@ void MiniMap::followMouse(const QPointF &globalMouse)
     setGeometry(shiftedGeom);
 
     const auto &targetRect =
-            stickToEdge(d->m_location, geom, MiniMap::Stickiness::Strict)
+            stickToEdge(newLocation, geom, MiniMap::Stickiness::Strict)
                     .adjusted(-kRelocatingThreshold, -kRelocatingThreshold, kRelocatingThreshold, kRelocatingThreshold);
     const qreal opacity = targetRect.contains(shiftedGeom) ? kOpacityRegular : kOpacityRelocating;
     d->m_opacity->setOpacity(opacity);
@@ -414,6 +421,21 @@ QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, Min
     }
 
     return shiftedRect;
+}
+
+MiniMap::Location MiniMap::location() const
+{
+    return d->m_location;
+}
+
+void MiniMap::setLocation(MiniMap::Location location)
+{
+    if (this->location() != location) {
+        LOG << d->m_location << "--->" << location;
+        d->m_location = location;
+        shared::SettingsManager::store<int>(
+                shared::SettingsManager::Common::MinimapLocation, static_cast<int>(this->location()));
+    }
 }
 
 } // namespace ui

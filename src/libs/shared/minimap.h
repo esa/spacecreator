@@ -32,7 +32,7 @@ class MiniMap : public QGraphicsView
 {
     Q_OBJECT
 public:
-    enum Location
+    enum class Location
     {
         North = 0,
         NorthEast,
@@ -53,6 +53,9 @@ public:
 
     void setDimColor(const QColor &to);
     QColor dimColor() const;
+
+    MiniMap::Location location() const;
+    void setLocation(MiniMap::Location location);
 
 Q_SIGNALS:
     void visibilityChanged(bool visible);
