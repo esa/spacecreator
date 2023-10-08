@@ -32,6 +32,20 @@ class MiniMap : public QGraphicsView
 {
     Q_OBJECT
 public:
+    enum Location
+    {
+        North = 0,
+        NorthEast,
+        East,
+        SouthEast,
+        South,
+        SouthWest,
+        West,
+        NorthWest,
+    };
+
+    Q_ENUM(Location);
+
     explicit MiniMap(QWidget *parent = nullptr);
     ~MiniMap(); // the definition (even an empty) is necessary for the dptr (std::unique_ptr)
 
@@ -58,14 +72,24 @@ protected:
 
 private:
     void processMouseInput();
-    bool checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const;
+    bool checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started,
+            Qt::KeyboardModifier mod = Qt::NoModifier) const;
     void updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape);
     QRectF mappedViewportOnScene() const;
     void adjustGeometry();
     void updateScaling();
 
-private:
     const std::unique_ptr<MiniMapPrivate> d;
+
+    MiniMap::Location posToLocation(const QPointF &pos, const QRectF &viewport) const;
+    void followMouse(const QPointF &globalPos);
+
+    enum class Stickiness
+    {
+        Strict,
+        Dynamic // follow an edge by mouse movement
+    };
+    QRect stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, MiniMap::Stickiness flow) const;
 };
 
 } // namespace ui

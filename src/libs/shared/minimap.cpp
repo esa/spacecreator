@@ -19,15 +19,18 @@
 
 #include "ui/grippoint.h"
 
+#include <QApplication>
 #include <QCursor>
 #include <QDebug>
 #include <QGraphicsItem>
+#include <QGraphicsOpacityEffect>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPoint>
 #include <QPointer>
+#include <QScopedPointer>
 #include <QScrollBar>
 #include <QTimer>
 #include <QUndoStack>
@@ -35,15 +38,23 @@
 namespace shared {
 namespace ui {
 
+#define LOG qDebug() << Q_FUNC_INFO
+
 static constexpr QPoint kOutOfView { -1, -1 };
 static const QColor kDefaultDimColor { 0x00, 0x00, 0x00, 0x88 };
 static constexpr qreal kDefaultScaleFactor { 6 };
+static const qreal kOpacityRegular { 0.9 };
+static const qreal kOpacityRelocating { 0.5 };
+static const int kRelocatingThreshold = 16;
 
 struct MiniMapPrivate {
     QPointer<QGraphicsView> m_view;
     QColor m_dimColor { kDefaultDimColor };
     QPoint m_mouseStart { kOutOfView };
     QPoint m_mouseFinish { kOutOfView };
+    MiniMap::Location m_location { MiniMap::Location::NorthEast };
+    bool m_relocating = false;
+    QScopedPointer<QGraphicsOpacityEffect> m_opacity;
 };
 
 MiniMap::MiniMap(QWidget *parent)
@@ -53,14 +64,17 @@ MiniMap::MiniMap(QWidget *parent)
     setOptimizationFlag(QGraphicsView::IndirectPainting);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setMouseTracking(true);
+
+    d->m_opacity.reset(new QGraphicsOpacityEffect(this));
+    d->m_opacity->setOpacity(kOpacityRegular);
+    setGraphicsEffect(d->m_opacity.data());
 }
 
 MiniMap::~MiniMap() { }
 
 void MiniMap::setupSourceView(QGraphicsView *view)
 {
-    Q_ASSERT(view);
-    Q_ASSERT(view->scene());
+    Q_ASSERT(view && view->scene());
 
     if (d->m_view) {
         d->m_view->removeEventFilter(this);
@@ -107,9 +121,10 @@ QColor MiniMap::dimColor() const
     return d->m_dimColor;
 }
 
-bool MiniMap::checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started) const
+bool MiniMap::checkMouseEvent(
+        QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started, Qt::KeyboardModifier mod) const
 {
-    return e->button() == current && e->buttons() == started && e->modifiers() == Qt::NoModifier;
+    return e->button() == current && e->buttons() == started && e->modifiers() == mod;
 }
 
 void MiniMap::updateCursorInMappedViewport(const QPoint &pos, Qt::CursorShape targetShape)
@@ -128,12 +143,15 @@ QRectF MiniMap::mappedViewportOnScene() const
 
 void MiniMap::adjustGeometry()
 {
+    LOG << 1;
     if (auto widget = parentWidget()) {
+        LOG << 2;
         const auto parentRect = widget->rect();
         const QSize sceneSize = scene()->sceneRect().size().toSize();
         QRect currentRect { QPoint(0, 0),
             sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatio) };
-        currentRect.moveTopRight(parentRect.topRight());
+        currentRect = stickToEdge(d->m_location, currentRect, MiniMap::Stickiness::Strict);
+        LOG << currentRect << d->m_location;
         setGeometry(currentRect);
     }
 }
@@ -150,10 +168,13 @@ void MiniMap::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
 
+    d->m_relocating = checkMouseEvent(event, Qt::LeftButton, Qt::LeftButton, Qt::ShiftModifier);
+
     if (checkMouseEvent(event, Qt::LeftButton, Qt::LeftButton)) {
         updateCursorInMappedViewport(event->pos(), Qt::ClosedHandCursor);
-
         d->m_mouseStart = event->pos();
+    } else if (d->m_relocating) {
+        qApp->setOverrideCursor(Qt::ClosedHandCursor);
     }
 }
 
@@ -161,26 +182,46 @@ void MiniMap::mouseMoveEvent(QMouseEvent *event)
 {
     QWidget::mouseMoveEvent(event);
 
-    if (checkMouseEvent(event, Qt::NoButton, Qt::NoButton)) {
+    static const Qt::MouseButton mbNone = Qt::NoButton;
+    static const Qt::MouseButton mbLeft = Qt::LeftButton;
+
+    if (checkMouseEvent(event, mbNone, mbNone)) {
         updateCursorInMappedViewport(event->pos(), Qt::OpenHandCursor);
-    } else if (checkMouseEvent(event, Qt::NoButton, Qt::LeftButton)) {
+    } else if (checkMouseEvent(event, mbNone, mbLeft)) {
         d->m_mouseFinish = event->pos();
         processMouseInput();
+    } else if (d->m_relocating) {
+        followMouse(event->globalPosition());
     }
 }
 
 void MiniMap::mouseReleaseEvent(QMouseEvent *event)
 {
     QWidget::mouseReleaseEvent(event);
-    if (checkMouseEvent(event, Qt::LeftButton, Qt::NoButton)) {
+
+    static const Qt::MouseButton mbNone = Qt::NoButton;
+    static const Qt::MouseButton mbLeft = Qt::LeftButton;
+
+    if (checkMouseEvent(event, mbLeft, mbNone)) {
         d->m_mouseFinish = event->pos();
-        processMouseInput();
+        if (!d->m_relocating) {
+            processMouseInput();
+        }
     }
 
     updateCursorInMappedViewport(event->pos(), Qt::OpenHandCursor);
 
     d->m_mouseStart = kOutOfView;
     d->m_mouseFinish = kOutOfView;
+
+    adjustGeometry();
+
+    if (d->m_relocating) {
+        LOG << "CELANUP";
+        qApp->restoreOverrideCursor();
+        d->m_relocating = false;
+        d->m_opacity->setOpacity(kOpacityRegular);
+    }
 }
 
 void MiniMap::processMouseInput()
@@ -209,8 +250,9 @@ void MiniMap::processMouseInput()
 void MiniMap::drawItems(QPainter *painter, int numItems, QGraphicsItem **items, const QStyleOptionGraphicsItem *options)
 {
     for (int idx = 0; idx < numItems; ++idx) {
-        if (items[idx]->type() == GripPoint::Type || !items[idx]->isVisible())
+        if ((items[idx]->type() == GripPoint::Type) || !items[idx]->isVisible()) {
             continue;
+        }
 
         painter->save();
         painter->setTransform(items[idx]->sceneTransform(), true);
@@ -223,7 +265,8 @@ void MiniMap::drawForeground(QPainter *painter, const QRectF &rect)
 {
     QPainterPath dimmedOverlay;
     dimmedOverlay.addRect(rect);
-    dimmedOverlay.addRect(mappedViewportOnScene());
+    const auto &viewportRect = mappedViewportOnScene();
+    dimmedOverlay.addRect(viewportRect);
     painter->setPen(Qt::NoPen);
     painter->fillPath(dimmedOverlay, dimColor());
 }
@@ -234,6 +277,143 @@ bool MiniMap::eventFilter(QObject *object, QEvent *event)
         QTimer::singleShot(0, this, &MiniMap::adjustGeometry);
     }
     return QGraphicsView::eventFilter(object, event);
+}
+
+MiniMap::Location MiniMap::posToLocation(const QPointF &pos, const QRectF &vpr) const
+{
+    auto lineLength = [&pos](const QPointF &end) { return QLineF(pos, end).length(); };
+
+    typedef qreal Distance;
+    typedef QPair<MiniMap::Location, Distance> PosInfo;
+    QVector<PosInfo> distances {
+        { MiniMap::Location::North, lineLength(QPointF(vpr.center().x(), vpr.top())) },
+        { MiniMap::Location::NorthEast, lineLength(vpr.topRight()) },
+        { MiniMap::Location::East, lineLength(QPointF(vpr.right(), vpr.center().y())) },
+        { MiniMap::Location::SouthEast, lineLength(vpr.bottomRight()) },
+        { MiniMap::Location::South, lineLength(QPointF(vpr.center().x(), vpr.bottom())) },
+        { MiniMap::Location::SouthWest, lineLength(vpr.bottomLeft()) },
+        { MiniMap::Location::West, lineLength(QPointF(vpr.left(), vpr.center().y())) },
+        { MiniMap::Location::NorthWest, lineLength(vpr.topLeft()) },
+    };
+
+    LOG << 1 << distances;
+
+    std::sort(std::begin(distances), std::end(distances),
+            [](const PosInfo &lhs, const PosInfo &rhs) { return lhs.second < rhs.second; });
+
+    LOG << 2 << distances;
+
+    return distances.constFirst().first;
+}
+
+void MiniMap::followMouse(const QPointF &globalMouse)
+{
+    auto viewport = qobject_cast<QGraphicsView *>(parentWidget());
+    Q_ASSERT(viewport != nullptr);
+
+    const QPointF &localMouse = viewport->mapFromGlobal(globalMouse);
+    const QRectF &viewportRect = viewport->viewport()->rect();
+
+    d->m_location = posToLocation(localMouse, viewportRect);
+    LOG << d->m_location;
+
+    const QRect &geom = geometry();
+    QRect shiftedGeom = stickToEdge(d->m_location, geom, MiniMap::Stickiness::Dynamic);
+    QPoint shiftedCenter = shiftedGeom.center();
+    QPoint freeCenter;
+
+    switch (d->m_location) {
+    case MiniMap::Location::North:
+    case MiniMap::Location::South: {
+        freeCenter = QPoint(localMouse.x(), shiftedCenter.y());
+        break;
+    }
+    case MiniMap::Location::West:
+    case MiniMap::Location::East: {
+        freeCenter = QPoint(shiftedCenter.x(), localMouse.y());
+        break;
+    }
+    default:
+        break;
+    }
+
+    if (!freeCenter.isNull()) {
+        shiftedGeom.moveCenter(freeCenter);
+    }
+
+    setGeometry(shiftedGeom);
+
+    const auto &targetRect =
+            stickToEdge(d->m_location, geom, MiniMap::Stickiness::Strict)
+                    .adjusted(-kRelocatingThreshold, -kRelocatingThreshold, kRelocatingThreshold, kRelocatingThreshold);
+    const qreal opacity = targetRect.contains(shiftedGeom) ? kOpacityRegular : kOpacityRelocating;
+    d->m_opacity->setOpacity(opacity);
+}
+
+QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, MiniMap::Stickiness flow) const
+{
+    auto viewport = qobject_cast<QGraphicsView *>(parentWidget());
+    Q_ASSERT(viewport != nullptr);
+
+    const QRectF &vpr = viewport->viewport()->rect();
+    const QPoint &vpc = vpr.center().toPoint();
+    const bool isStrict = flow == MiniMap::Stickiness::Strict;
+
+    QRect shiftedRect(srcGeometry);
+    QPoint shiftedCenter;
+
+    switch (edge) {
+    case MiniMap::Location::North: {
+        shiftedRect.moveTop(vpr.top());
+        if (isStrict) {
+            shiftedCenter = QPoint(vpc.x(), shiftedRect.center().y());
+        }
+        break;
+    }
+    case MiniMap::Location::NorthEast: {
+        shiftedRect.moveTopRight(vpr.topRight().toPoint());
+        break;
+    }
+    case MiniMap::Location::East: {
+        shiftedRect.moveRight(vpr.right());
+        if (isStrict) {
+            shiftedCenter = QPoint(shiftedRect.center().x(), vpc.y());
+        }
+        break;
+    }
+    case MiniMap::Location::SouthEast: {
+        shiftedRect.moveBottomRight(vpr.bottomRight().toPoint());
+        break;
+    }
+    case MiniMap::Location::South: {
+        shiftedRect.moveBottom(vpr.bottom());
+        if (isStrict) {
+            shiftedCenter = QPoint(vpc.x(), shiftedRect.center().y());
+        }
+        break;
+    }
+    case MiniMap::Location::SouthWest: {
+        shiftedRect.moveBottomLeft(vpr.bottomLeft().toPoint());
+        break;
+    }
+    case MiniMap::Location::West: {
+        shiftedRect.moveLeft(vpr.left());
+        if (isStrict) {
+            shiftedCenter = QPoint(shiftedRect.center().x(), vpc.y());
+        }
+        break;
+    }
+    case MiniMap::Location::NorthWest: {
+        shiftedRect.moveTopLeft(vpr.topLeft().toPoint());
+        break;
+    }
+    }
+
+    if (!shiftedCenter.isNull()) {
+        shiftedRect.moveCenter(shiftedCenter);
+    }
+
+    return shiftedRect;
 }
 
 } // namespace ui
