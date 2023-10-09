@@ -357,9 +357,7 @@ QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, Min
     switch (edge) {
     case MiniMap::Location::North: {
         shiftedRect.moveTop(vpr.top());
-        if (isStrict) {
-            shiftedCenter = QPoint(vpc.x(), shiftedRect.center().y());
-        }
+        shiftedCenter = QPoint(vpc.x(), shiftedRect.center().y());
         break;
     }
     case MiniMap::Location::NorthEast: {
@@ -368,9 +366,7 @@ QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, Min
     }
     case MiniMap::Location::East: {
         shiftedRect.moveRight(vpr.right());
-        if (isStrict) {
-            shiftedCenter = QPoint(shiftedRect.center().x(), vpc.y());
-        }
+        shiftedCenter = QPoint(shiftedRect.center().x(), vpc.y());
         break;
     }
     case MiniMap::Location::SouthEast: {
@@ -379,9 +375,7 @@ QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, Min
     }
     case MiniMap::Location::South: {
         shiftedRect.moveBottom(vpr.bottom());
-        if (isStrict) {
-            shiftedCenter = QPoint(vpc.x(), shiftedRect.center().y());
-        }
+        shiftedCenter = QPoint(vpc.x(), shiftedRect.center().y());
         break;
     }
     case MiniMap::Location::SouthWest: {
@@ -390,9 +384,7 @@ QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, Min
     }
     case MiniMap::Location::West: {
         shiftedRect.moveLeft(vpr.left());
-        if (isStrict) {
-            shiftedCenter = QPoint(shiftedRect.center().x(), vpc.y());
-        }
+        shiftedCenter = QPoint(shiftedRect.center().x(), vpc.y());
         break;
     }
     case MiniMap::Location::NorthWest: {
@@ -401,7 +393,7 @@ QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, Min
     }
     }
 
-    if (!shiftedCenter.isNull()) {
+    if (!shiftedCenter.isNull() && isStrict) {
         shiftedRect.moveCenter(shiftedCenter);
     }
 
