@@ -136,6 +136,11 @@ QString IVConnection::targetInterfaceName() const
     return targetInterface() ? targetInterface()->title() : QString();
 }
 
+void IVConnection::setData(IVInterface *ifaceSource, IVInterface *ifaceTarget)
+{
+    d->setData(ifaceSource, ifaceTarget);
+}
+
 void IVConnection::setInheritPI()
 {
     if (isOneDirection())

@@ -287,6 +287,22 @@ bool IVFunctionType::hasInterface(const QString &name, Qt::CaseSensitivity caseS
     return false;
 }
 
+IVInterface* IVFunctionType::getInterfaceByName(const QString &name, Qt::CaseSensitivity caseSensitivity) const
+{
+    for (auto i : qAsConst(d->m_pis)) {
+        if (name.compare(i->title(), caseSensitivity) == 0) {
+            return i;
+        }
+    }
+    for (auto i : qAsConst(d->m_ris)) {
+        if (name.compare(i->title(), caseSensitivity) == 0) {
+            return i;
+        }
+    }
+
+    return nullptr;
+}
+
 QVector<shared::ContextParameter> IVFunctionType::contextParams() const
 {
     return d->m_contextParams;

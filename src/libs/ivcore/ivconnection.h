@@ -49,6 +49,8 @@ public:
     QString targetInterfaceName() const;
     IVInterface *targetInterface() const;
 
+    void setData(IVInterface *ifaceSource, IVInterface *ifaceTarget);
+
     void setInheritPI();
     void unsetInheritPI();
 

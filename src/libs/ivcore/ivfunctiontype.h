@@ -63,6 +63,7 @@ public:
     void setArchetypeReferences(QVector<IVArchetypeReference *> references);
     bool hasNestedChildren() const;
     bool hasInterface(const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
+    IVInterface* getInterfaceByName(const QString &name, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive) const;
 
     QVector<shared::ContextParameter> contextParams() const;
     shared::ContextParameter contextParam(const QString &name) const;

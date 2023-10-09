@@ -30,6 +30,9 @@ add_subdirectory(csv)
 # TestDriver generator
 add_subdirectory(testgenerator)
 
+# IvMerger
+add_subdirectory(ivmerger)
+
 # conversion
 add_subdirectory(conversion)
 add_subdirectory(seds)

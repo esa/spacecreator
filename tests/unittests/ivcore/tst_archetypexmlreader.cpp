@@ -26,7 +26,6 @@
 #include "archetypes/layerarchetype.h"
 
 #include <QBuffer>
-#include <QSignalSpy>
 #include <QtTest>
 
 class tst_ArchetypeXMLReader : public QObject
