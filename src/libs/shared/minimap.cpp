@@ -149,8 +149,8 @@ QRectF MiniMap::mappedViewportOnScene() const
 
 void MiniMap::adjustGeometry()
 {
-    if (auto widget = parentWidget()) {
-        const auto parentRect = widget->rect();
+    if (d->m_view) {
+        const auto parentRect = d->m_view->rect();
         const QSize sceneSize = scene()->sceneRect().size().toSize();
         QRect currentRect { QPoint(0, 0),
             sceneSize.scaled(parentRect.size() / kDefaultScaleFactor, Qt::KeepAspectRatio) };
@@ -202,10 +202,7 @@ void MiniMap::mouseReleaseEvent(QMouseEvent *event)
 {
     QWidget::mouseReleaseEvent(event);
 
-    static const Qt::MouseButton mbNone = Qt::NoButton;
-    static const Qt::MouseButton mbLeft = Qt::LeftButton;
-
-    if (checkMouseEvent(event, mbLeft, mbNone)) {
+    if (checkMouseEvent(event, Qt::LeftButton, Qt::NoButton)) {
         d->m_mouseFinish = event->pos();
         if (!d->m_relocating) {
             processMouseInput();
@@ -252,7 +249,7 @@ void MiniMap::processMouseInput()
 void MiniMap::drawItems(QPainter *painter, int numItems, QGraphicsItem **items, const QStyleOptionGraphicsItem *options)
 {
     for (int idx = 0; idx < numItems; ++idx) {
-        if ((items[idx]->type() == GripPoint::Type) || !items[idx]->isVisible()) {
+        if (items[idx]->type() == GripPoint::Type || !items[idx]->isVisible()) {
             continue;
         }
 
@@ -267,15 +264,15 @@ void MiniMap::drawForeground(QPainter *painter, const QRectF &rect)
 {
     QPainterPath dimmedOverlay;
     dimmedOverlay.addRect(rect);
-    const auto &viewportRect = mappedViewportOnScene();
-    dimmedOverlay.addRect(viewportRect);
+    dimmedOverlay.addRect(mappedViewportOnScene());
     painter->setPen(Qt::NoPen);
     painter->fillPath(dimmedOverlay, dimColor());
 }
 
 bool MiniMap::eventFilter(QObject *object, QEvent *event)
 {
-    if (object == d->m_view->viewport() && event->type() == QEvent::Resize) {
+    const bool hasViewport = d->m_view && d->m_view->viewport();
+    if (hasViewport && object == d->m_view->viewport() && event->type() == QEvent::Resize) {
         QTimer::singleShot(0, this, &MiniMap::adjustGeometry);
     }
     return QGraphicsView::eventFilter(object, event);
@@ -306,7 +303,7 @@ MiniMap::Location MiniMap::posToLocation(const QPointF &pos, const QRectF &vpr) 
 
 void MiniMap::followMouse(const QPointF &globalMouse)
 {
-    auto viewport = qobject_cast<QGraphicsView *>(parentWidget());
+    auto viewport = d->m_view;
     Q_ASSERT(viewport != nullptr);
 
     const QPointF &localMouse = viewport->mapFromGlobal(globalMouse);
@@ -350,7 +347,7 @@ void MiniMap::followMouse(const QPointF &globalMouse)
 
 QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, MiniMap::Stickiness flow) const
 {
-    auto viewport = qobject_cast<QGraphicsView *>(parentWidget());
+    auto viewport = d->m_view;
     Q_ASSERT(viewport != nullptr);
 
     const QRectF &vpr = viewport->viewport()->rect();

@@ -90,7 +90,7 @@ private:
     enum class Stickiness
     {
         Strict,
-        Dynamic // follow an edge by mouse movement
+        Dynamic, // follow an edge by mouse movement
     };
     QRect stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, MiniMap::Stickiness flow) const;
 };
