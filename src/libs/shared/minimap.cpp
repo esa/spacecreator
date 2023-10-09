@@ -185,12 +185,9 @@ void MiniMap::mouseMoveEvent(QMouseEvent *event)
 {
     QWidget::mouseMoveEvent(event);
 
-    static const Qt::MouseButton mbNone = Qt::NoButton;
-    static const Qt::MouseButton mbLeft = Qt::LeftButton;
-
-    if (checkMouseEvent(event, mbNone, mbNone)) {
+    if (checkMouseEvent(event, Qt::NoButton, Qt::NoButton)) {
         updateCursorInMappedViewport(event->pos(), Qt::OpenHandCursor);
-    } else if (checkMouseEvent(event, mbNone, mbLeft)) {
+    } else if (checkMouseEvent(event, Qt::NoButton, Qt::LeftButton)) {
         d->m_mouseFinish = event->pos();
         processMouseInput();
     } else if (d->m_relocating) {
