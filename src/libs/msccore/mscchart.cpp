@@ -752,7 +752,8 @@ bool MscChart::moveEvent(MscInstanceEvent *event, ChartIndexList indices)
     for (auto it = indices.begin(); it != indices.end(); ++it) {
         QVector<MscInstanceEvent *> &instanceList = m_events[it->instance()];
         instanceList.removeAll(event);
-        instanceList.insert(it->index(), event);
+        const int idx = qBound(0, it->index(), static_cast<int>(instanceList.size()));
+        instanceList.insert(idx, event);
     }
 
     return true;
