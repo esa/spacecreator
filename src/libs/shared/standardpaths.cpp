@@ -17,6 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "standardpaths.h"
 
+#include <QCoreApplication>
+#include <QDir>
 #include <QFileInfo>
 
 namespace shared {
@@ -40,7 +42,13 @@ QString StandardPaths::writableLocation(QStandardPaths::StandardLocation type)
     }
 
     // Fallback
-    return QStandardPaths::writableLocation(type);
+    QString result = QStandardPaths::writableLocation(type);
+    if (m_testMode) {
+        if (!result.endsWith(qApp->applicationName())) {
+            result = QString("%1%2%3").arg(result, QDir::separator(), qApp->applicationName());
+        }
+    }
+    return result;
 }
 
 /**

@@ -25,8 +25,8 @@ Requires aqt to be installed. (pip3 install aqtinstall).
 Installing Qt 5.12.12 with QtCreator 4.8.2:
 python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv5 --qt_version=5.12.12 --qtcreator_version=4.8.2
 
-Installing Qt 6.4.1 with QtCreator 9.0.0:
-python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6.4.1 --qtcreator_version=9.0.0
+Installing Qt 6.4.3 with QtCreator 11.0.3:
+python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6.4.3 --qtcreator_version=11.0.3
 
 
 '''

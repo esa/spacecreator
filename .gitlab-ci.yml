@@ -36,13 +36,13 @@ spacecreator-master:
   stage: build-test-bundle
   variables:
     PROJECT_DIR: $CI_PROJECT_DIR
-    ENV_QT_VERSION: 6.4.1
-    ENV_QTC_VERSION: 9.0.0
+    ENV_QT_VERSION: 6.4.3
+    ENV_QTC_VERSION: 11.0.3
     ENV_DIR: /opt/spacecreator6
     APP_DIR: $ENV_DIR/spacecreator.AppDir
     ENV_QT_BASE_DIR: $ENV_DIR/Qt/$ENV_QT_VERSION/gcc_64
     BUILD_DIR: $CI_PROJECT_DIR/spacecreator_build_qt6
-    DOWNLOAD_DIR: $CI_PROJECT_DIR/downloads9
+    DOWNLOAD_DIR: $CI_PROJECT_DIR/downloads11
   script:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc. and build space creator
     - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
@@ -77,13 +77,13 @@ spacecreator-feature:
   stage: build-test
   variables:
     PROJECT_DIR: $CI_PROJECT_DIR
-    ENV_QT_VERSION: 6.4.1
-    ENV_QTC_VERSION: 9.0.0
+    ENV_QT_VERSION: 6.4.3
+    ENV_QTC_VERSION: 11.0.3
     ENV_DIR: /opt/spacecreator6
     APP_DIR: $ENV_DIR/spacecreator.AppDir
     ENV_QT_BASE_DIR: $ENV_DIR/Qt/$ENV_QT_VERSION/gcc_64
     BUILD_DIR: $CI_PROJECT_DIR/spacecreator_build_qt6
-    DOWNLOAD_DIR: $CI_PROJECT_DIR/downloads9
+    DOWNLOAD_DIR: $CI_PROJECT_DIR/downloads11
   script:
     # pre build: create build environment containing Qt with Grantlee, QtCreator with dev files, etc. and build space creator
     - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR

@@ -17,13 +17,16 @@
 
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
+#include "iveditor.h"
 #include "ivfunction.h"
-#include "ui/textitem.h"
+#include "ivlibrary.h"
+#include "standardpaths.h"
 #include "ui/resizelimits.h"
+#include "ui/textitem.h"
 
-#include <QtTest>
-#include <QGraphicsScene>
 #include <QFontDatabase>
+#include <QGraphicsScene>
+#include <QtTest>
 
 using namespace shared::ui;
 using namespace ive;
@@ -94,6 +97,10 @@ public:
     , m_entity(FunctionMock())
     , m_rectangularGraphicsItem(new FunctionGraphicsItem(&m_entity))
     {
+        shared::StandardPaths::setTestModeEnabled(true);
+        ivm::initIVLibrary();
+        ive::initIVEditor();
+
         m_scene.addItem(m_rectangularGraphicsItem);
     }
 

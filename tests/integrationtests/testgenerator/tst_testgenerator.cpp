@@ -19,9 +19,11 @@
 
 #include <QObject>
 #include <QTest>
+#include <ivlibrary.h>
 #include <ivtools.h>
 #include <modelloader.h>
 #include <qtestcase.h>
+#include <sharedlibrary.h>
 #include <standardpaths.h>
 #include <testgenerator.h>
 
@@ -52,6 +54,8 @@ private Q_SLOTS:
 void tst_testgenerator::initTestCase()
 {
     shared::StandardPaths::setTestModeEnabled(true);
+    ivm::initIVLibrary();
+    shared::initSharedLibrary();
 }
 
 void tst_testgenerator::testPrepareTestHarness()

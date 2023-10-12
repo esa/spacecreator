@@ -65,7 +65,7 @@
 
       vars:
             qt_extra_modules: " --modules qtwebsockets qt5compat"
-            qtc_short_version: "{{ qtc_version[:3] }}" #expected format 'X.Y.Z'
+            qtc_short_version: "{{ qtc_version.split('.')[0]+'.'+qtc_version.split('.')[1] }}" #expected format 'X.Y.Z'
             qtc_base_url: "https://download.qt.io/official_releases/qtcreator/{{ qtc_short_version }}/{{ qtc_version }}/installer_source/linux_x64/"
             qtc_bin_url: "{{ qtc_base_url }}qtcreator.7z"
             qtc_dev_url: "{{ qtc_base_url }}qtcreator_dev.7z"

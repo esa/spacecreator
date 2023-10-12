@@ -15,7 +15,7 @@ python3 ./scripts/build_spacecreator.py
     --project_dir ~/projects/spacecreator
     --build_dir ~/projects/spacecreator/build
     --env_dir ~/opt/spacecreatorenv6
-    --env_qt_dir ~/opt/spacecreatorenv6/Qt/6.4.1/gcc_64/
+    --env_qt_dir ~/opt/spacecreatorenv6/Qt/6.4.3/gcc_64/
 """
 
 
