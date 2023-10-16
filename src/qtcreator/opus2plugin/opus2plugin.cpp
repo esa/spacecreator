@@ -49,6 +49,21 @@ void Opus2Plugin::addOpus2Option()
     //connect(csvImportAction, &QAction::triggered, [this]() { selectBoardDialog(); });
     Core::Command *const runPopulationTool = Core::ActionManager::registerAction(runPopulationToolAction, Constants::RUN_POPULATION_TOOL_ID, allContexts);
     acToolsOpus2->addAction(runPopulationTool);
+
+    const auto runTailoringToolAction = new QAction(tr("Tailoring tool"), this);
+    //connect(csvImportAction, &QAction::triggered, [this]() { selectBoardDialog(); });
+    Core::Command *const runTailoringTool = Core::ActionManager::registerAction(runTailoringToolAction, Constants::RUN_TAILORING_TOOL_ID, allContexts);
+    acToolsOpus2->addAction(runTailoringTool);
+
+    const auto runDocumentGeneratorAction = new QAction(tr("Document generator"), this);
+    //connect(csvImportAction, &QAction::triggered, [this]() { selectBoardDialog(); });
+    Core::Command *const runDocumentGenerator = Core::ActionManager::registerAction(runDocumentGeneratorAction, Constants::RUN_DOCUMENT_GENERATOR_ID, allContexts);
+    acToolsOpus2->addAction(runDocumentGenerator);
+
+    const auto runFrontendGeneratorAction = new QAction(tr("Frontend generator"), this);
+    //connect(csvImportAction, &QAction::triggered, [this]() { selectBoardDialog(); });
+    Core::Command *const runFrontendGenerator = Core::ActionManager::registerAction(runFrontendGeneratorAction, Constants::RUN_FRONTEND_GENERATOR_ID, allContexts);
+    acToolsOpus2->addAction(runFrontendGenerator);
 }
 
 void Opus2Plugin::extensionsInitialized()
