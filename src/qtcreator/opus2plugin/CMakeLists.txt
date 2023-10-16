@@ -7,7 +7,7 @@ set(OPUS2_PLUGIN_SOURCES
     opus2plugin.cpp
 )
 
-set(DG_QTC_LIBRARIES
+set(OPUS2_QTC_LIBRARIES
     -L"${QTC_LIB_DIR}"
     -L"${QTC_PLUGINS_DIR}"
     Aggregation
@@ -15,7 +15,7 @@ set(DG_QTC_LIBRARIES
     Utils
 )
 
-set(DG_QTC_PLUGINS
+set(OPUS2_QTC_PLUGINS
     Core
     ProjectExplorer
     QtSupport
@@ -34,9 +34,9 @@ add_qtc_plugin(${PLUGIN_NAME}
             ${QT_CORE}
             ${QT_GUI}
             ${QT_WIDGETS}
-            ${DG_QTC_LIBRARIES}
-            ${DG_QTC_PLUGINS}
-    PLUGIN_DEPENDS ${DG_QTC_PLUGINS}
+            ${OPUS2_QTC_LIBRARIES}
+            ${OPUS2_QTC_PLUGINS}
+    PLUGIN_DEPENDS ${OPUS2_QTC_PLUGINS}
     SOURCES ${OPUS2_PLUGIN_SOURCES}
 )
 
@@ -45,7 +45,5 @@ target_include_directories(${PLUGIN_NAME}
     PRIVATE ${QTC_SOURCE_DIR}/src/libs
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins
     PRIVATE ${QTC_SOURCE_DIR}/src/plugins/coreplugin
+    PRIVATE ${QTC_SOURCE_DIR}/src/plugins/projectexplorer
 )
-
-source_group("Designer Files" REGULAR_EXPRESSION ".*.ui$")
-source_group("Resource Files" REGULAR_EXPRESSION ".*.qrc$")
