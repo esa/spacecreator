@@ -11,7 +11,7 @@ default:
     # dependencies
     - apt install -y  build-essential git g++ cmake cmake-data ninja-build make gcovr lcov ccache cccc doxygen graphviz zip p7zip curl wget default-jre uuid-dev pkg-config fuse python3-pip clang-format spin python3-pygraphviz python3-singledispatch python3-stringtemplate3 python3-pexpect ansible
     # install modified xmldiff
-    - pip3 install git+https://github.com/Shoobx/xmldiff
+    - pip3 install git+https://github.com/Shoobx/xmldiff@2.6.3
     # install OpenGEODE dependencies
     # *Python (both for OpenGEODE and sdl2promela)
     - pip3 install black==21.10b0 multipledispatch pyside6 pytest py7zr aqtinstall GitPython
