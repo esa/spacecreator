@@ -16,7 +16,7 @@
 */
 
 #include "commands/cmdfunctionimplementationremove.h"
-#include "commands/implementationshandler.h"
+#include "implementationshandler.h"
 #include "ivcommonprops.h"
 #include "iveditor.h"
 #include "ivfunction.h"

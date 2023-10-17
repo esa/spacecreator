@@ -49,6 +49,16 @@ public:
     QString implementationBasePath(const QString &name, const QString &functionName = "") const;
     QString implementationPath(const QString &name, const QString &language, const QString &functionName = "") const;
 
+    /**
+     * Returns the filename of the project file for the functions implementation. Does not contains the path.
+     */
+    static QString projectFilename(const QString &functionName);
+
+    /**
+     * Returns the directory name for the functions implementation. Does not contains the path.
+     */
+    static QString implementationDirectory(const QString &functionName);
+
 private:
     bool moveDefaultDirectories(const QString &currentImplName, const QString &language);
 

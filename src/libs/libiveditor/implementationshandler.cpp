@@ -31,6 +31,8 @@
 
 namespace ive {
 
+static const QString projectSuffix { "pro" };
+
 ImplementationsHandler::ImplementationsHandler(const QString &projectPath, ivm::IVFunctionType *entity)
     : m_projectPath(projectPath)
     , m_function(entity)
@@ -147,6 +149,16 @@ QString ImplementationsHandler::implementationPath(
 {
     const QString languageDir = ivm::IVPropertyTemplateConfig::instance()->languageDirectory(language);
     return implementationBasePath(name, functionName) + QDir::separator() + languageDir;
+}
+
+QString ImplementationsHandler::projectFilename(const QString &functionName)
+{
+    return QString("%1.%2").arg(functionName.toLower(), projectSuffix);
+}
+
+QString ImplementationsHandler::implementationDirectory(const QString &functionName)
+{
+    return functionName.toLower();
 }
 
 bool ImplementationsHandler::moveDefaultDirectories(const QString &currentImplName, const QString &language)

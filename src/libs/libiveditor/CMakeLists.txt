@@ -3,9 +3,16 @@ set(LIB_NAME libiveditor)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    archetypesmanagerdialog.cpp
+    archetypesmanagerdialog.h
+    archetypesmanagerdialog.ui
+    archetypesmanagermodel.cpp
+    archetypesmanagermodel.h
     asn1dialog.cpp
     asn1dialog.h
     asn1dialog.ui
+    commands/cmdarchetypelibraryapply.cpp
+    commands/cmdarchetypelibraryapply.h
     commands/cmdchangeasn1file.cpp
     commands/cmdchangeasn1file.h
     commands/cmdchangelayervisibility.cpp
@@ -36,20 +43,18 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdentitiesremove.h
     commands/cmdfunctionarchetypesapply.cpp
     commands/cmdfunctionarchetypesapply.h
-    commands/cmdarchetypelibraryapply.cpp
-    commands/cmdarchetypelibraryapply.h
     commands/cmdfunctionattrchange.cpp
     commands/cmdfunctionattrchange.h
     commands/cmdfunctionimplementationdefaultchange.cpp
     commands/cmdfunctionimplementationdefaultchange.h
-    commands/cmdfunctionitemcreate.cpp
-    commands/cmdfunctionitemcreate.h
     commands/cmdfunctionimplementationinsert.cpp
     commands/cmdfunctionimplementationinsert.h
     commands/cmdfunctionimplementationremove.cpp
     commands/cmdfunctionimplementationremove.h
     commands/cmdfunctionimplementationupdate.cpp
     commands/cmdfunctionimplementationupdate.h
+    commands/cmdfunctionitemcreate.cpp
+    commands/cmdfunctionitemcreate.h
     commands/cmdfunctiontypeitemcreate.cpp
     commands/cmdfunctiontypeitemcreate.h
     commands/cmdifaceattrchange.cpp
@@ -72,13 +77,15 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdrequiredifacepropertychange.h
     commands/cmdrootentitychange.cpp
     commands/cmdrootentitychange.h
+    commands/commandids.h
     commands/componentimporthelper.cpp
     commands/componentimporthelper.h
-    commands/commandids.h
-    commands/implementationshandler.cpp
-    commands/implementationshandler.h
     commandsstack.cpp
     commandsstack.h
+    config/ivlibrarydialog.cpp
+    config/ivlibrarydialog.h
+    config/ivlibrarywidget.cpp
+    config/ivlibrarywidget.h
     context/action/action.cpp
     context/action/action.h
     context/action/actionsmanager.cpp
@@ -106,11 +113,8 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/extprocmonitor.h
     createconnectiongroupdialog.cpp
     createconnectiongroupdialog.h
-    archetypesmanagerdialog.cpp
-    archetypesmanagerdialog.h
-    archetypesmanagerdialog.ui
-    archetypesmanagermodel.cpp
-    archetypesmanagermodel.h
+    endtoend/end2endfunctiongraphicsitem.cpp
+    endtoend/end2endfunctiongraphicsitem.h
     endtoend/endtoendconnections.cpp
     endtoend/endtoendconnections.h
     endtoend/endtoendview.cpp
@@ -118,21 +122,8 @@ target_sources(${LIB_NAME} PRIVATE
     endtoend/endtoendview.ui
     endtoend/leafdocumentsmodel.cpp
     endtoend/leafdocumentsmodel.h
-    modelchecking/modelcheckingwindow.cpp
-    modelchecking/modelcheckingwindow.h
-    modelchecking/modelcheckingwindow.ui
-    modelchecking/spinconfigsaver.h
-    modelchecking/spinconfigsaver.cpp
-    modelchecking/xmelwriter.h
-    modelchecking/xmelwriter.cpp
-    modelchecking/xmelreader.h
-    modelchecking/xmelreader.cpp
-    modelchecking/spinrundialog.h
-    modelchecking/spinrundialog.cpp
-    modelchecking/spinrunworker.h
-    modelchecking/spinrunworker.cpp
-    endtoend/end2endfunctiongraphicsitem.cpp
-    endtoend/end2endfunctiongraphicsitem.h
+    implementationshandler.cpp
+    implementationshandler.h
     interfacedocument.cpp
     interfacedocument.h
     itemeditor/common/ivutils.cpp
@@ -161,8 +152,6 @@ target_sources(${LIB_NAME} PRIVATE
     itemeditor/ivinterfacegroupgraphicsitem.h
     itemeditor/ivitemmodel.cpp
     itemeditor/ivitemmodel.h
-    remotecontrol/remotecontrolhandler.cpp
-    remotecontrol/remotecontrolhandler.h
     ivappwidget.cpp
     ivappwidget.h
     ivappwidget.ui
@@ -187,6 +176,24 @@ target_sources(${LIB_NAME} PRIVATE
     ivvisualizationmodelbase.h
     miniviewrenderer.cpp
     miniviewrenderer.h
+    modelchecking/modelcheckingwindow.cpp
+    modelchecking/modelcheckingwindow.h
+    modelchecking/modelcheckingwindow.ui
+    modelchecking/spinconfigsaver.cpp
+    modelchecking/spinconfigsaver.h
+    modelchecking/spinrundialog.cpp
+    modelchecking/spinrundialog.h
+    modelchecking/spinrunworker.cpp
+    modelchecking/spinrunworker.h
+    modelchecking/xmelreader.cpp
+    modelchecking/xmelreader.h
+    modelchecking/xmelwriter.cpp
+    modelchecking/xmelwriter.h
+    properties/archetypeswidget.cpp
+    properties/archetypeswidget.h
+    properties/archetypeswidget.ui
+    properties/archetypeswidgetmodel.cpp
+    properties/archetypeswidgetmodel.h
     properties/contextparametersmodel.cpp
     properties/contextparametersmodel.h
     properties/delegates/asn1valuedelegate.cpp
@@ -197,11 +204,6 @@ target_sources(${LIB_NAME} PRIVATE
     properties/delegates/filedialogdelegate.h
     properties/delegates/ivattributedelegate.cpp
     properties/delegates/ivattributedelegate.h
-    properties/archetypeswidgetmodel.cpp
-    properties/archetypeswidgetmodel.h
-    properties/archetypeswidget.cpp
-    properties/archetypeswidget.h
-    properties/archetypeswidget.ui
     properties/ifaceparametersmodel.cpp
     properties/ifaceparametersmodel.h
     properties/implementationsmodel.cpp
@@ -217,12 +219,10 @@ target_sources(${LIB_NAME} PRIVATE
     properties/ivpropertiesview.h
     properties/qivnamevalidator.cpp
     properties/qivnamevalidator.h
+    remotecontrol/remotecontrolhandler.cpp
+    remotecontrol/remotecontrolhandler.h
     zoomcontroller.cpp
     zoomcontroller.h
-    config/ivlibrarywidget.cpp
-    config/ivlibrarywidget.h
-    config/ivlibrarydialog.cpp
-    config/ivlibrarydialog.h
     )
 
 target_link_libraries(${LIB_NAME}

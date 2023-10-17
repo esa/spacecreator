@@ -21,6 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "commands/cmdifaceattrchange.h"
 #include "common.h"
 #include "diskutils.h"
+#include "implementationshandler.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
@@ -29,12 +30,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "spacecreatorproject.h"
 
 #include <QDir>
+#include <QDirIterator>
 #include <QMessageBox>
 #include <algorithm>
 
 namespace scs {
-
-static const QByteArray dotPro(".pro");
 
 IVRefactorHandler::IVRefactorHandler(QObject *parent)
     : QObject { parent }
@@ -194,10 +194,11 @@ void IVRefactorHandler::onIVFunctionNameChanged(
     const QString implPath = implementationBasePath();
     if (!implPath.isEmpty()) {
         // Rename all functions .pro file
-        const QString oldDiscName = oldName.toLower();
-        const QString newDiscName = func->title().toLower();
-        shared::QMakeFile::renameDirectory(
-                shared::joinedPath(implementationBasePath(), "taste.pro"), oldDiscName, newDiscName);
+        const QString projectFile = shared::joinedPath(implementationBasePath(), "taste.pro");
+        shared::QMakeFile::renameFileName(projectFile, { ive::ImplementationsHandler::projectFilename(oldName) },
+                { ive::ImplementationsHandler::projectFilename(func->title()) });
+        shared::QMakeFile::renameDirectory(projectFile, ive::ImplementationsHandler::implementationDirectory(oldName),
+                ive::ImplementationsHandler::implementationDirectory(func->title()));
     }
 }
 
@@ -231,21 +232,28 @@ void IVRefactorHandler::renameImplementationDirectory(const QString &oldName, co
     if (m_refactors.isEmpty()) {
         return;
     }
-    const QString oldDiscName = oldName.toLower();
-    const QString newDiscName = newName.toLower();
+    const QString oldDiscName = ive::ImplementationsHandler::implementationDirectory(oldName);
+    const QString newDiscName = ive::ImplementationsHandler::implementationDirectory(newName);
     const QString implPath = implementationBasePath();
     const QString source = shared::joinedPath(implPath, oldDiscName);
     const QString target = shared::joinedPath(implPath, newDiscName);
+
     shared::moveDir(source, target);
 
-    // Rename pro - file
-    const QString oldProFile = shared::filePath(target, oldDiscName, dotPro);
-    const QString newProFile = shared::filePath(target, newDiscName, dotPro);
-    QFile proFile(oldProFile);
-    proFile.rename(newProFile);
+    // Rename pro - file(s)
+    QDirIterator it(implPath, { ive::ImplementationsHandler::projectFilename(oldName) }, QDir::Files,
+            QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QString filePath = it.next();
+        QFileInfo fi(filePath);
+        const QString newProFile =
+                QString("%1/%2").arg(fi.absolutePath(), ive::ImplementationsHandler::projectFilename(newName));
+        QFile proFile(filePath);
+        proFile.rename(newProFile);
 
-    // Rename content of function .pro files
-    shared::QMakeFile::renameDirectory(newProFile, oldDiscName, newDiscName);
+        // Rename content of function .pro files
+        shared::QMakeFile::renameDirectory(newProFile, oldDiscName, newDiscName);
+    }
 }
 
 QString IVRefactorHandler::implementationBasePath() const

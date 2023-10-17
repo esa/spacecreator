@@ -18,6 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "replacerefactorbase.h"
 
 #include "common.h"
+#include "implementationshandler.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "qmakefile.h"
@@ -60,7 +61,7 @@ void ReplaceRefactorBase::onIVFunctionRenamed(
 {
     Q_ASSERT(func);
 
-    // Update file contens
+    // Update file contents
     const QStringList implFiles = codeFilePaths(oldName);
     const QList<QByteArray> oldTexts = functionsTextsToReplace(oldName);
     const QList<QByteArray> newTexts = functionsTextsToReplace(newName);
@@ -89,13 +90,15 @@ void ReplaceRefactorBase::onIVFunctionRenamed(
                 Utils::FilePath::fromString(fi.absoluteFilePath()), Utils::FilePath::fromString(newFileName));
     }
 
-    // rename file in .pro file
+    // rename file in .pro file(s)
+    const QStringList oldImplFiles = implementationFileNames(oldName);
+    const QStringList newImplFiles = implementationFileNames(newName);
     const QString implPath =
             m_storage->projectPath() + QDir::separator() + shared::kRootImplementationPath + QDir::separator();
-    const QString prFilePath = implPath + oldName.toLower() + QDir::separator() + oldName.toLower() + ".pro";
-    if (QFileInfo::exists(prFilePath)) {
-        const QStringList oldImplFiles = implementationFileNames(oldName);
-        const QStringList newImplFiles = implementationFileNames(newName);
+    QDirIterator it(implPath, { ive::ImplementationsHandler::projectFilename(oldName) }, QDir::Files,
+            QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QString prFilePath = it.next();
         for (int i = 0; i < newImplFiles.size(); ++i) {
             shared::QMakeFile::renameFileName(prFilePath, oldImplFiles[i], newImplFiles[i]);
         }

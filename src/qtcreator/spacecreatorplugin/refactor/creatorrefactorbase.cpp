@@ -17,8 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "creatorrefactorbase.h"
 
-#include "commands/implementationshandler.h"
 #include "errorhub.h"
+#include "implementationshandler.h"
 #include "ivfunction.h"
 #include "ivinterface.h"
 #include "spacecreatorproject.h"
