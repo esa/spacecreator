@@ -39,6 +39,14 @@ bool Opus2Plugin::initialize(const QStringList &arguments, QString *errorString)
 
     addOpus2Menu();
 
+#if QTC_VERSION >= 1100
+    connect(ProjectExplorer::ProjectManager::instance(), &ProjectExplorer::ProjectManager::startupProjectChanged, this,
+            &Opus2Plugin::initializeProjectInfo);
+#else
+    connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::startupProjectChanged, this,
+            &Opus2Plugin::initializeProjectInfo);
+#endif
+
     return true;
 }
 
@@ -78,14 +86,6 @@ void Opus2Plugin::addOpus2Menu()
     Core::Command *const runFrontendGenerator = Core::ActionManager::registerAction(
             runFrontendGeneratorAction, Constants::RUN_FRONTEND_GENERATOR_ID, allContexts);
     acToolsOpus2->addAction(runFrontendGenerator);
-
-#if QTC_VERSION >= 1100
-    connect(ProjectExplorer::ProjectManager::instance(), &ProjectExplorer::ProjectManager::startupProjectChanged, this,
-            &Opus2Plugin::initializeProjectInfo);
-#else
-    connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::startupProjectChanged, this,
-            &Opus2Plugin::initializeProjectInfo);
-#endif
 }
 
 void Opus2Plugin::runPopulationTool()
