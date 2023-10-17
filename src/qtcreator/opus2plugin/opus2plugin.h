@@ -27,7 +27,7 @@ private:
     void runDocumentGenerator();
     void runFrontendGenerator();
     void initializeOpus2Model();
-    void onActiveProjectChanged(ProjectExplorer::Project *project);
+    void initializeProjectInfo(ProjectExplorer::Project *project);
 
 private:
     const QString m_opus2ModelFileName = "opus2_model.xml";
@@ -36,6 +36,10 @@ private:
             + "/tool-inst/lib/Opus2/opus2/data/default_model/" + m_opus2ModelFileName;
     const QString m_opus2DefaultOptionsFilePath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation)
             + "/tool-inst/lib/Opus2/opus2/data/default_model/" + m_opus2OptionsFileName;
+    const QString m_populationToolCommand = "Opus2.PopulationToolGui";
+    const QString m_tailoringToolCommand = "Opus2.TailoringToolGui";
+    const QString m_documentGeneratorCommand = "Opus2.DocumentGeneratorGui";
+    const QString m_frontendGeneratorCommand = "Opus2.FrontendGeneratorGui";
 
     QMenu *m_opus2Menu = nullptr;
     ProjectExplorer::Project *m_currentProject = nullptr;

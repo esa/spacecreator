@@ -24,6 +24,7 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 
 namespace spctr {
 
@@ -80,31 +81,84 @@ void Opus2Plugin::addOpus2Menu()
 
 #if QTC_VERSION >= 1100
     connect(ProjectExplorer::ProjectManager::instance(), &ProjectExplorer::ProjectManager::startupProjectChanged, this,
-            &Opus2Plugin::onActiveProjectChanged);
+            &Opus2Plugin::initializeProjectInfo);
 #else
     connect(ProjectExplorer::SessionManager::instance(), &ProjectExplorer::SessionManager::startupProjectChanged, this,
-            &Opus2Plugin::onActiveProjectChanged);
+            &Opus2Plugin::initializeProjectInfo);
 #endif
 }
 
 void Opus2Plugin::runPopulationTool()
 {
     initializeOpus2Model();
+
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+
+    QProcess process;
+    process.setWorkingDirectory(m_currentProjectDirectoryPath);
+    process.start(m_populationToolCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
+
+    process.waitForFinished(-1);
+    if (process.exitCode() != 0) {
+        QMessageBox::critical(
+                qApp->activeWindow(), tr("Opus2 Population tool error"), tr("Opus2 Population tool has failed"));
+    }
 }
 
 void Opus2Plugin::runTailoringTool()
 {
     initializeOpus2Model();
+
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+
+    QProcess process;
+    process.setWorkingDirectory(m_currentProjectDirectoryPath);
+    process.start(m_tailoringToolCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
+
+    process.waitForFinished(-1);
+    if (process.exitCode() != 0) {
+        QMessageBox::critical(
+                qApp->activeWindow(), tr("Opus2 Tailoring tool error"), tr("Opus2 Tailoring tool has failed"));
+    }
 }
 
 void Opus2Plugin::runDocumentGenerator()
 {
     initializeOpus2Model();
+
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+
+    QProcess process;
+    process.setWorkingDirectory(m_currentProjectDirectoryPath);
+    process.start(m_documentGeneratorCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
+
+    process.waitForFinished(-1);
+    if (process.exitCode() != 0) {
+        QMessageBox::critical(
+                qApp->activeWindow(), tr("Opus2 Document generator error"), tr("Opus2 Document generator has failed"));
+    }
 }
 
 void Opus2Plugin::runFrontendGenerator()
 {
     initializeOpus2Model();
+
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+
+    QProcess process;
+    process.setWorkingDirectory(m_currentProjectDirectoryPath);
+    process.start(m_frontendGeneratorCommand,
+            QStringList() << opus2ModelFilePath << opus2OptionsFilePath << m_currentProjectDirectoryPath);
+
+    process.waitForFinished(-1);
+    if (process.exitCode() != 0) {
+        QMessageBox::critical(
+                qApp->activeWindow(), tr("Opus2 Population tool error"), tr("Opus2 Population tool has failed"));
+    }
 }
 
 void Opus2Plugin::initializeOpus2Model()
@@ -116,22 +170,22 @@ void Opus2Plugin::initializeOpus2Model()
     const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
 
-    if (!QFileInfo::exists(opus2ModelFilePath) || !QFileInfo::exists(opus2OptionsFilePath)) {
-        QFile::remove(opus2ModelFilePath);
-        QFile::remove(opus2OptionsFilePath);
-
-        qDebug() << m_opus2DefaultModelFilePath << QFileInfo::exists(m_opus2DefaultModelFilePath) << "\n";
-        qDebug() << m_opus2DefaultOptionsFilePath << QFileInfo::exists(m_opus2DefaultOptionsFilePath) << "\n";
-
-        if (!QFile::copy(m_opus2DefaultModelFilePath, opus2ModelFilePath)
-                || !QFile::copy(m_opus2DefaultOptionsFilePath, opus2OptionsFilePath)) {
+    if (!QFileInfo::exists(opus2ModelFilePath)) {
+        if (!QFile::copy(m_opus2DefaultModelFilePath, opus2ModelFilePath)) {
             QMessageBox::critical(qApp->activeWindow(), tr("Opus2 initialization error"),
                     tr("Could not copy default Opus2 model from library. Is Opus2 installed?"));
         }
     }
+
+    if (!QFileInfo::exists(opus2OptionsFilePath)) {
+        if (!QFile::copy(m_opus2DefaultOptionsFilePath, opus2OptionsFilePath)) {
+            QMessageBox::critical(qApp->activeWindow(), tr("Opus2 initialization error"),
+                    tr("Could not copy default Opus2 options from library. Is Opus2 installed?"));
+        }
+    }
 }
 
-void Opus2Plugin::onActiveProjectChanged(ProjectExplorer::Project *project)
+void Opus2Plugin::initializeProjectInfo(ProjectExplorer::Project *project)
 {
     m_currentProject = project;
     if (m_currentProject != nullptr) {
