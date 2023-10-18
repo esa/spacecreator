@@ -1,12 +1,12 @@
 {
-    \"Name\" : \"DeviceGenerator\",
+    \"Name\" : \"Opus2Plugin\",
     \"Version\" : \"0.0.1\",
     \"CompatVersion\" : \"0.0.1\",
     \"Vendor\" : \"ESA\",
-    \"Copyright\" : \"(C) 2022 N7 Space sp. z o.o.\",
+    \"Copyright\" : \"(C) 2023 N7 Space sp. z o.o.\",
     \"License\" : \"LGPL 2.1\",
     \"Category\" : \"Modeling\",
-    \"Description\" : \"Device modeling using TASTE\",
+    \"Description\" : \"PUS C modeling using TASTE\",
     \"Url\" : \"$$ORGANISATION_DOMAIN",
     $$dependencyList
 }

@@ -63,25 +63,25 @@ void Opus2Plugin::addOpus2Menu()
     Core::ActionContainer *const tools = Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
     tools->addMenu(acToolsOpus2);
 
-    const auto runPopulationToolAction = new QAction(tr("Population tool"), this);
+    const auto runPopulationToolAction = new QAction(tr("Population Tool"), this);
     connect(runPopulationToolAction, &QAction::triggered, [this]() { runPopulationTool(); });
     Core::Command *const runPopulationTool = Core::ActionManager::registerAction(
             runPopulationToolAction, Constants::RUN_POPULATION_TOOL_ID, allContexts);
     acToolsOpus2->addAction(runPopulationTool);
 
-    const auto runTailoringToolAction = new QAction(tr("Tailoring tool"), this);
+    const auto runTailoringToolAction = new QAction(tr("Tailoring Tool"), this);
     connect(runTailoringToolAction, &QAction::triggered, [this]() { runTailoringTool(); });
     Core::Command *const runTailoringTool =
             Core::ActionManager::registerAction(runTailoringToolAction, Constants::RUN_TAILORING_TOOL_ID, allContexts);
     acToolsOpus2->addAction(runTailoringTool);
 
-    const auto runDocumentGeneratorAction = new QAction(tr("Document generator"), this);
+    const auto runDocumentGeneratorAction = new QAction(tr("Document Generator"), this);
     connect(runDocumentGeneratorAction, &QAction::triggered, [this]() { runDocumentGenerator(); });
     Core::Command *const runDocumentGenerator = Core::ActionManager::registerAction(
             runDocumentGeneratorAction, Constants::RUN_DOCUMENT_GENERATOR_ID, allContexts);
     acToolsOpus2->addAction(runDocumentGenerator);
 
-    const auto runFrontendGeneratorAction = new QAction(tr("Frontend generator"), this);
+    const auto runFrontendGeneratorAction = new QAction(tr("Frontend Generator"), this);
     connect(runFrontendGeneratorAction, &QAction::triggered, [this]() { runFrontendGenerator(); });
     Core::Command *const runFrontendGenerator = Core::ActionManager::registerAction(
             runFrontendGeneratorAction, Constants::RUN_FRONTEND_GENERATOR_ID, allContexts);
@@ -92,8 +92,8 @@ void Opus2Plugin::runPopulationTool()
 {
     initializeOpus2Model();
 
-    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
-    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     QProcess process;
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
@@ -102,7 +102,7 @@ void Opus2Plugin::runPopulationTool()
     process.waitForFinished(-1);
     if (process.exitCode() != 0) {
         QMessageBox::critical(
-                qApp->activeWindow(), tr("Opus2 Population tool error"), tr("Opus2 Population tool has failed"));
+                qApp->activeWindow(), tr("Opus2 Population Tool error"), tr("Opus2 Population Tool has failed"));
     }
 }
 
@@ -110,8 +110,8 @@ void Opus2Plugin::runTailoringTool()
 {
     initializeOpus2Model();
 
-    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
-    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     QProcess process;
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
@@ -120,7 +120,7 @@ void Opus2Plugin::runTailoringTool()
     process.waitForFinished(-1);
     if (process.exitCode() != 0) {
         QMessageBox::critical(
-                qApp->activeWindow(), tr("Opus2 Tailoring tool error"), tr("Opus2 Tailoring tool has failed"));
+                qApp->activeWindow(), tr("Opus2 Tailoring Tool error"), tr("Opus2 Tailoring Tool has failed"));
     }
 }
 
@@ -128,8 +128,8 @@ void Opus2Plugin::runDocumentGenerator()
 {
     initializeOpus2Model();
 
-    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
-    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     QProcess process;
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
@@ -138,7 +138,7 @@ void Opus2Plugin::runDocumentGenerator()
     process.waitForFinished(-1);
     if (process.exitCode() != 0) {
         QMessageBox::critical(
-                qApp->activeWindow(), tr("Opus2 Document generator error"), tr("Opus2 Document generator has failed"));
+                qApp->activeWindow(), tr("Opus2 Document Generator error"), tr("Opus2 Document Generator has failed"));
     }
 }
 
@@ -146,8 +146,8 @@ void Opus2Plugin::runFrontendGenerator()
 {
     initializeOpus2Model();
 
-    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
-    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     QProcess process;
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
@@ -157,7 +157,7 @@ void Opus2Plugin::runFrontendGenerator()
     process.waitForFinished(-1);
     if (process.exitCode() != 0) {
         QMessageBox::critical(
-                qApp->activeWindow(), tr("Opus2 Population tool error"), tr("Opus2 Population tool has failed"));
+                qApp->activeWindow(), tr("Opus2 Frontend Generator error"), tr("Opus2 Frontend Generator has failed"));
     }
 }
 
@@ -167,8 +167,8 @@ void Opus2Plugin::initializeOpus2Model()
         return;
     }
 
-    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + "/" + m_opus2ModelFileName;
-    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + "/" + m_opus2OptionsFileName;
+    const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
+    const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     if (!QFileInfo::exists(opus2ModelFilePath)) {
         if (!QFile::copy(m_opus2DefaultModelFilePath, opus2ModelFilePath)) {
