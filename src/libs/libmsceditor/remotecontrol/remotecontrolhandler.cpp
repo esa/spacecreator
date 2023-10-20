@@ -68,7 +68,8 @@ Implemented commands and parameters list:
  + **name** - Instance's Name, command fails if Chart already has Instance with this name, optional
  + **kind** - Instance's Kind, optional - MSC uses the name if no kind is set.
  + **pos** - Instance's X position in pixel. Default is '-1' which means append at the right. Optional parameter.
- + **exStop** - Explicit stop {True, False=default}, optional
+- **StopInstance** - stop an existing instance
+ + **name** - name of the instance to stop
 - **Message** - creating new Message, command fails if neither **srcName** nor **dstName** parameter set.
  + **name** - Message's Name, optional
  + **srcName** - source Instance's Name, command fails if Chart doesn't have Instance with this name
