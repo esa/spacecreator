@@ -121,8 +121,8 @@ public:
     void setCreatorGitHash(const QString &hashStr);
     QString creatorGitHash() const;
 
-    bool setRequestURL(const QString &url);
-    QString requestsURL() const;
+    bool setRequirementsURL(const QString &url);
+    QString requirementsURL() const;
 
     bool isDirty() const;
 

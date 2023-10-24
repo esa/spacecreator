@@ -141,7 +141,7 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
     if (!uiFilePath.isEmpty()) {
         grouppedObjects[QLatin1String("UiFile")] = QVariant::fromValue(uiFilePath);
     }
-    const QString requestsURL= doc->requestsURL();
+    const QString requestsURL= doc->requirementsURL();
     if (!requestsURL.isEmpty()) {
         grouppedObjects[QLatin1String("requestsURL")] = QVariant::fromValue(requestsURL);
     }

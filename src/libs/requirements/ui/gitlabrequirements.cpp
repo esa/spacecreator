@@ -27,9 +27,9 @@ GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document
 
 void GitLabRequirements::LoadSavedCredentials()
 {
-    setUrl(m_document->requestsURL());
+    setUrl(m_document->requirementsURL());
     QSettings settings;
-    auto gitlabToken = settings.value(m_document->requestsURL() + "__token").toString();
+    auto gitlabToken = settings.value(m_document->requirementsURL() + "__token").toString();
     setToken(gitlabToken);
 }
 GitLabRequirements::~GitLabRequirements()
@@ -52,13 +52,14 @@ void GitLabRequirements::onChangeOfCredentials()
     QSettings settings;
     if (!ui->UrlLineEdit->text().isEmpty()) {
         auto gitlabToken = settings.value(ui->UrlLineEdit->text() + "__token").toString();
-        if ((gitlabToken != ui->TokenLineEdit->text()) || (ui->UrlLineEdit->text() != m_document->requestsURL())) {
-            settings.remove(m_document->requestsURL() + "__token");
+        if ((gitlabToken != ui->TokenLineEdit->text()) || (ui->UrlLineEdit->text() != m_document->requirementsURL())) {
+            settings.remove(m_document->requirementsURL() + "__token");
             settings.setValue(ui->UrlLineEdit->text() + "__token", ui->TokenLineEdit->text());
+            m_document->setRequirementsURL(ui->UrlLineEdit->text());
         }
     } else {
-        settings.remove(m_document->requestsURL() + "__token");
-        m_document->setRequestURL("");
+        settings.remove(m_document->requirementsURL() + "__token");
+        m_document->setRequirementsURL("");
         setToken("");
     }
 }

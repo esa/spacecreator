@@ -465,7 +465,7 @@ void InterfaceDocument::close()
     d->layersModel->clear();
     setPath(QString());
     d->commandsStack->clear();
-    setRequestURL({});
+    setRequirementsURL({});
     setCreatorGitHash({});
 }
 
@@ -732,7 +732,7 @@ QString InterfaceDocument::creatorGitHash() const
     return d->creatorGitHash;
 }
 
-bool InterfaceDocument::setRequestURL(const QString &url)
+bool InterfaceDocument::setRequirementsURL(const QString &url)
 {
     if (d->requestsURL != url)
     {
@@ -746,7 +746,7 @@ bool InterfaceDocument::setRequestURL(const QString &url)
 
 }
 
-QString InterfaceDocument::requestsURL() const
+QString InterfaceDocument::requirementsURL() const
 {
     return d->requestsURL;
 }
@@ -1194,7 +1194,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     if (metadata.contains(parser.uiFileNameTag()))
         setUIFileName(metadata[parser.uiFileNameTag()].toString());
     if (metadata.contains("requestsURL")){
-        setRequestURL(metadata["requestsURL"].toString());
+        setRequirementsURL(metadata["requestsURL"].toString());
     }
     setCreatorGitHash(metadata["creatorHash"].toString());
     shared::ErrorHub::clearCurrentFile();
