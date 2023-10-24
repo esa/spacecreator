@@ -10,11 +10,15 @@ remove_definitions(-DQT_NO_KEYWORDS)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+  requirement.cpp
+  requirement.h
+  requirementsmanager.cpp
+  requirementsmanager.h
+  requirementsmodel.cpp
+  requirementsmodel.h
   ui/gitlabrequirements.cpp
   ui/gitlabrequirements.h
   ui/gitlabrequirements.ui
-  requirementsmanager.h
-  requirementsmanager.cpp
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

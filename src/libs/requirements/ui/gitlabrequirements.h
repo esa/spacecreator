@@ -2,6 +2,7 @@
 #define GITLABREQUIREMENTS_H
 
 #include "requirementsmanager.h"
+#include "requirementsmodel.h"
 
 #include <QPointer>
 #include <QWidget>
@@ -26,12 +27,11 @@ public:
 
     void setUrl(const QString &url);
     void setToken(const QString &token);
-    void deleteListContent();
 
 protected:
     void LoadSavedCredentials();
-    void addRequirementRow(const QString &issueID, const QString &description);
     void onChangeOfCredentials();
+    requirement::Requirement requirementFromIssue(const Issue &issue) const;
 
 protected Q_SLOTS:
     void onLoginUpdate();
@@ -39,6 +39,7 @@ protected Q_SLOTS:
 private:
     Ui::GitLabRequirements *ui;
     RequirementsManager mReqManager;
+    requirement::RequirementsModel m_model;
     QPointer<ive::InterfaceDocument> m_document;
 };
 

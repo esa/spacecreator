@@ -43,23 +43,6 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="0" colspan="3">
-     <widget class="QTableWidget" name="AllRequirements">
-      <attribute name="horizontalHeaderStretchLastSection">
-       <bool>true</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string>ReqID</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Description</string>
-       </property>
-      </column>
-     </widget>
-    </item>
     <item row="3" column="1" colspan="2">
      <widget class="QLineEdit" name="TokenLineEdit"/>
     </item>
@@ -109,6 +92,16 @@
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
+     </widget>
+    </item>
+    <item row="5" column="0" colspan="3">
+     <widget class="QTableView" name="AllRequirements">
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
      </widget>
     </item>
    </layout>

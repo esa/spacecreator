@@ -5,6 +5,9 @@
 
 #include <QLineEdit>
 #include <QSettings>
+#include <requirement.h>
+
+using namespace requirement;
 
 GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document, QWidget *parent)
     : QWidget(parent)
@@ -14,6 +17,7 @@ GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document
 
 {
     ui->setupUi(this);
+    ui->AllRequirements->setModel(&m_model);
     LoadSavedCredentials();
     onLoginUpdate();
     connect(ui->Refresh, &QPushButton::clicked, this, &GitLabRequirements::onLoginUpdate);
@@ -43,20 +47,6 @@ void GitLabRequirements::setToken(const QString &token)
     ui->TokenLineEdit->setText(token);
 }
 
-void GitLabRequirements::deleteListContent()
-{
-    ui->AllRequirements->setRowCount(0);
-}
-
-void GitLabRequirements::addRequirementRow(const QString &issueID, const QString &description)
-{
-    static const int REQID = 0;
-    static const int DESCRIPTION = 1;
-    ui->AllRequirements->insertRow(ui->AllRequirements->rowCount());
-    ui->AllRequirements->setItem(ui->AllRequirements->rowCount() - 1, REQID, new QTableWidgetItem(issueID));
-    ui->AllRequirements->setItem(ui->AllRequirements->rowCount() - 1, DESCRIPTION, new QTableWidgetItem(description));
-}
-
 void GitLabRequirements::onChangeOfCredentials()
 {
     QSettings settings;
@@ -73,6 +63,11 @@ void GitLabRequirements::onChangeOfCredentials()
     }
 }
 
+Requirement GitLabRequirements::requirementFromIssue(const Issue &issue) const
+{
+    return { issue.mIssueID, issue.mTitle, issue.mDescription, issue.mIssueID };
+}
+
 void GitLabRequirements::onLoginUpdate()
 {
     mReqManager.setCredentials(ui->UrlLineEdit->text(), ui->TokenLineEdit->text());
@@ -80,11 +75,14 @@ void GitLabRequirements::onLoginUpdate()
     static const QString anyAssignee("");
     static const QString anyAuthor("");
     static const QStringList anyIssues = {};
-    deleteListContent();
+    m_model.setRequirements({});
     mReqManager.requestRequirements(anyAssignee, anyAuthor, anyIssues);
     connect(&mReqManager, &RequirementsManager::listOfIssues, [this](QList<Issue> issues) {
+        QList<Requirement> requirements;
+        requirements.reserve(issues.size());
         for (const auto &issue : issues) {
-            addRequirementRow(issue.mIssueID, issue.mDescription);
+            requirements.append(requirementFromIssue(issue));
         }
+        m_model.setRequirements(requirements);
     });
 }
