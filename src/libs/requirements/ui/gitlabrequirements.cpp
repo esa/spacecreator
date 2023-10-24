@@ -17,12 +17,16 @@ GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document
 
 {
     ui->setupUi(this);
-    ui->AllRequirements->setModel(&m_model);
+    m_filterModel.setSourceModel(&m_model);
+    ui->AllRequirements->setModel(&m_filterModel);
     LoadSavedCredentials();
     onLoginUpdate();
     connect(ui->Refresh, &QPushButton::clicked, this, &GitLabRequirements::onLoginUpdate);
     connect(ui->UrlLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
     connect(ui->TokenLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
+
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &RequirementsFilterModel::setFilter);
+    connect(ui->clearFilterButton, &QPushButton::clicked, ui->filterLineEdit, &QLineEdit::clear);
 }
 
 void GitLabRequirements::LoadSavedCredentials()

@@ -1,6 +1,7 @@
 #ifndef GITLABREQUIREMENTS_H
 #define GITLABREQUIREMENTS_H
 
+#include "requirementsfiltermodel.h"
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
 
@@ -40,6 +41,7 @@ private:
     Ui::GitLabRequirements *ui;
     RequirementsManager mReqManager;
     requirement::RequirementsModel m_model;
+    requirement::RequirementsFilterModel m_filterModel;
     QPointer<ive::InterfaceDocument> m_document;
 };
 

@@ -12,6 +12,8 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
   requirement.cpp
   requirement.h
+  requirementsfiltermodel.cpp
+  requirementsfiltermodel.h
   requirementsmanager.cpp
   requirementsmanager.h
   requirementsmodel.cpp
