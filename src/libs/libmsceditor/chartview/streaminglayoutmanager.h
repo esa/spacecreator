@@ -91,13 +91,14 @@ private Q_SLOTS:
     void updateMessagePosition();
 
 private:
-    void addAction(msc::MscAction *action);
-    void addCondition(msc::MscCondition *condition);
-    void addCreateMessage(msc::MscCreate *message);
-    void addMessage(msc::MscMessage *message);
-    void addTimer(msc::MscTimer *timer);
+    ActionItem *addAction(msc::MscAction *action);
+    ConditionItem *addCondition(msc::MscCondition *condition);
+    MessageItem *addCreateMessage(msc::MscCreate *message);
+    MessageItem *addMessage(msc::MscMessage *message);
+    TimerItem *addTimer(msc::MscTimer *timer);
     void updateInstancesRect();
     void checkChartSize(EventItem *item);
+    void updateYPerInstance();
 
     QPointer<MscChart> m_chart;
     std::unique_ptr<QGraphicsScene> m_scene;

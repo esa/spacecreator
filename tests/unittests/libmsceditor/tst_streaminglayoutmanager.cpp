@@ -59,6 +59,7 @@ private Q_SLOTS:
     void testAddCreateMesage();
     void testAddMessage();
     void testAddTimer();
+    void testRedoMessage();
 
 private:
     std::unique_ptr<MscModel> m_dataModel;
@@ -354,6 +355,48 @@ void tst_StreamingLayoutManager::testAddTimer()
 
     // check if action Y is plausible
     QCOMPARE_GT(timerItem->sceneBoundingRect().top(), instanceItem->headerItem()->sceneBoundingRect().bottom());
+}
+
+void tst_StreamingLayoutManager::testRedoMessage()
+{
+    MscInstance *instanceA = m_chart->makeInstance("A");
+    MscInstance *instanceB = m_chart->makeInstance("B");
+    instanceB->setCifGeometry({ { 800, 100 }, { 200, 0 }, { 0, 300 } });
+
+    MscMessage *message = new MscMessage("setAngle");
+    message->setSourceInstance(instanceA);
+    message->setTargetInstance(instanceB);
+    ChartIndexList instanceIndexes { { instanceA, 0 }, { instanceB, 0 } };
+    m_chart->addInstanceEvent(message, instanceIndexes);
+
+    MessageItem *messageItem = m_layoutManager->itemForMessage(message);
+    QCOMPARE_NE(messageItem, nullptr);
+
+    const QRectF messageRect = messageItem->sceneBoundingRect();
+
+    MscMessage *message2 = new MscMessage("setRadius");
+    message2->setSourceInstance(instanceA);
+    message2->setTargetInstance(instanceB);
+    ChartIndexList instanceIndexes2 { { instanceA, 1 }, { instanceB, 1 } };
+    m_chart->addInstanceEvent(message2, instanceIndexes2);
+
+    MessageItem *messageItem2 = m_layoutManager->itemForMessage(message2);
+    QCOMPARE_NE(messageItem2, nullptr);
+
+    const QRectF messageRect2 = messageItem2->sceneBoundingRect();
+
+    // undo
+    m_chart->removeInstanceEvent(message2);
+    m_chart->removeInstanceEvent(message);
+    // redo
+    m_chart->addInstanceEvent(message, instanceIndexes);
+    m_chart->addInstanceEvent(message2, instanceIndexes2);
+
+    // check rectangle
+    messageItem = m_layoutManager->itemForMessage(message);
+    messageItem2 = m_layoutManager->itemForMessage(message2);
+    QCOMPARE(messageRect, messageItem->sceneBoundingRect());
+    QCOMPARE(messageRect2, messageItem2->sceneBoundingRect());
 }
 
 QTEST_MAIN(tst_StreamingLayoutManager)

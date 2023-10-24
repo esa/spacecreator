@@ -252,25 +252,32 @@ void StreamingLayoutManager::updateContentsRect()
 
 void StreamingLayoutManager::eventAdded(MscInstanceEvent *event)
 {
+    EventItem *item = nullptr;
     switch (event->entityType()) {
     case MscEntity::EntityType::Action:
-        addAction(static_cast<MscAction *>(event));
+        item = addAction(static_cast<MscAction *>(event));
         break;
     case MscEntity::EntityType::Condition:
-        addCondition(static_cast<MscCondition *>(event));
+        item = addCondition(static_cast<MscCondition *>(event));
         break;
     case MscEntity::EntityType::Create:
-        addCreateMessage(static_cast<MscCreate *>(event));
+        item = addCreateMessage(static_cast<MscCreate *>(event));
         break;
     case MscEntity::EntityType::Message:
-        addMessage(static_cast<MscMessage *>(event));
+        item = addMessage(static_cast<MscMessage *>(event));
         break;
     case MscEntity::EntityType::Timer:
-        addTimer(static_cast<MscTimer *>(event));
+        item = addTimer(static_cast<MscTimer *>(event));
         break;
     default:
         qFatal("Not supported");
         break;
+    }
+
+    updateYPerInstance();
+    if (item) {
+        checkChartSize(item);
+        item->updateCif();
     }
 }
 
@@ -293,6 +300,8 @@ void StreamingLayoutManager::eventRemoved(MscInstanceEvent *event)
         }
         return false;
     });
+
+    updateYPerInstance();
 }
 
 void StreamingLayoutManager::updateMessagePosition()
@@ -307,19 +316,12 @@ void StreamingLayoutManager::updateMessagePosition()
         return;
     }
 
-    if (message->sourceInstance()) {
-        m_nextYperInstance[message->sourceInstance()] = item->tail().y() + interMessageSpan();
-    }
-    if (message->targetInstance()) {
-        m_nextYperInstance[message->targetInstance()] = item->head().y() + interMessageSpan();
-    }
-
+    updateYPerInstance();
     checkChartSize(item);
-
     item->updateCif();
 }
 
-void StreamingLayoutManager::addAction(MscAction *action)
+ActionItem *StreamingLayoutManager::addAction(MscAction *action)
 {
     Q_ASSERT(action->instance());
     auto item = new ActionItem(action, this, m_chartItem.get());
@@ -335,14 +337,11 @@ void StreamingLayoutManager::addAction(MscAction *action)
     item->setY(m_nextYperInstance[action->instance()]);
 
     item->instantLayoutUpdate();
-    m_nextYperInstance[action->instance()] = item->sceneBoundingRect().bottom() + interMessageSpan();
 
-    checkChartSize(item);
-
-    item->updateCif();
+    return item;
 }
 
-void StreamingLayoutManager::addCondition(MscCondition *condition)
+ConditionItem *StreamingLayoutManager::addCondition(MscCondition *condition)
 {
     auto item = new ConditionItem(condition, this, m_chartItem.get());
     connect(this, &msc::ChartLayoutManagerBase::instancesRectChanged, item, &msc::ConditionItem::setInstancesRect);
@@ -371,16 +370,11 @@ void StreamingLayoutManager::addCondition(MscCondition *condition)
     }
     item->setY(y);
     item->instantLayoutUpdate();
-    for (MscInstance *inst : instances) {
-        m_nextYperInstance[inst] = item->sceneBoundingRect().bottom() + interMessageSpan();
-    }
 
-    checkChartSize(item);
-
-    item->updateCif();
+    return item;
 }
 
-void StreamingLayoutManager::addCreateMessage(MscCreate *message)
+MessageItem *StreamingLayoutManager::addCreateMessage(MscCreate *message)
 {
     InstanceItem *sourceItem = itemForInstance(message->sourceInstance());
     InstanceItem *targetItem = itemForInstance(message->targetInstance());
@@ -390,7 +384,7 @@ void StreamingLayoutManager::addCreateMessage(MscCreate *message)
     Q_ASSERT(sourceItem);
     Q_ASSERT(targetItem);
     if (!message->sourceInstance() || !message->targetInstance() || !sourceItem || !targetItem) {
-        return;
+        return nullptr;
     }
 
     auto item = new MessageItem(message, this, sourceItem, targetItem, m_chartItem.get());
@@ -404,8 +398,6 @@ void StreamingLayoutManager::addCreateMessage(MscCreate *message)
         y = std::max(y, m_nextYperInstance[message->sourceInstance()]);
     }
     item->setY(y + interMessageSpan() * 0.5);
-    qreal nextY = item->sceneBoundingRect().bottom() + interMessageSpan() * 0.5;
-    m_nextYperInstance[message->sourceInstance()] = nextY;
 
     const qreal deltaY = item->head().y() - targetItem->leftCreatorTarget().y();
     targetItem->moveSilentlyBy(QPointF(0.0, deltaY));
@@ -416,15 +408,11 @@ void StreamingLayoutManager::addCreateMessage(MscCreate *message)
     syncItemPosToInstance(item, targetItem);
 
     item->instantLayoutUpdate();
-    m_nextYperInstance[message->targetInstance()] =
-            targetItem->headerItem()->sceneBoundingRect().bottom() + interMessageSpan();
 
-    checkChartSize(item);
-
-    item->updateCif();
+    return item;
 }
 
-void StreamingLayoutManager::addMessage(MscMessage *message)
+MessageItem *StreamingLayoutManager::addMessage(MscMessage *message)
 {
     InstanceItem *sourceItem = itemForInstance(message->sourceInstance());
     InstanceItem *targetItem = itemForInstance(message->targetInstance());
@@ -448,25 +436,20 @@ void StreamingLayoutManager::addMessage(MscMessage *message)
     syncItemPosToInstance(item, targetItem);
 
     item->instantLayoutUpdate();
-    if (item->boundingRect().top() < -(interMessageSpan() * 0.5)) {
+    const qreal offsetMax = interMessageSpan() * 0.5;
+    const qreal offset = item->boundingRect().top() + offsetMax;
+    if (offset < 0) {
         // some messages are multi line, and therfore higher
-        item->setY(item->y() - item->boundingRect().top());
+        item->setY(item->y() - offset);
         item->instantLayoutUpdate();
     }
-    if (message->sourceInstance()) {
-        m_nextYperInstance[message->sourceInstance()] = item->tail().y() + interMessageSpan();
-    }
-    if (message->targetInstance()) {
-        m_nextYperInstance[message->targetInstance()] = item->head().y() + interMessageSpan();
-    }
-
-    checkChartSize(item);
 
     connect(message, &MscMessage::cifPointsChanged, this, &StreamingLayoutManager::updateMessagePosition);
-    item->updateCif();
+
+    return item;
 }
 
-void StreamingLayoutManager::addTimer(MscTimer *timer)
+TimerItem *StreamingLayoutManager::addTimer(MscTimer *timer)
 {
     auto item = new TimerItem(timer, this, m_chartItem.get());
     item->setChartItem(m_chartItem.get());
@@ -481,11 +464,8 @@ void StreamingLayoutManager::addTimer(MscTimer *timer)
     item->setY(m_nextYperInstance[timer->instance()]);
 
     item->instantLayoutUpdate();
-    m_nextYperInstance[timer->instance()] = item->sceneBoundingRect().bottom() + interMessageSpan();
 
-    checkChartSize(item);
-
-    item->updateCif();
+    return item;
 }
 
 void StreamingLayoutManager::updateInstancesRect()
@@ -508,6 +488,63 @@ void StreamingLayoutManager::checkChartSize(EventItem *item)
     if (item->sceneBoundingRect().right() > (chartRect.right() - ChartItem::chartMargins().right())) {
         chartRect.setRight(item->sceneBoundingRect().right() + ChartItem::chartMargins().right());
         m_chartItem->setContentRect(chartRect);
+    }
+}
+
+void StreamingLayoutManager::updateYPerInstance()
+{
+    const qreal span = interMessageSpan();
+    const qreal halfSpan = span * 0.5;
+
+    for (auto it = m_nextYperInstance.cbegin(), end = m_nextYperInstance.cend(); it != end; ++it) {
+        MscInstance *instance = it.key();
+        if (instance->events().isEmpty()) {
+            if (const InstanceItem *instItem = itemForInstance(instance)) {
+                m_nextYperInstance[instance] = instItem->headerItem()->sceneBoundingRect().bottom() + halfSpan;
+            }
+        } else {
+            MscInstanceEvent *lastEvent = instance->events().last();
+            msc::InteractiveObject *eventItem = m_eventItems[lastEvent->internalId()];
+
+            switch (lastEvent->entityType()) {
+            case msc::MscEntity::EntityType::Action:
+            case msc::MscEntity::EntityType::Condition:
+            case msc::MscEntity::EntityType::Timer:
+                m_nextYperInstance[instance] = eventItem->sceneBoundingRect().bottom() + span;
+                break;
+                // case msc::MscEntity::EntityType::Coregion:
+            case msc::MscEntity::EntityType::Message: {
+                auto message = dynamic_cast<msc::MscMessage *>(lastEvent);
+                if (auto messageItem = dynamic_cast<const MessageItem *>(eventItem)) {
+                    if (instance == message->sourceInstance()) {
+                        m_nextYperInstance[instance] = messageItem->tail().y() + span;
+                    }
+                    if (instance == message->targetInstance()) {
+                        m_nextYperInstance[instance] = messageItem->head().y() + span;
+                    }
+                }
+                break;
+            }
+            case msc::MscEntity::EntityType::Create: {
+                auto message = dynamic_cast<msc::MscMessage *>(lastEvent);
+                auto messageItem = dynamic_cast<MessageItem *>(eventItem);
+                if (messageItem && instance == message->sourceInstance()) {
+                    m_nextYperInstance[instance] = messageItem->sceneBoundingRect().bottom() + halfSpan;
+                }
+                if (instance == message->targetInstance()) {
+                    if (const InstanceItem *instItem = itemForInstance(instance)) {
+                        m_nextYperInstance[instance] = instItem->headerItem()->sceneBoundingRect().bottom() + span;
+                    }
+                }
+                break;
+            }
+            default: {
+                Q_ASSERT(false);
+                qWarning() << "Event type not handled" << lastEvent->entityType();
+                return;
+            }
+            }
+        }
     }
 }
 
