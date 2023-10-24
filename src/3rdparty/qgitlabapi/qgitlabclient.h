@@ -11,7 +11,8 @@
 class QGITLABAPI_EXPORT QGitlabClient: public QObject {
     Q_OBJECT
 public:
-    QGitlabClient(const QString & url, const QString &token);
+    QGitlabClient();
+    void setCredentials(const QString & url, const QString &token);
     void requestIssues(const QString & assignee = QString(), const QString & author = QString(), const QStringList &iids = QStringList());
     void requestIssue(const QString &iid);
     void editIssue(const QString &projectID, const QString &issueID, const Issue& newIssue);

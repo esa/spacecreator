@@ -20,9 +20,11 @@
 #include "ivobject.h"
 #include "propertiesdialog.h"
 
+#include <ui/gitlabrequirements.h>
+
 #include <QPointer>
 
-class GitlabCredentialsDialog;
+class GitLabRequirements;
 
 namespace Asn1Acn {
 class Asn1SystemChecks;
@@ -76,6 +78,7 @@ private:
     bool m_isRequiredSystemElement;
 
     QPointer<InterfaceDocument> m_document;
+    GitLabRequirements m_requirementsWidget;
 };
 
 } // namespace ive

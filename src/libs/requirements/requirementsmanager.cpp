@@ -1,18 +1,23 @@
 #include "requirementsmanager.h"
 
-RequirementsManager::RequirementsManager(REPO_TYPE repoType, const QString &url, const QString &token):
+RequirementsManager::RequirementsManager(REPO_TYPE repoType):
     mRepoType(repoType)
 {
     switch(repoType)
     {
     case(REPO_TYPE::GITLAB):
     {
-        gitlabClient = new QGitlabClient(url, token);
+        gitlabClient = new QGitlabClient();
         break;
     }
     default:
         qDebug() << "unknown repository type";
     }
+}
+
+void RequirementsManager::setCredentials(const QString &url, const QString &token)
+{
+    gitlabClient->setCredentials(url, token);
 }
 
 void RequirementsManager::requestRequirements(const QString &assignee, const QString &author, const QStringList &iids) const

@@ -465,6 +465,8 @@ void InterfaceDocument::close()
     d->layersModel->clear();
     setPath(QString());
     d->commandsStack->clear();
+    setRequestURL({});
+    setCreatorGitHash({});
 }
 
 /**
@@ -735,6 +737,7 @@ bool InterfaceDocument::setRequestURL(const QString &url)
     if (d->requestsURL != url)
     {
         d->requestsURL = url;
+        exporter()->exportDocSilently(this, path());
         Q_EMIT requestURLChanged(d->requestsURL);
         return true;
     }

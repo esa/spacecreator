@@ -14,7 +14,7 @@ public:
 
     };
 
-    UrlComposer(QUrl url);
+    UrlComposer();
     QString ComposeUrl(UrlComposer::UrlTypes target) const;
 
     QUrl ComposeGetIssuesUrl(const QString &assignee,
@@ -36,6 +36,8 @@ public:
     QUrl ComposeProjectLabelsUrl(const QString &projectID,
                                  const QString &with_counts = "false",
                                  const QString &search = QString()) const;
+
+    void setBaseURL(const QUrl &newBaseURL);
 
 protected:
     QUrlQuery SetQuery(const QMap<QString, QVariant> data) const;

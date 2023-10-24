@@ -17,11 +17,14 @@ const QString kContentType = "application/x-www-form-urlencoded";
 
 } // namespace
 
-GitLabTransport::GitLabTransport(const QString &url, const QString &token)
-    : mUrlComposer(url)
-    , mToken(token)
-
+GitLabTransport::GitLabTransport()
 {}
+
+void GitLabTransport::setCredentials(const QString &url, const QString &token)
+{
+    mUrlComposer.setBaseURL(url);
+    mToken = token;
+}
 
 void GitLabTransport::RequestListofIssues(const QString &assignee,
                                      const QString &author,

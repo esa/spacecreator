@@ -1,11 +1,19 @@
 #include "qgitlabclient.h"
 #include <QDebug>
 
-QGitlabClient::QGitlabClient(const QString &url, const QString &token)
+QGitlabClient::QGitlabClient()
 {
-    mGitlab = std::make_unique<GitLabTransport>(url, token);
+    mGitlab = std::make_unique<GitLabTransport>();
     connect(mGitlab.get(), &GitLabTransport::ListOfIssues, this, &QGitlabClient::listOfIssues);
     connect(mGitlab.get(), &GitLabTransport::ListOfLabels, this, &QGitlabClient::listOfLabels);
+}
+
+void QGitlabClient::setCredentials(const QString &url, const QString &token)
+{
+    if (mGitlab)
+    {
+        mGitlab->setCredentials(url, token);
+    }
 }
 
 void QGitlabClient::requestIssues(const QString &assignee,

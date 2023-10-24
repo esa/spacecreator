@@ -19,7 +19,8 @@ public:
         POST = 1,
         PUT = 2,
     };
-    GitLabTransport(const QString &url, const QString &token);
+    GitLabTransport();
+    void setCredentials(const QString &url, const QString &token);
     void RequestListofIssues(const QString &assignee = QString(),
                              const QString &author = QString(),
                              const QStringList &iids = QStringList());

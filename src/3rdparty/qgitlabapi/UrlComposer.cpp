@@ -4,8 +4,7 @@
 #include <QMap>
 #include <QUrlQuery>
 
-UrlComposer::UrlComposer(QUrl url)
-    : mBaseURL(url)
+UrlComposer::UrlComposer()
 {}
 
 QString UrlComposer::ComposeUrl(UrlTypes target) const
@@ -53,6 +52,11 @@ QUrlQuery UrlComposer::SetQuery(const QMap<QString, QVariant> data) const
 
 
     return query;
+}
+
+void UrlComposer::setBaseURL(const QUrl &newBaseURL)
+{
+    mBaseURL = newBaseURL;
 }
 
 QUrl UrlComposer::ComposeGetIssuesUrl(const QString &assignee,

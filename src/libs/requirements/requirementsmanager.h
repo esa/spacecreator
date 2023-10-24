@@ -13,7 +13,8 @@ public:
         GITLAB
     };
 
-    RequirementsManager(REPO_TYPE repoType, const QString &url, const QString &token);
+    RequirementsManager(REPO_TYPE repoType);
+    void setCredentials(const QString &url, const QString &token);
     void requestRequirements(const QString &assignee,
                              const QString &author,
                              const QStringList &iids) const;
