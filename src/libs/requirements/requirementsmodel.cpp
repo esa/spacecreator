@@ -24,11 +24,25 @@ RequirementsModel::RequirementsModel(QObject *parent)
 {
 }
 
+void RequirementsModel::clear()
+{
+    setRequirements({});
+}
+
 void RequirementsModel::setRequirements(const QList<Requirement> &requirements)
 {
     beginResetModel();
     m_requirements = requirements;
     endResetModel();
+}
+
+void RequirementsModel::addRequirements(const QList<Requirement> &requirements)
+{
+    beginInsertRows(QModelIndex(), m_requirements.size(), m_requirements.size() + requirements.size() - 1);
+
+    m_requirements.append(requirements);
+
+    endInsertRows();
 }
 
 QVariant RequirementsModel::headerData(int section, Qt::Orientation orientation, int role) const

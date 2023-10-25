@@ -25,6 +25,9 @@ along with this program. If not, see
 
 namespace requirement {
 
+/**
+ * @brief Model to hold requirements for a Qt view
+ */
 class RequirementsModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -32,7 +35,16 @@ class RequirementsModel : public QAbstractTableModel
 public:
     explicit RequirementsModel(QObject *parent = nullptr);
 
+    void clear();
+
+    /**
+     * Replaces the set of existing requirements with the given one
+     */
     void setRequirements(const QList<Requirement> &requirements);
+    /**
+     * Appends the given @p requiremnets to the existing ones
+     */
+    void addRequirements(const QList<Requirement> &requirements);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;

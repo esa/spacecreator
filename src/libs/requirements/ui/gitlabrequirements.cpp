@@ -23,14 +23,24 @@ GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document
     m_filterModel.setSourceModel(&m_model);
     ui->AllRequirements->setModel(&m_filterModel);
 
-    LoadSavedCredentials();
-    onLoginUpdate();
     connect(ui->Refresh, &QPushButton::clicked, this, &GitLabRequirements::onLoginUpdate);
     connect(ui->UrlLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
     connect(ui->TokenLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
 
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
     connect(ui->clearFilterButton, &QPushButton::clicked, ui->filterLineEdit, &QLineEdit::clear);
+
+    connect(&mReqManager, &RequirementsManager::listOfIssues, this, [this](QList<Issue> issues) {
+        QList<Requirement> requirements;
+        requirements.reserve(issues.size());
+        for (const auto &issue : issues) {
+            requirements.append(requirementFromIssue(issue));
+        }
+        m_model.addRequirements(requirements);
+    });
+
+    LoadSavedCredentials();
+    onLoginUpdate();
 }
 
 void GitLabRequirements::LoadSavedCredentials()
@@ -79,19 +89,12 @@ Requirement GitLabRequirements::requirementFromIssue(const Issue &issue) const
 
 void GitLabRequirements::onLoginUpdate()
 {
+    m_model.clear();
+
     mReqManager.setCredentials(ui->UrlLineEdit->text(), ui->TokenLineEdit->text());
 
     static const QString anyAssignee("");
     static const QString anyAuthor("");
     static const QStringList anyIssues = {};
-    m_model.setRequirements({});
     mReqManager.requestRequirements(anyAssignee, anyAuthor, anyIssues);
-    connect(&mReqManager, &RequirementsManager::listOfIssues, [this](QList<Issue> issues) {
-        QList<Requirement> requirements;
-        requirements.reserve(issues.size());
-        for (const auto &issue : issues) {
-            requirements.append(requirementFromIssue(issue));
-        }
-        m_model.setRequirements(requirements);
-    });
 }
