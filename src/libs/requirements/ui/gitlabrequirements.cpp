@@ -17,15 +17,19 @@ GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document
 
 {
     ui->setupUi(this);
+    m_filterModel.setDynamicSortFilter(true);
+    m_filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_filterModel.setFilterKeyColumn(-1);
     m_filterModel.setSourceModel(&m_model);
     ui->AllRequirements->setModel(&m_filterModel);
+
     LoadSavedCredentials();
     onLoginUpdate();
     connect(ui->Refresh, &QPushButton::clicked, this, &GitLabRequirements::onLoginUpdate);
     connect(ui->UrlLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
     connect(ui->TokenLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
 
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &RequirementsFilterModel::setFilter);
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
     connect(ui->clearFilterButton, &QPushButton::clicked, ui->filterLineEdit, &QLineEdit::clear);
 }
 
