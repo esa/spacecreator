@@ -194,6 +194,57 @@ void VERectGraphicsItem::updateTextPosition()
     }
 }
 
+void VERectGraphicsItem::showHelperLines(bool show)
+{
+    if (show) {
+        const QRectF rect = boundingRect();
+        if (!m_topHelper) {
+            m_topHelper = graphicsviewutils::horizontalHelper(0, this);
+        }
+        if (!m_bottomHelper) {
+            m_bottomHelper = graphicsviewutils::horizontalHelper(rect.height(), this);
+        }
+        if (!m_leftHelper) {
+            m_leftHelper = graphicsviewutils::verticalHelper(0, this);
+        }
+        if (!m_rightHelper) {
+            m_rightHelper = graphicsviewutils::verticalHelper(rect.width(), this);
+        }
+    } else {
+        delete m_topHelper;
+        m_topHelper = nullptr;
+        delete m_bottomHelper;
+        m_bottomHelper = nullptr;
+        delete m_leftHelper;
+        m_leftHelper = nullptr;
+        delete m_rightHelper;
+        m_rightHelper = nullptr;
+    }
+}
+
+void VERectGraphicsItem::updateHelperLines()
+{
+    using namespace shared::graphicsviewutils;
+
+    const QRectF rect = boundingRect();
+    if (m_topHelper) {
+        const qreal y = rect.y();
+        m_topHelper->setLine(QLineF(-kHelperLineLength, y, kHelperLineLength, y));
+    }
+    if (m_bottomHelper) {
+        const qreal y = rect.y() + rect.height();
+        m_bottomHelper->setLine(QLineF(-kHelperLineLength, y, kHelperLineLength, y));
+    }
+    if (m_leftHelper) {
+        const qreal x = rect.x();
+        m_leftHelper->setLine(QLineF(x, -kHelperLineLength, x, kHelperLineLength));
+    }
+    if (m_rightHelper) {
+        const qreal x = rect.x() + rect.width();
+        m_rightHelper->setLine(QLineF(x, -kHelperLineLength, x, kHelperLineLength));
+    }
+}
+
 void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip,
                                               const QPointF &pressedAt,
                                               const QPointF &releasedAt)
@@ -591,8 +642,9 @@ void VERectGraphicsItem::onGeometryChanged()
             m_overridingCursor = true;
         }
     }
-}
 
+    updateHelperLines();
+}
 
 bool VERectGraphicsItem::doLayout()
 {

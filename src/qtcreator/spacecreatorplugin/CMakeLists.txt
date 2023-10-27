@@ -8,6 +8,8 @@ set(SC_PLUGIN_SOURCES
     common/messagemanager.h
     common/qtceditor.cpp
     common/qtceditor.h
+    dv/dvactionhandler.cpp
+    dv/dvactionhandler.h
     dv/dveditordocument.cpp
     dv/dveditordocument.h
     dv/dveditorfactory.cpp

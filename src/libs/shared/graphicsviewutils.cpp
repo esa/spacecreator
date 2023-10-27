@@ -1138,6 +1138,24 @@ void findGeometryForPoint(
         }
     }
 }
+
+QGraphicsLineItem *horizontalHelper(qreal y, QGraphicsItem *parent)
+{
+    const QPen linePen(Qt::gray, 1, Qt::DashLine);
+    auto helper = new QGraphicsLineItem(parent);
+    helper->setPen(linePen);
+    helper->setLine(QLineF(-9999, y, 9999, y));
+    return helper;
 }
 
+QGraphicsLineItem *verticalHelper(qreal x, QGraphicsItem *parent)
+{
+    const QPen linePen(Qt::gray, 1, Qt::DashLine);
+    auto helper = new QGraphicsLineItem(parent);
+    helper->setPen(linePen);
+    helper->setLine(QLineF(x, -kHelperLineLength, x, kHelperLineLength));
+    return helper;
+}
+
+}
 }

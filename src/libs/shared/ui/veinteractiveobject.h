@@ -84,6 +84,8 @@ public:
      */
     shared::ColorHandler colorHandler() const override;
 
+    virtual void showHelperLines(bool show) { Q_UNUSED(show); };
+
 Q_SIGNALS:
     void clicked(const QPointF &scenePos);
     void doubleClicked();

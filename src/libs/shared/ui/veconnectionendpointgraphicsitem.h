@@ -75,10 +75,14 @@ protected:
 
     void updateTextPosition() override;
 
+    void showHelperLines(bool show) override;
+
 protected:
     QList<QPointer<VEConnectionGraphicsItem>> m_connections;
     shared::graphicsviewutils::LookupDirection m_adjustDirection = graphicsviewutils::LookupDirection::Bidirectional;
     Qt::Alignment m_alignment;
+    QGraphicsLineItem *m_horizontalHelper = nullptr;
+    QGraphicsLineItem *m_verticalHelper = nullptr;
 };
 
 } // namespace ui

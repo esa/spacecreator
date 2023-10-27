@@ -37,6 +37,7 @@
 #include "ivinterface.h"
 #include "ivmodel.h"
 #include "ivpropertytemplateconfig.h"
+#include "settingsmanager.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -160,6 +161,14 @@ QAction *IVEditorCore::actionLaunchModelCheckingWindow()
         m_actionLaunchModelCheckingWindow->setCheckable(true);
     }
     return m_actionLaunchModelCheckingWindow;
+}
+
+QAction *IVEditorCore::actionHelpLines()
+{
+    if (m_actionHelpLines == nullptr) {
+        m_actionHelpLines = createHelpLinesAction(this);
+    }
+    return m_actionHelpLines;
 }
 
 QAction *IVEditorCore::actionDelete() const

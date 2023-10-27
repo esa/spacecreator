@@ -81,6 +81,9 @@ protected:
 
     virtual void updateTextPosition() override;
 
+    void showHelperLines(bool show) override;
+    void updateHelperLines();
+
 private Q_SLOTS:
     void onGeometryChanged();
 
@@ -90,6 +93,10 @@ private:
 
     bool m_overridingCursor = false;
     QSet<VEInteractiveObject *> m_collidedItems;
+    QGraphicsLineItem *m_topHelper = nullptr;
+    QGraphicsLineItem *m_bottomHelper = nullptr;
+    QGraphicsLineItem *m_leftHelper = nullptr;
+    QGraphicsLineItem *m_rightHelper = nullptr;
 };
 
 } // namespace ui

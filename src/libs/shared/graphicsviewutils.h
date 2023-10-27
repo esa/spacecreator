@@ -32,6 +32,11 @@ static const qreal kInterfaceTolerance = 5.;
  */
 static const qreal kFunctionTolerance = 20.;
 
+/*!
+ * Length of the helper lines to the left and right
+ */
+static const qreal kHelperLineLength = 9999.;
+
 enum class IntersectionType
 {
     Edge,
@@ -180,6 +185,9 @@ ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
 }
 
 void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal margin);
+
+QGraphicsLineItem *horizontalHelper(qreal y, QGraphicsItem *parent = nullptr);
+QGraphicsLineItem *verticalHelper(qreal x, QGraphicsItem *parent = nullptr);
 
 } // namespace graphicsviewutils
 } // namespace shared

@@ -105,6 +105,12 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+
+    void showHelperLines(bool show);
+
+private:
+    QGraphicsLineItem *m_horizontalHelper = nullptr;
+    QGraphicsLineItem *m_verticalHelper = nullptr;
 };
 
 } // namespace ui

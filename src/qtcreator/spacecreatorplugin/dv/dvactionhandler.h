@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2021 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2023 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,25 +17,15 @@
 
 #pragma once
 
-#include <QPointer>
-#include <coreplugin/editormanager/ieditorfactory.h>
-#include <memory>
+#include "common/actionhandler.h"
 
 namespace spctr {
-class DVActionHandler;
-class SpaceCreatorProjectManager;
 
-class DVEditorFactory : public Core::IEditorFactory
+class DVActionHandler : public ActionHandler
 {
     Q_OBJECT
 public:
-    DVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
-
-    Core::IEditor *createDVEditor();
-
-private:
-    std::unique_ptr<DVActionHandler> m_actionHandler;
-    QPointer<SpaceCreatorProjectManager> m_projectManager;
+    explicit DVActionHandler(QObject *parent = nullptr);
 };
 
-} // namespace spctr
+}

@@ -18,6 +18,7 @@
 #include "editorcore.h"
 
 #include "scversion.h"
+#include "settingsmanager.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QAction>
@@ -161,6 +162,25 @@ void EditorCore::setupMiniMap()
     m_miniMap->setVisible(actionToggleMinimap()->isChecked());
     connect(actionToggleMinimap(), &QAction::toggled, m_miniMap, &shared::ui::MiniMap::setVisible);
     connect(m_miniMap, &shared::ui::MiniMap::visibilityChanged, actionToggleMinimap(), &QAction::setChecked);
+}
+
+QAction *EditorCore::createHelpLinesAction(QObject *parent)
+{
+    using namespace shared;
+    auto action = new QAction(QIcon(":/sharedresources/icons/helplinesmove.svg"), tr("Helplines While Moving"), parent);
+    action->setCheckable(true);
+
+    SettingsManager *settings = SettingsManager::instance();
+    const bool helpLines = settings->load<bool>(SettingsManager::Common::ShowHelpLines, true);
+    action->setChecked(helpLines);
+    connect(settings, &SettingsManager::settingChanged, [action](const QString &key, const QVariant &value) {
+        if (key == SettingsManager::keyString(SettingsManager::Common::ShowHelpLines)) {
+            action->setChecked(value.toBool());
+        }
+    });
+    connect(action, &QAction::triggered,
+            [action]() { SettingsManager::store(SettingsManager::Common::ShowHelpLines, action->isChecked()); });
+    return action;
 }
 
 void EditorCore::showHelp()

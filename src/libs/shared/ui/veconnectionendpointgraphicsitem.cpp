@@ -17,6 +17,7 @@
 
 #include "veconnectionendpointgraphicsitem.h"
 
+#include "graphicsviewutils.h"
 #include "positionlookuphelper.h"
 #include "textitem.h"
 #include "veconnectiongraphicsitem.h"
@@ -272,6 +273,24 @@ void VEConnectionEndPointGraphicsItem::updateTextPosition()
 {
     if (m_textItem) {
         m_textItem->setPos(QPointF(0, 0));
+    }
+}
+
+void VEConnectionEndPointGraphicsItem::showHelperLines(bool show)
+{
+    if (show) {
+        const QPointF center = mapFromScene(connectionEndPoint());
+        if (!m_horizontalHelper) {
+            m_horizontalHelper = graphicsviewutils::horizontalHelper(center.y(), this);
+        }
+        if (!m_verticalHelper) {
+            m_verticalHelper = graphicsviewutils::verticalHelper(center.x(), this);
+        }
+    } else {
+        delete m_horizontalHelper;
+        m_horizontalHelper = nullptr;
+        delete m_verticalHelper;
+        m_verticalHelper = nullptr;
     }
 }
 

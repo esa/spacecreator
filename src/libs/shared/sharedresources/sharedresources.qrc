@@ -17,6 +17,7 @@
     </qresource>
     <qresource prefix="/sharedresources">
         <file>icons/copy.svg</file>
+        <file>icons/helplinesmove.svg</file>
         <file>icons/minimap.svg</file>
         <file>icons/newfile.svg</file>
         <file>icons/open.svg</file>

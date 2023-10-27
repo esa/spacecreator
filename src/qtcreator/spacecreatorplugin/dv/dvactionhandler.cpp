@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2023 European Space Agency - <maxime.perrotin@esa.int>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "ivactionhandler.h"
+#include "dvactionhandler.h"
 
 #include "editorcore.h"
 #include "spacecreatorpluginconstants.h"
@@ -31,27 +31,23 @@
 
 namespace spctr {
 
-IVActionHandler::IVActionHandler(QObject *parent)
-    : ActionHandler(spctr::Constants::K_IV_EDITOR_ID, parent)
+DVActionHandler::DVActionHandler(QObject *parent)
+    : ActionHandler(spctr::Constants::K_DV_EDITOR_ID, parent)
 {
     Core::Context contexts;
-    contexts.add(spctr::Constants::K_IV_EDITOR_ID);
+    contexts.add(spctr::Constants::K_DV_EDITOR_ID);
 
-    auto interfaceViewMenu = Core::ActionManager::createMenu(Constants::IV_MENU_ID);
-    auto action = new QAction(tr("Manage Archetypes"), this);
-    auto command = Core::ActionManager::registerAction(action, Constants::IV_MANAGE_ARCHETYPES_ID, contexts);
-    interfaceViewMenu->addAction(command);
-
+    auto viewMenu = Core::ActionManager::createMenu(Constants::DV_MENU_ID);
     auto helpLinesAction = shared::EditorCore::createHelpLinesAction(this);
     auto helpLinesCommand =
-            Core::ActionManager::registerAction(helpLinesAction, Constants::IV_SHOW_HELP_LINES_ID, contexts);
-    interfaceViewMenu->addAction(helpLinesCommand);
+            Core::ActionManager::registerAction(helpLinesAction, Constants::DV_SHOW_HELP_LINES_ID, contexts);
+    viewMenu->addAction(helpLinesCommand);
 
     auto toolsMenu = Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
-    QMenu *menu = interfaceViewMenu->menu();
-    menu->setTitle(tr("Interface view"));
+    QMenu *menu = viewMenu->menu();
+    menu->setTitle(tr("Deployment view"));
     menu->setEnabled(true);
-    toolsMenu->addMenu(interfaceViewMenu);
+    toolsMenu->addMenu(viewMenu);
 }
 
 }

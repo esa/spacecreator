@@ -74,6 +74,8 @@ public:
     /// Saves the file
     virtual bool save() = 0;
 
+    static QAction *createHelpLinesAction(QObject *parent = nullptr);
+
 public Q_SLOTS:
     void showHelp();
     void showAboutDialog();

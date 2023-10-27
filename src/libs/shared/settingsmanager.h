@@ -37,6 +37,7 @@ public:
         ColorSchemeFile,
         ShowMinimap,
         MinimapLocation,
+        ShowHelpLines,
     };
     Q_ENUM(Common)
 

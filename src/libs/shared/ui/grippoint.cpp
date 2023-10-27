@@ -18,7 +18,9 @@
 
 #include "grippoint.h"
 
+#include "graphicsviewutils.h"
 #include "grippointshandler.h"
+#include "settingsmanager.h"
 
 #include <QColor>
 #include <QCursor>
@@ -200,6 +202,9 @@ void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
         if (m_gripPointsHandler) {
             Q_EMIT m_gripPointsHandler->manualGeometryChangeStart(this, event->scenePos());
         }
+        if (SettingsManager::load<bool>(SettingsManager::Common::ShowHelpLines, true)) {
+            showHelperLines(true);
+        }
         event->accept();
     } else {
         event->ignore();
@@ -208,10 +213,29 @@ void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    showHelperLines(false);
     if (m_gripPointsHandler) {
         Q_EMIT m_gripPointsHandler->manualGeometryChangeFinish(
                 this, event->buttonDownScenePos(event->button()), event->scenePos());
         event->accept();
+    }
+}
+
+void GripPoint::showHelperLines(bool show)
+{
+    if (show) {
+        const QPointF center = boundingRect().center();
+        if (!m_horizontalHelper) {
+            m_horizontalHelper = graphicsviewutils::horizontalHelper(center.y(), this);
+        }
+        if (!m_verticalHelper) {
+            m_verticalHelper = graphicsviewutils::verticalHelper(center.x(), this);
+        }
+    } else {
+        delete m_horizontalHelper;
+        m_horizontalHelper = nullptr;
+        delete m_verticalHelper;
+        m_verticalHelper = nullptr;
     }
 }
 

@@ -404,6 +404,7 @@ void MainWindow::initMenus()
     menu->addAction(m_core->actionToggleMinimap());
     menu->addAction(m_core->actionToggleE2EView());
     menu->addAction(m_core->actionLaunchModelCheckingWindow());
+    menu->addAction(m_core->actionHelpLines());
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));

@@ -21,6 +21,7 @@
 #include "commands/cmdentitygeometrychange.h"
 #include "commandsstackbase.h"
 #include "graphicsviewutils.h"
+#include "settingsmanager.h"
 #include "textitem.h"
 #include "veobject.h"
 
@@ -267,6 +268,10 @@ void VEInteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
     s_mouseReleased = false;
     QGraphicsObject::mousePressEvent(event);
     onManualMoveStart(gripPointItem(shared::ui::GripPoint::Center), event->scenePos());
+
+    if (SettingsManager::load<bool>(SettingsManager::Common::ShowHelpLines, true)) {
+        showHelperLines(true);
+    }
 }
 
 void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -285,6 +290,7 @@ void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    showHelperLines(false);
     s_mouseReleased = true;
     onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()),
             event->scenePos());
@@ -299,6 +305,7 @@ void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void VEInteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseDoubleClickEvent(event);
+    showHelperLines(false);
     Q_EMIT doubleClicked();
 }
 
