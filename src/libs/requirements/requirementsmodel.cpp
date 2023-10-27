@@ -79,6 +79,14 @@ QVariant RequirementsModel::data(const QModelIndex &index, int role) const
       return QVariant();
   }
 
+  if (role == RequirementsModel::RoleNames::IssueLinkRole) {
+      switch (index.column()) {
+      case 0:
+          return m_requirements[index.row()].m_id;
+      case 1:
+          return m_requirements[index.row()].m_link;
+      }
+  }
   if (role == Qt::DisplayRole) {
       switch (index.column()) {
       case 0:

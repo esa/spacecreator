@@ -3,8 +3,10 @@
 #include "interfacedocument.h"
 #include "ui_gitlabrequirements.h"
 
+#include <QDesktopServices>
 #include <QLineEdit>
 #include <QSettings>
+#include <QTableView>
 #include <requirement.h>
 
 using namespace requirement;
@@ -23,12 +25,19 @@ GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document
     m_filterModel.setSourceModel(&m_model);
     ui->AllRequirements->setModel(&m_filterModel);
 
+    connect(ui->AllRequirements, &QTableView::doubleClicked, this, &GitLabRequirements::openIssueLink);
     connect(ui->Refresh, &QPushButton::clicked, this, &GitLabRequirements::onLoginUpdate);
     connect(ui->UrlLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
     connect(ui->TokenLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
 
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
     connect(ui->clearFilterButton, &QPushButton::clicked, ui->filterLineEdit, &QLineEdit::clear);
+    connect(&mReqManager, &RequirementsManager::RequestedProjectID, this, [this](const QString &projectID) {
+        static const QString anyAssignee("");
+        static const QString anyAuthor("");
+        static const QStringList anyIssues = {};
+        mReqManager.requestRequirements(projectID, anyAssignee, anyAuthor, anyIssues);
+    });
 
     connect(&mReqManager, &RequirementsManager::listOfIssues, this, [this](QList<Issue> issues) {
         QList<Requirement> requirements;
@@ -84,7 +93,8 @@ void GitLabRequirements::onChangeOfCredentials()
 
 Requirement GitLabRequirements::requirementFromIssue(const Issue &issue) const
 {
-    return { issue.mIssueID, issue.mTitle, issue.mDescription, issue.mIssueID };
+    auto issue_url = m_document->requirementsURL() + "/-/issues/" + issue.mIssueID;
+    return { issue.mIssueID, issue.mTitle, issue.mDescription, issue.mIssueID, issue_url};
 }
 
 void GitLabRequirements::onLoginUpdate()
@@ -93,8 +103,11 @@ void GitLabRequirements::onLoginUpdate()
 
     mReqManager.setCredentials(ui->UrlLineEdit->text(), ui->TokenLineEdit->text());
 
-    static const QString anyAssignee("");
-    static const QString anyAuthor("");
-    static const QStringList anyIssues = {};
-    mReqManager.requestRequirements(anyAssignee, anyAuthor, anyIssues);
+    auto projectName = QUrl(ui->UrlLineEdit->text()).path().split("/").last();
+    mReqManager.RequestProjectID(projectName);
+}
+
+void GitLabRequirements::openIssueLink(const QModelIndex &index)
+{
+   QDesktopServices::openUrl(index.data(Qt::UserRole).toString());
 }

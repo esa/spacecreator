@@ -36,7 +36,7 @@ protected:
 
 protected Q_SLOTS:
     void onLoginUpdate();
-
+    void openIssueLink(const QModelIndex &index);
 private:
     Ui::GitLabRequirements *ui;
     RequirementsManager mReqManager;

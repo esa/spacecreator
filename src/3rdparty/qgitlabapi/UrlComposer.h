@@ -10,6 +10,7 @@ public:
         GetIssues,
         CreateIssue,
         EditIssue,
+        Projects,
         ProjectLabels,
 
     };
@@ -17,7 +18,7 @@ public:
     UrlComposer();
     QString ComposeUrl(UrlComposer::UrlTypes target) const;
 
-    QUrl ComposeGetIssuesUrl(const QString &assignee,
+    QUrl ComposeGetIssuesUrl(const QString &projectID, const QString &assignee,
                              const QString &author,
                              const QStringList &iids,
                              const QString &scope = "all") const;
@@ -36,6 +37,7 @@ public:
     QUrl ComposeProjectLabelsUrl(const QString &projectID,
                                  const QString &with_counts = "false",
                                  const QString &search = QString()) const;
+    QUrl ComposeProjectUrl(const QString &projectName) const;
 
     void setBaseURL(const QUrl &newBaseURL);
 

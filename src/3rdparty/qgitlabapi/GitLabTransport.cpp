@@ -17,8 +17,7 @@ const QString kContentType = "application/x-www-form-urlencoded";
 
 } // namespace
 
-GitLabTransport::GitLabTransport()
-{}
+GitLabTransport::GitLabTransport() { }
 
 void GitLabTransport::setCredentials(const QString &url, const QString &token)
 {
@@ -26,11 +25,10 @@ void GitLabTransport::setCredentials(const QString &url, const QString &token)
     mToken = token;
 }
 
-void GitLabTransport::RequestListofIssues(const QString &assignee,
-                                     const QString &author,
-                                     const QStringList &iids)
+void GitLabTransport::RequestListofIssues(
+        const QString &projectID, const QString &assignee, const QString &author, const QStringList &iids)
 {
-    auto reply = SendRequest(GitLabTransport::GET, mUrlComposer.ComposeGetIssuesUrl(assignee, author, iids));
+    auto reply = SendRequest(GitLabTransport::GET, mUrlComposer.ComposeGetIssuesUrl(projectID, assignee, author, iids));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
@@ -55,13 +53,13 @@ void GitLabTransport::RequestIssue(const QString &issueID)
     static const QString anyAssignee("");
     static const QString anyAuthor("");
 
-    RequestListofIssues(anyAssignee, anyAuthor, {issueID});
+    RequestListofIssues(anyAssignee, anyAuthor, { issueID });
 }
 
 void GitLabTransport::RequestListofLabels(const QString &projectID, const QString &with_counts, const QString &search)
 {
-    auto reply = SendRequest(GitLabTransport::GET,
-                             mUrlComposer.ComposeProjectLabelsUrl(projectID, with_counts, search));
+    auto reply =
+            SendRequest(GitLabTransport::GET, mUrlComposer.ComposeProjectLabelsUrl(projectID, with_counts, search));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
@@ -85,10 +83,7 @@ void GitLabTransport::RequestListofLabels(const QString &projectID, const QStrin
 void GitLabTransport::CreateIssue(const QString &projectID, const Issue &issue)
 {
     auto reply = SendRequest(GitLabTransport::POST,
-                             mUrlComposer.ComposeCreateIssueUrl(projectID,
-                                                                issue.mTitle,
-                                                                issue.mDescription,
-                                                                issue.mAssignee));
+            mUrlComposer.ComposeCreateIssueUrl(projectID, issue.mTitle, issue.mDescription, issue.mAssignee));
     connect(reply, &QNetworkReply::finished, [reply]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
             qDebug() << reply->error() << reply->errorString();
@@ -99,15 +94,35 @@ void GitLabTransport::CreateIssue(const QString &projectID, const Issue &issue)
 void GitLabTransport::EditIssue(const QString &projectID, const Issue &newIssue)
 {
     auto reply = SendRequest(GitLabTransport::PUT,
-                             mUrlComposer.ComposeEditIssueUrl(projectID,
-                                                              newIssue.mIssueID,
-                                                              newIssue.mTitle,
-                                                              newIssue.mDescription,
-                                                              newIssue.mAssignee,
-                                                              newIssue.mState_event,
-                                                              newIssue.mLabels));
+            mUrlComposer.ComposeEditIssueUrl(projectID, newIssue.mIssueID, newIssue.mTitle, newIssue.mDescription,
+                    newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
     connect(reply, &QNetworkReply::finished, [reply]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
+            qDebug() << reply->error() << reply->errorString();
+        }
+    });
+}
+
+void GitLabTransport::requestProjectIdByName(const QString &projectName)
+{
+    auto reply = SendRequest(GitLabTransport::GET, mUrlComposer.ComposeProjectUrl(projectName));
+    connect(reply, &QNetworkReply::finished, [reply, this]() {
+        if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
+            QJsonParseError jsonError;
+            auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
+            if (QJsonParseError::NoError != jsonError.error) {
+                qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
+                emit ConnectionError(reply->errorString());
+            } else {
+                QString projectID;
+                auto content = replyContent.array();
+                if (!content.isEmpty()) {
+                    static const auto ID = "id";
+                    auto projectID =  QString::number(content.at(0).toObject().value("id").toInteger());
+                    emit RequestedProjectID(projectID);
+                }
+            }
+        } else {
             qDebug() << reply->error() << reply->errorString();
         }
     });
@@ -120,25 +135,20 @@ QNetworkReply *GitLabTransport::SendRequest(GitLabTransport::ReqType reqType, co
     request.setHeader(QNetworkRequest::ContentTypeHeader, kContentType);
 
     QNetworkReply *reply;
-    switch(reqType)
-    {
-    case GitLabTransport::GET:
-    {
+    switch (reqType) {
+    case GitLabTransport::GET: {
         reply = mManager.get(request);
         break;
     }
-    case GitLabTransport::POST:
-    {
+    case GitLabTransport::POST: {
         reply = mManager.post(request, uri.query(QUrl::FullyEncoded).toUtf8());
         break;
     }
-    case GitLabTransport::PUT:
-    {
+    case GitLabTransport::PUT: {
         reply = mManager.sendCustomRequest(request, "PUT");
         break;
     }
-    default:
-    {
+    default: {
         qDebug() << "Unknown request";
     }
     }

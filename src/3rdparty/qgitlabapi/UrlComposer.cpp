@@ -11,10 +11,7 @@ QString UrlComposer::ComposeUrl(UrlTypes target) const
 {
     QString address(mBaseURL.toString());
     switch (target) {
-    case UrlTypes::GetIssues: {
-        address += "/issues";
-        break;
-    }
+    case UrlTypes::GetIssues:
     case UrlComposer::UrlTypes::CreateIssue: {
         address += "/projects/%1/issues";
         break;
@@ -23,7 +20,11 @@ QString UrlComposer::ComposeUrl(UrlTypes target) const
         address += "/projects/%1/issues/%2";
         break;
     }
-    case ProjectLabels: {
+    case UrlComposer::UrlTypes::Projects: {
+        address +="/projects";
+        break;
+    }
+    case UrlComposer::UrlTypes::ProjectLabels: {
         address += "/projects/%1/labels";
         break;
     }
@@ -59,12 +60,14 @@ void UrlComposer::setBaseURL(const QUrl &newBaseURL)
     mBaseURL = newBaseURL;
 }
 
-QUrl UrlComposer::ComposeGetIssuesUrl(const QString &assignee,
+QUrl UrlComposer::ComposeGetIssuesUrl(const QString &projectID,
+                                      const QString &assignee,
                                       const QString &author,
                                       const QStringList &iids,
                                       const QString &scope) const
 {
-    QUrl url(ComposeUrl(UrlComposer::UrlTypes::GetIssues));
+    auto address = ComposeUrl(UrlComposer::UrlTypes::GetIssues);
+    address = address.arg(projectID);
 
     const QMap<QString, QVariant> data = {
         {"scope", scope},
@@ -72,7 +75,7 @@ QUrl UrlComposer::ComposeGetIssuesUrl(const QString &assignee,
         {"assignee_username", assignee},
         {"author_username", author},
     };
-
+    QUrl url(address);
     url.setQuery(SetQuery(data));
     return url;
 }
@@ -130,6 +133,19 @@ QUrl UrlComposer::ComposeProjectLabelsUrl(const QString &projectID,
         {"id", projectID},
         {"with_counts", with_counts},
         {"search", search} // Search label terms
+    };
+
+    QUrl url(address);
+    url.setQuery(SetQuery(data));
+    return url;
+}
+
+QUrl UrlComposer::ComposeProjectUrl(const QString &projectName) const
+{
+    QString address = ComposeUrl(UrlComposer::UrlTypes::Projects);
+
+    const QMap<QString, QVariant> data = {
+        {"search", projectName} // Search project name
     };
 
     QUrl url(address);

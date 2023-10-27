@@ -21,7 +21,8 @@ public:
     };
     GitLabTransport();
     void setCredentials(const QString &url, const QString &token);
-    void RequestListofIssues(const QString &assignee = QString(),
+    void RequestListofIssues(const QString &projectID,
+                             const QString &assignee = QString(),
                              const QString &author = QString(),
                              const QStringList &iids = QStringList());
     void RequestIssue(const QString &issueID);
@@ -30,7 +31,7 @@ public:
                              const QString &search);
     void CreateIssue(const QString &projectID, const Issue &issue);
     void EditIssue(const QString &projectID, const Issue &newIssue);
-
+    void requestProjectIdByName(const QString &projectName);
 protected:
     QNetworkReply *SendRequest(ReqType reqType, const QUrl &url);
 
@@ -38,6 +39,7 @@ Q_SIGNALS:
     void ListOfIssues(QList<Issue> issues);
     void ListOfLabels(QList<Label> labels);
     void ConnectionError(QString errorString);
+    void RequestedProjectID(QString projectID);
 
 private:
     QString mUsername;

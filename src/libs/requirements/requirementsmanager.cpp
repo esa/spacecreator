@@ -17,16 +17,17 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType):
 
 void RequirementsManager::setCredentials(const QString &url, const QString &token)
 {
-    gitlabClient->setCredentials(url, token);
+    auto _url = QUrl(url);
+    gitlabClient->setCredentials(_url.scheme() + "://" + _url.host(), token);
 }
 
-void RequirementsManager::requestRequirements(const QString &assignee, const QString &author, const QStringList &iids) const
+void RequirementsManager::requestRequirements(const QString &projectID, const QString &assignee, const QString &author, const QStringList &iids) const
 {
     switch(mRepoType)
     {
     case(REPO_TYPE::GITLAB):
     {
-        gitlabClient->requestIssues(assignee, author, iids);
+        gitlabClient->requestIssues(projectID, assignee, author, iids);
         connect(gitlabClient, &QGitlabClient::listOfIssues, this, &RequirementsManager::listOfIssues, Qt::UniqueConnection);
         break;
     }
@@ -56,6 +57,21 @@ void RequirementsManager::RequestListofLabels(const QString &projectID, const QS
     case(REPO_TYPE::GITLAB):
     {
         gitlabClient->RequestListofLabels(projectID, with_counts, search);
+        break;
+    }
+    default:
+        qDebug() << "unknown repository type";
+    }
+}
+
+void RequirementsManager::RequestProjectID(const QString &projectName)
+{
+    switch(mRepoType)
+    {
+    case(REPO_TYPE::GITLAB):
+    {
+        gitlabClient->requestProjectIdByName(projectName);
+        connect(gitlabClient, &QGitlabClient::RequestedProjectID, this, &RequirementsManager::RequestedProjectID, Qt::UniqueConnection);
         break;
     }
     default:

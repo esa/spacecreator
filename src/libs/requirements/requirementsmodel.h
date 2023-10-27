@@ -33,6 +33,12 @@ class RequirementsModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
+    enum RoleNames {
+        IssueLinkRole = Qt::UserRole + 1
+    };
+
+
+
     explicit RequirementsModel(QObject *parent = nullptr);
 
     void clear();

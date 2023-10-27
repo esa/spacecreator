@@ -29,6 +29,7 @@ public:
     QString m_description;
 
     QString m_issueID;
+    QString m_link;
 };
 
 } // namespace requirement
