@@ -34,6 +34,7 @@
 #include "itemeditor/dvnodegraphicsitem.h"
 #include "itemeditor/dvpartitiongraphicsitem.h"
 #include "itemeditor/graphicsitemhelpers.h"
+#include "ui/graphicsviewbase.h"
 #include "ui/veconnectiongraphicsitem.h"
 #include "ui/veinteractiveobject.h"
 #include "veobject.h"
@@ -55,7 +56,8 @@ static const qreal kPreviewItemPenWidth = 2.;
 
 namespace dve {
 
-DVCreatorTool::DVCreatorTool(QGraphicsView *view, DVItemModel *model, DVEditorCore *dvCore, QObject *parent)
+DVCreatorTool::DVCreatorTool(
+        shared::ui::GraphicsViewBase *view, DVItemModel *model, DVEditorCore *dvCore, QObject *parent)
     : shared::ui::CreatorTool(view, model, parent)
     , m_dvCore(dvCore)
 {
@@ -165,7 +167,7 @@ bool DVCreatorTool::onMousePress(QMouseEvent *e)
         return false;
     }
 
-    const QPointF scenePos = cursorInScene(e);
+    const QPointF scenePos = m_view->snappedPoint(cursorInScene(e));
     if ((m_toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
         return prepareReCreateConnectionPreview(e);
@@ -201,7 +203,7 @@ bool DVCreatorTool::onMouseRelease(QMouseEvent *e)
     } else if (m_toolType != ToolType::Pointer) {
         const bool hasPreview = m_previewItem || m_previewConnectionItem;
         if (hasPreview) {
-            const QPointF &scenePos = cursorInScene(e);
+            const QPointF &scenePos = m_view->snappedPoint(cursorInScene(e));
             return handleToolType(m_toolType, scenePos);
         }
     }
@@ -213,7 +215,7 @@ bool DVCreatorTool::onMouseMove(QMouseEvent *e)
     if (!m_view || !m_view->scene())
         return false;
 
-    const QPointF &scenePos = cursorInScene(e);
+    const QPointF &scenePos = m_view->snappedPoint(cursorInScene(e));
     if (m_previewItem && m_previewItem->isVisible()) {
         const QRectF newGeometry = QRectF(m_clickScenePos, scenePos).normalized();
         if (!newGeometry.isValid())

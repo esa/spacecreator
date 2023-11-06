@@ -64,8 +64,10 @@ const char IV_HELP_ID[] = "IVEditor.Help";
 const char IV_MENU_ID[] = "InterfaceView.Tools.Menu";
 const char IV_MANAGE_ARCHETYPES_ID[] = "InterfaceView.ManageArchetypes";
 const char IV_SHOW_HELP_LINES_ID[] = "InterfaceView.ShowHelpLines";
+const char IV_SNAP_TO_GRID_ID[] = "InterfaceView.SnapToGrid";
 const char DV_MENU_ID[] = "DeploymentView.Tools.Menu";
 const char DV_SHOW_HELP_LINES_ID[] = "DeploymentView.ShowHelpLines";
+const char DV_SNAP_TO_GRID_ID[] = "DeploymentView.SnapToGrid";
 
 // Settings
 const char SETTINGS_CATEGORY_DISPLAY[] = QT_TRANSLATE_NOOP("SpaceCreator", "SpaceCreator");

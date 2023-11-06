@@ -191,7 +191,9 @@ void GripPoint::updateLayout()
 void GripPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (m_gripPointsHandler) {
-        Q_EMIT m_gripPointsHandler->manualGeometryChangeProgress(this, event->lastScenePos(), event->scenePos());
+        Q_EMIT m_gripPointsHandler->manualGeometryChangeProgress(this,
+                graphicsviewutils::snappedPoint(scene(), event->lastScenePos()),
+                graphicsviewutils::snappedPoint(scene(), event->scenePos()));
         event->accept();
     }
 }
@@ -200,9 +202,11 @@ void GripPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         if (m_gripPointsHandler) {
-            Q_EMIT m_gripPointsHandler->manualGeometryChangeStart(this, event->scenePos());
+            Q_EMIT m_gripPointsHandler->manualGeometryChangeStart(
+                    this, graphicsviewutils::snappedPoint(scene(), event->scenePos()));
         }
-        if (SettingsManager::load<bool>(SettingsManager::Common::ShowHelpLines, true)) {
+        if (m_gripPointsHandler->helpLinesSupported()
+                && SettingsManager::load<bool>(SettingsManager::Common::ShowHelpLines, true)) {
             showHelperLines(true);
         }
         event->accept();
@@ -215,8 +219,8 @@ void GripPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     showHelperLines(false);
     if (m_gripPointsHandler) {
-        Q_EMIT m_gripPointsHandler->manualGeometryChangeFinish(
-                this, event->buttonDownScenePos(event->button()), event->scenePos());
+        Q_EMIT m_gripPointsHandler->manualGeometryChangeFinish(this, event->buttonDownScenePos(event->button()),
+                graphicsviewutils::snappedPoint(scene(), event->scenePos()));
         event->accept();
     }
 }

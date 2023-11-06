@@ -43,6 +43,10 @@ DVActionHandler::DVActionHandler(QObject *parent)
             Core::ActionManager::registerAction(helpLinesAction, Constants::DV_SHOW_HELP_LINES_ID, contexts);
     viewMenu->addAction(helpLinesCommand);
 
+    auto gridSnapAction = shared::EditorCore::createSnapToGridAction(this);
+    auto gridSnapCommand = Core::ActionManager::registerAction(gridSnapAction, Constants::DV_SNAP_TO_GRID_ID, contexts);
+    viewMenu->addAction(gridSnapCommand);
+
     auto toolsMenu = Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
     QMenu *menu = viewMenu->menu();
     menu->setTitle(tr("Deployment view"));

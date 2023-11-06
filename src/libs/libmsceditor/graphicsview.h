@@ -46,6 +46,8 @@ protected:
 
     QList<QPair<QPointF, QString>> mouseMoveCoordinates(
             QGraphicsScene *scene, const QPoint &screenPos, const QPointF &scenePos) const override;
+
+    bool gridSnapSupported() const override;
 };
 
 }

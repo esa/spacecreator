@@ -171,6 +171,14 @@ QAction *IVEditorCore::actionHelpLines()
     return m_actionHelpLines;
 }
 
+QAction *IVEditorCore::actionSnapToGrid()
+{
+    if (m_actionSnapToGrid == nullptr) {
+        m_actionSnapToGrid = createSnapToGridAction(this);
+    }
+    return m_actionSnapToGrid;
+}
+
 QAction *IVEditorCore::actionDelete() const
 {
     return m_mainWidget->actionDelete();

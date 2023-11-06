@@ -72,6 +72,7 @@ public:
     QAction *actionToggleE2EView();
     QAction *actionLaunchModelCheckingWindow();
     QAction *actionHelpLines();
+    QAction *actionSnapToGrid();
     QAction *actionDelete() const override;
 
     ivm::IVFunction *addFunction(const QString &name, ivm::IVFunction *parent = nullptr);
@@ -113,6 +114,7 @@ private:
     QAction *m_actionToggleE2EView { nullptr };
     QAction *m_actionLaunchModelCheckingWindow { nullptr };
     QAction *m_actionHelpLines { nullptr };
+    QAction *m_actionSnapToGrid { nullptr };
 
     QVector<ivm::IVFunction *> m_ivFunctions;
     QVector<ivm::IVConnection *> m_ivConnections;

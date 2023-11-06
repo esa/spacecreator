@@ -75,6 +75,7 @@ public:
     virtual bool save() = 0;
 
     static QAction *createHelpLinesAction(QObject *parent = nullptr);
+    static QAction *createSnapToGridAction(QObject *parent = nullptr);
 
 public Q_SLOTS:
     void showHelp();

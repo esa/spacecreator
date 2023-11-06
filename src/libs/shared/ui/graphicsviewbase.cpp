@@ -17,6 +17,8 @@
 
 #include "graphicsviewbase.h"
 
+#include "settingsmanager.h"
+
 #include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
@@ -92,6 +94,29 @@ qreal GraphicsViewBase::zoomStepPercent() const
 void GraphicsViewBase::setInteractive(bool on)
 {
     d->interactive = on;
+}
+
+QPointF GraphicsViewBase::snappedPoint(const QPointF &pos) const
+{
+    if (!gridSnapSupported()) {
+        return pos;
+    }
+
+    SettingsManager *settings = SettingsManager::instance();
+    const bool snap = settings->load<bool>(SettingsManager::Common::SnapToGrid, true);
+    if (snap) {
+        const qreal gridSize = settings->load<double>(SettingsManager::Common::ViewGridSize, 10.);
+        auto snapCoord = [gridSize](qreal value) -> qreal { return std::round(value / gridSize) * gridSize; };
+
+        return QPointF(snapCoord(pos.x()), snapCoord(pos.y()));
+    } else {
+        return pos;
+    }
+}
+
+QRectF GraphicsViewBase::snappedRect(const QRectF &rect) const
+{
+    return QRectF(snappedPoint(rect.topLeft()), snappedPoint(rect.bottomRight()));
 }
 
 /*!
@@ -295,6 +320,11 @@ void GraphicsViewBase::dropEvent(QDropEvent *event)
         }
     }
     return;
+}
+
+bool GraphicsViewBase::gridSnapSupported() const
+{
+    return true;
 }
 
 }

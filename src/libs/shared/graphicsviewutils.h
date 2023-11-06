@@ -186,8 +186,25 @@ ItemType *itemAt(const QGraphicsScene *scene, const QPointF &point)
 
 void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal margin);
 
+/*!
+ * Draws a horizontal helper line as child of \p parent. Helper lines in a very long dashed gray line
+ */
 QGraphicsLineItem *horizontalHelper(qreal y, QGraphicsItem *parent = nullptr);
+
+/*!
+ * Draws a horizontal helper line as child of \p parent. Helper lines in a very long dashed gray line
+ */
 QGraphicsLineItem *verticalHelper(qreal x, QGraphicsItem *parent = nullptr);
+
+/*!
+ * If snapping is enabled and supported, the given point is snapped to a virtual grid
+ */
+QPointF snappedPoint(QGraphicsScene *scene, const QPointF &pos);
+
+/*!
+ * If snapping is enabled and supported, the all the sides of the given rectangle are snapped to a virtual grid
+ */
+QRectF snappedRect(QGraphicsScene *scene, const QRectF &rect);
 
 } // namespace graphicsviewutils
 } // namespace shared

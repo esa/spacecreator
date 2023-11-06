@@ -18,7 +18,6 @@
 #include "graphicsview.h"
 
 #include "baseitems/common/coordinatesconverter.h"
-#include "baseitems/common/mscutils.h"
 #include "baseitems/interactiveobject.h"
 #include "graphicsviewutils.h"
 
@@ -60,6 +59,11 @@ QList<QPair<QPointF, QString>> GraphicsView::mouseMoveCoordinates(
                 item->modelEntity() ? item->modelEntity()->name() : QLatin1String("None") });
     }
     return coords;
+}
+
+bool GraphicsView::gridSnapSupported() const
+{
+    return false;
 }
 
 }

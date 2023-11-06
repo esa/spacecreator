@@ -278,7 +278,7 @@ void VEConnectionEndPointGraphicsItem::updateTextPosition()
 
 void VEConnectionEndPointGraphicsItem::showHelperLines(bool show)
 {
-    if (show) {
+    if (show && helpLinesSupported()) {
         const QPointF center = mapFromScene(connectionEndPoint());
         if (!m_horizontalHelper) {
             m_horizontalHelper = graphicsviewutils::horizontalHelper(center.y(), this);

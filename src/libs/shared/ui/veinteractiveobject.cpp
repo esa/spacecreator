@@ -180,6 +180,11 @@ shared::ColorHandler VEInteractiveObject::colorHandler() const
     return h;
 }
 
+bool VEInteractiveObject::helpLinesSupported() const
+{
+    return true;
+}
+
 shared::VEObject *VEInteractiveObject::entity() const
 {
     return m_dataObject;
@@ -267,7 +272,8 @@ void VEInteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     s_mouseReleased = false;
     QGraphicsObject::mousePressEvent(event);
-    onManualMoveStart(gripPointItem(shared::ui::GripPoint::Center), event->scenePos());
+    onManualMoveStart(
+            gripPointItem(shared::ui::GripPoint::Center), graphicsviewutils::snappedPoint(scene(), event->scenePos()));
 
     if (SettingsManager::load<bool>(SettingsManager::Common::ShowHelpLines, true)) {
         showHelperLines(true);
@@ -285,20 +291,21 @@ void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         return;
     }
     QGraphicsObject::mouseMoveEvent(event);
-    onManualMoveProgress(gripPointItem(shared::ui::GripPoint::Center), event->lastScenePos(), event->scenePos());
+    onManualMoveProgress(gripPointItem(shared::ui::GripPoint::Center),
+            graphicsviewutils::snappedPoint(scene(), event->lastScenePos()),
+            graphicsviewutils::snappedPoint(scene(), event->scenePos()));
 }
 
 void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    const QPointF pos = graphicsviewutils::snappedPoint(scene(), event->scenePos());
     showHelperLines(false);
     s_mouseReleased = true;
-    onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()),
-            event->scenePos());
+    onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()), pos);
 
-    const qreal distance =
-            graphicsviewutils::distanceLine(event->buttonDownScenePos(event->button()), event->scenePos());
+    const qreal distance = graphicsviewutils::distanceLine(event->buttonDownScenePos(event->button()), pos);
     if (distance <= kClickTreshold)
-        Q_EMIT clicked(event->scenePos());
+        Q_EMIT clicked(pos);
     QGraphicsObject::mouseReleaseEvent(event);
 }
 

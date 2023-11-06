@@ -48,6 +48,7 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
+#include "ui/graphicsviewbase.h"
 
 #include <QAction>
 #include <QApplication>
@@ -72,7 +73,7 @@ static const qreal kPreviewItemPenWidth = 2.;
 
 namespace ive {
 
-IVCreatorTool::IVCreatorTool(QGraphicsView *view, InterfaceDocument *doc)
+IVCreatorTool::IVCreatorTool(shared::ui::GraphicsViewBase *view, InterfaceDocument *doc)
     : shared::ui::CreatorTool(view, doc->itemsModel(), doc)
     , m_doc(doc)
 {
@@ -280,7 +281,7 @@ bool IVCreatorTool::onMousePress(QMouseEvent *e)
         return false;
     }
 
-    const QPointF scenePos = cursorInScene(e->globalPos());
+    const QPointF scenePos = m_view->snappedPoint(cursorInScene(e->globalPos()));
     if ((m_toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
         if (!m_previewConnectionItem) {
@@ -406,7 +407,7 @@ bool IVCreatorTool::onMouseRelease(QMouseEvent *e)
         const bool isIface = m_toolType == ToolType::ProvidedInterface || m_toolType == ToolType::RequiredInterface;
         if (hasPreview || isIface) {
             const QPointF &scenePos = cursorInScene(e->globalPos());
-            return handleToolType(m_toolType, scenePos);
+            return handleToolType(m_toolType, m_view->snappedPoint(scenePos));
         }
     }
     return false;
@@ -417,7 +418,7 @@ bool IVCreatorTool::onMouseMove(QMouseEvent *e)
     if (!m_view || !m_view->scene())
         return false;
 
-    const QPointF &scenePos = cursorInScene(e->globalPos());
+    const QPointF &scenePos = m_view->snappedPoint(cursorInScene(e->globalPos()));
     if (m_previewItem && m_previewItem->isVisible()) {
         const QRectF newGeometry = QRectF(m_clickScenePos, scenePos).normalized();
         if (!newGeometry.isValid())

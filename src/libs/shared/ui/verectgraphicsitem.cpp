@@ -123,7 +123,7 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
         return;
     }
 
-    const QRectF rect = movedRect(pressedAt, releasedAt);
+    const QRectF rect = graphicsviewutils::snappedRect(scene(), movedRect(pressedAt, releasedAt));
     if (QGraphicsItem *parentObj = parentItem()) {
         const QRectF parentRect =
                 parentObj->sceneBoundingRect().marginsRemoved(kContentMargins);
@@ -144,6 +144,7 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
     // Calculate new rect for this item, given that 'grip' was moved as descriped by 'from' and 'to'
     ResizeLimits resizeLimits(grip, from, to, sceneBoundingRect());
     QRectF newRect = resizedRect(resizeLimits);
+    newRect = graphicsviewutils::snappedRect(scene(), newRect);
     setGeometry(newRect);
 
     // Update positions of interface attachment points (iface)
@@ -196,7 +197,7 @@ void VERectGraphicsItem::updateTextPosition()
 
 void VERectGraphicsItem::showHelperLines(bool show)
 {
-    if (show) {
+    if (show && helpLinesSupported()) {
         const QRectF rect = boundingRect();
         if (!m_topHelper) {
             m_topHelper = graphicsviewutils::horizontalHelper(0, this);

@@ -44,7 +44,8 @@ public:
         ReCreateConnection,
     };
 
-    DVCreatorTool(QGraphicsView *view, DVItemModel *model, DVEditorCore *dvCore, QObject *parent = nullptr);
+    DVCreatorTool(
+            shared::ui::GraphicsViewBase *view, DVItemModel *model, DVEditorCore *dvCore, QObject *parent = nullptr);
     ~DVCreatorTool() override;
 
     void removeSelectedItems() override;

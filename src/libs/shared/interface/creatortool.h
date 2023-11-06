@@ -28,7 +28,6 @@
 #include <QSet>
 
 class QMenu;
-class QGraphicsView;
 class QMouseEvent;
 class QGraphicsRectItem;
 class QGraphicsPathItem;
@@ -36,6 +35,7 @@ class QContextMenuEvent;
 
 namespace shared {
 namespace ui {
+class GraphicsViewBase;
 class VEItemModel;
 class VEInteractiveObject;
 
@@ -48,7 +48,7 @@ public:
     {
         None = 0
     };
-    CreatorTool(QGraphicsView *view, VEItemModel *model, QObject *parent = nullptr);
+    CreatorTool(shared::ui::GraphicsViewBase *view, VEItemModel *model, QObject *parent = nullptr);
     ~CreatorTool() override;
 
     int toolType() const;
@@ -89,7 +89,7 @@ protected:
 
 protected:
     QSet<shared::ui::VEInteractiveObject *> m_collidedItems;
-    QPointer<QGraphicsView> m_view;
+    QPointer<shared::ui::GraphicsViewBase> m_view;
     QPointer<shared::ui::VEItemModel> m_model;
     QGraphicsRectItem *m_previewItem = nullptr;
     QGraphicsPathItem *m_previewConnectionItem = nullptr;

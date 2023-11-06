@@ -38,6 +38,8 @@ public:
         ShowMinimap,
         MinimapLocation,
         ShowHelpLines,
+        SnapToGrid,
+        ViewGridSize,
     };
     Q_ENUM(Common)
 

@@ -63,6 +63,15 @@ public:
     void setGripPointPos(GripPoint *gripPoint, const QPointF &scenePos);
     GripPoint *gripPoint(GripPoint::Location location) const;
 
+    /*!
+     * Sets if the grip point should show help lines when the user clicks on them
+     */
+    void setSupportHelpLines(bool support);
+    /*!
+     * Returns ih helper lines shpuld be shown for the grip points
+     */
+    bool helpLinesSupported() const;
+
 public Q_SLOTS:
     void showAnimated();
     void hideAnimated();
@@ -82,6 +91,7 @@ private:
     QList<GripPoint *> m_gripPoints;
     DrawRectInfo m_highlighter;
     bool m_visible = false;
+    bool m_supportHelpLines = true;
 
     GripPoint::Locations m_usedPoints;
 };

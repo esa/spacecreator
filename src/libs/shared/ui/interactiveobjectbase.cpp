@@ -1,20 +1,20 @@
 /*
-   Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
+    Copyright (C) 2018-2019 European Space Agency - <maxime.perrotin@esa.int>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public License
-   along with this program. If not, see
-   <https://www.gnu.org/licenses/lgpl-2.1.html>.
-*/
+    You should have received a copy of the GNU Library General Public License
+    along with this program. If not, see
+    <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 
 #include "interactiveobjectbase.h"
 
@@ -197,6 +197,16 @@ QPen InteractiveObjectBase::selectedPen() const
     return d->selectedPen;
 }
 
+void InteractiveObjectBase::showHelperLines(bool show)
+{
+    Q_UNUSED(show);
+}
+
+bool InteractiveObjectBase::helpLinesSupported() const
+{
+    return false;
+}
+
 /*!
    \brief InteractiveObjectBase::scheduleLayoutUpdate
    Triggers a geometry update of that item. That might be needed if for example the underlying entity changes some of
@@ -259,6 +269,7 @@ void InteractiveObjectBase::initGripPoints()
     }
 
     d->gripPointsHandler = new GripPointsHandler(this);
+    d->gripPointsHandler->setSupportHelpLines(helpLinesSupported());
     d->gripPointsHandler->setZValue(0);
 
     connect(d->gripPointsHandler, &GripPointsHandler::manualGeometryChangeStart, this,

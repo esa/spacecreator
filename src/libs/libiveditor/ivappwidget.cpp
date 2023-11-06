@@ -454,6 +454,8 @@ void IVAppWidget::showContextMenuForIVModel(const QPoint &pos)
     // Setup the context menu
     QMenu *menu = new QMenu;
     menu->addActions(actions);
+    QMenu *viewMenu = new QMenu(tr("View"), menu);
+
     menu->exec(treeView->mapToGlobal(pos));
 }
 

@@ -84,7 +84,10 @@ public:
      */
     shared::ColorHandler colorHandler() const override;
 
-    virtual void showHelperLines(bool show) { Q_UNUSED(show); };
+    /**
+     * Returns if actions (move/resize) should show a help lines for this item
+     */
+    bool helpLinesSupported() const override;
 
 Q_SIGNALS:
     void clicked(const QPointF &scenePos);

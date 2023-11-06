@@ -45,6 +45,16 @@ public:
 
     void setInteractive(bool on);
 
+    /*!
+     * If snapping is enabled and supported by this view, the given point is snapped to a virtual grid
+     */
+    QPointF snappedPoint(const QPointF &pos) const;
+    /*!
+     * If snapping is enabled and supported by this view, the all the sides of the given rectangle are snapped to a
+     * virtual grid
+     */
+    QRectF snappedRect(const QRectF &rect) const;
+
 Q_SIGNALS:
     void mouseMoved(const QString &coordsInfo);
     void zoomChanged(qreal percent);
@@ -80,6 +90,8 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+
+    virtual bool gridSnapSupported() const;
 
 private:
     struct GraphicsViewBasePrivate;

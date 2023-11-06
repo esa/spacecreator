@@ -17,6 +17,8 @@
 
 #include "creatortool.h"
 
+#include "editorcore.h"
+#include "ui/graphicsviewbase.h"
 #include "ui/veconnectiongraphicsitem.h"
 #include "ui/veinteractiveobject.h"
 #include "veitemmodel.h"
@@ -36,7 +38,7 @@
 namespace shared {
 namespace ui {
 
-CreatorTool::CreatorTool(QGraphicsView *view, VEItemModel *model, QObject *parent)
+CreatorTool::CreatorTool(shared::ui::GraphicsViewBase *view, VEItemModel *model, QObject *parent)
     : QObject(parent)
     , m_view(view)
     , m_model(model)
@@ -242,6 +244,10 @@ void CreatorTool::populateContextMenu_commonEdit(QMenu *menu, const QPointF &sce
             QIcon(QLatin1String(":/toolbar/icns/paste.svg")), tr("Paste"), this,
             [this, scenePos]() { Q_EMIT pasteActionTriggered(scenePos); }, QKeySequence::Paste);
     action->setEnabled(!QApplication::clipboard()->text().isEmpty());
+
+    QMenu *viewMenu = menu->addMenu(tr("View"));
+    viewMenu->addAction(shared::EditorCore::createHelpLinesAction(viewMenu));
+    viewMenu->addAction(shared::EditorCore::createSnapToGridAction(viewMenu));
 }
 
 void CreatorTool::populateContextMenu_propertiesDialog(QMenu *menu)

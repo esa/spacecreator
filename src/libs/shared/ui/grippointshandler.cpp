@@ -129,6 +129,16 @@ GripPoint *GripPointsHandler::gripPoint(GripPoint::Location location) const
     return nullptr;
 }
 
+void GripPointsHandler::setSupportHelpLines(bool support)
+{
+    m_supportHelpLines = support;
+}
+
+bool GripPointsHandler::helpLinesSupported() const
+{
+    return m_supportHelpLines;
+}
+
 void GripPointsHandler::showAnimated()
 {
     changeVisibilityAnimated(true);

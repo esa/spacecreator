@@ -173,13 +173,32 @@ QAction *EditorCore::createHelpLinesAction(QObject *parent)
     SettingsManager *settings = SettingsManager::instance();
     const bool helpLines = settings->load<bool>(SettingsManager::Common::ShowHelpLines, true);
     action->setChecked(helpLines);
-    connect(settings, &SettingsManager::settingChanged, [action](const QString &key, const QVariant &value) {
+    connect(settings, &SettingsManager::settingChanged, action, [action](const QString &key, const QVariant &value) {
         if (key == SettingsManager::keyString(SettingsManager::Common::ShowHelpLines)) {
             action->setChecked(value.toBool());
         }
     });
     connect(action, &QAction::triggered,
             [action]() { SettingsManager::store(SettingsManager::Common::ShowHelpLines, action->isChecked()); });
+    return action;
+}
+
+QAction *EditorCore::createSnapToGridAction(QObject *parent)
+{
+    using namespace shared;
+    auto action = new QAction(QIcon(":/sharedresources/icons/griduse.svg"), tr("Snap To Grid"), parent);
+    action->setCheckable(true);
+
+    SettingsManager *settings = SettingsManager::instance();
+    const bool gridSnap = settings->load<bool>(SettingsManager::Common::SnapToGrid, true);
+    action->setChecked(gridSnap);
+    connect(settings, &SettingsManager::settingChanged, action, [action](const QString &key, const QVariant &value) {
+        if (key == SettingsManager::keyString(SettingsManager::Common::SnapToGrid)) {
+            action->setChecked(value.toBool());
+        }
+    });
+    connect(action, &QAction::triggered,
+            [action]() { SettingsManager::store(SettingsManager::Common::SnapToGrid, action->isChecked()); });
     return action;
 }
 

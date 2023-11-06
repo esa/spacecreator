@@ -80,6 +80,15 @@ public:
 
     QPen selectedPen() const;
 
+    /**
+     * If supported for this item, horizontal/vertical help lines are shown/removed for this item
+     */
+    virtual void showHelperLines(bool show);
+    /**
+     * Returns if actions (move/resize) should show a help lines for this item
+     */
+    virtual bool helpLinesSupported() const;
+
 public Q_SLOTS:
     void scheduleLayoutUpdate();
     void instantLayoutUpdate();

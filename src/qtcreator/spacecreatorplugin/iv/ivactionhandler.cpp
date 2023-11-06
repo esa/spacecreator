@@ -46,6 +46,9 @@ IVActionHandler::IVActionHandler(QObject *parent)
     auto helpLinesCommand =
             Core::ActionManager::registerAction(helpLinesAction, Constants::IV_SHOW_HELP_LINES_ID, contexts);
     interfaceViewMenu->addAction(helpLinesCommand);
+    auto gridSnapAction = shared::EditorCore::createSnapToGridAction(this);
+    auto gridSnapCommand = Core::ActionManager::registerAction(gridSnapAction, Constants::IV_SNAP_TO_GRID_ID, contexts);
+    interfaceViewMenu->addAction(gridSnapCommand);
 
     auto toolsMenu = Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
     QMenu *menu = interfaceViewMenu->menu();

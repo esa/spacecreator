@@ -1,6 +1,7 @@
 #include "graphicsviewutils.h"
 
 #include "positionlookuphelper.h"
+#include "ui/graphicsviewbase.h"
 #include "ui/verectgraphicsitem.h"
 
 #include <QFontMetricsF>
@@ -1155,6 +1156,24 @@ QGraphicsLineItem *verticalHelper(qreal x, QGraphicsItem *parent)
     helper->setPen(linePen);
     helper->setLine(QLineF(x, -kHelperLineLength, x, kHelperLineLength));
     return helper;
+}
+
+QPointF snappedPoint(QGraphicsScene *scene, const QPointF &pos)
+{
+    if (!scene || scene->views().empty()) {
+        return pos;
+    }
+
+    if (auto view = dynamic_cast<ui::GraphicsViewBase *>(scene->views()[0])) {
+        return view->snappedPoint(pos);
+    }
+
+    return pos;
+}
+
+QRectF snappedRect(QGraphicsScene *scene, const QRectF &rect)
+{
+    return QRectF(snappedPoint(scene, rect.topLeft()), snappedPoint(scene, rect.bottomRight()));
 }
 
 }
