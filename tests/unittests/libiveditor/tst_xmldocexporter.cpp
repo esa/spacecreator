@@ -405,7 +405,7 @@ void tst_XmlDocExporter::testExportID()
     QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     const QByteArray text = testFileContent();
     const QString expectedStr = R"(
-        <InterfaceView version="1.1">
+        <InterfaceView version="1.3">
             <Function id="%2" is_type="NO" name="Function_2">
                 <Provided_Interface id="%4" kind="Protected" name="PI_1"/>
                 <Implementations>
@@ -422,8 +422,8 @@ void tst_XmlDocExporter::testExportID()
                 </Implementations>
             </Function>
             <Connection id="%5">
-                <Source func_name="Function_1" ri_name="PI_1"/>
-                <Target func_name="Function_2" pi_name="PI_1"/>
+                <Source iface_id="%3" func_name="Function_1" ri_name="PI_1"/>
+                <Target iface_id="%4" func_name="Function_2" pi_name="PI_1"/>
             </Connection>
         </InterfaceView>
     )";
@@ -458,7 +458,7 @@ void tst_XmlDocExporter::testExportUI()
     QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));
     QByteArray text = testFileContent();
     const QString expectedStr = R"(
-        <InterfaceView version="1.1" UiFile="%6" creatorHash="%7">
+        <InterfaceView version="1.3" UiFile="%6" creatorHash="%7">
             <Function id="%2" name="Function_2">
                 <Provided_Interface id="%4" name="PI_1"/>
             </Function>
@@ -469,8 +469,8 @@ void tst_XmlDocExporter::testExportUI()
                 </Required_Interface>
             </Function>
             <Connection id="%5">
-                <Source func_name="Function_1" ri_name="PI_1"/>
-                <Target func_name="Function_2" pi_name="PI_1"/>
+                <Source iface_id="%3" func_name="Function_1" ri_name="PI_1"/>
+                <Target iface_id="%4" func_name="Function_2" pi_name="PI_1"/>
             </Connection>
         </InterfaceView>
     )";
@@ -496,7 +496,7 @@ void tst_XmlDocExporter::testExportUI()
     QVERIFY(m_doc->exporter()->exportObjects(m_doc->objects().values(), &buffer));
     buffer.close();
     const QString expectedUIStr = R"(
-        <InterfaceView version="1.1">
+        <InterfaceView version="1.3">
             <Function id="%2" name="Function_2">
                 <Provided_Interface id="%4" name="PI_1"/>
             </Function>
@@ -507,8 +507,8 @@ void tst_XmlDocExporter::testExportUI()
                 </Required_Interface>
             </Function>
             <Connection id="%5">
-                <Source func_name="Function_1" ri_name="PI_1"/>
-                <Target func_name="Function_2" pi_name="PI_1"/>
+                <Source iface_id="%3" func_name="Function_1" ri_name="PI_1"/>
+                <Target iface_id="%4" func_name="Function_2" pi_name="PI_1"/>
             </Connection>
             <UI>
                 <Entity id="%5" AttrName="AttributeData"></Entity>
