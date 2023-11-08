@@ -7,6 +7,7 @@ QGitlabClient::QGitlabClient()
 {
     mGitlab = std::make_unique<GitLabTransport>();
     connect(mGitlab.get(), &GitLabTransport::ListOfIssues, this, &QGitlabClient::listOfIssues);
+    connect(mGitlab.get(), &GitLabTransport::issueFetchingDone, this, &QGitlabClient::issueFetchingDone);
     connect(mGitlab.get(), &GitLabTransport::ListOfLabels, this, &QGitlabClient::listOfLabels);
     connect(mGitlab.get(), &GitLabTransport::RequestedProjectID, this, &QGitlabClient::RequestedProjectID);
 }

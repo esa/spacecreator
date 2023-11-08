@@ -25,11 +25,12 @@ void GitLabTransport::setCredentials(const QString &url, const QString &token)
     mToken = token;
 }
 
-void GitLabTransport::RequestListofIssues(
-        const QString &projectID, const QString &assignee, const QString &author, const QStringList &iids)
+void GitLabTransport::RequestListofIssues(const QString &projectID, const QString &assignee, const QString &author,
+        const QStringList &iids, const int page)
 {
-    auto reply = SendRequest(GitLabTransport::GET, mUrlComposer.ComposeGetIssuesUrl(projectID, assignee, author, iids));
-    connect(reply, &QNetworkReply::finished, [reply, this]() {
+    auto reply = SendRequest(GitLabTransport::GET,
+            mUrlComposer.ComposeGetIssuesUrl(projectID, assignee, author, iids, "all", "opened", page));
+    connect(reply, &QNetworkReply::finished, [reply, projectID, assignee, author, iids, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
@@ -41,6 +42,19 @@ void GitLabTransport::RequestListofIssues(
                     issues.push_back(value.toObject());
                 }
                 emit ListOfIssues(issues);
+            }
+
+            // Request next page if needed
+            int page = pageNumberFromHeader(reply);
+            const int totalPages = totalPagesFromHeader(reply);
+            if (page >= 0 && totalPages >= 0) {
+                if (page < totalPages) {
+                    RequestListofIssues(projectID, assignee, author, iids, ++page);
+                } else {
+                    if (page == totalPages) {
+                        emit issueFetchingDone();
+                    }
+                }
             }
         } else {
             qDebug() << reply->error() << reply->errorString();
@@ -94,7 +108,7 @@ void GitLabTransport::CreateIssue(const QString &projectID, const Issue &issue)
 void GitLabTransport::EditIssue(const QString &projectID, const Issue &newIssue)
 {
     auto reply = SendRequest(GitLabTransport::PUT,
-            mUrlComposer.ComposeEditIssueUrl(projectID, newIssue.mIssueID, newIssue.mTitle, newIssue.mDescription,
+            mUrlComposer.ComposeEditIssueUrl(projectID, newIssue.mIssueIID, newIssue.mTitle, newIssue.mDescription,
                     newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
     connect(reply, &QNetworkReply::finished, [reply]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
@@ -154,4 +168,28 @@ QNetworkReply *GitLabTransport::SendRequest(GitLabTransport::ReqType reqType, co
     }
 
     return reply;
+}
+
+int GitLabTransport::pageNumberFromHeader(QNetworkReply *reply) const
+{
+    return numberHeaderAttribute(reply, "x-page");
+}
+
+int GitLabTransport::totalPagesFromHeader(QNetworkReply *reply) const
+{
+    return numberHeaderAttribute(reply, "x-total-pages");
+}
+
+int GitLabTransport::numberHeaderAttribute(QNetworkReply *reply, const QByteArray &headername) const
+{
+    if (!reply) {
+        return -1;
+    }
+
+    const QByteArray pageAttribute = reply->rawHeader(headername);
+    if (pageAttribute.isEmpty()) {
+        return -1;
+    }
+
+    return pageAttribute.toInt();
 }

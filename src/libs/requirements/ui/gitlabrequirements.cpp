@@ -112,9 +112,8 @@ void GitLabRequirements::onChangeOfCredentials()
 
 Requirement GitLabRequirements::requirementFromIssue(const Issue &issue) const
 {
-    auto issue_url = m_document->requirementsURL() + "/-/issues/" + issue.mIssueID;
-    return { issue.mIssueID, issue.mTitle, issue.mDescription, issue.mIssueID, issue_url};
-
+    auto issue_url = m_document->requirementsURL() + "/-/issues/" + issue.mIssueIID;
+    return { issue.mIssueIID, issue.mTitle, issue.mDescription, issue.mIssueIID, issue_url };
 }
 
 void GitLabRequirements::onLoginUpdate()

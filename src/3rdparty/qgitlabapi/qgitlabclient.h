@@ -23,7 +23,14 @@ public:
     void requestProjectIdByName(const QString &projectName);
 
 Q_SIGNALS:
+    /**
+     * @brief listOfIssues provides a block/page of issues
+     */
     void listOfIssues(QList<Issue>);
+    /**
+     * @brief issueFetchingDone is sent once all pages of issues are loaded
+     */
+    void issueFetchingDone();
     void listOfLabels(QList<Label>);
     void RequestedProjectID(QString);
 private:

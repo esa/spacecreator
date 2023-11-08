@@ -7,31 +7,6 @@
 UrlComposer::UrlComposer()
 {}
 
-QString UrlComposer::ComposeUrl(UrlTypes target) const
-{
-    QString address(mBaseURL.toString());
-    switch (target) {
-    case UrlTypes::GetIssues:
-    case UrlComposer::UrlTypes::CreateIssue: {
-        address += "/projects/%1/issues";
-        break;
-    }
-    case UrlComposer::UrlTypes::EditIssue: {
-        address += "/projects/%1/issues/%2";
-        break;
-    }
-    case UrlComposer::UrlTypes::Projects: {
-        address +="/projects";
-        break;
-    }
-    case UrlComposer::UrlTypes::ProjectLabels: {
-        address += "/projects/%1/labels";
-        break;
-    }
-    }
-    return address;
-}
-
 QUrlQuery UrlComposer::SetQuery(const QMap<QString, QVariant> data) const
 {
     QUrlQuery query;
@@ -50,8 +25,6 @@ QUrlQuery UrlComposer::SetQuery(const QMap<QString, QVariant> data) const
                 query.addQueryItem(key, data[key].toString());
         }
 
-
-
     return query;
 }
 
@@ -60,21 +33,14 @@ void UrlComposer::setBaseURL(const QUrl &newBaseURL)
     mBaseURL = newBaseURL;
 }
 
-QUrl UrlComposer::ComposeGetIssuesUrl(const QString &projectID,
-                                      const QString &assignee,
-                                      const QString &author,
-                                      const QStringList &iids,
-                                      const QString &scope) const
+QUrl UrlComposer::ComposeGetIssuesUrl(const QString &projectID, const QString &assignee, const QString &author,
+        const QStringList &iids, const QString &scope, const QString &state, int page) const
 {
-    auto address = ComposeUrl(UrlComposer::UrlTypes::GetIssues);
+    QString address = ComposeUrl(UrlComposer::UrlTypes::GetIssues);
     address = address.arg(projectID);
 
-    const QMap<QString, QVariant> data = {
-        {"scope", scope},
-        {"iids[]", iids},
-        {"assignee_username", assignee},
-        {"author_username", author},
-    };
+    const QMap<QString, QVariant> data = { { "scope", scope }, { "iids[]", iids }, { "assignee_username", assignee },
+        { "author_username", author }, { "state", state }, { "per_page", 80 }, { "page", page } };
     QUrl url(address);
     url.setQuery(SetQuery(data));
     return url;
@@ -109,13 +75,15 @@ QUrl UrlComposer::ComposeEditIssueUrl(const QString &projectID,
     QString address = ComposeUrl(UrlComposer::UrlTypes::EditIssue);
     address = address.arg(projectID, issueID);
 
-    const QMap<QString, QVariant> data = {{"id", projectID},
-                                         {"issue_iid", issueID},
-                                         {"title", title},
-                                         {"description", description},
-                                         {"assignee_ids", assignee},
-                                         {"state_event", state_event}, // Only allows "reopen" and "close" states
-                                         {"labels", labels}};
+    const QMap<QString, QVariant> data = {
+        { "id", projectID },
+        { "issue_iid", issueID },
+        { "title", title },
+        { "description", description },
+        { "assignee_ids", assignee },
+        { "state_event", state_event }, // Only allows "reopen" and "close" states
+        { "labels", labels },
+    };
 
     QUrl url(address);
     url.setQuery(SetQuery(data));
@@ -151,4 +119,29 @@ QUrl UrlComposer::ComposeProjectUrl(const QString &projectName) const
     QUrl url(address);
     url.setQuery(SetQuery(data));
     return url;
+}
+
+QString UrlComposer::ComposeUrl(UrlTypes target) const
+{
+    QString address(mBaseURL.toString());
+    switch (target) {
+    case UrlTypes::GetIssues:
+    case UrlComposer::UrlTypes::CreateIssue: {
+        address += "/projects/%1/issues";
+        break;
+    }
+    case UrlComposer::UrlTypes::EditIssue: {
+        address += "/projects/%1/issues/%2";
+        break;
+    }
+    case UrlComposer::UrlTypes::Projects: {
+        address += "/projects";
+        break;
+    }
+    case UrlComposer::UrlTypes::ProjectLabels: {
+        address += "/projects/%1/labels";
+        break;
+    }
+    }
+    return address;
 }
