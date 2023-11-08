@@ -272,14 +272,17 @@ void GraphicsViewBase::drawBackground(QPainter *painter, const QRectF &rect)
     painter->scale(100 / zoomPercent, 100 / zoomPercent);
 
     // Now do the drawing
+    SettingsManager *settings = SettingsManager::instance();
+    const int gridSize = static_cast<int>(settings->load<double>(SettingsManager::Common::ViewGridSize, 10.)) * 2;
+
     const int y1 = static_cast<int>(scaleSceneRect.top());
     const int y2 = static_cast<int>((scaleSceneRect.bottom() + 1));
     const int x1 = static_cast<int>((scaleSceneRect.left()));
     const int x2 = static_cast<int>((scaleSceneRect.right() + 1));
-    for (int x = x1 & ~15; x <= x2; x += 16) {
+    for (int x = x1 & ~(gridSize - 1); x <= x2; x += gridSize) {
         painter->drawLine(x, y1, x, y2);
     }
-    for (int y = y1 & ~15; y < y2; y += 16) {
+    for (int y = y1 & ~(gridSize - 1); y < y2; y += gridSize) {
         painter->drawLine(x1, y, x2, y);
     }
 
