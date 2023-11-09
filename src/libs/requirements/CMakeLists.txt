@@ -18,9 +18,9 @@ target_sources(${LIB_NAME} PRIVATE
   requirementsmanager.h
   requirementsmodel.cpp
   requirementsmodel.h
-  ui/gitlabrequirements.cpp
-  ui/gitlabrequirements.h
-  ui/gitlabrequirements.ui
+  ui/requirementswidget.cpp
+  ui/requirementswidget.h
+  ui/requirementswidget.ui
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

@@ -1,5 +1,4 @@
-#ifndef GITLABREQUIREMENTS_H
-#define GITLABREQUIREMENTS_H
+#pragma once
 
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
@@ -9,7 +8,7 @@
 #include <QWidget>
 
 namespace Ui {
-class GitLabRequirements;
+class RequirementsWidget;
 }
 
 namespace ive {
@@ -18,13 +17,13 @@ class InterfaceDocument;
 
 class RequirementsManager;
 
-class GitLabRequirements : public QWidget
+class RequirementsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit GitLabRequirements(QByteArray requirementsUrl,  QStringList requirementsIDs, QWidget *parent = nullptr);
-    ~GitLabRequirements();
+    explicit RequirementsWidget(QByteArray requirementsUrl, QStringList requirementsIDs, QWidget *parent = nullptr);
+    ~RequirementsWidget();
 
     void setUrl(const QString &url);
     void setToken(const QString &token);
@@ -42,11 +41,9 @@ Q_SIGNALS:
     void requirementsUrlChanged(QByteArray requirementsUrl);
 
 private:
-    Ui::GitLabRequirements *ui;
+    Ui::RequirementsWidget *ui;
     RequirementsManager mReqManager;
     requirement::RequirementsModel m_model;
     QSortFilterProxyModel m_filterModel;
     QByteArray m_requirementsUrl;
 };
-
-#endif // GITLABREQUIREMENTS_H

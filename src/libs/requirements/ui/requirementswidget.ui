@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>GitLabRequirements</class>
- <widget class="QWidget" name="GitLabRequirements">
+ <class>RequirementsWidget</class>
+ <widget class="QWidget" name="RequirementsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

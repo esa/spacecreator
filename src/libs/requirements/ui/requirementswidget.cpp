@@ -1,8 +1,9 @@
-#include "gitlabrequirements.h"
+#include "requirementswidget.h"
 
-#include "ui_gitlabrequirements.h"
+#include "ui_requirementswidget.h"
 
 #include <QDesktopServices>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QSettings>
 #include <QTableView>
@@ -10,9 +11,9 @@
 
 using namespace requirement;
 
-GitLabRequirements::GitLabRequirements(QByteArray requirementsUrl, QStringList requirementsIDs, QWidget *parent)
+RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, QStringList requirementsIDs, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::GitLabRequirements)
+    , ui(new Ui::RequirementsWidget)
     , mReqManager(RequirementsManager::REPO_TYPE::GITLAB)
     , m_requirementsUrl(requirementsUrl)
 
@@ -28,7 +29,7 @@ GitLabRequirements::GitLabRequirements(QByteArray requirementsUrl, QStringList r
     ui->AllRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     ui->AllRequirements->horizontalHeader()->setStretchLastSection(false);
     m_model.setSelectedRequirementsIDs(requirementsIDs);
-    connect(ui->AllRequirements, &QTableView::doubleClicked, this, &GitLabRequirements::openIssueLink);
+    connect(ui->AllRequirements, &QTableView::doubleClicked, this, &RequirementsWidget::openIssueLink);
     connect(&m_model, &requirement::RequirementsModel::dataChanged,
             [this](const QModelIndex &topLeft, const QModelIndex &BottomRight, const QList<int> &roles) {
                 if (topLeft != BottomRight) {
@@ -43,9 +44,9 @@ GitLabRequirements::GitLabRequirements(QByteArray requirementsUrl, QStringList r
                     emit requirementSelected(requirementID, checked);
                 }
             });
-    connect(ui->Refresh, &QPushButton::clicked, this, &GitLabRequirements::onLoginUpdate);
-    connect(ui->UrlLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
-    connect(ui->TokenLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
+    connect(ui->Refresh, &QPushButton::clicked, this, &RequirementsWidget::onLoginUpdate);
+    connect(ui->UrlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
+    connect(ui->TokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
 
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
     connect(ui->clearFilterButton, &QPushButton::clicked, ui->filterLineEdit, &QLineEdit::clear);
@@ -62,29 +63,29 @@ GitLabRequirements::GitLabRequirements(QByteArray requirementsUrl, QStringList r
     onLoginUpdate();
 }
 
-void GitLabRequirements::LoadSavedCredentials()
+void RequirementsWidget::LoadSavedCredentials()
 {
     setUrl(m_requirementsUrl);
     QSettings settings;
     auto gitlabToken = settings.value(m_requirementsUrl + "__token").toString();
     setToken(gitlabToken);
 }
-GitLabRequirements::~GitLabRequirements()
+RequirementsWidget::~RequirementsWidget()
 {
     delete ui;
 }
 
-void GitLabRequirements::setUrl(const QString &url)
+void RequirementsWidget::setUrl(const QString &url)
 {
     ui->UrlLineEdit->setText(url);
 }
 
-void GitLabRequirements::setToken(const QString &token)
+void RequirementsWidget::setToken(const QString &token)
 {
     ui->TokenLineEdit->setText(token);
 }
 
-void GitLabRequirements::onChangeOfCredentials()
+void RequirementsWidget::onChangeOfCredentials()
 {
     QSettings settings;
     if (!ui->UrlLineEdit->text().isEmpty()) {
@@ -102,7 +103,7 @@ void GitLabRequirements::onChangeOfCredentials()
     emit requirementsUrlChanged(m_requirementsUrl);
 }
 
-void GitLabRequirements::onLoginUpdate()
+void RequirementsWidget::onLoginUpdate()
 {
     m_model.clear();
     QUrl api_url;
@@ -116,7 +117,7 @@ void GitLabRequirements::onLoginUpdate()
     mReqManager.RequestProjectID(projectName);
 }
 
-void GitLabRequirements::openIssueLink(const QModelIndex &index)
+void RequirementsWidget::openIssueLink(const QModelIndex &index)
 {
     QDesktopServices::openUrl(index.data(Qt::UserRole).toString());
 }

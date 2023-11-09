@@ -56,7 +56,7 @@ public:
      */
     void addRequirements(const QList<requirement::Requirement> &requirements);
 
-    void setSelectedRequirementsIDs(const QStringList requirementIDs);
+    void setSelectedRequirementsIDs(const QStringList &requirementIDs);
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 

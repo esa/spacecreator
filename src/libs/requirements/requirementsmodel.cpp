@@ -45,7 +45,7 @@ void RequirementsModel::addRequirements(const QList<Requirement> &requirements)
     endInsertRows();
 }
 
-void RequirementsModel::setSelectedRequirementsIDs(const QStringList requirementIDs)
+void RequirementsModel::setSelectedRequirementsIDs(const QStringList &requirementIDs)
 {
     m_selected_requirements = QSet(requirementIDs.begin(), requirementIDs.end());
 }

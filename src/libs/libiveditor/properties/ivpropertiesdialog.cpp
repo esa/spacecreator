@@ -72,9 +72,9 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     , m_isRequiredSystemElement(false)
     , m_requirementsWidget(document->requirementsURL().toUtf8(), dataObject()->requestsIDs(), this)
 {
-    connect(&m_requirementsWidget, &GitLabRequirements::requirementSelected, this,
+    connect(&m_requirementsWidget, &RequirementsWidget::requirementSelected, this,
             &IVPropertiesDialog::requirementSelection);
-    connect(&m_requirementsWidget, &GitLabRequirements::requirementsUrlChanged,
+    connect(&m_requirementsWidget, &RequirementsWidget::requirementsUrlChanged,
             [this](QByteArray requirementUrl) { m_document->setRequirementsURL(requirementUrl); });
 }
 
