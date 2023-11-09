@@ -64,13 +64,8 @@ QUrl UrlComposer::ComposeCreateIssueUrl(const QString &projectID,
     return url;
 }
 
-QUrl UrlComposer::ComposeEditIssueUrl(const QString &projectID,
-                                      const QString &issueID,
-                                      const QString &title,
-                                      const QString &description,
-                                      const QString &assignee,
-                                      const QString &state_event,
-                                      const QString &labels) const
+QUrl UrlComposer::ComposeEditIssueUrl(int projectID, int issueID, const QString &title, const QString &description,
+        const QString &assignee, const QString &state_event, const QStringList &labels) const
 {
     QString address = ComposeUrl(UrlComposer::UrlTypes::EditIssue);
     address = address.arg(projectID, issueID);

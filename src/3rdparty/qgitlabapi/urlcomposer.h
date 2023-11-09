@@ -35,13 +35,9 @@ public:
                                const QString &title,
                                const QString &description,
                                const QString &assignee) const;
-    QUrl ComposeEditIssueUrl(const QString &projectID,
-                             const QString &issueID,
-                             const QString &title = QString(),
-                             const QString &description = QString(),
-                             const QString &assignee = QString(),
-                             const QString &state_event = QString(),
-                             const QString &labels = QString()) const;
+    QUrl ComposeEditIssueUrl(int projectID, int issueID, const QString &title = QString(),
+            const QString &description = QString(), const QString &assignee = QString(),
+            const QString &state_event = QString(), const QStringList &labels = QStringList()) const;
 
     QUrl ComposeProjectLabelsUrl(const QString &projectID,
                                  const QString &with_counts = "false",

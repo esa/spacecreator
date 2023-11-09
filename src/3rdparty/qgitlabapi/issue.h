@@ -4,7 +4,8 @@
 #include "QGitlabAPI_global.h"
 
 #include <QDateTime>
-#include <QJsonDocument>
+#include <QJsonObject>
+#include <QStringList>
 
 /**
  * @brief The Issue class holds data for a single issue
@@ -16,14 +17,15 @@ public:
     Issue();
     Issue(const QJsonObject &issue);
 
-    QString mIssueIID; // unique ID within this project
+    int mIssueID; /// unique ID for the whole server
+    int mIssueIID; /// unique ID within it's project
     QString mTitle;
     QString mDescription;
     QString mAuthor;
     QString mAssignee;
     QString mState;
     QString mState_event; /// @note should that be part of this class?
-    QString mLabels;
+    QStringList mLabels;
     QString mIssueType;
     QDateTime mCreatedAt;
     QDateTime mUpdatedAt;
