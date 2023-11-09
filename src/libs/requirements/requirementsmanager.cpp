@@ -1,7 +1,5 @@
 #include "requirementsmanager.h"
 
-#include <issuerequestoptions.h>
-
 RequirementsManager::RequirementsManager(REPO_TYPE repoType):
     mRepoType(repoType)
 {
@@ -9,7 +7,7 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType):
     {
     case(REPO_TYPE::GITLAB):
     {
-        gitlabClient = new QGitlabClient();
+        gitlabClient = new gitlab::QGitlabClient();
         break;
     }
     default:
@@ -30,11 +28,12 @@ void RequirementsManager::requestRequirements(
     {
     case(REPO_TYPE::GITLAB):
     {
-        IssueRequestOptions options;
+        gitlab::IssueRequestOptions options;
         options.mAssignee = assignee.toUtf8();
         options.mAuthor = author.toUtf8();
         gitlabClient->requestIssues(projectID, options);
-        connect(gitlabClient, &QGitlabClient::listOfIssues, this, &RequirementsManager::listOfIssues, Qt::UniqueConnection);
+        connect(gitlabClient, &gitlab::QGitlabClient::listOfIssues, this, &RequirementsManager::listOfIssues,
+                Qt::UniqueConnection);
         break;
     }
     default:
@@ -42,7 +41,7 @@ void RequirementsManager::requestRequirements(
     }
 }
 
-void RequirementsManager::createRequirement(const QString &projectID, const Issue &issue) const
+void RequirementsManager::createRequirement(const QString &projectID, const gitlab::Issue &issue) const
 {
     switch(mRepoType)
     {
@@ -77,7 +76,8 @@ void RequirementsManager::RequestProjectID(const QString &projectName)
     case(REPO_TYPE::GITLAB):
     {
         gitlabClient->requestProjectIdByName(projectName);
-        connect(gitlabClient, &QGitlabClient::requestedProjectID, this, &RequirementsManager::RequestedProjectID, Qt::UniqueConnection);
+        connect(gitlabClient, &gitlab::QGitlabClient::requestedProjectID, this,
+                &RequirementsManager::RequestedProjectID, Qt::UniqueConnection);
         break;
     }
     default:
@@ -85,7 +85,7 @@ void RequirementsManager::RequestProjectID(const QString &projectName)
     }
 }
 
-void RequirementsManager::editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue)
+void RequirementsManager::editIssue(const QString &projectID, const QString &issueID, const gitlab::Issue &newIssue)
 {
     switch(mRepoType)
     {

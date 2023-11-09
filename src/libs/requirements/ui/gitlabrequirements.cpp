@@ -55,7 +55,7 @@ GitLabRequirements::GitLabRequirements(QByteArray requirementsUrl, QStringList r
         mReqManager.requestRequirements(projectID, anyAssignee, anyAuthor);
     });
 
-    connect(&mReqManager, &RequirementsManager::listOfIssues, this, [this](QList<Issue> issues) {
+    connect(&mReqManager, &RequirementsManager::listOfIssues, this, [this](QList<gitlab::Issue> issues) {
         QList<Requirement> requirements;
         requirements.reserve(issues.size());
         for (const auto &issue : issues) {
@@ -108,7 +108,7 @@ void GitLabRequirements::onChangeOfCredentials()
     emit requirementsUrlChanged(m_requirementsUrl);
 }
 
-Requirement GitLabRequirements::requirementFromIssue(const Issue &issue) const
+Requirement GitLabRequirements::requirementFromIssue(const gitlab::Issue &issue) const
 {
     auto issue_url = m_requirementsUrl + "/-/issues/" + QString::number(issue.mIssueIID);
     return { QString::number(issue.mIssueIID), issue.mTitle, issue.mDescription, QString::number(issue.mIssueIID),

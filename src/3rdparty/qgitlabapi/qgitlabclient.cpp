@@ -12,11 +12,9 @@
 #include <QUrl>
 #include <QUrlQuery>
 
-namespace {
+namespace gitlab {
 
 const QString kContentType = "application/x-www-form-urlencoded";
-
-} // namespace
 
 QGitlabClient::QGitlabClient() { }
 
@@ -186,4 +184,6 @@ int QGitlabClient::numberHeaderAttribute(QNetworkReply *reply, const QByteArray 
     }
 
     return pageAttribute.toInt();
+}
+
 }

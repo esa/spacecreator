@@ -6,6 +6,8 @@
 #include <QUrlQuery>
 #include <QVariant>
 
+using namespace gitlab;
+
 UrlComposer::UrlComposer() { }
 
 QUrlQuery UrlComposer::setQuery(const QMap<QByteArray, QVariant> &data)

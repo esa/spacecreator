@@ -1,8 +1,6 @@
 #include "label.h"
 
-Label::Label()
-{
-}
+using namespace gitlab;
 
 Label::Label(const QJsonObject &label)
 {

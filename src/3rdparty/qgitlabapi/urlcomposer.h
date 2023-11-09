@@ -1,9 +1,11 @@
-#ifndef URLCOMPOSER_H
-#define URLCOMPOSER_H
+#pragma once
 
 #include <QUrl>
 
+namespace gitlab {
+
 class IssueRequestOptions;
+
 /**
  * Class to create URLs to fetch data from gitlab
  */
@@ -48,4 +50,4 @@ private:
     QUrl mBaseURL;
 };
 
-#endif // URLCOMPOSER_H
+}

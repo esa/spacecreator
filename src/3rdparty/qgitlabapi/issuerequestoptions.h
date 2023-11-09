@@ -6,6 +6,8 @@
 #include <QUrlQuery>
 #include <QVariant>
 
+namespace gitlab {
+
 /**
  * @brief The IssueRequestOptions class holds all options for fetching issue data
  * For more documentation see https://docs.gitlab.com/ee/api/issues.html
@@ -26,3 +28,4 @@ public:
     QUrlQuery urlQuery() const;
 };
 
+}

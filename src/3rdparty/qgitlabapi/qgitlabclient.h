@@ -1,5 +1,4 @@
-#ifndef QGITLABCLIENT_H
-#define QGITLABCLIENT_H
+#pragma once
 
 #include "QGitlabAPI_global.h"
 #include "issue.h"
@@ -9,6 +8,8 @@
 #include <QList>
 #include <QNetworkAccessManager>
 #include <QString>
+
+namespace gitlab {
 
 class IssueRequestOptions;
 
@@ -60,4 +61,4 @@ private:
     QNetworkAccessManager mManager;
 };
 
-#endif // QGITLABCLIENT_H
+}

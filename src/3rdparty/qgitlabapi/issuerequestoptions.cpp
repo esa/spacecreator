@@ -2,6 +2,8 @@
 
 #include "urlcomposer.h"
 
+using namespace gitlab;
+
 QUrlQuery IssueRequestOptions::urlQuery() const
 {
     QMap<QByteArray, QVariant> data;

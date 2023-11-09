@@ -1,5 +1,4 @@
-#ifndef LABEL_H
-#define LABEL_H
+#pragma once
 
 #include "QGitlabAPI_global.h"
 
@@ -7,10 +6,11 @@
 #include <QJsonObject>
 #include <QString>
 
+namespace gitlab {
+
 class QGITLABAPI_EXPORT Label
 {
 public:
-    Label();
     Label(const QJsonObject &label);
 
     int mLabelId;
@@ -19,4 +19,4 @@ public:
     QColor mColor;
 };
 
-#endif // LABEL_H
+}

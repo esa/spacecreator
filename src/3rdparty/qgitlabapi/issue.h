@@ -1,5 +1,4 @@
-#ifndef ISSUE_H
-#define ISSUE_H
+#pragma once
 
 #include "QGitlabAPI_global.h"
 
@@ -7,14 +6,14 @@
 #include <QJsonObject>
 #include <QStringList>
 
+namespace gitlab {
+
 /**
  * @brief The Issue class holds data for a single issue
  */
 class QGITLABAPI_EXPORT Issue
 {
 public:
-
-    Issue();
     Issue(const QJsonObject &issue);
 
     int mIssueID; /// unique ID for the whole server
@@ -32,4 +31,4 @@ public:
     int mNotesCount;
 };
 
-#endif // ISSUE_H
+}

@@ -3,9 +3,7 @@
 #include <QJsonArray>
 #include <QString>
 
-Issue::Issue()
-{
-}
+using namespace gitlab;
 
 Issue::Issue(const QJsonObject &issue)
 {
