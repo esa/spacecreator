@@ -75,10 +75,10 @@ void QGitlabClient::editIssue(const QString &projectID, const QString &issueID, 
     });
 }
 
-void QGitlabClient::createIssue(const QString &projectID, const Issue &issue)
+void QGitlabClient::createIssue(const QString &projectID, const QString &title, const QString &description)
 {
-    auto reply = SendRequest(QGitlabClient::POST,
-            mUrlComposer.composeCreateIssueUrl(projectID, issue.mTitle, issue.mDescription, issue.mAssignee));
+    auto reply =
+            SendRequest(QGitlabClient::POST, mUrlComposer.composeCreateIssueUrl(projectID, title, description, ""));
     connect(reply, &QNetworkReply::finished, [reply]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
             qDebug() << reply->error() << reply->errorString();

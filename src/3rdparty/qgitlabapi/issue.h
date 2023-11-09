@@ -16,6 +16,7 @@ class QGITLABAPI_EXPORT Issue
 public:
     Issue(const QJsonObject &issue);
 
+    QUrl mUrl; // Web page of the issue
     int mIssueID; /// unique ID for the whole server
     int mIssueIID; /// unique ID within it's project
     QString mTitle;

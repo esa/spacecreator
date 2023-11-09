@@ -18,6 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include <QString>
+#include <QUrl>
 
 namespace requirement {
 
@@ -28,8 +29,7 @@ public:
     QString m_longName;
     QString m_description;
     QString m_issueID;
-    QString m_link;
-
+    QUrl m_link;
 };
 
 } // namespace requirement

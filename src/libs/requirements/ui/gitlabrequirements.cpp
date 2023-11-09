@@ -55,14 +55,8 @@ GitLabRequirements::GitLabRequirements(QByteArray requirementsUrl, QStringList r
         mReqManager.requestRequirements(projectID, anyAssignee, anyAuthor);
     });
 
-    connect(&mReqManager, &RequirementsManager::listOfIssues, this, [this](QList<gitlab::Issue> issues) {
-        QList<Requirement> requirements;
-        requirements.reserve(issues.size());
-        for (const auto &issue : issues) {
-            requirements.append(requirementFromIssue(issue));
-        }
-        m_model.addRequirements(requirements);
-    });
+    connect(&mReqManager, &RequirementsManager::listOfRequirements, &m_model,
+            &requirement::RequirementsModel::addRequirements);
 
     LoadSavedCredentials();
     onLoginUpdate();
@@ -106,13 +100,6 @@ void GitLabRequirements::onChangeOfCredentials()
         setToken("");
     }
     emit requirementsUrlChanged(m_requirementsUrl);
-}
-
-Requirement GitLabRequirements::requirementFromIssue(const gitlab::Issue &issue) const
-{
-    auto issue_url = m_requirementsUrl + "/-/issues/" + QString::number(issue.mIssueIID);
-    return { QString::number(issue.mIssueIID), issue.mTitle, issue.mDescription, QString::number(issue.mIssueIID),
-        issue_url };
 }
 
 void GitLabRequirements::onLoginUpdate()

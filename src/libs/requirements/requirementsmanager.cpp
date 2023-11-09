@@ -1,13 +1,35 @@
 #include "requirementsmanager.h"
 
-RequirementsManager::RequirementsManager(REPO_TYPE repoType):
-    mRepoType(repoType)
+#include "gitlab/gitlabrequirements.h"
+
+#include <issue.h>
+#include <issuerequestoptions.h>
+#include <qgitlabclient.h>
+
+struct RequirementsManager::RequirementsManagerPrivate {
+    RequirementsManagerPrivate(RequirementsManager::REPO_TYPE repoType)
+        : mRepoType(repoType)
+    {
+    }
+
+    REPO_TYPE mRepoType;
+    std::unique_ptr<gitlab::QGitlabClient> gitlabClient;
+    std::unique_ptr<requirement::GitLabRequirements> gitlabRequirements;
+};
+
+RequirementsManager::RequirementsManager(REPO_TYPE repoType)
+    : d(std::make_unique<RequirementsManagerPrivate>(repoType))
 {
     switch(repoType)
     {
     case(REPO_TYPE::GITLAB):
     {
-        gitlabClient = new gitlab::QGitlabClient();
+        d->gitlabClient = std::make_unique<gitlab::QGitlabClient>();
+        d->gitlabRequirements = std::make_unique<requirement::GitLabRequirements>();
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfIssues, d->gitlabRequirements.get(),
+                &requirement::GitLabRequirements::listOfIssues);
+        connect(d->gitlabRequirements.get(), &requirement::GitLabRequirements::listOfRequirements, this,
+                &RequirementsManager::listOfRequirements);
         break;
     }
     default:
@@ -15,25 +37,23 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType):
     }
 }
 
+RequirementsManager::~RequirementsManager() { }
+
 void RequirementsManager::setCredentials(const QString &url, const QString &token)
 {
     auto _url = QUrl(url);
-    gitlabClient->setCredentials(_url.scheme() + "://" + _url.host(), token);
+    d->gitlabClient->setCredentials(_url.scheme() + "://" + _url.host(), token);
 }
 
 void RequirementsManager::requestRequirements(
         const QString &projectID, const QString &assignee, const QString &author) const
 {
-    switch(mRepoType)
-    {
-    case(REPO_TYPE::GITLAB):
-    {
+    switch (d->mRepoType) {
+    case (REPO_TYPE::GITLAB): {
         gitlab::IssueRequestOptions options;
         options.mAssignee = assignee.toUtf8();
         options.mAuthor = author.toUtf8();
-        gitlabClient->requestIssues(projectID, options);
-        connect(gitlabClient, &gitlab::QGitlabClient::listOfIssues, this, &RequirementsManager::listOfIssues,
-                Qt::UniqueConnection);
+        d->gitlabClient->requestIssues(projectID, options);
         break;
     }
     default:
@@ -41,27 +61,12 @@ void RequirementsManager::requestRequirements(
     }
 }
 
-void RequirementsManager::createRequirement(const QString &projectID, const gitlab::Issue &issue) const
+void RequirementsManager::createRequirement(
+        const QString &projectID, const QString &title, const QString &description) const
 {
-    switch(mRepoType)
-    {
-    case(REPO_TYPE::GITLAB):
-    {
-        gitlabClient->createIssue(projectID, issue);
-        break;
-    }
-    default:
-        qDebug() << "unknown repository type";
-    }
-}
-
-void RequirementsManager::RequestListofLabels(const QString &projectID, const QString &with_counts, const QString &search)
-{
-    switch(mRepoType)
-    {
-    case(REPO_TYPE::GITLAB):
-    {
-        gitlabClient->requestListofLabels(projectID, with_counts, search);
+    switch (d->mRepoType) {
+    case (REPO_TYPE::GITLAB): {
+        d->gitlabClient->createIssue(projectID, title, description);
         break;
     }
     default:
@@ -71,27 +76,12 @@ void RequirementsManager::RequestListofLabels(const QString &projectID, const QS
 
 void RequirementsManager::RequestProjectID(const QString &projectName)
 {
-    switch(mRepoType)
-    {
+    switch (d->mRepoType) {
     case(REPO_TYPE::GITLAB):
     {
-        gitlabClient->requestProjectIdByName(projectName);
-        connect(gitlabClient, &gitlab::QGitlabClient::requestedProjectID, this,
+        d->gitlabClient->requestProjectIdByName(projectName);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::requestedProjectID, this,
                 &RequirementsManager::RequestedProjectID, Qt::UniqueConnection);
-        break;
-    }
-    default:
-        qDebug() << "unknown repository type";
-    }
-}
-
-void RequirementsManager::editIssue(const QString &projectID, const QString &issueID, const gitlab::Issue &newIssue)
-{
-    switch(mRepoType)
-    {
-    case(REPO_TYPE::GITLAB):
-    {
-        gitlabClient->editIssue(projectID, issueID, newIssue);
         break;
     }
     default:

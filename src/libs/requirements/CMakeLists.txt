@@ -10,6 +10,8 @@ remove_definitions(-DQT_NO_KEYWORDS)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+  gitlab/gitlabrequirements.cpp
+  gitlab/gitlabrequirements.h
   requirement.cpp
   requirement.h
   requirementsmanager.cpp
@@ -22,5 +24,7 @@ target_sources(${LIB_NAME} PRIVATE
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
-target_link_libraries(${LIB_NAME} ${QT_NETWORK} ${QT_CORE} ${QT_WIDGETS} QGitlabAPI )
+target_link_libraries(${LIB_NAME}
+    PUBLIC ${QT_NETWORK} ${QT_CORE} ${QT_WIDGETS}
+    PRIVATE QGitlabAPI)
 target_compile_definitions(${LIB_NAME} PUBLIC QGITLABAPI_LIBRARY QT_DEBUG_OUTPUT)

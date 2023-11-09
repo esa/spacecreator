@@ -7,6 +7,7 @@ using namespace gitlab;
 
 Issue::Issue(const QJsonObject &issue)
 {
+    mUrl = issue["web_url"].toString();
     mIssueID = issue["id"].toInteger();
     mIssueIID = issue["iid"].toInteger();
     mTitle = issue["title"].toString();

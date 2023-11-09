@@ -32,7 +32,6 @@ public:
 protected:
     void LoadSavedCredentials();
     void onChangeOfCredentials();
-    requirement::Requirement requirementFromIssue(const gitlab::Issue &issue) const;
 
 protected Q_SLOTS:
     void onLoginUpdate();

@@ -54,7 +54,7 @@ public:
     /**
      * Appends the given @p requiremnets to the existing ones
      */
-    void addRequirements(const QList<Requirement> &requirements);
+    void addRequirements(const QList<requirement::Requirement> &requirements);
 
     void setSelectedRequirementsIDs(const QStringList requirementIDs);
     // Header:
@@ -67,9 +67,11 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+
 protected:
     QString getIdFromModelIndex(const QModelIndex &index) const;
+
 private:
     QList<Requirement> m_requirements;
     QSet<QString> m_selected_requirements;
