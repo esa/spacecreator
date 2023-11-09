@@ -10,6 +10,11 @@
 #include <QNetworkAccessManager>
 #include <QString>
 
+class IssueRequestOptions;
+
+/**
+ * @brief The QGitlabClient class is the main class to start requests on the Gitlab server
+ */
 class QGITLABAPI_EXPORT QGitlabClient: public QObject {
     Q_OBJECT
 public:
@@ -22,9 +27,7 @@ public:
 
     QGitlabClient();
     void setCredentials(const QString & url, const QString &token);
-    void requestIssues(const QString &projectID, const QString &assignee = QString(), const QString &author = QString(),
-            const QStringList &iids = QStringList(), const int page = 1);
-    void requestIssue(const QString &issueId);
+    void requestIssues(const QString &projectID, const IssueRequestOptions &options);
     void editIssue(const QString &projectID, const QString &issueID, const Issue& newIssue);
     void createIssue(const QString & projectID, const Issue &issue);
     void requestListofLabels(

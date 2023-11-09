@@ -1,5 +1,7 @@
 #include "requirementsmanager.h"
 
+#include <issuerequestoptions.h>
+
 RequirementsManager::RequirementsManager(REPO_TYPE repoType):
     mRepoType(repoType)
 {
@@ -21,13 +23,17 @@ void RequirementsManager::setCredentials(const QString &url, const QString &toke
     gitlabClient->setCredentials(_url.scheme() + "://" + _url.host(), token);
 }
 
-void RequirementsManager::requestRequirements(const QString &projectID, const QString &assignee, const QString &author, const QStringList &iids) const
+void RequirementsManager::requestRequirements(
+        const QString &projectID, const QString &assignee, const QString &author) const
 {
     switch(mRepoType)
     {
     case(REPO_TYPE::GITLAB):
     {
-        gitlabClient->requestIssues(projectID, assignee, author, iids);
+        IssueRequestOptions options;
+        options.mAssignee = assignee.toUtf8();
+        options.mAuthor = author.toUtf8();
+        gitlabClient->requestIssues(projectID, options);
         connect(gitlabClient, &QGitlabClient::listOfIssues, this, &RequirementsManager::listOfIssues, Qt::UniqueConnection);
         break;
     }

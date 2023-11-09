@@ -52,8 +52,7 @@ GitLabRequirements::GitLabRequirements(QByteArray requirementsUrl, QStringList r
     connect(&mReqManager, &RequirementsManager::RequestedProjectID, this, [this](const QString &projectID) {
         static const QString anyAssignee("");
         static const QString anyAuthor("");
-        static const QStringList anyIssues = {};
-        mReqManager.requestRequirements(projectID, anyAssignee, anyAuthor, anyIssues);
+        mReqManager.requestRequirements(projectID, anyAssignee, anyAuthor);
     });
 
     connect(&mReqManager, &RequirementsManager::listOfIssues, this, [this](QList<Issue> issues) {

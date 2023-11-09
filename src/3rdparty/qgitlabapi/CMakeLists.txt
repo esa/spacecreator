@@ -10,6 +10,8 @@ target_sources(${LIB_NAME} PRIVATE
   QGitlabAPI_global.h
   issue.cpp
   issue.h
+  issuerequestoptions.cpp
+  issuerequestoptions.h
   label.cpp
   label.h
   qgitlabclient.cpp

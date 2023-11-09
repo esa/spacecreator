@@ -1,5 +1,7 @@
 #include "qgitlabclient.h"
 
+#include "issuerequestoptions.h"
+
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -26,12 +28,10 @@ void QGitlabClient::setCredentials(const QString &url, const QString &token)
     mToken = token;
 }
 
-void QGitlabClient::requestIssues(const QString &projectID, const QString &assignee, const QString &author,
-        const QStringList &iids, const int page)
+void QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOptions &options)
 {
-    auto reply = SendRequest(QGitlabClient::GET,
-            mUrlComposer.ComposeGetIssuesUrl(projectID, assignee, author, iids, "all", "opened", page));
-    connect(reply, &QNetworkReply::finished, [reply, projectID, assignee, author, iids, this]() {
+    auto reply = SendRequest(QGitlabClient::GET, mUrlComposer.composeGetIssuesUrl(projectID, options));
+    connect(reply, &QNetworkReply::finished, [reply, projectID, options, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
@@ -50,7 +50,9 @@ void QGitlabClient::requestIssues(const QString &projectID, const QString &assig
             const int totalPages = totalPagesFromHeader(reply);
             if (page >= 0 && totalPages >= 0) {
                 if (page < totalPages) {
-                    requestIssues(projectID, assignee, author, iids, ++page);
+                    IssueRequestOptions nextPage = options;
+                    nextPage.mPage += 1;
+                    requestIssues(projectID, nextPage);
                 } else {
                     if (page == totalPages) {
                         Q_EMIT issueFetchingDone();
@@ -63,17 +65,10 @@ void QGitlabClient::requestIssues(const QString &projectID, const QString &assig
     });
 }
 
-void QGitlabClient::requestIssue(const QString &issueId)
-{
-    static const QString anyAssignee("");
-    static const QString anyAuthor("");
-    requestIssues(anyAssignee, anyAuthor, { issueId });
-}
-
 void QGitlabClient::editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue)
 {
     auto reply = SendRequest(QGitlabClient::PUT,
-            mUrlComposer.ComposeEditIssueUrl(projectID.toInt(), newIssue.mIssueIID, newIssue.mTitle,
+            mUrlComposer.composeEditIssueUrl(projectID.toInt(), newIssue.mIssueIID, newIssue.mTitle,
                     newIssue.mDescription, newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
     connect(reply, &QNetworkReply::finished, [reply]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
@@ -85,7 +80,7 @@ void QGitlabClient::editIssue(const QString &projectID, const QString &issueID, 
 void QGitlabClient::createIssue(const QString &projectID, const Issue &issue)
 {
     auto reply = SendRequest(QGitlabClient::POST,
-            mUrlComposer.ComposeCreateIssueUrl(projectID, issue.mTitle, issue.mDescription, issue.mAssignee));
+            mUrlComposer.composeCreateIssueUrl(projectID, issue.mTitle, issue.mDescription, issue.mAssignee));
     connect(reply, &QNetworkReply::finished, [reply]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
             qDebug() << reply->error() << reply->errorString();
@@ -95,7 +90,7 @@ void QGitlabClient::createIssue(const QString &projectID, const Issue &issue)
 
 void QGitlabClient::requestListofLabels(const QString &projectID, const QString &with_counts, const QString &search)
 {
-    auto reply = SendRequest(QGitlabClient::GET, mUrlComposer.ComposeProjectLabelsUrl(projectID, with_counts, search));
+    auto reply = SendRequest(QGitlabClient::GET, mUrlComposer.composeProjectLabelsUrl(projectID, with_counts, search));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
@@ -118,7 +113,7 @@ void QGitlabClient::requestListofLabels(const QString &projectID, const QString 
 
 void QGitlabClient::requestProjectIdByName(const QString &projectName)
 {
-    auto reply = SendRequest(QGitlabClient::GET, mUrlComposer.ComposeProjectUrl(projectName));
+    auto reply = SendRequest(QGitlabClient::GET, mUrlComposer.composeProjectUrl(projectName));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
