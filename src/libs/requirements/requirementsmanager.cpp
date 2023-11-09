@@ -56,7 +56,7 @@ void RequirementsManager::RequestListofLabels(const QString &projectID, const QS
     {
     case(REPO_TYPE::GITLAB):
     {
-        gitlabClient->RequestListofLabels(projectID, with_counts, search);
+        gitlabClient->requestListofLabels(projectID, with_counts, search);
         break;
     }
     default:
@@ -71,7 +71,7 @@ void RequirementsManager::RequestProjectID(const QString &projectName)
     case(REPO_TYPE::GITLAB):
     {
         gitlabClient->requestProjectIdByName(projectName);
-        connect(gitlabClient, &QGitlabClient::RequestedProjectID, this, &RequirementsManager::RequestedProjectID, Qt::UniqueConnection);
+        connect(gitlabClient, &QGitlabClient::requestedProjectID, this, &RequirementsManager::RequestedProjectID, Qt::UniqueConnection);
         break;
     }
     default:

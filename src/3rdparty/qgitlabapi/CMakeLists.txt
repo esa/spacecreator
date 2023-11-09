@@ -13,8 +13,6 @@ target_sources(${LIB_NAME} PRIVATE
   QGitlabAPI_global.h
   qgitlabclient.cpp
   qgitlabclient.h
-  GitLabTransport.cpp
-  GitLabTransport.h
   Issue.h
   Issue.cpp
   UrlComposer.h
