@@ -37,7 +37,11 @@ public:
         IssueLinkRole = Qt::UserRole + 1
     };
 
-
+    enum HEADER_SECTIONS{
+        REQUIREMENT_ID = 0,
+        DESCRIPTION = 1,
+        CHECKED = 2
+    };
 
     explicit RequirementsModel(QObject *parent = nullptr);
 
@@ -52,6 +56,7 @@ public:
      */
     void addRequirements(const QList<Requirement> &requirements);
 
+    void setSelectedRequirementsIDs(const QStringList requirementIDs);
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -61,8 +66,13 @@ public:
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+protected:
+    QString getIdFromModelIndex(const QModelIndex &index) const;
 private:
     QList<Requirement> m_requirements;
+    QSet<QString> m_selected_requirements;
 };
 
 } // namespace requirement

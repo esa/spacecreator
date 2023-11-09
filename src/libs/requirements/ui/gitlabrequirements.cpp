@@ -11,7 +11,8 @@
 
 using namespace requirement;
 
-GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document, QWidget *parent)
+GitLabRequirements::GitLabRequirements(
+        QPointer<ive::InterfaceDocument> document, QStringList requirementsIDs, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::GitLabRequirements)
     , mReqManager(RequirementsManager::REPO_TYPE::GITLAB)
@@ -24,8 +25,26 @@ GitLabRequirements::GitLabRequirements(QPointer<ive::InterfaceDocument> document
     m_filterModel.setFilterKeyColumn(-1);
     m_filterModel.setSourceModel(&m_model);
     ui->AllRequirements->setModel(&m_filterModel);
-
+    ui->AllRequirements->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    ui->AllRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->AllRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    ui->AllRequirements->horizontalHeader()->setStretchLastSection(false);
+    m_model.setSelectedRequirementsIDs(requirementsIDs);
     connect(ui->AllRequirements, &QTableView::doubleClicked, this, &GitLabRequirements::openIssueLink);
+    connect(&m_model, &requirement::RequirementsModel::dataChanged,
+            [this](const QModelIndex &topLeft, const QModelIndex &BottomRight, const QList<int> &roles) {
+                if (topLeft != BottomRight) {
+                    return;
+                }
+
+                if (topLeft.column() == requirement::RequirementsModel::CHECKED && roles.contains(Qt::CheckStateRole)) {
+                    auto index = m_model.index(topLeft.row(), requirement::RequirementsModel::REQUIREMENT_ID);
+                    auto requirementID = m_model.data(index, Qt::DisplayRole).toString();
+                    auto checked = m_model.data(topLeft, Qt::CheckStateRole).toBool();
+
+                    emit requirementSelected(requirementID, checked);
+                }
+            });
     connect(ui->Refresh, &QPushButton::clicked, this, &GitLabRequirements::onLoginUpdate);
     connect(ui->UrlLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
     connect(ui->TokenLineEdit, &QLineEdit::editingFinished, this, &GitLabRequirements::onChangeOfCredentials);
@@ -95,13 +114,18 @@ Requirement GitLabRequirements::requirementFromIssue(const Issue &issue) const
 {
     auto issue_url = m_document->requirementsURL() + "/-/issues/" + issue.mIssueID;
     return { issue.mIssueID, issue.mTitle, issue.mDescription, issue.mIssueID, issue_url};
+
 }
 
 void GitLabRequirements::onLoginUpdate()
 {
     m_model.clear();
+    QUrl api_url;
+    api_url.setScheme("https");
+    api_url.setHost(QUrl(ui->UrlLineEdit->text()).host());
+    api_url.setPath("/api/v4/");
 
-    mReqManager.setCredentials(ui->UrlLineEdit->text(), ui->TokenLineEdit->text());
+    mReqManager.setCredentials(api_url.toString(), ui->TokenLineEdit->text());
 
     auto projectName = QUrl(ui->UrlLineEdit->text()).path().split("/").last();
     mReqManager.RequestProjectID(projectName);

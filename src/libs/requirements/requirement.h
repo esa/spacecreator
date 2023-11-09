@@ -27,9 +27,9 @@ public:
     QString m_id;
     QString m_longName;
     QString m_description;
-
     QString m_issueID;
     QString m_link;
+
 };
 
 } // namespace requirement

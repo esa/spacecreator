@@ -23,7 +23,7 @@ class GitLabRequirements : public QWidget
     Q_OBJECT
 
 public:
-    explicit GitLabRequirements(QPointer<ive::InterfaceDocument> document, QWidget *parent = nullptr);
+    explicit GitLabRequirements(QPointer<ive::InterfaceDocument> document, QStringList requirementsIDs,  QWidget *parent = nullptr);
     ~GitLabRequirements();
 
     void setUrl(const QString &url);
@@ -37,6 +37,10 @@ protected:
 protected Q_SLOTS:
     void onLoginUpdate();
     void openIssueLink(const QModelIndex &index);
+
+Q_SIGNALS:
+    void requirementSelected(QString RequirementID, bool checked);
+
 private:
     Ui::GitLabRequirements *ui;
     RequirementsManager mReqManager;

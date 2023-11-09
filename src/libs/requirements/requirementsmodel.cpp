@@ -45,14 +45,22 @@ void RequirementsModel::addRequirements(const QList<Requirement> &requirements)
     endInsertRows();
 }
 
+void RequirementsModel::setSelectedRequirementsIDs(const QStringList requirementIDs)
+{
+    m_selected_requirements = QSet(requirementIDs.begin(), requirementIDs.end());
+}
+
 QVariant RequirementsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
-        if (section == 0) {
+        if (section == REQUIREMENT_ID) {
             return tr("ID");
         }
-        if (section == 1) {
+        if (section == DESCRIPTION) {
             return tr("Description");
+        }
+        if (section == CHECKED) {
+            return tr("Selected");
         }
     }
 
@@ -61,44 +69,86 @@ QVariant RequirementsModel::headerData(int section, Qt::Orientation orientation,
 
 int RequirementsModel::rowCount(const QModelIndex &parent) const
 {
-  if (parent.isValid()) {
-      return 0;
-  }
+    if (parent.isValid()) {
+        return 0;
+    }
 
-  return m_requirements.size();
+    return m_requirements.size();
 }
 
 int RequirementsModel::columnCount(const QModelIndex &parent) const
 {
-  return 2;
+    return 3;
 }
 
 QVariant RequirementsModel::data(const QModelIndex &index, int role) const
 {
-  if (!index.isValid() || index.column() >= m_requirements.size()) {
-      return QVariant();
-  }
+    if (!index.isValid() || index.row() >= m_requirements.size()) {
+        return QVariant();
+    }
 
-  if (role == RequirementsModel::RoleNames::IssueLinkRole) {
-      switch (index.column()) {
-      case 0:
-          return m_requirements[index.row()].m_id;
-      case 1:
-          return m_requirements[index.row()].m_link;
-      }
-  }
-  if (role == Qt::DisplayRole) {
-      switch (index.column()) {
-      case 0:
-          return m_requirements[index.row()].m_id;
-      case 1:
-          return m_requirements[index.row()].m_longName;
-      }
-  }
-  if (role == Qt::ToolTipRole) {
-      return m_requirements[index.row()].m_description;
-  }
-  return QVariant();
+    if (role == RequirementsModel::RoleNames::IssueLinkRole) {
+        switch (index.column()) {
+        case 0:
+            return m_requirements[index.row()].m_id;
+        case 1:
+            return m_requirements[index.row()].m_link;
+        }
+    }
+
+    if (role == Qt::DisplayRole) {
+        switch (index.column()) {
+        case REQUIREMENT_ID:
+            return m_requirements[index.row()].m_id;
+        case DESCRIPTION:
+            return m_requirements[index.row()].m_longName;
+        }
+    }
+    if (role == Qt::ToolTipRole) {
+        return m_requirements[index.row()].m_description;
+    }
+
+    if (role == Qt::CheckStateRole && index.column() == CHECKED) {
+        auto requirementID = getIdFromModelIndex(index);
+        return (m_selected_requirements.contains(requirementID)) ? Qt::Checked : Qt::Unchecked;
+    }
+
+    return QVariant();
+}
+
+bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (index.isValid() && role == Qt::CheckStateRole && index.column() == CHECKED) {
+        auto requirementID = getIdFromModelIndex(index);
+        auto checked = value.toBool();
+        if (checked) {
+            m_selected_requirements << requirementID;
+        } else {
+            m_selected_requirements.remove(requirementID);
+        }
+
+        emit dataChanged(index, index, { role });
+        return true;
+    }
+
+    return QAbstractTableModel::setData(index, value, role);
+}
+
+QString RequirementsModel::getIdFromModelIndex(const QModelIndex &index) const
+{
+    auto idx = this->index(index.row(), requirement::RequirementsModel::REQUIREMENT_ID);
+    return this->data(idx, Qt::DisplayRole).toString();
+}
+
+Qt::ItemFlags RequirementsModel::flags(const QModelIndex &index) const
+{
+    auto flags = QAbstractTableModel::flags(index);
+
+    if (index.column() == CHECKED) {
+        flags |= Qt::ItemIsUserCheckable;
+    }
+
+    return flags;
 }
 
 } // namespace requirement
