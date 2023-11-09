@@ -1,6 +1,5 @@
 #include "gitlabrequirements.h"
 
-#include "interfacedocument.h"
 #include "ui_gitlabrequirements.h"
 
 #include <QDesktopServices>
@@ -11,12 +10,11 @@
 
 using namespace requirement;
 
-GitLabRequirements::GitLabRequirements(
-        QPointer<ive::InterfaceDocument> document, QStringList requirementsIDs, QWidget *parent)
+GitLabRequirements::GitLabRequirements(QByteArray requirementsUrl, QStringList requirementsIDs, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::GitLabRequirements)
     , mReqManager(RequirementsManager::REPO_TYPE::GITLAB)
-    , m_document(document)
+    , m_requirementsUrl(requirementsUrl)
 
 {
     ui->setupUi(this);
@@ -73,9 +71,9 @@ GitLabRequirements::GitLabRequirements(
 
 void GitLabRequirements::LoadSavedCredentials()
 {
-    setUrl(m_document->requirementsURL());
+    setUrl(m_requirementsUrl);
     QSettings settings;
-    auto gitlabToken = settings.value(m_document->requirementsURL() + "__token").toString();
+    auto gitlabToken = settings.value(m_requirementsUrl + "__token").toString();
     setToken(gitlabToken);
 }
 GitLabRequirements::~GitLabRequirements()
@@ -98,21 +96,22 @@ void GitLabRequirements::onChangeOfCredentials()
     QSettings settings;
     if (!ui->UrlLineEdit->text().isEmpty()) {
         auto gitlabToken = settings.value(ui->UrlLineEdit->text() + "__token").toString();
-        if ((gitlabToken != ui->TokenLineEdit->text()) || (ui->UrlLineEdit->text() != m_document->requirementsURL())) {
-            settings.remove(m_document->requirementsURL() + "__token");
+        if ((gitlabToken != ui->TokenLineEdit->text()) || (ui->UrlLineEdit->text() != m_requirementsUrl)) {
+            settings.remove(m_requirementsUrl + "__token");
             settings.setValue(ui->UrlLineEdit->text() + "__token", ui->TokenLineEdit->text());
-            m_document->setRequirementsURL(ui->UrlLineEdit->text());
+            m_requirementsUrl = ui->UrlLineEdit->text().toUtf8();
         }
     } else {
-        settings.remove(m_document->requirementsURL() + "__token");
-        m_document->setRequirementsURL("");
+        settings.remove(m_requirementsUrl + "__token");
+        m_requirementsUrl.clear();
         setToken("");
     }
+    emit requirementsUrlChanged(m_requirementsUrl);
 }
 
 Requirement GitLabRequirements::requirementFromIssue(const Issue &issue) const
 {
-    auto issue_url = m_document->requirementsURL() + "/-/issues/" + issue.mIssueIID;
+    auto issue_url = m_requirementsUrl + "/-/issues/" + issue.mIssueIID;
     return { issue.mIssueIID, issue.mTitle, issue.mDescription, issue.mIssueIID, issue_url };
 }
 
@@ -132,5 +131,5 @@ void GitLabRequirements::onLoginUpdate()
 
 void GitLabRequirements::openIssueLink(const QModelIndex &index)
 {
-   QDesktopServices::openUrl(index.data(Qt::UserRole).toString());
+    QDesktopServices::openUrl(index.data(Qt::UserRole).toString());
 }

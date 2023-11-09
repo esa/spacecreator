@@ -70,11 +70,12 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     , m_archetypesModel(archetypesModel)
     , m_isFixedSystemElement(dataObject()->isFixedSystemElement())
     , m_isRequiredSystemElement(false)
-    , m_requirementsWidget(document, dataObject()->requestsIDs(), this)
-
+    , m_requirementsWidget(document->requirementsURL().toUtf8(), dataObject()->requestsIDs(), this)
 {
     connect(&m_requirementsWidget, &GitLabRequirements::requirementSelected, this,
             &IVPropertiesDialog::requirementSelection);
+    connect(&m_requirementsWidget, &GitLabRequirements::requirementsUrlChanged,
+            [this](QByteArray requirementUrl) { m_document->setRequirementsURL(requirementUrl); });
 }
 
 IVPropertiesDialog::~IVPropertiesDialog() { }
@@ -165,7 +166,7 @@ void IVPropertiesDialog::requirementSelection(QString requirementID, bool checke
 
     dataObject()->setRequestsIDs(keys.values());
     Q_EMIT m_document->dirtyChanged(true);
-//    m_document->exporter()->exportDocSilently(m_document, m_document->path());
+    //    m_document->exporter()->exportDocSilently(m_document, m_document->path());
 }
 
 void IVPropertiesDialog::initConnectionGroup()
