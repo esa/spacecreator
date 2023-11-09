@@ -1,9 +1,9 @@
-#include "Label.h"
+#include "label.h"
 
 Label::Label()
 {
-
 }
+
 Label::Label(const QJsonObject &label)
 {
     mName = label["name"].toString();

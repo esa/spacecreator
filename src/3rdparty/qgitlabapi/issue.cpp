@@ -1,4 +1,4 @@
- #include "Issue.h"
+#include "issue.h"
 
 #include <QJsonArray>
 #include <QJsonObject>

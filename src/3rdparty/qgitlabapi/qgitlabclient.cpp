@@ -39,10 +39,10 @@ void QGitlabClient::requestIssues(const QString &projectID, const QString &assig
                 qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
             } else {
                 QList<Issue> issues;
-                foreach (auto value, replyContent.array()) {
+                for (const QJsonValueRef &value : replyContent.array()) {
                     issues.push_back(value.toObject());
                 }
-                emit listOfIssues(issues);
+                Q_EMIT listOfIssues(issues);
             }
 
             // Request next page if needed
@@ -53,7 +53,7 @@ void QGitlabClient::requestIssues(const QString &projectID, const QString &assig
                     requestIssues(projectID, assignee, author, iids, ++page);
                 } else {
                     if (page == totalPages) {
-                        emit issueFetchingDone();
+                        Q_EMIT issueFetchingDone();
                     }
                 }
             }
@@ -102,13 +102,13 @@ void QGitlabClient::requestListofLabels(const QString &projectID, const QString 
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
             if (QJsonParseError::NoError != jsonError.error) {
                 qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
-                emit connectionError(reply->errorString());
+                Q_EMIT connectionError(reply->errorString());
             } else {
                 QList<Label> labels;
-                foreach (auto label, replyContent.array()) {
+                for (const QJsonValueRef &label : replyContent.array()) {
                     labels.push_back(Label(label.toObject()));
                 }
-                emit listOfLabels(labels);
+                Q_EMIT listOfLabels(labels);
             }
         } else {
             qDebug() << reply->error() << reply->errorString();
@@ -125,14 +125,14 @@ void QGitlabClient::requestProjectIdByName(const QString &projectName)
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
             if (QJsonParseError::NoError != jsonError.error) {
                 qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
-                emit connectionError(reply->errorString());
+                Q_EMIT connectionError(reply->errorString());
             } else {
                 QString projectID;
                 auto content = replyContent.array();
                 if (!content.isEmpty()) {
                     static const auto ID = "id";
                     auto projectID = QString::number(content.at(0).toObject().value("id").toInteger());
-                    emit requestedProjectID(projectID);
+                    Q_EMIT requestedProjectID(projectID);
                 }
             }
         } else {

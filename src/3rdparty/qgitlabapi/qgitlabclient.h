@@ -1,10 +1,10 @@
 #ifndef QGITLABCLIENT_H
 #define QGITLABCLIENT_H
 
-#include "Issue.h"
-#include "Label.h"
 #include "QGitlabAPI_global.h"
-#include "UrlComposer.h"
+#include "issue.h"
+#include "label.h"
+#include "urlcomposer.h"
 
 #include <QList>
 #include <QNetworkAccessManager>

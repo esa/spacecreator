@@ -14,8 +14,6 @@ public:
 
     QString mName;
     QString mDescription;
-
-
 };
 
 #endif // LABEL_H

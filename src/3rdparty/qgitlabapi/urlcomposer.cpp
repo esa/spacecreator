@@ -1,8 +1,8 @@
-#include "UrlComposer.h"
-#include "qvariant.h"
+#include "urlcomposer.h"
 
 #include <QMap>
 #include <QUrlQuery>
+#include <QVariant>
 
 UrlComposer::UrlComposer()
 {}
