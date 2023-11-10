@@ -35,6 +35,7 @@ void QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOp
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
             if (QJsonParseError::NoError != jsonError.error) {
                 qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
+                Q_EMIT connectionError(reply->errorString());
             } else {
                 QList<Issue> issues;
                 for (const QJsonValueRef &value : replyContent.array()) {
@@ -59,6 +60,7 @@ void QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOp
             }
         } else {
             qDebug() << reply->error() << reply->errorString();
+            Q_EMIT connectionError(reply->errorString());
         }
     });
 }
@@ -68,9 +70,10 @@ void QGitlabClient::editIssue(const QString &projectID, const QString &issueID, 
     auto reply = SendRequest(QGitlabClient::PUT,
             mUrlComposer.composeEditIssueUrl(projectID.toInt(), newIssue.mIssueIID, newIssue.mTitle,
                     newIssue.mDescription, newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
-    connect(reply, &QNetworkReply::finished, [reply]() {
+    connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
             qDebug() << reply->error() << reply->errorString();
+            Q_EMIT connectionError(reply->errorString());
         }
     });
 }
@@ -79,9 +82,10 @@ void QGitlabClient::createIssue(const QString &projectID, const QString &title, 
 {
     auto reply =
             SendRequest(QGitlabClient::POST, mUrlComposer.composeCreateIssueUrl(projectID, title, description, ""));
-    connect(reply, &QNetworkReply::finished, [reply]() {
+    connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
             qDebug() << reply->error() << reply->errorString();
+            Q_EMIT connectionError(reply->errorString());
         }
     });
 }
@@ -105,6 +109,7 @@ void QGitlabClient::requestListofLabels(const QString &projectID, const QString 
             }
         } else {
             qDebug() << reply->error() << reply->errorString();
+            Q_EMIT connectionError(reply->errorString());
         }
     });
 }
@@ -130,6 +135,7 @@ void QGitlabClient::requestProjectIdByName(const QString &projectName)
             }
         } else {
             qDebug() << reply->error() << reply->errorString();
+            Q_EMIT connectionError(reply->errorString());
         }
     });
 }

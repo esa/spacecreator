@@ -28,6 +28,8 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType)
         d->gitlabRequirements = std::make_unique<requirement::GitLabRequirements>();
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfIssues, d->gitlabRequirements.get(),
                 &requirement::GitLabRequirements::listOfIssues);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::connectionError, this,
+                &RequirementsManager::connectionError);
         connect(d->gitlabRequirements.get(), &requirement::GitLabRequirements::listOfRequirements, this,
                 &RequirementsManager::listOfRequirements);
         break;

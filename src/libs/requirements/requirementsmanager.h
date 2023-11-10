@@ -26,6 +26,7 @@ public:
 Q_SIGNALS:
     void listOfRequirements(const QList<requirement::Requirement> &);
     void RequestedProjectID(QString);
+    void connectionError(QString errorString);
 
 private:
     class RequirementsManagerPrivate;

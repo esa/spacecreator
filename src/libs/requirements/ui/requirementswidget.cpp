@@ -1,13 +1,14 @@
 #include "requirementswidget.h"
 
+#include "requirement.h"
 #include "ui_requirementswidget.h"
 
 #include <QDesktopServices>
 #include <QHeaderView>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QSettings>
 #include <QTableView>
-#include <requirement.h>
 
 using namespace requirement;
 
@@ -58,6 +59,9 @@ RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, QStringList r
 
     connect(&mReqManager, &RequirementsManager::listOfRequirements, &m_model,
             &requirement::RequirementsModel::addRequirements);
+    connect(&mReqManager, &RequirementsManager::connectionError, this, [this](QString error) {
+        QMessageBox::warning(this, tr("Connection error"), tr("Connection failed for this errror:\n%1").arg(error));
+    });
 
     LoadSavedCredentials();
     onLoginUpdate();
