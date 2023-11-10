@@ -49,7 +49,7 @@ Q_SIGNALS:
     void connectionError(QString errorString);
 
 protected:
-    QNetworkReply *SendRequest(ReqType reqType, const QUrl &url);
+    QNetworkReply *sendRequest(ReqType reqType, const QUrl &url);
     int pageNumberFromHeader(QNetworkReply *reply) const;
     int totalPagesFromHeader(QNetworkReply *reply) const;
     int numberHeaderAttribute(QNetworkReply *reply, const QByteArray &headername) const;

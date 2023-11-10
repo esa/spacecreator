@@ -51,7 +51,7 @@ RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, QStringList r
 
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
     connect(ui->clearFilterButton, &QPushButton::clicked, ui->filterLineEdit, &QLineEdit::clear);
-    connect(&mReqManager, &RequirementsManager::RequestedProjectID, this, [this](const QString &projectID) {
+    connect(&mReqManager, &RequirementsManager::requestedProjectID, this, [this](const QString &projectID) {
         static const QString anyAssignee("");
         static const QString anyAuthor("");
         mReqManager.requestRequirements(projectID, anyAssignee, anyAuthor);
@@ -118,7 +118,7 @@ void RequirementsWidget::onLoginUpdate()
     mReqManager.setCredentials(api_url.toString(), ui->TokenLineEdit->text());
 
     auto projectName = QUrl(ui->UrlLineEdit->text()).path().split("/").last();
-    mReqManager.RequestProjectID(projectName);
+    mReqManager.requestProjectID(projectName);
 }
 
 void RequirementsWidget::openIssueLink(const QModelIndex &index)

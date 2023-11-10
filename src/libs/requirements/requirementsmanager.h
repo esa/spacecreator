@@ -21,11 +21,11 @@ public:
     void setCredentials(const QString &url, const QString &token);
     void requestRequirements(const QString &projectID, const QString &assignee, const QString &author) const;
     void createRequirement(const QString &projectID, const QString &title, const QString &description) const;
-    void RequestProjectID(const QString &projectName);
+    void requestProjectID(const QString &projectName);
 
 Q_SIGNALS:
     void listOfRequirements(const QList<requirement::Requirement> &);
-    void RequestedProjectID(QString);
+    void requestedProjectID(QString);
     void connectionError(QString errorString);
 
 private:

@@ -28,7 +28,7 @@ void QGitlabClient::setCredentials(const QString &url, const QString &token)
 
 void QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOptions &options)
 {
-    auto reply = SendRequest(QGitlabClient::GET, mUrlComposer.composeGetIssuesUrl(projectID, options));
+    auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeGetIssuesUrl(projectID, options));
     connect(reply, &QNetworkReply::finished, [reply, projectID, options, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
@@ -67,7 +67,7 @@ void QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOp
 
 void QGitlabClient::editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue)
 {
-    auto reply = SendRequest(QGitlabClient::PUT,
+    auto reply = sendRequest(QGitlabClient::PUT,
             mUrlComposer.composeEditIssueUrl(projectID.toInt(), newIssue.mIssueIID, newIssue.mTitle,
                     newIssue.mDescription, newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
@@ -81,7 +81,7 @@ void QGitlabClient::editIssue(const QString &projectID, const QString &issueID, 
 void QGitlabClient::createIssue(const QString &projectID, const QString &title, const QString &description)
 {
     auto reply =
-            SendRequest(QGitlabClient::POST, mUrlComposer.composeCreateIssueUrl(projectID, title, description, ""));
+            sendRequest(QGitlabClient::POST, mUrlComposer.composeCreateIssueUrl(projectID, title, description, ""));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
             qDebug() << reply->error() << reply->errorString();
@@ -92,7 +92,7 @@ void QGitlabClient::createIssue(const QString &projectID, const QString &title, 
 
 void QGitlabClient::requestListofLabels(const QString &projectID, const QString &with_counts, const QString &search)
 {
-    auto reply = SendRequest(QGitlabClient::GET, mUrlComposer.composeProjectLabelsUrl(projectID, with_counts, search));
+    auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectLabelsUrl(projectID, with_counts, search));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
@@ -116,7 +116,7 @@ void QGitlabClient::requestListofLabels(const QString &projectID, const QString 
 
 void QGitlabClient::requestProjectIdByName(const QString &projectName)
 {
-    auto reply = SendRequest(QGitlabClient::GET, mUrlComposer.composeProjectUrl(projectName));
+    auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectUrl(projectName));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
@@ -140,7 +140,7 @@ void QGitlabClient::requestProjectIdByName(const QString &projectName)
     });
 }
 
-QNetworkReply *QGitlabClient::SendRequest(QGitlabClient::ReqType reqType, const QUrl &uri)
+QNetworkReply *QGitlabClient::sendRequest(QGitlabClient::ReqType reqType, const QUrl &uri)
 {
     QNetworkRequest request(uri);
     request.setRawHeader("PRIVATE-TOKEN", mToken.toUtf8());

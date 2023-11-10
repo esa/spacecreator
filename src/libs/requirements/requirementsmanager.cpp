@@ -76,14 +76,14 @@ void RequirementsManager::createRequirement(
     }
 }
 
-void RequirementsManager::RequestProjectID(const QString &projectName)
+void RequirementsManager::requestProjectID(const QString &projectName)
 {
     switch (d->mRepoType) {
     case(REPO_TYPE::GITLAB):
     {
         d->gitlabClient->requestProjectIdByName(projectName);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::requestedProjectID, this,
-                &RequirementsManager::RequestedProjectID, Qt::UniqueConnection);
+                &RequirementsManager::requestedProjectID, Qt::UniqueConnection);
         break;
     }
     default:
