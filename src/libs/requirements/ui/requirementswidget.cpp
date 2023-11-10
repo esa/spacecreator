@@ -119,5 +119,5 @@ void RequirementsWidget::onLoginUpdate()
 
 void RequirementsWidget::openIssueLink(const QModelIndex &index)
 {
-    QDesktopServices::openUrl(index.data(Qt::UserRole).toString());
+    QDesktopServices::openUrl(index.data(RequirementsModel::RoleNames::IssueLinkRole).toString());
 }
