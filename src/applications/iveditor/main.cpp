@@ -24,6 +24,7 @@
 #include "ivlibrary.h"
 #include "ivproject.h"
 #include "mainwindow.h"
+#include "requirementslibrary.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
 #include "templatinglibrary.h"
@@ -38,6 +39,7 @@ int main(int argc, char *argv[])
 
     templating::initTemplatingLibrary();
     shared::initSharedLibrary();
+    requirement::initRequirementsLibrary();
     ive::initIVEditor();
     ivm::initIVLibrary();
 

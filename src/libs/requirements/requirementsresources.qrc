@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/requirementsresources">
+        <file>icons/check_icon.svg</file>
+        <file>icons/uncheck_icon.svg</file>
+    </qresource>
+</RCC>

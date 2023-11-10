@@ -15,27 +15,10 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "gitlabrequirements.h"
-
-#include <issue.h>
-
-using namespace gitlab;
+#pragma once
 
 namespace requirement {
 
-void GitLabRequirements::listOfIssues(const QList<gitlab::Issue> &issues)
-{
-    QList<Requirement> requirements;
-    requirements.reserve(issues.size());
-    for (const auto &issue : issues) {
-        requirements.append(requirementFromIssue(issue));
-    }
-    Q_EMIT listOfRequirements(requirements);
-}
+void initRequirementsLibrary();
 
-Requirement GitLabRequirements::requirementFromIssue(const gitlab::Issue &issue)
-{
-    return { QString::number(issue.mIssueIID), issue.mTitle, issue.mDescription, QString::number(issue.mIssueIID),
-        issue.mUrl };
-}
 }

@@ -30,6 +30,7 @@
 #include "msceditor.h"
 #include "msceditorcore.h"
 #include "msclibrary.h"
+#include "requirementslibrary.h"
 #include "scl/scleditorfactory.h"
 #include "sharedlibrary.h"
 #include "spacecreatorpluginconstants.h"
@@ -52,6 +53,7 @@ void initSpaceCreatorResources()
 {
     Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
+    requirement::initRequirementsLibrary();
     msc::initMscLibrary();
     msc::initMscEditor();
     ive::initIVEditor();
