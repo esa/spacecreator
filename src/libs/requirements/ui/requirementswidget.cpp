@@ -33,7 +33,8 @@ namespace {
 const int kIconSize = 16;
 }
 
-RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, QStringList requirementsIDs, QWidget *parent)
+RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, shared::VEObject *dataObject,
+                                       shared::PropertyTemplateConfig *dynPropConfig, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::RequirementsWidget)
     , mReqManager(RequirementsManager::REPO_TYPE::GITLAB)
@@ -50,22 +51,11 @@ RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, QStringList r
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     ui->allRequirements->horizontalHeader()->setStretchLastSection(false);
-    m_model.setSelectedRequirementsIDs(requirementsIDs);
+
+    m_model.setDataObject(dataObject);
+    m_model.setPropertyTemplateConfig(dynPropConfig);
+
     connect(ui->allRequirements, &QTableView::doubleClicked, this, &RequirementsWidget::openIssueLink);
-    connect(&m_model, &requirement::RequirementsModel::dataChanged,
-            [this](const QModelIndex &topLeft, const QModelIndex &BottomRight, const QList<int> &roles) {
-                if (topLeft != BottomRight) {
-                    return;
-                }
-
-                if (topLeft.column() == requirement::RequirementsModel::CHECKED && roles.contains(Qt::CheckStateRole)) {
-                    auto index = m_model.index(topLeft.row(), requirement::RequirementsModel::REQUIREMENT_ID);
-                    auto requirementID = m_model.data(index, Qt::DisplayRole).toString();
-                    auto checked = m_model.data(topLeft, Qt::CheckStateRole).toBool();
-
-                    emit requirementSelected(requirementID, checked);
-                }
-            });
     connect(ui->refreshButton, &QPushButton::clicked, this, &RequirementsWidget::onLoginUpdate);
     connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
@@ -123,6 +113,11 @@ void RequirementsWidget::setUrl(const QString &url)
 void RequirementsWidget::setToken(const QString &token)
 {
     ui->tokenLineEdit->setText(token);
+}
+
+void RequirementsWidget::setCommandMacro(shared::cmd::CommandsStackBase::Macro *macro)
+{
+    m_model.setCommandMacro(macro);
 }
 
 void RequirementsWidget::onChangeOfCredentials()

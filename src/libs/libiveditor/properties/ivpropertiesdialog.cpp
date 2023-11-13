@@ -70,10 +70,8 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     , m_archetypesModel(archetypesModel)
     , m_isFixedSystemElement(dataObject()->isFixedSystemElement())
     , m_isRequiredSystemElement(false)
-    , m_requirementsWidget(document->requirementsURL().toUtf8(), dataObject()->requestsIDs(), this)
+    , m_requirementsWidget(document->requirementsURL().toUtf8(), dataObject(), propertiesConfig(), this)
 {
-    connect(&m_requirementsWidget, &RequirementsWidget::requirementSelected, this,
-            &IVPropertiesDialog::requirementSelection);
     connect(&m_requirementsWidget, &RequirementsWidget::requirementsUrlChanged,
             [this](QByteArray requirementUrl) { m_document->setRequirementsURL(requirementUrl); });
 }
@@ -151,22 +149,6 @@ void IVPropertiesDialog::init()
 ivm::IVObject *IVPropertiesDialog::dataObject() const
 {
     return qobject_cast<ivm::IVObject *>(shared::PropertiesDialog::dataObject());
-}
-
-void IVPropertiesDialog::requirementSelection(QString requirementID, bool checked) const
-{
-    auto ids = dataObject()->requestsIDs();
-    QSet<QString> keys(ids.begin(), ids.end());
-
-    if (checked) {
-        keys << requirementID;
-    } else {
-        keys.remove(requirementID);
-    }
-
-    dataObject()->setRequestsIDs(keys.values());
-    Q_EMIT m_document->dirtyChanged(true);
-    //    m_document->exporter()->exportDocSilently(m_document, m_document->path());
 }
 
 void IVPropertiesDialog::initConnectionGroup()
@@ -335,6 +317,7 @@ void IVPropertiesDialog::initArchetypeView()
 void IVPropertiesDialog::initRequestsView()
 {
     insertTab(&m_requirementsWidget, tr("Requirements"), getTabCount());
+    m_requirementsWidget.setCommandMacro(commandMacro());
 }
 
 } // namespace ive

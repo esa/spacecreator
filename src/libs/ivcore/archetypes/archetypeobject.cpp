@@ -88,7 +88,8 @@ QString ArchetypeObject::typeToString(Type t)
 
 QStringList ArchetypeObject::requestsIDs() const
 {
-    return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids)).split(",");
+    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids));
+    return value.isEmpty() ? QStringList() : value.split(",");
 }
 
 void ArchetypeObject::setRequestsIDs(const QStringList &requestIDs)

@@ -39,12 +39,13 @@ class RequirementsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit RequirementsWidget(QByteArray requirementsUrl, QStringList requirementsIDs, QWidget *parent = nullptr);
+    explicit RequirementsWidget(QByteArray requirementsUrl, shared::VEObject *dataObject,
+            shared::PropertyTemplateConfig *dynPropConfig, QWidget *parent = nullptr);
     ~RequirementsWidget();
 
     void setUrl(const QString &url);
     void setToken(const QString &token);
-
+    void setCommandMacro(shared::cmd::CommandsStackBase::Macro *macro);
 protected:
     void loadSavedCredentials();
     void onChangeOfCredentials();

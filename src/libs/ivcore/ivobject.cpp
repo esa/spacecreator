@@ -304,7 +304,8 @@ bool IVObject::isInstanceDescendant() const
 
 QStringList IVObject::requestsIDs() const
 {
-    return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids)).split(",");
+    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids));
+    return value.isEmpty() ? QStringList() : value.split(",");
 }
 
 void IVObject::setRequestsIDs(const QStringList &requestIDs)

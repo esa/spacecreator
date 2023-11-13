@@ -176,7 +176,8 @@ QVariantList DVObject::properties() const
 
 QStringList DVObject::requestsIDs() const
 {
-    return entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids)).split(",");
+    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids));
+    return value.isEmpty() ? QStringList() : value.split(",");
 }
 
 void DVObject::setRequestsIDs(const QStringList &requestIDs)

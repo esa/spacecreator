@@ -29,5 +29,5 @@ target_sources(${LIB_NAME} PRIVATE
 target_include_directories(${LIB_NAME} PUBLIC .)
 target_link_libraries(${LIB_NAME}
     PUBLIC ${QT_NETWORK} ${QT_CORE} ${QT_WIDGETS}
-    PRIVATE QGitlabAPI)
+    PRIVATE QGitlabAPI shared)
 target_compile_definitions(${LIB_NAME} PUBLIC QGITLABAPI_LIBRARY QT_DEBUG_OUTPUT)

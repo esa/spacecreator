@@ -18,10 +18,17 @@ along with this program. If not, see
 
 #pragma once
 
+#include "commandsstackbase.h"
+#include "propertytemplate.h"
 #include "requirement.h"
 
 #include <QAbstractTableModel>
 #include <QList>
+
+namespace shared {
+class PropertyTemplateConfig;
+class VEObject;
+}
 
 namespace requirement {
 
@@ -33,11 +40,13 @@ class RequirementsModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    enum RoleNames {
+    enum RoleNames
+    {
         IssueLinkRole = Qt::UserRole + 1
     };
 
-    enum HEADER_SECTIONS{
+    enum HEADER_SECTIONS
+    {
         REQUIREMENT_ID = 0,
         DESCRIPTION = 1,
         CHECKED = 2
@@ -56,7 +65,6 @@ public:
      */
     void addRequirements(const QList<requirement::Requirement> &requirements);
 
-    void setSelectedRequirementsIDs(const QStringList &requirementIDs);
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -67,14 +75,28 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
+
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    void setDataObject(shared::VEObject *obj);
+    void setCommandMacro(shared::cmd::CommandsStackBase::Macro *macro);
+    void setPropertyTemplateConfig(shared::PropertyTemplateConfig *dynPropConfig);
+
+    /**
+     * @brief setAttributeName Set the anme of the requirements attribute of the object
+     * @note Default is "requests_ids"
+     */
+    void setAttributeName(const QString &name);
 
 protected:
     QString getIdFromModelIndex(const QModelIndex &index) const;
+    shared::cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
+    shared::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
 
 private:
     QList<Requirement> m_requirements;
+    shared::VEObject *m_dataObject { nullptr };
     QSet<QString> m_selected_requirements;
+    QString m_attributeName = "requests_ids";
 };
 
 } // namespace requirement

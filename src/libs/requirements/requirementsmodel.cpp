@@ -17,6 +17,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "requirementsmodel.h"
 
+#include "commands/cmdentityattributeschange.h"
+#include "entityattribute.h"
+#include "veobject.h"
+
 namespace requirement {
 
 RequirementsModel::RequirementsModel(QObject *parent)
@@ -43,11 +47,6 @@ void RequirementsModel::addRequirements(const QList<Requirement> &requirements)
     m_requirements.append(requirements);
 
     endInsertRows();
-}
-
-void RequirementsModel::setSelectedRequirementsIDs(const QStringList &requirementIDs)
-{
-    m_selected_requirements = QSet(requirementIDs.begin(), requirementIDs.end());
 }
 
 QVariant RequirementsModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -105,7 +104,7 @@ QVariant RequirementsModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::CheckStateRole && index.column() == CHECKED) {
         auto requirementID = getIdFromModelIndex(index);
-        return (m_selected_requirements.contains(requirementID)) ? Qt::Checked : Qt::Unchecked;
+        return (m_dataObject->requestsIDs().contains(requirementID)) ? Qt::Checked : Qt::Unchecked;
     }
 
     return QVariant();
@@ -116,17 +115,41 @@ bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value,
     if (index.isValid() && role == Qt::CheckStateRole && index.column() == CHECKED) {
         auto requirementID = getIdFromModelIndex(index);
         auto checked = value.toBool();
+        QStringList selectedRequirements = m_dataObject->requestsIDs();
         if (checked) {
-            m_selected_requirements << requirementID;
+            selectedRequirements << requirementID;
         } else {
-            m_selected_requirements.remove(requirementID);
+            selectedRequirements.removeOne(requirementID);
         }
 
+        bool ok = m_cmdMacro->push(new shared::cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject,
+                { EntityAttribute { m_attributeName, QVariant::fromValue<QString>(selectedRequirements.join(",")),
+                        EntityAttribute::Type::Attribute } }));
         emit dataChanged(index, index, { role });
-        return true;
+        return ok;
     }
 
     return QAbstractTableModel::setData(index, value, role);
+}
+
+void RequirementsModel::setDataObject(shared::VEObject *obj)
+{
+    m_dataObject = obj;
+}
+
+void RequirementsModel::setCommandMacro(shared::cmd::CommandsStackBase::Macro *macro)
+{
+    m_cmdMacro = macro;
+}
+
+void RequirementsModel::setPropertyTemplateConfig(shared::PropertyTemplateConfig *dynPropConfig)
+{
+    m_propTemplatesConfig = dynPropConfig;
+}
+
+void RequirementsModel::setAttributeName(const QString &name)
+{
+    m_attributeName = name;
 }
 
 QString RequirementsModel::getIdFromModelIndex(const QModelIndex &index) const

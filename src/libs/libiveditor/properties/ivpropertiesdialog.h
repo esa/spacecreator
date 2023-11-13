@@ -58,7 +58,6 @@ public:
 protected:
     QString objectTypeName() const override;
     ivm::IVObject *dataObject() const override;
-    void requirementSelection(QString requirementID, bool checked) const;
 
 private:
     void initConnectionGroup();
