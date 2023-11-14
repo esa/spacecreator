@@ -73,6 +73,9 @@ protected:
     void drawForeground(QPainter *painter, const QRectF &rect) override;
     bool eventFilter(QObject *object, QEvent *event) override;
 
+    void enterEvent(QEnterEvent *event) override;
+    void leaveEvent(QEvent *event) override;
+
 private:
     void processMouseInput();
     bool checkMouseEvent(QMouseEvent *e, Qt::MouseButton current, Qt::MouseButton started,
@@ -93,6 +96,8 @@ private:
         Dynamic, // follow an edge by mouse movement
     };
     QRect stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, MiniMap::Stickiness flow) const;
+
+    void setOpacity(qreal o);
 };
 
 } // namespace ui

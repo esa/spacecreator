@@ -44,8 +44,10 @@ namespace ui {
 static constexpr QPoint kOutOfView { -1, -1 };
 static const QColor kDefaultDimColor { 0x00, 0x00, 0x00, 0x88 };
 static constexpr qreal kDefaultScaleFactor { 6 };
-static const qreal kOpacityRegular { 0.9 };
+static const qreal kOpacityRegular { 0.5 };
+static const qreal kOpacityHovered { 0.95 };
 static const qreal kOpacityRelocating { 0.5 };
+static const qreal kOpacityStickable { 0.75 };
 static const int kRelocatingThreshold { 5 };
 static const MiniMap::Location kDefaultLocation { MiniMap::Location::NorthEast };
 
@@ -72,7 +74,10 @@ MiniMap::MiniMap(QWidget *parent)
     setLocation(static_cast<MiniMap::Location>(location));
 
     d->m_opacity.reset(new QGraphicsOpacityEffect(this));
-    d->m_opacity->setOpacity(kOpacityRegular);
+    connect(d->m_opacity.data(), &QGraphicsOpacityEffect::opacityChanged, this,
+            [](qreal o) { qDebug() << "opacity --->" << o; });
+
+    setOpacity(kOpacityRegular);
     setGraphicsEffect(d->m_opacity.data());
 }
 
@@ -216,7 +221,7 @@ void MiniMap::mouseReleaseEvent(QMouseEvent *event)
     if (d->m_relocating) {
         qApp->restoreOverrideCursor();
         d->m_relocating = false;
-        d->m_opacity->setOpacity(kOpacityRegular);
+        setOpacity(kOpacityRegular);
     }
 }
 
@@ -338,8 +343,8 @@ void MiniMap::followMouse(const QPointF &globalMouse)
     const auto &targetRect =
             stickToEdge(newLocation, geom, MiniMap::Stickiness::Strict)
                     .adjusted(-kRelocatingThreshold, -kRelocatingThreshold, kRelocatingThreshold, kRelocatingThreshold);
-    const qreal opacity = targetRect.contains(shiftedGeom) ? kOpacityRegular : kOpacityRelocating;
-    d->m_opacity->setOpacity(opacity);
+    const qreal opacity = targetRect.contains(shiftedGeom) ? kOpacityStickable : kOpacityRelocating;
+    setOpacity(opacity);
 }
 
 QRect MiniMap::stickToEdge(MiniMap::Location edge, const QRect &srcGeometry, MiniMap::Stickiness flow) const
@@ -411,6 +416,27 @@ void MiniMap::setLocation(MiniMap::Location location)
         d->m_location = location;
         shared::SettingsManager::store<int>(
                 shared::SettingsManager::Common::MinimapLocation, static_cast<int>(this->location()));
+    }
+}
+
+void MiniMap::enterEvent(QEnterEvent *event)
+{
+    QGraphicsView::enterEvent(event);
+    setOpacity(kOpacityHovered);
+}
+
+void MiniMap::leaveEvent(QEvent *event)
+{
+    QGraphicsView::leaveEvent(event);
+    setOpacity(kOpacityRegular);
+}
+
+void MiniMap::setOpacity(qreal opacity)
+{
+    if (d->m_opacity->opacity() != opacity) {
+        LOG << 1 << d->m_opacity->opacity() << "-->" << opacity << parentWidget();
+        d->m_opacity->setOpacity(opacity);
+        LOG << 2 << d->m_opacity->opacity();
     }
 }
 
