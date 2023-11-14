@@ -39,13 +39,14 @@ RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, shared::VEObj
     , ui(new Ui::RequirementsWidget)
     , mReqManager(RequirementsManager::REPO_TYPE::GITLAB)
     , m_requirementsUrl(requirementsUrl)
-
 {
     ui->setupUi(this);
     m_filterModel.setDynamicSortFilter(true);
     m_filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     m_filterModel.setFilterKeyColumn(-1);
     m_filterModel.setSourceModel(&m_model);
+    m_checkedModel.setFilterKeyColumn(RequirementsModel::CHECKED);
+    m_checkedModel.setSourceModel(&m_filterModel);
     ui->allRequirements->setModel(&m_filterModel);
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
@@ -61,7 +62,6 @@ RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, shared::VEObj
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
 
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
-    connect(ui->clearFilterButton, &QPushButton::clicked, ui->filterLineEdit, &QLineEdit::clear);
     connect(&mReqManager, &RequirementsManager::requestedProjectID, this, [this](const QString &projectID) {
         static const QString anyAssignee("");
         static const QString anyAuthor("");
@@ -91,6 +91,9 @@ RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, shared::VEObj
     ui->tokenLabel->setToolTip(tokenTooltip);
     ui->tokenLineEdit->setToolTip(tokenTooltip);
     connect(ui->createTokenButton, &QPushButton::clicked, this, &RequirementsWidget::openTokenSettingsPage);
+
+    connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
+    ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
 }
 
 void RequirementsWidget::loadSavedCredentials()
@@ -167,4 +170,15 @@ void RequirementsWidget::openTokenSettingsPage()
     QUrl url(ui->urlLineEdit->text());
     url.setPath("/-/profile/personal_access_tokens");
     QDesktopServices::openUrl(url);
+}
+
+void RequirementsWidget::toggleShowUsedRequirements()
+{
+    if (ui->allRequirements->model() == &m_checkedModel) {
+        ui->allRequirements->setModel(&m_filterModel);
+        ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
+    } else {
+        ui->allRequirements->setModel(&m_checkedModel);
+        ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/disable_filter_icon.svg"));
+    }
 }

@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
+#include "checkedfilterproxymodel.h"
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
 
@@ -54,6 +55,7 @@ protected Q_SLOTS:
     void onLoginUpdate();
     void openIssueLink(const QModelIndex &index);
     void openTokenSettingsPage();
+    void toggleShowUsedRequirements();
 
 Q_SIGNALS:
     void requirementSelected(QString RequirementID, bool checked);
@@ -64,5 +66,6 @@ private:
     RequirementsManager mReqManager;
     requirement::RequirementsModel m_model;
     QSortFilterProxyModel m_filterModel;
+    shared::CheckedFilterProxyModel m_checkedModel;
     QByteArray m_requirementsUrl;
 };

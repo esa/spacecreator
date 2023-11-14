@@ -16,6 +16,8 @@ target_sources(${LIB_NAME} PRIVATE
     animation.h
     breadcrumbwidget.cpp
     breadcrumbwidget.h
+    checkedfilterproxymodel.cpp
+    checkedfilterproxymodel.h
     colors/colorhandler.cpp
     colors/colorhandler.h
     colors/colorhandlereditor.cpp
