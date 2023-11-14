@@ -3,6 +3,7 @@
 #include <QByteArray>
 #include <QList>
 #include <QMap>
+#include <QStringList>
 #include <QUrlQuery>
 #include <QVariant>
 
@@ -18,9 +19,12 @@ public:
     QByteArray mAssignee; /// If not empty, only issues assigned to that assignee (username) are fetched
     QByteArray mAuthor; /// If not empty, only issues assigned to that assignee with that username are fetched
     QList<int> mIids; /// If not empty, return only the issues having the given iids (unique IDs for the whole server)
+    QStringList mLabels; /// Comma-separated list of label names, issues must have all labels to be returned. None lists
+                         /// all issues with no labels. Any lists all issues with at least one label. No+Label
+                         /// (Deprecated) lists all issues with no labels. Predefined names are case-insensitive.
+    int mPage = 1; /// Number of the page to fetch. See pagination of gitlab API
     QByteArray mScope = "all"; /// Return issues for the given scope: "created_by_me", "assigned_to_me" or "all".
     QByteArray mState = "opened"; /// Return "all" issues or just those that are "opened" or "closed"
-    int mPage = 1; /// Number of the page to fetch. See pagination of gitlab API
 
     /**
      * @brief queryData Creates query data for the URL

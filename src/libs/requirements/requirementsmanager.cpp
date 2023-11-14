@@ -72,6 +72,7 @@ void RequirementsManager::requestRequirements(
         gitlab::IssueRequestOptions options;
         options.mAssignee = assignee.toUtf8();
         options.mAuthor = author.toUtf8();
+        options.mLabels = { "requirement" };
         d->gitlabClient->requestIssues(projectID, options);
         break;
     }
