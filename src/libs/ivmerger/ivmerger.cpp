@@ -20,6 +20,7 @@
 #include "ivmerger.h"
 
 #include "errorhub.h"
+#include "fullivexporter.h"
 #include "geometry.h"
 #include "graphicsviewutils.h"
 #include "ivcomment.h"
@@ -27,7 +28,9 @@
 #include "ivfunctiontype.h"
 #include "ivpropertytemplateconfig.h"
 
+#include <QDebug>
 #include <QFileInfo>
+#include <QMap>
 #include <QPointF>
 #include <algorithm>
 #include <iostream>
@@ -39,13 +42,16 @@ namespace ivmerger {
 
 bool IvMerger::mergeInterfaceViews(const QString &inputTargetIvFile, const QString &inputSourceIvFile)
 {
-    ivm::IVModel targetIvModel(ivm::IVPropertyTemplateConfig::instance());
-    ivm::IVModel sourceIvModel(ivm::IVPropertyTemplateConfig::instance());
+    ivm::IVPropertyTemplateConfig *conf = ivm::IVPropertyTemplateConfig::instance();
+    conf->init(QLatin1String("default_attrinbutes.xml"));
+    ivm::IVModel targetIvModel(conf);
+    ivm::IVModel sourceIvModel(conf);
 
     if (!parseInterfaceView(&targetIvModel, inputTargetIvFile)) {
         shared::ErrorHub::setCurrentFile(inputTargetIvFile);
         shared::ErrorHub::addError(shared::ErrorItem::Error, "Error parsing target interface view", inputTargetIvFile);
         shared::ErrorHub::clearCurrentFile();
+        qDebug() << "Cannot read target IV";
         return false;
     }
 
@@ -53,6 +59,7 @@ bool IvMerger::mergeInterfaceViews(const QString &inputTargetIvFile, const QStri
         shared::ErrorHub::setCurrentFile(inputSourceIvFile);
         shared::ErrorHub::addError(shared::ErrorItem::Error, "Error parsing target interface view", inputSourceIvFile);
         shared::ErrorHub::clearCurrentFile();
+        qDebug() << "Cannot read source IV";
         return false;
     }
 
@@ -73,78 +80,187 @@ bool IvMerger::mergeInterfaceViews(const QString &inputTargetIvFile, const QStri
 bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel)
 {
     if (sourceIvModel.allObjectsByType<ivm::IVFunctionType>().empty()) {
-        shared::ErrorHub::addError(shared::ErrorItem::Error,
-                "Source Interface View file does not contain any functions");
+        shared::ErrorHub::addError(
+                shared::ErrorItem::Error, "Source Interface View file does not contain any functions");
         return false;
     }
 
-    removeDuplicateObjects(targetIvModel, sourceIvModel);
+    QMap<ivm::IVFunctionType *, QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>>> connectionsToRestore;
 
-    QRectF targetRectContainingAllObjects = getRectContainingAllObjects(targetIvModel);
-    QRectF sourceRectContainingAllObjects = getRectContainingAllObjects(sourceIvModel);
+    // find top level functions in target
+    QVector<ivm::IVFunctionType *> targetFunctions = targetIvModel.allObjectsByType<ivm::IVFunctionType>();
+    QVector<ivm::IVFunctionType *> topLevelTargetFunctions;
+    collectTopLevelFunctions(targetFunctions, topLevelTargetFunctions);
 
-    qreal verticalOffset = targetRectContainingAllObjects.top() - sourceRectContainingAllObjects.top();
-    qreal horizontalOffset =
-            targetRectContainingAllObjects.left() - sourceRectContainingAllObjects.right() - MARGIN;
+    // find top level functions in source
+    QSet<ivm::IVFunctionType *> insertedSourceFunctions;
+    QVector<ivm::IVFunctionType *> sourceFunctions = sourceIvModel.allObjectsByType<ivm::IVFunctionType>();
+    QVector<ivm::IVFunctionType *> topLevelSourceFunctions;
+    collectTopLevelFunctions(sourceFunctions, topLevelSourceFunctions);
 
-    QVector<shared::VEObject *> allSourceObjects = sourceIvModel.objects().values();
+    // replace top level functions in target by coresponding top level functions from source
+    for (ivm::IVFunctionType *sourceFunction : topLevelSourceFunctions) {
+        for (ivm::IVFunctionType *targetFunction : targetFunctions) {
+            if (sourceFunction->id() == targetFunction->id()) {
+                QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> connectionInfos;
 
-    moveAllObjects(allSourceObjects, verticalOffset, horizontalOffset);
+                replaceFunction(targetIvModel, sourceIvModel, targetFunction, sourceFunction, connectionInfos);
 
-    targetIvModel.addObjects(allSourceObjects);
+                // remember connections to restore it later
+                connectionsToRestore.insert(sourceFunction, connectionInfos);
+
+                // mark target function as inserted
+                insertedSourceFunctions.insert(sourceFunction);
+            }
+        }
+    }
+
+    // find place to insert new functions (if necessary)
+    qreal leftBorder = std::numeric_limits<double>::max();
+    qreal bottomBorder = std::numeric_limits<double>::max();
+    const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
+    for (ivm::IVFunctionType *function : targetFunctions) {
+        const QString coordStr = function->entityAttributeValue<QString>(coordToken);
+
+        const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
+        leftBorder = std::min(leftBorder, rect.left());
+        bottomBorder = std::min(bottomBorder, rect.bottom());
+    }
+
+    QVector<ivm::IVComment *> targetComments = targetIvModel.allObjectsByType<ivm::IVComment>();
+
+    for (ivm::IVComment *comment : targetComments) {
+        const QString coordStr = comment->entityAttributeValue<QString>(coordToken);
+        const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
+        leftBorder = std::min(leftBorder, rect.left());
+        bottomBorder = std::min(bottomBorder, rect.bottom());
+    }
+
+    // insert remaining top level functions from source to the target
+    for (ivm::IVFunctionType *sourceFunction : topLevelSourceFunctions) {
+        if (insertedSourceFunctions.contains(sourceFunction)) {
+            continue; // skip already inserted functions
+        }
+
+        // remove external connections in function from  source
+        QMultiMap<shared::Id, shared::Id> connectionInfos;
+        QVector<ivm::IVConnection *> sourceConnections = sourceFunction->connections();
+        for (ivm::IVConnection *connection : sourceConnections) {
+            if (!connection->isNested()) {
+                sourceIvModel.removeObject(connection);
+                connectionInfos.insert(connection->source()->id(), connection->target()->id());
+            }
+        }
+
+        // reparent sourceFunction into targetIvModel
+        reparentRecursive(targetIvModel, sourceFunction);
+
+        // set new coordinates of sourceFunction
+        QRectF coordinates = shared::graphicsviewutils::rect(sourceFunction->coordinates());
+        coordinates.moveTo(leftBorder, bottomBorder + 40);
+        sourceFunction->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
+
+        // update bottomBorder
+        bottomBorder += 40 + coordinates.height();
+    }
+
+    // calculate again set of all top level functions in target
+    targetFunctions = targetIvModel.allObjectsByType<ivm::IVFunctionType>();
+    topLevelTargetFunctions.clear();
+    collectTopLevelFunctions(targetFunctions, topLevelTargetFunctions);
+
+    restoreConnections(targetIvModel, topLevelTargetFunctions, connectionsToRestore);
 
     return true;
 }
 
-void IvMerger::removeDuplicateObjects(ivm::IVModel &targetIvModel, const ivm::IVModel &sourceIvModel)
+void IvMerger::collectTopLevelFunctions(
+        QVector<ivm::IVFunctionType *> &allFunctions, QVector<ivm::IVFunctionType *> &topLevelFunctions)
 {
-    QVector<ivm::IVFunctionType *> allTargetFunctions = targetIvModel.allObjectsByType<ivm::IVFunctionType>();
-    QVector<ivm::IVFunctionType *> allSourceFunctions = sourceIvModel.allObjectsByType<ivm::IVFunctionType>();
-
-    for (ivm::IVFunctionType *sourceFunction : allSourceFunctions) {
-        for (ivm::IVFunctionType *targetFunction : allTargetFunctions) {
-            if (sourceFunction->id() == targetFunction->id()) {
-                replaceConnectionsEndpoints(targetIvModel, targetFunction, sourceFunction);
-                removeFunctionAndItsChildren(targetIvModel, targetFunction);
-            }
-        }
-    }
-
-    // Remove rest of objects
-    for (shared::VEObject *sourceObject : sourceIvModel.objects().values()) {
-        for (shared::VEObject *targetObject : targetIvModel.objects().values()) {
-            if (sourceObject->id() == targetObject->id()) {
-                targetIvModel.removeObject(targetObject);
-            }
-        }
-    }
-
-    // Remove dangling connections
-    for (ivm::IVConnection *connection : targetIvModel.allObjectsByType<ivm::IVConnection>()) {
-        if (connection->source() == nullptr || connection->target() == nullptr) {
-            targetIvModel.removeObject(connection);
+    for (ivm::IVFunctionType *function : allFunctions) {
+        if (!function->isNested()) {
+            topLevelFunctions.append(function);
         }
     }
 }
 
-void IvMerger::replaceConnectionsEndpoints(
-        ivm::IVModel &ivModel, ivm::IVFunctionType *targetFunctionToRemove, ivm::IVFunctionType *sourceFunction)
+void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvModel, ivm::IVFunctionType *currentFunction,
+        ivm::IVFunctionType *newFunction,
+        QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> &connectionInfos)
 {
-    QVector<ivm::IVConnection *> allConnections = ivModel.allObjectsByType<ivm::IVConnection>();
+    QVector<ivm::IVConnection *> targetConnections = ivModel.getConnectionsForFunction(currentFunction->id());
 
-    for (ivm::IVConnection *connection : ivModel.allObjectsByType<ivm::IVConnection>()) {
-        if (connection->source() != nullptr && connection->source()->id() == targetFunctionToRemove->id()) {
-            ivm::IVInterface *interfaceToReplace =
-                    sourceFunction->getInterfaceByName(connection->sourceInterfaceName());
-            if (interfaceToReplace != nullptr) {
-                connection->setData(interfaceToReplace, connection->targetInterface());
-            }
+    // remove all connections from/to target top level functions
+    // but save information for later
+    // QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> connectionInfos;
+    for (ivm::IVConnection *connection : targetConnections) {
+        if (!connection->isNested()) {
+            connectionInfos.insert(qMakePair(connection->source()->id(), connection->sourceInterfaceName()),
+                    qMakePair(connection->target()->id(), connection->targetInterfaceName()));
+            ivModel.removeObject(connection);
         }
-        if (connection->target() != nullptr && connection->target()->id() == targetFunctionToRemove->id()) {
-            ivm::IVInterface *interfaceToReplace =
-                    sourceFunction->getInterfaceByName(connection->targetInterfaceName());
-            if (interfaceToReplace != nullptr) {
-                connection->setData(connection->sourceInterface(), interfaceToReplace);
+    }
+
+    // remove external connections from source
+    QVector<ivm::IVConnection *> sourceConnections = sourceIvModel.getConnectionsForFunction(newFunction->id());
+    for (ivm::IVConnection *connection : sourceConnections) {
+        if (!connection->isNested()) {
+            sourceIvModel.removeObject(connection);
+        }
+    }
+
+    // get coordinates of top level function in target
+    QRectF targetPosition = shared::graphicsviewutils::rect(currentFunction->coordinates());
+    QRectF sourcePosition = shared::graphicsviewutils::rect(newFunction->coordinates());
+    // calculate offset
+    qreal xIfaceOffset = targetPosition.x() - sourcePosition.x();
+    qreal yIfaceOffset = targetPosition.y() - sourcePosition.y();
+
+    // remove target function
+    removeFunctionAndItsChildren(ivModel, currentFunction);
+
+    // move source function into position where target function was located
+    // (this includes also coordinates)
+    QVector<ivm::IVInterface *> interfaces = newFunction->interfaces();
+    for (ivm::IVInterface *iface : interfaces) {
+        QPointF ifacePos = shared::graphicsviewutils::pos(iface->coordinates());
+        ifacePos += QPointF(xIfaceOffset, yIfaceOffset);
+        iface->setCoordinates(shared::graphicsviewutils::coordinates(ifacePos));
+    }
+    sourcePosition.moveTo(targetPosition.x(), targetPosition.y());
+
+    // reparent sourceFunction into targetIvModel
+    reparentRecursive(ivModel, newFunction);
+
+    // set updated coordinates of top function from source
+    newFunction->setCoordinates(shared::graphicsviewutils::coordinates(sourcePosition));
+}
+
+void IvMerger::restoreConnections(ivm::IVModel &ivModel, QVector<ivm::IVFunctionType *> &allFunctions,
+        QMap<ivm::IVFunctionType *, QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>>>
+                connectionsToRestore)
+{
+    // restore connections between inserted functions and user functions
+    for (auto iter = connectionsToRestore.begin(); iter != connectionsToRestore.end(); ++iter) {
+        ivm::IVFunctionType *sourceFunction = iter.key();
+        const QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> connectionInfos = iter.value();
+        // iterate over saved connection infos
+        for (auto infoIter = connectionInfos.begin(); infoIter != connectionInfos.end(); ++infoIter) {
+            if (infoIter.key().first == sourceFunction->id()) {
+                // find toplevel
+                for (ivm::IVFunctionType *functionToConnect : allFunctions) {
+                    if (infoIter.value().first == functionToConnect->id()) {
+                        realizeConnection(ivModel, allFunctions, sourceFunction, infoIter.key().second,
+                                functionToConnect, infoIter.value().second);
+                    }
+                }
+            } else if (infoIter.value().first == sourceFunction->id()) {
+                for (ivm::IVFunctionType *functionToConnect : allFunctions) {
+                    if (infoIter.key().first == functionToConnect->id()) {
+                        realizeConnection(ivModel, allFunctions, functionToConnect, infoIter.key().second,
+                                sourceFunction, infoIter.value().second);
+                    }
+                }
             }
         }
     }
@@ -155,106 +271,42 @@ void IvMerger::removeFunctionAndItsChildren(ivm::IVModel &ivModel, ivm::IVFuncti
     for (ivm::IVObject *child : targetFunctionToRemove->children()) {
         ivModel.removeObject(child);
     }
+
     ivModel.removeObject(targetFunctionToRemove);
 }
 
-QRectF IvMerger::getRectContainingAllObjects(const ivm::IVModel &ivModel)
+void IvMerger::reparentRecursive(ivm::IVModel &newParent, ivm::IVObject *obj)
 {
-    QVector<ivm::IVFunctionType *> allModelFunctions = ivModel.allObjectsByType<ivm::IVFunctionType>();
-    QVector<ivm::IVComment *> allModelComments = ivModel.allObjectsByType<ivm::IVComment>();
-
-    if (allModelFunctions.isEmpty() && allModelComments.isEmpty()) {
-        return QRectF(QPointF(0.0, 0.0), QPointF(0.0, 0.0));
+    if (obj->isFunctionType()) {
+        ivm::IVFunctionType *func = obj->as<ivm::IVFunctionType *>();
+        QVector<ivm::IVObject *> children = func->children();
+        for (ivm::IVObject *child : children) {
+            reparentRecursive(newParent, child);
+        }
     }
 
-    qreal leftBorder = std::numeric_limits<double>::max();
-    qreal topBorder = std::numeric_limits<double>::min();
-    qreal rightBorder = std::numeric_limits<double>::min();
-    qreal bottomBorder = std::numeric_limits<double>::max();
-
-    const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
-
-    for (auto function : allModelFunctions) {
-        const QString coordStr = function->entityAttributeValue<QString>(coordToken);
-        const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
-
-        leftBorder = std::min(leftBorder, rect.left());
-        topBorder = std::max(topBorder, rect.top());
-        rightBorder = std::max(rightBorder, rect.right());
-        bottomBorder = std::min(bottomBorder, rect.bottom());
-    }
-
-    for (auto comment : allModelComments) {
-        const QString coordStr = comment->entityAttributeValue<QString>(coordToken);
-        const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
-
-        leftBorder = std::min(leftBorder, rect.left());
-        topBorder = std::max(topBorder, rect.top());
-        rightBorder = std::max(rightBorder, rect.right());
-        bottomBorder = std::min(bottomBorder, rect.bottom());
-    }
-
-    return QRectF(QPointF(leftBorder, topBorder), QPointF(rightBorder, bottomBorder));
+    newParent.addObject(obj);
 }
 
-// DODAĆ KOMENTY
-
-void IvMerger::moveAllObjects(
-        QVector<shared::VEObject *> &objects, const qreal verticalOffset, const qreal horizontalOffset)
+void IvMerger::realizeConnection(ivm::IVModel &ivModel, const QVector<ivm::IVFunctionType *> allTopLevelFunctions,
+        ivm::IVFunctionType *fromFunction, const QString &fromInterfaceName, ivm::IVFunctionType *toFunction,
+        const QString &toInterfaceName)
 {
-    const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
-
-    for (auto object : objects) {
-        ivm::IVObject *ivObject = object->as<ivm::IVObject *>();
-        if (ivObject == nullptr) {
-            continue;
-        }
-
-        switch (ivObject->type()) {
-        case ivm::IVObject::Type::Function:
-        case ivm::IVObject::Type::FunctionType:
-        case ivm::IVObject::Type::Comment: {
-            QString coordStr = ivObject->entityAttributeValue<QString>(coordToken);
-            QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
-
-            rect.setLeft(rect.left() + horizontalOffset);
-            rect.setTop(rect.top() + verticalOffset);
-            rect.setRight(rect.right() + horizontalOffset);
-            rect.setBottom(rect.bottom() + verticalOffset);
-
-            ivObject->setCoordinates(shared::graphicsviewutils::coordinates(rect));
-            break;
-        }
-        case ivm::IVObject::Type::RequiredInterface:
-        case ivm::IVObject::Type::ProvidedInterface:
-        case ivm::IVObject::Type::InterfaceGroup: {
-            const QString coordStr = ivObject->entityAttributeValue<QString>(coordToken);
-            QPointF point = shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(coordStr));
-
-            point.setY(point.y() + verticalOffset);
-            point.setX(point.x() + horizontalOffset);
-
-            ivObject->setCoordinates(shared::graphicsviewutils::coordinates(point));
-            break;
-        }
-        case ivm::IVObject::Type::Connection:
-        case ivm::IVObject::Type::ConnectionGroup: {
-            const QString coordStr = ivObject->entityAttributeValue<QString>(coordToken);
-            QVector<QPointF> polygon =
-                    shared::graphicsviewutils::polygon(ivm::IVObject::coordinatesFromString(coordStr));
-
-            for (auto point : polygon) {
-                point.setY(point.y() + verticalOffset);
-                point.setX(point.x() + horizontalOffset);
-            }
-
-            ivObject->setCoordinates(shared::graphicsviewutils::coordinates(polygon));
-            break;
-        }
-        default:
-            break;
-        }
+    QList<QRectF> sibilingRects;
+    for (ivm::IVFunctionType *targetFunction : allTopLevelFunctions) {
+        sibilingRects.append(shared::graphicsviewutils::rect(targetFunction->coordinates()));
     }
+    ivm::IVInterface *fromInterface = fromFunction->getInterfaceByName(fromInterfaceName);
+    ivm::IVInterface *toInterface = toFunction->getInterfaceByName(toInterfaceName);
+    const QPointF startPos = shared::graphicsviewutils::pos(fromInterface->coordinates());
+    const QPointF endPos = shared::graphicsviewutils::pos(toInterface->coordinates());
+    const QRectF startRect = shared::graphicsviewutils::rect(fromFunction->coordinates());
+    const QRectF endRect = shared::graphicsviewutils::rect(toFunction->coordinates());
+    const QVector<QPointF> points =
+            shared::graphicsviewutils::createConnectionPath(sibilingRects, startPos, startRect, endPos, endRect);
+    ivm::IVConnection *newConnection = new ivm::IVConnection(fromInterface, toInterface);
+    ivModel.addObject(newConnection);
+    newConnection->setCoordinates(shared::graphicsviewutils::coordinates(points));
 }
 
 bool IvMerger::parseInterfaceView(ivm::IVModel *model, const QString &inputIvFile)
@@ -276,8 +328,8 @@ bool IvMerger::parseInterfaceView(ivm::IVModel *model, const QString &inputIvFil
     QVector<ivm::IVObject *> objects = parser.parsedObjects();
     ivm::IVObject::sortObjectList(objects);
 
-    model->setExtAttributes(parser.externalAttributes());
-    model->addObjects(objects);
+    model->clear();
+    model->initFromObjects(objects, parser.externalAttributes());
     shared::ErrorHub::clearCurrentFile();
 
     return true;
@@ -285,8 +337,8 @@ bool IvMerger::parseInterfaceView(ivm::IVModel *model, const QString &inputIvFil
 
 bool IvMerger::saveInterfaceView(ivm::IVModel *model, const QString &outputIvFile)
 {
-    ivm::IVXMLWriter exporter;
-    return exporter.exportObjectsSilently(model->objects().values(), outputIvFile);
+    FullIVExporter exporter(model);
+    return exporter.doExport(outputIvFile);
 }
 
 } // namespace sdl::exporter

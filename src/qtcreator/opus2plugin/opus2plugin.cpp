@@ -96,6 +96,7 @@ void Opus2Plugin::runPopulationTool()
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     QProcess process;
+    process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
     process.start(m_populationToolCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
 
@@ -114,6 +115,7 @@ void Opus2Plugin::runTailoringTool()
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     QProcess process;
+    process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
     process.start(m_tailoringToolCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
 
@@ -132,6 +134,7 @@ void Opus2Plugin::runDocumentGenerator()
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     QProcess process;
+    process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
     process.start(m_documentGeneratorCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
 
@@ -150,6 +153,7 @@ void Opus2Plugin::runFrontendGenerator()
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
     QProcess process;
+    process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
     process.start(m_frontendGeneratorCommand,
             QStringList() << opus2ModelFilePath << opus2OptionsFilePath << m_currentProjectDirectoryPath);

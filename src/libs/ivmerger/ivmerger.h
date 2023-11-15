@@ -49,12 +49,19 @@ public:
     bool mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel);
 
 private:
-    void removeDuplicateObjects(ivm::IVModel &targetIvModel, const ivm::IVModel &sourceIvModel);
-    void replaceConnectionsEndpoints(ivm::IVModel &ivModel, ivm::IVFunctionType *targetFunctionToRemove, ivm::IVFunctionType *sourceFunction);
     void removeFunctionAndItsChildren(ivm::IVModel &ivModel, ivm::IVFunctionType *targetFunctionToRemove);
-    QRectF getRectContainingAllObjects(const ivm::IVModel &ivModel);
-    void moveAllObjects(
-            QVector<shared::VEObject *> &objects, const qreal verticalMoveValue, const qreal horizontalValue);
+    void collectTopLevelFunctions(
+            QVector<ivm::IVFunctionType *> &allFunctions, QVector<ivm::IVFunctionType *> &topLevelFunctions);
+    void replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvModel, ivm::IVFunctionType *currentFunction,
+            ivm::IVFunctionType *newFunction,
+            QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> &connectionInfos);
+    void restoreConnections(ivm::IVModel &ivModel, QVector<ivm::IVFunctionType *> &allFunctions,
+            QMap<ivm::IVFunctionType *, QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>>>
+                    connectionsToRestore);
+    void reparentRecursive(ivm::IVModel &newParent, ivm::IVObject *obj);
+    void realizeConnection(ivm::IVModel &ivModel, const QVector<ivm::IVFunctionType *> allTopLevelFunctions,
+            ivm::IVFunctionType *fromFunction, const QString &fromInterfaceName, ivm::IVFunctionType *toFunction,
+            const QString &toInterfaceName);
     bool parseInterfaceView(ivm::IVModel *model, const QString &inputIvFile);
     bool saveInterfaceView(ivm::IVModel *model, const QString &inputIvFile);
 };

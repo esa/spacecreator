@@ -19,14 +19,21 @@
 
 #include "errorhub.h"
 
+#include <QCoreApplication>
 #include <cstdlib>
 #include <iostream>
+#include <ivcore/ivlibrary.h>
 #include <ivmerger/ivmerger.h>
+#include <shared/sharedlibrary.h>
 
 int main(int argc, char **argv)
 {
-    if (argc != 3) 
-    {
+    Q_INIT_RESOURCE(asn1_resources);
+
+    shared::initSharedLibrary();
+    ivm::initIVLibrary();
+
+    if (argc != 3) {
         std::cerr << "Usage: ivmerger <inputTargetFilename> <inputSourceFilename>\n";
         return EXIT_FAILURE;
     }
@@ -36,12 +43,10 @@ int main(int argc, char **argv)
     const auto inputTargetFilepath = QString(argv[1]);
     const auto inputSourceFilepath = QString(argv[2]);
 
-    if(!merger.mergeInterfaceViews(inputTargetFilepath, inputSourceFilepath))
-    {
+    if (!merger.mergeInterfaceViews(inputTargetFilepath, inputSourceFilepath)) {
         std::cerr << "Failure during merging\n";
 
-        for(shared::ErrorItem error : shared::ErrorHub::errors())
-        {
+        for (shared::ErrorItem error : shared::ErrorHub::errors()) {
             std::cerr << error.m_description.toStdString() << "\n";
         }
 
