@@ -33,7 +33,7 @@ FullIVExporter::FullIVExporter(ivm::IVModel *modelToExport)
 
 bool FullIVExporter::doExport(QString outputIvFile)
 {
-    QString uiFile = "interfaceview.ui.xml";
+    const static QString uiFile = "interfaceview.ui.xml";
     QList<shared::VEObject *> objects = m_modelToExport->objects().values();
     QHash<QString, QVariant> ivObjects = collectObjects(objects);
 

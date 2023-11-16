@@ -86,7 +86,7 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
         return false;
     }
 
-    QMap<ivm::IVFunctionType *, QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>>> connectionsToRestore;
+    QMap<ivm::IVFunctionType *, FunctionEndpoints> connectionsToRestore;
 
     // find top level functions in target
     QVector<ivm::IVFunctionType *> targetFunctions = targetIvModel.allObjectsByType<ivm::IVFunctionType>();
@@ -99,11 +99,43 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
     QVector<ivm::IVFunctionType *> topLevelSourceFunctions;
     collectTopLevelFunctions(sourceFunctions, topLevelSourceFunctions);
 
+    mergeFunctions(targetIvModel, sourceIvModel, topLevelSourceFunctions, targetFunctions, connectionsToRestore,
+            insertedSourceFunctions);
+
+    addNewFunctions(targetIvModel, sourceIvModel, topLevelSourceFunctions, targetFunctions, connectionsToRestore,
+            insertedSourceFunctions);
+
+    // calculate again set of all top level functions in target
+    targetFunctions = targetIvModel.allObjectsByType<ivm::IVFunctionType>();
+    topLevelTargetFunctions.clear();
+    collectTopLevelFunctions(targetFunctions, topLevelTargetFunctions);
+
+    restoreConnections(targetIvModel, topLevelTargetFunctions, connectionsToRestore);
+
+    return true;
+}
+
+void IvMerger::collectTopLevelFunctions(
+        QVector<ivm::IVFunctionType *> &allFunctions, QVector<ivm::IVFunctionType *> &topLevelFunctions)
+{
+    for (ivm::IVFunctionType *function : allFunctions) {
+        if (!function->isNested()) {
+            topLevelFunctions.append(function);
+        }
+    }
+}
+
+void IvMerger::mergeFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel,
+        QVector<ivm::IVFunctionType *> &topLevelSourceFunctions, QVector<ivm::IVFunctionType *> &targetFunctions,
+        QMap<ivm::IVFunctionType *, FunctionEndpoints> &connectionsToRestore,
+        QSet<ivm::IVFunctionType *> &insertedSourceFunctions)
+
+{
     // replace top level functions in target by coresponding top level functions from source
     for (ivm::IVFunctionType *sourceFunction : topLevelSourceFunctions) {
         for (ivm::IVFunctionType *targetFunction : targetFunctions) {
             if (sourceFunction->id() == targetFunction->id()) {
-                QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> connectionInfos;
+                FunctionEndpoints connectionInfos;
 
                 replaceFunction(targetIvModel, sourceIvModel, targetFunction, sourceFunction, connectionInfos);
 
@@ -115,7 +147,13 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
             }
         }
     }
+}
 
+void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel,
+        QVector<ivm::IVFunctionType *> &topLevelSourceFunctions, QVector<ivm::IVFunctionType *> &targetFunctions,
+        QMap<ivm::IVFunctionType *, FunctionEndpoints> &connectionsToRestore,
+        QSet<ivm::IVFunctionType *> &insertedSourceFunctions)
+{
     // find place to insert new functions (if necessary)
     qreal leftBorder = std::numeric_limits<double>::max();
     qreal bottomBorder = std::numeric_limits<double>::max();
@@ -144,7 +182,7 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
         }
 
         // remove external connections in function from  source
-        QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> connectionInfos;
+        FunctionEndpoints connectionInfos;
         QVector<ivm::IVConnection *> sourceConnections = sourceIvModel.getConnectionsForFunction(sourceFunction->id());
         for (ivm::IVConnection *connection : sourceConnections) {
             if (!connection->isNested()) {
@@ -167,36 +205,15 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
 
         connectionsToRestore.insert(sourceFunction, connectionInfos);
     }
-
-    // calculate again set of all top level functions in target
-    targetFunctions = targetIvModel.allObjectsByType<ivm::IVFunctionType>();
-    topLevelTargetFunctions.clear();
-    collectTopLevelFunctions(targetFunctions, topLevelTargetFunctions);
-
-    restoreConnections(targetIvModel, topLevelTargetFunctions, connectionsToRestore);
-
-    return true;
-}
-
-void IvMerger::collectTopLevelFunctions(
-        QVector<ivm::IVFunctionType *> &allFunctions, QVector<ivm::IVFunctionType *> &topLevelFunctions)
-{
-    for (ivm::IVFunctionType *function : allFunctions) {
-        if (!function->isNested()) {
-            topLevelFunctions.append(function);
-        }
-    }
 }
 
 void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvModel, ivm::IVFunctionType *currentFunction,
-        ivm::IVFunctionType *newFunction,
-        QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> &connectionInfos)
+        ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos)
 {
     QVector<ivm::IVConnection *> targetConnections = ivModel.getConnectionsForFunction(currentFunction->id());
 
     // remove all connections from/to target top level functions
     // but save information for later
-    // QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> connectionInfos;
     for (ivm::IVConnection *connection : targetConnections) {
         if (!connection->isNested()) {
             connectionInfos.insert(qMakePair(connection->source()->id(), connection->sourceInterfaceName()),
@@ -241,13 +258,12 @@ void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvMode
 }
 
 void IvMerger::restoreConnections(ivm::IVModel &ivModel, QVector<ivm::IVFunctionType *> &allFunctions,
-        QMap<ivm::IVFunctionType *, QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>>>
-                connectionsToRestore)
+        QMap<ivm::IVFunctionType *, FunctionEndpoints> connectionsToRestore)
 {
     // restore connections between inserted functions and user functions
     for (auto iter = connectionsToRestore.begin(); iter != connectionsToRestore.end(); ++iter) {
         ivm::IVFunctionType *sourceFunction = iter.key();
-        const QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> connectionInfos = iter.value();
+        const FunctionEndpoints &connectionInfos = iter.value();
         // iterate over saved connection infos
         for (auto infoIter = connectionInfos.begin(); infoIter != connectionInfos.end(); ++infoIter) {
             if (infoIter.key().first == sourceFunction->id()) {

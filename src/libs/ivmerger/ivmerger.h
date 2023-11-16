@@ -49,15 +49,25 @@ public:
     bool mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel);
 
 private:
+    using EndpointInfo = QPair<shared::Id, QString>;
+    using FunctionEndpoints = QMultiMap<EndpointInfo, EndpointInfo>;
+
+private:
     void removeFunctionAndItsChildren(ivm::IVModel &ivModel, ivm::IVFunctionType *targetFunctionToRemove);
     void collectTopLevelFunctions(
             QVector<ivm::IVFunctionType *> &allFunctions, QVector<ivm::IVFunctionType *> &topLevelFunctions);
+    void mergeFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel,
+            QVector<ivm::IVFunctionType *> &topLevelSourceFunctions, QVector<ivm::IVFunctionType *> &targetFunctions,
+            QMap<ivm::IVFunctionType *, FunctionEndpoints> &connectionsToRestore,
+            QSet<ivm::IVFunctionType *> &insertedSourceFunctions);
+    void addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel,
+            QVector<ivm::IVFunctionType *> &topLevelSourceFunctions, QVector<ivm::IVFunctionType *> &targetFunctions,
+            QMap<ivm::IVFunctionType *, FunctionEndpoints> &connectionsToRestore,
+            QSet<ivm::IVFunctionType *> &insertedSourceFunctions);
     void replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvModel, ivm::IVFunctionType *currentFunction,
-            ivm::IVFunctionType *newFunction,
-            QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> &connectionInfos);
+            ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos);
     void restoreConnections(ivm::IVModel &ivModel, QVector<ivm::IVFunctionType *> &allFunctions,
-            QMap<ivm::IVFunctionType *, QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>>>
-                    connectionsToRestore);
+            QMap<ivm::IVFunctionType *, FunctionEndpoints> connectionsToRestore);
     void reparentRecursive(ivm::IVModel &newParent, ivm::IVObject *obj);
     void realizeConnection(ivm::IVModel &ivModel, const QVector<ivm::IVFunctionType *> allTopLevelFunctions,
             ivm::IVFunctionType *fromFunction, const QString &fromInterfaceName, ivm::IVFunctionType *toFunction,
