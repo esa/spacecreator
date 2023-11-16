@@ -33,6 +33,7 @@
 #include <QMap>
 #include <QPointF>
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <ivcore/ivxmlreader.h>
 #include <ivcore/ivxmlwriter.h>
@@ -143,12 +144,13 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
         }
 
         // remove external connections in function from  source
-        QMultiMap<shared::Id, shared::Id> connectionInfos;
-        QVector<ivm::IVConnection *> sourceConnections = sourceFunction->connections();
+        QMultiMap<QPair<shared::Id, QString>, QPair<shared::Id, QString>> connectionInfos;
+        QVector<ivm::IVConnection *> sourceConnections = sourceIvModel.getConnectionsForFunction(sourceFunction->id());
         for (ivm::IVConnection *connection : sourceConnections) {
             if (!connection->isNested()) {
                 sourceIvModel.removeObject(connection);
-                connectionInfos.insert(connection->source()->id(), connection->target()->id());
+                connectionInfos.insert(qMakePair(connection->source()->id(), connection->sourceInterfaceName()),
+                        qMakePair(connection->target()->id(), connection->targetInterfaceName()));
             }
         }
 
@@ -162,6 +164,8 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
 
         // update bottomBorder
         bottomBorder += 40 + coordinates.height();
+
+        connectionsToRestore.insert(sourceFunction, connectionInfos);
     }
 
     // calculate again set of all top level functions in target
@@ -297,7 +301,15 @@ void IvMerger::realizeConnection(ivm::IVModel &ivModel, const QVector<ivm::IVFun
         sibilingRects.append(shared::graphicsviewutils::rect(targetFunction->coordinates()));
     }
     ivm::IVInterface *fromInterface = fromFunction->getInterfaceByName(fromInterfaceName);
+    if (fromInterface == nullptr) {
+        // cannot realize connection interface removed in newer version of function
+        return;
+    }
     ivm::IVInterface *toInterface = toFunction->getInterfaceByName(toInterfaceName);
+    if (toInterface == nullptr) {
+        // cannot realize connection interface removed in newer version of function
+        return;
+    }
     const QPointF startPos = shared::graphicsviewutils::pos(fromInterface->coordinates());
     const QPointF endPos = shared::graphicsviewutils::pos(toInterface->coordinates());
     const QRectF startRect = shared::graphicsviewutils::rect(fromFunction->coordinates());
