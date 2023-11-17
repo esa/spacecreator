@@ -39,6 +39,11 @@ private Q_SLOTS:
     void test_simpleIvsMerge();
     void test_ivMergeWithReplace();
     void test_ivMergeNestedFunctions();
+    void test_capabilityRemovedFromTailoring();
+
+private:
+    ivm::IVFunction *findFunction(QVector<ivm::IVFunction *> &list, const QString &name);
+    ivm::IVInterface *findInterface(QVector<ivm::IVInterface *> &list, const QString &name);
 
 private:
     ivm::IVPropertyTemplateConfig *m_dynPropConfig;
@@ -247,6 +252,209 @@ void tst_IvMerger::test_ivMergeNestedFunctions()
     auto citer = conns.begin();
     QCOMPARE((*citer)->source()->title(), "SourceNestedFn1");
     QCOMPARE((*citer)->target()->title(), "SourceNestedFn2");
+}
+
+void tst_IvMerger::test_capabilityRemovedFromTailoring()
+{
+    // required ids
+    shared::Id routerId = shared::createId();
+    shared::Id applicationId = shared::createId();
+    shared::Id capabilityRouterId = shared::createId();
+    shared::Id capability1Id = shared::createId();
+    shared::Id capability2Id = shared::createId();
+
+    // target model
+    ivm::IVFunction *router = ivm::testutils::createFunction("router", nullptr, routerId);
+    ivm::IVInterface *routerTc = ivm::testutils::createRequiredIface(router, "tc");
+    routerTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    router->addChild(routerTc);
+
+    ivm::IVFunction *app = ivm::testutils::createFunction("application", nullptr, applicationId);
+    ivm::IVInterface *appTc = ivm::testutils::createProvidedIface(app, "tc");
+    appTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    app->addChild(appTc);
+
+    ivm::IVFunction *capabilityRouter =
+            ivm::testutils::createFunction("capability_router", nullptr, capabilityRouterId);
+    ivm::IVInterface *capabilityRouterTc = ivm::testutils::createProvidedIface(capabilityRouter, "tc");
+    appTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    capabilityRouter->addChild(capabilityRouterTc);
+    ivm::IVInterface *capabilityRouterReq1 = ivm::testutils::createRequiredIface(capabilityRouter, "req_1");
+    capabilityRouterReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    ivm::IVInterface *capabilityRouterReq2 = ivm::testutils::createRequiredIface(capabilityRouter, "req_2");
+    capabilityRouterReq2->setKind(ivm::IVInterface::OperationKind::Protected);
+    capabilityRouter->addChild(capabilityRouterReq1);
+    capabilityRouter->addChild(capabilityRouterReq2);
+
+    app->addChild(capabilityRouter);
+
+    ivm::IVFunction *capability1 = ivm::testutils::createFunction("capability_1", nullptr, capability1Id);
+    ivm::IVInterface *capability1Req1 = ivm::testutils::createProvidedIface(capability1, "req_1");
+    capability1Req1->setKind(ivm::IVInterface::OperationKind::Protected);
+    capability1->addChild(capability1Req1);
+
+    app->addChild(capability1);
+
+    ivm::IVFunction *capability2 = ivm::testutils::createFunction("capability_1", nullptr, capability2Id);
+    ivm::IVInterface *capability2Req2 = ivm::testutils::createProvidedIface(capability2, "req21");
+    capability2Req2->setKind(ivm::IVInterface::OperationKind::Protected);
+    capability2->addChild(capability2Req2);
+    app->addChild(capability2);
+
+    ivm::IVConnection *connReq1 = ivm::testutils::createConnection(capabilityRouter, capability1, "req_1");
+    ivm::IVConnection *connReq2 = ivm::testutils::createConnection(capabilityRouter, capability2, "req_2");
+
+    app->addChild(connReq1);
+    app->addChild(connReq2);
+
+    ivm::IVConnection *connAppTc = ivm::testutils::createConnection(app, capabilityRouter, "tc");
+    app->addChild(connAppTc);
+
+    ivm::IVConnection *connTc = ivm::testutils::createConnection(router, app, "tc");
+
+    ivm::IVModel targetModel(m_dynPropConfig);
+    const QVector<ivm::IVObject *> targetObjects { router, app, connTc };
+    targetModel.addObjects(targetObjects);
+
+    // source model
+    ivm::IVFunction *sourceRouter = ivm::testutils::createFunction("router", nullptr, routerId);
+    ivm::IVInterface *sourceRouterTc = ivm::testutils::createRequiredIface(sourceRouter, "tc");
+    sourceRouterTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceRouter->addChild(sourceRouterTc);
+
+    ivm::IVFunction *sourceApp = ivm::testutils::createFunction("application", nullptr, applicationId);
+    ivm::IVInterface *sourceAppTc = ivm::testutils::createProvidedIface(sourceApp, "tc");
+    sourceAppTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceApp->addChild(sourceAppTc);
+
+    ivm::IVFunction *sourceCapabilityRouter =
+            ivm::testutils::createFunction("capability_router", nullptr, capabilityRouterId);
+    ivm::IVInterface *sourceCapabilityRouterTc = ivm::testutils::createProvidedIface(sourceCapabilityRouter, "tc");
+    sourceAppTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapabilityRouter->addChild(sourceCapabilityRouterTc);
+    ivm::IVInterface *sourceCapabilityRouterReq1 = ivm::testutils::createRequiredIface(sourceCapabilityRouter, "req_1");
+    sourceCapabilityRouterReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapabilityRouter->addChild(sourceCapabilityRouterReq1);
+
+    sourceApp->addChild(sourceCapabilityRouter);
+
+    ivm::IVFunction *sourceCapability1 = ivm::testutils::createFunction("capability_1", nullptr, capability1Id);
+    ivm::IVInterface *sourceCapabilityReq1 = ivm::testutils::createProvidedIface(sourceCapability1, "req_1");
+    sourceCapabilityReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapability1->addChild(sourceCapabilityReq1);
+
+    sourceApp->addChild(sourceCapability1);
+
+    ivm::IVConnection *sourceConnReq1 =
+            ivm::testutils::createConnection(sourceCapabilityRouter, sourceCapability1, "req_1");
+
+    sourceApp->addChild(sourceConnReq1);
+
+    ivm::IVConnection *sourceConnAppTc = ivm::testutils::createConnection(sourceApp, sourceCapabilityRouter, "tc");
+    sourceApp->addChild(sourceConnAppTc);
+
+    ivm::IVConnection *sourceConnTc = ivm::testutils::createConnection(sourceRouter, sourceApp, "tc");
+
+    ivm::IVModel sourceModel(m_dynPropConfig);
+    const QVector<ivm::IVObject *> sourceObjects { sourceRouter, sourceApp, sourceConnTc };
+    sourceModel.addObjects(sourceObjects);
+
+    ivmerger::IvMerger merger;
+    merger.mergeInterfaceViews(targetModel, sourceModel);
+
+    QVector<ivm::IVFunction *> allTargetFunctions = targetModel.allObjectsByType<ivm::IVFunction>();
+
+    QCOMPARE(allTargetFunctions.size(), 2);
+
+    QCOMPARE(targetModel.allObjectsByType<ivm::IVConnection>().size(), 1);
+
+    ivm::IVFunction *resultRouter = findFunction(allTargetFunctions, "router");
+
+    ivm::IVFunction *resultApplication = findFunction(allTargetFunctions, "application");
+
+    QVERIFY(resultRouter != nullptr);
+    QVERIFY(resultApplication != nullptr);
+
+    QCOMPARE(resultRouter->interfaces().size(), 1);
+    QCOMPARE(resultRouter->interfaces().front()->title(), "tc");
+    QVERIFY(resultRouter->interfaces().front()->isRequired());
+    QCOMPARE(resultRouter->interfaces().front()->kind(), ivm::IVInterface::OperationKind::Protected);
+
+    QCOMPARE(resultApplication->interfaces().size(), 1);
+    QCOMPARE(resultApplication->interfaces().front()->title(), "tc");
+    QVERIFY(resultApplication->interfaces().front()->isProvided());
+    QCOMPARE(resultApplication->interfaces().front()->kind(), ivm::IVInterface::OperationKind::Protected);
+
+    QCOMPARE(targetModel.allObjectsByType<ivm::IVConnection>().first()->source()->title(), "router");
+    QCOMPARE(targetModel.allObjectsByType<ivm::IVConnection>().first()->target()->title(), "application");
+
+    QVector<ivm::IVFunction *> applicationFunctions = resultApplication->functions();
+
+    QCOMPARE(applicationFunctions.size(), 2);
+
+    ivm::IVFunction *resultCapabilityRouter = findFunction(applicationFunctions, "capability_router");
+    ivm::IVFunction *resultCapability = findFunction(applicationFunctions, "capability_1");
+
+    QVERIFY(resultCapabilityRouter != nullptr);
+    QVERIFY(resultCapability != nullptr);
+
+    QVector<ivm::IVInterface *> capabilityRouterInterfaces = resultCapabilityRouter->interfaces();
+    QCOMPARE(capabilityRouterInterfaces.size(), 2);
+    ivm::IVInterface *resultCapabilityTc = findInterface(capabilityRouterInterfaces, "tc");
+    ivm::IVInterface *resultCapabilityReq1 = findInterface(capabilityRouterInterfaces, "req_1");
+
+    QVERIFY(resultCapabilityTc != nullptr);
+    QVERIFY(resultCapabilityReq1 != nullptr);
+    QCOMPARE(resultCapabilityTc->kind(), ivm::IVInterface::OperationKind::Protected);
+    QVERIFY(resultCapabilityTc->isProvided());
+    QCOMPARE(resultCapabilityReq1->kind(), ivm::IVInterface::OperationKind::Protected);
+    QVERIFY(resultCapabilityReq1->isRequired());
+
+    QCOMPARE(resultCapability->interfaces().size(), 1);
+    QCOMPARE(resultCapability->interfaces().front()->title(), "req_1");
+    QCOMPARE(resultCapability->interfaces().front()->kind(), ivm::IVInterface::OperationKind::Protected);
+    QVERIFY(resultCapability->interfaces().front()->isProvided());
+
+    QCOMPARE(resultApplication->connections().size(), 2);
+
+    ivm::IVConnection *firstConn = resultApplication->connections().first();
+    ivm::IVConnection *lastConn = resultApplication->connections().last();
+
+    if (firstConn->targetName() == "capability_router") {
+        QCOMPARE(firstConn->targetName(), "capability_router");
+        QCOMPARE(firstConn->targetInterfaceName(), "tc");
+        QCOMPARE(firstConn->sourceName(), "application");
+        QCOMPARE(firstConn->sourceInterfaceName(), "tc");
+
+        QCOMPARE(lastConn->targetName(), "capability_1");
+        QCOMPARE(lastConn->targetInterfaceName(), "req_1");
+        QCOMPARE(lastConn->sourceName(), "capability_router");
+        QCOMPARE(lastConn->sourceInterfaceName(), "req_1");
+    } else {
+        QCOMPARE(lastConn->targetName(), "capability_router");
+        QCOMPARE(lastConn->targetInterfaceName(), "tc");
+        QCOMPARE(lastConn->sourceName(), "application");
+        QCOMPARE(lastConn->sourceInterfaceName(), "tc");
+
+        QCOMPARE(firstConn->targetName(), "capability_1");
+        QCOMPARE(firstConn->targetInterfaceName(), "req_1");
+        QCOMPARE(firstConn->sourceName(), "capability_router");
+        QCOMPARE(firstConn->sourceInterfaceName(), "req_1");
+    }
+}
+
+ivm::IVFunction *tst_IvMerger::findFunction(QVector<ivm::IVFunction *> &list, const QString &name)
+{
+    auto iter = std::find_if(
+            list.begin(), list.end(), [&name](ivm::IVFunction *fn) { return fn->title().compare(name) == 0; });
+    return iter != list.end() ? *iter : nullptr;
+}
+
+ivm::IVInterface *tst_IvMerger::findInterface(QVector<ivm::IVInterface *> &list, const QString &name)
+{
+    auto iter = std::find_if(
+            list.begin(), list.end(), [&name](ivm::IVInterface *iface) { return iface->title().compare(name) == 0; });
+    return iter != list.end() ? *iter : nullptr;
 }
 
 QTEST_APPLESS_MAIN(tst_IvMerger)
