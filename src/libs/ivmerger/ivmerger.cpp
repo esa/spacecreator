@@ -166,6 +166,13 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
         bottomBorder = std::min(bottomBorder, rect.bottom());
     }
 
+    if (leftBorder == std::numeric_limits<double>::max()) {
+        leftBorder = 0.0;
+    }
+    if (bottomBorder == std::numeric_limits<double>::max()) {
+        bottomBorder = 0.0;
+    }
+
     QVector<ivm::IVComment *> targetComments = targetIvModel.allObjectsByType<ivm::IVComment>();
 
     for (ivm::IVComment *comment : targetComments) {
@@ -197,6 +204,15 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
 
         // set new coordinates of sourceFunction
         QRectF coordinates = shared::graphicsviewutils::rect(sourceFunction->coordinates());
+        qreal xIfaceOffset = leftBorder - coordinates.x();
+        qreal yIfaceOffset = (bottomBorder + 40) - coordinates.y();
+        QVector<ivm::IVInterface *> interfaces = sourceFunction->interfaces();
+        for (ivm::IVInterface *iface : interfaces) {
+            QPointF ifacePos = shared::graphicsviewutils::pos(iface->coordinates());
+            ifacePos += QPointF(xIfaceOffset, yIfaceOffset);
+            iface->setCoordinates(shared::graphicsviewutils::coordinates(ifacePos));
+        }
+
         coordinates.moveTo(leftBorder, bottomBorder + 40);
         sourceFunction->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
 
