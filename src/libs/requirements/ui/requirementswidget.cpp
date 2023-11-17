@@ -74,7 +74,7 @@ RequirementsWidget::RequirementsWidget(
         ui->serverStatusLabel->setPixmap(
                 QPixmap(":/requirementsresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
         ui->serverStatusLabel->setToolTip(tr("Connection to the server failed"));
-        QMessageBox::warning(this, tr("Connection error"), tr("Connection failed for this errror:\n%1").arg(error));
+        QMessageBox::warning(this, tr("Connection error"), tr("Connection failed for this error:\n%1").arg(error));
     });
 
     loadSavedCredentials();
@@ -137,17 +137,22 @@ void RequirementsWidget::onChangeOfCredentials()
 
 void RequirementsWidget::onLoginUpdate()
 {
+    ui->serverStatusLabel->setPixmap({});
+
     QUrl api_url;
     api_url.setScheme("https");
     api_url.setHost(QUrl(ui->urlLineEdit->text()).host());
     api_url.setPath("/api/v4/");
+
+    if (!api_url.isValid() || ui->tokenLineEdit->text().isEmpty()) {
+        return;
+    }
 
     mReqManager->setCredentials(api_url.toString(), ui->tokenLineEdit->text());
 
     auto projectName = QUrl(ui->urlLineEdit->text()).path().split("/").last();
     mReqManager->requestProjectID(projectName);
 
-    ui->serverStatusLabel->setPixmap({});
     ui->serverStatusLabel->setToolTip(tr("Checking connection to the server"));
 }
 
