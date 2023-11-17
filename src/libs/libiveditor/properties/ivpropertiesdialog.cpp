@@ -34,7 +34,6 @@
 #include "ivconnectiongroup.h"
 #include "ivconnectiongroupmodel.h"
 #include "ivcore/abstractsystemchecks.h"
-#include "ivexporter.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
@@ -44,6 +43,8 @@
 #include "properties/delegates/ivattributedelegate.h"
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
+#include "requirementsmanager.h"
+#include "requirementsmodel.h"
 #include "ui/veinteractiveobject.h"
 
 #include <QDebug>
@@ -70,9 +71,18 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     , m_archetypesModel(archetypesModel)
     , m_isFixedSystemElement(dataObject()->isFixedSystemElement())
     , m_isRequiredSystemElement(false)
-    , m_requirementsWidget(document->requirementsURL().toUtf8(), dataObject(), propertiesConfig(), this)
 {
-    connect(&m_requirementsWidget, &RequirementsWidget::requirementsUrlChanged,
+    m_reqManager = new RequirementsManager(RequirementsManager::REPO_TYPE::GITLAB, this);
+    m_reqModel = new requirement::RequirementsModel(this);
+    m_reqModel->setDataObject(dataObject());
+    m_reqModel->setPropertyTemplateConfig(dynPropConfig);
+    connect(m_reqManager, &RequirementsManager::listOfRequirements, m_reqModel,
+            &requirement::RequirementsModel::addRequirements);
+    connect(m_reqManager, &RequirementsManager::startfetchingRequirements, m_reqModel,
+            &requirement::RequirementsModel::clear);
+
+    m_reqWidget = new RequirementsWidget(document->requirementsURL().toUtf8(), m_reqManager, m_reqModel, this);
+    connect(m_reqWidget, &RequirementsWidget::requirementsUrlChanged,
             [this](QByteArray requirementUrl) { m_document->setRequirementsURL(requirementUrl); });
 }
 
@@ -316,8 +326,8 @@ void IVPropertiesDialog::initArchetypeView()
 
 void IVPropertiesDialog::initRequestsView()
 {
-    insertTab(&m_requirementsWidget, tr("Requirements"), getTabCount());
-    m_requirementsWidget.setCommandMacro(commandMacro());
+    insertTab(m_reqWidget, tr("Requirements"), getTabCount());
+    m_reqModel->setCommandMacro(commandMacro());
 }
 
 } // namespace ive

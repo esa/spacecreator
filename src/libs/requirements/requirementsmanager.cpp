@@ -34,8 +34,9 @@ struct RequirementsManager::RequirementsManagerPrivate {
     std::unique_ptr<requirement::GitLabRequirements> gitlabRequirements;
 };
 
-RequirementsManager::RequirementsManager(REPO_TYPE repoType)
-    : d(std::make_unique<RequirementsManagerPrivate>(repoType))
+RequirementsManager::RequirementsManager(REPO_TYPE repoType, QObject *parent)
+    : QObject(parent)
+    , d(std::make_unique<RequirementsManagerPrivate>(repoType))
 {
     switch(repoType)
     {
@@ -64,8 +65,7 @@ void RequirementsManager::setCredentials(const QString &url, const QString &toke
     d->gitlabClient->setCredentials(_url.scheme() + "://" + _url.host(), token);
 }
 
-void RequirementsManager::requestRequirements(
-        const QString &projectID, const QString &assignee, const QString &author) const
+void RequirementsManager::requestRequirements(const QString &projectID, const QString &assignee, const QString &author)
 {
     switch (d->mRepoType) {
     case (REPO_TYPE::GITLAB): {
@@ -73,6 +73,7 @@ void RequirementsManager::requestRequirements(
         options.mAssignee = assignee.toUtf8();
         options.mAuthor = author.toUtf8();
         options.mLabels = { "requirement" };
+        Q_EMIT startfetchingRequirements();
         d->gitlabClient->requestIssues(projectID, options);
         break;
     }

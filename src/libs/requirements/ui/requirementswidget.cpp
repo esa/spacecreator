@@ -17,7 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "requirementswidget.h"
 
-#include "requirement.h"
+#include "requirementsmanager.h"
+#include "requirementsmodel.h"
 #include "ui_requirementswidget.h"
 
 #include <QDesktopServices>
@@ -33,18 +34,19 @@ namespace {
 const int kIconSize = 16;
 }
 
-RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, shared::VEObject *dataObject,
-                                       shared::PropertyTemplateConfig *dynPropConfig, QWidget *parent)
+RequirementsWidget::RequirementsWidget(
+        const QByteArray &requirementsUrl, RequirementsManager *manager, QAbstractItemModel *model, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::RequirementsWidget)
-    , mReqManager(RequirementsManager::REPO_TYPE::GITLAB)
+    , mReqManager(manager)
+    , m_model(model)
     , m_requirementsUrl(requirementsUrl)
 {
     ui->setupUi(this);
     m_filterModel.setDynamicSortFilter(true);
     m_filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     m_filterModel.setFilterKeyColumn(-1);
-    m_filterModel.setSourceModel(&m_model);
+    m_filterModel.setSourceModel(m_model);
     m_checkedModel.setFilterKeyColumn(RequirementsModel::CHECKED);
     m_checkedModel.setSourceModel(&m_filterModel);
     ui->allRequirements->setModel(&m_filterModel);
@@ -53,27 +55,22 @@ RequirementsWidget::RequirementsWidget(QByteArray requirementsUrl, shared::VEObj
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     ui->allRequirements->horizontalHeader()->setStretchLastSection(false);
 
-    m_model.setDataObject(dataObject);
-    m_model.setPropertyTemplateConfig(dynPropConfig);
-
     connect(ui->allRequirements, &QTableView::doubleClicked, this, &RequirementsWidget::openIssueLink);
     connect(ui->refreshButton, &QPushButton::clicked, this, &RequirementsWidget::onLoginUpdate);
     connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
 
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
-    connect(&mReqManager, &RequirementsManager::requestedProjectID, this, [this](const QString &projectID) {
+    connect(mReqManager, &RequirementsManager::requestedProjectID, this, [this](const QString &projectID) {
         static const QString anyAssignee("");
         static const QString anyAuthor("");
-        mReqManager.requestRequirements(projectID, anyAssignee, anyAuthor);
+        mReqManager->requestRequirements(projectID, anyAssignee, anyAuthor);
         ui->serverStatusLabel->setPixmap(
                 QPixmap(":/requirementsresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
         ui->serverStatusLabel->setToolTip(tr("Connection to the server is ok"));
     });
 
-    connect(&mReqManager, &RequirementsManager::listOfRequirements, &m_model,
-            &requirement::RequirementsModel::addRequirements);
-    connect(&mReqManager, &RequirementsManager::connectionError, this, [this](QString error) {
+    connect(mReqManager, &RequirementsManager::connectionError, this, [this](QString error) {
         ui->serverStatusLabel->setPixmap(
                 QPixmap(":/requirementsresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
         ui->serverStatusLabel->setToolTip(tr("Connection to the server failed"));
@@ -118,11 +115,6 @@ void RequirementsWidget::setToken(const QString &token)
     ui->tokenLineEdit->setText(token);
 }
 
-void RequirementsWidget::setCommandMacro(shared::cmd::CommandsStackBase::Macro *macro)
-{
-    m_model.setCommandMacro(macro);
-}
-
 void RequirementsWidget::onChangeOfCredentials()
 {
     QSettings settings;
@@ -145,16 +137,15 @@ void RequirementsWidget::onChangeOfCredentials()
 
 void RequirementsWidget::onLoginUpdate()
 {
-    m_model.clear();
     QUrl api_url;
     api_url.setScheme("https");
     api_url.setHost(QUrl(ui->urlLineEdit->text()).host());
     api_url.setPath("/api/v4/");
 
-    mReqManager.setCredentials(api_url.toString(), ui->tokenLineEdit->text());
+    mReqManager->setCredentials(api_url.toString(), ui->tokenLineEdit->text());
 
     auto projectName = QUrl(ui->urlLineEdit->text()).path().split("/").last();
-    mReqManager.requestProjectID(projectName);
+    mReqManager->requestProjectID(projectName);
 
     ui->serverStatusLabel->setPixmap({});
     ui->serverStatusLabel->setToolTip(tr("Checking connection to the server"));

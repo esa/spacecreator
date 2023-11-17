@@ -33,14 +33,15 @@ public:
         GITLAB
     };
 
-    RequirementsManager(REPO_TYPE repoType);
+    RequirementsManager(REPO_TYPE repoType, QObject *parent = nullptr);
     ~RequirementsManager();
     void setCredentials(const QString &url, const QString &token);
-    void requestRequirements(const QString &projectID, const QString &assignee, const QString &author) const;
+    void requestRequirements(const QString &projectID, const QString &assignee, const QString &author);
     void createRequirement(const QString &projectID, const QString &title, const QString &description) const;
     void requestProjectID(const QString &projectName);
 
 Q_SIGNALS:
+    void startfetchingRequirements();
     void listOfRequirements(const QList<requirement::Requirement> &);
     void requestedProjectID(QString);
     void connectionError(QString errorString);

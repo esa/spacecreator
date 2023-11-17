@@ -25,6 +25,10 @@
 #include <QPointer>
 
 class RequirementsWidget;
+class RequirementsManager;
+namespace requirement {
+class RequirementsModel;
+}
 
 namespace Asn1Acn {
 class Asn1SystemChecks;
@@ -78,7 +82,9 @@ private:
     bool m_isRequiredSystemElement;
 
     QPointer<InterfaceDocument> m_document;
-    RequirementsWidget m_requirementsWidget;
+    RequirementsWidget *m_reqWidget = nullptr;
+    RequirementsManager *m_reqManager = nullptr;
+    requirement::RequirementsModel *m_reqModel = nullptr;
 };
 
 } // namespace ive
