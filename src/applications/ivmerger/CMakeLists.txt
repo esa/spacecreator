@@ -9,8 +9,8 @@ target_include_directories(IvMergerApp
 target_link_libraries(IvMergerApp
     PRIVATE     CommonProjectWarnings
                 ${QT_CORE}
-	            asn1library
-				asn1editor
+                asn1library
+                asn1editor
                 IvMerger)
 set_target_properties(IvMergerApp PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
