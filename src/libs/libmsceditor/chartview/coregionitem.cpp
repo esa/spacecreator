@@ -182,8 +182,8 @@ void CoregionItem::applyCif()
 void CoregionItem::updateCif()
 {
     if (!geometryManagedByCif()) {
-        cif::CifBlockShared emptyCif = cif::CifBlockFactory::createBlockConcurrent();
-        emptyCif->addLine(cif::CifLineShared(new cif::CifLineConcurrent()));
+        cif::CifBlockShared emptyCif =
+                cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineConcurrent()) });
         m_entity->addCif(emptyCif);
     }
 

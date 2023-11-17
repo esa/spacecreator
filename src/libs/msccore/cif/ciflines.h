@@ -215,6 +215,13 @@ public:
     QString payloadToString() const override;
     QString toString(int tabsSize) const override;
 };
+class CifLineRequirement : public CifLine
+{
+public:
+    CifLine::CifType lineType() const override;
+    bool initFrom(const QString &sourceLine) override;
+    QString payloadToString() const override;
+};
 
 } // ns cif
 } // ns msc

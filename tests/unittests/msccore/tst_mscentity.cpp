@@ -15,6 +15,8 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
 #include "mscentity.h"
 
 #include <QSignalSpy>
@@ -49,6 +51,7 @@ private Q_SLOTS:
     void testDefaultName();
     void testConstructorName();
     void testSetName();
+    void testExtractingRequirementFromCif();
 
 private:
     static const QString TestEntityName;
@@ -75,6 +78,26 @@ void tst_MscEntity::testSetName()
     entity.setName(TestEntityName);
     QCOMPARE(entity.name(), TestEntityName);
     QCOMPARE(spy.count(), 1);
+}
+
+void tst_MscEntity::testExtractingRequirementFromCif()
+{
+    MscEntitytImpl entity;
+
+    cif::CifBlockShared requirementCif =
+            cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineRequirement()) });
+    QByteArray req { "a3b4-1f2e,a9f3-742d" };
+    requirementCif->setPayload(QVariant::fromValue(req), cif::CifLine::CifType::Requirement);
+
+    entity.setCifs({ requirementCif });
+
+    QByteArrayList expected { "a3b4-1f2e", "a9f3-742d" };
+    QCOMPARE(entity.requirements(), expected);
+    QCOMPARE(entity.cifs().size(), 1);
+
+    entity.setRequirements({});
+    QCOMPARE(entity.requirements(), QByteArrayList());
+    QCOMPARE(entity.cifs().size(), 0);
 }
 
 QTEST_APPLESS_MAIN(tst_MscEntity)

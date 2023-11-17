@@ -20,6 +20,7 @@
 #include "cif/cifblock.h"
 #include "cif/cifline.h"
 
+#include <QByteArrayList>
 #include <QPointer>
 #include <QRegularExpression>
 #include <QString>
@@ -86,6 +87,15 @@ public:
     void clearCifs();
     virtual QString cifText(int tabsSize = 0) const;
 
+    /**
+     * Returns the list of requirement IDs associated by this entity
+     */
+    QByteArrayList requirements() const;
+    /**
+     * Sets the list of requirement IDs associated by this entity
+     */
+    void setRequirements(const QByteArrayList &requirements);
+
 #ifdef QT_DEBUG
     void dbgShowCifs() const;
 #endif
@@ -98,10 +108,14 @@ Q_SIGNALS:
     void cifTextChanged();
 
 private:
+    cif::CifBlockShared requirementsCifBlock() const;
+    QByteArrayList requirementsFromCifBlock(const cif::CifBlockShared &cif) const;
+
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
     QPointer<MscComment> m_comment;
     QVector<cif::CifBlockShared> m_cifs;
+    QByteArrayList m_requirements;
 
     static const QRegularExpression m_nameVerify;
 };

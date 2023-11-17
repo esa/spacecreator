@@ -766,3 +766,20 @@ void tst_MscReader::testNameFiltering()
     auto *condition = static_cast<MscCondition *>(chart->eventsForInstance(instance1).at(0));
     QCOMPARE(condition->name(), QString("Con_2"));
 }
+
+void tst_MscReader::testRequirements()
+{
+    const auto msc = QString("msc Chart_1;\n"
+                             "    /* CIF REQUIREMENT ab1d-ef72,238f-007b */\n"
+                             "    instance Inst_1;\n"
+                             "    endinstance;\n"
+                             "endmsc;\n");
+
+    MscModel *model = m_reader->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    const QByteArrayList expectedRequirements { "ab1d-ef72", "238f-007b" };
+    QCOMPARE(chart->instances().at(0)->requirements(), expectedRequirements);
+}

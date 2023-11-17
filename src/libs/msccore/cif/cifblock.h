@@ -27,6 +27,7 @@ namespace cif {
 class CifBlock
 {
 public:
+    CifBlock(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
     virtual ~CifBlock();
     QVector<CifLineShared> lines() const;
     virtual void setLines(const QVector<CifLineShared> &lines);

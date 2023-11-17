@@ -22,45 +22,75 @@
 namespace msc {
 namespace cif {
 
+using SharedCifLines = QVector<CifLineShared>;
+
 class CifBlockAction : public CifBlock
 {
 public:
+    explicit CifBlockAction(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockCall : public CifBlock
 {
 public:
+    explicit CifBlockCall(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockComment : public CifBlock
 {
 public:
+    explicit CifBlockComment(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockConcurrent : public CifBlock
 {
 public:
+    explicit CifBlockConcurrent(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockCondition : public CifBlock
 {
 public:
+    explicit CifBlockCondition(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockCreate : public CifBlock
 {
 public:
+    explicit CifBlockCreate(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockInstance : public CifBlock
 {
 public:
+    explicit CifBlockInstance(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
     static constexpr int AxisWidth { 800 };
 };
@@ -68,54 +98,101 @@ public:
 class CifBlockImport : public CifBlock
 {
 public:
+    explicit CifBlockImport(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockMessage : public CifBlock
 {
 public:
+    explicit CifBlockMessage(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockMscDocument : public CifBlock
 {
 public:
+    explicit CifBlockMscDocument(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockReset : public CifBlock
 {
 public:
+    explicit CifBlockReset(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockSet : public CifBlock
 {
 public:
+    explicit CifBlockSet(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockStop : public CifBlock
 {
 public:
+    explicit CifBlockStop(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockSubmsc : public CifBlock
 {
 public:
+    explicit CifBlockSubmsc(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockText : public CifBlock
 {
 public:
+    explicit CifBlockText(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
     CifLine::CifType blockType() const override;
 };
 
 class CifBlockTimeout : public CifBlock
 {
 public:
+    explicit CifBlockTimeout(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
+    CifLine::CifType blockType() const override;
+};
+
+class CifBlockRequirement : public CifBlock
+{
+public:
+    explicit CifBlockRequirement(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
+
     CifLine::CifType blockType() const override;
 };
 

@@ -60,8 +60,8 @@ void CmdMessageItemCreate::redo()
         m_message->targetInstance()->setExplicitCreator(m_message->sourceInstance());
 
     if (!m_msgPoints.isEmpty())
-        if (cif::CifBlockShared msgCif = cif::CifBlockFactory::createBlockMessage()) {
-            msgCif->setLines({ cif::CifLineShared(new cif::CifLineMessage) });
+        if (cif::CifBlockShared msgCif =
+                        cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineMessage) })) {
             msgCif->setPayload(QVariant::fromValue(m_msgPoints), cif::CifLine::CifType::Message);
             m_modelItem->setCifs({ msgCif });
         }

@@ -167,8 +167,8 @@ void TimerItem::applyCif()
 void TimerItem::updateCif()
 {
     if (!geometryManagedByCif()) {
-        cif::CifBlockShared emptyCif = cif::CifBlockFactory::createBlockTimeout();
-        emptyCif->addLine(cif::CifLineShared(new cif::CifLineTimeout()));
+        cif::CifBlockShared emptyCif =
+                cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineTimeout()) });
         m_entity->addCif(emptyCif);
     }
 

@@ -912,8 +912,8 @@ void MessageItem::updateCif()
     const cif::CifLine::CifType usedCifType = mainCifType();
     const QVector<QPoint> &pointsCif = CoordinatesConverter::sceneToCif(messagePoints());
     if (!geometryManagedByCif()) {
-        const CifBlockShared &emptyCif =
-                isCreator() ? CifBlockFactory::createBlockCreate() : CifBlockFactory::createBlockMessage();
+        const auto targetCifType = isCreator() ? cif::CifLine::CifType::Create : cif::CifLine::CifType::Message;
+        const CifBlockShared &emptyCif = CifBlockFactory::createBlock(targetCifType);
         m_message->addCif(emptyCif);
     }
 

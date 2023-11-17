@@ -378,5 +378,28 @@ QString CifLineGlobalComment::toString(int tabsSize) const
     return payload.isEmpty() ? QString() : QString("%1/* %2 */\n").arg(tabs, payload);
 }
 
+CifLine::CifType CifLineRequirement::lineType() const
+{
+    return CifLine::CifType::Requirement;
+}
+
+bool CifLineRequirement::initFrom(const QString &sourceLine)
+{
+    m_sourceLine = sourceLine;
+    const QString typeString = CifLine::nameForType(CifLine::CifType::Requirement);
+    int idx = sourceLine.indexOf(typeString);
+    if (idx >= 0) {
+        idx += typeString.size();
+        const QString payload = sourceLine.right(sourceLine.size() - idx);
+        setPayload(payload.trimmed());
+    }
+    return !m_sourceLine.isEmpty();
+}
+
+QString CifLineRequirement::payloadToString() const
+{
+    return payload().toString();
+}
+
 } // ns cif
 } // ns msc

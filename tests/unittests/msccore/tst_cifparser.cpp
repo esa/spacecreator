@@ -74,6 +74,7 @@ private Q_SLOTS:
     void testParsingCifLineTimeout();
     void testParsingCifLineTextMode();
     void testParsingCifLineTextName();
+    void testParsingCifLineRequirement();
 
     void testParsingCifBlockAction();
     void testParsingCifBlockCall();
@@ -104,6 +105,7 @@ private Q_SLOTS:
     void testParsingCifBlockTimeout();
     void testParsingCifBlockTextMode();
     void testParsingCifBlockTextName();
+    void testParsingCifBlockRequirement();
 
     void testParsingCifAtDocumentFront();
     void testIgnoreUnknownCif();
@@ -232,6 +234,10 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
         break;
     case CifLine::CifType::GlobalComment:
         cifLine = QString("/* Text should be placed as global cif comment */");
+        break;
+    case CifLine::CifType::Requirement:
+        cifLine = lineTemplate.arg(
+                QString("%1 ab1d-ef72,238f-007b").arg(CifLine::nameForType(CifLine::CifType::Requirement)));
         break;
 
     default:
@@ -418,6 +424,11 @@ void tst_CifParser::testParsingCifLineTextMode()
 void tst_CifParser::testParsingCifLineTextName()
 {
     testParsingCifLine(CifLine::CifType::TextName);
+}
+
+void tst_CifParser::testParsingCifLineRequirement()
+{
+    testParsingCifLine(CifLine::CifType::Requirement);
 }
 
 void tst_CifParser::testParsingCifBlock(const QVector<QVector<CifLine::CifType>> &blocks)
@@ -683,6 +694,11 @@ void tst_CifParser::testParsingCifBlockTextName()
 {
     // used within text?
     QSKIP(qPrintable(QString("Unsupported yet")));
+}
+
+void tst_CifParser::testParsingCifBlockRequirement()
+{
+    QSKIP(qPrintable(QString("Not implemented yet")));
 }
 
 void tst_CifParser::testParsingCifAtDocumentFront()

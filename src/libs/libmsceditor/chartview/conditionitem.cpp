@@ -152,8 +152,8 @@ void ConditionItem::applyCif()
 void ConditionItem::updateCif()
 {
     if (!geometryManagedByCif()) {
-        cif::CifBlockShared emptyCif = cif::CifBlockFactory::createBlockCondition();
-        emptyCif->addLine(cif::CifLineShared(new cif::CifLineCondition()));
+        cif::CifBlockShared emptyCif =
+                cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineCondition()) });
         m_entity->addCif(emptyCif);
     }
 

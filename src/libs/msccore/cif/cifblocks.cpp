@@ -99,5 +99,10 @@ CifLine::CifType CifBlockTimeout::blockType() const
     return CifLine::CifType::Timeout;
 }
 
+CifLine::CifType CifBlockRequirement::blockType() const
+{
+    return CifLine::CifType::Requirement;
+}
+
 } // ns cif
 } // ns msc

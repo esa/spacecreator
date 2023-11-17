@@ -29,27 +29,20 @@ class CifBlockFactory
 public:
     static QVector<CifBlockShared> createBlocks(const QVector<QVector<CifLineShared>> &lines);
     static CifBlockShared createBlock(const QVector<CifLineShared> &lines);
-
-    static CifBlockShared createBlockAction(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
-    static CifBlockShared createBlockCall(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockComment(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockConcurrent(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
-    static CifBlockShared createBlockCondition(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
-    static CifBlockShared createBlockCreate(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
-    static CifBlockShared createBlockInstance(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
-    static CifBlockShared createBlockImport(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockMessage(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
-    static CifBlockShared createBlockMscDocument(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
-    static CifBlockShared createBlockReset(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockSet(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockStop(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockSubmsc(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockText(const QVector<CifLineShared> &lines);
-    static CifBlockShared createBlockTimeout(const QVector<CifLineShared> &lines = QVector<CifLineShared>());
+    static CifBlockShared createBlock(
+            const CifLine::CifType cifType, const QVector<CifLineShared> &lines = QVector<CifLineShared>());
 
 private:
     CifBlockFactory() = delete;
     CifBlockFactory(const CifBlockFactory &ot) = delete;
+
+    struct CifBlockCreatorHelper {
+        template<class T>
+        CifBlockShared create(const QVector<CifLineShared> &lines)
+        {
+            return CifBlockShared(new T(lines));
+        }
+    };
 };
 
 } // ns cif

@@ -57,6 +57,7 @@ private Q_SLOTS:
     void testDefaultDocumentTypeFromLoad();
     void testMessageDeclaration();
     void testNameFiltering();
+    void testRequirements();
 
     // Instance create tests - in tst_msccreateparsing
     void testInstanceCreate();

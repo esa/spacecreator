@@ -37,165 +37,51 @@ QVector<CifBlockShared> CifBlockFactory::createBlocks(const QVector<QVector<CifL
 
 CifBlockShared CifBlockFactory::createBlock(const QVector<CifLineShared> &lines)
 {
-    for (const CifLineShared &line : lines) {
-        switch (line->lineType()) {
-        case CifLine::CifType::Action:
-            return createBlockAction(lines);
-        case CifLine::CifType::Call:
-            return createBlockCall(lines);
-        case CifLine::CifType::Comment:
-            return createBlockComment(lines);
-        case CifLine::CifType::Concurrent:
-            return createBlockConcurrent(lines);
-        case CifLine::CifType::Condition:
-            return createBlockCondition(lines);
-        case CifLine::CifType::Create:
-            return createBlockCreate(lines);
-        case CifLine::CifType::Instance:
-            return createBlockInstance(lines);
-        case CifLine::CifType::Import:
-            return createBlockImport(lines);
-        case CifLine::CifType::Message:
-            return createBlockMessage(lines);
-        case CifLine::CifType::MscDocument:
-            return createBlockMscDocument(lines);
-        case CifLine::CifType::Reset:
-            return createBlockReset(lines);
-        case CifLine::CifType::Set:
-            return createBlockSet(lines);
-        case CifLine::CifType::Stop:
-            return createBlockStop(lines);
-        case CifLine::CifType::Submsc:
-            return createBlockSubmsc(lines);
-        case CifLine::CifType::Text:
-            return createBlockText(lines);
-        case CifLine::CifType::Timeout:
-            return createBlockTimeout(lines);
-        default:
-            break;
-        }
+    return lines.isEmpty() ? CifBlockShared() : createBlock(lines.first()->lineType(), lines);
+}
+
+/*static*/ CifBlockShared CifBlockFactory::createBlock(
+        const CifLine::CifType cifType, const QVector<CifLineShared> &lines)
+{
+    switch (cifType) {
+    case CifLine::CifType::Action:
+        return CifBlockCreatorHelper().create<CifBlockAction>(lines);
+    case CifLine::CifType::Call:
+        return CifBlockCreatorHelper().create<CifBlockCall>(lines);
+    case CifLine::CifType::Comment:
+        return CifBlockCreatorHelper().create<CifBlockComment>(lines);
+    case CifLine::CifType::Concurrent:
+        return CifBlockCreatorHelper().create<CifBlockConcurrent>(lines);
+    case CifLine::CifType::Condition:
+        return CifBlockCreatorHelper().create<CifBlockCondition>(lines);
+    case CifLine::CifType::Create:
+        return CifBlockCreatorHelper().create<CifBlockCreate>(lines);
+    case CifLine::CifType::Instance:
+        return CifBlockCreatorHelper().create<CifBlockInstance>(lines);
+    case CifLine::CifType::Import:
+        return CifBlockCreatorHelper().create<CifBlockImport>(lines);
+    case CifLine::CifType::Message:
+        return CifBlockCreatorHelper().create<CifBlockMessage>(lines);
+    case CifLine::CifType::MscDocument:
+        return CifBlockCreatorHelper().create<CifBlockMscDocument>(lines);
+    case CifLine::CifType::Reset:
+        return CifBlockCreatorHelper().create<CifBlockReset>(lines);
+    case CifLine::CifType::Set:
+        return CifBlockCreatorHelper().create<CifBlockSet>(lines);
+    case CifLine::CifType::Stop:
+        return CifBlockCreatorHelper().create<CifBlockStop>(lines);
+    case CifLine::CifType::Submsc:
+        return CifBlockCreatorHelper().create<CifBlockSubmsc>(lines);
+    case CifLine::CifType::Text:
+        return CifBlockCreatorHelper().create<CifBlockText>(lines);
+    case CifLine::CifType::Timeout:
+        return CifBlockCreatorHelper().create<CifBlockTimeout>(lines);
+    case CifLine::CifType::Requirement:
+        return CifBlockCreatorHelper().create<CifBlockRequirement>(lines);
+    default:
+        break;
     }
     return CifBlockShared();
-}
-CifBlockShared CifBlockFactory::createBlockAction(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockAction());
-    if (!lines.isEmpty()) {
-        block->setLines(lines);
-    }
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockCall(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockCall());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockComment(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockComment());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockConcurrent(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockConcurrent());
-    if (!lines.isEmpty()) {
-        block->setLines(lines);
-    }
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockCondition(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockCondition());
-    if (!lines.isEmpty()) {
-        block->setLines(lines);
-    }
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockCreate(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockCreate());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockInstance(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockInstance());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockImport(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockImport());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockMessage(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockMessage());
-    if (!lines.isEmpty())
-        block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockMscDocument(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockMscDocument());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockReset(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockReset());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockSet(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockSet());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockStop(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockStop());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockSubmsc(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockSubmsc());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockText(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockText());
-    block->setLines(lines);
-    return block;
-}
-
-CifBlockShared CifBlockFactory::createBlockTimeout(const QVector<CifLineShared> &lines)
-{
-    CifBlockShared block(new CifBlockTimeout());
-    if (!lines.isEmpty()) {
-        block->setLines(lines);
-    }
-    return block;
 }
 
 } // ns cif

@@ -65,6 +65,7 @@ private Q_SLOTS:
     void testSerializeMscMessage();
     void testSerializeMscTimer_data();
     void testSerializeMscTimer();
+    void testRequirements();
 
 private:
     QString removeIndention(const QString &text) const;
@@ -172,8 +173,8 @@ void tst_MscWriter::testSaveDocumentModel_data()
     auto doc5 = new MscDocument("BaseDoc", model);
     auto doc6 = new MscDocument("CifDoc", model);
     doc5->addDocument(doc6);
-    cif::CifBlockShared mscDocCif = cif::CifBlockFactory::createBlockMscDocument();
-    mscDocCif->addLine(cif::CifLineShared(new cif::CifLineMscDocument()));
+    cif::CifBlockShared mscDocCif =
+            cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineMscDocument()) });
     const QVector<QPoint> points { QPoint(20, 30), QPoint(500, 400) };
     mscDocCif->setPayload(QVariant::fromValue(points), cif::CifLine::CifType::MscDocument);
     doc6->addCif(mscDocCif);
@@ -1078,6 +1079,29 @@ void tst_MscWriter::testSerializeMscTimer()
     setSaveMode(SaveMode::GRANTLEE);
     text = modelText(model);
     QCOMPARE(text, resultGrantLee);
+}
+
+void tst_MscWriter::testRequirements()
+{
+    auto model = new MscModel(this);
+    auto chart = new MscChart("Chart_1");
+    auto instance = new MscInstance("Inst_1");
+    instance->setRequirements({ "ab1d-ef72", "238f-007b" });
+    chart->addInstance(instance);
+    model->addChart(chart);
+    const auto result = QString("msc Chart_1;\n"
+                                "    /* CIF REQUIREMENT ab1d-ef72,238f-007b */\n"
+                                "    instance Inst_1;\n"
+                                "    endinstance;\n"
+                                "endmsc;\n");
+
+    setSaveMode(SaveMode::CUSTOM);
+    QString text = modelText(model);
+    QCOMPARE(text, result);
+
+    setSaveMode(SaveMode::GRANTLEE);
+    text = modelText(model);
+    QCOMPARE(text, removeIndention(result));
 }
 
 QTEST_MAIN(tst_MscWriter)

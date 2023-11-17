@@ -1044,7 +1044,7 @@ void MscChart::setCifRect(const QRect &rect)
 
         CifBlockShared mscDocCif = cifMscDoc();
         if (!mscDocCif) {
-            mscDocCif = CifBlockFactory::createBlockMscDocument();
+            mscDocCif = CifBlockFactory::createBlock(CifLine::CifType::MscDocument);
             pDoc->addCif(mscDocCif);
         }
 

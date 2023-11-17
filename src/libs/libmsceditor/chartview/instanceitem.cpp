@@ -422,8 +422,7 @@ void InstanceItem::updateCif()
     using namespace cif;
 
     if (!geometryManagedByCif()) {
-        CifBlockShared emptyCif = CifBlockFactory::createBlockInstance();
-        emptyCif->addLine(CifLineShared(new CifLineInstance()));
+        CifBlockShared emptyCif = CifBlockFactory::createBlock({ CifLineShared(new CifLineInstance()) });
         m_instance->addCif(emptyCif);
     }
 

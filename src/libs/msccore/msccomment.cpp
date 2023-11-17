@@ -131,19 +131,17 @@ void MscComment::updateCifComment()
     if (!m_rect.isNull()) {
         /// Comment geometry update
         cif::CifLineShared cifLine;
-        if (isGlobal())
+        if (isGlobal()) {
             cifLine = cif::CifLineShared(new cif::CifLineText());
-        else
+        } else {
             cifLine = cif::CifLineShared(new cif::CifLineComment());
+        }
 
         if (cifBlock.isNull()) {
-            if (isGlobal())
-                cifBlock = cif::CifBlockFactory::createBlockText({ cif::CifLineShared(cifLine) });
-            else
-                cifBlock = cif::CifBlockFactory::createBlockComment({ cif::CifLineShared(cifLine) });
+            cifBlock = cif::CifBlockFactory::createBlock({ cifLine });
             addCif(cifBlock);
         } else if (!cifBlock->hasPayloadFor(mainCifType())) {
-            cifBlock->addLine(cif::CifLineShared(cifLine));
+            cifBlock->addLine(cifLine);
         }
 
         const QVector<QPoint> points { m_rect.topLeft(), { m_rect.width(), m_rect.height() } };
@@ -155,7 +153,7 @@ void MscComment::updateCifComment()
     /// Comment text update
     if (isGlobal() && !m_text.isEmpty() && m_rect.isValid()) {
         if (cifBlock.isNull()) {
-            cifBlock = cif::CifBlockFactory::createBlockText({ cif::CifLineShared(new cif::CifLineText()) });
+            cifBlock = cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineText()) });
             addCif(cifBlock);
         } else if (!cifBlock->hasPayloadFor(mainCifType())) {
             cifBlock->addLine(cif::CifLineShared(new cif::CifLineText()));

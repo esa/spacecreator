@@ -121,8 +121,8 @@ void ActionItem::applyCif()
 void ActionItem::updateCif()
 {
     if (!geometryManagedByCif()) {
-        cif::CifBlockShared emptyCif = cif::CifBlockFactory::createBlockAction();
-        emptyCif->addLine(cif::CifLineShared(new cif::CifLineAction()));
+        cif::CifBlockShared emptyCif =
+                cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineAction()) });
         m_entity->addCif(emptyCif);
     }
 

@@ -23,6 +23,12 @@
 namespace msc {
 namespace cif {
 
+CifBlock::CifBlock(const QVector<CifLineShared> &lines)
+    : m_lines(lines)
+{
+    updateHashKey(); // we can call just setLines(lines); instead, but that is virtual and we're in the base c-tor
+}
+
 CifBlock::~CifBlock() { }
 
 QVector<CifLineShared> CifBlock::lines() const

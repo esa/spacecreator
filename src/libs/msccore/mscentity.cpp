@@ -17,6 +17,8 @@
 
 #include "mscentity.h"
 
+#include "cif/cifblockfactory.h"
+#include "cif/ciflines.h"
 #include "msccomment.h"
 
 #include <QDebug>
@@ -138,13 +140,32 @@ QString MscEntity::entityTypeName() const
 
 QVector<cif::CifBlockShared> MscEntity::cifs() const
 {
-    return m_cifs;
+    if (m_requirements.isEmpty()) {
+        return m_cifs;
+    }
+
+    QVector<cif::CifBlockShared> allCifs = m_cifs;
+    allCifs.append(requirementsCifBlock());
+    return allCifs;
 }
 
 void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
 {
     if (m_cifs != cifs) {
-        m_cifs = cifs;
+        m_cifs.clear();
+        bool requirementsCleared = false;
+        for (const cif::CifBlockShared &block : cifs) {
+            if (block->blockType() != cif::CifLine::CifType::Requirement) {
+                m_cifs.append(block);
+            } else {
+                if (!requirementsCleared) {
+                    m_requirements.clear();
+                    requirementsCleared = true;
+                }
+                m_requirements.append(requirementsFromCifBlock(block));
+            }
+        }
+
         Q_EMIT dataChanged();
         Q_EMIT cifTextChanged();
     }
@@ -152,6 +173,13 @@ void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
 
 void MscEntity::addCif(const cif::CifBlockShared &cif)
 {
+    if (cif->blockType() == cif::CifLine::CifType::Requirement) {
+        m_requirements.append(requirementsFromCifBlock(cif));
+        Q_EMIT dataChanged();
+        Q_EMIT cifTextChanged();
+        return;
+    }
+
     if (!m_cifs.contains(cif)) {
         m_cifs.append(cif);
         Q_EMIT dataChanged();
@@ -179,8 +207,9 @@ void MscEntity::clearCifs()
 QString MscEntity::cifText(int tabsSize) const
 {
     QStringList cifTexts;
-    cifTexts.reserve(m_cifs.size());
-    for (const cif::CifBlockShared &cifBlock : m_cifs) {
+    const QVector<cif::CifBlockShared> &cif = cifs();
+    cifTexts.reserve(cif.size());
+    for (const cif::CifBlockShared &cifBlock : cif) {
         if (cifBlock->blockType() != cif::CifLine::CifType::Comment) {
             cifTexts << cifBlock->toString(tabsSize);
         }
@@ -189,13 +218,30 @@ QString MscEntity::cifText(int tabsSize) const
     return cifTexts.join("\n");
 }
 
+QByteArrayList MscEntity::requirements() const
+{
+    return m_requirements;
+}
+
+void MscEntity::setRequirements(const QByteArrayList &requirements)
+{
+    if (requirements == m_requirements) {
+        return;
+    }
+
+    m_requirements = requirements;
+    Q_EMIT dataChanged();
+    Q_EMIT cifTextChanged();
+}
+
 #ifdef QT_DEBUG
 void MscEntity::dbgShowCifs() const
 {
-    qDebug() << QString("%1[%2]->CIFs %3:").arg(name(), entityTypeName()).arg(m_cifs.size());
-    for (int i = 0; i < m_cifs.size(); ++i) {
-        qDebug() << QString("\t CIF # %1/%2").arg(i).arg(m_cifs.size());
-        const cif::CifBlockShared &cifBlock = m_cifs.at(i);
+    const QVector<cif::CifBlockShared> &cif = cifs();
+    qDebug() << QString("%1[%2]->CIFs %3:").arg(name(), entityTypeName()).arg(cif.size());
+    for (int i = 0; i < cif.size(); ++i) {
+        qDebug() << QString("\t CIF # %1/%2").arg(i).arg(cif.size());
+        const cif::CifBlockShared &cifBlock = cif.at(i);
         for (int j = 0; j < cifBlock->lines().size(); ++j)
             qDebug() << QString("\t\t CIF Line #%1/%2: %3")
                                 .arg(j)
@@ -208,6 +254,31 @@ void MscEntity::dbgShowCifs() const
 QString MscEntity::toDbgString() const
 {
     return QString("%1('%2')").arg(entityTypeName(), m_name);
+}
+
+cif::CifBlockShared MscEntity::requirementsCifBlock() const
+{
+    if (m_requirements.isEmpty()) {
+        return {};
+    }
+
+    cif::CifBlockShared requirementCif =
+            cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineRequirement()) });
+    const QByteArray req = m_requirements.join(",");
+    requirementCif->setPayload(QVariant::fromValue(req), cif::CifLine::CifType::Requirement);
+
+    return requirementCif;
+}
+
+QByteArrayList MscEntity::requirementsFromCifBlock(const cif::CifBlockShared &cif) const
+{
+    const QVariant &variant = cif->payload(cif::CifLine::CifType::Requirement);
+    QByteArray data = variant.toString().toUtf8();
+    if (data.isEmpty()) {
+        return {};
+    }
+
+    return data.split(',');
 }
 
 } // namespace msc

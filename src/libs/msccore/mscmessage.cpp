@@ -263,7 +263,7 @@ void MscMessage::setCifPoints(const QVector<QPoint> &points)
 
     CifBlockShared msgCif = cifMessage();
     if (!msgCif) {
-        msgCif = CifBlockFactory::createBlockMessage();
+        msgCif = CifBlockFactory::createBlock(cif::CifLine::CifType::Message);
         addCif(msgCif);
     }
 

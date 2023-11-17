@@ -194,7 +194,7 @@ void MscInstance::setCifGeometry(const QVector<QPoint> &cifGeometry)
 
     CifBlockShared instanceCif = cifInstance();
     if (!instanceCif) {
-        instanceCif = CifBlockFactory::createBlockInstance();
+        instanceCif = CifBlockFactory::createBlock(cif::CifLine::CifType::Instance);
         addCif(instanceCif);
     }
 
