@@ -74,8 +74,6 @@ MiniMap::MiniMap(QWidget *parent)
     setLocation(static_cast<MiniMap::Location>(location));
 
     d->m_opacity.reset(new QGraphicsOpacityEffect(this));
-    connect(d->m_opacity.data(), &QGraphicsOpacityEffect::opacityChanged, this,
-            [](qreal o) { qDebug() << "opacity --->" << o; });
 
     setOpacity(kOpacityRegular);
     setGraphicsEffect(d->m_opacity.data());
@@ -434,9 +432,7 @@ void MiniMap::leaveEvent(QEvent *event)
 void MiniMap::setOpacity(qreal opacity)
 {
     if (d->m_opacity->opacity() != opacity) {
-        LOG << 1 << d->m_opacity->opacity() << "-->" << opacity << parentWidget();
         d->m_opacity->setOpacity(opacity);
-        LOG << 2 << d->m_opacity->opacity();
     }
 }
 
