@@ -94,8 +94,9 @@ target_sources(${LIB_NAME} PRIVATE
 target_link_libraries(${LIB_NAME}
     dvcore
     asn1editor
-    templating
+    requirements
     shared
+    templating
     ${QT_CORE}
     ${QT_SVG}
     ${QT_WIDGETS}

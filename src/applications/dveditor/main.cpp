@@ -19,6 +19,7 @@
 #include "dveditorcore.h"
 #include "dvlibrary.h"
 #include "mainwindow.h"
+#include "requirementslibrary.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
 
@@ -29,6 +30,7 @@
 int main(int argc, char *argv[])
 {
     shared::initSharedLibrary();
+    requirement::initRequirementsLibrary();
     dve::initDvEditor();
     dvm::initDVLibrary();
 

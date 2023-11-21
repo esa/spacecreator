@@ -20,6 +20,7 @@
 #include "abstractsystemchecks.h"
 #include "asn1systemchecks.h"
 #include "commandsstackbase.h"
+#include "dvappmodel.h"
 #include "dvattributedelegate.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
@@ -29,19 +30,34 @@
 #include "propertieslistmodel.h"
 #include "propertiesviewbase.h"
 #include "propertytemplateconfig.h"
+#include "requirementsmanager.h"
+#include "requirementsmodel.h"
+#include "ui/requirementswidget.h"
 
 #include <QStyledItemDelegate>
 #include <QTableView>
 
 namespace dve {
 
-DVPropertiesDialog::DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig,
+DVPropertiesDialog::DVPropertiesDialog(dve::DVAppModel *appModel, shared::PropertyTemplateConfig *dynPropConfig,
         shared::ui::VEInteractiveObject *uiObj, dvm::AbstractSystemChecks *systemChecker,
         Asn1Acn::Asn1SystemChecks *asn1Checks, shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, uiObj, commandsStack, parent)
     , m_dvChecker(systemChecker)
     , m_asn1Checks(asn1Checks)
 {
+    m_reqManager = new RequirementsManager(RequirementsManager::REPO_TYPE::GITLAB, this);
+    m_reqModel = new requirement::RequirementsModel(this);
+    m_reqModel->setDataObject(dataObject());
+    m_reqModel->setPropertyTemplateConfig(dynPropConfig);
+    connect(m_reqManager, &RequirementsManager::listOfRequirements, m_reqModel,
+            &requirement::RequirementsModel::addRequirements);
+    connect(m_reqManager, &RequirementsManager::startfetchingRequirements, m_reqModel,
+            &requirement::RequirementsModel::clear);
+
+    m_reqWidget = new RequirementsWidget(appModel->requirementsURL().toUtf8(), m_reqManager, m_reqModel, this);
+    connect(m_reqWidget, &RequirementsWidget::requirementsUrlChanged, this,
+            [appModel](QByteArray requirementUrl) { appModel->setRequirementsURL(QString::fromUtf8(requirementUrl)); });
 }
 
 QString DVPropertiesDialog::objectTypeName() const
@@ -100,6 +116,7 @@ void DVPropertiesDialog::init()
         break;
     }
     initStyleView();
+    initRequirementsView();
     setCurrentTabIndex(0);
 }
 
@@ -115,6 +132,12 @@ void DVPropertiesDialog::initAttributesView()
     viewAttrs->setModel(modelAttrs);
 
     insertTab(viewAttrs, tr("Attributes"));
+}
+
+void DVPropertiesDialog::initRequirementsView()
+{
+    insertTab(m_reqWidget, tr("Requirements"), getTabCount());
+    m_reqModel->setCommandMacro(commandMacro());
 }
 
 dvm::DVObject *DVPropertiesDialog::dataObject() const

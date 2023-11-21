@@ -39,6 +39,7 @@ struct DVAppModel::DVAppModelPrivate {
     QString filePath;
     QString uiFileName { shared::kDefaultDeploymentViewUIFileName };
     QString creatorGitHash;
+    QString requirementsURL;
     std::unique_ptr<dvm::DVModel> objectsModel;
 };
 
@@ -96,6 +97,9 @@ bool DVAppModel::load(const QString &path)
     }
     setCreatorGitHash(metadata[QLatin1String("creatorHash")].toString());
     d->objectsModel->initFromObjects(reader.parsedObjects());
+    if (metadata.contains("requirementsURL")) {
+        setRequirementsURL(metadata["requirementsURL"].toString());
+    }
 
     shared::ErrorHub::clearCurrentFile();
     return true;
@@ -140,6 +144,26 @@ QString DVAppModel::creatorGitHash() const
 void DVAppModel::setCreatorGitHash(const QString &newCreatorGitHash)
 {
     d->creatorGitHash = newCreatorGitHash;
+}
+
+/*!
+ * \brief DVAppModel::setRequirementsURL Sets the URL (gitlab project) where the requirements are stored
+ */
+void DVAppModel::setRequirementsURL(const QString &url)
+{
+    if (d->requirementsURL == url) {
+        return;
+    }
+    d->requirementsURL = url;
+    Q_EMIT requirementsURLChanged(d->requirementsURL);
+}
+
+/*!
+ * \brief DVAppModel::requirementsURL Returns the URL (gitlab project) where the requirements are stored
+ */
+const QString &DVAppModel::requirementsURL() const
+{
+    return d->requirementsURL;
 }
 
 /*!

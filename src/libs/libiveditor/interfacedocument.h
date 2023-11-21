@@ -72,6 +72,7 @@ class InterfaceDocument : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString mscFileName READ mscFileName WRITE setMscFileName NOTIFY mscFileNameChanged)
+    Q_PROPERTY(QString requirementsUrl READ requirementsURL WRITE setRequirementsURL NOTIFY requirementsURLChanged)
 
 public:
     explicit InterfaceDocument(QObject *parent = nullptr);
@@ -121,8 +122,8 @@ public:
     void setCreatorGitHash(const QString &hashStr);
     QString creatorGitHash() const;
 
-    bool setRequirementsURL(const QString &url);
-    QString requirementsURL() const;
+    void setRequirementsURL(const QString &url);
+    const QString &requirementsURL() const;
 
     bool isDirty() const;
 
@@ -170,7 +171,7 @@ public:
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
     void titleChanged();
-    void requestURLChanged(const QString &requestUrl);
+    void requirementsURLChanged(const QString &url);
     void asn1FileNameChanged(const QString &asn1FileName);
     void mscFileNameChanged(const QString &mscFileName);
     void uiFileNameChanged(const QString &uiFileName);

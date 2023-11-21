@@ -30,23 +30,28 @@ class CommandsStackBase;
 class PropertyTemplateConfig;
 } // namespace cmd
 } // namespace shared
-
+class RequirementsWidget;
+class RequirementsManager;
+namespace requirement {
+class RequirementsModel;
+}
 namespace Asn1Acn {
 class Asn1SystemChecks;
 }
-
 namespace dvm {
 class AbstractSystemChecks;
 }
 
 namespace dve {
+class DVAppModel;
 
 class DVPropertiesDialog : public shared::PropertiesDialog
 {
 public:
-    DVPropertiesDialog(shared::PropertyTemplateConfig *dynPropConfig, shared::ui::VEInteractiveObject *uiObj,
-            dvm::AbstractSystemChecks *systemChecker, Asn1Acn::Asn1SystemChecks *asn1Checks,
-            shared::cmd::CommandsStackBase *commandsStack, QWidget *parent = nullptr);
+    DVPropertiesDialog(dve::DVAppModel *appModel, shared::PropertyTemplateConfig *dynPropConfig,
+            shared::ui::VEInteractiveObject *uiObj, dvm::AbstractSystemChecks *systemChecker,
+            Asn1Acn::Asn1SystemChecks *asn1Checks, shared::cmd::CommandsStackBase *commandsStack,
+            QWidget *parent = nullptr);
 
     void init() override;
 
@@ -59,9 +64,13 @@ protected:
 
 private:
     void initAttributesView();
+    void initRequirementsView();
 
     dvm::AbstractSystemChecks *m_dvChecker = nullptr;
     Asn1Acn::Asn1SystemChecks *m_asn1Checks = nullptr;
+    RequirementsWidget *m_reqWidget = nullptr;
+    RequirementsManager *m_reqManager = nullptr;
+    requirement::RequirementsModel *m_reqModel = nullptr;
 };
 
 } // namespace dve

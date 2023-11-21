@@ -81,7 +81,7 @@ bus.devices                :    |_ List of devices connected to this bus
 device                     :       |_ Instance of bus.devices (same properties as in node.devices)
 ====================================
 {% endcomment %}
-<DeploymentView version="1.2"{% if UiFile %} UiFile="{{ UiFile }}"{% endif %}{% if creatorHash %} creatorHash="{{ creatorHash }}"{% endif %}{% if modifierHash %} modifierHash="{{ modifierHash }}"{% endif %}>
+<DeploymentView version="1.2"{% if UiFile %} UiFile="{{ UiFile }}"{% endif %}{% if creatorHash %} creatorHash="{{ creatorHash }}"{% endif %}{% if modifierHash %} modifierHash="{{ modifierHash }}"{% endif %}{% if requirementsURL %} requirementsURL="{{ requirementsURL }}"{% endif %}>
 {% for node in Nodes %}
     <Node id="{{ node.id }}"{% for attr in node.attributes %} {{ attr.name }}="{{ attr.value }}"{% endfor %}>
     {% for prop in node.properties %}

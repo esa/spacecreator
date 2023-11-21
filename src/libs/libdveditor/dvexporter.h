@@ -43,11 +43,13 @@ public:
     bool exportObjects(const QList<shared::VEObject *> &objects, QIODevice *outBuffer,
             const QString &pathToTemplate = templatePath(QLatin1String("deploymentview.ui")));
 
-    bool exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &creatorGitHash, const QString &outPath = QString(),
-            const QString &pathToTemplate = QString(), QWidget *root = nullptr);
+    bool exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
+            const QString &outPath = QString(), const QString &pathToTemplate = QString(),
+            const QString &requirementsURL = QString(), QWidget *root = nullptr);
 
-    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &creatorGitHash, const QString &outPath,
-            const QString &pathToTemplate = {}, const QString &uiFile = {});
+    bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
+            const QString &outPath, const QString &pathToTemplate = {}, const QString &requirementsURL = {},
+            const QString &uiFile = {});
 
 private:
     /**
@@ -57,6 +59,8 @@ private:
      */
     QVariant createFrom(const shared::VEObject *object) const override;
     QString groupName(const shared::VEObject *object) const override;
+    QHash<QString, QVariant> collectDvObjects(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
+            const QString &requirementsURL) const;
 
     templating::UIExporter *m_uiExporter;
 };

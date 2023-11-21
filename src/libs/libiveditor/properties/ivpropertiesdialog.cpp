@@ -152,7 +152,7 @@ void IVPropertiesDialog::init()
         break;
     }
     initStyleView();
-    initRequestsView();
+    initRequirementsView();
 
     setCurrentTabIndex(0);
 }
@@ -325,7 +325,7 @@ void IVPropertiesDialog::initArchetypeView()
     insertTab(archetypesWidget, tr("Archetypes"), getTabCount());
 }
 
-void IVPropertiesDialog::initRequestsView()
+void IVPropertiesDialog::initRequirementsView()
 {
     insertTab(m_reqWidget, tr("Requirements"), getTabCount());
     m_reqModel->setCommandMacro(commandMacro());

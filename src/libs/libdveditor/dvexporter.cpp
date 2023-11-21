@@ -48,7 +48,7 @@ bool DVExporter::exportObjects(
 }
 
 bool DVExporter::exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
-        const QString &outPath, const QString &templatePath, QWidget *root)
+        const QString &outPath, const QString &templatePath, const QString &requirementsURL, QWidget *root)
 {
     QString usedTemplate(templatePath);
     if (usedTemplate.isEmpty()) {
@@ -68,15 +68,14 @@ bool DVExporter::exportObjectsInteractively(const QList<shared::VEObject *> &obj
         }
     }
 
-    QHash<QString, QVariant> dvObjects = collectObjects(objects);
+    QHash<QString, QVariant> dvObjects = collectDvObjects(objects, creatorGitHash, requirementsURL);
     dvObjects.insert(m_uiExporter->collectObjects(objects));
-    dvObjects.insert(QLatin1String("creatorHash"), QVariant::fromValue(creatorGitHash));
-    dvObjects.insert(QLatin1String("modifierHash"), QVariant::fromValue(spaceCreatorGitHash));
+
     return showExportDialog(dvObjects, usedTemplate, savePath, root);
 }
 
 bool DVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
-        const QString &outPath, const QString &pathToTemplate, const QString &uiFile)
+        const QString &outPath, const QString &pathToTemplate, const QString &requirementsURL, const QString &uiFile)
 {
     if (outPath.isEmpty()) {
         return false;
@@ -93,17 +92,14 @@ bool DVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects,
         shared::ErrorHub::addError(shared::ErrorItem::Error, saveFile.errorString());
         return false;
     }
-    QHash<QString, QVariant> dvObjects = collectObjects(objects);
+
+    QHash<QString, QVariant> dvObjects = collectDvObjects(objects, creatorGitHash, requirementsURL);
     const QHash<QString, QVariant> uiObjects = m_uiExporter->collectObjects(objects);
     if (uiFile.isEmpty()) {
         dvObjects.insert(uiObjects);
     } else {
         dvObjects.insert(QLatin1String("UiFile"), QVariant::fromValue(uiFile));
     }
-    dvObjects.insert(QLatin1String("creatorHash"),
-            QVariant::fromValue(creatorGitHash.isEmpty() ? spaceCreatorGitHash : creatorGitHash));
-    dvObjects.insert(QLatin1String("modifierHash"), QVariant::fromValue(spaceCreatorGitHash));
-
     bool result = exportData(dvObjects, usedTemplate, &saveFile);
     if (!uiFile.isEmpty()) {
         saveFile.commit();
@@ -148,6 +144,23 @@ QString DVExporter::groupName(const shared::VEObject *object) const
         }
     }
     return {};
+}
+
+/*!
+ * \brief DVExporter::collectDvObjects Returns all data objects and meta data
+ * \note Does not include UI objects
+ */
+QHash<QString, QVariant> DVExporter::collectDvObjects(
+        const QList<shared::VEObject *> &objects, const QString &creatorGitHash, const QString &requirementsURL) const
+{
+    QHash<QString, QVariant> dvObjects = collectObjects(objects);
+    dvObjects.insert(QLatin1String("creatorHash"),
+            QVariant::fromValue(creatorGitHash.isEmpty() ? spaceCreatorGitHash : creatorGitHash));
+    dvObjects.insert(QLatin1String("modifierHash"), QVariant::fromValue(spaceCreatorGitHash));
+    if (!requirementsURL.isEmpty()) {
+        dvObjects[QLatin1String("requirementsURL")] = QVariant::fromValue(requirementsURL);
+    }
+    return dvObjects;
 }
 
 } // namespace dve

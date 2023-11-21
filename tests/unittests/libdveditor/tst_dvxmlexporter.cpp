@@ -56,6 +56,7 @@ private Q_SLOTS:
     void testExportMessage();
     void testAll();
     void testExportToBuffer();
+    void testExportRequirementsURL();
 
 private:
     std::unique_ptr<dve::DVExporter> m_exporter;
@@ -484,6 +485,16 @@ void tst_DVXmlExporter::testExportToBuffer()
     m_exporter->exportObjects({}, &buffer);
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\"/>";
     QVERIFY(XmlData(expected) == XmlData(buffer.data()));
+}
+
+void tst_DVXmlExporter::testExportRequirementsURL()
+{
+    m_exporter->exportObjectsSilently(
+            {}, spaceCreatorGitHash, m_testFilePath, QString(), "htpps://some.git.lab/space/creator");
+    const QByteArray text = testFileContent();
+    const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\" "
+                                "requirementsURL=\"htpps://some.git.lab/space/creator\"/>";
+    QVERIFY(XmlData(expected) == XmlData(text));
 }
 
 QTEST_MAIN(tst_DVXmlExporter)

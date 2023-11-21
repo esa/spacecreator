@@ -322,8 +322,8 @@ bool DVEditorCore::save()
 
 bool DVEditorCore::saveAs()
 {
-    return d->m_exporter->exportObjectsInteractively(
-            d->m_appModel->objectsModel()->objects().values(), d->m_appModel->creatorGitHash(), filePath());
+    return d->m_exporter->exportObjectsInteractively(d->m_appModel->objectsModel()->objects().values(),
+            d->m_appModel->creatorGitHash(), filePath(), QString(), d->m_appModel->requirementsURL());
 }
 
 DVExporter *DVEditorCore::exporter() const
@@ -558,23 +558,30 @@ void DVEditorCore::centerOnView()
     d->m_mainWidget->centerView();
 }
 
+/*!
+ * \brief DVEditorCore::setRequirementsUrl Sets the URL (gitlab project) where the requirements are stored
+ */
 void DVEditorCore::setRequirementsUrl(const QUrl &url)
 {
-    qCritical() << "to be implemented" << Q_FUNC_INFO;
+    d->m_appModel->setRequirementsURL(url.toString());
 }
 
+/*!
+ * \brief DVEditorCore::requirementsUrl Returns the URL (gitlab project) where the requirements are stored
+ */
 const QUrl &DVEditorCore::requirementsUrl() const
 {
-    qCritical() << "to be implemented" << Q_FUNC_INFO;
     static QUrl url;
+    url = QUrl(d->m_appModel->requirementsURL());
     return url;
 }
 
 void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
     if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {
-        dve::DVPropertiesDialog dialog(d->m_dynPropConfig, d->m_model->getItem<shared::ui::VEInteractiveObject *>(id),
-                d->m_systemChecks, d->m_asn1SystemChecks, d->m_appModel->commandsStack(), d->m_mainWidget->window());
+        dve::DVPropertiesDialog dialog(d->m_appModel.get(), d->m_dynPropConfig,
+                d->m_model->getItem<shared::ui::VEInteractiveObject *>(id), d->m_systemChecks, d->m_asn1SystemChecks,
+                d->m_appModel->commandsStack(), d->m_mainWidget->window());
         dialog.init();
         dialog.exec();
     }

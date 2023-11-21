@@ -41,6 +41,7 @@ class DVAppModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY titleChanged)
+    Q_PROPERTY(QString requirementsUrl READ requirementsURL WRITE setRequirementsURL NOTIFY requirementsURLChanged)
 
 public:
     explicit DVAppModel(QObject *parent = nullptr);
@@ -60,6 +61,9 @@ public:
     QString creatorGitHash() const;
     void setCreatorGitHash(const QString &newCreatorGitHash);
 
+    void setRequirementsURL(const QString &url);
+    const QString &requirementsURL() const;
+
     dvm::DVModel *objectsModel() const;
 
     bool isDirty() const;
@@ -69,6 +73,7 @@ public:
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
     void titleChanged();
+    void requirementsURLChanged(const QString &url);
 
 private:
     struct DVAppModelPrivate;
