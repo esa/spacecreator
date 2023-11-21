@@ -51,7 +51,7 @@ public:
     QString token() const;
 
 protected:
-    void loadSavedCredentials();
+    bool loadSavedCredentials();
     void onChangeOfCredentials();
 
 protected Q_SLOTS:
@@ -59,6 +59,7 @@ protected Q_SLOTS:
     void openIssueLink(const QModelIndex &index);
     void openTokenSettingsPage();
     void toggleShowUsedRequirements();
+    void requestRequirements();
 
 Q_SIGNALS:
     void requirementSelected(QString RequirementID, bool checked);

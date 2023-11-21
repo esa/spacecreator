@@ -61,14 +61,7 @@ RequirementsWidget::RequirementsWidget(
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
 
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
-    connect(mReqManager, &RequirementsManager::requestedProjectID, this, [this](const QString &projectID) {
-        static const QString anyAssignee("");
-        static const QString anyAuthor("");
-        mReqManager->requestRequirements(projectID, anyAssignee, anyAuthor);
-        ui->serverStatusLabel->setPixmap(
-                QPixmap(":/requirementsresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
-        ui->serverStatusLabel->setToolTip(tr("Connection to the server is ok"));
-    });
+    connect(mReqManager, &RequirementsManager::connectionReady, this, &RequirementsWidget::requestRequirements);
 
     connect(mReqManager, &RequirementsManager::connectionError, this, [this](QString error) {
         ui->serverStatusLabel->setPixmap(
@@ -77,8 +70,12 @@ RequirementsWidget::RequirementsWidget(
         QMessageBox::warning(this, tr("Connection error"), tr("Connection failed for this error:\n%1").arg(error));
     });
 
-    loadSavedCredentials();
-    onLoginUpdate();
+    bool hasCredentialsStored = loadSavedCredentials();
+    if (hasCredentialsStored)
+    {
+        onLoginUpdate();
+    }
+
 
     const QString urlTooltip = tr("Set the Gitlab server URL including the project path");
     ui->urlLabel->setToolTip(urlTooltip);
@@ -93,12 +90,18 @@ RequirementsWidget::RequirementsWidget(
     ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
 }
 
-void RequirementsWidget::loadSavedCredentials()
+bool RequirementsWidget::loadSavedCredentials()
 {
-    setUrl(m_requirementsUrl);
     QSettings settings;
     auto gitlabToken = settings.value(m_requirementsUrl + "__token").toString();
+    if (m_requirementsUrl.isEmpty() || gitlabToken.isEmpty())
+    {
+        return false;
+    }
+
+    setUrl(m_requirementsUrl);
     setToken(gitlabToken);
+    return true;
 }
 RequirementsWidget::~RequirementsWidget()
 {
@@ -158,25 +161,28 @@ void RequirementsWidget::onChangeOfCredentials()
     emit requirementsUrlChanged(m_requirementsUrl);
 }
 
+void RequirementsWidget::requestRequirements()
+{
+    static const QString anyAssignee("");
+    static const QString anyAuthor("");
+    mReqManager->requestRequirements(anyAssignee, anyAuthor);
+    ui->serverStatusLabel->setPixmap(
+            QPixmap(":/requirementsresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
+    ui->serverStatusLabel->setToolTip(tr("Connection to the server is ok"));
+}
+
 void RequirementsWidget::onLoginUpdate()
 {
+
     ui->serverStatusLabel->setPixmap({});
 
-    QUrl api_url;
-    api_url.setScheme("https");
-    api_url.setHost(QUrl(ui->urlLineEdit->text()).host());
-    api_url.setPath("/api/v4/");
-
-    if (!api_url.isValid() || ui->tokenLineEdit->text().isEmpty()) {
+    if (ui->urlLineEdit->text().isEmpty() || ui->tokenLineEdit->text().isEmpty()) {
         return;
     }
 
-    mReqManager->setCredentials(api_url.toString(), ui->tokenLineEdit->text());
-
-    auto projectName = QUrl(ui->urlLineEdit->text()).path().split("/").last();
-    mReqManager->requestProjectID(projectName);
-
     ui->serverStatusLabel->setToolTip(tr("Checking connection to the server"));
+    mReqManager->setCredentials(ui->urlLineEdit->text(), ui->tokenLineEdit->text());
+
 }
 
 void RequirementsWidget::openIssueLink(const QModelIndex &index)

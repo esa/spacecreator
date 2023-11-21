@@ -26,6 +26,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 class RequirementsManager: public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString projectID READ projectID WRITE setProjectID NOTIFY connectionReady)
 public:
 
     enum class REPO_TYPE
@@ -36,17 +37,25 @@ public:
     RequirementsManager(REPO_TYPE repoType, QObject *parent = nullptr);
     ~RequirementsManager();
     void setCredentials(const QString &url, const QString &token);
-    void requestRequirements(const QString &projectID, const QString &assignee, const QString &author);
+    void requestRequirements(const QString &assignee, const QString &author);
     void createRequirement(const QString &projectID, const QString &title, const QString &description) const;
-    void requestProjectID(const QString &projectName);
+    void requestProjectID(const QUrl &url);
+    QString projectID() const;
+
+public Q_SLOTS:
+    void setProjectID(const QString &newProjectID);
 
 Q_SIGNALS:
     void startfetchingRequirements();
     void listOfRequirements(const QList<requirement::Requirement> &);
-    void requestedProjectID(QString);
+    void connectionReady();
     void connectionError(QString errorString);
 
+
 private:
+    QString m_projectID = "";
+    QUrl m_projectUrl = {};
+    QString m_token = "";
     class RequirementsManagerPrivate;
     std::unique_ptr<RequirementsManagerPrivate> d;
 };

@@ -33,7 +33,7 @@ public:
     void createIssue(const QString &projectID, const QString &title, const QString &description);
     void requestListofLabels(
             const QString &projectID, const QString &with_counts = "false", const QString &search = QString());
-    void requestProjectIdByName(const QString &projectName);
+    void requestProjectId(const QUrl &projectUrl);
 
 Q_SIGNALS:
     /**

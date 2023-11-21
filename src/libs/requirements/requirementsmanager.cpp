@@ -23,6 +23,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <issuerequestoptions.h>
 #include <qgitlabclient.h>
 
+#include <QDir>
+
 struct RequirementsManager::RequirementsManagerPrivate {
     RequirementsManagerPrivate(RequirementsManager::REPO_TYPE repoType)
         : mRepoType(repoType)
@@ -61,11 +63,27 @@ RequirementsManager::~RequirementsManager() { }
 
 void RequirementsManager::setCredentials(const QString &url, const QString &token)
 {
-    auto _url = QUrl(url);
+    if (m_projectUrl == url && token == m_token)
+    {
+        Q_EMIT connectionReady();
+        return;
+    }
+
+    m_projectUrl = url;
+    m_token = token;
+    m_projectID.clear();
+
+    QUrl _url;
+    _url.setScheme("https");
+    _url.setHost(QUrl(url).host());
+    _url.setPath("/api/v4/");
+
+
     d->gitlabClient->setCredentials(_url.scheme() + "://" + _url.host(), token);
+    requestProjectID(url);
 }
 
-void RequirementsManager::requestRequirements(const QString &projectID, const QString &assignee, const QString &author)
+void RequirementsManager::requestRequirements(const QString &assignee, const QString &author)
 {
     switch (d->mRepoType) {
     case (REPO_TYPE::GITLAB): {
@@ -74,7 +92,7 @@ void RequirementsManager::requestRequirements(const QString &projectID, const QS
         options.mAuthor = author.toUtf8();
         options.mLabels = { "requirement" };
         Q_EMIT startfetchingRequirements();
-        d->gitlabClient->requestIssues(projectID, options);
+        d->gitlabClient->requestIssues(m_projectID, options);
         break;
     }
     default:
@@ -95,17 +113,30 @@ void RequirementsManager::createRequirement(
     }
 }
 
-void RequirementsManager::requestProjectID(const QString &projectName)
+void RequirementsManager::requestProjectID(const QUrl &url)
 {
     switch (d->mRepoType) {
     case(REPO_TYPE::GITLAB):
     {
-        d->gitlabClient->requestProjectIdByName(projectName);
+        d->gitlabClient->requestProjectId(url);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::requestedProjectID, this,
-                &RequirementsManager::requestedProjectID, Qt::UniqueConnection);
+                &RequirementsManager::setProjectID, Qt::UniqueConnection);
         break;
     }
     default:
         qDebug() << "unknown repository type";
     }
+}
+
+QString RequirementsManager::projectID() const
+{
+    return m_projectID;
+}
+
+void RequirementsManager::setProjectID(const QString &newProjectID)
+{
+    if (m_projectID == newProjectID)
+        return;
+    m_projectID = newProjectID;
+    Q_EMIT connectionReady();
 }

@@ -3,6 +3,7 @@
 #include "issuerequestoptions.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -114,10 +115,11 @@ void QGitlabClient::requestListofLabels(const QString &projectID, const QString 
     });
 }
 
-void QGitlabClient::requestProjectIdByName(const QString &projectName)
+void QGitlabClient::requestProjectId(const QUrl &projectUrl)
 {
+    auto projectName = QDir(QUrl(projectUrl).path()).dirName();
     auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectUrl(projectName));
-    connect(reply, &QNetworkReply::finished, [reply, this]() {
+    connect(reply, &QNetworkReply::finished, [reply,projectUrl, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
@@ -129,8 +131,20 @@ void QGitlabClient::requestProjectIdByName(const QString &projectName)
                 auto content = replyContent.array();
                 if (!content.isEmpty()) {
                     static const auto ID = "id";
-                    auto projectID = QString::number(content.at(0).toObject().value("id").toInteger());
-                    Q_EMIT requestedProjectID(projectID);
+                    QString projectID;
+                    for (const auto item: content)
+                    {
+                        if (item.toObject().value("web_url").toString() == projectUrl.toString())
+                        {
+                            projectID = QString::number(item.toObject().value("id").toInteger());
+                            Q_EMIT requestedProjectID(projectID);
+                            break;
+                        }
+                    }
+
+
+
+
                 }
             }
         } else {
