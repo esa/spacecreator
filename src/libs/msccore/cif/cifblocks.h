@@ -196,5 +196,16 @@ public:
     CifLine::CifType blockType() const override;
 };
 
+class CifBlockRequirementsUrl : public CifBlock
+{
+public:
+    explicit CifBlockRequirementsUrl(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
+
+    CifLine::CifType blockType() const override;
+};
+
 } // ns cif
 } // ns msc

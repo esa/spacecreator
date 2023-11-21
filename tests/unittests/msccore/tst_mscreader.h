@@ -58,6 +58,7 @@ private Q_SLOTS:
     void testMessageDeclaration();
     void testNameFiltering();
     void testRequirements();
+    void testRequirementsUrl();
 
     // Instance create tests - in tst_msccreateparsing
     void testInstanceCreate();

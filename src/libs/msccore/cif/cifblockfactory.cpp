@@ -78,6 +78,8 @@ CifBlockShared CifBlockFactory::createBlock(const QVector<CifLineShared> &lines)
         return CifBlockCreatorHelper().create<CifBlockTimeout>(lines);
     case CifLine::CifType::Requirement:
         return CifBlockCreatorHelper().create<CifBlockRequirement>(lines);
+    case CifLine::CifType::RequirementsUrl:
+        return CifBlockCreatorHelper().create<CifBlockRequirementsUrl>(lines);
     default:
         break;
     }

@@ -121,6 +121,18 @@ MscModel *MscReader::parse(ANTLRInputStream &input, QStringList *errorMessages)
             checkDocumentHierarchy(doc);
         }
     }
+
+    // Extract requirements url
+    MscEntity *entity = model->firstEntity();
+    QVector<cif::CifBlockShared> cifs = entity->cifs();
+    for (const cif::CifBlockShared &block : cifs) {
+        if (block->blockType() == cif::CifLine::CifType::RequirementsUrl) {
+            model->setRequirementsUrl(block->payload().toUrl());
+            break;
+        }
+    }
+    model->removeRequirementsUrlFromFirstEntity();
+
     return model;
 }
 

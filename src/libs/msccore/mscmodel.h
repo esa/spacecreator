@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QPointer>
 #include <QStringList>
+#include <QUrl>
 #include <QVector>
 #include <conversion/common/model.h>
 #include <memory>
@@ -29,10 +30,15 @@ class Asn1SystemChecks;
 }
 
 namespace msc {
+
+class MscEntity;
 class MscChart;
 class MscDocument;
 class MscMessage;
 
+/*!
+ * \brief The MscModel class represents all data of a .msc (message sequence chart) file
+ */
 class MscModel : public QObject, public conversion::Model
 {
     Q_OBJECT
@@ -42,6 +48,7 @@ class MscModel : public QObject, public conversion::Model
     Q_PROPERTY(QVector<msc::MscDocument *> documents READ documents NOTIFY dataChanged)
     Q_PROPERTY(QVector<msc::MscChart *> charts READ charts NOTIFY dataChanged)
     Q_PROPERTY(QString filename READ filename WRITE setFilename NOTIFY filenameChanged)
+    Q_PROPERTY(QUrl requirementsUrl READ requirementsUrl WRITE setRequirementsUrl NOTIFY requirementsUrlChanged)
 
 public:
     explicit MscModel(QObject *parent = nullptr);
@@ -62,6 +69,7 @@ public:
     void addChart(MscChart *chart);
 
     msc::MscChart *firstChart() const;
+    msc::MscEntity *firstEntity() const;
 
     QVector<MscDocument *> allDocuments() const;
     QVector<MscChart *> allCharts() const;
@@ -83,6 +91,11 @@ public:
     bool checkMessageAsn1Compliance(const msc::MscMessage &message) const;
     bool checkAllMessagesForAsn1Compliance(QStringList *faultyMessages = nullptr) const;
 
+    void setRequirementsUrl(const QUrl &url);
+    const QUrl &requirementsUrl() const;
+    void addRequirementsUrlToFirstEntity();
+    void removeRequirementsUrlFromFirstEntity();
+
 Q_SIGNALS:
     void dataChanged();
     void documentAdded(msc::MscDocument *document);
@@ -91,6 +104,7 @@ Q_SIGNALS:
     void dataLanguageChanged(const QString &dataLanguage);
     void dataDefinitionStringChanged(const QString &dataString);
     void asn1DataChanged();
+    void requirementsUrlChanged();
     void filenameChanged();
 
     // Emitted whenever a document is removed anywhere in the model
@@ -106,6 +120,7 @@ private:
     QString m_dataDefinitionString;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asnChecks;
     QString m_filename;
+    QUrl m_requirementsUrl;
 };
 
 } // namespace msc

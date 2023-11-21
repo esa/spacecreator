@@ -273,7 +273,7 @@ cif::CifBlockShared MscEntity::requirementsCifBlock() const
 QByteArrayList MscEntity::requirementsFromCifBlock(const cif::CifBlockShared &cif) const
 {
     const QVariant &variant = cif->payload(cif::CifLine::CifType::Requirement);
-    QByteArray data = variant.toString().toUtf8();
+    const QByteArray data = variant.toString().toUtf8();
     if (data.isEmpty()) {
         return {};
     }

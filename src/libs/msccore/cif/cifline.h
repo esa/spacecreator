@@ -64,7 +64,8 @@ public:
         GlobalComment,
         Concurrent,
         Requirement,
-        Unknown
+        RequirementsUrl,
+        Unknown,
     };
     Q_ENUM(CifType)
 
@@ -141,5 +142,16 @@ public:
     {
     }
 };
-} // ns cif
+
+/**
+ * A CIF line containing a single line of raw text
+ */
+class CifTextLineHolder : public CifLinePointsHolder
+{
+public:
+    bool initFrom(const QString &sourceLine) override;
+    QString payloadToString() const override;
+};
+
+} // ns cifT
 } // ns msc

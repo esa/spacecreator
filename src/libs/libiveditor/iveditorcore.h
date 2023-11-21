@@ -95,6 +95,9 @@ public:
 
     void centerOnView();
 
+    void setRequirementsUrl(const QUrl &url) override;
+    const QUrl &requirementsUrl() const override;
+
 public Q_SLOTS:
     void onSaveRenderRequested();
 

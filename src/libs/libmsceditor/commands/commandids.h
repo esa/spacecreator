@@ -51,7 +51,9 @@ enum Id
     SetAsn1File,
     ChangeInstancePosition,
     EditMessagePoints,
-    LastId
+    LastId,
+    UpdateEntityRequirements,
+    SetRequirementsUrl
 };
 
 } // ns cmd

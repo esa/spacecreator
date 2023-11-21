@@ -521,6 +521,24 @@ void IVEditorCore::centerOnView()
     m_mainWidget->centerView();
 }
 
+void IVEditorCore::setRequirementsUrl(const QUrl &url)
+{
+    const QUrl oldUrl(url.toString());
+    if (url == oldUrl) {
+        return;
+    }
+
+    m_document->setRequirementsURL(url.toString());
+    Q_EMIT requirementsUrlChanged();
+}
+
+const QUrl &IVEditorCore::requirementsUrl() const
+{
+    static QUrl url;
+    url = QUrl(m_document->requirementsURL());
+    return url;
+}
+
 /*!
  * \brief Return the list of image formats which the Qt is available to write.
  */

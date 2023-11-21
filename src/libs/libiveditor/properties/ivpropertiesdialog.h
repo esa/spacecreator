@@ -20,8 +20,6 @@
 #include "ivobject.h"
 #include "propertiesdialog.h"
 
-#include <ui/requirementswidget.h>
-
 #include <QPointer>
 
 class RequirementsWidget;

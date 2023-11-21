@@ -98,6 +98,9 @@ public:
     QString filePath() const override;
     bool save() override;
 
+    void setRequirementsUrl(const QUrl &url) override;
+    const QUrl &requirementsUrl() const override;
+
 public Q_SLOTS:
     void selectCurrentChart();
     void openMessageDeclarationEditor(QWidget *parentwidget);

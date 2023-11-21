@@ -35,7 +35,7 @@ const int kIconSize = 16;
 }
 
 RequirementsWidget::RequirementsWidget(
-        const QByteArray &requirementsUrl, RequirementsManager *manager, QAbstractItemModel *model, QWidget *parent)
+        const QByteArray &requirementsUrl, RequirementsManager *manager, RequirementsModelBase *model, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::RequirementsWidget)
     , mReqManager(manager)
@@ -105,14 +105,37 @@ RequirementsWidget::~RequirementsWidget()
     delete ui;
 }
 
+/*!
+ * \brief RequirementsWidget::setUrl Sets the URL to fetch the requiremenst from
+ */
 void RequirementsWidget::setUrl(const QString &url)
 {
     ui->urlLineEdit->setText(url);
 }
 
+/*!
+ * \brief RequirementsWidget::url Returns the URL to fetch the requiremenst from
+ */
+QUrl RequirementsWidget::url() const
+{
+    return QUrl(ui->urlLineEdit->text());
+}
+
+/*!
+ * \brief RequirementsWidget::setToken Sets the token to authenticate for fetching the requirements
+ * \note The token is stored in the settings and used from there when fetching the data
+ */
 void RequirementsWidget::setToken(const QString &token)
 {
     ui->tokenLineEdit->setText(token);
+}
+
+/*!
+ * \brief RequirementsWidget::token Returns the token to authenticate for fetching the requirements
+ */
+QString RequirementsWidget::token() const
+{
+    return ui->urlLineEdit->text();
 }
 
 void RequirementsWidget::onChangeOfCredentials()

@@ -18,14 +18,18 @@
 #include "mscappwidget.h"
 
 #include "commands/cmdsetasn1file.h"
+#include "commands/cmdsetrequirementsurl.h"
+#include "commands/cmdupdateentityrequirements.h"
 #include "documentitemmodel.h"
 #include "hierarchyview/hierarchyviewmodel.h"
 #include "mainmodel.h"
 #include "msccommandsstack.h"
 #include "msceditorcore.h"
+#include "mscentity.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
 #include "mscmodel.h"
+#include "mscrequirementsdialog.h"
 #include "systemchecks.h"
 #include "tools/actioncreatortool.h"
 #include "tools/basetool.h"
@@ -56,7 +60,7 @@ static const char *HIERARCHY_TYPE_TAG = "hierarchyTag";
 
 MscAppWidget::MscAppWidget(MSCEditorCore *mscCore, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::MSCAppWidget)
+    , ui(new ::Ui::MSCAppWidget)
     , m_mscCore(mscCore)
 {
     ui->setupUi(this);
@@ -290,6 +294,7 @@ void MscAppWidget::initConnections()
     connect(ui->documentTree->selectionModel(), &QItemSelectionModel::currentChanged, this,
             &MscAppWidget::showSelection);
     connect(ui->documentTree, &QTreeView::doubleClicked, this, &MscAppWidget::showChart);
+    connect(ui->documentTree, &DocumentTreeView::editRequirements, this, &MscAppWidget::showRequirements);
 
     connect(mainModel(), &msc::MainModel::selectedDocumentChanged, ui->documentTree,
             &msc::DocumentTreeView::setSelectedDocument);
@@ -457,6 +462,28 @@ void MscAppWidget::showHierarchyView(bool show)
         setViewMode(ViewMode::HIERARCHY);
     } else {
         showDocumentView(true);
+    }
+}
+
+/*!
+ * \brief MscAppWidget::showRequirements Opens the dialog to edit the requirements information
+ * \param entity The entity that the requirements should be linked to
+ */
+void MscAppWidget::showRequirements(MscEntity *entity)
+{
+    MscRequirementsDialog dialog(m_mscCore->requirementsUrl(), entity, this);
+    int ret = dialog.exec();
+    if (ret == QDialog::Accepted) {
+        msc::MscCommandsStack *undoStack = m_mscCore->commandsStack();
+        undoStack->beginMacro(tr("Update requrirements"));
+        const QByteArrayList ids = dialog.selectedRequirements();
+        if (ids != entity->requirements()) {
+            undoStack->push(new cmd::CmdUpdateEntityRequirements(entity, ids));
+        }
+        if (dialog.url() != m_mscCore->requirementsUrl()) {
+            undoStack->push(new cmd::CmdSetRequirementsUrl(m_mscCore, dialog.url()));
+        }
+        undoStack->endMacro();
     }
 }
 

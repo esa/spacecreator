@@ -115,10 +115,14 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdsetmessagedeclarations.h
     commands/cmdsetparameterlist.cpp
     commands/cmdsetparameterlist.h
+    commands/cmdsetrequirementsurl.cpp
+    commands/cmdsetrequirementsurl.h
     commands/cmdtimeritemcreate.cpp
     commands/cmdtimeritemcreate.h
     commands/cmdtimeritemmove.cpp
     commands/cmdtimeritemmove.h
+    commands/cmdupdateentityrequirements.cpp
+    commands/cmdupdateentityrequirements.h
     commands/commandids.h
     commands/eventmovebasecommand.cpp
     commands/eventmovebasecommand.h
@@ -150,6 +154,9 @@ target_sources(${LIB_NAME} PRIVATE
     msceditorcore.cpp
     msceditorcore.h
     msceditorresources.qrc
+    mscrequirementsdialog.cpp
+    mscrequirementsdialog.h
+    mscrequirementsdialog.ui
     remotecontrol/remotecontrolhandler.cpp
     remotecontrol/remotecontrolhandler.h
     systemchecks.cpp
@@ -196,6 +203,7 @@ target_link_libraries(${LIB_NAME}
     ivcore
     shared
     asn1editor
+    requirements
     ${QT_CORE}
     ${QT_GUI}
     ${QT_NETWORK}

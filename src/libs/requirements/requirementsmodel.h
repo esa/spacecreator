@@ -19,8 +19,7 @@ along with this program. If not, see
 #pragma once
 
 #include "commandsstackbase.h"
-#include "propertytemplate.h"
-#include "requirement.h"
+#include "requirementsmodelbase.h"
 
 #include <QAbstractTableModel>
 #include <QList>
@@ -32,70 +31,30 @@ class VEObject;
 
 namespace requirement {
 
-/**
- * @brief Model to hold requirements for a Qt view
+/*!
+ * \brief Model to hold requirements for a Qt view to operate on a VE object directly.
+ * \note The data is changed in the model via undo directly after the click
  */
-class RequirementsModel : public QAbstractTableModel
+class RequirementsModel : public RequirementsModelBase
 {
     Q_OBJECT
 
 public:
-    enum RoleNames
-    {
-        IssueLinkRole = Qt::UserRole + 1
-    };
-
-    enum HEADER_SECTIONS
-    {
-        REQUIREMENT_ID = 0,
-        DESCRIPTION = 1,
-        CHECKED = 2
-    };
-
     explicit RequirementsModel(QObject *parent = nullptr);
 
-    void clear();
-
-    /**
-     * Replaces the set of existing requirements with the given one
-     */
-    void setRequirements(const QList<Requirement> &requirements);
-    /**
-     * Appends the given @p requiremnets to the existing ones
-     */
-    void addRequirements(const QList<requirement::Requirement> &requirements);
-
-    // Header:
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-    // Basic functionality:
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     void setDataObject(shared::VEObject *obj);
     void setCommandMacro(shared::cmd::CommandsStackBase::Macro *macro);
     void setPropertyTemplateConfig(shared::PropertyTemplateConfig *dynPropConfig);
 
-    /**
-     * @brief setAttributeName Set the anme of the requirements attribute of the object
-     * @note Default is "requests_ids"
-     */
     void setAttributeName(const QString &name);
 
 protected:
-    QString getIdFromModelIndex(const QModelIndex &index) const;
     shared::cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
     shared::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
-
-private:
-    QList<Requirement> m_requirements;
     shared::VEObject *m_dataObject { nullptr };
-    QSet<QString> m_selected_requirements;
     QString m_attributeName = "requests_ids";
 };
 

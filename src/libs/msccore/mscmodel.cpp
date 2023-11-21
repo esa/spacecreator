@@ -18,6 +18,8 @@
 #include "mscmodel.h"
 
 #include "asn1systemchecks.h"
+#include "cifblockfactory.h"
+#include "ciflines.h"
 #include "errorhub.h"
 #include "mscchart.h"
 #include "mscdocument.h"
@@ -25,6 +27,7 @@
 #include "mscmessagedeclarationlist.h"
 
 #include <QDebug>
+#include <algorithm>
 
 namespace msc {
 
@@ -152,6 +155,22 @@ MscChart *MscModel::firstChart() const
     return firstChart(m_documents);
 }
 
+/*!
+ * Returns the first document. If there is no document, it returns the first chart;
+ */
+MscEntity *MscModel::firstEntity() const
+{
+    if (!m_documents.isEmpty()) {
+        return m_documents[0];
+    }
+
+    if (!m_charts.isEmpty()) {
+        return m_charts[0];
+    }
+
+    return nullptr;
+}
+
 void addChildDocuments(msc::MscDocument *doc, QVector<MscDocument *> &allDocs)
 {
     allDocs += doc->documents();
@@ -249,6 +268,7 @@ void MscModel::clear()
     m_charts.clear();
 
     setDataLanguage("");
+    setRequirementsUrl(QUrl());
 
     Q_EMIT cleared();
     Q_EMIT dataChanged();
@@ -349,6 +369,78 @@ bool MscModel::checkAllMessagesForAsn1Compliance(QStringList *faultyMessages) co
     }
 
     return ok;
+}
+
+/*!
+ * Sets the URL where requirements are stored
+ */
+void MscModel::setRequirementsUrl(const QUrl &url)
+{
+    if (url == m_requirementsUrl) {
+        return;
+    }
+
+    m_requirementsUrl = url;
+    Q_EMIT requirementsUrlChanged();
+}
+
+/*!
+ * Returns the URL where requirements are stored
+ */
+const QUrl &MscModel::requirementsUrl() const
+{
+    return m_requirementsUrl;
+}
+
+/*!
+ * Add the information of the URL where the requirements are stored as CIF information to the first entity
+ */
+void MscModel::addRequirementsUrlToFirstEntity()
+{
+    MscEntity *entity = firstEntity();
+    if (!entity) {
+        return;
+    }
+
+    if (!m_requirementsUrl.isValid()) {
+        removeRequirementsUrlFromFirstEntity();
+        return;
+    }
+
+    // If the requirements url block is there already, update it
+    QVector<cif::CifBlockShared> cifs = entity->cifs();
+    for (const cif::CifBlockShared &block : cifs) {
+        if (block->blockType() == cif::CifLine::CifType::RequirementsUrl) {
+            block->setPayload(m_requirementsUrl, cif::CifLine::CifType::RequirementsUrl);
+            return;
+        }
+    }
+
+    // no requirements url block there yet, so add it
+    cif::CifBlockShared requirementsUrlCif =
+            cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineRequirementsUrl()) });
+    requirementsUrlCif->setPayload(QVariant::fromValue(m_requirementsUrl), cif::CifLine::CifType::RequirementsUrl);
+    cifs.append(requirementsUrlCif);
+    entity->setCifs(cifs);
+}
+
+/*!
+ * Removes the CIF information of the requirements URL from the first entity
+ */
+void MscModel::removeRequirementsUrlFromFirstEntity()
+{
+    MscEntity *entity = firstEntity();
+    if (!entity) {
+        return;
+    }
+
+    QVector<cif::CifBlockShared> cifs = entity->cifs();
+    auto it = std::remove_if(cifs.begin(), cifs.end(), [](const cif::CifBlockShared &block) {
+        return block->blockType() == cif::CifLine::CifType::RequirementsUrl;
+    });
+    cifs.erase(it, cifs.end());
+
+    entity->setCifs(cifs);
 }
 
 void MscModel::appendMessages(msc::MscDocument *doc, QVector<msc::MscMessage *> &messages) const

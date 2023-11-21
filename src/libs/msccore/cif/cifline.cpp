@@ -17,6 +17,8 @@
 
 #include "cifline.h"
 
+#include "cifparser.h"
+
 #include <QDebug>
 #include <QMetaEnum>
 #include <QRegularExpression>
@@ -182,6 +184,22 @@ QString CifLinePointsHolder::payloadToString() const
         result += QString("(%1, %2)").arg(QString::number(point.x()), QString::number(point.y()));
     }
     return result;
+}
+
+bool CifTextLineHolder::initFrom(const QString &sourceLine)
+{
+    m_sourceLine = sourceLine;
+    if (m_sourceLine.isEmpty()) {
+        return false;
+    }
+    const QString line = QString(sourceLine).remove(CifParser::CifLineTag).remove(nameForType(lineType()));
+    setPayload(line.trimmed());
+    return !line.isEmpty();
+}
+
+QString CifTextLineHolder::payloadToString() const
+{
+    return payload().toString();
 }
 
 } // ns cif

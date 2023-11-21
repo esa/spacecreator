@@ -18,6 +18,8 @@ target_sources(${LIB_NAME} PRIVATE
   requirementslibrary.h
   requirementsmanager.cpp
   requirementsmanager.h
+  requirementsmodelbase.cpp
+  requirementsmodelbase.h
   requirementsmodel.cpp
   requirementsmodel.h
   ui/requirementswidget.cpp

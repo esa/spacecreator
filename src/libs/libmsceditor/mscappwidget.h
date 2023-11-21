@@ -29,18 +29,20 @@ class MSCAppWidget;
 }
 
 namespace msc {
-class GraphicsView;
-class MainModel;
-class MSCEditorCore;
+
 class ActionCreatorTool;
 class BaseTool;
 class CommentCreatorTool;
 class ConditionCreatorTool;
 class CoregionCreatorTool;
 class EntityDeleteTool;
+class GraphicsView;
 class InstanceCreatorTool;
 class InstanceStopTool;
+class MSCEditorCore;
+class MainModel;
 class MessageCreatorTool;
+class MscEntity;
 class PointerTool;
 class TimerCreatorTool;
 
@@ -83,6 +85,7 @@ public Q_SLOTS:
     void setViewMode(msc::MscAppWidget::ViewMode mode);
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
+    void showRequirements(msc::MscEntity *entity);
     void activateDefaultTool();
     void checkGlobalComment();
     void checkInstances();

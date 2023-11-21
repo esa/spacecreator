@@ -45,6 +45,7 @@
 #include "propertiesviewbase.h"
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
+#include "ui/requirementswidget.h"
 #include "ui/veinteractiveobject.h"
 
 #include <QDebug>

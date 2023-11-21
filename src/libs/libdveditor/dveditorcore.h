@@ -110,6 +110,9 @@ public:
 
     void centerOnView();
 
+    void setRequirementsUrl(const QUrl &url) override;
+    const QUrl &requirementsUrl() const override;
+
 private Q_SLOTS:
     void showPropertyEditor(const shared::Id &id);
     void showInfoMessage(const QString &title, const QString &message);

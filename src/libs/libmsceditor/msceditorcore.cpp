@@ -395,6 +395,22 @@ bool MSCEditorCore::save()
 }
 
 /*!
+ * \brief MSCEditorCore::setRequirementsUrl sets the URL where to fetch the requirements for the entities from
+ */
+void MSCEditorCore::setRequirementsUrl(const QUrl &url)
+{
+    m_model->mscModel()->setRequirementsUrl(url);
+}
+
+/*!
+ * \brief MSCEditorCore::requirementsUrl returns the URL where to fetch the requirements for the entities from
+ */
+const QUrl &MSCEditorCore::requirementsUrl() const
+{
+    return m_model->mscModel()->requirementsUrl();
+}
+
+/*!
  * \brief msc::MSCEditorCore::selectCurrentChart Set the current chart as the currently selected.
  */
 void MSCEditorCore::selectCurrentChart()

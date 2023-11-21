@@ -32,6 +32,9 @@ class InterfaceDocument;
 }
 
 class RequirementsManager;
+namespace requirement {
+class RequirementsModelBase;
+}
 
 class RequirementsWidget : public QWidget
 {
@@ -39,11 +42,13 @@ class RequirementsWidget : public QWidget
 
 public:
     explicit RequirementsWidget(const QByteArray &requirementsUrl, RequirementsManager *manager,
-            QAbstractItemModel *model, QWidget *parent = nullptr);
+            requirement::RequirementsModelBase *model, QWidget *parent = nullptr);
     ~RequirementsWidget();
 
     void setUrl(const QString &url);
+    QUrl url() const;
     void setToken(const QString &token);
+    QString token() const;
 
 protected:
     void loadSavedCredentials();
@@ -62,7 +67,7 @@ Q_SIGNALS:
 private:
     Ui::RequirementsWidget *ui;
     QPointer<RequirementsManager> mReqManager;
-    QPointer<QAbstractItemModel> m_model;
+    QPointer<requirement::RequirementsModelBase> m_model;
     QSortFilterProxyModel m_filterModel;
     shared::CheckedFilterProxyModel m_checkedModel;
     QByteArray m_requirementsUrl;

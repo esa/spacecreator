@@ -199,13 +199,10 @@ public:
     QVariant payload() const override;
     void setPayload(const QVariant &p) override;
 };
-class CifLineTextName : public CifLine
+class CifLineTextName : public CifTextLineHolder
 {
 public:
     CifLine::CifType lineType() const override;
-    bool initFrom(const QString &sourceLine) override;
-    QVariant payload() const override;
-    void setPayload(const QVariant &p) override;
 };
 class CifLineGlobalComment : public CifLine
 {
@@ -215,12 +212,15 @@ public:
     QString payloadToString() const override;
     QString toString(int tabsSize) const override;
 };
-class CifLineRequirement : public CifLine
+class CifLineRequirement : public CifTextLineHolder
 {
 public:
     CifLine::CifType lineType() const override;
-    bool initFrom(const QString &sourceLine) override;
-    QString payloadToString() const override;
+};
+class CifLineRequirementsUrl : public CifTextLineHolder
+{
+public:
+    CifLine::CifType lineType() const override;
 };
 
 } // ns cif

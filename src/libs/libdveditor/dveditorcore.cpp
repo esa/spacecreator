@@ -57,6 +57,7 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QUndoCommand>
+#include <QUrl>
 
 namespace dve {
 
@@ -555,6 +556,18 @@ void DVEditorCore::updateFunctionImplementationList(const QString &functionName)
 void DVEditorCore::centerOnView()
 {
     d->m_mainWidget->centerView();
+}
+
+void DVEditorCore::setRequirementsUrl(const QUrl &url)
+{
+    qCritical() << "to be implemented" << Q_FUNC_INFO;
+}
+
+const QUrl &DVEditorCore::requirementsUrl() const
+{
+    qCritical() << "to be implemented" << Q_FUNC_INFO;
+    static QUrl url;
+    return url;
 }
 
 void DVEditorCore::showPropertyEditor(const shared::Id &id)

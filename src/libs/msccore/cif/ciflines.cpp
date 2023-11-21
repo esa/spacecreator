@@ -332,26 +332,6 @@ CifLine::CifType CifLineTextName::lineType() const
 {
     return CifLine::CifType::TextName;
 }
-bool CifLineTextName::initFrom(const QString &sourceLine)
-{
-    m_sourceLine = sourceLine;
-
-    if (m_sourceLine.isEmpty())
-        return false;
-
-    const QString line = QString(sourceLine).remove(CifParser::CifLineTag).remove(nameForType(lineType()));
-    setPayload(line.trimmed());
-
-    return !line.isEmpty();
-}
-QVariant CifLineTextName::payload() const
-{
-    return CifLine::payload();
-}
-void CifLineTextName::setPayload(const QVariant &p)
-{
-    return CifLine::setPayload(p);
-}
 
 CifLine::CifType CifLineGlobalComment::lineType() const
 {
@@ -383,22 +363,9 @@ CifLine::CifType CifLineRequirement::lineType() const
     return CifLine::CifType::Requirement;
 }
 
-bool CifLineRequirement::initFrom(const QString &sourceLine)
+CifLine::CifType CifLineRequirementsUrl::lineType() const
 {
-    m_sourceLine = sourceLine;
-    const QString typeString = CifLine::nameForType(CifLine::CifType::Requirement);
-    int idx = sourceLine.indexOf(typeString);
-    if (idx >= 0) {
-        idx += typeString.size();
-        const QString payload = sourceLine.right(sourceLine.size() - idx);
-        setPayload(payload.trimmed());
-    }
-    return !m_sourceLine.isEmpty();
-}
-
-QString CifLineRequirement::payloadToString() const
-{
-    return payload().toString();
+    return CifLine::CifType::RequirementsUrl;
 }
 
 } // ns cif

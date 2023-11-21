@@ -104,5 +104,10 @@ CifLine::CifType CifBlockRequirement::blockType() const
     return CifLine::CifType::Requirement;
 }
 
+CifLine::CifType CifBlockRequirementsUrl::blockType() const
+{
+    return CifLine::CifType::RequirementsUrl;
+}
+
 } // ns cif
 } // ns msc

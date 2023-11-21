@@ -128,26 +128,32 @@ bool MscWriter::saveChart(const MscChart *chart, const QString &fileName)
  */
 QString MscWriter::modelText(MscModel *model)
 {
-    if (m_saveMode == SaveMode::GRANTLEE) {
-        return exportGrantlee(model, QString());
+    if (!model) {
+        return QString();
     }
 
-    setModel(model);
+    model->addRequirementsUrlToFirstEntity();
 
     QString text;
-    QTextStream out(&text);
-
-    if (!model->documents().isEmpty()) {
-        for (MscDocument *doc : model->documents()) {
-            out << serialize(doc);
-        }
+    if (m_saveMode == SaveMode::GRANTLEE) {
+        text = exportGrantlee(model, QString());
     } else {
-        for (const auto *chart : model->charts()) {
-            out << serialize(chart);
+        setModel(model);
+        QTextStream out(&text);
+        if (!model->documents().isEmpty()) {
+            for (MscDocument *doc : model->documents()) {
+                out << serialize(doc);
+            }
+        } else {
+            for (const auto *chart : model->charts()) {
+                out << serialize(chart);
+            }
         }
+        setModel(nullptr);
     }
 
-    setModel(nullptr);
+    model->removeRequirementsUrlFromFirstEntity();
+
     return text;
 }
 

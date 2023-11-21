@@ -27,7 +27,7 @@
 #include "msceditorcore.h"
 #include "msclibrary.h"
 #include "mscproject.h"
-#include "mscwriter.h"
+#include "requirementslibrary.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
 #include "templatinglibrary.h"
@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     msc::initMscEditor();
     ive::initIVEditor();
     ivm::initIVLibrary();
+    requirement::initRequirementsLibrary();
     templating::initTemplatingLibrary();
 
     QApplication a(argc, argv);

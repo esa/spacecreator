@@ -75,6 +75,7 @@ private Q_SLOTS:
     void testParsingCifLineTextMode();
     void testParsingCifLineTextName();
     void testParsingCifLineRequirement();
+    void testParsingCifLineRequirementsUrl();
 
     void testParsingCifBlockAction();
     void testParsingCifBlockCall();
@@ -106,6 +107,7 @@ private Q_SLOTS:
     void testParsingCifBlockTextMode();
     void testParsingCifBlockTextName();
     void testParsingCifBlockRequirement();
+    void testParsingCifBlockRequirementsUrl();
 
     void testParsingCifAtDocumentFront();
     void testIgnoreUnknownCif();
@@ -238,6 +240,10 @@ void tst_CifParser::createCifLine(CifLine::CifType cif, QString &outLine)
     case CifLine::CifType::Requirement:
         cifLine = lineTemplate.arg(
                 QString("%1 ab1d-ef72,238f-007b").arg(CifLine::nameForType(CifLine::CifType::Requirement)));
+        break;
+    case CifLine::CifType::RequirementsUrl:
+        cifLine = lineTemplate.arg(QString("%1 https://some.git.lab/owesome/project")
+                                           .arg(CifLine::nameForType(CifLine::CifType::RequirementsUrl)));
         break;
 
     default:
@@ -429,6 +435,11 @@ void tst_CifParser::testParsingCifLineTextName()
 void tst_CifParser::testParsingCifLineRequirement()
 {
     testParsingCifLine(CifLine::CifType::Requirement);
+}
+
+void tst_CifParser::testParsingCifLineRequirementsUrl()
+{
+    testParsingCifLine(CifLine::CifType::RequirementsUrl);
 }
 
 void tst_CifParser::testParsingCifBlock(const QVector<QVector<CifLine::CifType>> &blocks)
@@ -697,6 +708,11 @@ void tst_CifParser::testParsingCifBlockTextName()
 }
 
 void tst_CifParser::testParsingCifBlockRequirement()
+{
+    QSKIP(qPrintable(QString("Not implemented yet")));
+}
+
+void tst_CifParser::testParsingCifBlockRequirementsUrl()
 {
     QSKIP(qPrintable(QString("Not implemented yet")));
 }

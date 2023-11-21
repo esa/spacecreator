@@ -65,7 +65,7 @@ private Q_SLOTS:
     void testSerializeMscMessage();
     void testSerializeMscTimer_data();
     void testSerializeMscTimer();
-    void testRequirements();
+    void testSerializeRequirements();
 
 private:
     QString removeIndention(const QString &text) const;
@@ -1081,26 +1081,24 @@ void tst_MscWriter::testSerializeMscTimer()
     QCOMPARE(text, resultGrantLee);
 }
 
-void tst_MscWriter::testRequirements()
+void tst_MscWriter::testSerializeRequirements()
 {
-    auto model = new MscModel(this);
-    auto chart = new MscChart("Chart_1");
-    auto instance = new MscInstance("Inst_1");
-    instance->setRequirements({ "ab1d-ef72", "238f-007b" });
-    chart->addInstance(instance);
-    model->addChart(chart);
-    const auto result = QString("msc Chart_1;\n"
-                                "    /* CIF REQUIREMENT ab1d-ef72,238f-007b */\n"
-                                "    instance Inst_1;\n"
-                                "    endinstance;\n"
-                                "endmsc;\n");
+    auto model = std::make_unique<MscModel>(this);
+    model->setRequirementsUrl(QUrl("https://some.git.lab/pro/one"));
+    auto doc = new MscDocument("Doc_1");
+    doc->setRequirements({ "ab1d-ef72", "238f-007b" });
+    model->addDocument(doc);
+    const auto result = QString("/* CIF REQUIREMENTSURL https://some.git.lab/pro/one */\n\n"
+                                "/* CIF REQUIREMENT ab1d-ef72,238f-007b */\n"
+                                "mscdocument Doc_1 /* MSC AND */;\n"
+                                "endmscdocument;\n");
 
     setSaveMode(SaveMode::CUSTOM);
-    QString text = modelText(model);
+    QString text = modelText(model.get());
     QCOMPARE(text, result);
 
     setSaveMode(SaveMode::GRANTLEE);
-    text = modelText(model);
+    text = modelText(model.get());
     QCOMPARE(text, removeIndention(result));
 }
 

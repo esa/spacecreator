@@ -783,3 +783,14 @@ void tst_MscReader::testRequirements()
     const QByteArrayList expectedRequirements { "ab1d-ef72", "238f-007b" };
     QCOMPARE(chart->instances().at(0)->requirements(), expectedRequirements);
 }
+
+void tst_MscReader::testRequirementsUrl()
+{
+    const auto msc = QString("/* CIF REQUIREMENTSURL https://some.git.lab/pro/one */\n\n"
+                             "/* CIF REQUIREMENT ab1d-ef72,238f-007b */\n"
+                             "mscdocument TDoc_1 /* MSC AND */;\n"
+                             "endmscdocument;\n");
+
+    MscModel *model = m_reader->parseText(msc);
+    QCOMPARE(model->requirementsUrl(), QUrl("https://some.git.lab/pro/one"));
+}

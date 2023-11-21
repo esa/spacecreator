@@ -40,6 +40,7 @@ class GraphicsViewBase;
 class EditorCore : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QUrl requirementsUrl READ requirementsUrl WRITE setRequirementsUrl NOTIFY requirementsUrlChanged FINAL)
 
 public:
     explicit EditorCore(QObject *parent = nullptr);
@@ -69,13 +70,18 @@ public:
 
     virtual bool renameAsnFile(const QString &oldName, const QString &newName) = 0;
 
-    /// Returns the full file path of the file in this core
+    //! Returns the full file path of the file in this core
     virtual QString filePath() const = 0;
-    /// Saves the file
+    //! Saves the file
     virtual bool save() = 0;
 
     static QAction *createHelpLinesAction(QObject *parent = nullptr);
     static QAction *createSnapToGridAction(QObject *parent = nullptr);
+
+    //! Sets the URL where requirements are stored
+    virtual void setRequirementsUrl(const QUrl &url) = 0;
+    //! Returns the URL where requirements are stored
+    virtual const QUrl &requirementsUrl() const = 0;
 
 public Q_SLOTS:
     void showHelp();
@@ -83,6 +89,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
+    void requirementsUrlChanged(); //! Emitted when the user edited the URL of the requirements
 
 private:
     virtual QUrl helpPage() const;
