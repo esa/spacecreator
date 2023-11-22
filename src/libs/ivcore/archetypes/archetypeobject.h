@@ -101,9 +101,9 @@ public:
 
     static QString typeToString(Type t);
 
-    QStringList requestsIDs() const;
+    QStringList requestsIDs() const override;
 
-    void setRequestsIDs(const QStringList &requestIDs);
+    void setRequestsIDs(const QStringList &requestIDs) override;
 
 Q_SIGNALS:
     void titleChanged(const QString &title);

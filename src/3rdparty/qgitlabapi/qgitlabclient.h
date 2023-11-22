@@ -47,7 +47,7 @@ Q_SIGNALS:
     void listOfLabels(QList<Label>);
     void requestedProjectID(QString);
     void connectionError(QString errorString);
-
+    void issueCreated();
 protected:
     QNetworkReply *sendRequest(ReqType reqType, const QUrl &url);
     int pageNumberFromHeader(QNetworkReply *reply) const;

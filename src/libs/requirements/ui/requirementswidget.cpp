@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "requirementswidget.h"
 
+#include "addnewrequirementdialog.h"
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
 #include "ui_requirementswidget.h"
@@ -57,12 +58,13 @@ RequirementsWidget::RequirementsWidget(
 
     connect(ui->allRequirements, &QTableView::doubleClicked, this, &RequirementsWidget::openIssueLink);
     connect(ui->refreshButton, &QPushButton::clicked, this, &RequirementsWidget::onLoginUpdate);
+    connect(ui->createRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::showNewRequirementDialog);
     connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
-
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
     connect(mReqManager, &RequirementsManager::connectionReady, this, &RequirementsWidget::requestRequirements);
-
+    connect(mReqManager, &RequirementsManager::requirementCreated, this, &RequirementsWidget::requestRequirements);
+    connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
     connect(mReqManager, &RequirementsManager::connectionError, this, [this](QString error) {
         ui->serverStatusLabel->setPixmap(
                 QPixmap(":/requirementsresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
@@ -71,11 +73,9 @@ RequirementsWidget::RequirementsWidget(
     });
 
     bool hasCredentialsStored = loadSavedCredentials();
-    if (hasCredentialsStored)
-    {
+    if (hasCredentialsStored) {
         onLoginUpdate();
     }
-
 
     const QString urlTooltip = tr("Set the Gitlab server URL including the project path");
     ui->urlLabel->setToolTip(urlTooltip);
@@ -85,7 +85,6 @@ RequirementsWidget::RequirementsWidget(
     ui->tokenLabel->setToolTip(tokenTooltip);
     ui->tokenLineEdit->setToolTip(tokenTooltip);
     connect(ui->createTokenButton, &QPushButton::clicked, this, &RequirementsWidget::openTokenSettingsPage);
-
     connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
     ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
 }
@@ -94,8 +93,7 @@ bool RequirementsWidget::loadSavedCredentials()
 {
     QSettings settings;
     auto gitlabToken = settings.value(m_requirementsUrl + "__token").toString();
-    if (m_requirementsUrl.isEmpty() || gitlabToken.isEmpty())
-    {
+    if (m_requirementsUrl.isEmpty() || gitlabToken.isEmpty()) {
         return false;
     }
 
@@ -173,7 +171,6 @@ void RequirementsWidget::requestRequirements()
 
 void RequirementsWidget::onLoginUpdate()
 {
-
     ui->serverStatusLabel->setPixmap({});
 
     if (ui->urlLineEdit->text().isEmpty() || ui->tokenLineEdit->text().isEmpty()) {
@@ -182,7 +179,6 @@ void RequirementsWidget::onLoginUpdate()
 
     ui->serverStatusLabel->setToolTip(tr("Checking connection to the server"));
     mReqManager->setCredentials(ui->urlLineEdit->text(), ui->tokenLineEdit->text());
-
 }
 
 void RequirementsWidget::openIssueLink(const QModelIndex &index)
@@ -205,5 +201,15 @@ void RequirementsWidget::toggleShowUsedRequirements()
     } else {
         ui->allRequirements->setModel(&m_checkedModel);
         ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/disable_filter_icon.svg"));
+    }
+}
+
+void RequirementsWidget::showNewRequirementDialog() const
+{
+    QScopedPointer<AddNewRequirementDialog> dialog(new AddNewRequirementDialog());
+    dialog->setModal(true);
+    auto ret = dialog->exec();
+    if (ret == QDialog::Accepted) {
+        mReqManager->createRequirement(dialog->title(), dialog->description());
     }
 }

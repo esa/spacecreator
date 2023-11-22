@@ -19,11 +19,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "gitlab/gitlabrequirements.h"
 
+#include <QDir>
 #include <issue.h>
 #include <issuerequestoptions.h>
 #include <qgitlabclient.h>
-
-#include <QDir>
 
 struct RequirementsManager::RequirementsManagerPrivate {
     RequirementsManagerPrivate(RequirementsManager::REPO_TYPE repoType)
@@ -40,10 +39,8 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType, QObject *parent)
     : QObject(parent)
     , d(std::make_unique<RequirementsManagerPrivate>(repoType))
 {
-    switch(repoType)
-    {
-    case(REPO_TYPE::GITLAB):
-    {
+    switch (repoType) {
+    case (REPO_TYPE::GITLAB): {
         d->gitlabClient = std::make_unique<gitlab::QGitlabClient>();
         d->gitlabRequirements = std::make_unique<requirement::GitLabRequirements>();
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfIssues, d->gitlabRequirements.get(),
@@ -63,8 +60,7 @@ RequirementsManager::~RequirementsManager() { }
 
 void RequirementsManager::setCredentials(const QString &url, const QString &token)
 {
-    if (m_projectUrl == url && token == m_token)
-    {
+    if (m_projectUrl == url && token == m_token) {
         Q_EMIT connectionReady();
         return;
     }
@@ -77,7 +73,6 @@ void RequirementsManager::setCredentials(const QString &url, const QString &toke
     _url.setScheme("https");
     _url.setHost(QUrl(url).host());
     _url.setPath("/api/v4/");
-
 
     d->gitlabClient->setCredentials(_url.scheme() + "://" + _url.host(), token);
     requestProjectID(url);
@@ -100,12 +95,13 @@ void RequirementsManager::requestRequirements(const QString &assignee, const QSt
     }
 }
 
-void RequirementsManager::createRequirement(
-        const QString &projectID, const QString &title, const QString &description) const
+void RequirementsManager::createRequirement(const QString &title, const QString &description) const
 {
     switch (d->mRepoType) {
     case (REPO_TYPE::GITLAB): {
-        d->gitlabClient->createIssue(projectID, title, description);
+        d->gitlabClient->createIssue(m_projectID, title, description);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this, &RequirementsManager::requirementCreated,
+                Qt::UniqueConnection);
         break;
     }
     default:
@@ -116,8 +112,7 @@ void RequirementsManager::createRequirement(
 void RequirementsManager::requestProjectID(const QUrl &url)
 {
     switch (d->mRepoType) {
-    case(REPO_TYPE::GITLAB):
-    {
+    case (REPO_TYPE::GITLAB): {
         d->gitlabClient->requestProjectId(url);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::requestedProjectID, this,
                 &RequirementsManager::setProjectID, Qt::UniqueConnection);

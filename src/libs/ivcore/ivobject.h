@@ -89,8 +89,8 @@ public:
     bool isInstanceDescendant() const;
 
 
-    QStringList requestsIDs() const;
-    void setRequestsIDs(const QStringList &requestIDs);
+    QStringList requestsIDs() const override;
+    void setRequestsIDs(const QStringList &requestIDs) override;
 
     QString groupName() const;
     void setGroupName(const QString &groupName);

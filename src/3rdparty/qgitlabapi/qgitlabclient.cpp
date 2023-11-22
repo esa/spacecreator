@@ -84,9 +84,13 @@ void QGitlabClient::createIssue(const QString &projectID, const QString &title, 
     auto reply =
             sendRequest(QGitlabClient::POST, mUrlComposer.composeCreateIssueUrl(projectID, title, description, ""));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
-        if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
+        if (reply->error() != QNetworkReply::NoError) {
             qDebug() << reply->error() << reply->errorString();
             Q_EMIT connectionError(reply->errorString());
+        }
+        else
+        {
+            Q_EMIT issueCreated();
         }
     });
 }

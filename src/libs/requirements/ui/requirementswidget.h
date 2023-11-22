@@ -58,8 +58,10 @@ protected Q_SLOTS:
     void onLoginUpdate();
     void openIssueLink(const QModelIndex &index);
     void openTokenSettingsPage();
+
     void toggleShowUsedRequirements();
     void requestRequirements();
+    void showNewRequirementDialog() const;
 
 Q_SIGNALS:
     void requirementSelected(QString RequirementID, bool checked);
@@ -67,6 +69,7 @@ Q_SIGNALS:
 
 private:
     Ui::RequirementsWidget *ui;
+
     QPointer<RequirementsManager> mReqManager;
     QPointer<requirement::RequirementsModelBase> m_model;
     QSortFilterProxyModel m_filterModel;

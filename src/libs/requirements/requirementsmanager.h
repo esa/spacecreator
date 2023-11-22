@@ -15,8 +15,7 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#ifndef REQUIREMENTSMANAGER_H
-#define REQUIREMENTSMANAGER_H
+#pragma once
 
 #include "requirement.h"
 
@@ -38,7 +37,7 @@ public:
     ~RequirementsManager();
     void setCredentials(const QString &url, const QString &token);
     void requestRequirements(const QString &assignee, const QString &author);
-    void createRequirement(const QString &projectID, const QString &title, const QString &description) const;
+    void createRequirement(const QString &title, const QString &description) const;
     void requestProjectID(const QUrl &url);
     QString projectID() const;
 
@@ -50,7 +49,7 @@ Q_SIGNALS:
     void listOfRequirements(const QList<requirement::Requirement> &);
     void connectionReady();
     void connectionError(QString errorString);
-
+    void requirementCreated();
 
 private:
     QString m_projectID = "";
@@ -59,5 +58,3 @@ private:
     class RequirementsManagerPrivate;
     std::unique_ptr<RequirementsManagerPrivate> d;
 };
-
-#endif // REQUIREMENTSMANAGER_H
