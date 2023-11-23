@@ -748,21 +748,29 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const QString &typeName, co
     const auto argumentName = buildCheckArgumentName(typeName, "v");
 
     // Build one big expression for range check
-    std::vector<BinaryExpression> rangeCheckingExpressions;
+    std::vector<Expression> rangeCheckingExpressions;
     for (const auto &range : rangeSubsets.getRanges()) {
-        auto minValueConst = std::make_unique<Expression>(Constant(range.first));
-        auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
-        auto greaterThanExpr = std::make_unique<Expression>(
-                BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
-
         auto maxValueConst = std::make_unique<Expression>(Constant(range.second));
         auto maxValueVar = std::make_unique<Expression>(VariableRef(argumentName));
         auto lessThanExpr = std::make_unique<Expression>(
                 BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
 
-        BinaryExpression combinedExpr(
-                BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
-        rangeCheckingExpressions.push_back(std::move(combinedExpr));
+        if (range.first == std::numeric_limits<int32_t>::min()) {
+            // special case when minimum value of int32_t is used
+            // in such case, the int datatype in promela does have a representation of such value
+            // (see https://spinroot.com/spin/Man/datatypes.html)
+            rangeCheckingExpressions.push_back(std::move(*lessThanExpr));
+        } else {
+            auto minValueConst = std::make_unique<Expression>(Constant(range.first));
+            qDebug() << "Min value " << range.first;
+            auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
+            auto greaterThanExpr = std::make_unique<Expression>(BinaryExpression(
+                    BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
+
+            BinaryExpression combinedExpr(
+                    BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
+            rangeCheckingExpressions.push_back(Expression(std::move(combinedExpr)));
+        }
     }
 
     auto rangeCheckingExpression =
