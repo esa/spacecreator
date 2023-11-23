@@ -43,8 +43,10 @@ QWidget *DynamicActionOption::widget()
 
 void DynamicActionOption::apply()
 {
-    m_widget->save();
-    ive::ActionsManager::reload();
+    if (m_widget) {
+        m_widget->save();
+        ive::ActionsManager::reload();
+    }
 }
 
 void DynamicActionOption::finish()

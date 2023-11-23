@@ -52,7 +52,9 @@ QWidget *PropertyOptions::widget()
 
 void PropertyOptions::apply()
 {
-    m_widget->save();
+    if (m_widget) {
+        m_widget->save();
+    }
 }
 
 void PropertyOptions::finish()

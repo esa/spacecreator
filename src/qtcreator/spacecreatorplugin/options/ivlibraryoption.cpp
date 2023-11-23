@@ -41,7 +41,9 @@ QWidget *IVLibraryOption::widget()
 
 void IVLibraryOption::apply()
 {
-    m_widget->save();
+    if (m_widget) {
+        m_widget->save();
+    }
 }
 
 void IVLibraryOption::finish()

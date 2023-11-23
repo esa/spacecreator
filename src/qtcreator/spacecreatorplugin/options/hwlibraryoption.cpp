@@ -41,7 +41,9 @@ QWidget *HwLibraryOption::widget()
 
 void HwLibraryOption::apply()
 {
-    m_widget->save();
+    if (m_widget) {
+        m_widget->save();
+    }
 }
 
 void HwLibraryOption::finish()
