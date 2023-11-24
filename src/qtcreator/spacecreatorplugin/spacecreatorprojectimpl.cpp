@@ -61,7 +61,12 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
 
     static bool hubInitialized = false;
     if (!hubInitialized) {
+#if QTC_VERSION >= 1200
+        const ProjectExplorer::TaskCategory category { TASK_CATEGORY_SPACE_CREATOR, tr("ASN error"), tr("") };
+        ProjectExplorer::TaskHub::instance()->addCategory(category);
+#else
         ProjectExplorer::TaskHub::instance()->addCategory(TASK_CATEGORY_SPACE_CREATOR, tr("ASN error"));
+#endif
         hubInitialized = true;
     }
 

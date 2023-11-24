@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <QPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
 #include <memory>
@@ -25,7 +26,11 @@ namespace spctr {
 class ActionHandler;
 class SpaceCreatorProjectManager;
 
+#if QTC_VERSION >= 1200
+class MscEditorFactory : public QObject, public Core::IEditorFactory
+#else
 class MscEditorFactory : public Core::IEditorFactory
+#endif
 {
     Q_OBJECT
 
@@ -38,5 +43,4 @@ private:
     std::unique_ptr<ActionHandler> m_actionHandler;
     QPointer<SpaceCreatorProjectManager> m_projectManager;
 };
-
 }

@@ -205,7 +205,7 @@ def download_asn1scc(env_dir: str) -> None:
     Downloads asn1scc archive. In the build step it will we compiled into the asn1scc-fuzzer executable
     :param env_dir: The dir in which asn1scc is extracted
     """
-    asn_url = "https://github.com/ttsiodras/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2"
+    asn_url = "https://github.com/maxime-esa/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2"
     asn_tarbz2 = join_dir(env_dir, 'asn1scc-bin-4.2.4.7f.tar.bz2')
     print('prebuild.py: Downloading {} to {}'.format(asn_url, asn_tarbz2))
     try:
@@ -276,7 +276,7 @@ def build_asn1scc_language_server(env_dir: str) -> None:
 
 
 def download_asn1scc_language_server(env_dir: str) -> None:
-    url = "https://github.com/ttsiodras/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
+    url = "https://github.com/maxime-esa/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
     asn1cc_lsp_tarbz2 = join_dir(env_dir, 'asn1scc-lsp.tar.bz2')
     print('prebuild.py: Downloading {} to {}'.format(url, asn1cc_lsp_tarbz2))
     try:

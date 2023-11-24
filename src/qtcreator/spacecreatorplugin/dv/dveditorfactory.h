@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <QPointer>
 #include <coreplugin/editormanager/ieditorfactory.h>
 #include <memory>
@@ -25,7 +26,11 @@ namespace spctr {
 class DVActionHandler;
 class SpaceCreatorProjectManager;
 
+#if QTC_VERSION >= 1200
+class DVEditorFactory : public QObject, public Core::IEditorFactory
+#else
 class DVEditorFactory : public Core::IEditorFactory
+#endif
 {
     Q_OBJECT
 public:

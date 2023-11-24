@@ -121,6 +121,14 @@ if (EXISTS "${QTC_SOURCE_DIR}" AND EXISTS "${QTC_LIB_DIR}")
         set(QTC_VERSION_STR "${CMAKE_MATCH_1}")
     endif()
 
+    # Check since QtCreator 12
+    if (NOT QTC_VERSION_STR)
+        include(${QTC_INSTALL}/lib/cmake/QtCreator/QtCreatorIDEBranding.cmake)
+        if (IDE_VERSION)
+            set(QTC_VERSION_STR ${IDE_VERSION})
+        endif()
+    endif()
+
     if (NOT QTC_VERSION_STR)
         message(FATAL_ERROR "QtCreatorCheck: Unable to read QtCreator version")
     endif()
