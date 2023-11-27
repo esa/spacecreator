@@ -45,7 +45,6 @@ class IVItemModel : public shared::ui::VEItemModel
 {
     Q_OBJECT
 public:
-
     explicit IVItemModel(ivm::IVModel *model, cmd::CommandsStack *commandsStack, QObject *parent = nullptr);
     ~IVItemModel() override;
 
@@ -78,7 +77,7 @@ private:
     void setupInterfaceGeometry(ivm::IVObject *obj);
     void setupConnectionGeometry(ivm::IVObject *obj);
 
-    bool isVisible(ivm::IVObject *obj);
+    bool isVisible(ivm::IVObject *obj) const;
 
 private:
     shared::DelayedSignal *m_textUpdate = nullptr;

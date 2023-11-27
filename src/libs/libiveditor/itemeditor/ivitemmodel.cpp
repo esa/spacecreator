@@ -501,7 +501,7 @@ void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj)
     }
 }
 
-bool IVItemModel::isVisible(ivm::IVObject *obj)
+bool IVItemModel::isVisible(ivm::IVObject *obj) const
 {
     if (!obj) {
         return true;
