@@ -92,7 +92,7 @@ RequirementsWidget::RequirementsWidget(
 bool RequirementsWidget::loadSavedCredentials()
 {
     QSettings settings;
-    auto gitlabToken = settings.value(m_requirementsUrl + "__token").toString();
+    auto gitlabToken = settings.value(tokenKey(QUrl(m_requirementsUrl).host())).toString();
     if (m_requirementsUrl.isEmpty() || gitlabToken.isEmpty()) {
         return false;
     }
@@ -141,17 +141,19 @@ QString RequirementsWidget::token() const
 
 void RequirementsWidget::onChangeOfCredentials()
 {
+    QString newUrlHostKey = tokenKey(QUrl(ui->urlLineEdit->text()).host());
+    QString oldUrlHostKey = tokenKey(QUrl(m_requirementsUrl).host());
     QSettings settings;
     if (!ui->urlLineEdit->text().isEmpty()) {
-        QString gitlabToken = settings.value(ui->urlLineEdit->text() + "__token").toString();
+        QString gitlabToken = settings.value(newUrlHostKey).toString();
         if ((gitlabToken != ui->tokenLineEdit->text()) || (ui->urlLineEdit->text() != m_requirementsUrl)) {
-            settings.remove(m_requirementsUrl + "__token");
-            settings.setValue(ui->urlLineEdit->text() + "__token", ui->tokenLineEdit->text());
+            settings.remove(oldUrlHostKey);
+            settings.setValue(newUrlHostKey, ui->tokenLineEdit->text());
             m_requirementsUrl = ui->urlLineEdit->text().toUtf8();
             ui->createTokenButton->setEnabled(true);
         }
     } else {
-        settings.remove(m_requirementsUrl + "__token");
+        settings.remove(oldUrlHostKey);
         m_requirementsUrl.clear();
         setToken("");
         ui->createTokenButton->setEnabled(false);
