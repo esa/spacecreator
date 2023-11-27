@@ -1,5 +1,6 @@
 #include "graphicsviewutils.h"
 
+#include "connection.h"
 #include "positionlookuphelper.h"
 #include "ui/graphicsviewbase.h"
 #include "ui/verectgraphicsitem.h"
@@ -859,49 +860,21 @@ QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDir
 QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const QPointF &startIfacePos,
         const QRectF &sourceRect, const QPointF &endIfacePos, const QRectF &targetRect)
 {
-    const QLineF startDirection = ifaceSegment(sourceRect, startIfacePos, endIfacePos);
-    if (startDirection.isNull())
-        return {};
+    using namespace topohelp::cnct;
+    const ConnectionEnvInfo connectionInfo {
+        sourceRect,
+        startIfacePos,
+        targetRect,
+        endIfacePos,
+        existingRects,
+    };
 
-    const QLineF endDirection = ifaceSegment(targetRect, endIfacePos, startIfacePos);
-    if (endDirection.isNull())
-        return {};
-
-    QVector<QPointF> points = path(existingRects, startDirection, endDirection);
-    if (points.size() < 2) {
-        // if no path was found, fall back to start/end directly
-        return { startIfacePos, endIfacePos };
-    }
-    return simplifyPoints(points);
+    return createConnection(connectionInfo);
 }
 
 QVector<QPointF> simplifyPoints(const QVector<QPointF> &points)
 {
-    if (points.size() <= 2)
-        return points;
-
-    auto checkLines = [](const QLineF &line1, const QLineF &line2) -> bool {
-        if (line1.length() < kMinSegmentLength) {
-            return true;
-        }
-        const int simplifiedAngle = qAbs(qRound(line1.angleTo(line2)) % 180);
-        if (simplifiedAngle < kMinSegmentAngle || 180 - simplifiedAngle < kMinSegmentAngle) {
-            return true;
-        }
-        return false;
-    };
-
-    QVector<QPointF> simplifiedPoints(points);
-    for (int idx = 1; idx < simplifiedPoints.size() - 1;) {
-        const QLineF currentLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx - 1) };
-        const QLineF nextLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx + 1) };
-        if (checkLines(currentLine, nextLine)) {
-            simplifiedPoints.removeAt(idx);
-            continue;
-        }
-        ++idx;
-    }
-    return simplifiedPoints;
+    return topohelp::cnct::simplifyPoints(points);
 }
 
 bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
