@@ -47,3 +47,9 @@ add_subdirectory(spacecreatorsystem)
 
 # Reporting
 add_subdirectory(reporting)
+
+# Requirements
+add_subdirectory(requirements)
+
+# Objects topology helper
+add_subdirectory(topohelper)

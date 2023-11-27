@@ -187,6 +187,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_WIDGETS}
     ${QT_XML}
     requirements
+    topohelper
 )
 
 if(OPTIONS_NO_DEPRECATED)
