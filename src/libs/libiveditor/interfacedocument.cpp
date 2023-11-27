@@ -97,7 +97,6 @@ struct InterfaceDocument::InterfaceDocumentPrivate {
 
     QString filePath;
     QString creatorGitHash;
-    QString requirementsURL;
 
     ivm::IVPropertyTemplateConfig *dynPropConfig { nullptr };
     IVItemModel *itemsModel { nullptr };
@@ -465,7 +464,7 @@ void InterfaceDocument::close()
     d->layersModel->clear();
     setPath(QString());
     d->commandsStack->clear();
-    setRequirementsURL({});
+    objectsModel()->setRequirementsURL({});
     setCreatorGitHash({});
 }
 
@@ -730,25 +729,6 @@ void InterfaceDocument::setCreatorGitHash(const QString &hashStr)
 QString InterfaceDocument::creatorGitHash() const
 {
     return d->creatorGitHash;
-}
-
-/*!
- * \brief InterfaceDocument::setRequirementsURL Sets the URL (gitlab project) where the requirements are stored
- */
-void InterfaceDocument::setRequirementsURL(const QString &url)
-{
-    if (d->requirementsURL != url) {
-        d->requirementsURL = url;
-        Q_EMIT requirementsURLChanged(d->requirementsURL);
-    }
-}
-
-/*!
- * \brief InterfaceDocument::requirementsURL Returns the URL (gitlab project) where the requirements are stored
- */
-const QString &InterfaceDocument::requirementsURL() const
-{
-    return d->requirementsURL;
 }
 
 QString InterfaceDocument::uiFileName() const
@@ -1194,7 +1174,7 @@ bool InterfaceDocument::loadImpl(const QString &path)
     if (metadata.contains(parser.uiFileNameTag()))
         setUIFileName(metadata[parser.uiFileNameTag()].toString());
     if (metadata.contains("requirementsURL")) {
-        setRequirementsURL(metadata["requirementsURL"].toString());
+        objectsModel()->setRequirementsURL(metadata["requirementsURL"].toString());
     }
     setCreatorGitHash(metadata["creatorHash"].toString());
     shared::ErrorHub::clearCurrentFile();

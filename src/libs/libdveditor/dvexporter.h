@@ -19,6 +19,8 @@
 
 #include "objectsexporter.h"
 
+#include <QUrl>
+
 class QBuffer;
 
 namespace dvm {
@@ -45,10 +47,10 @@ public:
 
     bool exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
             const QString &outPath = QString(), const QString &pathToTemplate = QString(),
-            const QString &requirementsURL = QString(), QWidget *root = nullptr);
+            const QUrl &requirementsURL = {}, QWidget *root = nullptr);
 
     bool exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
-            const QString &outPath, const QString &pathToTemplate = {}, const QString &requirementsURL = {},
+            const QString &outPath, const QString &pathToTemplate = {}, const QUrl &requirementsURL = {},
             const QString &uiFile = {});
 
 private:
@@ -59,8 +61,8 @@ private:
      */
     QVariant createFrom(const shared::VEObject *object) const override;
     QString groupName(const shared::VEObject *object) const override;
-    QHash<QString, QVariant> collectDvObjects(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
-            const QString &requirementsURL) const;
+    QHash<QString, QVariant> collectDvObjects(
+            const QList<shared::VEObject *> &objects, const QString &creatorGitHash, const QUrl &requirementsURL) const;
 
     templating::UIExporter *m_uiExporter;
 };

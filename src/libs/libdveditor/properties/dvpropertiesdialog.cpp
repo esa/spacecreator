@@ -19,8 +19,8 @@
 
 #include "abstractsystemchecks.h"
 #include "asn1systemchecks.h"
+#include "commands/cmdsetrequirementsurl.h"
 #include "commandsstackbase.h"
-#include "dvappmodel.h"
 #include "dvattributedelegate.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
@@ -39,7 +39,7 @@
 
 namespace dve {
 
-DVPropertiesDialog::DVPropertiesDialog(dve::DVAppModel *appModel, shared::PropertyTemplateConfig *dynPropConfig,
+DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemplateConfig *dynPropConfig,
         shared::ui::VEInteractiveObject *uiObj, dvm::AbstractSystemChecks *systemChecker,
         Asn1Acn::Asn1SystemChecks *asn1Checks, shared::cmd::CommandsStackBase *commandsStack, QWidget *parent)
     : shared::PropertiesDialog(dynPropConfig, uiObj, commandsStack, parent)
@@ -55,9 +55,14 @@ DVPropertiesDialog::DVPropertiesDialog(dve::DVAppModel *appModel, shared::Proper
     connect(m_reqManager, &RequirementsManager::startfetchingRequirements, m_reqModel,
             &requirement::RequirementsModel::clear);
 
-    m_reqWidget = new RequirementsWidget(appModel->requirementsURL().toUtf8(), m_reqManager, m_reqModel, this);
+    m_reqWidget = new RequirementsWidget(model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
     connect(m_reqWidget, &RequirementsWidget::requirementsUrlChanged, this,
-            [appModel](QByteArray requirementUrl) { appModel->setRequirementsURL(QString::fromUtf8(requirementUrl)); });
+            [model, commandsStack](QByteArray requirementUrl) {
+                const QUrl url = QUrl(QString(requirementUrl));
+                if (url != model->requirementsURL()) {
+                    commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, url));
+                }
+            });
 }
 
 QString DVPropertiesDialog::objectTypeName() const

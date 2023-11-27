@@ -18,12 +18,18 @@
 #pragma once
 
 #include <QObject>
+#include <QUrl>
 
 namespace shared {
 
+/*!
+ * \brief The AbstractProject class is the base class for projects in all SpaceCreator applications/editors
+ */
 class AbstractProject : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QUrl requirementsURL READ requirementsURL WRITE setRequirementsURL NOTIFY requirementsURLChanged)
+
 public:
     explicit AbstractProject(QObject *parent = nullptr);
 
@@ -33,6 +39,12 @@ public:
     virtual QStringList allIVFiles() const = 0;
     virtual QStringList allMscFiles() const = 0;
     virtual QStringList allAsn1Files() const = 0;
+
+    virtual void setRequirementsURL(const QUrl &url) = 0;
+    virtual QUrl requirementsURL() const = 0;
+
+Q_SIGNALS:
+    void requirementsURLChanged(const QUrl &url);
 };
 
 } // namespace shared

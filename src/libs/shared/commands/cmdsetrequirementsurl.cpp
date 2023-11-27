@@ -19,29 +19,29 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "commandids.h"
 
-namespace msc {
+namespace shared {
 namespace cmd {
 
 /*!
  * \param mscCore The model to store the URL information in
  * \param url The new URL for the requirements (gitlab project)
  */
-CmdSetRequirementsUrl::CmdSetRequirementsUrl(msc::MSCEditorCore *mscCore, const QUrl &url, QObject *parent)
+CmdSetRequirementsUrl::CmdSetRequirementsUrl(shared::DataModel *model, const QUrl &url, QObject *parent)
     : shared::UndoCommand(parent)
-    , m_mscCore(mscCore)
-    , m_oldUrl(mscCore->requirementsUrl())
+    , m_model(model)
+    , m_oldUrl(m_model->requirementsURL())
     , m_newUrl(url)
 {
 }
 
 void CmdSetRequirementsUrl::redo()
 {
-    m_mscCore->setRequirementsUrl(m_newUrl);
+    m_model->setRequirementsURL(m_newUrl);
 }
 
 void CmdSetRequirementsUrl::undo()
 {
-    m_mscCore->setRequirementsUrl(m_oldUrl);
+    m_model->setRequirementsURL(m_oldUrl);
 }
 
 bool CmdSetRequirementsUrl::mergeWith(const QUndoCommand *command)
@@ -61,4 +61,4 @@ int CmdSetRequirementsUrl::id() const
 }
 
 } // namespace cmd
-} // namespace msc
+} // namespace shared

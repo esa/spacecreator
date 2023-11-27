@@ -92,7 +92,8 @@ int main(int argc, char *argv[])
         setupIvSystemQueriesIfAvailable(inputFile, &dvcore);
 
         const bool convertOk = dvcore.exporter()->exportObjectsSilently(appModel->objectsModel()->objects().values(),
-                appModel->creatorGitHash(), outputFile, templateFile, appModel->requirementsURL());
+                appModel->creatorGitHash(), outputFile, templateFile,
+                appModel->objectsModel()->requirementsURL().toString());
         if (!convertOk) {
             qCritical() << "Error converting " << inputFile << "to" << outputFile;
             return -1;

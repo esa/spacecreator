@@ -17,24 +17,22 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
-#include "msceditorcore.h"
+#include "datamodel.h"
 #include "undocommand.h"
 
 #include <QPointer>
 #include <QUrl>
 
-namespace msc {
-
-class MSCEditorCore;
+namespace shared {
 namespace cmd {
 
 /*!
- * \brief The CmdSetRequirementsUrl class handles setting the URL for the requirements of a MSC file
+ * \brief The CmdSetRequirementsUrl class handles setting the URL for the requirements of a model
  */
 class CmdSetRequirementsUrl : public shared::UndoCommand
 {
 public:
-    CmdSetRequirementsUrl(msc::MSCEditorCore *mscCore, const QUrl &url, QObject *parent = nullptr);
+    CmdSetRequirementsUrl(shared::DataModel *model, const QUrl &url, QObject *parent = nullptr);
 
     void redo() override;
     void undo() override;
@@ -42,11 +40,10 @@ public:
     int id() const override;
 
 private:
-    QPointer<msc::MSCEditorCore> m_mscCore;
+    QPointer<shared::DataModel> m_model;
     QUrl m_oldUrl;
     QUrl m_newUrl;
 };
 
 } // namespace cmd
-} // namespace msc
-
+} // namespace shared

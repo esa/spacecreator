@@ -32,7 +32,7 @@
 namespace msc {
 
 MscModel::MscModel(QObject *parent)
-    : QObject(parent)
+    : shared::DataModel(parent)
 {
 }
 
@@ -268,7 +268,6 @@ void MscModel::clear()
     m_charts.clear();
 
     setDataLanguage("");
-    setRequirementsUrl(QUrl());
 
     Q_EMIT cleared();
     Q_EMIT dataChanged();
@@ -372,27 +371,6 @@ bool MscModel::checkAllMessagesForAsn1Compliance(QStringList *faultyMessages) co
 }
 
 /*!
- * Sets the URL where requirements are stored
- */
-void MscModel::setRequirementsUrl(const QUrl &url)
-{
-    if (url == m_requirementsUrl) {
-        return;
-    }
-
-    m_requirementsUrl = url;
-    Q_EMIT requirementsUrlChanged();
-}
-
-/*!
- * Returns the URL where requirements are stored
- */
-const QUrl &MscModel::requirementsUrl() const
-{
-    return m_requirementsUrl;
-}
-
-/*!
  * Add the information of the URL where the requirements are stored as CIF information to the first entity
  */
 void MscModel::addRequirementsUrlToFirstEntity()
@@ -402,7 +380,7 @@ void MscModel::addRequirementsUrlToFirstEntity()
         return;
     }
 
-    if (!m_requirementsUrl.isValid()) {
+    if (!requirementsURL().isValid()) {
         removeRequirementsUrlFromFirstEntity();
         return;
     }
@@ -411,7 +389,7 @@ void MscModel::addRequirementsUrlToFirstEntity()
     QVector<cif::CifBlockShared> cifs = entity->cifs();
     for (const cif::CifBlockShared &block : cifs) {
         if (block->blockType() == cif::CifLine::CifType::RequirementsUrl) {
-            block->setPayload(m_requirementsUrl, cif::CifLine::CifType::RequirementsUrl);
+            block->setPayload(requirementsURL(), cif::CifLine::CifType::RequirementsUrl);
             return;
         }
     }
@@ -419,7 +397,7 @@ void MscModel::addRequirementsUrlToFirstEntity()
     // no requirements url block there yet, so add it
     cif::CifBlockShared requirementsUrlCif =
             cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineRequirementsUrl()) });
-    requirementsUrlCif->setPayload(QVariant::fromValue(m_requirementsUrl), cif::CifLine::CifType::RequirementsUrl);
+    requirementsUrlCif->setPayload(QVariant::fromValue(requirementsURL()), cif::CifLine::CifType::RequirementsUrl);
     cifs.append(requirementsUrlCif);
     entity->setCifs(cifs);
 }

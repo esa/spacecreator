@@ -30,6 +30,11 @@ class QUndoStack;
 class QUrl;
 
 namespace shared {
+namespace cmd {
+class CommandsStackBase;
+}
+
+class DataModel;
 
 class CommandLineParser;
 
@@ -40,11 +45,13 @@ class GraphicsViewBase;
 class EditorCore : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QUrl requirementsUrl READ requirementsUrl WRITE setRequirementsUrl NOTIFY requirementsUrlChanged FINAL)
+    Q_PROPERTY(QUrl requirementsURL READ requirementsURL WRITE setRequirementsURL NOTIFY requirementsURLChanged FINAL)
 
 public:
     explicit EditorCore(QObject *parent = nullptr);
     virtual ~EditorCore();
+
+    virtual DataModel *dataModel() const = 0;
 
     QWidget *minimapView() const;
     virtual ui::GraphicsViewBase *chartView() = 0;
@@ -79,9 +86,9 @@ public:
     static QAction *createSnapToGridAction(QObject *parent = nullptr);
 
     //! Sets the URL where requirements are stored
-    virtual void setRequirementsUrl(const QUrl &url) = 0;
+    virtual void setRequirementsURL(const QUrl &url);
     //! Returns the URL where requirements are stored
-    virtual const QUrl &requirementsUrl() const = 0;
+    virtual const QUrl &requirementsURL() const;
 
 public Q_SLOTS:
     void showHelp();
@@ -89,7 +96,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
-    void requirementsUrlChanged(); //! Emitted when the user edited the URL of the requirements
+    void requirementsURLChanged(const QUrl &url); //! Emitted when the user edited the URL of the requirements
 
 private:
     virtual QUrl helpPage() const;
@@ -110,3 +117,6 @@ private:
 };
 
 }
+
+typedef QSharedPointer<shared::EditorCore> EditorCorePtr;
+Q_DECLARE_METATYPE(EditorCorePtr)

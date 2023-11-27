@@ -42,11 +42,13 @@ class IVAppWidget;
 class IVEditorCore : public shared::EditorCore
 {
     Q_OBJECT
+
 public:
     explicit IVEditorCore(QObject *parent = nullptr);
     ~IVEditorCore() override;
 
     ive::InterfaceDocument *document() const;
+    shared::DataModel *dataModel() const override;
 
     void setDvChecks(ivm::AbstractSystemChecks *checks);
     ivm::AbstractSystemChecks *dvChecks() const;
@@ -95,9 +97,6 @@ public:
 
     void centerOnView();
 
-    void setRequirementsUrl(const QUrl &url) override;
-    const QUrl &requirementsUrl() const override;
-
 public Q_SLOTS:
     void onSaveRenderRequested();
 
@@ -129,7 +128,6 @@ private:
 
     QPointer<IVAppWidget> m_mainWidget;
 };
-
 }
 
 typedef QSharedPointer<ive::IVEditorCore> IVEditorCorePtr;

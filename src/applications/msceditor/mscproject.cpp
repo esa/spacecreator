@@ -18,6 +18,7 @@
 #include "mscproject.h"
 
 #include "mainmodel.h"
+#include "mscmodel.h"
 
 #include <QDebug>
 #include <QFileInfo>
@@ -48,6 +49,22 @@ QStringList MscProject::allAsn1Files() const
     }
 
     return result;
+}
+
+void MscProject::setRequirementsURL(const QUrl &url)
+{
+    if (m_model) {
+        m_model->mscModel()->setRequirementsURL(url.toString());
+    }
+}
+
+QUrl MscProject::requirementsURL() const
+{
+    if (m_model) {
+        return m_model->mscModel()->requirementsURL();
+    }
+
+    return QUrl();
 }
 
 QStringList MscProject::allDVFiles() const

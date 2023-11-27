@@ -18,7 +18,6 @@
 #pragma once
 
 #include "editorcore.h"
-#include "graphicsview.h"
 #include "mscdocument.h"
 
 #include <QList>
@@ -56,6 +55,7 @@ public:
     ~MSCEditorCore();
 
     msc::MainModel *mainModel() const;
+    shared::DataModel *dataModel() const override;
 
     shared::ui::GraphicsViewBase *chartView() override;
 
@@ -97,10 +97,7 @@ public:
 
     QString filePath() const override;
     bool save() override;
-
-    void setRequirementsUrl(const QUrl &url) override;
-    const QUrl &requirementsUrl() const override;
-
+    
 public Q_SLOTS:
     void selectCurrentChart();
     void openMessageDeclarationEditor(QWidget *parentwidget);

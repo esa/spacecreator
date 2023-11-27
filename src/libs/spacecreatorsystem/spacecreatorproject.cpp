@@ -208,6 +208,26 @@ QVector<MSCEditorCorePtr> SpaceCreatorProject::allMscCores() const
 }
 
 /*!
+ * Returns all editor core objects
+ */
+QVector<EditorCorePtr> SpaceCreatorProject::allCores() const
+{
+    QVector<EditorCorePtr> cores;
+    auto getCores = [&cores](const auto &collection) {
+        for (const auto &core : collection) {
+            if (core) {
+                cores.append(core);
+            }
+        }
+    };
+
+    getCores(QList<IVEditorCorePtr> { ivCore() });
+    getCores(allDVCores());
+    getCores(allMscCores());
+    return cores;
+}
+
+/*!
    Returns if the given \p core is in this storage
  */
 bool SpaceCreatorProject::contains(QSharedPointer<shared::EditorCore> core) const
@@ -339,6 +359,32 @@ DvSystemQueries *SpaceCreatorProject::dvChecks() const
     return m_dvChecks.get();
 }
 
+void SpaceCreatorProject::setRequirementsURL(const QUrl &url)
+{
+    if (url == requirementsURL()) {
+        return;
+    }
+
+    m_requirementsURL = url;
+    for (const EditorCorePtr &core : allCores()) {
+        core->setRequirementsURL(m_requirementsURL);
+    }
+}
+
+QUrl SpaceCreatorProject::requirementsURL() const
+{
+    if (m_requirementsURL.isValid()) {
+        return m_requirementsURL;
+    }
+
+    IVEditorCorePtr iCore = ivCore();
+    if (iCore) {
+        iCore->requirementsURL();
+    }
+
+    return QUrl();
+}
+
 /*!
    Removes all data that is stored here, but is not part of the project
  */
@@ -382,6 +428,8 @@ void SpaceCreatorProject::setDvData(const QString &fileName, DVEditorCorePtr dvD
 
     m_dvStore[fileName] = dvData;
     connect(dvData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
+    connect(dvData.data(), &shared::EditorCore::requirementsURLChanged, this,
+            &scs::SpaceCreatorProject::setRequirementsURL);
     Q_EMIT dvCoreAdded(dvData);
 }
 
@@ -402,6 +450,8 @@ void SpaceCreatorProject::setIvData(const QString &fileName, IVEditorCorePtr ivD
 
     m_ivStore[fileName] = ivData;
     connect(ivData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
+    connect(ivData.data(), &shared::EditorCore::requirementsURLChanged, this,
+            &scs::SpaceCreatorProject::setRequirementsURL);
     ivData->setDvChecks(m_dvChecks.get());
     Q_EMIT ivCoreAdded(ivData);
 }
@@ -423,6 +473,8 @@ void SpaceCreatorProject::setMscData(const QString &fileName, MSCEditorCorePtr m
 
     m_mscStore[fileName] = mscData;
     connect(mscData.data(), &shared::EditorCore::editedExternally, this, &scs::SpaceCreatorProject::editedExternally);
+    connect(mscData.data(), &shared::EditorCore::requirementsURLChanged, this,
+            &scs::SpaceCreatorProject::setRequirementsURL);
     auto checker = new scs::IvSystemChecks(this, mscData.data());
     checker->setMscCore(mscData.data());
     mscData->setSystemChecker(checker);

@@ -471,7 +471,7 @@ void MscAppWidget::showHierarchyView(bool show)
  */
 void MscAppWidget::showRequirements(MscEntity *entity)
 {
-    MscRequirementsDialog dialog(m_mscCore->requirementsUrl(), entity, this);
+    MscRequirementsDialog dialog(m_mscCore->requirementsURL(), entity, this);
     int ret = dialog.exec();
     if (ret == QDialog::Accepted) {
         msc::MscCommandsStack *undoStack = m_mscCore->commandsStack();
@@ -480,8 +480,8 @@ void MscAppWidget::showRequirements(MscEntity *entity)
         if (ids != entity->requirements()) {
             undoStack->push(new cmd::CmdUpdateEntityRequirements(entity, ids));
         }
-        if (dialog.url() != m_mscCore->requirementsUrl()) {
-            undoStack->push(new cmd::CmdSetRequirementsUrl(m_mscCore, dialog.url()));
+        if (dialog.url() != m_mscCore->requirementsURL()) {
+            undoStack->push(new shared::cmd::CmdSetRequirementsUrl(m_mscCore->mainModel()->mscModel(), dialog.url()));
         }
         undoStack->endMacro();
     }

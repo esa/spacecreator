@@ -17,6 +17,8 @@
 
 #include "editorcore.h"
 
+#include "commands/cmdsetrequirementsurl.h"
+#include "datamodel.h"
 #include "scversion.h"
 #include "settingsmanager.h"
 #include "ui/graphicsviewbase.h"
@@ -200,6 +202,36 @@ QAction *EditorCore::createSnapToGridAction(QObject *parent)
     connect(action, &QAction::triggered,
             [action]() { SettingsManager::store(SettingsManager::Common::SnapToGrid, action->isChecked()); });
     return action;
+}
+
+/*!
+ * \brief EditorCore::setRequirementsURL sets the URL where to fetch the requirements for the entities from.
+ * \note The change is wrapped in a command for undo/redo.
+ */
+void EditorCore::setRequirementsURL(const QUrl &url)
+{
+    if (url == requirementsURL() || !dataModel()) {
+        return;
+    }
+
+    auto cmd = new shared::cmd::CmdSetRequirementsUrl(dataModel(), url);
+    undoStack()->push(cmd);
+
+    Q_EMIT requirementsURLChanged(requirementsURL());
+    Q_EMIT editedExternally(this);
+}
+
+/*!
+ * \brief EditorCore::requirementsURL returns the URL where to fetch the requirements for the entities from
+ */
+const QUrl &EditorCore::requirementsURL() const
+{
+    if (dataModel()) {
+        return dataModel()->requirementsURL();
+    }
+
+    static QUrl url;
+    return url;
 }
 
 void EditorCore::showHelp()

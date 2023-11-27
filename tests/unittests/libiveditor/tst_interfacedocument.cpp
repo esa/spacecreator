@@ -45,6 +45,9 @@ public:
     QStringList allIVFiles() const override { return {}; }
     QStringList allMscFiles() const override { return {}; }
     QStringList allAsn1Files() const override { return { { QString(EXAMPLES_DIR) + "asn1/dataview-uniq.asn" } }; }
+
+    void setRequirementsURL(const QUrl &url) override { Q_UNUSED(url); }
+    QUrl requirementsURL() const override { return QUrl(); };
 };
 
 class tst_InterfaceDocument : public QObject

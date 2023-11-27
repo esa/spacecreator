@@ -123,6 +123,9 @@ DVEditorCore::DVEditorCore(QObject *parent)
     connect(&d->m_hwReload, &QTimer::timeout, this, &DVEditorCore::reloadHWLibrary);
     connect(&d->m_hwLibraryWatcher, &QFileSystemWatcher::directoryChanged, &d->m_hwReload, qOverload<>(&QTimer::start));
     connect(&d->m_hwLibraryWatcher, &QFileSystemWatcher::fileChanged, &d->m_hwReload, qOverload<>(&QTimer::start));
+
+    connect(d->m_appModel->objectsModel(), &shared::DataModel::requirementsURLChanged, this,
+            &shared::EditorCore::requirementsURLChanged);
 }
 
 DVEditorCore::~DVEditorCore() { }
@@ -133,6 +136,14 @@ DVEditorCore::~DVEditorCore() { }
 DVAppModel *DVEditorCore::appModel() const
 {
     return d->m_appModel.get();
+}
+
+shared::DataModel *DVEditorCore::dataModel() const
+{
+    if (d->m_appModel && d->m_appModel->objectsModel()) {
+        return d->m_appModel->objectsModel();
+    }
+    return nullptr;
 }
 
 void DVEditorCore::setSystemChecker(dvm::AbstractSystemChecks *checker)
@@ -317,13 +328,13 @@ bool DVEditorCore::save()
 {
     return d->m_exporter->exportObjectsSilently(d->m_appModel->objectsModel()->objects().values(),
             d->m_appModel->creatorGitHash(), filePath(), d->m_exporter->defaultTemplatePath(),
-            d->m_appModel->uiFileName());
+            d->m_appModel->objectsModel()->requirementsURL(), d->m_appModel->uiFileName());
 }
 
 bool DVEditorCore::saveAs()
 {
     return d->m_exporter->exportObjectsInteractively(d->m_appModel->objectsModel()->objects().values(),
-            d->m_appModel->creatorGitHash(), filePath(), QString(), d->m_appModel->requirementsURL());
+            d->m_appModel->creatorGitHash(), filePath(), QString(), d->m_appModel->objectsModel()->requirementsURL());
 }
 
 DVExporter *DVEditorCore::exporter() const
@@ -558,28 +569,10 @@ void DVEditorCore::centerOnView()
     d->m_mainWidget->centerView();
 }
 
-/*!
- * \brief DVEditorCore::setRequirementsUrl Sets the URL (gitlab project) where the requirements are stored
- */
-void DVEditorCore::setRequirementsUrl(const QUrl &url)
-{
-    d->m_appModel->setRequirementsURL(url.toString());
-}
-
-/*!
- * \brief DVEditorCore::requirementsUrl Returns the URL (gitlab project) where the requirements are stored
- */
-const QUrl &DVEditorCore::requirementsUrl() const
-{
-    static QUrl url;
-    url = QUrl(d->m_appModel->requirementsURL());
-    return url;
-}
-
 void DVEditorCore::showPropertyEditor(const shared::Id &id)
 {
     if (auto obj = d->m_appModel->objectsModel()->getObject(id)) {
-        dve::DVPropertiesDialog dialog(d->m_appModel.get(), d->m_dynPropConfig,
+        dve::DVPropertiesDialog dialog(d->m_appModel->objectsModel(), d->m_dynPropConfig,
                 d->m_model->getItem<shared::ui::VEInteractiveObject *>(id), d->m_systemChecks, d->m_asn1SystemChecks,
                 d->m_appModel->commandsStack(), d->m_mainWidget->window());
         dialog.init();

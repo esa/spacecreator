@@ -48,7 +48,7 @@ bool DVExporter::exportObjects(
 }
 
 bool DVExporter::exportObjectsInteractively(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
-        const QString &outPath, const QString &templatePath, const QString &requirementsURL, QWidget *root)
+        const QString &outPath, const QString &templatePath, const QUrl &requirementsURL, QWidget *root)
 {
     QString usedTemplate(templatePath);
     if (usedTemplate.isEmpty()) {
@@ -75,7 +75,7 @@ bool DVExporter::exportObjectsInteractively(const QList<shared::VEObject *> &obj
 }
 
 bool DVExporter::exportObjectsSilently(const QList<shared::VEObject *> &objects, const QString &creatorGitHash,
-        const QString &outPath, const QString &pathToTemplate, const QString &requirementsURL, const QString &uiFile)
+        const QString &outPath, const QString &pathToTemplate, const QUrl &requirementsURL, const QString &uiFile)
 {
     if (outPath.isEmpty()) {
         return false;
@@ -151,14 +151,14 @@ QString DVExporter::groupName(const shared::VEObject *object) const
  * \note Does not include UI objects
  */
 QHash<QString, QVariant> DVExporter::collectDvObjects(
-        const QList<shared::VEObject *> &objects, const QString &creatorGitHash, const QString &requirementsURL) const
+        const QList<shared::VEObject *> &objects, const QString &creatorGitHash, const QUrl &requirementsURL) const
 {
     QHash<QString, QVariant> dvObjects = collectObjects(objects);
     dvObjects.insert(QLatin1String("creatorHash"),
             QVariant::fromValue(creatorGitHash.isEmpty() ? spaceCreatorGitHash : creatorGitHash));
     dvObjects.insert(QLatin1String("modifierHash"), QVariant::fromValue(spaceCreatorGitHash));
-    if (!requirementsURL.isEmpty()) {
-        dvObjects[QLatin1String("requirementsURL")] = QVariant::fromValue(requirementsURL);
+    if (requirementsURL.isValid()) {
+        dvObjects[QLatin1String("requirementsURL")] = QVariant::fromValue(requirementsURL.toString());
     }
     return dvObjects;
 }

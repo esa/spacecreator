@@ -18,6 +18,7 @@
 #include "ivproject.h"
 
 #include "interfacedocument.h"
+#include "ivmodel.h"
 
 #include <QDebug>
 #include <QFileInfo>
@@ -42,6 +43,22 @@ QString IvProject::projectPath() const
 QStringList IvProject::allAsn1Files() const
 {
     return m_model->asn1FilesPaths() + m_model->asn1FilesPathsExternal();
+}
+
+void IvProject::setRequirementsURL(const QUrl &url)
+{
+    if (m_model) {
+        m_model->objectsModel()->setRequirementsURL(url.toString());
+    }
+}
+
+QUrl IvProject::requirementsURL() const
+{
+    if (m_model) {
+        return m_model->objectsModel()->requirementsURL();
+    }
+
+    return QUrl();
 }
 
 QStringList IvProject::allDVFiles() const

@@ -18,8 +18,8 @@
 #include "ivexporter.h"
 
 #include "interfacedocument.h"
+#include "ivmodel.h"
 #include "scversion.h"
-#include "templating/exportableivobject.h"
 
 #include <QBuffer>
 #include <QDebug>
@@ -141,9 +141,9 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
     if (!uiFilePath.isEmpty()) {
         grouppedObjects[QLatin1String("UiFile")] = QVariant::fromValue(uiFilePath);
     }
-    const QString requirementsURL = doc->requirementsURL();
-    if (!requirementsURL.isEmpty()) {
-        grouppedObjects[QLatin1String("requirementsURL")] = QVariant::fromValue(requirementsURL);
+    const QUrl &requirementsURL = doc->objectsModel()->requirementsURL();
+    if (requirementsURL.isValid()) {
+        grouppedObjects[QLatin1String("requirementsURL")] = QVariant::fromValue(requirementsURL.toString());
     }
 
     const QString creatorGitHash = doc->creatorGitHash();

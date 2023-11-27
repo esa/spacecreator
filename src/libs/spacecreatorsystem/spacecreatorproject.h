@@ -32,9 +32,6 @@ namespace Asn1Acn {
 class Asn1ModelStorage;
 class Asn1SystemChecks;
 }
-namespace shared {
-class EditorCore;
-}
 
 namespace scs {
 
@@ -70,6 +67,7 @@ public:
     virtual IVEditorCorePtr ivCore() const;
     virtual QVector<DVEditorCorePtr> allDVCores() const;
     virtual QVector<MSCEditorCorePtr> allMscCores() const;
+    virtual QVector<EditorCorePtr> allCores() const;
 
     bool contains(QSharedPointer<shared::EditorCore> core) const;
 
@@ -90,6 +88,9 @@ public:
     scs::IvSystemQueries *ivQuery() const;
     // Access to check for the DV files
     scs::DvSystemQueries *dvChecks() const;
+
+    void setRequirementsURL(const QUrl &url) override;
+    QUrl requirementsURL() const override;
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
@@ -115,6 +116,7 @@ protected:
     std::unique_ptr<scs::IVRefactorHandler> m_ivRefactorHandler;
     std::unique_ptr<scs::MSCRefactor> m_mscRefactor;
     std::unique_ptr<scs::DVRefactor> m_dvRefactor;
+    QUrl m_requirementsURL;
 };
 
 } // namespace scs

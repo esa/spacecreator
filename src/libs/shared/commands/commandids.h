@@ -29,9 +29,9 @@ enum Id
     RemoveEntityProperty,
     RenameEntityProperty,
     ChangeEntityAttributes,
+    SetRequirementsUrl,
 
     LastId
 };
-
 }
 }

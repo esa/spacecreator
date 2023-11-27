@@ -39,6 +39,9 @@ public:
     QStringList allMscFiles() const override;
     QStringList allAsn1Files() const override;
 
+    void setRequirementsURL(const QUrl &url) override;
+    QUrl requirementsURL() const override;
+
 private:
     QPointer<InterfaceDocument> m_model;
 };

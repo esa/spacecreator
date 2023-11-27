@@ -37,7 +37,6 @@
 #include "ivinterface.h"
 #include "ivmodel.h"
 #include "ivpropertytemplateconfig.h"
-#include "settingsmanager.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -73,6 +72,9 @@ IVEditorCore::IVEditorCore(QObject *parent)
     if (ivm::IVModel *layerModel = document()->layersModel()) {
         connect(layerModel, &ivm::IVModel::objectsAdded, this, &ive::IVEditorCore::updateIVItems);
     }
+
+    connect(m_document->objectsModel(), &shared::DataModel::requirementsURLChanged, this,
+            &shared::EditorCore::requirementsURLChanged);
 }
 
 IVEditorCore::~IVEditorCore() { }
@@ -83,6 +85,11 @@ IVEditorCore::~IVEditorCore() { }
 InterfaceDocument *IVEditorCore::document() const
 {
     return m_document;
+}
+
+shared::DataModel *IVEditorCore::dataModel() const
+{
+    return m_document->objectsModel();
 }
 
 shared::ui::GraphicsViewBase *IVEditorCore::chartView()
@@ -519,24 +526,6 @@ void IVEditorCore::centerOnView()
 {
     mainwidget();
     m_mainWidget->centerView();
-}
-
-void IVEditorCore::setRequirementsUrl(const QUrl &url)
-{
-    const QUrl oldUrl(url.toString());
-    if (url == oldUrl) {
-        return;
-    }
-
-    m_document->setRequirementsURL(url.toString());
-    Q_EMIT requirementsUrlChanged();
-}
-
-const QUrl &IVEditorCore::requirementsUrl() const
-{
-    static QUrl url;
-    url = QUrl(m_document->requirementsURL());
-    return url;
 }
 
 /*!

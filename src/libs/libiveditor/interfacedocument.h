@@ -17,12 +17,11 @@
 
 #pragma once
 
-#include <shared/common.h>
-#include <shared/entityattribute.h>
-
 #include <QAction>
 #include <QPointer>
 #include <QQueue>
+#include <shared/common.h>
+#include <shared/entityattribute.h>
 
 class QGraphicsScene;
 class QGraphicsItem;
@@ -72,7 +71,6 @@ class InterfaceDocument : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString mscFileName READ mscFileName WRITE setMscFileName NOTIFY mscFileNameChanged)
-    Q_PROPERTY(QString requirementsUrl READ requirementsURL WRITE setRequirementsURL NOTIFY requirementsURLChanged)
 
 public:
     explicit InterfaceDocument(QObject *parent = nullptr);
@@ -122,9 +120,6 @@ public:
     void setCreatorGitHash(const QString &hashStr);
     QString creatorGitHash() const;
 
-    void setRequirementsURL(const QString &url);
-    const QString &requirementsURL() const;
-
     bool isDirty() const;
 
     QList<QAction *> customActions() const;
@@ -171,7 +166,6 @@ public:
 Q_SIGNALS:
     void dirtyChanged(bool dirty);
     void titleChanged();
-    void requirementsURLChanged(const QString &url);
     void asn1FileNameChanged(const QString &asn1FileName);
     void mscFileNameChanged(const QString &mscFileName);
     void uiFileNameChanged(const QString &uiFileName);

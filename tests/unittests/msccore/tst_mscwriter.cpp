@@ -1084,7 +1084,7 @@ void tst_MscWriter::testSerializeMscTimer()
 void tst_MscWriter::testSerializeRequirements()
 {
     auto model = std::make_unique<MscModel>(this);
-    model->setRequirementsUrl(QUrl("https://some.git.lab/pro/one"));
+    model->setRequirementsURL(QUrl("https://some.git.lab/pro/one"));
     auto doc = new MscDocument("Doc_1");
     doc->setRequirements({ "ab1d-ef72", "238f-007b" });
     model->addDocument(doc);

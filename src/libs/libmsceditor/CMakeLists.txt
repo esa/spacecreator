@@ -115,8 +115,6 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdsetmessagedeclarations.h
     commands/cmdsetparameterlist.cpp
     commands/cmdsetparameterlist.h
-    commands/cmdsetrequirementsurl.cpp
-    commands/cmdsetrequirementsurl.h
     commands/cmdtimeritemcreate.cpp
     commands/cmdtimeritemcreate.h
     commands/cmdtimeritemmove.cpp

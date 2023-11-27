@@ -490,7 +490,7 @@ void tst_DVXmlExporter::testExportToBuffer()
 void tst_DVXmlExporter::testExportRequirementsURL()
 {
     m_exporter->exportObjectsSilently(
-            {}, spaceCreatorGitHash, m_testFilePath, QString(), "htpps://some.git.lab/space/creator");
+            {}, spaceCreatorGitHash, m_testFilePath, QString(), QUrl("htpps://some.git.lab/space/creator"));
     const QByteArray text = testFileContent();
     const QByteArray expected = "<?xml version=\"1.0\"?>\n<DeploymentView version=\"1.0\" "
                                 "requirementsURL=\"htpps://some.git.lab/space/creator\"/>";

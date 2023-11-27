@@ -127,7 +127,7 @@ MscModel *MscReader::parse(ANTLRInputStream &input, QStringList *errorMessages)
     QVector<cif::CifBlockShared> cifs = entity->cifs();
     for (const cif::CifBlockShared &block : cifs) {
         if (block->blockType() == cif::CifLine::CifType::RequirementsUrl) {
-            model->setRequirementsUrl(block->payload().toUrl());
+            model->setRequirementsURL(block->payload().toUrl());
             break;
         }
     }

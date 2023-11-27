@@ -24,6 +24,7 @@
 #include "commands/cmdentitynamechange.h"
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
+#include "graphicsview.h"
 #include "hierarchyviewmodel.h"
 #include "ivconnection.h"
 #include "ivfunction.h"
@@ -68,6 +69,12 @@ MSCEditorCore::MSCEditorCore(QObject *parent)
     setSystemChecker(new SystemChecks(this));
 
     connect(m_model->commandsStack(), &msc::MscCommandsStack::nameChanged, this, &msc::MSCEditorCore::nameChanged);
+    connect(m_model->mscModel(), &shared::DataModel::requirementsURLChanged, this,
+            &shared::EditorCore::requirementsURLChanged);
+    connect(m_model.get(), &msc::MainModel::modelUpdated, this, [this]() {
+        connect(m_model->mscModel(), &shared::DataModel::requirementsURLChanged, this,
+                &shared::EditorCore::requirementsURLChanged);
+    });
 
     connect(&(mainModel()->chartViewModel()), &msc::ChartLayoutManager::initialNameAccepted, this,
             [this](MscEntity *entity) {
@@ -86,6 +93,11 @@ MSCEditorCore::~MSCEditorCore() { }
 MainModel *MSCEditorCore::mainModel() const
 {
     return m_model.get();
+}
+
+shared::DataModel *MSCEditorCore::dataModel() const
+{
+    return m_model->mscModel();
 }
 
 shared::ui::GraphicsViewBase *MSCEditorCore::chartView()
@@ -392,22 +404,6 @@ bool MSCEditorCore::save()
     }
 
     return m_model->saveMsc(m_model->currentFilePath());
-}
-
-/*!
- * \brief MSCEditorCore::setRequirementsUrl sets the URL where to fetch the requirements for the entities from
- */
-void MSCEditorCore::setRequirementsUrl(const QUrl &url)
-{
-    m_model->mscModel()->setRequirementsUrl(url);
-}
-
-/*!
- * \brief MSCEditorCore::requirementsUrl returns the URL where to fetch the requirements for the entities from
- */
-const QUrl &MSCEditorCore::requirementsUrl() const
-{
-    return m_model->mscModel()->requirementsUrl();
 }
 
 /*!

@@ -19,6 +19,7 @@
 
 #include "../common/exceptions/inconsistentmodelexception.h"
 #include "common.h"
+#include "datamodel.h"
 #include "entityattribute.h"
 
 #include <QObject>
@@ -29,7 +30,7 @@ namespace shared {
 class VEObject;
 struct VEModelPrivate;
 
-class VEModel : public QObject
+class VEModel : public shared::DataModel
 {
     Q_OBJECT
 public:
@@ -41,7 +42,7 @@ public:
     virtual bool addObject(VEObject *obj);
     virtual bool removeObject(VEObject *obj);
     virtual VEObject *getObject(const shared::Id &id) const;
-    virtual void clear();
+    void clear() override;
 
     /**
      * @brief Lookup for an object that has an attribute `attrName` with `value` set
@@ -54,9 +55,6 @@ public:
     void setExtAttributes(const QHash<shared::Id, EntityAttributes> &attrs);
     QHash<shared::Id, EntityAttributes> extAttributes() const;
     EntityAttributes extEntityAttributes(const shared::Id &id) const;
-
-    void setCreatorGitHash(const QString &hashStr);
-    QString creatorGitHash() const;
 
 public:
     template<typename C, typename T = std::decay_t<decltype(*std::begin(std::declval<C>()))>,

@@ -22,6 +22,7 @@
 #include "archetypeswidget.h"
 #include "asn1systemchecks.h"
 #include "commands/cmdentityattributeschange.h"
+#include "commands/cmdsetrequirementsurl.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
@@ -35,6 +36,7 @@
 #include "ivconnectiongroupmodel.h"
 #include "ivcore/abstractsystemchecks.h"
 #include "ivinterface.h"
+#include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivobject.h"
 #include "ivpropertieslistmodel.h"
@@ -81,10 +83,16 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
             &requirement::RequirementsModel::addRequirements);
     connect(m_reqManager, &RequirementsManager::startfetchingRequirements, m_reqModel,
             &requirement::RequirementsModel::clear);
-
-    m_reqWidget = new RequirementsWidget(document->requirementsURL().toUtf8(), m_reqManager, m_reqModel, this);
-    connect(m_reqWidget, &RequirementsWidget::requirementsUrlChanged,
-            [this](QByteArray requirementUrl) { m_document->setRequirementsURL(requirementUrl); });
+    shared::DataModel *model = document->objectsModel();
+    m_reqWidget = new RequirementsWidget(
+            model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
+    connect(m_reqWidget, &RequirementsWidget::requirementsUrlChanged, this,
+            [model, commandsStack](QByteArray requirementUrl) {
+                const QUrl url = QUrl(QString(requirementUrl));
+                if (url != model->requirementsURL()) {
+                    commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, url));
+                }
+            });
 }
 
 IVPropertiesDialog::~IVPropertiesDialog() { }

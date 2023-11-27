@@ -60,6 +60,7 @@ public:
     ~DVEditorCore() override;
 
     dve::DVAppModel *appModel() const;
+    shared::DataModel *dataModel() const override;
 
     void setAsn1Check(Asn1Acn::Asn1SystemChecks *check);
     Asn1Acn::Asn1SystemChecks *asn1Checker() const;
@@ -109,10 +110,7 @@ public:
     void updateFunctionImplementationList(const QString &functionName);
 
     void centerOnView();
-
-    void setRequirementsUrl(const QUrl &url) override;
-    const QUrl &requirementsUrl() const override;
-
+    
 private Q_SLOTS:
     void showPropertyEditor(const shared::Id &id);
     void showInfoMessage(const QString &title, const QString &message);

@@ -40,15 +40,15 @@ class Asn1SystemChecks;
 }
 namespace dvm {
 class AbstractSystemChecks;
+class DVModel;
 }
 
 namespace dve {
-class DVAppModel;
 
 class DVPropertiesDialog : public shared::PropertiesDialog
 {
 public:
-    DVPropertiesDialog(dve::DVAppModel *appModel, shared::PropertyTemplateConfig *dynPropConfig,
+    DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemplateConfig *dynPropConfig,
             shared::ui::VEInteractiveObject *uiObj, dvm::AbstractSystemChecks *systemChecker,
             Asn1Acn::Asn1SystemChecks *asn1Checks, shared::cmd::CommandsStackBase *commandsStack,
             QWidget *parent = nullptr);

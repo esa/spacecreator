@@ -47,12 +47,16 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdentitypropertyremove.h
     commands/cmdentitypropertyrename.cpp
     commands/cmdentitypropertyrename.h
+    commands/cmdsetrequirementsurl.cpp
+    commands/cmdsetrequirementsurl.h
     commandsstackbase.cpp
     commandsstackbase.h
     common.cpp
     common.h
     componentmodel.cpp
     componentmodel.h
+    datamodel.cpp
+    datamodel.h
     delayedsignal.cpp
     delayedsignal.h
     diskutils.cpp

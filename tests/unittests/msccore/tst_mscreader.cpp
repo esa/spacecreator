@@ -792,5 +792,5 @@ void tst_MscReader::testRequirementsUrl()
                              "endmscdocument;\n");
 
     MscModel *model = m_reader->parseText(msc);
-    QCOMPARE(model->requirementsUrl(), QUrl("https://some.git.lab/pro/one"));
+    QCOMPARE(model->requirementsURL(), QUrl("https://some.git.lab/pro/one"));
 }
