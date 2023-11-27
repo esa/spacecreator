@@ -8,6 +8,8 @@ namespace topohelp {
 namespace utils {
 
 static const qreal kConnectionMargin = 16.0;
+static const qreal kMinSegmentLength = 10.0;
+static const qreal kMinSegmentAngle = 5.0;
 
 enum class IntersectionType
 {
@@ -488,6 +490,36 @@ PointsList path(const RectsList &existingRects, const QLineF &startDirection, co
         }
     }
     return {};
+}
+
+PointsList simplifyPoints(const PointsList &points)
+{
+    if (points.size() <= 2) {
+        return points;
+    }
+
+    static constexpr int piDeg = 180;
+
+    auto checkLines = [](const QLineF &line1, const QLineF &line2) -> bool {
+        if (line1.length() < kMinSegmentLength) {
+            return true;
+        }
+        const int simplifiedAngle = qAbs(qRound(line1.angleTo(line2)) % piDeg);
+        const bool angleOk = simplifiedAngle < kMinSegmentAngle || piDeg - simplifiedAngle < kMinSegmentAngle;
+        return angleOk;
+    };
+
+    PointsList simplifiedPoints(points);
+    for (int idx = 1; idx < simplifiedPoints.size() - 1;) {
+        const QLineF currentLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx - 1) };
+        const QLineF nextLine { simplifiedPoints.value(idx), simplifiedPoints.value(idx + 1) };
+        if (checkLines(currentLine, nextLine)) {
+            simplifiedPoints.removeAt(idx);
+            continue;
+        }
+        ++idx;
+    }
+    return simplifiedPoints;
 }
 
 } // namespace utils

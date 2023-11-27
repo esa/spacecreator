@@ -3,12 +3,12 @@ set(TOPOHELP_LIB_NAME topohelper)
 add_library(${TOPOHELP_LIB_NAME} STATIC)
 
 target_sources(${TOPOHELP_LIB_NAME} PUBLIC
+    utils.h
     connection.h
 )
 target_sources(${TOPOHELP_LIB_NAME} PRIVATE
-    connection.cpp
-    utils.h
     utils.cpp
+    connection.cpp
 )
 
 target_include_directories(${TOPOHELP_LIB_NAME} PUBLIC .)

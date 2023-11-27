@@ -13,9 +13,7 @@ struct ConnectionEnvInfo {
     QList<QRectF> sceneObjects;
 };
 
-PointsList createConnection(const ConnectionEnvInfo &info);
-
-PointsList simplifyPoints(const PointsList &points);
+PointsList createConnectionPath(const ConnectionEnvInfo &info);
 
 } // namespace cnct
 } // namespace topohelp

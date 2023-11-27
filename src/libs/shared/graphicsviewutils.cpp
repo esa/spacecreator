@@ -4,6 +4,7 @@
 #include "positionlookuphelper.h"
 #include "ui/graphicsviewbase.h"
 #include "ui/verectgraphicsitem.h"
+#include "utils.h"
 
 #include <QFontMetricsF>
 #include <QPainter>
@@ -869,12 +870,12 @@ QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const 
         existingRects,
     };
 
-    return createConnection(connectionInfo);
+    return createConnectionPath(connectionInfo);
 }
 
 QVector<QPointF> simplifyPoints(const QVector<QPointF> &points)
 {
-    return topohelp::cnct::simplifyPoints(points);
+    return topohelp::utils::simplifyPoints(points);
 }
 
 bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
