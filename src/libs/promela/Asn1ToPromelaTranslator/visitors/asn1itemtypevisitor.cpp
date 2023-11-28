@@ -757,7 +757,7 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const QString &typeName, co
 
         if (range.first == std::numeric_limits<int32_t>::min()) {
             // special case when minimum value of int32_t is used
-            // in such case, the int datatype in promela does have a representation of such value
+            // in such case, the int datatype in promela does not have a representation of such value
             // (see https://spinroot.com/spin/Man/datatypes.html)
             rangeCheckingExpressions.push_back(std::move(*lessThanExpr));
         } else {
