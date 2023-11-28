@@ -1,0 +1,193 @@
+{
+    "actions": [
+        {
+            "CommandType": "Instance",
+            "Parameters": {
+                "name": "Instance_A"
+            }
+        },
+        {
+            "CommandType": "Instance",
+            "Parameters": {
+                "name": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Instance",
+            "Parameters": {
+                "name": "Instance_C"
+            }
+        },
+        {
+            "CommandType": "Instance",
+            "Parameters": {
+                "name": "Instance_D"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "start-client",
+                "srcName": "Instance_A",
+                "dstName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "request-content",
+                "srcName": "Instance_B",
+                "dstName": "Instance_C"
+            }
+        },
+        {
+            "CommandType": "Condition",
+            "Parameters": {
+                "name": "wait_for_data",
+                "instanceName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "create",
+                "srcName": "Instance_C",
+                "dstName": "Instance_D",
+                "MessageType" : "Create"
+            }
+        },
+        {
+            "CommandType": "Condition",
+            "Parameters": {
+                "name": "running",
+                "instanceName": "Instance_D"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "get-state",
+                "srcName": "Instance_C",
+                "dstName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Timer",
+            "Parameters": {
+                "name": "pulse",
+                "instanceName": "Instance_D",
+                "TimerType": "Start"
+            }
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "sent-content",
+                "srcName": "Instance_D",
+                "dstName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Timer",
+            "Parameters": {
+                "name": "pulse",
+                "instanceName": "Instance_D",
+                "TimerType": "Start"
+            }
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Undo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Redo"
+        },
+        {
+            "CommandType": "Message",
+            "Parameters": {
+                "name": "ping",
+                "srcName": "Instance_D",
+                "dstName": "Instance_A"
+            }
+        },
+        {
+            "CommandType": "Action",
+            "Parameters": {
+                "name": "Action_0",
+                "instanceName": "Instance_B"
+            }
+        },
+        {
+            "CommandType": "Action",
+            "Parameters": {
+                "name": "Action_1",
+                "instanceName": "Instance_A"
+            }
+        }
+    ]
+}

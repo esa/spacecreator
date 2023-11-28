@@ -60,8 +60,11 @@ private Q_SLOTS:
     void testAddMessage();
     void testAddTimer();
     void testRedoMessage();
+    void testRedoInstance();
 
 private:
+    MscMessage *addMessage(const QString &name, MscInstance *from, MscInstance *to, int idx);
+
     std::unique_ptr<MscModel> m_dataModel;
     std::unique_ptr<MscCommandsStack> m_undoStack;
     std::unique_ptr<StreamingLayoutManager> m_layoutManager;
@@ -363,40 +366,78 @@ void tst_StreamingLayoutManager::testRedoMessage()
     MscInstance *instanceB = m_chart->makeInstance("B");
     instanceB->setCifGeometry({ { 800, 100 }, { 200, 0 }, { 0, 300 } });
 
-    MscMessage *message = new MscMessage("setAngle");
-    message->setSourceInstance(instanceA);
-    message->setTargetInstance(instanceB);
-    ChartIndexList instanceIndexes { { instanceA, 0 }, { instanceB, 0 } };
-    m_chart->addInstanceEvent(message, instanceIndexes);
-
+    MscMessage *message = addMessage("setAngle", instanceA, instanceB, 0);
     MessageItem *messageItem = m_layoutManager->itemForMessage(message);
     QCOMPARE_NE(messageItem, nullptr);
-
     const QRectF messageRect = messageItem->sceneBoundingRect();
 
-    MscMessage *message2 = new MscMessage("setRadius");
-    message2->setSourceInstance(instanceA);
-    message2->setTargetInstance(instanceB);
-    ChartIndexList instanceIndexes2 { { instanceA, 1 }, { instanceB, 1 } };
-    m_chart->addInstanceEvent(message2, instanceIndexes2);
-
+    MscMessage *message2 = addMessage("setRadius", instanceA, instanceB, 1);
     MessageItem *messageItem2 = m_layoutManager->itemForMessage(message2);
     QCOMPARE_NE(messageItem2, nullptr);
-
     const QRectF messageRect2 = messageItem2->sceneBoundingRect();
 
     // undo
     m_chart->removeInstanceEvent(message2);
     m_chart->removeInstanceEvent(message);
+
     // redo
-    m_chart->addInstanceEvent(message, instanceIndexes);
-    m_chart->addInstanceEvent(message2, instanceIndexes2);
+    message = addMessage("setAngle", instanceA, instanceB, 0);
+    message2 = addMessage("setRadius", instanceA, instanceB, 1);
 
     // check rectangle
     messageItem = m_layoutManager->itemForMessage(message);
     messageItem2 = m_layoutManager->itemForMessage(message2);
     QCOMPARE(messageRect, messageItem->sceneBoundingRect());
     QCOMPARE(messageRect2, messageItem2->sceneBoundingRect());
+}
+
+void tst_StreamingLayoutManager::testRedoInstance()
+{
+    MscInstance *instanceA = m_chart->makeInstance("A");
+    MscInstance *instanceB = m_chart->makeInstance("B");
+    const QVector<QPoint> &cifGeometry = { { 800, 100 }, { 200, 0 }, { 0, 300 } };
+    instanceB->setCifGeometry(cifGeometry);
+
+    MscMessage *message = addMessage("setAngle", instanceA, instanceB, 0);
+    MessageItem *messageItem = m_layoutManager->itemForMessage(message);
+    QCOMPARE_NE(messageItem, nullptr);
+    const QRectF messageRect = messageItem->sceneBoundingRect();
+
+    MscMessage *message2 = addMessage("setRadius", instanceA, instanceB, 1);
+    MessageItem *messageItem2 = m_layoutManager->itemForMessage(message2);
+    QCOMPARE_NE(messageItem2, nullptr);
+    const QRectF messageRect2 = messageItem2->sceneBoundingRect();
+
+    InstanceItem *instanceAItem = m_layoutManager->itemForInstance(instanceA);
+    const QRectF instARect = instanceAItem->sceneBoundingRect();
+    InstanceItem *instanceBItem = m_layoutManager->itemForInstance(instanceB);
+    const QRectF instBRect = instanceBItem->sceneBoundingRect();
+
+    // undo
+    m_chart->removeInstanceEvent(message2);
+    m_chart->removeInstanceEvent(message);
+    m_chart->removeInstance(instanceB);
+
+    // redo
+    instanceB = m_chart->makeInstance("B");
+    instanceB->setCifGeometry(cifGeometry);
+    m_chart->addInstance(instanceB);
+    message = addMessage("setAngle", instanceA, instanceB, 0);
+    message2 = addMessage("setRadius", instanceA, instanceB, 1);
+
+    instanceBItem = m_layoutManager->itemForInstance(instanceB);
+    QCOMPARE(instARect, instanceAItem->sceneBoundingRect());
+    QCOMPARE(instBRect, instanceBItem->sceneBoundingRect());
+}
+
+MscMessage *tst_StreamingLayoutManager::addMessage(const QString &name, MscInstance *from, MscInstance *to, int idx)
+{
+    MscMessage *message = new MscMessage("setAngle");
+    message->setSourceInstance(from);
+    message->setTargetInstance(to);
+    ChartIndexList instanceIndexes { { from, idx }, { to, idx } };
+    m_chart->addInstanceEvent(message, instanceIndexes);
+    return message;
 }
 
 QTEST_MAIN(tst_StreamingLayoutManager)

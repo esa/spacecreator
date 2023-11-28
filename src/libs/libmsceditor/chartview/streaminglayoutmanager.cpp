@@ -218,6 +218,7 @@ void StreamingLayoutManager::instanceAdded(MscInstance *instance, int index)
         m_instanceItems.append(item);
     }
     m_nextYperInstance[instance] = item->headerItem()->sceneBoundingRect().bottom() + interMessageSpan() / 2.;
+    item->syncHeightToChartBox();
     updateInstancesRect();
     Q_EMIT instanceItemsChanged();
 }

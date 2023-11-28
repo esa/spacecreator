@@ -14,7 +14,7 @@ import time
 
 idx = 0
 
-with open('astream.json') as json_file:
+with open('astream_undo_redo.json') as json_file:
     actions = json.load(json_file)['actions']
 
 def run(*args):
