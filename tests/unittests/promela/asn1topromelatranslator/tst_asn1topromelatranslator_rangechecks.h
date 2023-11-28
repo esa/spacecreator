@@ -36,6 +36,7 @@ private Q_SLOTS:
     void cleanupTestCase();
 
     void testInteger() const;
+    void testIntegerMinValue() const;
     void testEnum() const;
     void testSequenceOf() const;
 

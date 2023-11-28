@@ -51,9 +51,9 @@ using promela::translator::Asn1NodeVisitor;
 
 namespace tmc::test {
 
-void tst_Asn1ToPromelaTranslator_RangeChecks::initTestCase() {}
+void tst_Asn1ToPromelaTranslator_RangeChecks::initTestCase() { }
 
-void tst_Asn1ToPromelaTranslator_RangeChecks::cleanupTestCase() {}
+void tst_Asn1ToPromelaTranslator_RangeChecks::cleanupTestCase() { }
 
 void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
 {
@@ -106,6 +106,48 @@ void tst_Asn1ToPromelaTranslator_RangeChecks::testInteger() const
         QVERIFY(maxValueVar != nullptr);
         QCOMPARE(maxValueVar->getElements().begin()->m_name, "MyInteger_vc");
         const auto maxValueConst = std::get_if<Constant>(&maxValueExpr->getRight()->getContent());
+        QVERIFY(maxValueConst != nullptr);
+        QCOMPARE(maxValueConst->getValue(), 10);
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_RangeChecks::testIntegerMinValue() const
+{
+    // test for special case, then check for minimum value shall not be generated
+    auto asn1Model = std::make_unique<Definitions>("TmcTestModule", SourceLocation());
+
+    {
+        auto integerType = std::make_unique<Integer>();
+        integerType->constraints().append({ std::numeric_limits<int32_t>::min(), 10 });
+        auto myIntegerAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyInteger"), QStringLiteral("MyInteger"), SourceLocation(), std::move(integerType));
+
+        asn1Model->addType(std::move(myIntegerAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*asn1Model);
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 2);
+    {
+        const auto inlineDef = findInline(promelaModel.getInlineDefs(), "MyInteger_range_check");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 1);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
+
+        const auto assertCall = findAssertCall(inlineDef->getSequence());
+        QVERIFY(assertCall != nullptr);
+
+        const auto assertExpr = std::get_if<BinaryExpression>(&assertCall->expression().getContent());
+        QVERIFY(assertExpr != nullptr);
+
+        QVERIFY(assertExpr->getOperator() == BinaryExpression::Operator::LEQUAL);
+
+        const auto maxValueVar = std::get_if<VariableRef>(&assertExpr->getLeft()->getContent());
+        QVERIFY(maxValueVar != nullptr);
+        QCOMPARE(maxValueVar->getElements().begin()->m_name, "MyInteger_vc");
+        const auto maxValueConst = std::get_if<Constant>(&assertExpr->getRight()->getContent());
         QVERIFY(maxValueConst != nullptr);
         QCOMPARE(maxValueConst->getValue(), 10);
     }
