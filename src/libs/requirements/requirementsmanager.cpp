@@ -95,11 +95,13 @@ void RequirementsManager::requestRequirements(const QString &assignee, const QSt
     }
 }
 
-void RequirementsManager::createRequirement(const QString &title, const QString &description) const
+void RequirementsManager::createRequirement(
+        const QString &title, const QString &reqIfId, const QString &description) const
 {
     switch (d->mRepoType) {
     case (REPO_TYPE::GITLAB): {
-        d->gitlabClient->createIssue(m_projectID, title, description);
+        const QString descr = QString("#reqid %1\n\n%2").arg(reqIfId, description);
+        d->gitlabClient->createIssue(m_projectID, title, descr);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this, &RequirementsManager::requirementCreated,
                 Qt::UniqueConnection);
         break;

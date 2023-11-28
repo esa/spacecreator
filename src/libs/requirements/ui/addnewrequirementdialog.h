@@ -33,9 +33,12 @@ class AddNewRequirementDialog : public QDialog
 public:
     explicit AddNewRequirementDialog(QWidget *parent = nullptr);
     ~AddNewRequirementDialog();
-    QString title();
-    QString description();
+    QString title() const;
+    QString description() const;
+    QString reqIfId() const;
 
 private:
+    void updateOkButton();
+
     Ui::AddNewRequirementDialog *ui;
 };

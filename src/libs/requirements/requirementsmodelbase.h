@@ -36,7 +36,8 @@ class RequirementsModelBase : public QAbstractTableModel
 public:
     enum RoleNames
     {
-        IssueLinkRole = Qt::UserRole + 1
+        IssueLinkRole = Qt::UserRole + 1,
+        ReqIfIdRole
     };
 
     enum HEADER_SECTIONS
@@ -72,7 +73,7 @@ public:
     static QSet<QString> convert(const QByteArrayList &list);
 
 protected:
-    QString getIdFromModelIndex(const QModelIndex &index) const;
+    QString getReqIfIdFromModelIndex(const QModelIndex &index) const;
 
     QList<Requirement> m_requirements;
     QSet<QString> m_selectedRequirements;

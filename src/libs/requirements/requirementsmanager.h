@@ -37,7 +37,7 @@ public:
     ~RequirementsManager();
     void setCredentials(const QString &url, const QString &token);
     void requestRequirements(const QString &assignee, const QString &author);
-    void createRequirement(const QString &title, const QString &description) const;
+    void createRequirement(const QString &title, const QString &reqIfId, const QString &description) const;
     void requestProjectID(const QUrl &url);
     QString projectID() const;
 

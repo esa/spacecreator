@@ -93,7 +93,7 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case REQUIREMENT_ID:
-            return m_requirements[index.row()].m_id;
+            return m_requirements[index.row()].m_issueID;
         case DESCRIPTION:
             return m_requirements[index.row()].m_longName;
         }
@@ -103,7 +103,11 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::CheckStateRole && index.column() == CHECKED) {
-        return m_selectedRequirements.contains(getIdFromModelIndex(index)) ? Qt::Checked : Qt::Unchecked;
+        return m_selectedRequirements.contains(getReqIfIdFromModelIndex(index)) ? Qt::Checked : Qt::Unchecked;
+    }
+
+    if (role == RequirementsModelBase::RoleNames::ReqIfIdRole) {
+        return m_requirements[index.row()].m_id;
     }
 
     return QVariant();
@@ -112,7 +116,7 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
 bool RequirementsModelBase::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (index.isValid() && role == Qt::CheckStateRole && index.column() == CHECKED) {
-        QString requirementID = getIdFromModelIndex(index);
+        const QString requirementID = getReqIfIdFromModelIndex(index);
         bool checked = value.toBool();
         if (checked) {
             m_selectedRequirements.insert(requirementID);
@@ -126,10 +130,10 @@ bool RequirementsModelBase::setData(const QModelIndex &index, const QVariant &va
     return QAbstractTableModel::setData(index, value, role);
 }
 
-QString RequirementsModelBase::getIdFromModelIndex(const QModelIndex &index) const
+QString RequirementsModelBase::getReqIfIdFromModelIndex(const QModelIndex &index) const
 {
-    auto idx = this->index(index.row(), requirement::RequirementsModelBase::REQUIREMENT_ID);
-    return this->data(idx, Qt::DisplayRole).toString();
+    auto idx = this->index(index.row(), REQUIREMENT_ID);
+    return this->data(idx, RequirementsModelBase::ReqIfIdRole).toString();
 }
 
 Qt::ItemFlags RequirementsModelBase::flags(const QModelIndex &index) const

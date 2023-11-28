@@ -20,6 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "ui_addnewrequirementdialog.h"
 
 #include <QDialogButtonBox>
+#include <QPushButton>
 
 AddNewRequirementDialog::AddNewRequirementDialog(QWidget *parent)
     : QDialog(parent)
@@ -27,6 +28,10 @@ AddNewRequirementDialog::AddNewRequirementDialog(QWidget *parent)
 {
     ui->setupUi(this);
     ui->gridLayout->setVerticalSpacing(10);
+
+    connect(ui->titleLineEdit, &QLineEdit::textChanged, this, &AddNewRequirementDialog::updateOkButton);
+    connect(ui->idLineEdit, &QLineEdit::textChanged, this, &AddNewRequirementDialog::updateOkButton);
+    updateOkButton();
 }
 
 AddNewRequirementDialog::~AddNewRequirementDialog()
@@ -34,12 +39,35 @@ AddNewRequirementDialog::~AddNewRequirementDialog()
     delete ui;
 }
 
-QString AddNewRequirementDialog::title()
+/*!
+ * Returns the title of the requirements.
+ * A title is mandatory to add a requirement
+ */
+QString AddNewRequirementDialog::title() const
 {
-    return ui->TitleLineEdit->text();
+    return ui->titleLineEdit->text();
 }
 
-QString AddNewRequirementDialog::description()
+QString AddNewRequirementDialog::description() const
 {
-    return ui->DescriptionTextEdit->toPlainText();
+    return ui->descriptionTextEdit->toPlainText();
+}
+
+/*!
+ * Returns the ID of the requirements.
+ * An ID is mandatory to add a requirement
+ */
+QString AddNewRequirementDialog::reqIfId() const
+{
+    return ui->idLineEdit->text();
+}
+
+void AddNewRequirementDialog::updateOkButton()
+{
+    QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    if (!okButton) {
+        return;
+    }
+
+    okButton->setEnabled(!ui->titleLineEdit->text().isEmpty() && !ui->idLineEdit->text().isEmpty());
 }

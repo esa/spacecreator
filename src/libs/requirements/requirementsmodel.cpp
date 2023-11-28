@@ -35,7 +35,7 @@ QVariant RequirementsModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::CheckStateRole && index.column() == CHECKED) {
-        auto requirementID = getIdFromModelIndex(index);
+        auto requirementID = getReqIfIdFromModelIndex(index);
         return (m_dataObject->requestsIDs().contains(requirementID)) ? Qt::Checked : Qt::Unchecked;
     }
 
@@ -45,8 +45,8 @@ QVariant RequirementsModel::data(const QModelIndex &index, int role) const
 bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (index.isValid() && role == Qt::CheckStateRole && index.column() == CHECKED) {
-        auto requirementID = getIdFromModelIndex(index);
-        auto checked = value.toBool();
+        const QString requirementID = getReqIfIdFromModelIndex(index);
+        const bool checked = value.toBool();
         QStringList selectedRequirements = m_dataObject->requestsIDs();
         if (checked) {
             selectedRequirements << requirementID;

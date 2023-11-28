@@ -35,7 +35,31 @@ void GitLabRequirements::listOfIssues(const QList<gitlab::Issue> &issues)
 
 Requirement GitLabRequirements::requirementFromIssue(const gitlab::Issue &issue)
 {
-    return { QString::number(issue.mIssueIID), issue.mTitle, issue.mDescription, QString::number(issue.mIssueIID),
-        issue.mUrl };
+    return { pareseReqIfId(issue), issue.mTitle, issue.mDescription, QString::number(issue.mIssueIID), issue.mUrl };
+}
+
+QString GitLabRequirements::pareseReqIfId(const gitlab::Issue &issue)
+{
+    static const QString keyWord("#reqid");
+    for (const QString &line : issue.mDescription.split("\n")) {
+        QString id = line.trimmed();
+        if (id.trimmed().startsWith(keyWord)) {
+            id = id.sliced(keyWord.length());
+            id = id.trimmed();
+            if (id.startsWith(":")) {
+                id = id.sliced(1).trimmed();
+            }
+
+            // Remove quotes if there
+            if (id.startsWith("\"")) {
+                id = id.sliced(1);
+            }
+            if (id.endsWith("\"")) {
+                id.chop(1);
+            }
+            return id;
+        }
+    }
+    return QString::number(issue.mIssueIID);
 }
 }

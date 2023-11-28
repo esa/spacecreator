@@ -212,6 +212,6 @@ void RequirementsWidget::showNewRequirementDialog() const
     dialog->setModal(true);
     auto ret = dialog->exec();
     if (ret == QDialog::Accepted) {
-        mReqManager->createRequirement(dialog->title(), dialog->description());
+        mReqManager->createRequirement(dialog->title(), dialog->reqIfId(), dialog->description());
     }
 }
