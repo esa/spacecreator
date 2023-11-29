@@ -82,6 +82,7 @@ public:
         iface_id,
         reference,
         requests_ids,
+        review_ids,
 
         // properties values
         QGenC,

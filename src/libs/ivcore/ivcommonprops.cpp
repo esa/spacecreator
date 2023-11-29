@@ -77,6 +77,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "iface_id", Token::iface_id },
     { "reference", Token::reference },
     { "requests_ids", Token::requests_ids },
+    { "review_ids", Token::review_ids },
 
     // TASTE props:
     { "Taste::coordinates", Token::coordinates },
