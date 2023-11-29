@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setOrganizationName(SC_ORGANISATION);
     a.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
-    a.setApplicationVersion(spaceCreatorVersion);
+    a.setApplicationVersion(spaceCreatorVersionAndGit);
     a.setApplicationName("IV Editor");
 
     QDirIterator dirIt(":/fonts");

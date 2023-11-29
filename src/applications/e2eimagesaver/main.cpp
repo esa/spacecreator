@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     app.setOrganizationName(SC_ORGANISATION);
     app.setOrganizationDomain(SC_ORGANISATION_DOMAIN);
-    app.setApplicationVersion(spaceCreatorVersion);
+    app.setApplicationVersion(spaceCreatorVersionAndGit);
     app.setApplicationName(QObject::tr("e2eimagesaver"));
 
     QCommandLineParser cmdParser;
