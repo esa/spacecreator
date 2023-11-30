@@ -16,8 +16,6 @@ target_sources(${LIB_NAME} PRIVATE
     animation.h
     breadcrumbwidget.cpp
     breadcrumbwidget.h
-    checkedfilterproxymodel.cpp
-    checkedfilterproxymodel.h
     colors/colorhandler.cpp
     colors/colorhandler.h
     colors/colorhandlereditor.cpp
@@ -122,6 +120,8 @@ target_sources(${LIB_NAME} PRIVATE
     reports/bugreportdialog.ui
     reports/bugreporthandler.cpp
     reports/bugreporthandler.h
+    requirementsmodel.cpp
+    requirementsmodel.h
     settingsmanager.cpp
     settingsmanager.h
     sharedlibrary.cpp
@@ -186,6 +186,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_WEBSOCKETS}
     ${QT_WIDGETS}
     ${QT_XML}
+    requirements
 )
 
 if(OPTIONS_NO_DEPRECATED)

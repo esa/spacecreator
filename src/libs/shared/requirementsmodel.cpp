@@ -59,7 +59,7 @@ bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value,
         bool ok = m_cmdMacro->push(new shared::cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject,
                 { EntityAttribute { m_attributeName, QVariant::fromValue<QString>(selectedRequirements.join(",")),
                         EntityAttribute::Type::Attribute } }));
-        emit dataChanged(index, index, { role });
+        Q_EMIT dataChanged(index, index, { role });
         return ok;
     }
 
