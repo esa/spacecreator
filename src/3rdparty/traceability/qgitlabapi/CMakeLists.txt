@@ -1,8 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
 set(LIB_NAME QGitlabAPI)
-set(CMAKE_AUTOMOC ON)
-
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(QGitlabAPI STATIC)
 
