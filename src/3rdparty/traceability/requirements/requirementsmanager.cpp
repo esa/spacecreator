@@ -104,8 +104,8 @@ void RequirementsManager::createRequirement(
     case (REPO_TYPE::GITLAB): {
         const QString descr = QString("#reqid %1\n\n%2").arg(reqIfId, description);
         d->gitlabClient->createIssue(m_projectID, title, descr);
-        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this, &RequirementsManager::requirementCreated,
-                Qt::UniqueConnection);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this,
+                &RequirementsManager::requirementCreated, Qt::UniqueConnection);
         break;
     }
     default:

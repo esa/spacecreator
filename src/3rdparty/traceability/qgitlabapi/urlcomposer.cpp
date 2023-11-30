@@ -52,7 +52,7 @@ QUrl UrlComposer::composeCreateIssueUrl(
     address = address.arg(projectID);
 
     const QMap<QByteArray, QVariant> data = { { "id", projectID }, { "title", title }, { "description", description },
-        { "assignee_id", assignee }, {"labels", {"requirement"}} };
+        { "assignee_id", assignee }, { "labels", { "requirement" } } };
 
     QUrl url(address);
     url.setQuery(setQuery(data));

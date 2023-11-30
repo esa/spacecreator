@@ -29,7 +29,6 @@ class RequirementsManager : public QObject
     Q_OBJECT
     Q_PROPERTY(QString projectID READ projectID WRITE setProjectID NOTIFY connectionReady)
 public:
-
     enum class REPO_TYPE
     {
         GITLAB

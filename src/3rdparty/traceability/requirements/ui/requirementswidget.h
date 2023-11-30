@@ -75,7 +75,7 @@ private:
     CheckedFilterProxyModel m_checkedModel;
     QByteArray m_requirementsUrl;
 
-    QString tokenKey( const QString& base) const {return QString("%1__token").arg(base);}
+    QString tokenKey(const QString &base) const { return QString("%1__token").arg(base); }
 };
 
 }

@@ -16,7 +16,8 @@ class IssueRequestOptions;
 /**
  * @brief The QGitlabClient class is the main class to start requests on the Gitlab server
  */
-class QGITLABAPI_EXPORT QGitlabClient: public QObject {
+class QGITLABAPI_EXPORT QGitlabClient : public QObject
+{
     Q_OBJECT
 public:
     enum ReqType
@@ -27,9 +28,9 @@ public:
     };
 
     QGitlabClient();
-    void setCredentials(const QString & url, const QString &token);
+    void setCredentials(const QString &url, const QString &token);
     void requestIssues(const QString &projectID, const IssueRequestOptions &options);
-    void editIssue(const QString &projectID, const QString &issueID, const Issue& newIssue);
+    void editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue);
     void createIssue(const QString &projectID, const QString &title, const QString &description);
     void requestListofLabels(
             const QString &projectID, const QString &with_counts = "false", const QString &search = QString());
@@ -48,6 +49,7 @@ Q_SIGNALS:
     void requestedProjectID(QString);
     void connectionError(QString errorString);
     void issueCreated();
+
 protected:
     QNetworkReply *sendRequest(ReqType reqType, const QUrl &url);
     int pageNumberFromHeader(QNetworkReply *reply) const;
@@ -60,5 +62,4 @@ private:
     QString mToken;
     QNetworkAccessManager mManager;
 };
-
 }

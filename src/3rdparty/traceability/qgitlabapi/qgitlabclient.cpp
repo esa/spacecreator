@@ -87,9 +87,7 @@ void QGitlabClient::createIssue(const QString &projectID, const QString &title, 
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << reply->error() << reply->errorString();
             Q_EMIT connectionError(reply->errorString());
-        }
-        else
-        {
+        } else {
             Q_EMIT issueCreated();
         }
     });
@@ -123,7 +121,7 @@ void QGitlabClient::requestProjectId(const QUrl &projectUrl)
 {
     auto projectName = QDir(QUrl(projectUrl).path()).dirName();
     auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectUrl(projectName));
-    connect(reply, &QNetworkReply::finished, [reply,projectUrl, this]() {
+    connect(reply, &QNetworkReply::finished, [reply, projectUrl, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
@@ -136,19 +134,13 @@ void QGitlabClient::requestProjectId(const QUrl &projectUrl)
                 if (!content.isEmpty()) {
                     static const auto ID = "id";
                     QString projectID;
-                    for (const auto item: content)
-                    {
-                        if (item.toObject().value("web_url").toString() == projectUrl.toString())
-                        {
+                    for (const auto item : content) {
+                        if (item.toObject().value("web_url").toString() == projectUrl.toString()) {
                             projectID = QString::number(item.toObject().value("id").toInteger());
                             Q_EMIT requestedProjectID(projectID);
                             break;
                         }
                     }
-
-
-
-
                 }
             }
         } else {
