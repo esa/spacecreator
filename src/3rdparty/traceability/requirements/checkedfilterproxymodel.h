@@ -19,7 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include <QSortFilterProxyModel>
 
-namespace shared {
+namespace requirement {
 
 /**
  * @brief The CheckedFilterProxyModel class is used to filter a Qt view model for rows that are checked
@@ -43,5 +43,4 @@ private:
     bool m_filterChecked = true;
 };
 
-} // namespace shared
-
+} // namespace requirement

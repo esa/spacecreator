@@ -22,9 +22,11 @@
 
 #include <QPointer>
 
+namespace requirement {
 class RequirementsWidget;
 class RequirementsManager;
-namespace requirement {
+}
+namespace shared {
 class RequirementsModel;
 }
 
@@ -80,9 +82,9 @@ private:
     bool m_isRequiredSystemElement;
 
     QPointer<InterfaceDocument> m_document;
-    RequirementsWidget *m_reqWidget = nullptr;
-    RequirementsManager *m_reqManager = nullptr;
-    requirement::RequirementsModel *m_reqModel = nullptr;
+    requirement::RequirementsWidget *m_reqWidget = nullptr;
+    requirement::RequirementsManager *m_reqManager = nullptr;
+    shared::RequirementsModel *m_reqModel = nullptr;
 };
 
 } // namespace ive

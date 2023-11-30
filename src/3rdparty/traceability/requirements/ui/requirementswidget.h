@@ -31,10 +31,9 @@ namespace ive {
 class InterfaceDocument;
 }
 
-class RequirementsManager;
 namespace requirement {
+class RequirementsManager;
 class RequirementsModelBase;
-}
 
 class RequirementsWidget : public QWidget
 {
@@ -73,9 +72,10 @@ private:
     QPointer<RequirementsManager> mReqManager;
     QPointer<requirement::RequirementsModelBase> m_model;
     QSortFilterProxyModel m_filterModel;
-    shared::CheckedFilterProxyModel m_checkedModel;
+    CheckedFilterProxyModel m_checkedModel;
     QByteArray m_requirementsUrl;
 
     QString tokenKey( const QString& base) const {return QString("%1__token").arg(base);}
-
 };
+
+}

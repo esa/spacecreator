@@ -75,18 +75,18 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     , m_isFixedSystemElement(dataObject()->isFixedSystemElement())
     , m_isRequiredSystemElement(false)
 {
-    m_reqManager = new RequirementsManager(RequirementsManager::REPO_TYPE::GITLAB, this);
-    m_reqModel = new requirement::RequirementsModel(this);
+    m_reqManager = new requirement::RequirementsManager(requirement::RequirementsManager::REPO_TYPE::GITLAB, this);
+    m_reqModel = new shared::RequirementsModel(this);
     m_reqModel->setDataObject(dataObject());
     m_reqModel->setPropertyTemplateConfig(dynPropConfig);
-    connect(m_reqManager, &RequirementsManager::listOfRequirements, m_reqModel,
-            &requirement::RequirementsModel::addRequirements);
-    connect(m_reqManager, &RequirementsManager::startfetchingRequirements, m_reqModel,
-            &requirement::RequirementsModel::clear);
+    connect(m_reqManager, &requirement::RequirementsManager::listOfRequirements, m_reqModel,
+            &shared::RequirementsModel::addRequirements);
+    connect(m_reqManager, &requirement::RequirementsManager::startfetchingRequirements, m_reqModel,
+            &shared::RequirementsModel::clear);
     shared::DataModel *model = document->objectsModel();
-    m_reqWidget = new RequirementsWidget(
+    m_reqWidget = new requirement::RequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
-    connect(m_reqWidget, &RequirementsWidget::requirementsUrlChanged, this,
+    connect(m_reqWidget, &requirement::RequirementsWidget::requirementsUrlChanged, this,
             [model, commandsStack](QByteArray requirementUrl) {
                 const QUrl url = QUrl(QString(requirementUrl));
                 if (url != model->requirementsURL()) {

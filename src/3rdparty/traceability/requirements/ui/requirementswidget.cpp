@@ -29,11 +29,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QSettings>
 #include <QTableView>
 
-using namespace requirement;
-
-namespace {
+namespace requirement {
 const int kIconSize = 16;
-}
 
 RequirementsWidget::RequirementsWidget(
         const QByteArray &requirementsUrl, RequirementsManager *manager, RequirementsModelBase *model, QWidget *parent)
@@ -214,4 +211,6 @@ void RequirementsWidget::showNewRequirementDialog() const
     if (ret == QDialog::Accepted) {
         mReqManager->createRequirement(dialog->title(), dialog->reqIfId(), dialog->description());
     }
+}
+
 }

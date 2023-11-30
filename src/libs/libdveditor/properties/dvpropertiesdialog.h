@@ -30,9 +30,11 @@ class CommandsStackBase;
 class PropertyTemplateConfig;
 } // namespace cmd
 } // namespace shared
+namespace requirement {
 class RequirementsWidget;
 class RequirementsManager;
-namespace requirement {
+}
+namespace shared {
 class RequirementsModel;
 }
 namespace Asn1Acn {
@@ -68,9 +70,9 @@ private:
 
     dvm::AbstractSystemChecks *m_dvChecker = nullptr;
     Asn1Acn::Asn1SystemChecks *m_asn1Checks = nullptr;
-    RequirementsWidget *m_reqWidget = nullptr;
-    RequirementsManager *m_reqManager = nullptr;
-    requirement::RequirementsModel *m_reqModel = nullptr;
+    requirement::RequirementsWidget *m_reqWidget = nullptr;
+    requirement::RequirementsManager *m_reqManager = nullptr;
+    shared::RequirementsModel *m_reqModel = nullptr;
 };
 
 } // namespace dve

@@ -22,6 +22,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QDialogButtonBox>
 #include <QPushButton>
 
+namespace requirement {
+
 AddNewRequirementDialog::AddNewRequirementDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::AddNewRequirementDialog)
@@ -70,4 +72,6 @@ void AddNewRequirementDialog::updateOkButton()
     }
 
     okButton->setEnabled(!ui->titleLineEdit->text().isEmpty() && !ui->idLineEdit->text().isEmpty());
+}
+
 }

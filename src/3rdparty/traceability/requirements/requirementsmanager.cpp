@@ -24,6 +24,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <issuerequestoptions.h>
 #include <qgitlabclient.h>
 
+namespace requirement {
+
 struct RequirementsManager::RequirementsManagerPrivate {
     RequirementsManagerPrivate(RequirementsManager::REPO_TYPE repoType)
         : mRepoType(repoType)
@@ -136,4 +138,6 @@ void RequirementsManager::setProjectID(const QString &newProjectID)
         return;
     m_projectID = newProjectID;
     Q_EMIT connectionReady();
+}
+
 }

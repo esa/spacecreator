@@ -21,11 +21,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QPointer>
 #include <QUrl>
 
-class RequirementsWidget;
-class RequirementsManager;
-
 namespace requirement {
+class RequirementsManager;
 class RequirementsModelBase;
+class RequirementsWidget;
 }
 
 namespace msc {
@@ -54,8 +53,8 @@ public:
 
 private:
     Ui::MscRequirementsDialog *ui;
-    RequirementsWidget *m_reqWidget = nullptr;
-    RequirementsManager *m_reqManager = nullptr;
+    requirement::RequirementsWidget *m_reqWidget = nullptr;
+    requirement::RequirementsManager *m_reqManager = nullptr;
     requirement::RequirementsModelBase *m_reqModel = nullptr;
     QPointer<msc::MscEntity> m_entity;
     QUrl m_reqUrl;

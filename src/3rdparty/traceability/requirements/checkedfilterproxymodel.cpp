@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "checkedfilterproxymodel.h"
 
-namespace shared {
+namespace requirement {
 
 CheckedFilterProxyModel::CheckedFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel{parent}
@@ -29,7 +29,7 @@ void CheckedFilterProxyModel::setFilterChecked(bool on)
     m_filterChecked = on;
 }
 
-bool shared::CheckedFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourcParent) const
+bool CheckedFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourcParent) const
 {
     QModelIndex idx = sourceModel()->index(sourceRow, filterKeyColumn(), sourcParent);
 
@@ -37,4 +37,4 @@ bool shared::CheckedFilterProxyModel::filterAcceptsRow(int sourceRow, const QMod
     return m_filterChecked ? checked : !checked;
 }
 
-} // namespace shared
+} // namespace requirement

@@ -22,7 +22,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QObject>
 #include <memory>
 
-class RequirementsManager: public QObject
+namespace requirement {
+
+class RequirementsManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString projectID READ projectID WRITE setProjectID NOTIFY connectionReady)
@@ -58,3 +60,5 @@ private:
     class RequirementsManagerPrivate;
     std::unique_ptr<RequirementsManagerPrivate> d;
 };
+
+}

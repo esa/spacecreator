@@ -27,15 +27,12 @@ along with this program. If not, see
 namespace shared {
 class PropertyTemplateConfig;
 class VEObject;
-}
-
-namespace requirement {
 
 /*!
  * \brief Model to hold requirements for a Qt view to operate on a VE object directly.
  * \note The data is changed in the model via undo directly after the click
  */
-class RequirementsModel : public RequirementsModelBase
+class RequirementsModel : public requirement::RequirementsModelBase
 {
     Q_OBJECT
 
@@ -45,17 +42,17 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
-    void setDataObject(shared::VEObject *obj);
-    void setCommandMacro(shared::cmd::CommandsStackBase::Macro *macro);
-    void setPropertyTemplateConfig(shared::PropertyTemplateConfig *dynPropConfig);
+    void setDataObject(VEObject *obj);
+    void setCommandMacro(cmd::CommandsStackBase::Macro *macro);
+    void setPropertyTemplateConfig(PropertyTemplateConfig *dynPropConfig);
 
     void setAttributeName(const QString &name);
 
 protected:
-    shared::cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
-    shared::PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
-    shared::VEObject *m_dataObject { nullptr };
+    cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
+    PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
+    VEObject *m_dataObject { nullptr };
     QString m_attributeName = "requests_ids";
 };
 
-} // namespace requirement
+} // namespace shared

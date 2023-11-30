@@ -23,6 +23,8 @@ namespace Ui {
 class AddNewRequirementDialog;
 }
 
+namespace requirement {
+
 /*!
  * \brief The dialog for adding a new Requirement
  */
@@ -42,3 +44,5 @@ private:
 
     Ui::AddNewRequirementDialog *ui;
 };
+
+}

@@ -21,7 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "entityattribute.h"
 #include "veobject.h"
 
-namespace requirement {
+namespace shared {
 
 RequirementsModel::RequirementsModel(QObject *parent)
     : RequirementsModelBase(parent)
@@ -56,7 +56,7 @@ bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value,
             m_selectedRequirements.remove(requirementID);
         }
 
-        bool ok = m_cmdMacro->push(new shared::cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject,
+        bool ok = m_cmdMacro->push(new cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject,
                 { EntityAttribute { m_attributeName, QVariant::fromValue<QString>(selectedRequirements.join(",")),
                         EntityAttribute::Type::Attribute } }));
         Q_EMIT dataChanged(index, index, { role });
@@ -66,17 +66,17 @@ bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value,
     return RequirementsModelBase::setData(index, value, role);
 }
 
-void RequirementsModel::setDataObject(shared::VEObject *obj)
+void RequirementsModel::setDataObject(VEObject *obj)
 {
     m_dataObject = obj;
 }
 
-void RequirementsModel::setCommandMacro(shared::cmd::CommandsStackBase::Macro *macro)
+void RequirementsModel::setCommandMacro(cmd::CommandsStackBase::Macro *macro)
 {
     m_cmdMacro = macro;
 }
 
-void RequirementsModel::setPropertyTemplateConfig(shared::PropertyTemplateConfig *dynPropConfig)
+void RequirementsModel::setPropertyTemplateConfig(PropertyTemplateConfig *dynPropConfig)
 {
     m_propTemplatesConfig = dynPropConfig;
 }
@@ -90,4 +90,4 @@ void RequirementsModel::setAttributeName(const QString &name)
     m_attributeName = name;
 }
 
-} // namespace requirement
+} // namespace shared
