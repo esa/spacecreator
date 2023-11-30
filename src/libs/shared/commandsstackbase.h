@@ -46,14 +46,16 @@ public:
         explicit Macro(CommandsStackBase *undoStack, const QString &title = QString());
         ~Macro();
 
-        bool push(QUndoCommand *cmd) const;
+        bool push(QUndoCommand *cmd);
 
         void setComplete(bool complete);
         bool isComplete() const;
 
     private:
-        bool m_keepMacro { false };
+        bool m_keepMacro = false;
         CommandsStackBase *m_undoStack = nullptr;
+        QString m_title;
+        bool m_started = false;
     };
 
     explicit CommandsStackBase(QObject *parent = nullptr);

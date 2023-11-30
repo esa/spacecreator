@@ -39,8 +39,8 @@ namespace cmd {
  */
 CommandsStackBase::Macro::Macro(CommandsStackBase *undoStack, const QString &title)
     : m_undoStack(undoStack)
+    , m_title(title)
 {
-    m_undoStack->beginMacro(title);
 }
 
 /*!
@@ -63,22 +63,24 @@ CommandsStackBase::Macro::Macro(CommandsStackBase *undoStack, const QString &tit
  */
 CommandsStackBase::Macro::~Macro()
 {
-    m_undoStack->endMacro();
+    if (m_started) {
+        m_undoStack->endMacro();
 
-    int count = 0;
-    if (const auto cmd = m_undoStack->command(m_undoStack->index() - 1)) {
-        count = cmd->childCount();
-    }
-
-    if (!isComplete() || 0 == count) {
-
-        // I found no other way to remove a macro from the stack:
-        const int posOfMacro = m_undoStack->index() - 1;
-        if (auto macroCmd = const_cast<QUndoCommand *>(m_undoStack->command(posOfMacro))) {
-            macroCmd->undo(); // unperform all the stuff
-            macroCmd->setObsolete(true); // to be checked in QUndoStack::undo
+        int count = 0;
+        if (const auto cmd = m_undoStack->command(m_undoStack->index() - 1)) {
+            count = cmd->childCount();
         }
-        m_undoStack->undo(); // just removes the history record
+
+        if (!isComplete() || 0 == count) {
+
+            // I found no other way to remove a macro from the stack:
+            const int posOfMacro = m_undoStack->index() - 1;
+            if (auto macroCmd = const_cast<QUndoCommand *>(m_undoStack->command(posOfMacro))) {
+                macroCmd->undo(); // unperform all the stuff
+                macroCmd->setObsolete(true); // to be checked in QUndoStack::undo
+            }
+            m_undoStack->undo(); // just removes the history record
+        }
     }
 }
 
@@ -87,10 +89,13 @@ CommandsStackBase::Macro::~Macro()
  * Checks the \a cmd for null and places it into the current stack.
  * Returns \c false if the \a cmd is null.
  */
-bool CommandsStackBase::Macro::push(QUndoCommand *cmd) const
+bool CommandsStackBase::Macro::push(QUndoCommand *cmd)
 {
-    m_undoStack->push(cmd);
-    return true;
+    if (!m_started) {
+        m_undoStack->beginMacro(m_title);
+        m_started = true;
+    }
+    return m_undoStack->push(cmd);
 }
 
 /*!
