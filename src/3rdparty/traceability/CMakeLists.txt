@@ -1,0 +1,2 @@
+add_subdirectory(qgitlabapi)
+add_subdirectory(requirements)

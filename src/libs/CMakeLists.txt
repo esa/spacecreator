@@ -47,6 +47,3 @@ add_subdirectory(spacecreatorsystem)
 
 # Reporting
 add_subdirectory(reporting)
-
-# Requirements
-add_subdirectory(requirements)
