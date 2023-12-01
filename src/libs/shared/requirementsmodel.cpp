@@ -56,7 +56,7 @@ bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value,
             m_selectedRequirements.remove(requirementID);
         }
 
-        bool ok = m_cmdMacro->push(new cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject,
+        const bool ok = m_cmdMacro->push(new cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject,
                 { EntityAttribute { m_attributeName, QVariant::fromValue<QString>(selectedRequirements.join(",")),
                         EntityAttribute::Type::Attribute } }));
         Q_EMIT dataChanged(index, index, { role });
