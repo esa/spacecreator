@@ -71,7 +71,7 @@ void AddNewRequirementDialog::updateOkButton()
         return;
     }
 
-    okButton->setEnabled(!ui->titleLineEdit->text().isEmpty() && !ui->idLineEdit->text().isEmpty());
+    okButton->setDisabled(ui->titleLineEdit->text().isEmpty() || ui->idLineEdit->text().isEmpty());
 }
 
 }

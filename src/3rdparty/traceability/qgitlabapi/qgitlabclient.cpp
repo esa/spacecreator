@@ -135,8 +135,11 @@ void QGitlabClient::requestProjectId(const QUrl &projectUrl)
                     static const auto ID = "id";
                     QString projectID;
                     for (const auto item : content) {
-                        if (item.toObject().value("web_url").toString() == projectUrl.toString()) {
-                            projectID = QString::number(item.toObject().value("id").toInteger());
+                        const QString projectUrlStr(projectUrl.toString());
+                        const auto &itemObj = item.toObject();
+                        const bool objOk = !itemObj.isEmpty() && itemObj.contains("web_url") && itemObj.contains("id");
+                        if (objOk && itemObj.value("web_url").toString() == projectUrlStr) {
+                            projectID = QString::number(itemObj.value("id").toInteger());
                             Q_EMIT requestedProjectID(projectID);
                             break;
                         }

@@ -1,6 +1,6 @@
 set(LIB_NAME QGitlabAPI)
 
-add_library(QGitlabAPI STATIC)
+add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
   QGitlabAPI_global.h
