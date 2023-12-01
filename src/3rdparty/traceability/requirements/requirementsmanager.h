@@ -20,14 +20,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "requirement.h"
 
 #include <QObject>
+#include <QUrl>
 #include <memory>
 
 namespace requirement {
 
+/*!
+ * The RequirementsManager is responsible to communicate to the server/storage that handles the requirments for
+ * components
+ */
 class RequirementsManager : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString projectID READ projectID WRITE setProjectID NOTIFY connectionReady)
+    Q_PROPERTY(QString projectID READ projectID WRITE setProjectID NOTIFY projectIDChanged)
+    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+
 public:
     enum class REPO_TYPE
     {
@@ -36,23 +43,30 @@ public:
 
     RequirementsManager(REPO_TYPE repoType, QObject *parent = nullptr);
     ~RequirementsManager();
-    void setCredentials(const QString &url, const QString &token);
-    void requestRequirements(const QString &assignee, const QString &author);
-    void createRequirement(const QString &title, const QString &reqIfId, const QString &description) const;
-    void requestProjectID(const QUrl &url);
-    QString projectID() const;
+    bool setCredentials(const QString &url, const QString &token);
+    QString projectUrl() const;
+    const QString &token() const;
+    bool isBusy() const;
+
+    const QString &projectID() const;
+
+    bool requestAllRequirements();
+    bool createRequirement(const QString &title, const QString &reqIfId, const QString &description) const;
 
 public Q_SLOTS:
     void setProjectID(const QString &newProjectID);
 
 Q_SIGNALS:
-    void startfetchingRequirements();
+    void busyChanged();
+    void projectIDChanged();
+    void startFetchingRequirements();
     void listOfRequirements(const QList<requirement::Requirement> &);
-    void connectionReady();
     void connectionError(QString errorString);
     void requirementCreated();
 
 private:
+    bool requestProjectID(const QUrl &url);
+
     QString m_projectID = "";
     QUrl m_projectUrl = {};
     QString m_token = "";

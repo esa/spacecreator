@@ -22,6 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "requirementsmodelbase.h"
 #include "ui_requirementswidget.h"
 
+#include <QCursor>
 #include <QDesktopServices>
 #include <QHeaderView>
 #include <QLineEdit>
@@ -36,7 +37,7 @@ RequirementsWidget::RequirementsWidget(
         const QByteArray &requirementsUrl, RequirementsManager *manager, RequirementsModelBase *model, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::RequirementsWidget)
-    , mReqManager(manager)
+    , m_reqManager(manager)
     , m_model(model)
     , m_requirementsUrl(requirementsUrl)
 {
@@ -54,24 +55,23 @@ RequirementsWidget::RequirementsWidget(
     ui->allRequirements->horizontalHeader()->setStretchLastSection(false);
 
     connect(ui->allRequirements, &QTableView::doubleClicked, this, &RequirementsWidget::openIssueLink);
-    connect(ui->refreshButton, &QPushButton::clicked, this, &RequirementsWidget::onLoginUpdate);
+    connect(ui->refreshButton, &QPushButton::clicked, this, &RequirementsWidget::setLoginData);
     connect(ui->createRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::showNewRequirementDialog);
     connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
-    connect(mReqManager, &RequirementsManager::connectionReady, this, &RequirementsWidget::requestRequirements);
-    connect(mReqManager, &RequirementsManager::requirementCreated, this, &RequirementsWidget::requestRequirements);
+    connect(m_reqManager, &RequirementsManager::projectIDChanged, this, &RequirementsWidget::requestRequirements);
+    connect(m_reqManager, &RequirementsManager::requirementCreated, this, &RequirementsWidget::requestRequirements);
     connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
-    connect(mReqManager, &RequirementsManager::connectionError, this, [this](QString error) {
-        ui->serverStatusLabel->setPixmap(
-                QPixmap(":/requirementsresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
-        ui->serverStatusLabel->setToolTip(tr("Connection to the server failed"));
+    connect(m_reqManager, &RequirementsManager::busyChanged, this, &RequirementsWidget::updateServerStatus);
+    connect(m_reqManager, &RequirementsManager::connectionError, this, [this](QString error) {
+        updateServerStatus();
         QMessageBox::warning(this, tr("Connection error"), tr("Connection failed for this error:\n%1").arg(error));
     });
 
     bool hasCredentialsStored = loadSavedCredentials();
     if (hasCredentialsStored) {
-        onLoginUpdate();
+        setLoginData();
     }
 
     const QString urlTooltip = tr("Set the Gitlab server URL including the project path");
@@ -160,24 +160,49 @@ void RequirementsWidget::onChangeOfCredentials()
 
 void RequirementsWidget::requestRequirements()
 {
-    static const QString anyAssignee("");
-    static const QString anyAuthor("");
-    mReqManager->requestRequirements(anyAssignee, anyAuthor);
-    ui->serverStatusLabel->setPixmap(
-            QPixmap(":/requirementsresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
-    ui->serverStatusLabel->setToolTip(tr("Connection to the server is ok"));
+    m_reqManager->requestAllRequirements();
 }
 
-void RequirementsWidget::onLoginUpdate()
+void RequirementsWidget::setLoginData()
 {
-    ui->serverStatusLabel->setPixmap({});
-
     if (ui->urlLineEdit->text().isEmpty() || ui->tokenLineEdit->text().isEmpty()) {
+        ui->serverStatusLabel->setPixmap({});
+        return;
+    }
+
+    if (ui->urlLineEdit->text() == m_reqManager->projectUrl() && ui->tokenLineEdit->text() == m_reqManager->token()) {
+        m_reqManager->requestAllRequirements();
         return;
     }
 
     ui->serverStatusLabel->setToolTip(tr("Checking connection to the server"));
-    mReqManager->setCredentials(ui->urlLineEdit->text(), ui->tokenLineEdit->text());
+    m_reqManager->setCredentials(ui->urlLineEdit->text(), ui->tokenLineEdit->text());
+}
+
+void RequirementsWidget::updateServerStatus()
+{
+    ui->refreshButton->setEnabled(!m_reqManager->isBusy());
+    const QCursor busyCursor(Qt::WaitCursor);
+    if (m_reqManager->isBusy()) {
+        if (ui->allRequirements->cursor() != busyCursor) {
+            ui->allRequirements->setCursor(busyCursor);
+        }
+    } else {
+        if (ui->allRequirements->cursor() == busyCursor) {
+            ui->allRequirements->unsetCursor();
+        }
+    }
+
+    const bool connectionOk = !m_reqManager->projectID().isEmpty();
+    if (connectionOk) {
+        ui->serverStatusLabel->setPixmap(
+                QPixmap(":/requirementsresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
+        ui->serverStatusLabel->setToolTip(tr("Connection to the server is ok"));
+    } else {
+        ui->serverStatusLabel->setPixmap(
+                QPixmap(":/requirementsresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
+        ui->serverStatusLabel->setToolTip(tr("Connection to the server failed"));
+    }
 }
 
 void RequirementsWidget::openIssueLink(const QModelIndex &index)
@@ -209,8 +234,7 @@ void RequirementsWidget::showNewRequirementDialog() const
     dialog->setModal(true);
     auto ret = dialog->exec();
     if (ret == QDialog::Accepted) {
-        mReqManager->createRequirement(dialog->title(), dialog->reqIfId(), dialog->description());
+        m_reqManager->createRequirement(dialog->title(), dialog->reqIfId(), dialog->description());
     }
 }
-
 }

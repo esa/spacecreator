@@ -54,10 +54,10 @@ protected:
     void onChangeOfCredentials();
 
 protected Q_SLOTS:
-    void onLoginUpdate();
+    void setLoginData();
+    void updateServerStatus();
     void openIssueLink(const QModelIndex &index);
     void openTokenSettingsPage();
-
     void toggleShowUsedRequirements();
     void requestRequirements();
     void showNewRequirementDialog() const;
@@ -69,7 +69,7 @@ Q_SIGNALS:
 private:
     Ui::RequirementsWidget *ui;
 
-    QPointer<RequirementsManager> mReqManager;
+    QPointer<RequirementsManager> m_reqManager;
     QPointer<requirement::RequirementsModelBase> m_model;
     QSortFilterProxyModel m_filterModel;
     CheckedFilterProxyModel m_checkedModel;

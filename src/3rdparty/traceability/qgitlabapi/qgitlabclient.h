@@ -19,6 +19,7 @@ class IssueRequestOptions;
 class QGITLABAPI_EXPORT QGitlabClient : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool busy READ isBusy NOTIFY busyStateChanged)
 public:
     enum ReqType
     {
@@ -29,22 +30,25 @@ public:
 
     QGitlabClient();
     void setCredentials(const QString &url, const QString &token);
-    void requestIssues(const QString &projectID, const IssueRequestOptions &options);
-    void editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue);
-    void createIssue(const QString &projectID, const QString &title, const QString &description);
-    void requestListofLabels(
+    bool requestIssues(const QString &projectID, const IssueRequestOptions &options);
+    bool editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue);
+    bool createIssue(const QString &projectID, const QString &title, const QString &description);
+    bool requestListofLabels(
             const QString &projectID, const QString &with_counts = "false", const QString &search = QString());
-    void requestProjectId(const QUrl &projectUrl);
+    bool requestProjectId(const QUrl &projectUrl);
+
+    bool isBusy() const;
 
 Q_SIGNALS:
-    /**
-     * @brief listOfIssues provides a block/page of issues
+    /*!
+     * Provides a block/page of issues
      */
     void listOfIssues(QList<Issue>);
-    /**
-     * @brief issueFetchingDone is sent once all pages of issues are loaded
+    /*!
+     * Is send either when fetching data is started. Or when the fething of data ended.
+     * The busy property is true, while the fetching is active
      */
-    void issueFetchingDone();
+    void busyStateChanged(bool);
     void listOfLabels(QList<Label>);
     void requestedProjectID(QString);
     void connectionError(QString errorString);
@@ -55,11 +59,13 @@ protected:
     int pageNumberFromHeader(QNetworkReply *reply) const;
     int totalPagesFromHeader(QNetworkReply *reply) const;
     int numberHeaderAttribute(QNetworkReply *reply, const QByteArray &headername) const;
+    void setBusy(bool busy);
 
 private:
     QString mUsername;
     UrlComposer mUrlComposer;
     QString mToken;
     QNetworkAccessManager mManager;
+    bool m_busy = false;
 };
 }

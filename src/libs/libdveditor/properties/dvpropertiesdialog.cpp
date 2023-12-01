@@ -52,7 +52,7 @@ DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemp
     m_reqModel->setPropertyTemplateConfig(dynPropConfig);
     connect(m_reqManager, &requirement::RequirementsManager::listOfRequirements, m_reqModel,
             &shared::RequirementsModel::addRequirements);
-    connect(m_reqManager, &requirement::RequirementsManager::startfetchingRequirements, m_reqModel,
+    connect(m_reqManager, &requirement::RequirementsManager::startFetchingRequirements, m_reqModel,
             &shared::RequirementsModel::clear);
 
     m_reqWidget = new requirement::RequirementsWidget(

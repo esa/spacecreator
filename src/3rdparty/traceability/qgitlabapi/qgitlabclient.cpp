@@ -27,8 +27,12 @@ void QGitlabClient::setCredentials(const QString &url, const QString &token)
     mToken = token;
 }
 
-void QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOptions &options)
+bool QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOptions &options)
 {
+    if (isBusy()) {
+        return true;
+    }
+    setBusy(true);
     auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeGetIssuesUrl(projectID, options));
     connect(reply, &QNetworkReply::finished, [reply, projectID, options, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
@@ -55,35 +59,48 @@ void QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOp
                     requestIssues(projectID, nextPage);
                 } else {
                     if (page == totalPages) {
-                        Q_EMIT issueFetchingDone();
+                        setBusy(false);
                     }
                 }
             }
         } else {
             qDebug() << reply->error() << reply->errorString();
+            setBusy(false);
             Q_EMIT connectionError(reply->errorString());
         }
     });
+    return false;
 }
 
-void QGitlabClient::editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue)
+bool QGitlabClient::editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue)
 {
+    if (isBusy()) {
+        return true;
+    }
+    setBusy(true);
     auto reply = sendRequest(QGitlabClient::PUT,
             mUrlComposer.composeEditIssueUrl(projectID.toInt(), newIssue.mIssueIID, newIssue.mTitle,
                     newIssue.mDescription, newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
+        setBusy(false);
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
             qDebug() << reply->error() << reply->errorString();
             Q_EMIT connectionError(reply->errorString());
         }
     });
+    return false;
 }
 
-void QGitlabClient::createIssue(const QString &projectID, const QString &title, const QString &description)
+bool QGitlabClient::createIssue(const QString &projectID, const QString &title, const QString &description)
 {
+    if (isBusy()) {
+        return true;
+    }
+    setBusy(true);
     auto reply =
             sendRequest(QGitlabClient::POST, mUrlComposer.composeCreateIssueUrl(projectID, title, description, ""));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
+        setBusy(false);
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << reply->error() << reply->errorString();
             Q_EMIT connectionError(reply->errorString());
@@ -91,12 +108,18 @@ void QGitlabClient::createIssue(const QString &projectID, const QString &title, 
             Q_EMIT issueCreated();
         }
     });
+    return false;
 }
 
-void QGitlabClient::requestListofLabels(const QString &projectID, const QString &with_counts, const QString &search)
+bool QGitlabClient::requestListofLabels(const QString &projectID, const QString &with_counts, const QString &search)
 {
+    if (isBusy()) {
+        return true;
+    }
+    setBusy(true);
     auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectLabelsUrl(projectID, with_counts, search));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
+        setBusy(false);
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
@@ -115,13 +138,19 @@ void QGitlabClient::requestListofLabels(const QString &projectID, const QString 
             Q_EMIT connectionError(reply->errorString());
         }
     });
+    return false;
 }
 
-void QGitlabClient::requestProjectId(const QUrl &projectUrl)
+bool QGitlabClient::requestProjectId(const QUrl &projectUrl)
 {
+    if (isBusy()) {
+        return true;
+    }
+    setBusy(true);
     auto projectName = QDir(QUrl(projectUrl).path()).dirName();
     auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectUrl(projectName));
     connect(reply, &QNetworkReply::finished, [reply, projectUrl, this]() {
+        setBusy(false);
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
@@ -151,6 +180,15 @@ void QGitlabClient::requestProjectId(const QUrl &projectUrl)
             Q_EMIT connectionError(reply->errorString());
         }
     });
+    return false;
+}
+
+/*!
+ * Returns true, if data is currently fetched from the server
+ */
+bool QGitlabClient::isBusy() const
+{
+    return m_busy;
 }
 
 QNetworkReply *QGitlabClient::sendRequest(QGitlabClient::ReqType reqType, const QUrl &uri)
@@ -205,4 +243,13 @@ int QGitlabClient::numberHeaderAttribute(QNetworkReply *reply, const QByteArray 
     return pageAttribute.toInt();
 }
 
+void QGitlabClient::setBusy(bool busy)
+{
+    if (busy == m_busy) {
+        return;
+    }
+
+    m_busy = busy;
+    Q_EMIT busyStateChanged(m_busy);
+}
 }
