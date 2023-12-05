@@ -168,4 +168,16 @@ QSet<QString> RequirementsModelBase::convert(const QByteArrayList &list)
     return set;
 }
 
+Requirement RequirementsModelBase::requirementFromIndex(const QModelIndex &idx)
+{
+    QModelIndex _idx = index(idx.row(), RequirementsModelBase::REQUIREMENT_ID);
+    QString issueID = _idx.data().toString();
+    for (const auto &requirement : m_requirements) {
+        if (requirement.m_issueID == issueID) {
+            return requirement;
+        }
+    }
+    return Requirement();
+}
+
 } // namespace requirement

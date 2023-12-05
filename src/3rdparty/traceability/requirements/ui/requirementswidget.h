@@ -61,6 +61,8 @@ protected Q_SLOTS:
     void toggleShowUsedRequirements();
     void requestRequirements();
     void showNewRequirementDialog() const;
+    void removeRequirement();
+    void modelSelectionChanged(const QItemSelection &selected, const QItemSelection &);
 
 Q_SIGNALS:
     void requirementSelected(QString RequirementID, bool checked);

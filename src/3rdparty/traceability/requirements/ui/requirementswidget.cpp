@@ -53,15 +53,19 @@ RequirementsWidget::RequirementsWidget(
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     ui->allRequirements->horizontalHeader()->setStretchLastSection(false);
-
+    ui->removeRequirementButton->setEnabled(false);
+    connect(ui->allRequirements->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+            &RequirementsWidget::modelSelectionChanged);
     connect(ui->allRequirements, &QTableView::doubleClicked, this, &RequirementsWidget::openIssueLink);
     connect(ui->refreshButton, &QPushButton::clicked, this, &RequirementsWidget::setLoginData);
     connect(ui->createRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::showNewRequirementDialog);
+    connect(ui->removeRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::removeRequirement);
     connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
     connect(m_reqManager, &RequirementsManager::projectIDChanged, this, &RequirementsWidget::requestRequirements);
     connect(m_reqManager, &RequirementsManager::requirementCreated, this, &RequirementsWidget::requestRequirements);
+    connect(m_reqManager, &RequirementsManager::requirementClosed, this, &RequirementsWidget::requestRequirements);
     connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
     connect(m_reqManager, &RequirementsManager::busyChanged, this, &RequirementsWidget::updateServerStatus);
     connect(m_reqManager, &RequirementsManager::connectionError, this, [this](QString error) {
@@ -237,4 +241,29 @@ void RequirementsWidget::showNewRequirementDialog() const
         m_reqManager->createRequirement(dialog->title(), dialog->reqIfId(), dialog->description());
     }
 }
+/*!
+ * \brief removeRequirement takes a look in the selectionModel.
+ *        If more than one row is selected returns, otherwise
+ *        calls Requirements Manager to remove it (aka close the issue)
+ */
+void RequirementsWidget::removeRequirement()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, tr("Remove requirement"),
+            tr("Are you sure you want to remove the selected requirement?"), QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        auto currentIndex = ui->allRequirements->selectionModel()->currentIndex();
+        if (currentIndex.isValid()) {
+            Requirement requirement = m_model->requirementFromIndex(currentIndex);
+            m_reqManager->removeRequirement(requirement);
+        }
+    }
+}
+
+void RequirementsWidget::modelSelectionChanged(const QItemSelection &selected, const QItemSelection & /*unused*/)
+{
+    bool enabled = (selected.indexes().count() > 0);
+    ui->removeRequirementButton->setEnabled(enabled);
+}
+
 }

@@ -59,21 +59,30 @@ QUrl UrlComposer::composeCreateIssueUrl(
     return url;
 }
 
-QUrl UrlComposer::composeEditIssueUrl(int projectID, int issueID, const QString &title, const QString &description,
-        const QString &assignee, const QString &state_event, const QStringList &labels) const
+QUrl UrlComposer::composeEditIssueUrl(const QString &projectID, const QString &issueID, const QString &title,
+        const QString &description, const QString &assignee, const QString &state_event,
+        const QStringList &labels) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::EditIssue);
     address = address.arg(projectID, issueID);
 
-    const QMap<QByteArray, QVariant> data = {
-        { "id", projectID },
-        { "issue_iid", issueID },
-        { "title", title },
-        { "description", description },
-        { "assignee_ids", assignee },
-        { "state_event", state_event }, // Only allows "reopen" and "close" states
-        { "labels", labels },
-    };
+    QMap<QByteArray, QVariant> data = { { "id", projectID }, { "issue_iid", issueID } };
+
+    if (!title.isEmpty()) {
+        data.insert("title", title);
+    }
+    if (!description.isEmpty()) {
+        data.insert("description", description);
+    }
+    if (!assignee.isEmpty()) {
+        data.insert("assignee_ids", assignee);
+    }
+    if (!state_event.isEmpty()) {
+        data.insert("state_event", state_event);
+    }
+    if (!labels.isEmpty()) {
+        data.insert("labels", labels);
+    }
 
     QUrl url(address);
     url.setQuery(setQuery(data));

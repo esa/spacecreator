@@ -33,7 +33,7 @@ public:
     QUrl composeGetIssuesUrl(const QString &projectID, const IssueRequestOptions &options) const;
     QUrl composeCreateIssueUrl(
             const QString &projectID, const QString &title, const QString &description, const QString &assignee) const;
-    QUrl composeEditIssueUrl(int projectID, int issueID, const QString &title = QString(),
+    QUrl composeEditIssueUrl(const QString &projectID, const QString &issueID, const QString &title = QString(),
             const QString &description = QString(), const QString &assignee = QString(),
             const QString &state_event = QString(), const QStringList &labels = QStringList()) const;
 

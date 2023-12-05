@@ -55,6 +55,8 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType, QObject *parent)
                 &RequirementsManager::setProjectID);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this,
                 &RequirementsManager::requirementCreated);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueClosed, this,
+                &RequirementsManager::requirementClosed);
         connect(d->gitlabRequirements.get(), &requirement::GitLabRequirements::listOfRequirements, this,
                 &RequirementsManager::listOfRequirements);
         break;
@@ -168,6 +170,19 @@ bool RequirementsManager::createRequirement(
     case (REPO_TYPE::GITLAB): {
         const QString descr = QString("#reqid %1\n\n%2").arg(reqIfId, description);
         const bool wasBusy = d->gitlabClient->createIssue(m_projectID, title, descr);
+        return !wasBusy;
+    }
+    default:
+        qDebug() << "unknown repository type";
+    }
+    return false;
+}
+
+bool RequirementsManager::removeRequirement(const Requirement &requirement) const
+{
+    switch (d->mRepoType) {
+    case (REPO_TYPE::GITLAB): {
+        const bool wasBusy = d->gitlabClient->closeIssue(m_projectID, requirement.m_issueID);
         return !wasBusy;
     }
     default:

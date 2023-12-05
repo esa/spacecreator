@@ -79,7 +79,7 @@ bool QGitlabClient::editIssue(const QString &projectID, const QString &issueID, 
     }
     setBusy(true);
     auto reply = sendRequest(QGitlabClient::PUT,
-            mUrlComposer.composeEditIssueUrl(projectID.toInt(), newIssue.mIssueIID, newIssue.mTitle,
+            mUrlComposer.composeEditIssueUrl(projectID, QString::number(newIssue.mIssueIID), newIssue.mTitle,
                     newIssue.mDescription, newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         setBusy(false);
@@ -106,6 +106,31 @@ bool QGitlabClient::createIssue(const QString &projectID, const QString &title, 
             Q_EMIT connectionError(reply->errorString());
         } else {
             Q_EMIT issueCreated();
+        }
+    });
+    return false;
+}
+
+bool QGitlabClient::closeIssue(const QString &projectID, const QString &issueID)
+{
+    if (isBusy()) {
+        return true;
+    }
+    setBusy(true);
+    static const QString &title = QString();
+    static const QString &description = QString();
+    static const QString &assignee = QString();
+    const QString state_event = "close";
+    const QStringList &labels = QStringList();
+    auto reply = sendRequest(QGitlabClient::PUT,
+            mUrlComposer.composeEditIssueUrl(projectID, issueID, title, description, assignee, state_event, labels));
+    connect(reply, &QNetworkReply::finished, [reply, this]() {
+        setBusy(false);
+        if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
+            qDebug() << reply->error() << reply->errorString();
+            Q_EMIT connectionError(reply->errorString());
+        } else {
+            Q_EMIT issueClosed();
         }
     });
     return false;

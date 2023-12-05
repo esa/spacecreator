@@ -33,6 +33,7 @@ public:
     bool requestIssues(const QString &projectID, const IssueRequestOptions &options);
     bool editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue);
     bool createIssue(const QString &projectID, const QString &title, const QString &description);
+    bool closeIssue(const QString &projectID, const QString &issueID);
     bool requestListofLabels(
             const QString &projectID, const QString &with_counts = "false", const QString &search = QString());
     bool requestProjectId(const QUrl &projectUrl);
@@ -53,6 +54,7 @@ Q_SIGNALS:
     void requestedProjectID(QString);
     void connectionError(QString errorString);
     void issueCreated();
+    void issueClosed();
 
 protected:
     QNetworkReply *sendRequest(ReqType reqType, const QUrl &url);

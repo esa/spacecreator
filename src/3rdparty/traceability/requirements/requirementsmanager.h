@@ -52,6 +52,7 @@ public:
 
     bool requestAllRequirements();
     bool createRequirement(const QString &title, const QString &reqIfId, const QString &description) const;
+    bool removeRequirement(const Requirement &requirement) const;
 
 public Q_SLOTS:
     void setProjectID(const QString &newProjectID);
@@ -63,6 +64,7 @@ Q_SIGNALS:
     void listOfRequirements(const QList<requirement::Requirement> &);
     void connectionError(QString errorString);
     void requirementCreated();
+    void requirementClosed();
 
 private:
     bool requestProjectID(const QUrl &url);

@@ -72,6 +72,8 @@ public:
 
     static QSet<QString> convert(const QByteArrayList &list);
 
+    Requirement requirementFromIndex(const QModelIndex &idx);
+
 protected:
     QString getReqIfIdFromModelIndex(const QModelIndex &index) const;
 
