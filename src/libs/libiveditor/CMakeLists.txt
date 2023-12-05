@@ -172,6 +172,8 @@ target_sources(${LIB_NAME} PRIVATE
     iveditorresources.qrc
     ivexporter.cpp
     ivexporter.h
+    ivimporter.cpp
+    ivimporter.h
     ivvisualizationmodelbase.cpp
     ivvisualizationmodelbase.h
     miniviewrenderer.cpp

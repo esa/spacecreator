@@ -40,6 +40,8 @@ class IVFunctionType;
 }
 
 namespace ive {
+
+class IVImporter;
 class GraphicsView;
 class InterfaceDocument;
 class IVCreatorTool;
@@ -75,13 +77,8 @@ private Q_SLOTS:
     void cutItems();
     void wrapItems();
     void exportToClipboard(const QList<shared::VEObject *> &objects, QMimeData *mimeData = nullptr);
-    void pasteItems();
-    void pasteItems(const QPointF &sceneDropPoint);
     void showPropertyEditor(const shared::Id &id);
     void showEditAttributesDialog();
-    void importEntity(const shared::Id &id, QPointF sceneDropPoint);
-    void instantiateEntity(const shared::Id &id, QPointF sceneDropPoint);
-    void linkEntity(const shared::Id &id, QPointF sceneDropPoint);
 
     void enterNestedView(const shared::Id &id);
     void onItemDoubleClicked(const shared::Id &id);
@@ -127,6 +124,7 @@ private:
 
     QPointer<IVEditorCore> m_ivCore;
     QPointer<InterfaceDocument> m_document;
+    IVImporter *m_importer;
 };
 
 } // namespace ive
