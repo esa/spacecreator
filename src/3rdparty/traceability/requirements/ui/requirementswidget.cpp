@@ -197,7 +197,7 @@ void RequirementsWidget::updateServerStatus()
         }
     }
 
-    const bool connectionOk = !m_reqManager->projectID().isEmpty();
+    const bool connectionOk = (m_reqManager->projectID() != -1);
     if (connectionOk) {
         ui->serverStatusLabel->setPixmap(
                 QPixmap(":/requirementsresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));

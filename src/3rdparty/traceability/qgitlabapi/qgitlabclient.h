@@ -30,12 +30,12 @@ public:
 
     QGitlabClient();
     void setCredentials(const QString &url, const QString &token);
-    bool requestIssues(const QString &projectID, const IssueRequestOptions &options);
-    bool editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue);
-    bool createIssue(const QString &projectID, const QString &title, const QString &description);
-    bool closeIssue(const QString &projectID, const QString &issueID);
+    bool requestIssues(const int &projectID, const IssueRequestOptions &options);
+    bool editIssue(const int &projectID, const int &issueID, const Issue &newIssue);
+    bool createIssue(const int &projectID, const QString &title, const QString &description);
+    bool closeIssue(const int &projectID, const int &issueID);
     bool requestListofLabels(
-            const QString &projectID, const QString &with_counts = "false", const QString &search = QString());
+            const int &projectID, const QString &with_counts = "false", const QString &search = QString());
     bool requestProjectId(const QUrl &projectUrl);
 
     bool isBusy() const;
@@ -51,7 +51,7 @@ Q_SIGNALS:
      */
     void busyStateChanged(bool);
     void listOfLabels(QList<Label>);
-    void requestedProjectID(QString);
+    void requestedProjectID(int);
     void connectionError(QString errorString);
     void issueCreated();
     void issueClosed();

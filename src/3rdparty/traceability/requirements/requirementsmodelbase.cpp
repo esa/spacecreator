@@ -171,7 +171,7 @@ QSet<QString> RequirementsModelBase::convert(const QByteArrayList &list)
 Requirement RequirementsModelBase::requirementFromIndex(const QModelIndex &idx)
 {
     QModelIndex _idx = index(idx.row(), RequirementsModelBase::REQUIREMENT_ID);
-    QString issueID = _idx.data().toString();
+    int issueID = _idx.data().toInt();
     for (const auto &requirement : m_requirements) {
         if (requirement.m_issueID == issueID) {
             return requirement;

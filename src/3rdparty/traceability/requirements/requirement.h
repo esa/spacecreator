@@ -28,7 +28,7 @@ public:
     QString m_id;
     QString m_longName;
     QString m_description;
-    QString m_issueID;
+    int m_issueID;
     QUrl m_link;
 };
 

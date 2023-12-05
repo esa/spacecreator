@@ -83,7 +83,7 @@ bool RequirementsManager::setCredentials(const QString &url, const QString &toke
 
     m_projectUrl = url;
     m_token = token;
-    m_projectID.clear();
+    m_projectID = -1;
 
     QUrl _url;
     _url.setScheme("https");
@@ -126,7 +126,7 @@ bool RequirementsManager::isBusy() const
 /*!
  * Returns the internal ID of the project
  */
-const QString &RequirementsManager::projectID() const
+const int &RequirementsManager::projectID() const
 {
     return m_projectID;
 }
@@ -191,7 +191,7 @@ bool RequirementsManager::removeRequirement(const Requirement &requirement) cons
     return false;
 }
 
-void RequirementsManager::setProjectID(const QString &newProjectID)
+void RequirementsManager::setProjectID(const int &newProjectID)
 {
     if (m_projectID == newProjectID) {
         return;

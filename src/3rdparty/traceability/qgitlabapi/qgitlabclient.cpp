@@ -27,7 +27,7 @@ void QGitlabClient::setCredentials(const QString &url, const QString &token)
     mToken = token;
 }
 
-bool QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOptions &options)
+bool QGitlabClient::requestIssues(const int &projectID, const IssueRequestOptions &options)
 {
     if (isBusy()) {
         return true;
@@ -72,15 +72,15 @@ bool QGitlabClient::requestIssues(const QString &projectID, const IssueRequestOp
     return false;
 }
 
-bool QGitlabClient::editIssue(const QString &projectID, const QString &issueID, const Issue &newIssue)
+bool QGitlabClient::editIssue(const int &projectID, const int &issueID, const Issue &newIssue)
 {
     if (isBusy()) {
         return true;
     }
     setBusy(true);
     auto reply = sendRequest(QGitlabClient::PUT,
-            mUrlComposer.composeEditIssueUrl(projectID, QString::number(newIssue.mIssueIID), newIssue.mTitle,
-                    newIssue.mDescription, newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
+            mUrlComposer.composeEditIssueUrl(projectID, newIssue.mIssueIID, newIssue.mTitle, newIssue.mDescription,
+                    newIssue.mAssignee, newIssue.mState_event, newIssue.mLabels));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         setBusy(false);
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
@@ -91,7 +91,7 @@ bool QGitlabClient::editIssue(const QString &projectID, const QString &issueID, 
     return false;
 }
 
-bool QGitlabClient::createIssue(const QString &projectID, const QString &title, const QString &description)
+bool QGitlabClient::createIssue(const int &projectID, const QString &title, const QString &description)
 {
     if (isBusy()) {
         return true;
@@ -111,7 +111,7 @@ bool QGitlabClient::createIssue(const QString &projectID, const QString &title, 
     return false;
 }
 
-bool QGitlabClient::closeIssue(const QString &projectID, const QString &issueID)
+bool QGitlabClient::closeIssue(const int &projectID, const int &issueID)
 {
     if (isBusy()) {
         return true;
@@ -136,7 +136,7 @@ bool QGitlabClient::closeIssue(const QString &projectID, const QString &issueID)
     return false;
 }
 
-bool QGitlabClient::requestListofLabels(const QString &projectID, const QString &with_counts, const QString &search)
+bool QGitlabClient::requestListofLabels(const int &projectID, const QString &with_counts, const QString &search)
 {
     if (isBusy()) {
         return true;
@@ -183,17 +183,15 @@ bool QGitlabClient::requestProjectId(const QUrl &projectUrl)
                 qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
                 Q_EMIT connectionError(reply->errorString());
             } else {
-                QString projectID;
                 auto content = replyContent.array();
                 if (!content.isEmpty()) {
                     static const auto ID = "id";
-                    QString projectID;
                     for (const auto item : content) {
                         const QString projectUrlStr(projectUrl.toString());
                         const auto &itemObj = item.toObject();
                         const bool objOk = !itemObj.isEmpty() && itemObj.contains("web_url") && itemObj.contains("id");
                         if (objOk && itemObj.value("web_url").toString() == projectUrlStr) {
-                            projectID = QString::number(itemObj.value("id").toInteger());
+                            int projectID = itemObj.value("id").toInteger();
                             Q_EMIT requestedProjectID(projectID);
                             break;
                         }

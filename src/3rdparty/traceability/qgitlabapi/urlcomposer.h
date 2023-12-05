@@ -30,15 +30,15 @@ public:
      * @param projectID The ID of the project. \see ComposeProjectUrl to get the ID from the project name
      * @param options All options/parameters for fetching the issues for the
      */
-    QUrl composeGetIssuesUrl(const QString &projectID, const IssueRequestOptions &options) const;
+    QUrl composeGetIssuesUrl(const int &projectID, const IssueRequestOptions &options) const;
     QUrl composeCreateIssueUrl(
-            const QString &projectID, const QString &title, const QString &description, const QString &assignee) const;
-    QUrl composeEditIssueUrl(const QString &projectID, const QString &issueID, const QString &title = QString(),
+            const int &projectID, const QString &title, const QString &description, const QString &assignee) const;
+    QUrl composeEditIssueUrl(const int &projectID, const int &issueID, const QString &title = QString(),
             const QString &description = QString(), const QString &assignee = QString(),
             const QString &state_event = QString(), const QStringList &labels = QStringList()) const;
 
     QUrl composeProjectLabelsUrl(
-            const QString &projectID, const QString &with_counts = "false", const QString &search = QString()) const;
+            const int &projectID, const QString &with_counts = "false", const QString &search = QString()) const;
     QUrl composeProjectUrl(const QString &projectName) const;
 
     void setBaseURL(const QUrl &newBaseURL);

@@ -32,7 +32,7 @@ namespace requirement {
 class RequirementsManager : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString projectID READ projectID WRITE setProjectID NOTIFY projectIDChanged)
+    Q_PROPERTY(int projectID READ projectID WRITE setProjectID NOTIFY projectIDChanged)
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
 
 public:
@@ -48,14 +48,14 @@ public:
     const QString &token() const;
     bool isBusy() const;
 
-    const QString &projectID() const;
+    const int &projectID() const;
 
     bool requestAllRequirements();
     bool createRequirement(const QString &title, const QString &reqIfId, const QString &description) const;
     bool removeRequirement(const Requirement &requirement) const;
 
 public Q_SLOTS:
-    void setProjectID(const QString &newProjectID);
+    void setProjectID(const int &newProjectID);
 
 Q_SIGNALS:
     void busyChanged();
@@ -69,7 +69,7 @@ Q_SIGNALS:
 private:
     bool requestProjectID(const QUrl &url);
 
-    QString m_projectID = "";
+    int m_projectID = -1;
     QUrl m_projectUrl = {};
     QString m_token = "";
     class RequirementsManagerPrivate;

@@ -35,7 +35,7 @@ void GitLabRequirements::listOfIssues(const QList<gitlab::Issue> &issues)
 
 Requirement GitLabRequirements::requirementFromIssue(const gitlab::Issue &issue)
 {
-    return { pareseReqIfId(issue), issue.mTitle, issue.mDescription, QString::number(issue.mIssueIID), issue.mUrl };
+    return { pareseReqIfId(issue), issue.mTitle, issue.mDescription, issue.mIssueIID, issue.mUrl };
 }
 
 QString GitLabRequirements::pareseReqIfId(const gitlab::Issue &issue)

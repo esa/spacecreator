@@ -35,10 +35,10 @@ void UrlComposer::setBaseURL(const QUrl &newBaseURL)
     mBaseURL = newBaseURL;
 }
 
-QUrl UrlComposer::composeGetIssuesUrl(const QString &projectID, const IssueRequestOptions &options) const
+QUrl UrlComposer::composeGetIssuesUrl(const int &projectID, const IssueRequestOptions &options) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::GetIssues);
-    address = address.arg(projectID);
+    address = address.arg(QString::number(projectID));
 
     QUrl url(address);
     url.setQuery(options.urlQuery());
@@ -46,27 +46,28 @@ QUrl UrlComposer::composeGetIssuesUrl(const QString &projectID, const IssueReque
 }
 
 QUrl UrlComposer::composeCreateIssueUrl(
-        const QString &projectID, const QString &title, const QString &description, const QString &assignee) const
+        const int &projectID, const QString &title, const QString &description, const QString &assignee) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::CreateIssue);
-    address = address.arg(projectID);
+    address = address.arg(QString::number(projectID));
 
-    const QMap<QByteArray, QVariant> data = { { "id", projectID }, { "title", title }, { "description", description },
-        { "assignee_id", assignee }, { "labels", { "requirement" } } };
+    const QMap<QByteArray, QVariant> data = { { "id", QString::number(projectID) }, { "title", title },
+        { "description", description }, { "assignee_id", assignee }, { "labels", { "requirement" } } };
 
     QUrl url(address);
     url.setQuery(setQuery(data));
     return url;
 }
 
-QUrl UrlComposer::composeEditIssueUrl(const QString &projectID, const QString &issueID, const QString &title,
+QUrl UrlComposer::composeEditIssueUrl(const int &projectID, const int &issueID, const QString &title,
         const QString &description, const QString &assignee, const QString &state_event,
         const QStringList &labels) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::EditIssue);
-    address = address.arg(projectID, issueID);
+    address = address.arg(QString::number(projectID), QString::number(issueID));
 
-    QMap<QByteArray, QVariant> data = { { "id", projectID }, { "issue_iid", issueID } };
+    QMap<QByteArray, QVariant> data = { { "id", QString::number(projectID) },
+        { "issue_iid", QString::number(issueID) } };
 
     if (!title.isEmpty()) {
         data.insert("title", title);
@@ -89,14 +90,13 @@ QUrl UrlComposer::composeEditIssueUrl(const QString &projectID, const QString &i
     return url;
 }
 
-QUrl UrlComposer::composeProjectLabelsUrl(
-        const QString &projectID, const QString &with_counts, const QString &search) const
+QUrl UrlComposer::composeProjectLabelsUrl(const int &projectID, const QString &with_counts, const QString &search) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::ProjectLabels);
-    address = address.arg(projectID);
+    address = address.arg(QString::number(projectID));
 
     const QMap<QByteArray, QVariant> data = {
-        { "id", projectID }, { "with_counts", with_counts }, { "search", search } // Search label terms
+        { "id", QString::number(projectID) }, { "with_counts", with_counts }, { "search", search } // Search label terms
     };
 
     QUrl url(address);
