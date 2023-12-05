@@ -29,6 +29,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QMessageBox>
 #include <QSettings>
 #include <QTableView>
+#include <QToolButton>
 
 namespace requirement {
 const int kIconSize = 16;
@@ -42,13 +43,18 @@ RequirementsWidget::RequirementsWidget(
     , m_requirementsUrl(requirementsUrl)
 {
     ui->setupUi(this);
-    m_filterModel.setDynamicSortFilter(true);
-    m_filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
-    m_filterModel.setFilterKeyColumn(-1);
-    m_filterModel.setSourceModel(m_model);
+    m_textFilterModel.setDynamicSortFilter(true);
+    m_textFilterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_textFilterModel.setFilterKeyColumn(-1);
+    m_textFilterModel.setSourceModel(m_model);
+
+    m_tagFilterModel.setDynamicSortFilter(true);
+    m_tagFilterModel.setSourceModel(&m_textFilterModel);
+
     m_checkedModel.setFilterKeyColumn(RequirementsModelBase::CHECKED);
-    m_checkedModel.setSourceModel(&m_filterModel);
-    ui->allRequirements->setModel(&m_filterModel);
+    m_checkedModel.setSourceModel(&m_tagFilterModel);
+
+    ui->allRequirements->setModel(&m_tagFilterModel);
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
@@ -62,16 +68,20 @@ RequirementsWidget::RequirementsWidget(
     connect(ui->removeRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::removeRequirement);
     connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_filterModel, &QSortFilterProxyModel::setFilterFixedString);
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_textFilterModel,
+            &QSortFilterProxyModel::setFilterFixedString);
     connect(m_reqManager, &RequirementsManager::projectIDChanged, this, &RequirementsWidget::requestRequirements);
     connect(m_reqManager, &RequirementsManager::requirementCreated, this, &RequirementsWidget::requestRequirements);
     connect(m_reqManager, &RequirementsManager::requirementClosed, this, &RequirementsWidget::requestRequirements);
     connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
     connect(m_reqManager, &RequirementsManager::busyChanged, this, &RequirementsWidget::updateServerStatus);
+    connect(m_reqManager, &RequirementsManager::listOfTags, this, &RequirementsWidget::fillTagBar);
     connect(m_reqManager, &RequirementsManager::connectionError, this, [this](QString error) {
         updateServerStatus();
         QMessageBox::warning(this, tr("Connection error"), tr("Connection failed for this error:\n%1").arg(error));
     });
+    connect(m_reqManager, &RequirementsManager::fetchingRequirementsEnded, m_reqManager,
+            &RequirementsManager::requestTags);
 
     bool hasCredentialsStored = loadSavedCredentials();
     if (hasCredentialsStored) {
@@ -169,6 +179,12 @@ void RequirementsWidget::requestRequirements()
 
 void RequirementsWidget::setLoginData()
 {
+    if (m_reqManager->isBusy()) {
+        return;
+    }
+
+    ui->serverStatusLabel->setPixmap({});
+
     if (ui->urlLineEdit->text().isEmpty() || ui->tokenLineEdit->text().isEmpty()) {
         ui->serverStatusLabel->setPixmap({});
         return;
@@ -224,12 +240,57 @@ void RequirementsWidget::openTokenSettingsPage()
 void RequirementsWidget::toggleShowUsedRequirements()
 {
     if (ui->allRequirements->model() == &m_checkedModel) {
-        ui->allRequirements->setModel(&m_filterModel);
+        ui->allRequirements->setModel(&m_tagFilterModel);
         ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
     } else {
         ui->allRequirements->setModel(&m_checkedModel);
         ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/disable_filter_icon.svg"));
     }
+}
+
+void RequirementsWidget::fillTagBar(const QStringList &tags)
+{
+    auto it = std::remove_if(m_tagButtons.begin(), m_tagButtons.end(), [this, tags](QToolButton *button) {
+        if (!tags.contains(button->text())) {
+            m_tagFilterModel.removeTag(button->text());
+            button->deleteLater();
+            return true;
+        }
+        return false;
+    });
+    m_tagButtons.erase(it, m_tagButtons.end());
+
+    for (const QString &tag : tags) {
+        if (!tagButtonExists(tag)) {
+            auto button = new QToolButton(ui->tagFilterBar);
+            button->setText(tag);
+            button->setCheckable(true);
+            connect(button, &QToolButton::toggled, this, [this](bool checked) {
+                auto button = dynamic_cast<QToolButton *>(sender());
+                if (!button) {
+                    return;
+                }
+                if (checked) {
+                    m_tagFilterModel.addTag(button->text());
+                } else {
+                    m_tagFilterModel.removeTag(button->text());
+                }
+            });
+
+            m_tagButtons.append(button);
+            ui->tagFilterBar->addWidget(button);
+        }
+    }
+}
+
+bool RequirementsWidget::tagButtonExists(const QString &tag) const
+{
+    for (const QToolButton *button : m_tagButtons) {
+        if (button->text() == tag) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void RequirementsWidget::showNewRequirementDialog() const
@@ -238,7 +299,8 @@ void RequirementsWidget::showNewRequirementDialog() const
     dialog->setModal(true);
     auto ret = dialog->exec();
     if (ret == QDialog::Accepted) {
-        m_reqManager->createRequirement(dialog->title(), dialog->reqIfId(), dialog->description());
+        m_reqManager->createRequirement(
+                dialog->title(), dialog->reqIfId(), dialog->description(), dialog->testMethod());
     }
 }
 /*!

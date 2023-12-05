@@ -37,7 +37,8 @@ public:
     enum RoleNames
     {
         IssueLinkRole = Qt::UserRole + 1,
-        ReqIfIdRole
+        ReqIfIdRole,
+        TagsRole
     };
 
     enum HEADER_SECTIONS

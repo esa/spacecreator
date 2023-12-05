@@ -43,16 +43,19 @@ public:
 
     RequirementsManager(REPO_TYPE repoType, QObject *parent = nullptr);
     ~RequirementsManager();
+
     bool setCredentials(const QString &url, const QString &token);
     QString projectUrl() const;
     const QString &token() const;
-    bool isBusy() const;
 
+    bool isBusy() const;
     const int &projectID() const;
 
     bool requestAllRequirements();
-    bool createRequirement(const QString &title, const QString &reqIfId, const QString &description) const;
+    bool createRequirement(
+            const QString &title, const QString &reqIfId, const QString &description, const QString &testMethod) const;
     bool removeRequirement(const Requirement &requirement) const;
+    bool requestTags();
 
 public Q_SLOTS:
     void setProjectID(const int &newProjectID);
@@ -60,8 +63,10 @@ public Q_SLOTS:
 Q_SIGNALS:
     void busyChanged();
     void projectIDChanged();
-    void startFetchingRequirements();
+    void startingFetchingRequirements();
+    void fetchingRequirementsEnded();
     void listOfRequirements(const QList<requirement::Requirement> &);
+    void listOfTags(const QStringList &);
     void connectionError(QString errorString);
     void requirementCreated();
     void requirementClosed();

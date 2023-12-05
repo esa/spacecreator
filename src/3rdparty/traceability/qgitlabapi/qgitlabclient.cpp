@@ -60,6 +60,7 @@ bool QGitlabClient::requestIssues(const int &projectID, const IssueRequestOption
                 } else {
                     if (page == totalPages) {
                         setBusy(false);
+                        Q_EMIT issueFetchingDone();
                     }
                 }
             }
@@ -91,14 +92,15 @@ bool QGitlabClient::editIssue(const int &projectID, const int &issueID, const Is
     return false;
 }
 
-bool QGitlabClient::createIssue(const int &projectID, const QString &title, const QString &description)
+bool QGitlabClient::createIssue(
+        const int &projectID, const QString &title, const QString &description, const QStringList &labels)
 {
     if (isBusy()) {
         return true;
     }
     setBusy(true);
-    auto reply =
-            sendRequest(QGitlabClient::POST, mUrlComposer.composeCreateIssueUrl(projectID, title, description, ""));
+    auto reply = sendRequest(
+            QGitlabClient::POST, mUrlComposer.composeCreateIssueUrl(projectID, title, description, labels, ""));
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         setBusy(false);
         if (reply->error() != QNetworkReply::NoError) {

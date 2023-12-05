@@ -35,7 +35,9 @@ void GitLabRequirements::listOfIssues(const QList<gitlab::Issue> &issues)
 
 Requirement GitLabRequirements::requirementFromIssue(const gitlab::Issue &issue)
 {
-    return { pareseReqIfId(issue), issue.mTitle, issue.mDescription, issue.mIssueIID, issue.mUrl };
+    QStringList tags = issue.mLabels;
+    tags.removeAll(k_requirementsTypeLabel);
+    return { pareseReqIfId(issue), issue.mTitle, issue.mDescription, issue.mIssueIID, tags, issue.mUrl };
 }
 
 QString GitLabRequirements::pareseReqIfId(const gitlab::Issue &issue)
@@ -61,5 +63,19 @@ QString GitLabRequirements::pareseReqIfId(const gitlab::Issue &issue)
         }
     }
     return QString::number(issue.mIssueIID);
+}
+
+/*!
+ * Returns the tags from the list of labels provided by the gitlab server
+ */
+QStringList GitLabRequirements::tagsFromLabels(const QList<gitlab::Label> &labels)
+{
+    QStringList tags;
+    for (const gitlab::Label &label : labels) {
+        if (label.mName != k_requirementsTypeLabel) {
+            tags.append(label.mName);
+        }
+    }
+    return tags;
 }
 }

@@ -81,7 +81,7 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     m_reqModel->setPropertyTemplateConfig(dynPropConfig);
     connect(m_reqManager, &requirement::RequirementsManager::listOfRequirements, m_reqModel,
             &shared::RequirementsModel::addRequirements);
-    connect(m_reqManager, &requirement::RequirementsManager::startFetchingRequirements, m_reqModel,
+    connect(m_reqManager, &requirement::RequirementsManager::startingFetchingRequirements, m_reqModel,
             &shared::RequirementsModel::clear);
     shared::DataModel *model = document->objectsModel();
     m_reqWidget = new requirement::RequirementsWidget(

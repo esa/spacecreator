@@ -38,6 +38,7 @@ public:
     QString title() const;
     QString description() const;
     QString reqIfId() const;
+    QString testMethod() const;
 
 private:
     void updateOkButton();

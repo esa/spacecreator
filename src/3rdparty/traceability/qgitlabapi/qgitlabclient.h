@@ -20,6 +20,7 @@ class QGITLABAPI_EXPORT QGitlabClient : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyStateChanged)
+
 public:
     enum ReqType
     {
@@ -32,7 +33,7 @@ public:
     void setCredentials(const QString &url, const QString &token);
     bool requestIssues(const int &projectID, const IssueRequestOptions &options);
     bool editIssue(const int &projectID, const int &issueID, const Issue &newIssue);
-    bool createIssue(const int &projectID, const QString &title, const QString &description);
+    bool createIssue(const int &projectID, const QString &title, const QString &description, const QStringList &labels);
     bool closeIssue(const int &projectID, const int &issueID);
     bool requestListofLabels(
             const int &projectID, const QString &with_counts = "false", const QString &search = QString());
@@ -50,6 +51,10 @@ Q_SIGNALS:
      * The busy property is true, while the fetching is active
      */
     void busyStateChanged(bool);
+    /*!
+     * Sent after successfully fetching issues
+     */
+    void issueFetchingDone();
     void listOfLabels(QList<Label>);
     void requestedProjectID(int);
     void connectionError(QString errorString);

@@ -17,28 +17,28 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
-#include "issue.h"
-#include "label.h"
-#include "requirement.h"
-
-#include <QObject>
+#include <QSortFilterProxyModel>
 
 namespace requirement {
 
-const static QString k_requirementsTypeLabel = "requirement";
-
-class GitLabRequirements : public QObject
+/*!
+ * A filter model to filter a requirement model for tags.
+ * All data is shown that has at least one of the tags to filter for.
+ * If no tag is set for filtering, all data is shown.
+ */
+class TagFilterProxyModel : public QSortFilterProxyModel
 {
-    Q_OBJECT
 public:
-    void listOfIssues(const QList<gitlab::Issue> &issues);
+    explicit TagFilterProxyModel(QObject *parent = nullptr);
 
-    static Requirement requirementFromIssue(const gitlab::Issue &issue);
-    static QString pareseReqIfId(const gitlab::Issue &issue);
-    static QStringList tagsFromLabels(const QList<gitlab::Label> &labels);
+    void addTag(const QString &tag);
+    void removeTag(const QString &tag);
 
-Q_SIGNALS:
-    void listOfRequirements(const QList<Requirement> &);
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+
+private:
+    QStringList m_tags;
 };
 
-}
+} // namespace requirement

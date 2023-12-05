@@ -57,6 +57,10 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType, QObject *parent)
                 &RequirementsManager::requirementCreated);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueClosed, this,
                 &RequirementsManager::requirementClosed);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueFetchingDone, this,
+                &RequirementsManager::fetchingRequirementsEnded);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfLabels, this,
+                [this](QList<gitlab::Label> labels) { Q_EMIT listOfTags(GitLabRequirements::tagsFromLabels(labels)); });
         connect(d->gitlabRequirements.get(), &requirement::GitLabRequirements::listOfRequirements, this,
                 &RequirementsManager::listOfRequirements);
         break;
@@ -141,13 +145,12 @@ bool RequirementsManager::requestAllRequirements()
     switch (d->mRepoType) {
     case (REPO_TYPE::GITLAB): {
         gitlab::IssueRequestOptions options;
-        options.mLabels = { "requirement" };
-
+        options.mLabels = { k_requirementsTypeLabel };
         const bool wasBusy = d->gitlabClient->requestIssues(m_projectID, options);
         if (wasBusy) {
             return false;
         }
-        Q_EMIT startFetchingRequirements();
+        Q_EMIT startingFetchingRequirements();
         return true;
     }
     default:
@@ -161,15 +164,17 @@ bool RequirementsManager::requestAllRequirements()
  * \param title The title of the requirement
  * \param reqIfId The ID of that requirement
  * \param description The content of the requirements
+ * \param testMethod The selected class of testing
  * \return Returns true when everything went well.
  */
 bool RequirementsManager::createRequirement(
-        const QString &title, const QString &reqIfId, const QString &description) const
+        const QString &title, const QString &reqIfId, const QString &description, const QString &testMethod) const
 {
     switch (d->mRepoType) {
     case (REPO_TYPE::GITLAB): {
         const QString descr = QString("#reqid %1\n\n%2").arg(reqIfId, description);
-        const bool wasBusy = d->gitlabClient->createIssue(m_projectID, title, descr);
+        QStringList labels = { k_requirementsTypeLabel, testMethod };
+        const bool wasBusy = d->gitlabClient->createIssue(m_projectID, title, descr, labels);
         return !wasBusy;
     }
     default:
@@ -184,6 +189,24 @@ bool RequirementsManager::removeRequirement(const Requirement &requirement) cons
     case (REPO_TYPE::GITLAB): {
         const bool wasBusy = d->gitlabClient->closeIssue(m_projectID, requirement.m_issueID);
         return !wasBusy;
+    }
+    default:
+        qDebug() << "unknown repository type";
+    }
+    return false;
+}
+
+bool RequirementsManager::requestTags()
+{
+    switch (d->mRepoType) {
+    case (REPO_TYPE::GITLAB): {
+        gitlab::IssueRequestOptions options;
+        options.mLabels = { k_requirementsTypeLabel };
+        const bool wasBusy = d->gitlabClient->requestListofLabels(m_projectID);
+        if (wasBusy) {
+            return false;
+        }
+        return true;
     }
     default:
         qDebug() << "unknown repository type";

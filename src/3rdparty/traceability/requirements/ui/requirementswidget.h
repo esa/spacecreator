@@ -18,9 +18,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include "checkedfilterproxymodel.h"
+#include "tagfilterproxymodel.h"
 
 #include <QPointer>
 #include <QSortFilterProxyModel>
+#include <QToolButton>
 #include <QWidget>
 
 namespace Ui {
@@ -63,21 +65,24 @@ protected Q_SLOTS:
     void showNewRequirementDialog() const;
     void removeRequirement();
     void modelSelectionChanged(const QItemSelection &selected, const QItemSelection &);
+    void fillTagBar(const QStringList &tags);
 
 Q_SIGNALS:
     void requirementSelected(QString RequirementID, bool checked);
     void requirementsUrlChanged(QByteArray requirementsUrl);
 
 private:
-    Ui::RequirementsWidget *ui;
+    QString tokenKey(const QString &base) const { return QString("%1__token").arg(base); }
+    bool tagButtonExists(const QString &tag) const;
 
+    Ui::RequirementsWidget *ui;
+    QList<QToolButton *> m_tagButtons;
     QPointer<RequirementsManager> m_reqManager;
     QPointer<requirement::RequirementsModelBase> m_model;
-    QSortFilterProxyModel m_filterModel;
+    QSortFilterProxyModel m_textFilterModel;
+    TagFilterProxyModel m_tagFilterModel;
     CheckedFilterProxyModel m_checkedModel;
     QByteArray m_requirementsUrl;
-
-    QString tokenKey(const QString &base) const { return QString("%1__token").arg(base); }
 };
 
 }

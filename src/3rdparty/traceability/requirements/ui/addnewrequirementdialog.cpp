@@ -50,6 +50,9 @@ QString AddNewRequirementDialog::title() const
     return ui->titleLineEdit->text();
 }
 
+/*!
+ * Contains the main content of the requirement
+ */
 QString AddNewRequirementDialog::description() const
 {
     return ui->descriptionTextEdit->toPlainText();
@@ -62,6 +65,14 @@ QString AddNewRequirementDialog::description() const
 QString AddNewRequirementDialog::reqIfId() const
 {
     return ui->idLineEdit->text();
+}
+
+/*!
+ * Requirements are classified by different test methods. There is always only one test method.
+ */
+QString AddNewRequirementDialog::testMethod() const
+{
+    return ui->testMethodBox->currentText();
 }
 
 void AddNewRequirementDialog::updateOkButton()

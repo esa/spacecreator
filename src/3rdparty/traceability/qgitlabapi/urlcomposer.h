@@ -6,7 +6,7 @@ namespace gitlab {
 
 class IssueRequestOptions;
 
-/**
+/*!
  * Class to create URLs to fetch data from gitlab
  */
 class UrlComposer
@@ -25,14 +25,9 @@ public:
 
     static QUrlQuery setQuery(const QMap<QByteArray, QVariant> &data);
 
-    /**
-     * @brief ComposeGetIssuesUrl creates the full url to fetch issues from the server @see setBaseUrl
-     * @param projectID The ID of the project. \see ComposeProjectUrl to get the ID from the project name
-     * @param options All options/parameters for fetching the issues for the
-     */
     QUrl composeGetIssuesUrl(const int &projectID, const IssueRequestOptions &options) const;
-    QUrl composeCreateIssueUrl(
-            const int &projectID, const QString &title, const QString &description, const QString &assignee) const;
+    QUrl composeCreateIssueUrl(const int &projectID, const QString &title, const QString &description,
+            const QStringList &labels, const QString &assignee) const;
     QUrl composeEditIssueUrl(const int &projectID, const int &issueID, const QString &title = QString(),
             const QString &description = QString(), const QString &assignee = QString(),
             const QString &state_event = QString(), const QStringList &labels = QStringList()) const;

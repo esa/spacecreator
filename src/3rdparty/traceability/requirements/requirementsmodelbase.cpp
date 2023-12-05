@@ -110,6 +110,10 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
         return m_requirements[index.row()].m_id;
     }
 
+    if (role == RequirementsModelBase::RoleNames::TagsRole) {
+        return m_requirements[index.row()].m_tags;
+    }
+
     return QVariant();
 }
 

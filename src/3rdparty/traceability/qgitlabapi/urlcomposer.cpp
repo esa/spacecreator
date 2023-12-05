@@ -35,6 +35,11 @@ void UrlComposer::setBaseURL(const QUrl &newBaseURL)
     mBaseURL = newBaseURL;
 }
 
+/*!
+ * \brief ComposeGetIssuesUrl creates the full url to fetch issues from the server @see setBaseUrl
+ * \param projectID The ID of the project. \see ComposeProjectUrl to get the ID from the project name
+ * \param options All options/parameters for fetching the issues for the
+ */
 QUrl UrlComposer::composeGetIssuesUrl(const int &projectID, const IssueRequestOptions &options) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::GetIssues);
@@ -45,14 +50,17 @@ QUrl UrlComposer::composeGetIssuesUrl(const int &projectID, const IssueRequestOp
     return url;
 }
 
-QUrl UrlComposer::composeCreateIssueUrl(
-        const int &projectID, const QString &title, const QString &description, const QString &assignee) const
+QUrl UrlComposer::composeCreateIssueUrl(const int &projectID, const QString &title, const QString &description,
+        const QStringList &labels, const QString &assignee) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::CreateIssue);
     address = address.arg(QString::number(projectID));
 
-    const QMap<QByteArray, QVariant> data = { { "id", QString::number(projectID) }, { "title", title },
-        { "description", description }, { "assignee_id", assignee }, { "labels", { "requirement" } } };
+    QMap<QByteArray, QVariant> data = { { "id", QString::number(projectID) }, { "title", title },
+        { "description", description }, { "assignee_id", assignee } };
+    if (!labels.isEmpty()) {
+        data.insert("labels", labels.join(","));
+    }
 
     QUrl url(address);
     url.setQuery(setQuery(data));
