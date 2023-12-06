@@ -16,7 +16,9 @@ QUrlQuery IssueRequestOptions::urlQuery() const
     if (!mIids.isEmpty()) {
         data["assignee_username"] = QVariant::fromValue<QList<int>>(mIids);
     }
-    if (mPage <= 0) {
+    if (mPage > 0) {
+        data["page"] = mPage;
+    } else {
         data["page"] = 1;
     }
     if (!mScope.isEmpty()) {

@@ -55,7 +55,8 @@ bool QGitlabClient::requestIssues(const int &projectID, const IssueRequestOption
             if (page >= 0 && totalPages >= 0) {
                 if (page < totalPages) {
                     IssueRequestOptions nextPage = options;
-                    nextPage.mPage += 1;
+                    nextPage.mPage = page + 1;
+                    m_busy = false; // workaround to enable request for the next page
                     requestIssues(projectID, nextPage);
                 } else {
                     if (page == totalPages) {
