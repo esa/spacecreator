@@ -60,6 +60,8 @@ RequirementsWidget::RequirementsWidget(
     ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     ui->allRequirements->horizontalHeader()->setStretchLastSection(false);
     ui->removeRequirementButton->setEnabled(false);
+    connect(m_model, &requirement::RequirementsModelBase::rowsInserted,
+            [this]() { ui->allRequirements->resizeRowsToContents(); });
     connect(ui->allRequirements->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &RequirementsWidget::modelSelectionChanged);
     connect(ui->allRequirements, &QTableView::doubleClicked, this, &RequirementsWidget::openIssueLink);
@@ -67,6 +69,7 @@ RequirementsWidget::RequirementsWidget(
     connect(ui->createRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::showNewRequirementDialog);
     connect(ui->removeRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::removeRequirement);
     connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
+    ui->tokenLineEdit->setEchoMode(QLineEdit::Password);
     connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_textFilterModel,
             &QSortFilterProxyModel::setFilterFixedString);
