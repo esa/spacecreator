@@ -99,7 +99,6 @@ RequirementsWidget::RequirementsWidget(
     ui->tokenLabel->setToolTip(tokenTooltip);
     ui->tokenLineEdit->setToolTip(tokenTooltip);
     connect(ui->createTokenButton, &QPushButton::clicked, this, &RequirementsWidget::openTokenSettingsPage);
-    connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
     ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
 }
 
