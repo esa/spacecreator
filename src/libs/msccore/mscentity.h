@@ -90,11 +90,11 @@ public:
     /**
      * Returns the list of requirement IDs associated by this entity
      */
-    QByteArrayList requirements() const;
+    QStringList requirements() const;
     /**
      * Sets the list of requirement IDs associated by this entity
      */
-    void setRequirements(const QByteArrayList &requirements);
+    void setRequirements(const QStringList &requirements);
 
 #ifdef QT_DEBUG
     void dbgShowCifs() const;
@@ -109,13 +109,13 @@ Q_SIGNALS:
 
 private:
     cif::CifBlockShared requirementsCifBlock() const;
-    QByteArrayList requirementsFromCifBlock(const cif::CifBlockShared &cif) const;
+    QStringList requirementsFromCifBlock(const cif::CifBlockShared &cif) const;
 
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
     QPointer<MscComment> m_comment;
     QVector<cif::CifBlockShared> m_cifs;
-    QByteArrayList m_requirements;
+    QStringList m_requirements;
 
     static const QRegularExpression m_nameVerify;
 };

@@ -35,7 +35,7 @@ namespace requirement {
 const int kIconSize = 16;
 
 RequirementsWidget::RequirementsWidget(
-        const QByteArray &requirementsUrl, RequirementsManager *manager, RequirementsModelBase *model, QWidget *parent)
+        const QString &requirementsUrl, RequirementsManager *manager, RequirementsModelBase *model, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::RequirementsWidget)
     , m_reqManager(manager)

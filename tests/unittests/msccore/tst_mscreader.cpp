@@ -25,7 +25,6 @@
 #include "msccoregion.h"
 #include "mscdocument.h"
 #include "mscinstance.h"
-#include "mscmessage.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
 #include "mscreader.h"
@@ -780,7 +779,7 @@ void tst_MscReader::testRequirements()
     MscChart *chart = model->charts().at(0);
 
     QCOMPARE(chart->instances().size(), 1);
-    const QByteArrayList expectedRequirements { "ab1d-ef72", "238f-007b" };
+    const QStringList expectedRequirements { "ab1d-ef72", "238f-007b" };
     QCOMPARE(chart->instances().at(0)->requirements(), expectedRequirements);
 }
 

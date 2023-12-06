@@ -254,13 +254,13 @@ int QGitlabClient::totalPagesFromHeader(QNetworkReply *reply) const
     return numberHeaderAttribute(reply, "x-total-pages");
 }
 
-int QGitlabClient::numberHeaderAttribute(QNetworkReply *reply, const QByteArray &headername) const
+int QGitlabClient::numberHeaderAttribute(QNetworkReply *reply, const QString &headername) const
 {
     if (!reply) {
         return -1;
     }
 
-    const QByteArray pageAttribute = reply->rawHeader(headername);
+    const QString pageAttribute = reply->rawHeader(headername.toUtf8());
     if (pageAttribute.isEmpty()) {
         return -1;
     }

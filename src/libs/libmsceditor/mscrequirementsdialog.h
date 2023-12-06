@@ -49,7 +49,7 @@ public:
     QUrl url() const;
     QString token() const;
 
-    QByteArrayList selectedRequirements() const;
+    QStringList selectedRequirements() const;
 
 private:
     Ui::MscRequirementsDialog *ui;

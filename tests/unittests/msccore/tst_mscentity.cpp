@@ -91,12 +91,12 @@ void tst_MscEntity::testExtractingRequirementFromCif()
 
     entity.setCifs({ requirementCif });
 
-    QByteArrayList expected { "a3b4-1f2e", "a9f3-742d" };
+    QStringList expected { "a3b4-1f2e", "a9f3-742d" };
     QCOMPARE(entity.requirements(), expected);
     QCOMPARE(entity.cifs().size(), 1);
 
     entity.setRequirements({});
-    QCOMPARE(entity.requirements(), QByteArrayList());
+    QCOMPARE(entity.requirements(), QStringList());
     QCOMPARE(entity.cifs().size(), 0);
 }
 

@@ -27,7 +27,7 @@ namespace cmd {
  * \param item The entity the requirements are linked to
  * \param requirements A list of IDs of the requirements to be linked to the entity
  */
-CmdUpdateEntityRequirements::CmdUpdateEntityRequirements(MscEntity *item, const QByteArrayList &requirements)
+CmdUpdateEntityRequirements::CmdUpdateEntityRequirements(MscEntity *item, const QStringList &requirements)
     : msc::cmd::BaseCommand(item)
     , m_newRequirements(requirements)
     , m_oldRequirements(item->requirements())

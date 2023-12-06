@@ -87,8 +87,8 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     m_reqWidget = new requirement::RequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
     connect(m_reqWidget, &requirement::RequirementsWidget::requirementsUrlChanged, this,
-            [model, commandsStack](QByteArray requirementUrl) {
-                const QUrl url = QUrl(QString(requirementUrl));
+            [model, commandsStack](QString requirementUrl) {
+                const QUrl url = QUrl(requirementUrl);
                 if (url != model->requirementsURL()) {
                     commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, url));
                 }

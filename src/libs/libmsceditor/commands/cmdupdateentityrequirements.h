@@ -28,7 +28,7 @@ namespace cmd {
 class CmdUpdateEntityRequirements : public msc::cmd::BaseCommand
 {
 public:
-    CmdUpdateEntityRequirements(msc::MscEntity *item, const QByteArrayList &requirements);
+    CmdUpdateEntityRequirements(msc::MscEntity *item, const QStringList &requirements);
 
     void redo() override;
     void undo() override;
@@ -36,10 +36,9 @@ public:
     int id() const override;
 
 private:
-    QByteArrayList m_newRequirements;
-    QByteArrayList m_oldRequirements;
+    QStringList m_newRequirements;
+    QStringList m_oldRequirements;
 };
 
 } // namespace cmd
 } // namespace msc
-

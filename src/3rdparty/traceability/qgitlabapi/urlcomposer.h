@@ -23,7 +23,7 @@ public:
 
     UrlComposer();
 
-    static QUrlQuery setQuery(const QMap<QByteArray, QVariant> &data);
+    static QUrlQuery setQuery(const QMap<QString, QVariant> &data);
 
     QUrl composeGetIssuesUrl(const int &projectID, const IssueRequestOptions &options) const;
     QUrl composeCreateIssueUrl(const int &projectID, const QString &title, const QString &description,

@@ -38,7 +38,8 @@ MscRequirementsDialog::MscRequirementsDialog(const QUrl &requirementsUrl, msc::M
     m_reqModel->setSelectedRequirements(RequirementsModelBase::convert(m_entity->requirements()));
     connect(m_reqManager, &RequirementsManager::listOfRequirements, m_reqModel,
             &RequirementsModelBase::addRequirements);
-    connect(m_reqManager, &RequirementsManager::startingFetchingRequirements, m_reqModel, &RequirementsModelBase::clear);
+    connect(m_reqManager, &RequirementsManager::startingFetchingRequirements, m_reqModel,
+            &RequirementsModelBase::clear);
 
     m_reqWidget = new RequirementsWidget(requirementsUrl.toString().toUtf8(), m_reqManager, m_reqModel, this);
     m_reqWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -71,13 +72,9 @@ QString MscRequirementsDialog::token() const
  * \brief MscRequirementsDialog::selectedRequirements Returns the list of IDs of requirements that are linked to the
  * entity
  */
-QByteArrayList MscRequirementsDialog::selectedRequirements() const
+QStringList MscRequirementsDialog::selectedRequirements() const
 {
-    QByteArrayList result;
-    for (const QString &id : m_reqModel->selectedRequirements()) {
-        result.append(id.toUtf8());
-    }
-    return result;
+    return m_reqModel->selectedRequirements().values();
 }
 
 } // namespace msc

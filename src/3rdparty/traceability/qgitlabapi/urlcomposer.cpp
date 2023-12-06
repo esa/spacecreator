@@ -10,7 +10,7 @@ using namespace gitlab;
 
 UrlComposer::UrlComposer() { }
 
-QUrlQuery UrlComposer::setQuery(const QMap<QByteArray, QVariant> &data)
+QUrlQuery UrlComposer::setQuery(const QMap<QString, QVariant> &data)
 {
     QUrlQuery query;
     auto keys = data.keys();
@@ -56,7 +56,7 @@ QUrl UrlComposer::composeCreateIssueUrl(const int &projectID, const QString &tit
     QString address = composeUrl(UrlComposer::UrlTypes::CreateIssue);
     address = address.arg(QString::number(projectID));
 
-    QMap<QByteArray, QVariant> data = { { "id", QString::number(projectID) }, { "title", title },
+    QMap<QString, QVariant> data = { { "id", QString::number(projectID) }, { "title", title },
         { "description", description }, { "assignee_id", assignee } };
     if (!labels.isEmpty()) {
         data.insert("labels", labels.join(","));
@@ -74,8 +74,7 @@ QUrl UrlComposer::composeEditIssueUrl(const int &projectID, const int &issueID, 
     QString address = composeUrl(UrlComposer::UrlTypes::EditIssue);
     address = address.arg(QString::number(projectID), QString::number(issueID));
 
-    QMap<QByteArray, QVariant> data = { { "id", QString::number(projectID) },
-        { "issue_iid", QString::number(issueID) } };
+    QMap<QString, QVariant> data = { { "id", QString::number(projectID) }, { "issue_iid", QString::number(issueID) } };
 
     if (!title.isEmpty()) {
         data.insert("title", title);
@@ -103,7 +102,7 @@ QUrl UrlComposer::composeProjectLabelsUrl(const int &projectID, const QString &w
     QString address = composeUrl(UrlComposer::UrlTypes::ProjectLabels);
     address = address.arg(QString::number(projectID));
 
-    const QMap<QByteArray, QVariant> data = {
+    const QMap<QString, QVariant> data = {
         { "id", QString::number(projectID) }, { "with_counts", with_counts }, { "search", search } // Search label terms
     };
 
@@ -116,7 +115,7 @@ QUrl UrlComposer::composeProjectUrl(const QString &projectName) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::Projects);
 
-    const QMap<QByteArray, QVariant> data = {
+    const QMap<QString, QVariant> data = {
         { "search", projectName } // Search project name
     };
 

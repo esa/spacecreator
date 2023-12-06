@@ -476,7 +476,7 @@ void MscAppWidget::showRequirements(MscEntity *entity)
     if (ret == QDialog::Accepted) {
         msc::MscCommandsStack *undoStack = m_mscCore->commandsStack();
         undoStack->beginMacro(tr("Update requrirements"));
-        const QByteArrayList ids = dialog.selectedRequirements();
+        const QStringList ids = dialog.selectedRequirements();
         if (ids != entity->requirements()) {
             undoStack->push(new cmd::CmdUpdateEntityRequirements(entity, ids));
         }

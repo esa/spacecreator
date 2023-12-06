@@ -42,7 +42,7 @@ class RequirementsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit RequirementsWidget(const QByteArray &requirementsUrl, RequirementsManager *manager,
+    explicit RequirementsWidget(const QString &requirementsUrl, RequirementsManager *manager,
             requirement::RequirementsModelBase *model, QWidget *parent = nullptr);
     ~RequirementsWidget();
 
@@ -69,7 +69,7 @@ protected Q_SLOTS:
 
 Q_SIGNALS:
     void requirementSelected(QString RequirementID, bool checked);
-    void requirementsUrlChanged(QByteArray requirementsUrl);
+    void requirementsUrlChanged(QString requirementsUrl);
 
 private:
     QString tokenKey(const QString &base) const { return QString("%1__token").arg(base); }
@@ -82,7 +82,7 @@ private:
     QSortFilterProxyModel m_textFilterModel;
     TagFilterProxyModel m_tagFilterModel;
     CheckedFilterProxyModel m_checkedModel;
-    QByteArray m_requirementsUrl;
+    QString m_requirementsUrl;
 };
 
 }

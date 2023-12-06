@@ -71,7 +71,7 @@ public:
     virtual const QSet<QString> &selectedRequirements() const;
     virtual void setSelectedRequirements(const QSet<QString> &selected);
 
-    static QSet<QString> convert(const QByteArrayList &list);
+    static QSet<QString> convert(const QStringList &list);
 
     Requirement requirementFromIndex(const QModelIndex &idx);
 

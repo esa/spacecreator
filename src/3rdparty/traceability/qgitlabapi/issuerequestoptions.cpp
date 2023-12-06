@@ -6,7 +6,7 @@ using namespace gitlab;
 
 QUrlQuery IssueRequestOptions::urlQuery() const
 {
-    QMap<QByteArray, QVariant> data;
+    QMap<QString, QVariant> data;
     if (!mAssignee.isEmpty()) {
         data["assignee_username"] = mAssignee;
     }

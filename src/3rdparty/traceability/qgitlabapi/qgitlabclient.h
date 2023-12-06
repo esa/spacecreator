@@ -65,7 +65,7 @@ protected:
     QNetworkReply *sendRequest(ReqType reqType, const QUrl &url);
     int pageNumberFromHeader(QNetworkReply *reply) const;
     int totalPagesFromHeader(QNetworkReply *reply) const;
-    int numberHeaderAttribute(QNetworkReply *reply, const QByteArray &headername) const;
+    int numberHeaderAttribute(QNetworkReply *reply, const QString &headername) const;
     void setBusy(bool busy);
 
 private:

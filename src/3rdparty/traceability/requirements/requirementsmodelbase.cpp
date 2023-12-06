@@ -163,13 +163,9 @@ void RequirementsModelBase::setSelectedRequirements(const QSet<QString> &selecte
     endResetModel();
 }
 
-QSet<QString> RequirementsModelBase::convert(const QByteArrayList &list)
+QSet<QString> RequirementsModelBase::convert(const QStringList &list)
 {
-    QSet<QString> set;
-    for (const QByteArray &item : list) {
-        set.insert(item);
-    }
-    return set;
+    return QSet<QString>(list.begin(), list.end());
 }
 
 Requirement RequirementsModelBase::requirementFromIndex(const QModelIndex &idx)

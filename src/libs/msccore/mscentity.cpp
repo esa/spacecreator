@@ -218,12 +218,12 @@ QString MscEntity::cifText(int tabsSize) const
     return cifTexts.join("\n");
 }
 
-QByteArrayList MscEntity::requirements() const
+QStringList MscEntity::requirements() const
 {
     return m_requirements;
 }
 
-void MscEntity::setRequirements(const QByteArrayList &requirements)
+void MscEntity::setRequirements(const QStringList &requirements)
 {
     if (requirements == m_requirements) {
         return;
@@ -264,16 +264,16 @@ cif::CifBlockShared MscEntity::requirementsCifBlock() const
 
     cif::CifBlockShared requirementCif =
             cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineRequirement()) });
-    const QByteArray req = m_requirements.join(",");
+    const QString req = m_requirements.join(",");
     requirementCif->setPayload(QVariant::fromValue(req), cif::CifLine::CifType::Requirement);
 
     return requirementCif;
 }
 
-QByteArrayList MscEntity::requirementsFromCifBlock(const cif::CifBlockShared &cif) const
+QStringList MscEntity::requirementsFromCifBlock(const cif::CifBlockShared &cif) const
 {
     const QVariant &variant = cif->payload(cif::CifLine::CifType::Requirement);
-    const QByteArray data = variant.toString().toUtf8();
+    const QString data = variant.toString();
     if (data.isEmpty()) {
         return {};
     }
