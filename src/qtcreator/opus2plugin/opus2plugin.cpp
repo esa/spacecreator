@@ -98,7 +98,29 @@ void Opus2Plugin::runPopulationTool()
     QProcess process;
     process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
     process.setWorkingDirectory(m_currentProjectDirectoryPath);
-    process.start(m_populationToolCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
+
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+    const QString libPathKey { "LD_LIBRARY_PATH" };
+    const QString userLibPathKey { "_ORIGINAL_LD_LIBRARY_PATH" };
+
+    if (env.keys().contains(userLibPathKey)) {
+        QString path = env.value(userLibPathKey);
+
+        if (path.isEmpty()) {
+            env.remove(libPathKey);
+        } else {
+            env.insert(libPathKey, path);
+        }
+        
+        process.setProcessEnvironment(env);
+    }
+
+    QStringList arguments;
+    arguments << opus2ModelFilePath;
+    arguments << opus2OptionsFilePath;
+
+    process.start(m_populationToolCommand, arguments);
 
     process.waitForFinished(-1);
     if (process.exitCode() != 0) {
