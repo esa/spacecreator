@@ -59,10 +59,6 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment);
 QRectF getNearestIntersectedRect(const QList<QRectF> &existingRects, const QVector<QPointF> &points,
         topohelp::IntersectionType intersectionType);
 
-bool isOnVerticalSide(const QRectF &rect, const QPointF &point);
-bool isOnHorizontalSide(const QRectF &rect, const QPointF &point);
-bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper = true);
-
 QList<QRectF> siblingItemsRects(const QGraphicsItem *item);
 
 QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects);

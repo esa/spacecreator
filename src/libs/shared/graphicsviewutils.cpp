@@ -339,36 +339,7 @@ Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
 
 bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
 {
-    if (v1.size() != v2.size())
-        return false;
-
-    for (int idx = 0; idx < v1.size(); ++idx) {
-        if (v1.at(idx).toPoint() != v2.at(idx).toPoint())
-            return false;
-    }
-    return true;
-}
-
-bool isOnVerticalSide(const QRectF &rect, const QPointF &point)
-{
-    return (qFuzzyCompare(rect.left(), point.x()) || qFuzzyCompare(rect.right(), point.x()))
-            && ((rect.top() < point.y() && rect.bottom() > point.y()) || qFuzzyCompare(rect.top(), point.y())
-                    || qFuzzyCompare(rect.bottom(), point.y()));
-}
-
-bool isOnHorizontalSide(const QRectF &rect, const QPointF &point)
-{
-    return (qFuzzyCompare(rect.top(), point.y()) || qFuzzyCompare(rect.bottom(), point.y()))
-            && ((rect.left() < point.x() && rect.right() > point.x()) || qFuzzyCompare(rect.left(), point.x())
-                    || qFuzzyCompare(rect.right(), point.x()));
-}
-
-bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper)
-{
-    if (!rect.contains(point)) {
-        return false;
-    }
-    return !proper || (!isOnHorizontalSide(rect, point) && !isOnVerticalSide(rect, point));
+    return topohelp::utils::comparePolygones(v1, v2);
 }
 
 /*!

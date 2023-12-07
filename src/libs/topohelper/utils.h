@@ -88,6 +88,7 @@ QList<PointsList> findSubPath(
 QVector<qint32> coordinates(const QPointF &point);
 QVector<qint32> coordinates(const QRectF &rect);
 QVector<qint32> coordinates(const PointsList &points);
+bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2);
 
 }
 
