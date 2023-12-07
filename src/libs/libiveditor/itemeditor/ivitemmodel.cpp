@@ -286,7 +286,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
         QRectF mappedViewportGeometry;
         if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
             const QRect viewportGeometry =
-                    view->viewport()->geometry().marginsRemoved(shared::graphicsviewutils::kContentMargins.toMargins());
+                    view->viewport()->geometry().marginsRemoved(topohelp::kContentMargins.toMargins());
             mappedViewportGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
                     view->mapToScene(QPoint(viewportGeometry.width(), viewportGeometry.height())));
         }
@@ -306,7 +306,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
         }
         if (childrenBoundingRect.isValid()) {
             mappedViewportGeometry.moveCenter(childrenBoundingRect.center());
-            mappedViewportGeometry |= childrenBoundingRect.marginsAdded(shared::graphicsviewutils::kRootMargins);
+            mappedViewportGeometry |= childrenBoundingRect.marginsAdded(topohelp::kRootMargins);
         }
 
         const QString strRootCoord =
@@ -324,8 +324,8 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
             } else {
                 QRectF mappedViewportGeometry;
                 if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
-                    const QRect viewportGeometry = view->viewport()->geometry().marginsRemoved(
-                            shared::graphicsviewutils::kContentMargins.toMargins());
+                    const QRect viewportGeometry =
+                            view->viewport()->geometry().marginsRemoved(topohelp::kContentMargins.toMargins());
                     mappedViewportGeometry = QRectF(view->mapToScene(QPoint(0, 0)),
                             view->mapToScene(QPoint(viewportGeometry.width(), viewportGeometry.height())));
                 }
@@ -342,7 +342,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
                 const QRectF geometry = shared::graphicsviewutils::rect(coordinates);
                 if (geometry.isValid()) {
                     if (parentObj && !parentGeometry.contains(geometry)) {
-                        parentGeometry |= geometry.marginsAdded(shared::graphicsviewutils::kRootMargins);
+                        parentGeometry |= geometry.marginsAdded(topohelp::kRootMargins);
                         const QString strRootCoord = ivm::IVObject::coordinatesToString(
                                 shared::graphicsviewutils::coordinates(parentGeometry));
                         parentObj->setEntityProperty(
@@ -369,7 +369,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
                 }
                 const QRectF rect =
                         shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordinates.toString()));
-                itemsGeometry |= rect.marginsAdded(shared::graphicsviewutils::kRootMargins);
+                itemsGeometry |= rect.marginsAdded(topohelp::kRootMargins);
                 existingRects.append(rect);
             }
         }
@@ -439,8 +439,7 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
 
         const QPointF ifacePoint =
                 shared::graphicsviewutils::pos(shared::VEObject::coordinatesFromString(ifaceStrCoord));
-        const QRectF ifaceRect =
-                shared::graphicsviewutils::adjustFromPoint(ifacePoint, shared::graphicsviewutils::kInterfaceBaseLength);
+        const QRectF ifaceRect = shared::graphicsviewutils::adjustFromPoint(ifacePoint, topohelp::kInterfaceBaseLength);
         siblingsRects << ifaceRect;
     }
 

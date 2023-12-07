@@ -4,7 +4,6 @@
 #include "positionlookuphelper.h"
 #include "ui/graphicsviewbase.h"
 #include "ui/verectgraphicsitem.h"
-#include "utils.h"
 
 #include <QFontMetricsF>
 #include <QPainter>
@@ -62,191 +61,24 @@ QPainterPath edgeCuttedRectShape(const QRectF &rect, qreal cut)
     return result;
 }
 
-/*!
- * \brief Helper to detect if the \a line intersects the \a rect.
- * Coordinates of the intersection point stored in \a intersectPos.
- * Returns \c true if \a rect and \a line are not null and intersected.
- */
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
 {
-    if (rect.isNull() || line.isNull())
-        return false;
-
-    const QVector<QLineF> rectLines = {
-        { rect.topLeft(), rect.topRight() },
-        { rect.topRight(), rect.bottomRight() },
-        { rect.bottomRight(), rect.bottomLeft() },
-        { rect.bottomLeft(), rect.topLeft() },
-    };
-
-    for (const QLineF &rectLine : rectLines) {
-        if (rectLine.intersects(line, intersectPos) == QLineF::BoundedIntersection)
-            return true;
-    }
-
-    return false;
+    return topohelp::utils::intersects(rect, line, intersectPos);
 }
-
-/*!
- * \brief Helper to detect if at least one sub segment of the \a polygon intersects the \a rect.
- * Coordinates of the intersection point stored in \a intersctPos.
- * Returns \c true if a sub segment of the \a polygon intersects the \a rect.
- */
-/*!
- * Returns coordinates of intersection points.
- */
 bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos)
 {
-    for (int idx = 1; idx < polygon.size(); ++idx) {
-        if (intersects(rect, QLineF(polygon.value(idx - 1), polygon.value(idx)), intersectPos))
-            return true;
-    }
-    return false;
+    return topohelp::utils::intersects(rect, polygon, intersectPos);
 }
 
-/*!
- * \brief Helper to detect if each sub segment of the \a polygon intersects the \a rect.
- * Returns coordinates of intersection points.
- */
+QRectF getNearestIntersectedRect(
+        const QList<QRectF> &existingRects, const QVector<QPointF> &points, topohelp::IntersectionType intersectionType)
+{
+    return topohelp::utils::getNearestIntersectedRect(existingRects, points, intersectionType);
+}
+
 QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon)
 {
-    if (rect.isNull() || polygon.isEmpty())
-        return {};
-
-    const QVector<QLineF> rectLines = {
-        { rect.topLeft(), rect.topRight() },
-        { rect.topRight(), rect.bottomRight() },
-        { rect.bottomRight(), rect.bottomLeft() },
-        { rect.bottomLeft(), rect.topLeft() },
-    };
-
-    QPointF intersectPos;
-    QVector<QPointF> points;
-    for (int idx = 1; idx < polygon.size(); ++idx) {
-        const QLineF line = { polygon.value(idx - 1), polygon.value(idx) };
-        for (const QLineF &rectLine : rectLines) {
-            if (rectLine.intersects(line, &intersectPos) == QLineF::BoundedIntersection)
-                points.append(intersectPos);
-        }
-    }
-    return points;
-}
-
-/*!
- * Returns the nearest rect from \a existingRects which intersects with \a points according to \a intersectionType:
- *  \p Edge - any intersection point, even located on the edge of rect
-    \p Single - intersection point should be located inside rect, and only one
-    \p Multiple - 2+ intersection points
- */
-QRectF getNearestIntersectedRect(
-        const QList<QRectF> &existingRects, const QVector<QPointF> &points, IntersectionType intersectionType)
-{
-    if (points.size() < 2) {
-        return {};
-    }
-
-    struct SearchIndex {
-        QRectF closestIntersectedRect;
-        qreal distance = 0;
-        int sectionIdx = -1;
-    };
-    QList<SearchIndex> indexes;
-    for (int idx = 1; idx < points.size(); ++idx) {
-        const QLineF line { points.at(idx - 1), points.at(idx) };
-        if (qFuzzyIsNull(line.length())) {
-            continue;
-        }
-        for (auto it = existingRects.cbegin(); it != existingRects.cend(); ++it) {
-            QPointF intersectionPoint;
-            if (intersectionType == IntersectionType::Edge
-                    && !shared::graphicsviewutils::intersects(*it, line, &intersectionPoint)) {
-                continue;
-            } else {
-                const auto intersectionPoints = shared::graphicsviewutils::intersectionPoints(
-                        *it, QPolygonF(QVector<QPointF> { line.p1(), line.p2() }));
-                if (intersectionPoints.isEmpty()) {
-                    continue;
-                }
-                if (intersectionType == IntersectionType::Multiple) {
-                    if (intersectionPoints.size() <= 1) {
-                        continue;
-                    }
-                } else {
-                    const int properPointsCount = std::count_if(
-                            intersectionPoints.cbegin(), intersectionPoints.cend(), [points](const QPointF &point) {
-                                return points.first() != point && points.last() != point;
-                            });
-                    if (properPointsCount == 0) {
-                        continue;
-                    }
-                }
-                std::for_each(intersectionPoints.cbegin(), intersectionPoints.cend(),
-                        [&intersectionPoint, sectionStartPoint = line.p1()](const QPointF &p) {
-                            if (distanceLine(sectionStartPoint, intersectionPoint)
-                                    > distanceLine(p, sectionStartPoint)) {
-                                intersectionPoint = p;
-                            }
-                        });
-            }
-            indexes << SearchIndex { *it, QLineF(line.p1(), intersectionPoint).length(), idx };
-        }
-    }
-
-    std::sort(indexes.begin(), indexes.end(), [](const SearchIndex &sh1, const SearchIndex &sh2) {
-        return sh1.sectionIdx == sh2.sectionIdx ? sh1.distance < sh2.distance : sh1.sectionIdx < sh2.sectionIdx;
-    });
-
-    return indexes.isEmpty() ? QRectF() : indexes.first().closestIntersectedRect;
-}
-
-/*!
- * Returns the side type of \a boundingArea's which is most close to the \a pos.
- */
-Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
-{
-    if (!boundingArea.isValid())
-        return Qt::AlignCenter;
-
-    Qt::Alignment side = Qt::AlignCenter;
-    if (boundingArea.contains(pos)) {
-        qreal distance = std::numeric_limits<qreal>::max();
-        const qreal leftDistance = pos.x() - boundingArea.left();
-        if (leftDistance < distance) {
-            distance = leftDistance;
-            side = Qt::AlignLeft;
-        }
-        const qreal topDistance = pos.y() - boundingArea.top();
-        if (topDistance < distance) {
-            distance = topDistance;
-            side = Qt::AlignTop;
-        }
-        const qreal rightDistance = boundingArea.right() - pos.x();
-        if (rightDistance < distance) {
-            distance = rightDistance;
-            side = Qt::AlignRight;
-        }
-        const qreal bottomDistance = boundingArea.bottom() - pos.y();
-        if (bottomDistance < distance) {
-            distance = bottomDistance;
-            side = Qt::AlignBottom;
-        }
-    } else {
-        const QVector<QPair<QLineF, Qt::Alignment>> rectLines = {
-            { QLineF(boundingArea.bottomLeft(), boundingArea.topLeft()), Qt::AlignLeft },
-            { QLineF(boundingArea.topLeft(), boundingArea.topRight()), Qt::AlignTop },
-            { QLineF(boundingArea.topRight(), boundingArea.bottomRight()), Qt::AlignRight },
-            { QLineF(boundingArea.bottomRight(), boundingArea.bottomLeft()), Qt::AlignBottom },
-        };
-        const QLineF line { boundingArea.center(), pos };
-        auto it = std::find_if(
-                rectLines.constBegin(), rectLines.constEnd(), [line](const QPair<QLineF, Qt::Alignment> &rectSide) {
-                    QPointF dummyPoint;
-                    return line.intersects(rectSide.first, &dummyPoint) == QLineF::BoundedIntersection;
-                });
-        if (it != rectLines.constEnd())
-            side = it->second;
-    }
-    return side;
+    return topohelp::utils::intersectionPoints(rect, polygon);
 }
 
 /*!
@@ -355,37 +187,10 @@ bool alignedLine(QLineF &line, int angleTolerance)
     return false;
 }
 
-/*!
- * \brief Returns the distance between \a p1 and \a p2.
- */
-qreal distanceLine(const QPointF &p1, const QPointF &p2)
+qreal distanceLine(const QPointF &pnt1, const QPointF &pnt2)
 {
-    return std::sqrt(std::pow((p2.x() - p1.x()), 2) + std::pow((p2.y() - p1.y()), 2));
+    return topohelp::utils::distanceLine(pnt1, pnt2);
 }
-
-/*!
- * Returns the total length of all subsegments of \a polygon.
- */
-qreal distancePolygon(const QVector<QPointF> &polygon)
-{
-    qreal distance = 0;
-    for (auto it = std::next(polygon.constBegin()); it != polygon.constEnd(); ++it)
-        distance += distanceLine(*std::prev(it), *it);
-    return distance;
-}
-
-/*!
- * Returns the list of \a area corner points, sorted by minimal distance between the corner and \a point1 or \a point2.
- */
-QList<QPointF> sortedCorners(const QRectF &area, const QPointF &point1, const QPointF &point2)
-{
-    QList<QPointF> rectPoints { area.topLeft(), area.topRight(), area.bottomLeft(), area.bottomRight() };
-    std::sort(rectPoints.begin(), rectPoints.end(), [=](const QPointF &p1, const QPointF &p2) {
-        return distancePolygon({ point1, p1, point2 }) < distancePolygon({ point1, p2, point2 });
-    });
-    return rectPoints;
-}
-
 /*!
  * Converts the IV[AADL/XML] coordinates pair to the QPointF.
  * If \a coordinates is empty or its size != 2 an empty point returned.
@@ -445,32 +250,22 @@ QVector<QPointF> polygon(const QVector<qint32> &coordinates)
 
 QVector<qint32> coordinates(const QPointF &point)
 {
-    if (point.isNull())
-        return {};
-
-    return coordinates(QVector<QPointF> { point });
+    return topohelp::utils::coordinates(point);
 }
 
 QVector<qint32> coordinates(const QRectF &rect)
 {
-    if (rect.isValid())
-        return coordinates(QVector<QPointF> { rect.topLeft(), rect.bottomRight() });
-
-    return {};
+    return topohelp::utils::coordinates(rect);
 }
 
 QVector<qint32> coordinates(const QVector<QPointF> &points)
 {
-    QVector<qint32> coordinates;
-    for (const QPointF &point : points)
-        coordinates << qRound(point.x()) << qRound(point.y());
-    return coordinates;
+    return topohelp::utils::coordinates(points);
 }
 
 QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
 {
-    const QPointF adjustmentPoint { adjustment / 2, adjustment / 2 };
-    return QRectF { pos - adjustmentPoint, pos + adjustmentPoint };
+    return topohelp::utils::adjustFromPoint(pos, adjustment);
 }
 
 /*!
@@ -521,42 +316,10 @@ QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::A
  */
 
 QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side,
-        const LookupDirection direction)
+        const topohelp::LookupDirection direction)
 {
-    const bool clockwise = direction == LookupDirection::Clockwise;
-    QRectF resultRect { itemRect };
-    switch (side) {
-    case Qt::AlignLeft:
-        if (clockwise)
-            resultRect.moveBottom(intersectedItemRect.top() - kInterfaceLayoutOffset);
-        else
-            resultRect.moveTop(intersectedItemRect.bottom() + kInterfaceLayoutOffset);
-        break;
-    case Qt::AlignRight:
-        if (clockwise)
-            resultRect.moveTop(intersectedItemRect.bottom() + kInterfaceLayoutOffset);
-        else
-            resultRect.moveBottom(intersectedItemRect.top() - kInterfaceLayoutOffset);
-        break;
-    case Qt::AlignTop:
-        if (clockwise)
-            resultRect.moveLeft(intersectedItemRect.right() + kInterfaceLayoutOffset);
-        else
-            resultRect.moveRight(intersectedItemRect.left() - kInterfaceLayoutOffset);
-        break;
-    case Qt::AlignBottom:
-        if (clockwise)
-            resultRect.moveRight(intersectedItemRect.left() - kInterfaceLayoutOffset);
-        else
-            resultRect.moveLeft(intersectedItemRect.right() + kInterfaceLayoutOffset);
-        break;
-    default:
-        qWarning() << "Unhandled side:" << side;
-        return {};
-    }
-    return resultRect;
+    return topohelp::utils::adjustedRect(itemRect, intersectedItemRect, side, direction);
 }
-
 /*!
  * Checks intersection \a itemRect with \a itemRects
  * and assign first intersection to \a collidingRect
@@ -564,298 +327,32 @@ QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, c
 
 bool isCollided(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect)
 {
-    auto it = std::find_if(itemRects.cbegin(), itemRects.cend(),
-            [itemRect](const QRectF &siblingRect) { return siblingRect.intersects(itemRect); });
-    if (it != itemRects.cend()) {
-        if (collidingRect)
-            *collidingRect = *it;
-        return true;
-    }
-    return false;
+    return topohelp::utils::isCollided(itemRects, itemRect, collidingRect);
 }
 
-/*!
- * Generates angled segments for \a IVConnectionGraphicsItem from \a startPoint to \a endPoint
- * \param startDirection as previous point for generated one
- * \param endDirection as next point for generated one
- * \return set of points as segment for \a IVConnectionGraphicsItem connects \a startPoint and \a endPoint
- */
 QList<QVector<QPointF>> generateSegments(const QPointF &startPoint, const QPointF &endPoint)
 {
-    if (startPoint == endPoint)
-        return {};
-
-    if (qFuzzyCompare(startPoint.x(), endPoint.x()) || qFuzzyCompare(startPoint.y(), endPoint.y()))
-        return { { startPoint, endPoint } };
-
-    return { { startPoint, { startPoint.x(), endPoint.y() }, endPoint },
-        { startPoint, { endPoint.x(), startPoint.y() }, endPoint } };
+    return topohelp::utils::generateSegments(startPoint, endPoint);
 }
 
-/*!
- * Generates angled segments for \a IVConnectionGraphicsItem from \a startDirection to \a endDirection
- * \param startDirection as previous segment for generated one
- * \param endDirection as next segment for generated one
- * \return set of points as segment for \a IVConnectionGraphicsItem connects \a startDirection and \a endDirection
- */
 QVector<QPointF> generateSegments(const QLineF &startDirection, const QLineF &endDirection)
 {
-    if (startDirection.isNull() || endDirection.isNull())
-        return {};
-
-    QVector<QPointF> connectionPoints { startDirection.p2(), endDirection.p2() };
-    const qreal angle = startDirection.angleTo(endDirection);
-    static const qreal tolerance = 0.1;
-    if (std::abs(std::sin(qDegreesToRadians(angle))) <= tolerance) { // ||
-        const QPointF mid = QLineF(connectionPoints.first(), connectionPoints.last()).center();
-        QLineF midLine { mid, QPointF(0, 0) };
-        midLine.setAngle(startDirection.angle() - 90);
-
-        QPointF startLastPoint;
-        midLine.intersects(startDirection, &startLastPoint);
-        connectionPoints.insert(connectionPoints.size() - 1, startLastPoint);
-
-        QPointF endLastPoint;
-        midLine.intersects(endDirection, &endLastPoint);
-        connectionPoints.insert(connectionPoints.size() - 1, endLastPoint);
-    } else { // |_, \_, /_, etc
-        QPointF mid;
-        startDirection.intersects(endDirection, &mid);
-        connectionPoints.insert(connectionPoints.size() - 1, mid);
-    }
-    return connectionPoints;
+    return topohelp::utils::generateSegments(startDirection, endDirection);
 }
 
-static inline QLineF getDirection(const QRectF &sceneRect, const QPointF &point)
-{
-    switch (getNearestSide(sceneRect, point)) {
-    case Qt::AlignTop:
-        return QLineF(sceneRect.topLeft(), sceneRect.topRight()).normalVector();
-    case Qt::AlignBottom:
-        return QLineF(sceneRect.bottomRight(), sceneRect.bottomLeft()).normalVector();
-    case Qt::AlignLeft:
-        return QLineF(sceneRect.bottomLeft(), sceneRect.topLeft()).normalVector();
-    case Qt::AlignRight:
-        return QLineF(sceneRect.topRight(), sceneRect.bottomRight()).normalVector();
-    default:
-        break;
-    }
-    return QLineF();
-};
-
-/*!
- * Generates the segments for \a IVConnectionGraphicsItem from \a firstEndPoint with direction to \a lastEndPoint
- * \param sceneRect as a geometry of an item where connected \a IVInterfaceGraphicsItem is placed
- * \param firstEndPoint as starting point
- * \param lastEndPoint as point used to find direction of segment (into/out the \a sceneRect)
- * \return last segment for \a IVConnectionGraphicsItem linked to \a IVInterfaceGraphicsItem
- */
 QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const QPointF &lastEndPoint)
 {
-    QLineF vector = getDirection(sceneRect, firstEndPoint);
-    if (vector.isNull())
-        return {};
-
-    vector.translate(firstEndPoint - vector.p1());
-    vector.setLength(kConnectionMargin);
-
-    if (sceneRect.contains(lastEndPoint))
-        vector.setAngle(180 + vector.angle());
-
-    return vector;
+    return topohelp::utils::ifaceSegment(sceneRect, firstEndPoint, lastEndPoint);
 }
 
-/*!
- * Generates the path for \a IVConnectionGraphicsItem from \a startPoint to \a endPoint
- * \param existingRects existing items geometries in scene coordinates shouldn't been overlapped
- * \param startPoint as first polyline node
- * \param endDirection as last polyline node
- * \return set of polyline nodes coordinates
- */
 QVector<QPointF> path(const QList<QRectF> &existingRects, const QPointF &startPoint, const QPointF &endPoint)
 {
-    const QVector<QPointF> points { startPoint, endPoint };
-    auto item = getNearestIntersectedRect(existingRects, points, IntersectionType::Multiple);
-    if (!item.isValid())
-        return points;
-
-    const QList<QVector<QPointF>> possiblePaths = findSubPath(item, { startPoint }, { endPoint }, false);
-    if (possiblePaths.isEmpty()) {
-        return {};
-    }
-
-    QList<QVector<QPointF>> paths;
-    for (const QVector<QPointF> &possiblePath : possiblePaths) {
-        if (possiblePath.isEmpty()) {
-            continue;
-        }
-
-        if (possiblePath.last() == endPoint) {
-            paths.append(possiblePath);
-        } else {
-            const auto p = path(existingRects, possiblePath.last(), endPoint);
-            if (!p.isEmpty()) {
-                QVector<QPointF> prevPath(possiblePath);
-                prevPath.removeLast();
-                paths.append(prevPath << p);
-            }
-        }
-    }
-    if (paths.isEmpty()) {
-        return {};
-    }
-
-    QVector<QPointF> shortestPath;
-    qreal minLength = std::numeric_limits<qreal>::max();
-    for (const QVector<QPointF> &path : paths) {
-        if (path.size() < 2) {
-            continue;
-        }
-        const qreal length = distancePolygon(path);
-        if (minLength > length && !qFuzzyIsNull(length)) {
-            minLength = length;
-            shortestPath = path;
-        }
-    }
-    if (shortestPath.isEmpty())
-        return {};
-
-    return shortestPath;
+    return topohelp::utils::path(existingRects, startPoint, endPoint);
 }
 
-/*!
- * Generates the segments for \a IVConnectionGraphicsItem from \a prevPoints to \a nextPoints
- * \param itemRect geometry of intersected item bounding box
- * \param prevPoints as starting points
- * \param nextPoints as points generated segments should be connected to
- * \param strict as a flag showing if it should check full intersection with \a itemRect
- * or some node could be placed on the edge of noticed rect
- * \return set of possible paths
- */
-QList<QVector<QPointF>> findSubPath(
-        const QRectF &itemRect, const QVector<QPointF> &prevPoints, const QVector<QPointF> &nextPoints, bool strict)
-{
-    Q_ASSERT(itemRect.isValid());
-    Q_ASSERT(!prevPoints.isEmpty());
-    Q_ASSERT(!nextPoints.isEmpty());
-
-    if (!itemRect.isValid() || prevPoints.isEmpty() || nextPoints.isEmpty())
-        return {};
-
-    const QPointF startPoint = prevPoints.last();
-    const QPointF endPoint = nextPoints.last();
-    Q_ASSERT(startPoint != endPoint);
-    if (startPoint == endPoint)
-        return {};
-
-    const QRectF itemRectMargins =
-            itemRect.adjusted(-kConnectionMargin, -kConnectionMargin, kConnectionMargin, kConnectionMargin);
-    const QList<QPointF> rectCorners = sortedCorners(itemRectMargins, startPoint, endPoint);
-    QList<QVector<QPointF>> allPaths;
-    for (const QPointF &p : rectCorners) {
-        const QVector<QPointF> lastSegment = { p, endPoint };
-        for (const auto &polygon : generateSegments(startPoint, p)) {
-            const bool withoutIntersections = strict
-                    ? !shared::graphicsviewutils::intersects(itemRect, polygon)
-                            && !shared::graphicsviewutils::intersects(itemRect, QLineF(p, endPoint))
-                    : shared::graphicsviewutils::intersectionPoints(itemRect, polygon).size() < 2
-                            && shared::graphicsviewutils::intersectionPoints(itemRect, lastSegment).size() < 2;
-            if (withoutIntersections) {
-                QVector<QPointF> previousPoints(prevPoints);
-                previousPoints.removeLast();
-                previousPoints << polygon;
-                allPaths << previousPoints;
-            }
-        }
-    }
-    return allPaths;
-}
-
-/*!
- * Generates the path for \a IVConnectionGraphicsItem from \a startPoint to \a endPoint
- * \param existingRects geometries of existing items in scene coordinates that should be checked on collisions
- * \param startDirection as first polyline segment
- * \param endDirection as last polyline segment
- * \return set of polyline nodes coordinates
- */
-
-QVector<QPointF> findPath(const QList<QRectF> &existingRects, const QLineF &startDirection, const QLineF &endDirection,
-        QRectF *intersectedRect)
-{
-    const QVector<QPointF> points = generateSegments(startDirection, endDirection);
-    const QRectF rect = getNearestIntersectedRect(existingRects, points, IntersectionType::Single);
-    if (!rect.isValid())
-        return points;
-
-    if (intersectedRect)
-        *intersectedRect = rect;
-    return {};
-}
-
-/*!
- * Generates the whole path for \a IVConnectionGraphicsItem
- * \param existingRects geometries of existing items in scene coordinates that should be checked on collisions
- * \param startDirection as first polyline segment
- * \param endDirection as last polyline segment
- * \return set of polyline nodes coordinates
- */
 QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDirection, const QLineF &endDirection)
 {
-    QRectF intersectedRect;
-    QList<QVector<QPointF>> paths { { startDirection.p1(), startDirection.p2() } };
-    while (true) {
-        QList<QVector<QPointF>> deeper;
-        QList<QVector<QPointF>> results;
-        for (const auto &path : paths) {
-            Q_ASSERT(path.size() >= 2);
-            if (path.size() < 2)
-                return {};
-
-            const QLineF prevDirection { path.value(path.size() - 2), path.value(path.size() - 1) };
-            QVector<QPointF> shortPath = findPath(existingRects, prevDirection, endDirection, &intersectedRect);
-            if (!shortPath.isEmpty()) {
-                QVector<QPointF> result;
-                result.append(startDirection.p1());
-                result.append(path);
-                result.append(shortPath);
-                result.append(endDirection.p1());
-                results.append(result);
-                continue;
-            }
-            const QList<QVector<QPointF>> subPaths =
-                    findSubPath(intersectedRect, path, { endDirection.p1(), endDirection.p2() });
-            for (auto subPath : subPaths) {
-                if (subPath.isEmpty()) {
-                    continue;
-                }
-
-                const QRectF item = getNearestIntersectedRect(existingRects, subPath, IntersectionType::Single);
-                if (item.isValid())
-                    continue;
-                else if (subPath.last() == endDirection.p2())
-                    results.append(subPath);
-                else
-                    deeper.append(subPath);
-            }
-        }
-        if (!results.isEmpty()) {
-            std::sort(results.begin(), results.end(), [](const QVector<QPointF> &v1, const QVector<QPointF> &v2) {
-                if (v1.size() == v2.size())
-                    return distancePolygon(v1) < distancePolygon(v2);
-                return v1.size() < v2.size();
-            });
-
-            return results.first();
-        }
-
-        if (paths.size() != deeper.size() || !std::equal(paths.constBegin(), paths.constEnd(), deeper.constBegin()))
-            paths = deeper;
-        else if (!deeper.isEmpty())
-            return deeper.front();
-        else
-            break;
-    }
-    return {};
+    return topohelp::utils::path(existingRects, startDirection, endDirection);
 }
 
 QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const QPointF &startIfacePos,
@@ -876,6 +373,11 @@ QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const 
 QVector<QPointF> simplifyPoints(const QVector<QPointF> &points)
 {
     return topohelp::utils::simplifyPoints(points);
+}
+
+Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos)
+{
+    return topohelp::utils::getNearestSide(boundingArea, pos);
 }
 
 bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
@@ -917,12 +419,7 @@ bool rectContainsPoint(const QRectF &rect, const QPointF &point, bool proper)
  */
 QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects)
 {
-    auto it = std::find_if(existingRects.constBegin(), existingRects.constEnd(),
-            [rect](const QRectF &r) { return r.intersects(rect); });
-    if (it != existingRects.constEnd()) {
-        return *it;
-    }
-    return QRectF();
+    return topohelp::utils::collidingRect(rect, existingRects);
 };
 
 /*!
@@ -932,62 +429,8 @@ QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects)
 void findGeometryForRect(
         QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects, const QMarginsF &margins)
 {
-    if (!itemRect.isValid()) {
-        const QRectF contentRect = boundedRect.marginsRemoved(margins);
-        const QSizeF size = contentRect.isValid() ? kDefaultGraphicsItemSize.boundedTo(contentRect.size())
-                                                  : kDefaultGraphicsItemSize;
-        itemRect = QRectF(contentRect.topLeft(), size);
-    }
-    QRectF itemGeometry(itemRect.marginsAdded(margins));
-
-    if (!existingRects.isEmpty()) {
-        static const qreal kOffset = 2;
-        if (boundedRect.isValid()) {
-            QRectF contentGeometry = boundedRect.marginsRemoved(margins);
-            itemGeometry.moveTopLeft(contentGeometry.topLeft());
-
-            QRectF intersectedRect = collidingRect(itemGeometry, existingRects);
-            while (!intersectedRect.isNull()) {
-                if (contentGeometry.right() - intersectedRect.right() > itemGeometry.width()) {
-                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
-                } else if (contentGeometry.bottom() - intersectedRect.bottom() > itemGeometry.height()) {
-                    itemGeometry.moveLeft(contentGeometry.left() + kOffset);
-                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
-                } else if (contentGeometry.width() <= contentGeometry.height()) {
-                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
-                    contentGeometry.setRight(itemGeometry.right());
-                } else {
-                    itemGeometry.moveLeft(contentGeometry.left() + kOffset);
-                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
-                    contentGeometry.setBottom(itemGeometry.bottom());
-                }
-                intersectedRect = collidingRect(itemGeometry, existingRects);
-            }
-        } else {
-            QRectF existingRect;
-            std::for_each(existingRects.cbegin(), existingRects.cend(),
-                    [&existingRect](const QRectF &r) { existingRect |= r; });
-            QRectF intersectedRect = collidingRect(itemGeometry, existingRects);
-            while (!intersectedRect.isNull()) {
-                if (existingRect.height() > existingRect.width()) {
-                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
-                } else {
-                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
-                }
-                intersectedRect = collidingRect(itemGeometry, existingRects);
-            }
-        }
-    }
-
-    itemRect = itemGeometry.marginsRemoved(margins);
-    QRectF newBoundingRect;
-    for (const QRectF &rect : existingRects) {
-        newBoundingRect |= rect;
-    }
-    newBoundingRect |= itemRect;
-    boundedRect |= newBoundingRect.marginsAdded(margins);
+    return topohelp::utils::findGeometryForRect(itemRect, boundedRect, existingRects, margins);
 }
-
 /*!
  * Gets geometries of rectangular items with the same level
  * as \a item in scene coordinates with \a margins added
@@ -1016,12 +459,7 @@ QList<QRectF> siblingItemsRects(const QGraphicsItem *item)
 
 bool isRectBounded(const QRectF &outerRect, const QRectF &innerRect)
 {
-    if (!innerRect.isValid()) {
-        return true;
-    } else if (!outerRect.isValid()) {
-        return false;
-    }
-    return outerRect.contains(innerRect);
+    return topohelp::utils::isRectBounded(outerRect, innerRect);
 }
 
 bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect)
@@ -1031,7 +469,7 @@ bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRec
     }
 
     const QList<QRectF> siblingRects = siblingItemsRects(upcomingItem);
-    return isCollided(siblingRects, upcomingItemRect.marginsAdded(kContentMargins));
+    return isCollided(siblingRects, upcomingItemRect.marginsAdded(topohelp::kContentMargins));
 }
 
 bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect)
@@ -1039,6 +477,8 @@ bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect
     if (!upcomingItem || !upcomingItemRect.isValid()) {
         return false;
     }
+
+    using topohelp::kContentMargins;
 
     if (auto rectItem = qobject_cast<const ui::VERectGraphicsItem *>(upcomingItem->toGraphicsObject())) {
         // Is this item contained by its parent
@@ -1091,8 +531,10 @@ void drawText(QPainter *painter, const QRectF &rect, const QString &text, qreal 
 void findGeometryForPoint(
         QPointF &ifacePos, const QRectF &boundedRect, const QList<QRectF> &existingRects, const QMarginsF &margins)
 {
+    using topohelp::kInterfaceBaseLength;
+
     const QRectF kBaseRect = adjustFromPoint(QPointF(0, 0), kInterfaceBaseLength);
-    QRectF itemRect = adjustFromPoint(ifacePos, kInterfaceBaseLength + kSiblingMinDistance);
+    QRectF itemRect = adjustFromPoint(ifacePos, kInterfaceBaseLength + topohelp::kSiblingMinDistance);
 
     itemRect.moveCenter(ifacePos);
     QRectF intersectedRect;
@@ -1125,6 +567,8 @@ QGraphicsLineItem *horizontalHelper(qreal y, QGraphicsItem *parent)
 
 QGraphicsLineItem *verticalHelper(qreal x, QGraphicsItem *parent)
 {
+    using topohelp::kHelperLineLength;
+
     const QPen linePen(Qt::gray, 1, Qt::DashLine);
     auto helper = new QGraphicsLineItem(parent);
     helper->setPen(linePen);

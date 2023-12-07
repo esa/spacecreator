@@ -21,7 +21,7 @@
 
 #include <QtMath>
 
-namespace gu = shared::graphicsviewutils;
+namespace gu = topohelp;
 
 static const QMarginsF kMargins { gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset,
     gu::kInterfaceLayoutOffset };
@@ -67,7 +67,7 @@ struct PositionLookupHelper::PositionLookupPrivate {
         : m_sidePaths(sidePaths)
         , m_siblingsRects(siblingsRects)
         , m_parentRect(parentRect)
-        , m_initialSideIdx(indexFromSide(gu::getNearestSide(parentRect, pos)))
+        , m_initialSideIdx(indexFromSide(gu::utils::getNearestSide(parentRect, pos)))
         , m_direction(direction)
         , m_cw({ this, pos, m_initialSideIdx, gu::LookupDirection::Clockwise })
         , m_ccw({ this, pos, m_initialSideIdx, gu::LookupDirection::CounterClockwise })
@@ -164,7 +164,7 @@ struct PositionLookupHelper::PositionLookupPrivate {
 
         bool isBounded() const { return q->m_parentRect.contains(itemPos); }
 
-        bool isReady() const { return isBounded() && !gu::isCollided(q->m_siblingsRects, itemRect()); }
+        bool isReady() const { return isBounded() && !gu::utils::isCollided(q->m_siblingsRects, itemRect()); }
 
         bool hasNext() const
         {
@@ -176,13 +176,13 @@ struct PositionLookupHelper::PositionLookupPrivate {
 
         bool nextRect()
         {
-            if (gu::isCollided(q->m_siblingsRects, itemRect(), &intersectedRect)) {
+            if (gu::utils::isCollided(q->m_siblingsRects, itemRect(), &intersectedRect)) {
                 auto dir = direction == gu::LookupDirection::Mixed
                         ? ((side() == Qt::AlignLeft || side() == Qt::AlignBottom)
-                                          ? gu::LookupDirection::CounterClockwise
-                                          : gu::LookupDirection::Clockwise)
+                                        ? gu::LookupDirection::CounterClockwise
+                                        : gu::LookupDirection::Clockwise)
                         : direction;
-                const QRectF rect = gu::adjustedRect(itemRect(), intersectedRect, side(), dir);
+                const QRectF rect = gu::utils::adjustedRect(itemRect(), intersectedRect, side(), dir);
                 itemPos = rect.topLeft() - originPoint();
                 return true;
             }
@@ -204,15 +204,15 @@ PositionLookupHelper::PositionLookupHelper(const QList<QPair<Qt::Alignment, QPai
 {
 }
 
-PositionLookupHelper::~PositionLookupHelper() {}
+PositionLookupHelper::~PositionLookupHelper() { }
 
 bool PositionLookupHelper::lookup()
 {
     auto isValid = [this](PositionLookupPrivate::DirectionHelper *helper) {
         return (d->m_direction == helper->direction
                        || (d->m_direction == gu::LookupDirection::Bidirectional
-                                  && (helper->direction == gu::LookupDirection::Clockwise
-                                             || helper->direction == gu::LookupDirection::CounterClockwise)))
+                               && (helper->direction == gu::LookupDirection::Clockwise
+                                       || helper->direction == gu::LookupDirection::CounterClockwise)))
                 && helper->hasNext();
     };
 

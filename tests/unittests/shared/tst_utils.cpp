@@ -73,44 +73,44 @@ void tst_Utils::testAdjustedRect()
     const QRectF itemRect { 100, 100, 100, 100 };
     const QRectF intersectedItemRect { 150, 150, 100, 100 };
     QVERIFY(shared::graphicsviewutils::adjustedRect(
-                    itemRect, intersectedItemRect, Qt::AlignLeft, shared::graphicsviewutils::LookupDirection::Clockwise)
+                    itemRect, intersectedItemRect, Qt::AlignLeft, topohelp::LookupDirection::Clockwise)
                     .bottom()
             < intersectedItemRect.top());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignLeft,
-                    shared::graphicsviewutils::LookupDirection::CounterClockwise)
+    QVERIFY(shared::graphicsviewutils::adjustedRect(
+                    itemRect, intersectedItemRect, Qt::AlignLeft, topohelp::LookupDirection::CounterClockwise)
                     .top()
             > intersectedItemRect.bottom());
     QVERIFY(shared::graphicsviewutils::adjustedRect(
-                    itemRect, intersectedItemRect, Qt::AlignTop, shared::graphicsviewutils::LookupDirection::Clockwise)
+                    itemRect, intersectedItemRect, Qt::AlignTop, topohelp::LookupDirection::Clockwise)
                     .left()
             > intersectedItemRect.right());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignTop,
-                    shared::graphicsviewutils::LookupDirection::CounterClockwise)
+    QVERIFY(shared::graphicsviewutils::adjustedRect(
+                    itemRect, intersectedItemRect, Qt::AlignTop, topohelp::LookupDirection::CounterClockwise)
                     .right()
             < intersectedItemRect.left());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight,
-                    shared::graphicsviewutils::LookupDirection::Clockwise)
+    QVERIFY(shared::graphicsviewutils::adjustedRect(
+                    itemRect, intersectedItemRect, Qt::AlignRight, topohelp::LookupDirection::Clockwise)
                     .top()
             > intersectedItemRect.bottom());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignRight,
-                    shared::graphicsviewutils::LookupDirection::CounterClockwise)
+    QVERIFY(shared::graphicsviewutils::adjustedRect(
+                    itemRect, intersectedItemRect, Qt::AlignRight, topohelp::LookupDirection::CounterClockwise)
                     .bottom()
             < intersectedItemRect.top());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom,
-                    shared::graphicsviewutils::LookupDirection::Clockwise)
+    QVERIFY(shared::graphicsviewutils::adjustedRect(
+                    itemRect, intersectedItemRect, Qt::AlignBottom, topohelp::LookupDirection::Clockwise)
                     .right()
             < intersectedItemRect.left());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(itemRect, intersectedItemRect, Qt::AlignBottom,
-                    shared::graphicsviewutils::LookupDirection::CounterClockwise)
+    QVERIFY(shared::graphicsviewutils::adjustedRect(
+                    itemRect, intersectedItemRect, Qt::AlignBottom, topohelp::LookupDirection::CounterClockwise)
                     .left()
             > intersectedItemRect.right());
 
     const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
     for (int idx = 0; idx < me.keyCount(); ++idx) {
         const auto align = static_cast<Qt::Alignment>(me.value(idx));
-        if (!shared::graphicsviewutils::kRectSides.contains(align)) {
+        if (!topohelp::kRectSides.contains(align)) {
             QVERIFY(!shared::graphicsviewutils::adjustedRect(
-                    itemRect, intersectedItemRect, align, shared::graphicsviewutils::LookupDirection::Clockwise)
+                    itemRect, intersectedItemRect, align, topohelp::LookupDirection::Clockwise)
                              .isValid());
         }
     }
@@ -139,7 +139,7 @@ void tst_Utils::testAlignRectToSide()
             QVERIFY(!shared::graphicsviewutils::alignRectToSide(testData.boundingRect, {}, align, testData.offset)
                              .isValid());
 
-            if (!shared::graphicsviewutils::kRectSides.contains(align)) {
+            if (!topohelp::kRectSides.contains(align)) {
                 QVERIFY(!shared::graphicsviewutils::alignRectToSide(
                         testData.boundingRect, testData.itemRect, align, testData.offset)
                                  .isValid());

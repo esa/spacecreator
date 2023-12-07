@@ -41,7 +41,7 @@
 #include <QPainter>
 #include <QtDebug>
 
-static const qreal kHeight = shared::graphicsviewutils::kInterfaceBaseLength * 4 / 5;
+static const qreal kHeight = topohelp::kInterfaceBaseLength * 4 / 5;
 static const QColor kSelectedBackgroundColor = QColor(Qt::magenta);
 static const QColor kDefaultBackgroundColor = QColor(Qt::blue);
 static const int kTextMargin = 2;
@@ -110,7 +110,7 @@ QPointF IVInterfaceGraphicsItem::connectionEndPoint(const bool nestedConnection)
     }
     if (auto parentGraphicsItem = parentItem()) {
         const QRectF parentRect = parentGraphicsItem->boundingRect();
-        const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, pos());
+        const Qt::Alignment alignment = topohelp::utils::getNearestSide(parentRect, pos());
         switch (alignment) {
         case Qt::AlignLeft:
             if (nestedConnection) {
@@ -155,7 +155,7 @@ QPointF IVInterfaceGraphicsItem::connectionEndPoint(shared::ui::VEConnectionGrap
 QPainterPath IVInterfaceGraphicsItem::ifaceShape() const
 {
     const QRectF parentRect = parentItem()->boundingRect();
-    const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, pos());
+    const Qt::Alignment alignment = topohelp::utils::getNearestSide(parentRect, pos());
     return mapToScene(ifaceTransform(alignment).map(ifacePath()));
 }
 
@@ -208,7 +208,7 @@ qreal IVInterfaceGraphicsItem::maxWidth() const
     const QRectF sceneRect = scene()->sceneRect();
     const QRectF parentRect = targetItem()->boundingRect();
     const QPointF ifacePos = pos();
-    const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
+    const Qt::Alignment side = topohelp::utils::getNearestSide(parentRect, ifacePos);
     QRectF rect;
     rect.setTop(itemRect.top());
     rect.setBottom(itemRect.bottom());
@@ -283,7 +283,7 @@ void IVInterfaceGraphicsItem::updateTextPosition()
     if (m_textItem) {
         const QRectF parentRect = targetItem()->boundingRect();
         const QPointF ifacePos = pos();
-        const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, ifacePos);
+        const Qt::Alignment side = topohelp::utils::getNearestSide(parentRect, ifacePos);
         m_textItem->setPos(m_textItem->mapToParent(textTransform(side).map(QPointF(0, 0))));
     }
 }
@@ -394,7 +394,7 @@ void IVInterfaceGraphicsItem::onAttrOrPropChanged(const QString &attrName)
 
 QTransform IVInterfaceGraphicsItem::typeTransform(Qt::Alignment alignment) const
 {
-    const qreal offset = shared::graphicsviewutils::kInterfaceBaseLength + 2;
+    const qreal offset = topohelp::kInterfaceBaseLength + 2;
 
     QPointF shift(0., 0.);
     switch (alignment) {
@@ -468,7 +468,7 @@ QTransform IVInterfaceGraphicsItem::textTransform(Qt::Alignment alignment) const
 
 QPainterPath IVInterfaceGraphicsItem::ifacePath() const
 {
-    static const qreal kBase = shared::graphicsviewutils::kInterfaceBaseLength;
+    static const qreal kBase = topohelp::kInterfaceBaseLength;
 
     QPainterPath path;
     path.addPolygon(QVector<QPointF> {
@@ -546,7 +546,7 @@ QPainterPath IVInterfaceGraphicsItem::composeShape() const
     QPainterPathStroker pathStroker;
     pathStroker.setCapStyle(Qt::PenCapStyle::RoundCap);
     pathStroker.setJoinStyle(Qt::PenJoinStyle::RoundJoin);
-    pathStroker.setWidth(shared::graphicsviewutils::kInterfaceBaseLength);
+    pathStroker.setWidth(topohelp::kInterfaceBaseLength);
     const QPainterPath strokePath = pathStroker.createStroke(strokeBasePath);
     path = path.united(strokePath);
 

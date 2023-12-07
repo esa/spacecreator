@@ -16,6 +16,7 @@
 */
 
 #include "common.h"
+#include "connection.h"
 #include "connectioncreationvalidator.h"
 #include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
@@ -160,11 +161,11 @@ void tst_ConnectionUtils::tst_segmentGenerationByPoints()
 {
     QPointF startPoint { 100, 100 };
     QPointF endPoint { startPoint };
-    auto segments = shared::graphicsviewutils::generateSegments(startPoint, endPoint);
+    auto segments = topohelp::utils::generateSegments(startPoint, endPoint);
     QVERIFY(segments.isEmpty());
 
     endPoint += QPointF(200, 200);
-    segments = shared::graphicsviewutils::generateSegments(startPoint, endPoint);
+    segments = topohelp::utils::generateSegments(startPoint, endPoint);
     QVERIFY(!segments.isEmpty());
     for (auto segment : segments) {
         QVERIFY(segment.startsWith(startPoint));
@@ -174,52 +175,52 @@ void tst_ConnectionUtils::tst_segmentGenerationByPoints()
 
 void tst_ConnectionUtils::tst_segmentGeneration()
 {
-    auto segments = shared::graphicsviewutils::generateSegments(QLineF(), QLineF());
+    auto segments = topohelp::utils::generateSegments(QLineF(), QLineF());
     QVERIFY(segments.isEmpty());
     QLineF startSegment { QPointF(100, 100), QPointF(100, 200) };
-    segments = shared::graphicsviewutils::generateSegments(startSegment, QLineF());
+    segments = topohelp::utils::generateSegments(startSegment, QLineF());
     QVERIFY(segments.isEmpty());
     QLineF endSegment { QPointF(300, 200), QPointF(300, 100) };
-    segments = shared::graphicsviewutils::generateSegments(QLineF(), endSegment);
+    segments = topohelp::utils::generateSegments(QLineF(), endSegment);
     QVERIFY(segments.isEmpty());
 
     // ||
-    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
+    segments = topohelp::utils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // |_
     endSegment.setP2(QPointF(200, 200));
-    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
+    segments = topohelp::utils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // \_
     startSegment.setP1(QPointF(0, 0));
-    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
+    segments = topohelp::utils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // \|
     endSegment.setP1(QPointF(200, 100));
-    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
+    segments = topohelp::utils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // /|
     startSegment.setP1(QPointF(100, 100));
-    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
+    segments = topohelp::utils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
 
     // /_
     endSegment.setP1(QPointF(300, 200));
-    segments = shared::graphicsviewutils::generateSegments(startSegment, endSegment);
+    segments = topohelp::utils::generateSegments(startSegment, endSegment);
     QVERIFY(segments.size() >= 3);
     QVERIFY(segments.first() == startSegment.p2());
     QVERIFY(segments.last() == endSegment.p2());
@@ -227,24 +228,24 @@ void tst_ConnectionUtils::tst_segmentGeneration()
 
 void tst_ConnectionUtils::tst_ifaceSegment()
 {
-    auto line = shared::graphicsviewutils::ifaceSegment(QRectF(), QPointF(), QPointF());
+    auto line = topohelp::utils::ifaceSegment(QRectF(), QPointF(), QPointF());
     QVERIFY(line.isNull());
 
     QRectF rect { 100, 100, 300, 300 };
     QPointF first, last;
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
 
     first = QPointF(200, 100);
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 0);
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -253,13 +254,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 200);
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(600, 200);
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -268,13 +269,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(200, 600);
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -283,13 +284,13 @@ void tst_ConnectionUtils::tst_ifaceSegment()
     Q_ASSERT(rect.contains(first));
 
     last = QPointF(0, 300);
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
 
     last = QPointF(200, 200);
-    line = shared::graphicsviewutils::ifaceSegment(rect, first, last);
+    line = topohelp::utils::ifaceSegment(rect, first, last);
     QVERIFY(!line.isNull());
     QVERIFY(line.p1() != line.p2());
     QVERIFY(rect.contains(last) == rect.contains(line.p2()));
@@ -299,14 +300,17 @@ void tst_ConnectionUtils::tst_createConnectionPath()
 {
     const QRectF r1 = f1->sceneBoundingRect();
     const QRectF r2 = f2->sceneBoundingRect();
-    QVector<QPointF> path = shared::graphicsviewutils::createConnectionPath(
-            existingRects(), QPointF(r1.x(), r1.y() + 100), r1, QPointF(r2.right(), r2.y() + 100), r2);
+
+    using namespace topohelp::cnct;
+    const ConnectionEnvInfo connectionInfo { r1, QPointF(r1.x(), r1.y() + 100), r2, QPointF(r2.right(), r2.y() + 100),
+        existingRects() };
+    QVector<QPointF> path = topohelp::cnct::createConnectionPath(connectionInfo);
     QVERIFY(!path.isEmpty());
     path.append(path.last());
     path.append(path.last());
     path.prepend(path.first());
     path.prepend(path.first());
-    auto simplifiedPath = shared::graphicsviewutils::simplifyPoints(path);
+    auto simplifiedPath = topohelp::utils::simplifyPoints(path);
     QCOMPARE(simplifiedPath.size() + 4, path.size());
 }
 
@@ -317,16 +321,16 @@ void tst_ConnectionUtils::tst_findPath()
     const QPointF startPoint(r1.x(), r1.y() + 100);
     const QPointF endPoint(r2.right(), r2.y() + 100);
 
-    const QLineF startSegment = shared::graphicsviewutils::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = shared::graphicsviewutils::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = topohelp::utils::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = topohelp::utils::ifaceSegment(r2, endPoint, startPoint);
 
     QRectF intersectedRect;
-    auto path = shared::graphicsviewutils::findPath(existingRects(), startSegment, endSegment, &intersectedRect);
+    auto path = topohelp::utils::findPath(existingRects(), startSegment, endSegment, &intersectedRect);
     QVERIFY(!intersectedRect.isNull());
     QVERIFY(path.isEmpty());
 
     intersectedRect = {};
-    path = shared::graphicsviewutils::findPath(existingRects(), QLineF(r1.topLeft(), r1.topRight()),
+    path = topohelp::utils::findPath(existingRects(), QLineF(r1.topLeft(), r1.topRight()),
             QLineF(r2.bottomRight(), r2.bottomLeft()), &intersectedRect);
     QVERIFY(intersectedRect.isNull());
     QVERIFY(!path.isEmpty());
@@ -339,17 +343,16 @@ void tst_ConnectionUtils::tst_findSubPath()
     const QPointF startPoint(r1.x(), r1.y() + 100);
     const QPointF endPoint(r2.right(), r2.y() + 100);
 
-    const QLineF startSegment = shared::graphicsviewutils::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = shared::graphicsviewutils::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = topohelp::utils::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = topohelp::utils::ifaceSegment(r2, endPoint, startPoint);
 
     const auto pathsFromStart =
-            shared::graphicsviewutils::findSubPath(r1, QVector<QPointF> { startSegment.p1(), startSegment.p2() },
+            topohelp::utils::findSubPath(r1, QVector<QPointF> { startSegment.p1(), startSegment.p2() },
                     QVector<QPointF> { endSegment.p1(), endSegment.p2() });
     QVERIFY(!pathsFromStart.isEmpty());
 
-    const auto pathsFromEnd =
-            shared::graphicsviewutils::findSubPath(r2, QVector<QPointF> { endSegment.p1(), endSegment.p2() },
-                    QVector<QPointF> { startSegment.p1(), startSegment.p2() });
+    const auto pathsFromEnd = topohelp::utils::findSubPath(r2, QVector<QPointF> { endSegment.p1(), endSegment.p2() },
+            QVector<QPointF> { startSegment.p1(), startSegment.p2() });
     QVERIFY(!pathsFromEnd.isEmpty());
 
     static const QList<int> types = { ive::IVFunctionGraphicsItem::Type, ive::IVFunctionTypeGraphicsItem::Type };
@@ -370,11 +373,11 @@ void tst_ConnectionUtils::tst_findSubPath()
         }
     }
     for (auto path : paths) {
-        path = shared::graphicsviewutils::simplifyPoints(path);
+        path = topohelp::utils::simplifyPoints(path);
         auto items = m_scene.items(path);
         auto it = std::find_if(items.constBegin(), items.constEnd(), [path](QGraphicsItem *item) {
             return types.contains(item->type())
-                    && shared::graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), path).size() >= 2;
+                    && topohelp::utils::intersectionPoints(item->sceneBoundingRect(), path).size() >= 2;
         });
         QVERIFY(it == items.constEnd());
     }
@@ -387,7 +390,7 @@ void tst_ConnectionUtils::tst_pathByPoints()
     const QPointF startPoint(r1.x() - 100, r1.center().y());
     const QPointF endPoint(r2.right() + 100, r2.center().y());
 
-    auto path = shared::graphicsviewutils::path(existingRects(), startPoint, endPoint);
+    auto path = topohelp::utils::path(existingRects(), startPoint, endPoint);
     QVERIFY(!path.isEmpty());
 }
 
@@ -410,7 +413,7 @@ void tst_ConnectionUtils::tst_endPoints()
             } else {
                 qFatal("Test for Interface group isn't implemented yet");
             }
-            iface->setCoordinates(shared::graphicsviewutils::coordinates(ci.position));
+            iface->setCoordinates(topohelp::utils::coordinates(ci.position));
             iface->postInit();
             if (ci.function->addChild(iface)) {
                 auto ifaceItem = new ive::IVInterfaceGraphicsItem(iface, data.at(idx).function());
@@ -521,10 +524,10 @@ void tst_ConnectionUtils::tst_path()
     const QPointF startPoint(r1.x() - 100, r1.center().y());
     const QPointF endPoint(r2.right() + 100, r2.center().y());
 
-    const QLineF startSegment = shared::graphicsviewutils::ifaceSegment(r1, startPoint, endPoint);
-    const QLineF endSegment = shared::graphicsviewutils::ifaceSegment(r2, endPoint, startPoint);
+    const QLineF startSegment = topohelp::utils::ifaceSegment(r1, startPoint, endPoint);
+    const QLineF endSegment = topohelp::utils::ifaceSegment(r2, endPoint, startPoint);
 
-    auto path = shared::graphicsviewutils::path(existingRects(), startSegment, endSegment);
+    auto path = topohelp::utils::path(existingRects(), startSegment, endSegment);
     QVERIFY(!path.isEmpty());
 }
 
@@ -548,9 +551,11 @@ void tst_ConnectionUtils::checkEndPoints(ive::IVFunctionGraphicsItem *startFn, D
             QCOMPARE(result.connectionPoints, connectionPoints);
         }
 
-        const auto path = shared::graphicsviewutils::createConnectionPath(existingRects(),
-                isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), start.rect(),
-                isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), end.rect());
+        const topohelp::cnct::ConnectionEnvInfo connectionInfo { start.rect(),
+            isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), end.rect(),
+            isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), existingRects() };
+
+        const auto path = topohelp::cnct::createConnectionPath(connectionInfo);
         QVERIFY(!path.isEmpty());
     }
 }

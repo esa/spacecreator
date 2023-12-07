@@ -40,8 +40,6 @@
 namespace ive {
 namespace gi {
 
-namespace utils = shared::graphicsviewutils;
-
 ivm::IVFunction *functionObject(QGraphicsItem *item)
 {
     if (!item)
@@ -206,10 +204,12 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
 
     ivm::ValidationResult result;
     result.connectionPoints = points;
-    result.functionAtStartPos = utils::nearestItem(
-            scene, utils::adjustFromPoint(startPos, utils::kFunctionTolerance), { ive::IVFunctionGraphicsItem::Type });
-    result.functionAtEndPos = utils::nearestItem(
-            scene, utils::adjustFromPoint(endPos, utils::kFunctionTolerance), { ive::IVFunctionGraphicsItem::Type });
+    result.functionAtStartPos = shared::graphicsviewutils::nearestItem(scene,
+            topohelp::utils::adjustFromPoint(startPos, topohelp::kFunctionTolerance),
+            { ive::IVFunctionGraphicsItem::Type });
+    result.functionAtEndPos = shared::graphicsviewutils::nearestItem(scene,
+            topohelp::utils::adjustFromPoint(endPos, topohelp::kFunctionTolerance),
+            { ive::IVFunctionGraphicsItem::Type });
     result.startObject = ive::gi::functionObject(result.functionAtStartPos);
     result.endObject = ive::gi::functionObject(result.functionAtEndPos);
     result.isToOrFromNested =
@@ -221,18 +221,20 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         return result;
     }
 
-    const auto startIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(utils::nearestItem(scene,
-            utils::adjustFromPoint(startPos, utils::kInterfaceTolerance), { ive::IVInterfaceGraphicsItem::Type }));
+    const auto startIfaceItem =
+            qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(scene,
+                    topohelp::utils::adjustFromPoint(startPos, topohelp::kInterfaceTolerance),
+                    { ive::IVInterfaceGraphicsItem::Type }));
 
-    static const QMarginsF kToleranceMargins = { utils::kInterfaceTolerance / 2, utils::kInterfaceTolerance / 2,
-        utils::kInterfaceTolerance / 2, utils::kInterfaceTolerance / 2 };
+    static const QMarginsF kToleranceMargins = { topohelp::kInterfaceTolerance / 2, topohelp::kInterfaceTolerance / 2,
+        topohelp::kInterfaceTolerance / 2, topohelp::kInterfaceTolerance / 2 };
 
     if (startIfaceItem
             && startIfaceItem->ifaceShape().boundingRect().marginsAdded(kToleranceMargins).contains(startPos)) {
         result.startIface = startIfaceItem->entity();
         result.startPointAdjusted =
                 startIfaceItem->connectionEndPoint(result.functionAtStartPos->isAncestorOf(result.functionAtEndPos));
-    } else if (!utils::intersects(
+    } else if (!topohelp::utils::intersects(
                        result.functionAtStartPos->sceneBoundingRect(), connectionLine, &result.startPointAdjusted)) {
         result.setFailed(ivm::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
         return result;
@@ -243,13 +245,14 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         return result;
     }
 
-    const auto endIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(utils::nearestItem(
-            scene, utils::adjustFromPoint(endPos, utils::kInterfaceTolerance), { ive::IVInterfaceGraphicsItem::Type }));
+    const auto endIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(
+            scene, topohelp::utils::adjustFromPoint(endPos, topohelp::kInterfaceTolerance),
+            { ive::IVInterfaceGraphicsItem::Type }));
     if (endIfaceItem && endIfaceItem->ifaceShape().boundingRect().marginsAdded(kToleranceMargins).contains(endPos)) {
         result.endIface = endIfaceItem->entity();
         result.endPointAdjusted =
                 endIfaceItem->connectionEndPoint(result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
-    } else if (!utils::intersects(
+    } else if (!topohelp::utils::intersects(
                        result.functionAtEndPos->sceneBoundingRect(), connectionLine, &result.endPointAdjusted)) {
         result.setFailed(ivm::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
         return result;

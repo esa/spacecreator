@@ -35,10 +35,9 @@
 #include "ivpropertytemplateconfig.h"
 #include "parameter.h"
 #include "ui/grippoint.h"
+#include "ui/resizelimits.h"
 #include "ui/textitem.h"
 #include "veobject.h"
-#include "graphicsviewutils.h"
-#include "ui/resizelimits.h"
 
 #include <QApplication>
 #include <QGraphicsScene>
@@ -55,11 +54,11 @@ static const qreal extraSpace = 5.0;
 namespace ive {
 
 using shared::ui::GripPoint;
-using shared::graphicsviewutils::kContentMargins;
-using shared::ui::ResizeType;
-using shared::ui::VerticalEdge;
 using shared::ui::HorizontalEdge;
+using shared::ui::ResizeType;
 using shared::ui::VERectGraphicsItem;
+using shared::ui::VerticalEdge;
+using topohelp::kContentMargins;
 
 IVFunctionTypeGraphicsItem::IVFunctionTypeGraphicsItem(ivm::IVFunctionType *entity, QGraphicsItem *parent)
     : VERectGraphicsItem(entity, parent)
@@ -139,7 +138,7 @@ void IVFunctionTypeGraphicsItem::updateTextPosition()
     if (!m_textItem) {
         return;
     }
-    const QRectF targetTextRect = boundingRect().marginsRemoved(shared::graphicsviewutils::kTextMargins);
+    const QRectF targetTextRect = boundingRect().marginsRemoved(topohelp::kTextMargins);
 
     // reset m_textItems's size
     m_textItem->setExplicitSize(QSizeF());
@@ -212,10 +211,10 @@ QRectF IVFunctionTypeGraphicsItem::resizedRect(shared::ui::ResizeLimits resizeLi
 qreal findLeftMostEdge(const QList<VERectGraphicsItem *> &collidingItems)
 {
     // Find the left-most edge of the colliding items
-    auto leftMostItemIter = std::min_element(collidingItems.begin(), collidingItems.end(), [](VERectGraphicsItem *a, VERectGraphicsItem *b)
-                                             {
-                                                 return a->sceneBoundingRect().left() < b->sceneBoundingRect().left();
-                                             });
+    auto leftMostItemIter = std::min_element(
+            collidingItems.begin(), collidingItems.end(), [](VERectGraphicsItem *a, VERectGraphicsItem *b) {
+                return a->sceneBoundingRect().left() < b->sceneBoundingRect().left();
+            });
     qreal leftMostEdge = (*leftMostItemIter)->sceneBoundingRect().left();
     return leftMostEdge;
 }
@@ -223,10 +222,10 @@ qreal findLeftMostEdge(const QList<VERectGraphicsItem *> &collidingItems)
 qreal findRightMostEdge(const QList<VERectGraphicsItem *> &collidingItems)
 {
     // Find the right-most edge of the colliding items
-    auto rightMostItemIter = std::max_element(collidingItems.begin(), collidingItems.end(), [](VERectGraphicsItem *a, VERectGraphicsItem *b)
-                                              {
-                                                  return a->sceneBoundingRect().right() < b->sceneBoundingRect().right();
-                                              });
+    auto rightMostItemIter = std::max_element(
+            collidingItems.begin(), collidingItems.end(), [](VERectGraphicsItem *a, VERectGraphicsItem *b) {
+                return a->sceneBoundingRect().right() < b->sceneBoundingRect().right();
+            });
     qreal rightMostEdge = (*rightMostItemIter)->sceneBoundingRect().right();
     return rightMostEdge;
 }
@@ -234,10 +233,10 @@ qreal findRightMostEdge(const QList<VERectGraphicsItem *> &collidingItems)
 qreal findTopMostEdge(const QList<VERectGraphicsItem *> &collidingItems)
 {
     // Find the top-most edge of the colliding items
-    auto topItemIter = std::min_element(collidingItems.begin(), collidingItems.end(), [](VERectGraphicsItem *a, VERectGraphicsItem *b)
-                                        {
-                                            return a->sceneBoundingRect().top() < b->sceneBoundingRect().top();
-                                        });
+    auto topItemIter = std::min_element(
+            collidingItems.begin(), collidingItems.end(), [](VERectGraphicsItem *a, VERectGraphicsItem *b) {
+                return a->sceneBoundingRect().top() < b->sceneBoundingRect().top();
+            });
     qreal topEdge = (*topItemIter)->sceneBoundingRect().top();
     return topEdge;
 }
@@ -245,10 +244,10 @@ qreal findTopMostEdge(const QList<VERectGraphicsItem *> &collidingItems)
 qreal findBottomMostEdge(const QList<VERectGraphicsItem *> &collidingItems)
 {
     // Find the right-most edge of the colliding items
-    auto lowestItemIter = std::max_element(collidingItems.begin(), collidingItems.end(), [](VERectGraphicsItem *a, VERectGraphicsItem *b)
-                                           {
-                                               return a->sceneBoundingRect().bottom() < b->sceneBoundingRect().bottom();
-                                           });
+    auto lowestItemIter = std::max_element(
+            collidingItems.begin(), collidingItems.end(), [](VERectGraphicsItem *a, VERectGraphicsItem *b) {
+                return a->sceneBoundingRect().bottom() < b->sceneBoundingRect().bottom();
+            });
     qreal lowestEdge = (*lowestItemIter)->sceneBoundingRect().bottom();
     return lowestEdge;
 }
@@ -306,9 +305,8 @@ shared::ui::ResizeLimits IVFunctionTypeGraphicsItem::resizeLimitsForCollision(sh
         }
     }
 
-
     bool bothResizeTypesAreMax = resizeLimits.getVerticalResizeType() == ResizeType::Max
-                                 && resizeLimits.getHorizontalResizeType() == ResizeType::Max;
+            && resizeLimits.getHorizontalResizeType() == ResizeType::Max;
     if (bothResizeTypesAreMax) {
         VerticalEdge vEdge = resizeLimits.getVerticalEdge();
         HorizontalEdge hEdge = resizeLimits.getHorizontalEdge();
@@ -320,19 +318,23 @@ shared::ui::ResizeLimits IVFunctionTypeGraphicsItem::resizeLimitsForCollision(sh
         QList<VERectGraphicsItem *> collidingItems;
         if (areaIsTopLeft) {
             QRectF topLeftRect = resizeLimits.getUnlimitedTopLeftRect();
-            collidingItems = findCollidingVERectGraphicsItems(topLeftRect, QMarginsF(kContentMargins.left(), kContentMargins.top(), 0.0, 0.0));
+            collidingItems = findCollidingVERectGraphicsItems(
+                    topLeftRect, QMarginsF(kContentMargins.left(), kContentMargins.top(), 0.0, 0.0));
         }
         if (areaIsTopRight) {
             QRectF topRightRect = resizeLimits.getUnlimitedTopRightRect();
-            collidingItems = findCollidingVERectGraphicsItems(topRightRect, QMarginsF(0.0, kContentMargins.top(), kContentMargins.right(), 0.0));
+            collidingItems = findCollidingVERectGraphicsItems(
+                    topRightRect, QMarginsF(0.0, kContentMargins.top(), kContentMargins.right(), 0.0));
         }
         if (areaIsBottomRight) {
             QRectF bottomRight = resizeLimits.getUnlimitedBottomRightRect();
-            collidingItems = findCollidingVERectGraphicsItems(bottomRight, QMarginsF(0.0, 0.0, kContentMargins.right(), kContentMargins.bottom()));
+            collidingItems = findCollidingVERectGraphicsItems(
+                    bottomRight, QMarginsF(0.0, 0.0, kContentMargins.right(), kContentMargins.bottom()));
         }
         if (areaIsBottomLeft) {
             QRectF bottomLeftRect = resizeLimits.getUnlimitedBottomLeftRect();
-            collidingItems = findCollidingVERectGraphicsItems(bottomLeftRect, QMarginsF(kContentMargins.left(), 0.0, 0.0, kContentMargins.bottom()));
+            collidingItems = findCollidingVERectGraphicsItems(
+                    bottomLeftRect, QMarginsF(kContentMargins.left(), 0.0, 0.0, kContentMargins.bottom()));
         }
 
         if (!collidingItems.isEmpty()) {
@@ -382,8 +384,9 @@ shared::ui::ResizeLimits IVFunctionTypeGraphicsItem::resizeLimitsForCollision(sh
     if (rectIsLeftAndRight) {
         // Detect collision left and right
         QRectF leftRightRect = resizeLimits.getUnlimitedVerticalRect(); // Get the unlimited rect as if the user had
-            // only used the right-, or left-grippoint.
-        QList<VERectGraphicsItem *> collidingItemsLeftOrRight = findCollidingVERectGraphicsItems(leftRightRect, QMarginsF(kContentMargins.left(), 0.0, kContentMargins.right(), 0.0));
+                                                                        // only used the right-, or left-grippoint.
+        QList<VERectGraphicsItem *> collidingItemsLeftOrRight = findCollidingVERectGraphicsItems(
+                leftRightRect, QMarginsF(kContentMargins.left(), 0.0, kContentMargins.right(), 0.0));
 
         if (!collidingItemsLeftOrRight.isEmpty()) {
             if (resizeLimits.getVerticalEdge() == VerticalEdge::LeftEdge) {
@@ -415,8 +418,9 @@ shared::ui::ResizeLimits IVFunctionTypeGraphicsItem::resizeLimitsForCollision(sh
     if (rectIsUpAndDown) {
         // Detect collision up and down
         QRectF upDownRect = resizeLimits.getUnlimitedHorizontalRect(); // Get the unlimited rect as if the user had only
-            // used the top-, or bottom-grippoint.
-        QList<VERectGraphicsItem *> collidingItemsUpOrDown = findCollidingVERectGraphicsItems(upDownRect, QMarginsF(0.0, kContentMargins.top(), 0.0, kContentMargins.bottom()));
+                                                                       // used the top-, or bottom-grippoint.
+        QList<VERectGraphicsItem *> collidingItemsUpOrDown = findCollidingVERectGraphicsItems(
+                upDownRect, QMarginsF(0.0, kContentMargins.top(), 0.0, kContentMargins.bottom()));
 
         if (!collidingItemsUpOrDown.isEmpty()) {
             if (resizeLimits.getHorizontalEdge() == HorizontalEdge::TopEdge) {
@@ -448,7 +452,7 @@ shared::ui::ResizeLimits IVFunctionTypeGraphicsItem::resizeLimitsForCollision(sh
 shared::ui::ResizeLimits IVFunctionTypeGraphicsItem::resizedRectForTextLabel(shared::ui::ResizeLimits resizeLimits)
 {
     QRectF textLabelRect = m_textItem->sceneBoundingRect();
-    textLabelRect = textLabelRect.marginsAdded(shared::graphicsviewutils::kTextMargins);
+    textLabelRect = textLabelRect.marginsAdded(topohelp::kTextMargins);
     textLabelRect.setWidth(textLabelRect.width()
             + extraSpace); // A little extra space is needed, otherwise the text item moves about ever so sligtly.
 
@@ -471,8 +475,6 @@ shared::ui::ResizeLimits IVFunctionTypeGraphicsItem::resizedRectForTextLabel(sha
     }
     return resizeLimits;
 }
-
-
 
 bool IVFunctionTypeGraphicsItem::isRootItem() const
 {

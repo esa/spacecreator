@@ -102,7 +102,7 @@ void IVCommentGraphicsItem::rebuildLayout()
 
 QSizeF IVCommentGraphicsItem::minimumSize() const
 {
-    return shared::graphicsviewutils::kDefaultGraphicsItemSize;
+    return topohelp::kDefaultGraphicsItemSize;
 }
 
 shared::ColorManager::HandledColors IVCommentGraphicsItem::handledColorType() const

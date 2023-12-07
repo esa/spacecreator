@@ -43,7 +43,7 @@ CmdNodeEntityCreate::CmdNodeEntityCreate(dvm::DVModel *model, const dvm::DVBoard
     , m_partition(new dvm::DVPartition(m_node))
 {
     m_node->setTitle(dvm::DVNameValidator::nameForObject(m_node, m_model, m_board->title()));
-    const QRectF geometry { QRectF(pos, shared::graphicsviewutils::kDefaultNodeGraphicsItemSize) };
+    const QRectF geometry { QRectF(pos, topohelp::kDefaultNodeGraphicsItemSize) };
     prepareData({ qMakePair(m_node, QVector<QPointF> { geometry.topLeft(), geometry.bottomRight() }) });
 
     m_partition->setTitle(dvm::DVNameValidator::nameForObject(m_partition, m_model));

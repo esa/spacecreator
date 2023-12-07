@@ -60,7 +60,7 @@ void DVNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
 QSizeF DVNodeGraphicsItem::minimumSize() const
 {
-    return shared::graphicsviewutils::kDefaultNodeGraphicsItemSize;
+    return topohelp::kDefaultNodeGraphicsItemSize;
 }
 
 int DVNodeGraphicsItem::itemLevel(bool isSelected) const
@@ -84,7 +84,7 @@ void DVNodeGraphicsItem::rebuildLayout()
     shared::ui::VERectGraphicsItem::rebuildLayout();
     const QRectF nestedContent = nestedItemsSceneBoundingRect();
     if (nestedContent.isValid()) {
-        const QRectF contentRect = nestedContent.marginsAdded(shared::graphicsviewutils::kContentMargins);
+        const QRectF contentRect = nestedContent.marginsAdded(topohelp::kContentMargins);
         if (!sceneBoundingRect().contains(contentRect)) {
             const QRectF upcomingRect = sceneBoundingRect() | contentRect;
             if (!shared::graphicsviewutils::isCollided(this, upcomingRect)) {

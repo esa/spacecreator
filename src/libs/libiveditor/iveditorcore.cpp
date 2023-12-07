@@ -197,8 +197,8 @@ QAction *IVEditorCore::actionDelete() const
  */
 ivm::IVFunction *IVEditorCore::addFunction(const QString &name, ivm::IVFunction *parent)
 {
-    auto cmd = new cmd::CmdFunctionItemCreate(m_document->objectsModel(), parent,
-            QRectF(QPointF(10., 10.), shared::graphicsviewutils::kDefaultGraphicsItemSize), name);
+    auto cmd = new cmd::CmdFunctionItemCreate(
+            m_document->objectsModel(), parent, QRectF(QPointF(10., 10.), topohelp::kDefaultGraphicsItemSize), name);
     bool ok = commandsStack()->push(cmd);
     if (ok) {
         Q_EMIT editedExternally(this);

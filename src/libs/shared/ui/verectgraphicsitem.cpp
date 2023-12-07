@@ -22,6 +22,7 @@
 #include "ui/minimizelimits.h"
 #include "ui/resizelimits.h"
 #include "ui/textitem.h"
+#include "utils.h"
 #include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
 
@@ -31,8 +32,6 @@
 
 namespace shared {
 namespace ui {
-
-using graphicsviewutils::kContentMargins;
 
 VERectGraphicsItem::VERectGraphicsItem(VEObject *entity, QGraphicsItem *parentGraphicsItem)
     : VEInteractiveObject(entity, parentGraphicsItem)
@@ -125,8 +124,7 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
 
     const QRectF rect = graphicsviewutils::snappedRect(scene(), movedRect(pressedAt, releasedAt));
     if (QGraphicsItem *parentObj = parentItem()) {
-        const QRectF parentRect =
-                parentObj->sceneBoundingRect().marginsRemoved(kContentMargins);
+        const QRectF parentRect = parentObj->sceneBoundingRect().marginsRemoved(topohelp::kContentMargins);
         if (!shared::graphicsviewutils::isRectBounded(parentRect, rect)) {
             return;
         }
@@ -225,7 +223,7 @@ void VERectGraphicsItem::showHelperLines(bool show)
 
 void VERectGraphicsItem::updateHelperLines()
 {
-    using namespace shared::graphicsviewutils;
+    using topohelp::kHelperLineLength;
 
     const QRectF rect = boundingRect();
     if (m_topHelper) {
@@ -246,9 +244,7 @@ void VERectGraphicsItem::updateHelperLines()
     }
 }
 
-void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip,
-                                              const QPointF &pressedAt,
-                                              const QPointF &releasedAt)
+void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt && !m_overridingCursor) {
         return;
@@ -275,12 +271,9 @@ void VERectGraphicsItem::onManualResizeFinish(GripPoint *grip,
         }
         layoutConnectionsOnResize(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
     }
-
 }
 
-void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip,
-                                            const QPointF &pressedAt,
-                                            const QPointF &releasedAt)
+void VERectGraphicsItem::onManualMoveFinish(GripPoint *grip, const QPointF &pressedAt, const QPointF &releasedAt)
 {
     if (pressedAt == releasedAt && !m_overridingCursor) {
         return;
@@ -308,20 +301,17 @@ QSizeF VERectGraphicsItem::minimumSize() const
     return QSizeF(100, 50);
 }
 
-
-
-
-//ResizeLimits VERectGraphicsItem::resizeLimitsForCollision(ResizeLimits resizeLimits)
+// ResizeLimits VERectGraphicsItem::resizeLimitsForCollision(ResizeLimits resizeLimits)
 //{
-//    // In case this VERectGraphicsItem has a parent (is a nested function) check
-//    // for collision with the parent's edges
-//    QGraphicsItem *parent = parentItem();
-//    VERectGraphicsItem *parentVERectGraphicsItem = nullptr;
-//    if (parent) {
-//        parentVERectGraphicsItem = qobject_cast<VERectGraphicsItem *>(parent->toGraphicsObject());
-//    }
-//    if (parentVERectGraphicsItem) {
-//        QRectF parentRect = parentVERectGraphicsItem->sceneBoundingRect();
+//     // In case this VERectGraphicsItem has a parent (is a nested function) check
+//     // for collision with the parent's edges
+//     QGraphicsItem *parent = parentItem();
+//     VERectGraphicsItem *parentVERectGraphicsItem = nullptr;
+//     if (parent) {
+//         parentVERectGraphicsItem = qobject_cast<VERectGraphicsItem *>(parent->toGraphicsObject());
+//     }
+//     if (parentVERectGraphicsItem) {
+//         QRectF parentRect = parentVERectGraphicsItem->sceneBoundingRect();
 
 //        if (resizeLimits.isLeftEdgeMaximizing()) {
 //            // See if left edge of this rect is left of parent left edge
@@ -364,7 +354,6 @@ QSizeF VERectGraphicsItem::minimumSize() const
 //        }
 //    }
 
-
 //    bool bothResizeTypesAreMax = resizeLimits.getVerticalResizeType() == ResizeType::Max
 //            && resizeLimits.getHorizontalResizeType() == ResizeType::Max;
 //    if (bothResizeTypesAreMax) {
@@ -378,26 +367,30 @@ QSizeF VERectGraphicsItem::minimumSize() const
 //        QList<VERectGraphicsItem *> collidingItems;
 //        if (areaIsTopLeft) {
 //            QRectF topLeftRect = resizeLimits.getUnlimitedTopLeftRect();
-//            collidingItems = findCollidingVERectGraphicsItems(topLeftRect, QMarginsF(kContentMargins.left(), kContentMargins.top(), 0.0, 0.0));
+//            collidingItems = findCollidingVERectGraphicsItems(topLeftRect, QMarginsF(kContentMargins.left(),
+//            kContentMargins.top(), 0.0, 0.0));
 //        }
 //        if (areaIsTopRight) {
 //            QRectF topRightRect = resizeLimits.getUnlimitedTopRightRect();
-//            collidingItems = findCollidingVERectGraphicsItems(topRightRect, QMarginsF(0.0, kContentMargins.top(), kContentMargins.right(), 0.0));
+//            collidingItems = findCollidingVERectGraphicsItems(topRightRect, QMarginsF(0.0, kContentMargins.top(),
+//            kContentMargins.right(), 0.0));
 //        }
 //        if (areaIsBottomRight) {
 //            QRectF bottomRight = resizeLimits.getUnlimitedBottomRightRect();
-//            collidingItems = findCollidingVERectGraphicsItems(bottomRight, QMarginsF(0.0, 0.0, kContentMargins.right(), kContentMargins.bottom()));
+//            collidingItems = findCollidingVERectGraphicsItems(bottomRight, QMarginsF(0.0, 0.0,
+//            kContentMargins.right(), kContentMargins.bottom()));
 //        }
 //        if (areaIsBottomLeft) {
 //            QRectF bottomLeftRect = resizeLimits.getUnlimitedBottomLeftRect();
-//            collidingItems = findCollidingVERectGraphicsItems(bottomLeftRect, QMarginsF(kContentMargins.left(), 0.0, 0.0, kContentMargins.bottom()));
+//            collidingItems = findCollidingVERectGraphicsItems(bottomLeftRect, QMarginsF(kContentMargins.left(), 0.0,
+//            0.0, kContentMargins.bottom()));
 //        }
 
 //        if (!collidingItems.isEmpty()) {
 //            QRectF collidingItemRect = collidingItems.first()->sceneBoundingRect();
-//            QPair<HorizontalEdge, VerticalEdge> intersectedEdges = resizeLimits.getIntersectedEdges(collidingItemRect);
-//            HorizontalEdge intersectedHorizontalEdge = intersectedEdges.first;
-//            VerticalEdge intersectedVerticalEdge = intersectedEdges.second;
+//            QPair<HorizontalEdge, VerticalEdge> intersectedEdges =
+//            resizeLimits.getIntersectedEdges(collidingItemRect); HorizontalEdge intersectedHorizontalEdge =
+//            intersectedEdges.first; VerticalEdge intersectedVerticalEdge = intersectedEdges.second;
 
 //            if (intersectedHorizontalEdge == HorizontalEdge::TopEdge) {
 //                if (resizeLimits.isHorizontalLimitSet()) {
@@ -441,7 +434,8 @@ QSizeF VERectGraphicsItem::minimumSize() const
 //        // Detect collision left and right
 //        QRectF leftRightRect = resizeLimits.getUnlimitedVerticalRect(); // Get the unlimited rect as if the user had
 //                                                                        // only used the right-, or left-grippoint.
-//        QList<VERectGraphicsItem *> collidingItemsLeftOrRight = findCollidingVERectGraphicsItems(leftRightRect, QMarginsF(kContentMargins.left(), 0.0, kContentMargins.right(), 0.0));
+//        QList<VERectGraphicsItem *> collidingItemsLeftOrRight = findCollidingVERectGraphicsItems(leftRightRect,
+//        QMarginsF(kContentMargins.left(), 0.0, kContentMargins.right(), 0.0));
 
 //        if (!collidingItemsLeftOrRight.isEmpty()) {
 //            if (resizeLimits.getVerticalEdge() == VerticalEdge::LeftEdge) {
@@ -472,9 +466,11 @@ QSizeF VERectGraphicsItem::minimumSize() const
 //    bool rectIsUpAndDown = resizeLimits.getHorizontalResizeType() == ResizeType::Max;
 //    if (rectIsUpAndDown) {
 //        // Detect collision up and down
-//        QRectF upDownRect = resizeLimits.getUnlimitedHorizontalRect(); // Get the unlimited rect as if the user had only
+//        QRectF upDownRect = resizeLimits.getUnlimitedHorizontalRect(); // Get the unlimited rect as if the user had
+//        only
 //                                                                       // used the top-, or bottom-grippoint.
-//        QList<VERectGraphicsItem *> collidingItemsUpOrDown = findCollidingVERectGraphicsItems(upDownRect, QMarginsF(0.0, kContentMargins.top(), 0.0, kContentMargins.bottom()));
+//        QList<VERectGraphicsItem *> collidingItemsUpOrDown = findCollidingVERectGraphicsItems(upDownRect,
+//        QMarginsF(0.0, kContentMargins.top(), 0.0, kContentMargins.bottom()));
 
 //        if (!collidingItemsUpOrDown.isEmpty()) {
 //            if (resizeLimits.getHorizontalEdge() == HorizontalEdge::TopEdge) {
@@ -503,8 +499,8 @@ QSizeF VERectGraphicsItem::minimumSize() const
 //    return resizeLimits;
 //}
 
-
-QList<VERectGraphicsItem *> VERectGraphicsItem::findCollidingVERectGraphicsItems(const QRectF &rect, QMarginsF margins) const
+QList<VERectGraphicsItem *> VERectGraphicsItem::findCollidingVERectGraphicsItems(
+        const QRectF &rect, QMarginsF margins) const
 {
     QList<VERectGraphicsItem *> collidingSiblings;
     QList<QGraphicsItem *> items = scene()->items();
@@ -518,8 +514,7 @@ QList<VERectGraphicsItem *> VERectGraphicsItem::findCollidingVERectGraphicsItems
         QRectF itemRect = item->sceneBoundingRect();
         if (rect.intersects(itemRect.marginsAdded(margins))) {
             auto sibling = qobject_cast<VERectGraphicsItem *>(item->toGraphicsObject());
-            if (sibling)
-            {
+            if (sibling) {
                 collidingSiblings.append(sibling);
             }
         }
@@ -611,7 +606,7 @@ QRectF VERectGraphicsItem::nestedItemsSceneBoundingRect() const
 void VERectGraphicsItem::onGeometryChanged()
 {
     QSet<VEInteractiveObject *> items;
-    QRectF areaToCheckForCollisions = sceneBoundingRect().marginsAdded(graphicsviewutils::kContentMargins);
+    QRectF areaToCheckForCollisions = sceneBoundingRect().marginsAdded(topohelp::kContentMargins);
     QList<QGraphicsItem *> collidedItems = scene()->items(areaToCheckForCollisions);
     std::for_each(collidedItems.begin(), collidedItems.end(), [this, &items](QGraphicsItem *item) {
         auto rectItem = qobject_cast<VERectGraphicsItem *>(item->toGraphicsObject());
@@ -627,7 +622,7 @@ void VERectGraphicsItem::onGeometryChanged()
     oldItems.subtract(items);
 
     for (auto item : oldItems) {
-        //item->doHighlighting(Qt::green, false);
+        // item->doHighlighting(Qt::green, false);
     }
     m_collidedItems = items;
 
@@ -656,10 +651,10 @@ bool VERectGraphicsItem::doLayout()
         QMarginsF margins;
         if (parentFunction) {
             boundedRect = parentFunction->sceneBoundingRect();
-            margins = graphicsviewutils::kContentMargins;
+            margins = topohelp::kContentMargins;
         } else {
             boundedRect = scene()->itemsBoundingRect();
-            margins = graphicsviewutils::kRootMargins;
+            margins = topohelp::kRootMargins;
         }
 
         QRectF itemRect = this->boundingRect();
@@ -735,7 +730,6 @@ QRectF VERectGraphicsItem::resizedRect(ResizeLimits resizeLimits)
     QRectF limitedRect = resizeLimits.getLimitedRect();
     return limitedRect;
 }
-
 
 } // namespace ui
 

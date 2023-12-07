@@ -127,7 +127,7 @@ void tst_PositionLookupHelper::testLookupOnTop()
     const QRectF parentBoundingRect = functionItem->boundingRect();
     itemRect.translate(parentBoundingRect.left() + parentBoundingRect.width() / 2, parentBoundingRect.top());
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + shared::graphicsviewutils::kInterfaceLayoutOffset);
+            / (itemRect.width() + topohelp::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount, itemRect);
     testOnSide(itemRects, initialOffset, parentBoundingRect);
 }
@@ -139,7 +139,7 @@ void tst_PositionLookupHelper::testLookupOnLeft()
     const QRectF parentBoundingRect = functionItem->boundingRect();
     itemRect.translate(parentBoundingRect.left(), parentBoundingRect.top() + parentBoundingRect.height() / 2);
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + shared::graphicsviewutils::kInterfaceLayoutOffset);
+            / (itemRect.width() + topohelp::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount, itemRect);
     testOnSide(itemRects, initialOffset, parentBoundingRect);
 }
@@ -151,7 +151,7 @@ void tst_PositionLookupHelper::testLookupOnRight()
     const QRectF parentBoundingRect = functionItem->boundingRect();
     itemRect.translate(parentBoundingRect.right(), parentBoundingRect.top() + parentBoundingRect.height() / 2);
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + shared::graphicsviewutils::kInterfaceLayoutOffset);
+            / (itemRect.width() + topohelp::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount, itemRect);
     testOnSide(itemRects, initialOffset, parentBoundingRect);
 }
@@ -162,7 +162,7 @@ void tst_PositionLookupHelper::testLookupOnBottom()
     const QRectF parentBoundingRect = functionItem->boundingRect();
     itemRect.translate(parentBoundingRect.left() + parentBoundingRect.width() / 2, parentBoundingRect.bottom());
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + shared::graphicsviewutils::kInterfaceLayoutOffset);
+            / (itemRect.width() + topohelp::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount, itemRect);
     testOnSide(itemRects, initialOffset, parentBoundingRect);
 }
@@ -179,7 +179,7 @@ void tst_PositionLookupHelper::testLookupAllSides()
         QPointF(parentBoundingRect.left(), parentBoundingRect.top() + parentBoundingRect.height() / 2) };
 
     const int ifaceCount = (parentBoundingRect.width() * 2 + parentBoundingRect.height() * 2)
-            / (itemRect.width() + shared::graphicsviewutils::kInterfaceLayoutOffset);
+            / (itemRect.width() + topohelp::kInterfaceLayoutOffset);
     QVector<QRectF> itemRects(ifaceCount);
     for (int idx = 0; idx < ifaceCount; ++idx) {
         itemRect.moveTopLeft(insertPoints.value(idx % insertPoints.size()) + initialOffset);

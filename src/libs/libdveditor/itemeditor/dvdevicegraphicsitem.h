@@ -63,7 +63,7 @@ protected:
     void updateTextPosition() override;
 
     QList<QPair<Qt::Alignment, QPainterPath>> sidePaths() const override;
-    shared::graphicsviewutils::LookupDirection lookupType() const override;
+    topohelp::LookupDirection lookupType() const override;
     shared::ui::TextItem *initTextItem() override;
     void updateEntityTitle(const QString &text);
 };

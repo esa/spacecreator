@@ -209,13 +209,13 @@ void MiniViewRenderer::updateData()
     }
     while (!itemsWithoutGeometry.isEmpty()) {
         const shared::Id id = itemsWithoutGeometry.takeLast();
-        QRectF itemRect { QPointF(), shared::graphicsviewutils::kDefaultGraphicsItemSize };
+        QRectF itemRect { QPointF(), topohelp::kDefaultGraphicsItemSize };
         shared::graphicsviewutils::findGeometryForRect(itemRect, nestedRect, d->rects.values());
         rectItems.insert(id, itemRect);
     }
 
     const QRectF br = d->item->boundingRect();
-    const QRectF contentRect { nestedRect.marginsAdded(shared::graphicsviewutils::kRootMargins) };
+    const QRectF contentRect { nestedRect.marginsAdded(topohelp::kRootMargins) };
     const qreal sf = qMin(br.width() / contentRect.width(), br.height() / contentRect.height());
     const QTransform transform = QTransform::fromScale(sf, sf).translate(-contentRect.x(), -contentRect.y());
 

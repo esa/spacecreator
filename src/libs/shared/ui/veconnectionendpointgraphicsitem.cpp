@@ -110,7 +110,7 @@ VEConnectionEndPointGraphicsItem::prepareChangeCoordinatesCommandParams() const
 
 void VEConnectionEndPointGraphicsItem::adjustItem()
 {
-    static const qreal kSiblingMinDistance = shared::graphicsviewutils::kSiblingMinDistance;
+    static const qreal kSiblingMinDistance = topohelp::kSiblingMinDistance;
     if (!parentItem()) {
         return;
     }
@@ -264,9 +264,9 @@ QList<QPair<Qt::Alignment, QPainterPath>> VEConnectionEndPointGraphicsItem::side
     };
 }
 
-graphicsviewutils::LookupDirection VEConnectionEndPointGraphicsItem::lookupType() const
+topohelp::LookupDirection VEConnectionEndPointGraphicsItem::lookupType() const
 {
-    return graphicsviewutils::LookupDirection::Bidirectional;
+    return topohelp::LookupDirection::Bidirectional;
 }
 
 void VEConnectionEndPointGraphicsItem::updateTextPosition()

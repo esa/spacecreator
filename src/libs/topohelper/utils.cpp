@@ -1,7 +1,10 @@
 #include "utils.h"
 
+#include <QDebug>
 #include <QPolygonF>
 #include <QtMath>
+
+#define WRN qWarning() << Q_FUNC_INFO
 
 namespace topohelp {
 
@@ -11,27 +14,12 @@ static const qreal kConnectionMargin = 16.0;
 static const qreal kMinSegmentLength = 10.0;
 static const qreal kMinSegmentAngle = 5.0;
 
-enum class IntersectionType
-{
-    Edge,
-    Single,
-    Multiple,
-};
-
-enum class LookupDirection
-{
-    CounterClockwise = 0x1,
-    Clockwise = 0x2,
-    Bidirectional = CounterClockwise | Clockwise,
-    Mixed,
-};
-
 /*!
  * \brief Helper to detect if the \a line intersects the \a rect.
  * Coordinates of the intersection point stored in \a intersectPos.
  * Returns \c true if \a rect and \a line are not null and intersected.
  */
-bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr)
+bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos)
 {
     if (rect.isNull() || line.isNull()) {
         return false;
@@ -60,7 +48,7 @@ bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = 
 /*!
  * Returns coordinates of intersection points.
  */
-bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr)
+bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos)
 {
     for (int idx = 1; idx < polygon.size(); ++idx) {
         if (intersects(rect, QLineF(polygon.value(idx - 1), polygon.value(idx)), intersectPos)) {
@@ -341,7 +329,8 @@ qreal distancePolygon(const PointsList &polygon)
 }
 
 /*!
- * Returns the list of \a area corner points, sorted by minimal distance between the corner and \a point1 or \a point2.
+ * Returns the list of \a area corner points, sorted by minimal distance between the corner and \a point1 or \a
+ * point2.
  */
 PointsList sortedCorners(const QRectF &area, const QPointF &point1, const QPointF &point2)
 {
@@ -382,7 +371,7 @@ QList<PointsList> generateSegments(const QPointF &startPoint, const QPointF &end
  * \return set of possible paths
  */
 QList<PointsList> findSubPath(
-        const QRectF &itemRect, const PointsList &prevPoints, const PointsList &nextPoints, bool strict = true)
+        const QRectF &itemRect, const PointsList &prevPoints, const PointsList &nextPoints, bool strict)
 {
     Q_ASSERT(itemRect.isValid());
     Q_ASSERT(!prevPoints.isEmpty());
@@ -492,6 +481,64 @@ PointsList path(const RectsList &existingRects, const QLineF &startDirection, co
     return {};
 }
 
+/*!
+ * Generates the path for \a IVConnectionGraphicsItem from \a startPoint to \a endPoint
+ * \param existingRects existing items geometries in scene coordinates shouldn't been overlapped
+ * \param startPoint as first polyline node
+ * \param endDirection as last polyline node
+ * \return set of polyline nodes coordinates
+ */
+PointsList path(const RectsList &existingRects, const QPointF &startPoint, const QPointF &endPoint)
+{
+    const QVector<QPointF> points { startPoint, endPoint };
+    auto item = getNearestIntersectedRect(existingRects, points, IntersectionType::Multiple);
+    if (!item.isValid())
+        return points;
+
+    const QList<QVector<QPointF>> possiblePaths = findSubPath(item, { startPoint }, { endPoint }, false);
+    if (possiblePaths.isEmpty()) {
+        return {};
+    }
+
+    QList<QVector<QPointF>> paths;
+    for (const QVector<QPointF> &possiblePath : possiblePaths) {
+        if (possiblePath.isEmpty()) {
+            continue;
+        }
+
+        if (possiblePath.last() == endPoint) {
+            paths.append(possiblePath);
+        } else {
+            const auto p = path(existingRects, possiblePath.last(), endPoint);
+            if (!p.isEmpty()) {
+                QVector<QPointF> prevPath(possiblePath);
+                prevPath.removeLast();
+                paths.append(prevPath << p);
+            }
+        }
+    }
+    if (paths.isEmpty()) {
+        return {};
+    }
+
+    QVector<QPointF> shortestPath;
+    qreal minLength = std::numeric_limits<qreal>::max();
+    for (const QVector<QPointF> &path : paths) {
+        if (path.size() < 2) {
+            continue;
+        }
+        const qreal length = distancePolygon(path);
+        if (minLength > length && !qFuzzyIsNull(length)) {
+            minLength = length;
+            shortestPath = path;
+        }
+    }
+    if (shortestPath.isEmpty())
+        return {};
+
+    return shortestPath;
+}
+
 PointsList simplifyPoints(const PointsList &points)
 {
     if (points.size() <= 2) {
@@ -520,6 +567,181 @@ PointsList simplifyPoints(const PointsList &points)
         ++idx;
     }
     return simplifiedPoints;
+}
+
+/*!
+ * Moves \a itemRect on the \a side from \a intersectedItemRect
+ */
+
+QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side,
+        const LookupDirection direction)
+{
+    const bool clockwise = direction == LookupDirection::Clockwise;
+    QRectF resultRect { itemRect };
+    switch (side) {
+    case Qt::AlignLeft:
+        if (clockwise)
+            resultRect.moveBottom(intersectedItemRect.top() - kInterfaceLayoutOffset);
+        else
+            resultRect.moveTop(intersectedItemRect.bottom() + kInterfaceLayoutOffset);
+        break;
+    case Qt::AlignRight:
+        if (clockwise)
+            resultRect.moveTop(intersectedItemRect.bottom() + kInterfaceLayoutOffset);
+        else
+            resultRect.moveBottom(intersectedItemRect.top() - kInterfaceLayoutOffset);
+        break;
+    case Qt::AlignTop:
+        if (clockwise)
+            resultRect.moveLeft(intersectedItemRect.right() + kInterfaceLayoutOffset);
+        else
+            resultRect.moveRight(intersectedItemRect.left() - kInterfaceLayoutOffset);
+        break;
+    case Qt::AlignBottom:
+        if (clockwise)
+            resultRect.moveRight(intersectedItemRect.left() - kInterfaceLayoutOffset);
+        else
+            resultRect.moveLeft(intersectedItemRect.right() + kInterfaceLayoutOffset);
+        break;
+    default:
+        WRN << "Unhandled side:" << side;
+        return {};
+    }
+    return resultRect;
+}
+
+/*!
+ * Checks intersection \a itemRect with \a itemRects
+ * and assign first intersection to \a collidingRect
+ */
+
+bool isCollided(const RectsList &itemRects, const QRectF &itemRect, QRectF *collidingRect)
+{
+    auto it = std::find_if(itemRects.cbegin(), itemRects.cend(),
+            [itemRect](const QRectF &siblingRect) { return siblingRect.intersects(itemRect); });
+    if (it != itemRects.cend()) {
+        if (collidingRect)
+            *collidingRect = *it;
+        return true;
+    }
+    return false;
+}
+
+bool isRectBounded(const QRectF &outerRect, const QRectF &innerRect)
+{
+    if (!innerRect.isValid()) {
+        return true;
+    } else if (!outerRect.isValid()) {
+        return false;
+    }
+    return outerRect.contains(innerRect);
+}
+
+QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
+{
+    const QPointF adjustmentPoint { adjustment / 2, adjustment / 2 };
+    return QRectF { pos - adjustmentPoint, pos + adjustmentPoint };
+}
+
+/*!
+ * Searches location for \a itemRect within \a boundedRect that could be expanded to include mentioned rect
+ * without overlapping with \a existingRects
+ */
+void findGeometryForRect(
+        QRectF &itemRect, QRectF &boundedRect, const RectsList &existingRects, const QMarginsF &margins)
+{
+    using topohelp::kDefaultGraphicsItemSize;
+    if (!itemRect.isValid()) {
+        const QRectF contentRect = boundedRect.marginsRemoved(margins);
+        const QSizeF size = contentRect.isValid() ? kDefaultGraphicsItemSize.boundedTo(contentRect.size())
+                                                  : kDefaultGraphicsItemSize;
+        itemRect = QRectF(contentRect.topLeft(), size);
+    }
+    QRectF itemGeometry(itemRect.marginsAdded(margins));
+
+    if (!existingRects.isEmpty()) {
+        static const qreal kOffset = 2;
+        if (boundedRect.isValid()) {
+            QRectF contentGeometry = boundedRect.marginsRemoved(margins);
+            itemGeometry.moveTopLeft(contentGeometry.topLeft());
+
+            QRectF intersectedRect = collidingRect(itemGeometry, existingRects);
+            while (!intersectedRect.isNull()) {
+                if (contentGeometry.right() - intersectedRect.right() > itemGeometry.width()) {
+                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
+                } else if (contentGeometry.bottom() - intersectedRect.bottom() > itemGeometry.height()) {
+                    itemGeometry.moveLeft(contentGeometry.left() + kOffset);
+                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
+                } else if (contentGeometry.width() <= contentGeometry.height()) {
+                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
+                    contentGeometry.setRight(itemGeometry.right());
+                } else {
+                    itemGeometry.moveLeft(contentGeometry.left() + kOffset);
+                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
+                    contentGeometry.setBottom(itemGeometry.bottom());
+                }
+                intersectedRect = collidingRect(itemGeometry, existingRects);
+            }
+        } else {
+            QRectF existingRect;
+            std::for_each(existingRects.cbegin(), existingRects.cend(),
+                    [&existingRect](const QRectF &r) { existingRect |= r; });
+            QRectF intersectedRect = collidingRect(itemGeometry, existingRects);
+            while (!intersectedRect.isNull()) {
+                if (existingRect.height() > existingRect.width()) {
+                    itemGeometry.moveLeft(intersectedRect.right() + kOffset);
+                } else {
+                    itemGeometry.moveTop(intersectedRect.bottom() + kOffset);
+                }
+                intersectedRect = collidingRect(itemGeometry, existingRects);
+            }
+        }
+    }
+
+    itemRect = itemGeometry.marginsRemoved(margins);
+    QRectF newBoundingRect;
+    for (const QRectF &rect : existingRects) {
+        newBoundingRect |= rect;
+    }
+    newBoundingRect |= itemRect;
+    boundedRect |= newBoundingRect.marginsAdded(margins);
+}
+
+/*!
+ * Searches rect from \a existingRects that intersects with \a rect
+ */
+QRectF collidingRect(const QRectF &rect, const RectsList &existingRects)
+{
+    auto it = std::find_if(existingRects.constBegin(), existingRects.constEnd(),
+            [rect](const QRectF &r) { return r.intersects(rect); });
+    if (it != existingRects.constEnd()) {
+        return *it;
+    }
+    return QRectF();
+};
+
+QVector<qint32> coordinates(const QPointF &point)
+{
+    if (point.isNull())
+        return {};
+
+    return coordinates(QVector<QPointF> { point });
+}
+
+QVector<qint32> coordinates(const QRectF &rect)
+{
+    if (rect.isValid())
+        return coordinates(QVector<QPointF> { rect.topLeft(), rect.bottomRight() });
+
+    return {};
+}
+
+QVector<qint32> coordinates(const PointsList &points)
+{
+    QVector<qint32> coordinates;
+    for (const QPointF &point : points)
+        coordinates << qRound(point.x()) << qRound(point.y());
+    return coordinates;
 }
 
 } // namespace utils

@@ -149,7 +149,7 @@ bool tst_IVConnectionGraphicsItem::checkIntersections(ive::IVConnectionGraphicsI
 {
     const QRectF itemRect = shared::graphicsviewutils::getNearestIntersectedRect(
             shared::graphicsviewutils::siblingItemsRects(connection), connection->points(),
-            shared::graphicsviewutils::IntersectionType::Single);
+            topohelp::IntersectionType::Single);
 
     return itemRect.isValid();
 }

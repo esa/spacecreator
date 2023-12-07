@@ -37,7 +37,7 @@ namespace dve {
 DVDeviceGraphicsItem::DVDeviceGraphicsItem(dvm::DVDevice *device, QGraphicsItem *parent)
     : shared::ui::VEConnectionEndPointGraphicsItem(device, parent)
 {
-    m_adjustDirection = shared::graphicsviewutils::LookupDirection::CounterClockwise;
+    m_adjustDirection = topohelp::LookupDirection::CounterClockwise;
 
     setBoundingRect(kBoundingRect);
 }
@@ -170,9 +170,9 @@ QList<QPair<Qt::Alignment, QPainterPath>> DVDeviceGraphicsItem::sidePaths() cons
     };
 }
 
-shared::graphicsviewutils::LookupDirection DVDeviceGraphicsItem::lookupType() const
+topohelp::LookupDirection DVDeviceGraphicsItem::lookupType() const
 {
-    return shared::graphicsviewutils::LookupDirection::Mixed;
+    return topohelp::LookupDirection::Mixed;
 }
 
 shared::ui::TextItem *DVDeviceGraphicsItem::initTextItem()

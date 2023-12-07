@@ -251,7 +251,7 @@ void CmdEntitiesImport::prepareRectangularType(
                 obj->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
             }
         } else {
-            QRectF itemRect { parentRect.topLeft(), shared::graphicsviewutils::kDefaultGraphicsItemSize };
+            QRectF itemRect { parentRect.topLeft(), topohelp::kDefaultGraphicsItemSize };
             shared::graphicsviewutils::findGeometryForRect(itemRect, parentRect, existingRects);
             existingRects.append(itemRect);
             obj->setCoordinates(shared::graphicsviewutils::coordinates(itemRect));
@@ -285,8 +285,8 @@ void CmdEntitiesImport::prepareEndPointType(ivm::IVObject *obj, const QPointF &o
 
                     const QPointF siblingPos =
                             shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(coordStr));
-                    const QRectF siblingRect = shared::graphicsviewutils::adjustFromPoint(
-                            siblingPos, shared::graphicsviewutils::kInterfaceBaseLength);
+                    const QRectF siblingRect =
+                            shared::graphicsviewutils::adjustFromPoint(siblingPos, topohelp::kInterfaceBaseLength);
                     interfacesRects << siblingRect;
                 }
 

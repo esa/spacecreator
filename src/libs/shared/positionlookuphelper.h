@@ -48,8 +48,8 @@ class PositionLookupHelper
 public:
     explicit PositionLookupHelper(const QList<QPair<Qt::Alignment, QPainterPath>> &sidePaths, const QRectF &parentRect,
             const QList<QRectF> &siblingsRects, const QPointF &pos,
-            const shared::graphicsviewutils::LookupDirection direction =
-                    shared::graphicsviewutils::LookupDirection::Bidirectional);
+            const topohelp::LookupDirection direction =
+                    topohelp::LookupDirection::Bidirectional);
 
     ~PositionLookupHelper();
 

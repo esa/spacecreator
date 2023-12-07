@@ -101,7 +101,7 @@ void VEItemModel::shrinkScene()
 
                 return rect;
             });
-    m_graphicsScene->setSceneRect(rect.marginsAdded(shared::graphicsviewutils::kContentMargins));
+    m_graphicsScene->setSceneRect(rect.marginsAdded(topohelp::kContentMargins));
 }
 
 void VEItemModel::onSceneSelectionChanged()
@@ -214,9 +214,8 @@ void VEItemModel::initItem(VEInteractiveObject *item)
     connect(
             item, &VEInteractiveObject::clicked, this,
             [this, entity = item->entity()]() { Q_EMIT itemClicked(entity->id()); }, Qt::QueuedConnection);
-    connect(item, &VEInteractiveObject::doubleClicked, this, [this, entity = item->entity()]() {
-        Q_EMIT itemDoubleClicked(entity->id());
-    });
+    connect(item, &VEInteractiveObject::doubleClicked, this,
+            [this, entity = item->entity()]() { Q_EMIT itemDoubleClicked(entity->id()); });
 
     m_items.insert(object->id(), item);
     if (m_graphicsScene != item->scene()) {
@@ -271,12 +270,11 @@ void VEItemModel::updateSceneRect()
     }
 
     if (itemsRect != m_prevItemsRect) {
-        const QRectF sceneRect =
-                m_graphicsScene->sceneRect().marginsRemoved(shared::graphicsviewutils::kContentMargins);
+        const QRectF sceneRect = m_graphicsScene->sceneRect().marginsRemoved(topohelp::kContentMargins);
         const QRectF updated = sceneRect.united(itemsRect);
 
         if (sceneRect != updated) {
-            m_graphicsScene->setSceneRect(updated.marginsAdded(shared::graphicsviewutils::kContentMargins));
+            m_graphicsScene->setSceneRect(updated.marginsAdded(topohelp::kContentMargins));
             m_prevItemsRect = itemsRect;
         }
     }

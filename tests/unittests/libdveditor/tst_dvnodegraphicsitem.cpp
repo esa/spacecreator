@@ -26,7 +26,7 @@
 #include <QGraphicsScene>
 #include <QtTest>
 
-using namespace shared::graphicsviewutils;
+using namespace topohelp;
 
 class tst_DVNodeGraphicsItem : public QObject
 {

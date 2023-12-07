@@ -18,6 +18,7 @@
 #pragma once
 
 #include "graphicsviewutils.h"
+#include "utils.h"
 #include "veinteractiveobject.h"
 
 #include <QPointer>
@@ -71,7 +72,7 @@ protected:
     virtual QPainterPath itemPath(Qt::Alignment alignment) const;
 
     virtual QList<QPair<Qt::Alignment, QPainterPath>> sidePaths() const;
-    virtual shared::graphicsviewutils::LookupDirection lookupType() const;
+    virtual topohelp::LookupDirection lookupType() const;
 
     void updateTextPosition() override;
 
@@ -79,7 +80,7 @@ protected:
 
 protected:
     QList<QPointer<VEConnectionGraphicsItem>> m_connections;
-    shared::graphicsviewutils::LookupDirection m_adjustDirection = graphicsviewutils::LookupDirection::Bidirectional;
+    topohelp::LookupDirection m_adjustDirection = topohelp::LookupDirection::Bidirectional;
     Qt::Alignment m_alignment;
     QGraphicsLineItem *m_horizontalHelper = nullptr;
     QGraphicsLineItem *m_verticalHelper = nullptr;
