@@ -175,24 +175,36 @@ QString RequirementsWidget::token() const
 
 void RequirementsWidget::onChangeOfCredentials()
 {
-    QString newUrlHostKey = tokenKey(QUrl(ui->urlLineEdit->text()).host());
-    QString oldUrlHostKey = tokenKey(QUrl(m_requirementsUrl).host());
-    QSettings settings;
-    if (!ui->urlLineEdit->text().isEmpty()) {
-        QString gitlabToken = settings.value(newUrlHostKey).toString();
-        if ((gitlabToken != ui->tokenLineEdit->text()) || (ui->urlLineEdit->text() != m_requirementsUrl)) {
-            settings.remove(oldUrlHostKey);
-            settings.setValue(newUrlHostKey, ui->tokenLineEdit->text());
-            m_requirementsUrl = ui->urlLineEdit->text().toUtf8();
-            ui->createTokenButton->setEnabled(true);
-        }
-    } else {
-        settings.remove(oldUrlHostKey);
-        m_requirementsUrl.clear();
-        setToken("");
+    const QUrl newUrl(ui->urlLineEdit->text(), QUrl::StrictMode);
+    if (!newUrl.isValid()) {
         ui->createTokenButton->setEnabled(false);
+        return;
     }
+
+    ui->createTokenButton->setEnabled(true);
+
+    QString newUrlHostKey = tokenKey(newUrl.host());
+    QSettings settings;
+    settings.beginGroup("SpaceCreator");
+    const QString gitlabToken = settings.value(newUrlHostKey).toString();
+
+    // If token is empty, try to find the token in the settings
+    if (ui->tokenLineEdit->text().isEmpty() && !gitlabToken.isEmpty()) {
+        ui->tokenLineEdit->setText(gitlabToken);
+    }
+
+    // If anything changed
+    if ((gitlabToken != ui->tokenLineEdit->text()) || (ui->urlLineEdit->text() != m_requirementsUrl)) {
+        settings.setValue(newUrlHostKey, ui->tokenLineEdit->text());
+        m_requirementsUrl = ui->urlLineEdit->text().toUtf8();
+    }
+    settings.endGroup();
+
     emit requirementsUrlChanged(m_requirementsUrl);
+
+    if (!m_requirementsUrl.isEmpty() && !ui->tokenLineEdit->text().isEmpty()) {
+        setLoginData();
+    }
 }
 
 void RequirementsWidget::requestRequirements()
