@@ -18,6 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include "checkedfilterproxymodel.h"
+#include "requirementtextproxymodel.h"
 #include "tagfilterproxymodel.h"
 
 #include <QPointer>
@@ -79,7 +80,7 @@ private:
     QList<QToolButton *> m_tagButtons;
     QPointer<RequirementsManager> m_reqManager;
     QPointer<requirement::RequirementsModelBase> m_model;
-    QSortFilterProxyModel m_textFilterModel;
+    RequirementTextProxyModel m_textFilterModel;
     TagFilterProxyModel m_tagFilterModel;
     CheckedFilterProxyModel m_checkedModel;
     QString m_requirementsUrl;

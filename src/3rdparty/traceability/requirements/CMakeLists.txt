@@ -17,6 +17,8 @@ target_sources(${LIB_NAME} PRIVATE
   requirementsmanager.h
   requirementsmodelbase.cpp
   requirementsmodelbase.h
+  requirementtextproxymodel.cpp
+  requirementtextproxymodel.h
   tagfilterproxymodel.cpp
   tagfilterproxymodel.h
   ui/requirementswidget.cpp

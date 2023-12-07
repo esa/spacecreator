@@ -55,8 +55,8 @@ QVariant RequirementsModelBase::headerData(int section, Qt::Orientation orientat
         if (section == REQUIREMENT_ID) {
             return tr("ID");
         }
-        if (section == DESCRIPTION) {
-            return tr("Description");
+        if (section == TITLE) {
+            return tr("Title");
         }
         if (section == CHECKED) {
             return tr("Selected");
@@ -94,7 +94,7 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
         switch (index.column()) {
         case REQUIREMENT_ID:
             return m_requirements[index.row()].m_issueID;
-        case DESCRIPTION:
+        case TITLE:
             return m_requirements[index.row()].m_longName;
         }
     }
@@ -112,6 +112,10 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
 
     if (role == RequirementsModelBase::RoleNames::TagsRole) {
         return m_requirements[index.row()].m_tags;
+    }
+
+    if (role == RequirementsModelBase::RoleNames::DetailDescriptionRole) {
+        return m_requirements[index.row()].m_description;
     }
 
     return QVariant();

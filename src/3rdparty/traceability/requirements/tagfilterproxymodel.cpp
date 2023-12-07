@@ -59,7 +59,6 @@ bool TagFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
 
     for (const QString &tag : m_tags) {
         if (tags.contains(tag)) {
-            qDebug() << Q_FUNC_INFO << tags << " -> TRUE";
             return true;
         }
     }

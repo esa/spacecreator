@@ -38,13 +38,14 @@ public:
     {
         IssueLinkRole = Qt::UserRole + 1,
         ReqIfIdRole,
-        TagsRole
+        TagsRole,
+        DetailDescriptionRole,
     };
 
     enum HEADER_SECTIONS
     {
         REQUIREMENT_ID = 0,
-        DESCRIPTION = 1,
+        TITLE = 1,
         CHECKED = 2
     };
 
