@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils.h"
+#include "topohelper/geometry.h"
 
 #include <QGraphicsItem>
 #include <QGraphicsScene>
@@ -12,14 +12,6 @@ namespace graphicsviewutils {
 
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPainterPath edgeCuttedRectShape(const QRectF &rect, qreal cut);
-bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);
-bool intersects(const QRectF &rect, const QPolygonF &polygon, QPointF *intersectPos = nullptr);
-QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon);
-qreal distanceLine(const QPointF &pnt1, const QPointF &pnt2);
-
-Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos);
-
-QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side);
 
 QGraphicsItem *nearestItem(
         const QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes = QList<int>());
@@ -28,50 +20,14 @@ QGraphicsItem *nearestItem(
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, qreal offset,
         const QList<int> &acceptableTypes = QList<int>());
 
-bool alignedLine(QLineF &line, int angleTolerance = 10);
-
-QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side,
-        const topohelp::LookupDirection direction);
-
-bool isCollided(const QList<QRectF> &itemRects, const QRectF &itemRect, QRectF *collidingRect = nullptr);
-
-QList<QVector<QPointF>> generateSegments(const QPointF &startPoint, const QPointF &endPoint);
-QVector<QPointF> generateSegments(const QLineF &startDirection, const QLineF &endDirection);
-QLineF ifaceSegment(const QRectF &sceneRect, const QPointF &firstEndPoint, const QPointF &lastEndPoint);
-QVector<QPointF> path(const QList<QRectF> &existingRects, const QPointF &startPoint, const QPointF &endPoint);
-QVector<QPointF> path(const QList<QRectF> &existingRects, const QLineF &startDirection, const QLineF &endDirection);
-
-QVector<QPointF> createConnectionPath(const QList<QRectF> &existingRects, const QPointF &startIfacePos,
-        const QRectF &sourceRect, const QPointF &endIfacePos, const QRectF &targetRect);
-QVector<QPointF> simplifyPoints(const QVector<QPointF> &points);
-bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2);
-
-QPointF pos(const QVector<qint32> &coordinates);
-QRectF rect(const QVector<qint32> &coordinates);
-QVector<QPointF> polygon(const QVector<qint32> &coordinates);
-
-QVector<qint32> coordinates(const QPointF &point);
-QVector<qint32> coordinates(const QRectF &rect);
-QVector<qint32> coordinates(const QVector<QPointF> &points);
-
-QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment);
-
-QRectF getNearestIntersectedRect(const QList<QRectF> &existingRects, const QVector<QPointF> &points,
-        topohelp::IntersectionType intersectionType);
+bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
 
 QList<QRectF> siblingItemsRects(const QGraphicsItem *item);
 
-QRectF collidingRect(const QRectF &rect, const QList<QRectF> &existingRects);
 void findGeometryForPoint(QPointF &itemRect, const QRectF &boundedRect, const QList<QRectF> &existingRects = {},
         const QMarginsF &margins = topohelp::kRootMargins);
-void findGeometryForRect(QRectF &itemRect, QRectF &boundedRect, const QList<QRectF> &existingRects = {},
-        const QMarginsF &margins = topohelp::kRootMargins);
-
-bool isRectBounded(const QRectF &outerRect, const QRectF &innerRect);
 
 bool isBounded(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
-
-bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
 
 //! \brief Get the top level items in a scene
 template<class ItemType>
