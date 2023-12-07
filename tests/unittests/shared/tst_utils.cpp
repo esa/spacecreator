@@ -37,7 +37,6 @@ private Q_SLOTS:
     void initTestCase();
     void testCheckCollision();
     void testAdjustedRect();
-    void testAlignRectToSide();
     void testCollidingRect();
     void testSiblingSceneRects();
     void testFindGeometryForRect();
@@ -112,43 +111,6 @@ void tst_Utils::testAdjustedRect()
             QVERIFY(!shared::graphicsviewutils::adjustedRect(
                     itemRect, intersectedItemRect, align, topohelp::LookupDirection::Clockwise)
                              .isValid());
-        }
-    }
-}
-
-void tst_Utils::testAlignRectToSide()
-{
-    struct Data {
-        QRectF boundingRect;
-        QRectF itemRect;
-        QPointF offset;
-    };
-
-    static const QList<Data> testDataList = {
-        Data { { 100, 100, 500, 500 }, { 550, 550, 100, 100 }, { -25, -25 } },
-        Data { { 0, 0, 250, 250 }, { 0, 0, 250, 250 }, { -50, -50 } },
-        Data { { 550, 550, 100, 100 }, { 100, 100, 500, 500 }, { -75, -75 } },
-    };
-
-    for (auto testData : testDataList) {
-        const QMetaEnum me = QMetaEnum::fromType<Qt::Alignment>();
-        for (int idx = 0; idx < me.keyCount(); ++idx) {
-            const auto align = static_cast<Qt::Alignment>(me.value(idx));
-            QVERIFY(!shared::graphicsviewutils::alignRectToSide({}, testData.itemRect, align, testData.offset)
-                             .isValid());
-            QVERIFY(!shared::graphicsviewutils::alignRectToSide(testData.boundingRect, {}, align, testData.offset)
-                             .isValid());
-
-            if (!topohelp::kRectSides.contains(align)) {
-                QVERIFY(!shared::graphicsviewutils::alignRectToSide(
-                        testData.boundingRect, testData.itemRect, align, testData.offset)
-                                 .isValid());
-            } else {
-                const QRectF alignedRect = shared::graphicsviewutils::alignRectToSide(
-                        testData.boundingRect, testData.itemRect, align, testData.offset);
-                QVERIFY(alignedRect.isValid());
-                QVERIFY(testData.boundingRect.contains(alignedRect.topLeft() - testData.offset));
-            }
         }
     }
 }

@@ -269,49 +269,6 @@ QRectF adjustFromPoint(const QPointF &pos, const qreal &adjustment)
 }
 
 /*!
- * Returns a \a itemRect aligned inside of \a boundingRect but keeping the offset of \a originPointOffset
- */
-
-QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side,
-        const QPointF &originPointOffset, const QMarginsF &margins)
-{
-    if (!boundingRect.isValid() || !itemRect.isValid())
-        return {};
-
-    QRectF rect { itemRect };
-    auto adjustVertically = [=](QRectF &rect) {
-        rect.moveTop(qBound(boundingRect.top() + originPointOffset.y() + margins.top(), rect.top(),
-                boundingRect.bottom() + originPointOffset.y() - margins.bottom()));
-    };
-    auto adjustHorizontally = [=](QRectF &rect) {
-        rect.moveLeft(qBound(boundingRect.left() + originPointOffset.x() + margins.left(), rect.left(),
-                boundingRect.right() + originPointOffset.x() - margins.right()));
-    };
-
-    switch (side) {
-    case Qt::AlignLeft:
-        rect.moveLeft(boundingRect.left() + originPointOffset.x());
-        adjustVertically(rect);
-        break;
-    case Qt::AlignTop:
-        rect.moveTop(boundingRect.top() + originPointOffset.y());
-        adjustHorizontally(rect);
-        break;
-    case Qt::AlignRight:
-        rect.moveLeft(boundingRect.right() + originPointOffset.x());
-        adjustVertically(rect);
-        break;
-    case Qt::AlignBottom:
-        rect.moveTop(boundingRect.bottom() + originPointOffset.y());
-        adjustHorizontally(rect);
-        break;
-    default:
-        return {};
-    }
-    return rect;
-}
-
-/*!
  * Moves \a itemRect on the \a side from \a intersectedItemRect
  */
 

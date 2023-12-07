@@ -30,9 +30,6 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, q
 
 bool alignedLine(QLineF &line, int angleTolerance = 10);
 
-QRectF alignRectToSide(const QRectF &boundingRect, const QRectF &itemRect, Qt::Alignment side,
-        const QPointF &originPointOffset, const QMarginsF &margins = QMarginsF());
-
 QRectF adjustedRect(const QRectF &itemRect, const QRectF &intersectedItemRect, const Qt::Alignment side,
         const topohelp::LookupDirection direction);
 
