@@ -137,12 +137,19 @@ public:
 
     virtual void setRequestsIDs(const QStringList &requestIDs) = 0;
 
+    /// Use only if you really know what you do - other objects might have a reference on this ID
+    void recreateId();
+
 Q_SIGNALS:
     void attributeChanged(const QString &name);
     void markerChanged();
 
+    void idChanged(shared::VEObject *obj, const shared::Id &oldId, const shared::Id &newId);
+
 public Q_SLOTS:
     bool setParentObject(shared::VEObject *parentObject);
+
+    virtual void updateIdDependency(shared::VEObject *obj, const shared::Id &oldId, const shared::Id &newId);
 
 protected:
     virtual QVariantList generateProperties(bool isProperty) const = 0;

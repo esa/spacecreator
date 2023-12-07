@@ -451,6 +451,16 @@ QVector<shared::InterfaceParameter> IVConnection::params() const
     return {};
 }
 
+void IVConnection::updateIdDependency(VEObject *obj, const shared::Id &oldId, const shared::Id &newId)
+{
+    Q_UNUSED(obj)
+    if (d->m_delayedInit.m_from.m_ifaceId == oldId) {
+        d->m_delayedInit.m_from.m_ifaceId = newId;
+    }
+    if (d->m_delayedInit.m_to.m_ifaceId == oldId) {
+        d->m_delayedInit.m_to.m_ifaceId = newId;
+    }
+}
 }
 
 QDebug operator<<(QDebug debug, const ivm::IVConnection &c)

@@ -984,8 +984,7 @@ QVector<QAction *> IVAppWidget::initActions()
     connect(m_tool, &IVCreatorTool::copyActionTriggered, this, &IVAppWidget::copyItems);
     connect(m_tool, &IVCreatorTool::cutActionTriggered, this, &IVAppWidget::cutItems);
     connect(m_tool, &IVCreatorTool::wrapSelectedItemsTriggered, this, &IVAppWidget::wrapItems);
-    connect(m_tool, &IVCreatorTool::pasteActionTriggered, m_importer,
-            qOverload<const QPointF &>(&IVImporter::pasteItems));
+    connect(m_tool, &IVCreatorTool::pasteActionTriggered, m_importer, qOverload<QPointF>(&IVImporter::pasteItems));
 
     auto actCreateFunctionType = new QAction(tr("Function Type"));
     ActionsManager::registerAction(Q_FUNC_INFO, actCreateFunctionType, "Function Type", "Create FunctionType object");

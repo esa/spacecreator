@@ -32,7 +32,7 @@ struct VEObjectPrivate {
     {
     }
 
-    const shared::Id m_id;
+    shared::Id m_id;
     EntityAttributes m_attrs;
     VEModel *m_model;
     bool m_marked = false;
@@ -258,6 +258,28 @@ void VEObject::setMarked(bool mark)
 bool VEObject::isMarked() const
 {
     return d->m_marked;
+}
+
+/*!
+ * Be very very careful using this function. As other very likely rely on the ID.
+ */
+void VEObject::recreateId()
+{
+    const shared::Id oldId = d->m_id;
+    d->m_id = shared::createId();
+    Q_EMIT idChanged(this, oldId, d->m_id);
+}
+
+/*!
+ * Updates the ID reference, if it has one
+ * \param obj Pointer to the object that changed it's ID
+ * \param oldId The old ID of the object be fore the change
+ * \param newId The new ID of the object
+ */
+void VEObject::updateIdDependency(VEObject *obj, const shared::Id &oldId, const shared::Id &newId)
+{
+    Q_UNUSED(newId)
+    Q_UNUSED(oldId)
 }
 
 VEObject *VEObject::parentObject() const

@@ -26,6 +26,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 class QGraphicsView;
 
 namespace ivm {
+
+class IVObject;
 class IVFunctionType;
 }
 namespace ive {
@@ -47,13 +49,15 @@ public:
 
 public Q_SLOTS:
     void pasteItems();
-    void pasteItems(const QPointF &sceneDropPoint);
+    void pasteItems(QPointF sceneDropPoint);
     void importEntity(const shared::Id &id, QPointF sceneDropPoint);
     void instantiateEntity(const shared::Id &id, QPointF sceneDropPoint);
     void linkEntity(const shared::Id &id, QPointF sceneDropPoint);
 
 private:
     ivm::IVFunctionType *functionAtPosition(QPointF &sceneDropPoint);
+    QStringList conflictingNames(const QVector<ivm::IVObject *> &objects) const;
+    void resetIds(const QVector<ivm::IVObject *> &objects) const;
 
     QPointer<QGraphicsView> m_graphicsView;
     QPointer<InterfaceDocument> m_document;

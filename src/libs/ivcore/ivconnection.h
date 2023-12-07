@@ -117,6 +117,8 @@ public:
     QString name() const;
     QVector<shared::InterfaceParameter> params() const;
 
+    void updateIdDependency(shared::VEObject *obj, const shared::Id &oldId, const shared::Id &newId) override;
+
 protected:
     explicit IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVInterface *ifaceTarget,
             QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);

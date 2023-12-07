@@ -96,7 +96,7 @@ void IVImporter::pasteItems()
  * Import the components from the clipboard at the given position
  * \param sceneDropPoint Position in the scene to create the new component(s)
  */
-void IVImporter::pasteItems(const QPointF &sceneDropPoint)
+void IVImporter::pasteItems(QPointF sceneDropPoint)
 {
     const QMimeData *mimeData = QApplication::clipboard()->mimeData();
     if (!mimeData) {
@@ -106,46 +106,35 @@ void IVImporter::pasteItems(const QPointF &sceneDropPoint)
         return;
     }
 
-    QGraphicsItem *itemAtScenePos = m_document->scene()->itemAt(sceneDropPoint, m_graphicsView->transform());
-    while (itemAtScenePos && itemAtScenePos->type() != IVFunctionGraphicsItem::Type) {
-        itemAtScenePos = itemAtScenePos->parentItem();
-    }
-    ivm::IVFunctionType *parentObject = gi::functionObject(itemAtScenePos);
-    if (!parentObject && m_document->objectsModel() && m_document->objectsModel()->rootObject()) {
-        parentObject = qobject_cast<ivm::IVFunctionType *>(m_document->objectsModel()->rootObject());
-    }
-
     const QByteArray data = mimeData->text().toUtf8();
     ivm::IVXMLReader parser;
-    if (parser.read(data)) {
-        QVector<ivm::IVObject *> objects = parser.parsedObjects();
-        const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
-        ivm::IVObject::sortObjectList(objects);
-        for (ivm::IVObject *obj : qAsConst(objects)) {
-            const EntityAttributes attrs = extAttrs.value(obj->id());
-            for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
-                obj->setEntityAttribute(attrIt.value());
-            }
-        }
-
-        const QSet<QString> existingFunctionNames = m_document->objectsModel()->nestedFunctionNames();
-        const QSet<QString> intersectedNames = nestedFunctionNames(objects).intersect(existingFunctionNames);
-        if (!intersectedNames.isEmpty()) {
-            QList<QString> intersectedNamesList;
-            intersectedNamesList.reserve(intersectedNames.size());
-            for (const QString &name : intersectedNames) {
-                intersectedNamesList.append(name);
-            }
-            const QString msg = tr("Entities couldn't be pasted because of Function names conflict(s): %1")
-                                        .arg(intersectedNamesList.join(QLatin1String(", ")));
-            shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
-            return;
-        }
-
-        auto cmdImport = new cmd::CmdEntitiesImport(objects, parentObject, m_document->objectsModel(),
-                m_document->componentModel(), m_document->asn1Check(), sceneDropPoint);
-        m_document->commandsStack()->push(cmdImport);
+    if (!parser.read(data)) {
+        return;
     }
+    QVector<ivm::IVObject *> objects = parser.parsedObjects();
+    ivm::IVObject::sortObjectList(objects);
+    resetIds(objects);
+    const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
+    for (ivm::IVObject *obj : qAsConst(objects)) {
+        const EntityAttributes attrs = extAttrs.value(obj->id());
+        for (auto attrIt = attrs.constBegin(); attrIt != attrs.constEnd(); ++attrIt) {
+            obj->setEntityAttribute(attrIt.value());
+        }
+    }
+
+    const QStringList intersectedNamesList = conflictingNames(objects);
+    if (!intersectedNamesList.isEmpty()) {
+        const QString msg = tr("Entities couldn't be pasted because of Function names conflict(s): %1")
+                                    .arg(intersectedNamesList.join(QLatin1String(", ")));
+        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
+        return;
+    }
+
+    ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
+
+    auto cmdImport = new cmd::CmdEntitiesImport(objects, parentObject, m_document->objectsModel(),
+            m_document->componentModel(), m_document->asn1Check(), sceneDropPoint);
+    m_document->commandsStack()->push(cmdImport);
 }
 
 /*!
@@ -162,22 +151,6 @@ void IVImporter::importEntity(const shared::Id &id, QPointF sceneDropPoint)
         return;
     }
 
-    const QSet<QString> existingFunctionNames = m_document->objectsModel()->nestedFunctionNames();
-    const QSet<QString> intersectedNames =
-            nestedFunctionNames(obj->as<ivm::IVFunctionType *>()).intersect(existingFunctionNames);
-    if (!intersectedNames.isEmpty()) {
-        QList<QString> intersectedNamesList;
-        intersectedNamesList.reserve(intersectedNames.size());
-        for (const QString &name : intersectedNames) {
-            intersectedNamesList.append(name);
-        }
-        const QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
-                                    .arg(obj->titleUI(), intersectedNamesList.join(QLatin1String(", ")));
-        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
-        return;
-    }
-    ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
-
     QList<ivm::IVObject *> objects;
     QSharedPointer<shared::ComponentModel::Component> component = m_document->componentModel()->component(id);
     ivm::IVXMLReader parser;
@@ -186,6 +159,7 @@ void IVImporter::importEntity(const shared::Id &id, QPointF sceneDropPoint)
     }
     objects = parser.parsedObjects();
     ivm::IVObject::sortObjectList(objects);
+    resetIds(objects);
     const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
     for (auto it = extAttrs.constBegin(); it != extAttrs.constEnd(); ++it) {
         auto objIt = std::find_if(objects.constBegin(), objects.constEnd(),
@@ -196,6 +170,17 @@ void IVImporter::importEntity(const shared::Id &id, QPointF sceneDropPoint)
             }
         }
     }
+
+    const QStringList intersectedNamesList = conflictingNames(objects);
+    if (!intersectedNamesList.isEmpty()) {
+        const QString msg = tr("Chosen entity [%1] couldn't be imported because of Function names conflict(s): %2")
+                                    .arg(obj->titleUI(), intersectedNamesList.join(QLatin1String(", ")));
+        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
+        return;
+    }
+
+    ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
+
     auto cmdImport = new cmd::CmdEntitiesImport(objects, parentObject, m_document->objectsModel(),
             m_document->componentModel(), m_document->asn1Check(), sceneDropPoint);
     m_document->commandsStack()->push(cmdImport);
@@ -236,24 +221,6 @@ void IVImporter::linkEntity(const shared::Id &id, QPointF sceneDropPoint)
         return;
     }
 
-    const QSet<QString> existingFunctionNames = m_document->objectsModel()->nestedFunctionNames();
-    const QSet<QString> intersectedNames =
-            nestedFunctionNames(obj->as<ivm::IVFunctionType *>()).intersect(existingFunctionNames);
-    if (!intersectedNames.isEmpty()) {
-        QList<QString> intersectedNamesList;
-        intersectedNamesList.reserve(intersectedNames.size());
-        for (const QString &name : intersectedNames) {
-            intersectedNamesList.append(name);
-        }
-        const QString msg =
-                tr("Chosen entity [%1] couldn't be imported as reference because of Function names conflict(s): %2")
-                        .arg(obj->titleUI(), intersectedNamesList.join(QLatin1String(", ")));
-        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
-        return;
-    }
-
-    ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
-
     QList<ivm::IVObject *> objects;
     QSharedPointer<shared::ComponentModel::Component> component = m_document->componentModel()->component(id);
 
@@ -263,6 +230,7 @@ void IVImporter::linkEntity(const shared::Id &id, QPointF sceneDropPoint)
     }
     objects = parser.parsedObjects();
     ivm::IVObject::sortObjectList(objects);
+    resetIds(objects);
     const QHash<shared::Id, EntityAttributes> extAttrs = parser.externalAttributes();
     for (auto it = extAttrs.constBegin(); it != extAttrs.constEnd(); ++it) {
         auto objIt = std::find_if(objects.constBegin(), objects.constEnd(),
@@ -276,6 +244,17 @@ void IVImporter::linkEntity(const shared::Id &id, QPointF sceneDropPoint)
     std::for_each(objects.begin(), objects.end(), [](shared::VEObject *obj) {
         obj->setEntityAttribute(ivm::meta::Props::token(ivm::meta::Props::Token::reference), true);
     });
+
+    const QStringList intersectedNamesList = conflictingNames(objects);
+    if (!intersectedNamesList.isEmpty()) {
+        const QString msg =
+                tr("Chosen entity [%1] couldn't be imported as reference because of Function names conflict(s): %2")
+                        .arg(obj->titleUI(), intersectedNamesList.join(QLatin1String(", ")));
+        shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
+        return;
+    }
+
+    ivm::IVFunctionType *parentObject = functionAtPosition(sceneDropPoint);
 
     auto cmdLink = new cmd::CmdEntitiesImport(objects, parentObject, m_document->objectsModel(),
             m_document->componentModel(), m_document->asn1Check(), sceneDropPoint);
@@ -305,4 +284,31 @@ ivm::IVFunctionType *IVImporter::functionAtPosition(QPointF &sceneDropPoint)
 
     return parentObject;
 }
+
+QStringList IVImporter::conflictingNames(const QVector<ivm::IVObject *> &objects) const
+{
+    QStringList intersectedNamesList;
+    const QSet<QString> existingFunctionNames = m_document->objectsModel()->nestedFunctionNames();
+    const QSet<QString> intersectedNames = nestedFunctionNames(objects).intersect(existingFunctionNames);
+    if (!intersectedNames.isEmpty()) {
+        intersectedNamesList.reserve(intersectedNames.size());
+        for (const QString &name : intersectedNames) {
+            intersectedNamesList.append(name);
+        }
+    }
+    return intersectedNamesList;
+}
+
+void IVImporter::resetIds(const QVector<ivm::IVObject *> &objects) const
+{
+    for (ivm::IVObject *obj : objects) {
+        const shared::Id oldId = obj->id();
+        obj->recreateId();
+        const shared::Id newId = obj->id();
+        for (ivm::IVObject *updateObj : objects) {
+            updateObj->updateIdDependency(obj, oldId, newId);
+        }
+    }
+}
+
 } // namespace ive
