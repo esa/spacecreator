@@ -89,6 +89,12 @@ QVector<qint32> coordinates(const QPointF &point);
 QVector<qint32> coordinates(const QRectF &rect);
 QVector<qint32> coordinates(const PointsList &points);
 bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2);
+QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side);
+bool alignedLine(QLineF &line, int angleTolerance = 10);
+
+QPointF pos(const QVector<qint32> &coordinates);
+QRectF rect(const QVector<qint32> &coordinates);
+QVector<QPointF> polygon(const QVector<qint32> &coordinates);
 
 }
 

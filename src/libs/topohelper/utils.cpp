@@ -756,5 +756,107 @@ bool comparePolygones(const QVector<QPointF> &v1, const QVector<QPointF> &v2)
     return true;
 }
 
+/*!
+ * \brief Adjusts appropriate coordinate of \a pos to the \a boundingArea side specified by \a side.
+ * Returns the adjusted \a pos.
+ */
+QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side)
+{
+    switch (side) {
+    case Qt::AlignLeft:
+        return QPointF(boundingArea.left(), qBound(boundingArea.top(), pos.y(), boundingArea.bottom()));
+    case Qt::AlignRight:
+        return QPointF(boundingArea.right(), qBound(boundingArea.top(), pos.y(), boundingArea.bottom()));
+    case Qt::AlignTop:
+        return QPointF(qBound(boundingArea.left(), pos.x(), boundingArea.right()), boundingArea.top());
+    case Qt::AlignBottom:
+        return QPointF(qBound(boundingArea.left(), pos.x(), boundingArea.right()), boundingArea.bottom());
+    }
+
+    return boundingArea.center();
+}
+
+/*!
+ * \fn ive::bool alignedLine(QLineF &line, int angleTolerance)
+ * \brief  Adjusts the angle of the \a line to the nearest x90 degrees ccw with \a angleTolerance.
+ * Returns true if the \a line's angle adjusted.
+ */
+bool alignedLine(QLineF &line, int angleTolerance)
+{
+    if (line.isNull())
+        return false;
+
+    static const int kStep = 90;
+
+    auto isBounded = [](int straightAngle, int tolerance, int angle) {
+        return straightAngle - tolerance < angle && angle < straightAngle + tolerance;
+    };
+
+    for (int angle = 360; angle >= 0; angle -= kStep) {
+        if (isBounded(angle, angleTolerance, std::ceil(line.angle()))) {
+            line.setAngle(angle);
+            return true;
+        }
+    }
+    return false;
+}
+
+/*!
+ * Converts the IV[AADL/XML] coordinates pair to the QPointF.
+ * If \a coordinates is empty or its size != 2 an empty point returned.
+ */
+QPointF pos(const QVector<qint32> &coordinates)
+{
+    if (coordinates.isEmpty())
+        return {};
+
+    Q_ASSERT(coordinates.size() == 2);
+    if (coordinates.size() != 2)
+        return {};
+
+    return QPointF(coordinates.first(), coordinates.last());
+}
+
+/*!
+ * Converts four coordinate numbers from IV[AADL/XML] to the QRectF.
+ * If \a coordinates is empty or its size != 4 returns an empty rect.
+ */
+QRectF rect(const QVector<qint32> &coordinates)
+{
+    if (coordinates.isEmpty())
+        return {};
+
+    Q_ASSERT(coordinates.size() == 4);
+    if (coordinates.size() != 4)
+        return {};
+
+    QList<QPointF> points;
+    for (int idx = 0; idx + 1 < coordinates.size(); idx += 2)
+        points.append(QPointF(coordinates.value(idx), coordinates.value(idx + 1)));
+
+    return { points.first(), points.last() };
+}
+
+/*!
+ * Converts coordinate numbers from IV[AADL/XML] to vector of QPointF.
+ * If \a coordinates is empty or its size is odd returns an empty vector.
+ */
+
+QVector<QPointF> polygon(const QVector<qint32> &coordinates)
+{
+    if (coordinates.isEmpty())
+        return {};
+
+    Q_ASSERT(coordinates.size() % 2 == 0);
+    if (coordinates.size() % 2 != 0)
+        return {};
+
+    QVector<QPointF> points;
+    for (int idx = 0; idx + 1 < coordinates.size(); idx += 2)
+        points.append(QPointF(coordinates.value(idx), coordinates.value(idx + 1)));
+
+    return points;
+}
+
 } // namespace utils
 } // namespace topohelp

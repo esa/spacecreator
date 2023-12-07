@@ -87,18 +87,7 @@ QVector<QPointF> intersectionPoints(const QRectF &rect, const QPolygonF &polygon
  */
 QPointF getSidePosition(const QRectF &boundingArea, const QPointF &pos, Qt::Alignment side)
 {
-    switch (side) {
-    case Qt::AlignLeft:
-        return QPointF(boundingArea.left(), qBound(boundingArea.top(), pos.y(), boundingArea.bottom()));
-    case Qt::AlignRight:
-        return QPointF(boundingArea.right(), qBound(boundingArea.top(), pos.y(), boundingArea.bottom()));
-    case Qt::AlignTop:
-        return QPointF(qBound(boundingArea.left(), pos.x(), boundingArea.right()), boundingArea.top());
-    case Qt::AlignBottom:
-        return QPointF(qBound(boundingArea.left(), pos.x(), boundingArea.right()), boundingArea.bottom());
-    }
-
-    return boundingArea.center();
+    return topohelp::utils::getSidePosition(boundingArea, pos, side);
 }
 
 /*!
@@ -169,22 +158,7 @@ QGraphicsItem *nearestItem(
  */
 bool alignedLine(QLineF &line, int angleTolerance)
 {
-    if (line.isNull())
-        return false;
-
-    static const int kStep = 90;
-
-    auto isBounded = [](int straightAngle, int tolerance, int angle) {
-        return straightAngle - tolerance < angle && angle < straightAngle + tolerance;
-    };
-
-    for (int angle = 360; angle >= 0; angle -= kStep) {
-        if (isBounded(angle, angleTolerance, std::ceil(line.angle()))) {
-            line.setAngle(angle);
-            return true;
-        }
-    }
-    return false;
+    return topohelp::utils::alignedLine(line, angleTolerance);
 }
 
 qreal distanceLine(const QPointF &pnt1, const QPointF &pnt2)
@@ -197,14 +171,7 @@ qreal distanceLine(const QPointF &pnt1, const QPointF &pnt2)
  */
 QPointF pos(const QVector<qint32> &coordinates)
 {
-    if (coordinates.isEmpty())
-        return {};
-
-    Q_ASSERT(coordinates.size() == 2);
-    if (coordinates.size() != 2)
-        return {};
-
-    return QPointF(coordinates.first(), coordinates.last());
+    return topohelp::utils::pos(coordinates);
 }
 
 /*!
@@ -213,18 +180,7 @@ QPointF pos(const QVector<qint32> &coordinates)
  */
 QRectF rect(const QVector<qint32> &coordinates)
 {
-    if (coordinates.isEmpty())
-        return {};
-
-    Q_ASSERT(coordinates.size() == 4);
-    if (coordinates.size() != 4)
-        return {};
-
-    QList<QPointF> points;
-    for (int idx = 0; idx + 1 < coordinates.size(); idx += 2)
-        points.append(QPointF(coordinates.value(idx), coordinates.value(idx + 1)));
-
-    return { points.first(), points.last() };
+    return topohelp::utils::rect(coordinates);
 }
 
 /*!
@@ -234,18 +190,7 @@ QRectF rect(const QVector<qint32> &coordinates)
 
 QVector<QPointF> polygon(const QVector<qint32> &coordinates)
 {
-    if (coordinates.isEmpty())
-        return {};
-
-    Q_ASSERT(coordinates.size() % 2 == 0);
-    if (coordinates.size() % 2 != 0)
-        return {};
-
-    QVector<QPointF> points;
-    for (int idx = 0; idx + 1 < coordinates.size(); idx += 2)
-        points.append(QPointF(coordinates.value(idx), coordinates.value(idx + 1)));
-
-    return points;
+    return topohelp::utils::polygon(coordinates);
 }
 
 QVector<qint32> coordinates(const QPointF &point)
