@@ -127,7 +127,9 @@ bool RequirementsWidget::loadSavedRequirementsTableGeometry()
     auto AllRequirementsHeaderState = settings.value("AllRequirementsHeaderState");
     if (AllRequirementsHeaderState.isValid()) {
         ui->allRequirements->horizontalHeader()->restoreState(AllRequirementsHeaderState.toByteArray());
+        return true;
     }
+    return false;
 }
 
 RequirementsWidget::~RequirementsWidget()
