@@ -54,6 +54,7 @@ public:
 
 protected:
     bool loadSavedCredentials();
+    bool loadSavedRequirementsTableGeometry();
     void onChangeOfCredentials();
 
 protected Q_SLOTS:

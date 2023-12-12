@@ -38,6 +38,7 @@ public:
     {
         IssueLinkRole = Qt::UserRole + 1,
         ReqIfIdRole,
+        IssueIdRole,
         TagsRole,
         DetailDescriptionRole,
     };

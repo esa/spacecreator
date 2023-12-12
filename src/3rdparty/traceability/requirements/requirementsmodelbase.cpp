@@ -93,7 +93,7 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case REQUIREMENT_ID:
-            return m_requirements[index.row()].m_issueID;
+            return m_requirements[index.row()].m_id;
         case TITLE:
             return m_requirements[index.row()].m_longName;
         }
@@ -108,6 +108,10 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
 
     if (role == RequirementsModelBase::RoleNames::ReqIfIdRole) {
         return m_requirements[index.row()].m_id;
+    }
+
+    if (role == RequirementsModelBase::RoleNames::IssueIdRole) {
+        return m_requirements[index.row()].m_issueID;
     }
 
     if (role == RequirementsModelBase::RoleNames::TagsRole) {
@@ -175,7 +179,7 @@ QSet<QString> RequirementsModelBase::convert(const QStringList &list)
 Requirement RequirementsModelBase::requirementFromIndex(const QModelIndex &idx)
 {
     QModelIndex _idx = index(idx.row(), RequirementsModelBase::REQUIREMENT_ID);
-    int issueID = _idx.data().toInt();
+    int issueID = _idx.data(RequirementsModelBase::IssueIdRole).toInt();
     for (const auto &requirement : m_requirements) {
         if (requirement.m_issueID == issueID) {
             return requirement;

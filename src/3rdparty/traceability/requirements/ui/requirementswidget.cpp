@@ -55,10 +55,14 @@ RequirementsWidget::RequirementsWidget(
     m_checkedModel.setSourceModel(&m_tagFilterModel);
 
     ui->allRequirements->setModel(&m_tagFilterModel);
-    ui->allRequirements->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    ui->allRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    ui->allRequirements->horizontalHeader()->setStretchLastSection(false);
+    ui->allRequirements->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
+    ui->allRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
+    ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Interactive);
+
+    ui->allRequirements->setColumnWidth(1, width() - ui->allRequirements->width());
+
+    ui->allRequirements->horizontalHeader()->setStretchLastSection(true);
+    ui->allRequirements->setSortingEnabled(true);
     ui->removeRequirementButton->setEnabled(false);
     connect(m_model, &requirement::RequirementsModelBase::rowsInserted,
             [this]() { ui->allRequirements->resizeRowsToContents(); });
@@ -91,6 +95,8 @@ RequirementsWidget::RequirementsWidget(
         setLoginData();
     }
 
+    loadSavedRequirementsTableGeometry();
+
     const QString urlTooltip = tr("Set the Gitlab server URL including the project path");
     ui->urlLabel->setToolTip(urlTooltip);
     ui->urlLineEdit->setToolTip(urlTooltip);
@@ -114,8 +120,21 @@ bool RequirementsWidget::loadSavedCredentials()
     setToken(gitlabToken);
     return true;
 }
+
+bool RequirementsWidget::loadSavedRequirementsTableGeometry()
+{
+    QSettings settings;
+    auto AllRequirementsHeaderState = settings.value("AllRequirementsHeaderState");
+    if (AllRequirementsHeaderState.isValid()) {
+        ui->allRequirements->horizontalHeader()->restoreState(AllRequirementsHeaderState.toByteArray());
+    }
+}
+
 RequirementsWidget::~RequirementsWidget()
 {
+    QSettings settings;
+    QByteArray AllRequirementsHeaderState = ui->allRequirements->horizontalHeader()->saveState();
+    settings.setValue("AllRequirementsHeaderState", AllRequirementsHeaderState);
     delete ui;
 }
 
