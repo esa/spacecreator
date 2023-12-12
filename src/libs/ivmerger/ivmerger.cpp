@@ -156,20 +156,20 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
 {
     // find place to insert new functions (if necessary)
     qreal leftBorder = std::numeric_limits<double>::max();
-    qreal bottomBorder = std::numeric_limits<double>::max();
+    qreal bottomBorder = std::numeric_limits<double>::min();
     const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
     for (ivm::IVFunctionType *function : targetFunctions) {
         const QString coordStr = function->entityAttributeValue<QString>(coordToken);
 
         const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
         leftBorder = std::min(leftBorder, rect.left());
-        bottomBorder = std::min(bottomBorder, rect.bottom());
+        bottomBorder = std::max(bottomBorder, rect.bottom());
     }
 
     if (leftBorder == std::numeric_limits<double>::max()) {
         leftBorder = 0.0;
     }
-    if (bottomBorder == std::numeric_limits<double>::max()) {
+    if (bottomBorder == std::numeric_limits<double>::min()) {
         bottomBorder = 0.0;
     }
 
@@ -179,7 +179,7 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
         const QString coordStr = comment->entityAttributeValue<QString>(coordToken);
         const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
         leftBorder = std::min(leftBorder, rect.left());
-        bottomBorder = std::min(bottomBorder, rect.bottom());
+        bottomBorder = std::max(bottomBorder, rect.bottom());
     }
 
     // insert remaining top level functions from source to the target
