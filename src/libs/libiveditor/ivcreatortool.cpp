@@ -1,4 +1,4 @@
-﻿/*
+/*
   Copyright (C) 2019 European Space Agency - <maxime.perrotin@esa.int>
 
   This library is free software; you can redistribute it and/or
@@ -407,7 +407,7 @@ bool IVCreatorTool::onMouseRelease(QMouseEvent *e)
         const bool isIface = m_toolType == ToolType::ProvidedInterface || m_toolType == ToolType::RequiredInterface;
         if (hasPreview || isIface) {
             const QPointF &scenePos = cursorInScene(e->globalPos());
-            return handleToolType(m_toolType, m_view->snappedPoint(scenePos));
+            return handleToolType(m_toolType, scenePos);
         }
     }
     return false;
@@ -418,8 +418,8 @@ bool IVCreatorTool::onMouseMove(QMouseEvent *e)
     if (!m_view || !m_view->scene())
         return false;
 
-    const QPointF &scenePos = m_view->snappedPoint(cursorInScene(e->globalPos()));
     if (m_previewItem && m_previewItem->isVisible()) {
+        const QPointF &scenePos = m_view->snappedPoint(cursorInScene(e->globalPos()));
         const QRectF newGeometry = QRectF(m_clickScenePos, scenePos).normalized();
         if (!newGeometry.isValid())
             return true;
@@ -460,6 +460,7 @@ bool IVCreatorTool::onMouseMove(QMouseEvent *e)
         if (m_view->scene()) {
             QPainterPath pp;
             pp.addPolygon(m_connectionPoints);
+            const QPointF &scenePos = cursorInScene(e->globalPos());
             pp.lineTo(scenePos);
             m_previewConnectionItem->setPath(pp);
             warnConnectionPreview(scenePos);
@@ -753,14 +754,16 @@ void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
 
 void IVCreatorTool::handleInterface(QGraphicsScene *scene, ivm::IVInterface::InterfaceType type, const QPointF &pos)
 {
+    const QPointF snappedPos = m_view->snappedPoint(pos);
     if (auto parentItem = shared::graphicsviewutils::nearestItem(scene,
-                shared::graphicsviewutils::adjustFromPoint(pos, shared::graphicsviewutils::kInterfaceTolerance),
+                shared::graphicsviewutils::adjustFromPoint(snappedPos, shared::graphicsviewutils::kInterfaceTolerance),
                 kFunctionTypes)) {
         ivm::IVFunctionType *parentObject = gi::functionTypeObject(parentItem);
         if (parentObject && parentObject->isReference())
             return;
 
-        ivm::IVInterface::CreationInfo ifaceDescr(model()->objectsModel(), parentObject, pos, type, shared::createId());
+        ivm::IVInterface::CreationInfo ifaceDescr(
+                model()->objectsModel(), parentObject, snappedPos, type, shared::createId());
         ifaceDescr.resetKind();
 
         if (auto cmd = createInterfaceCommand(ifaceDescr))
@@ -1046,7 +1049,8 @@ bool IVCreatorTool::warnConnectionPreview(const QPointF &pos)
     else
         connectionPoints.append(pos);
 
-    auto info = ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, connectionPoints);
+    ivm::ValidationResult info =
+            ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, connectionPoints);
     bool warn = true;
     if (m_toolType == ToolType::ReCreateConnection) {
         if ((info.status != ivm::ConnectionCreationValidator::FailReason::MulticastDisabled
