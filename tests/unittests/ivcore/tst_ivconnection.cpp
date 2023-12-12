@@ -35,6 +35,7 @@ private Q_SLOTS:
     void testCorrectConnectionSourceTarget();
     void testIsProtected();
     void testMulticastConnectionInit();
+    void textPrototypes();
 
 private:
     ivm::IVPropertyTemplateConfig *conf { nullptr };
@@ -179,6 +180,43 @@ void tst_IVConnection::testMulticastConnectionInit()
     connection->setDelayedStart(startInfo);
     connection->setDelayedEnd(endInfo);
     QVERIFY(model.addObject(connection));
+}
+
+void tst_IVConnection::textPrototypes()
+{
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    auto rifn1 = dynamic_cast<ivm::IVInterfaceRequired *>(
+            ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Required, "RI1"));
+    QCOMPARE_NE(rifn1, nullptr);
+    rifn1->setEntityProperty(ivm::meta::Props::token(ivm::meta::Props::Token::InheritPI), "true");
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2");
+    auto pifn2 = dynamic_cast<ivm::IVInterfaceProvided *>(
+            ivm::testutils::createIface(fn2, ivm::IVInterface::InterfaceType::Provided, "PI1"));
+    QCOMPARE_NE(pifn2, nullptr);
+
+    QCOMPARE(rifn1->hasPrototype(pifn2), false);
+
+    ivm::IVConnection *connection = new ivm::IVConnection(rifn1, pifn2);
+    QCOMPARE(rifn1->hasPrototype(pifn2), false);
+
+    // As the RI is inherited, the prototype is set (from external on connection creation)
+    connection->setInheritPI();
+    QCOMPARE(rifn1->hasPrototype(pifn2), true);
+
+    // Check if releasing the prototype connection works
+    connection->unsetInheritPI();
+    QCOMPARE(rifn1->hasPrototype(pifn2), false);
+
+    // Check if the prototype connection is removed when the connection is deleted
+    connection->setInheritPI();
+    QCOMPARE(rifn1->hasPrototype(pifn2), true);
+    delete connection;
+    QCOMPARE(rifn1->hasPrototype(pifn2), false);
+
+    delete rifn1;
+    delete fn1;
+    delete pifn2;
+    delete fn2;
 }
 
 QTEST_APPLESS_MAIN(tst_IVConnection)

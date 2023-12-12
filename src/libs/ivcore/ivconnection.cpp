@@ -94,6 +94,12 @@ IVConnection::IVConnection(const IVObject::Type t, IVInterface *ifaceSource, IVI
 IVConnection::~IVConnection()
 {
     clearPostponedEndpoints();
+
+    auto ri = selectIface<IVInterfaceRequired *>();
+    const auto pi = selectIface<const IVInterfaceProvided *>();
+    if (ri && pi) {
+        ri->unsetPrototype(pi);
+    }
 }
 
 QString IVConnection::sourceName() const
@@ -218,9 +224,6 @@ void IVConnection::handleInheritPIChange(IVConnection::InheritPIChange inheritan
     if (!ri->isInheritPI() && !ri->hasPrototypePi())
         return;
 
-    if (ri->hasPrototype(pi))
-        return;
-
     const bool rmLabel = inheritance == IVConnection::InheritPIChange::NotInherit;
     if (rmLabel) {
         disconnect(ri, &IVInterfaceRequired::propChanged_InheritPI, this, nullptr);
@@ -228,6 +231,9 @@ void IVConnection::handleInheritPIChange(IVConnection::InheritPIChange inheritan
         ri->unsetPrototype(pi);
         return;
     }
+
+    if (ri->hasPrototype(pi))
+        return;
 
     ri->setPrototype(pi);
 
