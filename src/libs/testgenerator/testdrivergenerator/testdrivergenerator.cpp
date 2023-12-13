@@ -61,7 +61,10 @@ auto TestDriverGenerator::generateTestDriver(
     checkTestData(testData);
     checkInterface(interface);
 
-    const TestDriverGeneratorContext context(testData.header().fields(), interface.params());
+    const auto params = interface.params();
+    const auto paramsSize = params.size();
+
+    const TestDriverGeneratorContext context(testData.header().fields(), params);
 
     const auto testRecordsSize = testData.records().size();
     const QString testDriverRiName = getTestDriverRiName(interface);
@@ -80,7 +83,7 @@ auto TestDriverGenerator::generateTestDriver(
           "\n"
           "typedef struct {\n";
 
-    for (const auto &param : interface.params()) {
+    for (const auto &param : params) {
         ss << "    asn1Scc" << param.paramTypeName().toStdString() << " " << param.name().toStdString() << ";\n";
     }
 
@@ -113,13 +116,21 @@ auto TestDriverGenerator::generateTestDriver(
           "    for (unsigned int i = 0; i < testDataSize; i++) {\n"
           "        // clang-format off\n";
     ss << QString("        %1(\n").arg(testDriverRiName).toStdString();
-    for (auto it = interface.params().begin(); it != std::prev(interface.params().end()); it++) {
-        ss << QString("                &(%1[i].%2),\n").arg(testVectorVariableName).arg(it->name()).toStdString();
+
+    if (paramsSize >= 2) {
+        for (auto i = 0; i < paramsSize - 1; ++i) {
+            const auto name = params[i].name();
+            ss << QString("                &(%1[i].%2),\n").arg(testVectorVariableName).arg(name).toStdString();
+        }
     }
-    ss << QString("                &(%1[i].%2)\n")
+
+    if (paramsSize >= 1) {
+        ss << QString("                &(%1[i].%2)\n")
                     .arg(testVectorVariableName)
-                    .arg(std::prev(interface.params().end())->name())
+                    .arg(params[paramsSize - 1].name())
                     .toStdString();
+    }
+
     ss << "        );\n"
           "        // clang-format on\n"
           "    }\n";
