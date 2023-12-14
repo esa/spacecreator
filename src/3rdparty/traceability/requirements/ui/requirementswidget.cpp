@@ -111,7 +111,9 @@ RequirementsWidget::RequirementsWidget(
 bool RequirementsWidget::loadSavedCredentials()
 {
     QSettings settings;
+    settings.beginGroup("SpaceCreator");
     auto gitlabToken = settings.value(tokenKey(QUrl(m_requirementsUrl).host())).toString();
+    settings.endGroup();
     if (m_requirementsUrl.isEmpty() || gitlabToken.isEmpty()) {
         return false;
     }
@@ -124,7 +126,9 @@ bool RequirementsWidget::loadSavedCredentials()
 bool RequirementsWidget::loadSavedRequirementsTableGeometry()
 {
     QSettings settings;
+    settings.beginGroup("SpaceCreator");
     auto AllRequirementsHeaderState = settings.value("AllRequirementsHeaderState");
+    settings.endGroup();
     if (AllRequirementsHeaderState.isValid()) {
         ui->allRequirements->horizontalHeader()->restoreState(AllRequirementsHeaderState.toByteArray());
         return true;
@@ -135,8 +139,10 @@ bool RequirementsWidget::loadSavedRequirementsTableGeometry()
 RequirementsWidget::~RequirementsWidget()
 {
     QSettings settings;
+    settings.beginGroup("SpaceCreator");
     QByteArray AllRequirementsHeaderState = ui->allRequirements->horizontalHeader()->saveState();
     settings.setValue("AllRequirementsHeaderState", AllRequirementsHeaderState);
+    settings.endGroup();
     delete ui;
 }
 
