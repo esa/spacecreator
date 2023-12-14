@@ -65,7 +65,7 @@ private:
             QMap<ivm::IVFunctionType *, FunctionEndpoints> &connectionsToRestore,
             QSet<ivm::IVFunctionType *> &insertedSourceFunctions);
     void replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvModel, ivm::IVFunctionType *currentFunction,
-            ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos, QVector<ivm::IVFunctionType *> newFunctionsToAdd);
+            ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos, QVector<ivm::IVFunctionType *> functionsThatWillNotBeReplaced);
     void restoreConnections(ivm::IVModel &ivModel, QVector<ivm::IVFunctionType *> &allFunctions,
             QMap<ivm::IVFunctionType *, FunctionEndpoints> connectionsToRestore);
     void reparentRecursive(ivm::IVModel &newParent, ivm::IVObject *obj);

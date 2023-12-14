@@ -132,11 +132,11 @@ void IvMerger::mergeFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceI
 
 {
     // get functions that will not be replaced
-    QVector<ivm::IVFunctionType *> newFunctionsToAdd;
+    QVector<ivm::IVFunctionType *> functionsThatWillNotBeReplaced;
     for (ivm::IVFunctionType *sourceFunction : topLevelSourceFunctions) {
         for (ivm::IVFunctionType *targetFunction : targetFunctions) {
             if (!sourceFunction->isNested() && sourceFunction->id() != targetFunction->id()) {
-                newFunctionsToAdd.append(sourceFunction);
+                functionsThatWillNotBeReplaced.append(sourceFunction);
             }
         }
     }
@@ -147,7 +147,7 @@ void IvMerger::mergeFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceI
             if (sourceFunction->id() == targetFunction->id()) {
                 FunctionEndpoints connectionInfos;
 
-                replaceFunction(targetIvModel, sourceIvModel, targetFunction, sourceFunction, connectionInfos, newFunctionsToAdd);
+                replaceFunction(targetIvModel, sourceIvModel, targetFunction, sourceFunction, connectionInfos, functionsThatWillNotBeReplaced);
 
                 // remember connections to restore it later
                 connectionsToRestore.insert(sourceFunction, connectionInfos);
@@ -234,7 +234,7 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
 }
 
 void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvModel, ivm::IVFunctionType *currentFunction,
-        ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos, QVector<ivm::IVFunctionType *> newFunctionsToAdd)
+        ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos, QVector<ivm::IVFunctionType *> functionsThatWillNotBeReplaced)
 {
     QVector<ivm::IVConnection *> targetConnections = ivModel.getConnectionsForFunction(currentFunction->id());
 
@@ -253,7 +253,7 @@ void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvMode
     for (ivm::IVConnection *connection : sourceConnections) {
 
         bool isConnectionToNewFunctionToBeAdded = false;
-        for (ivm::IVFunctionType * newFunctionToBeAdded : newFunctionsToAdd){
+        for (ivm::IVFunctionType * newFunctionToBeAdded : functionsThatWillNotBeReplaced){
             if (connection->source()->id() == newFunctionToBeAdded->id() || connection->target()->id() == newFunctionToBeAdded->id())
             {
                 isConnectionToNewFunctionToBeAdded = true;
