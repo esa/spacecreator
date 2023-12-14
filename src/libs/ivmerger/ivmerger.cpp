@@ -102,7 +102,7 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
     mergeFunctions(targetIvModel, sourceIvModel, topLevelSourceFunctions, targetFunctions, connectionsToRestore,
             insertedSourceFunctions);
 
-    addNewFunctions(targetIvModel, sourceIvModel, topLevelSourceFunctions, targetFunctions, connectionsToRestore,
+    addNewFunctions(targetIvModel, sourceIvModel, topLevelSourceFunctions, topLevelTargetFunctions, connectionsToRestore,
             insertedSourceFunctions);
 
     // calculate again set of all top level functions in target
@@ -131,13 +131,23 @@ void IvMerger::mergeFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceI
         QSet<ivm::IVFunctionType *> &insertedSourceFunctions)
 
 {
+    // get functions that will not be replaced
+    QVector<ivm::IVFunctionType *> newFunctionsToAdd;
+    for (ivm::IVFunctionType *sourceFunction : topLevelSourceFunctions) {
+        for (ivm::IVFunctionType *targetFunction : targetFunctions) {
+            if (!sourceFunction->isNested() && sourceFunction->id() != targetFunction->id()) {
+                newFunctionsToAdd.append(sourceFunction);
+            }
+        }
+    }
+
     // replace top level functions in target by coresponding top level functions from source
     for (ivm::IVFunctionType *sourceFunction : topLevelSourceFunctions) {
         for (ivm::IVFunctionType *targetFunction : targetFunctions) {
             if (sourceFunction->id() == targetFunction->id()) {
                 FunctionEndpoints connectionInfos;
 
-                replaceFunction(targetIvModel, sourceIvModel, targetFunction, sourceFunction, connectionInfos);
+                replaceFunction(targetIvModel, sourceIvModel, targetFunction, sourceFunction, connectionInfos, newFunctionsToAdd);
 
                 // remember connections to restore it later
                 connectionsToRestore.insert(sourceFunction, connectionInfos);
@@ -150,7 +160,7 @@ void IvMerger::mergeFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceI
 }
 
 void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel,
-        QVector<ivm::IVFunctionType *> &topLevelSourceFunctions, QVector<ivm::IVFunctionType *> &targetFunctions,
+        QVector<ivm::IVFunctionType *> &topLevelSourceFunctions, QVector<ivm::IVFunctionType *> &topLevelTargetFunctions,
         QMap<ivm::IVFunctionType *, FunctionEndpoints> &connectionsToRestore,
         QSet<ivm::IVFunctionType *> &insertedSourceFunctions)
 {
@@ -158,7 +168,7 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
     qreal leftBorder = std::numeric_limits<double>::max();
     qreal bottomBorder = std::numeric_limits<double>::min();
     const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
-    for (ivm::IVFunctionType *function : targetFunctions) {
+    for (ivm::IVFunctionType *function : topLevelTargetFunctions) {
         const QString coordStr = function->entityAttributeValue<QString>(coordToken);
 
         const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
@@ -224,7 +234,7 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
 }
 
 void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvModel, ivm::IVFunctionType *currentFunction,
-        ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos)
+        ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos, QVector<ivm::IVFunctionType *> newFunctionsToAdd)
 {
     QVector<ivm::IVConnection *> targetConnections = ivModel.getConnectionsForFunction(currentFunction->id());
 
@@ -241,7 +251,17 @@ void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvMode
     // remove external connections from source
     QVector<ivm::IVConnection *> sourceConnections = sourceIvModel.getConnectionsForFunction(newFunction->id());
     for (ivm::IVConnection *connection : sourceConnections) {
-        if (!connection->isNested()) {
+
+        bool isConnectionToNewFunctionToBeAdded = false;
+        for (ivm::IVFunctionType * newFunctionToBeAdded : newFunctionsToAdd){
+            if (connection->source()->id() == newFunctionToBeAdded->id() || connection->target()->id() == newFunctionToBeAdded->id())
+            {
+                isConnectionToNewFunctionToBeAdded = true;
+                break;
+            }
+        }
+
+        if (!connection->isNested() && !isConnectionToNewFunctionToBeAdded) {
             sourceIvModel.removeObject(connection);
         }
     }
