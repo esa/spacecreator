@@ -25,7 +25,7 @@
 
 namespace ivmerger {
 
-static const qreal MARGIN = 100.0;
+static const int MARGIN = 300;
 
 /**
  * @brief   Merger that merges two interface view model

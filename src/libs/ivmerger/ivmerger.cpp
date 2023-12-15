@@ -165,22 +165,22 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
         QSet<ivm::IVFunctionType *> &insertedSourceFunctions)
 {
     // find place to insert new functions (if necessary)
-    qreal leftBorder = std::numeric_limits<double>::max();
-    qreal bottomBorder = std::numeric_limits<double>::min();
+    qreal rightBorder = std::numeric_limits<double>::min();
+    qreal topBorder = std::numeric_limits<double>::max();
     const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
     for (ivm::IVFunctionType *function : topLevelTargetFunctions) {
         const QString coordStr = function->entityAttributeValue<QString>(coordToken);
 
         const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
-        leftBorder = std::min(leftBorder, rect.left());
-        bottomBorder = std::max(bottomBorder, rect.bottom());
+        rightBorder = std::max(rightBorder, rect.right());
+        topBorder = std::min(topBorder, rect.top());
     }
 
-    if (leftBorder == std::numeric_limits<double>::max()) {
-        leftBorder = 0.0;
+    if (rightBorder == std::numeric_limits<double>::min()) {
+        rightBorder = 0.0;
     }
-    if (bottomBorder == std::numeric_limits<double>::min()) {
-        bottomBorder = 0.0;
+    if (topBorder == std::numeric_limits<double>::max()) {
+        topBorder = 0.0;
     }
 
     QVector<ivm::IVComment *> targetComments = targetIvModel.allObjectsByType<ivm::IVComment>();
@@ -188,8 +188,8 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
     for (ivm::IVComment *comment : targetComments) {
         const QString coordStr = comment->entityAttributeValue<QString>(coordToken);
         const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
-        leftBorder = std::min(leftBorder, rect.left());
-        bottomBorder = std::max(bottomBorder, rect.bottom());
+        rightBorder = std::max(rightBorder, rect.right());
+        topBorder = std::min(topBorder, rect.top());
     }
 
     // insert remaining top level functions from source to the target
@@ -214,8 +214,8 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
 
         // set new coordinates of sourceFunction
         QRectF coordinates = shared::graphicsviewutils::rect(sourceFunction->coordinates());
-        qreal xIfaceOffset = leftBorder - coordinates.x();
-        qreal yIfaceOffset = (bottomBorder + 40) - coordinates.y();
+        qreal xIfaceOffset = (rightBorder + MARGIN) - coordinates.x();
+        qreal yIfaceOffset = topBorder - coordinates.y();
         QVector<ivm::IVInterface *> interfaces = sourceFunction->interfaces();
         for (ivm::IVInterface *iface : interfaces) {
             QPointF ifacePos = shared::graphicsviewutils::pos(iface->coordinates());
@@ -223,11 +223,11 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
             iface->setCoordinates(shared::graphicsviewutils::coordinates(ifacePos));
         }
 
-        coordinates.moveTo(leftBorder, bottomBorder + 40);
+        coordinates.moveTo(rightBorder + MARGIN, topBorder);
         sourceFunction->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
 
-        // update bottomBorder
-        bottomBorder += 40 + coordinates.height();
+        // update rightBorder
+        rightBorder += MARGIN + coordinates.width();
 
         connectionsToRestore.insert(sourceFunction, connectionInfos);
     }
