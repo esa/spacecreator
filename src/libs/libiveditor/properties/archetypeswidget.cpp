@@ -131,12 +131,12 @@ void ArchetypesWidget::applyArchetypes()
             const auto ivFunction = m_model->getFunction();
             if (ivFunction->hasInterface(interface->title()))
             {
-                const auto existedInterface = ivFunction->getInterfaceByName(interface->title());
-                const auto existedInterfaceType = existedInterface->direction();
+                const auto existingInterface = ivFunction->getInterfaceByName(interface->title());
+                const auto existingInterfaceType = existingInterface->direction();
                 const auto interfaceType = interface->getInterfaceType();
 
-                if (((existedInterfaceType == ivm::IVInterface::InterfaceType::Required) && (interfaceType == ivm::InterfaceArchetype::InterfaceType::REQUIRED)) ||
-                    ((existedInterfaceType == ivm::IVInterface::InterfaceType::Provided) && (interfaceType == ivm::InterfaceArchetype::InterfaceType::PROVIDED)))
+                if (((existingInterfaceType == ivm::IVInterface::InterfaceType::Required) && (interfaceType == ivm::InterfaceArchetype::InterfaceType::REQUIRED)) ||
+                    ((existingInterfaceType == ivm::IVInterface::InterfaceType::Provided) && (interfaceType == ivm::InterfaceArchetype::InterfaceType::PROVIDED)))
                 {
                     const auto directionName = interfaceType == ivm::InterfaceArchetype::InterfaceType::REQUIRED ? "required" : "provided";
                     QMessageBox::warning(qApp->activeWindow(), tr("Duplicate interface"), 
