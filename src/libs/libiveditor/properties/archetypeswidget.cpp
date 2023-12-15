@@ -126,13 +126,26 @@ void ArchetypesWidget::applyArchetypes()
             continue;
         }
 
-        for (auto interface : functionArchetype->getInterfaces()) {
-            if (m_model->getFunction()->hasInterface(interface->title())) {
-                QMessageBox::warning(qApp->activeWindow(), tr("Duplicate interface"),
-                        tr("Function %1 already has an interface named %2")
-                                .arg(m_model->getFunction()->title())
-                                .arg(interface->title()));
-                continue;
+        for (auto interface : functionArchetype->getInterfaces())
+        {
+            const auto ivFunction = m_model->getFunction();
+            if (ivFunction->hasInterface(interface->title()))
+            {
+                const auto existedInterface = ivFunction->getInterfaceByName(interface->title());
+                const auto existedInterfaceType = existedInterface->direction();
+                const auto interfaceType = interface->getInterfaceType();
+
+                if (((existedInterfaceType == ivm::IVInterface::InterfaceType::Required) && (interfaceType == ivm::InterfaceArchetype::InterfaceType::REQUIRED)) ||
+                    ((existedInterfaceType == ivm::IVInterface::InterfaceType::Provided) && (interfaceType == ivm::InterfaceArchetype::InterfaceType::PROVIDED)))
+                {
+                    const auto directionName = interfaceType == ivm::InterfaceArchetype::InterfaceType::REQUIRED ? "required" : "provided";
+                    QMessageBox::warning(qApp->activeWindow(), tr("Duplicate interface"), 
+                                        tr("Function \"%1\" already contains the interface called \"%2\" with \"%3\" direction")
+                                        .arg(ivFunction->title())
+                                        .arg(interface->title())
+                                        .arg(directionName));
+                    continue;
+                }
             }
 
             ivm::IVInterface::CreationInfo creationInfo = generateCreationInfo(interface);
