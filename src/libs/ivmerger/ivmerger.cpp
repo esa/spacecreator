@@ -192,6 +192,16 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
         topBorder = std::min(topBorder, rect.top());
     }
 
+    // sort top level source functions on x postion
+    std::sort(topLevelSourceFunctions.begin(),
+          topLevelSourceFunctions.end(),
+          [](const ivm::IVFunctionType* a, const ivm::IVFunctionType* b) 
+          { 
+              QRectF coordinatesA = shared::graphicsviewutils::rect(a->coordinates());
+              QRectF coordinatesB = shared::graphicsviewutils::rect(b->coordinates());
+              return coordinatesA.x() < coordinatesB.x(); 
+          });
+
     // insert remaining top level functions from source to the target
     for (ivm::IVFunctionType *sourceFunction : topLevelSourceFunctions) {
         if (insertedSourceFunctions.contains(sourceFunction)) {
