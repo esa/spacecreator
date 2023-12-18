@@ -21,6 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "requirementsmanager.h"
 #include "requirementsmodelbase.h"
 #include "ui_requirementswidget.h"
+#include "widgetbar.h"
 
 #include <QCursor>
 #include <QDesktopServices>
@@ -41,6 +42,7 @@ RequirementsWidget::RequirementsWidget(
     , m_reqManager(manager)
     , m_model(model)
     , m_requirementsUrl(requirementsUrl)
+    , m_widgetBar(new WidgetBar(this))
 {
     ui->setupUi(this);
     m_textFilterModel.setDynamicSortFilter(true);
@@ -106,6 +108,7 @@ RequirementsWidget::RequirementsWidget(
     ui->tokenLineEdit->setToolTip(tokenTooltip);
     connect(ui->createTokenButton, &QPushButton::clicked, this, &RequirementsWidget::openTokenSettingsPage);
     ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
+    ui->verticalLayout->insertWidget(0, m_widgetBar);
 }
 
 bool RequirementsWidget::loadSavedCredentials()
@@ -303,7 +306,7 @@ void RequirementsWidget::fillTagBar(const QStringList &tags)
 
     for (const QString &tag : tags) {
         if (!tagButtonExists(tag)) {
-            auto button = new QToolButton(ui->tagFilterBar);
+            auto button = new QToolButton(m_widgetBar);
             button->setText(tag);
             button->setCheckable(true);
             connect(button, &QToolButton::toggled, this, [this](bool checked) {
@@ -319,7 +322,7 @@ void RequirementsWidget::fillTagBar(const QStringList &tags)
             });
 
             m_tagButtons.append(button);
-            ui->tagFilterBar->addWidget(button);
+            m_widgetBar->addWidget(button);
         }
     }
 }

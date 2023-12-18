@@ -27,6 +27,9 @@ target_sources(${LIB_NAME} PRIVATE
   ui/addnewrequirementdialog.h
   ui/addnewrequirementdialog.cpp
   ui/addnewrequirementdialog.ui
+  ui/widgetbar.h
+  ui/widgetbar.cpp
+  ui/widgetbar.ui
   requirementsresources.qrc
 )
 

@@ -38,6 +38,8 @@ namespace requirement {
 class RequirementsManager;
 class RequirementsModelBase;
 
+class WidgetBar;
+
 class RequirementsWidget : public QWidget
 {
     Q_OBJECT
@@ -79,6 +81,7 @@ private:
 
     Ui::RequirementsWidget *ui;
     QList<QToolButton *> m_tagButtons;
+    WidgetBar *m_widgetBar;
     QPointer<RequirementsManager> m_reqManager;
     QPointer<requirement::RequirementsModelBase> m_model;
     RequirementTextProxyModel m_textFilterModel;
