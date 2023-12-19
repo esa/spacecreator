@@ -516,6 +516,12 @@ void tst_IvMerger::test_ivMergeDataPoolConnections()
     sourceRouter->addChild(sourceRouterTc);
 
     ivm::IVFunction *sourceDataPool = ivm::testutils::createFunction("data_pool", nullptr, dataPoolId);
+    ivm::IVInterface *sourceDataPoolIface1 = ivm::testutils::createProvidedIface(sourceDataPool, "data_pool_load_parameter_value");
+    sourceDataPoolIface1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceDataPool->addChild(sourceDataPoolIface1);
+    ivm::IVInterface *sourceDataPoolIface2 = ivm::testutils::createProvidedIface(sourceDataPool, "data_pool_store_parameter_value");
+    sourceDataPoolIface2->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceDataPool->addChild(sourceDataPoolIface2);
 
     ivm::IVFunction *sourceApp = ivm::testutils::createFunction("application", nullptr, applicationId);
     ivm::IVInterface *sourceAppTc = ivm::testutils::createProvidedIface(sourceApp, "tc");
@@ -570,7 +576,7 @@ void tst_IvMerger::test_ivMergeDataPoolConnections()
     sourceApp->addChild(sourceAppDataPoolReq1);
     ivm::IVInterface *sourceAppDataPoolReq2 = ivm::testutils::createRequiredIface(sourceApp, "data_pool_store_parameter_value");
     sourceAppDataPoolReq1->setKind(ivm::IVInterface::OperationKind::Protected);
-    sourceApp->addChild(sourceAppDataPoolReq1);
+    sourceApp->addChild(sourceAppDataPoolReq2);
     auto sourceAppDataPoolReq1Connection = new ivm::IVConnection(sourceCapability3DataPoolReq1, sourceAppDataPoolReq1);
     auto sourceAppDataPoolReq2Connection = new ivm::IVConnection(sourceCapability3DataPoolReq2, sourceAppDataPoolReq2);
     sourceApp->addChild(sourceAppDataPoolReq1Connection);
