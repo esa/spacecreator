@@ -40,6 +40,7 @@ private Q_SLOTS:
     void test_ivMergeWithReplace();
     void test_ivMergeNestedFunctions();
     void test_capabilityRemovedFromTailoring();
+    void test_ivMergeDataPoolConnections();
 
 private:
     ivm::IVFunction *findFunction(QVector<ivm::IVFunction *> &list, const QString &name);
@@ -295,7 +296,7 @@ void tst_IvMerger::test_capabilityRemovedFromTailoring()
 
     app->addChild(capability1);
 
-    ivm::IVFunction *capability2 = ivm::testutils::createFunction("capability_1", nullptr, capability2Id);
+    ivm::IVFunction *capability2 = ivm::testutils::createFunction("capability_2", nullptr, capability2Id);
     ivm::IVInterface *capability2Req2 = ivm::testutils::createProvidedIface(capability2, "req21");
     capability2Req2->setKind(ivm::IVInterface::OperationKind::Protected);
     capability2->addChild(capability2Req2);
@@ -440,6 +441,212 @@ void tst_IvMerger::test_capabilityRemovedFromTailoring()
         QCOMPARE(firstConn->targetInterfaceName(), "req_1");
         QCOMPARE(firstConn->sourceName(), "capability_router");
         QCOMPARE(firstConn->sourceInterfaceName(), "req_1");
+    }
+}
+
+void tst_IvMerger::test_ivMergeDataPoolConnections()
+{
+    // required ids
+    shared::Id routerId = shared::createId();
+    shared::Id dataPoolId = shared::createId();
+    shared::Id applicationId = shared::createId();
+    shared::Id capabilityRouterId = shared::createId();
+    shared::Id capability1Id = shared::createId();
+    shared::Id capability2Id = shared::createId();
+    shared::Id capability3Id = shared::createId();
+
+    // target model
+    ivm::IVFunction *router = ivm::testutils::createFunction("router", nullptr, routerId);
+    ivm::IVInterface *routerTc = ivm::testutils::createRequiredIface(router, "tc");
+    routerTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    router->addChild(routerTc);
+
+    ivm::IVFunction *app = ivm::testutils::createFunction("application", nullptr, applicationId);
+    ivm::IVInterface *appTc = ivm::testutils::createProvidedIface(app, "tc");
+    appTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    app->addChild(appTc);
+
+    ivm::IVFunction *capabilityRouter =
+            ivm::testutils::createFunction("capability_router", nullptr, capabilityRouterId);
+    ivm::IVInterface *capabilityRouterTc = ivm::testutils::createProvidedIface(capabilityRouter, "tc");
+    appTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    capabilityRouter->addChild(capabilityRouterTc);
+    ivm::IVInterface *capabilityRouterReq1 = ivm::testutils::createRequiredIface(capabilityRouter, "req_1");
+    capabilityRouterReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    ivm::IVInterface *capabilityRouterReq2 = ivm::testutils::createRequiredIface(capabilityRouter, "req_2");
+    capabilityRouterReq2->setKind(ivm::IVInterface::OperationKind::Protected);
+    capabilityRouter->addChild(capabilityRouterReq1);
+    capabilityRouter->addChild(capabilityRouterReq2);
+
+    app->addChild(capabilityRouter);
+
+    ivm::IVFunction *capability1 = ivm::testutils::createFunction("capability_1", nullptr, capability1Id);
+    ivm::IVInterface *capability1Req1 = ivm::testutils::createProvidedIface(capability1, "req_1");
+    capability1Req1->setKind(ivm::IVInterface::OperationKind::Protected);
+    capability1->addChild(capability1Req1);
+
+    app->addChild(capability1);
+
+    ivm::IVFunction *capability2 = ivm::testutils::createFunction("capability_2", nullptr, capability2Id);
+    ivm::IVInterface *capability2Req2 = ivm::testutils::createProvidedIface(capability2, "req_2");
+    capability2Req2->setKind(ivm::IVInterface::OperationKind::Protected);
+    capability2->addChild(capability2Req2);
+
+    app->addChild(capability2);
+
+    ivm::IVConnection *connReq1 = ivm::testutils::createConnection(capabilityRouter, capability1, "req_1");
+    ivm::IVConnection *connReq2 = ivm::testutils::createConnection(capabilityRouter, capability2, "req_2");
+
+    app->addChild(connReq1);
+    app->addChild(connReq2);
+
+    ivm::IVConnection *connAppTc = ivm::testutils::createConnection(app, capabilityRouter, "tc");
+    app->addChild(connAppTc);
+
+    ivm::IVConnection *connTc = ivm::testutils::createConnection(router, app, "tc");
+
+    ivm::IVModel targetModel(m_dynPropConfig);
+    const QVector<ivm::IVObject *> targetObjects { router, app, connTc };
+    targetModel.addObjects(targetObjects);
+
+    // source model
+    ivm::IVFunction *sourceRouter = ivm::testutils::createFunction("router", nullptr, routerId);
+    ivm::IVInterface *sourceRouterTc = ivm::testutils::createRequiredIface(sourceRouter, "tc");
+    sourceRouterTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceRouter->addChild(sourceRouterTc);
+
+    ivm::IVFunction *sourceDataPool = ivm::testutils::createFunction("data_pool", nullptr, dataPoolId);
+
+    ivm::IVFunction *sourceApp = ivm::testutils::createFunction("application", nullptr, applicationId);
+    ivm::IVInterface *sourceAppTc = ivm::testutils::createProvidedIface(sourceApp, "tc");
+    sourceAppTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceApp->addChild(sourceAppTc);
+
+    ivm::IVFunction *sourceCapabilityRouter =
+            ivm::testutils::createFunction("capability_router", nullptr, capabilityRouterId);
+    ivm::IVInterface *sourceCapabilityRouterTc = ivm::testutils::createProvidedIface(sourceCapabilityRouter, "tc");
+    sourceAppTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapabilityRouter->addChild(sourceCapabilityRouterTc);
+    ivm::IVInterface *sourceCapabilityRouterReq1 = ivm::testutils::createRequiredIface(sourceCapabilityRouter, "req_1");
+    sourceCapabilityRouterReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapabilityRouter->addChild(sourceCapabilityRouterReq1);
+    ivm::IVInterface *sourceCapabilityRouterReq2 = ivm::testutils::createRequiredIface(sourceCapabilityRouter, "req_2");
+    sourceCapabilityRouterReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapabilityRouter->addChild(sourceCapabilityRouterReq2);
+    ivm::IVInterface *sourceCapabilityRouterReq3 = ivm::testutils::createRequiredIface(sourceCapabilityRouter, "req_3");
+    sourceCapabilityRouterReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapabilityRouter->addChild(sourceCapabilityRouterReq3);
+
+    sourceApp->addChild(sourceCapabilityRouter);
+
+    ivm::IVFunction *sourceCapability1 = ivm::testutils::createFunction("capability_1", nullptr, capability1Id);
+    ivm::IVInterface *sourceCapability1Req1 = ivm::testutils::createProvidedIface(capability1, "req_1");
+    sourceCapability1Req1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapability1->addChild(sourceCapability1Req1);
+
+    sourceApp->addChild(sourceCapability1);
+
+    ivm::IVFunction *sourceCapability2 = ivm::testutils::createFunction("capability_2", nullptr, capability2Id);
+    ivm::IVInterface *sourceCapability2Req2 = ivm::testutils::createProvidedIface(sourceCapability2, "req_2");
+    sourceCapability2Req2->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapability2->addChild(sourceCapability2Req2);
+
+    sourceApp->addChild(sourceCapability2);
+
+    ivm::IVFunction *sourceCapability3 = ivm::testutils::createFunction("capability_3", nullptr, capability3Id);
+    ivm::IVInterface *sourceCapability3Req3 = ivm::testutils::createProvidedIface(sourceCapability3, "req_3");
+    sourceCapability3Req3->setKind(ivm::IVInterface::OperationKind::Protected);
+    ivm::IVInterface *sourceCapability3DataPoolReq1 = ivm::testutils::createRequiredIface(sourceCapability3, "data_pool_load_parameter_value");
+    sourceCapability3DataPoolReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    ivm::IVInterface *sourceCapability3DataPoolReq2 = ivm::testutils::createRequiredIface(sourceCapability3, "data_pool_store_parameter_value");
+    sourceCapability3DataPoolReq2->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapability3->addChild(sourceCapability3DataPoolReq1);
+    sourceCapability3->addChild(sourceCapability3DataPoolReq2);
+
+    sourceApp->addChild(sourceCapability3);
+
+    ivm::IVInterface *sourceAppDataPoolReq1 = ivm::testutils::createRequiredIface(sourceApp, "data_pool_load_parameter_value");
+    sourceAppDataPoolReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceApp->addChild(sourceAppDataPoolReq1);
+    ivm::IVInterface *sourceAppDataPoolReq2 = ivm::testutils::createRequiredIface(sourceApp, "data_pool_store_parameter_value");
+    sourceAppDataPoolReq1->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceApp->addChild(sourceAppDataPoolReq1);
+    auto sourceAppDataPoolReq1Connection = new ivm::IVConnection(sourceCapability3DataPoolReq1, sourceAppDataPoolReq1);
+    auto sourceAppDataPoolReq2Connection = new ivm::IVConnection(sourceCapability3DataPoolReq2, sourceAppDataPoolReq2);
+    sourceApp->addChild(sourceAppDataPoolReq1Connection);
+    sourceApp->addChild(sourceAppDataPoolReq2Connection);
+
+    ivm::IVConnection *sourceConnReq1 = ivm::testutils::createConnection(sourceCapabilityRouter, sourceCapability1, "req_1");
+    ivm::IVConnection *sourceConnReq2 = ivm::testutils::createConnection(sourceCapabilityRouter, sourceCapability2, "req_2");
+    ivm::IVConnection *sourceConnReq3 = ivm::testutils::createConnection(sourceCapabilityRouter, sourceCapability3, "req_3");
+
+    sourceApp->addChild(sourceConnReq1);
+    sourceApp->addChild(sourceConnReq2);
+    sourceApp->addChild(sourceConnReq3);
+
+    ivm::IVConnection *sourceConnAppTc = ivm::testutils::createConnection(sourceApp, sourceCapabilityRouter, "tc");
+    sourceApp->addChild(sourceConnAppTc);
+
+    ivm::IVConnection *sourceConnTc = ivm::testutils::createConnection(sourceRouter, sourceApp, "tc");
+
+    ivm::IVConnection *sourceDataPoolConn1 = ivm::testutils::createConnection(sourceApp, sourceDataPool, "data_pool_load_parameter_value");
+    ivm::IVConnection *sourceDataPoolConn2 = ivm::testutils::createConnection(sourceApp, sourceDataPool, "data_pool_store_parameter_value");
+
+    ivm::IVModel sourceModel(m_dynPropConfig);
+    const QVector<ivm::IVObject *> sourceObjects { sourceRouter, sourceDataPool, sourceApp, sourceConnTc, sourceDataPoolConn1, sourceDataPoolConn2 };
+    sourceModel.addObjects(sourceObjects);
+
+    ivmerger::IvMerger merger;
+    merger.mergeInterfaceViews(targetModel, sourceModel);
+
+    QVector<ivm::IVFunction *> allTargetFunctions = targetModel.allObjectsByType<ivm::IVFunction>();
+
+    QCOMPARE(allTargetFunctions.size(), 3);
+
+    ivm::IVFunction *resultRouter = findFunction(allTargetFunctions, "router");
+    ivm::IVFunction *resultApplication = findFunction(allTargetFunctions, "application");
+    ivm::IVFunction *resultDataPool = findFunction(allTargetFunctions, "data_pool");
+
+    QVERIFY(resultRouter != nullptr);
+    QVERIFY(resultApplication != nullptr);
+    QVERIFY(resultDataPool != nullptr);
+
+    QVector<ivm::IVInterface *> resultApplicationInterfaces = resultApplication->interfaces();
+    QCOMPARE(resultApplicationInterfaces.size(), 3);
+
+    ivm::IVInterface *resultAppInterface1 = findInterface(resultApplicationInterfaces, "data_pool_load_parameter_value");
+    ivm::IVInterface *resultAppInterface2 = findInterface(resultApplicationInterfaces, "data_pool_store_parameter_value");
+
+    QVERIFY(resultAppInterface1 != nullptr);
+    QVERIFY(resultAppInterface2 != nullptr);
+
+    QVector<ivm::IVInterface *> resultDataPoolInterfaces = resultDataPool->interfaces();
+    QCOMPARE(resultDataPoolInterfaces.size(), 2);
+
+    ivm::IVInterface *resultDataPoolInterface1 = findInterface(resultDataPoolInterfaces, "data_pool_load_parameter_value");
+    ivm::IVInterface *resultDataPoolInterface2 = findInterface(resultDataPoolInterfaces, "data_pool_store_parameter_value");
+
+    QVERIFY(resultDataPoolInterface1 != nullptr);
+    QVERIFY(resultDataPoolInterface2 != nullptr);
+
+    QCOMPARE(targetModel.allObjectsByType<ivm::IVConnection>().size(), 3);
+
+    for (ivm::IVConnection *conn : targetModel.allObjectsByType<ivm::IVConnection>())
+    {
+        if(conn->targetName() == "application")
+        {
+            continue;
+        }
+        QCOMPARE(conn->targetName(), "data_pool");
+
+        if(conn->sourceInterfaceName() != "data_pool_load_parameter_value")
+        {
+            QCOMPARE(conn->sourceInterfaceName(), "data_pool_store_parameter_value");
+        }
+        if(conn->sourceInterfaceName() != "data_pool_store_parameter_value")
+        {
+            QCOMPARE(conn->sourceInterfaceName(), "data_pool_load_parameter_value");
+        }
     }
 }
 
