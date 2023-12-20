@@ -72,8 +72,7 @@ void PropertiesDialog::insertTab(QWidget *widget, const QString &tabName, int id
 void PropertiesDialog::removeTab(QWidget *containedWidget)
 {
     auto index = d->ui->tabWidget->indexOf(containedWidget);
-    if (index > -1)
-    {
+    if (index > -1) {
         d->ui->tabWidget->removeTab(index);
     }
 }
@@ -88,7 +87,7 @@ void PropertiesDialog::initStyleView()
     if (auto obj = dataObject()) {
         auto colorHandlerEditor = new ColorHandlerEditor(this);
         colorHandlerEditor->setInteractiveObject(d->uiObject, propertiesConfig());
-        insertTab(colorHandlerEditor, tr("Style configuration"), getTabCount());
+        insertTab(colorHandlerEditor, tr("Style"), getTabCount());
         connect(colorHandlerEditor, &ColorHandlerEditor::entityAttributeChanged, this,
                 [this](const EntityAttribute &entityAttr) {
                     auto styleChangeCmd =
