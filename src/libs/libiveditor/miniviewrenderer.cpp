@@ -249,9 +249,9 @@ void MiniViewRenderer::updateData()
             std::swap(outerRect, innerRect);
         }
 
-        const topohelp::cnct::ConnectionEnvInfo connectionInfo { outerRect, outerPos, innerRect, innerPos,
+        const topohelp::connection::ConnectionEnvInfo connectionInfo { outerRect, outerPos, innerRect, innerPos,
             mappedRects };
-        d->polygons[connectionData.connectionId] = topohelp::cnct::createConnectionPath(connectionInfo);
+        d->polygons[connectionData.connectionId] = topohelp::connection::createConnectionPath(connectionInfo);
     }
 }
 

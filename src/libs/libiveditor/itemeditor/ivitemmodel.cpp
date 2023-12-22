@@ -487,8 +487,8 @@ void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj)
         }
     }
 
-    const topohelp::cnct::ConnectionEnvInfo connectionInfo { startRect, startPos, endRect, endPos, siblingRects };
-    const QVector<QPointF> points = topohelp::cnct::createConnectionPath(connectionInfo);
+    const topohelp::connection::ConnectionEnvInfo connectionInfo { startRect, startPos, endRect, endPos, siblingRects };
+    const QVector<QPointF> points = topohelp::connection::createConnectionPath(connectionInfo);
     connection->setCoordinates(topohelp::geom::coordinates(points));
     if (obj->parentObject()) {
         obj->setAttributeExportable(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates), false);

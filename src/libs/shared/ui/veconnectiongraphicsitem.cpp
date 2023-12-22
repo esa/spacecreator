@@ -70,7 +70,7 @@ static inline QVector<QPointF> generateConnectionPath(VEConnectionGraphicsItem *
     const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
     const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
 
-    using namespace topohelp::cnct;
+    using namespace topohelp::connection;
     const ConnectionEnvInfo connectionInfo { startItem->targetItem()->sceneBoundingRect(),
         startItem->connectionEndPoint(isStartEndpointNested), endItem->targetItem()->sceneBoundingRect(),
         endItem->connectionEndPoint(isEndEndpointNested), graphicsviewutils::siblingItemsRects(connection) };

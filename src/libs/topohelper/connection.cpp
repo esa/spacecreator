@@ -4,7 +4,7 @@
 #include <QList>
 
 namespace topohelp {
-namespace cnct {
+namespace connection {
 
 /*!
  * \brief createConnectionPath
@@ -46,6 +46,6 @@ PointsList createConnectionPath(const ConnectionEnvInfo &info)
     return topohelp::geom::simplifyPoints(points);
 }
 
-} // namespace cnct
+} // namespace connection
 
 } // namespace topohelp

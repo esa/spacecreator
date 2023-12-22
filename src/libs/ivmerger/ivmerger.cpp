@@ -378,8 +378,8 @@ void IvMerger::realizeConnection(ivm::IVModel &ivModel, const QVector<ivm::IVFun
     const QRectF startRect = topohelp::geom::rect(fromFunction->coordinates());
     const QRectF endRect = topohelp::geom::rect(toFunction->coordinates());
 
-    const topohelp::cnct::ConnectionEnvInfo connectionInfo { startRect, startPos, endRect, endPos, sibilingRects };
-    const QVector<QPointF> points = topohelp::cnct::createConnectionPath(connectionInfo);
+    const topohelp::connection::ConnectionEnvInfo connectionInfo { startRect, startPos, endRect, endPos, sibilingRects };
+    const QVector<QPointF> points = topohelp::connection::createConnectionPath(connectionInfo);
 
     ivm::IVConnection *newConnection = new ivm::IVConnection(fromInterface, toInterface);
     ivModel.addObject(newConnection);

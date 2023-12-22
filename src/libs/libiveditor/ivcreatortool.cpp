@@ -819,11 +819,11 @@ static inline QVector<QPointF> generateConnectionPoints(IVItemModel *model, shar
 
     QGraphicsItem *siblingItem = isStartEndpointNested ? startItem->targetItem() : endItem->targetItem();
 
-    const topohelp::cnct::ConnectionEnvInfo connectionInfo { startItem->targetItem()->sceneBoundingRect(),
+    const topohelp::connection::ConnectionEnvInfo connectionInfo { startItem->targetItem()->sceneBoundingRect(),
         startItem->connectionEndPoint(isStartEndpointNested), endItem->targetItem()->sceneBoundingRect(),
         endItem->connectionEndPoint(isEndEndpointNested), shared::graphicsviewutils::siblingItemsRects(siblingItem) };
 
-    return topohelp::cnct::createConnectionPath(connectionInfo);
+    return topohelp::connection::createConnectionPath(connectionInfo);
 }
 
 void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints)

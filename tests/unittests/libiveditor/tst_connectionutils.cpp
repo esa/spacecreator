@@ -302,7 +302,7 @@ void tst_ConnectionUtils::tst_createConnectionPath()
     const QRectF r1 = f1->sceneBoundingRect();
     const QRectF r2 = f2->sceneBoundingRect();
 
-    using namespace topohelp::cnct;
+    using namespace topohelp::connection;
     const ConnectionEnvInfo connectionInfo { r1, QPointF(r1.x(), r1.y() + 100), r2, QPointF(r2.right(), r2.y() + 100),
         existingRects() };
     QVector<QPointF> path = createConnectionPath(connectionInfo);
@@ -552,11 +552,11 @@ void tst_ConnectionUtils::checkEndPoints(ive::IVFunctionGraphicsItem *startFn, D
             QCOMPARE(result.connectionPoints, connectionPoints);
         }
 
-        const topohelp::cnct::ConnectionEnvInfo connectionInfo { start.rect(),
+        const topohelp::connection::ConnectionEnvInfo connectionInfo { start.rect(),
             isReversed ? result.connectionPoints.last() : result.connectionPoints.first(), end.rect(),
             isReversed ? result.connectionPoints.first() : result.connectionPoints.last(), existingRects() };
 
-        const auto path = topohelp::cnct::createConnectionPath(connectionInfo);
+        const auto path = topohelp::connection::createConnectionPath(connectionInfo);
         QVERIFY(!path.isEmpty());
     }
 }

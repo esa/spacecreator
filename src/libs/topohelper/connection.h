@@ -3,7 +3,7 @@
 #include "geometry.h"
 
 namespace topohelp {
-namespace cnct {
+namespace connection {
 
 struct ConnectionEnvInfo {
     QRectF objFrom;
@@ -15,5 +15,5 @@ struct ConnectionEnvInfo {
 
 PointsList createConnectionPath(const ConnectionEnvInfo &info);
 
-} // namespace cnct
+} // namespace connection
 } // namespace topohelp
