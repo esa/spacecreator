@@ -322,7 +322,7 @@ PointsList findPath(const RectsList &existingRects, const QLineF &startDirection
 /*!
  * Returns the total length of all subsegments of \a polygon.
  */
-qreal distancePolygon(const PointsList &polygon)
+qreal calcDistance(const PointsList &polygon)
 {
     qreal distance = 0;
     for (auto it = std::next(polygon.constBegin()); it != polygon.constEnd(); ++it) {
@@ -339,7 +339,7 @@ PointsList sortedCorners(const QRectF &area, const QPointF &point1, const QPoint
 {
     PointsList rectPoints { area.topLeft(), area.topRight(), area.bottomLeft(), area.bottomRight() };
     std::sort(rectPoints.begin(), rectPoints.end(), [=](const QPointF &pnt1, const QPointF &pnt2) {
-        return distancePolygon({ point1, pnt1, point2 }) < distancePolygon({ point1, pnt2, point2 });
+        return calcDistance({ point1, pnt1, point2 }) < calcDistance({ point1, pnt2, point2 });
     });
     return rectPoints;
 }
@@ -464,7 +464,7 @@ PointsList path(const RectsList &existingRects, const QLineF &startDirection, co
         if (!results.isEmpty()) {
             std::sort(results.begin(), results.end(), [](const PointsList &pnt1, const PointsList &pont2) {
                 if (pnt1.size() == pont2.size()) {
-                    return distancePolygon(pnt1) < distancePolygon(pont2);
+                    return calcDistance(pnt1) < calcDistance(pont2);
                 }
 
                 return pnt1.size() < pont2.size();
@@ -530,7 +530,7 @@ PointsList path(const RectsList &existingRects, const QPointF &startPoint, const
         if (path.size() < 2) {
             continue;
         }
-        const qreal length = distancePolygon(path);
+        const qreal length = calcDistance(path);
         if (minLength > length && !qFuzzyIsNull(length)) {
             minLength = length;
             shortestPath = path;
