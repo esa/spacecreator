@@ -197,8 +197,8 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
     // sort top level source functions on x postion
     std::sort(topLevelSourceFunctions.begin(), topLevelSourceFunctions.end(),
             [](const ivm::IVFunctionType *a, const ivm::IVFunctionType *b) {
-                QRectF coordinatesA = shared::graphicsviewutils::rect(a->coordinates());
-                QRectF coordinatesB = shared::graphicsviewutils::rect(b->coordinates());
+                QRectF coordinatesA = topohelp::geom::rect(a->coordinates());
+                QRectF coordinatesB = topohelp::geom::rect(b->coordinates());
                 return coordinatesA.x() < coordinatesB.x();
             });
 
@@ -223,15 +223,9 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
         reparentRecursive(targetIvModel, sourceFunction);
 
         // set new coordinates of sourceFunction
-<<<<<<< HEAD
-        QRectF coordinates = shared::graphicsviewutils::rect(sourceFunction->coordinates());
+        QRectF coordinates = topohelp::geom::rect(sourceFunction->coordinates());
         qreal xIfaceOffset = (rightBorder + MARGIN) - coordinates.x();
         qreal yIfaceOffset = topBorder - coordinates.y();
-=======
-        QRectF coordinates = topohelp::geom::rect(sourceFunction->coordinates());
-        qreal xIfaceOffset = leftBorder - coordinates.x();
-        qreal yIfaceOffset = (bottomBorder + 40) - coordinates.y();
->>>>>>> 9bbeab83b (graphicsviewutils' methods moved to a topohelper, documentation updated)
         QVector<ivm::IVInterface *> interfaces = sourceFunction->interfaces();
         for (ivm::IVInterface *iface : interfaces) {
             QPointF ifacePos = topohelp::geom::pos(iface->coordinates());
@@ -239,13 +233,8 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
             iface->setCoordinates(topohelp::geom::coordinates(ifacePos));
         }
 
-<<<<<<< HEAD
         coordinates.moveTo(rightBorder + MARGIN, topBorder);
-        sourceFunction->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
-=======
-        coordinates.moveTo(leftBorder, bottomBorder + 40);
         sourceFunction->setCoordinates(topohelp::geom::coordinates(coordinates));
->>>>>>> 9bbeab83b (graphicsviewutils' methods moved to a topohelper, documentation updated)
 
         // update rightBorder
         rightBorder += MARGIN + coordinates.width();

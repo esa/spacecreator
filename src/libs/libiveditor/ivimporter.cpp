@@ -85,7 +85,7 @@ void IVImporter::pasteItems()
     QPointF sceneDropPoint;
     if (m_graphicsView->viewport()
                     ->rect()
-                    .marginsRemoved(shared::graphicsviewutils::kContentMargins.toMargins())
+                    .marginsRemoved(topohelp::kContentMargins.toMargins())
                     .contains(viewportCursorPos)) {
         sceneDropPoint = m_graphicsView->mapToScene(viewportCursorPos);
     }
