@@ -23,6 +23,8 @@
 #include "ivconnection.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
+#include "topohelper/connection.h"
+#include "topohelper/geometry.h"
 
 #include <QGraphicsView>
 #include <QLabel>
@@ -145,8 +147,7 @@ void MiniViewRenderer::updateData()
         auto token = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
         const QString strCoordinates = child->entityAttributeValue<QString>(token);
         if (rectangleEntityTypes.contains(child->type())) {
-            const QRectF itemSceneRect =
-                    shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(strCoordinates));
+            const QRectF itemSceneRect = topohelp::geom::rect(ivm::IVObject::coordinatesFromString(strCoordinates));
             if (itemSceneRect.isValid()) {
                 nestedRect |= itemSceneRect;
                 rectItems.insert(child->id(), itemSceneRect);
@@ -160,7 +161,7 @@ void MiniViewRenderer::updateData()
                 continue;
             }
             const QPolygonF itemScenePoints =
-                    shared::graphicsviewutils::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
+                    topohelp::geom::polygon(ivm::IVObject::coordinatesFromString(strCoordinates));
 
             if (connection->source()->id() != d->item->entity()->id()
                     && connection->target()->id() != d->item->entity()->id()) { // Child <> Child Connection
@@ -195,7 +196,7 @@ void MiniViewRenderer::updateData()
                     const QString ifaceStrCoordinates = innerIface->entityAttributeValue<QString>(innerIfacePosStr);
                     innerIfacePos = ifaceStrCoordinates.isEmpty()
                             ? QPointF(-1, -1)
-                            : shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
+                            : topohelp::geom::pos(ivm::IVObject::coordinatesFromString(ifaceStrCoordinates));
                     const ConnectionData cd { outerIfaceItem->scenePos(), innerIfacePos,
                         innerIface->parentObject()->id(), connection->id(),
                         outerIface->id() == connection->sourceInterface()->id() };
@@ -210,7 +211,7 @@ void MiniViewRenderer::updateData()
     while (!itemsWithoutGeometry.isEmpty()) {
         const shared::Id id = itemsWithoutGeometry.takeLast();
         QRectF itemRect { QPointF(), topohelp::kDefaultGraphicsItemSize };
-        shared::graphicsviewutils::findGeometryForRect(itemRect, nestedRect, d->rects.values());
+        topohelp::geom::findGeometryForRect(itemRect, nestedRect, d->rects.values());
         rectItems.insert(id, itemRect);
     }
 
@@ -238,8 +239,8 @@ void MiniViewRenderer::updateData()
                 (outerRect.bottom() - outerPos.y()) / outerRect.height() };
             const qreal x = innerRect.left() + innerRect.width() * ratio.x();
             const qreal y = innerRect.top() + innerRect.height() * ratio.y();
-            const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(outerRect, outerPos);
-            innerPos = shared::graphicsviewutils::getSidePosition(innerRect, QPointF(x, y), side);
+            const Qt::Alignment side = topohelp::geom::getNearestSide(outerRect, outerPos);
+            innerPos = topohelp::geom::getSidePosition(innerRect, QPointF(x, y), side);
         } else {
             innerPos = transform.map(connectionData.innerScenePos);
         }
@@ -247,8 +248,10 @@ void MiniViewRenderer::updateData()
             std::swap(outerPos, innerPos);
             std::swap(outerRect, innerRect);
         }
-        d->polygons[connectionData.connectionId] =
-                shared::graphicsviewutils::createConnectionPath(mappedRects, outerPos, outerRect, innerPos, innerRect);
+
+        const topohelp::cnct::ConnectionEnvInfo connectionInfo { outerRect, outerPos, innerRect, innerPos,
+            mappedRects };
+        d->polygons[connectionData.connectionId] = topohelp::cnct::createConnectionPath(connectionInfo);
     }
 }
 

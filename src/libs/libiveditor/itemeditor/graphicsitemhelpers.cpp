@@ -32,6 +32,7 @@
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivobject.h"
+#include "topohelper/geometry.h"
 #include "ui/veinteractiveobject.h"
 
 #include <QGraphicsScene>
@@ -205,10 +206,10 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     ivm::ValidationResult result;
     result.connectionPoints = points;
     result.functionAtStartPos = shared::graphicsviewutils::nearestItem(scene,
-            topohelp::utils::adjustFromPoint(startPos, topohelp::kFunctionTolerance),
+            topohelp::geom::adjustFromPoint(startPos, topohelp::kFunctionTolerance),
             { ive::IVFunctionGraphicsItem::Type });
     result.functionAtEndPos = shared::graphicsviewutils::nearestItem(scene,
-            topohelp::utils::adjustFromPoint(endPos, topohelp::kFunctionTolerance),
+            topohelp::geom::adjustFromPoint(endPos, topohelp::kFunctionTolerance),
             { ive::IVFunctionGraphicsItem::Type });
     result.startObject = ive::gi::functionObject(result.functionAtStartPos);
     result.endObject = ive::gi::functionObject(result.functionAtEndPos);
@@ -223,7 +224,7 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
 
     const auto startIfaceItem =
             qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(scene,
-                    topohelp::utils::adjustFromPoint(startPos, topohelp::kInterfaceTolerance),
+                    topohelp::geom::adjustFromPoint(startPos, topohelp::kInterfaceTolerance),
                     { ive::IVInterfaceGraphicsItem::Type }));
 
     static const QMarginsF kToleranceMargins = { topohelp::kInterfaceTolerance / 2, topohelp::kInterfaceTolerance / 2,
@@ -234,7 +235,7 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
         result.startIface = startIfaceItem->entity();
         result.startPointAdjusted =
                 startIfaceItem->connectionEndPoint(result.functionAtStartPos->isAncestorOf(result.functionAtEndPos));
-    } else if (!topohelp::utils::intersects(
+    } else if (!topohelp::geom::intersects(
                        result.functionAtStartPos->sceneBoundingRect(), connectionLine, &result.startPointAdjusted)) {
         result.setFailed(ivm::ConnectionCreationValidator::FailReason::CannotCreateStartIface);
         return result;
@@ -246,13 +247,13 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     }
 
     const auto endIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(
-            scene, topohelp::utils::adjustFromPoint(endPos, topohelp::kInterfaceTolerance),
+            scene, topohelp::geom::adjustFromPoint(endPos, topohelp::kInterfaceTolerance),
             { ive::IVInterfaceGraphicsItem::Type }));
     if (endIfaceItem && endIfaceItem->ifaceShape().boundingRect().marginsAdded(kToleranceMargins).contains(endPos)) {
         result.endIface = endIfaceItem->entity();
         result.endPointAdjusted =
                 endIfaceItem->connectionEndPoint(result.functionAtEndPos->isAncestorOf(result.functionAtStartPos));
-    } else if (!topohelp::utils::intersects(
+    } else if (!topohelp::geom::intersects(
                        result.functionAtEndPos->sceneBoundingRect(), connectionLine, &result.endPointAdjusted)) {
         result.setFailed(ivm::ConnectionCreationValidator::FailReason::CannotCreateEndIface);
         return result;

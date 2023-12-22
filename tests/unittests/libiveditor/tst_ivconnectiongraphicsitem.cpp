@@ -27,6 +27,7 @@
 #include "ivpropertytemplateconfig.h"
 #include "sharedlibrary.h"
 #include "standardpaths.h"
+#include "topohelper/geometry.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -147,9 +148,9 @@ void tst_IVConnectionGraphicsItem::tst_Overlapping()
 
 bool tst_IVConnectionGraphicsItem::checkIntersections(ive::IVConnectionGraphicsItem *connection)
 {
-    const QRectF itemRect = shared::graphicsviewutils::getNearestIntersectedRect(
-            shared::graphicsviewutils::siblingItemsRects(connection), connection->points(),
-            topohelp::IntersectionType::Single);
+    const QRectF itemRect =
+            topohelp::geom::getNearestIntersectedRect(shared::graphicsviewutils::siblingItemsRects(connection),
+                    connection->points(), topohelp::IntersectionType::Single);
 
     return itemRect.isValid();
 }

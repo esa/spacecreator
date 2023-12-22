@@ -23,6 +23,7 @@
 #include "ivfunction.h"
 #include "ivlibrary.h"
 #include "sharedlibrary.h"
+#include "topohelper/geometry.h"
 
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
@@ -61,9 +62,9 @@ void tst_Utils::testCheckCollision()
     const QRectF rectNotCollided { 225, 225, 50, 50 };
     QRectF intersected;
     QRectF notIntersected;
-    QVERIFY(shared::graphicsviewutils::isCollided(rects, rectCollided, &intersected));
+    QVERIFY(topohelp::geom::isCollided(rects, rectCollided, &intersected));
     QVERIFY(intersected == rects.at(3));
-    QVERIFY(shared::graphicsviewutils::isCollided(rects, rectNotCollided, &notIntersected) == false);
+    QVERIFY(topohelp::geom::isCollided(rects, rectNotCollided, &notIntersected) == false);
     QVERIFY(!notIntersected.isValid());
 }
 
@@ -71,35 +72,35 @@ void tst_Utils::testAdjustedRect()
 {
     const QRectF itemRect { 100, 100, 100, 100 };
     const QRectF intersectedItemRect { 150, 150, 100, 100 };
-    QVERIFY(shared::graphicsviewutils::adjustedRect(
+    QVERIFY(topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, Qt::AlignLeft, topohelp::LookupDirection::Clockwise)
                     .bottom()
             < intersectedItemRect.top());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(
+    QVERIFY(topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, Qt::AlignLeft, topohelp::LookupDirection::CounterClockwise)
                     .top()
             > intersectedItemRect.bottom());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(
+    QVERIFY(topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, Qt::AlignTop, topohelp::LookupDirection::Clockwise)
                     .left()
             > intersectedItemRect.right());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(
+    QVERIFY(topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, Qt::AlignTop, topohelp::LookupDirection::CounterClockwise)
                     .right()
             < intersectedItemRect.left());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(
+    QVERIFY(topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, Qt::AlignRight, topohelp::LookupDirection::Clockwise)
                     .top()
             > intersectedItemRect.bottom());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(
+    QVERIFY(topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, Qt::AlignRight, topohelp::LookupDirection::CounterClockwise)
                     .bottom()
             < intersectedItemRect.top());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(
+    QVERIFY(topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, Qt::AlignBottom, topohelp::LookupDirection::Clockwise)
                     .right()
             < intersectedItemRect.left());
-    QVERIFY(shared::graphicsviewutils::adjustedRect(
+    QVERIFY(topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, Qt::AlignBottom, topohelp::LookupDirection::CounterClockwise)
                     .left()
             > intersectedItemRect.right());
@@ -108,7 +109,7 @@ void tst_Utils::testAdjustedRect()
     for (int idx = 0; idx < me.keyCount(); ++idx) {
         const auto align = static_cast<Qt::Alignment>(me.value(idx));
         if (!topohelp::kRectSides.contains(align)) {
-            QVERIFY(!shared::graphicsviewutils::adjustedRect(
+            QVERIFY(!topohelp::geom::adjustedRect(
                     itemRect, intersectedItemRect, align, topohelp::LookupDirection::Clockwise)
                              .isValid());
         }
@@ -122,10 +123,10 @@ void tst_Utils::testCollidingRect()
         { 200, 200, 100, 100 },
         { 0, 200, 100, 100 },
     };
-    QVERIFY(shared::graphicsviewutils::collidingRect(QRectF(200, 0, 100, 100), existingRects).isNull());
-    QCOMPARE(shared::graphicsviewutils::collidingRect(QRectF(150, 150, 100, 100), existingRects), existingRects.at(1));
-    QCOMPARE(shared::graphicsviewutils::collidingRect(QRectF(-50, 150, 300, 300), existingRects), existingRects.at(1));
-    QCOMPARE(shared::graphicsviewutils::collidingRect(QRectF(-50, 150, 200, 200), existingRects), existingRects.at(2));
+    QVERIFY(topohelp::geom::collidingRect(QRectF(200, 0, 100, 100), existingRects).isNull());
+    QCOMPARE(topohelp::geom::collidingRect(QRectF(150, 150, 100, 100), existingRects), existingRects.at(1));
+    QCOMPARE(topohelp::geom::collidingRect(QRectF(-50, 150, 300, 300), existingRects), existingRects.at(1));
+    QCOMPARE(topohelp::geom::collidingRect(QRectF(-50, 150, 200, 200), existingRects), existingRects.at(2));
 }
 
 void tst_Utils::testSiblingSceneRects()
@@ -179,12 +180,12 @@ void tst_Utils::testFindGeometryForRect()
         br |= r;
 
     QRectF boundingRect { br };
-    shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
+    topohelp::geom::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br == boundingRect);
 
     existingRects << itemRect;
-    shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
+    topohelp::geom::findGeometryForRect(itemRect, boundingRect, existingRects, QMarginsF());
     QVERIFY(boundingRect.contains(itemRect));
     QVERIFY(br != boundingRect);
 
@@ -192,7 +193,7 @@ void tst_Utils::testFindGeometryForRect()
     itemRect = QRectF();
     QRectF boundingRectOriginal(100, 50, 300, 200);
     boundingRect = boundingRectOriginal;
-    shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, {}, QMarginsF(10, 10, 10, 10));
+    topohelp::geom::findGeometryForRect(itemRect, boundingRect, {}, QMarginsF(10, 10, 10, 10));
     QVERIFY(boundingRect.contains(itemRect));
     QCOMPARE(boundingRect, boundingRectOriginal);
 
@@ -200,7 +201,7 @@ void tst_Utils::testFindGeometryForRect()
     itemRect = QRectF();
     boundingRectOriginal = QRectF(100, 50, 150, 50);
     boundingRect = boundingRectOriginal;
-    shared::graphicsviewutils::findGeometryForRect(itemRect, boundingRect, {}, QMarginsF(10, 10, 10, 10));
+    topohelp::geom::findGeometryForRect(itemRect, boundingRect, {}, QMarginsF(10, 10, 10, 10));
     QVERIFY(boundingRect.contains(itemRect));
     QCOMPARE(boundingRect, boundingRectOriginal);
     QCOMPARE(itemRect, QRectF(110, 60, 130, 30));

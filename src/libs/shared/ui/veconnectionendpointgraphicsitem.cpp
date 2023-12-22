@@ -20,6 +20,7 @@
 #include "graphicsviewutils.h"
 #include "positionlookuphelper.h"
 #include "textitem.h"
+#include "topohelper/geometry.h"
 #include "veconnectiongraphicsitem.h"
 #include "veobject.h"
 #include "verectgraphicsitem.h"
@@ -80,7 +81,7 @@ void VEConnectionEndPointGraphicsItem::updateFromEntity()
     if (!entity())
         return;
 
-    const QPointF coordinates = graphicsviewutils::pos(entity()->coordinates());
+    const QPointF coordinates = topohelp::geom::pos(entity()->coordinates());
     if (coordinates.isNull()) {
         doLayout();
     } else {
@@ -137,7 +138,7 @@ void VEConnectionEndPointGraphicsItem::adjustItem()
     itemRect = mapRectToParent(itemRect);
     const QRectF parentRect = parentItem()->boundingRect();
 
-    if ((pos().isNull() || shared::graphicsviewutils::isCollided(siblingsRects, itemRect)) && parentRect.isValid()) {
+    if ((pos().isNull() || topohelp::geom::isCollided(siblingsRects, itemRect)) && parentRect.isValid()) {
         PositionLookupHelper helper(
                 sidePaths(), parentRect, siblingsRects, itemRect.topLeft() - initialOffset, lookupType());
         if (helper.lookup()) {
@@ -181,8 +182,8 @@ void VEConnectionEndPointGraphicsItem::rebuildLayout()
 {
     const QPointF entityPos = scenePos();
     const QRectF parentRect = targetItem()->sceneBoundingRect();
-    m_alignment = shared::graphicsviewutils::getNearestSide(parentRect, entityPos);
-    const QPointF stickyPos = shared::graphicsviewutils::getSidePosition(parentRect, entityPos, m_alignment);
+    m_alignment = topohelp::geom::getNearestSide(parentRect, entityPos);
+    const QPointF stickyPos = topohelp::geom::getSidePosition(parentRect, entityPos, m_alignment);
     updateInternalItems(m_alignment);
     setPos(targetItem()->mapFromScene(stickyPos));
 }
@@ -217,7 +218,7 @@ void VEConnectionEndPointGraphicsItem::onManualMoveProgress(GripPoint *grip, con
 
     const QPointF mappedPos = mapToParent(mapFromScene(to));
     const QRectF parentRect = targetItem()->boundingRect();
-    const Qt::Alignment alignment = graphicsviewutils::getNearestSide(parentRect, mappedPos);
+    const Qt::Alignment alignment = topohelp::geom::getNearestSide(parentRect, mappedPos);
     updateInternalItems(alignment);
     setPos(mappedPos);
     updateGripPoints();

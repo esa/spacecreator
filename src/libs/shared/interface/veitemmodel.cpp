@@ -18,7 +18,7 @@
 #include "veitemmodel.h"
 
 #include "commandsstackbase.h"
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 #include "ui/graphicsscenebase.h"
 #include "ui/veinteractiveobject.h"
 #include "vemodel.h"

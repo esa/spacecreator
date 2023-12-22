@@ -24,10 +24,10 @@
 #include "colors/colormanager.h"
 #include "commands/cmdchartitemchangegeometry.h"
 #include "commands/cmdentitynamechange.h"
-#include "graphicsviewutils.h"
 #include "mscchart.h"
 #include "mscchartviewconstants.h"
 #include "msccommandsstack.h"
+#include "topohelper/geometry.h"
 #include "ui/grippoint.h"
 #include "ui/grippointshandler.h"
 

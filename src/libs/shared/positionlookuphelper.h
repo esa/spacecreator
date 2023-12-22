@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 
 #include <QHash>
 #include <QPainterPath>
@@ -48,8 +48,7 @@ class PositionLookupHelper
 public:
     explicit PositionLookupHelper(const QList<QPair<Qt::Alignment, QPainterPath>> &sidePaths, const QRectF &parentRect,
             const QList<QRectF> &siblingsRects, const QPointF &pos,
-            const topohelp::LookupDirection direction =
-                    topohelp::LookupDirection::Bidirectional);
+            const topohelp::LookupDirection direction = topohelp::LookupDirection::Bidirectional);
 
     ~PositionLookupHelper();
 

@@ -29,6 +29,7 @@
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "standardpaths.h"
+#include "topohelper/geometry.h"
 
 #include <QApplication>
 #include <QBuffer>
@@ -116,7 +117,7 @@ bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPoi
             if (!obj->parentObject() || obj->parentObject() == m_parent) {
                 m_rootEntities.append(obj);
                 if (isRectangularType(obj)) {
-                    const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
+                    const QRectF objRect = topohelp::geom::rect(obj->coordinates());
                     if (!objRect.isNull())
                         importingRect |= objRect;
                 }
@@ -127,13 +128,13 @@ bool CmdEntitiesImport::init(const QVector<ivm::IVObject *> &objects, const QPoi
     if (m_parent) {
         const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates);
         const QString coordStr = m_parent->entityAttributeValue<QString>(coordToken);
-        parentRect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
+        parentRect = topohelp::geom::rect(ivm::IVObject::coordinatesFromString(coordStr));
     }
     const QPointF insertPos = shared::isValidPosition(pos) ? pos : QPointF(0, 0);
     const QPointF basePoint = importingRect.topLeft();
     importingRect.moveTopLeft(insertPos);
     QList<QRectF> existingRects = existingModelRects(m_parent);
-    shared::graphicsviewutils::findGeometryForRect(importingRect, parentRect, existingRects);
+    topohelp::geom::findGeometryForRect(importingRect, parentRect, existingRects);
     const QPointF offset = importingRect.topLeft() - basePoint;
 
     for (ivm::IVObject *obj : qAsConst(objects)) {
@@ -244,17 +245,17 @@ void CmdEntitiesImport::prepareRectangularType(
         ivm::IVObject *obj, const QPointF &offset, QRectF &parentRect, QList<QRectF> &existingRects)
 {
     if (!obj->parentObject()) {
-        QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
+        QVector<QPointF> coordinates = topohelp::geom::polygon(obj->coordinates());
         if (!coordinates.isEmpty()) {
             if (!offset.isNull()) {
                 std::for_each(coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
-                obj->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
+                obj->setCoordinates(topohelp::geom::coordinates(coordinates));
             }
         } else {
             QRectF itemRect { parentRect.topLeft(), topohelp::kDefaultGraphicsItemSize };
-            shared::graphicsviewutils::findGeometryForRect(itemRect, parentRect, existingRects);
+            topohelp::geom::findGeometryForRect(itemRect, parentRect, existingRects);
             existingRects.append(itemRect);
-            obj->setCoordinates(shared::graphicsviewutils::coordinates(itemRect));
+            obj->setCoordinates(topohelp::geom::coordinates(itemRect));
         }
     }
 }
@@ -262,13 +263,13 @@ void CmdEntitiesImport::prepareRectangularType(
 void CmdEntitiesImport::prepareEndPointType(ivm::IVObject *obj, const QPointF &offset)
 {
     if (auto fn = qobject_cast<ivm::IVFunctionType *>(obj->parentObject())) {
-        QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
+        QVector<QPointF> coordinates = topohelp::geom::polygon(obj->coordinates());
         if (!fn->parentObject()) {
             if (!coordinates.isEmpty()) {
                 if (!offset.isNull()) {
                     std::for_each(
                             coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
-                    obj->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
+                    obj->setCoordinates(topohelp::geom::coordinates(coordinates));
                 }
             } else {
                 static const QString coordToken = ivm::meta::Props::token(ivm::meta::Props::Token::coordinates);
@@ -283,18 +284,17 @@ void CmdEntitiesImport::prepareEndPointType(ivm::IVObject *obj, const QPointF &o
                         continue;
                     }
 
-                    const QPointF siblingPos =
-                            shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(coordStr));
+                    const QPointF siblingPos = topohelp::geom::pos(ivm::IVObject::coordinatesFromString(coordStr));
                     const QRectF siblingRect =
-                            shared::graphicsviewutils::adjustFromPoint(siblingPos, topohelp::kInterfaceBaseLength);
+                            topohelp::geom::adjustFromPoint(siblingPos, topohelp::kInterfaceBaseLength);
                     interfacesRects << siblingRect;
                 }
 
                 const QString coordStr = fn->entityAttributeValue<QString>(coordToken);
-                QRectF fnRect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
+                QRectF fnRect = topohelp::geom::rect(ivm::IVObject::coordinatesFromString(coordStr));
                 QPointF ifacePos { 0, 0 };
                 shared::graphicsviewutils::findGeometryForPoint(ifacePos, fnRect, interfacesRects);
-                obj->setCoordinates(shared::graphicsviewutils::coordinates(ifacePos));
+                obj->setCoordinates(topohelp::geom::coordinates(ifacePos));
             }
         }
     }
@@ -372,22 +372,22 @@ void CmdEntitiesImport::prepareConnectionType(
     }
 
     if (!obj->parentObject()) {
-        QVector<QPointF> coordinates = shared::graphicsviewutils::polygon(obj->coordinates());
+        QVector<QPointF> coordinates = topohelp::geom::polygon(obj->coordinates());
         if (!coordinates.isEmpty()) {
             if (!offset.isNull()) {
                 std::for_each(coordinates.begin(), coordinates.end(), [offset](QPointF &point) { point += offset; });
-                obj->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
+                obj->setCoordinates(topohelp::geom::coordinates(coordinates));
             }
             if (auto connectionGroup = qobject_cast<ivm::IVConnectionGroup *>(obj)) {
                 if (auto iface = connectionGroup->sourceInterfaceGroup()) {
-                    iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.front()));
+                    iface->setCoordinates(topohelp::geom::coordinates(coordinates.front()));
                 } else if (auto iface = findIface(connectionGroup->delayedStart(), objects)) {
-                    iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.front()));
+                    iface->setCoordinates(topohelp::geom::coordinates(coordinates.front()));
                 }
                 if (auto iface = connectionGroup->targetInterfaceGroup()) {
-                    iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.last()));
+                    iface->setCoordinates(topohelp::geom::coordinates(coordinates.last()));
                 } else if (auto iface = findIface(connectionGroup->delayedEnd(), objects)) {
-                    iface->setCoordinates(shared::graphicsviewutils::coordinates(coordinates.last()));
+                    iface->setCoordinates(topohelp::geom::coordinates(coordinates.last()));
                 }
             }
         }
@@ -399,7 +399,7 @@ QList<QRectF> CmdEntitiesImport::existingModelRects(ivm::IVObject *parent) const
     QList<QRectF> existingRects;
     for (const auto &obj : m_model->objects()) {
         if (obj->parentObject() == parent && isRectangularType(obj->as<ivm::IVObject *>())) {
-            const QRectF objRect = shared::graphicsviewutils::rect(obj->coordinates());
+            const QRectF objRect = topohelp::geom::rect(obj->coordinates());
             if (objRect.isValid()) {
                 existingRects.append(objRect);
             }

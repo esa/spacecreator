@@ -21,12 +21,12 @@
 #include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
 #include "graphicsitemhelpers.h"
-#include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivcoreutils.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
+#include "topohelper/geometry.h"
 #include "ui/textitem.h"
 
 #include <QApplication>

@@ -17,7 +17,6 @@
 
 #include "graphicsscenebase.h"
 
-#include "graphicsviewutils.h"
 #include "ui/veinteractiveobject.h"
 
 #include <QGraphicsSceneHelpEvent>

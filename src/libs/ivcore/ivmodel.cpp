@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "errorhub.h"
-#include "graphicsviewutils.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
@@ -29,6 +28,7 @@
 #include "ivinterfacegroup.h"
 #include "ivpropertytemplate.h"
 #include "propertytemplateconfig.h"
+#include "topohelper/geometry.h"
 
 #include <QtDebug>
 
@@ -234,9 +234,9 @@ void IVModel::clone(IVObject *origin, QList<IVObject *> &importedObjects, IVMode
         }
 
         if (!pos.isNull()) {
-            QRectF originGeometry = shared::graphicsviewutils::rect(origin->coordinates());
+            QRectF originGeometry = topohelp::geom::rect(origin->coordinates());
             originGeometry.moveTo(pos);
-            ivClone->setCoordinates(shared::graphicsviewutils::coordinates(originGeometry));
+            ivClone->setCoordinates(topohelp::geom::coordinates(originGeometry));
         }
     } else {
         ivClone = origin;

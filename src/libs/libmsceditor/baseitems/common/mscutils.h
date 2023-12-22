@@ -17,6 +17,7 @@
 #pragma once
 
 #include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 
 #include <QColor>
 #include <QGraphicsItem>

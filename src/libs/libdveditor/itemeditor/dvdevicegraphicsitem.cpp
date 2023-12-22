@@ -19,12 +19,9 @@
 
 #include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
-#include "dvconnectiongraphicsitem.h"
 #include "dvnamevalidator.h"
 #include "dvnodegraphicsitem.h"
 #include "dvpropertytemplateconfig.h"
-#include "graphicsviewutils.h"
-#include "positionlookuphelper.h"
 #include "ui/textitem.h"
 
 #include <QPainter>
@@ -59,7 +56,7 @@ QPointF DVDeviceGraphicsItem::connectionEndPoint(const bool nestedConnection) co
     const QRectF deviceRect = sceneBoundingRect();
     if (auto parentGraphicsItem = parentItem()) {
         const QRectF parentRect = parentGraphicsItem->boundingRect();
-        const Qt::Alignment alignment = shared::graphicsviewutils::getNearestSide(parentRect, pos());
+        const Qt::Alignment alignment = topohelp::geom::getNearestSide(parentRect, pos());
         switch (alignment) {
         case Qt::AlignLeft:
             if (nestedConnection) {
@@ -155,7 +152,7 @@ void DVDeviceGraphicsItem::updateTextPosition()
     if (m_textItem) {
         const QPointF pos = scenePos();
         const QRectF parentRect = targetItem()->sceneBoundingRect();
-        const Qt::Alignment side = shared::graphicsviewutils::getNearestSide(parentRect, pos);
+        const Qt::Alignment side = topohelp::geom::getNearestSide(parentRect, pos);
         updateInternalItems(side);
     }
 }

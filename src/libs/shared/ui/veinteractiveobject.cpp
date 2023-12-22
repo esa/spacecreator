@@ -23,6 +23,7 @@
 #include "graphicsviewutils.h"
 #include "settingsmanager.h"
 #include "textitem.h"
+#include "topohelper/geometry.h"
 #include "veobject.h"
 
 #include <QDebug>
@@ -303,7 +304,7 @@ void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     s_mouseReleased = true;
     onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()), pos);
 
-    const qreal distance = graphicsviewutils::distanceLine(event->buttonDownScenePos(event->button()), pos);
+    const qreal distance = topohelp::geom::distanceLine(event->buttonDownScenePos(event->button()), pos);
     if (distance <= kClickTreshold)
         Q_EMIT clicked(pos);
     QGraphicsObject::mouseReleaseEvent(event);

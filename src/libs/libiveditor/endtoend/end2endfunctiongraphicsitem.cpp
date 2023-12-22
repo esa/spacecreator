@@ -17,7 +17,7 @@
 
 #include "end2endfunctiongraphicsitem.h"
 
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 
 #include <QPainter>
 #include <QtDebug>

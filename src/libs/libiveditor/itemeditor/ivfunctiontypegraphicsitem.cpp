@@ -34,6 +34,7 @@
 #include "ivobject.h"
 #include "ivpropertytemplateconfig.h"
 #include "parameter.h"
+#include "topohelper/geometry.h"
 #include "ui/grippoint.h"
 #include "ui/resizelimits.h"
 #include "ui/textitem.h"

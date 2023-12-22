@@ -22,6 +22,7 @@
 #include "dvnamevalidator.h"
 #include "dvpropertytemplateconfig.h"
 #include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 #include "ui/textitem.h"
 
 #include <QPainter>

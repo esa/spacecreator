@@ -21,13 +21,13 @@
 #include "cmdinterfaceitemcreate.h"
 #include "commandids.h"
 #include "commands/cmdentityattributeschange.h"
-#include "graphicsviewutils.h"
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
 #include "standardpaths.h"
+#include "topohelper/geometry.h"
 
 #include <QTemporaryDir>
 
@@ -37,10 +37,10 @@ static inline void shiftObjects(const QVector<ivm::IVObject *> &objects, const Q
         if (!obj) {
             continue;
         }
-        auto points = shared::graphicsviewutils::polygon(obj->coordinates());
+        auto points = topohelp::geom::polygon(obj->coordinates());
         std::transform(
                 points.cbegin(), points.cend(), points.begin(), [offset](const QPointF &p) { return p + offset; });
-        obj->setCoordinates(shared::graphicsviewutils::coordinates(points));
+        obj->setCoordinates(topohelp::geom::coordinates(points));
         if (obj->type() == ivm::IVObject::Type::FunctionType || obj->type() == ivm::IVObject::Type::Function) {
             shiftObjects(obj->as<ivm::IVFunctionType *>()->children(), offset);
         }
@@ -65,10 +65,10 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm:
     m_instantiatedEntity->setTitle(
             ivm::IVNameValidator::nameForInstance(m_instantiatedEntity, entity->title() + QLatin1String("_Instance_")));
 
-    QRectF typeGeometry = shared::graphicsviewutils::rect(entity->coordinates());
+    QRectF typeGeometry = topohelp::geom::rect(entity->coordinates());
     const QPointF offset = pos - typeGeometry.topLeft();
     typeGeometry.moveTo(pos);
-    m_instantiatedEntity->setCoordinates(shared::graphicsviewutils::coordinates(typeGeometry));
+    m_instantiatedEntity->setCoordinates(topohelp::geom::coordinates(typeGeometry));
     m_instantiatedEntity->setInstanceOf(entity);
     m_subCmds.append(
             new shared::cmd::CmdEntityAttributesChange(ivm::IVPropertyTemplateConfig::instance(), m_instantiatedEntity,
@@ -77,7 +77,7 @@ CmdEntitiesInstantiate::CmdEntitiesInstantiate(ivm::IVFunctionType *entity, ivm:
 
     for (auto iface : entity->interfaces()) {
         ivm::IVInterface::CreationInfo clone = ivm::IVInterface::CreationInfo::cloneIface(iface, m_instantiatedEntity);
-        clone.position = shared::graphicsviewutils::pos(iface->coordinates()) + offset;
+        clone.position = topohelp::geom::pos(iface->coordinates()) + offset;
         m_subCmds.append(new CmdInterfaceItemCreate(clone));
     }
 

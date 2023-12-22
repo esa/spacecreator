@@ -15,7 +15,6 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
 #include "itemeditor/ivinterfacegraphicsitem.h"
@@ -24,6 +23,7 @@
 #include "ivtestutils.h"
 #include "positionlookuphelper.h"
 #include "sharedlibrary.h"
+#include "topohelper/geometry.h"
 
 #include <QGraphicsScene>
 #include <QObject>
@@ -66,7 +66,7 @@ void tst_PositionLookupHelper::testOnSide(
             if (helper.isSideChanged()) {
                 ifaceItem->updateInternalItems(helper.side());
             }
-            iface->setCoordinates(shared::graphicsviewutils::coordinates(helper.mappedOriginPoint()));
+            iface->setCoordinates(topohelp::geom::coordinates(helper.mappedOriginPoint()));
             ifaceItem->rebuildLayout();
         }
 

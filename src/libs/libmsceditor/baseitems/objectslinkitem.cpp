@@ -20,7 +20,7 @@
 
 #include "common/objectanchor.h"
 #include "common/objectslink.h"
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 
 #include <QEvent>
 #include <QGraphicsSceneMoveEvent>

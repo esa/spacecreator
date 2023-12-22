@@ -18,7 +18,6 @@
 #include "ivconnectiongraphicsitem.h"
 
 #include "colors/colormanager.h"
-#include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
 #include "itemeditor/graphicsitemhelpers.h"
 #include "ivcommentgraphicsitem.h"
@@ -30,6 +29,7 @@
 #include "ivinterface.h"
 #include "ivinterfacegraphicsitem.h"
 #include "ivnamevalidator.h"
+#include "topohelper/geometry.h"
 #include "ui/grippointshandler.h"
 #include "ui/textitem.h"
 

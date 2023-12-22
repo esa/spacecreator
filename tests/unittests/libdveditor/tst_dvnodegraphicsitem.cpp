@@ -18,10 +18,10 @@
 #include "dveditor.h"
 #include "dvnode.h"
 #include "dvpartition.h"
-#include "graphicsviewutils.h"
 #include "itemeditor/dvnodegraphicsitem.h"
 #include "itemeditor/dvpartitiongraphicsitem.h"
 #include "standardpaths.h"
+#include "topohelper/geometry.h"
 
 #include <QGraphicsScene>
 #include <QtTest>

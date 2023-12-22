@@ -16,7 +16,6 @@
 */
 
 #include "../common/xmldatahelper.h"
-#include "graphicsviewutils.h"
 #include "interfacedocument.h"
 #include "ivarchetypelibraryreference.h"
 #include "ivarchetypereference.h"
@@ -32,6 +31,7 @@
 #include "ivtestutils.h"
 #include "parameter.h"
 #include "scversion.h"
+#include "topohelper/geometry.h"
 
 #include <QObject>
 #include <QTemporaryDir>
@@ -488,7 +488,7 @@ void tst_XmlDocExporter::testExportUI()
 
     connection->setEntityAttribute("AttrName", "AttributeData");
     testfunc1->setEntityProperty("Namespace::PropertyName::Type::value", "PropertyValue");
-    testfunc2->setCoordinates(shared::graphicsviewutils::coordinates(QRectF(100, 100, 100, 100)));
+    testfunc2->setCoordinates(topohelp::geom::coordinates(QRectF(100, 100, 100, 100)));
 
     text.clear();
     QBuffer buffer(&text);

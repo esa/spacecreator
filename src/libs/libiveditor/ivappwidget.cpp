@@ -29,7 +29,6 @@
 #include "context/action/actionsmanager.h"
 #include "errorhub.h"
 #include "geometry.h"
-#include "graphicsviewutils.h"
 #include "interfacedocument.h"
 #include "itemeditor/graphicsitemhelpers.h"
 #include "itemeditor/ivfunctiongraphicsitem.h"
@@ -48,6 +47,7 @@
 #include "ivxmlreader.h"
 #include "properties/ivpropertiesdialog.h"
 #include "qitemselectionmodel.h"
+#include "topohelper/geometry.h"
 #include "ui_ivappwidget.h"
 
 #include <QAction>
@@ -575,7 +575,7 @@ void IVAppWidget::wrapItems()
     for (shared::VEObject *obj : qAsConst(objects)) {
         if (auto iObj = qobject_cast<ivm::IVObject *>(obj)) {
             if (kRectTypes.contains(iObj->type())) {
-                itemSceneRect |= shared::graphicsviewutils::rect(iObj->coordinates());
+                itemSceneRect |= topohelp::geom::rect(iObj->coordinates());
             }
         }
     }
@@ -605,8 +605,8 @@ void IVAppWidget::wrapItems()
     for (auto objIt = objects.begin(); objIt != objects.cend();) {
         if (auto iObj = qobject_cast<const ivm::IVConnection *>(*objIt)) {
             if (!objects.contains(iObj->source())) {
-                const QVector<QPointF> intersectionPoints = shared::graphicsviewutils::intersectionPoints(
-                        itemSceneRect, shared::graphicsviewutils::polygon(iObj->coordinates()));
+                const QVector<QPointF> intersectionPoints =
+                        topohelp::geom::intersectionPoints(itemSceneRect, topohelp::geom::polygon(iObj->coordinates()));
                 ivm::IVInterface::CreationInfo ifaceInfo =
                         ivm::IVInterface::CreationInfo::fromIface(iObj->targetInterface());
                 if (!intersectionPoints.isEmpty())
@@ -628,8 +628,8 @@ void IVAppWidget::wrapItems()
                 objIt = objects.erase(objIt);
                 continue;
             } else if (!objects.contains(iObj->target())) {
-                const QVector<QPointF> intersectionPoints = shared::graphicsviewutils::intersectionPoints(
-                        itemSceneRect, shared::graphicsviewutils::polygon(iObj->coordinates()));
+                const QVector<QPointF> intersectionPoints =
+                        topohelp::geom::intersectionPoints(itemSceneRect, topohelp::geom::polygon(iObj->coordinates()));
                 ivm::IVInterface::CreationInfo ifaceInfo =
                         ivm::IVInterface::CreationInfo::fromIface(iObj->sourceInterface());
                 if (!intersectionPoints.isEmpty())

@@ -18,11 +18,11 @@
 #include "verectgraphicsitem.h"
 
 #include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 #include "ui/grippointshandler.h"
 #include "ui/minimizelimits.h"
 #include "ui/resizelimits.h"
 #include "ui/textitem.h"
-#include "utils.h"
 #include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
 
@@ -98,7 +98,7 @@ void VERectGraphicsItem::updateFromEntity()
     if (!obj)
         return;
 
-    const QRectF itemSceneRect { graphicsviewutils::rect(obj->coordinates()) };
+    const QRectF itemSceneRect { topohelp::geom::rect(obj->coordinates()) };
     if (!itemSceneRect.isValid()) {
         doLayout();
     } else {
@@ -125,7 +125,7 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
     const QRectF rect = graphicsviewutils::snappedRect(scene(), movedRect(pressedAt, releasedAt));
     if (QGraphicsItem *parentObj = parentItem()) {
         const QRectF parentRect = parentObj->sceneBoundingRect().marginsRemoved(topohelp::kContentMargins);
-        if (!shared::graphicsviewutils::isRectBounded(parentRect, rect)) {
+        if (!topohelp::geom::isRectBounded(parentRect, rect)) {
             return;
         }
     }
@@ -146,7 +146,7 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
     setGeometry(newRect);
 
     // Update positions of interface attachment points (iface)
-    const QRectF entityRect = graphicsviewutils::rect(entity()->coordinates());
+    const QRectF entityRect = topohelp::geom::rect(entity()->coordinates());
     for (auto child : childItems()) {
         auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(child->toGraphicsObject());
         if (iface) {
@@ -157,16 +157,16 @@ void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &
                 return;
             }
 
-            const QPointF storedPos = graphicsviewutils::pos(obj->coordinates());
+            const QPointF storedPos = topohelp::geom::pos(obj->coordinates());
             if (storedPos.isNull()) {
                 iface->instantLayoutUpdate();
                 continue;
             }
 
             // Calculate the new postion of the iface.
-            const Qt::Alignment side = graphicsviewutils::getNearestSide(entityRect, storedPos);
+            const Qt::Alignment side = topohelp::geom::getNearestSide(entityRect, storedPos);
             const QRectF sceneRect = sceneBoundingRect();
-            const QPointF pos = graphicsviewutils::getSidePosition(sceneRect, storedPos, side);
+            const QPointF pos = topohelp::geom::getSidePosition(sceneRect, storedPos, side);
             iface->setPos(iface->parentItem()->mapFromScene(pos));
         }
     }
@@ -660,8 +660,7 @@ bool VERectGraphicsItem::doLayout()
         QRectF itemRect = this->boundingRect();
         itemRect.moveTopLeft(boundedRect.topLeft());
 
-        graphicsviewutils::findGeometryForRect(
-                itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), margins);
+        topohelp::geom::findGeometryForRect(itemRect, boundedRect, graphicsviewutils::siblingItemsRects(this), margins);
         if (itemRect != sceneBoundingRect()) {
             setRect(itemRect);
             return true;

@@ -22,18 +22,12 @@
 #include "commands/cmdentityattributeschange.h"
 #include "commandsstackbase.h"
 #include "graphicsitemhelpers.h"
-#include "graphicsviewutils.h"
 #include "itemeditor/common/ivutils.h"
-#include "ivcommentgraphicsitem.h"
-#include "ivconnection.h"
-#include "ivconnectiongraphicsitem.h"
-#include "ivfunction.h"
-#include "ivfunctiongraphicsitem.h"
 #include "ivfunctiontypegraphicsitem.h"
 #include "ivinterface.h"
 #include "ivnamevalidator.h"
 #include "ivpropertytemplateconfig.h"
-#include "positionlookuphelper.h"
+#include "topohelper/geometry.h"
 #include "ui/textitem.h"
 #include "ui/veconnectiongraphicsitem.h"
 
@@ -110,7 +104,7 @@ QPointF IVInterfaceGraphicsItem::connectionEndPoint(const bool nestedConnection)
     }
     if (auto parentGraphicsItem = parentItem()) {
         const QRectF parentRect = parentGraphicsItem->boundingRect();
-        const Qt::Alignment alignment = topohelp::utils::getNearestSide(parentRect, pos());
+        const Qt::Alignment alignment = topohelp::geom::getNearestSide(parentRect, pos());
         switch (alignment) {
         case Qt::AlignLeft:
             if (nestedConnection) {
@@ -155,7 +149,7 @@ QPointF IVInterfaceGraphicsItem::connectionEndPoint(shared::ui::VEConnectionGrap
 QPainterPath IVInterfaceGraphicsItem::ifaceShape() const
 {
     const QRectF parentRect = parentItem()->boundingRect();
-    const Qt::Alignment alignment = topohelp::utils::getNearestSide(parentRect, pos());
+    const Qt::Alignment alignment = topohelp::geom::getNearestSide(parentRect, pos());
     return mapToScene(ifaceTransform(alignment).map(ifacePath()));
 }
 
@@ -208,7 +202,7 @@ qreal IVInterfaceGraphicsItem::maxWidth() const
     const QRectF sceneRect = scene()->sceneRect();
     const QRectF parentRect = targetItem()->boundingRect();
     const QPointF ifacePos = pos();
-    const Qt::Alignment side = topohelp::utils::getNearestSide(parentRect, ifacePos);
+    const Qt::Alignment side = topohelp::geom::getNearestSide(parentRect, ifacePos);
     QRectF rect;
     rect.setTop(itemRect.top());
     rect.setBottom(itemRect.bottom());
@@ -283,7 +277,7 @@ void IVInterfaceGraphicsItem::updateTextPosition()
     if (m_textItem) {
         const QRectF parentRect = targetItem()->boundingRect();
         const QPointF ifacePos = pos();
-        const Qt::Alignment side = topohelp::utils::getNearestSide(parentRect, ifacePos);
+        const Qt::Alignment side = topohelp::geom::getNearestSide(parentRect, ifacePos);
         m_textItem->setPos(m_textItem->mapToParent(textTransform(side).map(QPointF(0, 0))));
     }
 }

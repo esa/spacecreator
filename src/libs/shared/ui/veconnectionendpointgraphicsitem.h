@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "graphicsviewutils.h"
-#include "utils.h"
+#include "geometry.h"
+#include "topohelper/geometry.h"
 #include "veinteractiveobject.h"
 
 #include <QPointer>

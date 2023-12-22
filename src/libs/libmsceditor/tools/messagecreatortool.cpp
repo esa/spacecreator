@@ -28,6 +28,7 @@
 #include "msccreate.h"
 #include "mscinstance.h"
 #include "mscmessage.h"
+#include "topohelper/geometry.h"
 
 #include <QDebug>
 #include <QMouseEvent>
@@ -372,7 +373,7 @@ bool MessageCreatorTool::validateUserPoints(msc::MscMessage *message)
 
     auto ensureIntersected = [&](const QLineF &arrow, MscInstance *instance) {
         const QRectF r = instanceItemRect(instance);
-        if (!r.isNull() && !shared::graphicsviewutils::intersects(r, arrow))
+        if (!r.isNull() && !topohelp::geom::intersects(r, arrow))
             return false;
         return true;
     };

@@ -34,6 +34,7 @@
 #include "itemeditor/dvnodegraphicsitem.h"
 #include "itemeditor/dvpartitiongraphicsitem.h"
 #include "itemeditor/graphicsitemhelpers.h"
+#include "topohelper/geometry.h"
 #include "ui/graphicsviewbase.h"
 #include "ui/veconnectiongraphicsitem.h"
 #include "ui/veinteractiveobject.h"
@@ -422,8 +423,8 @@ bool DVCreatorTool::handleConnectionCreate(const QPointF &pos)
     if (!m_previewConnectionItem)
         return false;
 
-    if (auto itemUnderCursor = qgraphicsitem_cast<DVDeviceGraphicsItem *>(
-                shared::graphicsviewutils::nearestItem(scene, pos, topohelp::kInterfaceTolerance, { DVDeviceGraphicsItem::Type }))) {
+    if (auto itemUnderCursor = qgraphicsitem_cast<DVDeviceGraphicsItem *>(shared::graphicsviewutils::nearestItem(
+                scene, pos, topohelp::kInterfaceTolerance, { DVDeviceGraphicsItem::Type }))) {
         const QPointF finishPoint = itemUnderCursor->connectionEndPoint();
         if (!itemUnderCursor->ifaceShape().boundingRect().contains(m_connectionPoints.front())) {
             m_connectionPoints.append(finishPoint);
@@ -492,8 +493,8 @@ bool DVCreatorTool::prepareMultiPointConnectionPreview(QMouseEvent *e)
 {
     QGraphicsScene *scene = m_view->scene();
     const QPointF scenePos = cursorInScene(e);
-    QGraphicsItem *item =
-            shared::graphicsviewutils::nearestItem(scene, scenePos, topohelp::kInterfaceTolerance, { DVDeviceGraphicsItem::Type });
+    QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
+            scene, scenePos, topohelp::kInterfaceTolerance, { DVDeviceGraphicsItem::Type });
     if (!item) {
         return false;
     }
@@ -516,8 +517,8 @@ bool DVCreatorTool::prepareReCreateConnectionPreview(QMouseEvent *e)
     const QPointF scenePos = cursorInScene(e);
 
     if (!m_previewConnectionItem) {
-        QGraphicsItem *item =
-                shared::graphicsviewutils::nearestItem(scene, scenePos, topohelp::kInterfaceTolerance, { DVDeviceGraphicsItem::Type });
+        QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
+                scene, scenePos, topohelp::kInterfaceTolerance, { DVDeviceGraphicsItem::Type });
         if (!item || item->type() != DVDeviceGraphicsItem::Type)
             return false;
 
@@ -589,7 +590,8 @@ bool DVCreatorTool::prepareDirectConnectionPreview(QMouseEvent *e)
     QGraphicsScene *scene = m_view->scene();
     const QPointF scenePos = cursorInScene(e);
 
-    if (!shared::graphicsviewutils::nearestItem(scene, scenePos, topohelp::kInterfaceTolerance, { DVDeviceGraphicsItem::Type })) {
+    if (!shared::graphicsviewutils::nearestItem(
+                scene, scenePos, topohelp::kInterfaceTolerance, { DVDeviceGraphicsItem::Type })) {
         return false;
     }
 

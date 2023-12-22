@@ -19,7 +19,7 @@
 
 #include "baseitems/common/coordinatesconverter.h"
 #include "baseitems/interactiveobject.h"
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 
 #include <QGraphicsItem>
 #include <QMouseEvent>

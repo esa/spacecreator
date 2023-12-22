@@ -26,7 +26,6 @@
 #include "commands/cmdinterfaceitemcreate.h"
 #include "commandsstack.h"
 #include "context/action/actionsmanager.h"
-#include "graphicsviewutils.h"
 #include "interfacedocument.h"
 #include "itemeditor/graphicsview.h"
 #include "ivappwidget.h"
@@ -37,6 +36,7 @@
 #include "ivinterface.h"
 #include "ivmodel.h"
 #include "ivpropertytemplateconfig.h"
+#include "topohelper/geometry.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -248,8 +248,8 @@ bool IVEditorCore::addConnection(QString name, const QString &fromInstanceName, 
         auto createConnection = [ivModel, this](
                                         ivm::IVFunction *parent, ivm::IVInterface *inIf, ivm::IVInterface *outIf) {
             QVector<QPointF> points;
-            points.append(shared::graphicsviewutils::pos(inIf->coordinates()));
-            points.append(shared::graphicsviewutils::pos(outIf->coordinates()));
+            points.append(topohelp::geom::pos(inIf->coordinates()));
+            points.append(topohelp::geom::pos(outIf->coordinates()));
             auto command = new cmd::CmdConnectionItemCreate(ivModel, parent, inIf->id(), outIf->id(), points);
             commandsStack()->push(command);
         };
@@ -594,7 +594,7 @@ ivm::IVInterface *IVEditorCore::getInterface(
         ivm::IVInterface::CreationInfo createInfo(ivModel, parentFunction);
         createInfo.name = ifName;
         createInfo.type = ifType;
-        QRectF funcRect = shared::graphicsviewutils::rect(parentFunction->coordinates());
+        QRectF funcRect = topohelp::geom::rect(parentFunction->coordinates());
         QPointF ifPos(funcRect.left(), funcRect.center().y());
         if (ifType == ivm::IVInterface::InterfaceType::Required) {
             ifPos.setX(funcRect.right());

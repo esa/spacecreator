@@ -17,10 +17,8 @@
 
 #include "cmdentitygeometrychange.h"
 
-#include "cmdentityautolayout.h"
 #include "commandids.h"
-#include "commandsstackbase.h"
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 #include "veobject.h"
 
 namespace shared {
@@ -33,7 +31,7 @@ CmdEntityGeometryChange::CmdEntityGeometryChange(
 {
 }
 
-CmdEntityGeometryChange::~CmdEntityGeometryChange() {}
+CmdEntityGeometryChange::~CmdEntityGeometryChange() { }
 
 void CmdEntityGeometryChange::redo()
 {
@@ -95,8 +93,8 @@ QList<CmdEntityGeometryChange::ObjectData> CmdEntityGeometryChange::convertData(
 {
     QList<ObjectData> result;
     for (const auto &objectData : objectsData)
-        result.append({ objectData.first, objectData.first->coordinates(),
-                shared::graphicsviewutils::coordinates(objectData.second) });
+        result.append(
+                { objectData.first, objectData.first->coordinates(), topohelp::geom::coordinates(objectData.second) });
 
     return result;
 }

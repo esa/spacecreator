@@ -19,7 +19,7 @@
 
 #include "dvdevicegraphicsitem.h"
 #include "dvnodegraphicsitem.h"
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 
 #include <QPainter>
 

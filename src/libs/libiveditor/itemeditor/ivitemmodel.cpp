@@ -22,7 +22,6 @@
 #include "delayedsignal.h"
 #include "graphicsitemhelpers.h"
 #include "graphicsviewutils.h"
-#include "itemeditor/common/ivutils.h"
 #include "ivcomment.h"
 #include "ivcommentgraphicsitem.h"
 #include "ivconnection.h"
@@ -37,7 +36,8 @@
 #include "ivinterfacegraphicsitem.h"
 #include "ivinterfacegroup.h"
 #include "ivinterfacegroupgraphicsitem.h"
-#include "positionlookuphelper.h"
+#include "topohelper/connection.h"
+#include "topohelper/geometry.h"
 #include "ui/veconnectiongraphicsitem.h"
 
 #include <QGraphicsView>
@@ -70,10 +70,9 @@ static inline void dumpItem(QObject *obj, bool strict = false)
         qInfo() << "\nGraphics Iface geometry:\n" << iface->scenePos() << "\n" << iface->sceneBoundingRect() << "\n";
         qInfo() << "\nInternal Iface data:\n"
                 << iface->entity()->title() << "\n"
-                << shared::graphicsviewutils::pos(iface->entity()->coordinates()) << "\n";
+                << topohelp::geom::pos(iface->entity()->coordinates()) << "\n";
         qInfo() << "\n####:\n" << iface->connectionItems();
-        Q_ASSERT(!strict
-                || iface->scenePos().toPoint() == shared::graphicsviewutils::pos(iface->entity()->coordinates()));
+        Q_ASSERT(!strict || iface->scenePos().toPoint() == topohelp::geom::pos(iface->entity()->coordinates()));
     } else if (auto connection = qobject_cast<ive::IVConnectionGraphicsItem *>(item)) {
         qInfo() << "\nGraphics Connection geometry:\n"
                 << connection->points() << "\n"
@@ -84,22 +83,22 @@ static inline void dumpItem(QObject *obj, bool strict = false)
                                                                               connection->endItem()->entity()->title())
                                                             : connection->entity()->title())
                 << "\n"
-                << shared::graphicsviewutils::polygon(connection->entity()->coordinates()) << "\n";
+                << topohelp::geom::polygon(connection->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
-                || shared::graphicsviewutils::comparePolygones(connection->graphicsPoints(),
-                        shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
+                || topohelp::comparePolygones(
+                        connection->graphicsPoints(), topohelp::geom::polygon(connection->entity()->coordinates())));
         Q_ASSERT(!strict
-                || shared::graphicsviewutils::comparePolygones(
-                        connection->points(), shared::graphicsviewutils::polygon(connection->entity()->coordinates())));
+                || topohelp::comparePolygones(
+                        connection->points(), topohelp::geom::polygon(connection->entity()->coordinates())));
     } else if (auto rectItem = qobject_cast<shared::ui::VERectGraphicsItem *>(item)) {
         qInfo() << "\nGraphics" << rectItem->metaObject()->className() << "geometry:\n"
                 << rectItem->sceneBoundingRect() << "\n";
         qInfo() << "\nInternal Function data:\n"
                 << rectItem->entity()->title() << "\n"
-                << shared::graphicsviewutils::rect(rectItem->entity()->coordinates()) << "\n";
+                << topohelp::geom::rect(rectItem->entity()->coordinates()) << "\n";
         Q_ASSERT(!strict
                 || rectItem->sceneBoundingRect().toRect()
-                        == shared::graphicsviewutils::rect(rectItem->entity()->coordinates()).toRect());
+                        == topohelp::geom::rect(rectItem->entity()->coordinates()).toRect());
     } else {
         qFatal("Not implemented trace");
     }
@@ -244,16 +243,16 @@ static inline QPointF mapPositionFromOrigin(ivm::IVInterface *iface, ivm::meta::
         const QRectF &functionRect, Qt::Alignment *side)
 {
     const auto parentFn = iface->parentObject()->as<ivm::IVFunctionType *>();
-    const QRectF fnRect = shared::graphicsviewutils::rect(
+    const QRectF fnRect = topohelp::geom::rect(
             ivm::IVObject::coordinatesFromString(
                     parentFn->entityAttributeValue<QString>(ivm::meta::Props::token(coordinateToken))))
                                   .normalized();
     const QString strCoordinates = iface->entityAttributeValue<QString>(ivm::meta::Props::token(coordinateToken));
-    QPointF pos = shared::graphicsviewutils::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
+    QPointF pos = topohelp::geom::pos(ivm::IVObject::coordinatesFromString(strCoordinates));
 
-    *side = shared::graphicsviewutils::getNearestSide(fnRect, pos);
+    *side = topohelp::geom::getNearestSide(fnRect, pos);
 
-    pos = shared::graphicsviewutils::getSidePosition(fnRect, pos, *side);
+    pos = topohelp::geom::getSidePosition(fnRect, pos, *side);
     if (qFuzzyCompare(fnRect.top(), pos.y())) {
         const qreal sf = (pos.x() - fnRect.left()) / (fnRect.right() - fnRect.left());
         pos = QLineF(functionRect.topLeft(), functionRect.topRight()).pointAt(sf);
@@ -299,8 +298,8 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
                 if (!childCoordinates.isValid()) {
                     continue;
                 }
-                const QPolygonF points = shared::graphicsviewutils::polygon(
-                        ivm::IVObject::coordinatesFromString(childCoordinates.toString()));
+                const QPolygonF points =
+                        topohelp::geom::polygon(ivm::IVObject::coordinatesFromString(childCoordinates.toString()));
                 childrenBoundingRect |= points.boundingRect();
             }
         }
@@ -310,7 +309,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
         }
 
         const QString strRootCoord =
-                ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(mappedViewportGeometry));
+                ivm::IVObject::coordinatesToString(topohelp::geom::coordinates(mappedViewportGeometry));
         obj->setEntityProperty(tokenStr, strRootCoord);
         obj->setAttributeExportable(tokenStr, true);
     } else {
@@ -319,8 +318,7 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
             static const QString parentTokenStr = ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates);
             const QVariant rootCoord = parentObj->entityAttributeValue(parentTokenStr);
             if (rootCoord.isValid()) {
-                parentGeometry =
-                        shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(rootCoord.toString()));
+                parentGeometry = topohelp::geom::rect(ivm::IVObject::coordinatesFromString(rootCoord.toString()));
             } else {
                 QRectF mappedViewportGeometry;
                 if (const QGraphicsView *view = m_graphicsScene->views().value(0)) {
@@ -339,12 +337,12 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
         if (!coordinatesStr.isEmpty()) {
             const QVector<qint32> coordinates = ivm::IVObject::coordinatesFromString(coordinatesStr);
             if (!coordinates.isEmpty()) {
-                const QRectF geometry = shared::graphicsviewutils::rect(coordinates);
+                const QRectF geometry = topohelp::geom::rect(coordinates);
                 if (geometry.isValid()) {
                     if (parentObj && !parentGeometry.contains(geometry)) {
                         parentGeometry |= geometry.marginsAdded(topohelp::kRootMargins);
-                        const QString strRootCoord = ivm::IVObject::coordinatesToString(
-                                shared::graphicsviewutils::coordinates(parentGeometry));
+                        const QString strRootCoord =
+                                ivm::IVObject::coordinatesToString(topohelp::geom::coordinates(parentGeometry));
                         parentObj->setEntityProperty(
                                 ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
                         parentObj->setAttributeExportable(
@@ -367,25 +365,23 @@ void IVItemModel::setupRectangularGeometry(ivm::IVObject *obj)
                 if (!coordinates.isValid()) {
                     continue;
                 }
-                const QRectF rect =
-                        shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordinates.toString()));
+                const QRectF rect = topohelp::geom::rect(ivm::IVObject::coordinatesFromString(coordinates.toString()));
                 itemsGeometry |= rect.marginsAdded(topohelp::kRootMargins);
                 existingRects.append(rect);
             }
         }
 
         QRectF itemGeometry;
-        shared::graphicsviewutils::findGeometryForRect(itemGeometry, parentGeometry, existingRects);
+        topohelp::geom::findGeometryForRect(itemGeometry, parentGeometry, existingRects);
         if (parentObj) {
             const QString strRootCoord = ivm::IVObject::coordinatesToString(
-                    shared::graphicsviewutils::coordinates(parentGeometry | itemsGeometry | itemGeometry));
+                    topohelp::geom::coordinates(parentGeometry | itemsGeometry | itemGeometry));
             parentObj->setEntityProperty(
                     ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), strRootCoord);
             parentObj->setAttributeExportable(ivm::meta::Props::token(ivm::meta::Props::Token::RootCoordinates), false);
         }
 
-        const QString strCoord =
-                ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(itemGeometry));
+        const QString strCoord = ivm::IVObject::coordinatesToString(topohelp::geom::coordinates(itemGeometry));
         obj->setEntityProperty(tokenStr, strCoord);
         if (parentObj) {
             obj->setAttributeExportable(tokenStr, false);
@@ -413,7 +409,7 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
         return;
     }
     const QString parentStrCoord = parentObj->entityAttributeValue<QString>(ivm::meta::Props::token(token));
-    const QRectF parentRect = shared::graphicsviewutils::rect(shared::VEObject::coordinatesFromString(parentStrCoord));
+    const QRectF parentRect = topohelp::geom::rect(shared::VEObject::coordinatesFromString(parentStrCoord));
     Qt::Alignment side = Qt::AlignCenter;
 
     QPointF ifacePos;
@@ -437,14 +433,13 @@ void IVItemModel::setupInterfaceGeometry(ivm::IVObject *obj)
             continue;
         }
 
-        const QPointF ifacePoint =
-                shared::graphicsviewutils::pos(shared::VEObject::coordinatesFromString(ifaceStrCoord));
-        const QRectF ifaceRect = shared::graphicsviewutils::adjustFromPoint(ifacePoint, topohelp::kInterfaceBaseLength);
+        const QPointF ifacePoint = topohelp::geom::pos(shared::VEObject::coordinatesFromString(ifaceStrCoord));
+        const QRectF ifaceRect = topohelp::geom::adjustFromPoint(ifacePoint, topohelp::kInterfaceBaseLength);
         siblingsRects << ifaceRect;
     }
 
     shared::graphicsviewutils::findGeometryForPoint(ifacePos, parentRect, siblingsRects);
-    const QString strCoord = ivm::IVObject::coordinatesToString(shared::graphicsviewutils::coordinates(ifacePos));
+    const QString strCoord = ivm::IVObject::coordinatesToString(topohelp::geom::coordinates(ifacePos));
     obj->setEntityProperty(ivm::meta::Props::token(token), strCoord);
     if (parentObj->parentObject()) {
         obj->setAttributeExportable(ivm::meta::Props::token(token), false);
@@ -474,10 +469,10 @@ void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj)
         return;
     }
 
-    const QPointF startPos = shared::graphicsviewutils::pos(startEndPoint->coordinates());
-    const QPointF endPos = shared::graphicsviewutils::pos(endEndPoint->coordinates());
-    const QRectF startRect = shared::graphicsviewutils::rect(startEndPoint->function()->coordinates());
-    const QRectF endRect = shared::graphicsviewutils::rect(endEndPoint->function()->coordinates());
+    const QPointF startPos = topohelp::geom::pos(startEndPoint->coordinates());
+    const QPointF endPos = topohelp::geom::pos(endEndPoint->coordinates());
+    const QRectF startRect = topohelp::geom::rect(startEndPoint->function()->coordinates());
+    const QRectF endRect = topohelp::geom::rect(endEndPoint->function()->coordinates());
 
     QList<QRectF> siblingRects;
     for (auto entity : objectsModel()->objects()) {
@@ -487,14 +482,14 @@ void IVItemModel::setupConnectionGeometry(ivm::IVObject *obj)
                 continue;
 
             if (kRectangularTypes.contains(iObj->type())) {
-                siblingRects.append(shared::graphicsviewutils::rect(iObj->coordinates()));
+                siblingRects.append(topohelp::geom::rect(iObj->coordinates()));
             }
         }
     }
 
-    const QVector<QPointF> points =
-            shared::graphicsviewutils::createConnectionPath(siblingRects, startPos, startRect, endPos, endRect);
-    connection->setCoordinates(shared::graphicsviewutils::coordinates(points));
+    const topohelp::cnct::ConnectionEnvInfo connectionInfo { startRect, startPos, endRect, endPos, siblingRects };
+    const QVector<QPointF> points = topohelp::cnct::createConnectionPath(connectionInfo);
+    connection->setCoordinates(topohelp::geom::coordinates(points));
     if (obj->parentObject()) {
         obj->setAttributeExportable(ivm::meta::Props::token(ivm::meta::Props::Token::coordinates), false);
     }
@@ -637,14 +632,14 @@ shared::ui::VEInteractiveObject *IVItemModel::createItem(shared::Id objectId)
                 return getItem<ive::IVInterfaceGroupGraphicsItem *>(id);
             };
 
-            const QVector<QPointF> coords = shared::graphicsviewutils::polygon(connection->coordinates());
+            const QVector<QPointF> coords = topohelp::geom::polygon(connection->coordinates());
             if (connection->sourceInterface() && !coords.isEmpty())
-                connection->sourceInterface()->setCoordinates(shared::graphicsviewutils::coordinates(coords.front()));
+                connection->sourceInterface()->setCoordinates(topohelp::geom::coordinates(coords.front()));
             IVInterfaceGroupGraphicsItem *startItem =
                     connection->sourceInterface() ? ifaceGroupItem(connection->sourceInterface()->id()) : nullptr;
 
             if (connection->targetInterface() && !coords.isEmpty())
-                connection->targetInterface()->setCoordinates(shared::graphicsviewutils::coordinates(coords.back()));
+                connection->targetInterface()->setCoordinates(topohelp::geom::coordinates(coords.back()));
             IVInterfaceGroupGraphicsItem *endItem =
                     connection->targetInterface() ? ifaceGroupItem(connection->targetInterface()->id()) : nullptr;
 

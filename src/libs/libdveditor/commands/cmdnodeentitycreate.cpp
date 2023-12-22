@@ -27,7 +27,7 @@
 #include "dvpartition.h"
 #include "dvsystemfunction.h"
 #include "dvsysteminterface.h"
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 
 #include <QRectF>
 

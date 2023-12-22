@@ -18,9 +18,9 @@
 #include "ivfunctiongraphicsitem.h"
 
 #include "colors/colormanager.h"
-#include "graphicsviewutils.h"
 #include "ivfunction.h"
 #include "miniviewrenderer.h"
+#include "topohelper/geometry.h"
 #include "ui/minimizelimits.h"
 #include "ui/resizelimits.h"
 #include "ui/textitem.h"

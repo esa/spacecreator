@@ -21,12 +21,12 @@
 
 #include "errorhub.h"
 #include "fullivexporter.h"
-#include "geometry.h"
-#include "graphicsviewutils.h"
 #include "ivcomment.h"
 #include "ivconnection.h"
 #include "ivfunctiontype.h"
 #include "ivpropertytemplateconfig.h"
+#include "topohelper/connection.h"
+#include "topohelper/geometry.h"
 
 #include <QDebug>
 #include <QFileInfo>
@@ -102,8 +102,8 @@ bool IvMerger::mergeInterfaceViews(ivm::IVModel &targetIvModel, ivm::IVModel &so
     mergeFunctions(targetIvModel, sourceIvModel, topLevelSourceFunctions, targetFunctions, connectionsToRestore,
             insertedSourceFunctions);
 
-    addNewFunctions(targetIvModel, sourceIvModel, topLevelSourceFunctions, topLevelTargetFunctions, connectionsToRestore,
-            insertedSourceFunctions);
+    addNewFunctions(targetIvModel, sourceIvModel, topLevelSourceFunctions, topLevelTargetFunctions,
+            connectionsToRestore, insertedSourceFunctions);
 
     // calculate again set of all top level functions in target
     targetFunctions = targetIvModel.allObjectsByType<ivm::IVFunctionType>();
@@ -147,7 +147,8 @@ void IvMerger::mergeFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceI
             if (sourceFunction->id() == targetFunction->id()) {
                 FunctionEndpoints connectionInfos;
 
-                replaceFunction(targetIvModel, sourceIvModel, targetFunction, sourceFunction, connectionInfos, functionsThatWillNotBeReplaced);
+                replaceFunction(targetIvModel, sourceIvModel, targetFunction, sourceFunction, connectionInfos,
+                        functionsThatWillNotBeReplaced);
 
                 // remember connections to restore it later
                 connectionsToRestore.insert(sourceFunction, connectionInfos);
@@ -160,7 +161,8 @@ void IvMerger::mergeFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceI
 }
 
 void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &sourceIvModel,
-        QVector<ivm::IVFunctionType *> &topLevelSourceFunctions, QVector<ivm::IVFunctionType *> &topLevelTargetFunctions,
+        QVector<ivm::IVFunctionType *> &topLevelSourceFunctions,
+        QVector<ivm::IVFunctionType *> &topLevelTargetFunctions,
         QMap<ivm::IVFunctionType *, FunctionEndpoints> &connectionsToRestore,
         QSet<ivm::IVFunctionType *> &insertedSourceFunctions)
 {
@@ -171,7 +173,7 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
     for (ivm::IVFunctionType *function : topLevelTargetFunctions) {
         const QString coordStr = function->entityAttributeValue<QString>(coordToken);
 
-        const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
+        const QRectF rect = topohelp::geom::rect(ivm::IVObject::coordinatesFromString(coordStr));
         rightBorder = std::max(rightBorder, rect.right());
         topBorder = std::min(topBorder, rect.top());
     }
@@ -187,20 +189,18 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
 
     for (ivm::IVComment *comment : targetComments) {
         const QString coordStr = comment->entityAttributeValue<QString>(coordToken);
-        const QRectF rect = shared::graphicsviewutils::rect(ivm::IVObject::coordinatesFromString(coordStr));
+        const QRectF rect = topohelp::geom::rect(ivm::IVObject::coordinatesFromString(coordStr));
         rightBorder = std::max(rightBorder, rect.right());
         topBorder = std::min(topBorder, rect.top());
     }
 
     // sort top level source functions on x postion
-    std::sort(topLevelSourceFunctions.begin(),
-          topLevelSourceFunctions.end(),
-          [](const ivm::IVFunctionType* a, const ivm::IVFunctionType* b) 
-          { 
-              QRectF coordinatesA = shared::graphicsviewutils::rect(a->coordinates());
-              QRectF coordinatesB = shared::graphicsviewutils::rect(b->coordinates());
-              return coordinatesA.x() < coordinatesB.x(); 
-          });
+    std::sort(topLevelSourceFunctions.begin(), topLevelSourceFunctions.end(),
+            [](const ivm::IVFunctionType *a, const ivm::IVFunctionType *b) {
+                QRectF coordinatesA = shared::graphicsviewutils::rect(a->coordinates());
+                QRectF coordinatesB = shared::graphicsviewutils::rect(b->coordinates());
+                return coordinatesA.x() < coordinatesB.x();
+            });
 
     // insert remaining top level functions from source to the target
     for (ivm::IVFunctionType *sourceFunction : topLevelSourceFunctions) {
@@ -223,18 +223,29 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
         reparentRecursive(targetIvModel, sourceFunction);
 
         // set new coordinates of sourceFunction
+<<<<<<< HEAD
         QRectF coordinates = shared::graphicsviewutils::rect(sourceFunction->coordinates());
         qreal xIfaceOffset = (rightBorder + MARGIN) - coordinates.x();
         qreal yIfaceOffset = topBorder - coordinates.y();
+=======
+        QRectF coordinates = topohelp::geom::rect(sourceFunction->coordinates());
+        qreal xIfaceOffset = leftBorder - coordinates.x();
+        qreal yIfaceOffset = (bottomBorder + 40) - coordinates.y();
+>>>>>>> 9bbeab83b (graphicsviewutils' methods moved to a topohelper, documentation updated)
         QVector<ivm::IVInterface *> interfaces = sourceFunction->interfaces();
         for (ivm::IVInterface *iface : interfaces) {
-            QPointF ifacePos = shared::graphicsviewutils::pos(iface->coordinates());
+            QPointF ifacePos = topohelp::geom::pos(iface->coordinates());
             ifacePos += QPointF(xIfaceOffset, yIfaceOffset);
-            iface->setCoordinates(shared::graphicsviewutils::coordinates(ifacePos));
+            iface->setCoordinates(topohelp::geom::coordinates(ifacePos));
         }
 
+<<<<<<< HEAD
         coordinates.moveTo(rightBorder + MARGIN, topBorder);
         sourceFunction->setCoordinates(shared::graphicsviewutils::coordinates(coordinates));
+=======
+        coordinates.moveTo(leftBorder, bottomBorder + 40);
+        sourceFunction->setCoordinates(topohelp::geom::coordinates(coordinates));
+>>>>>>> 9bbeab83b (graphicsviewutils' methods moved to a topohelper, documentation updated)
 
         // update rightBorder
         rightBorder += MARGIN + coordinates.width();
@@ -244,7 +255,8 @@ void IvMerger::addNewFunctions(ivm::IVModel &targetIvModel, ivm::IVModel &source
 }
 
 void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvModel, ivm::IVFunctionType *currentFunction,
-        ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos, QVector<ivm::IVFunctionType *> functionsThatWillNotBeReplaced)
+        ivm::IVFunctionType *newFunction, FunctionEndpoints &connectionInfos,
+        QVector<ivm::IVFunctionType *> functionsThatWillNotBeReplaced)
 {
     QVector<ivm::IVConnection *> targetConnections = ivModel.getConnectionsForFunction(currentFunction->id());
 
@@ -263,9 +275,9 @@ void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvMode
     for (ivm::IVConnection *connection : sourceConnections) {
 
         bool isConnectionToNewFunctionToBeAdded = false;
-        for (ivm::IVFunctionType * newFunctionToBeAdded : functionsThatWillNotBeReplaced){
-            if (connection->source()->id() == newFunctionToBeAdded->id() || connection->target()->id() == newFunctionToBeAdded->id())
-            {
+        for (ivm::IVFunctionType *newFunctionToBeAdded : functionsThatWillNotBeReplaced) {
+            if (connection->source()->id() == newFunctionToBeAdded->id()
+                    || connection->target()->id() == newFunctionToBeAdded->id()) {
                 isConnectionToNewFunctionToBeAdded = true;
                 break;
             }
@@ -277,8 +289,8 @@ void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvMode
     }
 
     // get coordinates of top level function in target
-    QRectF targetPosition = shared::graphicsviewutils::rect(currentFunction->coordinates());
-    QRectF sourcePosition = shared::graphicsviewutils::rect(newFunction->coordinates());
+    QRectF targetPosition = topohelp::geom::rect(currentFunction->coordinates());
+    QRectF sourcePosition = topohelp::geom::rect(newFunction->coordinates());
     // calculate offset
     qreal xIfaceOffset = targetPosition.x() - sourcePosition.x();
     qreal yIfaceOffset = targetPosition.y() - sourcePosition.y();
@@ -290,9 +302,9 @@ void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvMode
     // (this includes also coordinates)
     QVector<ivm::IVInterface *> interfaces = newFunction->interfaces();
     for (ivm::IVInterface *iface : interfaces) {
-        QPointF ifacePos = shared::graphicsviewutils::pos(iface->coordinates());
+        QPointF ifacePos = topohelp::geom::pos(iface->coordinates());
         ifacePos += QPointF(xIfaceOffset, yIfaceOffset);
-        iface->setCoordinates(shared::graphicsviewutils::coordinates(ifacePos));
+        iface->setCoordinates(topohelp::geom::coordinates(ifacePos));
     }
     sourcePosition.moveTo(targetPosition.x(), targetPosition.y());
 
@@ -300,7 +312,7 @@ void IvMerger::replaceFunction(ivm::IVModel &ivModel, ivm::IVModel &sourceIvMode
     reparentRecursive(ivModel, newFunction);
 
     // set updated coordinates of top function from source
-    newFunction->setCoordinates(shared::graphicsviewutils::coordinates(sourcePosition));
+    newFunction->setCoordinates(topohelp::geom::coordinates(sourcePosition));
 }
 
 void IvMerger::restoreConnections(ivm::IVModel &ivModel, QVector<ivm::IVFunctionType *> &allFunctions,
@@ -360,7 +372,7 @@ void IvMerger::realizeConnection(ivm::IVModel &ivModel, const QVector<ivm::IVFun
 {
     QList<QRectF> sibilingRects;
     for (ivm::IVFunctionType *targetFunction : allTopLevelFunctions) {
-        sibilingRects.append(shared::graphicsviewutils::rect(targetFunction->coordinates()));
+        sibilingRects.append(topohelp::geom::rect(targetFunction->coordinates()));
     }
     ivm::IVInterface *fromInterface = fromFunction->getInterfaceByName(fromInterfaceName);
     if (fromInterface == nullptr) {
@@ -372,15 +384,17 @@ void IvMerger::realizeConnection(ivm::IVModel &ivModel, const QVector<ivm::IVFun
         // cannot realize connection interface removed in newer version of function
         return;
     }
-    const QPointF startPos = shared::graphicsviewutils::pos(fromInterface->coordinates());
-    const QPointF endPos = shared::graphicsviewutils::pos(toInterface->coordinates());
-    const QRectF startRect = shared::graphicsviewutils::rect(fromFunction->coordinates());
-    const QRectF endRect = shared::graphicsviewutils::rect(toFunction->coordinates());
-    const QVector<QPointF> points =
-            shared::graphicsviewutils::createConnectionPath(sibilingRects, startPos, startRect, endPos, endRect);
+    const QPointF startPos = topohelp::geom::pos(fromInterface->coordinates());
+    const QPointF endPos = topohelp::geom::pos(toInterface->coordinates());
+    const QRectF startRect = topohelp::geom::rect(fromFunction->coordinates());
+    const QRectF endRect = topohelp::geom::rect(toFunction->coordinates());
+
+    const topohelp::cnct::ConnectionEnvInfo connectionInfo { startRect, startPos, endRect, endPos, sibilingRects };
+    const QVector<QPointF> points = topohelp::cnct::createConnectionPath(connectionInfo);
+
     ivm::IVConnection *newConnection = new ivm::IVConnection(fromInterface, toInterface);
     ivModel.addObject(newConnection);
-    newConnection->setCoordinates(shared::graphicsviewutils::coordinates(points));
+    newConnection->setCoordinates(topohelp::geom::coordinates(points));
 }
 
 bool IvMerger::parseInterfaceView(ivm::IVModel *model, const QString &inputIvFile)

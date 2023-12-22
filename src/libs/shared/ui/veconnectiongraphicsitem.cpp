@@ -19,6 +19,7 @@
 
 #include "graphicsviewutils.h"
 #include "grippointshandler.h"
+#include "topohelper/connection.h"
 #include "ui/textitem.h"
 #include "veconnectionendpointgraphicsitem.h"
 #include "veobject.h"
@@ -43,8 +44,7 @@ static inline QList<QGraphicsItem *> intersectedItems(VEConnectionGraphicsItem *
                     return true;
                 }
 
-                const auto intersectionPoints =
-                        graphicsviewutils::intersectionPoints(item->sceneBoundingRect(), points);
+                const auto intersectionPoints = topohelp::geom::intersectionPoints(item->sceneBoundingRect(), points);
                 return intersectionPoints.size() <= 1;
             });
     intersectedGraphicsItems.erase(endIt, intersectedGraphicsItems.end());
@@ -70,9 +70,11 @@ static inline QVector<QPointF> generateConnectionPath(VEConnectionGraphicsItem *
     const bool isStartEndpointNested = startItem->targetItem()->isAncestorOf(endItem);
     const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
 
-    return graphicsviewutils::createConnectionPath(graphicsviewutils::siblingItemsRects(connection),
-            startItem->connectionEndPoint(isStartEndpointNested), startItem->targetItem()->sceneBoundingRect(),
-            endItem->connectionEndPoint(isEndEndpointNested), endItem->targetItem()->sceneBoundingRect());
+    using namespace topohelp::cnct;
+    const ConnectionEnvInfo connectionInfo { startItem->targetItem()->sceneBoundingRect(),
+        startItem->connectionEndPoint(isStartEndpointNested), endItem->targetItem()->sceneBoundingRect(),
+        endItem->connectionEndPoint(isEndEndpointNested), graphicsviewutils::siblingItemsRects(connection) };
+    return createConnectionPath(connectionInfo);
 }
 
 //! Get the connection path with replaced \a connection segments intersected with \a cachedIntersectedItems
@@ -87,9 +89,9 @@ static inline QVector<QPointF> replaceIntersectedSegments(
             continue;
         }
         for (int cacheIdx = 0; cacheIdx < cachedIntersectedItems.size(); ++cacheIdx) {
-            const auto intersectionPoints = shared::graphicsviewutils::intersectionPoints(
-                    cachedIntersectedItems.value(cacheIdx)->sceneBoundingRect(),
-                    QVector<QPointF> { points.value(idx - 1), points.value(idx) });
+            const auto intersectionPoints =
+                    topohelp::geom::intersectionPoints(cachedIntersectedItems.value(cacheIdx)->sceneBoundingRect(),
+                            QVector<QPointF> { points.value(idx - 1), points.value(idx) });
             const int properIntersectionPointsCount = std::count_if(
                     intersectionPoints.cbegin(), intersectionPoints.cend(), [&points](const QPointF &intesectionPoint) {
                         return points.first() != intesectionPoint && points.last() != intesectionPoint;
@@ -120,7 +122,7 @@ static inline QVector<QPointF> replaceIntersectedSegments(
     sections.erase(std::unique(sections.begin(), sections.end()), sections.end());
     const QList<QRectF> existingRects = shared::graphicsviewutils::siblingItemsRects(connection);
     for (auto chunk : sections) {
-        const QVector<QPointF> subPath = shared::graphicsviewutils::path(existingRects, chunk.first, chunk.second);
+        const QVector<QPointF> subPath = topohelp::geom::path(existingRects, chunk.first, chunk.second);
         if (!points.isEmpty()) {
             /// Remove overlapped chunk
             const int idxStart = points.indexOf(chunk.first);
@@ -138,7 +140,7 @@ static inline QVector<QPointF> replaceIntersectedSegments(
             break;
         }
     }
-    return shared::graphicsviewutils::simplifyPoints(points);
+    return topohelp::geom::simplifyPoints(points);
 }
 
 VEConnectionGraphicsItem::GraphicsPathItem::GraphicsPathItem(QGraphicsItem *parent)
@@ -181,7 +183,7 @@ void VEConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
         return;
     }
 
-    if (!graphicsviewutils::comparePolygones(m_points, points)) {
+    if (!topohelp::geom::comparePolygones(m_points, points)) {
         m_points = points;
         instantLayoutUpdate();
     }
@@ -208,7 +210,7 @@ void VEConnectionGraphicsItem::updateFromEntity()
 
     m_readingEntity = true;
 
-    setPoints(graphicsviewutils::polygon(entity()->coordinates()));
+    setPoints(topohelp::geom::polygon(entity()->coordinates()));
     updateVisibility();
 
     m_readingEntity = false;
@@ -324,7 +326,7 @@ bool VEConnectionGraphicsItem::doLayout()
 
     m_points = generateConnectionPath(this);
     updateBoundingRect();
-    return !shared::graphicsviewutils::comparePolygones(oldPoints, m_points);
+    return !topohelp::geom::comparePolygones(oldPoints, m_points);
 }
 
 bool VEConnectionGraphicsItem::replaceInterface(
@@ -407,7 +409,7 @@ void VEConnectionGraphicsItem::updateOverlappedSections()
     const QList<QGraphicsItem *> cachedIntersectedItems = intersectedItems(this);
     /// Nothing to update without intersections with Function(Type) items
     if (cachedIntersectedItems.isEmpty()) {
-        m_points = shared::graphicsviewutils::simplifyPoints(m_points);
+        m_points = topohelp::geom::simplifyPoints(m_points);
     } else {
         m_points = replaceIntersectedSegments(cachedIntersectedItems, this);
     }
@@ -488,11 +490,11 @@ void VEConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF &
     QPointF intersectionPoint { releasedAt };
     if (idx > 0 && idx < m_points.size() - 1) {
         QLineF prevLine = { m_points.value(idx - 1), intersectionPoint };
-        if (shared::graphicsviewutils::alignedLine(prevLine))
+        if (topohelp::geom::alignedLine(prevLine))
             intersectionPoint = prevLine.p2();
 
         QLineF nextLine = { m_points.value(idx + 1), intersectionPoint };
-        if (shared::graphicsviewutils::alignedLine(nextLine))
+        if (topohelp::geom::alignedLine(nextLine))
             intersectionPoint = nextLine.p2();
     }
     m_points[idx] = intersectionPoint;
@@ -605,7 +607,7 @@ bool VEConnectionGraphicsItem::removeCollidedGrips(GripPoint *gp)
 
 void VEConnectionGraphicsItem::simplify()
 {
-    m_points = shared::graphicsviewutils::simplifyPoints(m_points);
+    m_points = topohelp::geom::simplifyPoints(m_points);
 }
 
 void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGraphicsItem *endPoint)
@@ -620,7 +622,7 @@ void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGra
     }
 
     if (m_points.size() > 2) {
-        QVector<QPointF> initialPoints = graphicsviewutils::polygon(entity()->coordinates());
+        QVector<QPointF> initialPoints = topohelp::geom::polygon(entity()->coordinates());
         if (initialPoints.size() < 2) {
             initialPoints.append(m_points.first());
             initialPoints.append(m_points.last());

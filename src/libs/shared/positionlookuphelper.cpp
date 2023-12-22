@@ -17,14 +17,12 @@
 
 #include "positionlookuphelper.h"
 
-#include "graphicsviewutils.h"
+#include "topohelper/geometry.h"
 
 #include <QtMath>
 
-namespace gu = topohelp;
-
-static const QMarginsF kMargins { gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset, gu::kInterfaceLayoutOffset,
-    gu::kInterfaceLayoutOffset };
+static const QMarginsF kMargins { topohelp::kInterfaceLayoutOffset, topohelp::kInterfaceLayoutOffset,
+    topohelp::kInterfaceLayoutOffset, topohelp::kInterfaceLayoutOffset };
 
 void alignPosWithinRect(const QRectF &rect, Qt::Alignment alignment, QPointF &pos, QMarginsF margins)
 {
@@ -63,22 +61,22 @@ namespace shared {
 
 struct PositionLookupHelper::PositionLookupPrivate {
     PositionLookupPrivate(const QList<QPair<Qt::Alignment, QPainterPath>> &sidePaths, const QRectF &parentRect,
-            const QList<QRectF> &siblingsRects, const QPointF &pos, const gu::LookupDirection direction)
+            const QList<QRectF> &siblingsRects, const QPointF &pos, const topohelp::LookupDirection direction)
         : m_sidePaths(sidePaths)
         , m_siblingsRects(siblingsRects)
         , m_parentRect(parentRect)
-        , m_initialSideIdx(indexFromSide(gu::utils::getNearestSide(parentRect, pos)))
+        , m_initialSideIdx(indexFromSide(topohelp::geom::getNearestSide(parentRect, pos)))
         , m_direction(direction)
-        , m_cw({ this, pos, m_initialSideIdx, gu::LookupDirection::Clockwise })
-        , m_ccw({ this, pos, m_initialSideIdx, gu::LookupDirection::CounterClockwise })
-        , m_mixed({ this, pos, m_initialSideIdx, gu::LookupDirection::Mixed })
+        , m_cw({ this, pos, m_initialSideIdx, topohelp::LookupDirection::Clockwise })
+        , m_ccw({ this, pos, m_initialSideIdx, topohelp::LookupDirection::CounterClockwise })
+        , m_mixed({ this, pos, m_initialSideIdx, topohelp::LookupDirection::Mixed })
     {
     }
     const QList<QPair<Qt::Alignment, QPainterPath>> m_sidePaths;
     const QList<QRectF> m_siblingsRects;
     const QRectF m_parentRect;
     const int m_initialSideIdx;
-    const gu::LookupDirection m_direction;
+    const topohelp::LookupDirection m_direction;
 
     Qt::Alignment sideFromIndex(const int idx) const
     {
@@ -97,7 +95,7 @@ struct PositionLookupHelper::PositionLookupPrivate {
 
     struct DirectionHelper {
         DirectionHelper(PositionLookupHelper::PositionLookupPrivate *q, const QPointF &itemPos, int sideIdx,
-                gu::LookupDirection direction)
+                topohelp::LookupDirection direction)
             : q(q)
             , itemPos(itemPos)
             , sideIdx(sideIdx)
@@ -109,7 +107,7 @@ struct PositionLookupHelper::PositionLookupPrivate {
         QRectF intersectedRect;
         QPointF itemPos;
         int sideIdx;
-        const gu::LookupDirection direction;
+        const topohelp::LookupDirection direction;
 
         QRectF itemRect() const { return QRectF(itemPos + originPoint(), shapeForSide().boundingRect().size()); }
         QPointF originPoint() const { return shapeForSide().boundingRect().topLeft(); }
@@ -138,14 +136,14 @@ struct PositionLookupHelper::PositionLookupPrivate {
 
         void nextSide()
         {
-            if (direction == gu::LookupDirection::Clockwise || direction == gu::LookupDirection::Mixed) {
+            if (direction == topohelp::LookupDirection::Clockwise || direction == topohelp::LookupDirection::Mixed) {
                 ++sideIdx;
-            } else if (direction == gu::LookupDirection::CounterClockwise) {
+            } else if (direction == topohelp::LookupDirection::CounterClockwise) {
                 --sideIdx;
             }
 
             // resetting transposed rect to keep origin point on another edge of function
-            if (direction == gu::LookupDirection::Mixed) {
+            if (direction == topohelp::LookupDirection::Mixed) {
                 switch (side()) {
                 case Qt::AlignLeft:
                 case Qt::AlignRight:
@@ -164,7 +162,7 @@ struct PositionLookupHelper::PositionLookupPrivate {
 
         bool isBounded() const { return q->m_parentRect.contains(itemPos); }
 
-        bool isReady() const { return isBounded() && !gu::utils::isCollided(q->m_siblingsRects, itemRect()); }
+        bool isReady() const { return isBounded() && !topohelp::geom::isCollided(q->m_siblingsRects, itemRect()); }
 
         bool hasNext() const
         {
@@ -176,13 +174,13 @@ struct PositionLookupHelper::PositionLookupPrivate {
 
         bool nextRect()
         {
-            if (gu::utils::isCollided(q->m_siblingsRects, itemRect(), &intersectedRect)) {
-                auto dir = direction == gu::LookupDirection::Mixed
+            if (topohelp::geom::isCollided(q->m_siblingsRects, itemRect(), &intersectedRect)) {
+                auto dir = direction == topohelp::LookupDirection::Mixed
                         ? ((side() == Qt::AlignLeft || side() == Qt::AlignBottom)
-                                        ? gu::LookupDirection::CounterClockwise
-                                        : gu::LookupDirection::Clockwise)
+                                        ? topohelp::LookupDirection::CounterClockwise
+                                        : topohelp::LookupDirection::Clockwise)
                         : direction;
-                const QRectF rect = gu::utils::adjustedRect(itemRect(), intersectedRect, side(), dir);
+                const QRectF rect = topohelp::geom::adjustedRect(itemRect(), intersectedRect, side(), dir);
                 itemPos = rect.topLeft() - originPoint();
                 return true;
             }
@@ -199,7 +197,7 @@ struct PositionLookupHelper::PositionLookupPrivate {
 
 PositionLookupHelper::PositionLookupHelper(const QList<QPair<Qt::Alignment, QPainterPath>> &sidePaths,
         const QRectF &parentRect, const QList<QRectF> &siblingsRects, const QPointF &pos,
-        const gu::LookupDirection direction)
+        const topohelp::LookupDirection direction)
     : d(new PositionLookupPrivate(sidePaths, parentRect, siblingsRects, pos, direction))
 {
 }
@@ -210,9 +208,9 @@ bool PositionLookupHelper::lookup()
 {
     auto isValid = [this](PositionLookupPrivate::DirectionHelper *helper) {
         return (d->m_direction == helper->direction
-                       || (d->m_direction == gu::LookupDirection::Bidirectional
-                               && (helper->direction == gu::LookupDirection::Clockwise
-                                       || helper->direction == gu::LookupDirection::CounterClockwise)))
+                       || (d->m_direction == topohelp::LookupDirection::Bidirectional
+                               && (helper->direction == topohelp::LookupDirection::Clockwise
+                                       || helper->direction == topohelp::LookupDirection::CounterClockwise)))
                 && helper->hasNext();
     };
 

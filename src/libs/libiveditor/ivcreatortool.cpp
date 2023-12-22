@@ -48,6 +48,8 @@
 #include "ivfunction.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
+#include "topohelper/connection.h"
+#include "topohelper/geometry.h"
 #include "ui/graphicsviewbase.h"
 
 #include <QAction>
@@ -205,7 +207,7 @@ void IVCreatorTool::groupSelectedItems()
         if (it != groupCreationDataList.end()) {
             it->connections.append(connection);
         } else {
-            QVector<QPointF> points = shared::graphicsviewutils::polygon(connection->coordinates());
+            QVector<QPointF> points = topohelp::geom::polygon(connection->coordinates());
             if (points.isEmpty()) {
                 const QGraphicsItem *sourceItem = m_model->getItem(connection->source()->id());
                 const QGraphicsItem *targetItem = m_model->getItem(connection->target()->id());
@@ -215,9 +217,9 @@ void IVCreatorTool::groupSelectedItems()
 
                 QPointF startPoint = sourceItem->sceneBoundingRect().center();
                 QPointF endPoint = targetItem->sceneBoundingRect().center();
-                const bool startAdjusted = shared::graphicsviewutils::intersects(
+                const bool startAdjusted = topohelp::geom::intersects(
                         sourceItem->sceneBoundingRect(), QLineF(startPoint, endPoint), &startPoint);
-                const bool endAdjusted = shared::graphicsviewutils::intersects(
+                const bool endAdjusted = topohelp::geom::intersects(
                         targetItem->sceneBoundingRect(), QLineF(startPoint, endPoint), &endPoint);
                 if (!startAdjusted || !endAdjusted) {
                     return;
@@ -703,7 +705,7 @@ void IVCreatorTool::handleFunctionType(QGraphicsScene *scene, const QPointF &pos
 
         if (shared::graphicsviewutils::isCollided(m_previewItem, itemSceneRect)) {
             QRectF parentRect = m_previewItem->parentItem() ? m_previewItem->parentItem()->boundingRect() : QRectF();
-            shared::graphicsviewutils::findGeometryForRect(
+            topohelp::geom::findGeometryForRect(
                     itemSceneRect, parentRect, shared::graphicsviewutils::siblingItemsRects(m_previewItem));
         }
 
@@ -738,7 +740,7 @@ void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
 
         if (shared::graphicsviewutils::isCollided(m_previewItem, itemSceneRect)) {
             QRectF parentRect = m_previewItem->parentItem() ? m_previewItem->parentItem()->boundingRect() : QRectF();
-            shared::graphicsviewutils::findGeometryForRect(
+            topohelp::geom::findGeometryForRect(
                     itemSceneRect, parentRect, shared::graphicsviewutils::siblingItemsRects(m_previewItem));
         }
 
@@ -753,9 +755,8 @@ void IVCreatorTool::handleFunction(QGraphicsScene *scene, const QPointF &pos)
 void IVCreatorTool::handleInterface(QGraphicsScene *scene, ivm::IVInterface::InterfaceType type, const QPointF &pos)
 {
     const QPointF snappedPos = m_view->snappedPoint(pos);
-    if (auto parentItem = shared::graphicsviewutils::nearestItem(scene,
-                shared::graphicsviewutils::adjustFromPoint(snappedPos, topohelp::kInterfaceTolerance),
-                kFunctionTypes)) {
+    if (auto parentItem = shared::graphicsviewutils::nearestItem(
+                scene, topohelp::geom::adjustFromPoint(snappedPos, topohelp::kInterfaceTolerance), kFunctionTypes)) {
         ivm::IVFunctionType *parentObject = gi::functionTypeObject(parentItem);
         if (parentObject && parentObject->isReference())
             return;
@@ -817,9 +818,12 @@ static inline QVector<QPointF> generateConnectionPoints(IVItemModel *model, shar
     const bool isEndEndpointNested = endItem->targetItem()->isAncestorOf(startItem);
 
     QGraphicsItem *siblingItem = isStartEndpointNested ? startItem->targetItem() : endItem->targetItem();
-    return shared::graphicsviewutils::createConnectionPath(shared::graphicsviewutils::siblingItemsRects(siblingItem),
-            startItem->connectionEndPoint(isStartEndpointNested), startItem->targetItem()->sceneBoundingRect(),
-            endItem->connectionEndPoint(isEndEndpointNested), endItem->targetItem()->sceneBoundingRect());
+
+    const topohelp::cnct::ConnectionEnvInfo connectionInfo { startItem->targetItem()->sceneBoundingRect(),
+        startItem->connectionEndPoint(isStartEndpointNested), endItem->targetItem()->sceneBoundingRect(),
+        endItem->connectionEndPoint(isEndEndpointNested), shared::graphicsviewutils::siblingItemsRects(siblingItem) };
+
+    return topohelp::cnct::createConnectionPath(connectionInfo);
 }
 
 void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints)
@@ -897,8 +901,7 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints)
             break;
         }
         const QRectF rect = item->sceneBoundingRect();
-        const QVector<QPointF> intersectionPoints =
-                shared::graphicsviewutils::intersectionPoints(rect, info.connectionPoints);
+        const QVector<QPointF> intersectionPoints = topohelp::geom::intersectionPoints(rect, info.connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             parentForConnection = item;
             break;
@@ -947,7 +950,7 @@ void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints)
             break;
         }
         const QRectF rect = item->sceneBoundingRect();
-        const auto intersectionPoints = shared::graphicsviewutils::intersectionPoints(rect, info.connectionPoints);
+        const auto intersectionPoints = topohelp::geom::intersectionPoints(rect, info.connectionPoints);
         if (intersectionPoints.isEmpty() || intersectionPoints.size() % 2 == 0) {
             Q_ASSERT(parentForConnection == item || parentForConnection == nullptr);
             parentForConnection = item;
