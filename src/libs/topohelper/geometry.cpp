@@ -227,7 +227,7 @@ PointsList intersectionPoints(const QRectF &rect, const QPolygonF &polygon)
  */
 qreal calcDistance(const QPointF &pnt1, const QPointF &pnt2)
 {
-    return std::sqrt(std::pow((pnt2.x() - pnt1.x()), 2) + std::pow((pnt2.y() - pnt1.y()), 2));
+    return QLineF(pnt1, pnt2).length();
 }
 
 /*!
