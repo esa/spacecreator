@@ -65,7 +65,7 @@ PointsList path(const RectsList &existingRects, const QLineF &startDirection, co
 PointsList path(const RectsList &existingRects, const QPointF &startPoint, const QPointF &endPoint);
 Qt::Alignment getNearestSide(const QRectF &boundingArea, const QPointF &pos);
 PointsList intersectionPoints(const QRectF &rect, const QPolygonF &polygon);
-qreal distanceLine(const QPointF &pnt1, const QPointF &pnt2);
+qreal calcDistance(const QPointF &pnt1, const QPointF &pnt2);
 QRectF getNearestIntersectedRect(
         const RectsList &existingRects, const PointsList &points, IntersectionType intersectionType);
 bool intersects(const QRectF &rect, const QLineF &line, QPointF *intersectPos = nullptr);

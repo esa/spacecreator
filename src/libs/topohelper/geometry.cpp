@@ -225,7 +225,7 @@ PointsList intersectionPoints(const QRectF &rect, const QPolygonF &polygon)
  *
  * TODO: check why it is not the QLineF.length() call?
  */
-qreal distanceLine(const QPointF &pnt1, const QPointF &pnt2)
+qreal calcDistance(const QPointF &pnt1, const QPointF &pnt2)
 {
     return std::sqrt(std::pow((pnt2.x() - pnt1.x()), 2) + std::pow((pnt2.y() - pnt1.y()), 2));
 }
@@ -280,8 +280,8 @@ QRectF getNearestIntersectedRect(
                 }
                 std::for_each(intersectPoints.cbegin(), intersectPoints.cend(),
                         [&intersectionPoint, sectionStartPoint = line.p1()](const QPointF &pnt) {
-                            if (distanceLine(sectionStartPoint, intersectionPoint)
-                                    > distanceLine(pnt, sectionStartPoint)) {
+                            if (calcDistance(sectionStartPoint, intersectionPoint)
+                                    > calcDistance(pnt, sectionStartPoint)) {
                                 intersectionPoint = pnt;
                             }
                         });
@@ -326,7 +326,7 @@ qreal distancePolygon(const PointsList &polygon)
 {
     qreal distance = 0;
     for (auto it = std::next(polygon.constBegin()); it != polygon.constEnd(); ++it) {
-        distance += distanceLine(*std::prev(it), *it);
+        distance += calcDistance(*std::prev(it), *it);
     }
     return distance;
 }
