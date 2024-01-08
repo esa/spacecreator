@@ -18,11 +18,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "requirementsmanager.h"
 
 #include "gitlab/gitlabrequirements.h"
+#include "issue.h"
+#include "issuerequestoptions.h"
+#include "labelsrequestoptions.h"
+#include "qgitlabclient.h"
 
 #include <QDir>
-#include <issue.h>
-#include <issuerequestoptions.h>
-#include <qgitlabclient.h>
 
 namespace requirement {
 
@@ -59,8 +60,11 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType, QObject *parent)
                 &RequirementsManager::requirementClosed);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueFetchingDone, this,
                 &RequirementsManager::fetchingRequirementsEnded);
-        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfLabels, this,
-                [this](QList<gitlab::Label> labels) { Q_EMIT listOfTags(GitLabRequirements::tagsFromLabels(labels)); });
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::labelsFetchingDone, this,
+                [this] { Q_EMIT listOfTags(m_tagsBuffer); });
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfLabels, this, [this](QList<gitlab::Label> labels) {
+            m_tagsBuffer.append(GitLabRequirements::tagsFromLabels(labels));
+        });
         connect(d->gitlabRequirements.get(), &requirement::GitLabRequirements::listOfRequirements, this,
                 &RequirementsManager::listOfRequirements);
         break;
@@ -145,8 +149,9 @@ bool RequirementsManager::requestAllRequirements()
     switch (d->mRepoType) {
     case (REPO_TYPE::GITLAB): {
         gitlab::IssueRequestOptions options;
+        options.mProjectID = m_projectID;
         options.mLabels = { k_requirementsTypeLabel };
-        const bool wasBusy = d->gitlabClient->requestIssues(m_projectID, options);
+        const bool wasBusy = d->gitlabClient->requestIssues(options);
         if (wasBusy) {
             return false;
         }
@@ -200,18 +205,24 @@ bool RequirementsManager::requestTags()
 {
     switch (d->mRepoType) {
     case (REPO_TYPE::GITLAB): {
-        gitlab::IssueRequestOptions options;
-        options.mLabels = { k_requirementsTypeLabel };
-        const bool wasBusy = d->gitlabClient->requestListofLabels(m_projectID);
+        gitlab::LabelsRequestOptions options;
+        options.mProjectID = m_projectID;
+        const bool wasBusy = d->gitlabClient->requestListofLabels(options);
         if (wasBusy) {
             return false;
         }
+        m_tagsBuffer.clear();
         return true;
     }
     default:
         qDebug() << "unknown repository type";
     }
     return false;
+}
+
+QStringList RequirementsManager::tagsBuffer()
+{
+    return m_tagsBuffer;
 }
 
 void RequirementsManager::setProjectID(const int &newProjectID)

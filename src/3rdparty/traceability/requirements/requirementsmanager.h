@@ -34,6 +34,7 @@ class RequirementsManager : public QObject
     Q_OBJECT
     Q_PROPERTY(int projectID READ projectID WRITE setProjectID NOTIFY projectIDChanged)
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    Q_PROPERTY(QStringList tagsBuffer READ tagsBuffer)
 
 public:
     enum class REPO_TYPE
@@ -57,6 +58,8 @@ public:
     bool removeRequirement(const Requirement &requirement) const;
     bool requestTags();
 
+    QStringList tagsBuffer();
+
 public Q_SLOTS:
     void setProjectID(const int &newProjectID);
 
@@ -77,6 +80,7 @@ private:
     int m_projectID = -1;
     QUrl m_projectUrl = {};
     QString m_token = "";
+    QStringList m_tagsBuffer;
     class RequirementsManagerPrivate;
     std::unique_ptr<RequirementsManagerPrivate> d;
 };

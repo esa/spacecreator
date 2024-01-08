@@ -5,6 +5,7 @@
 namespace gitlab {
 
 class IssueRequestOptions;
+class LabelsRequestOptions;
 
 /*!
  * Class to create URLs to fetch data from gitlab
@@ -32,8 +33,7 @@ public:
             const QString &description = QString(), const QString &assignee = QString(),
             const QString &state_event = QString(), const QStringList &labels = QStringList()) const;
 
-    QUrl composeProjectLabelsUrl(
-            const int &projectID, const QString &with_counts = "false", const QString &search = QString()) const;
+    QUrl composeProjectLabelsUrl(const LabelsRequestOptions &options) const;
     QUrl composeProjectUrl(const QString &projectName) const;
 
     void setBaseURL(const QUrl &newBaseURL);

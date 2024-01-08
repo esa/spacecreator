@@ -1,6 +1,7 @@
 #include "urlcomposer.h"
 
 #include "issuerequestoptions.h"
+#include "labelsrequestoptions.h"
 
 #include <QMap>
 #include <QUrlQuery>
@@ -97,17 +98,13 @@ QUrl UrlComposer::composeEditIssueUrl(const int &projectID, const int &issueID, 
     return url;
 }
 
-QUrl UrlComposer::composeProjectLabelsUrl(const int &projectID, const QString &with_counts, const QString &search) const
+QUrl UrlComposer::composeProjectLabelsUrl(const LabelsRequestOptions &options) const
 {
     QString address = composeUrl(UrlComposer::UrlTypes::ProjectLabels);
-    address = address.arg(QString::number(projectID));
-
-    const QMap<QString, QVariant> data = {
-        { "id", QString::number(projectID) }, { "with_counts", with_counts }, { "search", search } // Search label terms
-    };
+    address = address.arg(QString::number(options.mProjectID));
 
     QUrl url(address);
-    url.setQuery(setQuery(data));
+    url.setQuery(options.urlQuery());
     return url;
 }
 

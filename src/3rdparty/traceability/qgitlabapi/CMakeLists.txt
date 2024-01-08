@@ -10,8 +10,11 @@ target_sources(${LIB_NAME} PRIVATE
   issuerequestoptions.h
   label.cpp
   label.h
+  labelsrequestoptions.h
+  labelsrequestoptions.cpp
   qgitlabclient.cpp
   qgitlabclient.h
+  requestoptions.h
   urlcomposer.cpp
   urlcomposer.h
 )

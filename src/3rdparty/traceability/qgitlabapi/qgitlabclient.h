@@ -12,6 +12,8 @@
 namespace gitlab {
 
 class IssueRequestOptions;
+class LabelsRequestOptions;
+class RequestOptions;
 
 /**
  * @brief The QGitlabClient class is the main class to start requests on the Gitlab server
@@ -31,12 +33,11 @@ public:
 
     QGitlabClient();
     void setCredentials(const QString &url, const QString &token);
-    bool requestIssues(const int &projectID, const IssueRequestOptions &options);
+    bool requestIssues(const IssueRequestOptions &options);
     bool editIssue(const int &projectID, const int &issueID, const Issue &newIssue);
     bool createIssue(const int &projectID, const QString &title, const QString &description, const QStringList &labels);
     bool closeIssue(const int &projectID, const int &issueID);
-    bool requestListofLabels(
-            const int &projectID, const QString &with_counts = "false", const QString &search = QString());
+    bool requestListofLabels(const LabelsRequestOptions &options);
     bool requestProjectId(const QUrl &projectUrl);
 
     bool isBusy() const;
@@ -55,6 +56,11 @@ Q_SIGNALS:
      * Sent after successfully fetching issues
      */
     void issueFetchingDone();
+    /*!
+     * Sent after successfully fetching labels
+     */
+    void labelsFetchingDone();
+
     void listOfLabels(QList<Label>);
     void requestedProjectID(int);
     void connectionError(QString errorString);
@@ -63,10 +69,18 @@ Q_SIGNALS:
 
 protected:
     QNetworkReply *sendRequest(ReqType reqType, const QUrl &url);
+    /*!
+     * \brief requestNextPage makes a request for next page (if any ) for issues or labels
+     * \param reply
+     * \param options which can be any derived class from RequestOptions
+     * \return true if there was another requestable page
+     */
+    bool requestNextPage(QNetworkReply *reply, const RequestOptions &options);
     int pageNumberFromHeader(QNetworkReply *reply) const;
     int totalPagesFromHeader(QNetworkReply *reply) const;
     int numberHeaderAttribute(QNetworkReply *reply, const QString &headername) const;
     void setBusy(bool busy);
+    bool isIssueRequest(QNetworkReply *reply) const;
 
 private:
     QString mUsername;

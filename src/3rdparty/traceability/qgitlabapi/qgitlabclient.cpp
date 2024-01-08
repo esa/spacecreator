@@ -1,6 +1,7 @@
 #include "qgitlabclient.h"
 
 #include "issuerequestoptions.h"
+#include "labelsrequestoptions.h"
 
 #include <QDebug>
 #include <QDir>
@@ -27,14 +28,14 @@ void QGitlabClient::setCredentials(const QString &url, const QString &token)
     mToken = token;
 }
 
-bool QGitlabClient::requestIssues(const int &projectID, const IssueRequestOptions &options)
+bool QGitlabClient::requestIssues(const IssueRequestOptions &options)
 {
     if (isBusy()) {
         return true;
     }
     setBusy(true);
-    auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeGetIssuesUrl(projectID, options));
-    connect(reply, &QNetworkReply::finished, [reply, projectID, options, this]() {
+    auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeGetIssuesUrl(options.mProjectID, options));
+    connect(reply, &QNetworkReply::finished, [reply, options, this]() {
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
@@ -49,21 +50,9 @@ bool QGitlabClient::requestIssues(const int &projectID, const IssueRequestOption
                 Q_EMIT listOfIssues(issues);
             }
 
-            // Request next page if needed
-            int page = pageNumberFromHeader(reply);
-            const int totalPages = totalPagesFromHeader(reply);
-            if (page >= 0 && totalPages >= 0) {
-                if (page < totalPages) {
-                    IssueRequestOptions nextPage = options;
-                    nextPage.mPage = page + 1;
-                    m_busy = false; // workaround to enable request for the next page
-                    requestIssues(projectID, nextPage);
-                } else {
-                    if (page == totalPages) {
-                        setBusy(false);
-                        Q_EMIT issueFetchingDone();
-                    }
-                }
+            if (!requestNextPage(reply, options)) {
+                setBusy(false);
+                Q_EMIT issueFetchingDone();
             }
         } else {
             qDebug() << reply->error() << reply->errorString();
@@ -139,14 +128,14 @@ bool QGitlabClient::closeIssue(const int &projectID, const int &issueID)
     return false;
 }
 
-bool QGitlabClient::requestListofLabels(const int &projectID, const QString &with_counts, const QString &search)
+bool QGitlabClient::requestListofLabels(const LabelsRequestOptions &options)
 {
     if (isBusy()) {
         return true;
     }
     setBusy(true);
-    auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectLabelsUrl(projectID, with_counts, search));
-    connect(reply, &QNetworkReply::finished, [reply, this]() {
+    auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectLabelsUrl(options));
+    connect(reply, &QNetworkReply::finished, [reply, this, options]() {
         setBusy(false);
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
@@ -160,6 +149,10 @@ bool QGitlabClient::requestListofLabels(const int &projectID, const QString &wit
                     labels.push_back(Label(label.toObject()));
                 }
                 Q_EMIT listOfLabels(labels);
+            }
+            if (!requestNextPage(reply, options)) {
+                setBusy(false);
+                Q_EMIT labelsFetchingDone();
             }
         } else {
             qDebug() << reply->error() << reply->errorString();
@@ -245,6 +238,29 @@ QNetworkReply *QGitlabClient::sendRequest(QGitlabClient::ReqType reqType, const 
     return reply;
 }
 
+bool QGitlabClient::requestNextPage(QNetworkReply *reply, const RequestOptions &options)
+{
+    int page = pageNumberFromHeader(reply);
+    const int totalPages = totalPagesFromHeader(reply);
+    if (page >= 0 && totalPages >= 0) {
+        if (page < totalPages) {
+            if (isIssueRequest(reply)) {
+                IssueRequestOptions nextPage = dynamic_cast<const IssueRequestOptions &>(options);
+                nextPage.mPage = page + 1;
+                m_busy = false; // workaround to enable request for the next page
+                requestIssues(nextPage);
+            } else {
+                LabelsRequestOptions nextPage = dynamic_cast<const LabelsRequestOptions &>(options);
+                nextPage.mPage = page + 1;
+                m_busy = false; // workaround to enable request for the next page
+                requestListofLabels(nextPage);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
 int QGitlabClient::pageNumberFromHeader(QNetworkReply *reply) const
 {
     return numberHeaderAttribute(reply, "x-page");
@@ -278,4 +294,9 @@ void QGitlabClient::setBusy(bool busy)
     m_busy = busy;
     Q_EMIT busyStateChanged(m_busy);
 }
+}
+
+bool gitlab::QGitlabClient::isIssueRequest(QNetworkReply *reply) const
+{
+    return reply->request().url().query().contains("api/v4/issues");
 }
