@@ -225,7 +225,7 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
     const auto startIfaceItem =
             qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(scene,
                     topohelp::geom::adjustFromPoint(startPos, topohelp::kInterfaceTolerance),
-                    { ive::IVInterfaceGraphicsItem::Type }));
+                    { ive::IVInterfaceGraphicsItem::Type }, shared::graphicsviewutils::DistanceCondition::InsideItem));
 
     static const QMarginsF kToleranceMargins = { topohelp::kInterfaceTolerance / 2, topohelp::kInterfaceTolerance / 2,
         topohelp::kInterfaceTolerance / 2, topohelp::kInterfaceTolerance / 2 };
@@ -248,7 +248,7 @@ ivm::ValidationResult validateConnectionCreate(QGraphicsScene *scene, const QVec
 
     const auto endIfaceItem = qgraphicsitem_cast<ive::IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(
             scene, topohelp::geom::adjustFromPoint(endPos, topohelp::kInterfaceTolerance),
-            { ive::IVInterfaceGraphicsItem::Type }));
+            { ive::IVInterfaceGraphicsItem::Type }, shared::graphicsviewutils::DistanceCondition::InsideItem));
     if (endIfaceItem && endIfaceItem->ifaceShape().boundingRect().marginsAdded(kToleranceMargins).contains(endPos)) {
         result.endIface = endIfaceItem->entity();
         result.endPointAdjusted =

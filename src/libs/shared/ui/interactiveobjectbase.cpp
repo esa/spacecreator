@@ -45,6 +45,8 @@ struct InteractiveObjectBase::InteractiveObjectBasePrivate {
     QPen selectedPen;
 
     shared::DelayedSignal *rebuildLayoutSignal = nullptr;
+
+    QGraphicsRectItem *bbox = nullptr;
 };
 
 InteractiveObjectBase::InteractiveObjectBase(QGraphicsItem *parent)
@@ -352,6 +354,20 @@ void InteractiveObjectBase::gripPointReleased(GripPoint *gp, const QPointF &pres
     }
 }
 
+/*!
+ * If shown, syncs the bounding box item with the item's current bounding box
+ */
+void InteractiveObjectBase::updateBoundingBox()
+{
+    if (!d->bbox) {
+        return;
+    }
+
+    QRectF rect = sceneBoundingRect();
+    rect = mapRectFromScene(rect);
+    d->bbox->setRect(rect);
+}
+
 HighlightRectItem *InteractiveObjectBase::createHighlighter()
 {
     auto highlighter = new HighlightRectItem(this);
@@ -368,6 +384,20 @@ shared::ColorHandler InteractiveObjectBase::colorHandler() const
 {
     // Get colorHandler for the type of this instance type
     return shared::ColorManager::instance()->colorsForItem(handledColorType());
+}
+
+/*!
+ * A functionality for debugging. It draws a box to visualize the bounding box of the item
+ */
+void InteractiveObjectBase::showBoundingBox()
+{
+    if (!d->bbox) {
+        d->bbox = new QGraphicsRectItem(this);
+        d->bbox->setBrush(QBrush(QColor(255, 64, 64, 32)));
+        d->bbox->setPen(QPen(QColor(255, 64, 64, 128), 2));
+        connect(this, &InteractiveObjectBase::boundingBoxChanged, this, &InteractiveObjectBase::updateBoundingBox);
+    }
+    updateBoundingBox();
 }
 
 }

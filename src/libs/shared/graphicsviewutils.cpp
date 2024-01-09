@@ -72,10 +72,13 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &pos, cons
 }
 
 /*!
- * \brief Iterates over all \a scene items in the specified \a area and returns the first one which
- * QGraphicsItem::type found in \a acceptableTypes list.
+ * \brief Iterates over all \a scene items in the specified \a area and returns the item the area is the losest to
+ * (closest to the border) QGraphicsItem::type found in \a acceptableTypes list.
+ * \param distanceCondition Select if item border should be close to the area or if it should be preferred to be "well
+ * inside the item"
  */
-QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes)
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes,
+        const DistanceCondition distanceCondition)
 {
     const QList<QGraphicsItem *> areaItems = scene->items(area);
     if (areaItems.isEmpty())
@@ -84,11 +87,14 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, cons
     const QPointF point = area.center();
     if (areaItems.size() == 1) {
         auto item = areaItems.value(0);
-        if (item && item->contains(point) && acceptableTypes.contains(item->type()))
+        if (item && item->sceneBoundingRect().contains(point) && acceptableTypes.contains(item->type())) {
             return item;
+        } else {
+            return nullptr;
+        }
     }
 
-    qreal distance = std::numeric_limits<int>::max();
+    qreal distance = std::numeric_limits<qreal>::max();
     QGraphicsItem *nearestToCenter = nullptr;
     for (QGraphicsItem *item : areaItems) {
         if (!acceptableTypes.isEmpty() && !acceptableTypes.contains(item->type()))
@@ -99,6 +105,12 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, cons
         itemDistance = std::min(itemDistance, qAbs(itemRect.left() - point.x()));
         itemDistance = std::min(itemDistance, qAbs(itemRect.top() - point.y()));
         itemDistance = std::min(itemDistance, qAbs(itemRect.bottom() - point.y()));
+
+        if (distanceCondition == DistanceCondition::InsideItem && itemRect.contains(point)) {
+            // if inside of the item, the farer away from the border, the better
+            itemDistance *= -1;
+        }
+
         if (itemDistance < distance) {
             nearestToCenter = item;
             distance = itemDistance;
@@ -110,9 +122,11 @@ QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area, cons
 /*!
  * \brief Iterates over all \a scene items in the square with center in \a center and the size of \a offset and returns
  * the first one which QGraphicsItem::type found in \a acceptableTypes list.
+ * \param distanceCondition Select if item border should be close to the area or if it should be preferred to be "well
+ * inside the item"
  */
-QGraphicsItem *nearestItem(
-        const QGraphicsScene *scene, const QPointF &center, qreal offset, const QList<int> &acceptableTypes)
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, qreal offset,
+        const QList<int> &acceptableTypes, const DistanceCondition distanceCondition)
 {
     const QRectF area { center - QPointF(offset / 2, offset / 2), center + QPointF(offset / 2, offset / 2) };
     return nearestItem(scene, area, acceptableTypes);
@@ -277,6 +291,5 @@ QRectF snappedRect(QGraphicsScene *scene, const QRectF &rect)
 {
     return QRectF(snappedPoint(scene, rect.topLeft()), snappedPoint(scene, rect.bottomRight()));
 }
-
 }
 }

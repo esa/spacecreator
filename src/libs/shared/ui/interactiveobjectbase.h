@@ -130,6 +130,8 @@ protected:
      */
     virtual ColorHandler colorHandler() const;
 
+    void showBoundingBox();
+
 protected Q_SLOTS:
     virtual void rebuildLayout();
 
@@ -137,6 +139,7 @@ private Q_SLOTS:
     virtual void gripPointPressed(shared::ui::GripPoint *pos, const QPointF &at);
     virtual void gripPointMoved(shared::ui::GripPoint *gp, const QPointF &from, const QPointF &to);
     virtual void gripPointReleased(shared::ui::GripPoint *pos, const QPointF &pressedAt, const QPointF &releasedAt);
+    void updateBoundingBox();
 
 private:
     HighlightRectItem *createHighlighter();

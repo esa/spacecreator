@@ -283,12 +283,12 @@ bool IVCreatorTool::onMousePress(QMouseEvent *e)
         return false;
     }
 
-    const QPointF scenePos = m_view->snappedPoint(cursorInScene(e->globalPos()));
+    QPointF scenePos = cursorInScene(e->globalPos());
     if ((m_toolType == ToolType::ReCreateConnection || e->modifiers() & Qt::ShiftModifier)
             && e->button() != Qt::RightButton) {
         if (!m_previewConnectionItem) {
-            QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
-                    scene, scenePos, topohelp::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
+            QGraphicsItem *item = shared::graphicsviewutils::nearestItem(scene, scenePos, topohelp::kInterfaceTolerance,
+                    { IVInterfaceGraphicsItem::Type }, shared::graphicsviewutils::DistanceCondition::InsideItem);
             if (!item || item->type() != IVInterfaceGraphicsItem::Type)
                 return false;
 
@@ -327,10 +327,16 @@ bool IVCreatorTool::onMousePress(QMouseEvent *e)
     }
 
     if (m_toolType == ToolType::DirectConnection && e->button() != Qt::RightButton) {
-        if (!shared::graphicsviewutils::nearestItem(scene, scenePos, QList<int> { IVFunctionGraphicsItem::Type })) {
-            if (!shared::graphicsviewutils::nearestItem(
-                        scene, scenePos, topohelp::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type }))
+        QGraphicsItem *item = shared::graphicsviewutils::nearestItem(scene, scenePos, topohelp::kInterfaceTolerance,
+                { IVInterfaceGraphicsItem::Type }, shared::graphicsviewutils::DistanceCondition::InsideItem);
+        if (item) {
+            auto interfaceItem = static_cast<IVInterfaceGraphicsItem *>(item);
+            scenePos = interfaceItem->connectionEndPoint(false);
+        } else {
+            if (!shared::graphicsviewutils::nearestItem(scene, scenePos, QList<int> { IVFunctionGraphicsItem::Type })) {
                 return false;
+            }
+            scenePos = m_view->snappedPoint(cursorInScene(e->globalPos()));
         }
 
         if (m_previewConnectionItem) {
@@ -345,10 +351,14 @@ bool IVCreatorTool::onMousePress(QMouseEvent *e)
         return true;
     } else if (m_toolType == ToolType::MultiPointConnection && e->button() != Qt::RightButton) {
         if (!m_previewConnectionItem) {
-            QGraphicsItem *item = shared::graphicsviewutils::nearestItem(
-                    scene, scenePos, topohelp::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type });
-            if (!item)
+            QGraphicsItem *item = shared::graphicsviewutils::nearestItem(scene, scenePos, topohelp::kInterfaceTolerance,
+                    { IVInterfaceGraphicsItem::Type }, shared::graphicsviewutils::DistanceCondition::InsideItem);
+            if (!item) {
                 return false;
+            } else {
+                auto interfaceItem = static_cast<IVInterfaceGraphicsItem *>(item);
+                scenePos = interfaceItem->connectionEndPoint(false);
+            }
 
             const QPointF startPoint = item->mapToScene(QPointF(0, 0));
             m_previewConnectionItem = new QGraphicsPathItem;
@@ -361,6 +371,7 @@ bool IVCreatorTool::onMousePress(QMouseEvent *e)
         return !m_connectionPoints.contains(scenePos);
     } else if (e->button() == Qt::RightButton
             || (m_toolType != ToolType::RequiredInterface && m_toolType != ToolType::ProvidedInterface)) {
+        scenePos = m_view->snappedPoint(cursorInScene(e->globalPos()));
         if (!m_previewItem) {
             QGraphicsItem *parentItem = m_view->itemAt(e->pos());
             while (parentItem != nullptr && parentItem->type() != IVFunctionGraphicsItem::Type
@@ -779,8 +790,9 @@ bool IVCreatorTool::handleConnectionCreate(const QPointF &pos)
     if (!m_previewConnectionItem)
         return false;
 
-    if (auto itemUnderCursor = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(shared::graphicsviewutils::nearestItem(
-                scene, pos, topohelp::kInterfaceTolerance, { IVInterfaceGraphicsItem::Type }))) {
+    if (auto itemUnderCursor = qgraphicsitem_cast<IVInterfaceGraphicsItem *>(
+                shared::graphicsviewutils::nearestItem(scene, pos, topohelp::kInterfaceTolerance,
+                        { IVInterfaceGraphicsItem::Type }, shared::graphicsviewutils::DistanceCondition::InsideItem))) {
         const QPointF finishPoint = itemUnderCursor->connectionEndPoint();
         if (!itemUnderCursor->ifaceShape().boundingRect().contains(m_connectionPoints.front())) {
             m_connectionPoints.append(finishPoint);

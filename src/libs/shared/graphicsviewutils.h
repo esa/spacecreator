@@ -13,12 +13,20 @@ namespace graphicsviewutils {
 QPainterPath lineShape(const QLineF &line, qreal span);
 QPainterPath edgeCuttedRectShape(const QRectF &rect, qreal cut);
 
+/// Enum to select if the item closer to the border of the selcted point more inside should be preferred
+enum class DistanceCondition
+{
+    CloseToBorder, /// Prefer the closest border if several items are close to the selection point/area
+    InsideItem /// Prefer the "most inside the item" if several items are close to the selection point/area
+};
 QGraphicsItem *nearestItem(
         const QGraphicsScene *scene, const QPointF &pos, const QList<int> &acceptableTypes = QList<int>());
-QGraphicsItem *nearestItem(
-        const QGraphicsScene *scene, const QRectF &area, const QList<int> &acceptableTypes = QList<int>());
+QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QRectF &area,
+        const QList<int> &acceptableTypes = QList<int>(),
+        const DistanceCondition distanceCondition = DistanceCondition::CloseToBorder);
 QGraphicsItem *nearestItem(const QGraphicsScene *scene, const QPointF &center, qreal offset,
-        const QList<int> &acceptableTypes = QList<int>());
+        const QList<int> &acceptableTypes = QList<int>(),
+        const DistanceCondition distanceCondition = DistanceCondition::CloseToBorder);
 
 bool isCollided(const QGraphicsItem *upcomingItem, const QRectF &upcomingItemRect);
 
