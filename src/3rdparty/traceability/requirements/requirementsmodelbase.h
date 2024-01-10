@@ -77,6 +77,8 @@ public:
 
     Requirement requirementFromIndex(const QModelIndex &idx);
 
+    bool reqIfIDExists(const QString &reqIfID) const;
+
 protected:
     QString getReqIfIdFromModelIndex(const QModelIndex &index) const;
 

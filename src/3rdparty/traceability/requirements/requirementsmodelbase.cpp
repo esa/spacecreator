@@ -188,4 +188,10 @@ Requirement RequirementsModelBase::requirementFromIndex(const QModelIndex &idx)
     return Requirement();
 }
 
+bool RequirementsModelBase::reqIfIDExists(const QString &reqIfID) const
+{
+    return std::any_of(m_requirements.begin(), m_requirements.end(),
+            [reqIfID](const Requirement &req) { return req.m_id == reqIfID; });
+}
+
 } // namespace requirement

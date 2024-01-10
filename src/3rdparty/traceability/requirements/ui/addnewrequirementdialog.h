@@ -18,12 +18,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include <QDialog>
+#include <QPointer>
 
 namespace Ui {
 class AddNewRequirementDialog;
 }
 
 namespace requirement {
+
+class RequirementsModelBase;
 
 /*!
  * \brief The dialog for adding a new Requirement
@@ -33,7 +36,7 @@ class AddNewRequirementDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddNewRequirementDialog(QWidget *parent = nullptr);
+    explicit AddNewRequirementDialog(requirement::RequirementsModelBase *model, QWidget *parent = nullptr);
     ~AddNewRequirementDialog();
     QString title() const;
     QString description() const;
@@ -42,7 +45,7 @@ public:
 
 private:
     void updateOkButton();
-
+    requirement::RequirementsModelBase *m_model;
     Ui::AddNewRequirementDialog *ui;
 };
 

@@ -339,7 +339,7 @@ bool RequirementsWidget::tagButtonExists(const QString &tag) const
 
 void RequirementsWidget::showNewRequirementDialog() const
 {
-    QScopedPointer<AddNewRequirementDialog> dialog(new AddNewRequirementDialog());
+    QScopedPointer<AddNewRequirementDialog> dialog(new AddNewRequirementDialog(m_model.get()));
     dialog->setModal(true);
     auto ret = dialog->exec();
     if (ret == QDialog::Accepted) {
