@@ -431,6 +431,12 @@ void IVInterface::forgetClone(IVInterface *clone)
 void IVInterface::setAttributeImpl(const QString &name, const QVariant &value, EntityAttribute::Type type)
 {
     if (meta::Props::token(name) == meta::Props::Token::name && value.isValid()) {
+        if (isClone() && value.toString() != nameFromCloneOrigin(d->m_cloneOf)) {
+            // Cloned interfaces inherit their names from the function type interface that they are cloned from
+            return;
+        }
+
+        // Check if an interface of same type (PIR/RI) and the same name exists already
         const QString newName = value.toString();
         if (auto fn = function()) {
             for (IVInterface *iface : isRequiredInterface() ? fn->ris() : fn->pis()) {
@@ -577,16 +583,11 @@ void IVInterface::reflectAttrs(const IVInterface *from)
     // has multiple connections to provided interfaces.
     if (keepName) {
         revertAttribute(meta::Props::Token::name, newAttrs, m_originalFields.attrs);
-    } else if (const IVFunctionType *fn = function()) {
-        const QVector<IVInterface *> ifaces = fn->interfaces();
-        const auto it = std::find_if(ifaces.cbegin(), ifaces.cend(), [this](const IVInterface *iface) {
-            return iface != this && iface->isRequired() && iface->title() == title();
-        });
-        if (it != ifaces.cend()) {
-            auto newAttrIt = newAttrs.find(meta::Props::token(meta::Props::Token::name));
-            if (newAttrIt != newAttrs.end()) {
-                newAttrIt->setValue(from->function()->title() + QLatin1Char('_') + from->title());
-            }
+    } else {
+        const QString name = nameFromCloneOrigin(from);
+        auto newAttrIt = newAttrs.find(meta::Props::token(meta::Props::Token::name));
+        if (newAttrIt != newAttrs.end() && !name.isEmpty()) {
+            newAttrIt->setValue(name);
         }
     }
 
@@ -610,6 +611,24 @@ void IVInterface::reflectParams(const IVInterface *from)
         return;
 
     setParams(from->params());
+}
+
+QString IVInterface::nameFromCloneOrigin(const IVInterface *from)
+{
+    if (!from) {
+        return "";
+    }
+
+    QString name = from->title();
+    if (const IVFunctionType *fn = function()) {
+        const QVector<IVInterface *> ifaces = isRequiredInterface() ? fn->ris() : fn->pis();
+        const auto it = std::find_if(ifaces.cbegin(), ifaces.cend(),
+                [this, name](const IVInterface *iface) { return iface != this && iface->title() == name; });
+        if (it != ifaces.cend()) {
+            name = from->function()->title() + QLatin1Char('_') + from->title();
+        }
+    }
+    return name;
 }
 
 void IVInterfaceRequired::setAttributeImpl(
@@ -646,7 +665,9 @@ void IVInterfaceRequired::setAttributeImpl(
             } else {
                 if (isInheritPI()) {
                     const auto it = std::find_if(m_prototypes.cbegin(), m_prototypes.cend(),
-                            [usedName](const ivm::IVInterfaceProvided *iface) { return iface->title() == usedName; });
+                            [this, usedName](const ivm::IVInterfaceProvided *iface) {
+                                return this->nameFromCloneOrigin(iface) == usedName;
+                            });
                     if (it != m_prototypes.cend()) {
                         autoName = true;
                     } else {

@@ -37,6 +37,22 @@ class IVFunction;
 class IVFunctionType;
 struct IVInterfacePrivate;
 
+/*!
+  \brief The IVInterface class
+
+### Rules for taking over names from other interfaces
+* PI/RI inherited from a function type can't be edited by the user
+* When connected, RI take over the name of the PI (if the property `InheritPI`is set to false, it keeps it's name)
+* The user can change the name of a RI, if it is not derived from a function type (`InheritPI` is then set to false).
+The PI name is not affected.
+* If the auto renaming from the tool fails because there is already a RI with the same name on the function, then the
+RI is prefixed with the remote function name.
+* If the RI was already connected to an existing PI and the user tries to connect it to another PI of another function
+but with a different name, the tool checks if the interface is compatible (parameters, kind) and if the connection is
+possible, it does not make any renaming (since it was already connected)
+* If the user renames a PI, then all connected RIs should be checked, and those that have the "Inherit from PI" set to
+True shall be renamed
+ */
 class IVInterface : public IVObject
 {
     Q_OBJECT
@@ -165,6 +181,7 @@ protected:
 
     void reflectAttrs(const IVInterface *from);
     void reflectParams(const IVInterface *from);
+    QString nameFromCloneOrigin(const IVInterface *from);
 
 protected:
     struct OriginalPropsHolder {

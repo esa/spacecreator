@@ -41,7 +41,22 @@ public:
     shared::Id id() const;
     void setModel(VEModel *model);
 
+    /*!
+     * Return the name of the object
+     * ### Basic name restrictions
+     * * The name can't be empty
+     * * Consist only of characters [a-z]A-Z], numbers and the following special characters: <,=,_
+     * * Starts with a character [a-z][A-Z]
+     * * Ends with a character [a-z][A-Z] or a number
+     * * No duplicates names are allowed for PI interfaces of one function
+     * * No duplicates names are allowed for RI interfaces of one function
+     * * The name is not one of the "forbidden names" (like "class"). The full list of forbidden names is stored in the
+     * file `forbidden_names.txt`
+     */
     virtual QString title() const = 0;
+    /*!
+     * Returns the name of the object as it is supposed to be shown in the UI to the user.
+     */
     virtual QString titleUI() const = 0;
 
     virtual QVector<qint32> coordinates() const = 0;
