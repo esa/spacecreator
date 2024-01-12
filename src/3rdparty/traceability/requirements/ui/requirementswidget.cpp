@@ -74,9 +74,10 @@ RequirementsWidget::RequirementsWidget(
     connect(ui->refreshButton, &QPushButton::clicked, this, &RequirementsWidget::setLoginData);
     connect(ui->createRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::showNewRequirementDialog);
     connect(ui->removeRequirementButton, &QPushButton::clicked, this, &RequirementsWidget::removeRequirement);
-    connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
-    ui->tokenLineEdit->setEchoMode(QLineEdit::Password);
-    connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &RequirementsWidget::onChangeOfCredentials);
+    connect(ui->credentialWidget, &tracecommon::CredentialWidget::urlChanged, this,
+            &RequirementsWidget::onChangeOfCredentials);
+    connect(ui->credentialWidget, &tracecommon::CredentialWidget::tokenChanged, this,
+            &RequirementsWidget::onChangeOfCredentials);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_textFilterModel,
             &QSortFilterProxyModel::setFilterFixedString);
     connect(m_reqManager, &RequirementsManager::projectIDChanged, this, &RequirementsWidget::requestRequirements);
@@ -99,14 +100,6 @@ RequirementsWidget::RequirementsWidget(
 
     loadSavedRequirementsTableGeometry();
 
-    const QString urlTooltip = tr("Set the Gitlab server URL including the project path");
-    ui->urlLabel->setToolTip(urlTooltip);
-    ui->urlLineEdit->setToolTip(urlTooltip);
-    const QString tokenTooltip = tr(
-            "To create a personal access token, go to  Profile > Preferences > Access Tokens \n in your gitlab server");
-    ui->tokenLabel->setToolTip(tokenTooltip);
-    ui->tokenLineEdit->setToolTip(tokenTooltip);
-    connect(ui->createTokenButton, &QPushButton::clicked, this, &RequirementsWidget::openTokenSettingsPage);
     ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
     ui->verticalLayout->insertWidget(0, m_widgetBar);
 }
@@ -121,8 +114,8 @@ bool RequirementsWidget::loadSavedCredentials()
         return false;
     }
 
-    setUrl(m_requirementsUrl);
-    setToken(gitlabToken);
+    ui->credentialWidget->setUrl(m_requirementsUrl);
+    ui->credentialWidget->setToken(gitlabToken);
     return true;
 }
 
@@ -150,28 +143,11 @@ RequirementsWidget::~RequirementsWidget()
 }
 
 /*!
- * \brief RequirementsWidget::setUrl Sets the URL to fetch the requiremenst from
- */
-void RequirementsWidget::setUrl(const QString &url)
-{
-    ui->urlLineEdit->setText(url);
-}
-
-/*!
- * \brief RequirementsWidget::url Returns the URL to fetch the requiremenst from
+ * Returns the URL to fetch the requirements from
  */
 QUrl RequirementsWidget::url() const
 {
-    return QUrl(ui->urlLineEdit->text());
-}
-
-/*!
- * \brief RequirementsWidget::setToken Sets the token to authenticate for fetching the requirements
- * \note The token is stored in the settings and used from there when fetching the data
- */
-void RequirementsWidget::setToken(const QString &token)
-{
-    ui->tokenLineEdit->setText(token);
+    return ui->credentialWidget->url();
 }
 
 /*!
@@ -179,18 +155,15 @@ void RequirementsWidget::setToken(const QString &token)
  */
 QString RequirementsWidget::token() const
 {
-    return ui->urlLineEdit->text();
+    return ui->credentialWidget->token();
 }
 
 void RequirementsWidget::onChangeOfCredentials()
 {
-    const QUrl newUrl(ui->urlLineEdit->text(), QUrl::StrictMode);
+    const QUrl newUrl(ui->credentialWidget->url());
     if (!newUrl.isValid()) {
-        ui->createTokenButton->setEnabled(false);
         return;
     }
-
-    ui->createTokenButton->setEnabled(true);
 
     QString newUrlHostKey = tokenKey(newUrl.host());
     QSettings settings;
@@ -198,20 +171,20 @@ void RequirementsWidget::onChangeOfCredentials()
     const QString gitlabToken = settings.value(newUrlHostKey).toString();
 
     // If token is empty, try to find the token in the settings
-    if (ui->tokenLineEdit->text().isEmpty() && !gitlabToken.isEmpty()) {
-        ui->tokenLineEdit->setText(gitlabToken);
+    if (ui->credentialWidget->token().isEmpty() && !gitlabToken.isEmpty()) {
+        ui->credentialWidget->setToken(gitlabToken);
     }
 
     // If anything changed
-    if ((gitlabToken != ui->tokenLineEdit->text()) || (ui->urlLineEdit->text() != m_requirementsUrl)) {
-        settings.setValue(newUrlHostKey, ui->tokenLineEdit->text());
-        m_requirementsUrl = ui->urlLineEdit->text().toUtf8();
+    if ((gitlabToken != ui->credentialWidget->token()) || (ui->credentialWidget->url() != m_requirementsUrl)) {
+        settings.setValue(newUrlHostKey, ui->credentialWidget->token());
+        m_requirementsUrl = ui->credentialWidget->url().toString();
     }
     settings.endGroup();
 
     emit requirementsUrlChanged(m_requirementsUrl);
 
-    if (!m_requirementsUrl.isEmpty() && !ui->tokenLineEdit->text().isEmpty()) {
+    if (!m_requirementsUrl.isEmpty() && !ui->credentialWidget->token().isEmpty()) {
         setLoginData();
     }
 }
@@ -229,18 +202,19 @@ void RequirementsWidget::setLoginData()
 
     ui->serverStatusLabel->setPixmap({});
 
-    if (ui->urlLineEdit->text().isEmpty() || ui->tokenLineEdit->text().isEmpty()) {
+    if (ui->credentialWidget->url().isEmpty() || ui->credentialWidget->token().isEmpty()) {
         ui->serverStatusLabel->setPixmap({});
         return;
     }
 
-    if (ui->urlLineEdit->text() == m_reqManager->projectUrl() && ui->tokenLineEdit->text() == m_reqManager->token()) {
+    if (ui->credentialWidget->url() == m_reqManager->projectUrl()
+            && ui->credentialWidget->token() == m_reqManager->token()) {
         m_reqManager->requestAllRequirements();
         return;
     }
 
     ui->serverStatusLabel->setToolTip(tr("Checking connection to the server"));
-    m_reqManager->setCredentials(ui->urlLineEdit->text(), ui->tokenLineEdit->text());
+    m_reqManager->setCredentials(ui->credentialWidget->url().toString(), ui->credentialWidget->token());
 }
 
 void RequirementsWidget::updateServerStatus()
@@ -272,13 +246,6 @@ void RequirementsWidget::updateServerStatus()
 void RequirementsWidget::openIssueLink(const QModelIndex &index)
 {
     QDesktopServices::openUrl(index.data(RequirementsModelBase::RoleNames::IssueLinkRole).toString());
-}
-
-void RequirementsWidget::openTokenSettingsPage()
-{
-    QUrl url(ui->urlLineEdit->text());
-    url.setPath("/-/profile/personal_access_tokens");
-    QDesktopServices::openUrl(url);
 }
 
 void RequirementsWidget::toggleShowUsedRequirements()

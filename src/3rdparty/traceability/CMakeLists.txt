@@ -13,4 +13,6 @@ set(CMAKE_AUTOUIC ON)
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 
 add_subdirectory(qgitlabapi)
+add_subdirectory(tracecommon)
 add_subdirectory(requirements)
+add_subdirectory(reviews)

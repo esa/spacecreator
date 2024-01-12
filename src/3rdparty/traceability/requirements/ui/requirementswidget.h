@@ -49,9 +49,7 @@ public:
             requirement::RequirementsModelBase *model, QWidget *parent = nullptr);
     ~RequirementsWidget();
 
-    void setUrl(const QString &url);
     QUrl url() const;
-    void setToken(const QString &token);
     QString token() const;
 
 protected:
@@ -63,7 +61,6 @@ protected Q_SLOTS:
     void setLoginData();
     void updateServerStatus();
     void openIssueLink(const QModelIndex &index);
-    void openTokenSettingsPage();
     void toggleShowUsedRequirements();
     void requestRequirements();
     void showNewRequirementDialog() const;
