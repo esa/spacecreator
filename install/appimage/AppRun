@@ -58,11 +58,11 @@ libdir=`cd "${HERE}/lib" ; pwd`
 # Add path to deployed Qt libraries in package
 qtlibdir=$libdir/Qt/lib
 if test -d "$qtlibdir"; then
-    qtlibpath=:$qtlibdir
+    qtlibpath=$qtlibdir
 fi
 libexecdir=${HERE}/libexec
 # Add Qt Creator library path
-LD_LIBRARY_PATH=$libdir:$libdir/qtcreator$qtlibpath${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+LD_LIBRARY_PATH=$libdir:$libdir/qtcreator:$qtlibpath:$qtlibpath/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 
 TOOL=$1
