@@ -304,11 +304,15 @@ def copy_additional_qt_modules(env_qt_dir: str, app_dir: str) -> None:
     copy_file_pattern_to_dir(pattern, app_lib_dir)
 
 
-def extract_libzxb_util(install_dir: str, lib_dir: str) -> None:
+def extract_extraLibraries(install_dir: str, lib_dir: str) -> None:
     libzxb_util_gz = join_dir(install_dir, 'libzxb-util.tar.gz')
     print('Extracting {} to {}'.format(libzxb_util_gz, lib_dir))
-    with tarfile.open(libzxb_util_gz, 'r:gz') as archive:
-        archive.extractall(lib_dir)
+    with utilTarfile.open(libzxb_util_gz, 'r:gz') as utilArchive:
+        utilArchive.extractall(lib_dir)
+    libxcb_cursor_gz = join_dir(install_dir, 'libxcb_cursor.tar.gz')
+    print('Extracting {} to {}'.format(libxcb_cursor_gz, lib_dir))
+    with cursorTarfile.open(libxcb_cursor_gz, 'r:gz') as cursorArchive:
+        cursorArchive.extractall(lib_dir)
 
 
 def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
@@ -401,7 +405,7 @@ def main():
     # libzxb-util
     install_dir = paths.install_dir
     lib_dir = join_dir(app_dir, 'lib')
-    extract_libzxb_util(install_dir, lib_dir)
+    extract_extraLibraries(install_dir, lib_dir)
 
     # Abstract Syntax Notation
     download_asn1scc(env_dir)

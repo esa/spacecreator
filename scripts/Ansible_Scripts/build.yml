@@ -20,6 +20,11 @@
         src: "{{ install_dir }}/libzxb-util.tar.gz"
         dest: "{{ app_lib_dir }}"
 
+    - name: "Extract libxcb-cursor to {{ app_lib_dir }}"
+      unarchive:
+        src: "{{ install_dir }}/libxcb-cursor.tar.gz"
+        dest: "{{ app_lib_dir }}"
+
     - name: Copy additional Qt modules from "{{ app_lib_dir }} to "{{ env_qt_dir }}/lib"
       copy:
         src: "{{ item }}"

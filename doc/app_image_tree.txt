@@ -44,6 +44,8 @@ spacecreator.AppDir/																						.gitlab-ci.yml
 		x86-64-linux-gnu/										/install/libzxb-util.tar.gz					source
 			libxcb-util.so.1*									/install/libzxb-util.tar.gz					source														prebuild.py
 			libxcb-util.so.1.0.0								/install/libzxb-util.tar.gz					source														prebuild.py
+			libxcb-cursor.so*									/install/libxcb-cursor.tar.gz				source														prebuild.py
+			libxcb-cursor.so.0.0.0								/install/libxcb-cursor.tar.gz				source														prebuild.py
 	libexec/													qtcreator-4.8.2.7z							download_qtcreator.sh
 		qtcreator/												qtcreator-4.8.2.7z							download_qtcreator.sh
 			asn1scc-Fuzzer/										asn1scc-Fuzzer-0.9-linux-x64.tar.gz 		/asn1scc/CMakeLists.txt/asn1_compiler_dist.sh				postbuild.py
