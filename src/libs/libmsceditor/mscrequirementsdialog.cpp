@@ -35,7 +35,7 @@ MscRequirementsDialog::MscRequirementsDialog(const QUrl &requirementsUrl, msc::M
 
     m_reqManager = new RequirementsManager(RequirementsManager::REPO_TYPE::GITLAB, this);
     m_reqModel = new RequirementsModelBase(this);
-    m_reqModel->setSelectedRequirements(RequirementsModelBase::convert(m_entity->requirements()));
+    m_reqModel->setSelectedRequirements(m_entity->requirements());
     connect(m_reqManager, &RequirementsManager::listOfRequirements, m_reqModel,
             &RequirementsModelBase::addRequirements);
     connect(m_reqManager, &RequirementsManager::startingFetchingRequirements, m_reqModel,
@@ -74,7 +74,7 @@ QString MscRequirementsDialog::token() const
  */
 QStringList MscRequirementsDialog::selectedRequirements() const
 {
-    return m_reqModel->selectedRequirements().values();
+    return m_reqModel->selectedRequirements();
 }
 
 } // namespace msc

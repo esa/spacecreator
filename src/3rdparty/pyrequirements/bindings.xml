@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<typesystem package="TasteQtWidgets">
+	<load-typesystem name="typesystem_widgets.xml" generate="no"/>
+    <load-typesystem name="typesystem_core.xml" generate="no"/>
+    <load-typesystem name="typesystem_gui.xml" generate="no"/>
+    <namespace-type name="requirement" generate = "yes">
+       <object-type name="RequirementsWidget">
+       </object-type>
+       <object-type name="RequirementsManager">
+       </object-type>
+       <object-type name="RequirementsModelBase">
+       </object-type>
+    </namespace-type>
+</typesystem>

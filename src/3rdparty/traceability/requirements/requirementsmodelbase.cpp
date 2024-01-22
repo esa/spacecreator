@@ -131,9 +131,9 @@ bool RequirementsModelBase::setData(const QModelIndex &index, const QVariant &va
         const QString requirementID = getReqIfIdFromModelIndex(index);
         bool checked = value.toBool();
         if (checked) {
-            m_selectedRequirements.insert(requirementID);
+            m_selectedRequirements.append(requirementID);
         } else {
-            m_selectedRequirements.remove(requirementID);
+            m_selectedRequirements.removeAll(requirementID);
         }
         emit dataChanged(index, index, { role });
         return true;
@@ -159,21 +159,16 @@ Qt::ItemFlags RequirementsModelBase::flags(const QModelIndex &index) const
     return flags;
 }
 
-const QSet<QString> &RequirementsModelBase::selectedRequirements() const
+const QStringList &RequirementsModelBase::selectedRequirements() const
 {
     return m_selectedRequirements;
 }
 
-void RequirementsModelBase::setSelectedRequirements(const QSet<QString> &selected)
+void RequirementsModelBase::setSelectedRequirements(const QStringList &selected)
 {
     beginResetModel();
     m_selectedRequirements = selected;
     endResetModel();
-}
-
-QSet<QString> RequirementsModelBase::convert(const QStringList &list)
-{
-    return QSet<QString>(list.begin(), list.end());
 }
 
 Requirement RequirementsModelBase::requirementFromIndex(const QModelIndex &idx)

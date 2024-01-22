@@ -50,10 +50,10 @@ bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value,
         QStringList selectedRequirements = m_dataObject->requestsIDs();
         if (checked) {
             selectedRequirements << requirementID;
-            m_selectedRequirements.insert(requirementID);
+            m_selectedRequirements.append(requirementID);
         } else {
             selectedRequirements.removeOne(requirementID);
-            m_selectedRequirements.remove(requirementID);
+            m_selectedRequirements.removeAll(requirementID);
         }
 
         const bool ok = m_cmdMacro->push(new cmd::CmdEntityAttributesChange(m_propTemplatesConfig, m_dataObject,

@@ -22,6 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "tagfilterproxymodel.h"
 
 #include <QPointer>
+#include <QItemSelection>
 #include <QSortFilterProxyModel>
 #include <QToolButton>
 #include <QWidget>

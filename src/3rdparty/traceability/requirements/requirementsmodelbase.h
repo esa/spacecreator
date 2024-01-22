@@ -22,7 +22,6 @@ along with this program. If not, see
 
 #include <QAbstractTableModel>
 #include <QList>
-#include <QSet>
 
 namespace requirement {
 
@@ -70,10 +69,9 @@ public:
 
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    virtual const QSet<QString> &selectedRequirements() const;
-    virtual void setSelectedRequirements(const QSet<QString> &selected);
+    virtual const QStringList &selectedRequirements() const;
+    virtual void setSelectedRequirements(const QStringList &selected);
 
-    static QSet<QString> convert(const QStringList &list);
 
     Requirement requirementFromIndex(const QModelIndex &idx);
 
@@ -83,7 +81,7 @@ protected:
     QString getReqIfIdFromModelIndex(const QModelIndex &index) const;
 
     QList<Requirement> m_requirements;
-    QSet<QString> m_selectedRequirements;
+    QStringList m_selectedRequirements;
 };
 
 } // namespace requirement

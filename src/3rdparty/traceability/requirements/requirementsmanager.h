@@ -42,7 +42,7 @@ public:
         GITLAB
     };
 
-    RequirementsManager(REPO_TYPE repoType, QObject *parent = nullptr);
+    RequirementsManager(REPO_TYPE repoType = RequirementsManager::REPO_TYPE::GITLAB, QObject *parent = nullptr);
     ~RequirementsManager();
 
     bool setCredentials(const QString &url, const QString &token);
