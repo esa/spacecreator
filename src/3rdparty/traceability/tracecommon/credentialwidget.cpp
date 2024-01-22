@@ -77,7 +77,7 @@ void CredentialWidget::setToken(const QString &token)
  */
 QString CredentialWidget::token() const
 {
-    return ui->urlLineEdit->text();
+    return ui->tokenLineEdit->text();
 }
 
 void CredentialWidget::updateTockenButton()
