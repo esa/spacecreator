@@ -17,10 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
+#include "issuesmanager.h"
 #include "requirement.h"
 
-#include <QObject>
-#include <QUrl>
 #include <memory>
 
 namespace requirement {
@@ -29,58 +28,27 @@ namespace requirement {
  * The RequirementsManager is responsible to communicate to the server/storage that handles the requirments for
  * components
  */
-class RequirementsManager : public QObject
+class RequirementsManager : public tracecommon::IssuesManager
 {
     Q_OBJECT
-    Q_PROPERTY(int projectID READ projectID WRITE setProjectID NOTIFY projectIDChanged)
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
-    Q_PROPERTY(QStringList tagsBuffer READ tagsBuffer)
 
 public:
-    enum class REPO_TYPE
-    {
-        GITLAB
-    };
-
-    RequirementsManager(REPO_TYPE repoType = RequirementsManager::REPO_TYPE::GITLAB, QObject *parent = nullptr);
+    RequirementsManager(REPO_TYPE repoType = tracecommon::IssuesManager::REPO_TYPE::GITLAB, QObject *parent = nullptr);
     ~RequirementsManager();
-
-    bool setCredentials(const QString &url, const QString &token);
-    QString projectUrl() const;
-    const QString &token() const;
-
-    bool isBusy() const;
-    const int &projectID() const;
 
     bool requestAllRequirements();
     bool createRequirement(
             const QString &title, const QString &reqIfId, const QString &description, const QString &testMethod) const;
     bool removeRequirement(const Requirement &requirement) const;
-    bool requestTags();
-
-    QStringList tagsBuffer();
-
-public Q_SLOTS:
-    void setProjectID(const int &newProjectID);
 
 Q_SIGNALS:
-    void busyChanged();
-    void projectIDChanged();
     void startingFetchingRequirements();
     void fetchingRequirementsEnded();
     void listOfRequirements(const QList<requirement::Requirement> &);
-    void listOfTags(const QStringList &);
-    void connectionError(QString errorString);
     void requirementCreated();
     void requirementClosed();
 
 private:
-    bool requestProjectID(const QUrl &url);
-
-    int m_projectID = -1;
-    QUrl m_projectUrl = {};
-    QString m_token = "";
-    QStringList m_tagsBuffer;
     class RequirementsManagerPrivate;
     std::unique_ptr<RequirementsManagerPrivate> d;
 };

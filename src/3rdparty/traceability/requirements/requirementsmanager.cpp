@@ -18,50 +18,42 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "requirementsmanager.h"
 
 #include "gitlab/gitlabrequirements.h"
-#include "issue.h"
 #include "issuerequestoptions.h"
-#include "labelsrequestoptions.h"
+#include "issuesmanagerprivate.h"
 #include "qgitlabclient.h"
 
 #include <QDir>
 
 namespace requirement {
 
-struct RequirementsManager::RequirementsManagerPrivate {
-    RequirementsManagerPrivate(RequirementsManager::REPO_TYPE repoType)
-        : mRepoType(repoType)
+struct RequirementsManager::RequirementsManagerPrivate : public tracecommon::IssuesManagerPrivate {
+    RequirementsManagerPrivate(RequirementsManager::REPO_TYPE rType)
+        : IssuesManagerPrivate(rType)
     {
+        switch (repoType) {
+        case REPO_TYPE::GITLAB:
+            gitlabRequirements = std::make_unique<requirement::GitLabRequirements>();
+        }
     }
 
-    REPO_TYPE mRepoType;
-    std::unique_ptr<gitlab::QGitlabClient> gitlabClient;
     std::unique_ptr<requirement::GitLabRequirements> gitlabRequirements;
 };
 
 RequirementsManager::RequirementsManager(REPO_TYPE repoType, QObject *parent)
-    : QObject(parent)
+    : tracecommon::IssuesManager(parent)
     , d(std::make_unique<RequirementsManagerPrivate>(repoType))
 {
-    switch (repoType) {
+    init(d.get());
+    switch (d->repoType) {
     case (REPO_TYPE::GITLAB): {
-        d->gitlabClient = std::make_unique<gitlab::QGitlabClient>();
-        d->gitlabRequirements = std::make_unique<requirement::GitLabRequirements>();
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfIssues, d->gitlabRequirements.get(),
                 &requirement::GitLabRequirements::listOfIssues);
-        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::connectionError, this,
-                &RequirementsManager::connectionError);
-        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::busyStateChanged, this,
-                &RequirementsManager::busyChanged);
-        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::requestedProjectID, this,
-                &RequirementsManager::setProjectID);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this,
                 &RequirementsManager::requirementCreated);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueClosed, this,
                 &RequirementsManager::requirementClosed);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueFetchingDone, this,
                 &RequirementsManager::fetchingRequirementsEnded);
-        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::labelsFetchingDone, this,
-                [this] { Q_EMIT listOfTags(m_tagsBuffer); });
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfLabels, this, [this](QList<gitlab::Label> labels) {
             m_tagsBuffer.append(GitLabRequirements::tagsFromLabels(labels));
         });
@@ -77,76 +69,13 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType, QObject *parent)
 RequirementsManager::~RequirementsManager() { }
 
 /*!
- * Sets the url and authentification credentials to be able to load data from the server.
- * It does trigger a re-load of all requirements after the data is validated by the server (project ID set).
- * \param url The URL of the project to fetch the requirements
- * \param token The authentikation token for the server
- * \return Returns true when everything went well.
- */
-bool RequirementsManager::setCredentials(const QString &url, const QString &token)
-{
-    if (m_projectUrl == url && token == m_token) {
-        return true;
-    }
-
-    m_projectUrl = url;
-    m_token = token;
-    m_projectID = -1;
-
-    QUrl _url;
-    _url.setScheme("https");
-    _url.setHost(QUrl(url).host());
-    _url.setPath("/api/v4/");
-
-    d->gitlabClient->setCredentials(_url.scheme() + "://" + _url.host(), token);
-    return requestProjectID(url);
-}
-
-/*!
- * URL of the project to load the requirements data from
- */
-QString RequirementsManager::projectUrl() const
-{
-    return m_projectUrl.toString();
-}
-
-/*!
- * The token used to authenticate on the server
- */
-const QString &RequirementsManager::token() const
-{
-    return m_token;
-}
-
-/*!
- * Returns true when there is currently a request to load data running
- */
-bool RequirementsManager::isBusy() const
-{
-    switch (d->mRepoType) {
-
-    case (REPO_TYPE::GITLAB):
-        return d->gitlabClient->isBusy();
-    }
-    return false;
-}
-
-/*!
- * Returns the internal ID of the project
- */
-const int &RequirementsManager::projectID() const
-{
-    return m_projectID;
-}
-
-/*!
  * Starts a request to load all requirements from the server. The requirements will be delivered by the
  * listOfRequirements signal.
  * \return Returns true when everything went well.
  */
 bool RequirementsManager::requestAllRequirements()
 {
-    switch (d->mRepoType) {
+    switch (d->repoType) {
     case (REPO_TYPE::GITLAB): {
         gitlab::IssueRequestOptions options;
         options.mProjectID = m_projectID;
@@ -175,7 +104,7 @@ bool RequirementsManager::requestAllRequirements()
 bool RequirementsManager::createRequirement(
         const QString &title, const QString &reqIfId, const QString &description, const QString &testMethod) const
 {
-    switch (d->mRepoType) {
+    switch (d->repoType) {
     case (REPO_TYPE::GITLAB): {
         const QString descr = QString("#reqid %1\n\n%2").arg(reqIfId, description);
         QStringList labels = { k_requirementsTypeLabel, testMethod };
@@ -190,55 +119,9 @@ bool RequirementsManager::createRequirement(
 
 bool RequirementsManager::removeRequirement(const Requirement &requirement) const
 {
-    switch (d->mRepoType) {
+    switch (d->repoType) {
     case (REPO_TYPE::GITLAB): {
         const bool wasBusy = d->gitlabClient->closeIssue(m_projectID, requirement.m_issueID);
-        return !wasBusy;
-    }
-    default:
-        qDebug() << "unknown repository type";
-    }
-    return false;
-}
-
-bool RequirementsManager::requestTags()
-{
-    switch (d->mRepoType) {
-    case (REPO_TYPE::GITLAB): {
-        gitlab::LabelsRequestOptions options;
-        options.mProjectID = m_projectID;
-        const bool wasBusy = d->gitlabClient->requestListofLabels(options);
-        if (wasBusy) {
-            return false;
-        }
-        m_tagsBuffer.clear();
-        return true;
-    }
-    default:
-        qDebug() << "unknown repository type";
-    }
-    return false;
-}
-
-QStringList RequirementsManager::tagsBuffer()
-{
-    return m_tagsBuffer;
-}
-
-void RequirementsManager::setProjectID(const int &newProjectID)
-{
-    if (m_projectID == newProjectID) {
-        return;
-    }
-    m_projectID = newProjectID;
-    Q_EMIT projectIDChanged();
-}
-
-bool RequirementsManager::requestProjectID(const QUrl &url)
-{
-    switch (d->mRepoType) {
-    case (REPO_TYPE::GITLAB): {
-        const bool wasBusy = d->gitlabClient->requestProjectId(url);
         return !wasBusy;
     }
     default:
