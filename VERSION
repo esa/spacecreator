@@ -5,7 +5,7 @@
 
 
 # This sets the major version
-export SC_MAJOR_VERSION=11
+export SC_MAJOR_VERSION=12
 
 # This sets the minor version
 export SC_MINOR_VERSION=0

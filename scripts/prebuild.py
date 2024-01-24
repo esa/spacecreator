@@ -313,6 +313,10 @@ def extract_extraLibraries(install_dir: str, lib_dir: str) -> None:
     print('Extracting {} to {}'.format(libxcb_cursor_gz, lib_dir))
     with cursorTarfile.open(libxcb_cursor_gz, 'r:gz') as cursorArchive:
         cursorArchive.extractall(lib_dir)
+    libssl3_gz = join_dir(install_dir, 'libssl3.tar.gz')
+    print('Extracting {} to {}'.format(libssl3_gz, lib_dir))
+    with sslTarfile.open(libssl3_gz, 'r:gz') as sslArchive:
+        sslArchive.extractall(lib_dir)
 
 
 def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
