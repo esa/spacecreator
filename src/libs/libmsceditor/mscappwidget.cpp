@@ -320,6 +320,9 @@ void MscAppWidget::initConnections()
             [&]() { Q_EMIT showAsn1File(mainModel()->asn1File().absoluteFilePath()); });
     connect(ui->asn1Select, &QPushButton::clicked, this, [&]() { Q_EMIT selectAsn1(); });
     connect(ui->ivSwitch, &QPushButton::clicked, this, [&]() { Q_EMIT showInterfaceView(); });
+
+    connect(mainModel(), &msc::MainModel::modelDataChanged, this, &MscAppWidget::updateMscToolbarActionsEnablement);
+    connect(mainModel(), &msc::MainModel::modelUpdated, this, &MscAppWidget::updateMscToolbarActionsEnablement);
 }
 
 QVector<QAction *> MscAppWidget::chartActions() const
@@ -673,6 +676,44 @@ void MscAppWidget::showSelection(const QModelIndex &current, const QModelIndex &
         if (auto document = dynamic_cast<msc::MscDocument *>(obj)) {
             mainModel()->setSelectedDocument(document);
         }
+    }
+}
+
+void MscAppWidget::updateMscToolbarActionsEnablement()
+{
+    auto chart = m_mscCore->mainModel()->chartViewModel().currentChart();
+    const bool hasInstance = chart && !chart->instances().isEmpty();
+
+    bool forceDefault(false);
+    for (QAction *act : chartActions()) {
+        const msc::BaseTool::ToolType toolType(act->data().value<msc::BaseTool::ToolType>());
+        switch (toolType) {
+        case msc::BaseTool::ToolType::ActionCreator:
+        case msc::BaseTool::ToolType::ConditionCreator:
+        case msc::BaseTool::ToolType::MessageCreator:
+        case msc::BaseTool::ToolType::CommentCreator:
+        case msc::BaseTool::ToolType::CoregionCreator:
+        case msc::BaseTool::ToolType::EntityDeleter:
+        case msc::BaseTool::ToolType::InstanceStopper:
+        case msc::BaseTool::ToolType::TimerCreator: {
+            const bool changed = act->isEnabled() && !hasInstance;
+            forceDefault = forceDefault || changed;
+            act->setEnabled(hasInstance);
+            break;
+        }
+        case msc::BaseTool::ToolType::Pointer:
+        case msc::BaseTool::ToolType::InstanceCreator:
+        default: {
+            act->setEnabled(true);
+            break;
+        }
+        }
+    }
+
+    checkGlobalComment();
+
+    if (forceDefault) {
+        activateDefaultTool();
     }
 }
 

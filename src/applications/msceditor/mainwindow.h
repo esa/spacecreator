@@ -104,8 +104,6 @@ private:
     void onGeometryRestored();
     QSizeF prepareChartBoxSize() const;
 
-    void updateMscToolbarActionsEnablement();
-
     static QStringList mscFileFilters();
 
     bool saveDocument();

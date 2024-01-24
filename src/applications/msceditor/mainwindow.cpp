@@ -592,48 +592,6 @@ QSizeF MainWindow::prepareChartBoxSize() const
     return QSizeF();
 }
 
-void MainWindow::updateMscToolbarActionsEnablement()
-{
-    if (!d->m_mainWidget) {
-        return;
-    }
-
-    auto chart = d->m_core->mainModel()->chartViewModel().currentChart();
-    const bool hasInstance = chart && !chart->instances().isEmpty();
-
-    bool forceDefault(false);
-    for (QAction *act : d->m_mainWidget->chartActions()) {
-        const msc::BaseTool::ToolType toolType(act->data().value<msc::BaseTool::ToolType>());
-        switch (toolType) {
-        case msc::BaseTool::ToolType::ActionCreator:
-        case msc::BaseTool::ToolType::ConditionCreator:
-        case msc::BaseTool::ToolType::MessageCreator:
-        case msc::BaseTool::ToolType::CommentCreator:
-        case msc::BaseTool::ToolType::CoregionCreator:
-        case msc::BaseTool::ToolType::EntityDeleter:
-        case msc::BaseTool::ToolType::InstanceStopper:
-        case msc::BaseTool::ToolType::TimerCreator: {
-            const bool changed = act->isEnabled() && !hasInstance;
-            forceDefault = forceDefault || changed;
-            act->setEnabled(hasInstance);
-            break;
-        }
-        case msc::BaseTool::ToolType::Pointer:
-        case msc::BaseTool::ToolType::InstanceCreator:
-        default: {
-            act->setEnabled(true);
-            break;
-        }
-        }
-    }
-
-    d->m_mainWidget->checkGlobalComment();
-
-    if (forceDefault) {
-        d->m_mainWidget->activateDefaultTool();
-    }
-}
-
 QStringList MainWindow::mscFileFilters()
 {
     static QStringList filters;
@@ -664,7 +622,6 @@ bool MainWindow::saveDocument()
 void MainWindow::updateModel()
 {
     d->mscTextBrowser->setModel(d->m_core->mainModel()->mscModel());
-    updateMscToolbarActionsEnablement();
 }
 
 #ifdef QT_DEBUG

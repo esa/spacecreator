@@ -102,6 +102,7 @@ private Q_SLOTS:
     void updateHierarchyActions();
     void showChart(const QModelIndex &index);
     void showSelection(const QModelIndex &current, const QModelIndex &previous);
+    void updateMscToolbarActionsEnablement();
 
 private:
     msc::MainModel *mainModel() const;
