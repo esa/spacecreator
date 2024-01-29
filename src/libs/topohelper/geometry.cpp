@@ -505,7 +505,7 @@ PointsList path(const RectsList &existingRects, const QLineF &startDirection, co
  * Generates the path for a connection between the \a startPoint and \a endPoint
  * \param existingRects existing items geometries in scene coordinates shouldn't been overlapped
  * \param startPoint as first polyline node
- * \param endDirection as last polyline node
+ * \param endPoint as last polyline node
  * \return set of polyline nodes coordinates
  */
 PointsList path(const RectsList &existingRects, const QPointF &startPoint, const QPointF &endPoint)

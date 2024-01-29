@@ -44,6 +44,10 @@ namespace connection {
  */
 PointsList createConnectionPath(const ConnectionEnvInfo &info)
 {
+    if (!info.objFrom.isValid() || !info.objTo.isValid() || info.pntFrom.isNull() || info.pntTo.isNull()) {
+        return {};
+    }
+
     const QLineF &startDirection = topohelp::geom::ifaceSegment(info.objFrom, info.pntFrom, info.pntTo);
     if (startDirection.isNull()) {
         return {};

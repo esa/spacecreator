@@ -20,6 +20,7 @@ add_subdirectory(shared)
 add_subdirectory(spacecreatorsystem)
 add_subdirectory(spintrail)
 add_subdirectory(simulatortrail)
+add_subdirectory(topohelper)
 
 if(${QTC_FOUND})
     add_subdirectory(testgenerator)
