@@ -20,7 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "mscentity.h"
 #include "requirementsmanager.h"
 #include "requirementsmodelbase.h"
-#include "ui/requirementswidget.h"
+#include "shared/ui/spacecreatorrequirements.h"
 #include "ui_mscrequirementsdialog.h"
 
 namespace msc {
@@ -41,7 +41,8 @@ MscRequirementsDialog::MscRequirementsDialog(const QUrl &requirementsUrl, msc::M
     connect(m_reqManager, &RequirementsManager::startingFetchingRequirements, m_reqModel,
             &RequirementsModelBase::clear);
 
-    m_reqWidget = new RequirementsWidget(requirementsUrl.toString().toUtf8(), m_reqManager, m_reqModel, this);
+    m_reqWidget = new ::shared::ui::SpaceCreatorRequirements(
+            requirementsUrl.toString().toUtf8(), m_reqManager, m_reqModel, this);
     m_reqWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->contentLayout->addWidget(m_reqWidget, 0, 0, 1, 1);
 }

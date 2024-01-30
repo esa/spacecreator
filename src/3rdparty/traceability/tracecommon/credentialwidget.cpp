@@ -39,6 +39,8 @@ CredentialWidget::CredentialWidget(QWidget *parent)
     ui->tokenLabel->setToolTip(tokenTooltip);
     ui->tokenLineEdit->setToolTip(tokenTooltip);
     connect(ui->createTokenButton, &QPushButton::clicked, this, &CredentialWidget::openTokenSettingsPage);
+    connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &CredentialWidget::urlChanged);
+    connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &CredentialWidget::tokenChanged);
 }
 
 CredentialWidget::~CredentialWidget()
@@ -52,7 +54,6 @@ CredentialWidget::~CredentialWidget()
 void CredentialWidget::setUrl(const QString &url)
 {
     ui->urlLineEdit->setText(url);
-    Q_EMIT urlChanged();
 }
 
 /*!
@@ -69,7 +70,6 @@ QUrl CredentialWidget::url() const
 void CredentialWidget::setToken(const QString &token)
 {
     ui->tokenLineEdit->setText(token);
-    Q_EMIT tokenChanged();
 }
 
 /*!

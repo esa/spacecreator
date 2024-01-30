@@ -32,7 +32,7 @@
 #include "propertytemplateconfig.h"
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
-#include "ui/requirementswidget.h"
+#include "shared/ui/spacecreatorrequirements.h"
 
 #include <QStyledItemDelegate>
 #include <QTableView>
@@ -55,9 +55,9 @@ DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemp
     connect(m_reqManager, &requirement::RequirementsManager::startingFetchingRequirements, m_reqModel,
             &shared::RequirementsModel::clear);
 
-    m_reqWidget = new requirement::RequirementsWidget(
+    m_reqWidget = new ::shared::ui::SpaceCreatorRequirements(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
-    connect(m_reqWidget, &requirement::RequirementsWidget::requirementsUrlChanged, this,
+    connect(m_reqWidget, &shared::ui::SpaceCreatorRequirements::requirementsUrlChanged, this,
             [model, commandsStack](QString requirementUrl) {
                 const QUrl url = QUrl(requirementUrl);
                 if (url != model->requirementsURL()) {

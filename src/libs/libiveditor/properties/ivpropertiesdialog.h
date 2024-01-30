@@ -23,10 +23,12 @@
 #include <QPointer>
 
 namespace requirement {
-class RequirementsWidget;
 class RequirementsManager;
 }
 namespace shared {
+namespace ui {
+class SpaceCreatorRequirements;
+}
 class RequirementsModel;
 }
 
@@ -52,10 +54,10 @@ class IVPropertiesDialog : public shared::PropertiesDialog
     Q_OBJECT
 
 public:
-    explicit IVPropertiesDialog(QPointer<InterfaceDocument> document, const QString &projectPath, ivm::IVPropertyTemplateConfig *dynPropConfig,
-            shared::ui::VEInteractiveObject *uiObj, ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel,
-            ivm::AbstractSystemChecks *checks, Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack,
-            QWidget *parent = nullptr);
+    explicit IVPropertiesDialog(QPointer<InterfaceDocument> document, const QString &projectPath,
+            ivm::IVPropertyTemplateConfig *dynPropConfig, shared::ui::VEInteractiveObject *uiObj,
+            ivm::IVModel *layersModel, ivm::ArchetypeModel *archetypesModel, ivm::AbstractSystemChecks *checks,
+            Asn1Acn::Asn1SystemChecks *asn1Checks, cmd::CommandsStack *commandsStack, QWidget *parent = nullptr);
     ~IVPropertiesDialog() override;
     void init() override;
 
@@ -82,7 +84,7 @@ private:
     bool m_isRequiredSystemElement;
 
     QPointer<InterfaceDocument> m_document;
-    requirement::RequirementsWidget *m_reqWidget = nullptr;
+    shared::ui::SpaceCreatorRequirements *m_reqWidget = nullptr;
     requirement::RequirementsManager *m_reqManager = nullptr;
     shared::RequirementsModel *m_reqModel = nullptr;
 };

@@ -21,8 +21,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "requirementtextproxymodel.h"
 #include "tagfilterproxymodel.h"
 
-#include <QPointer>
 #include <QItemSelection>
+#include <QPointer>
 #include <QSortFilterProxyModel>
 #include <QToolButton>
 #include <QWidget>
@@ -51,12 +51,12 @@ public:
     ~RequirementsWidget();
 
     QUrl url() const;
+    void setUrl(const QUrl &url);
     QString token() const;
+    void setToken(const QString &token);
 
 protected:
-    bool loadSavedCredentials();
     bool loadSavedRequirementsTableGeometry();
-    void onChangeOfCredentials();
 
 protected Q_SLOTS:
     void setLoginData();
@@ -72,11 +72,14 @@ protected Q_SLOTS:
 Q_SIGNALS:
     void requirementSelected(QString RequirementID, bool checked);
     void requirementsUrlChanged(QString requirementsUrl);
+    void requirementsCredentialsChanged(QUrl url, QString token);
+
+protected:
+    QString m_requirementsUrl;
 
 private:
-    QString tokenKey(const QString &base) const { return QString("%1__token").arg(base); }
     bool tagButtonExists(const QString &tag) const;
-
+    void onChangeOfCredentials();
     Ui::RequirementsWidget *ui;
     QList<QToolButton *> m_tagButtons;
     WidgetBar *m_widgetBar;
@@ -85,7 +88,6 @@ private:
     RequirementTextProxyModel m_textFilterModel;
     TagFilterProxyModel m_tagFilterModel;
     CheckedFilterProxyModel m_checkedModel;
-    QString m_requirementsUrl;
 };
 
 }

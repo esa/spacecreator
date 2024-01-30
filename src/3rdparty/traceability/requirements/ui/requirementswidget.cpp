@@ -66,7 +66,7 @@ RequirementsWidget::RequirementsWidget(
     ui->allRequirements->horizontalHeader()->setStretchLastSection(true);
     ui->allRequirements->setSortingEnabled(true);
     ui->removeRequirementButton->setEnabled(false);
-    connect(m_model, &requirement::RequirementsModelBase::rowsInserted,
+    connect(m_model, &requirement::RequirementsModelBase::rowsInserted, this,
             [this]() { ui->allRequirements->resizeRowsToContents(); });
     connect(ui->allRequirements->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &RequirementsWidget::modelSelectionChanged);
@@ -86,37 +86,17 @@ RequirementsWidget::RequirementsWidget(
     connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
     connect(m_reqManager, &RequirementsManager::busyChanged, this, &RequirementsWidget::updateServerStatus);
     connect(m_reqManager, &RequirementsManager::listOfTags, this, &RequirementsWidget::fillTagBar);
-    connect(m_reqManager, &RequirementsManager::connectionError, this, [this](QString error) {
+    connect(m_reqManager, &RequirementsManager::connectionError, this, [this](const QString &error) {
         updateServerStatus();
         QMessageBox::warning(this, tr("Connection error"), tr("Connection failed for this error:\n%1").arg(error));
     });
     connect(m_reqManager, &RequirementsManager::fetchingRequirementsEnded, m_reqManager,
             &RequirementsManager::requestTags);
 
-    bool hasCredentialsStored = loadSavedCredentials();
-    if (hasCredentialsStored) {
-        setLoginData();
-    }
-
     loadSavedRequirementsTableGeometry();
 
     ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
     ui->verticalLayout->insertWidget(0, m_widgetBar);
-}
-
-bool RequirementsWidget::loadSavedCredentials()
-{
-    QSettings settings;
-    settings.beginGroup("SpaceCreator");
-    auto gitlabToken = settings.value(tokenKey(QUrl(m_requirementsUrl).host())).toString();
-    settings.endGroup();
-    if (m_requirementsUrl.isEmpty() || gitlabToken.isEmpty()) {
-        return false;
-    }
-
-    ui->credentialWidget->setUrl(m_requirementsUrl);
-    ui->credentialWidget->setToken(gitlabToken);
-    return true;
 }
 
 bool RequirementsWidget::loadSavedRequirementsTableGeometry()
@@ -149,6 +129,14 @@ QUrl RequirementsWidget::url() const
 {
     return ui->credentialWidget->url();
 }
+/*!
+ * \brief RequirementsWidget::setUrl sets the url to fetch the requirements from
+ * \param url
+ */
+void RequirementsWidget::setUrl(const QUrl &url)
+{
+    ui->credentialWidget->setUrl(url.toString());
+}
 
 /*!
  * \brief RequirementsWidget::token Returns the token to authenticate for fetching the requirements
@@ -158,35 +146,25 @@ QString RequirementsWidget::token() const
     return ui->credentialWidget->token();
 }
 
+/*!
+ * \brief RequirementsWidget::setToken sets the Token to authenticate for fetching the requirements
+ * \param token
+ */
+void RequirementsWidget::setToken(const QString &token)
+{
+    ui->credentialWidget->setToken(token);
+}
+
 void RequirementsWidget::onChangeOfCredentials()
 {
     const QUrl newUrl(ui->credentialWidget->url());
-    if (!newUrl.isValid()) {
+    const QString newToken(ui->credentialWidget->token());
+    if (!newUrl.isValid() || newToken.isEmpty()) {
         return;
     }
 
-    QString newUrlHostKey = tokenKey(newUrl.host());
-    QSettings settings;
-    settings.beginGroup("SpaceCreator");
-    const QString gitlabToken = settings.value(newUrlHostKey).toString();
-
-    // If token is empty, try to find the token in the settings
-    if (ui->credentialWidget->token().isEmpty() && !gitlabToken.isEmpty()) {
-        ui->credentialWidget->setToken(gitlabToken);
-    }
-
-    // If anything changed
-    if ((gitlabToken != ui->credentialWidget->token()) || (ui->credentialWidget->url() != m_requirementsUrl)) {
-        settings.setValue(newUrlHostKey, ui->credentialWidget->token());
-        m_requirementsUrl = ui->credentialWidget->url().toString();
-    }
-    settings.endGroup();
-
+    emit requirementsCredentialsChanged(newUrl, newToken);
     emit requirementsUrlChanged(m_requirementsUrl);
-
-    if (!m_requirementsUrl.isEmpty() && !ui->credentialWidget->token().isEmpty()) {
-        setLoginData();
-    }
 }
 
 void RequirementsWidget::requestRequirements()
@@ -202,19 +180,21 @@ void RequirementsWidget::setLoginData()
 
     ui->serverStatusLabel->setPixmap({});
 
-    if (ui->credentialWidget->url().isEmpty() || ui->credentialWidget->token().isEmpty()) {
+    const QUrl currUrl(ui->credentialWidget->url());
+    const QString currToken(ui->credentialWidget->token());
+
+    if (currUrl.isEmpty() || currToken.isEmpty()) {
         ui->serverStatusLabel->setPixmap({});
         return;
     }
 
-    if (ui->credentialWidget->url() == m_reqManager->projectUrl()
-            && ui->credentialWidget->token() == m_reqManager->token()) {
+    if (currUrl == m_reqManager->projectUrl() && currToken == m_reqManager->token()) {
         m_reqManager->requestAllRequirements();
         return;
     }
 
     ui->serverStatusLabel->setToolTip(tr("Checking connection to the server"));
-    m_reqManager->setCredentials(ui->credentialWidget->url().toString(), ui->credentialWidget->token());
+    m_reqManager->setCredentials(currUrl.toString(), currToken);
 }
 
 void RequirementsWidget::updateServerStatus()
@@ -296,19 +276,15 @@ void RequirementsWidget::fillTagBar(const QStringList &tags)
 
 bool RequirementsWidget::tagButtonExists(const QString &tag) const
 {
-    for (const QToolButton *button : m_tagButtons) {
-        if (button->text() == tag) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(
+            m_tagButtons.begin(), m_tagButtons.end(), [&tag](const auto *btn) { return btn->text() == tag; });
 }
 
 void RequirementsWidget::showNewRequirementDialog() const
 {
     QScopedPointer<AddNewRequirementDialog> dialog(new AddNewRequirementDialog(m_model.get()));
     dialog->setModal(true);
-    auto ret = dialog->exec();
+    const auto ret = dialog->exec();
     if (ret == QDialog::Accepted) {
         m_reqManager->createRequirement(
                 dialog->title(), dialog->reqIfId(), dialog->description(), dialog->testMethod());
@@ -325,9 +301,9 @@ void RequirementsWidget::removeRequirement()
     reply = QMessageBox::question(this, tr("Remove requirement"),
             tr("Are you sure you want to remove the selected requirement?"), QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-        auto currentIndex = ui->allRequirements->selectionModel()->currentIndex();
+        const auto &currentIndex = ui->allRequirements->selectionModel()->currentIndex();
         if (currentIndex.isValid()) {
-            Requirement requirement = m_model->requirementFromIndex(currentIndex);
+            const Requirement &requirement = m_model->requirementFromIndex(currentIndex);
             m_reqManager->removeRequirement(requirement);
         }
     }
@@ -335,7 +311,7 @@ void RequirementsWidget::removeRequirement()
 
 void RequirementsWidget::modelSelectionChanged(const QItemSelection &selected, const QItemSelection & /*unused*/)
 {
-    bool enabled = (selected.indexes().count() > 0);
+    const bool enabled(selected.indexes().count() > 0);
     ui->removeRequirementButton->setEnabled(enabled);
 }
 

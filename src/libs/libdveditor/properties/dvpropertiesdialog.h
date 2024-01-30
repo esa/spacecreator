@@ -24,6 +24,7 @@
 namespace shared {
 namespace ui {
 class VEInteractiveObject;
+class SpaceCreatorRequirements;
 }
 namespace cmd {
 class CommandsStackBase;
@@ -31,7 +32,6 @@ class PropertyTemplateConfig;
 } // namespace cmd
 } // namespace shared
 namespace requirement {
-class RequirementsWidget;
 class RequirementsManager;
 }
 namespace shared {
@@ -70,7 +70,7 @@ private:
 
     dvm::AbstractSystemChecks *m_dvChecker = nullptr;
     Asn1Acn::Asn1SystemChecks *m_asn1Checks = nullptr;
-    requirement::RequirementsWidget *m_reqWidget = nullptr;
+    shared::ui::SpaceCreatorRequirements *m_reqWidget = nullptr;
     requirement::RequirementsManager *m_reqManager = nullptr;
     shared::RequirementsModel *m_reqModel = nullptr;
 };
