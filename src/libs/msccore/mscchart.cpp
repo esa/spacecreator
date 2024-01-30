@@ -125,6 +125,17 @@ void MscChart::addInstance(MscInstance *instance, int index)
         }
     }
 
+    // Check for shared conditions
+    for (MscInstanceEvent *ev : qAsConst(m_chronologicalEvents)) {
+        if (auto condition = dynamic_cast<MscCondition *>(ev)) {
+            if (condition->shared()) {
+                if (!m_events[instance].contains(condition)) {
+                    m_events[instance].append(condition);
+                }
+            }
+        }
+    }
+
     Q_EMIT instanceAdded(instance, m_instances.indexOf(instance));
     Q_EMIT instancesChanged();
     Q_EMIT dataChanged();

@@ -15,6 +15,7 @@ addQtTest(tst_ciflinetext msccore "cifcommon/ciflinepointstestbase.h;cifcommon/c
 addQtTest(tst_ciflinetimeout msccore "cifcommon/ciflinepointstestbase.h;cifcommon/ciflinepointstestbase.cpp")
 addQtTest(tst_cifparser msccore "cifcommon/ciflinepointstestbase.h;cifcommon/ciflinepointstestbase.cpp")
 addQtTest(tst_mscchart msccore)
+addQtTest(tst_msccondition msccore)
 addQtTest(tst_mscdocument msccore)
 addQtTest(tst_mscentity msccore)
 addQtTest(tst_mscgate msccore)

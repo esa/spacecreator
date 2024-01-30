@@ -92,6 +92,7 @@ private Q_SLOTS:
     void testIncompleteMessageIn();
     void testIncompleteMessageOut();
     void testConditionDublicate();
+    void testSharedConditionMissing();
     void testTestMessageInstanceName();
     void testSameNameDifferentInstances();
     void testDifferentParameter();

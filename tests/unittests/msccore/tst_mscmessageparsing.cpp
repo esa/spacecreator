@@ -16,6 +16,7 @@
 */
 
 #include "exceptions.h"
+#include "mscaction.h"
 #include "mscchart.h"
 #include "msccondition.h"
 #include "mscdocument.h"
@@ -836,6 +837,44 @@ void tst_MscReader::testConditionDublicate()
     QCOMPARE(event->instance(), responder);
 
     delete model;
+}
+
+void tst_MscReader::testSharedConditionMissing()
+{
+    static const QLatin1String msc("msc connection; \
+                    instance Initiator; \
+                        out msg to Responder; \
+                        condition Wait shared all; \
+                        create Runner; \
+                    endinstance; \
+                    instance Responder; \
+                        in msg from Initiator; \
+                        action 'go_go_go'; \
+                    endinstance;\
+                    instance Runner; \
+                        action 'hello'; \
+                    endinstance;\
+                endmsc;");
+
+    MscModel *model = m_reader->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+
+    MscChart *chart = model->charts().at(0);
+    MscInstance *initiator = chart->instances().at(0);
+    MscInstance *responder = chart->instances().at(1);
+    MscInstance *runner = chart->instances().at(2);
+
+    // Check is condition was added to instance "responder" correctly after the message
+    QCOMPARE(chart->eventsForInstance(responder).size(), 3);
+    auto message = dynamic_cast<MscMessage *>(chart->eventsForInstance(responder).at(0));
+    QVERIFY(message != nullptr);
+    auto condition = dynamic_cast<MscCondition *>(chart->eventsForInstance(responder).at(1));
+    QVERIFY(condition != nullptr);
+    auto action = dynamic_cast<MscAction *>(chart->eventsForInstance(responder).at(2));
+    QVERIFY(action != nullptr);
+
+    // shared condition not added as instance "runner", as it was not yet started
+    QCOMPARE(chart->eventsForInstance(runner).size(), 2); // create message and action
 }
 
 void tst_MscReader::testTestMessageInstanceName()

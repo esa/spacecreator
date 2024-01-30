@@ -119,4 +119,5 @@ private:
     std::vector<antlr4::Token *> getHiddenCommentTokensToLeft(int tokenIndex);
     msc::MscParameterList readParameterList(MscParser::ParameterListContext *parameterList);
     QStringList readTypeRefList(MscParser::TypeRefListContext *context);
+    void addMissingConditions();
 };

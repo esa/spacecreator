@@ -894,12 +894,14 @@ void MscParserVisitor::insertInstanceEvents()
     // Fix shared conditions
     auto replaceDuplicateCondition = [&](MscCondition *condition, InstanceEvents &events) {
         for (int k = 0; k < events.size(); ++k) {
-            if (events[k]->entityType() == msc::MscEntity::EntityType::Condition) { }
-            auto condition2 = static_cast<MscCondition *>(events[k]);
-            if (condition2->shared() && condition != condition2 && condition->name() == condition2->name()) {
-                // replace the duplicate
-                delete condition2;
-                events[k] = condition;
+            if (events[k]->entityType() == msc::MscEntity::EntityType::Condition) {
+                auto condition2 = static_cast<MscCondition *>(events[k]);
+                if (condition2->shared() && condition != condition2 && condition->name() == condition2->name()) {
+                    // replace the duplicate
+                    delete condition2;
+                    events[k] = condition;
+                    return;
+                }
             }
         }
     };
@@ -917,6 +919,8 @@ void MscParserVisitor::insertInstanceEvents()
             }
         }
     }
+
+    addMissingConditions();
 
     // Set all the events in the chart
     QHash<MscInstance *, QVector<MscInstanceEvent *>> events;
@@ -1182,4 +1186,59 @@ QStringList MscParserVisitor::readTypeRefList(MscParser::TypeRefListContext *con
     }
 
     return result;
+}
+
+void MscParserVisitor::addMissingConditions()
+{
+    QList<MscCondition *> allSharedConditions;
+    for (int i = 0; i < m_instanceEventsList.size(); ++i) {
+        for (MscInstanceEvent *event : m_instanceEventsList[i]) {
+            if (event->entityType() == msc::MscEntity::EntityType::Condition) {
+                auto condition = static_cast<MscCondition *>(event);
+                if (condition->shared() && !allSharedConditions.contains(condition)) {
+                    allSharedConditions.append(condition);
+                }
+            }
+        }
+    }
+
+    auto eventUsedBeforeInOtherInstance = [&](MscInstanceEvent *event, MscCondition *condition) {
+        for (int i = 0; i < m_instanceEventsList.size(); ++i) {
+            const int conditionIdx = m_instanceEventsList[i].indexOf(condition);
+            const int eventIdx = m_instanceEventsList[i].indexOf(event);
+            if (conditionIdx >= 0 && eventIdx >= 0) {
+                if (eventIdx < conditionIdx) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    for (MscCondition *condition : allSharedConditions) {
+        for (int i = 0; i < m_instanceEventsList.size(); ++i) {
+            if (m_instanceEventsList[i].contains(condition)) {
+                continue;
+            }
+
+            int idx = 0;
+            for (MscInstanceEvent *event : m_instanceEventsList[i]) {
+                if (eventUsedBeforeInOtherInstance(event, condition)) {
+                    ++idx;
+                } else {
+                    break;
+                }
+            }
+
+            // Check if instance is started after the shared condition
+            MscInstance *inst = m_currentChart->instances().at(i);
+            if (inst->isCreated() && idx == 0) {
+                continue;
+            }
+
+            if (idx >= 0) {
+                m_instanceEventsList[i].insert(idx, condition);
+            }
+        }
+    }
 }
