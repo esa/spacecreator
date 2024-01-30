@@ -37,37 +37,28 @@ private slots:
 
         auto asFlags = [](Qt::Alignment flag) { return QFlags<Qt::AlignmentFlag>(flag); };
 
-        const QRectF rect100(0, 0, 100, 100);
-        const QRectF rect200(100, 100, 200, 200);
+        constexpr QRectF testRect(0, 0, 100, 100);
+        constexpr QPointF center(testRect.center());
+        constexpr int padding(10);
 
-        // Point inside the bounding area
-        QTest::newRow("InsideBoundingArea") << rect100 << QPointF(50, 50) << asFlags(Qt::AlignLeft);
+        QTest::newRow("InsideLeft") << testRect << QPointF(testRect.left() + padding, center.y())
+                                    << asFlags(Qt::AlignLeft);
+        QTest::newRow("InsideTop") << testRect << QPointF(center.x(), testRect.top() + padding)
+                                   << asFlags(Qt::AlignTop);
+        QTest::newRow("InsideRight") << testRect << QPointF(testRect.right() - padding, center.y())
+                                     << asFlags(Qt::AlignRight);
+        QTest::newRow("InsideBottom") << testRect << QPointF(center.x(), testRect.bottom() - padding)
+                                      << asFlags(Qt::AlignBottom);
 
-        // Point close to the left side
-        QTest::newRow("NearLeftSide") << rect100 << QPointF(10, 50) << asFlags(Qt::AlignLeft);
+        QTest::newRow("OutsideLeft") << testRect << QPointF(testRect.left() - padding, center.y())
+                                     << asFlags(Qt::AlignLeft);
+        QTest::newRow("OutsideTop") << testRect << QPointF(center.x(), testRect.top() - padding)
+                                    << asFlags(Qt::AlignTop);
+        QTest::newRow("OutsideRight") << testRect << QPointF(testRect.right() + padding, center.y())
+                                      << asFlags(Qt::AlignRight);
+        QTest::newRow("OutsideBottom") << testRect << QPointF(center.x(), testRect.bottom() + padding)
+                                       << asFlags(Qt::AlignBottom);
 
-        // Point close to the top side
-        QTest::newRow("NearTopSide") << rect100 << QPointF(50, 10) << asFlags(Qt::AlignTop);
-
-        // Point close to the right side
-        QTest::newRow("NearRightSide") << rect100 << QPointF(90, 50) << asFlags(Qt::AlignRight);
-
-        // Point close to the bottom side
-        QTest::newRow("NearBottomSide") << rect100 << QPointF(50, 90) << asFlags(Qt::AlignBottom);
-
-        // Point outside, near the left side
-        QTest::newRow("OutsideNearLeft") << rect200 << QPointF(50, 150) << asFlags(Qt::AlignLeft);
-
-        // Point outside, near the top side
-        QTest::newRow("OutsideNearTop") << rect200 << QPointF(150, 50) << asFlags(Qt::AlignTop);
-
-        // Point outside, near the right side
-        QTest::newRow("OutsideNearRight") << rect200 << QPointF(251, 150) << asFlags(Qt::AlignRight);
-
-        // Point outside, near the bottom side
-        QTest::newRow("OutsideNearBottom") << rect200 << QPointF(150, 251) << asFlags(Qt::AlignBottom);
-
-        // Invalid bounding area
         QTest::newRow("InvalidBoundingArea") << QRectF() << QPointF(50, 50) << asFlags(Qt::AlignCenter);
     }
 
@@ -78,6 +69,8 @@ private slots:
         QFETCH(Qt::Alignment, expectedResult);
 
         const Qt::Alignment &actualResult = getNearestSide(boundingArea, pos);
+
+        qDebug() << actualResult << expectedResult;
 
         QCOMPARE(actualResult, expectedResult);
     }
