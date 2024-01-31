@@ -44,12 +44,17 @@ private slots:
 
         QTest::newRow("Horizontal") << pnt0x0 << pnt10x0 << QList<PointsList> { { pnt0x0, pnt10x0 } };
 
-        QTest::newRow("Diagonal") << pnt0x0 << pnt10x10
-                                  << QList<PointsList> { { pnt0x0, pnt0x10, pnt10x10 }, { pnt0x0, pnt10x0, pnt10x10 } };
+        QTest::newRow("DiagonalUpDown") << pnt0x0 << pnt10x10
+                                        << QList<PointsList> {
+                                               { pnt0x0, pnt0x10, pnt10x10 },
+                                               { pnt0x0, pnt10x0, pnt10x10 },
+                                           };
 
-        QTest::newRow("Horizontal&Vertical")
-                << pnt0x0 << pnt10x10
-                << QList<PointsList> { { pnt0x0, pnt0x10, pnt10x10 }, { pnt0x0, pnt10x0, pnt10x10 } };
+        QTest::newRow("DiagonalDownUp") << pnt10x10 << pnt0x0
+                                        << QList<PointsList> {
+                                               { pnt10x10, pnt10x0, pnt0x0 },
+                                               { pnt10x10, pnt0x10, pnt0x0 },
+                                           };
 
         QTest::newRow("EqualPoints") << pnt5x5 << pnt5x5 << QList<PointsList> {};
     }
@@ -61,7 +66,6 @@ private slots:
         QFETCH(QList<PointsList>, expectedResult);
 
         const QList<PointsList> &actualResult = generateSegments(startPoint, endPoint);
-
         QCOMPARE(actualResult, expectedResult);
     }
 };
