@@ -30,13 +30,43 @@ class TestIsCollided : public QObject
 private slots:
     void testIsCollided_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<RectsList>("itemRects");
+        QTest::addColumn<QRectF>("itemRect");
+        QTest::addColumn<QRectF>("expectedCollidingRect");
+        QTest::addColumn<bool>("expectedResult");
+
+        constexpr QRectF emptyRect = QRectF();
+        constexpr QRectF itemRect(0, 0, 10, 10);
+        constexpr QRectF collidedRect10(5, 5, 10, 10);
+        constexpr QRectF collidedRect15(5, 5, 15, 15);
+        constexpr QRectF collidedRect25(15, 15, 25, 25);
+        constexpr QRectF collidedRect30(20, 20, 30, 30);
+
+        QTest::newRow("CollidedWithAnother")
+                << RectsList { collidedRect15, collidedRect30 } << itemRect << collidedRect15 << true;
+
+        QTest::newRow("NotCollidedWithAny")
+                << RectsList { collidedRect25, collidedRect30 } << itemRect << emptyRect << false;
+
+        QTest::newRow("CollidedWithSame")
+                << RectsList { collidedRect10, collidedRect30 } << itemRect << collidedRect10 << true;
+
+        QTest::newRow("EmptyRects") << RectsList {} << itemRect << emptyRect << false;
+        QTest::newRow("EmptyRect") << RectsList { collidedRect10 } << emptyRect << emptyRect << false;
     }
 
     void testIsCollided()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = isCollided(replaceMe);
+        QFETCH(RectsList, itemRects);
+        QFETCH(QRectF, itemRect);
+        QFETCH(QRectF, expectedCollidingRect);
+        QFETCH(bool, expectedResult);
+
+        QRectF actualCollidingRect;
+        const bool actualResult = isCollided(itemRects, itemRect, &actualCollidingRect);
+
+        QCOMPARE(actualResult, expectedResult);
+        QCOMPARE(actualCollidingRect, expectedCollidingRect);
     }
 };
 
