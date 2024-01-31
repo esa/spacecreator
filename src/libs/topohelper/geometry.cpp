@@ -274,7 +274,7 @@ QRectF getNearestIntersectedRect(
         for (auto it = existingRects.cbegin(); it != existingRects.cend(); ++it) {
             QPointF intersectionPoint;
             if (intersectionType == IntersectionType::Edge
-                    && !!topohelp::geom::intersects(*it, line, &intersectionPoint)) {
+                    && !topohelp::geom::intersects(*it, line, &intersectionPoint)) {
                 continue;
             } else {
                 const auto intersectPoints =
