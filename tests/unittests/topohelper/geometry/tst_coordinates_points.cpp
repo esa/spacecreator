@@ -30,13 +30,37 @@ class TestCoordinates_points : public QObject
 private slots:
     void testCoordinates_points_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<PointsList>("points");
+        QTest::addColumn<QVector<qint32>>("expectedResult");
+
+        QTest::newRow("NonEmptyInput") << PointsList { QPointF(10.5, 20.9), QPointF(30.4, 40.1), QPointF(-1, -1),
+            QPointF(0, 0), QPointF(1000000, 1000000), QPointF(2147483647, -2147483648) }
+                                       << QVector<qint32> {
+                                              11,
+                                              21,
+                                              30,
+                                              40,
+                                              -1,
+                                              -1,
+                                              0,
+                                              0,
+                                              1000000,
+                                              1000000,
+                                              2147483647,
+                                              -2147483648,
+                                          };
+
+        QTest::newRow("EmptyInput") << PointsList {} << QVector<qint32> {};
     }
 
     void testCoordinates_points()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = coordinates_points(replaceMe);
+        QFETCH(PointsList, points);
+        QFETCH(QVector<qint32>, expectedResult);
+
+        const auto &actualResult = coordinates(points);
+
+        QCOMPARE(actualResult, expectedResult);
     }
 };
 
