@@ -762,7 +762,7 @@ QRectF collidingRect(const QRectF &rect, const RectsList &existingRects)
         return *it;
     }
     return QRectF();
-};
+}
 
 /*!
  * \brief converts a QPointF into a QVector of qint32 (32-bit signed integers) representing the x and y coordinates

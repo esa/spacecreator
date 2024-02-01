@@ -30,13 +30,57 @@ class TestCollidingRect : public QObject
 private slots:
     void testCollidingRect_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<QRectF>("testRect");
+        QTest::addColumn<RectsList>("existingRects");
+        QTest::addColumn<QRectF>("expectedCollisionRect");
+
+        constexpr qreal width(100);
+        constexpr qreal height(100);
+        constexpr QRectF testRect(0, 0, width, height);
+
+        {
+            constexpr QRectF first(testRect.translated(0, height + 1));
+            constexpr QRectF second(testRect.translated(width + 1, 0));
+
+            QTest::newRow("NoCollision") << testRect << RectsList { first, second } << QRectF();
+        }
+
+        {
+            constexpr QRectF first(testRect.translated(0, height - 1));
+            constexpr QRectF second(testRect.translated(width + 1, 0));
+
+            QTest::newRow("CollisionWithFirst") << testRect << RectsList { first, second } << first;
+        }
+
+        {
+            constexpr QRectF first(testRect.translated(0, height - 1));
+            constexpr QRectF second(testRect.translated(width + 1, 0));
+
+            QTest::newRow("CollisionWithLast") << testRect << RectsList { second, first } << first;
+        }
+
+        {
+            constexpr QRectF first(testRect.adjusted(1, 1, -1, -1));
+            QTest::newRow("CollisionWithChild") << testRect << RectsList { first } << first;
+        }
+
+        {
+            constexpr QRectF first(testRect.adjusted(-1, -1, 1, 1));
+            QTest::newRow("CollisionWithParent") << testRect << RectsList { first } << first;
+        }
+
+        QTest::newRow("CollisionWithEmpty") << testRect << RectsList { QRectF() } << QRectF();
+        QTest::newRow("CollisionOfEmpty") << QRectF() << RectsList { testRect } << QRectF();
     }
 
     void testCollidingRect()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = collidingRect(replaceMe);
+        QFETCH(QRectF, testRect);
+        QFETCH(RectsList, existingRects);
+        QFETCH(QRectF, expectedCollisionRect);
+
+        const auto &actualResult = collidingRect(testRect, existingRects);
+        QCOMPARE(actualResult, expectedCollisionRect);
     }
 };
 
