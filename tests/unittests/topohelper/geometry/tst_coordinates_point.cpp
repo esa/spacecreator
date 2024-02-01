@@ -30,13 +30,25 @@ class TestCoordinates_point : public QObject
 private slots:
     void testCoordinates_point_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<QPointF>("point");
+        QTest::addColumn<QVector<qint32>>("expectedResult");
+
+        QTest::newRow("Ceil") << QPointF(10.5, 20.9) << QVector<qint32> { 11, 21 };
+        QTest::newRow("Floor") << QPointF(30.4, 40.1) << QVector<qint32> { 30, 40 };
+        QTest::newRow("EmptyInput") << QPointF {} << QVector<qint32> {};
+        QTest::newRow("Zero") << QPointF(0, 0) << QVector<qint32> {}; // TODO: I'd expect {0,0} here…
+        QTest::newRow("Large") << QPointF(1000000, 1000000) << QVector<qint32> { 1000000, 1000000 };
+        QTest::newRow("MaxMin") << QPointF(2147483647, -2147483648) << QVector<qint32> { 2147483647, -2147483648 };
     }
 
     void testCoordinates_point()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = coordinates_point(replaceMe);
+        QFETCH(QPointF, point);
+        QFETCH(QVector<qint32>, expectedResult);
+
+        const auto &actualResult = coordinates(point);
+
+        QCOMPARE(actualResult, expectedResult);
     }
 };
 
