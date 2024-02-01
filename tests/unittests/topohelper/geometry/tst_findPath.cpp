@@ -30,13 +30,39 @@ class TestFindPath : public QObject
 private slots:
     void testFindPath_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<RectsList>("existingRects");
+        QTest::addColumn<QLineF>("startDirection");
+        QTest::addColumn<QLineF>("endDirection");
+        QTest::addColumn<QRectF>("expectedIntersectedRect");
+        QTest::addColumn<PointsList>("expectedResult");
+
+        constexpr QRectF rect(100, 100, 200, 200);
+        constexpr QLineF leftLine(50, 150, 70, 150);
+        constexpr QLineF rightLine(350, 150, 370, 150);
+
+        QTest::newRow("NoRect") << RectsList {} << QLineF(0, 0, 10, 10) << QLineF(20, 20, 30, 30) << QRectF {}
+                                << PointsList { QPointF(10, 10), QPointF(20, 20), QPointF(20, 20), QPointF(30, 30) };
+
+        QTest::newRow("RectIntersection") << RectsList { rect } << leftLine << rightLine << rect << PointsList {};
+
+        QTest::newRow("RectNoIntersection")
+                << RectsList { rect } << leftLine.translated(0, -100) << rightLine.translated(0, -100) << QRectF()
+                << PointsList { QPointF(70, 50), QPointF(220, 50), QPointF(220, 50), QPointF(370, 50) };
     }
 
     void testFindPath()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = findPath(replaceMe);
+        QFETCH(RectsList, existingRects);
+        QFETCH(QLineF, startDirection);
+        QFETCH(QLineF, endDirection);
+        QFETCH(QRectF, expectedIntersectedRect);
+        QFETCH(PointsList, expectedResult);
+
+        QRectF intersectedRect;
+        const auto &actualResult = findPath(existingRects, startDirection, endDirection, &intersectedRect);
+
+        QCOMPARE(intersectedRect, expectedIntersectedRect);
+        QCOMPARE(actualResult, expectedResult);
     }
 };
 
