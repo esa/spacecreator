@@ -28,15 +28,32 @@ class TestAlignedLine : public QObject
     Q_OBJECT
 
 private slots:
-    void testAlignedLine_data()
-    {
-        QSKIP("Not implemented yet");
-    }
 
     void testAlignedLine()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = alignedLine(replaceMe);
+        constexpr QLineF srcLine(0, 0, 10, 0);
+
+        auto performRotationTest = [&srcLine](qreal startAngle, int interval, qreal target) {
+            QLineF line(srcLine);
+            line.setAngle(startAngle);
+            for (int a = 1; a <= interval; ++a) {
+                QCOMPARE(alignedLine(line, a), false);
+            }
+            QCOMPARE(alignedLine(line, interval + 1), true);
+            QCOMPARE(line.angle(), target);
+        };
+
+        performRotationTest(45, 45, 90);
+
+        performRotationTest(80, 10, 90);
+        performRotationTest(170, 10, 180);
+        performRotationTest(260, 10, 270);
+        performRotationTest(350, 10, 0);
+
+        performRotationTest(0, 90, 90);
+        performRotationTest(90, 90, 180);
+        performRotationTest(180, 90, 270);
+        performRotationTest(270, 90, 0);
     }
 };
 

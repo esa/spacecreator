@@ -872,7 +872,8 @@ bool alignedLine(QLineF &line, int angleTolerance)
     };
 
     for (int angle = 360; angle >= 0; angle -= kStep) {
-        if (isBounded(angle, angleTolerance, std::ceil(line.angle()))) {
+        if (!qFuzzyCompare(1. + line.angle(), 1. + qreal(angle))
+                && isBounded(angle, angleTolerance, std::ceil(line.angle()))) {
             line.setAngle(angle);
             return true;
         }
