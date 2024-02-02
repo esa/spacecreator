@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "topohelper/geometry.h"
 
-#include <QPointF>
 #include <QtTest>
 
 using namespace topohelp;
@@ -30,13 +29,28 @@ class TestPos : public QObject
 private slots:
     void testPos_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<QVector<qint32>>("coordinates");
+        QTest::addColumn<QPointF>("expectedResult");
+
+        constexpr QPointF testPointF(10, 20);
+        const QPoint &testPoint = testPointF.toPoint();
+        constexpr QPointF noPoint;
+
+        QTest::newRow("Empty") << QVector<qint32> {} << noPoint;
+
+#ifdef QT_NO_DEBUG // avoid the assertion
+        QTest::newRow("Invalid") << QVector<qint32> { testPoint.x() } << noPoint;
+#endif
+        QTest::newRow("Valid") << QVector<qint32> { testPoint.x(), testPoint.y() } << testPointF;
     }
 
     void testPos()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = pos(replaceMe);
+        QFETCH(QVector<qint32>, coordinates);
+        QFETCH(QPointF, expectedResult);
+
+        const auto &actualResult = pos(coordinates);
+        QCOMPARE(actualResult, expectedResult);
     }
 };
 
