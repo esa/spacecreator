@@ -30,13 +30,37 @@ class TestRect : public QObject
 private slots:
     void testRect_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<QVector<qint32>>("coordinates");
+        QTest::addColumn<QRectF>("expectedResult");
+
+        QTest::newRow("ValidCase") << QVector<qint32> { -10, 20, 30, 40 } << QRectF(QPointF(-10, 20), QPointF(30, 40));
+
+        QTest::newRow("ZeroWidth") << QVector<qint32> { 0, 0, 0, 40 } << QRectF(0, 0, 0, 40);
+        QTest::newRow("NegativeWidth") << QVector<qint32> { 0, 0, -30, 40 } << QRectF(QPointF(0, 0), QPointF(-30, 40));
+
+        QTest::newRow("ZeroHeight") << QVector<qint32> { 0, 0, 40, 0 } << QRectF(QPointF(0, 0), QPointF(40, 0));
+        QTest::newRow("NegativeHeight") << QVector<qint32> { 0, 0, 40, -40 } << QRectF(QPointF(0, 0), QPointF(40, -40));
+
+        QTest::newRow("ZeroTopLeft") << QVector<qint32> { 0, 0, 30, 40 } << QRectF(QPointF(0, 0), QPointF(30, 40));
+        QTest::newRow("ZeroBottomRight") << QVector<qint32> { -10, 20, 0, 0 }
+                                         << QRectF(QPointF(-10, 20), QPointF(0, 0));
+        QTest::newRow("AllZeroes") << QVector<qint32> { 0, 0, 0, 0 } << QRectF(QPointF(0, 0), QPointF(0, 0));
+
+#ifdef QT_NO_DEBUG
+        QTest::newRow("EmptyCoordinates") << QVector<qint32> {} << QRectF();
+        QTest::newRow("InvalidCoordinates3") << QVector<qint32> { 10, 20, 30 } << QRectF();
+        QTest::newRow("InvalidCoordinates5") << QVector<qint32> { 10, 20, 30, 40, 50 } << QRectF();
+#endif
     }
 
     void testRect()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = rect(replaceMe);
+        QFETCH(QVector<qint32>, coordinates);
+        QFETCH(QRectF, expectedResult);
+
+        const auto &actualResult = rect(coordinates);
+
+        QCOMPARE(actualResult, expectedResult);
     }
 };
 
