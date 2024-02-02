@@ -30,13 +30,56 @@ class TestPolygon : public QObject
 private slots:
     void testPolygon_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<QVector<qint32>>("coordinates");
+        QTest::addColumn<PointsList>("expectedResult");
+
+        auto fillPoints = [](int count) {
+            PointsList points;
+            constexpr int step = 10;
+
+            int counter = 0;
+            for (int i = 0; i < count; ++i) {
+                points << QPointF(counter, counter + step);
+                counter += 2 * step;
+            }
+            return points;
+        };
+
+        constexpr int MaxPointCount = 10;
+
+        for (int i = 0; i < MaxPointCount; ++i) {
+            const QString &validCaseName = QString("ValidPoints%1").arg(i);
+
+            const PointsList &validPoints = fillPoints(i);
+            QVector<qint32> validNumbers;
+
+            for (const auto &pointF : validPoints) {
+                const QPoint &point = pointF.toPoint();
+                validNumbers << point.x() << point.y();
+            }
+
+            QTest::newRow(validCaseName.toUtf8().data()) << validNumbers << validPoints;
+
+#ifdef QT_NO_DEBUG
+            const QString &invalidCaseName = QString("InvalidPoints%1").arg(i);
+            QVector<qint32> invalidNumbers(validNumbers);
+            if (!invalidNumbers.isEmpty()) {
+                invalidNumbers.takeLast();
+            }
+
+            QTest::newRow(invalidCaseName.toUtf8().data()) << invalidNumbers << PointsList();
+#endif
+        }
     }
 
     void testPolygon()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = polygon(replaceMe);
+        QFETCH(QVector<qint32>, coordinates);
+        QFETCH(PointsList, expectedResult);
+
+        const auto &actualResult = polygon(coordinates);
+
+        QCOMPARE(actualResult, expectedResult);
     }
 };
 
