@@ -30,13 +30,34 @@ class TestComparePolygones : public QObject
 private slots:
     void testComparePolygones_data()
     {
-        QSKIP("Not implemented yet");
+        QTest::addColumn<PointsList>("polygon1");
+        QTest::addColumn<PointsList>("polygon2");
+        QTest::addColumn<bool>("expectedResult");
+
+        static const PointsList points012 { { 0, 0 }, { 1, 1 }, { 2, 2 } };
+        static const PointsList emptyList {};
+
+        QTest::newRow("BothEmpty") << emptyList << emptyList << true;
+
+        QTest::newRow("FirstEmpty") << emptyList << points012 << false;
+
+        QTest::newRow("SecondEmpty") << points012 << emptyList << false;
+
+        QTest::newRow("Equal") << points012 << points012 << true;
+
+        QTest::newRow("DifferentSize") << points012 << PointsList({ { 0, 0 }, { 1, 1 } }) << false;
+
+        QTest::newRow("DifferentPolygons") << points012 << PointsList({ { 5, 4 }, { 3, 2 }, { 1, 0 } }) << false;
     }
 
     void testComparePolygones()
     {
-        QSKIP("Not implemented yet");
-        // const auto &actualResult = comparePolygones(replaceMe);
+        QFETCH(PointsList, polygon1);
+        QFETCH(PointsList, polygon2);
+        QFETCH(bool, expectedResult);
+
+        const auto &actualResult = comparePolygones(polygon1, polygon2);
+        QCOMPARE(actualResult, expectedResult);
     }
 };
 
