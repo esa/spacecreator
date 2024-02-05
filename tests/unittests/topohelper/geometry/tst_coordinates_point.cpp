@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "topohelper/geometry.h"
 
-#include <QPointF>
 #include <QtTest>
 
 using namespace topohelp;
