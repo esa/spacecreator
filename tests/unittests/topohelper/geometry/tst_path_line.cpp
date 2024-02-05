@@ -22,36 +22,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 using namespace topohelp;
 using namespace topohelp::geom;
 
-class TestPath : public QObject
+class TestPathLine : public QObject
 {
     Q_OBJECT
 
 private slots:
-    void testPath_data()
+    void testPathLine_data()
     {
         QTest::addColumn<RectsList>("existingRects");
-        QTest::addColumn<QPointF>("startPoint");
-        QTest::addColumn<QPointF>("endPoint");
         QTest::addColumn<QLineF>("startDirection");
         QTest::addColumn<QLineF>("endDirection");
         QTest::addColumn<PointsList>("expectedResult");
 
-        QTest::newRow("Points::DirectPath") << RectsList {} // existingRects
-                                            << QPointF(0, 0) // startPoint
-                                            << QPointF(100, 100) // endPoint
-                                            << QLineF() << QLineF() // unused
-                                            << PointsList { QPointF(0, 0), QPointF(100, 100) }; // expectedResult
-
-        QTest::newRow("Points::IntersectedPath")
-                << RectsList { QRectF(50, 50, 100, 100) } // existingRects
-                << QPointF(0, 70) // startPoint
-                << QPointF(200, 70) // endPoint
-                << QLineF() << QLineF() // unused
-                << PointsList { QPointF(0, 70), QPointF(0, 34), QPointF(166, 34), QPointF(200, 70) }; // expectedResult
-
         QTest::newRow("Lines::DirectPath")
                 << RectsList {} // existingRects
-                << QPointF() << QPointF() // unused
                 << QLineF(0, 0, 10, 10) // startDirection
                 << QLineF(90, 90, 100, 100) // endDirection
                 << PointsList { QPointF(0, 0), QPointF(0, 0), QPointF(10, 10), QPointF(10, 10), QPointF(55, 55),
@@ -60,7 +44,6 @@ private slots:
 
         QTest::newRow("Lines::IntersectedPath")
                 << RectsList { QRectF(50, 50, 100, 100) } // existingRects
-                << QPointF() << QPointF() // unused
                 << QLineF(0, 70, 25, 70) // startDirection
                 << QLineF(175, 70, 200, 70) // endDirection
                 << PointsList { QPointF(0, 70), QPointF(0, 70), QPointF(25, 70), QPointF(25, 34), QPointF(166, 34),
@@ -70,23 +53,18 @@ private slots:
         //{ QPointF(0, 70), QPointF(25, 70), QPointF(25, 34), QPointF(175, 34), QPointF(175, 70), QPointF(200, 70) }
     }
 
-    void testPath()
+    void testPathLine()
     {
         QFETCH(RectsList, existingRects);
-        QFETCH(QPointF, startPoint);
-        QFETCH(QPointF, endPoint);
         QFETCH(QLineF, startDirection);
         QFETCH(QLineF, endDirection);
         QFETCH(PointsList, expectedResult);
 
-        const bool usePoints = startDirection.isNull() && endDirection.isNull();
-
-        const PointsList &actualResult = usePoints ? path(existingRects, startPoint, endPoint)
-                                                   : path(existingRects, startDirection, endDirection);
+        const PointsList &actualResult = path(existingRects, startDirection, endDirection);
 
         QCOMPARE(actualResult, expectedResult);
     }
 };
 
-QTEST_MAIN(TestPath)
-#include "tst_path.moc"
+QTEST_MAIN(TestPathLine)
+#include "tst_path_line.moc"

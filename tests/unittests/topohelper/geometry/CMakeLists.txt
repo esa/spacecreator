@@ -1,4 +1,5 @@
-addQtTest(tst_path topohelper)
+addQtTest(tst_path_point topohelper)
+addQtTest(tst_path_line topohelper)
 addQtTest(tst_getNearestSide topohelper)
 addQtTest(tst_ifaceSegment topohelper)
 addQtTest(tst_simplifyPoints topohelper)
