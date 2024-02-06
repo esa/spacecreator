@@ -25,7 +25,9 @@ class IVActionHandler : public ActionHandler
 {
     Q_OBJECT
 public:
-    explicit IVActionHandler(QObject *parent = nullptr);
-};
+    explicit IVActionHandler(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 
+protected Q_SLOTS:
+    void showReviewsDialog();
+};
 }

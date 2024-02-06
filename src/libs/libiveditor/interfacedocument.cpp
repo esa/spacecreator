@@ -1171,10 +1171,14 @@ bool InterfaceDocument::loadImpl(const QString &path)
         setAsn1FileName(metadata["asn1file"].toString());
     }
     setMscFileName(metadata["mscfile"].toString());
-    if (metadata.contains(parser.uiFileNameTag()))
+    if (metadata.contains(parser.uiFileNameTag())) {
         setUIFileName(metadata[parser.uiFileNameTag()].toString());
+    }
     if (metadata.contains("requirementsURL")) {
         objectsModel()->setRequirementsURL(metadata["requirementsURL"].toString());
+    }
+    if (metadata.contains("reviewsURL")) {
+        objectsModel()->setReviewsURL(metadata["reviewsURL"].toString());
     }
     setCreatorGitHash(metadata["creatorHash"].toString());
     shared::ErrorHub::clearCurrentFile();

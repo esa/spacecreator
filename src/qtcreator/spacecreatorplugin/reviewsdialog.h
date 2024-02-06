@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2024 European Space Agency - <maxime.perrotin@esa.int>
+  Copyright (C) 2024 European Space Agency - <maxime.perrotin@esa.int>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,32 +17,31 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
-#include <QWidget>
+#include <QDialog>
+#include <QUrl>
 
-namespace reviews {
+namespace spctr {
 
 namespace Ui {
-class ReviewsWidget;
+class ReviewsDialog;
 }
 
-/*!
- * Widget for listing all reviews
- */
-class ReviewsWidget : public QWidget
+class ReviewsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ReviewsWidget(QWidget *parent = nullptr);
-    ~ReviewsWidget();
+    explicit ReviewsDialog(QWidget *parent = nullptr);
+    ~ReviewsDialog();
 
+    void setUrl(const QUrl &reviewsUrl);
     QUrl url() const;
-    void setUrl(const QUrl &url);
-    QString token() const;
-    void setToken(const QString &token);
+
+private Q_SLOTS:
+    void saveToken();
 
 private:
-    Ui::ReviewsWidget *ui;
+    Ui::ReviewsDialog *ui;
 };
 
-} // namespace reviews
+} // namespace spctr

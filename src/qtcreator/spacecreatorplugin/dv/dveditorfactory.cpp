@@ -29,7 +29,7 @@ namespace spctr {
 
 DVEditorFactory::DVEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_actionHandler(new DVActionHandler(this))
+    , m_actionHandler(new DVActionHandler(projectManager, this))
     , m_projectManager(projectManager)
 {
     setId(spctr::Constants::K_DV_EDITOR_ID);

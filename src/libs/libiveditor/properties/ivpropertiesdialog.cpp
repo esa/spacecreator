@@ -54,7 +54,6 @@
 #include <QHeaderView>
 #include <QListView>
 #include <QPlainTextEdit>
-#include <QSettings>
 #include <QTableView>
 #include <QTimer>
 #include <QUndoCommand>

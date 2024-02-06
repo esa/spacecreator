@@ -145,6 +145,10 @@ QHash<QString, QVariant> IVExporter::collectInterfaceObjects(InterfaceDocument *
     if (requirementsURL.isValid()) {
         grouppedObjects[QLatin1String("requirementsURL")] = QVariant::fromValue(requirementsURL.toString());
     }
+    const QUrl &reviewsURL = doc->objectsModel()->reviewsURL();
+    if (reviewsURL.isValid()) {
+        grouppedObjects[QLatin1String("reviewsURL")] = QVariant::fromValue(reviewsURL.toString());
+    }
 
     const QString creatorGitHash = doc->creatorGitHash();
     grouppedObjects[QLatin1String("creatorHash")] = QVariant::fromValue(creatorGitHash);

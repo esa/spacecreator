@@ -45,6 +45,21 @@ const QUrl &DataModel::requirementsURL() const
     return m_requirementsURL;
 }
 
+void DataModel::setReviewsURL(const QUrl &url)
+{
+    if (!url.isValid() || url == m_reviewsURL) {
+        return;
+    }
+
+    m_reviewsURL = url;
+    Q_EMIT reviewsURLChanged(m_reviewsURL);
+}
+
+const QUrl &DataModel::reviewsURL() const
+{
+    return m_reviewsURL;
+}
+
 /*!
  * Returns the git has for this SpaceCreator build
  */

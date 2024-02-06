@@ -31,8 +31,8 @@
 
 namespace spctr {
 
-DVActionHandler::DVActionHandler(QObject *parent)
-    : ActionHandler(spctr::Constants::K_DV_EDITOR_ID, parent)
+DVActionHandler::DVActionHandler(SpaceCreatorProjectManager *projectManager, QObject *parent)
+    : ActionHandler(spctr::Constants::K_DV_EDITOR_ID, projectManager, parent)
 {
     Core::Context contexts;
     contexts.add(spctr::Constants::K_DV_EDITOR_ID);

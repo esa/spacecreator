@@ -18,8 +18,11 @@ along with this program. If not, see
 
 #include "spacecreatorrequirements.h"
 
+#include "settingsmanager.h"
+
 #include <QSettings>
 #include <QUrl>
+
 namespace shared {
 namespace ui {
 SpaceCreatorRequirements::SpaceCreatorRequirements(const QString &requirementsUrl,
@@ -42,9 +45,9 @@ void SpaceCreatorRequirements::onCredentialsChange(const QUrl &newUrl, const QSt
         return;
     }
 
-    const QString &newUrlHostKey = tokenKey(newUrl.host());
+    const QString &newUrlHostKey = SettingsManager::tokenKey(newUrl.host());
     QSettings settings;
-    settings.beginGroup("SpaceCreator");
+    settings.beginGroup(SettingsManager::spaceCreatorGroup());
     const QString &storedToken = settings.value(newUrlHostKey).toString();
 
     // If anything changed
@@ -64,8 +67,8 @@ void SpaceCreatorRequirements::onCredentialsChange(const QUrl &newUrl, const QSt
 bool SpaceCreatorRequirements::loadSavedCredentials()
 {
     QSettings settings;
-    settings.beginGroup("SpaceCreator");
-    const auto &storedToken = settings.value(tokenKey(QUrl(m_requirementsUrl).host())).toString();
+    settings.beginGroup(SettingsManager::spaceCreatorGroup());
+    const auto &storedToken = settings.value(SettingsManager::tokenKey(QUrl(m_requirementsUrl).host())).toString();
     settings.endGroup();
 
     if (m_requirementsUrl.isEmpty() || storedToken.isEmpty()) {

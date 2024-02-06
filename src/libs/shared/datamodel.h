@@ -28,6 +28,7 @@ class DataModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QUrl requirementsURL READ requirementsURL WRITE setRequirementsURL NOTIFY requirementsURLChanged)
+    Q_PROPERTY(QUrl reviewsURL READ reviewsURL WRITE setReviewsURL NOTIFY reviewsURLChanged)
     Q_PROPERTY(QString creatorGitHash READ creatorGitHash WRITE setCreatorGitHash NOTIFY creatorGitHashChanged)
 
 public:
@@ -38,15 +39,20 @@ public:
     void setRequirementsURL(const QUrl &url);
     const QUrl &requirementsURL() const;
 
+    void setReviewsURL(const QUrl &url);
+    const QUrl &reviewsURL() const;
+
     void setCreatorGitHash(const QString &hashStr);
     QString creatorGitHash() const;
 
 Q_SIGNALS:
     void requirementsURLChanged(const QUrl &);
+    void reviewsURLChanged(const QUrl &);
     void creatorGitHashChanged(const QString &);
 
 protected:
     QUrl m_requirementsURL;
+    QUrl m_reviewsURL;
     QString m_creatorGitHash;
 };
 

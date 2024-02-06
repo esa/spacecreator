@@ -20,6 +20,7 @@
 #include "standardpaths.h"
 
 #include <QDebug>
+#include <QUrl>
 
 static QString path()
 {
@@ -43,6 +44,29 @@ SettingsManager *SettingsManager::instance()
     }
 
     return instance;
+}
+
+QString SettingsManager::spaceCreatorGroup()
+{
+    return "SpaceCreator";
+}
+
+/*!
+ * Returns the settings key for storing a token of a host
+ * \param hostname The hostname the token is belonging to
+ */
+QString SettingsManager::tokenKey(const QString &hostname)
+{
+    return QString("%1__token").arg(hostname);
+}
+
+/*!
+ * Returns the settings key for storing a token of an url
+ * \param hostname The hostname the token is belonging to
+ */
+QString SettingsManager::tokenKey(const QUrl &url)
+{
+    return tokenKey(url.host());
 }
 
 QSettings *SettingsManager::storage()

@@ -20,6 +20,7 @@
 #include "editorcore.h"
 #include "qtceditor.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectmanager.h"
 
 #include <QAction>
 #include <QUndoGroup>
@@ -37,8 +38,9 @@ namespace spctr {
 /**
  * @param id the ID of the editor type
  */
-ActionHandler::ActionHandler(const Utils::Id &id, QObject *parent)
+ActionHandler::ActionHandler(const Utils::Id &id, SpaceCreatorProjectManager *projectManager, QObject *parent)
     : QObject(parent)
+    , m_projectManager(projectManager)
     , m_contextId(id)
     , m_undoGroup(new QUndoGroup(this))
 {

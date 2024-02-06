@@ -21,6 +21,8 @@
 #include <QObject>
 #include <QSettings>
 
+class QUrl;
+
 namespace shared {
 
 class SettingsManager : public QObject
@@ -122,6 +124,10 @@ public:
         const QVariant value = instance()->storage()->value(key);
         return value.isValid() ? value.value<V>() : defaultValue;
     }
+
+    static QString spaceCreatorGroup();
+    static QString tokenKey(const QString &hostname);
+    static QString tokenKey(const QUrl &url);
 
 Q_SIGNALS:
     void settingChanged(const QString &key, const QVariant &value);

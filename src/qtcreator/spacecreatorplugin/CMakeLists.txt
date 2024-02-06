@@ -71,6 +71,7 @@ set(SC_PLUGIN_SOURCES
     refactor/pythonrefactor.h
     refactor/replacerefactorbase.cpp
     refactor/replacerefactorbase.h
+    reviewsdialog.h reviewsdialog.cpp reviewsdialog.ui
     spacecreatorplugin.cpp
     spacecreatorplugin.h
     spacecreatorplugin_global.h
@@ -98,7 +99,7 @@ set(SC_QTC_PLUGINS
 
 add_qtc_plugin(${PLUGIN_NAME}
     DEFINES SCPLUGIN_LIBRARY
-    DEPENDS spacecreatorsystem libmsceditor libiveditor libdveditor ${QT_CORE} ${QT_GUI} ${QT_WIDGETS} ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
+    DEPENDS spacecreatorsystem libmsceditor libiveditor libdveditor reviews ${QT_CORE} ${QT_GUI} ${QT_WIDGETS} ${SC_QTC_LIBRARIES} ${SC_QTC_PLUGINS}
     PLUGIN_DEPENDS ${SC_QTC_PLUGINS}
     SOURCES ${SC_PLUGIN_SOURCES}
 )

@@ -30,6 +30,7 @@ enum Id
     RenameEntityProperty,
     ChangeEntityAttributes,
     SetRequirementsUrl,
+    SetReviewsUrl,
 
     LastId
 };

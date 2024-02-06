@@ -42,11 +42,27 @@ QUrl ReviewsWidget::url() const
 }
 
 /*!
+ * Sets the url to fetch the requirements from
+ */
+void ReviewsWidget::setUrl(const QUrl &url)
+{
+    ui->credentialWidget->setUrl(url.toString());
+}
+
+/*!
  * Returns the token to authenticate for fetching the reviews
  */
 QString ReviewsWidget::token() const
 {
     return ui->credentialWidget->token();
+}
+
+/*!
+ * Sets the Token to authenticate for fetching the requirements
+ */
+void ReviewsWidget::setToken(const QString &token)
+{
+    ui->credentialWidget->setToken(token);
 }
 
 } // namespace reviews

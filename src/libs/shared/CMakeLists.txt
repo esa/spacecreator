@@ -47,6 +47,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdentitypropertyrename.h
     commands/cmdsetrequirementsurl.cpp
     commands/cmdsetrequirementsurl.h
+    commands/cmdsetreviewsurl.cpp
+    commands/cmdsetreviewsurl.h
     commandsstackbase.cpp
     commandsstackbase.h
     common.cpp

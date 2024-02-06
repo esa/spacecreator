@@ -17,8 +17,14 @@
 
 #include "ivactionhandler.h"
 
+#include "commands/cmdsetreviewsurl.h"
+#include "commandsstack.h"
 #include "editorcore.h"
+#include "interfacedocument.h"
+#include "ivmodel.h"
+#include "reviewsdialog.h"
 #include "spacecreatorpluginconstants.h"
+#include "spacecreatorprojectimpl.h"
 
 #include <QMenu>
 #include <coreplugin/actionmanager/actioncontainer.h>
@@ -26,13 +32,14 @@
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/icontext.h>
 #include <coreplugin/icore.h>
+#include <projectexplorer/projectmanager.h>
 #include <utils/icon.h>
 #include <utils/utilsicons.h>
 
 namespace spctr {
 
-IVActionHandler::IVActionHandler(QObject *parent)
-    : ActionHandler(spctr::Constants::K_IV_EDITOR_ID, parent)
+IVActionHandler::IVActionHandler(SpaceCreatorProjectManager *projectManager, QObject *parent)
+    : ActionHandler(spctr::Constants::K_IV_EDITOR_ID, projectManager, parent)
 {
     Core::Context contexts;
     contexts.add(spctr::Constants::K_IV_EDITOR_ID);
@@ -50,6 +57,13 @@ IVActionHandler::IVActionHandler(QObject *parent)
     auto gridSnapCommand = Core::ActionManager::registerAction(gridSnapAction, Constants::IV_SNAP_TO_GRID_ID, contexts);
     interfaceViewMenu->addAction(gridSnapCommand);
 
+    interfaceViewMenu->addSeparator();
+
+    auto reviewsAction = new QAction(tr("Show reviews ..."));
+    connect(reviewsAction, &QAction::triggered, this, &IVActionHandler::showReviewsDialog);
+    auto reviewsCommand = Core::ActionManager::registerAction(reviewsAction, Constants::IV_SHOW_REVIEWS_ID, contexts);
+    interfaceViewMenu->addAction(reviewsCommand);
+
     auto toolsMenu = Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
     QMenu *menu = interfaceViewMenu->menu();
     menu->setTitle(tr("Interface view"));
@@ -57,4 +71,23 @@ IVActionHandler::IVActionHandler(QObject *parent)
     toolsMenu->addMenu(interfaceViewMenu);
 }
 
+void IVActionHandler::showReviewsDialog()
+{
+    SpaceCreatorProjectImpl *project = m_projectManager->currentSpaceCreatorProject();
+    if (!project || !project->ivCore()) {
+        return;
+    }
+
+    ivm::IVModel *model = project->ivCore()->document()->objectsModel();
+    const QUrl reviewUrl = model->reviewsURL();
+    ReviewsDialog dialog;
+    dialog.setUrl(reviewUrl);
+    const int ret = dialog.exec();
+    if (ret == QDialog::Accepted) {
+        ive::cmd::CommandsStack *commandsStack = project->ivCore()->commandsStack();
+        if (dialog.url() != model->reviewsURL()) {
+            commandsStack->push(new shared::cmd::CmdSetReviewsUrl(model, dialog.url()));
+        }
+    }
+}
 }

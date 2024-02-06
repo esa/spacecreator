@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2024 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2023 European Space Agency - <maxime.perrotin@esa.int>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,32 +17,33 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
-#include <QWidget>
+#include "datamodel.h"
+#include "undocommand.h"
 
-namespace reviews {
+#include <QPointer>
+#include <QUrl>
 
-namespace Ui {
-class ReviewsWidget;
-}
+namespace shared {
+namespace cmd {
 
 /*!
- * Widget for listing all reviews
+ * \brief The CmdSetReviewsUrl class handles setting the URL for the reviews of a model
  */
-class ReviewsWidget : public QWidget
+class CmdSetReviewsUrl : public shared::UndoCommand
 {
-    Q_OBJECT
-
 public:
-    explicit ReviewsWidget(QWidget *parent = nullptr);
-    ~ReviewsWidget();
+    CmdSetReviewsUrl(shared::DataModel *model, const QUrl &url, QObject *parent = nullptr);
 
-    QUrl url() const;
-    void setUrl(const QUrl &url);
-    QString token() const;
-    void setToken(const QString &token);
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
 
 private:
-    Ui::ReviewsWidget *ui;
+    QPointer<shared::DataModel> m_model;
+    QUrl m_oldUrl;
+    const QUrl m_newUrl;
 };
 
-} // namespace reviews
+} // namespace cmd
+} // namespace shared

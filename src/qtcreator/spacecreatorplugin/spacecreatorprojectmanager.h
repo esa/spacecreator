@@ -60,6 +60,9 @@ public:
 
     scs::SpaceCreatorProject *orphanStorage() const;
 
+    SpaceCreatorProjectImpl *spaceCreatorProject(ProjectExplorer::Project *qtcProject) const;
+    SpaceCreatorProjectImpl *currentSpaceCreatorProject() const;
+
 private Q_SLOTS:
     void addProject(ProjectExplorer::Project *project);
     void removeProject(ProjectExplorer::Project *project);

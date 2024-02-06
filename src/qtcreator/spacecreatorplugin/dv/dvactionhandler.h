@@ -25,7 +25,7 @@ class DVActionHandler : public ActionHandler
 {
     Q_OBJECT
 public:
-    explicit DVActionHandler(QObject *parent = nullptr);
+    explicit DVActionHandler(SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
 };
 
 }

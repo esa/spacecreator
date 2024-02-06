@@ -19,6 +19,7 @@
 
 #include "spacecreatorprojectimpl.h"
 
+#include <editormanager/editormanager.h>
 #include <projectexplorer/project.h>
 #if QTC_VERSION >= 1100
 #include <projectexplorer/projectmanager.h>
@@ -132,6 +133,38 @@ SpaceCreatorProjectImpl *SpaceCreatorProjectManager::project(const QSharedPointe
 scs::SpaceCreatorProject *SpaceCreatorProjectManager::orphanStorage() const
 {
     return m_orphanStorage.get();
+}
+
+/*!
+ * Returns the SpaceCreator project that is used by the given QtCreator project
+ */
+SpaceCreatorProjectImpl *SpaceCreatorProjectManager::spaceCreatorProject(ProjectExplorer::Project *qtcProject) const
+{
+    auto found = std::find_if(m_projects.cbegin(), m_projects.cend(),
+                [qtcProject](auto *pro) { return pro->project() == qtcProject; });
+    return found != m_projects.cend() ? *found : nullptr;
+}
+
+/*!
+ * Returns the spacecreator of the current active editor/document.
+ */
+SpaceCreatorProjectImpl *SpaceCreatorProjectManager::currentSpaceCreatorProject() const
+{
+    SpaceCreatorProjectImpl *spaceProject = nullptr;
+    Core::IDocument *doc = Core::EditorManager::currentDocument();
+    if (doc) {
+        const QString filename = doc->filePath().toFileInfo().absoluteFilePath();
+        spaceProject = project(filename);
+    }
+
+    if (!spaceProject) {
+        ProjectExplorer::Project *qtcProject = ProjectExplorer::ProjectManager::instance()->startupProject();
+        if (qtcProject) {
+            spaceProject = spaceCreatorProject(qtcProject);
+        }
+    }
+
+    return spaceProject;
 }
 
 /*!

@@ -18,7 +18,9 @@
 #pragma once
 
 #include <QObject>
+#include <QPointer>
 #include <id.h>
+#include <spacecreatorprojectmanager.h>
 
 class QAction;
 class QUndoGroup;
@@ -28,6 +30,7 @@ class IEditor;
 }
 
 namespace spctr {
+class SpaceCreatorProjectManager;
 
 /**
  * Class do handle undo/redo and similar actions for the different editors/documents inside QtCreator
@@ -36,7 +39,10 @@ class ActionHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit ActionHandler(const Utils::Id &id, QObject *parent = nullptr);
+    explicit ActionHandler(const Utils::Id &id, SpaceCreatorProjectManager *projectManager, QObject *parent = nullptr);
+
+protected:
+    QPointer<SpaceCreatorProjectManager> m_projectManager;
 
 private Q_SLOTS:
     void onCurrentEditorChanged(Core::IEditor *editor);
@@ -48,5 +54,4 @@ private:
     QUndoGroup *m_undoGroup = nullptr;
     QAction *m_deleteAction = nullptr;
 };
-
 }

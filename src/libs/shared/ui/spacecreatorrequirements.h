@@ -37,7 +37,6 @@ public Q_SLOTS:
     void onCredentialsChange(const QUrl &url, const QString& newToken);
 
 private:
-    QString tokenKey(const QString &base) const { return QString("%1__token").arg(base); }
     bool loadSavedCredentials();
 };
 }

@@ -29,7 +29,7 @@ namespace spctr {
 
 MscEditorFactory::MscEditorFactory(SpaceCreatorProjectManager *projectManager, QObject *parent)
     : IEditorFactory()
-    , m_actionHandler(new ActionHandler(spctr::Constants::K_MSC_EDITOR_ID, this))
+    , m_actionHandler(new ActionHandler(spctr::Constants::K_MSC_EDITOR_ID, projectManager, this))
     , m_projectManager(projectManager)
 {
     setId(Constants::K_MSC_EDITOR_ID);
