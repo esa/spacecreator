@@ -86,10 +86,13 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     m_reqWidget = new ::shared::ui::SpaceCreatorRequirements(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
     connect(m_reqWidget, &::shared::ui::SpaceCreatorRequirements::requirementsUrlChanged, this,
-            [model, commandsStack](QString requirementUrl) {
+            [model, commandsStack, this](QString requirementUrl) {
                 const QUrl url = QUrl(requirementUrl);
                 if (url != model->requirementsURL()) {
                     commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, url));
+                }
+                if (url.isValid() && m_reqWidget->token().isEmpty()) {
+                    m_reqWidget->loadSavedCredentials();
                 }
             });
 }

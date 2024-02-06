@@ -33,11 +33,10 @@ public:
     SpaceCreatorRequirements(const QString &requirementsUrl, requirement::RequirementsManager *manager,
             requirement::RequirementsModelBase *model, QWidget *parent = nullptr);
 
+    bool loadSavedCredentials();
+
 public Q_SLOTS:
     void onCredentialsChange(const QUrl &url, const QString& newToken);
-
-private:
-    bool loadSavedCredentials();
 };
 }
 }

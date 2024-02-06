@@ -157,14 +157,14 @@ void RequirementsWidget::setToken(const QString &token)
 
 void RequirementsWidget::onChangeOfCredentials()
 {
-    const QUrl newUrl(ui->credentialWidget->url());
+    m_requirementsUrl = ui->credentialWidget->url().toString();
+    Q_EMIT requirementsUrlChanged(m_requirementsUrl);
     const QString newToken(ui->credentialWidget->token());
-    if (!newUrl.isValid() || newToken.isEmpty()) {
+    if (m_requirementsUrl.isEmpty() || newToken.isEmpty()) {
         return;
     }
 
-    emit requirementsCredentialsChanged(newUrl, newToken);
-    emit requirementsUrlChanged(m_requirementsUrl);
+    emit requirementsCredentialsChanged(m_requirementsUrl, newToken);
 }
 
 void RequirementsWidget::requestRequirements()

@@ -40,7 +40,7 @@ CredentialWidget::CredentialWidget(QWidget *parent)
     ui->tokenLineEdit->setToolTip(tokenTooltip);
     connect(ui->createTokenButton, &QPushButton::clicked, this, &CredentialWidget::openTokenSettingsPage);
     connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &CredentialWidget::urlChanged);
-    connect(ui->urlLineEdit, &QLineEdit::editingFinished, this, &CredentialWidget::tokenChanged);
+    connect(ui->tokenLineEdit, &QLineEdit::editingFinished, this, &CredentialWidget::tokenChanged);
 }
 
 CredentialWidget::~CredentialWidget()
@@ -53,6 +53,9 @@ CredentialWidget::~CredentialWidget()
  */
 void CredentialWidget::setUrl(const QString &url)
 {
+    if (url == ui->urlLineEdit->text()) {
+        return;
+    }
     ui->urlLineEdit->setText(url);
 }
 
@@ -69,6 +72,9 @@ QUrl CredentialWidget::url() const
  */
 void CredentialWidget::setToken(const QString &token)
 {
+    if (token == ui->tokenLineEdit->text()) {
+        return;
+    }
     ui->tokenLineEdit->setText(token);
 }
 

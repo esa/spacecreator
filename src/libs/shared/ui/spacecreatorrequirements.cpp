@@ -39,6 +39,23 @@ SpaceCreatorRequirements::SpaceCreatorRequirements(const QString &requirementsUr
     }
 }
 
+bool SpaceCreatorRequirements::loadSavedCredentials()
+{
+    QSettings settings;
+    settings.beginGroup(SettingsManager::spaceCreatorGroup());
+    const auto &storedToken = settings.value(SettingsManager::tokenKey(QUrl(m_requirementsUrl).host())).toString();
+    settings.endGroup();
+
+    if (m_requirementsUrl.isEmpty() || storedToken.isEmpty()) {
+        return false;
+    }
+
+    setUrl(m_requirementsUrl);
+    setToken(storedToken);
+
+    return true;
+}
+
 void SpaceCreatorRequirements::onCredentialsChange(const QUrl &newUrl, const QString &newToken)
 {
     if (!newUrl.isValid()) {
@@ -64,21 +81,5 @@ void SpaceCreatorRequirements::onCredentialsChange(const QUrl &newUrl, const QSt
     }
 }
 
-bool SpaceCreatorRequirements::loadSavedCredentials()
-{
-    QSettings settings;
-    settings.beginGroup(SettingsManager::spaceCreatorGroup());
-    const auto &storedToken = settings.value(SettingsManager::tokenKey(QUrl(m_requirementsUrl).host())).toString();
-    settings.endGroup();
-
-    if (m_requirementsUrl.isEmpty() || storedToken.isEmpty()) {
-        return false;
-    }
-
-    setUrl(m_requirementsUrl);
-    setToken(storedToken);
-
-    return true;
-}
 }
 }
