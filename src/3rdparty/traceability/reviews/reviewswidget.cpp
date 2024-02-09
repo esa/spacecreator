@@ -17,20 +17,42 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "reviewswidget.h"
 
+#include "reviewsmanager.h"
+#include "reviewsmodel.h"
 #include "ui_reviewswidget.h"
 
 namespace reviews {
+const int kIconSize = 16;
 
 ReviewsWidget::ReviewsWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ReviewsWidget)
 {
     ui->setupUi(this);
+
+    connect(ui->refreshButton, &QPushButton::clicked, this, &ReviewsWidget::setLoginData);
+    connect(ui->credentialWidget, &tracecommon::CredentialWidget::urlChanged, this,
+            &ReviewsWidget::onChangeOfCredentials);
+    connect(ui->credentialWidget, &tracecommon::CredentialWidget::tokenChanged, this,
+            &ReviewsWidget::onChangeOfCredentials);
 }
 
 ReviewsWidget::~ReviewsWidget()
 {
     delete ui;
+}
+
+void ReviewsWidget::setManager(ReviewsManager *manager)
+{
+    m_reviewsManager = manager;
+    connect(m_reviewsManager, &ReviewsManager::projectIDChanged, this, &ReviewsWidget::requestReviews);
+    connect(m_reviewsManager, &ReviewsManager::busyChanged, this, &ReviewsWidget::updateServerStatus);
+}
+
+void ReviewsWidget::setModel(ReviewsModel *model)
+{
+    m_model = model;
+    ui->allReviews->setModel(m_model);
 }
 
 /*!
@@ -63,6 +85,80 @@ QString ReviewsWidget::token() const
 void ReviewsWidget::setToken(const QString &token)
 {
     ui->credentialWidget->setToken(token);
+}
+
+void ReviewsWidget::setLoginData()
+{
+    if (m_reviewsManager->isBusy()) {
+        return;
+    }
+
+    ui->serverStatusLabel->setPixmap({});
+
+    const QUrl currUrl(ui->credentialWidget->url());
+    const QString currToken(ui->credentialWidget->token());
+
+    if (currUrl.isEmpty() || currToken.isEmpty()) {
+        ui->serverStatusLabel->setPixmap({});
+        return;
+    }
+
+    if (currUrl == m_reviewsManager->projectUrl() && currToken == m_reviewsManager->token()) {
+        m_reviewsManager->requestAllReviews();
+        return;
+    }
+
+    ui->serverStatusLabel->setToolTip(tr("Checking connection to the server"));
+    m_reviewsManager->setCredentials(currUrl.toString(), currToken);
+}
+
+void ReviewsWidget::updateServerStatus()
+{
+    if (!m_reviewsManager) {
+        return;
+    }
+
+    ui->refreshButton->setEnabled(!m_reviewsManager->isBusy());
+    const QCursor busyCursor(Qt::WaitCursor);
+    if (m_reviewsManager->isBusy()) {
+        if (ui->allReviews->cursor() != busyCursor) {
+            ui->allReviews->setCursor(busyCursor);
+        }
+    } else {
+        if (ui->allReviews->cursor() == busyCursor) {
+            ui->allReviews->unsetCursor();
+        }
+    }
+
+    const bool connectionOk = (m_reviewsManager->projectID() != -1);
+    if (connectionOk) {
+        ui->serverStatusLabel->setPixmap(
+                QPixmap(":/tracecommonresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
+        ui->serverStatusLabel->setToolTip(tr("Connection to the server is ok"));
+    } else {
+        ui->serverStatusLabel->setPixmap(
+                QPixmap(":/tracecommonresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
+        ui->serverStatusLabel->setToolTip(tr("Connection to the server failed"));
+    }
+}
+
+void ReviewsWidget::onChangeOfCredentials()
+{
+    const QUrl newUrl(ui->credentialWidget->url());
+    const QString newToken(ui->credentialWidget->token());
+    if (!newUrl.isValid() || newToken.isEmpty()) {
+        return;
+    }
+
+    Q_EMIT reviewsCredentialsChanged(newUrl, newToken);
+    Q_EMIT reviewsUrlChanged(newUrl);
+}
+
+void ReviewsWidget::requestReviews()
+{
+    if (m_reviewsManager) {
+        m_reviewsManager->requestAllReviews();
+    }
 }
 
 } // namespace reviews

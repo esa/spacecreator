@@ -27,10 +27,10 @@
 #include "msceditorcore.h"
 #include "msclibrary.h"
 #include "mscproject.h"
-#include "requirementslibrary.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
 #include "templatinglibrary.h"
+#include "tracecommonlibrary.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     msc::initMscEditor();
     ive::initIVEditor();
     ivm::initIVLibrary();
-    requirement::initRequirementsLibrary();
+    tracecommon::initTraceCommonLibrary();
     templating::initTemplatingLibrary();
 
     QApplication a(argc, argv);

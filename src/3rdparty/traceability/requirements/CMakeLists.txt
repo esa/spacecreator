@@ -11,8 +11,6 @@ target_sources(${LIB_NAME} PRIVATE
   gitlab/gitlabrequirements.h
   requirement.cpp
   requirement.h
-  requirementslibrary.cpp
-  requirementslibrary.h
   requirementsmanager.cpp
   requirementsmanager.h
   requirementsmodelbase.cpp
@@ -30,7 +28,6 @@ target_sources(${LIB_NAME} PRIVATE
   ui/widgetbar.h
   ui/widgetbar.cpp
   ui/widgetbar.ui
-  requirementsresources.qrc
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

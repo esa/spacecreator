@@ -4,6 +4,9 @@ add_library(${LIB_NAME} STATIC
     credentialwidget.h credentialwidget.cpp credentialwidget.ui
     issuesmanager.h issuesmanager.cpp
     issuesmanagerprivate.h issuesmanagerprivate.cpp
+    tracecommonresources.qrc
+    tracecommonlibrary.cpp
+    tracecommonlibrary.h
     )
 
 target_sources(${LIB_NAME} PRIVATE

@@ -1,14 +1,13 @@
 set(LIB_NAME reviews)
 
-add_library(${LIB_NAME} STATIC
-    gitlab/gitlabreviews.cpp
-    gitlab/gitlabreviews.h
-    review.cpp
-    review.h
-    reviewswidget.h reviewswidget.cpp reviewswidget.ui
-    reviewsmanager.h reviewsmanager.cpp)
+add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+    gitlab/gitlabreviews.h gitlab/gitlabreviews.cpp
+    review.h review.cpp
+    reviewsmodel.h reviewsmodel.cpp
+    reviewswidget.h reviewswidget.cpp reviewswidget.ui
+    reviewsmanager.h reviewsmanager.cpp
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

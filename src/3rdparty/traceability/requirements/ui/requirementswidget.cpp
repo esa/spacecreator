@@ -95,7 +95,7 @@ RequirementsWidget::RequirementsWidget(
 
     loadSavedRequirementsTableGeometry();
 
-    ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
+    ui->filterButton->setIcon(QPixmap(":/tracecommonresources/icons/filter_icon.svg"));
     ui->verticalLayout->insertWidget(0, m_widgetBar);
 }
 
@@ -214,11 +214,11 @@ void RequirementsWidget::updateServerStatus()
     const bool connectionOk = (m_reqManager->projectID() != -1);
     if (connectionOk) {
         ui->serverStatusLabel->setPixmap(
-                QPixmap(":/requirementsresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
+                QPixmap(":/tracecommonresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
         ui->serverStatusLabel->setToolTip(tr("Connection to the server is ok"));
     } else {
         ui->serverStatusLabel->setPixmap(
-                QPixmap(":/requirementsresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
+                QPixmap(":/tracecommonresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
         ui->serverStatusLabel->setToolTip(tr("Connection to the server failed"));
     }
 }
@@ -232,10 +232,10 @@ void RequirementsWidget::toggleShowUsedRequirements()
 {
     if (ui->allRequirements->model() == &m_checkedModel) {
         ui->allRequirements->setModel(&m_tagFilterModel);
-        ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/filter_icon.svg"));
+        ui->filterButton->setIcon(QPixmap(":/tracecommonresources/icons/filter_icon.svg"));
     } else {
         ui->allRequirements->setModel(&m_checkedModel);
-        ui->filterButton->setIcon(QPixmap(":/requirementsresources/icons/disable_filter_icon.svg"));
+        ui->filterButton->setIcon(QPixmap(":/tracecommonresources/icons/disable_filter_icon.svg"));
     }
 }
 

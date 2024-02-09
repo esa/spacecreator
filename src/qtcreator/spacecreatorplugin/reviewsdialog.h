@@ -20,6 +20,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QDialog>
 #include <QUrl>
 
+namespace reviews {
+
+class ReviewsModel;
+class ReviewsManager;
+}
+
 namespace spctr {
 
 namespace Ui {
@@ -42,6 +48,9 @@ private Q_SLOTS:
 
 private:
     Ui::ReviewsDialog *ui;
+
+    reviews::ReviewsManager *m_reviewsManager = nullptr;
+    reviews::ReviewsModel *m_reviewsModel = nullptr;
 };
 
 } // namespace spctr

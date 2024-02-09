@@ -15,10 +15,23 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "tracecommonlibrary.h"
 
-namespace requirement {
+#include <qglobal.h>
 
-void initRequirementsLibrary();
+static void init_tracecommon_library()
+{
+    Q_INIT_RESOURCE(tracecommonresources);
+}
+
+namespace tracecommon {
+
+/**
+   Initializes the library resources and Qt meta types.
+ */
+void initTraceCommonLibrary()
+{
+    init_tracecommon_library();
+}
 
 }

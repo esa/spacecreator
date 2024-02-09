@@ -17,6 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "reviewsdialog.h"
 
+#include "reviewsmanager.h"
+#include "reviewsmodel.h"
 #include "settingsmanager.h"
 #include "ui_reviewsdialog.h"
 
@@ -28,9 +30,17 @@ namespace spctr {
 ReviewsDialog::ReviewsDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ReviewsDialog)
+    , m_reviewsManager(new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this))
+    , m_reviewsModel(new reviews::ReviewsModel(this))
 {
     ui->setupUi(this);
+    ui->reviewsWidget->setManager(m_reviewsManager);
+    ui->reviewsWidget->setModel(m_reviewsModel);
     connect(this, &QDialog::accepted, this, &ReviewsDialog::saveToken);
+    connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
+            &reviews::ReviewsModel::addReviews);
+    connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
+            &reviews::ReviewsModel::clear);
 }
 
 ReviewsDialog::~ReviewsDialog()

@@ -48,6 +48,7 @@ ReviewsManager::ReviewsManager(REPO_TYPE repoType, QObject *parent)
                 [this](const QList<gitlab::Issue> &issues) { Q_EMIT d->gitlabReviews->convertIssues(issues); });
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueFetchingDone, this,
                 &ReviewsManager::fetchingReviewsEnded);
+        connect(d->gitlabReviews.get(), &reviews::GitLabReviews::listOfReviews, this, &ReviewsManager::listOfReviews);
     }
     }
 }

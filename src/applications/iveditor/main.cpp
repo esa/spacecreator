@@ -24,10 +24,10 @@
 #include "ivlibrary.h"
 #include "ivproject.h"
 #include "mainwindow.h"
-#include "requirementslibrary.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
 #include "templatinglibrary.h"
+#include "tracecommonlibrary.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     templating::initTemplatingLibrary();
     shared::initSharedLibrary();
-    requirement::initRequirementsLibrary();
+    tracecommon::initTraceCommonLibrary();
     ive::initIVEditor();
     ivm::initIVLibrary();
 

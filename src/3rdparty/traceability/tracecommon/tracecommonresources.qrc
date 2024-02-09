@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/requirementsresources">
+    <qresource prefix="/tracecommonresources">
         <file>icons/check_icon.svg</file>
         <file>icons/disable_filter_icon.svg</file>
         <file>icons/filter_icon.svg</file>

@@ -17,9 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
+#include <QPointer>
 #include <QWidget>
 
 namespace reviews {
+
+class ReviewsModel;
+class ReviewsManager;
 
 namespace Ui {
 class ReviewsWidget;
@@ -36,13 +40,30 @@ public:
     explicit ReviewsWidget(QWidget *parent = nullptr);
     ~ReviewsWidget();
 
+    void setManager(ReviewsManager *manager);
+    void setModel(ReviewsModel *model);
+
     QUrl url() const;
     void setUrl(const QUrl &url);
     QString token() const;
     void setToken(const QString &token);
 
+public Q_SLOTS:
+    void setLoginData();
+    void updateServerStatus();
+
+Q_SIGNALS:
+    void reviewsUrlChanged(QUrl reviewsUrl);
+    void reviewsCredentialsChanged(QUrl url, QString token);
+
+protected Q_SLOTS:
+    void onChangeOfCredentials();
+    void requestReviews();
+
 private:
     Ui::ReviewsWidget *ui;
+    QPointer<ReviewsManager> m_reviewsManager;
+    QPointer<ReviewsModel> m_model;
 };
 
 } // namespace reviews

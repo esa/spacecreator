@@ -19,9 +19,9 @@
 #include "dveditorcore.h"
 #include "dvlibrary.h"
 #include "mainwindow.h"
-#include "requirementslibrary.h"
 #include "scversion.h"
 #include "sharedlibrary.h"
+#include "tracecommonlibrary.h"
 
 #include <QApplication>
 #include <QDirIterator>
@@ -30,7 +30,7 @@
 int main(int argc, char *argv[])
 {
     shared::initSharedLibrary();
-    requirement::initRequirementsLibrary();
+    tracecommon::initTraceCommonLibrary();
     dve::initDvEditor();
     dvm::initDVLibrary();
 
