@@ -59,6 +59,10 @@ for ASN1_CONFIG_DATA_TYPE in $ASN1_CONFIG_DATA_TYPES; do
     find $CD_INSTALLATION_DIRECTORY/%{ProjectNameLowerCase} -type f | xargs sed -i "s/asn1Scc${ASN1_CONFIG_DATA_TYPE}/${ASN1_CONFIG_DATA_TYPE}/g"
 done
 find $CD_INSTALLATION_DIRECTORY/%{ProjectNameLowerCase} -type f | xargs sed -i "s/asn1Scc/${PARTITION_NAME}_asn1Scc/gi"
+find $CD_INSTALLATION_DIRECTORY/cdsrcproj -type f | xargs sed -i "s/T_Runtime_Error_NONE/${PARTITION_NAME}_T_Runtime_Error_NONE/g"
+find $CD_INSTALLATION_DIRECTORY/cdsrcproj -type f | xargs sed -i "s/T_Runtime_Error_noerror_PRESENT/${PARTITION_NAME}_T_Runtime_Error_noerror_PRESENT/g"
+find $CD_INSTALLATION_DIRECTORY/cdsrcproj -type f | xargs sed -i "s/T_Runtime_Error_encodeerror_PRESENT/${PARTITION_NAME}_T_Runtime_Error_encodeerror_PRESENT/g"
+find $CD_INSTALLATION_DIRECTORY/cdsrcproj -type f | xargs sed -i "s/T_Runtime_Error_decodeerror_PRESENT/${PARTITION_NAME}_T_Runtime_Error_decodeerror_PRESENT/g"
 find $CD_INSTALLATION_DIRECTORY/%{ProjectNameLowerCase} -type f | xargs sed -i "s/request_size.h/${PARTITION_NAME}_request_size.h/g"
 find $CD_INSTALLATION_DIRECTORY/%{ProjectNameLowerCase} -type f | xargs sed -i "s/routing.h/${PARTITION_NAME}_routing.h/g"
 find $CD_INSTALLATION_DIRECTORY/%{ProjectNameLowerCase} -type f | xargs sed -i "s/C_ASN1_Types.h/${PARTITION_NAME}_C_ASN1_Types.h/g"
