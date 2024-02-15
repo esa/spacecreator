@@ -25,9 +25,14 @@
 namespace requirement {
 class RequirementsManager;
 }
+namespace reviews {
+class ReviewsManager;
+class ReviewsModel;
+}
 namespace shared {
 namespace ui {
 class SpaceCreatorRequirements;
+class SCReviewsWidget;
 }
 class RequirementsModel;
 }
@@ -74,6 +79,7 @@ private:
     void initLanguageView();
     void initArchetypeView();
     void initRequirementsView();
+    void initReviewView();
 
     QPointer<ivm::AbstractSystemChecks> m_ivChecks;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;
@@ -84,9 +90,14 @@ private:
     bool m_isRequiredSystemElement;
 
     QPointer<InterfaceDocument> m_document;
+
     shared::ui::SpaceCreatorRequirements *m_reqWidget = nullptr;
     requirement::RequirementsManager *m_reqManager = nullptr;
     shared::RequirementsModel *m_reqModel = nullptr;
+
+    shared::ui::SCReviewsWidget *m_reviewWidget = nullptr;
+    reviews::ReviewsManager *m_reviewsManager = nullptr;
+    reviews::ReviewsModel *m_reviewsModel = nullptr;
 };
 
 } // namespace ive

@@ -44,9 +44,9 @@ public:
     void setModel(ReviewsModel *model);
 
     QUrl url() const;
-    void setUrl(const QUrl &url);
+    virtual void setUrl(const QUrl &url);
     QString token() const;
-    void setToken(const QString &token);
+    virtual void setToken(const QString &token);
 
 public Q_SLOTS:
     void setLoginData();
@@ -59,8 +59,9 @@ Q_SIGNALS:
 protected Q_SLOTS:
     void onChangeOfCredentials();
     void requestReviews();
+    void openIssueLink(const QModelIndex &index);
 
-private:
+protected:
     Ui::ReviewsWidget *ui;
     QPointer<ReviewsManager> m_reviewsManager;
     QPointer<ReviewsModel> m_model;

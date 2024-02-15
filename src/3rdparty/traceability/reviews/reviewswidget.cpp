@@ -21,6 +21,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "reviewsmodel.h"
 #include "ui_reviewswidget.h"
 
+#include <QDesktopServices>
+#include <QMessageBox>
+
 namespace reviews {
 const int kIconSize = 16;
 
@@ -35,6 +38,7 @@ ReviewsWidget::ReviewsWidget(QWidget *parent)
             &ReviewsWidget::onChangeOfCredentials);
     connect(ui->credentialWidget, &tracecommon::CredentialWidget::tokenChanged, this,
             &ReviewsWidget::onChangeOfCredentials);
+    connect(ui->allReviews, &QTableView::doubleClicked, this, &ReviewsWidget::openIssueLink);
 }
 
 ReviewsWidget::~ReviewsWidget()
@@ -158,6 +162,16 @@ void ReviewsWidget::requestReviews()
 {
     if (m_reviewsManager) {
         m_reviewsManager->requestAllReviews();
+    }
+}
+
+void ReviewsWidget::openIssueLink(const QModelIndex &index)
+{
+    const QString data = index.data(ReviewsModel::RoleNames::IssueLinkRole).toString();
+    const QUrl issueUrl(data);
+    bool ok = QDesktopServices::openUrl(issueUrl);
+    if (!ok) {
+        QMessageBox::warning(this, tr("Url error"), tr("Error opening the url\n%1").arg(issueUrl.toString()));
     }
 }
 

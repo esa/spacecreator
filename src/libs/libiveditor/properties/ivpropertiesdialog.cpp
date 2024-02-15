@@ -23,6 +23,7 @@
 #include "asn1systemchecks.h"
 #include "commands/cmdentityattributeschange.h"
 #include "commands/cmdsetrequirementsurl.h"
+#include "commands/cmdsetreviewsurl.h"
 #include "commandsstack.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
@@ -47,7 +48,11 @@
 #include "propertiesviewbase.h"
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
+#include "reviewsmanager.h"
+#include "reviewsmodel.h"
+#include "reviewswidget.h"
 #include "shared/ui/spacecreatorrequirements.h"
+#include "ui/screviewswidget.h"
 #include "ui/veinteractiveobject.h"
 
 #include <QDebug>
@@ -95,6 +100,22 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
                     m_reqWidget->loadSavedCredentials();
                 }
             });
+
+    m_reviewWidget = new shared::ui::SCReviewsWidget(this);
+    m_reviewsManager = new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this);
+    m_reviewWidget->setManager(m_reviewsManager);
+    m_reviewsModel = new reviews::ReviewsModel(this);
+    m_reviewWidget->setModel(m_reviewsModel);
+    connect(m_reviewWidget, &reviews::ReviewsWidget::reviewsUrlChanged, this,
+            [model, commandsStack, this](QUrl reviewsUrl) {
+                if (reviewsUrl != model->reviewsURL()) {
+                    commandsStack->push(new shared::cmd::CmdSetReviewsUrl(model, reviewsUrl));
+                }
+            });
+    connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
+            &reviews::ReviewsModel::addReviews);
+    connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
+            &reviews::ReviewsModel::clear);
 }
 
 IVPropertiesDialog::~IVPropertiesDialog() { }
@@ -163,6 +184,7 @@ void IVPropertiesDialog::init()
     }
     initStyleView();
     initRequirementsView();
+    initReviewView();
 
     setCurrentTabIndex(0);
 }
@@ -339,6 +361,13 @@ void IVPropertiesDialog::initRequirementsView()
 {
     insertTab(m_reqWidget, tr("Requirements"), getTabCount());
     m_reqModel->setCommandMacro(commandMacro());
+}
+
+void IVPropertiesDialog::initReviewView()
+{
+    const QUrl reviewUrl = m_document->objectsModel()->reviewsURL();
+    m_reviewWidget->setUrl(reviewUrl);
+    insertTab(m_reviewWidget, tr("Reviews"), getTabCount());
 }
 
 } // namespace ive

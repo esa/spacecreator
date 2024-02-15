@@ -156,6 +156,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/minimizelimits.cpp
     ui/spacecreatorrequirements.h
     ui/spacecreatorrequirements.cpp
+    ui/screviewswidget.h
+    ui/screviewswidget.cpp
     ui/textitem.cpp
     ui/textitem.h
     ui/veconnectionendpointgraphicsitem.cpp
@@ -191,6 +193,7 @@ target_link_libraries(${LIB_NAME}
     ${QT_WIDGETS}
     ${QT_XML}
     requirements
+    reviews
     topohelper
 )
 

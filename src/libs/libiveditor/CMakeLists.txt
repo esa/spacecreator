@@ -235,6 +235,7 @@ target_link_libraries(${LIB_NAME}
     templating
     msccore
     requirements
+    reviews
     ${QT_CONCURRENT}
     ${QT_NETWORK}
     ${QT_SVG}
