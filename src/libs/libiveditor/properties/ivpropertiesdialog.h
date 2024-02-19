@@ -31,7 +31,7 @@ class ReviewsModel;
 }
 namespace shared {
 namespace ui {
-class SpaceCreatorRequirements;
+class SCRequirementsWidget;
 class SCReviewsWidget;
 }
 class RequirementsModel;
@@ -90,8 +90,8 @@ private:
     bool m_isRequiredSystemElement;
 
     QPointer<InterfaceDocument> m_document;
-
-    shared::ui::SpaceCreatorRequirements *m_reqWidget = nullptr;
+    
+    shared::ui::SCRequirementsWidget *m_reqWidget = nullptr;
     requirement::RequirementsManager *m_reqManager = nullptr;
     shared::RequirementsModel *m_reqModel = nullptr;
 

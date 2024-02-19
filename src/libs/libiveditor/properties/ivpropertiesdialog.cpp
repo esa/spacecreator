@@ -51,7 +51,7 @@
 #include "reviewsmanager.h"
 #include "reviewsmodel.h"
 #include "reviewswidget.h"
-#include "shared/ui/spacecreatorrequirements.h"
+#include "shared/ui/screquirementswidget.h"
 #include "ui/screviewswidget.h"
 #include "ui/veinteractiveobject.h"
 
@@ -88,9 +88,9 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     connect(m_reqManager, &requirement::RequirementsManager::startingFetchingRequirements, m_reqModel,
             &shared::RequirementsModel::clear);
     shared::DataModel *model = document->objectsModel();
-    m_reqWidget = new ::shared::ui::SpaceCreatorRequirements(
+    m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
-    connect(m_reqWidget, &::shared::ui::SpaceCreatorRequirements::requirementsUrlChanged, this,
+    connect(m_reqWidget, &::shared::ui::SCRequirementsWidget::requirementsUrlChanged, this,
             [model, commandsStack, this](QString requirementUrl) {
                 const QUrl url = QUrl(requirementUrl);
                 if (url != model->requirementsURL()) {

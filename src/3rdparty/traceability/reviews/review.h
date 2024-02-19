@@ -30,6 +30,7 @@ class Review
 public:
     QString m_longName;
     QString m_description;
+    QString m_author;
     int m_issueID;
     QStringList m_tags;
     QUrl m_link;

@@ -12,8 +12,8 @@ Issue::Issue(const QJsonObject &issue)
     mIssueIID = issue["iid"].toInteger();
     mTitle = issue["title"].toString();
     mDescription = issue["description"].toString();
-    mAuthor = issue["author"].toString();
-    mAssignee = issue["assignee"].toString();
+    mAuthor = issue["author"]["name"].toString();
+    mAssignee = issue["assignee"]["name"].toString();
     mState = issue["state"].toString();
     QVariant v = issue["labels"].toString();
     QString s = v.toString();

@@ -24,7 +24,7 @@
 namespace shared {
 namespace ui {
 class VEInteractiveObject;
-class SpaceCreatorRequirements;
+class SCRequirementsWidget;
 }
 namespace cmd {
 class CommandsStackBase;
@@ -70,7 +70,7 @@ private:
 
     dvm::AbstractSystemChecks *m_dvChecker = nullptr;
     Asn1Acn::Asn1SystemChecks *m_asn1Checks = nullptr;
-    shared::ui::SpaceCreatorRequirements *m_reqWidget = nullptr;
+    shared::ui::SCRequirementsWidget *m_reqWidget = nullptr;
     requirement::RequirementsManager *m_reqManager = nullptr;
     shared::RequirementsModel *m_reqModel = nullptr;
 };

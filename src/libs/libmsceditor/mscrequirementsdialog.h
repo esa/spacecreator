@@ -23,7 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace shared {
 namespace ui {
-class SpaceCreatorRequirements;
+class SCRequirementsWidget;
 }
 }
 
@@ -58,7 +58,7 @@ public:
 
 private:
     Ui::MscRequirementsDialog *ui;
-    shared::ui::SpaceCreatorRequirements *m_reqWidget = nullptr;
+    shared::ui::SCRequirementsWidget *m_reqWidget = nullptr;
     requirement::RequirementsManager *m_reqManager = nullptr;
     requirement::RequirementsModelBase *m_reqModel = nullptr;
     QPointer<msc::MscEntity> m_entity;

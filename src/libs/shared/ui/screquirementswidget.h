@@ -25,12 +25,12 @@ class RequirementsModelBase;
 }
 namespace shared {
 namespace ui {
-class SpaceCreatorRequirements : public requirement::RequirementsWidget
 
+class SCRequirementsWidget : public requirement::RequirementsWidget
 {
     Q_OBJECT
 public:
-    SpaceCreatorRequirements(const QString &requirementsUrl, requirement::RequirementsManager *manager,
+    SCRequirementsWidget(const QString &requirementsUrl, requirement::RequirementsManager *manager,
             requirement::RequirementsModelBase *model, QWidget *parent = nullptr);
 
     bool loadSavedCredentials();

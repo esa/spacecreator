@@ -52,8 +52,11 @@ void ReviewsModel::addReviews(const QList<Review> &reviews)
 QVariant ReviewsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
-        if (section == TITLE) {
+        switch (section) {
+        case TITLE:
             return tr("Title");
+        case AUTHOR:
+            return tr("Author");
         }
     }
 
@@ -71,7 +74,7 @@ int ReviewsModel::rowCount(const QModelIndex &parent) const
 
 int ReviewsModel::columnCount(const QModelIndex &parent) const
 {
-    return 1;
+    return 2;
 }
 
 QVariant ReviewsModel::data(const QModelIndex &index, int role) const
@@ -85,7 +88,12 @@ QVariant ReviewsModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::DisplayRole) {
-        return m_reviews[index.row()].m_longName;
+        switch (index.column()) {
+        case TITLE:
+            return m_reviews[index.row()].m_longName;
+        case AUTHOR:
+            return m_reviews[index.row()].m_author;
+        }
     }
     if (role == Qt::ToolTipRole) {
         return m_reviews[index.row()].m_description;

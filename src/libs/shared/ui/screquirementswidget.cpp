@@ -16,8 +16,7 @@ along with this program. If not, see
 <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "spacecreatorrequirements.h"
-
+#include "screquirementswidget.h"
 #include "settingsmanager.h"
 
 #include <QSettings>
@@ -25,13 +24,14 @@ along with this program. If not, see
 
 namespace shared {
 namespace ui {
-SpaceCreatorRequirements::SpaceCreatorRequirements(const QString &requirementsUrl,
-        requirement::RequirementsManager *manager, requirement::RequirementsModelBase *model, QWidget *parent)
+
+SCRequirementsWidget::SCRequirementsWidget(const QString &requirementsUrl, requirement::RequirementsManager *manager,
+        requirement::RequirementsModelBase *model, QWidget *parent)
     : requirement::RequirementsWidget(requirementsUrl, manager, model, parent)
 
 {
     connect(this, &requirement::RequirementsWidget::requirementsCredentialsChanged, this,
-            &SpaceCreatorRequirements::onCredentialsChange);
+            &SCRequirementsWidget::onCredentialsChange);
 
     const bool hasCredentialsStored = loadSavedCredentials();
     if (hasCredentialsStored) {
@@ -39,7 +39,7 @@ SpaceCreatorRequirements::SpaceCreatorRequirements(const QString &requirementsUr
     }
 }
 
-bool SpaceCreatorRequirements::loadSavedCredentials()
+bool SCRequirementsWidget::loadSavedCredentials()
 {
     QSettings settings;
     settings.beginGroup(SettingsManager::spaceCreatorGroup());
@@ -56,7 +56,7 @@ bool SpaceCreatorRequirements::loadSavedCredentials()
     return true;
 }
 
-void SpaceCreatorRequirements::onCredentialsChange(const QUrl &newUrl, const QString &newToken)
+void SCRequirementsWidget::onCredentialsChange(const QUrl &newUrl, const QString &newToken)
 {
     if (!newUrl.isValid()) {
         return;

@@ -154,8 +154,8 @@ target_sources(${LIB_NAME} PRIVATE
     ui/listtreedialog.cpp
     ui/minimizelimits.h
     ui/minimizelimits.cpp
-    ui/spacecreatorrequirements.h
-    ui/spacecreatorrequirements.cpp
+    ui/screquirementswidget.h
+    ui/screquirementswidget.cpp
     ui/screviewswidget.h
     ui/screviewswidget.cpp
     ui/textitem.cpp

@@ -46,7 +46,7 @@ Review GitLabReviews::reviewFromIssue(const gitlab::Issue &issue)
 {
     QStringList tags = issue.mLabels;
     tags.removeAll(k_reviewsTypeLabel);
-    return { issue.mTitle, issue.mDescription, issue.mIssueIID, tags, issue.mUrl };
+    return { issue.mTitle, issue.mDescription, issue.mAuthor, issue.mIssueIID, tags, issue.mUrl };
 }
 
 }
