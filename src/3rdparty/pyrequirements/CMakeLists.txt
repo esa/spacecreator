@@ -1,165 +1,158 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(TasteQtPyWidget VERSION 0.0.1 DESCRIPTION "C++/Qt Widgets for ESA Python projects" LANGUAGES CXX)
+project(TasteQtWidgets VERSION 0.0.1 DESCRIPTION "C++/Qt Widgets for ESA Python projects" LANGUAGES CXX)
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)
+set(QT_VER_MAJ_MIN ${Qt6_VERSION_MAJOR}.${Qt6_VERSION_MINOR})
+
+set(Python3_FIND_VIRTUALENV FIRST)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+
+execute_process(
+    COMMAND
+        ${Python3_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"
+    OUTPUT_VARIABLE PYTHON_LIBS_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if(NOT DEFINED SHIBOKEN_CUSTOM_PREFIX) # look for shiboken in a custom location
+    # TODO: ensure the PYTHON_LIBS_DIR is correct
+    set(SHIBOKEN_CUSTOM_PREFIX "${PYTHON_LIBS_DIR}/shiboken6")
+endif()
+
+if(NOT DEFINED PYSIDE_CUSTOM_PREFIX) # look for pyside in a custom location
+    # TODO: ensure the PYTHON_LIBS_DIR is correct
+    set(PYSIDE_CUSTOM_PREFIX "${PYTHON_LIBS_DIR}/PySide6")
+endif()
+
+find_package(Shiboken6 ${QT_VER_MAJ_MIN} REQUIRED)
+find_package(PySide6 ${QT_VER_MAJ_MIN} REQUIRED)
+
+set(Python3_VERSION_MAJORMINOR "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
+if(NOT TasteQtWidgets_PYTHON_BINDINGS_INSTALL_PREFIX)
+    set(PYTHON_SITE_DIR $ENV{HOME}/.local/lib/python${Python3_VERSION_MAJORMINOR}/site-packages)
+    if (EXISTS ${PYTHON_SITE_DIR})
+        set(TasteQtWidgets_PYTHON_BINDINGS_INSTALL_PREFIX
+            ${PYTHON_SITE_DIR}
+            CACHE FILEPATH "Custom path to install python bindings."
+        )
+    else()
+        set(TasteQtWidgets_PYTHON_BINDINGS_INSTALL_PREFIX
+                ${PYTHON_LIBS_DIR}
+                CACHE FILEPATH "Custom path to install python bindings."
+            )
+    endif()
+endif()
+
+set(TASTE_PYTHON_MODULE_NAME "Py${PROJECT_NAME}")
+set(TasteQtWidgets_PYTHON_BINDINGS_INSTALL_PREFIX "${TasteQtWidgets_PYTHON_BINDINGS_INSTALL_PREFIX}/${TASTE_PYTHON_MODULE_NAME}")
+
+include(KDPySide6ModuleBuild)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Setup Qt
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Gui)
-set(CMAKE_INCLUDE_CURRENT_DIR ON) # Generated files should be in the include path. Good for moc with Qt
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(original_library "QtTASTE")
+set(bindings_library ${PROJECT_NAME})
 
+set(TASTE_SUBLIB_SRC_ROOT ${CMAKE_SOURCE_DIR}/../traceability)
+add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/qgitlabapi ${CMAKE_BINARY_DIR}/traceability/qgitlabapi)
+add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/tracecommon ${CMAKE_BINARY_DIR}/traceability/tracecommon)
+add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/requirements ${CMAKE_BINARY_DIR}/traceability/requirements)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/../traceability ${CMAKE_BINARY_DIR}/traceability)
+set(TasteQtWidgets_SRC
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_label_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_label_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_issue_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_issue_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_qgitlabclient_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_qgitlabclient_wrapper.cpp
 
-set(original_library "libQtTASTE")
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmodelbase_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmodelbase_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementswidget_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementswidget_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmanager_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmanager_wrapper.cpp
+
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tracecommon_issuesmanager_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tracecommon_issuesmanager_wrapper.cpp
+
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_module_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_python.h
+)
+
+# includes necessary to parse and build the classes specified on typesystem
+set(TasteQtWidgets_include_paths
+    $<JOIN:$<TARGET_PROPERTY:${original_library},INTERFACE_INCLUDE_DIRECTORIES>,${PATH_SEP}>
+)
+
+# A list of paths where shiboken should look for typesystem
+set(TasteQtWidgets_typesystem_paths # PySide path, this variable was exposed by FindPySide6.cmake
+    ${PYSIDE_TYPESYSTEMS}
+)
+
+# Libraries that will be necessary to link the target, this will used in the command 'target_link_libraries'
+set(TasteQtWidgets_target_link_libraries ${original_library}
+    ${MY_LINK_LIBS}
+    ${Python3_LIBRARIES}
+    QGitlabAPI
+    requirements
+    tracecommon
+)
+
+set(LIBS_ICUI18N_DIR ${PYSIDE_BASEDIR}"/Qt/lib/")
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${LIBS_ICUI18N_DIR})
 
 add_library(${original_library} SHARED )
 
 target_link_libraries(${original_library} PUBLIC
+    QGitlabAPI
     requirements
+    tracecommon
 )
 
-set_target_properties(${original_library} PROPERTIES VERSION 0.0.1)
-
-### Do not prepend a "lib" for the library filename
-set_property(TARGET ${original_library} PROPERTY PREFIX "")
-
-macro(pyside_config option output_var)
-    if(${ARGC} GREATER 2)
-        set(is_list ${ARGV2})
-    else()
-        set(is_list "")
-    endif()
-
-    execute_process(
-      COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/pyside_config.py
-              ${option}
-      OUTPUT_VARIABLE ${output_var}
-      OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-    if ("${${output_var}}" STREQUAL "")
-        message(FATAL_ERROR "Error: Calling pyside_config.py ${option} returned no output.")
-    endif()
-    if(is_list)
-        string (REPLACE " " ";" ${output_var} "${${output_var}}")
-    endif()
-endmacro()
-
-# Query for the shiboken generator path, Python path, include paths and linker flags.
-pyside_config(--shiboken-module-path shiboken_module_path)
-pyside_config(--shiboken-generator-path shiboken_generator_path)
-pyside_config(--python-include-path python_include_dir)
-pyside_config(--shiboken-generator-include-path shiboken_include_dir 1)
-pyside_config(--shiboken-module-shared-libraries-cmake shiboken_shared_libraries 0)
-pyside_config(--python-link-flags-cmake python_linking_data 0)
-pyside_config(--pyside-path pyside_path)
-pyside_config(--pyside-include-path pyside_include_dir 1)
-pyside_config(--pyside-shared-libraries-cmake pyside_shared_libraries 0)
-
-### Before we can run the shiboken generator, we define a couple of variables.
-set(shiboken_path "${shiboken_generator_path}/shiboken6")
-if(NOT EXISTS ${shiboken_path})
-    message(FATAL_ERROR "Shiboken executable not found at path: ${shiboken_path}")
-endif()
-
-# The name of the generated bindings module (as imported in Python).
-set(bindings_library "TasteQtWidgets")
-
-
-# Typesystem xml file which defines the relationships between the C++ types / functions and the corresponding Python equivalents.
-set(typesystem_file ${CMAKE_SOURCE_DIR}/bindings.xml)
-
-# The header file with all the types and functions for which bindings will be generated.
-# Usually it simply includes other headers of the library you are creating bindings for.
-set(wrapped_header ${CMAKE_SOURCE_DIR}/bindings.h)
-
-# Specify which C++ files will be generated by shiboken. This includes the module wrapper
-# and a '.cpp' file per C++ type. These are needed for generating the module shared library.
-set(generated_sources
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_module_wrapper.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementswidget_wrapper.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmanager_wrapper.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmodelbase_wrapper.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_wrapper.cpp
-)
-
-### Gather include diretories needed for Qt
 set(QT_INCLUDES "")
-foreach(QT_MODULE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Gui requirements)
+foreach(QT_MODULE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Gui QGitlabAPI requirements tracecommon)
     get_property(QT_WIDGETS_INCLUDE_DIRS TARGET ${QT_MODULE} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
     foreach(INCLUDE_DIR ${QT_WIDGETS_INCLUDE_DIRS})
-        list(APPEND QT_INCLUDES "-I${INCLUDE_DIR}")
-        message(${INCLUDE_DIR})
+        if(NOT "${INCLUDE_DIR}" IN_LIST QT_INCLUDES)
+            list(APPEND QT_INCLUDES "${INCLUDE_DIR}")
+            message(STATUS "Adding INCLUDE path: " ${INCLUDE_DIR})
+        endif()
     endforeach()
 endforeach()
 
-
-### Now we are ready to tell cmake how to produce breadcrumbs_wrapper.cpp and place it in a module
-set(shiboken_options --generator-set=shiboken --enable-parent-ctor-heuristic
-    --enable-return-value-heuristic --use-isnull-as-nb_nonzero
-    --avoid-protected-hack --enable-pyside-extensions
-    -I${CMAKE_SOURCE_DIR}/include
-#    -I${CMAKE_SOURCE_DIR}/traceability/requirements
-#    -I${CMAKE_SOURCE_DIR}/traceability/requirements/ui
-#    -I${CMAKE_SOURCE_DIR}/traceability/qgitlabapi
+set(ALL_INCLUDE_PATHS
     ${QT_INCLUDES}
-    -T${pyside_path}/typesystems
-    --output-directory=${CMAKE_CURRENT_BINARY_DIR}
-    )
+    ${SHIBOKEN_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/../traceability
+)
+# Include flags/path that will be set in 'target_include_directories'
+set(TasteQtWidgets_target_include_directories ${ALL_INCLUDE_PATHS})
+set(TasteQtWidgets_include_paths ${ALL_INCLUDE_PATHS})
 
-set(generated_sources_dependencies ${wrapped_header} ${typesystem_file})
+create_python_bindings(
+    ${PROJECT_NAME}
+    "${TasteQtWidgets_typesystem_paths}"
+    "${TasteQtWidgets_include_paths}"
+    "${TasteQtWidgets_SRC}"
+    "${TasteQtWidgets_target_include_directories}"
+    "${TasteQtWidgets_target_link_libraries}"
+    ${CMAKE_CURRENT_SOURCE_DIR}/tasteqtwidgets_global.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/tasteqtwidgets_typesystem.xml
+    ""
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
-# Add custom target to run shiboken to generate the binding cpp files.
-add_custom_command(OUTPUT ${generated_sources}
-                   COMMAND ${shiboken_path}
-                   ${shiboken_options} ${wrapped_header} ${typesystem_file}
-                   DEPENDS ${generated_sources_dependencies}
-                   IMPLICIT_DEPENDS CXX ${wrapped_header}
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                   COMMENT "Running generator for ${typesystem_file}.")
+message("\n")
+message(STATUS "Resulting Python module to be installed: " ${TasteQtWidgets_PYTHON_BINDINGS_INSTALL_PREFIX})
+message("\n")
 
-# Define and build the bindings library.
-add_library(${bindings_library} MODULE ${generated_sources}
-    main.py)
-
-# We need to include the headers for the module bindings that we use.
-set(pyside_additional_includes "")
-foreach(INCLUDE_DIR ${pyside_include_dir})
-    list(APPEND pyside_additional_includes "${INCLUDE_DIR}/QtCore")
-    list(APPEND pyside_additional_includes "${INCLUDE_DIR}/QtGui")
-    list(APPEND pyside_additional_includes "${INCLUDE_DIR}/QtWidgets")
-    list(APPEND pyside_additional_includes "${INCLUDE_DIR}/QtNetwork")
-endforeach()
-
-# Apply relevant include and link flags.
-target_include_directories(${bindings_library} PRIVATE ${pyside_additional_includes})
-target_include_directories(${bindings_library} PRIVATE ${pyside_include_dir})
-target_include_directories(${bindings_library} PRIVATE ${python_include_dir})
-target_include_directories(${bindings_library} PRIVATE ${shiboken_include_dir})
-target_include_directories(${bindings_library} PRIVATE ${CMAKE_SOURCE_DIR})
-target_include_directories(${bindings_library} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-
-target_link_libraries(${bindings_library} PRIVATE Qt6::Widgets)
-target_link_libraries(${bindings_library} PRIVATE ${original_library})
-target_link_libraries(${bindings_library} PRIVATE ${pyside_shared_libraries})
-target_link_libraries(${bindings_library} PRIVATE ${shiboken_shared_libraries})
-
-
-### Set correct per- and post-fix for the binding library
-set_property(TARGET ${bindings_library} PROPERTY PREFIX "")
-set_property(TARGET ${bindings_library} PROPERTY OUTPUT_NAME
-             "${bindings_library}${PYTHON_EXTENSION_SUFFIX}")
-
-
-# Install the library and the bindings module into the source folder near the main.py file, so
-# that the Python interpeter successfully imports the used module.
-install(TARGETS ${bindings_library} ${original_library}
-        LIBRARY DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}
-        RUNTIME DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}
-        )
-
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/main.py.in ${CMAKE_CURRENT_SOURCE_DIR}/main.py)

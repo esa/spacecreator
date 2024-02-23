@@ -69,7 +69,7 @@ public:
 
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    virtual const QStringList &selectedRequirements() const;
+    virtual QStringList selectedRequirements() const;
     virtual void setSelectedRequirements(const QStringList &selected);
 
 

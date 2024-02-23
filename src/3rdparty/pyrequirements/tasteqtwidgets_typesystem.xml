@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<typesystem package="TasteQtWidgets">
+    <load-typesystem name="typesystem_widgets.xml" generate="no"/>
+    <load-typesystem name="typesystem_core.xml" generate="no"/>
+    <load-typesystem name="typesystem_gui.xml" generate="no"/>
+
+    <namespace-type name="requirement" visible="no">
+        <object-type name="RequirementsWidget">
+        </object-type>
+        <object-type name="RequirementsManager">
+        </object-type>
+        <object-type name="RequirementsModelBase">
+            <enum-type name="RoleNames"/>
+            <enum-type name="HEADER_SECTIONS"/>
+        </object-type>
+    </namespace-type>
+
+    <namespace-type name="tracecommon" visible="no">
+<!--        <object-type name="IssuesManagerPrivate" />-->
+        <object-type name="IssuesManager">
+            <enum-type name="REPO_TYPE"/>
+        </object-type>
+    </namespace-type>
+
+    <namespace-type name="gitlab" visible="no">
+        <object-type name="QGitlabClient">
+            <enum-type name="ReqType"/>
+        </object-type>
+        <object-type name="Issue" />
+        <object-type name="Label" />
+    </namespace-type>
+
+</typesystem>

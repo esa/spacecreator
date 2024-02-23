@@ -159,7 +159,7 @@ Qt::ItemFlags RequirementsModelBase::flags(const QModelIndex &index) const
     return flags;
 }
 
-const QStringList &RequirementsModelBase::selectedRequirements() const
+QStringList RequirementsModelBase::selectedRequirements() const
 {
     return m_selectedRequirements;
 }
