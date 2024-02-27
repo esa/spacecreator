@@ -33,6 +33,7 @@
 #include "interface/parameternamedelegate.h"
 #include "interfacedocument.h"
 #include "ivcomment.h"
+#include "ivcommonprops.h"
 #include "ivconnectiongroup.h"
 #include "ivconnectiongroupmodel.h"
 #include "ivcore/abstractsystemchecks.h"
@@ -368,6 +369,22 @@ void IVPropertiesDialog::initReviewView()
     const QUrl reviewUrl = m_document->objectsModel()->reviewsURL();
     m_reviewWidget->setUrl(reviewUrl);
     insertTab(m_reviewWidget, tr("Reviews"), getTabCount());
+    connect(m_reviewWidget, &shared::ui::SCReviewsWidget::reviewAdded, this, &IVPropertiesDialog::addReviewId);
+    connect(m_reviewWidget, &shared::ui::SCReviewsWidget::reviewRemoved, this, [this](const QString &reviewId) {
+        // Remove without undo - as the review is gone on the server
+        dataObject()->removeReviewID(reviewId);
+    });
+}
+
+void IVPropertiesDialog::addReviewId(const reviews::Review &review)
+{
+    ivm::IVObject *ivObj = dataObject();
+    QStringList reviews = ivObj->reviewIDs();
+    reviews.append(review.m_id);
+    static const QString attributeName = ivm::meta::Props::token(ivm::meta::Props::Token::review_ids);
+    commandMacro()->push(new shared::cmd::CmdEntityAttributesChange(propertiesConfig(), ivObj,
+            { EntityAttribute { attributeName, QVariant::fromValue<QString>(reviews.join(",")),
+                    EntityAttribute::Type::Attribute } }));
 }
 
 } // namespace ive

@@ -26,6 +26,7 @@ namespace requirement {
 class RequirementsManager;
 }
 namespace reviews {
+class Review;
 class ReviewsManager;
 class ReviewsModelBase;
 }
@@ -80,6 +81,8 @@ private:
     void initArchetypeView();
     void initRequirementsView();
     void initReviewView();
+
+    void addReviewId(const reviews::Review &review);
 
     QPointer<ivm::AbstractSystemChecks> m_ivChecks;
     QPointer<Asn1Acn::Asn1SystemChecks> m_asn1Checks;

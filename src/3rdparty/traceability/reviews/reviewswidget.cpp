@@ -17,6 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "reviewswidget.h"
 
+#include "addnewreviewdialog.h"
+#include "review.h"
 #include "reviewsmanager.h"
 #include "reviewsmodelbase.h"
 #include "ui_reviewswidget.h"
@@ -32,6 +34,7 @@ ReviewsWidget::ReviewsWidget(QWidget *parent)
     , ui(new Ui::ReviewsWidget)
 {
     ui->setupUi(this);
+    ui->removeReviewButton->setEnabled(false);
 
     connect(ui->refreshButton, &QPushButton::clicked, this, &ReviewsWidget::setLoginData);
     connect(ui->credentialWidget, &tracecommon::CredentialWidget::urlChanged, this,
@@ -39,6 +42,8 @@ ReviewsWidget::ReviewsWidget(QWidget *parent)
     connect(ui->credentialWidget, &tracecommon::CredentialWidget::tokenChanged, this,
             &ReviewsWidget::onChangeOfCredentials);
     connect(ui->allReviews, &QTableView::doubleClicked, this, &ReviewsWidget::openIssueLink);
+    connect(ui->createReviewButton, &QPushButton::clicked, this, &ReviewsWidget::showNewReviewDialog);
+    connect(ui->removeReviewButton, &QPushButton::clicked, this, &ReviewsWidget::removeReview);
 }
 
 ReviewsWidget::~ReviewsWidget()
@@ -46,11 +51,23 @@ ReviewsWidget::~ReviewsWidget()
     delete ui;
 }
 
+/*!
+ * Hides the create/remove review button
+ * \param show when set to false, the buttons are hidden
+ */
+void ReviewsWidget::showButtons(bool show)
+{
+    ui->createReviewButton->setVisible(show);
+    ui->removeReviewButton->setVisible(show);
+}
+
 void ReviewsWidget::setManager(ReviewsManager *manager)
 {
     m_reviewsManager = manager;
     connect(m_reviewsManager, &ReviewsManager::projectIDChanged, this, &ReviewsWidget::requestReviews);
     connect(m_reviewsManager, &ReviewsManager::busyChanged, this, &ReviewsWidget::updateServerStatus);
+    connect(m_reviewsManager, &ReviewsManager::reviewAdded, this, &ReviewsWidget::reviewAdded);
+    connect(m_reviewsManager, &ReviewsManager::reviewAdded, this, &ReviewsWidget::requestReviews);
 }
 
 void ReviewsWidget::setModel(ReviewsModelBase *model)
@@ -172,6 +189,36 @@ void ReviewsWidget::openIssueLink(const QModelIndex &index)
     bool ok = QDesktopServices::openUrl(issueUrl);
     if (!ok) {
         QMessageBox::warning(this, tr("Url error"), tr("Error opening the url\n%1").arg(issueUrl.toString()));
+    }
+}
+
+void ReviewsWidget::showNewReviewDialog() const
+{
+    QScopedPointer<AddNewReviewDialog> dialog(new AddNewReviewDialog(m_model.get()));
+    dialog->setModal(true);
+    const auto ret = dialog->exec();
+    if (ret == QDialog::Accepted) {
+        m_reviewsManager->createReview(
+                dialog->title(), dialog->reviewId(), dialog->description(), dialog->testMethod());
+    }
+}
+
+void ReviewsWidget::removeReview()
+{
+    const auto &currentIndex = ui->allReviews->selectionModel()->currentIndex();
+    if (!currentIndex.isValid()) {
+        return;
+    }
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, tr("Remove review"), tr("Are you sure you want to remove the selected review?"),
+            QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        const Review &review = m_model->reviewFromIndex(currentIndex);
+        const bool ok = m_reviewsManager->removeReview(review);
+        if (ok) {
+            Q_EMIT reviewRemoved(review.m_id);
+        }
     }
 }
 

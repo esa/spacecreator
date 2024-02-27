@@ -63,6 +63,10 @@ public:
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+    Review reviewFromIndex(const QModelIndex &idx) const;
+
+    bool reviewIDExists(const QString &revID) const;
+
 protected:
     QList<Review> m_reviews;
 };

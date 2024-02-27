@@ -72,7 +72,6 @@ public:
     virtual QStringList selectedRequirements() const;
     virtual void setSelectedRequirements(const QStringList &selected);
 
-
     Requirement requirementFromIndex(const QModelIndex &idx);
 
     bool reqIfIDExists(const QString &reqIfID) const;

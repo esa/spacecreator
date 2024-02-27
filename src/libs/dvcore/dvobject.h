@@ -81,10 +81,11 @@ public:
     QVariantList attributes() const;
     QVariantList properties() const;
 
-    QStringList requestsIDs() const;
+    QStringList requirementIDs() const override;
+    void setRequirementIDs(const QStringList &requestIDs) override;
 
-    void setRequestsIDs(const QStringList &requestIDs);
-
+    QStringList reviewIDs() const override;
+    void setReviewIDs(const QStringList &reviewIDs) override;
 
 Q_SIGNALS:
     void urlChanged(const QString &title);

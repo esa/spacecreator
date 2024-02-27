@@ -35,6 +35,7 @@ ReviewsDialog::ReviewsDialog(scs::SpaceCreatorProject *project, QWidget *parent)
     , m_reviewsModel(new spctr::AllReviewsModel(project, this))
 {
     ui->setupUi(this);
+    ui->reviewsWidget->showButtons(false);
     ui->reviewsWidget->setManager(m_reviewsManager);
     ui->reviewsWidget->setModel(m_reviewsModel);
     connect(this, &QDialog::accepted, this, &ReviewsDialog::saveToken);

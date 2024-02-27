@@ -97,7 +97,10 @@ bool QGitlabClient::createIssue(
             qDebug() << reply->error() << reply->errorString();
             Q_EMIT connectionError(reply->errorString());
         } else {
-            Q_EMIT issueCreated();
+            QJsonDocument replyContent = QJsonDocument::fromJson(reply->readAll());
+            QJsonObject jobj = replyContent.object();
+            Issue issue(jobj);
+            Q_EMIT issueCreated(issue);
         }
     });
     return false;

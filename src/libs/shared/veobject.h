@@ -148,9 +148,17 @@ public:
     void setMarked(bool mark);
     bool isMarked() const;
 
-    virtual QStringList requestsIDs() const = 0;
+    /// Returns the IDs of all requrements linked to this component
+    virtual QStringList requirementIDs() const = 0;
+    /// Sets the IDs of all requrements linked to this component
+    virtual void setRequirementIDs(const QStringList &requestIDs) = 0;
 
-    virtual void setRequestsIDs(const QStringList &requestIDs) = 0;
+    /// Returns the IDs of all reviews linked to this component
+    virtual QStringList reviewIDs() const = 0;
+    /// Sets the IDs of all review linked to this component
+    virtual void setReviewIDs(const QStringList &reviewIDs) = 0;
+    /// Removes a single ID from the list of review IDs
+    void removeReviewID(const QString &reviewId);
 
     /// Use only if you really know what you do - other objects might have a reference on this ID
     void recreateId();

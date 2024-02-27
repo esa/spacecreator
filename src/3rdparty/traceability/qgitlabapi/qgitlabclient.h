@@ -64,7 +64,7 @@ Q_SIGNALS:
     void listOfLabels(QList<Label>);
     void requestedProjectID(int);
     void connectionError(QString errorString);
-    void issueCreated();
+    void issueCreated(const Issue &issue);
     void issueClosed();
 
 protected:

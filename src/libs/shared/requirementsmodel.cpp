@@ -36,7 +36,7 @@ QVariant RequirementsModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::CheckStateRole && index.column() == CHECKED) {
         auto requirementID = getReqIfIdFromModelIndex(index);
-        return (m_dataObject->requestsIDs().contains(requirementID)) ? Qt::Checked : Qt::Unchecked;
+        return (m_dataObject->requirementIDs().contains(requirementID)) ? Qt::Checked : Qt::Unchecked;
     }
 
     return RequirementsModelBase::data(index, role);
@@ -47,7 +47,7 @@ bool RequirementsModel::setData(const QModelIndex &index, const QVariant &value,
     if (index.isValid() && role == Qt::CheckStateRole && index.column() == CHECKED) {
         const QString requirementID = getReqIfIdFromModelIndex(index);
         const bool checked = value.toBool();
-        QStringList selectedRequirements = m_dataObject->requestsIDs();
+        QStringList selectedRequirements = m_dataObject->requirementIDs();
         if (checked) {
             selectedRequirements << requirementID;
             m_selectedRequirements.append(requirementID);
@@ -83,7 +83,7 @@ void RequirementsModel::setPropertyTemplateConfig(PropertyTemplateConfig *dynPro
 
 /*!
  * \brief setAttributeName Set the anme of the requirements attribute of the object
- * \note Default is "requests_ids"
+ * \note Default is "requirement_ids"
  */
 void RequirementsModel::setAttributeName(const QString &name)
 {

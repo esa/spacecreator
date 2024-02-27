@@ -302,18 +302,33 @@ bool IVObject::isInstanceDescendant() const
     return false;
 }
 
-QStringList IVObject::requestsIDs() const
+QStringList IVObject::requirementIDs() const
 {
-    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids));
+    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requirement_ids));
     return value.isEmpty() ? QStringList() : value.split(",");
 }
 
-void IVObject::setRequestsIDs(const QStringList &requestIDs)
+void IVObject::setRequirementIDs(const QStringList &requirementIDs)
 {
-    if (requestIDs.isEmpty()) {
-        removeEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids));
+    if (requirementIDs.isEmpty()) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::requirement_ids));
     } else {
-        setEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids), requestIDs.join(","));
+        setEntityAttribute(meta::Props::token(meta::Props::Token::requirement_ids), requirementIDs.join(","));
+    }
+}
+
+QStringList IVObject::reviewIDs() const
+{
+    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::review_ids));
+    return value.isEmpty() ? QStringList() : value.split(",");
+}
+
+void IVObject::setReviewIDs(const QStringList &reviewIDs)
+{
+    if (reviewIDs.isEmpty()) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::review_ids));
+    } else {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::review_ids), reviewIDs.join(","));
     }
 }
 

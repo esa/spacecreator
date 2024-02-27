@@ -100,10 +100,11 @@ public:
     void resetTitle();
 
     static QString typeToString(Type t);
-
-    QStringList requestsIDs() const override;
-
-    void setRequestsIDs(const QStringList &requestIDs) override;
+    
+    QStringList requirementIDs() const override;
+    void setRequirementIDs(const QStringList &requestIDs) override;
+    QStringList reviewIDs() const override;
+    void setReviewIDs(const QStringList &reviewIDs) override;
 
 Q_SIGNALS:
     void titleChanged(const QString &title);

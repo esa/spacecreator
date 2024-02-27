@@ -49,6 +49,10 @@ ReviewsManager::ReviewsManager(REPO_TYPE repoType, QObject *parent)
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueFetchingDone, this,
                 &ReviewsManager::fetchingReviewsEnded);
         connect(d->gitlabReviews.get(), &reviews::GitLabReviews::listOfReviews, this, &ReviewsManager::listOfReviews);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this, [this](const gitlab::Issue &issue) {
+            Review newReview = GitLabReviews::reviewFromIssue(issue);
+            Q_EMIT reviewAdded(newReview);
+        });
     }
     }
 }
@@ -68,6 +72,35 @@ bool ReviewsManager::requestAllReviews()
         }
         Q_EMIT startingFetchingReviews();
         return true;
+    }
+    default:
+        qDebug() << "unknown repository type";
+    }
+    return false;
+}
+
+bool ReviewsManager::createReview(
+        const QString &title, const QString &revId, const QString &description, const QString &method) const
+{
+    switch (d->repoType) {
+    case (REPO_TYPE::GITLAB): {
+        const QString descr = QString("#revid %1\n\n%2").arg(revId, description);
+        QStringList labels = { k_reviewsTypeLabel, method };
+        const bool wasBusy = d->gitlabClient->createIssue(m_projectID, title, descr, labels);
+        return !wasBusy;
+    }
+    default:
+        qDebug() << "unknown repository type";
+    }
+    return false;
+}
+
+bool ReviewsManager::removeReview(const Review &review) const
+{
+    switch (d->repoType) {
+    case (REPO_TYPE::GITLAB): {
+        const bool wasBusy = d->gitlabClient->closeIssue(m_projectID, review.m_issueID);
+        return !wasBusy;
     }
     default:
         qDebug() << "unknown repository type";

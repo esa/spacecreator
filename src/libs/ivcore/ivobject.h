@@ -88,9 +88,11 @@ public:
     bool isReference() const;
     bool isInstanceDescendant() const;
 
+    QStringList requirementIDs() const override;
+    void setRequirementIDs(const QStringList &requirementIDs) override;
 
-    QStringList requestsIDs() const override;
-    void setRequestsIDs(const QStringList &requestIDs) override;
+    QStringList reviewIDs() const override;
+    void setReviewIDs(const QStringList &reviewIDs) override;
 
     QString groupName() const;
     void setGroupName(const QString &groupName);

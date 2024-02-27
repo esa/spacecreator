@@ -1,8 +1,7 @@
 set(LIB_NAME reviews)
 
-add_library(${LIB_NAME} STATIC)
-
-target_sources(${LIB_NAME} PRIVATE
+add_library(${LIB_NAME} STATIC
+    addnewreviewdialog.h addnewreviewdialog.cpp addnewreviewdialog.ui
     gitlab/gitlabreviews.h gitlab/gitlabreviews.cpp
     review.h review.cpp
     reviewsmodelbase.h reviewsmodelbase.cpp

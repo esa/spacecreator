@@ -174,18 +174,33 @@ QVariantList DVObject::properties() const
     return generateProperties(true);
 }
 
-QStringList DVObject::requestsIDs() const
+QStringList DVObject::requirementIDs() const
 {
-    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requests_ids));
+    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::requirement_ids));
     return value.isEmpty() ? QStringList() : value.split(",");
 }
 
-void DVObject::setRequestsIDs(const QStringList &requestIDs)
+void DVObject::setRequirementIDs(const QStringList &requestIDs)
 {
     if (requestIDs.isEmpty()) {
-        removeEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids));
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::requirement_ids));
     } else {
-        setEntityAttribute(meta::Props::token(meta::Props::Token::requests_ids), requestIDs.join(","));
+        setEntityAttribute(meta::Props::token(meta::Props::Token::requirement_ids), requestIDs.join(","));
+    }
+}
+
+QStringList DVObject::reviewIDs() const
+{
+    QString value = entityAttributeValue<QString>(meta::Props::token(meta::Props::Token::review_ids));
+    return value.isEmpty() ? QStringList() : value.split(",");
+}
+
+void DVObject::setReviewIDs(const QStringList &reviewIDs)
+{
+    if (reviewIDs.isEmpty()) {
+        removeEntityAttribute(meta::Props::token(meta::Props::Token::review_ids));
+    } else {
+        setEntityAttribute(meta::Props::token(meta::Props::Token::review_ids), reviewIDs.join(","));
     }
 }
 

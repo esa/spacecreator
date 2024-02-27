@@ -261,6 +261,21 @@ bool VEObject::isMarked() const
 }
 
 /*!
+ * Remove the given ID from the list of linked IDs
+ * \param reviewId The Id to remove from this component
+ */
+void VEObject::removeReviewID(const QString &reviewId)
+{
+    QStringList ids = reviewIDs();
+    if (!ids.contains(reviewId)) {
+        return;
+    }
+
+    ids.removeAll(reviewId);
+    setReviewIDs(ids);
+}
+
+/*!
  * Be very very careful using this function. As other very likely rely on the ID.
  */
 void VEObject::recreateId()

@@ -22,6 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace reviews {
 
+class Review;
 class ReviewsModelBase;
 class ReviewsManager;
 
@@ -40,6 +41,8 @@ public:
     explicit ReviewsWidget(QWidget *parent = nullptr);
     ~ReviewsWidget();
 
+    void showButtons(bool show);
+
     void setManager(ReviewsManager *manager);
     void setModel(ReviewsModelBase *model);
 
@@ -55,11 +58,15 @@ public Q_SLOTS:
 Q_SIGNALS:
     void reviewsUrlChanged(QUrl reviewsUrl);
     void reviewsCredentialsChanged(QUrl url, QString token);
+    void reviewAdded(const Review &review);
+    void reviewRemoved(const QString &reviewId);
 
 protected Q_SLOTS:
     void onChangeOfCredentials();
     void requestReviews();
     void openIssueLink(const QModelIndex &index);
+    void showNewReviewDialog() const;
+    void removeReview();
 
 protected:
     Ui::ReviewsWidget *ui;

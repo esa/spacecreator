@@ -114,4 +114,21 @@ QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+Review ReviewsModelBase::reviewFromIndex(const QModelIndex &idx) const
+{
+    int issueID = idx.data(ReviewsModelBase::IssueIdRole).toInt();
+    for (const auto &review : m_reviews) {
+        if (review.m_issueID == issueID) {
+            return review;
+        }
+    }
+    return Review();
+}
+
+bool ReviewsModelBase::reviewIDExists(const QString &revID) const
+{
+    return std::any_of(
+            m_reviews.begin(), m_reviews.end(), [revID](const Review &review) { return review.m_id == revID; });
+}
+
 } // namespace requirement

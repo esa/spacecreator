@@ -52,7 +52,7 @@ protected:
     cmd::CommandsStackBase::Macro *m_cmdMacro { nullptr };
     PropertyTemplateConfig *m_propTemplatesConfig { nullptr };
     VEObject *m_dataObject { nullptr };
-    QString m_attributeName = "requests_ids";
+    QString m_attributeName = "requirement_ids";
 };
 
 } // namespace shared

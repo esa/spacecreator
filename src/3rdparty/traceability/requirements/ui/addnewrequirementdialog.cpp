@@ -26,8 +26,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 namespace requirement {
 
 AddNewRequirementDialog::AddNewRequirementDialog(RequirementsModelBase *model, QWidget *parent)
-    : m_model(model)
-    , QDialog(parent)
+    : QDialog(parent)
+    , m_model(model)
     , ui(new Ui::AddNewRequirementDialog)
 {
     ui->setupUi(this);

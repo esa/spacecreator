@@ -12,31 +12,38 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public License
-along with this program. If not, see
-<https://www.gnu.org/licenses/lgpl-2.1.html>.
+along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #pragma once
-#include "reviewswidget.h"
+
+#include <QDialog>
 
 namespace reviews {
-class ReviewsManager;
-class ReviewsModelBase;
-}
-namespace shared {
-namespace ui {
-class SCReviewsWidget : public reviews::ReviewsWidget
 
+namespace Ui {
+class AddNewReviewDialog;
+}
+
+class ReviewsModelBase;
+
+class AddNewReviewDialog : public QDialog
 {
     Q_OBJECT
+
 public:
-    SCReviewsWidget(QWidget *parent = nullptr);
+    explicit AddNewReviewDialog(reviews::ReviewsModelBase *model, QWidget *parent = nullptr);
+    ~AddNewReviewDialog();
+    QString title() const;
+    QString description() const;
+    QString reviewId() const;
+    QString testMethod() const;
 
-    bool loadSavedCredentials();
-    void setUrl(const QUrl &url) override;
+private:
+    void updateOkButton();
 
-public Q_SLOTS:
-    void onCredentialsChange(const QUrl &url, const QString &newToken);
+    Ui::AddNewReviewDialog *ui = nullptr;
+    ReviewsModelBase *m_model = nullptr;
 };
-}
-}
+
+} // namespace review

@@ -36,11 +36,15 @@ public:
     ~ReviewsManager();
 
     bool requestAllReviews();
+    bool createReview(
+            const QString &title, const QString &revId, const QString &description, const QString &method) const;
+    bool removeReview(const Review &review) const;
 
 Q_SIGNALS:
     void startingFetchingReviews();
     void fetchingReviewsEnded();
     void listOfReviews(const QList<reviews::Review> &);
+    void reviewAdded(const Review &review);
 
 private:
     class ReviewsManagerPrivate;
