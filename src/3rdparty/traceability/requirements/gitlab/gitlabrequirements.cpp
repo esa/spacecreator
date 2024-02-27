@@ -37,10 +37,10 @@ Requirement GitLabRequirements::requirementFromIssue(const gitlab::Issue &issue)
 {
     QStringList tags = issue.mLabels;
     tags.removeAll(k_requirementsTypeLabel);
-    return { pareseReqIfId(issue), issue.mTitle, issue.mDescription, issue.mIssueIID, tags, issue.mUrl };
+    return { parseReqIfId(issue), issue.mTitle, issue.mDescription, issue.mIssueIID, tags, issue.mUrl };
 }
 
-QString GitLabRequirements::pareseReqIfId(const gitlab::Issue &issue)
+QString GitLabRequirements::parseReqIfId(const gitlab::Issue &issue)
 {
     static const QString keyWord("#reqid");
     for (const QString &line : issue.mDescription.split("\n")) {

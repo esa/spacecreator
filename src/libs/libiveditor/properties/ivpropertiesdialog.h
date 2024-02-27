@@ -27,7 +27,7 @@ class RequirementsManager;
 }
 namespace reviews {
 class ReviewsManager;
-class ReviewsModel;
+class ReviewsModelBase;
 }
 namespace shared {
 namespace ui {
@@ -97,7 +97,7 @@ private:
 
     shared::ui::SCReviewsWidget *m_reviewWidget = nullptr;
     reviews::ReviewsManager *m_reviewsManager = nullptr;
-    reviews::ReviewsModel *m_reviewsModel = nullptr;
+    reviews::ReviewsModelBase *m_reviewsModel = nullptr;
 };
 
 } // namespace ive

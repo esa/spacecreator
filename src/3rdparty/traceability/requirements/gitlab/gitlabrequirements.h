@@ -34,7 +34,7 @@ public:
     void listOfIssues(const QList<gitlab::Issue> &issues);
 
     static Requirement requirementFromIssue(const gitlab::Issue &issue);
-    static QString pareseReqIfId(const gitlab::Issue &issue);
+    static QString parseReqIfId(const gitlab::Issue &issue);
     static QStringList tagsFromLabels(const QList<gitlab::Label> &labels);
 
 Q_SIGNALS:

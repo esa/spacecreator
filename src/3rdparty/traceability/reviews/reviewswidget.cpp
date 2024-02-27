@@ -18,7 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "reviewswidget.h"
 
 #include "reviewsmanager.h"
-#include "reviewsmodel.h"
+#include "reviewsmodelbase.h"
 #include "ui_reviewswidget.h"
 
 #include <QDesktopServices>
@@ -53,7 +53,7 @@ void ReviewsWidget::setManager(ReviewsManager *manager)
     connect(m_reviewsManager, &ReviewsManager::busyChanged, this, &ReviewsWidget::updateServerStatus);
 }
 
-void ReviewsWidget::setModel(ReviewsModel *model)
+void ReviewsWidget::setModel(ReviewsModelBase *model)
 {
     m_model = model;
     ui->allReviews->setModel(m_model);
@@ -167,7 +167,7 @@ void ReviewsWidget::requestReviews()
 
 void ReviewsWidget::openIssueLink(const QModelIndex &index)
 {
-    const QString data = index.data(ReviewsModel::RoleNames::IssueLinkRole).toString();
+    const QString data = index.data(ReviewsModelBase::RoleNames::IssueLinkRole).toString();
     const QUrl issueUrl(data);
     bool ok = QDesktopServices::openUrl(issueUrl);
     if (!ok) {

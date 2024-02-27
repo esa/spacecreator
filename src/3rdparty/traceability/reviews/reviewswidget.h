@@ -22,7 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace reviews {
 
-class ReviewsModel;
+class ReviewsModelBase;
 class ReviewsManager;
 
 namespace Ui {
@@ -41,7 +41,7 @@ public:
     ~ReviewsWidget();
 
     void setManager(ReviewsManager *manager);
-    void setModel(ReviewsModel *model);
+    void setModel(ReviewsModelBase *model);
 
     QUrl url() const;
     virtual void setUrl(const QUrl &url);
@@ -64,7 +64,7 @@ protected Q_SLOTS:
 protected:
     Ui::ReviewsWidget *ui;
     QPointer<ReviewsManager> m_reviewsManager;
-    QPointer<ReviewsModel> m_model;
+    QPointer<ReviewsModelBase> m_model;
 };
 
 } // namespace reviews

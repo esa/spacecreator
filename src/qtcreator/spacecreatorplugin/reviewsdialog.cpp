@@ -17,9 +17,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "reviewsdialog.h"
 
+#include "allreviewsmodel.h"
 #include "reviewsmanager.h"
-#include "reviewsmodel.h"
 #include "settingsmanager.h"
+#include "spacecreatorproject.h"
 #include "ui_reviewsdialog.h"
 
 #include <QSettings>
@@ -27,20 +28,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace spctr {
 
-ReviewsDialog::ReviewsDialog(QWidget *parent)
+ReviewsDialog::ReviewsDialog(scs::SpaceCreatorProject *project, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ReviewsDialog)
     , m_reviewsManager(new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this))
-    , m_reviewsModel(new reviews::ReviewsModel(this))
+    , m_reviewsModel(new spctr::AllReviewsModel(project, this))
 {
     ui->setupUi(this);
     ui->reviewsWidget->setManager(m_reviewsManager);
     ui->reviewsWidget->setModel(m_reviewsModel);
     connect(this, &QDialog::accepted, this, &ReviewsDialog::saveToken);
     connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
-            &reviews::ReviewsModel::addReviews);
+            &reviews::ReviewsModelBase::addReviews);
     connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
-            &reviews::ReviewsModel::clear);
+            &reviews::ReviewsModelBase::clear);
 }
 
 ReviewsDialog::~ReviewsDialog()

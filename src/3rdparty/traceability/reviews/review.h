@@ -28,6 +28,7 @@ namespace reviews {
 class Review
 {
 public:
+    QString m_id;
     QString m_longName;
     QString m_description;
     QString m_author;

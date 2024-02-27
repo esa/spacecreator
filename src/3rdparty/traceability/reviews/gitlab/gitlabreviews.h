@@ -36,6 +36,7 @@ public:
     QList<Review> convertIssues(const QList<gitlab::Issue> &issues);
 
     static Review reviewFromIssue(const gitlab::Issue &issue);
+    static QString parseRevIfId(const gitlab::Issue &issue);
 
 Q_SIGNALS:
     void listOfReviews(const QList<Review> &);

@@ -80,7 +80,7 @@ void IVActionHandler::showReviewsDialog()
 
     ivm::IVModel *model = project->ivCore()->document()->objectsModel();
     const QUrl reviewUrl = model->reviewsURL();
-    ReviewsDialog dialog;
+    ReviewsDialog dialog(project);
     dialog.setUrl(reviewUrl);
     const int ret = dialog.exec();
     if (ret == QDialog::Accepted) {

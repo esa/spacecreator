@@ -28,7 +28,7 @@ namespace reviews {
 /*!
  * \brief Base model to hold reviews for a Qt view
  */
-class ReviewsModel : public QAbstractTableModel
+class ReviewsModelBase : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -47,7 +47,7 @@ public:
         AUTHOR
     };
 
-    explicit ReviewsModel(QObject *parent = nullptr);
+    explicit ReviewsModelBase(QObject *parent = nullptr);
 
     virtual void clear();
 

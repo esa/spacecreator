@@ -49,7 +49,7 @@
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
 #include "reviewsmanager.h"
-#include "reviewsmodel.h"
+#include "reviewsmodelbase.h"
 #include "reviewswidget.h"
 #include "shared/ui/screquirementswidget.h"
 #include "ui/screviewswidget.h"
@@ -104,7 +104,7 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     m_reviewWidget = new shared::ui::SCReviewsWidget(this);
     m_reviewsManager = new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this);
     m_reviewWidget->setManager(m_reviewsManager);
-    m_reviewsModel = new reviews::ReviewsModel(this);
+    m_reviewsModel = new reviews::ReviewsModelBase(this);
     m_reviewWidget->setModel(m_reviewsModel);
     connect(m_reviewWidget, &reviews::ReviewsWidget::reviewsUrlChanged, this,
             [model, commandsStack, this](QUrl reviewsUrl) {
@@ -113,9 +113,9 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
                 }
             });
     connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
-            &reviews::ReviewsModel::addReviews);
+            &reviews::ReviewsModelBase::addReviews);
     connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
-            &reviews::ReviewsModel::clear);
+            &reviews::ReviewsModelBase::clear);
 }
 
 IVPropertiesDialog::~IVPropertiesDialog() { }

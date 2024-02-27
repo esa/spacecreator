@@ -15,16 +15,16 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "reviewsmodel.h"
+#include "reviewsmodelbase.h"
 
 namespace reviews {
 
-ReviewsModel::ReviewsModel(QObject *parent)
+ReviewsModelBase::ReviewsModelBase(QObject *parent)
     : QAbstractTableModel(parent)
 {
 }
 
-void ReviewsModel::clear()
+void ReviewsModelBase::clear()
 {
     setReviews({});
 }
@@ -32,7 +32,7 @@ void ReviewsModel::clear()
 /*!
  * Replaces the set of existing reviews with the given one
  */
-void ReviewsModel::setReviews(const QList<Review> &reviews)
+void ReviewsModelBase::setReviews(const QList<Review> &reviews)
 {
     beginResetModel();
     m_reviews = reviews;
@@ -42,14 +42,14 @@ void ReviewsModel::setReviews(const QList<Review> &reviews)
 /*!
  * Appends the given \a reviews to the existing ones
  */
-void ReviewsModel::addReviews(const QList<Review> &reviews)
+void ReviewsModelBase::addReviews(const QList<Review> &reviews)
 {
     beginInsertRows(QModelIndex(), m_reviews.size(), m_reviews.size() + reviews.size() - 1);
     m_reviews.append(reviews);
     endInsertRows();
 }
 
-QVariant ReviewsModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ReviewsModelBase::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
@@ -63,7 +63,7 @@ QVariant ReviewsModel::headerData(int section, Qt::Orientation orientation, int 
     return {};
 }
 
-int ReviewsModel::rowCount(const QModelIndex &parent) const
+int ReviewsModelBase::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid()) {
         return 0;
@@ -72,18 +72,18 @@ int ReviewsModel::rowCount(const QModelIndex &parent) const
     return m_reviews.size();
 }
 
-int ReviewsModel::columnCount(const QModelIndex &parent) const
+int ReviewsModelBase::columnCount(const QModelIndex &parent) const
 {
     return 2;
 }
 
-QVariant ReviewsModel::data(const QModelIndex &index, int role) const
+QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() >= m_reviews.size()) {
         return QVariant();
     }
 
-    if (role == ReviewsModel::RoleNames::IssueLinkRole) {
+    if (role == ReviewsModelBase::RoleNames::IssueLinkRole) {
         return m_reviews[index.row()].m_link;
     }
 
@@ -99,15 +99,15 @@ QVariant ReviewsModel::data(const QModelIndex &index, int role) const
         return m_reviews[index.row()].m_description;
     }
 
-    if (role == ReviewsModel::RoleNames::IssueIdRole) {
+    if (role == ReviewsModelBase::RoleNames::IssueIdRole) {
         return m_reviews[index.row()].m_issueID;
     }
 
-    if (role == ReviewsModel::RoleNames::TagsRole) {
+    if (role == ReviewsModelBase::RoleNames::TagsRole) {
         return m_reviews[index.row()].m_tags;
     }
 
-    if (role == ReviewsModel::RoleNames::DetailDescriptionRole) {
+    if (role == ReviewsModelBase::RoleNames::DetailDescriptionRole) {
         return m_reviews[index.row()].m_description;
     }
 

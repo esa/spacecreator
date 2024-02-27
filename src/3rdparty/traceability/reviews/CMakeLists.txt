@@ -5,7 +5,7 @@ add_library(${LIB_NAME} STATIC)
 target_sources(${LIB_NAME} PRIVATE
     gitlab/gitlabreviews.h gitlab/gitlabreviews.cpp
     review.h review.cpp
-    reviewsmodel.h reviewsmodel.cpp
+    reviewsmodelbase.h reviewsmodelbase.cpp
     reviewswidget.h reviewswidget.cpp reviewswidget.ui
     reviewsmanager.h reviewsmanager.cpp
 )

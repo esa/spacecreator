@@ -2,6 +2,7 @@ set(PLUGIN_NAME SpaceCreatorPlugin)
 
 set(SC_PLUGIN_SOURCES
     SpaceCreatorPlugin.json.in
+    allreviewsmodel.h allreviewsmodel.cpp
     common/actionhandler.cpp
     common/actionhandler.h
     common/messagemanager.cpp

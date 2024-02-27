@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2024 European Space Agency - <maxime.perrotin@esa.int>
+   Copyright (C) 2023 European Space Agency - <maxime.perrotin@esa.int>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -17,43 +17,30 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
-#include <QDialog>
-#include <QUrl>
+#include "reviewsmodelbase.h"
 
-namespace reviews {
-class ReviewsManager;
-}
+#include <QPointer>
+
 namespace scs {
 class SpaceCreatorProject;
 }
 
 namespace spctr {
 
-class AllReviewsModel;
-
-namespace Ui {
-class ReviewsDialog;
-}
-
-class ReviewsDialog : public QDialog
+class AllReviewsModel : public reviews::ReviewsModelBase
 {
     Q_OBJECT
-
 public:
-    explicit ReviewsDialog(scs::SpaceCreatorProject *project, QWidget *parent = nullptr);
-    ~ReviewsDialog();
+    explicit AllReviewsModel(scs::SpaceCreatorProject *project, QObject *parent = nullptr);
 
-    void setUrl(const QUrl &reviewsUrl);
-    QUrl url() const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-private Q_SLOTS:
-    void saveToken();
+protected:
+    QString componentForReview(const QString &revId) const;
 
-private:
-    Ui::ReviewsDialog *ui;
-
-    reviews::ReviewsManager *m_reviewsManager = nullptr;
-    AllReviewsModel *m_reviewsModel = nullptr;
+    QPointer<scs::SpaceCreatorProject> m_project;
 };
 
 } // namespace spctr

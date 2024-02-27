@@ -46,7 +46,32 @@ Review GitLabReviews::reviewFromIssue(const gitlab::Issue &issue)
 {
     QStringList tags = issue.mLabels;
     tags.removeAll(k_reviewsTypeLabel);
-    return { issue.mTitle, issue.mDescription, issue.mAuthor, issue.mIssueIID, tags, issue.mUrl };
+    return Review { parseRevIfId(issue), issue.mTitle, issue.mDescription, issue.mAuthor, issue.mIssueIID, tags,
+        issue.mUrl };
 }
 
+QString GitLabReviews::parseRevIfId(const gitlab::Issue &issue)
+{
+    static const QString keyWord("#revid");
+    for (const QString &line : issue.mDescription.split("\n")) {
+        QString id = line.trimmed();
+        if (id.trimmed().startsWith(keyWord)) {
+            id = id.sliced(keyWord.length());
+            id = id.trimmed();
+            if (id.startsWith(":")) {
+                id = id.sliced(1).trimmed();
+            }
+
+            // Remove quotes if there
+            if (id.startsWith("\"")) {
+                id = id.sliced(1);
+            }
+            if (id.endsWith("\"")) {
+                id.chop(1);
+            }
+            return id;
+        }
+    }
+    return QString::number(issue.mIssueIID);
+}
 }
