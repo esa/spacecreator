@@ -59,6 +59,10 @@ void ReviewsDialog::setUrl(const QUrl &reviewsUrl)
     const QString token = settings.value(tokenKey, ui->reviewsWidget->token()).toString();
     ui->reviewsWidget->setToken(token);
     settings.endGroup();
+
+    if (!token.isEmpty()) {
+        ui->reviewsWidget->setLoginData();
+    }
 }
 
 QUrl ReviewsDialog::url() const
