@@ -166,6 +166,7 @@ void ReviewsWidget::updateServerStatus()
 void ReviewsWidget::updateProjectReady()
 {
     if (!m_reviewsManager) {
+        ui->createReviewButton->setEnabled(false);
         return;
     }
 

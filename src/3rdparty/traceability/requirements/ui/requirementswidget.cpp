@@ -228,6 +228,7 @@ void RequirementsWidget::updateServerStatus()
 void RequirementsWidget::updateProjectReady()
 {
     if (!m_reqManager) {
+        ui->createRequirementButton->setEnabled(false);
         return;
     }
 
