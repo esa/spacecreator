@@ -175,6 +175,7 @@ bool QGitlabClient::requestProjectId(const QUrl &projectUrl)
     auto reply = sendRequest(QGitlabClient::GET, mUrlComposer.composeProjectUrl(projectName));
     connect(reply, &QNetworkReply::finished, [reply, projectUrl, this]() {
         setBusy(false);
+        int projectID = -1;
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
@@ -190,8 +191,7 @@ bool QGitlabClient::requestProjectId(const QUrl &projectUrl)
                         const auto &itemObj = item.toObject();
                         const bool objOk = !itemObj.isEmpty() && itemObj.contains("web_url") && itemObj.contains("id");
                         if (objOk && itemObj.value("web_url").toString() == projectUrlStr) {
-                            int projectID = itemObj.value("id").toInteger();
-                            Q_EMIT requestedProjectID(projectID);
+                            projectID = itemObj.value("id").toInteger();
                             break;
                         }
                     }
@@ -201,6 +201,7 @@ bool QGitlabClient::requestProjectId(const QUrl &projectUrl)
             qDebug() << reply->error() << reply->errorString();
             Q_EMIT connectionError(reply->errorString());
         }
+        Q_EMIT requestedProjectID(projectID);
     });
     return false;
 }

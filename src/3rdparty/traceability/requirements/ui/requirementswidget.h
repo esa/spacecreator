@@ -61,6 +61,7 @@ protected:
 protected Q_SLOTS:
     void setLoginData();
     void updateServerStatus();
+    void updateProjectReady();
     void openIssueLink(const QModelIndex &index);
     void toggleShowUsedRequirements();
     void requestRequirements();

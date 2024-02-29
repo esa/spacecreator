@@ -45,6 +45,7 @@ public:
 
     bool isBusy() const;
     const int &projectID() const;
+    virtual bool hasValidProjectID() const;
 
     bool requestTags();
     QStringList tagsBuffer();

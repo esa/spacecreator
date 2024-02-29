@@ -45,7 +45,7 @@ bool IssuesManager::setCredentials(const QString &url, const QString &token)
 
     m_projectUrl = url;
     m_token = token;
-    m_projectID = -1;
+    setProjectID(-1);
 
     QUrl _url;
     _url.setScheme("https");
@@ -95,6 +95,13 @@ bool IssuesManager::isBusy() const
 const int &IssuesManager::projectID() const
 {
     return m_projectID;
+}
+/*!
+ * Returns if the manager has a project to work on
+ */
+bool IssuesManager::hasValidProjectID() const
+{
+    return m_projectID >= 0;
 }
 
 bool IssuesManager::requestTags()

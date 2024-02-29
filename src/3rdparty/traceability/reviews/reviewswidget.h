@@ -54,6 +54,7 @@ public:
 public Q_SLOTS:
     void setLoginData();
     void updateServerStatus();
+    void updateProjectReady();
 
 Q_SIGNALS:
     void reviewsUrlChanged(QUrl reviewsUrl);

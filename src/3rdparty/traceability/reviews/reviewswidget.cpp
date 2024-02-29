@@ -64,7 +64,7 @@ void ReviewsWidget::showButtons(bool show)
 void ReviewsWidget::setManager(ReviewsManager *manager)
 {
     m_reviewsManager = manager;
-    connect(m_reviewsManager, &ReviewsManager::projectIDChanged, this, &ReviewsWidget::requestReviews);
+    connect(m_reviewsManager, &ReviewsManager::projectIDChanged, this, &ReviewsWidget::updateProjectReady);
     connect(m_reviewsManager, &ReviewsManager::busyChanged, this, &ReviewsWidget::updateServerStatus);
     connect(m_reviewsManager, &ReviewsManager::reviewAdded, this, &ReviewsWidget::reviewAdded);
     connect(m_reviewsManager, &ReviewsManager::reviewAdded, this, &ReviewsWidget::requestReviews);
@@ -151,7 +151,7 @@ void ReviewsWidget::updateServerStatus()
         }
     }
 
-    const bool connectionOk = (m_reviewsManager->projectID() != -1);
+    const bool connectionOk = (m_reviewsManager->hasValidProjectID());
     if (connectionOk) {
         ui->serverStatusLabel->setPixmap(
                 QPixmap(":/tracecommonresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
@@ -161,6 +161,16 @@ void ReviewsWidget::updateServerStatus()
                 QPixmap(":/tracecommonresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
         ui->serverStatusLabel->setToolTip(tr("Connection to the server failed"));
     }
+}
+
+void ReviewsWidget::updateProjectReady()
+{
+    if (!m_reviewsManager) {
+        return;
+    }
+
+    ui->createReviewButton->setEnabled(m_reviewsManager->hasValidProjectID());
+    requestReviews();
 }
 
 void ReviewsWidget::onChangeOfCredentials()
@@ -177,7 +187,7 @@ void ReviewsWidget::onChangeOfCredentials()
 
 void ReviewsWidget::requestReviews()
 {
-    if (m_reviewsManager) {
+    if (m_reviewsManager && m_reviewsManager->hasValidProjectID()) {
         m_reviewsManager->requestAllReviews();
     }
 }

@@ -80,7 +80,7 @@ RequirementsWidget::RequirementsWidget(
             &RequirementsWidget::onChangeOfCredentials);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_textFilterModel,
             &QSortFilterProxyModel::setFilterFixedString);
-    connect(m_reqManager, &RequirementsManager::projectIDChanged, this, &RequirementsWidget::requestRequirements);
+    connect(m_reqManager, &RequirementsManager::projectIDChanged, this, &RequirementsWidget::updateProjectReady);
     connect(m_reqManager, &RequirementsManager::requirementCreated, this, &RequirementsWidget::requestRequirements);
     connect(m_reqManager, &RequirementsManager::requirementClosed, this, &RequirementsWidget::requestRequirements);
     connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
@@ -169,7 +169,9 @@ void RequirementsWidget::onChangeOfCredentials()
 
 void RequirementsWidget::requestRequirements()
 {
-    m_reqManager->requestAllRequirements();
+    if (m_reqManager && m_reqManager->hasValidProjectID()) {
+        m_reqManager->requestAllRequirements();
+    }
 }
 
 void RequirementsWidget::setLoginData()
@@ -211,7 +213,7 @@ void RequirementsWidget::updateServerStatus()
         }
     }
 
-    const bool connectionOk = (m_reqManager->projectID() != -1);
+    const bool connectionOk = (m_reqManager->hasValidProjectID());
     if (connectionOk) {
         ui->serverStatusLabel->setPixmap(
                 QPixmap(":/tracecommonresources/icons/check_icon.svg").scaled(kIconSize, kIconSize));
@@ -221,6 +223,16 @@ void RequirementsWidget::updateServerStatus()
                 QPixmap(":/tracecommonresources/icons/uncheck_icon.svg").scaled(kIconSize, kIconSize));
         ui->serverStatusLabel->setToolTip(tr("Connection to the server failed"));
     }
+}
+
+void RequirementsWidget::updateProjectReady()
+{
+    if (!m_reqManager) {
+        return;
+    }
+
+    ui->createRequirementButton->setEnabled(m_reqManager->hasValidProjectID());
+    requestRequirements();
 }
 
 void RequirementsWidget::openIssueLink(const QModelIndex &index)
