@@ -41,7 +41,7 @@ const QHash<QString, Props::Token> Props::TokensByName = {
     { "type", Token::type },
     { "encoding", Token::encoding },
     { "path", Token::path },
-    { "requests_ids", Token::requirement_ids },
+    { "requirement_ids", Token::requirement_ids },
     { "review_ids", Token::review_ids },
 
     { "port", Token::port },
