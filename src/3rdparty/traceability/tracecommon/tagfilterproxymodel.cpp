@@ -17,9 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "tagfilterproxymodel.h"
 
-#include "requirementsmodelbase.h"
+#include "tracecommonmodelbase.h"
 
-namespace requirement {
+namespace tracecommon {
 
 TagFilterProxyModel::TagFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel { parent }
@@ -55,7 +55,7 @@ bool TagFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
     }
 
     QModelIndex idx = sourceModel()->index(sourceRow, filterKeyColumn(), sourcParent);
-    const QStringList tags = idx.data(RequirementsModelBase::TagsRole).toStringList();
+    const QStringList tags = idx.data(TraceCommonModelBase::TagsRole).toStringList();
 
     for (const QString &tag : m_tags) {
         if (tags.contains(tag)) {
@@ -65,4 +65,4 @@ bool TagFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
     return false;
 }
 
-} // namespace requirement
+} // namespace tracecommon

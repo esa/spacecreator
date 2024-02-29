@@ -19,26 +19,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include <QSortFilterProxyModel>
 
-namespace requirement {
+namespace tracecommon {
 
 /*!
- * A filter model to filter a requirement model for tags.
- * All data is shown that has at least one of the tags to filter for.
- * If no tag is set for filtering, all data is shown.
+ * A filter model to filter a requirement model for text in all of it's relevant data
  */
-class TagFilterProxyModel : public QSortFilterProxyModel
+class IssueTextProxyModel : public QSortFilterProxyModel
 {
 public:
-    explicit TagFilterProxyModel(QObject *parent = nullptr);
-
-    void addTag(const QString &tag);
-    void removeTag(const QString &tag);
+    explicit IssueTextProxyModel(QObject *parent = nullptr);
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
-
-private:
-    QStringList m_tags;
 };
 
-} // namespace requirement
+} // namespace tracecommon

@@ -17,10 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "requirementsmodelbase.h"
 
+using namespace tracecommon;
+
 namespace requirement {
 
 RequirementsModelBase::RequirementsModelBase(QObject *parent)
-    : QAbstractTableModel(parent)
+    : TraceCommonModelBase(parent)
 {
 }
 
@@ -86,20 +88,22 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    if (role == RequirementsModelBase::RoleNames::IssueLinkRole) {
-        return m_requirements[index.row()].m_link;
+    const Requirement &requirement = m_requirements[index.row()];
+
+    if (role == TraceCommonModelBase::IssueLinkRole) {
+        return requirement.m_link;
     }
 
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case REQUIREMENT_ID:
-            return m_requirements[index.row()].m_id;
+            return requirement.m_id;
         case TITLE:
-            return m_requirements[index.row()].m_longName;
+            return requirement.m_longName;
         }
     }
     if (role == Qt::ToolTipRole) {
-        return m_requirements[index.row()].m_description;
+        return requirement.m_description;
     }
 
     if (role == Qt::CheckStateRole && index.column() == CHECKED) {
@@ -107,19 +111,23 @@ QVariant RequirementsModelBase::data(const QModelIndex &index, int role) const
     }
 
     if (role == RequirementsModelBase::RoleNames::ReqIfIdRole) {
-        return m_requirements[index.row()].m_id;
+        return requirement.m_id;
     }
 
-    if (role == RequirementsModelBase::RoleNames::IssueIdRole) {
-        return m_requirements[index.row()].m_issueID;
+    if (role == TraceCommonModelBase::IssueIdRole) {
+        return requirement.m_issueID;
     }
 
-    if (role == RequirementsModelBase::RoleNames::TagsRole) {
-        return m_requirements[index.row()].m_tags;
+    if (role == TraceCommonModelBase::TagsRole) {
+        return requirement.m_tags;
     }
 
-    if (role == RequirementsModelBase::RoleNames::DetailDescriptionRole) {
-        return m_requirements[index.row()].m_description;
+    if (role == TraceCommonModelBase::TitleRole) {
+        return requirement.m_longName;
+    }
+
+    if (role == TraceCommonModelBase::DetailDescriptionRole) {
+        return requirement.m_description;
     }
 
     return QVariant();

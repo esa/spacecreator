@@ -20,6 +20,9 @@
         <object-type name="IssuesManager">
             <enum-type name="REPO_TYPE"/>
         </object-type>
+        <object-type name="TraceCommonModelBase">
+            <enum-type name="RoleNames"/>
+        </object-type>
     </namespace-type>
 
     <namespace-type name="gitlab" visible="no">

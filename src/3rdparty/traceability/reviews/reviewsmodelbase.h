@@ -19,8 +19,8 @@ along with this program. If not, see
 #pragma once
 
 #include "review.h"
+#include "tracecommonmodelbase.h"
 
-#include <QAbstractTableModel>
 #include <QList>
 
 namespace reviews {
@@ -28,17 +28,14 @@ namespace reviews {
 /*!
  * \brief Base model to hold reviews for a Qt view
  */
-class ReviewsModelBase : public QAbstractTableModel
+class ReviewsModelBase : public tracecommon::TraceCommonModelBase
 {
     Q_OBJECT
 
 public:
     enum RoleNames
     {
-        IssueLinkRole = Qt::UserRole + 1,
-        IssueIdRole,
-        TagsRole,
-        DetailDescriptionRole,
+        ReviewIdRole = tracecommon::TraceCommonModelBase::UserRole + 1,
     };
 
     enum HEADER_SECTIONS

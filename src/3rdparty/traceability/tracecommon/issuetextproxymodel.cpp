@@ -15,35 +15,29 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "requirementtextproxymodel.h"
+#include "issuetextproxymodel.h"
 
-#include "requirementsmodelbase.h"
+#include "tracecommonmodelbase.h"
 
-namespace requirement {
+namespace tracecommon {
 
-RequirementTextProxyModel::RequirementTextProxyModel(QObject *parent)
+IssueTextProxyModel::IssueTextProxyModel(QObject *parent)
     : QSortFilterProxyModel { parent }
 {
 }
 
-bool RequirementTextProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+bool IssueTextProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
     QRegularExpression expression = filterRegularExpression();
 
     const QModelIndex idx = sourceModel()->index(sourceRow, 0, sourceParent);
 
-    const QString reqId = idx.data(RequirementsModelBase::ReqIfIdRole).toString();
-    QRegularExpressionMatch match = expression.match(reqId);
+    const QString detail = idx.data(TraceCommonModelBase::DetailDescriptionRole).toString();
+    QRegularExpressionMatch match = expression.match(detail);
     if (match.hasMatch()) {
         return true;
     }
-    const QString detail = idx.data(RequirementsModelBase::DetailDescriptionRole).toString();
-    match = expression.match(detail);
-    if (match.hasMatch()) {
-        return true;
-    }
-    const QModelIndex titleIdx = sourceModel()->index(sourceRow, RequirementsModelBase::TITLE, sourceParent);
-    const QString title = titleIdx.data(Qt::DisplayRole).toString();
+    const QString title = idx.data(TraceCommonModelBase::TitleRole).toString();
     match = expression.match(title);
     if (match.hasMatch()) {
         return true;

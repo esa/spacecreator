@@ -22,7 +22,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QHBoxLayout>
 #include <QScrollBar>
 
-namespace requirement {
+namespace tracecommon {
+
 WidgetBar::WidgetBar(QWidget *parent)
     : QScrollArea(parent)
     , ui(new Ui::WidgetBar)

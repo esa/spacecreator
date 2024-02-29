@@ -1,15 +1,18 @@
 set(LIB_NAME tracecommon)
 
 add_library(${LIB_NAME} STATIC
+)
+
+target_sources(${LIB_NAME} PRIVATE
     credentialwidget.h credentialwidget.cpp credentialwidget.ui
     issuesmanager.h issuesmanager.cpp
     issuesmanagerprivate.h issuesmanagerprivate.cpp
+    issuetextproxymodel.h issuetextproxymodel.cpp
+    tagfilterproxymodel.h tagfilterproxymodel.cpp
     tracecommonresources.qrc
-    tracecommonlibrary.cpp
-    tracecommonlibrary.h
-    )
-
-target_sources(${LIB_NAME} PRIVATE
+    tracecommonlibrary.h tracecommonlibrary.cpp
+    tracecommonmodelbase.h tracecommonmodelbase.cpp
+    widgetbar.h widgetbar.cpp widgetbar.ui
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

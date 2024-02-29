@@ -15,22 +15,13 @@ You should have received a copy of the GNU Library General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#pragma once
+#include "tracecommonmodelbase.h"
 
-#include <QSortFilterProxyModel>
+namespace tracecommon {
 
-namespace requirement {
-
-/*!
- * A filter model to filter a requirement model for text in all of it's relevant data
- */
-class RequirementTextProxyModel : public QSortFilterProxyModel
+TraceCommonModelBase::TraceCommonModelBase(QObject *parent)
+    : QAbstractTableModel(parent)
 {
-public:
-    explicit RequirementTextProxyModel(QObject *parent = nullptr);
+}
 
-protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
-};
-
-} // namespace requirement
+} // namespace tracecommon

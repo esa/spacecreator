@@ -26,6 +26,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QDesktopServices>
 #include <QMessageBox>
 
+using namespace tracecommon;
+
 namespace reviews {
 const int kIconSize = 16;
 
@@ -195,7 +197,7 @@ void ReviewsWidget::requestReviews()
 
 void ReviewsWidget::openIssueLink(const QModelIndex &index)
 {
-    const QString data = index.data(ReviewsModelBase::RoleNames::IssueLinkRole).toString();
+    const QString data = index.data(TraceCommonModelBase::IssueLinkRole).toString();
     const QUrl issueUrl(data);
     bool ok = QDesktopServices::openUrl(issueUrl);
     if (!ok) {

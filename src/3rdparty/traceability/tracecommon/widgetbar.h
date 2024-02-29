@@ -19,11 +19,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include <QScrollArea>
 
+namespace tracecommon {
+
 namespace Ui {
 class WidgetBar;
 }
-
-namespace requirement {
 
 /*!
  * \brief This is horizontally scrollable widget bar

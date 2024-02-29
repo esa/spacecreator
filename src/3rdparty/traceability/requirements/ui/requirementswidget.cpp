@@ -42,7 +42,7 @@ RequirementsWidget::RequirementsWidget(
     , m_reqManager(manager)
     , m_model(model)
     , m_requirementsUrl(requirementsUrl)
-    , m_widgetBar(new WidgetBar(this))
+    , m_widgetBar(new tracecommon::WidgetBar(this))
 {
     ui->setupUi(this);
     m_textFilterModel.setDynamicSortFilter(true);
@@ -238,7 +238,7 @@ void RequirementsWidget::updateProjectReady()
 
 void RequirementsWidget::openIssueLink(const QModelIndex &index)
 {
-    QDesktopServices::openUrl(index.data(RequirementsModelBase::RoleNames::IssueLinkRole).toString());
+    QDesktopServices::openUrl(index.data(tracecommon::TraceCommonModelBase::IssueLinkRole).toString());
 }
 
 void RequirementsWidget::toggleShowUsedRequirements()

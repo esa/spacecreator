@@ -17,10 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "reviewsmodelbase.h"
 
+using namespace tracecommon;
+
 namespace reviews {
 
 ReviewsModelBase::ReviewsModelBase(QObject *parent)
-    : QAbstractTableModel(parent)
+    : TraceCommonModelBase(parent)
 {
 }
 
@@ -83,7 +85,7 @@ QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    if (role == ReviewsModelBase::RoleNames::IssueLinkRole) {
+    if (role == TraceCommonModelBase::IssueLinkRole) {
         return m_reviews[index.row()].m_link;
     }
 
@@ -99,15 +101,15 @@ QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
         return m_reviews[index.row()].m_description;
     }
 
-    if (role == ReviewsModelBase::RoleNames::IssueIdRole) {
+    if (role == TraceCommonModelBase::IssueIdRole) {
         return m_reviews[index.row()].m_issueID;
     }
 
-    if (role == ReviewsModelBase::RoleNames::TagsRole) {
+    if (role == TraceCommonModelBase::TagsRole) {
         return m_reviews[index.row()].m_tags;
     }
 
-    if (role == ReviewsModelBase::RoleNames::DetailDescriptionRole) {
+    if (role == TraceCommonModelBase::DetailDescriptionRole) {
         return m_reviews[index.row()].m_description;
     }
 

@@ -19,8 +19,8 @@ along with this program. If not, see
 #pragma once
 
 #include "requirement.h"
+#include "tracecommonmodelbase.h"
 
-#include <QAbstractTableModel>
 #include <QList>
 
 namespace requirement {
@@ -28,18 +28,14 @@ namespace requirement {
 /*!
  * \brief Base model to hold requirements for a Qt view
  */
-class RequirementsModelBase : public QAbstractTableModel
+class RequirementsModelBase : public tracecommon::TraceCommonModelBase
 {
     Q_OBJECT
 
 public:
     enum RoleNames
     {
-        IssueLinkRole = Qt::UserRole + 1,
-        ReqIfIdRole,
-        IssueIdRole,
-        TagsRole,
-        DetailDescriptionRole,
+        ReqIfIdRole = tracecommon::TraceCommonModelBase::UserRole + 1,
     };
 
     enum HEADER_SECTIONS

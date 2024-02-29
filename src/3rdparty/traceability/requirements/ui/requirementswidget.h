@@ -18,7 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include "checkedfilterproxymodel.h"
-#include "requirementtextproxymodel.h"
+#include "issuetextproxymodel.h"
 #include "tagfilterproxymodel.h"
 
 #include <QItemSelection>
@@ -35,11 +35,13 @@ namespace ive {
 class InterfaceDocument;
 }
 
+namespace tracecommon {
+class WidgetBar;
+}
+
 namespace requirement {
 class RequirementsManager;
 class RequirementsModelBase;
-
-class WidgetBar;
 
 class RequirementsWidget : public QWidget
 {
@@ -83,11 +85,11 @@ private:
     void onChangeOfCredentials();
     Ui::RequirementsWidget *ui;
     QList<QToolButton *> m_tagButtons;
-    WidgetBar *m_widgetBar;
+    tracecommon::WidgetBar *m_widgetBar;
     QPointer<RequirementsManager> m_reqManager;
     QPointer<requirement::RequirementsModelBase> m_model;
-    RequirementTextProxyModel m_textFilterModel;
-    TagFilterProxyModel m_tagFilterModel;
+    tracecommon::IssueTextProxyModel m_textFilterModel;
+    tracecommon::TagFilterProxyModel m_tagFilterModel;
     CheckedFilterProxyModel m_checkedModel;
 };
 

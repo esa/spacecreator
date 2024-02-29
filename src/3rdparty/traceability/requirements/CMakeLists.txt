@@ -15,19 +15,12 @@ target_sources(${LIB_NAME} PRIVATE
   requirementsmanager.h
   requirementsmodelbase.cpp
   requirementsmodelbase.h
-  requirementtextproxymodel.cpp
-  requirementtextproxymodel.h
-  tagfilterproxymodel.cpp
-  tagfilterproxymodel.h
   ui/requirementswidget.cpp
   ui/requirementswidget.h
   ui/requirementswidget.ui
   ui/addnewrequirementdialog.h
   ui/addnewrequirementdialog.cpp
   ui/addnewrequirementdialog.ui
-  ui/widgetbar.h
-  ui/widgetbar.cpp
-  ui/widgetbar.ui
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)
