@@ -18,7 +18,7 @@
 #include "dveditordocument.h"
 
 #include "dvappmodel.h"
-#include "dveditorcore.h"
+//#include "dveditorcore.h"
 #include "dvsystemqueries.h"
 #include "errorhub.h"
 #include "spacecreatorpluginconstants.h"

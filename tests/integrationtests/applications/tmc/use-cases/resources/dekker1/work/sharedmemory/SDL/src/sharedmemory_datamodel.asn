@@ -12,6 +12,7 @@ Sharedmemory-Context ::= SEQUENCE {
    state Sharedmemory-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    membuffer T-MemBuffer,
    writeaccess T-WriteAccess
 }

@@ -55,14 +55,19 @@ TmcVerifier::TmcVerifier(const QString &inputIvFilepath, const QString &outputDi
             connect(m_converter.get(), SIGNAL(conversionFinished(bool)), this, SLOT(conversionFinished(bool)));
     connect(m_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
     connect(m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
+    connect(m_process, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
     connect(m_verifierProcess, SIGNAL(readyReadStandardError()), this, SLOT(verifierStderrReady()));
     connect(m_verifierProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(verifierStdoutReady()));
+    connect(m_verifierProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this,
+            SLOT(processError(QProcess::ProcessError)));
 
     connect(m_traceGeneratorProcess, SIGNAL(readyReadStandardError()), this, SLOT(traceStderrReady()));
     connect(m_traceGeneratorProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(traceStdoutReady()));
     connect(m_traceGeneratorProcess, SIGNAL(started()), this, SLOT(traceGeneratorStarted()));
     connect(m_traceGeneratorProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(traceGeneratorFinished(int, QProcess::ExitStatus)));
+    connect(m_traceGeneratorProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this,
+            SLOT(processError(QProcess::ProcessError)));
 
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
 
@@ -781,6 +786,46 @@ void TmcVerifier::traceGeneratorFinished(int exitCode, QProcess::ExitStatus exit
     m_traceFiles.append(outputFile);
 
     generateNextTrace();
+}
+
+void TmcVerifier::processError(QProcess::ProcessError error)
+{
+    m_timer->stop();
+    if (m_process->state() != QProcess::ProcessState::NotRunning) {
+        m_process->terminate();
+    }
+    if (m_verifierProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_verifierProcess->terminate();
+    }
+    if (m_traceGeneratorProcess->state() != QProcess::ProcessState::NotRunning) {
+        m_traceGeneratorProcess->terminate();
+    }
+    switch (error) {
+    case QProcess::ProcessError::FailedToStart:
+        Q_EMIT verifierMessage("External process failed to start.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::Crashed:
+        Q_EMIT verifierMessage("External process crashed.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::Timedout:
+        Q_EMIT verifierMessage("External process timeout.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::WriteError:
+        Q_EMIT verifierMessage("External process write error.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::ReadError:
+        Q_EMIT verifierMessage("External process read error.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::UnknownError:
+        Q_EMIT verifierMessage("External process unknown error.");
+        Q_EMIT conversionFinished(false);
+        break;
+    }
 }
 
 void TmcVerifier::timeout()

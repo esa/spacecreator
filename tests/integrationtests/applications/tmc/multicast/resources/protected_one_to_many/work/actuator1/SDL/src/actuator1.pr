@@ -1,15 +1,17 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Actuator1;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (994, 575), (267, 140) */
     -- Text area for declarations and comments
     
     dcl signal_received MyInteger := 0;
     /* CIF ENDTEXT */
     /* CIF procedure (662, 615), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     procedure test_fn;
+        /* CIF Keep Specific Geode Partition 'default' */
         /* CIF TEXT (63, 209), (170, 140) */
         fpar in p1 MyInteger;
-        
         /* CIF ENDTEXT */
         /* CIF START (500, 147), (70, 35) */
         START;
@@ -24,7 +26,8 @@ process Actuator1;
         output ctrl_dummy;
         /* CIF NEXTSTATE (533, 346), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (867, 220), (70, 35) */
+    /* CIF state (863, 228), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
     endstate;
 endprocess Actuator1;

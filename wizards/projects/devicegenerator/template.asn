@@ -37,12 +37,15 @@
 
     DeliveredRequestData ::= SEQUENCE {
         private-data PlatformSpecificPointer, -- (Broker)void* private_data
-        data InputDataPtr, -- (Broker)const uint8_t* const
+        message-data InputDataPtr, -- (Broker)const uint8_t* const
         length DataLength -- (Broker)const size_t
     }
 
     ReceivedRequestData ::= SEQUENCE {
-        private-data PlatformSpecificPointer -- (Broker)void* private_data
+        private-data PlatformSpecificPointer, -- (Broker)void* private_data
+        bus-id SystemBus, -- (Broker)const enum SystemBus bus_id
+        message-data InputDataPtr, -- (Broker)const uint8_t* const
+        length DataLength -- (Broker)const size_t
     }
 
 END

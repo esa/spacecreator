@@ -11,7 +11,7 @@ edit:
 generate-code:
 	mkdir -p code && cd code && \
 	   cp ../../../dataview/dataview-uniq.asn ../src && \
-	   $(OPENGEODE) --taste --toAda ../src/demo_timer_manager.pr && \
+	   $(OPENGEODE) --taste --simu --toAda ../src/demo_timer_manager.pr && \
 	   mv *.gpr ..
 
 compile-linux: generate-code

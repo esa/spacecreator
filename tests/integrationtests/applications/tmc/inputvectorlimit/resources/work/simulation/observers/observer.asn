@@ -12,6 +12,7 @@ Left-Context ::= SEQUENCE {
    state Left-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    leftarg MyInteger,
    leftval MyInteger
 }
@@ -32,6 +33,7 @@ Right-Context ::= SEQUENCE {
    state Right-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    rightarg MyInteger,
    rightval MyInteger
 }
@@ -112,8 +114,11 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        gui,
+       
        left,
+       
        right,
+       
        
        env
    }
@@ -195,6 +200,7 @@ BEGIN
    }
    
    Left-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          leftinterface SEQUENCE { leftarg MyInteger}
@@ -202,6 +208,7 @@ BEGIN
    }
    
    Right-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          rightinterface SEQUENCE { rightarg MyInteger}
@@ -266,6 +273,11 @@ BEGIN
 
       left   Left-Context,
       right  Right-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      gui
    }
 
 END

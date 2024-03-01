@@ -1,6 +1,6 @@
 all:
 	mkdir -p code
-	cd code && opengeode --toAda /home/taste/projects/spacecreator/tests/integrationtests/applications/tmc/interfaceviewoptimizer/resources/work/ponger/SDL/src/system_structure.pr "../ponger.pr"
+	cd code && opengeode --toAda ../*.pr
 	asn1scc -fp AUTO -typePrefix asn1Scc -o code -equal -Ada dataview-uniq.asn code/ponger_datamodel.asn
 	cd code && gnat make ponger
 clean:

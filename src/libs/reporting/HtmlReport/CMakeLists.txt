@@ -21,10 +21,13 @@ target_sources(HtmlReport
                "${INCLUDES}"
                "${RESOURCES}")
 
+target_include_directories(HtmlReport
+    PUBLIC     .
+    PRIVATE    ${CMAKE_SOURCE_DIR}/src/libs)
+
 target_link_libraries(HtmlReport
-    PUBLIC      ivcore
-                libiveditor
-                Report
+    PUBLIC      Qt${QT_VERSION_MAJOR}::Core
+                Tmc::Report
                 Grantlee5::TextDocument
                 Grantlee5::Templates
     PRIVATE     CommonProjectWarnings)

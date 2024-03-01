@@ -2,7 +2,7 @@ Sdlmodel-Datamodel DEFINITIONS ::=
 BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
-   MyInteger, MyReal FROM REALLYGUIPROJECT-DATAVIEW
+   MyInteger, MyReal FROM REAL-GENERATION
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
@@ -12,17 +12,17 @@ Sdlmodel-Context ::= SEQUENCE {
    state Sdlmodel-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyReal,
    received MyInteger
 }
 
 END
 
-REALLYGUIPROJECT-DATAVIEW DEFINITIONS ::=
-BEGIN
+REAL-GENERATION DEFINITIONS ::= BEGIN
 
-   MyInteger ::= INTEGER (0 .. 10000)
-   MyReal ::= REAL (-10.0 .. 10.0)
+MyInteger ::= INTEGER (0 .. 10000)
+MyReal ::= REAL (-10.0 .. 10.0)
 
 END
 
@@ -57,10 +57,34 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        environment,
+       
        sdlmodel,
+       
        
        env
    }
+
+END
+
+ENVIRONMENT-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS 
+
+MyReal FROM REAL-GENERATION
+
+ ;
+
+
+
+
+
+
+
+Environment-pi-1-param ::= MyReal
+
+
+
 
 END
 
@@ -71,7 +95,7 @@ BEGIN
       
       
       --  ASN.1 modules used by thread sdlmodel_PI_1
-      MyReal FROM REALLYGUIPROJECT-DATAVIEW
+      MyReal FROM REAL-GENERATION
       
       -- Import generic integer type (used for timers)
       T-UInt32 FROM TASTE-BasicTypes
@@ -102,6 +126,7 @@ BEGIN
    }
    
    Sdlmodel-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pi-1 SEQUENCE { param MyReal}
@@ -162,6 +187,11 @@ BEGIN
       sdlmodel-queue Events-Ty (SIZE (0 .. sdlmodel-queue-size)),
 
       sdlmodel  Sdlmodel-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      environment
    }
 
 END

@@ -12,6 +12,7 @@ Actuator1-Context ::= SEQUENCE {
    state Actuator1-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyInteger
 }
 
@@ -31,6 +32,7 @@ Actuator2-Context ::= SEQUENCE {
    state Actuator2-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyInteger
 }
 
@@ -50,6 +52,7 @@ Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    coeff MyInteger,
    param MyInteger,
    source PID,
@@ -83,41 +86,6 @@ TRAILGEN-MULTICAST-DATAVIEW DEFINITIONS ::=
 BEGIN
 
    MyInteger ::= INTEGER (0 .. 10000)
-
--- ASN.1 Type definitions must start with an uppercase
--- Field names in records (SEQUENCE) must start with a lowercase
--- Underscores are not allowed: use dash (hyphen) 
--- For integers do not assume that small ranges will be translated to small
--- types in C or Ada (expect unsigned or signed 64 bits types with subtypes
--- for the range in Ada)
-
--- Simple types:
-
--- TASTE-Boolean ::= BOOLEAN
--- MyInteger   ::= INTEGER (0..255)
--- MyReal      ::= REAL (0.0 .. 1000.0)
--- MyBool      ::= BOOLEAN
--- MyEnum      ::= ENUMERATED { hello, world, how-are-you }
-
--- Complex types:
-
---  MySeq       ::= SEQUENCE {
---      input-data  MyInteger,
---      output-data MyInteger,
---      validity    ENUMERATED { valid, invalid }
---  }
---
---  MyChoice    ::= CHOICE {
---      a BOOLEAN,
---      b MySeq
---  }
---
---  MySeqOf     ::= SEQUENCE (SIZE (2)) OF MyEnum
---
---  MyOctStr    ::= OCTET STRING (SIZE (3))
---
---  -- You can also declare constants
---  myVar       MySeqOf     ::= { hello, world }
 
 END
 
@@ -183,6 +151,7 @@ BEGIN
    
    
    Actuator1-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          test-parameter SEQUENCE { p1 MyInteger}
@@ -193,6 +162,7 @@ BEGIN
    }
    
    Actuator2-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          test-parameter SEQUENCE { p1 MyInteger}
@@ -203,6 +173,7 @@ BEGIN
    }
    
    Controller-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          result SEQUENCE { p1 MyInteger}

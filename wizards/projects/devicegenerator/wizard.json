@@ -269,6 +269,10 @@
                 {
                     "source": "snippets/%{CDBoard}/Board1.xml",
                     "target": "%{ProjectDirectory}/snippets/Board1.xml"
+                },
+                {
+                    "source": "%{IVFileSource}_config_flags.h",
+                    "target": "%{ProjectDirectory}/config_flags.h"
                 }
             ]
         }

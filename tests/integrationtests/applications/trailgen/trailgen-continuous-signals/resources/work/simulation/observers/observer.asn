@@ -12,6 +12,7 @@ Actuator-Context ::= SEQUENCE {
    state Actuator-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyInteger,
    counter MyInteger
 }
@@ -32,6 +33,7 @@ Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    my-param MyTestInteger,
    my-value MyInteger
 }
@@ -79,8 +81,11 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        actuator,
+       
        controller,
+       
        environ,
+       
        
        env
    }
@@ -154,6 +159,7 @@ BEGIN
    
    
    Actuator-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          work SEQUENCE { p1 MyInteger}
@@ -164,6 +170,7 @@ BEGIN
    }
    
    Controller-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          result SEQUENCE { p1 MyInteger},
@@ -176,6 +183,7 @@ BEGIN
    }
    
    Environ-Event ::= CHOICE {
+      -- Lang: GUI TRUE FALSE
       msg-in CHOICE {
          report SEQUENCE { p1 MyInteger}
       },
@@ -242,6 +250,11 @@ BEGIN
 
       actuator    Actuator-Context,
       controller  Controller-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      environ
    }
 
 END

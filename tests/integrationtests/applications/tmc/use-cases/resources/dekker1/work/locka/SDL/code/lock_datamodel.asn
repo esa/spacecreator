@@ -3,13 +3,16 @@ BEGIN
 --  This file was generated automatically by OpenGEODE
 IMPORTS
    T-UInt16, T-WriteAccess, T-ByteArray, T-MemBuffer, T-WriteRequest, T-ProcID FROM DEKKER1-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview;
 
-Lock-States ::= ENUMERATED {writing, wait-turn, idle, wait-nocontention}
+Lock-States ::= ENUMERATED {writing, idle, wait-nocontention, wait-turn}
 
 Lock-Context ::= SEQUENCE {
    state Lock-States,
    init-done BOOLEAN,
+   sender PID,
+   offspring PID,
    remotewantstoenter T-Boolean,
    writesize T-UInt8,
    myprocid T-ProcID,

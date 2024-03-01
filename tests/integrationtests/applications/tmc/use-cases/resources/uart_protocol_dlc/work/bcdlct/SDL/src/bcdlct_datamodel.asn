@@ -15,6 +15,7 @@ Bcdlct-Context ::= SEQUENCE {
    state Bcdlct-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    txsdu T-UART-DLC-SDU,
    txpdu T-UART-DLC-PDU,
    txcount UINT8,

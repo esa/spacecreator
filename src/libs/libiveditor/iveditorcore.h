@@ -71,6 +71,7 @@ public:
     QAction *actionExportType();
     QAction *actionToggleE2EView();
     QAction *actionLaunchModelCheckingWindow();
+    QAction *actionLaunchMBSEQualityModelCheckerWindow();
     QAction *actionDelete() const override;
 
     ivm::IVFunction *addFunction(const QString &name, ivm::IVFunction *parent = nullptr);
@@ -111,6 +112,7 @@ private:
     QAction *m_actionExportType { nullptr };
     QAction *m_actionToggleE2EView { nullptr };
     QAction *m_actionLaunchModelCheckingWindow { nullptr };
+    QAction *m_actionLaunchMQMCheckerWindow { nullptr };
 
     QVector<ivm::IVFunction *> m_ivFunctions;
     QVector<ivm::IVConnection *> m_ivConnections;

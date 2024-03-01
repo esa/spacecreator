@@ -6,12 +6,13 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Actuator1-States ::= ENUMERATED {stateb, statea}
+Actuator1-States ::= ENUMERATED {statea, stateb}
 
 Actuator1-Context ::= SEQUENCE {
    state Actuator1-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
@@ -24,12 +25,13 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Actuator2-States ::= ENUMERATED {stateb, statea}
+Actuator2-States ::= ENUMERATED {statea, stateb}
 
 Actuator2-Context ::= SEQUENCE {
    state Actuator2-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
@@ -42,12 +44,13 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {test1parameter, test1parameterless, test2parameter, finished, test2parameterless, error}
+Controller-States ::= ENUMERATED {test1parameter, finished, test2parameter, test2parameterless, error, test1parameterless}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyInteger,
    source PID
 }
@@ -140,6 +143,7 @@ BEGIN
    
    
    Actuator1-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          trigger1 SEQUENCE {  }
@@ -151,6 +155,7 @@ BEGIN
    }
    
    Actuator2-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          trigger2 SEQUENCE {  }
@@ -162,6 +167,7 @@ BEGIN
    }
    
    Controller-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          test-parameter     SEQUENCE { p1 MyInteger},

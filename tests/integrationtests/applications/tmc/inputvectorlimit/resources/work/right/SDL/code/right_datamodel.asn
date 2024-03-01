@@ -1,14 +1,18 @@
 Right-Datamodel DEFINITIONS ::=
 BEGIN
+--  This file was generated automatically by OpenGEODE
 IMPORTS
    MyInteger FROM INPUTVECTORLIMIT-DATAVIEW
-   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes;
+   T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
+   PID-Range, PID FROM System-Dataview;
 
 Right-States ::= ENUMERATED {wait}
 
 Right-Context ::= SEQUENCE {
    state Right-States,
    init-done BOOLEAN,
+   sender PID,
+   offspring PID,
    rightarg MyInteger,
    rightval MyInteger
 }

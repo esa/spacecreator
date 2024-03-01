@@ -1,33 +1,36 @@
 /* CIF PROCESS (250, 149), (150, 75) */
 process Actuator;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (384, 313), (267, 140) */
     -- Text area for declarations and comments
     
     dcl counter MyInteger;
     dcl param MyInteger;
     /* CIF ENDTEXT */
-    /* CIF START (360, 59), (70, 35) */
+    /* CIF START (365, 76), (70, 35) */
     START;
-        /* CIF NEXTSTATE (360, 109), (70, 35) */
+        /* CIF NEXTSTATE (365, 126), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (1221, 283), (70, 35) */
-    state Wait;
-        /* CIF input (1205, 338), (97, 35) */
-        input work(param);
-            /* CIF task (1163, 393), (181, 35) */
-            task counter := counter + param;
-            /* CIF output (1200, 448), (107, 35) */
-            output done(counter);
-            /* CIF NEXTSTATE (1219, 503), (70, 35) */
-            NEXTSTATE Wait;
-    endstate;
     /* CIF state (948, 269), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
         /* CIF input (948, 324), (70, 35) */
         input reset;
             /* CIF task (936, 379), (92, 35) */
             task counter := 0;
             /* CIF NEXTSTATE (948, 434), (70, 35) */
+            NEXTSTATE Wait;
+    endstate;
+    /* CIF state (1221, 283), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
+        /* CIF input (1204, 338), (97, 35) */
+        input work(param);
+            /* CIF task (1162, 393), (181, 35) */
+            task counter := counter + param;
+            /* CIF output (1199, 448), (107, 35) */
+            output done(counter);
+            /* CIF NEXTSTATE (1218, 503), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Actuator;

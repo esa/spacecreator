@@ -91,6 +91,8 @@ void SpinRunWorker::run()
     m_verifier->setSearchShortestPath(m_spinConfig.searchShortestPath);
     m_verifier->setUseFairScheduling(m_spinConfig.useFairScheduling);
     m_verifier->setUseBitHashing(m_spinConfig.useBitHashing);
+    m_verifier->setMulticastEnabled(m_spinConfig.supportMulticast);
+
     if (m_spinConfig.numberOfCores.has_value()) {
         m_verifier->setNumberOfCores(m_spinConfig.numberOfCores.value());
     }

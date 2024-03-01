@@ -11,7 +11,8 @@ Actuator1-States ::= ENUMERATED {wait}
 Actuator1-Context ::= SEQUENCE {
    state Actuator1-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
@@ -29,7 +30,8 @@ Actuator2-States ::= ENUMERATED {wait}
 Actuator2-Context ::= SEQUENCE {
    state Actuator2-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
@@ -48,6 +50,7 @@ Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyInteger
 }
 
@@ -138,6 +141,7 @@ BEGIN
    
    
    Actuator1-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          trigger1 SEQUENCE {  }
@@ -148,6 +152,7 @@ BEGIN
    }
    
    Actuator2-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          trigger2 SEQUENCE {  }
@@ -158,6 +163,7 @@ BEGIN
    }
    
    Controller-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          test-parameter SEQUENCE { p1 MyInteger}

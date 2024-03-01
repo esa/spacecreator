@@ -1,0 +1,8 @@
+{% comment %}
+Template for generation of XML scheme of archetypeLibraryReference.
+The following tags are available in this sub-template:
+archetypeLibraryReference                       : Instance of archetypeLibraryReference (provided by a top level template)
+archetypeLibraryReference.archetypeLibrary      :   |_ ArchetypeLibraryReference archetype_library
+archetypeLibraryReference.archetypePath         :   |_ ArchetypeLibraryReference path
+{% endcomment %}
+<ArchetypeLibraryReference archetype_library="{{ archetypeLibraryReference.archetypeLibrary }}" path="{{ archetypeLibraryReference.archetypePath }}"/>

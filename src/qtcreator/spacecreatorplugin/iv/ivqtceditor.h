@@ -19,7 +19,7 @@
 
 #include "common/qtceditor.h"
 #include "iveditorcore.h"
-
+#include "dveditorcore.h"
 #include <QPointer>
 #include <editormanager/ieditor.h>
 
@@ -28,6 +28,7 @@ class QToolBar;
 namespace ive {
 class ModelCheckingWindow;
 class EndToEndView;
+class MBSEQualityModelCheckerWindow;
 }
 
 namespace spctr {
@@ -47,6 +48,7 @@ public:
     Core::IDocument *document() const override;
     IVEditorDocument *ivDocument() const;
     IVEditorCorePtr ivPlugin() const;
+    DVEditorCorePtr dvPlugin()const;
 
     QWidget *toolBar() override;
 
@@ -57,12 +59,16 @@ public Q_SLOTS:
     void showE2EDataflow(const QStringList &mscFiles);
     void showCurrentModelCheckingWindow();
     void showModelCheckingWindow(const QString);
+    void showCurrentMBSEQualityModelCheckerWindow();
+    void showMBSEQualityModelCheckerWindow(const QString, const QStringList &dvFiles, const QStringList &mscFiles);
 
 private:
     IVEditorDocument *m_document = nullptr;
+    DVEditorCorePtr dvm_document= nullptr;
     QPointer<QToolBar> m_toolbar = nullptr;
     IVMainWidget *m_editorWidget = nullptr;
     QPointer<ive::ModelCheckingWindow> m_modelCheckingWindow;
+    QPointer<ive::MBSEQualityModelCheckerWindow> m_mbseQualityModelCheckerWindow;
     QPointer<ive::EndToEndView> m_endToEndView;
     QPointer<SpaceCreatorProjectManager> m_projectManager;
 };

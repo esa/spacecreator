@@ -44,7 +44,7 @@
 #include <iostream>
 #include <ivcore/ivfunction.h>
 #include <ivcore/ivxmlreader.h>
-#include <libiveditor/ivexporter.h>
+#include <ivcore/ivxmlwriter.h>
 #include <promela/PromelaOptions/options.h>
 #include <sdl/SdlOptions/options.h>
 #include <simulatortrail/SimulatorTrailOptions/options.h>
@@ -74,7 +74,7 @@ using conversion::simulatortrail::SimulatorTrailRegistrar;
 using conversion::spintrail::SpinTrailOptions;
 using conversion::spintrail::SpinTrailRegistrar;
 using conversion::translator::TranslationException;
-using ive::IVExporter;
+using ivm::IVXMLWriter;
 using ivm::IVFunction;
 using ivm::IVFunctionType;
 using ivm::IVInterface;
@@ -154,6 +154,7 @@ TmcConverter::TmcConverter(const QString &inputIvFilepath, const QString &output
     connect(m_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
     connect(m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
     connect(m_process, SIGNAL(started()), this, SLOT(processStarted()));
+    connect(m_process, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
     connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(processFinished(int, QProcess::ExitStatus)));
     connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
@@ -682,7 +683,7 @@ std::unique_ptr<IVModel> TmcConverter::readInterfaceView(const QString &filepath
 
 void TmcConverter::saveOptimizedInterfaceView(const IVModel *ivModel, const QString outputFilePath)
 {
-    IVExporter exporter;
+    IVXMLWriter exporter;
     exporter.exportObjectsSilently(ivModel->objects().values(), outputFilePath);
 }
 
@@ -1005,6 +1006,38 @@ void TmcConverter::processStarted()
     m_timer->stop();
     m_timer->setSingleShot(true);
     m_timer->start(m_commandTimeout);
+}
+
+void TmcConverter::processError(QProcess::ProcessError error)
+{
+    m_process->terminate();
+    m_timer->stop();
+    switch (error) {
+    case QProcess::ProcessError::FailedToStart:
+        Q_EMIT message("External process failed to start.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::Crashed:
+        Q_EMIT message("External process crashed.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::Timedout:
+        Q_EMIT message("External process timeout.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::WriteError:
+        Q_EMIT message("External process write error.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::ReadError:
+        Q_EMIT message("External process read error.");
+        Q_EMIT conversionFinished(false);
+        break;
+    case QProcess::ProcessError::UnknownError:
+        Q_EMIT message("External process unknown error.");
+        Q_EMIT conversionFinished(false);
+        break;
+    }
 }
 
 void TmcConverter::processFinished(int exitCode, QProcess::ExitStatus exitStatus)

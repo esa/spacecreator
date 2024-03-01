@@ -11,7 +11,8 @@ Helper-States ::= ENUMERATED {wait}
 Helper-Context ::= SEQUENCE {
    state Helper-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END

@@ -162,6 +162,16 @@ QAction *IVEditorCore::actionLaunchModelCheckingWindow()
     return m_actionLaunchModelCheckingWindow;
 }
 
+QAction *IVEditorCore::actionLaunchMBSEQualityModelCheckerWindow()
+{
+    if (m_actionLaunchMQMCheckerWindow == nullptr) {
+        m_actionLaunchMQMCheckerWindow = new QAction(
+                QIcon(":/toolbar/icns/mqm_icon.png"), tr("Launch MBSE Quality Model Checker Window"), this);
+        m_actionLaunchMQMCheckerWindow->setCheckable(true);
+    }
+    return m_actionLaunchMQMCheckerWindow;
+}
+
 QAction *IVEditorCore::actionDelete() const
 {
     return m_mainWidget->actionDelete();

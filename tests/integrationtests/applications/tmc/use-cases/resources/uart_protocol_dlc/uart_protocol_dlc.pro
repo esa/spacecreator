@@ -5,8 +5,10 @@ CONFIG += generateC
 DISTFILES +=  $(HOME)/tool-inst/share/taste-types/taste-types.asn
 DISTFILES += uart_protocol_dlc.msc
 DISTFILES += interfaceview.xml
+DISTFILES += work/binaries/*.msc
 DISTFILES += work/binaries/coverage/index.html
 DISTFILES += work/binaries/filters
+DISTFILES += work/system.asn
 
 DISTFILES += data_model/basic_types.asn
 DISTFILES += data_model/bilevel_types.asn

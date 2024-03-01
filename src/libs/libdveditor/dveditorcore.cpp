@@ -162,6 +162,7 @@ dvm::AbstractSystemChecks *DVEditorCore::systemChecker() const
     return d->m_systemChecks;
 }
 
+
 void DVEditorCore::addToolBars(QMainWindow *window)
 {
     if (window)

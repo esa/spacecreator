@@ -58,7 +58,7 @@ ModelCheckingWindow::ModelCheckingWindow(InterfaceDocument *document, const QStr
     : QMainWindow(parent)
     , d(new ModelCheckingWindowPrivate)
 {
-    // Set ui and interface document
+   // Set ui and interface document
     d->ui.setupUi(this);
     d->document = document;
 

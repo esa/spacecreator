@@ -33,6 +33,7 @@
 #include "ivfunctiontype.h"
 #include "minimap.h"
 #include "modelchecking/modelcheckingwindow.h"
+#include "mqmchecker/mbsequalitymodelcheckerwindow.h"
 #include "reports/bugreportdialog.h"
 #include "settingsmanager.h"
 #include "ui_mainwindow.h"
@@ -126,6 +127,14 @@ MainWindow::MainWindow(ive::IVEditorCore *core, QWidget *parent)
     connect(modelCheckingWindow, &ModelCheckingWindow::visibleChanged, core->actionLaunchModelCheckingWindow(),
             &QAction::setChecked);
     modelCheckingWindow->setVisible(core->actionLaunchModelCheckingWindow()->isChecked());
+
+ // Create the MQM window and add the action
+    auto modelMQMCheckerWindow = new MBSEQualityModelCheckerWindow(m_core->document(), "",  this);
+    modelMQMCheckerWindow->hide();
+    connect(core->actionLaunchMBSEQualityModelCheckerWindow(), &QAction::toggled, modelMQMCheckerWindow, &QWidget::setVisible);
+    connect(core->actionLaunchMBSEQualityModelCheckerWindow(), &QAction::toggled, modelMQMCheckerWindow, &MBSEQualityModelCheckerWindow::callCheckMetrics);
+    connect(modelMQMCheckerWindow, &MBSEQualityModelCheckerWindow::visibleChanged, core->actionLaunchMBSEQualityModelCheckerWindow(),&QAction::setChecked);
+    modelMQMCheckerWindow->setVisible(core->actionLaunchMBSEQualityModelCheckerWindow()->isChecked());
 
     connect(shared::ErrorHub::instance(), &shared::ErrorHub::errorAdded, this, [this](const shared::ErrorItem &error) {
         switch (error.m_type) {
@@ -404,6 +413,7 @@ void MainWindow::initMenus()
     menu->addAction(m_core->actionToggleMinimap());
     menu->addAction(m_core->actionToggleE2EView());
     menu->addAction(m_core->actionLaunchModelCheckingWindow());
+    menu->addAction(m_core->actionLaunchMBSEQualityModelCheckerWindow());
 
     // Initialize the help menu
     menu = menuBar()->addMenu(tr("&Help"));

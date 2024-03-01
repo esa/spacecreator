@@ -26,10 +26,12 @@ package body Demo_Timer_Manager_PI is
    end Continuous_Signals;
 
    --  Provided interfaces
-   procedure Reset_Pinger_Pingertimer (Global_State : in out asn1SccSystem_State) is
+   procedure Reset_Pinger_Pingertimer (Global_State : in out asn1SccSystem_State;
+                                  Sender_PID   : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)
       Demo_Timer_Manager.Ctxt := Global_State.Demo_Timer_Manager;
+      Demo_Timer_Manager.Ctxt.Sender := Sender_PID;
       --  If user code calls synchronous RIs, set their state too
       Update_States_For_Synchronous_Calls (Global_State);
       Demo_Timer_Manager.Reset_Pinger_Pingertimer;
@@ -40,10 +42,12 @@ package body Demo_Timer_Manager_PI is
    end Reset_Pinger_Pingertimer;
    
    
-   procedure Reset_Ponger_Pongertimer (Global_State : in out asn1SccSystem_State) is
+   procedure Reset_Ponger_Pongertimer (Global_State : in out asn1SccSystem_State;
+                                  Sender_PID   : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)
       Demo_Timer_Manager.Ctxt := Global_State.Demo_Timer_Manager;
+      Demo_Timer_Manager.Ctxt.Sender := Sender_PID;
       --  If user code calls synchronous RIs, set their state too
       Update_States_For_Synchronous_Calls (Global_State);
       Demo_Timer_Manager.Reset_Ponger_Pongertimer;
@@ -56,10 +60,12 @@ package body Demo_Timer_Manager_PI is
    
    procedure Set_Pinger_Pingertimer
       (Global_State : in out asn1SccSystem_State;
-      Val : in out asn1SccT_Uint32) is
+      Val : in out asn1SccT_Uint32;
+       Sender_PID : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)
       Demo_Timer_Manager.Ctxt := Global_State.Demo_Timer_Manager;
+      Demo_Timer_Manager.Ctxt.Sender := Sender_PID;
       --  If user code calls synchronous RIs, set their state too
       Update_States_For_Synchronous_Calls (Global_State);
       Demo_Timer_Manager.Set_Pinger_Pingertimer
@@ -73,10 +79,12 @@ package body Demo_Timer_Manager_PI is
    
    procedure Set_Ponger_Pongertimer
       (Global_State : in out asn1SccSystem_State;
-      Val : in out asn1SccT_Uint32) is
+      Val : in out asn1SccT_Uint32;
+       Sender_PID : asn1SccPID := asn1SccEnv) is
    begin
       -- Set the current context (provided by the simulation API)
       Demo_Timer_Manager.Ctxt := Global_State.Demo_Timer_Manager;
+      Demo_Timer_Manager.Ctxt.Sender := Sender_PID;
       --  If user code calls synchronous RIs, set their state too
       Update_States_For_Synchronous_Calls (Global_State);
       Demo_Timer_Manager.Set_Ponger_Pongertimer
@@ -86,19 +94,5 @@ package body Demo_Timer_Manager_PI is
       --  If user code called synchronous RIs, populate their state
       Update_Global_State_After_Synchronous_Calls (Global_State);
    end Set_Ponger_Pongertimer;
-   
-   
-   procedure Tick (Global_State : in out asn1SccSystem_State) is
-   begin
-      -- Set the current context (provided by the simulation API)
-      Demo_Timer_Manager.Ctxt := Global_State.Demo_Timer_Manager;
-      --  If user code calls synchronous RIs, set their state too
-      Update_States_For_Synchronous_Calls (Global_State);
-      Demo_Timer_Manager.Tick;
-      -- Update the global state
-      Global_State.Demo_Timer_Manager := Demo_Timer_Manager.Ctxt;
-      --  If user code called synchronous RIs, populate their state
-      Update_Global_State_After_Synchronous_Calls (Global_State);
-   end Tick;
 
 end Demo_Timer_Manager_PI;

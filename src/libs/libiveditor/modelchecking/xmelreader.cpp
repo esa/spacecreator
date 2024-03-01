@@ -158,19 +158,24 @@ bool XmelReader::readSubmodel()
     bool hasFunction = false;
 
     while (xml.readNextStartElement()) {
-        Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("Functions_Kept"));
+        if (xml.name() == QLatin1String("Kept_Functions")) {
 
-        functionsSelected.clear();
+            Q_ASSERT(xml.isStartElement() && xml.name() == QLatin1String("Kept_Functions"));
 
-        while (xml.readNextStartElement()) {
-            if (xml.name() == QLatin1String("FunctionKept")){
-                Q_ASSERT(xml.attributes().hasAttribute("name"));
-                functionsSelected.append(xml.attributes().value("name").toString());
-                hasFunction = true;
-                xml.skipCurrentElement();
-            } else {
-                xml.skipCurrentElement();
+            functionsSelected.clear();
+
+            while (xml.readNextStartElement()) {
+                if (xml.name() == QLatin1String("FunctionKept")){
+                    Q_ASSERT(xml.attributes().hasAttribute("name"));
+                    functionsSelected.append(xml.attributes().value("name").toString());
+                    hasFunction = true;
+                    xml.skipCurrentElement();
+                } else {
+                    xml.skipCurrentElement();
+                }
             }
+        } else {
+            xml.skipCurrentElement();
         }
     }
 

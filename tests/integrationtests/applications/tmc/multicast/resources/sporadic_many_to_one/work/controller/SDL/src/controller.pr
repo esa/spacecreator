@@ -1,5 +1,6 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Controller;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (399, 576), (170, 140) */
     dcl param MyInteger;
     dcl source PID;
@@ -10,31 +11,60 @@ process Controller;
         output trigger1;
         /* CIF NEXTSTATE (397, 231), (139, 35) */
         NEXTSTATE Test1Parameterless;
-    /* CIF state (1408, 142), (117, 35) */
-    state Test1Parameter;
-        /* CIF input (1386, 197), (160, 35) */
-        input test_parameter(param);
-            /* CIF PROCEDURECALL (1398, 252), (137, 35) */
+    /* CIF state (441, 335), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Error;
+    endstate;
+    /* CIF state (470, 443), (72, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Finished;
+    endstate;
+    /* CIF state (779, 143), (139, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Test1Parameterless;
+        /* CIF input (780, 198), (137, 35) */
+        input test_parameterless;
+            /* CIF PROCEDURECALL (780, 253), (137, 35) */
             call get_sender(source);
-            /* CIF decision (1399, 307), (134, 50) */
+            /* CIF decision (782, 308), (134, 50) */
             decision source = Actuator1;
-                /* CIF ANSWER (1387, 377), (70, 23) */
+                /* CIF ANSWER (770, 378), (70, 23) */
                 (true):
-                    /* CIF output (1386, 420), (71, 35) */
+                    /* CIF output (769, 421), (71, 35) */
                     output trigger2;
-                    /* CIF NEXTSTATE (1363, 475), (117, 35) */
-                    NEXTSTATE Test2Parameter;
-                /* CIF ANSWER (1491, 377), (70, 23) */
+                    /* CIF NEXTSTATE (735, 476), (139, 35) */
+                    NEXTSTATE Test2Parameterless;
+                /* CIF ANSWER (885, 378), (70, 23) */
                 (false):
-                    /* CIF NEXTSTATE (1491, 420), (70, 35) */
+                    /* CIF NEXTSTATE (885, 421), (70, 35) */
                     NEXTSTATE Error;
             enddecision;
     endstate;
-    /* CIF state (1076, 143), (139, 35) */
+    /* CIF state (1801, 144), (117, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Test2Parameter;
+        /* CIF input (1779, 199), (160, 35) */
+        input test_parameter(param);
+            /* CIF PROCEDURECALL (1791, 254), (137, 35) */
+            call get_sender(source);
+            /* CIF decision (1792, 309), (134, 50) */
+            decision source = Actuator2;
+                /* CIF ANSWER (1781, 379), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (1779, 422), (72, 35) */
+                    NEXTSTATE Finished;
+                /* CIF ANSWER (1871, 379), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (1871, 422), (70, 35) */
+                    NEXTSTATE Error;
+            enddecision;
+    endstate;
+    /* CIF state (1075, 143), (139, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Test2Parameterless;
-        /* CIF input (1077, 198), (137, 35) */
+        /* CIF input (1076, 198), (137, 35) */
         input test_parameterless;
-            /* CIF PROCEDURECALL (1077, 253), (137, 35) */
+            /* CIF PROCEDURECALL (1076, 253), (137, 35) */
             call get_sender(source);
             /* CIF decision (1078, 308), (134, 50) */
             decision source = Actuator2;
@@ -50,48 +80,25 @@ process Controller;
                     NEXTSTATE Error;
             enddecision;
     endstate;
-    /* CIF state (1802, 144), (117, 35) */
-    state Test2Parameter;
-        /* CIF input (1780, 199), (160, 35) */
+    /* CIF state (1407, 142), (117, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Test1Parameter;
+        /* CIF input (1385, 197), (160, 35) */
         input test_parameter(param);
-            /* CIF PROCEDURECALL (1792, 254), (137, 35) */
+            /* CIF PROCEDURECALL (1397, 252), (137, 35) */
             call get_sender(source);
-            /* CIF decision (1793, 309), (134, 50) */
-            decision source = Actuator2;
-                /* CIF ANSWER (1781, 379), (70, 23) */
-                (true):
-                    /* CIF NEXTSTATE (1779, 422), (72, 35) */
-                    NEXTSTATE Finished;
-                /* CIF ANSWER (1871, 379), (70, 23) */
-                (false):
-                    /* CIF NEXTSTATE (1871, 422), (70, 35) */
-                    NEXTSTATE Error;
-            enddecision;
-    endstate;
-    /* CIF state (769, 136), (139, 35) */
-    state Test1Parameterless;
-        /* CIF input (770, 191), (137, 35) */
-        input test_parameterless;
-            /* CIF PROCEDURECALL (770, 246), (137, 35) */
-            call get_sender(source);
-            /* CIF decision (771, 301), (134, 50) */
+            /* CIF decision (1398, 307), (134, 50) */
             decision source = Actuator1;
-                /* CIF ANSWER (759, 371), (70, 23) */
+                /* CIF ANSWER (1387, 377), (70, 23) */
                 (true):
-                    /* CIF output (758, 414), (71, 35) */
+                    /* CIF output (1386, 420), (71, 35) */
                     output trigger2;
-                    /* CIF NEXTSTATE (724, 469), (139, 35) */
-                    NEXTSTATE Test2Parameterless;
-                /* CIF ANSWER (874, 371), (70, 23) */
+                    /* CIF NEXTSTATE (1363, 475), (117, 35) */
+                    NEXTSTATE Test2Parameter;
+                /* CIF ANSWER (1491, 377), (70, 23) */
                 (false):
-                    /* CIF NEXTSTATE (874, 414), (70, 35) */
+                    /* CIF NEXTSTATE (1491, 420), (70, 35) */
                     NEXTSTATE Error;
             enddecision;
-    endstate;
-    /* CIF state (471, 443), (72, 35) */
-    state Finished;
-    endstate;
-    /* CIF state (441, 335), (70, 35) */
-    state Error;
     endstate;
 endprocess Controller;

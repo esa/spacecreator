@@ -17,7 +17,7 @@ void utils_startup(void)
    // puts ("[Utils] Startup");
 }
 
-void utils_PI_Stub
+void utils_PI_stub
       (const asn1SccMyInteger *IN_stubparamin,
        asn1SccMyInteger *OUT_stubparamout)
 

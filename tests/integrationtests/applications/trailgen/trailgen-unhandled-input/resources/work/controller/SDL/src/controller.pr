@@ -1,39 +1,42 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Controller;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (350, 470), (267, 140) */
     -- Text area for declarations and comments
     
     dcl test_param MyInteger;
     dcl result_param MyInteger;
     /* CIF ENDTEXT */
-    /* CIF START (707, 218), (70, 35) */
+    /* CIF START (720, 232), (70, 35) */
     START;
-        /* CIF task (684, 273), (114, 35) */
+        /* CIF task (697, 287), (114, 35) */
         task test_param := 2;
-        /* CIF output (679, 323), (124, 35) */
+        /* CIF output (692, 337), (124, 35) */
         output ping(test_param);
-        /* CIF NEXTSTATE (707, 373), (70, 35) */
+        /* CIF NEXTSTATE (720, 387), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (1301, 210), (70, 35) */
-    state Idle;
-        /* CIF input (1266, 265), (139, 35) */
-        input pong(result_param);
-            /* CIF task (1278, 320), (114, 35) */
-            task test_param := 1;
-            /* CIF output (1273, 375), (124, 35) */
-            output ping(test_param);
-            /* CIF NEXTSTATE (1301, 430), (70, 35) */
-            NEXTSTATE Wait;
-    endstate;
     /* CIF state (1017, 211), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (982, 266), (139, 35) */
+        /* CIF input (981, 266), (139, 35) */
         input pong(result_param);
             /* CIF task (994, 321), (114, 35) */
             task test_param := 3;
             /* CIF output (989, 376), (124, 35) */
             output ping(test_param);
-            /* CIF NEXTSTATE (1017, 431), (70, 35) */
+            /* CIF NEXTSTATE (1016, 431), (70, 35) */
             NEXTSTATE Idle;
+    endstate;
+    /* CIF state (1301, 210), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Idle;
+        /* CIF input (1265, 265), (139, 35) */
+        input pong(result_param);
+            /* CIF task (1278, 320), (114, 35) */
+            task test_param := 1;
+            /* CIF output (1273, 375), (124, 35) */
+            output ping(test_param);
+            /* CIF NEXTSTATE (1300, 430), (70, 35) */
+            NEXTSTATE Wait;
     endstate;
 endprocess Controller;

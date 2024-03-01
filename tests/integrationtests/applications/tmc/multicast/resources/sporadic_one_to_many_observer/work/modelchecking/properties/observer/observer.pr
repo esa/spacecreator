@@ -1,5 +1,6 @@
 system observer;
-    /* CIF TEXT (144, 214), (474, 140) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (144, 214), (472, 140) */
     use datamodel comment 'observer.asn';
     
     signal test_in(MyInteger) renames input test_parameter to actuator1;
@@ -19,10 +20,7 @@ test_out;
         connect c and r;
         /* CIF PROCESS (259, 86), (150, 75) */
         process observer;
-            /* CIF TEXT (944, 318), (267, 140) */
-            -- Text area for declarations and comments
-            dcl test_out_count MyInteger := 0;
-            /* CIF ENDTEXT */
+            /* CIF Keep Specific Geode Partition 'default' */
             /* CIF TEXT (0, 57), (222, 140) */
             monitor st System_State;
             
@@ -30,15 +28,37 @@ test_out;
             
             errorstates error;
             /* CIF ENDTEXT */
-            /* CIF START (291, 103), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
+            /* CIF TEXT (944, 318), (267, 140) */
+            -- Text area for declarations and comments
+            dcl test_out_count MyInteger := 0;
+            /* CIF ENDTEXT */
+            /* CIF START (330, 127), (70, 35) */
             START;
-                /* CIF NEXTSTATE (268, 158), (115, 35) */
+                /* CIF NEXTSTATE (307, 182), (115, 35) */
                 NEXTSTATE Wait_For_Event;
-            /* CIF state (260, 554), (115, 35) */
+            /* CIF state (517, 158), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
+            state error;
+            endstate;
+            /* CIF state (692, 345), (115, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state Wait_For_Event;
-                /* CIF input (258, 609), (119, 35) */
+                /* CIF input (681, 400), (138, 35) */
+                input test_out(outparam);
+                    /* CIF task (630, 455), (240, 35) */
+                    task test_out_count := test_out_count + 1;
+                    /* CIF output (681, 505), (138, 35) */
+                    output test_out(outparam);
+                    /* CIF NEXTSTATE (693, 555), (115, 35) */
+                    NEXTSTATE Wait_For_Event;
+            endstate;
+            /* CIF state (257, 554), (115, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
+            state Wait_For_Event;
+                /* CIF input (255, 609), (119, 35) */
                 input test_in(inparam);
-                    /* CIF decision (261, 664), (113, 50) */
+                    /* CIF decision (258, 664), (113, 50) */
                     decision test_out_count
                     /* CIF comment (395, 671), (397, 35) */
                     comment '2 is a expected value, the error state shows that observer works';
@@ -51,20 +71,6 @@ test_out;
                             /* CIF NEXTSTATE (305, 777), (115, 35) */
                             NEXTSTATE Wait_For_Event;
                     enddecision;
-            endstate;
-            /* CIF state (695, 345), (115, 35) */
-            state Wait_For_Event;
-                /* CIF input (684, 400), (138, 35) */
-                input test_out(outparam);
-                    /* CIF task (633, 455), (240, 35) */
-                    task test_out_count := test_out_count + 1;
-                    /* CIF output (684, 505), (138, 35) */
-                    output test_out(outparam);
-                    /* CIF NEXTSTATE (696, 555), (115, 35) */
-                    NEXTSTATE Wait_For_Event;
-            endstate;
-            /* CIF state (517, 158), (70, 35) */
-            state error;
             endstate;
         endprocess observer;
     endblock;

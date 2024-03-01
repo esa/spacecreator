@@ -1,0 +1,6 @@
+{# This template is for test purposes only #}
+<Functions>
+{% for func in Functions %}
+    {% include "function.tmplt" %}
+{% endfor %}
+</Functions>

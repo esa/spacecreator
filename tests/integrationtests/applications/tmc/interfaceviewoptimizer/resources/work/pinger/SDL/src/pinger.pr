@@ -1,10 +1,12 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Pinger;
-    /* CIF TEXT (1074, 65), (267, 128) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (1074, 65), (267, 140) */
     -- Text area for declarations and comments
     
     dcl value MyInteger;
     dcl result MyInteger;
+    timer pingertimer;
     /* CIF ENDTEXT */
     /* CIF START (320, 9), (70, 35) */
     START;
@@ -13,14 +15,15 @@ process Pinger;
         /* CIF NEXTSTATE (320, 114), (70, 35) */
         NEXTSTATE Wait;
     /* CIF state (450, 10), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (423, 65), (123, 41) */
+        /* CIF input (430, 65), (108, 35) */
         input ClockInterface;
-            /* CIF task (421, 126), (126, 35) */
+            /* CIF task (422, 120), (123, 35) */
             task value := value + 1;
-            /* CIF output (413, 176), (142, 35) */
+            /* CIF output (413, 170), (142, 35) */
             output PingInterface(value);
-            /* CIF NEXTSTATE (449, 231), (70, 35) */
+            /* CIF NEXTSTATE (449, 225), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Pinger;

@@ -1,22 +1,6 @@
 <RCC>
     <qresource prefix="/defaults">
         <file>resources/contextmenu.json</file>
-        <file>templating/xml_templates/comment.tmplt</file>
-        <file>templating/xml_templates/comments.tmplt</file>
-        <file>templating/xml_templates/connection.tmplt</file>
-        <file>templating/xml_templates/connections.tmplt</file>
-        <file>templating/xml_templates/function.tmplt</file>
-        <file>templating/xml_templates/functions.tmplt</file>
-        <file>templating/xml_templates/interface.tmplt</file>
-        <file>templating/xml_templates/interfaces.tmplt</file>
-        <file>templating/xml_templates/interfaceview.tmplt</file>
-        <file>templating/xml_templates/connectiongroup.tmplt</file>
-        <file>templating/xml_templates/connectiongroups.tmplt</file>
-        <file>templating/xml_templates/layer.tmplt</file>
-        <file>templating/xml_templates/layers.tmplt</file>
-        <file>templating/xml_templates/archetypeLibraryReference.tmplt</file>
-        <file>templating/xml_templates/archetypeLibraryReferences.tmplt</file>
-        <file>templating/xml_templates/interfaceview.ui.tmplt</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file>icns/asn1.png</file>
@@ -48,5 +32,7 @@
         <file>icns/shrink.svg</file>
         <file>icns/ungroup_connections.svg</file>
         <file>icns/wrap_function.svg</file>
+        <file>icns/mqm_icon.png</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>

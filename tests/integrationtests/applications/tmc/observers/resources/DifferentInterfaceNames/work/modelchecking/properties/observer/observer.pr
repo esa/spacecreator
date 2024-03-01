@@ -1,5 +1,6 @@
 system observer;
-    /* CIF TEXT (144, 214), (319, 140) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (144, 214), (317, 140) */
     use datamodel comment 'observer.asn';
     
     signal notify renames output left from controller;
@@ -13,8 +14,9 @@ system observer;
             from env to observer with notify;
             from observer to env with notify;
         connect c and r;
-        /* CIF PROCESS (259, 87), (150, 75) */
+        /* CIF PROCESS (259, 86), (150, 75) */
         process observer;
+            /* CIF Keep Specific Geode Partition 'default' */
             /* CIF TEXT (0, 57), (222, 140) */
             monitor st System_State;
             
@@ -22,11 +24,12 @@ system observer;
             
             errorstates error;
             /* CIF ENDTEXT */
-            /* CIF START (397, 65), (70, 35) */
+            /* CIF START (402, 73), (70, 35) */
             START;
-                /* CIF NEXTSTATE (397, 120), (70, 35) */
+                /* CIF NEXTSTATE (402, 128), (70, 35) */
                 NEXTSTATE Idle;
             /* CIF state (606, 89), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state Idle;
                 /* CIF input (606, 144), (70, 35) */
                 input notify;
@@ -36,6 +39,7 @@ system observer;
                     NEXTSTATE error;
             endstate;
             /* CIF state (912, 64), (70, 35) */
+            /* CIF Keep Specific Geode Partition 'default' */
             state error;
             endstate;
         endprocess observer;

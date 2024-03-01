@@ -6,15 +6,16 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Pinger-States ::= ENUMERATED {wait, ok3, ok2, ok1}
+Pinger-States ::= ENUMERATED {ok1, ok3, ok2, wait}
 
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    value1 My-Sequence,
    value2 My-Sequence
 }
 
-Pinger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+Pinger-Mychoice-Selection ::= ENUMERATED {small-present(1), big-present(2)}
 END

@@ -1,5 +1,4 @@
-set(LIB_NAME libiveditor)
-
+set(LIB_NAME libiveditor) 
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
@@ -131,6 +130,12 @@ target_sources(${LIB_NAME} PRIVATE
     modelchecking/spinrundialog.cpp
     modelchecking/spinrunworker.h
     modelchecking/spinrunworker.cpp
+    mqmchecker/mbsequalitymodelcheckerwindow.h
+    mqmchecker/mbsequalitymodelcheckerwindow.cpp
+    mqmchecker/mbsequalitymodelcheckerwindow.ui
+    mqmchecker/readSDL.py
+    mqmchecker/legend.ui
+    mqmchecker/mqm_export_metrics_to_xlsx.py
     endtoend/end2endfunctiongraphicsitem.cpp
     endtoend/end2endfunctiongraphicsitem.h
     interfacedocument.cpp
@@ -217,24 +222,6 @@ target_sources(${LIB_NAME} PRIVATE
     properties/ivpropertiesview.h
     properties/qivnamevalidator.cpp
     properties/qivnamevalidator.h
-    templating/exportableivconnection.cpp
-    templating/exportableivconnection.h
-    templating/exportableivconnectiongroup.cpp
-    templating/exportableivconnectiongroup.h
-    templating/exportableivfunction.cpp
-    templating/exportableivfunction.h
-    templating/exportableivconnectionlayertype.cpp
-    templating/exportableivconnectionlayertype.h
-    templating/exportableivinterface.cpp
-    templating/exportableivinterface.h
-    templating/exportableivobject.cpp
-    templating/exportableivobject.h
-    templating/exportableivfunctiontype.cpp
-    templating/exportableivfunctiontype.h
-    templating/exportableivarchetypereference.cpp
-    templating/exportableivarchetypereference.h
-    templating/exportableivarchetypelibraryreference.cpp
-    templating/exportableivarchetypelibraryreference.h
     zoomcontroller.cpp
     zoomcontroller.h
     config/ivlibrarywidget.cpp

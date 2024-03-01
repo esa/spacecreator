@@ -1,33 +1,22 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Controller;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (498, 479), (267, 140) */
     -- Text area for declarations and comments
     
     dcl test_param MyTestInteger;
     dcl myval MyInteger;
     /* CIF ENDTEXT */
-    /* CIF START (752, 223), (70, 35) */
+    /* CIF START (761, 241), (70, 35) */
     START;
-        /* CIF NEXTSTATE (752, 273), (70, 35) */
+        /* CIF NEXTSTATE (761, 291), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (1083, 334), (70, 35) */
-    state Wait;
-        /* CIF input (1052, 389), (121, 35) */
-        input test(test_param);
-            /* CIF output (1078, 444), (70, 35) */
-            output reset;
-            /* CIF task (1072, 499), (81, 35) */
-            task myval := 0;
-            /* CIF output (1065, 549), (95, 35) */
-            output work(myval);
-            /* CIF NEXTSTATE (1071, 599), (83, 35) */
-            NEXTSTATE Operation;
-    endstate;
-    /* CIF state (1348, 326), (83, 35) */
+    /* CIF state (1347, 326), (83, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Operation;
-        /* CIF input (1342, 381), (95, 35) */
+        /* CIF input (1341, 381), (95, 35) */
         input done(myval);
-            /* CIF decision (1308, 436), (164, 50) */
+            /* CIF decision (1307, 436), (164, 50) */
             decision myval > test_param * 10;
                 /* CIF ANSWER (1277, 506), (70, 23) */
                 (true):
@@ -44,5 +33,19 @@ process Controller;
                     /* CIF NEXTSTATE (1398, 659), (83, 35) */
                     NEXTSTATE Operation;
             enddecision;
+    endstate;
+    /* CIF state (1083, 334), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
+        /* CIF input (1051, 389), (121, 35) */
+        input test(test_param);
+            /* CIF output (1077, 444), (70, 35) */
+            output reset;
+            /* CIF task (1071, 499), (81, 35) */
+            task myval := 0;
+            /* CIF output (1064, 549), (95, 35) */
+            output work(myval);
+            /* CIF NEXTSTATE (1070, 599), (83, 35) */
+            NEXTSTATE Operation;
     endstate;
 endprocess Controller;

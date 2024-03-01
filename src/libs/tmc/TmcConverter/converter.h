@@ -280,6 +280,7 @@ private Q_SLOTS:
     void processStderrReady();
     void processStdoutReady();
     void processStarted();
+    void processError(QProcess::ProcessError error);
     void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void timeout();
     void functionConversionFinished(bool success);

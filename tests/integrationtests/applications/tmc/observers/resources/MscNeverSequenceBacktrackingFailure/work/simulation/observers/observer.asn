@@ -11,7 +11,8 @@ Pinger-States ::= ENUMERATED {wait}
 Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
@@ -30,6 +31,7 @@ Ponger-Context ::= SEQUENCE {
    state Ponger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    counter MyInteger
 }
 
@@ -109,8 +111,11 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        clock,
+       
        pinger,
+       
        ponger,
+       
        
        env
    }
@@ -174,6 +179,7 @@ BEGIN
    }
    
    Pinger-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pong SEQUENCE {  },
@@ -185,6 +191,7 @@ BEGIN
    }
    
    Ponger-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          ping SEQUENCE {  }
@@ -252,6 +259,11 @@ BEGIN
 
       pinger  Pinger-Context,
       ponger  Ponger-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      clock
    }
 
 END

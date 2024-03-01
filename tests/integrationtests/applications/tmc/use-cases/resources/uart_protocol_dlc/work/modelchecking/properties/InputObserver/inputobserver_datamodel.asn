@@ -12,7 +12,7 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID-Range, PID FROM System-Dataview
-   Bcapp-Event, Bcdlct-Event, Channeleffects-Event, Demo-Timer-Manager-Event, Demo-Timer-Manager-Periodic-Events, Erroredchannel-Event, Rtapp-Event, Rtdlcr-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State FROM Simulation-DataView
+   Bcapp-Event, Bcdlct-Event, Channeleffects-Event, Demo-Timer-Manager-Event, Erroredchannel-Event, Rtapp-Event, Rtdlcr-Event, Observer-State-Kind, Function-Event, Named-Function-Event, Interface-Event, Observable-Event, Events-Ty, System-State, System-GUIs FROM Simulation-DataView
    TimerData, AggregateTimerData FROM Simulation-Timers-DataView;
 
 Inputobserver-States ::= ENUMERATED {wait, error}
@@ -20,28 +20,28 @@ Inputobserver-States ::= ENUMERATED {wait, error}
 Inputobserver-Context ::= SEQUENCE {
    state Inputobserver-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
-Inputobserver-Channeleffects-Event-Msg-Out-Selection  ::= ENUMERATED {corruptchar-present(1), dropchar-present(2)}
-Inputobserver-Channeleffects-Event-Selection  ::= ENUMERATED {msg-out-present(1)}
-Inputobserver-Erroredchannel-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), corruptchar-present(2), dropchar-present(3), phytxchar-present(4)}
-Inputobserver-Erroredchannel-Event-Msg-Out-Selection  ::= ENUMERATED {phyrxchar-present(1), phyrxerror-present(2), phytxerror-present(3)}
-Inputobserver-Erroredchannel-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
-Inputobserver-Bcapp-Event-Msg-Out-Selection  ::= ENUMERATED {dlctxreset-present(1), dlctxsdu-present(2)}
-Inputobserver-Bcapp-Event-Selection  ::= ENUMERATED {msg-out-present(1)}
-Inputobserver-Bcdlct-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), dlctxreset-present(2), dlctxsdu-present(3), phytxerror-present(4)}
-Inputobserver-Bcdlct-Event-Msg-Out-Selection  ::= ENUMERATED {phytxchar-present(1)}
-Inputobserver-Bcdlct-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
-Inputobserver-Rtapp-Event-Msg-In-Selection  ::= ENUMERATED {dlcrxerror-present(1), dlcrxsdu-present(2)}
-Inputobserver-Rtapp-Event-Msg-Out-Selection  ::= ENUMERATED {dlcrxreset-present(1)}
-Inputobserver-Rtapp-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
-Inputobserver-Rtdlcr-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), dlcrxreset-present(2), phyrxchar-present(3), phyrxerror-present(4), frametimer-present(5)}
-Inputobserver-Rtdlcr-Event-Msg-Out-Selection  ::= ENUMERATED {dlcrxerror-present(1), dlcrxsdu-present(2)}
-Inputobserver-Rtdlcr-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
-Inputobserver-Demo-Timer-Manager-Event-Msg-In-Selection  ::= ENUMERATED {input-none-present(1), tick-present(2)}
-Inputobserver-Demo-Timer-Manager-Event-Msg-Out-Selection  ::= ENUMERATED {rtdlcr-frametimer-present(1)}
-Inputobserver-Demo-Timer-Manager-Event-Selection  ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
-Inputobserver-Function-Event-Selection  ::= ENUMERATED {bcapp-present(1), bcdlct-present(2), channeleffects-present(3), env-present(4), erroredchannel-present(5), rtapp-present(6), rtdlcr-present(7)}
-Inputobserver-Observable-Event-Selection  ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
+Inputobserver-Demo-Timer-Manager-Event-Msg-Out-Selection ::= ENUMERATED {rtdlcr-frametimer-present(1), rtdlcr-frametimer-reset-present(2), rtdlcr-frametimer-set-present(3)}
+Inputobserver-Demo-Timer-Manager-Event-Selection ::= ENUMERATED {msg-out-present(1)}
+Inputobserver-Channeleffects-Event-Msg-Out-Selection ::= ENUMERATED {corruptchar-present(1), dropchar-present(2)}
+Inputobserver-Channeleffects-Event-Selection ::= ENUMERATED {msg-out-present(1)}
+Inputobserver-Erroredchannel-Event-Msg-In-Selection ::= ENUMERATED {input-none-present(1), corruptchar-present(2), dropchar-present(3), phytxchar-present(4)}
+Inputobserver-Erroredchannel-Event-Msg-Out-Selection ::= ENUMERATED {phyrxchar-present(1), phyrxerror-present(2), phytxerror-present(3)}
+Inputobserver-Erroredchannel-Event-Selection ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Bcapp-Event-Msg-Out-Selection ::= ENUMERATED {dlctxreset-present(1), dlctxsdu-present(2)}
+Inputobserver-Bcapp-Event-Selection ::= ENUMERATED {msg-out-present(1)}
+Inputobserver-Bcdlct-Event-Msg-In-Selection ::= ENUMERATED {input-none-present(1), dlctxreset-present(2), dlctxsdu-present(3), phytxerror-present(4)}
+Inputobserver-Bcdlct-Event-Msg-Out-Selection ::= ENUMERATED {phytxchar-present(1)}
+Inputobserver-Bcdlct-Event-Selection ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Rtapp-Event-Msg-In-Selection ::= ENUMERATED {dlcrxerror-present(1), dlcrxsdu-present(2)}
+Inputobserver-Rtapp-Event-Msg-Out-Selection ::= ENUMERATED {dlcrxreset-present(1)}
+Inputobserver-Rtapp-Event-Selection ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Rtdlcr-Event-Msg-In-Selection ::= ENUMERATED {input-none-present(1), dlcrxreset-present(2), phyrxchar-present(3), phyrxerror-present(4), frametimer-present(5)}
+Inputobserver-Rtdlcr-Event-Msg-Out-Selection ::= ENUMERATED {dlcrxerror-present(1), dlcrxsdu-present(2)}
+Inputobserver-Rtdlcr-Event-Selection ::= ENUMERATED {msg-in-present(1), msg-out-present(2)}
+Inputobserver-Function-Event-Selection ::= ENUMERATED {bcapp-present(1), bcdlct-present(2), channeleffects-present(3), demo-timer-manager-present(4), erroredchannel-present(5), rtapp-present(6), rtdlcr-present(7)}
+Inputobserver-Observable-Event-Selection ::= ENUMERATED {no-event-present(1), system-startup-present(2), input-event-present(3), output-event-present(4), unhandled-input-present(5)}
 END

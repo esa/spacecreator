@@ -1,5 +1,6 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Controller;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (446, 149), (267, 140) */
     -- Text area for declarations and comments
     
@@ -8,39 +9,17 @@ process Controller;
     dcl param_unprotected_x MyInteger;
     dcl param_unprotected_y MyInteger;
     /* CIF ENDTEXT */
-    /* CIF START (329, 21), (70, 35) */
+    /* CIF START (344, 23), (70, 35) */
     START;
-        /* CIF NEXTSTATE (329, 71), (70, 35) */
+        /* CIF NEXTSTATE (344, 73), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (983, 14), (70, 35) */
-    state Wait;
-        /* CIF input (983, 69), (70, 35) */
-        input test;
-            /* CIF task (920, 124), (195, 68) */
-            task param_protected_x := 101,
-param_protected_y := 102,
-param_unprotected_x := 103,
-param_unprotected_y := 104;
-            /* CIF PROCEDURECALL (819, 212), (396, 35) */
-            call testUnprotected(param_unprotected_x, param_unprotected_y);
-            /* CIF decision (833, 267), (368, 50) */
-            decision param_unprotected_y >= 0 and param_unprotected_y <= 2;
-                /* CIF ANSWER (938, 337), (70, 23) */
-                (true):
-                    /* CIF NEXTSTATE (919, 380), (106, 35) */
-                    NEXTSTATE TestProtected;
-                /* CIF ANSWER (1028, 337), (70, 23) */
-                (false):
-                    /* CIF NEXTSTATE (1028, 380), (70, 35) */
-                    NEXTSTATE Error;
-            enddecision;
-    endstate;
-    /* CIF state (1409, 17), (106, 35) */
+    /* CIF state (1407, 17), (106, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state TestProtected;
         /* CIF input (1430, 72), (70, 35) */
         input test;
             /* CIF PROCEDURECALL (1289, 127), (350, 35) */
-            call testProtected(param_protected_x, param_protected_y);
+            call testprotected(param_protected_x, param_protected_y);
             /* CIF decision (1295, 182), (338, 50) */
             decision param_protected_y >= 0 and param_protected_y <= 2;
                 /* CIF ANSWER (1475, 252), (70, 23) */
@@ -53,10 +32,36 @@ param_unprotected_y := 104;
                     NEXTSTATE Finished;
             enddecision;
     endstate;
+    /* CIF state (983, 14), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
+        /* CIF input (983, 69), (70, 35) */
+        input test;
+            /* CIF task (920, 124), (195, 68) */
+            task param_protected_x := 101,
+param_protected_y := 102,
+param_unprotected_x := 103,
+param_unprotected_y := 104;
+            /* CIF PROCEDURECALL (820, 212), (395, 35) */
+            call testunprotected(param_unprotected_x, param_unprotected_y);
+            /* CIF decision (833, 267), (368, 50) */
+            decision param_unprotected_y >= 0 and param_unprotected_y <= 2;
+                /* CIF ANSWER (938, 337), (70, 23) */
+                (true):
+                    /* CIF NEXTSTATE (919, 380), (106, 35) */
+                    NEXTSTATE TestProtected;
+                /* CIF ANSWER (1028, 337), (70, 23) */
+                (false):
+                    /* CIF NEXTSTATE (1028, 380), (70, 35) */
+                    NEXTSTATE Error;
+            enddecision;
+    endstate;
     /* CIF state (413, 324), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Error;
     endstate;
-    /* CIF state (312, 323), (72, 35) */
+    /* CIF state (310, 323), (72, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Finished;
     endstate;
 endprocess Controller;

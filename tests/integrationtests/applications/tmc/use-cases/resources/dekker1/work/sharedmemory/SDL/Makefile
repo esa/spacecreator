@@ -1,4 +1,6 @@
-# SDL
+#Taste::Instances_Max 1
+#Taste::Instances_Min 1
+#Taste::Startup_Priority 1
 SEDS_CONVERTER?=spacecreator.AppImage --sedsconverter
 OPENGEODE?=opengeode
 VISUAL?=kate
@@ -18,7 +20,7 @@ sdl-to-if:
 # Ada
 generate-code:
 	mkdir -p code && cd code && \
-	   $(OPENGEODE) --taste --toAda ../src/sharedmemory.pr ../src/system_structure.pr && \
+	   $(OPENGEODE) --taste --simu --toAda ../src/sharedmemory.pr ../src/system_structure.pr && \
 	   mv *.gpr ..
 
 compile-linux: generate-code

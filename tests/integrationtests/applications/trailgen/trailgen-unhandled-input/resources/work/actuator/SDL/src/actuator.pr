@@ -1,5 +1,6 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Actuator;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (401, 337), (267, 140) */
     -- Text area for declarations and comments
     
@@ -9,25 +10,28 @@ process Actuator;
     START;
         /* CIF NEXTSTATE (363, 90), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (933, 57), (70, 35) */
-    state Busy;
-        /* CIF input (928, 112), (79, 35) */
-        input ping(wrk);
-            /* CIF output (933, 167), (70, 35) */
-            output pong(3);
-            /* CIF NEXTSTATE (929, 222), (77, 35) */
-            NEXTSTATE Detected;
+    /* CIF state (1241, 87), (77, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Detected;
     endstate;
-    /* CIF state (645, 29), (70, 35) */
+    /* CIF state (650, 51), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (640, 84), (79, 35) */
+        /* CIF input (644, 106), (79, 35) */
         input ping(wrk);
-            /* CIF output (645, 139), (70, 35) */
+            /* CIF output (649, 161), (70, 35) */
             output pong(0);
-            /* CIF NEXTSTATE (645, 194), (70, 35) */
+            /* CIF NEXTSTATE (649, 216), (70, 35) */
             NEXTSTATE Busy;
     endstate;
-    /* CIF state (1242, 87), (77, 35) */
-    state Detected;
+    /* CIF state (933, 57), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Busy;
+        /* CIF input (927, 112), (79, 35) */
+        input ping(wrk);
+            /* CIF output (932, 167), (70, 35) */
+            output pong(3);
+            /* CIF NEXTSTATE (928, 222), (77, 35) */
+            NEXTSTATE Detected;
     endstate;
 endprocess Actuator;

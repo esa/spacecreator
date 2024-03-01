@@ -9,12 +9,13 @@ IMPORTS
    MyInteger FROM UART-PROTOCOL-DLC-DATAVIEW
    PID-Range, PID FROM System-Dataview;
 
-Erroredchannel-States ::= ENUMERATED {idle, corrupt, drop}
+Erroredchannel-States ::= ENUMERATED {idle, drop, corrupt}
 
 Erroredchannel-Context ::= SEQUENCE {
    state Erroredchannel-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    corruption UINT8,
    txchar UINT8
 }

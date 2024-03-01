@@ -1,6 +1,7 @@
 /* CIF PROCESS (250, 148), (150, 75) */
 process Controller;
-    /* CIF TEXT (506, 363), (203, 140) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (522, 362), (203, 140) */
     dcl parameterless1 MyInteger;
     dcl parameterless2 MyInteger;
     
@@ -10,55 +11,10 @@ process Controller;
     dcl finished MyInteger;
     dcl error MyInteger;
     /* CIF ENDTEXT */
-    /* CIF procedure (552, 642), (137, 35) */
-    procedure test_parameterless;
-        /* CIF TEXT (178, 410), (267, 140) */
-        -- Text area for declarations and comments
-        
-        dcl source PID;
-        /* CIF ENDTEXT */
-        /* CIF START (891, 555), (70, 35) */
-        START;
-            /* CIF PROCEDURECALL (857, 610), (137, 35) */
-            call get_sender(source);
-            /* CIF decision (858, 665), (135, 50) */
-            decision parameterless1 = 1;
-                /* CIF ANSWER (776, 735), (70, 23) */
-                (false):
-                    /* CIF decision (743, 778), (134, 50) */
-                    decision source = Actuator1;
-                        /* CIF ANSWER (849, 848), (70, 23) */
-                        (false):
-                            /* CIF task (845, 891), (76, 35) */
-                            task error := 1;
-                        /* CIF ANSWER (731, 848), (70, 23) */
-                        (true):
-                            /* CIF task (696, 891), (138, 35) */
-                            task parameterless1 := 1;
-                            /* CIF output (730, 941), (71, 35) */
-                            output trigger2;
-                    enddecision;
-                /* CIF ANSWER (1013, 735), (70, 23) */
-                (true):
-                    /* CIF decision (980, 778), (134, 50) */
-                    decision source = Actuator2;
-                        /* CIF ANSWER (1087, 848), (70, 23) */
-                        (false):
-                            /* CIF task (1083, 891), (76, 35) */
-                            task error := 1;
-                        /* CIF ANSWER (968, 848), (70, 23) */
-                        (true):
-                            /* CIF task (933, 891), (138, 35) */
-                            task parameterless2 := 1;
-                            /* CIF output (967, 941), (71, 35) */
-                            output trigger1;
-                    enddecision;
-            enddecision;
-            /* CIF return (908, 1007), (35, 35) */
-            return ;
-    endprocedure;
-    /* CIF procedure (987, 661), (114, 35) */
+    /* CIF procedure (986, 661), (114, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     procedure test_parameter;
+        /* CIF Keep Specific Geode Partition 'default' */
         /* CIF TEXT (103, 135), (267, 140) */
         -- Text area for declarations and comments
         fpar in p1 MyInteger;
@@ -105,19 +61,71 @@ process Controller;
             /* CIF return (724, 608), (35, 35) */
             return ;
     endprocedure;
-    /* CIF START (1099, 276), (70, 35) */
+    /* CIF procedure (551, 642), (137, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    procedure test_parameterless;
+        /* CIF Keep Specific Geode Partition 'default' */
+        /* CIF TEXT (178, 410), (267, 140) */
+        -- Text area for declarations and comments
+        
+        dcl source PID;
+        /* CIF ENDTEXT */
+        /* CIF START (891, 555), (70, 35) */
+        START;
+            /* CIF PROCEDURECALL (857, 610), (137, 35) */
+            call get_sender(source);
+            /* CIF decision (858, 665), (135, 50) */
+            decision parameterless1 = 1;
+                /* CIF ANSWER (776, 735), (70, 23) */
+                (false):
+                    /* CIF decision (743, 778), (134, 50) */
+                    decision source = Actuator1;
+                        /* CIF ANSWER (849, 848), (70, 23) */
+                        (false):
+                            /* CIF task (845, 891), (76, 35) */
+                            task error := 1;
+                        /* CIF ANSWER (731, 848), (70, 23) */
+                        (true):
+                            /* CIF task (696, 891), (138, 35) */
+                            task parameterless1 := 1;
+                            /* CIF output (730, 941), (71, 35) */
+                            output trigger2;
+                    enddecision;
+                /* CIF ANSWER (1013, 735), (70, 23) */
+                (true):
+                    /* CIF decision (980, 778), (134, 50) */
+                    decision source = Actuator2;
+                        /* CIF ANSWER (1087, 848), (70, 23) */
+                        (false):
+                            /* CIF task (1083, 891), (76, 35) */
+                            task error := 1;
+                        /* CIF ANSWER (968, 848), (70, 23) */
+                        (true):
+                            /* CIF task (933, 891), (138, 35) */
+                            task parameterless2 := 1;
+                            /* CIF output (967, 941), (71, 35) */
+                            output trigger1;
+                    enddecision;
+            enddecision;
+            /* CIF return (908, 1007), (35, 35) */
+            return ;
+    endprocedure;
+    /* CIF START (1077, 278), (70, 35) */
     START;
-        /* CIF output (1098, 331), (71, 35) */
+        /* CIF output (1076, 333), (71, 35) */
         output trigger1;
-        /* CIF NEXTSTATE (1099, 381), (70, 35) */
+        /* CIF NEXTSTATE (1077, 383), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (1401, 258), (70, 35) */
-    state Wait;
+    /* CIF state (769, 53), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Error;
     endstate;
-    /* CIF state (744, 113), (72, 35) */
+    /* CIF state (743, 113), (72, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Finished;
     endstate;
-    /* CIF state (769, 53), (70, 35) */
-    state Error;
+    /* CIF state (1401, 258), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
     endstate;
 endprocess Controller;

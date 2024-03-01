@@ -1,0 +1,6 @@
+{# This template is for test purposes only #}
+<ConnectionGroups>
+{% for conngroups in ConnectionGroups %}
+    {% include "connectiongroup.tmplt" %}
+{% endfor %}
+</ConnectionGroups>

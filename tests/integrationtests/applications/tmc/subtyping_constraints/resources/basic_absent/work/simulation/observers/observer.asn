@@ -4,18 +4,19 @@ BEGIN
 IMPORTS
    MyInteger, MySeq, MyChoice FROM BASIC-ABSENT-DATAVIEW
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
-   PID FROM System-Dataview;
+   PID-Range, PID FROM System-Dataview;
 
-Function-2-States ::= ENUMERATED {wait, incorrect}
+Function-2-States ::= ENUMERATED {incorrect, wait}
 
 Function-2-Context ::= SEQUENCE {
    state Function-2-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    myvar MySeq
 }
 
-Function-2-Mychoice-Selection  ::= ENUMERATED {a-present(1), b-present(2)}
+Function-2-Mychoice-Selection ::= ENUMERATED {a-present(1), b-present(2)}
 END
 
 BASIC-ABSENT-DATAVIEW DEFINITIONS ::=
@@ -68,7 +69,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        function-1,
+       
        function-2,
+       
        
        env
    }
@@ -110,6 +113,7 @@ BEGIN
    
    
    Function-1-Event ::= CHOICE {
+      -- Lang: GUI TRUE FALSE
       msg-in CHOICE {
          pi-2 SEQUENCE { p1 MyChoice}
       },
@@ -119,6 +123,7 @@ BEGIN
    }
    
    Function-2-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pi-1 SEQUENCE { p1 MySeq}
@@ -182,6 +187,11 @@ BEGIN
       function-2-queue Events-Ty (SIZE (0 .. function-2-queue-size)),
 
       function-2  Function-2-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      function-1
    }
 
 END

@@ -52,6 +52,7 @@ namespace dve {
 class DVAppModel;
 class DVExporter;
 
+
 class DVEditorCore : public shared::EditorCore
 {
     Q_OBJECT

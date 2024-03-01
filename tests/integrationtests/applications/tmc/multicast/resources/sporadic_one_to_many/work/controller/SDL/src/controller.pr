@@ -6,67 +6,76 @@ process Controller;
         output test_parameterless;
         /* CIF NEXTSTATE (622, 317), (181, 35) */
         NEXTSTATE CheckParameterless1And2;
-    /* CIF state (1059, 487), (158, 35) */
-    state CheckParameter1And2;
-        /* CIF input (1098, 542), (80, 35) */
-        input received1;
-            /* CIF NEXTSTATE (1075, 597), (127, 35) */
-            NEXTSTATE CheckParameter2;
-    endstate;
-    /* CIF state (1344, 241), (150, 35) */
-    state CheckParameterless1;
-        /* CIF input (1379, 296), (80, 35) */
-        input received1;
-            /* CIF output (1354, 351), (130, 35) */
+    /* CIF state (1062, 240), (150, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state CheckParameterless2;
+        /* CIF input (1097, 295), (80, 35) */
+        input received2;
+            /* CIF output (1072, 350), (130, 35) */
             output test_parameter(2);
-            /* CIF NEXTSTATE (1340, 406), (158, 35) */
+            /* CIF NEXTSTATE (1058, 405), (158, 35) */
             NEXTSTATE CheckParameter1And2;
     endstate;
-    /* CIF state (1342, 479), (158, 35) */
-    state CheckParameter1And2;
-        /* CIF input (1381, 534), (80, 35) */
-        input received2;
-            /* CIF NEXTSTATE (1358, 589), (127, 35) */
-            NEXTSTATE CheckParameter1;
-    endstate;
-    /* CIF state (1319, 54), (181, 35) */
-    state CheckParameterless1And2;
-        /* CIF input (1369, 109), (80, 35) */
-        input received2;
-            /* CIF NEXTSTATE (1334, 164), (150, 35) */
-            NEXTSTATE CheckParameterless1;
-    endstate;
-    /* CIF state (1045, 53), (181, 35) */
-    state CheckParameterless1And2;
-        /* CIF input (1095, 108), (80, 35) */
-        input received1;
-            /* CIF NEXTSTATE (1060, 163), (150, 35) */
-            NEXTSTATE CheckParameterless2;
-    endstate;
-    /* CIF state (1367, 682), (127, 35) */
-    state CheckParameter1;
-        /* CIF input (1390, 737), (80, 35) */
-        input received1;
-            /* CIF NEXTSTATE (1394, 792), (72, 35) */
-            NEXTSTATE Finished;
-    endstate;
-    /* CIF state (1064, 687), (127, 35) */
-    state CheckParameter2;
-        /* CIF input (1087, 742), (80, 35) */
-        input received2;
-            /* CIF NEXTSTATE (1091, 797), (72, 35) */
-            NEXTSTATE Finished;
-    endstate;
-    /* CIF state (572, 501), (72, 35) */
+    /* CIF state (571, 501), (72, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Finished;
     endstate;
-    /* CIF state (1063, 240), (150, 35) */
-    state CheckParameterless2;
-        /* CIF input (1098, 295), (80, 35) */
+    /* CIF state (1063, 687), (127, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state CheckParameter2;
+        /* CIF input (1086, 742), (80, 35) */
         input received2;
-            /* CIF output (1073, 350), (130, 35) */
+            /* CIF NEXTSTATE (1090, 797), (72, 35) */
+            NEXTSTATE Finished;
+    endstate;
+    /* CIF state (1366, 682), (127, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state CheckParameter1;
+        /* CIF input (1389, 737), (80, 35) */
+        input received1;
+            /* CIF NEXTSTATE (1393, 792), (72, 35) */
+            NEXTSTATE Finished;
+    endstate;
+    /* CIF state (1049, 59), (181, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state CheckParameterless1And2;
+        /* CIF input (1099, 114), (80, 35) */
+        input received1;
+            /* CIF NEXTSTATE (1064, 169), (150, 35) */
+            NEXTSTATE CheckParameterless2;
+    endstate;
+    /* CIF state (1318, 54), (181, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state CheckParameterless1And2;
+        /* CIF input (1368, 109), (80, 35) */
+        input received2;
+            /* CIF NEXTSTATE (1333, 164), (150, 35) */
+            NEXTSTATE CheckParameterless1;
+    endstate;
+    /* CIF state (1341, 479), (158, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state CheckParameter1And2;
+        /* CIF input (1380, 534), (80, 35) */
+        input received2;
+            /* CIF NEXTSTATE (1357, 589), (127, 35) */
+            NEXTSTATE CheckParameter1;
+    endstate;
+    /* CIF state (1343, 241), (150, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state CheckParameterless1;
+        /* CIF input (1378, 296), (80, 35) */
+        input received1;
+            /* CIF output (1353, 351), (130, 35) */
             output test_parameter(2);
-            /* CIF NEXTSTATE (1059, 405), (158, 35) */
+            /* CIF NEXTSTATE (1339, 406), (158, 35) */
             NEXTSTATE CheckParameter1And2;
+    endstate;
+    /* CIF state (1058, 487), (158, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state CheckParameter1And2;
+        /* CIF input (1097, 542), (80, 35) */
+        input received1;
+            /* CIF NEXTSTATE (1074, 597), (127, 35) */
+            NEXTSTATE CheckParameter2;
     endstate;
 endprocess Controller;

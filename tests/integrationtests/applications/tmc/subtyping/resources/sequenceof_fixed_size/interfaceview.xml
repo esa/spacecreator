@@ -1,9 +1,7 @@
-<InterfaceView asn1file="sequenceof_subtypes.asn">
-<Function name="TheThing" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="69700 36600 89700 44600"/>
-<Provided_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" miat="0" queue_size="1" priority="1">
+<InterfaceView version="1.2" asn1file="/home/taste/tool-inst/share/taste-types/taste-types.asn" UiFile="interfaceview.ui.xml">
+<Function id="{252e038a-4473-44a6-b8b8-fde1fb55c349}" name="TheThing" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" instances_min="1" startup_priority="1" instances_max="1">
+<Provided_Interface id="{807b7426-ae65-4992-b4a6-199d75071375}" name="Tick" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
     <Input_Parameter name="arg" type="MyArray" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="69700 40400"/>
 </Provided_Interface>
 
     <Implementations>
@@ -11,11 +9,9 @@
     </Implementations>
 </Function>
 
-<Function name="Clk" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
-    <Property name="Taste::coordinates" value="32200 36500 52200 44500"/>
-<Required_Interface name="Tick" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" wcet="0" miat="0" queue_size="1" priority="1">
+<Function id="{b42dd513-57ca-43f9-99ae-d20900a42c33}" name="Clk" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" instances_min="1" startup_priority="1" instances_max="1">
+<Required_Interface id="{9fcbefa9-d3ed-4e91-95d0-4b90367802e1}" name="Tick" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
     <Input_Parameter name="arg" type="MyArray" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="52200 40700"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
@@ -25,12 +21,11 @@
     </Implementations>
 </Function>
 
-<Connection  required_system_element="NO">
-    <Source func_name="Clk" ri_name="Tick"/>
-    <Target func_name="TheThing" pi_name="Tick"/>
-    <Property name="Taste::coordinates" value="52800 40700 61100 40700 69400 40400"/>
+<Connection id="{9a9ae98f-f0c9-43bd-8f37-76134ad4bd69}" required_system_element="NO">
+    <Source func_name="Clk" ri_name="Tick" />
+    <Target func_name="TheThing" pi_name="Tick" />
 </Connection>
 
-<Layer name="default"/>
+<Layer name="default" is_visible="true"/>
 
 </InterfaceView>

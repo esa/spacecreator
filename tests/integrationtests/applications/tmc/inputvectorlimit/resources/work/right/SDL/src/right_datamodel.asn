@@ -12,6 +12,7 @@ Right-Context ::= SEQUENCE {
    state Right-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    rightarg MyInteger,
    rightval MyInteger
 }

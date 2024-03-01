@@ -1,6 +1,7 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Receiver;
-    /* CIF TEXT (1334, 60), (296, 143) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    /* CIF TEXT (1334, 60), (296, 140) */
     -- Text area for declarations and comments
     
     dcl choiceArg MyBetterChoice;
@@ -11,15 +12,16 @@ process Receiver;
     START;
         /* CIF NEXTSTATE (437, 67), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (600, 20), (70, 35) */
+    /* CIF state (613, 20), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (528, 75), (213, 43) */
-        input ChoiceInterface(choiceArg) ;
-            /* CIF task (550, 138), (169, 35) */
+        /* CIF input (555, 75), (183, 35) */
+        input ChoiceInterface(choiceArg);
+            /* CIF task (562, 130), (169, 35) */
             task choiceValue := choiceArg;
-            /* CIF task (558, 193), (153, 35) */
+            /* CIF task (570, 185), (153, 35) */
             task choiceHandled := true;
-            /* CIF NEXTSTATE (600, 248), (70, 35) */
+            /* CIF NEXTSTATE (612, 240), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Receiver;

@@ -1,20 +1,17 @@
-<InterfaceView asn1file="taste-types.asn">
-<Function name="actuator" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
-    <Property name="Taste::coordinates" value="11000 11800 38700 40900"/>
-<Provided_Interface name="TestProtected" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+<InterfaceView version="1.2" asn1file="externalproc.acn" UiFile="interfaceview.ui.xml">
+<Function id="{ea37b171-da5b-4769-aa2d-d30c0f3f3eec}" name="actuator" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" FPGA_Configurations="" instances_min="1" startup_priority="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{ef04703a-96a1-4634-b148-cd00193c134f}" name="testprotected" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="x" type="MyInteger" encoding="NATIVE"/>
     <Output_Parameter name="y" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="38700 33600"/>
 </Provided_Interface>
 
-<Provided_Interface name="TestUnprotected" kind="Unprotected" layer="default" required_system_element="NO" wcet="0">
+<Provided_Interface id="{96cacddb-2073-47ac-88ea-e8b198d2b75a}" name="testunprotected" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" is_observable="false" wcet="0" is_alarm="false">
     <Input_Parameter name="x" type="MyInteger" encoding="NATIVE"/>
     <Output_Parameter name="y" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="38700 20500"/>
 </Provided_Interface>
 
-<Required_Interface name="Test" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" queue_size="1" priority="1">
-    <Property name="Taste::coordinates" value="38700 27200"/>
+<Required_Interface id="{0adc17f4-0802-4451-bc17-8749b1f2f2a8}" name="Test" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" wcet="0" stack_size="1024" priority="1" queue_size="1">
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
@@ -24,24 +21,21 @@
     </Implementations>
 </Function>
 
-<Function name="controller" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" FPGA_Configurations="" startup_priority="1">
-    <Property name="Taste::coordinates" value="63500 12200 91800 44300"/>
-<Provided_Interface name="Test" kind="Sporadic" layer="default" required_system_element="NO" stack_size="1024" miat="0" wcet="0" queue_size="1" priority="1">
-    <Property name="Taste::coordinates" value="63500 27200"/>
+<Function id="{fe4e9ad8-6f82-4583-bc74-544cfd613d61}" name="controller" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" FPGA_Configurations="" instances_min="1" startup_priority="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{60f3d06a-6526-4520-90a5-bf2684d2c00f}" name="Test" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" miat="0" wcet="0" stack_size="1024" priority="1" queue_size="1">
 </Provided_Interface>
 
-<Required_Interface name="TestProtected" kind="Protected" layer="default" required_system_element="NO" wcet="0">
+<Required_Interface id="{d38d9613-a234-441b-b7f0-5431932f8e1a}" name="testprotected" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="x" type="MyInteger" encoding="NATIVE"/>
     <Output_Parameter name="y" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="63500 33500"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
 
-<Required_Interface name="TestUnprotected" kind="Unprotected" layer="default" required_system_element="NO" wcet="0">
+<Required_Interface id="{fd3fecfc-fc80-4197-a503-838abcc48d3b}" name="testunprotected" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" is_observable="false" wcet="0" is_alarm="false">
     <Input_Parameter name="x" type="MyInteger" encoding="NATIVE"/>
     <Output_Parameter name="y" type="MyInteger" encoding="NATIVE"/>
-    <Property name="Taste::coordinates" value="63500 20500"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
@@ -51,24 +45,21 @@
     </Implementations>
 </Function>
 
-<Connection  required_system_element="NO">
-    <Source func_name="actuator" ri_name="Test"/>
-    <Target func_name="controller" pi_name="Test"/>
-    <Property name="Taste::coordinates" value="39300 27200 63200 27200"/>
+<Connection id="{69338759-a91e-4748-ac4e-81343da46261}" name="controller_testprotected____actuator_testprotected" required_system_element="NO">
+    <Source func_name="controller" ri_name="testprotected" />
+    <Target func_name="actuator" pi_name="testprotected" />
 </Connection>
 
-<Connection  required_system_element="NO">
-    <Source func_name="controller" ri_name="TestProtected"/>
-    <Target func_name="actuator" pi_name="TestProtected"/>
-    <Property name="Taste::coordinates" value="62900 33500 39000 33600"/>
+<Connection id="{479e8744-dcf7-4967-aa10-6cbd8d3d0c60}" required_system_element="NO">
+    <Source func_name="actuator" ri_name="Test" />
+    <Target func_name="controller" pi_name="Test" />
 </Connection>
 
-<Connection  required_system_element="NO">
-    <Source func_name="controller" ri_name="TestUnprotected"/>
-    <Target func_name="actuator" pi_name="TestUnprotected"/>
-    <Property name="Taste::coordinates" value="62900 20500 39000 20500"/>
+<Connection id="{ba35d4a3-1e94-4522-96a0-f2fa010cc436}" name="controller_testunprotected____actuator_testunprotected" required_system_element="NO">
+    <Source func_name="controller" ri_name="testunprotected" />
+    <Target func_name="actuator" pi_name="testunprotected" />
 </Connection>
 
-<Layer name="default"/>
+<Layer name="default" is_visible="true"/>
 
 </InterfaceView>

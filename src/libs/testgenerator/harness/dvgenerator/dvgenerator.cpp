@@ -53,9 +53,11 @@ auto DvGenerator::generate(const std::vector<ivm::IVFunction *> &functionsToBind
     auto model = std::make_unique<dvm::DVModel>();
 
     const QVector<dvm::DVObject *> loadedLib = getAllHwObjectsFromLib();
+    assert(loadedLib.size() > 0);
     const QVector<dvm::DVObject *> selectedObjects = getSelectedHwObjects(loadedLib, hw);
-
+    assert(selectedObjects.size() > 0);
     dvm::DVNode *const node = makeNodeAndAddToModel(nodeTitle, nodeLabel, model.get(), getBoard(selectedObjects));
+    assert(node != NULL);
     makePartitionAndAddToNode(hostPartitionName, model.get(), node);
 
     std::for_each(functionsToBind.begin(), functionsToBind.end(),

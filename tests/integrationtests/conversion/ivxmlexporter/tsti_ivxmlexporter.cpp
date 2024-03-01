@@ -29,7 +29,6 @@
 #include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
 #include <ivcore/ivpropertytemplateconfig.h>
-#include <libiveditor/iveditor.h>
 #include <memory>
 
 using conversion::Options;
@@ -56,7 +55,6 @@ private:
 void tsti_IvXmlExporter::initTestCase()
 {
     ivm::initIVLibrary();
-    ive::initIVEditor();
     m_config = IVPropertyTemplateConfig::instance();
     m_config->init("config.xml");
 }

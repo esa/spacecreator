@@ -12,6 +12,7 @@ Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    octetarg MyBetterOctetString,
    octetvalue MyBetterOctetString,
    octethandled T-Boolean

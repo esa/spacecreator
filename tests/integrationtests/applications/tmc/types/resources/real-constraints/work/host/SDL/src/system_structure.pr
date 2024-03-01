@@ -11,6 +11,11 @@ system Host;
    /* CIF Keep Specific Geode PARAMNAMES p1 */
    signal Pong (MyReal);
 
+   -- For internal use, return the PID of the caller
+   procedure get_sender;
+      fpar out sender PID;
+   external;
+
    channel c
       from env to Host with Ping;
       from Host to env with Pong;

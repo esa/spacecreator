@@ -12,8 +12,9 @@ Function-2-Context ::= SEQUENCE {
    state Function-2-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    myvar MySeq
 }
 
-Function-2-Mychoice-Selection  ::= ENUMERATED {a-present(1), b-present(2)}
+Function-2-Mychoice-Selection ::= ENUMERATED {a-present(1), b-present(2)}
 END

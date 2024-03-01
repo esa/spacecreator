@@ -1,29 +1,25 @@
 /* CIF PROCESS (250, 150), (150, 75) */
 process Controller;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (150, 360), (267, 140) */
     -- Text area for declarations and comments
     
     dcl param MyReal;
     /* CIF ENDTEXT */
-    /* CIF START (320, 10), (70, 35) */
+    /* CIF START (323, 30), (70, 35) */
     START;
-        /* CIF task (303, 65), (102, 35) */
+        /* CIF task (306, 85), (102, 35) */
         task param := 5.25;
-        /* CIF output (307, 120), (94, 35) */
+        /* CIF output (310, 140), (94, 35) */
         output Ping(param);
-        /* CIF NEXTSTATE (320, 173), (70, 35) */
+        /* CIF NEXTSTATE (323, 193), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (715, 102), (70, 35) */
-    state Finish;
-    endstate;
-    /* CIF state (719, 156), (70, 35) */
-    state Failure;
-    endstate;
     /* CIF state (510, 85), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (494, 140), (98, 35) */
+        /* CIF input (493, 140), (98, 35) */
         input Pong(param);
-            /* CIF decision (434, 195), (218, 50) */
+            /* CIF decision (433, 195), (218, 50) */
             decision param > 10.49 and param < 10.51;
                 /* CIF ANSWER (465, 265), (70, 23) */
                 (true):
@@ -34,5 +30,13 @@ process Controller;
                     /* CIF NEXTSTATE (555, 308), (70, 35) */
                     NEXTSTATE Failure;
             enddecision;
+    endstate;
+    /* CIF state (719, 156), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Failure;
+    endstate;
+    /* CIF state (715, 102), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Finish;
     endstate;
 endprocess Controller;

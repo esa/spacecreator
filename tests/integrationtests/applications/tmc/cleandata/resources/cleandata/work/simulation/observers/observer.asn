@@ -11,7 +11,8 @@ Function-2-States ::= ENUMERATED {wait}
 Function-2-Context ::= SEQUENCE {
    state Function-2-States,
    init-done BOOLEAN,
-   sender PID
+   sender PID,
+   offspring PID
 }
 
 END
@@ -55,10 +56,37 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        function-1,
+       
        function-2,
+       
        
        env
    }
+
+END
+
+FUNCTION-1-SUBTYPE DEFINITIONS ::=
+BEGIN
+
+IMPORTS MyInteger FROM CLEANDATA-DATAVIEW
+
+
+MyInteger FROM CLEANDATA-DATAVIEW
+
+ ;
+
+
+
+
+Function-1-pi-2-p1 ::= MyInteger
+
+
+
+
+Function-1-pi-1-p1 ::= MyInteger
+
+
+
 
 END
 
@@ -97,6 +125,7 @@ BEGIN
    
    
    Function-1-Event ::= CHOICE {
+      -- Lang: GUI TRUE FALSE
       msg-in CHOICE {
          pi-2 SEQUENCE { p1 MyInteger}
       },
@@ -106,6 +135,7 @@ BEGIN
    }
    
    Function-2-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          pi-1 SEQUENCE { p1 MyInteger}
@@ -169,6 +199,11 @@ BEGIN
       function-2-queue Events-Ty (SIZE (0 .. function-2-queue-size)),
 
       function-2  Function-2-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      function-1
    }
 
 END

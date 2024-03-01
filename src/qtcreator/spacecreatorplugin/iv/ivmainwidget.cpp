@@ -72,6 +72,7 @@ void IVMainWidget::init()
     connect(m_plugin->actionToggleE2EView(), &QAction::triggered, this, &IVMainWidget::requestE2EDataflow);
     connect(m_plugin->actionLaunchModelCheckingWindow(), &QAction::triggered, this,
             &IVMainWidget::requestModelCheckingWindow);
+    connect(m_plugin->actionLaunchMBSEQualityModelCheckerWindow(),&QAction::triggered,this,&::spctr::IVMainWidget::requestMBSEQualityModelChekerWindow);
 
     m_plugin->setupMiniMap();
 }

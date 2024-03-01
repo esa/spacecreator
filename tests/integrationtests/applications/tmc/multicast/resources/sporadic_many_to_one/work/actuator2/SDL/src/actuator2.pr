@@ -4,22 +4,24 @@ process Actuator2;
     START;
         /* CIF NEXTSTATE (387, 110), (70, 35) */
         NEXTSTATE StateA;
-    /* CIF state (701, 53), (70, 35) */
-    state StateA;
-        /* CIF input (699, 108), (71, 35) */
+    /* CIF state (976, 63), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state StateB;
+        /* CIF input (973, 118), (71, 35) */
         input trigger2;
-            /* CIF output (666, 163), (137, 35) */
-            output test_parameterless;
-            /* CIF NEXTSTATE (700, 218), (70, 35) */
+            /* CIF output (944, 173), (130, 35) */
+            output test_parameter(3);
+            /* CIF NEXTSTATE (974, 228), (70, 35) */
             NEXTSTATE StateB;
     endstate;
-    /* CIF state (976, 63), (70, 35) */
-    state StateB;
-        /* CIF input (974, 118), (71, 35) */
+    /* CIF state (702, 71), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state StateA;
+        /* CIF input (699, 126), (71, 35) */
         input trigger2;
-            /* CIF output (945, 173), (130, 35) */
-            output test_parameter(3);
-            /* CIF NEXTSTATE (975, 228), (70, 35) */
+            /* CIF output (666, 181), (137, 35) */
+            output test_parameterless;
+            /* CIF NEXTSTATE (700, 236), (70, 35) */
             NEXTSTATE StateB;
     endstate;
 endprocess Actuator2;

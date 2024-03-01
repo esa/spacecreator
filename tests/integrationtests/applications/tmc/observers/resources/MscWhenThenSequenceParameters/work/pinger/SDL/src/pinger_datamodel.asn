@@ -12,9 +12,10 @@ Pinger-Context ::= SEQUENCE {
    state Pinger-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    value1 MySequence,
    value2 MySequence
 }
 
-Pinger-Mychoice-Selection  ::= ENUMERATED {small-present(1), big-present(2)}
+Pinger-Mychoice-Selection ::= ENUMERATED {small-present(1), big-present(2)}
 END

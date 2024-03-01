@@ -1,5 +1,6 @@
 /* CIF PROCESS (252, 149), (150, 75) */
 process Controller;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (670, 193), (267, 140) */
     -- Text area for declarations and comments
     
@@ -13,16 +14,18 @@ process Controller;
         output Ping(param);
         /* CIF NEXTSTATE (320, 271), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (503, 90), (70, 35) */
+    /* CIF state (504, 102), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (486, 157), (98, 35) */
+        /* CIF input (485, 169), (98, 35) */
         input Pong(param);
-            /* CIF task (452, 212), (167, 35) */
+            /* CIF task (451, 224), (167, 35) */
             task param := param + 1000.0;
-            /* CIF NEXTSTATE (497, 267), (77, 35) */
+            /* CIF NEXTSTATE (496, 279), (77, 35) */
             NEXTSTATE Overflow;
     endstate;
-    /* CIF state (694, 98), (77, 35) */
+    /* CIF state (692, 98), (77, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Overflow;
     endstate;
 endprocess Controller;

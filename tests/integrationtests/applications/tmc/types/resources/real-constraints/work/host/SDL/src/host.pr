@@ -1,5 +1,6 @@
 /* CIF PROCESS (251, 150), (150, 75) */
 process Host;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (851, 187), (267, 140) */
     -- Text area for declarations and comments
     dcl param MyReal;
@@ -8,13 +9,14 @@ process Host;
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (525, 28), (70, 35) */
+    /* CIF state (538, 29), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (511, 89), (94, 35) */
+        /* CIF input (522, 90), (94, 35) */
         input Ping(param);
-            /* CIF output (509, 152), (98, 35) */
+            /* CIF output (520, 153), (98, 35) */
             output Pong(param);
-            /* CIF NEXTSTATE (524, 207), (70, 35) */
+            /* CIF NEXTSTATE (535, 208), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Host;

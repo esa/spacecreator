@@ -1,22 +1,24 @@
-/* CIF PROCESS (250, 150), (150, 75) */
+/* CIF PROCESS (250, 149), (150, 75) */
 process Thething;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (631, 34), (267, 140) */
     -- Text area for declarations and comments
     
-    dcl arg MyOctoString;
+    dcl argx MyOctoString;
     dcl result MyOctoString;
     /* CIF ENDTEXT */
     /* CIF START (320, 10), (70, 35) */
     START;
         /* CIF NEXTSTATE (320, 60), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (451, 10), (70, 35) */
+    /* CIF state (493, 20), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Wait;
-        /* CIF input (447, 65), (74, 35) */
-        input Tick(arg);
-            /* CIF task (438, 120), (93, 35) */
-            task result := arg;
-            /* CIF NEXTSTATE (450, 175), (70, 35) */
+        /* CIF input (482, 75), (80, 35) */
+        input Tick(argx);
+            /* CIF task (473, 130), (99, 35) */
+            task result := argx;
+            /* CIF NEXTSTATE (488, 185), (70, 35) */
             NEXTSTATE Wait;
     endstate;
 endprocess Thething;

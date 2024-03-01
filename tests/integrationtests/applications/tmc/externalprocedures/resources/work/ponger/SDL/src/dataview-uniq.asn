@@ -35,8 +35,11 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        pinger,
+       
        ponger,
+       
        utils,
+       
        
        env
    }

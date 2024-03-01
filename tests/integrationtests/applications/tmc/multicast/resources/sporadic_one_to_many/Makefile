@@ -72,7 +72,7 @@ skeletons:
 
 work/skeletons_built:	InterfaceView.aadl DataView.aadl
 	$(KAZOO) --gw -o work
-	$(MAKE) -C work dataview
+	$(MAKE) -C work dataview simulink_skeletons
 	touch $@
 
 work/glue_simu:	InterfaceView.aadl DataView.aadl
@@ -132,5 +132,5 @@ clean:
 	find work -type f -path "*/QGenC/src/*.h" -not -name "simulink_definition_of_types.h" -not -name "*_invoke_ri.h" -exec rm -f {} + || :
 	find work -type f -path "*/QGenC/src/*.c" -exec rm -f {} + || :
 
-.PHONY: clean release debug coverage skeletons simu run
+.PHONY: clean release debug coverage skeletons simu run simulink_skeletons
 

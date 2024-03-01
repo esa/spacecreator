@@ -1346,6 +1346,7 @@ QVector<QAction *> IVAppWidget::initViewActions()
     m_viewActions.append(m_ivCore->actionExportFunctions());
     m_viewActions.append(m_ivCore->actionExportType());
     m_viewActions.append(m_ivCore->actionLaunchModelCheckingWindow());
+    m_viewActions.append(m_ivCore->actionLaunchMBSEQualityModelCheckerWindow());
 
     auto actionSaveSceneRender =
             new QAction(QIcon(QLatin1String(":/toolbar/icns/render.svg")), tr("Render Scene..."), this);

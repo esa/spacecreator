@@ -307,22 +307,22 @@ ObserverAttachments IvToPromelaTranslator::getObserverAttachments(IvToPromelaTra
 
             const IVInterface *i = findRequiredInterface(context.ivModel(), fromFunction, attachment.interface());
             if (i == nullptr) {
-                throw TranslationException("No inteface");
-            }
-            const QVector<IVConnection *> connections = context.ivModel()->getConnectionsForIface(i->id());
-
-            // check possible connection
-            for (const IVConnection *connection : connections) {
-                if (connection != nullptr && function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
-                        && interface.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0) {
-                    result.push_back(attachment);
-                }
                 // special case for the timers, when the interface name contains both function name and timer name
-                else if (function.compare(toFunction, Qt::CaseInsensitive) == 0
+                if (function.compare(toFunction, Qt::CaseInsensitive) == 0
                         && attachment.interface().compare(
                                    QString("%1_%2").arg(function).arg(interface), Qt::CaseInsensitive)
                                 == 0) {
                     result.push_back(attachment);
+                }
+            } else {
+                const QVector<IVConnection *> connections = context.ivModel()->getConnectionsForIface(i->id());
+
+                // check possible connection
+                for (const IVConnection *connection : connections) {
+                    if (function.compare(connection->targetName(), Qt::CaseInsensitive) == 0
+                            && interface.compare(connection->targetInterfaceName(), Qt::CaseInsensitive) == 0) {
+                        result.push_back(attachment);
+                    }
                 }
             }
         }
@@ -566,13 +566,17 @@ void IvToPromelaTranslator::prepareSporadicCallInfo(IvToPromelaTranslatorContext
 QString IvToPromelaTranslator::prepareCallInfo(RequiredCallInfo &info, IvToPromelaTranslatorContext &context,
         const QString &functionName, const ivm::IVInterface *requiredInterface) const
 {
-    QString inlineName =
-            QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
+    const QString interfaceName = requiredInterface->title();
+    QString inlineName;
+    if (requiredInterface->kind() == IVInterface::OperationKind::Sporadic) {
+        inlineName = QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
+    } else {
+        inlineName = QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName.toLower());
+    }
     info.m_name = inlineName;
     info.m_interfaceName = getInterfaceName(requiredInterface);
 
-    const QString parameterNamePrefix =
-            QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(requiredInterface->title());
+    const QString parameterNamePrefix = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
     for (const InterfaceParameter &interfaceParam : requiredInterface->params()) {
         RequiredCallInfo::ParameterInfo parameterInfo;
         parameterInfo.m_parameterType = interfaceParam.paramTypeName();
@@ -616,8 +620,15 @@ QString IvToPromelaTranslator::prepareCallInfo(RequiredCallInfo &info, IvToProme
             targetInfo.m_providedInlineName = QString();
         } else {
             targetInfo.m_isEnvironment = false;
-            targetInfo.m_providedInlineName =
-                    QString("%1_0_PI_0_%2").arg(Escaper::escapePromelaIV(targetFunctionName)).arg(targetInterfaceName);
+            if (requiredInterface->kind() == IVInterface::OperationKind::Sporadic) {
+                targetInfo.m_providedInlineName = QString("%1_0_PI_0_%2")
+                                                          .arg(Escaper::escapePromelaIV(targetFunctionName))
+                                                          .arg(targetInterfaceName);
+            } else {
+                targetInfo.m_providedInlineName = QString("%1_0_PI_0_%2")
+                                                          .arg(Escaper::escapePromelaIV(targetFunctionName))
+                                                          .arg(targetInterfaceName.toLower());
+            }
         }
         info.m_targets.emplace(targetFunctionName, targetInfo);
     }

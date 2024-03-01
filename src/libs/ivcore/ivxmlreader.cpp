@@ -149,6 +149,7 @@ struct IVXMLReaderPrivate {
                 m_connectionsById[connId] = conn;
         }
 
+
         if (IVConnectionLayerType *layer = m_currentObject.layer()) {
             m_layers.insert(layer->title(), layer);
         }

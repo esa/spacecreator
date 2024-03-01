@@ -1,5 +1,6 @@
 /* CIF PROCESS (250, 148), (150, 75) */
 process Actuator;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (393, 314), (267, 140) */
     -- Text area for declarations and comments
     
@@ -10,22 +11,14 @@ process Actuator;
     START;
         /* CIF NEXTSTATE (435, 132), (70, 35) */
         NEXTSTATE Wait;
-    /* CIF state (951, 296), (70, 35) */
-    state Wait;
-        /* CIF input (934, 351), (97, 35) */
-        input work(param);
-            /* CIF task (937, 406), (92, 35) */
-            task counter := 1;
-            /* CIF NEXTSTATE (948, 461), (70, 35) */
-            NEXTSTATE Work;
-    endstate;
     /* CIF state (1234, 295), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state Work;
-        /* CIF provided (1222, 350), (86, 35) */
+        /* CIF provided (1221, 350), (86, 35) */
         provided param /= 0;
-            /* CIF task (1170, 405), (190, 35) */
+            /* CIF task (1169, 405), (190, 35) */
             task counter := counter + counter;
-            /* CIF decision (1225, 460), (81, 50) */
+            /* CIF decision (1224, 460), (81, 50) */
             decision param = 1;
                 /* CIF ANSWER (1299, 530), (70, 23) */
                 (false):
@@ -42,5 +35,15 @@ process Actuator;
                     /* CIF NEXTSTATE (1167, 683), (70, 35) */
                     NEXTSTATE Wait;
             enddecision;
+    endstate;
+    /* CIF state (964, 288), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state Wait;
+        /* CIF input (946, 343), (97, 35) */
+        input work(param);
+            /* CIF task (949, 398), (92, 35) */
+            task counter := 1;
+            /* CIF NEXTSTATE (960, 453), (70, 35) */
+            NEXTSTATE Work;
     endstate;
 endprocess Actuator;

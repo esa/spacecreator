@@ -12,6 +12,7 @@ Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    seqarg MyBetterSequence,
    seqvalue MyBetterSequence,
    seqhandled T-Boolean
@@ -60,7 +61,9 @@ BEGIN
    -- List of functions (instances) present in the system
    PID ::= ENUMERATED {
        pinger,
+       
        receiver,
+       
        
        env
    }
@@ -127,6 +130,7 @@ BEGIN
    }
    
    Receiver-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          sequenceinterface SEQUENCE { seqarg MyBetterSequence}
@@ -187,6 +191,11 @@ BEGIN
       receiver-queue Events-Ty (SIZE (0 .. receiver-queue-size)),
 
       receiver  Receiver-Context
+   }
+
+   --  List the GUI functions (environment of the system being simulated)
+   System-GUIs ::= ENUMERATED {
+      pinger
    }
 
 END

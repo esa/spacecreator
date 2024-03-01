@@ -41,6 +41,7 @@ public:
 Q_SIGNALS:
     void requestE2EDataflow();
     void requestModelCheckingWindow();
+    void requestMBSEQualityModelChekerWindow();
 
 public Q_SLOTS:
     void setMinimapVisible(bool visible);

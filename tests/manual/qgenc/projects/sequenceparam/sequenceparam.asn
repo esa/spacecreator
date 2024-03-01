@@ -1,0 +1,14 @@
+SEQUENCEPARAM-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+    MyInteger ::= INTEGER (0 .. 10000)
+    MyReal ::= REAL (0.0 .. 1000.0)
+    MyBool ::= BOOLEAN
+
+    MySeq   ::= SEQUENCE {
+       intSeqElement  MyInteger,
+       realSeqElement MyReal,
+       boolSeqElement MyBool
+    }
+
+END

@@ -806,7 +806,9 @@ void IvToPromelaGenerator::createPromelaObjectsForTimers()
             if (!proctypeIter->second->m_isTimer) {
                 continue;
             }
-            const QString channelName = proctypeIter->second->m_queueName;
+            const QString channelName = proctypeIter->second->m_observers.empty()
+                    ? proctypeIter->second->m_queueName
+                    : proctypeIter->second->m_observers.front()->m_observerQueue;
             const QString timerName = proctypeIter->second->m_interfaceName;
             VariableRef timerData("global_state");
             timerData.appendElement("timers");

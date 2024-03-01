@@ -12,10 +12,11 @@ Receiver-Context ::= SEQUENCE {
    state Receiver-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    choicearg MyBetterChoice,
    choicevalue MyBetterChoice,
    choicehandled T-Boolean
 }
 
-Receiver-Mychoice-Selection  ::= ENUMERATED {option1-present(1), option2-present(2)}
+Receiver-Mychoice-Selection ::= ENUMERATED {option1-present(1), option2-present(2)}
 END

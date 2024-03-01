@@ -1,5 +1,6 @@
 /* CIF PROCESS (250, 149), (150, 75) */
 process Bcdlct;
+    /* CIF Keep Specific Geode Partition 'default' */
     /* CIF TEXT (935, 46), (302, 233) */
     -- Text area for declarations and comments
     
@@ -17,30 +18,10 @@ process Bcdlct;
     --    out result T_UART_DLC_FrameCRC;
     --EXTERNAL;
     /* CIF ENDTEXT */
-    /* CIF procedure (952, 374), (70, 35) */
-    procedure Encode;
-        /* CIF TEXT (789, 82), (287, 140) */
-        -- Text area for declarations and comments
-        
-        fpar
-            in frame T_UART_DLC_PDU,
-            out byteBuffer T_UART_DLC_FrameBuffer;
-        /* CIF ENDTEXT */
-        /* CIF START (157, 44), (70, 35) */
-        START;
-            /* CIF task (80, 99), (223, 35) */
-            task byteBuffer(0) := frame.dlc_header;
-            /* CIF task (33, 154), (317, 53) */
-            task for  index in RANGE (0,c_UART_DLC_SDU_SIZE) :
-   byteBuffer(1+index) := frame.dlc_payload(index)
-endfor;
-            /* CIF task (26, 227), (331, 35) */
-            task byteBuffer(C_UART_DLC_SDU_SIZE + 1) := txPDU.crc;
-            /* CIF return (174, 277), (35, 35) */
-            return ;
-    endprocedure;
-    /* CIF procedure (987, 481), (101, 35) */
+    /* CIF procedure (986, 481), (101, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     procedure ComputeCRC;
+        /* CIF Keep Specific Geode Partition 'default' */
         /* CIF TEXT (709, 97), (267, 158) */
         -- Text area for declarations and comments
         
@@ -80,40 +61,66 @@ dataIndex := 0;
                     join L1;
             enddecision;
     endprocedure;
+    /* CIF procedure (952, 374), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    procedure Encode;
+        /* CIF Keep Specific Geode Partition 'default' */
+        /* CIF TEXT (789, 82), (287, 140) */
+        -- Text area for declarations and comments
+        
+        fpar
+            in frame T_UART_DLC_PDU,
+            out byteBuffer T_UART_DLC_FrameBuffer;
+        /* CIF ENDTEXT */
+        /* CIF START (157, 44), (70, 35) */
+        START;
+            /* CIF task (80, 99), (223, 35) */
+            task byteBuffer(0) := frame.dlc_header;
+            /* CIF task (33, 154), (317, 53) */
+            task for  index in RANGE (0,c_UART_DLC_SDU_SIZE) :
+   byteBuffer(1+index) := frame.dlc_payload(index)
+endfor;
+            /* CIF task (26, 227), (331, 35) */
+            task byteBuffer(C_UART_DLC_SDU_SIZE + 1) := txPDU.crc;
+            /* CIF return (174, 277), (35, 35) */
+            return ;
+    endprocedure;
     /* CIF START (320, 10), (70, 35) */
     START;
         /* CIF NEXTSTATE (320, 64), (70, 35) */
         NEXTSTATE IDLE;
-    /* CIF state (566, 42), (70, 35) */
-    state IDLE;
-        /* CIF input (536, 97), (130, 35) */
-        input DLCTxSDU(txSDU);
-            /* CIF task (447, 152), (307, 35) */
-            task txPDU.dlc_header := C_UART_DLC_SYNC_VALUE;
-            /* CIF task (507, 207), (187, 35) */
-            task txPDU.dlc_payload := txSDU;
-            /* CIF PROCEDURECALL (496, 257), (210, 35) */
-            call ComputeCRC(txSDU, txPDU.crc);
-            /* CIF PROCEDURECALL (498, 312), (206, 35) */
-            call Encode(txPDU, txFrameBuffer);
-            /* CIF task (554, 362), (94, 35) */
-            task txCount := 0;
-            /* CIF NEXTSTATE (543, 412), (115, 35) */
-            NEXTSTATE TRANSMITTING;
-    endstate;
-    /* CIF state (527, 463), (115, 35) */
+    /* CIF state (526, 463), (115, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
     state TRANSMITTING;
-        /* CIF provided (351, 518), (225, 35) */
+        /* CIF provided (350, 518), (225, 35) */
         provided txCount < C_UART_DLC_PDU_SIZE;
-            /* CIF output (342, 573), (243, 35) */
+            /* CIF output (341, 573), (243, 35) */
             output PHYTxChar( txFrameBuffer(txCount));
-            /* CIF task (386, 628), (155, 35) */
+            /* CIF task (385, 628), (155, 35) */
             task txCount := txCount + 1;
-            /* CIF NEXTSTATE (406, 678), (115, 35) */
+            /* CIF NEXTSTATE (405, 678), (115, 35) */
             NEXTSTATE TRANSMITTING;
-        /* CIF provided (613, 518), (232, 35) */
+        /* CIF provided (612, 518), (232, 35) */
         provided txCount >= C_UART_DLC_PDU_SIZE;
-            /* CIF NEXTSTATE (695, 573), (70, 35) */
+            /* CIF NEXTSTATE (694, 573), (70, 35) */
             NEXTSTATE IDLE;
+    endstate;
+    /* CIF state (578, 41), (70, 35) */
+    /* CIF Keep Specific Geode Partition 'default' */
+    state IDLE;
+        /* CIF input (547, 96), (130, 35) */
+        input DLCTxSDU(txSDU);
+            /* CIF task (459, 151), (307, 35) */
+            task txPDU.dlc_header := C_UART_DLC_SYNC_VALUE;
+            /* CIF task (519, 206), (187, 35) */
+            task txPDU.dlc_payload := txSDU;
+            /* CIF PROCEDURECALL (507, 256), (210, 35) */
+            call ComputeCRC(txSDU, txPDU.crc);
+            /* CIF PROCEDURECALL (509, 311), (206, 35) */
+            call Encode(txPDU, txFrameBuffer);
+            /* CIF task (565, 361), (94, 35) */
+            task txCount := 0;
+            /* CIF NEXTSTATE (555, 411), (115, 35) */
+            NEXTSTATE TRANSMITTING;
     endstate;
 endprocess Bcdlct;

@@ -12,6 +12,7 @@ Actuator1-Context ::= SEQUENCE {
    state Actuator1-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyInteger
 }
 
@@ -31,6 +32,7 @@ Actuator2-Context ::= SEQUENCE {
    state Actuator2-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    param MyInteger
 }
 
@@ -44,12 +46,13 @@ IMPORTS
    T-Int32, T-UInt32, T-Int8, T-UInt8, T-Boolean, T-Null-Record FROM TASTE-BasicTypes
    PID-Range, PID FROM System-Dataview;
 
-Controller-States ::= ENUMERATED {waitforboth, finished, waitfor2, waitfor1}
+Controller-States ::= ENUMERATED {waitforboth, finished, waitfor1, waitfor2}
 
 Controller-Context ::= SEQUENCE {
    state Controller-States,
    init-done BOOLEAN,
    sender PID,
+   offspring PID,
    my-value MyInteger
 }
 
@@ -143,6 +146,7 @@ BEGIN
    
    
    Actuator1-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          test-parameter SEQUENCE { p1 MyInteger}
@@ -153,6 +157,7 @@ BEGIN
    }
    
    Actuator2-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          test-parameter SEQUENCE { p1 MyInteger}
@@ -163,6 +168,7 @@ BEGIN
    }
    
    Controller-Event ::= CHOICE {
+      -- Lang: SDL TRUE FALSE
       msg-in CHOICE {
          input-none SEQUENCE {},
          received1 SEQUENCE {  },

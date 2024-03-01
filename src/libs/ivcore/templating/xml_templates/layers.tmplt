@@ -1,0 +1,6 @@
+{# This template is for test purposes only #}
+<Layers>
+{% for layer in ConnectionLayers %}
+    {% include "layer.tmplt" %}
+{% endfor %}
+</Layers>

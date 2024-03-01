@@ -101,7 +101,7 @@ def check_cmake_version(min_major: int, min_minor: int, min_patch: int) -> None:
 def read_version_from_file(version_file: str, ci_build_id: str) -> []:
     version_cmd = [version_file]
 
-    completed_process = subprocess.run(version_cmd, shell=True, env={'CI_BUILD_ID': ci_build_id})
+    completed_process = subprocess.run(version_cmd, shell=True, env={'CI_JOB_ID': ci_build_id})
     if not completed_process.returncode == 0:
         print("Could not read ", version_file)
         exit(1)
