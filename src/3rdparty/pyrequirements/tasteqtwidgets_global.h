@@ -7,6 +7,7 @@
 #include <qgitlabapi/issue.h>
 #include <qgitlabapi/label.h>
 #include <qgitlabapi/qgitlabclient.h>
+#include <requirements/requirement.h>
 #include <requirements/requirementsmanager.h>
 #include <requirements/requirementsmodelbase.h>
 #include <requirements/ui/requirementswidget.h>

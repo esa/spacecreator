@@ -163,7 +163,7 @@ void RequirementsWidget::onChangeOfCredentials()
     if (m_requirementsUrl.isEmpty() || newToken.isEmpty()) {
         return;
     }
-
+    m_reqManager->setCredentials(m_requirementsUrl, newToken);
     emit requirementsCredentialsChanged(m_requirementsUrl, newToken);
 }
 

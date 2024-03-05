@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 
 project(TasteQtWidgets VERSION 0.0.1 DESCRIPTION "C++/Qt Widgets for ESA Python projects" LANGUAGES CXX)
 
@@ -6,6 +6,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)
 set(QT_VER_MAJ_MIN ${Qt6_VERSION_MAJOR}.${Qt6_VERSION_MINOR})
+include(CCache)
 
 set(Python3_FIND_VIRTUALENV FIRST)
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -67,25 +68,31 @@ add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/tracecommon ${CMAKE_BINARY_DIR}/tracea
 add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/requirements ${CMAKE_BINARY_DIR}/traceability/requirements)
 
 set(TasteQtWidgets_SRC
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_label_wrapper.h
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_label_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_issue_wrapper.h
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_issue_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_label_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_label_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_qgitlabclient_wrapper.h
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_qgitlabclient_wrapper.cpp
 
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirement_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirement_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmanager_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmanager_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmodelbase_wrapper.h
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmodelbase_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementswidget_wrapper.h
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementswidget_wrapper.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmanager_wrapper.h
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementsmanager_wrapper.cpp
-
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tracecommon_issuesmanager_wrapper.h
-    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tracecommon_issuesmanager_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_wrapper.cpp
 
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_module_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_python.h
+
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tracecommon_issuesmanager_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tracecommon_issuesmanager_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tracecommon_tracecommonmodelbase_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tracecommon_tracecommonmodelbase_wrapper.cpp
 )
 
 # includes necessary to parse and build the classes specified on typesystem

@@ -14,6 +14,8 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#define WRN qWarning() << Q_FUNC_INFO
+
 namespace gitlab {
 
 const QString kContentType = "application/x-www-form-urlencoded";
@@ -40,8 +42,12 @@ bool QGitlabClient::requestIssues(const IssueRequestOptions &options)
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
             if (QJsonParseError::NoError != jsonError.error) {
-                qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
-                Q_EMIT connectionError(reply->errorString());
+                const QString &errMsg = QString("ERROR: QGitlabClient::requestIssues: Parsing json data: %1, #%2")
+                                                .arg(jsonError.errorString())
+                                                .arg(jsonError.offset);
+                WRN << errMsg;
+                notifyError(reply, errMsg);
+                // TODO: setBusy(false); ?
             } else {
                 QList<Issue> issues;
                 for (const QJsonValueRef &value : replyContent.array()) {
@@ -55,9 +61,9 @@ bool QGitlabClient::requestIssues(const IssueRequestOptions &options)
                 Q_EMIT issueFetchingDone();
             }
         } else {
-            qDebug() << reply->error() << reply->errorString();
+            WRN << reply->error() << reply->errorString();
             setBusy(false);
-            Q_EMIT connectionError(reply->errorString());
+            notifyError(reply, "QGitlabClient::requestIssues");
         }
     });
     return false;
@@ -75,8 +81,8 @@ bool QGitlabClient::editIssue(const int &projectID, const int &issueID, const Is
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         setBusy(false);
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
-            qDebug() << reply->error() << reply->errorString();
-            Q_EMIT connectionError(reply->errorString());
+            WRN << reply->error() << reply->errorString();
+            notifyError(reply, "QGitlabClient::editIssue");
         }
     });
     return false;
@@ -94,8 +100,9 @@ bool QGitlabClient::createIssue(
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         setBusy(false);
         if (reply->error() != QNetworkReply::NoError) {
-            qDebug() << reply->error() << reply->errorString();
-            Q_EMIT connectionError(reply->errorString());
+            WRN << reply->error() << reply->errorString();
+            notifyError(reply, "QGitlabClient::createIssue");
+
         } else {
             QJsonDocument replyContent = QJsonDocument::fromJson(reply->readAll());
             QJsonObject jobj = replyContent.object();
@@ -122,8 +129,9 @@ bool QGitlabClient::closeIssue(const int &projectID, const int &issueID)
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         setBusy(false);
         if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
-            qDebug() << reply->error() << reply->errorString();
-            Q_EMIT connectionError(reply->errorString());
+            WRN << reply->error() << reply->errorString();
+            notifyError(reply, "QGitlabClient::closeIssue");
+
         } else {
             Q_EMIT issueClosed();
         }
@@ -144,8 +152,8 @@ bool QGitlabClient::requestListofLabels(const LabelsRequestOptions &options)
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
             if (QJsonParseError::NoError != jsonError.error) {
-                qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
-                Q_EMIT connectionError(reply->errorString());
+                WRN << "ERROR: Parsing json data: " << jsonError.errorString();
+                notifyError(reply, "QGitlabClient::requestListofLabels");
             } else {
                 QList<Label> labels;
                 for (const QJsonValueRef &label : replyContent.array()) {
@@ -158,8 +166,8 @@ bool QGitlabClient::requestListofLabels(const LabelsRequestOptions &options)
                 Q_EMIT labelsFetchingDone();
             }
         } else {
-            qDebug() << reply->error() << reply->errorString();
-            Q_EMIT connectionError(reply->errorString());
+            WRN << reply->error() << reply->errorString();
+            notifyError(reply, "QGitlabClient::requestListofLabels");
         }
     });
     return false;
@@ -180,8 +188,12 @@ bool QGitlabClient::requestProjectId(const QUrl &projectUrl)
             QJsonParseError jsonError;
             auto replyContent = QJsonDocument::fromJson(reply->readAll(), &jsonError);
             if (QJsonParseError::NoError != jsonError.error) {
-                qWarning() << "ERROR: Parsing json data: " << jsonError.errorString();
-                Q_EMIT connectionError(reply->errorString());
+                WRN << "ERROR: Parsing json data: " << jsonError.errorString();
+                const QString &errMsg = QString("ERROR: QGitlabClient::requestProjectId: Parsing json data: %1, #%2")
+                                                .arg(jsonError.errorString())
+                                                .arg(jsonError.offset);
+                WRN << errMsg;
+                notifyError(reply, errMsg);
             } else {
                 auto content = replyContent.array();
                 if (!content.isEmpty()) {
@@ -198,8 +210,10 @@ bool QGitlabClient::requestProjectId(const QUrl &projectUrl)
                 }
             }
         } else {
-            qDebug() << reply->error() << reply->errorString();
-            Q_EMIT connectionError(reply->errorString());
+            WRN << reply->error() << reply->errorString();
+            notifyError(reply,
+                    QString("Response %1 != 200")
+                            .arg(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt()));
         }
         Q_EMIT requestedProjectID(projectID);
     });
@@ -235,7 +249,7 @@ QNetworkReply *QGitlabClient::sendRequest(QGitlabClient::ReqType reqType, const 
         break;
     }
     default: {
-        qDebug() << "Unknown request";
+        WRN << "Unknown request";
     }
     }
 
@@ -303,4 +317,23 @@ void QGitlabClient::setBusy(bool busy)
 bool gitlab::QGitlabClient::isIssueRequest(QNetworkReply *reply) const
 {
     return reply->request().url().query().contains("api/v4/issues");
+}
+
+void gitlab::QGitlabClient::notifyError(QNetworkReply *reply, const QString &text)
+{
+    const QStringList fields {
+        reply ? reply->errorString() : QString(),
+        text,
+    };
+
+    const QString &msg = fields.join("\n").simplified();
+    if (msg.isEmpty()) {
+        auto ptr = reinterpret_cast<quintptr>(reply);
+        const QString &wrnMsg = QString("Error message is empty, args were: reply='0x%1', text='%2'")
+                                        .arg(ptr, QT_POINTER_SIZE * 2, 16, QChar('0'))
+                                        .arg(text);
+        WRN << wrnMsg;
+    }
+
+    Q_EMIT connectionError(msg);
 }

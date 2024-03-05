@@ -88,5 +88,7 @@ private:
     QString mToken;
     QNetworkAccessManager mManager;
     bool m_busy = false;
+
+    void notifyError(QNetworkReply *reply, const QString &text = QString());
 };
 }

@@ -18,18 +18,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 import sys
 
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import SIGNAL, SLOT, QObject
 from @TASTE_PYTHON_MODULE_NAME@ import TasteQtWidgets as QtTaste  # after PySide!
 
-
 if __name__ == "__main__":
-
     app = QApplication(sys.argv)
 
     url = ""
-    manager = QtTaste.RequirementsManager()
-    model = QtTaste.RequirementsModelBase()
-
-    widget = QtTaste.RequirementsWidget(url, manager, model)
+    manager = QtTaste.requirement.RequirementsManager()
+    model = QtTaste.requirement.RequirementsModelBase()
+    manager.listOfRequirements.connect(model.addRequirements)
+    widget = QtTaste.requirement.RequirementsWidget(url, manager, model)
     widget.setWindowTitle("T̶a̶s̶t̶e̶ ̶t̶h̶e̶TASTE for Python")
     widget.resize(640, 480)
 
