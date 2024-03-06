@@ -26,7 +26,7 @@ RequirementsModelBase::RequirementsModelBase(QObject *parent)
 {
 }
 
-void RequirementsModelBase::clear()
+void RequirementsModelBase::clearRequirements()
 {
     setRequirements({});
 }

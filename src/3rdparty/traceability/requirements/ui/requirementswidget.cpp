@@ -170,6 +170,7 @@ void RequirementsWidget::onChangeOfCredentials()
 void RequirementsWidget::requestRequirements()
 {
     if (m_reqManager && m_reqManager->hasValidProjectID()) {
+        m_model->clearRequirements();
         m_reqManager->requestAllRequirements();
     }
 }
@@ -189,7 +190,7 @@ void RequirementsWidget::setLoginData()
         ui->serverStatusLabel->setPixmap({});
         return;
     }
-    m_model.clear();
+    m_model->clearRequirements();
     if (currUrl == m_reqManager->projectUrl() && currToken == m_reqManager->token()) {
 
         m_reqManager->requestAllRequirements();

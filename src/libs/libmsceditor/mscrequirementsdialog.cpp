@@ -39,7 +39,7 @@ MscRequirementsDialog::MscRequirementsDialog(const QUrl &requirementsUrl, msc::M
     connect(m_reqManager, &RequirementsManager::listOfRequirements, m_reqModel,
             &RequirementsModelBase::addRequirements);
     connect(m_reqManager, &RequirementsManager::startingFetchingRequirements, m_reqModel,
-            &RequirementsModelBase::clear);
+            &RequirementsModelBase::clearRequirements);
     
     m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             requirementsUrl.toString().toUtf8(), m_reqManager, m_reqModel, this);

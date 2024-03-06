@@ -87,7 +87,7 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     connect(m_reqManager, &requirement::RequirementsManager::listOfRequirements, m_reqModel,
             &shared::RequirementsModel::addRequirements);
     connect(m_reqManager, &requirement::RequirementsManager::startingFetchingRequirements, m_reqModel,
-            &shared::RequirementsModel::clear);
+            &shared::RequirementsModel::clearRequirements);
     shared::DataModel *model = document->objectsModel();
     m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
