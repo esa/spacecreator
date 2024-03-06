@@ -229,14 +229,13 @@
               cmd: "{{ p7zip }} -y  x {{ download_dir }}/Asn1Acn-PusC-Library-1.1.0.7z -o{{ pusc_target_dir }}"
               creates: "{{ pusc_target_dir }}/ccsds"
 
-          - name: Check if  "{{ env_qt_libexec_dir }}/qtqhelpgenerator" exists
+          - name: Check if  "{{ env_qt_libexec_dir }}/qhelpgenerator" exists
             stat:
-              path: "{{ env_qt_libexec_dir }}/qtqhelpgenerator"
+              path: "{{ env_qt_libexec_dir }}/qhelpgenerator"
             register: src_file
 
-          - name: Copy "{{ env_qt_libexec_dir }}/qtqhelpgenerator" to "{{ app_dir }}/libexec"
+          - name: Copy "{{ env_qt_libexec_dir }}/qhelpgenerator" to "{{ app_dir }}/libexec"
             copy:
-              src:  "{{ env_qt_libexec_dir }}/qtqhelpgenerator"
+              src:  "{{ env_qt_libexec_dir }}/qhelpgenerator"
               dest: "{{ app_dir }}/libexec"
-              recursive: yes
             when: src_file.stat.exists
