@@ -46,8 +46,13 @@ void RequirementsModelBase::setRequirements(const QList<Requirement> &requiremen
  */
 void RequirementsModelBase::addRequirements(const QList<Requirement> &requirements)
 {
-    beginInsertRows(QModelIndex(), m_requirements.size(), m_requirements.size() + requirements.size() - 1);
-    m_requirements.append(requirements);
+    QList<Requirement> reqs;
+
+    std::copy_if(requirements.begin(), requirements.end(), std::back_inserter(reqs),
+            [this](const Requirement &req) { return !m_requirements.contains(req); });
+
+    beginInsertRows(QModelIndex(), m_requirements.size(), m_requirements.size() + reqs.size() - 1);
+    m_requirements.append(reqs);
     endInsertRows();
 }
 

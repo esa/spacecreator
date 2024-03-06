@@ -189,8 +189,9 @@ void RequirementsWidget::setLoginData()
         ui->serverStatusLabel->setPixmap({});
         return;
     }
-
+    m_model.clear();
     if (currUrl == m_reqManager->projectUrl() && currToken == m_reqManager->token()) {
+
         m_reqManager->requestAllRequirements();
         return;
     }

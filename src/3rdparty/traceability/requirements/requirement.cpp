@@ -19,4 +19,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace requirement {
 
+bool Requirement::operator ==(const Requirement &req) const
+{
+    return (req.m_id == this->m_id);
+}
+
 } // namespace requirement
