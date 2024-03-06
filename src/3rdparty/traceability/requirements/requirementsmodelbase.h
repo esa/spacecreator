@@ -47,7 +47,7 @@ public:
 
     explicit RequirementsModelBase(QObject *parent = nullptr);
 
-    virtual void clear();
+    virtual void clearRequirements();
 
     virtual void setRequirements(const QList<Requirement> &requirements);
     virtual void addRequirements(const QList<requirement::Requirement> &requirements);
