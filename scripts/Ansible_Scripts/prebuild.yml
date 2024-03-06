@@ -238,4 +238,5 @@
             copy:
               src:  "{{ env_qt_libexec_dir }}/qhelpgenerator"
               dest: "{{ app_dir }}/libexec"
+              mode: '0755'
             when: src_file.stat.exists
