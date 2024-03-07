@@ -17,8 +17,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
+#include "issuetextproxymodel.h"
+#include "tagfilterproxymodel.h"
+
+#include <QList>
 #include <QPointer>
+#include <QToolButton>
 #include <QWidget>
+
+namespace tracecommon {
+class WidgetBar;
+}
 
 namespace reviews {
 
@@ -68,11 +77,18 @@ protected Q_SLOTS:
     void openIssueLink(const QModelIndex &index);
     void showNewReviewDialog() const;
     void removeReview();
+    void fillTagBar(const QStringList &tags);
 
 protected:
+    bool tagButtonExists(const QString &tag) const;
+
     Ui::ReviewsWidget *ui;
+    QList<QToolButton *> m_tagButtons;
+    tracecommon::WidgetBar *m_widgetBar;
     QPointer<ReviewsManager> m_reviewsManager;
     QPointer<ReviewsModelBase> m_model;
+    tracecommon::IssueTextProxyModel m_textFilterModel;
+    tracecommon::TagFilterProxyModel m_tagFilterModel;
 };
 
 } // namespace reviews

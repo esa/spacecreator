@@ -43,7 +43,9 @@ bool IssueTextProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
         return true;
     }
 
-    return false;
+    const QString author = idx.data(TraceCommonModelBase::AuthorRole).toString();
+    match = expression.match(author);
+    return match.hasMatch();
 }
 
 } // namespace requirement

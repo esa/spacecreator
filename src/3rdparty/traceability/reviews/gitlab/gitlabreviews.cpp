@@ -74,4 +74,19 @@ QString GitLabReviews::parseRevIfId(const gitlab::Issue &issue)
     }
     return QString::number(issue.mIssueIID);
 }
+
+/*!
+ * Returns the tags from the list of labels provided by the gitlab server
+ */
+QStringList GitLabReviews::tagsFromLabels(const QList<gitlab::Label> &labels)
+{
+    QStringList tags;
+    for (const gitlab::Label &label : labels) {
+        if (label.mName.compare(k_reviewsTypeLabel) != 0) {
+            tags.append(label.mName);
+        }
+    }
+    tags.removeDuplicates();
+    return tags;
+}
 }

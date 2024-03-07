@@ -83,6 +83,7 @@ protected:
 private:
     bool tagButtonExists(const QString &tag) const;
     void onChangeOfCredentials();
+
     Ui::RequirementsWidget *ui;
     QList<QToolButton *> m_tagButtons;
     tracecommon::WidgetBar *m_widgetBar;

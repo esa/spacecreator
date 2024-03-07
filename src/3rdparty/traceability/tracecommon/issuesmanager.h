@@ -47,10 +47,10 @@ public:
     const int &projectID() const;
     virtual bool hasValidProjectID() const;
 
-    bool requestTags();
     QStringList tagsBuffer();
 
 public Q_SLOTS:
+    bool requestTags();
     void setProjectID(const int &newProjectID);
 
 Q_SIGNALS:

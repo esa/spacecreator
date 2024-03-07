@@ -37,6 +37,7 @@ public:
         TagsRole,
         TitleRole,
         DetailDescriptionRole,
+        AuthorRole,
 
         UserRole,
     };

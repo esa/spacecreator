@@ -18,6 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #pragma once
 
 #include "issue.h"
+#include "label.h"
 #include "review.h"
 
 #include <QObject>
@@ -37,6 +38,7 @@ public:
 
     static Review reviewFromIssue(const gitlab::Issue &issue);
     static QString parseRevIfId(const gitlab::Issue &issue);
+    static QStringList tagsFromLabels(const QList<gitlab::Label> &labels);
 
 Q_SIGNALS:
     void listOfReviews(const QList<Review> &);

@@ -48,6 +48,8 @@ ReviewsManager::ReviewsManager(REPO_TYPE repoType, QObject *parent)
                 [this](const QList<gitlab::Issue> &issues) { Q_EMIT d->gitlabReviews->convertIssues(issues); });
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueFetchingDone, this,
                 &ReviewsManager::fetchingReviewsEnded);
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfLabels, this,
+                [this](QList<gitlab::Label> labels) { m_tagsBuffer.append(GitLabReviews::tagsFromLabels(labels)); });
         connect(d->gitlabReviews.get(), &reviews::GitLabReviews::listOfReviews, this, &ReviewsManager::listOfReviews);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this, [this](const gitlab::Issue &issue) {
             Review newReview = GitLabReviews::reviewFromIssue(issue);

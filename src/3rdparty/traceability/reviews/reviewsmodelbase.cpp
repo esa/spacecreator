@@ -85,32 +85,30 @@ QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    if (role == TraceCommonModelBase::IssueLinkRole) {
+    switch (role) {
+    case TraceCommonModelBase::IssueLinkRole:
         return m_reviews[index.row()].m_link;
-    }
-
-    if (role == Qt::DisplayRole) {
+    case Qt::DisplayRole: {
         switch (index.column()) {
         case TITLE:
             return m_reviews[index.row()].m_longName;
         case AUTHOR:
             return m_reviews[index.row()].m_author;
         }
+        break;
     }
-    if (role == Qt::ToolTipRole) {
+    case Qt::ToolTipRole:
         return m_reviews[index.row()].m_description;
-    }
-
-    if (role == TraceCommonModelBase::IssueIdRole) {
+    case TraceCommonModelBase::IssueIdRole:
         return m_reviews[index.row()].m_issueID;
-    }
-
-    if (role == TraceCommonModelBase::TagsRole) {
+    case TraceCommonModelBase::TagsRole:
         return m_reviews[index.row()].m_tags;
-    }
-
-    if (role == TraceCommonModelBase::DetailDescriptionRole) {
+    case TraceCommonModelBase::DetailDescriptionRole:
         return m_reviews[index.row()].m_description;
+    case TraceCommonModelBase::TitleRole:
+        return m_reviews[index.row()].m_longName;
+    case TraceCommonModelBase::AuthorRole:
+        return m_reviews[index.row()].m_author;
     }
 
     return QVariant();

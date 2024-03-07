@@ -22,8 +22,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "reviewsmanager.h"
 #include "reviewsmodelbase.h"
 #include "ui_reviewswidget.h"
+#include "widgetbar.h"
 
 #include <QDesktopServices>
+#include <QLineEdit>
 #include <QMessageBox>
 
 using namespace tracecommon;
@@ -34,9 +36,17 @@ const int kIconSize = 16;
 ReviewsWidget::ReviewsWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ReviewsWidget)
+    , m_widgetBar(new tracecommon::WidgetBar(this))
 {
     ui->setupUi(this);
     ui->removeReviewButton->setEnabled(false);
+
+    m_textFilterModel.setDynamicSortFilter(true);
+    m_textFilterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_textFilterModel.setFilterKeyColumn(-1);
+
+    m_tagFilterModel.setDynamicSortFilter(true);
+    m_tagFilterModel.setSourceModel(&m_textFilterModel);
 
     connect(ui->refreshButton, &QPushButton::clicked, this, &ReviewsWidget::setLoginData);
     connect(ui->credentialWidget, &tracecommon::CredentialWidget::urlChanged, this,
@@ -46,6 +56,10 @@ ReviewsWidget::ReviewsWidget(QWidget *parent)
     connect(ui->allReviews, &QTableView::doubleClicked, this, &ReviewsWidget::openIssueLink);
     connect(ui->createReviewButton, &QPushButton::clicked, this, &ReviewsWidget::showNewReviewDialog);
     connect(ui->removeReviewButton, &QPushButton::clicked, this, &ReviewsWidget::removeReview);
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_textFilterModel,
+            &QSortFilterProxyModel::setFilterFixedString);
+
+    ui->verticalLayout->insertWidget(0, m_widgetBar);
 }
 
 ReviewsWidget::~ReviewsWidget()
@@ -70,12 +84,16 @@ void ReviewsWidget::setManager(ReviewsManager *manager)
     connect(m_reviewsManager, &ReviewsManager::busyChanged, this, &ReviewsWidget::updateServerStatus);
     connect(m_reviewsManager, &ReviewsManager::reviewAdded, this, &ReviewsWidget::reviewAdded);
     connect(m_reviewsManager, &ReviewsManager::reviewAdded, this, &ReviewsWidget::requestReviews);
+    connect(m_reviewsManager, &ReviewsManager::fetchingReviewsEnded, m_reviewsManager, &ReviewsManager::requestTags);
+    connect(m_reviewsManager, &ReviewsManager::listOfTags, this, &ReviewsWidget::fillTagBar);
 }
 
 void ReviewsWidget::setModel(ReviewsModelBase *model)
 {
     m_model = model;
-    ui->allReviews->setModel(m_model);
+    m_textFilterModel.setSourceModel(m_model);
+    // Note: m_tagFilterModel uses m_textFilterModel as source model
+    ui->allReviews->setModel(&m_tagFilterModel);
 }
 
 /*!
@@ -233,6 +251,49 @@ void ReviewsWidget::removeReview()
             Q_EMIT reviewRemoved(review.m_id);
         }
     }
+}
+
+void ReviewsWidget::fillTagBar(const QStringList &tags)
+{
+    auto it = std::remove_if(m_tagButtons.begin(), m_tagButtons.end(), [this, tags](QToolButton *button) {
+        if (!tags.contains(button->text())) {
+            m_tagFilterModel.removeTag(button->text());
+            button->deleteLater();
+            return true;
+        }
+        return false;
+    });
+    if (it != m_tagButtons.end()) {
+        m_tagButtons.erase(it, m_tagButtons.end());
+    }
+
+    for (const QString &tag : tags) {
+        if (!tagButtonExists(tag)) {
+            auto button = new QToolButton(m_widgetBar);
+            button->setText(tag);
+            button->setCheckable(true);
+            connect(button, &QToolButton::toggled, this, [this](bool checked) {
+                auto button = dynamic_cast<QToolButton *>(sender());
+                if (!button) {
+                    return;
+                }
+                if (checked) {
+                    m_tagFilterModel.addTag(button->text());
+                } else {
+                    m_tagFilterModel.removeTag(button->text());
+                }
+            });
+
+            m_tagButtons.append(button);
+            m_widgetBar->addWidget(button);
+        }
+    }
+}
+
+bool ReviewsWidget::tagButtonExists(const QString &tag) const
+{
+    return std::any_of(m_tagButtons.begin(), m_tagButtons.end(),
+            [&tag](const auto *btn) { return btn->text().compare(tag) == 0; });
 }
 
 } // namespace reviews
