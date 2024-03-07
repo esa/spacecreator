@@ -30,7 +30,7 @@
 int main(int argc, char *argv[])
 {
     shared::initSharedLibrary();
-    tracecommon::initTraceCommonLibrary();
+    initTraceCommonLibrary();
     dve::initDvEditor();
     dvm::initDVLibrary();
 

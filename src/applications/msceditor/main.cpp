@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     msc::initMscEditor();
     ive::initIVEditor();
     ivm::initIVLibrary();
-    tracecommon::initTraceCommonLibrary();
+    initTraceCommonLibrary();
     templating::initTemplatingLibrary();
 
     QApplication a(argc, argv);

@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     templating::initTemplatingLibrary();
     shared::initSharedLibrary();
-    tracecommon::initTraceCommonLibrary();
+    initTraceCommonLibrary();
     ive::initIVEditor();
     ivm::initIVLibrary();
 
