@@ -25,6 +25,7 @@
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetmessagedeclarations.h"
 #include "commands/cmdsetparameterlist.h"
+#include "common.h"
 #include "messagedeclarationsdialog.h"
 #include "mscchart.h"
 #include "msccommandsstack.h"
@@ -33,6 +34,7 @@
 #include "mscmessage.h"
 #include "mscmessagedeclarationlist.h"
 #include "mscmodel.h"
+#include "mscnamevalidator.h"
 #include "mscreader.h"
 #include "mscwriter.h"
 #include "systemchecks.h"
@@ -63,7 +65,7 @@ MessageDialog::MessageDialog(msc::MscMessage *message, msc::ChartLayoutManagerBa
     Q_ASSERT(message);
     ui->setupUi(this);
 
-    QRegularExpressionValidator *nameValidator = new QRegularExpressionValidator(msc::MscEntity::nameVerifier(), this);
+    auto nameValidator = new msc::MscNameValidator(this);
     ui->nameLineEdit->setValidator(nameValidator);
 
     ui->nameLineEdit->setText(m_message->name());
@@ -83,6 +85,11 @@ MessageDialog::MessageDialog(msc::MscMessage *message, msc::ChartLayoutManagerBa
     connect(ui->editDeclarationsButton, &QPushButton::clicked, this, &MessageDialog::editDeclarations);
 
     connect(ui->nameLineEdit, &QLineEdit::textEdited, this, &MessageDialog::checkforEmptyCompleter);
+    connect(ui->nameLineEdit, &QLineEdit::textChanged, this, [this]() {
+        if (QPushButton *okButton = ui->buttonBox->button(QDialogButtonBox::Ok)) {
+            okButton->setEnabled(ui->nameLineEdit->hasAcceptableInput());
+        }
+    });
 
     fillMessageDeclartionBox();
     selectDeclarationFromName();

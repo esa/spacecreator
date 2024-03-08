@@ -175,6 +175,11 @@ QString hwLibraryPath();
 QSet<QString> forbiddenNamesSet();
 
 /*!
+ Checks if the given name is in the forbidden name set.
+ */
+bool isForbiddenName(const QString &name);
+
+/*!
    Returns is the given \p name is usable as name in general.
  */
 bool isValidName(const QString &name);

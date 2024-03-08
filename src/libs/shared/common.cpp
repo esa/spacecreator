@@ -152,14 +152,19 @@ QSet<QString> forbiddenNamesSet()
     return {};
 }
 
+bool isForbiddenName(const QString &name)
+{
+    static const QSet<QString> &reservedWords = shared::forbiddenNamesSet();
+    return reservedWords.contains(name.trimmed());
+}
+
 bool isValidName(const QString &name)
 {
     if (name.isEmpty()) {
         return false;
     }
 
-    static const QSet<QString> reservedWords = shared::forbiddenNamesSet();
-    if (reservedWords.contains(name.trimmed())) {
+    if (isForbiddenName(name)) {
         return false;
     }
 

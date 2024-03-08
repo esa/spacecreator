@@ -24,6 +24,7 @@
 #include "cif/ciflines.h"
 #include "colors/colormanager.h"
 #include "commands/cmdactioninformaltext.h"
+#include "common.h"
 #include "datastatement.h"
 #include "mscaction.h"
 #include "mscchartviewconstants.h"
@@ -48,6 +49,10 @@ public:
 protected:
     bool validateText(const QString &text) const override
     {
+        if (shared::isForbiddenName(text)) {
+            return false;
+        }
+
         MscReader reader(MscReader::NOTIFY::NO_HUB);
         QStringList errors;
         // test plain informal action, or data statements

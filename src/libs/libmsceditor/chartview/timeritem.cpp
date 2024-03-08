@@ -25,6 +25,7 @@
 #include "cif/ciflines.h"
 #include "colors/colormanager.h"
 #include "commands/cmdentitynamechange.h"
+#include "common.h"
 #include "msccommandsstack.h"
 #include "mscreader.h"
 #include "msctimer.h"
@@ -47,6 +48,10 @@ public:
 protected:
     bool validateText(const QString &text) const override
     {
+        if (shared::isForbiddenName(text)) {
+            return false;
+        }
+
         MscReader reader(MscReader::NOTIFY::NO_HUB);
         QStringList errors;
         // test plain informal timer, or data statements

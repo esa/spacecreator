@@ -20,6 +20,7 @@
 
 #include "documentitemmodel.h"
 #include "mscdocument.h"
+#include "mscnamevalidator.h"
 
 #include <QLineEdit>
 #include <QMenu>
@@ -46,7 +47,7 @@ public:
         QWidget *editor = QStyledItemDelegate::createEditor(parent, option, index);
         auto line = qobject_cast<QLineEdit *>(editor);
         if (line) {
-            auto nameValidator = new QRegularExpressionValidator(msc::MscEntity::nameVerifier(), line);
+            auto nameValidator = new msc::MscNameValidator(line);
             line->setValidator(nameValidator);
         }
         return editor;

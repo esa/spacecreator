@@ -152,6 +152,7 @@ target_sources(${LIB_NAME} PRIVATE
     msceditorcore.cpp
     msceditorcore.h
     msceditorresources.qrc
+    mscnamevalidator.h mscnamevalidator.cpp
     mscrequirementsdialog.cpp
     mscrequirementsdialog.h
     mscrequirementsdialog.ui

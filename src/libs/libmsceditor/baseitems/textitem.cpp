@@ -18,6 +18,7 @@
 
 #include "textitem.h"
 
+#include "common.h"
 #include "mscreader.h"
 
 namespace msc {
@@ -29,6 +30,10 @@ TextItem::TextItem(QGraphicsItem *parent)
 
 bool TextItem::validateText(const QString &text) const
 {
+    if (shared::isForbiddenName(text)) {
+        return false;
+    }
+
     if (m_mscValidationTest.isEmpty()) {
         return true;
     }
