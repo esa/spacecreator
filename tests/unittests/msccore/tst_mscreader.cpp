@@ -783,6 +783,30 @@ void tst_MscReader::testRequirements()
     QCOMPARE(chart->instances().at(0)->requirements(), expectedRequirements);
 }
 
+void tst_MscReader::testRequirementsInDocument()
+{
+    const auto msc = QString("/* CIF REQUIREMENTSURL https://git.server.com/esa/requirementstest */"
+                             "mscdocument CppRename /* MSC AND */;"
+                             "language ASN.1;"
+                             "data CppRename.asn;"
+                             "/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */"
+                             "/* CIF REQUIREMENT aabd-7765,936f2-bf2a */"
+                             "mscdocument Nominal /* MSC LEAF */;"
+                             "msc CppRename;"
+                             "endmsc;"
+                             "endmscdocument;"
+                             "endmscdocument;");
+
+    MscModel *model = m_reader->parseText(msc);
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc1 = model->documents().at(0);
+    QCOMPARE(doc1->documents().size(), 1);
+    MscDocument *doc2 = doc1->documents().at(0);
+
+    const QStringList expectedRequirements { "aabd-7765", "936f2-bf2a" };
+    QCOMPARE(doc2->requirements(), expectedRequirements);
+}
+
 void tst_MscReader::testRequirementsUrl()
 {
     const auto msc = QString("/* CIF REQUIREMENTSURL https://some.git.lab/pro/one */\n\n"

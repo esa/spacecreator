@@ -144,9 +144,11 @@ QVector<CifParser::LinesCollection> CifParser::prepareCifLines(const QStringList
     auto isAcceptableLine = [&isText, &isCifComment](const QString &line) { return isText || isCifComment(line); };
 
     auto addLine = [&](LinesCollection &to, const CifLineShared &line) {
-        if (!to.isEmpty())
-            if (to.last()->lineType() == CifLine::CifType::End)
+        if (!to.isEmpty()) {
+            if (to.last()->lineType() == CifLine::CifType::End || to.last()->lineType() != line->lineType()) {
                 return false;
+            }
+        }
 
         if (!to.contains(line)) {
             to.append(line);
