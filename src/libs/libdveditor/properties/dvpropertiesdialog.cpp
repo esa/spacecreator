@@ -58,10 +58,13 @@ DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemp
     m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
     connect(m_reqWidget, &shared::ui::SCRequirementsWidget::requirementsUrlChanged, this,
-            [model, commandsStack](QString requirementUrl) {
+            [model, commandsStack, this](QString requirementUrl) {
                 const QUrl url = QUrl(requirementUrl);
                 if (url != model->requirementsURL()) {
                     commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, url));
+                }
+                if (url.isValid() && m_reqWidget->token().isEmpty()) {
+                    m_reqWidget->loadSavedCredentials();
                 }
             });
 }

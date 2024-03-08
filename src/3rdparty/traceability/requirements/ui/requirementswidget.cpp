@@ -28,7 +28,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QSettings>
 #include <QTableView>
 #include <QToolButton>
 
@@ -93,32 +92,12 @@ RequirementsWidget::RequirementsWidget(
     connect(m_reqManager, &RequirementsManager::fetchingRequirementsEnded, m_reqManager,
             &RequirementsManager::requestTags);
 
-    loadSavedRequirementsTableGeometry();
-
     ui->filterButton->setIcon(QPixmap(":/tracecommonresources/icons/filter_icon.svg"));
     ui->verticalLayout->insertWidget(0, m_widgetBar);
 }
 
-bool RequirementsWidget::loadSavedRequirementsTableGeometry()
-{
-    QSettings settings;
-    settings.beginGroup("SpaceCreator");
-    auto AllRequirementsHeaderState = settings.value("AllRequirementsHeaderState");
-    settings.endGroup();
-    if (AllRequirementsHeaderState.isValid()) {
-        ui->allRequirements->horizontalHeader()->restoreState(AllRequirementsHeaderState.toByteArray());
-        return true;
-    }
-    return false;
-}
-
 RequirementsWidget::~RequirementsWidget()
 {
-    QSettings settings;
-    settings.beginGroup("SpaceCreator");
-    QByteArray AllRequirementsHeaderState = ui->allRequirements->horizontalHeader()->saveState();
-    settings.setValue("AllRequirementsHeaderState", AllRequirementsHeaderState);
-    settings.endGroup();
     delete ui;
 }
 
@@ -153,6 +132,11 @@ QString RequirementsWidget::token() const
 void RequirementsWidget::setToken(const QString &token)
 {
     ui->credentialWidget->setToken(token);
+}
+
+QHeaderView *RequirementsWidget::horizontalTableHeader() const
+{
+    return ui->allRequirements->horizontalHeader();
 }
 
 void RequirementsWidget::onChangeOfCredentials()

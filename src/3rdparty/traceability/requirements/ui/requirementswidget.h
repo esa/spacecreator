@@ -27,6 +27,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QToolButton>
 #include <QWidget>
 
+class QHeaderView;
+
 namespace Ui {
 class RequirementsWidget;
 }
@@ -58,7 +60,7 @@ public:
     void setToken(const QString &token);
 
 protected:
-    bool loadSavedRequirementsTableGeometry();
+    QHeaderView *horizontalTableHeader() const;
 
 protected Q_SLOTS:
     void setLoginData();

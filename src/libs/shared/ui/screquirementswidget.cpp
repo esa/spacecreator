@@ -17,8 +17,10 @@ along with this program. If not, see
 */
 
 #include "screquirementswidget.h"
+
 #include "settingsmanager.h"
 
+#include <QHeaderView>
 #include <QSettings>
 #include <QUrl>
 
@@ -37,6 +39,30 @@ SCRequirementsWidget::SCRequirementsWidget(const QString &requirementsUrl, requi
     if (hasCredentialsStored) {
         setLoginData();
     }
+
+    loadSavedRequirementsTableGeometry();
+}
+
+SCRequirementsWidget::~SCRequirementsWidget()
+{
+    QSettings settings;
+    settings.beginGroup("SpaceCreator");
+    QByteArray AllRequirementsHeaderState = horizontalTableHeader()->saveState();
+    settings.setValue("AllRequirementsHeaderState", AllRequirementsHeaderState);
+    settings.endGroup();
+}
+
+bool SCRequirementsWidget::loadSavedRequirementsTableGeometry()
+{
+    QSettings settings;
+    settings.beginGroup("SpaceCreator");
+    auto AllRequirementsHeaderState = settings.value("AllRequirementsHeaderState");
+    settings.endGroup();
+    if (AllRequirementsHeaderState.isValid()) {
+        horizontalTableHeader()->restoreState(AllRequirementsHeaderState.toByteArray());
+        return true;
+    }
+    return false;
 }
 
 bool SCRequirementsWidget::loadSavedCredentials()

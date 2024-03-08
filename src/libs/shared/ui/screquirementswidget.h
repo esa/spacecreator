@@ -32,11 +32,15 @@ class SCRequirementsWidget : public requirement::RequirementsWidget
 public:
     SCRequirementsWidget(const QString &requirementsUrl, requirement::RequirementsManager *manager,
             requirement::RequirementsModelBase *model, QWidget *parent = nullptr);
+    ~SCRequirementsWidget();
 
     bool loadSavedCredentials();
 
 public Q_SLOTS:
     void onCredentialsChange(const QUrl &url, const QString& newToken);
+
+protected:
+    bool loadSavedRequirementsTableGeometry();
 };
 }
 }

@@ -45,6 +45,14 @@ MscRequirementsDialog::MscRequirementsDialog(const QUrl &requirementsUrl, msc::M
             requirementsUrl.toString().toUtf8(), m_reqManager, m_reqModel, this);
     m_reqWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->contentLayout->addWidget(m_reqWidget, 0, 0, 1, 1);
+
+    connect(m_reqWidget, &shared::ui::SCRequirementsWidget::requirementsUrlChanged, this,
+            [this](QString requirementUrl) {
+                const QUrl url = QUrl(requirementUrl);
+                if (url.isValid() && m_reqWidget->token().isEmpty()) {
+                    m_reqWidget->loadSavedCredentials();
+                }
+            });
 }
 
 MscRequirementsDialog::~MscRequirementsDialog()
