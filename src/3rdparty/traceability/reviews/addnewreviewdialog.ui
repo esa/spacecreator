@@ -73,7 +73,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="methodLabel">
      <property name="text">
-      <string>Method</string>
+      <string>Criticality</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
