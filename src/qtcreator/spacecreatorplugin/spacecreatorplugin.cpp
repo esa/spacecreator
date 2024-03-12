@@ -53,7 +53,7 @@ void initSpaceCreatorResources()
 {
     Q_INIT_RESOURCE(asn1_resources);
     shared::initSharedLibrary();
-    tracecommon::initTraceCommonLibrary();
+    initTraceCommonLibrary();
     msc::initMscLibrary();
     msc::initMscEditor();
     ive::initIVEditor();

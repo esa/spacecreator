@@ -24,14 +24,10 @@ static void init_tracecommon_library()
     Q_INIT_RESOURCE(tracecommonresources);
 }
 
-namespace tracecommon {
-
 /**
    Initializes the library resources and Qt meta types.
  */
 void initTraceCommonLibrary()
 {
     init_tracecommon_library();
-}
-
 }

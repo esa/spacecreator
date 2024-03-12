@@ -23,7 +23,6 @@ from @TASTE_PYTHON_MODULE_NAME@ import TasteQtWidgets as QtTaste  # after PySide
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
     url = ""
     manager = QtTaste.requirement.RequirementsManager()
     model = QtTaste.requirement.RequirementsModelBase()

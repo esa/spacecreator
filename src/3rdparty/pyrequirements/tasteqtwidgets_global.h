@@ -12,4 +12,4 @@
 #include <requirements/requirementsmodelbase.h>
 #include <requirements/ui/requirementswidget.h>
 #include <tracecommon/issuesmanager.h>
-// #include <tracecommon/issuesmanagerprivate.h>
+#include <tracecommon/tracecommonlibrary.h>

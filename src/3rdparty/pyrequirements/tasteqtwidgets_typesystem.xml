@@ -3,6 +3,10 @@
     <load-typesystem name="typesystem_widgets.xml" generate="no"/>
     <load-typesystem name="typesystem_core.xml" generate="no"/>
     <load-typesystem name="typesystem_gui.xml" generate="no"/>
+    <inject-code class="target" position="beginning">
+        initTraceCommonLibrary();
+    </inject-code>
+
 
     <namespace-type name="requirement" visible="yes">
         <object-type name="RequirementsWidget">
@@ -16,14 +20,16 @@
             <enum-type name="HEADER_SECTIONS"/>
         </object-type>
     </namespace-type>
-    
+    <function signature="initTraceCommonLibrary()"/>
     <namespace-type name="tracecommon" visible="no">
+
         <object-type name="IssuesManager">
             <enum-type name="REPO_TYPE"/>
         </object-type>
         <object-type name="TraceCommonModelBase">
             <enum-type name="RoleNames"/>
         </object-type>
+        <function signature="initTraceCommonLibrary"/>
     </namespace-type>
 
     <namespace-type name="gitlab" visible="no">
