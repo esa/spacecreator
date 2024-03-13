@@ -3,6 +3,7 @@ image: $CI_REGISTRY_IMAGE/taste-buster:latest
 stages:
   - build-test
   - build-test-bundle
+  - coverage
 
 
 variables:
@@ -90,3 +91,28 @@ spacecreator-feature:
   rules:
     # For pipelines created when a merge request is created or updated
     - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
+
+
+spacecreator-coverage:
+  stage: coverage
+  script:
+    - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR -e cmake_extra_options="-DCOVERAGE_ENABLED=ON"
+    - cd $BUILD_DIR
+    - ctest
+    - ninja coverage
+    - ccache -s ; df -h # show statistics after build
+  coverage: /^\s*lines:\s*\d+.\d+\%/
+  cache:
+    key: spacecreator_cache
+    paths:
+      - $BUILD_DIR/asn1scc_bin
+      - $DOWNLOAD_DIR
+      - ccache
+  artifacts:
+    reports:
+      junit: $BUILD_DIR/tst_*-result.xml
+    expire_in: 2 days
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: $BUILD_DIR/coverage.xml

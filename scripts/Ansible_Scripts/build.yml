@@ -12,7 +12,7 @@
     app_dir: "{{ env_dir }}/spacecreator.AppDir"
     app_lib_dir: "{{ app_dir }}/lib/Qt/lib"
     space_project_build_dir: "{{ project_dir }}/spacecreator_build_qt6"
-    spacecreator_ninja_config_cmd: " cmake -GNinja  -S{{project_dir }} -B{{ space_project_build_dir }} -DCMAKE_BUILD_TYPE=Release -DBUILD_PATCH_NUMBER={{ patch_version }} -DCMAKE_PREFIX_PATH={{ env_qt_dir }}/lib/cmake/ -DQT_QMAKE_EXECUTABLE:STRING={{ env_qt_dir }}/bin/qmake -DQTC_INSTALL={{ app_dir }} -DQTC_SOURCE={{ app_dir }} -DBUILD_PLUGIN_ASN1=False -DENABLE_FORMAT_CHECK:BOOL=OFF"
+    spacecreator_ninja_config_cmd: " cmake -GNinja  -S{{project_dir }} -B{{ space_project_build_dir }} -DCMAKE_BUILD_TYPE=Release -DBUILD_PATCH_NUMBER={{ patch_version }} -DCMAKE_PREFIX_PATH={{ env_qt_dir }}/lib/cmake/ -DQT_QMAKE_EXECUTABLE:STRING={{ env_qt_dir }}/bin/qmake -DQTC_INSTALL={{ app_dir }} -DQTC_SOURCE={{ app_dir }} -DBUILD_PLUGIN_ASN1=False -DENABLE_FORMAT_CHECK:BOOL=OFF {{ cmake_extra_options }}"
 
   tasks:
     - name: "Extract libzxb-util to {{ app_lib_dir }}"

@@ -45,6 +45,12 @@ add_custom_command(OUTPUT _run_gcovr_parser
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_custom_target (coverage DEPENDS _run_gcovr_parser)
 
+add_custom_command(OUTPUT _run_gcovr_xml_parser
+    POST_BUILD
+    COMMAND gcovr -r ${CMAKE_SOURCE_DIR}/src --object-dir=${CMAKE_BINARY_DIR}/src -e ".*/3rdparty.*" --xml-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --root ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_custom_target (_run_gcovr_parser DEPENDS _run_gcovr_xml_parser)
+
 add_custom_command(OUTPUT _run_lcov_parser
     POST_BUILD
     COMMAND lcov --capture --directory ${CMAKE_BINARY_DIR} --output-file=coverage.info
