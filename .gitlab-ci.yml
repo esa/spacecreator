@@ -109,8 +109,7 @@ spacecreator-coverage:
   artifacts:
     reports:
       junit: $BUILD_DIR/tst_*-result.xml
-    expire_in: 2 days
-    reports:
       coverage_report:
         coverage_format: cobertura
         path: $BUILD_DIR/coverage.xml
+    expire_in: 2 days
