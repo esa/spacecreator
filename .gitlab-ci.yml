@@ -1,9 +1,7 @@
 image: $CI_REGISTRY_IMAGE/taste-buster:latest
 
 stages:
-  - build-test
-  - build-test-bundle
-  - coverage
+  - build
 
 
 variables:
@@ -45,7 +43,7 @@ default:
 
 
 spacecreator-master:
-  stage: build-test-bundle
+  stage: build
   script:
     - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
     - python3 $CI_PROJECT_DIR/scripts/postbuild.py --project_dir $PROJECT_DIR --app_dir $APP_DIR --build_dir $BUILD_DIR # Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
@@ -70,7 +68,7 @@ spacecreator-master:
 
 
 spacecreator-feature:
-  stage: build-test
+  stage: build
   script:
     - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR
     - python3 $CI_PROJECT_DIR/scripts/postbuild.py --project_dir $PROJECT_DIR --app_dir $APP_DIR --build_dir $BUILD_DIR # Copy the SpaceCreator-plugin to the plugin-directory of the QtCreator that is to load it.
@@ -94,7 +92,7 @@ spacecreator-feature:
 
 
 spacecreator-coverage:
-  stage: coverage
+  stage: build
   script:
     - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR -e cmake_extra_options="-DCOVERAGE_ENABLED=ON"
     - cd $BUILD_DIR
