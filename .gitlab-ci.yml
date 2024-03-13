@@ -96,7 +96,7 @@ spacecreator-coverage:
   script:
     - ansible-playbook $CI_PROJECT_DIR/scripts/Ansible_Scripts/build.yml -e env_dir=$ENV_DIR -e env_qt_version=$ENV_QT_VERSION -e qtc_version=$ENV_QTC_VERSION -e project_dir=$CI_PROJECT_DIR -e patch_version=$CI_JOB_ID -e download_dir=$DOWNLOAD_DIR -e cmake_extra_options="-DCOVERAGE_ENABLED=ON"
     - cd $BUILD_DIR
-    - ctest
+    - ./scripts/run_tests.sh $BUILD_DIR
     - ninja coverage
     - ccache -s ; df -h # show statistics after build
   coverage: /^\s*lines:\s*\d+.\d+\%/
