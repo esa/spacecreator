@@ -35,6 +35,7 @@ namespace ui {
 class SCRequirementsWidget;
 class SCReviewsWidget;
 }
+class ComponentReviewsProxyModel;
 class RequirementsModel;
 }
 
@@ -100,7 +101,7 @@ private:
 
     shared::ui::SCReviewsWidget *m_reviewWidget = nullptr;
     reviews::ReviewsManager *m_reviewsManager = nullptr;
-    reviews::ReviewsModelBase *m_reviewsModel = nullptr;
+    shared::ComponentReviewsProxyModel *m_reviewsModel = nullptr;
 };
 
 } // namespace ive

@@ -55,6 +55,7 @@ target_sources(${LIB_NAME} PRIVATE
     common.h
     componentmodel.cpp
     componentmodel.h
+    componentreviewsproxymodel.h componentreviewsproxymodel.cpp
     datamodel.cpp
     datamodel.h
     delayedsignal.cpp

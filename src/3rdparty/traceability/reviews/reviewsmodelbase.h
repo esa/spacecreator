@@ -48,21 +48,21 @@ public:
 
     virtual void clear();
 
-    void setReviews(const QList<Review> &reviews);
-    void addReviews(const QList<Review> &reviews);
+    virtual void setReviews(const QList<Review> &reviews);
+    virtual void addReviews(const QList<Review> &reviews);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     // Basic functionality:
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     Review reviewFromIndex(const QModelIndex &idx) const;
 
-    bool reviewIDExists(const QString &revID) const;
+    virtual bool reviewIDExists(const QString &revID) const;
 
 protected:
     QList<Review> m_reviews;

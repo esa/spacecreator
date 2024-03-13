@@ -109,6 +109,8 @@ QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
         return m_reviews[index.row()].m_longName;
     case TraceCommonModelBase::AuthorRole:
         return m_reviews[index.row()].m_author;
+    case ReviewIdRole:
+        return m_reviews[index.row()].m_id;
     }
 
     return QVariant();

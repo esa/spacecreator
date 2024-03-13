@@ -25,6 +25,7 @@
 #include "commands/cmdsetrequirementsurl.h"
 #include "commands/cmdsetreviewsurl.h"
 #include "commandsstack.h"
+#include "componentreviewsproxymodel.h"
 #include "contextparametersmodel.h"
 #include "delegates/asn1valuedelegate.h"
 #include "ifaceparametersmodel.h"
@@ -105,7 +106,8 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     m_reviewWidget = new shared::ui::SCReviewsWidget(this);
     m_reviewsManager = new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this);
     m_reviewWidget->setManager(m_reviewsManager);
-    m_reviewsModel = new reviews::ReviewsModelBase(this);
+    m_reviewsModel = new shared::ComponentReviewsProxyModel(this);
+    m_reviewsModel->setAcceptableIds(dataObject()->reviewIDs());
     m_reviewWidget->setModel(m_reviewsModel);
     connect(m_reviewWidget, &reviews::ReviewsWidget::reviewsUrlChanged, this,
             [model, commandsStack, this](QUrl reviewsUrl) {
@@ -385,6 +387,7 @@ void IVPropertiesDialog::addReviewId(const reviews::Review &review)
     commandMacro()->push(new shared::cmd::CmdEntityAttributesChange(propertiesConfig(), ivObj,
             { EntityAttribute { attributeName, QVariant::fromValue<QString>(reviews.join(",")),
                     EntityAttribute::Type::Attribute } }));
+    m_reviewsModel->setAcceptableIds(ivObj->reviewIDs());
 }
 
 } // namespace ive
