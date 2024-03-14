@@ -31,6 +31,15 @@ python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6
 
 '''
 
+def __notify_satus(message: str):
+    me = os.path.basename(__file__)
+    print(f"{me}: {message}")
+
+def __notify_action_started(action:str, arg_from, arg_to):
+    __notify_satus(f"{action} '{arg_from}' to '{arg_to}'")
+
+def __notify_download_started(url, destination):
+    __notify_action_started("Downloading", url, destination)
 
 def build_path_object(project_dir: str, env_path: str, qt_version: str):
     """
@@ -58,7 +67,7 @@ def download_qt(env_qt_path: str, env_qt_version: str) -> None:
     Extra modules installed: qtwebsockets, qt5compat
     """
     build_with_qt6 = env_qt_version.split('.')[0] == '6'
-    print("Downloading Qt {} to {}".format(env_qt_version, env_qt_path))
+    __notify_download_started(env_qt_version, env_qt_path)
     download_qt_command = ['aqt', 'install-qt', '--outputdir', env_qt_path,
                            '--base', 'https://download.qt.io/',
                            'linux', 'desktop', env_qt_version]
@@ -68,7 +77,7 @@ def download_qt(env_qt_path: str, env_qt_version: str) -> None:
     print_cmd(download_qt_command)
     completed_process = subprocess.run(download_qt_command)
     if not completed_process.returncode == 0:
-        print("Downloading Qt {} failed".format(env_qt_version))
+        __notify_satus(f"Downloading Qt {env_qt_version} failed")
         exit(1)
 
 
@@ -89,11 +98,11 @@ def download_qtcreator(env_path: str, env_qtc_version: str, env_app_dir) -> None
 
     bin_url = base_url + 'qtcreator.7z'
     qtcreator7z = join_dir(env_path, 'qtcreator.7z')
-    print("Downloading {} to {}".format(bin_url, qtcreator7z))
+    __notify_download_started(bin_url,qtcreator7z)
     try:
         urllib.request.urlretrieve(bin_url, qtcreator7z)  # download qtcreator.7z to the root of the env folder
     except:
-        print("Could not download QtCreator 7z file {}".format(bin_url))
+        __notify_satus(f"Could not download QtCreator 7z file '{bin_url}'")
         exit(2)
 
     with py7zr.SevenZipFile(qtcreator7z, mode='r') as z:
@@ -102,11 +111,11 @@ def download_qtcreator(env_path: str, env_qtc_version: str, env_app_dir) -> None
     # Download the header files for building plugins for QtCreator and extract them to where qtcreator is
     dev_url = base_url + 'qtcreator_dev.7z'
     qtcreatordev7z = join_dir(env_path, 'qtcreator_dev.7z')
-    print("Downloading {} to {}".format(dev_url, qtcreatordev7z))
+    __notify_download_started(dev_url, qtcreatordev7z)
     try:
         urllib.request.urlretrieve(dev_url, qtcreatordev7z)  # download qtcreator.7z to the root of the env folder
     except:
-        print('Could not download QtCreator dev {}'.format(dev_url))
+        __notify_satus(f"Could not download QtCreator dev '{dev_url}'")
         exit(3)
     with py7zr.SevenZipFile(qtcreatordev7z, mode='r') as zdev:
         zdev.extractall(env_app_dir)  # uncompress qtcreator into AppDir because qtcreator IS the app
@@ -119,7 +128,7 @@ def download_grantlee(env_dir: str) -> None:
     gitlab_url = "https://gitrepos.estec.esa.int/taste/grantlee.git"
     target_dir = join_dir(env_dir, 'grantlee')
     grantlee_tag = "v5.3.1"
-    print('Cloning grantlee from {} the tag {}'.format(gitlab_url, grantlee_tag))
+    __notify_satus(f"Cloning grantlee from '{gitlab_url}' the tag '{grantlee_tag}'")
     Repo.clone_from(gitlab_url, target_dir)
     repo = Git(target_dir)
     repo.checkout(grantlee_tag)
@@ -131,7 +140,7 @@ def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
     cmake_source_dir = join_dir(env_dir, 'grantlee')
     qmake_dir = join_dir(env_qt_dir, 'bin', 'qmake')
 
-    print('Building grantlee')
+    __notify_satus("Building grantlee")
     # Make ninja.build
     ninja_cmd = ['cmake',
                  '-GNinja',
@@ -147,7 +156,7 @@ def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
     print_cmd(ninja_cmd)
     completed_process = subprocess.run(ninja_cmd)
     if not completed_process.returncode == 0:
-        print("Could not make ninja.build for grantlee")
+        __notify_satus("Could not make ninja.build for grantlee")
         exit(4)
 
     # Build Grantlee using ninja
@@ -157,7 +166,7 @@ def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
     print_cmd(build_cmd)
     completed_process = subprocess.run(build_cmd)
     if not completed_process.returncode == 0:
-        print("Could not build grantlee")
+        __notify_satus("Could not build grantlee")
         exit(4)
 
 
@@ -181,7 +190,7 @@ def install_grantlee(env_dir: str, app_dir: str) -> None:
     print_cmd(install_cmd)
     completed_process = subprocess.run(install_cmd)
     if not completed_process.returncode == 0:
-        print("Could not install grantlee in {}".format(cmake_build_dir))
+        __notify_satus(f"Could not install grantlee in '{cmake_build_dir}'")
         exit(5)
 
     # Install grantlee in spacecreator.AppDir
@@ -207,13 +216,13 @@ def download_asn1scc(env_dir: str) -> None:
     """
     asn_url = "https://github.com/maxime-esa/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2"
     asn_tarbz2 = join_dir(env_dir, 'asn1scc-bin-4.2.4.7f.tar.bz2')
-    print('prebuild.py: Downloading {} to {}'.format(asn_url, asn_tarbz2))
+    __notify_download_started(asn_url, asn_tarbz2)
     try:
         urllib.request.urlretrieve(asn_url, asn_tarbz2)  # download qtcreator.7z to the root of the env folder
     except:
-        print("prebuild.py: Could not download asn1scc from {}".format(asn_url))
+        __notify_satus(f"Could not download asn1scc from '{asn_url}'")
         exit(4)
-    print('prebuild.py: Extracting {} to {}'.format(asn_tarbz2, env_dir))
+    __notify_action_started("Extracting", asn_tarbz2, env_dir)
     with tarfile.open(asn_tarbz2, 'r:bz2') as asn_tarbz2_file:
         asn_tarbz2_file.extractall(env_dir)
 
@@ -224,14 +233,14 @@ def download_asn_fuzzer(env_dir: str, app_dir: str) -> None:
     """
     fuzzer_url = "https://github.com/n7space/asn1scc.Fuzzer/releases/download/0.9/asn1scc-Fuzzer-0.9-linux-x64.tar.gz"
     fuzzer_targz = join_dir(env_dir, 'asn1scc-Fuzzer-0.9-linux-x64.tar.gz')
-    print('prebuild.py: Downloading {} to {}'.format(fuzzer_url, fuzzer_targz))
+    __notify_download_started(fuzzer_url,fuzzer_targz)
     try:
         urllib.request.urlretrieve(fuzzer_url, fuzzer_targz)
     except:
-        print("prebuild.py: Could not download asn fuzzer from {}".format(fuzzer_url))
+        __notify_satus(f"Could not download asn fuzzer from '{fuzzer_url}'")
         exit(4)
     fuzzer_target = join_dir(app_dir, "libexec", "qtcreator")
-    print('prebuild.py: Extracting {} to {}'.format(fuzzer_targz, fuzzer_target))
+    __notify_action_started("Extracting", fuzzer_targz, fuzzer_target)
     with tarfile.open(fuzzer_targz, 'r:gz') as fuzzer_targz_file:
         fuzzer_targz_file.extractall(fuzzer_target)
 
@@ -242,15 +251,16 @@ def download_pus_c(env_dir: str, app_dir: str) -> None:
     """
     pusc_url = "https://github.com/n7space/asn1-pusc-lib/releases/download/1.1.0/Asn1Acn-PusC-Library-1.1.0.7z"
     pusc_7z = join_dir(env_dir, 'Asn1Acn-PusC-Library-1.1.0.7z')
-    print('prebuild.py: Downloading {} to {}'.format(pusc_url, pusc_7z))
+    __notify_download_started(pusc_url,pusc_7z)
     try:
         urllib.request.urlretrieve(pusc_url, pusc_7z)
     except:
-        print("prebuild.py: Could not download asn fuzzer from {}".format(pusc_url))
+        __notify_satus(f"Could not download asn fuzzer from '{pusc_url}'")
         exit(4)
     pusc_target = join_dir(app_dir, "share", "qtcreator", "asn1acn", "libs", "PUS-C")
     ensure_dir(pusc_target)
-    print('prebuild.py: Extracting {} to {}'.format(pusc_7z, pusc_target))
+    __notify_action_started("Extracting", pusc_7z, pusc_target)
+
     with py7zr.SevenZipFile(pusc_7z, mode='r') as z:
         z.extractall(pusc_target)
 
@@ -258,48 +268,48 @@ def download_pus_c(env_dir: str, app_dir: str) -> None:
 def build_asn1scc_language_server(env_dir: str) -> None:
     makefile = join_dir(env_dir, 'Makefile.debian')
     if not os.path.exists(makefile):
-        print("prebuild.py: No Makefile.debian found in {}".format(makefile))
+        __notify_satus(f"No Makefile.debian found in '{makefile}'")
         exit(5)
     make_cmd = ['make', '-f', makefile]
-    print('prebuild.py: Building Language Server')
+    __notify_satus("Building Language Server")
     print_cmd(make_cmd)
     completed_process = subprocess.run(make_cmd)
     if not completed_process.returncode == 0:
-        print("prebuild.py: Could build asn1scc")
+        __notify_satus("Could not build asn1scc")
         exit(6)
     server = join_dir(env_dir, 'asn1scc', 'lsp', 'Server', 'Server', 'bin', 'Release', 'net6.0', 'Server')
     if os.path.exists(server):
-        print("prebuild.py: Successfully build {}".format(server))
+        __notify_satus(f"Successfully build '{server}'")
     else:
-        print("prebuild.py: Failed building language server. File not build: {}", server)
+        __notify_satus(f"Failed building language server. File not build: '{server}'")
         exit(7)
 
 
 def download_asn1scc_language_server(env_dir: str) -> None:
     url = "https://github.com/maxime-esa/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
     asn1cc_lsp_tarbz2 = join_dir(env_dir, 'asn1scc-lsp.tar.bz2')
-    print('prebuild.py: Downloading {} to {}'.format(url, asn1cc_lsp_tarbz2))
+    __notify_download_started(url,asn1cc_lsp_tarbz2)
     try:
         urllib.request.urlretrieve(url, asn1cc_lsp_tarbz2)  # download qtcreator.7z to the root of the env folder
     except:
-        print("prebuild.py: Could not download asn1scc language server from {}".format(url))
+        __notify_satus(f"Could not download asn1scc language server from '{url}'")
         exit(4)
-    print('prebuild.py: Extracting {} to {}'.format(asn1cc_lsp_tarbz2, env_dir))
+    __notify_action_started("Extracting",asn1cc_lsp_tarbz2, env_dir)
     with tarfile.open(asn1cc_lsp_tarbz2, 'r:bz2') as ans_lsp_tarbz2_file:
         ans_lsp_tarbz2_file.extractall(env_dir)
 
 
 def copy_additional_qt_modules(env_qt_dir: str, app_dir: str) -> None:
     if not os.path.exists(env_qt_dir):
-        print("prebuild.py: Could not find env qt dir: {}". format(env_qt_dir))
+        __notify_satus(f"Could not find env qt dir: '{env_qt_dir}'")
         exit(1)
     if not os.path.exists(app_dir):
-        print("prebuild.py: Could not find env app dir: {}".format(app_dir))
+        __notify_satus(f"Could not find env app dir: '{app_dir}'")
         exit(2)
 
     env_qt_lib_dir = join_dir(env_qt_dir, 'lib')
     app_lib_dir = join_dir(app_dir, 'lib', 'Qt', 'lib')
-    print("prebuild.py: Copying additional qt modules from {} to {}".format(env_qt_lib_dir, app_lib_dir))
+    __notify_action_started("Copying additional qt modules", env_qt_lib_dir, app_lib_dir)
     pattern = join_dir(env_qt_lib_dir, 'libQt*WebSockets*')
     copy_file_pattern_to_dir(pattern, app_lib_dir)
 
@@ -308,34 +318,34 @@ def extract_extraLibraries(install_dir: str, lib_dir: str) -> None:
     extra_libs = ['libzxb-util.tar.gz', 'libxcb-cursor.tar.gz', 'libssl3.tar.gz']
     for extra_lib_name in extra_libs:
         extra_lib = join_dir(install_dir, extra_lib_name)
-        print("Extracting '{extra_lib}' to '{lib_dir}'")
+        __notify_action_started("Extracting", extra_lib, lib_dir)
         with tarfile.open(extra_lib, 'r:gz') as archive:
             archive.extractall(lib_dir)
 
 def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
     if not os.path.exists(generic_highlighter_dir):
-        print("prebuild.py: Could not find wizards dir: {}".format(generic_highlighter_dir))
+        __notify_satus(f"Could not find wizards dir: '{generic_highlighter_dir}'")
         exit(1)
-    print("prebuild.py: Copying generic highlighter files from {} to {}".format(generic_highlighter_dir, generic_highlighter_install_dir))
+    __notify_action_started("Copying generic highlighter files", generic_highlighter_dir, generic_highlighter_install_dir)
     copy_content_of_dir_to_other_dir(generic_highlighter_dir, generic_highlighter_install_dir)
 
 
 def copy_snippets(snippets_dir: str, snippets_install_dir: str) -> None:
     if not os.path.exists(snippets_dir):
-        print("prebuild.py: Could not find snippets dir {}".format(snippets_dir))
+        __notify_satus(f"Could not find snippets dir '{snippets_dir}'")
         exit(1)
-    print("prebuild.py: Copying snippets from {} to {}".format(snippets_dir, snippets_install_dir))
+    __notify_action_started("Copying snippets", snippets_dir, snippets_install_dir)
     copy_content_of_dir_to_other_dir(snippets_dir, snippets_install_dir)
 
 
 def copy_qhelpgenerator(qhelpgenerator_dir: str, target_libexec_dir: str) -> None:
     if not os.path.exists(qhelpgenerator_dir):
-        print("prebuild.py: Could not find qhelpgenerator in {}".format(qhelpgenerator_dir))
+        __notify_satus(f"Could not find qhelpgenerator in '{qhelpgenerator_dir}'")
         exit(1)
     if not os.path.exists(target_libexec_dir):
         os.makedirs(target_libexec_dir)  # in QtC 4 this folder does not exist
     qhelpgenerator = join_dir(qhelpgenerator_dir, 'qhelpgenerator')
-    print("prebuild.py: Copying qhelpgenerator from {} to {}".format(qhelpgenerator_dir, target_libexec_dir))
+    __notify_action_started("Copying qhelpgenerator", qhelpgenerator_dir, target_libexec_dir)
     shutil.copy2(qhelpgenerator, target_libexec_dir)
 
 
@@ -364,7 +374,7 @@ def main():
         project_dir = args.project_dir
     else:
         project_dir = default_project_dir
-        print("prebuild.py: project_dir defaults to {}".format(project_dir))
+        __notify_satus(f"project_dir defaults to '{project_dir}'")
 
     env_dir = args.env_path
     if args.app_dir:
@@ -376,9 +386,9 @@ def main():
     qtcreator_version = args.qtcreator_version
     paths = build_path_object(project_dir, env_dir, qt_version)
 
-    print("prebuild.py: env_dir is {}".format(env_dir))
-    print("prebuild.py: qt_version was {}".format(qt_version))
-    print("prebuild.py: qtcreator_version is {}".format(qtcreator_version))
+    __notify_satus(f"env_dir is '{env_dir}'")
+    __notify_satus(f"qt_version is {qt_version}")
+    __notify_satus(f"qtcreator_version is {qtcreator_version}")
 
     check_cmake_version(3, 18, 0)
 
