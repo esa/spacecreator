@@ -46,10 +46,19 @@ public:
     };
 
     explicit RequirementsModelBase(QObject *parent = nullptr);
-
+    /*!
+     * \brief Empties the list of requirements of the model
+     */
     virtual void clearRequirements();
-
+    /*!
+     * \brief set a list of requirements in the model
+     * \param requirements
+     */
     virtual void setRequirements(const QList<Requirement> &requirements);
+    /*!
+     * \brief Append some reuqiements to the existing requirements in the model
+     * \param requirements
+     */
     virtual void addRequirements(const QList<requirement::Requirement> &requirements);
 
     // Header:
@@ -65,11 +74,24 @@ public:
 
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
+    /*!
+     * \brief List of selected requirements in the UI
+     * \return requirements
+     */
     virtual QStringList selectedRequirements() const;
+
+    /*!
+     * \brief List of selected requirements in the UI
+     * \return requirements
+     */
     virtual void setSelectedRequirements(const QStringList &selected);
 
     Requirement requirementFromIndex(const QModelIndex &idx);
-
+    /*!
+     * \brief Check if a requirement ID already exists in the model
+     * \param requirement ID
+     * \return True if the Requirement ID already exists
+     */
     bool reqIfIDExists(const QString &reqIfID) const;
 
 protected:

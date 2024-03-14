@@ -32,14 +32,61 @@ public:
     };
 
     QGitlabClient();
+    /*!
+     * \brief Sets the url and token to operate with the GitlabAPI
+     * \param The url parameter is stripped of the project name and set with the path "/api/v4" so it can
+     *        be used with the different Gitlab API Endpoints
+     * \param This the personal token used on any call to the Gitlab API.
+     */
     void setCredentials(const QString &url, const QString &token);
+    /*!
+     * \brief Makes one or more request to the gitlab api to retrieve all the requirements
+     * \param the options are used to filter the requirements search
+     * \return Returns true if there's a pending request otherwise false.
+     */
     bool requestIssues(const IssueRequestOptions &options);
+    /*!
+     * \brief Edits any Issue (requirement or review)
+     * \param projectID used for the query
+     * \param issueID used for the query
+     * \param newIssue the issue with the edits that need to be changed.
+     * \return Returns true if there's a pending request otherwise false.
+     */
     bool editIssue(const int &projectID, const int &issueID, const Issue &newIssue);
+    /*!
+     * \brief Creates a new issue (requirement or review)
+     * \param projectID used for the query
+     * \param title that corresponds to the gitlab issue title
+     * \param description that corresponds to the gitlab issue description
+     * \param labels that will be included in the issue
+     * \return Returns true if there's a pending request otherwise false.
+     */
     bool createIssue(const int &projectID, const QString &title, const QString &description, const QStringList &labels);
+    /*!
+     * \brief Closes an issue (removes a requirement or review)
+     * \param projectID used for the query
+     * \param issueID used for the query
+     * \return Returns true if there's a pending request otherwise false.
+     */
     bool closeIssue(const int &projectID, const int &issueID);
-    bool requestListofLabels(const LabelsRequestOptions &options);
-    bool requestProjectId(const QUrl &projectUrl);
+    /*!
+     * \brief Makes one or more request to the gitlab api to retrieve all the labels
+     * \param the options are used to filter the labels search
+     * \return Returns true if there's a pending request otherwise false.
+     */
 
+    bool requestListofLabels(const LabelsRequestOptions &options);
+    /*!
+     * \brief request the project ID to be used on any of the queries to the gitlab API
+     * \param projectID retrieveed using the project name included in the url
+     * \return Returns true if there's a pending request otherwise false.
+     */
+
+    bool requestProjectId(const QUrl &projectUrl);
+    /*!
+     * \brief Helper function that returns true if there is any ongoing request to the gitlab server
+     * \return true if busy
+     */
     bool isBusy() const;
 
 Q_SIGNALS:
@@ -60,11 +107,32 @@ Q_SIGNALS:
      * Sent after successfully fetching labels
      */
     void labelsFetchingDone();
-
+    /*!
+     * \brief This is the list of labels retrieved from the gitlab project.
+     * If there are too many labels to be fetched, the signal will be emitted
+     * once per successful network request
+     */
     void listOfLabels(QList<Label>);
+    /*!
+     * \brief This is the project ID obtained after calling `requestProjectId`.
+     * The signal will be emitted if there's a response and the url supplied matches
+     * the one contained in the reply's json data.
+     */
     void requestedProjectID(int);
+    /*!
+     * \brief This signal is emitted for any failing request of this class
+     * \param errorString returns a text message corresponding to request error.
+     */
     void connectionError(QString errorString);
+    /*!
+     * \brief This signal is emitted if the server return a sucessful reply
+     * on issue creation request (requirement/review).
+     * \param issue An Issue object is created to convert it to a requirement or a review.
+     */
     void issueCreated(const Issue &issue);
+    /*!
+     * \brief This signal is emitted if an issue is Closed. At the moment is used to refresh the list of requirements.
+     */
     void issueClosed();
 
 protected:
