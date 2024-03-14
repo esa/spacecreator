@@ -11,7 +11,6 @@ import shutil
 from utils import join_dir, print_cmd, ensure_dir, check_cmake_version, copy_content_of_dir_to_other_dir, copy_file_pattern_to_dir
 from git import Git
 from git.repo import Repo
-
 '''
 This script prepares a build environment in a given folder for SpaceCreator. SpaceCreator is a plugin for QtCreator
 and the following is needed to compile it:
@@ -31,15 +30,19 @@ python3 ./scripts/prebuild.py --output_dir ~/opt/spacecreatorenv6 --qt_version=6
 
 '''
 
+
 def __notify_satus(message: str):
     me = os.path.basename(__file__)
     print(f"{me}: {message}")
 
-def __notify_action_started(action:str, arg_from, arg_to):
+
+def __notify_action_started(action: str, arg_from, arg_to):
     __notify_satus(f"{action} '{arg_from}' to '{arg_to}'")
+
 
 def __notify_download_started(url, destination):
     __notify_action_started("Downloading", url, destination)
+
 
 def build_path_object(project_dir: str, env_path: str, qt_version: str):
     """
@@ -57,6 +60,7 @@ def build_path_object(project_dir: str, env_path: str, qt_version: str):
         env_qt_libexec_dir = join_dir(env_qt_dir, 'libexec')
         env_qt_bin_dir = join_dir(env_qt_dir, 'bin')
         install_dir = join_dir(project_dir, 'install')
+
     _paths = Paths()
     return _paths
 
@@ -68,9 +72,17 @@ def download_qt(env_qt_path: str, env_qt_version: str) -> None:
     """
     build_with_qt6 = env_qt_version.split('.')[0] == '6'
     __notify_download_started(env_qt_version, env_qt_path)
-    download_qt_command = ['aqt', 'install-qt', '--outputdir', env_qt_path,
-                           '--base', 'https://download.qt.io/',
-                           'linux', 'desktop', env_qt_version]
+    download_qt_command = [
+        'aqt',
+        'install-qt',
+        '--outputdir',
+        env_qt_path,
+        '--base',
+        'https://download.qt.io/',
+        'linux',
+        'desktop',
+        env_qt_version,
+    ]
     if build_with_qt6:
         download_qt_command += ['--modules', 'qtwebsockets', 'qt5compat']
 
@@ -93,15 +105,14 @@ def download_qtcreator(env_path: str, env_qtc_version: str, env_app_dir) -> None
     version_list = env_qtc_version.split('.')
     version_short = '.'.join(version_list[:2])  # version_short is now in the format X.Y
 
-    base_url = 'https://download.qt.io/official_releases/qtcreator/' + \
-                   version_short + '/' + env_qtc_version + '/installer_source/linux_x64/'
+    base_url = f"https://download.qt.io/official_releases/qtcreator/{version_short}/{env_qtc_version}/installer_source/linux_x64/"
 
     bin_url = base_url + 'qtcreator.7z'
     qtcreator7z = join_dir(env_path, 'qtcreator.7z')
-    __notify_download_started(bin_url,qtcreator7z)
+    __notify_download_started(bin_url, qtcreator7z)
     try:
         urllib.request.urlretrieve(bin_url, qtcreator7z)  # download qtcreator.7z to the root of the env folder
-    except:
+    except:  # noqa E722
         __notify_satus(f"Could not download QtCreator 7z file '{bin_url}'")
         exit(2)
 
@@ -114,7 +125,7 @@ def download_qtcreator(env_path: str, env_qtc_version: str, env_app_dir) -> None
     __notify_download_started(dev_url, qtcreatordev7z)
     try:
         urllib.request.urlretrieve(dev_url, qtcreatordev7z)  # download qtcreator.7z to the root of the env folder
-    except:
+    except:  # noqa E722
         __notify_satus(f"Could not download QtCreator dev '{dev_url}'")
         exit(3)
     with py7zr.SevenZipFile(qtcreatordev7z, mode='r') as zdev:
@@ -142,16 +153,20 @@ def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
 
     __notify_satus("Building grantlee")
     # Make ninja.build
-    ninja_cmd = ['cmake',
-                 '-GNinja',
-                 '-DCMAKE_PREFIX_PATH:STRING=' + env_qt_dir,
-                 '-DQT_QMAKE_EXECUTABLE:STRING=' + qmake_dir,
-                 '-DCMAKE_BUILD_TYPE=Release',
-                 '-DCMAKE_INSTALL_PREFIX=' + env_qt_dir,
-                 '-B', cmake_build_dir,
-                 '-S', cmake_source_dir,
-                 '-DGRANTLEE_BUILD_WITH_QT6=ON',
-                 '-Wmaybe-uninitialized']
+    ninja_cmd = [
+        'cmake',
+        '-GNinja',
+        '-DCMAKE_PREFIX_PATH:STRING=' + env_qt_dir,
+        '-DQT_QMAKE_EXECUTABLE:STRING=' + qmake_dir,
+        '-DCMAKE_BUILD_TYPE=Release',
+        '-DCMAKE_INSTALL_PREFIX=' + env_qt_dir,
+        '-B',
+        cmake_build_dir,
+        '-S',
+        cmake_source_dir,
+        '-DGRANTLEE_BUILD_WITH_QT6=ON',
+        '-Wmaybe-uninitialized',
+    ]
 
     print_cmd(ninja_cmd)
     completed_process = subprocess.run(ninja_cmd)
@@ -160,9 +175,11 @@ def build_grantlee(env_dir: str, env_qt_dir: str) -> None:
         exit(4)
 
     # Build Grantlee using ninja
-    build_cmd = ['cmake',
-                 '--build',
-                 cmake_build_dir]
+    build_cmd = [
+        'cmake',
+        '--build',
+        cmake_build_dir,
+    ]
     print_cmd(build_cmd)
     completed_process = subprocess.run(build_cmd)
     if not completed_process.returncode == 0:
@@ -182,11 +199,13 @@ def install_grantlee(env_dir: str, app_dir: str) -> None:
     :param env_dir: path to the build environment (i.e ~/opt/spacecreatorenv6)
     """
     cmake_build_dir = join_dir(env_dir, 'build')
-    install_cmd = ['cmake',
-                   '--build',
-                   cmake_build_dir,
-                   '--target',
-                   'install']
+    install_cmd = [
+        'cmake',
+        '--build',
+        cmake_build_dir,
+        '--target',
+        'install',
+    ]
     print_cmd(install_cmd)
     completed_process = subprocess.run(install_cmd)
     if not completed_process.returncode == 0:
@@ -219,7 +238,7 @@ def download_asn1scc(env_dir: str) -> None:
     __notify_download_started(asn_url, asn_tarbz2)
     try:
         urllib.request.urlretrieve(asn_url, asn_tarbz2)  # download qtcreator.7z to the root of the env folder
-    except:
+    except:  # noqa E722
         __notify_satus(f"Could not download asn1scc from '{asn_url}'")
         exit(4)
     __notify_action_started("Extracting", asn_tarbz2, env_dir)
@@ -233,10 +252,10 @@ def download_asn_fuzzer(env_dir: str, app_dir: str) -> None:
     """
     fuzzer_url = "https://github.com/n7space/asn1scc.Fuzzer/releases/download/0.9/asn1scc-Fuzzer-0.9-linux-x64.tar.gz"
     fuzzer_targz = join_dir(env_dir, 'asn1scc-Fuzzer-0.9-linux-x64.tar.gz')
-    __notify_download_started(fuzzer_url,fuzzer_targz)
+    __notify_download_started(fuzzer_url, fuzzer_targz)
     try:
         urllib.request.urlretrieve(fuzzer_url, fuzzer_targz)
-    except:
+    except:  # noqa E722
         __notify_satus(f"Could not download asn fuzzer from '{fuzzer_url}'")
         exit(4)
     fuzzer_target = join_dir(app_dir, "libexec", "qtcreator")
@@ -251,10 +270,10 @@ def download_pus_c(env_dir: str, app_dir: str) -> None:
     """
     pusc_url = "https://github.com/n7space/asn1-pusc-lib/releases/download/1.1.0/Asn1Acn-PusC-Library-1.1.0.7z"
     pusc_7z = join_dir(env_dir, 'Asn1Acn-PusC-Library-1.1.0.7z')
-    __notify_download_started(pusc_url,pusc_7z)
+    __notify_download_started(pusc_url, pusc_7z)
     try:
         urllib.request.urlretrieve(pusc_url, pusc_7z)
-    except:
+    except:  # noqa E722
         __notify_satus(f"Could not download asn fuzzer from '{pusc_url}'")
         exit(4)
     pusc_target = join_dir(app_dir, "share", "qtcreator", "asn1acn", "libs", "PUS-C")
@@ -288,13 +307,13 @@ def build_asn1scc_language_server(env_dir: str) -> None:
 def download_asn1scc_language_server(env_dir: str) -> None:
     url = "https://github.com/maxime-esa/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
     asn1cc_lsp_tarbz2 = join_dir(env_dir, 'asn1scc-lsp.tar.bz2')
-    __notify_download_started(url,asn1cc_lsp_tarbz2)
+    __notify_download_started(url, asn1cc_lsp_tarbz2)
     try:
         urllib.request.urlretrieve(url, asn1cc_lsp_tarbz2)  # download qtcreator.7z to the root of the env folder
-    except:
+    except:  # noqa E722
         __notify_satus(f"Could not download asn1scc language server from '{url}'")
         exit(4)
-    __notify_action_started("Extracting",asn1cc_lsp_tarbz2, env_dir)
+    __notify_action_started("Extracting", asn1cc_lsp_tarbz2, env_dir)
     with tarfile.open(asn1cc_lsp_tarbz2, 'r:bz2') as ans_lsp_tarbz2_file:
         ans_lsp_tarbz2_file.extractall(env_dir)
 
@@ -321,6 +340,7 @@ def extract_extraLibraries(install_dir: str, lib_dir: str) -> None:
         __notify_action_started("Extracting", extra_lib, lib_dir)
         with tarfile.open(extra_lib, 'r:gz') as archive:
             archive.extractall(lib_dir)
+
 
 def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
     if not os.path.exists(generic_highlighter_dir):
@@ -355,18 +375,33 @@ def main():
 
     # Parse arguments
     parser = argparse.ArgumentParser(prog='prebuild')
-    parser.add_argument('--output_dir', dest='env_path', type=str, required=True,
+    parser.add_argument('--output_dir',
+                        dest='env_path',
+                        type=str,
+                        required=True,
                         help='Where to put the build environment . This means the '
-                             'specified version of Qt, GrantLee lib and the spacecrator.AppDir which'
-                             ' is the final application')
-    parser.add_argument('--project_dir', dest='project_dir', type=str, required=False,
+                        'specified version of Qt, GrantLee lib and the spacecrator.AppDir which'
+                        ' is the final application')
+    parser.add_argument('--project_dir',
+                        dest='project_dir',
+                        type=str,
+                        required=False,
                         help='Path to the folder where spacecreator project is')
-    parser.add_argument('--qt_version', dest='qt_version', type=str, required=True,
+    parser.add_argument('--qt_version',
+                        dest='qt_version',
+                        type=str,
+                        required=True,
                         help='Version of Qt to download to the build environment. Format X.Y.Z')
-    parser.add_argument('--qtcreator_version', dest='qtcreator_version', type=str, required=True,
+    parser.add_argument('--qtcreator_version',
+                        dest='qtcreator_version',
+                        type=str,
+                        required=True,
                         help='Version of Qt Creator to download. Format X.Y.Z')
-    parser.add_argument('--app_dir', dest='app_dir', type=str, required=False,
-                        help='Path to the folder that contains AppDir. Defaults to output_dir/spacecreator.AppDir')
+    parser.add_argument('--app_dir',
+                        dest='app_dir',
+                        type=str,
+                        required=False,
+                        help="Path to the folder that contains AppDir. Defaults to output_dir/spacecreator.AppDir")
     args = parser.parse_args()
 
     # Build the paths object
