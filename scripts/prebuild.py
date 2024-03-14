@@ -305,19 +305,12 @@ def copy_additional_qt_modules(env_qt_dir: str, app_dir: str) -> None:
 
 
 def extract_extraLibraries(install_dir: str, lib_dir: str) -> None:
-    libzxb_util_gz = join_dir(install_dir, 'libzxb-util.tar.gz')
-    print('Extracting {} to {}'.format(libzxb_util_gz, lib_dir))
-    with tarfile.open(libzxb_util_gz, 'r:gz') as utilArchive:
-        utilArchive.extractall(lib_dir)
-    libxcb_cursor_gz = join_dir(install_dir, 'libxcb-cursor.tar.gz')
-    print('Extracting {} to {}'.format(libxcb_cursor_gz, lib_dir))
-    with tarfile.open(libxcb_cursor_gz, 'r:gz') as cursorArchive:
-        cursorArchive.extractall(lib_dir)
-    libssl3_gz = join_dir(install_dir, 'libssl3.tar.gz')
-    print('Extracting {} to {}'.format(libssl3_gz, lib_dir))
-    with tarfile.open(libssl3_gz, 'r:gz') as sslArchive:
-        sslArchive.extractall(lib_dir)
-
+    extra_libs = ['libzxb-util.tar.gz', 'libxcb-cursor.tar.gz', 'libssl3.tar.gz']
+    for extra_lib_name in extra_libs:
+        extra_lib = join_dir(install_dir, extra_lib_name)
+        print("Extracting '{extra_lib}' to '{lib_dir}'")
+        with tarfile.open(extra_lib, 'r:gz') as archive:
+            archive.extractall(lib_dir)
 
 def copy_highlighter_files(generic_highlighter_dir: str, generic_highlighter_install_dir: str) -> None:
     if not os.path.exists(generic_highlighter_dir):
