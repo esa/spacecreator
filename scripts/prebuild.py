@@ -307,15 +307,15 @@ def copy_additional_qt_modules(env_qt_dir: str, app_dir: str) -> None:
 def extract_extraLibraries(install_dir: str, lib_dir: str) -> None:
     libzxb_util_gz = join_dir(install_dir, 'libzxb-util.tar.gz')
     print('Extracting {} to {}'.format(libzxb_util_gz, lib_dir))
-    with utilTarfile.open(libzxb_util_gz, 'r:gz') as utilArchive:
+    with tarfile.open(libzxb_util_gz, 'r:gz') as utilArchive:
         utilArchive.extractall(lib_dir)
-    libxcb_cursor_gz = join_dir(install_dir, 'libxcb_cursor.tar.gz')
+    libxcb_cursor_gz = join_dir(install_dir, 'libxcb-cursor.tar.gz')
     print('Extracting {} to {}'.format(libxcb_cursor_gz, lib_dir))
-    with cursorTarfile.open(libxcb_cursor_gz, 'r:gz') as cursorArchive:
+    with tarfile.open(libxcb_cursor_gz, 'r:gz') as cursorArchive:
         cursorArchive.extractall(lib_dir)
     libssl3_gz = join_dir(install_dir, 'libssl3.tar.gz')
     print('Extracting {} to {}'.format(libssl3_gz, lib_dir))
-    with sslTarfile.open(libssl3_gz, 'r:gz') as sslArchive:
+    with tarfile.open(libssl3_gz, 'r:gz') as sslArchive:
         sslArchive.extractall(lib_dir)
 
 
