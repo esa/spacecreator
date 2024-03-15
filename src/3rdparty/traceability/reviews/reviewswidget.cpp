@@ -128,6 +128,14 @@ void ReviewsWidget::setToken(const QString &token)
     ui->credentialWidget->setToken(token);
 }
 
+/*!
+ * A pointer to the table header, so the column geometry can be saved/restored
+ */
+QHeaderView *ReviewsWidget::horizontalTableHeader() const
+{
+    return ui->allReviews->horizontalHeader();
+}
+
 void ReviewsWidget::setLoginData()
 {
     if (m_reviewsManager->isBusy()) {

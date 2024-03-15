@@ -46,20 +46,20 @@ SCRequirementsWidget::SCRequirementsWidget(const QString &requirementsUrl, requi
 SCRequirementsWidget::~SCRequirementsWidget()
 {
     QSettings settings;
-    settings.beginGroup("SpaceCreator");
-    QByteArray AllRequirementsHeaderState = horizontalTableHeader()->saveState();
-    settings.setValue("AllRequirementsHeaderState", AllRequirementsHeaderState);
+    settings.beginGroup(shared::SettingsManager::spaceCreatorGroup());
+    QByteArray allRequirementsHeaderState = horizontalTableHeader()->saveState();
+    settings.setValue("AllRequirementsHeaderState", allRequirementsHeaderState);
     settings.endGroup();
 }
 
 bool SCRequirementsWidget::loadSavedRequirementsTableGeometry()
 {
     QSettings settings;
-    settings.beginGroup("SpaceCreator");
-    auto AllRequirementsHeaderState = settings.value("AllRequirementsHeaderState");
+    settings.beginGroup(shared::SettingsManager::spaceCreatorGroup());
+    auto allRequirementsHeaderState = settings.value("AllRequirementsHeaderState");
     settings.endGroup();
-    if (AllRequirementsHeaderState.isValid()) {
-        horizontalTableHeader()->restoreState(AllRequirementsHeaderState.toByteArray());
+    if (allRequirementsHeaderState.isValid()) {
+        horizontalTableHeader()->restoreState(allRequirementsHeaderState.toByteArray());
         return true;
     }
     return false;

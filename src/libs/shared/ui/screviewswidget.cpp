@@ -20,6 +20,7 @@ along with this program. If not, see
 
 #include "settingsmanager.h"
 
+#include <QHeaderView>
 #include <QSettings>
 #include <QUrl>
 
@@ -30,6 +31,16 @@ SCReviewsWidget::SCReviewsWidget(QWidget *parent)
     : reviews::ReviewsWidget(parent)
 {
     connect(this, &reviews::ReviewsWidget::reviewsCredentialsChanged, this, &SCReviewsWidget::onCredentialsChange);
+    loadSavedTableGeometry();
+}
+
+SCReviewsWidget::~SCReviewsWidget()
+{
+    QSettings settings;
+    settings.beginGroup(shared::SettingsManager::spaceCreatorGroup());
+    const QByteArray &headerState = horizontalTableHeader()->saveState();
+    settings.setValue("ComponentReviewsHeaderState", headerState);
+    settings.endGroup();
 }
 
 void SCReviewsWidget::setUrl(const QUrl &url)
@@ -81,5 +92,16 @@ void SCReviewsWidget::onCredentialsChange(const QUrl &newUrl, const QString &new
     }
 }
 
+bool SCReviewsWidget::loadSavedTableGeometry()
+{
+    QSettings settings;
+    settings.beginGroup(shared::SettingsManager::spaceCreatorGroup());
+    const QVariant &headerState = settings.value("ComponentReviewsHeaderState");
+    if (headerState.isValid()) {
+        horizontalTableHeader()->restoreState(headerState.toByteArray());
+        return true;
+    }
+    return false;
+}
 }
 }

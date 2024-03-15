@@ -59,7 +59,6 @@ public:
     QString token() const;
     void setToken(const QString &token);
 
-protected:
     QHeaderView *horizontalTableHeader() const;
 
 protected Q_SLOTS:

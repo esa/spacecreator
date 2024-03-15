@@ -50,6 +50,8 @@ private Q_SLOTS:
     void saveToken();
 
 private:
+    void loadSavedGeometry();
+
     Ui::ReviewsDialog *ui;
 
     reviews::ReviewsManager *m_reviewsManager = nullptr;

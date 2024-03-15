@@ -31,12 +31,16 @@ class SCReviewsWidget : public reviews::ReviewsWidget
     Q_OBJECT
 public:
     SCReviewsWidget(QWidget *parent = nullptr);
+    ~SCReviewsWidget();
 
     bool loadSavedCredentials();
     void setUrl(const QUrl &url) override;
 
 public Q_SLOTS:
     void onCredentialsChange(const QUrl &url, const QString &newToken);
+
+protected:
+    bool loadSavedTableGeometry();
 };
 }
 }

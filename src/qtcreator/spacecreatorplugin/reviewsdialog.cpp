@@ -23,6 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "spacecreatorproject.h"
 #include "ui_reviewsdialog.h"
 
+#include <QHeaderView>
 #include <QSettings>
 #include <QUrl>
 
@@ -43,10 +44,18 @@ ReviewsDialog::ReviewsDialog(scs::SpaceCreatorProject *project, QWidget *parent)
             &reviews::ReviewsModelBase::addReviews);
     connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
             &reviews::ReviewsModelBase::clear);
+    loadSavedGeometry();
 }
 
 ReviewsDialog::~ReviewsDialog()
 {
+    QSettings settings;
+    settings.beginGroup(shared::SettingsManager::spaceCreatorGroup());
+    const QByteArray &headerState = ui->reviewsWidget->horizontalTableHeader()->saveState();
+    settings.setValue("AllReviewsHeaderState", headerState);
+    settings.setValue("AllReviewDialogSize", size());
+    settings.endGroup();
+
     delete ui;
 }
 
@@ -80,6 +89,21 @@ void ReviewsDialog::saveToken()
     settings.beginGroup(shared::SettingsManager::spaceCreatorGroup());
     const QString &tokenKey = shared::SettingsManager::tokenKey(ui->reviewsWidget->url());
     settings.setValue(tokenKey, ui->reviewsWidget->token());
+    settings.endGroup();
+}
+
+void ReviewsDialog::loadSavedGeometry()
+{
+    QSettings settings;
+    settings.beginGroup(shared::SettingsManager::spaceCreatorGroup());
+    const QVariant &headerState = settings.value("AllReviewsHeaderState");
+    if (headerState.isValid()) {
+        ui->reviewsWidget->horizontalTableHeader()->restoreState(headerState.toByteArray());
+    }
+    const QSize &dialogSize = settings.value("AllReviewDialogSize").toSize();
+    if (dialogSize.isValid()) {
+        resize(dialogSize.width(), dialogSize.height());
+    }
     settings.endGroup();
 }
 

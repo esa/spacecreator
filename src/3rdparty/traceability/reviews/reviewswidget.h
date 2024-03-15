@@ -25,6 +25,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include <QToolButton>
 #include <QWidget>
 
+class QHeaderView;
 namespace tracecommon {
 class WidgetBar;
 }
@@ -59,6 +60,8 @@ public:
     virtual void setUrl(const QUrl &url);
     QString token() const;
     virtual void setToken(const QString &token);
+
+    QHeaderView *horizontalTableHeader() const;
 
 public Q_SLOTS:
     void setLoginData();
