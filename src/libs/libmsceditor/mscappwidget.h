@@ -86,6 +86,7 @@ public Q_SLOTS:
     void showDocumentView(bool show);
     void showHierarchyView(bool show);
     void showRequirements(msc::MscEntity *entity);
+    void showReviews(msc::MscEntity *entity);
     void activateDefaultTool();
     void checkGlobalComment();
     void checkInstances();

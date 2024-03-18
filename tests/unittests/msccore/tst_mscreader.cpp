@@ -817,3 +817,55 @@ void tst_MscReader::testRequirementsUrl()
     MscModel *model = m_reader->parseText(msc);
     QCOMPARE(model->requirementsURL(), QUrl("https://some.git.lab/pro/one"));
 }
+
+void tst_MscReader::testReviews()
+{
+    const auto msc = QString("msc Chart_1;\n"
+                             "    /* CIF REVIEWS ab1d-ef72,238f-007b */\n"
+                             "    instance Inst_1;\n"
+                             "    endinstance;\n"
+                             "endmsc;\n");
+
+    MscModel *model = m_reader->parseText(msc);
+    QCOMPARE(model->charts().size(), 1);
+    MscChart *chart = model->charts().at(0);
+
+    QCOMPARE(chart->instances().size(), 1);
+    const QStringList expectedreviews { "ab1d-ef72", "238f-007b" };
+    QCOMPARE(chart->instances().at(0)->reviews(), expectedreviews);
+}
+
+void tst_MscReader::testReviewsInDocument()
+{
+    const auto msc = QString("/* CIF REVIEWSURL https://git.server.com/esa/requirementstest */"
+                             "mscdocument CppRename /* MSC AND */;"
+                             "language ASN.1;"
+                             "data CppRename.asn;"
+                             "/* CIF MSCDOCUMENT (0, 0) (4200, 2300) */"
+                             "/* CIF REVIEWS aabd-7765,936f2-bf2a */"
+                             "mscdocument Nominal /* MSC LEAF */;"
+                             "msc CppRename;"
+                             "endmsc;"
+                             "endmscdocument;"
+                             "endmscdocument;");
+
+    MscModel *model = m_reader->parseText(msc);
+    QCOMPARE(model->documents().size(), 1);
+    MscDocument *doc1 = model->documents().at(0);
+    QCOMPARE(doc1->documents().size(), 1);
+    MscDocument *doc2 = doc1->documents().at(0);
+
+    const QStringList expectedReview { "aabd-7765", "936f2-bf2a" };
+    QCOMPARE(doc2->reviews(), expectedReview);
+}
+
+void tst_MscReader::testReviewsUrl()
+{
+    const auto msc = QString("/* CIF REVIEWSURL https://some.git.lab/pro/one */\n\n"
+                             "/* CIF REVIEWS ab1d-ef72,238f-007b */\n"
+                             "mscdocument TDoc_1 /* MSC AND */;\n"
+                             "endmscdocument;\n");
+
+    MscModel *model = m_reader->parseText(msc);
+    QCOMPARE(model->reviewsURL(), QUrl("https://some.git.lab/pro/one"));
+}

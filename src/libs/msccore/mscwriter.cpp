@@ -131,8 +131,8 @@ QString MscWriter::modelText(MscModel *model)
     if (!model) {
         return QString();
     }
-
-    model->addRequirementsUrlToFirstEntity();
+    
+    model->addDocumentMetaDataToFirstEntity();
 
     QString text;
     if (m_saveMode == SaveMode::GRANTLEE) {
@@ -152,7 +152,7 @@ QString MscWriter::modelText(MscModel *model)
         setModel(nullptr);
     }
 
-    model->removeRequirementsUrlFromFirstEntity();
+    model->removeDocumentMetaDataFromFirstEntity();
 
     return text;
 }

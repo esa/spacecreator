@@ -42,6 +42,8 @@ public:
 
     virtual void setRequirementsURL(const QUrl &url) = 0;
     virtual QUrl requirementsURL() const = 0;
+    virtual void setReviewsURL(const QUrl &url) = 0;
+    virtual QUrl reviewsURL() const = 0;
 
 Q_SIGNALS:
     void requirementsURLChanged(const QUrl &url);

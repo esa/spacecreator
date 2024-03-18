@@ -52,7 +52,8 @@ enum Id
     ChangeInstancePosition,
     EditMessagePoints,
     LastId,
-    UpdateEntityRequirements
+    UpdateEntityRequirements,
+    UpdateEntityReviews
 };
 
 } // ns cmd

@@ -67,6 +67,22 @@ QUrl MscProject::requirementsURL() const
     return QUrl();
 }
 
+void MscProject::setReviewsURL(const QUrl &url)
+{
+    if (m_model) {
+        m_model->mscModel()->setReviewsURL(url.toString());
+    }
+}
+
+QUrl MscProject::reviewsURL() const
+{
+    if (m_model) {
+        return m_model->mscModel()->reviewsURL();
+    }
+
+    return QUrl();
+}
+
 QStringList MscProject::allDVFiles() const
 {
     return {};

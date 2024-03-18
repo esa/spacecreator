@@ -65,6 +65,8 @@ public:
         Concurrent,
         Requirement,
         RequirementsUrl,
+        Reviews,
+        ReviewsUrl,
         Unknown,
     };
     Q_ENUM(CifType)

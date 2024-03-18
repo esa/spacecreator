@@ -109,5 +109,15 @@ CifLine::CifType CifBlockRequirementsUrl::blockType() const
     return CifLine::CifType::RequirementsUrl;
 }
 
+CifLine::CifType CifBlockReviews::blockType() const
+{
+    return CifLine::CifType::Reviews;
+}
+
+CifLine::CifType CifBlockReviewsUrl::blockType() const
+{
+    return CifLine::CifType::ReviewsUrl;
+}
+
 } // ns cif
 } // ns msc

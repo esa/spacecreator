@@ -368,5 +368,15 @@ CifLine::CifType CifLineRequirementsUrl::lineType() const
     return CifLine::CifType::RequirementsUrl;
 }
 
+CifLine::CifType CifLineReviews::lineType() const
+{
+    return CifLine::CifType::Reviews;
+}
+
+CifLine::CifType CifLineReviewsUrl::lineType() const
+{
+    return CifLine::CifType::ReviewsUrl;
+}
+
 } // ns cif
 } // ns msc

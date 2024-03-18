@@ -44,6 +44,7 @@ Q_SIGNALS:
     void selectedDocumentChanged(msc::MscDocument *selectedDocument);
     //! Emitted when the dialog to edit requirements for the document should be opened
     void editRequirements(msc::MscDocument *document);
+    void editReviews(msc::MscDocument *document);
 
 private Q_SLOTS:
     void changHierarchyType();

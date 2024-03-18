@@ -50,7 +50,7 @@ void ComponentReviewsProxyModel::addReviews(const QList<reviews::Review> &review
     beginResetModel();
     m_originalReviews.append(reviews);
     for (const reviews::Review &review : reviews) {
-        if (m_ids.contains(review.m_id)) {
+        if (m_ids.contains(review.m_id) && !m_reviews.contains(review)) {
             m_reviews.append(review);
         }
     }

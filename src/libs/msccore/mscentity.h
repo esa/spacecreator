@@ -95,6 +95,16 @@ public:
      * Sets the list of requirement IDs associated by this entity
      */
     void setRequirements(const QStringList &requirements);
+    /**
+     * Returns the list of reviews IDs associated by this entity
+     */
+    QStringList reviews() const;
+    /**
+     * Sets the list of reviews IDs associated by this entity
+     */
+    void setReviews(const QStringList &reviews);
+    /// Removes a single ID from the list of review IDs
+    void removeReviewID(const QString &reviewId);
 
 #ifdef QT_DEBUG
     void dbgShowCifs() const;
@@ -110,12 +120,15 @@ Q_SIGNALS:
 private:
     cif::CifBlockShared requirementsCifBlock() const;
     QStringList requirementsFromCifBlock(const cif::CifBlockShared &cif) const;
+    cif::CifBlockShared reviewsCifBlock() const;
+    QStringList reviewsFromCifBlock(const cif::CifBlockShared &cif) const;
 
     QString m_name = MscEntity::DefaultName;
     const QUuid m_id;
     QPointer<MscComment> m_comment;
     QVector<cif::CifBlockShared> m_cifs;
     QStringList m_requirements;
+    QStringList m_reviews;
 
     static const QRegularExpression m_nameVerify;
 };

@@ -205,13 +205,13 @@ void ReviewsWidget::updateProjectReady()
 void ReviewsWidget::onChangeOfCredentials()
 {
     const QUrl newUrl(ui->credentialWidget->url());
+    Q_EMIT reviewsUrlChanged(newUrl);
     const QString newToken(ui->credentialWidget->token());
     if (!newUrl.isValid() || newToken.isEmpty()) {
         return;
     }
-
+    m_reviewsManager->setCredentials(newUrl.toString(), newToken);
     Q_EMIT reviewsCredentialsChanged(newUrl, newToken);
-    Q_EMIT reviewsUrlChanged(newUrl);
 }
 
 void ReviewsWidget::requestReviews()

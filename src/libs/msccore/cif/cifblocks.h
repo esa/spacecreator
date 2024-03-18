@@ -207,5 +207,27 @@ public:
     CifLine::CifType blockType() const override;
 };
 
+class CifBlockReviews : public CifBlock
+{
+public:
+    explicit CifBlockReviews(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
+
+    CifLine::CifType blockType() const override;
+};
+
+class CifBlockReviewsUrl : public CifBlock
+{
+public:
+    explicit CifBlockReviewsUrl(const SharedCifLines &lines = SharedCifLines())
+        : CifBlock(lines)
+    {
+    }
+
+    CifLine::CifType blockType() const override;
+};
+
 } // ns cif
 } // ns msc

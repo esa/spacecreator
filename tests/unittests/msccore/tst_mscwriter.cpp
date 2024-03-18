@@ -66,6 +66,7 @@ private Q_SLOTS:
     void testSerializeMscTimer_data();
     void testSerializeMscTimer();
     void testSerializeRequirements();
+    void testSerializeReviews();
 
 private:
     QString removeIndention(const QString &text) const;
@@ -1090,6 +1091,27 @@ void tst_MscWriter::testSerializeRequirements()
     model->addDocument(doc);
     const auto result = QString("/* CIF REQUIREMENTSURL https://some.git.lab/pro/one */\n\n"
                                 "/* CIF REQUIREMENT ab1d-ef72,238f-007b */\n"
+                                "mscdocument Doc_1 /* MSC AND */;\n"
+                                "endmscdocument;\n");
+
+    setSaveMode(SaveMode::CUSTOM);
+    QString text = modelText(model.get());
+    QCOMPARE(text, result);
+
+    setSaveMode(SaveMode::GRANTLEE);
+    text = modelText(model.get());
+    QCOMPARE(text, removeIndention(result));
+}
+
+void tst_MscWriter::testSerializeReviews()
+{
+    auto model = std::make_unique<MscModel>(this);
+    model->setReviewsURL(QUrl("https://some.git.lab/pro/one"));
+    auto doc = new MscDocument("Doc_1");
+    doc->setReviews({ "ab1d-ef72", "238f-007b" });
+    model->addDocument(doc);
+    const auto result = QString("/* CIF REVIEWSURL https://some.git.lab/pro/one */\n\n"
+                                "/* CIF REVIEWS ab1d-ef72,238f-007b */\n"
                                 "mscdocument Doc_1 /* MSC AND */;\n"
                                 "endmscdocument;\n");
 

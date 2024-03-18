@@ -371,41 +371,58 @@ bool MscModel::checkAllMessagesForAsn1Compliance(QStringList *faultyMessages) co
 }
 
 /*!
- * Add the information of the URL where the requirements are stored as CIF information to the first entity
+ * Add informations like URL for requrements or reviews
  */
-void MscModel::addRequirementsUrlToFirstEntity()
+void MscModel::addDocumentMetaDataToFirstEntity()
 {
     MscEntity *entity = firstEntity();
     if (!entity) {
         return;
     }
 
-    if (!requirementsURL().isValid()) {
-        removeRequirementsUrlFromFirstEntity();
-        return;
-    }
+    removeDocumentMetaDataFromFirstEntity();
 
-    // If the requirements url block is there already, update it
-    QVector<cif::CifBlockShared> cifs = entity->cifs();
-    for (const cif::CifBlockShared &block : cifs) {
-        if (block->blockType() == cif::CifLine::CifType::RequirementsUrl) {
-            block->setPayload(requirementsURL(), cif::CifLine::CifType::RequirementsUrl);
-            return;
+    if (requirementsURL().isValid()) {
+        // If the requirements url block is there already, update it
+        QVector<cif::CifBlockShared> cifs = entity->cifs();
+        for (const cif::CifBlockShared &block : cifs) {
+            if (block->blockType() == cif::CifLine::CifType::RequirementsUrl) {
+                block->setPayload(requirementsURL(), cif::CifLine::CifType::RequirementsUrl);
+                return;
+            }
         }
+
+        // no requirements url block there yet, so add it
+        cif::CifBlockShared requirementsUrlCif =
+                cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineRequirementsUrl()) });
+        requirementsUrlCif->setPayload(QVariant::fromValue(requirementsURL()), cif::CifLine::CifType::RequirementsUrl);
+        cifs.append(requirementsUrlCif);
+        entity->setCifs(cifs);
     }
 
-    // no requirements url block there yet, so add it
-    cif::CifBlockShared requirementsUrlCif =
-            cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineRequirementsUrl()) });
-    requirementsUrlCif->setPayload(QVariant::fromValue(requirementsURL()), cif::CifLine::CifType::RequirementsUrl);
-    cifs.append(requirementsUrlCif);
-    entity->setCifs(cifs);
+    if (reviewsURL().isValid()) {
+        // If the reviews url block is there already, update it
+        QVector<cif::CifBlockShared> cifs = entity->cifs();
+        for (const cif::CifBlockShared &block : cifs) {
+            if (block->blockType() == cif::CifLine::CifType::ReviewsUrl) {
+                block->setPayload(reviewsURL(), cif::CifLine::CifType::ReviewsUrl);
+                return;
+            }
+        }
+
+        // no reviews url block there yet, so add it
+        cif::CifBlockShared reviewsUrlCif =
+                cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineReviewsUrl()) });
+        reviewsUrlCif->setPayload(QVariant::fromValue(reviewsURL()), cif::CifLine::CifType::ReviewsUrl);
+        cifs.append(reviewsUrlCif);
+        entity->setCifs(cifs);
+    }
 }
 
 /*!
- * Removes the CIF information of the requirements URL from the first entity
+ * Removes informations like URL for requrements or reviews
  */
-void MscModel::removeRequirementsUrlFromFirstEntity()
+void MscModel::removeDocumentMetaDataFromFirstEntity()
 {
     MscEntity *entity = firstEntity();
     if (!entity) {
@@ -414,7 +431,8 @@ void MscModel::removeRequirementsUrlFromFirstEntity()
 
     QVector<cif::CifBlockShared> cifs = entity->cifs();
     auto it = std::remove_if(cifs.begin(), cifs.end(), [](const cif::CifBlockShared &block) {
-        return block->blockType() == cif::CifLine::CifType::RequirementsUrl;
+        return (block->blockType() == cif::CifLine::CifType::RequirementsUrl)
+                || (block->blockType() == cif::CifLine::CifType::ReviewsUrl);
     });
     cifs.erase(it, cifs.end());
 

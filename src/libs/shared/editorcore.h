@@ -90,6 +90,11 @@ public:
     //! Returns the URL where requirements are stored
     virtual const QUrl &requirementsURL() const;
 
+    //! Sets the URL where reviews are stored
+    virtual void setReviewsURL(const QUrl &url);
+    //! Returns the URL where reviews are stored
+    virtual const QUrl &reviewsURL() const;
+
 public Q_SLOTS:
     void showHelp();
     void showAboutDialog();
@@ -97,6 +102,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
     void requirementsURLChanged(const QUrl &url); //! Emitted when the user edited the URL of the requirements
+    void reviewsURLChanged(const QUrl &url); //! Emitted when the user edited the URL of the reviews
 
 private:
     virtual QUrl helpPage() const;

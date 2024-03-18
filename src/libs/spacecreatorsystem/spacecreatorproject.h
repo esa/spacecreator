@@ -91,6 +91,8 @@ public:
 
     void setRequirementsURL(const QUrl &url) override;
     QUrl requirementsURL() const override;
+    void setReviewsURL(const QUrl &url) override;
+    QUrl reviewsURL() const override;
 
 Q_SIGNALS:
     void editedExternally(shared::EditorCore *);
@@ -117,6 +119,7 @@ protected:
     std::unique_ptr<scs::MSCRefactor> m_mscRefactor;
     std::unique_ptr<scs::DVRefactor> m_dvRefactor;
     QUrl m_requirementsURL;
+    QUrl m_reviewsURL;
 };
 
 } // namespace scs

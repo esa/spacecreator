@@ -75,6 +75,8 @@ private:
     CifLineShared readCifLineGlobalComment(const QString &from) const;
     CifLineShared readCifLineRequirement(const QString &from) const;
     CifLineShared readCifLineRequirementsUrl(const QString &from) const;
+    CifLineShared readCifLineReviews(const QString &from) const;
+    CifLineShared readCifLineReviewsUrl(const QString &from) const;
 
     typedef QVector<CifLineShared> LinesCollection;
     QVector<CifParser::LinesCollection> prepareCifLines(const QStringList &lines) const;

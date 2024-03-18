@@ -71,9 +71,12 @@ MSCEditorCore::MSCEditorCore(QObject *parent)
     connect(m_model->commandsStack(), &msc::MscCommandsStack::nameChanged, this, &msc::MSCEditorCore::nameChanged);
     connect(m_model->mscModel(), &shared::DataModel::requirementsURLChanged, this,
             &shared::EditorCore::requirementsURLChanged);
+    connect(m_model->mscModel(), &shared::DataModel::reviewsURLChanged, this, &shared::EditorCore::reviewsURLChanged);
     connect(m_model.get(), &msc::MainModel::modelUpdated, this, [this]() {
         connect(m_model->mscModel(), &shared::DataModel::requirementsURLChanged, this,
                 &shared::EditorCore::requirementsURLChanged);
+        connect(m_model->mscModel(), &shared::DataModel::reviewsURLChanged, this,
+                &shared::EditorCore::reviewsURLChanged);
     });
 
     connect(&(mainModel()->chartViewModel()), &msc::ChartLayoutManager::initialNameAccepted, this,

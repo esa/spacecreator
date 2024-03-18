@@ -41,6 +41,8 @@ public:
 
     void setRequirementsURL(const QUrl &url) override;
     QUrl requirementsURL() const override;
+    void setReviewsURL(const QUrl &url) override;
+    QUrl reviewsURL() const override;
 
 private:
     QPointer<InterfaceDocument> m_model;

@@ -222,6 +222,16 @@ class CifLineRequirementsUrl : public CifTextLineHolder
 public:
     CifLine::CifType lineType() const override;
 };
+class CifLineReviews : public CifTextLineHolder
+{
+public:
+    CifLine::CifType lineType() const override;
+};
+class CifLineReviewsUrl : public CifTextLineHolder
+{
+public:
+    CifLine::CifType lineType() const override;
+};
 
 } // ns cif
 } // ns msc

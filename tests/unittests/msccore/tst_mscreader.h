@@ -60,6 +60,9 @@ private Q_SLOTS:
     void testRequirements();
     void testRequirementsInDocument();
     void testRequirementsUrl();
+    void testReviews();
+    void testReviewsInDocument();
+    void testReviewsUrl();
 
     // Instance create tests - in tst_msccreateparsing
     void testInstanceCreate();

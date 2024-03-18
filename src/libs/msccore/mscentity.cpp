@@ -140,12 +140,17 @@ QString MscEntity::entityTypeName() const
 
 QVector<cif::CifBlockShared> MscEntity::cifs() const
 {
-    if (m_requirements.isEmpty()) {
+    if (m_requirements.isEmpty() && m_reviews.isEmpty()) {
         return m_cifs;
     }
 
     QVector<cif::CifBlockShared> allCifs = m_cifs;
-    allCifs.append(requirementsCifBlock());
+    if (!m_requirements.isEmpty()) {
+        allCifs.append(requirementsCifBlock());
+    }
+    if (!m_reviews.isEmpty()) {
+        allCifs.append(reviewsCifBlock());
+    }
     return allCifs;
 }
 
@@ -154,15 +159,27 @@ void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
     if (m_cifs != cifs) {
         m_cifs.clear();
         bool requirementsCleared = false;
+        bool reviewsCleared = false;
         for (const cif::CifBlockShared &block : cifs) {
-            if (block->blockType() != cif::CifLine::CifType::Requirement) {
-                m_cifs.append(block);
-            } else {
+            switch (block->blockType()) {
+            case cif::CifLine::CifType::Requirement: {
                 if (!requirementsCleared) {
                     m_requirements.clear();
                     requirementsCleared = true;
                 }
                 m_requirements.append(requirementsFromCifBlock(block));
+                break;
+            }
+            case cif::CifLine::CifType::Reviews: {
+                if (!reviewsCleared) {
+                    m_reviews.clear();
+                    reviewsCleared = true;
+                }
+                m_reviews.append(reviewsFromCifBlock(block));
+                break;
+            }
+            default:
+                m_cifs.append(block);
             }
         }
 
@@ -173,15 +190,18 @@ void MscEntity::setCifs(const QVector<cif::CifBlockShared> &cifs)
 
 void MscEntity::addCif(const cif::CifBlockShared &cif)
 {
-    if (cif->blockType() == cif::CifLine::CifType::Requirement) {
+    switch (cif->blockType()) {
+    case cif::CifLine::CifType::Requirement:
         m_requirements.append(requirementsFromCifBlock(cif));
-        Q_EMIT dataChanged();
-        Q_EMIT cifTextChanged();
-        return;
+        break;
+    case cif::CifLine::CifType::Reviews:
+        m_reviews.append(reviewsFromCifBlock(cif));
+        break;
+    default: {
+        if (!m_cifs.contains(cif)) {
+            m_cifs.append(cif);
+        }
     }
-
-    if (!m_cifs.contains(cif)) {
-        m_cifs.append(cif);
         Q_EMIT dataChanged();
         Q_EMIT cifTextChanged();
     }
@@ -234,6 +254,37 @@ void MscEntity::setRequirements(const QStringList &requirements)
     Q_EMIT cifTextChanged();
 }
 
+QStringList MscEntity::reviews() const
+{
+    return m_reviews;
+}
+
+void MscEntity::setReviews(const QStringList &reviews)
+{
+    if (reviews == m_reviews) {
+        return;
+    }
+
+    m_reviews = reviews;
+    Q_EMIT dataChanged();
+    Q_EMIT cifTextChanged();
+}
+
+/*!
+ * Remove the given ID from the list of linked IDs
+ * \param reviewId The Id to remove from this component
+ */
+void MscEntity::removeReviewID(const QString &reviewId)
+{
+    QStringList ids = reviews();
+    if (!ids.contains(reviewId)) {
+        return;
+    }
+
+    ids.removeAll(reviewId);
+    setReviews(ids);
+}
+
 #ifdef QT_DEBUG
 void MscEntity::dbgShowCifs() const
 {
@@ -273,6 +324,31 @@ cif::CifBlockShared MscEntity::requirementsCifBlock() const
 QStringList MscEntity::requirementsFromCifBlock(const cif::CifBlockShared &cif) const
 {
     const QVariant &variant = cif->payload(cif::CifLine::CifType::Requirement);
+    const QString data = variant.toString();
+    if (data.isEmpty()) {
+        return {};
+    }
+
+    return data.split(',');
+}
+
+cif::CifBlockShared MscEntity::reviewsCifBlock() const
+{
+    if (m_reviews.isEmpty()) {
+        return {};
+    }
+
+    cif::CifBlockShared reviewsCif =
+            cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineReviews()) });
+    const QString req = m_reviews.join(",");
+    reviewsCif->setPayload(QVariant::fromValue(req), cif::CifLine::CifType::Reviews);
+
+    return reviewsCif;
+}
+
+QStringList MscEntity::reviewsFromCifBlock(const cif::CifBlockShared &cif) const
+{
+    const QVariant &variant = cif->payload(cif::CifLine::CifType::Reviews);
     const QString data = variant.toString();
     if (data.isEmpty()) {
         return {};

@@ -19,4 +19,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace reviews {
 
+bool Review::operator==(const Review &other) const
+{
+    return (m_id == other.m_id) && (m_longName == other.m_longName) && (m_description == other.m_description)
+            && (m_author == other.m_author) && (m_issueID == other.m_issueID) && (m_tags == other.m_tags)
+            && (m_link == other.m_link);
+}
+
 } // namespace reviews

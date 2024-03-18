@@ -18,6 +18,7 @@
 #include "editorcore.h"
 
 #include "commands/cmdsetrequirementsurl.h"
+#include "commands/cmdsetreviewsurl.h"
 #include "datamodel.h"
 #include "scversion.h"
 #include "settingsmanager.h"
@@ -228,6 +229,29 @@ const QUrl &EditorCore::requirementsURL() const
 {
     if (dataModel()) {
         return dataModel()->requirementsURL();
+    }
+
+    static QUrl url;
+    return url;
+}
+
+void EditorCore::setReviewsURL(const QUrl &url)
+{
+    if (url == reviewsURL() || !dataModel()) {
+        return;
+    }
+
+    auto cmd = new shared::cmd::CmdSetReviewsUrl(dataModel(), url);
+    undoStack()->push(cmd);
+
+    Q_EMIT reviewsURLChanged(reviewsURL());
+    Q_EMIT editedExternally(this);
+}
+
+const QUrl &EditorCore::reviewsURL() const
+{
+    if (dataModel()) {
+        return dataModel()->reviewsURL();
     }
 
     static QUrl url;

@@ -92,8 +92,8 @@ public:
     bool checkMessageAsn1Compliance(const msc::MscMessage &message) const;
     bool checkAllMessagesForAsn1Compliance(QStringList *faultyMessages = nullptr) const;
 
-    void addRequirementsUrlToFirstEntity();
-    void removeRequirementsUrlFromFirstEntity();
+    void addDocumentMetaDataToFirstEntity();
+    void removeDocumentMetaDataFromFirstEntity();
 
 Q_SIGNALS:
     void dataChanged();

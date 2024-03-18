@@ -225,6 +225,7 @@ QMenu *DocumentTreeView::contextMenu(msc::MscDocument *document)
     menu->addAction(tr("Rename"), this, [&]() { edit(currentIndex()); });
     menu->addSeparator();
     menu->addAction(tr("Edit requirements ..."), this, [this, document]() { Q_EMIT editRequirements(document); });
+    menu->addAction(tr("Edit reviews ..."), this, [this, document]() { Q_EMIT editReviews(document); });
 
     return menu;
 }

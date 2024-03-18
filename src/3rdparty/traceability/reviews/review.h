@@ -35,6 +35,8 @@ public:
     int m_issueID;
     QStringList m_tags;
     QUrl m_link;
+
+    bool operator==(const Review &other) const;
 };
 
 } // namespace reviews

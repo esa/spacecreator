@@ -122,16 +122,24 @@ MscModel *MscReader::parse(ANTLRInputStream &input, QStringList *errorMessages)
         }
     }
 
+    const MscEntity *entity = model->firstEntity();
+    const QVector<cif::CifBlockShared> cifs = entity->cifs();
     // Extract requirements url
-    MscEntity *entity = model->firstEntity();
-    QVector<cif::CifBlockShared> cifs = entity->cifs();
     for (const cif::CifBlockShared &block : cifs) {
         if (block->blockType() == cif::CifLine::CifType::RequirementsUrl) {
             model->setRequirementsURL(block->payload().toUrl());
             break;
         }
     }
-    model->removeRequirementsUrlFromFirstEntity();
+    // Extract review url
+    for (const cif::CifBlockShared &block : cifs) {
+        if (block->blockType() == cif::CifLine::CifType::ReviewsUrl) {
+            model->setReviewsURL(block->payload().toUrl());
+            break;
+        }
+    }
+
+    model->removeDocumentMetaDataFromFirstEntity();
 
     return model;
 }

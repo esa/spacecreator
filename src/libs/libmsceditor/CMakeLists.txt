@@ -121,6 +121,8 @@ target_sources(${LIB_NAME} PRIVATE
     commands/cmdtimeritemmove.h
     commands/cmdupdateentityrequirements.cpp
     commands/cmdupdateentityrequirements.h
+    commands/cmdupdateentityreviews.cpp
+    commands/cmdupdateentityreviews.h
     commands/commandids.h
     commands/eventmovebasecommand.cpp
     commands/eventmovebasecommand.h
@@ -156,6 +158,9 @@ target_sources(${LIB_NAME} PRIVATE
     mscrequirementsdialog.cpp
     mscrequirementsdialog.h
     mscrequirementsdialog.ui
+    mscreviewsdialog.cpp
+    mscreviewsdialog.h
+    mscreviewsdialog.ui
     remotecontrol/remotecontrolhandler.cpp
     remotecontrol/remotecontrolhandler.h
     systemchecks.cpp

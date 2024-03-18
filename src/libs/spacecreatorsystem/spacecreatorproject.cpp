@@ -385,6 +385,32 @@ QUrl SpaceCreatorProject::requirementsURL() const
     return QUrl();
 }
 
+void SpaceCreatorProject::setReviewsURL(const QUrl &url)
+{
+    if (url == reviewsURL()) {
+        return;
+    }
+
+    m_reviewsURL = url;
+    for (const EditorCorePtr &core : allCores()) {
+        core->setReviewsURL(m_reviewsURL);
+    }
+}
+
+QUrl SpaceCreatorProject::reviewsURL() const
+{
+    if (m_reviewsURL.isValid()) {
+        return m_reviewsURL;
+    }
+
+    IVEditorCorePtr iCore = ivCore();
+    if (iCore) {
+        iCore->reviewsURL();
+    }
+
+    return QUrl();
+}
+
 /*!
    Removes all data that is stored here, but is not part of the project
  */

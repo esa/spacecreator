@@ -12,34 +12,33 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public License
-along with this program. If not, see
-<https://www.gnu.org/licenses/lgpl-2.1.html>.
+along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
 #pragma once
-#include "reviewswidget.h"
 
-namespace reviews {
-class ReviewsManager;
-class ReviewsModelBase;
-}
-namespace shared {
-namespace ui {
-class SCReviewsWidget : public reviews::ReviewsWidget
+#include "basecommand.h"
 
+namespace msc {
+namespace cmd {
+
+/*!
+ * \brief The CmdUpdateEntityReviews class handles the set of reviews linked to an entity
+ */
+class CmdUpdateEntityReviews : public msc::cmd::BaseCommand
 {
-    Q_OBJECT
 public:
-    SCReviewsWidget(QWidget *parent = nullptr);
-    ~SCReviewsWidget();
+    CmdUpdateEntityReviews(msc::MscEntity *item, const QStringList &reviews);
 
-    void setUrl(const QUrl &url) override;
+    void redo() override;
+    void undo() override;
+    bool mergeWith(const QUndoCommand *command) override;
+    int id() const override;
 
-public Q_SLOTS:
-    void onCredentialsChange(const QUrl &url, const QString &newToken);
-
-protected:
-    bool loadSavedTableGeometry();
+private:
+    QStringList m_newReviews;
+    QStringList m_oldReviews;
 };
-}
-}
+
+} // namespace cmd
+} // namespace msc

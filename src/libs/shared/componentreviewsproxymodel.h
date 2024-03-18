@@ -35,8 +35,8 @@ public:
      */
     void setAcceptableIds(const QStringList &ids);
 
-    virtual void setReviews(const QList<reviews::Review> &reviews);
-    virtual void addReviews(const QList<reviews::Review> &reviews);
+    void setReviews(const QList<reviews::Review> &reviews) override;
+    void addReviews(const QList<reviews::Review> &reviews) override;
 
 protected:
     QStringList m_ids;

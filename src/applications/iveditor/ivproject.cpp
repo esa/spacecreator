@@ -61,6 +61,22 @@ QUrl IvProject::requirementsURL() const
     return QUrl();
 }
 
+void IvProject::setReviewsURL(const QUrl &url)
+{
+    if (m_model) {
+        m_model->objectsModel()->setReviewsURL(url.toString());
+    }
+}
+
+QUrl IvProject::reviewsURL() const
+{
+    if (m_model) {
+        return m_model->objectsModel()->reviewsURL();
+    }
+
+    return QUrl();
+}
+
 QStringList IvProject::allDVFiles() const
 {
     return {};

@@ -19,6 +19,7 @@
 
 #include "commands/cmdsetasn1file.h"
 #include "commands/cmdsetrequirementsurl.h"
+#include "commands/cmdsetreviewsurl.h"
 #include "commands/cmdupdateentityrequirements.h"
 #include "documentitemmodel.h"
 #include "hierarchyview/hierarchyviewmodel.h"
@@ -30,6 +31,7 @@
 #include "mscmessage.h"
 #include "mscmodel.h"
 #include "mscrequirementsdialog.h"
+#include "mscreviewsdialog.h"
 #include "systemchecks.h"
 #include "tools/actioncreatortool.h"
 #include "tools/basetool.h"
@@ -295,6 +297,7 @@ void MscAppWidget::initConnections()
             &MscAppWidget::showSelection);
     connect(ui->documentTree, &QTreeView::doubleClicked, this, &MscAppWidget::showChart);
     connect(ui->documentTree, &DocumentTreeView::editRequirements, this, &MscAppWidget::showRequirements);
+    connect(ui->documentTree, &DocumentTreeView::editReviews, this, &MscAppWidget::showReviews);
 
     connect(mainModel(), &msc::MainModel::selectedDocumentChanged, ui->documentTree,
             &msc::DocumentTreeView::setSelectedDocument);
@@ -475,9 +478,9 @@ void MscAppWidget::showHierarchyView(bool show)
 void MscAppWidget::showRequirements(MscEntity *entity)
 {
     MscRequirementsDialog dialog(m_mscCore->requirementsURL(), entity, this);
+    msc::MscCommandsStack *undoStack = m_mscCore->commandsStack();
     int ret = dialog.exec();
     if (ret == QDialog::Accepted) {
-        msc::MscCommandsStack *undoStack = m_mscCore->commandsStack();
         undoStack->beginMacro(tr("Update requrirements"));
         const QStringList ids = dialog.selectedRequirements();
         if (ids != entity->requirements()) {
@@ -487,6 +490,24 @@ void MscAppWidget::showRequirements(MscEntity *entity)
             undoStack->push(new shared::cmd::CmdSetRequirementsUrl(m_mscCore->mainModel()->mscModel(), dialog.url()));
         }
         undoStack->endMacro();
+    }
+}
+
+void MscAppWidget::showReviews(MscEntity *entity)
+{
+    msc::MscCommandsStack *undoStack = m_mscCore->commandsStack();
+    undoStack->beginMacro(tr("Update reviews"));
+
+    MscReviewsDialog dialog(m_mscCore->reviewsURL(), entity, undoStack, this);
+    int ret = dialog.exec();
+    if (ret == QDialog::Accepted) {
+        if (dialog.url() != m_mscCore->reviewsURL()) {
+            undoStack->push(new shared::cmd::CmdSetReviewsUrl(m_mscCore->mainModel()->mscModel(), dialog.url()));
+        }
+    }
+    undoStack->endMacro();
+    if (ret != QDialog::Accepted) {
+        undoStack->undo();
     }
 }
 

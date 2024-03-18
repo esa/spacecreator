@@ -114,6 +114,10 @@ CifLineShared CifParser::readCifLine(const QString &line) const
         return readCifLineRequirement(line);
     case CifLine::CifType::RequirementsUrl:
         return readCifLineRequirementsUrl(line);
+    case CifLine::CifType::Reviews:
+        return readCifLineReviews(line);
+    case CifLine::CifType::ReviewsUrl:
+        return readCifLineReviewsUrl(line);
     default: {
         qDebug() << (QString("Unknown CIF entry: %1").arg(line));
         return {};
@@ -467,6 +471,24 @@ CifLineShared CifParser::readCifLineRequirement(const QString &from) const
 CifLineShared CifParser::readCifLineRequirementsUrl(const QString &from) const
 {
     CifLineShared cif(new CifLineRequirementsUrl());
+    if (!cif->initFrom(from)) {
+        cif.reset();
+    }
+    return cif;
+}
+
+CifLineShared CifParser::readCifLineReviews(const QString &from) const
+{
+    CifLineShared cif(new CifLineReviews());
+    if (!cif->initFrom(from)) {
+        cif.reset();
+    }
+    return cif;
+}
+
+CifLineShared CifParser::readCifLineReviewsUrl(const QString &from) const
+{
+    CifLineShared cif(new CifLineReviewsUrl());
     if (!cif->initFrom(from)) {
         cif.reset();
     }

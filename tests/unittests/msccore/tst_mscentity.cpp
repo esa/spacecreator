@@ -52,6 +52,7 @@ private Q_SLOTS:
     void testConstructorName();
     void testSetName();
     void testExtractingRequirementFromCif();
+    void testExtractingReviewFromCif();
 
 private:
     static const QString TestEntityName;
@@ -97,6 +98,26 @@ void tst_MscEntity::testExtractingRequirementFromCif()
 
     entity.setRequirements({});
     QCOMPARE(entity.requirements(), QStringList());
+    QCOMPARE(entity.cifs().size(), 0);
+}
+
+void tst_MscEntity::testExtractingReviewFromCif()
+{
+    MscEntitytImpl entity;
+
+    cif::CifBlockShared reviewCif =
+            cif::CifBlockFactory::createBlock({ cif::CifLineShared(new cif::CifLineReviews()) });
+    const QByteArray reviewId { "a3b4-1f2e,a9f3-742d" };
+    reviewCif->setPayload(QVariant::fromValue(reviewId), cif::CifLine::CifType::Reviews);
+
+    entity.setCifs({ reviewCif });
+
+    QStringList expected { "a3b4-1f2e", "a9f3-742d" };
+    QCOMPARE(entity.reviews(), { expected });
+    QCOMPARE(entity.cifs().size(), 1);
+
+    entity.setReviews({});
+    QCOMPARE(entity.reviews(), QStringList());
     QCOMPARE(entity.cifs().size(), 0);
 }
 

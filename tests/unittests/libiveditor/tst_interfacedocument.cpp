@@ -48,6 +48,8 @@ public:
 
     void setRequirementsURL(const QUrl &url) override { Q_UNUSED(url); }
     QUrl requirementsURL() const override { return QUrl(); };
+    void setReviewsURL(const QUrl &url) override { Q_UNUSED(url); }
+    QUrl reviewsURL() const override { return QUrl(); };
 };
 
 class tst_InterfaceDocument : public QObject
