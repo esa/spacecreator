@@ -20,6 +20,20 @@
             <enum-type name="HEADER_SECTIONS"/>
         </object-type>
     </namespace-type>
+
+    <namespace-type name="reviews" visible="yes">
+        <object-type name="ReviewsWidget">
+        </object-type>
+        <object-type name="ReviewsManager">
+        </object-type>
+        <value-type name="Review">
+        </value-type>
+        <object-type name="ReviewsModelBase">
+            <enum-type name="RoleNames"/>
+            <enum-type name="HEADER_SECTIONS"/>
+        </object-type>
+    </namespace-type>
+
     <function signature="initTraceCommonLibrary()"/>
     <namespace-type name="tracecommon" visible="no">
 

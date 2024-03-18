@@ -66,6 +66,7 @@ set(TASTE_SUBLIB_SRC_ROOT ${CMAKE_SOURCE_DIR}/../traceability)
 add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/qgitlabapi ${CMAKE_BINARY_DIR}/traceability/qgitlabapi)
 add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/tracecommon ${CMAKE_BINARY_DIR}/traceability/tracecommon)
 add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/requirements ${CMAKE_BINARY_DIR}/traceability/requirements)
+add_subdirectory(${TASTE_SUBLIB_SRC_ROOT}/reviews ${CMAKE_BINARY_DIR}/traceability/reviews)
 
 set(TasteQtWidgets_SRC
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/gitlab_issue_wrapper.h
@@ -85,6 +86,20 @@ set(TasteQtWidgets_SRC
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_requirementswidget_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_wrapper.h
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/requirement_wrapper.cpp
+
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_review_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_review_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_reviewsmanager_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_reviewsmanager_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_reviewsmodelbase_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_reviewsmodelbase_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_reviewswidget_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_reviewswidget_wrapper.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_wrapper.h
+    ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_wrapper.cpp
+
+
+
 
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_module_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_python.h
@@ -111,6 +126,7 @@ set(TasteQtWidgets_target_link_libraries ${original_library}
     ${Python3_LIBRARIES}
     QGitlabAPI
     requirements
+    reviews
     tracecommon
 )
 
@@ -122,11 +138,12 @@ add_library(${original_library} SHARED )
 target_link_libraries(${original_library} PUBLIC
     QGitlabAPI
     requirements
+    reviews
     tracecommon
 )
 
 set(QT_INCLUDES "")
-foreach(QT_MODULE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Gui QGitlabAPI requirements tracecommon)
+foreach(QT_MODULE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Gui QGitlabAPI requirements reviews tracecommon)
     get_property(QT_WIDGETS_INCLUDE_DIRS TARGET ${QT_MODULE} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
     foreach(INCLUDE_DIR ${QT_WIDGETS_INCLUDE_DIRS})
         if(NOT "${INCLUDE_DIR}" IN_LIST QT_INCLUDES)
