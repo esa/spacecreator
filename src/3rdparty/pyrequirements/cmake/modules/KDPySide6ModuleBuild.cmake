@@ -148,7 +148,7 @@ macro(
                    LIBRARY_OUTPUT_DIRECTORY ${moduleOutputDir}
     )
 
-    set_target_properties(${TARGET_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
+    set_target_properties(${TARGET_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN/../PySide6/Qt/lib:$ORIGIN")
     target_include_directories(${TARGET_NAME} PUBLIC ${targetIncludeDirs})
 
     target_link_libraries(${TARGET_NAME} ${targetLinkLibraries} PySide6::pyside6 Shiboken6::libshiboken)
