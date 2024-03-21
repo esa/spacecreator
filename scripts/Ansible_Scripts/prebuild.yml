@@ -69,7 +69,7 @@
             qtc_base_url: "https://download.qt.io/official_releases/qtcreator/{{ qtc_short_version }}/{{ qtc_version }}/installer_source/linux_x64/"
             qtc_bin_url: "{{ qtc_base_url }}qtcreator.7z"
             qtc_dev_url: "{{ qtc_base_url }}qtcreator_dev.7z"
-            asn_url: "https://github.com/maxime-esa/asn1scc/releases/download/4.2.4.7f/asn1scc-bin-4.2.4.7f.tar.bz2"
+            asn_url: "https://github.com/maxime-esa/asn1scc/releases/download/4.5.1.5/asn1scc-bin-4.5.1.5.tar.bz2"
             fuzzer_url: "https://github.com/n7space/asn1scc.Fuzzer/releases/download/0.9/asn1scc-Fuzzer-0.9-linux-x64.tar.gz"
             pusc_url: "https://github.com/n7space/asn1-pusc-lib/releases/download/1.1.0/Asn1Acn-PusC-Library-1.1.0.7z "
             env_qt_install_dir: "{{ env_dir }}/Qt"
@@ -150,19 +150,6 @@
               cmd: "{{ p7zip }} -y  x {{ download_dir }}/qtcreator_dev.7z -o{{ app_dir }}"
               creates: "{{ app_dir }}/include"
 
-          - name: Download asn1scc language server
-            get_url:
-                url: "https://github.com/maxime-esa/asn1scc/releases/download/4.3.1.1/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
-                dest: "{{ download_dir }}/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
-                mode: '0755'
-                timeout: "{{ download_timeout }}"
-
-          - name: Extract archive of asn1scc language server  "{{ env_dir }}"
-            unarchive:
-                src: "{{ download_dir }}/asn1scc_lsp_linux-x64-4.3.1.1.tar.bz2"
-                dest: "{{ env_dir }}"
-                creates: "{{ env_dir }}/asn1scc_lsp_linux-x64/System.dll"
-
           - name: Download Grantlee Template Library
             git:
               repo: "https://gitrepos.estec.esa.int/taste/grantlee.git"
@@ -194,13 +181,13 @@
           - name: Download asn1scc
             get_url:
                 url: "{{ asn_url }}"
-                dest: "{{ download_dir }}/asn1scc-bin-4.2.4.7f.tar.bz2"
+                dest: "{{ download_dir }}/asn1scc-bin-4.5.1.5.tar.bz2"
                 mode: '0755'
                 timeout: "{{ download_timeout }}"
 
           - name: Extract asn1scc to "{{ env_dir }}"
             unarchive:
-                src: "{{ download_dir }}/asn1scc-bin-4.2.4.7f.tar.bz2"
+                src: "{{ download_dir }}/asn1scc-bin-4.5.1.5.tar.bz2"
                 dest: "{{ env_dir }}"
                 creates: "{{ env_dir }}/asn1scc/System.dll"
 
