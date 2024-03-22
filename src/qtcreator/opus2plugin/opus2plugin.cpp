@@ -1,5 +1,6 @@
 #include "opus2plugin.h"
 
+#include "externalprocess.h"
 #include "opus2pluginconstants.h"
 
 #include <coreplugin/actionmanager/actioncontainer.h>
@@ -24,7 +25,6 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
 
 namespace spctr {
 
@@ -95,35 +95,18 @@ void Opus2Plugin::runPopulationTool()
     const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
-    QProcess process;
-    process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
-    process.setWorkingDirectory(m_currentProjectDirectoryPath);
-
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-
-    const QString libPathKey { "LD_LIBRARY_PATH" };
-    const QString userLibPathKey { "_ORIGINAL_LD_LIBRARY_PATH" };
-
-    if (env.keys().contains(userLibPathKey)) {
-        QString path = env.value(userLibPathKey);
-
-        if (path.isEmpty()) {
-            env.remove(libPathKey);
-        } else {
-            env.insert(libPathKey, path);
-        }
-        
-        process.setProcessEnvironment(env);
-    }
+    std::unique_ptr<QProcess> process = shared::ExternalProcess::create(this);
+    process->setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
+    process->setWorkingDirectory(m_currentProjectDirectoryPath);
 
     QStringList arguments;
     arguments << opus2ModelFilePath;
     arguments << opus2OptionsFilePath;
 
-    process.start(m_populationToolCommand, arguments);
+    process->start(m_populationToolCommand, arguments);
 
-    process.waitForFinished(-1);
-    if (process.exitCode() != 0) {
+    process->waitForFinished(-1);
+    if (process->exitCode() != 0) {
         QMessageBox::critical(
                 qApp->activeWindow(), tr("Opus2 Population Tool error"), tr("Opus2 Population Tool has failed"));
     }
@@ -136,13 +119,13 @@ void Opus2Plugin::runTailoringTool()
     const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
-    QProcess process;
-    process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
-    process.setWorkingDirectory(m_currentProjectDirectoryPath);
-    process.start(m_tailoringToolCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
+    std::unique_ptr<QProcess> process = shared::ExternalProcess::create(this);
+    process->setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
+    process->setWorkingDirectory(m_currentProjectDirectoryPath);
+    process->start(m_tailoringToolCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
 
-    process.waitForFinished(-1);
-    if (process.exitCode() != 0) {
+    process->waitForFinished(-1);
+    if (process->exitCode() != 0) {
         QMessageBox::critical(
                 qApp->activeWindow(), tr("Opus2 Tailoring Tool error"), tr("Opus2 Tailoring Tool has failed"));
     }
@@ -155,13 +138,13 @@ void Opus2Plugin::runDocumentGenerator()
     const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
-    QProcess process;
-    process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
-    process.setWorkingDirectory(m_currentProjectDirectoryPath);
-    process.start(m_documentGeneratorCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
+    std::unique_ptr<QProcess> process = shared::ExternalProcess::create(this);
+    process->setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
+    process->setWorkingDirectory(m_currentProjectDirectoryPath);
+    process->start(m_documentGeneratorCommand, QStringList() << opus2ModelFilePath << opus2OptionsFilePath);
 
-    process.waitForFinished(-1);
-    if (process.exitCode() != 0) {
+    process->waitForFinished(-1);
+    if (process->exitCode() != 0) {
         QMessageBox::critical(
                 qApp->activeWindow(), tr("Opus2 Document Generator error"), tr("Opus2 Document Generator has failed"));
     }
@@ -174,14 +157,14 @@ void Opus2Plugin::runFrontendGenerator()
     const QString opus2ModelFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2ModelFileName;
     const QString opus2OptionsFilePath = m_currentProjectDirectoryPath + QDir::separator() + m_opus2OptionsFileName;
 
-    QProcess process;
-    process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
-    process.setWorkingDirectory(m_currentProjectDirectoryPath);
-    process.start(m_frontendGeneratorCommand,
+    std::unique_ptr<QProcess> process = shared::ExternalProcess::create(this);
+    process->setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
+    process->setWorkingDirectory(m_currentProjectDirectoryPath);
+    process->start(m_frontendGeneratorCommand,
             QStringList() << opus2ModelFilePath << opus2OptionsFilePath << m_currentProjectDirectoryPath);
 
-    process.waitForFinished(-1);
-    if (process.exitCode() != 0) {
+    process->waitForFinished(-1);
+    if (process->exitCode() != 0) {
         QMessageBox::critical(
                 qApp->activeWindow(), tr("Opus2 Frontend Generator error"), tr("Opus2 Frontend Generator has failed"));
     }

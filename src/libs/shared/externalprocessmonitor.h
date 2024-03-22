@@ -19,18 +19,32 @@
 
 #include <QProcess>
 #include <QWidget>
+#include <memory.h>
 
+class QPushButton;
 class QTextBrowser;
+class QVBoxLayout;
 
-namespace ive {
+namespace shared {
 
-class ExtProcMonitor : public QWidget
+/*!
+ * A dialog showing the output of an external process, called by this dialog
+ */
+class ExternalProcrocessMonitor : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ExtProcMonitor(QWidget *parent = nullptr);
-    bool start(const QString &app, const QStringList &args, const QString &workingDir);
+    explicit ExternalProcrocessMonitor(QWidget *parent = nullptr);
+    ~ExternalProcrocessMonitor();
+
+    void setCloseOnSuccessfulFinish(bool closeAtEnd);
+    void showCloseButton(bool showClose);
+
+    bool start(const QString &app, const QStringList &args, const QString &workingDir = {});
+
+    static bool executeBlocking(
+            const QString &app, const QStringList &args, const QString &workingDir = {}, QWidget *parent = nullptr);
 
 private Q_SLOTS:
     void onErrorOccurred(QProcess::ProcessError error);
@@ -44,8 +58,11 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    QTextBrowser *m_display;
-    QProcess *m_process;
+    QVBoxLayout *m_layout = nullptr;
+    QTextBrowser *m_display = nullptr;
+    QPushButton *m_closeButton = nullptr;
+    std::unique_ptr<QProcess> m_process;
+    bool m_closeAtEnd = true;
 };
 
 }

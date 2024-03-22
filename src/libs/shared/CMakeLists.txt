@@ -71,6 +71,8 @@ target_sources(${LIB_NAME} PRIVATE
     exportableattribute.h
     exportableproperty.cpp
     exportableproperty.h
+    externalprocess.h externalprocess.cpp
+    externalprocessmonitor.h externalprocessmonitor.cpp
     geometry.cpp
     geometry.h
     graphicsviewutils.cpp

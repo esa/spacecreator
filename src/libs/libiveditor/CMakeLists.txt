@@ -109,8 +109,6 @@ target_sources(${LIB_NAME} PRIVATE
     context/action/editor/dynactioneditorwidget.cpp
     context/action/editor/dynactioneditorwidget.h
     context/action/editor/dynactioneditorwidget.ui
-    context/action/extprocmonitor.cpp
-    context/action/extprocmonitor.h
     createconnectiongroupdialog.cpp
     createconnectiongroupdialog.h
     endtoend/end2endfunctiongraphicsitem.cpp

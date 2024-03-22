@@ -17,6 +17,8 @@
 
 #include "modelcheckingwindow.h"
 
+#include "externalprocess.h"
+#include "externalprocessmonitor.h"
 #include "interfacedocument.h"
 #include "ivfunction.h"
 #include "ivmodel.h"
@@ -33,7 +35,6 @@
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
 #include <QSettings>
 #include <QThread>
 #include <conversion/common/escaper/escaper.h>
@@ -226,7 +227,7 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     }
 
     // CALL MAKE SKELETONS
-    auto makeSkeletonsCallerProcess = new QProcess(this);
+    std::unique_ptr<QProcess> makeSkeletonsCallerProcess = shared::ExternalProcess::create(this);
     makeSkeletonsCallerProcess->setWorkingDirectory(this->projectDir + "/");
     QString makeCmd = "make";
     QStringList arguments;
@@ -239,10 +240,10 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
     }
 
     // CALL MAKE DEPLOYMENT
-    auto makeDeploymentCallerProcess = new QProcess(this);
+    std::unique_ptr<QProcess> makeDeploymentCallerProcess = shared::ExternalProcess::create(this);
     QStringList deployArguments;
     deployArguments << "DeploymentView.aadl";
-    makeSkeletonsCallerProcess->setWorkingDirectory(this->projectDir + "/");
+    makeDeploymentCallerProcess->setWorkingDirectory(this->projectDir + "/");
     makeDeploymentCallerProcess->start(makeCmd, deployArguments);
     makeDeploymentCallerProcess->waitForFinished();
     if (makeDeploymentCallerProcess->exitCode() != 0
@@ -257,7 +258,7 @@ void ModelCheckingWindow::callTasteGens(bool toggled)
                    << "--glue"
                    << "-t"
                    << "MOCHECK";
-    auto kazooCallerProcess = new QProcess(this);
+    std::unique_ptr<QProcess> kazooCallerProcess = shared::ExternalProcess::create(this);
     kazooCallerProcess->setWorkingDirectory(this->projectDir + "/");
     kazooCallerProcess->start(kazooCmd, kazooArguments);
     kazooCallerProcess->waitForFinished();
@@ -585,7 +586,7 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     QString program;
     QStringList arguments;
 
-    auto p = new QProcess(this);
+    observedProcess = shared::ExternalProcess::create(this);
 
     if (fileSuffix == "msc" || fileSuffix == "scl") {
         program = "spacecreator.AppImage";
@@ -594,30 +595,17 @@ void ModelCheckingWindow::on_treeWidget_properties_itemDoubleClicked(QTreeWidget
     } else { // then has to be a .pr file
         program = "opengeode";
         arguments << item->text(1);
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        const QString libPathKey { "LD_LIBRARY_PATH" };
-        const QString userLibPathKey { "_ORIGINAL_LD_LIBRARY_PATH" };
-        if (env.keys().contains(userLibPathKey)) {
-            QString path = env.value(userLibPathKey);
-            if (path.isEmpty()) {
-                env.remove(libPathKey);
-            } else {
-                env.insert(libPathKey, path);
-            }
-            p->setProcessEnvironment(env);
-        }
     }
 
-    observedProcess = p;
-    p->start(program, arguments);
-    if (!p->waitForStarted(10000)) {
-        QString cmd = program + " " + arguments.join(" ");
-        QMessageBox::warning(this, tr("Open property"), tr("Error when calling '%1'.").arg(cmd));
+    observedProcess->start(program, arguments);
+    if (!observedProcess->waitForStarted(10000)) {
+        QMessageBox::warning(this, tr("Open property"), tr("Error when calling the '%1' with the following args: '%2'.").arg(program, arguments.join(" ")));
         return;
     }
-    connect(p, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
-    connect(p, SIGNAL(readyReadStandardError()), this, SLOT(processStderr()));
-    connect(p, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdout()));
+    connect(observedProcess.get(), SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(processFinished(int, QProcess::ExitStatus)));
+    connect(observedProcess.get(), SIGNAL(readyReadStandardError()), this, SLOT(processStderr()));
+    connect(observedProcess.get(), SIGNAL(readyReadStandardOutput()), this, SLOT(processStdout()));
 
     statusBar()->showMessage("File open.", 6000);
 }
@@ -657,7 +645,7 @@ void ModelCheckingWindow::on_treeWidget_subtyping_itemDoubleClicked(QTreeWidgetI
     QString program = "spacecreator.AppImage";
     QStringList arguments;
     arguments << "-client" << item->text(1);
-    auto p = new QProcess(this);
+    std::unique_ptr<QProcess> p = shared::ExternalProcess::create(this);
     p->start(program, arguments);
     if (!p->waitForStarted(10000)) {
         QString cmd = program + " " + arguments.join(" ");
@@ -706,15 +694,11 @@ void ModelCheckingWindow::on_pushButton_interactiveSim_clicked()
     }
 
     // build and run the interactive simulator
-    QString xtermCmd = "xterm";
-    QStringList arguments;
-    arguments << "-hold"
-              << "-e"
-              << "make"
-              << "simu";
-    if (QProcess::execute(xtermCmd, arguments) != 0) {
-        QString fullCmd = xtermCmd + " " + arguments.join(" ");
-        QMessageBox::warning(this, tr("Interactive Simulator"), "Error executing: " + fullCmd);
+    QString makeCmd = "make";
+    const QStringList arguments {"simu"};
+    if (shared::ExternalProcrocessMonitor::executeBlocking(makeCmd, arguments) != 0) {
+        const QString &fullCmd = QString("%1 %2").arg(makeCmd, arguments.join(" "));
+        QMessageBox::warning(this, tr("Interactive Simulator"), tr("Error executing: '%1'").arg(fullCmd));
     }
 }
 
@@ -729,15 +713,11 @@ void ModelCheckingWindow::on_pushButton_exhaustiveSim_clicked()
     }
 
     // build and run the exhaustive simulator
-    QString xtermCmd = "xterm";
-    QStringList arguments;
-    arguments << "-hold"
-              << "-e"
-              << "make"
-              << "native_modelchecker";
-    if (QProcess::execute(xtermCmd, arguments) != 0) {
-        QString fullCmd = xtermCmd + " " + arguments.join(" ");
-        QMessageBox::warning(this, tr("Exhaustive Simulator"), "Error executing: " + fullCmd);
+    QString makeCmd = "make";
+    const QStringList arguments {"native_modelchecker"};
+    if (shared::ExternalProcrocessMonitor::executeBlocking(makeCmd, arguments) != 0) {
+        const QString &fullCmd = QString("%1 %2").arg(makeCmd, arguments.join(" "));
+        QMessageBox::warning(this, tr("Exhaustive Simulator"), tr("Error executing: '%1'").arg(fullCmd));
     }
 }
 
@@ -765,14 +745,11 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
 
     // REMOVE statusfile, callif.sh
     QString rmCmd = "rm";
-    QStringList arguments;
-    arguments << "-f"
-              << "statusfile"
-              << "callif.sh";
+    const QStringList arguments {"-f", "statusfile", "callif.sh"};
 
-    if (QProcess::execute(rmCmd, arguments) != 0) {
-        QString fullCmd = rmCmd + " " + arguments.join(" ");
-        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + fullCmd);
+    if (shared::ExternalProcess::executeBlocking(rmCmd, arguments) != 0) {
+        const QString &fullCmd = QString("%1 %2").arg(rmCmd, arguments.join(" "));
+        QMessageBox::warning(this, tr("Call IF"), tr("Error executing: '%1'").arg(fullCmd));
     }
 
     // REMOVE output dir, if existing
@@ -799,16 +776,12 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
     }
 
     // CALL IF make rule via terminal, saving make return in statusfile
-    QString xtermCmd = "xterm";
-    QStringList callifArguments;
-    callifArguments << "-hold"
-                    << "-e"
-                    << "sh"
-                    << "callif.sh";
+    QString shellCmd = "sh";
+    const QStringList callifArguments {"callif.sh"};
 
-    if (QProcess::execute(xtermCmd, callifArguments) != 0) {
-        QString fullCallifCmd = xtermCmd + " " + callifArguments.join(" ");
-        QMessageBox::warning(this, tr("Call IF"), "Error executing: " + fullCallifCmd);
+    if (shared::ExternalProcrocessMonitor::executeBlocking(shellCmd, callifArguments) != 0) {
+        const QString &fullCallifCmd = QString("%1 %2").arg(shellCmd, callifArguments.join(" "));
+        QMessageBox::warning(this, tr("Call IF"), tr("Error executing: '%1'").arg(fullCallifCmd));
     }
 
     // READ statusfile with make return value
@@ -859,11 +832,9 @@ void ModelCheckingWindow::on_pushButton_callIF_clicked()
         if (!saveDirectoryName.isEmpty()) {
             // copy output directory
             QString program = "cp";
-            QStringList arguments;
-            arguments << "-r"
-                      << "." << saveDirectoryName;
-            if (QProcess::execute(program, arguments) != 0) {
-                QMessageBox::warning(this, tr("Call IF"), "Error copying output folder to: " + saveDirectoryName);
+            const QStringList arguments {"-r", ".", saveDirectoryName};
+            if (shared::ExternalProcess::executeBlocking(program, arguments) != 0) {
+                QMessageBox::warning(this, tr("Call IF"), tr("Error copying output folder to: '%1'").arg(saveDirectoryName));
             }
         }
     }
@@ -900,7 +871,8 @@ void ModelCheckingWindow::on_treeWidget_results_itemDoubleClicked(QTreeWidgetIte
         arguments << item->text(1);
     }
 
-    auto p = new QProcess();
+    std::unique_ptr<QProcess> process = shared::ExternalProcess::create(this);
+    QProcess *p = process.release();
     connect(p, &QProcess::stateChanged, [p](QProcess::ProcessState newState) {
         if (newState == QProcess::NotRunning) {
             p->deleteLater();
@@ -934,10 +906,9 @@ void ModelCheckingWindow::convertToObs()
     QString qDirAppPath = QDir::currentPath();
     QDir::setCurrent(this->projectDir + "/work/modelchecking/properties/" + propDirName);
     QString program = "make";
-    QStringList arguments;
-    arguments << fileName;
-    if (QProcess::execute(program, arguments) != 0) {
-        QMessageBox::warning(this, tr("Convert to Observer"), "Error when calling make rule!");
+    const QStringList arguments {fileName};
+    if (shared::ExternalProcess::executeBlocking(program, arguments) != 0) {
+        QMessageBox::warning(this, tr("Convert to Observer"), tr("Error when calling make rule!"));
         // reset path
         QDir::setCurrent(qDirAppPath);
         return;
@@ -1095,11 +1066,9 @@ QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyT
 
 bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &propertyName)
 {
-    auto makeCommandProcess = new QProcess(this);
     const QString makeCommand = "make";
-    QStringList arguments;
-    arguments << makeRule << "NAME=" + propertyName;
-    if (makeCommandProcess->execute(makeCommand, arguments)) {
+    const QStringList arguments {makeRule, "NAME=", propertyName};
+    if (shared::ExternalProcess::executeBlocking(makeCommand, arguments)) {
         QString fullCmd = makeCommand + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(fullCmd));
         return false;
@@ -1161,11 +1130,10 @@ bool ModelCheckingWindow::handleMessageSequenceChartWhenThen(
         return false;
     }
 
-    QProcess sedCommandProcess;
     const QString sedParameter = sedParameterForWhenThenPropertyTemplate.arg(propertyName);
     const QStringList sedParameters = { sedParameterForInplaceEdit, sedParameter, newPropertyFilePath };
 
-    if (sedCommandProcess.execute(sedCommand, sedParameters) != 0) {
+    if (shared::ExternalProcess::executeBlocking(sedCommand, sedParameters) != 0) {
 
         QMessageBox::warning(this, tr("Add new property"),
                 tr("%1 %2 command can not be executed.").arg(sedCommand).arg(sedParameters.join(" ")));
@@ -1331,7 +1299,7 @@ void ModelCheckingWindow::addSubtypes()
 
         // CALL MAKE RULE
         // first set path to project dir
-        auto process = new QProcess(this);
+        std::unique_ptr<QProcess> process = shared::ExternalProcess::create(this);
         process->setWorkingDirectory(this->projectDir);
         QString makeCmd = "make";
         QStringList arguments;
@@ -1376,8 +1344,8 @@ void ModelCheckingWindow::deleteSubtypes()
         QString program = "rm";
         QStringList arguments;
         arguments << this->subtypesPath + "/" + fileInfo.fileName();
-        if (QProcess::execute(program, arguments) != 0) {
-            QMessageBox::warning(this, tr("Delete subtypes"), "Error rm command");
+        if (shared::ExternalProcess::executeBlocking(program, arguments) != 0) {
+            QMessageBox::warning(this, tr("Delete subtypes"), tr("Error rm command"));
             return;
         }
 
@@ -1413,14 +1381,14 @@ void ModelCheckingWindow::deleteProperty()
     if (ret == QMessageBox::Yes) {
         if (fileOrDir == "folder") { // is directory
             args << "-r" << this->propertiesPath + "/" + fileInfo.fileName();
-            if (QProcess::execute("rm", args) != 0) {
-                QMessageBox::warning(this, tr("Delete property"), "Error rm command");
+            if (shared::ExternalProcess::executeBlocking("rm", args) != 0) {
+                QMessageBox::warning(this, tr("Delete property"), tr("Error rm command"));
                 return;
             }
         } else { // is file
             args << this->propertiesPath + "/" + parent + "/" + fileInfo.fileName();
-            if (QProcess::execute("rm", args) != 0) {
-                QMessageBox::warning(this, tr("Delete property"), "Error rm command");
+            if (shared::ExternalProcess::executeBlocking("rm", args) != 0) {
+                QMessageBox::warning(this, tr("Delete property"), tr("Error rm command"));
                 return;
             }
         }

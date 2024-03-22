@@ -23,6 +23,7 @@
 #include "context/action/actionsmanager.h"
 #include "context/action/editor/dynactioneditor.h"
 #include "diskutils.h"
+#include "externalprocess.h"
 #include "itemeditor/ivitemmodel.h"
 #include "ivcomponentmodel.h"
 #include "ivexporter.h"
@@ -43,7 +44,6 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
 #include <QSplitter>
 #include <QUndoStack>
 #include <QVBoxLayout>
@@ -51,7 +51,6 @@
 #include <asn1library/asn1modelstorage.h>
 #include <asn1library/asn1systemchecks.h>
 #include <common/exceptions/inconsistentmodelexception.h>
-#include <filesystem>
 #include <ivcore/abstractsystemchecks.h>
 #include <ivcore/archetypes/archetypelibrary.h>
 #include <ivcore/archetypes/archetypemodel.h>
@@ -1243,7 +1242,7 @@ void InterfaceDocument::createProFile(const QString &path)
 
 void InterfaceDocument::initTASTEEnv(const QString &path)
 {
-    auto initTASTECallerProcess = new QProcess(this);
+    std::unique_ptr<QProcess> initTASTECallerProcess = shared::ExternalProcess::create();
     initTASTECallerProcess->setProgram("taste");
     initTASTECallerProcess->setArguments({ "reset" });
     initTASTECallerProcess->setWorkingDirectory(path);
@@ -1253,7 +1252,6 @@ void InterfaceDocument::initTASTEEnv(const QString &path)
         QMessageBox::warning(qApp->activeWindow(), tr("Init TASTE environment"),
                 tr("Error during TASTE environment initiation for exported component!"));
     }
-    initTASTECallerProcess->deleteLater();
 }
 
 bool InterfaceDocument::isProjectAsnFile(const QString &filename) const

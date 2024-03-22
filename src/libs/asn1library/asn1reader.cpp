@@ -18,6 +18,7 @@
 #include "asn1reader.h"
 
 #include "astxmlparser.h"
+#include "externalprocess.h"
 #include "file.h"
 #include "standardpaths.h"
 
@@ -277,11 +278,10 @@ QString Asn1Reader::asn1AsHtml(const QString &filename) const
         QString cmd = QString("%1 -customIcdUper %2::%3 %4")
                               .arg(asn1Compiler, prettyPrintFileName, asn1HtmlFileName, filename);
 #endif
-        QProcess process;
-        process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
-        process.setProcessChannelMode(QProcess::MergedChannels);
-        process.start(cmd);
-        process.waitForFinished();
+        std::unique_ptr<QProcess> process = shared::ExternalProcess::create();
+        process->setProcessChannelMode(QProcess::MergedChannels);
+        process->startCommand(cmd);
+        process->waitForFinished();
 
         QFile htmlFile(asn1HtmlFileName);
         QString html;
@@ -320,10 +320,10 @@ QString Asn1Reader::checkforCompiler() const
     }
     return asn1Exec;
 #else
-    QProcess process;
-    process.start(QString("which"), { QString("asn1scc") });
-    process.waitForFinished();
-    QString asn1Exec = process.readAll();
+    std::unique_ptr<QProcess> process = shared::ExternalProcess::create();
+    process->start(QString("which"), { QString("asn1scc") });
+    process->waitForFinished();
+    QString asn1Exec = process->readAll();
     asn1Exec.remove('\n');
     if (asn1Exec.isEmpty()) {
         asn1Exec = shared::StandardPaths::writableLocation(QStandardPaths::HomeLocation)
@@ -480,9 +480,11 @@ bool Asn1Reader::convertToXML(
 
     // Check the compiler exists
     if (asn1Compiler.isEmpty()) {
-        QString msg = tr("ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc");
-        if (errorMessages)
+        const QString &msg =
+                tr("ASN1 parse error: Unable to run the asn1scc compiler. https://github.com/ttsiodras/asn1scc");
+        if (errorMessages) {
             errorMessages->append(msg);
+        }
         for (const QString &asn1FileName : asn1FileNames) {
             shared::ErrorHub::addError(shared::ErrorItem::Error, msg, asn1FileName);
         }
@@ -497,28 +499,28 @@ bool Asn1Reader::convertToXML(
     parameters << asn1FileNames;
 
     // Setup the process
-    QProcess asn1Process;
-    connect(&asn1Process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            [&](int, QProcess::ExitStatus exitStatus) {
-                if (exitStatus == QProcess::CrashExit) {
-                    const QString message = tr("asn1scc compiler process crashed");
-                    if (errorMessages) {
-                        errorMessages->append(message);
-                    }
-                }
-            });
-    connect(&asn1Process, &QProcess::errorOccurred, this,
-            [&](QProcess::ProcessError) { parseAsn1SccErrors(asn1Process.errorString(), errorMessages); });
+    std::unique_ptr<QProcess> asn1Process = shared::ExternalProcess::create();
+    connect(asn1Process.get(), &QProcess::finished, [&](int, QProcess::ExitStatus exitStatus) {
+        if (exitStatus == QProcess::CrashExit) {
+            static const QString &msg = tr("asn1scc compiler process crashed");
+            if (errorMessages) {
+                errorMessages->append(msg);
+            } else {
+                shared::ErrorHub::addError(shared::ErrorItem::Error, msg);
+            }
+        }
+    });
+    connect(asn1Process.get(), &QProcess::errorOccurred, this,
+            [&](QProcess::ProcessError) { parseAsn1SccErrors(asn1Process->errorString(), errorMessages); });
 
-    asn1Process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
-    asn1Process.setProcessChannelMode(QProcess::MergedChannels);
-    asn1Process.setProgram(asn1Compiler);
-    asn1Process.setArguments(parameters);
-    asn1Process.start();
-    asn1Process.waitForFinished(60000);
+    asn1Process->setProcessChannelMode(QProcess::MergedChannels);
+    asn1Process->setProgram(asn1Compiler);
+    asn1Process->setArguments(parameters);
+    asn1Process->start();
+    asn1Process->waitForFinished(60000);
 
-    int exitCode = asn1Process.exitCode();
-    QByteArray error = asn1Process.readAll();
+    const int exitCode = asn1Process->exitCode();
+    QByteArray error = asn1Process->readAll();
     if (exitCode != 0) {
         parseAsn1SccErrors(error, errorMessages);
         QFile::remove(asn1XMLFileName);

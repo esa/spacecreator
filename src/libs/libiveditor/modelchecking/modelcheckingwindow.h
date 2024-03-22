@@ -26,7 +26,6 @@
 #include <QMainWindow>
 #include <QProcess>
 #include <QTreeWidgetItem>
-#include <functional>
 
 namespace ive {
 
@@ -161,7 +160,7 @@ private:
     void setCheckBoxState(QCheckBox *checkBox, bool isChecked);
     SpinConfigData readSpinConfigFromUI();
 
-    QProcess *observedProcess;
+    std::unique_ptr<QProcess> observedProcess;
 };
 
 }

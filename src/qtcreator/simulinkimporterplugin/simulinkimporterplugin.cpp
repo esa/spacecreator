@@ -19,12 +19,13 @@
 
 #include "simulinkimporterplugin.h"
 
+#include "externalprocess.h"
+
 #include <QAction>
 #include <QFile>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-#include <QProcess>
 #include <conversion/asn1/Asn1Exporter/exporter.h>
 #include <conversion/asn1/Asn1Importer/importer.h>
 #include <conversion/asn1/Asn1Options/options.h>
@@ -205,7 +206,7 @@ auto SimulinkImporterPlugin::importSlx() -> void
 
     printMatLabCommand(matlabCallArguments);
 
-    if (QProcess().execute(m_matlabAppName, matlabCallArguments) != 0) {
+    if (shared::ExternalProcess::executeBlocking(m_matlabAppName, matlabCallArguments) != 0) {
         printErrorInGeneralMessages(GenMsg::matlabCommandHasFailed);
 
         removeMatLabTemporaryWorkingDirectory();

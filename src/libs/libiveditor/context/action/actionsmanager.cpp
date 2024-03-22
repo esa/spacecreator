@@ -19,10 +19,10 @@
 
 #include "diskutils.h"
 #include "errorhub.h"
-#include "extprocmonitor.h"
+#include "externalprocessmonitor.h"
 #include "interfacedocument.h"
 #include "ivexporter.h"
-#include "ivfunction.h"
+#include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "ivobject.h"
 #include "qfiledialog.h"
@@ -42,7 +42,6 @@
 #include <QMessageBox>
 #include <QMetaObject>
 #include <QObject>
-#include <QProcess>
 #include <QUndoStack>
 #include <QVersionNumber>
 
@@ -502,7 +501,7 @@ void ActionsManager::triggerActionExternal(
                 break;
             }
 
-        ExtProcMonitor *mon = new ExtProcMonitor(mainWindow);
+        auto *mon = new shared::ExternalProcrocessMonitor(mainWindow);
         mon->setAttribute(Qt::WA_DeleteOnClose);
 
         mon->start(act.m_externalApp, params, cwd);
