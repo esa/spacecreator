@@ -128,8 +128,11 @@
     <layout class="QHBoxLayout" name="buttonsLayout">
      <item>
       <widget class="QPushButton" name="createReviewButton">
+       <property name="toolTip">
+        <string>Add Review Item Discrepancy</string>
+       </property>
        <property name="text">
-        <string>Create review ...</string>
+        <string>Add RID ...</string>
        </property>
       </widget>
      </item>
