@@ -32,8 +32,8 @@
 
 namespace shared {
 
-ExternalProcrocessMonitor::ExternalProcrocessMonitor(QWidget *parent)
-    : QWidget(parent, Qt::Window)
+ExternalProcrocessMonitor::ExternalProcrocessMonitor(QWidget *parent, Qt::WindowFlags f)
+    : QDialog(parent, Qt::Window)
     , m_display(new QTextBrowser(this))
     , m_process(shared::ExternalProcess::create(this))
 {
@@ -65,11 +65,13 @@ void ExternalProcrocessMonitor::showCloseButton(bool showClose)
         m_closeButton = new QPushButton(tr("Close"), this);
         connect(m_closeButton, &QPushButton::clicked, this, &ExternalProcrocessMonitor::close);
         m_layout->addWidget(m_closeButton);
+        return;
     }
 
     if (!showClose && m_closeButton != nullptr) {
         delete m_closeButton;
         m_closeButton = nullptr;
+        return;
     }
 }
 
@@ -105,17 +107,27 @@ bool ExternalProcrocessMonitor::start(const QString &app, const QStringList &arg
 bool ExternalProcrocessMonitor::executeBlocking(
         const QString &app, const QStringList &args, const QString &workingDir, QWidget *parent)
 {
-    auto monitor = new ExternalProcrocessMonitor(parent);
-    monitor->setAttribute(Qt::WA_DeleteOnClose);
-    monitor->setCloseOnSuccessfulFinish(false);
-    monitor->showCloseButton(true);
-
-    const bool ok = monitor->start(app, args, workingDir);
-    if (!ok) {
+    if (app.isEmpty()) {
         return false;
     }
 
-    if (!monitor->m_process->waitForFinished(-1) || monitor->m_process->error() == QProcess::FailedToStart) {
+    auto monitor = new ExternalProcrocessMonitor(parent);
+    monitor->setCloseOnSuccessfulFinish(false);
+    monitor->showCloseButton(true);
+
+    if (!workingDir.isEmpty()) {
+        monitor->m_process->setWorkingDirectory(workingDir);
+    }
+
+    monitor->m_display->append(
+            QString("<b>Starting</b> %1 %2\nin %3")
+                    .arg(app, args.join(" "), QDir(monitor->m_process->workingDirectory()).absolutePath()));
+    monitor->setWindowTitle(app);
+    monitor->m_process->start(app, args);
+    monitor->exec();
+    monitor->deleteLater();
+
+    if (monitor->m_process->error() == QProcess::FailedToStart) {
         return -2;
     }
     return monitor->m_process->exitStatus() == QProcess::NormalExit ? monitor->m_process->exitCode() : -1;
@@ -164,7 +176,7 @@ void ExternalProcrocessMonitor::closeEvent(QCloseEvent *event)
         }
     }
 
-    event->accept();
+    QDialog::closeEvent(event);
 }
 
 void ExternalProcrocessMonitor::syncStop()

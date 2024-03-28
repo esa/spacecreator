@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include <QDialog>
 #include <QProcess>
-#include <QWidget>
 #include <memory.h>
 
 class QPushButton;
@@ -30,12 +30,12 @@ namespace shared {
 /*!
  * A dialog showing the output of an external process, called by this dialog
  */
-class ExternalProcrocessMonitor : public QWidget
+class ExternalProcrocessMonitor : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ExternalProcrocessMonitor(QWidget *parent = nullptr);
+    explicit ExternalProcrocessMonitor(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~ExternalProcrocessMonitor();
 
     void setCloseOnSuccessfulFinish(bool closeAtEnd);
