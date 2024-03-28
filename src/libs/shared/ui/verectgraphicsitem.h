@@ -84,6 +84,8 @@ protected:
     void showHelperLines(bool show) override;
     void updateHelperLines();
 
+    void updateChildrenGeometry();
+
 private Q_SLOTS:
     void onGeometryChanged();
 

@@ -133,35 +133,6 @@ shared::ui::ResizeLimits IVFunctionGraphicsItem::resizedRectForNestedFunctions(
     return resizeLimits;
 }
 
-// QRectF IVFunctionGraphicsItem::resizedRectForNestedFunctions(GripPoint *grip, const QPointF &from, const QPointF &to,
-// const QRectF &rect) const
-//{
-//     // Calculate the limits of movement for each grip-point on a rect with no connections
-//     QRectF result = rect;
-//     shared::ui::MinimizeLimits::Limits limits;
-//     limits.leftGripsRightMostLimit = result.right();  // The furthes to the right, the left-grip can go is the right
-//     side of the rect. limits.rightGripsLeftMostLimit = result.left();   // The furthest to the left, the right-grip
-//     can go is the left side of the rect. limits.topGripsBottomMostLimit = result.bottom(); // The deepest the
-//     top-grip can go, is the bottom of the rect. limits.bottomGripsTopMostLimit = result.top();    // The highest the
-//     bottom-grip can go, is the top of the rect.
-
-//    // The limits are determined by the bounding rect of the nested functions, so we calculated that
-//    QRectF nestedItemsRect = boundingRectForNestedFunctions();
-//    if (nestedItemsRect.isValid())
-//    {
-//        limits.leftGripsRightMostLimit = nestedItemsRect.left(); // The furthest to the right, the left-grip can go is
-//        the left side of the bounding rect for the nested functions. limits.rightGripsLeftMostLimit =
-//        nestedItemsRect.right(); // The furthest to the left, the right-grip can go is the right side of the bounding
-//        rect for the nested functions. limits.topGripsBottomMostLimit = nestedItemsRect.top(); // The deepest the
-//        top-grip can go, is the top of the bounding rect for the nested functions. limits.bottomGripsTopMostLimit =
-//        nestedItemsRect.bottom(); // The highest the bottom-grip can go, is the bottom of the bounding rect for the
-//        nested functions.
-//    }
-//    // Apply the movement described by 'to' while respecting the calculated limits
-//    result = shared::ui::MinimizeLimits::applyTo(result, limits, grip->location(), from, to);
-//    return result;
-//}
-
 QRectF IVFunctionGraphicsItem::boundingRectForNestedFunctions() const
 {
     QRectF nestedItemsBoundingRect; // Start with empty rectangle
