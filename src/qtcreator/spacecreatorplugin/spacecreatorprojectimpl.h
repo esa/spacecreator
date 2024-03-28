@@ -37,6 +37,7 @@ class AdaRefactor;
 class CRefactor;
 class CppRefactor;
 class PythonRefactor;
+class SdlRefactor;
 
 /*!
    Does contain everything to load/store/validate Space Creator models that belong to once QtCreator project
@@ -68,6 +69,7 @@ private:
     std::unique_ptr<CRefactor> m_cRefactor;
     std::unique_ptr<CppRefactor> m_cppRefactor;
     std::unique_ptr<PythonRefactor> m_pythonRefactor;
+    std::unique_ptr<SdlRefactor> m_sdlRefactor;
 };
 
 } // namespace spctr

@@ -27,6 +27,7 @@
 #include "refactor/cpprefactor.h"
 #include "refactor/crefactor.h"
 #include "refactor/pythonrefactor.h"
+#include "refactor/sdlrefactor.h"
 
 #include <QDebug>
 #include <QDir>
@@ -46,6 +47,7 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     , m_cRefactor(std::make_unique<CRefactor>())
     , m_cppRefactor(std::make_unique<CppRefactor>())
     , m_pythonRefactor(std::make_unique<PythonRefactor>())
+    , m_sdlRefactor(std::make_unique<SdlRefactor>())
 {
     Q_ASSERT(m_project);
 
@@ -83,6 +85,8 @@ SpaceCreatorProjectImpl::SpaceCreatorProjectImpl(ProjectExplorer::Project *proje
     m_ivRefactorHandler->registerRefactor(m_cppRefactor.get());
     m_pythonRefactor->setStorage(this);
     m_ivRefactorHandler->registerRefactor(m_pythonRefactor.get());
+    m_sdlRefactor->setStorage(this);
+    m_ivRefactorHandler->registerRefactor(m_sdlRefactor.get());
 }
 
 SpaceCreatorProjectImpl::~SpaceCreatorProjectImpl() { }

@@ -70,6 +70,7 @@ set(SC_PLUGIN_SOURCES
     refactor/creatorrefactorbase.h
     refactor/pythonrefactor.cpp
     refactor/pythonrefactor.h
+    refactor/sdlrefactor.h refactor/sdlrefactor.cpp
     refactor/replacerefactorbase.cpp
     refactor/replacerefactorbase.h
     reviewsdialog.h reviewsdialog.cpp reviewsdialog.ui
