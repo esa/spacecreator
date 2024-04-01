@@ -28,6 +28,9 @@
 #include <QApplication>
 #include <QtDebug>
 
+// just a tmp dbg helper, to be removed soonish
+#define TEXT_TRACE_ME qWarning() << Q_FUNC_INFO
+
 static const qreal kSelectionOffset = 10;
 
 namespace shared {
@@ -36,6 +39,7 @@ namespace ui {
 //! Get list of graphics items intersected with \a connection
 static inline QList<QGraphicsItem *> intersectedItems(VEConnectionGraphicsItem *connection)
 {
+    TEXT_TRACE_ME;
     const QVector<QPointF> &points = connection->points();
     QList<QGraphicsItem *> intersectedGraphicsItems = connection->scene()->items(points);
     auto endIt = std::remove_if(intersectedGraphicsItems.begin(), intersectedGraphicsItems.end(),
@@ -56,6 +60,7 @@ static inline QList<QGraphicsItem *> intersectedItems(VEConnectionGraphicsItem *
  */
 static inline QVector<QPointF> generateConnectionPath(VEConnectionGraphicsItem *connection)
 {
+    TEXT_TRACE_ME;
     if (!connection || !connection->scene())
         return {};
 
@@ -81,6 +86,7 @@ static inline QVector<QPointF> generateConnectionPath(VEConnectionGraphicsItem *
 static inline QVector<QPointF> replaceIntersectedSegments(
         const QList<QGraphicsItem *> &cachedIntersectedItems, VEConnectionGraphicsItem *connection)
 {
+    TEXT_TRACE_ME;
     QVector<QPointF> points = connection->points();
     QList<QPair<QPointF, QPointF>> sections;
     QPointF point;
@@ -175,6 +181,7 @@ VEConnectionGraphicsItem::~VEConnectionGraphicsItem()
 
 void VEConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
 {
+    TEXT_TRACE_ME;
     if (points.isEmpty()) {
         if (m_startItem && m_endItem)
             doLayout();
@@ -191,11 +198,13 @@ void VEConnectionGraphicsItem::setPoints(const QVector<QPointF> &points)
 
 QVector<QPointF> VEConnectionGraphicsItem::points() const
 {
+    TEXT_TRACE_ME;
     return m_points;
 }
 
 QVector<QPointF> VEConnectionGraphicsItem::graphicsPoints() const
 {
+    TEXT_TRACE_ME;
     QPolygonF polygon = m_item->path().toFillPolygon();
     if (polygon.isClosed())
         polygon.removeLast();
@@ -204,6 +213,7 @@ QVector<QPointF> VEConnectionGraphicsItem::graphicsPoints() const
 
 void VEConnectionGraphicsItem::updateFromEntity()
 {
+    TEXT_TRACE_ME;
     Q_ASSERT(entity());
     if (!entity())
         return;
@@ -218,6 +228,7 @@ void VEConnectionGraphicsItem::updateFromEntity()
 
 void VEConnectionGraphicsItem::init()
 {
+    TEXT_TRACE_ME;
     VEInteractiveObject::init();
     updateInterfaceConnectionsReference(ConnectionEndPointReference::Set);
 }
@@ -234,6 +245,7 @@ QRectF VEConnectionGraphicsItem::boundingRect() const
 
 void VEConnectionGraphicsItem::initGripPoints()
 {
+    TEXT_TRACE_ME;
     VEInteractiveObject::initGripPoints();
     for (int idx = 0; idx < m_points.size(); ++idx)
         gripPointsHandler()->createGripPoint(GripPoint::Absolute);
@@ -241,6 +253,7 @@ void VEConnectionGraphicsItem::initGripPoints()
 
 void VEConnectionGraphicsItem::updateGripPoints()
 {
+    TEXT_TRACE_ME;
     if (gripPointsHandler() == nullptr)
         return;
 
@@ -291,6 +304,7 @@ VERectGraphicsItem *VEConnectionGraphicsItem::targetItem() const
 
 QList<QPair<VEObject *, QVector<QPointF>>> VEConnectionGraphicsItem::prepareChangeCoordinatesCommandParams() const
 {
+    TEXT_TRACE_ME;
     if (!entity() || !m_startItem || !m_startItem->entity() || !m_endItem || !m_endItem->entity()) {
         return {};
     }
@@ -314,6 +328,7 @@ QList<QPair<VEObject *, QVector<QPointF>>> VEConnectionGraphicsItem::prepareChan
  */
 bool VEConnectionGraphicsItem::doLayout()
 {
+    TEXT_TRACE_ME;
     if (!m_startItem || !m_startItem->isVisible() || !m_endItem || !m_endItem->isVisible()) {
         setVisible(false);
         return false;
@@ -332,6 +347,7 @@ bool VEConnectionGraphicsItem::doLayout()
 bool VEConnectionGraphicsItem::replaceInterface(
         VEConnectionEndPointGraphicsItem *ifaceToBeReplaced, VEConnectionEndPointGraphicsItem *newIface)
 {
+    TEXT_TRACE_ME;
     if (m_startItem == ifaceToBeReplaced) {
         Q_ASSERT(m_startItem->parentItem() == newIface->parentItem());
         m_startItem->removeConnection(this);
@@ -354,6 +370,8 @@ bool VEConnectionGraphicsItem::replaceInterface(
 void VEConnectionGraphicsItem::layoutInterfaceConnections(VEConnectionEndPointGraphicsItem *ifaceItem,
         LayoutPolicy layoutPolicy, CollisionsPolicy collisionsPolicy, bool includingNested)
 {
+    // layoutPolicy = LastSegment;
+    TEXT_TRACE_ME;
     for (VEConnectionGraphicsItem *connection : ifaceItem->connectionItems()) {
         Q_ASSERT(connection && connection->startItem() && connection->endItem());
         if (!connection) {
@@ -375,6 +393,7 @@ void VEConnectionGraphicsItem::layoutInterfaceConnections(VEConnectionEndPointGr
 void VEConnectionGraphicsItem::layoutConnection(
         VEConnectionEndPointGraphicsItem *ifaceItem, LayoutPolicy layoutPolicy, CollisionsPolicy collisionsPolicy)
 {
+    TEXT_TRACE_ME;
     if (layoutPolicy == LayoutPolicy::Default) {
         doLayout();
         return;
@@ -400,6 +419,7 @@ void VEConnectionGraphicsItem::layoutConnection(
 //! Replaces intersected segments of connection path with newly generated subpaths if any
 void VEConnectionGraphicsItem::updateOverlappedSections()
 {
+    TEXT_TRACE_ME;
     if (m_points.isEmpty()) {
         return;
     }
@@ -424,6 +444,7 @@ bool VEConnectionGraphicsItem::isItemVisible() const
 
 void VEConnectionGraphicsItem::onManualMoveStart(GripPoint *gp, const QPointF &at)
 {
+    TEXT_TRACE_ME;
     if (gripPointsHandler() == nullptr)
         return;
 
@@ -443,6 +464,7 @@ void VEConnectionGraphicsItem::onManualMoveStart(GripPoint *gp, const QPointF &a
 
 void VEConnectionGraphicsItem::onManualMoveProgress(GripPoint *gp, const QPointF &from, const QPointF &to)
 {
+    TEXT_TRACE_ME;
     if (gripPointsHandler() == nullptr)
         return;
 
@@ -475,6 +497,7 @@ void VEConnectionGraphicsItem::onManualMoveProgress(GripPoint *gp, const QPointF
 
 void VEConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF &pressedAt, const QPointF &releasedAt)
 {
+    TEXT_TRACE_ME;
     if (gripPointsHandler() == nullptr)
         return;
 
@@ -520,6 +543,7 @@ void VEConnectionGraphicsItem::onManualMoveFinish(GripPoint *gp, const QPointF &
 
 void VEConnectionGraphicsItem::updateBoundingRect()
 {
+    TEXT_TRACE_ME;
     prepareGeometryChange();
 
     QPainterPath pp;
@@ -531,6 +555,7 @@ void VEConnectionGraphicsItem::updateBoundingRect()
 
 void VEConnectionGraphicsItem::rebuildLayout()
 {
+    TEXT_TRACE_ME;
     if (!m_startItem || !m_endItem || !entity()) {
         setVisible(false);
         return;
@@ -564,6 +589,7 @@ void VEConnectionGraphicsItem::rebuildLayout()
 
 void VEConnectionGraphicsItem::onSelectionChanged(bool isSelected)
 {
+    TEXT_TRACE_ME;
     const shared::ColorHandler h = colorHandler();
     QPen pen = h.pen();
     pen.setWidthF(isSelected ? 1.5 * pen.widthF() : pen.widthF());
@@ -583,6 +609,7 @@ void VEConnectionGraphicsItem::applyColorScheme()
 
 bool VEConnectionGraphicsItem::removeCollidedGrips(GripPoint *gp)
 {
+    TEXT_TRACE_ME;
     auto grips = gripPointsHandler()->gripPoints();
     const int idx = grips.indexOf(gp);
     if (idx == -1)
@@ -607,11 +634,13 @@ bool VEConnectionGraphicsItem::removeCollidedGrips(GripPoint *gp)
 
 void VEConnectionGraphicsItem::simplify()
 {
+    TEXT_TRACE_ME;
     m_points = topohelp::geom::simplifyPoints(m_points);
 }
 
 void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGraphicsItem *endPoint)
 {
+    TEXT_TRACE_ME;
     if (!endPoint || m_points.size() < 2) {
         return;
     }
@@ -672,6 +701,7 @@ void VEConnectionGraphicsItem::transformToEndPoint(const VEConnectionEndPointGra
 
 void VEConnectionGraphicsItem::updateTextPosition()
 {
+    TEXT_TRACE_ME;
     if (m_textItem) {
         m_textItem->setExplicitSize(boundingRect().size());
     }
@@ -679,6 +709,7 @@ void VEConnectionGraphicsItem::updateTextPosition()
 
 void VEConnectionGraphicsItem::updateEndPoint(const VEConnectionEndPointGraphicsItem *endPoint)
 {
+    TEXT_TRACE_ME;
     if (!endPoint || m_points.size() < 2)
         return;
 
@@ -698,6 +729,7 @@ void VEConnectionGraphicsItem::updateEndPoint(const VEConnectionEndPointGraphics
 
 void VEConnectionGraphicsItem::updateInterfaceConnectionsReference(ConnectionEndPointReference action)
 {
+    TEXT_TRACE_ME;
     for (VEConnectionEndPointGraphicsItem *endPoint : { startItem(), endItem() }) {
         if (endPoint) {
             if (action == ConnectionEndPointReference::Remove)
