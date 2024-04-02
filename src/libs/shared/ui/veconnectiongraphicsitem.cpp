@@ -29,7 +29,11 @@
 #include <QtDebug>
 
 // just a tmp dbg helper, to be removed soonish
+#ifdef TRACE_MY_CALLS_TMP_DBG_DENGOF
 #define TEXT_TRACE_ME qWarning() << Q_FUNC_INFO
+#else
+#define TEXT_TRACE_ME void()
+#endif // TRACE_MY_CALLS_TMP_DBG_DENGOF
 
 static const qreal kSelectionOffset = 10;
 
