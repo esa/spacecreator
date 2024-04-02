@@ -49,14 +49,15 @@ CredentialWidget::~CredentialWidget()
 }
 
 /*!
- * Sets the URL to fetch the requiremenst from
+ * Sets the URL to fetch the requirements from
  */
-void CredentialWidget::setUrl(const QString &url)
+void CredentialWidget::setUrl(const QUrl &url)
 {
-    if (url == ui->urlLineEdit->text()) {
+    const QString urlStr = url.toString();
+    if (urlStr == ui->urlLineEdit->text()) {
         return;
     }
-    ui->urlLineEdit->setText(url);
+    ui->urlLineEdit->setText(urlStr);
 }
 
 /*!

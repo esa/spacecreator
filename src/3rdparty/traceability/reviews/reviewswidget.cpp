@@ -86,6 +86,17 @@ void ReviewsWidget::setManager(ReviewsManager *manager)
     connect(m_reviewsManager, &ReviewsManager::reviewAdded, this, &ReviewsWidget::requestReviews);
     connect(m_reviewsManager, &ReviewsManager::fetchingReviewsEnded, m_reviewsManager, &ReviewsManager::requestTags);
     connect(m_reviewsManager, &ReviewsManager::listOfTags, this, &ReviewsWidget::fillTagBar);
+    connect(m_reviewsManager, &tracecommon::IssuesManager::projectUrlChanged, ui->credentialWidget,
+            &tracecommon::CredentialWidget::setUrl);
+    connect(m_reviewsManager, &tracecommon::IssuesManager::tokenChanged, ui->credentialWidget,
+            &tracecommon::CredentialWidget::setToken);
+
+    if (!m_reviewsManager->projectUrl().isEmpty()) {
+        ui->credentialWidget->setUrl(m_reviewsManager->projectUrl());
+    }
+    if (!m_reviewsManager->token().isEmpty()) {
+        ui->credentialWidget->setToken(m_reviewsManager->token());
+    }
 }
 
 void ReviewsWidget::setModel(ReviewsModelBase *model)
@@ -109,6 +120,9 @@ QUrl ReviewsWidget::url() const
  */
 void ReviewsWidget::setUrl(const QUrl &url)
 {
+    if (ui->credentialWidget->url() == url) {
+        return;
+    }
     ui->credentialWidget->setUrl(url.toString());
 }
 
@@ -125,6 +139,9 @@ QString ReviewsWidget::token() const
  */
 void ReviewsWidget::setToken(const QString &token)
 {
+    if (ui->credentialWidget->token() == token) {
+        return;
+    }
     ui->credentialWidget->setToken(token);
 }
 
@@ -206,6 +223,7 @@ void ReviewsWidget::onChangeOfCredentials()
 {
     const QUrl newUrl(ui->credentialWidget->url());
     Q_EMIT reviewsUrlChanged(newUrl);
+    setUrl(newUrl);
     const QString newToken(ui->credentialWidget->token());
     if (!newUrl.isValid() || newToken.isEmpty()) {
         return;

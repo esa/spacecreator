@@ -37,7 +37,7 @@ public:
     explicit CredentialWidget(QWidget *parent = nullptr);
     ~CredentialWidget();
 
-    void setUrl(const QString &url);
+    void setUrl(const QUrl &url);
     QUrl url() const;
     void setToken(const QString &token);
     QString token() const;

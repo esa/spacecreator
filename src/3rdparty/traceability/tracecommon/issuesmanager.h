@@ -30,6 +30,8 @@ class IssuesManager : public QObject
     Q_PROPERTY(int projectID READ projectID WRITE setProjectID NOTIFY projectIDChanged)
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
     Q_PROPERTY(QStringList tagsBuffer READ tagsBuffer)
+    Q_PROPERTY(QUrl projectUrl READ projectUrl NOTIFY projectUrlChanged)
+    Q_PROPERTY(QString token READ token NOTIFY tokenChanged)
 
 public:
     enum class REPO_TYPE
@@ -58,6 +60,8 @@ Q_SIGNALS:
     void projectIDChanged();
     void listOfTags(const QStringList &);
     void connectionError(QString errorString);
+    void projectUrlChanged(const QUrl &url);
+    void tokenChanged(const QString &token);
 
 protected:
     void init(IssuesManagerPrivate *priv);

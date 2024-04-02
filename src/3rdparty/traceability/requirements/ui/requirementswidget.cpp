@@ -91,9 +91,24 @@ RequirementsWidget::RequirementsWidget(
     });
     connect(m_reqManager, &RequirementsManager::fetchingRequirementsEnded, m_reqManager,
             &RequirementsManager::requestTags);
+    connect(m_reqManager, &tracecommon::IssuesManager::projectUrlChanged, ui->credentialWidget,
+            &tracecommon::CredentialWidget::setUrl);
+    connect(m_reqManager, &tracecommon::IssuesManager::tokenChanged, ui->credentialWidget,
+            &tracecommon::CredentialWidget::setToken);
 
     ui->filterButton->setIcon(QPixmap(":/tracecommonresources/icons/filter_icon.svg"));
     ui->verticalLayout->insertWidget(0, m_widgetBar);
+
+    if (!m_reqManager->projectUrl().isEmpty()) {
+        ui->credentialWidget->setUrl(m_reqManager->projectUrl());
+    } else {
+        if (!m_requirementsUrl.isEmpty()) {
+            m_reqManager->setCredentials(m_requirementsUrl, m_reqManager->projectUrl());
+        }
+    }
+    if (!m_reqManager->token().isEmpty()) {
+        ui->credentialWidget->setToken(m_reqManager->token());
+    }
 }
 
 RequirementsWidget::~RequirementsWidget()
@@ -114,6 +129,9 @@ QUrl RequirementsWidget::url() const
  */
 void RequirementsWidget::setUrl(const QUrl &url)
 {
+    if (ui->credentialWidget->url() == url) {
+        return;
+    }
     ui->credentialWidget->setUrl(url.toString());
 }
 
@@ -131,6 +149,9 @@ QString RequirementsWidget::token() const
  */
 void RequirementsWidget::setToken(const QString &token)
 {
+    if (ui->credentialWidget->token() == token) {
+        return;
+    }
     ui->credentialWidget->setToken(token);
 }
 
@@ -148,7 +169,7 @@ void RequirementsWidget::onChangeOfCredentials()
         return;
     }
     m_reqManager->setCredentials(m_requirementsUrl, newToken);
-    emit requirementsCredentialsChanged(m_requirementsUrl, newToken);
+    Q_EMIT requirementsCredentialsChanged(m_requirementsUrl, newToken);
 }
 
 void RequirementsWidget::requestRequirements()

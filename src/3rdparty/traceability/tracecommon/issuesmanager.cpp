@@ -47,6 +47,13 @@ bool IssuesManager::setCredentials(const QString &url, const QString &token)
     m_token = token;
     setProjectID(-1);
 
+    Q_EMIT projectUrlChanged(m_projectUrl);
+    Q_EMIT tokenChanged(m_token);
+
+    if (m_projectUrl.isEmpty() || m_token.isEmpty()) {
+        return false;
+    }
+
     QUrl _url;
     _url.setScheme("https");
     _url.setHost(QUrl(url).host());
