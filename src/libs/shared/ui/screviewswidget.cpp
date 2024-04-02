@@ -30,7 +30,13 @@ namespace ui {
 SCReviewsWidget::SCReviewsWidget(QWidget *parent)
     : reviews::ReviewsWidget(parent)
 {
+    const bool hasCredentialsStored = loadSavedCredentials();
+    if (hasCredentialsStored) {
+        setLoginData();
+    }
+
     connect(this, &reviews::ReviewsWidget::reviewsCredentialsChanged, this, &SCReviewsWidget::onCredentialsChange);
+
     loadSavedTableGeometry();
 }
 
@@ -90,6 +96,23 @@ void SCReviewsWidget::onCredentialsChange(const QUrl &newUrl, const QString &new
     if (!reviewsUrl.isEmpty() && !newToken.isEmpty()) {
         setLoginData();
     }
+}
+
+bool SCReviewsWidget::loadSavedCredentials()
+{
+    QSettings settings;
+    settings.beginGroup(SettingsManager::spaceCreatorGroup());
+    const auto &storedToken = settings.value(SettingsManager::tokenKey(QUrl(url()).host())).toString();
+    settings.endGroup();
+
+    if (url().isEmpty() || storedToken.isEmpty()) {
+        return false;
+    }
+
+    setUrl(url());
+    setToken(storedToken);
+
+    return true;
 }
 
 bool SCReviewsWidget::loadSavedTableGeometry()

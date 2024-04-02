@@ -19,8 +19,11 @@
 
 #include "abstractsystemchecks.h"
 #include "asn1systemchecks.h"
+#include "commands/cmdentityattributeschange.h"
 #include "commands/cmdsetrequirementsurl.h"
+#include "commands/cmdsetreviewsurl.h"
 #include "commandsstackbase.h"
+#include "componentreviewsproxymodel.h"
 #include "dvattributedelegate.h"
 #include "dvconnection.h"
 #include "dvdevice.h"
@@ -32,7 +35,11 @@
 #include "propertytemplateconfig.h"
 #include "requirementsmanager.h"
 #include "requirementsmodel.h"
+#include "reviewsmanager.h"
+#include "reviewsmodelbase.h"
+#include "reviewswidget.h"
 #include "shared/ui/screquirementswidget.h"
+#include "ui/screviewswidget.h"
 
 #include <QStyledItemDelegate>
 #include <QTableView>
@@ -54,7 +61,7 @@ DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemp
             &shared::RequirementsModel::addRequirements);
     connect(m_reqManager, &requirement::RequirementsManager::startingFetchingRequirements, m_reqModel,
             &shared::RequirementsModel::clearRequirements);
-    
+
     m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
     connect(m_reqWidget, &shared::ui::SCRequirementsWidget::requirementsUrlChanged, this,
@@ -63,10 +70,34 @@ DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemp
                 if (url != model->requirementsURL()) {
                     commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, url));
                 }
+                if (model->reviewsURL().isEmpty()) {
+                    commandsStack->push(new shared::cmd::CmdSetReviewsUrl(model, url));
+                }
                 if (url.isValid() && m_reqWidget->token().isEmpty()) {
                     m_reqWidget->loadSavedCredentials();
                 }
             });
+
+    m_reviewWidget = new shared::ui::SCReviewsWidget(this);
+    m_reviewsManager = new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this);
+    m_reviewWidget->setManager(m_reviewsManager);
+    m_reviewWidget->setUrl(model->requirementsURL());
+    m_reviewsModel = new shared::ComponentReviewsProxyModel(this);
+    m_reviewsModel->setAcceptableIds(dataObject()->reviewIDs());
+    m_reviewWidget->setModel(m_reviewsModel);
+    connect(m_reviewWidget, &reviews::ReviewsWidget::reviewsUrlChanged, this,
+            [model, commandsStack, this](QUrl reviewsUrl) {
+                if (reviewsUrl != model->reviewsURL()) {
+                    commandsStack->push(new shared::cmd::CmdSetReviewsUrl(model, reviewsUrl));
+                }
+                if (model->requirementsURL().isEmpty()) {
+                    commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, reviewsUrl));
+                }
+            });
+    connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
+            &reviews::ReviewsModelBase::addReviews);
+    connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
+            &reviews::ReviewsModelBase::clear);
 }
 
 QString DVPropertiesDialog::objectTypeName() const
@@ -126,6 +157,7 @@ void DVPropertiesDialog::init()
     }
     initStyleView();
     initRequirementsView();
+    initReviewView();
     setCurrentTabIndex(0);
 }
 
@@ -180,6 +212,28 @@ void DVPropertiesDialog::done(int r)
     }
 
     PropertiesDialog::done(r);
+}
+
+void DVPropertiesDialog::initReviewView()
+{
+    insertTab(m_reviewWidget, tr("Reviews"), getTabCount());
+    connect(m_reviewWidget, &shared::ui::SCReviewsWidget::reviewAdded, this, &DVPropertiesDialog::addReviewId);
+    connect(m_reviewWidget, &shared::ui::SCReviewsWidget::reviewRemoved, this, [this](const QString &reviewId) {
+        // Remove without undo - as the review is gone on the server
+        dataObject()->removeReviewID(reviewId);
+    });
+}
+
+void DVPropertiesDialog::addReviewId(const reviews::Review &review)
+{
+    dvm::DVObject *dvObj = dataObject();
+    QStringList reviews = dvObj->reviewIDs();
+    reviews.append(review.m_id);
+    static const QString attributeName = dvm::meta::Props::token(dvm::meta::Props::Token::review_ids);
+    commandMacro()->push(new shared::cmd::CmdEntityAttributesChange(propertiesConfig(), dvObj,
+            { EntityAttribute { attributeName, QVariant::fromValue<QString>(reviews.join(",")),
+                    EntityAttribute::Type::Attribute } }));
+    m_reviewsModel->setAcceptableIds(dvObj->reviewIDs());
 }
 
 } // namespace dve

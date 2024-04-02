@@ -37,6 +37,7 @@ public:
 
 public Q_SLOTS:
     void onCredentialsChange(const QUrl &url, const QString &newToken);
+    bool loadSavedCredentials();
 
 protected:
     bool loadSavedTableGeometry();

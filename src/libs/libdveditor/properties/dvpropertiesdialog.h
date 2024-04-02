@@ -34,6 +34,21 @@ class PropertyTemplateConfig;
 namespace requirement {
 class RequirementsManager;
 }
+
+namespace reviews {
+class Review;
+class ReviewsManager;
+class ReviewsModelBase;
+}
+namespace shared {
+namespace ui {
+
+class SCReviewsWidget;
+}
+class ComponentReviewsProxyModel;
+
+}
+
 namespace shared {
 class RequirementsModel;
 }
@@ -67,12 +82,19 @@ protected:
 private:
     void initAttributesView();
     void initRequirementsView();
+    void initReviewView();
+
+    void addReviewId(const reviews::Review &review);
 
     dvm::AbstractSystemChecks *m_dvChecker = nullptr;
     Asn1Acn::Asn1SystemChecks *m_asn1Checks = nullptr;
     shared::ui::SCRequirementsWidget *m_reqWidget = nullptr;
     requirement::RequirementsManager *m_reqManager = nullptr;
     shared::RequirementsModel *m_reqModel = nullptr;
+
+    shared::ui::SCReviewsWidget *m_reviewWidget = nullptr;
+    reviews::ReviewsManager *m_reviewsManager = nullptr;
+    shared::ComponentReviewsProxyModel *m_reviewsModel = nullptr;
 };
 
 } // namespace dve

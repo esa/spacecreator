@@ -489,6 +489,9 @@ void MscAppWidget::showRequirements(MscEntity *entity)
         if (dialog.url() != m_mscCore->requirementsURL()) {
             undoStack->push(new shared::cmd::CmdSetRequirementsUrl(m_mscCore->mainModel()->mscModel(), dialog.url()));
         }
+        if (m_mscCore->reviewsURL().isEmpty()) {
+            undoStack->push(new shared::cmd::CmdSetReviewsUrl(m_mscCore->mainModel()->mscModel(), dialog.url()));
+        }
         undoStack->endMacro();
     }
 }
@@ -503,6 +506,9 @@ void MscAppWidget::showReviews(MscEntity *entity)
     if (ret == QDialog::Accepted) {
         if (dialog.url() != m_mscCore->reviewsURL()) {
             undoStack->push(new shared::cmd::CmdSetReviewsUrl(m_mscCore->mainModel()->mscModel(), dialog.url()));
+        }
+        if (m_mscCore->requirementsURL().isEmpty()) {
+            undoStack->push(new shared::cmd::CmdSetRequirementsUrl(m_mscCore->mainModel()->mscModel(), dialog.url()));
         }
     }
     undoStack->endMacro();

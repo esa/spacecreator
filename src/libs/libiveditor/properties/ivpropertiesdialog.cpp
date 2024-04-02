@@ -92,27 +92,35 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     shared::DataModel *model = document->objectsModel();
     m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
-    connect(m_reqWidget, &::shared::ui::SCRequirementsWidget::requirementsUrlChanged, this,
-            [model, commandsStack, this](QString requirementUrl) {
-                const QUrl url = QUrl(requirementUrl);
-                if (url != model->requirementsURL()) {
-                    commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, url));
-                }
-                if (url.isValid() && m_reqWidget->token().isEmpty()) {
-                    m_reqWidget->loadSavedCredentials();
-                }
-            });
-
     m_reviewWidget = new shared::ui::SCReviewsWidget(this);
     m_reviewsManager = new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this);
     m_reviewWidget->setManager(m_reviewsManager);
     m_reviewsModel = new shared::ComponentReviewsProxyModel(this);
     m_reviewsModel->setAcceptableIds(dataObject()->reviewIDs());
     m_reviewWidget->setModel(m_reviewsModel);
+
+    connect(m_reqWidget, &::shared::ui::SCRequirementsWidget::requirementsUrlChanged, this,
+            [model, commandsStack, this](QString requirementUrl) {
+                const QUrl url = QUrl(requirementUrl);
+                if (url != model->requirementsURL()) {
+                    commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, url));
+                }
+                if (model->reviewsURL().isEmpty()) {
+                    commandsStack->push(new shared::cmd::CmdSetReviewsUrl(model, url));
+                }
+                if (url.isValid() && m_reqWidget->token().isEmpty()) {
+                    m_reqWidget->loadSavedCredentials();
+                    m_reviewWidget->loadSavedCredentials();
+                }
+            });
+
     connect(m_reviewWidget, &reviews::ReviewsWidget::reviewsUrlChanged, this,
             [model, commandsStack, this](QUrl reviewsUrl) {
                 if (reviewsUrl != model->reviewsURL()) {
                     commandsStack->push(new shared::cmd::CmdSetReviewsUrl(model, reviewsUrl));
+                }
+                if (model->requirementsURL().isEmpty()) {
+                    commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, reviewsUrl));
                 }
             });
     connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
