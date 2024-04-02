@@ -374,7 +374,10 @@ bool VEConnectionGraphicsItem::replaceInterface(
 void VEConnectionGraphicsItem::layoutInterfaceConnections(VEConnectionEndPointGraphicsItem *ifaceItem,
         LayoutPolicy layoutPolicy, CollisionsPolicy collisionsPolicy, bool includingNested)
 {
-    // layoutPolicy = LastSegment;
+    if (layoutPolicy != LastSegment) {
+        qWarning() << Q_FUNC_INFO << "forcing LayoutPolicy:" << layoutPolicy << "--> LastSegment";
+        layoutPolicy = LastSegment;
+    }
     TEXT_TRACE_ME;
     for (VEConnectionGraphicsItem *connection : ifaceItem->connectionItems()) {
         Q_ASSERT(connection && connection->startItem() && connection->endItem());

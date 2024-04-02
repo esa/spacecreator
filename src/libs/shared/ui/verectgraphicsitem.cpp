@@ -514,7 +514,7 @@ void VERectGraphicsItem::layoutConnectionsOnMove(VEConnectionGraphicsItem::Colli
     for (const auto item : childItems()) {
         if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(item->toGraphicsObject())) {
             VEConnectionGraphicsItem::layoutInterfaceConnections(
-                    iface, VEConnectionGraphicsItem::LayoutPolicy::LastSegment, collisionsPolicy, false);
+                    iface, VEConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, false);
         }
     }
 }

@@ -40,6 +40,7 @@ public:
         LastSegment,
         Scaling,
     };
+    Q_ENUM(LayoutPolicy);
 
     explicit VEConnectionGraphicsItem(VEObject *connection, VEConnectionEndPointGraphicsItem *startItem,
             VEConnectionEndPointGraphicsItem *endItem, QGraphicsItem *parent = nullptr);
