@@ -59,6 +59,8 @@ QVariant ReviewsModelBase::headerData(int section, Qt::Orientation orientation, 
             return tr("Title");
         case AUTHOR:
             return tr("Author");
+        case CRITICALITY:
+            return tr("Criticality");
         }
     }
 
@@ -76,7 +78,7 @@ int ReviewsModelBase::rowCount(const QModelIndex &parent) const
 
 int ReviewsModelBase::columnCount(const QModelIndex &parent) const
 {
-    return 2;
+    return 3;
 }
 
 QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
@@ -94,6 +96,8 @@ QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
             return m_reviews[index.row()].m_longName;
         case AUTHOR:
             return m_reviews[index.row()].m_author;
+        case CRITICALITY:
+            return m_reviews[index.row()].criticality();
         }
         break;
     }

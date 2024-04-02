@@ -41,7 +41,8 @@ public:
     enum HEADER_SECTIONS
     {
         TITLE = 0,
-        AUTHOR
+        AUTHOR,
+        CRITICALITY
     };
 
     explicit ReviewsModelBase(QObject *parent = nullptr);

@@ -17,7 +17,27 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "review.h"
 
+#include <QObject>
+
 namespace reviews {
+
+/*!
+ * Returns the criticality / test method of the review.
+ */
+QString Review::criticality() const
+{
+    if (m_tags.contains("minor", Qt::CaseInsensitive)) {
+        return QObject::tr("minor");
+    }
+    if (m_tags.contains("major", Qt::CaseInsensitive)) {
+        return QObject::tr("major");
+    }
+    if (m_tags.contains("editorial", Qt::CaseInsensitive)) {
+        return QObject::tr("editorial");
+    }
+
+    return QObject::tr("default");
+}
 
 bool Review::operator==(const Review &other) const
 {

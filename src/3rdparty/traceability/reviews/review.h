@@ -36,6 +36,8 @@ public:
     QStringList m_tags;
     QUrl m_link;
 
+    QString criticality() const;
+
     bool operator==(const Review &other) const;
 };
 
