@@ -27,8 +27,11 @@ if __name__ == "__main__":
     manager = QtTaste.requirement.RequirementsManager()
     model = QtTaste.requirement.RequirementsModelBase()
     manager.listOfRequirements.connect(model.addRequirements)
-    widget = QtTaste.requirement.RequirementsWidget(url, manager, model)
-    widget.setWindowTitle("T̶a̶s̶t̶e̶ ̶t̶h̶e̶TASTE for Python")
+    widget = QtTaste.requirement.RequirementsWidget()
+    widget.setManager(manager)
+    widget.setModel(model)
+    widget.setUrl(url)
+    widget.setWindowTitle("TASTE for Python")
     widget.resize(640, 480)
 
     widget.show()

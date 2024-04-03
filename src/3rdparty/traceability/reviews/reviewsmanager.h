@@ -35,9 +35,26 @@ public:
             REPO_TYPE repoType = tracecommon::IssuesManager::REPO_TYPE::GITLAB, QObject *parent = nullptr);
     ~ReviewsManager();
 
+    /*!
+     * \brief Makes a request to retrieve all the reviews
+     * \return Returns true if there's a pending request otherwise false.
+     */
     bool requestAllReviews();
+    /*!
+     * \brief Makes a request to create review
+     * \param title The title of the review
+     * \param revId the ID of the review (Not be confused with the Gitlab issue ID)
+     * \param description The reviews's  full description
+     * \param method The test method / criticality of the review
+     * \return Returns true if there's a pending request otherwise false.
+     */
     bool createReview(
             const QString &title, const QString &revId, const QString &description, const QString &method) const;
+    /*!
+     * \brief Removes a review
+     * \param review Instance of the review object to be removed
+     * \return Returns true if there's a pending request otherwise false.
+     */
     bool removeReview(const Review &review) const;
 
 Q_SIGNALS:
@@ -45,6 +62,7 @@ Q_SIGNALS:
     void fetchingReviewsEnded();
     void listOfReviews(const QList<reviews::Review> &);
     void reviewAdded(const Review &review);
+    void reviewClosed();
 
 private:
     class ReviewsManagerPrivate;

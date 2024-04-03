@@ -55,6 +55,7 @@ ReviewsManager::ReviewsManager(REPO_TYPE repoType, QObject *parent)
             Review newReview = GitLabReviews::reviewFromIssue(issue);
             Q_EMIT reviewAdded(newReview);
         });
+        connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueClosed, this, &ReviewsManager::reviewClosed);
     }
     }
 }

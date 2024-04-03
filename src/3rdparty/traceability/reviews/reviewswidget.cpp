@@ -67,10 +67,6 @@ ReviewsWidget::~ReviewsWidget()
     delete ui;
 }
 
-/*!
- * Hides the create/remove review button
- * \param show when set to false, the buttons are hidden
- */
 void ReviewsWidget::showButtons(bool show)
 {
     ui->createReviewButton->setVisible(show);
@@ -107,17 +103,11 @@ void ReviewsWidget::setModel(ReviewsModelBase *model)
     ui->allReviews->setModel(&m_tagFilterModel);
 }
 
-/*!
- * Returns the URL to fetch the reviews from
- */
 QUrl ReviewsWidget::url() const
 {
     return ui->credentialWidget->url();
 }
 
-/*!
- * Sets the url to fetch the requirements from
- */
 void ReviewsWidget::setUrl(const QUrl &url)
 {
     if (ui->credentialWidget->url() == url) {
@@ -126,17 +116,11 @@ void ReviewsWidget::setUrl(const QUrl &url)
     ui->credentialWidget->setUrl(url.toString());
 }
 
-/*!
- * Returns the token to authenticate for fetching the reviews
- */
 QString ReviewsWidget::token() const
 {
     return ui->credentialWidget->token();
 }
 
-/*!
- * Sets the Token to authenticate for fetching the requirements
- */
 void ReviewsWidget::setToken(const QString &token)
 {
     if (ui->credentialWidget->token() == token) {
@@ -145,9 +129,6 @@ void ReviewsWidget::setToken(const QString &token)
     ui->credentialWidget->setToken(token);
 }
 
-/*!
- * A pointer to the table header, so the column geometry can be saved/restored
- */
 QHeaderView *ReviewsWidget::horizontalTableHeader() const
 {
     return ui->allReviews->horizontalHeader();

@@ -49,7 +49,7 @@ RequirementsManager::RequirementsManager(REPO_TYPE repoType, QObject *parent)
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::listOfIssues, d->gitlabRequirements.get(),
                 &requirement::GitLabRequirements::listOfIssues);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueCreated, this,
-                &RequirementsManager::requirementCreated);
+                &RequirementsManager::requirementAdded);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueClosed, this,
                 &RequirementsManager::requirementClosed);
         connect(d->gitlabClient.get(), &gitlab::QGitlabClient::issueFetchingDone, this,

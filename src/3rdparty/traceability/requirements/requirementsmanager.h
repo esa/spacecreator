@@ -35,6 +35,7 @@ class RequirementsManager : public tracecommon::IssuesManager
 public:
     RequirementsManager(REPO_TYPE repoType = tracecommon::IssuesManager::REPO_TYPE::GITLAB, QObject *parent = nullptr);
     ~RequirementsManager();
+
     /*!
      * \brief Makes a request to retrieve all the requirements
      * \return Returns true if there's a pending request otherwise false.
@@ -42,17 +43,17 @@ public:
     bool requestAllRequirements();
     /*!
      * \brief Makes a request to create requirement
-     * \param The title of the requirement
-     * \param reqIfId: the ID of the requirement (Not be fe confused with the Gitlab issue ID)
-     * \param Thew requiement's description
-     * \param The test method of the requirement
+     * \param title The title of the requirement
+     * \param reqIfId The ID of the requirement (Not be confused with the Gitlab issue ID)
+     * \param description The requiement's description
+     * \param testMethod The test method of the requirement
      * \return Returns true if there's a pending request otherwise false.
      */
     bool createRequirement(
             const QString &title, const QString &reqIfId, const QString &description, const QString &testMethod) const;
     /*!
      * \brief Removes a requirement
-     * \param Instance of the requirement object to be removed
+     * \param requirement Instance of the requirement object to be removed
      * \return Returns true if there's a pending request otherwise false.
      */
     bool removeRequirement(const Requirement &requirement) const;
@@ -73,7 +74,7 @@ Q_SIGNALS:
     /*!
      * \brief This signal is triggered when a Requirement is created
      */
-    void requirementCreated();
+    void requirementAdded();
     /*!
      * \brief This signal is triggered when a Requirement is closed
      */

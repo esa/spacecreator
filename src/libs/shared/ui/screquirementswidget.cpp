@@ -18,6 +18,7 @@ along with this program. If not, see
 
 #include "screquirementswidget.h"
 
+#include "requirementsmanager.h"
 #include "settingsmanager.h"
 
 #include <QHeaderView>
@@ -29,9 +30,14 @@ namespace ui {
 
 SCRequirementsWidget::SCRequirementsWidget(const QString &requirementsUrl, requirement::RequirementsManager *manager,
         requirement::RequirementsModelBase *model, QWidget *parent)
-    : requirement::RequirementsWidget(requirementsUrl, manager, model, parent)
-
+    : requirement::RequirementsWidget(parent)
 {
+    if (!requirementsUrl.isEmpty()) {
+        manager->setCredentials(requirementsUrl, manager->token());
+    }
+    setManager(manager);
+    setModel(model);
+
     connect(this, &requirement::RequirementsWidget::requirementsCredentialsChanged, this,
             &SCRequirementsWidget::onCredentialsChange);
 

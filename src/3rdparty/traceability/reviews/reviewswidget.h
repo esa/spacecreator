@@ -51,16 +51,35 @@ public:
     explicit ReviewsWidget(QWidget *parent = nullptr);
     ~ReviewsWidget();
 
+    /*!
+     * Hides the create/remove review button
+     * \param show when set to false, the buttons are hidden
+     */
     void showButtons(bool show);
 
     void setManager(ReviewsManager *manager);
     void setModel(ReviewsModelBase *model);
 
+    /*!
+     * Returns the URL to fetch the reviews from
+     */
     QUrl url() const;
+    /*!
+     * Sets the url to fetch the requirements from
+     */
     virtual void setUrl(const QUrl &url);
+    /*!
+     * Returns the token to authenticate for fetching the reviews
+     */
     QString token() const;
+    /*!
+     * Sets the Token to authenticate for fetching the requirements
+     */
     virtual void setToken(const QString &token);
 
+    /*!
+     * A pointer to the table header, so the column geometry can be saved/restored
+     */
     QHeaderView *horizontalTableHeader() const;
 
 public Q_SLOTS:

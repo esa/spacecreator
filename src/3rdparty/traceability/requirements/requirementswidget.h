@@ -50,15 +50,40 @@ class RequirementsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit RequirementsWidget(const QString &requirementsUrl, RequirementsManager *manager,
-            requirement::RequirementsModelBase *model, QWidget *parent = nullptr);
+    explicit RequirementsWidget(QWidget *parent = nullptr);
     ~RequirementsWidget();
 
+    /*!
+     * The manager to load/save the requirements from the data source (gitlab)
+     */
+    void setManager(RequirementsManager *manager);
+    /*!
+     * Model for the QTableView to show the requirements
+     */
+    void setModel(requirement::RequirementsModelBase *model);
+
+    /*!
+     * Returns the URL to fetch the requirements from
+     */
     QUrl url() const;
+    /*!
+     * \brief RequirementsWidget::setUrl sets the url to fetch the requirements from
+     * \param url
+     */
     void setUrl(const QUrl &url);
+    /*!
+     * \brief RequirementsWidget::token Returns the token to authenticate for fetching the requirements
+     */
     QString token() const;
+    /*!
+     * \brief RequirementsWidget::setToken sets the Token to authenticate for fetching the requirements
+     * \param token
+     */
     void setToken(const QString &token);
 
+    /*!
+     * A pointer to the table header, so the column geometry can be saved/restored
+     */
     QHeaderView *horizontalTableHeader() const;
 
 protected Q_SLOTS:

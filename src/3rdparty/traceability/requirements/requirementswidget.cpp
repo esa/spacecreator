@@ -34,20 +34,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 namespace requirement {
 const int kIconSize = 16;
 
-RequirementsWidget::RequirementsWidget(
-        const QString &requirementsUrl, RequirementsManager *manager, RequirementsModelBase *model, QWidget *parent)
+RequirementsWidget::RequirementsWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::RequirementsWidget)
-    , m_reqManager(manager)
-    , m_model(model)
-    , m_requirementsUrl(requirementsUrl)
     , m_widgetBar(new tracecommon::WidgetBar(this))
 {
     ui->setupUi(this);
     m_textFilterModel.setDynamicSortFilter(true);
     m_textFilterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     m_textFilterModel.setFilterKeyColumn(-1);
-    m_textFilterModel.setSourceModel(m_model);
 
     m_tagFilterModel.setDynamicSortFilter(true);
     m_tagFilterModel.setSourceModel(&m_textFilterModel);
@@ -56,17 +51,11 @@ RequirementsWidget::RequirementsWidget(
     m_checkedModel.setSourceModel(&m_tagFilterModel);
 
     ui->allRequirements->setModel(&m_tagFilterModel);
-    ui->allRequirements->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
-    ui->allRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
-    ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Interactive);
-
-    ui->allRequirements->setColumnWidth(1, width() - ui->allRequirements->width());
-
     ui->allRequirements->horizontalHeader()->setStretchLastSection(true);
     ui->allRequirements->setSortingEnabled(true);
+
     ui->removeRequirementButton->setEnabled(false);
-    connect(m_model, &requirement::RequirementsModelBase::rowsInserted, this,
-            [this]() { ui->allRequirements->resizeRowsToContents(); });
+
     connect(ui->allRequirements->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &RequirementsWidget::modelSelectionChanged);
     connect(ui->allRequirements, &QTableView::doubleClicked, this, &RequirementsWidget::openIssueLink);
@@ -79,10 +68,23 @@ RequirementsWidget::RequirementsWidget(
             &RequirementsWidget::onChangeOfCredentials);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, &m_textFilterModel,
             &QSortFilterProxyModel::setFilterFixedString);
-    connect(m_reqManager, &RequirementsManager::projectIDChanged, this, &RequirementsWidget::updateProjectReady);
-    connect(m_reqManager, &RequirementsManager::requirementCreated, this, &RequirementsWidget::requestRequirements);
-    connect(m_reqManager, &RequirementsManager::requirementClosed, this, &RequirementsWidget::requestRequirements);
     connect(ui->filterButton, &QPushButton::clicked, this, &RequirementsWidget::toggleShowUsedRequirements);
+
+    ui->filterButton->setIcon(QPixmap(":/tracecommonresources/icons/filter_icon.svg"));
+    ui->verticalLayout->insertWidget(0, m_widgetBar);
+}
+
+RequirementsWidget::~RequirementsWidget()
+{
+    delete ui;
+}
+
+void RequirementsWidget::setManager(RequirementsManager *manager)
+{
+    m_reqManager = manager;
+    connect(m_reqManager, &RequirementsManager::projectIDChanged, this, &RequirementsWidget::updateProjectReady);
+    connect(m_reqManager, &RequirementsManager::requirementAdded, this, &RequirementsWidget::requestRequirements);
+    connect(m_reqManager, &RequirementsManager::requirementClosed, this, &RequirementsWidget::requestRequirements);
     connect(m_reqManager, &RequirementsManager::busyChanged, this, &RequirementsWidget::updateServerStatus);
     connect(m_reqManager, &RequirementsManager::listOfTags, this, &RequirementsWidget::fillTagBar);
     connect(m_reqManager, &RequirementsManager::connectionError, this, [this](const QString &error) {
@@ -96,37 +98,34 @@ RequirementsWidget::RequirementsWidget(
     connect(m_reqManager, &tracecommon::IssuesManager::tokenChanged, ui->credentialWidget,
             &tracecommon::CredentialWidget::setToken);
 
-    ui->filterButton->setIcon(QPixmap(":/tracecommonresources/icons/filter_icon.svg"));
-    ui->verticalLayout->insertWidget(0, m_widgetBar);
-
     if (!m_reqManager->projectUrl().isEmpty()) {
         ui->credentialWidget->setUrl(m_reqManager->projectUrl());
-    } else {
-        if (!m_requirementsUrl.isEmpty()) {
-            m_reqManager->setCredentials(m_requirementsUrl, m_reqManager->projectUrl());
-        }
+        m_requirementsUrl = m_reqManager->projectUrl();
     }
     if (!m_reqManager->token().isEmpty()) {
         ui->credentialWidget->setToken(m_reqManager->token());
     }
 }
 
-RequirementsWidget::~RequirementsWidget()
+void RequirementsWidget::setModel(RequirementsModelBase *model)
 {
-    delete ui;
+    m_model = model;
+    m_textFilterModel.setSourceModel(m_model);
+
+    ui->allRequirements->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
+    ui->allRequirements->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
+    ui->allRequirements->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Interactive);
+    ui->allRequirements->setColumnWidth(1, width() - ui->allRequirements->width());
+
+    connect(m_model, &requirement::RequirementsModelBase::rowsInserted, this,
+            [this]() { ui->allRequirements->resizeRowsToContents(); });
 }
 
-/*!
- * Returns the URL to fetch the requirements from
- */
 QUrl RequirementsWidget::url() const
 {
     return ui->credentialWidget->url();
 }
-/*!
- * \brief RequirementsWidget::setUrl sets the url to fetch the requirements from
- * \param url
- */
+
 void RequirementsWidget::setUrl(const QUrl &url)
 {
     if (ui->credentialWidget->url() == url) {
@@ -135,18 +134,11 @@ void RequirementsWidget::setUrl(const QUrl &url)
     ui->credentialWidget->setUrl(url.toString());
 }
 
-/*!
- * \brief RequirementsWidget::token Returns the token to authenticate for fetching the requirements
- */
 QString RequirementsWidget::token() const
 {
     return ui->credentialWidget->token();
 }
 
-/*!
- * \brief RequirementsWidget::setToken sets the Token to authenticate for fetching the requirements
- * \param token
- */
 void RequirementsWidget::setToken(const QString &token)
 {
     if (ui->credentialWidget->token() == token) {
@@ -162,6 +154,10 @@ QHeaderView *RequirementsWidget::horizontalTableHeader() const
 
 void RequirementsWidget::onChangeOfCredentials()
 {
+    if (!m_reqManager) {
+        return;
+    }
+
     m_requirementsUrl = ui->credentialWidget->url().toString();
     Q_EMIT requirementsUrlChanged(m_requirementsUrl);
     const QString newToken(ui->credentialWidget->token());
@@ -174,6 +170,10 @@ void RequirementsWidget::onChangeOfCredentials()
 
 void RequirementsWidget::requestRequirements()
 {
+    if (!m_reqManager || !m_model) {
+        return;
+    }
+
     if (m_reqManager && m_reqManager->hasValidProjectID()) {
         m_model->clearRequirements();
         m_reqManager->requestAllRequirements();
@@ -182,7 +182,7 @@ void RequirementsWidget::requestRequirements()
 
 void RequirementsWidget::setLoginData()
 {
-    if (m_reqManager->isBusy()) {
+    if (!m_reqManager || m_reqManager->isBusy()) {
         return;
     }
 
@@ -208,6 +208,10 @@ void RequirementsWidget::setLoginData()
 
 void RequirementsWidget::updateServerStatus()
 {
+    if (!m_reqManager) {
+        return;
+    }
+
     ui->refreshButton->setEnabled(!m_reqManager->isBusy());
     const QCursor busyCursor(Qt::WaitCursor);
     if (m_reqManager->isBusy()) {
@@ -302,6 +306,10 @@ bool RequirementsWidget::tagButtonExists(const QString &tag) const
 
 void RequirementsWidget::showNewRequirementDialog() const
 {
+    if (!m_reqManager || !m_model) {
+        return;
+    }
+
     QScopedPointer<AddNewRequirementDialog> dialog(new AddNewRequirementDialog(m_model.get()));
     dialog->setModal(true);
     const auto ret = dialog->exec();
@@ -317,6 +325,10 @@ void RequirementsWidget::showNewRequirementDialog() const
  */
 void RequirementsWidget::removeRequirement()
 {
+    if (!m_reqManager || !m_model) {
+        return;
+    }
+
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, tr("Remove requirement"),
             tr("Are you sure you want to remove the selected requirement?"), QMessageBox::Yes | QMessageBox::No);

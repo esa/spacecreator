@@ -47,9 +47,20 @@ public:
 
     explicit ReviewsModelBase(QObject *parent = nullptr);
 
+    /*!
+     * \brief Empties the list of reviews of the model
+     */
     virtual void clear();
 
+    /*!
+     * \brief Sets the list of reviews in the model
+     * \param reviews All reviews in that model
+     */
     virtual void setReviews(const QList<Review> &reviews);
+    /*!
+     * \brief Append reviews to the existing reviews in the model
+     * \param reviews Reviews to add to the model
+     */
     virtual void addReviews(const QList<Review> &reviews);
 
     // Header:
@@ -63,6 +74,11 @@ public:
 
     Review reviewFromIndex(const QModelIndex &idx) const;
 
+    /*!
+     * \brief Check if a review ID already exists in the model
+     * \param revID The ID of the review
+     * \return True if the review exists in the model
+     */
     virtual bool reviewIDExists(const QString &revID) const;
 
 protected:
