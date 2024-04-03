@@ -5,6 +5,9 @@ remove_definitions(-DQT_NO_KEYWORDS)
 add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
+  addnewrequirementdialog.cpp
+  addnewrequirementdialog.h
+  addnewrequirementdialog.ui
   checkedfilterproxymodel.cpp
   checkedfilterproxymodel.h
   gitlab/gitlabrequirements.cpp
@@ -15,12 +18,9 @@ target_sources(${LIB_NAME} PRIVATE
   requirementsmanager.h
   requirementsmodelbase.cpp
   requirementsmodelbase.h
-  ui/requirementswidget.cpp
-  ui/requirementswidget.h
-  ui/requirementswidget.ui
-  ui/addnewrequirementdialog.h
-  ui/addnewrequirementdialog.cpp
-  ui/addnewrequirementdialog.ui
+  requirementswidget.cpp
+  requirementswidget.h
+  requirementswidget.ui
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

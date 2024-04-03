@@ -17,7 +17,7 @@ along with this program. If not, see
 */
 
 #pragma once
-#include "ui/requirementswidget.h"
+#include "requirementswidget.h"
 
 namespace requirement {
 class RequirementsManager;

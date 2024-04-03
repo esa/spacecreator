@@ -4,9 +4,9 @@ add_library(${LIB_NAME} STATIC
     addnewreviewdialog.h addnewreviewdialog.cpp addnewreviewdialog.ui
     gitlab/gitlabreviews.h gitlab/gitlabreviews.cpp
     review.h review.cpp
+    reviewsmanager.h reviewsmanager.cpp
     reviewsmodelbase.h reviewsmodelbase.cpp
     reviewswidget.h reviewswidget.cpp reviewswidget.ui
-    reviewsmanager.h reviewsmanager.cpp
 )
 
 target_include_directories(${LIB_NAME} PUBLIC .)

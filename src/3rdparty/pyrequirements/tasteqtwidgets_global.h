@@ -10,7 +10,7 @@
 #include <requirements/requirement.h>
 #include <requirements/requirementsmanager.h>
 #include <requirements/requirementsmodelbase.h>
-#include <requirements/ui/requirementswidget.h>
+#include <requirements/requirementswidget.h>
 #include <reviews/review.h>
 #include <reviews/reviewsmanager.h>
 #include <reviews/reviewsmodelbase.h>
