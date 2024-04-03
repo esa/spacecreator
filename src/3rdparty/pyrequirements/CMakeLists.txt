@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(TasteQtWidgets VERSION 0.0.1 DESCRIPTION "C++/Qt Widgets for ESA Python projects" LANGUAGES CXX)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)
 set(QT_VER_MAJ_MIN ${Qt6_VERSION_MAJOR}.${Qt6_VERSION_MINOR})
@@ -97,9 +97,6 @@ set(TasteQtWidgets_SRC
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_reviewswidget_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_wrapper.h
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/reviews_wrapper.cpp
-
-
-
 
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_module_wrapper.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/${bindings_library}/tasteqtwidgets_python.h

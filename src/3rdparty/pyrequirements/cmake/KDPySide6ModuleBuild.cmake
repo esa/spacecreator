@@ -118,7 +118,6 @@ macro(
     make_path(python_dir_include_dirs ${raw_python_dir_include_dirs})
 
     set_property(SOURCE ${outputSource} PROPERTY SKIP_AUTOGEN OFF)
-    set(tmp_PYSIDE_libicui_dir "/home/denis/develop/vs/KDDockWidgets/venv/lib/python3.7/site-packages/PySide6/Qt/lib")
 
     set(tmp_CMD_dbg $<TARGET_PROPERTY:Shiboken6::shiboken,LOCATION>
         ${GENERATOR_EXTRA_FLAGS}
