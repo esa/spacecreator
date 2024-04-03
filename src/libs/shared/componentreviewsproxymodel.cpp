@@ -21,8 +21,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace shared {
 
-ComponentReviewsProxyModel::ComponentReviewsProxyModel(QObject *parent)
-    : reviews::ReviewsModelBase { parent }
+ComponentReviewsProxyModel::ComponentReviewsProxyModel(reviews::ReviewsManager *manager, QObject *parent)
+    : reviews::ReviewsModelBase { manager, parent }
 {
 }
 

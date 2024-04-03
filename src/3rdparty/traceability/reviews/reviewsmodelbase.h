@@ -22,8 +22,11 @@ along with this program. If not, see
 #include "tracecommonmodelbase.h"
 
 #include <QList>
+#include <QPointer>
 
 namespace reviews {
+
+class ReviewsManager;
 
 /*!
  * \brief Base model to hold reviews for a Qt view
@@ -45,12 +48,12 @@ public:
         CRITICALITY
     };
 
-    explicit ReviewsModelBase(QObject *parent = nullptr);
+    explicit ReviewsModelBase(ReviewsManager *manager, QObject *parent = nullptr);
 
     /*!
      * \brief Empties the list of reviews of the model
      */
-    virtual void clear();
+    virtual void clearReviews();
 
     /*!
      * \brief Sets the list of reviews in the model
@@ -83,6 +86,7 @@ public:
 
 protected:
     QList<Review> m_reviews;
+    QPointer<ReviewsManager> m_manager;
 };
 
 } // namespace requirement

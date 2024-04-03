@@ -17,13 +17,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "requirementsmodelbase.h"
 
+#include "requirementsmanager.h"
+
 using namespace tracecommon;
 
 namespace requirement {
 
-RequirementsModelBase::RequirementsModelBase(QObject *parent)
+RequirementsModelBase::RequirementsModelBase(RequirementsManager *manager, QObject *parent)
     : TraceCommonModelBase(parent)
+    , m_manager(manager)
 {
+    if (m_manager != nullptr) {
+        connect(m_manager, &RequirementsManager::listOfRequirements, this, &RequirementsModelBase::addRequirements);
+        connect(m_manager, &RequirementsManager::startingFetchingRequirements, this,
+                &RequirementsModelBase::clearRequirements);
+    }
 }
 
 void RequirementsModelBase::clearRequirements()

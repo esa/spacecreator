@@ -33,17 +33,13 @@ ReviewsDialog::ReviewsDialog(scs::SpaceCreatorProject *project, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ReviewsDialog)
     , m_reviewsManager(new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this))
-    , m_reviewsModel(new spctr::AllReviewsModel(project, this))
+    , m_reviewsModel(new spctr::AllReviewsModel(project, m_reviewsManager, this))
 {
     ui->setupUi(this);
     ui->reviewsWidget->showButtons(false);
     ui->reviewsWidget->setManager(m_reviewsManager);
     ui->reviewsWidget->setModel(m_reviewsModel);
     connect(this, &QDialog::accepted, this, &ReviewsDialog::saveToken);
-    connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
-            &reviews::ReviewsModelBase::addReviews);
-    connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
-            &reviews::ReviewsModelBase::clear);
     loadSavedGeometry();
 }
 

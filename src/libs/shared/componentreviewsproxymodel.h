@@ -28,7 +28,7 @@ namespace shared {
 class ComponentReviewsProxyModel : public reviews::ReviewsModelBase
 {
 public:
-    explicit ComponentReviewsProxyModel(QObject *parent = nullptr);
+    explicit ComponentReviewsProxyModel(reviews::ReviewsManager *manager, QObject *parent = nullptr);
 
     /*!
      * Limits the reviews to only those reviews that have on of the given ids

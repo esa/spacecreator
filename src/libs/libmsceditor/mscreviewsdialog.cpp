@@ -41,10 +41,8 @@ MscReviewsDialog::MscReviewsDialog(
     ui->setupUi(this);
 
     m_reviewsManager = new ReviewsManager(ReviewsManager::REPO_TYPE::GITLAB, this);
-    m_reviewsModel = new shared::ComponentReviewsProxyModel(this);
+    m_reviewsModel = new shared::ComponentReviewsProxyModel(m_reviewsManager, this);
     m_reviewsModel->setAcceptableIds(m_entity->reviews());
-    connect(m_reviewsManager, &ReviewsManager::listOfReviews, m_reviewsModel, &ReviewsModelBase::addReviews);
-    connect(m_reviewsManager, &ReviewsManager::startingFetchingReviews, m_reviewsModel, &ReviewsModelBase::clear);
 
     m_reviewsWidget = new ::shared::ui::SCReviewsWidget(this);
     m_reviewsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

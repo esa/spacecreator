@@ -82,20 +82,16 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
     , m_isRequiredSystemElement(false)
 {
     m_reqManager = new requirement::RequirementsManager(requirement::RequirementsManager::REPO_TYPE::GITLAB, this);
-    m_reqModel = new shared::RequirementsModel(this);
+    m_reqModel = new shared::RequirementsModel(m_reqManager, this);
     m_reqModel->setDataObject(dataObject());
     m_reqModel->setPropertyTemplateConfig(dynPropConfig);
-    connect(m_reqManager, &requirement::RequirementsManager::listOfRequirements, m_reqModel,
-            &shared::RequirementsModel::addRequirements);
-    connect(m_reqManager, &requirement::RequirementsManager::startingFetchingRequirements, m_reqModel,
-            &shared::RequirementsModel::clearRequirements);
     shared::DataModel *model = document->objectsModel();
     m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
     m_reviewWidget = new shared::ui::SCReviewsWidget(this);
     m_reviewsManager = new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this);
     m_reviewWidget->setManager(m_reviewsManager);
-    m_reviewsModel = new shared::ComponentReviewsProxyModel(this);
+    m_reviewsModel = new shared::ComponentReviewsProxyModel(m_reviewsManager, this);
     m_reviewsModel->setAcceptableIds(dataObject()->reviewIDs());
     m_reviewWidget->setModel(m_reviewsModel);
 
@@ -123,10 +119,6 @@ IVPropertiesDialog::IVPropertiesDialog(QPointer<InterfaceDocument> document, con
                     commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, reviewsUrl));
                 }
             });
-    connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
-            &reviews::ReviewsModelBase::addReviews);
-    connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
-            &reviews::ReviewsModelBase::clear);
 }
 
 IVPropertiesDialog::~IVPropertiesDialog() { }

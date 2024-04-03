@@ -35,8 +35,8 @@ namespace spctr {
 
 static const int COMPONENT_COLUMN = 3;
 
-AllReviewsModel::AllReviewsModel(scs::SpaceCreatorProject *project, QObject *parent)
-    : reviews::ReviewsModelBase { parent }
+AllReviewsModel::AllReviewsModel(scs::SpaceCreatorProject *project, reviews::ReviewsManager *manager, QObject *parent)
+    : reviews::ReviewsModelBase { manager, parent }
     , m_project(project)
 {
 }

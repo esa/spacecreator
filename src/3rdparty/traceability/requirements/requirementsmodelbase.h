@@ -22,8 +22,11 @@ along with this program. If not, see
 #include "tracecommonmodelbase.h"
 
 #include <QList>
+#include <QPointer>
 
 namespace requirement {
+
+class RequirementsManager;
 
 /*!
  * \brief Base model to hold requirements for a Qt view
@@ -45,7 +48,7 @@ public:
         CHECKED = 2
     };
 
-    explicit RequirementsModelBase(QObject *parent = nullptr);
+    explicit RequirementsModelBase(RequirementsManager *manager, QObject *parent = nullptr);
     /*!
      * \brief Empties the list of requirements of the model
      */
@@ -99,6 +102,7 @@ protected:
 
     QList<Requirement> m_requirements;
     QStringList m_selectedRequirements;
+    QPointer<RequirementsManager> m_manager;
 };
 
 } // namespace requirement

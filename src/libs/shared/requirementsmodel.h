@@ -37,7 +37,7 @@ class RequirementsModel : public requirement::RequirementsModelBase
     Q_OBJECT
 
 public:
-    explicit RequirementsModel(QObject *parent = nullptr);
+    explicit RequirementsModel(requirement::RequirementsManager *manager, QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 

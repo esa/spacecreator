@@ -31,7 +31,8 @@ class AllReviewsModel : public reviews::ReviewsModelBase
 {
     Q_OBJECT
 public:
-    explicit AllReviewsModel(scs::SpaceCreatorProject *project, QObject *parent = nullptr);
+    explicit AllReviewsModel(
+            scs::SpaceCreatorProject *project, reviews::ReviewsManager *manager, QObject *parent = nullptr);
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;

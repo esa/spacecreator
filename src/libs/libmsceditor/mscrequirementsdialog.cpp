@@ -34,12 +34,8 @@ MscRequirementsDialog::MscRequirementsDialog(const QUrl &requirementsUrl, msc::M
     ui->setupUi(this);
 
     m_reqManager = new RequirementsManager(RequirementsManager::REPO_TYPE::GITLAB, this);
-    m_reqModel = new RequirementsModelBase(this);
+    m_reqModel = new RequirementsModelBase(m_reqManager, this);
     m_reqModel->setSelectedRequirements(m_entity->requirements());
-    connect(m_reqManager, &RequirementsManager::listOfRequirements, m_reqModel,
-            &RequirementsModelBase::addRequirements);
-    connect(m_reqManager, &RequirementsManager::startingFetchingRequirements, m_reqModel,
-            &RequirementsModelBase::clearRequirements);
     
     m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             requirementsUrl.toString().toUtf8(), m_reqManager, m_reqModel, this);

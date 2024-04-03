@@ -54,13 +54,9 @@ DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemp
     , m_asn1Checks(asn1Checks)
 {
     m_reqManager = new requirement::RequirementsManager(requirement::RequirementsManager::REPO_TYPE::GITLAB, this);
-    m_reqModel = new shared::RequirementsModel(this);
+    m_reqModel = new shared::RequirementsModel(m_reqManager, this);
     m_reqModel->setDataObject(dataObject());
     m_reqModel->setPropertyTemplateConfig(dynPropConfig);
-    connect(m_reqManager, &requirement::RequirementsManager::listOfRequirements, m_reqModel,
-            &shared::RequirementsModel::addRequirements);
-    connect(m_reqManager, &requirement::RequirementsManager::startingFetchingRequirements, m_reqModel,
-            &shared::RequirementsModel::clearRequirements);
 
     m_reqWidget = new ::shared::ui::SCRequirementsWidget(
             model->requirementsURL().toString().toUtf8(), m_reqManager, m_reqModel, this);
@@ -82,7 +78,7 @@ DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemp
     m_reviewsManager = new reviews::ReviewsManager(tracecommon::IssuesManager::REPO_TYPE::GITLAB, this);
     m_reviewWidget->setManager(m_reviewsManager);
     m_reviewWidget->setUrl(model->requirementsURL());
-    m_reviewsModel = new shared::ComponentReviewsProxyModel(this);
+    m_reviewsModel = new shared::ComponentReviewsProxyModel(m_reviewsManager, this);
     m_reviewsModel->setAcceptableIds(dataObject()->reviewIDs());
     m_reviewWidget->setModel(m_reviewsModel);
     connect(m_reviewWidget, &reviews::ReviewsWidget::reviewsUrlChanged, this,
@@ -94,10 +90,6 @@ DVPropertiesDialog::DVPropertiesDialog(dvm::DVModel *model, shared::PropertyTemp
                     commandsStack->push(new shared::cmd::CmdSetRequirementsUrl(model, reviewsUrl));
                 }
             });
-    connect(m_reviewsManager, &reviews::ReviewsManager::listOfReviews, m_reviewsModel,
-            &reviews::ReviewsModelBase::addReviews);
-    connect(m_reviewsManager, &reviews::ReviewsManager::startingFetchingReviews, m_reviewsModel,
-            &reviews::ReviewsModelBase::clear);
 }
 
 QString DVPropertiesDialog::objectTypeName() const

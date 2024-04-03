@@ -17,16 +17,23 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "reviewsmodelbase.h"
 
+#include "reviewsmanager.h"
+
 using namespace tracecommon;
 
 namespace reviews {
 
-ReviewsModelBase::ReviewsModelBase(QObject *parent)
+ReviewsModelBase::ReviewsModelBase(ReviewsManager *manager, QObject *parent)
     : TraceCommonModelBase(parent)
+    , m_manager(manager)
 {
+    if (m_manager != nullptr) {
+        connect(m_manager, &ReviewsManager::listOfReviews, this, &ReviewsModelBase::addReviews);
+        connect(m_manager, &ReviewsManager::startingFetchingReviews, this, &ReviewsModelBase::clearReviews);
+    }
 }
 
-void ReviewsModelBase::clear()
+void ReviewsModelBase::clearReviews()
 {
     setReviews({});
 }

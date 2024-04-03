@@ -23,8 +23,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace shared {
 
-RequirementsModel::RequirementsModel(QObject *parent)
-    : RequirementsModelBase(parent)
+RequirementsModel::RequirementsModel(requirement::RequirementsManager *manager, QObject *parent)
+    : RequirementsModelBase(manager, parent)
 {
 }
 
