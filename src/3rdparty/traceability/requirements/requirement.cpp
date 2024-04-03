@@ -19,9 +19,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace requirement {
 
-bool Requirement::operator ==(const Requirement &req) const
+bool Requirement::isValid() const
+{
+    return !m_id.isEmpty() && !m_longName.isEmpty();
+}
+
+bool Requirement::operator==(const Requirement &req) const
 {
     return (req.m_id == this->m_id);
 }
 
 } // namespace requirement
+
+QDebug operator<<(QDebug debug, const requirement::Requirement &r)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "Requirement(" << r.m_id << ", " << r.m_longName << ", issue:" << r.m_issueID << ")";
+    return debug;
+}

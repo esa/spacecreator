@@ -335,8 +335,11 @@ void RequirementsWidget::removeRequirement()
     if (reply == QMessageBox::Yes) {
         const auto &currentIndex = ui->allRequirements->selectionModel()->currentIndex();
         if (currentIndex.isValid()) {
-            const Requirement &requirement = m_model->requirementFromIndex(currentIndex);
-            m_reqManager->removeRequirement(requirement);
+            const QString reqIfID = currentIndex.data(RequirementsModelBase::ReqIfIdRole).toString();
+            const Requirement requirement = m_model->requirementFromId(reqIfID);
+            if (requirement.isValid()) {
+                m_reqManager->removeRequirement(requirement);
+            }
         }
     }
 }

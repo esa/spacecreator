@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 #pragma once
 
+#include <QDebug>
 #include <QString>
 #include <QUrl>
 
@@ -32,7 +33,11 @@ public:
     QStringList m_tags;
     QUrl m_link;
 
+    bool isValid() const;
+
     bool operator ==(const Requirement& req) const;
 };
 
 } // namespace requirement
+
+QDebug operator<<(QDebug debug, const requirement::Requirement &r);

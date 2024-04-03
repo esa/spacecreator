@@ -210,4 +210,16 @@ bool RequirementsModelBase::reqIfIDExists(const QString &reqIfID) const
             [reqIfID](const Requirement &req) { return req.m_id == reqIfID; });
 }
 
+Requirement RequirementsModelBase::requirementFromId(const QString &reqIfID) const
+{
+    auto it = std::find_if(m_requirements.begin(), m_requirements.end(),
+            [reqIfID](const Requirement &req) { return req.m_id == reqIfID; });
+
+    if (it != m_requirements.end()) {
+        return *it;
+    } else {
+        return Requirement();
+    }
+}
+
 } // namespace requirement

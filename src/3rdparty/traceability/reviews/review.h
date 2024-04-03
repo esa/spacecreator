@@ -38,6 +38,8 @@ public:
 
     QString criticality() const;
 
+    bool isValid() const;
+
     bool operator==(const Review &other) const;
 };
 

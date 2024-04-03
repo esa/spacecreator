@@ -92,10 +92,17 @@ public:
     Requirement requirementFromIndex(const QModelIndex &idx);
     /*!
      * \brief Check if a requirement ID already exists in the model
-     * \param requirement ID
+     * \param reqIfID requirement ID
      * \return True if the Requirement ID already exists
      */
     bool reqIfIDExists(const QString &reqIfID) const;
+
+    /*!
+     * \brief Returns the requirement with the given ID
+     * \param reqIfID requirement ID
+     * \return  The full requirement, or an invalid one if it does not exist
+     */
+    Requirement requirementFromId(const QString &reqIfID) const;
 
 protected:
     QString getReqIfIdFromModelIndex(const QModelIndex &index) const;

@@ -39,6 +39,11 @@ QString Review::criticality() const
     return QObject::tr("default");
 }
 
+bool Review::isValid() const
+{
+    return !m_id.isEmpty() && !m_longName.isEmpty();
+}
+
 bool Review::operator==(const Review &other) const
 {
     return (m_id == other.m_id) && (m_longName == other.m_longName) && (m_description == other.m_description)
