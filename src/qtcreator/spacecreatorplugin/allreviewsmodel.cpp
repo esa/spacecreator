@@ -21,12 +21,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 #include "dvappmodel.h"
 #include "dvcommonprops.h"
 #include "dvmodel.h"
+#include "dvobject.h"
 #include "interfacedocument.h"
 #include "ivcommonprops.h"
 #include "iveditorcore.h"
 #include "ivfunctiontype.h"
 #include "ivinterface.h"
 #include "mainmodel.h"
+#include "mscchart.h"
+#include "mscdocument.h"
 #include "msceditorcore.h"
 #include "mscmodel.h"
 #include "spacecreatorproject.h"
@@ -110,7 +113,13 @@ QString AllReviewsModel::componentForReview(const QString &revId) const
         for (auto data : model->objects()) {
             auto dvData = dynamic_cast<dvm::DVObject *>(data);
             if (dvData && dvData->entityAttributeValue(dvToken, "") == revId) {
-                return QString("DV: %1").arg(dvData->titleUI());
+                switch (dvData->type()) {
+                case dvm::DVObject::Type::Partition:
+                case dvm::DVObject::Type::Device:
+                    return QString("DV: %1.%2").arg(dvData->parentObject()->titleUI(), dvData->titleUI());
+                default:
+                    return QString("DV: %1").arg(dvData->titleUI());
+                }
             }
         }
     }
@@ -119,12 +128,14 @@ QString AllReviewsModel::componentForReview(const QString &revId) const
     QVector<MSCEditorCorePtr> mscCores = m_project->allMscCores();
     for (const MSCEditorCorePtr &mscCore : mscCores) {
         msc::MscModel *model = mscCore->mainModel()->mscModel();
-        for (msc::MscChart *chart : model->allCharts()) {
-            for (msc::MscInstance *instance : chart->instances()) {
-                // @todo - add msc reviews support
+        for (msc::MscDocument *doc : model->allDocuments()) {
+            if (doc->reviews().contains(revId)) {
+                return QString("MSC: %1").arg(doc->name());
             }
-            for (msc::MscInstanceEvent *event : chart->instanceEvents()) {
-                // @todo - add msc reviews support
+        }
+        for (msc::MscChart *chart : model->allCharts()) {
+            if (chart->reviews().contains(revId)) {
+                return QString("MSC: %1").arg(chart->name());
             }
         }
     }

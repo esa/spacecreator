@@ -32,6 +32,7 @@ MscRequirementsDialog::MscRequirementsDialog(const QUrl &requirementsUrl, msc::M
     , m_entity(entity)
 {
     ui->setupUi(this);
+    setWindowTitle(tr("Requirements for %1").arg(entity->name()));
 
     m_reqManager = new RequirementsManager(RequirementsManager::REPO_TYPE::GITLAB, this);
     m_reqModel = new RequirementsModelBase(m_reqManager, this);

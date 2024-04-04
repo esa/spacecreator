@@ -39,6 +39,7 @@ MscReviewsDialog::MscReviewsDialog(
     , m_undoStack(undoStack)
 {
     ui->setupUi(this);
+    setWindowTitle(tr("Reviews for %1").arg(entity->name()));
 
     m_reviewsManager = new ReviewsManager(ReviewsManager::REPO_TYPE::GITLAB, this);
     m_reviewsModel = new shared::ComponentReviewsProxyModel(m_reviewsManager, this);
