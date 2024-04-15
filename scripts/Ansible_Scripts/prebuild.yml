@@ -36,20 +36,32 @@
               - python3-pexpect
               - xmldiff
 
-        - name: Add backport repository
-          become: yes
-          when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "10")
-          apt_repository:
-            repo: deb http://ftp.debian.org/debian buster-backports main
-            state: present
-        - name: Update to backported cmake version
+        - name: Create dirs
+          file:
+            path: "{{ download_dir }}"
+            state: directory
+            mode: 0755
+
+        - name: Remove cmake package (old version)
           become: yes
           when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "10")
           apt:
             name: cmake
-            state: present
-            default_release: buster-backports
-            update_cache: yes
+            state: absent
+        - name: Download cmake from Github
+          when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "10")
+          retries: 2
+          get_url:
+              url: "https://github.com/Kitware/CMake/releases/download/v3.18.4/cmake-3.18.4-Linux-x86_64.sh"
+              dest: "{{ download_dir }}/cmake-3.18.4-Linux-x86_64.sh"
+              mode: '0755'
+              timeout: "{{ download_timeout }}"
+        - name: Install cmake in usr/local
+          become: yes
+          when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "10")
+          command:
+            cmd: "{{ download_dir }}/cmake-3.18.4-Linux-x86_64.sh --prefix=/usr/local --skip-license"
+            creates:  "/usr/local/bin/cmake"
 
         - name: Install PIP dependencies
           become: yes
