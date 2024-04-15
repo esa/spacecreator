@@ -36,7 +36,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html
 
 namespace spctr {
 
-static const int COMPONENT_COLUMN = 3;
+static const int COMPONENT_COLUMN = 4;
 
 AllReviewsModel::AllReviewsModel(scs::SpaceCreatorProject *project, reviews::ReviewsManager *manager, QObject *parent)
     : reviews::ReviewsModelBase { manager, parent }
@@ -48,6 +48,8 @@ QVariant AllReviewsModel::headerData(int section, Qt::Orientation orientation, i
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
+        case REVIEW_ID:
+            return tr("ID");
         case TITLE:
             return tr("Title");
         case AUTHOR:
@@ -64,13 +66,15 @@ QVariant AllReviewsModel::headerData(int section, Qt::Orientation orientation, i
 
 int AllReviewsModel::columnCount(const QModelIndex &parent) const
 {
-    return 4;
+    return 5;
 }
 
 QVariant AllReviewsModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
+        case REVIEW_ID:
+            return m_reviews[index.row()].m_id;
         case TITLE:
             return m_reviews[index.row()].m_longName;
         case AUTHOR:

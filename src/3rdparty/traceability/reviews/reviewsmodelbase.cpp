@@ -62,6 +62,8 @@ QVariant ReviewsModelBase::headerData(int section, Qt::Orientation orientation, 
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
+        case REVIEW_ID:
+            return tr("ID");
         case TITLE:
             return tr("Title");
         case AUTHOR:
@@ -85,7 +87,7 @@ int ReviewsModelBase::rowCount(const QModelIndex &parent) const
 
 int ReviewsModelBase::columnCount(const QModelIndex &parent) const
 {
-    return 3;
+    return 4;
 }
 
 QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
@@ -99,6 +101,8 @@ QVariant ReviewsModelBase::data(const QModelIndex &index, int role) const
         return m_reviews[index.row()].m_link;
     case Qt::DisplayRole: {
         switch (index.column()) {
+        case REVIEW_ID:
+            return m_reviews[index.row()].m_id;
         case TITLE:
             return m_reviews[index.row()].m_longName;
         case AUTHOR:
