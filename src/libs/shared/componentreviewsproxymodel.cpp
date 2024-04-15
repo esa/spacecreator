@@ -57,4 +57,10 @@ void ComponentReviewsProxyModel::addReviews(const QList<reviews::Review> &review
     endResetModel();
 }
 
+bool ComponentReviewsProxyModel::reviewIDExists(const QString &revID) const
+{
+    return std::any_of(m_originalReviews.begin(), m_originalReviews.end(),
+            [revID](const reviews::Review &review) { return review.m_id == revID; });
+}
+
 } // namespace shared

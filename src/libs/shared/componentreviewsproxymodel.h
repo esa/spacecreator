@@ -38,6 +38,8 @@ public:
     void setReviews(const QList<reviews::Review> &reviews) override;
     void addReviews(const QList<reviews::Review> &reviews) override;
 
+    bool reviewIDExists(const QString &revID) const override;
+
 protected:
     QStringList m_ids;
     QList<reviews::Review> m_originalReviews;
