@@ -300,13 +300,15 @@ void VEInteractiveObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     const QPointF pos = graphicsviewutils::snappedPoint(scene(), event->scenePos());
+    const QPointF newPos = graphicsviewutils::snappedPoint(scene(), event->buttonDownScenePos(event->button()));
     showHelperLines(false);
     s_mouseReleased = true;
-    onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), event->buttonDownScenePos(event->button()), pos);
+    onManualMoveFinish(gripPointItem(shared::ui::GripPoint::Center), newPos, pos);
 
-    const qreal distance = topohelp::geom::calcDistance(event->buttonDownScenePos(event->button()), pos);
-    if (distance <= kClickTreshold)
+    const qreal distance = topohelp::geom::calcDistance(newPos, pos);
+    if (distance <= kClickTreshold) {
         Q_EMIT clicked(pos);
+    }
     QGraphicsObject::mouseReleaseEvent(event);
 }
 
