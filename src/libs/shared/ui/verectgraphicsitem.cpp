@@ -130,7 +130,6 @@ void VERectGraphicsItem::onManualMoveProgress(GripPoint *grip, const QPointF &pr
         }
     }
     setGeometry(rect);
-    layoutConnectionsOnMove(shared::ui::VEConnectionGraphicsItem::CollisionsPolicy::Ignore);
 }
 
 void VERectGraphicsItem::onManualResizeProgress(GripPoint *grip, const QPointF &from, const QPointF &to)
@@ -246,7 +245,15 @@ void VERectGraphicsItem::updateChildrenGeometry()
             // Calculate the new postion of the iface.
             const Qt::Alignment side = topohelp::geom::getNearestSide(entityRect, storedPos);
             const QRectF sceneRect = sceneBoundingRect();
-            const QPointF pos = topohelp::geom::getSidePosition(sceneRect, storedPos, side);
+            QPointF pos;
+            if (sceneRect.size() == entityRect.size()) {
+                // moving
+                const QPointF diff = sceneRect.topLeft() - entityRect.topLeft();
+                pos = storedPos + diff;
+            } else {
+                // resizing
+                pos = topohelp::geom::getSidePosition(sceneRect, storedPos, side);
+            }
             iface->setPos(iface->parentItem()->mapFromScene(pos));
         }
     }
