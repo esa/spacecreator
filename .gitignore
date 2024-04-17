@@ -7,6 +7,7 @@
 
 # IDE files
 CMakeLists.txt.user
+*.txt.user.*
 *.pro.user
 .idea/
 
@@ -51,4 +52,5 @@ tests/unittests/sdl/SdlExporter/references/*/work/*
 # autosave files
 *.autosave
 
-*.txt.user.*
+# External code
+src/3rdparty/tasteqtwidgets
