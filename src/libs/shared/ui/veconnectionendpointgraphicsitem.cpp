@@ -223,7 +223,7 @@ void VEConnectionEndPointGraphicsItem::onManualMoveProgress(GripPoint *grip, con
     setPos(mappedPos);
     updateGripPoints();
 
-    VEConnectionGraphicsItem::layoutInterfaceConnections(this, VEConnectionGraphicsItem::LayoutPolicy::LastSegment,
+    VEConnectionGraphicsItem::layoutInterfaceConnections(this, VEConnectionGraphicsItem::LayoutPolicy::Default,
             VEConnectionGraphicsItem::CollisionsPolicy::Ignore, true);
 }
 

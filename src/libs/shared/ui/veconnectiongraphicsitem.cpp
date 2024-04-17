@@ -374,10 +374,6 @@ bool VEConnectionGraphicsItem::replaceInterface(
 void VEConnectionGraphicsItem::layoutInterfaceConnections(VEConnectionEndPointGraphicsItem *ifaceItem,
         LayoutPolicy layoutPolicy, CollisionsPolicy collisionsPolicy, bool includingNested)
 {
-    if (layoutPolicy != LastSegment) {
-        qWarning() << Q_FUNC_INFO << "forcing LayoutPolicy:" << layoutPolicy << "--> LastSegment";
-        layoutPolicy = LastSegment;
-    }
     TEXT_TRACE_ME;
     for (VEConnectionGraphicsItem *connection : ifaceItem->connectionItems()) {
         Q_ASSERT(connection && connection->startItem() && connection->endItem());
@@ -491,7 +487,7 @@ void VEConnectionGraphicsItem::onManualMoveProgress(GripPoint *gp, const QPointF
 
         auto updateEndPointItem = [&](VEConnectionEndPointGraphicsItem *endPointItem) {
             endPointItem->setPos(endPointItem->parentItem()->mapFromScene(to));
-            layoutInterfaceConnections(endPointItem, LayoutPolicy::LastSegment, CollisionsPolicy::Ignore, false);
+            layoutInterfaceConnections(endPointItem, LayoutPolicy::Default, CollisionsPolicy::Ignore, false);
         };
         if (idx == 0)
             updateEndPointItem(m_startItem);

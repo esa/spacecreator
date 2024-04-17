@@ -507,7 +507,7 @@ void VERectGraphicsItem::layoutConnectionsOnResize(VEConnectionGraphicsItem::Col
     for (const auto item : childItems()) {
         if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(item->toGraphicsObject())) {
             VEConnectionGraphicsItem::layoutInterfaceConnections(
-                    iface, VEConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, true);
+                    iface, VEConnectionGraphicsItem::LayoutPolicy::Default, collisionsPolicy, true);
         } else if (auto connection = qobject_cast<VEConnectionGraphicsItem *>(item->toGraphicsObject())) {
             if (connection->sourceItem() != this && connection->targetItem() != this)
                 connection->doLayout();
@@ -521,7 +521,7 @@ void VERectGraphicsItem::layoutConnectionsOnMove(VEConnectionGraphicsItem::Colli
     for (const auto item : childItems()) {
         if (auto iface = qobject_cast<VEConnectionEndPointGraphicsItem *>(item->toGraphicsObject())) {
             VEConnectionGraphicsItem::layoutInterfaceConnections(
-                    iface, VEConnectionGraphicsItem::LayoutPolicy::Scaling, collisionsPolicy, false);
+                    iface, VEConnectionGraphicsItem::LayoutPolicy::Default, collisionsPolicy, false);
         }
     }
 }
