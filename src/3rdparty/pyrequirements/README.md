@@ -2,13 +2,21 @@
 
 ## Using a script to do it automatically
 
-Run the `setup.py` script
+### Prerequisites
 
-All required libraries, models, source will be loaded. The module will be built. And the result is placed in the a directory next to the detected PySide. Probably somewhere like `~/.local/lib/python3.10/site-packages/PyTasteQtWidgets`
+Have Python3 and PySide installed.  
+PySyde is needed to use detect the correct version of PySide and Qt.
+
+### Do the installation
+
+Run the `install.py` script with python3.
+
+All required libraries, models, source will be loaded. The module will be built. And the result is placed in the a directory next to the detected PySide. Probably somewhere like `~/.local/lib/python3.10/site-packages/PyTasteQtWidgets`. Depending on your python version.
+
 
 ## Doing it manually
 
-In case the `setup.py` script fails, or you want to learn how to build it, here the manual installation.
+In case the `install.py` script fails, or you want to learn how to build it, here the manual installation.
 
 ### Prerequisites
 

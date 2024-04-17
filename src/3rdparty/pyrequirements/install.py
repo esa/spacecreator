@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from importlib.metadata import version
 from subprocess import check_call, CalledProcessError
 import os
 import pathlib
@@ -8,6 +7,15 @@ import shutil
 import platform
 import distro
 import pip
+import sys
+import shlex
+
+
+if sys.version_info >= (3, 8):
+    from importlib.metadata import version
+else:
+    import pkg_resources
+
 
 def module_version(moduleName):
     """
@@ -15,7 +23,10 @@ def module_version(moduleName):
         Otherwise returns the string "N/A" 
     """
     try: 
-        return(version(moduleName))
+        if sys.version_info >= (3, 8):
+            return(version(moduleName))
+        else:
+            return pkg_resources.get_distribution(moduleName).version
     except:
         return('N/A')
 
@@ -30,7 +41,7 @@ def module_path(moduleName):
 
 class SystemInfo:
     def __init__(self):
-        self.python_version = platform.python_version()
+        self.python_version = sys.version_info
         self.qt_version = module_version("PySide6")
         if self.qt_version == "N/A":
             self.qt_version = "6.5.3"
@@ -41,9 +52,12 @@ class SystemInfo:
         self.distributin_version = distro.version()
         self.source_dir = os.path.dirname(os.path.realpath(__file__))
         self.build_dir = self.source_dir + "/build"
+
+    def python_version_str(self):
+        return str(self.python_version[0]) + "." + str(self.python_version[1]) + "." + str(self.python_version[2])
     
     def print_info(self):
-        print("Python version      : " + self.python_version)
+        print("Python version      : " + self.python_version_str())
         print("Qt/PySide version   : " + self.qt_version)
         print("Qt path             : " + self.qt_path)
         print("Distribution        : " + self.distribution_name)
@@ -54,15 +68,25 @@ class SystemInfo:
 
 def check_or_raise(moduleName):
     if (module_version(moduleName) == "N/A"):
-        raise RuntimeError(moduleName + " was not found. Please install it and run this script again") 
+        raise RuntimeError(moduleName + " was not found. Please install it and run this script again")
+
+
+def run_command(cmd, stdout=None, environ=os.environ):
+    """
+        Run a command - and before print the full command to stdout
+        cmd is a list as it is passed to subprocess.check_call
+    """
+    print("- Running: '" + " ".join(cmd) + "'")
+    check_call(cmd, stdout=stdout, env=environ)
 
 
 def check_or_install(pkgName, version, extra_args=""):
-    pkg_ver = pkgName if not version else pkgName + "==" + version
-    pkg_ver_args = pkg_ver if not extra_args else pkg_ver + extra_args
     if (module_version(pkgName) == "N/A"):
-        import sys
-        check_call([sys.executable, '-m', 'pip', 'install', pkg_ver, "--break-system-packages"])
+        cmd = [sys.executable, '-m', 'pip', 'install', pkgName if not version else pkgName + "==" + version]
+        if extra_args:
+            cmd = cmd +shlex.split(extra_args)
+        cmd = cmd + ["--break-system-packages"]
+        run_command(cmd)
 
 
 def apt_install(packagesNames):
@@ -71,7 +95,7 @@ def apt_install(packagesNames):
         the names of the packages to install using apt
     """
     try:
-        check_call(['sudo', 'apt', 'install', '-y', *packagesNames], stdout=open(os.devnull,'wb'))
+        run_command(['sudo', 'apt', 'install', '-y', *packagesNames], stdout=open(os.devnull,'wb'))
     except CalledProcessError as e:
         print(e.output)
 
@@ -79,16 +103,17 @@ def apt_install(packagesNames):
 def clang_check():
     config_file = '/usr/bin/llvm-config-'
     if  distro.id() == 'debian':
+        if distro.version() == "10":
+            config_file += '11'
+            apt_install(["llvm-11", "llvm-11-dev", "libclang-11-dev", "clang-11", "patchelf", "ninja-build"])
         if distro.version() == "11":
             config_file += '13'
-            #Install system dependencies using apt
-            apt_install(["vim", "llvm-13", "llvm-13-dev", "libclang-13-dev", "clang-13", "patchelf", "ninja-build"])
+            apt_install(["llvm-13", "llvm-13-dev", "libclang-13-dev", "clang-13", "patchelf", "ninja-build"])
 
     if  distro.id() == 'ubuntu':
         if distro.version() == "20.04":
             config_file += '12'
-            #Install system dependencies using apt
-            apt_install(["vim", "llvm-12", "llvm-12-dev", "libclang-12-dev", "clang-12", "patchelf", "ninja-build"])
+            apt_install(["llvm-12", "llvm-12-dev", "libclang-12-dev", "clang-12", "patchelf", "ninja-build"])
             
     #Create symlink to llvm-config on /usr/bin
     try:
@@ -96,25 +121,25 @@ def clang_check():
     except FileExistsError:
         print ("The symlink already exists")
     except OSError:
-        check_call(['sudo', 'ln', '-s', config_file, '/usr/bin/llvm-config'])
+        run_command(['sudo', 'ln', '-s', config_file, '/usr/bin/llvm-config'])
 
 
 def cmake_prepare(info, environ=os.environ):
     try:
-        check_call(['cmake', '-S', info.source_dir, '-B', info.build_dir, "-DCMAKE_PREFIX_PATH=" + info.qt_base_path], env=environ)
+        run_command(['cmake', '-S', info.source_dir, '-B', info.build_dir, "-DCMAKE_PREFIX_PATH=" + info.qt_base_path], environ=environ)
     except CalledProcessError as e:
         print(e.output)
 
 
 def cmake_build(info, ncpus=1, environ=os.environ):
     try:
-        check_call(['cmake', '--build', info.build_dir, '-j' + str(ncpus)], env=environ)
+        run_command(['cmake', '--build', info.build_dir, '-j' + str(ncpus)], environ=environ)
     except CalledProcessError as e:
         print(e.output)
 
 def cmake_install(info):
     try:
-        check_call(['cmake', '--install', info.build_dir])
+        run_command(['cmake', '--install', info.build_dir])
     except CalledProcessError as e:
         print(e.output)
 
@@ -123,8 +148,7 @@ def check_install_qt_dev(info):
     try:
         if not os.path.exists(info.qt_path):
             cmd = "aqt install-qt --outputdir " + info.qt_path + " --base 'https://download.qt.io' linux desktop " + info.qt_version
-            import shlex
-            check_call(shlex.split(cmd))
+            run_command(shlex.split(cmd))
         return info.qt_path
     except CalledProcessError as e:
         print(e.output)
@@ -167,10 +191,11 @@ else:
     env_copy["LD_LIBRARY_PATH"] = info.qt_lib_path
 print("* info: using LD_LIBRARY_PATH: " + env_copy["LD_LIBRARY_PATH"])
 # Building PyRequirements
-cmake_prepare(info, env_copy)
+cmake_prepare(info, environ=env_copy)
 # Get number of cores
 ncpus = os.cpu_count()
-cmake_build(info, ncpus - 1, env_copy)
+cmake_build(info, ncpus - 1, environ=env_copy)
 
 print("** Install module")
 cmake_install(info)
+
