@@ -39,8 +39,17 @@ class HighlightRectItem;
 class InteractiveObjectBase : public QGraphicsObject
 {
     Q_OBJECT
+    Q_PROPERTY(UserInteraction interactionMode READ interactionMode NOTIFY interactionModeChanged FINAL)
 
 public:
+    enum UserInteraction
+    {
+        None,
+        Moving,
+        Resizing,
+    };
+    Q_ENUM(UserInteraction);
+
     explicit InteractiveObjectBase(QGraphicsItem *parent = nullptr);
     ~InteractiveObjectBase() override;
 
@@ -89,6 +98,11 @@ public:
      */
     virtual bool helpLinesSupported() const;
 
+    /*!
+     * Mode of user interaction. While the user does move/resize the item.
+     */
+    UserInteraction interactionMode() const;
+
 public Q_SLOTS:
     void scheduleLayoutUpdate();
     void instantLayoutUpdate();
@@ -98,6 +112,7 @@ Q_SIGNALS:
     void moved(shared::ui::InteractiveObjectBase *item);
     void boundingBoxChanged();
     void needUpdateLayout();
+    void interactionModeChanged();
 
 protected:
     virtual void onManualMoveStart(GripPoint *gp, const QPointF &at);
@@ -134,6 +149,7 @@ protected:
 
 protected Q_SLOTS:
     virtual void rebuildLayout();
+    void setInteractionMode(UserInteraction mode);
 
 private Q_SLOTS:
     virtual void gripPointPressed(shared::ui::GripPoint *pos, const QPointF &at);
@@ -147,6 +163,5 @@ private:
     struct InteractiveObjectBasePrivate;
     InteractiveObjectBasePrivate *d;
 };
-
 }
 }

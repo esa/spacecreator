@@ -246,7 +246,7 @@ void VERectGraphicsItem::updateChildrenGeometry()
             const Qt::Alignment side = topohelp::geom::getNearestSide(entityRect, storedPos);
             const QRectF sceneRect = sceneBoundingRect();
             QPointF pos;
-            if (sceneRect.size() == entityRect.size()) {
+            if (interactionMode() == Moving) {
                 // moving
                 const QPointF diff = sceneRect.topLeft() - entityRect.topLeft();
                 pos = storedPos + diff;

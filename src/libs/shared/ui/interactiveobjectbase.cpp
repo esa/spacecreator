@@ -47,6 +47,8 @@ struct InteractiveObjectBase::InteractiveObjectBasePrivate {
     shared::DelayedSignal *rebuildLayoutSignal = nullptr;
 
     QGraphicsRectItem *bbox = nullptr;
+
+    UserInteraction interaction = None;
 };
 
 InteractiveObjectBase::InteractiveObjectBase(QGraphicsItem *parent)
@@ -209,6 +211,11 @@ bool InteractiveObjectBase::helpLinesSupported() const
     return false;
 }
 
+InteractiveObjectBase::UserInteraction InteractiveObjectBase::interactionMode() const
+{
+    return d->interaction;
+}
+
 /*!
    \brief InteractiveObjectBase::scheduleLayoutUpdate
    Triggers a geometry update of that item. That might be needed if for example the underlying entity changes some of
@@ -327,11 +334,23 @@ QVariant InteractiveObjectBase::itemChange(GraphicsItemChange change, const QVar
  */
 void InteractiveObjectBase::rebuildLayout() { }
 
+void InteractiveObjectBase::setInteractionMode(InteractiveObjectBase::UserInteraction mode)
+{
+    if (mode == d->interaction) {
+        return;
+    }
+
+    d->interaction = mode;
+    Q_EMIT interactionModeChanged();
+}
+
 void InteractiveObjectBase::gripPointPressed(GripPoint *gp, const QPointF &at)
 {
     if (gp->isMover()) {
+        setInteractionMode(Moving);
         onManualMoveStart(gp, at);
     } else {
+        setInteractionMode(Resizing);
         onManualResizeStart(gp, at);
     }
 }
@@ -352,6 +371,7 @@ void InteractiveObjectBase::gripPointReleased(GripPoint *gp, const QPointF &pres
     } else {
         onManualResizeFinish(gp, pressedAt, releasedAt);
     }
+    setInteractionMode(None);
 }
 
 /*!
@@ -399,6 +419,5 @@ void InteractiveObjectBase::showBoundingBox()
     }
     updateBoundingBox();
 }
-
 }
 }

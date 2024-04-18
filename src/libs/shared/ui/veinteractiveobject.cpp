@@ -273,6 +273,7 @@ void VEInteractiveObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     s_mouseReleased = false;
     QGraphicsObject::mousePressEvent(event);
+    setInteractionMode(Moving);
     onManualMoveStart(
             gripPointItem(shared::ui::GripPoint::Center), graphicsviewutils::snappedPoint(scene(), event->scenePos()));
 
@@ -310,6 +311,7 @@ void VEInteractiveObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         Q_EMIT clicked(pos);
     }
     QGraphicsObject::mouseReleaseEvent(event);
+    setInteractionMode(None);
 }
 
 void VEInteractiveObject::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
