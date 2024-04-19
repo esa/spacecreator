@@ -93,6 +93,9 @@ namespace ivm {
 ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
         IVFunction *sourceFunction, IVFunction *targetFunction, IVInterface *sourceIface, IVInterface *targetIface)
 {
+    Q_ASSERT(sourceFunction);
+    Q_ASSERT(targetFunction);
+
     // [1] - the edge functions are not FunctionType
     for (const IVFunction *function : { sourceFunction, targetFunction }) {
         if (function && function->isFunctionType()) {
@@ -110,7 +113,11 @@ ConnectionCreationValidator::FailReason ConnectionCreationValidator::canConnect(
     // [3] - an iface kind is not Cyclic
     for (const IVInterface *iface : { sourceIface, targetIface }) {
         if (iface && iface->kind() == IVInterface::OperationKind::Cyclic) {
-            return FailReason::IsCyclic;
+            const bool nested = sourceFunction->parentObject() == targetFunction
+                    || targetFunction->parentObject() == sourceFunction;
+            if (!nested) {
+                return FailReason::IsCyclic;
+            }
         }
     }
 

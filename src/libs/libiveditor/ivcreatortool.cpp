@@ -840,9 +840,11 @@ static inline QVector<QPointF> generateConnectionPoints(IVItemModel *model, shar
 
 void IVCreatorTool::handleConnection(const QVector<QPointF> &graphicPoints)
 {
-    const auto info = ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, graphicPoints);
-    if (info.failed())
+    const ivm::ValidationResult info =
+            ive::gi::validateConnectionCreate(m_view ? m_view->scene() : nullptr, graphicPoints);
+    if (info.failed()) {
         return;
+    }
 
     const IVFunctionGraphicsItem *parentForConnection = nullptr;
     QPointF startInterfacePoint { info.startPointAdjusted };
