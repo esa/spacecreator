@@ -44,6 +44,31 @@ AllReviewsModel::AllReviewsModel(scs::SpaceCreatorProject *project, reviews::Rev
 {
 }
 
+void AllReviewsModel::setReviews(const QList<reviews::Review> &reviews)
+{
+    beginResetModel();
+    m_allReviews = reviews;
+    m_reviews.clear();
+    for (const reviews::Review &review : m_allReviews) {
+        if (!componentForReview(review.m_id).isEmpty()) {
+            m_reviews.append(review);
+        }
+    }
+    endResetModel();
+}
+
+void AllReviewsModel::addReviews(const QList<reviews::Review> &reviews)
+{
+    beginResetModel();
+    m_allReviews.append(reviews);
+    for (const reviews::Review &review : reviews) {
+        if (!componentForReview(review.m_id).isEmpty() && !m_reviews.contains(review)) {
+            m_reviews.append(review);
+        }
+    }
+    endResetModel();
+}
+
 QVariant AllReviewsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {

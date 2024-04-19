@@ -27,12 +27,19 @@ class SpaceCreatorProject;
 
 namespace spctr {
 
+/*!
+ * Show all reviews that do have a reference in that model.
+ * Others are not shown, as one review-URL might be used for seferal models.
+ */
 class AllReviewsModel : public reviews::ReviewsModelBase
 {
     Q_OBJECT
 public:
     explicit AllReviewsModel(
             scs::SpaceCreatorProject *project, reviews::ReviewsManager *manager, QObject *parent = nullptr);
+
+    void setReviews(const QList<reviews::Review> &reviews) override;
+    void addReviews(const QList<reviews::Review> &reviews) override;
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -42,6 +49,7 @@ protected:
     QString componentForReview(const QString &revId) const;
 
     QPointer<scs::SpaceCreatorProject> m_project;
+    QList<reviews::Review> m_allReviews;
 };
 
 } // namespace spctr
