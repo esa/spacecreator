@@ -131,8 +131,9 @@ void tst_IVModel::testManageFunctions()
     QCOMPARE(model.objects().size(), 0);
 
     ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
-    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &model);
-    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &model);
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2");
+    fn2->setParent(&model);
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3");
 
     const QVector<ivm::IVFunction *> functions { fn1, fn2, fn3 };
     for (int i = 0; i < functions.size(); ++i) {
@@ -277,10 +278,10 @@ void tst_IVModel::testManageMixed()
 
     QCOMPARE(model.objects().size(), 0);
 
-    ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1");
+    ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1", &model);
     ivm::IVFunction *container2 = ivm::testutils::createFunction("Container2", container1);
     ivm::IVFunction *container3 = ivm::testutils::createFunction("Container3", container2);
-    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1", &model);
     ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &model);
     ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &model);
     const int functionsCount = 6;
@@ -288,22 +289,24 @@ void tst_IVModel::testManageMixed()
     ivm::IVInterface::CreationInfo ci1 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, fn1);
     ci1.name = "eth0";
     ivm::IVInterface *iface1 = ivm::IVInterface::createIface(ci1);
+    model.addObject(iface1);
     ivm::IVInterface::CreationInfo ci2 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Required, fn2);
     ci2.name = "wlan0";
     ivm::IVInterface *iface2 = ivm::IVInterface::createIface(ci2);
+    model.addObject(iface2);
     ivm::IVInterface::CreationInfo ci3 = ivm::testutils::init(ivm::IVInterface::InterfaceType::Provided, fn3);
     ci3.name = "ppp0";
     ivm::IVInterface *iface3 = ivm::IVInterface::createIface(ci3);
+    model.addObject(iface3);
 
     const QVector<ivm::IVObject *> objects { container1, fn1, iface1, container2, fn2, iface2, container3, fn3,
         iface3 };
 
-    model.addObjects(objects);
-
     QCOMPARE(model.objects().size(), 3 + functionsCount);
 
-    for (auto object : objects)
+    for (auto object : objects) {
         QVERIFY(model.removeObject(object));
+    }
 
     QCOMPARE(model.objects().size(), 0);
 }
@@ -325,13 +328,12 @@ void tst_IVModel::testConnectionQuery()
 void tst_IVModel::testAvailableFunctionTypes()
 {
     ivm::IVModel sharedModel(m_dynPropConfig);
-    ivm::IVFunctionType *sfnt1 = ivm::testutils::createFunctionType("sFnT1");
+    ivm::IVFunctionType *sfnt1 = ivm::testutils::createFunctionType("sFnT1", &sharedModel);
     ivm::IVFunctionType *sfnt2 = ivm::testutils::createFunctionType("sFnT2", &sharedModel);
     ivm::IVFunctionType *sfnt3 = ivm::testutils::createFunctionType("sFnT3", &sharedModel);
     const int sharedFunctionTypesCount = 3;
 
     const QVector<ivm::IVObject *> sharedObjects { sfnt1, sfnt2, sfnt3 };
-    sharedModel.addObjects(sharedObjects);
     QCOMPARE(sharedModel.objects().size(), sharedFunctionTypesCount);
 
     ivm::IVModel model(m_dynPropConfig, &sharedModel);
@@ -347,22 +349,20 @@ void tst_IVModel::testAvailableFunctionTypes()
         return fnTypes;
     });
 
-    ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1");
+    ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1", &model);
     ivm::IVFunction *container2 = ivm::testutils::createFunction("Container2", container1);
     ivm::IVFunction *container3 = ivm::testutils::createFunction("Container3", container2);
-    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1", &model);
     ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &model);
     ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &model);
     const int functionsCount = 6;
 
-    ivm::IVFunctionType *fnt1 = ivm::testutils::createFunctionType("FnT1");
+    ivm::IVFunctionType *fnt1 = ivm::testutils::createFunctionType("FnT1", &model);
     ivm::IVFunctionType *fnt2 = ivm::testutils::createFunctionType("FnT2", &model);
     ivm::IVFunctionType *fnt3 = ivm::testutils::createFunctionType("FnT3", &model);
     const int functionTypesCount = 3;
 
     const QVector<ivm::IVObject *> objects { container1, container2, container3, fn1, fn2, fn3, fnt1, fnt2, fnt3 };
-
-    model.addObjects(objects);
     QCOMPARE(model.objects().size(), functionsCount + functionTypesCount);
 
     const auto availableTypes = model.getAvailableFunctionTypes(container1);

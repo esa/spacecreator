@@ -29,6 +29,8 @@ IVInterface *createIface(IVFunctionType *fn, IVInterface::InterfaceType t = IVIn
 IVConnection *createConnection(
         IVFunctionType *source, IVFunctionType *target, const QString &name, const shared::Id &id = shared::InvalidId);
 
+IVConnection *createConnection(IVInterface *source, IVInterface *target, const shared::Id &id = shared::InvalidId);
+
 IVFunction *createFunction(
         const QString &name = QString(), QObject *parent = nullptr, const shared::Id &id = shared::InvalidId);
 

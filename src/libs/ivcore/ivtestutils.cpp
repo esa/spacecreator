@@ -32,11 +32,34 @@ IVInterface::CreationInfo init(
     return ci;
 }
 
+bool addToModelAndParent(IVObject *ivObject, QObject *parent)
+{
+    if (parent == nullptr) {
+        return true;
+    }
+
+    if (auto parentFn = dynamic_cast<IVFunctionType *>(parent)) {
+        bool ok = parentFn->addChild(ivObject);
+        if (parentFn->model()) {
+            ok = ok && parentFn->model()->addObject(ivObject);
+        }
+        return ok;
+    }
+
+    if (auto model = dynamic_cast<IVModel *>(parent)) {
+        return model->addObject(ivObject);
+    }
+
+    return true;
+}
+
 IVInterface *createIface(IVFunctionType *fn, IVInterface::InterfaceType t, const QString &name, const shared::Id &id)
 {
     IVInterface *interface = IVInterface::createIface(init(t, fn, name, id));
-    if (fn->model()) {
-        fn->model()->addObject(interface);
+    const bool ok = addToModelAndParent(interface, fn);
+    if (!ok) {
+        delete interface;
+        interface = nullptr;
     }
     return interface;
 }
@@ -58,7 +81,12 @@ IVConnection *createConnection(
             ? *it
             : ivm::testutils::createIface(target, ivm::IVInterface::InterfaceType::Provided, name);
 
-    auto connection = new ivm::IVConnection(targetIf, sourceIf, nullptr, id);
+    return createConnection(sourceIf, targetIf, id);
+}
+
+IVConnection *createConnection(IVInterface *source, IVInterface *target, const shared::Id &id)
+{
+    auto connection = new ivm::IVConnection(source, target, nullptr, id);
     ivm::IVModel *ivModel = source ? source->model() : target->model();
     if (ivModel) {
         ivModel->addObject(connection);
@@ -80,6 +108,11 @@ IVFunction *createFunction(const QString &name, QObject *parent, const shared::I
 {
     auto fn = new IVFunction(parent, id);
     fn->setTitle(name);
+    const bool ok = addToModelAndParent(fn, parent);
+    if (!ok) {
+        delete fn;
+        fn = nullptr;
+    }
     return fn;
 }
 
@@ -87,6 +120,11 @@ IVFunctionType *createFunctionType(const QString &name, QObject *parent, const s
 {
     auto fnt = new IVFunctionType(parent, id);
     fnt->setTitle(name);
+    const bool ok = addToModelAndParent(fnt, parent);
+    if (!ok) {
+        delete fnt;
+        fnt = nullptr;
+    }
     return fnt;
 }
 
@@ -94,6 +132,11 @@ IVComment *createComment(const QString &name, QObject *parent, const shared::Id 
 {
     auto comment = new IVComment(parent, id);
     comment->setTitle(name);
+    const bool ok = addToModelAndParent(comment, parent);
+    if (!ok) {
+        delete comment;
+        comment = nullptr;
+    }
     return comment;
 }
 
@@ -118,6 +161,5 @@ IVArchetypeLibraryReference *createArchetypeLibraryReference(
             new IVArchetypeLibraryReference(archetypeLibraryName, archetypeLibraryPath, parent);
     return archetypeLibraryReference;
 }
-
 }
 }

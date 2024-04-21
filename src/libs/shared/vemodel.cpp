@@ -45,6 +45,14 @@ bool VEModel::isEmpty() const
 
 bool VEModel::addObject(VEObject *obj)
 {
+    if (!obj) {
+        return false;
+    }
+    if (getObject(obj->id()) != nullptr) {
+        // object is in the model already
+        return false;
+    }
+
     try {
         if (addObjectImpl(obj)) {
             if (!obj->postInit()) {

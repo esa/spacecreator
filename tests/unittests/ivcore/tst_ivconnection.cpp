@@ -162,11 +162,8 @@ void tst_IVConnection::testMulticastConnectionInit()
     QVERIFY(model.addObject(c2));
 
     ivm::IVFunction *fn3Nested = ivm::testutils::createFunction("Fn3Nested", fn3);
-    QVERIFY(model.addObject(fn3Nested));
-    fn3->addChild(fn3Nested);
     ivm::IVInterface *rifn3Nested =
             ivm::testutils::createIface(fn3Nested, ivm::IVInterface::InterfaceType::Required, "RI1");
-    fn3Nested->addChild(rifn3Nested);
 
     ivm::IVConnection *connection = new ivm::IVConnection(nullptr, nullptr);
     ivm::IVConnection::EndPointInfo startInfo;

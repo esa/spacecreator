@@ -50,8 +50,6 @@ void tst_IVFunction::testRequiredInterfacesManagement() const
     const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
         auto ri = ivm::testutils::createIface(&obj, ifaceType);
-        const bool ok = obj.addChild(ri);
-        QVERIFY(ok);
         QCOMPARE(obj.ris().size(), i + 1);
     }
 
@@ -74,8 +72,6 @@ void tst_IVFunction::testProvidedInterfacesManagement() const
     const int ifacesCount = 10;
     for (int i = 0; i < ifacesCount; ++i) {
         auto pi = ivm::testutils::createIface(&obj, ifaceType);
-        const bool ok = obj.addChild(pi);
-        QVERIFY(ok);
         QCOMPARE(obj.pis().size(), i + 1);
     }
 
@@ -108,11 +104,6 @@ void tst_IVFunction::testCommonInterfacesManagement() const
     }
 
     QCOMPARE(ifaces.size(), ifacesCountHalf * 2);
-
-    for (auto iface : ifaces) {
-        const bool ok = obj.addChild(iface);
-        QVERIFY(ok);
-    }
 
     QCOMPARE(obj.ris().size(), ifacesCountHalf);
     QCOMPARE(obj.pis().size(), ifacesCountHalf);

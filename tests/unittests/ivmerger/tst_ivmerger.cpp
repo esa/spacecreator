@@ -278,7 +278,7 @@ void tst_IvMerger::test_capabilityRemovedFromTailoring()
     ivm::IVFunction *capabilityRouter =
             ivm::testutils::createFunction("capability_router", nullptr, capabilityRouterId);
     ivm::IVInterface *capabilityRouterTc = ivm::testutils::createProvidedIface(capabilityRouter, "tc");
-    appTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    capabilityRouterTc->setKind(ivm::IVInterface::OperationKind::Protected);
     capabilityRouter->addChild(capabilityRouterTc);
     ivm::IVInterface *capabilityRouterReq1 = ivm::testutils::createRequiredIface(capabilityRouter, "req_1");
     capabilityRouterReq1->setKind(ivm::IVInterface::OperationKind::Protected);
@@ -308,10 +308,10 @@ void tst_IvMerger::test_capabilityRemovedFromTailoring()
     app->addChild(connReq1);
     app->addChild(connReq2);
 
-    ivm::IVConnection *connAppTc = ivm::testutils::createConnection(app, capabilityRouter, "tc");
+    ivm::IVConnection *connAppTc = ivm::testutils::createConnection(appTc, capabilityRouterTc);
     app->addChild(connAppTc);
 
-    ivm::IVConnection *connTc = ivm::testutils::createConnection(router, app, "tc");
+    ivm::IVConnection *connTc = ivm::testutils::createConnection(routerTc, appTc);
 
     ivm::IVModel targetModel(m_dynPropConfig);
     const QVector<ivm::IVObject *> targetObjects { router, app, connTc };
@@ -351,10 +351,10 @@ void tst_IvMerger::test_capabilityRemovedFromTailoring()
 
     sourceApp->addChild(sourceConnReq1);
 
-    ivm::IVConnection *sourceConnAppTc = ivm::testutils::createConnection(sourceApp, sourceCapabilityRouter, "tc");
+    ivm::IVConnection *sourceConnAppTc = ivm::testutils::createConnection(appTc, sourceCapabilityRouterTc);
     sourceApp->addChild(sourceConnAppTc);
 
-    ivm::IVConnection *sourceConnTc = ivm::testutils::createConnection(sourceRouter, sourceApp, "tc");
+    ivm::IVConnection *sourceConnTc = ivm::testutils::createConnection(sourceRouterTc, appTc);
 
     ivm::IVModel sourceModel(m_dynPropConfig);
     const QVector<ivm::IVObject *> sourceObjects { sourceRouter, sourceApp, sourceConnTc };
@@ -531,7 +531,7 @@ void tst_IvMerger::test_ivMergeDataPoolConnections()
     ivm::IVFunction *sourceCapabilityRouter =
             ivm::testutils::createFunction("capability_router", nullptr, capabilityRouterId);
     ivm::IVInterface *sourceCapabilityRouterTc = ivm::testutils::createProvidedIface(sourceCapabilityRouter, "tc");
-    sourceAppTc->setKind(ivm::IVInterface::OperationKind::Protected);
+    sourceCapabilityRouterTc->setKind(ivm::IVInterface::OperationKind::Protected);
     sourceCapabilityRouter->addChild(sourceCapabilityRouterTc);
     ivm::IVInterface *sourceCapabilityRouterReq1 = ivm::testutils::createRequiredIface(sourceCapabilityRouter, "req_1");
     sourceCapabilityRouterReq1->setKind(ivm::IVInterface::OperationKind::Protected);
@@ -590,10 +590,10 @@ void tst_IvMerger::test_ivMergeDataPoolConnections()
     sourceApp->addChild(sourceConnReq2);
     sourceApp->addChild(sourceConnReq3);
 
-    ivm::IVConnection *sourceConnAppTc = ivm::testutils::createConnection(sourceApp, sourceCapabilityRouter, "tc");
+    ivm::IVConnection *sourceConnAppTc = ivm::testutils::createConnection(appTc, sourceCapabilityRouterTc);
     sourceApp->addChild(sourceConnAppTc);
 
-    ivm::IVConnection *sourceConnTc = ivm::testutils::createConnection(sourceRouter, sourceApp, "tc");
+    ivm::IVConnection *sourceConnTc = ivm::testutils::createConnection(sourceRouterTc, appTc);
 
     ivm::IVConnection *sourceDataPoolConn1 = ivm::testutils::createConnection(sourceApp, sourceDataPool, "data_pool_load_parameter_value");
     ivm::IVConnection *sourceDataPoolConn2 = ivm::testutils::createConnection(sourceApp, sourceDataPool, "data_pool_store_parameter_value");

@@ -167,7 +167,7 @@ void tst_IVFunctionType::testChildrenManagementFunction()
     fn3->addChild(ivm::testutils::createIface(fn3, itProvided));
 
     const QVector<ivm::IVObject *> functions { fn0, fn1, fn2, fn3 };
-    testChildrenManagement(&obj, functions);
+    testChildrenManagement(&obj, functions, true);
 }
 
 void tst_IVFunctionType::testChildrenManagement(
@@ -275,7 +275,7 @@ void tst_IVFunctionType::testChildrenManagementMixed()
     fnType3->addChild(ivm::testutils::createIface(fnType3, itProvided));
 
     const QVector<ivm::IVObject *> children { fnType0, fn0, fnType1, fn1, fnType2, fn3, fnType3, fn2 };
-    testChildrenManagement(&obj, children);
+    testChildrenManagement(&obj, children, true);
 }
 
 QTEST_APPLESS_MAIN(tst_IVFunctionType)

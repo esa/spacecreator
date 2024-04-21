@@ -250,7 +250,8 @@ void tst_XmlDocExporter::testExportNestedComment()
 {
     auto testfunc1 = ivm::testutils::createFunction("TestFunc1", m_doc.get());
     testfunc1->setEntityAttribute(QLatin1String("instance_of"), QString());
-    auto testcomment1 = ivm::testutils::createComment("TestComment1", testfunc1);
+    auto testcomment1 = ivm::testutils::createComment("TestComment1");
+    testcomment1->setParent(testfunc1);
     testfunc1->addChild(testcomment1);
 
     QVector<ivm::IVObject *> objects;
