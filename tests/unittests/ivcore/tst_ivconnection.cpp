@@ -141,20 +141,14 @@ void tst_IVConnection::testMulticastConnectionInit()
 {
     ivm::IVModel model(conf);
 
-    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
-    QVERIFY(model.addObject(fn1));
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1", &model);
     ivm::IVInterface *pifn1 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "PI1");
-    fn1->addChild(pifn1);
 
-    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2");
-    QVERIFY(model.addObject(fn2));
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &model);
     ivm::IVInterface *pifn2 = ivm::testutils::createIface(fn2, ivm::IVInterface::InterfaceType::Provided, "PI4");
-    fn2->addChild(pifn2);
 
-    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3");
-    QVERIFY(model.addObject(fn3));
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &model);
     ivm::IVInterface *rifn3 = ivm::testutils::createIface(fn3, ivm::IVInterface::InterfaceType::Required, "PI1");
-    fn3->addChild(rifn3);
 
     ivm::IVConnection *c1 = new ivm::IVConnection(rifn3, pifn1);
     QVERIFY(model.addObject(c1));

@@ -389,17 +389,11 @@ void tst_XmlDocExporter::testExportToBuffer()
 
 void tst_XmlDocExporter::testExportID()
 {
-    auto testfunc1 = ivm::testutils::createFunction("Function_1", m_doc.get());
-    m_doc->objectsModel()->addObject(testfunc1);
+    auto testfunc1 = ivm::testutils::createFunction("Function_1", m_doc->objectsModel());
     auto reqIface = ivm::testutils::createRequiredIface(testfunc1, "PI_1");
-    testfunc1->addChild(reqIface);
-    m_doc->objectsModel()->addObject(reqIface);
 
-    auto testfunc2 = ivm::testutils::createFunction("Function_2", m_doc.get());
-    m_doc->objectsModel()->addObject(testfunc2);
+    auto testfunc2 = ivm::testutils::createFunction("Function_2", m_doc->objectsModel());
     auto provIface = ivm::testutils::createProvidedIface(testfunc2, "PI_1");
-    testfunc2->addChild(provIface);
-    m_doc->objectsModel()->addObject(provIface);
 
     auto connection = ivm::testutils::createConnection(testfunc1, testfunc2, "PI_1");
 
@@ -444,16 +438,10 @@ void tst_XmlDocExporter::testExportUI()
     ivm::IVPropertyTemplateConfig::instance()->initFromData(kAttrTemplate);
 
     auto testfunc1 = ivm::testutils::createFunction("Function_1", m_doc.get());
-    m_doc->objectsModel()->addObject(testfunc1);
     auto reqIface = ivm::testutils::createRequiredIface(testfunc1, "PI_1");
-    testfunc1->addChild(reqIface);
-    m_doc->objectsModel()->addObject(reqIface);
 
     auto testfunc2 = ivm::testutils::createFunction("Function_2", m_doc.get());
-    m_doc->objectsModel()->addObject(testfunc2);
     auto provIface = ivm::testutils::createProvidedIface(testfunc2, "PI_1");
-    testfunc2->addChild(provIface);
-    m_doc->objectsModel()->addObject(provIface);
 
     auto connection = ivm::testutils::createConnection(testfunc1, testfunc2, "PI_1");
     QVERIFY(m_doc->exporter()->exportDocSilently(m_doc.get(), m_testFilePath));

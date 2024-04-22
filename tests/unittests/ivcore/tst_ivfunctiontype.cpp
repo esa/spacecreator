@@ -159,12 +159,12 @@ void tst_IVFunctionType::testChildrenManagementFunction()
 
     ivm::IVFunction *fn0 = ivm::testutils::createFunction("Fn0", &obj);
     ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1", &obj);
-    fn1->addChild(ivm::testutils::createIface(fn1, itProvided));
+    ivm::testutils::createIface(fn1, itProvided);
     ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &obj);
-    fn2->addChild(ivm::testutils::createIface(fn2, itRequired));
+    ivm::testutils::createIface(fn2, itRequired);
     ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &obj);
-    fn3->addChild(ivm::testutils::createIface(fn3, itRequired));
-    fn3->addChild(ivm::testutils::createIface(fn3, itProvided));
+    ivm::testutils::createIface(fn3, itRequired);
+    ivm::testutils::createIface(fn3, itProvided);
 
     const QVector<ivm::IVObject *> functions { fn0, fn1, fn2, fn3 };
     testChildrenManagement(&obj, functions, true);
@@ -226,20 +226,16 @@ void tst_IVFunctionType::testChildrenManagementContainer()
     auto itRequired = ivm::IVInterface::InterfaceType::Required;
 
     ivm::IVFunctionType *fnType0 = ivm::testutils::createFunctionType("FnType0", &obj);
-    obj.addChild(fnType0);
 
     ivm::IVFunctionType *fnType1 = ivm::testutils::createFunctionType("FnType1", &obj);
-    obj.addChild(fnType1);
-    fnType1->addChild(ivm::testutils::createIface(fnType1, itProvided));
+    ivm::testutils::createIface(fnType1, itProvided);
 
     ivm::IVFunctionType *fnType2 = ivm::testutils::createFunctionType("FnType2", &obj);
-    obj.addChild(fnType2);
-    fnType2->addChild(ivm::testutils::createIface(fnType2, itRequired));
+    ivm::testutils::createIface(fnType2, itRequired);
 
     ivm::IVFunctionType *fnType3 = ivm::testutils::createFunctionType("FnType3", &obj);
-    obj.addChild(fnType3);
-    fnType3->addChild(ivm::testutils::createIface(fnType3, itRequired));
-    fnType3->addChild(ivm::testutils::createIface(fnType3, itProvided));
+    ivm::testutils::createIface(fnType3, itRequired);
+    ivm::testutils::createIface(fnType3, itProvided);
 
     const QVector<ivm::IVObject *> functionTypes { fnType0, fnType1, fnType2, fnType3 };
     testChildrenManagement(&obj, functionTypes, true);
@@ -254,25 +250,25 @@ void tst_IVFunctionType::testChildrenManagementMixed()
 
     ivm::IVFunction *fn0 = ivm::testutils::createFunction("Fn0", &obj);
     ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1", &obj);
-    fn1->addChild(ivm::testutils::createIface(fn1, itProvided));
+    ivm::testutils::createIface(fn1, itProvided);
 
     ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &obj);
-    fn1->addChild(ivm::testutils::createIface(fn2, itRequired));
+    ivm::testutils::createIface(fn2, itRequired);
 
     ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &obj);
-    fn3->addChild(ivm::testutils::createIface(fn3, itRequired));
-    fn3->addChild(ivm::testutils::createIface(fn3, itProvided));
+    ivm::testutils::createIface(fn3, itRequired);
+    ivm::testutils::createIface(fn3, itProvided);
 
     ivm::IVFunctionType *fnType0 = ivm::testutils::createFunctionType("FnType0", &obj);
     ivm::IVFunctionType *fnType1 = ivm::testutils::createFunctionType("FnType1", &obj);
-    fnType1->addChild(ivm::testutils::createIface(fnType1, itProvided));
+    ivm::testutils::createIface(fnType1, itProvided);
 
     ivm::IVFunctionType *fnType2 = ivm::testutils::createFunctionType("FnType2", &obj);
-    fnType2->addChild(ivm::testutils::createIface(fnType2, itRequired));
+    ivm::testutils::createIface(fnType2, itRequired);
 
     ivm::IVFunctionType *fnType3 = ivm::testutils::createFunctionType("FnType3", &obj);
-    fnType3->addChild(ivm::testutils::createIface(fnType3, itRequired));
-    fnType3->addChild(ivm::testutils::createIface(fnType3, itProvided));
+    ivm::testutils::createIface(fnType3, itRequired);
+    ivm::testutils::createIface(fnType3, itProvided);
 
     const QVector<ivm::IVObject *> children { fnType0, fn0, fnType1, fn1, fnType2, fn3, fnType3, fn2 };
     testChildrenManagement(&obj, children, true);

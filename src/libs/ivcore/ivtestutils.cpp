@@ -91,6 +91,11 @@ IVConnection *createConnection(IVInterface *source, IVInterface *target, const s
     if (ivModel) {
         ivModel->addObject(connection);
     }
+    if (source->function()) {
+        if (auto parentFn = dynamic_cast<IVFunctionType *>(source->function()->parentObject())) {
+            parentFn->addChild(connection);
+        }
+    }
     return connection;
 }
 

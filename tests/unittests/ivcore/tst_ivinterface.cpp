@@ -44,32 +44,6 @@ private Q_SLOTS:
     void tst_InheritNamesFromFunctionTypesPrefixedFunction();
 
 private:
-    ivm::IVFunction *addFunction(const QString &name)
-    {
-        auto func = new ivm::IVFunction;
-        func->setTitle(name);
-        m_model->addObject(func);
-        return func;
-    }
-    ivm::IVInterfaceProvided *addProvidedInterface(ivm::IVFunctionType *fn, const QString &name)
-    {
-        ivm::IVInterfaceProvided *piInterface = ivm::testutils::createProvidedIface(fn, name);
-        if (fn) {
-            fn->addChild(piInterface);
-        }
-        m_model->addObject(piInterface);
-        return piInterface;
-    }
-    ivm::IVInterfaceRequired *addRequiredInterface(ivm::IVFunctionType *fn, const QString &name)
-    {
-        ivm::IVInterfaceRequired *riInterface = ivm::testutils::createRequiredIface(fn, name);
-        if (fn) {
-            fn->addChild(riInterface);
-        }
-        m_model->addObject(riInterface);
-        return riInterface;
-    }
-
     ivm::IVPropertyTemplateConfig *cfg { nullptr };
     std::unique_ptr<ivm::IVModel> m_model;
 };
@@ -95,10 +69,10 @@ void tst_IVInterface::tst_setAttr_Autoname()
 {
     static const QString autonamedPropName = ivm::meta::Props::token(ivm::meta::Props::Token::Autonamed);
 
-    ivm::IVFunction *func = addFunction("func");
+    ivm::IVFunction *func = ivm::testutils::createFunction("func", m_model.get());
 
     ivm::IVInterface::CreationInfo ci;
-    ivm::IVInterfaceRequired *reqIface = addRequiredInterface(func, "");
+    ivm::IVInterfaceRequired *reqIface = ivm::testutils::createRequiredIface(func, "");
 
     QVERIFY(reqIface->isAutoNamed());
     QVERIFY(reqIface->isInheritPI());
@@ -114,7 +88,7 @@ void tst_IVInterface::tst_setAttr_Autoname()
     QVERIFY(reqIface->entityAttributeValue<bool>(autonamedPropName));
     QVERIFY(reqIface->isAutoNamed());
 
-    ivm::IVInterfaceProvided *provIface = addProvidedInterface(func, "");
+    ivm::IVInterfaceProvided *provIface = ivm::testutils::createProvidedIface(func, "");
     reqIface->setPrototype(provIface);
     QVERIFY(reqIface->hasEntityAttribute(autonamedPropName));
     QVERIFY(reqIface->entityAttributeValue<bool>(autonamedPropName));
@@ -134,33 +108,19 @@ void tst_IVInterface::tst_setAttr_Autoname()
 
 void tst_IVInterface::tst_reqIfaceAutorename()
 {
-    auto func1 = new ivm::IVFunction;
-    func1->setTitle("F1");
-    m_model->addObject(func1);
+    auto func1 = ivm::testutils::createFunction("F1", m_model.get());
     ivm::IVInterfaceProvided *provIface1 { ivm::testutils::createProvidedIface(func1, "P1") };
-    func1->addChild(provIface1);
-    m_model->addObject(provIface1);
 
-    auto func2 = new ivm::IVFunction;
-    func2->setTitle("F2");
-    m_model->addObject(func2);
+    auto func2 = ivm::testutils::createFunction("F2", m_model.get());
     ivm::IVInterfaceProvided *provIface2 { ivm::testutils::createProvidedIface(func2, "P1") };
-    func2->addChild(provIface2);
-    m_model->addObject(provIface2);
 
-    auto func3 = new ivm::IVFunction();
-    m_model->addObject(func3);
-    func3->setTitle("F3");
+    auto func3 = ivm::testutils::createFunction("F3", m_model.get());
     ivm::IVInterfaceRequired *reqIface1 { ivm::testutils::createRequiredIface(func3) };
-    func3->addChild(reqIface1);
-    m_model->addObject(reqIface1);
     reqIface1->setPrototype(provIface1);
     QCOMPARE(reqIface1->title(), provIface1->title());
 
     ivm::IVInterfaceRequired *reqIface2 { ivm::testutils::createRequiredIface(func3) };
     QCOMPARE(reqIface2->isAutoNamed(), true);
-    func3->addChild(reqIface2);
-    m_model->addObject(reqIface2);
     QCOMPARE(reqIface2->isAutoNamed(), true);
     reqIface2->setPrototype(provIface2);
     QCOMPARE(reqIface2->isAutoNamed(), true);
@@ -173,20 +133,14 @@ void tst_IVInterface::tst_reqIfaceAutorename()
 
     QString title = QLatin1String("P1");
     ivm::IVInterfaceProvided *provIface3 { ivm::testutils::createProvidedIface(func3, title) };
-    func3->addChild(provIface3);
-    m_model->addObject(provIface3);
     QCOMPARE(provIface3->title(), title);
 
     ivm::IVInterfaceRequired *reqIface3 { ivm::testutils::createRequiredIface(func2, title) };
-    func2->addChild(reqIface3);
-    m_model->addObject(reqIface3);
     reqIface3->setPrototype(provIface3);
     QCOMPARE(provIface3->title(), reqIface3->title());
 
     title = QLatin1String("P5");
     ivm::IVInterfaceProvided *provIface5 { ivm::testutils::createProvidedIface(func3, title) };
-    func3->addChild(provIface5);
-    m_model->addObject(provIface5);
     QCOMPARE(provIface5->title(), title);
 
     title = QLatin1String("P1");
@@ -200,13 +154,11 @@ void tst_IVInterface::tst_reqIfaceAutorename()
  */
 void tst_IVInterface::tst_InheritNamesFromFunctionTypes()
 {
-    auto funcType = new ivm::IVFunctionType;
-    funcType->setTitle(QLatin1String("FT1"));
-    m_model->addObject(funcType);
-    ivm::IVInterfaceProvided *typePI = addProvidedInterface(funcType, "parse");
-    ivm::IVInterfaceRequired *typeRI = addRequiredInterface(funcType, "parse");
+    auto funcType = ivm::testutils::createFunctionType("FT1", m_model.get());
+    ivm::IVInterfaceProvided *typePI = ivm::testutils::createProvidedIface(funcType, "parse");
+    ivm::IVInterfaceRequired *typeRI = ivm::testutils::createRequiredIface(funcType, "parse");
 
-    auto func1 = addFunction("F1");
+    auto func1 = ivm::testutils::createFunction("F1", m_model.get());
     QCOMPARE(func1->interfaces().size(), 0);
 
     // Now inherit from the type
@@ -238,11 +190,11 @@ void tst_IVInterface::tst_InheritNamesFromFunctionTypes()
 void tst_IVInterface::tst_renameConnectedRIs()
 {
     using namespace ivm::meta;
-    auto func1 = addFunction("F1");
-    ivm::IVInterfaceProvided *piInterface = addProvidedInterface(func1, "PI_name");
+    auto func1 = ivm::testutils::createFunction("F1", m_model.get());
+    ivm::IVInterfaceProvided *piInterface = ivm::testutils::createProvidedIface(func1, "PI_name");
 
-    auto func2 = addFunction("F2");
-    ivm::IVInterfaceRequired *riInterface = addRequiredInterface(func2, "");
+    auto func2 = ivm::testutils::createFunction("F2", m_model.get());
+    ivm::IVInterfaceRequired *riInterface = ivm::testutils::createRequiredIface(func2, "");
     QCOMPARE(riInterface->isInheritPI(), true);
     QCOMPARE(riInterface->title(), "RI_0");
 
@@ -274,17 +226,15 @@ void tst_IVInterface::tst_renameConnectedRIs()
  */
 void tst_IVInterface::tst_InheritNamesFromFunctionTypesPrefixedFunction()
 {
-    auto funcType = new ivm::IVFunctionType;
-    funcType->setTitle(QLatin1String("FT1"));
-    m_model->addObject(funcType);
-    ivm::IVInterfaceProvided *typePI = addProvidedInterface(funcType, "parse");
-    ivm::IVInterfaceRequired *typeRI = addRequiredInterface(funcType, "parse");
+    auto funcType = ivm::testutils::createFunctionType("FT1", m_model.get());
+    ivm::IVInterfaceProvided *typePI = ivm::testutils::createProvidedIface(funcType, "parse");
+    ivm::IVInterfaceRequired *typeRI = ivm::testutils::createRequiredIface(funcType, "parse");
 
-    auto func1 = addFunction("F1");
+    auto func1 = ivm::testutils::createFunction("F1", m_model.get());
     QCOMPARE(func1->interfaces().size(), 0);
 
     // Now inherit from the type
-    ivm::IVInterfaceRequired *typeRINamedAlready = addRequiredInterface(func1, "parse");
+    ivm::IVInterfaceRequired *typeRINamedAlready = ivm::testutils::createRequiredIface(func1, "parse");
     QCOMPARE(typeRINamedAlready->title(), "parse");
     auto clonePI = ivm::IVInterface::CreationInfo::cloneIface(typePI, func1);
     ivm::IVInterface *clonedPI = ivm::IVInterface::createIface(clonePI);

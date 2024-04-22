@@ -110,8 +110,7 @@ void tst_IvSystemChecks::testCheckInstanceNames()
     // Add function with different name
     ive::InterfaceDocument *doc = ivPlugin->document();
     ivm::IVModel *ivModel = doc->objectsModel();
-    auto ivFnct = ivm::testutils::createFunction("init");
-    ivModel->addObject(ivFnct);
+    auto ivFnct = ivm::testutils::createFunction("init", ivModel);
     result = m_checker->checkInstanceNames();
     QCOMPARE(result.size(), 1);
     QCOMPARE(m_checker->checkInstance(instance), false);
@@ -154,10 +153,8 @@ void tst_IvSystemChecks::testCheckInstanceRelations()
     // Add function for the instances
     ive::InterfaceDocument *doc = ivPlugin->document();
     ivm::IVModel *ivModel = doc->objectsModel();
-    auto function1 = ivm::testutils::createFunction("init");
-    ivModel->addObject(function1);
-    auto function2 = ivm::testutils::createFunction("reset");
-    ivModel->addObject(function2);
+    auto function1 = ivm::testutils::createFunction("init", ivModel);
+    auto function2 = ivm::testutils::createFunction("reset", ivModel);
     result = m_checker->checkInstanceRelations();
     QCOMPARE(result.size(), 0);
 
@@ -167,8 +164,7 @@ void tst_IvSystemChecks::testCheckInstanceRelations()
     QCOMPARE(result.size(), 2);
 
     // Make function2 be nested by function1 via another one
-    auto function15 = ivm::testutils::createFunction("init");
-    ivModel->addObject(function15);
+    auto function15 = ivm::testutils::createFunction("init", ivModel);
     function15->setParent(function1);
     function2->setParent(function15);
     result = m_checker->checkInstanceRelations();
@@ -203,18 +199,14 @@ void tst_IvSystemChecks::testCheckMessageNames()
     // Add function with different source/target
     ive::InterfaceDocument *doc = ivPlugin->document();
     ivm::IVModel *ivModel = doc->objectsModel();
-    auto ivFuncA = ivm::testutils::createFunction("Instance A");
-    ivModel->addObject(ivFuncA);
-    auto ivFuncB = ivm::testutils::createFunction("Instance B");
-    ivModel->addObject(ivFuncB);
+    auto ivFuncA = ivm::testutils::createFunction("Instance A", ivModel);
+    auto ivFuncB = ivm::testutils::createFunction("Instance B", ivModel);
 
     ivm::IVInterface *requiredInterface =
             ivm::testutils::createIface(ivFuncA, ivm::IVInterface::InterfaceType::Required, "DummyA");
-    ivModel->addObject(requiredInterface);
 
     ivm::IVInterface *providedInterface =
             ivm::testutils::createIface(ivFuncB, ivm::IVInterface::InterfaceType::Provided, "DummyB");
-    ivModel->addObject(providedInterface);
     ivModel->addObject(new ivm::IVConnection(requiredInterface, providedInterface));
     result = m_checker->checkMessages();
     QCOMPARE(result.size(), 1);
@@ -308,10 +300,8 @@ void tst_IvSystemChecks::testCheckMessage()
     // Create corresponding iv model
     ive::InterfaceDocument *doc = ivPlugin->document();
     ivm::IVModel *ivModel = doc->objectsModel();
-    auto sourceFunc = ivm::testutils::createFunction("Dummy1");
-    ivModel->addObject(sourceFunc);
-    auto targetFunc = ivm::testutils::createFunction("Dummy2");
-    ivModel->addObject(targetFunc);
+    auto sourceFunc = ivm::testutils::createFunction("Dummy1", ivModel);
+    auto targetFunc = ivm::testutils::createFunction("Dummy2", ivModel);
     ivm::IVConnection *connection = ivm::testutils::createConnection(sourceFunc, targetFunc, "Msg1");
     QCOMPARE(m_checker->checkMessage(message), true);
     ivModel->removeObject(connection);

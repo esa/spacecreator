@@ -113,8 +113,7 @@ void tst_MSCRefactor::testFunctionWasRenamed()
     const QString oldName = "Function_1";
     const QString newName = "Function_A";
 
-    auto ivFunc1 = ivm::testutils::createFunction(oldName);
-    m_ivModel->addObject(ivFunc1);
+    auto ivFunc1 = ivm::testutils::createFunction(oldName, m_ivModel.get());
     QCOMPARE(firstInstance()->name(), oldName);
 
     ivFunc1->setTitle(newName);
@@ -124,12 +123,9 @@ void tst_MSCRefactor::testFunctionWasRenamed()
 
 void tst_MSCRefactor::testMessagesUsed()
 {
-    auto ivFunc1 = ivm::testutils::createFunction("Function_1");
-    m_ivModel->addObject(ivFunc1);
-    auto ivFuncB = ivm::testutils::createFunction("Function_B");
-    m_ivModel->addObject(ivFuncB);
-    auto ivFunc33 = ivm::testutils::createFunction("Function_33");
-    m_ivModel->addObject(ivFunc33);
+    auto ivFunc1 = ivm::testutils::createFunction("Function_1", m_ivModel.get());
+    auto ivFuncB = ivm::testutils::createFunction("Function_B", m_ivModel.get());
+    auto ivFunc33 = ivm::testutils::createFunction("Function_33", m_ivModel.get());
 
     {
         ivm::IVConnection *connection = ivm::testutils::createConnection(ivFuncB, ivFunc33, "init");
@@ -151,10 +147,8 @@ void tst_MSCRefactor::testInterfaceWasRenamed()
     const QString oldName = "init";
     const QString newName = "start";
 
-    auto ivFuncB = ivm::testutils::createFunction("Function_B");
-    m_ivModel->addObject(ivFuncB);
-    auto ivFunc33 = ivm::testutils::createFunction("Function_33");
-    m_ivModel->addObject(ivFunc33);
+    auto ivFuncB = ivm::testutils::createFunction("Function_B", m_ivModel.get());
+    auto ivFunc33 = ivm::testutils::createFunction("Function_33", m_ivModel.get());
     ivm::IVConnection *connection = ivm::testutils::createConnection(ivFuncB, ivFunc33, oldName);
     ivm::IVInterface *ivIface = connection->targetInterface();
 
@@ -168,10 +162,8 @@ void tst_MSCRefactor::testInterfaceWasRenamed()
 
 void tst_MSCRefactor::testIVConnectionUsed()
 {
-    auto ivFuncB = ivm::testutils::createFunction("Function_B");
-    m_ivModel->addObject(ivFuncB);
-    auto ivFunc33 = ivm::testutils::createFunction("Function_33");
-    m_ivModel->addObject(ivFunc33);
+    auto ivFuncB = ivm::testutils::createFunction("Function_B", m_ivModel.get());
+    auto ivFunc33 = ivm::testutils::createFunction("Function_33", m_ivModel.get());
 
     ivm::IVConnection *connection = ivm::testutils::createConnection(ivFuncB, ivFunc33, "init");
     QCOMPARE(m_mscRefactor->isIVConnectionUsed(connection), true);
@@ -183,10 +175,8 @@ void tst_MSCRefactor::testIVConnectionUsed()
 void tst_MSCRefactor::testIVObjectRemoved()
 {
     const QString name = "init";
-    auto ivFuncB = ivm::testutils::createFunction("Function_B");
-    m_ivModel->addObject(ivFuncB);
-    auto ivFunc33 = ivm::testutils::createFunction("Function_33");
-    m_ivModel->addObject(ivFunc33);
+    auto ivFuncB = ivm::testutils::createFunction("Function_B", m_ivModel.get());
+    auto ivFunc33 = ivm::testutils::createFunction("Function_33", m_ivModel.get());
 
     ivm::IVConnection *connection = ivm::testutils::createConnection(ivFuncB, ivFunc33, name);
     msc::MscMessage *msg = mscMessage(name);

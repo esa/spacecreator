@@ -60,14 +60,11 @@ void tst_ConnectionCreationValidator::init()
 
 void tst_ConnectionCreationValidator::tst_cyclicInterface()
 {
-    IVFunction *fnA = testutils::createFunction("A");
-    m_model->addObject(fnA);
-    IVFunction *fnB = testutils::createFunction("B");
-    m_model->addObject(fnB);
+    IVFunction *fnA = testutils::createFunction("A", m_model.get());
+    IVFunction *fnB = testutils::createFunction("B", m_model.get());
 
     IVInterfaceProvided *piIf = testutils::createProvidedIface(fnA, "cycle");
     piIf->setKind(IVInterface::OperationKind::Cyclic);
-    fnA->addChild(piIf);
 
     const ConnectionCreationValidator::FailReason result =
             ConnectionCreationValidator::canConnect(fnB, fnA, piIf, nullptr);
@@ -76,15 +73,11 @@ void tst_ConnectionCreationValidator::tst_cyclicInterface()
 
 void tst_ConnectionCreationValidator::tst_cyclicNestedInterface()
 {
-    IVFunction *parentFn = testutils::createFunction("parentFn");
-    m_model->addObject(parentFn);
+    IVFunction *parentFn = testutils::createFunction("parentFn", m_model.get());
     IVFunction *nestedFn = testutils::createFunction("nestedFn", parentFn);
-    m_model->addObject(nestedFn);
-    parentFn->addChild(nestedFn);
 
     IVInterfaceProvided *piIf = testutils::createProvidedIface(parentFn, "cycle");
     piIf->setKind(IVInterface::OperationKind::Cyclic);
-    parentFn->addChild(piIf);
 
     const ConnectionCreationValidator::FailReason result =
             ConnectionCreationValidator::canConnect(parentFn, nestedFn, piIf, nullptr);

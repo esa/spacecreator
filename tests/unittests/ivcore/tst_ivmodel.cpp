@@ -62,10 +62,8 @@ void tst_IVModel::testManageContainers()
     QCOMPARE(model.objects().size(), 0);
 
     ivm::IVFunction *container1 = ivm::testutils::createFunction("Container1");
-    ivm::IVFunction *container2 = ivm::testutils::createFunction("Container2");
-    container1->addChild(container2);
-    ivm::IVFunction *container3 = ivm::testutils::createFunction("Container3");
-    container2->addChild(container3);
+    ivm::IVFunction *container2 = ivm::testutils::createFunction("Container2", container1);
+    ivm::IVFunction *container3 = ivm::testutils::createFunction("Container3", container2);
 
     const QVector<ivm::IVFunction *> containers { container1, container2, container3 };
     for (int i = 0; i < containers.size(); ++i) {
@@ -313,10 +311,9 @@ void tst_IVModel::testManageMixed()
 
 void tst_IVModel::testConnectionQuery()
 {
-    auto fn1 = ivm::testutils::createFunction("Fn1");
-    auto fn2 = ivm::testutils::createFunction("Fn2");
+    auto fn1 = ivm::testutils::createFunction("Fn1", m_model.get());
+    auto fn2 = ivm::testutils::createFunction("Fn2", m_model.get());
     ivm::IVConnection *connect1 = ivm::testutils::createConnection(fn1, fn2, "cnt1");
-    m_model->addObjects(QList<ivm::IVObject *> { fn1, fn2, connect1 });
 
     const Qt::CaseSensitivity m_caseCheck = Qt::CaseInsensitive;
     QCOMPARE(m_model->getConnection("Dummy", "Fn1", "Fn2", m_caseCheck), nullptr);
@@ -378,9 +375,11 @@ void tst_IVModel::testAvailableFunctionTypes()
 
 void tst_IVModel::testGetConnectionsBetweenFunctions()
 {
-    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1");
-    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2");
-    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3");
+    ivm::IVModel model(m_dynPropConfig, nullptr);
+
+    ivm::IVFunction *fn1 = ivm::testutils::createFunction("Fn1", &model);
+    ivm::IVFunction *fn2 = ivm::testutils::createFunction("Fn2", &model);
+    ivm::IVFunction *fn3 = ivm::testutils::createFunction("Fn3", &model);
 
     ivm::IVConnection *c1 = ivm::testutils::createConnection(fn1, fn2, "C1");
     ivm::IVConnection *c2 = ivm::testutils::createConnection(fn1, fn2, "C2");
@@ -388,9 +387,6 @@ void tst_IVModel::testGetConnectionsBetweenFunctions()
     ivm::IVConnection *c4 = ivm::testutils::createConnection(fn1, fn3, "C4");
     ivm::IVConnection *c5 = ivm::testutils::createConnection(fn3, fn2, "C5");
 
-    ivm::IVModel model(m_dynPropConfig, nullptr);
-    const QVector<ivm::IVObject *> objects { fn1, fn2, fn3, c1, c2, c3, c4, c5 };
-    model.addObjects(objects);
 
     const QVector<ivm::IVConnection *> connections = model.getConnectionsBetweenFunctions(fn1->id(), fn2->id());
     QVERIFY(connections.contains(c1));

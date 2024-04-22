@@ -85,8 +85,6 @@ void tst_CmdEntitiesRemove::test_removeEntityTwice()
 
     QPointer<ivm::IVFunction> fn = ivCore->addFunction("f1");
     QPointer<ivm::IVInterface> pi1 = ivm::testutils::createProvidedIface(fn, "PI_1");
-    fn->addChild(pi1);
-    ivModel->addObject(pi1);
 
     QList<ivm::IVObject *> entities;
     entities.append(pi1.data());

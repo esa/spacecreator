@@ -175,10 +175,8 @@ void tst_IVEditAttributesModel::testEmptyInterfaces()
 
 void tst_IVEditAttributesModel::testReadFunctions()
 {
-    auto function1 = ivm::testutils::createFunction("Function 1");
-    auto function2 = ivm::testutils::createFunction("Function 2");
-
-    m_ivModel->addObjects(QList<ivm::IVObject *> { function1, function2 });
+    auto function1 = ivm::testutils::createFunction("Function 1", m_ivModel.get());
+    auto function2 = ivm::testutils::createFunction("Function 2", m_ivModel.get());
 
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get());
     QCOMPARE(model.rowCount(QModelIndex()), 2);
@@ -197,12 +195,10 @@ void tst_IVEditAttributesModel::testReadFunctions()
 
 void tst_IVEditAttributesModel::testReadInterfaces()
 {
-    auto function1 = ivm::testutils::createFunction("Function 1");
-    auto function2 = ivm::testutils::createFunction("Function 2");
+    auto function1 = ivm::testutils::createFunction("Function 1", m_ivModel.get());
+    auto function2 = ivm::testutils::createFunction("Function 2", m_ivModel.get());
     auto interface1 = ivm::testutils::createProvidedIface(function1, "Interface 1");
     auto interface2 = ivm::testutils::createProvidedIface(function2, "Interface 2");
-
-    m_ivModel->addObjects(QList<ivm::IVObject *> { interface1, interface2 });
 
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get());
     QCOMPARE(model.rowCount(QModelIndex()), 2);
@@ -215,10 +211,8 @@ void tst_IVEditAttributesModel::testReadInterfaces()
 
 void tst_IVEditAttributesModel::testWriteFunctions()
 {
-    auto function = ivm::testutils::createFunction("Function");
-    auto type = ivm::testutils::createFunctionType("Type");
-
-    m_ivModel->addObjects(QList<ivm::IVObject *> { function, type });
+    auto function = ivm::testutils::createFunction("Function", m_ivModel.get());
+    auto type = ivm::testutils::createFunctionType("Type", m_ivModel.get());
 
     shared::cmd::CommandsStackBase stack;
     shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
@@ -238,10 +232,8 @@ void tst_IVEditAttributesModel::testWriteFunctions()
 
 void tst_IVEditAttributesModel::testWriteInterfaces()
 {
-    auto function = ivm::testutils::createFunction("Function 1");
+    auto function = ivm::testutils::createFunction("Function 1", m_ivModel.get());
     auto interface = ivm::testutils::createProvidedIface(function, "Interface 1");
-
-    m_ivModel->addObjects(QList<ivm::IVObject *> { interface });
 
     shared::cmd::CommandsStackBase stack;
     shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
@@ -255,10 +247,8 @@ void tst_IVEditAttributesModel::testWriteInterfaces()
 
 void tst_IVEditAttributesModel::testSaveFunctions()
 {
-    auto function1 = ivm::testutils::createFunction("Function 1");
-    auto function2 = ivm::testutils::createFunction("Function 2");
-
-    m_ivModel->addObjects(QList<ivm::IVObject *> { function1, function2 });
+    auto function1 = ivm::testutils::createFunction("Function 1", m_ivModel.get());
+    auto function2 = ivm::testutils::createFunction("Function 2", m_ivModel.get());
 
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Function, m_ivModel.get());
 
@@ -280,12 +270,10 @@ void tst_IVEditAttributesModel::testSaveFunctions()
 
 void tst_IVEditAttributesModel::testSaveInterfaces()
 {
-    auto function1 = ivm::testutils::createFunction("Function 1");
-    auto function2 = ivm::testutils::createFunction("Function 2");
+    auto function1 = ivm::testutils::createFunction("Function 1", m_ivModel.get());
+    auto function2 = ivm::testutils::createFunction("Function 2", m_ivModel.get());
     auto interface1 = ivm::testutils::createProvidedIface(function1, "Interface 1");
     auto interface2 = ivm::testutils::createProvidedIface(function2, "Interface 2");
-
-    m_ivModel->addObjects(QList<ivm::IVObject *> { interface1, interface2 });
 
     ive::IVEditAttributesModel model(ive::IVEditAttributesModel::Interface, m_ivModel.get());
 
@@ -315,10 +303,8 @@ void tst_IVEditAttributesModel::testSaveInterfaces()
 
 void tst_IVEditAttributesModel::testLoadFunctions()
 {
-    auto function = ivm::testutils::createFunction("Function");
-    auto type = ivm::testutils::createFunctionType("Type");
-
-    m_ivModel->addObjects(QList<ivm::IVObject *> { function, type });
+    auto function = ivm::testutils::createFunction("Function", m_ivModel.get());
+    auto type = ivm::testutils::createFunctionType("Type", m_ivModel.get());
 
     shared::cmd::CommandsStackBase stack;
     shared::cmd::CommandsStackBase::Macro macro(&stack, "test");
@@ -336,10 +322,8 @@ void tst_IVEditAttributesModel::testLoadFunctions()
 
 void tst_IVEditAttributesModel::testLoadInterfaces()
 {
-    auto function = ivm::testutils::createFunction("Function");
+    auto function = ivm::testutils::createFunction("Function", m_ivModel.get());
     auto interface = ivm::testutils::createProvidedIface(function, "Interface");
-
-    m_ivModel->addObjects(QList<ivm::IVObject *> { interface });
 
     shared::cmd::CommandsStackBase stack;
     shared::cmd::CommandsStackBase::Macro macro(&stack, "test");

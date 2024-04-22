@@ -94,8 +94,7 @@ void tst_InterfaceDocument::test_checkAllInterfacesForAsn1Compliance()
     m_ivDoc->setPath(QString(EXAMPLES_DIR).append("asn1/interfaceview.xml"));
     m_ivDoc->setAsn1FileName("dataview-uniq.asn");
 
-    auto fn1 = ivm::testutils::createFunction("Fn1");
-    m_ivDoc->objectsModel()->addObject(fn1);
+    auto fn1 = ivm::testutils::createFunction("Fn1", m_ivDoc->objectsModel());
 
     // Empty parameters results to true
     auto if1 = ivm::testutils::createIface(fn1, ivm::IVInterface::InterfaceType::Provided, "If1");

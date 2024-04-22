@@ -127,8 +127,7 @@ void tst_ConnectionUtils::initTestCase()
     m_scene.addItem(f1);
     f1->setRect(QRectF(100, 100, 300, 300));
 
-    auto nestedEntity1 = ivm::testutils::createFunction("Nested_F1");
-    entity1->addChild(nestedEntity1);
+    auto nestedEntity1 = ivm::testutils::createFunction("Nested_F1", entity1);
     nf1 = new ive::IVFunctionGraphicsItem(nestedEntity1, f1);
     nf1->setRect(QRectF(150, 150, 100, 100));
 
@@ -137,8 +136,7 @@ void tst_ConnectionUtils::initTestCase()
     m_scene.addItem(f2);
     f2->setRect(QRectF(600, 100, 300, 300));
 
-    auto nestedEntity2 = ivm::testutils::createFunction("Nested_F2");
-    entity2->addChild(nestedEntity2);
+    auto nestedEntity2 = ivm::testutils::createFunction("Nested_F2", entity2);
     nf2 = new ive::IVFunctionGraphicsItem(nestedEntity2, f2);
     nf2->setRect(QRectF(650, 150, 100, 100));
 
