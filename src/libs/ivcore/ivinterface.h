@@ -138,6 +138,8 @@ public:
 
     QList<IVFunction *> functionsStack() const;
 
+    void alignToParentFunction();
+
     IVInterface *cloneOf() const;
     bool isClone() const;
     bool isCloned() const;

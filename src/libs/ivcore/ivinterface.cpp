@@ -24,6 +24,7 @@
 #include "ivfunction.h"
 #include "ivmodel.h"
 #include "ivnamevalidator.h"
+#include "topohelper/geometry.h"
 
 #include <QDebug>
 #include <QMetaEnum>
@@ -157,6 +158,8 @@ bool IVInterface::postInit()
     if (!model() || !function()) {
         return false;
     }
+
+    alignToParentFunction();
 
     if (!function()->isFunction()) {
         return IVObject::postInit();
@@ -376,6 +379,29 @@ QList<IVFunction *> IVInterface::functionsStack() const
         parentFunc = qobject_cast<IVFunction *>(parentFunc->parentObject());
     }
     return result;
+}
+
+/*!
+ * Makes sure the interface position is at the parent funtion's border
+ */
+void IVInterface::alignToParentFunction()
+{
+    IVFunctionType *func = function();
+    if (!func) {
+        return;
+    }
+
+    const QRectF funcRect = topohelp::geom::rect(func->coordinates());
+    if (!funcRect.isValid()) {
+        return;
+    }
+    const QPointF storedPos = topohelp::geom::pos(coordinates());
+    const Qt::Alignment side = topohelp::geom::getNearestSide(funcRect, storedPos);
+    const QPointF pos = topohelp::geom::getSidePosition(funcRect, storedPos, side);
+
+    if (pos != storedPos) {
+        setCoordinates(topohelp::geom::coordinates(pos));
+    }
 }
 
 IVInterface *IVInterface::cloneOf() const

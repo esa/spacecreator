@@ -83,15 +83,21 @@ bool IVFunctionType::addChild(IVObject *child)
             break;
         }
         case IVObject::Type::InterfaceGroup: {
-            d->m_ifaceGroups.append(child->as<IVInterfaceGroup *>());
+            auto ifGroup = child->as<IVInterfaceGroup *>();
+            d->m_ifaceGroups.append(ifGroup);
+            ifGroup->alignToParentFunction();
             break;
         }
         case IVObject::Type::ProvidedInterface: {
-            d->m_pis.append(child->as<IVInterfaceProvided *>());
+            auto pi = child->as<IVInterfaceProvided *>();
+            d->m_pis.append(pi);
+            pi->alignToParentFunction();
             break;
         }
         case IVObject::Type::RequiredInterface: {
-            d->m_ris.append(child->as<IVInterfaceRequired *>());
+            auto ri = child->as<IVInterfaceRequired *>();
+            d->m_ris.append(ri);
+            ri->alignToParentFunction();
             break;
         }
         case IVObject::Type::Comment: {

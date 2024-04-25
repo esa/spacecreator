@@ -224,7 +224,16 @@ void VEConnectionGraphicsItem::updateFromEntity()
 
     m_readingEntity = true;
 
-    setPoints(topohelp::geom::polygon(entity()->coordinates()));
+    const topohelp::PointsList points = topohelp::geom::polygon(entity()->coordinates());
+    setPoints(points);
+
+    // Make sure the end points match their endpoint-items
+    updateEndPoint(m_startItem);
+    updateEndPoint(m_endItem);
+    if (!topohelp::geom::comparePolygones(points, m_points)) {
+        entity()->setCoordinates(topohelp::geom::coordinates(m_points));
+    }
+
     updateVisibility();
 
     m_readingEntity = false;

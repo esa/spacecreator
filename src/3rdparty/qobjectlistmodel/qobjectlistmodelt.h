@@ -60,7 +60,7 @@ template<class T>
 class QObjectListModelT : public QObjectListModel
 {
 public:
-    QObjectListModelT<T>(QObject *parent = nullptr)
+    QObjectListModelT(QObject *parent = nullptr)
         : QObjectListModel(parent)
     {
     }
