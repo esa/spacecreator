@@ -24,7 +24,7 @@ namespace spctr {
 
 IVLibraryOption::IVLibraryOption()
 {
-    setId(Constants::SETTINGS_DV_HW_LIBRARY_ID);
+    setId(Constants::SETTINGS_IV_LIBRARY_ID);
     setDisplayName(QObject::tr("Interface View Library"));
     setCategory(Constants::SETTINGS_CATEGORY);
 

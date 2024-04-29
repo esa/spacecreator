@@ -25,7 +25,6 @@
 namespace spctr {
 
 Asn1SccOption::Asn1SccOption(QObject *parent)
-    : Core::IOptionsPage(parent)
 {
     setId(Constants::SETTINGS_ASN1_ID);
     setDisplayName(QObject::tr("Asn1scc compiler"));

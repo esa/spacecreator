@@ -26,8 +26,7 @@
 namespace spctr {
 
 ColorOption::ColorOption(QObject *parent)
-    : Core::IOptionsPage(parent)
-    , m_originalFile(shared::ColorManager::instance()->sourceFile())
+    : m_originalFile(shared::ColorManager::instance()->sourceFile())
 {
     setId(Constants::SETTINGS_IV_COLOR_ID);
     setDisplayName(QObject::tr("Colors"));

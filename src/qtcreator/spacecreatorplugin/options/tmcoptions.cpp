@@ -29,7 +29,6 @@
 namespace spctr {
 
 TmcOptions::TmcOptions(QObject *parent)
-    : Core::IOptionsPage(parent)
 {
     setId(Constants::SETTINGS_TMC_ID);
     setDisplayName(QObject::tr("Taste Model Checker settings"));
