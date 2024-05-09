@@ -44,8 +44,6 @@ public:
         None
     };
 
-    using ParentFunctionsInfo = std::unordered_map<QString, std::vector<QString>>;
-
 public:
     /**
      * @brief   Deleted constructor
@@ -80,21 +78,14 @@ public:
     static auto optimizeModel(ivm::IVModel *ivModel, const std::vector<QString> &functionNames, Mode mode) -> void;
 
 private:
-    static auto flattenModel(ivm::IVModel *ivModel) -> ParentFunctionsInfo;
-    static auto flattenConnections(ivm::IVFunctionType *function, std::vector<ivm::IVConnection *> &connectionsToRemove,
-            ivm::IVModel *ivModel) -> void;
-    static auto shouldFlattenConnection(ivm::IVConnection *connection, ivm::IVFunctionType *function) -> bool;
-    static auto findLastConnection(ivm::IVConnection *connection, ivm::IVModel *ivModel) -> ivm::IVConnection *;
+    static auto flattenModel(ivm::IVModel *ivModel) -> void;
+    static auto flattenOneFunction(ivm::IVModel* ivModel) -> bool;
+    static auto moveNestedFunctionsToRoot(ivm::IVModel* ivModel, ivm::IVFunctionType* function)->void;
 
     static auto discardFunctions(ivm::IVModel *ivModel, const std::vector<QString> &functionNames) -> void;
     static auto keepFunctions(ivm::IVModel *ivModel, const std::vector<QString> &functionNames) -> void;
 
     static auto markAsEnvironment(ivm::IVFunction *function) -> void;
-
-    static auto resolveFunctionNames(const std::vector<QString> &functionNames,
-            InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo) -> std::vector<QString>;
-    static auto resolveFunctionName(const QString &functionName,
-            InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo) -> std::vector<QString>;
 
     static auto setGuiAsDefaultImplementation(ivm::IVFunction *function) -> void;
     static auto findImplementationType(const QString &implementationName, const ivm::IVFunction *function) -> QString;

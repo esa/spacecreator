@@ -20,13 +20,19 @@
 #include "interfaceviewoptimizer.h"
 
 #include <QBuffer>
+#include <QMap>
 #include <QSaveFile>
+#include <QString>
+#include <algorithm>
+#include <cassert>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
 #include <ivcore/ivcommonprops.h>
 #include <ivcore/ivconnection.h>
+#include <ivcore/ivconnectiongroup.h>
 #include <ivcore/ivfunction.h>
 #include <libiveditor/ivexporter.h>
+#include <map>
 
 using ivm::IVConnection;
 using ivm::IVFunction;
@@ -40,19 +46,27 @@ using conversion::translator::TranslationException;
 
 namespace tmc {
 
+namespace {
+struct ConnectionInfo {
+    shared::Id sourceInterfaceName;
+    shared::Id targetFunctionName;
+    shared::Id targetInterfaceName;
+};
+
+using ConnectionInfoMap = QMap<shared::Id, ConnectionInfo>;
+}
+
 void InterfaceViewOptimizer::optimizeModel(
         IVModel *ivModel, const std::vector<QString> &functionNames, InterfaceViewOptimizer::Mode mode)
 {
-    auto parentFunctionsInfo = flattenModel(ivModel);
-
-    auto allFunctionNames = resolveFunctionNames(functionNames, parentFunctionsInfo);
+    flattenModel(ivModel);
 
     switch (mode) {
     case Mode::Environment:
-        discardFunctions(ivModel, allFunctionNames);
+        discardFunctions(ivModel, functionNames);
         break;
     case Mode::Keep:
-        keepFunctions(ivModel, allFunctionNames);
+        keepFunctions(ivModel, functionNames);
         break;
     case Mode::None:
         break;
@@ -63,78 +77,18 @@ void InterfaceViewOptimizer::optimizeModel(
     removeDeadFunctions(ivModel);
 }
 
-InterfaceViewOptimizer::ParentFunctionsInfo InterfaceViewOptimizer::flattenModel(IVModel *ivModel)
+void InterfaceViewOptimizer::flattenModel(ivm::IVModel *ivModel)
 {
-    ParentFunctionsInfo parentFunctionsInfo;
+    while (flattenOneFunction(ivModel))
+        ;
+}
 
-    std::vector<IVFunctionType *> functionsToRemove;
-    std::vector<IVConnection *> connectionsToRemove;
-
+bool InterfaceViewOptimizer::flattenOneFunction(IVModel *ivModel)
+{
+    // find parent functions in the loop
     for (auto function : ivModel->allObjectsByType<IVFunctionType>()) {
         if (isFunctionParent(function)) {
-            std::vector<QString> children;
-            for (auto childFunction : function->functions()) {
-                children.push_back(childFunction->title());
-            }
-            parentFunctionsInfo.insert({ function->title(), std::move(children) });
-
-            functionsToRemove.push_back(function);
-        } else {
-            flattenConnections(function, connectionsToRemove, ivModel);
-        }
-    }
-
-    for (auto connection : connectionsToRemove) {
-        ivModel->removeObject(connection);
-    }
-
-    for (auto function : functionsToRemove) {
-        const auto &connections = ivModel->getConnectionsForFunction(function->id());
-        for (auto connection : connections) {
-            ivModel->removeObject(connection);
-        }
-
-        ivModel->removeObject(function);
-    }
-
-    return parentFunctionsInfo;
-}
-
-void InterfaceViewOptimizer::flattenConnections(
-        IVFunctionType *function, std::vector<IVConnection *> &connectionsToRemove, IVModel *ivModel)
-{
-    const auto &connections = ivModel->getConnectionsForFunction(function->id());
-
-    for (auto connection : connections) {
-        if (!shouldFlattenConnection(connection, function)) {
-            continue;
-        }
-
-        const auto sourceInterface = connection->sourceInterface();
-        auto lastConnection = findLastConnection(connection, ivModel);
-        const auto targetInterface = lastConnection->targetInterface();
-
-        connectionsToRemove.push_back(lastConnection);
-
-        auto newConnection = new IVConnection(sourceInterface, targetInterface);
-        ivModel->addObject(newConnection);
-    }
-}
-
-bool InterfaceViewOptimizer::shouldFlattenConnection(IVConnection *connection, IVFunctionType *function)
-{
-    if (connection == nullptr) {
-        return false;
-    }
-
-    if (connection->sourceName() != function->title()) {
-        return false;
-    }
-
-    const auto target = connection->target();
-    if (isFunctionType(target)) {
-        const auto targetFunc = target->as<const IVFunctionType *>();
-        if (isFunctionParent(targetFunc)) {
+            moveNestedFunctionsToRoot(ivModel, function);
             return true;
         }
     }
@@ -142,22 +96,92 @@ bool InterfaceViewOptimizer::shouldFlattenConnection(IVConnection *connection, I
     return false;
 }
 
-IVConnection *InterfaceViewOptimizer::findLastConnection(IVConnection *connection, IVModel *ivModel)
+void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, ivm::IVFunctionType *function)
 {
-    auto target = connection->target()->as<IVFunctionType *>();
+    QVector<QString> nestedFunctionNames;
+    for (const auto &child : function->functions()) {
+        nestedFunctionNames.append(child->property("name").toString());
+    }
+    for (const auto &child : function->functionTypes()) {
+        nestedFunctionNames.append(child->property("name").toString());
+    }
 
-    if (isFunctionParent(target)) {
-        const auto &targetName = connection->targetName();
-        const auto &targetConnections = ivModel->getConnectionsForIface(connection->targetInterface()->id());
+    ConnectionInfoMap connectionsToRestore;
+    const auto interfaces = function->interfaces();
 
-        const auto foundNextConnection = std::find_if(targetConnections.begin(), targetConnections.end(),
-                [&](const auto conn) { return conn->sourceName() == targetName; });
+    const auto connections = ivModel->getConnectionsForFunction(function->id());
+    std::multimap<shared::Id, QPair<shared::Id, shared::Id>> innerInputConnections;
+    std::multimap<shared::Id, QPair<shared::Id, shared::Id>> innerOutputConnections;
+    std::multimap<shared::Id, QPair<shared::Id, shared::Id>> outerInputConnections;
+    std::multimap<shared::Id, QPair<shared::Id, shared::Id>> outerOutputConnections;
+    for (const auto &connection : connections) {
+        if (connection->source()->id() == function->id()) {
+            if (nestedFunctionNames.contains(connection->targetName())) {
+                innerOutputConnections.emplace(connection->sourceInterface()->id(),
+                        qMakePair(connection->target()->id(), connection->targetInterface()->id()));
+            } else {
+                outerOutputConnections.emplace(connection->sourceInterface()->id(),
+                        qMakePair(connection->target()->id(), connection->targetInterface()->id()));
+            }
+        } else {
+            if (nestedFunctionNames.contains(connection->targetName())) {
+                innerInputConnections.emplace(connection->targetInterface()->id(),
+                        qMakePair(connection->source()->id(), connection->sourceInterface()->id()));
+            } else {
+                outerInputConnections.emplace(connection->targetInterfaceName(),
+                        qMakePair(connection->source()->id(), connection->sourceInterface()->id()));
+            }
+        }
+    }
 
+    for (auto infoIter = outerInputConnections.begin(); infoIter != outerInputConnections.end(); ++infoIter) {
+        auto [begin, end] = innerOutputConnections.equal_range(infoIter->first);
+        for (auto iter = begin; iter != end; ++iter) {
+            connectionsToRestore.insert(infoIter->second.first,
+                    ConnectionInfo { infoIter->second.second, iter->second.first, iter->second.second });
+        }
+    }
+
+    for (auto infoIter = innerInputConnections.begin(); infoIter != innerInputConnections.end(); ++infoIter) {
+        auto [begin, end] = outerOutputConnections.equal_range(infoIter->first);
+        for (auto iter = begin; iter != end; ++iter) {
+            connectionsToRestore.insert(infoIter->second.first,
+                    ConnectionInfo { infoIter->second.second, iter->second.first, iter->second.second });
+        }
+    }
+
+    // remove all connections
+    for (const auto &connection : connections) {
         ivModel->removeObject(connection);
+    }
 
-        return findLastConnection(*foundNextConnection, ivModel);
-    } else {
-        return connection;
+    // reparent functions
+    for (auto fn : function->functions()) {
+        fn->setParent(ivModel);
+    }
+    for (auto fn : function->functionTypes()) {
+        fn->setParent(ivModel);
+    }
+    // reparent connections
+    for (auto conn : function->connections()) {
+        conn->setParent(ivModel);
+    }
+    for (auto conn : function->connectionGroups()) {
+        conn->setParent(ivModel);
+    }
+
+    // remove function
+    ivModel->removeObject(function);
+
+    // restore connections
+    for (auto iter = connectionsToRestore.begin(); iter != connectionsToRestore.end(); ++iter) {
+        IVInterface *source = dynamic_cast<IVInterface *>(ivModel->getObject(iter.value().sourceInterfaceName));
+        IVInterface *target = dynamic_cast<IVInterface *>(ivModel->getObject(iter.value().targetInterfaceName));
+        assert(source != nullptr);
+        assert(target != nullptr);
+        auto connection = new IVConnection(source, target, ivModel);
+        ivModel->addObject(connection);
+        source->function()->addChild(connection);
     }
 }
 
@@ -192,39 +216,6 @@ void InterfaceViewOptimizer::markAsEnvironment(IVFunction *function)
 
     if (currentDefaultImplementationType.toLower() == "sdl") {
         setGuiAsDefaultImplementation(function);
-    }
-}
-
-std::vector<QString> InterfaceViewOptimizer::resolveFunctionNames(
-        const std::vector<QString> &functionNames, InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo)
-{
-    std::vector<QString> allFunctionNames;
-
-    for (const auto &functionName : functionNames) {
-        auto resolvedFunctionNames = resolveFunctionName(functionName, parentFunctionsInfo);
-        allFunctionNames.insert(allFunctionNames.end(), resolvedFunctionNames.begin(), resolvedFunctionNames.end());
-    }
-
-    return allFunctionNames;
-}
-
-std::vector<QString> InterfaceViewOptimizer::resolveFunctionName(
-        const QString &functionName, InterfaceViewOptimizer::ParentFunctionsInfo parentFunctionsInfo)
-{
-    if (parentFunctionsInfo.count(functionName) == 0) {
-        return { functionName };
-    } else {
-        const auto childrenFunctionsNames = parentFunctionsInfo.at(functionName);
-
-        std::vector<QString> allFunctionNames;
-
-        for (const auto &childrenFunctionName : childrenFunctionsNames) {
-            auto resolvedChildrenFunctionNames = resolveFunctionName(childrenFunctionName, parentFunctionsInfo);
-            allFunctionNames.insert(allFunctionNames.begin(), resolvedChildrenFunctionNames.begin(),
-                    resolvedChildrenFunctionNames.end());
-        }
-
-        return allFunctionNames;
     }
 }
 
@@ -331,7 +322,7 @@ void InterfaceViewOptimizer::removeUnallowedInterfaces(IVFunction *function)
     std::vector<IVInterface *> interfacesToRemove;
 
     for (const auto interface : function->interfaces()) {
-        if (interface->kind() != IVInterface::OperationKind::Sporadic) {
+        if (interface->kind() == IVInterface::OperationKind::Cyclic) {
             interfacesToRemove.push_back(interface);
         }
     }
