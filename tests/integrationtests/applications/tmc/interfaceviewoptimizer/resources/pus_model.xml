@@ -1,0 +1,599 @@
+<InterfaceView version="1.3" asn1file="master_project.acn" modifierHash="36c071c">
+<Function id="{c8a8d868-49c7-49de-ac3e-a3ebe8d24ed0}" name="ALPHA" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{cf103e37-cc3b-479b-86c7-5c484247b1c5}" name="tc_apid_1_alpha" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" queue_size="1" stack_size="50" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-TELECOMMAND" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{91ae09a3-8701-4c80-9aa0-18ed2959d82f}" name="failed_start_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-EXECUTION-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{b3f94fa4-c524-45eb-83ee-14ae5ec2dc35}" name="successful_progress_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="step_id" type="ALPHA-EXECUTION-STEP-ID" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{e8f74158-d738-40a6-90eb-0bb4020fc4af}" name="failed_progress_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-EXECUTION-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+    <Input_Parameter name="step_id" type="ALPHA-EXECUTION-STEP-ID" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{1dc95d7a-9635-449c-9a95-3c3d74a077e6}" name="routing_failed" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-ROUTING-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{546e7676-5f9b-4e52-b904-98149457b066}" name="end_on_board_communication_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="target_apid" type="ALPHA-TAILORABLE-APPLICATION-PROCESS-ID-ENUM" encoding="NATIVE"/>
+    <Input_Parameter name="result" type="ROOT-BOOLEAN" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{03a36e09-305a-417c-9c0b-75d72e239114}" name="TM" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-TELEMETRY" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{b33bcbb1-bdfc-49b6-94e5-3b474c1704ca}" name="get_time_reference_status" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Output_Parameter name="time_reference_status" type="ROOT-TIME-REFERENCE-STATUS" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{4ba222ed-00b6-497f-8549-b38d0fa9e21f}" name="invoke_on_board_communication_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="target_apid" type="ALPHA-TAILORABLE-APPLICATION-PROCESS-ID-ENUM" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Function id="{aa035e9e-49c7-49de-ac3e-a3ebe8d24ed0}" name="alpha_capability_router" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{1672488f-10b5-4341-9218-78408177e9f9}" name="tc_apid_1_alpha" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" queue_size="1" stack_size="50" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-TELECOMMAND" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{8eb3f506-47a3-4427-bb20-2cbc061b4c6a}" name="alpha_decode_tc" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" is_alarm="false" is_observable="false" wcet="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-DATA-FIELD" encoding="NATIVE"/>
+    <Output_Parameter name="decoded_packet" type="ALPHA-TELECOMMAND" encoding="ACN"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{8dd1ff87-d2ca-464a-a6c2-6194f362d23a}" name="alpha_set_packet_data_length" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" is_alarm="false" is_observable="false" wcet="0">
+    <Input_Parameter name="packet_data_length" type="ROOT-UINT32" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{0c6e072b-95de-470b-a42c-aeaf8742fc5d}" name="successful_acceptance" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{900078f4-f84b-4ce1-bf73-2a7c8fa03a0d}" name="failed_acceptance" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-ACCEPTANCE-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{7b8f2d2c-49ab-4adb-a8bc-74b28cde3cd8}" name="perform_an_are_you_alive_connection_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="request" type="ALPHA-PERFORM-AN-ARE-YOU-ALIVE-CONNECTION-TEST-GENERIC" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{6092f157-ec62-48de-9ecb-cc203f56febd}" name="perform_an_on_board_connection_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="request" type="ALPHA-PERFORM-AN-ON-BOARD-CONNECTION-TEST-GENERIC" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{aaf1272c-49c7-49de-ac3e-a3ebe8d24ed0}" name="alpha_decoder" is_type="NO" language="Blackbox_C" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{5b6856d2-ee9d-4426-a18c-dc5a75cbdc25}" name="alpha_decode_tc" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" is_alarm="false" is_observable="false" wcet="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-DATA-FIELD" encoding="NATIVE"/>
+    <Output_Parameter name="decoded_packet" type="ALPHA-TELECOMMAND" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface id="{9813e771-13a0-4b03-a85e-63f62f975841}" name="alpha_set_packet_data_length" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" is_alarm="false" is_observable="false" wcet="0">
+    <Input_Parameter name="packet_data_length" type="ROOT-UINT32" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{06af1625-ab85-4175-9b38-72c2bb2747fe}" name="encode_tm" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" is_alarm="false" is_observable="false" wcet="0">
+    <Input_Parameter name="telemetry_data" type="ALPHA-TELEMETRY" encoding="ACN"/>
+    <Output_Parameter name="packet_data" type="ROOT-SPACE-PACKET-DATA-FIELD" encoding="NATIVE"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="Blackbox_C"/>
+    </Implementations>
+</Function>
+
+<Function id="{98eb046e-49c7-49de-ac3e-a3ebe8d24ed0}" name="alpha_telemetry_packer" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{2cf29142-49a3-4bf8-aa31-6a65dcc3684a}" name="send_report" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="telemetry_data" type="ALPHA-TELEMETRY" encoding="NATIVE"/>
+    <Input_Parameter name="destination_id" type="ROOT-APPLICATION-PROCESS-USER-ID" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{5a3a6ca5-17c4-4cd2-b1ee-21ffa7771b53}" name="encode_tm" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" is_alarm="false" is_observable="false" wcet="0">
+    <Input_Parameter name="telemetry_data" type="ALPHA-TELEMETRY" encoding="ACN"/>
+    <Output_Parameter name="packet_data" type="ROOT-SPACE-PACKET-DATA-FIELD" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{87e57525-e1c3-492d-95db-813abcb096ee}" name="TM" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-TELEMETRY" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface id="{2e2d7e34-0f50-486d-8abf-8567680cb219}" name="get_time_reference_status" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false">
+    <Output_Parameter name="time_reference_status" type="ROOT-TIME-REFERENCE-STATUS" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{fb39ce44-07f6-4ed1-878e-883cb677f43e}" name="alpha_pus1_acceptance_and_reporting" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{997b52cc-de9b-4bd0-aa4b-7be61201820c}" name="successful_acceptance" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{cb32f279-7f75-4de8-9d9e-8d4e6b6e5621}" name="failed_acceptance" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-ACCEPTANCE-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{6723c253-b0d6-4be8-8ecb-f95edf3f08b4}" name="send_report" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="telemetry_data" type="ALPHA-TELEMETRY" encoding="NATIVE"/>
+    <Input_Parameter name="destination_id" type="ROOT-APPLICATION-PROCESS-USER-ID" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{851cc3a5-b944-4be5-9f18-075a63b1ac4a}" name="alpha_pus1_execution_reporting" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{5da7fbb3-3f40-456f-858b-e040b4a66fde}" name="successful_start_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{a5cff481-2033-4fa4-8b11-431a2f9aad97}" name="failed_start_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-EXECUTION-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{870d7085-17e9-403a-b5a4-2198585fa839}" name="successful_progress_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="step_id" type="ALPHA-EXECUTION-STEP-ID" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{501e8797-95b1-4f02-8bf7-bb35e5eb1e8b}" name="failed_progress_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-EXECUTION-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+    <Input_Parameter name="step_id" type="ALPHA-EXECUTION-STEP-ID" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{b59471e3-f6c8-4a93-95d1-d394f81db0ed}" name="successful_completion_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{8c436e82-ead4-4c55-a17d-a373a606da85}" name="failed_completion_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-EXECUTION-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{1c08d01b-9f6b-4e26-8268-cc5be376e910}" name="send_report" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="telemetry_data" type="ALPHA-TELEMETRY" encoding="NATIVE"/>
+    <Input_Parameter name="destination_id" type="ROOT-APPLICATION-PROCESS-USER-ID" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{8a6bccd9-d61c-470b-b6e6-e8d4acf09570}" name="alpha_pus1_routing_and_reporting" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{b92c7c28-9492-44f5-b5bc-54e2508a6015}" name="routing_failed" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-ROUTING-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{461cd09c-4c0a-48d6-8c6f-756e4fbf0aa3}" name="send_report" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="telemetry_data" type="ALPHA-TELEMETRY" encoding="NATIVE"/>
+    <Input_Parameter name="destination_id" type="ROOT-APPLICATION-PROCESS-USER-ID" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{92a42a3a-6704-45e0-b309-edd538822df7}" name="alpha_pus17_perform_an_are_you_alive_connection_test" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{9e0f9aa9-d5c7-4fcb-b02a-3409311a2dbe}" name="perform_an_are_you_alive_connection_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="request" type="ALPHA-PERFORM-AN-ARE-YOU-ALIVE-CONNECTION-TEST-GENERIC" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{e90a7033-2757-48b1-9938-a4a50fb358de}" name="successful_start_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{83b4e5ec-888a-4635-8fcd-f0a7814a6c1b}" name="successful_completion_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{66ff0f51-01cc-4439-9717-82b6eb92bcee}" name="send_report" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="telemetry_data" type="ALPHA-TELEMETRY" encoding="NATIVE"/>
+    <Input_Parameter name="destination_id" type="ROOT-APPLICATION-PROCESS-USER-ID" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{9378732d-084a-46e1-95a9-92591aafa8a4}" name="alpha_pus17_perform_an_on_board_connection_test" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{a232e55b-d71b-489f-926c-863ea5206398}" name="perform_an_on_board_connection_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="request" type="ALPHA-PERFORM-AN-ON-BOARD-CONNECTION-TEST-GENERIC" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{0bbff524-feee-4c8f-b22d-6cba44c8c6f3}" name="end_on_board_communication_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="target_apid" type="ALPHA-TAILORABLE-APPLICATION-PROCESS-ID-ENUM" encoding="NATIVE"/>
+    <Input_Parameter name="result" type="ROOT-BOOLEAN" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{b70cf616-ec02-45f8-a6a3-3d158b1c6d5f}" name="successful_start_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{f030c783-6ee0-4aeb-8d6a-ade020791fbb}" name="successful_completion_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{3aaba125-d5a8-416c-ae4b-435922586134}" name="failed_completion_of_execution" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-EXECUTION-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{46a4ed50-8297-4c7c-bc84-854c0959747e}" name="invoke_on_board_communication_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="target_apid" type="ALPHA-TAILORABLE-APPLICATION-PROCESS-ID-ENUM" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface id="{ce26eb69-ece0-4f6a-8ba2-e2010aecdd60}" name="send_report" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="telemetry_data" type="ALPHA-TELEMETRY" encoding="NATIVE"/>
+    <Input_Parameter name="destination_id" type="ROOT-APPLICATION-PROCESS-USER-ID" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection id="{d5dba3d4-a93e-4001-9aac-f0e673d0904f}" name="alpha_capability_router_alpha_decode_tc___alpha_decoder_alpha_decode_tc" required_system_element="NO">
+    <Source iface_id="{8eb3f506-47a3-4427-bb20-2cbc061b4c6a}" func_name="alpha_capability_router" ri_name="alpha_decode_tc" />
+    <Target iface_id="{5b6856d2-ee9d-4426-a18c-dc5a75cbdc25}" func_name="alpha_decoder" pi_name="alpha_decode_tc" />
+</Connection>
+
+<Connection id="{15c218f6-c16a-4d49-8e9c-0262dcf58a7b}" name="alpha_capability_router_alpha_set_packet_data_length___alpha_decoder_alpha_set_packet_data_length" required_system_element="NO">
+    <Source iface_id="{8dd1ff87-d2ca-464a-a6c2-6194f362d23a}" func_name="alpha_capability_router" ri_name="alpha_set_packet_data_length" />
+    <Target iface_id="{9813e771-13a0-4b03-a85e-63f62f975841}" func_name="alpha_decoder" pi_name="alpha_set_packet_data_length" />
+</Connection>
+
+<Connection id="{951555e7-4b45-4cdb-8e67-d54995437e51}" name="alpha_capability_router_successful_acceptance___alpha_pus1_acceptance_and_reporting_successful_acceptance" required_system_element="NO">
+    <Source iface_id="{0c6e072b-95de-470b-a42c-aeaf8742fc5d}" func_name="alpha_capability_router" ri_name="successful_acceptance" />
+    <Target iface_id="{997b52cc-de9b-4bd0-aa4b-7be61201820c}" func_name="alpha_pus1_acceptance_and_reporting" pi_name="successful_acceptance" />
+</Connection>
+
+<Connection id="{5b328a8d-873e-4109-a2ed-a732e4ce6c2c}" name="alpha_capability_router_failed_acceptance___alpha_pus1_acceptance_and_reporting_failed_acceptance" required_system_element="NO">
+    <Source iface_id="{900078f4-f84b-4ce1-bf73-2a7c8fa03a0d}" func_name="alpha_capability_router" ri_name="failed_acceptance" />
+    <Target iface_id="{cb32f279-7f75-4de8-9d9e-8d4e6b6e5621}" func_name="alpha_pus1_acceptance_and_reporting" pi_name="failed_acceptance" />
+</Connection>
+
+<Connection id="{e580b785-9c6c-4510-9896-40bbbdc41166}" name="alpha_capability_router_perform_an_are_you_alive_connection_test___alpha_pus17_perform_an_are_you_alive_connection_test_perform_an_are_you_alive_connection_test" required_system_element="NO">
+    <Source iface_id="{7b8f2d2c-49ab-4adb-a8bc-74b28cde3cd8}" func_name="alpha_capability_router" ri_name="perform_an_are_you_alive_connection_test" />
+    <Target iface_id="{9e0f9aa9-d5c7-4fcb-b02a-3409311a2dbe}" func_name="alpha_pus17_perform_an_are_you_alive_connection_test" pi_name="perform_an_are_you_alive_connection_test" />
+</Connection>
+
+<Connection id="{c2a0140c-3b79-4041-8ca7-4a1e9a769d25}" name="alpha_capability_router_perform_an_on_board_connection_test___alpha_pus17_perform_an_on_board_connection_test_perform_an_on_board_connection_test" required_system_element="NO">
+    <Source iface_id="{6092f157-ec62-48de-9ecb-cc203f56febd}" func_name="alpha_capability_router" ri_name="perform_an_on_board_connection_test" />
+    <Target iface_id="{a232e55b-d71b-489f-926c-863ea5206398}" func_name="alpha_pus17_perform_an_on_board_connection_test" pi_name="perform_an_on_board_connection_test" />
+</Connection>
+
+<Connection id="{5c957a80-bc41-4da7-aad6-533d1c505cad}" name="alpha_telemetry_packer_encode_tm___alpha_decoder_encode_tm" required_system_element="NO">
+    <Source iface_id="{5a3a6ca5-17c4-4cd2-b1ee-21ffa7771b53}" func_name="alpha_telemetry_packer" ri_name="encode_tm" />
+    <Target iface_id="{06af1625-ab85-4175-9b38-72c2bb2747fe}" func_name="alpha_decoder" pi_name="encode_tm" />
+</Connection>
+
+<Connection id="{4bd15311-f975-4010-a4fa-933b03fc60fe}" name="alpha_pus1_acceptance_and_reporting_send_report___alpha_telemetry_packer_send_report" required_system_element="NO">
+    <Source iface_id="{6723c253-b0d6-4be8-8ecb-f95edf3f08b4}" func_name="alpha_pus1_acceptance_and_reporting" ri_name="send_report" />
+    <Target iface_id="{2cf29142-49a3-4bf8-aa31-6a65dcc3684a}" func_name="alpha_telemetry_packer" pi_name="send_report" />
+</Connection>
+
+<Connection id="{30fa4159-d6c8-45de-a859-a63e3fb5815a}" name="alpha_pus1_execution_reporting_send_report___alpha_telemetry_packer_send_report" required_system_element="NO">
+    <Source iface_id="{1c08d01b-9f6b-4e26-8268-cc5be376e910}" func_name="alpha_pus1_execution_reporting" ri_name="send_report" />
+    <Target iface_id="{2cf29142-49a3-4bf8-aa31-6a65dcc3684a}" func_name="alpha_telemetry_packer" pi_name="send_report" />
+</Connection>
+
+<Connection id="{6aee41de-05a9-432e-a65e-1f0b937c62e9}" name="alpha_pus1_routing_and_reporting_send_report___alpha_telemetry_packer_send_report" required_system_element="NO">
+    <Source iface_id="{461cd09c-4c0a-48d6-8c6f-756e4fbf0aa3}" func_name="alpha_pus1_routing_and_reporting" ri_name="send_report" />
+    <Target iface_id="{2cf29142-49a3-4bf8-aa31-6a65dcc3684a}" func_name="alpha_telemetry_packer" pi_name="send_report" />
+</Connection>
+
+<Connection id="{b4ad8b80-1817-4dde-9cb3-44e5bb153700}" name="alpha_pus17_perform_an_are_you_alive_connection_test_successful_start_of_execution___alpha_pus1_execution_reporting_successful_start_of_execution" required_system_element="NO">
+    <Source iface_id="{e90a7033-2757-48b1-9938-a4a50fb358de}" func_name="alpha_pus17_perform_an_are_you_alive_connection_test" ri_name="successful_start_of_execution" />
+    <Target iface_id="{5da7fbb3-3f40-456f-858b-e040b4a66fde}" func_name="alpha_pus1_execution_reporting" pi_name="successful_start_of_execution" />
+</Connection>
+
+<Connection id="{3620940f-7e42-4ca6-9a1c-23337957dcf6}" name="alpha_pus17_perform_an_are_you_alive_connection_test_successful_completion_of_execution___alpha_pus1_execution_reporting_successful_completion_of_execution" required_system_element="NO">
+    <Source iface_id="{83b4e5ec-888a-4635-8fcd-f0a7814a6c1b}" func_name="alpha_pus17_perform_an_are_you_alive_connection_test" ri_name="successful_completion_of_execution" />
+    <Target iface_id="{b59471e3-f6c8-4a93-95d1-d394f81db0ed}" func_name="alpha_pus1_execution_reporting" pi_name="successful_completion_of_execution" />
+</Connection>
+
+<Connection id="{4a0d9e13-486f-4fc1-bd26-e8d33751d4a4}" name="alpha_pus17_perform_an_are_you_alive_connection_test_send_report___alpha_telemetry_packer_send_report" required_system_element="NO">
+    <Source iface_id="{66ff0f51-01cc-4439-9717-82b6eb92bcee}" func_name="alpha_pus17_perform_an_are_you_alive_connection_test" ri_name="send_report" />
+    <Target iface_id="{2cf29142-49a3-4bf8-aa31-6a65dcc3684a}" func_name="alpha_telemetry_packer" pi_name="send_report" />
+</Connection>
+
+<Connection id="{eaab0da5-d342-4097-a328-dd553fba0281}" name="alpha_pus17_perform_an_on_board_connection_test_successful_start_of_execution___alpha_pus1_execution_reporting_successful_start_of_execution" required_system_element="NO">
+    <Source iface_id="{b70cf616-ec02-45f8-a6a3-3d158b1c6d5f}" func_name="alpha_pus17_perform_an_on_board_connection_test" ri_name="successful_start_of_execution" />
+    <Target iface_id="{5da7fbb3-3f40-456f-858b-e040b4a66fde}" func_name="alpha_pus1_execution_reporting" pi_name="successful_start_of_execution" />
+</Connection>
+
+<Connection id="{45a4b660-9828-4078-98bb-7e74d864af56}" name="alpha_pus17_perform_an_on_board_connection_test_successful_completion_of_execution___alpha_pus1_execution_reporting_successful_completion_of_execution" required_system_element="NO">
+    <Source iface_id="{f030c783-6ee0-4aeb-8d6a-ade020791fbb}" func_name="alpha_pus17_perform_an_on_board_connection_test" ri_name="successful_completion_of_execution" />
+    <Target iface_id="{b59471e3-f6c8-4a93-95d1-d394f81db0ed}" func_name="alpha_pus1_execution_reporting" pi_name="successful_completion_of_execution" />
+</Connection>
+
+<Connection id="{b6e8cfa7-3f7c-4d39-8f36-e02a845ebbb1}" name="alpha_pus17_perform_an_on_board_connection_test_failed_completion_of_execution___alpha_pus1_execution_reporting_failed_completion_of_execution" required_system_element="NO">
+    <Source iface_id="{3aaba125-d5a8-416c-ae4b-435922586134}" func_name="alpha_pus17_perform_an_on_board_connection_test" ri_name="failed_completion_of_execution" />
+    <Target iface_id="{8c436e82-ead4-4c55-a17d-a373a606da85}" func_name="alpha_pus1_execution_reporting" pi_name="failed_completion_of_execution" />
+</Connection>
+
+<Connection id="{e2d47a2b-a543-4492-a193-8864d62fb52a}" name="alpha_pus17_perform_an_on_board_connection_test_send_report___alpha_telemetry_packer_send_report" required_system_element="NO">
+    <Source iface_id="{ce26eb69-ece0-4f6a-8ba2-e2010aecdd60}" func_name="alpha_pus17_perform_an_on_board_connection_test" ri_name="send_report" />
+    <Target iface_id="{2cf29142-49a3-4bf8-aa31-6a65dcc3684a}" func_name="alpha_telemetry_packer" pi_name="send_report" />
+</Connection>
+
+<Connection id="{d96276b8-dc8e-44da-94df-2408c330583c}" name="ALPHA_tc_apid_1_alpha___alpha_capability_router_tc_apid_1_alpha" required_system_element="NO">
+    <Source iface_id="{cf103e37-cc3b-479b-86c7-5c484247b1c5}" func_name="ALPHA" pi_name="tc_apid_1_alpha" />
+    <Target iface_id="{1672488f-10b5-4341-9218-78408177e9f9}" func_name="alpha_capability_router" pi_name="tc_apid_1_alpha" />
+</Connection>
+
+<Connection id="{84461b2c-d199-4851-89d0-f4ed929307fa}" name="alpha_telemetry_packer_TM___ALPHA_TM" required_system_element="NO">
+    <Source iface_id="{87e57525-e1c3-492d-95db-813abcb096ee}" func_name="alpha_telemetry_packer" ri_name="TM" />
+    <Target iface_id="{03a36e09-305a-417c-9c0b-75d72e239114}" func_name="ALPHA" ri_name="TM" />
+</Connection>
+
+<Connection id="{9d16b585-b2ac-41db-9e5a-be20241bb6d3}" name="alpha_telemetry_packer_get_time_reference_status___ALPHA_get_time_reference_status" required_system_element="NO">
+    <Source iface_id="{2e2d7e34-0f50-486d-8abf-8567680cb219}" func_name="alpha_telemetry_packer" ri_name="get_time_reference_status" />
+    <Target iface_id="{b33bcbb1-bdfc-49b6-94e5-3b474c1704ca}" func_name="ALPHA" ri_name="get_time_reference_status" />
+</Connection>
+
+<Connection id="{3461fd22-a732-4324-91b1-5bf706c375b8}" name="ALPHA_failed_start_of_execution___alpha_pus1_execution_reporting_failed_start_of_execution" required_system_element="NO">
+    <Source iface_id="{91ae09a3-8701-4c80-9aa0-18ed2959d82f}" func_name="ALPHA" pi_name="failed_start_of_execution" />
+    <Target iface_id="{a5cff481-2033-4fa4-8b11-431a2f9aad97}" func_name="alpha_pus1_execution_reporting" pi_name="failed_start_of_execution" />
+</Connection>
+
+<Connection id="{34f43f21-d2cd-45d1-b64a-3536069d740c}" name="ALPHA_successful_progress_of_execution___alpha_pus1_execution_reporting_successful_progress_of_execution" required_system_element="NO">
+    <Source iface_id="{b3f94fa4-c524-45eb-83ee-14ae5ec2dc35}" func_name="ALPHA" pi_name="successful_progress_of_execution" />
+    <Target iface_id="{870d7085-17e9-403a-b5a4-2198585fa839}" func_name="alpha_pus1_execution_reporting" pi_name="successful_progress_of_execution" />
+</Connection>
+
+<Connection id="{b8e9c6cf-4289-4fa4-9b1c-b081e7e4da24}" name="ALPHA_failed_progress_of_execution___alpha_pus1_execution_reporting_failed_progress_of_execution" required_system_element="NO">
+    <Source iface_id="{e8f74158-d738-40a6-90eb-0bb4020fc4af}" func_name="ALPHA" pi_name="failed_progress_of_execution" />
+    <Target iface_id="{501e8797-95b1-4f02-8bf7-bb35e5eb1e8b}" func_name="alpha_pus1_execution_reporting" pi_name="failed_progress_of_execution" />
+</Connection>
+
+<Connection id="{a4e52152-02a7-4069-af29-68df242a17f3}" name="ALPHA_routing_failed___alpha_pus1_routing_and_reporting_routing_failed" required_system_element="NO">
+    <Source iface_id="{1dc95d7a-9635-449c-9a95-3c3d74a077e6}" func_name="ALPHA" pi_name="routing_failed" />
+    <Target iface_id="{b92c7c28-9492-44f5-b5bc-54e2508a6015}" func_name="alpha_pus1_routing_and_reporting" pi_name="routing_failed" />
+</Connection>
+
+<Connection id="{0d06cfbd-8221-4503-b9cd-36c106f09661}" name="alpha_pus17_perform_an_on_board_connection_test_invoke_on_board_communication_test___ALPHA_invoke_on_board_communication_test" required_system_element="NO">
+    <Source iface_id="{46a4ed50-8297-4c7c-bc84-854c0959747e}" func_name="alpha_pus17_perform_an_on_board_connection_test" ri_name="invoke_on_board_communication_test" />
+    <Target iface_id="{4ba222ed-00b6-497f-8549-b38d0fa9e21f}" func_name="ALPHA" ri_name="invoke_on_board_communication_test" />
+</Connection>
+
+<Connection id="{5fd18352-a175-42dd-8b29-f4aed09f7695}" name="ALPHA_end_on_board_communication_test___alpha_pus17_perform_an_on_board_connection_test_end_on_board_communication_test" required_system_element="NO">
+    <Source iface_id="{546e7676-5f9b-4e52-b904-98149457b066}" func_name="ALPHA" pi_name="end_on_board_communication_test" />
+    <Target iface_id="{0bbff524-feee-4c8f-b22d-6cba44c8c6f3}" func_name="alpha_pus17_perform_an_on_board_connection_test" pi_name="end_on_board_communication_test" />
+</Connection>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{8bd344dd-1992-49ac-9db6-5cc48e69fe16}" name="router" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="YES" required_system_element="YES" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{9d18baeb-1e38-4e78-bb66-9a1c685d6179}" name="tc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" queue_size="1" stack_size="50" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-TELECOMMAND" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{a168c8c5-b683-47b4-81a6-66ffcb34d1a3}" name="routing_failed" kind="Protected" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="failure_notice" type="ALPHA-ROUTING-FAILURE-NOTICE-GENERIC" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{569c05ac-c0f9-4543-ae81-4ce80ce96c67}" name="tc_apid_1_alpha" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="YES" is_simulink_interface="false" queue_size="1" stack_size="50" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-TELECOMMAND" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{1b5ac5fd-74f8-4da1-b584-1fba7214486b}" name="proxy" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{bbda4e0c-c084-4f56-8097-80eceea28e4f}" name="TM" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-TELEMETRY" encoding="NATIVE"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{59107077-2384-4d3a-b892-6023098f2732}" name="control_panel" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Required_Interface id="{03834f5f-61bf-4692-afe5-8727b092fe95}" name="tc" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="50" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="packet" type="ROOT-SPACE-PACKET-TELECOMMAND" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function id="{262ec0d5-318d-45b6-acb9-4ceaab3c71c7}" name="lowlevel" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{4786657b-9393-4a38-89ff-cb21a788efb6}" name="get_time_reference_status" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Output_Parameter name="time_reference_status" type="ROOT-TIME-REFERENCE-STATUS" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{f84563bd-fb2b-4111-87c4-c7da7ea25312}" name="invoke_on_board_communication_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="target_apid" type="ALPHA-TAILORABLE-APPLICATION-PROCESS-ID-ENUM" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{54a91a82-cfe0-4f87-b55e-0d28459ba789}" name="end_on_board_communication_test" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="request_id" type="ALPHA-REQUEST-ID" encoding="NATIVE"/>
+    <Input_Parameter name="secondary_header" type="ALPHA-TC-SECONDARY-HEADER" encoding="NATIVE"/>
+    <Input_Parameter name="target_apid" type="ALPHA-TAILORABLE-APPLICATION-PROCESS-ID-ENUM" encoding="NATIVE"/>
+    <Input_Parameter name="result" type="ROOT-BOOLEAN" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Connection id="{1b187bd3-85eb-409e-ab7a-d1c1ce7b1572}" required_system_element="NO">
+    <Source iface_id="{54a91a82-cfe0-4f87-b55e-0d28459ba789}" func_name="lowlevel" ri_name="end_on_board_communication_test" />
+    <Target iface_id="{546e7676-5f9b-4e52-b904-98149457b066}" func_name="ALPHA" pi_name="end_on_board_communication_test" />
+</Connection>
+
+<Connection id="{97a95efd-c144-48ac-b940-7f01b5370e6b}" required_system_element="NO">
+    <Source iface_id="{03a36e09-305a-417c-9c0b-75d72e239114}" func_name="ALPHA" ri_name="TM" />
+    <Target iface_id="{bbda4e0c-c084-4f56-8097-80eceea28e4f}" func_name="proxy" pi_name="TM" />
+</Connection>
+
+<Connection id="{a861e949-e669-46f3-8818-2d0f792e9dd1}" required_system_element="NO">
+    <Source iface_id="{b33bcbb1-bdfc-49b6-94e5-3b474c1704ca}" func_name="ALPHA" ri_name="get_time_reference_status" />
+    <Target iface_id="{4786657b-9393-4a38-89ff-cb21a788efb6}" func_name="lowlevel" pi_name="get_time_reference_status" />
+</Connection>
+
+<Connection id="{9dec88fb-958e-47ba-b538-90e38ff8d595}" required_system_element="NO">
+    <Source iface_id="{03834f5f-61bf-4692-afe5-8727b092fe95}" func_name="control_panel" ri_name="tc" />
+    <Target iface_id="{9d18baeb-1e38-4e78-bb66-9a1c685d6179}" func_name="router" pi_name="tc" />
+</Connection>
+
+<Connection id="{31219a04-b685-4c06-9d5b-44a28127812d}" required_system_element="NO">
+    <Source iface_id="{a168c8c5-b683-47b4-81a6-66ffcb34d1a3}" func_name="router" ri_name="routing_failed" />
+    <Target iface_id="{1dc95d7a-9635-449c-9a95-3c3d74a077e6}" func_name="ALPHA" pi_name="routing_failed" />
+</Connection>
+
+<Connection id="{5fc1f7d4-1e2d-49c8-b5a7-70f0ffab0250}" required_system_element="NO">
+    <Source iface_id="{569c05ac-c0f9-4543-ae81-4ce80ce96c67}" func_name="router" ri_name="tc_apid_1_alpha" />
+    <Target iface_id="{cf103e37-cc3b-479b-86c7-5c484247b1c5}" func_name="ALPHA" pi_name="tc_apid_1_alpha" />
+</Connection>
+
+<Connection id="{2fb137bb-b0d0-422f-a2c3-a891b29c9090}" required_system_element="NO">
+    <Source iface_id="{4ba222ed-00b6-497f-8549-b38d0fa9e21f}" func_name="ALPHA" ri_name="invoke_on_board_communication_test" />
+    <Target iface_id="{f84563bd-fb2b-4111-87c4-c7da7ea25312}" func_name="lowlevel" pi_name="invoke_on_board_communication_test" />
+</Connection>
+
+<Layer name="default" is_visible="true"/>
+
+</InterfaceView>

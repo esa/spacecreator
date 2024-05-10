@@ -20,6 +20,7 @@ configure_file(test_interface_view_optimizer_standalone.sh test_interface_view_o
 configure_file(test_interface_view_optimizer_keep.sh test_interface_view_optimizer_keep.sh COPYONLY)
 configure_file(test_interface_view_optimizer_ergo_agent.sh test_interface_view_optimizer_ergo_agent.sh COPYONLY)
 configure_file(test_interface_view_optimizer_ergo_battery.sh test_interface_view_optimizer_ergo_battery.sh COPYONLY)
+configure_file(test_only_one_function_with_sync_interfaces.sh test_only_one_function_with_sync_interfaces.sh COPYONLY)
 add_custom_target(${TEST_NAME}_copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources
     DEPENDS ${TEST_NAME})
