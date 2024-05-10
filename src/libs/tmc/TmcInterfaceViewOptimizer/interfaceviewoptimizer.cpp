@@ -46,15 +46,7 @@ using conversion::translator::TranslationException;
 
 namespace tmc {
 
-namespace {
-struct ConnectionInfo {
-    shared::Id sourceInterfaceName;
-    shared::Id targetFunctionName;
-    shared::Id targetInterfaceName;
-};
-
-using ConnectionInfoMap = QMultiMap<shared::Id, ConnectionInfo>;
-}
+using ConnectionInfoMap = QMultiMap<shared::Id, shared::Id>;
 
 void InterfaceViewOptimizer::optimizeModel(
         IVModel *ivModel, const std::vector<QString> &functionNames, InterfaceViewOptimizer::Mode mode)
@@ -141,16 +133,14 @@ void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, iv
     for (auto infoIter = outerInputConnections.begin(); infoIter != outerInputConnections.end(); ++infoIter) {
         auto [begin, end] = innerOutputConnections.equal_range(infoIter->first);
         for (auto iter = begin; iter != end; ++iter) {
-            connectionsToRestore.insert(infoIter->second.first,
-                    ConnectionInfo { infoIter->second.second, iter->second.first, iter->second.second });
+            connectionsToRestore.insert(infoIter->second.second, iter->second.second);
         }
     }
 
     for (auto infoIter = innerInputConnections.begin(); infoIter != innerInputConnections.end(); ++infoIter) {
         auto [begin, end] = outerOutputConnections.equal_range(infoIter->first);
         for (auto iter = begin; iter != end; ++iter) {
-            connectionsToRestore.insert(infoIter->second.first,
-                    ConnectionInfo { infoIter->second.second, iter->second.first, iter->second.second });
+            connectionsToRestore.insert(infoIter->second.second, iter->second.second);
         }
     }
 
@@ -179,8 +169,8 @@ void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, iv
 
     // restore connections
     for (auto iter = connectionsToRestore.begin(); iter != connectionsToRestore.end(); ++iter) {
-        IVInterface *source = dynamic_cast<IVInterface *>(ivModel->getObject(iter.value().sourceInterfaceName));
-        IVInterface *target = dynamic_cast<IVInterface *>(ivModel->getObject(iter.value().targetInterfaceName));
+        IVInterface *source = dynamic_cast<IVInterface *>(ivModel->getObject(iter.key()));
+        IVInterface *target = dynamic_cast<IVInterface *>(ivModel->getObject(iter.value()));
         assert(source != nullptr);
         assert(target != nullptr);
         auto connection = new IVConnection(source, target, ivModel);
