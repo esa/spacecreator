@@ -59,14 +59,17 @@ using ConnectionInfoMap = QMap<shared::Id, ConnectionInfo>;
 void InterfaceViewOptimizer::optimizeModel(
         IVModel *ivModel, const std::vector<QString> &functionNames, InterfaceViewOptimizer::Mode mode)
 {
+    // resolve functions
+    std::vector<QString> allFunctionNames = resolveFunctionNames(ivModel, functionNames);
+
     flattenModel(ivModel);
 
     switch (mode) {
     case Mode::Environment:
-        discardFunctions(ivModel, functionNames);
+        discardFunctions(ivModel, allFunctionNames);
         break;
     case Mode::Keep:
-        keepFunctions(ivModel, functionNames);
+        keepFunctions(ivModel, allFunctionNames);
         break;
     case Mode::None:
         break;
@@ -87,7 +90,8 @@ bool InterfaceViewOptimizer::flattenOneFunction(IVModel *ivModel)
 {
     // find parent functions in the loop
     for (auto function : ivModel->allObjectsByType<IVFunctionType>()) {
-        if (isFunctionParent(function)) {
+        if (isFunctionParent(function) && function->parentObject() == nullptr) {
+
             moveNestedFunctionsToRoot(ivModel, function);
             return true;
         }
@@ -123,12 +127,12 @@ void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, iv
                 outerOutputConnections.emplace(connection->sourceInterface()->id(),
                         qMakePair(connection->target()->id(), connection->targetInterface()->id()));
             }
-        } else {
+        } else if (connection->target()->id() == function->id()) {
             if (nestedFunctionNames.contains(connection->targetName())) {
                 innerInputConnections.emplace(connection->targetInterface()->id(),
                         qMakePair(connection->source()->id(), connection->sourceInterface()->id()));
             } else {
-                outerInputConnections.emplace(connection->targetInterfaceName(),
+                outerInputConnections.emplace(connection->targetInterface()->id(),
                         qMakePair(connection->source()->id(), connection->sourceInterface()->id()));
             }
         }
@@ -182,6 +186,34 @@ void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, iv
         auto connection = new IVConnection(source, target, ivModel);
         ivModel->addObject(connection);
         source->function()->addChild(connection);
+    }
+}
+
+std::vector<QString> InterfaceViewOptimizer::resolveFunctionNames(
+        ivm::IVModel *ivModel, const std::vector<QString> &functionNames)
+{
+    std::vector<QString> result;
+    for (const auto &name : functionNames) {
+        auto function = ivModel->getFunction(name, Qt::CaseSensitivity::CaseInsensitive);
+        if (function != nullptr && isFunctionParent(function)) {
+            std::vector<QString> childs;
+            getChildFunctionNames(function, childs);
+            std::copy(childs.begin(), childs.end(), std::back_inserter(result));
+        } else {
+            result.push_back(name);
+        }
+    }
+    return result;
+}
+
+void InterfaceViewOptimizer::getChildFunctionNames(ivm::IVFunctionType *function, std::vector<QString> &functionNames)
+{
+    for (const auto &child : function->functions()) {
+        if (isFunctionParent(child)) {
+            getChildFunctionNames(child, functionNames);
+        } else {
+            functionNames.push_back(child->property("name").toString());
+        }
     }
 }
 

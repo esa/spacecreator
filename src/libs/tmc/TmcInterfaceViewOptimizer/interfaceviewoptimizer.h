@@ -79,9 +79,12 @@ public:
 
 private:
     static auto flattenModel(ivm::IVModel *ivModel) -> void;
-    static auto flattenOneFunction(ivm::IVModel* ivModel) -> bool;
-    static auto moveNestedFunctionsToRoot(ivm::IVModel* ivModel, ivm::IVFunctionType* function)->void;
+    static auto flattenOneFunction(ivm::IVModel *ivModel) -> bool;
+    static auto moveNestedFunctionsToRoot(ivm::IVModel *ivModel, ivm::IVFunctionType *function) -> void;
 
+    static auto resolveFunctionNames(ivm::IVModel *ivModel, const std::vector<QString> &functionNames)
+            -> std::vector<QString>;
+    static auto getChildFunctionNames(ivm::IVFunctionType *function, std::vector<QString> &functionNames) -> void;
     static auto discardFunctions(ivm::IVModel *ivModel, const std::vector<QString> &functionNames) -> void;
     static auto keepFunctions(ivm::IVModel *ivModel, const std::vector<QString> &functionNames) -> void;
 
