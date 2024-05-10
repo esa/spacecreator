@@ -53,7 +53,7 @@ struct ConnectionInfo {
     shared::Id targetInterfaceName;
 };
 
-using ConnectionInfoMap = QMap<shared::Id, ConnectionInfo>;
+using ConnectionInfoMap = QMultiMap<shared::Id, ConnectionInfo>;
 }
 
 void InterfaceViewOptimizer::optimizeModel(
@@ -102,7 +102,7 @@ bool InterfaceViewOptimizer::flattenOneFunction(IVModel *ivModel)
 
 void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, ivm::IVFunctionType *function)
 {
-    QVector<QString> nestedFunctionNames;
+    QStringList nestedFunctionNames;
     for (const auto &child : function->functions()) {
         nestedFunctionNames.append(child->property("name").toString());
     }
@@ -120,7 +120,7 @@ void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, iv
     std::multimap<shared::Id, QPair<shared::Id, shared::Id>> outerOutputConnections;
     for (const auto &connection : connections) {
         if (connection->source()->id() == function->id()) {
-            if (nestedFunctionNames.contains(connection->targetName())) {
+            if (nestedFunctionNames.contains(connection->targetName(), Qt::CaseSensitivity::CaseInsensitive)) {
                 innerOutputConnections.emplace(connection->sourceInterface()->id(),
                         qMakePair(connection->target()->id(), connection->targetInterface()->id()));
             } else {
@@ -128,7 +128,7 @@ void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, iv
                         qMakePair(connection->target()->id(), connection->targetInterface()->id()));
             }
         } else if (connection->target()->id() == function->id()) {
-            if (nestedFunctionNames.contains(connection->targetName())) {
+            if (nestedFunctionNames.contains(connection->sourceName(), Qt::CaseSensitivity::CaseInsensitive)) {
                 innerInputConnections.emplace(connection->targetInterface()->id(),
                         qMakePair(connection->source()->id(), connection->sourceInterface()->id()));
             } else {
