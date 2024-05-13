@@ -74,22 +74,23 @@ void InterfaceViewOptimizer::optimizeModel(
 
 void InterfaceViewOptimizer::flattenModel(ivm::IVModel *ivModel)
 {
-    while (flattenOneFunction(ivModel))
-        ;
+    IVFunctionType *function = nullptr;
+    // flatten all functions one by one
+    while ((function = findFunctionToFlatten(ivModel)) != nullptr) {
+        moveNestedFunctionsToRoot(ivModel, function);
+    }
 }
 
-bool InterfaceViewOptimizer::flattenOneFunction(IVModel *ivModel)
+ivm::IVFunctionType *InterfaceViewOptimizer::findFunctionToFlatten(IVModel *ivModel)
 {
-    // find parent functions in the loop
+    // find parent function to be flatten
     for (auto function : ivModel->allObjectsByType<IVFunctionType>()) {
         if (isFunctionParent(function) && function->parentObject() == nullptr) {
-
-            moveNestedFunctionsToRoot(ivModel, function);
-            return true;
+            return function;
         }
     }
 
-    return false;
+    return nullptr;
 }
 
 void InterfaceViewOptimizer::moveNestedFunctionsToRoot(ivm::IVModel *ivModel, ivm::IVFunctionType *function)
