@@ -543,7 +543,12 @@ void IvToPromelaGenerator::createPromelaObjectsForFunction(
         createPromelaObjectsForSporadicRis(functionName, *iter->second);
     }
 
-    createCheckQueueInline(m_context.model(), functionName, channelNames);
+    if (!channelNames.empty()) {
+        // if the function hasn't sporadic interfaces, only synchronous,
+        // then the list of channelNames is empty
+        // the inline shall be generated when the list is not empty
+        createCheckQueueInline(m_context.model(), functionName, channelNames);
+    }
     createGetSenderInline(m_context.model(), functionName);
     if (m_context.isMulticastSupported()) {
         createSenderPidVariable(m_context.model(), functionName);
