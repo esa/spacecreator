@@ -925,7 +925,7 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfInitLoop(const QString &utypeName, 
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(dst);
 
-    const auto inlineName = QString("%1_elem%2").arg(utypeName).arg(m_initializeValueInlineSuffix);
+    const auto inlineName = QString("%1__elem%2").arg(utypeName).arg(m_initializeValueInlineSuffix);
     auto inlineCall = InlineCall(inlineName, inlineArguments);
     loopSequence->appendElement(std::move(inlineCall));
 

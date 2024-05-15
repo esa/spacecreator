@@ -462,7 +462,7 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
         if (const auto overridenSequenceOf = dynamic_cast<const SequenceOf *>(m_overridenType);
                 overridenSequenceOf != nullptr) {
             const auto initCallName =
-                    QString("%1_elem_init_value").arg(Escaper::escapePromelaName(m_overridenType->identifier()));
+                    QString("%1__elem_init_value").arg(Escaper::escapePromelaName(m_overridenType->identifier()));
             handleOverridenType(type.identifier(), overridenSequenceOf->constraints(), initCallName, valueVariableName,
                     minSize, maxSize, sequence.get());
         } else if (const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
@@ -642,7 +642,7 @@ QString Asn1TypeValueGeneratorVisitor::getSequenceComponentTypeName(
     const auto &type = *asnComponent.type();
 
     if (isEmbeddedType(type)) {
-        return QString("%1_%2").arg(sequenceName).arg(asnComponent.name());
+        return QString("%1__%2").arg(sequenceName).arg(asnComponent.name());
     } else {
         return type.typeName();
     }
@@ -654,7 +654,7 @@ QString Asn1TypeValueGeneratorVisitor::getChoiceComponentTypeName(
     const auto &type = *choiceComponent.type();
 
     if (isEmbeddedType(type)) {
-        return QString("%1_%2").arg(choiceName).arg(choiceComponent.name());
+        return QString("%1__%2").arg(choiceName).arg(choiceComponent.name());
     } else {
         return type.typeName();
     }
