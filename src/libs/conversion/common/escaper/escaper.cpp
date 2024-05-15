@@ -165,15 +165,13 @@ void Escaper::removeNonalphanumericCharacters(QString &name, const QChar &delime
 
 void Escaper::replaceDelimeters(QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter)
 {
-    int howManyDelimeters = 0;
-    for (int i = 0; i < name.size(); i++) {
-        if (isCharInVector(name.at(i), srcDelimeters)) {
-            howManyDelimeters++;
-        } else if (howManyDelimeters > 0) {
-            name.replace(i - howManyDelimeters, howManyDelimeters, dstDelimeter);
-            howManyDelimeters = 0;
-        }
-    }
+    const QString regexpString =
+            std::accumulate(srcDelimeters.begin(), srcDelimeters.end(), QString("["),
+                    [](auto s, const QChar c) { return s + (c == '-' ? QString("\\-") : QString(c)); })
+            + "]";
+    const QRegularExpression re(regexpString);
+    const QStringList parts = name.split(re, Qt::KeepEmptyParts);
+    name = parts.join(dstDelimeter);
 }
 
 } // namespace conversion

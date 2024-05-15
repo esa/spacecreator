@@ -590,7 +590,7 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 QString Asn1ItemTypeVisitor::constructTypeName(QString name)
 {
     if (m_baseTypeName.has_value()) {
-        return QString("%1_%2").arg(m_baseTypeName.value()).arg(Escaper::escapePromelaName(name));
+        return QString("%1__%2").arg(m_baseTypeName.value()).arg(Escaper::escapePromelaName(name));
     }
     return Escaper::escapePromelaName(std::move(name));
 }
@@ -862,7 +862,7 @@ void Asn1ItemTypeVisitor::addSizeCheckInline(
 
 QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const
 {
-    return Escaper::escapePromelaName(utype) + "_" + Escaper::escapePromelaName(field) + m_assignValueInlineSuffix;
+    return Escaper::escapePromelaName(utype) + "__" + Escaper::escapePromelaName(field) + m_assignValueInlineSuffix;
 }
 
 QString Asn1ItemTypeVisitor::buildCheckArgumentName(const QString &typeName, const QString &postfix) const
@@ -888,7 +888,7 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfDataLoop(const QString &utypeName, 
     inlineArguments.append(dst);
     inlineArguments.append(src);
 
-    const auto inlineName = QString("%1_elem%2").arg(utypeName).arg(m_assignValueInlineSuffix);
+    const auto inlineName = QString("%1__elem%2").arg(utypeName).arg(m_assignValueInlineSuffix);
     auto inlineCall = InlineCall(inlineName, inlineArguments);
     loopSequence->appendElement(std::move(inlineCall));
 
