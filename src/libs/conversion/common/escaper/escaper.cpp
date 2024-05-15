@@ -87,7 +87,7 @@ QString Escaper::escapeAsn1FieldName(QString name)
 
 QString Escaper::escapePromelaName(QString name)
 {
-    escapeName(name, '_');
+    escapeName(name, '_', Qt::KeepEmptyParts);
 
     return name;
 }
@@ -136,11 +136,11 @@ QString Escaper::escapeCFieldName(QString name)
     return name;
 }
 
-void Escaper::escapeName(QString &name, const QChar &delimeter)
+void Escaper::escapeName(QString &name, const QChar &delimeter, Qt::SplitBehavior behaviour)
 {
     name = name.trimmed();
     removeLeadingNonletters(name);
-    replaceDelimeters(name, { '_', '-', ' ' }, delimeter);
+    replaceDelimeters(name, { '_', '-', ' ' }, delimeter, behaviour);
     removeNonalphanumericCharacters(name, delimeter);
 
     if (name.isEmpty()) {
@@ -163,14 +163,15 @@ void Escaper::removeNonalphanumericCharacters(QString &name, const QChar &delime
     name.remove(QRegularExpression(QString("[^a-zA-Z0-9\\%1]").arg(delimeter)));
 }
 
-void Escaper::replaceDelimeters(QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter)
+void Escaper::replaceDelimeters(
+        QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter, Qt::SplitBehavior behaviour)
 {
     const QString regexpString =
             std::accumulate(srcDelimeters.begin(), srcDelimeters.end(), QString("["),
                     [](auto s, const QChar c) { return s + (c == '-' ? QString("\\-") : QString(c)); })
             + "]";
     const QRegularExpression re(regexpString);
-    const QStringList parts = name.split(re, Qt::KeepEmptyParts);
+    const QStringList parts = name.split(re, behaviour);
     name = parts.join(dstDelimeter);
 }
 

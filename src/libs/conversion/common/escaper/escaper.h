@@ -144,7 +144,8 @@ public:
     static auto escapeCFieldName(QString name) -> QString;
 
 private:
-    static auto escapeName(QString &name, const QChar &delimeter) -> void;
+    static auto escapeName(QString &name, const QChar &delimeter, Qt::SplitBehavior behaviour = Qt::SkipEmptyParts)
+            -> void;
 
     static auto isCharInVector(const QChar &c, const std::vector<QChar> &delimeters) -> bool;
 
@@ -152,8 +153,8 @@ private:
 
     static auto removeNonalphanumericCharacters(QString &name, const QChar &delimeter) -> void;
 
-    static auto replaceDelimeters(QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter)
-            -> void;
+    static auto replaceDelimeters(QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter,
+            Qt::SplitBehavior behaviour = Qt::SkipEmptyParts) -> void;
 };
 
 } // namespace conversion

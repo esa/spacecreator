@@ -91,9 +91,9 @@ using promela::translator::PromelaTypeSorter;
 
 namespace tmc::test {
 
-void tst_Asn1ToPromelaTranslator::initTestCase() {}
+void tst_Asn1ToPromelaTranslator::initTestCase() { }
 
-void tst_Asn1ToPromelaTranslator::cleanupTestCase() {}
+void tst_Asn1ToPromelaTranslator::cleanupTestCase() { }
 
 void tst_Asn1ToPromelaTranslator::testBasicTypes()
 {
@@ -795,10 +795,10 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QCOMPARE(expectedDataUtype.getFields().size(), 2);
     QCOMPARE(expectedDataUtype.getFields().at(0).getName(), "ch1");
     QVERIFY(expectedDataUtype.getFields().at(0).getType().isUtypeReference());
-    QCOMPARE(expectedDataUtype.getFields().at(0).getType().getUtypeReference().getName(), "MyType_ch1");
+    QCOMPARE(expectedDataUtype.getFields().at(0).getType().getUtypeReference().getName(), "MyType__ch1");
     QCOMPARE(expectedDataUtype.getFields().at(1).getName(), "ch2");
     QVERIFY(expectedDataUtype.getFields().at(1).getType().isUtypeReference());
-    QCOMPARE(expectedDataUtype.getFields().at(1).getType().getUtypeReference().getName(), "MyType_ch2");
+    QCOMPARE(expectedDataUtype.getFields().at(1).getType().getUtypeReference().getName(), "MyType__ch2");
 
     QCOMPARE(promelaModel.getValueDefinitions().at(0).getName(), "MyType_NONE");
     QCOMPARE(promelaModel.getValueDefinitions().at(0).getValue(), 0);
@@ -811,8 +811,8 @@ void tst_Asn1ToPromelaTranslator::testChoice()
     QCOMPARE(promelaModel.getValueDefinitions().at(4).getName(), "Mytype_selection_ch2_PRESENT");
     QCOMPARE(promelaModel.getValueDefinitions().at(4).getValue(), 2);
 
-    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_ch1");
-    QCOMPARE(promelaModel.getTypeAliases().at(1).getName(), "MyType_ch2");
+    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType__ch1");
+    QCOMPARE(promelaModel.getTypeAliases().at(1).getName(), "MyType__ch2");
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 6);
     {
@@ -829,7 +829,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
         QCOMPARE(assignConditional->getAlternatives().size(), 3);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch1_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__ch1_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
@@ -837,7 +837,7 @@ void tst_Asn1ToPromelaTranslator::testChoice()
         QVERIFY(assignment != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch2_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__ch2_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
@@ -845,11 +845,11 @@ void tst_Asn1ToPromelaTranslator::testChoice()
         QVERIFY(assignment != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch1_range_check");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__ch1_range_check");
         QVERIFY(inlineDef != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_ch2_range_check");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__ch2_range_check");
         QVERIFY(inlineDef != nullptr);
     }
     {
@@ -901,20 +901,20 @@ void tst_Asn1ToPromelaTranslator::testSequence()
     const Declaration &decl1 = expectedUtype.getFields().at(0);
     QCOMPARE("field1", decl1.getName());
     QVERIFY(decl1.getType().isUtypeReference());
-    QCOMPARE(decl1.getType().getUtypeReference().getName(), "MyType_field1");
+    QCOMPARE(decl1.getType().getUtypeReference().getName(), "MyType__field1");
 
     const Declaration &decl2 = expectedUtype.getFields().at(1);
     QCOMPARE("field2", decl2.getName());
     QVERIFY(decl2.getType().isUtypeReference());
-    QCOMPARE(decl2.getType().getUtypeReference().getName(), "MyType_field2");
+    QCOMPARE(decl2.getType().getUtypeReference().getName(), "MyType__field2");
 
     const TypeAlias &expectedAlias1 = promelaModel.getTypeAliases().at(0);
-    QCOMPARE(expectedAlias1.getName(), "MyType_field1");
+    QCOMPARE(expectedAlias1.getName(), "MyType__field1");
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias1.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias1.getType()), BasicType::INT);
 
     const TypeAlias &expectedAlias2 = promelaModel.getTypeAliases().at(1);
-    QCOMPARE(expectedAlias2.getName(), "MyType_field2");
+    QCOMPARE(expectedAlias2.getName(), "MyType__field2");
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 
@@ -930,7 +930,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         QVERIFY(inlineCall != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__field1_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
@@ -938,7 +938,7 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         QVERIFY(assignment != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__field2_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
@@ -946,11 +946,11 @@ void tst_Asn1ToPromelaTranslator::testSequence()
         QVERIFY(assignment != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_range_check");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__field1_range_check");
         QVERIFY(inlineDef != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_range_check");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__field2_range_check");
         QVERIFY(inlineDef != nullptr);
     }
 }
@@ -1007,12 +1007,12 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     const Declaration &decl1 = expectedUtype.getFields().at(0);
     QCOMPARE("field1", decl1.getName());
     QVERIFY(decl1.getType().isUtypeReference());
-    QCOMPARE(decl1.getType().getUtypeReference().getName(), "MyType_field1");
+    QCOMPARE(decl1.getType().getUtypeReference().getName(), "MyType__field1");
 
     const Declaration &decl2 = expectedUtype.getFields().at(1);
     QCOMPARE("field2", decl2.getName());
     QVERIFY(decl2.getType().isUtypeReference());
-    QCOMPARE(decl2.getType().getUtypeReference().getName(), "MyType_field2");
+    QCOMPARE(decl2.getType().getUtypeReference().getName(), "MyType__field2");
 
     const Declaration &decl3 = expectedUtype.getFields().at(2);
     QCOMPARE("exist", decl3.getName());
@@ -1020,12 +1020,12 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
     QCOMPARE(decl3.getType().getUtypeReference().getName(), "MyType_exist");
 
     const TypeAlias &expectedAlias1 = promelaModel.getTypeAliases().at(0);
-    QCOMPARE(expectedAlias1.getName(), "MyType_field1");
+    QCOMPARE(expectedAlias1.getName(), "MyType__field1");
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias1.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias1.getType()), BasicType::INT);
 
     const TypeAlias &expectedAlias2 = promelaModel.getTypeAliases().at(1);
-    QCOMPARE(expectedAlias2.getName(), "MyType_field2");
+    QCOMPARE(expectedAlias2.getName(), "MyType__field2");
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias2.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias2.getType()), BasicType::FLOAT);
 
@@ -1104,7 +1104,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         }
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__field1_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
@@ -1112,7 +1112,7 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         QVERIFY(assignment != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__field2_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
@@ -1120,11 +1120,11 @@ void tst_Asn1ToPromelaTranslator::testSequenceWithOptional()
         QVERIFY(assignment != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field1_range_check");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__field1_range_check");
         QVERIFY(inlineDef != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_field2_range_check");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__field2_range_check");
         QVERIFY(inlineDef != nullptr);
     }
 }
@@ -1174,23 +1174,23 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
     {
         const Utype &expectedLevel2 = promelaModel.getUtypes().at(0);
         QCOMPARE(expectedLevel2.isUnionType(), false);
-        QCOMPARE(expectedLevel2.getName(), "Level0_level1_level2");
+        QCOMPARE(expectedLevel2.getName(), "Level0__level1__level2");
         QCOMPARE(expectedLevel2.getFields().size(), 1);
         const Declaration &expectedLevel2Field = expectedLevel2.getFields().front();
         QCOMPARE(expectedLevel2Field.getName(), "field");
         QVERIFY(expectedLevel2Field.getType().isUtypeReference());
-        QCOMPARE(expectedLevel2Field.getType().getUtypeReference().getName(), "Level0_level1_level2_field");
+        QCOMPARE(expectedLevel2Field.getType().getUtypeReference().getName(), "Level0__level1__level2__field");
     }
 
     {
         const Utype &expectedLevel1 = promelaModel.getUtypes().at(1);
         QCOMPARE(expectedLevel1.isUnionType(), false);
-        QCOMPARE(expectedLevel1.getName(), "Level0_level1");
+        QCOMPARE(expectedLevel1.getName(), "Level0__level1");
         QCOMPARE(expectedLevel1.getFields().size(), 1);
         const Declaration &expectedLevel1Field = expectedLevel1.getFields().front();
         QCOMPARE(expectedLevel1Field.getName(), "level2");
         QVERIFY(expectedLevel1Field.getType().isUtypeReference());
-        QCOMPARE(expectedLevel1Field.getType().getUtypeReference().getName(), "Level0_level1_level2");
+        QCOMPARE(expectedLevel1Field.getType().getUtypeReference().getName(), "Level0__level1__level2");
     }
 
     {
@@ -1202,11 +1202,11 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QCOMPARE(expectedLevel0Field.getName(), "level1");
         ;
         QVERIFY(expectedLevel0Field.getType().isUtypeReference());
-        QCOMPARE(expectedLevel0Field.getType().getUtypeReference().getName(), "Level0_level1");
+        QCOMPARE(expectedLevel0Field.getType().getUtypeReference().getName(), "Level0__level1");
     }
 
     const TypeAlias &expectedAlias = promelaModel.getTypeAliases().at(0);
-    QCOMPARE(expectedAlias.getName(), "Level0_level1_level2_field");
+    QCOMPARE(expectedAlias.getName(), "Level0__level1__level2__field");
     QVERIFY(std::holds_alternative<BasicType>(expectedAlias.getType()));
     QCOMPARE(std::get<BasicType>(expectedAlias.getType()), BasicType::INT);
 
@@ -1220,7 +1220,7 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QVERIFY(inlineCall != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "Level0_level1_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "Level0__level1_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
@@ -1228,7 +1228,7 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
         QVERIFY(inlineCall != nullptr);
     }
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "Level0_level1_level2_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "Level0__level1__level2_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 1);
@@ -1237,7 +1237,7 @@ void tst_Asn1ToPromelaTranslator::testNestedSequence()
     }
     {
         const InlineDef *inlineDef =
-                findInline(promelaModel.getInlineDefs(), "Level0_level1_level2_field_assign_value");
+                findInline(promelaModel.getInlineDefs(), "Level0__level1__level2__field_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
@@ -1283,14 +1283,14 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
     QCOMPARE(expectedData.getType().getArrayType().getSize(), EXPECTED_SIZE);
     QVERIFY(std::holds_alternative<UtypeRef>(expectedData.getType().getArrayType().getType()));
     const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData.getType().getArrayType().getType());
-    QCOMPARE(expectedRef.getName(), "MyType_elem");
+    QCOMPARE(expectedRef.getName(), "MyType__elem");
 
     const Declaration expectedLength = expectedUtype.getFields().at(1);
     QCOMPARE(expectedLength.getName(), "length");
     QVERIFY(expectedLength.getType().isBasicType());
     QCOMPARE(expectedLength.getType().getBasicType(), BasicType::INT);
 
-    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_elem");
+    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType__elem");
     QVERIFY(std::holds_alternative<BasicType>(promelaModel.getTypeAliases().at(0).getType()));
     QCOMPARE(std::get<BasicType>(promelaModel.getTypeAliases().at(0).getType()), BasicType::INT);
 
@@ -1342,7 +1342,7 @@ void tst_Asn1ToPromelaTranslator::testVariableSequenceOf()
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 5);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_elem_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__elem_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
@@ -1388,9 +1388,9 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
     QCOMPARE(expectedData.getType().getArrayType().getSize(), EXPECTED_SIZE);
     QVERIFY(std::holds_alternative<UtypeRef>(expectedData.getType().getArrayType().getType()));
     const UtypeRef &expectedRef = std::get<UtypeRef>(expectedData.getType().getArrayType().getType());
-    QCOMPARE(expectedRef.getName(), "MyType_elem");
+    QCOMPARE(expectedRef.getName(), "MyType__elem");
 
-    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType_elem");
+    QCOMPARE(promelaModel.getTypeAliases().at(0).getName(), "MyType__elem");
     QVERIFY(std::holds_alternative<BasicType>(promelaModel.getTypeAliases().at(0).getType()));
     QCOMPARE(std::get<BasicType>(promelaModel.getTypeAliases().at(0).getType()), BasicType::INT);
 
@@ -1411,7 +1411,7 @@ void tst_Asn1ToPromelaTranslator::testFixedSequenceOf()
 
     QCOMPARE(promelaModel.getInlineDefs().size(), 4);
     {
-        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType_elem_assign_value");
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "MyType__elem_assign_value");
         QVERIFY(inlineDef != nullptr);
         QCOMPARE(inlineDef->getArguments().size(), 2);
         QCOMPARE(inlineDef->getSequence().getContent().size(), 2);
