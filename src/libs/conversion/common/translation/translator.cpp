@@ -24,6 +24,7 @@ namespace conversion::translator {
 void Translator::checkSourceModelCount(const std::vector<Model *> &models) const
 {
     const auto requiredModelsCount = getDependencies().size();
+    const auto optionalModelsCount = getOptionalDependencies().size();
 
     const auto &sourceModelName = modelTypeToString(getSourceModelType());
     const auto &targetModelName = modelTypeToString(getTargetModelType());
@@ -37,7 +38,7 @@ void Translator::checkSourceModelCount(const std::vector<Model *> &models) const
         auto message =
                 QString("Not enough models passed for %1 to %2 translation").arg(sourceModelName).arg(targetModelName);
         throw TranslationException(std::move(message));
-    } else if (models.size() > requiredModelsCount) {
+    } else if (models.size() > requiredModelsCount + optionalModelsCount) {
         auto message =
                 QString("Too many models passed for %1 to %2 translation").arg(sourceModelName).arg(targetModelName);
         throw TranslationException(std::move(message));
