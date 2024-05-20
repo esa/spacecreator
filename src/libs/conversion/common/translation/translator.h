@@ -93,12 +93,19 @@ public:
      */
     virtual auto getDependencies() const -> std::set<ModelType> = 0;
     /**
+     * @brief   Provides a set of all source model types that are optional for the translation
+     *
+     * @return  Set of optional models
+     */
+    virtual auto getOptionalDependencies() const -> std::set<ModelType> = 0;
+    /**
      * @brief Get the specified model from the vector of models
      *
      * @tparam ModelT  type of required model
      * @param models   vector of models
      *
      * @return a model of the required type
+     * @throws conversion::translator::TranslationException
      */
     template<typename ModelT>
     static auto getModel(const std::vector<Model *> &models) -> ModelT *;
@@ -109,9 +116,31 @@ public:
      * @param models   vector of models
      *
      * @return a model of the required type
+     * @throws conversion::translator::TranslationException
      */
     template<typename ModelT>
     static auto getModel(const std::vector<std::unique_ptr<Model>> &models) -> ModelT *;
+
+    /**
+     * @brief Get the specified model from the vector of models
+     *
+     * @tparam ModelT  type of required model
+     * @param models   vector of models
+     *
+     * @return a model of the required type or nullptr
+     */
+    template<typename ModelT>
+    static auto getOptionalModel(const std::vector<Model *> &models) -> ModelT *;
+    /**
+     * @brief Get the specified model from the vector of models
+     *
+     * @tparam ModelT  type of required model
+     * @param models   vector of models
+     *
+     * @return a model of the required type or nullptr
+     */
+    template<typename ModelT>
+    static auto getOptionalModel(const std::vector<std::unique_ptr<Model>> &models) -> ModelT *;
 
 protected:
     auto checkSourceModelCount(const std::vector<Model *> &models) const -> void;
@@ -142,6 +171,32 @@ ModelT *Translator::getModel(const std::vector<std::unique_ptr<Model>> &models)
     for_each(models.begin(), models.end(), [&rawOutModels](auto &model) { rawOutModels.push_back(model.get()); });
 
     return getModel<ModelT>(rawOutModels);
+}
+
+template<typename ModelT>
+ModelT *Translator::getOptionalModel(const std::vector<Model *> &models)
+{
+    std::vector<Model *> foundModels;
+    std::copy_if(models.begin(), models.end(), std::back_inserter(foundModels),
+            [](Model *model) { return dynamic_cast<ModelT *>(model) != nullptr; });
+
+    if (foundModels.empty()) {
+        return nullptr;
+    } else if (foundModels.size() > 1) {
+        auto message = QString("More than 1 source %1 model passed").arg(ModelProperties<ModelT>::name);
+        throw conversion::translator::TranslationException(std::move(message));
+    } else {
+        return dynamic_cast<ModelT *>(foundModels[0]);
+    }
+}
+
+template<typename ModelT>
+ModelT *Translator::getOptionalModel(const std::vector<std::unique_ptr<Model>> &models)
+{
+    std::vector<conversion::Model *> rawOutModels;
+    for_each(models.begin(), models.end(), [&rawOutModels](auto &model) { rawOutModels.push_back(model.get()); });
+
+    return getOptionalModel<ModelT>(rawOutModels);
 }
 
 } // namespace conversion::translator

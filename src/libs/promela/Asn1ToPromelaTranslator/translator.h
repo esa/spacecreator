@@ -66,6 +66,12 @@ public:
      * @return  Set of required models
      */
     auto getDependencies() const -> std::set<conversion::ModelType> override;
+    /**
+     * @brief   Provides a set of all source model types that are optional for the translation
+     *
+     * @return  Set of optional models
+     */
+    auto getOptionalDependencies() const -> std::set<conversion::ModelType> override;
 
 private:
     auto translateAsn1Model(const Asn1Acn::Asn1Model *model, bool enhancedSpinSupport,

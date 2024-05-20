@@ -68,6 +68,12 @@ public:
      * @return  Set of required models
      */
     virtual auto getDependencies() const -> std::set<ModelType> override;
+    /**
+     * @brief   Provides a set of all source model types that are optional for the translation
+     *
+     * @return  Set of optional models
+     */
+    virtual auto getOptionalDependencies() const -> std::set<ModelType> override;
 
     /**
      * @brief   Gets SEDS package from given vector

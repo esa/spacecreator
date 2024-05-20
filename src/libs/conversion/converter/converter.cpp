@@ -131,6 +131,17 @@ void Converter::translateModels(const std::set<ModelType> &sourceModelsTypes, Mo
         }
     }
 
+    for (const auto dependencyModelType : translator->getOptionalDependencies()) {
+        if (isModelImported(dependencyModelType)) {
+            auto *model = m_modelCache[dependencyModelType].get();
+            sourceModels.push_back(model);
+        } else if (m_registry.isTranslatorRegistered(sourceModelsTypes, dependencyModelType)) {
+            translateModels(sourceModelsTypes, dependencyModelType);
+            auto *model = m_modelCache[dependencyModelType].get();
+            sourceModels.push_back(model);
+        }
+    }
+
     auto outputModels = translator->translateModels(std::move(sourceModels), m_options);
 
     for (auto &outputModel : outputModels) {

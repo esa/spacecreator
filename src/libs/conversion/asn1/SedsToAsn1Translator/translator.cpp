@@ -65,6 +65,11 @@ std::set<ModelType> SedsToAsn1Translator::getDependencies() const
     return dependencies;
 }
 
+std::set<ModelType> SedsToAsn1Translator::getOptionalDependencies() const
+{
+    return {};
+}
+
 std::vector<std::unique_ptr<Model>> SedsToAsn1Translator::translateSedsModel(
         const SedsModel *sedsModel, const Options &options) const
 {

@@ -219,6 +219,15 @@ public:
      */
     size_t getNumberOfProctypes() const;
 
+    /**
+     * @brief Convert ASN.1 files to promela and save the result in file
+     *
+     * @param inputFilepathList list of input ASN.1 files.
+     * @param outputFilepath output promela file.
+     * @return true if conversion succeed, otherwise false.
+     */
+    bool convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath);
+
 Q_SIGNALS:
     /**
      * @brief Conversion message.
@@ -245,9 +254,6 @@ private:
     bool convertInterfaceview(const QString &inputFilepath, const QString &outputFilepath,
             const QList<QString> &asn1FilepathList, const QStringList &modelFunctions,
             const QStringList &environmentFunctions);
-    bool convertDataview(
-            const QList<QString> &inputFilepathList, const QString &ivFilepath, const QString &outputFilepath);
-
     bool convertMscObservers(const QString &ivFilePath);
     void generateObserverDatamodel(QProcess &process, const QString &sdlFileName);
 

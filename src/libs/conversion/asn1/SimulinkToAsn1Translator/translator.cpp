@@ -54,6 +54,11 @@ std::set<ModelType> SimulinkToAsn1Translator::getDependencies() const
     return dependencies;
 }
 
+std::set<ModelType> SimulinkToAsn1Translator::getOptionalDependencies() const
+{
+    return {};
+}
+
 std::vector<std::unique_ptr<Model>> SimulinkToAsn1Translator::translateModels(
         std::vector<Model *> sourceModels, const Options &options) const
 {

@@ -88,6 +88,11 @@ std::set<ModelType> SedsToIvTranslator::getDependencies() const
     return dependencies;
 }
 
+std::set<ModelType> SedsToIvTranslator::getOptionalDependencies() const
+{
+    return {};
+}
+
 std::vector<std::unique_ptr<Model>> SedsToIvTranslator::translateSedsModel(
         const SedsModel *sedsModel, ivm::IVPropertyTemplateConfig *ivConfig, const Options &options) const
 {

@@ -43,7 +43,16 @@ bool PromelaRegistrar::registerCapabilities(conversion::Registry &registry)
         return false;
     }
 
+    // the Asn1ToPromelaTranslator is registered twice
+    // the first configuration takes only Asn1  asn an input
     auto asn1ToPromelaTranslator = std::make_unique<Asn1ToPromelaTranslator>();
+    result = registry.registerTranslator(
+            { ModelType::Asn1 }, ModelType::PromelaData, std::move(asn1ToPromelaTranslator));
+    if (!result) {
+        return false;
+    }
+    // the second configuration takes Asn1 an IV as an input
+    asn1ToPromelaTranslator = std::make_unique<Asn1ToPromelaTranslator>();
     result = registry.registerTranslator(
             { ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, std::move(asn1ToPromelaTranslator));
     if (!result) {

@@ -74,12 +74,12 @@ using conversion::simulatortrail::SimulatorTrailRegistrar;
 using conversion::spintrail::SpinTrailOptions;
 using conversion::spintrail::SpinTrailRegistrar;
 using conversion::translator::TranslationException;
-using ivm::IVXMLWriter;
 using ivm::IVFunction;
 using ivm::IVFunctionType;
 using ivm::IVInterface;
 using ivm::IVModel;
 using ivm::IVObject;
+using ivm::IVXMLWriter;
 using shared::InterfaceParameter;
 using tmc::converter::TmcConverter;
 
@@ -430,6 +430,40 @@ size_t TmcConverter::getNumberOfProctypes() const
     return m_numberOfProctypes;
 }
 
+bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, const QString &outputFilepath)
+{
+    Q_EMIT message(QString("Converting ASN.1 files:\n"));
+    for (const QString &file : inputFilepathList) {
+        Q_EMIT message(QString("    %1\n").arg(file));
+    }
+    Q_EMIT message(QString("  to:\n"));
+    Q_EMIT message(QString("    %1\n").arg(outputFilepath));
+
+    Options options;
+
+    for (const QString &inputFileName : inputFilepathList) {
+        options.add(Asn1Options::inputFilepath, inputFileName);
+    }
+
+    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
+        QFileInfo subtypesFileInfo(subtypesFilepath);
+        options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
+    }
+
+    if (m_isRealTypeEnabled) {
+        options.add(PromelaOptions::enhancedSpinSupport);
+        options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
+    }
+
+    options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
+
+    options.add(PromelaOptions::outputFilepath, outputFilepath);
+
+    // when option PromelaOptions::asn1ValueGeneration is disabled
+    // then option IvOptions::inputFilepath is not required
+    return convertModel({ ModelType::Asn1  }, ModelType::PromelaData, {}, std::move(options));
+}
+
 bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceModelTypes,
         conversion::ModelType targetModelType, const std::set<conversion::ModelType> &auxilaryModelTypes,
         conversion::Options options)
@@ -571,40 +605,6 @@ bool TmcConverter::convertInterfaceview(const QString &inputFilepath, const QStr
 
     return convertModel(
             { ModelType::InterfaceView, ModelType::Asn1 }, ModelType::PromelaSystem, {}, std::move(options));
-}
-
-bool TmcConverter::convertDataview(
-        const QList<QString> &inputFilepathList, const QString &ivFilepath, const QString &outputFilepath)
-{
-    Q_EMIT message(QString("Converting ASN.1 files:\n"));
-    for (const QString &file : inputFilepathList) {
-        Q_EMIT message(QString("    %1\n").arg(file));
-    }
-    Q_EMIT message(QString("  to:\n"));
-    Q_EMIT message(QString("    %1\n").arg(outputFilepath));
-
-    Options options;
-
-    for (const QString &inputFileName : inputFilepathList) {
-        options.add(Asn1Options::inputFilepath, inputFileName);
-    }
-
-    for (const auto &subtypesFilepath : m_subtypesFilepaths) {
-        QFileInfo subtypesFileInfo(subtypesFilepath);
-        options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
-    }
-
-    if (m_isRealTypeEnabled) {
-        options.add(PromelaOptions::enhancedSpinSupport);
-        options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
-    }
-
-    options.add(IvOptions::inputFilepath, ivFilepath);
-    options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
-
-    options.add(PromelaOptions::outputFilepath, outputFilepath);
-
-    return convertModel({ ModelType::Asn1, ModelType::InterfaceView }, ModelType::PromelaData, {}, std::move(options));
 }
 
 bool TmcConverter::convertMscObservers(const QString &ivFilePath)
@@ -779,12 +779,14 @@ bool TmcConverter::createEnvGenerationInlines(const QFileInfo &inputDataView, co
         options.add(PromelaOptions::subtypesFilepath, subtypesFileInfo.absoluteFilePath());
     }
 
-    options.add(IvOptions::inputFilepath, ivFilepath);
     options.add(IvOptions::configFilepath, shared::interfaceCustomAttributesFilePath());
 
     options.add(PromelaOptions::outputFilepath, outputFilepath.absoluteFilePath());
 
+    // when option PromelaOptions::asn1ValueGeneration is enabled
+    // then option IvOptions::inputFilepath is required
     options.add(PromelaOptions::asn1ValueGeneration);
+    options.add(IvOptions::inputFilepath, ivFilepath);
     options.add(PromelaOptions::realGeneratorDelta, m_delta.value_or(""));
 
     for (const QString &datatype : envDatatypes) {
@@ -960,7 +962,7 @@ void TmcConverter::finishConversion()
     const QFileInfo simuDataView = simuDataViewLocation();
 
     const QFileInfo outputDataview = outputFilepath("dataview.pml");
-    if (!convertDataview(m_asn1Files, m_outputOptimizedIvFileName, outputDataview.absoluteFilePath())) {
+    if (!convertDataview(m_asn1Files, outputDataview.absoluteFilePath())) {
         return;
     }
 

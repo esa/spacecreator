@@ -42,7 +42,7 @@ using simulink::model::SimulinkModel;
 namespace conversion::iv::translator::simulink {
 
 // clang-format off
-const QStringList SimulinkToIvTranslator::m_supportedIVFunctionImplementations = 
+const QStringList SimulinkToIvTranslator::m_supportedIVFunctionImplementations =
 {
     "QGenC"
 };
@@ -77,6 +77,11 @@ std::set<ModelType> SimulinkToIvTranslator::getDependencies() const
 {
     static std::set<ModelType> dependencies { ModelType::Simulink };
     return dependencies;
+}
+
+std::set<ModelType> SimulinkToIvTranslator::getOptionalDependencies() const
+{
+    return {};
 }
 
 std::vector<std::unique_ptr<Model>> SimulinkToIvTranslator::translateSimulinkModel(

@@ -24,8 +24,10 @@
 #include <QString>
 #include <iostream>
 #include <shared/qstringhash.h>
+#include <tmc/TmcConverter/converter.h>
 #include <unordered_map>
 
+using tmc::converter::TmcConverter;
 using tmc::verifier::TmcVerifier;
 
 namespace {
@@ -77,6 +79,8 @@ void TmcExecutor::execute()
     bool isMulticastEnabled = false;
     bool verify = false;
     std::optional<int> sdl2promelaTimeout;
+    std::optional<QString> dataviewOutputPath;
+    QList<QString> inputAsn1Files;
 
     const QStringList args = QCoreApplication::arguments();
 
@@ -249,6 +253,27 @@ void TmcExecutor::execute()
             }
 
             sdl2promelaTimeout = value;
+        } else if (arg == "-dataview") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing filename after -dataview");
+                QCoreApplication::exit(EXIT_FAILURE);
+                return;
+            }
+            if (dataviewOutputPath.has_value()) {
+                qCritical("Duplicated -dataview argument");
+                QCoreApplication::exit(EXIT_FAILURE);
+                return;
+            }
+            ++i;
+            dataviewOutputPath = args[i];
+        } else if (arg == "-asn") {
+            if (i + 1 == args.size()) {
+                qCritical("Missing filename after -asn");
+                QCoreApplication::exit(EXIT_FAILURE);
+                return;
+            }
+            ++i;
+            inputAsn1Files.push_back(args[i]);
         } else if (arg == "-h" || arg == "--help") {
             qInfo("tmc: TASTE Model Checker");
             qInfo("Usage: tmc [OPTIONS]");
@@ -275,6 +300,8 @@ void TmcExecutor::execute()
             qInfo("  -delta <delta value>   Set delta for reals generation");
             qInfo("  -multicast             Enable support multicast connections in InterfaceView");
             qInfo("  -verify                Run whole verification process");
+            qInfo("  -dataview <name>       Translate only ASN.1 files, specified by -asn and save result to <name>");
+            qInfo("  -asn <name>            Use <name> as input file to translate ASN.1 to promela");
             qInfo("  -h, --help             Print this message and exit.");
             QCoreApplication::exit(EXIT_SUCCESS);
             return;
@@ -285,61 +312,83 @@ void TmcExecutor::execute()
         }
     }
 
-    if (!inputIvFilepath.has_value()) {
-        qCritical("Missing mandatory argument: input InterfaceView");
+    if (!inputIvFilepath.has_value() && !dataviewOutputPath.has_value()) {
+        qCritical("Missing mandatory argument: input InterfaceView or output Promela dataview");
         QCoreApplication::exit(EXIT_FAILURE);
         return;
     }
-    if (!outputDirectory.has_value()) {
-        qCritical("Missing mandatory argument: output directory");
-        QCoreApplication::exit(EXIT_FAILURE);
-        return;
-    }
-    if (!environmentFunctions.empty() && !keepFunctions.empty()) {
-        qCritical("-e and -k arguments cannot be combined");
+    if (inputIvFilepath.has_value() && dataviewOutputPath.has_value()) {
+        qCritical("The arguments input InterfaceView and output Promela dataview cannot be used simultaneously");
         QCoreApplication::exit(EXIT_FAILURE);
         return;
     }
 
-    m_verifier = std::make_unique<TmcVerifier>(inputIvFilepath.value(), outputDirectory.value());
-
-    connect(m_verifier.get(), SIGNAL(finished(bool)), this, SLOT(finished(bool)));
-    connect(m_verifier.get(), SIGNAL(verifierMessage(QString)), this, SLOT(verifierMessage(QString)));
-
-    m_verifier->setMscObserverFiles(mscObserverFiles);
-    m_verifier->setEnvironmentFunctions(environmentFunctions);
-    m_verifier->setKeepFunctions(keepFunctions);
-    m_verifier->setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
-    m_verifier->setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
-    m_verifier->setProcessesBasePriority(std::move(processesBasePriority));
-    m_verifier->setSubtypesFilepaths(subtypesFilepaths);
-    m_verifier->setDelta(delta);
-    m_verifier->setRealTypeEnabled(isRealTypeEnabled);
-    m_verifier->setMulticastEnabled(isMulticastEnabled);
-
-    if (!m_verifier->addStopConditionFiles(stopConditionFiles)) {
-        qCritical() << "Cannot attach stop condition file";
-        QCoreApplication::exit(EXIT_FAILURE);
-        return;
-    }
-    for (const auto &info : observerInfos) {
-        if (!m_verifier->attachObserver(extractObserverPath(info), extractObserverPriority(info))) {
-            qCritical() << "Cannot attach observer " << info;
+    if (inputIvFilepath.has_value()) {
+        if (!outputDirectory.has_value()) {
+            qCritical("Missing mandatory argument: output directory");
             QCoreApplication::exit(EXIT_FAILURE);
             return;
         }
-    }
-    if (sdl2promelaTimeout.has_value()) {
-        m_verifier->setSdl2PromelaTimeout(sdl2promelaTimeout.value());
-    }
+        if (!environmentFunctions.empty() && !keepFunctions.empty()) {
+            qCritical("-e and -k arguments cannot be combined");
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        }
 
-    if (m_verifier->execute(
-                verify ? TmcVerifier::ExecuteMode::ConvertAndVerify : TmcVerifier::ExecuteMode::ConvertOnly)) {
-        return;
+        m_verifier = std::make_unique<TmcVerifier>(inputIvFilepath.value(), outputDirectory.value());
+
+        connect(m_verifier.get(), SIGNAL(finished(bool)), this, SLOT(finished(bool)));
+        connect(m_verifier.get(), SIGNAL(verifierMessage(QString)), this, SLOT(verifierMessage(QString)));
+
+        m_verifier->setMscObserverFiles(mscObserverFiles);
+        m_verifier->setEnvironmentFunctions(environmentFunctions);
+        m_verifier->setKeepFunctions(keepFunctions);
+        m_verifier->setGlobalInputVectorLengthLimit(std::move(globalInputVectorLengthLimit));
+        m_verifier->setInterfaceInputVectorLengthLimits(std::move(interfaceInputVectorLengthLimits));
+        m_verifier->setProcessesBasePriority(std::move(processesBasePriority));
+        m_verifier->setSubtypesFilepaths(subtypesFilepaths);
+        m_verifier->setDelta(delta);
+        m_verifier->setRealTypeEnabled(isRealTypeEnabled);
+        m_verifier->setMulticastEnabled(isMulticastEnabled);
+
+        if (!m_verifier->addStopConditionFiles(stopConditionFiles)) {
+            qCritical() << "Cannot attach stop condition file";
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        }
+        for (const auto &info : observerInfos) {
+            if (!m_verifier->attachObserver(extractObserverPath(info), extractObserverPriority(info))) {
+                qCritical() << "Cannot attach observer " << info;
+                QCoreApplication::exit(EXIT_FAILURE);
+                return;
+            }
+        }
+        if (sdl2promelaTimeout.has_value()) {
+            m_verifier->setSdl2PromelaTimeout(sdl2promelaTimeout.value());
+        }
+
+        if (m_verifier->execute(
+                    verify ? TmcVerifier::ExecuteMode::ConvertAndVerify : TmcVerifier::ExecuteMode::ConvertOnly)) {
+            return;
+        } else {
+            qCritical() << "Cannot start verifier";
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        }
     } else {
-        qCritical() << "Cannot start verifier";
-        QCoreApplication::exit(EXIT_FAILURE);
-        return;
+        if (inputAsn1Files.empty()) {
+            qCritical("Missing input ASN.1 files");
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        }
+
+        auto converter = std::make_unique<TmcConverter>("", "");
+
+        connect(converter.get(), SIGNAL(message(QString)), this, SLOT(verifierMessage(QString)));
+        if (converter->convertDataview(inputAsn1Files, dataviewOutputPath.value())) {
+            QCoreApplication::exit(EXIT_FAILURE);
+        }
+        QCoreApplication::exit(EXIT_SUCCESS);
     }
 }
 

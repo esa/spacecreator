@@ -212,6 +212,11 @@ std::set<conversion::ModelType> SpinTrailToSimulatorTrailTranslator::getDependen
     return dependencies;
 }
 
+std::set<conversion::ModelType> SpinTrailToSimulatorTrailTranslator::getOptionalDependencies() const
+{
+    return {};
+}
+
 void SpinTrailToSimulatorTrailTranslator::findChannelNames(const SystemInfo &systemInfo,
         const Asn1Acn::Asn1Model &asn1Model, QMap<QString, ChannelInfo> &channels,
         QMap<QString, std::pair<ChannelInfo, bool>> &observerChannels) const

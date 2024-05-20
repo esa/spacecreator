@@ -52,9 +52,14 @@ std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateModels(
     const std::vector<QString> valueGeneration = options.values(PromelaOptions::asn1ValueGenerationForType);
 
     const auto *asn1Model = getModel<Asn1Model>(sourceModels);
-    const auto *ivModel = getModel<IVModel>(sourceModels);
+    const ivm::IVModel *ivModel = getOptionalModel<IVModel>(sourceModels);
 
     if (asn1ValueGeneration) {
+        if (ivModel == nullptr) {
+            // ivModel is required
+            auto message = QString("Missing source %1 model").arg(conversion::ModelProperties<IVModel>::name);
+            throw conversion::translator::TranslationException(std::move(message));
+        }
         QStringList typeNames;
         std::copy(valueGeneration.begin(), valueGeneration.end(), std::back_inserter(typeNames));
 
@@ -80,7 +85,12 @@ ModelType Asn1ToPromelaTranslator::getTargetModelType() const
 
 std::set<ModelType> Asn1ToPromelaTranslator::getDependencies() const
 {
-    return std::set<ModelType> { ModelType::Asn1, ModelType::InterfaceView };
+    return std::set<ModelType> { ModelType::Asn1 };
+}
+
+std::set<ModelType> Asn1ToPromelaTranslator::getOptionalDependencies() const
+{
+    return std::set<ModelType> { ModelType::InterfaceView };
 }
 
 std::vector<std::unique_ptr<Model>> Asn1ToPromelaTranslator::translateAsn1Model(
