@@ -100,6 +100,11 @@ std::set<ModelType> IvToPromelaTranslator::getDependencies() const
     return std::set<ModelType> { ModelType::InterfaceView, ModelType::Asn1 };
 }
 
+std::set<ModelType> IvToPromelaTranslator::getOptionalDependencies() const
+{
+    return {};
+}
+
 std::unique_ptr<SystemInfo> IvToPromelaTranslator::prepareSystemInfo(
         const ivm::IVModel *model, const conversion::Options &options) const
 {
