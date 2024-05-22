@@ -358,10 +358,7 @@ void IvToPromelaTranslator::prepareFunctionInfo(IvToPromelaTranslatorContext &co
                 || providedInterface->kind() == IVInterface::OperationKind::Unprotected) {
             // skip
         } else {
-            auto message = QString("Unallowed interface kind in function %1, only sporadic, protected and unprotected "
-                                   "interfaces are allowed")
-                                   .arg(functionName);
-            throw TranslationException(message);
+            // skip cyclic interfaces
         }
     }
     for (const IVInterface *requiredInterface : ivFunction->ris()) {
@@ -371,10 +368,7 @@ void IvToPromelaTranslator::prepareFunctionInfo(IvToPromelaTranslatorContext &co
                 || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
             prepareSynchronousCallInfo(context, functionName, requiredInterface, functionInfo);
         } else {
-            auto message = QString("Unallowed interface kind in function %1, only sporadic, protected and unprotected "
-                                   "interfaces are allowed")
-                                   .arg(functionName);
-            throw TranslationException(message);
+            // skip cyclic interfaces
         }
     }
     const QVector<shared::ContextParameter> parameters = ivFunction->contextParams();
@@ -445,10 +439,7 @@ void IvToPromelaTranslator::prepareEnvironmentFunctionInfo(IvToPromelaTranslator
                 || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
             // skip
         } else {
-            auto message = QString("Unallowed interface kind in function %1, only sporadic, protected and unprotected "
-                                   "required interfaces are allowed")
-                                   .arg(functionName);
-            throw TranslationException(message);
+            // skip cyclic interfaces
         }
     }
 }
