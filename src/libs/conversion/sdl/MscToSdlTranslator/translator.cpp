@@ -70,11 +70,6 @@ std::set<ModelType> MscToSdlTranslator::getDependencies() const
     return dependencies;
 }
 
-std::set<ModelType> MscToSdlTranslator::getOptionalDependencies() const
-{
-    return {};
-}
-
 std::vector<std::unique_ptr<Model>> MscToSdlTranslator::translateMscModel(
         const MscModel *mscModel, const Asn1Acn::File *asn1File, const IVModel *ivModel, const Options &options) const
 {

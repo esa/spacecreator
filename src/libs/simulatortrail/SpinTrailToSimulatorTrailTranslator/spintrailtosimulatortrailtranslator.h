@@ -67,12 +67,6 @@ public:
      * @return  Set of required models
      */
     std::set<conversion::ModelType> getDependencies() const override;
-    /**
-     * @brief   Provides a set of all source model types that are optional for the translation
-     *
-     * @return  Set of optional models
-     */
-    std::set<conversion::ModelType> getOptionalDependencies() const override;
 
 private:
     struct ChannelInfo {

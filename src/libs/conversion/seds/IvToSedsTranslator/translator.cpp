@@ -58,11 +58,6 @@ std::set<ModelType> IvToSedsTranslator::getDependencies() const
     return dependencies;
 }
 
-std::set<ModelType> IvToSedsTranslator::getOptionalDependencies() const
-{
-    return {};
-}
-
 std::vector<std::unique_ptr<Model>> IvToSedsTranslator::translateIvModel(
         const IVModel *ivModel, const Options &options) const
 {

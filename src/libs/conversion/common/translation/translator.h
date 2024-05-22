@@ -95,9 +95,11 @@ public:
     /**
      * @brief   Provides a set of all source model types that are optional for the translation
      *
+     * The default implementation returns empty set of dependencies.
+     *
      * @return  Set of optional models
      */
-    virtual auto getOptionalDependencies() const -> std::set<ModelType> = 0;
+    virtual auto getOptionalDependencies() const -> std::set<ModelType>;
     /**
      * @brief Get the specified model from the vector of models
      *

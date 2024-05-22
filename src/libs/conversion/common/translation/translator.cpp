@@ -21,6 +21,11 @@
 
 namespace conversion::translator {
 
+std::set<ModelType> Translator::getOptionalDependencies() const
+{
+    return {};
+}
+
 void Translator::checkSourceModelCount(const std::vector<Model *> &models) const
 {
     const auto requiredModelsCount = getDependencies().size();

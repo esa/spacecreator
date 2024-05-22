@@ -71,11 +71,6 @@ std::set<ModelType> SedsToSdlTranslator::getDependencies() const
     return dependencies;
 }
 
-std::set<ModelType> SedsToSdlTranslator::getOptionalDependencies() const
-{
-    return {};
-}
-
 std::vector<std::unique_ptr<Model>> SedsToSdlTranslator::translateSedsModel(
         const SedsModel *sedsModel, Asn1Acn::Asn1Model *asn1Model, ivm::IVModel *ivModel, const Options &options) const
 {

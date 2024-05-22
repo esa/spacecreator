@@ -79,11 +79,6 @@ std::set<ModelType> SimulinkToIvTranslator::getDependencies() const
     return dependencies;
 }
 
-std::set<ModelType> SimulinkToIvTranslator::getOptionalDependencies() const
-{
-    return {};
-}
-
 std::vector<std::unique_ptr<Model>> SimulinkToIvTranslator::translateSimulinkModel(
         const SimulinkModel &simulinkModel, IVPropertyTemplateConfig &ivConfig, const Options &options) const
 {
