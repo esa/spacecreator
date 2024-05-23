@@ -166,11 +166,14 @@ void Escaper::removeNonalphanumericCharacters(QString &name, const QChar &delime
 void Escaper::replaceDelimeters(
         QString &name, const std::vector<QChar> &srcDelimeters, const QChar &dstDelimeter, Qt::SplitBehavior behaviour)
 {
+    // create regexp in the form of [abc] where a, b and c are elements of srcDelimiters
+    // additionaly escape the dash '-', which has special meaning inside [] group
+    // the regexp is used to split
+    auto escape_dash = [](auto s, const QChar c) { return s + (c == '-' ? QString("\\-") : QString(c)); };
     const QString regexpString =
-            std::accumulate(srcDelimeters.begin(), srcDelimeters.end(), QString("["),
-                    [](auto s, const QChar c) { return s + (c == '-' ? QString("\\-") : QString(c)); })
-            + "]";
+            std::accumulate(srcDelimeters.begin(), srcDelimeters.end(), QString("["), escape_dash) + "]";
     const QRegularExpression re(regexpString);
+
     const QStringList parts = name.split(re, behaviour);
     name = parts.join(dstDelimeter);
 }
