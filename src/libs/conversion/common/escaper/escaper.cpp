@@ -168,10 +168,19 @@ void Escaper::replaceDelimeters(
 {
     // create regexp in the form of [abc] where a, b and c are elements of srcDelimiters
     // additionaly escape the dash '-', which has special meaning inside [] group
+    // and the backslash '\'
     // the regexp is used to split
-    auto escape_dash = [](auto s, const QChar c) { return s + (c == '-' ? QString("\\-") : QString(c)); };
+    auto escape_characters = [](auto s, const QChar c) {
+        if (c == '-') {
+            return s + "\\-";
+        }
+        if (c == '\\') {
+            return s + "\\\\";
+        }
+        return s + c;
+    };
     const QString regexpString =
-            std::accumulate(srcDelimeters.begin(), srcDelimeters.end(), QString("["), escape_dash) + "]";
+            std::accumulate(srcDelimeters.begin(), srcDelimeters.end(), QString("["), escape_characters) + "]";
     const QRegularExpression re(regexpString);
 
     const QStringList parts = name.split(re, behaviour);
