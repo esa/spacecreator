@@ -440,7 +440,7 @@ void IvToPromelaGenerator::generateEnvironmentProctype(const QString &functionNa
     if (limit.has_value()) {
         // If limit was set to 0, then we don't generate the loop at all
         if (*limit != 0) {
-            Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
+            Declaration iteratorVariable(DataType(BasicType::INT), "inputVectorCounter");
             sequence.appendElement(std::move(iteratorVariable));
 
             VariableRef iteratorVariableRef("inputVectorCounter");
@@ -536,7 +536,7 @@ void IvToPromelaGenerator::generateEnvironmentProctypeForSynchronousInterface(
     if (limit.has_value()) {
         // If limit was set to 0, then we don't generate the loop at all
         if (*limit != 0) {
-            Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
+            Declaration iteratorVariable(DataType(BasicType::INT), "inputVectorCounter");
             sequence.appendElement(std::move(iteratorVariable));
 
             VariableRef iteratorVariableRef("inputVectorCounter");

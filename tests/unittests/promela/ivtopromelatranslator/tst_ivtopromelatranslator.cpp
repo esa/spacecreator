@@ -41,6 +41,7 @@ using promela::model::DataType;
 using promela::model::Declaration;
 using promela::model::DoLoop;
 using promela::model::Expression;
+using promela::model::ForLoop;
 using promela::model::GoTo;
 using promela::model::InlineCall;
 using promela::model::InlineDef;
@@ -75,6 +76,7 @@ private Q_SLOTS:
     void testSynchronousInterfaces();
     void testChannelNames();
     void testEnvironmentCallsSynchronousInterface();
+    void testEnvironmentCallsSynchronousInterfaceWithLimit();
 
 private:
     template<typename T>
@@ -1558,6 +1560,71 @@ void tst_IvToPromelaTranslator::testEnvironmentCallsSynchronousInterface()
     QCOMPARE(mainLoop->getSequences().size(), 1);
 
     const Sequence &loopSequence = *mainLoop->getSequences().front();
+    QCOMPARE(loopSequence.getType(), Sequence::Type::ATOMIC);
+    QVERIFY(!loopSequence.isEmpty());
+
+    const InlineCall *genValueCall = findProctypeElement<InlineCall>(loopSequence, 0);
+    QVERIFY(genValueCall != nullptr);
+    QCOMPARE(genValueCall->getName(), "MyInteger_generate_value");
+    QCOMPARE(genValueCall->getArguments().size(), 1);
+    const ChannelRecv *lockAcquire = findProctypeElement<ChannelRecv>(loopSequence, 1);
+    QVERIFY(lockAcquire != nullptr);
+    QCOMPARE(lockAcquire->getChannelRef().getElements().size(), 1);
+    QCOMPARE(lockAcquire->getChannelRef().getElements().front().m_name, "Actuator_lock");
+    const InlineCall *interfaceCall = findProctypeElement<InlineCall>(loopSequence, 2);
+    QVERIFY(interfaceCall != nullptr);
+    QCOMPARE(interfaceCall->getName(), "Actuator_0_PI_0_set_position");
+    QCOMPARE(interfaceCall->getArguments().size(), 1);
+    const ChannelSend *lockRelease = findProctypeElement<ChannelSend>(loopSequence, 3);
+    QVERIFY(lockRelease != nullptr);
+    QCOMPARE(lockRelease->getChannelRef().getElements().size(), 1);
+    QCOMPARE(lockRelease->getChannelRef().getElements().front().m_name, "Actuator_lock");
+}
+
+void tst_IvToPromelaTranslator::testEnvironmentCallsSynchronousInterfaceWithLimit()
+{
+    std::unique_ptr<ivm::IVModel> ivModel = importIvModel("env_calls_sync.xml");
+    QVERIFY(ivModel);
+
+    conversion::Options options;
+    options.add(PromelaOptions::environmentFunctionName, "controller");
+    options.add(PromelaOptions::modelFunctionName, "actuator");
+    options.add(PromelaOptions::globalInputVectorLengthLimit, "3");
+
+    std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
+    QVERIFY(promelaModel);
+
+    QCOMPARE(promelaModel->getProctypes().size(), 1);
+    const Proctype *proctype = findProctype(promelaModel->getProctypes(), "Controller_set_position");
+    QVERIFY(proctype != nullptr);
+    QVERIFY(proctype->isActive());
+    QCOMPARE(proctype->getInstancesCount(), 1);
+    const Sequence &main = proctype->getSequence();
+
+    const Expression *wait_for_init = findProctypeElement<Expression>(main, 0);
+    QVERIFY(wait_for_init != nullptr);
+    const Declaration *parameterDeclaration = findProctypeElement<Declaration>(main, 1);
+    QVERIFY(parameterDeclaration != nullptr);
+    QCOMPARE(parameterDeclaration->getName(), "value_1");
+    QVERIFY(parameterDeclaration->getType().isUtypeReference());
+    QCOMPARE(parameterDeclaration->getType().getUtypeReference().getName(), "MyInteger");
+
+    const Declaration *limitVariableDeclaration = findProctypeElement<Declaration>(main, 2);
+    QVERIFY(limitVariableDeclaration != nullptr);
+    QCOMPARE(limitVariableDeclaration->getName(), "inputVectorCounter");
+    QVERIFY(limitVariableDeclaration->getType().isBasicType());
+    QCOMPARE(limitVariableDeclaration->getType().getBasicType(), BasicType::INT);
+
+    const ForLoop *mainLoop = findProctypeElement<ForLoop>(main, 3);
+    QVERIFY(mainLoop != nullptr);
+
+    QCOMPARE(mainLoop->getType(), ForLoop::Type::RANGE);
+    QCOMPARE(mainLoop->getForVariable().getElements().size(), 1);
+    QCOMPARE(mainLoop->getForVariable().getElements().front().m_name, "inputVectorCounter");
+    QCOMPARE(mainLoop->getFirstIntValue(), 0);
+    QCOMPARE(mainLoop->getLastIntValue(), 2);
+
+    const Sequence &loopSequence = *mainLoop->getSequence();
     QCOMPARE(loopSequence.getType(), Sequence::Type::ATOMIC);
     QVERIFY(!loopSequence.isEmpty());
 
