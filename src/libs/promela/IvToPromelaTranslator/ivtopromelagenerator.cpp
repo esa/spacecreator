@@ -513,11 +513,11 @@ void IvToPromelaGenerator::generateEnvironmentProctypeForSynchronousInterface(
     for (auto targetIter = info.m_targets.begin(); targetIter != info.m_targets.end(); ++targetIter) {
         const RequiredCallInfo::TargetInfo &targetInfo = targetIter->second;
         if (info.m_isProtected) {
-            sequence.appendElement(createLockAcquireStatement(targetInfo.m_targetFunctionName));
+            loopSequence->appendElement(createLockAcquireStatement(targetInfo.m_targetFunctionName));
         }
         loopSequence->appendElement(InlineCall(targetInfo.m_providedInlineName, callArguments));
         if (info.m_isProtected) {
-            sequence.appendElement(createLockReleaseStatement(targetInfo.m_targetFunctionName));
+            loopSequence->appendElement(createLockReleaseStatement(targetInfo.m_targetFunctionName));
         }
     }
 
