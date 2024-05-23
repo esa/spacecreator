@@ -461,7 +461,7 @@ bool TmcConverter::convertDataview(const QList<QString> &inputFilepathList, cons
 
     // when option PromelaOptions::asn1ValueGeneration is disabled
     // then option IvOptions::inputFilepath is not required
-    return convertModel({ ModelType::Asn1  }, ModelType::PromelaData, {}, std::move(options));
+    return convertModel({ ModelType::Asn1 }, ModelType::PromelaData, {}, std::move(options));
 }
 
 bool TmcConverter::convertModel(const std::set<conversion::ModelType> &sourceModelTypes,
@@ -752,7 +752,11 @@ void TmcConverter::findEnvironmentDatatypes(
         for (const IVInterface *interface : requiredInterfaces) {
             QVector<InterfaceParameter> parameters = interface->params();
             if (parameters.size() > 1) {
-                // TODO report an error
+                for (const auto &param : parameters) {
+                    if (param.direction() == InterfaceParameter::Direction::IN) {
+                        envDataTypes.append(param.paramTypeName());
+                    }
+                }
             } else if (parameters.size() == 1) {
                 envDataTypes.append(parameters.front().paramTypeName());
             }

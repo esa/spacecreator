@@ -55,7 +55,12 @@ public:
      * @return Sequence type
      */
     Type getType() const noexcept;
-
+    /**
+     * @brief Check if Sequence is empty
+     *
+     * @return true if sequence is empty, otherwise false
+     */
+    bool isEmpty() const noexcept;
     /**
      * @brief Getter for content of sequence
      *

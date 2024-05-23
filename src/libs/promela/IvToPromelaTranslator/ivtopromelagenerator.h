@@ -47,6 +47,8 @@ private:
             -> std::unique_ptr<model::ProctypeElement>;
     auto generateEnvironmentProctype(const QString &functionName, const QString &interfaceName,
             const std::pair<QString, QString> &interfaceParameter, const QString &sendInline) -> void;
+    auto generateEnvironmentProctypeForSynchronousInterface(const QString &functionName, const RequiredCallInfo &info)
+            -> void;
     auto generateSendInline(const QString &functionName, const QString &interfaceName,
             const QString &sourceFunctionName, const QString &sourceInterfaceName, const QString &channelName,
             const QString &parameterType, const QString &parameterName) -> void;

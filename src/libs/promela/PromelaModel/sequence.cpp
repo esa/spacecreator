@@ -32,6 +32,11 @@ Sequence::Type Sequence::getType() const noexcept
     return m_type;
 }
 
+bool Sequence::isEmpty() const noexcept
+{
+    return m_content.empty();
+}
+
 const std::list<std::unique_ptr<ProctypeElement>> &Sequence::getContent() const noexcept
 {
     return m_content;

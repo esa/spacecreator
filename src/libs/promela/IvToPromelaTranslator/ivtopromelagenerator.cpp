@@ -469,6 +469,102 @@ void IvToPromelaGenerator::generateEnvironmentProctype(const QString &functionNa
     m_context.model()->addProctype(std::move(proctype));
 }
 
+void IvToPromelaGenerator::generateEnvironmentProctypeForSynchronousInterface(
+        const QString &functionName, const RequiredCallInfo &info)
+{
+    const QString interfaceName = info.m_interfaceName;
+
+    Sequence sequence(Sequence::Type::NORMAL);
+    sequence.appendElement(createWaitForInitStatement());
+
+    // declare variables for parameters
+    size_t index = 1;
+    for (const RequiredCallInfo::ParameterInfo &param : info.m_parameters) {
+        const QString variableName = QString("value_%1").arg(index);
+        sequence.appendElement(
+                Declaration(DataType(UtypeRef(Escaper::escapePromelaName(param.m_parameterType))), variableName));
+        ++index;
+    }
+
+    const auto &globalInputVectorLengthLimit = m_context.options().value(PromelaOptions::globalInputVectorLengthLimit);
+    const auto &interfaceInputVectorLenghtLimit =
+            m_context.options().value(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()));
+
+    std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
+
+    QList<InlineCall::Argument> callArguments;
+    index = 1;
+    for (const RequiredCallInfo::ParameterInfo &param : info.m_parameters) {
+        const QString variableName = QString("value_%1").arg(index);
+        callArguments.append(VariableRef(variableName));
+
+        if (!param.m_isOutput) {
+            // generate values only for input parameters
+            const auto parameterSubtype = handleParameterSubtype(Escaper::escapePromelaName(param.m_parameterType),
+                    param.m_parameterName, interfaceName, functionName);
+            const QString generateValueInlineName = QString("%1_generate_value").arg(parameterSubtype);
+            QList<InlineCall::Argument> generateValueArguments;
+            generateValueArguments.append(VariableRef(variableName));
+            loopSequence->appendElement(InlineCall(generateValueInlineName, generateValueArguments));
+        }
+        ++index;
+    }
+
+    for (auto targetIter = info.m_targets.begin(); targetIter != info.m_targets.end(); ++targetIter) {
+        const RequiredCallInfo::TargetInfo &targetInfo = targetIter->second;
+        if (info.m_isProtected) {
+            sequence.appendElement(createLockAcquireStatement(targetInfo.m_targetFunctionName));
+        }
+        loopSequence->appendElement(InlineCall(targetInfo.m_providedInlineName, callArguments));
+        if (info.m_isProtected) {
+            sequence.appendElement(createLockReleaseStatement(targetInfo.m_targetFunctionName));
+        }
+    }
+
+    // clang-format off
+    auto limit = [&]() -> std::optional<int> {
+        if (interfaceInputVectorLenghtLimit.has_value()) {
+            return interfaceInputVectorLenghtLimit->toInt();
+        } else if (globalInputVectorLengthLimit.has_value()) {
+            return globalInputVectorLengthLimit->toInt();
+        } else {
+            return std::nullopt;
+        }
+    }();
+    // clang-format on
+
+    if (limit.has_value()) {
+        // If limit was set to 0, then we don't generate the loop at all
+        if (*limit != 0) {
+            Declaration iteratorVariable(DataType(UtypeRef("int")), "inputVectorCounter");
+            sequence.appendElement(std::move(iteratorVariable));
+
+            VariableRef iteratorVariableRef("inputVectorCounter");
+            Expression firstExpression(0);
+            Expression lastExpression(*limit - 1);
+
+            ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
+
+            sequence.appendElement(std::move(loop));
+        }
+    } else {
+        DoLoop loop;
+        loop.appendSequence(std::move(loopSequence));
+
+        sequence.appendElement(std::move(loop));
+    }
+
+    const QString proctypeName = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
+
+    std::unique_ptr<Proctype> proctype = std::make_unique<Proctype>(proctypeName, std::move(sequence));
+
+    proctype->setActive(true);
+    proctype->setInstancesCount(1);
+    proctype->setPriority(1);
+
+    m_context.model()->addProctype(std::move(proctype));
+}
+
 std::unique_ptr<model::ProctypeElement> IvToPromelaGenerator::createWaitForInitStatement()
 {
     return std::make_unique<ProctypeElement>(Expression(VariableRef(m_systemInitedVariableName)));
@@ -688,6 +784,10 @@ void IvToPromelaGenerator::createPromelaObjectsForEnvironment(
 
     if (m_context.isMulticastSupported()) {
         createSenderPidVariable(m_context.model(), functionName);
+    }
+
+    for (auto iter = functionInfo.m_synchronousCalls.begin(); iter != functionInfo.m_synchronousCalls.end(); ++iter) {
+        generateEnvironmentProctypeForSynchronousInterface(functionName, *iter->second);
     }
 }
 

@@ -437,7 +437,7 @@ void IvToPromelaTranslator::prepareEnvironmentFunctionInfo(IvToPromelaTranslator
             functionInfo.m_environmentSourceProctypes.emplace(proctypeName, std::move(proctypeInfo));
         } else if (requiredInterface->kind() == IVInterface::OperationKind::Protected
                 || requiredInterface->kind() == IVInterface::OperationKind::Unprotected) {
-            // skip
+            prepareSynchronousCallInfo(context, functionName, requiredInterface, functionInfo);
         } else {
             // skip cyclic interfaces
         }

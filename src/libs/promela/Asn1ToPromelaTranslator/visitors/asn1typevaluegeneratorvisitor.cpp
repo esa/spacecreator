@@ -95,6 +95,7 @@ using promela::model::ProctypeElement;
 using promela::model::PromelaModel;
 using promela::model::RealConstant;
 using promela::model::Select;
+using promela::model::Skip;
 using promela::model::UtypeRef;
 using promela::model::ValueDefinition;
 using promela::model::VariableRef;
@@ -412,6 +413,11 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
                 sequence.appendElement(std::move(asnSequenceComponentInlineCall));
             }
         }
+    }
+
+    if (sequence.isEmpty()) {
+        // is is empty if the ASN.1 definiton is SEQUENCE { }
+        sequence.appendElement(Skip());
     }
 
     auto inlineDef = std::make_unique<InlineDef>(inlineSeqGeneratorName, inlineArguments, std::move(sequence));
