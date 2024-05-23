@@ -1,33 +1,33 @@
 #define SimpleChoiceWithAnonymousTypes_alt1_PRESENT 1
 #define SimpleChoiceWithAnonymousTypes_alt2_PRESENT 2
-inline SimpleChoiceWithAnonymousTypes_alt1_generate_value(SimpleChoiceWithAnonymousTypes_alt1_gv)
+inline SimpleChoiceWithAnonymousTypes__alt1_generate_value(SimpleChoiceWithAnonymousTypes__alt1_gv)
 {
-    int SimpleChoiceWithAnonymousTypes_alt1_tmp;
+    int SimpleChoiceWithAnonymousTypes__alt1_tmp;
     if
     ::  atomic {
-        select (SimpleChoiceWithAnonymousTypes_alt1_tmp : 0 .. 5);
+        select (SimpleChoiceWithAnonymousTypes__alt1_tmp : 0 .. 5);
     }
     fi;
-    SimpleChoiceWithAnonymousTypes_alt1_gv = SimpleChoiceWithAnonymousTypes_alt1_tmp;
+    SimpleChoiceWithAnonymousTypes__alt1_gv = SimpleChoiceWithAnonymousTypes__alt1_tmp;
 }
-inline SimpleChoiceWithAnonymousTypes_alt2_generate_value(SimpleChoiceWithAnonymousTypes_alt2_gv)
+inline SimpleChoiceWithAnonymousTypes__alt2_generate_value(SimpleChoiceWithAnonymousTypes__alt2_gv)
 {
-    int SimpleChoiceWithAnonymousTypes_alt2_tmp;
+    int SimpleChoiceWithAnonymousTypes__alt2_tmp;
     if
     ::  atomic {
-        select (SimpleChoiceWithAnonymousTypes_alt2_tmp : -1 .. 1);
+        select (SimpleChoiceWithAnonymousTypes__alt2_tmp : -1 .. 1);
     }
     fi;
-    SimpleChoiceWithAnonymousTypes_alt2_gv = SimpleChoiceWithAnonymousTypes_alt2_tmp;
+    SimpleChoiceWithAnonymousTypes__alt2_gv = SimpleChoiceWithAnonymousTypes__alt2_tmp;
 }
 inline SimpleChoiceWithAnonymousTypes_generate_value(SimpleChoiceWithAnonymousTypes_gv)
 {
     if
     ::  true;
-        SimpleChoiceWithAnonymousTypes_alt1_generate_value(SimpleChoiceWithAnonymousTypes_gv.data.alt1);
+        SimpleChoiceWithAnonymousTypes__alt1_generate_value(SimpleChoiceWithAnonymousTypes_gv.data.alt1);
         SimpleChoiceWithAnonymousTypes_gv.selection = SimpleChoiceWithAnonymousTypes_alt1_PRESENT;
     ::  true;
-        SimpleChoiceWithAnonymousTypes_alt2_generate_value(SimpleChoiceWithAnonymousTypes_gv.data.alt2);
+        SimpleChoiceWithAnonymousTypes__alt2_generate_value(SimpleChoiceWithAnonymousTypes_gv.data.alt2);
         SimpleChoiceWithAnonymousTypes_gv.selection = SimpleChoiceWithAnonymousTypes_alt2_PRESENT;
     fi;
 }

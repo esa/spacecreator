@@ -1,41 +1,41 @@
-inline EnvParamSeq_x_generate_value(EnvParamSeq_x_gv)
+inline EnvParamSeq__x_generate_value(EnvParamSeq__x_gv)
 {
-    int EnvParamSeq_x_tmp;
+    int EnvParamSeq__x_tmp;
     if
     ::  atomic {
-        select (EnvParamSeq_x_tmp : 0 .. 9);
+        select (EnvParamSeq__x_tmp : 0 .. 9);
     }
     fi;
-    EnvParamSeq_x_gv = EnvParamSeq_x_tmp;
+    EnvParamSeq__x_gv = EnvParamSeq__x_tmp;
 }
-inline EnvParamSeq_y_generate_value(EnvParamSeq_y_gv)
+inline EnvParamSeq__y_generate_value(EnvParamSeq__y_gv)
 {
-    int EnvParamSeq_y_tmp;
+    int EnvParamSeq__y_tmp;
     if
     ::  atomic {
-        select (EnvParamSeq_y_tmp : 0 .. 7);
+        select (EnvParamSeq__y_tmp : 0 .. 7);
     }
     fi;
-    EnvParamSeq_y_gv = EnvParamSeq_y_tmp;
+    EnvParamSeq__y_gv = EnvParamSeq__y_tmp;
 }
-inline EnvParamSeq_z_generate_value(EnvParamSeq_z_gv)
+inline EnvParamSeq__z_generate_value(EnvParamSeq__z_gv)
 {
     if
     ::  true;
-        EnvParamSeq_z_gv = 1;
+        EnvParamSeq__z_gv = 1;
     ::  true;
-        EnvParamSeq_z_gv = 0;
+        EnvParamSeq__z_gv = 0;
     fi;
 }
 inline EnvParamSeq_generate_value(EnvParamSeq_gv)
 {
-    EnvParamSeq_x_generate_value(EnvParamSeq_gv.x);
+    EnvParamSeq__x_generate_value(EnvParamSeq_gv.x);
     if
     ::  true;
-        EnvParamSeq_y_generate_value(EnvParamSeq_gv.y);
+        EnvParamSeq__y_generate_value(EnvParamSeq_gv.y);
         EnvParamSeq_gv.exist.y = 1;
     ::  true;
         EnvParamSeq_gv.exist.y = 0;
     fi;
-    EnvParamSeq_z_generate_value(EnvParamSeq_gv.z);
+    EnvParamSeq__z_generate_value(EnvParamSeq_gv.z);
 }

@@ -1,18 +1,18 @@
-inline Outer_sequence_memberSequence_memberInt_generate_value(Outer_sequence_memberSequence_memberInt_gv)
+inline Outer_sequence__memberSequence__memberInt_generate_value(Outer_sequence__memberSequence__memberInt_gv)
 {
-    int Outer_sequence_memberSequence_memberInt_tmp;
+    int Outer_sequence__memberSequence__memberInt_tmp;
     if
     ::  atomic {
-        select (Outer_sequence_memberSequence_memberInt_tmp : 0 .. 10);
+        select (Outer_sequence__memberSequence__memberInt_tmp : 0 .. 10);
     }
     fi;
-    Outer_sequence_memberSequence_memberInt_gv = Outer_sequence_memberSequence_memberInt_tmp;
+    Outer_sequence__memberSequence__memberInt_gv = Outer_sequence__memberSequence__memberInt_tmp;
 }
-inline Outer_sequence_memberSequence_generate_value(Outer_sequence_memberSequence_gv)
+inline Outer_sequence__memberSequence_generate_value(Outer_sequence__memberSequence_gv)
 {
-    Outer_sequence_memberSequence_memberInt_generate_value(Outer_sequence_memberSequence_gv.memberInt);
+    Outer_sequence__memberSequence__memberInt_generate_value(Outer_sequence__memberSequence_gv.memberInt);
 }
 inline Outer_sequence_generate_value(Outer_sequence_gv)
 {
-    Outer_sequence_memberSequence_generate_value(Outer_sequence_gv.memberSequence);
+    Outer_sequence__memberSequence_generate_value(Outer_sequence_gv.memberSequence);
 }
