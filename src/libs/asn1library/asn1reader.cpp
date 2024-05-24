@@ -497,7 +497,7 @@ bool Asn1Reader::convertToXML(
     if (asn1CompilerTimeoutSetting.isValid()) {
         bool convOk = false;
         int value = asn1CompilerTimeoutSetting.toInt(&convOk);
-        if (convOk) {
+        if (convOk && value != 0) {
             asn1CompilerTimeout = value * 1000;
         }
     }
