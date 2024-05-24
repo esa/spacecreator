@@ -406,10 +406,6 @@ void IvToPromelaGenerator::generateEnvironmentProctype(const QString &functionNa
         sequence.appendElement(Declaration(DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), "value"));
     }
 
-    const auto &globalInputVectorLengthLimit = m_context.options().value(PromelaOptions::globalInputVectorLengthLimit);
-    const auto &interfaceInputVectorLenghtLimit =
-            m_context.options().value(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()));
-
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
     QList<InlineCall::Argument> sendInlineArguments;
@@ -425,48 +421,7 @@ void IvToPromelaGenerator::generateEnvironmentProctype(const QString &functionNa
 
     loopSequence->appendElement(InlineCall(sendInline, sendInlineArguments));
 
-    // clang-format off
-    auto limit = [&]() -> std::optional<int> {
-        if (interfaceInputVectorLenghtLimit.has_value()) {
-            return interfaceInputVectorLenghtLimit->toInt();
-        } else if (globalInputVectorLengthLimit.has_value()) {
-            return globalInputVectorLengthLimit->toInt();
-        } else {
-            return std::nullopt;
-        }
-    }();
-    // clang-format on
-
-    if (limit.has_value()) {
-        // If limit was set to 0, then we don't generate the loop at all
-        if (*limit != 0) {
-            Declaration iteratorVariable(DataType(BasicType::INT), "inputVectorCounter");
-            sequence.appendElement(std::move(iteratorVariable));
-
-            VariableRef iteratorVariableRef("inputVectorCounter");
-            Expression firstExpression(0);
-            Expression lastExpression(*limit - 1);
-
-            ForLoop loop(std::move(iteratorVariableRef), firstExpression, lastExpression, std::move(loopSequence));
-
-            sequence.appendElement(std::move(loop));
-        }
-    } else {
-        DoLoop loop;
-        loop.appendSequence(std::move(loopSequence));
-
-        sequence.appendElement(std::move(loop));
-    }
-
-    const QString proctypeName = QString("%1_%2").arg(Escaper::escapePromelaIV(functionName)).arg(interfaceName);
-
-    std::unique_ptr<Proctype> proctype = std::make_unique<Proctype>(proctypeName, std::move(sequence));
-
-    proctype->setActive(true);
-    proctype->setInstancesCount(1);
-    proctype->setPriority(1);
-
-    m_context.model()->addProctype(std::move(proctype));
+    addEnvironmentProctype(functionName, interfaceName, std::move(sequence), std::move(loopSequence));
 }
 
 void IvToPromelaGenerator::generateEnvironmentProctypeForSynchronousInterface(
@@ -485,10 +440,6 @@ void IvToPromelaGenerator::generateEnvironmentProctypeForSynchronousInterface(
                 Declaration(DataType(UtypeRef(Escaper::escapePromelaName(param.m_parameterType))), variableName));
         ++index;
     }
-
-    const auto &globalInputVectorLengthLimit = m_context.options().value(PromelaOptions::globalInputVectorLengthLimit);
-    const auto &interfaceInputVectorLenghtLimit =
-            m_context.options().value(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()));
 
     std::unique_ptr<Sequence> loopSequence = std::make_unique<Sequence>(Sequence::Type::ATOMIC);
 
@@ -520,6 +471,16 @@ void IvToPromelaGenerator::generateEnvironmentProctypeForSynchronousInterface(
             loopSequence->appendElement(createLockReleaseStatement(targetInfo.m_targetFunctionName));
         }
     }
+
+    addEnvironmentProctype(functionName, interfaceName, std::move(sequence), std::move(loopSequence));
+}
+
+void IvToPromelaGenerator::addEnvironmentProctype(const QString &functionName, const QString &interfaceName,
+        Sequence sequence, std::unique_ptr<Sequence> loopSequence)
+{
+    const auto &globalInputVectorLengthLimit = m_context.options().value(PromelaOptions::globalInputVectorLengthLimit);
+    const auto &interfaceInputVectorLenghtLimit =
+            m_context.options().value(PromelaOptions::interfaceInputVectorLengthLimit.arg(interfaceName.toLower()));
 
     // clang-format off
     auto limit = [&]() -> std::optional<int> {

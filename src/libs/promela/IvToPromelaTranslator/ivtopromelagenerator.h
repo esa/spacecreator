@@ -49,6 +49,8 @@ private:
             const std::pair<QString, QString> &interfaceParameter, const QString &sendInline) -> void;
     auto generateEnvironmentProctypeForSynchronousInterface(const QString &functionName, const RequiredCallInfo &info)
             -> void;
+    auto addEnvironmentProctype(const QString &functionName, const QString &interfaceName,
+            promela::model::Sequence sequence, std::unique_ptr<promela::model::Sequence> loopSequence) -> void;
     auto generateSendInline(const QString &functionName, const QString &interfaceName,
             const QString &sourceFunctionName, const QString &sourceInterfaceName, const QString &channelName,
             const QString &parameterType, const QString &parameterName) -> void;

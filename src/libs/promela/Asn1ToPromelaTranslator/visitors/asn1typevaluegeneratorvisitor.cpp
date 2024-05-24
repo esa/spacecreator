@@ -416,7 +416,8 @@ void Asn1TypeValueGeneratorVisitor::visit(const Sequence &type)
     }
 
     if (sequence.isEmpty()) {
-        // is is empty if the ASN.1 definiton is SEQUENCE { }
+        // the sequence is empty when the ASN.1 definiton is SEQUENCE { }
+        // the _assign_value inline does nothing
         sequence.appendElement(Skip());
     }
 
