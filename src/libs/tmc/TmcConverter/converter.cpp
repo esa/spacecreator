@@ -753,7 +753,7 @@ void TmcConverter::findEnvironmentDatatypes(
     // (or at least the read operation returns undefined value).
     // The interface kind is ignored here.
     // Sporadic interface has at most one input parameter.
-    // Sync interfaces has both input and output parameters.
+    // Sync interfaces have both input and output parameters.
     for (const QString &functionName : envFunctions) {
         IVFunction *function = model.getFunction(functionName, Qt::CaseSensitivity::CaseInsensitive);
         QVector<IVInterface *> requiredInterfaces = function->ris();
