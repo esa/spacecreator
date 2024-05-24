@@ -41,6 +41,7 @@ QWidget *Asn1SccOption::widget()
         QSettings settings;
         m_widget->setCompiler(settings.value(Constants::SETTINGS_ASN_COMPILER_KEY).toString());
         m_widget->setParameter(settings.value(Constants::SETTINGS_ASN_COMPILER_PARAMETER_KEY).toString());
+        m_widget->setTimeout(settings.value(Constants::SETTINGS_ASN_COMPILER_TIMEOUT).toString());
     }
     return m_widget;
 }
@@ -54,6 +55,7 @@ void Asn1SccOption::apply()
     QSettings setting;
     setting.setValue(Constants::SETTINGS_ASN_COMPILER_KEY, m_widget->compiler());
     setting.setValue(Constants::SETTINGS_ASN_COMPILER_PARAMETER_KEY, m_widget->parameter());
+    setting.setValue(Constants::SETTINGS_ASN_COMPILER_TIMEOUT, m_widget->timeout());
 }
 
 void Asn1SccOption::finish()

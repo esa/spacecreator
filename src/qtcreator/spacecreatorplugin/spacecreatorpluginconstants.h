@@ -82,6 +82,7 @@ const char SETTINGS_TMC_ID[] = "G.SpaceCreator.TMC";
 const char SETTINGS_CATEGORY[] = "K.SpaceCreator";
 const QString SETTINGS_ASN_COMPILER_KEY = { "SpaceCreator/asn1compiler" };
 const QString SETTINGS_ASN_COMPILER_PARAMETER_KEY = { "SpaceCreator/asn1compilerparameter" };
+const QString SETTINGS_ASN_COMPILER_TIMEOUT = { "SpaceCreator/asn1compilertimeout" };
 
 // Context
 const char SCL_BASE_CONTEXT[] = "Scl.BaseContext";

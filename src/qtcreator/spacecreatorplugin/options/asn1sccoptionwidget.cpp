@@ -68,4 +68,14 @@ QString Asn1SccOptionWidget::parameter() const
     return ui->parameterLineEdit->text();
 }
 
+void Asn1SccOptionWidget::setTimeout(const QString &timeout)
+{
+    ui->timeoutLineEdit->setText(timeout);
+}
+
+QString Asn1SccOptionWidget::timeout() const
+{
+    return ui->timeoutLineEdit->text();
+}
+
 }

@@ -22,6 +22,9 @@ public:
     void setParameter(const QString &parameter);
     QString parameter() const;
 
+    void setTimeout(const QString &timeout);
+    QString timeout() const;
+
 private:
     Ui::Asn1SccOptionWidget *ui;
 };

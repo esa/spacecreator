@@ -491,6 +491,17 @@ bool Asn1Reader::convertToXML(
         return false;
     }
 
+    QSettings settings;
+    QVariant asn1CompilerTimeoutSetting = settings.value("SpaceCreator/asn1compilertimeout").toInt();
+    int asn1CompilerTimeout = 60000;
+    if (asn1CompilerTimeoutSetting.isValid()) {
+        bool convOk = false;
+        int value = asn1CompilerTimeoutSetting.toInt(&convOk);
+        if (convOk) {
+            asn1CompilerTimeout = value * 1000;
+        }
+    }
+
     // Add parameters for output xml file
     QString asn1XMLFileName = temporaryFileName("asn1", "xml");
     parameters << asn1XMLFileName;
@@ -517,7 +528,7 @@ bool Asn1Reader::convertToXML(
     asn1Process->setProgram(asn1Compiler);
     asn1Process->setArguments(parameters);
     asn1Process->start();
-    asn1Process->waitForFinished(60000);
+    asn1Process->waitForFinished(asn1CompilerTimeout);
 
     const int exitCode = asn1Process->exitCode();
     QByteArray error = asn1Process->readAll();
