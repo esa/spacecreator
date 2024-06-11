@@ -22,12 +22,15 @@
 #include "sequencecomponentvaluevisitor.h"
 #include "sizeconstraintvisitor.h"
 
+#include <QDebug>
 #include <asn1library/asn1/choicevalue.h>
 #include <asn1library/asn1/multiplevalue.h>
 #include <asn1library/asn1/namedvalue.h>
 #include <asn1library/asn1/singlevalue.h>
 #include <asn1library/asn1/types/choice.h>
+#include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/userdefinedtype.h>
@@ -41,7 +44,9 @@ using Asn1Acn::ChoiceValue;
 using Asn1Acn::IntegerValue;
 using Asn1Acn::MultipleValue;
 using Asn1Acn::NamedValue;
+using Asn1Acn::OctetStringValue;
 using Asn1Acn::SingleValue;
+using Asn1Acn::StringValue;
 using Asn1Acn::Value;
 using Asn1Acn::ValuePtr;
 using Asn1Acn::Types::BitString;
@@ -99,31 +104,70 @@ void ValueAssignmentVisitor::visit(const Boolean &type)
 void ValueAssignmentVisitor::visit(const Null &type)
 {
     Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for NULL datatype");
+    throw ConverterException(QString("Value assignment is not implemented for %1, NULL datatype").arg(m_typeName));
 }
 
 void ValueAssignmentVisitor::visit(const BitString &type)
 {
     Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for BIT STRING datatype");
+    throw ConverterException(
+            QString("Value assignment is not implemented for %1, BIT STRING datatype").arg(m_typeName));
 }
 
 void ValueAssignmentVisitor::visit(const OctetString &type)
 {
-    Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for OCTET STRING datatype");
+    if (m_value->typeEnum() != Value::SINGLE_VALUE) {
+        throw ConverterException("Invalid value for OCTET STRING datatype");
+    }
+
+    SizeConstraintVisitor<OctetStringValue> sizeConstraintVisitor;
+    type.constraints().accept(sizeConstraintVisitor);
 }
 
 void ValueAssignmentVisitor::visit(const IA5String &type)
 {
-    Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for IA5String datatype");
+    if (m_value->typeEnum() != Value::SINGLE_VALUE) {
+        throw ConverterException("Invalid value for OCTET STRING datatype");
+    }
+
+    SizeConstraintVisitor<StringValue> sizeConstraintVisitor;
+    type.constraints().accept(sizeConstraintVisitor);
+
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
+    QString value = singleValue->value();
+    // remove first and last character, it is quotation mark
+    value.remove(0, 1);
+    value.remove(value.length() - 1, 1);
+    QVector<QChar> bytes = getBytesFromString(value);
+
+    size_t index = 0;
+
+    for (const QChar b : bytes) {
+        VariableRef target = m_target;
+        target.appendElement("data", std::make_unique<Expression>(promela::model::Constant(index)));
+        m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(b.unicode()))));
+        ++index;
+    }
+    while (index < sizeConstraintVisitor.getMaxSize()) {
+        VariableRef target = m_target;
+        target.appendElement("data", std::make_unique<Expression>(promela::model::Constant(index)));
+        m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(0))));
+        ++index;
+    }
+
+    if (sizeConstraintVisitor.getMinSize() != sizeConstraintVisitor.getMaxSize()) {
+        VariableRef target = m_target;
+        target.appendElement("length");
+        int stringSize = bytes.size();
+        m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(stringSize))));
+    }
 }
 
 void ValueAssignmentVisitor::visit(const NumericString &type)
 {
     Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for NUMERIC STRING datatype");
+    throw ConverterException(
+            QString("Value generation is not implemented for %1, NUMERIC STRING datatype").arg(m_typeName));
 }
 
 void ValueAssignmentVisitor::visit(const Enumerated &type)
@@ -263,5 +307,25 @@ void ValueAssignmentVisitor::visit(const UserdefinedType &type)
     ValueAssignmentVisitor visitor(m_value, m_sequence, m_target, type.typeName());
 
     type.type()->accept(visitor);
+}
+
+QVector<QChar> ValueAssignmentVisitor::getBytesFromString(const QString &str)
+{
+    QVector<QChar> result;
+
+    bool escape = false;
+    for (const QChar c : str) {
+        if (c == '\\') {
+            if (escape) {
+                result.append(c);
+                escape = false;
+            } else {
+                escape = true;
+            }
+        } else {
+            result.append(c);
+        }
+    }
+    return result;
 }
 }

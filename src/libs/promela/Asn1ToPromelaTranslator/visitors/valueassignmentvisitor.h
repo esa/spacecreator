@@ -129,6 +129,9 @@ public:
     void visit(const Asn1Acn::Types::UserdefinedType &type) override;
 
 private:
+    QVector<QChar> getBytesFromString(const QString &str);
+
+private:
     Asn1Acn::Value *m_value;
     model::Sequence &m_sequence;
     model::VariableRef m_target;
