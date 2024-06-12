@@ -130,6 +130,8 @@ public:
 
 private:
     QVector<QChar> getBytesFromString(const QString &str);
+    QVector<unsigned char> getBytesFromOctetString(const QString &str);
+    int hexdigit(int c);
 
 private:
     Asn1Acn::Value *m_value;

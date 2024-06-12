@@ -124,14 +124,14 @@ void ValueAssignmentVisitor::visit(const OctetString &type)
 
     const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
     QString value = singleValue->value();
-    QVector<QChar> bytes = getBytesFromString(value);
+    QVector<unsigned char> bytes = getBytesFromOctetString(value);
 
     size_t index = 0;
 
-    for (const QChar b : bytes) {
+    for (const unsigned char b : bytes) {
         VariableRef target = m_target;
         target.appendElement("data", std::make_unique<Expression>(promela::model::Constant(index)));
-        m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(b.unicode()))));
+        m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(b))));
         ++index;
     }
 
@@ -338,5 +338,38 @@ QVector<QChar> ValueAssignmentVisitor::getBytesFromString(const QString &str)
         }
     }
     return result;
+}
+
+QVector<unsigned char> ValueAssignmentVisitor::getBytesFromOctetString(const QString &str)
+{
+    QVector<unsigned char> result;
+
+    int high_nibble = 0;
+    int low_nibble = 0;
+
+    auto iter = str.begin();
+    while (iter != str.end()) {
+        high_nibble = hexdigit(iter->unicode());
+        ++iter;
+        low_nibble = hexdigit(iter->unicode());
+        ++iter;
+
+        result.append((high_nibble << 4) | low_nibble);
+    }
+    return result;
+}
+
+int ValueAssignmentVisitor::hexdigit(int c)
+{
+    if (isdigit(c)) {
+        return c - '0';
+    }
+    if (c >= 'A' && c <= 'F') {
+        return 10 + c - 'A';
+    }
+    if (c >= 'a' && c <= 'f') {
+        return 10 + c - 'a';
+    }
+    return 0;
 }
 }

@@ -30,7 +30,9 @@
 #include <asn1library/asn1/types/boolean.h>
 #include <asn1library/asn1/types/choice.h>
 #include <asn1library/asn1/types/enumerated.h>
+#include <asn1library/asn1/types/ia5string.h>
 #include <asn1library/asn1/types/integer.h>
+#include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/real.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
@@ -58,7 +60,9 @@ using Asn1Acn::Types::Choice;
 using Asn1Acn::Types::ChoiceAlternative;
 using Asn1Acn::Types::Enumerated;
 using Asn1Acn::Types::EnumeratedItem;
+using Asn1Acn::Types::IA5String;
 using Asn1Acn::Types::Integer;
+using Asn1Acn::Types::OctetString;
 using Asn1Acn::Types::Real;
 using Asn1Acn::Types::Sequence;
 using Asn1Acn::Types::SequenceOf;
@@ -74,9 +78,9 @@ using promela::model::VariableRef;
 using promela::translator::Asn1NodeVisitor;
 
 namespace tmc::test {
-void tst_Asn1ToPromelaTranslator_Values::initTestCase() {}
+void tst_Asn1ToPromelaTranslator_Values::initTestCase() { }
 
-void tst_Asn1ToPromelaTranslator_Values::cleanupTestCase() {}
+void tst_Asn1ToPromelaTranslator_Values::cleanupTestCase() { }
 
 void tst_Asn1ToPromelaTranslator_Values::testSequence() const
 {
@@ -575,6 +579,124 @@ void tst_Asn1ToPromelaTranslator_Values::testChoice() const
     QCOMPARE(std::get<Constant>(inlineCall->getArguments().last()).getValue(), 3);
 }
 
+void tst_Asn1ToPromelaTranslator_Values::testOctetString() const
+{
+    auto asn1Model = createModel();
+
+    {
+        auto stringType = std::make_unique<OctetString>();
+        Asn1Acn::Range<int64_t> range(0, 4);
+        auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+        auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::OctetStringValue>>(
+                std::move(rangeConstraint));
+        stringType->constraints().append(std::move(sizeConstraint));
+
+        auto myIntegerAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyString"), QStringLiteral("MyString"), SourceLocation(), stringType->clone());
+
+        asn1Model->addType(std::move(myIntegerAssignment));
+
+        auto stringReference = std::make_unique<UserdefinedType>("MyString", "myModule");
+        stringReference->setType(stringType->clone());
+
+        auto myValueAssignment = std::make_unique<ValueAssignment>(QStringLiteral("myValue"), SourceLocation(),
+                std::move(stringReference), std::make_unique<SingleValue>("0011aabb"));
+        asn1Model->addValue(std::move(myValueAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*asn1Model);
+
+    QCOMPARE(promelaModel.getDeclarations().size(), 1);
+
+    QCOMPARE(promelaModel.getDeclarations().at(0).getName(), "myValue");
+    QVERIFY(promelaModel.getDeclarations().at(0).getType().isUtypeReference());
+    QCOMPARE(promelaModel.getDeclarations().at(0).getType().getUtypeReference().getName(), "MyString");
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 3);
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "myValue_init");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 5);
+
+        verifyArrayAssignment(findProctypeElement<Assignment>(inlineDef->getSequence(), 0), "myValue", 0, 0x0);
+        verifyArrayAssignment(findProctypeElement<Assignment>(inlineDef->getSequence(), 1), "myValue", 1, 0x11);
+        verifyArrayAssignment(findProctypeElement<Assignment>(inlineDef->getSequence(), 2), "myValue", 2, 0xaa);
+        verifyArrayAssignment(findProctypeElement<Assignment>(inlineDef->getSequence(), 3), "myValue", 3, 0xbb);
+
+        const Assignment *lengthAssignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 4);
+        QVERIFY(lengthAssignment);
+        QCOMPARE(lengthAssignment->getVariableRef().getElements().size(), 2);
+        QCOMPARE(lengthAssignment->getVariableRef().getElements().front().m_name, "myValue");
+        QVERIFY(!lengthAssignment->getVariableRef().getElements().front().m_index);
+        QCOMPARE(lengthAssignment->getVariableRef().getElements().back().m_name, "length");
+        QVERIFY(!lengthAssignment->getVariableRef().getElements().back().m_index);
+        QVERIFY(std::holds_alternative<Constant>(lengthAssignment->getExpression().getContent()));
+        QCOMPARE(std::get<Constant>(lengthAssignment->getExpression().getContent()).getValue(), 4);
+    }
+}
+
+void tst_Asn1ToPromelaTranslator_Values::testIA5String() const
+{
+    auto asn1Model = createModel();
+
+    {
+        auto stringType = std::make_unique<IA5String>();
+        Asn1Acn::Range<int64_t> range(0, 4);
+        auto rangeConstraint = std::make_unique<Asn1Acn::Constraints::RangeConstraint<Asn1Acn::IntegerValue>>(range);
+        auto sizeConstraint = std::make_unique<Asn1Acn::Constraints::SizeConstraint<Asn1Acn::StringValue>>(
+                std::move(rangeConstraint));
+        stringType->constraints().append(std::move(sizeConstraint));
+
+        auto myIntegerAssignment = std::make_unique<TypeAssignment>(
+                QStringLiteral("MyString"), QStringLiteral("MyString"), SourceLocation(), stringType->clone());
+
+        asn1Model->addType(std::move(myIntegerAssignment));
+
+        auto stringReference = std::make_unique<UserdefinedType>("MyString", "myModule");
+        stringReference->setType(stringType->clone());
+
+        auto myValueAssignment = std::make_unique<ValueAssignment>(QStringLiteral("myValue"), SourceLocation(),
+                std::move(stringReference), std::make_unique<SingleValue>("test"));
+        asn1Model->addValue(std::move(myValueAssignment));
+    }
+
+    PromelaModel promelaModel;
+    Asn1NodeVisitor visitor(promelaModel, true);
+    visitor.visit(*asn1Model);
+
+    QCOMPARE(promelaModel.getDeclarations().size(), 1);
+
+    QCOMPARE(promelaModel.getDeclarations().at(0).getName(), "myValue");
+    QVERIFY(promelaModel.getDeclarations().at(0).getType().isUtypeReference());
+    QCOMPARE(promelaModel.getDeclarations().at(0).getType().getUtypeReference().getName(), "MyString");
+
+    QCOMPARE(promelaModel.getInlineDefs().size(), 3);
+    {
+        const InlineDef *inlineDef = findInline(promelaModel.getInlineDefs(), "myValue_init");
+        QVERIFY(inlineDef != nullptr);
+        QCOMPARE(inlineDef->getArguments().size(), 0);
+        QCOMPARE(inlineDef->getSequence().getContent().size(), 5);
+
+        verifyArrayAssignment(findProctypeElement<Assignment>(inlineDef->getSequence(), 0), "myValue", 0, 't');
+        verifyArrayAssignment(findProctypeElement<Assignment>(inlineDef->getSequence(), 1), "myValue", 1, 'e');
+        verifyArrayAssignment(findProctypeElement<Assignment>(inlineDef->getSequence(), 2), "myValue", 2, 's');
+        verifyArrayAssignment(findProctypeElement<Assignment>(inlineDef->getSequence(), 3), "myValue", 3, 't');
+
+        const Assignment *lengthAssignment = findProctypeElement<Assignment>(inlineDef->getSequence(), 4);
+        QVERIFY(lengthAssignment);
+        QCOMPARE(lengthAssignment->getVariableRef().getElements().size(), 2);
+        QCOMPARE(lengthAssignment->getVariableRef().getElements().front().m_name, "myValue");
+        QVERIFY(!lengthAssignment->getVariableRef().getElements().front().m_index);
+        QCOMPARE(lengthAssignment->getVariableRef().getElements().back().m_name, "length");
+        QVERIFY(!lengthAssignment->getVariableRef().getElements().back().m_index);
+        QVERIFY(std::holds_alternative<Constant>(lengthAssignment->getExpression().getContent()));
+        QCOMPARE(std::get<Constant>(lengthAssignment->getExpression().getContent()).getValue(), 4);
+    }
+}
+
 std::unique_ptr<Definitions> tst_Asn1ToPromelaTranslator_Values::createModel() const
 {
     return std::make_unique<Definitions>("myModule", SourceLocation());
@@ -605,6 +727,22 @@ const T *tst_Asn1ToPromelaTranslator_Values::findProctypeElement(
         return &(std::get<T>((*iter)->getValue()));
     }
     return nullptr;
+}
+
+void tst_Asn1ToPromelaTranslator_Values::verifyArrayAssignment(const ::promela::model::Assignment *assignment,
+        const QString &target, int32_t index, int32_t expectedValue) const
+{
+    QVERIFY(assignment);
+    QCOMPARE(assignment->getVariableRef().getElements().size(), 2);
+    QCOMPARE(assignment->getVariableRef().getElements().front().m_name, target);
+    QVERIFY(!assignment->getVariableRef().getElements().front().m_index);
+    QCOMPARE(assignment->getVariableRef().getElements().back().m_name, "data");
+    QVERIFY(assignment->getVariableRef().getElements().back().m_index);
+    QVERIFY(std::holds_alternative<Constant>(assignment->getVariableRef().getElements().back().m_index->getContent()));
+    QCOMPARE(std::get<Constant>(assignment->getVariableRef().getElements().back().m_index->getContent()).getValue(),
+            index);
+    QVERIFY(std::holds_alternative<Constant>(assignment->getExpression().getContent()));
+    QCOMPARE(std::get<Constant>(assignment->getExpression().getContent()).getValue(), expectedValue);
 }
 
 }

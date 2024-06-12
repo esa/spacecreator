@@ -45,6 +45,8 @@ private Q_SLOTS:
     void testBoolean() const;
     void testSequenceOf() const;
     void testChoice() const;
+    void testOctetString() const;
+    void testIA5String() const;
 
 private:
     std::unique_ptr<Definitions> createModel() const;
@@ -53,5 +55,8 @@ private:
 
     template<typename T>
     const T *findProctypeElement(const ::promela::model::Sequence &sequence, size_t index) const;
+
+    void verifyArrayAssignment(const ::promela::model::Assignment *assignment, const QString &target, int32_t index,
+            int32_t expectedValue) const;
 };
 }
