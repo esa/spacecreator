@@ -638,6 +638,8 @@ void IvToPromelaGenerator::createPromelaObjectsForSyncRis(const QString &functio
 
     Sequence sequence(Sequence::Type::NORMAL);
 
+    bool atLeastOneEnvironmentTarget = false;
+
     for (auto targetIter = info.m_targets.begin(); targetIter != info.m_targets.end(); ++targetIter) {
         const RequiredCallInfo::TargetInfo &targetInfo = targetIter->second;
         if (targetInfo.m_isEnvironment) {
@@ -654,6 +656,7 @@ void IvToPromelaGenerator::createPromelaObjectsForSyncRis(const QString &functio
                 InlineCall generateValueInlineCall(generateValueInlineName, generateValueInlineArgs);
                 sequence.appendElement(std::move(generateValueInlineCall));
             }
+            atLeastOneEnvironmentTarget = true;
         } else {
             if (info.m_isProtected) {
                 sequence.appendElement(createLockAcquireStatement(targetInfo.m_targetFunctionName));
@@ -674,8 +677,12 @@ void IvToPromelaGenerator::createPromelaObjectsForSyncRis(const QString &functio
     }
 
     if (sequence.getContent().size() == 0) {
-        auto message = QString("Empty content of inline %1").arg(info.m_name);
-        throw TranslationException(message);
+        if (atLeastOneEnvironmentTarget) {
+            sequence.appendElement(Skip());
+        } else {
+            auto message = QString("Empty content of inline %1").arg(info.m_name);
+            throw TranslationException(message);
+        }
     }
 
     std::unique_ptr<InlineDef> inlineDef = std::make_unique<InlineDef>(info.m_name, arguments, std::move(sequence));
