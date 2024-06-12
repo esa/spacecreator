@@ -104,14 +104,13 @@ void ValueAssignmentVisitor::visit(const Boolean &type)
 void ValueAssignmentVisitor::visit(const Null &type)
 {
     Q_UNUSED(type);
-    throw ConverterException(QString("Value assignment is not implemented for %1, NULL datatype").arg(m_typeName));
+    throw ConverterException(QString("ASN.1 constants not supported for %1, NULL datatype").arg(m_typeName));
 }
 
 void ValueAssignmentVisitor::visit(const BitString &type)
 {
     Q_UNUSED(type);
-    throw ConverterException(
-            QString("Value assignment is not implemented for %1, BIT STRING datatype").arg(m_typeName));
+    throw ConverterException(QString("ASN.1 constants not supported for %1, BIT STRING datatype").arg(m_typeName));
 }
 
 void ValueAssignmentVisitor::visit(const OctetString &type)
@@ -122,22 +121,9 @@ void ValueAssignmentVisitor::visit(const OctetString &type)
 
     SizeConstraintVisitor<OctetStringValue> sizeConstraintVisitor;
     type.constraints().accept(sizeConstraintVisitor);
-}
-
-void ValueAssignmentVisitor::visit(const IA5String &type)
-{
-    if (m_value->typeEnum() != Value::SINGLE_VALUE) {
-        throw ConverterException("Invalid value for OCTET STRING datatype");
-    }
-
-    SizeConstraintVisitor<StringValue> sizeConstraintVisitor;
-    type.constraints().accept(sizeConstraintVisitor);
 
     const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
     QString value = singleValue->value();
-    // remove first and last character, it is quotation mark
-    value.remove(0, 1);
-    value.remove(value.length() - 1, 1);
     QVector<QChar> bytes = getBytesFromString(value);
 
     size_t index = 0;
@@ -148,10 +134,36 @@ void ValueAssignmentVisitor::visit(const IA5String &type)
         m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(b.unicode()))));
         ++index;
     }
-    while (index < sizeConstraintVisitor.getMaxSize()) {
+
+    if (sizeConstraintVisitor.getMinSize() != sizeConstraintVisitor.getMaxSize()) {
         VariableRef target = m_target;
+        target.appendElement("length");
+        int stringSize = bytes.size();
+        m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(stringSize))));
+    }
+}
+
+void ValueAssignmentVisitor::visit(const IA5String &type)
+{
+    if (m_value->typeEnum() != Value::SINGLE_VALUE) {
+        throw ConverterException("Invalid value for IA5String datatype");
+    }
+
+    SizeConstraintVisitor<StringValue> sizeConstraintVisitor;
+    type.constraints().accept(sizeConstraintVisitor);
+
+    const SingleValue *singleValue = dynamic_cast<const SingleValue *>(m_value);
+    QString value = singleValue->value();
+    QVector<QChar> bytes = getBytesFromString(value);
+
+    size_t index = 0;
+
+    for (const QChar b : bytes) {
+        VariableRef target = m_target;
+        // the character is converted to numeric value
+        // promela has character literal, but it is not supported in promela model
         target.appendElement("data", std::make_unique<Expression>(promela::model::Constant(index)));
-        m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(0))));
+        m_sequence.appendElement(Assignment(target, Expression(promela::model::Constant(b.unicode()))));
         ++index;
     }
 
@@ -166,8 +178,7 @@ void ValueAssignmentVisitor::visit(const IA5String &type)
 void ValueAssignmentVisitor::visit(const NumericString &type)
 {
     Q_UNUSED(type);
-    throw ConverterException(
-            QString("Value generation is not implemented for %1, NUMERIC STRING datatype").arg(m_typeName));
+    throw ConverterException(QString("ASN.1 constants not supported for %1, NUMERIC STRING datatype").arg(m_typeName));
 }
 
 void ValueAssignmentVisitor::visit(const Enumerated &type)
@@ -282,7 +293,7 @@ void ValueAssignmentVisitor::visit(const Real &type)
 void ValueAssignmentVisitor::visit(const LabelType &type)
 {
     Q_UNUSED(type);
-    throw ConverterException("Value generation is not implemented for LabelType");
+    throw ConverterException(QString("ASN.1 constants not supported for %1, LabelType datatype").arg(m_typeName));
 }
 
 void ValueAssignmentVisitor::visit(const Integer &type)
