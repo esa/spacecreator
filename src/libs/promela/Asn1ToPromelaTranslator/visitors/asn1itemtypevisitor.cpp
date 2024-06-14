@@ -755,31 +755,42 @@ void Asn1ItemTypeVisitor::addIntegerRangeCheckInline(const QString &typeName, co
         auto lessThanExpr = std::make_unique<Expression>(
                 BinaryExpression(BinaryExpression::Operator::LEQUAL, std::move(maxValueVar), std::move(maxValueConst)));
 
-        if (range.first == std::numeric_limits<int32_t>::min()) {
-            // special case when minimum value of int32_t is used
-            // in such case, the int datatype in promela does not have a representation of such value
-            // (see https://spinroot.com/spin/Man/datatypes.html)
+        auto minValueConst = std::make_unique<Expression>(Constant(range.first));
+        auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
+        auto greaterThanExpr = std::make_unique<Expression>(
+                BinaryExpression(BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
+
+        // special case when value less than minimum value of int32_t is used
+        // or value greater than maximum value of int32_t - 1
+        // in such case, the int datatype in promela does not have a representation of such value
+        // (see https://spinroot.com/spin/Man/datatypes.html)
+        // drop one value or both
+        if (range.second >= std::numeric_limits<int32_t>::max()) {
+            if (range.first > std::numeric_limits<int32_t>::min()) {
+                rangeCheckingExpressions.push_back(std::move(*greaterThanExpr));
+            }
+        } else if (range.first <= std::numeric_limits<int32_t>::min()) {
             rangeCheckingExpressions.push_back(std::move(*lessThanExpr));
         } else {
-            auto minValueConst = std::make_unique<Expression>(Constant(range.first));
-            auto minValueVar = std::make_unique<Expression>(VariableRef(argumentName));
-            auto greaterThanExpr = std::make_unique<Expression>(BinaryExpression(
-                    BinaryExpression::Operator::GEQUAL, std::move(minValueVar), std::move(minValueConst)));
-
             BinaryExpression combinedExpr(
                     BinaryExpression::Operator::AND, std::move(greaterThanExpr), std::move(lessThanExpr));
             rangeCheckingExpressions.push_back(Expression(std::move(combinedExpr)));
         }
     }
 
-    auto rangeCheckingExpression =
-            std::accumulate(std::next(rangeCheckingExpressions.begin()), rangeCheckingExpressions.end(),
-                    std::make_unique<Expression>(rangeCheckingExpressions.front()), [&](auto &&acc, const auto &expr) {
-                        return std::make_unique<Expression>(BinaryExpression(
-                                BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
-                    });
+    if (rangeCheckingExpressions.empty()) {
+        // since range checks may be skiped, use constant in range check inline
+        addRangeCheckInline(Expression(Constant(1)), typeName);
+    } else {
+        auto rangeCheckingExpression = std::accumulate(std::next(rangeCheckingExpressions.begin()),
+                rangeCheckingExpressions.end(), std::make_unique<Expression>(rangeCheckingExpressions.front()),
+                [&](auto &&acc, const auto &expr) {
+                    return std::make_unique<Expression>(BinaryExpression(
+                            BinaryExpression::Operator::OR, std::move(acc), std::make_unique<Expression>(expr)));
+                });
 
-    addRangeCheckInline(*rangeCheckingExpression, typeName);
+        addRangeCheckInline(*rangeCheckingExpression, typeName);
+    }
 }
 
 void Asn1ItemTypeVisitor::addRealRangeCheckInline(const QString &typeName, const RealSubset &rangeSubsets)
