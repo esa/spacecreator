@@ -1067,7 +1067,8 @@ QString ModelCheckingWindow::getMakeRuleForPropertyType(const QString &propertyT
 bool ModelCheckingWindow::invokeMake(const QString &makeRule, const QString &propertyName)
 {
     const QString makeCommand = "make";
-    const QStringList arguments {makeRule, "NAME=", propertyName};
+    const QString nameArgument = QString("NAME=%1").arg(propertyName);
+    const QStringList arguments { makeRule, nameArgument };
     if (shared::ExternalProcess::executeBlocking(makeCommand, arguments)) {
         QString fullCmd = makeCommand + " " + arguments.join(" ");
         QMessageBox::warning(this, tr("Add new property"), tr("%1 command can not be executed.").arg(fullCmd));
