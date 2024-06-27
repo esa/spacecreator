@@ -29,6 +29,7 @@
 
 using promela::model::AssertCall;
 using promela::model::Assignment;
+using promela::model::CCode;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
 using promela::model::Conditional;
@@ -284,6 +285,18 @@ void ProctypeElementVisitor::operator()(const PrintfStatement &statement)
         visitor.visit(argument);
     }
     m_stream << ");\n";
+}
+
+void ProctypeElementVisitor::operator()(const CCode &code)
+{
+    if (code.hasContent()) {
+        m_stream << m_indent << "c_code {\n";
+        const auto lines = code.getContent().split('\n');
+        for (const auto &line : lines) {
+            m_stream << m_indent << m_baseIndent << line << "\n";
+        }
+        m_stream << m_indent << "}\n";
+    }
 }
 
 QString ProctypeElementVisitor::expressionContentToString(const model::Expression &expression)

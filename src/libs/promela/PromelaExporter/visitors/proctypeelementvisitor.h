@@ -154,6 +154,8 @@ public:
      */
     void operator()(const model::PrintfStatement &statement);
 
+    void operator()(const model::CCode &code);
+
 private:
     QString expressionContentToString(const model::Expression &expression);
 

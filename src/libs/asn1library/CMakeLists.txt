@@ -4,6 +4,8 @@ add_library(${LIB_NAME} STATIC)
 
 target_sources(${LIB_NAME} PRIVATE
     asn1const.h
+	asn1scc.cpp
+	asn1scc.h
     asn1modelstorage.cpp
     asn1modelstorage.h
     asn1valueparser.cpp

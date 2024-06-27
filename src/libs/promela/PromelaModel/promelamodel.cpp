@@ -36,6 +36,21 @@ const QList<QString> &PromelaModel::getIncludes() const noexcept
     return m_includes;
 }
 
+void PromelaModel::addCDecl(CDecl declaration)
+{
+    m_cdecl = std::move(declaration);
+}
+
+const CDecl &PromelaModel::getCDecl() const noexcept
+{
+    return m_cdecl.value();
+}
+
+bool PromelaModel::hasCDecl() const noexcept
+{
+    return m_cdecl.has_value();
+}
+
 void PromelaModel::addMtype(const QString &value)
 {
     m_mtypeValues.insert(value);

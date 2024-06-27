@@ -1,18 +1,22 @@
 project(IvToPromelaTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
-  translator.cpp
+  helper.cpp
   ivtopromelagenerator.cpp
   ivtopromelatranslatorcontext.cpp
   observerattachment.cpp
+  sequencecomponentvisitor.cpp
   systeminfo.cpp
+  translator.cpp
 )
 set(INCLUDES
-  translator.h
+  helper.h
   ivtopromelagenerator.h
   ivtopromelatranslatorcontext.h
   observerattachment.h
+  sequencecomponentvisitor.h
   systeminfo.h
+  translator.h
 )
 
 add_library(IvToPromelaTranslator STATIC)
@@ -24,7 +28,8 @@ target_include_directories(IvToPromelaTranslator
   PUBLIC                   .
   PRIVATE                  "${CMAKE_SOURCE_DIR}/src/libs")
 target_link_libraries(IvToPromelaTranslator
-  PUBLIC              Conversion::Common
+    PUBLIC            Conversion::Common
+                      Conversion::Asn1ToPromelaTranslator
                       Promela::Model
                       asn1library
                       ivcore

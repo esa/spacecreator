@@ -19,6 +19,8 @@
 
 #include "ivtopromelagenerator.h"
 
+#include "helper.h"
+
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivmodel.h>
@@ -32,6 +34,8 @@ using promela::model::Assignment;
 using promela::model::BasicType;
 using promela::model::BinaryExpression;
 using promela::model::BooleanConstant;
+using promela::model::CCode;
+using promela::model::CDecl;
 using promela::model::ChannelInit;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
@@ -72,6 +76,8 @@ void IvToPromelaGenerator::generate()
 
     m_context.model()->addDeclaration(Declaration(DataType(BasicType::INT), m_systemInitedVariableName));
 
+    createMessageTypes();
+
     createPromelaObjectsForTimers();
 
     createPromelaObjectsForObservers();
@@ -91,6 +97,9 @@ void IvToPromelaGenerator::generate()
     }
 
     m_context.model()->addInclude("env_inlines.pml");
+    m_context.model()->addInclude("message_sizes.pml");
+
+    m_context.model()->addCDecl(CDecl("\\#include \"dataview-uniq.h\""));
 
     createSystemState();
 
@@ -109,6 +118,26 @@ void IvToPromelaGenerator::generate()
 
     for (const QString &additionalInclude : additionalIncludes) {
         m_context.model()->addEpilogueInclude(additionalInclude);
+    }
+}
+
+void IvToPromelaGenerator::createMessageTypes()
+{
+    for (const QString &messageType : m_systemInfo.m_messageTypes) {
+        QString bufferTypeName = messageTypeName(messageType);
+        QString sizeConstantName = QString("asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING").arg(messageType);
+
+        Utype bufferType(std::move(bufferTypeName));
+        DataType arrayType = DataType(ArrayType(std::move(sizeConstantName), BasicType::BYTE));
+        Declaration arrayDeclaration = Declaration(std::move(arrayType), "data");
+        bufferType.addField(std::move(arrayDeclaration));
+
+        m_context.model()->addUtype(bufferType);
+
+        Helper helper(m_context.asn1Model(), "$target$", "$source$");
+
+        m_templatesFromPromelaToC.insert(messageType, helper.createAssignmentTemplateFromPromelaToC(messageType));
+        m_templatesFromCToPromela.insert(messageType, helper.createAssignmentTemplateFromCToPromela(messageType));
     }
 }
 
@@ -235,9 +264,12 @@ void IvToPromelaGenerator::generateProctype(
     Sequence sequence(Sequence::Type::NORMAL);
     sequence.appendElement(createWaitForInitStatement());
 
-    const QString &signalParameterName = QString("%1_%2_signal_parameter")
-                                                 .arg(Escaper::escapePromelaIV(functionName))
-                                                 .arg(proctypeInfo.m_interfaceName.toLower());
+    const QString signalParameterName = QString("%1_%2_signal_parameter")
+                                                .arg(Escaper::escapePromelaIV(functionName))
+                                                .arg(proctypeInfo.m_interfaceName.toLower());
+
+    const QString signalMessageName = QString("%1_message").arg(signalParameterName);
+
     const QString channelUsedName = QString("%1_%2_channel_used")
                                             .arg(Escaper::escapePromelaIV(functionName))
                                             .arg(proctypeInfo.m_interfaceName.toLower());
@@ -245,8 +277,10 @@ void IvToPromelaGenerator::generateProctype(
     if (!proctypeInfo.m_parameterTypeName.isEmpty()) {
         // parameter variable declaration
         // channel used declaration
-        m_context.model()->addDeclaration(Declaration(
-                DataType(UtypeRef(Escaper::escapePromelaName(proctypeInfo.m_parameterTypeName))), signalParameterName));
+        const QString parameterTypeName = Escaper::escapePromelaName(proctypeInfo.m_parameterTypeName);
+        m_context.model()->addDeclaration(Declaration(DataType(UtypeRef(parameterTypeName)), signalParameterName));
+        m_context.model()->addDeclaration(
+                Declaration(DataType(UtypeRef(messageTypeName(parameterTypeName))), signalMessageName));
         Declaration channelUsedDeclaration = Declaration(DataType(BasicType::BOOLEAN), channelUsedName);
         channelUsedDeclaration.setInit(Expression(Constant(0)));
         m_context.model()->addDeclaration(channelUsedDeclaration);
@@ -304,7 +338,7 @@ void IvToPromelaGenerator::generateProctype(
         }
 
         loopSequence->appendElement(generateProcessMessageBlock(functionName, functionName, currentChannelName, piName,
-                proctypeInfo.m_parameterTypeName, signalParameterName, mainLoopLabel, false,
+                proctypeInfo.m_parameterTypeName, signalParameterName, signalMessageName, mainLoopLabel, false,
                 std::move(preProcessingElements), std::move(observerStatements)));
     }
 
@@ -314,7 +348,7 @@ void IvToPromelaGenerator::generateProctype(
 
         loopSequence->appendElement(generateProcessMessageBlock((*iter)->m_observerName, functionName,
                 currentChannelName, observerInputSignalName(**iter), proctypeInfo.m_parameterTypeName,
-                signalParameterName, mainLoopLabel, true, {}, {}));
+                signalParameterName, signalMessageName, mainLoopLabel, true, {}, {}));
     }
 
     // release function mutex
@@ -341,10 +375,13 @@ void IvToPromelaGenerator::generateProctype(
 
 std::unique_ptr<ProctypeElement> IvToPromelaGenerator::generateProcessMessageBlock(const QString &functionName,
         const QString &modelFunctionName, const QString &channelName, const QString &inlineName,
-        const QString &parameterType, const QString &parameterName, const QString &exitLabel, bool lock,
+        const QString &parameterType, const QString &parameterName, const QString &messageName,
+        const QString &exitLabel, bool lock,
         std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements,
         std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements)
 {
+    // parameterName - > name of the variable
+    // messageName - > name of the message
     QList<InlineCall::Argument> checkQueueArguments;
     checkQueueArguments.append(VariableRef(channelName));
 
@@ -353,7 +390,26 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::generateProcessMessageBlo
 
     // channel receive
     processMessageSeq->appendElement(
-            createReceiveStatement(modelFunctionName, channelName, parameterType, parameterName));
+            createReceiveStatement(modelFunctionName, channelName, parameterType, messageName));
+
+    QString assignment =
+            assignmentFromCToPromela(parameterType, QString("now.%1").arg(parameterName), parameterName + "_c_var");
+
+    QString conversionCode = QString("{\n"
+                                     "asn1Scc%1 %2_c_var;\n"
+                                     "BitStream %2_stream;\n"
+                                     "int %2_rc;"
+                                     "BitStream_AttachBuffer(&%2_stream,\n"
+                                     "    now.%2_message.data,\n"
+                                     "    asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING);\n"
+                                     "asn1Scc%1_Decode(&%2_c_var,\n"
+                                     "    &%2_stream,\n"
+                                     "    &%2_rc);\n"
+                                     "%3"
+                                     "}")
+                                     .arg(parameterType, parameterName, std::move(assignment));
+
+    processMessageSeq->appendElement(CCode(std::move(conversionCode)));
 
     while (!preProcessingElements.empty()) {
         processMessageSeq->appendElement(std::move(preProcessingElements.front()));
@@ -691,22 +747,77 @@ void IvToPromelaGenerator::createPromelaObjectsForSyncRis(const QString &functio
 
 void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &functionName, const RequiredCallInfo &info)
 {
-    QList<QString> arguments;
+    // create a inline to call sporadic REQUIRED interface.
+    // such inline will put a message into channel.
+
+    assert(info.m_parameters.size() <= 1); // sporadic interface shall have at most one parameter
+
+    QList<QString> inlineArguments;
     QList<Expression> sendArguments;
+
     if (m_context.isMulticastSupported()) {
+        // if multicast is supported - send a pid of the caller
         const QString pidName = QString("PID_%1").arg(Escaper::escapePromelaField(functionName));
         sendArguments.append(Expression(VariableRef(pidName)));
-    } else if (info.m_parameters.empty()) {
-        sendArguments.append(Expression(Constant(0)));
-    }
-    for (const RequiredCallInfo::ParameterInfo &parameterInfo : info.m_parameters) {
-        const auto argumentName = handleSendInlineArgument(
-                parameterInfo.m_parameterType, functionName, info.m_interfaceName, parameterInfo.m_parameterName);
-        arguments.append(argumentName);
-        sendArguments.append(Expression(VariableRef(argumentName)));
     }
 
     Sequence sequence(Sequence::Type::NORMAL);
+    if (!info.m_parameters.empty()) {
+        const RequiredCallInfo::ParameterInfo &parameterInfo = info.m_parameters.front();
+        const QString argumentName = handleSendInlineArgument(
+                parameterInfo.m_parameterType, functionName, info.m_interfaceName, parameterInfo.m_parameterName);
+
+        const QString messageVariableName = globalMessageName(argumentName);
+        const QString temporaryVariableName = globalTemporaryVariableName(argumentName);
+
+        Declaration messageVariableDecl =
+                Declaration(DataType(UtypeRef(messageTypeName(parameterInfo.m_parameterType))), messageVariableName);
+        Declaration temporaryVariableDecl =
+                Declaration(DataType(UtypeRef(parameterInfo.m_parameterType)), temporaryVariableName);
+        m_context.model()->addDeclaration(std::move(messageVariableDecl));
+        m_context.model()->addDeclaration(std::move(temporaryVariableDecl));
+
+        inlineArguments.append(argumentName);
+        sendArguments.append(Expression(VariableRef(messageVariableName)));
+
+        // generate code to encode parameter in message
+        // TODO this shall be an inline call
+        // sequence.appendElement(Assignment(VariableRef(temporaryVariableName),
+        // Expression(VariableRef(argumentName))));
+        QList<InlineCall::Argument> assignInlineArguments;
+        assignInlineArguments.append(VariableRef(temporaryVariableName));
+        assignInlineArguments.append(VariableRef(argumentName));
+        sequence.appendElement(InlineCall(
+                QString("%1_assign_value").arg(parameterInfo.m_parameterType), std::move(assignInlineArguments)));
+
+        QString assignment = assignmentFromPromelaToC(
+                parameterInfo.m_parameterType, argumentName + "_c_var", QString("now.%1").arg(temporaryVariableName));
+
+        QString code = QString("{\n"
+                               "asn1Scc%1 %2_c_var;\n"
+                               "BitStream %2_stream;\n"
+                               "int %2_rc;\n"
+                               "\n"
+                               "%4"
+                               "\n"
+                               "BitStream_Init(&%2_stream,\n"
+                               "    now.%3.data,\n"
+                               "    asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING);\n"
+                               "asn1Scc%1_Encode(&%2_c_var,\n"
+                               "    &%2_stream,\n"
+                               "    &%2_rc,\n"
+                               "    0);\n"
+                               "}")
+                               .arg(parameterInfo.m_parameterType, argumentName, messageVariableName, assignment);
+
+        sequence.appendElement(CCode(std::move(code)));
+
+    } else {
+        if (info.m_parameters.empty() && sendArguments.empty()) {
+            // if there's PID nor parameter, put zero in queue.
+            sendArguments.append(Expression(Constant(0)));
+        }
+    }
 
     for (auto targetIter = info.m_targets.begin(); targetIter != info.m_targets.end(); ++targetIter) {
         const RequiredCallInfo::TargetInfo &targetInfo = targetIter->second;
@@ -719,7 +830,8 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
         throw TranslationException(message);
     }
 
-    std::unique_ptr<InlineDef> inlineDef = std::make_unique<InlineDef>(info.m_name, arguments, std::move(sequence));
+    std::unique_ptr<InlineDef> inlineDef =
+            std::make_unique<InlineDef>(info.m_name, inlineArguments, std::move(sequence));
     m_context.model()->addInlineDef(std::move(inlineDef));
 }
 
@@ -1142,6 +1254,16 @@ QString IvToPromelaGenerator::handleSendInlineArgument(const QString &parameterT
     }
 }
 
+QString IvToPromelaGenerator::globalTemporaryVariableName(const QString &parameterName)
+{
+    return QString("%1_var").arg(parameterName);
+}
+
+QString IvToPromelaGenerator::globalMessageName(const QString &parameterName)
+{
+    return QString("%1_message").arg(parameterName);
+}
+
 QString IvToPromelaGenerator::buildParameterSubtypeName(
         const QString &functionName, const QString &interfaceName, const QString &parameterName)
 {
@@ -1163,16 +1285,52 @@ void IvToPromelaGenerator::createChannel(const QString &channelName, const QStri
     if (m_context.isMulticastSupported()) {
         channelType.append(ChannelInit::Type(UtypeRef("PID")));
         if (!messageType.isEmpty()) {
-            channelType.append(ChannelInit::Type(UtypeRef(Escaper::escapePromelaName(messageType))));
+            QString modifiedMessageType = messageTypeName(Escaper::escapePromelaName(messageType));
+            channelType.append(ChannelInit::Type(UtypeRef(modifiedMessageType)));
         }
     } else {
-        channelType.append(messageType.isEmpty()
-                        ? ChannelInit::Type(BasicType::INT)
-                        : ChannelInit::Type(UtypeRef(Escaper::escapePromelaName(messageType))));
+        QString modifiedMessageType = messageTypeName(Escaper::escapePromelaName(messageType));
+        channelType.append(messageType.isEmpty() ? ChannelInit::Type(BasicType::INT)
+                                                 : ChannelInit::Type(UtypeRef(modifiedMessageType)));
     }
     ChannelInit channelInit(channelSize, std::move(channelType));
     Declaration declaration(DataType(BasicType::CHAN), channelName);
     declaration.setInit(channelInit);
-    m_context.model()->addDeclaration(declaration);
+    m_context.model()->addDeclaration(std::move(declaration));
 }
+
+QString IvToPromelaGenerator::messageTypeName(const QString &typeName)
+{
+    return QString("%1Message").arg(typeName);
+}
+
+QString IvToPromelaGenerator::assignmentFromPromelaToC(
+        const QString &typeName, const QString &target, const QString &source)
+{
+    if (!m_templatesFromPromelaToC.contains(typeName)) {
+        auto message = QString("No assignment template from promela to c for type %1").arg(typeName);
+        throw TranslationException(message);
+    }
+
+    QString tmplt = m_templatesFromPromelaToC.value(typeName);
+
+    tmplt.replace("$target$", target);
+    tmplt.replace("$source$", source);
+    return tmplt;
+}
+
+QString IvToPromelaGenerator::assignmentFromCToPromela(
+        const QString &typeName, const QString &target, const QString &source)
+{
+    if (!m_templatesFromCToPromela.contains(typeName)) {
+        auto message = QString("No assignment template from c to promela for type %1").arg(typeName);
+        throw TranslationException(message);
+    }
+
+    QString tmplt = m_templatesFromCToPromela.value(typeName);
+    tmplt.replace("$target$", target);
+    tmplt.replace("$source$", source);
+    return tmplt;
+}
+
 }

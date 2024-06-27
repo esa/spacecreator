@@ -269,6 +269,7 @@ private:
 
     QFileInfo workDirectory() const;
     QFileInfo simuDataViewLocation() const;
+    QFileInfo dataviewUniqLocation() const;
     QFileInfo sdlImplementationBaseDirectory(const QString &functionName) const;
     QFileInfo sdlImplementationLocation(const QString &functionName) const;
     QFileInfo sdlSystemStructureLocation(const QString &functionName) const;
@@ -280,6 +281,8 @@ private:
     void convertNextMscObserver();
     void convertNextObserver();
     void attachNextObserver();
+    void generateCDataview();
+    bool generateMessageSizes(QFileInfo input, QFileInfo output);
 
 private Q_SLOTS:
     void finishConversion();
@@ -292,6 +295,8 @@ private Q_SLOTS:
     void functionConversionFinished(bool success);
     void observerConversionFinished(bool success);
     void stopConditionConversionFinished(bool success);
+    void asn1sccProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void asn1sccProcessStarted();
 
 private:
     const QString m_inputIvFilepath;

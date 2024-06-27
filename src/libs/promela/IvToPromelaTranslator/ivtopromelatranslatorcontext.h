@@ -40,7 +40,8 @@ public:
      * @param promelaModel The model that is being created
      */
     IvToPromelaTranslatorContext(model::PromelaSystemModel *promelaModel, const ivm::IVModel *ivModel,
-            const conversion::Options &options, const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons,
+            const Asn1Acn::Asn1Model *asn1Model, const conversion::Options &options,
+            const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons,
             const std::vector<QString> &modelFunctions, const std::vector<QString> &observerNames);
 
     /**
@@ -93,6 +94,8 @@ public:
      * @return IV model
      */
     auto ivModel() const -> const ivm::IVModel *;
+
+    auto asn1Model() const -> const Asn1Acn::Asn1Model*;
 
     /**
      * Getter for the conversion options
@@ -153,6 +156,7 @@ public:
 private:
     model::PromelaSystemModel *m_promelaModel;
     const ivm::IVModel *m_ivModel;
+    const Asn1Acn::Asn1Model *m_asn1Model;
     const conversion::Options &m_options;
     const std::vector<const Asn1Acn::Definitions *> &m_asn1SubtypesDefinitons;
     const std::vector<QString> &m_modelFunctions;

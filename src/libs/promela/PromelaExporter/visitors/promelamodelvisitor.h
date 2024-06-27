@@ -50,6 +50,7 @@ public:
     void visit(const model::PromelaModel &promelaModel);
 
 private:
+    void generateCDecl(const model::CDecl &declaration);
     void generateIncludes(const QList<QString> &includes);
     void generateMtypes(const QSet<QString> &values);
     void generateNamedMtypes(const std::map<QString, model::NamedMtype> &values);

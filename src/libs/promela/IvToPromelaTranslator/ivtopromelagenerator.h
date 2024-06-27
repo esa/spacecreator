@@ -22,6 +22,8 @@
 #include "ivtopromelatranslatorcontext.h"
 #include "systeminfo.h"
 
+#include <QHash>
+
 namespace promela::translator {
 class IvToPromelaGenerator final
 {
@@ -32,6 +34,7 @@ public:
 
 private:
     auto initializeFunction(model::Sequence &sequence, const QString &functionName) -> void;
+    auto createMessageTypes() -> void;
     auto addChannelAndLock(const QString &functionName) -> void;
     auto observerInputSignalName(const ObserverAttachment &attachment) -> QString;
     auto observerInputSignalName(const ObserverInfo &observerInfo) -> QString;
@@ -41,7 +44,7 @@ private:
     auto generateProctype(const QString &functionName, bool environment, const ProctypeInfo &proctypeInfo) -> void;
     auto generateProcessMessageBlock(const QString &functionName, const QString &modelFunctionName,
             const QString &channelName, const QString &inlineName, const QString &parameterType,
-            const QString &parameterName, const QString &exitLabel, bool lock,
+            const QString &parameterName, const QString &messageName, const QString &exitLabel, bool lock,
             std::list<std::unique_ptr<promela::model::ProctypeElement>> preProcessingElements,
             std::list<std::unique_ptr<promela::model::ProctypeElement>> postProcessingElements)
             -> std::unique_ptr<model::ProctypeElement>;
@@ -88,9 +91,16 @@ private:
             const QString &interfaceName, const QString &functionName) -> QString;
     auto handleSendInlineArgument(const QString &parameterType, const QString &functionName,
             const QString &interfaceName, const QString parameterName) -> QString;
+    auto globalTemporaryVariableName(const QString &parameterName) -> QString;
+    auto globalMessageName(const QString &parameterName) -> QString;
     auto buildParameterSubtypeName(
             const QString &functionName, const QString &interfaceName, const QString &parameterName) -> QString;
     auto createChannel(const QString &channelName, const QString &messageType, size_t channelSize) -> void;
+
+    auto messageTypeName(const QString &typeName) -> QString;
+
+    auto assignmentFromPromelaToC(const QString &typeName, const QString &target, const QString &source) -> QString;
+    auto assignmentFromCToPromela(const QString &typeName, const QString &target, const QString &source) -> QString;
 
 private:
     inline static const QString m_systemInitedVariableName = "inited";
@@ -100,5 +110,8 @@ private:
     IvToPromelaTranslatorContext &m_context;
     SystemInfo &m_systemInfo;
     QSet<QString> m_createdChannels;
+
+    QHash<QString, QString> m_templatesFromPromelaToC;
+    QHash<QString, QString> m_templatesFromCToPromela;
 };
 }

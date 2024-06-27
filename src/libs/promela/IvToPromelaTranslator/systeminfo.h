@@ -277,6 +277,8 @@ struct SystemInfo {
      * @brief All observers that are a part of promela system
      */
     std::set<QString> m_observers;
+
+    std::set<QString> m_messageTypes;
 };
 
 }

@@ -59,10 +59,6 @@ public:
 
     QString asn1AsHtml(const QString &filename) const;
 
-    QString checkforCompiler() const;
-
-    QStringList defaultParameter() const;
-
     shared::ErrorItem::TaskType errorType(const QString &error) const;
     int lineNumberFromError(const QString &error) const;
     QString fileNameFromError(const QString &error) const;
@@ -73,7 +69,6 @@ Q_SIGNALS:
     void parseError(const QString &error);
 
 private:
-    QPair<QString, QStringList> asn1CompilerCommand() const;
     QString temporaryFileName(const QString &basename, const QString &suffix) const;
 
     QByteArray fileHash(const QStringList &fileNames) const;

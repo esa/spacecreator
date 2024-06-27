@@ -47,6 +47,12 @@ public:
     ArrayType(size_t size, Type type);
 
     /**
+     */
+    ArrayType(QString constantName, Type type);
+
+    const QString &getSizeConstantName() const;
+    bool hasExternallyDefinedSize() const;
+    /**
      * @brief Getter for array size
      *
      * @returns Array size
@@ -60,7 +66,7 @@ public:
     const Type &getType() const noexcept;
 
 private:
-    size_t m_size;
+    std::variant<size_t, QString> m_size;
     Type m_type;
 };
 }

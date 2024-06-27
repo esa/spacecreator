@@ -21,6 +21,7 @@
 
 #include "assertcall.h"
 #include "assignment.h"
+#include "ccode.h"
 #include "channelrecv.h"
 #include "channelsend.h"
 #include "conditional.h"
@@ -51,7 +52,8 @@ public:
      * @brief Variant representation of different alternatives of proctype element
      */
     using Value = std::variant<Declaration, ChannelSend, ChannelRecv, Expression, DoLoop, Assignment, InlineCall, Skip,
-            Conditional, Sequence, ForLoop, ExitLoop, Select, AssertCall, ElseStatement, Label, GoTo, PrintfStatement>;
+            Conditional, Sequence, ForLoop, ExitLoop, Select, AssertCall, ElseStatement, Label, GoTo, PrintfStatement,
+            CCode>;
 
     /**
      * @brief Constructor

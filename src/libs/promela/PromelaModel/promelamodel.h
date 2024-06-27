@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "cdecl.h"
 #include "initproctype.h"
 #include "inlinedef.h"
 #include "namedmtype.h"
@@ -78,6 +79,10 @@ public:
      * @return List of included promela files
      */
     const QList<QString> &getIncludes() const noexcept;
+
+    void addCDecl(CDecl declaration);
+    const CDecl &getCDecl() const noexcept;
+    bool hasCDecl() const noexcept;
 
     /**
      * @brief Add unnamed mtype value.
@@ -228,6 +233,7 @@ public:
     const QList<QString> &getEpilogueIncludes() const noexcept;
 
 private:
+    std::optional<CDecl> m_cdecl;
     QList<QString> m_includes;
     QSet<QString> m_mtypeValues;
     std::map<QString, NamedMtype> m_namedMtypeValues;

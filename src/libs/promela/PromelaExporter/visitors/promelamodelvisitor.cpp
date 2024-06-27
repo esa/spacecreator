@@ -28,6 +28,7 @@
 #include <QVector>
 #include <algorithm>
 
+using promela::model::CDecl;
 using promela::model::Declaration;
 using promela::model::InitProctype;
 using promela::model::InlineDef;
@@ -52,6 +53,9 @@ PromelaModelVisitor::PromelaModelVisitor(QTextStream &stream, QString baseIndent
 void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
 {
     generateIncludes(promelaModel.getIncludes());
+    if (promelaModel.hasCDecl()) {
+        generateCDecl(promelaModel.getCDecl());
+    }
     generateMtypes(promelaModel.getMtypeValues());
     generateNamedMtypes(promelaModel.getNamedMtypeValues());
     generateTypeAliases(promelaModel.getTypeAliases());
@@ -64,6 +68,18 @@ void PromelaModelVisitor::visit(const PromelaModel &promelaModel)
         generateInitProctype(promelaModel.getInit());
     }
     generateIncludes(promelaModel.getEpilogueIncludes());
+}
+
+void PromelaModelVisitor::generateCDecl(const CDecl &declaration)
+{
+    if (declaration.hasContent()) {
+        m_stream << "c_decl {\n";
+        const auto lines = declaration.getContent().split('\n');
+        for (const auto &line : lines) {
+            m_stream << m_baseIndent << line << "\n";
+        }
+        m_stream << "}\n";
+    }
 }
 
 void PromelaModelVisitor::generateIncludes(const QList<QString> &includes)

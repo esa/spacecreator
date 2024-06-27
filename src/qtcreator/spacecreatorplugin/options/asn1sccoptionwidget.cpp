@@ -17,7 +17,7 @@
 
 #include "asn1sccoptionwidget.h"
 
-#include "asn1reader.h"
+#include "asn1scc.h"
 #include "ui_asn1sccoptionwidget.h"
 
 #include <QFileDialog>
@@ -30,9 +30,9 @@ Asn1SccOptionWidget::Asn1SccOptionWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    Asn1Acn::Asn1Reader reader;
-    ui->compilerLineEdit->setPlaceholderText(reader.checkforCompiler());
-    QString defaultParameters = reader.defaultParameter().join(" ");
+    Asn1Acn::Asn1Scc asn1scc;
+    ui->compilerLineEdit->setPlaceholderText(asn1scc.checkforCompiler());
+    QString defaultParameters = asn1scc.defaultParameter().join(" ");
     ui->parameterLineEdit->setPlaceholderText(defaultParameters);
     connect(ui->pathButton, &QPushButton::clicked, this, [this]() {
         QFileInfo fi(compiler());

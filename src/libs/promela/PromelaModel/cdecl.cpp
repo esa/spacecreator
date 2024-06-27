@@ -1,7 +1,7 @@
 /** @file
  * This file is part of the SpaceCreator.
  *
- * @copyright (C) 2021 N7 Space Sp. z o.o.
+ * @copyright (C) 2024 N7 Space Sp. z o.o.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,38 +17,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-#include "arraytype.h"
+#include "cdecl.h"
 
 namespace promela::model {
-ArrayType::ArrayType(size_t size, Type type)
-    : m_size(size)
-    , m_type(std::move(type))
+CDecl::CDecl()
+    : m_content()
 {
 }
 
-ArrayType::ArrayType(QString constantName, Type type)
-    : m_size(std::move(constantName))
-    , m_type(std::move(type))
+CDecl::CDecl(QString content)
+    : m_content(std::move(content))
 {
 }
 
-const QString &ArrayType::getSizeConstantName() const
+const QString &CDecl::getContent() const noexcept
 {
-    return std::get<QString>(m_size);
+    return m_content;
 }
 
-bool ArrayType::hasExternallyDefinedSize() const
+bool CDecl::hasContent() const noexcept
 {
-    return std::holds_alternative<QString>(m_size);
+    return !m_content.isEmpty();
 }
 
-size_t ArrayType::getSize() const noexcept
+void CDecl::setContent(QString content)
 {
-    return std::get<size_t>(m_size);
-}
-
-const ArrayType::Type &ArrayType::getType() const noexcept
-{
-    return m_type;
+    m_content = std::move(content);
 }
 }

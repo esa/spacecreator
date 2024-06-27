@@ -24,6 +24,7 @@
 #include <QTemporaryFile>
 #include <QtDebug>
 #include <QtGlobal>
+#include <asn1library/asn1scc.h>
 #include <conversion/asn1/Asn1Options/options.h>
 #include <conversion/asn1/Asn1Registrar/registrar.h>
 #include <conversion/common/escaper/escaper.h>
@@ -815,6 +816,12 @@ QFileInfo TmcConverter::simuDataViewLocation() const
             + "observers" + QDir::separator() + "observer.asn");
 }
 
+QFileInfo TmcConverter::dataviewUniqLocation() const
+{
+    return QFileInfo(workDirectory().absoluteFilePath() + QDir::separator() + "dataview" + QDir::separator()
+            + "dataview-uniq.asn");
+}
+
 QFileInfo TmcConverter::sdlImplementationBaseDirectory(const QString &functionName) const
 {
     return QFileInfo(workDirectory().absoluteFilePath() + QDir::separator() + functionName.toLower() + QDir::separator()
@@ -931,7 +938,7 @@ void TmcConverter::convertNextMscObserver()
 void TmcConverter::convertNextObserver()
 {
     if (m_observersToConvert.empty()) {
-        QTimer::singleShot(0, this, SLOT(finishConversion()));
+        generateCDataview();
         return;
     }
     const ObserverInfo info = m_observersToConvert.front();
@@ -965,6 +972,65 @@ void TmcConverter::attachNextObserver()
     convertNextObserver();
 }
 
+void TmcConverter::generateCDataview()
+{
+    Asn1Acn::Asn1Scc asn1scc;
+    QString asn1sccCommand = asn1scc.getAsn1SccCommand();
+
+    QStringList arguments = QStringList() << "-uPER"
+                                          << "-typePrefix"
+                                          << "asn1Scc"
+                                          << "-renamePolicy"
+                                          << "3"
+                                          << "-o" << m_outputDirectory.absolutePath() << "-c";
+    arguments.append(dataviewUniqLocation().absolutePath());
+
+    Q_EMIT message(QString("Converting asn %1\n").arg(dataviewUniqLocation().absolutePath()));
+
+    disconnect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(processFinished(int, QProcess::ExitStatus)));
+    connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(asn1sccProcessFinished(int, QProcess::ExitStatus)));
+    disconnect(m_process, SIGNAL(started()), this, SLOT(processStarted()));
+    connect(m_process, SIGNAL(started()), this, SLOT(asn1sccProcessStarted()));
+
+    m_timer->setSingleShot(true);
+    m_timer->start(m_commandStartTimeout);
+    m_process->start(asn1sccCommand, arguments);
+}
+
+bool TmcConverter::generateMessageSizes(QFileInfo input, QFileInfo output)
+{
+    QFile inputFile(input.absoluteFilePath());
+    if (!inputFile.open(QIODevice::ReadOnly)) {
+        const auto errorMessage = QString("Could not open file %1\n").arg(input.absoluteFilePath());
+        Q_EMIT message(errorMessage);
+        Q_EMIT conversionFinished(false);
+        return false;
+    }
+    QFile outputFile(output.absoluteFilePath());
+    if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        const auto errorMessage = QString("Could not open file %1\n").arg(output.absoluteFilePath());
+        Q_EMIT message(errorMessage);
+        Q_EMIT conversionFinished(false);
+        return false;
+    }
+
+    QTextStream in(&inputFile);
+    QTextStream out(&outputFile);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        if (line.contains("_REQUIRED_BYTES_FOR_ENCODING")) {
+            out << line << "\n";
+        }
+    }
+
+    outputFile.close();
+    inputFile.close();
+
+    return true;
+}
+
 void TmcConverter::finishConversion()
 {
     const QFileInfo simuDataView = simuDataViewLocation();
@@ -982,6 +1048,12 @@ void TmcConverter::finishConversion()
     const QFileInfo outputSystemFile = outputFilepath("system.pml");
     if (!convertInterfaceview(m_outputOptimizedIvFileName, outputSystemFile.absoluteFilePath(), m_asn1Files,
                 m_modelFunctions, m_finalEnvironmentFunctions)) {
+        return;
+    }
+
+    const QFileInfo outputMessageSizesFile = outputFilepath("message_sizes.pml");
+    const QFileInfo inputHeaderFile = outputFilepath("dataview-uniq.h");
+    if (generateMessageSizes(inputHeaderFile, outputMessageSizesFile)) {
         return;
     }
 
@@ -1089,5 +1161,26 @@ void TmcConverter::observerConversionFinished(bool success)
 void TmcConverter::stopConditionConversionFinished(bool success)
 {
     Q_EMIT conversionFinished(success);
+}
+
+void TmcConverter::asn1sccProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    if (exitCode != EXIT_SUCCESS) {
+        Q_EMIT conversionFinished(false);
+        return;
+    }
+
+    QTimer::singleShot(0, this, SLOT(finishConversion()));
+}
+
+void TmcConverter::asn1sccProcessStarted()
+{
+    Asn1Acn::Asn1Scc asn1scc;
+    int asn1sccTimeout = asn1scc.getCompilerTimeout();
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(asn1sccTimeout);
 }
 }

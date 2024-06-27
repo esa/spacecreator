@@ -65,7 +65,7 @@ std::vector<std::unique_ptr<Model>> IvToPromelaTranslator::translateModels(
     const auto asn1SubtypesDefinitions = getSubtypesDefinitions(asn1Model, options);
 
     IvToPromelaTranslatorContext context(
-            promelaModel.get(), ivModel, options, asn1SubtypesDefinitions, modelFunctions, observerNames);
+            promelaModel.get(), ivModel, asn1Model, options, asn1SubtypesDefinitions, modelFunctions, observerNames);
 
     for (const auto &info : observerAttachmentInfos) {
         context.addObserverAttachment(ObserverAttachment(info));
@@ -110,7 +110,8 @@ std::unique_ptr<SystemInfo> IvToPromelaTranslator::prepareSystemInfo(
     const auto &observerAttachmentInfos = options.values(PromelaOptions::observerAttachment);
     const auto &observerNames = options.values(PromelaOptions::observerFunctionName);
 
-    IvToPromelaTranslatorContext context(nullptr, model, options, asn1Definitions, modelFunctions, observerNames);
+    IvToPromelaTranslatorContext context(
+            nullptr, model, nullptr, options, asn1Definitions, modelFunctions, observerNames);
 
     if (options.isSet(PromelaOptions::processesBasePriority)) {
         context.setBaseProctypePriority(options.value(PromelaOptions::processesBasePriority)->toUInt());
@@ -140,6 +141,29 @@ std::unique_ptr<SystemInfo> IvToPromelaTranslator::prepareSystemInfo(
     }
 
     result->m_observers = std::set<QString>(observerNames.begin(), observerNames.end());
+
+    // types how to
+    for (const IVFunction *ivFunction : ivFunctionList) {
+        const QString functionName = ivFunction->property("name").toString();
+        if (std::find(modelFunctions.begin(), modelFunctions.end(), functionName) != modelFunctions.end()) {
+
+            for (const IVInterface *providedInterface : ivFunction->pis()) {
+                if (providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
+                    const auto [parameterName, parameterType] = getInterfaceParameter(providedInterface);
+                    result->m_messageTypes.insert(parameterType);
+                }
+            }
+
+        } else if (std::find(environmentFunctions.begin(), environmentFunctions.end(), functionName)
+                != environmentFunctions.end()) {
+            for (const IVInterface *providedInterface : ivFunction->pis()) {
+                if (providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
+                    const auto [parameterName, parameterType] = getInterfaceParameter(providedInterface);
+                    result->m_messageTypes.insert(parameterType);
+                }
+            }
+        }
+    }
 
     return result;
 }

@@ -70,6 +70,10 @@ void DataTypeSuffixVisitor::operator()(const MtypeRef &type)
 
 void DataTypeSuffixVisitor::operator()(const ArrayType &type)
 {
-    m_stream << "[" << type.getSize() << "]";
+    if (type.hasExternallyDefinedSize()) {
+        m_stream << "[" << type.getSizeConstantName() << "]";
+    } else {
+        m_stream << "[" << type.getSize() << "]";
+    }
 }
 }

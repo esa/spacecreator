@@ -26,11 +26,12 @@ using ivm::IVModel;
 
 namespace promela::translator {
 IvToPromelaTranslatorContext::IvToPromelaTranslatorContext(model::PromelaSystemModel *promelaModel,
-        const IVModel *ivModel, const conversion::Options &options,
+        const IVModel *ivModel, const Asn1Acn::Asn1Model *asn1Model, const conversion::Options &options,
         const std::vector<const Asn1Acn::Definitions *> &asn1SubtypesDefinitons,
         const std::vector<QString> &modelFunctions, const std::vector<QString> &observerNames)
     : m_promelaModel(promelaModel)
     , m_ivModel(ivModel)
+    , m_asn1Model(asn1Model)
     , m_options(options)
     , m_asn1SubtypesDefinitons(asn1SubtypesDefinitons)
     , m_modelFunctions(modelFunctions)
@@ -156,6 +157,11 @@ auto IvToPromelaTranslatorContext::model() const -> model::PromelaSystemModel *
 const IVModel *IvToPromelaTranslatorContext::ivModel() const
 {
     return m_ivModel;
+}
+
+const Asn1Acn::Asn1Model *IvToPromelaTranslatorContext::asn1Model() const
+{
+    return m_asn1Model;
 }
 
 const conversion::Options &IvToPromelaTranslatorContext::options() const

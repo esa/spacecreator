@@ -1,0 +1,55 @@
+/** @file
+ * This file is part of the SpaceCreator.
+ *
+ * @copyright (C) 2024 N7 Space Sp. z o.o.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+
+#pragma once
+
+#include <QString>
+#include <asn1library/asn1/asn1model.h>
+#include <asn1library/asn1/types/type.h>
+
+namespace promela::translator {
+class Helper
+{
+public:
+    Helper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source);
+
+    QString createAssignmentTemplateFromPromelaToC(const QString &typeName);
+    QString createAssignmentTemplateFromCToPromela(const QString &typeName);
+
+    QString createAssignmentTemplateFromPromelaToC(const Asn1Acn::Types::Type *type);
+    QString createAssignmentTemplateFromCToPromela(const Asn1Acn::Types::Type *type);
+
+private:
+    const Asn1Acn::TypeAssignment *findType(const QString &name);
+
+    QString sequenceAssignmentFromPromelaToC(const Asn1Acn::Types::Sequence *type);
+    QString sequenceOfAssignmentFromPromelaToC(const Asn1Acn::Types::SequenceOf *type);
+    QString choiceAssignmentFromPromelaToC(const Asn1Acn::Types::Choice *type);
+
+    QString sequenceAssignmentFromCToPromela(const Asn1Acn::Types::Sequence *type);
+    QString sequenceOfAssignmentFromCToPromela(const Asn1Acn::Types::SequenceOf *type);
+    QString choiceAssignmentFromCToPromela(const Asn1Acn::Types::Choice *type);
+    QString addIndent(const QString &text);
+
+private:
+    const Asn1Acn::Asn1Model *m_asn1Model;
+    const QString m_target;
+    const QString m_source;
+};
+}

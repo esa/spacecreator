@@ -6,6 +6,8 @@ set(SOURCES
   assignment.cpp
   binaryexpression.cpp
   booleanconstant.cpp
+  ccode.cpp
+  cdecl.cpp
   channelinit.cpp
   channelrecv.cpp
   channelsend.cpp
@@ -46,6 +48,8 @@ set(INCLUDES
   basictypes.h
   binaryexpression.h
   booleanconstant.h
+  ccode.h
+  cdecl.h
   channelinit.h
   channelrecv.h
   channelsend.h
