@@ -20,8 +20,10 @@
 #pragma once
 
 #include <QString>
+#include <QStringList>
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/sequencecomponentvisitor.h>
+#include <promela/PromelaModel/variableref.h>
 
 namespace promela::translator {
 class SequenceComponentVisitor final : public Asn1Acn::SequenceComponentVisitor
@@ -43,6 +45,7 @@ public:
     const QString &getComponentName() const;
     bool isOptional() const;
     const QString &getContent() const;
+    QList<promela::model::VariableRef> takeListOfFields();
 
 private:
     const Direction m_direction;
@@ -53,5 +56,6 @@ private:
     QString m_componentName;
     bool m_isOptional;
     QString m_content;
+    QList<promela::model::VariableRef> m_fields;
 };
 }

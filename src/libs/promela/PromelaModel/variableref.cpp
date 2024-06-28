@@ -92,6 +92,26 @@ void VariableRef::appendElement(QString ref, std::unique_ptr<Expression> indexEx
     m_elements.emplace_back(std::move(ref), std::move(indexExpression));
 }
 
+void VariableRef::prependElement(QString ref)
+{
+    m_elements.emplace_front(std::move(ref), std::unique_ptr<Expression>());
+}
+
+void VariableRef::prependElement(QString ref, std::unique_ptr<Expression> indexExpression)
+{
+    m_elements.emplace_front(std::move(ref), std::move(indexExpression));
+}
+
+void VariableRef::addIndexExpression(std::unique_ptr<Expression> indexExpression)
+{
+    m_elements.front().m_index = std::move(indexExpression);
+}
+
+void VariableRef::changeFirstRef(QString ref)
+{
+    m_elements.front().m_name = std::move(ref);
+}
+
 const std::list<VariableRef::Element> &VariableRef::getElements() const noexcept
 {
     return m_elements;

@@ -19,21 +19,33 @@
 
 #pragma once
 
+#include <QList>
 #include <QString>
+#include <QStringList>
 #include <asn1library/asn1/asn1model.h>
 #include <asn1library/asn1/types/type.h>
+#include <promela/PromelaModel/expression.h>
+#include <promela/PromelaModel/variableref.h>
 
 namespace promela::translator {
 class Helper
 {
 public:
+    struct PrintfTemplate {
+        QString m_fmt;
+        QList<promela::model::VariableRef> m_args;
+    };
+
+public:
     Helper(const Asn1Acn::Asn1Model *asn1Model, QString target, QString source);
 
     QString createAssignmentTemplateFromPromelaToC(const QString &typeName);
     QString createAssignmentTemplateFromCToPromela(const QString &typeName);
+    QList<PrintfTemplate> generatePrintfTemplate(const QString &typeName);
 
     QString createAssignmentTemplateFromPromelaToC(const Asn1Acn::Types::Type *type);
     QString createAssignmentTemplateFromCToPromela(const Asn1Acn::Types::Type *type);
+    QList<promela::model::VariableRef> generateListOfFields(const Asn1Acn::Types::Type *type);
 
 private:
     const Asn1Acn::TypeAssignment *findType(const QString &name);
@@ -45,6 +57,11 @@ private:
     QString sequenceAssignmentFromCToPromela(const Asn1Acn::Types::Sequence *type);
     QString sequenceOfAssignmentFromCToPromela(const Asn1Acn::Types::SequenceOf *type);
     QString choiceAssignmentFromCToPromela(const Asn1Acn::Types::Choice *type);
+
+    QList<promela::model::VariableRef> sequenceListOfFields(const Asn1Acn::Types::Sequence *type);
+    QList<promela::model::VariableRef> sequenceOfListOfFields(const Asn1Acn::Types::SequenceOf *type);
+    QList<promela::model::VariableRef> choiceListOfFields(const Asn1Acn::Types::Choice *type);
+
     QString addIndent(const QString &text);
 
 private:

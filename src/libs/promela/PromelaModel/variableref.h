@@ -115,6 +115,14 @@ public:
      */
     void appendElement(QString ref, std::unique_ptr<Expression> indexExpression);
 
+    void prependElement(QString ref);
+
+    void prependElement(QString ref, std::unique_ptr<Expression> indexExpression);
+
+    void addIndexExpression(std::unique_ptr<Expression> indexExpression);
+
+    void changeFirstRef(QString ref);
+
     /**
      * @brief Getter for elements to variable reference.
      *

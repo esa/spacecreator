@@ -67,6 +67,7 @@ namespace promela::translator {
 IvToPromelaGenerator::IvToPromelaGenerator(IvToPromelaTranslatorContext &context, SystemInfo &systemInfo)
     : m_context(context)
     , m_systemInfo(systemInfo)
+    , m_ccodeGenerator(context.asn1Model(), m_systemInfo.m_messageTypes)
 {
 }
 
@@ -133,11 +134,6 @@ void IvToPromelaGenerator::createMessageTypes()
         bufferType.addField(std::move(arrayDeclaration));
 
         m_context.model()->addUtype(bufferType);
-
-        Helper helper(m_context.asn1Model(), "$target$", "$source$");
-
-        m_templatesFromPromelaToC.insert(messageType, helper.createAssignmentTemplateFromPromelaToC(messageType));
-        m_templatesFromCToPromela.insert(messageType, helper.createAssignmentTemplateFromCToPromela(messageType));
     }
 }
 
@@ -392,8 +388,8 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::generateProcessMessageBlo
     processMessageSeq->appendElement(
             createReceiveStatement(modelFunctionName, channelName, parameterType, messageName));
 
-    QString assignment =
-            assignmentFromCToPromela(parameterType, QString("now.%1").arg(parameterName), parameterName + "_c_var");
+    QString assignment = m_ccodeGenerator.assignmentFromCToPromela(
+            parameterType, QString("now.%1").arg(parameterName), parameterName + "_c_var");
 
     QString conversionCode = QString("{\n"
                                      "asn1Scc%1 %2_c_var;\n"
@@ -755,6 +751,9 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
     QList<QString> inlineArguments;
     QList<Expression> sendArguments;
 
+    QString temporaryVariableName;
+    QString temporaryVariableType;
+
     if (m_context.isMulticastSupported()) {
         // if multicast is supported - send a pid of the caller
         const QString pidName = QString("PID_%1").arg(Escaper::escapePromelaField(functionName));
@@ -768,7 +767,8 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
                 parameterInfo.m_parameterType, functionName, info.m_interfaceName, parameterInfo.m_parameterName);
 
         const QString messageVariableName = globalMessageName(argumentName);
-        const QString temporaryVariableName = globalTemporaryVariableName(argumentName);
+        temporaryVariableName = globalTemporaryVariableName(argumentName);
+        temporaryVariableType = parameterInfo.m_parameterType;
 
         Declaration messageVariableDecl =
                 Declaration(DataType(UtypeRef(messageTypeName(parameterInfo.m_parameterType))), messageVariableName);
@@ -790,7 +790,7 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
         sequence.appendElement(InlineCall(
                 QString("%1_assign_value").arg(parameterInfo.m_parameterType), std::move(assignInlineArguments)));
 
-        QString assignment = assignmentFromPromelaToC(
+        QString assignment = m_ccodeGenerator.assignmentFromPromelaToC(
                 parameterInfo.m_parameterType, argumentName + "_c_var", QString("now.%1").arg(temporaryVariableName));
 
         QString code = QString("{\n"
@@ -822,6 +822,17 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
     for (auto targetIter = info.m_targets.begin(); targetIter != info.m_targets.end(); ++targetIter) {
         const RequiredCallInfo::TargetInfo &targetInfo = targetIter->second;
         const QString channelName = targetInfo.m_providedQueueName;
+        if (temporaryVariableName.isEmpty()) {
+            QList<Expression> arguments;
+            arguments.append(Expression(StringConstant(QString("%1 send: 0").arg(channelName))));
+            sequence.appendElement(PrintfStatement(std::move(arguments)));
+        } else {
+            QList<PrintfStatement> statements = m_ccodeGenerator.printfStatements(
+                    temporaryVariableType, temporaryVariableName, QString("%1 send: ").arg(channelName));
+            while (!statements.empty()) {
+                sequence.appendElement(statements.takeFirst());
+            }
+        }
         sequence.appendElement(ChannelSend(VariableRef(channelName), sendArguments));
     }
 
@@ -1303,34 +1314,4 @@ QString IvToPromelaGenerator::messageTypeName(const QString &typeName)
 {
     return QString("%1Message").arg(typeName);
 }
-
-QString IvToPromelaGenerator::assignmentFromPromelaToC(
-        const QString &typeName, const QString &target, const QString &source)
-{
-    if (!m_templatesFromPromelaToC.contains(typeName)) {
-        auto message = QString("No assignment template from promela to c for type %1").arg(typeName);
-        throw TranslationException(message);
-    }
-
-    QString tmplt = m_templatesFromPromelaToC.value(typeName);
-
-    tmplt.replace("$target$", target);
-    tmplt.replace("$source$", source);
-    return tmplt;
-}
-
-QString IvToPromelaGenerator::assignmentFromCToPromela(
-        const QString &typeName, const QString &target, const QString &source)
-{
-    if (!m_templatesFromCToPromela.contains(typeName)) {
-        auto message = QString("No assignment template from c to promela for type %1").arg(typeName);
-        throw TranslationException(message);
-    }
-
-    QString tmplt = m_templatesFromCToPromela.value(typeName);
-    tmplt.replace("$target$", target);
-    tmplt.replace("$source$", source);
-    return tmplt;
-}
-
 }

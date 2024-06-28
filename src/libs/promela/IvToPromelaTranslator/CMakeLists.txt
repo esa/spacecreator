@@ -1,6 +1,7 @@
 project(IvToPromelaTranslator VERSION 1.0.0 LANGUAGES CXX)
 
 set(SOURCES
+  ccodegenerator.cpp
   helper.cpp
   ivtopromelagenerator.cpp
   ivtopromelatranslatorcontext.cpp
@@ -10,6 +11,7 @@ set(SOURCES
   translator.cpp
 )
 set(INCLUDES
+  ccodegenerator.h
   helper.h
   ivtopromelagenerator.h
   ivtopromelatranslatorcontext.h

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "ccodegenerator.h"
 #include "ivtopromelatranslatorcontext.h"
 #include "systeminfo.h"
 
@@ -99,9 +100,6 @@ private:
 
     auto messageTypeName(const QString &typeName) -> QString;
 
-    auto assignmentFromPromelaToC(const QString &typeName, const QString &target, const QString &source) -> QString;
-    auto assignmentFromCToPromela(const QString &typeName, const QString &target, const QString &source) -> QString;
-
 private:
     inline static const QString m_systemInitedVariableName = "inited";
     inline static const QString m_timerManagerProctypeName = "timer_manager_proc";
@@ -110,8 +108,6 @@ private:
     IvToPromelaTranslatorContext &m_context;
     SystemInfo &m_systemInfo;
     QSet<QString> m_createdChannels;
-
-    QHash<QString, QString> m_templatesFromPromelaToC;
-    QHash<QString, QString> m_templatesFromCToPromela;
+    CCodeGenerator m_ccodeGenerator;
 };
 }

@@ -55,6 +55,9 @@ void SequenceComponentVisitor::visit(const Asn1Acn::AsnSequenceComponent &compon
         m_content = helper.createAssignmentTemplateFromCToPromela(component.type());
         break;
     }
+
+    Helper fieldHelper(m_asn1Model, m_target, "");
+    m_fields = fieldHelper.generateListOfFields(component.type());
 }
 
 void SequenceComponentVisitor::visit(const Asn1Acn::AcnSequenceComponent &component)
@@ -80,5 +83,10 @@ bool SequenceComponentVisitor::isOptional() const
 const QString &SequenceComponentVisitor::getContent() const
 {
     return m_content;
+}
+
+QList<promela::model::VariableRef> SequenceComponentVisitor::takeListOfFields()
+{
+    return std::move(m_fields);
 }
 }
