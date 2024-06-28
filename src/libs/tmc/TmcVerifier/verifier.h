@@ -280,7 +280,10 @@ private:
     void executeVerifier();
 
     void executeSpin();
+    void startCompilation();
     void executeCC();
+    void executeCCLinker();
+    void runCC(const QStringList &arguments);
     void collectErrors();
     void generateTraces(int count);
     void generateNextTrace();
@@ -302,6 +305,7 @@ private Q_SLOTS:
     void spinFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void ccStarted();
     void ccFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void ccLinkerFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void panStarted();
     void panFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void traceGeneratorStarted();
@@ -342,6 +346,7 @@ private:
     QStringList m_traceFiles;
     QString m_currentTraceFile;
     QStringList m_mscObserverFiles;
+    QStringList m_cSourceFiles;
 
     QMetaObject::Connection m_processStartedConnection;
     QMetaObject::Connection m_processFinishedConnection;

@@ -382,11 +382,16 @@ void TmcVerifier::executeSpin()
     m_process->start(spinExe, arguments);
 }
 
-void TmcVerifier::executeCC()
+void TmcVerifier::startCompilation()
 {
-    const QString inputFile = "pan.c";
-    const QString outputFile = "pan";
-    const QString compilerExe = "gcc";
+    QDir outputDir(m_outputDirectory);
+
+    m_cSourceFiles = outputDir.entryList(QStringList("*.c"),
+            QDir::Files | QDir::CaseSensitive | QDir::Readable | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    // find c files
+    // compile
+    // link
+    // inject here
 
     m_process->setWorkingDirectory(m_outputDirectory);
 
@@ -396,41 +401,73 @@ void TmcVerifier::executeCC()
     disconnect(m_processStartedConnection);
     m_processStartedConnection = connect(m_process, SIGNAL(started()), this, SLOT(ccStarted()));
 
+    executeCC();
+}
+
+void TmcVerifier::executeCC()
+{
+    const QString inputFile = m_cSourceFiles.front();
+    m_cSourceFiles.pop_front();
+
     QStringList arguments = m_additionalCompilerFlags.split(" ");
 
+    if (inputFile == "pan.c") {
+        constexpr int VECTORSZ_DEFAULT_VALUE = 65535;
+        int vectorszValue = m_vectorszValue.value_or(VECTORSZ_DEFAULT_VALUE);
+        arguments.append("-DVECTORSZ=" + QString::number(vectorszValue));
+        qDebug() << "VECTORSZ: " << vectorszValue;
+
+        if (m_useBitHashing) {
+            arguments.append("-DBITSTATE");
+        }
+
+        if (m_explorationMode == ExplorationMode::BreadthFirst) {
+            arguments.append("-DBFS");
+        }
+
+        if (m_memoryLimit.has_value()) {
+            arguments.append(QString("-DMEMLIM=%1").arg(m_memoryLimit.value()));
+        }
+
+        if (m_numberOfCores.has_value()) {
+            arguments.append(QString("-DNCORE=%1").arg(m_numberOfCores.value()));
+        }
+
+        if (m_useFairScheduling) {
+            arguments.append(QString("-DNFAIR=%1").arg(m_converter->getNumberOfProctypes()));
+        }
+
+        if (m_searchShortestPath) {
+            arguments.append("-DREACH");
+        }
+    }
+
+    arguments.append("-c");
+    arguments.append(inputFile);
+
+    runCC(arguments);
+}
+
+void TmcVerifier::executeCCLinker()
+{
+    disconnect(m_processFinishedConnection);
+    m_processFinishedConnection = connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(ccLinkerFinished(int, QProcess::ExitStatus)));
+
+    QDir outputDir(m_outputDirectory);
+    QStringList arguments = outputDir.entryList(QStringList("*.o"),
+            QDir::Files | QDir::CaseSensitive | QDir::Readable | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+
+    const QString outputFile = "pan";
     arguments.append("-o");
     arguments.append(outputFile);
 
-    constexpr int VECTORSZ_DEFAULT_VALUE = 65535;
-    int vectorszValue = m_vectorszValue.value_or(VECTORSZ_DEFAULT_VALUE);
-    arguments.append("-DVECTORSZ=" + QString::number(vectorszValue));
-    qDebug() << "VECTORSZ: " << vectorszValue;
+    runCC(arguments);
+}
 
-    if (m_useBitHashing) {
-        arguments.append("-DBITSTATE");
-    }
-
-    if (m_explorationMode == ExplorationMode::BreadthFirst) {
-        arguments.append("-DBFS");
-    }
-
-    if (m_memoryLimit.has_value()) {
-        arguments.append(QString("-DMEMLIM=%1").arg(m_memoryLimit.value()));
-    }
-
-    if (m_numberOfCores.has_value()) {
-        arguments.append(QString("-DNCORE=%1").arg(m_numberOfCores.value()));
-    }
-
-    if (m_useFairScheduling) {
-        arguments.append(QString("-DNFAIR=%1").arg(m_converter->getNumberOfProctypes()));
-    }
-
-    if (m_searchShortestPath) {
-        arguments.append("-DREACH");
-    }
-
-    arguments.append(inputFile);
+void TmcVerifier::runCC(const QStringList &arguments)
+{
+    const QString compilerExe = "gcc";
 
     Q_EMIT verifierMessage(QString("Executing %1 %2\n").arg(compilerExe).arg(arguments.join(" ")));
     m_timer->setSingleShot(true);
@@ -701,7 +738,7 @@ void TmcVerifier::spinFinished(int exitCode, QProcess::ExitStatus exitStatus)
         Q_EMIT finished(false);
         return;
     }
-    executeCC();
+    startCompilation();
 }
 
 void TmcVerifier::ccStarted()
@@ -714,6 +751,24 @@ void TmcVerifier::ccStarted()
 }
 
 void TmcVerifier::ccFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitStatus);
+    m_timer->stop();
+    m_process->terminate();
+    if (exitCode != EXIT_SUCCESS) {
+        auto message = QString("CC finished with code: %1\n").arg(exitCode);
+        Q_EMIT verifierMessage(message);
+        Q_EMIT finished(false);
+        return;
+    }
+    if (m_cSourceFiles.empty()) {
+        executeCCLinker();
+    } else {
+        executeCC();
+    }
+}
+
+void TmcVerifier::ccLinkerFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitStatus);
     m_timer->stop();
