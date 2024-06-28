@@ -983,7 +983,7 @@ void TmcConverter::generateCDataview()
                                           << "-renamePolicy"
                                           << "3"
                                           << "-o" << m_outputDirectory.absolutePath() << "-c";
-    arguments.append(dataviewUniqLocation().absolutePath());
+    arguments.append(dataviewUniqLocation().absoluteFilePath());
 
     Q_EMIT message(QString("Converting asn %1\n").arg(dataviewUniqLocation().absolutePath()));
 
@@ -1053,7 +1053,7 @@ void TmcConverter::finishConversion()
 
     const QFileInfo outputMessageSizesFile = outputFilepath("message_sizes.pml");
     const QFileInfo inputHeaderFile = outputFilepath("dataview-uniq.h");
-    if (generateMessageSizes(inputHeaderFile, outputMessageSizesFile)) {
+    if (!generateMessageSizes(inputHeaderFile, outputMessageSizesFile)) {
         return;
     }
 
