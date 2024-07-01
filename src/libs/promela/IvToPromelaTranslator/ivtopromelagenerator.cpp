@@ -388,24 +388,14 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::generateProcessMessageBlo
     processMessageSeq->appendElement(
             createReceiveStatement(modelFunctionName, channelName, parameterType, messageName));
 
-    QString assignment = m_ccodeGenerator.assignmentFromCToPromela(
-            parameterType, QString("now.%1").arg(parameterName), parameterName + "_c_var");
+    m_ccodeGenerator.generateConversionFromBufferToParameter(*processMessageSeq, parameterType, parameterName);
 
-    QString conversionCode = QString("{\n"
-                                     "asn1Scc%1 %2_c_var;\n"
-                                     "BitStream %2_stream;\n"
-                                     "int %2_rc;"
-                                     "BitStream_AttachBuffer(&%2_stream,\n"
-                                     "    now.%2_message.data,\n"
-                                     "    asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING);\n"
-                                     "asn1Scc%1_Decode(&%2_c_var,\n"
-                                     "    &%2_stream,\n"
-                                     "    &%2_rc);\n"
-                                     "%3"
-                                     "}")
-                                     .arg(parameterType, parameterName, std::move(assignment));
+    QList<PrintfStatement> statements =
+            m_ccodeGenerator.printfStatements(parameterType, parameterName, QString("%1 recv: ").arg(channelName));
 
-    processMessageSeq->appendElement(CCode(std::move(conversionCode)));
+    while (!statements.empty()) {
+        processMessageSeq->appendElement(statements.takeFirst());
+    }
 
     while (!preProcessingElements.empty()) {
         processMessageSeq->appendElement(std::move(preProcessingElements.front()));
@@ -774,44 +764,15 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
                 Declaration(DataType(UtypeRef(messageTypeName(parameterInfo.m_parameterType))), messageVariableName);
         Declaration temporaryVariableDecl =
                 Declaration(DataType(UtypeRef(parameterInfo.m_parameterType)), temporaryVariableName);
+
         m_context.model()->addDeclaration(std::move(messageVariableDecl));
         m_context.model()->addDeclaration(std::move(temporaryVariableDecl));
 
         inlineArguments.append(argumentName);
         sendArguments.append(Expression(VariableRef(messageVariableName)));
 
-        // generate code to encode parameter in message
-        // TODO this shall be an inline call
-        // sequence.appendElement(Assignment(VariableRef(temporaryVariableName),
-        // Expression(VariableRef(argumentName))));
-        QList<InlineCall::Argument> assignInlineArguments;
-        assignInlineArguments.append(VariableRef(temporaryVariableName));
-        assignInlineArguments.append(VariableRef(argumentName));
-        sequence.appendElement(InlineCall(
-                QString("%1_assign_value").arg(parameterInfo.m_parameterType), std::move(assignInlineArguments)));
-
-        QString assignment = m_ccodeGenerator.assignmentFromPromelaToC(
-                parameterInfo.m_parameterType, argumentName + "_c_var", QString("now.%1").arg(temporaryVariableName));
-
-        QString code = QString("{\n"
-                               "asn1Scc%1 %2_c_var;\n"
-                               "BitStream %2_stream;\n"
-                               "int %2_rc;\n"
-                               "\n"
-                               "%4"
-                               "\n"
-                               "BitStream_Init(&%2_stream,\n"
-                               "    now.%3.data,\n"
-                               "    asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING);\n"
-                               "asn1Scc%1_Encode(&%2_c_var,\n"
-                               "    &%2_stream,\n"
-                               "    &%2_rc,\n"
-                               "    0);\n"
-                               "}")
-                               .arg(parameterInfo.m_parameterType, argumentName, messageVariableName, assignment);
-
-        sequence.appendElement(CCode(std::move(code)));
-
+        m_ccodeGenerator.generateConversionFromParameterToBuffer(
+                sequence, argumentName, parameterInfo.m_parameterType, temporaryVariableName, messageVariableName);
     } else {
         if (info.m_parameters.empty() && sendArguments.empty()) {
             // if there's PID nor parameter, put zero in queue.
@@ -1139,34 +1100,52 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
                 const QString inlineName =
                         QString("%1_0_RI_0_%2").arg(Escaper::escapePromelaIV(observerName)).arg(observerInterface);
 
-                QList<QString> arguments;
-                QList<Expression> params;
+                QList<QString> inlineArguments;
+                QList<Expression> sendParams;
+                Sequence sequence(Sequence::Type::NORMAL);
+
+                QString temporaryVariableName;
+
                 if (m_context.isMulticastSupported()) {
                     const QString senderVariableName =
                             QString("%1_sender").arg(Escaper::escapePromelaField(toFunction));
-                    if (!parameterType.isEmpty()) {
-                        const QString name = QString("%1_%2_%3").arg(observerName).arg(toFunction).arg(parameterName);
-                        arguments.append(name);
-                        params.append(Expression(VariableRef(senderVariableName)));
-                        params.append(Expression(VariableRef(name)));
-                    } else {
-                        params.append(Expression(VariableRef(senderVariableName)));
+                    sendParams.append(Expression(VariableRef(senderVariableName)));
+                }
+
+                if (!parameterType.isEmpty()) {
+                    const QString name = QString("%1_%2_%3").arg(observerName).arg(toFunction).arg(parameterName);
+                    inlineArguments.append(name);
+                    const QString messageVariableName = globalMessageName(name);
+                    temporaryVariableName = globalTemporaryVariableName(name);
+
+                    Declaration messageVariableDecl =
+                            Declaration(DataType(UtypeRef(messageTypeName(parameterType))), messageVariableName);
+                    Declaration temporaryVariableDecl =
+                            Declaration(DataType(UtypeRef(parameterType)), temporaryVariableName);
+
+                    m_context.model()->addDeclaration(std::move(messageVariableDecl));
+                    m_context.model()->addDeclaration(std::move(temporaryVariableDecl));
+
+                    sendParams.append(Expression(VariableRef(messageVariableName)));
+                    m_ccodeGenerator.generateConversionFromParameterToBuffer(
+                            sequence, name, parameterType, temporaryVariableName, messageVariableName);
+                    QList<PrintfStatement> statements = m_ccodeGenerator.printfStatements(
+                            parameterType, temporaryVariableName, QString("%1 send: ").arg(channelName));
+                    while (!statements.empty()) {
+                        sequence.appendElement(statements.takeFirst());
                     }
                 } else {
-                    if (!parameterType.isEmpty()) {
-                        const QString name = QString("%1_%2_%3").arg(observerName).arg(toFunction).arg(parameterName);
-                        arguments.append(name);
-                        params.append(Expression(VariableRef(name)));
-                    } else {
-                        params.append(Expression(Constant(1)));
-                    }
-                }
-                Sequence sequence(Sequence::Type::NORMAL);
+                    sendParams.append(Expression(Constant(1)));
 
-                sequence.appendElement(ChannelSend(VariableRef(channelName), params));
+                    QList<Expression> printfArguments;
+                    printfArguments.append(Expression(StringConstant(QString("%1 send: 0").arg(channelName))));
+                    sequence.appendElement(PrintfStatement(std::move(printfArguments)));
+                }
+
+                sequence.appendElement(ChannelSend(VariableRef(channelName), sendParams));
 
                 m_context.model()->addInlineDef(
-                        std::make_unique<InlineDef>(inlineName, arguments, std::move(sequence)));
+                        std::make_unique<InlineDef>(inlineName, inlineArguments, std::move(sequence)));
             }
         }
     }

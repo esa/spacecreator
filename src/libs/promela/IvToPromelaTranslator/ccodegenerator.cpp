@@ -22,9 +22,13 @@
 #include "helper.h"
 
 #include <conversion/common/translation/exceptions.h>
+#include <promela/PromelaModel/ccode.h>
+#include <promela/PromelaModel/proctypeelement.h>
 
 using conversion::translator::TranslationException;
+using promela::model::CCode;
 using promela::model::Expression;
+using promela::model::InlineCall;
 using promela::model::PrintfStatement;
 using promela::model::StringConstant;
 using promela::model::VariableRef;
@@ -38,6 +42,61 @@ CCodeGenerator::CCodeGenerator(const Asn1Acn::Asn1Model *asn1Model, const std::s
         m_templatesFromCToPromela.insert(messageType, helper.createAssignmentTemplateFromCToPromela(messageType));
         m_printfTemplates.insert(messageType, helper.generatePrintfTemplate(messageType));
     }
+}
+
+void CCodeGenerator::generateConversionFromParameterToBuffer(promela::model::Sequence &sequence,
+        const QString &parameterName, const QString &parameterType, const QString &temporaryVariableName,
+        const QString &bufferVariableName)
+{
+    QList<InlineCall::Argument> assignInlineArguments;
+    assignInlineArguments.append(VariableRef(temporaryVariableName));
+    assignInlineArguments.append(VariableRef(parameterName));
+    sequence.appendElement(InlineCall(QString("%1_assign_value").arg(parameterType), std::move(assignInlineArguments)));
+
+    QString assignment = assignmentFromPromelaToC(
+            parameterType, QString("%1_c_var").arg(parameterName), QString("now.%1").arg(temporaryVariableName));
+
+    QString code = QString("{\n"
+                           "asn1Scc%1 %2_c_var;\n"
+                           "BitStream %2_stream;\n"
+                           "int %2_rc;\n"
+                           "\n"
+                           "%4"
+                           "\n"
+                           "BitStream_Init(&%2_stream,\n"
+                           "    now.%3.data,\n"
+                           "    asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING);\n"
+                           "asn1Scc%1_Encode(&%2_c_var,\n"
+                           "    &%2_stream,\n"
+                           "    &%2_rc,\n"
+                           "    0);\n"
+                           "}")
+                           .arg(parameterType, parameterName, bufferVariableName, assignment);
+
+    sequence.appendElement(CCode(std::move(code)));
+}
+
+void CCodeGenerator::generateConversionFromBufferToParameter(
+        promela::model::Sequence &sequence, const QString &parameterType, const QString &parameterName)
+{
+    QString assignment =
+            assignmentFromCToPromela(parameterType, QString("now.%1").arg(parameterName), parameterName + "_c_var");
+
+    QString conversionCode = QString("{\n"
+                                     "asn1Scc%1 %2_c_var;\n"
+                                     "BitStream %2_stream;\n"
+                                     "int %2_rc;"
+                                     "BitStream_AttachBuffer(&%2_stream,\n"
+                                     "    now.%2_message.data,\n"
+                                     "    asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING);\n"
+                                     "asn1Scc%1_Decode(&%2_c_var,\n"
+                                     "    &%2_stream,\n"
+                                     "    &%2_rc);\n"
+                                     "%3"
+                                     "}")
+                                     .arg(parameterType, parameterName, std::move(assignment));
+
+    sequence.appendElement(CCode(std::move(conversionCode)));
 }
 
 QString CCodeGenerator::assignmentFromPromelaToC(const QString &typeName, const QString &target, const QString &source)

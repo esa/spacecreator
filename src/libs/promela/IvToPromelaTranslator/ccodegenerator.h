@@ -25,6 +25,7 @@
 #include <QString>
 #include <asn1library/asn1/asn1model.h>
 #include <promela/PromelaModel/printfstatement.h>
+#include <promela/PromelaModel/sequence.h>
 #include <set>
 
 namespace promela::translator {
@@ -32,6 +33,11 @@ class CCodeGenerator
 {
 public:
     CCodeGenerator(const Asn1Acn::Asn1Model *asn1Model, const std::set<QString> &messageTypes);
+
+    void generateConversionFromParameterToBuffer(promela::model::Sequence &sequence, const QString &parameterName,
+            const QString &parameterType, const QString &temporaryVariableName, const QString &bufferVariableName);
+    void generateConversionFromBufferToParameter(
+            promela::model::Sequence &sequence, const QString &parameterType, const QString &parameterName);
 
     QString assignmentFromPromelaToC(const QString &typeName, const QString &target, const QString &source);
     QString assignmentFromCToPromela(const QString &typeName, const QString &target, const QString &source);
