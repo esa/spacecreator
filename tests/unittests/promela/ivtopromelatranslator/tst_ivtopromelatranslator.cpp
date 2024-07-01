@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QtTest>
 #include <asn1library/asn1/asn1model.h>
+#include <common/modelloader/modelloader.h>
 #include <conversion/common/modeltype.h>
 #include <ivcore/ivlibrary.h>
 #include <ivcore/ivmodel.h>
@@ -32,8 +33,10 @@
 #include <promela/PromelaOptions/options.h>
 
 using conversion::promela::PromelaOptions;
+using plugincommon::ModelLoader;
 using promela::model::Assignment;
 using promela::model::BasicType;
+using promela::model::CCode;
 using promela::model::ChannelRecv;
 using promela::model::ChannelSend;
 using promela::model::Conditional;
@@ -130,7 +133,7 @@ void tst_IvToPromelaTranslator::testSimple()
     std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
     QVERIFY(promelaModel);
 
-    QCOMPARE(promelaModel->getIncludes().size(), 4);
+    QCOMPARE(promelaModel->getIncludes().size(), 5);
     QVERIFY(promelaModel->getIncludes().indexOf("dataview.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("controller.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("actuator.pml") >= 0);
@@ -341,13 +344,13 @@ void tst_IvToPromelaTranslator::testParameters()
     std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
     QVERIFY(promelaModel);
 
-    QCOMPARE(promelaModel->getIncludes().size(), 4);
+    QCOMPARE(promelaModel->getIncludes().size(), 5);
     QVERIFY(promelaModel->getIncludes().indexOf("dataview.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("controller.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("actuator.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("env_inlines.pml") >= 0);
 
-    QCOMPARE(promelaModel->getUtypes().size(), 1);
+    QCOMPARE(promelaModel->getUtypes().size(), 3);
 
     const auto &systemState = promelaModel->getUtypes().first();
     QCOMPARE(systemState.getName(), "system_state");
@@ -591,14 +594,14 @@ void tst_IvToPromelaTranslator::testFunctionTypes()
     std::unique_ptr<PromelaModel> promelaModel = translateIvToPromela(std::move(ivModel), options);
     QVERIFY(promelaModel);
 
-    QCOMPARE(promelaModel->getIncludes().size(), 5);
+    QCOMPARE(promelaModel->getIncludes().size(), 6);
     QVERIFY(promelaModel->getIncludes().indexOf("dataview.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("controller.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("up.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("down.pml") >= 0);
     QVERIFY(promelaModel->getIncludes().indexOf("env_inlines.pml") >= 0);
 
-    QCOMPARE(promelaModel->getUtypes().size(), 1);
+    QCOMPARE(promelaModel->getUtypes().size(), 3);
 
     const auto &systemState = promelaModel->getUtypes().first();
     QCOMPARE(systemState.getName(), "system_state");
@@ -1666,7 +1669,7 @@ std::unique_ptr<PromelaModel> tst_IvToPromelaTranslator::translateIvToPromela(
         std::unique_ptr<ivm::IVModel> ivModel, const conversion::Options &options)
 {
     IvToPromelaTranslator translator;
-    auto asn1Model = std::make_unique<Asn1Acn::Asn1Model>();
+    auto asn1Model = ModelLoader::loadAsn1Model("dataview.asn");
     std::vector<conversion::Model *> inputs;
     inputs.push_back(ivModel.get());
     inputs.push_back(asn1Model.get());
@@ -1771,7 +1774,15 @@ void tst_IvToPromelaTranslator::verifyProctypeSimple(
         QCOMPARE(channelUsedAssignment->getVariableRef().getElements().front().m_name, expectedChannelUsedName);
         QVERIFY(channelUsedAssignment->getVariableRef().getElements().front().m_index.get() == nullptr);
         ++element_index;
+
+        const CCode *conversionCode = findProctypeElement<CCode>(processingSequence, element_index);
+        QVERIFY(conversionCode);
+        ++element_index;
     }
+
+    const PrintfStatement *eventIndicator = findProctypeElement<PrintfStatement>(processingSequence, element_index);
+    QVERIFY(eventIndicator);
+    ++element_index;
 
     const InlineCall *sdlProcessingCall = findProctypeElement<InlineCall>(processingSequence, element_index);
     QVERIFY(sdlProcessingCall);

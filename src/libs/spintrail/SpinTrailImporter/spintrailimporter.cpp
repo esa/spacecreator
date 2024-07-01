@@ -24,8 +24,11 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QTextStream>
+#include <algorithm>
 #include <conversion/common/exceptions.h>
 #include <conversion/common/import/exceptions.h>
+#include <iterator>
+#include <promela/PromelaCommon/constants.h>
 #include <spintrail/SpinTrailModel/channelevent.h>
 #include <spintrail/SpinTrailModel/continuoussignal.h>
 #include <spintrail/SpinTrailModel/resettimerevent.h>
@@ -38,6 +41,7 @@ using namespace conversion::spintrail;
 
 using conversion::FileNotFoundException;
 using conversion::importer::ImportException;
+using promela::common::PromelaConstants;
 using spintrail::model::ChannelEvent;
 using spintrail::model::ContinuousSignal;
 using spintrail::model::ResetTimerEvent;
@@ -111,42 +115,72 @@ void SpinTrailImporter::processLine(spintrail::model::SpinTrailModel &model, con
         model.appendEvent(std::make_unique<UnhandledInputEvent>(functionName, interfaceName));
         return;
     }
-    // example input line:
-    // '9387:	proc  3 (Actuator_step:1) system.pml:53 Send 84	-> queue 5 (Controller_result_channel)'
-    // The line shall contains three substrings separated by tab character '\t'
-    // first step is to split the line and check if the result has 3 substrings
-    const QStringList elements = line.split('\t');
-    if (elements.length() != 3) {
-        return;
+
+    QRegularExpression channelSendEventValidation(
+            QString(R"( *%1 (\w+): (.*)$)").arg(PromelaConstants::channelSendMessage));
+    match = channelSendEventValidation.match(line);
+    if (match.hasMatch()) {
+        QString channelName = match.captured(1);
+        QStringList rawParameters = match.captured(2).split(',');
+        QStringList parameters;
+        std::transform(rawParameters.begin(), rawParameters.end(), std::back_inserter(parameters),
+                [](const QString &value) { return value.trimmed(); });
+        QString proctypeName;
+
+        model.appendEvent(std::make_unique<ChannelEvent>(
+                ChannelEvent::Type::Send, std::move(proctypeName), std::move(channelName), std::move(parameters)));
     }
 
-    // use this to additionaly validate if the parsed line is an trail event
-    QRegularExpression eventValidation(R"(^ *\d+:)");
-
-    QRegularExpression commandValidation = buildChannelCommandRegexp();
-
-    // channel name is enclosed by '(' and ')'
-    QRegularExpression channelValidation(R"(\((\w+)\))");
-
-    QRegularExpressionMatch eventMatch = eventValidation.match(elements[CHANNEL_EVENT_VALIDATION_PART]);
-
-    if (eventMatch.hasMatch()) {
-        QRegularExpressionMatch commandMatch = commandValidation.match(elements[CHANNEL_EVENT_COMMAND_PART]);
-        QRegularExpressionMatch channelMatch = channelValidation.match(elements[CHANNEL_EVENT_CHANNEL_PART]);
-        if (commandMatch.hasMatch() && channelMatch.hasMatch()) {
-            const QString proctypeString = commandMatch.captured(CHANNEL_EVENT_PROCTYPE_NAME);
-            QString proctypeName = proctypeString.split(':').front();
-            const QString commandString = commandMatch.captured(CHANNEL_EVENT_COMMAND_STRING);
-            const QString command = commandString.split(' ').front();
-            QStringList parameters = commandString.split(' ').back().split(',');
-            QString channelName = channelMatch.captured(CHANNEL_EVENT_CHANNEL_NAME);
-            const ChannelEvent::Type eventType = command.compare("recv", Qt::CaseInsensitive) == 0
-                    ? ChannelEvent::Type::Recv
-                    : ChannelEvent::Type::Send;
-            model.appendEvent(std::make_unique<ChannelEvent>(
-                    eventType, std::move(proctypeName), std::move(channelName), std::move(parameters)));
-        }
+    QRegularExpression channelRecvEventValidation(
+            QString(R"( *%1 (\w+): (.*)$)").arg(PromelaConstants::channelRecvMessage));
+    match = channelRecvEventValidation.match(line);
+    if (match.hasMatch()) {
+        QString channelName = match.captured(1);
+        QStringList rawParameters = match.captured(2).split(',');
+        QStringList parameters;
+        std::transform(rawParameters.begin(), rawParameters.end(), std::back_inserter(parameters),
+                [](const QString &value) { return value.trimmed(); });
+        QString proctypeName;
+        model.appendEvent(std::make_unique<ChannelEvent>(
+                ChannelEvent::Type::Recv, std::move(proctypeName), std::move(channelName), std::move(parameters)));
     }
+
+    // // example input line:
+    // // '9387:	proc  3 (Actuator_step:1) system.pml:53 Send 84	-> queue 5 (Controller_result_channel)'
+    // // The line shall contains three substrings separated by tab character '\t'
+    // // first step is to split the line and check if the result has 3 substrings
+    // const QStringList elements = line.split('\t');
+    // if (elements.length() != 3) {
+    //     return;
+    // }
+
+    // // use this to additionaly validate if the parsed line is an trail event
+    // QRegularExpression eventValidation(R"(^ *\d+:)");
+
+    // QRegularExpression commandValidation = buildChannelCommandRegexp();
+
+    // // channel name is enclosed by '(' and ')'
+    // QRegularExpression channelValidation(R"(\((\w+)\))");
+
+    // QRegularExpressionMatch eventMatch = eventValidation.match(elements[CHANNEL_EVENT_VALIDATION_PART]);
+
+    // if (eventMatch.hasMatch()) {
+    //     QRegularExpressionMatch commandMatch = commandValidation.match(elements[CHANNEL_EVENT_COMMAND_PART]);
+    //     QRegularExpressionMatch channelMatch = channelValidation.match(elements[CHANNEL_EVENT_CHANNEL_PART]);
+    //     if (commandMatch.hasMatch() && channelMatch.hasMatch()) {
+    //         const QString proctypeString = commandMatch.captured(CHANNEL_EVENT_PROCTYPE_NAME);
+    //         QString proctypeName = proctypeString.split(':').front();
+    //         const QString commandString = commandMatch.captured(CHANNEL_EVENT_COMMAND_STRING);
+    //         const QString command = commandString.split(' ').front();
+    //         QStringList parameters = commandString.split(' ').back().split(',');
+    //         QString channelName = channelMatch.captured(CHANNEL_EVENT_CHANNEL_NAME);
+    //         const ChannelEvent::Type eventType = command.compare("recv", Qt::CaseInsensitive) == 0
+    //                 ? ChannelEvent::Type::Recv
+    //                 : ChannelEvent::Type::Send;
+    //         model.appendEvent(std::make_unique<ChannelEvent>(
+    //                 eventType, std::move(proctypeName), std::move(channelName), std::move(parameters)));
+    //     }
+    // }
 }
 
 QRegularExpression SpinTrailImporter::buildChannelCommandRegexp() const

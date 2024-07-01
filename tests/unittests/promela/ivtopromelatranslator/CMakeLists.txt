@@ -11,6 +11,7 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE     Conversion::Common
                 Conversion::IvToPromelaTranslator
+                CommonTools
                 Qt${QT_VERSION_MAJOR}::Core
                 Qt${QT_VERSION_MAJOR}::Test)
 
@@ -23,5 +24,6 @@ configure_file(resources/unhandled_input_observers.xml unhandled_input_observers
 configure_file(resources/synchronous_interfaces.xml synchronous_interfaces.xml COPYONLY)
 configure_file(resources/channel_names.xml channel_names.xml COPYONLY)
 configure_file(resources/env_calls_sync.xml env_calls_sync.xml COPYONLY)
+configure_file(resources/dataview.asn dataview.asn COPYONLY)
 
 add_format_target(${TEST_NAME})

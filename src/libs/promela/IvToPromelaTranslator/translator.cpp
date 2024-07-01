@@ -150,7 +150,9 @@ std::unique_ptr<SystemInfo> IvToPromelaTranslator::prepareSystemInfo(
             for (const IVInterface *providedInterface : ivFunction->pis()) {
                 if (providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
                     const auto [parameterName, parameterType] = getInterfaceParameter(providedInterface);
-                    result->m_messageTypes.insert(parameterType);
+                    if (!parameterType.isEmpty()) {
+                        result->m_messageTypes.insert(parameterType);
+                    }
                 }
             }
 
@@ -159,7 +161,9 @@ std::unique_ptr<SystemInfo> IvToPromelaTranslator::prepareSystemInfo(
             for (const IVInterface *providedInterface : ivFunction->pis()) {
                 if (providedInterface->kind() == IVInterface::OperationKind::Sporadic) {
                     const auto [parameterName, parameterType] = getInterfaceParameter(providedInterface);
-                    result->m_messageTypes.insert(parameterType);
+                    if (!parameterType.isEmpty()) {
+                        result->m_messageTypes.insert(parameterType);
+                    }
                 }
             }
         }

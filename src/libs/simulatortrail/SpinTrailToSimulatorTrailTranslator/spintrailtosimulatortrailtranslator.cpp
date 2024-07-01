@@ -162,6 +162,8 @@ std::vector<std::unique_ptr<conversion::Model>> SpinTrailToSimulatorTrailTransla
     QMap<QString, std::pair<ChannelInfo, bool>> observerChannels;
     findChannelNames(*systemInfo, *asn1Model, channels, observerChannels);
 
+    // map from name of proctype to name of corresponding taste function
+    // but I have a name of the queue, right?
     QMap<QString, QString> proctypes;
     findProctypes(*systemInfo, proctypes);
 
@@ -430,7 +432,8 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(SimulatorTra
         const Asn1Acn::Types::Type *observableEvent, const Asn1Acn::Types::Enumerated *pid,
         bool isMulticastSupported) const
 {
-    if (channels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
+    Q_UNUSED(proctypes);
+    if (channels.contains(event->getChannelName())) {
         ChannelInfo &channelInfo = channels[event->getChannelName()];
         if (channelInfo.m_isTimer) {
             std::unique_ptr<ChoiceValue> inputNone = std::make_unique<ChoiceValue>(
@@ -459,7 +462,7 @@ void SpinTrailToSimulatorTrailTranslator::processSpinTrailRecvEvent(SimulatorTra
             ValuePtr message = getMessageValue(source, destination, channelInfo, observableEvent, parameters, true);
             result.appendValue(std::move(message));
         }
-    } else if (observerChannels.contains(event->getChannelName()) && proctypes.contains(event->getProctypeName())) {
+    } else if (observerChannels.contains(event->getChannelName())) {
         // do not produce input event when observer receives message
         std::pair<ChannelInfo, bool> &channelInfo = observerChannels[event->getChannelName()];
         channelInfo.first.m_senders.pop_front();

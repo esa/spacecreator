@@ -24,11 +24,13 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <ivcore/ivmodel.h>
+#include <promela/PromelaCommon/constants.h>
 #include <promela/PromelaOptions/options.h>
 
 using conversion::Escaper;
 using conversion::promela::PromelaOptions;
 using conversion::translator::TranslationException;
+using promela::common::PromelaConstants;
 using promela::model::ArrayType;
 using promela::model::Assignment;
 using promela::model::BasicType;
@@ -388,18 +390,25 @@ std::unique_ptr<ProctypeElement> IvToPromelaGenerator::generateProcessMessageBlo
     processMessageSeq->appendElement(
             createReceiveStatement(modelFunctionName, channelName, parameterType, messageName));
 
-    m_ccodeGenerator.generateConversionFromBufferToParameter(*processMessageSeq, parameterType, parameterName);
+    if (!parameterType.isEmpty()) {
+        m_ccodeGenerator.generateConversionFromBufferToParameter(*processMessageSeq, parameterType, parameterName);
 
-    QList<PrintfStatement> statements =
-            m_ccodeGenerator.printfStatements(parameterType, parameterName, QString("%1 recv: ").arg(channelName));
+        QList<PrintfStatement> statements = m_ccodeGenerator.printfStatements(parameterType, parameterName,
+                QString("%1 %2: ").arg(PromelaConstants::channelRecvMessage, channelName));
 
-    while (!statements.empty()) {
-        processMessageSeq->appendElement(statements.takeFirst());
-    }
+        while (!statements.empty()) {
+            processMessageSeq->appendElement(statements.takeFirst());
+        }
 
-    while (!preProcessingElements.empty()) {
-        processMessageSeq->appendElement(std::move(preProcessingElements.front()));
-        preProcessingElements.pop_front();
+        while (!preProcessingElements.empty()) {
+            processMessageSeq->appendElement(std::move(preProcessingElements.front()));
+            preProcessingElements.pop_front();
+        }
+    } else {
+        QList<Expression> arguments;
+        arguments.append(
+                Expression(StringConstant(QString("%1 %2: 0").arg(PromelaConstants::channelRecvMessage, channelName))));
+        processMessageSeq->appendElement(PrintfStatement(std::move(arguments)));
     }
 
     // acquire lock (observer or sdl process)
@@ -785,11 +794,12 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
         const QString channelName = targetInfo.m_providedQueueName;
         if (temporaryVariableName.isEmpty()) {
             QList<Expression> arguments;
-            arguments.append(Expression(StringConstant(QString("%1 send: 0").arg(channelName))));
+            arguments.append(Expression(
+                    StringConstant(QString("%1 %2: 0").arg(PromelaConstants::channelSendMessage, channelName))));
             sequence.appendElement(PrintfStatement(std::move(arguments)));
         } else {
-            QList<PrintfStatement> statements = m_ccodeGenerator.printfStatements(
-                    temporaryVariableType, temporaryVariableName, QString("%1 send: ").arg(channelName));
+            QList<PrintfStatement> statements = m_ccodeGenerator.printfStatements(temporaryVariableType,
+                    temporaryVariableName, QString("%1 %2: ").arg(PromelaConstants::channelSendMessage, channelName));
             while (!statements.empty()) {
                 sequence.appendElement(statements.takeFirst());
             }
@@ -1129,8 +1139,9 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
                     sendParams.append(Expression(VariableRef(messageVariableName)));
                     m_ccodeGenerator.generateConversionFromParameterToBuffer(
                             sequence, name, parameterType, temporaryVariableName, messageVariableName);
-                    QList<PrintfStatement> statements = m_ccodeGenerator.printfStatements(
-                            parameterType, temporaryVariableName, QString("%1 send: ").arg(channelName));
+                    QList<PrintfStatement> statements =
+                            m_ccodeGenerator.printfStatements(parameterType, temporaryVariableName,
+                                    QString("%1 %2: ").arg(PromelaConstants::channelSendMessage, channelName));
                     while (!statements.empty()) {
                         sequence.appendElement(statements.takeFirst());
                     }
@@ -1138,7 +1149,8 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
                     sendParams.append(Expression(Constant(1)));
 
                     QList<Expression> printfArguments;
-                    printfArguments.append(Expression(StringConstant(QString("%1 send: 0").arg(channelName))));
+                    printfArguments.append(Expression(StringConstant(
+                            QString("%1 %2: 0").arg(PromelaConstants::channelSendMessage, channelName))));
                     sequence.appendElement(PrintfStatement(std::move(printfArguments)));
                 }
 
@@ -1279,9 +1291,9 @@ void IvToPromelaGenerator::createChannel(const QString &channelName, const QStri
             channelType.append(ChannelInit::Type(UtypeRef(modifiedMessageType)));
         }
     } else {
-        QString modifiedMessageType = messageTypeName(Escaper::escapePromelaName(messageType));
-        channelType.append(messageType.isEmpty() ? ChannelInit::Type(BasicType::INT)
-                                                 : ChannelInit::Type(UtypeRef(modifiedMessageType)));
+        channelType.append(messageType.isEmpty()
+                        ? ChannelInit::Type(BasicType::INT)
+                        : ChannelInit::Type(UtypeRef(messageTypeName(Escaper::escapePromelaName(messageType)))));
     }
     ChannelInit channelInit(channelSize, std::move(channelType));
     Declaration declaration(DataType(BasicType::CHAN), channelName);
