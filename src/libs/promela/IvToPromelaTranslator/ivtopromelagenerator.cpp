@@ -128,7 +128,8 @@ void IvToPromelaGenerator::createMessageTypes()
 {
     for (const QString &messageType : m_systemInfo.m_messageTypes) {
         QString bufferTypeName = messageTypeName(messageType);
-        QString sizeConstantName = QString("asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING").arg(messageType);
+        QString sizeConstantName =
+                QString("asn1Scc%1_REQUIRED_BYTES_FOR_ENCODING").arg(Escaper::escapeCName(messageType));
 
         Utype bufferType(std::move(bufferTypeName));
         DataType arrayType = DataType(ArrayType(std::move(sizeConstantName), BasicType::BYTE));
@@ -771,8 +772,8 @@ void IvToPromelaGenerator::createPromelaObjectsForSporadicRis(const QString &fun
 
         Declaration messageVariableDecl =
                 Declaration(DataType(UtypeRef(messageTypeName(parameterInfo.m_parameterType))), messageVariableName);
-        Declaration temporaryVariableDecl =
-                Declaration(DataType(UtypeRef(parameterInfo.m_parameterType)), temporaryVariableName);
+        Declaration temporaryVariableDecl = Declaration(
+                DataType(UtypeRef(Escaper::escapePromelaName(parameterInfo.m_parameterType))), temporaryVariableName);
 
         m_context.model()->addDeclaration(std::move(messageVariableDecl));
         m_context.model()->addDeclaration(std::move(temporaryVariableDecl));
@@ -1130,8 +1131,8 @@ void IvToPromelaGenerator::createPromelaObjectsForObservers()
 
                     Declaration messageVariableDecl =
                             Declaration(DataType(UtypeRef(messageTypeName(parameterType))), messageVariableName);
-                    Declaration temporaryVariableDecl =
-                            Declaration(DataType(UtypeRef(parameterType)), temporaryVariableName);
+                    Declaration temporaryVariableDecl = Declaration(
+                            DataType(UtypeRef(Escaper::escapePromelaName(parameterType))), temporaryVariableName);
 
                     m_context.model()->addDeclaration(std::move(messageVariableDecl));
                     m_context.model()->addDeclaration(std::move(temporaryVariableDecl));
@@ -1258,12 +1259,12 @@ QString IvToPromelaGenerator::handleSendInlineArgument(const QString &parameterT
 
 QString IvToPromelaGenerator::globalTemporaryVariableName(const QString &parameterName)
 {
-    return QString("%1_var").arg(parameterName);
+    return QString("%1_var").arg(Escaper::escapePromelaName(parameterName));
 }
 
 QString IvToPromelaGenerator::globalMessageName(const QString &parameterName)
 {
-    return QString("%1_message").arg(parameterName);
+    return QString("%1_message").arg(Escaper::escapePromelaName(parameterName));
 }
 
 QString IvToPromelaGenerator::buildParameterSubtypeName(
@@ -1287,13 +1288,12 @@ void IvToPromelaGenerator::createChannel(const QString &channelName, const QStri
     if (m_context.isMulticastSupported()) {
         channelType.append(ChannelInit::Type(UtypeRef("PID")));
         if (!messageType.isEmpty()) {
-            QString modifiedMessageType = messageTypeName(Escaper::escapePromelaName(messageType));
+            QString modifiedMessageType = messageTypeName(messageType);
             channelType.append(ChannelInit::Type(UtypeRef(modifiedMessageType)));
         }
     } else {
-        channelType.append(messageType.isEmpty()
-                        ? ChannelInit::Type(BasicType::INT)
-                        : ChannelInit::Type(UtypeRef(messageTypeName(Escaper::escapePromelaName(messageType)))));
+        channelType.append(messageType.isEmpty() ? ChannelInit::Type(BasicType::INT)
+                                                 : ChannelInit::Type(UtypeRef(messageTypeName(messageType))));
     }
     ChannelInit channelInit(channelSize, std::move(channelType));
     Declaration declaration(DataType(BasicType::CHAN), channelName);
@@ -1303,6 +1303,6 @@ void IvToPromelaGenerator::createChannel(const QString &channelName, const QStri
 
 QString IvToPromelaGenerator::messageTypeName(const QString &typeName)
 {
-    return QString("%1Message").arg(typeName);
+    return QString("%1Message").arg(Escaper::escapePromelaName(typeName));
 }
 }

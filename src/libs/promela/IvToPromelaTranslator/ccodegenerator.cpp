@@ -21,10 +21,12 @@
 
 #include "helper.h"
 
+#include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <promela/PromelaModel/ccode.h>
 #include <promela/PromelaModel/proctypeelement.h>
 
+using conversion::Escaper;
 using conversion::translator::TranslationException;
 using promela::model::CCode;
 using promela::model::Expression;
@@ -51,10 +53,12 @@ void CCodeGenerator::generateConversionFromParameterToBuffer(promela::model::Seq
     QList<InlineCall::Argument> assignInlineArguments;
     assignInlineArguments.append(VariableRef(temporaryVariableName));
     assignInlineArguments.append(VariableRef(parameterName));
-    sequence.appendElement(InlineCall(QString("%1_assign_value").arg(parameterType), std::move(assignInlineArguments)));
+    sequence.appendElement(InlineCall(QString("%1_assign_value").arg(Escaper::escapePromelaName(parameterType)),
+            std::move(assignInlineArguments)));
 
-    QString assignment = assignmentFromPromelaToC(
-            parameterType, QString("%1_c_var").arg(parameterName), QString("now.%1").arg(temporaryVariableName));
+    QString assignment =
+            assignmentFromPromelaToC(parameterType, QString("%1_c_var").arg(Escaper::escapePromelaName(parameterName)),
+                    QString("now.%1").arg(Escaper::escapePromelaName(temporaryVariableName)));
 
     QString code = QString("{\n"
                            "asn1Scc%1 %2_c_var;\n"
@@ -71,7 +75,8 @@ void CCodeGenerator::generateConversionFromParameterToBuffer(promela::model::Seq
                            "    &%2_rc,\n"
                            "    0);\n"
                            "}")
-                           .arg(parameterType, parameterName, bufferVariableName, assignment);
+                           .arg(Escaper::escapePromelaName(parameterType), Escaper::escapePromelaName(parameterName),
+                                   Escaper::escapePromelaName(bufferVariableName), assignment);
 
     sequence.appendElement(CCode(std::move(code)));
 }
@@ -80,7 +85,8 @@ void CCodeGenerator::generateConversionFromBufferToParameter(
         promela::model::Sequence &sequence, const QString &parameterType, const QString &parameterName)
 {
     QString assignment =
-            assignmentFromCToPromela(parameterType, QString("now.%1").arg(parameterName), parameterName + "_c_var");
+            assignmentFromCToPromela(parameterType, QString("now.%1").arg(Escaper::escapePromelaName(parameterName)),
+                    Escaper::escapePromelaName(parameterName) + "_c_var");
 
     QString conversionCode = QString("{\n"
                                      "asn1Scc%1 %2_c_var;\n"
@@ -94,7 +100,8 @@ void CCodeGenerator::generateConversionFromBufferToParameter(
                                      "    &%2_rc);\n"
                                      "%3"
                                      "}")
-                                     .arg(parameterType, parameterName, std::move(assignment));
+                                     .arg(Escaper::escapePromelaName(parameterType),
+                                             Escaper::escapePromelaName(parameterName), std::move(assignment));
 
     sequence.appendElement(CCode(std::move(conversionCode)));
 }
