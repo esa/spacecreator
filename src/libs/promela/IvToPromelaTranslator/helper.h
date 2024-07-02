@@ -53,14 +53,20 @@ private:
     QString sequenceAssignmentFromPromelaToC(const Asn1Acn::Types::Sequence *type);
     QString sequenceOfAssignmentFromPromelaToC(const Asn1Acn::Types::SequenceOf *type);
     QString choiceAssignmentFromPromelaToC(const Asn1Acn::Types::Choice *type);
+    QString octetStringAssignmentFromPromelaToC(const Asn1Acn::Types::OctetString *type);
+    QString ia5StringAssignmentFromPromelaToC(const Asn1Acn::Types::IA5String *type);
 
     QString sequenceAssignmentFromCToPromela(const Asn1Acn::Types::Sequence *type);
     QString sequenceOfAssignmentFromCToPromela(const Asn1Acn::Types::SequenceOf *type);
     QString choiceAssignmentFromCToPromela(const Asn1Acn::Types::Choice *type);
+    QString octetStringAssignmentFromCToPromela(const Asn1Acn::Types::OctetString *type);
+    QString ia5StringAssignmentFromCToPromela(const Asn1Acn::Types::IA5String *type);
 
     QList<promela::model::VariableRef> sequenceListOfFields(const Asn1Acn::Types::Sequence *type);
     QList<promela::model::VariableRef> sequenceOfListOfFields(const Asn1Acn::Types::SequenceOf *type);
     QList<promela::model::VariableRef> choiceListOfFields(const Asn1Acn::Types::Choice *type);
+    QList<promela::model::VariableRef> octetStringListOfFields(const Asn1Acn::Types::OctetString *type);
+    QList<promela::model::VariableRef> ia5StringListOfFields(const Asn1Acn::Types::IA5String *type);
 
     QString addIndent(const QString &text);
 

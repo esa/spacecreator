@@ -23,6 +23,8 @@
 
 #include <QDebug>
 #include <asn1library/asn1/types/choice.h>
+#include <asn1library/asn1/types/ia5string.h>
+#include <asn1library/asn1/types/octetstring.h>
 #include <asn1library/asn1/types/sequence.h>
 #include <asn1library/asn1/types/sequenceof.h>
 #include <asn1library/asn1/types/type.h>
@@ -32,6 +34,8 @@
 #include <promela/PromelaModel/constant.h>
 
 using Asn1Acn::IntegerValue;
+using Asn1Acn::OctetStringValue;
+using Asn1Acn::StringValue;
 using conversion::translator::TranslationException;
 using promela::model::Constant;
 using promela::model::Expression;
@@ -116,6 +120,12 @@ QString Helper::createAssignmentTemplateFromPromelaToC(const Asn1Acn::Types::Typ
     case Asn1Acn::Types::Type::ASN1Type::CHOICE:
         return choiceAssignmentFromPromelaToC(dynamic_cast<const Asn1Acn::Types::Choice *>(type));
 
+    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING:
+        return octetStringAssignmentFromPromelaToC(dynamic_cast<const Asn1Acn::Types::OctetString *>(type));
+
+    case Asn1Acn::Types::Type::ASN1Type::IA5STRING:
+        return ia5StringAssignmentFromPromelaToC(dynamic_cast<const Asn1Acn::Types::IA5String *>(type));
+
     case Asn1Acn::Types::Type::ASN1Type::USERDEFINED: {
         const Asn1Acn::Types::UserdefinedType *t = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
         return createAssignmentTemplateFromPromelaToC(t->type());
@@ -148,6 +158,12 @@ QString Helper::createAssignmentTemplateFromCToPromela(const Asn1Acn::Types::Typ
     case Asn1Acn::Types::Type::ASN1Type::CHOICE:
         return choiceAssignmentFromCToPromela(dynamic_cast<const Asn1Acn::Types::Choice *>(type));
 
+    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING:
+        return octetStringAssignmentFromCToPromela(dynamic_cast<const Asn1Acn::Types::OctetString *>(type));
+
+    case Asn1Acn::Types::Type::ASN1Type::IA5STRING:
+        return ia5StringAssignmentFromCToPromela(dynamic_cast<const Asn1Acn::Types::IA5String *>(type));
+
     case Asn1Acn::Types::Type::ASN1Type::USERDEFINED: {
         const Asn1Acn::Types::UserdefinedType *t = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
         return createAssignmentTemplateFromCToPromela(t->type());
@@ -178,6 +194,12 @@ QList<VariableRef> Helper::generateListOfFields(const Asn1Acn::Types::Type *type
 
     case Asn1Acn::Types::Type::ASN1Type::CHOICE:
         return choiceListOfFields(dynamic_cast<const Asn1Acn::Types::Choice *>(type));
+
+    case Asn1Acn::Types::Type::ASN1Type::OCTETSTRING:
+        return octetStringListOfFields(dynamic_cast<const Asn1Acn::Types::OctetString *>(type));
+
+    case Asn1Acn::Types::Type::ASN1Type::IA5STRING:
+        return ia5StringListOfFields(dynamic_cast<const Asn1Acn::Types::IA5String *>(type));
 
     case Asn1Acn::Types::Type::ASN1Type::USERDEFINED: {
         const Asn1Acn::Types::UserdefinedType *t = dynamic_cast<const Asn1Acn::Types::UserdefinedType *>(type);
@@ -274,6 +296,50 @@ QString Helper::choiceAssignmentFromPromelaToC(const Asn1Acn::Types::Choice *typ
     return result;
 }
 
+QString Helper::octetStringAssignmentFromPromelaToC(const Asn1Acn::Types::OctetString *type)
+{
+    SizeConstraintVisitor<OctetStringValue> constraintVisitor;
+    type->constraints().accept(constraintVisitor);
+
+    QString result = QString("int i = 0;\n"
+                             "for(i = 0; i < %1; ++i)\n"
+                             "{\n"
+                             "%2.arr[i] = %3.data[1];\n"
+                             "}\n")
+                             .arg(constraintVisitor.getMaxSize())
+                             .arg(m_target)
+                             .arg(m_source);
+
+    if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
+        result.append(QString("%1.nCount = %2.length;\n").arg(m_target, m_source));
+    }
+
+    return result;
+}
+
+QString Helper::ia5StringAssignmentFromPromelaToC(const Asn1Acn::Types::IA5String *type)
+{
+    SizeConstraintVisitor<StringValue> constraintVisitor;
+    type->constraints().accept(constraintVisitor);
+
+    QString result = QString("int i = 0;\n"
+                             "for(i = 0; i < %1; ++i)\n"
+                             "{\n"
+                             "%2[i] = %3.data[i];\n"
+                             "}\n")
+                             .arg(constraintVisitor.getMaxSize())
+                             .arg(m_target)
+                             .arg(m_source);
+
+    if (constraintVisitor.getMinSize() == constraintVisitor.getMaxSize()) {
+        result.append(QString("%1[%2] = '\\0';\n").arg(m_target).arg(constraintVisitor.getMaxSize()));
+    } else {
+        result.append(QString("%1[%2.length] = '\\0';\n").arg(m_target, m_source));
+    }
+
+    return result;
+}
+
 QString Helper::sequenceAssignmentFromCToPromela(const Asn1Acn::Types::Sequence *type)
 {
     QString result;
@@ -334,6 +400,47 @@ QString Helper::choiceAssignmentFromCToPromela(const Asn1Acn::Types::Choice *typ
                           "}\n")
                           .arg(prefix, m_target, m_source, type->identifier(), component->name(), assignment);
         ++index;
+    }
+
+    return result;
+}
+
+QString Helper::octetStringAssignmentFromCToPromela(const Asn1Acn::Types::OctetString *type)
+{
+    SizeConstraintVisitor<OctetStringValue> constraintVisitor;
+    type->constraints().accept(constraintVisitor);
+    QString result = QString("int i = 0;\n"
+                             "for(i = 0; i < %1; ++i)\n"
+                             "{\n"
+                             "%2.data[i] = %3.arr[i];\n"
+                             "}\n")
+                             .arg(constraintVisitor.getMaxSize())
+                             .arg(m_target)
+                             .arg(m_source);
+
+    if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
+        result.append(QString("%1.length = %2.nCount;\n").arg(m_target, m_source));
+    }
+
+    return result;
+}
+
+QString Helper::ia5StringAssignmentFromCToPromela(const Asn1Acn::Types::IA5String *type)
+{
+    SizeConstraintVisitor<StringValue> constraintVisitor;
+    type->constraints().accept(constraintVisitor);
+
+    QString result = QString("int i = 0;\n"
+                             "for(i = 0; i < %1; ++i)\n"
+                             "{\n"
+                             "%2.data[i] = %3[i];\n"
+                             "}\n")
+                             .arg(constraintVisitor.getMaxSize())
+                             .arg(m_target)
+                             .arg(m_source);
+
+    if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
+        result.append(QString("%1.length = strlen(%2)';\n").arg(m_target, m_source));
     }
 
     return result;
@@ -419,6 +526,54 @@ QList<VariableRef> Helper::choiceListOfFields(const Asn1Acn::Types::Choice *type
     VariableRef selectionRef(m_target);
     selectionRef.appendElement("selection");
     result.append(std::move(selectionRef));
+
+    return result;
+}
+
+QList<promela::model::VariableRef> Helper::octetStringListOfFields(const Asn1Acn::Types::OctetString *type)
+{
+    SizeConstraintVisitor<OctetStringValue> constraintVisitor;
+    type->constraints().accept(constraintVisitor);
+
+    QList<VariableRef> result;
+
+    size_t itemCount = constraintVisitor.getMaxSize();
+
+    for (size_t index = 0; index < itemCount; ++index) {
+        VariableRef ref = VariableRef(m_target);
+        ref.appendElement("data", std::make_unique<Expression>(Constant(index)));
+        result.append(std::move(ref));
+    }
+
+    if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
+        VariableRef ref(m_target);
+        ref.appendElement("length");
+        result.append(std::move(ref));
+    }
+
+    return result;
+}
+
+QList<promela::model::VariableRef> Helper::ia5StringListOfFields(const Asn1Acn::Types::IA5String *type)
+{
+    SizeConstraintVisitor<StringValue> constraintVisitor;
+    type->constraints().accept(constraintVisitor);
+
+    QList<VariableRef> result;
+
+    size_t itemCount = constraintVisitor.getMaxSize();
+
+    for (size_t index = 0; index < itemCount; ++index) {
+        VariableRef ref = VariableRef(m_target);
+        ref.appendElement("data", std::make_unique<Expression>(Constant(index)));
+        result.append(std::move(ref));
+    }
+
+    if (constraintVisitor.getMinSize() != constraintVisitor.getMaxSize()) {
+        VariableRef ref(m_target);
+        ref.appendElement("length");
+        result.append(std::move(ref));
+    }
 
     return result;
 }
