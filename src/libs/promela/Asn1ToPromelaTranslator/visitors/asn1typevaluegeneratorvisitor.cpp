@@ -48,6 +48,8 @@
 #include <promela/Asn1ToPromelaTranslator/integersubset.h>
 #include <promela/Asn1ToPromelaTranslator/proctypemaker.h>
 #include <promela/Asn1ToPromelaTranslator/realgenerator.h>
+#include <promela/PromelaCommon/constants.h>
+#include <promela/PromelaCommon/namehelper.h>
 #include <promela/PromelaModel/basictypes.h>
 #include <promela/PromelaModel/binaryexpression.h>
 #include <promela/PromelaModel/conditional.h>
@@ -81,6 +83,8 @@ using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 using conversion::Escaper;
 using conversion::translator::TranslationException;
+using promela::common::PromelaConstants;
+using promela::common::PromelaNameHelper;
 using promela::model::Assignment;
 using promela::model::BinaryExpression;
 using promela::model::Conditional;
@@ -468,8 +472,12 @@ void Asn1TypeValueGeneratorVisitor::visit(const SequenceOf &type)
     if (m_overridenType != nullptr) {
         if (const auto overridenSequenceOf = dynamic_cast<const SequenceOf *>(m_overridenType);
                 overridenSequenceOf != nullptr) {
-            const auto initCallName =
-                    QString("%1__elem_init_value").arg(Escaper::escapePromelaName(m_overridenType->identifier()));
+            // const auto initCallName =
+            //         QString("%1__elem_init_value").arg(Escaper::escapePromelaName(m_overridenType->identifier()));
+            const auto initCallName = QString("%1_init_value")
+                                              .arg(PromelaNameHelper::createChildTypeName(
+                                                      Escaper::escapePromelaName(m_overridenType->identifier()),
+                                                      PromelaConstants::sequenceOfElementTypeNameSuffix));
             handleOverridenType(type.identifier(), overridenSequenceOf->constraints(), initCallName, valueVariableName,
                     minSize, maxSize, sequence.get());
         } else if (const auto overridenOctetString = dynamic_cast<const OctetString *>(m_overridenType);
@@ -649,7 +657,7 @@ QString Asn1TypeValueGeneratorVisitor::getSequenceComponentTypeName(
     const auto &type = *asnComponent.type();
 
     if (isEmbeddedType(type)) {
-        return QString("%1__%2").arg(sequenceName).arg(asnComponent.name());
+        return PromelaNameHelper::createChildTypeName(sequenceName, asnComponent.name());
     } else {
         return type.typeName();
     }
@@ -661,7 +669,7 @@ QString Asn1TypeValueGeneratorVisitor::getChoiceComponentTypeName(
     const auto &type = *choiceComponent.type();
 
     if (isEmbeddedType(type)) {
-        return QString("%1__%2").arg(choiceName).arg(choiceComponent.name());
+        return PromelaNameHelper::createChildTypeName(choiceName, choiceComponent.name());
     } else {
         return type.typeName();
     }

@@ -23,15 +23,19 @@
 
 #include <QDebug>
 #include <asn1library/asn1/asnsequencecomponent.h>
+#include <promela/PromelaCommon/namehelper.h>
 
 namespace promela::translator {
 
-SequenceComponentVisitor::SequenceComponentVisitor(
-        Direction direction, const Asn1Acn::Asn1Model *asn1Model, QString target, QString source)
-    : m_direction(direction)
+using promela::common::PromelaNameHelper;
+
+SequenceComponentVisitor::SequenceComponentVisitor(Operation operation, const Asn1Acn::Asn1Model *asn1Model,
+        QString target, QString source, const QString sequenceName)
+    : m_operation(operation)
     , m_asn1Model(asn1Model)
     , m_target(std::move(target))
     , m_source(std::move(source))
+    , m_sequenceName(std::move(sequenceName))
     , m_componentVisited(false)
     , m_isOptional(false)
     , m_content()
@@ -47,17 +51,20 @@ void SequenceComponentVisitor::visit(const Asn1Acn::AsnSequenceComponent &compon
     // TODO escape
     Helper helper(m_asn1Model, m_target + "." + component.name(), m_source + "." + component.name());
 
-    switch (m_direction) {
-    case Direction::FROM_PROMELA_TO_C:
-        m_content = helper.createAssignmentTemplateFromPromelaToC(component.type());
+    switch (m_operation) {
+    case Operation::FROM_PROMELA_TO_C:
+        m_content = helper.createAssignmentTemplateFromPromelaToC(
+                PromelaNameHelper::createChildTypeNameForCCode(m_sequenceName, component.name()), component.type());
         break;
-    case Direction::FROM_C_TO_PROMELA:
-        m_content = helper.createAssignmentTemplateFromCToPromela(component.type());
+    case Operation::FROM_C_TO_PROMELA:
+        m_content = helper.createAssignmentTemplateFromCToPromela(
+                PromelaNameHelper::createChildTypeNameForCCode(m_sequenceName, component.name()), component.type());
         break;
+    case Operation::LIST_PROMELA_FIELDS: {
+        Helper fieldHelper(m_asn1Model, m_target, "");
+        m_fields = fieldHelper.generateListOfFields(component.type());
+    } break;
     }
-
-    Helper fieldHelper(m_asn1Model, m_target, "");
-    m_fields = fieldHelper.generateListOfFields(component.type());
 }
 
 void SequenceComponentVisitor::visit(const Asn1Acn::AcnSequenceComponent &component)

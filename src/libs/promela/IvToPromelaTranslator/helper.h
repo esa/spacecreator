@@ -43,22 +43,22 @@ public:
     QString createAssignmentTemplateFromCToPromela(const QString &typeName);
     QList<PrintfTemplate> generatePrintfTemplate(const QString &typeName);
 
-    QString createAssignmentTemplateFromPromelaToC(const Asn1Acn::Types::Type *type);
-    QString createAssignmentTemplateFromCToPromela(const Asn1Acn::Types::Type *type);
+    QString createAssignmentTemplateFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::Type *type);
+    QString createAssignmentTemplateFromCToPromela(const QString &cTypeName, const Asn1Acn::Types::Type *type);
     QList<promela::model::VariableRef> generateListOfFields(const Asn1Acn::Types::Type *type);
 
 private:
     const Asn1Acn::TypeAssignment *findType(const QString &name);
 
-    QString sequenceAssignmentFromPromelaToC(const Asn1Acn::Types::Sequence *type);
-    QString sequenceOfAssignmentFromPromelaToC(const Asn1Acn::Types::SequenceOf *type);
-    QString choiceAssignmentFromPromelaToC(const Asn1Acn::Types::Choice *type);
+    QString sequenceAssignmentFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::Sequence *type);
+    QString sequenceOfAssignmentFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::SequenceOf *type);
+    QString choiceAssignmentFromPromelaToC(const QString &cTypeName, const Asn1Acn::Types::Choice *type);
     QString octetStringAssignmentFromPromelaToC(const Asn1Acn::Types::OctetString *type);
     QString ia5StringAssignmentFromPromelaToC(const Asn1Acn::Types::IA5String *type);
 
-    QString sequenceAssignmentFromCToPromela(const Asn1Acn::Types::Sequence *type);
-    QString sequenceOfAssignmentFromCToPromela(const Asn1Acn::Types::SequenceOf *type);
-    QString choiceAssignmentFromCToPromela(const Asn1Acn::Types::Choice *type);
+    QString sequenceAssignmentFromCToPromela(const QString &cTypeName, const Asn1Acn::Types::Sequence *type);
+    QString sequenceOfAssignmentFromCToPromela(const QString &cTypeName, const Asn1Acn::Types::SequenceOf *type);
+    QString choiceAssignmentFromCToPromela(const QString &cTypeName, const Asn1Acn::Types::Choice *type);
     QString octetStringAssignmentFromCToPromela(const Asn1Acn::Types::OctetString *type);
     QString ia5StringAssignmentFromCToPromela(const Asn1Acn::Types::IA5String *type);
 

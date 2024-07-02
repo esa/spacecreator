@@ -29,14 +29,16 @@ namespace promela::translator {
 class SequenceComponentVisitor final : public Asn1Acn::SequenceComponentVisitor
 {
 public:
-    enum class Direction
+    enum class Operation
     {
         FROM_PROMELA_TO_C,
         FROM_C_TO_PROMELA,
+        LIST_PROMELA_FIELDS,
     };
 
 public:
-    SequenceComponentVisitor(Direction direction, const Asn1Acn::Asn1Model *asn1Model, QString target, QString source);
+    SequenceComponentVisitor(Operation operation, const Asn1Acn::Asn1Model *asn1Model, QString target, QString source,
+            QString sequenceName);
 
     void visit(const Asn1Acn::AsnSequenceComponent &component) override;
     void visit(const Asn1Acn::AcnSequenceComponent &component) override;
@@ -48,10 +50,11 @@ public:
     QList<promela::model::VariableRef> takeListOfFields();
 
 private:
-    const Direction m_direction;
+    const Operation m_operation;
     const Asn1Acn::Asn1Model *m_asn1Model;
     const QString m_target;
     const QString m_source;
+    const QString m_sequenceName;
     bool m_componentVisited;
     QString m_componentName;
     bool m_isOptional;

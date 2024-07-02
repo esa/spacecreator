@@ -45,6 +45,8 @@
 #include <conversion/common/escaper/escaper.h>
 #include <conversion/common/translation/exceptions.h>
 #include <iostream>
+#include <promela/PromelaCommon/constants.h>
+#include <promela/PromelaCommon/namehelper.h>
 #include <promela/PromelaModel/proctypeelement.h>
 
 using Asn1Acn::BitStringValue;
@@ -68,6 +70,8 @@ using Asn1Acn::Types::SequenceOf;
 using Asn1Acn::Types::UserdefinedType;
 using conversion::Escaper;
 using conversion::translator::TranslationException;
+using promela::common::PromelaConstants;
+using promela::common::PromelaNameHelper;
 using promela::model::ArrayType;
 using promela::model::AssertCall;
 using promela::model::Assignment;
@@ -450,8 +454,8 @@ void Asn1ItemTypeVisitor::visit(const SequenceOf &type)
     const QString utypeName = constructTypeName(m_name);
     Utype utype = Utype(utypeName);
 
-    Asn1ItemTypeVisitor itemTypeVisitor(
-            m_promelaModel, utypeName, "elem", true, m_enhancedSpinSupport, m_nestedIndexCounter + 1);
+    Asn1ItemTypeVisitor itemTypeVisitor(m_promelaModel, utypeName, PromelaConstants::sequenceOfElementTypeNameSuffix,
+            true, m_enhancedSpinSupport, m_nestedIndexCounter + 1);
     type.itemsType()->accept(itemTypeVisitor);
     DataType dataType = itemTypeVisitor.getResultDataType().value();
 
@@ -590,7 +594,7 @@ void Asn1ItemTypeVisitor::visit(const UserdefinedType &type)
 QString Asn1ItemTypeVisitor::constructTypeName(QString name)
 {
     if (m_baseTypeName.has_value()) {
-        return QString("%1__%2").arg(m_baseTypeName.value()).arg(Escaper::escapePromelaName(name));
+        return PromelaNameHelper::createChildTypeName(m_baseTypeName.value(), Escaper::escapePromelaName(name));
     }
     return Escaper::escapePromelaName(std::move(name));
 }
@@ -873,7 +877,8 @@ void Asn1ItemTypeVisitor::addSizeCheckInline(
 
 QString Asn1ItemTypeVisitor::getAssignValueInlineNameForNestedType(const QString &utype, const QString &field) const
 {
-    return Escaper::escapePromelaName(utype) + "__" + Escaper::escapePromelaName(field) + m_assignValueInlineSuffix;
+    return PromelaNameHelper::createChildTypeName(Escaper::escapePromelaName(utype), Escaper::escapePromelaName(field))
+            + m_assignValueInlineSuffix;
 }
 
 QString Asn1ItemTypeVisitor::buildCheckArgumentName(const QString &typeName, const QString &postfix) const
@@ -899,7 +904,9 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfDataLoop(const QString &utypeName, 
     inlineArguments.append(dst);
     inlineArguments.append(src);
 
-    const auto inlineName = QString("%1__elem%2").arg(utypeName).arg(m_assignValueInlineSuffix);
+    const auto inlineName =
+            PromelaNameHelper::createChildTypeName(utypeName, PromelaConstants::sequenceOfElementTypeNameSuffix)
+            + m_assignValueInlineSuffix;
     auto inlineCall = InlineCall(inlineName, inlineArguments);
     loopSequence->appendElement(std::move(inlineCall));
 
@@ -936,7 +943,9 @@ ForLoop Asn1ItemTypeVisitor::createSequenceOfInitLoop(const QString &utypeName, 
     QList<InlineCall::Argument> inlineArguments;
     inlineArguments.append(dst);
 
-    const auto inlineName = QString("%1__elem%2").arg(utypeName).arg(m_initializeValueInlineSuffix);
+    const auto inlineName =
+            PromelaNameHelper::createChildTypeName(utypeName, PromelaConstants::sequenceOfElementTypeNameSuffix)
+            + m_initializeValueInlineSuffix;
     auto inlineCall = InlineCall(inlineName, inlineArguments);
     loopSequence->appendElement(std::move(inlineCall));
 

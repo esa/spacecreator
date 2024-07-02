@@ -56,6 +56,7 @@ target_link_libraries(Asn1ToPromelaTranslator
                       asn1library
                       ivcore
                       Promela::Model
+					  Promela::Common
   PRIVATE             CommonProjectWarnings)
 
 add_format_target(Asn1ToPromelaTranslator)
